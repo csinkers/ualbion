@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "exporter": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

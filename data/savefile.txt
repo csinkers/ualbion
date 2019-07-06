@@ -1,0 +1,75 @@
+:set ts=16
+
+Offset	TomHex	TomDec		??	RainerHex
+00	AC	172	CharSize		Rainer
+01	03	12	CharSize2		
+09	05	5	Level	09	04
+0A	01	1		0A	FF
+0C	03	3		0C	03
+0D	01	1		0D	02
+0E	01	1		0E	02
+0F	01	1		0F	02
+12	02	2		12	02
+15	01	1		15	01
+16	D5	213		16	D6
+17	03	3		17	03
+1A	0F	15	Training Points	1A	08
+1C	78	120	Money	1C	00
+1E	36	54	Eats	1E	05
+2E	2A	42	Str	2E	1C
+30	46	70	StrMax	30	46
+36	32	50	Int	36	4C
+38	5A	90	IntMax	38	5A
+3E	28	40	Dex	3E	50
+40	5A	90	DexMax	40	5A
+46	14	20	Spd	46	0B
+48	32	50	SpdMax	48	32
+4E	20	32	Sta	4E	23
+50	41	65	StaMax	50	41
+56	0A	10	Luc	56	0F
+58	19	25	LucMax	58	19
+5E	00	0	M-R	5E	0A
+60	14	20	M-Rmax	60	14
+					
+					
+6E	1C	28	Age	6E	2D
+70	50	80	?	70	50
+7E	23	35	Clo	7E	19
+80	50	80	CloMax	80	28
+86	19	25	Lon	86	14
+88	46	70	LonMax	88	28
+90	08	8	CriMax	90	05
+96	0F	15	L-P	96	19
+98	50	80	L-Pmax	98	50
+CE	0C	12	Life	CE	0C
+D0	14	20	LifeMax	D0	0C
+DC	19	25		DC	02
+E0	0C	12		E0	FB
+				E1	FF
+E6	0A	10		E6	19
+E8	04	4		E8	03
+EE	03	3		EE	02
+F2	90	144	Exp	F2	5E
+F3	01	1	Exp2	F3	01
+112	82	130		112	82
+113	0A	10		113	0A
+116	54	T	NameStart	116	52
+117	6F	o			
+118	6D	m			
+					
+					
+					
+302	01	1	Inv Start		
+306	7A				
+307	01				
+314	01				
+318	49				
+320	01		Slot 1 Number		
+321			?Slot 1 Number 2		
+322			Charges		
+323			Slot 1 Flags	1 = Ident	
+324	23		Slot 1 Type		
+325	01		Slot 1 Type 2		
+					
+326	01		Slot 2 Number		
+

@@ -4,7 +4,7 @@ open System
 open System.IO
 open System.Text
 open FSharp.Json
-let xldDir = @"C:\Games\albion\cd\xld"
+let xldDir = @"albion_sr\cd\xld"
 let mainOutputDir = @"C:\Depot\Main\ualbion\exported"
 let xmiToMidiPath = @"C:\Depot\Main\ualbion\exporter\Debug\XmiToMidi.exe"
 let bytesTo850String (bytes:byte array) = Encoding.GetEncoding(850).GetString(bytes).Replace("×", "ß").TrimEnd((char)0)

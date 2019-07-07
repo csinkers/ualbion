@@ -1,0 +1,7 @@
+.load ghidrasym
+!addsym SR_Main c:\tmp\sr.xml
+bp SR_Main!albion_main
+g
+bp KERNELBASE!CreateFileA ".printf \"%ma\\n\", poi(esp+4);kv;g"
+.logopen c:\tmp\srtrace
+g

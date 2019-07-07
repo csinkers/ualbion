@@ -1,7 +1,9 @@
 .vs/
+*.rep/
 Debug/
 bin/
 obj/
 albion_sr/
 packages/
 exported/
+*.gpr

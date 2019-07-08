@@ -37,6 +37,7 @@
             this.scrollBar = new System.Windows.Forms.VScrollBar();
             this.trackOffset = new System.Windows.Forms.TrackBar();
             this.numOffset = new System.Windows.Forms.NumericUpDown();
+            this.listPalettes = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.trackWidth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numWidth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.canvas)).BeginInit();
@@ -48,9 +49,10 @@
             // 
             this.fileTree.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.fileTree.Location = new System.Drawing.Point(3, 3);
+            this.fileTree.Location = new System.Drawing.Point(181, 13);
+            this.fileTree.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.fileTree.Name = "fileTree";
-            this.fileTree.Size = new System.Drawing.Size(375, 881);
+            this.fileTree.Size = new System.Drawing.Size(236, 740);
             this.fileTree.TabIndex = 0;
             this.fileTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.FileTree_AfterSelect);
             // 
@@ -58,19 +60,22 @@
             // 
             this.trackWidth.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.trackWidth.Location = new System.Drawing.Point(384, 816);
+            this.trackWidth.Location = new System.Drawing.Point(421, 650);
+            this.trackWidth.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.trackWidth.Maximum = 1024;
             this.trackWidth.Minimum = 1;
             this.trackWidth.Name = "trackWidth";
-            this.trackWidth.Size = new System.Drawing.Size(590, 90);
+            this.trackWidth.Size = new System.Drawing.Size(520, 56);
             this.trackWidth.TabIndex = 1;
             this.trackWidth.Value = 32;
             this.trackWidth.ValueChanged += new System.EventHandler(this.TrackWidth_ValueChanged);
+            this.trackWidth.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TrackWidth_KeyDown);
             // 
             // numWidth
             // 
             this.numWidth.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.numWidth.Location = new System.Drawing.Point(984, 836);
+            this.numWidth.Location = new System.Drawing.Point(945, 650);
+            this.numWidth.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.numWidth.Maximum = new decimal(new int[] {
             1024,
             0,
@@ -82,7 +87,7 @@
             0,
             0});
             this.numWidth.Name = "numWidth";
-            this.numWidth.Size = new System.Drawing.Size(120, 31);
+            this.numWidth.Size = new System.Drawing.Size(75, 22);
             this.numWidth.TabIndex = 2;
             this.numWidth.Value = new decimal(new int[] {
             32,
@@ -96,18 +101,20 @@
             // 
             this.textName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textName.Location = new System.Drawing.Point(384, 683);
+            this.textName.Location = new System.Drawing.Point(421, 564);
+            this.textName.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.textName.Name = "textName";
-            this.textName.Size = new System.Drawing.Size(693, 31);
+            this.textName.Size = new System.Drawing.Size(599, 22);
             this.textName.TabIndex = 3;
             this.textName.TextChanged += new System.EventHandler(this.TextName_TextChanged);
             // 
             // btnSave
             // 
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.Location = new System.Drawing.Point(1131, 816);
+            this.btnSave.Location = new System.Drawing.Point(876, 715);
+            this.btnSave.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(230, 68);
+            this.btnSave.Size = new System.Drawing.Size(144, 42);
             this.btnSave.TabIndex = 4;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
@@ -118,9 +125,10 @@
             this.canvas.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.canvas.Location = new System.Drawing.Point(384, 3);
+            this.canvas.Location = new System.Drawing.Point(421, 13);
+            this.canvas.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.canvas.Name = "canvas";
-            this.canvas.Size = new System.Drawing.Size(901, 674);
+            this.canvas.Size = new System.Drawing.Size(563, 547);
             this.canvas.TabIndex = 5;
             this.canvas.TabStop = false;
             // 
@@ -128,41 +136,56 @@
             // 
             this.scrollBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.scrollBar.Location = new System.Drawing.Point(1302, 3);
+            this.scrollBar.Location = new System.Drawing.Point(986, 2);
             this.scrollBar.Name = "scrollBar";
-            this.scrollBar.Size = new System.Drawing.Size(34, 674);
+            this.scrollBar.Size = new System.Drawing.Size(34, 558);
             this.scrollBar.TabIndex = 6;
             // 
             // trackOffset
             // 
             this.trackOffset.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.trackOffset.Location = new System.Drawing.Point(384, 720);
+            this.trackOffset.Location = new System.Drawing.Point(421, 590);
+            this.trackOffset.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.trackOffset.Maximum = 1024;
             this.trackOffset.Name = "trackOffset";
-            this.trackOffset.Size = new System.Drawing.Size(590, 90);
+            this.trackOffset.Size = new System.Drawing.Size(520, 56);
             this.trackOffset.TabIndex = 7;
             this.trackOffset.ValueChanged += new System.EventHandler(this.TrackOffset_ValueChanged);
             // 
             // numOffset
             // 
             this.numOffset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.numOffset.Location = new System.Drawing.Point(984, 749);
+            this.numOffset.Location = new System.Drawing.Point(945, 590);
+            this.numOffset.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.numOffset.Maximum = new decimal(new int[] {
             1024,
             0,
             0,
             0});
             this.numOffset.Name = "numOffset";
-            this.numOffset.Size = new System.Drawing.Size(120, 31);
+            this.numOffset.Size = new System.Drawing.Size(75, 22);
             this.numOffset.TabIndex = 8;
             this.numOffset.ValueChanged += new System.EventHandler(this.NumOffset_ValueChanged);
             // 
+            // listPalettes
+            // 
+            this.listPalettes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.listPalettes.FormattingEnabled = true;
+            this.listPalettes.ItemHeight = 16;
+            this.listPalettes.Location = new System.Drawing.Point(13, 13);
+            this.listPalettes.Name = "listPalettes";
+            this.listPalettes.Size = new System.Drawing.Size(163, 740);
+            this.listPalettes.TabIndex = 11;
+            this.listPalettes.SelectedIndexChanged += new System.EventHandler(this.ListPalettes_SelectedIndexChanged);
+            // 
             // MainFrm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(192F, 192F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(1650, 1229);
+            this.ClientSize = new System.Drawing.Size(1031, 768);
+            this.Controls.Add(this.listPalettes);
             this.Controls.Add(this.numOffset);
             this.Controls.Add(this.trackOffset);
             this.Controls.Add(this.scrollBar);
@@ -172,6 +195,7 @@
             this.Controls.Add(this.numWidth);
             this.Controls.Add(this.trackWidth);
             this.Controls.Add(this.fileTree);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "MainFrm";
             this.Text = "Image Reverser";
             this.Load += new System.EventHandler(this.MainFrm_Load);
@@ -196,6 +220,7 @@
         private System.Windows.Forms.VScrollBar scrollBar;
         private System.Windows.Forms.TrackBar trackOffset;
         private System.Windows.Forms.NumericUpDown numOffset;
+        private System.Windows.Forms.ListBox listPalettes;
     }
 }
 

@@ -12,6 +12,7 @@ let runExe path arguments onComplete =
         si.RedirectStandardError <- true
         si.FileName <- path
         si.Arguments <- arguments
+        si.UseShellExecute <- false
 
         use p = new Process()
         p.StartInfo <- si

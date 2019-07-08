@@ -18,6 +18,8 @@ namespace UAlbion.ImageReverser
             switch (item.Value<string>("Type"))
             {
                 case "texture": return item.ToObject<Config.Texture>();
+                case "interlaced_bitmap": return item.ToObject<Config.Texture>();
+                case "palette": return item.ToObject<Config.Palette>();
                 case "unknown": return item.ToObject<Config.ConfigObject>();
                 default: throw new NotImplementedException();
             }
@@ -26,12 +28,14 @@ namespace UAlbion.ImageReverser
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var o = JObject.FromObject(value);
+            /*
             switch (value)
             {
                 case Config.Texture _: o.AddFirst(new JProperty("Type", new JValue("texture"))); break;
                 case Config.ConfigObject _: o.AddFirst(new JProperty("Type", new JValue("unknown"))); break;
                 default: throw new NotImplementedException();
             }
+            */
             o.WriteTo(writer);
         }
     }
@@ -41,6 +45,7 @@ namespace UAlbion.ImageReverser
         public class ConfigObject
         {
             public string Name { get; set; }
+            public string Type { get; set; }
         }
 
         public class Texture : ConfigObject
@@ -48,6 +53,8 @@ namespace UAlbion.ImageReverser
             public int Width { get; set; }
             public int Offset { get; set; }
         }
+
+        public class Palette : ConfigObject { }
 
         public class Xld
         {

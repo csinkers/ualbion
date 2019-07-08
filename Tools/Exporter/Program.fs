@@ -2,11 +2,14 @@
 
 open System
 open System.IO
+open System.Reflection
 open System.Text
 open FSharp.Json
-let xldDir = @"albion_sr\cd\xld"
-let mainOutputDir = @"C:\Depot\Main\ualbion\exported"
-let xmiToMidiPath = @"C:\Depot\Main\ualbion\exporter\Debug\XmiToMidi.exe"
+
+let baseDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) |> (fun x -> Directory.GetParent(x).Parent.Parent.Parent.FullName)
+let xldDir = Path.Combine(baseDir, @"albion_sr\CD\XLDLIBS")
+let mainOutputDir = Path.Combine(baseDir, @"exported")
+let xmiToMidiPath = Path.Combine(baseDir, @"Tools\Debug\XmiToMidi.exe")
 let bytesTo850String (bytes:byte array) = Encoding.GetEncoding(850).GetString(bytes).Replace("×", "ß").TrimEnd((char)0)
 
 type OText =
@@ -274,111 +277,111 @@ Total size: 0x1ae3b (110,139 bytes)
 let files =
     [
 //    (*
-        @"C:\Games\albion\cd\XLD\3DBCKGR0.XLD", XldFile.graphics  // Large background images for 3D
-        @"C:\Games\albion\cd\XLD\3DFLOOR0.XLD", XldFile.graphics  // Floor textures for 3D
-        @"C:\Games\albion\cd\XLD\3DFLOOR1.XLD", XldFile.graphics  // Floor textures for 3D
-        @"C:\Games\albion\cd\XLD\3DFLOOR2.XLD", XldFile.graphics  // Floor textures for 3D
-        @"C:\Games\albion\cd\XLD\3DOBJEC0.XLD", XldFile.graphics  // Sprites for 3D
-        @"C:\Games\albion\cd\XLD\3DOBJEC1.XLD", XldFile.graphics  // Sprites for 3D
-        @"C:\Games\albion\cd\XLD\3DOBJEC2.XLD", XldFile.graphics  // Sprites for 3D
-        @"C:\Games\albion\cd\XLD\3DOBJEC3.XLD", XldFile.graphics  // Sprites for 3D
-        @"C:\Games\albion\cd\XLD\3DOVERL0.XLD", XldFile.graphics  // Misc sprites for 3D
-        @"C:\Games\albion\cd\XLD\3DOVERL1.XLD", XldFile.graphics  // Misc sprites for 3D
-        @"C:\Games\albion\cd\XLD\3DOVERL2.XLD", XldFile.graphics  // Misc sprites for 3D
-        @"C:\Games\albion\cd\XLD\3DWALLS0.XLD", XldFile.graphics  // Wall textures for 3D
-        @"C:\Games\albion\cd\XLD\3DWALLS1.XLD", XldFile.graphics  // Wall textures for 3D
-        @"C:\Games\albion\cd\XLD\AUTOGFX0.XLD", XldFile.raw "bin" // Tiny sprite maps?
-        @"C:\Games\albion\cd\XLD\BLKLIST0.XLD", XldFile.raw "bin" // ???
-        @"C:\Games\albion\cd\XLD\COMBACK0.XLD", XldFile.graphics  // Combat backgrounds
-        @"C:\Games\albion\cd\XLD\COMGFX0.XLD", XldFile.graphics   // Combat sprites / particles etc
-        @"C:\Games\albion\cd\XLD\EVNTSET0.XLD", XldFile.raw "bin" // ???
-        @"C:\Games\albion\cd\XLD\EVNTSET1.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\EVNTSET2.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\EVNTSET3.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\EVNTSET9.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\FBODPIX0.XLD", XldFile.graphics  // Playable character pictures
-        @"C:\Games\albion\cd\XLD\FONTS0.XLD", XldFile.raw "bin"   // Fonts, unknown format
-        @"C:\Games\albion\cd\XLD\ICONDAT0.XLD", XldFile.graphics  // Sprite-maps?
-        @"C:\Games\albion\cd\XLD\ICONGFX0.XLD", XldFile.graphics  // Sprite-maps?
-        // @"C:\Games\albion\cd\XLD\ITEMGFX", NONXLD              // Just an array of 16x16 sprites appended together
-        //@"C:\Games\albion\cd\XLD\ITEMLIST.DAT", NONXLD            // Probably contains weapon damage etc stats
-        //@"C:\Games\albion\cd\XLD\ITEMNAME.DAT", NONXLD            // Item names, char[20][], ordered in groups of DE, EN, FR (462 items)
-        @"C:\Games\albion\cd\XLD\LABDATA0.XLD", XldFile.raw "bin" // Not graphics, but definitely orderly
-        @"C:\Games\albion\cd\XLD\LABDATA1.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\LABDATA2.XLD", XldFile.raw "bin"
+        @"3DBCKGR0.XLD", XldFile.graphics  // Large background images for 3D
+        @"3DFLOOR0.XLD", XldFile.graphics  // Floor textures for 3D
+        @"3DFLOOR1.XLD", XldFile.graphics  // Floor textures for 3D
+        @"3DFLOOR2.XLD", XldFile.graphics  // Floor textures for 3D
+        @"3DOBJEC0.XLD", XldFile.graphics  // Sprites for 3D
+        @"3DOBJEC1.XLD", XldFile.graphics  // Sprites for 3D
+        @"3DOBJEC2.XLD", XldFile.graphics  // Sprites for 3D
+        @"3DOBJEC3.XLD", XldFile.graphics  // Sprites for 3D
+        @"3DOVERL0.XLD", XldFile.graphics  // Misc sprites for 3D
+        @"3DOVERL1.XLD", XldFile.graphics  // Misc sprites for 3D
+        @"3DOVERL2.XLD", XldFile.graphics  // Misc sprites for 3D
+        @"3DWALLS0.XLD", XldFile.graphics  // Wall textures for 3D
+        @"3DWALLS1.XLD", XldFile.graphics  // Wall textures for 3D
+        @"AUTOGFX0.XLD", XldFile.raw "bin" // Tiny sprite maps?
+        @"BLKLIST0.XLD", XldFile.raw "bin" // ???
+        @"COMBACK0.XLD", XldFile.graphics  // Combat backgrounds
+        @"COMGFX0.XLD", XldFile.graphics   // Combat sprites / particles etc
+        @"EVNTSET0.XLD", XldFile.raw "bin" // ???
+        @"EVNTSET1.XLD", XldFile.raw "bin"
+        @"EVNTSET2.XLD", XldFile.raw "bin"
+        @"EVNTSET3.XLD", XldFile.raw "bin"
+        @"EVNTSET9.XLD", XldFile.raw "bin"
+        @"FBODPIX0.XLD", XldFile.graphics  // Playable character pictures
+        @"FONTS0.XLD", XldFile.raw "bin"   // Fonts, unknown format
+        @"ICONDAT0.XLD", XldFile.graphics  // Sprite-maps?
+        @"ICONGFX0.XLD", XldFile.graphics  // Sprite-maps?
+        // @"ITEMGFX", NONXLD              // Just an array of 16x16 sprites appended together
+        //@"ITEMLIST.DAT", NONXLD            // Probably contains weapon damage etc stats
+        //@"ITEMNAME.DAT", NONXLD            // Item names, char[20][], ordered in groups of DE, EN, FR (462 items)
+        @"LABDATA0.XLD", XldFile.raw "bin" // Not graphics, but definitely orderly
+        @"LABDATA1.XLD", XldFile.raw "bin"
+        @"LABDATA2.XLD", XldFile.raw "bin"
         (*
-        @"C:\Games\albion\cd\XLD\MAPDATA1.XLD", XldFile.map       // 2D map data
-        @"C:\Games\albion\cd\XLD\MAPDATA2.XLD", XldFile.map       // 2D map data
-        @"C:\Games\albion\cd\XLD\MAPDATA3.XLD", XldFile.map       // 2D map data
+        @"MAPDATA1.XLD", XldFile.map       // 2D map data
+        @"MAPDATA2.XLD", XldFile.map       // 2D map data
+        @"MAPDATA3.XLD", XldFile.map       // 2D map data
         //*)
-        @"C:\Games\albion\cd\XLD\MONCHAR0.XLD", XldFile.graphics  // Monster combat spritemaps (heterogeneous)
-        @"C:\Games\albion\cd\XLD\MONGFX0.XLD", XldFile.raw "bin"  // Tiny files
-        @"C:\Games\albion\cd\XLD\MONGRP0.XLD", XldFile.raw "bin"  // Tiny files
-        @"C:\Games\albion\cd\XLD\MONGRP1.XLD", XldFile.raw "bin"  // Tiny files
-        @"C:\Games\albion\cd\XLD\MONGRP2.XLD", XldFile.raw "bin"  // Tiny files
-        @"C:\Games\albion\cd\XLD\NPCGR0.XLD", XldFile.graphics    // 2D NPC graphics. Spritemaps, 32 wide. (GR=Groß)
-        @"C:\Games\albion\cd\XLD\NPCGR1.XLD", XldFile.graphics    // 2D NPC graphics
-        @"C:\Games\albion\cd\XLD\NPCKL0.XLD", XldFile.graphics    // 2D NPCs on the world map (KL=Klein)
-        @"C:\Games\albion\cd\XLD\PALETTE.000", XldFile.raw "bin"  // ?? 192 bytes
-        @"C:\Games\albion\cd\XLD\PALETTE0.XLD", XldFile.raw "bin" // Palette data, 576 bytes/palette. 64 byte header + 256*16bit colour
-        @"C:\Games\albion\cd\XLD\PARTGR0.XLD", XldFile.raw "bin"  // 2D Player characters
-        @"C:\Games\albion\cd\XLD\PARTKL0.XLD", XldFile.raw "bin"  // 2D Player characters on the world map
-        @"C:\Games\albion\cd\XLD\PICTURE0.XLD", XldFile.graphics  // Heterogeneous spritemaps?
-        @"C:\Games\albion\cd\XLD\SAMPLES0.XLD", XldFile.samples   // Raw audio samples
-        @"C:\Games\albion\cd\XLD\SAMPLES1.XLD", XldFile.samples   // Raw audio samples
-        @"C:\Games\albion\cd\XLD\SAMPLES2.XLD", XldFile.samples   // Raw audio samples
-        @"C:\Games\albion\cd\XLD\SCRIPT0.XLD", XldFile.raw "txt"  // Plain text scripts
-        @"C:\Games\albion\cd\XLD\SCRIPT2.XLD", XldFile.raw "txt"  // Plain text scripts
-        @"C:\Games\albion\cd\XLD\SLAB", XldFile.raw "bin"         // Some sort of bitfield, everything is either 0xc_ or 0xf_. 86400 bytes (2^7, 3^3, 5^2)
-        @"C:\Games\albion\cd\XLD\SMLPORT0.XLD", XldFile.graphics  // Small portraits, mostly 34 wide.
-        @"C:\Games\albion\cd\XLD\SMLPORT1.XLD", XldFile.graphics  // Small portraits, mostly 34 wide.
-        @"C:\Games\albion\cd\XLD\SONGS0.XLD", XldFile.xmi         // XMI music files, can be converted to MIDI (imperfectly)
-        @"C:\Games\albion\cd\XLD\SPELLDAT.DAT", XldFile.raw "bin" // ???
-        @"C:\Games\albion\cd\XLD\TACTICO0.XLD", XldFile.graphics  // Battle sprites, all 32 wide.
-        @"C:\Games\albion\cd\XLD\TRANSTB0.XLD", XldFile.raw "bin" // ?? All files are 196608 bytes, some periodicity
-        @"C:\Games\albion\cd\XLD\WAVELIB0.XLD", XldFile.wavelib   // Sound effects
-        @"C:\Games\albion\cd\XLD\ENGLISH\EVNTTXT0.XLD", XldFile.strings // Translated text
-        @"C:\Games\albion\cd\XLD\ENGLISH\EVNTTXT1.XLD", XldFile.strings // Translated text
-        @"C:\Games\albion\cd\XLD\ENGLISH\EVNTTXT2.XLD", XldFile.strings // Translated text
-        @"C:\Games\albion\cd\XLD\ENGLISH\EVNTTXT3.XLD", XldFile.strings // Translated text
-        @"C:\Games\albion\cd\XLD\ENGLISH\EVNTTXT9.XLD", XldFile.strings // Translated text
-        @"C:\Games\albion\cd\XLD\ENGLISH\FLICS0.XLD", XldFile.raw "bin" // Probably SMK video
-        @"C:\Games\albion\cd\XLD\ENGLISH\MAPTEXT1.XLD", XldFile.strings // Translated text
-        @"C:\Games\albion\cd\XLD\ENGLISH\MAPTEXT2.XLD", XldFile.strings // Translated text
-        @"C:\Games\albion\cd\XLD\ENGLISH\MAPTEXT3.XLD", XldFile.strings // Translated text
-        @"C:\Games\albion\cd\XLD\ENGLISH\SYSTEXTS", XldFile.raw "txt"   // Plain text [%04d:format string]
-        @"C:\Games\albion\cd\XLD\ENGLISH\WORDLIS0.XLD", XldFile.chunkedStrings 21 // Topic words in zero padded chunks of 21 bytes
+        @"MONCHAR0.XLD", XldFile.graphics  // Monster combat spritemaps (heterogeneous)
+        @"MONGFX0.XLD", XldFile.raw "bin"  // Tiny files
+        @"MONGRP0.XLD", XldFile.raw "bin"  // Tiny files
+        @"MONGRP1.XLD", XldFile.raw "bin"  // Tiny files
+        @"MONGRP2.XLD", XldFile.raw "bin"  // Tiny files
+        @"NPCGR0.XLD", XldFile.graphics    // 2D NPC graphics. Spritemaps, 32 wide. (GR=Groß)
+        @"NPCGR1.XLD", XldFile.graphics    // 2D NPC graphics
+        @"NPCKL0.XLD", XldFile.graphics    // 2D NPCs on the world map (KL=Klein)
+        @"PALETTE.000", XldFile.raw "bin"  // ?? 192 bytes
+        @"PALETTE0.XLD", XldFile.raw "bin" // Palette data, 576 bytes/palette. 64 byte header + 256*16bit colour
+        @"PARTGR0.XLD", XldFile.raw "bin"  // 2D Player characters
+        @"PARTKL0.XLD", XldFile.raw "bin"  // 2D Player characters on the world map
+        @"PICTURE0.XLD", XldFile.graphics  // Heterogeneous spritemaps?
+        @"SAMPLES0.XLD", XldFile.samples   // Raw audio samples
+        @"SAMPLES1.XLD", XldFile.samples   // Raw audio samples
+        @"SAMPLES2.XLD", XldFile.samples   // Raw audio samples
+        @"SCRIPT0.XLD", XldFile.raw "txt"  // Plain text scripts
+        @"SCRIPT2.XLD", XldFile.raw "txt"  // Plain text scripts
+        @"SLAB", XldFile.raw "bin"         // Some sort of bitfield, everything is either 0xc_ or 0xf_. 86400 bytes (2^7, 3^3, 5^2)
+        @"SMLPORT0.XLD", XldFile.graphics  // Small portraits, mostly 34 wide.
+        @"SMLPORT1.XLD", XldFile.graphics  // Small portraits, mostly 34 wide.
+        @"SONGS0.XLD", XldFile.xmi         // XMI music files, can be converted to MIDI (imperfectly)
+        @"SPELLDAT.DAT", XldFile.raw "bin" // ???
+        @"TACTICO0.XLD", XldFile.graphics  // Battle sprites, all 32 wide.
+        @"TRANSTB0.XLD", XldFile.raw "bin" // ?? All files are 196608 bytes, some periodicity
+        @"WAVELIB0.XLD", XldFile.wavelib   // Sound effects
+        @"ENGLISH\EVNTTXT0.XLD", XldFile.strings // Translated text
+        @"ENGLISH\EVNTTXT1.XLD", XldFile.strings // Translated text
+        @"ENGLISH\EVNTTXT2.XLD", XldFile.strings // Translated text
+        @"ENGLISH\EVNTTXT3.XLD", XldFile.strings // Translated text
+        @"ENGLISH\EVNTTXT9.XLD", XldFile.strings // Translated text
+        @"ENGLISH\FLICS0.XLD", XldFile.raw "bin" // Probably SMK video
+        @"ENGLISH\MAPTEXT1.XLD", XldFile.strings // Translated text
+        @"ENGLISH\MAPTEXT2.XLD", XldFile.strings // Translated text
+        @"ENGLISH\MAPTEXT3.XLD", XldFile.strings // Translated text
+        @"ENGLISH\SYSTEXTS", XldFile.raw "txt"   // Plain text [%04d:format string]
+        @"ENGLISH\WORDLIS0.XLD", XldFile.chunkedStrings 21 // Topic words in zero padded chunks of 21 bytes
 
-        @"C:\Games\albion\cd\XLD\GERMAN\EVNTTXT0.XLD", XldFile.strings  // Translated text
-        @"C:\Games\albion\cd\XLD\GERMAN\EVNTTXT1.XLD", XldFile.strings  // Translated text
-        @"C:\Games\albion\cd\XLD\GERMAN\EVNTTXT2.XLD", XldFile.strings  // Translated text
-        @"C:\Games\albion\cd\XLD\GERMAN\EVNTTXT3.XLD", XldFile.strings  // Translated text
-        @"C:\Games\albion\cd\XLD\GERMAN\EVNTTXT9.XLD", XldFile.strings  // Translated text
-        @"C:\Games\albion\cd\XLD\GERMAN\FLICS0.XLD", XldFile.raw "bin" // Probably SMK video
-        @"C:\Games\albion\cd\XLD\GERMAN\MAPTEXT1.XLD", XldFile.strings  // Translated text
-        @"C:\Games\albion\cd\XLD\GERMAN\MAPTEXT2.XLD", XldFile.strings  // Translated text
-        @"C:\Games\albion\cd\XLD\GERMAN\MAPTEXT3.XLD", XldFile.strings  // Translated text
-        @"C:\Games\albion\cd\XLD\GERMAN\SYSTEXTS", XldFile.raw "txt"   // Plain text [%04d:format string]
-        @"C:\Games\albion\cd\XLD\GERMAN\WORDLIS0.XLD", XldFile.chunkedStrings 21 // Topic words in zero padded chunks of 21 bytes
+        @"GERMAN\EVNTTXT0.XLD", XldFile.strings  // Translated text
+        @"GERMAN\EVNTTXT1.XLD", XldFile.strings  // Translated text
+        @"GERMAN\EVNTTXT2.XLD", XldFile.strings  // Translated text
+        @"GERMAN\EVNTTXT3.XLD", XldFile.strings  // Translated text
+        @"GERMAN\EVNTTXT9.XLD", XldFile.strings  // Translated text
+        @"GERMAN\FLICS0.XLD", XldFile.raw "bin" // Probably SMK video
+        @"GERMAN\MAPTEXT1.XLD", XldFile.strings  // Translated text
+        @"GERMAN\MAPTEXT2.XLD", XldFile.strings  // Translated text
+        @"GERMAN\MAPTEXT3.XLD", XldFile.strings  // Translated text
+        @"GERMAN\SYSTEXTS", XldFile.raw "txt"   // Plain text [%04d:format string]
+        @"GERMAN\WORDLIS0.XLD", XldFile.chunkedStrings 21 // Topic words in zero padded chunks of 21 bytes
 
         // Map metadata?
-        @"C:\Games\albion\cd\XLD\INITIAL\AUTOMAP1.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\INITIAL\AUTOMAP2.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\INITIAL\AUTOMAP3.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\INITIAL\CHESTDT0.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\INITIAL\CHESTDT1.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\INITIAL\CHESTDT2.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\INITIAL\CHESTDT5.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\INITIAL\MERCHDT0.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\INITIAL\MERCHDT1.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\INITIAL\MERCHDT2.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\INITIAL\NPCCHAR0.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\INITIAL\NPCCHAR1.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\INITIAL\NPCCHAR2.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\INITIAL\PRTCHAR0.XLD", XldFile.raw "bin"
-        @"C:\Games\albion\cd\XLD\INITIAL\PRTCHAR1.XLD", XldFile.raw "bin"
+        @"INITIAL\AUTOMAP1.XLD", XldFile.raw "bin"
+        @"INITIAL\AUTOMAP2.XLD", XldFile.raw "bin"
+        @"INITIAL\AUTOMAP3.XLD", XldFile.raw "bin"
+        @"INITIAL\CHESTDT0.XLD", XldFile.raw "bin"
+        @"INITIAL\CHESTDT1.XLD", XldFile.raw "bin"
+        @"INITIAL\CHESTDT2.XLD", XldFile.raw "bin"
+        @"INITIAL\CHESTDT5.XLD", XldFile.raw "bin"
+        @"INITIAL\MERCHDT0.XLD", XldFile.raw "bin"
+        @"INITIAL\MERCHDT1.XLD", XldFile.raw "bin"
+        @"INITIAL\MERCHDT2.XLD", XldFile.raw "bin"
+        @"INITIAL\NPCCHAR0.XLD", XldFile.raw "bin"
+        @"INITIAL\NPCCHAR1.XLD", XldFile.raw "bin"
+        @"INITIAL\NPCCHAR2.XLD", XldFile.raw "bin"
+        @"INITIAL\PRTCHAR0.XLD", XldFile.raw "bin"
+        @"INITIAL\PRTCHAR1.XLD", XldFile.raw "bin"
         //*)
-        @"C:\Games\albion\cd\XLD\INITIAL\PRTCHAR2.XLD", XldFile.raw "bin"
+        @"INITIAL\PRTCHAR2.XLD", XldFile.raw "bin"
     ]
 
 [<EntryPoint>]
@@ -387,8 +390,7 @@ let main argv =
 
     files
     |> Seq.iter (fun (path, exportFunc) -> 
-        let relative = path.Substring(xldDir.Length+1)
-        XldFile.export path exportFunc (Path.Combine(mainOutputDir, relative))
+        XldFile.export (Path.Combine(xldDir, path)) exportFunc (Path.Combine(mainOutputDir, path))
     )
     0
 
@@ -477,3 +479,4 @@ Text/Convo parsing:
     {NORS} = ??
     {HIGH} = ??
 *)
+

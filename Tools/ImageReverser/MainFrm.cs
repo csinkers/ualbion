@@ -9,13 +9,13 @@ namespace UAlbion.ImageReverser
 {
     public partial class MainFrm : Form
     {
-        readonly string _rootPath;
+        readonly string _dataDir;
         readonly Config _config;
         TreeNode _rootNode;
 
-        public MainFrm(string rootPath, Config config)
+        public MainFrm(string dataDir, Config config)
         {
-            _rootPath = rootPath;
+            _dataDir = dataDir;
             _config = config;
             InitializeComponent();
         }
@@ -25,23 +25,91 @@ namespace UAlbion.ImageReverser
         void MainFrm_Load(object sender, EventArgs e)
         {
             _rootNode = fileTree.Nodes.Add("Files");
-            var files = Directory.EnumerateFiles(_rootPath, "*.*", SearchOption.AllDirectories);
+            var exportedDir = Path.GetFullPath(Path.Combine(_dataDir, _config.ExportedXldPath));
+            var files = Directory.EnumerateFiles(exportedDir, "*.*", SearchOption.AllDirectories);
             foreach (var file in files)
             {
                 var absDir = Path.GetDirectoryName(file);
-                var relativeDir = absDir.Substring(_rootPath.Length).TrimStart('\\');
+                var relativeDir = absDir.Substring(exportedDir.Length).TrimStart('\\');
                 if (relativeDir.Length == 0)
                     continue;
 
                 if (!_config.Xlds.ContainsKey(relativeDir))
                     _config.Xlds.Add(relativeDir, new Config.Xld());
 
-                var relative = file.Substring(_rootPath.Length + 1);
+                var relative = file.Substring(exportedDir.Length + 1);
                 var xld = _config.Xlds[relativeDir];
                 AddToTree(relative, xld);
             }
 
+            var palettesPath = Path.Combine(exportedDir, "PALETTE0.XLD");
+            files = Directory.EnumerateFiles(palettesPath, "*.*", SearchOption.AllDirectories);
+            foreach (var file in files)
+            {
+                var a = file.Substring(palettesPath.Length + 1, 2);
+                int paletteNumber = int.Parse(a);
+                var paletteName = _config.Xlds["PALETTE0.XLD"].Objects[paletteNumber].Name;
+                if (string.IsNullOrEmpty(paletteName))
+                    paletteName = file.Substring(exportedDir.Length + 1);
+
+                listPalettes.Items.Add(Palette.Load(file, paletteName));
+            }
+
+            listPalettes.SelectedIndex = 0;
+
             _rootNode.Expand();
+        }
+
+        Bitmap LoadRawTexture(string filename, Config.Texture texture, int magnify)
+        {
+            var bytes = File.ReadAllBytes(filename);
+
+            if (texture.Offset > bytes.Length)
+                texture.Offset = bytes.Length;
+
+            int height = (bytes.Length - texture.Offset + (texture.Width - 1)) / texture.Width;
+            if (height == 0)
+                return new Bitmap(1, 1);
+
+            Bitmap bmp = new Bitmap(texture.Width * magnify, height * magnify);
+
+            var d = bmp.LockBits(
+                new Rectangle(0, 0, bmp.Width, bmp.Height),
+                ImageLockMode.WriteOnly,
+                PixelFormat.Format24bppRgb);
+
+            var palette = (Palette)listPalettes.SelectedItem ?? new Palette("Dummy");
+
+            try
+            {
+                for (int n = texture.Offset; n < bytes.Length; n++)
+                {
+                    unsafe
+                    {
+                        for (int my = 0; my < magnify; my++)
+                        {
+                            for (int mx = 0; mx < magnify; mx++)
+                            {
+                                int x = magnify * ((n - texture.Offset) % texture.Width) + mx;
+                                int y = magnify * ((n - texture.Offset) / texture.Width) + my;
+                                byte* p = (byte*)d.Scan0 + y * d.Stride + x * 3;
+                                p[0] = palette.Blue(bytes[n]);
+                                p[1] = palette.Green(bytes[n]);
+                                p[2] = palette.Red(bytes[n]);
+                            }
+                        }
+                    }
+                }
+            }
+            finally { bmp.UnlockBits(d); }
+
+            return bmp;
+        }
+
+        Bitmap LoadInterlaced(string filename)
+        {
+            var a = new FileInfo(filename);
+            return new Bitmap(filename);
         }
 
         void Render()
@@ -50,44 +118,9 @@ namespace UAlbion.ImageReverser
             var (filename, obj) = CurrentObject;
             if (obj is Config.Texture texture)
             {
-                var bytes = File.ReadAllBytes(filename);
-                if (texture.Offset > bytes.Length)
-                    texture.Offset = bytes.Length;
-
-                int height = (bytes.Length - texture.Offset + (texture.Width - 1)) / texture.Width;
-                if (height == 0)
-                {
-                    canvas.Image = new Bitmap(1,1);
-                    return;
-                }
-
-                Bitmap bmp = new Bitmap(texture.Width * magnify, height * magnify);
-
-                var d = bmp.LockBits(
-                    new Rectangle(0, 0, bmp.Width, bmp.Height),
-                    ImageLockMode.WriteOnly,
-                    PixelFormat.Format24bppRgb);
-
-                try
-                {
-                    for (int n = texture.Offset; n < bytes.Length; n++)
-                    {
-                        unsafe
-                        {
-                            for (int my = 0; my < magnify; my++)
-                            {
-                                for (int mx = 0; mx < magnify; mx++)
-                                {
-                                    int x = magnify * ((n - texture.Offset) % texture.Width) + mx;
-                                    int y = magnify * ((n - texture.Offset) / texture.Width) + my;
-                                    byte* p = (byte*) d.Scan0 + y * d.Stride + x * 3;
-                                    p[0] = p[1] = p[2] = bytes[n];
-                                }
-                            }
-                        }
-                    }
-                }
-                finally { bmp.UnlockBits(d); }
+                var bmp = texture.Type == "texture"
+                        ? LoadRawTexture(filename, texture, magnify)
+                        : LoadInterlaced(filename);
 
                 canvas.Image = bmp;
             }
@@ -139,8 +172,9 @@ namespace UAlbion.ImageReverser
                 }
 
                 filename = filename.TrimEnd('\\');
+                var fullXldPath = Path.GetFullPath(Path.Combine(Path.Combine(_dataDir, _config.ExportedXldPath), filename));
                 return _config.Xlds.ContainsKey(filename) 
-                    ? ($"{_config.ExportedXldPath}\\{filename}", _config.Xlds[filename]) 
+                    ? (fullXldPath, _config.Xlds[filename]) 
                     : (null, null);
             }
         }
@@ -149,7 +183,7 @@ namespace UAlbion.ImageReverser
         {
             get
             {
-                if (!int.TryParse(fileTree.SelectedNode.Name, out int number))
+                if (!int.TryParse(fileTree.SelectedNode?.Name, out int number))
                     return (null, null);
 
                 var (xldFilename, xld) = CurrentXld;
@@ -226,6 +260,29 @@ namespace UAlbion.ImageReverser
         private void NumWidth_Enter(object sender, EventArgs e)
         {
             numWidth.Select(0, numWidth.Text.Length);
+        }
+
+        private void ListPalettes_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Render();
+        }
+
+        private void TrackWidth_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.Left && trackWidth.Value != 0)
+            {
+                trackWidth.Value = (int)(trackWidth.Value / (e.Shift ? 1.5 : 2.0));
+                e.Handled = true;
+            }
+
+            if (e.Control && e.KeyCode == Keys.Right)
+            {
+                var newValue =  (int)(trackWidth.Value * (e.Shift ? 1.5 : 2.0));
+                if (newValue > trackWidth.Maximum)
+                    newValue = trackWidth.Maximum;
+                trackWidth.Value = newValue;
+                e.Handled = true;
+            }
         }
     }
 }

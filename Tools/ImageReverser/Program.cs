@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 
@@ -13,21 +14,37 @@ namespace UAlbion.ImageReverser
         [STAThread]
         static void Main()
         {
-            const string rootPath = @"C:\Depot\Main\ualbion\exported";
-            var configPath = Path.Combine(rootPath, "config.json");
-            var configText = File.ReadAllText(configPath);
-            var config = JsonConvert.DeserializeObject<Config>(configText, new ConfigObjectConverter());
+            var baseDir = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Parent.Parent.Parent.FullName;
+            var dataDir = Path.Combine(baseDir, @"data");
+            var configPath = Path.Combine(dataDir, @"config.json");
+            Config config;
+            if (File.Exists(configPath))
+            {
+                var configText = File.ReadAllText(configPath);
+                config = JsonConvert.DeserializeObject<Config>(configText, new ConfigObjectConverter());
+            }
+            else
+            {
+                config = new Config
+                {
+                    BaseXldPath = @"..\albion_sr\CD\XLD",
+                    ExportedXldPath = @"..\exported"
+                };
+            }
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
             void SaveChanges(object sender, EventArgs args)
             {
-                var json = JsonConvert.SerializeObject(config, new ConfigObjectConverter());
+                var serializerSettings = new JsonSerializerSettings();
+                serializerSettings.Converters.Add(new ConfigObjectConverter());
+                serializerSettings.Formatting = Formatting.Indented;
+                var json = JsonConvert.SerializeObject(config, serializerSettings);
                 File.WriteAllText(configPath, json);
             }
 
-            var form = new MainFrm(rootPath, config);
+            var form = new MainFrm(dataDir, config);
             form.SaveClicked += SaveChanges;
             Application.Run(form);
             form.SaveClicked -= SaveChanges;

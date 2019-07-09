@@ -1,6 +1,6 @@
 ﻿namespace UAlbion.Formats
 {
-    internal class AlbionSprite
+    public class Map2D
     {
     }
 }

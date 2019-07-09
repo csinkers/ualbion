@@ -50,13 +50,7 @@
     <Compile Include="Entities\Party.cs" />
     <Compile Include="Entities\Player.cs" />
     <Compile Include="Entities\WanderingNpc.cs" />
-    <Compile Include="Formats\AlbionPalette.cs" />
-    <Compile Include="Formats\AlbionScript.cs" />
-    <Compile Include="Formats\AssetId.cs" />
-    <Compile Include="Formats\SaveFile.cs" />
     <Compile Include="Gui\AlbionButton.cs" />
-    <Compile Include="Formats\AlbionMultiSprite.cs" />
-    <Compile Include="Formats\AlbionSprite.cs" />
     <Compile Include="Gui\AlbionHeader.cs" />
     <Compile Include="Gui\AlbionIndicator.cs" />
     <Compile Include="Gui\AlbionLabel.cs" />
@@ -77,13 +71,10 @@
     <Compile Include="Gui\InventoryScreen.cs" />
     <Compile Include="Gui\LoadGameScreen.cs" />
     <Compile Include="Gui\MainMenu.cs" />
-    <Compile Include="Formats\Map2D.cs" />
-    <Compile Include="Formats\Map3D.cs" />
     <Compile Include="Gui\OptionsScreen.cs" />
     <Compile Include="Gui\YesNoMessageBox.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Formats\XldFile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -93,6 +84,11 @@
       <Project>{a93c282e-2854-490d-b50b-34baaf030642}</Project>
       <Name>PixelEngine</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Formats\Formats.csproj">
+      <Project>{e97457be-eb97-4c8e-b025-cbb4e8deb397}</Project>
+      <Name>Formats</Name>
+    </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

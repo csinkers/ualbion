@@ -9,7 +9,7 @@ using UAlbion.Gui;
 
 namespace UAlbion
 {
-    internal class GameState
+    public class GameState
     {
         AlbionPalette _palette;
         Party _party;

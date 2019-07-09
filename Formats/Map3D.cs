@@ -1,6 +1,6 @@
 ﻿namespace UAlbion.Formats
 {
-    internal class AlbionMultiSprite
+    public class Map3D
     {
     }
 }

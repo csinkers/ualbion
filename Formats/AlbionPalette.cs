@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UAlbion.Formats
 {
-    class AlbionPalette
+    public class AlbionPalette
     {
     }
 }

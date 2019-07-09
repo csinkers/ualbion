@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace UAlbion.ImageReverser
+namespace UAlbion.Formats
 {
     public class ConfigObjectConverter : JsonConverter
     {

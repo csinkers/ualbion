@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using UAlbion.Formats;
 
 namespace UAlbion.ImageReverser
 {

@@ -13,6 +13,6 @@ namespace UAlbion.Entities
         Point _position;
         Point _goal;
         int _frame;
-        AlbionMultiSprite _sprite;
+        AlbionSprite _sprite;
     }
 }

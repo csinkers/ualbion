@@ -9,7 +9,7 @@ open FSharp.Json
 let baseDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) |> (fun x -> Directory.GetParent(x).Parent.Parent.Parent.FullName)
 let xldDir = Path.Combine(baseDir, @"albion_sr\CD\XLDLIBS")
 let mainOutputDir = Path.Combine(baseDir, @"exported")
-let xmiToMidiPath = Path.Combine(baseDir, @"Tools\Debug\XmiToMidi.exe")
+let xmiToMidiPath = Path.Combine(baseDir, @"Debug\XmiToMidi.exe")
 let bytesTo850String (bytes:byte array) = Encoding.GetEncoding(850).GetString(bytes).Replace("×", "ß").TrimEnd((char)0)
 
 type OText =
@@ -87,6 +87,7 @@ type XldFile =
     }
     
     static member raw extension (br:BinaryReader) outputDir i length = 
+        if(length = 0) then () else
         let bytes = br.ReadBytes(length)
         File.WriteAllBytes(Path.Combine(outputDir, sprintf "%02d.%s" i extension), bytes)
 

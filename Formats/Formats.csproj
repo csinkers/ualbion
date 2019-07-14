@@ -64,11 +64,5 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Pixel-Engine\PixelEngine\PixelEngine.csproj">
-      <Project>{A93C282E-2854-490D-B50B-34BAAF030642}</Project>
-      <Name>PixelEngine</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

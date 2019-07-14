@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using PixelEngine;
 
 namespace UAlbion.Entities
 {
@@ -66,7 +65,7 @@ namespace UAlbion.Entities
         const int PositionHistoryCount = 40;
 
         readonly IList<Player> _players = new List<Player>();
-        readonly Point[] _positions = new Point[PositionHistoryCount];
+        readonly (int,int)[] _positions = new (int,int)[PositionHistoryCount];
         Direction _facing;
         int _activePlayer;
         bool _hasClock;

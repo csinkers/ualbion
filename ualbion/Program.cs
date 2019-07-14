@@ -1,21 +1,13 @@
-﻿using PixelEngine;
+﻿using UAlbion.Formats;
 
 namespace UAlbion
 {
-    public class Albion : Game
-    {
-        public Albion()
-        {
-            AppName = "Albion Remake";
-        }
-    }
-
-    internal class Program
+    class Program
     {
         static void Main(string[] args)
         {
-            var albion = new Albion();
-			albion.Construct(640, 480, 2, 2, 30);
+            var palette = Assets.LoadPalette(2);
+            var menuBackground = Assets.LoadTexture(AssetType.Picture, 19);
 
             /*
             Load palettes
@@ -24,7 +16,6 @@ namespace UAlbion
                 Set mode to main menu
             */
 
-            albion.Start();
         }
     }
 /*

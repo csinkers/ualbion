@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.IO;
-using PixelEngine;
 
 namespace UAlbion.Formats
 {
@@ -20,7 +19,7 @@ namespace UAlbion.Formats
 
     public class AlbionSprite
     {
-        AlbionFrame[] _sprites;
+        readonly AlbionFrame[] _sprites;
 
         public AlbionSprite(BinaryReader br, long streamLength, int width, int height)
         {
@@ -38,9 +37,13 @@ namespace UAlbion.Formats
             Debug.Assert(br.BaseStream.Position == initialPosition + streamLength);
         }
 
-        public AlbionSprite(BinaryReader br, long streamLength, SpriteType spriteType)
+        public AlbionSprite(BinaryReader br, long streamLength, AssetType type)
         {
-            if (spriteType == SpriteType.Multi)
+            if(type == AssetType.Picture)
+            {
+                // Load bitmap
+            }
+            else
             {
                 long initialPosition = br.BaseStream.Position;
 

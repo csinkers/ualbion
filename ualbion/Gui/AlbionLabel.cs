@@ -1,11 +1,9 @@
-﻿using PixelEngine;
-
-namespace UAlbion.Gui
+﻿namespace UAlbion.Gui
 {
     class AlbionLabel : GuiElement
     {
         string _text;
         int _width, _height;
-        Point _position;
+        (int,int) _position;
     }
 }

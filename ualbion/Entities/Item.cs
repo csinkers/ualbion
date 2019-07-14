@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using PixelEngine;
+using UAlbion.Formats;
 using UAlbion.Gui;
 
 namespace UAlbion.Entities
@@ -7,8 +7,8 @@ namespace UAlbion.Entities
     class Item : Inanimate
     {
         readonly IList<PlayerClass> _validClasses = new List<PlayerClass>();
-        Sprite _worldSprite;
-        Sprite _inventorySprite;
+        AlbionSprite _worldSprite;
+        AlbionSprite _inventorySprite;
         string _name;
         int _damage;
         int _protection;

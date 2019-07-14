@@ -7,3 +7,5 @@ albion_sr/
 packages/
 exported/
 *.gpr
+*.lock
+*.lock~

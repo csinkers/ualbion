@@ -5,7 +5,7 @@ using System.IO;
 
 namespace UAlbion.Formats
 {
-    enum GameLanguage
+    public enum GameLanguage
     {
         German,
         English,
@@ -26,7 +26,7 @@ namespace UAlbion.Formats
             { AssetType.IconData,           (AssetLocation.Base,      "ICONDAT!.XLD") }, // Texture
             { AssetType.IconGraphics,       (AssetLocation.Base,      "ICONGFX!.XLD") }, // Texture
             { AssetType.Palette,            (AssetLocation.Base,      "PALETTE!.XLD") }, // Palette
-            { AssetType.PaletteNull,        (AssetLocation.Base,      "PALETTE.000" ) }, // Palette (supplementary)
+            { AssetType.PaletteNull,        (AssetLocation.BaseRaw,   "PALETTE.000" ) }, // Palette (supplementary)
             { AssetType.Slab,               (AssetLocation.Base,      "SLAB"        ) }, //
             { AssetType.BigPartyGraphics,   (AssetLocation.Base,      "PARTGR!.XLD" ) }, // Texture
             { AssetType.SmallPartyGraphics, (AssetLocation.Base,      "PARTKL!.XLD" ) }, // Texture
@@ -79,7 +79,7 @@ namespace UAlbion.Formats
             Debug.Assert(number >= 0);
             Debug.Assert(number <= 9);
 
-            var baseDir = @"C:\Depot\bb\ualbion\albion_sr\CD\XLDLIBS"; // TODO: Pull from config
+            var baseDir = @"C:\Depot\Main\bitbucket\ualbion\albion_sr\CD\XLDLIBS"; // TODO: Pull from config
             switch (location)
             {
                 case AssetLocation.Base:
@@ -102,6 +102,8 @@ namespace UAlbion.Formats
                         return Path.Combine(baseDir, "CURRENT", baseName);
                     return Path.Combine(baseDir, "CURRENT", baseName.Replace("!", number.ToString()));
 
+                case AssetLocation.BaseRaw: return Path.Combine(baseDir, baseName);
+                case AssetLocation.LocalisedRaw: return Path.Combine(baseDir,  language.ToString().ToUpper(), baseName);
                 default: throw new ArgumentOutOfRangeException("Invalid asset location");
             }
         }
@@ -124,7 +126,7 @@ namespace UAlbion.Formats
             Debug.Assert(number >= 0);
             Debug.Assert(number <= 9);
 
-            var baseDir = @"C:\Depot\bb\ualbion\data"; // TODO: Pull from config
+            var baseDir = @"C:\Depot\Main\bitbucket\ualbion\data"; // TODO: Pull from config
             switch (location)
             {
                 case AssetLocation.Base:
@@ -132,10 +134,16 @@ namespace UAlbion.Formats
                         return Try(Path.Combine(baseDir, baseName, objectNumber.ToString()));
                     return Try(Path.Combine(baseDir, baseName.Replace("!", number.ToString()), objectNumber.ToString()));
 
+                case AssetLocation.BaseRaw:
+                    return Try(Path.Combine(baseDir, baseName));
+
                 case AssetLocation.Localised:
                     if (!baseName.Contains("!"))
                         return Path.Combine(baseDir, language.ToString().ToUpper(), baseName, objectNumber.ToString());
                     return Path.Combine(baseDir, language.ToString().ToUpper(), baseName.Replace("!", number.ToString()), objectNumber.ToString());
+
+                case AssetLocation.LocalisedRaw:
+                    return Try(Path.Combine(baseDir, language.ToString().ToUpper(), baseName));
 
                 case AssetLocation.Initial:
                     if (!baseName.Contains("!"))
@@ -151,7 +159,7 @@ namespace UAlbion.Formats
             }
         }
 
-        object LoadAsset(AssetType type, int id, GameLanguage language = GameLanguage.English)
+        object LoadAsset(AssetType type, int id, GameLanguage language, object context)
         {
             int xldIndex = id / 1000;
             Debug.Assert(xldIndex >= 0);
@@ -160,16 +168,16 @@ namespace UAlbion.Formats
             var (location, baseName) = _assetFiles[type];
 
             var overrideFilename = GetOverridePath(location, language, baseName, xldIndex, objectIndex);
-            if (File.Exists(overrideFilename))
+            if (overrideFilename != null || IsLocationRaw(location))
             {
-                using(var stream = File.OpenRead(overrideFilename))
+                var path = overrideFilename ?? GetXldPath(location, language, baseName, id);
+                using(var stream = File.OpenRead(path))
                 using (var br = new BinaryReader(stream))
                 {
-                    var asset = AssetLoader.Load(br, type, stream.Length, Path.GetExtension(overrideFilename));
+                    var asset = AssetLoader.Load(br, type, (int)stream.Length, context);
                     if(asset == null)
-                        throw new InvalidOperationException($"Object {type}:{id} could not be loaded from override file {overrideFilename}");
+                        throw new InvalidOperationException($"Object {type}:{id} could not be loaded from file {path}");
 
-                    _assetCache[type][id] = asset;
                     return asset;
                 }
             }
@@ -192,65 +200,58 @@ namespace UAlbion.Formats
 
             using (var br = xld.GetReaderForObject(objectIndex, out var length))
             {
-                var asset = AssetLoader.Load(br, type,length, null);
+                var asset = AssetLoader.Load(br, type,length, context);
                 if (asset == null)
                     throw new InvalidOperationException($"Object {type}:{id} could not be loaded from XLD {xld.Filename}");
 
-                _assetCache[type][id] = asset;
                 return asset;
             }
         }
 
-        object LoadAssetCached(AssetType type, int id, GameLanguage language = GameLanguage.English)
+        bool IsLocationRaw(AssetLocation location)
+        {
+            switch (location)
+            {
+                case AssetLocation.BaseRaw:
+                case AssetLocation.LocalisedRaw:
+                    return true;
+                default: return false;
+            }
+        }
+
+        object LoadAssetCached(AssetType type, int id, GameLanguage language) { return LoadAssetCached(type, id, language, null); }
+        object LoadAssetCached(AssetType type, int id, object context = null) { return LoadAssetCached(type, id, GameLanguage.English, context); }
+        object LoadAssetCached(AssetType type, int id, GameLanguage language, object context)
         {
             if (_assetCache.TryGetValue(type, out var typeCache))
             {
-                if (typeCache.TryGetValue(id, out var asset))
-                    return asset;
+                if (typeCache.TryGetValue(id, out var cachedAsset))
+                    return cachedAsset;
             }
             else _assetCache[type] = new Dictionary<int, object>();
 
-            return LoadAsset(type, id, language);
+            var newAsset = LoadAsset(type, id, language, context);
+            _assetCache[type][id] = newAsset;
+            return newAsset;
         }
 
-        static Map2D LoadMap2D(int id)
+        public static Map2D LoadMap2D(int id) { return (Map2D)Instance.LoadAssetCached(AssetType.MapData, id); }
+        public static Map3D LoadMap3D(int id) { return (Map3D)Instance.LoadAssetCached(AssetType.MapData, id); }
+        public static AlbionPalette LoadPalette(int id)
         {
-            return (Map2D)Instance.LoadAsset(AssetType.MapData, id);
+            var commonPalette = (byte[])Instance.LoadAssetCached(AssetType.PaletteNull, 0);
+            return (AlbionPalette)Instance.LoadAssetCached(AssetType.Palette, id, new AlbionPalette.PaletteContext(id, commonPalette));
         }
 
-        static Map3D LoadMap3D(int id)
-        {
-            return (Map3D)Instance.LoadAsset(AssetType.MapData, id);
-        }
+        public static AlbionSprite LoadTexture(AssetType type, int id) { return (AlbionSprite)Instance.LoadAssetCached(type, id); }
+        public static string LoadString(AssetType type, int id, GameLanguage language) { return (string)Instance.LoadAssetCached(AssetType.MapData, id, language); }
+        public static AlbionSample LoadSample(AssetType type, int id) { return (AlbionSample)Instance.LoadAssetCached(type, id); }
+        public static AlbionFont LoadFont(int id) { return (AlbionFont)Instance.LoadAssetCached(AssetType.Font, id); }
 
-        static AlbionPalette LoadPalette(int id)
+        public static AlbionVideo LoadVideo(int id, GameLanguage language)
         {
-            return (AlbionPalette)Instance.LoadAsset(AssetType.MapData, id);
-        }
-
-        static AlbionSprite LoadTexture(AssetType type, int id)
-        {
-            return (AlbionSprite)Instance.LoadAsset(AssetType.MapData, id);
-        }
-
-        static string LoadString(AssetType type, int id, GameLanguage language)
-        {
-            return (string)Instance.LoadAsset(AssetType.MapData, id, language);
-        }
-
-        static AlbionSample LoadSample(AssetType type, int id)
-        {
-            return (AlbionSample)Instance.LoadAsset(AssetType.MapData, id);
-        }
-
-        static AlbionFont LoadFont(int id)
-        {
-            return (AlbionFont)Instance.LoadAsset(AssetType.MapData, id);
-        }
-
-        static AlbionVideo LoadVideo(int id, GameLanguage language)
-        {
-            throw new NotImplementedException();
+            // Don't cache videos.
+            return (AlbionVideo) Instance.LoadAsset(AssetType.Flic, id, language, null);
         }
     }
 }

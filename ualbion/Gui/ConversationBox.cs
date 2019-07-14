@@ -1,19 +1,19 @@
-﻿using PixelEngine;
+﻿using UAlbion.Formats;
 
 namespace UAlbion.Gui
 {
     class ConversationBox : GuiElement
     {
         Entities.Conversation _conversation;
-        Sprite _speaker;
+        AlbionSprite _speaker;
         AlbionLabel _text;
 
-        void OnClick(Point point)
+        void OnClick((int,int) point)
         {
 
         }
 
-        void OnRightClick(Point point)
+        void OnRightClick((int,int) point)
         {
 
         }

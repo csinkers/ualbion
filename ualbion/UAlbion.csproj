@@ -80,10 +80,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Pixel-Engine\PixelEngine\PixelEngine.csproj">
-      <Project>{a93c282e-2854-490d-b50b-34baaf030642}</Project>
-      <Name>PixelEngine</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Formats\Formats.csproj">
       <Project>{e97457be-eb97-4c8e-b025-cbb4e8deb397}</Project>
       <Name>Formats</Name>

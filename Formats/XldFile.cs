@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace UAlbion.Formats
@@ -21,7 +22,8 @@ namespace UAlbion.Formats
             using (var br = new BinaryReader(_stream, Encoding.Default, true))
             {
                 var headerBytes = Encoding.ASCII.GetBytes(MagicString);
-                if(br.ReadBytes(headerBytes.Length) != headerBytes)
+                var actualHeader = br.ReadBytes(headerBytes.Length);
+                if(!actualHeader.SequenceEqual(headerBytes))
                     throw new FormatException("XLD file magic string not found");
                 byte terminator = br.ReadByte();
                 Debug.Assert(terminator == 0);

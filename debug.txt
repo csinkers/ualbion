@@ -5,3 +5,7 @@ g
 bp KERNELBASE!CreateFileA ".printf \"%ma\\n\", poi(esp+4);kv;g"
 .logopen c:\tmp\srtrace
 g
+
+
+
+.load C:\Depot\Main\bitbucket\ghidrasym\Release\ghidrasym.dll

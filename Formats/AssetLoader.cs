@@ -3,16 +3,9 @@ using System.IO;
 
 namespace UAlbion.Formats
 {
-    public enum SpriteType
-    {
-        Multi,
-        FixedWidth,
-        Bitmap,
-    }
-
     public static class AssetLoader
     {
-        public static object Load(BinaryReader br, AssetType type, long streamLength, string extensionHint)
+        public static object Load(BinaryReader br, AssetType type, int streamLength, object context)
         {
             switch (type)
             {
@@ -22,13 +15,9 @@ namespace UAlbion.Formats
                     break;
 
                 case AssetType.Font: return new AlbionFont(br, streamLength);
-
-                case AssetType.Palette: // Known, TODO: Implement
-                case AssetType.PaletteNull:
-                    break;
-
-                case AssetType.Picture:
-                    return new AlbionSprite(br, streamLength, SpriteType.Bitmap);
+                case AssetType.Palette: return new AlbionPalette(br, streamLength, (AlbionPalette.PaletteContext)context);
+                case AssetType.PaletteNull: return br.ReadBytes(streamLength);
+                case AssetType.Picture: return new AlbionSprite(br, streamLength, type);
 
                 // Fixed size graphics
                 case AssetType.Floor3D: return new AlbionSprite(br, streamLength, 64, 64); // Fixed width
@@ -55,7 +44,7 @@ namespace UAlbion.Formats
                 case AssetType.MonsterGraphics:
                 case AssetType.BackgroundGraphics: // Skyboxes
                 case AssetType.CombatGraphics:
-                    return new AlbionSprite(br, streamLength, SpriteType.Multi);
+                    return new AlbionSprite(br, streamLength, type);
 
                 // Textual resources
                 case AssetType.EventTexts:

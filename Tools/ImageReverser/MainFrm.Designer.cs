@@ -1,4 +1,4 @@
-﻿namespace UAlbion.ImageReverser
+﻿namespace UAlbion.Tools.ImageReverser
 {
     partial class MainFrm
     {

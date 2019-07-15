@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using Newtonsoft.Json;
 using UAlbion.Formats;
 
-namespace UAlbion.ImageReverser
+namespace UAlbion.Tools.ImageReverser
 {
     static class Program
     {
@@ -15,42 +15,21 @@ namespace UAlbion.ImageReverser
         [STAThread]
         static void Main()
         {
-            var baseDir = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Parent.Parent.Parent.FullName;
-            var dataDir = Path.Combine(baseDir, @"data");
-            var configPath = Path.Combine(dataDir, @"config.json");
-            Config config;
-            if (File.Exists(configPath))
-            {
-                var configText = File.ReadAllText(configPath);
-                config = JsonConvert.DeserializeObject<Config>(configText, new ConfigObjectConverter());
-            }
-            else
-            {
-                config = new Config
-                {
-                    BaseXldPath = @"..\albion_sr\CD\XLD",
-                    ExportedXldPath = @"..\exported"
-                };
-            }
+            var baseDir = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Parent.Parent.Parent.Parent.FullName;
+            Config config = Config.Load(baseDir);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            void SaveChanges(object sender, EventArgs args)
-            {
-                var serializerSettings = new JsonSerializerSettings();
-                serializerSettings.Converters.Add(new ConfigObjectConverter());
-                serializerSettings.Formatting = Formatting.Indented;
-                var json = JsonConvert.SerializeObject(config, serializerSettings);
-                File.WriteAllText(configPath, json);
-            }
+            void SaveChanges(object sender, EventArgs e) => config.Save();
 
-            var form = new MainFrm(dataDir, config);
+            var form = new MainFrm(config);
             form.SaveClicked += SaveChanges;
             Application.Run(form);
             form.SaveClicked -= SaveChanges;
 
             SaveChanges(null, EventArgs.Empty);
         }
+
     }
 }

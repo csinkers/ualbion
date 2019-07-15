@@ -1,7 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
-namespace UAlbion.ImageReverser
+namespace UAlbion.Tools.ImageReverser
 {
     public class Palette
     {

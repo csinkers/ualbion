@@ -1,6 +1,6 @@
 {
-  "BaseXldPath": "..\\albion_sr\\cd\\XLD",
-  "ExportedXldPath": "..\\exported",
+  "XldPath": "albion_sr\\cd\\XLDLIBS",
+  "ExportedXldPath": "exported",
   "Xlds": {
     "3DBCKGR0.XLD": {
       "Objects": {

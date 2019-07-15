@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UAlbion.Entities;
+using UAlbion.Core.Entities;
+using UAlbion.Core.Gui;
 using UAlbion.Formats;
-using UAlbion.Gui;
 
 namespace UAlbion
 {

@@ -6,17 +6,15 @@ using System.Linq;
 using System.Windows.Forms;
 using UAlbion.Formats;
 
-namespace UAlbion.ImageReverser
+namespace UAlbion.Tools.ImageReverser
 {
     public partial class MainFrm : Form
     {
-        readonly string _dataDir;
         readonly Config _config;
         TreeNode _rootNode;
 
-        public MainFrm(string dataDir, Config config)
+        public MainFrm(Config config)
         {
-            _dataDir = dataDir;
             _config = config;
             InitializeComponent();
         }
@@ -26,7 +24,7 @@ namespace UAlbion.ImageReverser
         void MainFrm_Load(object sender, EventArgs e)
         {
             _rootNode = fileTree.Nodes.Add("Files");
-            var exportedDir = Path.GetFullPath(Path.Combine(_dataDir, _config.ExportedXldPath));
+            var exportedDir = Path.GetFullPath(Path.Combine(_config.BasePath, _config.ExportedXldPath));
             var files = Directory.EnumerateFiles(exportedDir, "*.*", SearchOption.AllDirectories);
             foreach (var file in files)
             {
@@ -173,7 +171,7 @@ namespace UAlbion.ImageReverser
                 }
 
                 filename = filename.TrimEnd('\\');
-                var fullXldPath = Path.GetFullPath(Path.Combine(Path.Combine(_dataDir, _config.ExportedXldPath), filename));
+                var fullXldPath = Path.GetFullPath(Path.Combine(Path.Combine(_config.BasePath, _config.ExportedXldPath), filename));
                 return _config.Xlds.ContainsKey(filename) 
                     ? (fullXldPath, _config.Xlds[filename]) 
                     : (null, null);

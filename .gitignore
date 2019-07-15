@@ -9,3 +9,4 @@ exported/
 *.gpr
 *.lock
 *.lock~
+*.user

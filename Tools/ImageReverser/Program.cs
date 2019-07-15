@@ -2,7 +2,6 @@
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
-using Newtonsoft.Json;
 using UAlbion.Formats;
 
 namespace UAlbion.Tools.ImageReverser
@@ -30,6 +29,5 @@ namespace UAlbion.Tools.ImageReverser
 
             SaveChanges(null, EventArgs.Empty);
         }
-
     }
 }

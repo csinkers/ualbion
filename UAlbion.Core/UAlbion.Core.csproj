@@ -5,12 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenGL.Net" Version="0.8.4" />
-    <PackageReference Include="OpenGL.Net.CoreUI" Version="0.8.4" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\UAlbion.Formats\UAlbion.Formats.csproj" />
+    <PackageReference Include="Veldrid" Version="4.6.1" />
+    <PackageReference Include="Veldrid.SPIRV" Version="1.0.9" />
+    <PackageReference Include="Veldrid.StartupUtilities" Version="4.6.1" />
   </ItemGroup>
 
 </Project>

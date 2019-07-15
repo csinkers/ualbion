@@ -7,7 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UAlbion.Tools.XmiToMidi", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{149A8BC2-91D1-4249-9E1D-7B0054347832}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core", "UAlbion.Core\UAlbion.Core.csproj", "{CE0E2DB4-828A-45F4-9C41-20A7C5522DA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Game", "UAlbion.Game\UAlbion.Game.csproj", "{CE0E2DB4-828A-45F4-9C41-20A7C5522DA0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Formats", "UAlbion.Formats\UAlbion.Formats.csproj", "{78B55A1C-1200-4C6E-A9D3-9C04D65F0AF9}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImageReverser.Core", "Tools\ImageReverser\ImageReverser.Core.csproj", "{DAF591A3-9EC7-4153-9856-3ADD612CE09E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageReverser.Framework", "Tools\ImageReverser\Framework\ImageReverser.Framework.csproj", "{776382CD-4E23-4EF0-89D7-963E63507B5F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core", "UAlbion.Core\UAlbion.Core.csproj", "{4B3B467B-2E99-4836-B589-A69D272417F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -112,6 +114,18 @@ Global
 		{776382CD-4E23-4EF0-89D7-963E63507B5F}.Release|x64.Build.0 = Release|Any CPU
 		{776382CD-4E23-4EF0-89D7-963E63507B5F}.Release|x86.ActiveCfg = Release|Any CPU
 		{776382CD-4E23-4EF0-89D7-963E63507B5F}.Release|x86.Build.0 = Release|Any CPU
+		{4B3B467B-2E99-4836-B589-A69D272417F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B3B467B-2E99-4836-B589-A69D272417F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B3B467B-2E99-4836-B589-A69D272417F0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4B3B467B-2E99-4836-B589-A69D272417F0}.Debug|x64.Build.0 = Debug|Any CPU
+		{4B3B467B-2E99-4836-B589-A69D272417F0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4B3B467B-2E99-4836-B589-A69D272417F0}.Debug|x86.Build.0 = Debug|Any CPU
+		{4B3B467B-2E99-4836-B589-A69D272417F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B3B467B-2E99-4836-B589-A69D272417F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B3B467B-2E99-4836-B589-A69D272417F0}.Release|x64.ActiveCfg = Release|Any CPU
+		{4B3B467B-2E99-4836-B589-A69D272417F0}.Release|x64.Build.0 = Release|Any CPU
+		{4B3B467B-2E99-4836-B589-A69D272417F0}.Release|x86.ActiveCfg = Release|Any CPU
+		{4B3B467B-2E99-4836-B589-A69D272417F0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

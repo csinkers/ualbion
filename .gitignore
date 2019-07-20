@@ -10,3 +10,4 @@ exported/
 *.lock
 *.lock~
 *.user
+*.gar

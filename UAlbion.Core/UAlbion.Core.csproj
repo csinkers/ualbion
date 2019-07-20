@@ -4,10 +4,20 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Veldrid" Version="4.6.1" />
-    <PackageReference Include="Veldrid.SPIRV" Version="1.0.9" />
-    <PackageReference Include="Veldrid.StartupUtilities" Version="4.6.1" />
+    <Compile Remove="Assets\**" />
+    <EmbeddedResource Remove="Assets\**" />
+    <None Remove="Assets\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="SharpDX.XAudio2" Version="4.2.0" />
+    <PackageReference Include="Veldrid" Version="4.6.1" />
+    <PackageReference Include="Veldrid.SPIRV" Version="1.0.11" />
+    <PackageReference Include="Veldrid.StartupUtilities" Version="4.6.1" />
+  </ItemGroup>
 </Project>

@@ -16,7 +16,24 @@ namespace UAlbion.Core
             _height = height;
         }
 
-        public void WindowResized(int width, int height) => _imguiRenderer.WindowResized(width, height);
+        public void Attach(EventExchange exchange)
+        {
+            exchange.Subscribe<EngineUpdateEvent>(this);
+            exchange.Subscribe<WindowResizedEvent>(this);
+        }
+
+        public void Receive(IEvent @event, object sender)
+        {
+            switch (@event)
+            {
+                case EngineUpdateEvent e:
+                    _imguiRenderer.Update(e.DeltaSeconds, InputTracker.FrameSnapshot);
+                    break;
+                case WindowResizedEvent e:
+                    _imguiRenderer.WindowResized(e.Width, e.Height);
+                    break;
+            }
+        }
 
         public override void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
         {
@@ -52,19 +69,5 @@ namespace UAlbion.Core
 
         public override RenderPasses RenderPasses => RenderPasses.Overlay;
 
-        public void Attach(EventExchange exchange)
-        {
-            exchange.Subscribe<EngineUpdateEvent>(this);
-        }
-
-        public void Receive(IEvent @event)
-        {
-            switch (@event)
-            {
-                case EngineUpdateEvent e:
-                    _imguiRenderer.Update(e.DeltaSeconds, InputTracker.FrameSnapshot);
-                    break;
-            }
-        }
     }
 }

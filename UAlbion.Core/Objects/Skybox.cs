@@ -51,10 +51,8 @@ namespace UAlbion.Core.Objects
             Texture textureCube = imageSharpCubemapTexture.CreateDeviceTexture(gd, factory);
             TextureView textureView = factory.CreateTextureView(new TextureViewDescription(textureCube));
 
-            VertexLayoutDescription[] vertexLayouts = new VertexLayoutDescription[]
-            {
-                new VertexLayoutDescription(
-                    new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3))
+            VertexLayoutDescription[] vertexLayouts = {
+                new VertexLayoutDescription( new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3))
             };
 
             (Shader vs, Shader fs) = StaticResourceCache.GetShaders(gd, gd.ResourceFactory, "Skybox");
@@ -128,8 +126,7 @@ namespace UAlbion.Core.Objects
             return new RenderOrderKey(ulong.MaxValue);
         }
 
-        static readonly VertexPosition[] s_vertices = new VertexPosition[]
-        {
+        static readonly VertexPosition[] s_vertices = {
             // Top
             new VertexPosition(new Vector3(-20.0f,20.0f,-20.0f)),
             new VertexPosition(new Vector3(20.0f,20.0f,-20.0f)),
@@ -162,8 +159,7 @@ namespace UAlbion.Core.Objects
             new VertexPosition(new Vector3(-20.0f,-20.0f,20.0f)),
         };
 
-        static readonly ushort[] s_indices = new ushort[]
-        {
+        static readonly ushort[] s_indices = {
             0,1,2, 0,2,3,
             4,5,6, 4,6,7,
             8,9,10, 8,10,11,

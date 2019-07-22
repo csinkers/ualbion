@@ -1,24 +1,53 @@
 ﻿using System;
 using System.IO;
-using System.Numerics;
 using System.Reflection;
+using System.Threading.Tasks;
 using UAlbion.Core;
-using UAlbion.Core.Objects;
 using UAlbion.Formats;
-using UAlbion.Game;
+using UAlbion.Game.Gui;
 
 namespace UAlbion
 {
     class ConsoleLogger : IComponent
     {
+        EventExchange _exchange;
+
         public void Attach(EventExchange exchange)
         {
+            _exchange = exchange;
             exchange.Subscribe<IEvent>(this);
+            Task.Run(ConsoleReaderThread);
         }
 
-        public void Receive(IEvent @event)
+        public void Receive(IEvent @event, object sender)
         {
-            Console.WriteLine(@event.ToString());
+            switch(@event)
+            {
+                case EngineUpdateEvent e:
+                    break;
+
+                default:
+                    Console.WriteLine(@event.ToString());
+                    break;
+            }
+        }
+
+        public void ConsoleReaderThread()
+        {
+            do
+            {
+                var command = Console.ReadLine();
+                try
+                {
+                    var @event = Event.Parse(command);
+                    _exchange.Raise(@event, this);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Parse error: {0}", e);
+                }
+
+            } while (true);
         }
     }
 
@@ -38,16 +67,21 @@ namespace UAlbion
 
             using (var engine = new Engine())
             {
-                var scene = engine.Create3DScene();
+                var scene = engine.Create2DScene();
+                scene.AddComponent(new ConsoleLogger());
 
-                Skybox skybox = Skybox.LoadDefaultSkybox();
-                scene.AddRenderable(skybox);
+                var menu = new MainMenu();
+                scene.AddComponent(menu);
 
+                //MeshData planeMesh = PrimitiveShapes.Plane(1, 1, 1);
+                //Skybox skybox = Skybox.LoadDefaultSkybox();
+                //scene.AddRenderable(skybox);
+/*
                 var camera = (PerspectiveCamera)scene.Camera;
                 camera.Position = new Vector3(-80, 25, -4.3f);
                 camera.Yaw = -MathF.PI / 2;
                 camera.Pitch = -MathF.PI / 9;
-
+*/
                 engine.SetScene(scene);
                 engine.Run();
             }

@@ -37,8 +37,6 @@ namespace UAlbion.Core
         bool _colorSrgb = true;
         int _msaaOption = 0;
 
-        event Action<int, int> _resizeHandled;
-
         public Scene Create2DScene()
         {
             var camera = new OrthographicCamera(_graphicsDevice, _window);
@@ -79,9 +77,7 @@ namespace UAlbion.Core
             ShadowmapDrawer reflectionTexDrawer = new ShadowmapDrawer(() => _window, () => _sceneContext.ReflectionColorView);
             _resizeHandled += (w, h) => reflectionTexDrawer.OnWindowResized();
             reflectionTexDrawer.Position = new Vector2(40 + (reflectionTexDrawer.Size.X * 3), 25);
-            _scene.AddRenderable(reflectionTexDrawer);
-*/
-
+            _scene.AddRenderable(reflectionTexDrawer); */
         }
 
         public void SetScene(Scene scene)
@@ -122,7 +118,6 @@ namespace UAlbion.Core
             _igRenderable = new ImGuiRenderable(_window.Width, _window.Height);
             _duplicator = new ScreenDuplicator();
             _fullScreenQuad = new FullScreenQuad();
-            _resizeHandled += (w, h) => _igRenderable.WindowResized(w, h);
 
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
         }
@@ -540,7 +535,6 @@ namespace UAlbion.Core
 
                 _graphicsDevice.ResizeMainWindow((uint)width, (uint)height);
                 _scene.Exchange.Raise(new WindowResizedEvent(width, height), this);
-                _resizeHandled?.Invoke(width, height);
                 CommandList cl = _graphicsDevice.ResourceFactory.CreateCommandList();
                 cl.Begin();
                 _sceneContext.RecreateWindowSizedResources(_graphicsDevice, cl);

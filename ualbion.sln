@@ -21,6 +21,35 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageReverser.Framework", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core", "UAlbion.Core\UAlbion.Core.csproj", "{4B3B467B-2E99-4836-B589-A69D272417F0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}"
+	ProjectSection(SolutionItems) = preProject
+		data\config.json = data\config.json
+		data\items.json = data\items.json
+		data\savefile.txt = data\savefile.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shaders", "Shaders", "{5748618A-0094-4C7B-9511-062B2EF258EA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fragment", "Fragment", "{2CC25767-C093-4B72-B93E-C6E553611540}"
+	ProjectSection(SolutionItems) = preProject
+		data\Shaders\FullScreenQuad.frag = data\Shaders\FullScreenQuad.frag
+		data\Shaders\ScreenDuplicator.frag = data\Shaders\ScreenDuplicator.frag
+		data\Shaders\ShadowDepth.frag = data\Shaders\ShadowDepth.frag
+		data\Shaders\ShadowMain.frag = data\Shaders\ShadowMain.frag
+		data\Shaders\ShadowmapPreviewShader.frag = data\Shaders\ShadowmapPreviewShader.frag
+		data\Shaders\Skybox.frag = data\Shaders\Skybox.frag
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Vertex", "Vertex", "{7CD4B26B-A659-483A-8AEA-76BC79B903D8}"
+	ProjectSection(SolutionItems) = preProject
+		data\Shaders\FullScreenQuad.vert = data\Shaders\FullScreenQuad.vert
+		data\Shaders\ScreenDuplicator.vert = data\Shaders\ScreenDuplicator.vert
+		data\Shaders\ShadowDepth.vert = data\Shaders\ShadowDepth.vert
+		data\Shaders\ShadowMain.vert = data\Shaders\ShadowMain.vert
+		data\Shaders\ShadowmapPreviewShader.vert = data\Shaders\ShadowmapPreviewShader.vert
+		data\Shaders\Skybox.vert = data\Shaders\Skybox.vert
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -135,6 +164,9 @@ Global
 		{8611136B-B88E-498C-9F5B-5CF22EE48D32} = {149A8BC2-91D1-4249-9E1D-7B0054347832}
 		{DAF591A3-9EC7-4153-9856-3ADD612CE09E} = {149A8BC2-91D1-4249-9E1D-7B0054347832}
 		{776382CD-4E23-4EF0-89D7-963E63507B5F} = {149A8BC2-91D1-4249-9E1D-7B0054347832}
+		{5748618A-0094-4C7B-9511-062B2EF258EA} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
+		{2CC25767-C093-4B72-B93E-C6E553611540} = {5748618A-0094-4C7B-9511-062B2EF258EA}
+		{7CD4B26B-A659-483A-8AEA-76BC79B903D8} = {5748618A-0094-4C7B-9511-062B2EF258EA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2759A62D-227A-4D68-B6B5-966B9141AA74}

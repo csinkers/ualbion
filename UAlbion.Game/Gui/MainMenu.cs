@@ -1,43 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
 using ImGuiNET;
 using UAlbion.Core;
 
 namespace UAlbion.Game.Gui
 {
-    public enum DrawLayer
+    public class MainMenu : Component
     {
-        Background,
-        Tiles,
-        Objects,
-        Characters,
-        Effects
-    }
+        static readonly IList<Handler> Handlers = new Handler[]
+        {
+            new Handler<MainMenu, EngineUpdateEvent>((x, _) => x._menuFunc()),
+        };
 
-    internal class MainMenu : IComponent
-    {
         // Background = AssetType.Picture
 
         Action _menuFunc;
 
-        public MainMenu()
+        public MainMenu() : base(Handlers)
         {
             _menuFunc = PrimaryMenu;
-        }
-
-
-        public void Attach(EventExchange exchange)
-        {
-            exchange.Subscribe<EngineUpdateEvent>(this);
-        }
-
-        public void Receive(IEvent @event)
-        {
-            switch (@event)
-            {
-                case EngineUpdateEvent e:
-                    _menuFunc();
-                    break;
-            }
         }
 
         void PrimaryMenu()

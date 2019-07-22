@@ -30,25 +30,26 @@ namespace UAlbion.Core
             if (subscribers != null)
                 foreach(var subscriber in subscribers)
                     if(subscriber != sender)
-                        subscriber.Receive(e);
+                        subscriber.Receive(e, sender);
         }
 
-        public void Subscribe<T>(IComponent subscriber)
+        public void Subscribe<T>(IComponent subscriber) { Subscribe(typeof(T), subscriber); }
+        public void Subscribe(Type eventType, IComponent subscriber)
         {
             lock (_syncRoot)
             {
                 if (_subscribers.TryGetValue(subscriber, out var subscribedTypes))
                 {
-                    if (subscribedTypes.Contains(typeof(T)))
+                    if (subscribedTypes.Contains(eventType))
                         return;
                 }
                 else _subscribers[subscriber] = new List<Type>();
 
-                if (!_subscriptions.ContainsKey(typeof(T)))
-                    _subscriptions.Add(typeof(T), new List<IComponent>());
+                if (!_subscriptions.ContainsKey(eventType))
+                    _subscriptions.Add(eventType, new List<IComponent>());
 
-                _subscriptions[typeof(T)].Add(subscriber);
-                _subscribers[subscriber].Add(typeof(T));
+                _subscriptions[eventType].Add(subscriber);
+                _subscribers[subscriber].Add(eventType);
             }
         }
 

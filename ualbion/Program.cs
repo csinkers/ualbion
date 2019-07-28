@@ -1,56 +1,16 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using System.Numerics;
 using System.Reflection;
-using System.Threading.Tasks;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Core;
+using UAlbion.Core.Objects;
 using UAlbion.Formats;
+using UAlbion.Game;
 using UAlbion.Game.Gui;
 
 namespace UAlbion
 {
-    class ConsoleLogger : IComponent
-    {
-        EventExchange _exchange;
-
-        public void Attach(EventExchange exchange)
-        {
-            _exchange = exchange;
-            exchange.Subscribe<IEvent>(this);
-            Task.Run(ConsoleReaderThread);
-        }
-
-        public void Receive(IEvent @event, object sender)
-        {
-            switch(@event)
-            {
-                case EngineUpdateEvent e:
-                    break;
-
-                default:
-                    Console.WriteLine(@event.ToString());
-                    break;
-            }
-        }
-
-        public void ConsoleReaderThread()
-        {
-            do
-            {
-                var command = Console.ReadLine();
-                try
-                {
-                    var @event = Event.Parse(command);
-                    _exchange.Raise(@event, this);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Parse error: {0}", e);
-                }
-
-            } while (true);
-        }
-    }
-
     class Program
     {
         static unsafe void Main(string[] args)
@@ -63,8 +23,10 @@ namespace UAlbion
 
             var assets = new Assets(config);
             var palette = assets.LoadPalette(2);
-            var menuBackground = assets.LoadTexture(AssetType.Picture, 19);
+            Image<Rgba32> menuBackground = assets.LoadPicture(25);
+            var statusBackground = assets.LoadPicture(99);
 
+            var gameState = new GameState();
             using (var engine = new Engine())
             {
                 var scene = engine.Create2DScene();
@@ -73,9 +35,12 @@ namespace UAlbion
                 var menu = new MainMenu();
                 scene.AddComponent(menu);
 
-                //MeshData planeMesh = PrimitiveShapes.Plane(1, 1, 1);
-                //Skybox skybox = Skybox.LoadDefaultSkybox();
-                //scene.AddRenderable(skybox);
+                var background = new Sprite(menuBackground, new Vector2(-1.0f, -0.6f), new Vector2(2.0f, 1.6f));
+                scene.AddRenderable(background);
+
+                var status = new Sprite(statusBackground, new Vector2(-1.0f, -1.0f), new Vector2(2.0f, 0.4f));
+                scene.AddRenderable(status);
+
 /*
                 var camera = (PerspectiveCamera)scene.Camera;
                 camera.Position = new Vector3(-80, 25, -4.3f);

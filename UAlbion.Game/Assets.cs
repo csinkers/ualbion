@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Mime;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace UAlbion.Formats
 {
@@ -132,29 +135,29 @@ namespace UAlbion.Formats
             {
                 case AssetLocation.Base:
                     if(!baseName.Contains("!"))
-                        return Try(Path.Combine(_config.BasePath, baseName, objectNumber.ToString()));
-                    return Try(Path.Combine(_config.BasePath, baseName.Replace("!", number.ToString()), objectNumber.ToString()));
+                        return Try(Path.Combine(_config.BaseDataPath, baseName, objectNumber.ToString()));
+                    return Try(Path.Combine(_config.BaseDataPath, baseName.Replace("!", number.ToString()), objectNumber.ToString()));
 
                 case AssetLocation.BaseRaw:
-                    return Try(Path.Combine(_config.BasePath, baseName));
+                    return Try(Path.Combine(_config.BaseDataPath, baseName));
 
                 case AssetLocation.Localised:
                     if (!baseName.Contains("!"))
-                        return Path.Combine(_config.BasePath, language.ToString().ToUpper(), baseName, objectNumber.ToString());
-                    return Path.Combine(_config.BasePath, language.ToString().ToUpper(), baseName.Replace("!", number.ToString()), objectNumber.ToString());
+                        return Path.Combine(_config.BaseDataPath, language.ToString().ToUpper(), baseName, objectNumber.ToString());
+                    return Path.Combine(_config.BaseDataPath, language.ToString().ToUpper(), baseName.Replace("!", number.ToString()), objectNumber.ToString());
 
                 case AssetLocation.LocalisedRaw:
-                    return Try(Path.Combine(_config.BasePath, language.ToString().ToUpper(), baseName));
+                    return Try(Path.Combine(_config.BaseDataPath, language.ToString().ToUpper(), baseName));
 
                 case AssetLocation.Initial:
                     if (!baseName.Contains("!"))
-                        return Path.Combine(_config.BasePath, "INITIAL", baseName, objectNumber.ToString());
-                    return Path.Combine(_config.BasePath, "INITIAL", baseName.Replace("!", number.ToString()), objectNumber.ToString());
+                        return Path.Combine(_config.BaseDataPath, "INITIAL", baseName, objectNumber.ToString());
+                    return Path.Combine(_config.BaseDataPath, "INITIAL", baseName.Replace("!", number.ToString()), objectNumber.ToString());
 
                 case AssetLocation.Current:
                     if (!baseName.Contains("!"))
-                        return Path.Combine(_config.BasePath, "CURRENT", baseName, objectNumber.ToString());
-                    return Path.Combine(_config.BasePath, "CURRENT", baseName.Replace("!", number.ToString()), objectNumber.ToString());
+                        return Path.Combine(_config.BaseDataPath, "CURRENT", baseName, objectNumber.ToString());
+                    return Path.Combine(_config.BaseDataPath, "CURRENT", baseName.Replace("!", number.ToString()), objectNumber.ToString());
 
                 default: throw new ArgumentOutOfRangeException("Invalid asset location");
             }
@@ -244,6 +247,7 @@ namespace UAlbion.Formats
             return (AlbionPalette)LoadAssetCached(AssetType.Palette, id, new AlbionPalette.PaletteContext(id, commonPalette));
         }
 
+        public Image<Rgba32> LoadPicture(int id) { return (Image<Rgba32>)LoadAssetCached(AssetType.Picture, id); }
         public AlbionSprite LoadTexture(AssetType type, int id) { return (AlbionSprite)LoadAssetCached(type, id); }
         public string LoadString(AssetType type, int id, GameLanguage language) { return (string)LoadAssetCached(AssetType.MapData, id, language); }
         public AlbionSample LoadSample(AssetType type, int id) { return (AlbionSample)LoadAssetCached(type, id); }

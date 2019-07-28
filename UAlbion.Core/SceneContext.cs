@@ -1,7 +1,5 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Runtime.CompilerServices;
-using UAlbion.Core.Objects;
 using Veldrid;
 
 namespace UAlbion.Core
@@ -10,6 +8,7 @@ namespace UAlbion.Core
     {
         public DeviceBuffer ProjectionMatrixBuffer { get; private set; }
         public DeviceBuffer ViewMatrixBuffer { get; private set; }
+
         public DeviceBuffer LightInfoBuffer { get; private set; }
         public DeviceBuffer LightViewProjectionBuffer0 { get; internal set; }
         public DeviceBuffer LightViewProjectionBuffer1 { get; internal set; }
@@ -18,20 +17,6 @@ namespace UAlbion.Core
         public DeviceBuffer CameraInfoBuffer { get; private set; }
         public DeviceBuffer PointLightsBuffer { get; private set; }
 
-        public CascadedShadowMaps ShadowMaps { get; private set; } = new CascadedShadowMaps();
-        public TextureView NearShadowMapView => ShadowMaps.NearShadowMapView;
-        public TextureView MidShadowMapView => ShadowMaps.MidShadowMapView;
-        public TextureView FarShadowMapView => ShadowMaps.FarShadowMapView;
-        public Framebuffer NearShadowMapFramebuffer => ShadowMaps.NearShadowMapFramebuffer;
-        public Framebuffer MidShadowMapFramebuffer => ShadowMaps.MidShadowMapFramebuffer;
-        public Framebuffer FarShadowMapFramebuffer => ShadowMaps.FarShadowMapFramebuffer;
-        public Texture ShadowMapTexture => ShadowMaps.NearShadowMap; // Only used for size.
-
-        public Texture ReflectionColorTexture { get; private set; }
-        public Texture ReflectionDepthTexture { get; private set; }
-        public TextureView ReflectionColorView { get; private set; }
-        public Framebuffer ReflectionFramebuffer { get; private set; }
-        public DeviceBuffer ReflectionViewProjBuffer { get; private set; }
 
         // MainSceneView and Duplicator resource sets both use this.
         public ResourceLayout TextureSamplerResourceLayout { get; private set; }
@@ -46,15 +31,10 @@ namespace UAlbion.Core
         public Texture DuplicatorTarget0 { get; private set; }
         public TextureView DuplicatorTargetView0 { get; private set; }
         public ResourceSet DuplicatorTargetSet0 { get; internal set; }
-        public Texture DuplicatorTarget1 { get; private set; }
-        public TextureView DuplicatorTargetView1 { get; private set; }
-        public ResourceSet DuplicatorTargetSet1 { get; internal set; }
         public Framebuffer DuplicatorFramebuffer { get; private set; }
 
         public ICamera Camera { get; set; }
-        public DirectionalLight DirectionalLight { get; } = new DirectionalLight();
         public TextureSampleCount MainSceneSampleCount { get; internal set; }
-        public DeviceBuffer MirrorClipPlaneBuffer { get; private set; }
         public DeviceBuffer NoClipPlaneBuffer { get; private set; }
 
         public virtual void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
@@ -93,21 +73,10 @@ namespace UAlbion.Core
                 new ResourceLayoutElementDescription("SourceTexture", ResourceKind.TextureReadOnly, ShaderStages.Fragment),
                 new ResourceLayoutElementDescription("SourceSampler", ResourceKind.Sampler, ShaderStages.Fragment)));
 
-            uint ReflectionMapSize = 2048;
-            ReflectionColorTexture = factory.CreateTexture(TextureDescription.Texture2D(ReflectionMapSize, ReflectionMapSize, 12, 1, PixelFormat.R16_G16_B16_A16_Float, TextureUsage.RenderTarget | TextureUsage.Sampled | TextureUsage.GenerateMipmaps));
-            ReflectionDepthTexture = factory.CreateTexture(TextureDescription.Texture2D(ReflectionMapSize, ReflectionMapSize, 1, 1, PixelFormat.R32_Float, TextureUsage.DepthStencil));
-            ReflectionColorView = factory.CreateTextureView(ReflectionColorTexture);
-            ReflectionFramebuffer = factory.CreateFramebuffer(new FramebufferDescription(ReflectionDepthTexture, ReflectionColorTexture));
-            ReflectionViewProjBuffer = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
-
-            MirrorClipPlaneBuffer = factory.CreateBuffer(new BufferDescription(32, BufferUsage.UniformBuffer));
-            gd.UpdateBuffer(MirrorClipPlaneBuffer, 0, new ClipPlaneInfo(MirrorMesh.Plane, true));
             NoClipPlaneBuffer = factory.CreateBuffer(new BufferDescription(32, BufferUsage.UniformBuffer));
             gd.UpdateBuffer(NoClipPlaneBuffer, 0, new ClipPlaneInfo());
 
             RecreateWindowSizedResources(gd, cl);
-
-            ShadowMaps.CreateDeviceResources(gd);
         }
 
         public virtual void DestroyDeviceObjects()
@@ -128,21 +97,11 @@ namespace UAlbion.Core
             MainSceneFramebuffer.Dispose();
             MainSceneViewResourceSet.Dispose();
             DuplicatorTarget0.Dispose();
-            DuplicatorTarget1.Dispose();
             DuplicatorTargetView0.Dispose();
-            DuplicatorTargetView1.Dispose();
             DuplicatorTargetSet0.Dispose();
-            DuplicatorTargetSet1.Dispose();
             DuplicatorFramebuffer.Dispose();
             TextureSamplerResourceLayout.Dispose();
-            ReflectionColorTexture.Dispose();
-            ReflectionDepthTexture.Dispose();
-            ReflectionColorView.Dispose();
-            ReflectionFramebuffer.Dispose();
-            ReflectionViewProjBuffer.Dispose();
-            MirrorClipPlaneBuffer.Dispose();
             NoClipPlaneBuffer.Dispose();
-            ShadowMaps.DestroyDeviceObjects();
         }
 
         public void SetCurrentScene(Scene scene)
@@ -166,11 +125,8 @@ namespace UAlbion.Core
             MainSceneViewResourceSet?.Dispose();
             MainSceneFramebuffer?.Dispose();
             DuplicatorTarget0?.Dispose();
-            DuplicatorTarget1?.Dispose();
             DuplicatorTargetView0?.Dispose();
-            DuplicatorTargetView1?.Dispose();
             DuplicatorTargetSet0?.Dispose();
-            DuplicatorTargetSet1?.Dispose();
             DuplicatorFramebuffer?.Dispose();
 
             ResourceFactory factory = gd.ResourceFactory;
@@ -197,6 +153,7 @@ namespace UAlbion.Core
                 sampleCount);
 
             MainSceneColorTexture = factory.CreateTexture(ref mainColorDesc);
+
             if (sampleCount != TextureSampleCount.Count1)
             {
                 mainColorDesc.SampleCount = TextureSampleCount.Count1;
@@ -206,6 +163,7 @@ namespace UAlbion.Core
             {
                 MainSceneResolvedColorTexture = MainSceneColorTexture;
             }
+
             MainSceneResolvedColorView = factory.CreateTextureView(MainSceneResolvedColorTexture);
             MainSceneDepthTexture = factory.CreateTexture(TextureDescription.Texture2D(
                 gd.SwapchainFramebuffer.Width,
@@ -227,64 +185,10 @@ namespace UAlbion.Core
                 TextureUsage.RenderTarget | TextureUsage.Sampled);
             DuplicatorTarget0 = factory.CreateTexture(ref colorTargetDesc);
             DuplicatorTargetView0 = factory.CreateTextureView(DuplicatorTarget0);
-            DuplicatorTarget1 = factory.CreateTexture(ref colorTargetDesc);
-            DuplicatorTargetView1 = factory.CreateTextureView(DuplicatorTarget1);
             DuplicatorTargetSet0 = factory.CreateResourceSet(new ResourceSetDescription(TextureSamplerResourceLayout, DuplicatorTargetView0, gd.PointSampler));
-            DuplicatorTargetSet1 = factory.CreateResourceSet(new ResourceSetDescription(TextureSamplerResourceLayout, DuplicatorTargetView1, gd.PointSampler));
 
-            FramebufferDescription fbDesc = new FramebufferDescription(null, DuplicatorTarget0, DuplicatorTarget1);
+            FramebufferDescription fbDesc = new FramebufferDescription(null, DuplicatorTarget0);
             DuplicatorFramebuffer = factory.CreateFramebuffer(ref fbDesc);
         }
-    }
-
-    public class CascadedShadowMaps
-    {
-        public Texture NearShadowMap { get; private set; }
-        public TextureView NearShadowMapView { get; private set; }
-        public Framebuffer NearShadowMapFramebuffer { get; private set; }
-
-        public Texture MidShadowMap { get; private set; }
-        public TextureView MidShadowMapView { get; private set; }
-        public Framebuffer MidShadowMapFramebuffer { get; private set; }
-
-        public Texture FarShadowMap { get; private set; }
-        public TextureView FarShadowMapView { get; private set; }
-        public Framebuffer FarShadowMapFramebuffer { get; private set; }
-
-        public void CreateDeviceResources(GraphicsDevice gd)
-        {
-            var factory = gd.ResourceFactory;
-            TextureDescription desc = TextureDescription.Texture2D(2048, 2048, 1, 1, PixelFormat.D32_Float_S8_UInt, TextureUsage.DepthStencil | TextureUsage.Sampled);
-            NearShadowMap = factory.CreateTexture(desc);
-            NearShadowMap.Name = "Near Shadow Map";
-            NearShadowMapView = factory.CreateTextureView(NearShadowMap);
-            NearShadowMapFramebuffer = factory.CreateFramebuffer(new FramebufferDescription(
-                new FramebufferAttachmentDescription(NearShadowMap, 0), Array.Empty<FramebufferAttachmentDescription>()));
-
-            MidShadowMap = factory.CreateTexture(desc);
-            MidShadowMapView = factory.CreateTextureView(new TextureViewDescription(MidShadowMap, 0, 1, 0, 1));
-            MidShadowMapFramebuffer = factory.CreateFramebuffer(new FramebufferDescription(
-                new FramebufferAttachmentDescription(MidShadowMap, 0), Array.Empty<FramebufferAttachmentDescription>()));
-
-            FarShadowMap = factory.CreateTexture(desc);
-            FarShadowMapView = factory.CreateTextureView(new TextureViewDescription(FarShadowMap, 0, 1, 0, 1));
-            FarShadowMapFramebuffer = factory.CreateFramebuffer(new FramebufferDescription(
-                new FramebufferAttachmentDescription(FarShadowMap, 0), Array.Empty<FramebufferAttachmentDescription>()));
-        }
-
-        public void DestroyDeviceObjects()
-        {
-            NearShadowMap.Dispose();
-            NearShadowMapView.Dispose();
-            NearShadowMapFramebuffer.Dispose();
-
-            MidShadowMap.Dispose();
-            MidShadowMapView.Dispose();
-            MidShadowMapFramebuffer.Dispose();
-
-            FarShadowMap.Dispose();
-            FarShadowMapView.Dispose();
-            FarShadowMapFramebuffer.Dispose();
-        }
-    }
+   }
 }

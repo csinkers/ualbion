@@ -169,15 +169,10 @@ namespace UAlbion.Core
             float bottom, float top,
             float near, float far)
         {
-            Matrix4x4 ortho;
-            if (useReverseDepth)
-            {
-                ortho = Matrix4x4.CreateOrthographicOffCenter(left, right, bottom, top, far, near);
-            }
-            else
-            {
-                ortho = Matrix4x4.CreateOrthographicOffCenter(left, right, bottom, top, near, far);
-            }
+            var ortho = useReverseDepth 
+                ? Matrix4x4.CreateOrthographicOffCenter(left, right, bottom, top, far, near) 
+                : Matrix4x4.CreateOrthographicOffCenter(left, right, bottom, top, near, far);
+
             if (gd.IsClipSpaceYInverted)
             {
                 ortho *= new Matrix4x4(

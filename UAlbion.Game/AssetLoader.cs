@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using SixLabors.ImageSharp;
 
 namespace UAlbion.Formats
 {
@@ -17,7 +18,7 @@ namespace UAlbion.Formats
                 case AssetType.Font: return new AlbionFont(br, streamLength);
                 case AssetType.Palette: return new AlbionPalette(br, streamLength, (AlbionPalette.PaletteContext)context);
                 case AssetType.PaletteNull: return br.ReadBytes(streamLength);
-                case AssetType.Picture: return new AlbionSprite(br, streamLength, type);
+                case AssetType.Picture: return Image.Load(br.BaseStream);
 
                 // Fixed size graphics
                 case AssetType.Floor3D: return new AlbionSprite(br, streamLength, 64, 64); // Fixed width
@@ -44,7 +45,7 @@ namespace UAlbion.Formats
                 case AssetType.MonsterGraphics:
                 case AssetType.BackgroundGraphics: // Skyboxes
                 case AssetType.CombatGraphics:
-                    return new AlbionSprite(br, streamLength, type);
+                    return new AlbionSprite(br, streamLength);
 
                 // Textual resources
                 case AssetType.EventTexts:

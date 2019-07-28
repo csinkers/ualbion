@@ -6,9 +6,11 @@ namespace UAlbion.Core
     public sealed class EventAttribute : Attribute
     {
         public string Name { get; }
-        public EventAttribute(string name)
+        public string HelpText { get; }
+        public EventAttribute(string name, string helpText = null)
         {
             Name = name;
+            HelpText = helpText;
         }
     }
 

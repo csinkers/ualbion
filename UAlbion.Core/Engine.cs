@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Numerics;
+using System.Threading;
 using ImGuiNET;
 using Veldrid;
-using Veldrid.ImageSharp;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
-using Veldrid.Utilities;
 using UAlbion.Core.Objects;
 
 namespace UAlbion.Core
@@ -17,11 +14,10 @@ namespace UAlbion.Core
         readonly string[] _msaaOptions = { "Off", "2x", "4x", "8x", "16x", "32x" };
 
         static readonly double s_desiredFrameLengthSeconds = 1.0 / 60.0;
-        static readonly bool s_limitFrameRate = false;
+        static readonly bool s_limitFrameRate = true;
         static readonly FrameTimeAverager s_frameTimeAverager = new FrameTimeAverager(0.666);
         static RenderDoc _renderDoc;
 
-        readonly IDictionary<string, ImageSharpTexture> _textures = new Dictionary<string, ImageSharpTexture>();
         readonly FullScreenQuad _fullScreenQuad;
         readonly ScreenDuplicator _duplicator;
         readonly ImGuiRenderable _igRenderable;
@@ -34,7 +30,6 @@ namespace UAlbion.Core
         TextureSampleCount? _newSampleCount;
         bool _windowResized;
         bool _recreateWindow = true;
-        bool _colorSrgb = true;
         int _msaaOption = 0;
 
         public Scene Create2DScene()
@@ -57,27 +52,6 @@ namespace UAlbion.Core
             scene.AddRenderable(_duplicator);
             scene.AddRenderable(_fullScreenQuad);
             return scene;
-
-/*
-            ShadowmapDrawer texDrawIndexeder = new ShadowmapDrawer(() => _window, () => _sceneContext.NearShadowMapView);
-            _resizeHandled += (w, h) => texDrawIndexeder.OnWindowResized();
-            texDrawIndexeder.Position = new Vector2(10, 25);
-            _scene.AddRenderable(texDrawIndexeder);
-
-            ShadowmapDrawer texDrawIndexeder2 = new ShadowmapDrawer(() => _window, () => _sceneContext.MidShadowMapView);
-            _resizeHandled += (w, h) => texDrawIndexeder2.OnWindowResized();
-            texDrawIndexeder2.Position = new Vector2(20 + texDrawIndexeder2.Size.X, 25);
-            _scene.AddRenderable(texDrawIndexeder2);
-
-            ShadowmapDrawer texDrawIndexeder3 = new ShadowmapDrawer(() => _window, () => _sceneContext.FarShadowMapView);
-            _resizeHandled += (w, h) => texDrawIndexeder3.OnWindowResized();
-            texDrawIndexeder3.Position = new Vector2(30 + (texDrawIndexeder3.Size.X * 2), 25);
-            _scene.AddRenderable(texDrawIndexeder3);
-
-            ShadowmapDrawer reflectionTexDrawer = new ShadowmapDrawer(() => _window, () => _sceneContext.ReflectionColorView);
-            _resizeHandled += (w, h) => reflectionTexDrawer.OnWindowResized();
-            reflectionTexDrawer.Position = new Vector2(40 + (reflectionTexDrawer.Size.X * 3), 25);
-            _scene.AddRenderable(reflectionTexDrawer); */
         }
 
         public void SetScene(Scene scene)
@@ -99,7 +73,7 @@ namespace UAlbion.Core
                 WindowInitialState = WindowState.Normal,
                 WindowTitle = "UAlbion"
             };
-            GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(false, null, false, ResourceBindingModel.Improved, true, true, _colorSrgb);
+            GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(false, null, false, ResourceBindingModel.Improved, true, true, false);
 #if DEBUG
             gdOptions.Debug = true;
 #endif
@@ -108,9 +82,10 @@ namespace UAlbion.Core
                 gdOptions,
                 //VeldridStartup.GetPlatformDefaultBackend(),
                 //GraphicsBackend.Metal,
-                // GraphicsBackend.Vulkan,
+                //GraphicsBackend.Vulkan,
                 GraphicsBackend.OpenGL,
                 //GraphicsBackend.OpenGLES,
+                //GraphicsBackend.Direct3D11,
                 out _window,
                 out _graphicsDevice);
             _window.Resized += () => _windowResized = true;
@@ -120,92 +95,6 @@ namespace UAlbion.Core
             _fullScreenQuad = new FullScreenQuad();
 
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
-        }
-
-        /*
-        void AddSponzaAtriumObjects()
-        {
-            ObjParser parser = new ObjParser();
-            using (FileStream objStream = File.OpenRead(AssetHelper.GetPath("Models/SponzaAtrium/sponza.obj")))
-            {
-                ObjFile atriumFile = parser.Parse(objStream);
-                MtlFile atriumMtls;
-                using (FileStream mtlStream = File.OpenRead(AssetHelper.GetPath("Models/SponzaAtrium/sponza.mtl")))
-                {
-                    atriumMtls = new MtlParser().Parse(mtlStream);
-                }
-
-                foreach (ObjFile.MeshGroup group in atriumFile.MeshGroups)
-                {
-                    Vector3 scale = new Vector3(0.1f);
-                    ConstructedMeshInfo mesh = atriumFile.GetMesh(group);
-                    MaterialDefinition materialDef = atriumMtls.Definitions[mesh.MaterialName];
-                    ImageSharpTexture overrideTextureData = null;
-                    ImageSharpTexture alphaTexture = null;
-                    MaterialPropsAndBuffer materialProps = CommonMaterials.Brick;
-                    if (materialDef.DiffuseTexture != null)
-                    {
-                        string texturePath = AssetHelper.GetPath("Models/SponzaAtrium/" + materialDef.DiffuseTexture);
-                        overrideTextureData = LoadTexture(texturePath, true);
-                    }
-                    if (materialDef.AlphaMap != null)
-                    {
-                        string texturePath = AssetHelper.GetPath("Models/SponzaAtrium/" + materialDef.AlphaMap);
-                        alphaTexture = LoadTexture(texturePath, false);
-                    }
-                    if (materialDef.Name.Contains("vase"))
-                    {
-                        materialProps = CommonMaterials.Vase;
-                    }
-                    if (group.Name == "sponza_117")
-                    {
-                        MirrorMesh.Plane = Plane.CreateFromVertices(
-                            atriumFile.Positions[group.Faces[0].Vertex0.PositionIndex] * scale.X,
-                            atriumFile.Positions[group.Faces[0].Vertex1.PositionIndex] * scale.Y,
-                            atriumFile.Positions[group.Faces[0].Vertex2.PositionIndex] * scale.Z);
-                        materialProps = CommonMaterials.Reflective;
-                    }
-
-                    AddTexturedMesh(
-                        mesh,
-                        overrideTextureData,
-                        alphaTexture,
-                        materialProps,
-                        Vector3.Zero,
-                        Quaternion.Identity,
-                        scale,
-                        group.Name);
-                }
-            }
-        }
-        */
-
-        ImageSharpTexture LoadTexture(string texturePath, bool mipmap) // Plz don't call this with the same texturePath and different mipmap values.
-        {
-            if (!_textures.TryGetValue(texturePath, out ImageSharpTexture tex))
-            {
-                tex = new ImageSharpTexture(texturePath, mipmap, true);
-                _textures.Add(texturePath, tex);
-            }
-
-            return tex;
-        }
-
-        void AddTexturedMesh(
-            MeshData meshData,
-            ImageSharpTexture texData,
-            ImageSharpTexture alphaTexData,
-            MaterialPropsAndBuffer materialProps,
-            Vector3 position,
-            Quaternion rotation,
-            Vector3 scale,
-            string name)
-        {
-            TexturedMesh mesh = new TexturedMesh(name, meshData, texData, alphaTexData, materialProps ?? CommonMaterials.Brick);
-            mesh.Transform.Position = position;
-            mesh.Transform.Rotation = rotation;
-            mesh.Transform.Scale = scale;
-            _scene.AddRenderable(mesh);
         }
 
         public void Run()
@@ -223,6 +112,9 @@ namespace UAlbion.Core
 
                 while (s_limitFrameRate && deltaSeconds < s_desiredFrameLengthSeconds)
                 {
+                    var millisecondsToSleep = (int)((s_desiredFrameLengthSeconds - deltaSeconds) * 1000);
+                    if (millisecondsToSleep > 10)
+                        Thread.Sleep(millisecondsToSleep - 1);
                     currentFrameTicks = sw.ElapsedTicks;
                     deltaSeconds = (currentFrameTicks - previousFrameTicks) / (double)Stopwatch.Frequency;
                 }
@@ -321,11 +213,6 @@ namespace UAlbion.Core
                     {
                         _scene.ThreadedRendering = !_scene.ThreadedRendering;
                     }
-                    bool tinted = _fullScreenQuad.UseTintedTexture;
-                    if (ImGui.MenuItem("Tinted output", string.Empty, tinted, true))
-                    {
-                        _fullScreenQuad.UseTintedTexture = !tinted;
-                    }
 
                     ImGui.EndMenu();
                 }
@@ -345,11 +232,7 @@ namespace UAlbion.Core
                         ImGui.SetTooltip(
                             "Causes a new OS window to be created whenever the graphics backend is switched. This is much safer, and is the default.");
                     }
-                    if (ImGui.MenuItem("sRGB Swapchain Format", string.Empty, _colorSrgb, true))
-                    {
-                        _colorSrgb = !_colorSrgb;
-                        ChangeBackend(_graphicsDevice.BackendType);
-                    }
+
                     bool vsync = _graphicsDevice.SyncToVerticalBlank;
                     if (ImGui.MenuItem("VSync", string.Empty, vsync, true))
                     {
@@ -368,28 +251,7 @@ namespace UAlbion.Core
 
                     ImGui.EndMenu();
                 }
-                /*
-                if (ImGui.BeginMenu("Materials"))
-                {
-                    if (ImGui.BeginMenu("Brick"))
-                    {
-                        DrawIndexedMaterialMenu(CommonMaterials.Brick);
-                        ImGui.EndMenu();
-                    }
-                    if (ImGui.BeginMenu("Vase"))
-                    {
-                        DrawIndexedMaterialMenu(CommonMaterials.Vase);
-                        ImGui.EndMenu();
-                    }
-                    if (ImGui.BeginMenu("Reflective"))
-                    {
-                        DrawIndexedMaterialMenu(CommonMaterials.Reflective);
-                        ImGui.EndMenu();
-                    }
 
-                    ImGui.EndMenu();
-                }
-                */
                 if (ImGui.BeginMenu("Debug"))
                 {
                     if (ImGui.MenuItem("Refresh Device Objects"))
@@ -503,20 +365,6 @@ namespace UAlbion.Core
             Console.WriteLine($"Refreshing resources {numTimes} times took {sw.Elapsed.TotalSeconds} seconds.");
         }
 
-        void DrawIndexedMaterialMenu(MaterialPropsAndBuffer propsAndBuffer)
-        {
-            MaterialProperties props = propsAndBuffer.Properties;
-            float intensity = props.SpecularIntensity.X;
-            float reflectivity = props.Reflectivity;
-            if (ImGui.SliderFloat("Intensity", ref intensity, 0f, 10f, intensity.ToString(), 1f)
-                | ImGui.SliderFloat("Power", ref props.SpecularPower, 0f, 1000f, props.SpecularPower.ToString(), 1f)
-                | ImGui.SliderFloat("Reflectivity", ref props.Reflectivity, 0f, 1f, props.Reflectivity.ToString(), 1f))
-            {
-                props.SpecularIntensity = new Vector3(intensity);
-                propsAndBuffer.Properties = props;
-            }
-        }
-
         void ToggleFullscreenState()
         {
             bool isFullscreen = _window.WindowState == WindowState.BorderlessFullScreen;
@@ -585,26 +433,13 @@ namespace UAlbion.Core
                 _window.Resized += () => _windowResized = true;
             }
 
-            GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(false, null, syncToVBlank, ResourceBindingModel.Improved, true, true, _colorSrgb);
+            GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(false, null, syncToVBlank, ResourceBindingModel.Improved, true, true, false);
 #if DEBUG
             gdOptions.Debug = true;
 #endif
             _graphicsDevice = VeldridStartup.CreateGraphicsDevice(_window, gdOptions, backend);
-
             _scene.Camera.UpdateBackend(_graphicsDevice);
-
             CreateAllObjects();
-        }
-
-        void DestroyAllObjects()
-        {
-            _graphicsDevice.WaitForIdle();
-            _frameCommands.Dispose();
-            _sceneContext.DestroyDeviceObjects();
-            _scene.DestroyAllDeviceObjects();
-            CommonMaterials.DestroyAllDeviceObjects();
-            StaticResourceCache.DestroyAllDeviceObjects();
-            _graphicsDevice.WaitForIdle();
         }
 
         void CreateAllObjects()
@@ -620,6 +455,17 @@ namespace UAlbion.Core
             initCL.End();
             _graphicsDevice.SubmitCommands(initCL);
             initCL.Dispose();
+        }
+
+        void DestroyAllObjects()
+        {
+            _graphicsDevice.WaitForIdle();
+            _frameCommands.Dispose();
+            _sceneContext.DestroyDeviceObjects();
+            _scene.DestroyAllDeviceObjects();
+            CommonMaterials.DestroyAllDeviceObjects();
+            StaticResourceCache.DestroyAllDeviceObjects();
+            _graphicsDevice.WaitForIdle();
         }
 
         public void Dispose()

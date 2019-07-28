@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿#if false
+using System.IO;
 
 namespace UAlbion.Tools.ImageReverser
 {
@@ -164,3 +165,4 @@ namespace UAlbion.Tools.ImageReverser
         public override string ToString() { return Name; }
     }
 }
+#endif

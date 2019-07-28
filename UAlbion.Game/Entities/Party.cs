@@ -2,6 +2,17 @@
 
 namespace UAlbion.Game.Entities
 {
+    enum SceneType
+    {
+        MainMenu,
+        Inventory,
+        Large2D,
+        Small2D,
+        Dungeon,
+        Map,
+        Combat
+    }
+
     public class Party
     {
         const int PositionHistoryCount = 40;

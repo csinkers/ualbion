@@ -15,4 +15,8 @@
     <ProjectReference Include="..\UAlbion.Game\UAlbion.Game.csproj" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="cd /D C:\Depot\bb\ualbion\data\Shaders&#xD;&#xA;powershell C:\Depot\bb\ualbion\data\Shaders\compile.ps1" />
+  </Target>
+
 </Project>

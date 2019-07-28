@@ -7,14 +7,10 @@ namespace UAlbion.Core
     {
         public readonly ulong Value;
 
-        public RenderOrderKey(ulong value)
-        {
-            Value = value;
-        }
+        public RenderOrderKey(ulong value) { Value = value; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static RenderOrderKey Create(int materialId, float cameraDistance)
-            => Create((uint)materialId, cameraDistance);
+        public static RenderOrderKey Create(int materialId, float cameraDistance) => Create((uint)materialId, cameraDistance);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RenderOrderKey Create(uint materialId, float cameraDistance)
@@ -26,14 +22,7 @@ namespace UAlbion.Core
                 cameraDistanceInt);
         }
 
-        public int CompareTo(RenderOrderKey other)
-        {
-            return Value.CompareTo(other.Value);
-        }
-
-        int IComparable.CompareTo(object obj)
-        {
-            return Value.CompareTo(obj);
-        }
+        public int CompareTo(RenderOrderKey other) { return Value.CompareTo(other.Value); } 
+        int IComparable.CompareTo(object obj) { return Value.CompareTo(obj); }
     }
 }

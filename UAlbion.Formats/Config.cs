@@ -66,6 +66,8 @@ namespace UAlbion.Formats
 
         [JsonIgnore]
         public string BasePath { get; set; }
+
+        [JsonIgnore] public string BaseDataPath => Path.Combine(BasePath, "data");
         public string XldPath { get; set; }
         public string ExportedXldPath { get; set; }
 

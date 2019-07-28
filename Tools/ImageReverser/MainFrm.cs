@@ -10,11 +10,13 @@ namespace UAlbion.Tools.ImageReverser
 {
     public partial class MainFrm : Form
     {
+        readonly DateTime _startTime;
         readonly Config _config;
         TreeNode _rootNode;
 
         public MainFrm(Config config)
         {
+            _startTime = DateTime.Now;
             _config = config;
             InitializeComponent();
         }
@@ -41,6 +43,8 @@ namespace UAlbion.Tools.ImageReverser
                 AddToTree(relative, xld);
             }
 
+            var commonPalette = File.ReadAllBytes(Path.Combine(_config.BasePath, _config.XldPath, "PALETTE.000"));
+
             var palettesPath = Path.Combine(exportedDir, "PALETTE0.XLD");
             files = Directory.EnumerateFiles(palettesPath, "*.*", SearchOption.AllDirectories);
             foreach (var file in files)
@@ -51,7 +55,13 @@ namespace UAlbion.Tools.ImageReverser
                 if (string.IsNullOrEmpty(paletteName))
                     paletteName = file.Substring(exportedDir.Length + 1);
 
-                listPalettes.Items.Add(Palette.Load(file, paletteName));
+                using(var stream = File.Open(file, FileMode.Open))
+                using (var br = new BinaryReader(stream))
+                {
+                    var context = new AlbionPalette.PaletteContext(paletteNumber, paletteName, commonPalette);
+                    var palette = new AlbionPalette(br, (int) br.BaseStream.Length, context);
+                    listPalettes.Items.Add(palette);
+                }
             }
 
             listPalettes.SelectedIndex = 0;
@@ -66,6 +76,10 @@ namespace UAlbion.Tools.ImageReverser
             if (texture.Offset > bytes.Length)
                 texture.Offset = bytes.Length;
 
+            trackOffset.Maximum = bytes.Length - 1;
+            numOffset.Maximum = trackOffset.Maximum;
+            trackOffset.LargeChange = texture.Width * 400;
+
             int height = (bytes.Length - texture.Offset + (texture.Width - 1)) / texture.Width;
             if (height == 0)
                 return new Bitmap(1, 1);
@@ -77,7 +91,8 @@ namespace UAlbion.Tools.ImageReverser
                 ImageLockMode.WriteOnly,
                 PixelFormat.Format24bppRgb);
 
-            var palette = (Palette)listPalettes.SelectedItem ?? new Palette("Dummy");
+            var palette = (AlbionPalette)(listPalettes.SelectedItem ?? listPalettes.Items[0]);
+            var curPalette = palette.GetPaletteAtTime((int) (DateTime.Now - _startTime).TotalSeconds * 4);
 
             try
             {
@@ -92,9 +107,11 @@ namespace UAlbion.Tools.ImageReverser
                                 int x = magnify * ((n - texture.Offset) % texture.Width) + mx;
                                 int y = magnify * ((n - texture.Offset) / texture.Width) + my;
                                 byte* p = (byte*)d.Scan0 + y * d.Stride + x * 3;
-                                p[0] = palette.Blue(bytes[n]);
-                                p[1] = palette.Green(bytes[n]);
-                                p[2] = palette.Red(bytes[n]);
+                                byte color = bytes[n];
+
+                                p[0] = (byte)((curPalette[color] & 0x0000ff00) >> 8);
+                                p[1] = (byte)((curPalette[color] & 0x00ff0000) >> 16);
+                                p[2] = (byte)((curPalette[color] & 0xff000000) >> 24);
                             }
                         }
                     }

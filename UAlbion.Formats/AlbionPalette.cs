@@ -10,11 +10,14 @@ namespace UAlbion.Formats
         public class PaletteContext
         {
             public PaletteContext(int id, byte[] commonPalette) { Id = id; CommonPalette = commonPalette; }
+            public PaletteContext(int id, string name, byte[] commonPalette) { Id = id; CommonPalette = commonPalette; Name = name; }
             public int Id { get; }
+            public string Name { get; }
             public byte[] CommonPalette { get; }
         }
 
         public int Id { get; }
+        public string Name { get; }
         public readonly uint[] Entries = new uint[0x100];
         public static readonly IDictionary<int, IList<(byte, byte)>> AnimatedRanges = new Dictionary<int, IList<(int, int)>> {
             { 0,  new[] { (0x99, 0x9f), (0xb0, 0xbf) } }, // 7, 16 => 112
@@ -34,23 +37,37 @@ namespace UAlbion.Formats
         public AlbionPalette(BinaryReader br, int streamLength, PaletteContext context)
         {
             Id = context.Id;
+            Name = context.Name;
             Debug.Assert(context.CommonPalette.Length == 192);
             long startingOffset = br.BaseStream.Position;
             for (int i = 0; i < 192; i++)
             {
-                Entries[i] = (uint)br.ReadByte() << 24;
+                Entries[i]  = (uint)br.ReadByte() << 24;
                 Entries[i] |= (uint)br.ReadByte() << 16;
                 Entries[i] |= (uint)br.ReadByte() << 8;
             }
 
             for (int i = 192; i < 256; i++)
             {
-                Entries[i] = (uint)context.CommonPalette[(i - 192) * 3] << 24;
+                Entries[i]  = (uint)context.CommonPalette[(i - 192) * 3 + 0] << 24;
                 Entries[i] |= (uint)context.CommonPalette[(i - 192) * 3 + 1] << 16;
                 Entries[i] |= (uint)context.CommonPalette[(i - 192) * 3 + 2] << 8;
             }
 
             Debug.Assert(br.BaseStream.Position == startingOffset + streamLength);
+        }
+
+        public AlbionPalette(BinaryReader br)
+        {
+            Id = -1;
+            long startingOffset = br.BaseStream.Position;
+            for (int i = 0; i < 256; i++)
+            {
+                Entries[i]  = (uint)br.ReadByte() << 24;
+                Entries[i] |= (uint)br.ReadByte() << 16;
+                Entries[i] |= (uint)br.ReadByte() << 8;
+                br.ReadByte();
+            }
         }
 
         public uint[] GetPaletteAtTime(int tick)
@@ -75,5 +92,7 @@ namespace UAlbion.Formats
             }
             return result;
         }
+
+        public override string ToString() { return string.IsNullOrEmpty(Name) ? $"Palette {Id}" : Name; }
     }
 }

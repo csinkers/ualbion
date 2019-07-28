@@ -12,14 +12,14 @@ namespace UAlbion.Formats
             Pixels = bytes;
         }
 
-        int Width { get; }
-        int Height { get; }
-        byte[] Pixels { get; }
+        public int Width { get; }
+        public int Height { get; }
+        public byte[] Pixels { get; }
     }
 
     public class AlbionSprite
     {
-        readonly AlbionFrame[] _sprites;
+        public AlbionFrame[] Frames { get; }
 
         public AlbionSprite(BinaryReader br, long streamLength, int width, int height)
         {
@@ -28,37 +28,30 @@ namespace UAlbion.Formats
             long initialPosition = br.BaseStream.Position;
 
             int spriteCount = unchecked((int)(streamLength / (width * height)));
-            _sprites = new AlbionFrame[spriteCount];
+            Frames = new AlbionFrame[spriteCount];
             for (int i = 0; i < spriteCount; i++)
             {
                 var bytes = br.ReadBytes(width * height);
-                _sprites[i] = new AlbionFrame(width, height, bytes);
+                Frames[i] = new AlbionFrame(width, height, bytes);
             }
             Debug.Assert(br.BaseStream.Position == initialPosition + streamLength);
         }
 
-        public AlbionSprite(BinaryReader br, long streamLength, AssetType type)
+        public AlbionSprite(BinaryReader br, long streamLength)
         {
-            if(type == AssetType.Picture)
-            {
-                // Load bitmap
-            }
-            else
-            {
-                long initialPosition = br.BaseStream.Position;
+            long initialPosition = br.BaseStream.Position;
 
-                int width = br.ReadUInt16();
-                int height = br.ReadUInt16();
-                int spriteCount = br.ReadUInt16();
-                _sprites = new AlbionFrame[spriteCount];
-                for (int i = 0; i < spriteCount; i++)
-                {
-                    var bytes = br.ReadBytes(width * height);
-                    _sprites[i] = new AlbionFrame(width, height, bytes);
-                }
-
-                Debug.Assert(br.BaseStream.Position == initialPosition + streamLength);
+            int width = br.ReadUInt16();
+            int height = br.ReadUInt16();
+            int spriteCount = br.ReadUInt16();
+            Frames = new AlbionFrame[spriteCount];
+            for (int i = 0; i < spriteCount; i++)
+            {
+                var bytes = br.ReadBytes(width * height);
+                Frames[i] = new AlbionFrame(width, height, bytes);
             }
+
+            Debug.Assert(br.BaseStream.Position == initialPosition + streamLength);
         }
     }
 }

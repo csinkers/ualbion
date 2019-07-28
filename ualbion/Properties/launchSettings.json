@@ -2,7 +2,8 @@
   "profiles": {
     "UAlbion": {
       "commandName": "Project",
-      "workingDirectory": "C:\\Depot\\bb\\ualbion"
+      "workingDirectory": "C:\\Depot\\bb\\ualbion",
+      "nativeDebugging": true
     }
   }
 }

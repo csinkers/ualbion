@@ -49,10 +49,10 @@
             // 
             this.fileTree.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.fileTree.Location = new System.Drawing.Point(181, 13);
-            this.fileTree.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.fileTree.Location = new System.Drawing.Point(217, 16);
+            this.fileTree.Margin = new System.Windows.Forms.Padding(2);
             this.fileTree.Name = "fileTree";
-            this.fileTree.Size = new System.Drawing.Size(236, 740);
+            this.fileTree.Size = new System.Drawing.Size(282, 887);
             this.fileTree.TabIndex = 0;
             this.fileTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.FileTree_AfterSelect);
             // 
@@ -60,12 +60,12 @@
             // 
             this.trackWidth.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.trackWidth.Location = new System.Drawing.Point(421, 650);
-            this.trackWidth.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.trackWidth.Location = new System.Drawing.Point(505, 780);
+            this.trackWidth.Margin = new System.Windows.Forms.Padding(2);
             this.trackWidth.Maximum = 1024;
             this.trackWidth.Minimum = 1;
             this.trackWidth.Name = "trackWidth";
-            this.trackWidth.Size = new System.Drawing.Size(520, 56);
+            this.trackWidth.Size = new System.Drawing.Size(624, 69);
             this.trackWidth.TabIndex = 1;
             this.trackWidth.Value = 32;
             this.trackWidth.ValueChanged += new System.EventHandler(this.TrackWidth_ValueChanged);
@@ -74,8 +74,8 @@
             // numWidth
             // 
             this.numWidth.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.numWidth.Location = new System.Drawing.Point(945, 650);
-            this.numWidth.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.numWidth.Location = new System.Drawing.Point(1134, 780);
+            this.numWidth.Margin = new System.Windows.Forms.Padding(2);
             this.numWidth.Maximum = new decimal(new int[] {
             1024,
             0,
@@ -87,7 +87,7 @@
             0,
             0});
             this.numWidth.Name = "numWidth";
-            this.numWidth.Size = new System.Drawing.Size(75, 22);
+            this.numWidth.Size = new System.Drawing.Size(90, 26);
             this.numWidth.TabIndex = 2;
             this.numWidth.Value = new decimal(new int[] {
             32,
@@ -101,20 +101,20 @@
             // 
             this.textName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textName.Location = new System.Drawing.Point(421, 564);
-            this.textName.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textName.Location = new System.Drawing.Point(505, 677);
+            this.textName.Margin = new System.Windows.Forms.Padding(2);
             this.textName.Name = "textName";
-            this.textName.Size = new System.Drawing.Size(599, 22);
+            this.textName.Size = new System.Drawing.Size(718, 26);
             this.textName.TabIndex = 3;
             this.textName.TextChanged += new System.EventHandler(this.TextName_TextChanged);
             // 
             // btnSave
             // 
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.Location = new System.Drawing.Point(876, 715);
-            this.btnSave.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnSave.Location = new System.Drawing.Point(1051, 858);
+            this.btnSave.Margin = new System.Windows.Forms.Padding(2);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(144, 42);
+            this.btnSave.Size = new System.Drawing.Size(173, 50);
             this.btnSave.TabIndex = 4;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
@@ -125,10 +125,10 @@
             this.canvas.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.canvas.Location = new System.Drawing.Point(421, 13);
-            this.canvas.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.canvas.Location = new System.Drawing.Point(505, 16);
+            this.canvas.Margin = new System.Windows.Forms.Padding(2);
             this.canvas.Name = "canvas";
-            this.canvas.Size = new System.Drawing.Size(563, 547);
+            this.canvas.Size = new System.Drawing.Size(676, 656);
             this.canvas.TabIndex = 5;
             this.canvas.TabStop = false;
             // 
@@ -136,35 +136,35 @@
             // 
             this.scrollBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.scrollBar.Location = new System.Drawing.Point(986, 2);
+            this.scrollBar.Location = new System.Drawing.Point(1183, 2);
             this.scrollBar.Name = "scrollBar";
-            this.scrollBar.Size = new System.Drawing.Size(34, 558);
+            this.scrollBar.Size = new System.Drawing.Size(34, 670);
             this.scrollBar.TabIndex = 6;
             // 
             // trackOffset
             // 
             this.trackOffset.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.trackOffset.Location = new System.Drawing.Point(421, 590);
-            this.trackOffset.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.trackOffset.Maximum = 1024;
+            this.trackOffset.Location = new System.Drawing.Point(505, 708);
+            this.trackOffset.Margin = new System.Windows.Forms.Padding(2);
+            this.trackOffset.Maximum = 1048576;
             this.trackOffset.Name = "trackOffset";
-            this.trackOffset.Size = new System.Drawing.Size(520, 56);
+            this.trackOffset.Size = new System.Drawing.Size(624, 69);
             this.trackOffset.TabIndex = 7;
             this.trackOffset.ValueChanged += new System.EventHandler(this.TrackOffset_ValueChanged);
             // 
             // numOffset
             // 
             this.numOffset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.numOffset.Location = new System.Drawing.Point(945, 590);
-            this.numOffset.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.numOffset.Location = new System.Drawing.Point(1134, 708);
+            this.numOffset.Margin = new System.Windows.Forms.Padding(2);
             this.numOffset.Maximum = new decimal(new int[] {
             1024,
             0,
             0,
             0});
             this.numOffset.Name = "numOffset";
-            this.numOffset.Size = new System.Drawing.Size(75, 22);
+            this.numOffset.Size = new System.Drawing.Size(90, 26);
             this.numOffset.TabIndex = 8;
             this.numOffset.ValueChanged += new System.EventHandler(this.NumOffset_ValueChanged);
             // 
@@ -173,18 +173,19 @@
             this.listPalettes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.listPalettes.FormattingEnabled = true;
-            this.listPalettes.ItemHeight = 16;
-            this.listPalettes.Location = new System.Drawing.Point(13, 13);
+            this.listPalettes.ItemHeight = 20;
+            this.listPalettes.Location = new System.Drawing.Point(16, 16);
+            this.listPalettes.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.listPalettes.Name = "listPalettes";
-            this.listPalettes.Size = new System.Drawing.Size(163, 740);
+            this.listPalettes.Size = new System.Drawing.Size(195, 884);
             this.listPalettes.TabIndex = 11;
             this.listPalettes.SelectedIndexChanged += new System.EventHandler(this.ListPalettes_SelectedIndexChanged);
             // 
             // MainFrm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(144F, 144F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(1031, 768);
+            this.ClientSize = new System.Drawing.Size(1237, 922);
             this.Controls.Add(this.listPalettes);
             this.Controls.Add(this.numOffset);
             this.Controls.Add(this.trackOffset);
@@ -195,7 +196,7 @@
             this.Controls.Add(this.numWidth);
             this.Controls.Add(this.trackWidth);
             this.Controls.Add(this.fileTree);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "MainFrm";
             this.Text = "Image Reverser";
             this.Load += new System.EventHandler(this.MainFrm_Load);

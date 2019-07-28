@@ -27,14 +27,9 @@ namespace UAlbion.Core.Objects
         TextureView _alphaMapView;
 
         Pipeline _pipeline;
-        Pipeline _pipelineFrontCull;
         ResourceSet _mainProjViewRS;
         ResourceSet _mainSharedRS;
         ResourceSet _mainPerObjectRS;
-        ResourceSet _reflectionRS;
-        ResourceSet _noReflectionRS;
-        Pipeline _shadowMapPipeline;
-        ResourceSet[] _shadowMapResourceSets;
 
         DeviceBuffer _worldAndInverseBuffer;
 
@@ -43,8 +38,6 @@ namespace UAlbion.Core.Objects
         readonly MaterialPropsAndBuffer _materialProps;
         readonly Vector3 _objectCenter;
         readonly bool _materialPropsOwned = false;
-
-        public MaterialProperties MaterialProperties { get => _materialProps.Properties; set { _materialProps.Properties = value; } }
 
         public Transform Transform => _transform;
 
@@ -61,7 +54,7 @@ namespace UAlbion.Core.Objects
 
         public override BoundingBox BoundingBox => BoundingBox.Transform(_centeredBounds, _transform.GetTransformMatrix());
 
-        public unsafe override void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
+        public override unsafe void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
         {
             if (s_useUniformOffset)
             {
@@ -121,21 +114,6 @@ namespace UAlbion.Core.Objects
             ResourceLayout worldLayout = StaticResourceCache.GetResourceLayout(gd.ResourceFactory, new ResourceLayoutDescription(
                 new ResourceLayoutElementDescription("WorldAndInverse", ResourceKind.UniformBuffer, ShaderStages.Vertex, ResourceLayoutElementOptions.DynamicBinding)));
 
-            GraphicsPipelineDescription depthPD = new GraphicsPipelineDescription(
-                BlendStateDescription.Empty,
-                gd.IsDepthRangeZeroToOne ? DepthStencilStateDescription.DepthOnlyGreaterEqual : DepthStencilStateDescription.DepthOnlyLessEqual,
-                RasterizerStateDescription.Default,
-                PrimitiveTopology.TriangleList,
-                new ShaderSetDescription(
-                    shadowDepthVertexLayouts,
-                    new[] { depthVS, depthFS },
-                    new[] { new SpecializationConstant(100, gd.IsClipSpaceYInverted) }),
-                new ResourceLayout[] { projViewCombinedLayout, worldLayout },
-                sc.NearShadowMapFramebuffer.OutputDescription);
-            _shadowMapPipeline = StaticResourceCache.GetPipeline(gd.ResourceFactory, ref depthPD);
-
-            _shadowMapResourceSets = CreateShadowMapResourceSets(gd.ResourceFactory, disposeFactory, cl, sc, projViewCombinedLayout, worldLayout);
-
             VertexLayoutDescription[] mainVertexLayouts = new VertexLayoutDescription[]
             {
                 new VertexLayoutDescription(
@@ -190,9 +168,6 @@ namespace UAlbion.Core.Objects
                 sc.MainSceneFramebuffer.OutputDescription);
             _pipeline = StaticResourceCache.GetPipeline(gd.ResourceFactory, ref mainPD);
             _pipeline.Name = "TexturedMesh Main Pipeline";
-            mainPD.RasterizerState.CullMode = FaceCullMode.Front;
-            mainPD.Outputs = sc.ReflectionFramebuffer.OutputDescription;
-            _pipelineFrontCull = StaticResourceCache.GetPipeline(gd.ResourceFactory, ref mainPD);
 
             _mainProjViewRS = StaticResourceCache.GetResourceSet(gd.ResourceFactory, new ResourceSetDescription(projViewLayout,
                 sc.ProjectionMatrixBuffer,
@@ -214,47 +189,8 @@ namespace UAlbion.Core.Objects
                 gd.Aniso4xSampler,
                 _alphaMapView,
                 gd.LinearSampler,
-                sc.NearShadowMapView,
-                sc.MidShadowMapView,
-                sc.FarShadowMapView,
                 gd.PointSampler));
 
-            _reflectionRS = StaticResourceCache.GetResourceSet(gd.ResourceFactory, new ResourceSetDescription(reflectionLayout,
-                _alphaMapView, // Doesn't really matter -- just don't bind the actual reflection map since it's being rendered to.
-                gd.PointSampler,
-                sc.ReflectionViewProjBuffer,
-                sc.MirrorClipPlaneBuffer));
-
-            _noReflectionRS = StaticResourceCache.GetResourceSet(gd.ResourceFactory, new ResourceSetDescription(reflectionLayout,
-                sc.ReflectionColorView,
-                gd.PointSampler,
-                sc.ReflectionViewProjBuffer,
-                sc.NoClipPlaneBuffer));
-        }
-
-        ResourceSet[] CreateShadowMapResourceSets(
-            ResourceFactory sharedFactory,
-            ResourceFactory disposeFactory,
-            CommandList cl,
-            SceneContext sc,
-            ResourceLayout projViewLayout,
-            ResourceLayout worldLayout)
-        {
-            ResourceSet[] ret = new ResourceSet[6];
-
-            for (int i = 0; i < 3; i++)
-            {
-                DeviceBuffer viewProjBuffer = i == 0 ? sc.LightViewProjectionBuffer0 : i == 1 ? sc.LightViewProjectionBuffer1 : sc.LightViewProjectionBuffer2;
-                ret[i * 2] = StaticResourceCache.GetResourceSet(sharedFactory, new ResourceSetDescription(
-                    projViewLayout,
-                    viewProjBuffer));
-                ResourceSet worldRS = disposeFactory.CreateResourceSet(new ResourceSetDescription(
-                    worldLayout,
-                    new DeviceBufferRange(_worldAndInverseBuffer, _uniformOffset, 128)));
-                ret[i * 2 + 1] = worldRS;
-            }
-
-            return ret;
         }
 
         public override void DestroyDeviceObjects()
@@ -274,20 +210,7 @@ namespace UAlbion.Core.Objects
                 Vector3.Distance((_objectCenter * _transform.Scale) + _transform.Position, cameraPosition));
         }
 
-        public override RenderPasses RenderPasses
-        {
-            get
-            {
-                if (_alphaTextureData != null)
-                {
-                    return RenderPasses.AllShadowMap | RenderPasses.AlphaBlend | RenderPasses.ReflectionMap;
-                }
-                else
-                {
-                    return RenderPasses.AllShadowMap | RenderPasses.Standard | RenderPasses.ReflectionMap;
-                }
-            }
-        }
+        public override RenderPasses RenderPasses => _alphaTextureData != null ? RenderPasses.AlphaBlend : RenderPasses.Standard;
 
         public override void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass)
         {
@@ -296,18 +219,9 @@ namespace UAlbion.Core.Objects
                 _materialProps.FlushChanges(cl);
             }
 
-            if ((renderPass & RenderPasses.AllShadowMap) != 0)
-            {
-                int shadowMapIndex = renderPass == RenderPasses.ShadowMapNear ? 0 : renderPass == RenderPasses.ShadowMapMid ? 1 : 2;
-                RenderShadowMap(cl, sc, shadowMapIndex);
-            }
-            else if (renderPass == RenderPasses.Standard || renderPass == RenderPasses.AlphaBlend)
+            if (renderPass == RenderPasses.Standard || renderPass == RenderPasses.AlphaBlend)
             {
                 RenderStandard(cl, sc, false);
-            }
-            else if (renderPass == RenderPasses.ReflectionMap)
-            {
-                RenderStandard(cl, sc, true);
             }
         }
 
@@ -319,27 +233,15 @@ namespace UAlbion.Core.Objects
             gd.UpdateBuffer(_worldAndInverseBuffer, _uniformOffset * 2, ref wai);
         }
 
-        void RenderShadowMap(CommandList cl, SceneContext sc, int shadowMapIndex)
-        {
-            cl.SetVertexBuffer(0, _vb);
-            cl.SetIndexBuffer(_ib, IndexFormat.UInt16);
-            cl.SetPipeline(_shadowMapPipeline);
-            cl.SetGraphicsResourceSet(0, _shadowMapResourceSets[shadowMapIndex * 2]);
-            uint offset = _uniformOffset;
-            cl.SetGraphicsResourceSet(1, _shadowMapResourceSets[shadowMapIndex * 2 + 1], 1, ref offset);
-            cl.DrawIndexed((uint)_indexCount, 1, 0, 0, 0);
-        }
-
         void RenderStandard(CommandList cl, SceneContext sc, bool reflectionPass)
         {
             cl.SetVertexBuffer(0, _vb);
             cl.SetIndexBuffer(_ib, IndexFormat.UInt16);
-            cl.SetPipeline(reflectionPass ? _pipelineFrontCull : _pipeline);
+            cl.SetPipeline(_pipeline);
             cl.SetGraphicsResourceSet(0, _mainProjViewRS);
             cl.SetGraphicsResourceSet(1, _mainSharedRS);
             uint offset = _uniformOffset;
             cl.SetGraphicsResourceSet(2, _mainPerObjectRS, 1, ref offset);
-            cl.SetGraphicsResourceSet(3, reflectionPass ? _reflectionRS : _noReflectionRS);
             cl.DrawIndexed((uint)_indexCount, 1, 0, 0, 0);
         }
     }

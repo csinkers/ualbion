@@ -19,6 +19,7 @@ namespace UAlbion.Game
     [Event("sound_fx_off")] public class SoundFxOffEvent : GameEvent { }
     [Event("stop_anim")] public class StopAnimEvent : GameEvent { }
 
+
     [Event("active_member_text")]
     public class ActiveMemberTextEvent : GameEvent
     {
@@ -272,5 +273,13 @@ namespace UAlbion.Game
     {
         public UpdateEvent(int frames) { Frames = frames; }
         [EventPart("frames")] public int Frames { get; }
+    }
+
+    [Event("set_active_member")]
+    public class SetActiveMemberEvent : GameEvent
+    {
+        public SetActiveMemberEvent(int memberId) { MemberId = memberId; }
+        [EventPart("memberid")] public int MemberId { get; }
+
     }
 }

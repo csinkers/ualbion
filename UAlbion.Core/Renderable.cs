@@ -14,10 +14,7 @@ namespace UAlbion.Core
         public abstract RenderOrderKey GetRenderOrderKey(Vector3 cameraPosition);
         public virtual RenderPasses RenderPasses => RenderPasses.Standard;
 
-        public void Dispose()
-        {
-            DestroyDeviceObjects();
-        }
+        public void Dispose() { DestroyDeviceObjects(); }
     }
 
     public abstract class CullRenderable : Renderable

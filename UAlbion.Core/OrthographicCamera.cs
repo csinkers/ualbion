@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using Veldrid;
 using Veldrid.Sdl2;
 
@@ -11,13 +10,11 @@ namespace UAlbion.Core
         Matrix4x4 _projectionMatrix;
         Vector3 _position = new Vector3(0, 0, 1);
 
+        EventExchange _exchange;
         GraphicsDevice _gd;
         bool _useReverseDepth;
         float _windowWidth;
         float _windowHeight;
-
-        public event Action<Matrix4x4> ProjectionChanged;
-        public event Action<Matrix4x4> ViewChanged;
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;
@@ -41,6 +38,7 @@ namespace UAlbion.Core
 
         public void Attach(EventExchange exchange)
         {
+            _exchange = exchange;
             exchange.Subscribe<WindowResizedEvent>(this);
         }
 
@@ -72,13 +70,13 @@ namespace UAlbion.Core
                 0, _windowHeight,
                 NearDistance, FarDistance);
 
-            ProjectionChanged?.Invoke(_projectionMatrix);
+            _exchange?.Raise(new ProjectionMatrixChangedEvent(_projectionMatrix), this);
         }
 
         void UpdateViewMatrix()
         {
             _viewMatrix = Matrix4x4.CreateLookAt(_position, _position + LookDirection, Vector3.UnitY);
-            ViewChanged?.Invoke(_viewMatrix);
+            _exchange?.Raise(new ViewMatrixChangedEvent(_viewMatrix), this);
         }
 
         public CameraInfo GetCameraInfo() => new CameraInfo

@@ -14,7 +14,7 @@ namespace UAlbion.Tools.ImageReverser
         [STAThread]
         static void Main()
         {
-            var baseDir = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Parent.Parent.Parent.Parent.FullName;
+            var baseDir = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Parent.Parent.Parent.FullName;
             Config config = Config.Load(baseDir);
 
             Application.EnableVisualStyles();

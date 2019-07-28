@@ -20,7 +20,6 @@ namespace UAlbion.Core.Objects
         DeviceBuffer _vb;
         DeviceBuffer _ib;
         Pipeline _pipeline;
-        Pipeline _reflectionPipeline;
         ResourceSet _resourceSet;
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
 
@@ -69,12 +68,10 @@ namespace UAlbion.Core.Objects
                 new RasterizerStateDescription(FaceCullMode.None, PolygonFillMode.Solid, FrontFace.Clockwise, true, true),
                 PrimitiveTopology.TriangleList,
                 new ShaderSetDescription(vertexLayouts, new[] { vs, fs }, ShaderHelper.GetSpecializations(gd)),
-                new ResourceLayout[] { _layout },
+                new[] { _layout },
                 sc.MainSceneFramebuffer.OutputDescription);
 
             _pipeline = factory.CreateGraphicsPipeline(ref pd);
-            pd.Outputs = sc.ReflectionFramebuffer.OutputDescription;
-            _reflectionPipeline = factory.CreateGraphicsPipeline(ref pd);
 
             _resourceSet = factory.CreateResourceSet(new ResourceSetDescription(
                 _layout,
@@ -83,7 +80,7 @@ namespace UAlbion.Core.Objects
                 textureView,
                 gd.PointSampler));
 
-            _disposeCollector.Add(_vb, _ib, textureCube, textureView, _layout, _pipeline, _reflectionPipeline, _resourceSet, vs, fs);
+            _disposeCollector.Add(_vb, _ib, textureCube, textureView, _layout, _pipeline, _resourceSet, vs, fs);
         }
 
         public override void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc)
@@ -110,7 +107,7 @@ namespace UAlbion.Core.Objects
         {
             cl.SetVertexBuffer(0, _vb);
             cl.SetIndexBuffer(_ib, IndexFormat.UInt16);
-            cl.SetPipeline(renderPass == RenderPasses.ReflectionMap ? _reflectionPipeline : _pipeline);
+            cl.SetPipeline(_pipeline);
             cl.SetGraphicsResourceSet(0, _resourceSet);
             float depth = gd.IsDepthRangeZeroToOne ? 0 : 1;
             cl.SetViewport(0, new Viewport(0, 0, sc.MainSceneColorTexture.Width, sc.MainSceneColorTexture.Height, depth, depth));
@@ -119,7 +116,7 @@ namespace UAlbion.Core.Objects
             cl.SetViewport(0, new Viewport(0, 0, sc.MainSceneColorTexture.Width, sc.MainSceneColorTexture.Height, 0, 1));
         }
 
-        public override RenderPasses RenderPasses => RenderPasses.Standard | RenderPasses.ReflectionMap;
+        public override RenderPasses RenderPasses => RenderPasses.Standard;
 
         public override RenderOrderKey GetRenderOrderKey(Vector3 cameraPosition)
         {

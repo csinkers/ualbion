@@ -11,6 +11,8 @@ namespace UAlbion.Core
 {
     public class Engine : IDisposable
     {
+        public ITextureManager TextureManager { get; }
+
         readonly string[] _msaaOptions = { "Off", "2x", "4x", "8x", "16x", "32x" };
 
         static readonly double s_desiredFrameLengthSeconds = 1.0 / 60.0;
@@ -35,22 +37,28 @@ namespace UAlbion.Core
         public Scene Create2DScene()
         {
             var camera = new OrthographicCamera(_window);
-            var scene = new Scene(_graphicsDevice, _window, camera);
-            scene.AddRenderable(_igRenderable);
+            var scene = new Scene(camera);
+            scene.AddRenderer(_igRenderable);
+            scene.AddRenderer(_duplicator);
+            scene.AddRenderer(_fullScreenQuad);
+
             scene.AddComponent(_igRenderable);
-            scene.AddRenderable(_duplicator);
-            scene.AddRenderable(_fullScreenQuad);
+            scene.AddComponent(_duplicator);
+            scene.AddComponent(_fullScreenQuad);
             return scene;
         }
 
         public Scene Create3DScene()
         {
             var camera = new PerspectiveCamera(_graphicsDevice, _window);
-            var scene = new Scene(_graphicsDevice, _window, camera);
-            scene.AddRenderable(_igRenderable);
+            var scene = new Scene(camera);
+            scene.AddRenderer(_igRenderable);
+            scene.AddRenderer(_duplicator);
+            scene.AddRenderer(_fullScreenQuad);
+
             scene.AddComponent(_igRenderable);
-            scene.AddRenderable(_duplicator);
-            scene.AddRenderable(_fullScreenQuad);
+            scene.AddComponent(_duplicator);
+            scene.AddComponent(_fullScreenQuad);
             return scene;
         }
 
@@ -64,6 +72,7 @@ namespace UAlbion.Core
 
         public Engine()
         {
+            TextureManager = new TextureManager();
             WindowCreateInfo windowCi = new WindowCreateInfo
             {
                 X = 50,
@@ -207,11 +216,6 @@ namespace UAlbion.Core
                         }
 
                         ImGui.EndMenu();
-                    }
-                    bool threadedRendering = _scene.ThreadedRendering;
-                    if (ImGui.MenuItem("Render with multiple threads", string.Empty, threadedRendering, true))
-                    {
-                        _scene.ThreadedRendering = !_scene.ThreadedRendering;
                     }
 
                     ImGui.EndMenu();
@@ -401,8 +405,6 @@ namespace UAlbion.Core
 
             _frameCommands.Begin();
 
-            CommonMaterials.FlushAll(_frameCommands);
-
             _scene.RenderAllStages(_graphicsDevice, _frameCommands, _sceneContext);
             _graphicsDevice.SwapBuffers();
         }
@@ -450,7 +452,6 @@ namespace UAlbion.Core
             initCL.Name = "Recreation Initialization Command List";
             initCL.Begin();
             _sceneContext.CreateDeviceObjects(_graphicsDevice, initCL, _sceneContext);
-            CommonMaterials.CreateAllDeviceObjects(_graphicsDevice, initCL, _sceneContext);
             _scene.CreateAllDeviceObjects(_graphicsDevice, initCL, _sceneContext);
             initCL.End();
             _graphicsDevice.SubmitCommands(initCL);
@@ -463,7 +464,6 @@ namespace UAlbion.Core
             _frameCommands.Dispose();
             _sceneContext.DestroyDeviceObjects();
             _scene.DestroyAllDeviceObjects();
-            CommonMaterials.DestroyAllDeviceObjects();
             StaticResourceCache.DestroyAllDeviceObjects();
             _graphicsDevice.WaitForIdle();
         }
@@ -479,228 +479,6 @@ namespace UAlbion.Core
 }
 
 /*
-    public class Renderable : IDisposable
-    {
-        public readonly int IndexCount;
-        public readonly DeviceBuffer VertexBuffer;
-        public readonly DeviceBuffer IndexBuffer;
-
-        public Renderable(DeviceBuffer vertexBuffer, DeviceBuffer indexBuffer, int indexCount)
-        {
-            VertexBuffer = vertexBuffer;
-            IndexBuffer = indexBuffer;
-            IndexCount = indexCount;
-        }
-
-        public void Dispose()
-        {
-            VertexBuffer?.Dispose();
-            IndexBuffer?.Dispose();
-        }
-    }
-
-    public class Engine : IDisposable
-    {
-        readonly GraphicsDevice _graphicsDevice;
-        readonly CommandList _cl;
-        readonly Pipeline _pipeline;
-        readonly Sdl2Window _window;
-        readonly ResourceSet _paletteSet;
-        readonly ResourceSet _textureSet;
-        readonly RenderDoc _renderDoc;
-        readonly Renderable _plane;
-        int _ticks;
-        ResourceLayout _paletteLayout;
-        ResourceLayout _textureLayout;
-
-        Palette CreatePalette()
-        {
-            var palette = new byte[256 * 4];
-            for (int i = 0; i < palette.Length / 4; i++)
-            {
-                palette[i * 4 + 0] = (byte)(i % 64 * 4);
-                palette[i * 4 + 1] = (byte)(i % 37 * 6);
-                palette[i * 4 + 2] = (byte)i;
-                palette[i * 4 + 3] = 255;
-            }
-
-            return new Palette(palette);
-        }
-
-        EightBitTexture CreateTexture()
-        {
-            var background = new byte[640 * 480];
-            for (int y = 0; y < 480; y++)
-            {
-                for (int x = 0; x < 640; x++)
-                {
-                    float val = Math.Max((float) x / 640, (float) y / 480);
-                    background[y * 640 + x] = (byte) (255 - val * 255);
-                    //background[y * 640 + x] = (byte)(x % 32 + ((y % 8) << 5));
-                }
-            }
-
-            return new EightBitTexture(640, 480, 1, 1, background);
-        }
-
-        Renderable CreatePlane(ResourceFactory factory)
-        {
-            var vertices = new[]
-            {
-                    new Vertex2DTextured(new Vector2(-1.0f, 1.0f), new Vector2(0.0f, 1.0f)),
-                    new Vertex2DTextured(new Vector2(1.0f, 1.0f), new Vector2(1.0f, 1.0f)),
-                    new Vertex2DTextured(new Vector2(-1.0f, -1.0f), new Vector2(0.0f, 0.0f)),
-                    new Vertex2DTextured(new Vector2(1.0f, -1.0f), new Vector2(1.0f, 0.0f)),
-                };
-            var indices = new ushort[] { 0, 1, 2, 2, 1, 3 };
-
-            uint vertexBufferSize = (uint)(vertices.Length * Marshal.SizeOf<Vertex2DTextured>());
-            var vertexBuffer = factory.CreateBuffer(new BufferDescription(vertexBufferSize, BufferUsage.VertexBuffer));
-            _graphicsDevice.UpdateBuffer(vertexBuffer, 0, vertices);
-
-            uint indexBufferSize = (uint)(indices.Length * sizeof(ushort));
-            var indexBuffer = factory.CreateBuffer(new BufferDescription(indexBufferSize, BufferUsage.IndexBuffer));
-            _graphicsDevice.UpdateBuffer(indexBuffer, 0, indices);
-            return new Renderable(vertexBuffer, indexBuffer, indices.Length);
-        }
-
-        Pipeline CreatePipeline(ResourceFactory factory)
-        {
-            var vertexLayout = new VertexLayoutDescription(
-                new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
-                new VertexElementDescription("TexCoords", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2)
-                );
-
-            var shaderSet = new ShaderSetDescription(new[] { vertexLayout },
-                factory.CreateFromSpirv(
-                    new ShaderDescription(ShaderStages.Vertex, Encoding.UTF8.GetBytes(VertexCode), "main"),
-                    new ShaderDescription(ShaderStages.Fragment, Encoding.UTF8.GetBytes(FragmentCode), "main")));
-
-            _paletteLayout = factory.CreateResourceLayout(
-                 new ResourceLayoutDescription(
-                    new ResourceLayoutElementDescription("Palette", ResourceKind.TextureReadOnly, ShaderStages.Fragment),
-                    new ResourceLayoutElementDescription("PaletteSampler", ResourceKind.Sampler, ShaderStages.Fragment)));
-
-            _textureLayout = factory.CreateResourceLayout(
-                new ResourceLayoutDescription(
-                    new ResourceLayoutElementDescription("SurfaceTexture", ResourceKind.TextureReadOnly, ShaderStages.Fragment),
-                    new ResourceLayoutElementDescription("SurfaceSampler", ResourceKind.Sampler, ShaderStages.Fragment)));
-
-            return factory.CreateGraphicsPipeline(new GraphicsPipelineDescription(
-                BlendStateDescription.SingleOverrideBlend,
-                DepthStencilStateDescription.DepthOnlyLessEqual,
-                RasterizerStateDescription.Default,
-                PrimitiveTopology.TriangleList,
-                shaderSet,
-                new[] { _paletteLayout, _textureLayout },
-                _graphicsDevice.SwapchainFramebuffer.OutputDescription));
-        }
-
-        public Engine()
-        {
-            RenderDoc.Load(out RenderDoc tempRd);
-            _renderDoc = tempRd;
-            _renderDoc.SetCaptureSavePath(@"C:\tmp\RenderDocTraces");
-            _renderDoc.CaptureAllCmdLists = true;
-            _renderDoc.CaptureCallstacks = true;
-            _renderDoc.OverlayEnabled = true;
-
-            WindowCreateInfo windowInfo = new WindowCreateInfo
-            {
-                X = 100,
-                Y = 100,
-                WindowWidth = 640,
-                WindowHeight = 480,
-                WindowTitle = "UAlbion"
-            };
-            _window = VeldridStartup.CreateWindow(ref windowInfo);
-            _graphicsDevice = VeldridStartup.CreateGraphicsDevice(_window);
-            _window.KeyDown += WindowOnKeyDown;
-
-            ResourceFactory factory = _graphicsDevice.ResourceFactory;
-
-            _plane = CreatePlane(factory);
-            _pipeline = CreatePipeline(factory);
-
-            var palette = CreatePalette();
-            var paletteDeviceTexture = palette.CreateDeviceTexture(_graphicsDevice, factory, TextureUsage.Sampled);
-            var paletteView = factory.CreateTextureView(paletteDeviceTexture);
-
-            var backgroundTexture = CreateTexture();
-            var backgroundDeviceTexture = backgroundTexture.CreateDeviceTexture(_graphicsDevice, factory, TextureUsage.Sampled);
-            var backgroundTextureView = factory.CreateTextureView(backgroundDeviceTexture);
-
-            _paletteSet = factory.CreateResourceSet(new ResourceSetDescription(_paletteLayout, paletteView, _graphicsDevice.PointSampler));
-            _textureSet = factory.CreateResourceSet(new ResourceSetDescription(_textureLayout, backgroundTextureView, _graphicsDevice.Aniso4xSampler));
-            _cl = factory.CreateCommandList();
-        }
-
-        void WindowOnKeyDown(KeyEvent e)
-        {
-            switch(e.Key)
-            {
-                case Key.Escape:
-                case Key.Q:
-                    _window.Close();
-                    break;
-                case Key.F11:
-                    _renderDoc.LaunchReplayUI();
-                    break;
-            }
-        }
-
-        public void Start()
-        {
-            while (_window.Exists)
-            {
-                _window.PumpEvents();
-                Draw();
-                _ticks++;
-            }
-        }
-
-        void Draw()
-        {
-            _cl.Begin();
-
-            _cl.SetFramebuffer(_graphicsDevice.SwapchainFramebuffer);
-            _cl.ClearColorTarget(0, RgbaFloat.Black);
-            
-            _cl.SetPipeline(_pipeline);
-            _cl.SetVertexBuffer(0, _plane.VertexBuffer);
-            _cl.SetIndexBuffer(_plane.IndexBuffer, IndexFormat.UInt16);
-            _cl.SetGraphicsResourceSet(0, _paletteSet);
-            _cl.SetGraphicsResourceSet(1, _textureSet);
-            _cl.DrawIndexed((uint)_plane.IndexCount, 1, 0, 0, 0);
-
-            _cl.End();
-
-            _graphicsDevice.SubmitCommands(_cl);
-            _graphicsDevice.SwapBuffers();
-            _graphicsDevice.WaitForIdle();
-        }
-
-        public void Dispose()
-        {
-            _cl?.Dispose();
-            _pipeline?.Dispose();
-            _plane?.Dispose();
-            _graphicsDevice?.Dispose();
-        }
-
-        const string VertexCode = @"
-#version 450
-
-layout(location = 0) in vec2 Position;
-layout(location = 1) in vec2 TexCoords;
-layout(location = 0) out vec2 fsin_texCoords;
-
-void main()
-{
-    gl_Position = vec4(Position, 0, 1);
-    fsin_texCoords = TexCoords;
-}";
-
         const string FragmentCode = @"
 #version 450
 
@@ -723,4 +501,4 @@ void main()
     // fsout_color = vec4(fsin_texCoords[0], fsin_texCoords[1], 0.0, 1.0);
 }";
     }
-    */
+*/

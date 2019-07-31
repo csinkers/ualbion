@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Game.AssetIds;
 
@@ -248,7 +249,12 @@ namespace UAlbion.Game
             return (AlbionPalette)LoadAssetCached(AssetType.Palette, (int)id, new AlbionPalette.PaletteContext((int)id, commonPalette));
         }
 
-        public Image<Rgba32> LoadPicture(PictureId id) { return (Image<Rgba32>)LoadAsset(AssetType.Picture, (int)id, GameLanguage.English, null); }
+        public ITexture LoadPicture(PictureId id)
+        {
+            var image = (Image<Rgba32>)LoadAsset(AssetType.Picture, (int)id, GameLanguage.English, null);
+            return new TrueColorTexture(image);
+        }
+
         public AlbionSprite LoadTexture(AssetType type, int id) { return (AlbionSprite)LoadAsset(type, id, GameLanguage.English, null); }
         public string LoadString(AssetType type, int id, GameLanguage language) { return (string)LoadAssetCached(AssetType.MapData, id, language); }
         public AlbionSample LoadSample(AssetType type, int id) { return (AlbionSample)LoadAssetCached(type, id); }

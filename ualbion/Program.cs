@@ -1,8 +1,7 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
 using System.Reflection;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Core;
 using UAlbion.Core.Objects;
 using UAlbion.Formats;
@@ -12,6 +11,28 @@ using UAlbion.Game.Gui;
 
 namespace UAlbion
 {
+    class Billboard : Component
+    {
+        static IList<Handler> Handlers => new Handler[] { new Handler<Billboard,RenderEvent>((x, e) => x.OnRender(e)), };
+        public Vector2 Position { get; set; }
+
+        readonly ITexture _texture;
+        readonly SpriteFlags _flags;
+
+        public Billboard(ITexture texture, SpriteFlags flags) : base(Handlers)
+        {
+            _texture = texture;
+            _flags = flags;
+        }
+
+        void OnRender(RenderEvent renderEvent)
+        {
+            var sprite = ((SpriteRenderer)renderEvent.GetRenderer(typeof(SpriteRenderer))).CreateSprite();
+            sprite.Initialize(Position, _texture, 0, _flags);
+            renderEvent.Add(sprite);
+        }
+    }
+
     class Program
     {
         static unsafe void Main(string[] args)
@@ -24,13 +45,13 @@ namespace UAlbion
 
             var assets = new Assets(config);
             var palette = assets.LoadPalette(PaletteId.Main3D);
-
             var gameState = new GameState();
-            var textureManager = new AlbionTextureManager(assets);
+
             using (var engine = new Engine())
             {
-                var spriteRenderer = new SpriteRenderer();
                 var scene = engine.Create2DScene();
+                scene.SetPalette(palette.Entries); // TODO: Update on game tick
+                scene.AddRenderer(new SpriteRenderer(engine.TextureManager));
                 scene.AddComponent(new ConsoleLogger());
                 scene.Camera.Position = new Vector3(656, 678, 0);
                 scene.Camera.Magnification = 4.0f;
@@ -46,9 +67,9 @@ namespace UAlbion
                 //var status = new SpriteRenderer(statusBackground, new Vector2(0.0f, 0.8f), new Vector2(1.0f, 0.2f));
                 //scene.AddRenderable(status);
 
-                var mapImage = assets.LoadPicture(PictureId.TestMap);
-                var map = new Sprite(spriteRenderer, mapImage) { Position = new Vector2(0.0f, 0.0f));
-                scene.AddRenderable(map);
+                ITexture mapImage = assets.LoadPicture(PictureId.TestMap);
+                var map = new Billboard(mapImage, 0) { Position = new Vector2(0.0f, 0.0f) };
+                scene.AddComponent(map);
 
                 engine.SetScene(scene);
                 engine.Run();

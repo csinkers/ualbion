@@ -19,7 +19,8 @@ namespace UAlbion
         {
             switch(@event)
             {
-                case EngineUpdateEvent e:
+                case EngineUpdateEvent _:
+                case RenderEvent _:
                     break;
 
                 default:

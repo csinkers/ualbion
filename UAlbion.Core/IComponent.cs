@@ -23,17 +23,9 @@ namespace UAlbion.Core
 
         protected class Handler<TInstance, TEvent>  : Handler where TInstance : Component
         {
-            public Action<TInstance, TEvent> Callback { get; }
-
-            public Handler(Action<TInstance, TEvent> callback) : base(typeof(TEvent))
-            {
-                Callback = callback;
-            }
-
-            public override void Invoke(Component instance, IEvent @event)
-            {
-                Callback((TInstance)instance, (TEvent)@event);
-            }
+            readonly Action<TInstance, TEvent> _callback;
+            public Handler(Action<TInstance, TEvent> callback) : base(typeof(TEvent)) { _callback = callback; }
+            public override void Invoke(Component instance, IEvent @event) { _callback((TInstance)instance, (TEvent)@event); }
         }
 
         readonly IDictionary<Type, Handler> _handlers;

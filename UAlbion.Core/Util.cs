@@ -6,7 +6,7 @@ using Veldrid.Utilities;
 
 namespace UAlbion.Core
 {
-    internal static class Util
+    static class Util
     {
         internal static uint SizeInBytes<T>(this T[] array) where T : struct
         {

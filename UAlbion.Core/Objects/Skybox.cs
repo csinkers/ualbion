@@ -4,10 +4,10 @@ using SixLabors.ImageSharp.PixelFormats;
 using Veldrid;
 using Veldrid.ImageSharp;
 using Veldrid.Utilities;
-
+/*
 namespace UAlbion.Core.Objects
 {
-    public class Skybox : Renderable
+    public class Skybox : Component, IRenderable, IRenderer
     {
         readonly Image<Rgba32> _front;
         readonly Image<Rgba32> _back;
@@ -168,3 +168,4 @@ namespace UAlbion.Core.Objects
         ResourceLayout _layout;
     }
 }
+*/

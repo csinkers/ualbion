@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if false
+using System;
 using System.Numerics;
 using Veldrid;
 using Veldrid.ImageSharp;
@@ -252,3 +253,4 @@ namespace UAlbion.Core.Objects
         public Matrix4x4 InverseWorld;
     }
 }
+#endif

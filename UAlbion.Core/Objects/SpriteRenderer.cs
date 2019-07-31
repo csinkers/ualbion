@@ -1,19 +1,22 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using Veldrid;
 using Veldrid.SPIRV;
 using Veldrid.Utilities;
 
 namespace UAlbion.Core.Objects
 {
-    public interface ITextureId { }
-
-    public class SpriteRenderer
+    public class SpriteRenderer : IRenderer
     {
-        static readonly ResourceLayoutDescription LayoutDescription = new ResourceLayoutDescription(
-            ResourceLayoutH.Uniform("Projection"),
-            ResourceLayoutH.Uniform("View"),
-            ResourceLayoutH.Texture("SpriteTexture"),
-            ResourceLayoutH.Sampler("SpriteSampler"));
+        public interface ISprite: IRenderable
+        {
+            SpriteFlags Flags { get; }
+            ITexture Texture { get; }
+            Vector2 Position { get; }
+            Vector2 Size { get; }
+            Vector2 TexPosition { get; }
+            Vector2 TexSize { get; }
+        }
 
         static Vertex2DTextured Vertex(float x, float y, float u, float v) => new Vertex2DTextured(new Vector2(x, y), new Vector2(u, v));
         static readonly VertexLayoutDescription[] VertexLayouts = { new VertexLayoutDescription(
@@ -52,19 +55,24 @@ namespace UAlbion.Core.Objects
 
         readonly ushort[] _indices;
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
+        readonly ITextureManager _textureManager;
 
         // Context objects
         DeviceBuffer _vb;
         DeviceBuffer _ib;
         Pipeline _pipeline;
-        public ResourceLayout ResourceLayout { get; private set; }
+        ResourceLayout _resourceLayout;
 
-        public SpriteRenderer()
+        public SpriteRenderer(ITextureManager textureManager)
         {
+            _textureManager = textureManager ?? throw new ArgumentNullException(nameof(textureManager));
             _indices = new ushort[] { 0, 1, 2, 2, 1, 3 };
         }
 
-        static Vertex2DTextured[] BuildVertices(Sprite sprite)
+        public RenderPasses RenderPasses => RenderPasses.Standard;
+        public Sprite CreateSprite() { return new Sprite(); }
+
+        static Vertex2DTextured[] BuildVertices(ISprite sprite)
         {
             return new[]
             {
@@ -75,14 +83,21 @@ namespace UAlbion.Core.Objects
             };
         }
 
-        public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, Sprite sprite)
+        public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, uint[] palette, IRenderable renderable)
         {
+            var sprite = (ISprite) renderable;
+            var texture = _textureManager.GetTexture(sprite.Texture);
+            var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_resourceLayout,
+                (sprite.Flags & SpriteFlags.NoTransform) != 0 ? sc.IdentityMatrixBuffer : sc.ProjectionMatrixBuffer,
+                (sprite.Flags & SpriteFlags.NoTransform) != 0 ? sc.IdentityMatrixBuffer : sc.ViewMatrixBuffer,
+                texture, gd.PointSampler));
+
             cl.UpdateBuffer(_vb, 0, BuildVertices(sprite));
 
             cl.SetVertexBuffer(0, _vb);
             cl.SetIndexBuffer(_ib, IndexFormat.UInt16);
             cl.SetPipeline(_pipeline);
-            cl.SetGraphicsResourceSet(0, sprite.ResourceSet);
+            cl.SetGraphicsResourceSet(0, resourceSet);
             float depth = gd.IsDepthRangeZeroToOne ? 0 : 1;
             cl.SetViewport(0, new Viewport(0, 0, sc.MainSceneColorTexture.Width, sc.MainSceneColorTexture.Height, depth, depth));
             cl.DrawIndexed((uint)_indices.Length, 1, 0, 0, 0);
@@ -100,14 +115,16 @@ namespace UAlbion.Core.Objects
             _ib = factory.CreateBuffer(new BufferDescription(_indices.SizeInBytes(), BufferUsage.IndexBuffer));
             cl.UpdateBuffer(_ib, 0, _indices);
 
-            //ImageSharpTexture imageSharpTexture = new ImageSharpTexture(_texture, false);
-            //Texture deviceTexture = imageSharpTexture.CreateDeviceTexture(gd, factory);
-            //TextureView textureView = factory.CreateTextureView(new TextureViewDescription(deviceTexture));
-
             var shaderSet = new ShaderSetDescription(new[] { Vertex2DTextured.VertexLayout },
                 factory.CreateFromSpirv(ShaderH.Vertex(VertexShader), ShaderH.Fragment(FragmentShader)));
 
-            ResourceLayout = factory.CreateResourceLayout(LayoutDescription);
+            var LayoutDescription = new ResourceLayoutDescription(
+                ResourceLayoutH.Uniform("Projection"),
+                ResourceLayoutH.Uniform("View"),
+                ResourceLayoutH.Texture("SpriteTexture"),
+                ResourceLayoutH.Sampler("SpriteSampler"));
+
+            _resourceLayout = factory.CreateResourceLayout(LayoutDescription);
 
             var pd = new GraphicsPipelineDescription(
                 BlendStateDescription.SingleAlphaBlend,
@@ -115,19 +132,26 @@ namespace UAlbion.Core.Objects
                 new RasterizerStateDescription(FaceCullMode.None, PolygonFillMode.Solid, FrontFace.Clockwise, true, true),
                 PrimitiveTopology.TriangleList,
                 new ShaderSetDescription(VertexLayouts, shaderSet.Shaders, ShaderHelper.GetSpecializations(gd)),
-                new[] { ResourceLayout },
+                new[] { _resourceLayout },
                 sc.MainSceneFramebuffer.OutputDescription);
 
             _pipeline = factory.CreateGraphicsPipeline(ref pd);
 
-            _disposeCollector.Add(_vb, _ib, ResourceLayout, _pipeline);
+            _disposeCollector.Add(_vb, _ib, _resourceLayout, _pipeline);
         }
 
-        public void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc) { }
+        public void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IRenderable renderable)
+        {
+            var sprite = (ISprite) renderable;
+            _textureManager.PrepareTexture(sprite.Texture, gd);
+            // TODO: Setup device textures
+            //ImageSharpTexture imageSharpTexture = new ImageSharpTexture(_texture, false);
+            //Texture deviceTexture = imageSharpTexture.CreateDeviceTexture(gd, factory);
+            //TextureView textureView = factory.CreateTextureView(new TextureViewDescription(deviceTexture));
+        }
+
         public void DestroyDeviceObjects() { _disposeCollector.DisposeAll(); }
-        public RenderOrderKey GetRenderOrderKey(Vector3 cameraPosition) { return new RenderOrderKey(ulong.MaxValue); }
-        public RenderPasses RenderPasses => RenderPasses.Standard;
-        //public override BoundingBox BoundingBox { get; }
+        public void Dispose() { DestroyDeviceObjects(); }
     }
 }
 

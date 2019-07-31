@@ -1,20 +1,18 @@
-﻿using System.Numerics;
-using System.Text;
+﻿using System;
+using System.Collections.Generic;
 using Veldrid;
 using Veldrid.SPIRV;
 using Veldrid.Utilities;
 
 namespace UAlbion.Core.Objects
 {
-    static class ShaderH
+    class FullScreenQuad : Component, IRenderer, IRenderable
     {
-        public static ShaderDescription Vertex(string shader) => new ShaderDescription(ShaderStages.Vertex, Encoding.UTF8.GetBytes(shader), "main");
-        public static ShaderDescription Fragment(string shader) => new ShaderDescription(ShaderStages.Fragment, Encoding.UTF8.GetBytes(shader), "main");
-    }
-
-    internal class FullScreenQuad : Renderable
-    {
+        static readonly IList<Handler> Handlers = new Handler[] { new Handler<FullScreenQuad, RenderEvent>((x, e) => e.Add(x)) };
         static readonly ushort[] QuadIndices = { 0, 1, 2, 0, 2, 3 };
+        public RenderPasses RenderPasses => RenderPasses.SwapchainOutput;
+        public int RenderOrder => int.MaxValue;
+        public Type Renderer => typeof(FullScreenQuad);
 
         DisposeCollector _disposeCollector;
         Pipeline _pipeline;
@@ -51,7 +49,9 @@ namespace UAlbion.Core.Objects
                 OutputColor = color;
             }";
 
-        public override void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
+        public FullScreenQuad() : base(Handlers) { }
+
+        public void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
         {
             var factory = new DisposeCollectorResourceFactory(gd.ResourceFactory);
             _disposeCollector = factory.DisposeCollector;
@@ -61,7 +61,7 @@ namespace UAlbion.Core.Objects
                 ResourceLayoutH.Sampler("SourceSampler")));
 
             var shaderSet = new ShaderSetDescription(new[] { Vertex2DTextured.VertexLayout },
-                factory.CreateFromSpirv(ShaderH.Vertex(VertexShader), ShaderH.Fragment(FragmentShader)));
+                factory.CreateFromSpirv(ShaderHelper.Vertex(VertexShader), ShaderHelper.Fragment(FragmentShader)));
 
             var pd = new GraphicsPipelineDescription(
                 new BlendStateDescription(RgbaFloat.Black, BlendAttachmentDescription.OverrideBlend),
@@ -81,14 +81,7 @@ namespace UAlbion.Core.Objects
             cl.UpdateBuffer(_ib, 0, QuadIndices);
         }
 
-        public override void DestroyDeviceObjects()
-        {
-            _disposeCollector.DisposeAll();
-        }
-
-        public override RenderOrderKey GetRenderOrderKey(Vector3 cameraPosition) { return new RenderOrderKey(); }
-
-        public override void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass)
+        public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, uint[] palette, IRenderable r)
         {
             cl.SetPipeline(_pipeline);
             cl.SetGraphicsResourceSet(0, sc.DuplicatorTargetSet0);
@@ -97,7 +90,8 @@ namespace UAlbion.Core.Objects
             cl.DrawIndexed(6, 1, 0, 0, 0);
         }
 
-        public override RenderPasses RenderPasses => RenderPasses.SwapchainOutput;
-        public override void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc) { }
+        public void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IRenderable renderable) { }
+        public void DestroyDeviceObjects() { _disposeCollector.DisposeAll(); }
+        public void Dispose() { DestroyDeviceObjects(); }
     }
 }

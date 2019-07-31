@@ -1,4 +1,7 @@
-﻿namespace UAlbion.Core
+﻿using System;
+using System.Collections.Generic;
+
+namespace UAlbion.Core
 {
     public interface IEngineEvent : IEvent { }
     public abstract class EngineEvent : Event, IEngineEvent { }
@@ -28,9 +31,11 @@
     {
     }
 
-    [Event("e:render")]
+    //[Event("e:render")]
     public class RenderEvent : EngineEvent
     {
-
+        public RenderEvent(Action<IRenderable> add, Func<Type, IRenderer> getRenderer) { Add = add; GetRenderer = getRenderer; }
+        public Action<IRenderable> Add { get; }
+        public Func<Type, IRenderer> GetRenderer { get; }
     }
 }

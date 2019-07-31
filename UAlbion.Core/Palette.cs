@@ -3,18 +3,6 @@ using Veldrid;
 
 namespace UAlbion.Core
 {
-    public interface ITexture
-    {
-        PixelFormat Format { get; }
-        TextureType Type { get; }
-        uint Width { get; }
-        uint Height { get; }
-        uint Depth { get; }
-        uint MipLevels { get; }
-        uint ArrayLayers { get; }
-        Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage);
-    }
-
     public class Palette : ITexture
     {
         public PixelFormat Format => PixelFormat.R8_G8_B8_A8_UNorm;

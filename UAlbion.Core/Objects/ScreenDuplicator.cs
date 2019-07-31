@@ -1,17 +1,25 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Collections.Generic;
 using Veldrid;
 using Veldrid.Utilities;
 
 namespace UAlbion.Core.Objects
 {
-    internal class ScreenDuplicator : Renderable
+    class ScreenDuplicator : Component, IRenderable, IRenderer
     {
+        static readonly IList<Handler> Handlers = new Handler[] {new Handler<ScreenDuplicator, RenderEvent>((x, e) => e.Add(x)),};
+        static readonly ushort[] s_quadIndices = { 0, 1, 2, 0, 2, 3 };
         DisposeCollector _disposeCollector;
         Pipeline _pipeline;
         DeviceBuffer _ib;
         DeviceBuffer _vb;
 
-        public override void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
+        public ScreenDuplicator() : base(Handlers) { }
+        public RenderPasses RenderPasses => RenderPasses.Duplicator;
+        public int RenderOrder => 99;
+        public Type Renderer => typeof(ScreenDuplicator);
+
+        public void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
         {
             DisposeCollectorResourceFactory factory = new DisposeCollectorResourceFactory(gd.ResourceFactory);
             _disposeCollector = factory.DisposeCollector;
@@ -53,17 +61,7 @@ namespace UAlbion.Core.Objects
             cl.UpdateBuffer(_ib, 0, s_quadIndices);
         }
 
-        public override void DestroyDeviceObjects()
-        {
-            _disposeCollector.DisposeAll();
-        }
-
-        public override RenderOrderKey GetRenderOrderKey(Vector3 cameraPosition)
-        {
-            return new RenderOrderKey();
-        }
-
-        public override void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass)
+        public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, uint[] palette, IRenderable r)
         {
             cl.SetPipeline(_pipeline);
             cl.SetGraphicsResourceSet(0, sc.MainSceneViewResourceSet);
@@ -72,12 +70,8 @@ namespace UAlbion.Core.Objects
             cl.DrawIndexed(6, 1, 0, 0, 0);
         }
 
-        public override RenderPasses RenderPasses => RenderPasses.Duplicator;
-
-        public override void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc)
-        {
-        }
-
-        static readonly ushort[] s_quadIndices = new ushort[] { 0, 1, 2, 0, 2, 3 };
+        public void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IRenderable r) { }
+        public void DestroyDeviceObjects() { _disposeCollector.DisposeAll(); }
+        public void Dispose() { DestroyDeviceObjects(); }
     }
 }

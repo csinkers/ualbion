@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Veldrid;
 using Veldrid.SPIRV;
 
@@ -8,6 +9,8 @@ namespace UAlbion.Core
 {
     public static class ShaderHelper
     {
+        public static ShaderDescription Vertex(string shader) => new ShaderDescription(ShaderStages.Vertex, Encoding.UTF8.GetBytes(shader), "main");
+        public static ShaderDescription Fragment(string shader) => new ShaderDescription(ShaderStages.Fragment, Encoding.UTF8.GetBytes(shader), "main");
         public static (Shader vs, Shader fs) LoadSPIRV(
             GraphicsDevice gd,
             ResourceFactory factory,

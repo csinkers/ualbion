@@ -6,6 +6,7 @@ namespace UAlbion.Core
 {
     public class SceneContext
     {
+        public DeviceBuffer IdentityMatrixBuffer { get; private set; }
         public DeviceBuffer ProjectionMatrixBuffer { get; private set; }
         public DeviceBuffer ViewMatrixBuffer { get; private set; }
 
@@ -40,17 +41,22 @@ namespace UAlbion.Core
         public virtual void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
         {
             ResourceFactory factory = gd.ResourceFactory;
+            IdentityMatrixBuffer = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
+            cl.UpdateBuffer(IdentityMatrixBuffer, 0, Matrix4x4.Identity);
             ProjectionMatrixBuffer = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
             ViewMatrixBuffer = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
+
             LightViewProjectionBuffer0 = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
             LightViewProjectionBuffer0.Name = "LightViewProjectionBuffer0";
             LightViewProjectionBuffer1 = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
             LightViewProjectionBuffer1.Name = "LightViewProjectionBuffer1";
             LightViewProjectionBuffer2 = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
             LightViewProjectionBuffer2.Name = "LightViewProjectionBuffer2";
+
             DepthLimitsBuffer = factory.CreateBuffer(new BufferDescription((uint)Unsafe.SizeOf<DepthCascadeLimits>(), BufferUsage.UniformBuffer | BufferUsage.Dynamic));
             LightInfoBuffer = factory.CreateBuffer(new BufferDescription((uint)Unsafe.SizeOf<DirectionalLightInfo>(), BufferUsage.UniformBuffer | BufferUsage.Dynamic));
             CameraInfoBuffer = factory.CreateBuffer(new BufferDescription((uint)Unsafe.SizeOf<CameraInfo>(), BufferUsage.UniformBuffer | BufferUsage.Dynamic));
+
             if (Camera != null)
             {
                 UpdateCameraBuffers(cl);
@@ -81,6 +87,7 @@ namespace UAlbion.Core
 
         public virtual void DestroyDeviceObjects()
         {
+            IdentityMatrixBuffer.Dispose();
             ProjectionMatrixBuffer.Dispose();
             ViewMatrixBuffer.Dispose();
             LightInfoBuffer.Dispose();

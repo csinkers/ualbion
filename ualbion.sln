@@ -37,7 +37,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fragment", "Fragment", "{2C
 		data\Shaders\ShadowMain.frag = data\Shaders\ShadowMain.frag
 		data\Shaders\ShadowmapPreviewShader.frag = data\Shaders\ShadowmapPreviewShader.frag
 		data\Shaders\Skybox.frag = data\Shaders\Skybox.frag
-		data\Shaders\Sprite.frag = data\Shaders\Sprite.frag
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Vertex", "Vertex", "{7CD4B26B-A659-483A-8AEA-76BC79B903D8}"
@@ -48,8 +47,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Vertex", "Vertex", "{7CD4B2
 		data\Shaders\ShadowMain.vert = data\Shaders\ShadowMain.vert
 		data\Shaders\ShadowmapPreviewShader.vert = data\Shaders\ShadowmapPreviewShader.vert
 		data\Shaders\Skybox.vert = data\Shaders\Skybox.vert
-		data\Shaders\Sprite.vert = data\Shaders\Sprite.vert
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateEnums", "Tools\GenerateEnums\GenerateEnums.csproj", "{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -144,6 +144,18 @@ Global
 		{4B3B467B-2E99-4836-B589-A69D272417F0}.Release|x64.Build.0 = Release|Any CPU
 		{4B3B467B-2E99-4836-B589-A69D272417F0}.Release|x86.ActiveCfg = Release|Any CPU
 		{4B3B467B-2E99-4836-B589-A69D272417F0}.Release|x86.Build.0 = Release|Any CPU
+		{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}.Debug|x64.Build.0 = Debug|Any CPU
+		{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}.Debug|x86.Build.0 = Debug|Any CPU
+		{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}.Release|x64.ActiveCfg = Release|Any CPU
+		{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}.Release|x64.Build.0 = Release|Any CPU
+		{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}.Release|x86.ActiveCfg = Release|Any CPU
+		{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -155,6 +167,7 @@ Global
 		{5748618A-0094-4C7B-9511-062B2EF258EA} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
 		{2CC25767-C093-4B72-B93E-C6E553611540} = {5748618A-0094-4C7B-9511-062B2EF258EA}
 		{7CD4B26B-A659-483A-8AEA-76BC79B903D8} = {5748618A-0094-4C7B-9511-062B2EF258EA}
+		{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9} = {149A8BC2-91D1-4249-9E1D-7B0054347832}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2759A62D-227A-4D68-B6B5-966B9141AA74}

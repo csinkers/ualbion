@@ -69,7 +69,11 @@ namespace UAlbion.Core
                 Type = type;
                 Name = eventAttribute.Name;
                 var partsParameter = Expression.Parameter(typeof(string[]), "parts");
-                Parts = properties.Select((x, i) => new EventPartMetadata(x, partsParameter, i)).ToArray();
+                Parts = properties
+                    .Where(x => x.GetCustomAttribute(typeof(EventPartAttribute)) != null)
+                    .Select((x, i) => new EventPartMetadata(x, partsParameter, i))
+                    .ToArray();
+
                 Parser = BuildParser(partsParameter);
             }
 

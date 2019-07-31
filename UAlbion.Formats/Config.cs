@@ -61,6 +61,8 @@ namespace UAlbion.Formats
         {
             [JsonIgnore]
             public string Name;
+
+            public string EnumName;
             public IDictionary<int, ConfigObject> Objects { get; } = new Dictionary<int, ConfigObject>();
         }
 

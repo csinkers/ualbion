@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Net.Mime;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using UAlbion.Formats;
+using UAlbion.Game.AssetIds;
 
-namespace UAlbion.Formats
+namespace UAlbion.Game
 {
     public enum GameLanguage
     {
@@ -48,7 +49,7 @@ namespace UAlbion.Formats
             { AssetType.MapTexts,           (AssetLocation.Localised, "MAPTEXT!.XLD") }, // Strings
             { AssetType.ItemList,           (AssetLocation.Base,      "ITEMLIST.DAT") }, // 
             { AssetType.ItemNames,          (AssetLocation.Base,      "ITEMNAME.DAT") }, // Strings
-            { AssetType.ItemGraphics,       (AssetLocation.BaseRaw,      "ITEMGFX"     ) }, // Texture
+            { AssetType.ItemGraphics,       (AssetLocation.BaseRaw,   "ITEMGFX"     ) }, // Texture
             { AssetType.FullBodyPicture,    (AssetLocation.Base,      "FBODPIX!.XLD") }, // Texture
             { AssetType.Automap,            (AssetLocation.Initial,   "AUTOMAP!.XLD") }, // 
             { AssetType.AutomapGraphics,    (AssetLocation.Base,      "AUTOGFX!.XLD") }, // Texture
@@ -239,24 +240,24 @@ namespace UAlbion.Formats
             return newAsset;
         }
 
-        public Map2D LoadMap2D(int id) { return (Map2D)LoadAssetCached(AssetType.MapData, id); }
-        public Map3D LoadMap3D(int id) { return (Map3D)LoadAssetCached(AssetType.MapData, id); }
-        public AlbionPalette LoadPalette(int id)
+        public Map2D LoadMap2D(MapDataId id) { return (Map2D)LoadAssetCached(AssetType.MapData, (int)id); }
+        public Map3D LoadMap3D(MapDataId id) { return (Map3D)LoadAssetCached(AssetType.MapData, (int)id); }
+        public AlbionPalette LoadPalette(PaletteId id)
         {
             var commonPalette = (byte[])LoadAssetCached(AssetType.PaletteNull, 0);
-            return (AlbionPalette)LoadAssetCached(AssetType.Palette, id, new AlbionPalette.PaletteContext(id, commonPalette));
+            return (AlbionPalette)LoadAssetCached(AssetType.Palette, (int)id, new AlbionPalette.PaletteContext((int)id, commonPalette));
         }
 
-        public Image<Rgba32> LoadPicture(int id) { return (Image<Rgba32>)LoadAssetCached(AssetType.Picture, id); }
-        public AlbionSprite LoadTexture(AssetType type, int id) { return (AlbionSprite)LoadAssetCached(type, id); }
+        public Image<Rgba32> LoadPicture(PictureId id) { return (Image<Rgba32>)LoadAsset(AssetType.Picture, (int)id, GameLanguage.English, null); }
+        public AlbionSprite LoadTexture(AssetType type, int id) { return (AlbionSprite)LoadAsset(type, id, GameLanguage.English, null); }
         public string LoadString(AssetType type, int id, GameLanguage language) { return (string)LoadAssetCached(AssetType.MapData, id, language); }
         public AlbionSample LoadSample(AssetType type, int id) { return (AlbionSample)LoadAssetCached(type, id); }
-        public AlbionFont LoadFont(int id) { return (AlbionFont)LoadAssetCached(AssetType.Font, id); }
+        public AlbionFont LoadFont(FontId id) { return (AlbionFont)LoadAssetCached(AssetType.Font, (int)id); }
 
-        public AlbionVideo LoadVideo(int id, GameLanguage language)
+        public AlbionVideo LoadVideo(VideoId id, GameLanguage language)
         {
             // Don't cache videos.
-            return (AlbionVideo) LoadAsset(AssetType.Flic, id, language, null);
+            return (AlbionVideo) LoadAsset(AssetType.Flic, (int)id, language, null);
         }
     }
 }

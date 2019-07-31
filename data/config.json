@@ -3,11 +3,12 @@
   "ExportedXldPath": "exported",
   "Xlds": {
     "3DBCKGR0.XLD": {
+      "EnumName": "DungeonBackgroundId",
       "Objects": {
         "0": {
           "Width": 245,
           "Offset": 1,
-          "Name": "First image",
+          "Name": "FirstImage",
           "Type": "texture"
         },
         "1": {
@@ -31,191 +32,192 @@
       }
     },
     "3DFLOOR0.XLD": {
+      "EnumName": "DungeonFloorId",
       "Objects": {
         "0": {
           "Width": 64,
           "Offset": 0,
-          "Name": "Brick1",
+          "Name": "Brick",
           "Type": "texture"
         },
         "1": {
           "Width": 64,
           "Offset": 0,
-          "Name": "MossyBrick1",
+          "Name": "MossyBrick",
           "Type": "texture"
         },
         "2": {
           "Width": 64,
           "Offset": 0,
-          "Name": "Water1",
+          "Name": "Water",
           "Type": "texture"
         },
         "3": {
           "Width": 64,
           "Offset": 0,
-          "Name": "MossyBrickEdge1",
+          "Name": "MossyBrickEdge",
           "Type": "texture"
         },
         "4": {
           "Width": 64,
           "Offset": 0,
-          "Name": "MossyBrickEdge2",
+          "Name": "MossyBrickEdge",
           "Type": "texture"
         },
         "5": {
           "Width": 64,
           "Offset": 0,
-          "Name": "MossyBrickEdge3",
+          "Name": "MossyBrickEdge",
           "Type": "texture"
         },
         "6": {
           "Width": 64,
           "Offset": 0,
-          "Name": "MossyBrickEdge4",
+          "Name": "MossyBrickEdge",
           "Type": "texture"
         },
         "7": {
           "Width": 64,
           "Offset": 0,
-          "Name": "MossyBrickEdge5",
+          "Name": "MossyBrickEdge",
           "Type": "texture"
         },
         "8": {
           "Width": 64,
           "Offset": 0,
-          "Name": "MossyBrickEdge6",
+          "Name": "MossyBrickEdge",
           "Type": "texture"
         },
         "9": {
           "Width": 64,
           "Offset": 0,
-          "Name": "MossyBrickEdge7",
+          "Name": "MossyBrickEdge",
           "Type": "texture"
         },
         "10": {
           "Width": 64,
           "Offset": 0,
-          "Name": "MossyBrickEdge8",
+          "Name": "MossyBrickEdge",
           "Type": "texture"
         },
         "11": {
           "Width": 64,
           "Offset": 0,
-          "Name": "MossyBrickEdge9",
+          "Name": "MossyBrickEdge",
           "Type": "texture"
         },
         "12": {
           "Width": 64,
           "Offset": 0,
-          "Name": "MossyBrickEdge10",
+          "Name": "MossyBrickEdge",
           "Type": "texture"
         },
         "13": {
           "Width": 64,
           "Offset": 0,
-          "Name": "MossyBrickEdge11",
+          "Name": "MossyBrickEdge",
           "Type": "texture"
         },
         "14": {
           "Width": 64,
           "Offset": 0,
-          "Name": "MossyBrickEdge12",
+          "Name": "MossyBrickEdge",
           "Type": "texture"
         },
         "15": {
           "Width": 64,
           "Offset": 0,
-          "Name": "WatersEdge1",
+          "Name": "WatersEdge",
           "Type": "texture"
         },
         "16": {
           "Width": 64,
           "Offset": 0,
-          "Name": "WatersEdge2",
+          "Name": "WatersEdge",
           "Type": "texture"
         },
         "17": {
           "Width": 64,
           "Offset": 0,
-          "Name": "WatersEdge3",
+          "Name": "WatersEdge",
           "Type": "texture"
         },
         "18": {
           "Width": 64,
           "Offset": 0,
-          "Name": "WatersEdge4",
+          "Name": "WatersEdge",
           "Type": "texture"
         },
         "19": {
           "Width": 64,
           "Offset": 0,
-          "Name": "WatersEdge5",
+          "Name": "WatersEdge",
           "Type": "texture"
         },
         "20": {
           "Width": 64,
           "Offset": 0,
-          "Name": "WatersEdge6",
+          "Name": "WatersEdge",
           "Type": "texture"
         },
         "21": {
           "Width": 64,
           "Offset": 0,
-          "Name": "WatersEdge7",
+          "Name": "WatersEdge",
           "Type": "texture"
         },
         "22": {
           "Width": 64,
           "Offset": 0,
-          "Name": "WatersEdge8",
+          "Name": "WatersEdge",
           "Type": "texture"
         },
         "23": {
           "Width": 64,
           "Offset": 0,
-          "Name": "WatersEdge9",
+          "Name": "WatersEdge",
           "Type": "texture"
         },
         "24": {
           "Width": 64,
           "Offset": 0,
-          "Name": "WatersEdge10",
+          "Name": "WatersEdge",
           "Type": "texture"
         },
         "25": {
           "Width": 64,
           "Offset": 0,
-          "Name": "WatersEdge11",
+          "Name": "WatersEdge",
           "Type": "texture"
         },
         "26": {
           "Width": 64,
           "Offset": 0,
-          "Name": "WatersEdge12",
+          "Name": "WatersEdge",
           "Type": "texture"
         },
         "27": {
           "Width": 64,
           "Offset": 0,
-          "Name": "WoodPanel1",
+          "Name": "WoodPanel",
           "Type": "texture"
         },
         "28": {
           "Width": 64,
           "Offset": 0,
-          "Name": "WoodPanel2",
+          "Name": "WoodPanel",
           "Type": "texture"
         },
         "29": {
           "Width": 64,
           "Offset": 0,
-          "Name": "StonePanel1",
+          "Name": "StonePanel",
           "Type": "texture"
         },
         "30": {
           "Width": 64,
           "Offset": 0,
-          "Name": "Moss1",
+          "Name": "Moss",
           "Type": "texture"
         },
         "31": {
@@ -341,7 +343,7 @@
         "51": {
           "Width": 64,
           "Offset": 0,
-          "Name": "Wood1",
+          "Name": "Wood",
           "Type": "texture"
         },
         "52": {
@@ -359,13 +361,13 @@
         "54": {
           "Width": 64,
           "Offset": 0,
-          "Name": "Wood2",
+          "Name": "Wood",
           "Type": "texture"
         },
         "55": {
           "Width": 64,
           "Offset": 0,
-          "Name": "Wood3",
+          "Name": "Wood",
           "Type": "texture"
         },
         "56": {
@@ -377,7 +379,7 @@
         "57": {
           "Width": 64,
           "Offset": 3,
-          "Name": "Cobble1",
+          "Name": "Cobble",
           "Type": "texture"
         },
         "58": {
@@ -431,49 +433,49 @@
         "66": {
           "Width": 64,
           "Offset": 0,
-          "Name": "Maw1",
+          "Name": "Maw",
           "Type": "texture"
         },
         "67": {
           "Width": 64,
           "Offset": 0,
-          "Name": "Maw2",
+          "Name": "Maw",
           "Type": "texture"
         },
         "68": {
           "Width": 64,
           "Offset": 0,
-          "Name": "Maw3",
+          "Name": "Maw",
           "Type": "texture"
         },
         "69": {
           "Width": 64,
           "Offset": 0,
-          "Name": "Maw4",
+          "Name": "Maw",
           "Type": "texture"
         },
         "70": {
           "Width": 64,
           "Offset": 0,
-          "Name": "MawShut1",
+          "Name": "MawShut",
           "Type": "texture"
         },
         "71": {
           "Width": 64,
           "Offset": 0,
-          "Name": "MawShut2",
+          "Name": "MawShut",
           "Type": "texture"
         },
         "72": {
           "Width": 64,
           "Offset": 0,
-          "Name": "MawShut3",
+          "Name": "MawShut",
           "Type": "texture"
         },
         "73": {
           "Width": 64,
           "Offset": 0,
-          "Name": "MawShut4",
+          "Name": "MawShut",
           "Type": "texture"
         },
         "74": {
@@ -629,6 +631,7 @@
       }
     },
     "3DFLOOR1.XLD": {
+      "EnumName": "DungeonFloorId",
       "Objects": {
         "0": {
           "Width": 64,
@@ -1023,133 +1026,133 @@
         "65": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate1",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "66": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate2",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "67": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate3",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "68": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate4",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "69": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate5",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "70": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate6",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "71": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate7",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "72": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate8",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "73": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate9",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "74": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate10",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "75": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate11",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "76": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate12",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "77": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate13",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "78": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate14",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "79": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate15",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "80": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate16",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "81": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate17",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "82": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate18",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "83": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate19",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "84": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate20",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "85": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate21",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "86": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PressurePlate22",
+          "Name": "PressurePlate",
           "Type": "texture"
         },
         "87": {
@@ -1233,6 +1236,7 @@
       }
     },
     "3DFLOOR2.XLD": {
+      "EnumName": "DungeonFloorId",
       "Objects": {
         "0": {
           "Width": 64,
@@ -1837,6 +1841,7 @@
       }
     },
     "3DOBJEC0.XLD": {
+      "EnumName": "DungeonObjectId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -1847,253 +1852,253 @@
         "1": {
           "Width": 16,
           "Offset": 0,
-          "Name": "Pylon1",
+          "Name": "Pylon",
           "Type": "texture"
         },
         "2": {
           "Width": 64,
           "Offset": 0,
-          "Name": "PhallicGrowth1",
+          "Name": "PhallicGrowth",
           "Type": "texture"
         },
         "3": {
           "Width": 31,
           "Offset": 0,
-          "Name": "Plant1",
+          "Name": "Plant",
           "Type": "texture"
         },
         "4": {
           "Width": 31,
           "Offset": 0,
-          "Name": "Plant2",
+          "Name": "Plant",
           "Type": "texture"
         },
         "5": {
           "Width": 61,
           "Offset": 0,
-          "Name": "Bush1",
+          "Name": "Bush",
           "Type": "texture"
         },
         "6": {
           "Width": 61,
           "Offset": 0,
-          "Name": "Bush2",
+          "Name": "Bush",
           "Type": "texture"
         },
         "7": {
           "Width": 36,
           "Offset": 0,
-          "Name": "Plant3",
+          "Name": "Plant",
           "Type": "texture"
         },
         "8": {
           "Width": 25,
           "Offset": 0,
-          "Name": "Plant4",
+          "Name": "Plant",
           "Type": "texture"
         },
         "9": {
           "Width": 23,
           "Offset": 0,
-          "Name": "Plant5",
+          "Name": "Plant",
           "Type": "texture"
         },
         "10": {
           "Width": 27,
           "Offset": 0,
-          "Name": "Plant6",
+          "Name": "Plant",
           "Type": "texture"
         },
         "11": {
           "Width": 66,
           "Offset": 0,
-          "Name": "Tree1",
+          "Name": "Tree",
           "Type": "texture"
         },
         "12": {
           "Width": 63,
           "Offset": 0,
-          "Name": "Tree2",
+          "Name": "Tree",
           "Type": "texture"
         },
         "13": {
           "Width": 74,
           "Offset": 0,
-          "Name": "Tree3",
+          "Name": "Tree",
           "Type": "texture"
         },
         "14": {
           "Width": 39,
           "Offset": 0,
-          "Name": "Tree4",
+          "Name": "Tree",
           "Type": "texture"
         },
         "15": {
           "Width": 63,
           "Offset": 0,
-          "Name": "TreePillar1",
+          "Name": "TreePillar",
           "Type": "texture"
         },
         "16": {
           "Width": 66,
           "Offset": 0,
-          "Name": "Tree5",
+          "Name": "Tree",
           "Type": "texture"
         },
         "17": {
           "Width": 119,
           "Offset": 0,
-          "Name": "Dome1",
+          "Name": "Dome",
           "Type": "texture"
         },
         "18": {
           "Width": 60,
           "Offset": 0,
-          "Name": "Dome2",
+          "Name": "Dome",
           "Type": "texture"
         },
         "19": {
           "Width": 89,
           "Offset": 0,
-          "Name": "Fountain1",
+          "Name": "Fountain",
           "Type": "texture"
         },
         "20": {
           "Width": 20,
           "Offset": 0,
-          "Name": "Plant7",
+          "Name": "Plant",
           "Type": "texture"
         },
         "21": {
           "Width": 19,
           "Offset": 0,
-          "Name": "Plant8",
+          "Name": "Plant",
           "Type": "texture"
         },
         "22": {
           "Width": 19,
           "Offset": 0,
-          "Name": "Plant9",
+          "Name": "Plant",
           "Type": "texture"
         },
         "23": {
           "Width": 15,
           "Offset": 0,
-          "Name": "Plant10",
+          "Name": "Plant",
           "Type": "texture"
         },
         "24": {
           "Width": 24,
           "Offset": 0,
-          "Name": "Plant11",
+          "Name": "Plant",
           "Type": "texture"
         },
         "25": {
           "Width": 17,
           "Offset": 0,
-          "Name": "Plant12",
+          "Name": "Plant",
           "Type": "texture"
         },
         "26": {
           "Width": 50,
           "Offset": 0,
-          "Name": "Iskai1",
+          "Name": "Iskai",
           "Type": "texture"
         },
         "27": {
           "Width": 51,
           "Offset": 0,
-          "Name": "Iskai2",
+          "Name": "Iskai",
           "Type": "texture"
         },
         "28": {
           "Width": 51,
           "Offset": 0,
-          "Name": "Iskai3",
+          "Name": "Iskai",
           "Type": "texture"
         },
         "29": {
           "Width": 42,
           "Offset": 0,
-          "Name": "Iskai4",
+          "Name": "Iskai",
           "Type": "texture"
         },
         "30": {
           "Width": 42,
           "Offset": 0,
-          "Name": "Iskai5",
+          "Name": "Iskai",
           "Type": "texture"
         },
         "31": {
           "Width": 50,
           "Offset": 0,
-          "Name": "Iskai6",
+          "Name": "Iskai",
           "Type": "texture"
         },
         "32": {
           "Width": 51,
           "Offset": 0,
-          "Name": "Iskai7",
+          "Name": "Iskai",
           "Type": "texture"
         },
         "33": {
           "Width": 51,
           "Offset": 0,
-          "Name": "Iskai8",
+          "Name": "Iskai",
           "Type": "texture"
         },
         "34": {
           "Width": 50,
           "Offset": 0,
-          "Name": "Iskai9",
+          "Name": "Iskai",
           "Type": "texture"
         },
         "35": {
           "Width": 51,
           "Offset": 0,
-          "Name": "Iskai10",
+          "Name": "Iskai",
           "Type": "texture"
         },
         "36": {
           "Width": 51,
           "Offset": 0,
-          "Name": "Iskai11",
+          "Name": "Iskai",
           "Type": "texture"
         },
         "37": {
           "Width": 42,
           "Offset": 0,
-          "Name": "Iskai12",
+          "Name": "Iskai",
           "Type": "texture"
         },
         "38": {
           "Width": 42,
           "Offset": 0,
-          "Name": "Iskai13",
+          "Name": "Iskai",
           "Type": "texture"
         },
         "39": {
           "Width": 50,
           "Offset": 0,
-          "Name": "Iskai14",
+          "Name": "Iskai",
           "Type": "texture"
         },
         "40": {
           "Width": 51,
           "Offset": 0,
-          "Name": "Iskai15",
+          "Name": "Iskai",
           "Type": "texture"
         },
         "41": {
           "Width": 51,
           "Offset": 0,
-          "Name": "Iskai16",
+          "Name": "Iskai",
           "Type": "texture"
         },
         "42": {
           "Width": 32,
           "Offset": 0,
-          "Name": "Lamp1",
+          "Name": "Lamp",
           "Type": "texture"
         },
         "43": {
@@ -2111,133 +2116,133 @@
         "45": {
           "Width": 152,
           "Offset": 0,
-          "Name": "Pedestal1",
+          "Name": "Pedestal",
           "Type": "texture"
         },
         "46": {
           "Width": 81,
           "Offset": 0,
-          "Name": "Pedestal2",
+          "Name": "Pedestal",
           "Type": "texture"
         },
         "47": {
           "Width": 116,
           "Offset": 0,
-          "Name": "Fountain2",
+          "Name": "Fountain",
           "Type": "texture"
         },
         "48": {
           "Width": 57,
           "Offset": 0,
-          "Name": "PlantColumn1",
+          "Name": "PlantColumn",
           "Type": "texture"
         },
         "49": {
           "Width": 96,
           "Offset": 0,
-          "Name": "Barrel1",
+          "Name": "Barrel",
           "Type": "texture"
         },
         "50": {
           "Width": 123,
           "Offset": 0,
-          "Name": "Chest1",
+          "Name": "Chest",
           "Type": "texture"
         },
         "51": {
           "Width": 81,
           "Offset": 0,
-          "Name": "Vase1",
+          "Name": "Vase",
           "Type": "texture"
         },
         "52": {
           "Width": 53,
           "Offset": 0,
-          "Name": "PhallicGrowth2",
+          "Name": "PhallicGrowth",
           "Type": "texture"
         },
         "53": {
           "Width": 57,
           "Offset": 0,
-          "Name": "PhallicGrowth3",
+          "Name": "PhallicGrowth",
           "Type": "texture"
         },
         "54": {
           "Width": 28,
           "Offset": 0,
-          "Name": "Nodule1",
+          "Name": "Nodule",
           "Type": "texture"
         },
         "55": {
           "Width": 28,
           "Offset": 0,
-          "Name": "Nodule2",
+          "Name": "Nodule",
           "Type": "texture"
         },
         "56": {
           "Width": 32,
           "Offset": 0,
-          "Name": "Tentacle1",
+          "Name": "Tentacle",
           "Type": "texture"
         },
         "57": {
           "Width": 21,
           "Offset": 0,
-          "Name": "Tentacle2",
+          "Name": "Tentacle",
           "Type": "texture"
         },
         "58": {
           "Width": 25,
           "Offset": 0,
-          "Name": "Tentacle3",
+          "Name": "Tentacle",
           "Type": "texture"
         },
         "59": {
           "Width": 25,
           "Offset": 0,
-          "Name": "Tentacle4",
+          "Name": "Tentacle",
           "Type": "texture"
         },
         "60": {
           "Width": 21,
           "Offset": 0,
-          "Name": "Tentacle5",
+          "Name": "Tentacle",
           "Type": "texture"
         },
         "61": {
           "Width": 32,
           "Offset": 0,
-          "Name": "Tentacle6",
+          "Name": "Tentacle",
           "Type": "texture"
         },
         "62": {
           "Width": 43,
           "Offset": 0,
-          "Name": "PhallicGrowth4",
+          "Name": "PhallicGrowth",
           "Type": "texture"
         },
         "63": {
           "Width": 39,
           "Offset": 0,
-          "Name": "PhallicGrowth5",
+          "Name": "PhallicGrowth",
           "Type": "texture"
         },
         "64": {
           "Width": 53,
           "Offset": 0,
-          "Name": "PhallicGrowth6",
+          "Name": "PhallicGrowth",
           "Type": "texture"
         },
         "65": {
           "Width": 43,
           "Offset": 0,
-          "Name": "PhallicGrowth7",
+          "Name": "PhallicGrowth",
           "Type": "texture"
         },
         "66": {
           "Width": 39,
           "Offset": 0,
-          "Name": "PhallicGrowth8",
+          "Name": "PhallicGrowth",
           "Type": "texture"
         },
         "67": {
@@ -2279,25 +2284,25 @@
         "73": {
           "Width": 26,
           "Offset": 0,
-          "Name": "PotatoThing1",
+          "Name": "PotatoThing",
           "Type": "texture"
         },
         "74": {
           "Width": 31,
           "Offset": 0,
-          "Name": "PotatoThing2",
+          "Name": "PotatoThing",
           "Type": "texture"
         },
         "75": {
           "Width": 20,
           "Offset": 0,
-          "Name": "PotatoThing3",
+          "Name": "PotatoThing",
           "Type": "texture"
         },
         "76": {
           "Width": 19,
           "Offset": 0,
-          "Name": "PotatoThing4",
+          "Name": "PotatoThing",
           "Type": "texture"
         },
         "77": {
@@ -2351,43 +2356,43 @@
         "85": {
           "Width": 106,
           "Offset": 0,
-          "Name": "Skybox1",
+          "Name": "Skybox",
           "Type": "texture"
         },
         "86": {
           "Width": 106,
           "Offset": 0,
-          "Name": "Skybox2",
+          "Name": "Skybox",
           "Type": "texture"
         },
         "87": {
           "Width": 78,
           "Offset": 0,
-          "Name": "DiscoPlant1",
+          "Name": "DiscoPlant",
           "Type": "texture"
         },
         "88": {
           "Width": 78,
           "Offset": 0,
-          "Name": "DiscPlant2",
+          "Name": "DiscPlant",
           "Type": "texture"
         },
         "89": {
           "Width": 87,
           "Offset": 0,
-          "Name": "ScuttleBush1",
+          "Name": "ScuttleBush",
           "Type": "texture"
         },
         "90": {
           "Width": 87,
           "Offset": 0,
-          "Name": "ScuttleBush2",
+          "Name": "ScuttleBush",
           "Type": "texture"
         },
         "91": {
           "Width": 100,
           "Offset": 0,
-          "Name": "JellySpirit1",
+          "Name": "JellySpirit",
           "Type": "texture"
         },
         "92": {
@@ -2429,23 +2434,24 @@
         "98": {
           "Width": 24,
           "Offset": 0,
-          "Name": "TorchPedestal1",
+          "Name": "TorchPedestal",
           "Type": "texture"
         }
       }
     },
     "3DOBJEC1.XLD": {
+      "EnumName": "DungeonObjectId",
       "Objects": {
         "0": {
           "Width": 24,
           "Offset": 0,
-          "Name": "TorchPedestal2",
+          "Name": "TorchPedestal",
           "Type": "texture"
         },
         "1": {
           "Width": 35,
           "Offset": 0,
-          "Name": "TorchPedestal3",
+          "Name": "TorchPedestal",
           "Type": "texture"
         },
         "2": {
@@ -2493,13 +2499,13 @@
         "9": {
           "Width": 79,
           "Offset": 0,
-          "Name": "GlowingColumn1",
+          "Name": "GlowingColumn",
           "Type": "texture"
         },
         "10": {
           "Width": 79,
           "Offset": 0,
-          "Name": "GlowingColumn2",
+          "Name": "GlowingColumn",
           "Type": "texture"
         },
         "11": {
@@ -3039,6 +3045,7 @@
       }
     },
     "3DOBJEC2.XLD": {
+      "EnumName": "DungeonObjectId",
       "Objects": {
         "0": {
           "Width": 57,
@@ -3643,6 +3650,7 @@
       }
     },
     "3DOBJEC3.XLD": {
+      "EnumName": "DungeonObjectId",
       "Objects": {
         "0": {
           "Width": 56,
@@ -4247,6 +4255,7 @@
       }
     },
     "3DOVERL0.XLD": {
+      "EnumName": "DungeonOverlayId",
       "Objects": {
         "0": {
           "Width": 51,
@@ -4845,6 +4854,7 @@
       }
     },
     "3DOVERL1.XLD": {
+      "EnumName": "DungeonOverlayId",
       "Objects": {
         "0": {
           "Width": 35,
@@ -5449,6 +5459,7 @@
       }
     },
     "3DOVERL2.XLD": {
+      "EnumName": "DungeonOverlayId",
       "Objects": {
         "0": {
           "Width": 26,
@@ -6053,6 +6064,7 @@
       }
     },
     "3DWALLS0.XLD": {
+      "EnumName": "DungeonWallId",
       "Objects": {
         "0": {
           "Width": 112,
@@ -6651,6 +6663,7 @@
       }
     },
     "3DWALLS1.XLD": {
+      "EnumName": "DungeonWallId",
       "Objects": {
         "0": {
           "Width": 98,
@@ -7255,6 +7268,7 @@
       }
     },
     "AUTOGFX0.XLD": {
+      "EnumName": "AutoGraphicsId",
       "Objects": {
         "0": {
           "Width": 16,
@@ -7271,6 +7285,7 @@
       }
     },
     "BLKLIST0.XLD": {
+      "EnumName": "BlockListId",
       "Objects": {
         "0": {
           "Width": 49,
@@ -7341,6 +7356,7 @@
       }
     },
     "COMBACK0.XLD": {
+      "EnumName": "CombatBackgroundId",
       "Objects": {
         "0": {
           "Width": 360,
@@ -7459,6 +7475,7 @@
       }
     },
     "COMGFX0.XLD": {
+      "EnumName": "CombatGraphicsId",
       "Objects": {
         "0": {
           "Width": 23,
@@ -7973,6 +7990,7 @@
       }
     },
     "EVNTSET0.XLD": {
+      "EnumName": "EventSetId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -8169,6 +8187,7 @@
       }
     },
     "EVNTSET1.XLD": {
+      "EnumName": "EventSetId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -8773,6 +8792,7 @@
       }
     },
     "EVNTSET2.XLD": {
+      "EnumName": "EventSetId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -9377,6 +9397,7 @@
       }
     },
     "EVNTSET3.XLD": {
+      "EnumName": "EventSetId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -9981,6 +10002,7 @@
       }
     },
     "EVNTSET9.XLD": {
+      "EnumName": "EventSetId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -10585,6 +10607,7 @@
       }
     },
     "FBODPIX0.XLD": {
+      "EnumName": null,
       "Objects": {
         "0": {
           "Width": 128,
@@ -10649,6 +10672,7 @@
       }
     },
     "FONTS0.XLD": {
+      "EnumName": "FontId",
       "Objects": {
         "0": {
           "Width": 8,
@@ -10665,6 +10689,7 @@
       }
     },
     "ICONDAT0.XLD": {
+      "EnumName": "IconDataId",
       "Objects": {
         "0": {
           "Width": 8,
@@ -10735,6 +10760,7 @@
       }
     },
     "ICONGFX0.XLD": {
+      "EnumName": "IconGraphicsId",
       "Objects": {
         "0": {
           "Width": 16,
@@ -10805,6 +10831,7 @@
       }
     },
     "ITEMGFX": {
+      "EnumName": null,
       "Objects": {
         "0": {
           "Width": 16,
@@ -10815,12 +10842,15 @@
       }
     },
     "ITEMLIST.DAT": {
+      "EnumName": null,
       "Objects": {}
     },
     "ITEMNAME.DAT": {
+      "EnumName": null,
       "Objects": {}
     },
     "LABDATA0.XLD": {
+      "EnumName": "LabyrinthDataId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -10879,6 +10909,7 @@
       }
     },
     "LABDATA1.XLD": {
+      "EnumName": "LabyrinthDataId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -11483,6 +11514,7 @@
       }
     },
     "LABDATA2.XLD": {
+      "EnumName": "LabyrinthDataId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -12087,6 +12119,7 @@
       }
     },
     "MAPDATA1.XLD": {
+      "EnumName": "MapDataId",
       "Objects": {
         "0": {
           "Width": 150,
@@ -12691,6 +12724,7 @@
       }
     },
     "MAPDATA2.XLD": {
+      "EnumName": "MapDataId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -13295,6 +13329,7 @@
       }
     },
     "MAPDATA3.XLD": {
+      "EnumName": "MapDataId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -13899,6 +13934,7 @@
       }
     },
     "MONCHAR0.XLD": {
+      "EnumName": "MonsterCharacterId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -14257,6 +14293,7 @@
       }
     },
     "MONGFX0.XLD": {
+      "EnumName": "MonsterGraphicsId",
       "Objects": {
         "0": {
           "Width": 90,
@@ -14291,7 +14328,7 @@
         "5": {
           "Width": 79,
           "Offset": 0,
-          "Name": null,
+          "Name": "",
           "Type": "texture"
         },
         "6": {
@@ -14621,6 +14658,7 @@
       }
     },
     "MONGRP0.XLD": {
+      "EnumName": "MonsterGroupId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -15219,6 +15257,7 @@
       }
     },
     "MONGRP1.XLD": {
+      "EnumName": "MonsterGroupId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -15823,6 +15862,7 @@
       }
     },
     "MONGRP2.XLD": {
+      "EnumName": "MonsterGroupId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -16427,6 +16467,7 @@
       }
     },
     "NPCGR0.XLD": {
+      "EnumName": "LargeNpcId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -17025,6 +17066,7 @@
       }
     },
     "NPCGR1.XLD": {
+      "EnumName": "LargeNpcId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -17629,6 +17671,7 @@
       }
     },
     "NPCKL0.XLD": {
+      "EnumName": "SmallNpcId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -17807,9 +17850,11 @@
       }
     },
     "PALETTE.000": {
+      "EnumName": null,
       "Objects": {}
     },
     "PALETTE0.XLD": {
+      "EnumName": "PaletteId",
       "Objects": {
         "0": {
           "Name": "",
@@ -17840,7 +17885,7 @@
           "Type": "unknown"
         },
         "7": {
-          "Name": "Light2D_2",
+          "Name": "Light2D_",
           "Type": "unknown"
         },
         "8": {
@@ -17848,7 +17893,7 @@
           "Type": "unknown"
         },
         "9": {
-          "Name": "Dark2D_2",
+          "Name": "Dark2D_",
           "Type": "unknown"
         },
         "10": {
@@ -17912,7 +17957,7 @@
           "Type": "unknown"
         },
         "25": {
-          "Name": "Light2D_3",
+          "Name": "Light2D_",
           "Type": "unknown"
         },
         "26": {
@@ -18038,6 +18083,7 @@
       }
     },
     "PARTGR0.XLD": {
+      "EnumName": "LargePartyGraphicsId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -18084,7 +18130,7 @@
         "7": {
           "Width": 32,
           "Offset": 0,
-          "Name": "Tom2",
+          "Name": "Tom",
           "Type": "texture"
         },
         "8": {
@@ -18102,6 +18148,7 @@
       }
     },
     "PARTKL0.XLD": {
+      "EnumName": "SmallPartyGraphicsId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -18166,280 +18213,294 @@
       }
     },
     "PICTURE0.XLD": {
+      "EnumName": "PictureId",
       "Objects": {
         "0": {
           "Width": 72,
           "Offset": 0,
-          "Name": null,
+          "Name": "SmallWizard",
           "Type": "interlaced_bitmap"
         },
         "1": {
           "Width": 295,
           "Offset": 0,
-          "Name": null,
+          "Name": "HarbourTown",
           "Type": "interlaced_bitmap"
         },
         "2": {
           "Width": 230,
           "Offset": 0,
-          "Name": null,
+          "Name": "ScoutShip",
           "Type": "interlaced_bitmap"
         },
         "3": {
           "Width": 259,
           "Offset": 0,
-          "Name": null,
+          "Name": "BildDesPlanetenText",
           "Type": "interlaced_bitmap"
         },
         "4": {
           "Width": 281,
           "Offset": 0,
-          "Name": null,
+          "Name": "LabyrinthMap",
           "Type": "interlaced_bitmap"
         },
         "5": {
           "Width": 336,
           "Offset": 0,
-          "Name": null,
+          "Name": "HutByAWaterfall",
           "Type": "interlaced_bitmap"
         },
         "6": {
           "Width": 350,
           "Offset": 0,
-          "Name": null,
+          "Name": "MagiciansWithSeed",
           "Type": "interlaced_bitmap"
         },
         "7": {
           "Width": 317,
           "Offset": 0,
-          "Name": null,
+          "Name": "CelticVillage",
           "Type": "interlaced_bitmap"
         },
         "8": {
           "Width": 327,
           "Offset": 0,
-          "Name": null,
+          "Name": "CelticMelee",
           "Type": "interlaced_bitmap"
         },
         "9": {
           "Width": 347,
           "Offset": 0,
-          "Name": null,
+          "Name": "CelticIskaiStandoff",
           "Type": "interlaced_bitmap"
         },
         "10": {
           "Width": 251,
           "Offset": 0,
-          "Name": null,
+          "Name": "OpenChest",
           "Type": "interlaced_bitmap"
         },
         "11": {
           "Width": 188,
           "Offset": 0,
-          "Name": null,
+          "Name": "OpenChestWithGold",
           "Type": "interlaced_bitmap"
         },
         "12": {
           "Width": 195,
           "Offset": 0,
-          "Name": null,
+          "Name": "ClosedChest",
           "Type": "interlaced_bitmap"
         },
         "13": {
           "Width": 244,
           "Offset": 0,
-          "Name": null,
+          "Name": "LootPile",
           "Type": "interlaced_bitmap"
         },
         "14": {
           "Width": 360,
           "Offset": 0,
-          "Name": null,
+          "Name": "TorontoWithVines",
           "Type": "interlaced_bitmap"
         },
         "15": {
           "Width": 355,
           "Offset": 0,
-          "Name": null,
+          "Name": "TorontoWithVinesAndParty",
           "Type": "interlaced_bitmap"
         },
         "16": {
           "Width": 352,
           "Offset": 0,
-          "Name": null,
+          "Name": "EndgameScreenshot",
           "Type": "interlaced_bitmap"
         },
         "17": {
           "Width": 264,
           "Offset": 0,
-          "Name": null,
+          "Name": "WoodenDoor",
           "Type": "interlaced_bitmap"
         },
         "18": {
           "Width": 34,
           "Offset": 0,
-          "Name": null,
+          "Name": "MenuBackground",
           "Type": "interlaced_bitmap"
         },
         "19": {
           "Width": 327,
           "Offset": 0,
-          "Name": null,
+          "Name": "MenuBackground",
           "Type": "interlaced_bitmap"
         },
         "20": {
           "Width": 322,
           "Offset": 0,
-          "Name": null,
+          "Name": "MenuBackground",
           "Type": "interlaced_bitmap"
         },
         "21": {
           "Width": 285,
           "Offset": 0,
-          "Name": null,
+          "Name": "MenuBackground",
           "Type": "interlaced_bitmap"
         },
         "22": {
           "Width": 292,
           "Offset": 0,
-          "Name": null,
+          "Name": "MenuBackground",
           "Type": "interlaced_bitmap"
         },
         "23": {
           "Width": 344,
           "Offset": 0,
-          "Name": null,
+          "Name": "MenuBackground",
           "Type": "interlaced_bitmap"
         },
         "24": {
           "Width": 288,
           "Offset": 0,
-          "Name": null,
+          "Name": "MenuBackground",
           "Type": "interlaced_bitmap"
         },
         "25": {
           "Width": 333,
           "Offset": 0,
-          "Name": null,
+          "Name": "MenuBackground",
           "Type": "interlaced_bitmap"
         },
         "26": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "MenuBackground",
           "Type": "interlaced_bitmap"
         },
         "27": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "ColouredPlateMap",
           "Type": "interlaced_bitmap"
         },
         "28": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "SecretCaveMap",
           "Type": "interlaced_bitmap"
         },
         "29": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "Boop",
           "Type": "interlaced_bitmap"
         },
         "30": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "PartyResting",
           "Type": "interlaced_bitmap"
         },
         "31": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "CelticVillageScreenshot",
           "Type": "interlaced_bitmap"
         },
         "32": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "DungeonScreenshot",
           "Type": "interlaced_bitmap"
         },
         "33": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "CelticIndoorsScreenshot",
           "Type": "interlaced_bitmap"
         },
         "34": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "HouseScreenshot",
           "Type": "interlaced_bitmap"
         },
         "35": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "DjiKantosScreenshot",
           "Type": "interlaced_bitmap"
         },
         "36": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "RiversideScreenshot",
           "Type": "interlaced_bitmap"
         },
         "37": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "HarbourScreenshot",
           "Type": "interlaced_bitmap"
         },
         "38": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "DesertScreenshot",
           "Type": "interlaced_bitmap"
         },
         "39": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "EndgameScreenshot",
           "Type": "interlaced_bitmap"
         },
         "40": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "PressurePlateScreenshot",
           "Type": "interlaced_bitmap"
         },
         "41": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "KengetScreenshot",
           "Type": "interlaced_bitmap"
         },
         "42": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "DungeonScreenshot",
           "Type": "interlaced_bitmap"
         },
         "43": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "CombatScreenshot",
           "Type": "interlaced_bitmap"
         },
         "44": {
           "Width": 32,
           "Offset": 0,
-          "Name": null,
+          "Name": "CombatScreenshot",
+          "Type": "interlaced_bitmap"
+        },
+        "98": {
+          "Width": 1200,
+          "Offset": 0,
+          "Name": "TestMap",
+          "Type": "interlaced_bitmap"
+        },
+        "99": {
+          "Width": 360,
+          "Offset": 0,
+          "Name": "StatusBar",
           "Type": "interlaced_bitmap"
         }
       }
     },
     "SAMPLES0.XLD": {
+      "EnumName": "SampleId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -18912,6 +18973,7 @@
       }
     },
     "SAMPLES1.XLD": {
+      "EnumName": "SampleId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -19516,6 +19578,7 @@
       }
     },
     "SAMPLES2.XLD": {
+      "EnumName": "SampleId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -20120,6 +20183,7 @@
       }
     },
     "SCRIPT0.XLD": {
+      "EnumName": "ScriptId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -20496,6 +20560,7 @@
       }
     },
     "SCRIPT2.XLD": {
+      "EnumName": "ScriptId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -21100,9 +21165,11 @@
       }
     },
     "SLAB": {
+      "EnumName": null,
       "Objects": {}
     },
     "SMLPORT0.XLD": {
+      "EnumName": "SmallPortraitId",
       "Objects": {
         "0": {
           "Width": 34,
@@ -21701,6 +21768,7 @@
       }
     },
     "SMLPORT1.XLD": {
+      "EnumName": "SmallPortraitId",
       "Objects": {
         "0": {
           "Width": 34,
@@ -22305,6 +22373,7 @@
       }
     },
     "SONGS0.XLD": {
+      "EnumName": "SongId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -22585,9 +22654,11 @@
       }
     },
     "SPELLDAT.DAT": {
+      "EnumName": null,
       "Objects": {}
     },
     "TACTICO0.XLD": {
+      "EnumName": "TacticId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -23024,6 +23095,7 @@
       }
     },
     "TRANSTB0.XLD": {
+      "EnumName": "TranslationTableId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -23352,6 +23424,7 @@
       }
     },
     "WAVELIB0.XLD": {
+      "EnumName": "WaveLibraryId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -23572,6 +23645,7 @@
       }
     },
     "ENGLISH\\EVNTTXT0.XLD": {
+      "EnumName": "EventTextId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -23594,6 +23668,7 @@
       }
     },
     "ENGLISH\\EVNTTXT1.XLD": {
+      "EnumName": "EventTextId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -24198,6 +24273,7 @@
       }
     },
     "ENGLISH\\EVNTTXT2.XLD": {
+      "EnumName": "EventTextId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -24802,6 +24878,7 @@
       }
     },
     "ENGLISH\\EVNTTXT3.XLD": {
+      "EnumName": "EventTextId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -25406,6 +25483,7 @@
       }
     },
     "ENGLISH\\EVNTTXT9.XLD": {
+      "EnumName": "EventTextId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -26010,6 +26088,7 @@
       }
     },
     "ENGLISH\\FLICS0.XLD": {
+      "EnumName": "VideoId",
       "Objects": {
         "0": {
           "Width": 320,
@@ -26128,6 +26207,7 @@
       }
     },
     "ENGLISH\\MAPTEXT1.XLD": {
+      "EnumName": "MapTextId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -26732,6 +26812,7 @@
       }
     },
     "ENGLISH\\MAPTEXT2.XLD": {
+      "EnumName": "MapTextId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -27336,6 +27417,7 @@
       }
     },
     "ENGLISH\\MAPTEXT3.XLD": {
+      "EnumName": "MapTextId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -27940,9 +28022,11 @@
       }
     },
     "ENGLISH\\SYSTEXTS": {
+      "EnumName": null,
       "Objects": {}
     },
     "ENGLISH\\WORDLIS0.XLD": {
+      "EnumName": null,
       "Objects": {
         "0": {
           "Width": 32,
@@ -27965,6 +28049,7 @@
       }
     },
     "INITIAL\\AUTOMAP1.XLD": {
+      "EnumName": "AutoMapId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -28569,6 +28654,7 @@
       }
     },
     "INITIAL\\AUTOMAP2.XLD": {
+      "EnumName": "AutoMapId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -29173,6 +29259,7 @@
       }
     },
     "INITIAL\\AUTOMAP3.XLD": {
+      "EnumName": "AutoMapId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -29777,6 +29864,7 @@
       }
     },
     "INITIAL\\CHESTDT0.XLD": {
+      "EnumName": "ChestId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -29793,6 +29881,7 @@
       }
     },
     "INITIAL\\CHESTDT1.XLD": {
+      "EnumName": "ChestId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -30397,6 +30486,7 @@
       }
     },
     "INITIAL\\CHESTDT2.XLD": {
+      "EnumName": "ChestId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -31001,6 +31091,7 @@
       }
     },
     "INITIAL\\CHESTDT5.XLD": {
+      "EnumName": "ChestId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -31605,6 +31696,7 @@
       }
     },
     "INITIAL\\MERCHDT0.XLD": {
+      "EnumName": "Merchantid",
       "Objects": {
         "0": {
           "Width": 32,
@@ -31615,6 +31707,7 @@
       }
     },
     "INITIAL\\MERCHDT1.XLD": {
+      "EnumName": "Merchantid",
       "Objects": {
         "0": {
           "Width": 32,
@@ -32219,6 +32312,7 @@
       }
     },
     "INITIAL\\MERCHDT2.XLD": {
+      "EnumName": "Merchantid",
       "Objects": {
         "0": {
           "Width": 32,
@@ -32823,6 +32917,7 @@
       }
     },
     "INITIAL\\NPCCHAR0.XLD": {
+      "EnumName": "NpcCharacterId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -33397,6 +33492,7 @@
       }
     },
     "INITIAL\\NPCCHAR1.XLD": {
+      "EnumName": "NpcCharacterId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -34001,6 +34097,7 @@
       }
     },
     "INITIAL\\NPCCHAR2.XLD": {
+      "EnumName": "NpcCharacterId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -34605,6 +34702,7 @@
       }
     },
     "INITIAL\\PRTCHAR0.XLD": {
+      "EnumName": "PartyCharacterId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -34957,6 +35055,7 @@
       }
     },
     "INITIAL\\PRTCHAR1.XLD": {
+      "EnumName": "PartyCharacterId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -35561,6 +35660,7 @@
       }
     },
     "INITIAL\\PRTCHAR2.XLD": {
+      "EnumName": "PartyCharacterId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -36165,69 +36265,91 @@
       }
     },
     "CURRENT\\AUTOMAP1.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "CURRENT\\AUTOMAP2.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "CURRENT\\AUTOMAP3.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "CURRENT\\CHESTDT0.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "CURRENT\\CHESTDT1.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "CURRENT\\CHESTDT2.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "CURRENT\\CHESTDT5.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "CURRENT\\MERCHDT0.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "CURRENT\\MERCHDT1.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "CURRENT\\MERCHDT2.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "CURRENT\\NPCCHAR0.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "CURRENT\\NPCCHAR1.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "CURRENT\\NPCCHAR2.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "CURRENT\\PRTCHAR0.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "CURRENT\\PRTCHAR1.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "CURRENT\\PRTCHAR2.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "GERMAN\\EVNTTXT0.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "GERMAN\\EVNTTXT1.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "GERMAN\\EVNTTXT2.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "GERMAN\\EVNTTXT3.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "GERMAN\\EVNTTXT9.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "GERMAN\\FLICS0.XLD": {
+      "EnumName": null,
       "Objects": {
         "0": {
           "Width": 32,
@@ -36346,15 +36468,19 @@
       }
     },
     "GERMAN\\MAPTEXT1.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "GERMAN\\MAPTEXT2.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "GERMAN\\MAPTEXT3.XLD": {
+      "EnumName": null,
       "Objects": {}
     },
     "GERMAN\\WORDLIS0.XLD": {
+      "EnumName": null,
       "Objects": {}
     }
   }

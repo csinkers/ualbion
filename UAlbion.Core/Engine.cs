@@ -34,7 +34,7 @@ namespace UAlbion.Core
 
         public Scene Create2DScene()
         {
-            var camera = new OrthographicCamera(_graphicsDevice, _window);
+            var camera = new OrthographicCamera(_window);
             var scene = new Scene(_graphicsDevice, _window, camera);
             scene.AddRenderable(_igRenderable);
             scene.AddComponent(_igRenderable);

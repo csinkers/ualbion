@@ -3,7 +3,7 @@ using Veldrid;
 
 namespace UAlbion.Core
 {
-    internal interface ITexture
+    public interface ITexture
     {
         PixelFormat Format { get; }
         TextureType Type { get; }

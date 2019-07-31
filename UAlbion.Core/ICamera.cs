@@ -15,6 +15,7 @@ namespace UAlbion.Core
         float FieldOfView { get; }
         float NearDistance { get; }
         float AspectRatio { get; }
+        float Magnification { get; set; }
         CameraInfo GetCameraInfo();
     }
 

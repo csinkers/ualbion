@@ -9,16 +9,16 @@ namespace UAlbion.Core
         Matrix4x4 _viewMatrix;
         Matrix4x4 _projectionMatrix;
         Vector3 _position = new Vector3(0, 0, 1);
+        float _magnification = 1.0f;
 
         EventExchange _exchange;
-        GraphicsDevice _gd;
-        bool _useReverseDepth;
         float _windowWidth;
         float _windowHeight;
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;
         public Vector3 Position { get => _position; set { _position = value; UpdateViewMatrix(); } }
+        public float Magnification { get => _magnification; set { _magnification = value; UpdatePerspectiveMatrix(); } }
         public Vector3 LookDirection { get; } = new Vector3(0, 0, -1f);
         public float FarDistance => 100f;
         public float FieldOfView => 1f;
@@ -26,10 +26,8 @@ namespace UAlbion.Core
 
         public float AspectRatio => _windowWidth / _windowHeight;
 
-        public OrthographicCamera(GraphicsDevice gd, Sdl2Window window)
+        public OrthographicCamera(Sdl2Window window)
         {
-            _gd = gd;
-            _useReverseDepth = gd.IsDepthRangeZeroToOne;
             _windowWidth = window.Width;
             _windowHeight = window.Height;
             UpdatePerspectiveMatrix();
@@ -54,29 +52,25 @@ namespace UAlbion.Core
             }
         }
 
-        public void UpdateBackend(GraphicsDevice gd)
-        {
-            _gd = gd;
-            _useReverseDepth = gd.IsDepthRangeZeroToOne;
-            UpdatePerspectiveMatrix();
-        }
+        public void UpdateBackend(GraphicsDevice gd) { UpdatePerspectiveMatrix(); }
 
         void UpdatePerspectiveMatrix()
         {
-            _projectionMatrix = Util.CreateOrtho(
-                _gd,
-                _useReverseDepth,
-                0, _windowWidth,
-                0, _windowHeight,
-                NearDistance, FarDistance);
+            _projectionMatrix = Matrix4x4.Identity;
+            _projectionMatrix.M11 = (2.0f * _magnification) / _windowWidth;
+            _projectionMatrix.M22 = (-2.0f * _magnification) / _windowHeight;
+            _projectionMatrix.M41 = 0;
+            _projectionMatrix.M42 = 0;
 
-            _exchange?.Raise(new ProjectionMatrixChangedEvent(_projectionMatrix), this);
+            _exchange?.Raise(new ProjectionMatrixChangedEvent(), this);
         }
 
         void UpdateViewMatrix()
         {
-            _viewMatrix = Matrix4x4.CreateLookAt(_position, _position + LookDirection, Vector3.UnitY);
-            _exchange?.Raise(new ViewMatrixChangedEvent(_viewMatrix), this);
+            _viewMatrix = Matrix4x4.Identity;
+            _viewMatrix.M41 = -_position.X;
+            _viewMatrix.M42 = -_position.Y;
+            _exchange?.Raise(new ViewMatrixChangedEvent(), this);
         }
 
         public CameraInfo GetCameraInfo() => new CameraInfo

@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Formats
+﻿namespace UAlbion.Game
 {
     public enum AssetType
     {

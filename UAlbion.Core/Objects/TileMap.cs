@@ -4,7 +4,7 @@ using System.Text;
 
 namespace UAlbion.Core.Objects
 {
-    public class TileMap
+    public class TileMapRenderer
     {
     }
 }

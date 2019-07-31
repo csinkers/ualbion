@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace UAlbion.Core
+﻿namespace UAlbion.Core
 {
     public interface IEngineEvent : IEvent { }
     public abstract class EngineEvent : Event, IEngineEvent { }
@@ -23,18 +21,16 @@ namespace UAlbion.Core
     [Event("e:projection_changed")]
     public class ProjectionMatrixChangedEvent : EngineEvent
     {
-        [EventPart("matrix")]
-        public Matrix4x4 ProjectionMatrix { get; }
-
-        public ProjectionMatrixChangedEvent(Matrix4x4 projectionMatrix) { ProjectionMatrix = projectionMatrix; }
     }
 
     [Event("e:view_changed")]
     public class ViewMatrixChangedEvent : EngineEvent
     {
-        [EventPart("matrix")]
-        public Matrix4x4 ViewMatrix { get; }
+    }
 
-        public ViewMatrixChangedEvent(Matrix4x4 viewMatrix) { ViewMatrix = viewMatrix; }
+    [Event("e:render")]
+    public class RenderEvent : EngineEvent
+    {
+
     }
 }

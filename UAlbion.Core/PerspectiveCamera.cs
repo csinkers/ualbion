@@ -77,6 +77,7 @@ namespace UAlbion.Core
 
 
         public float AspectRatio => _windowWidth / _windowHeight;
+        public float Magnification { get; set; } // Ignored.
 
         public float Yaw { get => _yaw; set { _yaw = value; UpdateViewMatrix(); } }
         public float Pitch { get => _pitch; set { _pitch = value; UpdateViewMatrix(); } }

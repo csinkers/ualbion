@@ -7,6 +7,7 @@ using UAlbion.Core;
 using UAlbion.Core.Objects;
 using UAlbion.Formats;
 using UAlbion.Game;
+using UAlbion.Game.AssetIds;
 using UAlbion.Game.Gui;
 
 namespace UAlbion
@@ -22,31 +23,33 @@ namespace UAlbion
             Config config = Config.Load(baseDir);
 
             var assets = new Assets(config);
-            var palette = assets.LoadPalette(2);
-            Image<Rgba32> menuBackground = assets.LoadPicture(25);
-            var statusBackground = assets.LoadPicture(99);
+            var palette = assets.LoadPalette(PaletteId.Main3D);
 
             var gameState = new GameState();
+            var textureManager = new AlbionTextureManager(assets);
             using (var engine = new Engine())
             {
+                var spriteRenderer = new SpriteRenderer();
                 var scene = engine.Create2DScene();
                 scene.AddComponent(new ConsoleLogger());
+                scene.Camera.Position = new Vector3(656, 678, 0);
+                scene.Camera.Magnification = 4.0f;
 
                 var menu = new MainMenu();
                 scene.AddComponent(menu);
 
-                var background = new Sprite(menuBackground, new Vector2(-1.0f, -0.6f), new Vector2(2.0f, 1.6f));
-                scene.AddRenderable(background);
+                //Image<Rgba32> menuBackground = assets.LoadPicture( PictureId.MenuBackground8);
+                //var background = new Sprite(spriteRenderer, menuBackground, new Vector2(0.0f, 0.0f), new Vector2(1.0f, 0.8f));
+                //scene.AddRenderable(background);
 
-                var status = new Sprite(statusBackground, new Vector2(-1.0f, -1.0f), new Vector2(2.0f, 0.4f));
-                scene.AddRenderable(status);
+                //var statusBackground = assets.LoadPicture(PictureId.StatusBar);
+                //var status = new SpriteRenderer(statusBackground, new Vector2(0.0f, 0.8f), new Vector2(1.0f, 0.2f));
+                //scene.AddRenderable(status);
 
-/*
-                var camera = (PerspectiveCamera)scene.Camera;
-                camera.Position = new Vector3(-80, 25, -4.3f);
-                camera.Yaw = -MathF.PI / 2;
-                camera.Pitch = -MathF.PI / 9;
-*/
+                var mapImage = assets.LoadPicture(PictureId.TestMap);
+                var map = new Sprite(spriteRenderer, mapImage) { Position = new Vector2(0.0f, 0.0f));
+                scene.AddRenderable(map);
+
                 engine.SetScene(scene);
                 engine.Run();
             }

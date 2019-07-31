@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
 using SixLabors.ImageSharp;
+using UAlbion.Formats;
 
-namespace UAlbion.Formats
+namespace UAlbion.Game
 {
     public static class AssetLoader
     {

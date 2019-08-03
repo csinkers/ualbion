@@ -1,17 +1,24 @@
-﻿using System.Numerics;
+﻿using System.Collections.Generic;
+using System.Numerics;
 using Veldrid;
 using Veldrid.Sdl2;
 
 namespace UAlbion.Core
 {
-    public class OrthographicCamera : ICamera
+    public class OrthographicCamera : Component, ICamera
     {
+        static readonly IList<Handler> Handlers = new Handler[]
+            {new Handler<OrthographicCamera, WindowResizedEvent>((x, e) =>
+            {
+                x._windowWidth = e.Width;
+                x._windowHeight = e.Height;
+                x.UpdatePerspectiveMatrix();
+            })};
+
+        Vector3 _position = new Vector3(0, 0, 1);
         Matrix4x4 _viewMatrix;
         Matrix4x4 _projectionMatrix;
-        Vector3 _position = new Vector3(0, 0, 1);
         float _magnification = 1.0f;
-
-        EventExchange _exchange;
         float _windowWidth;
         float _windowHeight;
 
@@ -26,30 +33,12 @@ namespace UAlbion.Core
 
         public float AspectRatio => _windowWidth / _windowHeight;
 
-        public OrthographicCamera(Sdl2Window window)
+        public OrthographicCamera(Sdl2Window window) : base(Handlers)
         {
             _windowWidth = window.Width;
             _windowHeight = window.Height;
             UpdatePerspectiveMatrix();
             UpdateViewMatrix();
-        }
-
-        public void Attach(EventExchange exchange)
-        {
-            _exchange = exchange;
-            exchange.Subscribe<WindowResizedEvent>(this);
-        }
-
-        public void Receive(IEvent gameEvent, object sender)
-        {
-            switch (gameEvent)
-            {
-                case WindowResizedEvent e:
-                    _windowWidth = e.Width;
-                    _windowHeight = e.Height;
-                    UpdatePerspectiveMatrix();
-                    break;
-            }
         }
 
         public void UpdateBackend(GraphicsDevice gd) { UpdatePerspectiveMatrix(); }
@@ -62,7 +51,7 @@ namespace UAlbion.Core
             _projectionMatrix.M41 = 0;
             _projectionMatrix.M42 = 0;
 
-            _exchange?.Raise(new ProjectionMatrixChangedEvent(), this);
+            Exchange?.Raise(new ProjectionMatrixChangedEvent(), this);
         }
 
         void UpdateViewMatrix()
@@ -70,7 +59,7 @@ namespace UAlbion.Core
             _viewMatrix = Matrix4x4.Identity;
             _viewMatrix.M41 = -_position.X;
             _viewMatrix.M42 = -_position.Y;
-            _exchange?.Raise(new ViewMatrixChangedEvent(), this);
+            Exchange?.Raise(new ViewMatrixChangedEvent(), this);
         }
 
         public CameraInfo GetCameraInfo() => new CameraInfo

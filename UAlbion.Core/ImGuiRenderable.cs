@@ -46,7 +46,7 @@ namespace UAlbion.Core
             _imguiRenderer.Dispose();
         }
 
-        public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, uint[] palette, IRenderable r)
+        public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable r)
         {
             Debug.Assert(renderPass == RenderPasses.Overlay);
             _imguiRenderer.Render(gd, cl);

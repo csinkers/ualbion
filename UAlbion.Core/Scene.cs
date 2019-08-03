@@ -10,7 +10,7 @@ namespace UAlbion.Core
     {
         readonly IDictionary<int, IList<IRenderable>> _renderables = new Dictionary<int, IList<IRenderable>>();
         readonly IDictionary<Type, IRenderer> _renderers = new Dictionary<Type, IRenderer>();
-        uint[] _palette;
+        Palette _palette;
         CommandList _resourceUpdateCL;
 
         public ICamera Camera { get; }
@@ -21,7 +21,7 @@ namespace UAlbion.Core
 
         public void SetPalette(uint[] palette)
         {
-            _palette = palette;
+            _palette = new Palette(palette);
         }
 
         public void AddRenderer(IRenderer r)
@@ -51,6 +51,12 @@ namespace UAlbion.Core
                 _renderables[x.RenderOrder].Add(x);
             }, t => _renderers[t]), this);
 
+            sc.Palette?.Dispose();
+            sc.PaletteTexture?.Dispose();
+            // TODO: Ensure always disposed
+            sc.PaletteTexture = _palette.CreateDeviceTexture(gd, gd.ResourceFactory, TextureUsage.Sampled);
+            sc.Palette = gd.ResourceFactory.CreateTextureView(sc.PaletteTexture);
+
             // Update frame resources
             _resourceUpdateCL.Begin();
             foreach (IRenderable r in _renderables.SelectMany(x => x.Value))
@@ -76,13 +82,13 @@ namespace UAlbion.Core
             cl.ClearDepthStencil(depthClear);
             sc.UpdateCameraBuffers(cl); // Re-set because reflection step changed it.
             foreach(var key in orderedKeys)
-                Render(gd, cl, sc, RenderPasses.Standard, _renderables[key], _palette);
+                Render(gd, cl, sc, RenderPasses.Standard, _renderables[key]);
             cl.PopDebugGroup();
 
             // 2D Overlays
             cl.PushDebugGroup("Overlay");
             foreach (var key in orderedKeys)
-                Render(gd, cl, sc, RenderPasses.Overlay, _renderables[key], _palette);
+                Render(gd, cl, sc, RenderPasses.Overlay, _renderables[key]);
             cl.PopDebugGroup();
 
             if (sc.MainSceneColorTexture.SampleCount != TextureSampleCount.Count1)
@@ -95,7 +101,7 @@ namespace UAlbion.Core
             cl.SetFramebuffer(sc.DuplicatorFramebuffer);
             cl.SetFullViewports();
             foreach (var key in orderedKeys)
-                Render(gd, cl, sc, RenderPasses.Duplicator, _renderables[key], _palette);
+                Render(gd, cl, sc, RenderPasses.Duplicator, _renderables[key]);
             cl.PopDebugGroup();
 
             // Swapchain
@@ -103,7 +109,7 @@ namespace UAlbion.Core
             cl.SetFramebuffer(gd.SwapchainFramebuffer);
             cl.SetFullViewports();
             foreach (var key in orderedKeys)
-                Render(gd, cl, sc, RenderPasses.SwapchainOutput, _renderables[key], _palette);
+                Render(gd, cl, sc, RenderPasses.SwapchainOutput, _renderables[key]);
             cl.PopDebugGroup();
 
             cl.End();
@@ -114,13 +120,13 @@ namespace UAlbion.Core
             CommandList rc,
             SceneContext sc,
             RenderPasses pass,
-            IEnumerable<IRenderable> renderableList, uint[] palette)
+            IEnumerable<IRenderable> renderableList)
         {
             foreach (IRenderable renderable in renderableList)
             {
                 var renderer = _renderers[renderable.Renderer];
                 if ((renderer.RenderPasses & pass) != 0)
-                    renderer.Render(gd, rc, sc, pass, palette, renderable);
+                    renderer.Render(gd, rc, sc, pass, renderable);
             }
         }
 

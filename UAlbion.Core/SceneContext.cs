@@ -22,6 +22,8 @@ namespace UAlbion.Core
         // MainSceneView and Duplicator resource sets both use this.
         public ResourceLayout TextureSamplerResourceLayout { get; private set; }
 
+        public Texture PaletteTexture { get; internal set; }
+        public TextureView Palette { get; internal set; }
         public Texture MainSceneColorTexture { get; private set; }
         public Texture MainSceneDepthTexture { get; private set; }
         public Framebuffer MainSceneFramebuffer { get; private set; }

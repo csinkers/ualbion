@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using UAlbion.Core;
+using UAlbion.Game;
 
 namespace UAlbion
 {
@@ -21,6 +22,7 @@ namespace UAlbion
             {
                 case EngineUpdateEvent _:
                 case RenderEvent _:
+                case UpdateEvent _:
                     break;
 
                 default:

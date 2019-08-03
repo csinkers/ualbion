@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using Veldrid;
 using Veldrid.SPIRV;
 using Veldrid.Utilities;
@@ -43,14 +44,27 @@ namespace UAlbion.Core.Objects
             #version 450
 
             layout(set = 0, binding = 2) uniform texture2D SpriteTexture;
-            layout(set = 0, binding = 3) uniform sampler SpriteSampler;
+            layout(set = 0, binding = 3) uniform Flags { int _Flags; int _u2; int _u3; int _u4; };
+
+            layout(set = 1, binding = 0) uniform sampler SpriteSampler;
+            layout(set = 1, binding = 1) uniform texture2D Palette;
 
             layout(location = 0) in vec2 fsin_0;
             layout(location = 0) out vec4 OutputColor;
 
             void main()
             {
-                OutputColor = texture(sampler2D(SpriteTexture, SpriteSampler), fsin_0);
+                // If palette texture
+                if((_Flags & 4) != 0) // TODO: Const
+                {
+                    int index = int(255.0 * texture(sampler2D(SpriteTexture, SpriteSampler), fsin_0)[0]);
+                    vec4 color = texture(sampler2D(Palette, SpriteSampler), vec2(index, 0));
+                    OutputColor = color;
+                }
+                else
+                {
+                    OutputColor = texture(sampler2D(SpriteTexture, SpriteSampler), fsin_0);
+                }
             }";
 
         readonly ushort[] _indices;
@@ -60,8 +74,10 @@ namespace UAlbion.Core.Objects
         // Context objects
         DeviceBuffer _vb;
         DeviceBuffer _ib;
+        DeviceBuffer _flagsBuffer;
         Pipeline _pipeline;
-        ResourceLayout _resourceLayout;
+        ResourceLayout _perSpriteResourceLayout;
+        ResourceLayout _perFrameResourceLayout;
 
         public SpriteRenderer(ITextureManager textureManager)
         {
@@ -83,14 +99,26 @@ namespace UAlbion.Core.Objects
             };
         }
 
-        public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, uint[] palette, IRenderable renderable)
+        public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable renderable)
         {
             var sprite = (ISprite) renderable;
             var texture = _textureManager.GetTexture(sprite.Texture);
-            var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_resourceLayout,
+            var flags = sprite.Flags;
+
+            if (sprite.Texture.Format == PixelFormat.R8_UNorm)
+                flags |= SpriteFlags.UsePalette;
+
+            var flagsArray = new int[] {(int)flags, 0, 0, 0};
+            gd.UpdateBuffer(_flagsBuffer, 0, flagsArray);
+
+            var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_perSpriteResourceLayout,
                 (sprite.Flags & SpriteFlags.NoTransform) != 0 ? sc.IdentityMatrixBuffer : sc.ProjectionMatrixBuffer,
                 (sprite.Flags & SpriteFlags.NoTransform) != 0 ? sc.IdentityMatrixBuffer : sc.ViewMatrixBuffer,
-                texture, gd.PointSampler));
+                texture, _flagsBuffer));
+
+            // TODO: Only generate once per frame
+            var perFrameResourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_perFrameResourceLayout,
+                gd.PointSampler, sc.Palette));
 
             cl.UpdateBuffer(_vb, 0, BuildVertices(sprite));
 
@@ -98,6 +126,7 @@ namespace UAlbion.Core.Objects
             cl.SetIndexBuffer(_ib, IndexFormat.UInt16);
             cl.SetPipeline(_pipeline);
             cl.SetGraphicsResourceSet(0, resourceSet);
+            cl.SetGraphicsResourceSet(1, perFrameResourceSet);
             float depth = gd.IsDepthRangeZeroToOne ? 0 : 1;
             cl.SetViewport(0, new Viewport(0, 0, sc.MainSceneColorTexture.Width, sc.MainSceneColorTexture.Height, depth, depth));
             cl.DrawIndexed((uint)_indices.Length, 1, 0, 0, 0);
@@ -113,18 +142,24 @@ namespace UAlbion.Core.Objects
 
             _vb = factory.CreateBuffer(new BufferDescription(new Vertex2DTextured[4].SizeInBytes(), BufferUsage.VertexBuffer));
             _ib = factory.CreateBuffer(new BufferDescription(_indices.SizeInBytes(), BufferUsage.IndexBuffer));
+            _flagsBuffer = factory.CreateBuffer(new BufferDescription(4 * (uint)Marshal.SizeOf<int>(), BufferUsage.UniformBuffer));
             cl.UpdateBuffer(_ib, 0, _indices);
 
             var shaderSet = new ShaderSetDescription(new[] { Vertex2DTextured.VertexLayout },
-                factory.CreateFromSpirv(ShaderH.Vertex(VertexShader), ShaderH.Fragment(FragmentShader)));
+                factory.CreateFromSpirv(ShaderHelper.Vertex(VertexShader), ShaderHelper.Fragment(FragmentShader)));
 
-            var LayoutDescription = new ResourceLayoutDescription(
+            var PerSpriteLayoutDescription = new ResourceLayoutDescription(
                 ResourceLayoutH.Uniform("Projection"),
                 ResourceLayoutH.Uniform("View"),
                 ResourceLayoutH.Texture("SpriteTexture"),
-                ResourceLayoutH.Sampler("SpriteSampler"));
+                ResourceLayoutH.Uniform("Flags"));
 
-            _resourceLayout = factory.CreateResourceLayout(LayoutDescription);
+            var PerFrameLayoutDescription = new ResourceLayoutDescription(
+                ResourceLayoutH.Sampler("SpriteSampler"),
+                ResourceLayoutH.Texture("Palette"));
+
+            _perSpriteResourceLayout = factory.CreateResourceLayout(PerSpriteLayoutDescription);
+            _perFrameResourceLayout = factory.CreateResourceLayout(PerFrameLayoutDescription);
 
             var pd = new GraphicsPipelineDescription(
                 BlendStateDescription.SingleAlphaBlend,
@@ -132,12 +167,12 @@ namespace UAlbion.Core.Objects
                 new RasterizerStateDescription(FaceCullMode.None, PolygonFillMode.Solid, FrontFace.Clockwise, true, true),
                 PrimitiveTopology.TriangleList,
                 new ShaderSetDescription(VertexLayouts, shaderSet.Shaders, ShaderHelper.GetSpecializations(gd)),
-                new[] { _resourceLayout },
+                new[] { _perSpriteResourceLayout, _perFrameResourceLayout },
                 sc.MainSceneFramebuffer.OutputDescription);
 
             _pipeline = factory.CreateGraphicsPipeline(ref pd);
 
-            _disposeCollector.Add(_vb, _ib, _resourceLayout, _pipeline);
+            _disposeCollector.Add(_vb, _ib, _perSpriteResourceLayout, _perFrameResourceLayout, _pipeline, _flagsBuffer);
         }
 
         public void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IRenderable renderable)

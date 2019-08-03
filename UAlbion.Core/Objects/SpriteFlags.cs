@@ -7,5 +7,6 @@ namespace UAlbion.Core.Objects
     {
         NoTransform = 1,
         Highlight = 2,
+        UsePalette = 4,
     }
 }

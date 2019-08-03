@@ -81,7 +81,7 @@ namespace UAlbion.Core.Objects
             cl.UpdateBuffer(_ib, 0, QuadIndices);
         }
 
-        public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, uint[] palette, IRenderable r)
+        public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable r)
         {
             cl.SetPipeline(_pipeline);
             cl.SetGraphicsResourceSet(0, sc.DuplicatorTargetSet0);

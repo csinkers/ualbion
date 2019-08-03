@@ -66,6 +66,7 @@ namespace UAlbion.Formats
                 Entries[i]  = (uint)br.ReadByte() << 24;
                 Entries[i] |= (uint)br.ReadByte() << 16;
                 Entries[i] |= (uint)br.ReadByte() << 8;
+                Entries[i] |= 0xff;
                 br.ReadByte();
             }
         }

@@ -29,6 +29,7 @@ namespace UAlbion.Core
         }
 
         readonly IDictionary<Type, Handler> _handlers;
+        protected EventExchange Exchange { get; private set; }
 
         protected Component(IList<Handler> handlers)
         {
@@ -37,6 +38,7 @@ namespace UAlbion.Core
 
         public void Attach(EventExchange exchange)
         {
+            Exchange = exchange;
             foreach (var kvp in _handlers)
                 exchange.Subscribe(kvp.Key, this);
         }

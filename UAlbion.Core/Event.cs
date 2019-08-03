@@ -120,7 +120,11 @@ namespace UAlbion.Core
                 foreach(var type in assembly.GetTypes())
                 {
                     if (typeof(Event).IsAssignableFrom(type) && !type.IsAbstract)
-                        yield return type;
+                    {
+                        var eventAttribute = (EventAttribute)type.GetCustomAttribute(typeof(EventAttribute), false);
+                        if (eventAttribute != null)
+                            yield return type;
+                    }
                 }
             }
         }

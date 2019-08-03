@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
@@ -7,33 +8,10 @@ using UAlbion.Core.Objects;
 using UAlbion.Formats;
 using UAlbion.Game;
 using UAlbion.Game.AssetIds;
-using UAlbion.Game.Gui;
 
 namespace UAlbion
 {
-    class Billboard : Component
-    {
-        static IList<Handler> Handlers => new Handler[] { new Handler<Billboard,RenderEvent>((x, e) => x.OnRender(e)), };
-        public Vector2 Position { get; set; }
-
-        readonly ITexture _texture;
-        readonly SpriteFlags _flags;
-
-        public Billboard(ITexture texture, SpriteFlags flags) : base(Handlers)
-        {
-            _texture = texture;
-            _flags = flags;
-        }
-
-        void OnRender(RenderEvent renderEvent)
-        {
-            var sprite = ((SpriteRenderer)renderEvent.GetRenderer(typeof(SpriteRenderer))).CreateSprite();
-            sprite.Initialize(Position, _texture, 0, _flags);
-            renderEvent.Add(sprite);
-        }
-    }
-
-    class Program
+    static class Program
     {
         static unsafe void Main(string[] args)
         {
@@ -50,27 +28,36 @@ namespace UAlbion
             using (var engine = new Engine())
             {
                 var scene = engine.Create2DScene();
-                scene.SetPalette(palette.Entries); // TODO: Update on game tick
+                scene.SetPalette(palette.GetPaletteAtTime(0)); // TODO: Update on game tick
+                scene.AddComponent(new PaletteManager(scene, palette));
                 scene.AddRenderer(new SpriteRenderer(engine.TextureManager));
                 scene.AddComponent(new ConsoleLogger());
-                scene.Camera.Position = new Vector3(656, 678, 0);
-                scene.Camera.Magnification = 4.0f;
+                scene.AddComponent(new GameClock());
+                scene.Camera.Position = new Vector3(0, 0, 0);
+                scene.Camera.Magnification = 2.0f;
 
-                var menu = new MainMenu();
-                scene.AddComponent(menu);
+                // var menu = new MainMenu();
+                // scene.AddComponent(menu);
 
-                //Image<Rgba32> menuBackground = assets.LoadPicture( PictureId.MenuBackground8);
-                //var background = new Sprite(spriteRenderer, menuBackground, new Vector2(0.0f, 0.0f), new Vector2(1.0f, 0.8f));
-                //scene.AddRenderable(background);
+                // Image<Rgba32> menuBackground = assets.LoadPicture( PictureId.MenuBackground8);
+                // var background = new Sprite(spriteRenderer, menuBackground, new Vector2(0.0f, 0.0f), new Vector2(1.0f, 0.8f));
+                // scene.AddRenderable(background);
 
-                //var statusBackground = assets.LoadPicture(PictureId.StatusBar);
-                //var status = new SpriteRenderer(statusBackground, new Vector2(0.0f, 0.8f), new Vector2(1.0f, 0.2f));
-                //scene.AddRenderable(status);
+                // var statusBackground = assets.LoadPicture(PictureId.StatusBar);
+                // var status = new SpriteRenderer(statusBackground, new Vector2(0.0f, 0.8f), new Vector2(1.0f, 0.2f));
+                // scene.AddRenderable(status);
+
 
                 ITexture mapImage = assets.LoadPicture(PictureId.TestMap);
-                var map = new Billboard(mapImage, 0) { Position = new Vector2(0.0f, 0.0f) };
+                var map = new Billboard2D(mapImage, 0) { Position = new Vector2(0.0f, 0.0f) };
                 scene.AddComponent(map);
-
+//*
+                var testSprite = assets.LoadTexture(AssetType.Floor3D, (int)DungeonFloorId.Water);
+                var frame = testSprite.Frames[0];
+                var testTexture = new EightBitTexture((uint)frame.Width, (uint)frame.Height, 1, 1, frame.Pixels);
+                var testBillboard = new Billboard2D(testTexture, 0) { Position = new Vector2(-64.0f, 0.0f), RenderOrder = 1 };
+                scene.AddComponent(testBillboard);
+//*/
                 engine.SetScene(scene);
                 engine.Run();
             }
@@ -82,6 +69,33 @@ namespace UAlbion
                 Set mode to main menu
             */
 
+        }
+    }
+
+    class PaletteManager : Component
+    {
+        static readonly IList<Handler> Handlers = new Handler[]
+        {
+            new Handler<PaletteManager, UpdateEvent>((x, e) =>
+            {
+                x._ticks++;
+                x._scene.SetPalette(x._palette.GetPaletteAtTime(x._ticks));
+            }),
+        };
+
+        readonly Scene _scene;
+        AlbionPalette _palette;
+        int _ticks;
+
+        public PaletteManager(Scene scene, AlbionPalette palette) : base(Handlers)
+        {
+            _scene = scene;
+            _palette = palette ?? throw new ArgumentNullException(nameof(palette));
+        }
+
+        public void SetPalette(AlbionPalette palette)
+        {
+            _palette = palette ?? throw new ArgumentNullException(nameof(palette));
         }
     }
 }

@@ -7,7 +7,7 @@ namespace UAlbion.Game
 {
     public static class AssetLoader
     {
-        public static object Load(BinaryReader br, AssetType type, int streamLength, object context)
+        public static object Load(BinaryReader br, AssetType type, int id, string name, int streamLength, object context)
         {
             switch (type)
             {
@@ -17,19 +17,19 @@ namespace UAlbion.Game
                     break;
 
                 case AssetType.Font: return new AlbionFont(br, streamLength);
-                case AssetType.Palette: return new AlbionPalette(br, streamLength, (AlbionPalette.PaletteContext)context);
+                case AssetType.Palette: return new AlbionPalette(name, br, streamLength, (AlbionPalette.PaletteContext)context);
                 case AssetType.PaletteNull: return br.ReadBytes(streamLength);
                 case AssetType.Picture: return Image.Load(br.BaseStream);
 
                 // Fixed size graphics
-                case AssetType.Floor3D: return new AlbionSprite(br, streamLength, 64, 64); // Fixed width
-                case AssetType.IconGraphics: return new AlbionSprite(br, streamLength, 16, 16); // Fixed width
-                case AssetType.IconData: return new AlbionSprite(br, streamLength, 8, 8); // Weird little things... 8x8
-                case AssetType.SmallPortrait: return new AlbionSprite(br, streamLength, 34, 37);
-                case AssetType.TacticalIcon: return  new AlbionSprite(br, streamLength, 32, 48);
-                case AssetType.ItemGraphics: return new AlbionSprite(br, streamLength, 16, 16);
-                case AssetType.AutomapGraphics: return new AlbionSprite(br, streamLength, 8, 8);
-                case AssetType.CombatBackground: return new AlbionSprite(br, streamLength, 360, 192);
+                case AssetType.Floor3D: return new AlbionSprite(br, streamLength, 64, 64, name); // Fixed width
+                case AssetType.IconGraphics: return new AlbionSprite(br, streamLength, 16, 16, name); // Fixed width
+                case AssetType.IconData: return new AlbionSprite(br, streamLength, 8, 8, name); // Weird little things... 8x8
+                case AssetType.SmallPortrait: return new AlbionSprite(br, streamLength, 34, 37, name);
+                case AssetType.TacticalIcon: return  new AlbionSprite(br, streamLength, 32, 48, name);
+                case AssetType.ItemGraphics: return new AlbionSprite(br, streamLength, 16, 16, name);
+                case AssetType.AutomapGraphics: return new AlbionSprite(br, streamLength, 8, 8, name);
+                case AssetType.CombatBackground: return new AlbionSprite(br, streamLength, 360, 192, name);
 
                 // Dependently sized graphics
                 case AssetType.Wall3D: // Size varies, must be described elsewhere
@@ -46,7 +46,7 @@ namespace UAlbion.Game
                 case AssetType.MonsterGraphics:
                 case AssetType.BackgroundGraphics: // Skyboxes
                 case AssetType.CombatGraphics:
-                    return new AlbionSprite(br, streamLength);
+                    return new AlbionSprite(br, streamLength, name);
 
                 // Textual resources
                 case AssetType.EventTexts:

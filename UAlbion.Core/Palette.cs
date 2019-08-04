@@ -6,16 +6,18 @@ namespace UAlbion.Core
     public class Palette : ITexture
     {
         public PixelFormat Format => PixelFormat.R8_G8_B8_A8_UNorm;
-        public TextureType Type => TextureType.Texture1D;
+        public TextureType Type => TextureType.Texture2D;
         public uint Width => 256;
         public uint Height => 1;
         public uint Depth => 1;
         public uint MipLevels => 1;
         public uint ArrayLayers => 1;
+        public string Name { get; }
         uint[] TextureData { get;  }
 
-        public Palette(uint[] paletteData)
+        public Palette(string name, uint[] paletteData)
         {
+            Name = name;
             TextureData = paletteData;
         }
 
@@ -23,6 +25,8 @@ namespace UAlbion.Core
         {
             Texture texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, usage, Type));
             Texture staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, TextureUsage.Staging, Type));
+            texture.Name = Name;
+            staging.Name = Name + "_Staging";
 
             fixed (uint* texDataPtr = &TextureData[0])
             {

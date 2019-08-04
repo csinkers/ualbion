@@ -9,21 +9,15 @@ namespace UAlbion.Core
         public DeviceBuffer IdentityMatrixBuffer { get; private set; }
         public DeviceBuffer ProjectionMatrixBuffer { get; private set; }
         public DeviceBuffer ViewMatrixBuffer { get; private set; }
-
-        public DeviceBuffer LightInfoBuffer { get; private set; }
-        public DeviceBuffer LightViewProjectionBuffer0 { get; internal set; }
-        public DeviceBuffer LightViewProjectionBuffer1 { get; internal set; }
-        public DeviceBuffer LightViewProjectionBuffer2 { get; internal set; }
         public DeviceBuffer DepthLimitsBuffer { get; internal set; }
         public DeviceBuffer CameraInfoBuffer { get; private set; }
-        public DeviceBuffer PointLightsBuffer { get; private set; }
 
 
         // MainSceneView and Duplicator resource sets both use this.
         public ResourceLayout TextureSamplerResourceLayout { get; private set; }
 
         public Texture PaletteTexture { get; internal set; }
-        public TextureView Palette { get; internal set; }
+        public TextureView PaletteView { get; internal set; }
         public Texture MainSceneColorTexture { get; private set; }
         public Texture MainSceneDepthTexture { get; private set; }
         public Framebuffer MainSceneFramebuffer { get; private set; }
@@ -38,51 +32,36 @@ namespace UAlbion.Core
 
         public ICamera Camera { get; set; }
         public TextureSampleCount MainSceneSampleCount { get; internal set; }
-        public DeviceBuffer NoClipPlaneBuffer { get; private set; }
 
         public virtual void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
         {
+            Engine.CheckForErrors();
             ResourceFactory factory = gd.ResourceFactory;
-            IdentityMatrixBuffer = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
-            cl.UpdateBuffer(IdentityMatrixBuffer, 0, Matrix4x4.Identity);
             ProjectionMatrixBuffer = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
             ViewMatrixBuffer = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
+            IdentityMatrixBuffer = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
+            cl.UpdateBuffer(IdentityMatrixBuffer, 0, Matrix4x4.Identity);
 
-            LightViewProjectionBuffer0 = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
-            LightViewProjectionBuffer0.Name = "LightViewProjectionBuffer0";
-            LightViewProjectionBuffer1 = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
-            LightViewProjectionBuffer1.Name = "LightViewProjectionBuffer1";
-            LightViewProjectionBuffer2 = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
-            LightViewProjectionBuffer2.Name = "LightViewProjectionBuffer2";
+            IdentityMatrixBuffer.Name = "M_Id";
+            ProjectionMatrixBuffer.Name = "M_Projection";
+            ViewMatrixBuffer.Name = "M_View";
 
             DepthLimitsBuffer = factory.CreateBuffer(new BufferDescription((uint)Unsafe.SizeOf<DepthCascadeLimits>(), BufferUsage.UniformBuffer | BufferUsage.Dynamic));
-            LightInfoBuffer = factory.CreateBuffer(new BufferDescription((uint)Unsafe.SizeOf<DirectionalLightInfo>(), BufferUsage.UniformBuffer | BufferUsage.Dynamic));
             CameraInfoBuffer = factory.CreateBuffer(new BufferDescription((uint)Unsafe.SizeOf<CameraInfo>(), BufferUsage.UniformBuffer | BufferUsage.Dynamic));
+
+            DepthLimitsBuffer.Name = "B_DepthLimits";
+            CameraInfoBuffer.Name = "B_CameraInfo";
 
             if (Camera != null)
             {
                 UpdateCameraBuffers(cl);
             }
 
-            PointLightsBuffer = factory.CreateBuffer(new BufferDescription((uint)Unsafe.SizeOf<PointLightsInfo.Blittable>(), BufferUsage.UniformBuffer));
-
-            var pointLights = new[]
-            {
-                new PointLightInfo { Color = new Vector3(.6f, .6f, .6f),   Position = new Vector3(-50, 5, 0), Range =  75f },
-                new PointLightInfo { Color = new Vector3(.6f, .35f, .4f),  Position = new Vector3(0, 5, 0),   Range = 100f },
-                new PointLightInfo { Color = new Vector3(.6f, .6f, 0.35f), Position = new Vector3(50, 5, 0),  Range =  40f },
-                new PointLightInfo { Color = new Vector3(0.4f, 0.4f, .6f), Position = new Vector3(25, 5, 45), Range = 150f },
-            };
-            PointLightsInfo pli = new PointLightsInfo { NumActiveLights = pointLights.Length, PointLights = pointLights };
-
-            cl.UpdateBuffer(PointLightsBuffer, 0, pli.GetBlittable());
-
             TextureSamplerResourceLayout = factory.CreateResourceLayout(new ResourceLayoutDescription(
                 new ResourceLayoutElementDescription("SourceTexture", ResourceKind.TextureReadOnly, ShaderStages.Fragment),
                 new ResourceLayoutElementDescription("SourceSampler", ResourceKind.Sampler, ShaderStages.Fragment)));
 
-            NoClipPlaneBuffer = factory.CreateBuffer(new BufferDescription(32, BufferUsage.UniformBuffer));
-            gd.UpdateBuffer(NoClipPlaneBuffer, 0, new ClipPlaneInfo());
+            TextureSamplerResourceLayout.Name = "RL_TextureSampler";
 
             RecreateWindowSizedResources(gd, cl);
         }
@@ -92,13 +71,8 @@ namespace UAlbion.Core
             IdentityMatrixBuffer.Dispose();
             ProjectionMatrixBuffer.Dispose();
             ViewMatrixBuffer.Dispose();
-            LightInfoBuffer.Dispose();
-            LightViewProjectionBuffer0.Dispose();
-            LightViewProjectionBuffer1.Dispose();
-            LightViewProjectionBuffer2.Dispose();
             DepthLimitsBuffer.Dispose();
             CameraInfoBuffer.Dispose();
-            PointLightsBuffer.Dispose();
             MainSceneColorTexture.Dispose();
             MainSceneResolvedColorTexture.Dispose();
             MainSceneResolvedColorView.Dispose();
@@ -110,7 +84,8 @@ namespace UAlbion.Core
             DuplicatorTargetSet0.Dispose();
             DuplicatorFramebuffer.Dispose();
             TextureSamplerResourceLayout.Dispose();
-            NoClipPlaneBuffer.Dispose();
+            PaletteView?.Dispose();
+            PaletteTexture?.Dispose();
         }
 
         public void SetCurrentScene(Scene scene)
@@ -162,11 +137,13 @@ namespace UAlbion.Core
                 sampleCount);
 
             MainSceneColorTexture = factory.CreateTexture(ref mainColorDesc);
+            MainSceneColorTexture.Name = "T_MainSceneColor";
 
             if (sampleCount != TextureSampleCount.Count1)
             {
                 mainColorDesc.SampleCount = TextureSampleCount.Count1;
                 MainSceneResolvedColorTexture = factory.CreateTexture(ref mainColorDesc);
+                MainSceneResolvedColorTexture.Name = "T_MainSceneResolvedColor";
             }
             else
             {
@@ -185,6 +162,11 @@ namespace UAlbion.Core
             MainSceneFramebuffer = factory.CreateFramebuffer(new FramebufferDescription(MainSceneDepthTexture, MainSceneColorTexture));
             MainSceneViewResourceSet = factory.CreateResourceSet(new ResourceSetDescription(TextureSamplerResourceLayout, MainSceneResolvedColorView, gd.PointSampler));
 
+            MainSceneResolvedColorView.Name = "TV_MainSceneResolvedColor";
+            MainSceneDepthTexture.Name = "T_MainSceneDepth";
+            MainSceneFramebuffer.Name = "FB_MainFrame";
+            MainSceneViewResourceSet.Name = "RS_MainFrame";
+
             TextureDescription colorTargetDesc = TextureDescription.Texture2D(
                 gd.SwapchainFramebuffer.Width,
                 gd.SwapchainFramebuffer.Height,
@@ -196,8 +178,13 @@ namespace UAlbion.Core
             DuplicatorTargetView0 = factory.CreateTextureView(DuplicatorTarget0);
             DuplicatorTargetSet0 = factory.CreateResourceSet(new ResourceSetDescription(TextureSamplerResourceLayout, DuplicatorTargetView0, gd.PointSampler));
 
+            DuplicatorTarget0.Name = "T_DuplicatorTarget";
+            DuplicatorTargetView0.Name = "TV_DuplicatorTarget";
+            DuplicatorTargetSet0.Name = "RS_DuplicatorTarget";
+
             FramebufferDescription fbDesc = new FramebufferDescription(null, DuplicatorTarget0);
             DuplicatorFramebuffer = factory.CreateFramebuffer(ref fbDesc);
+            DuplicatorFramebuffer.Name = "FB_Duplicator";
         }
    }
 }

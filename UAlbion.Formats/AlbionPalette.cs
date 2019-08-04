@@ -10,9 +10,7 @@ namespace UAlbion.Formats
         public class PaletteContext
         {
             public PaletteContext(int id, byte[] commonPalette) { Id = id; CommonPalette = commonPalette; }
-            public PaletteContext(int id, string name, byte[] commonPalette) { Id = id; CommonPalette = commonPalette; Name = name; }
             public int Id { get; }
-            public string Name { get; }
             public byte[] CommonPalette { get; }
         }
 
@@ -34,10 +32,10 @@ namespace UAlbion.Formats
             x => x.Key, 
             x => (IList<(byte,byte)>)x.Value.Select(y => ((byte)y.Item1, (byte)y.Item2)).ToArray());
 
-        public AlbionPalette(BinaryReader br, int streamLength, PaletteContext context)
+        public AlbionPalette(string name, BinaryReader br, int streamLength, PaletteContext context)
         {
             Id = context.Id;
-            Name = context.Name;
+            Name = name;
             Debug.Assert(context.CommonPalette.Length == 192);
             long startingOffset = br.BaseStream.Position;
             for (int i = 0; i < 192; i++)

@@ -12,15 +12,18 @@ namespace UAlbion.Core
         public uint Depth => 1;
         public uint MipLevels { get;  }
         public uint ArrayLayers { get;  }
+        public string Name { get; }
         public byte[] TextureData { get;  }
 
         public EightBitTexture(
+            string name,
             uint width,
             uint height,
             uint mipLevels,
             uint arrayLayers,
             byte[] textureData)
         {
+            Name = name;
             Width = width;
             Height = height;
             MipLevels = mipLevels;
@@ -32,6 +35,8 @@ namespace UAlbion.Core
         {
             Texture texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, usage, Type));
             Texture staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, TextureUsage.Staging, Type));
+            texture.Name = "T_" + Name;
+            staging.Name = "T_" + Name + "_Staging";
 
             ulong offset = 0;
             fixed (byte* texDataPtr = &TextureData[0])

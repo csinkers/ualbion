@@ -10607,7 +10607,7 @@
       }
     },
     "FBODPIX0.XLD": {
-      "EnumName": null,
+      "EnumName": "FullBodyPictureId",
       "Objects": {
         "0": {
           "Width": 128,
@@ -31696,7 +31696,7 @@
       }
     },
     "INITIAL\\MERCHDT0.XLD": {
-      "EnumName": "Merchantid",
+      "EnumName": "MerchantId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -31707,7 +31707,7 @@
       }
     },
     "INITIAL\\MERCHDT1.XLD": {
-      "EnumName": "Merchantid",
+      "EnumName": "MerchantId",
       "Objects": {
         "0": {
           "Width": 32,
@@ -32312,7 +32312,7 @@
       }
     },
     "INITIAL\\MERCHDT2.XLD": {
-      "EnumName": "Merchantid",
+      "EnumName": "MerchantId",
       "Objects": {
         "0": {
           "Width": 32,

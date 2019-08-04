@@ -20,34 +20,32 @@ namespace UAlbion.Core.Objects
         DeviceBuffer _vb;
 
         const string VertexShader = @"
-            #version 450
-            layout(location = 0) in vec2 Position;
-            layout(location = 1) in vec2 TexCoords;
+#version 450
+layout(location = 0) in vec2 Position;
+layout(location = 1) in vec2 TexCoords;
 
-            layout(location = 0) out vec2 fsin_0;
+layout(location = 0) out vec2 fsin_0;
 
-            void main()
-            {
-                fsin_0 = TexCoords;
-                gl_Position = vec4(Position.x, Position.y, 0, 1);
-            }";
+void main()
+{
+    fsin_0 = TexCoords;
+    gl_Position = vec4(Position.x, Position.y, 0, 1);
+}";
 
         const string FragmentShader = @"
-            #version 450
+#version 450
 
-            layout(set = 0, binding = 0) uniform texture2D SourceTexture;
-            layout(set = 0, binding = 1) uniform sampler SourceSampler;
+layout(set = 0, binding = 0) uniform texture2D SourceTexture;
+layout(set = 0, binding = 1) uniform sampler SourceSampler;
 
-            layout(location = 0) in vec2 fsin_TexCoords;
-            layout(location = 0) out vec4 OutputColor;
+layout(location = 0) in vec2 fsin_TexCoords;
+layout(location = 0) out vec4 OutputColor;
 
-            layout(constant_id = 103) const bool OutputFormatSrgb = true;
-
-            void main()
-            {
-                vec4 color = texture(sampler2D(SourceTexture, SourceSampler), fsin_TexCoords);
-                OutputColor = color;
-            }";
+void main()
+{
+    vec4 color = texture(sampler2D(SourceTexture, SourceSampler), fsin_TexCoords);
+    OutputColor = color;
+}";
 
         public FullScreenQuad() : base(Handlers) { }
 
@@ -63,10 +61,14 @@ namespace UAlbion.Core.Objects
             var shaderSet = new ShaderSetDescription(new[] { Vertex2DTextured.VertexLayout },
                 factory.CreateFromSpirv(ShaderHelper.Vertex(VertexShader), ShaderHelper.Fragment(FragmentShader)));
 
+            var rasterizerState = new RasterizerStateDescription(
+                FaceCullMode.Back, PolygonFillMode.Solid, FrontFace.Clockwise, 
+                true, false);
+
             var pd = new GraphicsPipelineDescription(
                 new BlendStateDescription(RgbaFloat.Black, BlendAttachmentDescription.OverrideBlend),
                 DepthStencilStateDescription.Disabled,
-                new RasterizerStateDescription(FaceCullMode.Back, PolygonFillMode.Solid, FrontFace.Clockwise, true, false),
+                rasterizerState,
                 PrimitiveTopology.TriangleList,
                 new ShaderSetDescription(new[] { Vertex2DTextured.VertexLayout }, shaderSet.Shaders, ShaderHelper.GetSpecializations(gd)),
                 new[] { layout },

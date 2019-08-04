@@ -117,7 +117,8 @@ namespace UAlbion.Core
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                foreach(var type in assembly.GetTypes())
+                Type[] types; try { types = assembly.GetTypes(); } catch (ReflectionTypeLoadException e) { types = e.Types; }
+                foreach(var type in types.Where(x => x != null))
                 {
                     if (typeof(Event).IsAssignableFrom(type) && !type.IsAbstract)
                     {

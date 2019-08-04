@@ -2,7 +2,7 @@
   "profiles": {
     "UAlbion": {
       "commandName": "Project",
-      "workingDirectory": "C:\\Depot\\Main\\bitbucket\\ualbion",
+      "workingDirectory": "..",
       "nativeDebugging": true
     }
   }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Numerics;
-using System.Runtime.InteropServices;
 using Veldrid;
 using Veldrid.SPIRV;
 using Veldrid.Utilities;
@@ -9,22 +8,34 @@ namespace UAlbion.Core.Objects
 {
     public class SpriteRenderer : IRenderer
     {
-        public interface ISprite: IRenderable
+        public interface ISprite : IRenderable
         {
-            SpriteFlags Flags { get; }
             ITexture Texture { get; }
             Vector2 Position { get; }
             Vector2 Size { get; }
             Vector2 TexPosition { get; }
             Vector2 TexSize { get; }
+            SpriteFlags Flags { get; }
         }
 
-        static Vertex2DTextured Vertex(float x, float y, float u, float v) => new Vertex2DTextured(new Vector2(x, y), new Vector2(u, v));
-        static readonly VertexLayoutDescription[] VertexLayouts = { new VertexLayoutDescription(
-            VertexLayoutH.Position2D("Position"),
-            VertexLayoutH.Texture2D("TexCoords")) };
+        static class Shader
+        {
+            public static Vertex2DTextured Vertex(float x, float y, float u, float v) => new Vertex2DTextured(x, y, u, v);
 
-        const string VertexShader = @"
+            public static readonly VertexLayoutDescription[] VertexLayouts = {
+                new VertexLayoutDescription(
+                    VertexLayoutH.Texture2D("Position"),
+                    VertexLayoutH.Texture2D("TexCoords")) };
+
+            public static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
+                ResourceLayoutH.Uniform("Projection"),
+                ResourceLayoutH.Uniform("View"),
+                ResourceLayoutH.Uniform("Flags"),
+                ResourceLayoutH.Sampler("SpriteSampler"),
+                ResourceLayoutH.Texture("SpriteTexture"),
+                ResourceLayoutH.Texture("PaletteView"));
+
+            public const string VertexShader = @"
             #version 450
 
             layout(set = 0, binding = 0) uniform Projection { mat4 _Proj; };
@@ -40,34 +51,36 @@ namespace UAlbion.Core.Objects
                 gl_Position = _Proj * _View * vec4(Position.x, Position.y, 0, 1);
             }";
 
-        const string FragmentShader = @"
+            public const string FragmentShader = @"
             #version 450
 
-            layout(set = 0, binding = 2) uniform texture2D SpriteTexture;
-            layout(set = 0, binding = 3) uniform Flags { int _Flags; int _u2; int _u3; int _u4; };
-
-            layout(set = 1, binding = 0) uniform sampler SpriteSampler;
-            layout(set = 1, binding = 1) uniform texture2D Palette;
+            layout(set = 0, binding = 2) uniform SpriteFlags { mat4 _Flags; };
+            layout(set = 0, binding = 3) uniform sampler SpriteSampler;
+            layout(set = 0, binding = 4) uniform texture2D SpriteTexture;
+            layout(set = 0, binding = 5) uniform texture2D PaletteView;
 
             layout(location = 0) in vec2 fsin_0;
             layout(location = 0) out vec4 OutputColor;
 
             void main()
             {
-                // If palette texture
-                if((_Flags & 4) != 0) // TODO: Const
+                if (_Flags[0][0] > 0)
                 {
-                    int index = int(255.0 * texture(sampler2D(SpriteTexture, SpriteSampler), fsin_0)[0]);
-                    vec4 color = texture(sampler2D(Palette, SpriteSampler), vec2(index, 0));
-                    OutputColor = color;
+                    float redChannel = texture(sampler2D(SpriteTexture, SpriteSampler), fsin_0)[0];
+                    float index = 255.0f * redChannel;
+                    vec4 color = texture(sampler2D(PaletteView, SpriteSampler), vec2(redChannel, 0.0f));
+                    OutputColor = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+                    //OutputColor = (vec4(index / 255.0f, index / 255.0f, index / 255.0f, 1.0f) + color) / 2;
                 }
                 else
                 {
-                    OutputColor = texture(sampler2D(SpriteTexture, SpriteSampler), fsin_0);
+                    OutputColor = vec4(0.0f, 0.0f, 1.0f, 1.0f);
+                    //OutputColor = texture(sampler2D(SpriteTexture, SpriteSampler), fsin_0);
                 }
             }";
+        }
 
-        readonly ushort[] _indices;
+        static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
         readonly ITextureManager _textureManager;
 
@@ -77,112 +90,96 @@ namespace UAlbion.Core.Objects
         DeviceBuffer _flagsBuffer;
         Pipeline _pipeline;
         ResourceLayout _perSpriteResourceLayout;
-        ResourceLayout _perFrameResourceLayout;
 
         public SpriteRenderer(ITextureManager textureManager)
         {
             _textureManager = textureManager ?? throw new ArgumentNullException(nameof(textureManager));
-            _indices = new ushort[] { 0, 1, 2, 2, 1, 3 };
         }
 
         public RenderPasses RenderPasses => RenderPasses.Standard;
-        public Sprite CreateSprite() { return new Sprite(); }
+        public Sprite CreateSprite() { return new Sprite(); } // TODO: Sprite pooling / reuse?
 
         static Vertex2DTextured[] BuildVertices(ISprite sprite)
         {
             return new[]
             {
-                Vertex(sprite.Position.X, sprite.Position.Y, sprite.TexPosition.X, sprite.TexPosition.Y),
-                Vertex(sprite.Position.X + sprite.Size.X, sprite.Position.Y, sprite.TexPosition.X + sprite.TexSize.X, sprite.TexPosition.Y),
-                Vertex(sprite.Position.X, sprite.Position.Y + sprite.Size.Y, sprite.TexPosition.X, sprite.TexPosition.Y + sprite.TexSize.Y),
-                Vertex(sprite.Position.X + sprite.Size.X, sprite.Position.Y + sprite.Size.Y, sprite.TexPosition.X + sprite.TexSize.X, sprite.TexPosition.Y + sprite.TexSize.Y)
+                Shader.Vertex(sprite.Position.X, sprite.Position.Y, sprite.TexPosition.X, sprite.TexPosition.Y),
+                Shader.Vertex(sprite.Position.X + sprite.Size.X, sprite.Position.Y, sprite.TexPosition.X + sprite.TexSize.X, sprite.TexPosition.Y),
+                Shader.Vertex(sprite.Position.X, sprite.Position.Y + sprite.Size.Y, sprite.TexPosition.X, sprite.TexPosition.Y + sprite.TexSize.Y),
+                Shader.Vertex(sprite.Position.X + sprite.Size.X, sprite.Position.Y + sprite.Size.Y, sprite.TexPosition.X + sprite.TexSize.X, sprite.TexPosition.Y + sprite.TexSize.Y)
             };
-        }
-
-        public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable renderable)
-        {
-            var sprite = (ISprite) renderable;
-            var texture = _textureManager.GetTexture(sprite.Texture);
-            var flags = sprite.Flags;
-
-            if (sprite.Texture.Format == PixelFormat.R8_UNorm)
-                flags |= SpriteFlags.UsePalette;
-
-            var flagsArray = new int[] {(int)flags, 0, 0, 0};
-            gd.UpdateBuffer(_flagsBuffer, 0, flagsArray);
-
-            var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_perSpriteResourceLayout,
-                (sprite.Flags & SpriteFlags.NoTransform) != 0 ? sc.IdentityMatrixBuffer : sc.ProjectionMatrixBuffer,
-                (sprite.Flags & SpriteFlags.NoTransform) != 0 ? sc.IdentityMatrixBuffer : sc.ViewMatrixBuffer,
-                texture, _flagsBuffer));
-
-            // TODO: Only generate once per frame
-            var perFrameResourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_perFrameResourceLayout,
-                gd.PointSampler, sc.Palette));
-
-            cl.UpdateBuffer(_vb, 0, BuildVertices(sprite));
-
-            cl.SetVertexBuffer(0, _vb);
-            cl.SetIndexBuffer(_ib, IndexFormat.UInt16);
-            cl.SetPipeline(_pipeline);
-            cl.SetGraphicsResourceSet(0, resourceSet);
-            cl.SetGraphicsResourceSet(1, perFrameResourceSet);
-            float depth = gd.IsDepthRangeZeroToOne ? 0 : 1;
-            cl.SetViewport(0, new Viewport(0, 0, sc.MainSceneColorTexture.Width, sc.MainSceneColorTexture.Height, depth, depth));
-            cl.DrawIndexed((uint)_indices.Length, 1, 0, 0, 0);
-            cl.SetViewport(0, new Viewport(0, 0, sc.MainSceneColorTexture.Width, sc.MainSceneColorTexture.Height, 0, 1));
         }
 
         public void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
         {
-            if (_vb != null)
-                return;
-
             ResourceFactory factory = gd.ResourceFactory;
 
             _vb = factory.CreateBuffer(new BufferDescription(new Vertex2DTextured[4].SizeInBytes(), BufferUsage.VertexBuffer));
-            _ib = factory.CreateBuffer(new BufferDescription(_indices.SizeInBytes(), BufferUsage.IndexBuffer));
-            _flagsBuffer = factory.CreateBuffer(new BufferDescription(4 * (uint)Marshal.SizeOf<int>(), BufferUsage.UniformBuffer));
-            cl.UpdateBuffer(_ib, 0, _indices);
+            _ib = factory.CreateBuffer(new BufferDescription(Indices.SizeInBytes(), BufferUsage.IndexBuffer));
+            _flagsBuffer = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
+            _vb.Name = "SpriteVertexBuffer";
+            _ib.Name = "SpriteIndexBuffer";
+            _flagsBuffer.Name = "SpriteFlagsBuffer";
+            cl.UpdateBuffer(_ib, 0, Indices);
 
             var shaderSet = new ShaderSetDescription(new[] { Vertex2DTextured.VertexLayout },
-                factory.CreateFromSpirv(ShaderHelper.Vertex(VertexShader), ShaderHelper.Fragment(FragmentShader)));
+                factory.CreateFromSpirv(ShaderHelper.Vertex(Shader.VertexShader), ShaderHelper.Fragment(Shader.FragmentShader)));
 
-            var PerSpriteLayoutDescription = new ResourceLayoutDescription(
-                ResourceLayoutH.Uniform("Projection"),
-                ResourceLayoutH.Uniform("View"),
-                ResourceLayoutH.Texture("SpriteTexture"),
-                ResourceLayoutH.Uniform("Flags"));
+            _perSpriteResourceLayout = factory.CreateResourceLayout(Shader.PerSpriteLayoutDescription);
 
-            var PerFrameLayoutDescription = new ResourceLayoutDescription(
-                ResourceLayoutH.Sampler("SpriteSampler"),
-                ResourceLayoutH.Texture("Palette"));
+            var depthStencilMode = gd.IsDepthRangeZeroToOne
+                    ? DepthStencilStateDescription.DepthOnlyGreaterEqual
+                    : DepthStencilStateDescription.DepthOnlyLessEqual;
 
-            _perSpriteResourceLayout = factory.CreateResourceLayout(PerSpriteLayoutDescription);
-            _perFrameResourceLayout = factory.CreateResourceLayout(PerFrameLayoutDescription);
+            var rasterizerMode = new RasterizerStateDescription(
+                FaceCullMode.None, PolygonFillMode.Solid, FrontFace.Clockwise,
+                true, true);
 
             var pd = new GraphicsPipelineDescription(
                 BlendStateDescription.SingleAlphaBlend,
-                gd.IsDepthRangeZeroToOne ? DepthStencilStateDescription.DepthOnlyGreaterEqual : DepthStencilStateDescription.DepthOnlyLessEqual,
-                new RasterizerStateDescription(FaceCullMode.None, PolygonFillMode.Solid, FrontFace.Clockwise, true, true),
+                depthStencilMode,
+                rasterizerMode,
                 PrimitiveTopology.TriangleList,
-                new ShaderSetDescription(VertexLayouts, shaderSet.Shaders, ShaderHelper.GetSpecializations(gd)),
-                new[] { _perSpriteResourceLayout, _perFrameResourceLayout },
+                new ShaderSetDescription(Shader.VertexLayouts, shaderSet.Shaders, ShaderHelper.GetSpecializations(gd)),
+                new[] { _perSpriteResourceLayout },
                 sc.MainSceneFramebuffer.OutputDescription);
 
             _pipeline = factory.CreateGraphicsPipeline(ref pd);
 
-            _disposeCollector.Add(_vb, _ib, _perSpriteResourceLayout, _perFrameResourceLayout, _pipeline, _flagsBuffer);
+            _disposeCollector.Add(_vb, _ib, _perSpriteResourceLayout, _pipeline, _flagsBuffer);
         }
 
         public void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IRenderable renderable)
         {
-            var sprite = (ISprite) renderable;
+            var sprite = (ISprite)renderable;
             _textureManager.PrepareTexture(sprite.Texture, gd);
-            // TODO: Setup device textures
-            //ImageSharpTexture imageSharpTexture = new ImageSharpTexture(_texture, false);
-            //Texture deviceTexture = imageSharpTexture.CreateDeviceTexture(gd, factory);
-            //TextureView textureView = factory.CreateTextureView(new TextureViewDescription(deviceTexture));
+        }
+
+        public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable renderable)
+        {
+            var sprite = (ISprite)renderable;
+            var flags = sprite.Flags;
+
+            //if (sprite.Texture.Format == PixelFormat.R8_UNorm)
+                flags |= SpriteFlags.UsePalette;
+
+            var projection = (sprite.Flags & SpriteFlags.NoTransform) != 0 ? sc.IdentityMatrixBuffer : sc.ProjectionMatrixBuffer;
+            var view = (sprite.Flags & SpriteFlags.NoTransform) != 0 ? sc.IdentityMatrixBuffer : sc.ViewMatrixBuffer;
+            TextureView textureView = _textureManager.GetTexture(sprite.Texture);
+            gd.UpdateBuffer(_flagsBuffer, 0, new float[] { (float)flags, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
+
+            var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_perSpriteResourceLayout,
+                projection, view, _flagsBuffer, gd.PointSampler, textureView, sc.PaletteView));
+
+            cl.UpdateBuffer(_vb, 0, BuildVertices(sprite));
+            cl.SetVertexBuffer(0, _vb);
+            cl.SetIndexBuffer(_ib, IndexFormat.UInt16);
+            cl.SetPipeline(_pipeline);
+            cl.SetGraphicsResourceSet(0, resourceSet);
+            float depth = gd.IsDepthRangeZeroToOne ? 0 : 1;
+            cl.SetViewport(0, new Viewport(0, 0, sc.MainSceneColorTexture.Width, sc.MainSceneColorTexture.Height, depth, depth));
+            cl.DrawIndexed((uint)Indices.Length, 1, 0, 0, 0);
+            cl.SetViewport(0, new Viewport(0, 0, sc.MainSceneColorTexture.Width, sc.MainSceneColorTexture.Height, 0, 1));
         }
 
         public void DestroyDeviceObjects() { _disposeCollector.DisposeAll(); }

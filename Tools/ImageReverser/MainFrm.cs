@@ -58,8 +58,8 @@ namespace UAlbion.Tools.ImageReverser
                 using(var stream = File.Open(file, FileMode.Open))
                 using (var br = new BinaryReader(stream))
                 {
-                    var context = new AlbionPalette.PaletteContext(paletteNumber, paletteName, commonPalette);
-                    var palette = new AlbionPalette(br, (int) br.BaseStream.Length, context);
+                    var context = new AlbionPalette.PaletteContext(paletteNumber, commonPalette);
+                    var palette = new AlbionPalette(paletteName, br, (int) br.BaseStream.Length, context);
                     listPalettes.Items.Add(palette);
                 }
             }

@@ -48,5 +48,7 @@ namespace UAlbion.Core
             if (_handlers.TryGetValue(@event.GetType(), out var handler))
                 handler.Invoke(this, @event);
         }
+
+        protected void Raise(IEvent @event) { Exchange.Raise(@event, this); }
     }
 }

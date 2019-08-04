@@ -13,6 +13,7 @@ namespace UAlbion
 
         readonly ITexture _texture;
         readonly SpriteFlags _flags;
+        int _frameCount;
 
         public Billboard2D(ITexture texture, SpriteFlags flags) : base(Handlers)
         {
@@ -22,6 +23,10 @@ namespace UAlbion
 
         void OnRender(RenderEvent renderEvent)
         {
+            _frameCount++;
+            if ((_flags & SpriteFlags.OnlyEvenFrames) != 0 && _frameCount % 2 == 0)
+                return;
+
             var sprite = ((SpriteRenderer)renderEvent.GetRenderer(typeof(SpriteRenderer))).CreateSprite();
             sprite.Initialize(Position, _texture, RenderOrder, _flags);
             renderEvent.Add(sprite);

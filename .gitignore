@@ -6,6 +6,8 @@ obj/
 albion_sr/
 packages/
 exported/
+veldrid/
+veldrid-spirv/
 *.gpr
 *.lock
 *.lock~

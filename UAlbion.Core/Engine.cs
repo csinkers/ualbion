@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using ImGuiNET;
@@ -9,21 +10,29 @@ using UAlbion.Core.Objects;
 
 namespace UAlbion.Core
 {
-    public class Engine : IDisposable
+    public class Engine : Component, IDisposable
     {
-        public ITextureManager TextureManager { get; }
+        static readonly IList<Handler> Handlers = new Handler[]
+        {
+            new Handler<Engine, ToggleFullscreenEvent>((x, _) => x.ToggleFullscreenState()),
+            new Handler<Engine, LoadRenderDocEvent>((x, _) => { if (RenderDoc.Load(out _renderDoc)) { x.ChangeBackend(x._graphicsDevice.BackendType, forceRecreateWindow: true); } }),
+            new Handler<Engine, ToggleResizableEvent>((x, _) => x._window.Resizable = !x._window.Resizable),
+            new Handler<Engine, ToggleVisibleBorderEvent>((x, _) => x._window.BorderVisible = !x._window.BorderVisible)
+        };
 
-        readonly string[] _msaaOptions = { "Off", "2x", "4x", "8x", "16x", "32x" };
-
-        static readonly double s_desiredFrameLengthSeconds = 1.0 / 60.0;
-        static readonly bool s_limitFrameRate = true;
-        static readonly FrameTimeAverager s_frameTimeAverager = new FrameTimeAverager(0.666);
         static RenderDoc _renderDoc;
 
+        public ITextureManager TextureManager { get; }
+        readonly double _desiredFrameLengthSeconds = 1.0 / 60.0;
+        readonly bool _limitFrameRate = true;
+        readonly FrameTimeAverager _frameTimeAverager = new FrameTimeAverager(0.666);
         readonly FullScreenQuad _fullScreenQuad;
         readonly ScreenDuplicator _duplicator;
         readonly ImGuiRenderable _igRenderable;
         readonly SceneContext _sceneContext = new SceneContext();
+        readonly DebugMenus _debugMenus;
+
+        static Engine _instance;
 
         Sdl2Window _window;
         Scene _scene;
@@ -32,7 +41,11 @@ namespace UAlbion.Core
         TextureSampleCount? _newSampleCount;
         bool _windowResized;
         bool _recreateWindow = true;
-        int _msaaOption = 0;
+
+        internal GraphicsDevice GraphicsDevice => _graphicsDevice;
+        internal Sdl2Window Window => _window;
+        internal RenderDoc RenderDoc => _renderDoc;
+        internal string FrameTimeText => _frameTimeAverager.CurrentAverageFramesPerSecond.ToString("000.0 fps / ") + _frameTimeAverager.CurrentAverageFrameTimeMilliseconds.ToString("#00.00 ms");
 
         public Scene Create2DScene()
         {
@@ -42,9 +55,11 @@ namespace UAlbion.Core
             scene.AddRenderer(_duplicator);
             scene.AddRenderer(_fullScreenQuad);
 
+            scene.AddComponent(this);
             scene.AddComponent(_igRenderable);
             scene.AddComponent(_duplicator);
             scene.AddComponent(_fullScreenQuad);
+            scene.AddComponent(_debugMenus);
             return scene;
         }
 
@@ -56,54 +71,47 @@ namespace UAlbion.Core
             scene.AddRenderer(_duplicator);
             scene.AddRenderer(_fullScreenQuad);
 
+            scene.AddComponent(this);
             scene.AddComponent(_igRenderable);
             scene.AddComponent(_duplicator);
             scene.AddComponent(_fullScreenQuad);
+            scene.AddComponent(_debugMenus);
             return scene;
         }
 
         public void SetScene(Scene scene)
         {
             _scene = scene;
+            Engine.CheckForErrors();
             _sceneContext.SetCurrentScene(_scene);
+            Engine.CheckForErrors();
             CreateAllObjects();
+            Engine.CheckForErrors();
             ImGui.StyleColorsClassic();
         }
 
-        public Engine()
+        public Engine() : base(Handlers)
         {
+            _instance = this;
             TextureManager = new TextureManager();
-            WindowCreateInfo windowCi = new WindowCreateInfo
-            {
-                X = 50,
-                Y = 50,
-                WindowWidth = 960,
-                WindowHeight = 540,
-                WindowInitialState = WindowState.Normal,
-                WindowTitle = "UAlbion"
-            };
-            GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(false, null, false, ResourceBindingModel.Improved, true, true, false);
-#if DEBUG
-            gdOptions.Debug = true;
-#endif
-            VeldridStartup.CreateWindowAndGraphicsDevice(
-                windowCi,
-                gdOptions,
-                //VeldridStartup.GetPlatformDefaultBackend(),
-                //GraphicsBackend.Metal,
-                //GraphicsBackend.Vulkan,
-                GraphicsBackend.OpenGL,
-                //GraphicsBackend.OpenGLES,
-                //GraphicsBackend.Direct3D11,
-                out _window,
-                out _graphicsDevice);
-            _window.Resized += () => _windowResized = true;
+            ChangeBackend(
+                //VeldridStartup.GetPlatformDefaultBackend()
+                //GraphicsBackend.Metal
+                //GraphicsBackend.Vulkan
+                GraphicsBackend.OpenGL
+                //GraphicsBackend.OpenGLES
+                //GraphicsBackend.Direct3D11
+                );
+
 
             _igRenderable = new ImGuiRenderable(_window.Width, _window.Height);
             _duplicator = new ScreenDuplicator();
             _fullScreenQuad = new FullScreenQuad();
+            _debugMenus = new DebugMenus(this);
+            Engine.CheckForErrors();
 
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
+            Engine.CheckForErrors();
         }
 
         public void Run()
@@ -119,9 +127,9 @@ namespace UAlbion.Core
                 long currentFrameTicks = sw.ElapsedTicks;
                 double deltaSeconds = (currentFrameTicks - previousFrameTicks) / (double)Stopwatch.Frequency;
 
-                while (s_limitFrameRate && deltaSeconds < s_desiredFrameLengthSeconds)
+                while (_limitFrameRate && deltaSeconds < _desiredFrameLengthSeconds)
                 {
-                    var millisecondsToSleep = (int)((s_desiredFrameLengthSeconds - deltaSeconds) * 1000);
+                    var millisecondsToSleep = (int)((_desiredFrameLengthSeconds - deltaSeconds) * 1000);
                     if (millisecondsToSleep > 10)
                         Thread.Sleep(millisecondsToSleep - 1);
                     currentFrameTicks = sw.ElapsedTicks;
@@ -136,9 +144,7 @@ namespace UAlbion.Core
                 InputTracker.UpdateFrameInput(snapshot, _window);
                 Update((float)deltaSeconds);
                 if (!_window.Exists)
-                {
                     break;
-                }
 
                 Draw();
             }
@@ -149,221 +155,26 @@ namespace UAlbion.Core
 
         void Update(float deltaSeconds)
         {
-            s_frameTimeAverager.AddTime(deltaSeconds);
+            _frameTimeAverager.AddTime(deltaSeconds);
             _scene.Exchange.Raise(new EngineUpdateEvent(deltaSeconds), this);
-            RenderDebugMenu();
-/*
-            if (InputTracker.GetKeyDown(Key.F11))
-            {
-                ToggleFullscreenState();
-            }
-            if (InputTracker.GetKeyDown(Key.Keypad6))
-            {
-                _window.X += 10;
-            }
-            if (InputTracker.GetKeyDown(Key.Keypad4))
-            {
-                _window.X -= 10;
-            }
-            if (InputTracker.GetKeyDown(Key.Keypad8))
-            {
-                _window.Y += 10;
-            }
-            if (InputTracker.GetKeyDown(Key.Keypad2))
-            {
-                _window.Y -= 10;
-            }
-*/
             _window.Title = _graphicsDevice.BackendType.ToString();
         }
 
-        void RenderDebugMenu()
-        {
-            if (ImGui.BeginMainMenuBar())
-            {
-                if (ImGui.BeginMenu("Settings"))
-                {
-                    if (ImGui.BeginMenu("Graphics Backend"))
-                    {
-
-                        if (ImGui.MenuItem("Vulkan", string.Empty, _graphicsDevice.BackendType == GraphicsBackend.Vulkan, GraphicsDevice.IsBackendSupported(GraphicsBackend.Vulkan)))
-                        {
-                            ChangeBackend(GraphicsBackend.Vulkan);
-                        }
-                        if (ImGui.MenuItem("OpenGL", string.Empty, _graphicsDevice.BackendType == GraphicsBackend.OpenGL, GraphicsDevice.IsBackendSupported(GraphicsBackend.OpenGL)))
-                        {
-                            ChangeBackend(GraphicsBackend.OpenGL);
-                        }
-                        if (ImGui.MenuItem("OpenGL ES", string.Empty, _graphicsDevice.BackendType == GraphicsBackend.OpenGLES, GraphicsDevice.IsBackendSupported(GraphicsBackend.OpenGLES)))
-                        {
-                            ChangeBackend(GraphicsBackend.OpenGLES);
-                        }
-                        if (ImGui.MenuItem("Direct3D 11", string.Empty, _graphicsDevice.BackendType == GraphicsBackend.Direct3D11, GraphicsDevice.IsBackendSupported(GraphicsBackend.Direct3D11)))
-                        {
-                            ChangeBackend(GraphicsBackend.Direct3D11);
-                        }
-                        if (ImGui.MenuItem("Metal", string.Empty, _graphicsDevice.BackendType == GraphicsBackend.Metal, GraphicsDevice.IsBackendSupported(GraphicsBackend.Metal)))
-                        {
-                            ChangeBackend(GraphicsBackend.Metal);
-                        }
-                        ImGui.EndMenu();
-                    }
-                    if (ImGui.BeginMenu("MSAA"))
-                    {
-                        if (ImGui.Combo("MSAA", ref _msaaOption, _msaaOptions, _msaaOptions.Length))
-                        {
-                            ChangeMsaa(_msaaOption);
-                        }
-
-                        ImGui.EndMenu();
-                    }
-
-                    ImGui.EndMenu();
-                }
-                if (ImGui.BeginMenu("Window"))
-                {
-                    bool isFullscreen = _window.WindowState == WindowState.BorderlessFullScreen;
-                    if (ImGui.MenuItem("Fullscreen", "F11", isFullscreen, true))
-                    {
-                        ToggleFullscreenState();
-                    }
-                    if (ImGui.MenuItem("Always Recreate Sdl2Window", string.Empty, _recreateWindow, true))
-                    {
-                        _recreateWindow = !_recreateWindow;
-                    }
-                    if (ImGui.IsItemHovered())
-                    {
-                        ImGui.SetTooltip(
-                            "Causes a new OS window to be created whenever the graphics backend is switched. This is much safer, and is the default.");
-                    }
-
-                    bool vsync = _graphicsDevice.SyncToVerticalBlank;
-                    if (ImGui.MenuItem("VSync", string.Empty, vsync, true))
-                    {
-                        _graphicsDevice.SyncToVerticalBlank = !_graphicsDevice.SyncToVerticalBlank;
-                    }
-                    bool resizable = _window.Resizable;
-                    if (ImGui.MenuItem("Resizable Window", string.Empty, resizable))
-                    {
-                        _window.Resizable = !_window.Resizable;
-                    }
-                    bool bordered = _window.BorderVisible;
-                    if (ImGui.MenuItem("Visible Window Border", string.Empty, bordered))
-                    {
-                        _window.BorderVisible = !_window.BorderVisible;
-                    }
-
-                    ImGui.EndMenu();
-                }
-
-                if (ImGui.BeginMenu("Debug"))
-                {
-                    if (ImGui.MenuItem("Refresh Device Objects"))
-                    {
-                        RefreshDeviceObjects(1);
-                    }
-                    if (ImGui.MenuItem("Refresh Device Objects (10 times)"))
-                    {
-                        RefreshDeviceObjects(10);
-                    }
-                    if (ImGui.MenuItem("Refresh Device Objects (100 times)"))
-                    {
-                        RefreshDeviceObjects(100);
-                    }
-
-                    ImGui.EndMenu();
-                }
-
-                if (ImGui.BeginMenu("RenderDoc"))
-                {
-                    if (_renderDoc == null)
-                    {
-                        if (ImGui.MenuItem("Load"))
-                        {
-                            if (RenderDoc.Load(out _renderDoc))
-                            {
-                                ChangeBackend(_graphicsDevice.BackendType, forceRecreateWindow: true);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (ImGui.MenuItem("Trigger Capture"))
-                        {
-                            _renderDoc.TriggerCapture();
-                        }
-                        if (ImGui.BeginMenu("Options"))
-                        {
-                            bool allowVsync = _renderDoc.AllowVSync;
-                            if (ImGui.Checkbox("Allow VSync", ref allowVsync))
-                            {
-                                _renderDoc.AllowVSync = allowVsync;
-                            }
-                            bool validation = _renderDoc.APIValidation;
-                            if (ImGui.Checkbox("API Validation", ref validation))
-                            {
-                                _renderDoc.APIValidation = validation;
-                            }
-                            int delayForDebugger = (int)_renderDoc.DelayForDebugger;
-                            if (ImGui.InputInt("Debugger Delay", ref delayForDebugger))
-                            {
-                                delayForDebugger = Math.Clamp(delayForDebugger, 0, int.MaxValue);
-                                _renderDoc.DelayForDebugger = (uint)delayForDebugger;
-                            }
-                            bool verifyBufferAccess = _renderDoc.VerifyBufferAccess;
-                            if (ImGui.Checkbox("Verify Buffer Access", ref verifyBufferAccess))
-                            {
-                                _renderDoc.VerifyBufferAccess = verifyBufferAccess;
-                            }
-                            bool overlayEnabled = _renderDoc.OverlayEnabled;
-                            if (ImGui.Checkbox("Overlay Visible", ref overlayEnabled))
-                            {
-                                _renderDoc.OverlayEnabled = overlayEnabled;
-                            }
-                            bool overlayFrameRate = _renderDoc.OverlayFrameRate;
-                            if (ImGui.Checkbox("Overlay Frame Rate", ref overlayFrameRate))
-                            {
-                                _renderDoc.OverlayFrameRate = overlayFrameRate;
-                            }
-                            bool overlayFrameNumber = _renderDoc.OverlayFrameNumber;
-                            if (ImGui.Checkbox("Overlay Frame Number", ref overlayFrameNumber))
-                            {
-                                _renderDoc.OverlayFrameNumber = overlayFrameNumber;
-                            }
-                            bool overlayCaptureList = _renderDoc.OverlayCaptureList;
-                            if (ImGui.Checkbox("Overlay Capture List", ref overlayCaptureList))
-                            {
-                                _renderDoc.OverlayCaptureList = overlayCaptureList;
-                            }
-                            ImGui.EndMenu();
-                        }
-                        if (ImGui.MenuItem("Launch Replay UI"))
-                        {
-                            _renderDoc.LaunchReplayUI();
-                        }
-                    }
-                    ImGui.EndMenu();
-                }
-
-                ImGui.Text(s_frameTimeAverager.CurrentAverageFramesPerSecond.ToString("000.0 fps / ") + s_frameTimeAverager.CurrentAverageFrameTimeMilliseconds.ToString("#00.00 ms"));
-
-                ImGui.EndMainMenuBar();
-            }
-        }
-
-        void ChangeMsaa(int msaaOption)
+        internal void ChangeMsaa(int msaaOption)
         {
             TextureSampleCount sampleCount = (TextureSampleCount)msaaOption;
             _newSampleCount = sampleCount;
         }
 
-        void RefreshDeviceObjects(int numTimes)
+        internal void RefreshDeviceObjects(int numTimes)
         {
             Stopwatch sw = Stopwatch.StartNew();
             for (int i = 0; i < numTimes; i++)
             {
                 DestroyAllObjects();
+            Engine.CheckForErrors();
                 CreateAllObjects();
+            Engine.CheckForErrors();
             }
             sw.Stop();
             Console.WriteLine($"Refreshing resources {numTimes} times took {sw.Elapsed.TotalSeconds} seconds.");
@@ -400,58 +211,67 @@ namespace UAlbion.Core
                 _sceneContext.MainSceneSampleCount = _newSampleCount.Value;
                 _newSampleCount = null;
                 DestroyAllObjects();
+            Engine.CheckForErrors();
                 CreateAllObjects();
+            Engine.CheckForErrors();
             }
 
             _frameCommands.Begin();
-
             _scene.RenderAllStages(_graphicsDevice, _frameCommands, _sceneContext);
             _graphicsDevice.SwapBuffers();
         }
 
-        void ChangeBackend(GraphicsBackend backend) => ChangeBackend(backend, false);
+        internal void ChangeBackend(GraphicsBackend backend) => ChangeBackend(backend, false);
 
-        void ChangeBackend(GraphicsBackend backend, bool forceRecreateWindow)
+        internal void ChangeBackend(GraphicsBackend backend, bool forceRecreateWindow)
         {
-            DestroyAllObjects();
-            bool syncToVBlank = _graphicsDevice.SyncToVerticalBlank;
-            _graphicsDevice.Dispose();
-
-            if (_recreateWindow || forceRecreateWindow)
+            if (_graphicsDevice != null)
             {
+                DestroyAllObjects();
+                _graphicsDevice.Dispose();
+            }
+
+            if (_window == null || _recreateWindow || forceRecreateWindow)
+            {
+                _window?.Close();
+
                 WindowCreateInfo windowCI = new WindowCreateInfo
                 {
-                    X = _window.X,
-                    Y = _window.Y,
-                    WindowWidth = _window.Width,
-                    WindowHeight = _window.Height,
-                    WindowInitialState = _window.WindowState,
+                    X = _window?.X ?? 50,
+                    Y = _window?.Y ?? 50,
+                    WindowWidth = _window?.Width ?? 960,
+                    WindowHeight = _window?.Height ?? 540,
+                    WindowInitialState = _window?.WindowState ?? WindowState.Normal,
                     WindowTitle = "UAlbion"
                 };
-
-                _window.Close();
 
                 _window = VeldridStartup.CreateWindow(ref windowCI);
                 _window.Resized += () => _windowResized = true;
             }
 
-            GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(false, null, syncToVBlank, ResourceBindingModel.Improved, true, true, false);
-#if DEBUG
-            gdOptions.Debug = true;
-#endif
+            GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(false, null, false,
+                ResourceBindingModel.Improved, true, true, false, true)
+            { Debug = true };
+
             _graphicsDevice = VeldridStartup.CreateGraphicsDevice(_window, gdOptions, backend);
-            _scene.Camera.UpdateBackend(_graphicsDevice);
-            CreateAllObjects();
+
+            if (_scene != null)
+            {
+                _scene.Camera.UpdateBackend(_graphicsDevice);
+                CreateAllObjects();
+            }
         }
 
         void CreateAllObjects()
         {
             _frameCommands = _graphicsDevice.ResourceFactory.CreateCommandList();
             _frameCommands.Name = "Frame Commands List";
+
             CommandList initCL = _graphicsDevice.ResourceFactory.CreateCommandList();
             initCL.Name = "Recreation Initialization Command List";
             initCL.Begin();
             _sceneContext.CreateDeviceObjects(_graphicsDevice, initCL, _sceneContext);
+            CheckForErrors();
             _scene.CreateAllDeviceObjects(_graphicsDevice, initCL, _sceneContext);
             initCL.End();
             _graphicsDevice.SubmitCommands(initCL);
@@ -465,6 +285,7 @@ namespace UAlbion.Core
             _sceneContext.DestroyDeviceObjects();
             _scene.DestroyAllDeviceObjects();
             StaticResourceCache.DestroyAllDeviceObjects();
+            TextureManager.DestroyDeviceObjects();
             _graphicsDevice.WaitForIdle();
         }
 
@@ -475,30 +296,16 @@ namespace UAlbion.Core
             _fullScreenQuad?.Dispose();
             //_graphicsDevice?.Dispose();
         }
+
+        [Conditional("DEBUG")]
+        [DebuggerNonUserCode]
+        public static void CheckForErrors()
+        {
+            if (_instance.GraphicsDevice.GetOpenGLInfo(out BackendInfoOpenGL opengl))
+            {
+                opengl.CheckForErrors();
+            }
+        }
     }
 }
 
-/*
-        const string FragmentCode = @"
-#version 450
-
-layout(location = 0) in vec2 fsin_texCoords;
-layout(location = 0) out vec4 fsout_color;
-
-layout(set = 0, binding = 0) uniform texture2D Palette;
-layout(set = 0, binding = 1) uniform sampler PaletteSampler;
-
-layout(set = 1, binding = 0) uniform texture2D SurfaceTexture;
-layout(set = 1, binding = 1) uniform sampler SurfaceSampler;
-
-void main()
-{
-    int index = int(255.0 * texture(sampler2D(SurfaceTexture, SurfaceSampler), fsin_texCoords * vec2(640, 480))[0]);
-    vec4 color = texture(sampler2D(Palette, PaletteSampler), vec2(fsin_texCoords[0], 0));
-    fsout_color = color;
-    // fsout_color = vec4(index / 256.0, index / 256.0, index / 256.0, 1.0);
-    // fsout_color = texture(sampler2D(SurfaceTexture, SurfaceSampler), fsin_texCoords);//color;
-    // fsout_color = vec4(fsin_texCoords[0], fsin_texCoords[1], 0.0, 1.0);
-}";
-    }
-*/

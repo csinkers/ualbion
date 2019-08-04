@@ -1,6 +1,6 @@
 namespace UAlbion.Game.AssetIds
 {
-    public enum Merchantid
+    public enum MerchantId
     {
         Unknown0 = 0,
         Unknown100 = 100,

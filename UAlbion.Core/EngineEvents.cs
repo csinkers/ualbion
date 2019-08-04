@@ -21,15 +21,8 @@ namespace UAlbion.Core
         [EventPart("height")] public int Height { get; }
     }
 
-    [Event("e:projection_changed")]
-    public class ProjectionMatrixChangedEvent : EngineEvent
-    {
-    }
-
-    [Event("e:view_changed")]
-    public class ViewMatrixChangedEvent : EngineEvent
-    {
-    }
+    [Event("e:projection_changed")] public class ProjectionMatrixChangedEvent : EngineEvent { }
+    [Event("e:view_changed")] public class ViewMatrixChangedEvent : EngineEvent { }
 
     //[Event("e:render")]
     public class RenderEvent : EngineEvent
@@ -38,4 +31,9 @@ namespace UAlbion.Core
         public Action<IRenderable> Add { get; }
         public Func<Type, IRenderer> GetRenderer { get; }
     }
+
+    [Event("e:toggle_fullscreen")] public class ToggleFullscreenEvent : EngineEvent { }
+    [Event("e:load_renderdoc")] public class LoadRenderDocEvent : EngineEvent { }
+    [Event("e:toggle_resizable")] public class ToggleResizableEvent : EngineEvent { }
+    [Event("e:toggle_visible_border")] public class ToggleVisibleBorderEvent : EngineEvent { }
 }

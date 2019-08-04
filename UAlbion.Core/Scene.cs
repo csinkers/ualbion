@@ -19,9 +19,9 @@ namespace UAlbion.Core
 
         public Scene(ICamera camera) { Camera = camera; }
 
-        public void SetPalette(uint[] palette)
+        public void SetPalette(string name, uint[] palette)
         {
-            _palette = new Palette(palette);
+            _palette = new Palette(name, palette);
         }
 
         public void AddRenderer(IRenderer r)
@@ -51,11 +51,11 @@ namespace UAlbion.Core
                 _renderables[x.RenderOrder].Add(x);
             }, t => _renderers[t]), this);
 
-            sc.Palette?.Dispose();
+            sc.PaletteView?.Dispose();
             sc.PaletteTexture?.Dispose();
             // TODO: Ensure always disposed
             sc.PaletteTexture = _palette.CreateDeviceTexture(gd, gd.ResourceFactory, TextureUsage.Sampled);
-            sc.Palette = gd.ResourceFactory.CreateTextureView(sc.PaletteTexture);
+            sc.PaletteView = gd.ResourceFactory.CreateTextureView(sc.PaletteTexture);
 
             // Update frame resources
             _resourceUpdateCL.Begin();
@@ -64,7 +64,6 @@ namespace UAlbion.Core
                 var renderer = _renderers[r.Renderer];
                 renderer.UpdatePerFrameResources(gd, _resourceUpdateCL, sc, r);
             }
-
             _resourceUpdateCL.End();
             gd.SubmitCommands(_resourceUpdateCL);
 
@@ -79,6 +78,7 @@ namespace UAlbion.Core
             cl.SetViewport(0, new Viewport(0, 0, fbWidth, fbHeight, 0, 1));
             cl.SetFullViewports();
             cl.SetFullScissorRects();
+            cl.ClearColorTarget(0, RgbaFloat.Black);
             cl.ClearDepthStencil(depthClear);
             sc.UpdateCameraBuffers(cl); // Re-set because reflection step changed it.
             foreach(var key in orderedKeys)
@@ -117,7 +117,7 @@ namespace UAlbion.Core
         }
 
         void Render(GraphicsDevice gd,
-            CommandList rc,
+            CommandList cl,
             SceneContext sc,
             RenderPasses pass,
             IEnumerable<IRenderable> renderableList)
@@ -126,7 +126,7 @@ namespace UAlbion.Core
             {
                 var renderer = _renderers[renderable.Renderer];
                 if ((renderer.RenderPasses & pass) != 0)
-                    renderer.Render(gd, rc, sc, pass, renderable);
+                    renderer.Render(gd, cl, sc, pass, renderable);
             }
         }
 

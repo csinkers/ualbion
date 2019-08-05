@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
+using System.Linq;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Game.AssetIds;
@@ -17,8 +16,32 @@ namespace UAlbion.Game
         French,
     }
 
-    public class Assets
+    [Event("assets:reload", "Flush the asset cache, forcing all data to be reloaded from disk")]
+    public class ReloadAssetsEvent : GameEvent { }
+
+    [Event("assets:stats", "Print asset cache statistics.")]
+    public class AssetStatsEvent : GameEvent { }
+
+    public class Assets : RegisteredComponent
     {
+
+        static readonly IList<Handler> Handlers = new Handler[]
+        {
+            new Handler<Assets, ReloadAssetsEvent>((x, e) => { lock (x._syncRoot) { x._assetCache.Clear(); } }),
+            new Handler<Assets, AssetStatsEvent>((x, e) =>
+            {
+                Console.WriteLine("Asset Statistics:");
+                lock (x._syncRoot)
+                {
+                    foreach (var key in x._assetCache.Keys.OrderBy(y => y.ToString()))
+                    {
+                        Console.WriteLine("    {0}: {1} items", key, x._assetCache[key].Values.Count);
+                    }
+                }
+            }),
+        };
+
+        readonly object _syncRoot = new object();
         readonly Config _config;
         readonly IDictionary<AssetType, XldFile[]> _xlds = new Dictionary<AssetType, XldFile[]>();
         readonly IDictionary<AssetType, IDictionary<int, object>> _assetCache = new Dictionary<AssetType, IDictionary<int, object>>();
@@ -112,7 +135,7 @@ namespace UAlbion.Game
 
         readonly string[] _overrideExtensions = { "bmp", "png", "wav", "json", "mp3" };
 
-        public Assets(Config config)
+        public Assets(Config config) : base(Handlers)
         {
             _config = config;
         }
@@ -207,6 +230,9 @@ namespace UAlbion.Game
 
             using (var br = xld.GetReaderForObject(objectIndex, out var length))
             {
+                if (length == 0)
+                    return null;
+
                 var asset = AssetLoader.Load(br, type, id, name, length, context);
                 if (asset == null)
                     throw new InvalidOperationException($"Object {type}:{id} could not be loaded from XLD {xld.Filename}");
@@ -230,16 +256,23 @@ namespace UAlbion.Game
         object LoadAssetCached(AssetType type, int id, string name, object context = null) { return LoadAssetCached(type, id, name, GameLanguage.English, context); }
         object LoadAssetCached(AssetType type, int id, string name, GameLanguage language, object context)
         {
-            if (_assetCache.TryGetValue(type, out var typeCache))
+            lock(_syncRoot)
             {
-                if (typeCache.TryGetValue(id, out var cachedAsset))
-                    return cachedAsset;
+                if (_assetCache.TryGetValue(type, out var typeCache))
+                {
+                    if (typeCache.TryGetValue(id, out var cachedAsset))
+                        return cachedAsset;
+                }
+                else _assetCache[type] = new Dictionary<int, object>();
             }
-            else _assetCache[type] = new Dictionary<int, object>();
 
             var newAsset = LoadAsset(type, id, name, language, context);
-            _assetCache[type][id] = newAsset;
-            return newAsset;
+
+            lock (_syncRoot)
+            {
+                _assetCache[type][id] = newAsset;
+                return newAsset;
+            }
         }
 
         public Map2D LoadMap2D(MapDataId id) { return (Map2D)LoadAssetCached(AssetType.MapData, (int)id, $"Map2D:{id}"); }
@@ -250,14 +283,8 @@ namespace UAlbion.Game
             return (AlbionPalette)LoadAssetCached(AssetType.Palette, (int)id, $"Pal:{id}", new AlbionPalette.PaletteContext((int)id, commonPalette));
         }
 
-        public ITexture LoadPicture(PictureId id)
-        {
-            var name = $"Picture:{id}";
-            var image = (Image<Rgba32>)LoadAsset(AssetType.Picture, (int)id, name, GameLanguage.English, null);
-            return new TrueColorTexture(name, image);
-        }
 
-        public AlbionSprite LoadTexture(AssetType type, int id)
+        public ITexture LoadTexture(AssetType type, int id)
         {
             switch (type)
             {
@@ -275,34 +302,36 @@ namespace UAlbion.Game
                 case AssetType.MonsterGraphics:    return LoadTexture((MonsterGraphicsId)id);
                 case AssetType.Object3D:           return LoadTexture((DungeonObjectId)id);
                 case AssetType.Overlay3D:          return LoadTexture((DungeonOverlayId)id);
+                case AssetType.Picture:            return LoadTexture((PictureId) id);
                 case AssetType.SmallNpcGraphics:   return LoadTexture((SmallNpcId)id);
                 case AssetType.SmallPartyGraphics: return LoadTexture((SmallPartyGraphicsId)id);
                 case AssetType.SmallPortrait:      return LoadTexture((SmallPortraitId)id);
                 case AssetType.TacticalIcon:       return LoadTexture((TacticId)id);
                 case AssetType.Wall3D:             return LoadTexture((DungeonWallId)id);
-                default: return (AlbionSprite)LoadAssetCached(type, id, $"{type}:{id}", GameLanguage.English, null);
+                default: return (ITexture)LoadAssetCached(type, id, $"{type}:{id}", GameLanguage.English, null);
             }
         }
 
-        public AlbionSprite LoadTexture(AutoMapId id)            => (AlbionSprite)LoadAssetCached(AssetType.AutomapGraphics,    (int)id, $"AutomapGraphics:{id}");
-        public AlbionSprite LoadTexture(DungeonBackgroundId id)  => (AlbionSprite)LoadAssetCached(AssetType.BackgroundGraphics, (int)id, $"BackgroundGraphics:{id}");
-        public AlbionSprite LoadTexture(LargeNpcId id)           => (AlbionSprite)LoadAssetCached(AssetType.BigNpcGraphics,     (int)id, $"BigNpcGraphics:{id}");
-        public AlbionSprite LoadTexture(LargePartyGraphicsId id) => (AlbionSprite)LoadAssetCached(AssetType.BigPartyGraphics,   (int)id, $"BigPartyGraphics:{id}");
-        public AlbionSprite LoadTexture(CombatBackgroundId id)   => (AlbionSprite)LoadAssetCached(AssetType.CombatBackground,   (int)id, $"CombatBackground:{id}");
-        public AlbionSprite LoadTexture(CombatGraphicsId id)     => (AlbionSprite)LoadAssetCached(AssetType.CombatGraphics,     (int)id, $"CombatGraphics:{id}");
-        public AlbionSprite LoadTexture(DungeonFloorId id)       => (AlbionSprite)LoadAssetCached(AssetType.Floor3D,            (int)id, $"Floor3D:{id}");
-        public AlbionSprite LoadTexture(FullBodyPictureId id)    => (AlbionSprite)LoadAssetCached(AssetType.FullBodyPicture,    (int)id, $"FullBodyPicture:{id}");
-        public AlbionSprite LoadTexture(IconDataId id)           => (AlbionSprite)LoadAssetCached(AssetType.IconData,           (int)id, $"IconData:{id}");
-        public AlbionSprite LoadTexture(IconGraphicsId id)       => (AlbionSprite)LoadAssetCached(AssetType.IconGraphics,       (int)id, $"IconGraphics:{id}");
-        public AlbionSprite LoadTexture(ItemId id)               => (AlbionSprite)LoadAssetCached(AssetType.ItemGraphics,       (int)id, $"ItemGraphics:{id}"); // TODO: Enum
-        public AlbionSprite LoadTexture(MonsterGraphicsId id)    => (AlbionSprite)LoadAssetCached(AssetType.MonsterGraphics,    (int)id, $"MonsterGraphics:{id}");
-        public AlbionSprite LoadTexture(DungeonObjectId id)      => (AlbionSprite)LoadAssetCached(AssetType.Object3D,           (int)id, $"Object3D:{id}");
-        public AlbionSprite LoadTexture(DungeonOverlayId id)     => (AlbionSprite)LoadAssetCached(AssetType.Overlay3D,          (int)id, $"Overlay3D:{id}");
-        public AlbionSprite LoadTexture(SmallNpcId id)           => (AlbionSprite)LoadAssetCached(AssetType.SmallNpcGraphics,   (int)id, $"SmallNpcGraphics:{id}");
-        public AlbionSprite LoadTexture(SmallPartyGraphicsId id) => (AlbionSprite)LoadAssetCached(AssetType.SmallPartyGraphics, (int)id, $"SmallPartyGraphics:{id}");
-        public AlbionSprite LoadTexture(SmallPortraitId id)      => (AlbionSprite)LoadAssetCached(AssetType.SmallPortrait,      (int)id, $"SmallPortrait:{id}");
-        public AlbionSprite LoadTexture(TacticId id)             => (AlbionSprite)LoadAssetCached(AssetType.TacticalIcon,       (int)id, $"TacticalIcon:{id}");
-        public AlbionSprite LoadTexture(DungeonWallId id)        => (AlbionSprite)LoadAssetCached(AssetType.Wall3D,             (int)id, $"Wall3D:{id}");
+        public ITexture LoadTexture(AutoMapId id)            => (ITexture)LoadAssetCached(AssetType.AutomapGraphics,    (int)id, $"AutomapGraphics:{id}");
+        public ITexture LoadTexture(CombatBackgroundId id)   => (ITexture)LoadAssetCached(AssetType.CombatBackground,   (int)id, $"CombatBackground:{id}");
+        public ITexture LoadTexture(CombatGraphicsId id)     => (ITexture)LoadAssetCached(AssetType.CombatGraphics,     (int)id, $"CombatGraphics:{id}");
+        public ITexture LoadTexture(DungeonBackgroundId id)  => (ITexture)LoadAssetCached(AssetType.BackgroundGraphics, (int)id, $"BackgroundGraphics:{id}");
+        public ITexture LoadTexture(DungeonFloorId id)       => (ITexture)LoadAssetCached(AssetType.Floor3D,            (int)id, $"Floor3D:{id}");
+        public ITexture LoadTexture(DungeonObjectId id)      => (ITexture)LoadAssetCached(AssetType.Object3D,           (int)id, $"Object3D:{id}");
+        public ITexture LoadTexture(DungeonOverlayId id)     => (ITexture)LoadAssetCached(AssetType.Overlay3D,          (int)id, $"Overlay3D:{id}");
+        public ITexture LoadTexture(DungeonWallId id)        => (ITexture)LoadAssetCached(AssetType.Wall3D,             (int)id, $"Wall3D:{id}");
+        public ITexture LoadTexture(FullBodyPictureId id)    => (ITexture)LoadAssetCached(AssetType.FullBodyPicture,    (int)id, $"FullBodyPicture:{id}");
+        public ITexture LoadTexture(IconDataId id)           => (ITexture)LoadAssetCached(AssetType.IconData,           (int)id, $"IconData:{id}");
+        public ITexture LoadTexture(IconGraphicsId id)       => (ITexture)LoadAssetCached(AssetType.IconGraphics,       (int)id, $"IconGraphics:{id}");
+        public ITexture LoadTexture(ItemId id)               => (ITexture)LoadAssetCached(AssetType.ItemGraphics,       (int)id, $"ItemGraphics:{id}"); // TODO: Enum
+        public ITexture LoadTexture(LargeNpcId id)           => (ITexture)LoadAssetCached(AssetType.BigNpcGraphics,     (int)id, $"BigNpcGraphics:{id}");
+        public ITexture LoadTexture(LargePartyGraphicsId id) => (ITexture)LoadAssetCached(AssetType.BigPartyGraphics,   (int)id, $"BigPartyGraphics:{id}");
+        public ITexture LoadTexture(MonsterGraphicsId id)    => (ITexture)LoadAssetCached(AssetType.MonsterGraphics,    (int)id, $"MonsterGraphics:{id}");
+        public ITexture LoadTexture(PictureId id)            => (ITexture)LoadAssetCached(AssetType.Picture,            (int)id, $"Picture:{id}");
+        public ITexture LoadTexture(SmallNpcId id)           => (ITexture)LoadAssetCached(AssetType.SmallNpcGraphics,   (int)id, $"SmallNpcGraphics:{id}");
+        public ITexture LoadTexture(SmallPartyGraphicsId id) => (ITexture)LoadAssetCached(AssetType.SmallPartyGraphics, (int)id, $"SmallPartyGraphics:{id}");
+        public ITexture LoadTexture(SmallPortraitId id)      => (ITexture)LoadAssetCached(AssetType.SmallPortrait,      (int)id, $"SmallPortrait:{id}");
+        public ITexture LoadTexture(TacticId id)             => (ITexture)LoadAssetCached(AssetType.TacticalIcon,       (int)id, $"TacticalIcon:{id}");
 
         public string LoadString(AssetType type, int id, GameLanguage language) { return (string)LoadAssetCached(AssetType.MapData, id, $"String:{id}", language); }
         public AlbionSample LoadSample(AssetType type, int id) { return (AlbionSample)LoadAssetCached(type, id, $"Sample:{id}"); }

@@ -16,6 +16,8 @@ namespace UAlbion.Formats
 
         public int Id { get; }
         public string Name { get; }
+        public bool IsAnimated => AnimatedRanges.ContainsKey(Id);
+
         public readonly uint[] Entries = new uint[0x100];
         public static readonly IDictionary<int, IList<(byte, byte)>> AnimatedRanges = new Dictionary<int, IList<(int, int)>> {
             { 0,  new[] { (0x99, 0x9f), (0xb0, 0xbf) } }, // 7, 16 => 112

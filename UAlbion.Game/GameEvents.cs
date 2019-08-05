@@ -5,36 +5,9 @@ namespace UAlbion.Game
     public interface IGameEvent : IEvent { }
     public abstract class GameEvent : Event, IGameEvent { }
 
-    [Event("camera_lock")] public class CameraLockEvent : GameEvent { }
-    [Event("camera_unlock")] public class CameraUnlockEvent : GameEvent { }
-    [Event("fade_from_black")] public class FadeFromBlackEvent : GameEvent { }
-    [Event("fade_from_white")] public class FadeFromWhiteEvent : GameEvent { }
-    [Event("fade_to_black")] public class FadeToBlackEvent : GameEvent { }
-    [Event("fade_to_white")] public class FadeToWhiteEvent : GameEvent { }
-    [Event("fill_screen_0")] public class FillScreen0Event : GameEvent { }
-    [Event("party_off")] public class PartyOffEvent : GameEvent { }
-    [Event("party_on")] public class PartyOnEvent : GameEvent { }
-    [Event("restore_pal")] public class RestorePalEvent : GameEvent { }
-    [Event("show_map")] public class ShowMapEvent : GameEvent { }
-    [Event("sound_fx_off")] public class SoundFxOffEvent : GameEvent { }
-    [Event("stop_anim")] public class StopAnimEvent : GameEvent { }
-
-
-    [Event("active_member_text")]
-    public class ActiveMemberTextEvent : GameEvent
-    {
-        public ActiveMemberTextEvent(int textId) { TextId = textId; }
-        [EventPart("textId")] public int TextId { get; }
-    }
-
-    [Event("ambient")]
-    public class AmbientEvent : GameEvent
-    {
-        public AmbientEvent(int unk) { Unk = unk; }
-        [EventPart("unk")] public int Unk { get; }
-    }
-
-    [Event("camera_jump")]
+    [Event("camera_lock", "Lock camera movement so it no longer follows the party.")] public class CameraLockEvent : GameEvent { }
+    [Event("camera_unlock", "Unlock camera movement so it resumes following the party.")] public class CameraUnlockEvent : GameEvent { }
+    [Event("camera_jump", "Teleports the camera to the given position.")]
     public class CameraJumpEvent : GameEvent
     {
         public CameraJumpEvent(int x, int y) { X = x; Y = y; }
@@ -42,12 +15,48 @@ namespace UAlbion.Game
         [EventPart("y")] public int Y { get; }
     }
 
-    [Event("camera_move")]
+    [Event("camera_move", "Move the camera using relative coordinates.")]
     public class CameraMoveEvent : GameEvent
     {
         public CameraMoveEvent(int x, int y) { X = x; Y = y; }
         [EventPart("x ")] public int X { get; }
         [EventPart("y")] public int Y { get; }
+    }
+
+    [Event("fade_from_black", "Fade back into the game world from a black screen.")] public class FadeFromBlackEvent : GameEvent { }
+    [Event("fade_from_white", "Fade back into the game world from a white screen.")] public class FadeFromWhiteEvent : GameEvent { }
+    [Event("fade_to_black", "Fade away to a black screen.")] public class FadeToBlackEvent : GameEvent { }
+    [Event("fade_to_white", "Fade away to a white screen.")] public class FadeToWhiteEvent : GameEvent { }
+    [Event("fill_screen_0")] public class FillScreen0Event : GameEvent { }
+    [Event("fill_screen")]
+    public class FillScreenEvent : GameEvent
+    {
+        public FillScreenEvent(int color) { Color = color; }
+        [EventPart("color")] public int Color { get; }
+    }
+
+    [Event("party_off")] public class PartyOffEvent : GameEvent { }
+    [Event("party_on")] public class PartyOnEvent : GameEvent { }
+    [Event("restore_pal")] public class RestorePalEvent : GameEvent { }
+    [Event("show_map")] public class ShowMapEvent : GameEvent { }
+    [Event("sound_fx_off")] public class SoundFxOffEvent : GameEvent { }
+    [Event("stop_anim")] public class StopAnimEvent : GameEvent { }
+
+    [Event("stop_clock", "Stop the game clock from advancing automatically.")] public class StopClockEvent : GameEvent { }
+    [Event("start_clock", "Resume automatically updating the game clock.")] public class StartClockEvent : GameEvent { }
+
+    [Event("active_member_text", "Prompts the active party member to say something.")]
+    public class ActiveMemberTextEvent : GameEvent
+    {
+        public ActiveMemberTextEvent(int textId) { TextId = textId; }
+        [EventPart("textId", "The string / conversation identifier.")] public int TextId { get; }
+    }
+
+    [Event("ambient")]
+    public class AmbientEvent : GameEvent
+    {
+        public AmbientEvent(int unk) { Unk = unk; }
+        [EventPart("unk")] public int Unk { get; }
     }
 
     [Event("clear_quest_bit")]
@@ -64,13 +73,6 @@ namespace UAlbion.Game
         [EventPart("eventChainId")] public int EventChainId { get; }
     }
 
-    [Event("fill_screen")]
-    public class FillScreenEvent : GameEvent
-    {
-        public FillScreenEvent(int color) { Color = color; }
-        [EventPart("color")] public int Color { get; }
-    }
-
     [Event("load_pal")]
     public class LoadPalEvent : GameEvent
     {
@@ -78,24 +80,26 @@ namespace UAlbion.Game
         [EventPart("paletteId")] public int PaletteId { get; }
     }
 
-    [Event("npc_jump")]
-    public class NpcJumpEvent : GameEvent
+    public interface INpcEvent : IGameEvent { int NpcId { get; } }
+
+    [Event("npc_jump", "Teleport the given NPC to the given position.")]
+    public class NpcJumpEvent : Event, INpcEvent
     {
-        public NpcJumpEvent(int npcId, int x, int y) { NpcId = npcId; X = x; Y = y; }
+        public NpcJumpEvent(int npcId, int? x, int? y) { NpcId = npcId; X = x; Y = y; }
         [EventPart("npcId ")] public int NpcId { get; }
-        [EventPart("x", true)] public int X { get; }
-        [EventPart("y", true)] public int Y { get; }
+        [EventPart("x", true)] public int? X { get; }
+        [EventPart("y", true)] public int? Y { get; }
     }
 
     [Event("npc_lock")]
-    public class NpcLockEvent : GameEvent
+    public class NpcLockEvent : Event, INpcEvent
     {
         public NpcLockEvent(int npcId) { NpcId = npcId; }
         [EventPart("npcId")] public int NpcId { get; }
     }
 
     [Event("npc_move")]
-    public class NpcMoveEvent : GameEvent
+    public class NpcMoveEvent : Event, INpcEvent
     {
         public NpcMoveEvent(int npcId, int x, int y) { NpcId = npcId; X = x; Y = y; }
         [EventPart("npcId ")] public int NpcId { get; }
@@ -104,21 +108,21 @@ namespace UAlbion.Game
     }
 
     [Event("npc_off")]
-    public class NpcOffEvent : GameEvent
+    public class NpcOffEvent : Event, INpcEvent
     {
         public NpcOffEvent(int npcId) { NpcId = npcId; }
         [EventPart("npcId")] public int NpcId { get; }
     }
 
     [Event("npc_on")]
-    public class NpcOnEvent : GameEvent
+    public class NpcOnEvent : Event, INpcEvent
     {
         public NpcOnEvent(int npcId) { NpcId = npcId; }
         [EventPart("npcId")] public int NpcId { get; }
     }
 
     [Event("npc_text")]
-    public class NpcTextEvent : GameEvent
+    public class NpcTextEvent : Event, INpcEvent
     {
         public NpcTextEvent(int npcId, int textId) { NpcId = npcId; TextId = textId; }
         [EventPart("npcId ")] public int NpcId { get; }
@@ -126,7 +130,7 @@ namespace UAlbion.Game
     }
 
     [Event("npc_turn")]
-    public class NpcTurnEvent : GameEvent
+    public class NpcTurnEvent : Event, INpcEvent
     {
         public NpcTurnEvent(int npcId, int direction) { NpcId = npcId; Direction = direction; }
         [EventPart("npcId ")] public int NpcId { get; }
@@ -134,7 +138,7 @@ namespace UAlbion.Game
     }
 
     [Event("npc_unlock")]
-    public class NpcUnlockEvent : GameEvent
+    public class NpcUnlockEvent : Event, INpcEvent
     {
         public NpcUnlockEvent(int npcId) { NpcId = npcId; }
         [EventPart("npcId")] public int NpcId { get; }
@@ -199,10 +203,10 @@ namespace UAlbion.Game
     [Event("show_pic")]
     public class ShowPicEvent : GameEvent
     {
-        public ShowPicEvent(int picId, int x, int y) { PicId = picId; X = x; Y = y; }
+        public ShowPicEvent(int picId, int? x, int? y) { PicId = picId; X = x; Y = y; }
         [EventPart("picId ")] public int PicId { get; }
-        [EventPart("x", true)] public int X { get; }
-        [EventPart("y", true)] public int Y { get; }
+        [EventPart("x", true)] public int? X { get; }
+        [EventPart("y", true)] public int? Y { get; }
     }
 
     [Event("show_picture")]
@@ -253,12 +257,12 @@ namespace UAlbion.Game
     [Event("start_anim")]
     public class StartAnimEvent : GameEvent
     {
-        public StartAnimEvent(int unk1, int unk2, int unk3, int unk4, int unk5) { Unk1 = unk1; Unk2 = unk2; Unk3 = unk3; Unk4 = unk4; Unk5 = unk5; }
+        public StartAnimEvent(int unk1, int unk2, int unk3, int unk4, int? unk5) { Unk1 = unk1; Unk2 = unk2; Unk3 = unk3; Unk4 = unk4; Unk5 = unk5; }
         [EventPart("unk1 ")] public int Unk1 { get; }
         [EventPart("unk2 ")] public int Unk2 { get; }
         [EventPart("unk3 ")] public int Unk3 { get; }
         [EventPart("unk4 ")] public int Unk4 { get; }
-        [EventPart("unk5", true)] public int Unk5 { get; }
+        [EventPart("unk5", true)] public int? Unk5 { get; }
     }
 
     [Event("text")]

@@ -2,9 +2,9 @@ namespace UAlbion.Game.AssetIds
 {
     public enum SmallPartyGraphicsId
     {
-        Unknown0 = 0,
-        Unknown1 = 1,
-        Unknown2 = 2,
+        Tom = 0,
+        Rainer = 1,
+        Drirr = 2,
         Unknown3 = 3,
         Unknown4 = 4,
         Unknown5 = 5,

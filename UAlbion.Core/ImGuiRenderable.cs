@@ -41,6 +41,8 @@ namespace UAlbion.Core
             }
         }
 
+        public IEnumerable<IRenderable> UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IEnumerable<IRenderable> renderables) => renderables;
+
         public void DestroyDeviceObjects()
         {
             _imguiRenderer.Dispose();

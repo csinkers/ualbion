@@ -8,6 +8,7 @@ namespace UAlbion.Core
     {
         void Attach(EventExchange exchange);
         void Receive(IEvent @event, object sender);
+        void Detach();
     }
 
     public abstract class Component : IComponent
@@ -33,11 +34,16 @@ namespace UAlbion.Core
 
         protected Component(IList<Handler> handlers)
         {
-            _handlers = handlers.ToDictionary(x => x.Type, x => x);
+            _handlers = handlers == null 
+                ? new Dictionary<Type, Handler>() 
+                : handlers.ToDictionary(x => x.Type, x => x);
         }
 
         public void Attach(EventExchange exchange)
         {
+            if(Exchange != null)
+                throw new InvalidOperationException("A component can only be registered in one exchange at a time.");
+
             Exchange = exchange;
             foreach (var kvp in _handlers)
                 exchange.Subscribe(kvp.Key, this);
@@ -49,6 +55,17 @@ namespace UAlbion.Core
                 handler.Invoke(this, @event);
         }
 
+        public void Detach()
+        {
+            Exchange.Unsubscribe(this);
+            Exchange = null;
+        }
+
         protected void Raise(IEvent @event) { Exchange.Raise(@event, this); }
+    }
+
+    public abstract class RegisteredComponent : Component
+    {
+        protected RegisteredComponent(IList<Handler> handlers) : base(handlers) { }
     }
 }

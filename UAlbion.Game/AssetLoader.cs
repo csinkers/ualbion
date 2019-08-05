@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using UAlbion.Core;
 using UAlbion.Formats;
 
 namespace UAlbion.Game
@@ -14,28 +16,28 @@ namespace UAlbion.Game
                 case AssetType.MapData:
                 case AssetType.LabData:
                 case AssetType.Automap:
-                    break;
+                    throw new NotImplementedException();
 
                 case AssetType.Font: return new AlbionFont(br, streamLength);
                 case AssetType.Palette: return new AlbionPalette(name, br, streamLength, (AlbionPalette.PaletteContext)context);
                 case AssetType.PaletteNull: return br.ReadBytes(streamLength);
-                case AssetType.Picture: return Image.Load(br.BaseStream);
+                case AssetType.Picture: return ToTexture(name, Image.Load(br.BaseStream));
 
                 // Fixed size graphics
-                case AssetType.Floor3D: return new AlbionSprite(br, streamLength, 64, 64, name); // Fixed width
-                case AssetType.IconGraphics: return new AlbionSprite(br, streamLength, 16, 16, name); // Fixed width
-                case AssetType.IconData: return new AlbionSprite(br, streamLength, 8, 8, name); // Weird little things... 8x8
-                case AssetType.SmallPortrait: return new AlbionSprite(br, streamLength, 34, 37, name);
-                case AssetType.TacticalIcon: return  new AlbionSprite(br, streamLength, 32, 48, name);
-                case AssetType.ItemGraphics: return new AlbionSprite(br, streamLength, 16, 16, name);
-                case AssetType.AutomapGraphics: return new AlbionSprite(br, streamLength, 8, 8, name);
-                case AssetType.CombatBackground: return new AlbionSprite(br, streamLength, 360, 192, name);
+                case AssetType.Floor3D: return ToTexture(new AlbionSprite(br, streamLength, 64, 64, name)); // Fixed width
+                case AssetType.IconGraphics: return ToTexture(new AlbionSprite(br, streamLength, 16, 16, name)); // Fixed width
+                case AssetType.IconData: return ToTexture(new AlbionSprite(br, streamLength, 8, 8, name)); // Weird little things... 8x8
+                case AssetType.SmallPortrait: return ToTexture(new AlbionSprite(br, streamLength, 34, 37, name));
+                case AssetType.TacticalIcon: return  ToTexture(new AlbionSprite(br, streamLength, 32, 48, name));
+                case AssetType.ItemGraphics: return ToTexture(new AlbionSprite(br, streamLength, 16, 16, name));
+                case AssetType.AutomapGraphics: return ToTexture(new AlbionSprite(br, streamLength, 8, 8, name));
+                case AssetType.CombatBackground: return ToTexture(new AlbionSprite(br, streamLength, 360, 192, name));
 
                 // Dependently sized graphics
                 case AssetType.Wall3D: // Size varies, must be described elsewhere
                 case AssetType.Object3D: // Described by LabData
                 case AssetType.Overlay3D: // Size varies, must be described elsewhere
-                    break;
+                    throw new NotImplementedException();
 
                 // Self describing graphics
                 case AssetType.FullBodyPicture:
@@ -46,7 +48,7 @@ namespace UAlbion.Game
                 case AssetType.MonsterGraphics:
                 case AssetType.BackgroundGraphics: // Skyboxes
                 case AssetType.CombatGraphics:
-                    return new AlbionSprite(br, streamLength, name);
+                    return ToTexture(new AlbionSprite(br, streamLength, name));
 
                 // Textual resources
                 case AssetType.EventTexts:
@@ -82,6 +84,20 @@ namespace UAlbion.Game
                     throw new NotImplementedException();
             }
             throw new NotImplementedException();
+        }
+
+        static ITexture ToTexture(string name, Image<Rgba32> image) => new TrueColorTexture(name, image);
+        static ITexture ToTexture(AlbionSprite sprite)
+        {
+            // TODO: Multiframe etc
+            var frame = sprite.Frames[0];
+            return new EightBitTexture(
+                sprite.Name,
+                (uint)frame.Width,
+                (uint)frame.Height,
+                1,
+                1,
+                frame.Pixels);
         }
     }
 }

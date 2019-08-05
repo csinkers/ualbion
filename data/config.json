@@ -7273,7 +7273,7 @@
         "0": {
           "Width": 16,
           "Offset": 0,
-          "Name": null,
+          "Name": "",
           "Type": "texture"
         },
         "1": {
@@ -10765,67 +10765,67 @@
         "0": {
           "Width": 16,
           "Offset": 0,
-          "Name": null,
+          "Name": "Outdoors",
           "Type": "texture"
         },
         "1": {
           "Width": 16,
           "Offset": 0,
-          "Name": null,
+          "Name": "Outdoors",
           "Type": "texture"
         },
         "2": {
-          "Width": 32,
+          "Width": 16,
           "Offset": 0,
-          "Name": null,
+          "Name": "Indoors",
           "Type": "texture"
         },
         "3": {
-          "Width": 32,
+          "Width": 16,
           "Offset": 0,
-          "Name": null,
+          "Name": "Desert",
           "Type": "texture"
         },
         "4": {
-          "Width": 32,
+          "Width": 16,
           "Offset": 0,
-          "Name": null,
+          "Name": "Stoney",
           "Type": "texture"
         },
         "5": {
-          "Width": 32,
+          "Width": 16,
           "Offset": 0,
-          "Name": null,
+          "Name": "Stoney",
           "Type": "texture"
         },
         "6": {
-          "Width": 32,
+          "Width": 16,
           "Offset": 0,
-          "Name": null,
+          "Name": "CeltDungeon",
           "Type": "texture"
         },
         "7": {
-          "Width": 32,
+          "Width": 16,
           "Offset": 0,
-          "Name": null,
+          "Name": "Toronto",
           "Type": "texture"
         },
         "8": {
-          "Width": 32,
+          "Width": 16,
           "Offset": 0,
-          "Name": null,
+          "Name": "Celtic",
           "Type": "texture"
         },
         "9": {
           "Width": 16,
           "Offset": 0,
-          "Name": null,
+          "Name": "DjiKantos",
           "Type": "texture"
         },
         "10": {
           "Width": 16,
           "Offset": 0,
-          "Name": null,
+          "Name": "",
           "Type": "texture"
         }
       }
@@ -17135,7 +17135,7 @@
           "Type": "texture"
         },
         "11": {
-          "Width": 32,
+          "Width": 64,
           "Offset": 0,
           "Name": null,
           "Type": "texture"
@@ -17674,177 +17674,177 @@
       "EnumName": "SmallNpcId",
       "Objects": {
         "0": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Iskai",
           "Type": "texture"
         },
         "1": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Iskai",
           "Type": "texture"
         },
         "2": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Parrot",
           "Type": "texture"
         },
         "3": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Pig",
           "Type": "texture"
         },
         "4": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Flies",
           "Type": "texture"
         },
         "5": {
           "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Offset": 6,
+          "Name": "CatLivestock",
           "Type": "texture"
         },
         "6": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "OldMan",
           "Type": "texture"
         },
         "7": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Man",
           "Type": "texture"
         },
         "8": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 5,
+          "Name": "Woman",
           "Type": "texture"
         },
         "9": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Woman",
           "Type": "texture"
         },
         "10": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Woman",
           "Type": "texture"
         },
         "11": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Woman",
           "Type": "texture"
         },
         "12": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Man",
           "Type": "texture"
         },
         "13": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Man",
           "Type": "texture"
         },
         "14": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Man",
           "Type": "texture"
         },
         "15": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Man",
           "Type": "texture"
         },
         "16": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Man",
           "Type": "texture"
         },
         "17": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 96,
+          "Offset": 6,
+          "Name": "Ship",
           "Type": "texture"
         },
         "18": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "LargeInsect",
           "Type": "texture"
         },
         "19": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Toad",
           "Type": "texture"
         },
         "20": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "InsectSwarm",
           "Type": "texture"
         },
         "21": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "InsectSwarm",
           "Type": "texture"
         },
         "22": {
           "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Offset": 6,
+          "Name": "Krondiir",
           "Type": "texture"
         },
         "23": {
           "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Offset": 6,
+          "Name": "Krondiir",
           "Type": "texture"
         },
         "24": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "EvilKangaroo",
           "Type": "texture"
         },
         "25": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "PeskyWasp",
           "Type": "texture"
         },
         "26": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Man",
           "Type": "texture"
         },
         "27": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 96,
+          "Offset": 6,
+          "Name": "ScoutShip",
           "Type": "texture"
         },
         "28": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "FloatingHand",
           "Type": "texture"
         }
       }
@@ -18151,61 +18151,61 @@
       "EnumName": "SmallPartyGraphicsId",
       "Objects": {
         "0": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Tom",
           "Type": "texture"
         },
         "1": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 7,
+          "Name": "Rainer",
           "Type": "texture"
         },
         "2": {
-          "Width": 32,
-          "Offset": 0,
-          "Name": null,
+          "Width": 16,
+          "Offset": 6,
+          "Name": "Drirr",
           "Type": "texture"
         },
         "3": {
-          "Width": 32,
+          "Width": 16,
           "Offset": 0,
-          "Name": null,
+          "Name": "",
           "Type": "texture"
         },
         "4": {
-          "Width": 32,
+          "Width": 16,
           "Offset": 0,
           "Name": null,
           "Type": "texture"
         },
         "5": {
-          "Width": 32,
+          "Width": 16,
           "Offset": 0,
           "Name": null,
           "Type": "texture"
         },
         "6": {
-          "Width": 32,
+          "Width": 16,
           "Offset": 0,
           "Name": null,
           "Type": "texture"
         },
         "7": {
-          "Width": 32,
+          "Width": 16,
           "Offset": 0,
           "Name": null,
           "Type": "texture"
         },
         "8": {
-          "Width": 32,
+          "Width": 16,
           "Offset": 0,
           "Name": null,
           "Type": "texture"
         },
         "9": {
-          "Width": 32,
+          "Width": 16,
           "Offset": 0,
           "Name": null,
           "Type": "texture"
@@ -23232,7 +23232,7 @@
         "22": {
           "Width": 256,
           "Offset": 0,
-          "Name": null,
+          "Name": "",
           "Type": "texture"
         },
         "23": {

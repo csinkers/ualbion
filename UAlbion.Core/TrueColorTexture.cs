@@ -1,4 +1,5 @@
-﻿using SixLabors.ImageSharp;
+﻿using System.Numerics;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using Veldrid;
 using Veldrid.ImageSharp;
@@ -22,6 +23,13 @@ namespace UAlbion.Core
             Name = name;
             ImageSharpTexture imageSharpTexture = new ImageSharpTexture(image, false);
             _texture = imageSharpTexture;
+        }
+
+        public void GetSubImageDetails(int subImage, out Vector2 offset, out Vector2 size, out int layer)
+        {
+            offset = new Vector2(0,0);
+            size = new Vector2(1.0f,1.0f);
+            layer = 0;
         }
 
         public Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)

@@ -12,18 +12,21 @@ namespace UAlbion.Core
 
     public abstract class Event : IEvent
     {
-        class EventPartMetadata
+        public class EventPartMetadata
         {
             public string Name { get; }
+            public string HelpText { get; }
+            public bool IsOptional { get; set; }
             public Func<object, object> Getter { get; }
             public Type PropertyType { get; }
-
             public Expression Parser { get; }
 
             public EventPartMetadata(PropertyInfo property, ParameterExpression partsParameter, int index)
             {
                 var attribute = (EventPartAttribute)property.GetCustomAttribute(typeof(EventPartAttribute), false);
                 Name = attribute.Name;
+                HelpText = attribute.HelpText;
+                IsOptional = attribute.IsOptional;
                 PropertyType = property.PropertyType;
                 var getMethod = property.GetMethod;
 
@@ -51,13 +54,26 @@ namespace UAlbion.Core
                     var method = typeof(float).GetMethod("Parse", new[] { typeof(string) });
                     Parser = Expression.Call(method, part);
                 }
+                else if (PropertyType == typeof(int?))
+                {
+                    var method = GetType().GetMethod("ParseNullableInt", BindingFlags.NonPublic | BindingFlags.Static);
+                    Parser = Expression.Call(method, part);
+                }
                 else throw new NotImplementedException();
+            }
+            static int? ParseNullableInt(string s)
+            {
+                if (string.IsNullOrEmpty(s))
+                    return null;
+                return int.Parse(s);
             }
         }
 
-        class EventMetadata
+        public class EventMetadata
         {
             public string Name { get; }
+            public string[] Aliases { get; }
+            public string HelpText { get; }
             public Type Type { get; }
             public EventPartMetadata[] Parts { get; }
             public Func<string[], Event> Parser { get; }
@@ -68,6 +84,9 @@ namespace UAlbion.Core
                 var properties = type.GetProperties();
                 Type = type;
                 Name = eventAttribute.Name;
+                HelpText = eventAttribute.HelpText;
+                Aliases = eventAttribute.Aliases ?? new string[0];
+
                 var partsParameter = Expression.Parameter(typeof(string[]), "parts");
                 Parts = properties
                     .Where(x => x.GetCustomAttribute(typeof(EventPartAttribute)) != null)
@@ -87,9 +106,13 @@ namespace UAlbion.Core
                     sb.Append(' ');
                     if (part.PropertyType == typeof(string))
                     {
-                        sb.Append('"');
-                        sb.Append(((string)part.Getter(instance)).Replace("\"", "\\\""));
-                        sb.Append('"');
+                        var value = (string) part.Getter(instance);
+                        if (value != null)
+                        {
+                            sb.Append('"');
+                            sb.Append(value.Replace("\"", "\\\""));
+                            sb.Append('"');
+                        }
                     }
                     else
                     {
@@ -131,13 +154,20 @@ namespace UAlbion.Core
         }
 
         static readonly IDictionary<Type, EventMetadata> Serializers = GetAllEventTypes().ToDictionary(x => x, x => new EventMetadata(x));
-        static readonly IDictionary<string, EventMetadata> Events = Serializers.ToDictionary(x => x.Value.Name, x => x.Value);
+        static readonly IDictionary<string, EventMetadata> Events = 
+            Serializers
+            .SelectMany(x => 
+                new[] {x.Value.Name}.Concat(x.Value.Aliases)
+                .Select(y => new {Name = y, Meta = x.Value}))
+            .ToDictionary(x => x.Name, x => x.Meta);
 
         public override string ToString()
         {
             var metadata = Serializers[GetType()];
             return metadata.Serialize(this);
         }
+
+        public static IEnumerable<EventMetadata> GetEventMetadata() => Events.Values.OrderBy(x => x.Name);
 
         public static Event Parse(string s)
         {
@@ -195,12 +225,19 @@ namespace UAlbion.Core
                     yield return sb.ToString();
             }
 
-            var parts = Split().ToArray();
+            string[] parts = Split().ToArray();
             if (parts.Length == 0)
                 return null;
 
+            if (!Events.ContainsKey(parts[0]))
+                return null;
+
             var metadata = Events[parts[0]];
-            return metadata.Parser(parts);
+            if (parts.Length < metadata.Parts.Length + 1)
+                parts = parts.Concat(Enumerable.Repeat<string>(null, metadata.Parts.Length + 1 - parts.Length)).ToArray();
+
+            try { return metadata.Parser(parts); }
+            catch { return null; }
         }
     }
 }

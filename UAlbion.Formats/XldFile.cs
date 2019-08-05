@@ -11,7 +11,7 @@ namespace UAlbion.Formats
         readonly Stream _stream;
         readonly string MagicString = "XLD0I";
         readonly int[] _objectOffsets;
-        public object Filename { get; }
+        public string Filename { get; }
         int ObjectCount => _objectOffsets.Length - 1;
 
         public XldFile(string filename)
@@ -46,6 +46,9 @@ namespace UAlbion.Formats
 
         public BinaryReader GetReaderForObject(int objectIndex, out int length)
         {
+            if(objectIndex >= ObjectCount)
+                throw new InvalidOperationException($"Tried to request object {objectIndex} from {Filename}, but it only contains {ObjectCount} items.");
+
             _stream.Seek(_objectOffsets[objectIndex], SeekOrigin.Begin);
             length = _objectOffsets[objectIndex + 1] - _objectOffsets[objectIndex];
             return new BinaryReader(_stream, Encoding.Default, true);

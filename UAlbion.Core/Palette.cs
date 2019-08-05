@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using Veldrid;
 
 namespace UAlbion.Core
@@ -21,28 +22,39 @@ namespace UAlbion.Core
             TextureData = paletteData;
         }
 
+        public void GetSubImageDetails(int subImage, out Vector2 offset, out Vector2 size, out int layer)
+        {
+            offset = new Vector2(0,0);
+            size = new Vector2(1.0f,1.0f);
+            layer = 0;
+        }
+
         public unsafe Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
         {
-            Texture texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, usage, Type));
-            Texture staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, TextureUsage.Staging, Type));
-            texture.Name = Name;
-            staging.Name = Name + "_Staging";
-
-            fixed (uint* texDataPtr = &TextureData[0])
+            using (Texture staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels,
+                ArrayLayers, Format, TextureUsage.Staging, Type)))
             {
-                uint subresourceSize = Width * Height * 4;
-                gd.UpdateTexture(
-                    staging, (IntPtr)texDataPtr, subresourceSize,
-                    0, 0, 0, Width, Height, 1, 0, 0);
+                staging.Name = Name + "_Staging";
+
+                fixed (uint* texDataPtr = &TextureData[0])
+                {
+                    uint subresourceSize = Width * Height * 4;
+                    gd.UpdateTexture(
+                        staging, (IntPtr)texDataPtr, subresourceSize,
+                        0, 0, 0, Width, Height, 1, 0, 0);
+                }
+
+                Texture texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, usage, Type));
+                texture.Name = Name;
+                using (CommandList cl = rf.CreateCommandList())
+                {
+                    cl.Begin();
+                    cl.CopyTexture(staging, texture);
+                    cl.End();
+                    gd.SubmitCommands(cl);
+                }
+                return texture;
             }
-
-            CommandList cl = rf.CreateCommandList();
-            cl.Begin();
-            cl.CopyTexture(staging, texture);
-            cl.End();
-            gd.SubmitCommands(cl);
-
-            return texture;
         }
     }
 }

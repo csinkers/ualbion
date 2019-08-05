@@ -3,7 +3,7 @@
 namespace UAlbion.Core.Objects
 {
     [Flags]
-    public enum SpriteFlags : byte
+    public enum SpriteFlags : int
     {
         NoTransform = 1,
         Highlight = 2,

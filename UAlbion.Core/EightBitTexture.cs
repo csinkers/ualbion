@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Numerics;
 using Veldrid;
 
 namespace UAlbion.Core
@@ -31,41 +33,54 @@ namespace UAlbion.Core
             TextureData = textureData;
         }
 
+        public void GetSubImageDetails(int subImage, out Vector2 offset, out Vector2 size, out int layer)
+        {
+            Debug.Assert(subImage < ArrayLayers);
+            offset = new Vector2(0, 0);
+            size = new Vector2(1.0f, 1.0f);
+            layer = subImage;
+        }
+
         public unsafe Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
         {
-            Texture texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, usage, Type));
-            Texture staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, TextureUsage.Staging, Type));
-            texture.Name = "T_" + Name;
-            staging.Name = "T_" + Name + "_Staging";
-
-            ulong offset = 0;
-            fixed (byte* texDataPtr = &TextureData[0])
+            using (Texture staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, TextureUsage.Staging, Type)))
             {
-                for (uint level = 0; level < MipLevels; level++)
-                {
-                    uint mipWidth  = GetDimension(Width, level);
-                    uint mipHeight = GetDimension(Height, level);
-                    uint mipDepth  = GetDimension(Depth, level);
-                    uint subresourceSize = mipWidth * mipHeight * mipDepth * GetFormatSize(Format);
+                staging.Name = "T_" + Name + "_Staging";
 
-                    for (uint layer = 0; layer < ArrayLayers; layer++)
+                ulong offset = 0;
+                fixed (byte* texDataPtr = &TextureData[0])
+                {
+                    for (uint level = 0; level < MipLevels; level++)
                     {
-                        gd.UpdateTexture(
-                            staging, (IntPtr)(texDataPtr + offset), subresourceSize,
-                            0, 0, 0, mipWidth, mipHeight, mipDepth,
-                            level, layer);
-                        offset += subresourceSize;
+                        uint mipWidth = GetDimension(Width, level);
+                        uint mipHeight = GetDimension(Height, level);
+                        uint mipDepth = GetDimension(Depth, level);
+                        uint subresourceSize = mipWidth * mipHeight * mipDepth * GetFormatSize(Format);
+
+                        for (uint layer = 0; layer < ArrayLayers; layer++)
+                        {
+                            gd.UpdateTexture(
+                                staging, (IntPtr)(texDataPtr + offset), subresourceSize,
+                                0, 0, 0, mipWidth, mipHeight, mipDepth,
+                                level, layer);
+                            offset += subresourceSize;
+                        }
                     }
                 }
+
+                Texture texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, usage, Type));
+                texture.Name = "T_" + Name;
+
+                using (CommandList cl = rf.CreateCommandList())
+                {
+                    cl.Begin();
+                    cl.CopyTexture(staging, texture);
+                    cl.End();
+                    gd.SubmitCommands(cl);
+                }
+
+                return texture;
             }
-
-            CommandList cl = rf.CreateCommandList();
-            cl.Begin();
-            cl.CopyTexture(staging, texture);
-            cl.End();
-            gd.SubmitCommands(cl);
-
-            return texture;
         }
 
         uint GetFormatSize(PixelFormat format)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using ImGuiNET;
 using Veldrid;
@@ -6,8 +7,14 @@ using Veldrid.Sdl2;
 
 namespace UAlbion.Core
 {
-    public class PerspectiveCamera : ICamera
+    public class PerspectiveCamera : Component, ICamera
     {
+        static readonly IList<Handler> Handlers = new Handler[]
+        {
+            new Handler<PerspectiveCamera, WindowResizedEvent>((x, e) => x.WindowResized(e.Width, e.Height)),
+            new Handler<PerspectiveCamera, EngineUpdateEvent>((x, e) => x.Update(e.DeltaSeconds))
+        };
+
         Matrix4x4 _viewMatrix;
         Matrix4x4 _projectionMatrix;
 
@@ -36,7 +43,7 @@ namespace UAlbion.Core
         public float NearDistance => 1f;
         public float FarDistance => 1000f;
 
-        public PerspectiveCamera(GraphicsDevice gd, Sdl2Window window)
+        public PerspectiveCamera(GraphicsDevice gd, Sdl2Window window) : base(Handlers)
         {
             _gd = gd;
             _useReverseDepth = gd.IsDepthRangeZeroToOne;
@@ -45,27 +52,6 @@ namespace UAlbion.Core
             _windowHeight = window.Height;
             UpdatePerspectiveMatrix();
             UpdateViewMatrix();
-        }
-
-        public void Attach(EventExchange exchange)
-        {
-            exchange.Subscribe<WindowResizedEvent>(this);
-            exchange.Subscribe<EngineUpdateEvent>(this);
-        }
-
-        public void Receive(IEvent gameEvent, object sender)
-        {
-            switch (gameEvent)
-            {
-                case WindowResizedEvent e:
-                    _windowWidth = e.Width;
-                    _windowHeight = e.Height;
-                    UpdatePerspectiveMatrix();
-                    break;
-                case EngineUpdateEvent e:
-                    Update(e.DeltaSeconds);
-                    break;
-            }
         }
 
         public void UpdateBackend(GraphicsDevice gd)
@@ -149,7 +135,7 @@ namespace UAlbion.Core
             UpdateViewMatrix();
         }
 
-        public void WindowResized(float width, float height)
+        void WindowResized(float width, float height)
         {
             _windowWidth = width;
             _windowHeight = height;

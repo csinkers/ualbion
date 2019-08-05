@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace UAlbion.Core
 {
@@ -36,4 +35,5 @@ namespace UAlbion.Core
     [Event("e:load_renderdoc")] public class LoadRenderDocEvent : EngineEvent { }
     [Event("e:toggle_resizable")] public class ToggleResizableEvent : EngineEvent { }
     [Event("e:toggle_visible_border")] public class ToggleVisibleBorderEvent : EngineEvent { }
+    [Event("quit", "Exit the game.", new[] { "exit" })] public class QuitEvent : EngineEvent { }
 }

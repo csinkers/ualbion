@@ -7,10 +7,12 @@ namespace UAlbion.Core
     {
         public string Name { get; }
         public string HelpText { get; }
-        public EventAttribute(string name, string helpText = null)
+        public string[] Aliases { get; }
+        public EventAttribute(string name, string helpText = null, string[] aliases = null)
         {
             Name = name;
             HelpText = helpText;
+            Aliases = aliases;
         }
     }
 
@@ -18,13 +20,17 @@ namespace UAlbion.Core
     public sealed class EventPartAttribute : Attribute
     {
         public string Name { get; }
+        public string HelpText { get; }
         public bool IsOptional { get; }
 
-        public EventPartAttribute(string name, bool isOptional = false)
+        public EventPartAttribute(string name) : this(name, null, false) { }
+        public EventPartAttribute(string name, string helpText) : this(name, helpText, false) { }
+        public EventPartAttribute(string name, bool isOptional) : this(name, null, isOptional) { }
+        public EventPartAttribute(string name, string helpText, bool isOptional)
         {
             Name = name;
+            HelpText = helpText;
             IsOptional = isOptional;
         }
     }
-
 }

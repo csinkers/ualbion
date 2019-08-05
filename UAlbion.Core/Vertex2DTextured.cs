@@ -12,11 +12,9 @@ namespace UAlbion.Core
 
     public static class VertexLayoutH
     {
-        public static VertexElementDescription Position2D(string name) => new VertexElementDescription(name, VertexElementSemantic.Position, VertexElementFormat.Float2);
-        public static VertexElementDescription Position3D(string name) => new VertexElementDescription(name, VertexElementSemantic.Position, VertexElementFormat.Float3);
-        public static VertexElementDescription Texture2D(string name) => new VertexElementDescription(name, VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2);
-        public static VertexElementDescription Color(string name) => new VertexElementDescription(name, VertexElementSemantic.Color, VertexElementFormat.Float4);
-        public static VertexElementDescription Normal(string name) => new VertexElementDescription(name, VertexElementSemantic.Normal, VertexElementFormat.Float3);
+        public static VertexElementDescription Vector2D(string name) => new VertexElementDescription(name, VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2);
+        public static VertexElementDescription Vector3D(string name) => new VertexElementDescription(name, VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3);
+        public static VertexElementDescription Int(string name) => new VertexElementDescription(name, VertexElementSemantic.TextureCoordinate, VertexElementFormat.Int1);
     }
 
     internal struct Vertex2DTextured
@@ -37,7 +35,7 @@ namespace UAlbion.Core
         public Vertex2DTextured(float x, float y, float u, float v) { X = x; Y = y; U = u; V = v; }
 
         public static VertexLayoutDescription VertexLayout => new VertexLayoutDescription(
-            VertexLayoutH.Texture2D("Position"),
-            VertexLayoutH.Texture2D("TexCoords"));
+            VertexLayoutH.Vector2D("Position"),
+            VertexLayoutH.Vector2D("TexCoords"));
     }
 }

@@ -8,6 +8,7 @@ namespace UAlbion
     {
         const float TickDurationSeconds = 1 / 8.0f;
         float _elapsed;
+        bool _running = true;
 
         public GameClock() : base(Handlers) { }
 
@@ -15,6 +16,9 @@ namespace UAlbion
         {
             new Handler<GameClock, EngineUpdateEvent>((x, e) =>
             {
+                if (!x._running)
+                    return;
+
                 x._elapsed += e.DeltaSeconds;
                 if (x._elapsed > TickDurationSeconds)
                 {
@@ -25,7 +29,9 @@ namespace UAlbion
                 // If the game was paused for a while don't try and catch up
                 if (x._elapsed > 2 * TickDurationSeconds)
                     x._elapsed = 0;
-            })
+            }),
+            new Handler<GameClock, StopClockEvent>((x, e) => x._running = false),
+            new Handler<GameClock, StartClockEvent>((x, e) => x._running = true),
         };
     }
 }

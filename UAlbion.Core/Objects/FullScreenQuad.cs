@@ -83,6 +83,8 @@ void main()
             cl.UpdateBuffer(_ib, 0, QuadIndices);
         }
 
+        public IEnumerable<IRenderable> UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IEnumerable<IRenderable> renderables) => renderables;
+
         public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable r)
         {
             cl.SetPipeline(_pipeline);
@@ -92,7 +94,6 @@ void main()
             cl.DrawIndexed(6, 1, 0, 0, 0);
         }
 
-        public void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IRenderable renderable) { }
         public void DestroyDeviceObjects() { _disposeCollector.DisposeAll(); }
         public void Dispose() { DestroyDeviceObjects(); }
     }

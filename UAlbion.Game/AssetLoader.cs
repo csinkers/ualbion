@@ -3,6 +3,7 @@ using System.IO;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Core;
+using UAlbion.Core.Textures;
 using UAlbion.Formats;
 
 namespace UAlbion.Game

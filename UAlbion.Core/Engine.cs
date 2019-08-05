@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using ImGuiNET;
+using UAlbion.Core.Events;
 using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 using UAlbion.Core.Objects;
+using UAlbion.Core.Textures;
 
 namespace UAlbion.Core
 {
@@ -33,7 +35,7 @@ namespace UAlbion.Core
         readonly FrameTimeAverager _frameTimeAverager = new FrameTimeAverager(0.5);
         readonly FullScreenQuad _fullScreenQuad;
         readonly ScreenDuplicator _duplicator;
-        readonly ImGuiRenderable _igRenderable;
+        readonly DebugGuiRenderer _igRenderable;
         readonly SceneContext _sceneContext = new SceneContext();
         readonly DebugMenus _debugMenus;
 
@@ -105,8 +107,7 @@ namespace UAlbion.Core
                 GraphicsBackend.Direct3D11
                 );
 
-
-            _igRenderable = new ImGuiRenderable(Window.Width, Window.Height);
+            _igRenderable = new DebugGuiRenderer(Window.Width, Window.Height);
             _duplicator = new ScreenDuplicator();
             _fullScreenQuad = new FullScreenQuad();
             _debugMenus = new DebugMenus(this);

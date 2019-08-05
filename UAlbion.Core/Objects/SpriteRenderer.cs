@@ -3,46 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using UAlbion.Core.Textures;
 using Veldrid;
 using Veldrid.SPIRV;
 using Veldrid.Utilities;
 
 namespace UAlbion.Core.Objects
 {
-    public interface ISpriteResolver
-    {
-        Tuple<SpriteRenderer.SpriteKey, SpriteRenderer.InstanceData> Resolve(SpriteDefinition spriteDefinition);
-    }
-
-    public class SpriteDefinition<T> : SpriteDefinition where T : Enum
-    {
-        public SpriteDefinition(T id, int subObject, Vector2 position, int renderOrder, SpriteFlags flags)
-            : base(subObject, position, renderOrder, flags) { Id = id; }
-
-        public T Id { get; }
-        public override Type IdType => typeof(T);
-        public override int NumericId => (int)(object)Id;
-    }
-
-    public abstract class SpriteDefinition : IRenderable
-    {
-        protected SpriteDefinition(int subObject, Vector2 position, int renderOrder, SpriteFlags flags)
-        {
-            SubObject = subObject;
-            Position = position;
-            RenderOrder = renderOrder;
-            Flags = flags;
-        }
-
-        public Type Renderer => typeof(SpriteRenderer);
-        public int RenderOrder { get; }
-        public SpriteFlags Flags { get; }
-        public int SubObject { get; }
-        public Vector2 Position { get; }
-        public abstract Type IdType { get; }
-        public abstract int NumericId { get; }
-    }
-
     public class SpriteRenderer : IRenderer
     {
         public struct SpriteKey : IEquatable<SpriteKey>

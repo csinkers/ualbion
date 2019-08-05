@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using ImGuiNET;
+using UAlbion.Core.Events;
 using Veldrid;
 using Veldrid.Sdl2;
 

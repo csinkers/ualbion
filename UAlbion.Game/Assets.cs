@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UAlbion.Core;
+using UAlbion.Core.Events;
+using UAlbion.Core.Textures;
 using UAlbion.Formats;
 using UAlbion.Game.AssetIds;
 

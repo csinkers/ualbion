@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Objects;
-using UAlbion.Game;
+using UAlbion.Core.Textures;
 using UAlbion.Game.AssetIds;
 using Veldrid;
 
-namespace UAlbion
+namespace UAlbion.Game
 {
     public class SpriteResolver : ISpriteResolver
     {

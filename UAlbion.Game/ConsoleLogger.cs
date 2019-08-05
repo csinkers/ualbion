@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UAlbion.Core;
-using UAlbion.Game;
+using UAlbion.Core.Events;
 
-namespace UAlbion
+namespace UAlbion.Game
 {
     [Event("help", "Display help on the available console commands.", new[] {"?", "usage"})]
     public class HelpEvent : GameEvent
@@ -20,7 +20,7 @@ namespace UAlbion
         public string CommandName { get; }
     }
 
-    class ConsoleLogger : IComponent
+    public class ConsoleLogger : IComponent
     {
         EventExchange _exchange;
         bool _done;

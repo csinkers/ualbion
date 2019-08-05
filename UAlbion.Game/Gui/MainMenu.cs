@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ImGuiNET;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 
 namespace UAlbion.Game.Gui
 {

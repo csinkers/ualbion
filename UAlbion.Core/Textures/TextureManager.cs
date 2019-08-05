@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Veldrid;
 
-namespace UAlbion.Core
+namespace UAlbion.Core.Textures
 {
     public class TextureManager : ITextureManager
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace UAlbion.Core
+namespace UAlbion.Core.Events
 {
     public class EventExchange
     {

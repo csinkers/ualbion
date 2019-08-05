@@ -4,7 +4,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using Veldrid;
 using Veldrid.ImageSharp;
 
-namespace UAlbion.Core
+namespace UAlbion.Core.Textures
 {
     public class TrueColorTexture : ITexture
     {

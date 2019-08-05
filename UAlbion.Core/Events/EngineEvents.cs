@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UAlbion.Core
+namespace UAlbion.Core.Events
 {
     public interface IEngineEvent : IEvent { }
     public abstract class EngineEvent : Event, IEngineEvent { }

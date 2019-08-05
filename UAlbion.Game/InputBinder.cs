@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 using Veldrid;
 
 namespace UAlbion.Game

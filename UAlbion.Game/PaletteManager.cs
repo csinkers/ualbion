@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using UAlbion.Core;
 using UAlbion.Formats;
-using UAlbion.Game;
 using UAlbion.Game.AssetIds;
 
-namespace UAlbion
+namespace UAlbion.Game
 {
-    class PaletteManager : Component
+    public class PaletteManager : Component
     {
         static readonly IList<Handler> Handlers = new Handler[]
         {

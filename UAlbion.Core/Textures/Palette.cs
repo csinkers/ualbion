@@ -2,7 +2,7 @@
 using System.Numerics;
 using Veldrid;
 
-namespace UAlbion.Core
+namespace UAlbion.Core.Textures
 {
     public class Palette : ITexture
     {

@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Core.Objects;
 
-namespace UAlbion
+namespace UAlbion.Game
 {
-    class Billboard2D<T> : Component where T : Enum
+    public class Billboard2D<T> : Component where T : Enum
     {
         static IList<Handler> Handlers => new Handler[] { new Handler<Billboard2D<T>, RenderEvent>((x, e) => x.OnRender(e)), };
         public Vector2 Position { get; set; }

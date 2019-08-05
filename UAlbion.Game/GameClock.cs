@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Core;
-using UAlbion.Game;
+using UAlbion.Core.Events;
 
-namespace UAlbion
+namespace UAlbion.Game
 {
-    class GameClock : Component
+    public class GameClock : Component
     {
         const float TickDurationSeconds = 1 / 8.0f;
         float _elapsed;

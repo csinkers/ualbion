@@ -20,7 +20,7 @@ namespace UAlbion
             if (string.IsNullOrEmpty(baseDir))
                 return;
 
-            Config config = Config.Load(baseDir);
+            AssetConfig config = AssetConfig.Load(baseDir);
 
             var assets = new Assets(config);
             var spriteResolver = new SpriteResolver(assets);

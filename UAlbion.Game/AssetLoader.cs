@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Formats;
 
@@ -10,95 +13,131 @@ namespace UAlbion.Game
 {
     public static class AssetLoader
     {
-        public static object Load(BinaryReader br, AssetType type, int id, string name, int streamLength, object context)
+        public static IDictionary<XldObjectType, IAssetLoader> Loaders = GetAssetLoaders();
+        static IDictionary<XldObjectType, IAssetLoader> GetAssetLoaders()
         {
-            switch (type)
+            var dict = new Dictionary<XldObjectType, IAssetLoader>();
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                case AssetType.MapData:
-                case AssetType.LabData:
-                case AssetType.Automap:
-                    throw new NotImplementedException();
+                Type[] types; try { types = assembly.GetTypes(); } catch (ReflectionTypeLoadException e) { types = e.Types; }
+                foreach(var type in types.Where(x => x != null))
+                {
+                    if (typeof(IAssetLoader).IsAssignableFrom(type) && !type.IsAbstract)
+                    {
+                        var eventAttribute = (AssetLoaderAttribute)type.GetCustomAttribute(typeof(AssetLoaderAttribute), false);
+                        if (eventAttribute != null)
+                        {
+                            var constructor = type.GetConstructors().Single();
 
-                case AssetType.Font: return new AlbionFont(br, streamLength);
-                case AssetType.Palette: return new AlbionPalette(name, br, streamLength, (AlbionPalette.PaletteContext)context);
-                case AssetType.PaletteNull: return br.ReadBytes(streamLength);
-                case AssetType.Picture: return ToTexture(name, Image.Load(br.BaseStream));
-
-                // Fixed size graphics
-                case AssetType.Floor3D: return ToTexture(new AlbionSprite(br, streamLength, 64, 64, name)); // Fixed width
-                case AssetType.IconGraphics: return ToTexture(new AlbionSprite(br, streamLength, 16, 16, name)); // Fixed width
-                case AssetType.IconData: return ToTexture(new AlbionSprite(br, streamLength, 8, 8, name)); // Weird little things... 8x8
-                case AssetType.SmallPortrait: return ToTexture(new AlbionSprite(br, streamLength, 34, 37, name));
-                case AssetType.TacticalIcon: return  ToTexture(new AlbionSprite(br, streamLength, 32, 48, name));
-                case AssetType.ItemGraphics: return ToTexture(new AlbionSprite(br, streamLength, 16, 16, name));
-                case AssetType.AutomapGraphics: return ToTexture(new AlbionSprite(br, streamLength, 8, 8, name));
-                case AssetType.CombatBackground: return ToTexture(new AlbionSprite(br, streamLength, 360, 192, name));
-
-                // Dependently sized graphics
-                case AssetType.Wall3D: // Size varies, must be described elsewhere
-                case AssetType.Object3D: // Described by LabData
-                case AssetType.Overlay3D: // Size varies, must be described elsewhere
-                    throw new NotImplementedException();
-
-                // Self describing graphics
-                case AssetType.FullBodyPicture:
-                case AssetType.BigPartyGraphics:
-                case AssetType.SmallPartyGraphics:
-                case AssetType.BigNpcGraphics:
-                case AssetType.SmallNpcGraphics:
-                case AssetType.MonsterGraphics:
-                case AssetType.BackgroundGraphics: // Skyboxes
-                case AssetType.CombatGraphics:
-                    return ToTexture(new AlbionSprite(br, streamLength, name));
-
-                // Textual resources
-                case AssetType.EventTexts:
-                case AssetType.MapTexts:
-                case AssetType.Dictionary:
-                    return new AlbionStringTable(br, streamLength);
-
-                case AssetType.SystemTexts: return new AlbionStringTable(br, streamLength, StringTableType.SystemText); // Custom format, e.g. [numbers:format string]
-                case AssetType.ItemNames: return new AlbionStringTable(br, streamLength, StringTableType.ItemNames);
-                case AssetType.Script: return new AlbionScript(br, streamLength);
-
-                case AssetType.Sample:
-                case AssetType.WaveLibrary:
-                    return new AlbionSample(br, streamLength);
-
-                case AssetType.Song:
-
-                case AssetType.ChestData:
-                case AssetType.MerchantData:
-
-                case AssetType.PartyCharacterData:
-                case AssetType.MonsterCharacter:
-                case AssetType.NpcCharacterData:
-
-                case AssetType.BlockList:
-                case AssetType.EventSet:
-                case AssetType.ItemList:
-                case AssetType.SpellData:
-                case AssetType.MonsterGroup:
-                case AssetType.Flic:
-                case AssetType.Slab:
-                case AssetType.TransparencyTables: // Bit weird, always 256 wide.
-                    throw new NotImplementedException();
+                            var lambda = (Func<object>)Expression.Lambda(Expression.New(constructor)).Compile();
+                            var loader = (IAssetLoader)lambda();
+                            foreach (var objectType in eventAttribute.SupportedTypes)
+                                dict.Add(objectType, loader);
+                        }
+                    }
+                }
             }
-            throw new NotImplementedException();
+
+            return dict;
+        }
+
+        public static object Load(BinaryReader br, string name, int streamLength, AssetConfig.Asset config)
+        {
+            var loader = Loaders[config.Type];
+            object asset = loader.Load(br, streamLength, name, config);
+
+            if(asset is AlbionSprite s)
+                asset = ToTexture(s);
+
+            if (asset is Image<Rgba32> p)
+                asset = ToTexture(name, p);
+
+            return asset;
+        }
+
+        static (int, int) GetAtlasSize(int tileWidth, int tileHeight, int count)
+        {
+            int NextPowerOfTwo(int x) => (int)Math.Pow(2.0, Math.Ceiling(Math.Log(x, 2.0)));
+
+            int tilesPerRow = (int)Math.Ceiling(Math.Sqrt(count));
+            int width = NextPowerOfTwo(tileWidth * tilesPerRow);
+            int requiredHeight = tileHeight * ((count + tilesPerRow - 1) / tilesPerRow);
+            int height = NextPowerOfTwo(requiredHeight);
+            return (width, height);
         }
 
         static ITexture ToTexture(string name, Image<Rgba32> image) => new TrueColorTexture(name, image);
         static ITexture ToTexture(AlbionSprite sprite)
         {
-            // TODO: Multiframe etc
-            var frame = sprite.Frames[0];
+            EightBitTexture.SubImage[] subImages;
+            byte[] pixelData;
+
+            if (sprite.UniformFrames && sprite.Frames.Count >= 256)
+            {
+                // For things like tilemaps etc we repack into a power of 2-aligned texture atlas.
+                int tileWidth = sprite.Width;
+                int tileHeight = sprite.Height / sprite.Frames.Count;
+                var (width, height) = GetAtlasSize(tileWidth, tileHeight, sprite.Frames.Count);
+                pixelData = new byte[width * height];
+                subImages = new EightBitTexture.SubImage[sprite.Frames.Count];
+
+                int curX = 0;
+                int curY = 0;
+                for (int n = 0; n < sprite.Frames.Count; n++)
+                {
+                    for (int j = 0; j < tileHeight; j++)
+                    {
+                        for (int i = 0; i < tileWidth; i++)
+                        {
+                            var sourceX = i;
+                            var sourceY = j + n * tileHeight;
+                            var destX = curX + i;
+                            var destY = curY + j;
+                            pixelData[destY * width + destX] = sprite.PixelData[sourceX + sourceY * tileWidth];
+                        }
+                    }
+
+                    subImages[n] = new EightBitTexture.SubImage(curX, curY, tileWidth, tileHeight, 0);
+                    curX += tileWidth;
+                    if (curX + tileWidth > width)
+                    {
+                        curX = 0;
+                        curY += tileHeight;
+                    }
+                }
+            }
+            else if (sprite.UniformFrames) // For reasonably sized uniform sprites use layers to simplify mip mapping / tiling etc
+            {
+                pixelData = sprite.PixelData;
+                subImages = sprite.Frames
+                    .Select((x, i) => new EightBitTexture.SubImage(0, 0, x.Width, x.Height, i))
+                    .ToArray();
+            }
+            else // For non-uniforms just use the on-disk packing 
+            {
+                pixelData = sprite.PixelData;
+                subImages = sprite.Frames
+                    .Select(x => new EightBitTexture.SubImage(x.X, x.Y, x.Width, x.Height, 0))
+                    .ToArray();
+            }
+
             return new EightBitTexture(
                 sprite.Name,
-                (uint)frame.Width,
-                (uint)frame.Height,
+                (uint)sprite.Width,
+                (uint)sprite.Height,
                 1,
                 1,
-                frame.Pixels);
+                pixelData,
+                subImages);
+        }
+    }
+
+    [AssetLoader(XldObjectType.InterlacedBitmap)]
+    public class InterlacedBitmapLoader : IAssetLoader
+    {
+        public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
+        {
+            return Image.Load(br.BaseStream);
         }
     }
 }

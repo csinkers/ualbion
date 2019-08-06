@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if false
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
@@ -10,7 +11,7 @@ namespace UAlbion.Formats
     {
         public override bool CanConvert(Type objectType)
         {
-            return typeof(Config.ConfigObject).IsAssignableFrom(objectType);
+            return typeof(Config.Asset).IsAssignableFrom(objectType);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -21,7 +22,7 @@ namespace UAlbion.Formats
                 case "texture": return item.ToObject<Config.Texture>();
                 case "interlaced_bitmap": return item.ToObject<Config.Texture>();
                 case "palette": return item.ToObject<Config.Palette>();
-                case "unknown": return item.ToObject<Config.ConfigObject>();
+                case "unknown": return item.ToObject<Config.Asset>();
                 default: throw new NotImplementedException();
             }
         }
@@ -33,7 +34,7 @@ namespace UAlbion.Formats
             switch (value)
             {
                 case Config.Texture _: o.AddFirst(new JProperty("Type", new JValue("texture"))); break;
-                case Config.ConfigObject _: o.AddFirst(new JProperty("Type", new JValue("unknown"))); break;
+                case Config.Asset _: o.AddFirst(new JProperty("Type", new JValue("unknown"))); break;
                 default: throw new NotImplementedException();
             }
             */
@@ -43,19 +44,19 @@ namespace UAlbion.Formats
 
     public class Config
     {
-        public class ConfigObject
+        public class Asset
         {
             public string Name { get; set; }
             public string Type { get; set; }
         }
 
-        public class Texture : ConfigObject
+        public class Texture : Asset
         {
             public int Width { get; set; }
             public int Offset { get; set; }
         }
 
-        public class Palette : ConfigObject { }
+        public class Palette : Asset { }
 
         public class Xld
         {
@@ -63,7 +64,7 @@ namespace UAlbion.Formats
             public string Name;
 
             public string EnumName;
-            public IDictionary<int, ConfigObject> Objects { get; } = new Dictionary<int, ConfigObject>();
+            public IDictionary<int, Asset> Assets { get; } = new Dictionary<int, Asset>();
         }
 
         [JsonIgnore]
@@ -107,3 +108,4 @@ namespace UAlbion.Formats
         }
     }
 }
+#endif

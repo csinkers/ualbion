@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Numerics;
 using Veldrid;
 
@@ -7,6 +9,20 @@ namespace UAlbion.Core.Textures
 {
     public class EightBitTexture : ITexture
     {
+        public struct SubImage
+        {
+            public SubImage(int x, int y, int w, int h, int layer)
+            {
+                X = x; Y = y; W = w; H = h; Layer = layer;
+            }
+
+            public int X { get; }
+            public int Y { get; }
+            public int W { get; }
+            public int H { get; }
+            public int Layer { get; }
+        }
+
         public PixelFormat Format => PixelFormat.R8_UNorm;
         public TextureType Type => TextureType.Texture2D;
         public uint Width { get;  }
@@ -16,6 +32,7 @@ namespace UAlbion.Core.Textures
         public uint ArrayLayers { get;  }
         public string Name { get; }
         public byte[] TextureData { get;  }
+        readonly IList<SubImage> _subImages = new List<SubImage>();
 
         public EightBitTexture(
             string name,
@@ -23,7 +40,8 @@ namespace UAlbion.Core.Textures
             uint height,
             uint mipLevels,
             uint arrayLayers,
-            byte[] textureData)
+            byte[] textureData,
+            IEnumerable<SubImage> subImages)
         {
             Name = name;
             Width = width;
@@ -31,14 +49,25 @@ namespace UAlbion.Core.Textures
             MipLevels = mipLevels;
             ArrayLayers = arrayLayers;
             TextureData = textureData;
+            if(subImages != null)
+                foreach(var subImage in subImages)
+                    _subImages.Add(subImage);
         }
 
-        public void GetSubImageDetails(int subImage, out Vector2 offset, out Vector2 size, out int layer)
+        public void GetSubImageDetails(int id, out Vector2 offset, out Vector2 size, out int layer)
         {
-            Debug.Assert(subImage < ArrayLayers);
-            offset = new Vector2(0, 0);
-            size = new Vector2(1.0f, 1.0f);
-            layer = subImage;
+            Debug.Assert(id == 0 || id < _subImages.Count);
+            if(!_subImages.Any())
+            {
+                offset = Vector2.Zero;
+                size = Vector2.One;
+                layer = 0;
+            }
+
+            var subImage = _subImages[id];
+            offset = new Vector2((float)subImage.X / Width, (float)subImage.Y / Height);
+            size = new Vector2((float)subImage.W / Width, (float)subImage.H / Height);
+            layer = subImage.Layer;
         }
 
         public unsafe Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -7,18 +8,11 @@ namespace UAlbion.Formats
 {
     public class AlbionPalette
     {
-        public class PaletteContext
-        {
-            public PaletteContext(int id, byte[] commonPalette) { Id = id; CommonPalette = commonPalette; }
-            public int Id { get; }
-            public byte[] CommonPalette { get; }
-        }
-
         public int Id { get; }
         public string Name { get; }
         public bool IsAnimated => AnimatedRanges.ContainsKey(Id);
-
         public readonly uint[] Entries = new uint[0x100];
+
         public static readonly IDictionary<int, IList<(byte, byte)>> AnimatedRanges = new Dictionary<int, IList<(int, int)>> {
             { 0,  new[] { (0x99, 0x9f), (0xb0, 0xbf) } }, // 7, 16 => 112
             { 1,  new[] { (0x99, 0x9f), (0xb0, 0xb4), (0xb5, 0xbf) } }, // 7, 5, 11 => 385
@@ -31,43 +25,33 @@ namespace UAlbion.Formats
             { 30, new[] { (0x10, 0x4f) } }, // 80 => 80
             { 50, new[] { (0xb0, 0xb3), (0xb4, 0xbf) } }, // 4, 12 => 12
         }.ToDictionary(
-            x => x.Key, 
-            x => (IList<(byte,byte)>)x.Value.Select(y => ((byte)y.Item1, (byte)y.Item2)).ToArray());
+            x => x.Key,
+            x => (IList<(byte, byte)>)x.Value.Select(y => ((byte)y.Item1, (byte)y.Item2)).ToArray());
 
-        public AlbionPalette(string name, BinaryReader br, int streamLength, PaletteContext context)
+        public AlbionPalette(BinaryReader br, int streamLength, string name, int id)
         {
-            Id = context.Id;
+            Id = id;
             Name = name;
-            Debug.Assert(context.CommonPalette.Length == 192);
             long startingOffset = br.BaseStream.Position;
             for (int i = 0; i < 192; i++)
             {
-                Entries[i]  = (uint)br.ReadByte() << 24;
+                Entries[i] = (uint)br.ReadByte() << 24;
                 Entries[i] |= (uint)br.ReadByte() << 16;
                 Entries[i] |= (uint)br.ReadByte() << 8;
-            }
-
-            for (int i = 192; i < 256; i++)
-            {
-                Entries[i]  = (uint)context.CommonPalette[(i - 192) * 3 + 0] << 24;
-                Entries[i] |= (uint)context.CommonPalette[(i - 192) * 3 + 1] << 16;
-                Entries[i] |= (uint)context.CommonPalette[(i - 192) * 3 + 2] << 8;
             }
 
             Debug.Assert(br.BaseStream.Position == startingOffset + streamLength);
         }
-
-        public AlbionPalette(BinaryReader br)
+        public void SetCommonPalette(byte[] commonPalette)
         {
-            Id = -1;
-            long startingOffset = br.BaseStream.Position;
-            for (int i = 0; i < 256; i++)
+            if (commonPalette == null) throw new ArgumentNullException(nameof(commonPalette));
+            Debug.Assert(commonPalette.Length == 192);
+
+            for (int i = 192; i < 256; i++)
             {
-                Entries[i]  = (uint)br.ReadByte() << 24;
-                Entries[i] |= (uint)br.ReadByte() << 16;
-                Entries[i] |= (uint)br.ReadByte() << 8;
-                Entries[i] |= 0xff;
-                br.ReadByte();
+                Entries[i] = (uint)commonPalette[(i - 192) * 3 + 0] << 24;
+                Entries[i] |= (uint)commonPalette[(i - 192) * 3 + 1] << 16;
+                Entries[i] |= (uint)commonPalette[(i - 192) * 3 + 2] << 8;
             }
         }
 

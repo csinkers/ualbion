@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace UAlbion.Formats
+namespace UAlbion.Formats.Parsers
 {
     public class AlbionSample
     {

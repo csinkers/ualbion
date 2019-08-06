@@ -3,22 +3,46 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using UAlbion.Formats;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Tools.ImageReverser
 {
     public partial class MainFrm : Form
     {
         readonly DateTime _startTime;
-        readonly Config _config;
+        readonly AssetConfig _config;
+        readonly Timer _timer;
         TreeNode _rootNode;
+        AlbionSprite _sprite;
 
-        public MainFrm(Config config)
+        public MainFrm(AssetConfig config)
         {
             _startTime = DateTime.Now;
             _config = config;
+            _timer = new Timer { Interval = 250 };
+            _timer.Tick += OnTimerTick;
             InitializeComponent();
+        }
+
+        void OnTimerTick(object sender, EventArgs e)
+        {
+            if(_sprite?.Frames.Count > 1)
+            {
+                var frame = trackFrame.Value;
+                frame++;
+
+                var (filename, _) = CurrentObject;
+                if ((filename ?? "").Contains("MONGFX")) // Skip odd frames for monster graphics
+                    frame++;
+
+                frame = frame % _sprite.Frames.Count;
+                trackFrame.Value = frame;
+            }
+
+            Render();
         }
 
         public event EventHandler SaveClicked;
@@ -36,7 +60,7 @@ namespace UAlbion.Tools.ImageReverser
                     continue;
 
                 if (!_config.Xlds.ContainsKey(relativeDir))
-                    _config.Xlds.Add(relativeDir, new Config.Xld());
+                    _config.Xlds.Add(relativeDir, new AssetConfig.Xld());
 
                 var relative = file.Substring(exportedDir.Length + 1);
                 var xld = _config.Xlds[relativeDir];
@@ -51,15 +75,16 @@ namespace UAlbion.Tools.ImageReverser
             {
                 var a = file.Substring(palettesPath.Length + 1, 2);
                 int paletteNumber = int.Parse(a);
-                var paletteName = _config.Xlds["PALETTE0.XLD"].Objects[paletteNumber].Name;
+                var assetConfig = _config.Xlds["PALETTE0.XLD"].Assets[paletteNumber];
+                var paletteName = assetConfig.Name;
                 if (string.IsNullOrEmpty(paletteName))
                     paletteName = file.Substring(exportedDir.Length + 1);
 
                 using(var stream = File.Open(file, FileMode.Open))
                 using (var br = new BinaryReader(stream))
                 {
-                    var context = new AlbionPalette.PaletteContext(paletteNumber, commonPalette);
-                    var palette = new AlbionPalette(paletteName, br, (int) br.BaseStream.Length, context);
+                    var palette = new AlbionPalette(br, (int)br.BaseStream.Length, paletteName, paletteNumber);
+                    palette.SetCommonPalette(commonPalette);
                     listPalettes.Items.Add(palette);
                 }
             }
@@ -67,36 +92,101 @@ namespace UAlbion.Tools.ImageReverser
             listPalettes.SelectedIndex = 0;
 
             _rootNode.Expand();
+            _timer.Start();
         }
 
-        Bitmap LoadRawTexture(string filename, Config.Texture texture, int magnify)
+        IAssetLoader GetLoader(AssetConfig.Asset conf)
         {
-            var bytes = File.ReadAllBytes(filename);
+            switch (conf.Type)
+            {
+                case XldObjectType.AmorphousSprite: return new AmorphousSpriteLoader();
+                case XldObjectType.FixedSizeSprite: return new FixedSizeSpriteLoader();
 
-            if (texture.Offset > bytes.Length)
-                texture.Offset = bytes.Length;
+                case XldObjectType.SingleHeaderSprite:
+                case XldObjectType.HeaderPerSubImageSprite: return new HeaderBasedSpriteLoader();
 
-            trackOffset.Maximum = bytes.Length - 1;
-            numOffset.Maximum = trackOffset.Maximum;
-            trackOffset.LargeChange = texture.Width * 400;
+                default: throw new NotImplementedException();
+            }
+        }
 
-            int height = (bytes.Length - texture.Offset + (texture.Width - 1)) / texture.Width;
+        bool IsSprite(XldObjectType type)
+        {
+            switch (type)
+            {
+                case XldObjectType.AmorphousSprite: 
+                case XldObjectType.FixedSizeSprite:
+                case XldObjectType.SingleHeaderSprite:
+                case XldObjectType.HeaderPerSubImageSprite: return true;
+                default: return false;
+            }
+        }
+
+        AlbionSprite LoadSprite(string filename, AssetConfig.Asset conf)
+        {
+            using (var stream = File.OpenRead(filename))
+            using (var br = new BinaryReader(stream))
+            {
+                return (AlbionSprite)GetLoader(conf).Load(br, stream.Length, filename, conf);
+            }
+        }
+
+        void UpdateInfo()
+        {
+            var (filename, asset) = CurrentObject;
+            if (asset == null)
+            {
+                txtInfo.Text = "No asset selected";
+                return;
+            }
+
+            var fileInfo = new FileInfo(filename);
+            var sb = new StringBuilder();
+            sb.AppendLine($"{filename}");
+            sb.AppendLine($"File Size: {fileInfo.Length}");
+            sb.AppendLine($"XLD: {asset.Parent.Name}");
+            sb.AppendLine($"Type: {asset.Type}");
+            sb.AppendLine($"Conf Width: {asset.EffectiveWidth}");
+            sb.AppendLine($"Conf Height: {asset.EffectiveHeight}");
+
+            if (_sprite != null)
+            {
+                sb.AppendLine($"Frame Count: {_sprite.Frames.Count}");
+                sb.AppendLine($"Sprite Width: {_sprite.Width}");
+                sb.AppendLine($"Sprite Height: {_sprite.Height}");
+
+                sb.AppendLine($"Frame Width: {_sprite.Frames[trackFrame.Value].Width}");
+                sb.AppendLine($"Frame Height: {_sprite.Frames[trackFrame.Value].Height}");
+                sb.AppendLine($"Frame X: {_sprite.Frames[trackFrame.Value].X}");
+                sb.AppendLine($"Frame Y: {_sprite.Frames[trackFrame.Value].Y}");
+            }
+            txtInfo.Text = sb.ToString();
+        }
+
+        Bitmap GenerateBitmap(AlbionSprite sprite, int frameNumber, int width, int magnify, uint[] palette)
+        {
+            var frame = sprite.Frames[frameNumber];
+            var offset = frame.Y * sprite.Width;
+            int height = Math.Min(frame.Height, (sprite.PixelData.Length - offset + (width - 1)) / width);
             if (height == 0)
                 return new Bitmap(1, 1);
-
-            Bitmap bmp = new Bitmap(texture.Width * magnify, height * magnify);
+            Bitmap bmp;
+            if (canvas.Image?.Width == width * magnify && canvas.Image?.Height == height * magnify)
+            {
+                bmp = (Bitmap)canvas.Image;
+            }
+            else
+            {
+                bmp = new Bitmap(width * magnify, height * magnify);
+            }
 
             var d = bmp.LockBits(
                 new Rectangle(0, 0, bmp.Width, bmp.Height),
                 ImageLockMode.WriteOnly,
                 PixelFormat.Format24bppRgb);
 
-            var palette = (AlbionPalette)(listPalettes.SelectedItem ?? listPalettes.Items[0]);
-            var curPalette = palette.GetPaletteAtTime((int) (DateTime.Now - _startTime).TotalSeconds * 4);
-
             try
             {
-                for (int n = texture.Offset; n < bytes.Length; n++)
+                for (int n = offset; n < offset + width * height && n < sprite.PixelData.Length; n++)
                 {
                     unsafe
                     {
@@ -104,14 +194,14 @@ namespace UAlbion.Tools.ImageReverser
                         {
                             for (int mx = 0; mx < magnify; mx++)
                             {
-                                int x = magnify * ((n - texture.Offset) % texture.Width) + mx;
-                                int y = magnify * ((n - texture.Offset) / texture.Width) + my;
+                                int x = magnify * ((n - offset) % width) + mx;
+                                int y = magnify * ((n - offset) / width) + my;
                                 byte* p = (byte*)d.Scan0 + y * d.Stride + x * 3;
-                                byte color = bytes[n];
+                                byte color = sprite.PixelData[n];
 
-                                p[0] = (byte)((curPalette[color] & 0x0000ff00) >> 8);
-                                p[1] = (byte)((curPalette[color] & 0x00ff0000) >> 16);
-                                p[2] = (byte)((curPalette[color] & 0xff000000) >> 24);
+                                p[0] = (byte)((palette[color] & 0x0000ff00) >> 8);
+                                p[1] = (byte)((palette[color] & 0x00ff0000) >> 16);
+                                p[2] = (byte)((palette[color] & 0xff000000) >> 24);
                             }
                         }
                     }
@@ -122,27 +212,59 @@ namespace UAlbion.Tools.ImageReverser
             return bmp;
         }
 
-        Bitmap LoadInterlaced(string filename)
+        /*Bitmap LoadInterlaced(string filename)
         {
             var a = new FileInfo(filename);
             return new Bitmap(filename);
-        }
+        }*/
 
         void Render()
         {
             const int magnify = 3;
-            var (filename, obj) = CurrentObject;
-            if (obj is Config.Texture texture)
-            {
-                var bmp = texture.Type == "texture"
-                        ? LoadRawTexture(filename, texture, magnify)
-                        : LoadInterlaced(filename);
+            var (filename, asset) = CurrentObject;
+            if (asset == null)
+                return;
 
-                canvas.Image = bmp;
+            Bitmap bmp;
+            /*if (asset.Type == XldObjectType.InterlacedBitmap)
+            {
+                _sprite = null;
+                bmp = LoadInterlaced(filename);
             }
+            else*/ if (IsSprite(asset.Type))
+            {
+                if (filename != _sprite?.Name)
+                    _sprite = LoadSprite(filename, asset);
+
+                if (_sprite == null)
+                    return;
+
+                trackFrameCount.Maximum = _sprite.Height;
+                numFrameCount.Maximum = trackFrameCount.Maximum;
+                trackFrame.Maximum = _sprite.Frames.Count - 1;
+                numFrame.Maximum = trackFrame.Maximum;
+
+                if (trackWidth.Value == 1)
+                    trackWidth.Value = _sprite.Width;
+
+                var palette = (AlbionPalette)(listPalettes.SelectedItem ?? listPalettes.Items[0]);
+                uint[] curPalette = palette.GetPaletteAtTime((int)((DateTime.Now - _startTime).TotalSeconds * 4));
+
+                var width = Math.Max(0, trackWidth.Value);
+                var frame = Math.Max(0, trackFrame.Value);
+                bmp = GenerateBitmap(_sprite, frame, width, magnify, curPalette);
+            }
+            else
+            {
+                _sprite = null;
+                bmp = new Bitmap(1, 1);
+            }
+
+            canvas.Image = bmp;
+            UpdateInfo();
         }
 
-        void AddToTree(string location, Config.Xld xld)
+        void AddToTree(string location, AssetConfig.Xld xld)
         {
             var parts = location.Split('\\');
             TreeNode node = _rootNode;
@@ -158,18 +280,18 @@ namespace UAlbion.Tools.ImageReverser
             key = key.Substring(0, key.Length-4);
             int number = int.Parse(key);
 
-            if (!xld.Objects.ContainsKey(number)) xld.Objects[number] = new Config.Texture { Width = 32 };
-            Config.ConfigObject obj = xld.Objects[number];
+            if (!xld.Assets.ContainsKey(number)) xld.Assets[number] = new AssetConfig.Asset { Width = 32 };
+            AssetConfig.Asset obj = xld.Assets[number];
 
             string name = string.IsNullOrEmpty(obj.Name)
                 ? key
-                : $"{xld.Objects[number].Name} ({number})";
+                : $"{xld.Assets[number].Name} ({number})";
 
             if (!node.Nodes.ContainsKey(key))
                 node.Nodes.Add(key, name).Tag = obj;
         }
 
-        (string, Config.Xld) CurrentXld
+        (string, AssetConfig.Xld) CurrentXld
         {
             get
             {
@@ -195,7 +317,7 @@ namespace UAlbion.Tools.ImageReverser
             }
         }
 
-        (string, Config.ConfigObject) CurrentObject
+        (string, AssetConfig.Asset) CurrentObject
         {
             get
             {
@@ -203,32 +325,44 @@ namespace UAlbion.Tools.ImageReverser
                     return (null, null);
 
                 var (xldFilename, xld) = CurrentXld;
-                if (xld == null || !xld.Objects.ContainsKey(number))
+                if (xld == null || !xld.Assets.ContainsKey(number))
                     return (null, null);
 
                 var filename = $"{xldFilename}\\{number:00}.bin";
-                return (filename, xld.Objects[number]);
+                return (filename, xld.Assets[number]);
             }
         }
 
         void FileTree_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            var (filename, obj) = CurrentObject;
-            if (obj is Config.Texture texture)
+            var (filename, asset) = CurrentObject;
+            if (asset == null)
+                return;
+
+            trackWidth.Value = asset.EffectiveWidth == 0 ? 1 : asset.EffectiveWidth;
+            trackFrame.Value = 0;
+            textName.Text = asset.Name;
+            Render();
+
+            if (_sprite != null)
             {
-                trackWidth.Value = texture.Width;
-                trackOffset.Value = texture.Offset;
-                textName.Text = texture.Name;
-                Render();
+                trackFrameCount.Value = _sprite.Frames.Count;
+                if (asset.Type == XldObjectType.FixedSizeSprite && asset.Height != null && _sprite.Frames[0].Height != asset.Height)
+                    asset.Height = _sprite.Frames[0].Height;
             }
         }
 
-        private void TrackWidth_ValueChanged(object sender, EventArgs e)
+        #region Width
+        void TrackWidth_ValueChanged(object sender, EventArgs e)
         {
-            var (filename, obj) = CurrentObject;
-            if (obj is Config.Texture texture && texture.Width != trackWidth.Value)
+            var (filename, asset) = CurrentObject;
+            if (asset == null)
+                return;
+
+            if (!asset.Parent.Width.HasValue && asset.Type == XldObjectType.FixedSizeSprite && asset.Width != trackWidth.Value)
             {
-                texture.Width = trackWidth.Value;
+                asset.Width = trackWidth.Value;
+                _sprite = null; // Force sprite reload
                 Render();
             }
 
@@ -236,54 +370,7 @@ namespace UAlbion.Tools.ImageReverser
                 numWidth.Value = trackWidth.Value;
         }
 
-        private void NumWidth_ValueChanged(object sender, EventArgs e)
-        {
-            if (sender != trackWidth && trackWidth.Value != (int)numWidth.Value)
-                trackWidth.Value = (int)numWidth.Value;
-        }
-
-        private void TextName_TextChanged(object sender, EventArgs e)
-        {
-            var (filename, obj) = CurrentObject;
-            if (obj is Config.Texture texture)
-                texture.Name = textName.Text;
-        }
-
-        private void TrackOffset_ValueChanged(object sender, EventArgs e)
-        {
-            var (filename, obj) = CurrentObject;
-            if (obj is Config.Texture texture && texture.Offset != trackOffset.Value)
-            {
-                texture.Offset = trackOffset.Value;
-                Render();
-            }
-
-            if (sender != numOffset && (int)numOffset.Value != trackOffset.Value)
-                numOffset.Value = trackOffset.Value;
-        }
-
-        private void NumOffset_ValueChanged(object sender, EventArgs e)
-        {
-            if (sender != trackOffset && trackOffset.Value != (int)numOffset.Value)
-                trackOffset.Value = (int)numOffset.Value;
-        }
-
-        private void BtnSave_Click(object sender, EventArgs e)
-        {
-            SaveClicked?.Invoke(this, EventArgs.Empty);
-        }
-
-        private void NumWidth_Enter(object sender, EventArgs e)
-        {
-            numWidth.Select(0, numWidth.Text.Length);
-        }
-
-        private void ListPalettes_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            Render();
-        }
-
-        private void TrackWidth_KeyDown(object sender, KeyEventArgs e)
+        void TrackWidth_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Control && e.KeyCode == Keys.Left && trackWidth.Value != 0)
             {
@@ -298,6 +385,87 @@ namespace UAlbion.Tools.ImageReverser
                     newValue = trackWidth.Maximum;
                 trackWidth.Value = newValue;
                 e.Handled = true;
+            }
+        }
+
+        void NumWidth_ValueChanged(object sender, EventArgs e)
+        {
+            if (sender != trackWidth && trackWidth.Value != (int)numWidth.Value)
+                trackWidth.Value = (int)numWidth.Value;
+        }
+
+        void NumWidth_Enter(object sender, EventArgs e)
+        {
+            numWidth.Select(0, numWidth.Text.Length);
+        }
+
+        #endregion
+
+        void TextName_TextChanged(object sender, EventArgs e)
+        {
+            var (filename, asset) = CurrentObject;
+            if(asset != null)
+                asset.Name = textName.Text;
+        }
+
+        void TrackFrameCount_ValueChanged(object sender, EventArgs e)
+        {
+            var (filename, asset) = CurrentObject;
+            if (_sprite != null)
+            {
+                int? newHeight = trackFrameCount.Value <= 1 ? (int?)null : _sprite.Height / trackFrameCount.Value;
+                if (asset != null && !asset.Parent.Height.HasValue && asset.Type == XldObjectType.FixedSizeSprite && asset.Height != newHeight)
+                {
+                    asset.Height = newHeight;
+                    _sprite = null; // Force sprite reload
+                    Render();
+                }
+            }
+
+            if (sender != numFrameCount && (int)numFrameCount.Value != trackFrameCount.Value)
+                numFrameCount.Value = trackFrameCount.Value;
+        }
+
+        void NumFrameCount_ValueChanged(object sender, EventArgs e)
+        {
+            if (sender != trackFrameCount && trackFrameCount.Value != (int)numFrameCount.Value)
+                trackFrameCount.Value = (int)numFrameCount.Value;
+        }
+
+        void TrackFrame_ValueChanged(object sender, EventArgs e)
+        {
+            Render();
+            if (sender != numFrame && (int)numFrame.Value != trackFrame.Value)
+                numFrame.Value = trackFrame.Value;
+        }
+
+        void NumFrame_ValueChanged(object sender, EventArgs e)
+        {
+            if (sender != trackFrame && trackFrame.Value != (int)numFrame.Value)
+                trackFrame.Value = (int)numFrame.Value;
+        }
+
+        void BtnSave_Click(object sender, EventArgs e)
+        {
+            SaveClicked?.Invoke(this, EventArgs.Empty);
+        }
+
+        void ListPalettes_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Render();
+        }
+
+        void ChkAnimate_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkAnimate.Checked) _timer.Start();
+            else _timer.Stop();
+        }
+
+        private void FileTree_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.X && _sprite != null)
+            {
+                trackWidth.Value = _sprite.Frames[0].Height;
             }
         }
     }

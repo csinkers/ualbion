@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UAlbion.Core;
 using UAlbion.Formats;
+using UAlbion.Formats.Parsers;
 using UAlbion.Game.AssetIds;
 
 namespace UAlbion.Game

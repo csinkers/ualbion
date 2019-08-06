@@ -27,7 +27,7 @@ namespace GenerateEnums
         static void Main()
         {
             var baseDir = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Parent.Parent.Parent.Parent.FullName;
-            Config config = Config.Load(baseDir);
+            AssetConfig config = AssetConfig.Load(baseDir);
             var outpathPath = Path.Combine(baseDir, @"UAlbion.Game\AssetIds");
             var xldPattern = new Regex(@"([0-9]+).XLD$");
 
@@ -46,7 +46,7 @@ namespace GenerateEnums
                     enums[xld.Value.EnumName] = new EnumData { Name = xld.Value.EnumName };
                 var e = enums[xld.Value.EnumName];
 
-                foreach (var o in xld.Value.Objects)
+                foreach (var o in xld.Value.Assets)
                 {
                     var id = offset + o.Key;
                     e.Entries.Add(string.IsNullOrEmpty(o.Value.Name)

@@ -1,0 +1,9794 @@
+{
+  "XldPath": "albion_sr\\cd\\XLDLIBS",
+  "ExportedXldPath": "exported",
+  "Xlds": {
+    "3DBCKGR0.XLD": {
+      "EnumName": "DungeonBackgroundId",
+      "Type": "SingleHeaderSprite",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "FirstImage",
+          "Width": 245
+        },
+        "1": {
+          "Name": "",
+          "Width": 256
+        },
+        "2": {
+          "Width": 256
+        },
+        "3": {}
+      }
+    },
+    "3DFLOOR0.XLD": {
+      "EnumName": "DungeonFloorId",
+      "Type": "FixedSizeSprite",
+      "Width": 64,
+      "Height": 64,
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "Brick"
+        },
+        "1": {
+          "Name": "MossyBrick"
+        },
+        "2": {
+          "Name": "Water"
+        },
+        "3": {
+          "Name": "MossyBrickEdge"
+        },
+        "4": {
+          "Name": "MossyBrickEdge"
+        },
+        "5": {
+          "Name": "MossyBrickEdge"
+        },
+        "6": {
+          "Name": "MossyBrickEdge"
+        },
+        "7": {
+          "Name": "MossyBrickEdge"
+        },
+        "8": {
+          "Name": "MossyBrickEdge"
+        },
+        "9": {
+          "Name": "MossyBrickEdge"
+        },
+        "10": {
+          "Name": "MossyBrickEdge"
+        },
+        "11": {
+          "Name": "MossyBrickEdge"
+        },
+        "12": {
+          "Name": "MossyBrickEdge"
+        },
+        "13": {
+          "Name": "MossyBrickEdge"
+        },
+        "14": {
+          "Name": "MossyBrickEdge"
+        },
+        "15": {
+          "Name": "WatersEdge"
+        },
+        "16": {
+          "Name": "WatersEdge"
+        },
+        "17": {
+          "Name": "WatersEdge"
+        },
+        "18": {
+          "Name": "WatersEdge"
+        },
+        "19": {
+          "Name": "WatersEdge"
+        },
+        "20": {
+          "Name": "WatersEdge"
+        },
+        "21": {
+          "Name": "WatersEdge"
+        },
+        "22": {
+          "Name": "WatersEdge"
+        },
+        "23": {
+          "Name": "WatersEdge"
+        },
+        "24": {
+          "Name": "WatersEdge"
+        },
+        "25": {
+          "Name": "WatersEdge"
+        },
+        "26": {
+          "Name": "WatersEdge"
+        },
+        "27": {
+          "Name": "WoodPanel"
+        },
+        "28": {
+          "Name": "WoodPanel"
+        },
+        "29": {
+          "Name": "StonePanel"
+        },
+        "30": {
+          "Name": "Moss"
+        },
+        "31": {
+          "Name": ""
+        },
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {
+          "Name": ""
+        },
+        "51": {
+          "Name": "Wood"
+        },
+        "52": {
+          "Name": ""
+        },
+        "53": {
+          "Name": ""
+        },
+        "54": {
+          "Name": "Wood"
+        },
+        "55": {
+          "Name": "Wood"
+        },
+        "56": {
+          "Name": "CrackedMud"
+        },
+        "57": {
+          "Name": "Cobble"
+        },
+        "58": {
+          "Name": ""
+        },
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {
+          "Name": ""
+        },
+        "64": {
+          "Name": "ThrobbingPlantWall"
+        },
+        "65": {
+          "Name": "ThrobbingPlantWall"
+        },
+        "66": {
+          "Name": "Maw"
+        },
+        "67": {
+          "Name": "Maw"
+        },
+        "68": {
+          "Name": "Maw"
+        },
+        "69": {
+          "Name": "Maw"
+        },
+        "70": {
+          "Name": "MawShut"
+        },
+        "71": {
+          "Name": "MawShut"
+        },
+        "72": {
+          "Name": "MawShut"
+        },
+        "73": {
+          "Name": "MawShut"
+        },
+        "74": {
+          "Name": "MiniMaw"
+        },
+        "75": {
+          "Name": ""
+        },
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {}
+      }
+    },
+    "3DFLOOR1.XLD": {
+      "EnumName": "DungeonFloorId",
+      "Type": "FixedSizeSprite",
+      "Width": 64,
+      "Height": 64,
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": ""
+        },
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {
+          "Name": "PressurePlate"
+        },
+        "66": {
+          "Name": "PressurePlate"
+        },
+        "67": {
+          "Name": "PressurePlate"
+        },
+        "68": {
+          "Name": "PressurePlate"
+        },
+        "69": {
+          "Name": "PressurePlate"
+        },
+        "70": {
+          "Name": "PressurePlate"
+        },
+        "71": {
+          "Name": "PressurePlate"
+        },
+        "72": {
+          "Name": "PressurePlate"
+        },
+        "73": {
+          "Name": "PressurePlate"
+        },
+        "74": {
+          "Name": "PressurePlate"
+        },
+        "75": {
+          "Name": "PressurePlate"
+        },
+        "76": {
+          "Name": "PressurePlate"
+        },
+        "77": {
+          "Name": "PressurePlate"
+        },
+        "78": {
+          "Name": "PressurePlate"
+        },
+        "79": {
+          "Name": "PressurePlate"
+        },
+        "80": {
+          "Name": "PressurePlate"
+        },
+        "81": {
+          "Name": "PressurePlate"
+        },
+        "82": {
+          "Name": "PressurePlate"
+        },
+        "83": {
+          "Name": "PressurePlate"
+        },
+        "84": {
+          "Name": "PressurePlate"
+        },
+        "85": {
+          "Name": "PressurePlate"
+        },
+        "86": {
+          "Name": "PressurePlate"
+        },
+        "87": {
+          "Name": ""
+        },
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "3DFLOOR2.XLD": {
+      "EnumName": "DungeonFloorId",
+      "Type": "FixedSizeSprite",
+      "Width": 64,
+      "Height": 64,
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "3DOBJEC0.XLD": {
+      "EnumName": "DungeonObjectId",
+      "Type": "FixedSizeSprite",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "",
+          "Width": 32
+        },
+        "1": {
+          "Name": "Pylon",
+          "Width": 16
+        },
+        "2": {
+          "Name": "PhallicGrowth",
+          "Width": 64
+        },
+        "3": {
+          "Name": "Plant",
+          "Width": 31
+        },
+        "4": {
+          "Name": "Plant",
+          "Width": 31
+        },
+        "5": {
+          "Name": "Bush",
+          "Width": 61
+        },
+        "6": {
+          "Name": "Bush",
+          "Width": 61
+        },
+        "7": {
+          "Name": "Plant",
+          "Width": 36
+        },
+        "8": {
+          "Name": "Plant",
+          "Width": 25
+        },
+        "9": {
+          "Name": "Plant",
+          "Width": 23
+        },
+        "10": {
+          "Name": "Plant",
+          "Width": 27
+        },
+        "11": {
+          "Name": "Tree",
+          "Width": 66
+        },
+        "12": {
+          "Name": "Tree",
+          "Width": 63
+        },
+        "13": {
+          "Name": "Tree",
+          "Width": 74
+        },
+        "14": {
+          "Name": "Tree",
+          "Width": 39
+        },
+        "15": {
+          "Name": "TreePillar",
+          "Width": 63
+        },
+        "16": {
+          "Name": "Tree",
+          "Width": 66
+        },
+        "17": {
+          "Name": "Dome",
+          "Width": 119
+        },
+        "18": {
+          "Name": "Dome",
+          "Width": 60
+        },
+        "19": {
+          "Name": "Fountain",
+          "Width": 89
+        },
+        "20": {
+          "Name": "Plant",
+          "Width": 20
+        },
+        "21": {
+          "Name": "Plant",
+          "Width": 19
+        },
+        "22": {
+          "Name": "Plant",
+          "Width": 19
+        },
+        "23": {
+          "Name": "Plant",
+          "Width": 15
+        },
+        "24": {
+          "Name": "Plant",
+          "Width": 24
+        },
+        "25": {
+          "Name": "Plant",
+          "Width": 17
+        },
+        "26": {
+          "Name": "Iskai",
+          "Width": 50,
+          "Height": 128
+        },
+        "27": {
+          "Name": "Iskai",
+          "Width": 51,
+          "Height": 129
+        },
+        "28": {
+          "Name": "Iskai",
+          "Width": 51,
+          "Height": 129
+        },
+        "29": {
+          "Name": "Iskai",
+          "Width": 42,
+          "Height": 111
+        },
+        "30": {
+          "Name": "Iskai",
+          "Width": 42,
+          "Height": 111
+        },
+        "31": {
+          "Name": "Iskai",
+          "Width": 50,
+          "Height": 129
+        },
+        "32": {
+          "Name": "Iskai",
+          "Width": 51,
+          "Height": 130
+        },
+        "33": {
+          "Name": "Iskai",
+          "Width": 51,
+          "Height": 129
+        },
+        "34": {
+          "Name": "Iskai",
+          "Width": 50
+        },
+        "35": {
+          "Name": "Iskai",
+          "Width": 51
+        },
+        "36": {
+          "Name": "Iskai",
+          "Width": 51
+        },
+        "37": {
+          "Name": "Iskai",
+          "Width": 42
+        },
+        "38": {
+          "Name": "Iskai",
+          "Width": 42
+        },
+        "39": {
+          "Name": "Iskai",
+          "Width": 50
+        },
+        "40": {
+          "Name": "Iskai",
+          "Width": 51
+        },
+        "41": {
+          "Name": "Iskai",
+          "Width": 51
+        },
+        "42": {
+          "Name": "Lamp",
+          "Width": 32
+        },
+        "43": {
+          "Name": "",
+          "Width": 26
+        },
+        "44": {
+          "Width": 52
+        },
+        "45": {
+          "Name": "Pedestal",
+          "Width": 152
+        },
+        "46": {
+          "Name": "Pedestal",
+          "Width": 81
+        },
+        "47": {
+          "Name": "Fountain",
+          "Width": 116
+        },
+        "48": {
+          "Name": "PlantColumn",
+          "Width": 57
+        },
+        "49": {
+          "Name": "Barrel",
+          "Width": 96
+        },
+        "50": {
+          "Name": "Chest",
+          "Width": 123
+        },
+        "51": {
+          "Name": "Vase",
+          "Width": 81
+        },
+        "52": {
+          "Name": "PhallicGrowth",
+          "Width": 53
+        },
+        "53": {
+          "Name": "PhallicGrowth",
+          "Width": 57,
+          "Height": 135
+        },
+        "54": {
+          "Name": "Nodule",
+          "Width": 28,
+          "Height": 24
+        },
+        "55": {
+          "Name": "Nodule",
+          "Width": 28,
+          "Height": 24
+        },
+        "56": {
+          "Name": "Tentacle",
+          "Width": 32,
+          "Height": 52
+        },
+        "57": {
+          "Name": "Tentacle",
+          "Width": 21,
+          "Height": 49
+        },
+        "58": {
+          "Name": "Tentacle",
+          "Width": 25,
+          "Height": 40
+        },
+        "59": {
+          "Name": "Tentacle",
+          "Width": 25,
+          "Height": 40
+        },
+        "60": {
+          "Name": "Tentacle",
+          "Width": 21,
+          "Height": 48
+        },
+        "61": {
+          "Name": "Tentacle",
+          "Width": 32,
+          "Height": 52
+        },
+        "62": {
+          "Name": "PhallicGrowth",
+          "Width": 43
+        },
+        "63": {
+          "Name": "PhallicGrowth",
+          "Width": 39
+        },
+        "64": {
+          "Name": "PhallicGrowth",
+          "Width": 53
+        },
+        "65": {
+          "Name": "PhallicGrowth",
+          "Width": 43
+        },
+        "66": {
+          "Name": "PhallicGrowth",
+          "Width": 39
+        },
+        "67": {
+          "Name": "Plant",
+          "Width": 42
+        },
+        "68": {
+          "Name": "Plant",
+          "Width": 42
+        },
+        "69": {
+          "Name": "Plant",
+          "Width": 26
+        },
+        "70": {
+          "Name": "Nodule",
+          "Width": 63
+        },
+        "71": {
+          "Name": "Plant",
+          "Width": 26
+        },
+        "72": {
+          "Name": "Plant",
+          "Width": 17
+        },
+        "73": {
+          "Name": "PotatoThing",
+          "Width": 26
+        },
+        "74": {
+          "Name": "PotatoThing",
+          "Width": 31
+        },
+        "75": {
+          "Name": "PotatoThing",
+          "Width": 20
+        },
+        "76": {
+          "Name": "PotatoThing",
+          "Width": 19
+        },
+        "77": {
+          "Name": "",
+          "Width": 54
+        },
+        "78": {
+          "Width": 33
+        },
+        "79": {
+          "Width": 54
+        },
+        "80": {
+          "Name": "",
+          "Width": 33
+        },
+        "81": {
+          "Name": "DogFly",
+          "Width": 100,
+          "Height": 58
+        },
+        "82": {
+          "Name": "GraspingTrap",
+          "Width": 116,
+          "Height": 104
+        },
+        "83": {
+          "Name": "PhallicGrowth",
+          "Width": 53
+        },
+        "84": {
+          "Name": "PhallicGrowth",
+          "Width": 53
+        },
+        "85": {
+          "Name": "Skybox",
+          "Width": 106
+        },
+        "86": {
+          "Name": "Skybox",
+          "Width": 106
+        },
+        "87": {
+          "Name": "DiscoPlant",
+          "Width": 78
+        },
+        "88": {
+          "Name": "DiscPlant",
+          "Width": 78
+        },
+        "89": {
+          "Name": "ScuttleBush",
+          "Width": 87
+        },
+        "90": {
+          "Name": "ScuttleBush",
+          "Width": 87,
+          "Height": 88
+        },
+        "91": {
+          "Name": "JellySpirit",
+          "Width": 100,
+          "Height": 176
+        },
+        "92": {
+          "Name": "Plant",
+          "Width": 47
+        },
+        "93": {
+          "Name": "Plant",
+          "Width": 39
+        },
+        "94": {
+          "Name": "Plant",
+          "Width": 51
+        },
+        "95": {
+          "Name": "Plant",
+          "Width": 48
+        },
+        "96": {
+          "Name": "Plant",
+          "Width": 34
+        },
+        "97": {
+          "Name": "Plant",
+          "Width": 40
+        },
+        "98": {
+          "Name": "TorchPedestal",
+          "Width": 24,
+          "Height": 77
+        }
+      }
+    },
+    "3DOBJEC1.XLD": {
+      "EnumName": "DungeonObjectId",
+      "Type": "FixedSizeSprite",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "TorchPedestal",
+          "Width": 24,
+          "Height": 69
+        },
+        "1": {
+          "Name": "TorchPedestal",
+          "Width": 35,
+          "Height": 81
+        },
+        "2": {
+          "Name": "Column",
+          "Width": 74
+        },
+        "3": {
+          "Name": "Column",
+          "Width": 74
+        },
+        "4": {
+          "Name": "Column",
+          "Width": 74
+        },
+        "5": {
+          "Name": "Column",
+          "Width": 74
+        },
+        "6": {
+          "Name": "Column",
+          "Width": 24
+        },
+        "7": {
+          "Name": "Column",
+          "Width": 79
+        },
+        "8": {
+          "Name": "Column",
+          "Width": 79
+        },
+        "9": {
+          "Name": "GlowingColumn",
+          "Width": 79,
+          "Height": 177
+        },
+        "10": {
+          "Name": "GlowingColumn",
+          "Width": 79,
+          "Height": 177
+        },
+        "11": {
+          "Name": "Column",
+          "Width": 24
+        },
+        "12": {
+          "Name": "Column",
+          "Width": 24
+        },
+        "13": {
+          "Name": "PlantGrowth",
+          "Width": 64
+        },
+        "14": {
+          "Name": "Dome",
+          "Width": 119
+        },
+        "15": {
+          "Name": "Banner",
+          "Width": 90
+        },
+        "16": {
+          "Name": "Banner",
+          "Width": 89
+        },
+        "17": {
+          "Name": "Stone",
+          "Width": 35
+        },
+        "18": {
+          "Name": "Stone",
+          "Width": 31
+        },
+        "19": {
+          "Name": "Stone",
+          "Width": 33
+        },
+        "20": {
+          "Name": "Stone",
+          "Width": 36
+        },
+        "21": {
+          "Name": "Stone",
+          "Width": 33
+        },
+        "22": {
+          "Name": "Stone",
+          "Width": 31
+        },
+        "23": {
+          "Name": "Column",
+          "Width": 46
+        },
+        "24": {
+          "Name": "Vines",
+          "Width": 22
+        },
+        "25": {
+          "Name": "Vines",
+          "Width": 16
+        },
+        "26": {
+          "Name": "Vines",
+          "Width": 16
+        },
+        "27": {
+          "Name": "Vines",
+          "Width": 23
+        },
+        "28": {
+          "Name": "Stone",
+          "Width": 24
+        },
+        "29": {
+          "Name": "Stone",
+          "Width": 18
+        },
+        "30": {
+          "Name": "Stone",
+          "Width": 14
+        },
+        "31": {
+          "Name": "Stone",
+          "Width": 24
+        },
+        "32": {
+          "Name": "PotatoThing",
+          "Width": 31
+        },
+        "33": {
+          "Name": "PotatoThing",
+          "Width": 26
+        },
+        "34": {
+          "Name": "PotatoThing",
+          "Width": 19
+        },
+        "35": {
+          "Name": "PotatoThing",
+          "Width": 20
+        },
+        "36": {
+          "Name": "PotatoThing",
+          "Width": 14
+        },
+        "37": {
+          "Name": "PotatoThing",
+          "Width": 10
+        },
+        "38": {
+          "Name": "PotatoThing",
+          "Width": 67
+        },
+        "39": {
+          "Name": "PotatoThing",
+          "Width": 54
+        },
+        "40": {
+          "Name": "PotatoThing",
+          "Width": 33
+        },
+        "41": {
+          "Name": "Stone",
+          "Width": 18
+        },
+        "42": {
+          "Name": "Stone",
+          "Width": 21
+        },
+        "43": {
+          "Name": "Stone",
+          "Width": 20
+        },
+        "44": {
+          "Name": "Stone",
+          "Width": 19
+        },
+        "45": {
+          "Name": "Stone",
+          "Width": 21
+        },
+        "46": {
+          "Name": "Stalactite",
+          "Width": 42
+        },
+        "47": {
+          "Name": "Stalactite",
+          "Width": 31
+        },
+        "48": {
+          "Name": "Stalagmite",
+          "Width": 57
+        },
+        "49": {
+          "Name": "Stalagmite",
+          "Width": 50
+        },
+        "50": {
+          "Name": "Stalagmite",
+          "Width": 44
+        },
+        "51": {
+          "Name": "Stalagmite",
+          "Width": 31
+        },
+        "52": {
+          "Name": "Stalagmite",
+          "Width": 33
+        },
+        "53": {
+          "Name": "ShyBush",
+          "Width": 66,
+          "Height": 74
+        },
+        "54": {
+          "Name": "ShyBush",
+          "Width": 67,
+          "Height": 94
+        },
+        "55": {
+          "Name": "ShyBush",
+          "Width": 40,
+          "Height": 58
+        },
+        "56": {
+          "Name": "ShyBush",
+          "Width": 33,
+          "Height": 48
+        },
+        "57": {
+          "Name": "Stalagmactite",
+          "Width": 64
+        },
+        "58": {
+          "Name": "Stalagmactite",
+          "Width": 64
+        },
+        "59": {
+          "Name": "Stalagmite",
+          "Width": 63
+        },
+        "60": {
+          "Name": "Sign",
+          "Width": 58
+        },
+        "61": {
+          "Name": "Fountain",
+          "Width": 141,
+          "Height": 79
+        },
+        "62": {
+          "Name": "PlantColumn",
+          "Width": 75
+        },
+        "63": {
+          "Name": "Vase",
+          "Width": 75
+        },
+        "64": {
+          "Name": "Vase",
+          "Width": 92
+        },
+        "65": {
+          "Name": "",
+          "Width": 53
+        },
+        "66": {
+          "Name": "Plant",
+          "Width": 99
+        },
+        "67": {
+          "Name": "Tree",
+          "Width": 66
+        },
+        "68": {
+          "Name": "Lamp",
+          "Width": 51
+        },
+        "69": {
+          "Name": "Lamp",
+          "Width": 51
+        },
+        "70": {
+          "Name": "Lamp",
+          "Width": 51
+        },
+        "71": {
+          "Name": "Post",
+          "Width": 23
+        },
+        "72": {
+          "Name": "Post",
+          "Width": 23
+        },
+        "73": {
+          "Name": "Lantern",
+          "Width": 60
+        },
+        "74": {
+          "Name": "Lantern",
+          "Width": 60
+        },
+        "75": {
+          "Name": "Cauldron",
+          "Width": 98
+        },
+        "76": {
+          "Name": "Cauldron",
+          "Width": 98
+        },
+        "77": {
+          "Name": "Barrel",
+          "Width": 85
+        },
+        "78": {
+          "Name": "Barrel",
+          "Width": 56
+        },
+        "79": {
+          "Name": "BrokenBarrel",
+          "Width": 56
+        },
+        "80": {
+          "Name": "RuneStone",
+          "Width": 48
+        },
+        "81": {
+          "Name": "Table",
+          "Width": 126
+        },
+        "82": {
+          "Name": "Table",
+          "Width": 126
+        },
+        "83": {
+          "Name": "Stool",
+          "Width": 62
+        },
+        "84": {
+          "Name": "Vase",
+          "Width": 81
+        },
+        "85": {
+          "Name": "Vase",
+          "Width": 78
+        },
+        "86": {
+          "Name": "Pulley",
+          "Width": 37
+        },
+        "87": {
+          "Name": "Vase",
+          "Width": 65
+        },
+        "88": {
+          "Name": "Vase",
+          "Width": 65
+        },
+        "89": {
+          "Name": "Capstan",
+          "Width": 139
+        },
+        "90": {
+          "Name": "Ship",
+          "Width": 255
+        },
+        "91": {
+          "Name": "Bush",
+          "Width": 61
+        },
+        "92": {
+          "Name": "Bush",
+          "Width": 61
+        },
+        "93": {
+          "Name": "Plant",
+          "Width": 23
+        },
+        "94": {
+          "Name": "Plant",
+          "Width": 27
+        },
+        "95": {
+          "Name": "Tree",
+          "Width": 63
+        },
+        "96": {
+          "Name": "Tree",
+          "Width": 74
+        },
+        "97": {
+          "Name": "Plant",
+          "Width": 25
+        },
+        "98": {
+          "Name": "Plant",
+          "Width": 36
+        },
+        "99": {
+          "Name": "Stalactite",
+          "Width": 42
+        }
+      }
+    },
+    "3DOBJEC2.XLD": {
+      "EnumName": "DungeonObjectId",
+      "Type": "FixedSizeSprite",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "Stalagmite",
+          "Width": 57
+        },
+        "1": {
+          "Name": "Skeleton",
+          "Width": 48
+        },
+        "2": {
+          "Name": "Skeleton",
+          "Width": 32
+        },
+        "3": {
+          "Name": "Stone",
+          "Width": 18
+        },
+        "4": {
+          "Name": "Stone",
+          "Width": 21
+        },
+        "5": {
+          "Name": "Minerals",
+          "Width": 67
+        },
+        "6": {
+          "Name": "Minerals",
+          "Width": 68
+        },
+        "7": {
+          "Name": "Minerals",
+          "Width": 50
+        },
+        "8": {
+          "Name": "Minerals",
+          "Width": 28
+        },
+        "9": {
+          "Name": "Minerals",
+          "Width": 25
+        },
+        "10": {
+          "Name": "Minerals",
+          "Width": 21
+        },
+        "11": {
+          "Name": "Minerals",
+          "Width": 15
+        },
+        "12": {
+          "Name": "ScrapMetal",
+          "Width": 106
+        },
+        "13": {
+          "Name": "ScrapMetal",
+          "Width": 140
+        },
+        "14": {
+          "Name": "ScrapMetal",
+          "Width": 100
+        },
+        "15": {
+          "Name": "Barrel",
+          "Width": 96
+        },
+        "16": {
+          "Name": "Barrel",
+          "Width": 56
+        },
+        "17": {
+          "Name": "Pot",
+          "Width": 63
+        },
+        "18": {
+          "Name": "Pot",
+          "Width": 63
+        },
+        "19": {
+          "Name": "Pot",
+          "Width": 63
+        },
+        "20": {
+          "Name": "Chest",
+          "Width": 65
+        },
+        "21": {
+          "Name": "Staircase",
+          "Width": 122
+        },
+        "22": {
+          "Name": "Rock",
+          "Width": 38
+        },
+        "23": {
+          "Name": "Rock",
+          "Width": 57
+        },
+        "24": {
+          "Name": "",
+          "Width": 33
+        },
+        "25": {
+          "Width": 42
+        },
+        "26": {
+          "Width": 30
+        },
+        "27": {
+          "Name": "Rock",
+          "Width": 17
+        },
+        "28": {
+          "Name": "Rock",
+          "Width": 12
+        },
+        "29": {
+          "Name": "Rock",
+          "Width": 16
+        },
+        "30": {
+          "Name": "Rock",
+          "Width": 8
+        },
+        "31": {
+          "Name": "Rock",
+          "Width": 7
+        },
+        "32": {
+          "Name": "RubbishPile",
+          "Width": 68
+        },
+        "33": {
+          "Name": "RubbishPile",
+          "Width": 71
+        },
+        "34": {
+          "Name": "RubbishPile",
+          "Width": 85
+        },
+        "35": {
+          "Name": "Iskai",
+          "Width": 51,
+          "Height": 130
+        },
+        "36": {
+          "Name": "Iskai",
+          "Width": 51,
+          "Height": 128
+        },
+        "37": {
+          "Name": "Iskai",
+          "Width": 50,
+          "Height": 128
+        },
+        "38": {
+          "Name": "Iskai",
+          "Width": 50,
+          "Height": 128
+        },
+        "39": {
+          "Name": "Fireball",
+          "Width": 56,
+          "Height": 56
+        },
+        "40": {
+          "Name": "Flames",
+          "Width": 27,
+          "Height": 65
+        },
+        "41": {
+          "Name": "Shield",
+          "Width": 55
+        },
+        "42": {
+          "Name": "Shield",
+          "Width": 55
+        },
+        "43": {
+          "Name": "Grate",
+          "Width": 55
+        },
+        "44": {
+          "Name": "Sparkly",
+          "Width": 100,
+          "Height": 100
+        },
+        "45": {
+          "Name": "",
+          "Width": 64
+        },
+        "46": {
+          "Width": 64
+        },
+        "47": {
+          "Width": 10
+        },
+        "48": {
+          "Name": "Robot",
+          "Width": 63,
+          "Height": 101
+        },
+        "49": {
+          "Name": "Ladder",
+          "Width": 31
+        },
+        "50": {
+          "Name": "LampPlant",
+          "Width": 39
+        },
+        "51": {
+          "Name": "PlantColumn",
+          "Width": 63
+        },
+        "52": {
+          "Name": "Dome",
+          "Width": 60
+        },
+        "53": {
+          "Name": "Dome",
+          "Width": 119
+        },
+        "54": {
+          "Name": "Fountain",
+          "Width": 89
+        },
+        "55": {
+          "Name": "Column",
+          "Width": 66
+        },
+        "56": {
+          "Name": "Iskai",
+          "Width": 42,
+          "Height": 110
+        },
+        "57": {
+          "Name": "Iskai",
+          "Width": 51,
+          "Height": 129
+        },
+        "58": {
+          "Name": "Iskai",
+          "Width": 51,
+          "Height": 129
+        },
+        "59": {
+          "Name": "Iskai",
+          "Width": 50,
+          "Height": 128
+        },
+        "60": {
+          "Name": "Iskai",
+          "Width": 50,
+          "Height": 128
+        },
+        "61": {
+          "Name": "Lamp",
+          "Width": 32
+        },
+        "62": {
+          "Name": "",
+          "Width": 26
+        },
+        "63": {
+          "Width": 26
+        },
+        "64": {
+          "Name": "Celt",
+          "Width": 56,
+          "Height": 129
+        },
+        "65": {
+          "Name": "Celt",
+          "Width": 56,
+          "Height": 125
+        },
+        "66": {
+          "Name": "Celt",
+          "Width": 55,
+          "Height": 128
+        },
+        "67": {
+          "Name": "Celt",
+          "Width": 56,
+          "Height": 124
+        },
+        "68": {
+          "Name": "FatCelt",
+          "Width": 73,
+          "Height": 130
+        },
+        "69": {
+          "Name": "Celt",
+          "Width": 60,
+          "Height": 108
+        },
+        "70": {
+          "Name": "Celt",
+          "Width": 60,
+          "Height": 108
+        },
+        "71": {
+          "Name": "Celt",
+          "Width": 45,
+          "Height": 140
+        },
+        "72": {
+          "Name": "BeardyCelt",
+          "Width": 53,
+          "Height": 140
+        },
+        "73": {
+          "Name": "Celt",
+          "Width": 47,
+          "Height": 102
+        },
+        "74": {
+          "Name": "Celt",
+          "Width": 47,
+          "Height": 102
+        },
+        "75": {
+          "Name": "Pillar",
+          "Width": 61
+        },
+        "76": {
+          "Name": "BrokenRobot",
+          "Width": 64
+        },
+        "77": {
+          "Name": "",
+          "Width": 26
+        },
+        "78": {
+          "Name": "WaterPool",
+          "Width": 64
+        },
+        "79": {
+          "Name": "EmptyWaterPool",
+          "Width": 64
+        },
+        "80": {
+          "Name": "",
+          "Width": 64
+        },
+        "81": {
+          "Name": "Krondiir",
+          "Width": 145,
+          "Height": 164
+        },
+        "82": {
+          "Name": "Lever",
+          "Width": 66
+        },
+        "83": {
+          "Name": "Lever",
+          "Width": 66
+        },
+        "84": {
+          "Name": "",
+          "Width": 64
+        },
+        "85": {
+          "Width": 64
+        },
+        "86": {
+          "Name": "Flames",
+          "Width": 27,
+          "Height": 73
+        },
+        "87": {
+          "Name": "Flames",
+          "Width": 27,
+          "Height": 73
+        },
+        "88": {
+          "Name": "GrabbyTrap",
+          "Width": 116
+        },
+        "89": {
+          "Name": "Krondiir",
+          "Width": 145,
+          "Height": 164
+        },
+        "90": {
+          "Name": "EvilKangaroo",
+          "Width": 81,
+          "Height": 118
+        },
+        "91": {
+          "Name": "Fireball",
+          "Width": 56,
+          "Height": 55
+        },
+        "92": {
+          "Name": "IllManneredMoleRat",
+          "Width": 85,
+          "Height": 122
+        },
+        "93": {
+          "Name": "EvilKangaroo",
+          "Width": 81,
+          "Height": 119
+        },
+        "94": {
+          "Name": "Krondiir",
+          "Width": 155,
+          "Height": 172
+        },
+        "95": {
+          "Name": "PeskyWasp",
+          "Width": 165,
+          "Height": 146
+        },
+        "96": {
+          "Name": "FirePillar",
+          "Width": 24,
+          "Height": 77
+        },
+        "97": {
+          "Name": "FirePillar",
+          "Width": 24,
+          "Height": 70
+        },
+        "98": {
+          "Name": "Iskai",
+          "Width": 51,
+          "Height": 130
+        },
+        "99": {
+          "Name": "Celt",
+          "Width": 56,
+          "Height": 128
+        }
+      }
+    },
+    "3DOBJEC3.XLD": {
+      "EnumName": "DungeonObjectId",
+      "Type": "FixedSizeSprite",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "Celt",
+          "Width": 56,
+          "Height": 125
+        },
+        "1": {
+          "Name": "BeardyCelt",
+          "Width": 53,
+          "Height": 141
+        },
+        "2": {
+          "Name": "Demon",
+          "Width": 129,
+          "Height": 164
+        },
+        "3": {
+          "Name": "PeskyWasp",
+          "Width": 165,
+          "Height": 147
+        },
+        "4": {
+          "Name": "PeskyWasp",
+          "Width": 165,
+          "Height": 147
+        },
+        "5": {
+          "Name": "PeskyWasp",
+          "Width": 165,
+          "Height": 147
+        },
+        "6": {
+          "Name": "FloatingHand",
+          "Width": 90,
+          "Height": 136
+        },
+        "7": {
+          "Name": "IllTemperedMoleRat",
+          "Width": 85,
+          "Height": 122
+        },
+        "8": {
+          "Name": "Demon",
+          "Width": 129,
+          "Height": 164
+        },
+        "9": {
+          "Name": "AngryCloud",
+          "Width": 183,
+          "Height": 152
+        },
+        "10": {
+          "Name": "Krondiir",
+          "Width": 155,
+          "Height": 172
+        },
+        "11": {
+          "Name": "Raptor",
+          "Width": 106,
+          "Height": 112
+        },
+        "12": {
+          "Name": "Wizard",
+          "Width": 49,
+          "Height": 107
+        },
+        "13": {
+          "Name": "FloatingHand",
+          "Width": 90,
+          "Height": 136
+        },
+        "14": {
+          "Name": "Zombie",
+          "Width": 77,
+          "Height": 147
+        },
+        "15": {
+          "Name": "Chest",
+          "Width": 123
+        },
+        "16": {
+          "Name": "Zombie",
+          "Width": 77,
+          "Height": 147
+        },
+        "17": {
+          "Name": "AngryCloud",
+          "Width": 183,
+          "Height": 152
+        },
+        "18": {
+          "Name": "Spidermajigger",
+          "Width": 83,
+          "Height": 84
+        },
+        "19": {
+          "Name": "Security",
+          "Width": 54,
+          "Height": 116
+        },
+        "20": {
+          "Name": "Security",
+          "Width": 54,
+          "Height": 116
+        },
+        "21": {
+          "Name": "Celt",
+          "Width": 50,
+          "Height": 120
+        },
+        "22": {
+          "Name": "MutedPuppyDog",
+          "Width": 75,
+          "Height": 71
+        },
+        "23": {
+          "Name": "IllTemperedMoleRat",
+          "Width": 85,
+          "Height": 122
+        },
+        "24": {
+          "Name": "Raptor",
+          "Width": 106,
+          "Height": 112
+        },
+        "25": {
+          "Name": "Spidermajigger",
+          "Width": 83,
+          "Height": 84
+        },
+        "26": {
+          "Width": 33
+        },
+        "27": {
+          "Width": 32
+        },
+        "28": {
+          "Width": 32
+        },
+        "29": {
+          "Width": 32
+        },
+        "30": {
+          "Width": 32
+        },
+        "31": {
+          "Width": 32
+        },
+        "32": {
+          "Width": 32
+        },
+        "33": {
+          "Width": 32
+        },
+        "34": {
+          "Width": 32
+        },
+        "35": {
+          "Width": 32
+        },
+        "36": {
+          "Width": 32
+        },
+        "37": {
+          "Width": 32
+        },
+        "38": {
+          "Width": 32
+        },
+        "39": {
+          "Width": 32
+        },
+        "40": {
+          "Width": 32
+        },
+        "41": {
+          "Width": 32
+        },
+        "42": {
+          "Width": 32
+        },
+        "43": {
+          "Width": 32
+        },
+        "44": {
+          "Width": 32
+        },
+        "45": {
+          "Width": 32
+        },
+        "46": {
+          "Width": 32
+        },
+        "47": {
+          "Width": 32
+        },
+        "48": {
+          "Width": 32
+        },
+        "49": {
+          "Width": 32
+        },
+        "50": {
+          "Width": 32
+        },
+        "51": {
+          "Width": 32
+        },
+        "52": {
+          "Width": 32
+        },
+        "53": {
+          "Width": 32
+        },
+        "54": {
+          "Width": 32
+        },
+        "55": {
+          "Width": 32
+        },
+        "56": {
+          "Width": 32
+        },
+        "57": {
+          "Width": 32
+        },
+        "58": {
+          "Width": 32
+        },
+        "59": {
+          "Width": 32
+        },
+        "60": {
+          "Width": 32
+        },
+        "61": {
+          "Width": 32
+        },
+        "62": {
+          "Width": 32
+        },
+        "63": {
+          "Width": 32
+        },
+        "64": {
+          "Width": 32
+        },
+        "65": {
+          "Width": 32
+        },
+        "66": {
+          "Width": 32
+        },
+        "67": {
+          "Width": 32
+        },
+        "68": {
+          "Width": 32
+        },
+        "69": {
+          "Width": 32
+        },
+        "70": {
+          "Width": 32
+        },
+        "71": {
+          "Width": 32
+        },
+        "72": {
+          "Width": 32
+        },
+        "73": {
+          "Width": 32
+        },
+        "74": {
+          "Width": 32
+        },
+        "75": {
+          "Width": 32
+        },
+        "76": {
+          "Width": 32
+        },
+        "77": {
+          "Width": 32
+        },
+        "78": {
+          "Width": 32
+        },
+        "79": {
+          "Width": 32
+        },
+        "80": {
+          "Width": 32
+        },
+        "81": {
+          "Width": 32
+        },
+        "82": {
+          "Width": 32
+        },
+        "83": {
+          "Width": 32
+        },
+        "84": {
+          "Width": 32
+        },
+        "85": {
+          "Width": 32
+        },
+        "86": {
+          "Width": 32
+        },
+        "87": {
+          "Width": 32
+        },
+        "88": {
+          "Width": 32
+        },
+        "89": {
+          "Width": 32
+        },
+        "90": {
+          "Width": 32
+        },
+        "91": {
+          "Width": 32
+        },
+        "92": {
+          "Width": 32
+        },
+        "93": {
+          "Width": 32
+        },
+        "94": {
+          "Width": 32
+        },
+        "95": {
+          "Width": 32
+        },
+        "96": {
+          "Width": 32
+        },
+        "97": {
+          "Width": 32
+        },
+        "98": {
+          "Width": 32
+        },
+        "99": {
+          "Width": 32
+        }
+      }
+    },
+    "3DOVERL0.XLD": {
+      "EnumName": "DungeonOverlayId",
+      "Type": "FixedSizeSprite",
+      "RotatedLeft": true,
+      "Assets": {
+        "0": {
+          "Name": "",
+          "Width": 68
+        },
+        "1": {
+          "Width": 49
+        },
+        "2": {
+          "Width": 52
+        },
+        "3": {
+          "Width": 61
+        },
+        "4": {
+          "Width": 61
+        },
+        "5": {
+          "Width": 49
+        },
+        "6": {
+          "Width": 78
+        },
+        "7": {
+          "Width": 9
+        },
+        "8": {
+          "Width": 40
+        },
+        "9": {
+          "Width": 25
+        },
+        "10": {
+          "Width": 37
+        },
+        "11": {
+          "Width": 39
+        },
+        "12": {
+          "Width": 18
+        },
+        "13": {
+          "Width": 20
+        },
+        "14": {
+          "Width": 21
+        },
+        "15": {
+          "Width": 32
+        },
+        "16": {
+          "Width": 19
+        },
+        "17": {
+          "Width": 19
+        },
+        "18": {
+          "Width": 18
+        },
+        "19": {
+          "Width": 79
+        },
+        "20": {
+          "Width": 74
+        },
+        "21": {
+          "Width": 47
+        },
+        "22": {
+          "Width": 336
+        },
+        "23": {
+          "Width": 23
+        },
+        "24": {
+          "Width": 59
+        },
+        "25": {
+          "Width": 17
+        },
+        "26": {
+          "Width": 52
+        },
+        "27": {
+          "Width": 54
+        },
+        "28": {
+          "Width": 74
+        },
+        "29": {
+          "Width": 66
+        },
+        "30": {
+          "Width": 53
+        },
+        "31": {
+          "Width": 37
+        },
+        "32": {
+          "Width": 15
+        },
+        "33": {
+          "Width": 27
+        },
+        "34": {
+          "Width": 26
+        },
+        "35": {
+          "Width": 44
+        },
+        "36": {
+          "Width": 33
+        },
+        "37": {
+          "Width": 30
+        },
+        "38": {
+          "Width": 58
+        },
+        "39": {
+          "Width": 54
+        },
+        "40": {
+          "Width": 53
+        },
+        "41": {
+          "Width": 48
+        },
+        "42": {
+          "Width": 64
+        },
+        "43": {
+          "Width": 39
+        },
+        "44": {
+          "Width": 24
+        },
+        "45": {
+          "Width": 25
+        },
+        "46": {
+          "Width": 40
+        },
+        "47": {
+          "Width": 39
+        },
+        "48": {
+          "Width": 22
+        },
+        "49": {
+          "Width": 25
+        },
+        "50": {
+          "Width": 38
+        },
+        "51": {
+          "Width": 67
+        },
+        "52": {
+          "Width": 40
+        },
+        "53": {
+          "Width": 48
+        },
+        "54": {
+          "Width": 31
+        },
+        "55": {
+          "Width": 32
+        },
+        "56": {
+          "Width": 39
+        },
+        "57": {
+          "Width": 31
+        },
+        "58": {
+          "Width": 31
+        },
+        "59": {
+          "Width": 80
+        },
+        "60": {
+          "Width": 80
+        },
+        "61": {
+          "Width": 80
+        },
+        "62": {
+          "Width": 46
+        },
+        "63": {
+          "Width": 60
+        },
+        "64": {
+          "Width": 47
+        },
+        "65": {
+          "Width": 54
+        },
+        "66": {
+          "Width": 47
+        },
+        "67": {
+          "Width": 39
+        },
+        "68": {
+          "Width": 51
+        },
+        "69": {
+          "Width": 48
+        },
+        "70": {
+          "Width": 34
+        },
+        "71": {
+          "Width": 40
+        },
+        "72": {
+          "Width": 42
+        },
+        "73": {
+          "Width": 42
+        },
+        "74": {
+          "Width": 20
+        },
+        "75": {
+          "Width": 20
+        },
+        "76": {
+          "Width": 20
+        },
+        "77": {
+          "Width": 20
+        },
+        "78": {
+          "Width": 112
+        },
+        "79": {
+          "Width": 112
+        },
+        "80": {
+          "Width": 77
+        },
+        "81": {
+          "Width": 42
+        },
+        "82": {
+          "Width": 64
+        },
+        "83": {
+          "Width": 67
+        },
+        "84": {
+          "Width": 64
+        },
+        "85": {
+          "Width": 64
+        },
+        "86": {
+          "Width": 64
+        },
+        "87": {
+          "Width": 20
+        },
+        "88": {
+          "Width": 17
+        },
+        "89": {
+          "Width": 23
+        },
+        "90": {
+          "Width": 10
+        },
+        "91": {
+          "Width": 17
+        },
+        "92": {
+          "Width": 23
+        },
+        "93": {
+          "Width": 33
+        },
+        "94": {
+          "Width": 24
+        },
+        "95": {
+          "Width": 34
+        },
+        "96": {
+          "Width": 52
+        },
+        "97": {
+          "Width": 20
+        },
+        "98": {
+          "Width": 20
+        }
+      }
+    },
+    "3DOVERL1.XLD": {
+      "EnumName": "DungeonOverlayId",
+      "Type": "FixedSizeSprite",
+      "RotatedLeft": true,
+      "Assets": {
+        "0": {
+          "Width": 44
+        },
+        "1": {
+          "Width": 112
+        },
+        "2": {
+          "Width": 26
+        },
+        "3": {
+          "Width": 47
+        },
+        "4": {
+          "Width": 112
+        },
+        "5": {
+          "Width": 16
+        },
+        "6": {
+          "Width": 26
+        },
+        "7": {
+          "Width": 28
+        },
+        "8": {
+          "Width": 42
+        },
+        "9": {
+          "Width": 19
+        },
+        "10": {
+          "Width": 31
+        },
+        "11": {
+          "Width": 19
+        },
+        "12": {
+          "Width": 37
+        },
+        "13": {
+          "Width": 21
+        },
+        "14": {
+          "Width": 55
+        },
+        "15": {
+          "Width": 47
+        },
+        "16": {
+          "Width": 47
+        },
+        "17": {
+          "Width": 54
+        },
+        "18": {
+          "Width": 40
+        },
+        "19": {
+          "Width": 30
+        },
+        "20": {
+          "Width": 64
+        },
+        "21": {
+          "Width": 128
+        },
+        "22": {
+          "Width": 24
+        },
+        "23": {
+          "Width": 28
+        },
+        "24": {
+          "Width": 65
+        },
+        "25": {
+          "Width": 127
+        },
+        "26": {
+          "Width": 128
+        },
+        "27": {
+          "Width": 29
+        },
+        "28": {
+          "Width": 25
+        },
+        "29": {
+          "Width": 112
+        },
+        "30": {
+          "Width": 128
+        },
+        "31": {
+          "Width": 34
+        },
+        "32": {
+          "Width": 71
+        },
+        "33": {
+          "Width": 57
+        },
+        "34": {
+          "Width": 77
+        },
+        "35": {
+          "Width": 97
+        },
+        "36": {
+          "Width": 47
+        },
+        "37": {
+          "Width": 39
+        },
+        "38": {
+          "Width": 39
+        },
+        "39": {
+          "Width": 118
+        },
+        "40": {
+          "Width": 28
+        },
+        "41": {
+          "Width": 28
+        },
+        "42": {
+          "Width": 47
+        },
+        "43": {
+          "Width": 47
+        },
+        "44": {
+          "Width": 100
+        },
+        "45": {
+          "Width": 100
+        },
+        "46": {
+          "Width": 39
+        },
+        "47": {
+          "Width": 39
+        },
+        "48": {
+          "Width": 128
+        },
+        "49": {
+          "Width": 128
+        },
+        "50": {
+          "Width": 122
+        },
+        "51": {
+          "Width": 122
+        },
+        "52": {
+          "Width": 128
+        },
+        "53": {
+          "Width": 128
+        },
+        "54": {
+          "Width": 128
+        },
+        "55": {
+          "Width": 128
+        },
+        "56": {
+          "Width": 128
+        },
+        "57": {
+          "Width": 128
+        },
+        "58": {
+          "Width": 128
+        },
+        "59": {
+          "Width": 128
+        },
+        "60": {
+          "Width": 132
+        },
+        "61": {
+          "Width": 128
+        },
+        "62": {
+          "Width": 128
+        },
+        "63": {
+          "Width": 132
+        },
+        "64": {
+          "Width": 128
+        },
+        "65": {
+          "Width": 128
+        },
+        "66": {
+          "Width": 128
+        },
+        "67": {
+          "Width": 128
+        },
+        "68": {
+          "Width": 128
+        },
+        "69": {
+          "Width": 128
+        },
+        "70": {
+          "Width": 128
+        },
+        "71": {
+          "Width": 128
+        },
+        "72": {
+          "Width": 67
+        },
+        "73": {
+          "Width": 72
+        },
+        "74": {
+          "Width": 71
+        },
+        "75": {
+          "Width": 24
+        },
+        "76": {
+          "Width": 25
+        },
+        "77": {
+          "Width": 22
+        },
+        "78": {
+          "Width": 15
+        },
+        "79": {
+          "Width": 25
+        },
+        "80": {
+          "Width": 28
+        },
+        "81": {
+          "Width": 55
+        },
+        "82": {
+          "Width": 66
+        },
+        "83": {
+          "Width": 66
+        },
+        "84": {
+          "Width": 7
+        },
+        "85": {
+          "Width": 7
+        },
+        "86": {
+          "Width": 13
+        },
+        "87": {
+          "Width": 13
+        },
+        "88": {
+          "Width": 129
+        },
+        "89": {
+          "Width": 30
+        },
+        "90": {
+          "Width": 30
+        },
+        "91": {
+          "Width": 22
+        },
+        "92": {
+          "Width": 22
+        },
+        "93": {
+          "Width": 22
+        },
+        "94": {
+          "Width": 22
+        },
+        "95": {
+          "Width": 22
+        },
+        "96": {
+          "Width": 22
+        },
+        "97": {
+          "Width": 22
+        },
+        "98": {
+          "Width": 22
+        },
+        "99": {
+          "Width": 14
+        }
+      }
+    },
+    "3DOVERL2.XLD": {
+      "EnumName": "DungeonOverlayId",
+      "Type": "FixedSizeSprite",
+      "RotatedLeft": true,
+      "Assets": {
+        "0": {
+          "Width": 14
+        },
+        "1": {
+          "Width": 12
+        },
+        "2": {
+          "Width": 12
+        },
+        "3": {
+          "Width": 12
+        },
+        "4": {
+          "Width": 12
+        },
+        "5": {
+          "Width": 33
+        },
+        "6": {
+          "Width": 33
+        },
+        "7": {
+          "Width": 35
+        },
+        "8": {
+          "Width": 35
+        },
+        "9": {
+          "Width": 19
+        },
+        "10": {
+          "Width": 18
+        },
+        "11": {
+          "Width": 49
+        },
+        "12": {
+          "Width": 78
+        },
+        "13": {
+          "Width": 74
+        },
+        "14": {
+          "Width": 79
+        },
+        "15": {
+          "Width": 22
+        },
+        "16": {
+          "Width": 22
+        },
+        "17": {
+          "Width": 22
+        },
+        "18": {
+          "Width": 22
+        },
+        "19": {
+          "Width": 22
+        },
+        "20": {
+          "Width": 22
+        },
+        "21": {
+          "Width": 22
+        },
+        "22": {
+          "Width": 22
+        },
+        "23": {
+          "Width": 22
+        },
+        "24": {
+          "Width": 22
+        },
+        "25": {
+          "Width": 35
+        },
+        "26": {
+          "Width": 35
+        },
+        "27": {
+          "Width": 140
+        },
+        "28": {
+          "Width": 42
+        },
+        "29": {
+          "Width": 24
+        },
+        "30": {
+          "Width": 24
+        },
+        "31": {
+          "Width": 22
+        },
+        "32": {
+          "Width": 22
+        },
+        "33": {
+          "Width": 112
+        },
+        "34": {
+          "Width": 112
+        },
+        "35": {
+          "Width": 112
+        },
+        "36": {
+          "Width": 112
+        },
+        "37": {
+          "Width": 66
+        },
+        "38": {
+          "Width": 66
+        },
+        "39": {
+          "Width": 36
+        },
+        "40": {
+          "Width": 36
+        },
+        "41": {
+          "Width": 32
+        },
+        "42": {
+          "Width": 32
+        },
+        "43": {
+          "Width": 32
+        },
+        "44": {
+          "Width": 32
+        },
+        "45": {
+          "Width": 32
+        },
+        "46": {
+          "Width": 32
+        },
+        "47": {
+          "Width": 32
+        },
+        "48": {
+          "Width": 32
+        },
+        "49": {
+          "Width": 32
+        },
+        "50": {
+          "Width": 32
+        },
+        "51": {
+          "Width": 32
+        },
+        "52": {
+          "Width": 32
+        },
+        "53": {
+          "Width": 32
+        },
+        "54": {
+          "Width": 32
+        },
+        "55": {
+          "Width": 32
+        },
+        "56": {
+          "Width": 32
+        },
+        "57": {
+          "Width": 32
+        },
+        "58": {
+          "Width": 32
+        },
+        "59": {
+          "Width": 32
+        },
+        "60": {
+          "Width": 32
+        },
+        "61": {
+          "Width": 32
+        },
+        "62": {
+          "Width": 32
+        },
+        "63": {
+          "Width": 32
+        },
+        "64": {
+          "Width": 32
+        },
+        "65": {
+          "Width": 32
+        },
+        "66": {
+          "Width": 32
+        },
+        "67": {
+          "Width": 32
+        },
+        "68": {
+          "Width": 32
+        },
+        "69": {
+          "Width": 32
+        },
+        "70": {
+          "Width": 32
+        },
+        "71": {
+          "Width": 32
+        },
+        "72": {
+          "Width": 32
+        },
+        "73": {
+          "Width": 32
+        },
+        "74": {
+          "Width": 32
+        },
+        "75": {
+          "Width": 32
+        },
+        "76": {
+          "Width": 32
+        },
+        "77": {
+          "Width": 32
+        },
+        "78": {
+          "Width": 32
+        },
+        "79": {
+          "Width": 32
+        },
+        "80": {
+          "Width": 32
+        },
+        "81": {
+          "Width": 32
+        },
+        "82": {
+          "Width": 32
+        },
+        "83": {
+          "Width": 32
+        },
+        "84": {
+          "Width": 32
+        },
+        "85": {
+          "Width": 32
+        },
+        "86": {
+          "Width": 32
+        },
+        "87": {
+          "Width": 32
+        },
+        "88": {
+          "Width": 32
+        },
+        "89": {
+          "Width": 32
+        },
+        "90": {
+          "Width": 32
+        },
+        "91": {
+          "Width": 32
+        },
+        "92": {
+          "Width": 32
+        },
+        "93": {
+          "Width": 32
+        },
+        "94": {
+          "Width": 32
+        },
+        "95": {
+          "Width": 32
+        },
+        "96": {
+          "Width": 32
+        },
+        "97": {
+          "Width": 32
+        },
+        "98": {
+          "Width": 32
+        },
+        "99": {
+          "Width": 32
+        }
+      }
+    },
+    "3DWALLS0.XLD": {
+      "EnumName": "DungeonWallId",
+      "Type": "FixedSizeSprite",
+      "RotatedLeft": true,
+      "Assets": {
+        "0": {
+          "Name": "",
+          "Width": 112
+        },
+        "1": {
+          "Width": 112
+        },
+        "2": {
+          "Width": 112
+        },
+        "3": {
+          "Width": 112
+        },
+        "4": {
+          "Width": 112
+        },
+        "5": {
+          "Width": 112
+        },
+        "6": {
+          "Width": 112
+        },
+        "7": {
+          "Width": 112
+        },
+        "8": {
+          "Width": 112
+        },
+        "9": {
+          "Width": 112
+        },
+        "10": {
+          "Width": 128
+        },
+        "11": {
+          "Width": 128
+        },
+        "12": {
+          "Width": 128
+        },
+        "13": {
+          "Width": 128
+        },
+        "14": {
+          "Width": 128
+        },
+        "15": {
+          "Width": 128
+        },
+        "16": {
+          "Width": 128
+        },
+        "17": {
+          "Width": 128
+        },
+        "18": {
+          "Width": 128
+        },
+        "19": {
+          "Width": 128
+        },
+        "20": {
+          "Width": 128
+        },
+        "21": {
+          "Width": 128
+        },
+        "22": {
+          "Width": 128
+        },
+        "23": {
+          "Width": 128
+        },
+        "24": {
+          "Width": 128
+        },
+        "25": {
+          "Width": 128
+        },
+        "26": {
+          "Width": 129
+        },
+        "27": {
+          "Width": 129
+        },
+        "28": {
+          "Width": 129
+        },
+        "29": {
+          "Width": 129
+        },
+        "30": {
+          "Width": 129
+        },
+        "31": {
+          "Width": 127
+        },
+        "32": {
+          "Width": 129
+        },
+        "33": {
+          "Width": 129
+        },
+        "34": {
+          "Width": 129
+        },
+        "35": {
+          "Width": 128
+        },
+        "36": {
+          "Width": 129
+        },
+        "37": {
+          "Width": 129
+        },
+        "38": {
+          "Width": 80
+        },
+        "39": {
+          "Width": 80
+        },
+        "40": {
+          "Width": 80
+        },
+        "41": {
+          "Width": 80
+        },
+        "42": {
+          "Width": 129
+        },
+        "43": {
+          "Width": 129
+        },
+        "44": {
+          "Width": 32
+        },
+        "45": {
+          "Width": 106
+        },
+        "46": {
+          "Width": 106
+        },
+        "47": {
+          "Width": 106
+        },
+        "48": {
+          "Width": 106
+        },
+        "49": {
+          "Width": 129
+        },
+        "50": {
+          "Width": 130
+        },
+        "51": {
+          "Width": 530
+        },
+        "52": {
+          "Width": 106
+        },
+        "53": {
+          "Width": 106
+        },
+        "54": {
+          "Width": 112
+        },
+        "55": {
+          "Width": 112
+        },
+        "56": {
+          "Width": 112
+        },
+        "57": {
+          "Width": 112
+        },
+        "58": {
+          "Width": 112
+        },
+        "59": {
+          "Width": 112
+        },
+        "60": {
+          "Width": 112
+        },
+        "61": {
+          "Width": 112
+        },
+        "62": {
+          "Width": 112
+        },
+        "63": {
+          "Width": 112
+        },
+        "64": {
+          "Width": 8
+        },
+        "65": {
+          "Width": 112
+        },
+        "66": {
+          "Width": 112
+        },
+        "67": {
+          "Width": 112
+        },
+        "68": {
+          "Width": 112
+        },
+        "69": {
+          "Width": 112
+        },
+        "70": {
+          "Width": 112
+        },
+        "71": {
+          "Width": 64
+        },
+        "72": {
+          "Width": 64
+        },
+        "73": {
+          "Width": 64
+        },
+        "74": {
+          "Width": 128
+        },
+        "75": {
+          "Width": 99
+        },
+        "76": {
+          "Width": 66
+        },
+        "77": {
+          "Width": 51
+        },
+        "78": {
+          "Width": 128
+        },
+        "79": {
+          "Width": 128
+        },
+        "80": {
+          "Width": 128
+        },
+        "81": {
+          "Width": 128
+        },
+        "82": {
+          "Width": 128
+        },
+        "83": {
+          "Width": 128
+        },
+        "84": {
+          "Width": 128
+        },
+        "85": {
+          "Width": 128
+        },
+        "86": {
+          "Width": 128
+        },
+        "87": {
+          "Width": 128
+        },
+        "88": {
+          "Width": 128
+        },
+        "89": {
+          "Width": 128
+        },
+        "90": {
+          "Width": 128
+        },
+        "91": {
+          "Width": 128
+        },
+        "92": {
+          "Width": 128
+        },
+        "93": {
+          "Width": 128
+        },
+        "94": {
+          "Width": 128
+        },
+        "95": {
+          "Width": 128
+        },
+        "96": {
+          "Width": 128
+        },
+        "97": {
+          "Width": 128
+        },
+        "98": {
+          "Width": 128
+        }
+      }
+    },
+    "3DWALLS1.XLD": {
+      "EnumName": "DungeonWallId",
+      "Type": "FixedSizeSprite",
+      "RotatedLeft": true,
+      "Assets": {
+        "0": {
+          "Width": 128
+        },
+        "1": {
+          "Width": 128
+        },
+        "2": {
+          "Width": 128
+        },
+        "3": {
+          "Width": 128
+        },
+        "4": {
+          "Width": 128
+        },
+        "5": {
+          "Width": 128
+        },
+        "6": {
+          "Width": 129
+        },
+        "7": {
+          "Width": 129
+        },
+        "8": {
+          "Width": 129
+        },
+        "9": {
+          "Width": 64
+        },
+        "10": {
+          "Width": 64
+        },
+        "11": {
+          "Width": 64
+        },
+        "12": {
+          "Width": 106
+        },
+        "13": {
+          "Width": 106
+        },
+        "14": {
+          "Width": 129
+        },
+        "15": {
+          "Width": 129
+        },
+        "16": {
+          "Width": 129
+        },
+        "17": {
+          "Width": 129
+        },
+        "18": {
+          "Width": 129
+        },
+        "19": {
+          "Width": 300
+        },
+        "20": {
+          "Width": 129
+        },
+        "21": {
+          "Width": 256
+        },
+        "22": {
+          "Width": 128
+        },
+        "23": {
+          "Width": 129
+        },
+        "24": {
+          "Width": 112
+        },
+        "25": {
+          "Width": 112
+        },
+        "26": {
+          "Width": 112
+        },
+        "27": {
+          "Width": 146
+        },
+        "28": {
+          "Width": 64
+        },
+        "29": {
+          "Width": 112
+        },
+        "30": {
+          "Width": 64
+        },
+        "31": {
+          "Width": 64
+        },
+        "32": {
+          "Width": 64
+        },
+        "33": {
+          "Width": 64
+        },
+        "34": {
+          "Width": 64
+        },
+        "35": {
+          "Width": 112
+        },
+        "36": {
+          "Width": 112
+        },
+        "37": {
+          "Width": 300
+        },
+        "38": {
+          "Width": 32
+        },
+        "39": {
+          "Width": 32
+        },
+        "40": {
+          "Width": 32
+        },
+        "41": {
+          "Width": 32
+        },
+        "42": {
+          "Width": 32
+        },
+        "43": {
+          "Width": 32
+        },
+        "44": {
+          "Width": 32
+        },
+        "45": {
+          "Width": 32
+        },
+        "46": {
+          "Width": 32
+        },
+        "47": {
+          "Width": 32
+        },
+        "48": {
+          "Width": 32
+        },
+        "49": {
+          "Width": 32
+        },
+        "50": {
+          "Width": 32
+        },
+        "51": {
+          "Width": 32
+        },
+        "52": {
+          "Width": 32
+        },
+        "53": {
+          "Width": 32
+        },
+        "54": {
+          "Width": 32
+        },
+        "55": {
+          "Width": 32
+        },
+        "56": {
+          "Width": 32
+        },
+        "57": {
+          "Width": 32
+        },
+        "58": {
+          "Width": 32
+        },
+        "59": {
+          "Width": 32
+        },
+        "60": {
+          "Width": 32
+        },
+        "61": {
+          "Width": 32
+        },
+        "62": {
+          "Width": 32
+        },
+        "63": {
+          "Width": 32
+        },
+        "64": {
+          "Width": 32
+        },
+        "65": {
+          "Width": 32
+        },
+        "66": {
+          "Width": 32
+        },
+        "67": {
+          "Width": 32
+        },
+        "68": {
+          "Width": 32
+        },
+        "69": {
+          "Width": 32
+        },
+        "70": {
+          "Width": 32
+        },
+        "71": {
+          "Width": 32
+        },
+        "72": {
+          "Width": 32
+        },
+        "73": {
+          "Width": 32
+        },
+        "74": {
+          "Width": 32
+        },
+        "75": {
+          "Width": 32
+        },
+        "76": {
+          "Width": 32
+        },
+        "77": {
+          "Width": 32
+        },
+        "78": {
+          "Width": 32
+        },
+        "79": {
+          "Width": 32
+        },
+        "80": {
+          "Width": 32
+        },
+        "81": {
+          "Width": 32
+        },
+        "82": {
+          "Width": 32
+        },
+        "83": {
+          "Width": 32
+        },
+        "84": {
+          "Width": 32
+        },
+        "85": {
+          "Width": 32
+        },
+        "86": {
+          "Width": 32
+        },
+        "87": {
+          "Width": 32
+        },
+        "88": {
+          "Width": 32
+        },
+        "89": {
+          "Width": 32
+        },
+        "90": {
+          "Width": 32
+        },
+        "91": {
+          "Width": 32
+        },
+        "92": {
+          "Width": 32
+        },
+        "93": {
+          "Width": 32
+        },
+        "94": {
+          "Width": 32
+        },
+        "95": {
+          "Width": 32
+        },
+        "96": {
+          "Width": 32
+        },
+        "97": {
+          "Width": 32
+        },
+        "98": {
+          "Width": 32
+        },
+        "99": {
+          "Width": 32
+        }
+      }
+    },
+    "AUTOGFX0.XLD": {
+      "EnumName": "AutoGraphicsId",
+      "Type": "AmorphousSprite",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "Set",
+          "SubSprites": "(8,8,576) (16,16)"
+        },
+        "1": {
+          "Name": "Set",
+          "SubSprites": "(8,8,576) (16,16)"
+        }
+      }
+    },
+    "BLKLIST0.XLD": {
+      "EnumName": "BlockListId",
+      "Type": "BlockList",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {}
+      }
+    },
+    "COMBACK0.XLD": {
+      "EnumName": "CombatBackgroundId",
+      "Type": "FixedSizeSprite",
+      "Width": 360,
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "Plains"
+        },
+        "1": {
+          "Name": "Dungeon"
+        },
+        "2": {
+          "Name": "Desert"
+        },
+        "3": {
+          "Name": "WoodDungeon"
+        },
+        "4": {
+          "Name": "BarrelDungeon"
+        },
+        "5": {
+          "Name": "TableDungeon"
+        },
+        "6": {
+          "Name": "FireDungeon"
+        },
+        "7": {
+          "Name": "PlantDungeon"
+        },
+        "8": {
+          "Name": "Cave"
+        },
+        "9": {
+          "Name": "Toronto"
+        },
+        "10": {
+          "Name": "LivingWalls"
+        },
+        "11": {
+          "Name": "Plains"
+        },
+        "12": {
+          "Name": ""
+        },
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {}
+      }
+    },
+    "COMGFX0.XLD": {
+      "EnumName": "CombatGraphicsId",
+      "Type": "HeaderPerSubImageSprite",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": ""
+        },
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {}
+      }
+    },
+    "EVNTSET0.XLD": {
+      "EnumName": "EventSetId",
+      "Type": "EventSet",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {}
+      }
+    },
+    "EVNTSET1.XLD": {
+      "EnumName": "EventSetId",
+      "Type": "EventSet",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "EVNTSET2.XLD": {
+      "EnumName": "EventSetId",
+      "Type": "EventSet",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "EVNTSET3.XLD": {
+      "EnumName": "EventSetId",
+      "Type": "EventSet",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "EVNTSET9.XLD": {
+      "EnumName": "EventSetId",
+      "Type": "EventSet",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "FBODPIX0.XLD": {
+      "EnumName": "FullBodyPictureId",
+      "Type": "SingleHeaderSprite",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {}
+      }
+    },
+    "FONTS0.XLD": {
+      "EnumName": "FontId",
+      "Type": "FixedSizeSprite",
+      "Width": 8,
+      "Height": 8,
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "RegularFont"
+        },
+        "1": {
+          "Name": "BoldFont"
+        }
+      }
+    },
+    "ICONDAT0.XLD": {
+      "EnumName": "IconDataId",
+      "Type": "FixedSizeSprite",
+      "Width": 8,
+      "Height": 8,
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": ""
+        },
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {}
+      }
+    },
+    "ICONGFX0.XLD": {
+      "EnumName": "IconGraphicsId",
+      "Type": "FixedSizeSprite",
+      "Width": 16,
+      "Height": 16,
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "Outdoors"
+        },
+        "1": {
+          "Name": "Outdoors"
+        },
+        "2": {
+          "Name": "Indoors"
+        },
+        "3": {
+          "Name": "Desert"
+        },
+        "4": {
+          "Name": "Stoney"
+        },
+        "5": {
+          "Name": "Stoney"
+        },
+        "6": {
+          "Name": "CeltDungeon"
+        },
+        "7": {
+          "Name": "Toronto"
+        },
+        "8": {
+          "Name": "Celtic"
+        },
+        "9": {
+          "Name": "DjiKantos"
+        },
+        "10": {
+          "Name": ""
+        }
+      }
+    },
+    "ITEMGFX": {
+      "Type": "FixedSizeSprite",
+      "Width": 16,
+      "Height": 16,
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {}
+      }
+    },
+    "ITEMLIST.DAT": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "ITEMNAME.DAT": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "LABDATA0.XLD": {
+      "EnumName": "LabyrinthDataId",
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {}
+      }
+    },
+    "LABDATA1.XLD": {
+      "EnumName": "LabyrinthDataId",
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "LABDATA2.XLD": {
+      "EnumName": "LabyrinthDataId",
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "MAPDATA1.XLD": {
+      "EnumName": "MapDataId",
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "MAPDATA2.XLD": {
+      "EnumName": "MapDataId",
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "MAPDATA3.XLD": {
+      "EnumName": "MapDataId",
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "MONCHAR0.XLD": {
+      "EnumName": "MonsterCharacterId",
+      "Type": "CharacterData",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {}
+      }
+    },
+    "MONGFX0.XLD": {
+      "EnumName": "MonsterGraphicsId",
+      "Type": "HeaderPerSubImageSprite",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "FloatingHand"
+        },
+        "1": {},
+        "2": {},
+        "3": {
+          "Name": ""
+        },
+        "4": {},
+        "5": {
+          "Name": ""
+        },
+        "6": {
+          "Name": "EvilKangaroo"
+        },
+        "7": {
+          "Name": "EvilKangaroo"
+        },
+        "8": {},
+        "9": {
+          "Name": "Krondiir"
+        },
+        "10": {
+          "Name": "Krondiir"
+        },
+        "11": {},
+        "12": {
+          "Name": "PeskyWasp"
+        },
+        "13": {
+          "Name": "PeskyWasp"
+        },
+        "14": {
+          "Name": "PeskyWasp"
+        },
+        "15": {
+          "Name": "Raptor"
+        },
+        "16": {
+          "Name": "Raptor"
+        },
+        "17": {
+          "Name": "Raptor"
+        },
+        "18": {
+          "Name": "SpiderMajigger"
+        },
+        "19": {
+          "Name": "SpiderMajigger"
+        },
+        "20": {
+          "Name": "SpiderMajigger"
+        },
+        "21": {
+          "Name": "WormThingy"
+        },
+        "22": {
+          "Name": "WormThingy"
+        },
+        "23": {
+          "Name": "WormThingy"
+        },
+        "24": {
+          "Name": ""
+        },
+        "25": {},
+        "26": {
+          "Name": ""
+        },
+        "27": {
+          "Name": "Robot"
+        },
+        "28": {},
+        "29": {},
+        "30": {
+          "Name": "Iskai"
+        },
+        "31": {
+          "Name": "Iskai"
+        },
+        "32": {
+          "Name": "Iskai"
+        },
+        "33": {
+          "Name": "Celt"
+        },
+        "34": {
+          "Name": "Celt"
+        },
+        "35": {
+          "Name": "Celt"
+        },
+        "36": {
+          "Name": "Wizard"
+        },
+        "37": {
+          "Name": "Wizard"
+        },
+        "38": {
+          "Name": "Wizard"
+        },
+        "39": {
+          "Name": "Celt"
+        },
+        "40": {
+          "Name": "Celt"
+        },
+        "41": {
+          "Name": "Celt"
+        },
+        "42": {
+          "Name": "Security"
+        },
+        "43": {
+          "Name": "Security"
+        },
+        "44": {},
+        "45": {
+          "Name": "Ned"
+        },
+        "46": {
+          "Name": "Ned"
+        },
+        "47": {},
+        "48": {
+          "Name": "Demon"
+        },
+        "49": {
+          "Name": "Demon"
+        },
+        "50": {
+          "Name": "Demon"
+        },
+        "51": {
+          "Name": "AngryCloud"
+        },
+        "52": {
+          "Name": "AngryCloud"
+        },
+        "53": {
+          "Name": "AngryCloud"
+        },
+        "54": {
+          "Name": "Zombie"
+        },
+        "55": {
+          "Name": "Zombie"
+        },
+        "56": {
+          "Name": "Zombie"
+        },
+        "57": {
+          "Name": "Priest"
+        },
+        "58": {
+          "Name": "WobblyThing"
+        },
+        "59": {
+          "Name": "Cpu"
+        }
+      }
+    },
+    "MONGRP0.XLD": {
+      "EnumName": "MonsterGroupId",
+      "Type": "MonsterGroup",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {
+          "Name": ""
+        },
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {}
+      }
+    },
+    "MONGRP1.XLD": {
+      "EnumName": "MonsterGroupId",
+      "Type": "MonsterGroup",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "MONGRP2.XLD": {
+      "EnumName": "MonsterGroupId",
+      "Type": "MonsterGroup",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "NPCGR0.XLD": {
+      "EnumName": "LargeNpcId",
+      "Type": "SingleHeaderSprite",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "Iskai"
+        },
+        "1": {
+          "Name": "Iskai"
+        },
+        "2": {
+          "Name": "IskaiChild"
+        },
+        "3": {
+          "Name": "IskaiChild"
+        },
+        "4": {
+          "Name": "Iskai"
+        },
+        "5": {
+          "Name": "Iskai"
+        },
+        "6": {
+          "Name": "Iskai"
+        },
+        "7": {
+          "Name": "Iskai"
+        },
+        "8": {
+          "Name": "IskaiChild"
+        },
+        "9": {
+          "Name": "IskaiChild"
+        },
+        "10": {
+          "Name": "Iskai"
+        },
+        "11": {
+          "Name": "Iskai"
+        },
+        "12": {
+          "Name": "Iskai"
+        },
+        "13": {
+          "Name": "IskaiChild"
+        },
+        "14": {
+          "Name": "Celt"
+        },
+        "15": {
+          "Name": "Iskai"
+        },
+        "16": {
+          "Name": "Iskai"
+        },
+        "17": {
+          "Name": "Iskai"
+        },
+        "18": {
+          "Name": "Woman"
+        },
+        "19": {
+          "Name": "CrewMember"
+        },
+        "20": {
+          "Name": "Christine"
+        },
+        "21": {
+          "Name": "CrewMember"
+        },
+        "22": {
+          "Name": "CrewMember"
+        },
+        "23": {
+          "Name": "CrewMember"
+        },
+        "24": {
+          "Name": "CrewMember"
+        },
+        "25": {
+          "Name": "Rainer"
+        },
+        "26": {
+          "Name": "Iskai"
+        },
+        "27": {
+          "Name": "Iskai"
+        },
+        "28": {
+          "Name": "Iskai"
+        },
+        "29": {
+          "Name": "Iskai"
+        },
+        "30": {
+          "Name": "Iskai"
+        },
+        "31": {
+          "Name": "Iskai"
+        },
+        "32": {
+          "Name": "Iskai"
+        },
+        "33": {
+          "Name": "Iskai"
+        },
+        "34": {
+          "Name": "Iskai"
+        },
+        "35": {
+          "Name": "Iskai"
+        },
+        "36": {
+          "Name": "Iskai"
+        },
+        "37": {
+          "Name": "IskaiChild"
+        },
+        "38": {
+          "Name": "CelticWoman"
+        },
+        "39": {
+          "Name": "CelticWoman"
+        },
+        "40": {
+          "Name": "CelticWoman"
+        },
+        "41": {
+          "Name": "CelticWoman"
+        },
+        "42": {
+          "Name": "CelticWoman"
+        },
+        "43": {
+          "Name": "CelticWoman"
+        },
+        "44": {
+          "Name": "CelticWoman"
+        },
+        "45": {
+          "Name": "CelticWoman"
+        },
+        "46": {
+          "Name": "CelticChild"
+        },
+        "47": {
+          "Name": "CelticChild"
+        },
+        "48": {
+          "Name": "CelticGirl"
+        },
+        "49": {
+          "Name": "CelticGirl"
+        },
+        "50": {
+          "Name": "CelticGirl"
+        },
+        "51": {
+          "Name": "CelticGirl"
+        },
+        "52": {
+          "Name": "CelticWoman"
+        },
+        "53": {
+          "Name": "CelticWoman"
+        },
+        "54": {
+          "Name": "CelticWoman"
+        },
+        "55": {
+          "Name": "CelticWoman"
+        },
+        "56": {
+          "Name": "CelticWoman"
+        },
+        "57": {
+          "Name": "CelticWoman"
+        },
+        "58": {
+          "Name": "CelticWoman"
+        },
+        "59": {
+          "Name": "CelticWoman"
+        },
+        "60": {
+          "Name": "CelticWoman"
+        },
+        "61": {
+          "Name": "CelticWoman"
+        },
+        "62": {
+          "Name": "CelticWoman"
+        },
+        "63": {
+          "Name": "CelticWoman"
+        },
+        "64": {
+          "Name": "CelticWoman"
+        },
+        "65": {
+          "Name": "CelticWoman"
+        },
+        "66": {
+          "Name": "CelticMan"
+        },
+        "67": {
+          "Name": "CelticMan"
+        },
+        "68": {
+          "Name": "CelticMan"
+        },
+        "69": {
+          "Name": "CelticMan"
+        },
+        "70": {
+          "Name": "CelticMan"
+        },
+        "71": {
+          "Name": "CelticMan"
+        },
+        "72": {
+          "Name": "CelticMan"
+        },
+        "73": {
+          "Name": "CelticMan"
+        },
+        "74": {
+          "Name": "CelticMan"
+        },
+        "75": {
+          "Name": "CelticMan"
+        },
+        "76": {
+          "Name": "CelticMan"
+        },
+        "77": {
+          "Name": "CelticMan"
+        },
+        "78": {
+          "Name": "CelticMan"
+        },
+        "79": {
+          "Name": "CelticMan"
+        },
+        "80": {
+          "Name": "CelticMan"
+        },
+        "81": {
+          "Name": "CelticMan"
+        },
+        "82": {
+          "Name": "CelticMan"
+        },
+        "83": {
+          "Name": "CelticMan"
+        },
+        "84": {
+          "Name": "CelticMan"
+        },
+        "85": {
+          "Name": "CelticMan"
+        },
+        "86": {
+          "Name": "CelticMan"
+        },
+        "87": {
+          "Name": "CelticMan"
+        },
+        "88": {
+          "Name": "CelticMan"
+        },
+        "89": {
+          "Name": "CelticMan"
+        },
+        "90": {
+          "Name": "CelticMan"
+        },
+        "91": {
+          "Name": "CelticMan"
+        },
+        "92": {
+          "Name": "CelticMan"
+        },
+        "93": {
+          "Name": "CrewMember"
+        },
+        "94": {
+          "Name": "CelticWoman"
+        },
+        "95": {
+          "Name": "CelticWoman"
+        },
+        "96": {
+          "Name": "CrewMember"
+        },
+        "97": {
+          "Name": "CrewMember"
+        },
+        "98": {
+          "Name": "CrewMember"
+        }
+      }
+    },
+    "NPCGR1.XLD": {
+      "EnumName": "LargeNpcId",
+      "Type": "SingleHeaderSprite",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": ""
+        },
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "NPCKL0.XLD": {
+      "EnumName": "SmallNpcId",
+      "Type": "SingleHeaderSprite",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "Iskai"
+        },
+        "1": {
+          "Name": "Iskai"
+        },
+        "2": {
+          "Name": "Parrot"
+        },
+        "3": {
+          "Name": "Pig"
+        },
+        "4": {
+          "Name": "Flies"
+        },
+        "5": {
+          "Name": "CatLivestock"
+        },
+        "6": {
+          "Name": "OldMan"
+        },
+        "7": {
+          "Name": "Man"
+        },
+        "8": {
+          "Name": "Woman"
+        },
+        "9": {
+          "Name": "Woman"
+        },
+        "10": {
+          "Name": "Woman"
+        },
+        "11": {
+          "Name": "Woman"
+        },
+        "12": {
+          "Name": "Man"
+        },
+        "13": {
+          "Name": "Man"
+        },
+        "14": {
+          "Name": "Man"
+        },
+        "15": {
+          "Name": "Man"
+        },
+        "16": {
+          "Name": "Man"
+        },
+        "17": {
+          "Name": "Ship"
+        },
+        "18": {
+          "Name": "LargeInsect"
+        },
+        "19": {
+          "Name": "Toad"
+        },
+        "20": {
+          "Name": "InsectSwarm"
+        },
+        "21": {
+          "Name": "InsectSwarm"
+        },
+        "22": {
+          "Name": "Krondiir"
+        },
+        "23": {
+          "Name": "Krondiir"
+        },
+        "24": {
+          "Name": "EvilKangaroo"
+        },
+        "25": {
+          "Name": "PeskyWasp"
+        },
+        "26": {
+          "Name": "Man"
+        },
+        "27": {
+          "Name": "ScoutShip"
+        },
+        "28": {
+          "Name": "FloatingHand"
+        }
+      }
+    },
+    "PALETTE.000": {
+      "Type": "PaletteCommon",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "Common Palette"
+        }
+      }
+    },
+    "PALETTE0.XLD": {
+      "EnumName": "PaletteId",
+      "Type": "Palette",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "Outdoors"
+        },
+        "1": {
+          "Name": "Outdoors"
+        },
+        "2": {
+          "Name": "Main3D"
+        },
+        "3": {},
+        "4": {
+          "Name": "Mid2D"
+        },
+        "5": {},
+        "6": {
+          "Name": "Light2D"
+        },
+        "7": {
+          "Name": "Light2D_"
+        },
+        "8": {
+          "Name": "Dark2D"
+        },
+        "9": {
+          "Name": "Dark2D_"
+        },
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {
+          "Name": "GlowyPlantDungeon"
+        },
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {
+          "Name": "Inventory"
+        },
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {
+          "Name": "PlainsCombat"
+        },
+        "23": {
+          "Name": "DungeonCombat"
+        },
+        "24": {},
+        "25": {
+          "Name": "Light2D_"
+        },
+        "26": {
+          "Name": "DesertCombat"
+        },
+        "27": {},
+        "28": {
+          "Name": ""
+        },
+        "29": {},
+        "30": {},
+        "31": {
+          "Name": "WoodDungeonCombat"
+        },
+        "32": {
+          "Name": "BarrelDungeonCombat"
+        },
+        "33": {
+          "Name": "TableDungeonCombat"
+        },
+        "34": {
+          "Name": "FireDungeonCombat"
+        },
+        "35": {
+          "Name": "PlantDungeonCombat"
+        },
+        "36": {
+          "Name": "CaveCombat"
+        },
+        "37": {
+          "Name": "TorontoCombat"
+        },
+        "38": {
+          "Name": "LivingWallsCombat"
+        },
+        "39": {
+          "Name": "PlainsCombat"
+        },
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {
+          "Name": ""
+        },
+        "46": {
+          "Name": "OutdoorsNight"
+        },
+        "47": {
+          "Name": "OutdoorsDusk"
+        },
+        "48": {
+          "Name": ""
+        },
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {}
+      }
+    },
+    "PARTGR0.XLD": {
+      "EnumName": "LargePartyGraphicsId",
+      "Type": "SingleHeaderSprite",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "Tom"
+        },
+        "1": {
+          "Name": "Rainer"
+        },
+        "2": {
+          "Name": "Driir"
+        },
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {
+          "Name": "Tom"
+        },
+        "8": {},
+        "9": {}
+      }
+    },
+    "PARTKL0.XLD": {
+      "EnumName": "SmallPartyGraphicsId",
+      "Type": "SingleHeaderSprite",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "Tom"
+        },
+        "1": {
+          "Name": "Rainer"
+        },
+        "2": {
+          "Name": "Drirr"
+        },
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {}
+      }
+    },
+    "PICTURE0.XLD": {
+      "EnumName": "PictureId",
+      "Type": "InterlacedBitmap",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "SmallWizard"
+        },
+        "1": {
+          "Name": "HarbourTown"
+        },
+        "2": {
+          "Name": "ScoutShip"
+        },
+        "3": {
+          "Name": "BildDesPlanetenText"
+        },
+        "4": {
+          "Name": "LabyrinthMap"
+        },
+        "5": {
+          "Name": "HutByAWaterfall"
+        },
+        "6": {
+          "Name": "MagiciansWithSeed"
+        },
+        "7": {
+          "Name": "CelticVillage"
+        },
+        "8": {
+          "Name": "CelticMelee"
+        },
+        "9": {
+          "Name": "CelticIskaiStandoff"
+        },
+        "10": {
+          "Name": "OpenChest"
+        },
+        "11": {
+          "Name": "OpenChestWithGold"
+        },
+        "12": {
+          "Name": "ClosedChest"
+        },
+        "13": {
+          "Name": "LootPile"
+        },
+        "14": {
+          "Name": "TorontoWithVines"
+        },
+        "15": {
+          "Name": "TorontoWithVinesAndParty"
+        },
+        "16": {
+          "Name": "EndgameScreenshot"
+        },
+        "17": {
+          "Name": "WoodenDoor"
+        },
+        "18": {
+          "Name": "MenuBackground"
+        },
+        "19": {
+          "Name": "MenuBackground"
+        },
+        "20": {
+          "Name": "MenuBackground"
+        },
+        "21": {
+          "Name": "MenuBackground"
+        },
+        "22": {
+          "Name": "MenuBackground"
+        },
+        "23": {
+          "Name": "MenuBackground"
+        },
+        "24": {
+          "Name": "MenuBackground"
+        },
+        "25": {
+          "Name": "MenuBackground"
+        },
+        "26": {
+          "Name": "MenuBackground"
+        },
+        "27": {
+          "Name": "ColouredPlateMap"
+        },
+        "28": {
+          "Name": "SecretCaveMap"
+        },
+        "29": {
+          "Name": "Boop"
+        },
+        "30": {
+          "Name": "PartyResting"
+        },
+        "31": {
+          "Name": "CelticVillageScreenshot"
+        },
+        "32": {
+          "Name": "DungeonScreenshot"
+        },
+        "33": {
+          "Name": "CelticIndoorsScreenshot"
+        },
+        "34": {
+          "Name": "HouseScreenshot"
+        },
+        "35": {
+          "Name": "DjiKantosScreenshot"
+        },
+        "36": {
+          "Name": "RiversideScreenshot"
+        },
+        "37": {
+          "Name": "HarbourScreenshot"
+        },
+        "38": {
+          "Name": "DesertScreenshot"
+        },
+        "39": {
+          "Name": "EndgameScreenshot"
+        },
+        "40": {
+          "Name": "PressurePlateScreenshot"
+        },
+        "41": {
+          "Name": "KengetScreenshot"
+        },
+        "42": {
+          "Name": "DungeonScreenshot"
+        },
+        "43": {
+          "Name": "CombatScreenshot"
+        },
+        "44": {
+          "Name": "CombatScreenshot"
+        },
+        "98": {
+          "Name": "TestMap"
+        },
+        "99": {
+          "Name": "StatusBar"
+        }
+      }
+    },
+    "SAMPLES0.XLD": {
+      "EnumName": "SampleId",
+      "Type": "AudioSample",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {}
+      }
+    },
+    "SAMPLES1.XLD": {
+      "EnumName": "SampleId",
+      "Type": "AudioSample",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "SAMPLES2.XLD": {
+      "EnumName": "SampleId",
+      "Type": "AudioSample",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "SCRIPT0.XLD": {
+      "EnumName": "ScriptId",
+      "Type": "Script",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {}
+      }
+    },
+    "SCRIPT2.XLD": {
+      "EnumName": "ScriptId",
+      "Type": "Script",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "SLAB": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "SMLPORT0.XLD": {
+      "EnumName": "SmallPortraitId",
+      "Type": "FixedSizeSprite",
+      "Width": 34,
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": ""
+        },
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {}
+      }
+    },
+    "SMLPORT1.XLD": {
+      "EnumName": "SmallPortraitId",
+      "Type": "FixedSizeSprite",
+      "Width": 34,
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "SONGS0.XLD": {
+      "EnumName": "SongId",
+      "Type": "Song",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {}
+      }
+    },
+    "SPELLDAT.DAT": {
+      "Type": "SpellData",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "TACTICO0.XLD": {
+      "EnumName": "TacticalGraphicsId",
+      "Type": "FixedSizeSprite",
+      "Width": 32,
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {}
+      }
+    },
+    "TRANSTB0.XLD": {
+      "EnumName": "TranslationTableId",
+      "Type": "TranslationTable",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {}
+      }
+    },
+    "WAVELIB0.XLD": {
+      "EnumName": "WaveLibraryId",
+      "Type": "SampleLibrary",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {}
+      }
+    },
+    "$(LANG)\\EVNTTXT0.XLD": {
+      "EnumName": "EventTextId",
+      "Type": "StringTable",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {}
+      }
+    },
+    "$(LANG)\\EVNTTXT1.XLD": {
+      "EnumName": "EventTextId",
+      "Type": "StringTable",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "$(LANG)\\EVNTTXT2.XLD": {
+      "EnumName": "EventTextId",
+      "Type": "StringTable",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "$(LANG)\\EVNTTXT3.XLD": {
+      "EnumName": "EventTextId",
+      "Type": "StringTable",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "$(LANG)\\EVNTTXT9.XLD": {
+      "EnumName": "EventTextId",
+      "Type": "StringTable",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "$(LANG)\\FLICS0.XLD": {
+      "EnumName": "VideoId",
+      "Type": "Video",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {}
+      }
+    },
+    "$(LANG)\\MAPTEXT1.XLD": {
+      "EnumName": "MapTextId",
+      "Type": "StringTable",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "$(LANG)\\MAPTEXT2.XLD": {
+      "EnumName": "MapTextId",
+      "Type": "StringTable",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "$(LANG)\\MAPTEXT3.XLD": {
+      "EnumName": "MapTextId",
+      "Type": "StringTable",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "$(LANG)\\SYSTEXTS": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "$(LANG)\\WORDLIS0.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {}
+      }
+    },
+    "INITIAL\\AUTOMAP1.XLD": {
+      "EnumName": "AutoMapId",
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "INITIAL\\AUTOMAP2.XLD": {
+      "EnumName": "AutoMapId",
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "INITIAL\\AUTOMAP3.XLD": {
+      "EnumName": "AutoMapId",
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "INITIAL\\CHESTDT0.XLD": {
+      "EnumName": "ChestId",
+      "Type": "Inventory",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {}
+      }
+    },
+    "INITIAL\\CHESTDT1.XLD": {
+      "EnumName": "ChestId",
+      "Type": "Inventory",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "INITIAL\\CHESTDT2.XLD": {
+      "EnumName": "ChestId",
+      "Type": "Inventory",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "INITIAL\\CHESTDT5.XLD": {
+      "EnumName": "ChestId",
+      "Type": "Inventory",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "INITIAL\\MERCHDT0.XLD": {
+      "EnumName": "MerchantId",
+      "Type": "Inventory",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {}
+      }
+    },
+    "INITIAL\\MERCHDT1.XLD": {
+      "EnumName": "MerchantId",
+      "Type": "Inventory",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "INITIAL\\MERCHDT2.XLD": {
+      "EnumName": "MerchantId",
+      "Type": "Inventory",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "INITIAL\\NPCCHAR0.XLD": {
+      "EnumName": "NpcCharacterId",
+      "Type": "CharacterData",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {}
+      }
+    },
+    "INITIAL\\NPCCHAR1.XLD": {
+      "EnumName": "NpcCharacterId",
+      "Type": "CharacterData",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "INITIAL\\NPCCHAR2.XLD": {
+      "EnumName": "NpcCharacterId",
+      "Type": "CharacterData",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "INITIAL\\PRTCHAR0.XLD": {
+      "EnumName": "PartyCharacterId",
+      "Type": "CharacterData",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {}
+      }
+    },
+    "INITIAL\\PRTCHAR1.XLD": {
+      "EnumName": "PartyCharacterId",
+      "Type": "CharacterData",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "INITIAL\\PRTCHAR2.XLD": {
+      "EnumName": "PartyCharacterId",
+      "Type": "CharacterData",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {},
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {},
+        "17": {},
+        "18": {},
+        "19": {},
+        "20": {},
+        "21": {},
+        "22": {},
+        "23": {},
+        "24": {},
+        "25": {},
+        "26": {},
+        "27": {},
+        "28": {},
+        "29": {},
+        "30": {},
+        "31": {},
+        "32": {},
+        "33": {},
+        "34": {},
+        "35": {},
+        "36": {},
+        "37": {},
+        "38": {},
+        "39": {},
+        "40": {},
+        "41": {},
+        "42": {},
+        "43": {},
+        "44": {},
+        "45": {},
+        "46": {},
+        "47": {},
+        "48": {},
+        "49": {},
+        "50": {},
+        "51": {},
+        "52": {},
+        "53": {},
+        "54": {},
+        "55": {},
+        "56": {},
+        "57": {},
+        "58": {},
+        "59": {},
+        "60": {},
+        "61": {},
+        "62": {},
+        "63": {},
+        "64": {},
+        "65": {},
+        "66": {},
+        "67": {},
+        "68": {},
+        "69": {},
+        "70": {},
+        "71": {},
+        "72": {},
+        "73": {},
+        "74": {},
+        "75": {},
+        "76": {},
+        "77": {},
+        "78": {},
+        "79": {},
+        "80": {},
+        "81": {},
+        "82": {},
+        "83": {},
+        "84": {},
+        "85": {},
+        "86": {},
+        "87": {},
+        "88": {},
+        "89": {},
+        "90": {},
+        "91": {},
+        "92": {},
+        "93": {},
+        "94": {},
+        "95": {},
+        "96": {},
+        "97": {},
+        "98": {},
+        "99": {}
+      }
+    },
+    "ENGLISH\\EVNTTXT0.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "ENGLISH\\EVNTTXT1.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "ENGLISH\\EVNTTXT2.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "ENGLISH\\EVNTTXT3.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "ENGLISH\\EVNTTXT9.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "ENGLISH\\FLICS0.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Width": 32
+        },
+        "1": {
+          "Width": 32
+        },
+        "2": {
+          "Width": 32
+        },
+        "3": {
+          "Width": 32
+        },
+        "4": {
+          "Width": 32
+        },
+        "5": {
+          "Width": 32
+        },
+        "6": {
+          "Width": 32
+        },
+        "7": {
+          "Width": 32
+        },
+        "8": {
+          "Width": 32
+        },
+        "9": {
+          "Width": 32
+        },
+        "10": {
+          "Width": 32
+        },
+        "11": {
+          "Width": 32
+        },
+        "12": {
+          "Width": 32
+        },
+        "13": {
+          "Width": 32
+        },
+        "14": {
+          "Width": 32
+        },
+        "15": {
+          "Width": 32
+        },
+        "16": {
+          "Width": 32
+        },
+        "17": {
+          "Width": 32
+        },
+        "18": {
+          "Width": 32
+        }
+      }
+    },
+    "ENGLISH\\MAPTEXT1.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "ENGLISH\\MAPTEXT2.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "ENGLISH\\MAPTEXT3.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "ENGLISH\\WORDLIS0.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "GERMAN\\EVNTTXT0.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "GERMAN\\EVNTTXT1.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "GERMAN\\EVNTTXT2.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "GERMAN\\EVNTTXT3.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "GERMAN\\EVNTTXT9.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "GERMAN\\FLICS0.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Width": 32
+        },
+        "1": {
+          "Width": 32
+        },
+        "2": {
+          "Width": 32
+        },
+        "3": {
+          "Width": 32
+        },
+        "4": {
+          "Width": 32
+        },
+        "5": {
+          "Width": 32
+        },
+        "6": {
+          "Width": 32
+        },
+        "7": {
+          "Width": 32
+        },
+        "8": {
+          "Width": 32
+        },
+        "9": {
+          "Width": 32
+        },
+        "10": {
+          "Width": 32
+        },
+        "11": {
+          "Width": 32
+        },
+        "12": {
+          "Width": 32
+        },
+        "13": {
+          "Width": 32
+        },
+        "14": {
+          "Width": 32
+        },
+        "15": {
+          "Width": 32
+        },
+        "16": {
+          "Width": 32
+        },
+        "17": {
+          "Width": 32
+        },
+        "18": {
+          "Width": 32
+        }
+      }
+    },
+    "GERMAN\\MAPTEXT1.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "GERMAN\\MAPTEXT2.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "GERMAN\\MAPTEXT3.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    },
+    "GERMAN\\WORDLIS0.XLD": {
+      "Type": "Unknown",
+      "RotatedLeft": false,
+      "Assets": {}
+    }
+  }
+}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -17,6 +18,7 @@ namespace UAlbion.Tools.ImageReverser
         readonly Timer _timer;
         TreeNode _rootNode;
         AlbionSprite _sprite;
+        IList<int> _savedPalettes;
 
         public MainFrm(AssetConfig config)
         {
@@ -85,12 +87,11 @@ namespace UAlbion.Tools.ImageReverser
                 {
                     var palette = new AlbionPalette(br, (int)br.BaseStream.Length, paletteName, paletteNumber);
                     palette.SetCommonPalette(commonPalette);
-                    listPalettes.Items.Add(palette);
+                    chkListPalettes.Items.Add(palette);
                 }
             }
 
-            listPalettes.SelectedIndex = 0;
-
+            chkListPalettes.SelectedIndex = 0;
             _rootNode.Expand();
             _timer.Start();
         }
@@ -247,7 +248,7 @@ namespace UAlbion.Tools.ImageReverser
                 if (trackWidth.Value == 1)
                     trackWidth.Value = _sprite.Width;
 
-                var palette = (AlbionPalette)(listPalettes.SelectedItem ?? listPalettes.Items[0]);
+                var palette = (AlbionPalette)(chkListPalettes.SelectedItem ?? chkListPalettes.Items[0]);
                 uint[] curPalette = palette.GetPaletteAtTime((int)((DateTime.Now - _startTime).TotalSeconds * 4));
 
                 var width = Math.Max(0, trackWidth.Value);
@@ -333,11 +334,31 @@ namespace UAlbion.Tools.ImageReverser
             }
         }
 
+        void SyncSelectedPalettes()
+        {
+            var (filename, asset) = CurrentObject;
+            if (asset == null)
+                return;
+
+            if (asset.PaletteHints == null)
+                asset.PaletteHints = new List<int>();
+
+            for (int index = 0; index < chkListPalettes.Items.Count; index++)
+            {
+                var item = (AlbionPalette)chkListPalettes.Items[index];
+                chkListPalettes.SetItemChecked(index, asset.PaletteHints.Contains(item.Id));
+            }
+
+            if (!chkListPalettes.GetItemChecked(chkListPalettes.SelectedIndex) && chkListPalettes.CheckedIndices.Count > 0)
+                chkListPalettes.SelectedIndex = chkListPalettes.CheckedIndices[0];
+        }
+
         void FileTree_AfterSelect(object sender, TreeViewEventArgs e)
         {
             var (filename, asset) = CurrentObject;
             if (asset == null)
                 return;
+            SyncSelectedPalettes();
 
             trackWidth.Value = asset.EffectiveWidth == 0 ? 1 : asset.EffectiveWidth;
             trackFrame.Value = 0;
@@ -450,7 +471,7 @@ namespace UAlbion.Tools.ImageReverser
             SaveClicked?.Invoke(this, EventArgs.Empty);
         }
 
-        void ListPalettes_SelectedIndexChanged(object sender, EventArgs e)
+        void ChkListPalettes_SelectedIndexChanged(object sender, EventArgs e)
         {
             Render();
         }
@@ -461,11 +482,43 @@ namespace UAlbion.Tools.ImageReverser
             else _timer.Stop();
         }
 
-        private void FileTree_KeyDown(object sender, KeyEventArgs e)
+        void FileTree_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.X && _sprite != null)
+            if (e.Control && e.KeyCode == Keys.X && _sprite != null)
             {
                 trackWidth.Value = _sprite.Frames[0].Height;
+            }
+
+            var (_, asset) = CurrentObject;
+            if (e.Control && e.KeyCode == Keys.C && asset != null)
+            {
+                _savedPalettes = asset.PaletteHints.ToList();
+            }
+
+            if (e.Control && e.KeyCode == Keys.V && asset != null)
+            {
+                asset.PaletteHints.Clear();
+                foreach(var palette in _savedPalettes)
+                    asset.PaletteHints.Add(palette);
+                SyncSelectedPalettes();
+            }
+        }
+
+        void ChkListPalettes_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            var (_, asset) = CurrentObject;
+            if (asset == null)
+                return;
+
+            var palette = (AlbionPalette) chkListPalettes.Items[e.Index];
+            if (e.NewValue == CheckState.Checked)
+            {
+                if (!asset.PaletteHints.Contains(palette.Id))
+                    asset.PaletteHints.Add(palette.Id);
+            }
+            else
+            {
+                asset.PaletteHints.Remove(palette.Id);
             }
         }
     }

@@ -126,6 +126,15 @@ namespace UAlbion.Formats
             var serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, NullValueHandling = NullValueHandling.Ignore };
             var json = JsonConvert.SerializeObject(this, serializerSettings);
             File.WriteAllText(configPath, json);
+
+            foreach (var xld in Xlds)
+            {
+                foreach (var asset in xld.Value.Assets)
+                {
+                    if (asset.Value.PaletteHints == null)
+                        asset.Value.PaletteHints = new List<int>();
+                }
+            }
         }
     }
 }

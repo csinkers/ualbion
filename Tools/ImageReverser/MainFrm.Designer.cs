@@ -36,7 +36,6 @@
             this.canvas = new System.Windows.Forms.PictureBox();
             this.trackFrameCount = new System.Windows.Forms.TrackBar();
             this.numFrameCount = new System.Windows.Forms.NumericUpDown();
-            this.listPalettes = new System.Windows.Forms.ListBox();
             this.trackFrame = new System.Windows.Forms.TrackBar();
             this.numFrame = new System.Windows.Forms.NumericUpDown();
             this.txtInfo = new System.Windows.Forms.TextBox();
@@ -45,6 +44,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.chkAnimate = new System.Windows.Forms.CheckBox();
+            this.chkListPalettes = new System.Windows.Forms.CheckedListBox();
             ((System.ComponentModel.ISupportInitialize)(this.trackWidth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numWidth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.canvas)).BeginInit();
@@ -61,7 +61,7 @@
             this.fileTree.Location = new System.Drawing.Point(181, 13);
             this.fileTree.Margin = new System.Windows.Forms.Padding(2);
             this.fileTree.Name = "fileTree";
-            this.fileTree.Size = new System.Drawing.Size(236, 1463);
+            this.fileTree.Size = new System.Drawing.Size(235, 1441);
             this.fileTree.TabIndex = 0;
             this.fileTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.FileTree_AfterSelect);
             this.fileTree.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FileTree_KeyDown);
@@ -70,12 +70,12 @@
             // 
             this.trackWidth.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.trackWidth.Location = new System.Drawing.Point(520, 1318);
+            this.trackWidth.Location = new System.Drawing.Point(520, 1364);
             this.trackWidth.Margin = new System.Windows.Forms.Padding(2);
             this.trackWidth.Maximum = 1024;
             this.trackWidth.Minimum = 1;
             this.trackWidth.Name = "trackWidth";
-            this.trackWidth.Size = new System.Drawing.Size(1072, 56);
+            this.trackWidth.Size = new System.Drawing.Size(1333, 56);
             this.trackWidth.TabIndex = 1;
             this.trackWidth.Value = 32;
             this.trackWidth.ValueChanged += new System.EventHandler(this.TrackWidth_ValueChanged);
@@ -84,7 +84,7 @@
             // numWidth
             // 
             this.numWidth.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.numWidth.Location = new System.Drawing.Point(1596, 1323);
+            this.numWidth.Location = new System.Drawing.Point(1857, 1369);
             this.numWidth.Margin = new System.Windows.Forms.Padding(2);
             this.numWidth.Maximum = new decimal(new int[] {
             1024,
@@ -110,7 +110,7 @@
             // textName
             // 
             this.textName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.textName.Location = new System.Drawing.Point(520, 1292);
+            this.textName.Location = new System.Drawing.Point(520, 1338);
             this.textName.Margin = new System.Windows.Forms.Padding(2);
             this.textName.Name = "textName";
             this.textName.Size = new System.Drawing.Size(518, 22);
@@ -119,11 +119,11 @@
             // 
             // btnSave
             // 
-            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.Location = new System.Drawing.Point(1527, 1443);
+            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnSave.Location = new System.Drawing.Point(180, 1458);
             this.btnSave.Margin = new System.Windows.Forms.Padding(2);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(144, 42);
+            this.btnSave.Size = new System.Drawing.Size(235, 63);
             this.btnSave.TabIndex = 4;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
@@ -137,7 +137,7 @@
             this.canvas.Location = new System.Drawing.Point(688, 13);
             this.canvas.Margin = new System.Windows.Forms.Padding(2);
             this.canvas.Name = "canvas";
-            this.canvas.Size = new System.Drawing.Size(983, 1275);
+            this.canvas.Size = new System.Drawing.Size(1244, 1321);
             this.canvas.TabIndex = 5;
             this.canvas.TabStop = false;
             // 
@@ -145,12 +145,12 @@
             // 
             this.trackFrameCount.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.trackFrameCount.Location = new System.Drawing.Point(520, 1378);
+            this.trackFrameCount.Location = new System.Drawing.Point(520, 1424);
             this.trackFrameCount.Margin = new System.Windows.Forms.Padding(2);
             this.trackFrameCount.Maximum = 1024;
             this.trackFrameCount.Minimum = 1;
             this.trackFrameCount.Name = "trackFrameCount";
-            this.trackFrameCount.Size = new System.Drawing.Size(1072, 56);
+            this.trackFrameCount.Size = new System.Drawing.Size(1333, 56);
             this.trackFrameCount.TabIndex = 7;
             this.trackFrameCount.Value = 1;
             this.trackFrameCount.ValueChanged += new System.EventHandler(this.TrackFrameCount_ValueChanged);
@@ -158,7 +158,7 @@
             // numFrameCount
             // 
             this.numFrameCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.numFrameCount.Location = new System.Drawing.Point(1596, 1378);
+            this.numFrameCount.Location = new System.Drawing.Point(1857, 1424);
             this.numFrameCount.Margin = new System.Windows.Forms.Padding(2);
             this.numFrameCount.Maximum = new decimal(new int[] {
             1024,
@@ -180,27 +180,15 @@
             0});
             this.numFrameCount.ValueChanged += new System.EventHandler(this.NumFrameCount_ValueChanged);
             // 
-            // listPalettes
-            // 
-            this.listPalettes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.listPalettes.FormattingEnabled = true;
-            this.listPalettes.ItemHeight = 16;
-            this.listPalettes.Location = new System.Drawing.Point(13, 13);
-            this.listPalettes.Name = "listPalettes";
-            this.listPalettes.Size = new System.Drawing.Size(163, 1460);
-            this.listPalettes.TabIndex = 11;
-            this.listPalettes.SelectedIndexChanged += new System.EventHandler(this.ListPalettes_SelectedIndexChanged);
-            // 
             // trackFrame
             // 
             this.trackFrame.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.trackFrame.Location = new System.Drawing.Point(520, 1429);
+            this.trackFrame.Location = new System.Drawing.Point(520, 1475);
             this.trackFrame.Margin = new System.Windows.Forms.Padding(2);
             this.trackFrame.Maximum = 1024;
             this.trackFrame.Name = "trackFrame";
-            this.trackFrame.Size = new System.Drawing.Size(924, 56);
+            this.trackFrame.Size = new System.Drawing.Size(1185, 56);
             this.trackFrame.TabIndex = 12;
             this.trackFrame.Value = 32;
             this.trackFrame.ValueChanged += new System.EventHandler(this.TrackFrame_ValueChanged);
@@ -208,7 +196,7 @@
             // numFrame
             // 
             this.numFrame.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.numFrame.Location = new System.Drawing.Point(1448, 1443);
+            this.numFrame.Location = new System.Drawing.Point(1709, 1489);
             this.numFrame.Margin = new System.Windows.Forms.Padding(2);
             this.numFrame.Maximum = new decimal(new int[] {
             1024,
@@ -233,7 +221,7 @@
             this.txtInfo.Multiline = true;
             this.txtInfo.Name = "txtInfo";
             this.txtInfo.ReadOnly = true;
-            this.txtInfo.Size = new System.Drawing.Size(261, 1274);
+            this.txtInfo.Size = new System.Drawing.Size(261, 1320);
             this.txtInfo.TabIndex = 14;
             // 
             // label1
@@ -241,7 +229,7 @@
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(422, 1383);
+            this.label1.Location = new System.Drawing.Point(422, 1429);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(93, 17);
             this.label1.TabIndex = 15;
@@ -252,7 +240,7 @@
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(422, 1323);
+            this.label2.Location = new System.Drawing.Point(422, 1369);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(48, 17);
             this.label2.TabIndex = 16;
@@ -263,7 +251,7 @@
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(422, 1443);
+            this.label3.Location = new System.Drawing.Point(422, 1489);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(52, 17);
             this.label3.TabIndex = 17;
@@ -274,7 +262,7 @@
             this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(422, 1292);
+            this.label4.Location = new System.Drawing.Point(422, 1338);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(49, 17);
             this.label4.TabIndex = 18;
@@ -287,7 +275,7 @@
             this.chkAnimate.AutoSize = true;
             this.chkAnimate.Checked = true;
             this.chkAnimate.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkAnimate.Location = new System.Drawing.Point(1056, 1294);
+            this.chkAnimate.Location = new System.Drawing.Point(1056, 1340);
             this.chkAnimate.Name = "chkAnimate";
             this.chkAnimate.Size = new System.Drawing.Size(81, 21);
             this.chkAnimate.TabIndex = 19;
@@ -295,11 +283,24 @@
             this.chkAnimate.UseVisualStyleBackColor = true;
             this.chkAnimate.CheckedChanged += new System.EventHandler(this.ChkAnimate_CheckedChanged);
             // 
+            // chkListPalettes
+            // 
+            this.chkListPalettes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.chkListPalettes.FormattingEnabled = true;
+            this.chkListPalettes.Location = new System.Drawing.Point(13, 13);
+            this.chkListPalettes.Name = "chkListPalettes";
+            this.chkListPalettes.Size = new System.Drawing.Size(162, 1500);
+            this.chkListPalettes.TabIndex = 20;
+            this.chkListPalettes.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ChkListPalettes_ItemCheck);
+            this.chkListPalettes.SelectedIndexChanged += new System.EventHandler(this.ChkListPalettes_SelectedIndexChanged);
+            // 
             // MainFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(1682, 1496);
+            this.ClientSize = new System.Drawing.Size(1943, 1542);
+            this.Controls.Add(this.chkListPalettes);
             this.Controls.Add(this.chkAnimate);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
@@ -308,7 +309,6 @@
             this.Controls.Add(this.txtInfo);
             this.Controls.Add(this.numFrame);
             this.Controls.Add(this.trackFrame);
-            this.Controls.Add(this.listPalettes);
             this.Controls.Add(this.numFrameCount);
             this.Controls.Add(this.trackFrameCount);
             this.Controls.Add(this.btnSave);
@@ -343,7 +343,6 @@
         private System.Windows.Forms.PictureBox canvas;
         private System.Windows.Forms.TrackBar trackFrameCount;
         private System.Windows.Forms.NumericUpDown numFrameCount;
-        private System.Windows.Forms.ListBox listPalettes;
         private System.Windows.Forms.TrackBar trackFrame;
         private System.Windows.Forms.NumericUpDown numFrame;
         private System.Windows.Forms.TextBox txtInfo;
@@ -352,6 +351,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.CheckBox chkAnimate;
+        private System.Windows.Forms.CheckedListBox chkListPalettes;
     }
 }
 

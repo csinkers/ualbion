@@ -78,6 +78,6 @@ namespace UAlbion.Formats
             return result;
         }
 
-        public override string ToString() { return string.IsNullOrEmpty(Name) ? $"Palette {Id}" : Name; }
+        public override string ToString() { return string.IsNullOrEmpty(Name) ? $"Palette {Id}" : $"{Name} ({Id})"; }
     }
 }

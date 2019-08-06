@@ -9,14 +9,25 @@
       "Assets": {
         "0": {
           "Name": "FirstImage",
-          "Width": 245
+          "Width": 245,
+          "PaletteHints": [
+            2,
+            54
+          ]
         },
         "1": {
           "Name": "",
-          "Width": 256
+          "Width": 256,
+          "PaletteHints": [
+            2
+          ]
         },
         "2": {
-          "Width": 256
+          "Name": "",
+          "Width": 256,
+          "PaletteHints": [
+            24
+          ]
         },
         "3": {}
       }
@@ -29,185 +40,457 @@
       "RotatedLeft": false,
       "Assets": {
         "0": {
-          "Name": "Brick"
+          "Name": "Brick",
+          "PaletteHints": [
+            2
+          ]
         },
         "1": {
-          "Name": "MossyBrick"
+          "Name": "MossyBrick",
+          "PaletteHints": [
+            2
+          ]
         },
         "2": {
-          "Name": "Water"
+          "Name": "Water",
+          "PaletteHints": [
+            2
+          ]
         },
         "3": {
-          "Name": "MossyBrickEdge"
+          "Name": "MossyBrickEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "4": {
-          "Name": "MossyBrickEdge"
+          "Name": "MossyBrickEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "5": {
-          "Name": "MossyBrickEdge"
+          "Name": "MossyBrickEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "6": {
-          "Name": "MossyBrickEdge"
+          "Name": "MossyBrickEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "7": {
-          "Name": "MossyBrickEdge"
+          "Name": "MossyBrickEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "8": {
-          "Name": "MossyBrickEdge"
+          "Name": "MossyBrickEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "9": {
-          "Name": "MossyBrickEdge"
+          "Name": "MossyBrickEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "10": {
-          "Name": "MossyBrickEdge"
+          "Name": "MossyBrickEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "11": {
-          "Name": "MossyBrickEdge"
+          "Name": "MossyBrickEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "12": {
-          "Name": "MossyBrickEdge"
+          "Name": "MossyBrickEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "13": {
-          "Name": "MossyBrickEdge"
+          "Name": "MossyBrickEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "14": {
-          "Name": "MossyBrickEdge"
+          "Name": "MossyBrickEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "15": {
-          "Name": "WatersEdge"
+          "Name": "WatersEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "16": {
-          "Name": "WatersEdge"
+          "Name": "WatersEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "17": {
-          "Name": "WatersEdge"
+          "Name": "WatersEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "18": {
-          "Name": "WatersEdge"
+          "Name": "WatersEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "19": {
-          "Name": "WatersEdge"
+          "Name": "WatersEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "20": {
-          "Name": "WatersEdge"
+          "Name": "WatersEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "21": {
-          "Name": "WatersEdge"
+          "Name": "WatersEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "22": {
-          "Name": "WatersEdge"
+          "Name": "WatersEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "23": {
-          "Name": "WatersEdge"
+          "Name": "WatersEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "24": {
-          "Name": "WatersEdge"
+          "Name": "WatersEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "25": {
-          "Name": "WatersEdge"
+          "Name": "WatersEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "26": {
-          "Name": "WatersEdge"
+          "Name": "WatersEdge",
+          "PaletteHints": [
+            2
+          ]
         },
         "27": {
-          "Name": "WoodPanel"
+          "Name": "WoodPanel",
+          "PaletteHints": [
+            2
+          ]
         },
         "28": {
-          "Name": "WoodPanel"
+          "Name": "WoodPanel",
+          "PaletteHints": [
+            2
+          ]
         },
         "29": {
-          "Name": "StonePanel"
+          "Name": "StonePanel",
+          "PaletteHints": [
+            2
+          ]
         },
         "30": {
-          "Name": "Moss"
+          "Name": "Moss",
+          "PaletteHints": [
+            2
+          ]
         },
         "31": {
-          "Name": ""
+          "Name": "",
+          "PaletteHints": [
+            6
+          ]
         },
-        "32": {},
-        "33": {},
-        "34": {},
-        "35": {},
-        "36": {},
-        "37": {},
-        "38": {},
-        "39": {},
-        "40": {},
-        "41": {},
-        "42": {},
-        "43": {},
-        "44": {},
-        "45": {},
-        "46": {},
-        "47": {},
-        "48": {},
-        "49": {},
+        "32": {
+          "PaletteHints": [
+            6
+          ]
+        },
+        "33": {
+          "PaletteHints": [
+            6
+          ]
+        },
+        "34": {
+          "PaletteHints": [
+            6
+          ]
+        },
+        "35": {
+          "PaletteHints": [
+            6
+          ]
+        },
+        "36": {
+          "PaletteHints": [
+            6
+          ]
+        },
+        "37": {
+          "PaletteHints": [
+            6
+          ]
+        },
+        "38": {
+          "PaletteHints": [
+            6
+          ]
+        },
+        "39": {
+          "PaletteHints": [
+            6
+          ]
+        },
+        "40": {
+          "PaletteHints": [
+            7
+          ]
+        },
+        "41": {
+          "PaletteHints": [
+            7
+          ]
+        },
+        "42": {
+          "PaletteHints": [
+            7
+          ]
+        },
+        "43": {
+          "PaletteHints": [
+            7
+          ]
+        },
+        "44": {
+          "PaletteHints": [
+            7
+          ]
+        },
+        "45": {
+          "PaletteHints": [
+            7
+          ]
+        },
+        "46": {
+          "PaletteHints": [
+            7
+          ]
+        },
+        "47": {
+          "PaletteHints": [
+            7
+          ]
+        },
+        "48": {
+          "PaletteHints": [
+            7
+          ]
+        },
+        "49": {
+          "PaletteHints": [
+            7
+          ]
+        },
         "50": {
-          "Name": ""
+          "Name": "",
+          "PaletteHints": [
+            12,
+            13
+          ]
         },
         "51": {
-          "Name": "Wood"
+          "Name": "Wood",
+          "PaletteHints": [
+            12,
+            13
+          ]
         },
         "52": {
-          "Name": ""
+          "Name": "",
+          "PaletteHints": [
+            12,
+            13
+          ]
         },
         "53": {
-          "Name": ""
+          "Name": "",
+          "PaletteHints": [
+            12,
+            13
+          ]
         },
         "54": {
-          "Name": "Wood"
+          "Name": "Wood",
+          "PaletteHints": [
+            12,
+            13
+          ]
         },
         "55": {
-          "Name": "Wood"
+          "Name": "Wood",
+          "PaletteHints": [
+            12,
+            13
+          ]
         },
         "56": {
-          "Name": "CrackedMud"
+          "Name": "CrackedMud",
+          "PaletteHints": [
+            12,
+            13
+          ]
         },
         "57": {
-          "Name": "Cobble"
+          "Name": "Cobble",
+          "PaletteHints": [
+            12,
+            13
+          ]
         },
         "58": {
-          "Name": ""
+          "Name": "",
+          "PaletteHints": [
+            28,
+            14
+          ]
         },
-        "59": {},
-        "60": {},
-        "61": {},
-        "62": {},
+        "59": {
+          "Name": "",
+          "PaletteHints": [
+            28,
+            14
+          ]
+        },
+        "60": {
+          "PaletteHints": [
+            28,
+            14
+          ]
+        },
+        "61": {
+          "PaletteHints": [
+            28,
+            14
+          ]
+        },
+        "62": {
+          "PaletteHints": [
+            28,
+            14
+          ]
+        },
         "63": {
-          "Name": ""
+          "Name": "",
+          "PaletteHints": [
+            28,
+            14
+          ]
         },
         "64": {
-          "Name": "ThrobbingPlantWall"
+          "Name": "ThrobbingPlantWall",
+          "PaletteHints": [
+            28,
+            14
+          ]
         },
         "65": {
-          "Name": "ThrobbingPlantWall"
+          "Name": "ThrobbingPlantWall",
+          "PaletteHints": [
+            28,
+            14
+          ]
         },
         "66": {
-          "Name": "Maw"
+          "Name": "Maw",
+          "PaletteHints": [
+            28,
+            14
+          ]
         },
         "67": {
-          "Name": "Maw"
+          "Name": "Maw",
+          "PaletteHints": [
+            28,
+            14
+          ]
         },
         "68": {
-          "Name": "Maw"
+          "Name": "Maw",
+          "PaletteHints": [
+            28,
+            14
+          ]
         },
         "69": {
-          "Name": "Maw"
+          "Name": "Maw",
+          "PaletteHints": [
+            28,
+            14
+          ]
         },
         "70": {
-          "Name": "MawShut"
+          "Name": "MawShut",
+          "PaletteHints": [
+            28,
+            14
+          ]
         },
         "71": {
-          "Name": "MawShut"
+          "Name": "MawShut",
+          "PaletteHints": [
+            28,
+            14
+          ]
         },
         "72": {
-          "Name": "MawShut"
+          "Name": "MawShut",
+          "PaletteHints": [
+            28,
+            14
+          ]
         },
         "73": {
-          "Name": "MawShut"
+          "Name": "MawShut",
+          "PaletteHints": [
+            28,
+            14
+          ]
         },
         "74": {
-          "Name": "MiniMaw"
+          "Name": "MiniMaw",
+          "PaletteHints": [
+            28
+          ]
         },
         "75": {
           "Name": ""
@@ -216,12 +499,42 @@
         "77": {},
         "78": {},
         "79": {},
-        "80": {},
-        "81": {},
-        "82": {},
-        "83": {},
-        "84": {},
-        "85": {},
+        "80": {
+          "PaletteHints": [
+            17,
+            47
+          ]
+        },
+        "81": {
+          "PaletteHints": [
+            17,
+            47
+          ]
+        },
+        "82": {
+          "PaletteHints": [
+            17,
+            47
+          ]
+        },
+        "83": {
+          "PaletteHints": [
+            17,
+            47
+          ]
+        },
+        "84": {
+          "PaletteHints": [
+            17,
+            47
+          ]
+        },
+        "85": {
+          "PaletteHints": [
+            17,
+            47
+          ]
+        },
         "86": {},
         "87": {},
         "88": {},
@@ -245,153 +558,1076 @@
       "RotatedLeft": false,
       "Assets": {
         "0": {
-          "Name": ""
+          "Name": "",
+          "PaletteHints": [
+            21
+          ]
         },
-        "1": {},
-        "2": {},
-        "3": {},
-        "4": {},
-        "5": {},
-        "6": {},
-        "7": {},
-        "8": {},
-        "9": {},
-        "10": {},
-        "11": {},
-        "12": {},
-        "13": {},
-        "14": {},
-        "15": {},
-        "16": {},
-        "17": {},
-        "18": {},
-        "19": {},
-        "20": {},
-        "21": {},
-        "22": {},
-        "23": {},
-        "24": {},
-        "25": {},
-        "26": {},
-        "27": {},
-        "28": {},
-        "29": {},
-        "30": {},
-        "31": {},
-        "32": {},
-        "33": {},
-        "34": {},
-        "35": {},
-        "36": {},
-        "37": {},
-        "38": {},
-        "39": {},
-        "40": {},
-        "41": {},
-        "42": {},
-        "43": {},
-        "44": {},
-        "45": {},
-        "46": {},
-        "47": {},
-        "48": {},
-        "49": {},
-        "50": {},
-        "51": {},
-        "52": {},
-        "53": {},
-        "54": {},
-        "55": {},
-        "56": {},
-        "57": {},
-        "58": {},
-        "59": {},
-        "60": {},
-        "61": {},
-        "62": {},
-        "63": {},
-        "64": {},
+        "1": {
+          "PaletteHints": [
+            21
+          ]
+        },
+        "2": {
+          "PaletteHints": [
+            21
+          ]
+        },
+        "3": {
+          "PaletteHints": [
+            21
+          ]
+        },
+        "4": {
+          "PaletteHints": [
+            21
+          ]
+        },
+        "5": {
+          "PaletteHints": [
+            21
+          ]
+        },
+        "6": {
+          "PaletteHints": [
+            21
+          ]
+        },
+        "7": {
+          "PaletteHints": [
+            21
+          ]
+        },
+        "8": {
+          "PaletteHints": [
+            21
+          ]
+        },
+        "9": {
+          "PaletteHints": [
+            21
+          ]
+        },
+        "10": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "11": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "12": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "13": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "14": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "15": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "16": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "17": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "18": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "19": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "20": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "21": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "22": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "23": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "24": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "25": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "26": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "27": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "28": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "29": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "30": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "31": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "32": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "33": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "34": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "35": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "36": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "37": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "38": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "39": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "40": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "41": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "42": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "43": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "44": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "45": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "46": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "47": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "48": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "49": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "50": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "51": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "52": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "53": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "54": {
+          "PaletteHints": [
+            24
+          ]
+        },
+        "55": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "56": {
+          "Name": "",
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "57": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "58": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "59": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "60": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "61": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "62": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "63": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "64": {
+          "Name": "",
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
         "65": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateRedDown",
+          "PaletteHints": [
+            25,
+            7,
+            8,
+            9,
+            10,
+            12,
+            13,
+            14,
+            17,
+            19,
+            21,
+            22,
+            23,
+            24,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            49,
+            50,
+            55,
+            54,
+            53,
+            52,
+            51,
+            2
+          ]
         },
         "66": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateRedUp",
+          "PaletteHints": [
+            25,
+            7,
+            8,
+            9,
+            10,
+            12,
+            13,
+            14,
+            17,
+            19,
+            21,
+            22,
+            23,
+            24,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            49,
+            50,
+            55,
+            54,
+            53,
+            52,
+            51,
+            2
+          ]
         },
         "67": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateGreenDown",
+          "PaletteHints": [
+            25,
+            7,
+            8,
+            9,
+            10,
+            12,
+            13,
+            14,
+            17,
+            19,
+            21,
+            22,
+            23,
+            24,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            49,
+            50,
+            55,
+            54,
+            53,
+            52,
+            51,
+            2
+          ]
         },
         "68": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateGreenUp",
+          "PaletteHints": [
+            25,
+            7,
+            8,
+            9,
+            10,
+            12,
+            13,
+            14,
+            17,
+            19,
+            21,
+            22,
+            23,
+            24,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            49,
+            50,
+            55,
+            54,
+            53,
+            52,
+            51,
+            2
+          ]
         },
         "69": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateBlueDown",
+          "PaletteHints": [
+            25,
+            7,
+            8,
+            9,
+            10,
+            12,
+            13,
+            14,
+            17,
+            19,
+            21,
+            22,
+            23,
+            24,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            49,
+            50,
+            55,
+            54,
+            53,
+            52,
+            51,
+            2
+          ]
         },
         "70": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateBlueUp",
+          "PaletteHints": [
+            25,
+            7,
+            8,
+            9,
+            10,
+            12,
+            13,
+            14,
+            17,
+            19,
+            21,
+            22,
+            23,
+            24,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            49,
+            50,
+            55,
+            54,
+            53,
+            52,
+            51,
+            2
+          ]
         },
         "71": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlatePinkDown",
+          "PaletteHints": [
+            25,
+            7,
+            8,
+            9,
+            10,
+            12,
+            13,
+            14,
+            17,
+            19,
+            21,
+            22,
+            23,
+            24,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            49,
+            50,
+            55,
+            54,
+            53,
+            52,
+            51,
+            2
+          ]
         },
         "72": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlatePinkUp",
+          "PaletteHints": [
+            25,
+            7,
+            8,
+            9,
+            10,
+            12,
+            13,
+            14,
+            17,
+            19,
+            21,
+            22,
+            23,
+            24,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            49,
+            50,
+            55,
+            54,
+            53,
+            52,
+            51,
+            2
+          ]
         },
         "73": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateYellowDown",
+          "PaletteHints": [
+            25,
+            7,
+            8,
+            9,
+            10,
+            12,
+            13,
+            14,
+            17,
+            19,
+            21,
+            22,
+            23,
+            24,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            49,
+            50,
+            55,
+            54,
+            53,
+            52,
+            51,
+            2
+          ]
         },
         "74": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateYellowUp",
+          "PaletteHints": [
+            25,
+            7,
+            8,
+            9,
+            10,
+            12,
+            13,
+            14,
+            17,
+            19,
+            21,
+            22,
+            23,
+            24,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            49,
+            50,
+            55,
+            54,
+            53,
+            52,
+            51,
+            2
+          ]
         },
         "75": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateOrangeDown",
+          "PaletteHints": [
+            25,
+            7,
+            8,
+            9,
+            10,
+            12,
+            13,
+            14,
+            17,
+            19,
+            21,
+            22,
+            23,
+            24,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            49,
+            50,
+            55,
+            54,
+            53,
+            52,
+            51,
+            2
+          ]
         },
         "76": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateOrangeUp",
+          "PaletteHints": [
+            25,
+            7,
+            8,
+            9,
+            10,
+            12,
+            13,
+            14,
+            17,
+            19,
+            21,
+            22,
+            23,
+            24,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            49,
+            50,
+            55,
+            54,
+            53,
+            52,
+            51,
+            2
+          ]
         },
         "77": {
-          "Name": "PressurePlate"
+          "Name": "FireBallTop",
+          "PaletteHints": [
+            6,
+            21,
+            25,
+            55
+          ]
         },
         "78": {
-          "Name": "PressurePlate"
+          "Name": "FireballBottom",
+          "PaletteHints": [
+            6,
+            21,
+            25,
+            55
+          ]
         },
         "79": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateMidBlueOff",
+          "PaletteHints": [
+            6,
+            21,
+            25,
+            55
+          ]
         },
         "80": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateMidBlueOn",
+          "PaletteHints": [
+            6,
+            21,
+            25,
+            55
+          ]
         },
         "81": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateLBlueOff",
+          "PaletteHints": [
+            6,
+            21,
+            25,
+            55
+          ]
         },
         "82": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateLBlueOn",
+          "PaletteHints": [
+            6,
+            21,
+            25,
+            55
+          ]
         },
         "83": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateOrangeOff",
+          "PaletteHints": [
+            6,
+            21,
+            25,
+            55
+          ]
         },
         "84": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateOrangeOn",
+          "PaletteHints": [
+            6,
+            21,
+            25,
+            55
+          ]
         },
         "85": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateGreenOff",
+          "PaletteHints": [
+            6,
+            21,
+            25,
+            55
+          ]
         },
         "86": {
-          "Name": "PressurePlate"
+          "Name": "PressurePlateGreenOn",
+          "PaletteHints": [
+            6,
+            21,
+            25,
+            55
+          ]
         },
         "87": {
-          "Name": ""
+          "Name": "BrickFlareL",
+          "PaletteHints": [
+            6,
+            21,
+            25,
+            55
+          ]
         },
-        "88": {},
-        "89": {},
-        "90": {},
-        "91": {},
-        "92": {},
-        "93": {},
-        "94": {},
-        "95": {},
-        "96": {},
-        "97": {},
-        "98": {},
-        "99": {}
+        "88": {
+          "Name": "BrickFlareR",
+          "PaletteHints": [
+            6,
+            21,
+            25,
+            55
+          ]
+        },
+        "89": {
+          "Name": "SquarePanelFlareL",
+          "PaletteHints": [
+            6,
+            21,
+            25,
+            55
+          ]
+        },
+        "90": {
+          "Name": "SquarePanelFlareR",
+          "PaletteHints": [
+            6,
+            21,
+            25,
+            55
+          ]
+        },
+        "91": {
+          "Name": "SquareLight",
+          "PaletteHints": [
+            6,
+            21,
+            25,
+            55
+          ]
+        },
+        "92": {
+          "Name": "SquareFlashingLilght",
+          "PaletteHints": [
+            6,
+            21,
+            25,
+            55
+          ]
+        },
+        "93": {
+          "Name": "",
+          "PaletteHints": [
+            7
+          ]
+        },
+        "94": {
+          "PaletteHints": [
+            7
+          ]
+        },
+        "95": {
+          "PaletteHints": [
+            7
+          ]
+        },
+        "96": {
+          "PaletteHints": [
+            7
+          ]
+        },
+        "97": {
+          "PaletteHints": [
+            7
+          ]
+        },
+        "98": {
+          "PaletteHints": [
+            7
+          ]
+        },
+        "99": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        }
       }
     },
     "3DFLOOR2.XLD": {
@@ -401,89 +1637,489 @@
       "Height": 64,
       "RotatedLeft": false,
       "Assets": {
-        "0": {},
-        "1": {},
-        "2": {},
-        "3": {},
-        "4": {},
-        "5": {},
-        "6": {},
-        "7": {},
-        "8": {},
-        "9": {},
-        "10": {},
-        "11": {},
-        "12": {},
-        "13": {},
-        "14": {},
-        "15": {},
-        "16": {},
-        "17": {},
-        "18": {},
-        "19": {},
-        "20": {},
-        "21": {},
-        "22": {},
-        "23": {},
-        "24": {},
-        "25": {},
-        "26": {},
-        "27": {},
-        "28": {},
-        "29": {},
-        "30": {},
-        "31": {},
-        "32": {},
-        "33": {},
-        "34": {},
-        "35": {},
-        "36": {},
-        "37": {},
-        "38": {},
-        "39": {},
-        "40": {},
-        "41": {},
-        "42": {},
-        "43": {},
-        "44": {},
-        "45": {},
-        "46": {},
-        "47": {},
-        "48": {},
-        "49": {},
-        "50": {},
-        "51": {},
-        "52": {},
-        "53": {},
-        "54": {},
-        "55": {},
-        "56": {},
-        "57": {},
-        "58": {},
-        "59": {},
-        "60": {},
-        "61": {},
-        "62": {},
-        "63": {},
-        "64": {},
-        "65": {},
-        "66": {},
-        "67": {},
-        "68": {},
-        "69": {},
-        "70": {},
-        "71": {},
-        "72": {},
-        "73": {},
-        "74": {},
-        "75": {},
-        "76": {},
-        "77": {},
-        "78": {},
-        "79": {},
-        "80": {},
-        "81": {},
-        "82": {},
+        "0": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "1": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "2": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "3": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "4": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "5": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "6": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "7": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "8": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "9": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "10": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "11": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "12": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "13": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "14": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "15": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "16": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "17": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "18": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "19": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "20": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "21": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "22": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "23": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "24": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "25": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "26": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "27": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "28": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "29": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "30": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "31": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "32": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "33": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "34": {
+          "PaletteHints": [
+            24,
+            50
+          ]
+        },
+        "35": {
+          "PaletteHints": [
+            6
+          ]
+        },
+        "36": {
+          "PaletteHints": [
+            6
+          ]
+        },
+        "37": {
+          "PaletteHints": [
+            6
+          ]
+        },
+        "38": {
+          "PaletteHints": [
+            6
+          ]
+        },
+        "39": {
+          "PaletteHints": [
+            6
+          ]
+        },
+        "40": {
+          "PaletteHints": [
+            6
+          ]
+        },
+        "41": {
+          "PaletteHints": [
+            6
+          ]
+        },
+        "42": {
+          "PaletteHints": [
+            17
+          ]
+        },
+        "43": {
+          "PaletteHints": [
+            17
+          ]
+        },
+        "44": {
+          "PaletteHints": [
+            17
+          ]
+        },
+        "45": {
+          "PaletteHints": [
+            17
+          ]
+        },
+        "46": {
+          "PaletteHints": [
+            17
+          ]
+        },
+        "47": {
+          "PaletteHints": [
+            17
+          ]
+        },
+        "48": {
+          "PaletteHints": [
+            17
+          ]
+        },
+        "49": {
+          "PaletteHints": [
+            17
+          ]
+        },
+        "50": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "51": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "52": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "53": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "54": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "55": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "56": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "57": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "58": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "59": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "60": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "61": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "62": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "63": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "64": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "65": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "66": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "67": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "68": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "69": {
+          "PaletteHints": [
+            12,
+            13
+          ]
+        },
+        "70": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "71": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "72": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "73": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "74": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "75": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "76": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "77": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "78": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "79": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "80": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "81": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
+        "82": {
+          "PaletteHints": [
+            21,
+            29
+          ]
+        },
         "83": {},
         "84": {},
         "85": {},
@@ -3709,61 +5345,118 @@
       "RotatedLeft": false,
       "Assets": {
         "0": {
-          "Name": "Plains"
+          "Name": "Plains",
+          "PaletteHints": [
+            22
+          ]
         },
         "1": {
-          "Name": "Dungeon"
+          "Name": "Dungeon",
+          "PaletteHints": [
+            23
+          ]
         },
         "2": {
-          "Name": "Desert"
+          "Name": "Desert",
+          "PaletteHints": [
+            26
+          ]
         },
         "3": {
-          "Name": "WoodDungeon"
+          "Name": "WoodDungeon",
+          "PaletteHints": [
+            31
+          ]
         },
         "4": {
-          "Name": "BarrelDungeon"
+          "Name": "BarrelDungeon",
+          "PaletteHints": [
+            32
+          ]
         },
         "5": {
-          "Name": "TableDungeon"
+          "Name": "TableDungeon",
+          "PaletteHints": [
+            33
+          ]
         },
         "6": {
-          "Name": "FireDungeon"
+          "Name": "FireDungeon",
+          "PaletteHints": [
+            34
+          ]
         },
         "7": {
-          "Name": "PlantDungeon"
+          "Name": "PlantDungeon",
+          "PaletteHints": [
+            35
+          ]
         },
         "8": {
-          "Name": "Cave"
+          "Name": "Cave",
+          "PaletteHints": [
+            36
+          ]
         },
         "9": {
-          "Name": "Toronto"
+          "Name": "Toronto",
+          "PaletteHints": [
+            37
+          ]
         },
         "10": {
-          "Name": "LivingWalls"
+          "Name": "LivingWalls",
+          "PaletteHints": [
+            38
+          ]
         },
         "11": {
-          "Name": "Forest"
+          "Name": "Forest",
+          "PaletteHints": [
+            39
+          ]
         },
         "12": {
-          "Name": "Town"
+          "Name": "TownNight",
+          "PaletteHints": [
+            40
+          ]
         },
         "13": {
-          "Name": "Town"
+          "Name": "Town",
+          "PaletteHints": [
+            41
+          ]
         },
         "14": {
-          "Name": "Plains"
+          "Name": "Plains",
+          "PaletteHints": [
+            42
+          ]
         },
         "15": {
-          "Name": "Plains"
+          "Name": "Plains",
+          "PaletteHints": [
+            43
+          ]
         },
         "16": {
-          "Name": "DesertNight"
+          "Name": "DesertNight",
+          "PaletteHints": [
+            51
+          ]
         },
         "17": {
-          "Name": "ForestNight"
+          "Name": "ForestNight",
+          "PaletteHints": [
+            52
+          ]
         },
         "18": {
-          "Name": "ForestNight"
+          "Name": "ForestNight",
+          "PaletteHints": [
+            53
+          ]
         }
       }
     },
@@ -6158,10 +7851,21 @@
         "39": {
           "Name": "ForestCombat"
         },
-        "40": {},
-        "41": {},
-        "42": {},
-        "43": {},
+        "40": {
+          "Name": "TownNightCombat",
+          "PaletteHints": [
+            40
+          ]
+        },
+        "41": {
+          "Name": "TownCombat"
+        },
+        "42": {
+          "Name": "PlainsCombat"
+        },
+        "43": {
+          "Name": "PlainsCombat"
+        },
         "44": {},
         "45": {
           "Name": ""
@@ -6177,9 +7881,15 @@
         },
         "49": {},
         "50": {},
-        "51": {},
-        "52": {},
-        "53": {},
+        "51": {
+          "Name": "DesertNightCombat"
+        },
+        "52": {
+          "Name": "ForestNightCombat"
+        },
+        "53": {
+          "Name": "ForestNightCombat"
+        },
         "54": {},
         "55": {}
       }

@@ -2,7 +2,7 @@ namespace UAlbion.Game.AssetIds
 {
     public enum FontId
     {
-        Unknown0 = 0,
-        Unknown1 = 1,
+        RegularFont = 0,
+        BoldFont = 1,
     }
 }

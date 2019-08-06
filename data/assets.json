@@ -3742,17 +3742,29 @@
           "Name": "LivingWalls"
         },
         "11": {
-          "Name": "Plains"
+          "Name": "Forest"
         },
         "12": {
-          "Name": ""
+          "Name": "Town"
         },
-        "13": {},
-        "14": {},
-        "15": {},
-        "16": {},
-        "17": {},
-        "18": {}
+        "13": {
+          "Name": "Town"
+        },
+        "14": {
+          "Name": "Plains"
+        },
+        "15": {
+          "Name": "Plains"
+        },
+        "16": {
+          "Name": "DesertNight"
+        },
+        "17": {
+          "Name": "ForestNight"
+        },
+        "18": {
+          "Name": "ForestNight"
+        }
       }
     },
     "COMGFX0.XLD": {
@@ -6144,7 +6156,7 @@
           "Name": "LivingWallsCombat"
         },
         "39": {
-          "Name": "PlainsCombat"
+          "Name": "ForestCombat"
         },
         "40": {},
         "41": {},

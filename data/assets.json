@@ -423,70 +423,82 @@
         "66": {
           "Name": "Maw",
           "PaletteHints": [
-            28,
             14
           ]
         },
         "67": {
           "Name": "Maw",
           "PaletteHints": [
-            28,
             14
           ]
         },
         "68": {
           "Name": "Maw",
           "PaletteHints": [
-            28,
             14
           ]
         },
         "69": {
           "Name": "Maw",
           "PaletteHints": [
-            28,
             14
           ]
         },
         "70": {
           "Name": "MawShut",
           "PaletteHints": [
-            28,
             14
           ]
         },
         "71": {
           "Name": "MawShut",
           "PaletteHints": [
-            28,
             14
           ]
         },
         "72": {
           "Name": "MawShut",
           "PaletteHints": [
-            28,
             14
           ]
         },
         "73": {
           "Name": "MawShut",
           "PaletteHints": [
-            28,
             14
           ]
         },
         "74": {
           "Name": "MiniMaw",
           "PaletteHints": [
-            28
+            14
           ]
         },
-        "75": {},
-        "76": {},
-        "77": {},
-        "78": {},
-        "79": {},
+        "75": {
+          "PaletteHints": [
+            14
+          ]
+        },
+        "76": {
+          "PaletteHints": [
+            14
+          ]
+        },
+        "77": {
+          "PaletteHints": [
+            14
+          ]
+        },
+        "78": {
+          "PaletteHints": [
+            14
+          ]
+        },
+        "79": {
+          "PaletteHints": [
+            14
+          ]
+        },
         "80": {
           "PaletteHints": [
             17,
@@ -523,19 +535,71 @@
             47
           ]
         },
-        "86": {},
-        "87": {},
-        "88": {},
-        "89": {},
-        "90": {},
-        "91": {},
-        "92": {},
-        "93": {},
-        "94": {},
-        "95": {},
-        "96": {},
-        "97": {},
-        "98": {}
+        "86": {
+          "PaletteHints": [
+            14
+          ]
+        },
+        "87": {
+          "PaletteHints": [
+            14
+          ]
+        },
+        "88": {
+          "PaletteHints": [
+            14
+          ]
+        },
+        "89": {
+          "PaletteHints": [
+            14
+          ]
+        },
+        "90": {
+          "PaletteHints": [
+            17
+          ]
+        },
+        "91": {
+          "PaletteHints": [
+            17
+          ]
+        },
+        "92": {
+          "PaletteHints": [
+            17
+          ]
+        },
+        "93": {
+          "PaletteHints": [
+            21
+          ]
+        },
+        "94": {
+          "PaletteHints": [
+            21
+          ]
+        },
+        "95": {
+          "PaletteHints": [
+            21
+          ]
+        },
+        "96": {
+          "PaletteHints": [
+            21
+          ]
+        },
+        "97": {
+          "PaletteHints": [
+            21
+          ]
+        },
+        "98": {
+          "PaletteHints": [
+            21
+          ]
+        }
       }
     },
     "3DFLOOR1.XLD": {
@@ -2871,7 +2935,11 @@
         "98": {
           "Name": "TorchPedestal",
           "Width": 24,
-          "Height": 78
+          "Height": 78,
+          "PaletteHints": [
+            10,
+            17
+          ]
         }
       }
     },
@@ -2883,410 +2951,819 @@
         "0": {
           "Name": "TorchPedestal",
           "Width": 24,
-          "Height": 70
+          "Height": 70,
+          "PaletteHints": [
+            10,
+            17
+          ]
         },
         "1": {
           "Name": "TorchPedestal",
           "Width": 35,
-          "Height": 82
+          "Height": 82,
+          "PaletteHints": [
+            10,
+            17
+          ]
         },
         "2": {
           "Name": "Column",
-          "Width": 74
+          "Width": 74,
+          "PaletteHints": [
+            17
+          ]
         },
         "3": {
           "Name": "Column",
-          "Width": 74
+          "Width": 74,
+          "PaletteHints": [
+            17
+          ]
         },
         "4": {
           "Name": "Column",
-          "Width": 74
+          "Width": 74,
+          "PaletteHints": [
+            17
+          ]
         },
         "5": {
           "Name": "Column",
-          "Width": 74
+          "Width": 74,
+          "PaletteHints": [
+            17
+          ]
         },
         "6": {
           "Name": "Column",
-          "Width": 24
+          "Width": 24,
+          "PaletteHints": [
+            17
+          ]
         },
         "7": {
           "Name": "Column",
-          "Width": 79
+          "Width": 79,
+          "PaletteHints": [
+            17
+          ]
         },
         "8": {
           "Name": "Column",
-          "Width": 79
+          "Width": 79,
+          "PaletteHints": [
+            17
+          ]
         },
         "9": {
           "Name": "GlowingColumn",
           "Width": 79,
-          "Height": 178
+          "Height": 178,
+          "PaletteHints": [
+            17
+          ]
         },
         "10": {
           "Name": "GlowingColumn",
           "Width": 79,
-          "Height": 178
+          "Height": 178,
+          "PaletteHints": [
+            17
+          ]
         },
         "11": {
           "Name": "Column",
-          "Width": 24
+          "Width": 24,
+          "PaletteHints": [
+            17
+          ]
         },
         "12": {
           "Name": "Column",
-          "Width": 24
+          "Width": 24,
+          "PaletteHints": [
+            17
+          ]
         },
         "13": {
           "Name": "PlantGrowth",
-          "Width": 64
+          "Width": 64,
+          "PaletteHints": [
+            2
+          ]
         },
         "14": {
           "Name": "Dome",
-          "Width": 119
+          "Width": 119,
+          "PaletteHints": [
+            2
+          ]
         },
         "15": {
           "Name": "Banner",
-          "Width": 90
+          "Width": 90,
+          "PaletteHints": [
+            17
+          ]
         },
         "16": {
           "Name": "Banner",
-          "Width": 89
+          "Width": 89,
+          "PaletteHints": [
+            17
+          ]
         },
         "17": {
           "Name": "Stone",
-          "Width": 35
+          "Width": 35,
+          "PaletteHints": [
+            17
+          ]
         },
         "18": {
           "Name": "Stone",
-          "Width": 31
+          "Width": 31,
+          "PaletteHints": [
+            17
+          ]
         },
         "19": {
           "Name": "Stone",
-          "Width": 33
+          "Width": 33,
+          "PaletteHints": [
+            17
+          ]
         },
         "20": {
           "Name": "Stone",
-          "Width": 36
+          "Width": 36,
+          "PaletteHints": [
+            17
+          ]
         },
         "21": {
           "Name": "Stone",
-          "Width": 33
+          "Width": 33,
+          "PaletteHints": [
+            17
+          ]
         },
         "22": {
           "Name": "Stone",
-          "Width": 31
+          "Width": 31,
+          "PaletteHints": [
+            17
+          ]
         },
         "23": {
           "Name": "Column",
-          "Width": 46
+          "Width": 46,
+          "PaletteHints": [
+            17
+          ]
         },
         "24": {
           "Name": "Vines",
-          "Width": 22
+          "Width": 22,
+          "PaletteHints": [
+            17
+          ]
         },
         "25": {
           "Name": "Vines",
-          "Width": 16
+          "Width": 16,
+          "PaletteHints": [
+            17
+          ]
         },
         "26": {
           "Name": "Vines",
-          "Width": 16
+          "Width": 16,
+          "PaletteHints": [
+            17
+          ]
         },
         "27": {
           "Name": "Vines",
-          "Width": 23
+          "Width": 23,
+          "PaletteHints": [
+            17
+          ]
         },
         "28": {
           "Name": "Stone",
-          "Width": 24
+          "Width": 24,
+          "PaletteHints": [
+            17
+          ]
         },
         "29": {
           "Name": "Stone",
-          "Width": 18
+          "Width": 18,
+          "PaletteHints": [
+            17
+          ]
         },
         "30": {
           "Name": "Stone",
-          "Width": 14
+          "Width": 14,
+          "PaletteHints": [
+            17
+          ]
         },
         "31": {
           "Name": "Stone",
-          "Width": 24
+          "Width": 24,
+          "PaletteHints": [
+            17
+          ]
         },
         "32": {
           "Name": "PotatoThing",
-          "Width": 31
+          "Width": 31,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "33": {
           "Name": "PotatoThing",
-          "Width": 26
+          "Width": 26,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "34": {
           "Name": "PotatoThing",
-          "Width": 19
+          "Width": 19,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "35": {
           "Name": "PotatoThing",
-          "Width": 20
+          "Width": 20,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "36": {
           "Name": "PotatoThing",
-          "Width": 14
+          "Width": 14,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "37": {
           "Name": "PotatoThing",
-          "Width": 10
+          "Width": 10,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "38": {
           "Name": "PotatoThing",
-          "Width": 67
+          "Width": 67,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "39": {
           "Name": "PotatoThing",
-          "Width": 54
+          "Width": 54,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "40": {
           "Name": "PotatoThing",
-          "Width": 33
+          "Width": 33,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "41": {
           "Name": "Stone",
-          "Width": 18
+          "Width": 18,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "42": {
           "Name": "Stone",
-          "Width": 21
+          "Width": 21,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "43": {
           "Name": "Stone",
-          "Width": 20
+          "Width": 20,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "44": {
           "Name": "Stone",
-          "Width": 19
+          "Width": 19,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "45": {
           "Name": "Stone",
-          "Width": 21
+          "Width": 21,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "46": {
           "Name": "Stalactite",
-          "Width": 42
+          "Width": 42,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "47": {
           "Name": "Stalactite",
-          "Width": 31
+          "Width": 31,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "48": {
           "Name": "Stalagmite",
-          "Width": 57
+          "Width": 57,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "49": {
           "Name": "Stalagmite",
-          "Width": 50
+          "Width": 50,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "50": {
           "Name": "Stalagmite",
-          "Width": 44
+          "Width": 44,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "51": {
           "Name": "Stalagmite",
-          "Width": 31
+          "Width": 31,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "52": {
           "Name": "Stalagmite",
-          "Width": 33
+          "Width": 33,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "53": {
           "Name": "ShyBush",
           "Width": 66,
-          "Height": 74
+          "Height": 74,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "54": {
           "Name": "ShyBush",
           "Width": 67,
-          "Height": 94
+          "Height": 94,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "55": {
           "Name": "ShyBush",
           "Width": 40,
-          "Height": 58
+          "Height": 58,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "56": {
           "Name": "ShyBush",
           "Width": 33,
-          "Height": 48
+          "Height": 48,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "57": {
           "Name": "Stalagmactite",
-          "Width": 64
+          "Width": 64,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "58": {
           "Name": "Stalagmactite",
-          "Width": 64
+          "Width": 64,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "59": {
           "Name": "Stalagmite",
-          "Width": 63
+          "Width": 63,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "60": {
           "Name": "Sign",
-          "Width": 58
+          "Width": 58,
+          "PaletteHints": [
+            2,
+            54,
+            28
+          ]
         },
         "61": {
           "Name": "Fountain",
           "Width": 141,
-          "Height": 80
+          "Height": 80,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "62": {
           "Name": "PlantColumn",
-          "Width": 75
+          "Width": 75,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "63": {
           "Name": "Vase",
-          "Width": 75
+          "Width": 75,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "64": {
           "Name": "Vase",
-          "Width": 92
+          "Width": 92,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "65": {
-          "Width": 53
+          "Width": 53,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "66": {
           "Name": "Plant",
-          "Width": 99
+          "Width": 99,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "67": {
           "Name": "Tree",
-          "Width": 66
+          "Width": 66,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "68": {
           "Name": "Lamp",
-          "Width": 51
+          "Width": 51,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "69": {
           "Name": "Lamp",
-          "Width": 51
+          "Width": 51,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "70": {
           "Name": "Lamp",
-          "Width": 51
+          "Width": 51,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "71": {
           "Name": "Post",
-          "Width": 23
+          "Width": 23,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "72": {
           "Name": "Post",
-          "Width": 23
+          "Width": 23,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "73": {
           "Name": "Lantern",
-          "Width": 60
+          "Width": 60,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "74": {
           "Name": "Lantern",
-          "Width": 60
+          "Width": 60,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "75": {
           "Name": "Cauldron",
-          "Width": 98
+          "Width": 98,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "76": {
           "Name": "Cauldron",
-          "Width": 98
+          "Width": 98,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "77": {
           "Name": "Barrel",
-          "Width": 85
+          "Width": 85,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "78": {
           "Name": "Barrel",
-          "Width": 56
+          "Width": 56,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "79": {
           "Name": "BrokenBarrel",
-          "Width": 56
+          "Width": 56,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "80": {
           "Name": "RuneStone",
-          "Width": 48
+          "Width": 48,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "81": {
           "Name": "Table",
-          "Width": 126
+          "Width": 126,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "82": {
           "Name": "Table",
-          "Width": 126
+          "Width": 126,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "83": {
           "Name": "Stool",
-          "Width": 62
+          "Width": 62,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "84": {
           "Name": "Vase",
-          "Width": 81
+          "Width": 81,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "85": {
           "Name": "Vase",
-          "Width": 78
+          "Width": 78,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "86": {
           "Name": "Pulley",
-          "Width": 37
+          "Width": 37,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "87": {
           "Name": "Vase",
-          "Width": 65
+          "Width": 65,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "88": {
           "Name": "Vase",
-          "Width": 65
+          "Width": 65,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "89": {
           "Name": "Capstan",
-          "Width": 139
+          "Width": 139,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "90": {
           "Name": "Ship",
-          "Width": 255
+          "Width": 255,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "91": {
           "Name": "Bush",
-          "Width": 61
+          "Width": 61,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "92": {
           "Name": "Bush",
-          "Width": 61
+          "Width": 61,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "93": {
           "Name": "Plant",
-          "Width": 23
+          "Width": 23,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "94": {
           "Name": "Plant",
-          "Width": 27
+          "Width": 27,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "95": {
           "Name": "Tree",
-          "Width": 63
+          "Width": 63,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "96": {
           "Name": "Tree",
-          "Width": 74
+          "Width": 74,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "97": {
           "Name": "Plant",
-          "Width": 25
+          "Width": 25,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "98": {
           "Name": "Plant",
-          "Width": 36
+          "Width": 36,
+          "PaletteHints": [
+            24,
+            48,
+            50
+          ]
         },
         "99": {
           "Name": "Stalactite",
-          "Width": 42
+          "Width": 42,
+          "PaletteHints": [
+            21,
+            29
+          ]
         }
       }
     },
@@ -3297,170 +3774,305 @@
       "Assets": {
         "0": {
           "Name": "Stalagmite",
-          "Width": 57
+          "Width": 57,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "1": {
           "Name": "Skeleton",
-          "Width": 48
+          "Width": 48,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "2": {
           "Name": "Skeleton",
-          "Width": 32
+          "Width": 32,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "3": {
           "Name": "Stone",
-          "Width": 18
+          "Width": 18,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "4": {
           "Name": "Stone",
-          "Width": 21
+          "Width": 21,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "5": {
           "Name": "Minerals",
-          "Width": 67
+          "Width": 67,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "6": {
           "Name": "Minerals",
-          "Width": 68
+          "Width": 68,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "7": {
           "Name": "Minerals",
-          "Width": 50
+          "Width": 50,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "8": {
           "Name": "Minerals",
-          "Width": 28
+          "Width": 28,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "9": {
           "Name": "Minerals",
-          "Width": 25
+          "Width": 25,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "10": {
           "Name": "Minerals",
-          "Width": 21
+          "Width": 21,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "11": {
           "Name": "Minerals",
-          "Width": 15
+          "Width": 15,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "12": {
           "Name": "ScrapMetal",
-          "Width": 106
+          "Width": 106,
+          "PaletteHints": [
+            14
+          ]
         },
         "13": {
           "Name": "ScrapMetal",
-          "Width": 140
+          "Width": 140,
+          "PaletteHints": [
+            14
+          ]
         },
         "14": {
           "Name": "ScrapMetal",
-          "Width": 100
+          "Width": 100,
+          "PaletteHints": [
+            14
+          ]
         },
         "15": {
           "Name": "Barrel",
-          "Width": 96
+          "Width": 96,
+          "PaletteHints": [
+            14
+          ]
         },
         "16": {
           "Name": "Barrel",
-          "Width": 56
+          "Width": 56,
+          "PaletteHints": [
+            14
+          ]
         },
         "17": {
           "Name": "Pot",
-          "Width": 63
+          "Width": 63,
+          "PaletteHints": [
+            14
+          ]
         },
         "18": {
           "Name": "Pot",
-          "Width": 63
+          "Width": 63,
+          "PaletteHints": [
+            14
+          ]
         },
         "19": {
           "Name": "Pot",
-          "Width": 63
+          "Width": 63,
+          "PaletteHints": [
+            14
+          ]
         },
         "20": {
           "Name": "Chest",
-          "Width": 65
+          "Width": 65,
+          "PaletteHints": [
+            14
+          ]
         },
         "21": {
           "Name": "Staircase",
-          "Width": 122
+          "Width": 122,
+          "PaletteHints": [
+            14
+          ]
         },
         "22": {
           "Name": "Rock",
-          "Width": 38
+          "Width": 38,
+          "PaletteHints": [
+            14
+          ]
         },
         "23": {
           "Name": "Rock",
-          "Width": 57
+          "Width": 57,
+          "PaletteHints": [
+            14
+          ]
         },
         "24": {
-          "Width": 33
+          "Width": 33,
+          "PaletteHints": [
+            14
+          ]
         },
         "25": {
-          "Width": 42
+          "Width": 42,
+          "PaletteHints": [
+            14
+          ]
         },
         "26": {
-          "Width": 30
+          "Width": 30,
+          "PaletteHints": [
+            14
+          ]
         },
         "27": {
           "Name": "Rock",
-          "Width": 17
+          "Width": 17,
+          "PaletteHints": [
+            14
+          ]
         },
         "28": {
           "Name": "Rock",
-          "Width": 12
+          "Width": 12,
+          "PaletteHints": [
+            14
+          ]
         },
         "29": {
           "Name": "Rock",
-          "Width": 16
+          "Width": 16,
+          "PaletteHints": [
+            14
+          ]
         },
         "30": {
           "Name": "Rock",
-          "Width": 8
+          "Width": 8,
+          "PaletteHints": [
+            14
+          ]
         },
         "31": {
           "Name": "Rock",
-          "Width": 7
+          "Width": 7,
+          "PaletteHints": [
+            14
+          ]
         },
         "32": {
           "Name": "RubbishPile",
-          "Width": 68
+          "Width": 68,
+          "PaletteHints": [
+            14
+          ]
         },
         "33": {
           "Name": "RubbishPile",
-          "Width": 71
+          "Width": 71,
+          "PaletteHints": [
+            14
+          ]
         },
         "34": {
           "Name": "RubbishPile",
-          "Width": 85
+          "Width": 85,
+          "PaletteHints": [
+            14
+          ]
         },
         "35": {
           "Name": "Iskai",
           "Width": 51,
-          "Height": 130
+          "Height": 130,
+          "PaletteHints": [
+            2
+          ]
         },
         "36": {
           "Name": "Iskai",
           "Width": 51,
-          "Height": 129
+          "Height": 129,
+          "PaletteHints": [
+            2
+          ]
         },
         "37": {
           "Name": "Iskai",
           "Width": 50,
-          "Height": 128
+          "Height": 128,
+          "PaletteHints": [
+            2
+          ]
         },
         "38": {
           "Name": "Iskai",
           "Width": 50,
-          "Height": 129
+          "Height": 129,
+          "PaletteHints": [
+            2
+          ]
         },
         "39": {
           "Name": "Fireball",
           "Width": 56,
-          "Height": 56
+          "Height": 56,
+          "PaletteHints": [
+            2
+          ]
         },
         "40": {
           "Name": "Flames",
           "Width": 27,
-          "Height": 65
+          "Height": 74,
+          "PaletteHints": [
+            2
+          ]
         },
         "41": {
           "Name": "Shield",
@@ -3491,160 +4103,298 @@
         "48": {
           "Name": "Robot",
           "Width": 63,
-          "Height": 101
+          "Height": 101,
+          "PaletteHints": [
+            6,
+            10,
+            15,
+            17,
+            25,
+            55
+          ]
         },
         "49": {
           "Name": "Ladder",
-          "Width": 31
+          "Width": 31,
+          "PaletteHints": [
+            6,
+            10,
+            15,
+            17,
+            25,
+            55
+          ]
         },
         "50": {
           "Name": "LampPlant",
-          "Width": 39
+          "Width": 39,
+          "PaletteHints": [
+            24
+          ]
         },
         "51": {
           "Name": "PlantColumn",
-          "Width": 63
+          "Width": 63,
+          "PaletteHints": [
+            24
+          ]
         },
         "52": {
           "Name": "Dome",
-          "Width": 60
+          "Width": 60,
+          "PaletteHints": [
+            24
+          ]
         },
         "53": {
           "Name": "Dome",
-          "Width": 119
+          "Width": 119,
+          "PaletteHints": [
+            24
+          ]
         },
         "54": {
           "Name": "Fountain",
-          "Width": 89
+          "Width": 89,
+          "PaletteHints": [
+            24
+          ]
         },
         "55": {
           "Name": "Column",
-          "Width": 66
+          "Width": 66,
+          "PaletteHints": [
+            24
+          ]
         },
         "56": {
           "Name": "Iskai",
           "Width": 42,
-          "Height": 111
+          "Height": 111,
+          "PaletteHints": [
+            24
+          ]
         },
         "57": {
           "Name": "Iskai",
           "Width": 51,
-          "Height": 129
+          "Height": 129,
+          "PaletteHints": [
+            24
+          ]
         },
         "58": {
           "Name": "Iskai",
           "Width": 51,
-          "Height": 129
+          "Height": 129,
+          "PaletteHints": [
+            24
+          ]
         },
         "59": {
           "Name": "Iskai",
           "Width": 50,
-          "Height": 128
+          "Height": 128,
+          "PaletteHints": [
+            24
+          ]
         },
         "60": {
           "Name": "Iskai",
           "Width": 50,
-          "Height": 129
+          "Height": 129,
+          "PaletteHints": [
+            24
+          ]
         },
         "61": {
           "Name": "Lamp",
-          "Width": 32
+          "Width": 32,
+          "PaletteHints": [
+            7
+          ]
         },
         "62": {
-          "Width": 26
+          "Width": 26,
+          "PaletteHints": [
+            7
+          ]
         },
         "63": {
-          "Width": 26
+          "Width": 26,
+          "PaletteHints": [
+            7
+          ]
         },
         "64": {
           "Name": "Celt",
           "Width": 56,
-          "Height": 129
+          "Height": 129,
+          "PaletteHints": [
+            24
+          ]
         },
         "65": {
           "Name": "Celt",
           "Width": 56,
-          "Height": 125
+          "Height": 125,
+          "PaletteHints": [
+            24
+          ]
         },
         "66": {
           "Name": "Celt",
           "Width": 55,
-          "Height": 129
+          "Height": 129,
+          "PaletteHints": [
+            24
+          ]
         },
         "67": {
           "Name": "Celt",
           "Width": 56,
-          "Height": 125
+          "Height": 125,
+          "PaletteHints": [
+            24
+          ]
         },
         "68": {
           "Name": "FatCelt",
           "Width": 73,
-          "Height": 130
+          "Height": 130,
+          "PaletteHints": [
+            24
+          ]
         },
         "69": {
           "Name": "Celt",
           "Width": 60,
-          "Height": 109
+          "Height": 109,
+          "PaletteHints": [
+            24
+          ]
         },
         "70": {
           "Name": "Celt",
           "Width": 60,
-          "Height": 109
+          "Height": 109,
+          "PaletteHints": [
+            24
+          ]
         },
         "71": {
           "Name": "Celt",
           "Width": 45,
-          "Height": 141
+          "Height": 141,
+          "PaletteHints": [
+            24
+          ]
         },
         "72": {
           "Name": "BeardyCelt",
           "Width": 53,
-          "Height": 141
+          "Height": 141,
+          "PaletteHints": [
+            24
+          ]
         },
         "73": {
           "Name": "Celt",
           "Width": 47,
-          "Height": 102
+          "Height": 102,
+          "PaletteHints": [
+            24
+          ]
         },
         "74": {
           "Name": "Celt",
           "Width": 47,
-          "Height": 103
+          "Height": 103,
+          "PaletteHints": [
+            24
+          ]
         },
         "75": {
           "Name": "Pillar",
-          "Width": 61
+          "Width": 61,
+          "PaletteHints": [
+            24
+          ]
         },
         "76": {
           "Name": "BrokenRobot",
-          "Width": 64
+          "Width": 64,
+          "PaletteHints": [
+            6,
+            10,
+            15,
+            17,
+            25,
+            55
+          ]
         },
         "77": {
-          "Width": 26
+          "Width": 26,
+          "PaletteHints": [
+            7
+          ]
         },
         "78": {
           "Name": "WaterPool",
-          "Width": 64
+          "Width": 64,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "79": {
           "Name": "EmptyWaterPool",
-          "Width": 64
+          "Width": 64,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "80": {
-          "Width": 64
+          "Width": 64,
+          "PaletteHints": [
+            21,
+            29
+          ]
         },
         "81": {
           "Name": "Krondiir",
           "Width": 145,
-          "Height": 165
+          "Height": 165,
+          "PaletteHints": [
+            2,
+            12,
+            13,
+            14,
+            54
+          ]
         },
         "82": {
           "Name": "Lever",
-          "Width": 66
+          "Width": 66,
+          "PaletteHints": [
+            2,
+            12,
+            13,
+            14,
+            54
+          ]
         },
         "83": {
           "Name": "Lever",
-          "Width": 66
+          "Width": 66,
+          "PaletteHints": [
+            2,
+            12,
+            13,
+            14,
+            54
+          ]
         },
         "84": {
           "Width": 64
@@ -3655,71 +4405,173 @@
         "86": {
           "Name": "Flames",
           "Width": 27,
-          "Height": 74
+          "Height": 74,
+          "PaletteHints": [
+            2
+          ]
         },
         "87": {
           "Name": "Flames",
           "Width": 27,
-          "Height": 74
+          "Height": 74,
+          "PaletteHints": [
+            2
+          ]
         },
         "88": {
           "Name": "GrabbyTrap",
-          "Width": 116
+          "Width": 116,
+          "PaletteHints": [
+            14
+          ]
         },
         "89": {
           "Name": "Krondiir",
           "Width": 145,
-          "Height": 165
+          "Height": 165,
+          "PaletteHints": [
+            2,
+            12,
+            13,
+            14,
+            54
+          ]
         },
         "90": {
           "Name": "EvilKangaroo",
           "Width": 81,
-          "Height": 118
+          "Height": 118,
+          "PaletteHints": [
+            2,
+            12,
+            13,
+            14,
+            54
+          ]
         },
         "91": {
           "Name": "Fireball",
           "Width": 56,
-          "Height": 56
+          "Height": 56,
+          "PaletteHints": [
+            2,
+            12,
+            13,
+            14,
+            54
+          ]
         },
         "92": {
           "Name": "IllManneredMoleRat",
           "Width": 85,
-          "Height": 122
+          "Height": 122,
+          "PaletteHints": [
+            14,
+            28
+          ]
         },
         "93": {
           "Name": "EvilKangaroo",
           "Width": 81,
-          "Height": 119
+          "Height": 119,
+          "PaletteHints": [
+            2,
+            12,
+            13,
+            14,
+            54
+          ]
         },
         "94": {
           "Name": "Krondiir",
           "Width": 155,
-          "Height": 172
+          "Height": 172,
+          "PaletteHints": [
+            2,
+            12,
+            13,
+            14,
+            54
+          ]
         },
         "95": {
           "Name": "PeskyWasp",
           "Width": 165,
-          "Height": 147
+          "Height": 147,
+          "PaletteHints": [
+            54,
+            2
+          ]
         },
         "96": {
           "Name": "FirePillar",
           "Width": 24,
-          "Height": 78
+          "Height": 78,
+          "PaletteHints": [
+            2,
+            5,
+            8,
+            9,
+            10,
+            12,
+            13,
+            14,
+            15,
+            17,
+            19,
+            21,
+            23,
+            24,
+            26,
+            27,
+            28,
+            29,
+            44,
+            54
+          ]
         },
         "97": {
           "Name": "FirePillar",
           "Width": 24,
-          "Height": 70
+          "Height": 70,
+          "PaletteHints": [
+            2,
+            5,
+            8,
+            9,
+            10,
+            12,
+            13,
+            14,
+            15,
+            17,
+            19,
+            21,
+            23,
+            24,
+            26,
+            27,
+            28,
+            29,
+            44,
+            54
+          ]
         },
         "98": {
           "Name": "Iskai",
           "Width": 51,
-          "Height": 130
+          "Height": 130,
+          "PaletteHints": [
+            29
+          ]
         },
         "99": {
           "Name": "Celt",
           "Width": 56,
-          "Height": 129
+          "Height": 129,
+          "PaletteHints": [
+            29
+          ]
         }
       }
     },
@@ -3731,86 +4583,153 @@
         "0": {
           "Name": "Celt",
           "Width": 56,
-          "Height": 125
+          "Height": 125,
+          "PaletteHints": [
+            29
+          ]
         },
         "1": {
           "Name": "BeardyCelt",
           "Width": 53,
-          "Height": 141
+          "Height": 141,
+          "PaletteHints": [
+            29
+          ]
         },
         "2": {
           "Name": "Demon",
           "Width": 129,
-          "Height": 164
+          "Height": 164,
+          "PaletteHints": [
+            29,
+            2,
+            12,
+            13,
+            28,
+            54
+          ]
         },
         "3": {
           "Name": "PeskyWasp",
           "Width": 165,
-          "Height": 147
+          "Height": 147,
+          "PaletteHints": [
+            2,
+            14
+          ]
         },
         "4": {
           "Name": "PeskyWasp",
           "Width": 165,
-          "Height": 147
+          "Height": 147,
+          "PaletteHints": [
+            2,
+            14
+          ]
         },
         "5": {
           "Name": "PeskyWasp",
           "Width": 165,
-          "Height": 147
+          "Height": 147,
+          "PaletteHints": [
+            2,
+            14
+          ]
         },
         "6": {
           "Name": "FloatingHand",
           "Width": 90,
-          "Height": 136
+          "Height": 136,
+          "PaletteHints": [
+            12,
+            13
+          ]
         },
         "7": {
           "Name": "IllTemperedMoleRat",
           "Width": 85,
-          "Height": 122
+          "Height": 122,
+          "PaletteHints": [
+            15,
+            17
+          ]
         },
         "8": {
           "Name": "Demon",
           "Width": 129,
-          "Height": 164
+          "Height": 164,
+          "PaletteHints": [
+            15,
+            17
+          ]
         },
         "9": {
           "Name": "AngryCloud",
           "Width": 183,
-          "Height": 152
+          "Height": 152,
+          "PaletteHints": [
+            17
+          ]
         },
         "10": {
           "Name": "Krondiir",
           "Width": 155,
-          "Height": 172
+          "Height": 172,
+          "PaletteHints": [
+            17
+          ]
         },
         "11": {
           "Name": "Raptor",
           "Width": 106,
-          "Height": 112
+          "Height": 112,
+          "PaletteHints": [
+            17
+          ]
         },
         "12": {
           "Name": "Wizard",
           "Width": 49,
-          "Height": 107
+          "Height": 107,
+          "PaletteHints": [
+            21,
+            15
+          ]
         },
         "13": {
           "Name": "FloatingHand",
           "Width": 90,
-          "Height": 136
+          "Height": 136,
+          "PaletteHints": [
+            21,
+            15
+          ]
         },
         "14": {
           "Name": "Zombie",
           "Width": 77,
-          "Height": 147
+          "Height": 147,
+          "PaletteHints": [
+            21,
+            15
+          ]
         },
         "15": {
           "Name": "Chest",
-          "Width": 123
+          "Width": 123,
+          "PaletteHints": [
+            21,
+            15
+          ]
         },
         "16": {
           "Name": "Zombie",
           "Width": 77,
-          "Height": 147
+          "Height": 147,
+          "PaletteHints": [
+            21,
+            15
+          ]
         },
         "17": {
           "Name": "AngryCloud",
@@ -4087,31 +5006,58 @@
       "RotatedLeft": true,
       "Assets": {
         "0": {
-          "Width": 68
+          "Width": 68,
+          "PaletteHints": [
+            2
+          ]
         },
         "1": {
-          "Width": 49
+          "Width": 49,
+          "PaletteHints": [
+            2
+          ]
         },
         "2": {
-          "Width": 52
+          "Width": 52,
+          "PaletteHints": [
+            2
+          ]
         },
         "3": {
-          "Width": 61
+          "Width": 61,
+          "PaletteHints": [
+            2
+          ]
         },
         "4": {
-          "Width": 61
+          "Width": 61,
+          "PaletteHints": [
+            2
+          ]
         },
         "5": {
-          "Width": 49
+          "Width": 49,
+          "PaletteHints": [
+            2
+          ]
         },
         "6": {
-          "Width": 78
+          "Width": 78,
+          "PaletteHints": [
+            2
+          ]
         },
         "7": {
-          "Width": 9
+          "Width": 9,
+          "PaletteHints": [
+            2
+          ]
         },
         "8": {
-          "Width": 40
+          "Width": 40,
+          "PaletteHints": [
+            2
+          ]
         },
         "9": {
           "Width": 25

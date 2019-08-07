@@ -117,7 +117,7 @@ namespace UAlbion.Formats
             {
                 foreach (var asset in xld.Value.Assets)
                 {
-                    if (!asset.Value.PaletteHints.Any())
+                    if (asset.Value.PaletteHints != null && !asset.Value.PaletteHints.Any())
                         asset.Value.PaletteHints = null;
                 }
             }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Formats;
 using UAlbion.Formats.Parsers;
 using UAlbion.Game.AssetIds;
@@ -20,8 +21,10 @@ namespace UAlbion.Game
             new Handler<PaletteManager, LoadPalEvent>((x, e) =>
             {
                 var palette = x._assets.LoadPalette((PaletteId) e.PaletteId);
-                if(palette != null)
+                if (palette != null)
                     x.SetPalette(palette);
+                else
+                    x.Raise(new LogEvent((int)LogEvent.Level.Error,$"Palette ID {e.PaletteId} could not be loaded!"));
             })
         };
 
@@ -42,4 +45,5 @@ namespace UAlbion.Game
             _scene.SetPalette(_palette.Name, _palette.GetPaletteAtTime(_ticks));
         }
     }
+
 }

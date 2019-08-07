@@ -8,6 +8,9 @@ namespace UAlbion.Formats.Parsers
     {
         public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
         {
+            if (streamLength == 0)
+                return null;
+
             int width = config.EffectiveWidth;
             int height = config.EffectiveHeight;
             if (height == 0)

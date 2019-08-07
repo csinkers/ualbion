@@ -40,8 +40,8 @@ namespace UAlbion.Core
         static RenderDoc _renderDoc;
 
         public ITextureManager TextureManager { get; }
+        public bool LimitFrameRate { get; set; } = true;
         readonly double _desiredFrameLengthSeconds = 1.0 / 60.0;
-        readonly bool _limitFrameRate = true;
         readonly FrameTimeAverager _frameTimeAverager = new FrameTimeAverager(0.5);
         readonly FullScreenQuad _fullScreenQuad;
         readonly ScreenDuplicator _duplicator;
@@ -140,7 +140,7 @@ namespace UAlbion.Core
                 long currentFrameTicks = sw.ElapsedTicks;
                 double deltaSeconds = (currentFrameTicks - previousFrameTicks) / (double)Stopwatch.Frequency;
 
-                while (_limitFrameRate && deltaSeconds < _desiredFrameLengthSeconds)
+                while (LimitFrameRate && deltaSeconds < _desiredFrameLengthSeconds)
                 {
                     var millisecondsToSleep = (int)((_desiredFrameLengthSeconds - deltaSeconds) * 1000);
                     if (millisecondsToSleep > 10)
@@ -246,10 +246,10 @@ namespace UAlbion.Core
 
                 WindowCreateInfo windowCI = new WindowCreateInfo
                 {
-                    X = Window?.X ?? 1536,
-                    Y = Window?.Y ?? 864,
-                    WindowWidth = Window?.Width ?? 1536,
-                    WindowHeight = Window?.Height ?? 864,
+                    X = Window?.X ?? 684,
+                    Y = Window?.Y ?? 456,
+                    WindowWidth = Window?.Width ?? 684,
+                    WindowHeight = Window?.Height ?? 456,
                     WindowInitialState = Window?.WindowState ?? WindowState.Normal,
                     WindowTitle = "UAlbion"
                 };
@@ -311,10 +311,12 @@ namespace UAlbion.Core
         [DebuggerNonUserCode]
         public static void CheckForErrors()
         {
+            /*
             if (_instance.GraphicsDevice.GetOpenGLInfo(out BackendInfoOpenGL opengl))
             {
                 opengl.CheckForErrors();
             }
+            */
         }
     }
 }

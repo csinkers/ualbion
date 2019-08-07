@@ -13,3 +13,5 @@ veldrid-spirv/
 *.lock~
 *.user
 *.gar
+SDL2.dll
+libveldrid-spirv.dll

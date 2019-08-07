@@ -56,7 +56,7 @@ namespace UAlbion
                 scene.AddComponent(new Billboard2D<DungeonFloorId>(DungeonFloorId.Water, 0) { Position = new Vector2(-128.0f, 0.0f) });
                 scene.AddComponent(new Billboard2D<DungeonFloorId>(DungeonFloorId.Water, 0) { Position = new Vector2(-128.0f, 64.0f) });
                 scene.AddComponent(new Billboard2D<DungeonFloorId>(DungeonFloorId.Water, 0) { Position = new Vector2(-64.0f, 64.0f) });
-                scene.AddComponent(new Billboard2D<DungeonFloorId>(DungeonFloorId.Water, 0) { Position = new Vector2(-64.0f, 128.0f) });
+                scene.AddComponent(new Billboard2D<DungeonFloorId>((DungeonFloorId)520, 0) { Position = new Vector2(-64.0f, 128.0f) });
                 //*/
                 engine.SetScene(scene);
                 //scene.Exchange.Raise(new LoadRenderDocEvent(), null);

@@ -177,10 +177,10 @@ namespace UAlbion.Game
 
         object LoadAsset(AssetType type, int id, string name, GameLanguage language)
         {
-            int xldIndex = id / 1000;
+            int xldIndex = id / 100;
             Debug.Assert(xldIndex >= 0);
             Debug.Assert(xldIndex <= 9);
-            int objectIndex = id % 1000;
+            int objectIndex = id % 100;
             var (location, baseName) = _assetFiles[type];
 
             var paths = GetAssetPaths(location, language, baseName, xldIndex, objectIndex);
@@ -243,16 +243,31 @@ namespace UAlbion.Game
                 if (_assetCache.TryGetValue(type, out var typeCache))
                 {
                     if (typeCache.TryGetValue(id, out var cachedAsset))
+                    {
+                        if (cachedAsset is Exception)
+                            return null;
                         return cachedAsset;
+                    }
                 }
                 else _assetCache[type] = new Dictionary<int, object>();
             }
 
-            var newAsset = LoadAsset(type, id, name, language);
+            object newAsset;
+            try
+            {
+                newAsset = LoadAsset(type, id, name, language);
+            }
+            catch(Exception e)
+            {
+                Raise(new LogEvent((int)LogEvent.Level.Error, $"Could not load asset {name}: {e}"));
+                newAsset = e;
+            }
 
             lock (_syncRoot)
             {
                 _assetCache[type][id] = newAsset;
+                if (newAsset is Exception)
+                    return null;
                 return newAsset;
             }
         }
@@ -262,8 +277,12 @@ namespace UAlbion.Game
         public AlbionPalette LoadPalette(PaletteId id)
         {
             var palette = (AlbionPalette)LoadAssetCached(AssetType.Palette, (int)id, $"Pal:{id}");
-            var commonPalette = (byte[])LoadAssetCached(AssetType.PaletteNull, 0, "Pal_Common");
-            palette.SetCommonPalette(commonPalette);
+            if (palette != null)
+            {
+                var commonPalette = (byte[]) LoadAssetCached(AssetType.PaletteNull, 0, "Pal_Common");
+                palette.SetCommonPalette(commonPalette);
+            }
+
             return palette;
         }
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using UAlbion.Core;
 using UAlbion.Core.Objects;
 using UAlbion.Core.Textures;
 using UAlbion.Game.AssetIds;
@@ -12,6 +11,7 @@ namespace UAlbion.Game
     public class SpriteResolver : ISpriteResolver
     {
         readonly Assets _assets;
+        readonly ITexture _defaultTexture;
         static readonly IDictionary<Type, AssetType> AssetTypeLookup = new Dictionary<Type, AssetType>
         {
             { typeof(AutoMapId)           , AssetType.AutomapGraphics },
@@ -39,6 +39,7 @@ namespace UAlbion.Game
         public SpriteResolver(Assets assets)
         {
             _assets = assets ?? throw new ArgumentNullException(nameof(assets));
+            _defaultTexture = _assets.LoadTexture(DungeonWallId.DefaultTexture);
         }
 
         public Tuple<SpriteRenderer.SpriteKey, SpriteRenderer.InstanceData> Resolve(SpriteDefinition spriteDefinition)
@@ -46,6 +47,13 @@ namespace UAlbion.Game
             var assetType = AssetTypeLookup[spriteDefinition.IdType];
             var id = spriteDefinition.NumericId;
             ITexture texture = _assets.LoadTexture(assetType, id);
+            if (texture == null)
+            {
+                return Tuple.Create(new SpriteRenderer.SpriteKey(_defaultTexture, (int) DrawLayer.Diagnostic),
+                    new SpriteRenderer.InstanceData(spriteDefinition.Position,
+                        new Vector2(_defaultTexture.Width, _defaultTexture.Height),
+                        Vector2.Zero, Vector2.One, 0, 0));
+            }
 
             texture.GetSubImageDetails(spriteDefinition.SubObject, out var offset, out var size, out var layer);
 

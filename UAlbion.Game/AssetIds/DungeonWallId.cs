@@ -51,7 +51,7 @@ namespace UAlbion.Game.AssetIds
         Unknown46 = 46,
         Unknown47 = 47,
         Unknown48 = 48,
-        Unknown49 = 49,
+        DefaultTexture = 49,
         Unknown50 = 50,
         Unknown51 = 51,
         Unknown52 = 52,

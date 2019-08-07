@@ -79,13 +79,13 @@ namespace UAlbion.Core.Objects
             layout(set = 0, binding = 0) uniform Projection { mat4 _Proj; };
             layout(set = 0, binding = 1) uniform View { mat4 _View; };
 
-            layout(location = 0) in vec2 Position;
-            layout(location = 1) in vec2 Offset;
-            layout(location = 2) in vec2 Size;
-            layout(location = 3) in vec2 TexOffset;
-            layout(location = 4) in vec2 TexSize;
-            layout(location = 5) in int TexLayer;
-            layout(location = 6) in int Flags;
+            layout(location = 0) in vec2 _Position;
+            layout(location = 1) in vec2 _Offset;
+            layout(location = 2) in vec2 _Size;
+            layout(location = 3) in vec2 _TexOffset;
+            layout(location = 4) in vec2 _TexSize;
+            layout(location = 5) in int _TexLayer;
+            layout(location = 6) in int _Flags;
 
             layout(location = 0) out vec2 fsin_0;
             layout(location = 1) out flat int fsin_1;
@@ -93,10 +93,13 @@ namespace UAlbion.Core.Objects
 
             void main()
             {
-                fsin_0 = Position * TexSize + TexOffset;
-                fsin_1 = TexLayer;
-                fsin_2 = Flags;
-                gl_Position = _Proj * _View * vec4((Position * Size) + Offset, 0, 1);
+                fsin_0 = _Position * _TexSize + _TexOffset;
+                fsin_1 = _TexLayer;
+                fsin_2 = _Flags;
+                //vec4 preTransform = vec4(_Position.x * 1200.0f, _Position.y * 850.0f, 0.0f, 1.0f);
+                //gl_Position = vec4(_Position / 100000.0f, 0.0f, 0.0f); //_Proj * _View * preTransform;
+
+                gl_Position = _Proj * _View * vec4((_Position * _Size) + _Offset, 0, 1);
             }";
 
             public const string FragmentShader = @"
@@ -125,6 +128,8 @@ namespace UAlbion.Core.Objects
                 {
                     OutputColor = texture(sampler2D(SpriteTexture, SpriteSampler), fsin_0);
                 }
+
+                // OutputColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
             }";
         }
 

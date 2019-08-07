@@ -12,6 +12,16 @@ using UAlbion.Core.Textures;
 
 namespace UAlbion.Core
 {
+    /*
+    class CameraControls : Component
+    {
+        public CameraControls() : base(Handlers)
+        {
+        }
+
+        public static IList<Handler> Handlers = new Handler[] { new Handler<CameraControls,>(), }
+    } */
+
     public class Engine : Component, IDisposable
     {
         static readonly IList<Handler> Handlers = new Handler[]

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using Veldrid;
@@ -47,7 +48,7 @@ namespace UAlbion.Game
 
         static KeyBinding Bind(Key key, ModifierKeys modifiers = ModifierKeys.None) => new KeyBinding(key, modifiers);
 
-        IDictionary<InputMode, IDictionary<KeyBinding, string>> Bindings = new Dictionary<InputMode, IDictionary<KeyBinding, string>>
+        IDictionary<InputMode, IDictionary<KeyBinding, IEvent>> _bindings = new Dictionary<InputMode, IDictionary<KeyBinding, string>>
             {
                 { InputMode.Global, new Dictionary<KeyBinding, string>
                     {
@@ -60,6 +61,11 @@ namespace UAlbion.Game
                 },
 
                 { InputMode.World2D, new Dictionary<KeyBinding, string> {
+                    { Bind(Key.Keypad8), "+camera_move  0 -1" },
+                    { Bind(Key.Keypad4), "+camera_move -1  0" },
+                    { Bind(Key.Keypad6), "+camera_move  1  0" },
+                    { Bind(Key.Keypad2), "+camera_move  0  1" },
+
                     { Bind(Key.W), "+party_move  0 -1" },
                     { Bind(Key.S), "+party_move  0  1" },
                     { Bind(Key.A), "+party_move -1  0" },
@@ -119,7 +125,7 @@ namespace UAlbion.Game
                     { Bind(Key.Number7), "respond 7" },
                     { Bind(Key.Escape), "end_conversation" },
                 }},
-        };
+        }.ToDictionary(x => x.Key, x => (IDictionary<KeyBinding, IEvent>)x.Value.ToDictionary(y => y.Key, y => (IEvent)Event.Parse(y.Value)));
 
         public InputBinder() : base(Handlers) { }
 
@@ -142,13 +148,6 @@ namespace UAlbion.Game
         {
             // TODO: Re-emit any held events
         }
-    }
-
-    [Event("e:key_down")] public class KeyDownEvent : EngineEvent { }
-
-    [Event("e:scene_changed")] public class SceneChangedEvent : EngineEvent {
-        public SceneChangedEvent(string sceneId) { SceneId = sceneId; }
-        [EventPart("scene_id")] public string SceneId { get; }
     }
 
     /* SceneId:

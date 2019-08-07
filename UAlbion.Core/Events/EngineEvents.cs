@@ -36,4 +36,9 @@ namespace UAlbion.Core.Events
     [Event("e:toggle_resizable")] public class ToggleResizableEvent : EngineEvent { }
     [Event("e:toggle_visible_border")] public class ToggleVisibleBorderEvent : EngineEvent { }
     [Event("quit", "Exit the game.", new[] { "exit" })] public class QuitEvent : EngineEvent { }
+    [Event("e:key_down")] public class KeyDownEvent : EngineEvent { }
+    [Event("e:scene_changed")] public class SceneChangedEvent : EngineEvent {
+        public SceneChangedEvent(string sceneId) { SceneId = sceneId; }
+        [EventPart("scene_id")] public string SceneId { get; }
+    }
 }

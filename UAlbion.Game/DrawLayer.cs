@@ -3,12 +3,14 @@
     public enum DrawLayer
     {
         Background, // Skybox in 3D
-        Tiles,
-        Items,
-        Characters,
-        Effects,
+        Underlay,
+        Characters1,
+        Overlay,
+        Characters2,
+        // Items,
+        // Effects,
         Diagnostic, // Missing textures etc
         Interface, // GUI
-        Debug,
+        Debug, // ImGui
     }
 }

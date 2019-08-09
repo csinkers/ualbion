@@ -6,6 +6,7 @@ using UAlbion.Core.Objects;
 using UAlbion.Formats;
 using UAlbion.Game;
 using UAlbion.Game.AssetIds;
+using Veldrid;
 
 namespace UAlbion
 {
@@ -23,9 +24,19 @@ namespace UAlbion
             AssetConfig config = AssetConfig.Load(baseDir);
 
             var assets = new Assets(config);
+            var map = assets.LoadMap2D(MapDataId.Unknown116);
+#if false
             var spriteResolver = new SpriteResolver(assets);
 
-            using (var engine = new Engine())
+            var backend =
+                //VeldridStartup.GetPlatformDefaultBackend()
+                //GraphicsBackend.Metal
+                //GraphicsBackend.Vulkan
+                //GraphicsBackend.OpenGL
+                //GraphicsBackend.OpenGLES
+                GraphicsBackend.Direct3D11;
+
+            using (var engine = new Engine(backend))
             {
                 var scene = engine.Create2DScene();
                 scene.AddComponent(assets);
@@ -51,17 +62,20 @@ namespace UAlbion
                 var map = new Billboard2D<PictureId>(PictureId.TestMap, 0) { Position = new Vector2(0.0f, 0.0f) };
                 scene.AddComponent(map);
                 //*
-                var testBillboard = new Billboard2D<DungeonFloorId>(DungeonFloorId.Water, 0) { Position = new Vector2(-64.0f, 0.0f) };
-                scene.AddComponent(testBillboard);
-                scene.AddComponent(new Billboard2D<DungeonFloorId>(DungeonFloorId.Water, 0) { Position = new Vector2(-128.0f, 0.0f) });
-                scene.AddComponent(new Billboard2D<DungeonFloorId>(DungeonFloorId.Water, 0) { Position = new Vector2(-128.0f, 64.0f) });
-                scene.AddComponent(new Billboard2D<DungeonFloorId>(DungeonFloorId.Water, 0) { Position = new Vector2(-64.0f, 64.0f) });
-                scene.AddComponent(new Billboard2D<DungeonFloorId>((DungeonFloorId)520, 0) { Position = new Vector2(-64.0f, 128.0f) });
+                scene.AddComponent(new Billboard2D<DungeonFloorId>(DungeonFloorId.Water, 0) { Position =
+ new Vector2(-64.0f, 0.0f) });
+                scene.AddComponent(new Billboard2D<DungeonFloorId>(DungeonFloorId.Water, 0) { Position =
+ new Vector2(-128.0f, 0.0f) });
+                scene.AddComponent(new Billboard2D<DungeonFloorId>(DungeonFloorId.Water, 0) { Position =
+ new Vector2(-128.0f, 64.0f) });
+                scene.AddComponent(new Billboard2D<DungeonFloorId>(DungeonFloorId.Water, 0) { Position =
+ new Vector2(-64.0f, 64.0f) });
                 //*/
                 engine.SetScene(scene);
                 //scene.Exchange.Raise(new LoadRenderDocEvent(), null);
                 engine.Run();
             }
+#endif
         }
     }
 }

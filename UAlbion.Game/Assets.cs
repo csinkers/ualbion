@@ -185,7 +185,7 @@ namespace UAlbion.Game
 
             var paths = GetAssetPaths(location, language, baseName, xldIndex, objectIndex);
             var xldConfig = _config.Xlds[paths.XldNameInConfig];
-            xldConfig.Assets.TryGetValue(id, out var assetConfig);
+            xldConfig.Assets.TryGetValue(objectIndex, out var assetConfig);
 
             if (paths.OverridePath != null || IsLocationRaw(location))
             {

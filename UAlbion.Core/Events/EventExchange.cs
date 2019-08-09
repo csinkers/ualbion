@@ -6,10 +6,17 @@ namespace UAlbion.Core.Events
 {
     public class EventExchange
     {
+        readonly object _syncRoot = new object();
         readonly IDictionary<Type, IList<IComponent>> _subscriptions = new Dictionary<Type, IList<IComponent>>();
         readonly IDictionary<IComponent, IList<Type>> _subscribers = new Dictionary<IComponent, IList<Type>>();
         readonly IDictionary<Type, RegisteredComponent> _registrations = new Dictionary<Type, RegisteredComponent>();
-        readonly object _syncRoot = new object();
+        readonly EventExchange _parent;
+
+        public EventExchange(EventExchange parent = null)
+        {
+            _parent = parent; 
+
+        }
 
         public void Raise(IEvent e, object sender)
         {
@@ -31,6 +38,8 @@ namespace UAlbion.Core.Events
             if (subscribers != null)
                 foreach(var subscriber in subscribers)
                     subscriber.Receive(e, sender);
+
+            _parent?.Raise(e, sender);
         }
 
         public void Subscribe<T>(IComponent subscriber) { Subscribe(typeof(T), subscriber); }
@@ -90,7 +99,6 @@ namespace UAlbion.Core.Events
     }
 
     /*
-
     GameSystem: Update(float), bool Enabled, OnNewSceneLoaded()
         GraphicsSystem
         InputSystem
@@ -113,8 +121,6 @@ namespace UAlbion.Core.Events
 
     Component: GameObject owner, Transform, Attached/Removed, OnEnabled/Disabled, bool Enabled
         Behaviour: Start(Registry), PostEnabled/Disabled, PostAttached/Removed
-
-
 
     public interface ISubsystem { }
 

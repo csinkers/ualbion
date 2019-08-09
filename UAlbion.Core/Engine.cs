@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 using ImGuiNET;
 using UAlbion.Core.Events;
 using Veldrid;
@@ -40,16 +39,12 @@ namespace UAlbion.Core
         static RenderDoc _renderDoc;
 
         public ITextureManager TextureManager { get; }
-        public bool LimitFrameRate { get; set; } = true;
-        readonly double _desiredFrameLengthSeconds = 1.0 / 60.0;
         readonly FrameTimeAverager _frameTimeAverager = new FrameTimeAverager(0.5);
         readonly FullScreenQuad _fullScreenQuad;
         readonly ScreenDuplicator _duplicator;
         readonly DebugGuiRenderer _igRenderable;
         readonly SceneContext _sceneContext = new SceneContext();
         readonly DebugMenus _debugMenus;
-
-        static Engine _instance;
 
         Scene _scene;
         CommandList _frameCommands;
@@ -104,27 +99,17 @@ namespace UAlbion.Core
             ImGui.StyleColorsClassic();
         }
 
-        public Engine() : base(Handlers)
+        public Engine(GraphicsBackend backend) : base(Handlers)
         {
-            _instance = this;
             TextureManager = new TextureManager();
-            ChangeBackend(
-                //VeldridStartup.GetPlatformDefaultBackend()
-                //GraphicsBackend.Metal
-                //GraphicsBackend.Vulkan
-                //GraphicsBackend.OpenGL
-                //GraphicsBackend.OpenGLES
-                GraphicsBackend.Direct3D11
-                );
+            ChangeBackend(backend);
 
             _igRenderable = new DebugGuiRenderer(Window.Width, Window.Height);
             _duplicator = new ScreenDuplicator();
             _fullScreenQuad = new FullScreenQuad();
             _debugMenus = new DebugMenus(this);
-            Engine.CheckForErrors();
 
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
-            Engine.CheckForErrors();
         }
 
         public void Run()
@@ -133,27 +118,15 @@ namespace UAlbion.Core
                 throw new InvalidOperationException("The scene must be set before the main loop can be run.");
 
             long previousFrameTicks = 0;
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+            Stopwatch sw = Stopwatch.StartNew();
             while (Window.Exists)
             {
                 long currentFrameTicks = sw.ElapsedTicks;
                 double deltaSeconds = (currentFrameTicks - previousFrameTicks) / (double)Stopwatch.Frequency;
-
-                while (LimitFrameRate && deltaSeconds < _desiredFrameLengthSeconds)
-                {
-                    var millisecondsToSleep = (int)((_desiredFrameLengthSeconds - deltaSeconds) * 1000);
-                    if (millisecondsToSleep > 10)
-                        Thread.Sleep(millisecondsToSleep - 1);
-                    currentFrameTicks = sw.ElapsedTicks;
-                    deltaSeconds = (currentFrameTicks - previousFrameTicks) / (double)Stopwatch.Frequency;
-                }
-
                 previousFrameTicks = currentFrameTicks;
 
-                InputSnapshot snapshot = null;
                 Sdl2Events.ProcessEvents();
-                snapshot = Window.PumpEvents();
+                InputSnapshot snapshot = Window.PumpEvents();
                 InputTracker.UpdateFrameInput(snapshot, Window);
                 Update((float)deltaSeconds);
                 if (!Window.Exists)
@@ -244,7 +217,7 @@ namespace UAlbion.Core
             {
                 Window?.Close();
 
-                WindowCreateInfo windowCI = new WindowCreateInfo
+                WindowCreateInfo windowInfo = new WindowCreateInfo
                 {
                     X = Window?.X ?? 684,
                     Y = Window?.Y ?? 456,
@@ -254,14 +227,17 @@ namespace UAlbion.Core
                     WindowTitle = "UAlbion"
                 };
 
-                Window = VeldridStartup.CreateWindow(ref windowCI);
+                Window = VeldridStartup.CreateWindow(ref windowInfo);
                 Window.BorderVisible = false;
                 Window.Resized += () => _windowResized = true;
             }
 
             GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(false, null, false,
                 ResourceBindingModel.Improved, true, true, false, true)
-            { Debug = true };
+            {
+                Debug = true ,
+                SyncToVerticalBlank = true
+            };
 
             GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, gdOptions, backend);
 
@@ -281,7 +257,6 @@ namespace UAlbion.Core
             initCL.Name = "Recreation Initialization Command List";
             initCL.Begin();
             _sceneContext.CreateDeviceObjects(GraphicsDevice, initCL, _sceneContext);
-            CheckForErrors();
             _scene.CreateAllDeviceObjects(GraphicsDevice, initCL, _sceneContext);
             initCL.End();
             GraphicsDevice.SubmitCommands(initCL);
@@ -305,18 +280,6 @@ namespace UAlbion.Core
             _frameCommands?.Dispose();
             _fullScreenQuad?.Dispose();
             //_graphicsDevice?.Dispose();
-        }
-
-        [Conditional("DEBUG")]
-        [DebuggerNonUserCode]
-        public static void CheckForErrors()
-        {
-            /*
-            if (_instance.GraphicsDevice.GetOpenGLInfo(out BackendInfoOpenGL opengl))
-            {
-                opengl.CheckForErrors();
-            }
-            */
         }
     }
 }

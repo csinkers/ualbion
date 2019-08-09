@@ -305,16 +305,14 @@ let files =
         @"ICONDAT0.XLD", XldFile.graphics  // Sprite-maps?
         @"ICONGFX0.XLD", XldFile.graphics  // Sprite-maps?
         // @"ITEMGFX", NONXLD              // Just an array of 16x16 sprites appended together
-        //@"ITEMLIST.DAT", NONXLD            // Probably contains weapon damage etc stats
-        //@"ITEMNAME.DAT", NONXLD            // Item names, char[20][], ordered in groups of DE, EN, FR (462 items)
+        // @"ITEMLIST.DAT", NONXLD            // Probably contains weapon damage etc stats
+        // @"ITEMNAME.DAT", NONXLD            // Item names, char[20][], ordered in groups of DE, EN, FR (462 items)
         @"LABDATA0.XLD", XldFile.raw "bin" // Not graphics, but definitely orderly
         @"LABDATA1.XLD", XldFile.raw "bin"
         @"LABDATA2.XLD", XldFile.raw "bin"
-        (*
-        @"MAPDATA1.XLD", XldFile.map       // 2D map data
-        @"MAPDATA2.XLD", XldFile.map       // 2D map data
-        @"MAPDATA3.XLD", XldFile.map       // 2D map data
-        //*)
+        @"MAPDATA1.XLD", XldFile.raw "bin"       // 2D map data
+        @"MAPDATA2.XLD", XldFile.raw "bin"       // 2D map data
+        @"MAPDATA3.XLD", XldFile.raw "bin"       // 2D map data
         @"MONCHAR0.XLD", XldFile.graphics  // Monster combat spritemaps (heterogeneous)
         @"MONGFX0.XLD", XldFile.raw "bin"  // Tiny files
         @"MONGRP0.XLD", XldFile.raw "bin"  // Tiny files

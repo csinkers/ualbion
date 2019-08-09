@@ -20,6 +20,10 @@ namespace UAlbion.Formats
         SingleHeaderSprite,
         Video,
 
+        // Maps
+        Map2D,
+        Map3D,
+
         // Audio
         AudioSample,
         SampleLibrary,

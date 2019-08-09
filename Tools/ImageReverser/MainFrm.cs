@@ -19,6 +19,7 @@ namespace UAlbion.Tools.ImageReverser
         readonly Font _boldFont = new Font(DefaultFont, FontStyle.Bold);
         readonly Font _defaultFont = new Font(DefaultFont, 0);
         readonly IDictionary<AssetConfig.Asset, TreeNode> _nodes = new Dictionary<AssetConfig.Asset, TreeNode>();
+
         TreeNode _rootNode;
         AlbionSprite _logicalSprite;
         AlbionSprite _visualSprite;
@@ -232,12 +233,6 @@ namespace UAlbion.Tools.ImageReverser
             return bmp;
         }
 
-        /*Bitmap LoadInterlaced(string filename)
-        {
-            var a = new FileInfo(filename);
-            return new Bitmap(filename);
-        }*/
-
         void Render()
         {
             const int magnify = 3;
@@ -246,12 +241,7 @@ namespace UAlbion.Tools.ImageReverser
                 return;
 
             Bitmap bmp;
-            /*if (asset.Type == XldObjectType.InterlacedBitmap)
-            {
-                _sprite = null;
-                bmp = LoadInterlaced(filename);
-            }
-            else*/ if (IsSprite(asset.Type))
+            if (IsSprite(asset.Type))
             {
                 if (filename != _logicalSprite?.Name)
                 {
@@ -278,9 +268,15 @@ namespace UAlbion.Tools.ImageReverser
                 var palette = (AlbionPalette)(chkListPalettes.SelectedItem ?? chkListPalettes.Items[0]);
                 uint[] curPalette = palette.GetPaletteAtTime((int)((DateTime.Now - _startTime).TotalSeconds * 4));
 
-                var width = _visualSprite.Width; //Math.Max(0, trackWidth.Value);
+                var width = _visualSprite.Width;
                 var frame = Math.Max(0, trackFrame.Value);
                 bmp = GenerateBitmap(_visualSprite, frame, width, magnify, curPalette);
+            }
+            else if (asset.Type == XldObjectType.Map2D)
+            {
+                _logicalSprite = null;
+                _visualSprite = null;
+                bmp = new Bitmap(1, 1);
             }
             else
             {

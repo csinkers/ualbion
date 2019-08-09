@@ -83,10 +83,6 @@ namespace UAlbion.Core
                     {
                         _engine.GraphicsDevice.SyncToVerticalBlank = !_engine.GraphicsDevice.SyncToVerticalBlank;
                     }
-                    if(ImGui.MenuItem("Limit Frame Rate", string.Empty, _engine.LimitFrameRate, true))
-                    {
-                        _engine.LimitFrameRate = !_engine.LimitFrameRate;
-                    }
 
                     bool resizable = _engine.Window.Resizable;
                     if (ImGui.MenuItem("Resizable Window", string.Empty, resizable))

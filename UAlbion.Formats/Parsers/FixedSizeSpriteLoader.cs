@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace UAlbion.Formats.Parsers
 {
@@ -12,6 +13,8 @@ namespace UAlbion.Formats.Parsers
 
             int width = config.EffectiveWidth;
             int height = config.EffectiveHeight;
+            if (width == 0)
+                width = (int) Math.Sqrt(streamLength);
             if (height == 0)
                 height = (int)streamLength / width;
 

@@ -105,30 +105,50 @@ namespace UAlbion.Game
                         curY += tileHeight;
                     }
                 }
+
+                return new EightBitTexture(
+                    sprite.Name,
+                    (uint)width,
+                    (uint)height,
+                    1,
+                    1,
+                    pixelData,
+                    subImages);
             }
+            /*
             else if (sprite.UniformFrames) // For reasonably sized uniform sprites use layers to simplify mip mapping / tiling etc
             {
+                int tileWidth = sprite.Width;
+                int tileHeight = sprite.Height / sprite.Frames.Count;
                 pixelData = sprite.PixelData;
                 subImages = sprite.Frames
                     .Select((x, i) => new EightBitTexture.SubImage(0, 0, x.Width, x.Height, i))
                     .ToArray();
-            }
+
+                return new EightBitTexture(
+                    sprite.Name,
+                    (uint)tileWidth,
+                    (uint)tileHeight,
+                    1,
+                    (uint)subImages.Length,
+                    pixelData, subImages);
+            }*/
             else // For non-uniforms just use the on-disk packing 
             {
                 pixelData = sprite.PixelData;
                 subImages = sprite.Frames
                     .Select(x => new EightBitTexture.SubImage(x.X, x.Y, x.Width, x.Height, 0))
                     .ToArray();
-            }
 
-            return new EightBitTexture(
-                sprite.Name,
-                (uint)sprite.Width,
-                (uint)sprite.Height,
-                1,
-                1,
-                pixelData,
-                subImages);
+                return new EightBitTexture(
+                    sprite.Name,
+                    (uint)sprite.Width,
+                    (uint)sprite.Height,
+                    1,
+                    1,
+                    pixelData,
+                    subImages);
+            }
         }
     }
 

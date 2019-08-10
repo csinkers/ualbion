@@ -39,28 +39,37 @@ namespace UAlbion.Core.Objects
                 Flags = flags;
             }
 
-            public Vector2 Offset { get; }
-            public Vector2 Size { get; }
-            public Vector2 TexPosition { get; }
-            public Vector2 TexSize { get; }
-            public int TexLayer { get; }
-            public SpriteFlags Flags { get; }
+            public Vector2 Offset { get; set; } // Pixel coordinates
+            public Vector2 Size { get; set; } // Pixel coordinates
+            public Vector2 TexPosition { get; set; } // Normalised texture coordinates
+            public Vector2 TexSize { get; set; } // Normalised texture coordinates
+            public int TexLayer { get; set; }
+            public SpriteFlags Flags { get; set; }
         }
 
-        class MultiSprite : IRenderable
+        public class MultiSprite : IRenderable
         {
+            public MultiSprite(SpriteKey key)
+            {
+                Key = key;
+            }
+
             public MultiSprite(SpriteKey key, int bufferId, IEnumerable<InstanceData> sprites)
             {
                 Key = key;
                 BufferId = bufferId;
-                Instances = sprites.ToArray();
+
+                if (sprites is InstanceData[] array)
+                    Instances = array;
+                else
+                    Instances = sprites.ToArray();
             }
 
             public int RenderOrder => Key.RenderOrder;
             public Type Renderer => typeof(SpriteRenderer);
             public SpriteKey Key { get; }
-            public int BufferId { get; }
-            public InstanceData[] Instances { get; }
+            public int BufferId { get; set; }
+            public InstanceData[] Instances { get; set; }
         }
 
         static class Shader
@@ -206,6 +215,17 @@ namespace UAlbion.Core.Objects
             {
                 _textureManager.PrepareTexture(group.Key.Texture, gd);
                 var multiSprite = new MultiSprite(group.Key, _instanceBuffers.Count, group);
+                var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)multiSprite.Instances.Length * InstanceData.StructSize, BufferUsage.VertexBuffer));
+                buffer.Name = $"B_SpriteInst{_instanceBuffers.Count}";
+                gd.UpdateBuffer(buffer, 0, multiSprite.Instances);
+                _instanceBuffers.Add(buffer);
+                yield return multiSprite;
+            }
+
+            foreach(var multiSprite in renderables.OfType<MultiSprite>())
+            {
+                _textureManager.PrepareTexture(multiSprite.Key.Texture, gd);
+                multiSprite.BufferId = _instanceBuffers.Count;
                 var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)multiSprite.Instances.Length * InstanceData.StructSize, BufferUsage.VertexBuffer));
                 buffer.Name = $"B_SpriteInst{_instanceBuffers.Count}";
                 gd.UpdateBuffer(buffer, 0, multiSprite.Instances);

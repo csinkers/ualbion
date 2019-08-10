@@ -24,8 +24,6 @@ namespace UAlbion
             AssetConfig config = AssetConfig.Load(baseDir);
 
             var assets = new Assets(config);
-            var map = assets.LoadMap2D(MapDataId.Unknown116);
-#if false
             var spriteResolver = new SpriteResolver(assets);
 
             var backend =
@@ -46,8 +44,11 @@ namespace UAlbion
                 scene.AddComponent(new GameClock());
                 scene.Camera.Position = new Vector3(0, 0, 0);
                 scene.Camera.Magnification = 2.0f;
-                scene.Exchange.Raise(new LoadPalEvent((int)PaletteId.Main3D), null);
 
+                var map = new Map(assets, MapDataId.Unknown116);
+                scene.AddComponent(map);
+                scene.Exchange.Raise(new LoadPalEvent((int)map.GetPalette()), null);
+                /*
                 // var menu = new MainMenu();
                 // scene.AddComponent(menu);
 
@@ -75,7 +76,6 @@ namespace UAlbion
                 //scene.Exchange.Raise(new LoadRenderDocEvent(), null);
                 engine.Run();
             }
-#endif
         }
     }
 }

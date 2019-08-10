@@ -106,6 +106,8 @@ namespace UAlbion.Tools.ImageReverser
             switch (conf.Type)
             {
                 case XldObjectType.AmorphousSprite: return new AmorphousSpriteLoader();
+                case XldObjectType.Map2D:
+                case XldObjectType.Map3D:
                 case XldObjectType.FixedSizeSprite: return new FixedSizeSpriteLoader();
 
                 case XldObjectType.SingleHeaderSprite:
@@ -122,7 +124,9 @@ namespace UAlbion.Tools.ImageReverser
                 case XldObjectType.AmorphousSprite: 
                 case XldObjectType.FixedSizeSprite:
                 case XldObjectType.SingleHeaderSprite:
-                case XldObjectType.HeaderPerSubImageSprite: return true;
+                case XldObjectType.HeaderPerSubImageSprite: 
+                case XldObjectType.Map2D:
+                case XldObjectType.Map3D: return true;
                 default: return false;
             }
         }
@@ -272,12 +276,12 @@ namespace UAlbion.Tools.ImageReverser
                 var frame = Math.Max(0, trackFrame.Value);
                 bmp = GenerateBitmap(_visualSprite, frame, width, magnify, curPalette);
             }
-            else if (asset.Type == XldObjectType.Map2D)
-            {
-                _logicalSprite = null;
-                _visualSprite = null;
-                bmp = new Bitmap(1, 1);
-            }
+            //else if (asset.Type == XldObjectType.Map2D)
+            //{
+            //    _logicalSprite = null;
+            //    _visualSprite = null;
+            //    bmp = new Bitmap(1, 1);
+            //}
             else
             {
                 _logicalSprite = null;

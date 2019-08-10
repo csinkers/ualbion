@@ -12,6 +12,7 @@ namespace UAlbion.Formats.Parsers
             Debug.Assert(!config.Parent.RotatedLeft);
             var sprite = new AlbionSprite();
             long initialPosition = br.BaseStream.Position;
+            sprite.Name = name;
             sprite.UniformFrames = config.Type == XldObjectType.SingleHeaderSprite;
 
             int width = br.ReadUInt16();

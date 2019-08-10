@@ -57,7 +57,7 @@ namespace UAlbion.Core.Textures
         public void GetSubImageDetails(int id, out Vector2 offset, out Vector2 size, out int layer)
         {
             Debug.Assert(id == 0 || id < _subImages.Count);
-            if(!_subImages.Any())
+            if(_subImages.Count == 0)
             {
                 offset = Vector2.Zero;
                 size = Vector2.One;

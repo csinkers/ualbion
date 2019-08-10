@@ -22,6 +22,8 @@ namespace UAlbion.Core.Events
         {
             HashSet<IComponent> subscribers = new HashSet<IComponent>();
             var interfaces = e.GetType().GetInterfaces();
+            string eventText = e.ToString();
+            CoreTrace.Log.StartRaise(e.GetType().Name, eventText);
 
             lock (_syncRoot)
             {
@@ -35,11 +37,11 @@ namespace UAlbion.Core.Events
                             subscribers.Add(subscriber);
             }
 
-            if (subscribers != null)
-                foreach(var subscriber in subscribers)
-                    subscriber.Receive(e, sender);
+            foreach(var subscriber in subscribers)
+                subscriber.Receive(e, sender);
 
             _parent?.Raise(e, sender);
+            CoreTrace.Log.StopRaise(e.GetType().Name, eventText, subscribers.Count);
         }
 
         public void Subscribe<T>(IComponent subscriber) { Subscribe(typeof(T), subscriber); }

@@ -11,8 +11,8 @@ namespace UAlbion.Core
         static readonly IList<Handler> Handlers = new Handler[]
             {new Handler<OrthographicCamera, WindowResizedEvent>((x, e) =>
             {
-                x._windowWidth = e.Width;
-                x._windowHeight = e.Height;
+                x.WindowWidth = e.Width;
+                x.WindowHeight = e.Height;
                 x.UpdatePerspectiveMatrix();
             })};
 
@@ -20,8 +20,8 @@ namespace UAlbion.Core
         Matrix4x4 _viewMatrix;
         Matrix4x4 _projectionMatrix;
         float _magnification = 1.0f;
-        float _windowWidth;
-        float _windowHeight;
+        public float WindowWidth { get; private set; }
+        public float WindowHeight { get; private set; }
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;
@@ -32,12 +32,12 @@ namespace UAlbion.Core
         public float FieldOfView => 1f;
         public float NearDistance => 0.1f;
 
-        public float AspectRatio => _windowWidth / _windowHeight;
+        public float AspectRatio => WindowWidth / WindowHeight;
 
         public OrthographicCamera(Sdl2Window window) : base(Handlers)
         {
-            _windowWidth = window.Width;
-            _windowHeight = window.Height;
+            WindowWidth = window.Width;
+            WindowHeight = window.Height;
             UpdatePerspectiveMatrix();
             UpdateViewMatrix();
         }
@@ -47,8 +47,8 @@ namespace UAlbion.Core
         void UpdatePerspectiveMatrix()
         {
             _projectionMatrix = Matrix4x4.Identity;
-            _projectionMatrix.M11 = (2.0f * _magnification) / _windowWidth;
-            _projectionMatrix.M22 = (-2.0f * _magnification) / _windowHeight;
+            _projectionMatrix.M11 = (2.0f * _magnification) / WindowWidth;
+            _projectionMatrix.M22 = (-2.0f * _magnification) / WindowHeight;
             _projectionMatrix.M41 = 0;
             _projectionMatrix.M42 = 0;
 

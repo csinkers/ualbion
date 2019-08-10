@@ -11,16 +11,6 @@ using UAlbion.Core.Textures;
 
 namespace UAlbion.Core
 {
-    /*
-    class CameraControls : Component
-    {
-        public CameraControls() : base(Handlers)
-        {
-        }
-
-        public static IList<Handler> Handlers = new Handler[] { new Handler<CameraControls,>(), }
-    } */
-
     public class Engine : Component, IDisposable
     {
         static readonly IList<Handler> Handlers = new Handler[]
@@ -117,14 +107,10 @@ namespace UAlbion.Core
             if (_scene == null)
                 throw new InvalidOperationException("The scene must be set before the main loop can be run.");
 
-            long previousFrameTicks = 0;
-            Stopwatch sw = Stopwatch.StartNew();
-            while (Window.Exists)
+            var frameCounter = new FrameCounter();
+            while (Window.Exists)//*/ && frameCounter.FrameCount < 20)
             {
-                long currentFrameTicks = sw.ElapsedTicks;
-                double deltaSeconds = (currentFrameTicks - previousFrameTicks) / (double)Stopwatch.Frequency;
-                previousFrameTicks = currentFrameTicks;
-
+                double deltaSeconds = frameCounter.StartFrame();
                 Sdl2Events.ProcessEvents();
                 InputSnapshot snapshot = Window.PumpEvents();
                 InputTracker.UpdateFrameInput(snapshot, Window);
@@ -143,7 +129,6 @@ namespace UAlbion.Core
         {
             _frameTimeAverager.AddTime(deltaSeconds);
             _scene.Exchange.Raise(new EngineUpdateEvent(deltaSeconds), this);
-            Window.Title = GraphicsDevice.BackendType.ToString();
         }
 
         internal void ChangeMsaa(int msaaOption)
@@ -176,6 +161,7 @@ namespace UAlbion.Core
             int width = Window.Width;
             int height = Window.Height;
 
+            CoreTrace.Log.Info("Engine", "Start draw");
             if (_windowResized)
             {
                 _windowResized = false;
@@ -188,6 +174,7 @@ namespace UAlbion.Core
                 cl.End();
                 GraphicsDevice.SubmitCommands(cl);
                 cl.Dispose();
+                CoreTrace.Log.Info("Engine", "Resize finished");
             }
 
             if (_newSampleCount != null)
@@ -200,7 +187,9 @@ namespace UAlbion.Core
 
             _frameCommands.Begin();
             _scene.RenderAllStages(GraphicsDevice, _frameCommands, _sceneContext);
+            CoreTrace.Log.Info("Engine", "Swapping buffers...");
             GraphicsDevice.SwapBuffers();
+            CoreTrace.Log.Info("Engine", "Draw complete");
         }
 
         internal void ChangeBackend(GraphicsBackend backend) => ChangeBackend(backend, false);
@@ -240,6 +229,7 @@ namespace UAlbion.Core
             };
 
             GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, gdOptions, backend);
+            Window.Title = GraphicsDevice.BackendType.ToString();
 
             if (_scene != null)
             {

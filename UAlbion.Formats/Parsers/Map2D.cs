@@ -11,22 +11,22 @@ namespace UAlbion.Formats.Parsers
         [Flags]
         public enum TriggerType : ushort
         {
-            Normal = 1 << 0,
-            Examine = 1 << 1,
-            Touch = 1 << 2,
-            Speak = 1 << 3,
-            UseItem = 1 << 4,
-            MapInit = 1 << 5,
+            Normal    = 1 << 0,
+            Examine   = 1 << 1,
+            Touch     = 1 << 2,
+            Speak     = 1 << 3,
+            UseItem   = 1 << 4,
+            MapInit   = 1 << 5,
             EveryStep = 1 << 6,
             EveryHour = 1 << 7,
-            EveryDay = 1 << 8,
-            Default = 1 << 9,
-            Action = 1 << 10,
-            Npc = 1 << 11,
-            Take = 1 << 12,
-            Unk13 = 1 << 13,
-            Unk14 = 1 << 14,
-            Unk15 = 1 << 15,
+            EveryDay  = 1 << 8,
+            Default   = 1 << 9,
+            Action    = 1 << 10,
+            Npc       = 1 << 11,
+            Take      = 1 << 12,
+            Unk13     = 1 << 13,
+            Unk14     = 1 << 14,
+            Unk15     = 1 << 15,
         }
 
         [Flags]
@@ -49,12 +49,6 @@ namespace UAlbion.Formats.Parsers
             public ushort Unk8 { get; set; }
             public int Unk9 { get; set; }
             public Waypoint[] Waypoints { get; set; }
-        }
-
-        public struct Tile
-        {
-            public int Underlay { get; set; }
-            public int Overlay { get; set; }
         }
 
         public enum EventType : byte
@@ -122,7 +116,8 @@ namespace UAlbion.Formats.Parsers
 
 
         public IList<Npc> Npcs { get; } = new List<Npc>();
-        public Tile[] Tiles { get; set; }
+        public int[] Underlay { get; set; }
+        public int[] Overlay { get; set; }
         public IList<Event> Events { get; } = new List<Event>();
         public IList<Zone> Zones { get; } = new List<Zone>();
 
@@ -143,47 +138,49 @@ namespace UAlbion.Formats.Parsers
         {
             var startPosition = br.BaseStream.Position;
             var map = new Map2D();
-            map.Unk0 = br.ReadByte();
+            map.Unk0 = br.ReadByte(); // 0
 
-            int npcCount = br.ReadByte();
+            int npcCount = br.ReadByte(); // 1
             if (npcCount == 0) npcCount = 0x20;
             else if (npcCount == 0x40) npcCount = 0x60;
 
-            var mapType = br.ReadByte();
+            var mapType = br.ReadByte(); // 2
             Debug.Assert(2 == mapType); // 1 = 3D
 
-            map.Sound = br.ReadByte();
-            map.Width = br.ReadByte();
-            map.Height = br.ReadByte();
-            map.TilesetId = br.ReadByte();
-            map.CombatBackgroundId = br.ReadByte();
-            map.PaletteId = br.ReadByte();
-            map.FrameRate = br.ReadByte();
+            map.Sound     = br.ReadByte(); //3
+            map.Width     = br.ReadByte(); //4
+            map.Height    = br.ReadByte(); //5
+            map.TilesetId = br.ReadByte() - 1; //6
+            map.CombatBackgroundId = br.ReadByte(); //7
+            map.PaletteId = br.ReadByte() - 1; //8
+            map.FrameRate = br.ReadByte(); //9
 
             for (int i = 0; i < npcCount; i++)
             {
                 var npc = new Map2D.Npc();
-                npc.Id = br.ReadByte();
-                npc.Sound = br.ReadByte();
-                npc.EventNumber = br.ReadUInt16();
+                npc.Id = br.ReadByte(); // +0
+                npc.Sound = br.ReadByte(); // +1
+                npc.EventNumber = br.ReadUInt16(); // +2
                 if (npc.EventNumber == 0xffff) npc.EventNumber = null;
 
-                npc.ObjectNumber = br.ReadUInt16();
-                npc.Flags = br.ReadByte(); // Combine this & MovementType ?
-                npc.MovementType = (Map2D.MovementType)br.ReadByte();
-                npc.Unk8 = br.ReadByte();
-                npc.Unk9 = br.ReadByte();
+                npc.ObjectNumber = br.ReadUInt16(); // +4
+                npc.Flags = br.ReadByte(); // +6 // Combine this & MovementType ?
+                npc.MovementType = (Map2D.MovementType)br.ReadByte(); // +7
+                npc.Unk8 = br.ReadByte(); // +8
+                npc.Unk9 = br.ReadByte(); // +9
                 map.Npcs.Add(npc);
             }
 
-            map.Tiles = new Map2D.Tile[map.Width * map.Height];
+            map.Underlay = new int[map.Width * map.Height];
+            map.Overlay = new int[map.Width * map.Height];
             for (int i = 0; i < map.Width * map.Height; i++)
             {
                 byte b1 = br.ReadByte();
                 byte b2 = br.ReadByte();
                 byte b3 = br.ReadByte();
-                map.Tiles[i].Underlay = (b1 << 4) | ((b2 & 0xf0) >> 4);
-                map.Tiles[i].Overlay = ((b2 & 0x0f) << 8) | b3;
+
+                map.Overlay[i] = (b1 << 4) + (b2 >> 4);
+                map.Underlay[i] = ((b2 & 0x0F) << 8) + b3;
             }
 
             int zoneCount = br.ReadUInt16();
@@ -191,10 +188,10 @@ namespace UAlbion.Formats.Parsers
             {
                 var zone = new Map2D.Zone();
                 zone.Global = true;
-                zone.X = br.ReadUInt16();
+                zone.X = br.ReadUInt16(); // +0
                 Debug.Assert(zone.X == 0);
-                zone.Trigger = (Map2D.TriggerType)br.ReadUInt16();
-                zone.EventNumber = br.ReadUInt16();
+                zone.Trigger = (Map2D.TriggerType)br.ReadUInt16(); // +2
+                zone.EventNumber = br.ReadUInt16(); // +4
                 map.Zones.Add(zone);
             }
 
@@ -204,11 +201,11 @@ namespace UAlbion.Formats.Parsers
                 for (int i = 0; i < zoneCount; i++)
                 {
                     var zone = new Map2D.Zone();
-                    zone.X = br.ReadByte();
-                    var unk1 = br.ReadByte();
+                    zone.X = br.ReadByte(); // +0
+                    var unk1 = br.ReadByte(); // +1
                     zone.Y = (ushort)j;
-                    zone.Trigger = (Map2D.TriggerType)br.ReadUInt16();
-                    zone.EventNumber = br.ReadUInt16();
+                    zone.Trigger = (Map2D.TriggerType)br.ReadUInt16(); // +2
+                    zone.EventNumber = br.ReadUInt16(); // +4
                     map.Zones.Add(zone);
                 }
             }
@@ -217,15 +214,15 @@ namespace UAlbion.Formats.Parsers
             for (int i = 0; i < eventCount; i++)
             {
                 var e = new Map2D.Event();
-                e.EventType = br.ReadByte();
-                e.Unk1 = br.ReadByte();
-                e.Unk2 = br.ReadByte();
-                e.Unk3 = br.ReadByte();
-                e.Unk4 = br.ReadByte();
-                e.Unk5 = br.ReadByte();
-                e.Unk6 = br.ReadUInt16();
-                e.Unk8 = br.ReadUInt16();
-                e.NextEventId = br.ReadUInt16();
+                e.EventType = (Map2D.EventType)br.ReadByte(); // +0
+                e.Unk1 = br.ReadByte(); // +1
+                e.Unk2 = br.ReadByte(); // +2
+                e.Unk3 = br.ReadByte(); // +3
+                e.Unk4 = br.ReadByte(); // +4
+                e.Unk5 = br.ReadByte(); // +5
+                e.Unk6 = br.ReadUInt16(); // +6
+                e.Unk8 = br.ReadUInt16(); // +8
+                e.NextEventId = br.ReadUInt16(); // +A
                 if (e.NextEventId == 0xffff) e.NextEventId = null;
                 map.Events.Add(e);
             }

@@ -44,6 +44,7 @@ namespace UAlbion.Formats.Parsers
 
             AlbionSprite sprite = new AlbionSprite
             {
+                Name = name,
                 Width = 0,
                 UniformFrames = false,
                 Frames = new List<AlbionSprite.Frame>()

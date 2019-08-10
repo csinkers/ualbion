@@ -163,8 +163,9 @@ namespace UAlbion.Core.Events
 
         public override string ToString()
         {
-            var metadata = Serializers[GetType()];
-            return metadata.Serialize(this);
+            if(Serializers.TryGetValue(GetType(), out var metadata))
+                return metadata.Serialize(this);
+            return GetType().Name;
         }
 
         public static IEnumerable<EventMetadata> GetEventMetadata() => Events.Values.OrderBy(x => x.Name);

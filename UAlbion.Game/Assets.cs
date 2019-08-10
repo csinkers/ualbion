@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.Parsers;
@@ -19,10 +18,10 @@ namespace UAlbion.Game
         French,
     }
 
-    [Event("assets:reload", "Flush the asset cache, forcing all data to be reloaded from disk")]
+    [Core.Events.Event("assets:reload", "Flush the asset cache, forcing all data to be reloaded from disk")]
     public class ReloadAssetsEvent : GameEvent { }
 
-    [Event("assets:stats", "Print asset cache statistics.")]
+    [Core.Events.Event("assets:stats", "Print asset cache statistics.")]
     public class AssetStatsEvent : GameEvent { }
 
     public class Assets : RegisteredComponent
@@ -196,6 +195,7 @@ namespace UAlbion.Game
                     var asset = AssetLoader.Load(br, name, (int)stream.Length, assetConfig);
                     if(asset == null)
                         throw new InvalidOperationException($"Object {type}:{id} could not be loaded from file {path}");
+                    GameTrace.Log.AssetLoaded(type, id, name, language, path);
 
                     return asset;
                 }
@@ -220,6 +220,7 @@ namespace UAlbion.Game
                 var asset = AssetLoader.Load(br, name, length, assetConfig);
                 if (asset == null)
                     throw new InvalidOperationException($"Object {type}:{id} could not be loaded from XLD {xld.Filename}");
+                GameTrace.Log.AssetLoaded(type, id, name, language, paths.XldPath);
 
                 return asset;
             }
@@ -236,9 +237,10 @@ namespace UAlbion.Game
             }
         }
 
-        object LoadAssetCached(AssetType type, int id, string name, GameLanguage language = GameLanguage.English)
+        object LoadAssetCached<T>(AssetType type, T enumId, GameLanguage language = GameLanguage.English)
         {
-            lock(_syncRoot)
+            int id = (int)(object)enumId;
+            lock (_syncRoot)
             {
                 if (_assetCache.TryGetValue(type, out var typeCache))
                 {
@@ -253,6 +255,7 @@ namespace UAlbion.Game
             }
 
             object newAsset;
+            var name = GetNameForAsset(type, enumId);
             try
             {
                 newAsset = LoadAsset(type, id, name, language);
@@ -272,14 +275,14 @@ namespace UAlbion.Game
             }
         }
 
-        public Map2D LoadMap2D(MapDataId id) { return (Map2D)LoadAssetCached(AssetType.MapData, (int)id, $"Map2D:{id}"); }
-        public Map3D LoadMap3D(MapDataId id) { return (Map3D)LoadAssetCached(AssetType.MapData, (int)id, $"Map3D:{id}"); }
+        public Map2D LoadMap2D(MapDataId id) { return (Map2D)LoadAssetCached<MapDataId>(AssetType.MapData, id); }
+        public Map3D LoadMap3D(MapDataId id) { return (Map3D)LoadAssetCached(AssetType.MapData, id); }
         public AlbionPalette LoadPalette(PaletteId id)
         {
-            var palette = (AlbionPalette)LoadAssetCached(AssetType.Palette, (int)id, $"Pal:{id}");
+            var palette = (AlbionPalette)LoadAssetCached(AssetType.Palette, id);
             if (palette != null)
             {
-                var commonPalette = (byte[]) LoadAssetCached(AssetType.PaletteNull, 0, "Pal_Common");
+                var commonPalette = (byte[]) LoadAssetCached(AssetType.PaletteNull, 0);
                 palette.SetCommonPalette(commonPalette);
             }
 
@@ -311,38 +314,98 @@ namespace UAlbion.Game
                 case AssetType.SmallPortrait:      return LoadTexture((SmallPortraitId)id);
                 case AssetType.TacticalIcon:       return LoadTexture((TacticId)id);
                 case AssetType.Wall3D:             return LoadTexture((DungeonWallId)id);
-                default: return (ITexture)LoadAssetCached(type, id, $"{type}:{id}");
+                default: return (ITexture)LoadAssetCached(type, id);
             }
         }
 
-        public ITexture LoadTexture(AutoMapId id)            => (ITexture)LoadAssetCached(AssetType.AutomapGraphics,    (int)id, $"AutomapGraphics:{id}");
-        public ITexture LoadTexture(CombatBackgroundId id)   => (ITexture)LoadAssetCached(AssetType.CombatBackground,   (int)id, $"CombatBackground:{id}");
-        public ITexture LoadTexture(CombatGraphicsId id)     => (ITexture)LoadAssetCached(AssetType.CombatGraphics,     (int)id, $"CombatGraphics:{id}");
-        public ITexture LoadTexture(DungeonBackgroundId id)  => (ITexture)LoadAssetCached(AssetType.BackgroundGraphics, (int)id, $"BackgroundGraphics:{id}");
-        public ITexture LoadTexture(DungeonFloorId id)       => (ITexture)LoadAssetCached(AssetType.Floor3D,            (int)id, $"Floor3D:{id}");
-        public ITexture LoadTexture(DungeonObjectId id)      => (ITexture)LoadAssetCached(AssetType.Object3D,           (int)id, $"Object3D:{id}");
-        public ITexture LoadTexture(DungeonOverlayId id)     => (ITexture)LoadAssetCached(AssetType.Overlay3D,          (int)id, $"Overlay3D:{id}");
-        public ITexture LoadTexture(DungeonWallId id)        => (ITexture)LoadAssetCached(AssetType.Wall3D,             (int)id, $"Wall3D:{id}");
-        public ITexture LoadTexture(FullBodyPictureId id)    => (ITexture)LoadAssetCached(AssetType.FullBodyPicture,    (int)id, $"FullBodyPicture:{id}");
-        public ITexture LoadTexture(IconDataId id)           => (ITexture)LoadAssetCached(AssetType.IconData,           (int)id, $"IconData:{id}");
-        public ITexture LoadTexture(IconGraphicsId id)       => (ITexture)LoadAssetCached(AssetType.IconGraphics,       (int)id, $"IconGraphics:{id}");
-        public ITexture LoadTexture(ItemId id)               => (ITexture)LoadAssetCached(AssetType.ItemGraphics,       (int)id, $"ItemGraphics:{id}"); // TODO: Enum
-        public ITexture LoadTexture(LargeNpcId id)           => (ITexture)LoadAssetCached(AssetType.BigNpcGraphics,     (int)id, $"BigNpcGraphics:{id}");
-        public ITexture LoadTexture(LargePartyGraphicsId id) => (ITexture)LoadAssetCached(AssetType.BigPartyGraphics,   (int)id, $"BigPartyGraphics:{id}");
-        public ITexture LoadTexture(MonsterGraphicsId id)    => (ITexture)LoadAssetCached(AssetType.MonsterGraphics,    (int)id, $"MonsterGraphics:{id}");
-        public ITexture LoadTexture(PictureId id)            => (ITexture)LoadAssetCached(AssetType.Picture,            (int)id, $"Picture:{id}");
-        public ITexture LoadTexture(SmallNpcId id)           => (ITexture)LoadAssetCached(AssetType.SmallNpcGraphics,   (int)id, $"SmallNpcGraphics:{id}");
-        public ITexture LoadTexture(SmallPartyGraphicsId id) => (ITexture)LoadAssetCached(AssetType.SmallPartyGraphics, (int)id, $"SmallPartyGraphics:{id}");
-        public ITexture LoadTexture(SmallPortraitId id)      => (ITexture)LoadAssetCached(AssetType.SmallPortrait,      (int)id, $"SmallPortrait:{id}");
-        public ITexture LoadTexture(TacticId id)             => (ITexture)LoadAssetCached(AssetType.TacticalIcon,       (int)id, $"TacticalIcon:{id}");
-        public ITexture LoadTexture(FontId id)               => (ITexture)LoadAssetCached(AssetType.Font,               (int)id, $"Font:{id}");
+        public string GetNameForAsset<T>(AssetType type, T id)
+        {
+            switch (type)
+            {
+                case AssetType.AutomapGraphics: return $"AutomapGraphics:{id}";
+                case AssetType.CombatBackground: return $"CombatBackground:{id}";
+                case AssetType.CombatGraphics: return $"CombatGraphics:{id}";
+                case AssetType.BackgroundGraphics: return $"BackgroundGraphics:{id}";
+                case AssetType.Floor3D: return $"Floor3D:{id}";
+                case AssetType.Object3D: return $"Object3D:{id}";
+                case AssetType.Overlay3D: return $"Overlay3D:{id}";
+                case AssetType.Wall3D: return $"Wall3D:{id}";
+                case AssetType.FullBodyPicture: return $"FullBodyPicture:{id}";
+                case AssetType.IconData: return $"IconData:{id}";
+                case AssetType.IconGraphics: return $"IconGraphics:{id}";
+                case AssetType.ItemGraphics: return $"ItemGraphics:{id}"; // TODO: Enum
+                case AssetType.BigNpcGraphics: return $"BigNpcGraphics:{id}";
+                case AssetType.BigPartyGraphics: return $"BigPartyGraphics:{id}";
+                case AssetType.MonsterGraphics: return $"MonsterGraphics:{id}";
+                case AssetType.Picture: return $"Picture:{id}";
+                case AssetType.SmallNpcGraphics: return $"SmallNpcGraphics:{id}";
+                case AssetType.SmallPartyGraphics: return $"SmallPartyGraphics:{id}";
+                case AssetType.SmallPortrait: return $"SmallPortrait:{id}";
+                case AssetType.TacticalIcon: return $"TacticalIcon:{id}";
+                case AssetType.Font: return $"Font:{id}";
+                    
+                case AssetType.MapData:
+                case AssetType.Palette:
+                case AssetType.PaletteNull:
+                case AssetType.Slab:
+                case AssetType.LabData:
+                case AssetType.BlockList:
+                case AssetType.PartyCharacterData:
+                case AssetType.SystemTexts:
+                case AssetType.EventSet:
+                case AssetType.EventTexts:
+                case AssetType.MapTexts:
+                case AssetType.ItemList:
+                case AssetType.ItemNames:
+                case AssetType.Automap:
+                case AssetType.Song:
+                case AssetType.Sample:
+                case AssetType.WaveLibrary:
+                case AssetType.Unnamed2:
+                case AssetType.ChestData:
+                case AssetType.MerchantData:
+                case AssetType.NpcCharacterData:
+                case AssetType.MonsterGroup:
+                case AssetType.MonsterCharacter:
+                case AssetType.SpellData:
+                case AssetType.Flic:
+                case AssetType.Dictionary:
+                case AssetType.Script:
+                case AssetType.TransparencyTables:
+                default:
+                    return $"{type}.{id}";
+//, $"Pal:{id}"
+            }
+        }
+
+        public ITexture LoadTexture(AutoMapId id)            => (ITexture)LoadAssetCached(AssetType.AutomapGraphics,    id);
+        public ITexture LoadTexture(CombatBackgroundId id)   => (ITexture)LoadAssetCached(AssetType.CombatBackground,   id);
+        public ITexture LoadTexture(CombatGraphicsId id)     => (ITexture)LoadAssetCached(AssetType.CombatGraphics,     id);
+        public ITexture LoadTexture(DungeonBackgroundId id)  => (ITexture)LoadAssetCached(AssetType.BackgroundGraphics, id);
+        public ITexture LoadTexture(DungeonFloorId id)       => (ITexture)LoadAssetCached(AssetType.Floor3D,            id);
+        public ITexture LoadTexture(DungeonObjectId id)      => (ITexture)LoadAssetCached(AssetType.Object3D,           id);
+        public ITexture LoadTexture(DungeonOverlayId id)     => (ITexture)LoadAssetCached(AssetType.Overlay3D,          id);
+        public ITexture LoadTexture(DungeonWallId id)        => (ITexture)LoadAssetCached(AssetType.Wall3D,             id);
+        public ITexture LoadTexture(FullBodyPictureId id)    => (ITexture)LoadAssetCached(AssetType.FullBodyPicture,    id);
+        public ITexture LoadTexture(IconDataId id)           => (ITexture)LoadAssetCached(AssetType.IconData,           id);
+        public ITexture LoadTexture(IconGraphicsId id)       => (ITexture)LoadAssetCached(AssetType.IconGraphics,       id);
+        public ITexture LoadTexture(ItemId id)               => (ITexture)LoadAssetCached(AssetType.ItemGraphics,       id); // TODO: Enum
+        public ITexture LoadTexture(LargeNpcId id)           => (ITexture)LoadAssetCached(AssetType.BigNpcGraphics,     id);
+        public ITexture LoadTexture(LargePartyGraphicsId id) => (ITexture)LoadAssetCached(AssetType.BigPartyGraphics,   id);
+        public ITexture LoadTexture(MonsterGraphicsId id)    => (ITexture)LoadAssetCached(AssetType.MonsterGraphics,    id);
+        public ITexture LoadTexture(PictureId id)            => (ITexture)LoadAssetCached(AssetType.Picture,            id);
+        public ITexture LoadTexture(SmallNpcId id)           => (ITexture)LoadAssetCached(AssetType.SmallNpcGraphics,   id);
+        public ITexture LoadTexture(SmallPartyGraphicsId id) => (ITexture)LoadAssetCached(AssetType.SmallPartyGraphics, id);
+        public ITexture LoadTexture(SmallPortraitId id)      => (ITexture)LoadAssetCached(AssetType.SmallPortrait,      id);
+        public ITexture LoadTexture(TacticId id)             => (ITexture)LoadAssetCached(AssetType.TacticalIcon,       id);
+        public ITexture LoadTexture(FontId id)               => (ITexture)LoadAssetCached(AssetType.Font,               id);
 
         public string LoadString(AssetType type, int id, GameLanguage language, int subItem)
         {
-            var stringTable = (IDictionary<int, string>)LoadAssetCached(AssetType.MapData, id, $"String:{id}", language);
+            var stringTable = (IDictionary<int, string>)LoadAssetCached(AssetType.MapData, id, language);
             return stringTable[subItem];
         }
-        public AlbionSample LoadSample(AssetType type, int id) { return (AlbionSample)LoadAssetCached(type, id, $"Sample:{id}"); }
+        public AlbionSample LoadSample(AssetType type, int id) { return (AlbionSample)LoadAssetCached(type, id); }
         public AlbionVideo LoadVideo(VideoId id, GameLanguage language) => (AlbionVideo) LoadAsset(AssetType.Flic, (int)id, $"Video:{id}", language); // Don't cache videos.
     }
 }

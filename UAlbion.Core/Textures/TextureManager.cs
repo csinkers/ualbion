@@ -22,6 +22,7 @@ namespace UAlbion.Core.Textures
             var deviceTexture = texture.CreateDeviceTexture(gd, gd.ResourceFactory, TextureUsage.Sampled);
             var textureView = gd.ResourceFactory.CreateTextureView(deviceTexture);
             textureView.Name = "TV_" + texture.Name;
+            CoreTrace.Log.CreatedDeviceTexture(textureView.Name, texture.Width, texture.Height, texture.ArrayLayers);
 
             _textures[texture] = deviceTexture;
             _textureViews[texture] = textureView;

@@ -11,19 +11,23 @@ namespace UAlbion.Core.Events
         readonly IDictionary<IComponent, IList<Type>> _subscribers = new Dictionary<IComponent, IList<Type>>();
         readonly IDictionary<Type, RegisteredComponent> _registrations = new Dictionary<Type, RegisteredComponent>();
         readonly EventExchange _parent;
+        readonly SubscribedEvent _subscribedEvent = new SubscribedEvent();
 
         public EventExchange(EventExchange parent = null)
         {
             _parent = parent; 
-
         }
 
         public void Raise(IEvent e, object sender)
         {
             HashSet<IComponent> subscribers = new HashSet<IComponent>();
             var interfaces = e.GetType().GetInterfaces();
-            string eventText = e.ToString();
-            CoreTrace.Log.StartRaise(e.GetType().Name, eventText);
+            string eventText = null;
+            if (CoreTrace.Log.IsEnabled())
+            {
+                eventText = e.ToString();
+                CoreTrace.Log.StartRaise(e.GetType().Name, eventText);
+            }
 
             lock (_syncRoot)
             {
@@ -41,7 +45,8 @@ namespace UAlbion.Core.Events
                 subscriber.Receive(e, sender);
 
             _parent?.Raise(e, sender);
-            CoreTrace.Log.StopRaise(e.GetType().Name, eventText, subscribers.Count);
+            if (eventText != null)
+                CoreTrace.Log.StopRaise(e.GetType().Name, eventText, subscribers.Count);
         }
 
         public void Subscribe<T>(IComponent subscriber) { Subscribe(typeof(T), subscriber); }
@@ -62,6 +67,7 @@ namespace UAlbion.Core.Events
                 _subscriptions[eventType].Add(subscriber);
                 _subscribers[subscriber].Add(eventType);
             }
+            subscriber.Receive(_subscribedEvent, this);
         }
 
         public void Unsubscribe(IComponent subscriber)
@@ -99,57 +105,4 @@ namespace UAlbion.Core.Events
             return (T) _registrations[typeof(T)];
         }
     }
-
-    /*
-    GameSystem: Update(float), bool Enabled, OnNewSceneLoaded()
-        GraphicsSystem
-        InputSystem
-        SceneLoaderSystem
-        AudioSystem
-        AssetSystem
-        BehaviorUpdateSystem
-            IUpdateable[] + New & Removed (blocking)
-            Behavior[] newStarts
-            Update: Calls Update on all updateables and then flushes pending change lists
-
-        PhysicsSystem
-        ConsoleCommandSystem
-        SynchronizationHelperSystem (allows invoking actions on main thread)
-        GameObjectQuerySystem
-
-    GameObject - owns a collection of components, has a transform and parent/children
-
-    IUpdateable: Update(float)
-
-    Component: GameObject owner, Transform, Attached/Removed, OnEnabled/Disabled, bool Enabled
-        Behaviour: Start(Registry), PostEnabled/Disabled, PostAttached/Removed
-
-    public interface ISubsystem { }
-
-    public static class Registry
-    {
-        static readonly IDictionary<Type, ISubsystem> Subsystems = new Dictionary<Type, ISubsystem>();
-        static readonly object SyncRoot = new object();
-
-        public static T Resolve<T>()
-        {
-            lock (SyncRoot)
-            {
-                return (T)Subsystems[typeof(T)];
-            }
-        }
-
-        public static void Register(ISubsystem subsystem)
-        {
-            lock (SyncRoot)
-            {
-                var type = subsystem.GetType();
-                if(Subsystems.ContainsKey(type))
-                    throw new InvalidOperationException($"Component {type} already registered");
-
-                Subsystems[type] = subsystem;
-            }
-        }
-    }
-    */
 }

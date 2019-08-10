@@ -47,6 +47,7 @@ namespace UAlbion.Core
         internal RenderDoc RenderDoc => _renderDoc;
         internal string FrameTimeText => _frameTimeAverager.CurrentAverageFramesPerSecond.ToString("000.0 fps / ") + _frameTimeAverager.CurrentAverageFrameTimeMilliseconds.ToString("#00.00 ms");
 
+        // TODO: Build scenes from config
         public Scene Create2DScene()
         {
             var camera = new OrthographicCamera(Window);
@@ -111,9 +112,10 @@ namespace UAlbion.Core
             while (Window.Exists)//*/ && frameCounter.FrameCount < 20)
             {
                 double deltaSeconds = frameCounter.StartFrame();
+                Raise(new BeginFrameEvent());
                 Sdl2Events.ProcessEvents();
                 InputSnapshot snapshot = Window.PumpEvents();
-                InputTracker.UpdateFrameInput(snapshot, Window);
+                Raise(new InputEvent(deltaSeconds, snapshot, Window.MouseDelta));
                 Update((float)deltaSeconds);
                 if (!Window.Exists)
                     break;
@@ -128,13 +130,12 @@ namespace UAlbion.Core
         void Update(float deltaSeconds)
         {
             _frameTimeAverager.AddTime(deltaSeconds);
-            _scene.Exchange.Raise(new EngineUpdateEvent(deltaSeconds), this);
+            Raise(new EngineUpdateEvent(deltaSeconds));
         }
 
         internal void ChangeMsaa(int msaaOption)
         {
-            TextureSampleCount sampleCount = (TextureSampleCount)msaaOption;
-            _newSampleCount = sampleCount;
+            _newSampleCount = (TextureSampleCount)msaaOption;
         }
 
         internal void RefreshDeviceObjects(int numTimes)
@@ -167,7 +168,7 @@ namespace UAlbion.Core
                 _windowResized = false;
 
                 GraphicsDevice.ResizeMainWindow((uint)width, (uint)height);
-                _scene.Exchange.Raise(new WindowResizedEvent(width, height), this);
+                Raise(new WindowResizedEvent(width, height));
                 CommandList cl = GraphicsDevice.ResourceFactory.CreateCommandList();
                 cl.Begin();
                 _sceneContext.RecreateWindowSizedResources(GraphicsDevice, cl);

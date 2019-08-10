@@ -38,6 +38,14 @@ namespace UAlbion.Formats
                 Entries[i] = (uint)br.ReadByte() << 24;
                 Entries[i] |= (uint)br.ReadByte() << 16;
                 Entries[i] |= (uint)br.ReadByte() << 8;
+                //Entries[i] |= (uint)(i == 0 ? 0 : 0xff); // Alpha
+                /*
+                br.ReadBytes(3);
+                Entries[i] = (uint)i << 16;
+                Entries[i] |= (uint)i << 8;
+                Entries[i] |= (uint)i << 0;
+                Entries[i] |= ((uint)0xff) << 24; // Alpha
+                */
             }
 
             Debug.Assert(br.BaseStream.Position == startingOffset + streamLength);
@@ -49,9 +57,18 @@ namespace UAlbion.Formats
 
             for (int i = 192; i < 256; i++)
             {
+                //*
                 Entries[i] = (uint)commonPalette[(i - 192) * 3 + 0] << 24;
                 Entries[i] |= (uint)commonPalette[(i - 192) * 3 + 1] << 16;
                 Entries[i] |= (uint)commonPalette[(i - 192) * 3 + 2] << 8;
+                //Entries[i] |= 0xff; // Alpha
+                //*/
+                /*
+                Entries[i] = (uint)i << 16;
+                Entries[i] |= (uint)i << 8;
+                Entries[i] |= (uint)i << 0;
+                Entries[i] |= ((uint)0xff) << 24; // Alpha
+                //*/
             }
         }
 

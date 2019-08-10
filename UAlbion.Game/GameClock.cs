@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {

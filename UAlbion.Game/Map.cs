@@ -6,6 +6,7 @@ using UAlbion.Core.Objects;
 using UAlbion.Core.Textures;
 using UAlbion.Formats.Parsers;
 using UAlbion.Game.AssetIds;
+using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
@@ -13,7 +14,8 @@ namespace UAlbion.Game
     {
         static readonly IList<Handler> Handlers = new Handler[]
         {
-            new Handler<Map,RenderEvent>((x, e) => x.Render(e)),
+            new Handler<Map, RenderEvent>((x, e) => x.Render(e)),
+            new Handler<Map, SubscribedEvent>((x, e) => x.Raise(new LoadPalEvent((int) x.GetPalette())))
         };
 
         readonly Map2D _map;

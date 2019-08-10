@@ -58,11 +58,11 @@ namespace UAlbion.Core
 
         public void Detach()
         {
-            Exchange.Unsubscribe(this);
+            Exchange?.Unsubscribe(this);
             Exchange = null;
         }
 
-        protected void Raise(IEvent @event) { Exchange.Raise(@event, this); }
+        protected void Raise(IEvent @event) { Exchange?.Raise(@event, this); }
     }
 
     public abstract class RegisteredComponent : Component

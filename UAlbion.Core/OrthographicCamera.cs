@@ -9,17 +9,34 @@ namespace UAlbion.Core
     public class OrthographicCamera : Component, ICamera
     {
         static readonly IList<Handler> Handlers = new Handler[]
-            {new Handler<OrthographicCamera, WindowResizedEvent>((x, e) =>
+        {
+            new Handler<OrthographicCamera, BeginFrameEvent>((x, e) => x._movementDirection = Vector2.Zero),
+            new Handler<OrthographicCamera, EngineCameraMoveEvent>((x, e) => x._movementDirection += new Vector2(e.X, e.Y)),
+            new Handler<OrthographicCamera, MagnifyEvent>((x, e) =>
+            {
+                x._magnification += e.Delta;
+                if (x._magnification < 1.0f)
+                    x._magnification = 1.0f;
+                x.UpdatePerspectiveMatrix();
+            }),
+            new Handler<OrthographicCamera, EngineUpdateEvent>((x, e) =>
+            {
+                x._position += new Vector3(x._movementDirection.X, x._movementDirection.Y, 0) * e.DeltaSeconds;
+                x.UpdateViewMatrix();
+            }),
+            new Handler<OrthographicCamera, WindowResizedEvent>((x, e) =>
             {
                 x.WindowWidth = e.Width;
                 x.WindowHeight = e.Height;
                 x.UpdatePerspectiveMatrix();
-            })};
+            })
+        };
 
         Vector3 _position = new Vector3(0, 0, 1);
         Matrix4x4 _viewMatrix;
         Matrix4x4 _projectionMatrix;
         float _magnification = 1.0f;
+        Vector2 _movementDirection;
         public float WindowWidth { get; private set; }
         public float WindowHeight { get; private set; }
 
@@ -51,8 +68,6 @@ namespace UAlbion.Core
             _projectionMatrix.M22 = (-2.0f * _magnification) / WindowHeight;
             _projectionMatrix.M41 = 0;
             _projectionMatrix.M42 = 0;
-
-            Exchange?.Raise(new ProjectionMatrixChangedEvent(), this);
         }
 
         void UpdateViewMatrix()
@@ -60,7 +75,6 @@ namespace UAlbion.Core
             _viewMatrix = Matrix4x4.Identity;
             _viewMatrix.M41 = -_position.X;
             _viewMatrix.M42 = -_position.Y;
-            Exchange?.Raise(new ViewMatrixChangedEvent(), this);
         }
 
         public CameraInfo GetCameraInfo() => new CameraInfo

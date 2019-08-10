@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
@@ -86,10 +87,7 @@ namespace UAlbion.Game
         {
             switch(@event)
             {
-                case EngineUpdateEvent _:
-                case RenderEvent _:
-                case UpdateEvent _:
-                    break;
+                case IVerboseEvent _: break; 
 
                 case QuitEvent _:
                     _done = true;

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using UAlbion.Core;
-using UAlbion.Core.Events;
+using UAlbion.Core.Textures;
 using UAlbion.Formats;
-using UAlbion.Formats.Parsers;
 using UAlbion.Game.AssetIds;
+using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
@@ -37,6 +37,7 @@ namespace UAlbion.Game
         {
             _scene = scene;
             _assets = assets;
+            SetPalette(_assets.LoadPalette(PaletteId.Main3D));
         }
 
         public void SetPalette(AlbionPalette palette)
@@ -45,5 +46,4 @@ namespace UAlbion.Game
             _scene.SetPalette(_palette.Name, _palette.GetPaletteAtTime(_ticks));
         }
     }
-
 }

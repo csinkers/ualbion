@@ -6,6 +6,7 @@ using UAlbion.Core.Objects;
 using UAlbion.Formats;
 using UAlbion.Game;
 using UAlbion.Game.AssetIds;
+using UAlbion.Game.Events;
 using Veldrid;
 
 namespace UAlbion
@@ -42,27 +43,29 @@ namespace UAlbion
                 scene.AddRenderer(new SpriteRenderer(engine.TextureManager, spriteResolver));
                 scene.AddComponent(new ConsoleLogger());
                 scene.AddComponent(new GameClock());
+                scene.AddComponent(new InputBinder());
                 scene.Camera.Position = new Vector3(0, 0, 0);
                 scene.Camera.Magnification = 2.0f;
 
                 var map = new Map(assets, MapDataId.Unknown116);
                 scene.AddComponent(map);
-                scene.Exchange.Raise(new LoadPalEvent((int)map.GetPalette()), null);
                 /*
-                // var menu = new MainMenu();
-                // scene.AddComponent(menu);
+                var menu = new MainMenu();
+                scene.AddComponent(menu);
 
-                // Image<Rgba32> menuBackground = assets.LoadPicture( PictureId.MenuBackground8);
-                // var background = new Sprite(spriteRenderer, menuBackground, new Vector2(0.0f, 0.0f), new Vector2(1.0f, 0.8f));
-                // scene.AddRenderable(background);
+                Image<Rgba32> menuBackground = assets.LoadPicture( PictureId.MenuBackground8);
+                var background = new Sprite(spriteRenderer, menuBackground, new Vector2(0.0f, 0.0f), new Vector2(1.0f, 0.8f));
+                scene.AddRenderable(background);
 
-                // var statusBackground = assets.LoadPicture(PictureId.StatusBar);
-                // var status = new SpriteRenderer(statusBackground, new Vector2(0.0f, 0.8f), new Vector2(1.0f, 0.2f));
-                // scene.AddRenderable(status);
-
+                var statusBackground = assets.LoadPicture(PictureId.StatusBar);
+                var status = new SpriteRenderer(statusBackground, new Vector2(0.0f, 0.8f), new Vector2(1.0f, 0.2f));
+                scene.AddRenderable(status);
+                //*/
+                /*
                 var map = new Billboard2D<PictureId>(PictureId.TestMap, 0) { Position = new Vector2(0.0f, 0.0f) };
                 scene.AddComponent(map);
                 //*
+                */
                 scene.AddComponent(new Billboard2D<DungeonFloorId>(DungeonFloorId.Water, 0) { Position =
  new Vector2(-64.0f, 0.0f) });
                 scene.AddComponent(new Billboard2D<DungeonFloorId>(DungeonFloorId.Water, 0) { Position =

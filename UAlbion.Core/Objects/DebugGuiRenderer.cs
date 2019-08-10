@@ -11,7 +11,7 @@ namespace UAlbion.Core.Objects
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<DebugGuiRenderer, RenderEvent>((x, e) => e.Add(x)),
-            new Handler<DebugGuiRenderer, EngineUpdateEvent>((x,e) => x._imguiRenderer.Update(e.DeltaSeconds, InputTracker.FrameSnapshot)), 
+            new Handler<DebugGuiRenderer, InputEvent>((x,e) => x._imguiRenderer.Update((float)e.DeltaSeconds, e.Snapshot)), 
             new Handler<DebugGuiRenderer, WindowResizedEvent>((x,e) => x._imguiRenderer.WindowResized(e.Width, e.Height))
         };
 

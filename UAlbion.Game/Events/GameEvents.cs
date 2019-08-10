@@ -1,7 +1,6 @@
-﻿using UAlbion.Core;
-using UAlbion.Core.Events;
+﻿using UAlbion.Core.Events;
 
-namespace UAlbion.Game
+namespace UAlbion.Game.Events
 {
     public interface IGameEvent : IEvent { }
     public abstract class GameEvent : Event, IGameEvent { }
@@ -274,7 +273,7 @@ namespace UAlbion.Game
     }
 
     [Event("update")]
-    public class UpdateEvent : GameEvent
+    public class UpdateEvent : GameEvent, IVerboseEvent
     {
         public UpdateEvent(int frames) { Frames = frames; }
         [EventPart("frames")] public int Frames { get; }

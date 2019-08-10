@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using ImGuiNET;
+//using ImGuiNET;
 using UAlbion.Core.Events;
 using Veldrid;
 using Veldrid.Sdl2;
@@ -22,19 +22,16 @@ namespace UAlbion.Core
         Vector3 _position = new Vector3(0, 3, 0);
         Vector3 _lookDirection = new Vector3(0, -.3f, -1f);
 
-        readonly float _moveSpeed = 10.0f;
+        //readonly float _moveSpeed = 10.0f;
+        //Vector2 _mousePressedPos;
+        //bool _mousePressed = false;
         float _yaw;
         float _pitch;
-        Vector2 _mousePressedPos;
-        bool _mousePressed = false;
         GraphicsDevice _gd;
         bool _useReverseDepth;
         float _windowWidth;
         float _windowHeight;
-        readonly Sdl2Window _window;
-
-        public event Action<Matrix4x4> ProjectionChanged;
-        public event Action<Matrix4x4> ViewChanged;
+        //readonly Sdl2Window _window;
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;
@@ -48,7 +45,7 @@ namespace UAlbion.Core
         {
             _gd = gd;
             _useReverseDepth = gd.IsDepthRangeZeroToOne;
-            _window = window;
+            //_window = window;
             _windowWidth = window.Width;
             _windowHeight = window.Height;
             UpdatePerspectiveMatrix();
@@ -71,6 +68,7 @@ namespace UAlbion.Core
 
         public void Update(float deltaSeconds)
         {
+            /*
             float sprintFactor = InputTracker.GetKey(Key.ControlLeft)
                 ? 0.1f
                 : InputTracker.GetKey(Key.ShiftLeft) ? 2.5f : 1f;
@@ -134,6 +132,7 @@ namespace UAlbion.Core
 
             Pitch = Math.Clamp(Pitch, -1.55f, 1.55f);
             UpdateViewMatrix();
+            */
         }
 
         void WindowResized(float width, float height)
@@ -152,7 +151,6 @@ namespace UAlbion.Core
                 _windowWidth / _windowHeight,
                 NearDistance,
                 FarDistance);
-            ProjectionChanged?.Invoke(_projectionMatrix);
         }
 
         void UpdateViewMatrix()
@@ -161,7 +159,6 @@ namespace UAlbion.Core
             Vector3 lookDir = Vector3.Transform(-Vector3.UnitZ, lookRotation);
             _lookDirection = lookDir;
             _viewMatrix = Matrix4x4.CreateLookAt(_position, _position + _lookDirection, Vector3.UnitY);
-            ViewChanged?.Invoke(_viewMatrix);
         }
 
         public CameraInfo GetCameraInfo() => new CameraInfo

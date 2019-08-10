@@ -9,6 +9,7 @@ using System.Text;
 namespace UAlbion.Core.Events
 {
     public interface IEvent { }
+    public interface IVerboseEvent { }
 
     public abstract class Event : IEvent
     {
@@ -37,7 +38,6 @@ namespace UAlbion.Core.Events
                             Expression.Call(Expression.Convert(instance, property.DeclaringType), getMethod), 
                             typeof(object)), 
                         instance).Compile();
-
 
                 var part = Expression.ArrayIndex(partsParameter, Expression.Constant(index + 1));
                 if (PropertyType == typeof(string))

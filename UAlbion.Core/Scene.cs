@@ -8,7 +8,6 @@ using Veldrid;
 
 namespace UAlbion.Core
 {
-
     public class RenderDebugGroup : IDisposable
     {
         readonly CommandList _cl;

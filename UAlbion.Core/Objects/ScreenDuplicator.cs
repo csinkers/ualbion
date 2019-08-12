@@ -26,7 +26,7 @@ namespace UAlbion.Core.Objects
             _disposeCollector = factory.DisposeCollector;
 
             ResourceLayout resourceLayout = factory.CreateResourceLayout(new ResourceLayoutDescription(
-                new ResourceLayoutElementDescription("SourceTexture", ResourceKind.TextureReadOnly, ShaderStages.Fragment),
+                new ResourceLayoutElementDescription("vdspv_0_0", ResourceKind.TextureReadOnly, ShaderStages.Fragment),
                 new ResourceLayoutElementDescription("SourceSampler", ResourceKind.Sampler, ShaderStages.Fragment)));
 
             (Shader vs, Shader fs) = StaticResourceCache.GetShaders(gd, gd.ResourceFactory, "ScreenDuplicator");
@@ -51,6 +51,7 @@ namespace UAlbion.Core.Objects
                 new ResourceLayout[] { resourceLayout },
                 sc.DuplicatorFramebuffer.OutputDescription);
             _pipeline = factory.CreateGraphicsPipeline(ref pd);
+            _pipeline.Name = "P_ScreenDuplicator";
 
             float[] verts = Util.GetFullScreenQuadVerts(gd);
 

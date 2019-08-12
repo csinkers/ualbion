@@ -76,17 +76,17 @@ namespace UAlbion.Core.Objects
         {
             public static readonly VertexLayoutDescription VertexLayout = new VertexLayoutDescription(VertexLayoutH.Vector2D("Position"));
             public static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
-                ResourceLayoutH.Uniform("Projection"),
-                ResourceLayoutH.Uniform("View"),
+                ResourceLayoutH.Uniform("vdspv_0_0"),
+                ResourceLayoutH.Uniform("vdspv_0_1"),
                 ResourceLayoutH.Sampler("SpriteSampler"),
-                ResourceLayoutH.Texture("SpriteTexture"),
-                ResourceLayoutH.Texture("PaletteView"));
+                ResourceLayoutH.Texture("vdspv_0_3"), // Texture
+                ResourceLayoutH.Texture("vdspv_0_4")); // Palette
 
             public const string VertexShader = @"
             #version 450
 
-            layout(set = 0, binding = 0) uniform Projection { mat4 _Proj; };
-            layout(set = 0, binding = 1) uniform View { mat4 _View; };
+            layout(set = 0, binding = 0) uniform _Projection { mat4 Projection; };
+            layout(set = 0, binding = 1) uniform _View { mat4 View; };
 
             layout(location = 0) in vec2 _Position;
             layout(location = 1) in vec2 _Offset;
@@ -106,12 +106,12 @@ namespace UAlbion.Core.Objects
                 fsin_1 = _TexLayer;
                 fsin_2 = _Flags;
                 //vec4 preTransform = vec4(_Position.x * 1200.0f, _Position.y * 850.0f, 0.0f, 1.0f);
-                //gl_Position = vec4(_Position / 100000.0f, 0.0f, 0.0f); //_Proj * _View * preTransform;
+                //gl_Position = vec4(_Position / 100000.0f, 0.0f, 0.0f); //Projection * View * preTransform;
 
                 if((_Flags & 1) != 0) // If NoTransform set
                     gl_Position = vec4((_Position * _Size) + _Offset, 0, 1);
                 else
-                    gl_Position = _Proj * _View * vec4((_Position * _Size) + _Offset, 0, 1);
+                    gl_Position = Projection * View * vec4((_Position * _Size) + _Offset, 0, 1);
             }";
 
             public const string FragmentShader = @"
@@ -189,14 +189,14 @@ namespace UAlbion.Core.Objects
         {
             ResourceFactory factory = gd.ResourceFactory;
 
-            _vb = factory.CreateBuffer(new BufferDescription(new Vertex2DTextured[4].SizeInBytes(), BufferUsage.VertexBuffer));
+            _vb = factory.CreateBuffer(new BufferDescription(new Vector2[4].SizeInBytes(), BufferUsage.VertexBuffer));
             _ib = factory.CreateBuffer(new BufferDescription(Indices.SizeInBytes(), BufferUsage.IndexBuffer));
             _vb.Name = "SpriteVertexBuffer";
             _ib.Name = "SpriteIndexBuffer";
             cl.UpdateBuffer(_vb, 0, Vertices);
             cl.UpdateBuffer(_ib, 0, Indices);
 
-            var shaderSet = new ShaderSetDescription(new[] { Vertex2DTextured.VertexLayout },
+            var shaderSet = new ShaderSetDescription(new[] { Shader.VertexLayout, InstanceData.VertexLayout },
                 factory.CreateFromSpirv(ShaderHelper.Vertex(Shader.VertexShader), ShaderHelper.Fragment(Shader.FragmentShader)));
 
             _perSpriteResourceLayout = factory.CreateResourceLayout(Shader.PerSpriteLayoutDescription);
@@ -219,6 +219,7 @@ namespace UAlbion.Core.Objects
                 sc.MainSceneFramebuffer.OutputDescription);
 
             _pipeline = factory.CreateGraphicsPipeline(ref pd);
+            _pipeline.Name = "P_SpriteRenderer";
             _disposeCollector.Add(_vb, _ib, _perSpriteResourceLayout, _pipeline);
         }
 

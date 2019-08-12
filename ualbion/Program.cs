@@ -47,22 +47,29 @@ namespace UAlbion
 
             var backend =
                 //VeldridStartup.GetPlatformDefaultBackend()
-                //GraphicsBackend.Metal
-                //GraphicsBackend.Vulkan
-                //GraphicsBackend.OpenGL
-                //GraphicsBackend.OpenGLES
-                GraphicsBackend.Direct3D11
+                //GraphicsBackend.Metal /*
+                //GraphicsBackend.Vulkan /*
+                GraphicsBackend.OpenGL /*
+                //GraphicsBackend.OpenGLES /*
+                GraphicsBackend.Direct3D11 /*
+                //*/
                 ;
 
             using (var assets = new Assets(config))
             using (var engine = new Engine(backend))
             {
+                engine.CheckForErrors();
                 var spriteResolver = new SpriteResolver(assets);
                 engine.AddComponent(assets);
+                engine.CheckForErrors();
                 engine.AddComponent(new ConsoleLogger());
+                engine.CheckForErrors();
                 engine.AddComponent(new GameClock());
+                engine.CheckForErrors();
                 engine.AddComponent(new InputBinder());
+                engine.CheckForErrors();
                 engine.AddComponent(new SceneLoader(assets, engine, spriteResolver));
+                engine.CheckForErrors();
                 engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.TestMapIskai), null);
                 //engine.GlobalExchange.Raise(new LoadMapEvent((int)0), null);
 

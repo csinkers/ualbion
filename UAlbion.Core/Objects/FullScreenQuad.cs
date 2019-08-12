@@ -56,7 +56,7 @@ void main()
             _disposeCollector = factory.DisposeCollector;
 
             var layout = factory.CreateResourceLayout(new ResourceLayoutDescription(
-                ResourceLayoutH.Texture("SourceTexture"),
+                ResourceLayoutH.Texture("vdspv_0_0"),
                 ResourceLayoutH.Sampler("SourceSampler")));
 
             var shaderSet = new ShaderSetDescription(new[] { Vertex2DTextured.VertexLayout },
@@ -75,6 +75,7 @@ void main()
                 new[] { layout },
                 gd.SwapchainFramebuffer.OutputDescription);
             _pipeline = factory.CreateGraphicsPipeline(ref pd);
+            _pipeline.Name = "P_FullScreenQuad";
 
             float[] verts = Util.GetFullScreenQuadVerts(gd);
             _vb = factory.CreateBuffer(new BufferDescription(verts.SizeInBytes() * sizeof(float), BufferUsage.VertexBuffer));

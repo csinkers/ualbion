@@ -72,6 +72,7 @@ namespace UAlbion.Core.Objects
                 sc.MainSceneFramebuffer.OutputDescription);
 
             _pipeline = factory.CreateGraphicsPipeline(ref pd);
+            _pipeline.Name = "P_Skybox";
 
             _resourceSet = factory.CreateResourceSet(new ResourceSetDescription(
                 _layout,

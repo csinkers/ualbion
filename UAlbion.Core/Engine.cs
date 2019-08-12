@@ -52,6 +52,7 @@ namespace UAlbion.Core
         {
             TextureManager = new TextureManager();
             ChangeBackend(backend);
+            CheckForErrors();
 
             _igRenderable = new DebugGuiRenderer(Window.Width, Window.Height);
             _duplicator = new ScreenDuplicator();
@@ -119,6 +120,7 @@ namespace UAlbion.Core
 
         public void Run()
         {
+            GraphicsDevice.CheckForErrors();
             Raise(new BeginFrameEvent());
             if (Scene == null)
                 throw new InvalidOperationException("The scene must be set before the main loop can be run.");
@@ -245,6 +247,7 @@ namespace UAlbion.Core
             };
 
             GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, gdOptions, backend);
+            CheckForErrors();
             Window.Title = GraphicsDevice.BackendType.ToString();
 
             if (Scene != null)
@@ -287,6 +290,8 @@ namespace UAlbion.Core
             _fullScreenQuad?.Dispose();
             //_graphicsDevice?.Dispose();
         }
+
+        public void CheckForErrors() { GraphicsDevice?.CheckForErrors(); }
     }
 }
 

@@ -37,7 +37,7 @@ namespace UAlbion.Core
         readonly SceneContext _sceneContext = new SceneContext();
         readonly DebugMenus _debugMenus;
 
-        Scene _scene;
+        public Scene Scene { get; private set; }
         CommandList _frameCommands;
         TextureSampleCount? _newSampleCount;
         bool _windowResized;
@@ -94,14 +94,14 @@ namespace UAlbion.Core
             if(_frameCommands != null)
                 DestroyAllObjects();
 
-            if (_scene != null)
-                _scene.Exchange.IsActive = false;
+            if (Scene != null)
+                Scene.Exchange.IsActive = false;
 
-            _scene = scene;
-            _sceneContext.SetCurrentScene(_scene);
+            Scene = scene;
+            _sceneContext.SetCurrentScene(Scene);
             CreateAllObjects();
             ImGui.StyleColorsClassic();
-            _scene.Exchange.IsActive = true;
+            Scene.Exchange.IsActive = true;
         }
 
         public void AddComponent(IComponent component)
@@ -120,7 +120,7 @@ namespace UAlbion.Core
         public void Run()
         {
             Raise(new BeginFrameEvent());
-            if (_scene == null)
+            if (Scene == null)
                 throw new InvalidOperationException("The scene must be set before the main loop can be run.");
 
             var frameCounter = new FrameCounter();
@@ -202,7 +202,7 @@ namespace UAlbion.Core
             }
 
             _frameCommands.Begin();
-            _scene.RenderAllStages(GraphicsDevice, _frameCommands, _sceneContext);
+            Scene.RenderAllStages(GraphicsDevice, _frameCommands, _sceneContext);
             CoreTrace.Log.Info("Engine", "Swapping buffers...");
             GraphicsDevice.SwapBuffers();
             CoreTrace.Log.Info("Engine", "Draw complete");
@@ -247,9 +247,9 @@ namespace UAlbion.Core
             GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, gdOptions, backend);
             Window.Title = GraphicsDevice.BackendType.ToString();
 
-            if (_scene != null)
+            if (Scene != null)
             {
-                _scene.Camera.UpdateBackend(GraphicsDevice);
+                Scene.Camera.UpdateBackend(GraphicsDevice);
                 CreateAllObjects();
             }
         }
@@ -263,7 +263,7 @@ namespace UAlbion.Core
             initCL.Name = "Recreation Initialization Command List";
             initCL.Begin();
             _sceneContext.CreateDeviceObjects(GraphicsDevice, initCL, _sceneContext);
-            _scene.CreateAllDeviceObjects(GraphicsDevice, initCL, _sceneContext);
+            Scene.CreateAllDeviceObjects(GraphicsDevice, initCL, _sceneContext);
             initCL.End();
             GraphicsDevice.SubmitCommands(initCL);
             initCL.Dispose();
@@ -274,7 +274,7 @@ namespace UAlbion.Core
             GraphicsDevice.WaitForIdle();
             _frameCommands.Dispose();
             _sceneContext.DestroyDeviceObjects();
-            _scene.DestroyAllDeviceObjects();
+            Scene.DestroyAllDeviceObjects();
             StaticResourceCache.DestroyAllDeviceObjects();
             TextureManager.DestroyDeviceObjects();
             GraphicsDevice.WaitForIdle();

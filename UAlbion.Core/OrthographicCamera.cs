@@ -21,7 +21,7 @@ namespace UAlbion.Core
             }),
             new Handler<OrthographicCamera, EngineUpdateEvent>((x, e) =>
             {
-                x._position += new Vector3(x._movementDirection.X, x._movementDirection.Y, 0) * e.DeltaSeconds;
+                x._position +=  new Vector3(x._movementDirection.X, x._movementDirection.Y, 0) * e.DeltaSeconds;
                 x.UpdateViewMatrix();
             }),
             new Handler<OrthographicCamera, WindowResizedEvent>((x, e) =>
@@ -66,8 +66,6 @@ namespace UAlbion.Core
             _projectionMatrix = Matrix4x4.Identity;
             _projectionMatrix.M11 = (2.0f * _magnification) / WindowWidth;
             _projectionMatrix.M22 = (-2.0f * _magnification) / WindowHeight;
-            _projectionMatrix.M41 = 0;
-            _projectionMatrix.M42 = 0;
         }
 
         void UpdateViewMatrix()

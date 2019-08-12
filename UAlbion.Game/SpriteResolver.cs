@@ -60,7 +60,7 @@ namespace UAlbion.Game
             var key = new SpriteRenderer.SpriteKey(texture, spriteDefinition.RenderOrder);
             var instance = new SpriteRenderer.InstanceData(
                 spriteDefinition.Position,
-                size, texOffset, texSize, layer,
+                spriteDefinition.Size ?? size, texOffset, texSize, layer,
                 spriteDefinition.Flags | (texture.Format == PixelFormat.R8_UNorm ? SpriteFlags.UsePalette : 0)
             );
             return Tuple.Create(key, instance);

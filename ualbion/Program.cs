@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
@@ -27,9 +26,6 @@ namespace UAlbion
 
             AssetConfig config = AssetConfig.Load(baseDir);
 
-            var assets = new Assets(config);
-            var spriteResolver = new SpriteResolver(assets);
-
             /* Dump out info on all 2D maps
             for (int i = 100; i < 400; i++)
             {
@@ -55,23 +51,31 @@ namespace UAlbion
                 //GraphicsBackend.Vulkan
                 //GraphicsBackend.OpenGL
                 //GraphicsBackend.OpenGLES
-                GraphicsBackend.Direct3D11;
+                GraphicsBackend.Direct3D11
+                ;
 
+            using (var assets = new Assets(config))
             using (var engine = new Engine(backend))
             {
+                var spriteResolver = new SpriteResolver(assets);
                 engine.AddComponent(assets);
                 engine.AddComponent(new ConsoleLogger());
                 engine.AddComponent(new GameClock());
                 engine.AddComponent(new InputBinder());
                 engine.AddComponent(new SceneLoader(assets, engine, spriteResolver));
                 engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.Unknown100), null);
+                //engine.GlobalExchange.Raise(new LoadMapEvent((int)0), null);
+
                 /*
                 var menu = new MainMenu();
                 scene.AddComponent(menu);
 
-                Image<Rgba32> menuBackground = assets.LoadPicture( PictureId.MenuBackground8);
-                var background = new Sprite(spriteRenderer, menuBackground, new Vector2(0.0f, 0.0f), new Vector2(1.0f, 0.8f));
-                scene.AddRenderable(background);
+                var background = new Billboard2D<PictureId>(PictureId.MenuBackground8, 0)
+                {
+                    Position = new Vector2(-1.0f, 1.0f),
+                    Size = new Vector2(2.0f, -2.0f)
+                };
+                engine.AddComponent(background);
 
                 var statusBackground = assets.LoadPicture(PictureId.StatusBar);
                 var status = new SpriteRenderer(statusBackground, new Vector2(0.0f, 0.8f), new Vector2(1.0f, 0.2f));

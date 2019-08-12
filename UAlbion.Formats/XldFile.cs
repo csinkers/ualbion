@@ -25,6 +25,7 @@ namespace UAlbion.Formats
                 var actualHeader = br.ReadBytes(headerBytes.Length);
                 if(!actualHeader.SequenceEqual(headerBytes))
                     throw new FormatException("XLD file magic string not found");
+
                 byte terminator = br.ReadByte();
                 Debug.Assert(terminator == 0);
 
@@ -47,7 +48,7 @@ namespace UAlbion.Formats
         public BinaryReader GetReaderForObject(int objectIndex, out int length)
         {
             if(objectIndex >= ObjectCount)
-                throw new InvalidOperationException($"Tried to request object {objectIndex} from {Filename}, but it only contains {ObjectCount} items.");
+                throw new FileNotFoundException($"Tried to request object {objectIndex} from {Filename}, but it only contains {ObjectCount} items.");
 
             _stream.Seek(_objectOffsets[objectIndex], SeekOrigin.Begin);
             length = _objectOffsets[objectIndex + 1] - _objectOffsets[objectIndex];

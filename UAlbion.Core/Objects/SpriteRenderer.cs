@@ -108,7 +108,10 @@ namespace UAlbion.Core.Objects
                 //vec4 preTransform = vec4(_Position.x * 1200.0f, _Position.y * 850.0f, 0.0f, 1.0f);
                 //gl_Position = vec4(_Position / 100000.0f, 0.0f, 0.0f); //_Proj * _View * preTransform;
 
-                gl_Position = _Proj * _View * vec4((_Position * _Size) + _Offset, 0, 1);
+                if((_Flags & 1) != 0) // If NoTransform set
+                    gl_Position = vec4((_Position * _Size) + _Offset, 0, 1);
+                else
+                    gl_Position = _Proj * _View * vec4((_Position * _Size) + _Offset, 0, 1);
             }";
 
             public const string FragmentShader = @"

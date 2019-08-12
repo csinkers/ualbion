@@ -27,6 +27,16 @@ namespace UAlbion.Game
             if (_pendingMapChange == null)
                 return;
 
+            if (_pendingMapChange == 0) // 0 = Build a blank scene for testing / debugging0
+            {
+                var scene = _engine.Create2DScene();
+                scene.AddComponent(new PaletteManager(scene, _assets));
+                scene.AddRenderer(new SpriteRenderer(_engine.TextureManager, _spriteResolver));
+                _engine.SetScene(scene);
+                _pendingMapChange = null;
+                return;
+            }
+
             var mapData2D = _assets.LoadMap2D((MapDataId)_pendingMapChange);
             if (mapData2D != null)
             {

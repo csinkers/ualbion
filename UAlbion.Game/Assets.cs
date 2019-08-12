@@ -27,7 +27,7 @@ namespace UAlbion.Game
     public class AssetStatsEvent : GameEvent { }
     [Event("assets:cycle")] public class CycleCacheEvent : GameEvent { }
 
-    public class Assets : RegisteredComponent
+    public class Assets : RegisteredComponent, IDisposable
     {
         public Assets(AssetConfig config) : base(Handlers) { _config = config; }
 
@@ -432,6 +432,12 @@ namespace UAlbion.Game
         }
         public AlbionSample LoadSample(AssetType type, int id) { return (AlbionSample)LoadAssetCached(type, id); }
         public AlbionVideo LoadVideo(VideoId id, GameLanguage language) => (AlbionVideo) LoadAsset(AssetType.Flic, (int)id, $"Video:{id}", language); // Don't cache videos.
+
+        public void Dispose()
+        {
+            foreach(var xld in _xlds.SelectMany(x => x.Value))
+                xld?.Dispose();
+        }
     }
 
     internal class AssetNotFoundException : Exception

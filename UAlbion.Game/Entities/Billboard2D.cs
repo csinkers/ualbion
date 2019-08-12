@@ -11,6 +11,7 @@ namespace UAlbion.Game.Entities
     {
         static IList<Handler> Handlers => new Handler[] { new Handler<Billboard2D<T>, RenderEvent>((x, e) => x.OnRender(e)), };
         public Vector2 Position { get; set; }
+        public Vector2? Size { get; set; }
         public int RenderOrder { get; set; }
 
         readonly T _id;
@@ -29,7 +30,7 @@ namespace UAlbion.Game.Entities
             if ((_flags & SpriteFlags.OnlyEvenFrames) != 0 && _frameCount % 2 == 0)
                 return;
 
-            var sprite = new SpriteDefinition<T>(_id, 0, Position, RenderOrder, _flags);
+            var sprite = new SpriteDefinition<T>(_id, 0, Position, RenderOrder, _flags, Size);
             renderEvent.Add(sprite);
         }
     }

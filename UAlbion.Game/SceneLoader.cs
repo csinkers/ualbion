@@ -49,6 +49,7 @@ namespace UAlbion.Game
                 scene.Camera.Position = new Vector3(map.Size.X / 2, map.Size.Y / 2, 0);
                 scene.Camera.Magnification = 1.0f;
                 _engine.SetScene(scene);
+                Raise(new LogEvent((int)LogEvent.Level.Info, $"Loaded map {(int)_pendingMapChange}: {_pendingMapChange}"));
             }
 
             var mapData3D = _assets.LoadMap3D((MapDataId)_pendingMapChange);

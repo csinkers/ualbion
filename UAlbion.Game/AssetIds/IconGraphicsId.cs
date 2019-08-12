@@ -4,7 +4,7 @@ namespace UAlbion.Game.AssetIds
     {
         Outdoors1 = 0,
         Outdoors2 = 1,
-        Indoors = 2,
+        IskaiIndoors = 2,
         Desert = 3,
         Stoney1 = 4,
         Stoney2 = 5,

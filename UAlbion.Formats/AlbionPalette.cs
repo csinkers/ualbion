@@ -35,17 +35,20 @@ namespace UAlbion.Formats
             long startingOffset = br.BaseStream.Position;
             for (int i = 0; i < 192; i++)
             {
-                Entries[i] = (uint)br.ReadByte() << 24;
-                Entries[i] |= (uint)br.ReadByte() << 16;
-                Entries[i] |= (uint)br.ReadByte() << 8;
-                //Entries[i] |= (uint)(i == 0 ? 0 : 0xff); // Alpha
+                //*
+                Entries[i]  = (uint)br.ReadByte() << 0; // Red
+                Entries[i] |= (uint)br.ReadByte() << 8; // Green
+                Entries[i] |= (uint)br.ReadByte() << 16; // Blue
+                Entries[i] |= (uint)(i == 0 ? 0 : 0xff) << 24; // Alpha
+                //*/
                 /*
                 br.ReadBytes(3);
-                Entries[i] = (uint)i << 16;
-                Entries[i] |= (uint)i << 8;
-                Entries[i] |= (uint)i << 0;
-                Entries[i] |= ((uint)0xff) << 24; // Alpha
-                */
+                Entries[i] = 0;
+                Entries[i] |= (uint)0xff << 24; // Alpha
+                Entries[i] |= (uint)i << 16; // Blue
+                Entries[i] |= (uint)i << 8; // Green
+                Entries[i] |= (uint)i << 0; // Red
+                //*/
             }
 
             Debug.Assert(br.BaseStream.Position == startingOffset + streamLength);
@@ -58,16 +61,17 @@ namespace UAlbion.Formats
             for (int i = 192; i < 256; i++)
             {
                 //*
-                Entries[i] = (uint)commonPalette[(i - 192) * 3 + 0] << 24;
-                Entries[i] |= (uint)commonPalette[(i - 192) * 3 + 1] << 16;
-                Entries[i] |= (uint)commonPalette[(i - 192) * 3 + 2] << 8;
-                //Entries[i] |= 0xff; // Alpha
+                Entries[i]  = (uint)commonPalette[(i - 192) * 3 + 0] << 0; // Red
+                Entries[i] |= (uint)commonPalette[(i - 192) * 3 + 1] << 8; // Green
+                Entries[i] |= (uint)commonPalette[(i - 192) * 3 + 2] << 16; // Blue
+                Entries[i] |= (uint)0xff << 24; // Alpha
                 //*/
                 /*
-                Entries[i] = (uint)i << 16;
+                Entries[i] = 0;
+                Entries[i] |= (uint)i << 16;
                 Entries[i] |= (uint)i << 8;
                 Entries[i] |= (uint)i << 0;
-                Entries[i] |= ((uint)0xff) << 24; // Alpha
+                Entries[i] |= (uint)0xff << 24; // Alpha
                 //*/
             }
         }
@@ -77,6 +81,7 @@ namespace UAlbion.Formats
             var result = new uint[256];
             AnimatedRanges.TryGetValue(Id, out var ranges);
             ranges = ranges ?? new List<(byte, byte)>();
+            tick = int.MaxValue - tick;
 
             for (int i = 0; i < Entries.Length; i++)
             {

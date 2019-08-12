@@ -72,7 +72,7 @@ namespace UAlbion.Core.Objects
             public InstanceData[] Instances { get; set; }
         }
 
-        static class Shader
+            static class Shader
         {
             public static readonly VertexLayoutDescription VertexLayout = new VertexLayoutDescription(VertexLayoutH.Vector2D("Position"));
             public static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
@@ -126,19 +126,35 @@ namespace UAlbion.Core.Objects
 
             void main()
             {
+                /* NoTransform = 1,
+                   Highlight = 2,
+                   UsePalette = 4
+                   OnlyEvenFrames = 8,
+                   RedTint = 16,
+                   GreenTint = 32,
+                   BlueTint = 64,
+                   Transparent = 128 */
+
+                vec4 color;
                 if ((fsin_2 & 4) != 0)
                 {
                     float redChannel = texture(sampler2D(SpriteTexture, SpriteSampler), fsin_0)[0];
                     float index = 255.0f * redChannel;
-                    vec4 color = texture(sampler2D(PaletteView, SpriteSampler), vec2(redChannel, 0.0f));
-                    OutputColor = color;
+
+                    color = texture(sampler2D(PaletteView, SpriteSampler), vec2(redChannel, 0.0f));
                 }
                 else
                 {
-                    OutputColor = texture(sampler2D(SpriteTexture, SpriteSampler), fsin_0);
+                    color = texture(sampler2D(SpriteTexture, SpriteSampler), fsin_0);
                 }
 
-                // OutputColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+                if((fsin_2 & 2) != 0) color = color * 1.2;
+                if((fsin_2 & 16) != 0) color = vec4(1.0f, color.yzw);
+                if((fsin_2 & 32) != 0) color = vec4(color.x, 1.0f, color.zw);
+                if((fsin_2 & 64) != 0) color = vec4(color.xy, 1.0f, color.w);
+                if((fsin_2 & 128) != 0) color = vec4(color.xyz, color.w * 0.5f);
+
+                OutputColor = color;
             }";
         }
 

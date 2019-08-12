@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using UAlbion.Core;
@@ -6,6 +8,7 @@ using UAlbion.Core.Objects;
 using UAlbion.Formats;
 using UAlbion.Game;
 using UAlbion.Game.AssetIds;
+using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using Veldrid;
 
@@ -27,6 +30,25 @@ namespace UAlbion
             var assets = new Assets(config);
             var spriteResolver = new SpriteResolver(assets);
 
+            /* Dump out info on all 2D maps
+            for (int i = 100; i < 400; i++)
+            {
+                var map = assets.LoadMap2D((MapDataId) i);
+                if (map == null)
+                    continue;
+
+                int minUnderlay = map.Underlay.Where(x => x > 1).Select(x => (int?)x).Min() ?? 0;
+                int maxUnderlay = map.Underlay.Max();
+                int minOverlay = map.Overlay.Where(x => x > 1).Select(x => (int?)x).Min() ?? 0;
+                int maxOverlay = map.Overlay.Max();
+
+                Console.WriteLine($"TS{map.TilesetId} P{map.PaletteId} Underlays: {minUnderlay}-{maxUnderlay} Overlays: {minOverlay}-{maxOverlay} Map {i} W{map.Width} H{map.Height}");
+            }
+
+            Console.ReadLine();
+            return;
+            //*/
+
             var backend =
                 //VeldridStartup.GetPlatformDefaultBackend()
                 //GraphicsBackend.Metal
@@ -37,18 +59,12 @@ namespace UAlbion
 
             using (var engine = new Engine(backend))
             {
-                var scene = engine.Create2DScene();
-                scene.AddComponent(assets);
-                scene.AddComponent(new PaletteManager(scene, assets));
-                scene.AddRenderer(new SpriteRenderer(engine.TextureManager, spriteResolver));
-                scene.AddComponent(new ConsoleLogger());
-                scene.AddComponent(new GameClock());
-                scene.AddComponent(new InputBinder());
-                scene.Camera.Position = new Vector3(0, 0, 0);
-                scene.Camera.Magnification = 2.0f;
-
-                var map = new Map(assets, MapDataId.Unknown116);
-                scene.AddComponent(map);
+                engine.AddComponent(assets);
+                engine.AddComponent(new ConsoleLogger());
+                engine.AddComponent(new GameClock());
+                engine.AddComponent(new InputBinder());
+                engine.AddComponent(new SceneLoader(assets, engine, spriteResolver));
+                engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.Unknown100), null);
                 /*
                 var menu = new MainMenu();
                 scene.AddComponent(menu);
@@ -64,8 +80,7 @@ namespace UAlbion
                 /*
                 var map = new Billboard2D<PictureId>(PictureId.TestMap, 0) { Position = new Vector2(0.0f, 0.0f) };
                 scene.AddComponent(map);
-                //*
-                */
+                /*
                 scene.AddComponent(new Billboard2D<DungeonFloorId>(DungeonFloorId.Water, 0) { Position =
  new Vector2(-64.0f, 0.0f) });
                 scene.AddComponent(new Billboard2D<DungeonFloorId>(DungeonFloorId.Water, 0) { Position =
@@ -75,7 +90,6 @@ namespace UAlbion
                 scene.AddComponent(new Billboard2D<DungeonFloorId>(DungeonFloorId.Water, 0) { Position =
  new Vector2(-64.0f, 64.0f) });
                 //*/
-                engine.SetScene(scene);
                 //scene.Exchange.Raise(new LoadRenderDocEvent(), null);
                 engine.Run();
             }

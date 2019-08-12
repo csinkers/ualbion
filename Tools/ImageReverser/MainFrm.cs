@@ -106,8 +106,7 @@ namespace UAlbion.Tools.ImageReverser
             switch (conf.Type)
             {
                 case XldObjectType.AmorphousSprite: return new AmorphousSpriteLoader();
-                case XldObjectType.Map2D:
-                case XldObjectType.Map3D:
+                case XldObjectType.MapData:
                 case XldObjectType.FixedSizeSprite: return new FixedSizeSpriteLoader();
 
                 case XldObjectType.SingleHeaderSprite:
@@ -125,8 +124,7 @@ namespace UAlbion.Tools.ImageReverser
                 case XldObjectType.FixedSizeSprite:
                 case XldObjectType.SingleHeaderSprite:
                 case XldObjectType.HeaderPerSubImageSprite: 
-                case XldObjectType.Map2D:
-                case XldObjectType.Map3D: return true;
+                case XldObjectType.MapData: return true;
                 default: return false;
             }
         }
@@ -154,7 +152,7 @@ namespace UAlbion.Tools.ImageReverser
             sb.AppendLine($"{filename}");
             sb.AppendLine($"File Size: {fileInfo.Length}");
             sb.AppendLine($"XLD: {asset.Parent.Name}");
-            sb.AppendLine($"Type: {asset.Type}");
+            sb.AppendLine($"Layer: {asset.Type}");
             sb.AppendLine($"Conf Width: {asset.EffectiveWidth}");
             sb.AppendLine($"Conf Height: {asset.EffectiveHeight}");
             sb.AppendLine();
@@ -224,9 +222,9 @@ namespace UAlbion.Tools.ImageReverser
                                 byte* p = (byte*)d.Scan0 + y * d.Stride + x * 3;
                                 byte color = sprite.PixelData[n];
 
-                                p[0] = (byte)((palette[color] & 0x0000ff00) >> 8);
-                                p[1] = (byte)((palette[color] & 0x00ff0000) >> 16);
-                                p[2] = (byte)((palette[color] & 0xff000000) >> 24);
+                                p[0] = (byte)((palette[color] & 0x00ff0000) >> 16);
+                                p[1] = (byte)((palette[color] & 0x0000ff00) >> 8);
+                                p[2] = (byte)((palette[color] & 0x000000ff) >> 0);
                             }
                         }
                     }
@@ -276,7 +274,7 @@ namespace UAlbion.Tools.ImageReverser
                 var frame = Math.Max(0, trackFrame.Value);
                 bmp = GenerateBitmap(_visualSprite, frame, width, magnify, curPalette);
             }
-            //else if (asset.Type == XldObjectType.Map2D)
+            //else if (asset.Layer == XldObjectType.Map2D)
             //{
             //    _logicalSprite = null;
             //    _visualSprite = null;

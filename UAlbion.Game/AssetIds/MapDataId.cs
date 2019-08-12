@@ -13,7 +13,7 @@ namespace UAlbion.Game.AssetIds
         Unknown108 = 108,
         Unknown109 = 109,
         Unknown110 = 110,
-        Unknown111 = 111,
+        SouthWindClan = 111,
         Unknown112 = 112,
         Unknown113 = 113,
         Unknown114 = 114,

@@ -54,19 +54,21 @@ namespace UAlbion.Core.Textures
                     _subImages.Add(subImage);
         }
 
-        public void GetSubImageDetails(int id, out Vector2 offset, out Vector2 size, out int layer)
+        public void GetSubImageDetails(int id, out Vector2 size, out Vector2 texOffset, out Vector2 texSize, out int layer)
         {
             Debug.Assert(id == 0 || id < _subImages.Count);
             if(_subImages.Count == 0)
             {
-                offset = Vector2.Zero;
-                size = Vector2.One;
+                size = Vector2.One * 16;
+                texOffset = Vector2.Zero;
+                texSize = Vector2.One;
                 layer = 0;
             }
 
             var subImage = _subImages[id];
-            offset = new Vector2((float)subImage.X / Width, (float)subImage.Y / Height);
-            size = new Vector2((float)subImage.W / Width, (float)subImage.H / Height);
+            size = new Vector2(subImage.W, subImage.H);
+            texOffset = new Vector2((float)subImage.X / Width, (float)subImage.Y / Height);
+            texSize = new Vector2((float)subImage.W / Width, (float)subImage.H / Height);
             layer = subImage.Layer;
         }
 

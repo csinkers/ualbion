@@ -50,7 +50,7 @@ namespace UAlbion.Game
         static KeyBinding Bind(Key key, ModifierKeys modifiers = ModifierKeys.None) => new KeyBinding(key, modifiers);
 
         // TODO: Load bindings from config
-        IDictionary<InputMode, IDictionary<KeyBinding, string>> _bindings = new Dictionary<InputMode, IDictionary<KeyBinding, string>>
+        readonly IDictionary<InputMode, IDictionary<KeyBinding, string>> _bindings = new Dictionary<InputMode, IDictionary<KeyBinding, string>>
             {
                 { InputMode.Global, new Dictionary<KeyBinding, string>
                     {
@@ -65,15 +65,23 @@ namespace UAlbion.Game
                 },
 
                 { InputMode.World2D, new Dictionary<KeyBinding, string> {
-                    { Bind(Key.Keypad4), "+e:camera_move -64  0" },
-                    { Bind(Key.Keypad6), "+e:camera_move  64  0" },
-                    { Bind(Key.Keypad8), "+e:camera_move  0 -64" },
-                    { Bind(Key.Keypad2), "+e:camera_move  0  64" },
+                    { Bind(Key.Keypad4), "+e:camera_move -128  0" },
+                    { Bind(Key.Keypad6), "+e:camera_move  128  0" },
+                    { Bind(Key.Keypad8), "+e:camera_move  0 -128" },
+                    { Bind(Key.Keypad2), "+e:camera_move  0  128" },
 
-                    { Bind(Key.W), "+e:camera_move  0 -64" },
-                    { Bind(Key.A), "+e:camera_move -64  0" },
-                    { Bind(Key.S), "+e:camera_move  0  64" },
-                    { Bind(Key.D), "+e:camera_move  64  0" },
+                    { Bind(Key.W), "+e:camera_move  0 -128" },
+                    { Bind(Key.A), "+e:camera_move -128  0" },
+                    { Bind(Key.S), "+e:camera_move  0  128" },
+                    { Bind(Key.D), "+e:camera_move  128  0" },
+
+                    { Bind(Key.W, ModifierKeys.Shift), "+e:camera_move  0 -512" },
+                    { Bind(Key.A, ModifierKeys.Shift), "+e:camera_move -512  0" },
+                    { Bind(Key.S, ModifierKeys.Shift), "+e:camera_move  0  512" },
+                    { Bind(Key.D, ModifierKeys.Shift), "+e:camera_move  512  0" },
+
+                    {Bind(Key.A, ModifierKeys.Control), "!loadnextmap" },
+                    {Bind(Key.X, ModifierKeys.Control), "!loadprevmap" },
 
                     /*
                     { Bind(Key.W), "+party_move  0 -1" },
@@ -144,6 +152,7 @@ namespace UAlbion.Game
         InputMode _activeMode = InputMode.World2D;
         Vector2 _mousePosition;
         Vector2 _mouseDelta;
+        int _mapId = 100;
 
         ModifierKeys _modifiers
         {
@@ -177,8 +186,13 @@ namespace UAlbion.Game
 
             foreach (var keyEvent in e.Snapshot.KeyEvents)
             {
-                if (keyEvent.Down) _pressedKeys.Add(keyEvent.Key);
-                else _pressedKeys.Remove(keyEvent.Key);
+                if (!keyEvent.Down)
+                {
+                    _pressedKeys.Remove(keyEvent.Key);
+                    continue;
+                }
+
+                _pressedKeys.Add(keyEvent.Key);
 
                 var binding = new KeyBinding(keyEvent.Key, keyEvent.Modifiers);
                 if (!_bindings[_activeMode].TryGetValue(binding, out var action))
@@ -188,6 +202,19 @@ namespace UAlbion.Game
                 action = action.Trim();
                 if (action.StartsWith('+')) // Continuous actions are handled later
                     continue;
+
+                if (action == "!loadprevmap")
+                {
+                    _mapId--;
+                    Raise(new LoadMapEvent(_mapId));
+                    continue;
+                }
+                if (action == "!loadnextmap")
+                {
+                    _mapId++;
+                    Raise(new LoadMapEvent(_mapId));
+                    continue;
+                }
 
                 var actionEvent = Event.Parse(action);
                 if(actionEvent != null)
@@ -225,7 +252,7 @@ namespace UAlbion.Game
         */
     }
 
-    //[Event("change_input_mode", "Changes the currently active input mode / keybindings")]
+    //[MapEvent("change_input_mode", "Changes the currently active input mode / keybindings")]
     class ChangeInputModeEvent : GameEvent
     {
         //[EventPart("mode")]

@@ -8004,29 +8004,9 @@
     },
     "ICONDAT0.XLD": {
       "EnumName": "IconDataId",
-      "Type": "FixedSizeSprite",
+      "Type": "IconData",
       "Width": 8,
       "Height": 8,
-      "RotatedLeft": false,
-      "Assets": {
-        "0": {},
-        "1": {},
-        "2": {},
-        "3": {},
-        "4": {},
-        "5": {},
-        "6": {},
-        "7": {},
-        "8": {},
-        "9": {},
-        "10": {}
-      }
-    },
-    "ICONGFX0.XLD": {
-      "EnumName": "IconGraphicsId",
-      "Type": "FixedSizeSprite",
-      "Width": 16,
-      "Height": 16,
       "RotatedLeft": false,
       "Assets": {
         "0": {
@@ -8060,6 +8040,81 @@
           "Name": "DjiKantos"
         },
         "10": {}
+      }
+    },
+    "ICONGFX0.XLD": {
+      "EnumName": "IconGraphicsId",
+      "Type": "FixedSizeSprite",
+      "Width": 16,
+      "Height": 16,
+      "RotatedLeft": false,
+      "Assets": {
+        "0": {
+          "Name": "Outdoors",
+          "PaletteHints": [
+            0
+          ]
+        },
+        "1": {
+          "Name": "Outdoors",
+          "PaletteHints": [
+            1
+          ]
+        },
+        "2": {
+          "Name": "IskaiIndoors",
+          "PaletteHints": [
+            5,
+            19
+          ]
+        },
+        "3": {
+          "Name": "Desert",
+          "PaletteHints": [
+            3
+          ]
+        },
+        "4": {
+          "Name": "Stoney",
+          "PaletteHints": [
+            4
+          ]
+        },
+        "5": {
+          "Name": "Stoney",
+          "PaletteHints": [
+            15
+          ]
+        },
+        "6": {
+          "Name": "CeltDungeon",
+          "PaletteHints": [
+            8
+          ]
+        },
+        "7": {
+          "Name": "Toronto",
+          "PaletteHints": [
+            25
+          ]
+        },
+        "8": {
+          "Name": "Celtic",
+          "PaletteHints": [
+            27
+          ]
+        },
+        "9": {
+          "Name": "DjiKantos",
+          "PaletteHints": [
+            44
+          ]
+        },
+        "10": {
+          "PaletteHints": [
+            55
+          ]
+        }
       }
     },
     "ITEMGFX": {
@@ -8313,7 +8368,7 @@
     },
     "MAPDATA1.XLD": {
       "EnumName": "MapDataId",
-      "Type": "Map2D",
+      "Type": "MapData",
       "RotatedLeft": false,
       "Assets": {
         "0": {
@@ -8350,6 +8405,7 @@
           "Width": 270
         },
         "11": {
+          "Name": "South Wind Clan",
           "Width": 225
         },
         "12": {
@@ -8582,7 +8638,7 @@
     },
     "MAPDATA2.XLD": {
       "EnumName": "MapDataId",
-      "Type": "Map2D",
+      "Type": "MapData",
       "RotatedLeft": false,
       "Assets": {
         "0": {},
@@ -8689,7 +8745,7 @@
     },
     "MAPDATA3.XLD": {
       "EnumName": "MapDataId",
-      "Type": "Map2D",
+      "Type": "MapData",
       "RotatedLeft": false,
       "Assets": {
         "0": {},
@@ -9859,30 +9915,34 @@
       "RotatedLeft": false,
       "Assets": {
         "0": {
-          "Name": "Outdoors"
+          "Name": "Outdoors2D"
         },
         "1": {
-          "Name": "Outdoors"
+          "Name": "Outdoors2D"
         },
         "2": {
           "Name": "Main3D"
         },
-        "3": {},
-        "4": {
-          "Name": "Mid2D"
+        "3": {
+          "Name": "Desert2D"
         },
-        "5": {},
+        "4": {
+          "Name": "Stoney2D"
+        },
+        "5": {
+          "Name": "Iskai2D"
+        },
         "6": {
           "Name": "Light2D"
         },
         "7": {
-          "Name": "Light2D_"
+          "Name": "Light2D"
         },
         "8": {
-          "Name": "Dark2D"
+          "Name": "CeltDungeon2D"
         },
         "9": {
-          "Name": "Dark2D_"
+          "Name": "Dark2D"
         },
         "10": {},
         "11": {},
@@ -9891,13 +9951,17 @@
         "14": {
           "Name": "GlowyPlantDungeon"
         },
-        "15": {},
+        "15": {
+          "Name": "Stoney2D"
+        },
         "16": {},
         "17": {},
         "18": {
           "Name": "Inventory"
         },
-        "19": {},
+        "19": {
+          "Name": "Iskai2D"
+        },
         "20": {},
         "21": {},
         "22": {
@@ -9908,12 +9972,14 @@
         },
         "24": {},
         "25": {
-          "Name": "Light2D_"
+          "Name": "Toronto2D"
         },
         "26": {
           "Name": "DesertCombat"
         },
-        "27": {},
+        "27": {
+          "Name": "Celtic2D"
+        },
         "28": {},
         "29": {},
         "30": {},
@@ -9959,7 +10025,9 @@
         "43": {
           "Name": "PlainsCombat"
         },
-        "44": {},
+        "44": {
+          "Name": "DjiKantos2D"
+        },
         "45": {},
         "46": {
           "Name": "OutdoorsNight"
@@ -9980,7 +10048,9 @@
           "Name": "ForestNightCombat"
         },
         "54": {},
-        "55": {}
+        "55": {
+          "Name": "TileSet10"
+        }
       }
     },
     "PARTGR0.XLD": {

@@ -21,8 +21,8 @@ namespace UAlbion.Formats
         Video,
 
         // Maps
-        Map2D,
-        Map3D,
+        MapData,
+        IconData,
 
         // Audio
         AudioSample,
@@ -41,11 +41,11 @@ namespace UAlbion.Formats
         MonsterGroup,
         SpellData,
         TranslationTable,
+        LabyrinthData,
     }
 
     public class AssetConfig
     {
-
         public class Xld
         {
             [JsonIgnore] public string Name;
@@ -69,6 +69,7 @@ namespace UAlbion.Formats
             public int? Height;
             public string SubSprites;
             public IList<int> PaletteHints;
+            public bool? UseSmallGraphics;
             [JsonIgnore] public int EffectiveWidth => Width ?? Parent.Width ?? 0;
             [JsonIgnore] public int EffectiveHeight => Height ?? Parent.Height ?? 0;
         }

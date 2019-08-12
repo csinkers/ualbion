@@ -28,6 +28,7 @@ namespace UAlbion.Core
 
         static RenderDoc _renderDoc;
 
+        public EventExchange GlobalExchange { get; } = new EventExchange();
         public ITextureManager TextureManager { get; }
         readonly FrameTimeAverager _frameTimeAverager = new FrameTimeAverager(0.5);
         readonly FullScreenQuad _fullScreenQuad;
@@ -47,49 +48,6 @@ namespace UAlbion.Core
         internal RenderDoc RenderDoc => _renderDoc;
         internal string FrameTimeText => _frameTimeAverager.CurrentAverageFramesPerSecond.ToString("000.0 fps / ") + _frameTimeAverager.CurrentAverageFrameTimeMilliseconds.ToString("#00.00 ms");
 
-        // TODO: Build scenes from config
-        public Scene Create2DScene()
-        {
-            var camera = new OrthographicCamera(Window);
-            var scene = new Scene(camera);
-            scene.AddRenderer(_igRenderable);
-            scene.AddRenderer(_duplicator);
-            scene.AddRenderer(_fullScreenQuad);
-
-            scene.AddComponent(this);
-            scene.AddComponent(camera);
-            scene.AddComponent(_igRenderable);
-            scene.AddComponent(_duplicator);
-            scene.AddComponent(_fullScreenQuad);
-            scene.AddComponent(_debugMenus);
-            return scene;
-        }
-
-        public Scene Create3DScene()
-        {
-            var camera = new PerspectiveCamera(GraphicsDevice, Window);
-            var scene = new Scene(camera);
-            scene.AddRenderer(_igRenderable);
-            scene.AddRenderer(_duplicator);
-            scene.AddRenderer(_fullScreenQuad);
-
-            scene.AddComponent(this);
-            scene.AddComponent(camera);
-            scene.AddComponent(_igRenderable);
-            scene.AddComponent(_duplicator);
-            scene.AddComponent(_fullScreenQuad);
-            scene.AddComponent(_debugMenus);
-            return scene;
-        }
-
-        public void SetScene(Scene scene)
-        {
-            _scene = scene;
-            _sceneContext.SetCurrentScene(_scene);
-            CreateAllObjects();
-            ImGui.StyleColorsClassic();
-        }
-
         public Engine(GraphicsBackend backend) : base(Handlers)
         {
             TextureManager = new TextureManager();
@@ -101,10 +59,67 @@ namespace UAlbion.Core
             _debugMenus = new DebugMenus(this);
 
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
+            AddComponent(this);
+            AddComponent(_igRenderable);
+            AddComponent(_duplicator);
+            AddComponent(_fullScreenQuad);
+            AddComponent(_debugMenus);
+        }
+
+        public Scene Create2DScene()
+        {
+            // TODO: Build scenes from config
+            var camera = new OrthographicCamera(Window);
+            var scene = new Scene(camera, Exchange);
+            scene.AddRenderer(_igRenderable);
+            scene.AddRenderer(_duplicator);
+            scene.AddRenderer(_fullScreenQuad);
+            scene.AddComponent(camera);
+            return scene;
+        }
+
+        public Scene Create3DScene()
+        {
+            var camera = new PerspectiveCamera(GraphicsDevice, Window);
+            var scene = new Scene(camera, Exchange);
+            scene.AddRenderer(_igRenderable);
+            scene.AddRenderer(_duplicator);
+            scene.AddRenderer(_fullScreenQuad);
+            scene.AddComponent(camera);
+            return scene;
+        }
+
+        public void SetScene(Scene scene)
+        {
+            if(_frameCommands != null)
+                DestroyAllObjects();
+
+            if (_scene != null)
+                _scene.Exchange.IsActive = false;
+
+            _scene = scene;
+            _sceneContext.SetCurrentScene(_scene);
+            CreateAllObjects();
+            ImGui.StyleColorsClassic();
+            _scene.Exchange.IsActive = true;
+        }
+
+        public void AddComponent(IComponent component)
+        {
+            Debug.Assert(component != null);
+            if (component is RegisteredComponent rc)
+                GlobalExchange.Register(rc);
+            component.Attach(GlobalExchange);
+        }
+
+        public void RemoveComponent(IComponent component)
+        {
+            Exchange.Unsubscribe(component);
         }
 
         public void Run()
         {
+            Raise(new BeginFrameEvent());
             if (_scene == null)
                 throw new InvalidOperationException("The scene must be set before the main loop can be run.");
 

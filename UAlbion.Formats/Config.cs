@@ -9,15 +9,15 @@ namespace UAlbion.Formats
 {
     public class ConfigObjectConverter : JsonConverter
     {
-        public override bool CanConvert(Type objectType)
+        public override bool CanConvert(Layer objectType)
         {
             return typeof(Config.Asset).IsAssignableFrom(objectType);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Layer objectType, object existingValue, JsonSerializer serializer)
         {
             var item = JObject.Load(reader);
-            switch (item.Value<string>("Type"))
+            switch (item.Value<string>("Layer"))
             {
                 case "texture": return item.ToObject<Config.Texture>();
                 case "interlaced_bitmap": return item.ToObject<Config.Texture>();
@@ -33,8 +33,8 @@ namespace UAlbion.Formats
             /*
             switch (value)
             {
-                case Config.Texture _: o.AddFirst(new JProperty("Type", new JValue("texture"))); break;
-                case Config.Asset _: o.AddFirst(new JProperty("Type", new JValue("unknown"))); break;
+                case Config.Texture _: o.AddFirst(new JProperty("Layer", new JValue("texture"))); break;
+                case Config.Asset _: o.AddFirst(new JProperty("Layer", new JValue("unknown"))); break;
                 default: throw new NotImplementedException();
             }
             */
@@ -47,7 +47,7 @@ namespace UAlbion.Formats
         public class Asset
         {
             public string Name { get; set; }
-            public string Type { get; set; }
+            public string Layer { get; set; }
         }
 
         public class Texture : Asset

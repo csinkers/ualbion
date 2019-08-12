@@ -5,7 +5,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Objects;
 
-namespace UAlbion.Game
+namespace UAlbion.Game.Entities
 {
     public class Billboard2D<T> : Component where T : Enum
     {

@@ -22,10 +22,11 @@ namespace UAlbion.Core.Textures
             TextureData = paletteData;
         }
 
-        public void GetSubImageDetails(int subImage, out Vector2 offset, out Vector2 size, out int layer)
+        public void GetSubImageDetails(int subImage, out Vector2 size, out Vector2 texOffset, out Vector2 texSize, out int layer)
         {
-            offset = new Vector2(0,0);
-            size = new Vector2(1.0f,1.0f);
+            size = Vector2.One;
+            texOffset = Vector2.Zero;
+            texSize = Vector2.One;
             layer = 0;
         }
 

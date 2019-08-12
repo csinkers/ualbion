@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.Parsers;
@@ -19,11 +20,12 @@ namespace UAlbion.Game
         French,
     }
 
-    [Core.Events.Event("assets:reload", "Flush the asset cache, forcing all data to be reloaded from disk")]
+    [Event("assets:reload", "Flush the asset cache, forcing all data to be reloaded from disk")]
     public class ReloadAssetsEvent : GameEvent { }
 
-    [Core.Events.Event("assets:stats", "Print asset cache statistics.")]
+    [Event("assets:stats", "Print asset cache statistics.")]
     public class AssetStatsEvent : GameEvent { }
+    [Event("assets:cycle")] public class CycleCacheEvent : GameEvent { }
 
     public class Assets : RegisteredComponent
     {
@@ -32,6 +34,7 @@ namespace UAlbion.Game
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<Assets, ReloadAssetsEvent>((x, e) => { lock (x._syncRoot) { x._assetCache.Clear(); } }),
+            new Handler<Assets, CycleCacheEvent>((x, e) => { x.CycleCacheEvent(); }),
             new Handler<Assets, AssetStatsEvent>((x, e) =>
             {
                 Console.WriteLine("Asset Statistics:");
@@ -45,10 +48,20 @@ namespace UAlbion.Game
             }),
         };
 
+        void CycleCacheEvent()
+        {
+            lock (_syncRoot)
+            {
+                _oldAssetCache = _assetCache;
+                _assetCache = new Dictionary<AssetType, IDictionary<int, object>>();
+            }
+        }
+
         readonly object _syncRoot = new object();
         readonly AssetConfig _config;
         readonly IDictionary<AssetType, XldFile[]> _xlds = new Dictionary<AssetType, XldFile[]>();
-        readonly IDictionary<AssetType, IDictionary<int, object>> _assetCache = new Dictionary<AssetType, IDictionary<int, object>>();
+        IDictionary<AssetType, IDictionary<int, object>> _assetCache = new Dictionary<AssetType, IDictionary<int, object>>();
+        IDictionary<AssetType, IDictionary<int, object>> _oldAssetCache = new Dictionary<AssetType, IDictionary<int, object>>();
 
         // ReSharper disable StringLiteralTypo
         readonly IDictionary<AssetType, (AssetLocation, string)> _assetFiles = new Dictionary<AssetType, (AssetLocation, string)> {
@@ -195,7 +208,7 @@ namespace UAlbion.Game
                 {
                     var asset = AssetLoader.Load(br, name, (int)stream.Length, assetConfig);
                     if(asset == null)
-                        throw new InvalidOperationException($"Object {type}:{id} could not be loaded from file {path}");
+                        throw new AssetNotFoundException($"Object {type}:{id} could not be loaded from file {path}", type, id);
                     GameTrace.Log.AssetLoaded(type, id, name, language, path);
 
                     return asset;
@@ -211,7 +224,7 @@ namespace UAlbion.Game
             var xldArray = _xlds[type];
             var xld = xldArray[xldIndex];
             if (xld == null)
-                throw new InvalidOperationException($"XLD not found for object: {type}:{id} in {baseName} ({location})");
+                throw new AssetNotFoundException($"XLD not found for object: {type}:{id} in {baseName} ({location})", type, id);
 
             using (var br = xld.GetReaderForObject(objectIndex, out var length))
             {
@@ -220,7 +233,7 @@ namespace UAlbion.Game
 
                 var asset = AssetLoader.Load(br, name, length, assetConfig);
                 if (asset == null)
-                    throw new InvalidOperationException($"Object {type}:{id} could not be loaded from XLD {xld.Filename}");
+                    throw new AssetNotFoundException($"Object {type}:{id} could not be loaded from XLD {xld.Filename}", type, id);
                 GameTrace.Log.AssetLoaded(type, id, name, language, paths.XldPath);
 
                 return asset;
@@ -253,6 +266,16 @@ namespace UAlbion.Game
                     }
                 }
                 else _assetCache[type] = new Dictionary<int, object>();
+
+                // Check old cache
+                if (_oldAssetCache.TryGetValue(type, out var oldTypeCache) && oldTypeCache.TryGetValue(id, out var oldCachedAsset))
+                {
+                    if (!(oldCachedAsset is Exception))
+                    {
+                        _assetCache[type][id] = oldCachedAsset;
+                        return oldCachedAsset;
+                    }
+                }
             }
 
             object newAsset;
@@ -276,8 +299,8 @@ namespace UAlbion.Game
             }
         }
 
-        public Map2D LoadMap2D(MapDataId id) { return (Map2D)LoadAssetCached<MapDataId>(AssetType.MapData, id); }
-        public Map3D LoadMap3D(MapDataId id) { return (Map3D)LoadAssetCached(AssetType.MapData, id); }
+        public Map2D LoadMap2D(MapDataId id) { return LoadAssetCached(AssetType.MapData, id) as Map2D; }
+        public Map3D LoadMap3D(MapDataId id) { return LoadAssetCached(AssetType.MapData, id) as Map3D; }
         public AlbionPalette LoadPalette(PaletteId id)
         {
             var palette = (AlbionPalette)LoadAssetCached(AssetType.Palette, id);
@@ -400,6 +423,7 @@ namespace UAlbion.Game
         public ITexture LoadTexture(SmallPortraitId id)      => (ITexture)LoadAssetCached(AssetType.SmallPortrait,      id);
         public ITexture LoadTexture(TacticId id)             => (ITexture)LoadAssetCached(AssetType.TacticalIcon,       id);
         public ITexture LoadTexture(FontId id)               => (ITexture)LoadAssetCached(AssetType.Font,               id);
+        public TilesetData LoadTileData(IconDataId id) => (TilesetData)LoadAssetCached(AssetType.IconData,              id);
 
         public string LoadString(AssetType type, int id, GameLanguage language, int subItem)
         {
@@ -408,5 +432,17 @@ namespace UAlbion.Game
         }
         public AlbionSample LoadSample(AssetType type, int id) { return (AlbionSample)LoadAssetCached(type, id); }
         public AlbionVideo LoadVideo(VideoId id, GameLanguage language) => (AlbionVideo) LoadAsset(AssetType.Flic, (int)id, $"Video:{id}", language); // Don't cache videos.
+    }
+
+    internal class AssetNotFoundException : Exception
+    {
+        public AssetType Type { get; }
+        public int Id { get; }
+
+        public AssetNotFoundException(string message, AssetType type, int id) : base(message)
+        {
+            Type = type;
+            Id = id;
+        }
     }
 }

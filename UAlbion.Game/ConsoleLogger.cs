@@ -46,6 +46,9 @@ namespace UAlbion.Game
         }
     }
 
+    [Event("cls", "Clear the console history.")]
+    public class ClearConsoleEvent : GameEvent { }
+
     public class ConsoleLogger : IComponent
     {
         EventExchange _exchange;
@@ -87,7 +90,30 @@ namespace UAlbion.Game
         {
             switch(@event)
             {
-                case IVerboseEvent _: break; 
+                case IVerboseEvent _: break;
+                case LogEvent e:
+                {
+                    switch ((LogEvent.Level)e.Severity)
+                    {
+                        case LogEvent.Level.Verbose:
+                            Console.ForegroundColor = ConsoleColor.Gray;
+                            break;
+                        case LogEvent.Level.Warning:
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            break;
+                        case LogEvent.Level.Error:
+                        case LogEvent.Level.Critical:
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            break;
+                    }
+                    Console.WriteLine(e.Message);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    break;
+                }
+
+                case ClearConsoleEvent _ :
+                    Console.Clear();
+                    break;
 
                 case QuitEvent _:
                     _done = true;
@@ -128,8 +154,7 @@ namespace UAlbion.Game
                     break;
 
                 default:
-                    if (sender == this)
-                        return;
+                    if (sender == this) return;
                     Console.WriteLine(@event.ToString());
                     break;
             }

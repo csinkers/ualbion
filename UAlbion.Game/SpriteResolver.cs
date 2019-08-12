@@ -55,15 +55,12 @@ namespace UAlbion.Game
                         Vector2.Zero, Vector2.One, 0, 0));
             }
 
-            texture.GetSubImageDetails(spriteDefinition.SubObject, out var offset, out var size, out var layer);
+            texture.GetSubImageDetails(spriteDefinition.SubObject, out var size, out var texOffset, out var texSize, out var layer);
 
             var key = new SpriteRenderer.SpriteKey(texture, spriteDefinition.RenderOrder);
             var instance = new SpriteRenderer.InstanceData(
                 spriteDefinition.Position,
-                new Vector2(texture.Width, texture.Height),
-                offset,
-                size,
-                layer,
+                size, texOffset, texSize, layer,
                 spriteDefinition.Flags | (texture.Format == PixelFormat.R8_UNorm ? SpriteFlags.UsePalette : 0)
             );
             return Tuple.Create(key, instance);

@@ -11,15 +11,28 @@ namespace UAlbion.Core.Events
         readonly IDictionary<IComponent, IList<Type>> _subscribers = new Dictionary<IComponent, IList<Type>>();
         readonly IDictionary<Type, RegisteredComponent> _registrations = new Dictionary<Type, RegisteredComponent>();
         readonly EventExchange _parent;
+        readonly IList<EventExchange> _children = new List<EventExchange>();
         readonly SubscribedEvent _subscribedEvent = new SubscribedEvent();
+        public bool IsActive { get; set; } = true;
 
         public EventExchange(EventExchange parent = null)
         {
-            _parent = parent; 
+            _parent = parent;
+            _parent?.AddChild(this);
         }
 
-        public void Raise(IEvent e, object sender)
+        void AddChild(EventExchange eventExchange)
         {
+            lock(_syncRoot)
+                _children.Add(eventExchange);
+        }
+
+        public void Raise(IEvent e, object sender) { Raise(e, sender, null); }
+        void Raise(IEvent e, object sender, EventExchange sourceExchange)
+        {
+            if (!IsActive)
+                return;
+
             HashSet<IComponent> subscribers = new HashSet<IComponent>();
             var interfaces = e.GetType().GetInterfaces();
             string eventText = null;
@@ -44,7 +57,15 @@ namespace UAlbion.Core.Events
             foreach(var subscriber in subscribers)
                 subscriber.Receive(e, sender);
 
-            _parent?.Raise(e, sender);
+            if(_parent != null && sourceExchange != _parent)
+                _parent.Raise(e, sender, this);
+
+            IList<EventExchange> children;
+            lock (_children) { children = _children.ToList(); }
+            foreach(var childExchange in children)
+                if(childExchange != sourceExchange)
+                    childExchange.Raise(e, sender, this);
+
             if (eventText != null)
                 CoreTrace.Log.StopRaise(e.GetType().Name, eventText, subscribers.Count);
         }

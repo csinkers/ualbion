@@ -38,9 +38,13 @@ namespace UAlbion.Core
 
         public ICamera Camera { get; }
 
-        public EventExchange Exchange { get; } = new EventExchange();
+        public EventExchange Exchange { get; }
 
-        public Scene(ICamera camera) { Camera = camera; }
+        public Scene(ICamera camera, EventExchange parentExchange)
+        {
+            Camera = camera;
+            Exchange = new EventExchange(parentExchange);
+        }
 
         public void SetPalette(string name, uint[] palette)
         {

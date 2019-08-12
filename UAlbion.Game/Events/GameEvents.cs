@@ -275,11 +275,7 @@ namespace UAlbion.Game.Events
     [Event("update")]
     public class UpdateEvent : GameEvent, IVerboseEvent
     {
-        public UpdateEvent(int frames)
-        {
-            Frames = frames;
-        }
-
+        public UpdateEvent(int frames) { Frames = frames; }
         [EventPart("frames")] public int Frames { get; }
     }
 
@@ -288,16 +284,12 @@ namespace UAlbion.Game.Events
     {
         public SetActiveMemberEvent(int memberId) { MemberId = memberId; }
         [EventPart("memberid")] public int MemberId { get; }
-
     }
 
     [Event("load_map")]
     public class LoadMapEvent : GameEvent
     {
-        public LoadMapEvent(int mapId)
-        {
-            MapId = mapId;
-        }
+        public LoadMapEvent(int mapId) { MapId = mapId; }
         [EventPart(("id"))] public int MapId { get; }
     }
 }

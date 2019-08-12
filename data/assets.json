@@ -8010,16 +8010,19 @@
       "RotatedLeft": false,
       "Assets": {
         "0": {
-          "Name": "Outdoors"
+          "Name": "Outdoors",
+          "UseSmallGraphics": true
         },
         "1": {
-          "Name": "Outdoors"
+          "Name": "Outdoors",
+          "UseSmallGraphics": true
         },
         "2": {
           "Name": "Indoors"
         },
         "3": {
-          "Name": "Desert"
+          "Name": "Desert",
+          "UseSmallGraphics": true
         },
         "4": {
           "Name": "Stoney"

@@ -90,7 +90,9 @@ namespace UAlbion.Formats
                 {
                     if (i >= range.Item1 && i <= range.Item2)
                     {
-                        index = (i - range.Item1 + tick) % (range.Item2 - range.Item1 + 1) + range.Item1;
+                        int period = (range.Item2 - range.Item1 + 1);
+                        int tickModulo = tick % period;
+                        index = (i - range.Item1 + tickModulo) % period + range.Item1;
                         break;
                     }
                 }

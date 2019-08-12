@@ -63,7 +63,7 @@ namespace UAlbion
                 engine.AddComponent(new GameClock());
                 engine.AddComponent(new InputBinder());
                 engine.AddComponent(new SceneLoader(assets, engine, spriteResolver));
-                engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.Unknown100), null);
+                engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.TestMapIskai), null);
                 //engine.GlobalExchange.Raise(new LoadMapEvent((int)0), null);
 
                 /*

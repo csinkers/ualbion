@@ -5,7 +5,6 @@
     "3DBCKGR0.XLD": {
       "EnumName": "DungeonBackgroundId",
       "Type": "SingleHeaderSprite",
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "FirstImage",
@@ -34,7 +33,6 @@
       "Type": "FixedSizeSprite",
       "Width": 64,
       "Height": 64,
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "Brick",
@@ -607,7 +605,6 @@
       "Type": "FixedSizeSprite",
       "Width": 64,
       "Height": 64,
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "PaletteHints": [
@@ -1683,7 +1680,6 @@
       "Type": "FixedSizeSprite",
       "Width": 64,
       "Height": 64,
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "PaletteHints": [
@@ -2173,7 +2169,6 @@
     "3DOBJEC0.XLD": {
       "EnumName": "DungeonObjectId",
       "Type": "FixedSizeSprite",
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Width": 32,
@@ -2946,7 +2941,6 @@
     "3DOBJEC1.XLD": {
       "EnumName": "DungeonObjectId",
       "Type": "FixedSizeSprite",
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "TorchPedestal",
@@ -3770,7 +3764,6 @@
     "3DOBJEC2.XLD": {
       "EnumName": "DungeonObjectId",
       "Type": "FixedSizeSprite",
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "Stalagmite",
@@ -4578,7 +4571,6 @@
     "3DOBJEC3.XLD": {
       "EnumName": "DungeonObjectId",
       "Type": "FixedSizeSprite",
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "Celt",
@@ -7259,7 +7251,6 @@
     "AUTOGFX0.XLD": {
       "EnumName": "AutoGraphicsId",
       "Type": "AmorphousSprite",
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "Set",
@@ -7274,7 +7265,6 @@
     "BLKLIST0.XLD": {
       "EnumName": "BlockListId",
       "Type": "BlockList",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -7293,7 +7283,6 @@
       "EnumName": "CombatBackgroundId",
       "Type": "FixedSizeSprite",
       "Width": 360,
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "Plains",
@@ -7414,7 +7403,6 @@
     "COMGFX0.XLD": {
       "EnumName": "CombatGraphicsId",
       "Type": "HeaderPerSubImageSprite",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -7506,7 +7494,6 @@
     "EVNTSET0.XLD": {
       "EnumName": "EventSetId",
       "Type": "EventSet",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -7545,7 +7532,6 @@
     "EVNTSET1.XLD": {
       "EnumName": "EventSetId",
       "Type": "EventSet",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -7652,7 +7638,6 @@
     "EVNTSET2.XLD": {
       "EnumName": "EventSetId",
       "Type": "EventSet",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -7759,7 +7744,6 @@
     "EVNTSET3.XLD": {
       "EnumName": "EventSetId",
       "Type": "EventSet",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -7866,7 +7850,6 @@
     "EVNTSET9.XLD": {
       "EnumName": "EventSetId",
       "Type": "EventSet",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -7973,7 +7956,6 @@
     "FBODPIX0.XLD": {
       "EnumName": "FullBodyPictureId",
       "Type": "SingleHeaderSprite",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -7992,7 +7974,6 @@
       "Type": "FixedSizeSprite",
       "Width": 8,
       "Height": 8,
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "RegularFont"
@@ -8007,7 +7988,6 @@
       "Type": "IconData",
       "Width": 8,
       "Height": 8,
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "Outdoors",
@@ -8050,7 +8030,6 @@
       "Type": "FixedSizeSprite",
       "Width": 16,
       "Height": 16,
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "Outdoors",
@@ -8124,25 +8103,21 @@
       "Type": "FixedSizeSprite",
       "Width": 16,
       "Height": 16,
-      "RotatedLeft": false,
       "Assets": {
         "0": {}
       }
     },
     "ITEMLIST.DAT": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "ITEMNAME.DAT": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "LABDATA0.XLD": {
       "EnumName": "LabyrinthDataId",
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -8158,7 +8133,6 @@
     "LABDATA1.XLD": {
       "EnumName": "LabyrinthDataId",
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -8265,7 +8239,6 @@
     "LABDATA2.XLD": {
       "EnumName": "LabyrinthDataId",
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -8372,298 +8345,133 @@
     "MAPDATA1.XLD": {
       "EnumName": "MapDataId",
       "Type": "MapData",
-      "RotatedLeft": false,
       "Assets": {
-        "0": {
-          "Width": 150
-        },
-        "1": {
-          "Width": 63
-        },
-        "2": {
-          "Width": 60
-        },
-        "3": {
-          "Width": 90
-        },
-        "4": {
-          "Width": 150
-        },
-        "5": {
-          "Width": 54
-        },
-        "6": {
-          "Width": 147
-        },
-        "7": {
-          "Width": 300
-        },
-        "8": {
-          "Width": 120
-        },
-        "9": {
-          "Width": 105
-        },
-        "10": {
-          "Width": 270
-        },
-        "11": {
-          "Name": "South Wind Clan",
-          "Width": 225
-        },
-        "12": {
-          "Width": 135
-        },
-        "13": {
-          "Width": 324
-        },
-        "14": {
-          "Width": 363
-        },
-        "15": {
-          "Width": 135
-        },
-        "16": {
-          "Width": 360
-        },
-        "17": {
-          "Width": 144
-        },
-        "18": {
-          "Width": 210
-        },
-        "19": {
-          "Width": 204
-        },
-        "20": {
-          "Width": 180
-        },
-        "21": {
-          "Width": 1
-        },
-        "22": {
-          "Width": 154
-        },
-        "23": {
-          "Width": 1
-        },
-        "24": {
-          "Width": 65
-        },
-        "25": {
-          "Width": 1
-        },
-        "26": {
-          "Width": 63
-        },
-        "27": {
-          "Width": 1
-        },
-        "28": {
-          "Width": 107
-        },
-        "29": {
-          "Width": 1
-        },
-        "30": {
-          "Width": 108
-        },
-        "31": {
-          "Width": 1
-        },
-        "32": {
-          "Width": 107
-        },
-        "33": {
-          "Width": 1
-        },
-        "34": {
-          "Width": 113
-        },
-        "35": {
-          "Width": 1
-        },
-        "36": {
-          "Width": 108
-        },
-        "37": {
-          "Width": 1
-        },
-        "38": {
-          "Width": 109
-        },
-        "39": {
-          "Width": 1
-        },
-        "40": {
-          "Width": 103
-        },
-        "41": {
-          "Width": 1
-        },
-        "42": {
-          "Width": 129
-        },
-        "43": {
-          "Width": 1
-        },
-        "44": {
-          "Width": 102
-        },
-        "45": {
-          "Width": 1
-        },
-        "46": {
-          "Width": 104
-        },
-        "47": {
-          "Width": 1
-        },
-        "48": {
-          "Width": 95
-        },
-        "49": {
-          "Width": 1
-        },
-        "50": {
-          "Width": 111
-        },
-        "51": {
-          "Width": 1
-        },
-        "52": {
-          "Width": 68
-        },
-        "53": {
-          "Width": 1
-        },
-        "54": {
-          "Width": 152
-        },
-        "55": {
-          "Width": 1
-        },
-        "56": {
-          "Width": 116
-        },
-        "57": {
-          "Width": 1
-        },
-        "58": {
-          "Width": 98
-        },
-        "59": {
-          "Width": 1
-        },
-        "60": {
-          "Width": 94
-        },
-        "61": {
-          "Width": 1
-        },
-        "62": {
-          "Width": 165
-        },
-        "63": {
-          "Width": 1
-        },
-        "64": {
-          "Width": 148
-        },
-        "65": {
-          "Width": 1
-        },
-        "66": {
-          "Width": 104
-        },
-        "67": {
-          "Width": 1
-        },
-        "68": {
-          "Width": 79
-        },
-        "69": {
-          "Width": 1
-        },
-        "70": {
-          "Width": 79
-        },
-        "71": {
-          "Width": 1
-        },
-        "72": {
-          "Width": 79
-        },
-        "73": {
-          "Width": 1
-        },
-        "74": {
-          "Width": 87
-        },
-        "75": {},
-        "76": {},
-        "77": {},
-        "78": {},
-        "79": {},
-        "80": {},
-        "81": {},
-        "82": {},
-        "83": {},
-        "84": {},
-        "85": {},
-        "86": {},
-        "87": {},
-        "88": {},
-        "89": {},
-        "90": {
-          "Width": 1
-        },
-        "91": {},
-        "92": {},
-        "93": {},
-        "94": {},
-        "95": {
-          "Width": 177
-        },
-        "96": {
-          "Width": 1
-        },
-        "97": {
-          "Width": 108
-        },
-        "98": {
-          "Width": 1
-        },
-        "99": {
-          "Width": 128
-        }
+        "0": {  "Name": "Test-Map Iskai" },
+        "1": {  "Name": "Test-Map Toronto" },
+        "2": {  "Name": "Test-Map Toronto" },
+        "3": {  "Name": "Test-Map Srimalinar" },
+        "4": {  "Name": "Test-Map Drinno" },
+        "5": {  "Name": "Test-Map teilweise Absturz" },
+        "6": {  "Name": "Test-Map Argim" },
+        "7": {  "Name": "Test-Map Argim" },
+        "8": {  "Name": "teilweise eingerichtete Keltenhütte" },
+        "9": {  "Name": "Test-Map Khamulon" },
+        "10": { "Name": "Jirinaar3D" },
+        "11": { "Name": "Haus des Jägerclans" },
+        "12": { "Name": "Untergeschoss Jägerclan" },
+        "13": { "Name": "Rathaus Jirinaar" },
+        "14": { "Name": "Dji-Kas Gildenhaus" },
+        "15": { "Name": "Dji-Kas Untergeschoss" },
+        "16": { "Name": "Dji-Fadh Gildenhaus" },
+        "17": { "Name": "Dji-Kas Untergeschoss 2" },
+        "18": { "Name": "Snird, Haus der Waffen" },
+        "19": { "Name": "Gewürzhändler" },
+        "20": { "Name": "Haus der nützlichen Vielfalt" },
+        "21": { "Name": "Haus der Winde" },
+        "22": { "Name": "Altes Formergebäude" },
+        "23": { "Name": "Keller des Jägerclanhauses" },
+        "24": { "Name": "Leere Keltenhütte" },
+        "25": { "Name": "Leere Keltenhütte breit" },
+        "26": { "Name": "Leere Keltenhütte hoch" },
+        "27": { "Name": "Sarenas Hütte" },
+        "28": { "Name": "Peleitos Hütte" },
+        "29": { "Name": "Garris" },
+        "30": { "Name": "Bragona" },
+        "31": { "Name": "Tharnos" },
+        "32": { "Name": "Winion" },
+        "33": { "Name": "Oibelos" },
+        "34": { "Name": "Tamno" },
+        "35": { "Name": "Dranbar" },
+        "36": { "Name": "Bennos, Nahrung" },
+        "37": { "Name": "Aretha" },
+        "38": { "Name": "Rifrako" },
+        "39": { "Name": "Ferina" },
+        "40": { "Name": "Arjano Hütte" },
+        "41": { "Name": "Arjano Unten 2D" },
+        "42": { "Name": "Bibliothek" },
+        "43": { "Name": "Drinno 2D" },
+        "44": { "Name": "Drinno" },
+        "45": { "Name": "Drinno" },
+        "46": { "Name": "Drinno" },
+        "47": { "Name": "Drinno" },
+        "48": { "Name": "Drinno" },
+        "49": { "Name": "Beros Raum" },
+        "50": { "Name": "Toronto Teil 1" },
+        "51": { "Name": "Toronto Teil 2" },
+        "52": { "Name": "Toronto Teil 2" },
+        "53": { "Name": "Toronto Teil 3" },
+        "54": { "Name": "Kenget 3D" },
+        "55": { "Name": "Kenget 3D" },
+        "56": { "Name": "Kenget 3D" },
+        "57": { "Name": "Kenget 3D" },
+        "58": { "Name": "Kenget 3D" },
+        "59": { "Name": "Kenget 3D" },
+        "60": { "Name": "Kenget 3D" },
+        "61": { "Name": "Unnamed" },
+        "62": { "Name": "Kenget 3D" },
+        "63": { "Name": "Test-Map Kenget" },
+        "64": { "Name": "Formergebäude nach Kampf gegen Argim" },
+        "65": { "Name": "Unnamed" },
+        "66": { "Name": "Sequenz nach Landung auf Albion" },
+        "67": { "Name": "Kampftrainer Jirinaar" },
+        "68": { "Name": "Transporterhöhle Jirinaar" },
+        "69": { "Name": "Transporterhöhle Gratogel" },
+        "70": { "Name": "Transporterhöhle Maini Süd" },
+        "71": { "Name": "Transporterhöhle Maini Nord" },
+        "72": { "Name": "Transporterhöhle Umajo" },
+        "73": { "Name": "Transporterhöhle Dji Cantos" },
+        "74": { "Name": "Endszenario (nicht Sequenz)" },
+        "75": { "Name": "" },
+        "76": { "Name": "" },
+        "77": { "Name": "" },
+        "78": { "Name": "" },
+        "79": { "Name": "" },
+        "80": { "Name": "" },
+        "81": { "Name": "" },
+        "82": { "Name": "" },
+        "83": { "Name": "" },
+        "84": { "Name": "" },
+        "85": { "Name": "" },
+        "86": { "Name": "" },
+        "87": { "Name": "" },
+        "88": { "Name": "" },
+        "89": { "Name": "" },
+        "90": { "Name": "Zeroes_DoNotLoad)" },
+        "91": { "Name": "" },
+        "92": { "Name": "" },
+        "93": { "Name": "" },
+        "94": { "Name": "" },
+        "95": { "Name": "Test-Map" },
+        "96": { "Name": "Unnamed" },
+        "97": { "Name": "Test-Map" },
+        "98": { "Name": "Test-Map" },
+        "99": { "Name": "Albion Shortcut Map" }
       }
     },
     "MAPDATA2.XLD": {
       "EnumName": "MapDataId",
       "Type": "MapData",
-      "RotatedLeft": false,
       "Assets": {
-        "0": {},
-        "1": {},
-        "2": {},
-        "3": {},
-        "4": {},
-        "5": {},
-        "6": {},
-        "7": {},
+        "0": {  "Name": "Nakiridaani Kontinentkarte" },
+        "1": {  "Name": "Gratogel Kontinentkarte Norden" },
+        "2": {  "Name": "Gratogel Kontinentkarte Süden" },
+        "3": {  "Name": "Maini Kontinentkarte" },
+        "4": {  "Name": "Maini Kontinentkarte" },
+        "5": {  "Name": "Maini Kontinentkarte" },
+        "6": {  "Name": "Maini Kontinentkarte" },
+        "7": {  "Name": "Maini Kontinentkarte" },
         "8": {},
         "9": {},
-        "10": {},
-        "11": {},
-        "12": {},
-        "13": {},
-        "14": {},
-        "15": {},
-        "16": {},
-        "17": {},
-        "18": {},
-        "19": {},
+        "10": { "Name": "Test-Map Kontinentkarte" },
+        "11": { "Name": "Test-Map Grafik" },
+        "12": { "Name": "Iskai-Heiligtum" },
+        "13": { "Name": "Kontos" },
+        "14": { "Name": "Test-Map Grafik" },
+        "15": { "Name": "Umajo Kontinentkarte" },
+        "16": { "Name": "Umajo Kontinentkarte" },
+        "17": { "Name": "Umajo Kontinentkarte" },
+        "18": { "Name": "Unnamed" },
+        "19": { "Name": "Umajo Kontinentkarte" },
         "20": {},
         "21": {},
         "22": {},
@@ -8674,106 +8482,105 @@
         "27": {},
         "28": {},
         "29": {},
-        "30": {},
-        "31": {},
-        "32": {},
-        "33": {},
-        "34": {},
-        "35": {},
-        "36": {},
-        "37": {},
-        "38": {},
-        "39": {},
-        "40": {},
-        "41": {},
-        "42": {},
-        "43": {},
-        "44": {},
-        "45": {},
-        "46": {},
-        "47": {},
-        "48": {},
-        "49": {},
-        "50": {},
-        "51": {},
-        "52": {},
-        "53": {},
-        "54": {},
-        "55": {},
-        "56": {},
+        "30": { "Name": "Gerätemacher Gildenhaus" },
+        "31": { "Name": "Diamantschleifer Gildenhaus" },
+        "32": { "Name": "Waffenschmiede Gildenhaus" },
+        "33": { "Name": "Bergarbeiter Gildenhaus" },
+        "34": { "Name": "Gefängnis2D" },
+        "35": { "Name": "Umajo Kenta Karte" },
+        "36": { "Name": "Nahrungsmittel Kyla" },
+        "37": { "Name": "Gemischtwarenladen Umajo" },
+        "38": { "Name": "Gefängnis Umajo" },
+        "39": { "Name": "Gasthaus Erzmine" },
+        "40": { "Name": "Sojekos" },
+        "41": { "Name": "Haus Kyla" },
+        "42": { "Name": "Gebirgspassage 3D" },
+        "43": { "Name": "Gerätemacherdungeon 2D" },
+        "44": { "Name": "Gerätemacher 3D Lvl 2" },
+        "45": { "Name": "Gerätemacher 3D Lvl 1" },
+        "46": { "Name": "Gerätemacher 3D Kossotto" },
+        "47": { "Name": "Eingang ins Dungeon Gerätemacherkammer" },
+        "48": { "Name": "Stollen Bergarbeiter (Spitzel)" },
+        "49": { "Name": "Unnamed" },
+        "50": { "Name": "Unnamed" },
+        "51": { "Name": "Unnamed" },
+        "52": { "Name": "Kounos Höhle Lvl 1" },
+        "53": { "Name": "Kounos Höhle Lvl 2" },
+        "54": { "Name": "Kounos Höhle Lvl 3" },
+        "55": { "Name": "Kounos Höhle Lvl 4" },
+        "56": { "Name": "Kounos Höhle Lvl 5" },
         "57": {},
         "58": {},
         "59": {},
-        "60": {},
-        "61": {},
-        "62": {},
-        "63": {},
-        "64": {},
-        "65": {},
-        "66": {},
-        "67": {},
-        "68": {},
-        "69": {},
-        "70": {},
-        "71": {},
-        "72": {},
-        "73": {},
-        "74": {},
-        "75": {},
-        "76": {},
-        "77": {},
-        "78": {},
-        "79": {},
-        "80": {},
-        "81": {},
-        "82": {},
-        "83": {},
-        "84": {},
+        "60": { "Name": "Herberge Beloveno" },
+        "61": { "Name": "Siobhan" },
+        "62": { "Name": "Siobhan Keller" },
+        "63": { "Name": "Wohnhaus Süden" },
+        "64": { "Name": "Kariah" },
+        "65": { "Name": "Rathaus Beloveno" },
+        "66": { "Name": "Wohnhaus Nordwesten" },
+        "67": { "Name": "Nahrungshandel Dolo" },
+        "68": { "Name": "Rüstungen Bagga" },
+        "69": { "Name": "Poschs Waffenladen" },
+        "70": { "Name": "Gemischtwaren Riolea" },
+        "71": { "Name": "Heilerin Ramina" },
+        "72": { "Name": "Unnamed" },
+        "73": { "Name": "Händlerin Kounos" },
+        "74": { "Name": "Darios" },
+        "75": { "Name": "Gasthaus Kounos" },
+        "76": { "Name": "Kontos Labyrinth 3D Upper" },
+        "77": { "Name": "Kontos Labyrinth 3D Lower" },
+        "78": { "Name": "Waffenladen Nadje" },
+        "79": { "Name": "Magiergilde Srimalinar" },
+        "80": { "Name": "Arrim" },
+        "81": { "Name": "Edjirr" },
+        "82": { "Name": "Heiligtum Untergeschoß" },
+        "83": { "Name": "Beloveno Karte" },
+        "84": { "Name": "Srimalinar Karte" },
         "85": {},
         "86": {},
         "87": {},
         "88": {},
         "89": {},
-        "90": {},
-        "91": {},
-        "92": {},
-        "93": {},
-        "94": {},
-        "95": {},
+        "90": { "Name": "Test-Map Wüste" },
+        "91": { "Name": "Test-Map Dji Cantos" },
+        "92": { "Name": "Unnamed" },
+        "93": { "Name": "Test Items" },
+        "94": { "Name": "Test-Map Kenget Kamulos" },
+        "95": { "Name": "Test-Map Mahinohaus" },
         "96": {},
-        "97": {},
-        "98": {},
-        "99": {}
+        "97": { "Name": "Unnamed" },
+        "98": { "Name": "Unnamed" },
+        "99": { "Name": "Testmap Haus" }
       }
     },
     "MAPDATA3.XLD": {
       "EnumName": "MapDataId",
       "Type": "MapData",
-      "RotatedLeft": false,
       "Assets": {
-        "0": {},
-        "1": {},
-        "2": {},
-        "3": {},
-        "4": {},
-        "5": {},
+        "0": {  "Name": "Toronto 2D Gesamtkarte Spielbeginn" },
+        "1": {  "Name": "Reaktorraum der Toronto" },
+        "2": {  "Name": "Ankunft auf der Toronto Teil 2" },
+        "3": {  "Name": "Toronto Erkundung (Shuttle)" },
+        "4": {  "Name": "Toronto Erkundung (Shuttle) mit Joe" },
+        "5": {  "Name": "Reaktorraum mit AI und Brandt" },
         "6": {},
         "7": {},
         "8": {},
         "9": {},
-        "10": {},
-        "11": {},
-        "12": {},
-        "13": {},
+        "10": { "Name": "Gefängnis Kenget" },
+        "11": { "Name": "Kenget Kamulos 2D-Bereich" },
+        "12": { "Name": "Sklavenquartiere der Kenget" },
+        "13": { "Name": "Unnamed" },
         "14": {},
         "15": {},
         "16": {},
         "17": {},
         "18": {},
         "19": {},
-        "20": {},
+        "20": { "Name": "Insel des Friedens" },
         "21": {},
-        "22": {},
+        "22": { "Name": "Cantos Haus" },
         "23": {},
         "24": {},
         "25": {},
@@ -8839,9 +8646,9 @@
         "85": {},
         "86": {},
         "87": {},
-        "88": {},
-        "89": {},
-        "90": {},
+        "88": { "Name": "Unnamed" },
+        "89": { "Name": "Unnamed" },
+        "90": { "Name": "Unnamed" },
         "91": {},
         "92": {},
         "93": {},
@@ -8849,14 +8656,13 @@
         "95": {},
         "96": {},
         "97": {},
-        "98": {},
-        "99": {}
+        "98": { "Name": "Unnamed" },
+        "99": { "Name": "Unnamed" }
       }
     },
     "MONCHAR0.XLD": {
       "EnumName": "MonsterCharacterId",
       "Type": "CharacterData",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -8922,7 +8728,6 @@
     "MONGFX0.XLD": {
       "EnumName": "MonsterGraphicsId",
       "Type": "HeaderPerSubImageSprite",
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "FloatingHand"
@@ -9081,7 +8886,6 @@
     "MONGRP0.XLD": {
       "EnumName": "MonsterGroupId",
       "Type": "MonsterGroup",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -9187,7 +8991,6 @@
     "MONGRP1.XLD": {
       "EnumName": "MonsterGroupId",
       "Type": "MonsterGroup",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -9294,7 +9097,6 @@
     "MONGRP2.XLD": {
       "EnumName": "MonsterGroupId",
       "Type": "MonsterGroup",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -9401,7 +9203,6 @@
     "NPCGR0.XLD": {
       "EnumName": "LargeNpcId",
       "Type": "SingleHeaderSprite",
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "Iskai"
@@ -9705,7 +9506,6 @@
     "NPCGR1.XLD": {
       "EnumName": "LargeNpcId",
       "Type": "SingleHeaderSprite",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -9812,7 +9612,6 @@
     "NPCKL0.XLD": {
       "EnumName": "SmallNpcId",
       "Type": "SingleHeaderSprite",
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "Iskai"
@@ -9905,7 +9704,6 @@
     },
     "PALETTE.000": {
       "Type": "PaletteCommon",
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "Common Palette"
@@ -9915,7 +9713,6 @@
     "PALETTE0.XLD": {
       "EnumName": "PaletteId",
       "Type": "Palette",
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "Outdoors2D"
@@ -10059,7 +9856,6 @@
     "PARTGR0.XLD": {
       "EnumName": "LargePartyGraphicsId",
       "Type": "SingleHeaderSprite",
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "Tom"
@@ -10084,7 +9880,6 @@
     "PARTKL0.XLD": {
       "EnumName": "SmallPartyGraphicsId",
       "Type": "SingleHeaderSprite",
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "Tom"
@@ -10107,7 +9902,6 @@
     "PICTURE0.XLD": {
       "EnumName": "PictureId",
       "Type": "InterlacedBitmap",
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Name": "SmallWizard"
@@ -10255,7 +10049,6 @@
     "SAMPLES0.XLD": {
       "EnumName": "SampleId",
       "Type": "AudioSample",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -10340,7 +10133,6 @@
     "SAMPLES1.XLD": {
       "EnumName": "SampleId",
       "Type": "AudioSample",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -10447,7 +10239,6 @@
     "SAMPLES2.XLD": {
       "EnumName": "SampleId",
       "Type": "AudioSample",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -10554,7 +10345,6 @@
     "SCRIPT0.XLD": {
       "EnumName": "ScriptId",
       "Type": "Script",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -10623,7 +10413,6 @@
     "SCRIPT2.XLD": {
       "EnumName": "ScriptId",
       "Type": "Script",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -10729,14 +10518,12 @@
     },
     "SLAB": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "SMLPORT0.XLD": {
       "EnumName": "SmallPortraitId",
       "Type": "FixedSizeSprite",
       "Width": 34,
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -10843,7 +10630,6 @@
       "EnumName": "SmallPortraitId",
       "Type": "FixedSizeSprite",
       "Width": 34,
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -10950,7 +10736,6 @@
     "SONGS0.XLD": {
       "EnumName": "SongId",
       "Type": "Song",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -11002,14 +10787,12 @@
     },
     "SPELLDAT.DAT": {
       "Type": "SpellData",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "TACTICO0.XLD": {
       "EnumName": "TacticalGraphicsId",
       "Type": "FixedSizeSprite",
       "Width": 32,
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -11088,7 +10871,6 @@
     "TRANSTB0.XLD": {
       "EnumName": "TranslationTableId",
       "Type": "TranslationTable",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -11149,7 +10931,6 @@
     "WAVELIB0.XLD": {
       "EnumName": "WaveLibraryId",
       "Type": "SampleLibrary",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -11192,7 +10973,6 @@
     "$(LANG)\\EVNTTXT0.XLD": {
       "EnumName": "EventTextId",
       "Type": "StringTable",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -11202,7 +10982,6 @@
     "$(LANG)\\EVNTTXT1.XLD": {
       "EnumName": "EventTextId",
       "Type": "StringTable",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -11309,7 +11088,6 @@
     "$(LANG)\\EVNTTXT2.XLD": {
       "EnumName": "EventTextId",
       "Type": "StringTable",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -11416,7 +11194,6 @@
     "$(LANG)\\EVNTTXT3.XLD": {
       "EnumName": "EventTextId",
       "Type": "StringTable",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -11523,7 +11300,6 @@
     "$(LANG)\\EVNTTXT9.XLD": {
       "EnumName": "EventTextId",
       "Type": "StringTable",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -11630,7 +11406,6 @@
     "$(LANG)\\FLICS0.XLD": {
       "EnumName": "VideoId",
       "Type": "Video",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -11656,7 +11431,6 @@
     "$(LANG)\\MAPTEXT1.XLD": {
       "EnumName": "MapTextId",
       "Type": "StringTable",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -11763,7 +11537,6 @@
     "$(LANG)\\MAPTEXT2.XLD": {
       "EnumName": "MapTextId",
       "Type": "StringTable",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -11870,7 +11643,6 @@
     "$(LANG)\\MAPTEXT3.XLD": {
       "EnumName": "MapTextId",
       "Type": "StringTable",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -11976,12 +11748,10 @@
     },
     "$(LANG)\\SYSTEXTS": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "$(LANG)\\WORDLIS0.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -11991,7 +11761,6 @@
     "INITIAL\\AUTOMAP1.XLD": {
       "EnumName": "AutoMapId",
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -12098,7 +11867,6 @@
     "INITIAL\\AUTOMAP2.XLD": {
       "EnumName": "AutoMapId",
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -12205,7 +11973,6 @@
     "INITIAL\\AUTOMAP3.XLD": {
       "EnumName": "AutoMapId",
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -12312,7 +12079,6 @@
     "INITIAL\\CHESTDT0.XLD": {
       "EnumName": "ChestId",
       "Type": "Inventory",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {}
@@ -12321,7 +12087,6 @@
     "INITIAL\\CHESTDT1.XLD": {
       "EnumName": "ChestId",
       "Type": "Inventory",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -12428,7 +12193,6 @@
     "INITIAL\\CHESTDT2.XLD": {
       "EnumName": "ChestId",
       "Type": "Inventory",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -12535,7 +12299,6 @@
     "INITIAL\\CHESTDT5.XLD": {
       "EnumName": "ChestId",
       "Type": "Inventory",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -12642,7 +12405,6 @@
     "INITIAL\\MERCHDT0.XLD": {
       "EnumName": "MerchantId",
       "Type": "Inventory",
-      "RotatedLeft": false,
       "Assets": {
         "0": {}
       }
@@ -12650,7 +12412,6 @@
     "INITIAL\\MERCHDT1.XLD": {
       "EnumName": "MerchantId",
       "Type": "Inventory",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -12757,7 +12518,6 @@
     "INITIAL\\MERCHDT2.XLD": {
       "EnumName": "MerchantId",
       "Type": "Inventory",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -12864,7 +12624,6 @@
     "INITIAL\\NPCCHAR0.XLD": {
       "EnumName": "NpcCharacterId",
       "Type": "CharacterData",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -12966,7 +12725,6 @@
     "INITIAL\\NPCCHAR1.XLD": {
       "EnumName": "NpcCharacterId",
       "Type": "CharacterData",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -13073,7 +12831,6 @@
     "INITIAL\\NPCCHAR2.XLD": {
       "EnumName": "NpcCharacterId",
       "Type": "CharacterData",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -13180,7 +12937,6 @@
     "INITIAL\\PRTCHAR0.XLD": {
       "EnumName": "PartyCharacterId",
       "Type": "CharacterData",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -13245,7 +13001,6 @@
     "INITIAL\\PRTCHAR1.XLD": {
       "EnumName": "PartyCharacterId",
       "Type": "CharacterData",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -13352,7 +13107,6 @@
     "INITIAL\\PRTCHAR2.XLD": {
       "EnumName": "PartyCharacterId",
       "Type": "CharacterData",
-      "RotatedLeft": false,
       "Assets": {
         "0": {},
         "1": {},
@@ -13458,32 +13212,26 @@
     },
     "ENGLISH\\EVNTTXT0.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "ENGLISH\\EVNTTXT1.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "ENGLISH\\EVNTTXT2.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "ENGLISH\\EVNTTXT3.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "ENGLISH\\EVNTTXT9.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "ENGLISH\\FLICS0.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Width": 32
@@ -13546,22 +13294,18 @@
     },
     "ENGLISH\\MAPTEXT1.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "ENGLISH\\MAPTEXT2.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "ENGLISH\\MAPTEXT3.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "ENGLISH\\WORDLIS0.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Width": 32
@@ -13576,32 +13320,26 @@
     },
     "GERMAN\\EVNTTXT0.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "GERMAN\\EVNTTXT1.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "GERMAN\\EVNTTXT2.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "GERMAN\\EVNTTXT3.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "GERMAN\\EVNTTXT9.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "GERMAN\\FLICS0.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {
         "0": {
           "Width": 32
@@ -13664,27 +13402,22 @@
     },
     "GERMAN\\MAPTEXT1.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "GERMAN\\MAPTEXT2.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "GERMAN\\MAPTEXT3.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "GERMAN\\WORDLIS0.XLD": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     },
     "ENGLISH": {
       "Type": "Unknown",
-      "RotatedLeft": false,
       "Assets": {}
     }
   }

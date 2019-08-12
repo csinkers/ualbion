@@ -24,6 +24,24 @@ namespace GenerateEnums
 
     class Program
     {
+        static readonly char[] ForbiddenCharacters = { ' ', '\t', '-', '(', ')', ',' };
+        static string Sanitise(string x)
+        {
+            var chars = new List<char>();
+            bool capitaliseNext = true;
+            foreach (var c in x)
+            {
+                if (!ForbiddenCharacters.Contains(c))
+                {
+                    chars.Add(capitaliseNext ? char.ToUpper(c) : c);
+                    capitaliseNext = false;
+                }
+                else capitaliseNext = true;
+            }
+
+            return new string(chars.ToArray());
+        }
+
         static void Main()
         {
             var baseDir = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Parent.Parent.Parent.Parent.FullName;
@@ -51,7 +69,7 @@ namespace GenerateEnums
                     var id = offset + o.Key;
                     e.Entries.Add(string.IsNullOrEmpty(o.Value.Name)
                         ? new EnumEntry { Name = $"Unknown{id}", Value = id }
-                        : new EnumEntry { Name = o.Value.Name.Replace(" ", ""), Value= id});
+                        : new EnumEntry { Name = Sanitise(o.Value.Name), Value= id});
                 }
             }
 

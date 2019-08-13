@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UAlbion.Core;
-using UAlbion.Core.Textures;
+using UAlbion.Core.Events;
 using UAlbion.Formats;
 using UAlbion.Game.AssetIds;
 using UAlbion.Game.Events;
@@ -16,34 +15,37 @@ namespace UAlbion.Game
             {
                 x._ticks++;
                 if(x._palette.IsAnimated)
-                    x._scene.SetPalette(x._palette.Name, x._palette.GetPaletteAtTime(x._ticks));
+                    x.EmitPalette();
             }),
-            new Handler<PaletteManager, LoadPalEvent>((x, e) =>
-            {
-                var palette = x._assets.LoadPalette((PaletteId) e.PaletteId);
-                if (palette != null)
-                    x.SetPalette(palette);
-                else
-                    x.Raise(new LogEvent((int)LogEvent.Level.Error,$"Palette ID {e.PaletteId} could not be loaded!"));
-            })
+            new Handler<PaletteManager, SubscribedEvent>((x, e) => x.SetPalette(PaletteId.Main3D)),
+            new Handler<PaletteManager, LoadPalEvent>((x, e) => x.SetPalette((PaletteId)e.PaletteId))
         };
 
-        readonly Scene _scene;
         readonly Assets _assets;
         AlbionPalette _palette;
         int _ticks;
 
-        public PaletteManager(Scene scene, Assets assets) : base(Handlers)
+        public PaletteManager(Assets assets) : base(Handlers)
         {
-            _scene = scene;
             _assets = assets;
-            SetPalette(_assets.LoadPalette(PaletteId.Main3D));
         }
 
-        public void SetPalette(AlbionPalette palette)
+        void SetPalette(PaletteId paletteId)
         {
-            _palette = palette ?? throw new ArgumentNullException(nameof(palette));
-            _scene.SetPalette(_palette.Name, _palette.GetPaletteAtTime(_ticks));
+            var palette = _assets.LoadPalette(paletteId);
+            if (palette == null)
+            {
+                Raise(new LogEvent((int) LogEvent.Level.Error, $"Palette ID {paletteId} could not be loaded!"));
+                return;
+            }
+
+            _palette = palette;
+            EmitPalette();
+        }
+
+        void EmitPalette()
+        {
+            Exchange.Raise(new SetRawPaletteEvent(_palette.Name, _palette.GetPaletteAtTime(_ticks)), this);
         }
     }
 }

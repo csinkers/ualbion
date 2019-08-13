@@ -1,6 +1,6 @@
 ﻿namespace UAlbion.Game
 {
-    enum Spell
+    enum SpellId
     {
         // DjiKas
         ThornSnare,

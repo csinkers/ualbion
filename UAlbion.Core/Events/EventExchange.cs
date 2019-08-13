@@ -13,10 +13,14 @@ namespace UAlbion.Core.Events
         readonly EventExchange _parent;
         readonly IList<EventExchange> _children = new List<EventExchange>();
         readonly SubscribedEvent _subscribedEvent = new SubscribedEvent();
+        public string Name { get; }
         public bool IsActive { get; set; } = true;
 
-        public EventExchange(EventExchange parent = null)
+        public IReadOnlyList<EventExchange> Children { get { lock (_syncRoot) return _children.ToList(); } }
+
+        public EventExchange(string name, EventExchange parent = null)
         {
+            Name = name;
             _parent = parent;
             _parent?.AddChild(this);
         }
@@ -27,6 +31,7 @@ namespace UAlbion.Core.Events
                 _children.Add(eventExchange);
         }
 
+        public bool Contains(IComponent component) { lock(_syncRoot) return _subscribers.ContainsKey(component); }
         public void Raise(IEvent e, object sender) { Raise(e, sender, null); }
         void Raise(IEvent e, object sender, EventExchange sourceExchange)
         {
@@ -73,6 +78,7 @@ namespace UAlbion.Core.Events
         public void Subscribe<T>(IComponent subscriber) { Subscribe(typeof(T), subscriber); }
         public void Subscribe(Type eventType, IComponent subscriber)
         {
+            bool newSubscriber = false;
             lock (_syncRoot)
             {
                 if (_subscribers.TryGetValue(subscriber, out var subscribedTypes))
@@ -80,7 +86,11 @@ namespace UAlbion.Core.Events
                     if (subscribedTypes.Contains(eventType))
                         return;
                 }
-                else _subscribers[subscriber] = new List<Type>();
+                else
+                {
+                    _subscribers[subscriber] = new List<Type>();
+                    newSubscriber = true;
+                }
 
                 if (!_subscriptions.ContainsKey(eventType))
                     _subscriptions.Add(eventType, new List<IComponent>());
@@ -88,7 +98,8 @@ namespace UAlbion.Core.Events
                 _subscriptions[eventType].Add(subscriber);
                 _subscribers[subscriber].Add(eventType);
             }
-            subscriber.Receive(_subscribedEvent, this);
+            if (newSubscriber)
+                subscriber.Receive(_subscribedEvent, this);
         }
 
         public void Unsubscribe(IComponent subscriber)
@@ -124,6 +135,19 @@ namespace UAlbion.Core.Events
             if (!_registrations.ContainsKey(typeof(T)))
                 return null;
             return (T) _registrations[typeof(T)];
+        }
+
+        public void PruneInactiveChildren()
+        {
+            lock (_syncRoot)
+            {
+                for (int i = 0; i < _children.Count;)
+                {
+                    if (!_children[i].IsActive)
+                        _children.RemoveAt(i);
+                    else i++;
+                }
+            }
         }
     }
 }

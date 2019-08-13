@@ -144,7 +144,6 @@ namespace UAlbion.Formats.Parsers
 
         public bool UseSmallGraphics { get; set; }
         public IList<TileData> Tiles { get; } = new List<TileData>();
-        public TileData Get(int tileId) => Tiles[tileId];
     }
 
     [AssetLoader(XldObjectType.IconData)]

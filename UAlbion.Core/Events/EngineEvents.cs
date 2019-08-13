@@ -81,4 +81,28 @@ namespace UAlbion.Core.Events
         public int Delta { get; }
 
     }
+
+    public class SelectEvent : EngineEvent
+    {
+        // Coordinates are in logical / map-space.
+        public int X { get; }
+        public int Y { get; }
+        public Action<string, object> RegisterHit { get; }
+    }
+
+    public class SetRawPaletteEvent : EngineEvent, IVerboseEvent
+    {
+        public string Name { get; }
+        public uint[] Entries { get; }
+
+        public SetRawPaletteEvent(string name, uint[] entries)
+        {
+            Name = name;
+            Entries = entries;
+        }
+    }
+
+    public class PersistToDiskEvent : EngineEvent
+    {
+    }
 }

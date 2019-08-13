@@ -299,8 +299,8 @@ namespace UAlbion.Game
             }
         }
 
-        public Map2D LoadMap2D(MapDataId id) { return LoadAssetCached(AssetType.MapData, id) as Map2D; }
-        public Map3D LoadMap3D(MapDataId id) { return LoadAssetCached(AssetType.MapData, id) as Map3D; }
+        public MapData2D LoadMap2D(MapDataId id) { return LoadAssetCached(AssetType.MapData, id) as MapData2D; }
+        public MapData3D LoadMap3D(MapDataId id) { return LoadAssetCached(AssetType.MapData, id) as MapData3D; }
         public AlbionPalette LoadPalette(PaletteId id)
         {
             var palette = (AlbionPalette)LoadAssetCached(AssetType.Palette, id);
@@ -440,7 +440,7 @@ namespace UAlbion.Game
         }
     }
 
-    internal class AssetNotFoundException : Exception
+    class AssetNotFoundException : Exception
     {
         public AssetType Type { get; }
         public int Id { get; }

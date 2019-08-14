@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Veldrid;
 
@@ -82,12 +83,58 @@ namespace UAlbion.Core.Events
 
     }
 
-    public class SelectEvent : EngineEvent
+    public class Selection
     {
-        // Coordinates are in logical / map-space.
-        public int X { get; }
-        public int Y { get; }
-        public Action<string, object> RegisterHit { get; }
+        public Selection(Vector3 intersectionPoint, string name, object target)
+        {
+            IntersectionPoint = intersectionPoint;
+            Name = name;
+            Target = target;
+        }
+
+        public Vector3 IntersectionPoint { get; }
+        public string Name { get; }
+        public object Target { get; }
+    }
+
+    public class SelectionResultsEvent : Event
+    {
+        public SelectionResultsEvent(IList<Selection> selections)
+        {
+            Selections = selections;
+        }
+
+        public IList<Selection> Selections { get; }
+    }
+
+    public class ScreenCoordinateSelectEvent : EngineEvent
+    {
+        public ScreenCoordinateSelectEvent(Vector2 position, Action<float, Selection> registerHit)
+        {
+            Position = position;
+            RegisterHit = registerHit;
+        }
+
+        public Vector2 Position { get; }
+        public Action<float, Selection> RegisterHit { get; }
+    }
+
+    public class WorldCoordinateSelectEvent : EngineEvent
+    {
+        readonly Action<float, Selection> _registerHit;
+
+        public WorldCoordinateSelectEvent(Vector3 origin, Vector3 direction, Action<float, Selection> registerHit)
+        {
+            Origin = origin;
+            Direction = direction;
+            _registerHit = registerHit;
+        }
+
+        public Vector3 Origin { get; }
+        public Vector3 Direction { get; }
+
+        public void RegisterHit(float t, string name, object target) => 
+            _registerHit(t, new Selection(Origin + t * Direction, name, target));
     }
 
     public class SetRawPaletteEvent : EngineEvent, IVerboseEvent

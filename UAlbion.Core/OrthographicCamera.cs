@@ -12,6 +12,7 @@ namespace UAlbion.Core
         {
             new Handler<OrthographicCamera, BeginFrameEvent>((x, e) => x._movementDirection = Vector2.Zero),
             new Handler<OrthographicCamera, EngineCameraMoveEvent>((x, e) => x._movementDirection += new Vector2(e.X, e.Y)),
+            new Handler<OrthographicCamera, ScreenCoordinateSelectEvent>((x, e) => x.TransformSelect(e)),
             new Handler<OrthographicCamera, MagnifyEvent>((x, e) =>
             {
                 x._magnification += e.Delta;
@@ -31,6 +32,16 @@ namespace UAlbion.Core
                 x.UpdatePerspectiveMatrix();
             })
         };
+
+        void TransformSelect(ScreenCoordinateSelectEvent e)
+        {
+            var totalMatrix = ViewMatrix * ProjectionMatrix;
+            var inverse = totalMatrix.Inverse();
+            var normalisedScreenPosition = new Vector3(2 * e.Position.X / WindowWidth - 1.0f, -2 * e.Position.Y / WindowHeight + 1.0f, 0.0f);
+            var rayOrigin = Vector3.Transform(normalisedScreenPosition + Vector3.UnitZ, inverse);
+            var rayDirection = Vector3.Transform(normalisedScreenPosition, inverse) - rayOrigin;
+            Raise(new WorldCoordinateSelectEvent(rayOrigin, rayDirection, e.RegisterHit));
+        }
 
         Vector3 _position = new Vector3(0, 0, 1);
         Matrix4x4 _viewMatrix;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -23,28 +24,44 @@ namespace UAlbion.Game.Entities
         public Vector2 LogicalSize => new Vector2(_mapData.Width, _mapData.Height);
         public Vector2 PhysicalSize => _renderable.SizePixels;
         public Vector2 TileSize => _renderable.TileSize;
+        public Vector3 Position => Vector3.Zero;
+        public Vector3 Normal => Vector3.UnitZ;
 
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<Map2D, SubscribedEvent>((x, e) => x.Subscribed()),
-            new Handler<Map2D, SelectEvent>((x, e) => x.Select(e)),
+            new Handler<Map2D, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
         };
 
-        void Select(SelectEvent e)
+        void Select(WorldCoordinateSelectEvent e)
         {
-            if (e.X < 0 || e.X >= _mapData.Width ||
-                e.Y < 0 || e.Y >= _mapData.Height)
+            float denominator = Vector3.Dot(Normal, e.Direction);
+            if (Math.Abs(denominator) < 0.00001f)
                 return;
 
-            int index = e.Y * _mapData.Width + e.X;
-            e.RegisterHit("Map", this);
+            float t = Vector3.Dot(Position - e.Origin, Normal) / denominator;
+            if (t < 0)
+                return;
+
+            var intersectionPoint = e.Origin + t * e.Direction;
+            int x = (int)(intersectionPoint.X / TileSize.X);
+            int y = (int)(intersectionPoint.Y / TileSize.Y);
+            if (x < 0 || x >= _mapData.Width ||
+                y < 0 || y >= _mapData.Height)
+                return;
+
+            int index = y * _mapData.Width + x;
+
             int UnderlayId = _mapData.Underlay[index];
             int OverlayId = _mapData.Overlay[index];
-            e.RegisterHit("Underlay", _tileData.Tiles[UnderlayId]);
-            e.RegisterHit("Overlay", _tileData.Tiles[OverlayId]);
             int zoneIndex = _mapData.ZoneLookup[index];
+
             if (zoneIndex != -1)
-                e.RegisterHit("Zone", _mapData.Zones[zoneIndex]);
+                e.RegisterHit(t, "Zone", _mapData.Zones[zoneIndex]);
+
+            e.RegisterHit(t, "Overlay", _tileData.Tiles[OverlayId]);
+            e.RegisterHit(t, "Underlay", _tileData.Tiles[UnderlayId]);
+            e.RegisterHit(t, "Map", this);
         }
 
         public Map2D(Assets assets, MapDataId mapId) : base(Handlers)

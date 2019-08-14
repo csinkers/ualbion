@@ -58,18 +58,13 @@ namespace UAlbion
             using (var assets = new Assets(config))
             using (var engine = new Engine(backend))
             {
-                engine.CheckForErrors();
                 var spriteResolver = new SpriteResolver(assets);
-                engine.AddComponent(assets);
-                engine.CheckForErrors();
-                engine.AddComponent(new ConsoleLogger());
-                engine.CheckForErrors();
-                engine.AddComponent(new GameClock());
-                engine.CheckForErrors();
-                engine.AddComponent(new InputBinder());
-                engine.CheckForErrors();
-                engine.AddComponent(new SceneLoader(assets, engine, spriteResolver));
-                engine.CheckForErrors();
+                assets.Attach(engine.GlobalExchange);
+                new ConsoleLogger().Attach(engine.GlobalExchange);
+                new GameClock().Attach(engine.GlobalExchange);
+                new InputBinder().Attach(engine.GlobalExchange);
+                new SceneLoader(assets, engine, spriteResolver).Attach(engine.GlobalExchange);
+                new DebugMapInspector().Attach(engine.GlobalExchange);
                 engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.TestMapIskai), null);
                 //engine.GlobalExchange.Raise(new LoadMapEvent((int)0), null);
 

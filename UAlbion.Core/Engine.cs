@@ -65,11 +65,11 @@ namespace UAlbion.Core
             _debugMenus = new DebugMenus(this);
 
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
-            AddComponent(this);
-            AddComponent(_igRenderable);
-            AddComponent(_duplicator);
-            AddComponent(_fullScreenQuad);
-            AddComponent(_debugMenus);
+            Attach(GlobalExchange);
+            _igRenderable.Attach(GlobalExchange);
+            _duplicator.Attach(GlobalExchange);
+            _fullScreenQuad.Attach(GlobalExchange);
+            _debugMenus.Attach(GlobalExchange);
         }
 
         public (EventExchange, Scene) Create2DScene(string name, Vector2 tileSize)
@@ -118,19 +118,6 @@ namespace UAlbion.Core
             _sceneContext.SetCurrentScene(Scene);
             CreateAllObjects();
             ImGui.StyleColorsClassic();
-        }
-
-        public void AddComponent(IComponent component)
-        {
-            Debug.Assert(component != null);
-            if (component is RegisteredComponent rc)
-                GlobalExchange.Register(rc);
-            component.Attach(GlobalExchange);
-        }
-
-        public void RemoveComponent(IComponent component)
-        {
-            Exchange.Unsubscribe(component);
         }
 
         public void Run()

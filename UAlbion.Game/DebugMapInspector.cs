@@ -21,7 +21,11 @@ namespace UAlbion.Game
                 return;
             ImGui.BeginGroup();
             foreach (var hit in _hits)
-                ImGui.LabelText(hit.Name, $"Hit at {hit.IntersectionPoint}: {hit.Target}");
+            {
+                ImGui.LabelText($"\"{hit.Name}\" at {hit.IntersectionPoint}", "");
+                ImGui.TextWrapped($"{hit.Target}");
+            }
+
             ImGui.EndGroup();
         }
 

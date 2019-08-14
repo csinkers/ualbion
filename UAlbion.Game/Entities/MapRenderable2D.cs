@@ -34,6 +34,7 @@ namespace UAlbion.Game.Entities
         public Vector2 TileSize { get; }
         public PaletteId Palette => (PaletteId)_mapData.PaletteId;
         public Vector2 SizePixels => new Vector2(_mapData.Width, _mapData.Height) * TileSize;
+        public int? HighlightIndex { get; set; }
 
         public MapRenderable2D(MapData2D mapData, ITexture tileset, TilesetData tileData) : base(Handlers)
         {
@@ -67,6 +68,7 @@ namespace UAlbion.Game.Entities
 
         SpriteRenderer.InstanceData BuildInstanceData(int i, int j, TilesetData.TileData tile, int tickCount, bool isOverlay)
         {
+            int index = j * _mapData.Width + i;
             int underlayId = tile.GetSubImageForTile(tickCount);
             if (underlayId == ushort.MaxValue)
                 return _blankInstance;
@@ -82,6 +84,8 @@ namespace UAlbion.Game.Entities
 
             instance.Flags =
                 (_tileset is EightBitTexture ? SpriteFlags.UsePalette : 0)
+                | (HighlightIndex == index ? SpriteFlags.Highlight : 0)
+                | (_mapData.ZoneLookup[index] != -1 ? SpriteFlags.RedTint : 0)
                 //| ((tile.Flags & TilesetData.TileFlags.Unk5) != 0 ? SpriteFlags.RedTint : 0)
                 //| (((int) tile.Type) == 8 ? SpriteFlags.GreenTint : 0)
                 //| (((int) tile.Type) == 12 ? SpriteFlags.BlueTint : 0)

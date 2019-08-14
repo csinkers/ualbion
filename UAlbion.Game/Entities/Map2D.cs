@@ -35,6 +35,7 @@ namespace UAlbion.Game.Entities
 
         void Select(WorldCoordinateSelectEvent e)
         {
+            _renderable.HighlightIndex = null;
             float denominator = Vector3.Dot(Normal, e.Direction);
             if (Math.Abs(denominator) < 0.00001f)
                 return;
@@ -51,13 +52,26 @@ namespace UAlbion.Game.Entities
                 return;
 
             int index = y * _mapData.Width + x;
+            _renderable.HighlightIndex = index;
 
             int UnderlayId = _mapData.Underlay[index];
             int OverlayId = _mapData.Overlay[index];
             int zoneIndex = _mapData.ZoneLookup[index];
 
             if (zoneIndex != -1)
-                e.RegisterHit(t, "Zone", _mapData.Zones[zoneIndex]);
+            {
+                var zone = _mapData.Zones[zoneIndex];
+                e.RegisterHit(t, "Zone", zone);
+                HashSet<int> printedEvents = new HashSet<int>();
+                int eventNumber = zone.EventNumber;
+                do
+                {
+                    var zoneEvent = _mapData.Events[eventNumber];
+                    e.RegisterHit(t, "Event", zoneEvent);
+                    printedEvents.Add(eventNumber);
+                    eventNumber = zoneEvent.NextEventId ?? -1;
+                } while (eventNumber != -1 && !printedEvents.Contains(eventNumber));
+            }
 
             e.RegisterHit(t, "Overlay", _tileData.Tiles[OverlayId]);
             e.RegisterHit(t, "Underlay", _tileData.Tiles[UnderlayId]);

@@ -97,7 +97,7 @@ namespace UAlbion.Core.Events
         public object Target { get; }
     }
 
-    public class SelectionResultsEvent : Event
+    public class SelectionResultsEvent : Event, IVerboseEvent
     {
         public SelectionResultsEvent(IList<Selection> selections)
         {
@@ -107,7 +107,7 @@ namespace UAlbion.Core.Events
         public IList<Selection> Selections { get; }
     }
 
-    public class ScreenCoordinateSelectEvent : EngineEvent
+    public class ScreenCoordinateSelectEvent : EngineEvent, IVerboseEvent
     {
         public ScreenCoordinateSelectEvent(Vector2 position, Action<float, Selection> registerHit)
         {
@@ -119,7 +119,7 @@ namespace UAlbion.Core.Events
         public Action<float, Selection> RegisterHit { get; }
     }
 
-    public class WorldCoordinateSelectEvent : EngineEvent
+    public class WorldCoordinateSelectEvent : EngineEvent, IVerboseEvent
     {
         readonly Action<float, Selection> _registerHit;
 

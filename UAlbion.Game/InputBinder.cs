@@ -238,16 +238,16 @@ namespace UAlbion.Game
                     Raise(actionEvent);
             }
 
-            foreach(var mouseEvent in e.Snapshot.MouseEvents)
-            {
-                if(mouseEvent.Down)
-                {
+            //foreach(var mouseEvent in e.Snapshot.MouseEvents)
+            //{
+            //    if(mouseEvent.Down)
+            //    {
                     IList<(float, Selection)> hits = new List<(float, Selection)>();
                     Raise(new ScreenCoordinateSelectEvent(e.Snapshot.MousePosition, (t, selection) => hits.Add((t, selection))));
                     var orderedHits = hits.OrderBy(x => x.Item1).Select(x => x.Item2).ToList();
                     Raise(new SelectionResultsEvent(orderedHits));
-                }
-            }
+            //    }
+            //}
         }
 
         void OnUpdate(UpdateEvent engineUpdateEvent)

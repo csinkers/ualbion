@@ -56,5 +56,10 @@ namespace UAlbion.Formats.Parsers
             zone.EventNumber = br.ReadUInt16(); // +4
             return zone;
         }
+
+        public override string ToString()
+        {
+            return $"Zone T:{Trigger} Unk1:{Unk1} E:{EventNumber}";
+        }
     }
 }

@@ -33,6 +33,11 @@ namespace UAlbion.Game.Entities
             new Handler<Map2D, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
         };
 
+        public override string ToString()
+        {
+            return $"Map {MapId} {_mapData.Width}x{_mapData.Height} P:{(PaletteId)_mapData.PaletteId} T:{(IconDataId)_mapData.TilesetId}";
+        }
+
         void Select(WorldCoordinateSelectEvent e)
         {
             _renderable.HighlightIndex = null;
@@ -61,20 +66,20 @@ namespace UAlbion.Game.Entities
             if (zoneIndex != -1)
             {
                 var zone = _mapData.Zones[zoneIndex];
-                e.RegisterHit(t, "Zone", zone);
+                e.RegisterHit(t, $"Zone @ ({x}, {y})", zone);
                 HashSet<int> printedEvents = new HashSet<int>();
                 int eventNumber = zone.EventNumber;
-                do
+                while (eventNumber != -1 && !printedEvents.Contains(eventNumber))
                 {
                     var zoneEvent = _mapData.Events[eventNumber];
                     e.RegisterHit(t, "Event", zoneEvent);
                     printedEvents.Add(eventNumber);
                     eventNumber = zoneEvent.NextEventId ?? -1;
-                } while (eventNumber != -1 && !printedEvents.Contains(eventNumber));
+                } 
             }
 
-            e.RegisterHit(t, "Overlay", _tileData.Tiles[OverlayId]);
-            e.RegisterHit(t, "Underlay", _tileData.Tiles[UnderlayId]);
+            e.RegisterHit(t, $"Overlay @ ({x}, {y})", _tileData.Tiles[OverlayId]);
+            e.RegisterHit(t, $"Underlay @ ({x}, {y})", _tileData.Tiles[UnderlayId]);
             e.RegisterHit(t, "Map", this);
         }
 

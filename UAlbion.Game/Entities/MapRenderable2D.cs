@@ -35,6 +35,7 @@ namespace UAlbion.Game.Entities
         public PaletteId Palette => (PaletteId)_mapData.PaletteId;
         public Vector2 SizePixels => new Vector2(_mapData.Width, _mapData.Height) * TileSize;
         public int? HighlightIndex { get; set; }
+        int? _highLightEvent;
 
         public MapRenderable2D(MapData2D mapData, ITexture tileset, TilesetData tileData) : base(Handlers)
         {
@@ -82,10 +83,14 @@ namespace UAlbion.Game.Entities
             instance.TexSize = texSize;
             instance.TexLayer = layer;
 
+            int zoneNum = _mapData.ZoneLookup[index];
+            int eventNum = zoneNum == -1 ? -1 : _mapData.Zones[zoneNum].EventNumber;
+
             instance.Flags =
                 (_tileset is EightBitTexture ? SpriteFlags.UsePalette : 0)
                 | (HighlightIndex == index ? SpriteFlags.Highlight : 0)
-                | (_mapData.ZoneLookup[index] != -1 ? SpriteFlags.RedTint : 0)
+                | (eventNum != -1 && _highLightEvent != eventNum ? SpriteFlags.RedTint : 0)
+                | (_highLightEvent == eventNum ? SpriteFlags.GreenTint : 0)
                 //| ((tile.Flags & TilesetData.TileFlags.Unk5) != 0 ? SpriteFlags.RedTint : 0)
                 //| (((int) tile.Type) == 8 ? SpriteFlags.GreenTint : 0)
                 //| (((int) tile.Type) == 12 ? SpriteFlags.BlueTint : 0)
@@ -97,6 +102,15 @@ namespace UAlbion.Game.Entities
 
         void Update()
         {
+            if(HighlightIndex.HasValue)
+            {
+                int zoneNum = _mapData.ZoneLookup[HighlightIndex.Value];
+                _highLightEvent = zoneNum == -1 ? -1 : _mapData.Zones[zoneNum].EventNumber;
+                if (_highLightEvent == -1)
+                    _highLightEvent = null;
+            }
+            else _highLightEvent = null;
+
             int underlayIndex = 0;
             int overlayIndex = 0;
             for (int j = 0; j < _mapData.Height; j++)

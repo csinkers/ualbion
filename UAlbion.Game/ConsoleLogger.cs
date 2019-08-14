@@ -107,7 +107,7 @@ namespace UAlbion.Game
                             break;
                     }
                     Console.WriteLine(e.Message);
-                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.ForegroundColor = ConsoleColor.Gray;
                     break;
                 }
 

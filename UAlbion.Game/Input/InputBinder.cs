@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Events;
 using Veldrid;
 
-namespace UAlbion.Game
+namespace UAlbion.Game.Input
 {
     public enum InputMode
     {
@@ -38,6 +37,7 @@ namespace UAlbion.Game
         public bool Equals(KeyBinding other) { return Key == other.Key && Modifiers == other.Modifiers; }
         public override bool Equals(object obj) { return obj is KeyBinding other && Equals(other); }
         public override int GetHashCode() { unchecked { return ((int)Key * 397) ^ (int)Modifiers; } }
+        public override string ToString() => $"{Modifiers} + {Key}";
     }
 
     public class InputBinder : Component
@@ -46,6 +46,7 @@ namespace UAlbion.Game
             new Handler<InputBinder, ChangeInputModeEvent>((x, e) => x.OnInputModeChanged(e)),
             new Handler<InputBinder, InputEvent>((x, e) => x.OnInput(e)),
         };
+        public InputBinder() : base(Handlers) { }
 
         static KeyBinding Bind(Key key, ModifierKeys modifiers = ModifierKeys.None) => new KeyBinding(key, modifiers);
 
@@ -55,12 +56,16 @@ namespace UAlbion.Game
                 { InputMode.Global, new Dictionary<KeyBinding, string>
                     {
                         { Bind(Key.Escape), "toggle_menu" },
-                        { Bind(Key.F5), "quicksave" },
-                        { Bind(Key.F7), "quickload" },
+                        // { Bind(Key.F5), "quicksave" },
+                        // { Bind(Key.F7), "quickload" },
                         { Bind(Key.Tilde), "toggle_console" },
                         { Bind(Key.F4, ModifierKeys.Alt), "quit" },
                         { Bind(Key.BracketLeft), "e:mag -1" },
                         { Bind(Key.BracketRight), "e:mag 1" },
+                        { Bind(Key.V), "set_mouse_mode 1" },
+                        { Bind(Key.F5), "start_clock" },
+                        { Bind(Key.F6), "stop_clock" },
+                        { Bind(Key.F10), "update 1" },
                     }
                 },
 
@@ -172,7 +177,6 @@ namespace UAlbion.Game
             }
         }
 
-        public InputBinder() : base(Handlers) { }
 
         void OnInputModeChanged(ChangeInputModeEvent e)
         {
@@ -181,8 +185,10 @@ namespace UAlbion.Game
 
         void OnInput(InputEvent e)
         {
+            /*
             _mousePosition = e.Snapshot.MousePosition;
             _mouseDelta = e.MouseDelta;
+            */
 
             foreach (var keyEvent in e.Snapshot.KeyEvents)
             {
@@ -217,8 +223,7 @@ namespace UAlbion.Game
                 }
 
                 var actionEvent = Event.Parse(action);
-                if(actionEvent != null)
-                    Raise(actionEvent);
+                Raise(actionEvent ?? new LogEvent((int)LogEvent.Level.Error, $"The action \"{action}\" could not be parsed."));
             }
 
             // Handle continuous bindings
@@ -237,17 +242,6 @@ namespace UAlbion.Game
                 if(actionEvent != null)
                     Raise(actionEvent);
             }
-
-            //foreach(var mouseEvent in e.Snapshot.MouseEvents)
-            //{
-            //    if(mouseEvent.Down)
-            //    {
-                    IList<(float, Selection)> hits = new List<(float, Selection)>();
-                    Raise(new ScreenCoordinateSelectEvent(e.Snapshot.MousePosition, (t, selection) => hits.Add((t, selection))));
-                    var orderedHits = hits.OrderBy(x => x.Item1).Select(x => x.Item2).ToList();
-                    Raise(new SelectionResultsEvent(orderedHits));
-            //    }
-            //}
         }
 
         void OnUpdate(UpdateEvent engineUpdateEvent)

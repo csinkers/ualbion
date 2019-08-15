@@ -1,14 +1,11 @@
 ﻿using System.IO;
-using System.Linq;
-using System.Numerics;
 using System.Reflection;
 using UAlbion.Core;
-using UAlbion.Core.Objects;
 using UAlbion.Formats;
 using UAlbion.Game;
 using UAlbion.Game.AssetIds;
-using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
+using UAlbion.Game.Input;
 using Veldrid;
 
 namespace UAlbion
@@ -20,7 +17,14 @@ namespace UAlbion
             Veldrid.Sdl2.SDL_version version;
             Veldrid.Sdl2.Sdl2Native.SDL_GetVersion(&version);
 
-            var baseDir = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))?.Parent?.Parent?.Parent?.FullName;
+            var baseDir = Directory.GetParent(Path.GetDirectoryName(
+                Assembly.GetExecutingAssembly()
+                    .Location)) // ./ualbion/bin/Debug
+                ?.Parent        // ./ualbion/bin
+                ?.Parent        // ./ualbion
+                ?.Parent        // .
+                ?.FullName;
+
             if (string.IsNullOrEmpty(baseDir))
                 return;
 
@@ -62,10 +66,17 @@ namespace UAlbion
                 assets.Attach(engine.GlobalExchange);
                 new ConsoleLogger().Attach(engine.GlobalExchange);
                 new GameClock().Attach(engine.GlobalExchange);
-                new InputBinder().Attach(engine.GlobalExchange);
                 new SceneLoader(assets, engine, spriteResolver).Attach(engine.GlobalExchange);
                 new DebugMapInspector().Attach(engine.GlobalExchange);
                 engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.TestMapIskai), null);
+
+                new NormalMouseMode().Attach(engine.GlobalExchange);
+                new DebugPickMouseMode().Attach(engine.GlobalExchange);
+                new ContextMenuMouseMode().Attach(engine.GlobalExchange);
+                new InventoryMoveMouseMode().Attach(engine.GlobalExchange);
+                new InputBinder().Attach(engine.GlobalExchange);
+                engine.GlobalExchange.Raise(new SetMouseModeEvent((int)MouseModeId.Normal), null);
+
                 //engine.GlobalExchange.Raise(new LoadMapEvent((int)0), null);
 
                 /*

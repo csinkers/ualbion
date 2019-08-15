@@ -89,7 +89,7 @@ namespace UAlbion.Game.Entities
             instance.Flags =
                 (_tileset is EightBitTexture ? SpriteFlags.UsePalette : 0)
                 | (HighlightIndex == index ? SpriteFlags.Highlight : 0)
-                | (eventNum != -1 && _highLightEvent != eventNum ? SpriteFlags.RedTint : 0)
+                | (eventNum != -1 && _highLightEvent != eventNum ? SpriteFlags.Highlight : 0)
                 | (_highLightEvent == eventNum ? SpriteFlags.GreenTint : 0)
                 //| ((tile.Flags & TilesetData.TileFlags.Unk5) != 0 ? SpriteFlags.RedTint : 0)
                 //| (((int) tile.Type) == 8 ? SpriteFlags.GreenTint : 0)
@@ -118,11 +118,11 @@ namespace UAlbion.Game.Entities
                 for (int i = 0; i < _mapData.Width; i++)
                 {
                     var underlayTile = _tileData.Tiles[_mapData.Underlay[j * _mapData.Width + i]];
-                    _underlay.Instances[underlayIndex] = BuildInstanceData(i, j, underlayTile, _frameCount, false);
+                    _underlay.Instances[underlayIndex] = BuildInstanceData(i, j, underlayTile, 3 * _frameCount / 2, false);
                     underlayIndex++;
 
                     var overlayTile = _tileData.Tiles[_mapData.Overlay[j * _mapData.Width + i]];
-                    _overlay.Instances[overlayIndex] = BuildInstanceData(i, j, overlayTile, _frameCount, true);
+                    _overlay.Instances[overlayIndex] = BuildInstanceData(i, j, overlayTile, 3 * _frameCount / 2, true);
                     overlayIndex++;
                 }
             }

@@ -63,24 +63,24 @@ namespace UAlbion.Game.Entities
             int OverlayId = _mapData.Overlay[index];
             int zoneIndex = _mapData.ZoneLookup[index];
 
+            e.RegisterHit(t, $"Overlay @ ({x}, {y})", _tileData.Tiles[OverlayId]);
+            e.RegisterHit(t, $"Underlay @ ({x}, {y})", _tileData.Tiles[UnderlayId]);
+            e.RegisterHit(t, "Map", this);
+
             if (zoneIndex != -1)
             {
                 var zone = _mapData.Zones[zoneIndex];
                 e.RegisterHit(t, $"Zone @ ({x}, {y})", zone);
                 HashSet<int> printedEvents = new HashSet<int>();
                 int eventNumber = zone.EventNumber;
-                while (eventNumber != -1 && !printedEvents.Contains(eventNumber))
+                while (eventNumber != 0xffff && !printedEvents.Contains(eventNumber))
                 {
                     var zoneEvent = _mapData.Events[eventNumber];
                     e.RegisterHit(t, "Event", zoneEvent);
                     printedEvents.Add(eventNumber);
-                    eventNumber = zoneEvent.NextEventId ?? -1;
+                    eventNumber = zoneEvent.NextEventId ?? 0xffff;
                 } 
             }
-
-            e.RegisterHit(t, $"Overlay @ ({x}, {y})", _tileData.Tiles[OverlayId]);
-            e.RegisterHit(t, $"Underlay @ ({x}, {y})", _tileData.Tiles[UnderlayId]);
-            e.RegisterHit(t, "Map", this);
         }
 
         public Map2D(Assets assets, MapDataId mapId) : base(Handlers)

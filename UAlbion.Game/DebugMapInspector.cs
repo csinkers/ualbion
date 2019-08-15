@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Numerics;
 using ImGuiNET;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -10,7 +11,7 @@ namespace UAlbion.Game
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<DebugMapInspector, EngineUpdateEvent>((x, _) => x.RenderDialog()),
-            new Handler<DebugMapInspector, SelectionResultsEvent>((x, e) => x._hits = e.Selections),
+            new Handler<DebugMapInspector, ShowDebugInfoEvent>((x, e) => x._hits = e.Selections),
         };
 
         IList<Selection> _hits;
@@ -19,14 +20,36 @@ namespace UAlbion.Game
         {
             if (_hits == null)
                 return;
-            ImGui.BeginGroup();
+            ImGui.Begin("Inspector");
+            ImGui.BeginChild("Inspector");
+            int hitId = 0;
             foreach (var hit in _hits)
             {
-                ImGui.TextWrapped($"\"{hit.Name}\" at {hit.IntersectionPoint}");
-                ImGui.TextWrapped($"{hit.Target}");
-            }
+                if (ImGui.TreeNode($"Hit {hitId}"))
+                {
+                    ImGui.TextColored(new Vector4(1.0f, 0.8f, 0.0f, 1.0f), hit.Name);
+                    ImGui.Value("X", hit.IntersectionPoint.X);
+                    ImGui.Value("Y", hit.IntersectionPoint.Y);
+                    ImGui.Value("Z", hit.IntersectionPoint.Z);
+                    ImGui.TextWrapped($"{hit.Target}");
+                    ImGui.TreePop();
+                }
 
-            ImGui.EndGroup();
+                hitId++;
+            }
+            ImGui.EndChild();
+            ImGui.End();
+
+            /*
+
+            Window: Begin & End
+            Menus: BeginMenuBar, MenuItem, EndMenuBar
+            Colours: ColorEdit4
+            Graph: PlotLines
+            Text: Text, TextColored
+            ScrollBox: BeginChild, EndChild
+
+            */
         }
 
         public DebugMapInspector() : base(Handlers)

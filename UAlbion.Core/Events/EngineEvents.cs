@@ -97,9 +97,9 @@ namespace UAlbion.Core.Events
         public object Target { get; }
     }
 
-    public class SelectionResultsEvent : Event, IVerboseEvent
+    public class ShowDebugInfoEvent : Event, IVerboseEvent
     {
-        public SelectionResultsEvent(IList<Selection> selections)
+        public ShowDebugInfoEvent(IList<Selection> selections)
         {
             Selections = selections;
         }

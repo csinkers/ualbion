@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\UAlbion.Formats\UAlbion.Formats.csproj" />
+    <ProjectReference Include="..\..\Formats\UAlbion.Formats.csproj" />
   </ItemGroup>
 
 </Project>

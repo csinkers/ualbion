@@ -1,6 +1,6 @@
 {
   "XldPath": "albion_sr\\cd\\XLDLIBS",
-  "ExportedXldPath": "exported",
+  "ExportedXldPath": "Data\\Exported",
   "Xlds": {
     "3DBCKGR0.XLD": {
       "EnumName": "DungeonBackgroundId",

@@ -7,9 +7,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UAlbion.Tools.XmiToMidi", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{149A8BC2-91D1-4249-9E1D-7B0054347832}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Game", "UAlbion.Game\UAlbion.Game.csproj", "{CE0E2DB4-828A-45F4-9C41-20A7C5522DA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Game", "Game\UAlbion.Game.csproj", "{CE0E2DB4-828A-45F4-9C41-20A7C5522DA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Formats", "UAlbion.Formats\UAlbion.Formats.csproj", "{78B55A1C-1200-4C6E-A9D3-9C04D65F0AF9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Formats", "Formats\UAlbion.Formats.csproj", "{78B55A1C-1200-4C6E-A9D3-9C04D65F0AF9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion", "UAlbion\UAlbion.csproj", "{215725EE-7C55-49B6-97C1-88CDC163A8B0}"
 EndProject
@@ -17,7 +17,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "UAlbion.Tools.Exporter", "T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageReverser.Framework", "Tools\ImageReverser\ImageReverser.Framework.csproj", "{776382CD-4E23-4EF0-89D7-963E63507B5F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core", "UAlbion.Core\UAlbion.Core.csproj", "{4B3B467B-2E99-4836-B589-A69D272417F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core", "Core\UAlbion.Core.csproj", "{4B3B467B-2E99-4836-B589-A69D272417F0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}"
 	ProjectSection(SolutionItems) = preProject
@@ -71,7 +71,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Veldrid", "Veldrid", "{DB6A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.SPIRV", "veldrid-spirv\src\Veldrid.SPIRV\Veldrid.SPIRV.csproj", "{8E4A3651-9264-4FD6-AA1C-E48AEF26EFCA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UAlbion.Api", "UAlbion.Api\UAlbion.Api.csproj", "{20D41E69-C260-461F-A0B9-89920F133F60}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UAlbion.Api", "Api\UAlbion.Api.csproj", "{20D41E69-C260-461F-A0B9-89920F133F60}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

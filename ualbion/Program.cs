@@ -68,7 +68,7 @@ namespace UAlbion
                 new GameClock().Attach(engine.GlobalExchange);
                 new SceneLoader(assets, engine, spriteResolver).Attach(engine.GlobalExchange);
                 new DebugMapInspector().Attach(engine.GlobalExchange);
-                engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.TestMapIskai), null);
+                engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.HausDesJägerclans), null);
 
                 new NormalMouseMode().Attach(engine.GlobalExchange);
                 new DebugPickMouseMode().Attach(engine.GlobalExchange);

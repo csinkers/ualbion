@@ -68,7 +68,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\UAlbion.Formats\UAlbion.Formats.csproj">
+    <ProjectReference Include="..\..\Formats\UAlbion.Formats.csproj">
       <Project>{78b55a1c-1200-4c6e-a9d3-9c04d65f0af9}</Project>
       <Name>UAlbion.Formats</Name>
     </ProjectReference>

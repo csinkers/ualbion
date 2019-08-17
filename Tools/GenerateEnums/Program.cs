@@ -46,7 +46,7 @@ namespace GenerateEnums
         {
             var baseDir = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Parent.Parent.Parent.Parent.FullName;
             AssetConfig config = AssetConfig.Load(baseDir);
-            var outpathPath = Path.Combine(baseDir, @"UAlbion.Game\AssetIds");
+            var outpathPath = Path.Combine(baseDir, @"Formats\AssetIds");
             var xldPattern = new Regex(@"([0-9]+).XLD$");
 
             var enums = new Dictionary<string, EnumData>();
@@ -91,7 +91,7 @@ namespace GenerateEnums
 
             foreach (var e in enums.Values)
             {
-                File.WriteAllText(Path.Combine(outpathPath, e.Name + ".cs"), $@"namespace UAlbion.Game.AssetIds
+                File.WriteAllText(Path.Combine(outpathPath, e.Name + ".cs"), $@"namespace UAlbion.Formats.AssetIds
 {{
     public enum {e.Name}
     {{

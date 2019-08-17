@@ -120,7 +120,6 @@ namespace UAlbion.Core
 
         public void Run()
         {
-            GraphicsDevice.CheckForErrors();
             Raise(new BeginFrameEvent());
             if (Scene == null)
                 throw new InvalidOperationException("The scene must be set before the main loop can be run.");
@@ -291,7 +290,7 @@ namespace UAlbion.Core
             //_graphicsDevice?.Dispose();
         }
 
-        public void CheckForErrors() { GraphicsDevice?.CheckForErrors(); }
+        public void CheckForErrors() { /*GraphicsDevice?.CheckForErrors();*/ }
     }
 }
 

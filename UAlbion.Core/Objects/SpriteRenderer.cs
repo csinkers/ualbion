@@ -85,8 +85,8 @@ namespace UAlbion.Core.Objects
             public const string VertexShader = @"
             #version 450
 
-            layout(set = 0, binding = 0) uniform _Projection { mat4 Projection; };
-            layout(set = 0, binding = 1) uniform _View { mat4 View; };
+            layout(set = 0, binding = 0) uniform _Projection { mat4 Projection; }; // vdspv_0_0
+            layout(set = 0, binding = 1) uniform _View { mat4 View; }; // vdspv_0_1
 
             layout(location = 0) in vec2 _Position;
             layout(location = 1) in vec2 _Offset;
@@ -105,8 +105,6 @@ namespace UAlbion.Core.Objects
                 fsin_0 = _Position * _TexSize + _TexOffset;
                 fsin_1 = _TexLayer;
                 fsin_2 = _Flags;
-                //vec4 preTransform = vec4(_Position.x * 1200.0f, _Position.y * 850.0f, 0.0f, 1.0f);
-                //gl_Position = vec4(_Position / 100000.0f, 0.0f, 0.0f); //Projection * View * preTransform;
 
                 if((_Flags & 1) != 0) // If NoTransform set
                     gl_Position = vec4((_Position * _Size) + _Offset, 0, 1);
@@ -118,8 +116,8 @@ namespace UAlbion.Core.Objects
             #version 450
 
             layout(set = 0, binding = 2) uniform sampler SpriteSampler;
-            layout(set = 0, binding = 3) uniform texture2D SpriteTexture;
-            layout(set = 0, binding = 4) uniform texture2D PaletteView;
+            layout(set = 0, binding = 3) uniform texture2D SpriteTexture; // vdspv_0_3
+            layout(set = 0, binding = 4) uniform texture2D PaletteView; // vdspv_0_4
 
             layout(location = 0) in vec2 fsin_0;
             layout(location = 1) in flat int fsin_1;
@@ -129,33 +127,30 @@ namespace UAlbion.Core.Objects
 
             void main()
             {
-                /* NoTransform = 1,
-                   Highlight = 2,
-                   UsePalette = 4
-                   OnlyEvenFrames = 8,
-                   RedTint = 16,
-                   GreenTint = 32,
-                   BlueTint = 64,
-                   Transparent = 128 */
+                /* NoTransform = 1,  Highlight      = 2,
+                   UsePalette  = 4,  OnlyEvenFrames = 8,
+                   RedTint     = 16, GreenTint      = 32,
+                   BlueTint    = 64, Transparent    = 128 */
 
                 vec4 color;
                 if ((fsin_2 & 4) != 0)
                 {
                     float redChannel = texture(sampler2D(SpriteTexture, SpriteSampler), fsin_0)[0];
                     float index = 255.0f * redChannel;
-
                     color = texture(sampler2D(PaletteView, SpriteSampler), vec2(redChannel, 0.0f));
+                    if(index == 0)
+                        color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
                 }
                 else
                 {
                     color = texture(sampler2D(SpriteTexture, SpriteSampler), fsin_0);
                 }
 
-                if((fsin_2 & 2) != 0) color = color * 1.2;
-                if((fsin_2 & 16) != 0) color = vec4(1.0f, color.yzw);
-                if((fsin_2 & 32) != 0) color = vec4(color.x, 1.0f, color.zw);
-                if((fsin_2 & 64) != 0) color = vec4(color.xy, 1.0f, color.w);
-                if((fsin_2 & 128) != 0) color = vec4(color.xyz, color.w * 0.5f);
+                if((fsin_2 &   2) != 0) color = color * 1.2; // Highlight
+                if((fsin_2 &  16) != 0) color = vec4(1.0f, color.yzw);         // Red tint
+                if((fsin_2 &  32) != 0) color = vec4(color.x, 1.0f, color.zw); // Green tint
+                if((fsin_2 &  64) != 0) color = vec4(color.xy, 1.0f, color.w); // Blue tint
+                if((fsin_2 & 128) != 0) color = vec4(color.xyz, color.w * 0.5f); // Transparent
 
                 OutputColor = color;
             }";

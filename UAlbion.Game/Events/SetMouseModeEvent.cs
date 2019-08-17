@@ -1,4 +1,4 @@
-﻿using UAlbion.Core.Events;
+﻿using UAlbion.Api;
 using UAlbion.Game.Input;
 
 namespace UAlbion.Game.Events

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Parsers
 {

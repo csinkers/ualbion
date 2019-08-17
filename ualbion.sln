@@ -71,6 +71,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Veldrid", "Veldrid", "{DB6A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.SPIRV", "veldrid-spirv\src\Veldrid.SPIRV\Veldrid.SPIRV.csproj", "{8E4A3651-9264-4FD6-AA1C-E48AEF26EFCA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UAlbion.Api", "UAlbion.Api\UAlbion.Api.csproj", "{20D41E69-C260-461F-A0B9-89920F133F60}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -284,6 +286,18 @@ Global
 		{8E4A3651-9264-4FD6-AA1C-E48AEF26EFCA}.Release|x64.Build.0 = Release|Any CPU
 		{8E4A3651-9264-4FD6-AA1C-E48AEF26EFCA}.Release|x86.ActiveCfg = Release|Any CPU
 		{8E4A3651-9264-4FD6-AA1C-E48AEF26EFCA}.Release|x86.Build.0 = Release|Any CPU
+		{20D41E69-C260-461F-A0B9-89920F133F60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20D41E69-C260-461F-A0B9-89920F133F60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20D41E69-C260-461F-A0B9-89920F133F60}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{20D41E69-C260-461F-A0B9-89920F133F60}.Debug|x64.Build.0 = Debug|Any CPU
+		{20D41E69-C260-461F-A0B9-89920F133F60}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{20D41E69-C260-461F-A0B9-89920F133F60}.Debug|x86.Build.0 = Debug|Any CPU
+		{20D41E69-C260-461F-A0B9-89920F133F60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20D41E69-C260-461F-A0B9-89920F133F60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20D41E69-C260-461F-A0B9-89920F133F60}.Release|x64.ActiveCfg = Release|Any CPU
+		{20D41E69-C260-461F-A0B9-89920F133F60}.Release|x64.Build.0 = Release|Any CPU
+		{20D41E69-C260-461F-A0B9-89920F133F60}.Release|x86.ActiveCfg = Release|Any CPU
+		{20D41E69-C260-461F-A0B9-89920F133F60}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

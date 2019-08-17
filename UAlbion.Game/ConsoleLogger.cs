@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Events;

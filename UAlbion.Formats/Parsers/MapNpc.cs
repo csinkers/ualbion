@@ -24,6 +24,7 @@ namespace UAlbion.Formats.Parsers
             Random1 = 1,
             Random2 = 2,
             FollowParty = 4,
+            Stationary = 8,
 
             RandomMask = 3,
         }

@@ -13,7 +13,7 @@ namespace UAlbion.Game
 {
     public static class AssetLoader
     {
-        public static IDictionary<XldObjectType, IAssetLoader> Loaders = GetAssetLoaders();
+        static readonly IDictionary<XldObjectType, IAssetLoader> Loaders = GetAssetLoaders();
         static IDictionary<XldObjectType, IAssetLoader> GetAssetLoaders()
         {
             var dict = new Dictionary<XldObjectType, IAssetLoader>();

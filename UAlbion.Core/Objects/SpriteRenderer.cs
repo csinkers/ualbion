@@ -26,9 +26,9 @@ namespace UAlbion.Core.Objects
         {
             public static readonly uint StructSize = (uint)Unsafe.SizeOf<InstanceData>();
             public static readonly VertexLayoutDescription VertexLayout = new VertexLayoutDescription(
-                VertexLayoutH.Vector2D("Offset"), VertexLayoutH.Vector2D("Size"),
-                VertexLayoutH.Vector2D("TexPosition"), VertexLayoutH.Vector2D("TexSize"),
-                VertexLayoutH.Int("TexLayer"), VertexLayoutH.Int("Flags")
+                VertexLayoutHelper.Vector2D("Offset"), VertexLayoutHelper.Vector2D("Size"),
+                VertexLayoutHelper.Vector2D("TexPosition"), VertexLayoutHelper.Vector2D("TexSize"),
+                VertexLayoutHelper.Int("TexLayer"), VertexLayoutHelper.Int("Flags")
                 )
             { InstanceStepRate = 1 };
             public InstanceData(Vector2 position, Vector2 size, Vector2 texPosition, Vector2 texSize, int texLayer, SpriteFlags flags)
@@ -74,13 +74,13 @@ namespace UAlbion.Core.Objects
 
             static class Shader
         {
-            public static readonly VertexLayoutDescription VertexLayout = new VertexLayoutDescription(VertexLayoutH.Vector2D("Position"));
+            public static readonly VertexLayoutDescription VertexLayout = new VertexLayoutDescription(VertexLayoutHelper.Vector2D("Position"));
             public static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
-                ResourceLayoutH.Uniform("vdspv_0_0"),
-                ResourceLayoutH.Uniform("vdspv_0_1"),
-                ResourceLayoutH.Sampler("SpriteSampler"),
-                ResourceLayoutH.Texture("vdspv_0_3"), // Texture
-                ResourceLayoutH.Texture("vdspv_0_4")); // Palette
+                ResourceLayoutHelper.Uniform("vdspv_0_0"),
+                ResourceLayoutHelper.Uniform("vdspv_0_1"),
+                ResourceLayoutHelper.Sampler("SpriteSampler"),
+                ResourceLayoutHelper.Texture("vdspv_0_3"), // Texture
+                ResourceLayoutHelper.Texture("vdspv_0_4")); // Palette
 
             public const string VertexShader = @"
             #version 450

@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
-using UAlbion.Formats;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Game.Gui
 {
     public class CharacterPortrait : GuiElement
     {
-
     }
 
     public class GameFrame : GuiElement
@@ -22,7 +20,7 @@ namespace UAlbion.Game.Gui
         AlbionLabel _notes;
         AlbionLabel _hovered;
         InventoryScreen _inventory;
-        Map2D _map2d;
-        Map3D _map3d;
+        MapData2D _map2d;
+        MapData3D _map3d;
     }
 }

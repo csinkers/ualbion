@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-namespace UAlbion.Core.Events
+namespace UAlbion.Api
 {
     public interface IEvent { }
     public interface IVerboseEvent { }

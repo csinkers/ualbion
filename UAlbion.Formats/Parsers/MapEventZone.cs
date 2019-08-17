@@ -40,7 +40,7 @@ namespace UAlbion.Formats.Parsers
             zone.Global = true;
             zone.X = br.ReadUInt16(); // +0
             Debug.Assert(zone.X == 0);
-            zone.Trigger = (MapEventZone.TriggerType) br.ReadUInt16(); // +2
+            zone.Trigger = (TriggerType) br.ReadUInt16(); // +2
             zone.EventNumber = br.ReadUInt16(); // +4
             return zone;
         }
@@ -48,12 +48,18 @@ namespace UAlbion.Formats.Parsers
         public static MapEventZone LoadZone(BinaryReader br, ushort y)
         {
             var zone = new MapEventZone();
-            zone.X = br.ReadByte(); // +0
+            zone.X = (ushort)(br.ReadByte() - 1); // +0
+            Debug.Assert(zone.X != 0xffff);
             zone.Unk1 = br.ReadByte(); // +1
             zone.Y = y;
-            zone.Trigger = (MapEventZone.TriggerType)br.ReadUInt16(); // +2
+            zone.Trigger = (TriggerType)br.ReadUInt16(); // +2
             zone.EventNumber = br.ReadUInt16(); // +4
             return zone;
+        }
+
+        public override string ToString()
+        {
+            return $"Zone T:{Trigger} Unk1:{Unk1} E:{EventNumber}";
         }
     }
 }

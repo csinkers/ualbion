@@ -2,16 +2,18 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class Map2D
+    public class MapData2D
     {
         public int[] Underlay { get; set; }
         public int[] Overlay { get; set; }
         public IList<MapNpc> Npcs { get; } = new List<MapNpc>();
         public IList<MapEvent> Events { get; } = new List<MapEvent>();
         public IList<MapEventZone> Zones { get; } = new List<MapEventZone>();
+        public int[] ZoneLookup { get; private set; }
 
         public byte Unk0 { get; set; } // Wait/Rest, Light-Environment, NPC converge range
         public byte Sound { get; set; }
@@ -22,11 +24,11 @@ namespace UAlbion.Formats.Parsers
         public int PaletteId { get; set; }
         public byte FrameRate { get; set; }
 
-        public static Map2D Load(BinaryReader br, long streamLength, string name)
+        public static MapData2D Load(BinaryReader br, long streamLength, string name)
         {
             var startPosition = br.BaseStream.Position;
 
-            var map = new Map2D();
+            var map = new MapData2D();
             map.Unk0 = br.ReadByte(); // 0
             int npcCount = br.ReadByte(); // 1
             if (npcCount == 0) npcCount = 0x20;
@@ -90,6 +92,13 @@ namespace UAlbion.Formats.Parsers
                 map.Npcs.Add(npc);
 
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
+
+            map.ZoneLookup = Enumerable.Repeat(-1, map.Width * map.Height).ToArray();
+            for (int i = 0; i < map.Zones.Count; i++)
+            {
+                var z = map.Zones[i];
+                map.ZoneLookup[z.Y * map.Width + z.X] = i;
+            }
             return map;
         }
     }

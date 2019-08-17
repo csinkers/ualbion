@@ -1,14 +1,11 @@
 ﻿using System.IO;
-using System.Linq;
-using System.Numerics;
 using System.Reflection;
 using UAlbion.Core;
-using UAlbion.Core.Objects;
 using UAlbion.Formats;
 using UAlbion.Game;
 using UAlbion.Game.AssetIds;
-using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
+using UAlbion.Game.Input;
 using Veldrid;
 
 namespace UAlbion
@@ -20,7 +17,14 @@ namespace UAlbion
             Veldrid.Sdl2.SDL_version version;
             Veldrid.Sdl2.Sdl2Native.SDL_GetVersion(&version);
 
-            var baseDir = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))?.Parent?.Parent?.Parent?.FullName;
+            var baseDir = Directory.GetParent(Path.GetDirectoryName(
+                Assembly.GetExecutingAssembly()
+                    .Location)) // ./ualbion/bin/Debug
+                ?.Parent        // ./ualbion/bin
+                ?.Parent        // ./ualbion
+                ?.Parent        // .
+                ?.FullName;
+
             if (string.IsNullOrEmpty(baseDir))
                 return;
 
@@ -49,7 +53,7 @@ namespace UAlbion
                 //VeldridStartup.GetPlatformDefaultBackend()
                 //GraphicsBackend.Metal /*
                 //GraphicsBackend.Vulkan /*
-                GraphicsBackend.OpenGL /*
+                //GraphicsBackend.OpenGL /*
                 //GraphicsBackend.OpenGLES /*
                 GraphicsBackend.Direct3D11 /*
                 //*/
@@ -58,19 +62,21 @@ namespace UAlbion
             using (var assets = new Assets(config))
             using (var engine = new Engine(backend))
             {
-                engine.CheckForErrors();
                 var spriteResolver = new SpriteResolver(assets);
-                engine.AddComponent(assets);
-                engine.CheckForErrors();
-                engine.AddComponent(new ConsoleLogger());
-                engine.CheckForErrors();
-                engine.AddComponent(new GameClock());
-                engine.CheckForErrors();
-                engine.AddComponent(new InputBinder());
-                engine.CheckForErrors();
-                engine.AddComponent(new SceneLoader(assets, engine, spriteResolver));
-                engine.CheckForErrors();
+                assets.Attach(engine.GlobalExchange);
+                new ConsoleLogger().Attach(engine.GlobalExchange);
+                new GameClock().Attach(engine.GlobalExchange);
+                new SceneLoader(assets, engine, spriteResolver).Attach(engine.GlobalExchange);
+                new DebugMapInspector().Attach(engine.GlobalExchange);
                 engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.TestMapIskai), null);
+
+                new NormalMouseMode().Attach(engine.GlobalExchange);
+                new DebugPickMouseMode().Attach(engine.GlobalExchange);
+                new ContextMenuMouseMode().Attach(engine.GlobalExchange);
+                new InventoryMoveMouseMode().Attach(engine.GlobalExchange);
+                new InputBinder().Attach(engine.GlobalExchange);
+                engine.GlobalExchange.Raise(new SetMouseModeEvent((int)MouseModeId.Normal), null);
+
                 //engine.GlobalExchange.Raise(new LoadMapEvent((int)0), null);
 
                 /*

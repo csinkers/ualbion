@@ -1,35 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using Veldrid;
 
 namespace UAlbion.Core
 {
-    public class RenderDebugGroup : IDisposable
+    public class Scene : Component
     {
-        readonly CommandList _cl;
-        readonly string _name;
-
-        public RenderDebugGroup(CommandList cl, string name)
+        static readonly IList<Handler> Handlers = new Handler[]
         {
-            _cl = cl;
-            _name = name;
-            CoreTrace.Log.StartDebugGroup(name);
-            cl.PushDebugGroup(name);
-        }
+            new Handler<Scene, SetRawPaletteEvent>((x, e) => x._palette = new Palette(e.Name, e.Entries))
+        };
 
-        public void Dispose()
-        {
-            _cl.PopDebugGroup();
-            CoreTrace.Log.StopDebugGroup(_name);
-        }
-    }
-
-    public class Scene
-    {
         readonly IDictionary<Type, IList<IRenderable>> _renderables = new Dictionary<Type, IList<IRenderable>>();
         readonly IDictionary<int, IList<IRenderable>> _processedRenderables = new Dictionary<int, IList<IRenderable>>();
         readonly IDictionary<Type, IRenderer> _renderers = new Dictionary<Type, IRenderer>();
@@ -37,18 +22,12 @@ namespace UAlbion.Core
         CommandList _resourceUpdateCl;
 
         public ICamera Camera { get; }
+        public Vector2 TileSize { get; }
 
-        public EventExchange Exchange { get; }
-
-        public Scene(ICamera camera, EventExchange parentExchange)
+        public Scene(ICamera camera, Vector2 tileSize) : base(Handlers)
         {
             Camera = camera;
-            Exchange = new EventExchange(parentExchange);
-        }
-
-        public void SetPalette(string name, uint[] palette)
-        {
-            _palette = new Palette(name, palette);
+            TileSize = tileSize;
         }
 
         public void AddRenderer(IRenderer r)
@@ -56,40 +35,11 @@ namespace UAlbion.Core
             _renderers.Add(r.GetType(), r);
         }
 
-        public void AddComponent(IComponent component)
-        {
-            Debug.Assert(component != null);
-            if (component is RegisteredComponent rc)
-                Exchange.Register(rc);
-            component.Attach(Exchange);
-        }
-
-        public void RemoveComponent(IComponent component)
-        {
-            Exchange.Unsubscribe(component);
-        }
-
         public void RenderAllStages(GraphicsDevice gd, CommandList cl, SceneContext sc)
         {
             // Collect all renderables from components
             foreach(var renderer in _renderables.Values)
                 renderer.Clear();
-
-            /*
-            Func<Vector2, Vector2, bool> cullFunc = (p, s) => true;
-            if(Camera is OrthographicCamera c)
-            {
-                cullFunc = (p, s) =>
-                {
-                    if (p.X > (c.WindowWidth / c.Magnification) || p.Y > (c.WindowHeight / c.Magnification))
-                        return false;
-
-                    if (p.X + s.X < 0 || p.Y + s.Y < 0)
-                        return false;
-
-                    return true;
-                };
-            }*/
 
             int collected = 0;
             Exchange.Raise(new RenderEvent(x =>
@@ -109,7 +59,6 @@ namespace UAlbion.Core
             sc.PaletteView?.Dispose();
             sc.PaletteTexture?.Dispose();
             CoreTrace.Log.Info("Scene", "Disposed palette device texture");
-            // TODO: Ensure always disposed
             sc.PaletteTexture = _palette.CreateDeviceTexture(gd, gd.ResourceFactory, TextureUsage.Sampled);
             sc.PaletteView = gd.ResourceFactory.CreateTextureView(sc.PaletteTexture);
             CoreTrace.Log.Info("Scene", "Created palette device texture");
@@ -163,9 +112,7 @@ namespace UAlbion.Core
             }
 
             if (sc.MainSceneColorTexture.SampleCount != TextureSampleCount.Count1)
-            {
                 cl.ResolveTexture(sc.MainSceneColorTexture, sc.MainSceneResolvedColorTexture);
-            }
 
             using (new RenderDebugGroup(cl, "Duplicator"))
             {

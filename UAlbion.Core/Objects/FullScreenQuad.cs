@@ -56,8 +56,8 @@ void main()
             _disposeCollector = factory.DisposeCollector;
 
             var layout = factory.CreateResourceLayout(new ResourceLayoutDescription(
-                ResourceLayoutH.Texture("vdspv_0_0"),
-                ResourceLayoutH.Sampler("SourceSampler")));
+                ResourceLayoutHelper.Texture("vdspv_0_0"),
+                ResourceLayoutHelper.Sampler("SourceSampler")));
 
             var shaderSet = new ShaderSetDescription(new[] { Vertex2DTextured.VertexLayout },
                 factory.CreateFromSpirv(ShaderHelper.Vertex(VertexShader), ShaderHelper.Fragment(FragmentShader)));

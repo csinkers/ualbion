@@ -70,6 +70,7 @@ namespace UAlbion.Formats
             public string SubSprites;
             public IList<int> PaletteHints;
             public bool? UseSmallGraphics;
+            public string FrameCountOverrides;
             [JsonIgnore] public int EffectiveWidth => Width ?? Parent.Width ?? 0;
             [JsonIgnore] public int EffectiveHeight => Height ?? Parent.Height ?? 0;
         }

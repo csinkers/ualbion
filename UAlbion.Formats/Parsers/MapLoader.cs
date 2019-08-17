@@ -18,7 +18,7 @@ namespace UAlbion.Formats.Parsers
                     throw new NotImplementedException("3D maps cannot yet be loaded");
                     //return Map3D.Load(br, name);
 
-                case 2: return Map2D.Load(br, streamLength, name);
+                case 2: return MapData2D.Load(br, streamLength, name);
                 default: throw new NotImplementedException($"Unrecognised map type {mapType} found.");
             }
         }

@@ -6,6 +6,16 @@ using System.Linq;
 
 namespace UAlbion.Formats.Parsers
 {
+    /*
+    Indoors: Stairs up broken.
+        // 3572 - 3583
+        3583 3582 3581 3580 3579
+        3578    x    x    x 3577
+        3576 3575 3574 2789 3572
+
+    Outdoors1: 1535 is mapping to -1
+    Outdoors2: 1535 is mapping to -1
+    */
     public class TilesetData
     {
         public enum TileLayer : byte // Upper nibble of first byte
@@ -144,7 +154,6 @@ namespace UAlbion.Formats.Parsers
 
         public bool UseSmallGraphics { get; set; }
         public IList<TileData> Tiles { get; } = new List<TileData>();
-        public TileData Get(int tileId) => Tiles[tileId];
     }
 
     [AssetLoader(XldObjectType.IconData)]
@@ -170,6 +179,16 @@ namespace UAlbion.Formats.Parsers
             var validLayers = typeof(TilesetData.TileLayer).GetEnumValues().Cast<byte>().ToList();
             var validTypes = typeof(TilesetData.TileType).GetEnumValues().Cast<byte>().ToList();
 
+            var overrides = (config.FrameCountOverrides ?? "")
+                .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x =>
+                {
+                    var parts = x.Split(':');
+                    int tileNumber = int.Parse(parts[0]) - 1;
+                    int frameCount = int.Parse(parts[1]);
+                    return (tileNumber, frameCount);
+                }).ToDictionary(x => x.tileNumber, x => (byte)x.frameCount);
+
             int tileCount = (int)(streamLength / 8);
             for (int i = 0; i < tileCount; i++)
             {
@@ -190,6 +209,17 @@ namespace UAlbion.Formats.Parsers
                 t.TileNumber = (ushort)(br.ReadUInt16() - 1); // 4
                 t.FrameCount = br.ReadByte(); // 6
                 t.Unk7 = br.ReadByte(); // 7
+
+                if (overrides.ContainsKey(i))
+                {
+                    t.FrameCount = overrides[i];
+                    if(t.FrameCount == 0)
+                    {
+                        t.TileNumber = 0;
+                        t.FrameCount = 1;
+                    }
+                }
+
                 td.Tiles.Add(t);
             }
 

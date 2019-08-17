@@ -6,9 +6,8 @@ namespace UAlbion.Core
     public enum RenderPasses : int
     {
         Standard = 1 << 0,
-        AlphaBlend = 1 << 1,
-        Overlay = 1 << 2,
-        Duplicator = 1 << 6,
-        SwapchainOutput = 1 << 7,
+        Overlay = 1 << 1,
+        Duplicator = 1 << 2,
+        SwapchainOutput = 1 << 3,
     }
 }

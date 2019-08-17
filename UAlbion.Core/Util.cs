@@ -209,4 +209,18 @@ namespace UAlbion.Core
             }
         }
     }
+
+    public static class ResourceLayoutHelper
+    {
+        public static ResourceLayoutElementDescription Uniform(string name) => new ResourceLayoutElementDescription(name, ResourceKind.UniformBuffer, ShaderStages.Vertex);
+        public static ResourceLayoutElementDescription Texture(string name) => new ResourceLayoutElementDescription(name, ResourceKind.TextureReadOnly, ShaderStages.Fragment);
+        public static ResourceLayoutElementDescription Sampler(string name) => new ResourceLayoutElementDescription(name, ResourceKind.Sampler, ShaderStages.Fragment);
+    }
+
+    public static class VertexLayoutHelper
+    {
+        public static VertexElementDescription Vector2D(string name) => new VertexElementDescription(name, VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2);
+        public static VertexElementDescription Vector3D(string name) => new VertexElementDescription(name, VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3);
+        public static VertexElementDescription Int(string name) => new VertexElementDescription(name, VertexElementSemantic.TextureCoordinate, VertexElementFormat.Int1);
+    }
 }

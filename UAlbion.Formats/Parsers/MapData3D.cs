@@ -2,10 +2,11 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class Map3D
+    public class MapData3D
     {
         public byte CeilingFlags { get; set; }
         public byte Width { get; set; }
@@ -25,11 +26,11 @@ namespace UAlbion.Formats.Parsers
         public byte[] AutomapGraphics { get; set; }
         public IList<ushort> ActiveMapEvents { get; } = new List<ushort>();
 
-        public static Map3D Load(BinaryReader br, string name)
+        public static MapData3D Load(BinaryReader br, string name)
         {
             var startPosition = br.BaseStream.Position;
 
-            var map = new Map3D();
+            var map = new MapData3D();
             map.CeilingFlags = br.ReadByte(); // 0
             int npcCount = br.ReadByte(); // 1
             if (npcCount == 0) npcCount = 0x20;

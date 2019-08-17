@@ -4,7 +4,7 @@ using Veldrid;
 namespace UAlbion.Core
 {
     // Non-thread-safe cache for resources.
-    internal static class StaticResourceCache
+    static class StaticResourceCache
     {
         static readonly IDictionary<ShaderSetCacheKey, (Shader, Shader)> ShaderSets = new Dictionary<ShaderSetCacheKey, (Shader, Shader)>();
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Numerics;
 using ImGuiNET;
 using UAlbion.Core.Events;
 using Veldrid;
@@ -28,7 +29,9 @@ namespace UAlbion.Core
 
         static RenderDoc _renderDoc;
 
-        public EventExchange GlobalExchange { get; } = new EventExchange();
+        public EventExchange GlobalExchange { get; }
+        public EventExchange SceneExchange { get; }
+
         public ITextureManager TextureManager { get; }
         readonly FrameTimeAverager _frameTimeAverager = new FrameTimeAverager(0.5);
         readonly FullScreenQuad _fullScreenQuad;
@@ -50,6 +53,8 @@ namespace UAlbion.Core
 
         public Engine(GraphicsBackend backend) : base(Handlers)
         {
+            GlobalExchange = new EventExchange("Global");
+            SceneExchange = new EventExchange("Scenes", GlobalExchange);
             TextureManager = new TextureManager();
             ChangeBackend(backend);
             CheckForErrors();
@@ -60,33 +65,37 @@ namespace UAlbion.Core
             _debugMenus = new DebugMenus(this);
 
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
-            AddComponent(this);
-            AddComponent(_igRenderable);
-            AddComponent(_duplicator);
-            AddComponent(_fullScreenQuad);
-            AddComponent(_debugMenus);
+            Attach(GlobalExchange);
+            _igRenderable.Attach(GlobalExchange);
+            _duplicator.Attach(GlobalExchange);
+            _fullScreenQuad.Attach(GlobalExchange);
+            _debugMenus.Attach(GlobalExchange);
         }
 
-        public Scene Create2DScene()
+        public (EventExchange, Scene) Create2DScene(string name, Vector2 tileSize)
         {
             // TODO: Build scenes from config
+            var sceneExchange = new EventExchange(name, SceneExchange);
             var camera = new OrthographicCamera(Window);
-            var scene = new Scene(camera, Exchange);
+            var scene = new Scene(camera, tileSize);
+            scene.Attach(sceneExchange);
             scene.AddRenderer(_igRenderable);
             scene.AddRenderer(_duplicator);
             scene.AddRenderer(_fullScreenQuad);
-            scene.AddComponent(camera);
-            return scene;
+            camera.Attach(sceneExchange);
+            return (sceneExchange, scene);
         }
 
-        public Scene Create3DScene()
+        public Scene Create3DScene(string name)
         {
+            var sceneExchange = new EventExchange(name, SceneExchange);
             var camera = new PerspectiveCamera(GraphicsDevice, Window);
-            var scene = new Scene(camera, Exchange);
+            var scene = new Scene(camera, Vector2.One);
+            scene.Attach(sceneExchange);
             scene.AddRenderer(_igRenderable);
             scene.AddRenderer(_duplicator);
             scene.AddRenderer(_fullScreenQuad);
-            scene.AddComponent(camera);
+            camera.Attach(sceneExchange);
             return scene;
         }
 
@@ -95,27 +104,20 @@ namespace UAlbion.Core
             if(_frameCommands != null)
                 DestroyAllObjects();
 
-            if (Scene != null)
-                Scene.Exchange.IsActive = false;
+            foreach (var childExchange in SceneExchange.Children)
+            {
+                bool isCurrentScene = childExchange.Contains(scene);
+                if(!isCurrentScene && childExchange.IsActive)
+                    childExchange.Raise(new PersistToDiskEvent(), this);
+                childExchange.IsActive = isCurrentScene;
+            }
+
+            SceneExchange.PruneInactiveChildren();
 
             Scene = scene;
             _sceneContext.SetCurrentScene(Scene);
             CreateAllObjects();
             ImGui.StyleColorsClassic();
-            Scene.Exchange.IsActive = true;
-        }
-
-        public void AddComponent(IComponent component)
-        {
-            Debug.Assert(component != null);
-            if (component is RegisteredComponent rc)
-                GlobalExchange.Register(rc);
-            component.Attach(GlobalExchange);
-        }
-
-        public void RemoveComponent(IComponent component)
-        {
-            Exchange.Unsubscribe(component);
         }
 
         public void Run()

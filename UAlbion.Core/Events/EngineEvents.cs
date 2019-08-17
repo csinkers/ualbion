@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
+using UAlbion.Api;
 using Veldrid;
 
 namespace UAlbion.Core.Events
@@ -80,5 +82,75 @@ namespace UAlbion.Core.Events
         [EventPart("delta", "The change in magnification level")]
         public int Delta { get; }
 
+    }
+
+    public class Selection
+    {
+        public Selection(Vector3 intersectionPoint, string name, object target)
+        {
+            IntersectionPoint = intersectionPoint;
+            Name = name;
+            Target = target;
+        }
+
+        public Vector3 IntersectionPoint { get; }
+        public string Name { get; }
+        public object Target { get; }
+    }
+
+    public class ShowDebugInfoEvent : Event, IVerboseEvent
+    {
+        public ShowDebugInfoEvent(IList<Selection> selections)
+        {
+            Selections = selections;
+        }
+
+        public IList<Selection> Selections { get; }
+    }
+
+    public class ScreenCoordinateSelectEvent : EngineEvent, IVerboseEvent
+    {
+        public ScreenCoordinateSelectEvent(Vector2 position, Action<float, Selection> registerHit)
+        {
+            Position = position;
+            RegisterHit = registerHit;
+        }
+
+        public Vector2 Position { get; }
+        public Action<float, Selection> RegisterHit { get; }
+    }
+
+    public class WorldCoordinateSelectEvent : EngineEvent, IVerboseEvent
+    {
+        readonly Action<float, Selection> _registerHit;
+
+        public WorldCoordinateSelectEvent(Vector3 origin, Vector3 direction, Action<float, Selection> registerHit)
+        {
+            Origin = origin;
+            Direction = direction;
+            _registerHit = registerHit;
+        }
+
+        public Vector3 Origin { get; }
+        public Vector3 Direction { get; }
+
+        public void RegisterHit(float t, string name, object target) => 
+            _registerHit(t, new Selection(Origin + t * Direction, name, target));
+    }
+
+    public class SetRawPaletteEvent : EngineEvent, IVerboseEvent
+    {
+        public string Name { get; }
+        public uint[] Entries { get; }
+
+        public SetRawPaletteEvent(string name, uint[] entries)
+        {
+            Name = name;
+            Entries = entries;
+        }
+    }
+
+    public class PersistToDiskEvent : EngineEvent
+    {
     }
 }

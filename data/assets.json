@@ -7991,36 +7991,45 @@
       "Assets": {
         "0": {
           "Name": "Outdoors",
-          "UseSmallGraphics": true
+          "UseSmallGraphics": true,
+          "FrameCountOverrides": "2186:1 536:1 2843:1 217:1"
         },
         "1": {
           "Name": "Outdoors",
-          "UseSmallGraphics": true
+          "UseSmallGraphics": true,
+          "FrameCountOverrides": "2371:1 2518:1 458:1"
         },
         "2": {
-          "Name": "Indoors"
+          "Name": "Indoors",
+          "FrameCountOverrides": "2728:1 1158:1 1193:1 2485:1 831:1 1123:1 1306:1 2763:0 2764:0"
         },
         "3": {
           "Name": "Desert",
           "UseSmallGraphics": true
         },
         "4": {
-          "Name": "Stoney"
+          "Name": "Stoney",
+          "FrameCountOverrides": "3018:0 3019:0 2195:1 174:1 3034:1 2229:1 258:1"
         },
         "5": {
-          "Name": "Stoney"
+          "Name": "Stoney",
+          "FrameCountOverrides": "161:1 2101:1 2337:1 2155:1 336:1 1218:1 1264:1 729:1 2133:1 2606:0 737:1"
         },
         "6": {
-          "Name": "CeltDungeon"
+          "Name": "CeltDungeon",
+          "FrameCountOverrides": "384:1 358:1 2931:0 2466:1 2932:0 3558:0 977:1 3085:1"
         },
         "7": {
-          "Name": "Toronto"
+          "Name": "Toronto",
+          "FrameCountOverrides": "1240:1 1323:1 2528:1 2471:0 2472:0 2551:1 808:1 2550:0 801:1"
         },
         "8": {
-          "Name": "Celtic"
+          "Name": "Celtic",
+          "FrameCountOverrides": "284:1 2752:1 2598:0 2935:1 1317:1 877:1 3541:1 2599:0"
         },
         "9": {
-          "Name": "DjiKantos"
+          "Name": "DjiKantos",
+          "FrameCountOverrides": "2810:1 1349:1 2229:1 1376:1 1412:1 2808:1 2048:0 2049:0"
         },
         "10": {}
       }

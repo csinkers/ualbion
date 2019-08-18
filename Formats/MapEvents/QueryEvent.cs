@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Game.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {

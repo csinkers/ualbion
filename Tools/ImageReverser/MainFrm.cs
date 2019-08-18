@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using UAlbion.Formats;
+using UAlbion.Formats.Config;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Tools.ImageReverser

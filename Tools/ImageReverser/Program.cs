@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
-using UAlbion.Formats;
+using UAlbion.Formats.Config;
 
 namespace UAlbion.Tools.ImageReverser
 {

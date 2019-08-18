@@ -2,7 +2,6 @@
 using System.Numerics;
 using UAlbion.Core.Events;
 using Veldrid;
-using Veldrid.Sdl2;
 
 namespace UAlbion.Core
 {
@@ -39,13 +38,12 @@ namespace UAlbion.Core
         public float NearDistance => 1f;
         public float FarDistance => 1000f;
 
-        public PerspectiveCamera(GraphicsDevice gd, Sdl2Window window) : base(Handlers)
+        public PerspectiveCamera(GraphicsDevice gd, float windowWidth, float windowHeight) : base(Handlers)
         {
             _gd = gd;
             _useReverseDepth = gd.IsDepthRangeZeroToOne;
-            //_window = window;
-            _windowWidth = window.Width;
-            _windowHeight = window.Height;
+            _windowWidth = windowWidth;
+            _windowHeight = windowHeight;
             UpdatePerspectiveMatrix();
             UpdateViewMatrix();
         }
@@ -56,7 +54,6 @@ namespace UAlbion.Core
             _useReverseDepth = gd.IsDepthRangeZeroToOne;
             UpdatePerspectiveMatrix();
         }
-
 
         public float AspectRatio => _windowWidth / _windowHeight;
         public float Magnification { get; set; } // Ignored.

@@ -8,6 +8,9 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Core.Textures;
 using UAlbion.Formats;
+using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Game
 {
@@ -53,6 +56,11 @@ namespace UAlbion.Game
                 asset = ToTexture(name, p);
 
             return asset;
+        }
+
+        public static object LoadCoreSprite(CoreSpriteId id, string  basePath, CoreSpriteConfig config)
+        {
+            return ToTexture(CoreSpriteLoader.Load(id, basePath, config));
         }
 
         static (int, int) GetAtlasSize(int tileWidth, int tileHeight, int count)

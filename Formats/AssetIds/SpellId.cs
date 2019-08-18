@@ -1,6 +1,6 @@
-﻿namespace UAlbion.Game
+﻿namespace UAlbion.Formats.AssetIds
 {
-    enum SpellId
+    enum SpellId // TODO: Add this info to a JSON file and then auto-generate the enum.
     {
         // DjiKas
         ThornSnare,

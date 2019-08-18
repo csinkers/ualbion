@@ -51,6 +51,7 @@
         Script,
         Picture,
         TransparencyTables,
+        CoreGraphics
     }
 
     enum AssetLocation
@@ -60,6 +61,7 @@
         Localised,
         LocalisedRaw, // Not in an XLD
         Initial,
-        Current
+        Current,
+        MainExe
     }
 }

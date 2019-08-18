@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {

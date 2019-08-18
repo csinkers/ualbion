@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using UAlbion.Formats;
+using UAlbion.Formats.Config;
 
 namespace GenerateEnums
 {
@@ -82,6 +82,11 @@ namespace GenerateEnums
                     ? new EnumEntry { Name = $"Unknown{item.Key}", Value = item.Key }
                     : new EnumEntry { Name = Sanitise(item.Value.Name), Value= item.Key});
 
+            CoreSpriteConfig coreSpriteConfig = CoreSpriteConfig.Load(baseDir);
+            enums["CoreSpriteId"] = new EnumData { Name = "CoreSpriteId" };
+            foreach (var item in coreSpriteConfig.CoreSpriteIds)
+                enums["CoreSpriteId"].Entries.Add(new EnumEntry { Name = Sanitise(item.Value), Value = item.Key });
+
             foreach (var e in enums.Values)
             {
                 var duplicateNames = e.Entries.GroupBy(x => x.Name).Where(x => x.Count() > 1).ToList();
@@ -100,7 +105,13 @@ namespace GenerateEnums
 
             foreach (var e in enums.Values)
             {
-                File.WriteAllText(Path.Combine(outpathPath, e.Name + ".cs"), $@"namespace UAlbion.Formats.AssetIds
+                File.WriteAllText(Path.Combine(outpathPath, e.Name + ".cs"), 
+$@"// Note: This file was automatically generated using Tools/GenerateEnums.
+// No changes should be made to this file by hand. Instead, the relevant json 
+// files should be modified and then GenerateEnums should be used to regenerate
+// the various ID enums.
+
+namespace UAlbion.Formats.AssetIds
 {{
     public enum {e.Name}
     {{

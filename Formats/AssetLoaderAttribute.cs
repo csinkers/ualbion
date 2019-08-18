@@ -1,4 +1,5 @@
 ﻿using System;
+using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats
 {

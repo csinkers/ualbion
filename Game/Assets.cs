@@ -8,19 +8,12 @@ using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 using UAlbion.Formats.Parsers;
-using UAlbion.Game.AssetIds;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
-    public enum GameLanguage
-    {
-        German,
-        English,
-        French,
-    }
-
     [Event("assets:reload", "Flush the asset cache, forcing all data to be reloaded from disk")]
     public class ReloadAssetsEvent : GameEvent { }
 
@@ -30,7 +23,11 @@ namespace UAlbion.Game
 
     public class Assets : RegisteredComponent, IDisposable
     {
-        public Assets(AssetConfig config) : base(Handlers) { _config = config; }
+        public Assets(AssetConfig assetConfig, CoreSpriteConfig coreSpriteConfig) : base(Handlers)
+        {
+            _assetConfig = assetConfig;
+            _coreSpriteConfig = coreSpriteConfig;
+        }
 
         static readonly IList<Handler> Handlers = new Handler[]
         {
@@ -59,7 +56,8 @@ namespace UAlbion.Game
         }
 
         readonly object _syncRoot = new object();
-        readonly AssetConfig _config;
+        readonly AssetConfig _assetConfig;
+        readonly CoreSpriteConfig _coreSpriteConfig;
         readonly IDictionary<AssetType, XldFile[]> _xlds = new Dictionary<AssetType, XldFile[]>();
         IDictionary<AssetType, IDictionary<int, object>> _assetCache = new Dictionary<AssetType, IDictionary<int, object>>();
         IDictionary<AssetType, IDictionary<int, object>> _oldAssetCache = new Dictionary<AssetType, IDictionary<int, object>>();
@@ -114,7 +112,8 @@ namespace UAlbion.Game
             { AssetType.Dictionary,         (AssetLocation.Localised, "WORDLIS!.XLD") }, // Dictionary
             { AssetType.Script,             (AssetLocation.Base,      "SCRIPT!.XLD" ) }, // Script
             { AssetType.Picture,            (AssetLocation.Base,      "PICTURE!.XLD") }, // Texture (ILBM)
-            { AssetType.TransparencyTables, (AssetLocation.Base,      "TRANSTB!.XLD") }
+            { AssetType.TransparencyTables, (AssetLocation.Base,      "TRANSTB!.XLD") },
+            { AssetType.CoreGraphics,       (AssetLocation.MainExe,   "MAIN.EXE") },
         };
         // ReSharper restore StringLiteralTypo
 
@@ -148,38 +147,38 @@ namespace UAlbion.Game
             switch (location)
             {
                 case AssetLocation.Base:
-                    result.XldPath = Path.Combine(_config.BasePath, _config.XldPath, baseName);
-                    result.OverridePath = Try(Path.Combine(_config.BaseDataPath, baseName, objectNumber.ToString()));
+                    result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, baseName);
+                    result.OverridePath = Try(Path.Combine(_assetConfig.BaseDataPath, baseName, objectNumber.ToString()));
                     result.XldNameInConfig = baseName;
                     break;
 
                 case AssetLocation.BaseRaw:
-                    result.XldPath = Path.Combine(_config.BasePath, _config.XldPath, baseName);
-                    result.OverridePath = Try(Path.Combine(_config.BaseDataPath, baseName));
+                    result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, baseName);
+                    result.OverridePath = Try(Path.Combine(_assetConfig.BaseDataPath, baseName));
                     result.XldNameInConfig = baseName;
                     break;
 
                 case AssetLocation.Localised:
-                    result.XldPath = Path.Combine(_config.BasePath, _config.XldPath, lang, baseName);
-                    result.OverridePath = Path.Combine(_config.BaseDataPath, lang, baseName, objectNumber.ToString());
+                    result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, lang, baseName);
+                    result.OverridePath = Path.Combine(_assetConfig.BaseDataPath, lang, baseName, objectNumber.ToString());
                     result.XldNameInConfig = "$(LANG)\\" + baseName;
                     break;
 
                 case AssetLocation.LocalisedRaw:
-                    result.XldPath = Path.Combine(_config.BasePath, _config.XldPath, lang, baseName);
-                    result.OverridePath = Try(Path.Combine(_config.BaseDataPath, lang, baseName));
+                    result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, lang, baseName);
+                    result.OverridePath = Try(Path.Combine(_assetConfig.BaseDataPath, lang, baseName));
                     result.XldNameInConfig = "$(LANG)\\" + baseName;
                     break;
 
                 case AssetLocation.Initial:
-                    result.XldPath = Path.Combine(_config.BasePath, _config.XldPath, "INITIAL", baseName);
-                    result.OverridePath = Path.Combine(_config.BaseDataPath, "INITIAL", baseName, objectNumber.ToString());
+                    result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, "INITIAL", baseName);
+                    result.OverridePath = Path.Combine(_assetConfig.BaseDataPath, "INITIAL", baseName, objectNumber.ToString());
                     result.XldNameInConfig = "INITIAL\\" + baseName;
                     break;
 
                 case AssetLocation.Current:
-                    result.XldPath = Path.Combine(_config.BasePath, _config.XldPath, "CURRENT", baseName);
-                    result.OverridePath = Path.Combine(_config.BaseDataPath, "CURRENT", baseName, objectNumber.ToString());
+                    result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, "CURRENT", baseName);
+                    result.OverridePath = Path.Combine(_assetConfig.BaseDataPath, "CURRENT", baseName, objectNumber.ToString());
                     result.XldNameInConfig = "INITIAL\\" + baseName; // Note: Use the same metadata for CURRENT & INITIAL
                     break;
 
@@ -191,14 +190,17 @@ namespace UAlbion.Game
 
         object LoadAsset(AssetType type, int id, string name, GameLanguage language)
         {
+            var (location, baseName) = _assetFiles[type];
+            if (location == AssetLocation.MainExe || type == AssetType.CoreGraphics)
+                return AssetLoader.LoadCoreSprite((CoreSpriteId)id, _assetConfig.BasePath, _coreSpriteConfig);
+
             int xldIndex = id / 100;
             Debug.Assert(xldIndex >= 0);
             Debug.Assert(xldIndex <= 9);
             int objectIndex = id % 100;
-            var (location, baseName) = _assetFiles[type];
 
             var paths = GetAssetPaths(location, language, baseName, xldIndex, objectIndex);
-            var xldConfig = _config.Xlds[paths.XldNameInConfig];
+            var xldConfig = _assetConfig.Xlds[paths.XldNameInConfig];
             xldConfig.Assets.TryGetValue(objectIndex, out var assetConfig);
 
             if (paths.OverridePath != null || IsLocationRaw(location))
@@ -339,6 +341,7 @@ namespace UAlbion.Game
                 case AssetType.SmallPortrait:      return LoadTexture((SmallPortraitId)id);
                 case AssetType.TacticalIcon:       return LoadTexture((TacticId)id);
                 case AssetType.Wall3D:             return LoadTexture((DungeonWallId)id);
+                case AssetType.CoreGraphics:       return LoadTexture((CoreSpriteId)id);
                 default: return (ITexture)LoadAssetCached(type, id);
             }
         }
@@ -364,7 +367,8 @@ namespace UAlbion.Game
         public ITexture LoadTexture(SmallPortraitId id)      => (ITexture)LoadAssetCached(AssetType.SmallPortrait,      id);
         public ITexture LoadTexture(TacticId id)             => (ITexture)LoadAssetCached(AssetType.TacticalIcon,       id);
         public ITexture LoadTexture(FontId id)               => (ITexture)LoadAssetCached(AssetType.Font,               id);
-        public TilesetData LoadTileData(IconDataId id) => (TilesetData)LoadAssetCached(AssetType.IconData,              id);
+        public ITexture LoadTexture(CoreSpriteId id)         => (ITexture)LoadAssetCached(AssetType.CoreGraphics,       id);
+        public TilesetData LoadTileData(IconDataId id)       => (TilesetData)LoadAssetCached(AssetType.IconData,        id);
 
         public string LoadString(AssetType type, int id, GameLanguage language, int subItem)
         {

@@ -2,7 +2,7 @@
 using System.IO;
 using Newtonsoft.Json;
 
-namespace UAlbion.Formats
+namespace UAlbion.Formats.Config
 {
     public class ItemConfig
     {

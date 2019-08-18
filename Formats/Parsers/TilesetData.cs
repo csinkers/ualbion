@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {

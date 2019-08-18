@@ -77,7 +77,7 @@ namespace UAlbion.Core
         {
             // TODO: Build scenes from config
             var sceneExchange = new EventExchange(name, SceneExchange);
-            var camera = new OrthographicCamera(Window);
+            var camera = new OrthographicCamera(Window.Width, Window.Height);
             var scene = new Scene(camera, tileSize);
             scene.Attach(sceneExchange);
             scene.AddRenderer(_igRenderable);
@@ -90,7 +90,7 @@ namespace UAlbion.Core
         public (EventExchange, Scene) Create3DScene(string name)
         {
             var sceneExchange = new EventExchange(name, SceneExchange);
-            var camera = new PerspectiveCamera(GraphicsDevice, Window);
+            var camera = new PerspectiveCamera(GraphicsDevice, Window.Width, Window.Height);
             var scene = new Scene(camera, Vector2.One);
             scene.Attach(sceneExchange);
             scene.AddRenderer(_igRenderable);
@@ -123,6 +123,7 @@ namespace UAlbion.Core
 
         public void Run()
         {
+            Raise(new WindowResizedEvent(Window.Width, Window.Height));
             Raise(new BeginFrameEvent());
             if (Scene == null)
                 throw new InvalidOperationException("The scene must be set before the main loop can be run.");
@@ -238,6 +239,7 @@ namespace UAlbion.Core
 
                 Window = VeldridStartup.CreateWindow(ref windowInfo);
                 Window.BorderVisible = false;
+                Window.CursorVisible = false;
                 Window.Resized += () => _windowResized = true;
             }
 

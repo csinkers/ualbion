@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Input
@@ -9,7 +10,15 @@ namespace UAlbion.Game.Input
     {
         static readonly IList<Handler> Handlers = new Handler[]
         {
-            new Handler<NormalMouseMode, SetMouseModeEvent>((x,e) => x._isActive = e.Mode == MouseModeId.Normal),
+            new Handler<NormalMouseMode, SetMouseModeEvent>((x,e) =>
+            {
+                var activating = e.Mode == MouseModeId.Normal && !x._isActive;
+                if (activating)
+                {
+                    x._isActive = true;
+                    x.Raise(new SetCursorEvent(CoreSpriteId.Cursor));
+                }
+            }),
             new Handler<NormalMouseMode, InputEvent>((x,e) => x.OnInput(e)), 
         };
 

@@ -4,7 +4,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace UAlbion.Formats
+namespace UAlbion.Formats.Config
 {
     public enum XldObjectType
     {

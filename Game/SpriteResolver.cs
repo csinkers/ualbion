@@ -4,7 +4,6 @@ using System.Numerics;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Game.AssetIds;
 using Veldrid;
 
 namespace UAlbion.Game
@@ -34,7 +33,8 @@ namespace UAlbion.Game
             { typeof(SmallPortraitId)     , AssetType.SmallPortrait },
             { typeof(TacticId)            , AssetType.TacticalIcon },
             { typeof(DungeonWallId)       , AssetType.Wall3D},
-            { typeof(PictureId)           , AssetType.Picture }
+            { typeof(PictureId)           , AssetType.Picture },
+            { typeof(CoreSpriteId)        , AssetType.CoreGraphics }
         };
 
         public SpriteResolver(Assets assets)

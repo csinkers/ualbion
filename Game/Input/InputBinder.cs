@@ -1,14 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using Veldrid;
 
 namespace UAlbion.Game.Input
 {
+    public class SetCursorEvent : GameEvent
+    {
+        public SetCursorEvent(CoreSpriteId cursorId)
+        {
+            CursorId = cursorId;
+        }
+
+        public CoreSpriteId CursorId { get; }
+    }
+
     public enum InputMode
     {
         Global,

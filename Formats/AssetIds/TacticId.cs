@@ -1,6 +1,6 @@
-namespace UAlbion.Game.AssetIds
+namespace UAlbion.Formats.AssetIds
 {
-    public enum TacticId
+    public enum TacticId // TODO: Add this info to a JSON file and then auto-generate the enum.
     {
         Unknown0 = 0,
         Unknown1 = 1,

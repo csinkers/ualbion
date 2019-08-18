@@ -63,10 +63,10 @@ namespace UAlbion.Core
 
         public float AspectRatio => WindowWidth / WindowHeight;
 
-        public OrthographicCamera(Sdl2Window window) : base(Handlers)
+        public OrthographicCamera(float windowWidth, float windowHeight) : base(Handlers)
         {
-            WindowWidth = window.Width;
-            WindowHeight = window.Height;
+            WindowWidth = windowWidth;
+            WindowHeight = windowHeight;
             UpdatePerspectiveMatrix();
             UpdateViewMatrix();
         }

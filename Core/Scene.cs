@@ -10,6 +10,8 @@ namespace UAlbion.Core
 {
     public class Scene : Component
     {
+        readonly IDictionary<Type, IRenderer> _renderers;
+
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<Scene, SetRawPaletteEvent>((x, e) => x._palette = new Palette(e.Name, e.Entries))
@@ -17,22 +19,17 @@ namespace UAlbion.Core
 
         readonly IDictionary<Type, IList<IRenderable>> _renderables = new Dictionary<Type, IList<IRenderable>>();
         readonly IDictionary<int, IList<IRenderable>> _processedRenderables = new Dictionary<int, IList<IRenderable>>();
-        readonly IDictionary<Type, IRenderer> _renderers = new Dictionary<Type, IRenderer>();
         Palette _palette;
         CommandList _resourceUpdateCl;
 
         public ICamera Camera { get; }
         public Vector2 TileSize { get; }
 
-        public Scene(ICamera camera, Vector2 tileSize) : base(Handlers)
+        public Scene(ICamera camera, Vector2 tileSize, IDictionary<Type, IRenderer> renderers) : base(Handlers)
         {
+            _renderers = renderers;
             Camera = camera;
             TileSize = tileSize;
-        }
-
-        public void AddRenderer(IRenderer r)
-        {
-            _renderers.Add(r.GetType(), r);
         }
 
         public void RenderAllStages(GraphicsDevice gd, CommandList cl, SceneContext sc)
@@ -152,17 +149,11 @@ namespace UAlbion.Core
 
         internal void DestroyAllDeviceObjects()
         {
-            foreach (var r in _renderers.Values)
-                r.DestroyDeviceObjects();
-
             _resourceUpdateCl.Dispose();
         }
 
         internal void CreateAllDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
         {
-            foreach (var r in _renderers.Values)
-                r.CreateDeviceObjects(gd, cl, sc);
-
             _resourceUpdateCl = gd.ResourceFactory.CreateCommandList();
             _resourceUpdateCl.Name = "Scene Resource Update Command List";
         }

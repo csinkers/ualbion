@@ -46,7 +46,7 @@ namespace UAlbion.Game.Entities
         readonly LargeNpcId _id;
         readonly MapNpc.Waypoint[] _waypoints;
         Vector2 _position;
-        Vector2 _size;
+        Vector2 _size = Vector2.One;
         Animation _animation;
         int _frame;
         public Vector3 Normal => Vector3.UnitZ;
@@ -56,8 +56,12 @@ namespace UAlbion.Game.Entities
             _id = id;
             _waypoints = waypoints;
             _position = new Vector2(waypoints[0].X * 8, waypoints[0].Y * 8);
-            assets.LoadTexture(_id).GetSubImageDetails(_frame, out var size, out _, out _, out _);
-            _size = size; // TODO: Update to handle variable sized sprites
+            var texture = assets.LoadTexture(_id);
+            if (texture != null)
+            {
+                texture.GetSubImageDetails(_frame, out var size, out _, out _, out _);
+                _size = size; // TODO: Update to handle variable sized sprites
+            }
         }
 
         void Select(WorldCoordinateSelectEvent e)

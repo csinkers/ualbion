@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Reflection;
 using UAlbion.Core;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game;
@@ -46,10 +47,11 @@ namespace UAlbion
             using (var engine = new Engine(backend))
             {
                 var spriteResolver = new SpriteResolver(assets);
+                engine.AddRenderer(new SpriteRenderer(engine.TextureManager, spriteResolver));
                 assets.Attach(engine.GlobalExchange);
                 new ConsoleLogger().Attach(engine.GlobalExchange);
                 new GameClock().Attach(engine.GlobalExchange);
-                new SceneLoader(assets, engine, spriteResolver).Attach(engine.GlobalExchange);
+                new SceneLoader(assets, engine).Attach(engine.GlobalExchange);
                 new DebugMapInspector().Attach(engine.GlobalExchange);
 
                 new NormalMouseMode().Attach(engine.GlobalExchange);

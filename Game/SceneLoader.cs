@@ -2,7 +2,6 @@
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
@@ -19,7 +18,6 @@ namespace UAlbion.Game
 
         readonly Assets _assets;
         readonly Engine _engine;
-        readonly ISpriteResolver _spriteResolver;
         MapDataId? _pendingMapChange;
 
         void LoadMap()
@@ -32,7 +30,6 @@ namespace UAlbion.Game
                 var (sceneExchange, scene) = _engine.Create2DScene("TestScene", Vector2.One);
                 var paletteManager = new PaletteManager(_assets);
                 paletteManager.Attach(sceneExchange);
-                scene.AddRenderer(new SpriteRenderer(_engine.TextureManager, _spriteResolver));
                 _engine.SetScene(scene);
                 _pendingMapChange = null;
                 return;
@@ -45,7 +42,6 @@ namespace UAlbion.Game
                 var (sceneExchange, scene) = _engine.Create2DScene(_pendingMapChange.Value.ToString(), map.TileSize);
                 var paletteManager = new PaletteManager(_assets);
                 paletteManager.Attach(sceneExchange);
-                scene.AddRenderer(new SpriteRenderer(_engine.TextureManager, _spriteResolver));
 
                 map.Attach(sceneExchange);
                 scene.Camera.Position = new Vector3(map.PhysicalSize.X / 2, map.PhysicalSize.Y / 2, 0);
@@ -61,7 +57,6 @@ namespace UAlbion.Game
                 var (sceneExchange, scene) = _engine.Create3DScene(_pendingMapChange.Value.ToString());
                 var paletteManager = new PaletteManager(_assets);
                 paletteManager.Attach(sceneExchange);
-                scene.AddRenderer(new SpriteRenderer(_engine.TextureManager, _spriteResolver));
 
                 map.Attach(sceneExchange);
                 scene.Camera.Position = Vector3.Zero;
@@ -72,11 +67,10 @@ namespace UAlbion.Game
             _pendingMapChange = null;
         }
 
-        public SceneLoader(Assets assets, Engine engine, ISpriteResolver spriteResolver) : base(Handlers)
+        public SceneLoader(Assets assets, Engine engine) : base(Handlers)
         {
             _assets = assets;
             _engine = engine;
-            _spriteResolver = spriteResolver;
             // TODO: Get it to generate its own scenes.
         }
     }

@@ -32,13 +32,12 @@ namespace UAlbion.Core
         public EventExchange GlobalExchange { get; }
         public EventExchange SceneExchange { get; }
 
+        readonly IDictionary<Type, IRenderer> _renderers = new Dictionary<Type, IRenderer>();
         public ITextureManager TextureManager { get; }
         readonly FrameTimeAverager _frameTimeAverager = new FrameTimeAverager(0.5);
         readonly FullScreenQuad _fullScreenQuad;
-        readonly ScreenDuplicator _duplicator;
         readonly DebugGuiRenderer _igRenderable;
         readonly SceneContext _sceneContext = new SceneContext();
-        readonly DebugMenus _debugMenus;
 
         public Scene Scene { get; private set; }
         CommandList _frameCommands;
@@ -58,19 +57,27 @@ namespace UAlbion.Core
             TextureManager = new TextureManager();
             ChangeBackend(backend);
             CheckForErrors();
+            Sdl2Native.SDL_Init(SDLInitFlags.GameController);
 
             _igRenderable = new DebugGuiRenderer(Window.Width, Window.Height);
-            _duplicator = new ScreenDuplicator();
             _fullScreenQuad = new FullScreenQuad();
-            _debugMenus = new DebugMenus(this);
+            var duplicator = new ScreenDuplicator();
+            var debugMenus = new DebugMenus(this);
 
-            Sdl2Native.SDL_Init(SDLInitFlags.GameController);
-            Attach(GlobalExchange);
+            debugMenus.Attach(GlobalExchange);
             TextureManager.Attach(GlobalExchange);
-            _igRenderable.Attach(GlobalExchange);
-            _duplicator.Attach(GlobalExchange);
-            _fullScreenQuad.Attach(GlobalExchange);
-            _debugMenus.Attach(GlobalExchange);
+            Attach(GlobalExchange);
+
+            AddRenderer(_igRenderable);
+            AddRenderer(duplicator);
+            AddRenderer(_fullScreenQuad);
+        }
+
+        public void AddRenderer(IRenderer renderer)
+        {
+            _renderers.Add(renderer.GetType(), renderer);
+            if(renderer is IComponent component)
+                component.Attach(GlobalExchange);
         }
 
         public (EventExchange, Scene) Create2DScene(string name, Vector2 tileSize)
@@ -78,11 +85,8 @@ namespace UAlbion.Core
             // TODO: Build scenes from config
             var sceneExchange = new EventExchange(name, SceneExchange);
             var camera = new OrthographicCamera(Window.Width, Window.Height);
-            var scene = new Scene(camera, tileSize);
+            var scene = new Scene(camera, tileSize, _renderers);
             scene.Attach(sceneExchange);
-            scene.AddRenderer(_igRenderable);
-            scene.AddRenderer(_duplicator);
-            scene.AddRenderer(_fullScreenQuad);
             camera.Attach(sceneExchange);
             return (sceneExchange, scene);
         }
@@ -91,11 +95,8 @@ namespace UAlbion.Core
         {
             var sceneExchange = new EventExchange(name, SceneExchange);
             var camera = new PerspectiveCamera(GraphicsDevice, Window.Width, Window.Height);
-            var scene = new Scene(camera, Vector2.One);
+            var scene = new Scene(camera, Vector2.One, _renderers);
             scene.Attach(sceneExchange);
-            scene.AddRenderer(_igRenderable);
-            scene.AddRenderer(_duplicator);
-            scene.AddRenderer(_fullScreenQuad);
             camera.Attach(sceneExchange);
             return (sceneExchange, scene);
         }
@@ -270,6 +271,10 @@ namespace UAlbion.Core
             initCL.Name = "Recreation Initialization Command List";
             initCL.Begin();
             _sceneContext.CreateDeviceObjects(GraphicsDevice, initCL, _sceneContext);
+
+            foreach (var r in _renderers.Values)
+                r.CreateDeviceObjects(GraphicsDevice, initCL, _sceneContext);
+
             Scene.CreateAllDeviceObjects(GraphicsDevice, initCL, _sceneContext);
             initCL.End();
             GraphicsDevice.SubmitCommands(initCL);
@@ -281,6 +286,9 @@ namespace UAlbion.Core
             GraphicsDevice.WaitForIdle();
             _frameCommands.Dispose();
             _sceneContext.DestroyDeviceObjects();
+            foreach (var r in _renderers.Values)
+                r.DestroyDeviceObjects();
+
             Scene.DestroyAllDeviceObjects();
             StaticResourceCache.DestroyAllDeviceObjects();
             TextureManager.DestroyDeviceObjects();

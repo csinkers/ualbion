@@ -9,7 +9,7 @@ namespace UAlbion.Game.Input
 {
     public class CursorManager : Component
     {
-        const float UiScaleFactor = 8.0f; // TODO: Config
+        const float UiScaleFactor = 4.0f; // TODO: Config
         readonly Assets _assets;
         CoreSpriteId _cursorId = CoreSpriteId.Cursor;
         Vector2 _position;
@@ -45,8 +45,8 @@ namespace UAlbion.Game.Input
                 return;
 
             var position = new Vector3(
-                4 * _position.X / _windowSize.X - 2.0f,
-                2.0f - 4 * _position.Y / _windowSize.Y,
+                2 * _position.X / _windowSize.X - 1.0f,
+                1.0f - 2 * _position.Y / _windowSize.Y,
                 1.0f);
 
             var size = new Vector2(

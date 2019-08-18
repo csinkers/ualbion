@@ -107,9 +107,9 @@ namespace UAlbion.Core.Visual
                 fsin_2 = _Flags;
 
                 if((_Flags & 1) != 0) // If NoTransform set
-                    gl_Position = vec4((_Position * _Size), 0, 1) + vec4(_Offset, 1);
+                    gl_Position = vec4((_Position * _Size) + _Offset.xy, _Offset.z, 1);
                 else
-                    gl_Position = Projection * View * (vec4(_Position * _Size, 0, 1) + vec4(_Offset, 1));
+                    gl_Position = Projection * View * vec4((_Position * _Size) + _Offset.xy, _Offset.z, 1);
             }";
 
             public const string FragmentShader = @"

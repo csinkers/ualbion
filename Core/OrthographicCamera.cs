@@ -40,7 +40,7 @@ namespace UAlbion.Core
             var normalisedScreenPosition = new Vector3(2 * e.Position.X / WindowWidth - 1.0f, -2 * e.Position.Y / WindowHeight + 1.0f, 0.0f);
             var rayOrigin = Vector3.Transform(normalisedScreenPosition + Vector3.UnitZ, inverse);
             var rayDirection = Vector3.Transform(normalisedScreenPosition, inverse) - rayOrigin;
-            rayOrigin = new Vector3(rayOrigin.X * 2, rayOrigin.Y * 2, rayOrigin.Z);
+            rayOrigin = new Vector3(rayOrigin.X, rayOrigin.Y, rayOrigin.Z);
             Raise(new WorldCoordinateSelectEvent(rayOrigin, rayDirection, e.RegisterHit));
         }
 

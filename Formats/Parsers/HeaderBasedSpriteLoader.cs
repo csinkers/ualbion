@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Parsers
     {
         public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
         {
-            Debug.Assert(!config.Parent.RotatedLeft);
+            Debug.Assert(config.Parent.RotatedLeft != true);
             var sprite = new AlbionSprite();
             long initialPosition = br.BaseStream.Position;
             sprite.Name = name;

@@ -47,7 +47,7 @@ namespace UAlbion.Formats.Parsers
                 currentY += height;
             }
 
-            if (config.Parent.RotatedLeft)
+            if (config.Parent.RotatedLeft == true)
             {
                 var rotatedSprite = new AlbionSprite
                 {

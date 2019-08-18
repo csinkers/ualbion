@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -54,7 +55,7 @@ namespace UAlbion.Formats
             public XldObjectType Type;
             public int? Width;
             public int? Height;
-            public bool RotatedLeft;
+            public bool? RotatedLeft;
             public IDictionary<int, Asset> Assets { get; } = new Dictionary<int, Asset>();
         }
 
@@ -121,6 +122,8 @@ namespace UAlbion.Formats
         {
             foreach (var xld in Xlds)
             {
+                if (xld.Value.RotatedLeft == false)
+                    xld.Value.RotatedLeft = null;
                 foreach (var asset in xld.Value.Assets)
                 {
                     if (string.IsNullOrWhiteSpace(asset.Value.Name))

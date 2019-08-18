@@ -55,9 +55,10 @@ namespace UAlbion.Game
 
             result.SubObjects =
                 publicProperties.Select(FormatProperty)
-                .Concat(publicFields.Select(FormatField))
-                .Concat(privateProperties.Select(FormatProperty))
-                .Concat(privateFields.Select(FormatField));
+                .Concat(publicFields.Select(FormatField)).OrderBy(x => x.Name)
+                .Concat(
+                    privateProperties.Select(FormatProperty)
+                    .Concat(privateFields.Select(FormatField)).OrderBy(x => x.Name));
 
             return result;
         }

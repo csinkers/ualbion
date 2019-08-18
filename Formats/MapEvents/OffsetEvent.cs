@@ -6,8 +6,8 @@ namespace UAlbion.Formats.MapEvents
     {
         public OffsetEvent(BinaryReader br, int id, EventType type) : base(id, type)
         {
-            Unk1 = br.ReadByte(); // +1
-            Unk2 = br.ReadByte(); // +2
+            X = br.ReadSByte(); // +1
+            Y = br.ReadSByte(); // +2
             Unk3 = br.ReadByte(); // +3
             Unk4 = br.ReadByte(); // +4
             Unk5 = br.ReadByte(); // +5
@@ -15,8 +15,8 @@ namespace UAlbion.Formats.MapEvents
             Unk8 = br.ReadUInt16(); // +8
         }
 
-        public byte Unk1 { get; }
-        public byte Unk2 { get; }
+        public sbyte X { get; }
+        public sbyte Y { get; }
         public byte Unk3 { get; }
         public byte Unk4 { get; }
         public byte Unk5 { get; }

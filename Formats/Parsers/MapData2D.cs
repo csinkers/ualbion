@@ -82,6 +82,16 @@ namespace UAlbion.Formats.Parsers
             int eventCount = br.ReadUInt16();
             for (int i = 0; i < eventCount; i++)
                 map.Events.Add(MapEvent.Load(br, i));
+
+            foreach (var mapEvent in map.Events)
+            {
+                if (mapEvent.NextEventId.HasValue)
+                    mapEvent.NextEvent = map.Events[mapEvent.NextEventId.Value];
+
+                if (mapEvent is QueryEvent q && q.FalseEventId.HasValue)
+                    q.FalseEvent = map.Events[q.FalseEventId.Value];
+            }
+
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
             foreach (var npc in map.Npcs)

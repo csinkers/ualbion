@@ -16,7 +16,7 @@ namespace UAlbion.Formats.AssetIds
         Iskai8 = 11,
         Iskai9 = 12,
         IskaiChild5 = 13,
-        Celt = 14,
+        Assassin = 14,
         Iskai10 = 15,
         Iskai11 = 16,
         Iskai12 = 17,

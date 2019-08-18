@@ -280,7 +280,7 @@ namespace UAlbion.Game
             }
 
             object newAsset;
-            var name = GetNameForAsset(type, enumId);
+            var name = $"{type}.{enumId}";
             try
             {
                 newAsset = LoadAsset(type, id, name, language);
@@ -341,69 +341,6 @@ namespace UAlbion.Game
                 case AssetType.Wall3D:             return LoadTexture((DungeonWallId)id);
                 default: return (ITexture)LoadAssetCached(type, id);
             }
-        }
-
-        public string GetNameForAsset<T>(AssetType type, T id)
-        {
-            return $"{type}.{id}";
-            /*
-            switch (type)
-            {
-                case AssetType.AutomapGraphics: return $"AutomapGraphics:{id}";
-                case AssetType.CombatBackground: return $"CombatBackground:{id}";
-                case AssetType.CombatGraphics: return $"CombatGraphics:{id}";
-                case AssetType.BackgroundGraphics: return $"BackgroundGraphics:{id}";
-                case AssetType.Floor3D: return $"Floor3D:{id}";
-                case AssetType.Object3D: return $"Object3D:{id}";
-                case AssetType.Overlay3D: return $"Overlay3D:{id}";
-                case AssetType.Wall3D: return $"Wall3D:{id}";
-                case AssetType.FullBodyPicture: return $"FullBodyPicture:{id}";
-                case AssetType.IconData: return $"IconData:{id}";
-                case AssetType.IconGraphics: return $"IconGraphics:{id}";
-                case AssetType.ItemGraphics: return $"ItemGraphics:{id}"; // TODO: Enum
-                case AssetType.BigNpcGraphics: return $"BigNpcGraphics:{id}";
-                case AssetType.BigPartyGraphics: return $"BigPartyGraphics:{id}";
-                case AssetType.MonsterGraphics: return $"MonsterGraphics:{id}";
-                case AssetType.Picture: return $"Picture:{id}";
-                case AssetType.SmallNpcGraphics: return $"SmallNpcGraphics:{id}";
-                case AssetType.SmallPartyGraphics: return $"SmallPartyGraphics:{id}";
-                case AssetType.SmallPortrait: return $"SmallPortrait:{id}";
-                case AssetType.TacticalIcon: return $"TacticalIcon:{id}";
-                case AssetType.Font: return $"Font:{id}";
-                    
-                case AssetType.MapData:
-                case AssetType.Palette:
-                case AssetType.PaletteNull:
-                case AssetType.Slab:
-                case AssetType.LabData:
-                case AssetType.BlockList:
-                case AssetType.PartyCharacterData:
-                case AssetType.SystemTexts:
-                case AssetType.EventSet:
-                case AssetType.EventTexts:
-                case AssetType.MapTexts:
-                case AssetType.ItemList:
-                case AssetType.ItemNames:
-                case AssetType.Automap:
-                case AssetType.Song:
-                case AssetType.Sample:
-                case AssetType.WaveLibrary:
-                case AssetType.Unnamed2:
-                case AssetType.ChestData:
-                case AssetType.MerchantData:
-                case AssetType.NpcCharacterData:
-                case AssetType.MonsterGroup:
-                case AssetType.MonsterCharacter:
-                case AssetType.SpellData:
-                case AssetType.Flic:
-                case AssetType.Dictionary:
-                case AssetType.Script:
-                case AssetType.TransparencyTables:
-                default:
-                    return $"{type}.{id}";
-//, $"Pal:{id}"
-            }
-            */
         }
 
         public ITexture LoadTexture(AutoMapId id)            => (ITexture)LoadAssetCached(AssetType.AutomapGraphics,    id);

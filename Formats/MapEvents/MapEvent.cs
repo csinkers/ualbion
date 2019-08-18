@@ -45,6 +45,7 @@ namespace UAlbion.Formats.MapEvents
         public int Id { get; }
         public EventType Type { get; }
         public ushort? NextEventId { get; private set; }
+        public MapEvent NextEvent { get; set; }
 
         protected MapEvent(int id, EventType type)
         {
@@ -72,7 +73,7 @@ namespace UAlbion.Formats.MapEvents
                 case EventType.ChangeIcon:        result = new ChangeIconEvent(br, id, type); break;
                 case EventType.Encounter:         result = new EncounterEvent(br, id, type); break;
                 case EventType.PlaceAction:       result = new PlaceActionEvent(br, id, type); break;
-                case EventType.Query:             result = new QueryEvent(br, id, type); break;
+                case EventType.Query:             result = QueryEvent.Load(br, id, type); break;
                 case EventType.Modify:            result = ModifyEvent.Load(br, id, type); break;
                 case EventType.Action:            result = new ActionEvent(br, id, type); break;
                 case EventType.Signal:            result = new SignalEvent(br, id, type); break;

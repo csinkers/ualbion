@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Xml;
 using UAlbion.Formats;
 
 namespace GenerateEnums
@@ -24,13 +23,16 @@ namespace GenerateEnums
 
     class Program
     {
-        static readonly char[] ForbiddenCharacters = { ' ', '\t', '-', '(', ')', ',' };
+        static readonly char[] ForbiddenCharacters = { ' ', '\t', '-', '(', ')', ',', '?', '.', '"' };
         static string Sanitise(string x)
         {
             var chars = new List<char>();
             bool capitaliseNext = true;
             foreach (var c in x)
             {
+                if (c == '\'')
+                    continue;
+
                 if (!ForbiddenCharacters.Contains(c))
                 {
                     chars.Add(capitaliseNext ? char.ToUpper(c) : c);
@@ -72,6 +74,13 @@ namespace GenerateEnums
                         : new EnumEntry { Name = Sanitise(o.Value.Name), Value= id});
                 }
             }
+
+            ItemConfig itemConfig = ItemConfig.Load(baseDir);
+            enums["ItemId"] = new EnumData { Name = "ItemId" };
+            foreach (var item in itemConfig.Items)
+                enums["ItemId"].Entries.Add(string.IsNullOrEmpty(item.Value.Name)
+                    ? new EnumEntry { Name = $"Unknown{item.Key}", Value = item.Key }
+                    : new EnumEntry { Name = Sanitise(item.Value.Name), Value= item.Key});
 
             foreach (var e in enums.Values)
             {

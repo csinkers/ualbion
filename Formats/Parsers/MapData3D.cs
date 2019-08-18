@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Parsers
@@ -11,10 +13,10 @@ namespace UAlbion.Formats.Parsers
         public byte CeilingFlags { get; set; }
         public byte Width { get; set; }
         public byte Height { get; set; }
-        public int SongId { get; set; }
-        public int LabDataId { get; set; }
+        public SongId SongId { get; set; }
+        public LabyrinthDataId LabDataId { get; set; }
         public byte Unk7 { get; set; }
-        public int PaletteId { get; set; }
+        public PaletteId PaletteId { get; set; }
         public int Sound { get; set; }
         public int[] Contents { get; set; }
         public int[] Floors { get; set; }
@@ -26,32 +28,37 @@ namespace UAlbion.Formats.Parsers
         public byte[] AutomapGraphics { get; set; }
         public IList<ushort> ActiveMapEvents { get; } = new List<ushort>();
 
-        public static MapData3D Load(BinaryReader br, string name)
+        public static MapData3D Load(BinaryReader br, long streamLength, string name)
         {
             var startPosition = br.BaseStream.Position;
 
             var map = new MapData3D();
             map.CeilingFlags = br.ReadByte(); // 0
-            int npcCount = br.ReadByte(); // 1
+            int npcCount = br.ReadByte();     // 1
             if (npcCount == 0) npcCount = 0x20;
             else if (npcCount == 0x40) npcCount = 0x60;
 
             var mapType = br.ReadByte(); // 2
-            Debug.Assert(1 == mapType); // 1 = 3D, 2 = 2D
+            Debug.Assert(1 == mapType);  // 1 = 3D, 2 = 2D
 
-            map.SongId    = br.ReadByte() - 1; //3
-            map.Width     = br.ReadByte(); //4
-            map.Height    = br.ReadByte(); //5
-            map.LabDataId = br.ReadByte() - 1; //6
-            map.Unk7 = br.ReadByte(); //7 Possibly combat background??
-            map.PaletteId = br.ReadByte() - 1; //8
-            map.Sound = br.ReadByte() - 1; //9
+            map.SongId    = (SongId)br.ReadByte() - 1; // 3
+            map.Width     = br.ReadByte();     // 4
+            map.Height    = br.ReadByte();     // 5
+            map.LabDataId = (LabyrinthDataId)br.ReadByte() - 1; // 6
+            map.Unk7 = br.ReadByte();          // 7 Possibly combat background??
+            map.PaletteId = (PaletteId)br.ReadByte() - 1; // 8
+            map.Sound = br.ReadByte() - 1;     // 9
 
             for (int i = 0; i < npcCount; i++)
-                map.Npcs.Add(MapNpc.Load(br));
+            {
+                var npc = MapNpc.Load(br);
+                if (npc.Id == 0) continue;
+                map.Npcs.Add(npc);
+            }
+            Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
             map.Contents = new int[map.Width * map.Height];
-            map.Floors = new int[map.Width * map.Height];
+            map.Floors   = new int[map.Width * map.Height];
             map.Ceilings = new int[map.Width * map.Height];
             for (int i = 0; i < map.Width * map.Height; i++)
             {
@@ -59,10 +66,12 @@ namespace UAlbion.Formats.Parsers
                 map.Floors[i]   = br.ReadByte();
                 map.Ceilings[i] = br.ReadByte();
             }
+            Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
             int zoneCount = br.ReadUInt16();
             for (int i = 0; i < zoneCount; i++)
                 map.Zones.Add(MapEventZone.LoadGlobalZone(br));
+            Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
             for (int j = 0; j < map.Height; j++)
             {
@@ -71,16 +80,28 @@ namespace UAlbion.Formats.Parsers
                     map.Zones.Add(MapEventZone.LoadZone(br, (ushort)j));
             }
 
+            if (br.BaseStream.Position == startPosition + streamLength)
+            {
+                Debug.Assert(map.Zones.Count == 0);
+                return map;
+            }
+
             int eventCount = br.ReadUInt16();
             for (int i = 0; i < eventCount; i++)
                 map.Events.Add(MapEvent.Load(br, i));
+            Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
             foreach(var npc in map.Npcs)
                 npc.LoadWaypoints(br);
+            Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
             int automapInfoCount = br.ReadUInt16();
-            for (int i = 0; i < automapInfoCount; i++)
-                map.Automap.Add(AutomapInfo.Load(br));
+            if (automapInfoCount != 0xffff)
+            {
+                for (int i = 0; i < automapInfoCount; i++)
+                    map.Automap.Add(AutomapInfo.Load(br));
+                Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
+            }
 
             map.AutomapGraphics = br.ReadBytes(0x40);
 
@@ -92,6 +113,7 @@ namespace UAlbion.Formats.Parsers
 
                 map.ActiveMapEvents.Add(eventId);
             }
+            Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
             return map;
         }
@@ -112,6 +134,16 @@ namespace UAlbion.Formats.Parsers
                 i.Unk2 = br.ReadByte();
                 i.Unk3 = br.ReadByte();
                 var nameBytes = br.ReadBytes(15);
+
+                bool done = false; // Verify that strings contain no embedded nulls.
+                foreach (var t in nameBytes)
+                {
+                    if(done)
+                        Debug.Assert(t == 0);
+                    else if (t == 0)
+                        done = true;
+                }
+
                 i.Name = Encoding.ASCII.GetString(nameBytes);
                 return i;
             }

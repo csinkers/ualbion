@@ -2,7 +2,7 @@
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Objects;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
@@ -57,6 +57,16 @@ namespace UAlbion.Game
             var mapData3D = _assets.LoadMap3D(_pendingMapChange.Value);
             if (mapData3D != null)
             {
+                var map = new Map3D(_assets, _pendingMapChange.Value);
+                var (sceneExchange, scene) = _engine.Create3DScene(_pendingMapChange.Value.ToString());
+                var paletteManager = new PaletteManager(_assets);
+                paletteManager.Attach(sceneExchange);
+                scene.AddRenderer(new SpriteRenderer(_engine.TextureManager, _spriteResolver));
+
+                map.Attach(sceneExchange);
+                scene.Camera.Position = Vector3.Zero;
+                _engine.SetScene(scene);
+                Raise(new LogEvent((int)LogEvent.Level.Info, $"Loaded map {(int)_pendingMapChange}: {_pendingMapChange}"));
             }
 
             _pendingMapChange = null;
@@ -70,4 +80,5 @@ namespace UAlbion.Game
             // TODO: Get it to generate its own scenes.
         }
     }
+
 }

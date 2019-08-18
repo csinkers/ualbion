@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Numerics;
 
-namespace UAlbion.Core.Objects
+namespace UAlbion.Core.Visual
 {
     public abstract class SpriteDefinition : IRenderable
     {
-        protected SpriteDefinition(int subObject, Vector2 position, int renderOrder, SpriteFlags flags, Vector2? size)
+        protected SpriteDefinition(int subObject, Vector3 position, int renderOrder, SpriteFlags flags, Vector2? size)
         {
             SubObject = subObject;
             Position = position;
@@ -18,7 +18,7 @@ namespace UAlbion.Core.Objects
         public int RenderOrder { get; }
         public SpriteFlags Flags { get; }
         public int SubObject { get; }
-        public Vector2 Position { get; }
+        public Vector3 Position { get; }
         public Vector2? Size { get; }
         public abstract Type IdType { get; }
         public abstract int NumericId { get; }
@@ -26,7 +26,7 @@ namespace UAlbion.Core.Objects
 
     public class SpriteDefinition<T> : SpriteDefinition where T : Enum
     {
-        public SpriteDefinition(T id, int subObject, Vector2 position, int renderOrder, SpriteFlags flags, Vector2? size = null)
+        public SpriteDefinition(T id, int subObject, Vector3 position, int renderOrder, SpriteFlags flags, Vector2? size = null)
             : base(subObject, position, renderOrder, flags, size) { Id = id; }
 
         public T Id { get; }

@@ -40,7 +40,7 @@ namespace UAlbion.Formats.Parsers
         public byte Sound { get; set; }
         public ushort? EventNumber { get; set; }
         public ushort ObjectNumber { get; set; }
-        public int Flags { get; set; } // 1=Dialogue, 2=AutoAttack, 11=ReturnMsg
+        public NpcFlags Flags { get; set; } // 1=Dialogue, 2=AutoAttack, 11=ReturnMsg
         public MovementType Movement { get; set; }
         public ushort Unk8 { get; set; }
         public int Unk9 { get; set; }
@@ -54,8 +54,8 @@ namespace UAlbion.Formats.Parsers
             npc.EventNumber = br.ReadUInt16(); // +2
             if (npc.EventNumber == 0xffff) npc.EventNumber = null;
 
-            npc.ObjectNumber = br.ReadUInt16(); // +4
-            npc.Flags = br.ReadByte(); // +6 // Combine this & MovementType ?
+            npc.ObjectNumber = (ushort)(br.ReadUInt16() - 1); // +4
+            npc.Flags = (NpcFlags)br.ReadByte(); // +6 // Combine this & MovementType ?
             npc.Movement = (MovementType)br.ReadByte(); // +7
             npc.Unk8 = br.ReadByte(); // +8
             npc.Unk9 = br.ReadByte(); // +9

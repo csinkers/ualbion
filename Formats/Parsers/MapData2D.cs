@@ -45,12 +45,11 @@ namespace UAlbion.Formats.Parsers
             map.PaletteId = br.ReadByte() - 1; //8
             map.FrameRate = br.ReadByte(); //9
 
-            var npcs = new List<MapNpc>();
             for (int i = 0; i < npcCount; i++)
             {
                 var npc = MapNpc.Load(br);
                 if (npc.Id == 0) continue;
-                npcs.Add(npc);
+                map.Npcs.Add(npc);
             }
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
@@ -85,11 +84,8 @@ namespace UAlbion.Formats.Parsers
                 map.Events.Add(MapEvent.Load(br, i));
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
-            foreach (var npc in npcs)
+            foreach (var npc in map.Npcs)
                 npc.LoadWaypoints(br);
-
-            foreach (var npc in npcs.Where(x => x.Id != 0))
-                map.Npcs.Add(npc);
 
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 

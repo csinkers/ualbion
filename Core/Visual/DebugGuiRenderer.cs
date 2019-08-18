@@ -4,7 +4,7 @@ using System.Diagnostics;
 using UAlbion.Core.Events;
 using Veldrid;
 
-namespace UAlbion.Core.Objects
+namespace UAlbion.Core.Visual
 {
     public class DebugGuiRenderer : Component, IRenderer, IRenderable
     {

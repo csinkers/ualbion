@@ -25,13 +25,13 @@ namespace UAlbion.Game
             int hitId = 0;
             foreach (var hit in _hits)
             {
+                var p = hit.IntersectionPoint;
+                ImGui.SetNextTreeNodeOpen(true);
                 if (ImGui.TreeNode($"Hit {hitId}"))
                 {
-                    ImGui.TextColored(new Vector4(1.0f, 0.8f, 0.0f, 1.0f), hit.Name);
-                    ImGui.Value("X", hit.IntersectionPoint.X);
-                    ImGui.Value("Y", hit.IntersectionPoint.Y);
-                    ImGui.Value("Z", hit.IntersectionPoint.Z);
-                    ImGui.TextWrapped($"{hit.Target}");
+                    ImGui.TextColored(new Vector4(1.0f, 0.8f, 0.0f, 1.0f), $"{hit.Name} ({ p.X}, {p.Y}, {p.Z})");
+                    var reflected = Reflector.Reflect(hit.Target.ToString(), hit.Target);
+                    RenderNode(reflected);
                     ImGui.TreePop();
                 }
 
@@ -50,6 +50,23 @@ namespace UAlbion.Game
             ScrollBox: BeginChild, EndChild
 
             */
+        }
+
+        void RenderNode(Reflector.ReflectedObject reflected)
+        {
+            if (reflected.SubObjects != null)
+            {
+                if (ImGui.TreeNode($"{reflected.Name}: {reflected.Value} ({reflected.Object.GetType().Name})"))
+                {
+                    foreach (var child in reflected.SubObjects)
+                        RenderNode(child);
+                    ImGui.TreePop();
+                }
+            }
+            else
+            {
+                ImGui.TextWrapped($"{reflected.Name}: {reflected.Value} ({reflected.Object?.GetType().Name})");
+            }
         }
 
         public DebugMapInspector() : base(Handlers)

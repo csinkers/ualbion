@@ -11,7 +11,7 @@ namespace UAlbion.Formats.MapEvents
             Mode = (QuantityChangeOperation) br.ReadByte(); // 2
             Unk3 = br.ReadByte(); // 3
             Unk4 = br.ReadByte(); // 4
-            Debug.Assert(Unk4 == 0);
+            Debug.Assert(Unk4 == 0 || Unk4 == 3); // Always 0 for 2D?
             PartyMemberId = br.ReadByte(); // 5
             Unk6 = br.ReadUInt16(); // 8
             Amount = br.ReadUInt16(); // 8

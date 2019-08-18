@@ -4,7 +4,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class DummyMapEvent : MapEvent
     {
-        public DummyMapEvent(int id, BinaryReader br, EventType type) : base(id, type)
+        public DummyMapEvent(BinaryReader br, int id, EventType type) : base(id, type)
         {
             Unk1 = br.ReadByte(); // +1
             Unk2 = br.ReadByte(); // +2

@@ -4,7 +4,7 @@ using UAlbion.Core.Events;
 using Veldrid;
 using Veldrid.Utilities;
 
-namespace UAlbion.Core.Objects
+namespace UAlbion.Core.Visual
 {
     class ScreenDuplicator : Component, IRenderable, IRenderer
     {

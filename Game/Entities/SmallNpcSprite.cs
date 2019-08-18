@@ -2,10 +2,9 @@
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Objects;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Parsers;
-using UAlbion.Game.AssetIds;
 
 namespace UAlbion.Game.Entities
 {
@@ -47,7 +46,8 @@ namespace UAlbion.Game.Entities
 
         void Render(RenderEvent e)
         {
-            var npcSprite = new SpriteDefinition<SmallNpcId>(_id, 0, _position, (int)DrawLayer.Characters1, 0);
+            var positionLayered = new Vector3(_position, (255 - _position.Y + (int)DrawLayer.Characters1) / 255.0f);
+            var npcSprite = new SpriteDefinition<SmallNpcId>(_id, 0, positionLayered, (int)DrawLayer.Characters1, 0);
             e.Add(npcSprite);
         }
     }

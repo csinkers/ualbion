@@ -2,11 +2,13 @@
 {
     public enum DrawLayer
     {
-        Background, // Skybox in 3D
-        Underlay,
+        Background = 0, // Skybox in 3D
+        Underlay = 0,
         Characters1,
-        Overlay,
+        Overlay1,
         Characters2,
+        Overlay2,
+        Overlay3,
         // Items,
         // Effects,
         Diagnostic, // Missing textures etc

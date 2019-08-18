@@ -2,8 +2,8 @@
 using System.Reflection;
 using UAlbion.Core;
 using UAlbion.Formats;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Game;
-using UAlbion.Game.AssetIds;
 using UAlbion.Game.Events;
 using UAlbion.Game.Input;
 using Veldrid;
@@ -68,7 +68,8 @@ namespace UAlbion
                 new GameClock().Attach(engine.GlobalExchange);
                 new SceneLoader(assets, engine, spriteResolver).Attach(engine.GlobalExchange);
                 new DebugMapInspector().Attach(engine.GlobalExchange);
-                engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.HausDesJägerclans), null);
+                //engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.HausDesJägerclans), null);
+                engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.TorontoTeil1), null);
 
                 new NormalMouseMode().Attach(engine.GlobalExchange);
                 new DebugPickMouseMode().Attach(engine.GlobalExchange);

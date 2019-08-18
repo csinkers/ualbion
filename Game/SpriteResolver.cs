@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using UAlbion.Core.Objects;
 using UAlbion.Core.Textures;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.AssetIds;
 using Veldrid;

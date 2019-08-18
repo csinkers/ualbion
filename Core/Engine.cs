@@ -7,8 +7,8 @@ using UAlbion.Core.Events;
 using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
-using UAlbion.Core.Objects;
 using UAlbion.Core.Textures;
+using UAlbion.Core.Visual;
 
 namespace UAlbion.Core
 {
@@ -66,6 +66,7 @@ namespace UAlbion.Core
 
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
             Attach(GlobalExchange);
+            TextureManager.Attach(GlobalExchange);
             _igRenderable.Attach(GlobalExchange);
             _duplicator.Attach(GlobalExchange);
             _fullScreenQuad.Attach(GlobalExchange);
@@ -86,7 +87,7 @@ namespace UAlbion.Core
             return (sceneExchange, scene);
         }
 
-        public Scene Create3DScene(string name)
+        public (EventExchange, Scene) Create3DScene(string name)
         {
             var sceneExchange = new EventExchange(name, SceneExchange);
             var camera = new PerspectiveCamera(GraphicsDevice, Window);
@@ -96,7 +97,7 @@ namespace UAlbion.Core
             scene.AddRenderer(_duplicator);
             scene.AddRenderer(_fullScreenQuad);
             camera.Attach(sceneExchange);
-            return scene;
+            return (sceneExchange, scene);
         }
 
         public void SetScene(Scene scene)

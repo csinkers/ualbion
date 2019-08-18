@@ -38,7 +38,8 @@ namespace UAlbion.Formats.MapEvents
             Pause = 0x1A,
             SimpleChest = 0x1B,
             AskSurrender = 0x1C,
-            DoScript = 0x1D
+            DoScript = 0x1D,
+            UnkFF = 0xFF // 3D only?
         }
 
         public int Id { get; }
@@ -89,6 +90,7 @@ namespace UAlbion.Formats.MapEvents
                 case EventType.SimpleChest:       result = new SimpleChestEvent(br, id, type); break;
                 case EventType.AskSurrender:      result = new AskSurrenderEvent(br, id, type); break;
                 case EventType.DoScript:          result = new DoScriptEvent(br, id, type); break;
+                case EventType.UnkFF:             result = new DummyMapEvent(br, id, type); break;
                 default: throw new ArgumentOutOfRangeException();
             }
 

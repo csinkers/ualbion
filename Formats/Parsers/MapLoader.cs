@@ -14,10 +14,7 @@ namespace UAlbion.Formats.Parsers
             br.BaseStream.Position = startPosition;
             switch (mapType)
             {
-                case 1:
-                    throw new NotImplementedException("3D maps cannot yet be loaded");
-                    //return Map3D.Load(br, name);
-
+                case 1: return MapData3D.Load(br, streamLength, name);
                 case 2: return MapData2D.Load(br, streamLength, name);
                 default: throw new NotImplementedException($"Unrecognised map type {mapType} found.");
             }

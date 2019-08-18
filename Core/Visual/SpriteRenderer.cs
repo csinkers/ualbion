@@ -8,7 +8,7 @@ using Veldrid;
 using Veldrid.SPIRV;
 using Veldrid.Utilities;
 
-namespace UAlbion.Core.Objects
+namespace UAlbion.Core.Visual
 {
     public class SpriteRenderer : IRenderer
     {
@@ -26,12 +26,12 @@ namespace UAlbion.Core.Objects
         {
             public static readonly uint StructSize = (uint)Unsafe.SizeOf<InstanceData>();
             public static readonly VertexLayoutDescription VertexLayout = new VertexLayoutDescription(
-                VertexLayoutHelper.Vector2D("Offset"), VertexLayoutHelper.Vector2D("Size"),
+                VertexLayoutHelper.Vector3D("Offset"), VertexLayoutHelper.Vector2D("Size"),
                 VertexLayoutHelper.Vector2D("TexPosition"), VertexLayoutHelper.Vector2D("TexSize"),
                 VertexLayoutHelper.Int("TexLayer"), VertexLayoutHelper.Int("Flags")
                 )
             { InstanceStepRate = 1 };
-            public InstanceData(Vector2 position, Vector2 size, Vector2 texPosition, Vector2 texSize, int texLayer, SpriteFlags flags)
+            public InstanceData(Vector3 position, Vector2 size, Vector2 texPosition, Vector2 texSize, int texLayer, SpriteFlags flags)
             {
                 Offset = position; Size = size;
                 TexPosition = texPosition; TexSize = texSize;
@@ -39,7 +39,7 @@ namespace UAlbion.Core.Objects
                 Flags = flags;
             }
 
-            public Vector2 Offset { get; set; } // Pixel coordinates
+            public Vector3 Offset { get; set; } // Pixel coordinates
             public Vector2 Size { get; set; } // Pixel coordinates
             public Vector2 TexPosition { get; set; } // Normalised texture coordinates
             public Vector2 TexSize { get; set; } // Normalised texture coordinates
@@ -89,7 +89,7 @@ namespace UAlbion.Core.Objects
             layout(set = 0, binding = 1) uniform _View { mat4 View; }; // vdspv_0_1
 
             layout(location = 0) in vec2 _Position;
-            layout(location = 1) in vec2 _Offset;
+            layout(location = 1) in vec3 _Offset;
             layout(location = 2) in vec2 _Size;
             layout(location = 3) in vec2 _TexOffset;
             layout(location = 4) in vec2 _TexSize;
@@ -107,9 +107,9 @@ namespace UAlbion.Core.Objects
                 fsin_2 = _Flags;
 
                 if((_Flags & 1) != 0) // If NoTransform set
-                    gl_Position = vec4((_Position * _Size) + _Offset, 0, 1);
+                    gl_Position = vec4((_Position * _Size), 0, 1) + vec4(_Offset, 1);
                 else
-                    gl_Position = Projection * View * vec4((_Position * _Size) + _Offset, 0, 1);
+                    gl_Position = Projection * View * (vec4(_Position * _Size, 0, 1) + vec4(_Offset, 1));
             }";
 
             public const string FragmentShader = @"
@@ -147,9 +147,9 @@ namespace UAlbion.Core.Objects
                 }
 
                 if((fsin_2 &   2) != 0) color = color * 1.2; // Highlight
-                if((fsin_2 &  16) != 0) color = vec4(1.0f, color.yzw);         // Red tint
-                if((fsin_2 &  32) != 0) color = vec4(color.x, 1.0f, color.zw); // Green tint
-                if((fsin_2 &  64) != 0) color = vec4(color.xy, 1.0f, color.w); // Blue tint
+                if((fsin_2 &  16) != 0) color = vec4(color.x * 1.5f + 0.3f, color.yzw);         // Red tint
+                if((fsin_2 &  32) != 0) color = vec4(color.x, color.y * 1.5f + 0.3f, color.zw); // Green tint
+                if((fsin_2 &  64) != 0) color = vec4(color.xy, color.z * 1.5f + 0.f, color.w); // Blue tint
                 if((fsin_2 & 128) != 0) color = vec4(color.xyz, color.w * 0.5f); // Transparent
 
                 OutputColor = color;

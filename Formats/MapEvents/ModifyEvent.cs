@@ -29,7 +29,7 @@ namespace UAlbion.Formats.MapEvents
         public DisableEventChainEvent(BinaryReader br, int id, EventType type, ModifyType subType) : base(id, type, subType)
         {
             Unk2 = br.ReadByte(); // 2
-            Debug.Assert(Unk2 == 1);
+            Debug.Assert(Unk2 == 1 || Unk2 == 0 || Unk2 == 2); // Usually 1
             ChainNumber = br.ReadByte(); // 3
             Unk4 = br.ReadByte(); // 4
             Unk5 = br.ReadByte(); // 5

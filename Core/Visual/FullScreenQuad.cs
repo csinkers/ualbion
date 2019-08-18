@@ -5,7 +5,7 @@ using Veldrid;
 using Veldrid.SPIRV;
 using Veldrid.Utilities;
 
-namespace UAlbion.Core.Objects
+namespace UAlbion.Core.Visual
 {
     class FullScreenQuad : Component, IRenderer, IRenderable
     {

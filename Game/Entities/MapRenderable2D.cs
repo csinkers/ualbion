@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Objects;
 using UAlbion.Core.Textures;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Parsers;
 using UAlbion.Game.Events;
@@ -13,7 +14,7 @@ namespace UAlbion.Game.Entities
     public class MapRenderable2D : Component
     {
         readonly SpriteRenderer.InstanceData _blankInstance = new SpriteRenderer.InstanceData(
-            Vector2.Zero, Vector2.Zero, 
+            Vector3.Zero, Vector2.Zero, 
             Vector2.Zero, Vector2.Zero, 0, 0);
 
         readonly MapData2D _mapData;
@@ -57,8 +58,8 @@ namespace UAlbion.Game.Entities
                 }
             }
 
-            _underlay = new SpriteRenderer.MultiSprite(new SpriteRenderer.SpriteKey(_tileset, (int) DrawLayer.Underlay)) { Instances = underlay.ToArray() };
-            _overlay = new SpriteRenderer.MultiSprite(new SpriteRenderer.SpriteKey(_tileset, (int)DrawLayer.Overlay)) { Instances = overlay.ToArray() };
+            _underlay = new SpriteRenderer.MultiSprite(new SpriteRenderer.SpriteKey(_tileset, (int)DrawLayer.Underlay)) { Instances = underlay.ToArray() };
+            _overlay = new SpriteRenderer.MultiSprite(new SpriteRenderer.SpriteKey(_tileset, (int)DrawLayer.Overlay3)) { Instances = overlay.ToArray() };
         }
 
         void Subscribed()
@@ -75,7 +76,19 @@ namespace UAlbion.Game.Entities
 
             _tileset.GetSubImageDetails(underlayId, out var tileSize, out var texPosition, out var texSize, out var layer);
             var instance = new SpriteRenderer.InstanceData();
-            instance.Offset = new Vector2(i, j) * tileSize;
+
+            DrawLayer drawLayer;
+            switch((int)tile.Layer & 0x8)
+            {
+                case (int)TilesetData.TileLayer.Normal: drawLayer = DrawLayer.Underlay; break;
+                case (int)TilesetData.TileLayer.Layer1: drawLayer = DrawLayer.Overlay1; break;
+                case (int)TilesetData.TileLayer.Layer2: drawLayer = DrawLayer.Overlay2; break;
+                case (int)TilesetData.TileLayer.Layer3: drawLayer = DrawLayer.Overlay3; break;
+                default: drawLayer = DrawLayer.Underlay; break;
+            }
+
+            float zPos = (255 - j + (int)drawLayer) / 255.0f;
+            instance.Offset = new Vector3(new Vector2(i, j) * tileSize, zPos);
             instance.Size = tileSize;
 
             instance.TexPosition = texPosition;

@@ -345,6 +345,8 @@ namespace UAlbion.Game
 
         public string GetNameForAsset<T>(AssetType type, T id)
         {
+            return $"{type}.{id}";
+            /*
             switch (type)
             {
                 case AssetType.AutomapGraphics: return $"AutomapGraphics:{id}";
@@ -401,6 +403,7 @@ namespace UAlbion.Game
                     return $"{type}.{id}";
 //, $"Pal:{id}"
             }
+            */
         }
 
         public ITexture LoadTexture(AutoMapId id)            => (ITexture)LoadAssetCached(AssetType.AutomapGraphics,    id);

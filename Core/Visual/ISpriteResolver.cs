@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UAlbion.Core.Objects
+namespace UAlbion.Core.Visual
 {
     public interface ISpriteResolver
     {

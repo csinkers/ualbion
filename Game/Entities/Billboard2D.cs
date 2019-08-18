@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Objects;
+using UAlbion.Core.Visual;
 
 namespace UAlbion.Game.Entities
 {
@@ -30,7 +30,8 @@ namespace UAlbion.Game.Entities
             if ((_flags & SpriteFlags.OnlyEvenFrames) != 0 && _frameCount % 2 == 0)
                 return;
 
-            var sprite = new SpriteDefinition<T>(_id, 0, Position, RenderOrder, _flags, Size);
+            var positionLayered = new Vector3(Position, (255 - Position.Y) / 255.0f);
+            var sprite = new SpriteDefinition<T>(_id, 0, positionLayered, RenderOrder, _flags, Size);
             renderEvent.Add(sprite);
         }
     }

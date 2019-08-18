@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Objects;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Parsers;
 
@@ -38,28 +39,55 @@ namespace UAlbion.Game.Entities
 
         static readonly IList<Handler> Handlers = new Handler[]
         {
-            new Handler<LargeNpcSprite, RenderEvent>((x,e)=>x.Render(e)),
+            new Handler<LargeNpcSprite, RenderEvent>((x,e) => x.Render(e)),
+            new Handler<LargeNpcSprite, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
         };
 
         readonly LargeNpcId _id;
         readonly MapNpc.Waypoint[] _waypoints;
         Vector2 _position;
+        Vector2 _size;
         Animation _animation;
         int _frame;
+        public Vector3 Normal => Vector3.UnitZ;
 
-        public LargeNpcSprite(LargeNpcId id, MapNpc.Waypoint[] waypoints) : base(Handlers)
+        public LargeNpcSprite(LargeNpcId id, MapNpc.Waypoint[] waypoints, Assets assets) : base(Handlers)
         {
             _id = id;
             _waypoints = waypoints;
             _position = new Vector2(waypoints[0].X * 8, waypoints[0].Y * 8);
+            assets.LoadTexture(_id).GetSubImageDetails(_frame, out var size, out _, out _, out _);
+            _size = size; // TODO: Update to handle variable sized sprites
+        }
+
+        void Select(WorldCoordinateSelectEvent e)
+        {
+            float denominator = Vector3.Dot(Normal, e.Direction);
+            if (Math.Abs(denominator) < 0.00001f)
+                return;
+
+            float t = Vector3.Dot(new Vector3(_position, 0.0f) - e.Origin, Normal) / denominator;
+            if (t < 0)
+                return;
+
+            var intersectionPoint = e.Origin + t * e.Direction;
+            int x = (int)(intersectionPoint.X - _position.X);
+            int y = (int)(intersectionPoint.Y - _position.Y);
+
+            if (x < 0 || x >= _size.X ||
+                y < 0 || y >= _size.Y)
+                return;
+
+            e.RegisterHit(t, $"NPC {_id}", this);
         }
 
         void Render(RenderEvent e)
         {
+            var positionLayered = new Vector3(_position, ((int)DrawLayer.Characters1 + 255 - _position.Y) / 255.0f);
             var npcSprite = new SpriteDefinition<LargeNpcId>(
                 _id,
                 0,
-                _position,
+                positionLayered,
                 (int)DrawLayer.Characters1,
                 0);
 

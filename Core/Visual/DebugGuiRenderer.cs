@@ -12,7 +12,7 @@ namespace UAlbion.Core.Visual
         {
             new Handler<DebugGuiRenderer, RenderEvent>((x, e) => e.Add(x)),
             new Handler<DebugGuiRenderer, InputEvent>((x,e) => x._imguiRenderer.Update((float)e.DeltaSeconds, e.Snapshot)), 
-            new Handler<DebugGuiRenderer, WindowResizedEvent>((x,e) => x._imguiRenderer?.WindowResized(e.Width, e.Height))
+            new Handler<DebugGuiRenderer, WindowResizedEvent>((x,e) => x._imguiRenderer.WindowResized(e.Width, e.Height))
         };
 
         ImGuiRenderer _imguiRenderer;

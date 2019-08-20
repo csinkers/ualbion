@@ -31,6 +31,7 @@ namespace UAlbion.Game.Entities
         {
             new Handler<Map2D, SubscribedEvent>((x, e) => x.Subscribed()),
             new Handler<Map2D, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
+            new Handler<Map2D, UnloadMapEvent>((x, e) => x.Unload()),
         };
 
         readonly Assets _assets; // TODO: Remove this and use an AssetResolutionEvent or similar.
@@ -108,6 +109,11 @@ namespace UAlbion.Game.Entities
 
                 sprite.Attach(Exchange);
             }
+        }
+
+        void Unload()
+        {
+            Exchange.Unsubscribe(this);
         }
     }
 }

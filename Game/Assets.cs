@@ -3,64 +3,29 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.Parsers;
-using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
-    [Event("assets:reload", "Flush the asset cache, forcing all data to be reloaded from disk")]
-    public class ReloadAssetsEvent : GameEvent { }
-
-    [Event("assets:stats", "Print asset cache statistics.")]
-    public class AssetStatsEvent : GameEvent { }
-    [Event("assets:cycle")] public class CycleCacheEvent : GameEvent { }
-
     public class Assets : RegisteredComponent, IDisposable
     {
         public Assets(AssetConfig assetConfig, CoreSpriteConfig coreSpriteConfig) : base(Handlers)
         {
             _assetConfig = assetConfig;
             _coreSpriteConfig = coreSpriteConfig;
+            _assetCache = new AssetCache();
         }
 
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<Assets, ReloadAssetsEvent>((x, e) => { lock (x._syncRoot) { x._assetCache.Clear(); } }),
-            new Handler<Assets, CycleCacheEvent>((x, e) => { x.CycleCacheEvent(); }),
-            new Handler<Assets, AssetStatsEvent>((x, e) =>
-            {
-                Console.WriteLine("Asset Statistics:");
-                lock (x._syncRoot)
-                {
-                    foreach (var key in x._assetCache.Keys.OrderBy(y => y.ToString()))
-                    {
-                        Console.WriteLine("    {0}: {1} items", key, x._assetCache[key].Values.Count);
-                    }
-                }
-            }),
-        };
+        static readonly IList<Handler> Handlers = new Handler[] { };
 
-        void CycleCacheEvent()
-        {
-            lock (_syncRoot)
-            {
-                _oldAssetCache = _assetCache;
-                _assetCache = new Dictionary<AssetType, IDictionary<int, object>>();
-            }
-        }
-
-        readonly object _syncRoot = new object();
         readonly AssetConfig _assetConfig;
         readonly CoreSpriteConfig _coreSpriteConfig;
         readonly IDictionary<AssetType, XldFile[]> _xlds = new Dictionary<AssetType, XldFile[]>();
-        IDictionary<AssetType, IDictionary<int, object>> _assetCache = new Dictionary<AssetType, IDictionary<int, object>>();
-        IDictionary<AssetType, IDictionary<int, object>> _oldAssetCache = new Dictionary<AssetType, IDictionary<int, object>>();
 
         // ReSharper disable StringLiteralTypo
         readonly IDictionary<AssetType, (AssetLocation, string)> _assetFiles = new Dictionary<AssetType, (AssetLocation, string)> {
@@ -69,7 +34,7 @@ namespace UAlbion.Game
             { AssetType.IconGraphics,       (AssetLocation.Base,      "ICONGFX!.XLD") }, // Texture
             { AssetType.Palette,            (AssetLocation.Base,      "PALETTE!.XLD") }, // PaletteView
             { AssetType.PaletteNull,        (AssetLocation.BaseRaw,   "PALETTE.000" ) }, // PaletteView (supplementary)
-            { AssetType.Slab,               (AssetLocation.Base,      "SLAB"        ) }, //
+            { AssetType.Slab,               (AssetLocation.BaseRaw,   "SLAB"        ) }, // Texture
             { AssetType.BigPartyGraphics,   (AssetLocation.Base,      "PARTGR!.XLD" ) }, // Texture
             { AssetType.SmallPartyGraphics, (AssetLocation.Base,      "PARTKL!.XLD" ) }, // Texture
             { AssetType.LabData,            (AssetLocation.Base,      "LABDATA!.XLD") }, //
@@ -125,6 +90,8 @@ namespace UAlbion.Game
         }
 
         readonly string[] _overrideExtensions = { "bmp", "png", "wav", "json", "mp3" };
+        readonly AssetCache _assetCache;
+
         AssetPaths GetAssetPaths(AssetLocation location, GameLanguage language, string baseName, int number, int objectNumber)
         {
             string Try(string x)
@@ -257,49 +224,26 @@ namespace UAlbion.Game
         object LoadAssetCached<T>(AssetType type, T enumId, GameLanguage language = GameLanguage.English)
         {
             int id = (int)(object)enumId;
-            lock (_syncRoot)
-            {
-                if (_assetCache.TryGetValue(type, out var typeCache))
-                {
-                    if (typeCache.TryGetValue(id, out var cachedAsset))
-                    {
-                        if (cachedAsset is Exception)
-                            return null;
-                        return cachedAsset;
-                    }
-                }
-                else _assetCache[type] = new Dictionary<int, object>();
+            object asset = _assetCache.Get(type, id);
+            if (asset is Exception _) // If it failed to load once then stop trying (at least until an asset:reload / cycle)
+                return null;
 
-                // Check old cache
-                if (_oldAssetCache.TryGetValue(type, out var oldTypeCache) && oldTypeCache.TryGetValue(id, out var oldCachedAsset))
-                {
-                    if (!(oldCachedAsset is Exception))
-                    {
-                        _assetCache[type][id] = oldCachedAsset;
-                        return oldCachedAsset;
-                    }
-                }
-            }
+            if (asset != null)
+                return asset;
 
-            object newAsset;
             var name = $"{type}.{enumId}";
             try
             {
-                newAsset = LoadAsset(type, id, name, language);
+                asset = LoadAsset(type, id, name, language);
             }
             catch(Exception e)
             {
                 Raise(new LogEvent((int)LogEvent.Level.Error, $"Could not load asset {name}: {e}"));
-                newAsset = e;
+                asset = e;
             }
 
-            lock (_syncRoot)
-            {
-                _assetCache[type][id] = newAsset;
-                if (newAsset is Exception)
-                    return null;
-                return newAsset;
-            }
+            _assetCache.Add(asset, type, id);
+            return asset is Exception ? null : asset;
         }
 
         public MapData2D LoadMap2D(MapDataId id) { return LoadAssetCached(AssetType.MapData, id) as MapData2D; }
@@ -342,6 +286,7 @@ namespace UAlbion.Game
                 case AssetType.TacticalIcon:       return LoadTexture((TacticId)id);
                 case AssetType.Wall3D:             return LoadTexture((DungeonWallId)id);
                 case AssetType.CoreGraphics:       return LoadTexture((CoreSpriteId)id);
+                case AssetType.Slab:               return (ITexture)LoadAssetCached(AssetType.Slab, 0);
                 default: return (ITexture)LoadAssetCached(type, id);
             }
         }
@@ -382,18 +327,6 @@ namespace UAlbion.Game
         {
             foreach(var xld in _xlds.SelectMany(x => x.Value))
                 xld?.Dispose();
-        }
-    }
-
-    class AssetNotFoundException : Exception
-    {
-        public AssetType Type { get; }
-        public int Id { get; }
-
-        public AssetNotFoundException(string message, AssetType type, int id) : base(message)
-        {
-            Type = type;
-            Id = id;
         }
     }
 }

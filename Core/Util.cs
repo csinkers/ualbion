@@ -102,7 +102,7 @@ namespace UAlbion.Core
         }
 
         public static Matrix4x4 CreatePerspective(
-            GraphicsDevice gd,
+            bool isClipSpaceYInverted,
             bool useReverseDepth,
             float fov,
             float aspectRatio,
@@ -117,7 +117,7 @@ namespace UAlbion.Core
             {
                 persp = CreatePerspective(fov, aspectRatio, near, far);
             }
-            if (gd.IsClipSpaceYInverted)
+            if (isClipSpaceYInverted)
             {
                 persp *= new Matrix4x4(
                     1, 0, 0, 0,

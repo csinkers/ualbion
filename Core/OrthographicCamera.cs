@@ -2,7 +2,6 @@
 using System.Numerics;
 using UAlbion.Core.Events;
 using Veldrid;
-using Veldrid.Sdl2;
 
 namespace UAlbion.Core
 {
@@ -63,10 +62,10 @@ namespace UAlbion.Core
 
         public float AspectRatio => WindowWidth / WindowHeight;
 
-        public OrthographicCamera(float windowWidth, float windowHeight) : base(Handlers)
+        public OrthographicCamera() : base(Handlers)
         {
-            WindowWidth = windowWidth;
-            WindowHeight = windowHeight;
+            WindowWidth = 1;
+            WindowHeight = 1;
             UpdatePerspectiveMatrix();
             UpdateViewMatrix();
         }

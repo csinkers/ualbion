@@ -27,9 +27,8 @@ namespace UAlbion.Core.Events
     //[Event("e:render")]
     public class RenderEvent : EngineEvent, IVerboseEvent
     {
-        public RenderEvent(Action<IRenderable> add, Func<Type, IRenderer> getRenderer) { Add = add; GetRenderer = getRenderer; }
+        public RenderEvent(Action<IRenderable> add) { Add = add; }
         public Action<IRenderable> Add { get; }
-        public Func<Type, IRenderer> GetRenderer { get; }
     }
 
     [Event("e:toggle_fullscreen")] public class ToggleFullscreenEvent : EngineEvent { }
@@ -50,11 +49,6 @@ namespace UAlbion.Core.Events
             Snapshot = snapshot;
             MouseDelta = mouseDelta;
         }
-    }
-
-    [Event("e:scene_changed")] public class SceneChangedEvent : EngineEvent {
-        public SceneChangedEvent(string sceneId) { SceneId = sceneId; }
-        [EventPart("scene_id")] public string SceneId { get; }
     }
 
     [Event("e:camera_move", "Move the camera using relative coordinates.")]

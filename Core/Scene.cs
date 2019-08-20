@@ -1,54 +1,71 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using Veldrid;
 
 namespace UAlbion.Core
 {
+    [Event("set_scene", "Set the active scene")]
+    public class SetSceneEvent : EngineEvent
+    {
+        public SetSceneEvent(int sceneId)
+        {
+            SceneId = sceneId;
+        }
+
+        [EventPart("id", "The identifier of the scene to activate")]
+        public int SceneId { get; }
+    }
+
     public class Scene : Component
     {
-        readonly IDictionary<Type, IRenderer> _renderers;
+        readonly IList<Type> _activeRendererTypes;
 
         static readonly IList<Handler> Handlers = new Handler[]
         {
-            new Handler<Scene, SetRawPaletteEvent>((x, e) => x._palette = new Palette(e.Name, e.Entries))
+            new Handler<Scene, SetRawPaletteEvent>((x, e) => x._palette = new Palette(e.Name, e.Entries)),
+            new Handler<Scene, SetSceneEvent>((x, e) => x._isActive = e.SceneId == x.Id),
         };
 
         readonly IDictionary<Type, IList<IRenderable>> _renderables = new Dictionary<Type, IList<IRenderable>>();
         readonly IDictionary<int, IList<IRenderable>> _processedRenderables = new Dictionary<int, IList<IRenderable>>();
         Palette _palette;
         CommandList _resourceUpdateCl;
+        bool _isActive;
 
+        public int Id { get; }
         public ICamera Camera { get; }
-        public Vector2 TileSize { get; }
+        public EventExchange SceneExchange => Exchange;
 
-        public Scene(ICamera camera, Vector2 tileSize, IDictionary<Type, IRenderer> renderers) : base(Handlers)
+        public Scene(int sceneId, ICamera camera, IList<Type> activeActiveRendererTypeTypes) : base(Handlers)
         {
-            _renderers = renderers;
+            Id = sceneId;
             Camera = camera;
-            TileSize = tileSize;
+            _activeRendererTypes = activeActiveRendererTypeTypes;
         }
 
-        public void RenderAllStages(GraphicsDevice gd, CommandList cl, SceneContext sc)
+        public void RenderAllStages(GraphicsDevice gd, CommandList cl, SceneContext sc, IDictionary<Type, IRenderer> renderers)
         {
+            if (!_isActive)
+                return;
+
+            sc.SetCurrentScene(this);
+
             // Collect all renderables from components
             foreach(var renderer in _renderables.Values)
                 renderer.Clear();
 
-            int collected = 0;
             Exchange.Raise(new RenderEvent(x =>
             {
-                if(collected % 100 == 0)
-                    CoreTrace.Log.CollectedRenderables("Progress", collected);
-
+                if (!_activeRendererTypes.Contains(x.Renderer))
+                    return;
                 if (!_renderables.ContainsKey(x.Renderer))
                     _renderables[x.Renderer] = new List<IRenderable>();
                 _renderables[x.Renderer].Add(x);
-                collected++;
-            }, t => _renderers[t]), this);
+            }), this);
 
             foreach(var renderer in _renderables)
                 CoreTrace.Log.CollectedRenderables(renderer.Key.Name, renderer.Value.Count);
@@ -65,7 +82,7 @@ namespace UAlbion.Core
             _processedRenderables.Clear();
             foreach (var renderableGroup in _renderables)
             {
-                var renderer = _renderers[renderableGroup.Key];
+                var renderer = renderers[renderableGroup.Key];
                 foreach (var renderable in renderer.UpdatePerFrameResources(gd, _resourceUpdateCl, sc, renderableGroup.Value))
                 {
                     if (!_processedRenderables.ContainsKey(renderable.RenderOrder))
@@ -98,14 +115,14 @@ namespace UAlbion.Core
                 cl.ClearColorTarget(0, RgbaFloat.Black);
                 cl.ClearDepthStencil(depthClear);
                 foreach (var key in orderedKeys)
-                    Render(gd, cl, sc, RenderPasses.Standard, _processedRenderables[key]);
+                    Render(gd, cl, sc, RenderPasses.Standard, renderers, _processedRenderables[key]);
             }
 
             // 2D Overlays
             using (new RenderDebugGroup(cl, "Overlay"))
             {
                 foreach (var key in orderedKeys)
-                    Render(gd, cl, sc, RenderPasses.Overlay, _processedRenderables[key]);
+                    Render(gd, cl, sc, RenderPasses.Overlay, renderers, _processedRenderables[key]);
             }
 
             if (sc.MainSceneColorTexture.SampleCount != TextureSampleCount.Count1)
@@ -116,7 +133,7 @@ namespace UAlbion.Core
                 cl.SetFramebuffer(sc.DuplicatorFramebuffer);
                 cl.SetFullViewports();
                 foreach (var key in orderedKeys)
-                    Render(gd, cl, sc, RenderPasses.Duplicator, _processedRenderables[key]);
+                    Render(gd, cl, sc, RenderPasses.Duplicator, renderers, _processedRenderables[key]);
             }
 
             using (new RenderDebugGroup(cl, "Swapchain Pass"))
@@ -124,7 +141,7 @@ namespace UAlbion.Core
                 cl.SetFramebuffer(gd.SwapchainFramebuffer);
                 cl.SetFullViewports();
                 foreach (var key in orderedKeys)
-                    Render(gd, cl, sc, RenderPasses.SwapchainOutput, _processedRenderables[key]);
+                    Render(gd, cl, sc, RenderPasses.SwapchainOutput, renderers, _processedRenderables[key]);
             }
 
             cl.End();
@@ -137,11 +154,12 @@ namespace UAlbion.Core
             CommandList cl,
             SceneContext sc,
             RenderPasses pass,
+            IDictionary<Type, IRenderer> renderers,
             IEnumerable<IRenderable> renderableList)
         {
             foreach (IRenderable renderable in renderableList)
             {
-                var renderer = _renderers[renderable.Renderer];
+                var renderer = renderers[renderable.Renderer];
                 if ((renderer.RenderPasses & pass) != 0)
                     renderer.Render(gd, cl, sc, pass, renderable);
             }

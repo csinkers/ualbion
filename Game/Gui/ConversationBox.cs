@@ -1,5 +1,4 @@
 ﻿using UAlbion.Formats;
-using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Game.Gui
 {

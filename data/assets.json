@@ -10967,7 +10967,8 @@
       }
     },
     "SLAB": {
-      "Type": "Unknown",
+      "Type": "FixedSizeSprite",
+      "Width": 360,
       "Assets": {}
     },
     "SMLPORT0.XLD": {

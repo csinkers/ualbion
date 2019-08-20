@@ -1,12 +1,10 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
-using Veldrid;
 
 namespace UAlbion.Core
 {
     public interface ICamera : IComponent
     {
-        void UpdateBackend(GraphicsDevice gd);
         Matrix4x4 ViewMatrix { get; }
         Matrix4x4 ProjectionMatrix { get; }
         Vector3 Position { get; set; }

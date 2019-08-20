@@ -4,10 +4,10 @@
     {
         Background = 0, // Skybox in 3D
         Underlay = 0,
-        Characters1,
         Overlay1,
-        Characters2,
+        Characters1,
         Overlay2,
+        Characters2,
         Overlay3,
         // Items,
         // Effects,

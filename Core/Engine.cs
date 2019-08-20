@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Numerics;
+using System.Linq;
 using ImGuiNET;
 using UAlbion.Core.Events;
 using Veldrid;
@@ -30,16 +30,16 @@ namespace UAlbion.Core
         static RenderDoc _renderDoc;
 
         public EventExchange GlobalExchange { get; }
-        public EventExchange SceneExchange { get; }
 
         readonly IDictionary<Type, IRenderer> _renderers = new Dictionary<Type, IRenderer>();
+        readonly IList<Scene> _scenes = new List<Scene>();
         public ITextureManager TextureManager { get; }
         readonly FrameTimeAverager _frameTimeAverager = new FrameTimeAverager(0.5);
         readonly FullScreenQuad _fullScreenQuad;
         readonly DebugGuiRenderer _igRenderable;
         readonly SceneContext _sceneContext = new SceneContext();
 
-        public Scene Scene { get; private set; }
+        //public Scene Scene { get; private set; }
         CommandList _frameCommands;
         TextureSampleCount? _newSampleCount;
         bool _windowResized;
@@ -53,7 +53,6 @@ namespace UAlbion.Core
         public Engine(GraphicsBackend backend) : base(Handlers)
         {
             GlobalExchange = new EventExchange("Global");
-            SceneExchange = new EventExchange("Scenes", GlobalExchange);
             TextureManager = new TextureManager();
             ChangeBackend(backend);
             CheckForErrors();
@@ -80,54 +79,17 @@ namespace UAlbion.Core
                 component.Attach(GlobalExchange);
         }
 
-        public (EventExchange, Scene) Create2DScene(string name, Vector2 tileSize)
-        {
-            // TODO: Build scenes from config
-            var sceneExchange = new EventExchange(name, SceneExchange);
-            var camera = new OrthographicCamera(Window.Width, Window.Height);
-            var scene = new Scene(camera, tileSize, _renderers);
-            scene.Attach(sceneExchange);
-            camera.Attach(sceneExchange);
-            return (sceneExchange, scene);
-        }
-
-        public (EventExchange, Scene) Create3DScene(string name)
-        {
-            var sceneExchange = new EventExchange(name, SceneExchange);
-            var camera = new PerspectiveCamera(GraphicsDevice, Window.Width, Window.Height);
-            var scene = new Scene(camera, Vector2.One, _renderers);
-            scene.Attach(sceneExchange);
-            camera.Attach(sceneExchange);
-            return (sceneExchange, scene);
-        }
-
-        public void SetScene(Scene scene)
-        {
-            if(_frameCommands != null)
-                DestroyAllObjects();
-
-            foreach (var childExchange in SceneExchange.Children)
-            {
-                bool isCurrentScene = childExchange.Contains(scene);
-                if(!isCurrentScene && childExchange.IsActive)
-                    childExchange.Raise(new PersistToDiskEvent(), this);
-                childExchange.IsActive = isCurrentScene;
-            }
-
-            SceneExchange.PruneInactiveChildren();
-
-            Scene = scene;
-            _sceneContext.SetCurrentScene(Scene);
-            CreateAllObjects();
-            ImGui.StyleColorsClassic();
-        }
+        public void AddScene(Scene scene) { _scenes.Add(scene); }
+        public Scene GetScene(int sceneId) => _scenes.FirstOrDefault(x => x.Id == sceneId);
 
         public void Run()
         {
+            CreateAllObjects();
+            ImGui.StyleColorsClassic();
             Raise(new WindowResizedEvent(Window.Width, Window.Height));
             Raise(new BeginFrameEvent());
-            if (Scene == null)
-                throw new InvalidOperationException("The scene must be set before the main loop can be run.");
+            //if (Scene == null)
+            //    throw new InvalidOperationException("The scene must be set before the main loop can be run.");
 
             var frameCounter = new FrameCounter();
             while (Window.Exists)//*/ && frameCounter.FrameCount < 20)
@@ -208,7 +170,8 @@ namespace UAlbion.Core
             }
 
             _frameCommands.Begin();
-            Scene.RenderAllStages(GraphicsDevice, _frameCommands, _sceneContext);
+            foreach(var scene in _scenes)
+                scene.RenderAllStages(GraphicsDevice, _frameCommands, _sceneContext, _renderers);
             CoreTrace.Log.Info("Engine", "Swapping buffers...");
             GraphicsDevice.SwapBuffers();
             CoreTrace.Log.Info("Engine", "Draw complete");
@@ -255,11 +218,8 @@ namespace UAlbion.Core
             CheckForErrors();
             Window.Title = GraphicsDevice.BackendType.ToString();
 
-            if (Scene != null)
-            {
-                Scene.Camera.UpdateBackend(GraphicsDevice);
-                CreateAllObjects();
-            }
+            Raise(new BackendChangedEvent(GraphicsDevice));
+            CreateAllObjects();
         }
 
         void CreateAllObjects()
@@ -275,7 +235,8 @@ namespace UAlbion.Core
             foreach (var r in _renderers.Values)
                 r.CreateDeviceObjects(GraphicsDevice, initCL, _sceneContext);
 
-            Scene.CreateAllDeviceObjects(GraphicsDevice, initCL, _sceneContext);
+            foreach(var scene in _scenes)
+                scene.CreateAllDeviceObjects(GraphicsDevice, initCL, _sceneContext);
             initCL.End();
             GraphicsDevice.SubmitCommands(initCL);
             initCL.Dispose();
@@ -289,7 +250,8 @@ namespace UAlbion.Core
             foreach (var r in _renderers.Values)
                 r.DestroyDeviceObjects();
 
-            Scene.DestroyAllDeviceObjects();
+            foreach(var scene in _scenes)
+                scene.DestroyAllDeviceObjects();
             StaticResourceCache.DestroyAllDeviceObjects();
             TextureManager.DestroyDeviceObjects();
             GraphicsDevice.WaitForIdle();
@@ -304,6 +266,16 @@ namespace UAlbion.Core
         }
 
         public void CheckForErrors() { /*GraphicsDevice?.CheckForErrors();*/ }
+    }
+
+    public class BackendChangedEvent : EngineEvent
+    {
+        public GraphicsDevice GraphicsDevice { get; }
+
+        public BackendChangedEvent(GraphicsDevice graphicsDevice)
+        {
+            GraphicsDevice = graphicsDevice;
+        }
     }
 }
 

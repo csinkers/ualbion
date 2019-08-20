@@ -7,7 +7,7 @@ using Veldrid.Utilities;
 
 namespace UAlbion.Core.Visual
 {
-    class FullScreenQuad : Component, IRenderer, IRenderable
+    public class FullScreenQuad : Component, IRenderer, IRenderable
     {
         static readonly IList<Handler> Handlers = new Handler[] { new Handler<FullScreenQuad, RenderEvent>((x, e) => e.Add(x)) };
         static readonly ushort[] QuadIndices = { 0, 1, 2, 0, 2, 3 };

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core.Events;
-using Veldrid;
 
 namespace UAlbion.Core
 {
@@ -10,7 +9,8 @@ namespace UAlbion.Core
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<PerspectiveCamera, WindowResizedEvent>((x, e) => x.WindowResized(e.Width, e.Height)),
-            new Handler<PerspectiveCamera, EngineUpdateEvent>((x, e) => x.Update(e.DeltaSeconds))
+            new Handler<PerspectiveCamera, EngineUpdateEvent>((x, e) => x.Update(e.DeltaSeconds)),
+            new Handler<PerspectiveCamera, BackendChangedEvent>((x, e) => x.UpdateBackend(e)),
         };
 
         Matrix4x4 _viewMatrix;
@@ -24,10 +24,11 @@ namespace UAlbion.Core
         //bool _mousePressed = false;
         float _yaw;
         float _pitch;
-        GraphicsDevice _gd;
         bool _useReverseDepth;
         float _windowWidth;
         float _windowHeight;
+
+        bool _isClipSpaceYInverted;
         //readonly Sdl2Window _window;
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
@@ -38,20 +39,18 @@ namespace UAlbion.Core
         public float NearDistance => 1f;
         public float FarDistance => 1000f;
 
-        public PerspectiveCamera(GraphicsDevice gd, float windowWidth, float windowHeight) : base(Handlers)
+        public PerspectiveCamera() : base(Handlers)
         {
-            _gd = gd;
-            _useReverseDepth = gd.IsDepthRangeZeroToOne;
-            _windowWidth = windowWidth;
-            _windowHeight = windowHeight;
+            _windowWidth = 1;
+            _windowHeight = 1;
             UpdatePerspectiveMatrix();
             UpdateViewMatrix();
         }
 
-        public void UpdateBackend(GraphicsDevice gd)
+        void UpdateBackend(BackendChangedEvent e)
         {
-            _gd = gd;
-            _useReverseDepth = gd.IsDepthRangeZeroToOne;
+            _useReverseDepth = e.GraphicsDevice.IsDepthRangeZeroToOne;
+            _isClipSpaceYInverted = e.GraphicsDevice.IsClipSpaceYInverted;
             UpdatePerspectiveMatrix();
         }
 
@@ -140,7 +139,7 @@ namespace UAlbion.Core
         void UpdatePerspectiveMatrix()
         {
             _projectionMatrix = Util.CreatePerspective(
-                _gd,
+                _isClipSpaceYInverted,
                 _useReverseDepth,
                 FieldOfView,
                 _windowWidth / _windowHeight,

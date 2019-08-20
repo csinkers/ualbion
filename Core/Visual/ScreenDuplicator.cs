@@ -6,7 +6,7 @@ using Veldrid.Utilities;
 
 namespace UAlbion.Core.Visual
 {
-    class ScreenDuplicator : Component, IRenderable, IRenderer
+    public class ScreenDuplicator : Component, IRenderable, IRenderer
     {
         static readonly IList<Handler> Handlers = new Handler[] {new Handler<ScreenDuplicator, RenderEvent>((x, e) => e.Add(x)),};
         static readonly ushort[] s_quadIndices = { 0, 1, 2, 0, 2, 3 };

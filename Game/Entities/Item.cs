@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Formats;
-using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Game.Entities
 {

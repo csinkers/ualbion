@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using UAlbion.Core.Textures;
 using Veldrid;
 using Veldrid.SPIRV;
@@ -12,67 +11,7 @@ namespace UAlbion.Core.Visual
 {
     public class SpriteRenderer : IRenderer
     {
-        public struct SpriteKey : IEquatable<SpriteKey>
-        {
-            public SpriteKey(ITexture texture, int renderOrder) { Texture = texture; RenderOrder = renderOrder; }
-            public ITexture Texture { get; }
-            public int RenderOrder { get; }
-            public bool Equals(SpriteKey other) => Equals(Texture, other.Texture) && RenderOrder == other.RenderOrder;
-            public override bool Equals(object obj) => obj is SpriteKey other && Equals(other);
-            public override int GetHashCode() { unchecked { return ((Texture != null ? Texture.GetHashCode() : 0) * 397) ^ RenderOrder; } }
-        }
-
-        public struct InstanceData
-        {
-            public static readonly uint StructSize = (uint)Unsafe.SizeOf<InstanceData>();
-            public static readonly VertexLayoutDescription VertexLayout = new VertexLayoutDescription(
-                VertexLayoutHelper.Vector3D("Offset"), VertexLayoutHelper.Vector2D("Size"),
-                VertexLayoutHelper.Vector2D("TexPosition"), VertexLayoutHelper.Vector2D("TexSize"),
-                VertexLayoutHelper.Int("TexLayer"), VertexLayoutHelper.Int("Flags")
-                )
-            { InstanceStepRate = 1 };
-            public InstanceData(Vector3 position, Vector2 size, Vector2 texPosition, Vector2 texSize, int texLayer, SpriteFlags flags)
-            {
-                Offset = position; Size = size;
-                TexPosition = texPosition; TexSize = texSize;
-                TexLayer = texLayer;
-                Flags = flags;
-            }
-
-            public Vector3 Offset { get; set; } // Pixel coordinates
-            public Vector2 Size { get; set; } // Pixel coordinates
-            public Vector2 TexPosition { get; set; } // Normalised texture coordinates
-            public Vector2 TexSize { get; set; } // Normalised texture coordinates
-            public int TexLayer { get; set; }
-            public SpriteFlags Flags { get; set; }
-        }
-
-        public class MultiSprite : IRenderable
-        {
-            public MultiSprite(SpriteKey key)
-            {
-                Key = key;
-            }
-
-            public MultiSprite(SpriteKey key, int bufferId, IEnumerable<InstanceData> sprites)
-            {
-                Key = key;
-                BufferId = bufferId;
-
-                if (sprites is InstanceData[] array)
-                    Instances = array;
-                else
-                    Instances = sprites.ToArray();
-            }
-
-            public int RenderOrder => Key.RenderOrder;
-            public Type Renderer => typeof(SpriteRenderer);
-            public SpriteKey Key { get; }
-            public int BufferId { get; set; }
-            public InstanceData[] Instances { get; set; }
-        }
-
-            static class Shader
+        static class Shader
         {
             public static readonly VertexLayoutDescription VertexLayout = new VertexLayoutDescription(VertexLayoutHelper.Vector2D("Position"));
             public static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
@@ -191,7 +130,7 @@ namespace UAlbion.Core.Visual
             cl.UpdateBuffer(_vb, 0, Vertices);
             cl.UpdateBuffer(_ib, 0, Indices);
 
-            var shaderSet = new ShaderSetDescription(new[] { Shader.VertexLayout, InstanceData.VertexLayout },
+            var shaderSet = new ShaderSetDescription(new[] { Shader.VertexLayout, SpriteInstanceData.VertexLayout },
                 factory.CreateFromSpirv(ShaderHelper.Vertex(Shader.VertexShader), ShaderHelper.Fragment(Shader.FragmentShader)));
 
             _perSpriteResourceLayout = factory.CreateResourceLayout(Shader.PerSpriteLayoutDescription);
@@ -209,7 +148,7 @@ namespace UAlbion.Core.Visual
                 depthStencilMode,
                 rasterizerMode,
                 PrimitiveTopology.TriangleList,
-                new ShaderSetDescription(new[] { Shader.VertexLayout, InstanceData.VertexLayout }, shaderSet.Shaders, ShaderHelper.GetSpecializations(gd)),
+                new ShaderSetDescription(new[] { Shader.VertexLayout, SpriteInstanceData.VertexLayout }, shaderSet.Shaders, ShaderHelper.GetSpecializations(gd)),
                 new[] { _perSpriteResourceLayout },
                 sc.MainSceneFramebuffer.OutputDescription);
 
@@ -230,7 +169,7 @@ namespace UAlbion.Core.Visual
             {
                 _textureManager.PrepareTexture(group.Key.Texture, gd);
                 var multiSprite = new MultiSprite(group.Key, _instanceBuffers.Count, group);
-                var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)multiSprite.Instances.Length * InstanceData.StructSize, BufferUsage.VertexBuffer));
+                var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)multiSprite.Instances.Length * SpriteInstanceData.StructSize, BufferUsage.VertexBuffer));
                 buffer.Name = $"B_SpriteInst{_instanceBuffers.Count}";
                 gd.UpdateBuffer(buffer, 0, multiSprite.Instances);
                 _instanceBuffers.Add(buffer);
@@ -241,7 +180,7 @@ namespace UAlbion.Core.Visual
             {
                 _textureManager.PrepareTexture(multiSprite.Key.Texture, gd);
                 multiSprite.BufferId = _instanceBuffers.Count;
-                var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)multiSprite.Instances.Length * InstanceData.StructSize, BufferUsage.VertexBuffer));
+                var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)multiSprite.Instances.Length * SpriteInstanceData.StructSize, BufferUsage.VertexBuffer));
                 buffer.Name = $"B_SpriteInst{_instanceBuffers.Count}";
                 gd.UpdateBuffer(buffer, 0, multiSprite.Instances);
                 _instanceBuffers.Add(buffer);

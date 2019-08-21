@@ -314,6 +314,7 @@ namespace UAlbion.Game
         public ITexture LoadTexture(FontId id)               => (ITexture)LoadAssetCached(AssetType.Font,               id);
         public ITexture LoadTexture(CoreSpriteId id)         => (ITexture)LoadAssetCached(AssetType.CoreGraphics,       id);
         public TilesetData LoadTileData(IconDataId id)       => (TilesetData)LoadAssetCached(AssetType.IconData,        id);
+        public LabyrinthData LoadLabyrinthData(LabyrinthDataId id) => (LabyrinthData) LoadAssetCached(AssetType.LabData, id);
 
         public string LoadString(AssetType type, int id, GameLanguage language, int subItem)
         {
@@ -328,5 +329,6 @@ namespace UAlbion.Game
             foreach(var xld in _xlds.SelectMany(x => x.Value))
                 xld?.Dispose();
         }
+
     }
 }

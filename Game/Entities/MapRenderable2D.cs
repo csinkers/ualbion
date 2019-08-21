@@ -12,15 +12,15 @@ namespace UAlbion.Game.Entities
 {
     public class MapRenderable2D : Component
     {
-        readonly SpriteRenderer.InstanceData _blankInstance = new SpriteRenderer.InstanceData(
+        readonly SpriteInstanceData _blankInstance = new SpriteInstanceData(
             Vector3.Zero, Vector2.Zero, 
             Vector2.Zero, Vector2.Zero, 0, 0);
 
         readonly MapData2D _mapData;
         readonly ITexture _tileset;
         readonly TilesetData _tileData;
-        readonly SpriteRenderer.MultiSprite _underlay;
-        readonly SpriteRenderer.MultiSprite _overlay;
+        readonly MultiSprite _underlay;
+        readonly MultiSprite _overlay;
         int _frameCount;
 
         static readonly IList<Handler> Handlers = new Handler[]
@@ -43,8 +43,8 @@ namespace UAlbion.Game.Entities
             _tileData = tileData;
             TileSize = BuildInstanceData(0, 0, _tileData.Tiles[0], 0, false).Size;
 
-            var underlay = new List<SpriteRenderer.InstanceData>();
-            var overlay = new List<SpriteRenderer.InstanceData>();
+            var underlay = new List<SpriteInstanceData>();
+            var overlay = new List<SpriteInstanceData>();
             for (int j = 0; j < _mapData.Height; j++)
             {
                 for (int i = 0; i < _mapData.Width; i++)
@@ -57,16 +57,13 @@ namespace UAlbion.Game.Entities
                 }
             }
 
-            _underlay = new SpriteRenderer.MultiSprite(new SpriteRenderer.SpriteKey(_tileset, (int)DrawLayer.Underlay)) { Instances = underlay.ToArray() };
-            _overlay = new SpriteRenderer.MultiSprite(new SpriteRenderer.SpriteKey(_tileset, (int)DrawLayer.Overlay3)) { Instances = overlay.ToArray() };
+            _underlay = new MultiSprite(new SpriteKey(_tileset, (int)DrawLayer.Underlay)) { Instances = underlay.ToArray() };
+            _overlay = new MultiSprite(new SpriteKey(_tileset, (int)DrawLayer.Overlay3)) { Instances = overlay.ToArray() };
         }
 
-        void Subscribed()
-        {
-            Raise(new LoadPalEvent((int)Palette));
-        }
+        void Subscribed() { Raise(new LoadPalEvent((int)Palette)); }
 
-        SpriteRenderer.InstanceData BuildInstanceData(int i, int j, TilesetData.TileData tile, int tickCount, bool isOverlay)
+        SpriteInstanceData BuildInstanceData(int i, int j, TilesetData.TileData tile, int tickCount, bool isOverlay)
         {
             int index = j * _mapData.Width + i;
             int underlayId = tile.GetSubImageForTile(tickCount);
@@ -74,7 +71,7 @@ namespace UAlbion.Game.Entities
                 return _blankInstance;
 
             _tileset.GetSubImageDetails(underlayId, out var tileSize, out var texPosition, out var texSize, out var layer);
-            var instance = new SpriteRenderer.InstanceData();
+            var instance = new SpriteInstanceData();
 
             DrawLayer drawLayer;
             switch((int)tile.Layer & 0x8)

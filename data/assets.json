@@ -8126,7 +8126,7 @@
     },
     "LABDATA0.XLD": {
       "EnumName": "LabyrinthDataId",
-      "Type": "Unknown",
+      "Type": "LabyrinthData",
       "Assets": {
         "0": {},
         "1": {},
@@ -8141,7 +8141,7 @@
     },
     "LABDATA1.XLD": {
       "EnumName": "LabyrinthDataId",
-      "Type": "Unknown",
+      "Type": "LabyrinthData",
       "Assets": {
         "0": {},
         "1": {},
@@ -8247,7 +8247,7 @@
     },
     "LABDATA2.XLD": {
       "EnumName": "LabyrinthDataId",
-      "Type": "Unknown",
+      "Type": "LabyrinthData",
       "Assets": {
         "0": {},
         "1": {},

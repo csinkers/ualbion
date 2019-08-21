@@ -10,11 +10,13 @@ namespace UAlbion.Game.Entities
 {
     public interface IMap
     {
+        MapDataId MapId { get; }
         Vector2 LogicalSize { get; }
     }
 
     public class Map2D : Component, IMap
     {
+        readonly Assets _assets; // TODO: Remove this and use an AssetResolutionEvent or similar.
         readonly MapData2D _mapData;
         readonly TilesetData _tileData;
         readonly MapRenderable2D _renderable;
@@ -31,15 +33,10 @@ namespace UAlbion.Game.Entities
         {
             new Handler<Map2D, SubscribedEvent>((x, e) => x.Subscribed()),
             new Handler<Map2D, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
-            new Handler<Map2D, UnloadMapEvent>((x, e) => x.Unload()),
+            // new Handler<Map2D, UnloadMapEvent>((x, e) => x.Unload()),
         };
 
-        readonly Assets _assets; // TODO: Remove this and use an AssetResolutionEvent or similar.
-
-        public override string ToString()
-        {
-            return $"Map {MapId} {_mapData.Width}x{_mapData.Height} P:{(PaletteId)_mapData.PaletteId} T:{(IconDataId)_mapData.TilesetId}";
-        }
+        public override string ToString() { return $"Map2D: {MapId} ({(int)MapId}"; }
 
         public Map2D(Assets assets, MapDataId mapId) : base(Handlers)
         {
@@ -109,11 +106,6 @@ namespace UAlbion.Game.Entities
 
                 sprite.Attach(Exchange);
             }
-        }
-
-        void Unload()
-        {
-            Exchange.Unsubscribe(this);
         }
     }
 }

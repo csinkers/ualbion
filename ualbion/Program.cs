@@ -44,6 +44,7 @@ namespace UAlbion
                 typeof(DebugGuiRenderer),
                 typeof(FullScreenQuad),
                 typeof(ScreenDuplicator),
+                typeof(ExtrudedTileMapRenderer)
             };
 
             var scene = new Scene((int)SceneId.World3D, camera, renderers);
@@ -99,6 +100,7 @@ namespace UAlbion
                 var mapExchange = new EventExchange("Maps", engine.GlobalExchange);
                 var spriteResolver = new SpriteResolver(assets);
                 engine.AddRenderer(new SpriteRenderer(engine.TextureManager, spriteResolver));
+                engine.AddRenderer(new ExtrudedTileMapRenderer(engine.TextureManager));
                 engine.AddScene(Create2DScene(assets, sceneExchange));
                 engine.AddScene(Create3DScene(assets, sceneExchange));
 
@@ -115,9 +117,7 @@ namespace UAlbion
                 new CursorManager(assets).Attach(engine.GlobalExchange);
                 new PaletteManager(assets).Attach(engine.GlobalExchange);
                 engine.GlobalExchange.Raise(new SetMouseModeEvent((int)MouseModeId.Normal), null);
-                engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.HausDesJägerclans), null);
-
-                //engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.TorontoTeil1), null);
+                engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.TestMapToronto1), null);
 
                 /*
                 var menu = new MainMenu();

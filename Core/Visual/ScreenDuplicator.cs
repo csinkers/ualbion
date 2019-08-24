@@ -16,6 +16,7 @@ namespace UAlbion.Core.Visual
         DeviceBuffer _vb;
 
         public ScreenDuplicator() : base(Handlers) { }
+        public string Name => "ScreenDuplicator";
         public RenderPasses RenderPasses => RenderPasses.Duplicator;
         public int RenderOrder => 99;
         public Type Renderer => typeof(ScreenDuplicator);

@@ -14,15 +14,17 @@ namespace UAlbion.Core.Textures
         public uint MipLevels => 1;
         public uint ArrayLayers => 1;
         public string Name { get; }
+        public bool IsDirty { get; private set; }
         uint[] TextureData { get;  }
 
         public Palette(string name, uint[] paletteData)
         {
             Name = name;
             TextureData = paletteData;
+            IsDirty = true;
         }
 
-        public void GetSubImageDetails(int subImage, out Vector2 size, out Vector2 texOffset, out Vector2 texSize, out int layer)
+        public void GetSubImageDetails(int subImage, out Vector2 size, out Vector2 texOffset, out Vector2 texSize, out uint layer)
         {
             size = Vector2.One;
             texOffset = Vector2.Zero;
@@ -54,6 +56,8 @@ namespace UAlbion.Core.Textures
                     cl.End();
                     gd.SubmitCommands(cl);
                 }
+
+                IsDirty = false;
                 return texture;
             }
         }

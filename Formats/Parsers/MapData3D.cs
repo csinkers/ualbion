@@ -13,7 +13,7 @@ namespace UAlbion.Formats.Parsers
         public byte Width { get; set; }
         public byte Height { get; set; }
         public SongId SongId { get; set; }
-        public LabyrinthDataId LabDataId { get; set; }
+        public LabyrinthDataId? LabDataId { get; set; }
         public byte Unk7 { get; set; }
         public PaletteId PaletteId { get; set; }
         public int Sound { get; set; }
@@ -41,9 +41,11 @@ namespace UAlbion.Formats.Parsers
             Debug.Assert(1 == mapType);  // 1 = 3D, 2 = 2D
 
             map.SongId    = (SongId)br.ReadByte() - 1; // 3
-            map.Width     = br.ReadByte();     // 4
-            map.Height    = br.ReadByte();     // 5
-            map.LabDataId = (LabyrinthDataId)br.ReadByte() - 1; // 6
+            map.Width     = br.ReadByte(); // 4
+            map.Height    = br.ReadByte(); // 5
+            byte labData = br.ReadByte();  // 6
+            map.LabDataId = labData == 0 ? (LabyrinthDataId?)null : (LabyrinthDataId)(labData - 1);
+
             map.Unk7 = br.ReadByte();          // 7 Possibly combat background??
             map.PaletteId = (PaletteId)br.ReadByte() - 1; // 8
             map.Sound = br.ReadByte() - 1;     // 9

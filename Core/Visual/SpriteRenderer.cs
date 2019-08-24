@@ -13,21 +13,35 @@ namespace UAlbion.Core.Visual
     {
         static class Shader
         {
+            // Vertex Layout
             public static readonly VertexLayoutDescription VertexLayout = new VertexLayoutDescription(VertexLayoutHelper.Vector2D("Position"));
+
+            // Instance Layout
+            public static readonly VertexLayoutDescription InstanceLayout = new VertexLayoutDescription(
+                    VertexLayoutHelper.Vector3D("Offset"), VertexLayoutHelper.Vector2D("Size"),
+                    VertexLayoutHelper.Vector2D("TexPosition"), VertexLayoutHelper.Vector2D("TexSize"),
+                    VertexLayoutHelper.Int("TexLayer"), VertexLayoutHelper.Int("Flags"))
+            { InstanceStepRate = 1 };
+
+            // Resource Sets
             public static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
-                ResourceLayoutHelper.Uniform("vdspv_0_0"),
-                ResourceLayoutHelper.Uniform("vdspv_0_1"),
-                ResourceLayoutHelper.Sampler("SpriteSampler"),
-                ResourceLayoutHelper.Texture("vdspv_0_3"), // Texture
+                ResourceLayoutHelper.Uniform("vdspv_0_0"), // Perspective Matrix
+                ResourceLayoutHelper.Uniform("vdspv_0_1"),  // View Matrix
+                ResourceLayoutHelper.Sampler("vdspv_0_2"),  // SpriteSampler
+                ResourceLayoutHelper.Texture("vdspv_0_3"),  // SpriteTexture
                 ResourceLayoutHelper.Texture("vdspv_0_4")); // Palette
 
             public const string VertexShader = @"
             #version 450
 
+            // Resource Sets
             layout(set = 0, binding = 0) uniform _Projection { mat4 Projection; }; // vdspv_0_0
             layout(set = 0, binding = 1) uniform _View { mat4 View; }; // vdspv_0_1
 
+            // Vertex Data
             layout(location = 0) in vec2 _Position;
+
+            // Instance Data
             layout(location = 1) in vec3 _Offset;
             layout(location = 2) in vec2 _Size;
             layout(location = 3) in vec2 _TexOffset;
@@ -35,9 +49,10 @@ namespace UAlbion.Core.Visual
             layout(location = 5) in int _TexLayer;
             layout(location = 6) in int _Flags;
 
-            layout(location = 0) out vec2 fsin_0;
-            layout(location = 1) out flat int fsin_1;
-            layout(location = 2) out flat int fsin_2;
+            // Outputs to fragment shader
+            layout(location = 0) out vec2 fsin_0;     // Texture Coordinates
+            layout(location = 1) out flat int fsin_1; // Texture Layer
+            layout(location = 2) out flat int fsin_2; // Flags
 
             void main()
             {
@@ -54,14 +69,17 @@ namespace UAlbion.Core.Visual
             public const string FragmentShader = @"
             #version 450
 
-            layout(set = 0, binding = 2) uniform sampler SpriteSampler;
+            // Resource Sets
+            layout(set = 0, binding = 2) uniform sampler SpriteSampler;   // vdspv_0_2
             layout(set = 0, binding = 3) uniform texture2D SpriteTexture; // vdspv_0_3
-            layout(set = 0, binding = 4) uniform texture2D PaletteView; // vdspv_0_4
+            layout(set = 0, binding = 4) uniform texture2D PaletteView;   // vdspv_0_4
 
-            layout(location = 0) in vec2 fsin_0;
-            layout(location = 1) in flat int fsin_1;
-            layout(location = 2) in flat int fsin_2;
+            // Inputs from vertex shader
+            layout(location = 0) in vec2 fsin_0;     // Texture Coordinates
+            layout(location = 1) in flat int fsin_1; // Texture Layer
+            layout(location = 2) in flat int fsin_2; // Flags
 
+            // Fragment shader outputs
             layout(location = 0) out vec4 OutputColor;
 
             void main()
@@ -123,14 +141,14 @@ namespace UAlbion.Core.Visual
         {
             ResourceFactory factory = gd.ResourceFactory;
 
-            _vb = factory.CreateBuffer(new BufferDescription(new Vector2[4].SizeInBytes(), BufferUsage.VertexBuffer));
+            _vb = factory.CreateBuffer(new BufferDescription(Vertices.SizeInBytes(), BufferUsage.VertexBuffer));
             _ib = factory.CreateBuffer(new BufferDescription(Indices.SizeInBytes(), BufferUsage.IndexBuffer));
             _vb.Name = "SpriteVertexBuffer";
             _ib.Name = "SpriteIndexBuffer";
             cl.UpdateBuffer(_vb, 0, Vertices);
             cl.UpdateBuffer(_ib, 0, Indices);
 
-            var shaderSet = new ShaderSetDescription(new[] { Shader.VertexLayout, SpriteInstanceData.VertexLayout },
+            var shaderSet = new ShaderSetDescription(new[] { Shader.VertexLayout, Shader.InstanceLayout },
                 factory.CreateFromSpirv(ShaderHelper.Vertex(Shader.VertexShader), ShaderHelper.Fragment(Shader.FragmentShader)));
 
             _perSpriteResourceLayout = factory.CreateResourceLayout(Shader.PerSpriteLayoutDescription);
@@ -148,7 +166,9 @@ namespace UAlbion.Core.Visual
                 depthStencilMode,
                 rasterizerMode,
                 PrimitiveTopology.TriangleList,
-                new ShaderSetDescription(new[] { Shader.VertexLayout, SpriteInstanceData.VertexLayout }, shaderSet.Shaders, ShaderHelper.GetSpecializations(gd)),
+                new ShaderSetDescription(new[] { Shader.VertexLayout, Shader.InstanceLayout },
+                    shaderSet.Shaders,
+                    ShaderHelper.GetSpecializations(gd)),
                 new[] { _perSpriteResourceLayout },
                 sc.MainSceneFramebuffer.OutputDescription);
 

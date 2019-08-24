@@ -105,7 +105,7 @@ namespace UAlbion.Game
                         }
                     }
 
-                    subImages[n] = new EightBitTexture.SubImage(curX, curY, tileWidth, tileHeight, 0);
+                    subImages[n] = new EightBitTexture.SubImage((uint)curX, (uint)curY, (uint)tileWidth, (uint)tileHeight, 0);
                     curX += tileWidth;
                     if (curX + tileWidth > width)
                     {
@@ -145,7 +145,7 @@ namespace UAlbion.Game
             {
                 pixelData = sprite.PixelData;
                 subImages = sprite.Frames
-                    .Select(x => new EightBitTexture.SubImage(x.X, x.Y, x.Width, x.Height, 0))
+                    .Select(x => new EightBitTexture.SubImage((uint)x.X, (uint)x.Y, (uint)x.Width, (uint)x.Height, 0))
                     .ToArray();
 
                 return new EightBitTexture(

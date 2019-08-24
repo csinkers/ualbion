@@ -8,6 +8,7 @@ namespace UAlbion.Core.Textures
 {
     public class TrueColorTexture : ITexture
     {
+        public string Name { get; }
         public PixelFormat Format => PixelFormat.R8_G8_B8_A8_UNorm;
         public TextureType Type => TextureType.Texture2D;
         public uint Width => _texture.Width;
@@ -15,7 +16,7 @@ namespace UAlbion.Core.Textures
         public uint Depth => 1;
         public uint MipLevels => 1;
         public uint ArrayLayers => 1;
-        public string Name { get; }
+        public bool IsDirty { get; private set; }
         readonly ImageSharpTexture _texture;
 
         public TrueColorTexture(string name, Image<Rgba32> image)
@@ -23,9 +24,10 @@ namespace UAlbion.Core.Textures
             Name = name;
             ImageSharpTexture imageSharpTexture = new ImageSharpTexture(image, false);
             _texture = imageSharpTexture;
+            IsDirty = true;
         }
 
-        public void GetSubImageDetails(int subImage, out Vector2 size, out Vector2 texOffset, out Vector2 texSize, out int layer)
+        public void GetSubImageDetails(int subImage, out Vector2 size, out Vector2 texOffset, out Vector2 texSize, out uint layer)
         {
             size = new Vector2(Width, Height);
             texOffset = new Vector2(0,0);
@@ -35,6 +37,7 @@ namespace UAlbion.Core.Textures
 
         public Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
         {
+            IsDirty = false;
             var texture = _texture.CreateDeviceTexture(gd, rf);
             texture.Name = "T_" + Name;
             return texture;

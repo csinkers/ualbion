@@ -13,7 +13,8 @@ namespace UAlbion.Core.Textures
         uint Depth { get; }
         uint MipLevels { get; }
         uint ArrayLayers { get; }
-        void GetSubImageDetails(int subImage, out Vector2 size, out Vector2 texOffset, out Vector2 texSize, out int layer);
+        bool IsDirty { get; }
+        void GetSubImageDetails(int subImage, out Vector2 size, out Vector2 texOffset, out Vector2 texSize, out uint layer);
         Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage);
     }
 }

@@ -11,6 +11,7 @@ namespace UAlbion.Game.Entities
         readonly MapRenderable3D _renderable;
         static readonly IList<Handler> Handlers = new Handler[]
         {
+            new Handler<Map3D, SubscribedEvent>((x, e) => x.Subscribed()),
             new Handler<Map3D, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
             // new Handler<Map3D, UnloadMapEvent>((x, e) => x.Unload()),
         };
@@ -23,11 +24,19 @@ namespace UAlbion.Game.Entities
         {
             MapId = mapId;
             var mapData = assets.LoadMap3D(mapId);
-            var labyrinthData = assets.LoadLabyrinthData(mapData.LabDataId);
-            _renderable = new MapRenderable3D(mapData, labyrinthData);
+            if (mapData.LabDataId.HasValue)
+            {
+                var labyrinthData = assets.LoadLabyrinthData(mapData.LabDataId.Value);
+                _renderable = new MapRenderable3D(assets, mapData, labyrinthData);
+            }
         }
 
         public MapDataId MapId { get; }
         public Vector2 LogicalSize { get; }
+
+        void Subscribed()
+        {
+            _renderable?.Attach(Exchange);
+        }
     }
 }

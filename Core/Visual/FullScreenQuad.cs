@@ -11,6 +11,7 @@ namespace UAlbion.Core.Visual
     {
         static readonly IList<Handler> Handlers = new Handler[] { new Handler<FullScreenQuad, RenderEvent>((x, e) => e.Add(x)) };
         static readonly ushort[] QuadIndices = { 0, 1, 2, 0, 2, 3 };
+        public string Name => "FullScreenQuad";
         public RenderPasses RenderPasses => RenderPasses.SwapchainOutput;
         public int RenderOrder => int.MaxValue;
         public Type Renderer => typeof(FullScreenQuad);

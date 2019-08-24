@@ -76,7 +76,11 @@ namespace UAlbion.Core.Textures
         public void PrepareTexture(ITexture texture, GraphicsDevice gd)
         {
             if (_cache.ContainsKey(texture))
-                return;
+            {
+                if(!texture.IsDirty)
+                    return;
+                _cache[texture].Dispose();
+            }
 
             var deviceTexture = texture.CreateDeviceTexture(gd, gd.ResourceFactory, TextureUsage.Sampled);
             var textureView = gd.ResourceFactory.CreateTextureView(deviceTexture);

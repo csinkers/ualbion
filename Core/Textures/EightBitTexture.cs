@@ -11,27 +11,28 @@ namespace UAlbion.Core.Textures
     {
         public struct SubImage
         {
-            public SubImage(int x, int y, int w, int h, int layer)
+            public SubImage(uint x, uint y, uint w, uint h, uint layer)
             {
                 X = x; Y = y; W = w; H = h; Layer = layer;
             }
 
-            public int X { get; }
-            public int Y { get; }
-            public int W { get; }
-            public int H { get; }
-            public int Layer { get; }
+            public uint X { get; }
+            public uint Y { get; }
+            public uint W { get; }
+            public uint H { get; }
+            public uint Layer { get; }
         }
 
         public PixelFormat Format => PixelFormat.R8_UNorm;
         public TextureType Type => TextureType.Texture2D;
-        public uint Width { get;  }
-        public uint Height { get;  }
+        public uint Width { get; }
+        public uint Height { get; }
         public uint Depth => 1;
-        public uint MipLevels { get;  }
-        public uint ArrayLayers { get;  }
+        public uint MipLevels { get; }
+        public uint ArrayLayers { get; }
         public string Name { get; }
-        public byte[] TextureData { get;  }
+        public byte[] TextureData { get; }
+        public bool IsDirty { get; private set; }
         readonly IList<SubImage> _subImages = new List<SubImage>();
 
         public EightBitTexture(
@@ -52,9 +53,10 @@ namespace UAlbion.Core.Textures
             if(subImages != null)
                 foreach(var subImage in subImages)
                     _subImages.Add(subImage);
+            IsDirty = true;
         }
 
-        public void GetSubImageDetails(int id, out Vector2 size, out Vector2 texOffset, out Vector2 texSize, out int layer)
+        public void GetSubImageDetails(int id, out Vector2 size, out Vector2 texOffset, out Vector2 texSize, out uint layer)
         {
             Debug.Assert(id == 0 || id < _subImages.Count);
             if(_subImages.Count == 0)
@@ -110,6 +112,7 @@ namespace UAlbion.Core.Textures
                     gd.SubmitCommands(cl);
                 }
 
+                IsDirty = false;
                 return texture;
             }
         }
@@ -132,6 +135,40 @@ namespace UAlbion.Core.Textures
                 ret /= 2;
 
             return Math.Max(1, ret);
+        }
+
+        public void UploadSubImageToStagingTexture(GraphicsDevice gd, int subImageId, Texture staging, uint layer)
+        {
+            unsafe
+            {
+                fixed (byte* texDataPtr = &TextureData[0])
+                {
+                    if(staging.Width < Width || staging.Height < Height)
+                        throw new InvalidOperationException($"Tried to add an oversize ({Width}, {Height}) texture to a staging texture ({staging.Width}, {staging.Height}).");
+
+                    var subImage = _subImages[subImageId];
+                    uint subresourceSize = Width * Height * Depth * GetFormatSize(Format);
+                    byte* layerPtr = texDataPtr + subImage.Layer * subresourceSize;
+
+                    uint subImageSize = subImage.W * subImage.H;
+                    byte* subImageBytes = stackalloc byte[(int)subImageSize];
+                    for (int j = 0; j < subImage.H; j++)
+                    {
+                        byte* sourceRowPtr = layerPtr + (j + subImage.Y) * Width + subImage.X;
+                        for (int i = 0; i < subImage.W; i++)
+                        {
+                            subImageBytes[j * subImage.W + i] = sourceRowPtr[i];
+                        }
+                    }
+
+                    uint destX = (staging.Width  - subImage.W) / 2;
+                    uint destY = (staging.Height - subImage.H) / 2;
+                    gd.UpdateTexture(
+                        staging, (IntPtr)subImageBytes, subImageSize,
+                        destX, destY, 0, subImage.W, subImage.H, 1,
+                        0, layer);
+                }
+            }
         }
     }
 }

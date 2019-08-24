@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
@@ -26,6 +28,8 @@ namespace UAlbion.Formats.Parsers
         public ushort BackgroundTileAmount { get; set; }
         public ushort MaxVisibleTiles { get; set; }
         public ushort Unk20 { get; set; }
+        public ushort Lighting { get; set; }
+        public ushort Unk24 { get; set; }
         public IList<LabyrinthObject> Objects { get; } = new List<LabyrinthObject>();
         public IList<FloorAndCeiling> FloorAndCeilings { get; } = new List<FloorAndCeiling>();
         public IList<ExtraObject> ExtraObjects { get; } = new List<ExtraObject>();
@@ -35,6 +39,9 @@ namespace UAlbion.Formats.Parsers
         {
             public ushort AutoGraphicsId { get; set; }
             public IList<LabyrinthSubObject> SubObjects { get; } = new List<LabyrinthSubObject>();
+
+            public override string ToString() =>
+                $"LabObj{AutoGraphicsId}: {string.Join("; ", SubObjects.Select(x => x.ToString()))}";
         }
 
         public struct LabyrinthSubObject
@@ -43,6 +50,7 @@ namespace UAlbion.Formats.Parsers
             public int Y;
             public int Z;
             public int ObjectInfoNumber;
+            public override string ToString() => $"SubObj{ObjectInfoNumber}: ({X}, {Y}, {Z})";
         }
 
         public struct FloorAndCeiling
@@ -127,6 +135,8 @@ namespace UAlbion.Formats.Parsers
     {
         public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
         {
+            var startOffset = br.BaseStream.Position;
+
             var l = new LabyrinthData();
             l.WallHeight = br.ReadUInt16(); // 0
             l.CameraHeight = br.ReadUInt16(); // 2
@@ -147,12 +157,16 @@ namespace UAlbion.Formats.Parsers
             l.BackgroundTileAmount = br.ReadUInt16(); // 1C
             l.MaxVisibleTiles = br.ReadUInt16(); // 1E
             l.Unk20 = br.ReadUInt16(); // 20
+            l.Lighting = br.ReadUInt16(); // 22
+            l.Unk24 = br.ReadUInt16(); // 24
 
-            int objectCount = br.ReadUInt16();
+            Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);
+
+            int objectCount = br.ReadUInt16(); // 26
             for (int i = 0; i < objectCount; i++)
             {
                 var o = new LabyrinthData.LabyrinthObject();
-                o.AutoGraphicsId = br.ReadUInt16();
+                o.AutoGraphicsId = br.ReadUInt16(); // +0
                 for (int n = 0; n < 8; n++)
                 {
                     var so = new LabyrinthData.LabyrinthSubObject();
@@ -161,12 +175,13 @@ namespace UAlbion.Formats.Parsers
                     so.Z = br.ReadUInt16();
                     so.ObjectInfoNumber = br.ReadUInt16();
                     o.SubObjects.Add(so);
-                }
+                } // +64
 
                 l.Objects.Add(o);
             }
+            Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);
 
-            int floorAndCeilingCount = br.ReadUInt16();
+            int floorAndCeilingCount = br.ReadUInt16(); // 28 + objectCount * 42
             for (int i = 0; i < floorAndCeilingCount; i++)
             {
                 var fc = new LabyrinthData.FloorAndCeiling();
@@ -179,9 +194,10 @@ namespace UAlbion.Formats.Parsers
                 fc.TextureNumber = br.ReadUInt16();
                 fc.Unk8 = br.ReadUInt16();
                 l.FloorAndCeilings.Add(fc);
-            }
+            } 
+            Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);
 
-            int extraObjectCount = br.ReadUInt16();
+            int extraObjectCount = br.ReadUInt16(); // 2A + objectCount * 42 + floorAndCeilingCount * A
             for(int i = 0; i < extraObjectCount; i++)
             {
                 var eo = new LabyrinthData.ExtraObject();
@@ -196,6 +212,7 @@ namespace UAlbion.Formats.Parsers
                 eo.MapHeight = br.ReadUInt16();
                 l.ExtraObjects.Add(eo);
             }
+            Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);
 
             int wallCount = br.ReadUInt16();
             for (int i = 0; i < wallCount; i++)
@@ -226,6 +243,7 @@ namespace UAlbion.Formats.Parsers
 
                 l.Walls.Add(w);
             }
+            Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);
 
             return l;
         }

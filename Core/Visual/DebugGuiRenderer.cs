@@ -25,6 +25,7 @@ namespace UAlbion.Core.Visual
             _height = height;
         }
 
+        public string Name => "DebugGuiRenderer";
         public RenderPasses RenderPasses => RenderPasses.Overlay;
         public int RenderOrder => 99;
         public Type Renderer => typeof(DebugGuiRenderer);

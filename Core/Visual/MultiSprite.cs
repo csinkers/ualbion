@@ -22,6 +22,7 @@ namespace UAlbion.Core.Visual
                 Instances = sprites.ToArray();
         }
 
+        public string Name => Key.Texture.Name;
         public int RenderOrder => Key.RenderOrder;
         public Type Renderer => typeof(SpriteRenderer);
         public SpriteKey Key { get; }

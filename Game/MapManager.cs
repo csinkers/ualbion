@@ -4,6 +4,7 @@ using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
+using UAlbion.Game.Input;
 
 namespace UAlbion.Game
 {
@@ -16,7 +17,6 @@ namespace UAlbion.Game
         };
 
         readonly Assets _assets;
-        readonly Engine _engine;
         readonly EventExchange _mapExchange;
         MapDataId? _pendingMapChange;
 
@@ -45,6 +45,7 @@ namespace UAlbion.Game
                 map.Attach(exchange);
                 Raise(new CameraJumpEvent((int)map.LogicalSize.X / 2, (int)map.LogicalSize.Y / 2));
                 Raise(new SetSceneEvent((int)SceneId.World2D));
+                Raise(new SetMouseModeEvent((int)MouseModeId.Normal));
                 Raise(new LogEvent((int)LogEvent.Level.Info, $"Loaded map {(int)_pendingMapChange}: {_pendingMapChange}"));
             }
 
@@ -56,16 +57,16 @@ namespace UAlbion.Game
                 map.Attach(exchange);
                 Raise(new CameraJumpEvent((int)map.LogicalSize.X / 2, (int)map.LogicalSize.Y / 2));
                 Raise(new SetSceneEvent((int)SceneId.World3D));
+                Raise(new SetMouseModeEvent((int)MouseModeId.MouseLook));
                 Raise(new LogEvent((int)LogEvent.Level.Info, $"Loaded map {(int)_pendingMapChange}: {_pendingMapChange}"));
             }
 
             _pendingMapChange = null;
         }
 
-        public MapManager(Assets assets, Engine engine, EventExchange mapExchange) : base(Handlers)
+        public MapManager(Assets assets, EventExchange mapExchange) : base(Handlers)
         {
             _assets = assets;
-            _engine = engine;
             _mapExchange = mapExchange;
         }
     }

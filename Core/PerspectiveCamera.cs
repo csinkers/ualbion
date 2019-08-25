@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core.Events;
 
@@ -8,20 +9,30 @@ namespace UAlbion.Core
     {
         static readonly IList<Handler> Handlers = new Handler[]
         {
-            new Handler<PerspectiveCamera, WindowResizedEvent> ((x, e) => x.WindowResized(e.Width, e.Height)),
-            new Handler<PerspectiveCamera, EngineUpdateEvent>  ((x, e) => x.Update(e.DeltaSeconds)),
             new Handler<PerspectiveCamera, BackendChangedEvent>((x, e) => x.UpdateBackend(e)),
+            new Handler<PerspectiveCamera, BeginFrameEvent>((x, e) => x._movementDirection = Vector3.Zero),
+            new Handler<PerspectiveCamera, EngineCameraMoveEvent>((x, e) => x._movementDirection += new Vector3(e.X, 0, e.Y)),
+            new Handler<PerspectiveCamera, EngineCameraRotateEvent>((x, e) => { x.Yaw += e.Yaw; x.Pitch += e.Pitch; }),
+            new Handler<PerspectiveCamera, EngineUpdateEvent>((x, e) =>
+            {
+                if (x._movementDirection == Vector3.Zero)
+                    return;
+
+                Quaternion lookRotation = Quaternion.CreateFromYawPitchRoll(x.Yaw, x.Pitch, 0f);
+                x._movementDirection = Vector3.Transform(Vector3.Normalize(x._movementDirection), lookRotation);
+                x._position += x._movementDirection * e.DeltaSeconds;
+                x.UpdateViewMatrix();
+            }),
+            new Handler<PerspectiveCamera, WindowResizedEvent> ((x, e) => x.WindowResized(e.Width, e.Height)),
         };
 
         Matrix4x4 _viewMatrix;
         Matrix4x4 _projectionMatrix;
 
-        Vector3 _position = new Vector3(0, 3, 0);
+        Vector3 _position = new Vector3(0, 48, 0);
         Vector3 _lookDirection = new Vector3(0, -.3f, -1f);
+        Vector3 _movementDirection;
 
-        //readonly float _moveSpeed = 10.0f;
-        //Vector2 _mousePressedPos;
-        //bool _mousePressed = false;
         float _yaw;
         float _pitch;
         bool _useReverseDepth;
@@ -29,7 +40,6 @@ namespace UAlbion.Core
         float _windowHeight;
 
         bool _isClipSpaceYInverted;
-        //readonly Sdl2Window _window;
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;
@@ -58,75 +68,15 @@ namespace UAlbion.Core
         public float Magnification { get; set; } // Ignored.
 
         public float Yaw { get => _yaw; set { _yaw = value; UpdateViewMatrix(); } }
-        public float Pitch { get => _pitch; set { _pitch = value; UpdateViewMatrix(); } }
 
-        public void Update(float deltaSeconds)
+        public float Pitch
         {
-            /*
-            float sprintFactor = InputTracker.GetKey(Key.ControlLeft)
-                ? 0.1f
-                : InputTracker.GetKey(Key.ShiftLeft) ? 2.5f : 1f;
-
-            Vector3 motionDir = Vector3.Zero;
-            if (InputTracker.GetKey(Key.A))
+            get => _pitch;
+            set
             {
-                motionDir += -Vector3.UnitX;
-            }
-            if (InputTracker.GetKey(Key.D))
-            {
-                motionDir += Vector3.UnitX;
-            }
-            if (InputTracker.GetKey(Key.W))
-            {
-                motionDir += -Vector3.UnitZ;
-            }
-            if (InputTracker.GetKey(Key.S))
-            {
-                motionDir += Vector3.UnitZ;
-            }
-            if (InputTracker.GetKey(Key.Q))
-            {
-                motionDir += -Vector3.UnitY;
-            }
-            if (InputTracker.GetKey(Key.E))
-            {
-                motionDir += Vector3.UnitY;
-            }
-
-            if (motionDir != Vector3.Zero)
-            {
-                Quaternion lookRotation = Quaternion.CreateFromYawPitchRoll(Yaw, Pitch, 0f);
-                motionDir = Vector3.Transform(Vector3.Normalize(motionDir), lookRotation);
-                _position += motionDir * _moveSpeed * sprintFactor * deltaSeconds;
+                _pitch = Math.Clamp(value, -1.55f, 1.55f);
                 UpdateViewMatrix();
             }
-
-            if (!ImGui.GetIO().WantCaptureMouse
-                && (InputTracker.GetMouseButton(MouseButton.Left) || InputTracker.GetMouseButton(MouseButton.Right)))
-            {
-                if (!_mousePressed)
-                {
-                    _mousePressed = true;
-                    _mousePressedPos = InputTracker.MousePosition;
-                    Sdl2Native.SDL_ShowCursor(0);
-                    // Sdl2Native.SDL_SetWindowGrab(_window.SdlWindowHandle, true); 
-                }
-                Vector2 mouseDelta = _mousePressedPos - InputTracker.MousePosition;
-                Sdl2Native.SDL_WarpMouseInWindow(_window.SdlWindowHandle, (int)_mousePressedPos.X, (int)_mousePressedPos.Y);
-                Yaw += mouseDelta.X * 0.002f;
-                Pitch += mouseDelta.Y * 0.002f;
-            }
-            else if(_mousePressed)
-            {
-                Sdl2Native.SDL_WarpMouseInWindow(_window.SdlWindowHandle, (int)_mousePressedPos.X, (int)_mousePressedPos.Y);
-                // Sdl2Native.SDL_SetWindowGrab(_window.SdlWindowHandle, false);
-                Sdl2Native.SDL_ShowCursor(1);
-                _mousePressed = false;
-            }
-
-            Pitch = Math.Clamp(Pitch, -1.55f, 1.55f);
-            UpdateViewMatrix();
-            */
         }
 
         void WindowResized(float width, float height)

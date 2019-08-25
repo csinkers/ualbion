@@ -10,6 +10,9 @@
         Map,
         Inventory,
         Combat,
-        Conversation
+        Conversation,
+        MouseLook,
+        Interact3D,
+        Examine
     }
 }

@@ -108,12 +108,13 @@ namespace UAlbion
                 assets.Attach(engine.GlobalExchange);
                 new ConsoleLogger().Attach(engine.GlobalExchange);
                 new GameClock().Attach(engine.GlobalExchange);
-                new MapManager(assets, engine, mapExchange).Attach(engine.GlobalExchange);
+                new MapManager(assets, mapExchange).Attach(engine.GlobalExchange);
                 new DebugMapInspector().Attach(engine.GlobalExchange);
                 new NormalMouseMode().Attach(engine.GlobalExchange);
                 new DebugPickMouseMode().Attach(engine.GlobalExchange);
                 new ContextMenuMouseMode().Attach(engine.GlobalExchange);
                 new InventoryMoveMouseMode().Attach(engine.GlobalExchange);
+                new MouseLookMouseMode().Attach(engine.GlobalExchange);
                 new InputBinder(inputConfig).Attach(engine.GlobalExchange);
                 new CursorManager(assets).Attach(engine.GlobalExchange);
                 new PaletteManager(assets).Attach(engine.GlobalExchange);

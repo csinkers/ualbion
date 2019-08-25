@@ -45,7 +45,7 @@
         "Q": "cursor_mode look",
         "E": "cursor_mode manipulate"
     },
-    "World3D": {
+    "MouseLook": {
         "W": "+party_move  0 -1",
         "S": "+party_move  0  1",
         "A": "+party_move -1  0",
@@ -64,10 +64,13 @@
         "Number4": "set_active_member 3",
         "Number5": "set_active_member 4",
 
-        "Q": "+cursor_mode examine",
-        "E": "+cursor_mode interact",
+        "Q": "set_mouse_mode 7",
+        "E": "set_mouse_mode 6",
         "M": "open_map",
         "T": "wait"
+    },
+    "Interact3D": {
+        "E": "set_mouse_mode 5"
     },
     "Inventory": {
         "Control+A": "take_all",

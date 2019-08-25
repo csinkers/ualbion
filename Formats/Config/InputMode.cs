@@ -4,15 +4,14 @@
     {
         Global,
         Console,
-        Menu,
-        World2D,
-        World3D,
+        DebugPick,
+        Dialog,
         Map,
+        World2D,
         Inventory,
         Combat,
-        Conversation,
+        World3D,
         MouseLook,
-        Interact3D,
-        Examine
+        ContextMenu,
     }
 }

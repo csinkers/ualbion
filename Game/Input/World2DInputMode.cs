@@ -2,24 +2,25 @@
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Input
 {
-    public class NormalMouseMode : Component
+    public class World2DInputMode : Component
     {
         static readonly IList<Handler> Handlers = new Handler[]
         {
-            new Handler<NormalMouseMode, SetMouseModeEvent>((x,e) =>
+            new Handler<World2DInputMode, SetInputModeEvent>((x,e) =>
             {
-                var activating = e.Mode == MouseModeId.Normal && !x._isActive;
+                var activating = e.Mode == InputMode.World2D && !x._isActive;
                 if (activating)
                 {
                     x._isActive = true;
                     x.Raise(new SetCursorEvent(CoreSpriteId.Cursor));
                 }
             }),
-            new Handler<NormalMouseMode, InputEvent>((x,e) => x.OnInput(e)), 
+            new Handler<World2DInputMode, InputEvent>((x,e) => x.OnInput(e)), 
         };
 
         void OnInput(InputEvent e)
@@ -35,6 +36,6 @@ namespace UAlbion.Game.Input
 
         bool _isActive;
 
-        public NormalMouseMode() : base(Handlers) { }
+        public World2DInputMode() : base(Handlers) { }
     }
 }

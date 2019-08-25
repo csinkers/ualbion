@@ -53,7 +53,7 @@ namespace UAlbion.Core
 
         public void Receive(IEvent @event, object sender)
         {
-            if (_handlers.TryGetValue(@event.GetType(), out var handler))
+            if (sender != this && _handlers.TryGetValue(@event.GetType(), out var handler))
                 handler.Invoke(this, @event);
         }
 

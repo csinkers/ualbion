@@ -110,15 +110,13 @@ namespace UAlbion
                 new GameClock().Attach(engine.GlobalExchange);
                 new MapManager(assets, mapExchange).Attach(engine.GlobalExchange);
                 new DebugMapInspector().Attach(engine.GlobalExchange);
-                new NormalMouseMode().Attach(engine.GlobalExchange);
-                new DebugPickMouseMode().Attach(engine.GlobalExchange);
-                new ContextMenuMouseMode().Attach(engine.GlobalExchange);
-                new InventoryMoveMouseMode().Attach(engine.GlobalExchange);
-                new MouseLookMouseMode().Attach(engine.GlobalExchange);
+                new World2DInputMode().Attach(engine.GlobalExchange);
+                new DebugPickInputMode().Attach(engine.GlobalExchange);
+                new ContextMenuInputMode().Attach(engine.GlobalExchange);
+                new MouseLookInputMode().Attach(engine.GlobalExchange);
                 new InputBinder(inputConfig).Attach(engine.GlobalExchange);
                 new CursorManager(assets).Attach(engine.GlobalExchange);
                 new PaletteManager(assets).Attach(engine.GlobalExchange);
-                engine.GlobalExchange.Raise(new SetMouseModeEvent((int)MouseModeId.Normal), null);
                 engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.TestMapToronto1), null);
 
                 /*

@@ -2,9 +2,9 @@
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
-using UAlbion.Game.Input;
 
 namespace UAlbion.Game
 {
@@ -45,7 +45,7 @@ namespace UAlbion.Game
                 map.Attach(exchange);
                 Raise(new CameraJumpEvent((int)map.LogicalSize.X / 2, (int)map.LogicalSize.Y / 2));
                 Raise(new SetSceneEvent((int)SceneId.World2D));
-                Raise(new SetMouseModeEvent((int)MouseModeId.Normal));
+                Raise(new SetInputModeEvent((int)InputMode.World2D));
                 Raise(new LogEvent((int)LogEvent.Level.Info, $"Loaded map {(int)_pendingMapChange}: {_pendingMapChange}"));
             }
 
@@ -57,7 +57,7 @@ namespace UAlbion.Game
                 map.Attach(exchange);
                 Raise(new CameraJumpEvent((int)map.LogicalSize.X / 2, (int)map.LogicalSize.Y / 2));
                 Raise(new SetSceneEvent((int)SceneId.World3D));
-                Raise(new SetMouseModeEvent((int)MouseModeId.MouseLook));
+                Raise(new SetInputModeEvent((int)InputMode.MouseLook));
                 Raise(new LogEvent((int)LogEvent.Level.Info, $"Loaded map {(int)_pendingMapChange}: {_pendingMapChange}"));
             }
 

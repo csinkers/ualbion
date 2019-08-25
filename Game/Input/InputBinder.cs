@@ -24,7 +24,7 @@ namespace UAlbion.Game.Input
     public class InputBinder : Component
     {
         static readonly Handler[] Handlers = {
-            new Handler<InputBinder, ChangeInputModeEvent>((x, e) => x.OnInputModeChanged(e)),
+            new Handler<InputBinder, SetInputModeEvent>((x, e) => x.OnInputModeChanged(e)),
             new Handler<InputBinder, InputEvent>((x, e) => x.OnInput(e)),
         };
 
@@ -78,7 +78,7 @@ namespace UAlbion.Game.Input
             }
         }
 
-        void OnInputModeChanged(ChangeInputModeEvent e)
+        void OnInputModeChanged(SetInputModeEvent e)
         {
             _activeMode = e.Mode;
         }

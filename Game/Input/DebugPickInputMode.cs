@@ -2,17 +2,18 @@
 using System.Linq;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 using Veldrid;
 
 namespace UAlbion.Game.Input
 {
-    public class DebugPickMouseMode : Component
+    public class DebugPickInputMode : Component
     {
         static readonly IList<Handler> Handlers = new Handler[]
         {
-            new Handler<DebugPickMouseMode, SetMouseModeEvent>((x,e) => x._isActive = e.Mode == MouseModeId.DebugPick),
-            new Handler<DebugPickMouseMode, InputEvent>((x,e) => x.OnInput(e)), 
+            new Handler<DebugPickInputMode, SetInputModeEvent>((x,e) => x._isActive = e.Mode == InputMode.DebugPick),
+            new Handler<DebugPickInputMode, InputEvent>((x,e) => x.OnInput(e)), 
         };
 
         bool _isActive;
@@ -24,7 +25,7 @@ namespace UAlbion.Game.Input
 
             if(e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && x.Down))
             {
-                Raise(new SetMouseModeEvent((int)MouseModeId.Normal));
+                Raise(new SetInputModeEvent((int)InputMode.World2D));
                 return;
             }
 
@@ -34,6 +35,6 @@ namespace UAlbion.Game.Input
             Raise(new ShowDebugInfoEvent(orderedHits));
         }
 
-        public DebugPickMouseMode() : base(Handlers) { }
+        public DebugPickInputMode() : base(Handlers) { }
     }
 }

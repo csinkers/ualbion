@@ -3,6 +3,7 @@ using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Input
@@ -34,14 +35,14 @@ namespace UAlbion.Game.Input
     UpdateViewMatrix();
     */
 
-    public class MouseLookMouseMode : Component
+    public class MouseLookInputMode : Component
     {
         static readonly IList<Handler> Handlers = new Handler[]
         {
-            new Handler<MouseLookMouseMode, SetMouseModeEvent>((x,e) =>
+            new Handler<MouseLookInputMode, SetInputModeEvent>((x,e) =>
             {
-                var activating = e.Mode == MouseModeId.MouseLook && !x._isActive;
-                var deactivating = e.Mode != MouseModeId.MouseLook && x._isActive;
+                var activating = e.Mode == InputMode.MouseLook && !x._isActive;
+                var deactivating = e.Mode != InputMode.MouseLook && x._isActive;
                 if (activating)
                 {
                     x._isActive = true;
@@ -53,7 +54,7 @@ namespace UAlbion.Game.Input
 
                 }
             }),
-            new Handler<MouseLookMouseMode, InputEvent>((x,e) => x.OnInput(e)), 
+            new Handler<MouseLookInputMode, InputEvent>((x,e) => x.OnInput(e)), 
         };
 
         void OnInput(InputEvent e)
@@ -67,6 +68,6 @@ namespace UAlbion.Game.Input
 
         bool _isActive;
 
-        public MouseLookMouseMode() : base(Handlers) { }
+        public MouseLookInputMode() : base(Handlers) { }
     }
 }

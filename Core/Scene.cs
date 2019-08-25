@@ -1,25 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UAlbion.Api;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using Veldrid;
 
 namespace UAlbion.Core
 {
-    [Event("set_scene", "Set the active scene")]
-    public class SetSceneEvent : EngineEvent
-    {
-        public SetSceneEvent(int sceneId)
-        {
-            SceneId = sceneId;
-        }
-
-        [EventPart("id", "The identifier of the scene to activate")]
-        public int SceneId { get; }
-    }
-
     public class Scene : Component
     {
         readonly IList<Type> _activeRendererTypes;

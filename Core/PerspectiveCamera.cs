@@ -8,8 +8,8 @@ namespace UAlbion.Core
     {
         static readonly IList<Handler> Handlers = new Handler[]
         {
-            new Handler<PerspectiveCamera, WindowResizedEvent>((x, e) => x.WindowResized(e.Width, e.Height)),
-            new Handler<PerspectiveCamera, EngineUpdateEvent>((x, e) => x.Update(e.DeltaSeconds)),
+            new Handler<PerspectiveCamera, WindowResizedEvent> ((x, e) => x.WindowResized(e.Width, e.Height)),
+            new Handler<PerspectiveCamera, EngineUpdateEvent>  ((x, e) => x.Update(e.DeltaSeconds)),
             new Handler<PerspectiveCamera, BackendChangedEvent>((x, e) => x.UpdateBackend(e)),
         };
 

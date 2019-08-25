@@ -34,6 +34,7 @@ namespace UAlbion.Core.Textures
         public byte[] TextureData { get; }
         public bool IsDirty { get; private set; }
         readonly IList<SubImage> _subImages = new List<SubImage>();
+        public override string ToString() => $"8BitTexture {Name} ({Width}x{Height}, {_subImages.Count} subimages)";
 
         public EightBitTexture(
             string name,

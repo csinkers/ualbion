@@ -67,7 +67,7 @@ namespace UAlbion.Core.Visual
                 fsin_1 = _Textures;
                 fsin_2 = (_Flags & 0xfffffffc) | textureId;
 
-                gl_Position = Projection * View * vec4((_VertexPosition + vec3(_TilePosition.xy, 0.0f)) * TileSize, 1);
+                gl_Position = Projection * View * vec4((_VertexPosition + vec3(_TilePosition.x, 0.0f, _TilePosition.y)) * TileSize, 1);
             }";
 
         const string FragmentShader = @"
@@ -274,7 +274,7 @@ namespace UAlbion.Core.Visual
                 tilemap.InstanceBufferId = _instanceBuffers.Count;
                 var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)tilemap.Tiles.Length * TileMap.Tile.StructSize, BufferUsage.VertexBuffer));
                 buffer.Name = $"B_Tile3DInst{_instanceBuffers.Count}";
-                gd.UpdateBuffer(buffer, 0, tilemap.Tiles);
+                cl.UpdateBuffer(buffer, 0, tilemap.Tiles);
                 _instanceBuffers.Add(buffer);
 
                 _textureManager.PrepareTexture(tilemap.Floors, gd);
@@ -286,17 +286,16 @@ namespace UAlbion.Core.Visual
 
         public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable renderable)
         {
-            float depth = gd.IsDepthRangeZeroToOne ? 0 : 1;
             var tilemap = (TileMap)renderable;
             cl.PushDebugGroup($"Tiles3D:{tilemap.Name}:{tilemap.RenderOrder}");
-            TextureView floors = _textureManager.GetTexture(tilemap.Floors);
-            TextureView walls = _textureManager.GetTexture(tilemap.Walls);
+            TextureView floors   = _textureManager.GetTexture(tilemap.Floors);
+            TextureView walls    = _textureManager.GetTexture(tilemap.Walls);
             TextureView overlays = _textureManager.GetTexture(tilemap.Overlays);
 
             var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_layout,
                 sc.ProjectionMatrixBuffer,
                 sc.ViewMatrixBuffer,
-                _miscUniformBuffer, //tilemap.TileSize,
+                _miscUniformBuffer,
                 gd.PointSampler,
                 sc.PaletteView,
                 _textureSampler,
@@ -310,9 +309,7 @@ namespace UAlbion.Core.Visual
             cl.SetVertexBuffer(1, _instanceBuffers[tilemap.InstanceBufferId]);
             cl.SetIndexBuffer(_ib, IndexFormat.UInt16);
 
-            //cl.SetViewport(0, new Viewport(0, 0, sc.MainSceneColorTexture.Width, sc.MainSceneColorTexture.Height, depth, depth));
             cl.DrawIndexed((uint)Indices.Length, (uint)tilemap.Tiles.Length, 0, 0, 0);
-            //cl.SetViewport(0, new Viewport(0, 0, sc.MainSceneColorTexture.Width, sc.MainSceneColorTexture.Height, 0, 1));
             cl.PopDebugGroup();
         }
 

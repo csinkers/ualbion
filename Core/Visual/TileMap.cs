@@ -29,6 +29,8 @@ namespace UAlbion.Core.Visual
             public byte Wall { get; set; } // 0 = No Wall
             public byte Overlay { get; set; } // 0 = No Overlay
             public TileFlags Flags { get; set; }
+
+            public override string ToString() => $"({TilePosition.X}, {TilePosition.Y}): {Floor}.{Ceiling}.{Wall}.{Overlay} ({Flags})";
         }
 
         public TileMap(int renderOrder, Vector3 tileSize, uint width, uint height)
@@ -38,9 +40,9 @@ namespace UAlbion.Core.Visual
             Width = width;
             Height = height;
             Tiles = new Tile[width * height];
-            Floors = new MultiTexture("FloorTiles", width, height);
-            Walls = new MultiTexture("WallTiles", width, height);
-            Overlays = new MultiTexture("OverlayTiles", width, height);
+            Floors = new MultiTexture("FloorTiles", 64, 64);
+            Walls = new MultiTexture("WallTiles", 196, 196);
+            Overlays = new MultiTexture("OverlayTiles", 196, 196);
         }
 
         public string Name { get; set; }
@@ -62,13 +64,18 @@ namespace UAlbion.Core.Visual
             int wallSubImage, 
             int overlaySubImage)
         {
-            var tile = Tiles[y * Width + x];
-            tile.TilePosition = new Vector2(x, y);
-            tile.Floor = Floors.AddTexture(floor, floorSubImage);
-            tile.Ceiling = Floors.AddTexture(ceiling, ceilingSubImage);
-            tile.Wall = Walls.AddTexture(wall, wallSubImage);
-            tile.Overlay = Overlays.AddTexture(overlay, overlaySubImage);
-            tile.Flags = TileFlags.UsePalette;
+            unsafe
+            {
+                fixed (Tile* tile = &Tiles[y * Width + x])
+                {
+                    tile->TilePosition = new Vector2(x, y);
+                    tile->Floor = Floors.AddTexture(floor, floorSubImage);
+                    tile->Ceiling = Floors.AddTexture(ceiling, ceilingSubImage);
+                    tile->Wall = Walls.AddTexture(wall, wallSubImage);
+                    tile->Overlay = Overlays.AddTexture(overlay, overlaySubImage);
+                    tile->Flags = TileFlags.UsePalette;
+                }
+            }
         }
     }
 }

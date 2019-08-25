@@ -1,19 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
-    [Event("assets:reload", "Flush the asset cache, forcing all data to be reloaded from disk")]
-    public class ReloadAssetsEvent : GameEvent { }
-
-    [Event("assets:stats", "Print asset cache statistics.")]
-    public class AssetStatsEvent : GameEvent { }
-    [Event("assets:cycle")] public class CycleCacheEvent : GameEvent { }
-
     public class AssetCache : Component
     {
         static readonly IList<Handler> Handlers = new Handler[]

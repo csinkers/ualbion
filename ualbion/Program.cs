@@ -38,7 +38,6 @@ namespace UAlbion
         {
             var id = SceneId.World3D;
             var sceneExchange = new EventExchange(id.ToString(), allScenesExchange);
-            var camera = new PerspectiveCamera();
             var renderers = new[]
             {
                 typeof(DebugGuiRenderer),
@@ -47,6 +46,7 @@ namespace UAlbion
                 typeof(ExtrudedTileMapRenderer)
             };
 
+            var camera = new PerspectiveCamera();
             var scene = new Scene((int)SceneId.World3D, camera, renderers);
             scene.Attach(sceneExchange);
             camera.Attach(sceneExchange);
@@ -72,12 +72,13 @@ namespace UAlbion
 
             AssetConfig assetConfig = AssetConfig.Load(baseDir);
             CoreSpriteConfig coreSpriteConfig = CoreSpriteConfig.Load(baseDir);
+            InputConfig inputConfig = InputConfig.Load(baseDir);
 
             var backend =
                 //VeldridStartup.GetPlatformDefaultBackend()
                 //GraphicsBackend.Metal /*
                 //GraphicsBackend.Vulkan /*
-                //GraphicsBackend.OpenGL /*
+                GraphicsBackend.OpenGL /*
                 //GraphicsBackend.OpenGLES /*
                 GraphicsBackend.Direct3D11 /*
                 //*/
@@ -113,7 +114,7 @@ namespace UAlbion
                 new DebugPickMouseMode().Attach(engine.GlobalExchange);
                 new ContextMenuMouseMode().Attach(engine.GlobalExchange);
                 new InventoryMoveMouseMode().Attach(engine.GlobalExchange);
-                new InputBinder().Attach(engine.GlobalExchange);
+                new InputBinder(inputConfig).Attach(engine.GlobalExchange);
                 new CursorManager(assets).Attach(engine.GlobalExchange);
                 new PaletteManager(assets).Attach(engine.GlobalExchange);
                 engine.GlobalExchange.Raise(new SetMouseModeEvent((int)MouseModeId.Normal), null);

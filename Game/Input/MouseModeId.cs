@@ -5,6 +5,8 @@
         Normal,
         DebugPick,
         ContextMenu,
-        InventoryMove
+        InventoryMove,
+        WaitForClick,
+        MouseLook
     }
 }

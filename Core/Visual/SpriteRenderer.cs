@@ -191,7 +191,7 @@ namespace UAlbion.Core.Visual
                 var multiSprite = new MultiSprite(group.Key, _instanceBuffers.Count, group);
                 var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)multiSprite.Instances.Length * SpriteInstanceData.StructSize, BufferUsage.VertexBuffer));
                 buffer.Name = $"B_SpriteInst{_instanceBuffers.Count}";
-                gd.UpdateBuffer(buffer, 0, multiSprite.Instances);
+                cl.UpdateBuffer(buffer, 0, multiSprite.Instances);
                 _instanceBuffers.Add(buffer);
                 yield return multiSprite;
             }
@@ -202,7 +202,7 @@ namespace UAlbion.Core.Visual
                 multiSprite.BufferId = _instanceBuffers.Count;
                 var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)multiSprite.Instances.Length * SpriteInstanceData.StructSize, BufferUsage.VertexBuffer));
                 buffer.Name = $"B_SpriteInst{_instanceBuffers.Count}";
-                gd.UpdateBuffer(buffer, 0, multiSprite.Instances);
+                cl.UpdateBuffer(buffer, 0, multiSprite.Instances);
                 _instanceBuffers.Add(buffer);
                 yield return multiSprite;
             }

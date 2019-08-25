@@ -9,6 +9,7 @@ using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.Parsers;
+using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {

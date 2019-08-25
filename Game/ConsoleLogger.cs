@@ -10,46 +10,6 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
-    [Event("help", "Display help on the available console commands.", new[] {"?", "usage"})]
-    public class HelpEvent : GameEvent
-    {
-        public HelpEvent(string commandName)
-        {
-            CommandName = commandName;
-        }
-
-        [EventPart("command", true)]
-        public string CommandName { get; }
-    }
-
-    [Event("log", "Writes to the game log.")]
-    public class LogEvent : GameEvent
-    {
-        public enum Level
-        {
-            Verbose,
-            Info,
-            Warning,
-            Error,
-            Critical
-        }
-
-        [EventPart("severity", "The severity of the log event (0=Verbose, 1=Info, 2=Warning, 3=Error, 4=Critical)")]
-        public int Severity { get; }
-
-        [EventPart("msg", "The log message")]
-        public string Message { get; }
-
-        public LogEvent(int severity, string message)
-        {
-            Severity = severity;
-            Message = message;
-        }
-    }
-
-    [Event("cls", "Clear the console history.")]
-    public class ClearConsoleEvent : GameEvent { }
-
     public class ConsoleLogger : IComponent
     {
         EventExchange _exchange;

@@ -1,45 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 using Veldrid;
 
 namespace UAlbion.Game.Input
 {
-    public class SetCursorEvent : GameEvent
-    {
-        public SetCursorEvent(CoreSpriteId cursorId)
-        {
-            CursorId = cursorId;
-        }
-
-        public CoreSpriteId CursorId { get; }
-    }
-
-    public enum InputMode
-    {
-        Global,
-        Console,
-        Menu,
-        World2D,
-        World3D,
-        Map,
-        Inventory,
-        Combat,
-        Conversation
-    }
-
-    public enum CursorMode
-    {
-        Normal,
-        Examine,
-        Interact,
-        PathFinding
-    }
-
     public struct KeyBinding : IEquatable<KeyBinding>
     {
         public Key Key { get; }
@@ -57,112 +27,35 @@ namespace UAlbion.Game.Input
             new Handler<InputBinder, ChangeInputModeEvent>((x, e) => x.OnInputModeChanged(e)),
             new Handler<InputBinder, InputEvent>((x, e) => x.OnInput(e)),
         };
-        public InputBinder() : base(Handlers) { }
 
-        static KeyBinding Bind(Key key, ModifierKeys modifiers = ModifierKeys.None) => new KeyBinding(key, modifiers);
-
-        // TODO: Load bindings from config
-        readonly IDictionary<InputMode, IDictionary<KeyBinding, string>> _bindings = new Dictionary<InputMode, IDictionary<KeyBinding, string>>
+        public InputBinder(InputConfig config) : base(Handlers)
+        {
+            foreach (var rawMode in config.Bindings)
             {
-                { InputMode.Global, new Dictionary<KeyBinding, string>
+                if (!_bindings.ContainsKey(rawMode.Key))
+                    _bindings.Add(rawMode.Key, new Dictionary<KeyBinding, string>());
+
+                var mode = _bindings[rawMode.Key];
+                foreach (var rawBinding in rawMode.Value)
+                {
+                    var parts = rawBinding.Key.Split('+').Select(x => x.Trim().ToLower()).ToArray();
+                    Key key = Key.LastKey;
+                    var modifiers = ModifierKeys.None;
+                    for (int i = 0; i < parts.Length; i++)
                     {
-                        { Bind(Key.Escape), "toggle_menu" },
-                        // { Bind(Key.F5), "quicksave" },
-                        // { Bind(Key.F7), "quickload" },
-                        { Bind(Key.Tilde), "toggle_console" },
-                        { Bind(Key.F4, ModifierKeys.Alt), "quit" },
-                        { Bind(Key.BracketLeft), "e:mag -1" },
-                        { Bind(Key.BracketRight), "e:mag 1" },
-                        { Bind(Key.V), "set_mouse_mode 1" },
-                        { Bind(Key.F5), "start_clock" },
-                        { Bind(Key.F6), "stop_clock" },
-                        { Bind(Key.F10), "update 1" },
+                        if (i == parts.Length - 1)
+                            key = Enum.Parse<Key>(parts[i], true);
+                        else
+                            modifiers |= Enum.Parse<ModifierKeys>(parts[i], true);
                     }
-                },
 
-                { InputMode.World2D, new Dictionary<KeyBinding, string> {
-                    { Bind(Key.Keypad4), "+e:camera_move -128  0" },
-                    { Bind(Key.Keypad6), "+e:camera_move  128  0" },
-                    { Bind(Key.Keypad8), "+e:camera_move  0 -128" },
-                    { Bind(Key.Keypad2), "+e:camera_move  0  128" },
+                    if(key != Key.LastKey)
+                        mode[new KeyBinding(key, modifiers)] = rawBinding.Value;
+                }
+            }
+        }
 
-                    { Bind(Key.W), "+e:camera_move  0 -128" },
-                    { Bind(Key.A), "+e:camera_move -128  0" },
-                    { Bind(Key.S), "+e:camera_move  0  128" },
-                    { Bind(Key.D), "+e:camera_move  128  0" },
-
-                    { Bind(Key.W, ModifierKeys.Shift), "+e:camera_move  0 -512" },
-                    { Bind(Key.A, ModifierKeys.Shift), "+e:camera_move -512  0" },
-                    { Bind(Key.S, ModifierKeys.Shift), "+e:camera_move  0  512" },
-                    { Bind(Key.D, ModifierKeys.Shift), "+e:camera_move  512  0" },
-
-                    {Bind(Key.A, ModifierKeys.Control), "!loadnextmap" },
-                    {Bind(Key.X, ModifierKeys.Control), "!loadprevmap" },
-
-                    /*
-                    { Bind(Key.W), "+party_move  0 -1" },
-                    { Bind(Key.A), "+party_move -1  0" },
-                    { Bind(Key.S), "+party_move  0  1" },
-                    { Bind(Key.D), "+party_move  1  0" },
-                    //*/
-
-                    { Bind(Key.Up),    "+party_move  0 -1" },
-                    { Bind(Key.Down),  "+party_move  0  1" },
-                    { Bind(Key.Left),  "+party_move -1  0" },
-                    { Bind(Key.Right), "+party_move  1  0" },
-
-                    { Bind(Key.Tab), "open_inventory" },
-
-                    { Bind(Key.Number1), "set_active_member 0" },
-                    { Bind(Key.Number2), "set_active_member 1" },
-                    { Bind(Key.Number3), "set_active_member 2" },
-                    { Bind(Key.Number4), "set_active_member 3" },
-                    { Bind(Key.Number5), "set_active_member 4" },
-
-                    { Bind(Key.Q), "cursor_mode look" },
-                    { Bind(Key.E), "cursor_mode manipulate" },
-                } },
-
-                { InputMode.World3D, new Dictionary<KeyBinding, string> {
-                    { Bind(Key.W), "+party_move  0 -1" },
-                    { Bind(Key.S), "+party_move  0  1" },
-                    { Bind(Key.A), "+party_move -1  0" },
-                    { Bind(Key.D), "+party_move  1  0" },
-
-                    { Bind(Key.Up),    "+party_move  0 -1" },
-                    { Bind(Key.Down),  "+party_move  0  1" },
-                    { Bind(Key.Left),  "+party_move -1  0" },
-                    { Bind(Key.Right), "+party_move  1  0" },
-
-                    { Bind(Key.Tab), "open_inventory" },
-
-                    { Bind(Key.Number1), "set_active_member 0" },
-                    { Bind(Key.Number2), "set_active_member 1" },
-                    { Bind(Key.Number3), "set_active_member 2" },
-                    { Bind(Key.Number4), "set_active_member 3" },
-                    { Bind(Key.Number5), "set_active_member 4" },
-
-                    { Bind(Key.Q), "+cursor_mode examine" },
-                    { Bind(Key.E), "+cursor_mode interact" },
-                    { Bind(Key.M), "open_map" },
-                    { Bind(Key.T), "wait" },
-                } },
-                { InputMode.Inventory, new Dictionary<KeyBinding, string> {
-                    { Bind(Key.A, ModifierKeys.Control), "take_all" },
-                    { Bind(Key.Escape), "close_inventory" },
-                }},
-                { InputMode.Conversation, new Dictionary<KeyBinding, string> {
-                    { Bind(Key.Number1), "respond 1" },
-                    { Bind(Key.Number2), "respond 2" },
-                    { Bind(Key.Number3), "respond 3" },
-                    { Bind(Key.Number4), "respond 4" },
-                    { Bind(Key.Number5), "respond 5" },
-                    { Bind(Key.Number6), "respond 6" },
-                    { Bind(Key.Number7), "respond 7" },
-                    { Bind(Key.Escape), "end_conversation" },
-                }},
-        };
-
+        readonly IDictionary<InputMode, IDictionary<KeyBinding, string>> _bindings = new Dictionary<InputMode, IDictionary<KeyBinding, string>>();
         readonly HashSet<Key> _pressedKeys = new HashSet<Key>();
         InputMode _activeMode = InputMode.World2D;
         int _mapId = 100;
@@ -184,7 +77,6 @@ namespace UAlbion.Game.Input
                 return m;
             }
         }
-
 
         void OnInputModeChanged(ChangeInputModeEvent e)
         {
@@ -259,23 +151,4 @@ namespace UAlbion.Game.Input
         public bool GetMouseButtonDown(MouseButton button) { return NewMouseButtonsThisFrame.Contains(button); }
         */
     }
-
-    //[MapEvent("change_input_mode", "Changes the currently active input mode / keybindings")]
-    class ChangeInputModeEvent : GameEvent
-    {
-        //[EventPart("mode")]
-        public InputMode Mode { get; }
-        public ChangeInputModeEvent(InputMode mode)
-        {
-            Mode = mode;
-        }
-    }
-
-    /* SceneId:
-        MainMenu
-        Inventory
-        Combat
-        2D:10
-        3D:5
-     */
 }

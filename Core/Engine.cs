@@ -268,15 +268,5 @@ namespace UAlbion.Core
 
         public void CheckForErrors() { /*GraphicsDevice?.CheckForErrors();*/ }
     }
-
-    public class BackendChangedEvent : EngineEvent
-    {
-        public GraphicsDevice GraphicsDevice { get; }
-
-        public BackendChangedEvent(GraphicsDevice graphicsDevice)
-        {
-            GraphicsDevice = graphicsDevice;
-        }
-    }
 }
 

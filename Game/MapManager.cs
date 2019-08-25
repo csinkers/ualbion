@@ -69,8 +69,4 @@ namespace UAlbion.Game
             _mapExchange = mapExchange;
         }
     }
-
-    public class UnloadMapEvent : GameEvent
-    {
-    }
 }

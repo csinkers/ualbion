@@ -6793,7 +6793,11 @@
           "Width": 156
         },
         "51": {
-          "Width": 130
+          "Width": 130,
+          "Height": 106,
+          "PaletteHints": [
+            14
+          ]
         },
         "52": {
           "Width": 130

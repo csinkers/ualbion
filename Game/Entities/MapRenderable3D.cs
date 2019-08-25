@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -32,6 +31,7 @@ namespace UAlbion.Game.Entities
             _mapData = mapData;
             _labyrinthData = labyrinthData;
             _tilemap = new TileMap((int)DrawLayer.Background, Vector3.One * 64.0f, _mapData.Width, _mapData.Height);
+            Update(new UpdateEvent(0));
         }
 
         void Subscribed() { Raise(new LoadPalEvent((int)_mapData.PaletteId)); }
@@ -41,13 +41,13 @@ namespace UAlbion.Game.Entities
             _frameCount += e.Frames;
             for (int j = 0; j < _mapData.Height; j++)
             {
-                for (int i = 0; i < _mapData.Height; i++)
+                for (int i = 0; i < _mapData.Width; i++)
                 {
                     int index = j * _mapData.Width + i;
                     var floorInfo = _labyrinthData.FloorAndCeilings[_mapData.Floors[index]];
                     var ceilingInfo = _labyrinthData.FloorAndCeilings[_mapData.Ceilings[index]];
                     var contents = _mapData.Contents[index];
-                    var wallInfo = contents < 0x100 ? _labyrinthData.Walls[contents] : null;
+                    var wallInfo = contents < 100 ? _labyrinthData.Walls[contents] : null;
 
                     DungeonFloorId floorId = (DungeonFloorId)floorInfo.TextureNumber;
                     DungeonFloorId ceilingId = (DungeonFloorId)ceilingInfo.TextureNumber;

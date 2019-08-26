@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Numerics;
-using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Parsers;
+using UAlbion.Game.Events;
+using Component = UAlbion.Core.Component;
+using IComponent = UAlbion.Core.IComponent;
 
 namespace UAlbion.Game.Entities
 {
@@ -33,6 +36,8 @@ namespace UAlbion.Game.Entities
         {
             new Handler<Map2D, SubscribedEvent>((x, e) => x.Subscribed()),
             new Handler<Map2D, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
+            new Handler<Map2D, CameraJumpEvent>((x, e) => x.Raise(new EngineCameraMoveEvent(e.X * x.TileSize.X, e.Y * x.TileSize.Y, true))),
+            new Handler<Map2D, CameraMoveEvent>((x, e) => x.Raise(new EngineCameraMoveEvent(e.X * x.TileSize.X, e.Y * x.TileSize.Y))),
             // new Handler<Map2D, UnloadMapEvent>((x, e) => x.Unload()),
         };
 

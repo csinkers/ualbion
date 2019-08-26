@@ -49,23 +49,23 @@ namespace UAlbion.Core.Visual
 
             // Instance Data
             layout(location = 2) in vec2 _TilePosition; // X & Z, in tiles
-            layout(location = 3) in int _Textures; // Floor, Ceiling, Walls, Overlay - 1 byte each, 0 = transparent / off
-            layout(location = 4) in int _Flags; // Bits 2 - 31 are instance flags, 0 & 1 denote texture type.
+            layout(location = 3) in uint _Textures; // Floor, Ceiling, Walls, Overlay - 1 byte each, 0 = transparent / off
+            layout(location = 4) in uint _Flags; // Bits 2 - 31 are instance flags, 0 & 1 denote texture type.
 
             // Outputs
             layout(location = 0) out vec2 fsin_0;     // Texture Coordinates
-            layout(location = 1) out flat int fsin_1; // Textures
-            layout(location = 2) out flat int fsin_2; // Flags, bits 0-1 = tex type
+            layout(location = 1) out flat uint fsin_1; // Textures
+            layout(location = 2) out flat uint fsin_2; // Flags, bits 0-1 = tex type
 
             void main()
             {
-                int textureId = 2;
+                uint textureId = 2;
                 if (gl_VertexIndex < 4) textureId = 0;
                 else if (gl_VertexIndex < 8) textureId = 1;
 
                 fsin_0 = _TexCoords;
                 fsin_1 = _Textures;
-                fsin_2 = (_Flags & 0xfffffffc) | textureId;
+                fsin_2 = (_Flags & 0xfffffffc) | textureId;// | ((gl_InstanceIndex & 4) == 0 ? 256 : 0);
 
                 gl_Position = Projection * View * vec4((_VertexPosition + vec3(_TilePosition.x, 0.0f, _TilePosition.y)) * TileSize, 1);
             }";
@@ -77,40 +77,41 @@ namespace UAlbion.Core.Visual
             layout(set = 0, binding = 3) uniform sampler PaletteSampler;  // vdspv_0_3
             layout(set = 0, binding = 4) uniform texture2D PaletteView;   // vdspv_0_4
             layout(set = 0, binding = 5) uniform sampler TextureSampler;  // vdspv_0_5
-            layout(set = 0, binding = 6) uniform sampler2DArray Floors;   // vdspv_0_6
-            layout(set = 0, binding = 7) uniform sampler2DArray Walls;    // vdspv_0_7
-            layout(set = 0, binding = 8) uniform sampler2DArray Overlays; // vdspv_0_8
+            layout(set = 0, binding = 6) uniform texture2DArray Floors;   // vdspv_0_6
+            layout(set = 0, binding = 7) uniform texture2DArray Walls;    // vdspv_0_7
+            layout(set = 0, binding = 8) uniform texture2DArray Overlays; // vdspv_0_8
             // TODO: Lighting info
 
             // Vertex & Instance data piped through from vertex shader
             layout(location = 0) in vec2 fsin_0;     // Texture Coordinates
-            layout(location = 1) in flat int fsin_1; // Textures
-            layout(location = 2) in flat int fsin_2; // Flags
+            layout(location = 1) in flat uint fsin_1; // Textures
+            layout(location = 2) in flat uint fsin_2; // Flags
 
             layout(location = 0) out vec4 OutputColor;
 
             void main()
             {
-                float floorLayer   = float((fsin_1 & 0xff000000) >> 24);
-                float ceilingLayer = float((fsin_1 & 0x00ff0000) >> 16);
-                float wallLayer    = float((fsin_1 & 0x0000ff00) >> 8);
-                float overlayLayer = float(fsin_1 & 0x000000ff);
+                float floorLayer   = float(fsin_1 & 0x000000ff);
+                float ceilingLayer = float((fsin_1 & 0x0000ff00) >> 8);
+                float wallLayer    = float((fsin_1 & 0x00ff0000) >> 16);
+                float overlayLayer = float((fsin_1 & 0xff000000) >> 24);
 
                 /* 0&1: 0=Floor 1=Ceiling 2=Walls+Overlay 3=Unused
                    UsePalette =  4, Highlight   =   8,
                    RedTint    = 16, GreenTint   =  32,
-                   BlueTint   = 64, Transparent = 128 */
+                   BlueTint   = 64, Transparent = 128,
+                   NoTexture  = 256 */
 
                 vec4 color;
                 if ((fsin_2 & 3) == 0)
-                    color = texture(Floors, vec3(fsin_0, floorLayer));
+                    color = texture(sampler2DArray(Floors, TextureSampler), vec3(fsin_0, floorLayer));
                 else if ((fsin_2 & 3) == 1)
-                    color = texture(Floors, vec3(fsin_0, ceilingLayer));
+                    color = texture(sampler2DArray(Floors, TextureSampler), vec3(fsin_0, ceilingLayer));
                 else
                 {
-                    color = texture(Overlays, vec3(fsin_0, wallLayer));
+                    color = texture(sampler2DArray(Overlays, TextureSampler), vec3(fsin_0, wallLayer));
                     if(color.xyz == vec3(0.0f, 0.0f, 0.0f))
-                        color = texture(Walls, vec3(fsin_0, overlayLayer));
+                        color = texture(sampler2DArray(Walls, TextureSampler), vec3(fsin_0, overlayLayer));
                 }
 
                 if ((fsin_2 & 4) != 0) // 4=UsePalette
@@ -122,12 +123,21 @@ namespace UAlbion.Core.Visual
                     else
                         color = texture(sampler2D(PaletteView, PaletteSampler), vec2(redChannel, 0.0f));
                 }
+                // else if(color.x != 0) color = vec4(color.xx, 0.5f, 1.0f);
 
                 if((fsin_2 &   8) != 0) color = color * 1.2; // Highlight
                 if((fsin_2 &  16) != 0) color = vec4(color.x * 1.5f + 0.3f, color.yzw);         // Red tint
                 if((fsin_2 &  32) != 0) color = vec4(color.x, color.y * 1.5f + 0.3f, color.zw); // Green tint
                 if((fsin_2 &  64) != 0) color = vec4(color.xy, color.z * 1.5f + 0.f, color.w);  // Blue tint
                 if((fsin_2 & 128) != 0) color = vec4(color.xyz, color.w * 0.5f); // Transparent
+                if((fsin_2 & 256) != 0) {
+                    if ((fsin_2 & 3) == 0)
+                        color = vec4(floorLayer / 255.0f, floorLayer / 255.0f, floorLayer / 255.0f, 1.0f);
+                    else if ((fsin_2 & 3) == 1)
+                        color = vec4(ceilingLayer / 255.0f, ceilingLayer / 255.0f, ceilingLayer / 255.0f, 1.0f);
+                    else
+                        color = vec4(wallLayer / 255.0f, wallLayer / 255.0f, wallLayer / 255.0f, 1.0f);
+                }
 
                 OutputColor = color;
             }";
@@ -146,13 +156,13 @@ namespace UAlbion.Core.Visual
             new Vertex3DTextured(-0.5f, 0.0f,  0.5f, 0.0f, 0.0f), //  0 Bottom Front Left
             new Vertex3DTextured( 0.5f, 0.0f,  0.5f, 1.0f, 0.0f), //  1 Bottom Front Right
             new Vertex3DTextured(-0.5f, 0.0f, -0.5f, 0.0f, 1.0f), //  2 Bottom Back Left
-            new Vertex3DTextured(-0.5f, 0.0f, -0.5f, 1.0f, 1.0f), //  3 Bottom Back Right
+            new Vertex3DTextured( 0.5f, 0.0f, -0.5f, 1.0f, 1.0f), //  3 Bottom Back Right
 
             // Ceiling (facing inward)
             new Vertex3DTextured(-0.5f, 1.0f,  0.5f, 0.0f, 0.0f), //  4 Top Front Left
             new Vertex3DTextured( 0.5f, 1.0f,  0.5f, 1.0f, 0.0f), //  5 Top Front Right
             new Vertex3DTextured(-0.5f, 1.0f, -0.5f, 0.0f, 1.0f), //  6 Top Back Left
-            new Vertex3DTextured(-0.5f, 1.0f, -0.5f, 1.0f, 1.0f), //  7 Top Back Right
+            new Vertex3DTextured( 0.5f, 1.0f, -0.5f, 1.0f, 1.0f), //  7 Top Back Right
 
             // Back (facing outward)
             new Vertex3DTextured(-0.5f, 1.0f, -0.5f, 0.0f, 0.0f), //  8 Back Top Right
@@ -181,7 +191,7 @@ namespace UAlbion.Core.Visual
 
         static readonly ushort[] Indices =
         {
-            0,  1,  2,  2,  0,  3, // Floor
+            0,  1,  2,  2,  1,  3, // Floor
             4,  5,  6,  6,  5,  7, // Ceiling
             8,  9, 10, 10,  9, 11, // Back
             12, 13, 14, 14, 13, 15, // Front

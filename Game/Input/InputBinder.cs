@@ -26,6 +26,7 @@ namespace UAlbion.Game.Input
         static readonly Handler[] Handlers = {
             new Handler<InputBinder, SetInputModeEvent>((x, e) => x.OnInputModeChanged(e)),
             new Handler<InputBinder, InputEvent>((x, e) => x.OnInput(e)),
+            new Handler<InputBinder, LoadMapEvent>((x, e) => x._mapId = e.MapId),
         };
 
         public InputBinder(InputConfig config) : base(Handlers)

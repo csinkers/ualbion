@@ -19,7 +19,7 @@ namespace UAlbion.Core
                     return;
 
                 Quaternion lookRotation = Quaternion.CreateFromYawPitchRoll(x.Yaw, x.Pitch, 0f);
-                x._movementDirection = Vector3.Transform(Vector3.Normalize(x._movementDirection), lookRotation);
+                x._movementDirection = Vector3.Transform(x._movementDirection, lookRotation);
                 x._position += x._movementDirection * e.DeltaSeconds;
                 x.UpdateViewMatrix();
             }),

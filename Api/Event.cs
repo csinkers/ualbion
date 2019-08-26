@@ -44,6 +44,11 @@ namespace UAlbion.Api
                 {
                     Parser = part;
                 }
+                else if (PropertyType == typeof(bool))
+                {
+                    var method = typeof(bool).GetMethod("Parse", new[] { typeof(string) });
+                    Parser = Expression.Call(method, part);
+                }
                 else if (PropertyType == typeof(int))
                 {
                     var method = typeof(int).GetMethod("Parse", new[] { typeof(string) });
@@ -59,6 +64,11 @@ namespace UAlbion.Api
                     var method = GetType().GetMethod("ParseNullableInt", BindingFlags.NonPublic | BindingFlags.Static);
                     Parser = Expression.Call(method, part);
                 }
+                else if (PropertyType == typeof(bool?))
+                {
+                    var method = GetType().GetMethod("ParseNullableBool", BindingFlags.NonPublic | BindingFlags.Static);
+                    Parser = Expression.Call(method, part);
+                }
                 else throw new NotImplementedException();
             }
             static int? ParseNullableInt(string s)
@@ -66,6 +76,13 @@ namespace UAlbion.Api
                 if (string.IsNullOrEmpty(s))
                     return null;
                 return int.Parse(s);
+            }
+
+            static bool? ParseNullableBool(string s)
+            {
+                if (string.IsNullOrEmpty(s))
+                    return null;
+                return bool.Parse(s);
             }
         }
 

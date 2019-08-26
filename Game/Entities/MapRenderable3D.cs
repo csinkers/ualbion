@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -44,18 +45,18 @@ namespace UAlbion.Game.Entities
                 for (int i = 0; i < _mapData.Width; i++)
                 {
                     int index = j * _mapData.Width + i;
-                    var floorInfo = _labyrinthData.FloorAndCeilings[_mapData.Floors[index]];
-                    var ceilingInfo = _labyrinthData.FloorAndCeilings[_mapData.Ceilings[index]];
+                    int floorIndex = _mapData.Floors[index];
+                    int ceilingIndex = _mapData.Ceilings[index];
                     var contents = _mapData.Contents[index];
-                    var wallInfo = contents < 100 ? _labyrinthData.Walls[contents] : null;
 
-                    DungeonFloorId floorId = (DungeonFloorId)floorInfo.TextureNumber;
-                    DungeonFloorId ceilingId = (DungeonFloorId)ceilingInfo.TextureNumber;
-                    DungeonWallId wallId = (DungeonWallId)(wallInfo?.TextureNumber ?? 0);
+                    var floorInfo = floorIndex == 0 ? null : _labyrinthData.FloorAndCeilings[floorIndex - 1];
+                    var ceilingInfo = ceilingIndex == 0 ? null : _labyrinthData.FloorAndCeilings[ceilingIndex - 1];
+                    var wallInfo = contents < 100 ? null : _labyrinthData.Walls[contents - 101];
+
                     //DungeonOverlayId overlayId = (DungeonOverlayId)wallInfo.Overlays.First().;
-                    var floor = _assets.LoadTexture(floorId);
-                    var ceiling = _assets.LoadTexture(ceilingId);
-                    var wall = _assets.LoadTexture(wallId);
+                    ITexture floor = floorInfo == null ? null : _assets.LoadTexture((DungeonFloorId)floorInfo.TextureNumber);
+                    ITexture ceiling = ceilingInfo == null ? null : _assets.LoadTexture((DungeonFloorId)ceilingInfo.TextureNumber);
+                    ITexture wall = wallInfo == null ? null : _assets.LoadTexture((DungeonWallId)(wallInfo.TextureNumber));
                     ITexture overlay = null;
                     //var overlay = _assets.LoadTexture(overlayId);
 

@@ -63,7 +63,7 @@ namespace UAlbion.Game.Input
                 return;
 
             if(e.MouseDelta != Vector2.Zero)
-                Raise(new EngineCameraRotateEvent(e.MouseDelta.X * 0.01f, e.MouseDelta.Y * 0.01f));
+                Raise(new EngineCameraRotateEvent(e.MouseDelta.X * -0.01f, e.MouseDelta.Y * -0.01f));
         }
 
         bool _isActive;

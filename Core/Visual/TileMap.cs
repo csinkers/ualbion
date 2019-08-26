@@ -41,8 +41,8 @@ namespace UAlbion.Core.Visual
             Height = height;
             Tiles = new Tile[width * height];
             Floors = new MultiTexture("FloorTiles", 64, 64);
-            Walls = new MultiTexture("WallTiles", 196, 196);
-            Overlays = new MultiTexture("OverlayTiles", 196, 196);
+            Walls = new MultiTexture("WallTiles", 256, 256);
+            Overlays = new MultiTexture("OverlayTiles", 256, 256);
         }
 
         public string Name { get; set; }

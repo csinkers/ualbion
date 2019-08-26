@@ -53,7 +53,7 @@ namespace UAlbion.Formats.Parsers
             public override string ToString() => $"SubObj{ObjectInfoNumber}: ({X}, {Y}, {Z})";
         }
 
-        public struct FloorAndCeiling
+        public class FloorAndCeiling
         {
             [Flags]
             public enum FcFlags : byte

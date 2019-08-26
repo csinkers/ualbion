@@ -1,14 +1,19 @@
 {
     "Global": {
         "Escape": "toggle_menu",
-        "Tilde": "toggle_console",
+        "Tilde": "push_input_mode Console",
         "Alt+F4": "quit",
         "BracketLeft": "e:mag -1",
         "BracketRight": "e:mag 1",
-        "V": "set_mouse_mode 1",
+        "V": "push_input_mode DebugPick",
         "F5": "start_clock",
         "F6": "stop_clock",
-        "F10": "update 1"
+        "F10": "update 1",
+        "Control+A": "!loadnextmap",
+        "Control+X": "!loadprevmap"
+    },
+    "Console": {
+        "Tilde": "pop_input_mode"
     },
     "World2D": {
         "Keypad4": "+e:camera_move -128  0",
@@ -25,9 +30,6 @@
         "Shift+A": "+e:camera_move -512  0",
         "Shift+S": "+e:camera_move  0  512",
         "Shift+D": "+e:camera_move  512  0",
-
-        "Control+A": "!loadnextmap",
-        "Control+X": "!loadprevmap",
 
         "Up":    "+party_move  0 -1",
         "Down":  "+party_move  0  1",
@@ -46,10 +48,15 @@
         "E": "cursor_mode manipulate"
     },
     "MouseLook": {
-        "W": "+party_move  0 -1",
-        "S": "+party_move  0  1",
-        "A": "+party_move -1  0",
-        "D": "+party_move  1  0",
+        "W": "+e:camera_move  0 -128",
+        "A": "+e:camera_move -128  0",
+        "S": "+e:camera_move  0  128",
+        "D": "+e:camera_move  128  0",
+
+        "Shift+W": "+e:camera_move  0 -512",
+        "Shift+A": "+e:camera_move -512  0",
+        "Shift+S": "+e:camera_move  0  512",
+        "Shift+D": "+e:camera_move  512  0",
 
         "Up":    "+party_move  0 -1",
         "Down":  "+party_move  0  1",
@@ -64,19 +71,14 @@
         "Number4": "set_active_member 3",
         "Number5": "set_active_member 4",
 
-        "Q": "set_mouse_mode 7",
-        "E": "set_mouse_mode 6",
         "M": "open_map",
         "T": "wait"
-    },
-    "Interact3D": {
-        "E": "set_mouse_mode 5"
     },
     "Inventory": {
         "Control+A": "take_all",
         "Escape": "close_inventory"
     },
-    "Conversation": {
+    "Dialog": {
         "Number1": "respond 1",
         "Number2": "respond 2",
         "Number3": "respond 3",
@@ -84,6 +86,6 @@
         "Number5": "respond 5",
         "Number6": "respond 6",
         "Number7": "respond 7",
-        "Escape": "end_conversation"
+        "Escape": "close_dialog"
     }
 }

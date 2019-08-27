@@ -67,7 +67,13 @@ namespace UAlbion.Core.Visual
                 fsin_1 = _Textures;
                 fsin_2 = (_Flags & 0xfffffffc) | textureId;// | ((gl_InstanceIndex & 4) == 0 ? 256 : 0);
 
-                gl_Position = Projection * View * vec4((_VertexPosition + vec3(_TilePosition.x, 0.0f, _TilePosition.y)) * TileSize, 1);
+                if(    (textureId == 0 && ((fsin_1 & 0x000000ff) == 0))
+                    || (textureId == 1 && ((fsin_1 & 0x0000ff00) == 0))
+                    || (textureId == 2 && ((fsin_1 & 0x00ff0000) == 0))
+                )
+                    gl_Position = vec4(0,0,0,1);
+                else
+                    gl_Position = Projection * View * vec4((_VertexPosition + vec3(_TilePosition.x, 0.0f, _TilePosition.y)) * TileSize, 1);
             }";
 
         const string FragmentShader = @"
@@ -109,9 +115,9 @@ namespace UAlbion.Core.Visual
                     color = texture(sampler2DArray(Floors, TextureSampler), vec3(fsin_0, ceilingLayer));
                 else
                 {
-                    color = texture(sampler2DArray(Overlays, TextureSampler), vec3(fsin_0, wallLayer));
+                    color = texture(sampler2DArray(Overlays, TextureSampler), vec3(fsin_0, overlayLayer));
                     if(color.xyz == vec3(0.0f, 0.0f, 0.0f))
-                        color = texture(sampler2DArray(Walls, TextureSampler), vec3(fsin_0, overlayLayer));
+                        color = texture(sampler2DArray(Walls, TextureSampler), vec3(fsin_0, wallLayer));
                 }
 
                 if ((fsin_2 & 4) != 0) // 4=UsePalette
@@ -153,10 +159,10 @@ namespace UAlbion.Core.Visual
         static readonly Vertex3DTextured[] Vertices =
         {
             // Floor (facing inward)
-            new Vertex3DTextured(-0.5f, 0.0f,  0.5f, 0.0f, 0.0f), //  0 Bottom Front Left
-            new Vertex3DTextured( 0.5f, 0.0f,  0.5f, 1.0f, 0.0f), //  1 Bottom Front Right
-            new Vertex3DTextured(-0.5f, 0.0f, -0.5f, 0.0f, 1.0f), //  2 Bottom Back Left
-            new Vertex3DTextured( 0.5f, 0.0f, -0.5f, 1.0f, 1.0f), //  3 Bottom Back Right
+            new Vertex3DTextured(-0.5f, 0.0f,  0.5f, 0.0f, 1.0f), //  0 Bottom Front Left
+            new Vertex3DTextured( 0.5f, 0.0f,  0.5f, 1.0f, 1.0f), //  1 Bottom Front Right
+            new Vertex3DTextured(-0.5f, 0.0f, -0.5f, 0.0f, 0.0f), //  2 Bottom Back Left
+            new Vertex3DTextured( 0.5f, 0.0f, -0.5f, 1.0f, 0.0f), //  3 Bottom Back Right
 
             // Ceiling (facing inward)
             new Vertex3DTextured(-0.5f, 1.0f,  0.5f, 0.0f, 0.0f), //  4 Top Front Left

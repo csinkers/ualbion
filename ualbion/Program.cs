@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -96,7 +98,57 @@ namespace UAlbion
 
             using (var assets = new Assets(assetConfig, coreSpriteConfig))
             using (var engine = new Engine(backend))
+            //using(var sw = File.CreateText(@"C:\Depot\Main\bitbucket\ualbion\re\3DInfo.txt"))
             {
+                /*
+                for(int i = 100; i < 400; i++)
+                {
+                    var map = assets.LoadMap3D((MapDataId)i);
+                    if (map == null)
+                        continue;
+
+                    sw.WriteLine($"{i} {(MapDataId)i} {map.Width}x{map.Height} L{(int?)map.LabDataId} P{(int)map.PaletteId}:{map.PaletteId}");
+                    var floors = map.Floors.GroupBy(x => x).Select(x => (x.Key, x.Count())).OrderBy(x => x.Item1);
+                    sw.WriteLine("    Floors: " + string.Join(" ", floors.Select(x => $"{x.Item1}:{x.Item2}")));
+                    var ceilings = map.Ceilings.GroupBy(x => x).Select(x => (x.Key, x.Count())).OrderBy(x => x.Item1);
+                    sw.WriteLine("    Ceilings: " + string.Join(" ", ceilings.Select(x => $"{x.Item1}:{x.Item2}")));
+                    var contents = map.Contents.GroupBy(x => x).Select(x => (x.Key, x.Count())).OrderBy(x => x.Item1);
+                    sw.WriteLine("    Contents: " + string.Join(" ", contents.Select(x => $"{x.Item1}:{x.Item2}")));
+                }
+
+                for(int i = 0; i < 300; i++)
+                {
+                    var l = assets.LoadLabyrinthData((LabyrinthDataId) i);
+                    if(l == null)
+                        continue;
+
+                    sw.WriteLine($"L{i}");
+                    for (int j = 0; j < l.FloorAndCeilings.Count; j++)
+                    {
+                        var fc = l.FloorAndCeilings[j];
+                        sw.WriteLine($"    F/C {j}: {fc.TextureNumber} {fc.AnimationCount}");
+                    }
+
+                    for (int j = 0; j < l.Walls.Count; j++)
+                    {
+                        var w = l.Walls[j];
+                        sw.WriteLine($"    W {j}: {w.TextureNumber} {w.AnimationFrames} P{w.PaletteId}");
+                    }
+
+                    for (int j = 0; j < l.Objects.Count; j++)
+                    {
+                        var o = l.Objects[j];
+                        sw.WriteLine($"    Obj {j}: {o.AutoGraphicsId} [{string.Join(", ",o.SubObjects.Select(x => x.ObjectInfoNumber.ToString()))}]");
+                    }
+
+                    for (int j = 0; j < l.ExtraObjects.Count; j++)
+                    {
+                        var o = l.ExtraObjects[j];
+                        sw.WriteLine($"    Extra {j}: {o.TextureNumber} {o.AnimationFrames} {o.Width}x{o.Height} M:{o.MapWidth}x{o.MapHeight}");
+                    }
+                }
+
+                return; */
                 var sceneExchange = new EventExchange("Scenes", engine.GlobalExchange);
                 var mapExchange = new EventExchange("Maps", engine.GlobalExchange);
                 var spriteResolver = new SpriteResolver(assets);
@@ -117,7 +169,7 @@ namespace UAlbion
                 new InputBinder(inputConfig).Attach(engine.GlobalExchange);
                 new CursorManager(assets).Attach(engine.GlobalExchange);
                 new PaletteManager(assets).Attach(engine.GlobalExchange);
-                engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.TestMapToronto1), null);
+                engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.Jirinaar3D), null);
 
                 /*
                 var menu = new MainMenu();

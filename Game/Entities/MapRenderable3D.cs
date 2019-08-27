@@ -49,9 +49,9 @@ namespace UAlbion.Game.Entities
                     int ceilingIndex = _mapData.Ceilings[index];
                     var contents = _mapData.Contents[index];
 
-                    var floorInfo = floorIndex == 0 ? null : _labyrinthData.FloorAndCeilings[floorIndex - 1];
-                    var ceilingInfo = ceilingIndex == 0 ? null : _labyrinthData.FloorAndCeilings[ceilingIndex - 1];
-                    var wallInfo = contents < 100 ? null : _labyrinthData.Walls[contents - 101];
+                    var floorInfo = floorIndex == 0 || floorIndex >= _labyrinthData.FloorAndCeilings.Count ? null : _labyrinthData.FloorAndCeilings[floorIndex - 1];
+                    var ceilingInfo = ceilingIndex == 0 || ceilingIndex >= _labyrinthData.FloorAndCeilings.Count ? null : _labyrinthData.FloorAndCeilings[ceilingIndex - 1];
+                    var wallInfo = contents < 100 || contents - 101 >= _labyrinthData.Walls.Count ? null : _labyrinthData.Walls[contents - 101];
 
                     //DungeonOverlayId overlayId = (DungeonOverlayId)wallInfo.Overlays.First().;
                     ITexture floor = floorInfo == null ? null : _assets.LoadTexture((DungeonFloorId)floorInfo.TextureNumber);

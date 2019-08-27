@@ -11,7 +11,11 @@ namespace UAlbion.Core
         {
             new Handler<PerspectiveCamera, BackendChangedEvent>((x, e) => x.UpdateBackend(e)),
             new Handler<PerspectiveCamera, BeginFrameEvent>((x, e) => x._movementDirection = Vector3.Zero),
-            new Handler<PerspectiveCamera, EngineCameraMoveEvent>((x, e) => x._movementDirection += new Vector3(e.X, 0, e.Y)),
+            new Handler<PerspectiveCamera, EngineCameraMoveEvent>((x, e) =>
+            {
+                if (e.Absolute == true) x._position = new Vector3(e.X, e.Y, 0);
+                else x._movementDirection += new Vector3(e.X, 0, e.Y);
+            }),
             new Handler<PerspectiveCamera, EngineCameraRotateEvent>((x, e) => { x.Yaw += e.Yaw; x.Pitch += e.Pitch; }),
             new Handler<PerspectiveCamera, EngineUpdateEvent>((x, e) =>
             {
@@ -29,7 +33,7 @@ namespace UAlbion.Core
         Matrix4x4 _viewMatrix;
         Matrix4x4 _projectionMatrix;
 
-        Vector3 _position = new Vector3(0, 48, 0);
+        Vector3 _position = new Vector3(0, 0, 0);
         Vector3 _lookDirection = new Vector3(0, -.3f, -1f);
         Vector3 _movementDirection;
 
@@ -46,8 +50,8 @@ namespace UAlbion.Core
         public Vector3 Position { get => _position; set { _position = value; UpdateViewMatrix(); } }
         public Vector3 LookDirection => _lookDirection;
         public float FieldOfView => 1f;
-        public float NearDistance => 1f;
-        public float FarDistance => 1000f;
+        public float NearDistance => 10f;
+        public float FarDistance => 50000f;
 
         public PerspectiveCamera() : base(Handlers)
         {

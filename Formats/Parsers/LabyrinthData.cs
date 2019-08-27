@@ -191,7 +191,7 @@ namespace UAlbion.Formats.Parsers
                 fc.Unk3 = br.ReadByte();
                 fc.AnimationCount = br.ReadByte();
                 fc.Unk5 = br.ReadByte();
-                fc.TextureNumber = br.ReadUInt16();
+                fc.TextureNumber = (ushort)(br.ReadUInt16() - 1);
                 fc.Unk8 = br.ReadUInt16();
                 l.FloorAndCeilings.Add(fc);
             } 
@@ -203,7 +203,7 @@ namespace UAlbion.Formats.Parsers
                 var eo = new LabyrinthData.ExtraObject();
                 eo.Properties = br.ReadByte();
                 eo.CollisionData = br.ReadBytes(3);
-                eo.TextureNumber = br.ReadUInt16();
+                eo.TextureNumber = (ushort)(br.ReadUInt16() - 1);
                 eo.AnimationFrames = br.ReadByte();
                 eo.Unk7 = br.ReadByte();
                 eo.Width = br.ReadUInt16();
@@ -220,7 +220,7 @@ namespace UAlbion.Formats.Parsers
                 var w = new LabyrinthData.Wall();
                 w.Properties = (LabyrinthData.Wall.WallFlags) br.ReadByte();
                 w.CollisionData = br.ReadBytes(3);
-                w.TextureNumber = br.ReadUInt16();
+                w.TextureNumber = (ushort)(br.ReadUInt16() - 1);
                 w.AnimationFrames = br.ReadByte();
                 w.AutoGfxType = br.ReadByte();
                 w.PaletteId = br.ReadByte();
@@ -231,7 +231,7 @@ namespace UAlbion.Formats.Parsers
                 for (int j = 0; j < overlayCount; j++)
                 {
                     var o = new LabyrinthData.Wall.Overlay();
-                    o.TextureNumber = br.ReadUInt16();
+                    o.TextureNumber = (ushort)(br.ReadUInt16() - 1);
                     o.AnimationFrames = br.ReadByte();
                     o.WriteZero = br.ReadByte();
                     o.YOffset = br.ReadUInt16();

@@ -144,8 +144,9 @@ namespace UAlbion.Core.Textures
             {
                 fixed (byte* texDataPtr = &TextureData[0])
                 {
-                    if(staging.Width < Width || staging.Height < Height)
-                        throw new InvalidOperationException($"Tried to add an oversize ({Width}, {Height}) texture to a staging texture ({staging.Width}, {staging.Height}).");
+                    if (staging.Width < Width || staging.Height < Height)
+                        return;
+                        // throw new InvalidOperationException($"Tried to add an oversize ({Width}, {Height}) texture to a staging texture ({staging.Width}, {staging.Height}).");
 
                     var subImage = _subImages[subImageId];
                     uint subresourceSize = Width * Height * Depth * GetFormatSize(Format);

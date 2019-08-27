@@ -97,7 +97,7 @@ void main()
             cl.DrawIndexed(6, 1, 0, 0, 0);
         }
 
-        public void DestroyDeviceObjects() { _disposeCollector.DisposeAll(); }
+        public void DestroyDeviceObjects() { _disposeCollector?.DisposeAll(); }
         public void Dispose() { DestroyDeviceObjects(); }
     }
 }

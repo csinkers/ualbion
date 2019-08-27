@@ -46,7 +46,7 @@ namespace UAlbion.Core.Visual
 
         public void DestroyDeviceObjects()
         {
-            _imguiRenderer.Dispose();
+            _imguiRenderer?.Dispose();
         }
 
         public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable r)

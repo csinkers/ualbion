@@ -24,12 +24,9 @@ namespace UAlbion.Game.Entities
         {
             MapId = mapId;
             var mapData = assets.LoadMap3D(mapId);
-            if (mapData.LabDataId.HasValue)
-            {
-                var labyrinthData = assets.LoadLabyrinthData(mapData.LabDataId.Value);
-                if(labyrinthData != null)
-                    _renderable = new MapRenderable3D(assets, mapData, labyrinthData);
-            }
+            var labyrinthData = assets.LoadLabyrinthData(mapData.LabDataId);
+            if (labyrinthData != null)
+                _renderable = new MapRenderable3D(assets, mapData, labyrinthData);
         }
 
         public MapDataId MapId { get; }

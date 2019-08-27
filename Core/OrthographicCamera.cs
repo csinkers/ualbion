@@ -10,13 +10,21 @@ namespace UAlbion.Core
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<OrthographicCamera, BeginFrameEvent>((x, e) => x._movementDirection = Vector2.Zero),
-            new Handler<OrthographicCamera, EngineCameraMoveEvent>((x, e) => x._movementDirection += new Vector2(e.X, e.Y)),
+            new Handler<OrthographicCamera, EngineCameraMoveEvent>((x, e) =>
+            {
+                if (e.Absolute == true)
+                {
+                    x._position = new Vector3(e.X, e.Y, 1);
+                    x.UpdateViewMatrix();
+                }
+                else x._movementDirection += new Vector2(e.X, e.Y);
+            }),
             new Handler<OrthographicCamera, ScreenCoordinateSelectEvent>((x, e) => x.TransformSelect(e)),
             new Handler<OrthographicCamera, MagnifyEvent>((x, e) =>
             {
                 x._magnification += e.Delta;
-                if (x._magnification < 1.0f)
-                    x._magnification = 1.0f;
+                if (x._magnification < 0.5f)
+                    x._magnification = 0.5f;
                 x.UpdatePerspectiveMatrix();
             }),
             new Handler<OrthographicCamera, EngineUpdateEvent>((x, e) =>

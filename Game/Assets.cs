@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
@@ -22,7 +23,10 @@ namespace UAlbion.Game
             _assetCache = new AssetCache();
         }
 
-        static readonly IList<Handler> Handlers = new Handler[] { };
+        static readonly IList<Handler> Handlers = new Handler[]
+        {
+            new Handler<Assets,SubscribedEvent>((x,e) => x._assetCache.Attach(x.Exchange)),
+        };
 
         readonly AssetConfig _assetConfig;
         readonly CoreSpriteConfig _coreSpriteConfig;

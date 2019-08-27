@@ -24,7 +24,7 @@ namespace UAlbion.Core.Visual
         { InstanceStepRate = 1 };
 
         static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
-            ResourceLayoutHelper.Uniform("vdspv_0_0"), // Projection Matrix
+            ResourceLayoutHelper.Uniform("vdspv_0_0"),  // Projection Matrix
             ResourceLayoutHelper.Uniform("vdspv_0_1"),  // View Matrix
             ResourceLayoutHelper.Uniform("vdspv_0_2"),  // Tile Size
             ResourceLayoutHelper.Sampler("vdspv_0_3"),  // Point Sampler
@@ -71,7 +71,7 @@ namespace UAlbion.Core.Visual
                     || (textureId == 1 && ((fsin_1 & 0x0000ff00) == 0))
                     || (textureId == 2 && ((fsin_1 & 0x00ff0000) == 0))
                 )
-                    gl_Position = vec4(0,0,0,1);
+                    gl_Position = vec4(0,1e12,0,1); // Inactive faces/vertices get relegated to waaaay above the origin
                 else
                     gl_Position = Projection * View * vec4((_VertexPosition + vec3(_TilePosition.x, 0.0f, _TilePosition.y)) * TileSize, 1);
             }";
@@ -148,14 +148,6 @@ namespace UAlbion.Core.Visual
                 OutputColor = color;
             }";
 
-        public enum TextureSetId
-        {
-            Floor   = 0, // Faces 0, 1
-            Ceiling = 1, // Faces 2, 3
-            Wall    = 2, // Faces 4 - 11
-            Overlay = 3, // Faces 4 - 11
-        }
-
         static readonly Vertex3DTextured[] Vertices =
         {
             // Floor (facing inward)
@@ -197,9 +189,9 @@ namespace UAlbion.Core.Visual
 
         static readonly ushort[] Indices =
         {
-            0,  1,  2,  2,  1,  3, // Floor
-            4,  5,  6,  6,  5,  7, // Ceiling
-            8,  9, 10, 10,  9, 11, // Back
+             0,  1,  2,  2,  1,  3, // Floor
+             4,  5,  6,  6,  5,  7, // Ceiling
+             8,  9, 10, 10,  9, 11, // Back
             12, 13, 14, 14, 13, 15, // Front
             16, 17, 18, 18, 17, 19, // Left
             20, 21, 22, 22, 21, 23, // Right

@@ -13,7 +13,11 @@ namespace UAlbion.Core
             new Handler<PerspectiveCamera, BeginFrameEvent>((x, e) => x._movementDirection = Vector3.Zero),
             new Handler<PerspectiveCamera, EngineCameraMoveEvent>((x, e) =>
             {
-                if (e.Absolute == true) x._position = new Vector3(e.X, e.Y, 0);
+                if (e.Absolute == true)
+                {
+                    x._position = new Vector3(e.X, x._position.Y, e.Y);
+                    x.UpdateViewMatrix();
+                }
                 else x._movementDirection += new Vector3(e.X, 0, e.Y);
             }),
             new Handler<PerspectiveCamera, EngineCameraRotateEvent>((x, e) => { x.Yaw += e.Yaw; x.Pitch += e.Pitch; }),

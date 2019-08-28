@@ -29,6 +29,7 @@ namespace UAlbion.Core.Visual
             public byte Wall { get; set; } // 0 = No Wall
             public byte Overlay { get; set; } // 0 = No Overlay
             public TileFlags Flags { get; set; }
+            public Vector2 WallSize { get; set; }
 
             public override string ToString() => $"({TilePosition.X}, {TilePosition.Y}): {Floor}.{Ceiling}.{Wall}.{Overlay} ({Flags})";
         }
@@ -74,6 +75,8 @@ namespace UAlbion.Core.Visual
                     tile->Wall = Walls.AddTexture(wall, wallSubImage);
                     tile->Overlay = Overlays.AddTexture(overlay, overlaySubImage);
                     tile->Flags = TileFlags.UsePalette;
+                    Walls.GetSubImageDetails(tile->Wall, out _, out _, out var wallSize, out _);
+                    tile->WallSize = wallSize;
                 }
             }
         }

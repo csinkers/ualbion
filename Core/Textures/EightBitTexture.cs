@@ -163,11 +163,9 @@ namespace UAlbion.Core.Textures
                         }
                     }
 
-                    uint destX = (staging.Width  - subImage.W) / 2;
-                    uint destY = (staging.Height - subImage.H) / 2;
                     gd.UpdateTexture(
                         staging, (IntPtr)subImageBytes, subImageSize,
-                        destX, destY, 0, subImage.W, subImage.H, 1,
+                        0, 0, 0, subImage.W, subImage.H, 1,
                         0, layer);
                 }
             }

@@ -33,7 +33,16 @@ namespace UAlbion.Core.Visual
         {
             size = new Vector2(Width, Height);
             texOffset = Vector2.Zero;
-            texSize = Vector2.One;
+
+            var texture = _subTextures[subImage];
+            if(texture.Item1 == null)
+                texSize = Vector2.Zero;
+            else
+            {
+                texture.Item1.GetSubImageDetails(texture.Item2, out texSize, out _, out _, out _);
+                texSize /= new Vector2(Width, Height);
+            }
+
             layer = (uint)subImage;
         }
 

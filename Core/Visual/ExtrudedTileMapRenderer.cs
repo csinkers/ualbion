@@ -18,10 +18,11 @@ namespace UAlbion.Core.Visual
 
         // Instance Layout
         static readonly VertexLayoutDescription InstanceLayout = new VertexLayoutDescription(
-                VertexLayoutHelper.Vector2D("TilePosition"), // 2
-                VertexLayoutHelper.Int("Textures"), // 3
-                VertexLayoutHelper.Int("Flags"))    // 4
-        { InstanceStepRate = 1 };
+            VertexLayoutHelper.Vector2D("TilePosition"), // 2
+            VertexLayoutHelper.Int("Textures"), // 3
+            VertexLayoutHelper.Int("Flags"), // 4
+            VertexLayoutHelper.Vector2D("WallSize") // 5
+        ) { InstanceStepRate = 1 };
 
         static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
             ResourceLayoutHelper.Uniform("vdspv_0_0"),  // Projection Matrix
@@ -51,6 +52,7 @@ namespace UAlbion.Core.Visual
             layout(location = 2) in vec2 _TilePosition; // X & Z, in tiles
             layout(location = 3) in uint _Textures; // Floor, Ceiling, Walls, Overlay - 1 byte each, 0 = transparent / off
             layout(location = 4) in uint _Flags; // Bits 2 - 31 are instance flags, 0 & 1 denote texture type.
+            layout(location = 5) in vec2 _WallSize; // U & W, normalised
 
             // Outputs
             layout(location = 0) out vec2 fsin_0;     // Texture Coordinates
@@ -63,7 +65,10 @@ namespace UAlbion.Core.Visual
                 if (gl_VertexIndex < 4) textureId = 0;
                 else if (gl_VertexIndex < 8) textureId = 1;
 
-                fsin_0 = _TexCoords;
+                if(textureId == 2)
+                    fsin_0 = _TexCoords * _WallSize;
+                else
+                    fsin_0 = _TexCoords;
                 fsin_1 = _Textures;
                 fsin_2 = (_Flags & 0xfffffffc) | textureId;// | ((gl_InstanceIndex & 4) == 0 ? 256 : 0);
 

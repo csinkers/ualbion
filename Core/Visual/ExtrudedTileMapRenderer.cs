@@ -246,7 +246,7 @@ namespace UAlbion.Core.Visual
                 SamplerAddressMode.Wrap,
                 SamplerAddressMode.Wrap,
                 SamplerAddressMode.Clamp,
-                SamplerFilter.MinLinear_MagPoint_MipLinear,
+                SamplerFilter.MinPoint_MagPoint_MipPoint,
                 null, 1, 0, 0, 0, SamplerBorderColor.TransparentBlack
             ));
 

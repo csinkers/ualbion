@@ -2,7 +2,7 @@
 {
     public enum InputMode
     {
-        Global,
+        Global = 0,
         Console,
         DebugPick,
         Dialog,

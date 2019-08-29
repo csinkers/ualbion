@@ -25,7 +25,8 @@ namespace UAlbion.Game.Input
 
             if(e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && x.Down))
             {
-                Raise(new SetInputModeEvent((int)InputMode.World2D));
+                //Raise(new PopInputModeEvent());
+                Raise(new PopInputModeEvent());
                 return;
             }
 

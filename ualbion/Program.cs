@@ -167,6 +167,8 @@ namespace UAlbion
                 new ContextMenuInputMode().Attach(engine.GlobalExchange);
                 new MouseLookInputMode().Attach(engine.GlobalExchange);
                 new InputBinder(inputConfig).Attach(engine.GlobalExchange);
+                new InputModeStack().Attach(engine.GlobalExchange);
+                new SceneStack().Attach(engine.GlobalExchange);
                 new CursorManager(assets).Attach(engine.GlobalExchange);
                 new PaletteManager(assets).Attach(engine.GlobalExchange);
                 engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.Jirinaar3D), null);

@@ -42,10 +42,10 @@ namespace UAlbion.Game
             {
                 var exchange = new EventExchange(_pendingMapChange.Value.ToString(), _mapExchange);
                 var map = new Map2D(_assets, _pendingMapChange.Value);
-                map.Attach(exchange);
-                Raise(new CameraJumpEvent((int)map.LogicalSize.X / 2, (int)map.LogicalSize.Y / 2));
-                Raise(new SetSceneEvent((int)SceneId.World2D));
+                Raise(new SetSceneEvent((int)SceneId.World2D)); // Set the scene first to ensure scene-local components from other scenes are disabled.
+                exchange.Attach(map);
                 Raise(new SetInputModeEvent((int)InputMode.World2D));
+                Raise(new CameraJumpEvent((int)map.LogicalSize.X / 2, (int)map.LogicalSize.Y / 2));
                 Raise(new LogEvent((int)LogEvent.Level.Info, $"Loaded map {(int)_pendingMapChange}: {_pendingMapChange}"));
             }
 
@@ -54,10 +54,10 @@ namespace UAlbion.Game
             {
                 var exchange = new EventExchange(_pendingMapChange.Value.ToString(), _mapExchange);
                 var map = new Map3D(_assets, _pendingMapChange.Value);
-                map.Attach(exchange);
-                Raise(new CameraJumpEvent((int)map.LogicalSize.X / 2, (int)map.LogicalSize.Y / 2));
-                Raise(new SetSceneEvent((int)SceneId.World3D));
+                Raise(new SetSceneEvent((int)SceneId.World3D)); // Set the scene first to ensure scene-local components from other scenes are disabled.
+                exchange.Attach(map);
                 Raise(new SetInputModeEvent((int)InputMode.MouseLook));
+                Raise(new CameraJumpEvent((int)map.LogicalSize.X / 2, (int)map.LogicalSize.Y / 2));
                 Raise(new LogEvent((int)LogEvent.Level.Info, $"Loaded map {(int)_pendingMapChange}: {_pendingMapChange}"));
             }
 

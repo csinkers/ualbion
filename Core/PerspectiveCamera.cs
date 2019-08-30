@@ -10,28 +10,9 @@ namespace UAlbion.Core
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<PerspectiveCamera, BackendChangedEvent>((x, e) => x.UpdateBackend(e)),
-            new Handler<PerspectiveCamera, BeginFrameEvent>((x, e) => x._movementDirection = Vector3.Zero),
-            new Handler<PerspectiveCamera, EngineCameraMoveEvent>((x, e) =>
-            {
-                if (e.Absolute == true)
-                {
-                    x._position = new Vector3(e.X, x._position.Y, e.Y);
-                    x.UpdateViewMatrix();
-                }
-                else x._movementDirection += new Vector3(e.X, 0, e.Y);
-            }),
-            new Handler<PerspectiveCamera, EngineCameraRotateEvent>((x, e) => { x.Yaw += e.Yaw; x.Pitch += e.Pitch; }),
-            new Handler<PerspectiveCamera, EngineUpdateEvent>((x, e) =>
-            {
-                if (x._movementDirection == Vector3.Zero)
-                    return;
-
-                Quaternion lookRotation = Quaternion.CreateFromYawPitchRoll(x.Yaw, x.Pitch, 0f);
-                x._movementDirection = Vector3.Transform(x._movementDirection, lookRotation);
-                x._position += x._movementDirection * e.DeltaSeconds;
-                x.UpdateViewMatrix();
-            }),
             new Handler<PerspectiveCamera, WindowResizedEvent> ((x, e) => x.WindowResized(e.Width, e.Height)),
+            new Handler<PerspectiveCamera, SetCameraPositionEvent>((x, e) => x.Position = e.Position),
+            new Handler<PerspectiveCamera, SetCameraDirectionEvent>((x, e) => { x.Yaw = e.Yaw; x.Pitch = e.Pitch; }),
         };
 
         Matrix4x4 _viewMatrix;
@@ -39,7 +20,6 @@ namespace UAlbion.Core
 
         Vector3 _position = new Vector3(0, 0, 0);
         Vector3 _lookDirection = new Vector3(0, -.3f, -1f);
-        Vector3 _movementDirection;
 
         float _yaw;
         float _pitch;

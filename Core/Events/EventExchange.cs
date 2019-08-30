@@ -17,6 +17,8 @@ namespace UAlbion.Core.Events
         public string Name { get; }
         public bool IsActive { get; set; } = true;
 
+        public override string ToString() => $"EventExchange \"{Name}\" (IsActive={IsActive})";
+
         public IReadOnlyList<EventExchange> Children { get { lock (_syncRoot) return _children.ToList(); } }
 
         public EventExchange(string name, EventExchange parent = null)
@@ -76,6 +78,7 @@ namespace UAlbion.Core.Events
                 CoreTrace.Log.StopRaise(e.GetType().Name, eventText, subscribers.Count);
         }
 
+        public EventExchange Attach(IComponent component) { component.Attach(this); return this; }
         public void Subscribe<T>(IComponent subscriber) { Subscribe(typeof(T), subscriber); }
         public void Subscribe(Type eventType, IComponent subscriber)
         {

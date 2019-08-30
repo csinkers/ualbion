@@ -14,29 +14,29 @@ namespace UAlbion.Core
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<Scene, SetRawPaletteEvent>((x, e) => x._palette = new Palette(e.Name, e.Entries)),
-            new Handler<Scene, SetSceneEvent>((x, e) => x._isActive = e.SceneId == x.Id),
+            new Handler<Scene, SetSceneEvent>((x, e) => x.SceneExchange.IsActive = e.SceneId == x.Id),
         };
 
         readonly IDictionary<Type, IList<IRenderable>> _renderables = new Dictionary<Type, IList<IRenderable>>();
         readonly IDictionary<int, IList<IRenderable>> _processedRenderables = new Dictionary<int, IList<IRenderable>>();
         Palette _palette;
         CommandList _resourceUpdateCl;
-        bool _isActive;
 
         public int Id { get; }
         public ICamera Camera { get; }
-        public EventExchange SceneExchange => Exchange;
+        public EventExchange SceneExchange { get; }
 
-        public Scene(int sceneId, ICamera camera, IList<Type> activeActiveRendererTypeTypes) : base(Handlers)
+        public Scene(int sceneId, ICamera camera, IList<Type> activeActiveRendererTypeTypes, EventExchange sceneExchange) : base(Handlers)
         {
             Id = sceneId;
             Camera = camera;
             _activeRendererTypes = activeActiveRendererTypeTypes;
+            SceneExchange = sceneExchange;
         }
 
         public void RenderAllStages(GraphicsDevice gd, CommandList cl, SceneContext sc, IDictionary<Type, IRenderer> renderers)
         {
-            if (!_isActive)
+            if (!SceneExchange.IsActive)
                 return;
 
             sc.SetCurrentScene(this);

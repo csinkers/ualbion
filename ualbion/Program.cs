@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Reflection;
 using UAlbion.Core;
@@ -8,6 +7,7 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game;
+using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Input;
 using Veldrid;
@@ -20,7 +20,6 @@ namespace UAlbion
         {
             // TODO: Build scenes from config
             var id = SceneId.World2D;
-            var sceneExchange = new EventExchange(id.ToString(), allScenesExchange);
             var camera = new OrthographicCamera();
             var renderers = new[]
             {
@@ -30,16 +29,19 @@ namespace UAlbion
                 typeof(SpriteRenderer),
             };
 
-            var scene = new Scene((int)id, camera, renderers);
-            scene.Attach(sceneExchange);
-            camera.Attach(sceneExchange);
+            var sceneExchange = new EventExchange(id.ToString(), allScenesExchange);
+            var scene = new Scene((int)id, camera, renderers, sceneExchange);
+            allScenesExchange.Attach(scene);
+            var cameraMotion = new CameraMotion2D(camera);
+            sceneExchange
+                .Attach(camera)
+                .Attach(cameraMotion);
             return scene;
         }
 
         public static Scene Create3DScene(Assets assets, EventExchange allScenesExchange)
         {
             var id = SceneId.World3D;
-            var sceneExchange = new EventExchange(id.ToString(), allScenesExchange);
             var renderers = new[]
             {
                 typeof(DebugGuiRenderer),
@@ -49,9 +51,13 @@ namespace UAlbion
             };
 
             var camera = new PerspectiveCamera();
-            var scene = new Scene((int)SceneId.World3D, camera, renderers);
-            scene.Attach(sceneExchange);
-            camera.Attach(sceneExchange);
+            var sceneExchange = new EventExchange(id.ToString(), allScenesExchange);
+            var scene = new Scene((int)SceneId.World3D, camera, renderers, sceneExchange);
+            allScenesExchange.Attach(scene);
+            var cameraMotion = new CameraMotion3D(camera);
+            sceneExchange
+                .Attach(camera)
+                .Attach(cameraMotion);
             return scene;
         }
 
@@ -157,20 +163,22 @@ namespace UAlbion
                 engine.AddScene(Create2DScene(assets, sceneExchange));
                 engine.AddScene(Create3DScene(assets, sceneExchange));
 
-                assets.Attach(engine.GlobalExchange);
-                new ConsoleLogger().Attach(engine.GlobalExchange);
-                new GameClock().Attach(engine.GlobalExchange);
-                new MapManager(assets, mapExchange).Attach(engine.GlobalExchange);
-                new DebugMapInspector().Attach(engine.GlobalExchange);
-                new World2DInputMode().Attach(engine.GlobalExchange);
-                new DebugPickInputMode().Attach(engine.GlobalExchange);
-                new ContextMenuInputMode().Attach(engine.GlobalExchange);
-                new MouseLookInputMode().Attach(engine.GlobalExchange);
-                new InputBinder(inputConfig).Attach(engine.GlobalExchange);
-                new InputModeStack().Attach(engine.GlobalExchange);
-                new SceneStack().Attach(engine.GlobalExchange);
-                new CursorManager(assets).Attach(engine.GlobalExchange);
-                new PaletteManager(assets).Attach(engine.GlobalExchange);
+                engine.GlobalExchange
+                    .Attach(assets)
+                    .Attach(new ConsoleLogger())
+                    .Attach(new GameClock())
+                    .Attach(new MapManager(assets, mapExchange))
+                    .Attach(new DebugMapInspector())
+                    .Attach(new World2DInputMode())
+                    .Attach(new DebugPickInputMode())
+                    .Attach(new ContextMenuInputMode())
+                    .Attach(new MouseLookInputMode())
+                    .Attach(new InputBinder(inputConfig))
+                    .Attach(new InputModeStack())
+                    .Attach(new SceneStack())
+                    .Attach(new CursorManager(assets))
+                    .Attach(new PaletteManager(assets));
+
                 engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.Jirinaar3D), null);
 
                 /*

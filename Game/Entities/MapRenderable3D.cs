@@ -54,9 +54,9 @@ namespace UAlbion.Game.Entities
                     var wallInfo = contents < 100 || contents - 101 >= _labyrinthData.Walls.Count ? null : _labyrinthData.Walls[contents - 101];
 
                     //DungeonOverlayId overlayId = (DungeonOverlayId)wallInfo.Overlays.First().;
-                    ITexture floor = floorInfo == null ? null : _assets.LoadTexture((DungeonFloorId)floorInfo.TextureNumber);
-                    ITexture ceiling = ceilingInfo == null ? null : _assets.LoadTexture((DungeonFloorId)ceilingInfo.TextureNumber);
-                    ITexture wall = wallInfo == null ? null : _assets.LoadTexture((DungeonWallId)(wallInfo.TextureNumber));
+                    ITexture floor = floorInfo?.TextureNumber == null ? null : _assets.LoadTexture(floorInfo.TextureNumber.Value);
+                    ITexture ceiling = ceilingInfo?.TextureNumber == null ? null : _assets.LoadTexture(ceilingInfo.TextureNumber.Value);
+                    ITexture wall = wallInfo?.TextureNumber == null ? null : _assets.LoadTexture(wallInfo.TextureNumber.Value);
                     ITexture overlay = null;
                     //var overlay = _assets.LoadTexture(overlayId);
 

@@ -61,22 +61,21 @@ namespace UAlbion.Core
             _igRenderable = new DebugGuiRenderer(Window.Width, Window.Height);
             _fullScreenQuad = new FullScreenQuad();
             var duplicator = new ScreenDuplicator();
-            var debugMenus = new DebugMenus(this);
-
-            debugMenus.Attach(GlobalExchange);
-            TextureManager.Attach(GlobalExchange);
-            Attach(GlobalExchange);
 
             AddRenderer(_igRenderable);
             AddRenderer(duplicator);
             AddRenderer(_fullScreenQuad);
+            GlobalExchange
+                .Attach(this)
+                .Attach(new DebugMenus(this))
+                .Attach(TextureManager);
         }
 
         public void AddRenderer(IRenderer renderer)
         {
             _renderers.Add(renderer.GetType(), renderer);
             if(renderer is IComponent component)
-                component.Attach(GlobalExchange);
+                GlobalExchange.Attach(component);
         }
 
         public void AddScene(Scene scene) { _scenes.Add(scene); }

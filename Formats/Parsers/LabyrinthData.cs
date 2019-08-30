@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
@@ -41,7 +42,7 @@ namespace UAlbion.Formats.Parsers
             public IList<LabyrinthSubObject> SubObjects { get; } = new List<LabyrinthSubObject>();
 
             public override string ToString() =>
-                $"LabObj{AutoGraphicsId}: {string.Join("; ", SubObjects.Select(x => x.ToString()))}";
+                $"Obj.{AutoGraphicsId}: {string.Join("; ", SubObjects.Select(x => x.ToString()))}";
         }
 
         public struct LabyrinthSubObject
@@ -74,21 +75,25 @@ namespace UAlbion.Formats.Parsers
             public byte Unk3;
             public byte AnimationCount;
             public byte Unk5;
-            public ushort TextureNumber;
+            public DungeonFloorId? TextureNumber; // ushort
             public ushort Unk8;
+            public override string ToString() => $"FC.{TextureNumber}:{AnimationCount} {Properties}";
         }
 
         public class ExtraObject
         {
             public byte Properties; // 0
             public byte[] CollisionData; // 1, len = 3 bytes
-            public ushort TextureNumber; // 4
+            public DungeonObjectId? TextureNumber; // 4, ushort
             public byte AnimationFrames; // 6
             public byte Unk7; // 7
             public ushort Width; // 8
             public ushort Height; // A
             public ushort MapWidth; // C
             public ushort MapHeight; // E
+
+            public override string ToString() =>
+                $"EO.{TextureNumber}:{AnimationFrames} {Width}x{Height} [{MapWidth}x{MapHeight}] {Properties}";
         }
 
         public class Wall
@@ -108,7 +113,7 @@ namespace UAlbion.Formats.Parsers
 
             public WallFlags Properties; // 0
             public byte[] CollisionData; // 1, len = 3 bytes
-            public ushort TextureNumber; // 4
+            public DungeonWallId? TextureNumber; // 4, ushort
             public byte AnimationFrames; // 6
             public byte AutoGfxType;     // 7
             public byte PaletteId;       // 8
@@ -119,14 +124,20 @@ namespace UAlbion.Formats.Parsers
 
             public class Overlay
             {
-                public ushort TextureNumber; // 0
+                public DungeonOverlayId? TextureNumber; // 0, ushort
                 public byte AnimationFrames; // 2
                 public byte WriteZero; // 3
                 public ushort YOffset; // 4
                 public ushort XOffset; // 6
                 public ushort Width;   // 8
                 public ushort Height;  // A
+
+                public override string ToString() =>
+                    $"O.{TextureNumber}:{AnimationFrames} ({XOffset}, {YOffset}) {Width}x{Height}";
             }
+
+            public override string ToString() =>
+                $"Wall.{TextureNumber}:{AnimationFrames} {Width}x{Height} ({Properties}) [ {string.Join(", ", Overlays.Select(x => x.ToString()))} ]";
         }
     }
 
@@ -191,7 +202,8 @@ namespace UAlbion.Formats.Parsers
                 fc.Unk3 = br.ReadByte();
                 fc.AnimationCount = br.ReadByte();
                 fc.Unk5 = br.ReadByte();
-                fc.TextureNumber = (ushort)(br.ReadUInt16() - 1);
+                ushort textureNumber = br.ReadUInt16();
+                fc.TextureNumber = textureNumber == 0 ? (DungeonFloorId?)null : (DungeonFloorId)(textureNumber - 1);
                 fc.Unk8 = br.ReadUInt16();
                 l.FloorAndCeilings.Add(fc);
             } 
@@ -203,7 +215,8 @@ namespace UAlbion.Formats.Parsers
                 var eo = new LabyrinthData.ExtraObject();
                 eo.Properties = br.ReadByte();
                 eo.CollisionData = br.ReadBytes(3);
-                eo.TextureNumber = (ushort)(br.ReadUInt16() - 1);
+                ushort textureNumber = br.ReadUInt16();
+                eo.TextureNumber = textureNumber == 0 ? (DungeonObjectId?)null : (DungeonObjectId)(textureNumber - 1);
                 eo.AnimationFrames = br.ReadByte();
                 eo.Unk7 = br.ReadByte();
                 eo.Width = br.ReadUInt16();
@@ -220,7 +233,8 @@ namespace UAlbion.Formats.Parsers
                 var w = new LabyrinthData.Wall();
                 w.Properties = (LabyrinthData.Wall.WallFlags) br.ReadByte();
                 w.CollisionData = br.ReadBytes(3);
-                w.TextureNumber = (ushort)(br.ReadUInt16() - 1);
+                ushort textureNumber = br.ReadUInt16();
+                w.TextureNumber = textureNumber == 0 ? (DungeonWallId?)null : (DungeonWallId)(textureNumber - 1);
                 w.AnimationFrames = br.ReadByte();
                 w.AutoGfxType = br.ReadByte();
                 w.PaletteId = br.ReadByte();
@@ -231,7 +245,8 @@ namespace UAlbion.Formats.Parsers
                 for (int j = 0; j < overlayCount; j++)
                 {
                     var o = new LabyrinthData.Wall.Overlay();
-                    o.TextureNumber = (ushort)(br.ReadUInt16() - 1);
+                    textureNumber = br.ReadUInt16();
+                    o.TextureNumber = textureNumber == 0 ? (DungeonOverlayId?)null : (DungeonOverlayId)(textureNumber - 1);
                     o.AnimationFrames = br.ReadByte();
                     o.WriteZero = br.ReadByte();
                     o.YOffset = br.ReadUInt16();

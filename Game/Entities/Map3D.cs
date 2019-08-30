@@ -3,6 +3,7 @@ using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Parsers;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities
@@ -14,10 +15,10 @@ namespace UAlbion.Game.Entities
         {
             new Handler<Map3D, SubscribedEvent>((x, e) => x.Subscribed()),
             new Handler<Map3D, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
-            new Handler<Map3D, CameraJumpEvent>((x, e) => x.Raise(new EngineCameraMoveEvent(e.X * x.TileSize.X, e.Y * x.TileSize.Y, true))),
-            new Handler<Map3D, CameraMoveEvent>((x, e) => x.Raise(new EngineCameraMoveEvent(e.X * x.TileSize.X, e.Y * x.TileSize.Y))),
             // new Handler<Map3D, UnloadMapEvent>((x, e) => x.Unload()),
         };
+
+        readonly LabyrinthData _labyrinthData;
 
         void Select(WorldCoordinateSelectEvent worldCoordinateSelectEvent)
         {
@@ -27,18 +28,25 @@ namespace UAlbion.Game.Entities
         {
             MapId = mapId;
             var mapData = assets.LoadMap3D(mapId);
-            var labyrinthData = assets.LoadLabyrinthData(mapData.LabDataId);
-            if (labyrinthData != null)
-                _renderable = new MapRenderable3D(assets, mapData, labyrinthData);
+            _labyrinthData = assets.LoadLabyrinthData(mapData.LabDataId);
+            if (_labyrinthData != null)
+            {
+                _renderable = new MapRenderable3D(assets, mapData, _labyrinthData);
+                TileSize = new Vector3(64.0f, _labyrinthData.WallHeight, 64.0f);
+            }
+            else
+                TileSize = new Vector3(64.0f, 64.0f, 64.0f);
         }
 
         public MapDataId MapId { get; }
         public Vector2 LogicalSize { get; }
-        public Vector2 TileSize { get; } = new Vector2(64.0f, 64.0f);
+        public Vector3 TileSize { get; }
 
         void Subscribed()
         {
-            _renderable?.Attach(Exchange);
+            if (_renderable != null)
+                Exchange.Attach(_renderable);
+            Raise(new SetTileSizeEvent(TileSize, _labyrinthData.CameraHeight != 0 ? _labyrinthData.CameraHeight : 32));
         }
     }
 }

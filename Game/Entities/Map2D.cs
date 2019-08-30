@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Numerics;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
@@ -36,8 +35,6 @@ namespace UAlbion.Game.Entities
         {
             new Handler<Map2D, SubscribedEvent>((x, e) => x.Subscribed()),
             new Handler<Map2D, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
-            new Handler<Map2D, CameraJumpEvent>((x, e) => x.Raise(new EngineCameraMoveEvent(e.X * x.TileSize.X, e.Y * x.TileSize.Y, true))),
-            new Handler<Map2D, CameraMoveEvent>((x, e) => x.Raise(new EngineCameraMoveEvent(e.X * x.TileSize.X, e.Y * x.TileSize.Y))),
             // new Handler<Map2D, UnloadMapEvent>((x, e) => x.Unload()),
         };
 
@@ -101,7 +98,7 @@ namespace UAlbion.Game.Entities
 
         void Subscribed()
         {
-            _renderable.Attach(Exchange);
+            Exchange.Attach(_renderable);
             foreach (var npc in _mapData.Npcs)
             {
                 IComponent sprite = 
@@ -109,8 +106,9 @@ namespace UAlbion.Game.Entities
                         ? (IComponent)new SmallNpcSprite((SmallNpcId)npc.ObjectNumber, npc.Waypoints)
                         : new LargeNpcSprite((LargeNpcId)npc.ObjectNumber, npc.Waypoints, _assets);
 
-                sprite.Attach(Exchange);
+                Exchange.Attach(sprite);
             }
+            Raise(new SetTileSizeEvent(new Vector3(TileSize, 0.0f), 1.0f));
         }
     }
 }

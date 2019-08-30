@@ -195,7 +195,7 @@ namespace UAlbion.Core.Visual
         static readonly ushort[] Indices =
         {
              0,  1,  2,  2,  1,  3, // Floor
-             4,  5,  6,  6,  5,  7, // Ceiling
+             6,  5,  4,  7,  5,  6, // Ceiling
              8,  9, 10, 10,  9, 11, // Back
             12, 13, 14, 14, 13, 15, // Front
             16, 17, 18, 18, 17, 19, // Left
@@ -243,8 +243,8 @@ namespace UAlbion.Core.Visual
 
             _layout = factory.CreateResourceLayout(PerSpriteLayoutDescription);
             _textureSampler = gd.ResourceFactory.CreateSampler(new SamplerDescription(
-                SamplerAddressMode.Wrap,
-                SamplerAddressMode.Wrap,
+                SamplerAddressMode.Clamp,
+                SamplerAddressMode.Clamp,
                 SamplerAddressMode.Clamp,
                 SamplerFilter.MinPoint_MagPoint_MipPoint,
                 null, 1, 0, 0, 0, SamplerBorderColor.TransparentBlack
@@ -255,7 +255,7 @@ namespace UAlbion.Core.Visual
                     : DepthStencilStateDescription.DepthOnlyLessEqual;
 
             var rasterizerMode = new RasterizerStateDescription(
-                FaceCullMode.None, PolygonFillMode.Solid, FrontFace.Clockwise,
+                FaceCullMode.Front, PolygonFillMode.Solid, FrontFace.Clockwise,
                 true, true);
 
             var pd = new GraphicsPipelineDescription(

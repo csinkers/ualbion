@@ -12,25 +12,30 @@
         "Control+A": "!loadnextmap",
         "Control+X": "!loadprevmap",
 
-        "W": "+e:camera_move  0 -128",
-        "A": "+e:camera_move -128  0",
-        "S": "+e:camera_move  0  128",
-        "D": "+e:camera_move  128  0",
+        "W": "+camera_move  0 -2",
+        "A": "+camera_move -2  0",
+        "S": "+camera_move  0  2",
+        "D": "+camera_move  2  0",
 
-        "Shift+W": "+e:camera_move  0 -512",
-        "Shift+A": "+e:camera_move -512  0",
-        "Shift+S": "+e:camera_move  0  512",
-        "Shift+D": "+e:camera_move  512  0"
+        "Shift+W": "+camera_move  0 -4",
+        "Shift+A": "+camera_move -4  0",
+        "Shift+S": "+camera_move  0  4",
+        "Shift+D": "+camera_move  4  0"
     },
     "Console": {
         "Tilde": "pop_input_mode"
     },
     "DebugPick": {},
     "World2D": {
-        "Keypad4": "+e:camera_move -128  0",
-        "Keypad6": "+e:camera_move  128  0",
-        "Keypad8": "+e:camera_move  0 -128",
-        "Keypad2": "+e:camera_move  0  128",
+        "W": "+camera_move  0 -4",
+        "A": "+camera_move -4  0",
+        "S": "+camera_move  0  4",
+        "D": "+camera_move  4  0",
+
+        "Shift+W": "+camera_move  0 -8",
+        "Shift+A": "+camera_move -8  0",
+        "Shift+S": "+camera_move  0  8",
+        "Shift+D": "+camera_move  8  0",
 
         "Up":    "+party_move  0 -1",
         "Down":  "+party_move  0  1",

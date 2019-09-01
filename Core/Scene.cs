@@ -87,7 +87,7 @@ namespace UAlbion.Core
 
             var orderedKeys = _processedRenderables.Keys.OrderBy(x => x).ToList();
             CoreTrace.Log.Info("Scene", "Sorted processed renderables");
-            float depthClear = gd.IsDepthRangeZeroToOne ? 0f : 1f;
+            float depthClear = 1f; //gd.IsDepthRangeZeroToOne ? 1f : 0f;
 
             // Main scene
             using (new RenderDebugGroup(cl, "Main Scene Pass"))

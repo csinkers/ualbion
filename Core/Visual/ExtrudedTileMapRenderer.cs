@@ -251,8 +251,8 @@ namespace UAlbion.Core.Visual
             ));
 
             var depthStencilMode = gd.IsDepthRangeZeroToOne
-                    ? DepthStencilStateDescription.DepthOnlyGreaterEqual
-                    : DepthStencilStateDescription.DepthOnlyLessEqual;
+                    ? DepthStencilStateDescription.DepthOnlyLessEqual
+                    : DepthStencilStateDescription.DepthOnlyGreaterEqual;
 
             var rasterizerMode = new RasterizerStateDescription(
                 FaceCullMode.Front, PolygonFillMode.Solid, FrontFace.Clockwise,

@@ -50,9 +50,7 @@ namespace UAlbion.Game.Input
                 }
 
                 if (deactivating)
-                {
-
-                }
+                    x._isActive = false;
             }),
             new Handler<MouseLookInputMode, InputEvent>((x,e) => x.OnInput(e)), 
         };

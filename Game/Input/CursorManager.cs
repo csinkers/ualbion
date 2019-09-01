@@ -48,7 +48,7 @@ namespace UAlbion.Game.Input
             var position = new Vector3(
                 2 * _position.X / _windowSize.X - 1.0f,
                 1.0f - 2 * _position.Y / _windowSize.Y,
-                1.0f);
+                0.1f);
 
             var size = new Vector2(
                 UiScaleFactor * _size.X / _windowSize.X,

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using ImGuiNET;
 using UAlbion.Core.Events;
 using Veldrid;
@@ -79,19 +78,15 @@ namespace UAlbion.Core
         }
 
         public void AddScene(Scene scene) { _scenes.Add(scene); }
-        public Scene GetScene(int sceneId) => _scenes.FirstOrDefault(x => x.Id == sceneId);
-
         public void Run()
         {
             CreateAllObjects();
             ImGui.StyleColorsClassic();
             Raise(new WindowResizedEvent(Window.Width, Window.Height));
             Raise(new BeginFrameEvent());
-            //if (Scene == null)
-            //    throw new InvalidOperationException("The scene must be set before the main loop can be run.");
 
             var frameCounter = new FrameCounter();
-            while (Window.Exists)//*/ && frameCounter.FrameCount < 20)
+            while (Window.Exists)
             {
                 double deltaSeconds = frameCounter.StartFrame();
                 Raise(new BeginFrameEvent());
@@ -178,7 +173,7 @@ namespace UAlbion.Core
 
         internal void ChangeBackend(GraphicsBackend backend) => ChangeBackend(backend, false);
 
-        internal void ChangeBackend(GraphicsBackend backend, bool forceRecreateWindow)
+        void ChangeBackend(GraphicsBackend backend, bool forceRecreateWindow)
         {
             if (GraphicsDevice != null)
             {

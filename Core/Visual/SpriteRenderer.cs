@@ -154,8 +154,8 @@ namespace UAlbion.Core.Visual
             _perSpriteResourceLayout = factory.CreateResourceLayout(Shader.PerSpriteLayoutDescription);
 
             var depthStencilMode = gd.IsDepthRangeZeroToOne
-                    ? DepthStencilStateDescription.DepthOnlyGreaterEqual
-                    : DepthStencilStateDescription.DepthOnlyLessEqual;
+                    ? DepthStencilStateDescription.DepthOnlyLessEqual
+                    : DepthStencilStateDescription.DepthOnlyGreaterEqual;
 
             var rasterizerMode = new RasterizerStateDescription(
                 FaceCullMode.None, PolygonFillMode.Solid, FrontFace.Clockwise,

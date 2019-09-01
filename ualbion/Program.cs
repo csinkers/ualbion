@@ -1,5 +1,5 @@
-﻿using System.IO;
-using System.Linq;
+﻿using System;
+using System.IO;
 using System.Reflection;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -47,7 +47,8 @@ namespace UAlbion
                 typeof(DebugGuiRenderer),
                 typeof(FullScreenQuad),
                 typeof(ScreenDuplicator),
-                typeof(ExtrudedTileMapRenderer)
+                typeof(ExtrudedTileMapRenderer),
+                typeof(SpriteRenderer),
             };
 
             var camera = new PerspectiveCamera();
@@ -63,6 +64,10 @@ namespace UAlbion
 
         static unsafe void Main()
         {
+            //*
+            Console.WriteLine("Entry point reached. Press enter to continue");
+            Console.ReadLine(); //*/
+
             Veldrid.Sdl2.SDL_version version;
             Veldrid.Sdl2.Sdl2Native.SDL_GetVersion(&version);
 
@@ -86,7 +91,7 @@ namespace UAlbion
                 //VeldridStartup.GetPlatformDefaultBackend()
                 //GraphicsBackend.Metal /*
                 //GraphicsBackend.Vulkan /*
-                GraphicsBackend.OpenGL /*
+                //GraphicsBackend.OpenGL /*
                 //GraphicsBackend.OpenGLES /*
                 GraphicsBackend.Direct3D11 /*
                 //*/

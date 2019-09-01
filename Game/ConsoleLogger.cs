@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -12,6 +13,7 @@ namespace UAlbion.Game
 {
     public class ConsoleLogger : IComponent
     {
+        readonly ConcurrentQueue<IEvent> _queuedEvents = new ConcurrentQueue<IEvent>();
         EventExchange _exchange;
         bool _done;
 
@@ -51,6 +53,14 @@ namespace UAlbion.Game
         {
             switch(@event)
             {
+                case BeginFrameEvent _:
+                    while (_queuedEvents.TryDequeue(out var queuedEvent))
+                    {
+                        try { _exchange.Raise(queuedEvent, this); }
+                        catch (Exception exception) { Console.WriteLine("Error: {0}", exception.Message); }
+                    }
+                    break;
+
                 case IVerboseEvent _: break;
                 case LogEvent e:
                 {
@@ -126,7 +136,7 @@ namespace UAlbion.Game
             _exchange = null;
         }
 
-        public void ConsoleReaderThread()
+        void ConsoleReaderThread()
         {
             do
             {
@@ -138,10 +148,7 @@ namespace UAlbion.Game
                 {
                     var @event = Event.Parse(command);
                     if (@event != null)
-                    {
-                        try { _exchange.Raise(@event, this); }
-                        catch (Exception e) { Console.WriteLine("Error: {0}", e.Message); }
-                    }
+                        _queuedEvents.Enqueue(@event);
                     else
                         Console.WriteLine("Unknown event \"{0}\"", command);
                 }

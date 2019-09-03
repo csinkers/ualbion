@@ -57,6 +57,8 @@ namespace UAlbion.Core.Textures
             IsDirty = true;
         }
 
+        public bool ContainsColors(IEnumerable<byte> colors) => TextureData.Distinct().Intersect(colors).Any();
+
         public void GetSubImageDetails(int id, out Vector2 size, out Vector2 texOffset, out Vector2 texSize, out uint layer)
         {
             Debug.Assert(id == 0 || id < _subImages.Count);
@@ -138,7 +140,7 @@ namespace UAlbion.Core.Textures
             return Math.Max(1, ret);
         }
 
-        public void UploadSubImageToStagingTexture(GraphicsDevice gd, int subImageId, Texture staging, uint layer)
+        public void UploadSubImageToStagingTexture(GraphicsDevice gd, int subImageId, Texture staging, uint layer, uint[] palette, uint x, uint y)
         {
             unsafe
             {
@@ -146,26 +148,27 @@ namespace UAlbion.Core.Textures
                 {
                     if (staging.Width < Width || staging.Height < Height)
                         return;
-                        // throw new InvalidOperationException($"Tried to add an oversize ({Width}, {Height}) texture to a staging texture ({staging.Width}, {staging.Height}).");
+                    // throw new InvalidOperationException($"Tried to add an oversize ({Width}, {Height}) texture to a staging texture ({staging.Width}, {staging.Height}).");
 
                     var subImage = _subImages[subImageId];
                     uint subresourceSize = Width * Height * Depth * GetFormatSize(Format);
                     byte* layerPtr = texDataPtr + subImage.Layer * subresourceSize;
 
                     uint subImageSize = subImage.W * subImage.H;
-                    byte* subImageBytes = stackalloc byte[(int)subImageSize];
+                    uint* subImageBytes = stackalloc uint[(int)subImageSize];
                     for (int j = 0; j < subImage.H; j++)
                     {
                         byte* sourceRowPtr = layerPtr + (j + subImage.Y) * Width + subImage.X;
                         for (int i = 0; i < subImage.W; i++)
                         {
-                            subImageBytes[j * subImage.W + i] = sourceRowPtr[i];
+                            int index = j * (int)subImage.W + i;
+                            subImageBytes[index] = palette[sourceRowPtr[i]];
                         }
                     }
 
                     gd.UpdateTexture(
-                        staging, (IntPtr)subImageBytes, subImageSize,
-                        0, 0, 0, subImage.W, subImage.H, 1,
+                        staging, (IntPtr)subImageBytes, subImageSize * sizeof(uint),
+                        x, y, 0, subImage.W, subImage.H, 1,
                         0, layer);
                 }
             }

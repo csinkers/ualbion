@@ -83,8 +83,8 @@ namespace UAlbion.Game.Entities
                 default: drawLayer = DrawLayer.Underlay; break;
             }
 
-            float zPos = (255 - j + (int)drawLayer) / 255.0f;
-            instance.Offset = new Vector3(new Vector2(i, j) * tileSize, zPos);
+            // float zPos = (255 - j + (int)drawLayer) / 255.0f;
+            instance.Offset = new Vector3(new Vector2(i, j) * tileSize, drawLayer.ToZCoordinate(j));
             instance.Size = tileSize;
 
             instance.TexPosition = texPosition;

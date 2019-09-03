@@ -44,11 +44,11 @@ namespace UAlbion.Game.Input
         {
             if (_windowSize.X < 1 || _windowSize.Y < 1)
                 return;
-
+            var drawLayer = DrawLayer.Interface;
             var position = new Vector3(
                 2 * _position.X / _windowSize.X - 1.0f,
                 1.0f - 2 * _position.Y / _windowSize.Y,
-                0.1f);
+                drawLayer.ToZCoordinate(0));
 
             var size = new Vector2(
                 UiScaleFactor * _size.X / _windowSize.X,
@@ -57,7 +57,7 @@ namespace UAlbion.Game.Input
             e.Add(new SpriteDefinition<CoreSpriteId>(_cursorId,
                 0,
                 position,
-                (int) DrawLayer.Interface,
+                (int)drawLayer,
                 SpriteFlags.NoTransform,
                 size));
         }

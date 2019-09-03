@@ -6,6 +6,7 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Parsers;
+using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities
 {
@@ -41,11 +42,13 @@ namespace UAlbion.Game.Entities
         {
             new Handler<LargeNpcSprite, RenderEvent>((x,e) => x.Render(e)),
             new Handler<LargeNpcSprite, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
+            new Handler<LargeNpcSprite, SetTileSizeEvent>((x,e) => x._tileSize = new Vector2(e.TileSize.X, e.TileSize.Y))
         };
 
         readonly LargeNpcId _id;
         readonly MapNpc.Waypoint[] _waypoints;
         Vector2 _position;
+        Vector2 _tileSize;
         Vector2 _size = Vector2.One;
         Animation _animation;
         int _frame;
@@ -55,7 +58,7 @@ namespace UAlbion.Game.Entities
         {
             _id = id;
             _waypoints = waypoints;
-            _position = new Vector2(waypoints[0].X * 8, waypoints[0].Y * 8);
+            _position = new Vector2(waypoints[0].X, waypoints[0].Y);
             var texture = assets.LoadTexture(_id);
             if (texture != null)
             {
@@ -70,13 +73,14 @@ namespace UAlbion.Game.Entities
             if (Math.Abs(denominator) < 0.00001f)
                 return;
 
-            float t = Vector3.Dot(new Vector3(_position, 0.0f) - e.Origin, Normal) / denominator;
+            var pixelPosition = _position * _tileSize;
+            float t = Vector3.Dot(new Vector3(pixelPosition, 0.0f) - e.Origin, Normal) / denominator;
             if (t < 0)
                 return;
 
             var intersectionPoint = e.Origin + t * e.Direction;
-            int x = (int)(intersectionPoint.X - _position.X);
-            int y = (int)(intersectionPoint.Y - _position.Y);
+            int x = (int)(intersectionPoint.X - pixelPosition.X);
+            int y = (int)(intersectionPoint.Y - pixelPosition.Y);
 
             if (x < 0 || x >= _size.X ||
                 y < 0 || y >= _size.Y)
@@ -87,7 +91,7 @@ namespace UAlbion.Game.Entities
 
         void Render(RenderEvent e)
         {
-            var positionLayered = new Vector3(_position, ((int)DrawLayer.Characters1 + 255 - _position.Y) / 255.0f);
+            var positionLayered = new Vector3(_position * _tileSize, DrawLayer.Characters1.ToZCoordinate(_position.Y));
             var npcSprite = new SpriteDefinition<LargeNpcId>(
                 _id,
                 0,

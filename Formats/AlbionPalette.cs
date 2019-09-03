@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using UAlbion.Api;
 
 namespace UAlbion.Formats
 {
@@ -11,9 +12,11 @@ namespace UAlbion.Formats
         public int Id { get; }
         public string Name { get; }
         public bool IsAnimated => AnimatedRanges.ContainsKey(Id);
-        public readonly uint[] Entries = new uint[0x100];
+        public int Period { get; }
+        readonly uint[] Entries = new uint[0x100];
+        readonly IList<uint[]> _cache = new List<uint[]>();
 
-        public static readonly IDictionary<int, IList<(byte, byte)>> AnimatedRanges = new Dictionary<int, IList<(int, int)>> {
+        static readonly IDictionary<int, IList<(byte, byte)>> AnimatedRanges = new Dictionary<int, IList<(int, int)>> {
             { 0,  new[] { (0x99, 0x9f), (0xb0, 0xbf) } }, // 7, 16 => 112
             { 1,  new[] { (0x99, 0x9f), (0xb0, 0xb4), (0xb5, 0xbf) } }, // 7, 5, 11 => 385
             { 2,  new[] { (0x40, 0x43), (0x44, 0x4f) } }, // 4, 12 => 12
@@ -35,24 +38,41 @@ namespace UAlbion.Formats
             long startingOffset = br.BaseStream.Position;
             for (int i = 0; i < 192; i++)
             {
-                //*
                 Entries[i]  = (uint)br.ReadByte() << 0; // Red
                 Entries[i] |= (uint)br.ReadByte() << 8; // Green
                 Entries[i] |= (uint)br.ReadByte() << 16; // Blue
                 Entries[i] |= (uint)(i == 0 ? 0 : 0xff) << 24; // Alpha
-                //*/
-                /*
-                br.ReadBytes(3);
-                Entries[i] = 0;
-                Entries[i] |= (uint)0xff << 24; // Alpha
-                Entries[i] |= (uint)i << 16; // Blue
-                Entries[i] |= (uint)i << 8; // Green
-                Entries[i] |= (uint)i << 0; // Red
-                //*/
-            }
 
+            }
             Debug.Assert(br.BaseStream.Position == startingOffset + streamLength);
+
+            AnimatedRanges.TryGetValue(Id, out var ranges);
+            ranges = ranges ?? new List<(byte, byte)>();
+            Period = (int)Util.LCM(ranges.Select(x => (long)(x.Item2 - x.Item1 + 1)).Append(1));
+
+            for (int cacheIndex = 0; cacheIndex < Period; cacheIndex++)
+            {
+                var result = new uint[256];
+                for (int i = 0; i < Entries.Length; i++)
+                {
+                    int index = i;
+                    foreach (var range in ranges)
+                    {
+                        if (i >= range.Item1 && i <= range.Item2)
+                        {
+                            int period = (range.Item2 - range.Item1 + 1);
+                            int tickModulo = cacheIndex % period;
+                            index = (i - range.Item1 + tickModulo) % period + range.Item1;
+                            break;
+                        }
+                    }
+
+                    result[i] = Entries[index];
+                }
+                _cache.Add(result);
+            }
         }
+
         public void SetCommonPalette(byte[] commonPalette)
         {
             if (commonPalette == null) throw new ArgumentNullException(nameof(commonPalette));
@@ -60,48 +80,22 @@ namespace UAlbion.Formats
 
             for (int i = 192; i < 256; i++)
             {
-                //*
                 Entries[i]  = (uint)commonPalette[(i - 192) * 3 + 0] << 0; // Red
                 Entries[i] |= (uint)commonPalette[(i - 192) * 3 + 1] << 8; // Green
                 Entries[i] |= (uint)commonPalette[(i - 192) * 3 + 2] << 16; // Blue
                 Entries[i] |= (uint)0xff << 24; // Alpha
-                //*/
-                /*
-                Entries[i] = 0;
-                Entries[i] |= (uint)i << 16;
-                Entries[i] |= (uint)i << 8;
-                Entries[i] |= (uint)i << 0;
-                Entries[i] |= (uint)0xff << 24; // Alpha
-                //*/
             }
         }
 
+        public IList<uint[]> GetCompletePalette() => _cache;
         public uint[] GetPaletteAtTime(int tick)
         {
-            var result = new uint[256];
-            AnimatedRanges.TryGetValue(Id, out var ranges);
-            ranges = ranges ?? new List<(byte, byte)>();
             tick = int.MaxValue - tick;
-
-            for (int i = 0; i < Entries.Length; i++)
-            {
-                int index = i;
-                foreach (var range in ranges)
-                {
-                    if (i >= range.Item1 && i <= range.Item2)
-                    {
-                        int period = (range.Item2 - range.Item1 + 1);
-                        int tickModulo = tick % period;
-                        index = (i - range.Item1 + tickModulo) % period + range.Item1;
-                        break;
-                    }
-                }
-
-                result[i] = Entries[index];
-            }
-            return result;
+            int index = tick % Period;
+            return _cache[index];
         }
 
         public override string ToString() { return string.IsNullOrEmpty(Name) ? $"Palette {Id}" : $"{Name} ({Id})"; }
+
     }
 }

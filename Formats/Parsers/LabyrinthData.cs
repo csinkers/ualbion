@@ -116,7 +116,7 @@ namespace UAlbion.Formats.Parsers
             public DungeonWallId? TextureNumber; // 4, ushort
             public byte AnimationFrames; // 6
             public byte AutoGfxType;     // 7
-            public byte PaletteId;       // 8
+            public byte Unk8;            // 8 (PaletteId??)
             public byte Unk9;            // 9
             public ushort Width;         // A
             public ushort Height;        // C
@@ -237,7 +237,7 @@ namespace UAlbion.Formats.Parsers
                 w.TextureNumber = textureNumber == 0 ? (DungeonWallId?)null : (DungeonWallId)(textureNumber - 1);
                 w.AnimationFrames = br.ReadByte();
                 w.AutoGfxType = br.ReadByte();
-                w.PaletteId = br.ReadByte();
+                w.Unk8 = br.ReadByte();
                 w.Unk9 = br.ReadByte();
                 w.Width = br.ReadUInt16();
                 w.Height = br.ReadUInt16();

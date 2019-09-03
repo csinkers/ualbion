@@ -32,8 +32,7 @@ namespace UAlbion.Core.Visual
             ResourceLayoutHelper.Texture("vdspv_0_4"),  // Palette
             ResourceLayoutHelper.Sampler("vdspv_0_5"),  // Texture Sampler
             ResourceLayoutHelper.Texture("vdspv_0_6"),  // Floors
-            ResourceLayoutHelper.Texture("vdspv_0_7"),  // Walls
-            ResourceLayoutHelper.Texture("vdspv_0_8")); // Overlays
+            ResourceLayoutHelper.Texture("vdspv_0_7")); // Walls
 
         const string VertexShader = @"
             #version 450
@@ -90,7 +89,6 @@ namespace UAlbion.Core.Visual
             layout(set = 0, binding = 5) uniform sampler TextureSampler;  // vdspv_0_5
             layout(set = 0, binding = 6) uniform texture2DArray Floors;   // vdspv_0_6
             layout(set = 0, binding = 7) uniform texture2DArray Walls;    // vdspv_0_7
-            layout(set = 0, binding = 8) uniform texture2DArray Overlays; // vdspv_0_8
             // TODO: Lighting info
 
             // Vertex & Instance data piped through from vertex shader
@@ -119,11 +117,7 @@ namespace UAlbion.Core.Visual
                 else if ((fsin_2 & 3) == 1)
                     color = texture(sampler2DArray(Floors, TextureSampler), vec3(fsin_0, ceilingLayer));
                 else
-                {
-                    color = texture(sampler2DArray(Overlays, TextureSampler), vec3(fsin_0, overlayLayer));
-                    if(color.xyz == vec3(0.0f, 0.0f, 0.0f))
-                        color = texture(sampler2DArray(Walls, TextureSampler), vec3(fsin_0, wallLayer));
-                }
+                    color = texture(sampler2DArray(Walls, TextureSampler), vec3(fsin_0, wallLayer));
 
                 if ((fsin_2 & 4) != 0) // 4=UsePalette
                 {
@@ -292,7 +286,6 @@ namespace UAlbion.Core.Visual
 
                 _textureManager.PrepareTexture(tilemap.Floors, gd);
                 _textureManager.PrepareTexture(tilemap.Walls, gd);
-                _textureManager.PrepareTexture(tilemap.Overlays, gd);
                 yield return tilemap;
             }
         }
@@ -303,7 +296,6 @@ namespace UAlbion.Core.Visual
             cl.PushDebugGroup($"Tiles3D:{tilemap.Name}:{tilemap.RenderOrder}");
             TextureView floors   = _textureManager.GetTexture(tilemap.Floors);
             TextureView walls    = _textureManager.GetTexture(tilemap.Walls);
-            TextureView overlays = _textureManager.GetTexture(tilemap.Overlays);
 
             var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_layout,
                 sc.ProjectionMatrixBuffer,
@@ -313,8 +305,7 @@ namespace UAlbion.Core.Visual
                 sc.PaletteView,
                 _textureSampler,
                 floors,
-                walls,
-                overlays));
+                walls));
 
             cl.SetPipeline(_pipeline);
             cl.SetGraphicsResourceSet(0, resourceSet);

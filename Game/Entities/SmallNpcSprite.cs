@@ -5,6 +5,7 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Parsers;
+using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities
 {
@@ -28,12 +29,14 @@ namespace UAlbion.Game.Entities
 
         static readonly IList<Handler> Handlers = new Handler[]
         {
-            new Handler<SmallNpcSprite, RenderEvent>((x,e)=>x.Render(e)),
+            new Handler<SmallNpcSprite, RenderEvent>((x,e) => x.Render(e)),
+            new Handler<SmallNpcSprite, SetTileSizeEvent>((x,e) => x._tileSize = new Vector2(e.TileSize.X, e.TileSize.Y))
         };
 
         readonly SmallNpcId _id;
         readonly MapNpc.Waypoint[] _waypoints;
         Vector2 _position;
+        Vector2 _tileSize;
         Animation _animation;
         int _frame;
 
@@ -41,12 +44,12 @@ namespace UAlbion.Game.Entities
         {
             _id = id;
             _waypoints = waypoints;
-            _position = new Vector2(waypoints[0].X * 16, waypoints[0].Y * 16);
+            _position = new Vector2(waypoints[0].X, waypoints[0].Y);
         }
 
         void Render(RenderEvent e)
         {
-            var positionLayered = new Vector3(_position, (255 - _position.Y + (int)DrawLayer.Characters1) / 255.0f);
+            var positionLayered = new Vector3(_position * _tileSize, DrawLayer.Characters1.ToZCoordinate(_position.Y));
             var npcSprite = new SpriteDefinition<SmallNpcId>(_id, 0, positionLayered, (int)DrawLayer.Characters1, 0);
             e.Add(npcSprite);
         }

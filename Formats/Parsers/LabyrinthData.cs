@@ -249,8 +249,8 @@ namespace UAlbion.Formats.Parsers
                     o.TextureNumber = textureNumber == 0 ? (DungeonOverlayId?)null : (DungeonOverlayId)(textureNumber - 1);
                     o.AnimationFrames = br.ReadByte();
                     o.WriteZero = br.ReadByte();
-                    o.YOffset = br.ReadUInt16();
                     o.XOffset = br.ReadUInt16();
+                    o.YOffset = br.ReadUInt16();
                     o.Width = br.ReadUInt16();
                     o.Height = br.ReadUInt16();
                     w.Overlays.Add(o);

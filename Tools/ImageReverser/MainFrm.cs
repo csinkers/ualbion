@@ -249,10 +249,10 @@ namespace UAlbion.Tools.ImageReverser
                 if (filename != _logicalSprite?.Name)
                 {
                     // Ugh
-                    bool isRotated = asset.Parent.RotatedLeft ?? false;
-                    asset.Parent.RotatedLeft = false;
+                    bool isRotated = asset.Parent.Transposed ?? false;
+                    asset.Parent.Transposed = false;
                     _logicalSprite = LoadSprite(filename, asset);
-                    asset.Parent.RotatedLeft = isRotated;
+                    asset.Parent.Transposed = isRotated;
 
                     _visualSprite = isRotated ? LoadSprite(filename, asset) : _logicalSprite;
                 }

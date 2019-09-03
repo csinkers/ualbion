@@ -48,7 +48,7 @@ namespace UAlbion.Formats.Parsers
                 currentY += height;
             }
 
-            if (config.Parent.RotatedLeft == true)
+            if (config.Parent.Transposed == true)
             {
                 var rotatedSprite = new AlbionSprite
                 {
@@ -66,7 +66,7 @@ namespace UAlbion.Formats.Parsers
                     rotatedSprite.Frames[n] = new AlbionSprite.Frame(
                         0, rotatedFrameHeight * n, 
                         rotatedSprite.Width, rotatedFrameHeight);
-                    int x = rotatedSprite.Width - 1;
+                    int x = 0;
                     int y = 0;
                     for (int i = 0; i < width * height; i++)
                     {
@@ -78,7 +78,7 @@ namespace UAlbion.Formats.Parsers
                         if (y == rotatedFrameHeight)
                         {
                             y = 0;
-                            x--;
+                            x++;
                         }
                     }
                 }

@@ -76,7 +76,7 @@ namespace UAlbion.Game.Entities
                     byte floorIndex = (byte)_mapData.Floors[index];
                     byte ceilingIndex = (byte)_mapData.Ceilings[index];
                     int contents = _mapData.Contents[index];
-                    byte wallIndex = (byte)(contents < 100 || contents - 101 >= _labyrinthData.Walls.Count ? 0 : contents - 101);
+                    byte wallIndex = (byte)(contents < 100 || contents - 100 >= _labyrinthData.Walls.Count ? 0 : contents - 100);
 
                     _tilemap.Set(i, j, floorIndex, ceilingIndex, wallIndex, _frameCount);
                 }

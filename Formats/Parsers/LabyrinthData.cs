@@ -181,9 +181,9 @@ namespace UAlbion.Formats.Parsers
                 for (int n = 0; n < 8; n++)
                 {
                     var so = new LabyrinthData.LabyrinthSubObject();
-                    so.X = br.ReadUInt16();
-                    so.Y = br.ReadUInt16();
-                    so.Z = br.ReadUInt16();
+                    so.X = br.ReadInt16();
+                    so.Z = br.ReadInt16();
+                    so.Y = br.ReadInt16();
                     so.ObjectInfoNumber = br.ReadUInt16();
                     o.SubObjects.Add(so);
                 } // +64

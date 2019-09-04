@@ -61,7 +61,6 @@ namespace UAlbion.Core.Textures
 
         public void GetSubImageDetails(int id, out Vector2 size, out Vector2 texOffset, out Vector2 texSize, out uint layer)
         {
-            Debug.Assert(id == 0 || id < _subImages.Count);
             if(_subImages.Count == 0)
             {
                 size = Vector2.One * 16;
@@ -69,6 +68,9 @@ namespace UAlbion.Core.Textures
                 texSize = Vector2.One;
                 layer = 0;
             }
+
+            if (id >= _subImages.Count)
+                id = id % _subImages.Count;
 
             var subImage = _subImages[id];
             size = new Vector2(subImage.W, subImage.H);

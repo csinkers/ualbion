@@ -88,8 +88,11 @@ namespace UAlbion.Core.Textures
 
             if (logicalId >= _logicalSubImages.Count)
                 return 0;
+
             var logicalImage = _logicalSubImages[logicalId];
-            return _layerLookup[new LayerKey(logicalId, tick % logicalImage.Frames)];
+            if (_layerLookup.TryGetValue(new LayerKey(logicalId, tick % logicalImage.Frames), out var result))
+                return result;
+            return 0;
         }
 
         public void GetSubImageDetails(int subImage, out Vector2 size, out Vector2 texOffset, out Vector2 texSize, out uint layer)

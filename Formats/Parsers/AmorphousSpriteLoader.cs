@@ -39,7 +39,7 @@ namespace UAlbion.Formats.Parsers
 
         public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
         {
-            Debug.Assert(config.Parent.RotatedLeft != true);
+            Debug.Assert(config.Parent.Transposed != true);
             long initialPosition = br.BaseStream.Position;
             var sizes = ParseSpriteSizes(config.SubSprites);
 

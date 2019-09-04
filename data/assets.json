@@ -4995,129 +4995,150 @@
     "3DOVERL0.XLD": {
       "EnumName": "DungeonOverlayId",
       "Type": "FixedSizeSprite",
-      "RotatedLeft": true,
+      "Transposed": true,
       "Assets": {
         "0": {
+          "Name": "JiriDoor",
           "Width": 51,
           "PaletteHints": [
             2
           ]
         },
         "1": {
+          "Name": "JiriWindow",
           "Width": 44,
           "PaletteHints": [
             2
           ]
         },
         "2": {
+          "Name": "JiriWindow",
           "Width": 44,
           "PaletteHints": [
             2
           ]
         },
         "3": {
+          "Name": "JiriWindow",
           "Width": 50,
           "PaletteHints": [
             2
           ]
         },
         "4": {
+          "Name": "JiriWindow",
           "Width": 50,
           "PaletteHints": [
             2
           ]
         },
         "5": {
+          "Name": "JiriWindow",
           "Width": 47,
           "PaletteHints": [
             2
           ]
         },
         "6": {
+          "Name": "JiriDoor",
           "Width": 83,
           "PaletteHints": [
             2
           ]
         },
         "7": {
+          "Name": "JiriScuff",
           "Width": 6,
           "PaletteHints": [
             2
           ]
         },
         "8": {
+          "Name": "JiriDirt",
           "Width": 20,
           "PaletteHints": [
             2
           ]
         },
         "9": {
+          "Name": "JiriExposedRocks",
           "Width": 26,
           "PaletteHints": [
             2
           ]
         },
         "10": {
+          "Name": "JiriExposedRocks",
           "Width": 44,
           "PaletteHints": [
             2
           ]
         },
         "11": {
+          "Name": "JiriExposedRocks",
           "Width": 39,
           "PaletteHints": [
             2
           ]
         },
         "12": {
+          "Name": "JiriDamage",
           "Width": 31,
           "PaletteHints": [
             2
           ]
         },
         "13": {
+          "Name": "JiriDamage",
           "Width": 20,
           "PaletteHints": [
             2
           ]
         },
         "14": {
+          "Name": "JiriDamage",
           "Width": 36,
           "PaletteHints": [
             2
           ]
         },
         "15": {
+          "Name": "JiriDamage",
           "Width": 46,
           "PaletteHints": [
             2
           ]
         },
         "16": {
+          "Name": "JiriDamage",
           "Width": 37,
           "PaletteHints": [
             2
           ]
         },
         "17": {
+          "Name": "JiriFrameL",
           "Width": 112,
           "PaletteHints": [
             2
           ]
         },
         "18": {
+          "Name": "JiriFrameR",
           "Width": 112,
           "PaletteHints": [
             2
           ]
         },
         "19": {
+          "Name": "JiriWindow",
           "Width": 50,
           "PaletteHints": [
             2
           ]
         },
         "20": {
+          "Name": "JiriDoor",
           "Width": 76,
           "PaletteHints": [
             2
@@ -5127,6 +5148,7 @@
           "Width": 47
         },
         "22": {
+          "Name": "TorontoRotatingLight",
           "Width": 62,
           "Height": 42,
           "PaletteHints": [
@@ -5420,7 +5442,7 @@
     "3DOVERL1.XLD": {
       "EnumName": "DungeonOverlayId",
       "Type": "FixedSizeSprite",
-      "RotatedLeft": true,
+      "Transposed": true,
       "Assets": {
         "0": {
           "Width": 35,
@@ -6083,7 +6105,7 @@
     "3DOVERL2.XLD": {
       "EnumName": "DungeonOverlayId",
       "Type": "FixedSizeSprite",
-      "RotatedLeft": true,
+      "Transposed": true,
       "Assets": {
         "0": {
           "Width": 26,
@@ -6451,159 +6473,185 @@
     "3DWALLS0.XLD": {
       "EnumName": "DungeonWallId",
       "Type": "FixedSizeSprite",
-      "RotatedLeft": true,
+      "Transposed": true,
       "Assets": {
         "0": {
+          "Name": "JiriTileAndStone",
           "Width": 112,
           "PaletteHints": [
             2
           ]
         },
         "1": {
+          "Name": "JiriSpider",
           "Width": 112,
           "PaletteHints": [
             2
           ]
         },
         "2": {
+          "Name": "JiriDoor",
           "Width": 112,
           "PaletteHints": [
             2
           ]
         },
         "3": {
+          "Name": "JiriVines",
           "Width": 112,
           "PaletteHints": [
             2
           ]
         },
         "4": {
+          "Name": "JiriVinesWithWindow",
           "Width": 112,
           "PaletteHints": [
             2
           ]
         },
         "5": {
+          "Name": "JiriMasonry",
           "Width": 112,
           "PaletteHints": [
             2
           ]
         },
         "6": {
+          "Name": "JiriGate",
           "Width": 112,
           "PaletteHints": [
             2
           ]
         },
         "7": {
+          "Name": "JiriGateLeft",
           "Width": 112,
           "PaletteHints": [
             2
           ]
         },
         "8": {
+          "Name": "JiriGateRight",
           "Width": 112,
           "PaletteHints": [
             2
           ]
         },
         "9": {
+          "Name": "JiriOpenDoorway",
           "Width": 112,
           "PaletteHints": [
             2
           ]
         },
         "10": {
+          "Name": "TorontoVLight",
           "Width": 80,
           "PaletteHints": [
             6
           ]
         },
         "11": {
+          "Name": "TorontoPanelling",
           "Width": 80,
           "PaletteHints": [
             6
           ]
         },
         "12": {
+          "Name": "TonrtoVLight",
           "Width": 80,
           "PaletteHints": [
             6
           ]
         },
         "13": {
+          "Name": "TorontoPanelling",
           "Width": 80,
           "PaletteHints": [
             6
           ]
         },
         "14": {
+          "Name": "TorontoClosedDoor",
           "Width": 80,
           "PaletteHints": [
             6
           ]
         },
         "15": {
+          "Name": "TorontoOpenDoor",
           "Width": 80,
           "PaletteHints": [
             6
           ]
         },
         "16": {
+          "Name": "ReactorWall",
           "Width": 107,
           "PaletteHints": [
             7
           ]
         },
         "17": {
+          "Name": "ReactorWallGrate",
           "Width": 107,
           "PaletteHints": [
             7
           ]
         },
         "18": {
+          "Name": "ReactorWallMachinery",
           "Width": 107,
           "PaletteHints": [
             7
           ]
         },
         "19": {
+          "Name": "ReactorWallMachinery",
           "Width": 107,
           "PaletteHints": [
             7
           ]
         },
         "20": {
+          "Name": "ReactorVLight",
           "Width": 107,
           "PaletteHints": [
             7
           ]
         },
         "21": {
+          "Name": "ReactorPillar",
           "Width": 107,
           "PaletteHints": [
             7
           ]
         },
         "22": {
+          "Name": "ReactorOpenDoor",
           "Width": 107,
           "PaletteHints": [
             7
           ]
         },
         "23": {
+          "Name": "ReactorClosedDoor",
           "Width": 107,
           "PaletteHints": [
             7
           ]
         },
         "24": {
+          "Name": "ReactorPillarDoorR",
           "Width": 107,
           "PaletteHints": [
             7
           ]
         },
         "25": {
+          "Name": "ReactorPillarDoorL",
           "Width": 107,
           "PaletteHints": [
             7
@@ -6945,7 +6993,7 @@
     "3DWALLS1.XLD": {
       "EnumName": "DungeonWallId",
       "Type": "FixedSizeSprite",
-      "RotatedLeft": true,
+      "Transposed": true,
       "Assets": {
         "0": {
           "Width": 98

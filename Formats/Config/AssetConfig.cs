@@ -16,7 +16,7 @@ namespace UAlbion.Formats.Config
             public XldObjectType Type;
             public int? Width;
             public int? Height;
-            public bool? RotatedLeft;
+            public bool? Transposed;
             public IDictionary<int, Asset> Assets { get; } = new Dictionary<int, Asset>();
         }
 
@@ -83,8 +83,8 @@ namespace UAlbion.Formats.Config
         {
             foreach (var xld in Xlds)
             {
-                if (xld.Value.RotatedLeft == false)
-                    xld.Value.RotatedLeft = null;
+                if (xld.Value.Transposed == false)
+                    xld.Value.Transposed = null;
                 foreach (var asset in xld.Value.Assets)
                 {
                     if (string.IsNullOrWhiteSpace(asset.Value.Name))

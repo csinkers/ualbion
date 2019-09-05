@@ -54,25 +54,22 @@ namespace UAlbion.Game.Entities
 
             foreach (var npc in _mapData.Npcs)
             {
-                var objectData = _labyrinthData.Objects[npc.ObjectNumber - 1];
+                var objectData = _labyrinthData.ObjectGroups[npc.ObjectNumber - 1];
                 foreach (var subObject in objectData.SubObjects)
                 {
-                    if (subObject.ObjectInfoNumber == 0)
-                        continue;
-
                     float height = (float)subObject.Y / TileSize.Y;
                     if (height < 0)
                         height += TileSize.Y;
 
                     var position = new Vector3(npc.Waypoints[0].X, 0, npc.Waypoints[0].Y) * TileSize;
-                    var definition = _labyrinthData.ExtraObjects[subObject.ObjectInfoNumber - 1];
+                    var definition = _labyrinthData.Objects[subObject.ObjectInfoNumber];
                     if(definition.TextureNumber == null)
                         continue;
 
                     Exchange.Attach(new MapObjectSprite(
                         definition.TextureNumber.Value,
                         position,
-                        new Vector2(definition.Width, definition.Height)));
+                        new Vector2(definition.MapWidth, definition.MapHeight)));
                 }
             }
 
@@ -81,28 +78,25 @@ namespace UAlbion.Game.Entities
                 for (int x = 0; x < _mapData.Width; x++)
                 {
                     var contents = _mapData.Contents[y * _mapData.Width + x];
-                    if (contents == 0 || contents > 100)
+                    if (contents == 0 || contents >= _labyrinthData.ObjectGroups.Count)
                         continue;
 
-                    var objectInfo = _labyrinthData.Objects[contents - 1];
+                    var objectInfo = _labyrinthData.ObjectGroups[contents - 1];
                     foreach (var subObject in objectInfo.SubObjects)
                     {
-                        if (subObject.ObjectInfoNumber == 0)
-                            continue;
-
                         float height = (float)subObject.Y / TileSize.Y;
                         if (height < 0)
                             height += TileSize.Y;
 
                         var position = new Vector3(x, 0, y) * TileSize;
-                        var definition = _labyrinthData.ExtraObjects[subObject.ObjectInfoNumber - 1];
+                        var definition = _labyrinthData.Objects[subObject.ObjectInfoNumber];
                         if (definition.TextureNumber == null)
                             continue;
 
                         Exchange.Attach(new MapObjectSprite(
                             definition.TextureNumber.Value,
                             position,
-                            new Vector2(definition.Width, definition.Height)));
+                            new Vector2(definition.MapWidth, definition.MapHeight)));
                     }
                 }
             }

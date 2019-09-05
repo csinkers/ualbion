@@ -87,12 +87,15 @@ namespace UAlbion.Core.Visual
                 /* NoTransform = 1,  Highlight      = 2,
                    UsePalette  = 4,  OnlyEvenFrames = 8,
                    RedTint     = 16, GreenTint      = 32,
-                   BlueTint    = 64, Transparent    = 128 */
+                   BlueTint    = 64, Transparent    = 128 
+                   FliVertical = 256 */
+
+                vec2 uv = ((fsin_2 & 0x100) != 0) ? vec2(fsin_0.x, -fsin_0.y) : fsin_0;
 
                 vec4 color;
                 if ((fsin_2 & 4) != 0)
                 {
-                    float redChannel = texture(sampler2D(SpriteTexture, SpriteSampler), fsin_0)[0];
+                    float redChannel = texture(sampler2D(SpriteTexture, SpriteSampler), uv)[0];
                     float index = 255.0f * redChannel;
                     color = texture(sampler2D(PaletteView, SpriteSampler), vec2(redChannel, 0.0f));
                     if(index == 0)
@@ -100,7 +103,7 @@ namespace UAlbion.Core.Visual
                 }
                 else
                 {
-                    color = texture(sampler2D(SpriteTexture, SpriteSampler), fsin_0);
+                    color = texture(sampler2D(SpriteTexture, SpriteSampler), uv);
                 }
 
                 if((fsin_2 &   2) != 0) color = color * 1.2; // Highlight

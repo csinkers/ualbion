@@ -28,7 +28,7 @@ namespace UAlbion.Game.Entities
         {
             _id = id;
             _position = position;
-            _size = size;
+            _size = size / 8;
         }
 
         /*
@@ -61,7 +61,8 @@ namespace UAlbion.Game.Entities
                 _frame,
                 _position,
                 (int)DrawLayer.Underlay,
-                0);
+                SpriteFlags.FlipVertical,
+                _size);
 
             e.Add(sprite);
         }

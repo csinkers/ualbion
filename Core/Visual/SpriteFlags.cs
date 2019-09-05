@@ -12,6 +12,7 @@ namespace UAlbion.Core.Visual
         RedTint = 16,
         GreenTint = 32,
         BlueTint = 64,
-        Transparent = 128
+        Transparent = 128,
+        FlipVertical = 256,
     }
 }

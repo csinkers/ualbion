@@ -31,27 +31,28 @@ namespace UAlbion.Formats.Parsers
         public ushort Unk20 { get; set; }
         public ushort Lighting { get; set; }
         public ushort Unk24 { get; set; }
-        public IList<LabyrinthObject> Objects { get; } = new List<LabyrinthObject>();
+        public IList<ObjectGroup> ObjectGroups { get; } = new List<ObjectGroup>();
+        public IList<Object> Objects { get; } = new List<Object>();
         public IList<FloorAndCeiling> FloorAndCeilings { get; } = new List<FloorAndCeiling>();
-        public IList<ExtraObject> ExtraObjects { get; } = new List<ExtraObject>();
         public IList<Wall> Walls { get; } = new List<Wall>();
 
-        public class LabyrinthObject
+        public class ObjectGroup
         {
             public ushort AutoGraphicsId { get; set; }
-            public IList<LabyrinthSubObject> SubObjects { get; } = new List<LabyrinthSubObject>();
+            public IList<SubObject> SubObjects { get; } = new List<SubObject>();
 
             public override string ToString() =>
-                $"Obj.{AutoGraphicsId}: {string.Join("; ", SubObjects.Select(x => x.ToString()))}";
+                $"Obj: AG{AutoGraphicsId} [ {string.Join("; ", SubObjects.Select(x => x.ToString()))} ]";
         }
 
-        public struct LabyrinthSubObject
+        public class SubObject
         {
             public int X;
             public int Y;
             public int Z;
             public int ObjectInfoNumber;
-            public override string ToString() => $"SubObj{ObjectInfoNumber}: ({X}, {Y}, {Z})";
+            public override string ToString() => $"{ObjectInfoNumber}({ObjectId}) @ ({X}, {Y}, {Z})";
+            internal DungeonObjectId? ObjectId;
         }
 
         public class FloorAndCeiling
@@ -80,7 +81,7 @@ namespace UAlbion.Formats.Parsers
             public override string ToString() => $"FC.{TextureNumber}:{AnimationCount} {Properties}";
         }
 
-        public class ExtraObject
+        public class Object
         {
             public byte Properties; // 0
             public byte[] CollisionData; // 1, len = 3 bytes
@@ -173,26 +174,30 @@ namespace UAlbion.Formats.Parsers
 
             Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);
 
-            int objectCount = br.ReadUInt16(); // 26
-            for (int i = 0; i < objectCount; i++)
+            int objectGroupCount = br.ReadUInt16(); // 26
+            for (int i = 0; i < objectGroupCount; i++)
             {
-                var o = new LabyrinthData.LabyrinthObject();
-                o.AutoGraphicsId = br.ReadUInt16(); // +0
+                var og = new LabyrinthData.ObjectGroup();
+                og.AutoGraphicsId = br.ReadUInt16(); // +0
                 for (int n = 0; n < 8; n++)
                 {
-                    var so = new LabyrinthData.LabyrinthSubObject();
+                    var so = new LabyrinthData.SubObject();
                     so.X = br.ReadInt16();
                     so.Z = br.ReadInt16();
                     so.Y = br.ReadInt16();
                     so.ObjectInfoNumber = br.ReadUInt16();
-                    o.SubObjects.Add(so);
+                    if (so.ObjectInfoNumber != 0)
+                    {
+                        so.ObjectInfoNumber--;
+                        og.SubObjects.Add(so);
+                    }
                 } // +64
 
-                l.Objects.Add(o);
+                l.ObjectGroups.Add(og);
             }
             Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);
 
-            int floorAndCeilingCount = br.ReadUInt16(); // 28 + objectCount * 42
+            int floorAndCeilingCount = br.ReadUInt16(); // 28 + objectGroupCount * 42
             for (int i = 0; i < floorAndCeilingCount; i++)
             {
                 var fc = new LabyrinthData.FloorAndCeiling();
@@ -209,23 +214,31 @@ namespace UAlbion.Formats.Parsers
             } 
             Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);
 
-            int extraObjectCount = br.ReadUInt16(); // 2A + objectCount * 42 + floorAndCeilingCount * A
-            for(int i = 0; i < extraObjectCount; i++)
+            int objectCount = br.ReadUInt16(); // 2A + objectGroupCount * 42 + floorAndCeilingCount * A
+            for(int i = 0; i < objectCount; i++)
             {
-                var eo = new LabyrinthData.ExtraObject();
-                eo.Properties = br.ReadByte();
-                eo.CollisionData = br.ReadBytes(3);
+                var o = new LabyrinthData.Object();
+                o.Properties = br.ReadByte();
+                o.CollisionData = br.ReadBytes(3);
                 ushort textureNumber = br.ReadUInt16();
-                eo.TextureNumber = textureNumber == 0 ? (DungeonObjectId?)null : (DungeonObjectId)(textureNumber - 1);
-                eo.AnimationFrames = br.ReadByte();
-                eo.Unk7 = br.ReadByte();
-                eo.Width = br.ReadUInt16();
-                eo.Height = br.ReadUInt16();
-                eo.MapWidth = br.ReadUInt16();
-                eo.MapHeight = br.ReadUInt16();
-                l.ExtraObjects.Add(eo);
+                o.TextureNumber = textureNumber == 0 ? (DungeonObjectId?)null : (DungeonObjectId)(textureNumber - 1);
+                o.AnimationFrames = br.ReadByte();
+                o.Unk7 = br.ReadByte();
+                o.Width = br.ReadUInt16();
+                o.Height = br.ReadUInt16();
+                o.MapWidth = br.ReadUInt16();
+                o.MapHeight = br.ReadUInt16();
+                l.Objects.Add(o);
             }
             Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);
+
+            // Populate objectIds on subobjects to improve debugging experience
+            foreach (var so in l.ObjectGroups.SelectMany(x => x.SubObjects))
+            {
+                if (so.ObjectInfoNumber >= l.Objects.Count)
+                    continue;
+                so.ObjectId = l.Objects[so.ObjectInfoNumber].TextureNumber;
+            }
 
             int wallCount = br.ReadUInt16();
             for (int i = 0; i < wallCount; i++)

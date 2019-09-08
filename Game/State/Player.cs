@@ -1,6 +1,8 @@
-﻿namespace UAlbion.Game.Entities
+﻿using UAlbion.Game.Entities;
+
+namespace UAlbion.Game.State
 {
-    class PlayerStats
+    public class CharacterSheet
     {
         int _level;
 
@@ -40,13 +42,13 @@
         int _lockPickingMax;
     }
 
-    internal class Player
+    internal class Player : IPlayer
     {
-        string _name;
+        public string Name { get; }
         int _age;
         bool _isMale;
         int _combatPosition;
-        PlayerStats _stats;
+        public CharacterSheet Stats { get; }
 
         Item[] _inventory = new Item[24]; // 4x6
         Item _head;
@@ -57,5 +59,11 @@
         Item _rightRing;
         Item _feet;
         Item _torso;
+    }
+
+    public interface IPlayer
+    {
+        string Name { get; }
+        CharacterSheet Stats { get; }
     }
 }

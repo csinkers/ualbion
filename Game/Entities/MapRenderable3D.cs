@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -14,12 +16,12 @@ namespace UAlbion.Game.Entities
         readonly TileMap _tilemap;
         readonly MapData3D _mapData;
         readonly LabyrinthData _labyrinthData;
-        int _frameCount;
+        readonly IDictionary<int, IList<int>> _tilesByDistance = new Dictionary<int, IList<int>>();
 
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<MapRenderable3D, RenderEvent>((x, e) => x.Render(e)),
-            new Handler<MapRenderable3D, UpdateEvent>((x, e) => x.Update(e)),
+            new Handler<MapRenderable3D, PostUpdateEvent>((x, e) => x.PostUpdate(e)),
             new Handler<MapRenderable3D, SubscribedEvent>((x, e) => x.Subscribed())
         };
 
@@ -59,26 +61,50 @@ namespace UAlbion.Game.Entities
                     _tilemap.DefineWall(i + 1, overlay, overlayInfo.XOffset, overlayInfo.YOffset);
                 }
             }
-
-            Update(new UpdateEvent(0));
         }
 
-        void Subscribed() { Raise(new LoadPalEvent((int)_mapData.PaletteId)); }
+        void Subscribed() { Raise(new LoadPaletteEvent((int)_mapData.PaletteId)); }
 
-        void Update(UpdateEvent e)
+        void PostUpdate(PostUpdateEvent e)
         {
-            _frameCount += e.Frames;
+            foreach (var list in _tilesByDistance.Values)
+                list.Clear();
+
+            int cameraTileX = (int)e.GameState.CameraTilePosition.X;
+            int cameraTileY = (int)e.GameState.CameraTilePosition.Y;
+
             for (int j = 0; j < _mapData.Height; j++)
             {
                 for (int i = 0; i < _mapData.Width; i++)
                 {
+                    int distance = Math.Abs(j - cameraTileY) + Math.Abs(i - cameraTileX);
+                    if(!_tilesByDistance.TryGetValue(distance, out var list))
+                    {
+                        list = new List<int>();
+                        _tilesByDistance[distance] = list;
+                    }
+
                     int index = j * _mapData.Width + i;
+                    list.Add(index);
+                }
+            }
+
+            int order = 0;
+            foreach (var distance in _tilesByDistance.OrderByDescending(x => x.Key))
+            {
+                foreach (var index in distance.Value)
+                {
+                    byte i = (byte)(index % _mapData.Width);
+                    byte j = (byte)(index / _mapData.Width);
                     byte floorIndex = (byte)_mapData.Floors[index];
                     byte ceilingIndex = (byte)_mapData.Ceilings[index];
                     int contents = _mapData.Contents[index];
-                    byte wallIndex = (byte)(contents < 100 || contents - 100 >= _labyrinthData.Walls.Count ? 0 : contents - 100);
+                    byte wallIndex = (byte)(contents < 100 || contents - 100 >= _labyrinthData.Walls.Count
+                        ? 0
+                        : contents - 100);
 
-                    _tilemap.Set(i, j, floorIndex, ceilingIndex, wallIndex, _frameCount);
+                    _tilemap.Set(order, i, j, floorIndex, ceilingIndex, wallIndex, e.GameState.FrameCount);
+                    order++;
                 }
             }
         }

@@ -10,6 +10,7 @@ using UAlbion.Game;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Input;
+using UAlbion.Game.State;
 using Veldrid;
 
 namespace UAlbion
@@ -160,6 +161,7 @@ namespace UAlbion
                 }
 
                 return; */
+                var stateManager = new StateManager();
                 var sceneExchange = new EventExchange("Scenes", engine.GlobalExchange);
                 var mapExchange = new EventExchange("Maps", engine.GlobalExchange);
                 var spriteResolver = new SpriteResolver(assets);
@@ -171,7 +173,7 @@ namespace UAlbion
                 engine.GlobalExchange
                     .Attach(assets)
                     .Attach(new ConsoleLogger())
-                    .Attach(new GameClock())
+                    .Attach(new GameClock(stateManager))
                     .Attach(new MapManager(assets, mapExchange))
                     .Attach(new DebugMapInspector())
                     .Attach(new World2DInputMode())

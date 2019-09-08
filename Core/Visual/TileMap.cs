@@ -59,11 +59,12 @@ namespace UAlbion.Core.Visual
         public void DefineFloor(int id, ITexture texture) { Floors.AddTexture(id, texture, 0, 0); }
         public void DefineWall(int id, ITexture texture, uint x, uint y) { Walls.AddTexture(id, texture, x, y); }
 
-        public void Set(int x, int y, byte floorSubImage, byte ceilingSubImage, byte wallSubImage, int tick)
+        public void Set(int index, int x, int y, byte floorSubImage, byte ceilingSubImage, byte wallSubImage, int tick)
         {
             unsafe
             {
-                fixed (Tile* tile = &Tiles[y * Width + x])
+                // fixed (Tile* tile = &Tiles[y * Width + x])
+                fixed (Tile* tile = &Tiles[index])
                 {
                     tile->TilePosition = new Vector2(x, y);
                     tile->Floor = (byte)Floors.GetSubImageAtTime(floorSubImage, tick);

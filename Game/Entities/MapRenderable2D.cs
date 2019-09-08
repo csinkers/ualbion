@@ -61,7 +61,7 @@ namespace UAlbion.Game.Entities
             _overlay = new MultiSprite(new SpriteKey(_tileset, (int)DrawLayer.Overlay3)) { Instances = overlay.ToArray() };
         }
 
-        void Subscribed() { Raise(new LoadPalEvent((int)Palette)); }
+        void Subscribed() { Raise(new LoadPaletteEvent((int)Palette)); }
 
         SpriteInstanceData BuildInstanceData(int i, int j, TilesetData.TileData tile, int tickCount, bool isOverlay)
         {

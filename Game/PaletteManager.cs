@@ -7,6 +7,10 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
+    public interface IPaletteManager
+    {
+    }
+
     public class PaletteManager : Component
     {
         static readonly IList<Handler> Handlers = new Handler[]
@@ -18,7 +22,7 @@ namespace UAlbion.Game
                     x.EmitPalette();
             }),
             new Handler<PaletteManager, SubscribedEvent>((x, e) => x.SetPalette(PaletteId.Main3D)),
-            new Handler<PaletteManager, LoadPalEvent>((x, e) => x.SetPalette((PaletteId)e.PaletteId))
+            new Handler<PaletteManager, LoadPaletteEvent>((x, e) => x.SetPalette((PaletteId)e.PaletteId))
         };
 
         readonly Assets _assets;

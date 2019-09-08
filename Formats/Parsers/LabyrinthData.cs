@@ -11,21 +11,21 @@ namespace UAlbion.Formats.Parsers
     public class LabyrinthData
     {
         public ushort WallHeight { get; set; }
-        public ushort CameraHeight { get; set; }
+        public ushort CameraHeight { get; set; } // EffectiveHeight = (CameraHeight << 16) + 165??
         public ushort Unk4 { get; set; }
-        public ushort BackgroundId { get; set; }
-        public ushort BackgroundYPosition { get; set; }
-        public ushort FogDistance { get; set; }
+        public DungeonBackgroundId? BackgroundId { get; set; }
+        public ushort BackgroundYPosition { get; set; } // MAX(1096 - (BackgroundYPosition >> 16), 0)??
+        public ushort FogDistance { get; set; } // Distance in tiles that fog begins.
         public ushort FogRed { get; set; }
         public ushort FogGreen { get; set; }
         public ushort FogBlue { get; set; }
         public byte Unk12 { get; set; }
         public byte Unk13 { get; set; }
-        public byte BackgroundColour { get; set; }
+        public byte BackgroundColour { get; set; } // Palette index
         public byte Unk15 { get; set; }
         public ushort FogMode { get; set; }
         public ushort MaxLight { get; set; }
-        public ushort WallWidth { get; set; }
+        public ushort WallWidth { get; set; } // Effective = (1 << WallWidth), always between 7 & 10 (?)
         public ushort BackgroundTileAmount { get; set; }
         public ushort MaxVisibleTiles { get; set; }
         public ushort Unk20 { get; set; }
@@ -83,7 +83,19 @@ namespace UAlbion.Formats.Parsers
 
         public class Object
         {
-            public byte Properties; // 0
+            public enum ObjectFlags : byte
+            {
+                Unk0 = 1 << 0,
+                Unk1 = 1 << 1,
+                FloorObject = 1 << 2,
+                Unk3 = 1 << 3,
+                Unk4 = 1 << 4,
+                Unk5 = 1 << 5,
+                Unk6 = 1 << 6,
+                Unk7 = 1 << 7,
+            }
+
+            public ObjectFlags Properties; // 0
             public byte[] CollisionData; // 1, len = 3 bytes
             public DungeonObjectId? TextureNumber; // 4, ushort
             public byte AnimationFrames; // 6
@@ -117,7 +129,7 @@ namespace UAlbion.Formats.Parsers
             public DungeonWallId? TextureNumber; // 4, ushort
             public byte AnimationFrames; // 6
             public byte AutoGfxType;     // 7
-            public byte Unk8;            // 8 (PaletteId??)
+            public byte TransparentColour;            // 8 (PaletteId??)
             public byte Unk9;            // 9
             public ushort Width;         // A
             public ushort Height;        // C
@@ -153,7 +165,8 @@ namespace UAlbion.Formats.Parsers
             l.WallHeight = br.ReadUInt16(); // 0
             l.CameraHeight = br.ReadUInt16(); // 2
             l.Unk4 = br.ReadUInt16(); // 4
-            l.BackgroundId = br.ReadUInt16(); // 6
+            ushort backgroundId = br.ReadUInt16(); // 6
+            l.BackgroundId = backgroundId == 0 ? null : (DungeonBackgroundId?)(backgroundId - 1);
             l.BackgroundYPosition = br.ReadUInt16(); // 8
             l.FogDistance = br.ReadUInt16(); // A
             l.FogRed = br.ReadUInt16(); // C
@@ -218,7 +231,7 @@ namespace UAlbion.Formats.Parsers
             for(int i = 0; i < objectCount; i++)
             {
                 var o = new LabyrinthData.Object();
-                o.Properties = br.ReadByte();
+                o.Properties = (LabyrinthData.Object.ObjectFlags)br.ReadByte();
                 o.CollisionData = br.ReadBytes(3);
                 ushort textureNumber = br.ReadUInt16();
                 o.TextureNumber = textureNumber == 0 ? (DungeonObjectId?)null : (DungeonObjectId)(textureNumber - 1);
@@ -250,7 +263,7 @@ namespace UAlbion.Formats.Parsers
                 w.TextureNumber = textureNumber == 0 ? (DungeonWallId?)null : (DungeonWallId)(textureNumber - 1);
                 w.AnimationFrames = br.ReadByte();
                 w.AutoGfxType = br.ReadByte();
-                w.Unk8 = br.ReadByte();
+                w.TransparentColour = br.ReadByte();
                 w.Unk9 = br.ReadByte();
                 w.Width = br.ReadUInt16();
                 w.Height = br.ReadUInt16();

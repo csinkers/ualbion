@@ -172,6 +172,7 @@ namespace UAlbion
 
                 engine.GlobalExchange
                     .Attach(assets)
+                    .Attach(stateManager)
                     .Attach(new ConsoleLogger())
                     .Attach(new GameClock(stateManager))
                     .Attach(new MapManager(assets, mapExchange))

@@ -64,23 +64,26 @@ namespace UAlbion.Core
             sc.PaletteView = gd.ResourceFactory.CreateTextureView(sc.PaletteTexture);
             CoreTrace.Log.Info("Scene", "Created palette device texture");
 
-            // Update frame resources
             _resourceUpdateCl.Begin();
-            _processedRenderables.Clear();
-            foreach (var renderableGroup in _renderables)
+            using (new RenderDebugGroup(_resourceUpdateCl, "Prepare per-frame resources"))
             {
-                var renderer = renderers[renderableGroup.Key];
-                foreach (var renderable in renderer.UpdatePerFrameResources(gd, _resourceUpdateCl, sc, renderableGroup.Value))
+                _processedRenderables.Clear();
+                foreach (var renderableGroup in _renderables)
                 {
-                    if (!_processedRenderables.ContainsKey(renderable.RenderOrder))
-                        _processedRenderables[renderable.RenderOrder] = new List<IRenderable>();
-                    _processedRenderables[renderable.RenderOrder].Add(renderable);
+                    var renderer = renderers[renderableGroup.Key];
+                    foreach (var renderable in renderer.UpdatePerFrameResources(gd, _resourceUpdateCl, sc,
+                        renderableGroup.Value))
+                    {
+                        if (!_processedRenderables.ContainsKey(renderable.RenderOrder))
+                            _processedRenderables[renderable.RenderOrder] = new List<IRenderable>();
+                        _processedRenderables[renderable.RenderOrder].Add(renderable);
+                    }
                 }
+
+                CoreTrace.Log.CollectedRenderables("ProcessedRenderableTypes", _processedRenderables.Count);
+                CoreTrace.Log.CollectedRenderables("ProcessedRenderables",
+                    _processedRenderables.Sum(x => x.Value.Count));
             }
-
-            CoreTrace.Log.CollectedRenderables("ProcessedRenderableTypes", _processedRenderables.Count);
-            CoreTrace.Log.CollectedRenderables("ProcessedRenderables", _processedRenderables.Sum(x => x.Value.Count));
-
             _resourceUpdateCl.End();
             gd.SubmitCommands(_resourceUpdateCl);
             CoreTrace.Log.Info("Scene", "Submitted resource update commandlist");

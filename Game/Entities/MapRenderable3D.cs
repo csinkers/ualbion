@@ -71,7 +71,7 @@ namespace UAlbion.Game.Entities
                 list.Clear();
 
             int cameraTileX = (int)e.GameState.CameraTilePosition.X;
-            int cameraTileY = (int)e.GameState.CameraTilePosition.Y;
+            int cameraTileY = (int)e.GameState.CameraTilePosition.Z;
 
             for (int j = 0; j < _mapData.Height; j++)
             {
@@ -90,8 +90,14 @@ namespace UAlbion.Game.Entities
             }
 
             int order = 0;
-            foreach (var distance in _tilesByDistance.OrderByDescending(x => x.Key))
+            foreach (var distance in _tilesByDistance.OrderByDescending(x => x.Key).ToList())
             {
+                if (distance.Value.Count == 0)
+                {
+                    _tilesByDistance.Remove(distance.Key);
+                    continue;
+                }
+
                 foreach (var index in distance.Value)
                 {
                     byte i = (byte)(index % _mapData.Width);
@@ -111,6 +117,14 @@ namespace UAlbion.Game.Entities
 
         void Render(RenderEvent e)
         {
+            /* Split map rendering into one render call per distance group for debugging
+            int offset = 0;
+            foreach (var distance in _tilesByDistance.OrderByDescending(x => x.Key))
+            {
+                e.Add(new TileMapWindow(_tilemap, offset, distance.Value.Count));
+                offset += distance.Value.Count;
+            }
+            //*/
             e.Add(_tilemap);
         }
     }

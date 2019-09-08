@@ -31,7 +31,18 @@ namespace UAlbion.Core
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;
-        public Vector3 Position { get => _position; set { _position = value; UpdateViewMatrix(); } }
+
+        public Vector3 Position
+        {
+            get => _position;
+            set
+            {
+                _position = value;
+                UpdateViewMatrix();
+                Raise(new SetCameraPositionEvent(_position));
+            }
+        }
+
         public Vector3 LookDirection => _lookDirection;
         public float FieldOfView => 1f;
         public float NearDistance => 10f;

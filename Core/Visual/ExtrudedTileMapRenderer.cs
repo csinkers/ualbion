@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -69,13 +70,13 @@ namespace UAlbion.Core.Visual
                 else
                     fsin_0 = _TexCoords;
                 fsin_1 = _Textures;
-                fsin_2 = (_Flags & 0xfffffffc) | textureId;// | ((gl_InstanceIndex & 4) == 0 ? 256 : 0);
+                fsin_2 = (_Flags & 0xfffffffc) | textureId; // | ((gl_InstanceIndex & 4) == 0 ? 256 : 0);
 
                 if(    (textureId == 0 && ((fsin_1 & 0x000000ff) == 0))
                     || (textureId == 1 && ((fsin_1 & 0x0000ff00) == 0))
                     || (textureId == 2 && ((fsin_1 & 0x00ff0000) == 0))
                 )
-                    gl_Position = vec4(0,1e12,0,1); // Inactive faces/vertices get relegated to waaaay above the origin
+                    gl_Position = vec4(0, 1e12, 0, 1); // Inactive faces/vertices get relegated to waaaay above the origin
                 else
                     gl_Position = Projection * View * vec4((_VertexPosition + vec3(_TilePosition.x, 0.0f, _TilePosition.y)) * TileSize, 1);
             }";
@@ -288,14 +289,40 @@ namespace UAlbion.Core.Visual
                 _textureManager.PrepareTexture(tilemap.Walls, gd);
                 yield return tilemap;
             }
+
+            foreach (var window in renderables.OfType<TileMapWindow>())
+            {
+                var tilemap = window.TileMap;
+                cl.UpdateBuffer(_miscUniformBuffer, 0, tilemap.TileSize);
+                cl.UpdateBuffer(_miscUniformBuffer, 12, 0);
+                window.InstanceBufferId = _instanceBuffers.Count;
+                var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)window.Length * TileMap.Tile.StructSize, BufferUsage.VertexBuffer));
+                buffer.Name = $"B_Tile3DInst{_instanceBuffers.Count}";
+                cl.UpdateBuffer(buffer, 0, ref tilemap.Tiles[window.Offset], TileMap.Tile.StructSize * (uint)window.Length);
+                _instanceBuffers.Add(buffer);
+
+                _textureManager.PrepareTexture(tilemap.Floors, gd);
+                _textureManager.PrepareTexture(tilemap.Walls, gd);
+                yield return window;
+            }
         }
 
         public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable renderable)
         {
-            var tilemap = (TileMap)renderable;
+            var tilemap = renderable as TileMap;
+            var window = renderable as TileMapWindow;
+            if (tilemap == null && window == null)
+                return;
+
+            if (tilemap == null)
+                tilemap = window.TileMap;
+
+            if (window == null)
+                window = new TileMapWindow(tilemap, 0, tilemap.Tiles.Length) { InstanceBufferId = tilemap.InstanceBufferId };
+
             cl.PushDebugGroup($"Tiles3D:{tilemap.Name}:{tilemap.RenderOrder}");
-            TextureView floors   = _textureManager.GetTexture(tilemap.Floors);
-            TextureView walls    = _textureManager.GetTexture(tilemap.Walls);
+            TextureView floors = _textureManager.GetTexture(tilemap.Floors);
+            TextureView walls = _textureManager.GetTexture(tilemap.Walls);
 
             var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_layout,
                 sc.ProjectionMatrixBuffer,
@@ -310,10 +337,10 @@ namespace UAlbion.Core.Visual
             cl.SetPipeline(_pipeline);
             cl.SetGraphicsResourceSet(0, resourceSet);
             cl.SetVertexBuffer(0, _vb);
-            cl.SetVertexBuffer(1, _instanceBuffers[tilemap.InstanceBufferId]);
+            cl.SetVertexBuffer(1, _instanceBuffers[window.InstanceBufferId]);
             cl.SetIndexBuffer(_ib, IndexFormat.UInt16);
 
-            cl.DrawIndexed((uint)Indices.Length, (uint)tilemap.Tiles.Length, 0, 0, 0);
+            cl.DrawIndexed((uint)Indices.Length, (uint)window.Length, 0, 0, 0);
             cl.PopDebugGroup();
         }
 

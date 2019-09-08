@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using Veldrid;
+using Vulkan;
 
 namespace UAlbion.Core.Textures
 {
@@ -106,6 +108,27 @@ namespace UAlbion.Core.Textures
             layer = (uint)subImage;
         }
 
+        unsafe void Blit8To24(int width, int height, byte* fromBuffer, uint* toBuffer, int fromStride, int toStride, uint[] palette)
+        {
+            byte* from = fromBuffer;
+            uint* to = toBuffer;
+            for (int j = 0; j < height; j++)
+            {
+                for (int i = 0; i < width; i++)
+                {
+                    if(*from != 0)
+                        *to = palette[*from];
+                    to++; from++;
+                }
+
+                from += (fromStride - width);
+                to += (toStride - width);
+            }
+        }
+
+        [DllImport("Kernel32.dll", EntryPoint = "RtlZeroMemory", SetLastError = false)]
+        static extern void ZeroMemory(IntPtr dest, IntPtr size);
+
         public Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
         {
             if(_isMetadataDirty)
@@ -115,25 +138,52 @@ namespace UAlbion.Core.Textures
             {
                 staging.Name = "T_" + Name + "_Staging";
 
-                foreach(var lsi in _logicalSubImages)
+                unsafe
                 {
-                    for (int i = 0; i < lsi.Frames; i++)
+                    uint* toBuffer = stackalloc uint[(int)(Width * Height)];
+                    foreach (var lsi in _logicalSubImages)
                     {
-                        foreach (var component in lsi.Components)
+                        for (int i = 0; i < lsi.Frames; i++)
                         {
-                            if (component.Source == null)
-                                continue;
+                            ZeroMemory((IntPtr)toBuffer, (IntPtr)(Width * Height * sizeof(uint)));
+                            uint destinationLayer = (uint)_layerLookup[new LayerKey(lsi.Id, i)];
 
-                            var eightBitTexture = (EightBitTexture) component.Source;
-                            int frame = i % (int)eightBitTexture.ArrayLayers;
-                            int paletteFrame = lsi.IsPaletteAnimated ? i % _palette.Count : 0;
-                            int destinationLayer = _layerLookup[new LayerKey(lsi.Id, i)];
-                            eightBitTexture.UploadSubImageToStagingTexture(
-                                gd, frame, staging,
-                                (uint)destinationLayer,
-                                _palette[paletteFrame],
-                                component.X,
-                                component.Y);
+                            foreach (var component in lsi.Components)
+                            {
+                                if (component.Source == null)
+                                    continue;
+
+                                var eightBitTexture = (EightBitTexture)component.Source;
+                                int frame = i % (int)eightBitTexture.ArrayLayers;
+                                int paletteFrame = lsi.IsPaletteAnimated ? i % _palette.Count : 0;
+                                eightBitTexture.GetSubImageOffset(frame, out var sourceWidth, out var sourceHeight,
+                                    out var sourceOffset, out var sourceStride);
+
+                                if (component.X + sourceWidth > Width || component.Y + sourceHeight > Height)
+                                {
+                                    CoreTrace.Log.Warning(
+                                        "MultiTexture",
+                                        $"Tried to write an oversize component to {Name}: {component.Source.Name}:{frame} is ({sourceWidth}x{sourceHeight}) @ ({component.X}, {component.Y}) but multitexture is only ({Width}x{Height})");
+                                    continue;
+                                }
+
+                                fixed (byte* fromBuffer = &eightBitTexture.TextureData[0])
+                                {
+                                    Blit8To24(
+                                        sourceWidth,
+                                        sourceHeight,
+                                        fromBuffer + sourceOffset,
+                                        toBuffer + (int)(component.Y * Width + component.X),
+                                        sourceStride,
+                                        (int)Width,
+                                        _palette[paletteFrame]);
+                                }
+                            }
+
+                            gd.UpdateTexture(
+                                staging, (IntPtr)toBuffer, Width * Height * sizeof(uint),
+                                0, 0, 0, Width, Height, 1,
+                                0, destinationLayer);
                         }
                     }
                 }

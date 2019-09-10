@@ -83,6 +83,7 @@ namespace UAlbion.Formats.Parsers
 
         public class Object
         {
+            [Flags]
             public enum ObjectFlags : byte
             {
                 Unk0 = 1 << 0,

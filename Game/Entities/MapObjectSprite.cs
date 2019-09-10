@@ -19,15 +19,16 @@ namespace UAlbion.Game.Entities
 
         readonly DungeonObjectId _id;
         readonly Vector3 _position;
+        readonly bool _onFloor;
         readonly Vector2 _size;
         int _frame;
-        int _frameCount;
         public Vector3 Normal => Vector3.UnitZ;
 
-        public MapObjectSprite(DungeonObjectId id, Vector3 position, Vector2 size) : base(Handlers)
+        public MapObjectSprite(DungeonObjectId id, Vector3 position, Vector2 size, bool onFloor) : base(Handlers)
         {
             _id = id;
             _position = position;
+            _onFloor = onFloor;
             _size = size / 8;
         }
 
@@ -61,7 +62,7 @@ namespace UAlbion.Game.Entities
                 _frame,
                 _position,
                 (int)DrawLayer.Underlay,
-                SpriteFlags.FlipVertical,
+                SpriteFlags.FlipVertical | SpriteFlags.Billboard | (_onFloor ? SpriteFlags.Floor : 0),
                 _size);
 
             e.Add(sprite);

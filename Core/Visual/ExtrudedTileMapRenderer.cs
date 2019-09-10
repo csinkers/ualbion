@@ -13,9 +13,7 @@ namespace UAlbion.Core.Visual
     public class ExtrudedTileMapRenderer : IRenderer
     {
         // Vertex Layout
-        static readonly VertexLayoutDescription VertexLayout = new VertexLayoutDescription(
-            VertexLayoutHelper.Vector3D("Position"),       // 0
-                VertexLayoutHelper.Vector2D("TexCoords")); // 1
+        static readonly VertexLayoutDescription VertexLayout = Vertex3DTextured.VertexLayout;
 
         // Instance Layout
         static readonly VertexLayoutDescription InstanceLayout = new VertexLayoutDescription(
@@ -130,6 +128,9 @@ namespace UAlbion.Core.Visual
                         color = texture(sampler2D(PaletteView, PaletteSampler), vec2(redChannel, 0.0f));
                 }
                 // else if(color.x != 0) color = vec4(color.xx, 0.5f, 1.0f);
+
+                if(color.w == 0.0f)
+                    discard;
 
                 if((fsin_2 &   8) != 0) color = color * 1.2; // Highlight
                 if((fsin_2 &  16) != 0) color = vec4(color.x * 1.5f + 0.3f, color.yzw);         // Red tint

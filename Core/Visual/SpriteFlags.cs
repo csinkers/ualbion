@@ -5,14 +5,16 @@ namespace UAlbion.Core.Visual
     [Flags]
     public enum SpriteFlags : int
     {
-        NoTransform = 1,
-        Highlight = 2,
-        UsePalette = 4,
-        OnlyEvenFrames = 8,
-        RedTint = 16,
-        GreenTint = 32,
-        BlueTint = 64,
-        Transparent = 128,
-        FlipVertical = 256,
+        NoTransform    = 0x1,
+        Highlight      = 0x2,
+        UsePalette     = 0x4,
+        OnlyEvenFrames = 0x8,
+        RedTint        = 0x10,
+        GreenTint      = 0x20,
+        BlueTint       = 0x40,
+        Transparent    = 0x80,
+        FlipVertical   = 0x100,
+        Floor          = 0x200,
+        Billboard      = 0x400
     }
 }

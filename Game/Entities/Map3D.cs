@@ -57,19 +57,11 @@ namespace UAlbion.Game.Entities
                 var objectData = _labyrinthData.ObjectGroups[npc.ObjectNumber - 1];
                 foreach (var subObject in objectData.SubObjects)
                 {
-                    float height = (float)subObject.Y / TileSize.Y;
-                    if (height < 0)
-                        height += TileSize.Y;
-
-                    var position = new Vector3(npc.Waypoints[0].X, 0, npc.Waypoints[0].Y) * TileSize;
-                    var definition = _labyrinthData.Objects[subObject.ObjectInfoNumber];
-                    if(definition.TextureNumber == null)
+                    var sprite = BuildSprite(npc.Waypoints[0].X, npc.Waypoints[0].Y, subObject);
+                    if (sprite == null)
                         continue;
 
-                    Exchange.Attach(new MapObjectSprite(
-                        definition.TextureNumber.Value,
-                        position,
-                        new Vector2(definition.MapWidth, definition.MapHeight)));
+                    Exchange.Attach(sprite);
                 }
             }
 
@@ -84,22 +76,35 @@ namespace UAlbion.Game.Entities
                     var objectInfo = _labyrinthData.ObjectGroups[contents - 1];
                     foreach (var subObject in objectInfo.SubObjects)
                     {
-                        float height = (float)subObject.Y / TileSize.Y;
-                        if (height < 0)
-                            height += TileSize.Y;
-
-                        var position = new Vector3(x, 0, y) * TileSize;
-                        var definition = _labyrinthData.Objects[subObject.ObjectInfoNumber];
-                        if (definition.TextureNumber == null)
+                        var sprite = BuildSprite(x, y, subObject);
+                        if (sprite == null)
                             continue;
 
-                        Exchange.Attach(new MapObjectSprite(
-                            definition.TextureNumber.Value,
-                            position,
-                            new Vector2(definition.MapWidth, definition.MapHeight)));
+                        Exchange.Attach(sprite);
                     }
                 }
             }
+        }
+
+        MapObjectSprite BuildSprite(int tileX, int tileY, LabyrinthData.SubObject subObject)
+        {
+            var definition = _labyrinthData.Objects[subObject.ObjectInfoNumber];
+            if (definition.TextureNumber == null)
+                return null;
+
+            bool onFloor = (definition.Properties & LabyrinthData.Object.ObjectFlags.FloorObject) != 0;
+
+            var tilePosition = new Vector3(tileX, 0, tileY) * TileSize;
+            var offset = new Vector3(subObject.X, subObject.Y, subObject.Z) / 8.0f;
+            var smidgeon = onFloor ? new Vector3(0, 0.001f, 0) : Vector3.Zero;
+            var position = tilePosition + offset + smidgeon;
+
+            return new MapObjectSprite(
+                definition.TextureNumber.Value,
+                position,
+                new Vector2(definition.MapWidth, definition.MapHeight),
+                (definition.Properties & LabyrinthData.Object.ObjectFlags.FloorObject) != 0
+            );
         }
     }
 }

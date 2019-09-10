@@ -65,8 +65,23 @@ namespace UAlbion.Game.Entities
 
         void Subscribed() { Raise(new LoadPaletteEvent((int)_mapData.PaletteId)); }
 
+        void SetTile(int index, int order, int frame)
+        {
+            byte i = (byte)(index % _mapData.Width);
+            byte j = (byte)(index / _mapData.Width);
+            byte floorIndex = (byte)_mapData.Floors[index];
+            byte ceilingIndex = (byte)_mapData.Ceilings[index];
+            int contents = _mapData.Contents[index];
+            byte wallIndex = (byte)(contents < 100 || contents - 100 >= _labyrinthData.Walls.Count
+                ? 0
+                : contents - 100);
+
+            _tilemap.Set(order, i, j, floorIndex, ceilingIndex, wallIndex, frame);
+        }
+
         void PostUpdate(PostUpdateEvent e)
         {
+            const bool isSorting = false;
             foreach (var list in _tilesByDistance.Values)
                 list.Clear();
 
@@ -85,39 +100,37 @@ namespace UAlbion.Game.Entities
                     }
 
                     int index = j * _mapData.Width + i;
-                    list.Add(index);
+                    if(isSorting)
+                        list.Add(index);
+                    else
+                        SetTile(index, index, e.GameState.FrameCount);
                 }
             }
 
-            int order = 0;
-            foreach (var distance in _tilesByDistance.OrderByDescending(x => x.Key).ToList())
+            if (isSorting)
             {
-                if (distance.Value.Count == 0)
+                int order = 0;
+                foreach (var distance in _tilesByDistance.OrderByDescending(x => x.Key).ToList())
                 {
-                    _tilesByDistance.Remove(distance.Key);
-                    continue;
-                }
+                    if (distance.Value.Count == 0)
+                    {
+                        _tilesByDistance.Remove(distance.Key);
+                        continue;
+                    }
 
-                foreach (var index in distance.Value)
-                {
-                    byte i = (byte)(index % _mapData.Width);
-                    byte j = (byte)(index / _mapData.Width);
-                    byte floorIndex = (byte)_mapData.Floors[index];
-                    byte ceilingIndex = (byte)_mapData.Ceilings[index];
-                    int contents = _mapData.Contents[index];
-                    byte wallIndex = (byte)(contents < 100 || contents - 100 >= _labyrinthData.Walls.Count
-                        ? 0
-                        : contents - 100);
-
-                    _tilemap.Set(order, i, j, floorIndex, ceilingIndex, wallIndex, e.GameState.FrameCount);
-                    order++;
+                    foreach (var index in distance.Value)
+                    {
+                        SetTile(index, order, e.GameState.FrameCount);
+                        order++;
+                    }
                 }
             }
         }
 
         void Render(RenderEvent e)
         {
-            /* Split map rendering into one render call per distance group for debugging
+            e.Add(_tilemap); /*
+            // Split map rendering into one render call per distance group for debugging
             int offset = 0;
             foreach (var distance in _tilesByDistance.OrderByDescending(x => x.Key))
             {
@@ -125,7 +138,6 @@ namespace UAlbion.Game.Entities
                 offset += distance.Value.Count;
             }
             //*/
-            e.Add(_tilemap);
         }
     }
 }

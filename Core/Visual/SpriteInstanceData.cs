@@ -12,6 +12,7 @@ namespace UAlbion.Core.Visual
             TexPosition = texPosition; TexSize = texSize;
             TexLayer = texLayer;
             Flags = flags;
+            Rotation = 0;
         }
 
         public Vector3 Offset { get; set; } // Pixel coordinates
@@ -20,5 +21,6 @@ namespace UAlbion.Core.Visual
         public Vector2 TexSize { get; set; } // Normalised texture coordinates
         public uint TexLayer { get; set; }
         public SpriteFlags Flags { get; set; }
+        public float Rotation { get; set; }
     }
 }

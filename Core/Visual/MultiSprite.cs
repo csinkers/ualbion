@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace UAlbion.Core.Visual
 {
@@ -20,6 +21,18 @@ namespace UAlbion.Core.Visual
                 Instances = array;
             else
                 Instances = sprites.ToArray();
+        }
+
+        public void RotateSprites(Vector3 cameraPosition)
+        {
+            for(int i = 0; i < Instances.Length; i++)
+            {
+                if ((Instances[i].Flags & SpriteFlags.Billboard) == 0)
+                    continue;
+
+                var delta = Instances[i].Offset - cameraPosition;
+                Instances[i].Rotation = -(float)Math.Atan2(delta.X, delta.Z);
+            }
         }
 
         public string Name => Key.Texture.Name;

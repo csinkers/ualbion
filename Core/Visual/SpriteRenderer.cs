@@ -14,13 +14,15 @@ namespace UAlbion.Core.Visual
         static class Shader
         {
             // Vertex Layout
-            public static readonly VertexLayoutDescription VertexLayout = new VertexLayoutDescription(VertexLayoutHelper.Vector2D("Position"));
+            public static readonly VertexLayoutDescription VertexLayout = Vertex2DTextured.VertexLayout;
 
             // Instance Layout
             public static readonly VertexLayoutDescription InstanceLayout = new VertexLayoutDescription(
                     VertexLayoutHelper.Vector3D("Offset"), VertexLayoutHelper.Vector2D("Size"),
                     VertexLayoutHelper.Vector2D("TexPosition"), VertexLayoutHelper.Vector2D("TexSize"),
-                    VertexLayoutHelper.Int("TexLayer"), VertexLayoutHelper.Int("Flags"))
+                    VertexLayoutHelper.Int("TexLayer"), VertexLayoutHelper.Int("Flags"),
+                    VertexLayoutHelper.Float("Rotation")
+                    )
             { InstanceStepRate = 1 };
 
             // Resource Sets
@@ -40,30 +42,56 @@ namespace UAlbion.Core.Visual
 
             // Vertex Data
             layout(location = 0) in vec2 _Position;
+            layout(location = 1) in vec2 _TexCoords;
 
             // Instance Data
-            layout(location = 1) in vec3 _Offset;
-            layout(location = 2) in vec2 _Size;
-            layout(location = 3) in vec2 _TexOffset;
-            layout(location = 4) in vec2 _TexSize;
-            layout(location = 5) in int _TexLayer;
-            layout(location = 6) in int _Flags;
+            layout(location = 2) in vec3 _Offset;
+            layout(location = 3) in vec2 _Size;
+            layout(location = 4) in vec2 _TexOffset;
+            layout(location = 5) in vec2 _TexSize;
+            layout(location = 6) in int _TexLayer;
+            layout(location = 7) in int _Flags;
+            layout(location = 8) in float _Rotation;
 
             // Outputs to fragment shader
             layout(location = 0) out vec2 fsin_0;     // Texture Coordinates
             layout(location = 1) out flat int fsin_1; // Texture Layer
-            layout(location = 2) out flat int fsin_2; // Flags
+            layout(location = 2) out flat int fsin_2; /* Flags:
+               NoTransform  = 0x1,  Highlight      = 0x2,
+               UsePalette   = 0x4,  OnlyEvenFrames = 0x8,
+               RedTint      = 0x10,  GreenTint     = 0x20,
+               BlueTint     = 0x40,  Transparent   = 0x80 
+               FlipVertical = 0x100, FloorTile     = 0x200,
+               Billboard    = 0x400 */
 
             void main()
             {
-                fsin_0 = _Position * _TexSize + _TexOffset;
+                mat4 transform = mat4(1.0);
+                if((_Flags & 0x200) != 0)
+                    transform = mat4(
+                        1, 0, 0, 0,
+                        0, 0,-1, 0,
+                        0, 1, 0, 0,
+                        0, 0, 0, 1) * transform;
+
+                float c = cos(_Rotation);
+                float s = sin(_Rotation);
+                transform = mat4(
+                    c, 0, s, 0,
+                    0, 1, 0, 0,
+                   -s, 0, c, 0,
+                    0, 0, 0, 1) * transform;
+
+                // Projection * View * vec4((_Position * _Size) + _Offset.xy, _Offset.z, 1);
+                vec4 worldSpace = transform * vec4((_Position * _Size), 0, 0) + vec4(_Offset, 1);
+                if ((_Flags & 1) == 0)
+                    gl_Position = Projection * View * worldSpace;
+                else
+                    gl_Position = worldSpace;
+
+                fsin_0 = _TexCoords * _TexSize + _TexOffset;
                 fsin_1 = _TexLayer;
                 fsin_2 = _Flags;
-
-                if((_Flags & 1) != 0) // If NoTransform set
-                    gl_Position = vec4((_Position * _Size) + _Offset.xy, _Offset.z, 1);
-                else
-                    gl_Position = Projection * View * vec4((_Position * _Size) + _Offset.xy, _Offset.z, 1);
             }";
 
             public const string FragmentShader = @"
@@ -84,12 +112,6 @@ namespace UAlbion.Core.Visual
 
             void main()
             {
-                /* NoTransform = 1,  Highlight      = 2,
-                   UsePalette  = 4,  OnlyEvenFrames = 8,
-                   RedTint     = 16, GreenTint      = 32,
-                   BlueTint    = 64, Transparent    = 128 
-                   FliVertical = 256 */
-
                 vec2 uv = ((fsin_2 & 0x100) != 0) ? vec2(fsin_0.x, -fsin_0.y) : fsin_0;
 
                 vec4 color;
@@ -106,20 +128,23 @@ namespace UAlbion.Core.Visual
                     color = texture(sampler2D(SpriteTexture, SpriteSampler), uv);
                 }
 
-                if((fsin_2 &   2) != 0) color = color * 1.2; // Highlight
-                if((fsin_2 &  16) != 0) color = vec4(color.x * 1.5f + 0.3f, color.yzw);         // Red tint
-                if((fsin_2 &  32) != 0) color = vec4(color.x, color.y * 1.5f + 0.3f, color.zw); // Green tint
-                if((fsin_2 &  64) != 0) color = vec4(color.xy, color.z * 1.5f + 0.f, color.w); // Blue tint
-                if((fsin_2 & 128) != 0) color = vec4(color.xyz, color.w * 0.5f); // Transparent
+                if(color.w == 0.0f)
+                    discard;
+
+                if((fsin_2 & 0x02) != 0) color = color * 1.2; // Highlight
+                if((fsin_2 & 0x10) != 0) color = vec4(color.x * 1.5f + 0.3f, color.yzw);         // Red tint
+                if((fsin_2 & 0x20) != 0) color = vec4(color.x, color.y * 1.5f + 0.3f, color.zw); // Green tint
+                if((fsin_2 & 0x40) != 0) color = vec4(color.xy, color.z * 1.5f + 0.f, color.w); // Blue tint
+                if((fsin_2 & 0x80) != 0) color = vec4(color.xyz, color.w * 0.5f); // Transparent
 
                 OutputColor = color;
             }";
         }
 
-        static readonly Vector2[] Vertices =
+        static readonly Vertex2DTextured[] Vertices =
         {
-            new Vector2(0.0f, 0.0f), new Vector2(1.0f, 0.0f),
-            new Vector2(0.0f, 1.0f), new Vector2(1.0f, 1.0f),
+            new Vertex2DTextured(-0.5f, 0.0f, 0.0f, 0.0f), new Vertex2DTextured(0.5f, 0.0f, 1.0f, 0.0f),
+            new Vertex2DTextured(-0.5f, 1.0f, 0.0f, 1.0f), new Vertex2DTextured(0.5f, 1.0f, 1.0f, 1.0f),
         };
         static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
@@ -192,6 +217,7 @@ namespace UAlbion.Core.Visual
             {
                 _textureManager.PrepareTexture(group.Key.Texture, gd);
                 var multiSprite = new MultiSprite(group.Key, _instanceBuffers.Count, group);
+                multiSprite.RotateSprites(sc.Camera.Position);
                 var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)multiSprite.Instances.Length * SpriteInstanceData.StructSize, BufferUsage.VertexBuffer));
                 buffer.Name = $"B_SpriteInst{_instanceBuffers.Count}";
                 cl.UpdateBuffer(buffer, 0, multiSprite.Instances);
@@ -203,6 +229,7 @@ namespace UAlbion.Core.Visual
             {
                 _textureManager.PrepareTexture(multiSprite.Key.Texture, gd);
                 multiSprite.BufferId = _instanceBuffers.Count;
+                multiSprite.RotateSprites(sc.Camera.Position);
                 var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)multiSprite.Instances.Length * SpriteInstanceData.StructSize, BufferUsage.VertexBuffer));
                 buffer.Name = $"B_SpriteInst{_instanceBuffers.Count}";
                 cl.UpdateBuffer(buffer, 0, multiSprite.Instances);

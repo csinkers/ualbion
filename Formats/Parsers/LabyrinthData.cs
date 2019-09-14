@@ -221,8 +221,15 @@ namespace UAlbion.Formats.Parsers
                 fc.Unk3 = br.ReadByte();
                 fc.AnimationCount = br.ReadByte();
                 fc.Unk5 = br.ReadByte();
+
                 ushort textureNumber = br.ReadUInt16();
-                fc.TextureNumber = textureNumber == 0 ? (DungeonFloorId?)null : (DungeonFloorId)(textureNumber - 1);
+                if (textureNumber == 0)
+                    fc.TextureNumber = null;
+                else if (textureNumber < 100)
+                    fc.TextureNumber = (DungeonFloorId)(textureNumber - 1);
+                else
+                    fc.TextureNumber = (DungeonFloorId)textureNumber;
+
                 fc.Unk8 = br.ReadUInt16();
                 l.FloorAndCeilings.Add(fc);
             } 
@@ -234,8 +241,15 @@ namespace UAlbion.Formats.Parsers
                 var o = new LabyrinthData.Object();
                 o.Properties = (LabyrinthData.Object.ObjectFlags)br.ReadByte();
                 o.CollisionData = br.ReadBytes(3);
+
                 ushort textureNumber = br.ReadUInt16();
-                o.TextureNumber = textureNumber == 0 ? (DungeonObjectId?)null : (DungeonObjectId)(textureNumber - 1);
+                if (textureNumber == 0)
+                    o.TextureNumber = null;
+                else if (textureNumber < 100)
+                    o.TextureNumber = (DungeonObjectId)(textureNumber - 1);
+                else
+                    o.TextureNumber = (DungeonObjectId)textureNumber;
+
                 o.AnimationFrames = br.ReadByte();
                 o.Unk7 = br.ReadByte();
                 o.Width = br.ReadUInt16();
@@ -260,8 +274,15 @@ namespace UAlbion.Formats.Parsers
                 var w = new LabyrinthData.Wall();
                 w.Properties = (LabyrinthData.Wall.WallFlags) br.ReadByte();
                 w.CollisionData = br.ReadBytes(3);
+
                 ushort textureNumber = br.ReadUInt16();
-                w.TextureNumber = textureNumber == 0 ? (DungeonWallId?)null : (DungeonWallId)(textureNumber - 1);
+                if (textureNumber == 0)
+                    w.TextureNumber = null;
+                else if (textureNumber < 100)
+                    w.TextureNumber = (DungeonWallId)(textureNumber - 1);
+                else
+                    w.TextureNumber = (DungeonWallId)textureNumber;
+
                 w.AnimationFrames = br.ReadByte();
                 w.AutoGfxType = br.ReadByte();
                 w.TransparentColour = br.ReadByte();
@@ -272,8 +293,15 @@ namespace UAlbion.Formats.Parsers
                 for (int j = 0; j < overlayCount; j++)
                 {
                     var o = new LabyrinthData.Wall.Overlay();
+
                     textureNumber = br.ReadUInt16();
-                    o.TextureNumber = textureNumber == 0 ? (DungeonOverlayId?)null : (DungeonOverlayId)(textureNumber - 1);
+                    if (textureNumber == 0)
+                        o.TextureNumber = null;
+                    else if (textureNumber < 100)
+                        o.TextureNumber = (DungeonOverlayId)(textureNumber - 1);
+                    else
+                        o.TextureNumber = (DungeonOverlayId)textureNumber;
+
                     o.AnimationFrames = br.ReadByte();
                     o.WriteZero = br.ReadByte();
                     o.XOffset = br.ReadUInt16();

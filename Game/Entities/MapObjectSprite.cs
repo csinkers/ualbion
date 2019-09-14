@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
+using System.Xml;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
@@ -31,6 +32,8 @@ namespace UAlbion.Game.Entities
             _onFloor = onFloor;
             _size = size / 8;
         }
+
+        public override string ToString() => $"{_id} @ {_position} {_size.X}x{_size.Y} {(_onFloor ? "FLOOR" : "")}";
 
         /*
         void Select(WorldCoordinateSelectEvent e)

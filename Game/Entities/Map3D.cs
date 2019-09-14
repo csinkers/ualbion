@@ -42,6 +42,7 @@ namespace UAlbion.Game.Entities
                 TileSize = new Vector3(64.0f, 64.0f, 64.0f);
         }
 
+        public override string ToString() => $"Map3D:{MapId} {LogicalSize.X}x{LogicalSize.Y} TileSize: {TileSize}";
         public MapDataId MapId { get; }
         public Vector2 LogicalSize { get; }
         public Vector3 TileSize { get; }

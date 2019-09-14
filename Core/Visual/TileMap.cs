@@ -59,8 +59,8 @@ namespace UAlbion.Core.Visual
         public MultiTexture Walls { get; }
         public int InstanceBufferId { get; set; }
 
-        public void DefineFloor(int id, ITexture texture) { Floors.AddTexture(id, texture, 0, 0); }
-        public void DefineWall(int id, ITexture texture, uint x, uint y) { Walls.AddTexture(id, texture, x, y); }
+        public void DefineFloor(int id, ITexture texture) { Floors.AddTexture(id, texture, 0, 0, null, false); }
+        public void DefineWall(int id, ITexture texture, uint x, uint y, byte transparentColour, bool isAlphaTested) { Walls.AddTexture(id, texture, x, y, transparentColour, isAlphaTested); }
 
         public void Set(int index, int x, int y, byte floorSubImage, byte ceilingSubImage, byte wallSubImage, int tick)
         {
@@ -69,7 +69,6 @@ namespace UAlbion.Core.Visual
             Walls.PaletteFrame = paletteFrame;
             unsafe
             {
-                // fixed (Tile* tile = &Tiles[y * Width + x])
                 fixed (Tile* tile = &Tiles[index])
                 {
                     tile->TilePosition = new Vector2(x, y);

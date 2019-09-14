@@ -19,14 +19,20 @@ namespace UAlbion.Core.Textures
 
         class LogicalSubImage
         {
-            public LogicalSubImage(int id) { Id = id; }
+            public LogicalSubImage(int id)
+            {
+                Id = id;
+            }
 
             public int Id { get; }
             public uint W { get; set; }
             public uint H { get; set; }
             public int Frames { get; set; }
             public bool IsPaletteAnimated { get; set; }
+            public bool IsAlphaTested { get; set; }
+            public byte? TransparentColor { get; set; }
             public IList<SubImageComponent> Components { get; } = new List<SubImageComponent>();
+
             public override string ToString() => $"LSI{Id} {W}x{H}:{Frames}{(IsPaletteAnimated ? "P":" ")} {string.Join("; ",  Components.Select(x => x.ToString()))}";
         }
 
@@ -112,7 +118,11 @@ namespace UAlbion.Core.Textures
             layer = (uint)subImage;
         }
 
-        unsafe void Blit8To24(int width, int height, byte* fromBuffer, uint* toBuffer, int fromStride, int toStride, uint[] palette)
+        unsafe void Blit8To24(
+            int width, int height, 
+            byte* fromBuffer, uint* toBuffer, 
+            int fromStride, int toStride,
+            uint[] palette, byte? transparentColor)
         {
             byte* from = fromBuffer;
             uint* to = toBuffer;
@@ -120,7 +130,7 @@ namespace UAlbion.Core.Textures
             {
                 for (int i = 0; i < width; i++)
                 {
-                    if(*from != 0)
+                    if(!transparentColor.HasValue || *from != transparentColor.Value)
                         *to = palette[*from];
                     to++; from++;
                 }
@@ -153,7 +163,14 @@ namespace UAlbion.Core.Textures
 
                         for (int i = 0; i < lsi.Frames; i++)
                         {
-                            ZeroMemory((IntPtr)toBuffer, (IntPtr)(Width * Height * sizeof(uint)));
+                            if(lsi.IsAlphaTested)
+                                ZeroMemory((IntPtr)toBuffer, (IntPtr)(Width * Height * sizeof(uint)));
+                            else
+                            {
+                                for(int j = 0; j < Width*Height;j++)
+                                    toBuffer[j] = 0xff000000;
+                            }
+
                             uint destinationLayer = (uint)_layerLookup[new LayerKey(lsi.Id, i)];
 
                             foreach (var component in lsi.Components)
@@ -184,7 +201,8 @@ namespace UAlbion.Core.Textures
                                         toBuffer + (int)(component.Y * Width + component.X),
                                         sourceStride,
                                         (int)Width,
-                                        _palette[_paletteFrame]);
+                                        _palette[_paletteFrame],
+                                        lsi.TransparentColor);
                                 }
                             }
 
@@ -267,7 +285,7 @@ namespace UAlbion.Core.Textures
                 throw new InvalidOperationException("Too many textures added to multi-texture");
         }
 
-        public void AddTexture(int logicalSubImage, ITexture texture, uint x, uint y)
+        public void AddTexture(int logicalSubImage, ITexture texture, uint x, uint y, byte? transparentColor, bool isAlphaTested)
         {
             if (texture == null) // Will just end up using layer 0
                 return;
@@ -276,6 +294,8 @@ namespace UAlbion.Core.Textures
                 _logicalSubImages.Add(new LogicalSubImage(logicalSubImage));
 
             var lsi = _logicalSubImages[logicalSubImage];
+            lsi.IsAlphaTested = isAlphaTested;
+            lsi.TransparentColor = transparentColor;
             lsi.Components.Add(new SubImageComponent
             {
                 Source = texture,

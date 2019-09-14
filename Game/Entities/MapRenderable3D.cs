@@ -50,7 +50,8 @@ namespace UAlbion.Game.Entities
                     continue;
 
                 ITexture wall = assets.LoadTexture(wallInfo.TextureNumber.Value);
-                _tilemap.DefineWall(i + 1, wall, 0, 0);
+                bool isAlphaTested = (wallInfo.Properties & LabyrinthData.Wall.WallFlags.AlphaTested) != 0;
+                _tilemap.DefineWall(i + 1, wall, 0, 0, wallInfo.TransparentColour, isAlphaTested);
 
                 foreach(var overlayInfo in wallInfo.Overlays)
                 {
@@ -58,7 +59,7 @@ namespace UAlbion.Game.Entities
                         continue;
 
                     var overlay = assets.LoadTexture(overlayInfo.TextureNumber.Value);
-                    _tilemap.DefineWall(i + 1, overlay, overlayInfo.XOffset, overlayInfo.YOffset);
+                    _tilemap.DefineWall(i + 1, overlay, overlayInfo.XOffset, overlayInfo.YOffset, wallInfo.TransparentColour, isAlphaTested);
                 }
             }
         }

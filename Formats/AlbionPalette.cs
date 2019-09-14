@@ -84,6 +84,9 @@ namespace UAlbion.Formats
                 Entries[i] |= (uint)commonPalette[(i - 192) * 3 + 1] << 8; // Green
                 Entries[i] |= (uint)commonPalette[(i - 192) * 3 + 2] << 16; // Blue
                 Entries[i] |= (uint)0xff << 24; // Alpha
+
+                foreach (var frame in _cache)
+                    frame[i] = Entries[i];
             }
         }
 

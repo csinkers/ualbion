@@ -4,7 +4,6 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Veldrid;
-using Vulkan;
 
 namespace UAlbion.Core.Textures
 {
@@ -15,6 +14,7 @@ namespace UAlbion.Core.Textures
             public ITexture Source { get; set; }
             public uint X { get; set; }
             public uint Y { get; set; }
+            public override string ToString() => $"({X}, {Y}) {Source}";
         }
 
         class LogicalSubImage
@@ -27,6 +27,7 @@ namespace UAlbion.Core.Textures
             public int Frames { get; set; }
             public bool IsPaletteAnimated { get; set; }
             public IList<SubImageComponent> Components { get; } = new List<SubImageComponent>();
+            public override string ToString() => $"LSI{Id} {W}x{H}:{Frames}{(IsPaletteAnimated ? "P":" ")} {string.Join("; ",  Components.Select(x => x.ToString()))}";
         }
 
         struct LayerKey : IEquatable<LayerKey>
@@ -54,6 +55,9 @@ namespace UAlbion.Core.Textures
         uint _width;
         uint _height;
         bool _isMetadataDirty = true;
+        bool _isAnySubImagePaletteAnimated = false;
+        int _paletteFrame;
+        public int PaletteFrame { set { _paletteFrame = value; IsDirty |= _isAnySubImagePaletteAnimated; } }
 
         public MultiTexture(string name, IList<uint[]> palette)
         {
@@ -131,6 +135,7 @@ namespace UAlbion.Core.Textures
 
         public Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
         {
+            bool rebuildAll = _isMetadataDirty;
             if(_isMetadataDirty)
                 RebuildLayers();
 
@@ -143,6 +148,9 @@ namespace UAlbion.Core.Textures
                     uint* toBuffer = stackalloc uint[(int)(Width * Height)];
                     foreach (var lsi in _logicalSubImages)
                     {
+                        //if (!rebuildAll && !lsi.IsPaletteAnimated) // TODO: Requires caching a single Texture and then modifying it
+                        //    continue;
+
                         for (int i = 0; i < lsi.Frames; i++)
                         {
                             ZeroMemory((IntPtr)toBuffer, (IntPtr)(Width * Height * sizeof(uint)));
@@ -155,7 +163,7 @@ namespace UAlbion.Core.Textures
 
                                 var eightBitTexture = (EightBitTexture)component.Source;
                                 int frame = i % (int)eightBitTexture.ArrayLayers;
-                                int paletteFrame = lsi.IsPaletteAnimated ? i % _palette.Count : 0;
+                                // int paletteFrame = lsi.IsPaletteAnimated ? i % _palette.Count : 0;
                                 eightBitTexture.GetSubImageOffset(frame, out var sourceWidth, out var sourceHeight,
                                     out var sourceOffset, out var sourceStride);
 
@@ -176,7 +184,7 @@ namespace UAlbion.Core.Textures
                                         toBuffer + (int)(component.Y * Width + component.X),
                                         sourceStride,
                                         (int)Width,
-                                        _palette[paletteFrame]);
+                                        _palette[_paletteFrame]);
                                 }
                             }
 
@@ -211,6 +219,7 @@ namespace UAlbion.Core.Textures
 
         void RebuildLayers()
         {
+            _isAnySubImagePaletteAnimated = false;
             _isMetadataDirty = false;
             _layerLookup.Clear();
             _layerSizes.Clear();
@@ -232,19 +241,20 @@ namespace UAlbion.Core.Textures
 
                     if (!lsi.IsPaletteAnimated && component.Source is EightBitTexture t)
                         lsi.IsPaletteAnimated = t.ContainsColors(_animatedRange);
+
+                    if (lsi.IsPaletteAnimated)
+                        _isAnySubImagePaletteAnimated = true;
                 }
 
-                lsi.Frames = (int)Api.Util.LCM(
-                    lsi.Components.Select(x => (long)x.Source.ArrayLayers)
-                        .Append(lsi.IsPaletteAnimated ? _palette.Count : 1));
+                //lsi.Frames = (int)Api.Util.LCM(
+                //    lsi.Components.Select(x => (long)x.Source.ArrayLayers)
+                //        .Append(lsi.IsPaletteAnimated ? _palette.Count : 1));
+                lsi.Frames = (int)Api.Util.LCM(lsi.Components.Select(x => (long)x.Source.ArrayLayers).Append(1));
 
-                for(int i = 0; i < lsi.Frames; i++)
+                for (int i = 0; i < lsi.Frames; i++)
                 {
                     _layerLookup[new LayerKey(lsi.Id, i)] = _layerSizes.Count;
                     _layerSizes.Add(new Vector2(lsi.W, lsi.H));
-
-                    if (_layerSizes.Count > 255)
-                        throw new InvalidOperationException("Too many textures added to multi-texture");
                 }
 
                 if (Width < lsi.W)
@@ -252,6 +262,9 @@ namespace UAlbion.Core.Textures
                 if (Height < lsi.H)
                     Height = lsi.H;
             }
+
+            if (_layerSizes.Count > 255)
+                throw new InvalidOperationException("Too many textures added to multi-texture");
         }
 
         public void AddTexture(int logicalSubImage, ITexture texture, uint x, uint y)

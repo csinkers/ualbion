@@ -8,6 +8,8 @@ namespace UAlbion.Core.Visual
 {
     public class TileMap : IRenderable
     {
+        readonly IList<uint[]> _palette;
+
         [Flags]
         public enum TileFlags : int
         {
@@ -36,6 +38,7 @@ namespace UAlbion.Core.Visual
 
         public TileMap(int renderOrder, Vector3 tileSize, uint width, uint height, IList<uint[]> palette)
         {
+            _palette = palette;
             RenderOrder = renderOrder;
             TileSize = tileSize;
             Width = width;
@@ -61,6 +64,9 @@ namespace UAlbion.Core.Visual
 
         public void Set(int index, int x, int y, byte floorSubImage, byte ceilingSubImage, byte wallSubImage, int tick)
         {
+            int paletteFrame = tick % _palette.Count;
+            Floors.PaletteFrame = paletteFrame;
+            Walls.PaletteFrame = paletteFrame;
             unsafe
             {
                 // fixed (Tile* tile = &Tiles[y * Width + x])

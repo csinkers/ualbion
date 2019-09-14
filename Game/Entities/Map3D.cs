@@ -11,6 +11,7 @@ namespace UAlbion.Game.Entities
 {
     public class Map3D : Component, IMap
     {
+        readonly Skybox _skybox;
         readonly MapRenderable3D _renderable;
         static readonly IList<Handler> Handlers = new Handler[]
         {
@@ -36,6 +37,8 @@ namespace UAlbion.Game.Entities
             if (_labyrinthData != null)
             {
                 _renderable = new MapRenderable3D(assets, _mapData, _labyrinthData);
+                if(_labyrinthData.BackgroundId.HasValue)
+                    _skybox = new Skybox(assets, _labyrinthData.BackgroundId.Value, _mapData.PaletteId);
                 TileSize = new Vector3(64.0f, _labyrinthData.WallHeight, 64.0f);
             }
             else
@@ -49,8 +52,9 @@ namespace UAlbion.Game.Entities
 
         void Subscribed()
         {
-            if (_renderable != null)
-                Exchange.Attach(_renderable);
+            if (_skybox != null) Exchange.Attach(_skybox);
+            if (_renderable != null) Exchange.Attach(_renderable);
+
             Raise(new SetTileSizeEvent(TileSize, _labyrinthData.CameraHeight != 0 ? _labyrinthData.CameraHeight : 32));
 
             foreach (var npc in _mapData.Npcs)

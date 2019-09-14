@@ -187,8 +187,8 @@ namespace UAlbion
                     .Attach(new CursorManager(assets))
                     .Attach(new PaletteManager(assets));
 
-                //engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.Jirinaar3D), null);
-                engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.HausDesJägerclans), null);
+                engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.Jirinaar3D), null); /*
+                engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.HausDesJägerclans), null); //*/
 
                 /*
                 var menu = new MainMenu();

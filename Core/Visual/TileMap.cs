@@ -50,6 +50,7 @@ namespace UAlbion.Core.Visual
 
         public string Name { get; set; }
         public int RenderOrder { get; }
+        public Vector3 Position { get; set; }
         public Vector3 TileSize { get; }
         public Type Renderer => typeof(ExtrudedTileMapRenderer);
         public Tile[] Tiles { get; }
@@ -80,25 +81,6 @@ namespace UAlbion.Core.Visual
                     tile->WallSize = wallSize;
                 }
             }
-        }
-    }
-
-    public class TileMapWindow : IRenderable
-    {
-        public string Name => TileMap.Name;
-        public int RenderOrder => TileMap.RenderOrder;
-        public Type Renderer => TileMap.Renderer;
-
-        public int Offset { get; }
-        public int Length { get; }
-        public TileMap TileMap { get; }
-        public int InstanceBufferId { get; set; }
-
-        public TileMapWindow(TileMap tileMap, int offset, int length)
-        {
-            TileMap = tileMap;
-            Offset = offset;
-            Length = length;
         }
     }
 }

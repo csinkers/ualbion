@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -26,7 +25,7 @@ namespace UAlbion.Core.Visual
         static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
             ResourceLayoutHelper.Uniform("vdspv_0_0"),  // Projection Matrix
             ResourceLayoutHelper.Uniform("vdspv_0_1"),  // View Matrix
-            ResourceLayoutHelper.Uniform("vdspv_0_2"),  // Tile Size
+            ResourceLayoutHelper.Uniform("vdspv_0_2"),  // Misc Uniform Data
             ResourceLayoutHelper.Sampler("vdspv_0_3"),  // Point Sampler
             ResourceLayoutHelper.Texture("vdspv_0_4"),  // Palette
             ResourceLayoutHelper.Sampler("vdspv_0_5"),  // Texture Sampler
@@ -39,7 +38,7 @@ namespace UAlbion.Core.Visual
             // Resource Sets / Uniforms
             layout(set = 0, binding = 0) uniform _Projection { mat4 Projection; }; // vdspv_0_0
             layout(set = 0, binding = 1) uniform _View       { mat4 View; };       // vdspv_0_1
-            layout(set = 0, binding = 2) uniform _TileSize   { vec3 TileSize; int Unused; }; // vdspv_0_2
+            layout(set = 0, binding = 2) uniform _Misc       { vec3 Position; int Unused1; vec3 TileSize; int Unused2; }; // vdspv_0_2
             // TODO: Lighting info
 
             // Vertex Data
@@ -76,7 +75,7 @@ namespace UAlbion.Core.Visual
                 )
                     gl_Position = vec4(0, 1e12, 0, 1); // Inactive faces/vertices get relegated to waaaay above the origin
                 else
-                    gl_Position = Projection * View * vec4((_VertexPosition + vec3(_TilePosition.x, 0.0f, _TilePosition.y)) * TileSize, 1);
+                    gl_Position = Projection * View * vec4(Position + ( _VertexPosition + vec3(_TilePosition.x, 0.0f, _TilePosition.y)) * TileSize, 1);
             }";
 
         const string FragmentShader = @"
@@ -217,8 +216,10 @@ namespace UAlbion.Core.Visual
         public struct MiscUniformData
         {
             public static readonly uint SizeInBytes = (uint)Unsafe.SizeOf<MiscUniformData>();
-            public Vector3 TileSize { get; set; }
-            public int Unused { get; set; }
+            public Vector3 Position { get; set; } // 12 bytes
+            public int Unused1 { get; set; } // Need another 8 bytes to reach a multiple of 16.
+            public Vector3 TileSize { get; set; } // +12 bytes = 24
+            public int Unused2 { get; set; } // Need another 8 bytes to reach a multiple of 16.
         }
 
         public void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
@@ -276,26 +277,9 @@ namespace UAlbion.Core.Visual
                 buffer.Dispose();
             _instanceBuffers.Clear();
 
-            foreach (var tilemap in renderables.OfType<TileMap>())
-            {
-                cl.UpdateBuffer(_miscUniformBuffer, 0, tilemap.TileSize);
-                cl.UpdateBuffer(_miscUniformBuffer, 12, 0);
-                tilemap.InstanceBufferId = _instanceBuffers.Count;
-                var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)tilemap.Tiles.Length * TileMap.Tile.StructSize, BufferUsage.VertexBuffer));
-                buffer.Name = $"B_Tile3DInst{_instanceBuffers.Count}";
-                cl.UpdateBuffer(buffer, 0, tilemap.Tiles);
-                _instanceBuffers.Add(buffer);
-
-                _textureManager.PrepareTexture(tilemap.Floors, gd);
-                _textureManager.PrepareTexture(tilemap.Walls, gd);
-                yield return tilemap;
-            }
-
-            foreach (var window in renderables.OfType<TileMapWindow>())
+            void UpdateTilemapWindow(TileMapWindow window)
             {
                 var tilemap = window.TileMap;
-                cl.UpdateBuffer(_miscUniformBuffer, 0, tilemap.TileSize);
-                cl.UpdateBuffer(_miscUniformBuffer, 12, 0);
                 window.InstanceBufferId = _instanceBuffers.Count;
                 var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)window.Length * TileMap.Tile.StructSize, BufferUsage.VertexBuffer));
                 buffer.Name = $"B_Tile3DInst{_instanceBuffers.Count}";
@@ -304,26 +288,35 @@ namespace UAlbion.Core.Visual
 
                 _textureManager.PrepareTexture(tilemap.Floors, gd);
                 _textureManager.PrepareTexture(tilemap.Walls, gd);
+            }
+
+            foreach (var tilemap in renderables.OfType<TileMap>())
+            {
+                var window = new TileMapWindow(tilemap, 0, tilemap.Tiles.Length);
+                UpdateTilemapWindow(window);
+                yield return window;
+            }
+
+            foreach (var window in renderables.OfType<TileMapWindow>())
+            {
+                UpdateTilemapWindow(window);
                 yield return window;
             }
         }
 
         public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable renderable)
         {
-            var tilemap = renderable as TileMap;
             var window = renderable as TileMapWindow;
-            if (tilemap == null && window == null)
+            if (window == null)
                 return;
 
-            if (tilemap == null)
-                tilemap = window.TileMap;
-
-            if (window == null)
-                window = new TileMapWindow(tilemap, 0, tilemap.Tiles.Length) { InstanceBufferId = tilemap.InstanceBufferId };
-
+            var tilemap = window.TileMap;
             cl.PushDebugGroup($"Tiles3D:{tilemap.Name}:{tilemap.RenderOrder}");
             TextureView floors = _textureManager.GetTexture(tilemap.Floors);
             TextureView walls = _textureManager.GetTexture(tilemap.Walls);
+
+            var miscUniformData = new MiscUniformData { Position = tilemap.Position, TileSize = tilemap.TileSize, Unused1 = 0, Unused2 = 0 };
+            cl.UpdateBuffer(_miscUniformBuffer, 0, miscUniformData);
 
             var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_layout,
                 sc.ProjectionMatrixBuffer,

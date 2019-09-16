@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
@@ -39,10 +40,12 @@ namespace UAlbion.Game.Entities
             _labyrinthData = assets.LoadLabyrinthData(_mapData.LabDataId);
             if (_labyrinthData != null)
             {
-                _renderable = new MapRenderable3D(assets, _mapData, _labyrinthData);
-                if(_labyrinthData.BackgroundId.HasValue)
+                //TileSize = new Vector3(64.0f, 64.0f * (_labyrinthData.WallHeight) / 512.0f, 64.0f);
+                TileSize = new Vector3(_labyrinthData.EffectiveWallWidth, _labyrinthData.WallHeight,
+                    _labyrinthData.EffectiveWallWidth);
+                _renderable = new MapRenderable3D(assets, _mapData, _labyrinthData, TileSize);
+                if (_labyrinthData.BackgroundId.HasValue)
                     _skybox = new Skybox(assets, _labyrinthData.BackgroundId.Value, _mapData.PaletteId);
-                TileSize = new Vector3(64.0f, _labyrinthData.WallHeight, 64.0f);
 
                 var palette = assets.LoadPalette(_mapData.PaletteId);
                 uint backgroundColour = palette.GetPaletteAtTime(0)[_labyrinthData.BackgroundColour];
@@ -52,7 +55,7 @@ namespace UAlbion.Game.Entities
                 _backgroundColour = new RgbaFloat(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
             }
             else
-                TileSize = new Vector3(64.0f, 64.0f, 64.0f);
+                TileSize = Vector3.One * 512;
         }
 
         public override string ToString() => $"Map3D:{MapId} {LogicalSize.X}x{LogicalSize.Y} TileSize: {TileSize}";
@@ -66,14 +69,25 @@ namespace UAlbion.Game.Entities
             if (_renderable != null) Exchange.Attach(_renderable);
 
             Raise(new SetClearColourEvent(_backgroundColour.R, _backgroundColour.G, _backgroundColour.B));
-            Raise(new SetTileSizeEvent(TileSize, _labyrinthData.CameraHeight != 0 ? _labyrinthData.CameraHeight : 32));
+            if(_labyrinthData.CameraHeight != 0)
+                Debugger.Break();
+
+            if(_labyrinthData.Unk12 != 0) // 7 (Jirinaar), 54, 156 (Tall town)
+                Debugger.Break();
+            var maxObjectHeightRaw = _labyrinthData.ObjectGroups.Max(x => x.SubObjects.Max(y => (int?)y.Y));
+            Raise(new LogEvent(1, $"WallHeight: {_labyrinthData.WallHeight} MaxObj: {maxObjectHeightRaw} EffWallWidth: {_labyrinthData.EffectiveWallWidth}"));
+            Raise(new SetTileSizeEvent(TileSize, _labyrinthData.CameraHeight != 0 ? _labyrinthData.CameraHeight * 8 : TileSize.Y/2));
+
+            float objectYScaling = TileSize.Y / _labyrinthData.WallHeight;
+            if (maxObjectHeightRaw > _labyrinthData.WallHeight * 1.5f)
+                objectYScaling /= 2; // TODO: Figure out the proper way to handle this.
 
             foreach (var npc in _mapData.Npcs)
             {
                 var objectData = _labyrinthData.ObjectGroups[npc.ObjectNumber - 1];
                 foreach (var subObject in objectData.SubObjects)
                 {
-                    var sprite = BuildSprite(npc.Waypoints[0].X, npc.Waypoints[0].Y, subObject);
+                    var sprite = BuildSprite(npc.Waypoints[0].X, npc.Waypoints[0].Y, subObject, objectYScaling);
                     if (sprite == null)
                         continue;
 
@@ -92,7 +106,7 @@ namespace UAlbion.Game.Entities
                     var objectInfo = _labyrinthData.ObjectGroups[contents - 1];
                     foreach (var subObject in objectInfo.SubObjects)
                     {
-                        var sprite = BuildSprite(x, y, subObject);
+                        var sprite = BuildSprite(x, y, subObject, objectYScaling);
                         if (sprite == null)
                             continue;
 
@@ -102,7 +116,7 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        MapObjectSprite BuildSprite(int tileX, int tileY, LabyrinthData.SubObject subObject)
+        MapObjectSprite BuildSprite(int tileX, int tileY, LabyrinthData.SubObject subObject, float objectYScaling)
         {
             var definition = _labyrinthData.Objects[subObject.ObjectInfoNumber];
             if (definition.TextureNumber == null)
@@ -111,8 +125,15 @@ namespace UAlbion.Game.Entities
             bool onFloor = (definition.Properties & LabyrinthData.Object.ObjectFlags.FloorObject) != 0;
 
             var tilePosition = new Vector3(tileX - 0.5f, 0, tileY - 0.5f) * TileSize;
-            var offset = new Vector3(subObject.X, subObject.Y, subObject.Z) / 8.0f;
-            var smidgeon = onFloor ? new Vector3(0, 0.001f, 0) : Vector3.Zero;
+            var offset = new Vector3(
+                subObject.X,
+                subObject.Y * objectYScaling,
+                subObject.Z);
+
+            var smidgeon = onFloor 
+                ? new Vector3(0,offset.Y < float.Epsilon ? 0.01f : -0.01f, 0) 
+                : Vector3.Zero;
+
             var position = tilePosition + offset + smidgeon;
 
             return new MapObjectSprite(

@@ -30,7 +30,7 @@ namespace UAlbion.Game.Entities
             _id = id;
             _position = position;
             _onFloor = onFloor;
-            _size = size / 8;
+            _size = size;
         }
 
         public override string ToString() => $"{_id} @ {_position} {_size.X}x{_size.Y} {(_onFloor ? "FLOOR" : "")}";

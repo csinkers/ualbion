@@ -16,6 +16,7 @@ namespace UAlbion.Core.Textures
         public uint Depth => 1;
         public uint MipLevels => 1;
         public uint ArrayLayers => 1;
+        public int SubImageCount => 1;
         public bool IsDirty { get; private set; }
         readonly ImageSharpTexture _texture;
 

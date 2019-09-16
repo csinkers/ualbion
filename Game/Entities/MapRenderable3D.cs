@@ -25,14 +25,14 @@ namespace UAlbion.Game.Entities
             new Handler<MapRenderable3D, SubscribedEvent>((x, e) => x.Subscribed())
         };
 
-        public MapRenderable3D(Assets assets, MapData3D mapData, LabyrinthData labyrinthData) : base(Handlers)
+        public MapRenderable3D(Assets assets, MapData3D mapData, LabyrinthData labyrinthData, Vector3 tileSize) : base(Handlers)
         {
             _mapData = mapData;
             _labyrinthData = labyrinthData;
             var palette = assets.LoadPalette(_mapData.PaletteId);
             _tilemap = new TileMap(
                 (int)DrawLayer.Background, 
-                Vector3.One * 64.0f, 
+                tileSize,
                 _mapData.Width, _mapData.Height, 
                 palette.GetCompletePalette());
 

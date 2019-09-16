@@ -26,6 +26,7 @@ namespace UAlbion.Formats.Parsers
         public ushort FogMode { get; set; }
         public ushort MaxLight { get; set; }
         public ushort WallWidth { get; set; } // Effective = (1 << WallWidth), always between 7 & 10 (?)
+        public int EffectiveWallWidth => 1 << WallWidth; // Effective = (1 << WallWidth), always between 7 & 10 (?)
         public ushort BackgroundTileAmount { get; set; }
         public ushort MaxVisibleTiles { get; set; }
         public ushort Unk20 { get; set; }

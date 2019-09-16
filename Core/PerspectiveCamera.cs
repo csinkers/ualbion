@@ -24,10 +24,9 @@ namespace UAlbion.Core
         float _yaw;
         float _pitch;
         bool _useReverseDepth;
+        bool _isClipSpaceYInverted;
         float _windowWidth;
         float _windowHeight;
-
-        bool _isClipSpaceYInverted;
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;
@@ -46,7 +45,7 @@ namespace UAlbion.Core
         public Vector3 LookDirection => _lookDirection;
         public float FieldOfView => 1f;
         public float NearDistance => 10f;
-        public float FarDistance => 50000f;
+        public float FarDistance => 512.0f * 256.0f * 2.0f;
 
         public PerspectiveCamera() : base(Handlers)
         {

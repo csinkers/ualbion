@@ -58,8 +58,6 @@ namespace UAlbion.Core.Textures
         readonly IList<Vector2> _layerSizes = new List<Vector2>();
         readonly IList<uint[]> _palette;
         readonly HashSet<byte> _animatedRange;
-        uint _width;
-        uint _height;
         bool _isMetadataDirty = true;
         bool _isAnySubImagePaletteAnimated = false;
         int _paletteFrame;
@@ -85,12 +83,12 @@ namespace UAlbion.Core.Textures
         public string Name { get; }
         public PixelFormat Format => PixelFormat.R8_G8_B8_A8_UNorm;
         public TextureType Type => TextureType.Texture2D;
-        public uint Width { get { if (_isMetadataDirty) RebuildLayers(); return _width; } private set => _width = value; }
-        public uint Height { get { if (_isMetadataDirty) RebuildLayers(); return _height; } private set => _height = value; }
+        public uint Width { get; private set; }
+        public uint Height { get; private set; }
         public uint Depth => 1;
         public uint MipLevels { get; }
         public uint ArrayLayers { get { if (_isMetadataDirty) RebuildLayers(); return (uint)_layerSizes.Count; } }
-
+        public int SubImageCount => _layerSizes.Count;
         public bool IsDirty { get; private set; }
 
         public int GetSubImageAtTime(int logicalId, int tick)
@@ -126,17 +124,36 @@ namespace UAlbion.Core.Textures
         {
             byte* from = fromBuffer;
             uint* to = toBuffer;
-            for (int j = 0; j < height; j++)
+            if (transparentColor.HasValue)
             {
-                for (int i = 0; i < width; i++)
+                for (int j = 0; j < height; j++)
                 {
-                    if(!transparentColor.HasValue || *from != transparentColor.Value)
-                        *to = palette[*from];
-                    to++; from++;
-                }
+                    for (int i = 0; i < width; i++)
+                    {
+                        if (*from != transparentColor.Value)
+                            *to = palette[*from];
+                        to++;
+                        from++;
+                    }
 
-                from += (fromStride - width);
-                to += (toStride - width);
+                    from += (fromStride - width);
+                    to += (toStride - width);
+                }
+            }
+            else
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    for (int i = 0; i < width; i++)
+                    {
+                        *to = palette[*from];
+                        to++;
+                        from++;
+                    }
+
+                    from += (fromStride - width);
+                    to += (toStride - width);
+                }
             }
         }
 
@@ -179,7 +196,7 @@ namespace UAlbion.Core.Textures
                                     continue;
 
                                 var eightBitTexture = (EightBitTexture)component.Source;
-                                int frame = i % (int)eightBitTexture.ArrayLayers;
+                                int frame = i % eightBitTexture.SubImageCount;
                                 eightBitTexture.GetSubImageOffset(frame, out var sourceWidth, out var sourceHeight,
                                     out var sourceOffset, out var sourceStride);
 
@@ -263,11 +280,7 @@ namespace UAlbion.Core.Textures
                         _isAnySubImagePaletteAnimated = true;
                 }
 
-                //lsi.Frames = (int)Api.Util.LCM(
-                //    lsi.Components.Select(x => (long)x.Source.ArrayLayers)
-                //        .Append(lsi.IsPaletteAnimated ? _palette.Count : 1));
-                lsi.Frames = (int)Api.Util.LCM(lsi.Components.Select(x => (long)x.Source.ArrayLayers).Append(1));
-
+                lsi.Frames = (int)Api.Util.LCM(lsi.Components.Select(x => (long)x.Source.SubImageCount).Append(1));
                 for (int i = 0; i < lsi.Frames; i++)
                 {
                     _layerLookup[new LayerKey(lsi.Id, i)] = _layerSizes.Count;

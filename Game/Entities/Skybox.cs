@@ -32,7 +32,7 @@ namespace UAlbion.Game.Entities
         {
             _id = id;
             var palette = assets.LoadPalette(paletteId);
-            float size = 64.0f * 256.0f;
+            float size = 512.0f * 256.0f;
             _tilemap = new TileMap(
                 (int)DrawLayer.Background, 
                 new Vector3(-size, size / 3, size), // Just make sure it's bigger than the largest map

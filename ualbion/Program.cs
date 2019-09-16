@@ -91,7 +91,7 @@ namespace UAlbion
             var backend =
                 //VeldridStartup.GetPlatformDefaultBackend()
                 //GraphicsBackend.Metal /*
-                //GraphicsBackend.Vulkan /*
+                GraphicsBackend.Vulkan /*
                 //GraphicsBackend.OpenGL /*
                 //GraphicsBackend.OpenGLES /*
                 GraphicsBackend.Direct3D11 /*

@@ -10,6 +10,6 @@
         EnlightenedOne,
         Technician,
         OquloKamulos,
-        WarriorIskai
+        IskaiWarrior
     }
 }

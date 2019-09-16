@@ -201,6 +201,7 @@ namespace UAlbion.Core.Visual
         readonly ITextureManager _textureManager;
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
         readonly IList<DeviceBuffer> _instanceBuffers = new List<DeviceBuffer>();
+        readonly IList<ResourceSet> _resourceSets = new List<ResourceSet>();
         DeviceBuffer _vb;
         DeviceBuffer _ib;
         DeviceBuffer _miscUniformBuffer;
@@ -277,6 +278,10 @@ namespace UAlbion.Core.Visual
                 buffer.Dispose();
             _instanceBuffers.Clear();
 
+            foreach (var resourceSet in _resourceSets)
+                resourceSet.Dispose();
+            _resourceSets.Clear();
+
             void UpdateTilemapWindow(TileMapWindow window)
             {
                 var tilemap = window.TileMap;
@@ -327,6 +332,7 @@ namespace UAlbion.Core.Visual
                 _textureSampler,
                 floors,
                 walls));
+            _resourceSets.Add(resourceSet);
 
             cl.SetPipeline(_pipeline);
             cl.SetGraphicsResourceSet(0, resourceSet);
@@ -340,6 +346,14 @@ namespace UAlbion.Core.Visual
 
         public void DestroyDeviceObjects()
         {
+            foreach (var buffer in _instanceBuffers)
+                buffer.Dispose();
+            _instanceBuffers.Clear();
+
+            foreach (var resourceSet in _resourceSets)
+                resourceSet.Dispose();
+            _resourceSets.Clear();
+
             _disposeCollector.DisposeAll();
         }
 

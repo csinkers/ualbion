@@ -149,6 +149,7 @@ namespace UAlbion.Core.Visual
         static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
         readonly IList<DeviceBuffer> _instanceBuffers = new List<DeviceBuffer>();
+        readonly IList<ResourceSet> _resourceSets = new List<ResourceSet>();
         readonly ITextureManager _textureManager;
         readonly ISpriteResolver _spriteResolver;
 
@@ -211,21 +212,11 @@ namespace UAlbion.Core.Visual
                 buffer.Dispose();
             _instanceBuffers.Clear();
 
-            var resolved = renderables.OfType<SpriteDefinition>().Select(_spriteResolver.Resolve);
-            var grouped = resolved.GroupBy(x => x.Item1, x => x.Item2);
-            foreach (var group in grouped)
-            {
-                _textureManager.PrepareTexture(group.Key.Texture, gd);
-                var multiSprite = new MultiSprite(group.Key, _instanceBuffers.Count, group);
-                multiSprite.RotateSprites(sc.Camera.Position);
-                var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)multiSprite.Instances.Length * SpriteInstanceData.StructSize, BufferUsage.VertexBuffer));
-                buffer.Name = $"B_SpriteInst{_instanceBuffers.Count}";
-                cl.UpdateBuffer(buffer, 0, multiSprite.Instances);
-                _instanceBuffers.Add(buffer);
-                yield return multiSprite;
-            }
+            foreach (var resourceSet in _resourceSets)
+                resourceSet.Dispose();
+            _resourceSets.Clear();
 
-            foreach(var multiSprite in renderables.OfType<MultiSprite>())
+            void SetupMultiSpriteResources(MultiSprite multiSprite)
             {
                 _textureManager.PrepareTexture(multiSprite.Key.Texture, gd);
                 multiSprite.BufferId = _instanceBuffers.Count;
@@ -234,6 +225,20 @@ namespace UAlbion.Core.Visual
                 buffer.Name = $"B_SpriteInst{_instanceBuffers.Count}";
                 cl.UpdateBuffer(buffer, 0, multiSprite.Instances);
                 _instanceBuffers.Add(buffer);
+            }
+
+            var resolved = renderables.OfType<SpriteDefinition>().Select(_spriteResolver.Resolve);
+            var grouped = resolved.GroupBy(x => x.Item1, x => x.Item2);
+            foreach (var group in grouped)
+            {
+                var multiSprite = new MultiSprite(group.Key, _instanceBuffers.Count, group);
+                SetupMultiSpriteResources(multiSprite);
+                yield return multiSprite;
+            }
+
+            foreach(var multiSprite in renderables.OfType<MultiSprite>())
+            {
+                SetupMultiSpriteResources(multiSprite);
                 yield return multiSprite;
             }
         }
@@ -244,12 +249,14 @@ namespace UAlbion.Core.Visual
             var sprite = (MultiSprite)renderable;
             cl.PushDebugGroup($"Sprite:{sprite.Key.Texture.Name}:{sprite.Key.RenderOrder}");
             TextureView textureView = _textureManager.GetTexture(sprite.Key.Texture);
-            var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_perSpriteResourceLayout,
+            var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
+                _perSpriteResourceLayout,
                 sc.ProjectionMatrixBuffer,
                 sc.ViewMatrixBuffer,
                 gd.PointSampler,
                 textureView,
                 sc.PaletteView));
+            _resourceSets.Add(resourceSet);
 
             cl.SetPipeline(_pipeline);
             cl.SetGraphicsResourceSet(0, resourceSet);
@@ -269,6 +276,9 @@ namespace UAlbion.Core.Visual
             foreach (var buffer in _instanceBuffers)
                 buffer.Dispose();
             _instanceBuffers.Clear();
+            foreach (var resourceSet in _resourceSets)
+                resourceSet.Dispose();
+            _resourceSets.Clear();
         }
         public void Dispose() { DestroyDeviceObjects(); }
     }

@@ -7,7 +7,6 @@ using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Parsers;
 using UAlbion.Game.Events;
-using Veldrid;
 
 namespace UAlbion.Game.Entities
 {
@@ -22,10 +21,11 @@ namespace UAlbion.Game.Entities
             // new Handler<Map3D, UnloadMapEvent>((x, e) => x.Unload()),
         };
 
-        readonly Assets _assets;
         readonly LabyrinthData _labyrinthData;
         readonly MapData3D _mapData;
-        readonly RgbaFloat _backgroundColour;
+        readonly float _backgroundRed;
+        readonly float _backgroundGreen;
+        readonly float _backgroundBlue;
 
         void Select(WorldCoordinateSelectEvent worldCoordinateSelectEvent)
         {
@@ -33,7 +33,6 @@ namespace UAlbion.Game.Entities
 
         public Map3D(Assets assets, MapDataId mapId) : base(Handlers)
         {
-            _assets = assets;
             MapId = mapId;
             _mapData = assets.LoadMap3D(mapId);
 
@@ -49,10 +48,9 @@ namespace UAlbion.Game.Entities
 
                 var palette = assets.LoadPalette(_mapData.PaletteId);
                 uint backgroundColour = palette.GetPaletteAtTime(0)[_labyrinthData.BackgroundColour];
-                var r = backgroundColour & 0xff;
-                var g = backgroundColour & 0xff00 >> 8;
-                var b = backgroundColour & 0xff0000 >> 16;
-                _backgroundColour = new RgbaFloat(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
+                _backgroundRed   = (backgroundColour & 0xff) / 255.0f;
+                _backgroundGreen = (backgroundColour & 0xff00 >> 8) / 255.0f;
+                _backgroundBlue  = (backgroundColour & 0xff0000 >> 16) / 255.0f;
             }
             else
                 TileSize = Vector3.One * 512;
@@ -68,12 +66,12 @@ namespace UAlbion.Game.Entities
             if (_skybox != null) Exchange.Attach(_skybox);
             if (_renderable != null) Exchange.Attach(_renderable);
 
-            Raise(new SetClearColourEvent(_backgroundColour.R, _backgroundColour.G, _backgroundColour.B));
-            if(_labyrinthData.CameraHeight != 0)
-                Debugger.Break();
+            Raise(new SetClearColourEvent(_backgroundRed, _backgroundGreen, _backgroundBlue));
+            //if(_labyrinthData.CameraHeight != 0)
+            //    Debugger.Break();
 
-            if(_labyrinthData.Unk12 != 0) // 7 (Jirinaar), 54, 156 (Tall town)
-                Debugger.Break();
+            //if(_labyrinthData.Unk12 != 0) // 7=1|2|4 (Jirinaar), 54=32|16|4|2, 156=128|16|8|2 (Tall town)
+            //    Debugger.Break();
             var maxObjectHeightRaw = _labyrinthData.ObjectGroups.Max(x => x.SubObjects.Max(y => (int?)y.Y));
             Raise(new LogEvent(1, $"WallHeight: {_labyrinthData.WallHeight} MaxObj: {maxObjectHeightRaw} EffWallWidth: {_labyrinthData.EffectiveWallWidth}"));
             Raise(new SetTileSizeEvent(TileSize, _labyrinthData.CameraHeight != 0 ? _labyrinthData.CameraHeight * 8 : TileSize.Y/2));
@@ -124,6 +122,9 @@ namespace UAlbion.Game.Entities
 
             bool onFloor = (definition.Properties & LabyrinthData.Object.ObjectFlags.FloorObject) != 0;
 
+            // We should probably be offsetting the main tilemap by half a tile to centre the objects
+            // rather than fiddling with the object positions... will need to reevaluate when working on
+            // collision detection, path-finding etc.
             var tilePosition = new Vector3(tileX - 0.5f, 0, tileY - 0.5f) * TileSize;
             var offset = new Vector3(
                 subObject.X,

@@ -3,7 +3,7 @@ using UAlbion.Formats;
 
 namespace UAlbion.Game.Entities
 {
-    class Item : Inanimate
+    class Item
     {
         readonly IList<PlayerClass> _validClasses = new List<PlayerClass>();
         AlbionSprite _worldSprite;

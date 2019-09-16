@@ -7,9 +7,9 @@ namespace UAlbion.Formats.AssetIds
 {
     public enum SmallPortraitId
     {
-        Unknown0 = 0,
-        Unknown1 = 1,
-        Unknown2 = 2,
+        Tom = 0,
+        Rainer = 1,
+        Driir = 2,
         Unknown3 = 3,
         Unknown4 = 4,
         Unknown5 = 5,
@@ -135,7 +135,7 @@ namespace UAlbion.Formats.AssetIds
         Unknown126 = 126,
         Unknown127 = 127,
         Unknown128 = 128,
-        Unknown129 = 129,
+        GibtEsNicht = 129,
         Unknown130 = 130,
         Unknown131 = 131,
         Unknown132 = 132,
@@ -169,8 +169,8 @@ namespace UAlbion.Formats.AssetIds
         Unknown160 = 160,
         Unknown161 = 161,
         Unknown162 = 162,
-        Unknown163 = 163,
-        Unknown164 = 164,
+        GibtEsSchon1 = 163,
+        GibtEsSchon2 = 164,
         Unknown165 = 165,
         Unknown166 = 166,
         Unknown167 = 167,

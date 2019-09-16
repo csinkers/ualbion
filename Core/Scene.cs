@@ -15,12 +15,14 @@ namespace UAlbion.Core
         {
             new Handler<Scene, SetRawPaletteEvent>((x, e) => x._palette = new Palette(e.Name, e.Entries)),
             new Handler<Scene, SetSceneEvent>((x, e) => x.SceneExchange.IsActive = e.SceneId == x.Id),
+            new Handler<Scene, SetClearColourEvent>((x, e) => x._clearColour = new RgbaFloat(e.Red, e.Green, e.Blue, 1.0f)),
         };
 
         readonly IDictionary<Type, IList<IRenderable>> _renderables = new Dictionary<Type, IList<IRenderable>>();
         readonly IDictionary<int, IList<IRenderable>> _processedRenderables = new Dictionary<int, IList<IRenderable>>();
         Palette _palette;
         CommandList _resourceUpdateCl;
+        RgbaFloat _clearColour;
 
         public int Id { get; }
         public ICamera Camera { get; }
@@ -102,7 +104,7 @@ namespace UAlbion.Core
                 cl.SetViewport(0, new Viewport(0, 0, fbWidth, fbHeight, 0, 1));
                 cl.SetFullViewports();
                 cl.SetFullScissorRects();
-                cl.ClearColorTarget(0, RgbaFloat.Black);
+                cl.ClearColorTarget(0, _clearColour);
                 cl.ClearDepthStencil(depthClear);
                 foreach (var key in orderedKeys)
                     Render(gd, cl, sc, RenderPasses.Standard, renderers, _processedRenderables[key]);

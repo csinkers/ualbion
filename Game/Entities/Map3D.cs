@@ -6,6 +6,7 @@ using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Parsers;
 using UAlbion.Game.Events;
+using Veldrid;
 
 namespace UAlbion.Game.Entities
 {
@@ -23,6 +24,7 @@ namespace UAlbion.Game.Entities
         readonly Assets _assets;
         readonly LabyrinthData _labyrinthData;
         readonly MapData3D _mapData;
+        readonly RgbaFloat _backgroundColour;
 
         void Select(WorldCoordinateSelectEvent worldCoordinateSelectEvent)
         {
@@ -33,6 +35,7 @@ namespace UAlbion.Game.Entities
             _assets = assets;
             MapId = mapId;
             _mapData = assets.LoadMap3D(mapId);
+
             _labyrinthData = assets.LoadLabyrinthData(_mapData.LabDataId);
             if (_labyrinthData != null)
             {
@@ -40,6 +43,13 @@ namespace UAlbion.Game.Entities
                 if(_labyrinthData.BackgroundId.HasValue)
                     _skybox = new Skybox(assets, _labyrinthData.BackgroundId.Value, _mapData.PaletteId);
                 TileSize = new Vector3(64.0f, _labyrinthData.WallHeight, 64.0f);
+
+                var palette = assets.LoadPalette(_mapData.PaletteId);
+                uint backgroundColour = palette.GetPaletteAtTime(0)[_labyrinthData.BackgroundColour];
+                var r = backgroundColour & 0xff;
+                var g = backgroundColour & 0xff00 >> 8;
+                var b = backgroundColour & 0xff0000 >> 16;
+                _backgroundColour = new RgbaFloat(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
             }
             else
                 TileSize = new Vector3(64.0f, 64.0f, 64.0f);
@@ -55,6 +65,7 @@ namespace UAlbion.Game.Entities
             if (_skybox != null) Exchange.Attach(_skybox);
             if (_renderable != null) Exchange.Attach(_renderable);
 
+            Raise(new SetClearColourEvent(_backgroundColour.R, _backgroundColour.G, _backgroundColour.B));
             Raise(new SetTileSizeEvent(TileSize, _labyrinthData.CameraHeight != 0 ? _labyrinthData.CameraHeight : 32));
 
             foreach (var npc in _mapData.Npcs)
@@ -99,7 +110,7 @@ namespace UAlbion.Game.Entities
 
             bool onFloor = (definition.Properties & LabyrinthData.Object.ObjectFlags.FloorObject) != 0;
 
-            var tilePosition = new Vector3(tileX, 0, tileY) * TileSize;
+            var tilePosition = new Vector3(tileX - 0.5f, 0, tileY - 0.5f) * TileSize;
             var offset = new Vector3(subObject.X, subObject.Y, subObject.Z) / 8.0f;
             var smidgeon = onFloor ? new Vector3(0, 0.001f, 0) : Vector3.Zero;
             var position = tilePosition + offset + smidgeon;

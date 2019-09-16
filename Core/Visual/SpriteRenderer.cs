@@ -66,23 +66,24 @@ namespace UAlbion.Core.Visual
             void main()
             {
                 mat4 transform = mat4(1.0);
-                if((_Flags & 0x200) != 0)
+                if((_Flags & 0x200) != 0) {
+                    transform = mat4(1, 0,         0, 0,
+                                     0, 0,        -1, 0,
+                                     0, 1,         0, 0,
+                                     0, 0, _Size.y/2, 1) * transform;
+                }
+                else {
+                    float c = cos(_Rotation);
+                    float s = sin(_Rotation);
                     transform = mat4(
-                        1, 0, 0, 0,
-                        0, 0,-1, 0,
+                        c, 0, s, 0,
                         0, 1, 0, 0,
+                       -s, 0, c, 0,
                         0, 0, 0, 1) * transform;
+                }
 
-                float c = cos(_Rotation);
-                float s = sin(_Rotation);
-                transform = mat4(
-                    c, 0, s, 0,
-                    0, 1, 0, 0,
-                   -s, 0, c, 0,
-                    0, 0, 0, 1) * transform;
+                vec4 worldSpace = transform * vec4((_Position * _Size), 0, 1) + vec4(_Offset, 0);
 
-                // Projection * View * vec4((_Position * _Size) + _Offset.xy, _Offset.z, 1);
-                vec4 worldSpace = transform * vec4((_Position * _Size), 0, 0) + vec4(_Offset, 1);
                 if ((_Flags & 1) == 0)
                     gl_Position = Projection * View * worldSpace;
                 else

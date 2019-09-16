@@ -108,6 +108,8 @@ namespace UAlbion.Game.Entities
 
                 Exchange.Attach(sprite);
             }
+
+            Raise(new SetClearColourEvent(0,0,0));
             Raise(new SetTileSizeEvent(new Vector3(TileSize, 0.0f), 1.0f));
         }
     }

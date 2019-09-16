@@ -180,7 +180,6 @@ namespace UAlbion.Core.Textures
 
                                 var eightBitTexture = (EightBitTexture)component.Source;
                                 int frame = i % (int)eightBitTexture.ArrayLayers;
-                                // int paletteFrame = lsi.IsPaletteAnimated ? i % _palette.Count : 0;
                                 eightBitTexture.GetSubImageOffset(frame, out var sourceWidth, out var sourceHeight,
                                     out var sourceOffset, out var sourceStride);
 

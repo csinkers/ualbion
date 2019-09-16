@@ -543,7 +543,7 @@ namespace UAlbion.Tools.ImageReverser
                 _savedPalettes = asset.PaletteHints.ToList();
             }
 
-            if (e.Control && e.KeyCode == Keys.V && asset != null)
+            if (e.Control && e.KeyCode == Keys.V && asset != null && _savedPalettes != null)
             {
                 asset.PaletteHints.Clear();
                 foreach(var palette in _savedPalettes)

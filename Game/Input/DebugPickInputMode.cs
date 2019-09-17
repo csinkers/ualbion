@@ -33,7 +33,7 @@ namespace UAlbion.Game.Input
             IList<(float, Selection)> hits = new List<(float, Selection)>();
             Raise(new ScreenCoordinateSelectEvent(e.Snapshot.MousePosition, (t, selection) => hits.Add((t, selection))));
             var orderedHits = hits.OrderBy(x => x.Item1).Select(x => x.Item2).ToList();
-            Raise(new ShowDebugInfoEvent(orderedHits));
+            Raise(new ShowDebugInfoEvent(orderedHits, e.Snapshot.MousePosition));
         }
 
         public DebugPickInputMode() : base(Handlers) { }

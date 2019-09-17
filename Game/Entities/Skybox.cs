@@ -9,7 +9,6 @@ namespace UAlbion.Game.Entities
 {
     public class Skybox : Component
     {
-        readonly DungeonBackgroundId _id;
         readonly TileMap _tilemap;
 
         static readonly Handler[] Handlers =
@@ -30,7 +29,6 @@ namespace UAlbion.Game.Entities
 
         public Skybox(Assets assets, DungeonBackgroundId id, PaletteId paletteId) : base(Handlers)
         {
-            _id = id;
             var palette = assets.LoadPalette(paletteId);
             float size = 512.0f * 256.0f;
             _tilemap = new TileMap(
@@ -42,7 +40,6 @@ namespace UAlbion.Game.Entities
             _tilemap.DefineWall(1, texture, 0, 0, 0, false);
             _tilemap.DefineWall(1, texture, texture.Width, 0, 0, false);
             _tilemap.DefineWall(1, texture, texture.Width * 2, 0, 0, false);
-            _tilemap.DefineWall(1, texture, texture.Width * 3, 0, 0, false);
             _tilemap.Set(0, 0, 0, 0, 0, 1, 0);
         }
     }

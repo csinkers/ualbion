@@ -11,7 +11,9 @@ namespace UAlbion.Game.State
         PaletteId PaletteId { get; }
         DateTime Time { get; }
         Vector3 CameraTilePosition { get; }
+        Vector2 CameraDirection { get; }
         Vector3 CameraPosition { get; }
         Vector3 TileSize { get; }
+        float CameraMagnification { get; }
     }
 }

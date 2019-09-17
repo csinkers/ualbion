@@ -17,11 +17,18 @@ namespace UAlbion.Core
             }),
             new Handler<OrthographicCamera, MagnifyEvent>((x, e) =>
             {
+                if (x._magnification < 1.0f && e.Delta > 0)
+                    x._magnification = 0.0f;
+
                 x._magnification += e.Delta;
+
                 if (x._magnification < 0.5f)
                     x._magnification = 0.5f;
                 x.UpdatePerspectiveMatrix();
+                x.Raise(new SetCameraMagnificationEvent(x._magnification));
             }),
+
+            // BUG: This event is not received when the screen is resized while a 3D scene is active.
             new Handler<OrthographicCamera, WindowResizedEvent>((x, e) =>
             {
                 x.WindowWidth = e.Width;

@@ -18,6 +18,7 @@ namespace UAlbion.Game.State
             public Vector3 CameraTilePosition => CameraPosition / TileSize;
             public Vector3 CameraPosition { get; set; }
             public Vector2 CameraDirection { get; set; }
+            public float CameraMagnification { get; set; }
             public Vector3 TileSize { get; set; } = Vector3.One;
         }
 
@@ -26,10 +27,11 @@ namespace UAlbion.Game.State
         static readonly Handler[] Handlers = 
         {
             new Handler<StateManager, UpdateEvent>((x, e) => { x._state.FrameCount += e.Frames; }),
-            new Handler<StateManager, SetTileSizeEvent>((x, e) => { x._state.TileSize += e.TileSize; }),
+            new Handler<StateManager, SetTileSizeEvent>((x, e) => { x._state.TileSize = e.TileSize; }),
             new Handler<StateManager, LoadPaletteEvent>((x, e) => { x._state.PaletteId = (PaletteId)e.PaletteId; }),
             new Handler<StateManager, SetCameraPositionEvent>((x, e) => x._state.CameraPosition = e.Position),
             new Handler<StateManager, SetCameraDirectionEvent>((x, e) => x._state.CameraDirection = new Vector2(e.Yaw, e.Pitch)),
+            new Handler<StateManager, SetCameraMagnificationEvent>((x, e) => x._state.CameraMagnification = e.Magnification),
         };
 
         public StateManager() : base(Handlers) { }

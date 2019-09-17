@@ -161,6 +161,5 @@ namespace UAlbion.Core.Textures
 
             return Math.Max(1, ret);
         }
-
     }
 }

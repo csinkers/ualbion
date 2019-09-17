@@ -10,6 +10,7 @@ namespace UAlbion.Core
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<PerspectiveCamera, BackendChangedEvent>((x, e) => x.UpdateBackend(e)),
+            // BUG: This event is not received when the screen is resized while a 2D scene is active.
             new Handler<PerspectiveCamera, WindowResizedEvent> ((x, e) => x.WindowResized(e.Width, e.Height)),
             new Handler<PerspectiveCamera, SetCameraPositionEvent>((x, e) => x.Position = e.Position),
             new Handler<PerspectiveCamera, SetCameraDirectionEvent>((x, e) => { x.Yaw = e.Yaw; x.Pitch = e.Pitch; }),

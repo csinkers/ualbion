@@ -132,7 +132,7 @@ namespace UAlbion.Game.Entities
                 subObject.Z);
 
             var smidgeon = onFloor 
-                ? new Vector3(0,offset.Y < float.Epsilon ? 0.01f : -0.01f, 0) 
+                ? new Vector3(0,offset.Y < float.Epsilon ? 0.5f : -0.5f, 0) 
                 : Vector3.Zero;
 
             var position = tilePosition + offset + smidgeon;

@@ -176,7 +176,7 @@ namespace UAlbion
                     .Attach(new ConsoleLogger())
                     .Attach(new GameClock(stateManager))
                     .Attach(new MapManager(assets, mapExchange))
-                    .Attach(new DebugMapInspector())
+                    .Attach(new DebugMapInspector(stateManager))
                     .Attach(new World2DInputMode())
                     .Attach(new DebugPickInputMode())
                     .Attach(new ContextMenuInputMode())

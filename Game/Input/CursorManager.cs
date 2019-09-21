@@ -10,7 +10,7 @@ namespace UAlbion.Game.Input
 {
     public class CursorManager : Component
     {
-        const float UiScaleFactor = 4.0f; // TODO: Config
+        const float UiScaleFactor = 4.0f; // TODO: Use config / heuristic
         readonly Assets _assets;
         CoreSpriteId _cursorId = CoreSpriteId.Cursor;
         Vector2 _position;
@@ -41,7 +41,7 @@ namespace UAlbion.Game.Input
 
         void Input(InputEvent e)
         {
-            _position = e.Snapshot.MousePosition;
+            _position = e.Snapshot.MousePosition - _hotspot;
         }
 
         void Render(RenderEvent e)
@@ -52,7 +52,7 @@ namespace UAlbion.Game.Input
             var position = new Vector3(
                 2 * _position.X / _windowSize.X - 1.0f,
                 1.0f - 2 * _position.Y / _windowSize.Y,
-                drawLayer.ToZCoordinate(0));
+                0.0f);
 
             var size = new Vector2(
                 UiScaleFactor * _size.X / _windowSize.X,

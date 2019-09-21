@@ -49,10 +49,14 @@ namespace UAlbion.Core
         internal RenderDoc RenderDoc => _renderDoc;
         internal string FrameTimeText => _frameTimeAverager.CurrentAverageFramesPerSecond.ToString("000.0 fps / ") + _frameTimeAverager.CurrentAverageFrameTimeMilliseconds.ToString("#00.00 ms");
 
-        public Engine(GraphicsBackend backend) : base(Handlers)
+        public Engine(GraphicsBackend backend, bool useRenderDoc) : base(Handlers)
         {
             GlobalExchange = new EventExchange("Global");
             TextureManager = new TextureManager();
+
+            if (useRenderDoc)
+                RenderDoc.Load(out _renderDoc);
+
             ChangeBackend(backend);
             CheckForErrors();
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);

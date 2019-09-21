@@ -58,6 +58,7 @@ namespace UAlbion.Game.Input
                 0,
                 position,
                 (int)drawLayer,
+                false,
                 SpriteFlags.NoTransform,
                 size));
         }

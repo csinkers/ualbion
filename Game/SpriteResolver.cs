@@ -50,7 +50,7 @@ namespace UAlbion.Game
             ITexture texture = _assets.LoadTexture(assetType, id);
             if (texture == null)
             {
-                return Tuple.Create(new SpriteKey(_defaultTexture, (int) DrawLayer.Diagnostic),
+                return Tuple.Create(new SpriteKey(_defaultTexture, (int)DrawLayer.Diagnostic, spriteDefinition.DepthTested),
                     new SpriteInstanceData(spriteDefinition.Position,
                         new Vector2(_defaultTexture.Width, _defaultTexture.Height),
                         Vector2.Zero, Vector2.One, 0, 0));
@@ -58,7 +58,7 @@ namespace UAlbion.Game
 
             texture.GetSubImageDetails(spriteDefinition.SubObject, out var size, out var texOffset, out var texSize, out var layer);
 
-            var key = new SpriteKey(texture, spriteDefinition.RenderOrder);
+            var key = new SpriteKey(texture, spriteDefinition.RenderOrder, spriteDefinition.DepthTested);
             var instance = new SpriteInstanceData(
                 spriteDefinition.Position,
                 spriteDefinition.Size ?? size, texOffset, texSize, layer,

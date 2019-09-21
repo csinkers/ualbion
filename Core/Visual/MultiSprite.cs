@@ -38,6 +38,7 @@ namespace UAlbion.Core.Visual
         public string Name => Key.Texture.Name;
         public int RenderOrder => Key.RenderOrder;
         public Type Renderer => typeof(SpriteRenderer);
+        public bool DepthTested => Key.DepthTested;
         public SpriteKey Key { get; }
         public int BufferId { get; set; }
         public SpriteInstanceData[] Instances { get; set; }

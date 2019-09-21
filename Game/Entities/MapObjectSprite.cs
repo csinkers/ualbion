@@ -64,6 +64,7 @@ namespace UAlbion.Game.Entities
                 _frame,
                 _position,
                 (int)DrawLayer.Underlay,
+                true,
                 SpriteFlags.FlipVertical | SpriteFlags.Billboard | (_onFloor ? SpriteFlags.Floor : 0),
                 _size);
 

@@ -50,6 +50,7 @@ namespace UAlbion.Game
             { AssetType.BigNpcGraphics,     (AssetLocation.Base,      "NPCGR!.XLD"  ) }, // Texture
             { AssetType.BackgroundGraphics, (AssetLocation.Base,      "3DBCKGR!.XLD") }, // Texture
             { AssetType.Font,               (AssetLocation.Base,      "FONTS!.XLD"  ) }, // Font (raw, 8 wide. 00 = normal, 01 = bold)
+            { AssetType.MetaFont,           (AssetLocation.Meta,      null          ) }, // Generated from a font, setting colours appropriately
             { AssetType.BlockList,          (AssetLocation.Base,      "BLKLIST!.XLD") }, //
             { AssetType.PartyCharacterData, (AssetLocation.Initial,   "PRTCHAR!.XLD") }, //
             { AssetType.SmallPortrait,      (AssetLocation.Base,      "SMLPORT!.XLD") }, // Texture
@@ -166,6 +167,9 @@ namespace UAlbion.Game
             if (location == AssetLocation.MainExe || type == AssetType.CoreGraphics)
                 return AssetLoader.LoadCoreSprite((CoreSpriteId)id, _assetConfig.BasePath, _coreSpriteConfig);
 
+            if (location == AssetLocation.Meta)
+                return FontLoader.Load((MetaFontId) id, LoadTexture(FontId.RegularFont), LoadTexture(FontId.BoldFont));
+
             int xldIndex = id / 100;
             Debug.Assert(xldIndex >= 0);
             Debug.Assert(xldIndex <= 9);
@@ -228,7 +232,7 @@ namespace UAlbion.Game
 
         object LoadAssetCached<T>(AssetType type, T enumId, GameLanguage language = GameLanguage.English)
         {
-            int id = (int)(object)enumId;
+            int id = Convert.ToInt32(enumId);
             object asset = _assetCache.Get(type, id);
             if (asset is Exception _) // If it failed to load once then stop trying (at least until an asset:reload / cycle)
                 return null;
@@ -317,6 +321,7 @@ namespace UAlbion.Game
         public ITexture LoadTexture(SmallPortraitId id)      => (ITexture)LoadAssetCached(AssetType.SmallPortrait,      id);
         public ITexture LoadTexture(TacticId id)             => (ITexture)LoadAssetCached(AssetType.TacticalIcon,       id);
         public ITexture LoadTexture(FontId id)               => (ITexture)LoadAssetCached(AssetType.Font,               id);
+        public ITexture LoadTexture(MetaFontId id)           => (ITexture)LoadAssetCached(AssetType.MetaFont,               id);
         public ITexture LoadTexture(CoreSpriteId id)         => (ITexture)LoadAssetCached(AssetType.CoreGraphics,       id);
         public TilesetData LoadTileData(IconDataId id)       => (TilesetData)LoadAssetCached(AssetType.IconData,        id);
         public LabyrinthData LoadLabyrinthData(LabyrinthDataId id) => (LabyrinthData) LoadAssetCached(AssetType.LabData, id);

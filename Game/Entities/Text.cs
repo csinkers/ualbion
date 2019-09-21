@@ -9,7 +9,7 @@ namespace UAlbion.Game.Entities
 {
     public class Text : Component
     {
-        public IDictionary<char, int> FontMapping = new Dictionary<char, int>
+        readonly IDictionary<char, int> FontMapping = new Dictionary<char, int>
         {
             { 'a', 0 }, { 'b', 1 }, { 'c', 2 }, { 'd', 3 }, { 'e', 4 },
             { 'f', 5 }, { 'g', 6 }, { 'h', 7 }, { 'i', 8 }, { 'j', 9 },
@@ -40,39 +40,64 @@ namespace UAlbion.Game.Entities
 
         readonly string _text;
         readonly Vector2 _position;
-        readonly MultiSprite _sprite;
+        MultiSprite _sprite;
+        Vector2 _resolution = Vector2.One;
 
         static readonly Handler[] Handlers =
         {
-            new Handler<Text, RenderEvent>((x,e) => x.Render(e)), 
+            new Handler<Text, RenderEvent>((x,e) => x.Render(e)),
+            // TODO: Work out how to ensure this gets set when text created in between resize events.
+            new Handler<Text, WindowResizedEvent>((x,e) =>
+            {
+                x._resolution = new Vector2(e.Width, e.Height);
+                x.Reformat();
+            }),
         };
+
+        readonly ITexture _font;
+
 
         void Render(RenderEvent renderEvent)
         {
             renderEvent.Add(_sprite);
         }
 
-        public Text(ITexture font, string text, Vector2 position) : base(Handlers)
+        void Reformat()
         {
-            _text = text;
-            _position = position;
-
-            font.GetSubImageDetails(0, out var size, out _, out var texSize, out _);
-            var instances = new SpriteInstanceData[text.Length];
-            for(int i = 0; i < text.Length; i++)
+            _font.GetSubImageDetails(0, out var size, out _, out var texSize, out _);
+            var instances = new SpriteInstanceData[_text.Length];
+            for (int i = 0; i < _text.Length; i++)
             {
-                char c = text[i];
-                if (!FontMapping.TryGetValue(c, out var index))
+                char c = _text[i];
+                if (FontMapping.TryGetValue(c, out var index))
                 {
-                }
-                else
-                {
-                    font.GetSubImageDetails(index, out _, out var texOffset, out _, out var layer);
-                    instances[i].Flags = SpriteFlags.NoTransform;
+                    _font.GetSubImageDetails(index, out size, out var texOffset, out texSize, out var layer);
+                    size = new Vector2(size.X, -size.Y);
+                    instances[i].Flags =
+                        SpriteFlags.UsePalette | 
+                        SpriteFlags.NoTransform | 
+                        SpriteFlags.Transparent;
+                    instances[i].TexPosition = texOffset;
+                    instances[i].TexSize = texSize;
+                    instances[i].TexLayer = layer;
+                    instances[i].Offset = new Vector3(_position + new Vector2(8 * size.X * i, 0) / _resolution, 0);
+                    instances[i].Size = 8 * size / _resolution;
                 }
             }
 
-            _sprite = new MultiSprite(new SpriteKey(font, (int)DrawLayer.Interface)) { Instances = instances };
+            _sprite = new MultiSprite(new SpriteKey(_font, (int)DrawLayer.Interface, false))
+            {
+                Instances = instances
+            };
+        }
+
+        public Text(ITexture font, string text, Vector2 position) : base(Handlers)
+        {
+            // TODO: Left & right justification, kerning, line wrapping
+            _text = text;
+            _position = position;
+            _font = font;
+            Reformat();
         }
     }
 }

@@ -18,6 +18,7 @@
         BigNpcGraphics,
         BackgroundGraphics,
         Font,
+        MetaFont,
         BlockList,
         PartyCharacterData,
         SmallPortrait,
@@ -62,6 +63,7 @@
         LocalisedRaw, // Not in an XLD
         Initial,
         Current,
-        MainExe
+        MainExe,
+        Meta // Handled internally / based on other assets
     }
 }

@@ -5,18 +5,20 @@ namespace UAlbion.Core.Visual
 {
     public abstract class SpriteDefinition : IRenderable
     {
-        protected SpriteDefinition(string name, int subObject, Vector3 position, int renderOrder, SpriteFlags flags, Vector2? size)
+        protected SpriteDefinition(string name, int subObject, Vector3 position, int renderOrder, bool depthTested, SpriteFlags flags, Vector2? size)
         {
             Name = name;
             SubObject = subObject;
             Position = position;
             RenderOrder = renderOrder;
+            DepthTested = depthTested;
             Flags = flags;
             Size = size;
         }
 
         public string Name { get; }
         public Type Renderer => typeof(SpriteRenderer);
+        public bool DepthTested { get; }
         public int RenderOrder { get; }
         public SpriteFlags Flags { get; }
         public int SubObject { get; }
@@ -28,8 +30,8 @@ namespace UAlbion.Core.Visual
 
     public class SpriteDefinition<T> : SpriteDefinition where T : Enum
     {
-        public SpriteDefinition(T id, int subObject, Vector3 position, int renderOrder, SpriteFlags flags, Vector2? size = null)
-            : base(id.ToString(), subObject, position, renderOrder, flags, size) { Id = id; }
+        public SpriteDefinition(T id, int subObject, Vector3 position, int renderOrder, bool depthTested, SpriteFlags flags, Vector2? size = null)
+            : base(id.ToString(), subObject, position, renderOrder, depthTested, flags, size) { Id = id; }
 
         public T Id { get; }
         public override Type IdType => typeof(T);

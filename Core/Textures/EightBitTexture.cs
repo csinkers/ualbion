@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
@@ -34,6 +35,7 @@ namespace UAlbion.Core.Textures
         public byte[] TextureData { get; }
         public int SubImageCount => _subImages.Count;
         public bool IsDirty { get; private set; }
+        public IReadOnlyList<SubImage> SubImages => new ReadOnlyCollection<SubImage>(_subImages);
         readonly IList<SubImage> _subImages = new List<SubImage>();
         public override string ToString() => $"8BitTexture {Name} ({Width}x{Height}, {_subImages.Count} subimages)";
 

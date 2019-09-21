@@ -1,5 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using System.Numerics;
 using System.Reflection;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -65,7 +65,7 @@ namespace UAlbion
 
         static unsafe void Main()
         {
-            //*
+            /*
             Console.WriteLine("Entry point reached. Press enter to continue");
             Console.ReadLine(); //*/
 
@@ -91,7 +91,7 @@ namespace UAlbion
             var backend =
                 //VeldridStartup.GetPlatformDefaultBackend()
                 //GraphicsBackend.Metal /*
-                GraphicsBackend.Vulkan /*
+                //GraphicsBackend.Vulkan /*
                 //GraphicsBackend.OpenGL /*
                 //GraphicsBackend.OpenGLES /*
                 GraphicsBackend.Direct3D11 /*
@@ -109,7 +109,11 @@ namespace UAlbion
              */
 
             using (var assets = new Assets(assetConfig, coreSpriteConfig))
-            using (var engine = new Engine(backend))
+#if DEBUG
+            using (var engine = new Engine(backend, true))
+#else
+            using (var engine = new Engine(backend, false))
+#endif
             //using(var sw = File.CreateText(@"C:\Depot\Main\bitbucket\ualbion\re\3DInfo.txt"))
             {
                 /*
@@ -161,6 +165,7 @@ namespace UAlbion
                 }
 
                 return; */
+
                 var stateManager = new StateManager();
                 var sceneExchange = new EventExchange("Scenes", engine.GlobalExchange);
                 var mapExchange = new EventExchange("Maps", engine.GlobalExchange);
@@ -185,9 +190,14 @@ namespace UAlbion
                     .Attach(new InputModeStack())
                     .Attach(new SceneStack())
                     .Attach(new CursorManager(assets))
-                    .Attach(new PaletteManager(assets));
+                    .Attach(new PaletteManager(assets))
+                    .Attach(new Text(assets.LoadTexture(new MetaFontId()), "Hello world", Vector2.Zero))
+                    .Attach(new Text(assets.LoadTexture(new MetaFontId(false, MetaFontId.FontColor.Red)), "Test test test", new Vector2(0, -0.2f)))
+                    .Attach(new Text(assets.LoadTexture(new MetaFontId(true, MetaFontId.FontColor.Yellow)), "Warning!", new Vector2(0, -0.4f)))
+                    ;
 
                 engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.AltesFormergebäude), null); /*
+
                 engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.Jirinaar3D), null); /*
                 engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.HausDesJägerclans), null); //*/
 
@@ -206,7 +216,6 @@ namespace UAlbion
                 var status = new SpriteRenderer(statusBackground, new Vector2(0.0f, 0.8f), new Vector2(1.0f, 0.2f));
                 scene.AddRenderable(status);
                 //*/
-                //engine.GlobalExchange.Raise(new LoadRenderDocEvent(), null);
                 engine.Run();
             }
         }

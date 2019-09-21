@@ -58,10 +58,8 @@ namespace UAlbion.Game
             return asset;
         }
 
-        public static object LoadCoreSprite(CoreSpriteId id, string  basePath, CoreSpriteConfig config)
-        {
-            return ToTexture(CoreSpriteLoader.Load(id, basePath, config));
-        }
+        public static object LoadCoreSprite(CoreSpriteId id, string  basePath, CoreSpriteConfig config) =>
+            ToTexture(CoreSpriteLoader.Load(id, basePath, config));
 
         static (int, int) GetAtlasSize(int tileWidth, int tileHeight, int count)
         {
@@ -166,6 +164,28 @@ namespace UAlbion.Game
         public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
         {
             return Image.Load(br.BaseStream);
+        }
+    }
+
+    public static class FontLoader
+    {
+        public static ITexture Load(MetaFontId id, ITexture regular, ITexture bold)
+        {
+            var texture = (EightBitTexture)((id.IsBold) ? bold : regular);
+            var bytes = (byte[])texture.TextureData.Clone();
+            for(int i = 0; i < bytes.Length; i++)
+            {
+                if (bytes[i] == 0)
+                    continue;
+
+                bytes[i] += (byte)id.Color;
+            }
+
+            return new EightBitTexture(
+                $"Font{id.Color}{(id.IsBold ? "Bold" : "")}",
+                texture.Width, texture.Height,
+                texture.MipLevels, texture.ArrayLayers, 
+                bytes, texture.SubImages);
         }
     }
 }

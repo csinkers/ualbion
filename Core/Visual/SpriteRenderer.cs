@@ -112,7 +112,7 @@ namespace UAlbion.Core.Visual
 
             void main()
             {
-                vec2 uv = ((fsin_2 & 0x100) != 0) ? vec2(fsin_0.x, -fsin_0.y) : fsin_0;
+                vec2 uv = ((fsin_2 & 0x100) != 0) ? vec2(fsin_0.x, 1-fsin_0.y) : fsin_0;
 
                 vec4 color;
                 if ((fsin_2 & 4) != 0)
@@ -156,7 +156,8 @@ namespace UAlbion.Core.Visual
         // Context objects
         DeviceBuffer _vb;
         DeviceBuffer _ib;
-        Pipeline _pipeline;
+        Pipeline _depthTestPipeline;
+        Pipeline _noDepthPipeline;
         ResourceLayout _perSpriteResourceLayout;
 
         public SpriteRenderer(ITextureManager textureManager, ISpriteResolver spriteResolver)
@@ -190,7 +191,7 @@ namespace UAlbion.Core.Visual
                 FaceCullMode.None, PolygonFillMode.Solid, FrontFace.Clockwise,
                 true, true);
 
-            var pd = new GraphicsPipelineDescription(
+            var depthPd = new GraphicsPipelineDescription(
                 BlendStateDescription.SingleAlphaBlend,
                 depthStencilMode,
                 rasterizerMode,
@@ -201,9 +202,25 @@ namespace UAlbion.Core.Visual
                 new[] { _perSpriteResourceLayout },
                 sc.MainSceneFramebuffer.OutputDescription);
 
-            _pipeline = factory.CreateGraphicsPipeline(ref pd);
-            _pipeline.Name = "P_SpriteRenderer";
-            _disposeCollector.Add(_vb, _ib, _perSpriteResourceLayout, _pipeline);
+            _depthTestPipeline = factory.CreateGraphicsPipeline(ref depthPd);
+            _depthTestPipeline.Name = "P_SpriteRendererDT";
+
+            var nonDepthPd = new GraphicsPipelineDescription(
+                BlendStateDescription.SingleAlphaBlend,
+                DepthStencilStateDescription.Disabled,
+                new RasterizerStateDescription(FaceCullMode.None, PolygonFillMode.Solid, 
+                    FrontFace.Clockwise, false, false), 
+                PrimitiveTopology.TriangleList,
+                new ShaderSetDescription(new[] { Shader.VertexLayout, Shader.InstanceLayout },
+                    shaderSet.Shaders,
+                    ShaderHelper.GetSpecializations(gd)),
+                new[] { _perSpriteResourceLayout },
+                sc.MainSceneFramebuffer.OutputDescription);
+
+            _noDepthPipeline = factory.CreateGraphicsPipeline(ref nonDepthPd);
+            _noDepthPipeline.Name = "P_SpriteRendererNoDepth";
+
+            _disposeCollector.Add(_vb, _ib, _perSpriteResourceLayout, _depthTestPipeline);
         }
 
         public IEnumerable<IRenderable> UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IEnumerable<IRenderable> renderables)
@@ -258,7 +275,7 @@ namespace UAlbion.Core.Visual
                 sc.PaletteView));
             _resourceSets.Add(resourceSet);
 
-            cl.SetPipeline(_pipeline);
+            cl.SetPipeline(sprite.DepthTested ? _depthTestPipeline : _noDepthPipeline);
             cl.SetGraphicsResourceSet(0, resourceSet);
             cl.SetVertexBuffer(0, _vb);
             cl.SetIndexBuffer(_ib, IndexFormat.UInt16);

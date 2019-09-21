@@ -61,6 +61,9 @@ namespace UAlbion.Game
         public static object LoadCoreSprite(CoreSpriteId id, string  basePath, CoreSpriteConfig config) =>
             ToTexture(CoreSpriteLoader.Load(id, basePath, config));
 
+        public static object LoadCoreSpriteMetadata(CoreSpriteId id, string basePath, CoreSpriteConfig config) =>
+            CoreSpriteLoader.GetConfig(id, basePath, config, out _);
+
         static (int, int) GetAtlasSize(int tileWidth, int tileHeight, int count)
         {
             int NextPowerOfTwo(int x) => (int)Math.Pow(2.0, Math.Ceiling(Math.Log(x, 2.0)));
@@ -155,37 +158,6 @@ namespace UAlbion.Game
                     pixelData,
                     subImages);
             }
-        }
-    }
-
-    [AssetLoader(XldObjectType.InterlacedBitmap)]
-    public class InterlacedBitmapLoader : IAssetLoader
-    {
-        public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
-        {
-            return Image.Load(br.BaseStream);
-        }
-    }
-
-    public static class FontLoader
-    {
-        public static ITexture Load(MetaFontId id, ITexture regular, ITexture bold)
-        {
-            var texture = (EightBitTexture)((id.IsBold) ? bold : regular);
-            var bytes = (byte[])texture.TextureData.Clone();
-            for(int i = 0; i < bytes.Length; i++)
-            {
-                if (bytes[i] == 0)
-                    continue;
-
-                bytes[i] += (byte)id.Color;
-            }
-
-            return new EightBitTexture(
-                $"Font{id.Color}{(id.IsBold ? "Bold" : "")}",
-                texture.Width, texture.Height,
-                texture.MipLevels, texture.ArrayLayers, 
-                bytes, texture.SubImages);
         }
     }
 }

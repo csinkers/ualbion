@@ -14,8 +14,10 @@ namespace UAlbion.Game.Input
         readonly Assets _assets;
         CoreSpriteId _cursorId = CoreSpriteId.Cursor;
         Vector2 _position;
+        Vector2 _hotspot;
         Vector2 _size;
         Vector2 _windowSize;
+
         public CursorManager(Assets assets) : base(Handlers)
         {
             _assets = assets ?? throw new ArgumentNullException(nameof(assets));
@@ -30,9 +32,11 @@ namespace UAlbion.Game.Input
 
         void SetCursor(CoreSpriteId id)
         {
+            var texture = _assets.LoadTexture(id);
+            var config = _assets.LoadCoreSpriteInfo(id);
             _cursorId = id;
-            var texture = _assets.LoadTexture(_cursorId);
             _size = new Vector2(texture.Width, texture.Height);
+            _hotspot = new Vector2(config.Hotspot.X, config.Hotspot.Y);
         }
 
         void Input(InputEvent e)

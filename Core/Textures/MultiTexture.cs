@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using Veldrid;
 
 namespace UAlbion.Core.Textures
@@ -19,10 +23,7 @@ namespace UAlbion.Core.Textures
 
         class LogicalSubImage
         {
-            public LogicalSubImage(int id)
-            {
-                Id = id;
-            }
+            public LogicalSubImage(int id) { Id = id; }
 
             public int Id { get; }
             public uint W { get; set; }
@@ -116,7 +117,7 @@ namespace UAlbion.Core.Textures
             layer = (uint)subImage;
         }
 
-        unsafe void Blit8To24(
+        unsafe void Blit8To32(
             int width, int height, 
             byte* fromBuffer, uint* toBuffer, 
             int fromStride, int toStride,
@@ -210,7 +211,7 @@ namespace UAlbion.Core.Textures
 
                                 fixed (byte* fromBuffer = &eightBitTexture.TextureData[0])
                                 {
-                                    Blit8To24(
+                                    Blit8To32(
                                         sourceWidth,
                                         sourceHeight,
                                         fromBuffer + sourceOffset,
@@ -297,15 +298,18 @@ namespace UAlbion.Core.Textures
                 throw new InvalidOperationException("Too many textures added to multi-texture");
         }
 
-        public void AddTexture(int logicalSubImage, ITexture texture, uint x, uint y, byte? transparentColor, bool isAlphaTested)
+        public void AddTexture(int logicalId, ITexture texture, uint x, uint y, byte? transparentColor, bool isAlphaTested)
         {
+            if(logicalId == 0)
+                throw new InvalidOperationException("Logical Subimage Index 0 is reserved for a blank / transparent state");
+
             if (texture == null) // Will just end up using layer 0
                 return;
 
-            while(_logicalSubImages.Count <= logicalSubImage)
-                _logicalSubImages.Add(new LogicalSubImage(logicalSubImage));
+            while(_logicalSubImages.Count <= logicalId)
+                _logicalSubImages.Add(new LogicalSubImage(logicalId));
 
-            var lsi = _logicalSubImages[logicalSubImage];
+            var lsi = _logicalSubImages[logicalId];
             lsi.IsAlphaTested = isAlphaTested;
             lsi.TransparentColor = transparentColor;
             lsi.Components.Add(new SubImageComponent
@@ -337,6 +341,63 @@ namespace UAlbion.Core.Textures
                 ret /= 2;
 
             return Math.Max(1, ret);
+        }
+
+        public void SavePng(int logicalId, int tick, string path)
+        {
+            if(_isMetadataDirty)
+                RebuildLayers();
+
+            var logicalImage = _logicalSubImages[logicalId];
+            if (_layerLookup.TryGetValue(new LayerKey(logicalId, tick % logicalImage.Frames), out var subImageId))
+            {
+                var size = _layerSizes[subImageId];
+                int width = (int)size.X;
+                int height = (int)size.Y;
+                Rgba32[] pixels = new Rgba32[width * height];
+
+                foreach (var component in logicalImage.Components)
+                {
+                    if (component.Source == null)
+                        continue;
+
+                    var eightBitTexture = (EightBitTexture)component.Source;
+                    int frame = tick % eightBitTexture.SubImageCount;
+                    eightBitTexture.GetSubImageOffset(frame, out var sourceWidth, out var sourceHeight,
+                        out var sourceOffset, out var sourceStride);
+
+                    if (component.X + sourceWidth > Width || component.Y + sourceHeight > Height)
+                    {
+                        CoreTrace.Log.Warning(
+                            "MultiTexture",
+                            $"Tried to write an oversize component to {Name}: {component.Source.Name}:{frame} is ({sourceWidth}x{sourceHeight}) @ ({component.X}, {component.Y}) but multitexture is only ({Width}x{Height})");
+                        continue;
+                    }
+
+                    unsafe
+                    {
+                        fixed (Rgba32* toBuffer = &pixels[0])
+                        fixed (byte* fromBuffer = &eightBitTexture.TextureData[0])
+                        {
+                            Blit8To32(
+                                    sourceWidth,
+                                    sourceHeight,
+                                    fromBuffer + sourceOffset,
+                                    (uint*)toBuffer + (int)(component.Y * Width + component.X),
+                                    sourceStride,
+                                    (int)Width,
+                                    _palette[_paletteFrame],
+                                    logicalImage.TransparentColor);
+                        }
+                    }
+                }
+
+                Image<Rgba32> image = new Image<Rgba32>(width, height);
+                image.Frames.AddFrame(pixels);
+                image.Frames.RemoveFrame(0);
+                using(var stream = File.OpenWrite(path))
+                    image.SaveAsBmp(stream);
+            }
         }
     }
 }

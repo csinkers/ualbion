@@ -52,7 +52,8 @@
         Script,
         Picture,
         TransparencyTables,
-        CoreGraphics
+        CoreGraphics,
+        CoreGraphicsMetadata
     }
 
     enum AssetLocation

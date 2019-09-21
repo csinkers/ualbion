@@ -85,6 +85,7 @@ namespace UAlbion.Game
             { AssetType.Picture,            (AssetLocation.Base,      "PICTURE!.XLD") }, // Texture (ILBM)
             { AssetType.TransparencyTables, (AssetLocation.Base,      "TRANSTB!.XLD") },
             { AssetType.CoreGraphics,       (AssetLocation.MainExe,   "MAIN.EXE") },
+            { AssetType.CoreGraphicsMetadata, (AssetLocation.MainExe, "MAIN.EXE") },
         };
         // ReSharper restore StringLiteralTypo
 
@@ -164,10 +165,13 @@ namespace UAlbion.Game
         object LoadAsset(AssetType type, int id, string name, GameLanguage language)
         {
             var (location, baseName) = _assetFiles[type];
-            if (location == AssetLocation.MainExe || type == AssetType.CoreGraphics)
+            if (type == AssetType.CoreGraphics)
                 return AssetLoader.LoadCoreSprite((CoreSpriteId)id, _assetConfig.BasePath, _coreSpriteConfig);
 
-            if (location == AssetLocation.Meta)
+            if (type == AssetType.CoreGraphicsMetadata)
+                return AssetLoader.LoadCoreSpriteMetadata((CoreSpriteId)id, _assetConfig.BasePath, _coreSpriteConfig);
+
+            if (type == AssetType.MetaFont)
                 return FontLoader.Load((MetaFontId) id, LoadTexture(FontId.RegularFont), LoadTexture(FontId.BoldFont));
 
             int xldIndex = id / 100;
@@ -321,10 +325,13 @@ namespace UAlbion.Game
         public ITexture LoadTexture(SmallPortraitId id)      => (ITexture)LoadAssetCached(AssetType.SmallPortrait,      id);
         public ITexture LoadTexture(TacticId id)             => (ITexture)LoadAssetCached(AssetType.TacticalIcon,       id);
         public ITexture LoadTexture(FontId id)               => (ITexture)LoadAssetCached(AssetType.Font,               id);
-        public ITexture LoadTexture(MetaFontId id)           => (ITexture)LoadAssetCached(AssetType.MetaFont,               id);
+        public ITexture LoadTexture(MetaFontId id)           => (ITexture)LoadAssetCached(AssetType.MetaFont,           id);
         public ITexture LoadTexture(CoreSpriteId id)         => (ITexture)LoadAssetCached(AssetType.CoreGraphics,       id);
         public TilesetData LoadTileData(IconDataId id)       => (TilesetData)LoadAssetCached(AssetType.IconData,        id);
         public LabyrinthData LoadLabyrinthData(LabyrinthDataId id) => (LabyrinthData) LoadAssetCached(AssetType.LabData, id);
+        public ITexture LoadFont(MetaFontId.FontColor color, bool isBold) => LoadTexture(new MetaFontId(isBold, color));
+        public CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id) =>
+            (CoreSpriteConfig.BinaryResource)LoadAssetCached(AssetType.CoreGraphicsMetadata, id);
 
         public string LoadString(AssetType type, int id, GameLanguage language, int subItem)
         {

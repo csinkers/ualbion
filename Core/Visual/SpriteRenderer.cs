@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using Veldrid;
 using Veldrid.SPIRV;
@@ -8,8 +8,18 @@ using Veldrid.Utilities;
 
 namespace UAlbion.Core.Visual
 {
-    public class SpriteRenderer : IRenderer
+    public class SpriteRenderer : Component, IRenderer
     {
+        static readonly Handler[] Handlers =
+        {
+            new Handler<SpriteRenderer, SubscribedEvent>((x, e) =>
+            {
+                x._textureManager = x.Exchange.Resolve<ITextureManager>() ?? throw new SystemRequiredException(typeof(ITextureManager), x.GetType());
+                x._spriteResolver = x.Exchange.Resolve<ISpriteResolver>() ?? throw new SystemRequiredException(typeof(ISpriteResolver), x.GetType());
+            }),
+        };
+        public SpriteRenderer() : base(Handlers) { }
+
         static class Shader
         {
             // Vertex Layout
@@ -150,8 +160,8 @@ namespace UAlbion.Core.Visual
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
         readonly IList<DeviceBuffer> _instanceBuffers = new List<DeviceBuffer>();
         readonly IList<ResourceSet> _resourceSets = new List<ResourceSet>();
-        readonly ITextureManager _textureManager;
-        readonly ISpriteResolver _spriteResolver;
+        ITextureManager _textureManager;
+        ISpriteResolver _spriteResolver;
 
         // Context objects
         DeviceBuffer _vb;
@@ -159,12 +169,6 @@ namespace UAlbion.Core.Visual
         Pipeline _depthTestPipeline;
         Pipeline _noDepthPipeline;
         ResourceLayout _perSpriteResourceLayout;
-
-        public SpriteRenderer(ITextureManager textureManager, ISpriteResolver spriteResolver)
-        {
-            _textureManager = textureManager ?? throw new ArgumentNullException(nameof(textureManager));
-            _spriteResolver = spriteResolver ?? throw new ArgumentNullException(nameof(spriteResolver));
-        }
 
         public RenderPasses RenderPasses => RenderPasses.Standard;
         public void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)

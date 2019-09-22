@@ -13,16 +13,19 @@ namespace UAlbion.Core
             SetCurrentThreadActivityId(correlationId, out _);
         }
 
+        [Event(1, Level = EventLevel.Informational)]
         public void Info(string category, string message)
         {
             WriteEvent(1, category, message);
         }
 
+        [Event(2, Level = EventLevel.Warning)]
         public void Warning(string category, string message)
         {
             WriteEvent(2, category, message);
         }
 
+        [Event(3, Level = EventLevel.Error)]
         public void Error(string category, string message)
         {
             WriteEvent(3, category, message);
@@ -48,19 +51,33 @@ namespace UAlbion.Core
             WriteEvent(7, name);
         }
 
+        [Event(8, Level = EventLevel.Informational, Opcode = EventOpcode.Start)]
         public void StartRaise(string type, string details)
         {
             WriteEvent(8, type, details);
         }
 
+        [Event(9, Level = EventLevel.Informational, Opcode = EventOpcode.Stop)]
         public void StopRaise(string type, string details, int subscriberCount)
         {
             WriteEvent(9, type, details, subscriberCount);
         }
 
+        [Event(10, Level = EventLevel.Verbose, Opcode = EventOpcode.Start)]
+        public void StartRaiseVerbose(string type, string details)
+        {
+            WriteEvent(10, type, details);
+        }
+
+        [Event(11, Level = EventLevel.Verbose, Opcode = EventOpcode.Stop)]
+        public void StopRaiseVerbose(string type, string details, int subscriberCount)
+        {
+            WriteEvent(11, type, details, subscriberCount);
+        }
+
         public void CreatedDeviceTexture(string name, uint width, uint height, uint layers)
         {
-            WriteEvent(10, name, width, height, layers);
+            WriteEvent(12, name, width, height, layers);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -16,7 +17,6 @@ namespace UAlbion.Game.Input
         Vector2 _position;
         Vector2 _hotspot;
         Vector2 _size;
-        Vector2 _windowSize;
 
         public CursorManager(Assets assets) : base(Handlers)
         {
@@ -24,10 +24,10 @@ namespace UAlbion.Game.Input
         }
 
         static readonly Handler[] Handlers = {
-            new Handler<CursorManager, InputEvent>((x,e) => x.Input(e)),
+            new Handler<CursorManager, InputEvent>((x,e) => x._position = e.Snapshot.MousePosition - x._hotspot),
             new Handler<CursorManager, RenderEvent>((x,e) => x.Render(e)),
             new Handler<CursorManager, SetCursorEvent>((x,e) => x.SetCursor(e.CursorId)),
-            new Handler<CursorManager, WindowResizedEvent>((x, e) => x._windowSize = new Vector2(e.Width, e.Height))
+            new Handler<CursorManager, SetCursorPositionEvent>((x,e) => x._position = new Vector2(e.X, e.Y) - x._hotspot),
         };
 
         void SetCursor(CoreSpriteId id)
@@ -39,24 +39,22 @@ namespace UAlbion.Game.Input
             _hotspot = new Vector2(config.Hotspot.X, config.Hotspot.Y);
         }
 
-        void Input(InputEvent e)
-        {
-            _position = e.Snapshot.MousePosition - _hotspot;
-        }
-
         void Render(RenderEvent e)
         {
-            if (_windowSize.X < 1 || _windowSize.Y < 1)
+            var windowSize = Exchange.Resolve<IWindowState>().Size;
+            if (windowSize.X < 1 || windowSize.Y < 1)
                 return;
+
             var drawLayer = DrawLayer.Interface;
+            //if (((_position + _hotspot) - windowSize / 2).LengthSquared() > 1)
+            //    Debugger.Break();
+
             var position = new Vector3(
-                2 * _position.X / _windowSize.X - 1.0f,
-                1.0f - 2 * _position.Y / _windowSize.Y,
+                2 * _position.X / windowSize.X - 1.0f,
+                1.0f - 2 * _position.Y / windowSize.Y,
                 0.0f);
 
-            var size = new Vector2(
-                UiScaleFactor * _size.X / _windowSize.X,
-                -UiScaleFactor * _size.Y / _windowSize.Y);
+            var size = new Vector2(UiScaleFactor, -UiScaleFactor) * _size / windowSize;
 
             e.Add(new SpriteDefinition<CoreSpriteId>(_cursorId,
                 0,

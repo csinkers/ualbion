@@ -8,6 +8,7 @@ using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Parsers;
 using UAlbion.Game.Events;
+using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities
 {
@@ -21,7 +22,7 @@ namespace UAlbion.Game.Entities
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<MapRenderable3D, RenderEvent>((x, e) => x.Render(e)),
-            new Handler<MapRenderable3D, PostUpdateEvent>((x, e) => x.PostUpdate(e)),
+            new Handler<MapRenderable3D, PostUpdateEvent>((x, _) => x.PostUpdate()),
             new Handler<MapRenderable3D, SubscribedEvent>((x, e) => x.Subscribed())
         };
 
@@ -80,14 +81,18 @@ namespace UAlbion.Game.Entities
             _tilemap.Set(order, i, j, floorIndex, ceilingIndex, wallIndex, frame);
         }
 
-        void PostUpdate(PostUpdateEvent e)
+        void PostUpdate()
         {
+            var state = Exchange.Resolve<IStateManager>();
+            if (state == null)
+                return;
+
             const bool isSorting = false;
             foreach (var list in _tilesByDistance.Values)
                 list.Clear();
 
-            int cameraTileX = (int)e.GameState.CameraTilePosition.X;
-            int cameraTileY = (int)e.GameState.CameraTilePosition.Z;
+            int cameraTileX = (int)state.CameraTilePosition.X;
+            int cameraTileY = (int)state.CameraTilePosition.Z;
 
             for (int j = 0; j < _mapData.Height; j++)
             {
@@ -104,7 +109,7 @@ namespace UAlbion.Game.Entities
                     if(isSorting)
                         list.Add(index);
                     else
-                        SetTile(index, index, e.GameState.FrameCount);
+                        SetTile(index, index, state.FrameCount);
                 }
             }
 
@@ -121,7 +126,7 @@ namespace UAlbion.Game.Entities
 
                     foreach (var index in distance.Value)
                     {
-                        SetTile(index, order, e.GameState.FrameCount);
+                        SetTile(index, order, state.FrameCount);
                         order++;
                     }
                 }

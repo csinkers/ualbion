@@ -9,8 +9,6 @@ namespace UAlbion.Game
 {
     public class DebugMapInspector : Component
     {
-        readonly IStateManager _stateManager;
-
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<DebugMapInspector, EngineUpdateEvent>((x, _) => x.RenderDialog()),
@@ -29,7 +27,9 @@ namespace UAlbion.Game
             if (_hits == null)
                 return;
 
-            var state = _stateManager.Get();
+            var state = Exchange.Resolve<IStateManager>();
+            if (state == null)
+                return;
 
             ImGui.Begin("Inspector");
             ImGui.BeginChild("Inspector");
@@ -86,9 +86,6 @@ namespace UAlbion.Game
             }
         }
 
-        public DebugMapInspector(IStateManager stateManager) : base(Handlers)
-        {
-            _stateManager = stateManager;
-        }
+        public DebugMapInspector() : base(Handlers) { }
     }
 }

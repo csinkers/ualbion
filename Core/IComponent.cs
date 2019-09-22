@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UAlbion.Api;
 using UAlbion.Core.Events;
 
@@ -63,11 +64,7 @@ namespace UAlbion.Core
             Exchange = null;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void Raise(IEvent @event) { Exchange?.Raise(@event, this); }
-    }
-
-    public abstract class RegisteredComponent : Component
-    {
-        protected RegisteredComponent(IList<Handler> handlers) : base(handlers) { }
     }
 }

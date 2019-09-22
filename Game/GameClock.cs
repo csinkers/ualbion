@@ -2,7 +2,6 @@
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Events;
-using UAlbion.Game.State;
 
 namespace UAlbion.Game
 {
@@ -11,12 +10,8 @@ namespace UAlbion.Game
         const float TickDurationSeconds = 1 / 8.0f;
         float _elapsed;
         bool _running = false;
-        readonly IStateManager _stateManager;
 
-        public GameClock(IStateManager stateManager) : base(Handlers)
-        {
-            _stateManager = stateManager;
-        }
+        public GameClock() : base(Handlers) { }
 
         static readonly IList<Handler> Handlers = new Handler[]
         {
@@ -38,7 +33,7 @@ namespace UAlbion.Game
                         x._elapsed = 0;
                 }
 
-                x.Raise(new PostUpdateEvent(x._stateManager.Get()));
+                x.Raise(new PostUpdateEvent());
             }),
         };
     }

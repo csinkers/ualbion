@@ -125,7 +125,8 @@ namespace UAlbion.Game.Entities
             // We should probably be offsetting the main tilemap by half a tile to centre the objects
             // rather than fiddling with the object positions... will need to reevaluate when working on
             // collision detection, path-finding etc.
-            var tilePosition = new Vector3(tileX - 0.5f, 0, tileY - 0.5f) * TileSize;
+            var objectBias = new Vector3(-1.0f, 0, -1.0f); // / 2;
+            var tilePosition = (new Vector3(tileX, 0, tileY) + objectBias) * TileSize;
             var offset = new Vector3(
                 subObject.X,
                 subObject.Y * objectYScaling,

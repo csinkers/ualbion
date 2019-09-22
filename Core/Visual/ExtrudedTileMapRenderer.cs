@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using Veldrid;
 using Veldrid.SPIRV;
@@ -9,8 +10,17 @@ using Veldrid.Utilities;
 
 namespace UAlbion.Core.Visual
 {
-    public class ExtrudedTileMapRenderer : IRenderer
+    public class ExtrudedTileMapRenderer : Component, IRenderer
     {
+        static readonly Handler[] Handlers =
+        {
+            new Handler<ExtrudedTileMapRenderer, SubscribedEvent>((x, e) =>
+            {
+                x._textureManager = x.Exchange.Resolve<ITextureManager>() ?? throw new SystemRequiredException(typeof(ITextureManager), x.GetType());
+            }),
+        };
+        public ExtrudedTileMapRenderer() : base(Handlers) { }
+
         // Vertex Layout
         static readonly VertexLayoutDescription VertexLayout = Vertex3DTextured.VertexLayout;
 
@@ -198,21 +208,16 @@ namespace UAlbion.Core.Visual
         };
 
         public RenderPasses RenderPasses => RenderPasses.Standard;
-        readonly ITextureManager _textureManager;
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
         readonly IList<DeviceBuffer> _instanceBuffers = new List<DeviceBuffer>();
         readonly IList<ResourceSet> _resourceSets = new List<ResourceSet>();
+        ITextureManager _textureManager;
         DeviceBuffer _vb;
         DeviceBuffer _ib;
         DeviceBuffer _miscUniformBuffer;
         Pipeline _pipeline;
         ResourceLayout _layout;
         Sampler _textureSampler;
-
-        public ExtrudedTileMapRenderer(ITextureManager textureManager)
-        {
-            _textureManager = textureManager;
-        }
 
         public struct MiscUniformData
         {

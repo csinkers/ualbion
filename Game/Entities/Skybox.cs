@@ -4,6 +4,7 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
+using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities
 {
@@ -14,12 +15,12 @@ namespace UAlbion.Game.Entities
         static readonly Handler[] Handlers =
         {
             new Handler<Skybox, RenderEvent>((x, e) => x.Render(e)),
-            new Handler<Skybox, PostUpdateEvent>((x, e) => x.PostUpdate(e)),
+            new Handler<Skybox, PostUpdateEvent>((x, _) => x.PostUpdate()),
         };
 
-        void PostUpdate(PostUpdateEvent postUpdateEvent)
+        void PostUpdate()
         {
-            _tilemap.Position = postUpdateEvent.GameState.CameraPosition;
+            _tilemap.Position = Exchange.Resolve<IStateManager>().CameraPosition;
         }
 
         void Render(RenderEvent renderEvent)

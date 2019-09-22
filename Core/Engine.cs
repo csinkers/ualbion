@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Numerics;
 using ImGuiNET;
 using UAlbion.Core.Events;
 using Veldrid;
@@ -11,28 +12,28 @@ using UAlbion.Core.Visual;
 
 namespace UAlbion.Core
 {
-    public class Engine : Component, IDisposable
+    public class Engine : Component, IWindowState, IDisposable
     {
         static readonly IList<Handler> Handlers = new Handler[]
         {
-            new Handler<Engine, ToggleFullscreenEvent>((x, _) => x.ToggleFullscreenState()),
             new Handler<Engine, LoadRenderDocEvent>((x, _) =>
             {
                 if (_renderDoc == null && RenderDoc.Load(out _renderDoc))
                     x.ChangeBackend(x.GraphicsDevice.BackendType, true);
             }),
+            new Handler<Engine, QuitEvent>((x, e) => x.Window.Close()),
+            new Handler<Engine, SubscribedEvent>((x, _) => x.Exchange.Register<IWindowState>(x)),
+            new Handler<Engine, SetCursorPositionEvent>((x, e) => x._pendingCursorUpdate = new Vector2(e.X, e.Y)),
+            new Handler<Engine, ToggleFullscreenEvent>((x, _) => x.ToggleFullscreenState()),
             new Handler<Engine, ToggleResizableEvent>((x, _) => x.Window.Resizable = !x.Window.Resizable),
             new Handler<Engine, ToggleVisibleBorderEvent>((x, _) => x.Window.BorderVisible = !x.Window.BorderVisible),
-            new Handler<Engine, QuitEvent>((x, e) => x.Window.Close())
         };
 
         static RenderDoc _renderDoc;
-
         public EventExchange GlobalExchange { get; }
 
         readonly IDictionary<Type, IRenderer> _renderers = new Dictionary<Type, IRenderer>();
         readonly IList<Scene> _scenes = new List<Scene>();
-        public ITextureManager TextureManager { get; }
         readonly FrameTimeAverager _frameTimeAverager = new FrameTimeAverager(0.5);
         readonly FullScreenQuad _fullScreenQuad;
         readonly DebugGuiRenderer _igRenderable;
@@ -43,6 +44,7 @@ namespace UAlbion.Core
         TextureSampleCount? _newSampleCount;
         bool _windowResized;
         bool _recreateWindow = true;
+        Vector2? _pendingCursorUpdate;
 
         internal GraphicsDevice GraphicsDevice { get; private set; }
         internal Sdl2Window Window { get; private set; }
@@ -52,7 +54,6 @@ namespace UAlbion.Core
         public Engine(GraphicsBackend backend, bool useRenderDoc) : base(Handlers)
         {
             GlobalExchange = new EventExchange("Global");
-            TextureManager = new TextureManager();
 
             if (useRenderDoc)
                 RenderDoc.Load(out _renderDoc);
@@ -70,8 +71,7 @@ namespace UAlbion.Core
             AddRenderer(_fullScreenQuad);
             GlobalExchange
                 .Attach(this)
-                .Attach(new DebugMenus(this))
-                .Attach(TextureManager);
+                .Attach(new DebugMenus(this));
         }
 
         public void AddRenderer(IRenderer renderer)
@@ -94,9 +94,20 @@ namespace UAlbion.Core
             {
                 double deltaSeconds = frameCounter.StartFrame();
                 Raise(new BeginFrameEvent());
+
                 Sdl2Events.ProcessEvents();
                 InputSnapshot snapshot = Window.PumpEvents();
+                if (_pendingCursorUpdate.HasValue)
+                {
+                    Sdl2Native.SDL_WarpMouseInWindow(
+                        Window.SdlWindowHandle,
+                        (int)_pendingCursorUpdate.Value.X,
+                        (int)_pendingCursorUpdate.Value.Y);
+
+                    _pendingCursorUpdate = null;
+                }
                 Raise(new InputEvent(deltaSeconds, snapshot, Window.MouseDelta));
+
                 Update((float)deltaSeconds);
                 if (!Window.Exists)
                     break;
@@ -251,7 +262,7 @@ namespace UAlbion.Core
             foreach(var scene in _scenes)
                 scene.DestroyAllDeviceObjects();
             StaticResourceCache.DestroyAllDeviceObjects();
-            TextureManager.DestroyDeviceObjects();
+            Exchange.Resolve<ITextureManager>()?.DestroyDeviceObjects();
             GraphicsDevice.WaitForIdle();
         }
 
@@ -264,6 +275,10 @@ namespace UAlbion.Core
         }
 
         public void CheckForErrors() { /*GraphicsDevice?.CheckForErrors();*/ }
+
+        int IWindowState.Width => Window.Width;
+        int IWindowState.Height => Window.Height;
+        Vector2 IWindowState.Size => new Vector2(Window.Width, Window.Height);
     }
 }
 

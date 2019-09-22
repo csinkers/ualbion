@@ -79,22 +79,24 @@ namespace UAlbion
             {
                 InputConfig inputConfig = InputConfig.Load(baseDir);
 
-                var stateManager = new StateManager();
-                var sceneExchange = new EventExchange("Scenes", engine.GlobalExchange);
+                engine.GlobalExchange.Register<IStateManager>(new StateManager());
+                engine.GlobalExchange.Register<ISpriteResolver>(new SpriteResolver(assets));
+                engine.GlobalExchange.Register<ITextureManager>(new TextureManager());
+
                 var mapExchange = new EventExchange("Maps", engine.GlobalExchange);
-                var spriteResolver = new SpriteResolver(assets);
-                engine.AddRenderer(new SpriteRenderer(engine.TextureManager, spriteResolver));
-                engine.AddRenderer(new ExtrudedTileMapRenderer(engine.TextureManager));
+                var sceneExchange = new EventExchange("Scenes", engine.GlobalExchange);
+
+                engine.AddRenderer(new SpriteRenderer());
+                engine.AddRenderer(new ExtrudedTileMapRenderer());
                 engine.AddScene(Scenes.Create2DScene(assets, sceneExchange));
                 engine.AddScene(Scenes.Create3DScene(assets, sceneExchange));
 
                 engine.GlobalExchange
                     .Attach(assets)
-                    .Attach(stateManager)
                     .Attach(new ConsoleLogger())
-                    .Attach(new GameClock(stateManager))
+                    .Attach(new GameClock())
                     .Attach(new MapManager(assets, mapExchange))
-                    .Attach(new DebugMapInspector(stateManager))
+                    .Attach(new DebugMapInspector())
                     .Attach(new World2DInputMode())
                     .Attach(new DebugPickInputMode())
                     .Attach(new ContextMenuInputMode())

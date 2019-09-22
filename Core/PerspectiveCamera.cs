@@ -14,6 +14,11 @@ namespace UAlbion.Core
             new Handler<PerspectiveCamera, WindowResizedEvent> ((x, e) => x.WindowResized(e.Width, e.Height)),
             new Handler<PerspectiveCamera, SetCameraPositionEvent>((x, e) => x.Position = e.Position),
             new Handler<PerspectiveCamera, SetCameraDirectionEvent>((x, e) => { x.Yaw = e.Yaw; x.Pitch = e.Pitch; }),
+            new Handler<PerspectiveCamera, SetFieldOfViewEvent>((x, e) =>
+            {
+                x._fov = (float)(Math.PI * e.Degrees / 180);
+                x.UpdatePerspectiveMatrix();
+            }),
         };
 
         Matrix4x4 _viewMatrix;
@@ -28,6 +33,7 @@ namespace UAlbion.Core
         bool _isClipSpaceYInverted;
         float _windowWidth;
         float _windowHeight;
+        float _fov = 1f;
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;
@@ -44,7 +50,7 @@ namespace UAlbion.Core
         }
 
         public Vector3 LookDirection => _lookDirection;
-        public float FieldOfView => 1f;
+        public float FieldOfView => _fov;
         public float NearDistance => 10f;
         public float FarDistance => 512.0f * 256.0f * 2.0f;
 

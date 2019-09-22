@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UAlbion.Api;
 
 namespace UAlbion.Core.Events
@@ -10,10 +11,14 @@ namespace UAlbion.Core.Events
         readonly object _syncRoot = new object();
         readonly IDictionary<Type, IList<IComponent>> _subscriptions = new Dictionary<Type, IList<IComponent>>();
         readonly IDictionary<IComponent, IList<Type>> _subscribers = new Dictionary<IComponent, IList<Type>>();
-        readonly IDictionary<Type, RegisteredComponent> _registrations = new Dictionary<Type, RegisteredComponent>();
+        readonly IDictionary<Type, object> _registrations = new Dictionary<Type, object>();
         readonly EventExchange _parent;
         readonly IList<EventExchange> _children = new List<EventExchange>();
         readonly SubscribedEvent _subscribedEvent = new SubscribedEvent();
+#if DEBUG
+        readonly IList<IEvent> _frameEvents = new List<IEvent>();
+#endif
+
         public string Name { get; }
         public bool IsActive { get; set; } = true;
 
@@ -35,11 +40,20 @@ namespace UAlbion.Core.Events
         }
 
         public bool Contains(IComponent component) { lock(_syncRoot) return _subscribers.ContainsKey(component); }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Raise(IEvent e, object sender) { Raise(e, sender, null); }
         void Raise(IEvent e, object sender, EventExchange sourceExchange)
         {
+            // Event raising goes both up and down the hierarchy (i.e. all events will be delivered to all interested subscribers on all active exchanges)
+            // As such, the number of exchanges should be kept to a minimum. e.g. one global, one for the active scene etc
             if (!IsActive)
                 return;
+
+#if DEBUG
+            if(e is BeginFrameEvent) _frameEvents.Clear();
+            else _frameEvents.Add(e);
+#endif
 
             HashSet<IComponent> subscribers = new HashSet<IComponent>();
             var interfaces = e.GetType().GetInterfaces();
@@ -47,7 +61,8 @@ namespace UAlbion.Core.Events
             if (CoreTrace.Log.IsEnabled())
             {
                 eventText = e.ToString();
-                CoreTrace.Log.StartRaise(e.GetType().Name, eventText);
+                if(e is IVerboseEvent) CoreTrace.Log.StartRaiseVerbose(e.GetType().Name, eventText);
+                else CoreTrace.Log.StartRaise(e.GetType().Name, eventText);
             }
 
             lock (_syncRoot)
@@ -75,7 +90,10 @@ namespace UAlbion.Core.Events
                     childExchange.Raise(e, sender, this);
 
             if (eventText != null)
-                CoreTrace.Log.StopRaise(e.GetType().Name, eventText, subscribers.Count);
+            {
+                if (e is IVerboseEvent) CoreTrace.Log.StopRaiseVerbose(e.GetType().Name, eventText, subscribers.Count);
+                else CoreTrace.Log.StopRaise(e.GetType().Name, eventText, subscribers.Count);
+            }
         }
 
         public EventExchange Attach(IComponent component) { component.Attach(this); return this; }
@@ -132,13 +150,29 @@ namespace UAlbion.Core.Events
             }
         }
 
-        public void Register(RegisteredComponent rc) { _registrations.Add(rc.GetType(), rc); }
-
-        public T Resolve<T>() where T : RegisteredComponent
+        public void Register<T>(T system)
         {
-            if (!_registrations.ContainsKey(typeof(T)))
-                return null;
-            return (T) _registrations[typeof(T)];
+            if(_registrations.ContainsKey(typeof(T)))
+                throw new InvalidOperationException("Only one instance can be registered per type / interface in a given exchange.");
+            _registrations.Add(typeof(T), system);
+
+            if(system is IComponent component && !_subscribers.ContainsKey(component))
+                Attach(component);
+        }
+
+        public T Resolve<T>()
+        {
+            // System resolution only goes up
+            var exchange = this;
+            while (exchange != null)
+            {
+                if (exchange._registrations.TryGetValue(typeof(T), out var result))
+                    return (T)result;
+
+                exchange = exchange._parent;
+            }
+
+            return default(T);
         }
 
         public void PruneInactiveChildren()

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
+using ImGuiNET;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
@@ -53,15 +54,24 @@ namespace UAlbion.Game.Input
                     x._isActive = false;
             }),
             new Handler<MouseLookInputMode, InputEvent>((x,e) => x.OnInput(e)), 
+            new Handler<MouseLookInputMode, PostUpdateEvent>((x, e) =>
+            {
+                if (!x._isActive) return;
+                var windowState = x.Exchange.Resolve<IWindowState>();
+                x.Raise(new SetCursorPositionEvent(windowState.Width / 2, windowState.Height / 2));
+            }),
         };
 
         void OnInput(InputEvent e)
         {
-            if (!_isActive)
+            if (!_isActive /*|| ImGui.GetIO().WantCaptureMouse*/)
                 return;
 
-            if(e.MouseDelta != Vector2.Zero)
-                Raise(new CameraRotateEvent(e.MouseDelta.X * -0.01f, e.MouseDelta.Y * -0.01f));
+            var windowState = Exchange.Resolve<IWindowState>();
+            var delta = e.Snapshot.MousePosition - new Vector2((float)windowState.Width / 2, (float)windowState.Height / 2);
+
+            if (delta.LengthSquared() > float.Epsilon)
+                Raise(new CameraRotateEvent(delta.X * -0.003f, delta.Y * -0.003f));
         }
 
         bool _isActive;

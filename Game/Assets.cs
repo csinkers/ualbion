@@ -14,7 +14,7 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
-    public class Assets : RegisteredComponent, IDisposable
+    public class Assets : Component, IDisposable
     {
         public Assets(AssetConfig assetConfig, CoreSpriteConfig coreSpriteConfig) : base(Handlers)
         {

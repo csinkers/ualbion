@@ -54,11 +54,6 @@
         "E": "cursor_mode manipulate"
     },
     "MouseLook": {
-        "Up":    "+party_move  0 -1",
-        "Down":  "+party_move  0  1",
-        "Left":  "+party_move -1  0",
-        "Right": "+party_move  1  0",
-
         "Tab": "open_inventory",
 
         "Number1": "set_active_member 0",

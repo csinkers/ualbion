@@ -64,8 +64,8 @@ namespace UAlbion
             var backend =
                 //VeldridStartup.GetPlatformDefaultBackend()
                 //GraphicsBackend.Metal /*
-                //GraphicsBackend.Vulkan /*
-                //GraphicsBackend.OpenGL /*
+                GraphicsBackend.Vulkan /*
+                GraphicsBackend.OpenGL /*
                 //GraphicsBackend.OpenGLES /*
                 GraphicsBackend.Direct3D11 /*
                 //*/
@@ -106,9 +106,9 @@ namespace UAlbion
                     .Attach(new SceneStack())
                     .Attach(new CursorManager(assets))
                     .Attach(new PaletteManager(assets))
-                    .Attach(new Text(assets.LoadFont(MetaFontId.FontColor.White, false), "Hello world", Vector2.Zero))
-                    .Attach(new Text(assets.LoadFont(MetaFontId.FontColor.Red, true), "Test test test", new Vector2(0, -0.2f)))
-                    .Attach(new Text(assets.LoadFont(MetaFontId.FontColor.Yellow, false), "Warning!", new Vector2(0, -0.4f)))
+                    //.Attach(new Text(assets.LoadFont(MetaFontId.FontColor.White, false), "Hello world", Vector2.Zero))
+                    //.Attach(new Text(assets.LoadFont(MetaFontId.FontColor.Red, true), "Test test test", new Vector2(0, -0.2f)))
+                    //.Attach(new Text(assets.LoadFont(MetaFontId.FontColor.Yellow, false), "Warning!", new Vector2(0, -0.4f)))
                     ;
 
                 engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.AltesFormergebäude), null); /*

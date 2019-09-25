@@ -48,7 +48,7 @@ namespace GenerateEnums
         {
             var baseDir = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Parent.Parent.Parent.Parent.FullName;
             AssetConfig config = AssetConfig.Load(baseDir);
-            var outpathPath = Path.Combine(baseDir, @"Formats\AssetIds");
+            var outpathPath = Path.Combine(baseDir, @"Formats/AssetIds");
             var xldPattern = new Regex(@"([0-9]+).XLD$");
 
             var enums = new Dictionary<string, EnumData>();

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using UAlbion.Formats.AssetIds;
@@ -31,8 +32,15 @@ namespace UAlbion.Formats.Parsers
         public static CoreSpriteConfig.BinaryResource GetConfig(CoreSpriteId id, string basePath, CoreSpriteConfig config, out string filename)
         {
             var searchDirectory = Path.Combine(basePath, config.ExePath);
-            foreach (var file in Directory.EnumerateFiles(searchDirectory, "*.exe", SearchOption.AllDirectories))
+
+            if(!Directory.Exists(searchDirectory))
+                throw new InvalidOperationException($"Search directory {searchDirectory} does not exist");
+
+            foreach (var file in Directory.EnumerateFiles(searchDirectory, "*.*", SearchOption.AllDirectories))
             {
+                if(!file.EndsWith(".exe", StringComparison.InvariantCultureIgnoreCase))
+                    continue;
+
                 var hash = GetHash(file);
                 if (config.Hashes.TryGetValue(hash, out var resources))
                 {

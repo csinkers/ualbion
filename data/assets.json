@@ -1,6 +1,6 @@
 {
-  "XldPath": "albion_sr\\cd\\XLDLIBS",
-  "ExportedXldPath": "Data\\Exported",
+  "XldPath": "albion_sr/CD/ALBION/XLDLIBS",
+  "ExportedXldPath": "data/Exported",
   "Xlds": {
     "3DBCKGR0.XLD": {
       "EnumName": "DungeonBackgroundId",
@@ -12245,7 +12245,7 @@
         "35": {}
       }
     },
-    "$(LANG)\\EVNTTXT0.XLD": {
+    "$(LANG)/EVNTTXT0.XLD": {
       "EnumName": "EventTextId",
       "Type": "StringTable",
       "Assets": {
@@ -12254,7 +12254,7 @@
         "2": {}
       }
     },
-    "$(LANG)\\EVNTTXT1.XLD": {
+    "$(LANG)/EVNTTXT1.XLD": {
       "EnumName": "EventTextId",
       "Type": "StringTable",
       "Assets": {
@@ -12360,7 +12360,7 @@
         "99": {}
       }
     },
-    "$(LANG)\\EVNTTXT2.XLD": {
+    "$(LANG)/EVNTTXT2.XLD": {
       "EnumName": "EventTextId",
       "Type": "StringTable",
       "Assets": {
@@ -12466,7 +12466,7 @@
         "99": {}
       }
     },
-    "$(LANG)\\EVNTTXT3.XLD": {
+    "$(LANG)/EVNTTXT3.XLD": {
       "EnumName": "EventTextId",
       "Type": "StringTable",
       "Assets": {
@@ -12572,7 +12572,7 @@
         "99": {}
       }
     },
-    "$(LANG)\\EVNTTXT9.XLD": {
+    "$(LANG)/EVNTTXT9.XLD": {
       "EnumName": "EventTextId",
       "Type": "StringTable",
       "Assets": {
@@ -12678,7 +12678,7 @@
         "99": {}
       }
     },
-    "$(LANG)\\FLICS0.XLD": {
+    "$(LANG)/FLICS0.XLD": {
       "EnumName": "VideoId",
       "Type": "Video",
       "Assets": {
@@ -12703,7 +12703,7 @@
         "18": {}
       }
     },
-    "$(LANG)\\MAPTEXT1.XLD": {
+    "$(LANG)/MAPTEXT1.XLD": {
       "EnumName": "MapTextId",
       "Type": "StringTable",
       "Assets": {
@@ -12809,7 +12809,7 @@
         "99": {}
       }
     },
-    "$(LANG)\\MAPTEXT2.XLD": {
+    "$(LANG)/MAPTEXT2.XLD": {
       "EnumName": "MapTextId",
       "Type": "StringTable",
       "Assets": {
@@ -12915,7 +12915,7 @@
         "99": {}
       }
     },
-    "$(LANG)\\MAPTEXT3.XLD": {
+    "$(LANG)/MAPTEXT3.XLD": {
       "EnumName": "MapTextId",
       "Type": "StringTable",
       "Assets": {
@@ -13021,11 +13021,11 @@
         "99": {}
       }
     },
-    "$(LANG)\\SYSTEXTS": {
+    "$(LANG)/SYSTEXTS": {
       "Type": "Unknown",
       "Assets": {}
     },
-    "$(LANG)\\WORDLIS0.XLD": {
+    "$(LANG)/WORDLIS0.XLD": {
       "Type": "Unknown",
       "Assets": {
         "0": {},
@@ -13033,7 +13033,7 @@
         "2": {}
       }
     },
-    "INITIAL\\AUTOMAP1.XLD": {
+    "INITIAL/AUTOMAP1.XLD": {
       "EnumName": "AutoMapId",
       "Type": "Unknown",
       "Assets": {
@@ -13139,7 +13139,7 @@
         "99": {}
       }
     },
-    "INITIAL\\AUTOMAP2.XLD": {
+    "INITIAL/AUTOMAP2.XLD": {
       "EnumName": "AutoMapId",
       "Type": "Unknown",
       "Assets": {
@@ -13245,7 +13245,7 @@
         "99": {}
       }
     },
-    "INITIAL\\AUTOMAP3.XLD": {
+    "INITIAL/AUTOMAP3.XLD": {
       "EnumName": "AutoMapId",
       "Type": "Unknown",
       "Assets": {
@@ -13351,7 +13351,7 @@
         "99": {}
       }
     },
-    "INITIAL\\CHESTDT0.XLD": {
+    "INITIAL/CHESTDT0.XLD": {
       "EnumName": "ChestId",
       "Type": "Inventory",
       "Assets": {
@@ -13359,7 +13359,7 @@
         "1": {}
       }
     },
-    "INITIAL\\CHESTDT1.XLD": {
+    "INITIAL/CHESTDT1.XLD": {
       "EnumName": "ChestId",
       "Type": "Inventory",
       "Assets": {
@@ -13465,7 +13465,7 @@
         "99": {}
       }
     },
-    "INITIAL\\CHESTDT2.XLD": {
+    "INITIAL/CHESTDT2.XLD": {
       "EnumName": "ChestId",
       "Type": "Inventory",
       "Assets": {
@@ -13571,7 +13571,7 @@
         "99": {}
       }
     },
-    "INITIAL\\CHESTDT5.XLD": {
+    "INITIAL/CHESTDT5.XLD": {
       "EnumName": "ChestId",
       "Type": "Inventory",
       "Assets": {
@@ -13677,14 +13677,14 @@
         "99": {}
       }
     },
-    "INITIAL\\MERCHDT0.XLD": {
+    "INITIAL/MERCHDT0.XLD": {
       "EnumName": "MerchantId",
       "Type": "Inventory",
       "Assets": {
         "0": {}
       }
     },
-    "INITIAL\\MERCHDT1.XLD": {
+    "INITIAL/MERCHDT1.XLD": {
       "EnumName": "MerchantId",
       "Type": "Inventory",
       "Assets": {
@@ -13790,7 +13790,7 @@
         "99": {}
       }
     },
-    "INITIAL\\MERCHDT2.XLD": {
+    "INITIAL/MERCHDT2.XLD": {
       "EnumName": "MerchantId",
       "Type": "Inventory",
       "Assets": {
@@ -13896,7 +13896,7 @@
         "99": {}
       }
     },
-    "INITIAL\\NPCCHAR0.XLD": {
+    "INITIAL/NPCCHAR0.XLD": {
       "EnumName": "NpcCharacterId",
       "Type": "CharacterData",
       "Assets": {
@@ -13997,7 +13997,7 @@
         "94": {}
       }
     },
-    "INITIAL\\NPCCHAR1.XLD": {
+    "INITIAL/NPCCHAR1.XLD": {
       "EnumName": "NpcCharacterId",
       "Type": "CharacterData",
       "Assets": {
@@ -14103,7 +14103,7 @@
         "99": {}
       }
     },
-    "INITIAL\\NPCCHAR2.XLD": {
+    "INITIAL/NPCCHAR2.XLD": {
       "EnumName": "NpcCharacterId",
       "Type": "CharacterData",
       "Assets": {
@@ -14209,7 +14209,7 @@
         "99": {}
       }
     },
-    "INITIAL\\PRTCHAR0.XLD": {
+    "INITIAL/PRTCHAR0.XLD": {
       "EnumName": "PartyCharacterId",
       "Type": "CharacterData",
       "Assets": {
@@ -14273,7 +14273,7 @@
         "57": {}
       }
     },
-    "INITIAL\\PRTCHAR1.XLD": {
+    "INITIAL/PRTCHAR1.XLD": {
       "EnumName": "PartyCharacterId",
       "Type": "CharacterData",
       "Assets": {
@@ -14379,7 +14379,7 @@
         "99": {}
       }
     },
-    "INITIAL\\PRTCHAR2.XLD": {
+    "INITIAL/PRTCHAR2.XLD": {
       "EnumName": "PartyCharacterId",
       "Type": "CharacterData",
       "Assets": {
@@ -14485,27 +14485,27 @@
         "99": {}
       }
     },
-    "ENGLISH\\EVNTTXT0.XLD": {
+    "ENGLISH/EVNTTXT0.XLD": {
       "Type": "Unknown",
       "Assets": {}
     },
-    "ENGLISH\\EVNTTXT1.XLD": {
+    "ENGLISH/EVNTTXT1.XLD": {
       "Type": "Unknown",
       "Assets": {}
     },
-    "ENGLISH\\EVNTTXT2.XLD": {
+    "ENGLISH/EVNTTXT2.XLD": {
       "Type": "Unknown",
       "Assets": {}
     },
-    "ENGLISH\\EVNTTXT3.XLD": {
+    "ENGLISH/EVNTTXT3.XLD": {
       "Type": "Unknown",
       "Assets": {}
     },
-    "ENGLISH\\EVNTTXT9.XLD": {
+    "ENGLISH/EVNTTXT9.XLD": {
       "Type": "Unknown",
       "Assets": {}
     },
-    "ENGLISH\\FLICS0.XLD": {
+    "ENGLISH/FLICS0.XLD": {
       "Type": "Unknown",
       "Assets": {
         "0": {
@@ -14567,19 +14567,19 @@
         }
       }
     },
-    "ENGLISH\\MAPTEXT1.XLD": {
+    "ENGLISH/MAPTEXT1.XLD": {
       "Type": "Unknown",
       "Assets": {}
     },
-    "ENGLISH\\MAPTEXT2.XLD": {
+    "ENGLISH/MAPTEXT2.XLD": {
       "Type": "Unknown",
       "Assets": {}
     },
-    "ENGLISH\\MAPTEXT3.XLD": {
+    "ENGLISH/MAPTEXT3.XLD": {
       "Type": "Unknown",
       "Assets": {}
     },
-    "ENGLISH\\WORDLIS0.XLD": {
+    "ENGLISH/WORDLIS0.XLD": {
       "Type": "Unknown",
       "Assets": {
         "0": {
@@ -14593,27 +14593,27 @@
         }
       }
     },
-    "GERMAN\\EVNTTXT0.XLD": {
+    "GERMAN/EVNTTXT0.XLD": {
       "Type": "Unknown",
       "Assets": {}
     },
-    "GERMAN\\EVNTTXT1.XLD": {
+    "GERMAN/EVNTTXT1.XLD": {
       "Type": "Unknown",
       "Assets": {}
     },
-    "GERMAN\\EVNTTXT2.XLD": {
+    "GERMAN/EVNTTXT2.XLD": {
       "Type": "Unknown",
       "Assets": {}
     },
-    "GERMAN\\EVNTTXT3.XLD": {
+    "GERMAN/EVNTTXT3.XLD": {
       "Type": "Unknown",
       "Assets": {}
     },
-    "GERMAN\\EVNTTXT9.XLD": {
+    "GERMAN/EVNTTXT9.XLD": {
       "Type": "Unknown",
       "Assets": {}
     },
-    "GERMAN\\FLICS0.XLD": {
+    "GERMAN/FLICS0.XLD": {
       "Type": "Unknown",
       "Assets": {
         "0": {
@@ -14675,19 +14675,19 @@
         }
       }
     },
-    "GERMAN\\MAPTEXT1.XLD": {
+    "GERMAN/MAPTEXT1.XLD": {
       "Type": "Unknown",
       "Assets": {}
     },
-    "GERMAN\\MAPTEXT2.XLD": {
+    "GERMAN/MAPTEXT2.XLD": {
       "Type": "Unknown",
       "Assets": {}
     },
-    "GERMAN\\MAPTEXT3.XLD": {
+    "GERMAN/MAPTEXT3.XLD": {
       "Type": "Unknown",
       "Assets": {}
     },
-    "GERMAN\\WORDLIS0.XLD": {
+    "GERMAN/WORDLIS0.XLD": {
       "Type": "Unknown",
       "Assets": {}
     },

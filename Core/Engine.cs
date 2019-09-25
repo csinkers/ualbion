@@ -217,7 +217,7 @@ namespace UAlbion.Core
             }
 
             GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(false, null, false,
-                ResourceBindingModel.Improved, true, true, false, true)
+                ResourceBindingModel.Improved, true, true, false/*, true*/)
             {
                 Debug = true ,
                 SyncToVerticalBlank = true

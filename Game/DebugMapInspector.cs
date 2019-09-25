@@ -43,7 +43,7 @@ namespace UAlbion.Game
             foreach (var hit in _hits)
             {
                 var p = hit.IntersectionPoint;
-                ImGui.SetNextTreeNodeOpen(true);
+                ImGui.SetNextItemOpen(true);
                 if (ImGui.TreeNode($"Hit {hitId}"))
                 {
                     ImGui.TextColored(new Vector4(1.0f, 0.8f, 0.0f, 1.0f), $"{hit.Name} ({ p.X}, {p.Y}, {p.Z})");

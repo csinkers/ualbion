@@ -161,6 +161,17 @@ namespace UAlbion.Core.Textures
         [DllImport("Kernel32.dll", EntryPoint = "RtlZeroMemory", SetLastError = false)]
         static extern void ZeroMemory(IntPtr dest, IntPtr size);
 
+        unsafe void MemsetZero(byte* buffer, int size)
+        {
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                ZeroMemory((IntPtr)buffer, (IntPtr)size);
+            }
+            else
+                for (int i = 0; i < size; i++)
+                    *(buffer + i) = 0;
+        }
+
         public Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
         {
             bool rebuildAll = _isMetadataDirty;
@@ -182,7 +193,7 @@ namespace UAlbion.Core.Textures
                         for (int i = 0; i < lsi.Frames; i++)
                         {
                             if(lsi.IsAlphaTested)
-                                ZeroMemory((IntPtr)toBuffer, (IntPtr)(Width * Height * sizeof(uint)));
+                                MemsetZero((byte*)toBuffer, (int)(Width * Height * sizeof(uint)));
                             else
                             {
                                 for(int j = 0; j < Width*Height;j++)

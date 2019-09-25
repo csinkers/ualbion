@@ -21,7 +21,7 @@ namespace UAlbion.Core
                 if (_renderDoc == null && RenderDoc.Load(out _renderDoc))
                     x.ChangeBackend(x.GraphicsDevice.BackendType, true);
             }),
-            new Handler<Engine, QuitEvent>((x, e) => x.Window.Close()),
+            new Handler<Engine, QuitEvent>((x, e) => x._done = true),
             new Handler<Engine, SubscribedEvent>((x, _) => x.Exchange.Register<IWindowState>(x)),
             new Handler<Engine, SetCursorPositionEvent>((x, e) => x._pendingCursorUpdate = new Vector2(e.X, e.Y)),
             new Handler<Engine, ToggleFullscreenEvent>((x, _) => x.ToggleFullscreenState()),
@@ -43,6 +43,7 @@ namespace UAlbion.Core
         CommandList _frameCommands;
         TextureSampleCount? _newSampleCount;
         bool _windowResized;
+        bool _done;
         bool _recreateWindow = true;
         Vector2? _pendingCursorUpdate;
 
@@ -90,7 +91,7 @@ namespace UAlbion.Core
             Raise(new BeginFrameEvent());
 
             var frameCounter = new FrameCounter();
-            while (Window.Exists)
+            while (!_done)
             {
                 double deltaSeconds = frameCounter.StartFrame();
                 Raise(new BeginFrameEvent());
@@ -115,6 +116,7 @@ namespace UAlbion.Core
                 Draw();
             }
 
+            Window.Close();
             DestroyAllObjects();
             GraphicsDevice.Dispose();
         }

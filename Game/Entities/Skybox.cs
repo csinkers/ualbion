@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
@@ -28,7 +29,7 @@ namespace UAlbion.Game.Entities
             renderEvent.Add(_tilemap);
         }
 
-        public Skybox(Assets assets, DungeonBackgroundId id, PaletteId paletteId) : base(Handlers)
+        public Skybox(IAssetManager assets, DungeonBackgroundId id, PaletteId paletteId) : base(Handlers)
         {
             var palette = assets.LoadPalette(paletteId);
             float size = 512.0f * 256.0f;

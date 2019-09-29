@@ -24,17 +24,21 @@ namespace UAlbion.Core
         CommandList _resourceUpdateCl;
         RgbaFloat _clearColour;
 
-        public int Id { get; }
+        int Id { get; }
+        EventExchange SceneExchange { get; }
+        public string Name { get; }
         public ICamera Camera { get; }
-        public EventExchange SceneExchange { get; }
 
-        public Scene(int sceneId, ICamera camera, IList<Type> activeActiveRendererTypeTypes, EventExchange sceneExchange) : base(Handlers)
+        public Scene(int sceneId, string name, ICamera camera, IList<Type> activeActiveRendererTypeTypes, EventExchange sceneExchange) : base(Handlers)
         {
             Id = sceneId;
+            Name = name;
             Camera = camera;
             _activeRendererTypes = activeActiveRendererTypeTypes;
             SceneExchange = sceneExchange;
         }
+
+        public override string ToString() => $"Scene:{Name} {(SceneExchange.IsActive ? "Active" : "")}";
 
         public void RenderAllStages(GraphicsDevice gd, CommandList cl, SceneContext sc, IDictionary<Type, IRenderer> renderers)
         {
@@ -49,7 +53,7 @@ namespace UAlbion.Core
 
             Exchange.Raise(new RenderEvent(x =>
             {
-                if (!_activeRendererTypes.Contains(x.Renderer))
+                if (x == null || !_activeRendererTypes.Contains(x.Renderer))
                     return;
                 if (!_renderables.ContainsKey(x.Renderer))
                     _renderables[x.Renderer] = new List<IRenderable>();
@@ -57,7 +61,7 @@ namespace UAlbion.Core
             }), this);
 
             foreach(var renderer in _renderables)
-                CoreTrace.Log.CollectedRenderables(renderer.Key.Name, renderer.Value.Count);
+                CoreTrace.Log.CollectedRenderables(renderer.Key.Name, 0, renderer.Value.Count);
 
             sc.PaletteView?.Dispose();
             sc.PaletteTexture?.Dispose();
@@ -82,8 +86,8 @@ namespace UAlbion.Core
                     }
                 }
 
-                CoreTrace.Log.CollectedRenderables("ProcessedRenderableTypes", _processedRenderables.Count);
                 CoreTrace.Log.CollectedRenderables("ProcessedRenderables",
+                    _processedRenderables.Count,
                     _processedRenderables.Sum(x => x.Value.Count));
             }
             _resourceUpdateCl.End();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using UAlbion.Api;
 using UAlbion.Core.Events;
 using Veldrid;
 
@@ -26,8 +27,8 @@ namespace UAlbion.Core.Visual
         }
 
         public string Name => "DebugGuiRenderer";
-        public RenderPasses RenderPasses => RenderPasses.Overlay;
-        public int RenderOrder => 99;
+        public RenderPasses RenderPasses => RenderPasses.Standard;
+        public int RenderOrder => (int)DrawLayer.Debug;
         public Type Renderer => typeof(DebugGuiRenderer);
 
         public void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
@@ -51,7 +52,7 @@ namespace UAlbion.Core.Visual
 
         public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable r)
         {
-            Debug.Assert(renderPass == RenderPasses.Overlay);
+            Debug.Assert(renderPass == RenderPasses.Standard);
             _imguiRenderer.Render(gd, cl);
         }
 

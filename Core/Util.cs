@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using UAlbion.Core.Textures;
 using Veldrid;
 using Veldrid.Utilities;
 
 namespace UAlbion.Core
 {
-    static class Util
+    public static class Util
     {
         internal static uint SizeInBytes<T>(this T[] array) where T : struct
         {
@@ -207,6 +208,21 @@ namespace UAlbion.Core
                         -1, -1, 0, 1
                 };
             }
+        }
+
+        public static ITexture BuildRotatedTexture(EightBitTexture texture)
+        {
+            var rotatedPixels = new byte[texture.Width * texture.Height];
+            Api.Util.RotateImage((int)texture.Width, (int)texture.Height, 
+               new Span<byte>(texture.TextureData),
+               new Span<byte>(rotatedPixels));
+
+            return new EightBitTexture(
+                texture.Name + "Rotated",
+                texture.Height, texture.Width,
+                texture.MipLevels, texture.ArrayLayers,
+                rotatedPixels,
+                new[] { new EightBitTexture.SubImage(0, 0, texture.Height, texture.Width, 0) });
         }
     }
 

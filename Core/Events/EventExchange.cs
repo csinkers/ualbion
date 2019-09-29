@@ -8,7 +8,7 @@ namespace UAlbion.Core.Events
 {
     public class EventExchange
     {
-        readonly object _syncRoot = new object();
+        static readonly object _syncRoot = new object();
         readonly IDictionary<Type, IList<IComponent>> _subscriptions = new Dictionary<Type, IList<IComponent>>();
         readonly IDictionary<IComponent, IList<Type>> _subscribers = new Dictionary<IComponent, IList<Type>>();
         readonly IDictionary<Type, object> _registrations = new Dictionary<Type, object>();
@@ -41,9 +41,33 @@ namespace UAlbion.Core.Events
 
         public bool Contains(IComponent component) { lock(_syncRoot) return _subscribers.ContainsKey(component); }
 
+        void Collect(HashSet<IComponent> subscribers, Type type, Type[] interfaces)
+        {
+            lock (_syncRoot)
+            {
+                if (_subscriptions.TryGetValue(type, out var tempSubscribers))
+                    foreach (var subscriber in tempSubscribers)
+                        subscribers.Add(subscriber);
+
+                foreach(var @interface in interfaces)
+                    if (_subscriptions.TryGetValue(@interface, out var interfaceSubscribers))
+                        foreach (var subscriber in interfaceSubscribers)
+                            subscribers.Add(subscriber);
+            }
+        }
+
+        void CollectExchanges(ISet<EventExchange> exchanges)
+        {
+            if (!exchanges.Add(this))
+                return;
+
+            _parent?.CollectExchanges(exchanges);
+            foreach (var childExchange in _children)
+                childExchange.CollectExchanges(exchanges);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Raise(IEvent e, object sender) { Raise(e, sender, null); }
-        void Raise(IEvent e, object sender, EventExchange sourceExchange)
+        public void Raise(IEvent e, object sender)
         {
             // Event raising goes both up and down the hierarchy (i.e. all events will be delivered to all interested subscribers on all active exchanges)
             // As such, the number of exchanges should be kept to a minimum. e.g. one global, one for the active scene etc
@@ -56,8 +80,10 @@ namespace UAlbion.Core.Events
 #endif
 
             HashSet<IComponent> subscribers = new HashSet<IComponent>();
-            var interfaces = e.GetType().GetInterfaces();
+            var type = e.GetType();
+            var interfaces = type.GetInterfaces();
             string eventText = null;
+
             if (CoreTrace.Log.IsEnabled())
             {
                 eventText = e.ToString();
@@ -65,29 +91,14 @@ namespace UAlbion.Core.Events
                 else CoreTrace.Log.StartRaise(e.GetType().Name, eventText);
             }
 
-            lock (_syncRoot)
-            {
-                if (_subscriptions.TryGetValue(e.GetType(), out var tempSubscribers))
-                    foreach (var subscriber in tempSubscribers)
-                        subscribers.Add(subscriber);
-
-                foreach(var @interface in interfaces)
-                    if (_subscriptions.TryGetValue(@interface, out var interfaceSubscribers))
-                        foreach (var subscriber in interfaceSubscribers)
-                            subscribers.Add(subscriber);
-            }
+            var exchanges = new HashSet<EventExchange>();
+            lock(_syncRoot)
+                CollectExchanges(exchanges);
+            foreach(var exchange in exchanges)
+                exchange.Collect(subscribers, type, interfaces);
 
             foreach(var subscriber in subscribers)
                 subscriber.Receive(e, sender);
-
-            if(_parent != null && sourceExchange != _parent)
-                _parent.Raise(e, sender, this);
-
-            IList<EventExchange> children;
-            lock (_children) { children = _children.ToList(); }
-            foreach(var childExchange in children)
-                if(childExchange != sourceExchange)
-                    childExchange.Raise(e, sender, this);
 
             if (eventText != null)
             {

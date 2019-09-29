@@ -14,7 +14,45 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
-    public class Assets : Component, IDisposable
+    public interface IAssetManager
+    {
+        ITexture LoadTexture(AssetType type, int id);
+        ITexture LoadTexture(AutoMapId id);
+        ITexture LoadTexture(CombatBackgroundId id);
+        ITexture LoadTexture(CombatGraphicsId id);
+        ITexture LoadTexture(DungeonBackgroundId id);
+        ITexture LoadTexture(DungeonFloorId id);
+        ITexture LoadTexture(DungeonObjectId id);
+        ITexture LoadTexture(DungeonOverlayId id);
+        ITexture LoadTexture(DungeonWallId id);
+        ITexture LoadTexture(FullBodyPictureId id);
+        ITexture LoadTexture(IconDataId id);
+        ITexture LoadTexture(IconGraphicsId id);
+        ITexture LoadTexture(ItemId id);
+        ITexture LoadTexture(LargeNpcId id);
+        ITexture LoadTexture(LargePartyGraphicsId id);
+        ITexture LoadTexture(MonsterGraphicsId id);
+        ITexture LoadTexture(PictureId id);
+        ITexture LoadTexture(SmallNpcId id);
+        ITexture LoadTexture(SmallPartyGraphicsId id);
+        ITexture LoadTexture(SmallPortraitId id);
+        ITexture LoadTexture(TacticId id);
+        ITexture LoadTexture(FontId id);
+        ITexture LoadTexture(MetaFontId id);
+        ITexture LoadTexture(CoreSpriteId id);
+        ITexture LoadFont(MetaFontId.FontColor color, bool isBold);
+        TilesetData LoadTileData(IconDataId id);
+        LabyrinthData LoadLabyrinthData(LabyrinthDataId id);
+        CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id);
+        string LoadString(AssetType type, int id, GameLanguage language, int subItem);
+        AlbionSample LoadSample(AssetType type, int id);
+        AlbionVideo LoadVideo(VideoId id, GameLanguage language);
+        AlbionPalette LoadPalette(PaletteId id);
+        MapData2D LoadMap2D(MapDataId id);
+        MapData3D LoadMap3D(MapDataId id);
+    }
+
+    public class Assets : Component, IDisposable, IAssetManager
     {
         public Assets(AssetConfig assetConfig, CoreSpriteConfig coreSpriteConfig) : base(Handlers)
         {
@@ -259,8 +297,9 @@ namespace UAlbion.Game
             return asset is Exception ? null : asset;
         }
 
-        public MapData2D LoadMap2D(MapDataId id) { return LoadAssetCached(AssetType.MapData, id) as MapData2D; }
-        public MapData3D LoadMap3D(MapDataId id) { return LoadAssetCached(AssetType.MapData, id) as MapData3D; }
+        public MapData2D LoadMap2D(MapDataId id) => LoadAssetCached(AssetType.MapData, id) as MapData2D;
+        public MapData3D LoadMap3D(MapDataId id) => LoadAssetCached(AssetType.MapData, id) as MapData3D;
+
         public AlbionPalette LoadPalette(PaletteId id)
         {
             var palette = (AlbionPalette)LoadAssetCached(AssetType.Palette, id);
@@ -338,7 +377,7 @@ namespace UAlbion.Game
             var stringTable = (IDictionary<int, string>)LoadAssetCached(AssetType.MapData, id, language);
             return stringTable[subItem];
         }
-        public AlbionSample LoadSample(AssetType type, int id) { return (AlbionSample)LoadAssetCached(type, id); }
+        public AlbionSample LoadSample(AssetType type, int id) => (AlbionSample)LoadAssetCached(type, id);
         public AlbionVideo LoadVideo(VideoId id, GameLanguage language) => (AlbionVideo) LoadAsset(AssetType.Flic, (int)id, $"Video:{id}", language); // Don't cache videos.
 
         public void Dispose()
@@ -347,4 +386,5 @@ namespace UAlbion.Game
                 xld?.Dispose();
         }
     }
+
 }

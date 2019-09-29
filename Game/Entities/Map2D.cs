@@ -18,11 +18,10 @@ namespace UAlbion.Game.Entities
 
     public class Map2D : Component, IMap
     {
-        readonly Assets _assets; // TODO: Remove this and use an AssetResolutionEvent or similar.
-        readonly MapData2D _mapData;
-        readonly TilesetData _tileData;
-        readonly MapRenderable2D _renderable;
-        readonly bool _useSmallSprites;
+        MapData2D _mapData;
+        TilesetData _tileData;
+        MapRenderable2D _renderable;
+        bool _useSmallSprites;
 
         public MapDataId MapId { get; }
         public Vector2 LogicalSize => new Vector2(_mapData.Width, _mapData.Height);
@@ -40,15 +39,9 @@ namespace UAlbion.Game.Entities
 
         public override string ToString() { return $"Map2D: {MapId} ({(int)MapId}"; }
 
-        public Map2D(Assets assets, MapDataId mapId) : base(Handlers)
+        public Map2D(MapDataId mapId) : base(Handlers)
         {
             MapId = mapId;
-            _assets = assets;
-            _mapData = assets.LoadMap2D(mapId);
-            var tileset = assets.LoadTexture((IconGraphicsId)_mapData.TilesetId);
-            _tileData = assets.LoadTileData((IconDataId) _mapData.TilesetId);
-            _renderable = new MapRenderable2D(_mapData, tileset, _tileData);
-            _useSmallSprites = _tileData.UseSmallGraphics;
         }
 
         public void Select(WorldCoordinateSelectEvent e)
@@ -98,13 +91,20 @@ namespace UAlbion.Game.Entities
 
         void Subscribed()
         {
+            var assets = Exchange.Resolve<IAssetManager>();
+            _mapData = assets.LoadMap2D(MapId);
+            var tileset = assets.LoadTexture((IconGraphicsId) _mapData.TilesetId);
+            _tileData = assets.LoadTileData((IconDataId) _mapData.TilesetId);
+            _renderable = new MapRenderable2D(_mapData, tileset, _tileData);
+            _useSmallSprites = _tileData.UseSmallGraphics;
+
             Exchange.Attach(_renderable);
             foreach (var npc in _mapData.Npcs)
             {
                 IComponent sprite = 
                     _useSmallSprites
-                        ? (IComponent)new SmallNpcSprite((SmallNpcId)npc.ObjectNumber, npc.Waypoints)
-                        : new LargeNpcSprite((LargeNpcId)npc.ObjectNumber, npc.Waypoints, _assets);
+                        ? new SmallNpcSprite((SmallNpcId)npc.ObjectNumber, npc.Waypoints) as IComponent
+                        : new LargeNpcSprite((LargeNpcId)npc.ObjectNumber, npc.Waypoints, assets);
 
                 Exchange.Attach(sprite);
             }

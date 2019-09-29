@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
@@ -26,7 +27,7 @@ namespace UAlbion.Game.Entities
             new Handler<MapRenderable3D, SubscribedEvent>((x, e) => x.Subscribed())
         };
 
-        public MapRenderable3D(Assets assets, MapData3D mapData, LabyrinthData labyrinthData, Vector3 tileSize) : base(Handlers)
+        public MapRenderable3D(IAssetManager assets, MapData3D mapData, LabyrinthData labyrinthData, Vector3 tileSize) : base(Handlers)
         {
             _mapData = mapData;
             _labyrinthData = labyrinthData;

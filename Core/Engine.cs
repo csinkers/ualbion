@@ -50,7 +50,9 @@ namespace UAlbion.Core
         internal GraphicsDevice GraphicsDevice { get; private set; }
         internal Sdl2Window Window { get; private set; }
         internal RenderDoc RenderDoc => _renderDoc;
-        internal string FrameTimeText => _frameTimeAverager.CurrentAverageFramesPerSecond.ToString("000.0 fps / ") + _frameTimeAverager.CurrentAverageFrameTimeMilliseconds.ToString("#00.00 ms");
+
+        internal string FrameTimeText => _frameTimeAverager.CurrentAverageFramesPerSecond.ToString("000.0 fps / ") +
+                                         _frameTimeAverager.CurrentAverageFrameTimeMilliseconds.ToString("#00.00 ms");
 
         public Engine(GraphicsBackend backend, bool useRenderDoc) : base(Handlers)
         {
@@ -78,11 +80,12 @@ namespace UAlbion.Core
         public void AddRenderer(IRenderer renderer)
         {
             _renderers.Add(renderer.GetType(), renderer);
-            if(renderer is IComponent component)
+            if (renderer is IComponent component)
                 GlobalExchange.Attach(component);
         }
 
-        public void AddScene(Scene scene) { _scenes.Add(scene); }
+        public void AddScene(Scene scene) => _scenes.Add(scene);
+
         public void Run()
         {
             CreateAllObjects();
@@ -107,6 +110,7 @@ namespace UAlbion.Core
 
                     _pendingCursorUpdate = null;
                 }
+
                 Raise(new InputEvent(deltaSeconds, snapshot, Window.MouseDelta));
 
                 Update((float)deltaSeconds);
@@ -140,6 +144,7 @@ namespace UAlbion.Core
                 DestroyAllObjects();
                 CreateAllObjects();
             }
+
             sw.Stop();
             Console.WriteLine($"Refreshing resources {numTimes} times took {sw.Elapsed.TotalSeconds} seconds.");
         }
@@ -181,7 +186,7 @@ namespace UAlbion.Core
             }
 
             _frameCommands.Begin();
-            foreach(var scene in _scenes)
+            foreach (var scene in _scenes)
                 scene.RenderAllStages(GraphicsDevice, _frameCommands, _sceneContext, _renderers);
             CoreTrace.Log.Info("Engine", "Swapping buffers...");
             GraphicsDevice.SwapBuffers();
@@ -214,14 +219,14 @@ namespace UAlbion.Core
 
                 Window = VeldridStartup.CreateWindow(ref windowInfo);
                 Window.BorderVisible = false;
-                Window.CursorVisible = false;
+                Window.CursorVisible = true;
                 Window.Resized += () => _windowResized = true;
             }
 
             GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(false, null, false,
-                ResourceBindingModel.Improved, true, true, false/*, true*/)
+                ResourceBindingModel.Improved, true, true, false /*, true*/)
             {
-                Debug = true ,
+                Debug = true,
                 SyncToVerticalBlank = true
             };
 
@@ -246,7 +251,7 @@ namespace UAlbion.Core
             foreach (var r in _renderers.Values)
                 r.CreateDeviceObjects(GraphicsDevice, initCL, _sceneContext);
 
-            foreach(var scene in _scenes)
+            foreach (var scene in _scenes)
                 scene.CreateAllDeviceObjects(GraphicsDevice, initCL, _sceneContext);
             initCL.End();
             GraphicsDevice.SubmitCommands(initCL);
@@ -261,7 +266,7 @@ namespace UAlbion.Core
             foreach (var r in _renderers.Values)
                 r.DestroyDeviceObjects();
 
-            foreach(var scene in _scenes)
+            foreach (var scene in _scenes)
                 scene.DestroyAllDeviceObjects();
             StaticResourceCache.DestroyAllDeviceObjects();
             Exchange.Resolve<ITextureManager>()?.DestroyDeviceObjects();
@@ -276,11 +281,26 @@ namespace UAlbion.Core
             //_graphicsDevice?.Dispose();
         }
 
-        public void CheckForErrors() { /*GraphicsDevice?.CheckForErrors();*/ }
+        public void CheckForErrors()
+        {
+            /*GraphicsDevice?.CheckForErrors();*/
+        }
 
         int IWindowState.Width => Window.Width;
         int IWindowState.Height => Window.Height;
         Vector2 IWindowState.Size => new Vector2(Window.Width, Window.Height);
+
+        int IWindowState.GuiScale
+        {
+            get
+            {
+                const int NominalWidth = 360;
+                const int NominalHeight = 240;
+                float widthRatio = (float)Window.Width / NominalWidth;
+                float heightRatio = (float)Window.Height / NominalHeight;
+                return (int)(Math.Min(widthRatio, heightRatio) + 0.5f);
+            }
+        }
     }
 }
 

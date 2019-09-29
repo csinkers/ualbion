@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using UAlbion.Api;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
@@ -66,6 +67,11 @@ namespace UAlbion.Formats.Parsers
                     rotatedSprite.Frames[n] = new AlbionSprite.Frame(
                         0, rotatedFrameHeight * n, 
                         rotatedSprite.Width, rotatedFrameHeight);
+
+                    Util.RotateImage(width, height,
+                        new Span<byte>(sprite.PixelData, n * width * height, width * height),
+                        new Span<byte>(rotatedSprite.PixelData, n * width * height, width * height));
+                    /*
                     int x = 0;
                     int y = 0;
                     for (int i = 0; i < width * height; i++)
@@ -81,6 +87,7 @@ namespace UAlbion.Formats.Parsers
                             x++;
                         }
                     }
+                    */
                 }
 
                 return rotatedSprite;

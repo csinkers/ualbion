@@ -7,10 +7,8 @@ namespace UAlbion.Core.Visual
 {
     public class MultiSprite : IRenderable
     {
-        public MultiSprite(SpriteKey key)
-        {
-            Key = key;
-        }
+        public MultiSprite(SpriteKey key) { Key = key; }
+        public override string ToString() => $"Multi:{Name} {RenderOrder} Depth:{DepthTested} ({Instances.Length} instances)";
 
         public MultiSprite(SpriteKey key, int bufferId, IEnumerable<SpriteInstanceData> sprites)
         {

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
@@ -41,7 +42,7 @@ namespace UAlbion.Game.Entities
             _mapData = mapData;
             _tileset = tileset;
             _tileData = tileData;
-            TileSize = BuildInstanceData(0, 0, _tileData.Tiles[0], 0, false).Size;
+            TileSize = BuildInstanceData(0, 0, _tileData.Tiles[0], 0).Size;
 
             var underlay = new List<SpriteInstanceData>();
             var overlay = new List<SpriteInstanceData>();
@@ -50,10 +51,10 @@ namespace UAlbion.Game.Entities
                 for (int i = 0; i < _mapData.Width; i++)
                 {
                     var underlayTile = _tileData.Tiles[_mapData.Underlay[j * _mapData.Width + i]];
-                    underlay.Add(BuildInstanceData(i, j, underlayTile, 0, false));
+                    underlay.Add(BuildInstanceData(i, j, underlayTile, 0));
 
                     var overlayTile = _tileData.Tiles[_mapData.Overlay[j * _mapData.Width + i]];
-                    overlay.Add(BuildInstanceData(i, j, overlayTile, 0, true));
+                    overlay.Add(BuildInstanceData(i, j, overlayTile, 0));
                 }
             }
 
@@ -63,7 +64,7 @@ namespace UAlbion.Game.Entities
 
         void Subscribed() { Raise(new LoadPaletteEvent((int)Palette)); }
 
-        SpriteInstanceData BuildInstanceData(int i, int j, TilesetData.TileData tile, int tickCount, bool isOverlay)
+        SpriteInstanceData BuildInstanceData(int i, int j, TilesetData.TileData tile, int tickCount)
         {
             int index = j * _mapData.Width + i;
             int underlayId = tile.GetSubImageForTile(tickCount);
@@ -126,11 +127,11 @@ namespace UAlbion.Game.Entities
                 for (int i = 0; i < _mapData.Width; i++)
                 {
                     var underlayTile = _tileData.Tiles[_mapData.Underlay[j * _mapData.Width + i]];
-                    _underlay.Instances[underlayIndex] = BuildInstanceData(i, j, underlayTile, 3 * _frameCount / 2, false);
+                    _underlay.Instances[underlayIndex] = BuildInstanceData(i, j, underlayTile, 3 * _frameCount / 2);
                     underlayIndex++;
 
                     var overlayTile = _tileData.Tiles[_mapData.Overlay[j * _mapData.Width + i]];
-                    _overlay.Instances[overlayIndex] = BuildInstanceData(i, j, overlayTile, 3 * _frameCount / 2, true);
+                    _overlay.Instances[overlayIndex] = BuildInstanceData(i, j, overlayTile, 3 * _frameCount / 2);
                     overlayIndex++;
                 }
             }

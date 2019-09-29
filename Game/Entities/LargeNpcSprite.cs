@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
@@ -54,7 +55,7 @@ namespace UAlbion.Game.Entities
         int _frame;
         public Vector3 Normal => Vector3.UnitZ;
 
-        public LargeNpcSprite(LargeNpcId id, MapNpc.Waypoint[] waypoints, Assets assets) : base(Handlers)
+        public LargeNpcSprite(LargeNpcId id, MapNpc.Waypoint[] waypoints, IAssetManager assets) : base(Handlers)
         {
             _id = id;
             _waypoints = waypoints;

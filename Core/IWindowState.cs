@@ -7,5 +7,6 @@ namespace UAlbion.Core
         int Width { get; }
         int Height { get; }
         Vector2 Size { get; }
+        int GuiScale { get; }
     }
 }

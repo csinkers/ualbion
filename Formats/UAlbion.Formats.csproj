@@ -13,4 +13,10 @@
     <ProjectReference Include="..\Api\UAlbion.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="System.Memory">
+      <HintPath>..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\system.memory\4.5.1\ref\netstandard2.0\System.Memory.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

@@ -64,7 +64,7 @@ namespace UAlbion.Core.Visual
 
             // Outputs to fragment shader
             layout(location = 0) out vec2 fsin_0;     // Texture Coordinates
-            layout(location = 1) out flat int fsin_1; // Texture Layer
+            layout(location = 1) out flat float fsin_1; // Texture Layer
             layout(location = 2) out flat int fsin_2; /* Flags:
                NoTransform  = 0x1,  Highlight      = 0x2,
                UsePalette   = 0x4,  OnlyEvenFrames = 0x8,
@@ -100,7 +100,7 @@ namespace UAlbion.Core.Visual
                     gl_Position = worldSpace;
 
                 fsin_0 = _TexCoords * _TexSize + _TexOffset;
-                fsin_1 = _TexLayer;
+                fsin_1 = float(_TexLayer);
                 fsin_2 = _Flags;
             }";
 
@@ -109,13 +109,13 @@ namespace UAlbion.Core.Visual
 
             // Resource Sets
             layout(set = 0, binding = 2) uniform sampler SpriteSampler;   // vdspv_0_2
-            layout(set = 0, binding = 3) uniform texture2D SpriteTexture; // vdspv_0_3
+            layout(set = 0, binding = 3) uniform texture2DArray SpriteTexture; // vdspv_0_3
             layout(set = 0, binding = 4) uniform texture2D PaletteView;   // vdspv_0_4
 
             // Inputs from vertex shader
-            layout(location = 0) in vec2 fsin_0;     // Texture Coordinates
-            layout(location = 1) in flat int fsin_1; // Texture Layer
-            layout(location = 2) in flat int fsin_2; // Flags
+            layout(location = 0) in vec2 fsin_0;       // Texture Coordinates
+            layout(location = 1) in flat float fsin_1; // Texture Layer
+            layout(location = 2) in flat int fsin_2;   // Flags
 
             // Fragment shader outputs
             layout(location = 0) out vec4 OutputColor;
@@ -127,7 +127,7 @@ namespace UAlbion.Core.Visual
                 vec4 color;
                 if ((fsin_2 & 4) != 0)
                 {
-                    float redChannel = texture(sampler2D(SpriteTexture, SpriteSampler), uv)[0];
+                    float redChannel = texture(sampler2DArray(SpriteTexture, SpriteSampler), vec3(uv, fsin_1))[0];
                     float index = 255.0f * redChannel;
                     color = texture(sampler2D(PaletteView, SpriteSampler), vec2(redChannel, 0.0f));
                     if(index == 0)
@@ -135,7 +135,7 @@ namespace UAlbion.Core.Visual
                 }
                 else
                 {
-                    color = texture(sampler2D(SpriteTexture, SpriteSampler), uv);
+                    color = texture(sampler2DArray(SpriteTexture, SpriteSampler), vec3(uv, fsin_1));
                 }
 
                 if(color.w == 0.0f)
@@ -266,7 +266,7 @@ namespace UAlbion.Core.Visual
 
         public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable renderable)
         {
-            float depth = gd.IsDepthRangeZeroToOne ? 0 : 1;
+            // float depth = gd.IsDepthRangeZeroToOne ? 0 : 1;
             var sprite = (MultiSprite)renderable;
             cl.PushDebugGroup($"Sprite:{sprite.Key.Texture.Name}:{sprite.Key.RenderOrder}");
             TextureView textureView = _textureManager.GetTexture(sprite.Key.Texture);

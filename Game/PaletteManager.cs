@@ -25,18 +25,14 @@ namespace UAlbion.Game
             new Handler<PaletteManager, LoadPaletteEvent>((x, e) => x.SetPalette((PaletteId)e.PaletteId))
         };
 
-        readonly Assets _assets;
         AlbionPalette _palette;
         int _ticks;
 
-        public PaletteManager(Assets assets) : base(Handlers)
-        {
-            _assets = assets;
-        }
+        public PaletteManager() : base(Handlers) { }
 
         void SetPalette(PaletteId paletteId)
         {
-            var palette = _assets.LoadPalette(paletteId);
+            var palette = Exchange.Resolve<IAssetManager>().LoadPalette(paletteId);
             if (palette == null)
             {
                 Raise(new LogEvent((int) LogEvent.Level.Error, $"Palette ID {paletteId} could not be loaded!"));

@@ -11,6 +11,7 @@ using UAlbion.Formats.Config;
 using UAlbion.Game;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
+using UAlbion.Game.Gui;
 using UAlbion.Game.Input;
 using UAlbion.Game.State;
 using Veldrid;
@@ -59,13 +60,13 @@ namespace UAlbion
             }
         }
 
-        static void RunGame(Assets assets, string baseDir)
+        static void RunGame(IAssetManager assets, string baseDir)
         {
             var backend =
                 //VeldridStartup.GetPlatformDefaultBackend()
                 //GraphicsBackend.Metal /*
-                GraphicsBackend.Vulkan /*
-                GraphicsBackend.OpenGL /*
+                //GraphicsBackend.Vulkan /*
+                //GraphicsBackend.OpenGL /*
                 //GraphicsBackend.OpenGLES /*
                 GraphicsBackend.Direct3D11 /*
                 //*/
@@ -79,8 +80,9 @@ namespace UAlbion
             {
                 InputConfig inputConfig = InputConfig.Load(baseDir);
 
+                engine.GlobalExchange.Register<IAssetManager>(assets);
                 engine.GlobalExchange.Register<IStateManager>(new StateManager());
-                engine.GlobalExchange.Register<ISpriteResolver>(new SpriteResolver(assets));
+                engine.GlobalExchange.Register<ISpriteResolver>(new SpriteResolver());
                 engine.GlobalExchange.Register<ITextureManager>(new TextureManager());
 
                 var mapExchange = new EventExchange("Maps", engine.GlobalExchange);
@@ -88,14 +90,14 @@ namespace UAlbion
 
                 engine.AddRenderer(new SpriteRenderer());
                 engine.AddRenderer(new ExtrudedTileMapRenderer());
-                engine.AddScene(Scenes.Create2DScene(assets, sceneExchange));
-                engine.AddScene(Scenes.Create3DScene(assets, sceneExchange));
+                engine.AddScene(Scenes.CreateMenuScene(sceneExchange));
+                engine.AddScene(Scenes.Create2DScene(sceneExchange));
+                engine.AddScene(Scenes.Create3DScene(sceneExchange));
 
                 engine.GlobalExchange
-                    .Attach(assets)
                     .Attach(new ConsoleLogger())
                     .Attach(new GameClock())
-                    .Attach(new MapManager(assets, mapExchange))
+                    .Attach(new MapManager(mapExchange))
                     .Attach(new DebugMapInspector())
                     .Attach(new World2DInputMode())
                     .Attach(new DebugPickInputMode())
@@ -104,31 +106,30 @@ namespace UAlbion
                     .Attach(new InputBinder(inputConfig))
                     .Attach(new InputModeStack())
                     .Attach(new SceneStack())
-                    .Attach(new CursorManager(assets))
-                    .Attach(new PaletteManager(assets))
+                    .Attach(new CursorManager())
+                    .Attach(new PaletteManager())
                     //.Attach(new Text(assets.LoadFont(MetaFontId.FontColor.White, false), "Hello world", Vector2.Zero))
                     //.Attach(new Text(assets.LoadFont(MetaFontId.FontColor.Red, true), "Test test test", new Vector2(0, -0.2f)))
                     //.Attach(new Text(assets.LoadFont(MetaFontId.FontColor.Yellow, false), "Warning!", new Vector2(0, -0.4f)))
                     ;
 
+                /*
                 engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.AltesFormergebäude), null); /*
                 engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.Jirinaar3D), null); /*
                 engine.GlobalExchange.Raise(new LoadMapEvent((int)MapDataId.HausDesJägerclans), null); //*/
 
-                /*
+                //*
+
                 var menu = new MainMenu();
-                scene.AddComponent(menu);
+                var background = new ScreenSpaceSprite<PictureId>(PictureId.MenuBackground8, new Vector2(0.0f, 1.0f), new Vector2(2.0f, -1.6f));
+                var status = new ScreenSpaceSprite<PictureId>(PictureId.StatusBar, new Vector2(0.0f, -0.6f), new Vector2(2.0f, -0.4f));
+                engine.GlobalExchange
+                    .Attach(menu)
+                    .Attach(background)
+                    .Attach(status);
 
-                var background = new Billboard2D<PictureId>(PictureId.MenuBackground8, 0)
-                {
-                    Position = new Vector2(-1.0f, 1.0f),
-                    Size = new Vector2(2.0f, -2.0f)
-                };
-                engine.AddComponent(background);
-
-                var statusBackground = assets.LoadPicture(PictureId.StatusBar);
-                var status = new SpriteRenderer(statusBackground, new Vector2(0.0f, 0.8f), new Vector2(1.0f, 0.2f));
-                scene.AddRenderable(status);
+                engine.GlobalExchange.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
+                engine.GlobalExchange.Raise(new SetCursorEvent((int)CoreSpriteId.Cursor), null);
                 //*/
                 engine.Run();
             }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
@@ -12,8 +11,6 @@ namespace UAlbion.Game.Entities
 {
     public class Map3D : Component, IMap
     {
-        readonly Skybox _skybox;
-        readonly MapRenderable3D _renderable;
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<Map3D, SubscribedEvent>((x, e) => x.Subscribed()),
@@ -21,20 +18,32 @@ namespace UAlbion.Game.Entities
             // new Handler<Map3D, UnloadMapEvent>((x, e) => x.Unload()),
         };
 
-        readonly LabyrinthData _labyrinthData;
-        readonly MapData3D _mapData;
-        readonly float _backgroundRed;
-        readonly float _backgroundGreen;
-        readonly float _backgroundBlue;
+        Skybox _skybox;
+        MapRenderable3D _renderable;
+        LabyrinthData _labyrinthData;
+        MapData3D _mapData;
+        float _backgroundRed;
+        float _backgroundGreen;
+        float _backgroundBlue;
 
         void Select(WorldCoordinateSelectEvent worldCoordinateSelectEvent)
         {
         }
 
-        public Map3D(Assets assets, MapDataId mapId) : base(Handlers)
+        public Map3D(MapDataId mapId) : base(Handlers)
         {
             MapId = mapId;
-            _mapData = assets.LoadMap3D(mapId);
+        }
+
+        public override string ToString() => $"Map3D:{MapId} {LogicalSize.X}x{LogicalSize.Y} TileSize: {TileSize}";
+        public MapDataId MapId { get; }
+        public Vector2 LogicalSize { get; private set; }
+        public Vector3 TileSize { get; private set; }
+
+        void Subscribed()
+        {
+            var assets = Exchange.Resolve<IAssetManager>();
+            _mapData = assets.LoadMap3D(MapId);
 
             _labyrinthData = assets.LoadLabyrinthData(_mapData.LabDataId);
             if (_labyrinthData != null)
@@ -54,15 +63,7 @@ namespace UAlbion.Game.Entities
             }
             else
                 TileSize = Vector3.One * 512;
-        }
 
-        public override string ToString() => $"Map3D:{MapId} {LogicalSize.X}x{LogicalSize.Y} TileSize: {TileSize}";
-        public MapDataId MapId { get; }
-        public Vector2 LogicalSize { get; }
-        public Vector3 TileSize { get; }
-
-        void Subscribed()
-        {
             if (_skybox != null) Exchange.Attach(_skybox);
             if (_renderable != null) Exchange.Attach(_renderable);
 

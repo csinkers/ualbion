@@ -11,21 +11,20 @@ namespace UAlbion.Game.Gui
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<MainMenu, EngineUpdateEvent>((x, _) => x._menuFunc()),
+            new Handler<MainMenu, SubscribedEvent>((x, _) => x.Exchange.Attach(new Frame(x._width, x._height)))
         };
 
-        // Background = AssetType.Picture
-
         Action _menuFunc;
+        int _width = 9;
+        int _height = 14;
 
-        public MainMenu() : base(Handlers)
-        {
-            _menuFunc = PrimaryMenu;
-        }
+        public MainMenu() : base(Handlers) { _menuFunc = PrimaryMenu; }
 
         void PrimaryMenu()
         {
             bool gameInProgress = false;
             const int savedGames = 0;
+            ImGui.Begin("Main Menu");
             if (savedGames > 0)
             {
                 if (ImGui.Button("Continue game"))
@@ -61,9 +60,9 @@ namespace UAlbion.Game.Gui
             }
 
             if (ImGui.Button("Quit"))
-            {
-                // TODO
-            }
+                Raise(new QuitEvent());
+
+            ImGui.End();
         }
 
         void OptionsMenu()

@@ -1,39 +1,37 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities
 {
-    public class MapObjectSprite : Component
+    public class ScreenSpaceSprite<T> : Component where T : Enum
     {
         static readonly IList<Handler> Handlers = new Handler[]
         {
-            new Handler<MapObjectSprite, RenderEvent>((x,e) => x.Render(e)),
-            new Handler<MapObjectSprite, UpdateEvent>((x, e) => x._frame += e.Frames)
+            new Handler<ScreenSpaceSprite<T>, RenderEvent>((x,e) => x.Render(e)),
+            new Handler<ScreenSpaceSprite<T>, UpdateEvent>((x, e) => x._frame += e.Frames)
             //new Handler<MapObjectSprite, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
         };
 
-        readonly DungeonObjectId _id;
+        readonly T _id;
         readonly Vector3 _position;
-        readonly bool _onFloor;
         readonly Vector2 _size;
         int _frame;
         public Vector3 Normal => Vector3.UnitZ;
 
-        public MapObjectSprite(DungeonObjectId id, Vector3 position, Vector2 size, bool onFloor) : base(Handlers)
+        public ScreenSpaceSprite(T id, Vector2 position, Vector2 size) : base(Handlers)
         {
             _id = id;
-            _position = position;
-            _onFloor = onFloor;
+            _position = new Vector3(position.X, position.Y, 0.0f);
             _size = size;
         }
 
-        public override string ToString() => $"{_id} @ {_position} {_size.X}x{_size.Y} {(_onFloor ? "FLOOR" : "")}";
+        public override string ToString() => $"{_id} @ {_position} {_size.X}x{_size.Y}";
 
         /*
         void Select(WorldCoordinateSelectEvent e)
@@ -60,13 +58,13 @@ namespace UAlbion.Game.Entities
 
         void Render(RenderEvent e)
         {
-            var sprite = new SpriteDefinition<DungeonObjectId>(
+            var sprite = new SpriteDefinition<T>(
                 _id,
                 _frame,
                 _position,
-                (int)DrawLayer.Underlay,
+                (int)DrawLayer.Interface,
                 true,
-                SpriteFlags.FlipVertical | SpriteFlags.Billboard | (_onFloor ? SpriteFlags.Floor : 0),
+                SpriteFlags.NoTransform,
                 _size);
 
             e.Add(sprite);

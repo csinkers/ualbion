@@ -1,6 +1,5 @@
-﻿using System;
-using System.Diagnostics;
-using System.Numerics;
+﻿using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
@@ -12,16 +11,12 @@ namespace UAlbion.Game.Input
     public class CursorManager : Component
     {
         const float UiScaleFactor = 4.0f; // TODO: Use config / heuristic
-        readonly Assets _assets;
         CoreSpriteId _cursorId = CoreSpriteId.Cursor;
         Vector2 _position;
         Vector2 _hotspot;
         Vector2 _size;
 
-        public CursorManager(Assets assets) : base(Handlers)
-        {
-            _assets = assets ?? throw new ArgumentNullException(nameof(assets));
-        }
+        public CursorManager() : base(Handlers) { }
 
         static readonly Handler[] Handlers = {
             new Handler<CursorManager, InputEvent>((x,e) => x._position = e.Snapshot.MousePosition - x._hotspot),
@@ -32,11 +27,13 @@ namespace UAlbion.Game.Input
 
         void SetCursor(CoreSpriteId id)
         {
-            var texture = _assets.LoadTexture(id);
-            var config = _assets.LoadCoreSpriteInfo(id);
+            var assets = Exchange.Resolve<IAssetManager>();
+            var window = Exchange.Resolve<IWindowState>();
+            var texture = assets.LoadTexture(id);
+            var config = assets.LoadCoreSpriteInfo(id);
             _cursorId = id;
             _size = new Vector2(texture.Width, texture.Height);
-            _hotspot = new Vector2(config.Hotspot.X, config.Hotspot.Y);
+            _hotspot = window.GuiScale * new Vector2(config.Hotspot.X, config.Hotspot.Y);
         }
 
         void Render(RenderEvent e)
@@ -45,7 +42,7 @@ namespace UAlbion.Game.Input
             if (windowSize.X < 1 || windowSize.Y < 1)
                 return;
 
-            var drawLayer = DrawLayer.Interface;
+            var drawLayer = DrawLayer.MaxLayer;
             //if (((_position + _hotspot) - windowSize / 2).LengthSquared() > 1)
             //    Debugger.Break();
 

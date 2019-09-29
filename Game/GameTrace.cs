@@ -2,6 +2,7 @@
 
 namespace UAlbion.Game
 {
+    [EventSource(Name="UAlbion-GameTrace")]
     class GameTrace : EventSource
     {
         public static GameTrace Log { get; } = new GameTrace();

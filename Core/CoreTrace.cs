@@ -3,6 +3,7 @@ using System.Diagnostics.Tracing;
 
 namespace UAlbion.Core
 {
+    [EventSource(Name="UAlbion-CoreTrace")]
     class CoreTrace : EventSource
     {
         public static CoreTrace Log { get; } = new CoreTrace();
@@ -36,9 +37,9 @@ namespace UAlbion.Core
             WriteEvent(4, frameCount, deltaMicroseconds);
         }
 
-        public void CollectedRenderables(string renderer, int count)
+        public void CollectedRenderables(string renderer, int layerCount, int renderableCount)
         {
-            WriteEvent(5, renderer, count);
+            WriteEvent(5, renderer, layerCount, renderableCount);
         }
 
         public void StartDebugGroup(string name)

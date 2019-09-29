@@ -16,7 +16,6 @@ namespace UAlbion.Game
             new Handler<MapManager, BeginFrameEvent>((x, e) => x.LoadMap()), 
         };
 
-        readonly Assets _assets;
         readonly EventExchange _mapExchange;
         MapDataId? _pendingMapChange;
 
@@ -37,11 +36,12 @@ namespace UAlbion.Game
                 exchange.IsActive = false;
             _mapExchange.PruneInactiveChildren();
 
-            var mapData2D = _assets.LoadMap2D(_pendingMapChange.Value);
+            var assets = Exchange.Resolve<IAssetManager>();
+            var mapData2D = assets.LoadMap2D(_pendingMapChange.Value);
             if (mapData2D != null)
             {
                 var exchange = new EventExchange(_pendingMapChange.Value.ToString(), _mapExchange);
-                var map = new Map2D(_assets, _pendingMapChange.Value);
+                var map = new Map2D(_pendingMapChange.Value);
                 Raise(new SetSceneEvent((int)SceneId.World2D)); // Set the scene first to ensure scene-local components from other scenes are disabled.
                 exchange.Attach(map);
                 Raise(new SetInputModeEvent((int)InputMode.World2D));
@@ -49,11 +49,11 @@ namespace UAlbion.Game
                 Raise(new LogEvent((int)LogEvent.Level.Info, $"Loaded map {(int)_pendingMapChange}: {_pendingMapChange}"));
             }
 
-            var mapData3D = _assets.LoadMap3D(_pendingMapChange.Value);
+            var mapData3D = assets.LoadMap3D(_pendingMapChange.Value);
             if (mapData3D != null)
             {
                 var exchange = new EventExchange(_pendingMapChange.Value.ToString(), _mapExchange);
-                var map = new Map3D(_assets, _pendingMapChange.Value);
+                var map = new Map3D(_pendingMapChange.Value);
                 Raise(new SetSceneEvent((int)SceneId.World3D)); // Set the scene first to ensure scene-local components from other scenes are disabled.
                 exchange.Attach(map);
                 Raise(new SetInputModeEvent((int)InputMode.MouseLook));
@@ -64,9 +64,8 @@ namespace UAlbion.Game
             _pendingMapChange = null;
         }
 
-        public MapManager(Assets assets, EventExchange mapExchange) : base(Handlers)
+        public MapManager(EventExchange mapExchange) : base(Handlers)
         {
-            _assets = assets;
             _mapExchange = mapExchange;
         }
     }

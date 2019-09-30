@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ImGuiNET;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Gui
 {
@@ -11,7 +12,27 @@ namespace UAlbion.Game.Gui
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<MainMenu, EngineUpdateEvent>((x, _) => x._menuFunc()),
-            new Handler<MainMenu, SubscribedEvent>((x, _) => x.Exchange.Attach(new Frame(x._width, x._height)))
+            new Handler<MainMenu, SubscribedEvent>((x, _) =>
+            {
+                var assets = x.Exchange.Resolve<IAssetManager>();
+                var settings = x.Exchange.Resolve<ISettings>();
+                string S(SystemTextId id) => assets.LoadString(id, settings.Language);
+
+                x.Exchange.Attach(new Frame(x._width, x._height));
+                var header = new Header(0, 0, x._width - 2, 1, S(SystemTextId.MainMenu_MainMenu));
+                var divider = new Divider();
+                var buttons = new[]
+                    {
+                    new Button(0, 0, x._width-2, 1, S(SystemTextId.MainMenu_ContinueGame)),
+                    new Button(0, 0, x._width-2, 1, S(SystemTextId.MainMenu_NewGame)),
+                    new Button(0, 0, x._width-2, 1, S(SystemTextId.MainMenu_LoadGame)),
+                    new Button(0, 0, x._width-2, 1, S(SystemTextId.MainMenu_SaveGame)),
+                    new Button(0, 0, x._width-2, 1, S(SystemTextId.MainMenu_Options)),
+                    new Button(0, 0, x._width-2, 1, S(SystemTextId.MainMenu_ViewIntro)),
+                    new Button(0, 0, x._width-2, 1, S(SystemTextId.MainMenu_Credits)),
+                    new Button(0, 0, x._width-2, 1, S(SystemTextId.MainMenu_QuitGame)),
+                };
+            })
         };
 
         Action _menuFunc;

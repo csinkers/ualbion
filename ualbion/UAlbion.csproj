@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Core\UAlbion.Core.csproj" />
     <ProjectReference Include="..\Formats\UAlbion.Formats.csproj" />
     <ProjectReference Include="..\Game\UAlbion.Game.csproj" />

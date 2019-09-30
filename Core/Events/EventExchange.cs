@@ -164,7 +164,7 @@ namespace UAlbion.Core.Events
             }
         }
 
-        public void Register<T>(T system)
+        public EventExchange Register<T>(T system)
         {
             if(_registrations.ContainsKey(typeof(T)))
                 throw new InvalidOperationException("Only one instance can be registered per type / interface in a given exchange.");
@@ -172,6 +172,8 @@ namespace UAlbion.Core.Events
 
             if(system is IComponent component && !_subscribers.ContainsKey(component))
                 Attach(component);
+
+            return this;
         }
 
         public T Resolve<T>()

@@ -14,44 +14,6 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
-    public interface IAssetManager
-    {
-        ITexture LoadTexture(AssetType type, int id);
-        ITexture LoadTexture(AutoMapId id);
-        ITexture LoadTexture(CombatBackgroundId id);
-        ITexture LoadTexture(CombatGraphicsId id);
-        ITexture LoadTexture(DungeonBackgroundId id);
-        ITexture LoadTexture(DungeonFloorId id);
-        ITexture LoadTexture(DungeonObjectId id);
-        ITexture LoadTexture(DungeonOverlayId id);
-        ITexture LoadTexture(DungeonWallId id);
-        ITexture LoadTexture(FullBodyPictureId id);
-        ITexture LoadTexture(IconDataId id);
-        ITexture LoadTexture(IconGraphicsId id);
-        ITexture LoadTexture(ItemId id);
-        ITexture LoadTexture(LargeNpcId id);
-        ITexture LoadTexture(LargePartyGraphicsId id);
-        ITexture LoadTexture(MonsterGraphicsId id);
-        ITexture LoadTexture(PictureId id);
-        ITexture LoadTexture(SmallNpcId id);
-        ITexture LoadTexture(SmallPartyGraphicsId id);
-        ITexture LoadTexture(SmallPortraitId id);
-        ITexture LoadTexture(TacticId id);
-        ITexture LoadTexture(FontId id);
-        ITexture LoadTexture(MetaFontId id);
-        ITexture LoadTexture(CoreSpriteId id);
-        ITexture LoadFont(MetaFontId.FontColor color, bool isBold);
-        TilesetData LoadTileData(IconDataId id);
-        LabyrinthData LoadLabyrinthData(LabyrinthDataId id);
-        CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id);
-        string LoadString(AssetType type, int id, GameLanguage language, int subItem);
-        AlbionSample LoadSample(AssetType type, int id);
-        AlbionVideo LoadVideo(VideoId id, GameLanguage language);
-        AlbionPalette LoadPalette(PaletteId id);
-        MapData2D LoadMap2D(MapDataId id);
-        MapData3D LoadMap3D(MapDataId id);
-    }
-
     public class Assets : Component, IDisposable, IAssetManager
     {
         public Assets(AssetConfig assetConfig, CoreSpriteConfig coreSpriteConfig) : base(Handlers)
@@ -92,10 +54,10 @@ namespace UAlbion.Game
             { AssetType.BlockList,          (AssetLocation.Base,      "BLKLIST!.XLD") }, //
             { AssetType.PartyCharacterData, (AssetLocation.Initial,   "PRTCHAR!.XLD") }, //
             { AssetType.SmallPortrait,      (AssetLocation.Base,      "SMLPORT!.XLD") }, // Texture
-            { AssetType.SystemTexts,        (AssetLocation.Localised, "SYSTEXTS"    ) }, // Strings
+            { AssetType.SystemText,         (AssetLocation.LocalisedRaw, "SYSTEXTS" ) }, // Strings
             { AssetType.EventSet,           (AssetLocation.Base,      "EVNTSET!.XLD") }, //
-            { AssetType.EventTexts,         (AssetLocation.Localised, "EVNTTXT!.XLD") }, // Strings
-            { AssetType.MapTexts,           (AssetLocation.Localised, "MAPTEXT!.XLD") }, // Strings
+            { AssetType.EventText,          (AssetLocation.Localised, "EVNTTXT!.XLD") }, // Strings
+            { AssetType.MapText,            (AssetLocation.Localised, "MAPTEXT!.XLD") }, // Strings
             { AssetType.ItemList,           (AssetLocation.Base,      "ITEMLIST.DAT") }, //
             { AssetType.ItemNames,          (AssetLocation.Base,      "ITEMNAME.DAT") }, // Strings
             { AssetType.ItemGraphics,       (AssetLocation.BaseRaw,   "ITEMGFX"     ) }, // Texture
@@ -173,25 +135,25 @@ namespace UAlbion.Game
                 case AssetLocation.Localised:
                     result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, lang, baseName);
                     result.OverridePath = Path.Combine(_assetConfig.BaseDataPath, lang, baseName, objectNumber.ToString());
-                    result.XldNameInConfig = "$(LANG)\\" + baseName;
+                    result.XldNameInConfig = "$(LANG)/" + baseName;
                     break;
 
                 case AssetLocation.LocalisedRaw:
                     result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, lang, baseName);
                     result.OverridePath = Try(Path.Combine(_assetConfig.BaseDataPath, lang, baseName));
-                    result.XldNameInConfig = "$(LANG)\\" + baseName;
+                    result.XldNameInConfig = "$(LANG)/" + baseName;
                     break;
 
                 case AssetLocation.Initial:
                     result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, "INITIAL", baseName);
                     result.OverridePath = Path.Combine(_assetConfig.BaseDataPath, "INITIAL", baseName, objectNumber.ToString());
-                    result.XldNameInConfig = "INITIAL\\" + baseName;
+                    result.XldNameInConfig = "INITIAL/" + baseName;
                     break;
 
                 case AssetLocation.Current:
                     result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, "CURRENT", baseName);
                     result.OverridePath = Path.Combine(_assetConfig.BaseDataPath, "CURRENT", baseName, objectNumber.ToString());
-                    result.XldNameInConfig = "INITIAL\\" + baseName; // Note: Use the same metadata for CURRENT & INITIAL
+                    result.XldNameInConfig = "INITIAL/" + baseName; // Note: Use the same metadata for CURRENT & INITIAL
                     break;
 
                 default: throw new ArgumentOutOfRangeException("Invalid asset location");
@@ -374,9 +336,13 @@ namespace UAlbion.Game
 
         public string LoadString(AssetType type, int id, GameLanguage language, int subItem)
         {
-            var stringTable = (IDictionary<int, string>)LoadAssetCached(AssetType.MapData, id, language);
+            var stringTable = (IDictionary<int, string>)LoadAssetCached(type, id, language);
             return stringTable[subItem];
         }
+
+        public string LoadString(SystemTextId id, GameLanguage language) => LoadString(AssetType.SystemText, 0, language, (int)id);
+        public string LoadString(WordId id, GameLanguage language) => LoadString(AssetType.Dictionary, (int)id / 500, language, (int)id);
+
         public AlbionSample LoadSample(AssetType type, int id) => (AlbionSample)LoadAssetCached(type, id);
         public AlbionVideo LoadVideo(VideoId id, GameLanguage language) => (AlbionVideo) LoadAsset(AssetType.Flic, (int)id, $"Video:{id}", language); // Don't cache videos.
 

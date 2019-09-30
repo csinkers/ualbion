@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using System.Text;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
@@ -22,6 +23,8 @@ namespace UAlbion
     {
         static unsafe void Main()
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
+
             /*
             Console.WriteLine("Entry point reached. Press enter to continue");
             Console.ReadLine(); //*/
@@ -80,10 +83,12 @@ namespace UAlbion
             {
                 InputConfig inputConfig = InputConfig.Load(baseDir);
 
-                engine.GlobalExchange.Register<IAssetManager>(assets);
-                engine.GlobalExchange.Register<IStateManager>(new StateManager());
-                engine.GlobalExchange.Register<ISpriteResolver>(new SpriteResolver());
-                engine.GlobalExchange.Register<ITextureManager>(new TextureManager());
+                engine.GlobalExchange
+                    .Register<IAssetManager>(assets)
+                    .Register<IStateManager>(new StateManager())
+                    .Register<ISpriteResolver>(new SpriteResolver())
+                    .Register<ITextureManager>(new TextureManager())
+                    .Register<ISettings>(new Settings());
 
                 var mapExchange = new EventExchange("Maps", engine.GlobalExchange);
                 var sceneExchange = new EventExchange("Scenes", engine.GlobalExchange);
@@ -113,13 +118,12 @@ namespace UAlbion
                     //.Attach(new Text(assets.LoadFont(MetaFontId.FontColor.Yellow, false), "Warning!", new Vector2(0, -0.4f)))
                     ;
 
-                //*
+                /*
                 engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude), null); /*
                 engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.Jirinaar3D), null); /*
                 engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.HausDesJägerclans), null); //*/
 
-                /*
-
+                //*
                 var menu = new MainMenu();
                 var background = new ScreenSpaceSprite<PictureId>(PictureId.MenuBackground8, new Vector2(0.0f, 1.0f), new Vector2(2.0f, -1.6f));
                 var status = new ScreenSpaceSprite<PictureId>(PictureId.StatusBar, new Vector2(0.0f, -0.6f), new Vector2(2.0f, -0.4f));

@@ -2,6 +2,6 @@
 {
     class LoadGameScreen : GuiElement
     {
-        readonly AlbionButton[] _slots = new AlbionButton[10];
+        readonly Button[] _slots = new Button[10];
     }
 }

@@ -1,27 +1,27 @@
 ﻿namespace UAlbion.Game.Gui
 {
-    internal class AlbionSliderThumb : GuiElement
+    internal class SliderThumb : GuiElement
     {
-        AlbionSlider _owner;
+        Slider _owner;
 
-        public AlbionSliderThumb(AlbionSlider owner)
+        public SliderThumb(Slider owner)
         {
             _owner = owner;
         }
     }
 
-    internal class AlbionSlider : GuiElement
+    internal class Slider : GuiElement
     {
         int _value = 0;
         int _min = 0;
         int _max = 100;
-        readonly AlbionButton _lessButton = new AlbionButton();
-        readonly AlbionButton _moreButton = new AlbionButton();
-        readonly AlbionSliderThumb _thumb;
+        // readonly Button _lessButton = new Button();
+        // readonly Button _moreButton = new Button();
+        readonly SliderThumb _thumb;
 
-        public AlbionSlider()
+        public Slider()
         {
-            _thumb = new AlbionSliderThumb(this);
+            _thumb = new SliderThumb(this);
         }
     }
 }

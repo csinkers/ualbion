@@ -17,7 +17,7 @@ namespace UAlbion.Game.Gui
 
             class Page2 : GuiElement // Stats
             {
-                AlbionHeader _attributes = new AlbionHeader("Attributes");
+                Header _attributes = new Header("Attributes");
                 AlbionIndicator _strength;
                 AlbionIndicator _intelligence;
                 AlbionIndicator _dexterity;
@@ -27,7 +27,7 @@ namespace UAlbion.Game.Gui
                 AlbionIndicator _magicResistance;
                 AlbionIndicator _magicTalent;
 
-                AlbionHeader _skills;
+                Header _skills;
                 AlbionIndicator _closeCombat;
                 AlbionIndicator _rangedCombat;
                 AlbionIndicator _criticalChance;
@@ -36,32 +36,32 @@ namespace UAlbion.Game.Gui
 
             class Page3 : GuiElement
             {
-                AlbionHeader _conditionsHeader;
+                Header _conditionsHeader;
                 AlbionLabel _conditions;
-                AlbionHeader _languagesHeader;
+                Header _languagesHeader;
                 AlbionLabel _languages;
-                AlbionHeader _temporarySpellsHeader;
+                Header _temporarySpellsHeader;
                 AlbionLabel _temporarySpells;
 
-                AlbionButton _combatPositions;
+                Button _combatPositions;
             }
-            AlbionButton _page1Button;
-            AlbionButton _page2Button;
-            AlbionButton _page3Button;
+            Button _page1Button;
+            Button _page2Button;
+            Button _page3Button;
         }
 
         class ChestLeftPane
         {
-            readonly AlbionHeader _chestHeader = new AlbionHeader("Chest");
+            readonly Header _chestHeader = new Header("Chest");
             InventoryButton[] _inventory = new InventoryButton[24]; // 6x4
-            AlbionButton _money;
-            AlbionButton _food;
-            //TODO: AlbionButton _takeAll;
+            Button _money;
+            Button _food;
+            //TODO: Button _takeAll;
         }
 
         class MidPane : GuiElement
         {
-            AlbionHeader _name;
+            Header _name;
             InventoryButton _head;
             InventoryButton _neck;
             InventoryButton _torso;
@@ -80,10 +80,10 @@ namespace UAlbion.Game.Gui
         class RightPane
         {
             readonly InventoryButton[] _inventory = new InventoryButton[24]; // 4x6
-            AlbionHeader _backpack;
-            AlbionButton _money;
-            AlbionButton _food;
-            AlbionButton _exit;
+            Header _backpack;
+            Button _money;
+            Button _food;
+            Button _exit;
         }
 
         bool _isChest;

@@ -2,8 +2,8 @@
 {
     public class GuiElement
     {
-        GuiElement _parent;
-        (int,int) _position;
-        int _width, _height;
+        protected GuiElement _parent;
+        protected (int,int) _position;
+        protected int _width, _height;
     }
 }

@@ -25,6 +25,7 @@
 
         // Text
         StringTable,
+        SystemText,
         Script,
 
         // Misc

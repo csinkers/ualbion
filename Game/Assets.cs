@@ -289,7 +289,7 @@ namespace UAlbion.Game
             }
             catch(Exception e)
             {
-                Raise(new LogEvent((int)LogEvent.Level.Error, $"Could not load asset {name}: {e}"));
+                Raise(new LogEvent(LogEvent.Level.Error, $"Could not load asset {name}: {e}"));
                 asset = e;
             }
 

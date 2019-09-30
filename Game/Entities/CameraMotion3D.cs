@@ -15,7 +15,6 @@ namespace UAlbion.Game.Entities
             {
                 x._camera.Position = new Vector3(e.X * x._tileSize.X, x._height, e.Y * x._tileSize.Y);
             }),
-            new Handler<CameraMotion3D, SetCameraPositionEvent>((x,e) => {}),
             new Handler<CameraMotion3D, CameraMoveEvent>((x, e) => x._velocity += new Vector3(e.X, 0, e.Y) * x._tileSize),
             new Handler<CameraMotion3D, CameraRotateEvent>((x, e) => {
                 x._camera.Yaw += e.Yaw;

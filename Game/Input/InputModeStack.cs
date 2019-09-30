@@ -12,7 +12,7 @@ namespace UAlbion.Game.Input
             new Handler<InputModeStack, PushInputModeEvent>((x, e) =>
             {
                 x._stack.Push(x._currentMode);
-                x.Raise(new SetInputModeEvent((int)e.Mode));
+                x.Raise(new SetInputModeEvent(e.Mode));
                 x._currentMode = e.Mode;
             }),
             new Handler<InputModeStack, PopInputModeEvent>((x, e) =>
@@ -20,7 +20,7 @@ namespace UAlbion.Game.Input
                 if (x._stack.Count > 0)
                 {
                     var newMode = x._stack.Pop();
-                    x.Raise(new SetInputModeEvent((int) newMode));
+                    x.Raise(new SetInputModeEvent(newMode));
                     x._currentMode = newMode;
                 }
             }),

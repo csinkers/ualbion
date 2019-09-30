@@ -19,7 +19,10 @@ namespace UAlbion.Core
             new Handler<Engine, LoadRenderDocEvent>((x, _) =>
             {
                 if (_renderDoc == null && RenderDoc.Load(out _renderDoc))
+                {
+                    _renderDoc.OverlayEnabled = false;
                     x.ChangeBackend(x.GraphicsDevice.BackendType, true);
+                }
             }),
             new Handler<Engine, QuitEvent>((x, e) => x._done = true),
             new Handler<Engine, SubscribedEvent>((x, _) => x.Exchange.Register<IWindowState>(x)),
@@ -27,6 +30,7 @@ namespace UAlbion.Core
             new Handler<Engine, ToggleFullscreenEvent>((x, _) => x.ToggleFullscreenState()),
             new Handler<Engine, ToggleResizableEvent>((x, _) => x.Window.Resizable = !x.Window.Resizable),
             new Handler<Engine, ToggleVisibleBorderEvent>((x, _) => x.Window.BorderVisible = !x.Window.BorderVisible),
+            new Handler<Engine, RunRenderDocEvent>((x,_) => _renderDoc?.LaunchReplayUI())
         };
 
         static RenderDoc _renderDoc;

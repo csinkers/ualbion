@@ -58,6 +58,9 @@ namespace UAlbion.Core.Events
 
         void CollectExchanges(ISet<EventExchange> exchanges)
         {
+            if (!IsActive)
+                return;
+
             if (!exchanges.Add(this))
                 return;
 

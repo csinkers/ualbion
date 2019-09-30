@@ -66,7 +66,7 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        void Subscribed() { Raise(new LoadPaletteEvent((int)_mapData.PaletteId)); }
+        void Subscribed() { Raise(new LoadPaletteEvent(_mapData.PaletteId)); }
 
         void SetTile(int index, int order, int frame)
         {

@@ -11,7 +11,11 @@ namespace UAlbion.Game.Entities
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<CameraMotion2D, BeginFrameEvent>((x, e) => x._velocity = Vector2.Zero),
-            new Handler<CameraMotion2D, CameraJumpEvent>((x, e) => x.Raise(new SetCameraPositionEvent(new Vector3(e.X * x._tileSize.X, e.Y * x._tileSize.Y,x._height)))),
+            new Handler<CameraMotion2D, CameraJumpEvent>((x, e) =>
+            {
+                x._position = new Vector2(e.X * x._tileSize.X, e.Y * x._tileSize.Y);
+                x._camera.Position = new Vector3(x._position, x._height);
+            }),
             new Handler<CameraMotion2D, CameraMoveEvent>((x, e) => x._velocity += new Vector2(e.X * x._tileSize.X, e.Y * x._tileSize.Y)),
             new Handler<CameraMotion2D, SetTileSizeEvent>((x, e) =>
             {
@@ -21,11 +25,11 @@ namespace UAlbion.Game.Entities
             new Handler<CameraMotion2D, EngineUpdateEvent>((x, e) =>
             {
                 x._position += new Vector2(x._velocity.X, x._velocity.Y) * e.DeltaSeconds;
-                x.Raise(new SetCameraPositionEvent(new Vector3(x._position, 1.0f)));
+                x._camera.Position = new Vector3(x._position, x._height);
             }),
         };
 
-        OrthographicCamera _camera;
+        readonly OrthographicCamera _camera;
         Vector2 _position;
         Vector2 _velocity;
         Vector2 _tileSize = Vector2.One;

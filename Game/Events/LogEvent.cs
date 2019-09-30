@@ -15,12 +15,12 @@ namespace UAlbion.Game.Events
         }
 
         [EventPart("severity", "The severity of the log event (0=Verbose, 1=Info, 2=Warning, 3=Error, 4=Critical)")]
-        public int Severity { get; }
+        public Level Severity { get; }
 
         [EventPart("msg", "The log message")]
         public string Message { get; }
 
-        public LogEvent(int severity, string message)
+        public LogEvent(Level severity, string message)
         {
             Severity = severity;
             Message = message;

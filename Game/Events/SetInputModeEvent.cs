@@ -6,14 +6,12 @@ namespace UAlbion.Game.Events
     [Event("set_input_mode", "Emitted to change the currently active input mode")]
     public class SetInputModeEvent : GameEvent
     {
-        public SetInputModeEvent(int mode)
+        public SetInputModeEvent(InputMode mode)
         {
-            RawMode = mode;
+            Mode = mode;
         }
 
         [EventPart("mode")]
-        public int RawMode { get; }
-
-        public InputMode Mode => (InputMode) RawMode;
+        public InputMode Mode { get; }
     }
 }

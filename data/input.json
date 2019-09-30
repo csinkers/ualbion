@@ -11,6 +11,7 @@
         "F10": "update 1",
         "Control+A": "!loadnextmap",
         "Control+X": "!loadprevmap",
+        "Pause":  "e:renderdoc",
 
         "W": "+camera_move  0 -2",
         "A": "+camera_move -2  0",

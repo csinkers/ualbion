@@ -69,8 +69,15 @@ namespace UAlbion.Api
                     var method = GetType().GetMethod("ParseNullableBool", BindingFlags.NonPublic | BindingFlags.Static);
                     Parser = Expression.Call(method, part);
                 }
+                else if (PropertyType.IsEnum)
+                {
+                    var method = GetType().GetMethod("ParseEnum", BindingFlags.NonPublic | BindingFlags.Static);
+                    var generic = method.MakeGenericMethod(PropertyType);
+                    Parser = Expression.Call(generic, part);
+                }
                 else throw new NotImplementedException();
             }
+
             static int? ParseNullableInt(string s)
             {
                 if (string.IsNullOrEmpty(s))
@@ -84,6 +91,8 @@ namespace UAlbion.Api
                     return null;
                 return bool.Parse(s);
             }
+
+            static T ParseEnum<T>(string s) => (T)Enum.Parse(typeof(T), s, true);
         }
 
         public class EventMetadata

@@ -23,8 +23,7 @@ namespace UAlbion.Game.State
         {
             new Handler<StateManager, UpdateEvent>((x, e) => { x.FrameCount += e.Frames; }),
             new Handler<StateManager, SetTileSizeEvent>((x, e) => { x.TileSize = e.TileSize; }),
-            new Handler<StateManager, LoadPaletteEvent>((x, e) => { x.PaletteId = (PaletteId)e.PaletteId; }),
-            new Handler<StateManager, SetCameraPositionEvent>((x, e) => x.CameraPosition = e.Position),
+            new Handler<StateManager, LoadPaletteEvent>((x, e) => { x.PaletteId = e.PaletteId; }),
             new Handler<StateManager, SetCameraDirectionEvent>((x, e) => x.CameraDirection = new Vector2(e.Yaw, e.Pitch)),
             new Handler<StateManager, SetCameraMagnificationEvent>((x, e) => x.CameraMagnification = e.Magnification),
         };

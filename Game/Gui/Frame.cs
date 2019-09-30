@@ -39,6 +39,8 @@ namespace UAlbion.Game.Gui
             var assets = Exchange.Resolve<IAssetManager>();
             var sprites = new List<IRenderable>();
             var multi = new MultiTexture("MainMenu", assets.LoadPalette(PaletteId.Main3D).GetCompletePalette());
+            var background = assets.LoadTexture(CoreSpriteId.UiBackground);
+            multi.AddTexture(1, background, 6, 6, 0, true, (uint)(16 * _width - 12), (uint)(16 * _height - 12));
             for (int j = 0; j < _height; j++)
             {
                 for (int i = 0; i < _width; i++)
@@ -70,8 +72,10 @@ namespace UAlbion.Game.Gui
                             true);
                     }
 
+                    /*
                     if(i % 2 == 0 && j % 4 == 0) // Background is 32x64 compared to 16x16 for the corners
                         Set(CoreSpriteId.UiBackground, 6);
+                    */
 
                     if (j == 0)
                     {

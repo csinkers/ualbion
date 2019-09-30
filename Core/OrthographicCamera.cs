@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core.Events;
-using Veldrid;
 
 namespace UAlbion.Core
 {
@@ -10,11 +9,6 @@ namespace UAlbion.Core
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<OrthographicCamera, ScreenCoordinateSelectEvent>((x, e) => x.TransformSelect(e)),
-            new Handler<OrthographicCamera, SetCameraPositionEvent>((x, e) =>
-            {
-                x._position = e.Position;
-                x.UpdateViewMatrix();
-            }),
             new Handler<OrthographicCamera, MagnifyEvent>((x, e) =>
             {
                 if (x._magnification < 1.0f && e.Delta > 0)
@@ -73,8 +67,6 @@ namespace UAlbion.Core
             UpdatePerspectiveMatrix();
             UpdateViewMatrix();
         }
-
-        public void UpdateBackend(GraphicsDevice gd) { UpdatePerspectiveMatrix(); }
 
         void UpdatePerspectiveMatrix()
         {

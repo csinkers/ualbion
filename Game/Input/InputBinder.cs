@@ -4,6 +4,7 @@ using System.Linq;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 using Veldrid;
@@ -59,7 +60,7 @@ namespace UAlbion.Game.Input
         readonly IDictionary<InputMode, IDictionary<KeyBinding, string>> _bindings = new Dictionary<InputMode, IDictionary<KeyBinding, string>>();
         readonly HashSet<Key> _pressedKeys = new HashSet<Key>();
         InputMode _activeMode = InputMode.World2D;
-        int _mapId = 100;
+        MapDataId _mapId = (MapDataId)100;
 
         ModifierKeys Modifiers
         {
@@ -119,7 +120,7 @@ namespace UAlbion.Game.Input
                 }
 
                 var actionEvent = Event.Parse(action);
-                Raise(actionEvent ?? new LogEvent((int)LogEvent.Level.Error, $"The action \"{action}\" could not be parsed."));
+                Raise(actionEvent ?? new LogEvent(LogEvent.Level.Error, $"The action \"{action}\" could not be parsed."));
             }
 
             // Handle continuous bindings

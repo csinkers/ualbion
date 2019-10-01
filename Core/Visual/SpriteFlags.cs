@@ -15,6 +15,7 @@ namespace UAlbion.Core.Visual
         Transparent    = 0x80,
         FlipVertical   = 0x100,
         Floor          = 0x200,
-        Billboard      = 0x400
+        Billboard      = 0x400,
+        DropShadow     = 0x800
     }
 }

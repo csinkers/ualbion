@@ -1,20 +1,32 @@
-﻿namespace UAlbion.Game.Gui
+﻿using System.Numerics;
+using UAlbion.Core;
+using UAlbion.Core.Events;
+using UAlbion.Formats.AssetIds;
+using UAlbion.Game.Entities;
+
+namespace UAlbion.Game.Gui
 {
-    class Header : GuiElement
+    class Header : Component
     {
-        readonly string _text;
-
-        public Header(string text)
+        static readonly Handler[] Handlers =
         {
-            _text = text;
-        }
+            new Handler<Header, SubscribedEvent>((x, _) =>
+            {
+                x.Exchange.Attach(x._text);
+            }), 
+        };
 
-        public Header(int x, int y, int w, int h, string text)
+        readonly Text _text;
+        readonly Vector2 _position;
+        int _width;
+        int _height;
+
+        public Header(Vector2 position, int w, int h, string text) :  base(Handlers)
         {
-            _position = (x, y);
+            _position = position;
             _width = w;
             _height = h;
-            _text = text;
+            _text = new Text(MetaFontId.FontColor.White, true, text, _position);
         }
     }
 }

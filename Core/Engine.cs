@@ -302,7 +302,8 @@ namespace UAlbion.Core
                 const int NominalHeight = 240;
                 float widthRatio = (float)Window.Width / NominalWidth;
                 float heightRatio = (float)Window.Height / NominalHeight;
-                return (int)(Math.Min(widthRatio, heightRatio) + 0.5f);
+                int scale = (int)(Math.Min(widthRatio, heightRatio) + 0.5f);
+                return scale == 0 ? 1 : scale;
             }
         }
     }

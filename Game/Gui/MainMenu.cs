@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using ImGuiNET;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -12,27 +13,7 @@ namespace UAlbion.Game.Gui
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<MainMenu, EngineUpdateEvent>((x, _) => x._menuFunc()),
-            new Handler<MainMenu, SubscribedEvent>((x, _) =>
-            {
-                var assets = x.Exchange.Resolve<IAssetManager>();
-                var settings = x.Exchange.Resolve<ISettings>();
-                string S(SystemTextId id) => assets.LoadString(id, settings.Language);
-
-                x.Exchange.Attach(new Frame(x._width, x._height));
-                var header = new Header(0, 0, x._width - 2, 1, S(SystemTextId.MainMenu_MainMenu));
-                var divider = new Divider();
-                var buttons = new[]
-                    {
-                    new Button(0, 0, x._width-2, 1, S(SystemTextId.MainMenu_ContinueGame)),
-                    new Button(0, 0, x._width-2, 1, S(SystemTextId.MainMenu_NewGame)),
-                    new Button(0, 0, x._width-2, 1, S(SystemTextId.MainMenu_LoadGame)),
-                    new Button(0, 0, x._width-2, 1, S(SystemTextId.MainMenu_SaveGame)),
-                    new Button(0, 0, x._width-2, 1, S(SystemTextId.MainMenu_Options)),
-                    new Button(0, 0, x._width-2, 1, S(SystemTextId.MainMenu_ViewIntro)),
-                    new Button(0, 0, x._width-2, 1, S(SystemTextId.MainMenu_Credits)),
-                    new Button(0, 0, x._width-2, 1, S(SystemTextId.MainMenu_QuitGame)),
-                };
-            })
+            new Handler<MainMenu, SubscribedEvent>((x, _) => x.Rebuild())
         };
 
         Action _menuFunc;
@@ -40,6 +21,37 @@ namespace UAlbion.Game.Gui
         int _height = 14;
 
         public MainMenu() : base(Handlers) { _menuFunc = PrimaryMenu; }
+
+        void Rebuild()
+        {
+            var assets = Exchange.Resolve<IAssetManager>();
+            var settings = Exchange.Resolve<ISettings>();
+            var window = Exchange.Resolve<IWindowState>();
+            string S(SystemTextId id) => assets.LoadString(id, settings.Language);
+
+            var frame = new Frame(_width, _height);
+            Exchange.Attach(frame);
+            var origin = frame.Position + window.GuiScale * new Vector2(-0.02f, -0.05f);
+            var grid = new Vector2(0, -window.GuiScale * 12) / window.Size;
+
+            var header = new Header(origin, _width - 2, 1, S(SystemTextId.MainMenu_MainMenu));
+            var divider = new Divider();
+            var buttons = new[]
+            {
+                new Button(origin + grid*1, 16*(_width-2), 16, S(SystemTextId.MainMenu_ContinueGame)),
+                new Button(origin + grid*2, 16*(_width-2), 16, S(SystemTextId.MainMenu_NewGame)),
+                new Button(origin + grid*3, 16*(_width-2), 16, S(SystemTextId.MainMenu_LoadGame)),
+                new Button(origin + grid*4, 16*(_width-2), 16, S(SystemTextId.MainMenu_SaveGame)),
+                new Button(origin + grid*5, 16*(_width-2), 16, S(SystemTextId.MainMenu_Options)),
+                new Button(origin + grid*6, 16*(_width-2), 16, S(SystemTextId.MainMenu_ViewIntro)),
+                new Button(origin + grid*7, 16*(_width-2), 16, S(SystemTextId.MainMenu_Credits)),
+                new Button(origin + grid*8, 16*(_width-2), 16, S(SystemTextId.MainMenu_QuitGame)),
+            };
+
+            Exchange.Attach(header);
+            foreach (var button in buttons)
+                Exchange.Attach(button);
+        }
 
         void PrimaryMenu()
         {

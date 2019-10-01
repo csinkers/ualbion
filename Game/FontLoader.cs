@@ -7,7 +7,7 @@ namespace UAlbion.Game
     {
         public static ITexture Load(MetaFontId id, ITexture regular, ITexture bold)
         {
-            var texture = (EightBitTexture)((id.IsBold) ? bold : regular);
+            var texture = (EightBitTexture)(id.IsBold ? bold : regular);
             var bytes = (byte[])texture.TextureData.Clone();
             for(int i = 0; i < bytes.Length; i++)
             {

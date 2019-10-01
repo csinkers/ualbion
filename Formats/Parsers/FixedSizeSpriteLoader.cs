@@ -71,23 +71,6 @@ namespace UAlbion.Formats.Parsers
                     Util.RotateImage(width, height,
                         new Span<byte>(sprite.PixelData, n * width * height, width * height),
                         new Span<byte>(rotatedSprite.PixelData, n * width * height, width * height));
-                    /*
-                    int x = 0;
-                    int y = 0;
-                    for (int i = 0; i < width * height; i++)
-                    {
-                        int sourceIndex = n * width * height + i;
-                        int destIndex = y * rotatedSprite.Width + x + n * width * height;
-                        rotatedSprite.PixelData[destIndex] = sprite.PixelData[sourceIndex];
-
-                        y++;
-                        if (y == rotatedFrameHeight)
-                        {
-                            y = 0;
-                            x++;
-                        }
-                    }
-                    */
                 }
 
                 return rotatedSprite;

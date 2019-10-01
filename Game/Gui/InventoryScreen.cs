@@ -17,7 +17,7 @@ namespace UAlbion.Game.Gui
 
             class Page2 : GuiElement // Stats
             {
-                Header _attributes = new Header("Attributes");
+                // Header _attributes = new Header("Attributes");
                 AlbionIndicator _strength;
                 AlbionIndicator _intelligence;
                 AlbionIndicator _dexterity;
@@ -52,7 +52,7 @@ namespace UAlbion.Game.Gui
 
         class ChestLeftPane
         {
-            readonly Header _chestHeader = new Header("Chest");
+            // readonly Header _chestHeader = new Header("Chest");
             InventoryButton[] _inventory = new InventoryButton[24]; // 6x4
             Button _money;
             Button _food;

@@ -25,7 +25,7 @@ namespace UAlbion.Core
         RgbaFloat _clearColour;
 
         int Id { get; }
-        EventExchange SceneExchange { get; }
+        public EventExchange SceneExchange { get; }
         public string Name { get; }
         public ICamera Camera { get; }
 

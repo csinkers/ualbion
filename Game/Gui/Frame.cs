@@ -21,6 +21,7 @@ namespace UAlbion.Game.Gui
         readonly int _width;
         readonly int _height;
         IRenderable[] _sprites;
+        public Vector2 Position { get; private set; }
 
         public Frame(int width, int height) : base(Handlers)
         {
@@ -100,11 +101,12 @@ namespace UAlbion.Game.Gui
             var window = Exchange.Resolve<IWindowState>();
             multi.GetSubImageDetails(multi.GetSubImageAtTime(1, 0), out var size, out var offset, out var texSize, out var layer);
             var normalisedSize = window.GuiScale * new Vector2(1, -1) * size / window.Size;
+            Position = Vector2.Zero - normalisedSize / 2;
             sprites.Add(
                 new MultiSprite(new SpriteKey(multi, (int)DrawLayer.Interface, false))
                 {
                     Instances = new[] { new SpriteInstanceData(
-                        new Vector3(Vector2.Zero - normalisedSize / 2, 0),
+                        new Vector3(Position, 0),
                         normalisedSize,
                     offset, texSize, layer, SpriteFlags.NoTransform)
                     }

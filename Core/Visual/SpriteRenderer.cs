@@ -71,7 +71,7 @@ namespace UAlbion.Core.Visual
                RedTint      = 0x10,  GreenTint     = 0x20,
                BlueTint     = 0x40,  Transparent   = 0x80 
                FlipVertical = 0x100, FloorTile     = 0x200,
-               Billboard    = 0x400 */
+               Billboard    = 0x400, DropShadow    = 0x800 */
 
             void main()
             {
@@ -140,6 +140,9 @@ namespace UAlbion.Core.Visual
 
                 if(color.w == 0.0f)
                     discard;
+
+                if((fsin_2 & 0x800) != 0)
+                    color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
                 if((fsin_2 & 0x02) != 0) color = color * 1.2; // Highlight
                 if((fsin_2 & 0x10) != 0) color = vec4(color.x * 1.5f + 0.3f, color.yzw);         // Red tint

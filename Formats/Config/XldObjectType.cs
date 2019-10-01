@@ -13,6 +13,7 @@
         PaletteCommon,
         SingleHeaderSprite,
         Video,
+        Font,
 
         // Maps
         MapData,

@@ -95,7 +95,8 @@ namespace UAlbion
 
                 engine.AddRenderer(new SpriteRenderer());
                 engine.AddRenderer(new ExtrudedTileMapRenderer());
-                engine.AddScene(Scenes.CreateMenuScene(sceneExchange));
+                var menuScene = Scenes.CreateMenuScene(sceneExchange);
+                engine.AddScene(menuScene);
                 engine.AddScene(Scenes.Create2DScene(sceneExchange));
                 engine.AddScene(Scenes.Create3DScene(sceneExchange));
 
@@ -118,16 +119,16 @@ namespace UAlbion
                     //.Attach(new Text(assets.LoadFont(MetaFontId.FontColor.Yellow, false), "Warning!", new Vector2(0, -0.4f)))
                     ;
 
-                /*
+                //*
                 engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude), null); /*
                 engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.Jirinaar3D), null); /*
                 engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.HausDesJägerclans), null); //*/
 
-                //*
+                /*
                 var menu = new MainMenu();
                 var background = new ScreenSpaceSprite<PictureId>(PictureId.MenuBackground8, new Vector2(0.0f, 1.0f), new Vector2(2.0f, -1.6f));
                 var status = new ScreenSpaceSprite<PictureId>(PictureId.StatusBar, new Vector2(0.0f, -0.6f), new Vector2(2.0f, -0.4f));
-                engine.GlobalExchange
+                menuScene.SceneExchange
                     .Attach(menu)
                     .Attach(background)
                     .Attach(status);

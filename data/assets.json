@@ -8783,7 +8783,7 @@
     },
     "FONTS0.XLD": {
       "EnumName": "FontId",
-      "Type": "FixedSizeSprite",
+      "Type": "Font",
       "Width": 8,
       "Height": 8,
       "Assets": {

@@ -29,9 +29,9 @@ namespace UAlbion.Game.Gui
             var window = Exchange.Resolve<IWindowState>();
             string S(SystemTextId id) => assets.LoadString(id, settings.Language);
 
-            var frame = new Frame(_width, _height);
+            var frame = new Frame(140, 40, 79, 112);
             Exchange.Attach(frame);
-            var origin = frame.Position + window.GuiScale * new Vector2(-0.02f, -0.05f);
+            var origin = window.UiToScreen(130, 30);
             var grid = new Vector2(0, -window.GuiScale * 12) / window.Size;
 
             var header = new Header(origin, _width - 2, 1, S(SystemTextId.MainMenu_MainMenu));

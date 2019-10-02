@@ -16,6 +16,8 @@ namespace UAlbion.Core.Textures
                 X = x; Y = y; W = w; H = h; Layer = layer;
             }
 
+            public override string ToString() => $"({X}, {Y}, {W}, {H}, L{Layer})";
+
             public uint X { get; }
             public uint Y { get; }
             public uint W { get; }

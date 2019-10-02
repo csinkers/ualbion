@@ -1,21 +1,34 @@
-﻿using UAlbion.Game.Entities;
+﻿using System;
+using System.Collections.Generic;
+using System.Numerics;
+using UAlbion.Core;
+using UAlbion.Game.Entities;
 
 namespace UAlbion.Game.Gui
 {
-    internal class InventoryScreen : GuiElement
+    internal class InventoryScreen : IUiElement
     {
         class CharacterLeftPane
         {
-            class Page1 : GuiElement // Summary
+            class Page1 : IUiElement // Summary
             {
                 AlbionLabel _characterDescription; // Name, gender, age, race, class, level
                 AlbionLabel _lblLifePoints;
                 AlbionLabel _lblSpellPoints;
                 AlbionLabel _lblExperiencePoints;
                 AlbionLabel _lblTrainingPoints;
+                public IUiElement Parent { get; }
+                public IList<IUiElement> Children { get; }
+                public Vector2 Size { get; }
+                public bool FixedSize { get; }
+
+                public void Render(Vector2 position, Action<IRenderable> addFunc)
+                {
+                    throw new NotImplementedException();
+                }
             }
 
-            class Page2 : GuiElement // Stats
+            class Page2 : IUiElement // Stats
             {
                 // Header _attributes = new Header("Attributes");
                 AlbionIndicator _strength;
@@ -32,9 +45,18 @@ namespace UAlbion.Game.Gui
                 AlbionIndicator _rangedCombat;
                 AlbionIndicator _criticalChance;
                 AlbionIndicator _lockPicking;
+                public IUiElement Parent { get; }
+                public IList<IUiElement> Children { get; }
+                public Vector2 Size { get; }
+                public bool FixedSize { get; }
+
+                public void Render(Vector2 position, Action<IRenderable> addFunc)
+                {
+                    throw new NotImplementedException();
+                }
             }
 
-            class Page3 : GuiElement
+            class Page3 : IUiElement
             {
                 Header _conditionsHeader;
                 AlbionLabel _conditions;
@@ -44,6 +66,15 @@ namespace UAlbion.Game.Gui
                 AlbionLabel _temporarySpells;
 
                 Button _combatPositions;
+                public IUiElement Parent { get; }
+                public IList<IUiElement> Children { get; }
+                public Vector2 Size { get; }
+                public bool FixedSize { get; }
+
+                public void Render(Vector2 position, Action<IRenderable> addFunc)
+                {
+                    throw new NotImplementedException();
+                }
             }
             Button _page1Button;
             Button _page2Button;
@@ -59,7 +90,7 @@ namespace UAlbion.Game.Gui
             //TODO: Button _takeAll;
         }
 
-        class MidPane : GuiElement
+        class MidPane : IUiElement
         {
             Header _name;
             InventoryButton _head;
@@ -75,6 +106,15 @@ namespace UAlbion.Game.Gui
             AlbionLabel _damage;
             AlbionLabel _weight;
             AlbionLabel _protection;
+            public IUiElement Parent { get; }
+            public IList<IUiElement> Children { get; }
+            public Vector2 Size { get; }
+            public bool FixedSize { get; }
+
+            public void Render(Vector2 position, Action<IRenderable> addFunc)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         class RightPane
@@ -88,5 +128,14 @@ namespace UAlbion.Game.Gui
 
         bool _isChest;
         Item _itemInHand;
+        public IUiElement Parent { get; }
+        public IList<IUiElement> Children { get; }
+        public Vector2 Size { get; }
+        public bool FixedSize { get; }
+
+        public void Render(Vector2 position, Action<IRenderable> addFunc)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

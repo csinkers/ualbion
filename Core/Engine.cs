@@ -294,17 +294,44 @@ namespace UAlbion.Core
         int IWindowState.Height => Window.Height;
         Vector2 IWindowState.Size => new Vector2(Window.Width, Window.Height);
 
+        const int NominalWidth = 360;
+        const int NominalHeight = 240;
         int IWindowState.GuiScale
         {
             get
             {
-                const int NominalWidth = 360;
-                const int NominalHeight = 240;
                 float widthRatio = (float)Window.Width / NominalWidth;
                 float heightRatio = (float)Window.Height / NominalHeight;
-                int scale = (int)(Math.Min(widthRatio, heightRatio) + 0.5f);
+                int scale = (int)Math.Min(widthRatio, heightRatio);
                 return scale == 0 ? 1 : scale;
             }
+        }
+
+        Vector2 IWindowState.UiToScreen(int x, int y)
+        {
+            Debug.Assert(x >= 0);
+            Debug.Assert(y >= 0);
+            Debug.Assert(x <= NominalWidth);
+            Debug.Assert(y <= NominalHeight);
+
+            // UI Coordinates:
+            // Top left corner in original game = (0,0)
+            // Bottom right corner in original game = (360, 240)
+            // + bottom 48 pixels reserved for status bar, so viewport is 192 high.
+
+            // Scaled up to nearest whole multiple that will fit
+            // w/ letterboxing to compensate for aspect ratio differences.
+
+            return new Vector2(
+                (x - (float)NominalWidth / 2)  * ((IWindowState)this).GuiScale / ((IWindowState)this).Width,
+                ((float)NominalHeight / 2 - y) * ((IWindowState)this).GuiScale / ((IWindowState)this).Height);
+        }
+
+        Vector2 IWindowState.UiToScreenRelative(int x, int y)
+        {
+            return new Vector2(
+                (float)x * ((IWindowState)this).GuiScale / ((IWindowState)this).Width,
+                (float)y * ((IWindowState)this).GuiScale / ((IWindowState)this).Height);
         }
     }
 }

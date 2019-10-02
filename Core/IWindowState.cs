@@ -8,5 +8,7 @@ namespace UAlbion.Core
         int Height { get; }
         Vector2 Size { get; }
         int GuiScale { get; }
+        Vector2 UiToScreen(int x, int y);
+        Vector2 UiToScreenRelative(int x, int y);
     }
 }

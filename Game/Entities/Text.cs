@@ -72,7 +72,7 @@ namespace UAlbion.Game.Entities
                     font.GetSubImageDetails(index, out size, out var texOffset, out texSize, out var layer);
                     size = new Vector2(size.X + 1, -size.Y);
                     var baseInstance = new SpriteInstanceData(
-                        new Vector3(_position + new Vector2(offset, 0) / window.Size, 0),
+                        new Vector3(_position + window.UiToScreenRelative(offset, 0), 0),
                         window.GuiScale * size / window.Size,
                         texOffset, texSize, layer,
                         SpriteFlags.UsePalette | SpriteFlags.NoTransform);
@@ -84,26 +84,26 @@ namespace UAlbion.Game.Entities
                         instances[n + 2] = baseInstance;
                         instances[n + 3] = baseInstance;
 
-                        instances[n].Offset += new Vector3(new Vector2(2*window.GuiScale, -window.GuiScale) / window.Size, 0);
+                        instances[n].Offset += new Vector3(window.UiToScreenRelative(2, 1), 0);
                         instances[n].Flags |= SpriteFlags.DropShadow;
 
-                        instances[n+1].Offset += new Vector3(new Vector2(window.GuiScale, -window.GuiScale) / window.Size, 0);
+                        instances[n+1].Offset += new Vector3(window.UiToScreenRelative(1,1), 0);
                         instances[n+1].Flags |= SpriteFlags.DropShadow;
 
                         instances[n + 2].Offset += new Vector3(window.GuiScale / window.Size.X, 0, 0);
-                        offset += window.GuiScale;
+                        offset += 1;
                     }
                     else
                     {
                         instances[n].Flags |= SpriteFlags.DropShadow;
-                        instances[n].Offset += new Vector3(new Vector2(window.GuiScale, -window.GuiScale) / window.Size, 0);
+                        instances[n].Offset += new Vector3(window.UiToScreenRelative(1,1), 0);
                     }
 
-                    offset += window.GuiScale * (int)size.X;
+                    offset += (int)size.X;
                 }
                 else
                 {
-                    offset += window.GuiScale * 6;
+                    offset += 6;
                 }
             }
 

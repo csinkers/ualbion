@@ -59,6 +59,7 @@ namespace UAlbion
 
             using (var assets = new Assets(assetConfig, coreSpriteConfig))
             {
+                //DumpCoreSprites(assets, baseDir); return;
                 RunGame(assets, baseDir);
             }
         }
@@ -119,12 +120,12 @@ namespace UAlbion
                     //.Attach(new Text(assets.LoadFont(MetaFontId.FontColor.Yellow, false), "Warning!", new Vector2(0, -0.4f)))
                     ;
 
-                //*
+                /*
                 engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude), null); /*
                 engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.Jirinaar3D), null); /*
                 engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.HausDesJägerclans), null); //*/
 
-                /*
+                //*
                 var menu = new MainMenu();
                 var background = new ScreenSpaceSprite<PictureId>(PictureId.MenuBackground8, new Vector2(0.0f, 1.0f), new Vector2(2.0f, -1.6f));
                 var status = new ScreenSpaceSprite<PictureId>(PictureId.StatusBar, new Vector2(0.0f, -0.6f), new Vector2(2.0f, -0.4f));
@@ -140,8 +141,11 @@ namespace UAlbion
             }
         }
 
-        static void DumpCoreSprites(Assets assets, string baseDir)
+        static void DumpCoreSprites(IAssetManager assets, string baseDir)
         {
+            var dir = $@"{baseDir}\data\exported\MAIN.EXE";
+            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
             // Dump all core sprites
             var palette = assets.LoadPalette(PaletteId.Main3D);
             for (int i = 0; i < 86; i++)
@@ -150,11 +154,11 @@ namespace UAlbion
                 var coreSprite = assets.LoadTexture((CoreSpriteId)i);
                 var multiTexture = new MultiTexture(name, palette.GetCompletePalette());
                 multiTexture.AddTexture(1, coreSprite, 0, 0, null, false);
-                multiTexture.SavePng(1, 0, $@"{baseDir}\data\exported\MAIN.EXE\{name}.bmp");
+                multiTexture.SavePng(1, 0, $@"{dir}\{name}.bmp");
             }
         }
 
-        static void DumpMapAndLabData(Assets assets, string baseDir)
+        static void DumpMapAndLabData(IAssetManager assets, string baseDir)
         {
             using (var sw = File.CreateText($@"{baseDir}\re\3DInfo.txt"))
             {

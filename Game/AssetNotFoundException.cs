@@ -1,4 +1,5 @@
 ﻿using System;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game
 {

@@ -334,14 +334,14 @@ namespace UAlbion.Game
         public CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id) =>
             (CoreSpriteConfig.BinaryResource)LoadAssetCached(AssetType.CoreGraphicsMetadata, id);
 
-        public string LoadString(AssetType type, int id, GameLanguage language, int subItem)
+        public string LoadString(StringId id, GameLanguage language)
         {
-            var stringTable = (IDictionary<int, string>)LoadAssetCached(type, id, language);
-            return stringTable[subItem];
+            var stringTable = (IDictionary<int, string>)LoadAssetCached(id.Type, id.Id, language);
+            return stringTable[id.SubId];
         }
 
-        public string LoadString(SystemTextId id, GameLanguage language) => LoadString(AssetType.SystemText, 0, language, (int)id);
-        public string LoadString(WordId id, GameLanguage language) => LoadString(AssetType.Dictionary, (int)id / 500, language, (int)id);
+        public string LoadString(SystemTextId id, GameLanguage language) => LoadString(new StringId(AssetType.SystemText, 0, (int)id), language);
+        public string LoadString(WordId id, GameLanguage language) => LoadString(new StringId(AssetType.Dictionary, (int)id / 500, (int)id), language);
 
         public AlbionSample LoadSample(AssetType type, int id) => (AlbionSample)LoadAssetCached(type, id);
         public AlbionVideo LoadVideo(VideoId id, GameLanguage language) => (AlbionVideo) LoadAsset(AssetType.Flic, (int)id, $"Video:{id}", language); // Don't cache videos.

@@ -39,6 +39,7 @@ namespace UAlbion.Core.Visual
         public bool DepthTested => Key.DepthTested;
         public SpriteKey Key { get; }
         public int BufferId { get; set; }
+        public Vector3 Position { get; set; }
         public SpriteInstanceData[] Instances { get; set; }
     }
 }

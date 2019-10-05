@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
+using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
@@ -19,7 +20,7 @@ namespace UAlbion.Game.Gui
         public Vector2 Size { get; }
         public bool FixedSize { get; }
 
-        public void Render(Vector2 position, Action<IRenderable> addFunc)
+        public void Render(Rectangle position, Action<IRenderable> addFunc)
         {
             throw new NotImplementedException();
         }
@@ -44,7 +45,7 @@ namespace UAlbion.Game.Gui
         public Vector2 Size { get; }
         public bool FixedSize { get; }
 
-        public void Render(Vector2 position, Action<IRenderable> addFunc)
+        public void Render(Rectangle position, Action<IRenderable> addFunc)
         {
             throw new NotImplementedException();
         }

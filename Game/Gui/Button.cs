@@ -20,12 +20,12 @@ namespace UAlbion.Game.Gui
         int _width;
         int _height;
 
-        public Button(Vector2 position, int w, int h, string text) : base(Handlers)
+        public Button(Vector2 position, int w, int h, StringId text) : base(Handlers)
         {
             _position = position;
             _width = w;
             _height = h;
-            _text = new Text(MetaFontId.FontColor.White, false, text, _position);
+            _text = new Text(text);
         }
     }
 }

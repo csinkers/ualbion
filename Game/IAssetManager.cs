@@ -37,7 +37,7 @@ namespace UAlbion.Game
         LabyrinthData LoadLabyrinthData(LabyrinthDataId id);
         CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id);
 
-        string LoadString(AssetType type, int id, GameLanguage language, int subItem);
+        string LoadString(StringId id, GameLanguage language);
         string LoadString(SystemTextId id, GameLanguage language);
         string LoadString(WordId id, GameLanguage language);
 

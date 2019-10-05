@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
+using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
@@ -11,7 +12,7 @@ namespace UAlbion.Game.Gui
         IList<IUiElement> Children { get; }
         Vector2 Size { get; }
         bool FixedSize { get; }
-        void Render(Vector2 position, Action<IRenderable> addFunc);
+        void Render(Rectangle position, Action<IRenderable> addFunc);
     }
 
     /*
@@ -20,8 +21,5 @@ namespace UAlbion.Game.Gui
         Hardcoded
         Hardcoded width, height based on required height.
         Grid of fixed size elements
-
-
-
      */
 }

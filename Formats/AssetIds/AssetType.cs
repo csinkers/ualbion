@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Game
+namespace UAlbion.Formats.AssetIds
 {
     public enum AssetType
     {
@@ -54,17 +54,5 @@
         TransparencyTables,
         CoreGraphics,
         CoreGraphicsMetadata
-    }
-
-    enum AssetLocation
-    {
-        Base,
-        BaseRaw, // Not in an XLD
-        Localised,
-        LocalisedRaw, // Not in an XLD
-        Initial,
-        Current,
-        MainExe,
-        Meta // Handled internally / based on other assets
     }
 }

@@ -21,12 +21,12 @@ namespace UAlbion.Game.Gui
         int _width;
         int _height;
 
-        public Header(Vector2 position, int w, int h, string text) :  base(Handlers)
+        public Header(Vector2 position, int w, int h, StringId id) : base(Handlers)
         {
             _position = position;
             _width = w;
             _height = h;
-            _text = new Text(MetaFontId.FontColor.White, true, text, _position);
+            _text = new Text(id).Bold();
         }
     }
 }

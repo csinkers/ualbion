@@ -24,10 +24,8 @@ namespace UAlbion.Game.Gui
 
         void Rebuild()
         {
-            var assets = Exchange.Resolve<IAssetManager>();
-            var settings = Exchange.Resolve<ISettings>();
             var window = Exchange.Resolve<IWindowState>();
-            string S(SystemTextId id) => assets.LoadString(id, settings.Language);
+            StringId S(SystemTextId id) => new StringId(AssetType.SystemText, 0, (int)id);
 
             var frame = new Frame(140, 40, 79, 112);
             Exchange.Attach(frame);

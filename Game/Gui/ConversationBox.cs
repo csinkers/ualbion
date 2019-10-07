@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -7,8 +6,9 @@ using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    class ConversationBox : IUiElement
+    class ConversationBox : Component, IUiElement
     {
+        public ConversationBox() : base(null) { }
         Entities.Conversation _conversation;
         AlbionSprite _speaker;
         AlbionLabel _text;
@@ -23,10 +23,7 @@ namespace UAlbion.Game.Gui
 
         }
 
-        public IUiElement Parent { get; }
-        public IList<IUiElement> Children { get; }
         public Vector2 Size { get; }
-        public bool FixedSize { get; }
 
         public void Render(Rectangle position, Action<IRenderable> addFunc)
         {

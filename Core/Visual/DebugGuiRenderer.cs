@@ -4,6 +4,7 @@ using System.Diagnostics;
 using UAlbion.Api;
 using UAlbion.Core.Events;
 using Veldrid;
+using Veldrid.Utilities;
 
 namespace UAlbion.Core.Visual
 {
@@ -17,25 +18,22 @@ namespace UAlbion.Core.Visual
         };
 
         ImGuiRenderer _imguiRenderer;
-        readonly int _width;
-        readonly int _height;
 
-        public DebugGuiRenderer(int width, int height) : base(Handlers)
-        {
-            _width = width;
-            _height = height;
-        }
+        public DebugGuiRenderer() : base(Handlers) { }
 
         public string Name => "DebugGuiRenderer";
         public RenderPasses RenderPasses => RenderPasses.Standard;
         public int RenderOrder => (int)DrawLayer.Debug;
         public Type Renderer => typeof(DebugGuiRenderer);
+        public BoundingBox? Extents => null;
+        public event EventHandler ExtentsChanged;
 
         public void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
         {
             if (_imguiRenderer == null)
             {
-                _imguiRenderer = new ImGuiRenderer(gd, sc.MainSceneFramebuffer.OutputDescription, _width, _height, ColorSpaceHandling.Linear);
+                var window = Exchange.Resolve<IWindowState>();
+                _imguiRenderer = new ImGuiRenderer(gd, sc.MainSceneFramebuffer.OutputDescription, window.Width, window.Height, ColorSpaceHandling.Linear);
             }
             else
             {

@@ -69,7 +69,7 @@ namespace UAlbion.Core
             CheckForErrors();
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
 
-            _igRenderable = new DebugGuiRenderer(Window.Width, Window.Height);
+            _igRenderable = new DebugGuiRenderer();
             _fullScreenQuad = new FullScreenQuad();
             var duplicator = new ScreenDuplicator();
 

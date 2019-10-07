@@ -6,8 +6,9 @@ using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    class CombatPositionsDialog : IUiElement
+    class CombatPositionsDialog : Component, IUiElement
     {
+        public CombatPositionsDialog() : base(null) { }
         readonly InventoryButton[] _buttons = new InventoryButton[12];
         Button _okButton;
         public IUiElement Parent { get; }

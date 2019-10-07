@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using Veldrid.Utilities;
 
 namespace UAlbion.Core.Visual
 {
@@ -18,10 +19,22 @@ namespace UAlbion.Core.Visual
 
         public string Name { get; }
         public Type Renderer => typeof(SpriteRenderer);
+
+        public BoundingBox? Extents
+        {
+            get
+            {
+                var min = Position;
+                var max = Position + new Vector3(Size?.X ?? 1, Size?.Y ?? 1, Size?.X ?? 1);
+                return new BoundingBox(min, max);
+            }
+        }
+        public event EventHandler ExtentsChanged;
         public bool DepthTested { get; }
         public int RenderOrder { get; }
         public SpriteFlags Flags { get; }
         public int SubObject { get; }
+        
         public Vector3 Position { get; }
         public Vector2? Size { get; }
         public abstract Type IdType { get; }

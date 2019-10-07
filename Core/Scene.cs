@@ -7,6 +7,12 @@ using Veldrid;
 
 namespace UAlbion.Core
 {
+    public interface IScene
+    {
+        void Add(IRenderable renderable);
+        void Remove(IRenderable renderable);
+    }
+
     public class Scene : Component
     {
         readonly IList<Type> _activeRendererTypes;

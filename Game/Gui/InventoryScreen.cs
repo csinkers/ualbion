@@ -7,12 +7,14 @@ using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    internal class InventoryScreen : IUiElement
+    internal class InventoryScreen : Component, IUiElement
     {
+        public InventoryScreen() : base(null) { }
         class CharacterLeftPane
         {
-            class Page1 : IUiElement // Summary
+            class Page1 : Component, IUiElement // Summary
             {
+                public Page1() : base(null) { }
                 AlbionLabel _characterDescription; // Name, gender, age, race, class, level
                 AlbionLabel _lblLifePoints;
                 AlbionLabel _lblSpellPoints;
@@ -29,8 +31,9 @@ namespace UAlbion.Game.Gui
                 }
             }
 
-            class Page2 : IUiElement // Stats
+            class Page2 : Component, IUiElement // Stats
             {
+                public Page2() : base(null) { }
                 // Header _attributes = new Header("Attributes");
                 AlbionIndicator _strength;
                 AlbionIndicator _intelligence;
@@ -57,8 +60,9 @@ namespace UAlbion.Game.Gui
                 }
             }
 
-            class Page3 : IUiElement
+            class Page3 : Component, IUiElement
             {
+                public Page3() : base(null) { }
                 Header _conditionsHeader;
                 AlbionLabel _conditions;
                 Header _languagesHeader;
@@ -91,8 +95,9 @@ namespace UAlbion.Game.Gui
             //TODO: Button _takeAll;
         }
 
-        class MidPane : IUiElement
+        class MidPane : Component, IUiElement
         {
+            public MidPane() : base(null) { }
             Header _name;
             InventoryButton _head;
             InventoryButton _neck;

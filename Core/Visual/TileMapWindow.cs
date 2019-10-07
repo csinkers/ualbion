@@ -1,4 +1,5 @@
 ﻿using System;
+using Veldrid.Utilities;
 
 namespace UAlbion.Core.Visual
 {
@@ -7,6 +8,8 @@ namespace UAlbion.Core.Visual
         public string Name => TileMap.Name;
         public int RenderOrder => TileMap.RenderOrder;
         public Type Renderer => TileMap.Renderer;
+        public BoundingBox? Extents => TileMap.Extents;
+        public event EventHandler ExtentsChanged;
 
         public int Offset { get; }
         public int Length { get; }
@@ -18,6 +21,7 @@ namespace UAlbion.Core.Visual
             TileMap = tileMap;
             Offset = offset;
             Length = length;
+            TileMap.ExtentsChanged += (e, sender) => ExtentsChanged?.Invoke(sender, EventArgs.Empty);
         }
     }
 }

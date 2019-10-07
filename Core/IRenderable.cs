@@ -1,4 +1,5 @@
 ﻿using System;
+using Veldrid.Utilities;
 
 namespace UAlbion.Core
 {
@@ -7,5 +8,7 @@ namespace UAlbion.Core
         string Name { get; }
         int RenderOrder { get; }
         Type Renderer { get; }
+        BoundingBox? Extents { get; }
+        event EventHandler ExtentsChanged;
     }
 }

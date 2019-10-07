@@ -6,13 +6,11 @@ using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    class LoadGameScreen : IUiElement
+    class LoadGameScreen : Component, IUiElement
     {
+        public LoadGameScreen() : base(null) { }
         readonly Button[] _slots = new Button[10];
-        public IUiElement Parent { get; }
-        public IList<IUiElement> Children { get; }
         public Vector2 Size { get; }
-        public bool FixedSize { get; }
 
         public void Render(Rectangle position, Action<IRenderable> addFunc)
         {

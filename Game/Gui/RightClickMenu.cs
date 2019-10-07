@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
 using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    class RightClickMenu : IUiElement
+    class RightClickMenu : Component, IUiElement
     {
-        public IUiElement Parent { get; }
-        public IList<IUiElement> Children { get; }
+        public RightClickMenu() : base(null) { }
         public Vector2 Size { get; }
-        public bool FixedSize { get; }
 
         public void Render(Rectangle position, Action<IRenderable> addFunc)
         {

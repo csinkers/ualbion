@@ -15,8 +15,8 @@ namespace UAlbion.Core.Visual
             Rotation = 0;
         }
 
-        public Vector3 Offset { get; set; } // Pixel coordinates
-        public Vector2 Size { get; set; } // Pixel coordinates
+        public Vector3 Offset { get; set; } // World coordinates
+        public Vector2 Size { get; set; } // World coordinates
         public Vector2 TexPosition { get; set; } // Normalised texture coordinates
         public Vector2 TexSize { get; set; } // Normalised texture coordinates
         public uint TexLayer { get; set; }

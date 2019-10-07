@@ -5,51 +5,52 @@ using ImGuiNET;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    public class MainMenu : Component
+    public class MainMenu : Component, IUiElement
     {
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<MainMenu, EngineUpdateEvent>((x, _) => x._menuFunc()),
-            new Handler<MainMenu, SubscribedEvent>((x, _) => x.Rebuild())
         };
 
+        readonly Frame _frame;
         Action _menuFunc;
-        int _width = 9;
-        int _height = 14;
 
-        public MainMenu() : base(Handlers) { _menuFunc = PrimaryMenu; }
-
-        void Rebuild()
+        public MainMenu() : base(Handlers)
         {
-            var window = Exchange.Resolve<IWindowState>();
+            _menuFunc = PrimaryMenu;
             StringId S(SystemTextId id) => new StringId(AssetType.SystemText, 0, (int)id);
 
-            var frame = new Frame(140, 40, 79, 112);
-            Exchange.Attach(frame);
-            var origin = window.UiToScreen(130, 30);
-            var grid = new Vector2(0, -window.GuiScale * 12) / window.Size;
-
-            var header = new Header(origin, _width - 2, 1, S(SystemTextId.MainMenu_MainMenu));
-            var divider = new Divider();
-            var buttons = new[]
+            // Exchange.Attach(frame);
+            // var origin = window.UiToScreen(130, 30);
+            // var grid = new Vector2(0, -window.GuiScale * 12) / window.Size;
+            var elements = new List<IUiElement>
             {
-                new Button(origin + grid*1, 16*(_width-2), 16, S(SystemTextId.MainMenu_ContinueGame)),
-                new Button(origin + grid*2, 16*(_width-2), 16, S(SystemTextId.MainMenu_NewGame)),
-                new Button(origin + grid*3, 16*(_width-2), 16, S(SystemTextId.MainMenu_LoadGame)),
-                new Button(origin + grid*4, 16*(_width-2), 16, S(SystemTextId.MainMenu_SaveGame)),
-                new Button(origin + grid*5, 16*(_width-2), 16, S(SystemTextId.MainMenu_Options)),
-                new Button(origin + grid*6, 16*(_width-2), 16, S(SystemTextId.MainMenu_ViewIntro)),
-                new Button(origin + grid*7, 16*(_width-2), 16, S(SystemTextId.MainMenu_Credits)),
-                new Button(origin + grid*8, 16*(_width-2), 16, S(SystemTextId.MainMenu_QuitGame)),
+                new Header(S(SystemTextId.MainMenu_MainMenu)),
+                new Divider(MetaFontId.FontColor.Yellow),
+                new Padding(0,2),
+                new Button(S(SystemTextId.MainMenu_ContinueGame)),
+                new Padding(0,4),
+                new Button(S(SystemTextId.MainMenu_NewGame)),
+                new Button(S(SystemTextId.MainMenu_LoadGame)),
+                new Button(S(SystemTextId.MainMenu_SaveGame)),
+                new Padding(0,4),
+                new Button(S(SystemTextId.MainMenu_Options)),
+                new Button(S(SystemTextId.MainMenu_ViewIntro)),
+                new Button(S(SystemTextId.MainMenu_Credits)),
+                new Padding(0,3),
+                new Button(S(SystemTextId.MainMenu_QuitGame)),
             };
-
-            Exchange.Attach(header);
-            foreach (var button in buttons)
-                Exchange.Attach(button);
+            var stack = new VerticalStack(elements);
+            _frame = new Frame(new IUiElement[] { stack }); //140, 40, 79, 112);
+            Children.Add(_frame);
         }
+        public IUiElement Parent => null;
+        public Vector2 Size => _frame.Size;
+        public void Render(Rectangle position, Action<IRenderable> addFunc) { }
 
         void PrimaryMenu()
         {

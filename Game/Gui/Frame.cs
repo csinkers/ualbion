@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
@@ -6,10 +7,11 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
+using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    public class Frame : Component
+    public class Frame : Component, IUiElement
     {
         static readonly IList<Handler> Handlers = new Handler[]
         {
@@ -18,20 +20,13 @@ namespace UAlbion.Game.Gui
             new Handler<Frame, RenderEvent>((x, e) => x.Render(e)),
         };
 
-        int _x;
-        int _y;
-        readonly int _width;
-        readonly int _height;
         IRenderable[] _sprites;
         public Vector2 Position { get; private set; }
 
-        public Frame(int x, int y, int width, int height) : base(Handlers)
+        public Frame(IList<IUiElement> children) : base(Handlers)
         {
-            // Coordinates are for inner / content area.
-            _x = x;
-            _y = y;
-            _width = width;
-            _height = height;
+            foreach(var child in children)
+                Children.Add(child);
         }
 
         void Render(RenderEvent renderEvent)
@@ -42,13 +37,17 @@ namespace UAlbion.Game.Gui
 
         void Rebuild()
         {
+            var extents = Size;
+            int width = (int)((extents.X + 8) / 16);
+            int height = (int)((extents.Y + 8) / 16);
+
             var assets = Exchange.Resolve<IAssetManager>();
             var sprites = new List<IRenderable>();
             var multi = new MultiTexture("MainMenu", assets.LoadPalette(PaletteId.Main3D).GetCompletePalette());
             var background = assets.LoadTexture(CoreSpriteId.UiBackground);
-            multi.AddTexture(1, background, 6, 6, 0, true, (uint)_width + 14, (uint)_height + 14);
-            int tilesW = (_width + 14) / 16;
-            int tilesH = (_height + 14) / 16;
+            multi.AddTexture(1, background, 6, 6, 0, true, (uint)width + 14, (uint)height + 14);
+            int tilesW = (width + 14) / 16;
+            int tilesH = (height + 14) / 16;
             for (int j = 0; j < tilesH; j++)
             {
                 for (int i = 0; i < tilesW; i++)
@@ -91,7 +90,7 @@ namespace UAlbion.Game.Gui
                         else if (i == tilesW - 1) Set(CoreSpriteId.UiWindowTopRight, 0);
                         else                      SetLine(false, 4);
                     }
-                    else if (j == _height - 1)
+                    else if (j == height - 1)
                     {
                         if (i == 0)               Set(CoreSpriteId.UiWindowBottomLeft, 0);
                         else if (i == tilesW - 1) Set(CoreSpriteId.UiWindowBottomRight, 0);
@@ -108,7 +107,7 @@ namespace UAlbion.Game.Gui
             var window = Exchange.Resolve<IWindowState>();
             multi.GetSubImageDetails(multi.GetSubImageAtTime(1, 0), out var size, out var offset, out var texSize, out var layer);
             var normalisedSize = window.UiToScreenRelative((int)size.X, (int)size.Y);
-            Position = window.UiToScreen(_x, _y);
+            Position = Vector2.Zero; //window.UiToScreen(_x, _y);
             sprites.Add(
                 new MultiSprite(new SpriteKey(multi, (int)DrawLayer.Interface, false))
                 {
@@ -119,6 +118,12 @@ namespace UAlbion.Game.Gui
                     }
                 });
             _sprites = sprites.ToArray();
+        }
+
+        public Vector2 Size { get; }
+        public void Render(Rectangle extents, Action<IRenderable> addFunc)
+        {
+            throw new NotImplementedException();
         }
     }
 }

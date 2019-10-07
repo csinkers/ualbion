@@ -1,24 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
 using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    internal class SliderThumb : IUiElement
+    internal class SliderThumb : Component, IUiElement
     {
         Slider _owner;
 
-        public SliderThumb(Slider owner)
+        public SliderThumb(Slider owner) : base(null)
         {
             _owner = owner;
         }
 
-        public IUiElement Parent { get; }
-        public IList<IUiElement> Children { get; }
         public Vector2 Size { get; }
-        public bool FixedSize { get; }
 
         public void Render(Rectangle position, Action<IRenderable> addFunc)
         {
@@ -26,7 +22,7 @@ namespace UAlbion.Game.Gui
         }
     }
 
-    internal class Slider : IUiElement
+    internal class Slider : Component, IUiElement
     {
         int _value = 0;
         int _min = 0;
@@ -35,15 +31,12 @@ namespace UAlbion.Game.Gui
         // readonly Button _moreButton = new Button();
         readonly SliderThumb _thumb;
 
-        public Slider()
+        public Slider() : base(null)
         {
             _thumb = new SliderThumb(this);
         }
 
-        public IUiElement Parent { get; }
-        public IList<IUiElement> Children { get; }
         public Vector2 Size { get; }
-        public bool FixedSize { get; }
 
         public void Render(Rectangle position, Action<IRenderable> addFunc)
         {

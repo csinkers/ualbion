@@ -1,32 +1,50 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Linq;
+using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
+using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    class Header : Component
+    class Header : Component, IUiElement
     {
-        static readonly Handler[] Handlers =
+        static readonly Handler[] Handlers = { };
+
+        public Header(StringId id) : base(Handlers)
         {
-            new Handler<Header, SubscribedEvent>((x, _) =>
+            var text = new Text(id).Bold();
+            Children.Add(text);
+        }
+
+        public Vector2 Size
+        {
+            get
             {
-                x.Exchange.Attach(x._text);
-            }), 
-        };
+                Vector2 size = Vector2.Zero;
+                if (Children != null)
+                {
+                    foreach (var child in Children.OfType<IUiElement>())
+                    {
+                        var childSize = child.Size;
+                        if (childSize.X > size.X) size.X = childSize.X;
+                        if (childSize.Y > size.Y) size.Y = childSize.Y;
+                    }
+                }
+                return size;
+            }
+        }
 
-        readonly Text _text;
-        readonly Vector2 _position;
-        int _width;
-        int _height;
-
-        public Header(Vector2 position, int w, int h, StringId id) : base(Handlers)
+        public void Select(Vector2 position, Action<float, Selection> registerHit)
         {
-            _position = position;
-            _width = w;
-            _height = h;
-            _text = new Text(id).Bold();
+        }
+
+        public void Render(Rectangle extents, Action<IRenderable> addFunc)
+        {
+            foreach(var child in Children.OfType<IUiElement>())
+                child.Render(new Rectangle(extents.X, extents.Y, extents.Width, extents.Height), addFunc);
         }
     }
 }

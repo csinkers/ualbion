@@ -1,18 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
 using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    public interface IUiElement
+    public interface IUiElement : IComponent
     {
-        IUiElement Parent { get; }
-        IList<IUiElement> Children { get; }
         Vector2 Size { get; }
-        bool FixedSize { get; }
-        void Render(Rectangle position, Action<IRenderable> addFunc);
+        /*
+        {
+            Vector2 size = Vector2.Zero;
+            if (Children != null)
+            {
+                foreach (var child in Children.OfType<IUiElement>())
+                {
+                    var childSize = child.Size;
+                    if (childSize.X > size.X)
+                        size.X = childSize.X;
+                    if (childSize.Y > size.Y)
+                        size.Y = childSize.Y;
+                }
+            }
+            return size;
+        }*/
+
+        void Render(Rectangle extents, Action<IRenderable> addFunc);
     }
 
     /*

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using UAlbion.Core.Textures;
+using Veldrid.Utilities;
 
 namespace UAlbion.Core.Visual
 {
@@ -53,6 +54,9 @@ namespace UAlbion.Core.Visual
         public Vector3 Position { get; set; }
         public Vector3 TileSize { get; }
         public Type Renderer => typeof(ExtrudedTileMapRenderer);
+
+        public BoundingBox? Extents => new BoundingBox(Position, Position + TileSize * new Vector3(Width, 1, Height));
+        public event EventHandler ExtentsChanged; // Never fires, tilemaps remain static.
         public Tile[] Tiles { get; }
         public uint Width { get; }
         public uint Height { get; }

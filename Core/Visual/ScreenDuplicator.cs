@@ -20,6 +20,8 @@ namespace UAlbion.Core.Visual
         public RenderPasses RenderPasses => RenderPasses.Duplicator;
         public int RenderOrder => int.MaxValue;
         public Type Renderer => typeof(ScreenDuplicator);
+        public BoundingBox? Extents => null;
+        public event EventHandler ExtentsChanged;
 
         public void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
         {

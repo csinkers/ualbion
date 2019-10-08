@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
@@ -7,6 +8,7 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Game.Events;
 using Veldrid;
 
 namespace UAlbion.Game.Gui
@@ -15,34 +17,22 @@ namespace UAlbion.Game.Gui
     {
         static readonly IList<Handler> Handlers = new Handler[]
         {
-            new Handler<Frame, SubscribedEvent>((x, _) => x.Rebuild()),
             new Handler<Frame, WindowResizedEvent>((x, _) => x.Rebuild()),
-            new Handler<Frame, RenderEvent>((x, e) => x.Render(e)),
+            new Handler<Frame, SetLanguageEvent>((x, _) => x.Rebuild()), // Make this bubble up from the Text elements?
         };
 
-        IRenderable[] _sprites;
-        public Vector2 Position { get; private set; }
+        MultiSprite _sprite;
 
-        public Frame(IList<IUiElement> children) : base(Handlers)
-        {
-            foreach(var child in children)
-                Children.Add(child);
-        }
-
-        void Render(RenderEvent renderEvent)
-        {
-            foreach (var sprite in _sprites)
-                renderEvent.Add(sprite);
-        }
+        public Frame(IUiElement child) : base(Handlers) => Children.Add(child);
+        protected override void Subscribed() => Rebuild();
 
         void Rebuild()
         {
-            var extents = Size;
-            int width = (int)((extents.X + 8) / 16);
-            int height = (int)((extents.Y + 8) / 16);
+            var extents = GetSize();
+            int width = (int)extents.X;
+            int height = (int)extents.Y;
 
             var assets = Exchange.Resolve<IAssetManager>();
-            var sprites = new List<IRenderable>();
             var multi = new MultiTexture("MainMenu", assets.LoadPalette(PaletteId.Main3D).GetCompletePalette());
             var background = assets.LoadTexture(CoreSpriteId.UiBackground);
             multi.AddTexture(1, background, 6, 6, 0, true, (uint)width + 14, (uint)height + 14);
@@ -107,23 +97,33 @@ namespace UAlbion.Game.Gui
             var window = Exchange.Resolve<IWindowState>();
             multi.GetSubImageDetails(multi.GetSubImageAtTime(1, 0), out var size, out var offset, out var texSize, out var layer);
             var normalisedSize = window.UiToScreenRelative((int)size.X, (int)size.Y);
-            Position = Vector2.Zero; //window.UiToScreen(_x, _y);
-            sprites.Add(
+            _sprite =
                 new MultiSprite(new SpriteKey(multi, (int)DrawLayer.Interface, false))
                 {
                     Instances = new[] { new SpriteInstanceData(
-                        new Vector3(Position, 0),
+                        Vector3.Zero,
                         normalisedSize,
                     offset, texSize, layer, SpriteFlags.NoTransform)
                     }
-                });
-            _sprites = sprites.ToArray();
+                };
         }
 
-        public Vector2 Size { get; }
+        public Vector2 GetSize() => 
+            Children.OfType<IUiElement>().Max(x => x.GetSize()) + Vector2.One * 32;
+
         public void Render(Rectangle extents, Action<IRenderable> addFunc)
         {
-            throw new NotImplementedException();
+            var window = Exchange.Resolve<IWindowState>();
+            _sprite.Position = new Vector3(window.UiToScreen(extents.X, extents.Y), 0);
+            addFunc(_sprite);
+            var innerExtents = new Rectangle(
+                extents.X + 16,
+                 extents.Y + 16,
+                extents.Width - 32,
+                extents.Height - 32);
+
+            foreach (var child in Children.OfType<IUiElement>())
+                child.Render(innerExtents, addFunc);
         }
     }
 }

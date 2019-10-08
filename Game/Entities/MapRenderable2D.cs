@@ -28,7 +28,6 @@ namespace UAlbion.Game.Entities
         {
             new Handler<MapRenderable2D, RenderEvent>((x, e) => x.Render(e)),
             new Handler<MapRenderable2D, UpdateEvent>((x, e) => x.Update()),
-            new Handler<MapRenderable2D, SubscribedEvent>((x, e) => x.Subscribed())
         };
 
         public Vector2 TileSize { get; }
@@ -62,7 +61,7 @@ namespace UAlbion.Game.Entities
             _overlay = new MultiSprite(new SpriteKey(_tileset, (int)DrawLayer.Overlay3, true)) { Instances = overlay.ToArray() };
         }
 
-        void Subscribed() { Raise(new LoadPaletteEvent(Palette)); }
+        protected override void Subscribed() { Raise(new LoadPaletteEvent(Palette)); }
 
         SpriteInstanceData BuildInstanceData(int i, int j, TilesetData.TileData tile, int tickCount)
         {

@@ -32,7 +32,6 @@ namespace UAlbion.Game.Entities
 
         static readonly IList<Handler> Handlers = new Handler[]
         {
-            new Handler<Map2D, SubscribedEvent>((x, e) => x.Subscribed()),
             new Handler<Map2D, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
             // new Handler<Map2D, UnloadMapEvent>((x, e) => x.Unload()),
         };
@@ -89,7 +88,7 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        void Subscribed()
+        protected override void Subscribed()
         {
             var assets = Exchange.Resolve<IAssetManager>();
             _mapData = assets.LoadMap2D(MapId);

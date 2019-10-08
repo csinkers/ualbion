@@ -59,11 +59,7 @@ namespace UAlbion.Game.Entities
         MetaFontId.FontColor _color;
         bool _isBold;
         Justification _justification;
-
-        void Render(RenderEvent renderEvent)
-        {
-            renderEvent.Add(_sprite);
-        }
+        Vector2 _size;
 
         void Reformat()
         {
@@ -74,7 +70,7 @@ namespace UAlbion.Game.Entities
             var font = assets.LoadFont(_color, false);
             var text = assets.LoadString(_id, settings.Language);
 
-            font.GetSubImageDetails(0, out var size, out _, out var texSize, out _);
+            font.GetSubImageDetails(0, out var fontSize, out _, out var texSize, out _);
             var instances = new SpriteInstanceData[text.Length * (_isBold ? 4 : 2)];
             int offset = 0;
             for (int i = 0; i < text.Length; i++)
@@ -83,7 +79,7 @@ namespace UAlbion.Game.Entities
                 char c = text[i];
                 if (_fontMapping.TryGetValue(c, out var index))
                 {
-                    font.GetSubImageDetails(index, out size, out var texOffset, out texSize, out var layer);
+                    font.GetSubImageDetails(index, out var size, out var texOffset, out texSize, out var layer);
                     size = new Vector2(size.X + 1, -size.Y);
                     var baseInstance = new SpriteInstanceData(
                         new Vector3(window.UiToScreenRelative(offset, 0), 0),
@@ -125,6 +121,8 @@ namespace UAlbion.Game.Entities
             {
                 Instances = instances
             };
+
+            _size = new Vector2(offset + 1, fontSize.Y + 1); // +1 for the drop shadow
         }
 
         public Text(StringId id) : base(Handlers)
@@ -142,10 +140,7 @@ namespace UAlbion.Game.Entities
         public Text Center() { _justification = Justification.Center; return this; }
         public Text Right() { _justification = Justification.Right; return this; }
 
-        public IUiElement Parent { get; }
-        public IList<IUiElement> Children => null;
-        public Vector2 Size { get; }
-        public bool FixedSize { get; }
+        public Vector2 GetSize() => _size;
 
         public void Render(Rectangle position, Action<IRenderable> addFunc)
         {

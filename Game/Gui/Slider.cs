@@ -14,7 +14,7 @@ namespace UAlbion.Game.Gui
             _owner = owner;
         }
 
-        public Vector2 Size { get; }
+        public Vector2 GetSize() => Vector2.Zero;
 
         public void Render(Rectangle position, Action<IRenderable> addFunc)
         {
@@ -24,19 +24,21 @@ namespace UAlbion.Game.Gui
 
     internal class Slider : Component, IUiElement
     {
+        /*
         int _value = 0;
         int _min = 0;
         int _max = 100;
         // readonly Button _lessButton = new Button();
         // readonly Button _moreButton = new Button();
         readonly SliderThumb _thumb;
+        */
 
         public Slider() : base(null)
         {
-            _thumb = new SliderThumb(this);
+            // _thumb = new SliderThumb(this);
         }
 
-        public Vector2 Size { get; }
+        public Vector2 GetSize() => Vector2.Zero;
 
         public void Render(Rectangle position, Action<IRenderable> addFunc)
         {

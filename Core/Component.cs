@@ -34,6 +34,9 @@ namespace UAlbion.Core
             _handlers = handlers == null 
                 ? new Dictionary<Type, Handler>() 
                 : handlers?.ToDictionary(x => x.Type, x => x);
+
+            if (!_handlers.ContainsKey(typeof(SubscribedEvent)))
+                _handlers.Add(typeof(SubscribedEvent), new Handler<Component, SubscribedEvent>((x,e) => x.Subscribed()));
         }
 
         public void Attach(EventExchange exchange)
@@ -42,11 +45,12 @@ namespace UAlbion.Core
                 throw new InvalidOperationException("A component can only be registered in one exchange at a time.");
 
             Exchange = exchange;
-            foreach (var kvp in _handlers)
-                exchange.Subscribe(kvp.Key, this);
 
             foreach(var child in Children)
                 child.Attach(exchange);
+
+            foreach (var kvp in _handlers)
+                exchange.Subscribe(kvp.Key, this);
         }
 
         public void Receive(IEvent @event, object sender)
@@ -62,6 +66,8 @@ namespace UAlbion.Core
             Exchange?.Unsubscribe(this);
             Exchange = null;
         }
+
+        protected virtual void Subscribed() { }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void Raise(IEvent @event) { Exchange?.Raise(@event, this); }

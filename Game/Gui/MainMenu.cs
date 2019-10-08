@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using ImGuiNET;
 using UAlbion.Core;
@@ -45,12 +46,24 @@ namespace UAlbion.Game.Gui
                 new Button(S(SystemTextId.MainMenu_QuitGame)),
             };
             var stack = new VerticalStack(elements);
-            _frame = new Frame(new IUiElement[] { stack }); //140, 40, 79, 112);
+            _frame = new Frame(stack); //140, 40, 79, 112
             Children.Add(_frame);
         }
+
+        protected override void Subscribed()
+        {
+            var layout = Exchange.Resolve<ILayoutManager>();
+            layout.Add(this, DialogPositioning.Center);
+        }
+
         public IUiElement Parent => null;
-        public Vector2 Size => _frame.Size;
-        public void Render(Rectangle position, Action<IRenderable> addFunc) { }
+        public Vector2 GetSize() => _frame.GetSize();
+
+        public void Render(Rectangle extents, Action<IRenderable> addFunc)
+        {
+            foreach (var child in Children.OfType<IUiElement>())
+                child.Render(extents, addFunc);
+        }
 
         void PrimaryMenu()
         {

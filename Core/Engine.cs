@@ -290,18 +290,21 @@ namespace UAlbion.Core
             /*GraphicsDevice?.CheckForErrors();*/
         }
 
+        const int UiWidth = 360;
+        const int UiHeight = 240;
+
         int IWindowState.Width => Window.Width;
         int IWindowState.Height => Window.Height;
+        int IWindowState.UiWidth => UiWidth;
+        int IWindowState.UiHeight => UiHeight;
         Vector2 IWindowState.Size => new Vector2(Window.Width, Window.Height);
 
-        const int NominalWidth = 360;
-        const int NominalHeight = 240;
         int IWindowState.GuiScale
         {
             get
             {
-                float widthRatio = (float)Window.Width / NominalWidth;
-                float heightRatio = (float)Window.Height / NominalHeight;
+                float widthRatio = (float)Window.Width / UiWidth;
+                float heightRatio = (float)Window.Height / UiHeight;
                 int scale = (int)Math.Min(widthRatio, heightRatio);
                 return scale == 0 ? 1 : scale;
             }
@@ -311,8 +314,8 @@ namespace UAlbion.Core
         {
             Debug.Assert(x >= 0);
             Debug.Assert(y >= 0);
-            Debug.Assert(x <= NominalWidth);
-            Debug.Assert(y <= NominalHeight);
+            Debug.Assert(x <= UiWidth);
+            Debug.Assert(y <= UiHeight);
 
             // UI Coordinates:
             // Top left corner in original game = (0,0)
@@ -323,8 +326,8 @@ namespace UAlbion.Core
             // w/ letterboxing to compensate for aspect ratio differences.
 
             return new Vector2(
-                (x - (float)NominalWidth / 2)  * ((IWindowState)this).GuiScale / ((IWindowState)this).Width,
-                ((float)NominalHeight / 2 - y) * ((IWindowState)this).GuiScale / ((IWindowState)this).Height);
+                (x - (float)UiWidth / 2)  * ((IWindowState)this).GuiScale / ((IWindowState)this).Width,
+                ((float)UiHeight / 2 - y) * ((IWindowState)this).GuiScale / ((IWindowState)this).Height);
         }
 
         Vector2 IWindowState.UiToScreenRelative(int x, int y)

@@ -11,9 +11,10 @@ namespace UAlbion.Core
     {
         void Add(IRenderable renderable);
         void Remove(IRenderable renderable);
+        EventExchange SceneExchange { get; }
     }
 
-    public class Scene : Component
+    public class Scene : Component, IScene
     {
         readonly IList<Type> _activeRendererTypes;
 
@@ -22,6 +23,7 @@ namespace UAlbion.Core
             new Handler<Scene, SetRawPaletteEvent>((x, e) => x._palette = new Palette(e.Name, e.Entries)),
             new Handler<Scene, SetSceneEvent>((x, e) => x.SceneExchange.IsActive = e.SceneId == x.Id),
             new Handler<Scene, SetClearColourEvent>((x, e) => x._clearColour = new RgbaFloat(e.Red, e.Green, e.Blue, 1.0f)),
+            new Handler<Scene, SubscribedEvent>((x, e) => x.SceneExchange.Attach(x.Camera))
         };
 
         readonly IDictionary<Type, IList<IRenderable>> _renderables = new Dictionary<Type, IList<IRenderable>>();
@@ -35,13 +37,21 @@ namespace UAlbion.Core
         public string Name { get; }
         public ICamera Camera { get; }
 
-        public Scene(int sceneId, string name, ICamera camera, IList<Type> activeActiveRendererTypeTypes, EventExchange sceneExchange) : base(Handlers)
+        protected Scene(int sceneId, string name, ICamera camera, IList<Type> activeActiveRendererTypeTypes, EventExchange sceneExchange) : base(Handlers)
         {
             Id = sceneId;
             Name = name;
             Camera = camera;
             _activeRendererTypes = activeActiveRendererTypeTypes;
             SceneExchange = sceneExchange;
+        }
+
+        public void Add(IRenderable renderable)
+        {
+        }
+
+        public void Remove(IRenderable renderable)
+        {
         }
 
         public override string ToString() => $"Scene:{Name} {(SceneExchange.IsActive ? "Active" : "")}";

@@ -9,9 +9,9 @@ namespace UAlbion.Core
         Matrix4x4 ProjectionMatrix { get; }
         Vector3 Position { get; set; }
         Vector3 LookDirection { get; }
+        float NearDistance { get; }
         float FarDistance { get; }
         float FieldOfView { get; }
-        float NearDistance { get; }
         float AspectRatio { get; }
         float Magnification { get; set; }
         CameraInfo GetCameraInfo();

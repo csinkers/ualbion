@@ -136,7 +136,7 @@ namespace UAlbion.Game
             _exchange = null;
         }
 
-        async Task ConsoleReaderThread()
+        void ConsoleReaderThread()
         {
             do
             {

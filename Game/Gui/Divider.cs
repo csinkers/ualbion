@@ -10,7 +10,8 @@ namespace UAlbion.Game.Gui
     {
         readonly MetaFontId.FontColor _color;
         public Divider(MetaFontId.FontColor color) : base(null) { _color = color; }
-        public Vector2 Size => new Vector2(0, 1);
+        public Vector2 GetSize() => new Vector2(0, 1);
+
         public void Render(Rectangle extents, Action<IRenderable> addFunc)
         {
             // TODO: Render line

@@ -5,11 +5,11 @@ using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    class AlbionLabel : Component, IUiElement
+    class Label : Component, IUiElement
     {
-        public AlbionLabel() : base(null) { }
-        string _text;
-        public Vector2 Size { get; }
+        public Label() : base(null) { }
+
+        public Vector2 GetSize() => Vector2.Zero;
 
         public void Render(Rectangle position, Action<IRenderable> addFunc)
         {

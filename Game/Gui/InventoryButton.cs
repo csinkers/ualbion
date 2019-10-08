@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
-using UAlbion.Game.Entities;
 using Veldrid;
 
 namespace UAlbion.Game.Gui
@@ -10,8 +8,9 @@ namespace UAlbion.Game.Gui
     class InventoryButton : Component, IUiElement
     {
         public InventoryButton() : base(null) { }
-        Func<Item> _itemGetter;
-        public Vector2 Size { get; }
+        // Func<Item> _itemGetter;
+
+        public Vector2 GetSize() => Vector2.Zero;
 
         public void Render(Rectangle position, Action<IRenderable> addFunc)
         {

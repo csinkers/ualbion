@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
@@ -46,12 +48,18 @@ namespace UAlbion.Game.Entities
             _id = id;
             _waypoints = waypoints;
             _position = new Vector2(waypoints[0].X, waypoints[0].Y);
+            _animation = (Animation)new Random().Next((int)Animation.WalkW + 1);
         }
 
         void Render(RenderEvent e)
         {
+            var cycle = Frames[_animation];
+            _frame++;
+            if (!cycle.Contains(_frame))
+                _frame = cycle[0];
+
             var positionLayered = new Vector3(_position * _tileSize, DrawLayer.Characters1.ToZCoordinate(_position.Y));
-            var npcSprite = new SpriteDefinition<SmallNpcId>(_id, 0, positionLayered, (int)DrawLayer.Characters1, true, 0);
+            var npcSprite = new SpriteDefinition<SmallNpcId>(_id, _frame, positionLayered, (int)DrawLayer.Characters1, true, 0);
             e.Add(npcSprite);
         }
     }

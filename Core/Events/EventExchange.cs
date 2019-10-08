@@ -135,7 +135,7 @@ namespace UAlbion.Core.Events
                 _subscribers[subscriber].Add(eventType);
             }
             if (newSubscriber)
-                subscriber.Receive(_subscribedEvent, this);
+                    subscriber.Receive(_subscribedEvent, this);
         }
 
         public void Unsubscribe(IComponent subscriber)
@@ -188,7 +188,7 @@ namespace UAlbion.Core.Events
                 exchange = exchange._parent;
             }
 
-            return default(T);
+            return default;
         }
 
         public void PruneInactiveChildren()

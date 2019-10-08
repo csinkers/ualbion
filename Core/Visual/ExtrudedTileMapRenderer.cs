@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using Veldrid;
 using Veldrid.SPIRV;
@@ -12,14 +11,7 @@ namespace UAlbion.Core.Visual
 {
     public class ExtrudedTileMapRenderer : Component, IRenderer
     {
-        static readonly Handler[] Handlers =
-        {
-            new Handler<ExtrudedTileMapRenderer, SubscribedEvent>((x, e) =>
-            {
-                x._textureManager = x.Exchange.Resolve<ITextureManager>() ?? throw new SystemRequiredException(typeof(ITextureManager), x.GetType());
-            }),
-        };
-        public ExtrudedTileMapRenderer() : base(Handlers) { }
+        public ExtrudedTileMapRenderer() : base(null) { }
 
         // Vertex Layout
         static readonly VertexLayoutDescription VertexLayout = Vertex3DTextured.VertexLayout;
@@ -211,7 +203,6 @@ namespace UAlbion.Core.Visual
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
         readonly IList<DeviceBuffer> _instanceBuffers = new List<DeviceBuffer>();
         readonly IList<ResourceSet> _resourceSets = new List<ResourceSet>();
-        ITextureManager _textureManager;
         DeviceBuffer _vb;
         DeviceBuffer _ib;
         DeviceBuffer _miscUniformBuffer;
@@ -279,6 +270,7 @@ namespace UAlbion.Core.Visual
 
         public IEnumerable<IRenderable> UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IEnumerable<IRenderable> renderables)
         {
+            ITextureManager textureManager = Exchange.Resolve<ITextureManager>();
             foreach (var buffer in _instanceBuffers)
                 buffer.Dispose();
             _instanceBuffers.Clear();
@@ -296,8 +288,8 @@ namespace UAlbion.Core.Visual
                 cl.UpdateBuffer(buffer, 0, ref tilemap.Tiles[window.Offset], TileMap.Tile.StructSize * (uint)window.Length);
                 _instanceBuffers.Add(buffer);
 
-                _textureManager.PrepareTexture(tilemap.Floors, gd);
-                _textureManager.PrepareTexture(tilemap.Walls, gd);
+                textureManager.PrepareTexture(tilemap.Floors, gd);
+                textureManager.PrepareTexture(tilemap.Walls, gd);
             }
 
             foreach (var tilemap in renderables.OfType<TileMap>())
@@ -316,14 +308,15 @@ namespace UAlbion.Core.Visual
 
         public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable renderable)
         {
+            ITextureManager textureManager = Exchange.Resolve<ITextureManager>();
             var window = renderable as TileMapWindow;
             if (window == null)
                 return;
 
             var tilemap = window.TileMap;
             cl.PushDebugGroup($"Tiles3D:{tilemap.Name}:{tilemap.RenderOrder}");
-            TextureView floors = _textureManager.GetTexture(tilemap.Floors);
-            TextureView walls = _textureManager.GetTexture(tilemap.Walls);
+            TextureView floors = textureManager.GetTexture(tilemap.Floors);
+            TextureView walls = textureManager.GetTexture(tilemap.Walls);
 
             var miscUniformData = new MiscUniformData { Position = tilemap.Position, TileSize = tilemap.TileSize, Unused1 = 0, Unused2 = 0 };
             cl.UpdateBuffer(_miscUniformBuffer, 0, miscUniformData);

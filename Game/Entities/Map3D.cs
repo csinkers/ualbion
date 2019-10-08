@@ -13,7 +13,6 @@ namespace UAlbion.Game.Entities
     {
         static readonly IList<Handler> Handlers = new Handler[]
         {
-            new Handler<Map3D, SubscribedEvent>((x, e) => x.Subscribed()),
             new Handler<Map3D, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
             // new Handler<Map3D, UnloadMapEvent>((x, e) => x.Unload()),
         };
@@ -40,7 +39,7 @@ namespace UAlbion.Game.Entities
         public Vector2 LogicalSize { get; private set; }
         public Vector3 TileSize { get; private set; }
 
-        void Subscribed()
+        protected override void Subscribed()
         {
             var assets = Exchange.Resolve<IAssetManager>();
             _mapData = assets.LoadMap3D(MapId);

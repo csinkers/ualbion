@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
@@ -60,6 +61,8 @@ namespace UAlbion.Game.Entities
             _id = id;
             _waypoints = waypoints;
             _position = new Vector2(waypoints[0].X, waypoints[0].Y);
+            _animation = (Animation)new Random().Next((int) Animation.UpperBody);
+
             var texture = assets.LoadTexture(_id);
             if (texture != null)
             {
@@ -92,10 +95,15 @@ namespace UAlbion.Game.Entities
 
         void Render(RenderEvent e)
         {
+            var cycle = Frames[_animation];
+            _frame++;
+            if (!cycle.Contains(_frame))
+                _frame = cycle[0];
+
             var positionLayered = new Vector3(_position * _tileSize, DrawLayer.Characters1.ToZCoordinate(_position.Y));
             var npcSprite = new SpriteDefinition<LargeNpcId>(
                 _id,
-                0,
+                _frame,
                 positionLayered,
                 (int)DrawLayer.Characters1,
                 true,

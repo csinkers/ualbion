@@ -9,9 +9,9 @@ namespace UAlbion.Game.Gui
     class ConversationBox : Component, IUiElement
     {
         public ConversationBox() : base(null) { }
-        Entities.Conversation _conversation;
-        AlbionSprite _speaker;
-        AlbionLabel _text;
+        //Entities.Conversation _conversation;
+        //AlbionSprite _speaker;
+        //Label _text;
 
         void OnClick((int,int) point)
         {
@@ -23,7 +23,7 @@ namespace UAlbion.Game.Gui
 
         }
 
-        public Vector2 Size { get; }
+        public Vector2 GetSize() => Vector2.Zero;
 
         public void Render(Rectangle position, Action<IRenderable> addFunc)
         {

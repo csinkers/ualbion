@@ -14,21 +14,20 @@ namespace UAlbion.Game.Gui
             foreach(var child in children)
                 Children.Add(child);
         }
-        public Vector2 Size
-        {
-            get
-            {
-                Vector2 size = Vector2.Zero;
-                foreach (var child in Children.OfType<IUiElement>())
-                {
-                    var childSize = child.Size;
-                    if (childSize.X > size.X)
-                        size.X = childSize.X;
 
-                    size.Y += childSize.Y;
-                }
-                return size;
+        public Vector2 GetSize()
+        {
+            Vector2 size = Vector2.Zero;
+            foreach (var child in Children.OfType<IUiElement>())
+            {
+                var childSize = child.GetSize();
+                if (childSize.X > size.X)
+                    size.X = childSize.X;
+
+                size.Y += childSize.Y;
             }
+
+            return size;
         }
 
         public void Render(Rectangle extents, Action<IRenderable> addFunc)
@@ -36,7 +35,7 @@ namespace UAlbion.Game.Gui
             int offset = extents.Y;
             foreach(var child in Children.OfType<IUiElement>())
             {
-                int height = (int)child.Size.Y;
+                int height = (int)child.GetSize().Y;
                 child.Render(new Rectangle(extents.X,  offset, extents.Width, height), addFunc);
                 offset += height;
             }

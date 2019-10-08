@@ -52,9 +52,7 @@ namespace UAlbion.Core
             CameraInfoBuffer.Name = "B_CameraInfo";
 
             if (Camera != null)
-            {
                 UpdateCameraBuffers(cl);
-            }
 
             TextureSamplerResourceLayout = factory.CreateResourceLayout(new ResourceLayoutDescription(
                 new ResourceLayoutElementDescription("SourceTexture", ResourceKind.TextureReadOnly, ShaderStages.Fragment),

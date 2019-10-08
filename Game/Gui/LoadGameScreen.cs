@@ -10,7 +10,8 @@ namespace UAlbion.Game.Gui
     {
         public LoadGameScreen() : base(null) { }
         readonly Button[] _slots = new Button[10];
-        public Vector2 Size { get; }
+
+        public Vector2 GetSize() => Vector2.Zero;
 
         public void Render(Rectangle position, Action<IRenderable> addFunc)
         {

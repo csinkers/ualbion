@@ -5,6 +5,7 @@ namespace UAlbion.Game.Entities
 {
     class Item
     {
+        /*
         readonly IList<PlayerClass> _validClasses = new List<PlayerClass>();
         AlbionSprite _worldSprite;
         AlbionSprite _inventorySprite;
@@ -14,5 +15,6 @@ namespace UAlbion.Game.Entities
         int _ammoType;
         int _weight; // Grams
         bool _isTwoHanded;
+        */
     }
 }

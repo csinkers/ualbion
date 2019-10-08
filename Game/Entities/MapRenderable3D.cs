@@ -19,12 +19,13 @@ namespace UAlbion.Game.Entities
         readonly MapData3D _mapData;
         readonly LabyrinthData _labyrinthData;
         readonly IDictionary<int, IList<int>> _tilesByDistance = new Dictionary<int, IList<int>>();
+        bool _isSorting = false;
 
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<MapRenderable3D, RenderEvent>((x, e) => x.Render(e)),
             new Handler<MapRenderable3D, PostUpdateEvent>((x, _) => x.PostUpdate()),
-            new Handler<MapRenderable3D, SubscribedEvent>((x, e) => x.Subscribed())
+            new Handler<MapRenderable3D, SortMapTilesEvent>((x, e) => x._isSorting = e.IsSorting),
         };
 
         public MapRenderable3D(IAssetManager assets, MapData3D mapData, LabyrinthData labyrinthData, Vector3 tileSize) : base(Handlers)
@@ -66,7 +67,7 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        void Subscribed() { Raise(new LoadPaletteEvent(_mapData.PaletteId)); }
+        protected override void Subscribed() { Raise(new LoadPaletteEvent(_mapData.PaletteId)); }
 
         void SetTile(int index, int order, int frame)
         {
@@ -88,7 +89,6 @@ namespace UAlbion.Game.Entities
             if (state == null)
                 return;
 
-            const bool isSorting = false;
             foreach (var list in _tilesByDistance.Values)
                 list.Clear();
 
@@ -107,14 +107,14 @@ namespace UAlbion.Game.Entities
                     }
 
                     int index = j * _mapData.Width + i;
-                    if(isSorting)
+                    if(_isSorting)
                         list.Add(index);
                     else
                         SetTile(index, index, state.FrameCount);
                 }
             }
 
-            if (isSorting)
+            if (_isSorting)
             {
                 int order = 0;
                 foreach (var distance in _tilesByDistance.OrderByDescending(x => x.Key).ToList())

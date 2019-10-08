@@ -1,77 +1,121 @@
-﻿using UAlbion.Core;
+﻿using System;
+using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Game.Entities;
 
 namespace UAlbion.Game
 {
-    public class Scenes
+    public interface IFlatScene : IScene { }
+    public interface IDungeonScene : IScene { }
+    public interface IMapScene : IScene { }
+    public interface IMenuScene : IScene { }
+    public interface IInventoryScene : IScene { }
+
+    public class FlatScene : Scene, IFlatScene
     {
-        public static Scene Create2DScene(EventExchange allScenesExchange)
-        {
-            // TODO: Build scenes from config
-            var id = SceneId.World2D;
-            var camera = new OrthographicCamera();
-            var renderers = new[]
-            {
-                typeof(DebugGuiRenderer),
-                typeof(FullScreenQuad),
-                typeof(ScreenDuplicator),
-                typeof(SpriteRenderer),
-            };
+        const SceneId Id = SceneId.World2D;
+        static readonly Type[] Renderers = {
+            typeof(DebugGuiRenderer),
+            typeof(FullScreenQuad),
+            typeof(ScreenDuplicator),
+            typeof(SpriteRenderer),
+        };
 
-            var sceneExchange = new EventExchange(id.ToString(), allScenesExchange);
-            var scene = new Scene((int)id, "World2D", camera, renderers, sceneExchange);
-            allScenesExchange.Attach(scene);
-            var cameraMotion = new CameraMotion2D(camera);
-            sceneExchange
-                .Attach(camera)
+        public FlatScene(EventExchange allScenesExchange)
+            : base((int)Id,
+                Id.ToString(),
+                new OrthographicCamera(),
+                Renderers,
+                new EventExchange(Id.ToString(), allScenesExchange))
+        {
+            var cameraMotion = new CameraMotion2D((OrthographicCamera)Camera);
+            SceneExchange
                 .Attach(cameraMotion);
-            return scene;
         }
+    }
 
-        public static Scene Create3DScene(EventExchange allScenesExchange)
+    public class DungeonScene : Scene, IDungeonScene
+    {
+        const SceneId Id = SceneId.World3D;
+        static readonly Type[] Renderers = {
+            typeof(DebugGuiRenderer),
+            typeof(FullScreenQuad),
+            typeof(ScreenDuplicator),
+            typeof(ExtrudedTileMapRenderer),
+            typeof(SpriteRenderer),
+        };
+
+        public DungeonScene(EventExchange allScenesExchange) :
+            base((int)Id,
+                Id.ToString(),
+                new PerspectiveCamera(),
+                Renderers,
+                new EventExchange(Id.ToString(), allScenesExchange))
         {
-            var id = SceneId.World3D;
-            var renderers = new[]
-            {
-                typeof(DebugGuiRenderer),
-                typeof(FullScreenQuad),
-                typeof(ScreenDuplicator),
-                typeof(ExtrudedTileMapRenderer),
-                typeof(SpriteRenderer),
-            };
-
-            var camera = new PerspectiveCamera();
-            var sceneExchange = new EventExchange(id.ToString(), allScenesExchange);
-            var scene = new Scene((int)SceneId.World3D, "World3D", camera, renderers, sceneExchange);
-            allScenesExchange.Attach(scene);
-            var cameraMotion = new CameraMotion3D(camera);
-            sceneExchange
-                .Attach(camera)
+            var cameraMotion = new CameraMotion3D((PerspectiveCamera)Camera);
+            SceneExchange
                 .Attach(cameraMotion);
-            return scene;
         }
+    }
 
-        public static Scene CreateMenuScene(EventExchange allScenesExchange)
+    public class MapScene : Scene, IMapScene
+    {
+        const SceneId Id = SceneId.Automap;
+        static readonly Type[] Renderers = {
+            typeof(DebugGuiRenderer),
+            typeof(FullScreenQuad),
+            typeof(ScreenDuplicator),
+            typeof(SpriteRenderer),
+        };
+
+
+        public MapScene(EventExchange allScenesExchange)
+            : base((int)Id,
+                Id.ToString(),
+                new OrthographicCamera(),
+                Renderers,
+                new EventExchange(Id.ToString(), allScenesExchange))
         {
-            // TODO: Build scenes from config
-            var id = SceneId.MainMenu;
-            var camera = new OrthographicCamera();
-            var renderers = new[]
-            {
-                typeof(DebugGuiRenderer),
-                typeof(FullScreenQuad),
-                typeof(ScreenDuplicator),
-                typeof(SpriteRenderer),
-            };
-
-            var sceneExchange = new EventExchange(id.ToString(), allScenesExchange);
-            var scene = new Scene((int)id, "MainMenu", camera, renderers, sceneExchange);
-            allScenesExchange.Attach(scene);
-            sceneExchange
-                .Attach(camera);
-            return scene;
+            var cameraMotion = new CameraMotion2D((OrthographicCamera)Camera);
+            SceneExchange
+                .Attach(cameraMotion);
         }
+    }
+
+    public class MenuScene : Scene, IMenuScene
+    {
+        const SceneId Id = SceneId.MainMenu;
+        static readonly Type[] Renderers = {
+            typeof(DebugGuiRenderer),
+            typeof(FullScreenQuad),
+            typeof(ScreenDuplicator),
+            typeof(SpriteRenderer),
+        };
+        public MenuScene(EventExchange allScenesExchange) :
+            base((int)Id,
+                Id.ToString(),
+                new OrthographicCamera(),
+                Renderers,
+                new EventExchange(Id.ToString(), allScenesExchange))
+        { }
+    }
+
+    public class InventoryScene : Scene, IInventoryScene
+    {
+        const SceneId Id = SceneId.Inventory;
+        static readonly Type[] Renderers = {
+            typeof(DebugGuiRenderer),
+            typeof(FullScreenQuad),
+            typeof(ScreenDuplicator),
+            typeof(SpriteRenderer),
+        };
+        public InventoryScene(EventExchange allScenesExchange) :
+            base((int)Id,
+                Id.ToString(),
+                new OrthographicCamera(),
+                Renderers,
+                new EventExchange(Id.ToString(), allScenesExchange))
+        { }
     }
 }

@@ -19,22 +19,20 @@ namespace UAlbion.Game.Gui
             Children.Add(text);
         }
 
-        public Vector2 Size
+        public Vector2 GetSize()
         {
-            get
+            Vector2 size = Vector2.Zero;
+            if (Children != null)
             {
-                Vector2 size = Vector2.Zero;
-                if (Children != null)
+                foreach (var child in Children.OfType<IUiElement>())
                 {
-                    foreach (var child in Children.OfType<IUiElement>())
-                    {
-                        var childSize = child.Size;
-                        if (childSize.X > size.X) size.X = childSize.X;
-                        if (childSize.Y > size.Y) size.Y = childSize.Y;
-                    }
+                    var childSize = child.GetSize();
+                    if (childSize.X > size.X) size.X = childSize.X;
+                    if (childSize.Y > size.Y) size.Y = childSize.Y;
                 }
-                return size;
             }
+
+            return size;
         }
 
         public void Select(Vector2 position, Action<float, Selection> registerHit)
@@ -44,7 +42,7 @@ namespace UAlbion.Game.Gui
         public void Render(Rectangle extents, Action<IRenderable> addFunc)
         {
             foreach(var child in Children.OfType<IUiElement>())
-                child.Render(new Rectangle(extents.X, extents.Y, extents.Width, extents.Height), addFunc);
+                child.Render(extents, addFunc);
         }
     }
 }

@@ -17,26 +17,23 @@ namespace UAlbion.Game.Gui
             Children.Add(new Text(text));
         }
 
-        public Vector2 Size
+        public Vector2 GetSize()
         {
-            get
+            Vector2 size = Vector2.Zero;
+            if (Children != null)
             {
-                Vector2 size = Vector2.Zero;
-                if (Children != null)
+                foreach (var child in Children.OfType<IUiElement>())
                 {
-                    foreach (var child in Children.OfType<IUiElement>())
-                    {
-                        var childSize = child.Size;
-                        if (childSize.X > size.X)
-                            size.X = childSize.X;
-                        if (childSize.Y > size.Y)
-                            size.Y = childSize.Y;
-                    }
+                    var childSize = child.GetSize();
+                    if (childSize.X > size.X)
+                        size.X = childSize.X;
+                    if (childSize.Y > size.Y)
+                        size.Y = childSize.Y;
                 }
-
-                size += 2 * Vector2.One; // One pixel border
-                return size;
             }
+
+            size += 2 * Vector2.One; // One pixel border
+            return size;
         }
 
         public void Select(Vector2 position, Action<float, Selection> registerHit)

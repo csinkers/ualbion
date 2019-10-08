@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
-using UAlbion.Game.Entities;
 using Veldrid;
 
 namespace UAlbion.Game.Gui
@@ -10,20 +8,18 @@ namespace UAlbion.Game.Gui
     internal class InventoryScreen : Component, IUiElement
     {
         public InventoryScreen() : base(null) { }
+        /*
         class CharacterLeftPane
         {
             class Page1 : Component, IUiElement // Summary
             {
                 public Page1() : base(null) { }
-                AlbionLabel _characterDescription; // Name, gender, age, race, class, level
-                AlbionLabel _lblLifePoints;
-                AlbionLabel _lblSpellPoints;
-                AlbionLabel _lblExperiencePoints;
-                AlbionLabel _lblTrainingPoints;
-                public IUiElement Parent { get; }
-                public IList<IUiElement> Children { get; }
+                Label _characterDescription; // Name, gender, age, race, class, level
+                Label _lblLifePoints;
+                Label _lblSpellPoints;
+                Label _lblExperiencePoints;
+                Label _lblTrainingPoints;
                 public Vector2 Size { get; }
-                public bool FixedSize { get; }
 
                 public void Render(Rectangle position, Action<IRenderable> addFunc)
                 {
@@ -49,10 +45,7 @@ namespace UAlbion.Game.Gui
                 AlbionIndicator _rangedCombat;
                 AlbionIndicator _criticalChance;
                 AlbionIndicator _lockPicking;
-                public IUiElement Parent { get; }
-                public IList<IUiElement> Children { get; }
                 public Vector2 Size { get; }
-                public bool FixedSize { get; }
 
                 public void Render(Rectangle position, Action<IRenderable> addFunc)
                 {
@@ -64,17 +57,14 @@ namespace UAlbion.Game.Gui
             {
                 public Page3() : base(null) { }
                 Header _conditionsHeader;
-                AlbionLabel _conditions;
+                Label _conditions;
                 Header _languagesHeader;
-                AlbionLabel _languages;
+                Label _languages;
                 Header _temporarySpellsHeader;
-                AlbionLabel _temporarySpells;
+                Label _temporarySpells;
 
                 Button _combatPositions;
-                public IUiElement Parent { get; }
-                public IList<IUiElement> Children { get; }
                 public Vector2 Size { get; }
-                public bool FixedSize { get; }
 
                 public void Render(Rectangle position, Action<IRenderable> addFunc)
                 {
@@ -109,13 +99,10 @@ namespace UAlbion.Game.Gui
             InventoryButton _feet;
             InventoryButton _tail;
 
-            AlbionLabel _damage;
-            AlbionLabel _weight;
-            AlbionLabel _protection;
-            public IUiElement Parent { get; }
-            public IList<IUiElement> Children { get; }
+            Label _damage;
+            Label _weight;
+            Label _protection;
             public Vector2 Size { get; }
-            public bool FixedSize { get; }
 
             public void Render(Rectangle position, Action<IRenderable> addFunc)
             {
@@ -134,10 +121,9 @@ namespace UAlbion.Game.Gui
 
         bool _isChest;
         Item _itemInHand;
-        public IUiElement Parent { get; }
-        public IList<IUiElement> Children { get; }
-        public Vector2 Size { get; }
-        public bool FixedSize { get; }
+        */
+
+        public Vector2 GetSize() => Vector2.Zero;
 
         public void Render(Rectangle position, Action<IRenderable> addFunc)
         {

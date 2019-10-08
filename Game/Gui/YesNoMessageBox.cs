@@ -8,9 +8,9 @@ namespace UAlbion.Game.Gui
     class YesNoMessageBox : Component, IUiElement
     {
         public YesNoMessageBox() : base(null) { }
-        AlbionLabel _label;
+        // Label _label;
 
-        public Vector2 Size { get; }
+        public Vector2 GetSize() => Vector2.Zero;
 
         public void Render(Rectangle position, Action<IRenderable> addFunc)
         {

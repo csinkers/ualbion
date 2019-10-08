@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using Veldrid;
 using Veldrid.SPIRV;
@@ -10,15 +9,7 @@ namespace UAlbion.Core.Visual
 {
     public class SpriteRenderer : Component, IRenderer
     {
-        static readonly Handler[] Handlers =
-        {
-            new Handler<SpriteRenderer, SubscribedEvent>((x, e) =>
-            {
-                x._textureManager = x.Exchange.Resolve<ITextureManager>() ?? throw new SystemRequiredException(typeof(ITextureManager), x.GetType());
-                x._spriteResolver = x.Exchange.Resolve<ISpriteResolver>() ?? throw new SystemRequiredException(typeof(ISpriteResolver), x.GetType());
-            }),
-        };
-        public SpriteRenderer() : base(Handlers) { }
+        public SpriteRenderer() : base(null) { }
 
         static class Shader
         {
@@ -163,8 +154,6 @@ namespace UAlbion.Core.Visual
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
         readonly IList<DeviceBuffer> _instanceBuffers = new List<DeviceBuffer>();
         readonly IList<ResourceSet> _resourceSets = new List<ResourceSet>();
-        ITextureManager _textureManager;
-        ISpriteResolver _spriteResolver;
 
         // Context objects
         DeviceBuffer _vb;
@@ -232,6 +221,9 @@ namespace UAlbion.Core.Visual
 
         public IEnumerable<IRenderable> UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IEnumerable<IRenderable> renderables)
         {
+            ITextureManager textureManager = Exchange.Resolve<ITextureManager>();
+            ISpriteResolver spriteResolver = Exchange.Resolve<ISpriteResolver>();
+
             foreach (var buffer in _instanceBuffers)
                 buffer.Dispose();
             _instanceBuffers.Clear();
@@ -242,7 +234,7 @@ namespace UAlbion.Core.Visual
 
             void SetupMultiSpriteResources(MultiSprite multiSprite)
             {
-                _textureManager.PrepareTexture(multiSprite.Key.Texture, gd);
+                textureManager?.PrepareTexture(multiSprite.Key.Texture, gd);
                 multiSprite.BufferId = _instanceBuffers.Count;
                 multiSprite.RotateSprites(sc.Camera.Position);
                 var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)multiSprite.Instances.Length * SpriteInstanceData.StructSize, BufferUsage.VertexBuffer));
@@ -251,7 +243,7 @@ namespace UAlbion.Core.Visual
                 _instanceBuffers.Add(buffer);
             }
 
-            var resolved = renderables.OfType<SpriteDefinition>().Select(_spriteResolver.Resolve);
+            var resolved = renderables.OfType<SpriteDefinition>().Select(spriteResolver.Resolve);
             var grouped = resolved.GroupBy(x => x.Item1, x => x.Item2);
             foreach (var group in grouped)
             {
@@ -269,10 +261,12 @@ namespace UAlbion.Core.Visual
 
         public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable renderable)
         {
+            ITextureManager textureManager = Exchange.Resolve<ITextureManager>();
             // float depth = gd.IsDepthRangeZeroToOne ? 0 : 1;
             var sprite = (MultiSprite)renderable;
             cl.PushDebugGroup($"Sprite:{sprite.Key.Texture.Name}:{sprite.Key.RenderOrder}");
-            TextureView textureView = _textureManager.GetTexture(sprite.Key.Texture);
+            TextureView textureView = textureManager?.GetTexture(sprite.Key.Texture);
+
             var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
                 _perSpriteResourceLayout,
                 sc.ProjectionMatrixBuffer,
@@ -280,6 +274,7 @@ namespace UAlbion.Core.Visual
                 gd.PointSampler,
                 textureView,
                 sc.PaletteView));
+
             _resourceSets.Add(resourceSet);
 
             cl.SetPipeline(sprite.DepthTested ? _depthTestPipeline : _noDepthPipeline);

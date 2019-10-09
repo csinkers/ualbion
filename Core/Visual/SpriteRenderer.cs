@@ -88,7 +88,7 @@ namespace UAlbion.Core.Visual
                 if ((_Flags & 1) == 0)
                     gl_Position = Projection * View * worldSpace;
                 else
-                    gl_Position = worldSpace;
+                    gl_Position = View * worldSpace;
 
                 fsin_0 = _TexCoords * _TexSize + _TexOffset;
                 fsin_1 = float(_TexLayer);
@@ -270,7 +270,7 @@ namespace UAlbion.Core.Visual
             var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
                 _perSpriteResourceLayout,
                 sc.ProjectionMatrixBuffer,
-                sc.ViewMatrixBuffer,
+                sc.ModelViewMatrixBuffer,
                 gd.PointSampler,
                 textureView,
                 sc.PaletteView));

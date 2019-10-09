@@ -8,7 +8,7 @@ namespace UAlbion.Core
     {
         public DeviceBuffer IdentityMatrixBuffer { get; private set; }
         public DeviceBuffer ProjectionMatrixBuffer { get; private set; }
-        public DeviceBuffer ViewMatrixBuffer { get; private set; }
+        public DeviceBuffer ModelViewMatrixBuffer { get; private set; }
         public DeviceBuffer DepthLimitsBuffer { get; internal set; }
         public DeviceBuffer CameraInfoBuffer { get; private set; }
 
@@ -36,17 +36,22 @@ namespace UAlbion.Core
         public virtual void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
         {
             ResourceFactory factory = gd.ResourceFactory;
-            ProjectionMatrixBuffer = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
-            ViewMatrixBuffer = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
-            IdentityMatrixBuffer = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
+            ProjectionMatrixBuffer =
+                factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
+            ModelViewMatrixBuffer =
+                factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
+            IdentityMatrixBuffer =
+                factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
             cl.UpdateBuffer(IdentityMatrixBuffer, 0, Matrix4x4.Identity);
 
             IdentityMatrixBuffer.Name = "M_Id";
             ProjectionMatrixBuffer.Name = "M_Projection";
-            ViewMatrixBuffer.Name = "M_View";
+            ModelViewMatrixBuffer.Name = "M_View";
 
-            DepthLimitsBuffer = factory.CreateBuffer(new BufferDescription((uint)Unsafe.SizeOf<DepthCascadeLimits>(), BufferUsage.UniformBuffer | BufferUsage.Dynamic));
-            CameraInfoBuffer = factory.CreateBuffer(new BufferDescription((uint)Unsafe.SizeOf<CameraInfo>(), BufferUsage.UniformBuffer | BufferUsage.Dynamic));
+            DepthLimitsBuffer = factory.CreateBuffer(new BufferDescription((uint) Unsafe.SizeOf<DepthCascadeLimits>(),
+                BufferUsage.UniformBuffer | BufferUsage.Dynamic));
+            CameraInfoBuffer = factory.CreateBuffer(new BufferDescription((uint) Unsafe.SizeOf<CameraInfo>(),
+                BufferUsage.UniformBuffer | BufferUsage.Dynamic));
 
             DepthLimitsBuffer.Name = "B_DepthLimits";
             CameraInfoBuffer.Name = "B_CameraInfo";
@@ -55,7 +60,8 @@ namespace UAlbion.Core
                 UpdateCameraBuffers(cl);
 
             TextureSamplerResourceLayout = factory.CreateResourceLayout(new ResourceLayoutDescription(
-                new ResourceLayoutElementDescription("SourceTexture", ResourceKind.TextureReadOnly, ShaderStages.Fragment),
+                new ResourceLayoutElementDescription("SourceTexture", ResourceKind.TextureReadOnly,
+                    ShaderStages.Fragment),
                 new ResourceLayoutElementDescription("SourceSampler", ResourceKind.Sampler, ShaderStages.Fragment)));
 
             TextureSamplerResourceLayout.Name = "RL_TextureSampler";
@@ -67,7 +73,7 @@ namespace UAlbion.Core
         {
             IdentityMatrixBuffer.Dispose();
             ProjectionMatrixBuffer.Dispose();
-            ViewMatrixBuffer.Dispose();
+            ModelViewMatrixBuffer.Dispose();
             DepthLimitsBuffer.Dispose();
             CameraInfoBuffer.Dispose();
             MainSceneColorTexture.Dispose();
@@ -93,8 +99,12 @@ namespace UAlbion.Core
         public void UpdateCameraBuffers(CommandList cl)
         {
             cl.UpdateBuffer(ProjectionMatrixBuffer, 0, Camera.ProjectionMatrix);
-            cl.UpdateBuffer(ViewMatrixBuffer, 0, Camera.ViewMatrix);
             cl.UpdateBuffer(CameraInfoBuffer, 0, Camera.GetCameraInfo());
+        }
+
+        public void UpdateModelTransform(CommandList cl, Matrix4x4 transform)
+        {
+            cl.UpdateBuffer(ModelViewMatrixBuffer, 0, transform);
         }
 
         internal void RecreateWindowSizedResources(GraphicsDevice gd, CommandList cl)

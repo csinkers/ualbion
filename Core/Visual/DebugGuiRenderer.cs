@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core.Events;
 using Veldrid;
@@ -26,6 +27,7 @@ namespace UAlbion.Core.Visual
         public int RenderOrder => (int)DrawLayer.Debug;
         public Type Renderer => typeof(DebugGuiRenderer);
         public BoundingBox? Extents => null;
+        public Matrix4x4 Transform => Matrix4x4.Identity;
         public event EventHandler ExtentsChanged;
 
         public void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)

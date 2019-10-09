@@ -56,6 +56,7 @@ namespace UAlbion.Core.Visual
         public Type Renderer => typeof(ExtrudedTileMapRenderer);
 
         public BoundingBox? Extents => new BoundingBox(Position, Position + TileSize * new Vector3(Width, 1, Height));
+        public Matrix4x4 Transform => Matrix4x4.Identity;
         public event EventHandler ExtentsChanged; // Never fires, tilemaps remain static.
         public Tile[] Tiles { get; }
         public uint Width { get; }

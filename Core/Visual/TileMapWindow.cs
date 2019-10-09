@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using Veldrid.Utilities;
 
 namespace UAlbion.Core.Visual
@@ -9,6 +10,7 @@ namespace UAlbion.Core.Visual
         public int RenderOrder => TileMap.RenderOrder;
         public Type Renderer => TileMap.Renderer;
         public BoundingBox? Extents => TileMap.Extents;
+        public Matrix4x4 Transform => Matrix4x4.Identity;
         public event EventHandler ExtentsChanged;
 
         public int Offset { get; }

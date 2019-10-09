@@ -33,7 +33,14 @@ namespace UAlbion.Game.Entities
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<SmallNpcSprite, RenderEvent>((x,e) => x.Render(e)),
-            new Handler<SmallNpcSprite, SetTileSizeEvent>((x,e) => x._tileSize = new Vector2(e.TileSize.X, e.TileSize.Y))
+            new Handler<SmallNpcSprite, SetTileSizeEvent>((x,e) => x._tileSize = new Vector2(e.TileSize.X, e.TileSize.Y)),
+            new Handler<SmallNpcSprite, UpdateEvent>((x, e) =>
+            {
+                var cycle = Frames[x._animation];
+                x._frame++;
+                if (!cycle.Contains(x._frame))
+                    x._frame = cycle[0];
+            })
         };
 
         readonly SmallNpcId _id;
@@ -53,11 +60,6 @@ namespace UAlbion.Game.Entities
 
         void Render(RenderEvent e)
         {
-            var cycle = Frames[_animation];
-            _frame++;
-            if (!cycle.Contains(_frame))
-                _frame = cycle[0];
-
             var positionLayered = new Vector3(_position * _tileSize, DrawLayer.Characters1.ToZCoordinate(_position.Y));
             var npcSprite = new SpriteDefinition<SmallNpcId>(_id, _frame, positionLayered, (int)DrawLayer.Characters1, true, 0);
             e.Add(npcSprite);

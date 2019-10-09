@@ -6,6 +6,8 @@ namespace UAlbion.Core.Visual
 {
     public abstract class SpriteDefinition : IRenderable
     {
+        Vector3 _position;
+
         protected SpriteDefinition(string name, int subObject, Vector3 position, int renderOrder, bool depthTested, SpriteFlags flags, Vector2? size)
         {
             Name = name;
@@ -29,13 +31,23 @@ namespace UAlbion.Core.Visual
                 return new BoundingBox(min, max);
             }
         }
+        public Matrix4x4 Transform { get; private set; } = Matrix4x4.Identity;
         public event EventHandler ExtentsChanged;
         public bool DepthTested { get; }
         public int RenderOrder { get; }
         public SpriteFlags Flags { get; }
         public int SubObject { get; }
         
-        public Vector3 Position { get; }
+        public Vector3 Position
+        {
+            get => _position;
+            set
+            {
+                _position = value;
+                Transform = Matrix4x4.CreateTranslation(_position);
+                ExtentsChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
         public Vector2? Size { get; }
         public abstract Type IdType { get; }
         public abstract int NumericId { get; }

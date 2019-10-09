@@ -325,16 +325,16 @@ namespace UAlbion.Core
             // Scaled up to nearest whole multiple that will fit
             // w/ letterboxing to compensate for aspect ratio differences.
 
-            return new Vector2(
-                (x - (float)UiWidth / 2)  * ((IWindowState)this).GuiScale / ((IWindowState)this).Width,
-                ((float)UiHeight / 2 - y) * ((IWindowState)this).GuiScale / ((IWindowState)this).Height);
+            float screenX = (x - (float)UiWidth / 2) * ((IWindowState)this).GuiScale / ((IWindowState)this).Width;
+            float screenY = ((float)UiHeight / 2 - y) * ((IWindowState)this).GuiScale / ((IWindowState)this).Height;
+            return new Vector2(screenX, screenY);
         }
 
         Vector2 IWindowState.UiToScreenRelative(int x, int y)
         {
             return new Vector2(
                 (float)x * ((IWindowState)this).GuiScale / ((IWindowState)this).Width,
-                (float)y * ((IWindowState)this).GuiScale / ((IWindowState)this).Height);
+                -(float)y * ((IWindowState)this).GuiScale / ((IWindowState)this).Height);
         }
     }
 }

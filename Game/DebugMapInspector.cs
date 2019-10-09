@@ -34,6 +34,9 @@ namespace UAlbion.Game
             ImGui.Begin("Inspector");
             ImGui.BeginChild("Inspector");
             ImGui.Text($"CursorPos: {_mousePosition} TileSize: {state.TileSize}");
+            // Cursor: PixelPos NormPos UiPos
+            // Camera: WorldPos TilePos Direction Mag
+            // Per hit: WorldPos TilePos
             ImGui.Text($"Camera Position: {state.CameraPosition}");
             ImGui.Text($"TilePosition: {state.CameraTilePosition}");
             ImGui.Text($"Direction: {state.CameraDirection}");

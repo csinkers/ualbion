@@ -29,10 +29,10 @@ namespace UAlbion.Game.Entities
 
         static readonly IDictionary<Animation, int[]> Frames = new Dictionary<Animation, int[]>
         {
-            { Animation.WalkN, new[] { 0,1,2 } },
-            { Animation.WalkE, new[] { 3,4,5 } },
-            { Animation.WalkS, new[] { 6,7,8 } },
-            { Animation.WalkW, new[] { 9,10,11 } },
+            { Animation.WalkN, new[] { 2,1,0 } },
+            { Animation.WalkE, new[] { 5,4,3 } },
+            { Animation.WalkS, new[] { 8,7,6 } },
+            { Animation.WalkW, new[] { 11,10,9 } },
             { Animation.SitN,  new[] { 12 } },
             { Animation.SitE,  new[] { 13 } },
             { Animation.SitS,  new[] { 14 } },
@@ -44,7 +44,14 @@ namespace UAlbion.Game.Entities
         {
             new Handler<LargeNpcSprite, RenderEvent>((x,e) => x.Render(e)),
             new Handler<LargeNpcSprite, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
-            new Handler<LargeNpcSprite, SetTileSizeEvent>((x,e) => x._tileSize = new Vector2(e.TileSize.X, e.TileSize.Y))
+            new Handler<LargeNpcSprite, SetTileSizeEvent>((x,e) => x._tileSize = new Vector2(e.TileSize.X, e.TileSize.Y)),
+            new Handler<LargeNpcSprite, UpdateEvent>((x, e) =>
+            {
+                var cycle = Frames[x._animation];
+                x._frame--;
+                if (!cycle.Contains(x._frame))
+                    x._frame = cycle[0];
+            })
         };
 
         readonly LargeNpcId _id;
@@ -95,11 +102,6 @@ namespace UAlbion.Game.Entities
 
         void Render(RenderEvent e)
         {
-            var cycle = Frames[_animation];
-            _frame++;
-            if (!cycle.Contains(_frame))
-                _frame = cycle[0];
-
             var positionLayered = new Vector3(_position * _tileSize, DrawLayer.Characters1.ToZCoordinate(_position.Y));
             var npcSprite = new SpriteDefinition<LargeNpcId>(
                 _id,

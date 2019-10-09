@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using UAlbion.Core.Events;
 using Veldrid;
 using Veldrid.SPIRV;
@@ -16,6 +17,7 @@ namespace UAlbion.Core.Visual
         public int RenderOrder => int.MaxValue;
         public Type Renderer => typeof(FullScreenQuad);
         public BoundingBox? Extents => null;
+        public Matrix4x4 Transform => Matrix4x4.Identity;
         public event EventHandler ExtentsChanged;
 
         DisposeCollector _disposeCollector;

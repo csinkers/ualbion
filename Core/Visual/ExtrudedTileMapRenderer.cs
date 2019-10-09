@@ -323,7 +323,7 @@ namespace UAlbion.Core.Visual
 
             var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_layout,
                 sc.ProjectionMatrixBuffer,
-                sc.ViewMatrixBuffer,
+                sc.ModelViewMatrixBuffer,
                 _miscUniformBuffer,
                 gd.PointSampler,
                 sc.PaletteView,

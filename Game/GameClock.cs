@@ -7,7 +7,7 @@ namespace UAlbion.Game
 {
     public class GameClock : Component
     {
-        const float TickDurationSeconds = 1 / 8.0f;
+        const float TickDurationSeconds = 1 / 6.0f;
         float _elapsed;
         bool _running = false;
 

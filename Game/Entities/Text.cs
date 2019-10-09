@@ -47,7 +47,7 @@ namespace UAlbion.Game.Entities
         };
 
         readonly StringId _id;
-        MultiSprite _sprite;
+        UiMultiSprite _sprite;
 
         static readonly Handler[] Handlers =
         {
@@ -117,7 +117,7 @@ namespace UAlbion.Game.Entities
                 }
             }
 
-            _sprite = new MultiSprite(new SpriteKey(font, (int)DrawLayer.Interface, false))
+            _sprite = new UiMultiSprite(new SpriteKey(font, (int)DrawLayer.Interface, false))
             {
                 Instances = instances
             };
@@ -144,7 +144,10 @@ namespace UAlbion.Game.Entities
 
         public void Render(Rectangle position, Action<IRenderable> addFunc)
         {
-            _sprite.Position = new Vector3(position.X, position.Y, 0.0f); // TODO
+            var window = Exchange.Resolve<IWindowState>();
+            var newPosition = new Vector3(window.UiToScreen(position.X, position.Y), 0);
+            if (_sprite.Position != newPosition) // Check first to avoid excessive triggering of the ExtentsChanged event.
+                _sprite.Position = newPosition;
             addFunc(_sprite);
         }
     }

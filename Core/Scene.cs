@@ -171,6 +171,11 @@ namespace UAlbion.Core
         {
             foreach (IRenderable renderable in renderableList)
             {
+                if(renderable is IScreenSpaceRenderable)
+                    sc.UpdateModelTransform(cl, renderable.Transform);
+                else
+                    sc.UpdateModelTransform(cl, Camera.ViewMatrix * renderable.Transform);
+
                 var renderer = renderers[renderable.Renderer];
                 if ((renderer.RenderPasses & pass) != 0)
                     renderer.Render(gd, cl, sc, pass, renderable);

@@ -28,7 +28,7 @@ namespace UAlbion.Game.Input
         void SetCursor(CoreSpriteId id)
         {
             var assets = Exchange.Resolve<IAssetManager>();
-            var window = Exchange.Resolve<IWindowState>();
+            var window = Exchange.Resolve<IWindowManager>();
             var texture = assets.LoadTexture(id);
             var config = assets.LoadCoreSpriteInfo(id);
             _cursorId = id;
@@ -38,8 +38,8 @@ namespace UAlbion.Game.Input
 
         void Render(RenderEvent e)
         {
-            var windowSize = Exchange.Resolve<IWindowState>().Size;
-            if (windowSize.X < 1 || windowSize.Y < 1)
+            var window = Exchange.Resolve<IWindowManager>();
+            if (window.Size.X < 1 || window.Size.Y < 1)
                 return;
 
             var drawLayer = DrawLayer.MaxLayer;
@@ -47,11 +47,10 @@ namespace UAlbion.Game.Input
             //    Debugger.Break();
 
             var position = new Vector3(
-                2 * _position.X / windowSize.X - 1.0f,
-                1.0f - 2 * _position.Y / windowSize.Y,
+                window.PixelToNorm(_position),
                 0.0f);
 
-            var size = new Vector2(UiScaleFactor, -UiScaleFactor) * _size / windowSize;
+            var size = new Vector2(UiScaleFactor, -UiScaleFactor) * _size / window.Size;
 
             e.Add(new SpriteDefinition<CoreSpriteId>(_cursorId,
                 0,

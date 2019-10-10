@@ -41,7 +41,7 @@ namespace UAlbion.Game
                 var size = element.GetSize();
                 int x;
                 int y;
-                var window = Exchange.Resolve<IWindowState>();
+                var window = Exchange.Resolve<IWindowManager>();
 
                 switch(positioning)
                 {

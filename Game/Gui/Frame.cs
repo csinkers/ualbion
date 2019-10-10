@@ -35,7 +35,7 @@ namespace UAlbion.Game.Gui
             var assets = Exchange.Resolve<IAssetManager>();
             var multi = new MultiTexture("MainMenu", assets.LoadPalette(PaletteId.Main3D).GetCompletePalette());
             var background = assets.LoadTexture(CoreSpriteId.UiBackground);
-            multi.AddTexture(1, background, 6, 6, 0, true, (uint)width + 14, (uint)height + 14);
+            multi.AddTexture(1, background, 6, 6, 0, true, (uint)width - 6, (uint)height - 6);
             int tilesW = (width + 14) / 16;
             int tilesH = (height + 14) / 16;
             for (int j = 0; j < tilesH; j++)
@@ -94,9 +94,9 @@ namespace UAlbion.Game.Gui
                 }
             }
 
-            var window = Exchange.Resolve<IWindowState>();
+            var window = Exchange.Resolve<IWindowManager>();
             multi.GetSubImageDetails(multi.GetSubImageAtTime(1, 0), out var size, out var offset, out var texSize, out var layer);
-            var normalisedSize = window.UiToScreenRelative((int)size.X, (int)size.Y);
+            var normalisedSize = window.UiToNormRelative(new Vector2(size.X, size.Y));
             _sprite =
                 new MultiSprite(new SpriteKey(multi, (int)DrawLayer.Interface, false))
                 {
@@ -104,7 +104,8 @@ namespace UAlbion.Game.Gui
                         Vector3.Zero,
                         normalisedSize,
                     offset, texSize, layer, SpriteFlags.NoTransform)
-                    }
+                    },
+                    Flags = SpriteFlags.LeftAligned
                 };
         }
 
@@ -113,8 +114,8 @@ namespace UAlbion.Game.Gui
 
         public void Render(Rectangle extents, Action<IRenderable> addFunc)
         {
-            var window = Exchange.Resolve<IWindowState>();
-            _sprite.Position = new Vector3(window.UiToScreen(extents.X, extents.Y), 0);
+            var window = Exchange.Resolve<IWindowManager>();
+            _sprite.Position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);
             addFunc(_sprite);
             var innerExtents = new Rectangle(
                 extents.X + 16,

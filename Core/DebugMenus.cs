@@ -49,18 +49,21 @@ namespace UAlbion.Core
                 }
                 if (ImGui.BeginMenu("Window"))
                 {
+                    /*
                     bool isFullscreen = _engine.Window.WindowState == WindowState.BorderlessFullScreen;
                     if (ImGui.MenuItem("Fullscreen", "F11", isFullscreen, true))
                         Raise(new ToggleFullscreenEvent());
+                        */
 
                     if (ImGui.MenuItem("VSync", string.Empty, _engine.GraphicsDevice.SyncToVerticalBlank))
                         _engine.GraphicsDevice.SyncToVerticalBlank = !_engine.GraphicsDevice.SyncToVerticalBlank;
-
+                    /*
                     if (ImGui.MenuItem("Resizable Window", string.Empty, _engine.Window.Resizable))
                         Raise(new ToggleResizableEvent());
 
                     if (ImGui.MenuItem("Visible Window Border", string.Empty, _engine.Window.BorderVisible))
                         Raise(new ToggleVisibleBorderEvent());
+                    */
 
                     ImGui.EndMenu();
                 }

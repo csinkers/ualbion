@@ -12,7 +12,7 @@ using UAlbion.Core.Visual;
 
 namespace UAlbion.Core
 {
-    public class Engine : Component, IWindowState, IDisposable
+    public class Engine : Component, IDisposable
     {
         static readonly IList<Handler> Handlers = new Handler[]
         {
@@ -25,7 +25,6 @@ namespace UAlbion.Core
                 }
             }),
             new Handler<Engine, QuitEvent>((x, e) => x._done = true),
-            new Handler<Engine, SubscribedEvent>((x, _) => x.Exchange.Register<IWindowState>(x)),
             new Handler<Engine, SetCursorPositionEvent>((x, e) => x._pendingCursorUpdate = new Vector2(e.X, e.Y)),
             new Handler<Engine, ToggleFullscreenEvent>((x, _) => x.ToggleFullscreenState()),
             new Handler<Engine, ToggleResizableEvent>((x, _) => x.Window.Resizable = !x.Window.Resizable),
@@ -35,6 +34,7 @@ namespace UAlbion.Core
 
         static RenderDoc _renderDoc;
         public EventExchange GlobalExchange { get; }
+        Sdl2Window Window => _windowManager.Window;
 
         readonly IDictionary<Type, IRenderer> _renderers = new Dictionary<Type, IRenderer>();
         readonly IList<Scene> _scenes = new List<Scene>();
@@ -42,6 +42,7 @@ namespace UAlbion.Core
         readonly FullScreenQuad _fullScreenQuad;
         readonly DebugGuiRenderer _igRenderable;
         readonly SceneContext _sceneContext = new SceneContext();
+        readonly WindowManager _windowManager = new WindowManager();
 
         //public Scene Scene { get; private set; }
         CommandList _frameCommands;
@@ -52,7 +53,6 @@ namespace UAlbion.Core
         Vector2? _pendingCursorUpdate;
 
         internal GraphicsDevice GraphicsDevice { get; private set; }
-        internal Sdl2Window Window { get; private set; }
         internal RenderDoc RenderDoc => _renderDoc;
 
         internal string FrameTimeText => _frameTimeAverager.CurrentAverageFramesPerSecond.ToString("000.0 fps / ") +
@@ -77,6 +77,7 @@ namespace UAlbion.Core
             AddRenderer(duplicator);
             AddRenderer(_fullScreenQuad);
             GlobalExchange
+                .Register<IWindowManager>(_windowManager)
                 .Attach(this)
                 .Attach(new DebugMenus(this));
         }
@@ -221,7 +222,7 @@ namespace UAlbion.Core
                     WindowTitle = "UAlbion"
                 };
 
-                Window = VeldridStartup.CreateWindow(ref windowInfo);
+                _windowManager.Window = VeldridStartup.CreateWindow(ref windowInfo);
                 Window.BorderVisible = false;
                 Window.CursorVisible = true;
                 Window.Resized += () => _windowResized = true;
@@ -288,53 +289,6 @@ namespace UAlbion.Core
         public void CheckForErrors()
         {
             /*GraphicsDevice?.CheckForErrors();*/
-        }
-
-        const int UiWidth = 360;
-        const int UiHeight = 240;
-
-        int IWindowState.Width => Window.Width;
-        int IWindowState.Height => Window.Height;
-        int IWindowState.UiWidth => UiWidth;
-        int IWindowState.UiHeight => UiHeight;
-        Vector2 IWindowState.Size => new Vector2(Window.Width, Window.Height);
-
-        int IWindowState.GuiScale
-        {
-            get
-            {
-                float widthRatio = (float)Window.Width / UiWidth;
-                float heightRatio = (float)Window.Height / UiHeight;
-                int scale = (int)Math.Min(widthRatio, heightRatio);
-                return scale == 0 ? 1 : scale;
-            }
-        }
-
-        Vector2 IWindowState.UiToScreen(int x, int y)
-        {
-            Debug.Assert(x >= 0);
-            Debug.Assert(y >= 0);
-            Debug.Assert(x <= UiWidth);
-            Debug.Assert(y <= UiHeight);
-
-            // UI Coordinates:
-            // Top left corner in original game = (0,0)
-            // Bottom right corner in original game = (360, 240)
-            // + bottom 48 pixels reserved for status bar, so viewport is 192 high.
-
-            // Scaled up to nearest whole multiple that will fit
-            // w/ letterboxing to compensate for aspect ratio differences.
-
-            float screenX = (x - (float)UiWidth / 2) * ((IWindowState)this).GuiScale / ((IWindowState)this).Width;
-            float screenY = ((float)UiHeight / 2 - y) * ((IWindowState)this).GuiScale / ((IWindowState)this).Height;
-            return new Vector2(screenX, screenY);
-        }
-
-        Vector2 IWindowState.UiToScreenRelative(int x, int y)
-        {
-            return new Vector2(
-                (float)x * ((IWindowState)this).GuiScale / ((IWindowState)this).Width,
-                -(float)y * ((IWindowState)this).GuiScale / ((IWindowState)this).Height);
         }
     }
 }

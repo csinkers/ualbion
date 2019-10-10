@@ -78,6 +78,7 @@ namespace UAlbion.Core.Visual
         public bool DepthTested => Key.DepthTested;
         public SpriteKey Key { get; }
         public int BufferId { get; set; }
+        public SpriteFlags Flags { get; set; } // Common flags, mostly ignored.
 
         public Vector3 Position
         {

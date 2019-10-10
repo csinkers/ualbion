@@ -26,7 +26,7 @@ namespace UAlbion.Game.Gui
             StringId S(SystemTextId id) => new StringId(AssetType.SystemText, 0, (int)id);
 
             // Exchange.Attach(frame);
-            // var origin = window.UiToScreen(130, 30);
+            // var origin = window.UiToNorm(130, 30);
             // var grid = new Vector2(0, -window.GuiScale * 12) / window.Size;
             var elements = new List<IUiElement>
             {
@@ -37,7 +37,7 @@ namespace UAlbion.Game.Gui
                 new Padding(0,4),
                 new Button(S(SystemTextId.MainMenu_NewGame)),
                 new Button(S(SystemTextId.MainMenu_LoadGame)),
-                new Button(S(SystemTextId.MainMenu_SaveGame)),
+                //new Button(S(SystemTextId.MainMenu_SaveGame)),
                 new Padding(0,4),
                 new Button(S(SystemTextId.MainMenu_Options)),
                 new Button(S(SystemTextId.MainMenu_ViewIntro)),

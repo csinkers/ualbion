@@ -57,8 +57,8 @@ namespace UAlbion.Game.Input
             new Handler<MouseLookInputMode, PostUpdateEvent>((x, e) =>
             {
                 if (!x._isActive) return;
-                var windowState = x.Exchange.Resolve<IWindowState>();
-                x.Raise(new SetCursorPositionEvent(windowState.Width / 2, windowState.Height / 2));
+                var windowState = x.Exchange.Resolve<IWindowManager>();
+                x.Raise(new SetCursorPositionEvent(windowState.PixelWidth / 2, windowState.PixelHeight / 2));
             }),
         };
 
@@ -67,8 +67,8 @@ namespace UAlbion.Game.Input
             if (!_isActive /*|| ImGui.GetIO().WantCaptureMouse*/)
                 return;
 
-            var windowState = Exchange.Resolve<IWindowState>();
-            var delta = e.Snapshot.MousePosition - new Vector2((float)windowState.Width / 2, (float)windowState.Height / 2);
+            var windowState = Exchange.Resolve<IWindowManager>();
+            var delta = e.Snapshot.MousePosition - new Vector2((float)windowState.PixelWidth / 2, (float)windowState.PixelHeight / 2);
 
             if (delta.LengthSquared() > float.Epsilon)
                 Raise(new CameraRotateEvent(delta.X * -0.003f, delta.Y * -0.003f));

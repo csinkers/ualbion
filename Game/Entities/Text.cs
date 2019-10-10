@@ -64,7 +64,7 @@ namespace UAlbion.Game.Entities
         void Reformat()
         {
             var assets = Exchange.Resolve<IAssetManager>();
-            var window = Exchange.Resolve<IWindowState>();
+            var window = Exchange.Resolve<IWindowManager>();
             var settings = Exchange.Resolve<ISettings>();
 
             var font = assets.LoadFont(_color, false);
@@ -80,10 +80,11 @@ namespace UAlbion.Game.Entities
                 if (_fontMapping.TryGetValue(c, out var index))
                 {
                     font.GetSubImageDetails(index, out var size, out var texOffset, out texSize, out var layer);
-                    size = new Vector2(size.X + 1, -size.Y);
+
+                    var normPosition = window.UiToNormRelative(new Vector2(offset, 0));
                     var baseInstance = new SpriteInstanceData(
-                        new Vector3(window.UiToScreenRelative(offset, 0), 0),
-                        window.GuiScale * size / window.Size,
+                        new Vector3(normPosition, 0),
+                        window.UiToNormRelative(new Vector2(size.X, size.Y)),
                         texOffset, texSize, layer,
                         SpriteFlags.UsePalette | SpriteFlags.NoTransform);
 
@@ -94,32 +95,33 @@ namespace UAlbion.Game.Entities
                         instances[n + 2] = baseInstance;
                         instances[n + 3] = baseInstance;
 
-                        instances[n].Offset += new Vector3(window.UiToScreenRelative(2, 1), 0);
+                        instances[n].Offset += new Vector3(window.UiToNormRelative(new Vector2(2, 1)), 0);
                         instances[n].Flags |= SpriteFlags.DropShadow;
 
-                        instances[n+1].Offset += new Vector3(window.UiToScreenRelative(1,1), 0);
+                        instances[n+1].Offset += new Vector3(window.UiToNormRelative(new Vector2(1,1)), 0);
                         instances[n+1].Flags |= SpriteFlags.DropShadow;
 
-                        instances[n + 2].Offset += new Vector3(window.GuiScale / window.Size.X, 0, 0);
+                        instances[n + 2].Offset += new Vector3(window.UiToNormRelative(new Vector2(1, 0)), 0);
                         offset += 1;
                     }
                     else
                     {
                         instances[n].Flags |= SpriteFlags.DropShadow;
-                        instances[n].Offset += new Vector3(window.UiToScreenRelative(1,1), 0);
+                        instances[n].Offset += new Vector3(window.UiToNormRelative(new Vector2(1,1)), 0);
                     }
 
                     offset += (int)size.X;
                 }
                 else
                 {
-                    offset += 6;
+                    offset += 3;
                 }
             }
 
             _sprite = new UiMultiSprite(new SpriteKey(font, (int)DrawLayer.Interface, false))
             {
-                Instances = instances
+                Instances = instances,
+                Flags = SpriteFlags.LeftAligned
             };
 
             _size = new Vector2(offset + 1, fontSize.Y + 1); // +1 for the drop shadow
@@ -144,8 +146,8 @@ namespace UAlbion.Game.Entities
 
         public void Render(Rectangle position, Action<IRenderable> addFunc)
         {
-            var window = Exchange.Resolve<IWindowState>();
-            var newPosition = new Vector3(window.UiToScreen(position.X, position.Y), 0);
+            var window = Exchange.Resolve<IWindowManager>();
+            var newPosition = new Vector3(window.UiToNorm(new Vector2(position.X, position.Y)), 0);
             if (_sprite.Position != newPosition) // Check first to avoid excessive triggering of the ExtentsChanged event.
                 _sprite.Position = newPosition;
             addFunc(_sprite);

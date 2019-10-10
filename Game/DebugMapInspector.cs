@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 using ImGuiNET;
 using UAlbion.Core;
@@ -28,19 +29,18 @@ namespace UAlbion.Game
                 return;
 
             var state = Exchange.Resolve<IStateManager>();
+            var window = Exchange.Resolve<IWindowManager>();
             if (state == null)
                 return;
 
             ImGui.Begin("Inspector");
             ImGui.BeginChild("Inspector");
-            ImGui.Text($"CursorPos: {_mousePosition} TileSize: {state.TileSize}");
-            // Cursor: PixelPos NormPos UiPos
-            // Camera: WorldPos TilePos Direction Mag
-            // Per hit: WorldPos TilePos
-            ImGui.Text($"Camera Position: {state.CameraPosition}");
-            ImGui.Text($"TilePosition: {state.CameraTilePosition}");
-            ImGui.Text($"Direction: {state.CameraDirection}");
-            ImGui.Text($"Magnification: {state.CameraMagnification}");
+
+            var normPos = window.PixelToNorm(_mousePosition);
+            var uiPos = window.NormToUi(normPos);
+            ImGui.Text($"Cursor Pix: {_mousePosition} Norm: {normPos} UI: {uiPos}");
+            ImGui.Text($"Camera World: {state.CameraPosition} Tile: {state.CameraTilePosition} Dir: {state.CameraDirection} Mag: {state.CameraMagnification}");
+            ImGui.Text($"TileSize: {state.TileSize}");
 
             int hitId = 0;
             foreach (var hit in _hits)

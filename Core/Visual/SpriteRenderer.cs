@@ -129,11 +129,12 @@ namespace UAlbion.Core.Visual
                     color = texture(sampler2DArray(SpriteTexture, SpriteSampler), vec3(uv, fsin_1));
                 }
 
+                //color = vec4(0.5f, 0.5f, 0.5f, 1.0f); /*
                 if(color.w == 0.0f)
                     discard;
 
                 if((fsin_2 & 0x800) != 0)
-                    color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+                    color = vec4(0.0f, 0.0f, 0.0f, 1.0f); //*/
 
                 if((fsin_2 & 0x02) != 0) color = color * 1.2; // Highlight
                 if((fsin_2 & 0x10) != 0) color = vec4(color.x * 1.5f + 0.3f, color.yzw);         // Red tint
@@ -145,18 +146,26 @@ namespace UAlbion.Core.Visual
             }";
         }
 
-        static readonly Vertex2DTextured[] Vertices =
+        static readonly Vertex2DTextured[] CenteredVertices =
         {
             new Vertex2DTextured(-0.5f, 0.0f, 0.0f, 0.0f), new Vertex2DTextured(0.5f, 0.0f, 1.0f, 0.0f),
             new Vertex2DTextured(-0.5f, 1.0f, 0.0f, 1.0f), new Vertex2DTextured(0.5f, 1.0f, 1.0f, 1.0f),
         };
+
+        static readonly Vertex2DTextured[] LeftAlignedVertices =
+        {
+            new Vertex2DTextured(0.0f, 0.0f, 0.0f, 0.0f), new Vertex2DTextured(1.0f, 0.0f, 1.0f, 0.0f),
+            new Vertex2DTextured(0.0f, 1.0f, 0.0f, 1.0f), new Vertex2DTextured(1.0f, 1.0f, 1.0f, 1.0f),
+        };
+
         static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
         readonly IList<DeviceBuffer> _instanceBuffers = new List<DeviceBuffer>();
         readonly IList<ResourceSet> _resourceSets = new List<ResourceSet>();
 
         // Context objects
-        DeviceBuffer _vb;
+        DeviceBuffer _centeredVb;
+        DeviceBuffer _leftVb;
         DeviceBuffer _ib;
         Pipeline _depthTestPipeline;
         Pipeline _noDepthPipeline;
@@ -167,11 +176,14 @@ namespace UAlbion.Core.Visual
         {
             ResourceFactory factory = gd.ResourceFactory;
 
-            _vb = factory.CreateBuffer(new BufferDescription(Vertices.SizeInBytes(), BufferUsage.VertexBuffer));
+            _centeredVb = factory.CreateBuffer(new BufferDescription(CenteredVertices.SizeInBytes(), BufferUsage.VertexBuffer));
+            _leftVb = factory.CreateBuffer(new BufferDescription(CenteredVertices.SizeInBytes(), BufferUsage.VertexBuffer));
             _ib = factory.CreateBuffer(new BufferDescription(Indices.SizeInBytes(), BufferUsage.IndexBuffer));
-            _vb.Name = "SpriteVertexBuffer";
+            _centeredVb.Name = "SpriteVertexBufferC";
+            _leftVb.Name = "SpriteVertexBufferL";
             _ib.Name = "SpriteIndexBuffer";
-            cl.UpdateBuffer(_vb, 0, Vertices);
+            cl.UpdateBuffer(_centeredVb, 0, CenteredVertices);
+            cl.UpdateBuffer(_leftVb, 0, LeftAlignedVertices);
             cl.UpdateBuffer(_ib, 0, Indices);
 
             var shaderSet = new ShaderSetDescription(new[] { Shader.VertexLayout, Shader.InstanceLayout },
@@ -216,7 +228,7 @@ namespace UAlbion.Core.Visual
             _noDepthPipeline = factory.CreateGraphicsPipeline(ref nonDepthPd);
             _noDepthPipeline.Name = "P_SpriteRendererNoDepth";
 
-            _disposeCollector.Add(_vb, _ib, _perSpriteResourceLayout, _depthTestPipeline);
+            _disposeCollector.Add(_centeredVb, _leftVb, _ib, _perSpriteResourceLayout, _depthTestPipeline);
         }
 
         public IEnumerable<IRenderable> UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IEnumerable<IRenderable> renderables)
@@ -279,7 +291,7 @@ namespace UAlbion.Core.Visual
 
             cl.SetPipeline(sprite.DepthTested ? _depthTestPipeline : _noDepthPipeline);
             cl.SetGraphicsResourceSet(0, resourceSet);
-            cl.SetVertexBuffer(0, _vb);
+            cl.SetVertexBuffer(0, ((sprite.Flags & SpriteFlags.LeftAligned) != 0) ? _leftVb : _centeredVb);
             cl.SetIndexBuffer(_ib, IndexFormat.UInt16);
             cl.SetVertexBuffer(1, _instanceBuffers[sprite.BufferId]);
 

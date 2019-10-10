@@ -34,8 +34,8 @@ namespace UAlbion.Core.Visual
         {
             if (_imguiRenderer == null)
             {
-                var window = Exchange.Resolve<IWindowState>();
-                _imguiRenderer = new ImGuiRenderer(gd, sc.MainSceneFramebuffer.OutputDescription, window.Width, window.Height, ColorSpaceHandling.Linear);
+                var window = Exchange.Resolve<IWindowManager>();
+                _imguiRenderer = new ImGuiRenderer(gd, sc.MainSceneFramebuffer.OutputDescription, window.PixelWidth, window.PixelHeight, ColorSpaceHandling.Linear);
             }
             else
             {

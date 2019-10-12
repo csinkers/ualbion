@@ -21,7 +21,7 @@ namespace UAlbion.Game.Gui
                 Label _lblTrainingPoints;
                 public Vector2 Size { get; }
 
-                public void Render(Rectangle position, Action<IRenderable> addFunc)
+                public void Render(Rectangle position, int order, Action<IRenderable> addFunc)
                 {
                     throw new NotImplementedException();
                 }
@@ -47,7 +47,7 @@ namespace UAlbion.Game.Gui
                 AlbionIndicator _lockPicking;
                 public Vector2 Size { get; }
 
-                public void Render(Rectangle position, Action<IRenderable> addFunc)
+                public void Render(Rectangle position, int order, Action<IRenderable> addFunc)
                 {
                     throw new NotImplementedException();
                 }
@@ -66,7 +66,7 @@ namespace UAlbion.Game.Gui
                 Button _combatPositions;
                 public Vector2 Size { get; }
 
-                public void Render(Rectangle position, Action<IRenderable> addFunc)
+                public void Render(Rectangle position, int order, Action<IRenderable> addFunc)
                 {
                     throw new NotImplementedException();
                 }
@@ -104,7 +104,7 @@ namespace UAlbion.Game.Gui
             Label _protection;
             public Vector2 Size { get; }
 
-            public void Render(Rectangle position, Action<IRenderable> addFunc)
+            public void Render(Rectangle position, int order, Action<IRenderable> addFunc)
             {
                 throw new NotImplementedException();
             }
@@ -125,7 +125,7 @@ namespace UAlbion.Game.Gui
 
         public Vector2 GetSize() => Vector2.Zero;
 
-        public void Render(Rectangle position, Action<IRenderable> addFunc)
+        public void Render(Rectangle position, int order, Action<IRenderable> addFunc)
         {
             throw new NotImplementedException();
         }

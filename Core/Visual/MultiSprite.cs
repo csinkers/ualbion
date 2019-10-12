@@ -68,7 +68,12 @@ namespace UAlbion.Core.Visual
         Vector3 _position;
 
         public string Name => Key.Texture.Name;
-        public int RenderOrder => Key.RenderOrder;
+        public int RenderOrder
+        {
+            get => Key.RenderOrder;
+            set => Key = new SpriteKey(Key.Texture, value, Key.DepthTested);
+        }
+
         public Type Renderer => typeof(SpriteRenderer);
 
         public BoundingBox? Extents => new BoundingBox(_extents.Min + Position, _extents.Max + Position);
@@ -76,7 +81,7 @@ namespace UAlbion.Core.Visual
 
         public event EventHandler ExtentsChanged;
         public bool DepthTested => Key.DepthTested;
-        public SpriteKey Key { get; }
+        public SpriteKey Key { get; private set; }
         public int BufferId { get; set; }
         public SpriteFlags Flags { get; set; } // Common flags, mostly ignored.
 

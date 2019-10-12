@@ -25,13 +25,11 @@ namespace UAlbion.Game.Gui
             _menuFunc = PrimaryMenu;
             StringId S(SystemTextId id) => new StringId(AssetType.SystemText, 0, (int)id);
 
-            // Exchange.Attach(frame);
-            // var origin = window.UiToNorm(130, 30);
-            // var grid = new Vector2(0, -window.GuiScale * 12) / window.Size;
             var elements = new List<IUiElement>
             {
+                new Padding(0,2),
                 new Header(S(SystemTextId.MainMenu_MainMenu)),
-                new Divider(MetaFontId.FontColor.Yellow),
+                new Divider(CommonColor.Yellow3),
                 new Padding(0,2),
                 new Button(S(SystemTextId.MainMenu_ContinueGame)),
                 new Padding(0,4),
@@ -44,6 +42,7 @@ namespace UAlbion.Game.Gui
                 new Button(S(SystemTextId.MainMenu_Credits)),
                 new Padding(0,3),
                 new Button(S(SystemTextId.MainMenu_QuitGame)),
+                new Padding(0,2),
             };
             var stack = new VerticalStack(elements);
             _frame = new Frame(stack); //140, 40, 79, 112
@@ -59,10 +58,10 @@ namespace UAlbion.Game.Gui
         public IUiElement Parent => null;
         public Vector2 GetSize() => _frame.GetSize();
 
-        public void Render(Rectangle extents, Action<IRenderable> addFunc)
+        public void Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
             foreach (var child in Children.OfType<IUiElement>())
-                child.Render(extents, addFunc);
+                child.Render(extents, order + 1, addFunc);
         }
 
         void PrimaryMenu()

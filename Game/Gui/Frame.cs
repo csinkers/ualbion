@@ -1,43 +1,60 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using UAlbion.Api;
 using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Game.Events;
 using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
+    /*
+    public static class GuiHelper
+    {
+        public static IRenderable HorizontalLine(int x1, int x2, int y, byte color)
+        {
+        }
+
+        public static IRenderable VerticalLine(int x, int y1, int y2, byte color)
+        {
+        }
+
+        public static IRenderable HollowRectangle(int x1, int y1, int x2, int y2, byte color1, byte color2)
+        {
+        }
+
+        public static IRenderable FilledRectangle(int x1, int y1, int x2, int y2, byte color1, byte color2, byte fillColor)
+        {
+        }
+    }*/
+
     public class Frame : Component, IUiElement
     {
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<Frame, WindowResizedEvent>((x, _) => x.Rebuild()),
-            new Handler<Frame, SetLanguageEvent>((x, _) => x.Rebuild()), // Make this bubble up from the Text elements?
-        };
-
+        const int TileSize = 16;
         MultiSprite _sprite;
+        Vector2 _lastPixelSize;
 
-        public Frame(IUiElement child) : base(Handlers) => Children.Add(child);
-        protected override void Subscribed() => Rebuild();
-
-        void Rebuild()
+        public Frame(IUiElement child) : base(null) => Children.Add(child);
+        void Rebuild(int width, int height, int order)
         {
-            var extents = GetSize();
-            int width = (int)extents.X;
-            int height = (int)extents.Y;
+            var window = Exchange.Resolve<IWindowManager>();
+
+            {
+                var normSize = window.UiToNormRelative(new Vector2(width, height));
+                var pixelSize = window.NormToPixelRelative(normSize);
+
+                if ((pixelSize - _lastPixelSize).LengthSquared() < float.Epsilon && _sprite.RenderOrder == order)
+                    return;
+                _lastPixelSize = pixelSize;
+            }
 
             var assets = Exchange.Resolve<IAssetManager>();
             var multi = new MultiTexture("MainMenu", assets.LoadPalette(PaletteId.Main3D).GetCompletePalette());
             var background = assets.LoadTexture(CoreSpriteId.UiBackground);
-            multi.AddTexture(1, background, 6, 6, 0, true, (uint)width - 6, (uint)height - 6);
-            int tilesW = (width + 14) / 16;
-            int tilesH = (height + 14) / 16;
+            multi.AddTexture(1, background, 16, 16, 0, true, (uint)width - 32, (uint)height - 32);
+            int tilesW = width / TileSize;
+            int tilesH = height / TileSize;
             for (int j = 0; j < tilesH; j++)
             {
                 for (int i = 0; i < tilesW; i++)
@@ -47,8 +64,8 @@ namespace UAlbion.Game.Gui
                         multi.AddTexture(
                             1,
                             assets.LoadTexture(textureId),
-                            (uint)(16*i + bias),
-                            (uint)(16*j + bias),
+                            (uint)(TileSize*i + bias),
+                            (uint)(TileSize*j + bias),
                             0,
                             true);
                     }
@@ -63,8 +80,8 @@ namespace UAlbion.Game.Gui
                         multi.AddTexture(
                             1,
                             texture,
-                            (uint)(16*i + (vertical ? bias : 0)),
-                            (uint)(16*j + (vertical ? 0 : bias)),
+                            (uint)(TileSize*i + (vertical ? bias : 0)),
+                            (uint)(TileSize*j + (vertical ? 0 : bias)),
                             0,
                             true);
                     }
@@ -80,7 +97,7 @@ namespace UAlbion.Game.Gui
                         else if (i == tilesW - 1) Set(CoreSpriteId.UiWindowTopRight, 0);
                         else                      SetLine(false, 4);
                     }
-                    else if (j == height - 1)
+                    else if (j == tilesH - 1)
                     {
                         if (i == 0)               Set(CoreSpriteId.UiWindowBottomLeft, 0);
                         else if (i == tilesW - 1) Set(CoreSpriteId.UiWindowBottomRight, 0);
@@ -94,11 +111,10 @@ namespace UAlbion.Game.Gui
                 }
             }
 
-            var window = Exchange.Resolve<IWindowManager>();
             multi.GetSubImageDetails(multi.GetSubImageAtTime(1, 0), out var size, out var offset, out var texSize, out var layer);
             var normalisedSize = window.UiToNormRelative(new Vector2(size.X, size.Y));
             _sprite =
-                new MultiSprite(new SpriteKey(multi, (int)DrawLayer.Interface, false))
+                new UiMultiSprite(new SpriteKey(multi, order, false))
                 {
                     Instances = new[] { new SpriteInstanceData(
                         Vector3.Zero,
@@ -109,22 +125,23 @@ namespace UAlbion.Game.Gui
                 };
         }
 
-        public Vector2 GetSize() => 
-            Children.OfType<IUiElement>().Max(x => x.GetSize()) + Vector2.One * 32;
+        public Vector2 GetSize() => Children.OfType<IUiElement>().Max(x => x.GetSize()) + Vector2.One * TileSize * 2;
 
-        public void Render(Rectangle extents, Action<IRenderable> addFunc)
+        public void Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
+            Rebuild(extents.Width, extents.Height, order);
+
             var window = Exchange.Resolve<IWindowManager>();
             _sprite.Position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);
             addFunc(_sprite);
             var innerExtents = new Rectangle(
-                extents.X + 16,
-                 extents.Y + 16,
-                extents.Width - 32,
-                extents.Height - 32);
+                extents.X + TileSize,
+                 extents.Y + TileSize,
+                extents.Width - TileSize * 2,
+                extents.Height - TileSize * 2);
 
             foreach (var child in Children.OfType<IUiElement>())
-                child.Render(innerExtents, addFunc);
+                child.Render(innerExtents, order + 1, addFunc);
         }
     }
 }

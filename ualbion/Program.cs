@@ -128,9 +128,9 @@ namespace UAlbion
             var status = new ScreenSpaceSprite<PictureId>(PictureId.StatusBar, new Vector2(0.0f, -0.6f), new Vector2(2.0f, -0.4f));
             menuScene.SceneExchange
                 .Attach(menu)
-                //.Attach(new Starfield())
                 .Attach(background)
                 .Attach(status)
+                //.Attach(new Starfield())
                 ;
 
             engine.GlobalExchange.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);

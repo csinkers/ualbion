@@ -330,7 +330,7 @@ namespace UAlbion.Game
         public ITexture LoadTexture(CoreSpriteId id)         => (ITexture)LoadAssetCached(AssetType.CoreGraphics,       id);
         public TilesetData LoadTileData(IconDataId id)       => (TilesetData)LoadAssetCached(AssetType.IconData,        id);
         public LabyrinthData LoadLabyrinthData(LabyrinthDataId id) => (LabyrinthData) LoadAssetCached(AssetType.LabData, id);
-        public ITexture LoadFont(MetaFontId.FontColor color, bool isBold) => LoadTexture(new MetaFontId(isBold, color));
+        public ITexture LoadFont(CommonColor color, bool isBold) => LoadTexture(new MetaFontId(isBold, color));
         public CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id) =>
             (CoreSpriteConfig.BinaryResource)LoadAssetCached(AssetType.CoreGraphicsMetadata, id);
 

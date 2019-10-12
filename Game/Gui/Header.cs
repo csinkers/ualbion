@@ -15,7 +15,7 @@ namespace UAlbion.Game.Gui
 
         public Header(StringId id) : base(Handlers)
         {
-            var text = new Text(id).Bold();
+            var text = new Text(id).Bold().Center();
             Children.Add(text);
         }
 
@@ -35,14 +35,14 @@ namespace UAlbion.Game.Gui
             return size;
         }
 
-        public void Select(Vector2 position, Action<float, Selection> registerHit)
+        public void Select(Vector2 position, int order, Action<float, Selection> registerHit)
         {
         }
 
-        public void Render(Rectangle extents, Action<IRenderable> addFunc)
+        public void Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
             foreach(var child in Children.OfType<IUiElement>())
-                child.Render(extents, addFunc);
+                child.Render(extents, order + 1, addFunc);
         }
     }
 }

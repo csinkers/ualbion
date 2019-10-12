@@ -11,6 +11,9 @@ namespace UAlbion.Game.Gui
     public class Starfield : Component, IUiElement // UI-grid for testing
     {
         readonly ITexture _pixel;
+        MultiSprite _sprite;
+        Vector2 _lastPixelSize;
+
 
         public Starfield() : base(null)
         {
@@ -19,6 +22,55 @@ namespace UAlbion.Game.Gui
                 1, 1, 1, 1,
                 new byte[] { 1 },
                 new[] { new EightBitTexture.SubImage(0, 0, 1, 1, 0), });
+        }
+
+        void Rebuild(int width, int height, int order)
+        {
+            var window = Exchange.Resolve<IWindowManager>();
+
+            {
+                var normSize = window.UiToNormRelative(new Vector2(width, height));
+                var pixelSize = window.NormToPixelRelative(normSize);
+
+                if ((pixelSize - _lastPixelSize).LengthSquared() < float.Epsilon && _sprite.RenderOrder == order)
+                    return;
+                _lastPixelSize = pixelSize;
+            }
+
+            var totalSize = GetSize();
+            var extents = new Rectangle(0, 0, (int)totalSize.X, (int)totalSize.Y);
+
+            var instances = new List<SpriteInstanceData>();
+            for (int j = extents.Y; j < extents.Height; j++)
+            {
+                for (int i = extents.X; i < extents.Width; i++)
+                {
+                    int n = instances.Count;
+                    SpriteFlags flags = SpriteFlags.NoTransform;
+                    if ((n & 1) != 0) flags |= SpriteFlags.BlueTint;
+                    if ((n & 2) != 0) flags |= SpriteFlags.GreenTint;
+                    if ((n & 4) != 0) flags |= SpriteFlags.RedTint;
+                    if ((n & 8) != 0) flags |= SpriteFlags.Highlight;
+
+                    var position = new Vector3(window.UiToNorm(new Vector2(i, j)), 0);
+                    var size = 2 * Vector2.One / window.Size;
+                    instances.Add(
+                        new SpriteInstanceData(
+                            position,
+                            size,
+                            Vector2.Zero,
+                            Vector2.One,
+                            0,
+                            flags
+                        )
+                    );
+                }
+            }
+
+            _sprite = new MultiSprite(new SpriteKey(_pixel, order, false))
+            {
+                Instances = instances.ToArray()
+            };
         }
 
         protected override void Subscribed()
@@ -33,35 +85,10 @@ namespace UAlbion.Game.Gui
             return new Vector2(window.UiWidth, window.UiHeight);
         }
 
-        public void Render(Rectangle extents, Action<IRenderable> addFunc)
+        public void Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
-            var window = Exchange.Resolve<IWindowManager>();
-            var instances = new List<SpriteInstanceData>();
-            for(int j = extents.Y; j < extents.Height; j++)
-            {
-                for (int i = extents.X; i < extents.Width; i++)
-                {
-                    int n = instances.Count;
-                    SpriteFlags flags = SpriteFlags.NoTransform;
-                    if ((n & 1) != 0) flags |= SpriteFlags.BlueTint;
-                    if ((n & 2) != 0) flags |= SpriteFlags.GreenTint;
-                    if ((n & 4) != 0) flags |= SpriteFlags.RedTint;
-                    if ((n & 8) != 0) flags |= SpriteFlags.Highlight;
-
-                    instances.Add(
-                        new SpriteInstanceData(
-                            new Vector3(window.UiToNorm(new Vector2(i, j)), 0),
-                            Vector2.One / window.Size,
-                            Vector2.Zero,
-                            Vector2.One,
-                            0,
-                            flags
-                        )
-                    );
-                }
-            }
-
-            addFunc(new MultiSprite(new SpriteKey(_pixel, 1, false)) { Instances = instances.ToArray() });
+            Rebuild(extents.Width, extents.Height, order);
+            addFunc(_sprite);
         }
     }
 }

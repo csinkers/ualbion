@@ -38,7 +38,8 @@ namespace UAlbion.Game
 
             var normPos = window.PixelToNorm(_mousePosition);
             var uiPos = window.NormToUi(normPos);
-            ImGui.Text($"Cursor Pix: {_mousePosition} Norm: {normPos} UI: {uiPos}");
+            uiPos.X = (int) uiPos.X; uiPos.Y = (int) uiPos.Y;
+            ImGui.Text($"Cursor Pix: {_mousePosition} UI: {uiPos} Norm: {normPos} Scale: {window.GuiScale} PixSize: {window.Size}");
             ImGui.Text($"Camera World: {state.CameraPosition} Tile: {state.CameraTilePosition} Dir: {state.CameraDirection} Mag: {state.CameraMagnification}");
             ImGui.Text($"TileSize: {state.TileSize}");
 

@@ -11,8 +11,8 @@
         Overlay3    = 0x105, // + y coord
         // Effects,
         Diagnostic  = 0x300, // Missing textures etc
-        Interface   = 0x301, // GUI
-        Debug = 0x400, // ImGui
+        Interface   = 0x400, // GUI
+        Debug = 0x500, // ImGui
 
         MaxLayer    = 0xfff // Mouse cursor
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Gui;
@@ -85,7 +86,10 @@ namespace UAlbion.Game
                         throw new ArgumentOutOfRangeException();
                 }
 
-                element.Render(new Rectangle(x, y, (int)size.X, (int)size.Y), renderEvent.Add);
+                element.Render(
+                    new Rectangle(x, y, (int)size.X, (int)size.Y), 
+                    (int)DrawLayer.Interface,
+                    renderEvent.Add);
             }
         }
 

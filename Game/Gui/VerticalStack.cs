@@ -30,13 +30,13 @@ namespace UAlbion.Game.Gui
             return size;
         }
 
-        public void Render(Rectangle extents, Action<IRenderable> addFunc)
+        public void Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
             int offset = extents.Y;
             foreach(var child in Children.OfType<IUiElement>())
             {
                 int height = (int)child.GetSize().Y;
-                child.Render(new Rectangle(extents.X,  offset, extents.Width, height), addFunc);
+                child.Render(new Rectangle(extents.X,  offset, extents.Width, height), order + 1, addFunc);
                 offset += height;
             }
         }

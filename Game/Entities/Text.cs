@@ -51,17 +51,17 @@ namespace UAlbion.Game.Entities
 
         static readonly Handler[] Handlers =
         {
-            new Handler<Text, WindowResizedEvent>((x,e) => x.Reformat()),
-            new Handler<Text, SetLanguageEvent>((x,e) => x.Reformat()),
-            new Handler<Text, SubscribedEvent>((x,e) => x.Reformat()),
+            new Handler<Text, WindowResizedEvent>((x,e) => x.Rebuild()),
+            new Handler<Text, SetLanguageEvent>((x,e) => x.Rebuild()),
+            new Handler<Text, SubscribedEvent>((x,e) => x.Rebuild()),
         };
 
-        MetaFontId.FontColor _color;
+        CommonColor _color;
         bool _isBold;
         Justification _justification;
         Vector2 _size;
 
-        void Reformat()
+        void Rebuild()
         {
             var assets = Exchange.Resolve<IAssetManager>();
             var window = Exchange.Resolve<IWindowManager>();
@@ -131,23 +131,48 @@ namespace UAlbion.Game.Entities
         {
             // TODO: Left & right justification, kerning, line wrapping
             _id = id;
-            _color = MetaFontId.FontColor.White;
+            _color = CommonColor.White;
             _isBold = false;
             _justification = Justification.Left;
         }
 
         public Text Bold() { _isBold = true; return this; }
-        public Text Color(MetaFontId.FontColor color) { _color = color; return this; }
+        public Text Color(CommonColor color) { _color = color; return this; }
         public Text Left() { _justification = Justification.Left; return this; }
         public Text Center() { _justification = Justification.Center; return this; }
         public Text Right() { _justification = Justification.Right; return this; }
 
         public Vector2 GetSize() => _size;
 
-        public void Render(Rectangle position, Action<IRenderable> addFunc)
+        public void Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
             var window = Exchange.Resolve<IWindowManager>();
-            var newPosition = new Vector3(window.UiToNorm(new Vector2(position.X, position.Y)), 0);
+            if (_sprite.RenderOrder != order)
+                _sprite.RenderOrder = order;
+
+            var newPosition = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);
+            switch (_justification)
+            {
+                case Justification.Left:
+                    break;
+                case Justification.Center:
+                    newPosition += 
+                        new Vector3(
+                        window.UiToNormRelative(new Vector2(
+                            (extents.Width - _size.X) / 2,
+                            (extents.Height - _size.Y) / 2)), 
+                        0);
+                    break;
+                case Justification.Right:
+                    newPosition += 
+                        new Vector3(
+                        window.UiToNormRelative(new Vector2(
+                            extents.Width - _size.X,
+                            extents.Height - _size.Y)), 
+                        0);
+                    break;
+            }
+
             if (_sprite.Position != newPosition) // Check first to avoid excessive triggering of the ExtentsChanged event.
                 _sprite.Position = newPosition;
             addFunc(_sprite);

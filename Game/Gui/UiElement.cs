@@ -7,7 +7,7 @@ using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    abstract class UiElement : Component, IUiElement
+    public abstract class UiElement : Component, IUiElement
     {
         protected Vector2 GetMaxChildSize()
         {
@@ -28,7 +28,15 @@ namespace UAlbion.Game.Gui
 
         protected UiElement(IList<Handler> handlers) : base(handlers) { }
 
+        protected int RenderChildren(Rectangle extents, int order, Action<IRenderable> addFunc)
+        {
+            int maxOrder = order;
+            foreach (var child in Children.OfType<IUiElement>())
+                maxOrder = Math.Max(maxOrder, child.Render(extents, order + 1, addFunc));
+            return maxOrder + 1;
+        }
+
         public abstract Vector2 GetSize();
-        public abstract void Render(Rectangle extents, int order, Action<IRenderable> addFunc);
+        public abstract int Render(Rectangle extents, int order, Action<IRenderable> addFunc);
     }
 }

@@ -237,7 +237,7 @@ namespace UAlbion.Game
         object LoadAssetCached<T>(AssetType type, T enumId, GameLanguage language = GameLanguage.English)
         {
             int id = Convert.ToInt32(enumId);
-            object asset = _assetCache.Get(type, id);
+            object asset = _assetCache.Get(type, id, language);
             if (asset is Exception _) // If it failed to load once then stop trying (at least until an asset:reload / cycle)
                 return null;
 
@@ -255,7 +255,7 @@ namespace UAlbion.Game
                 asset = e;
             }
 
-            _assetCache.Add(asset, type, id);
+            _assetCache.Add(asset, type, id, language);
             return asset is Exception ? null : asset;
         }
 
@@ -352,5 +352,4 @@ namespace UAlbion.Game
                 xld?.Dispose();
         }
     }
-
 }

@@ -85,10 +85,11 @@ namespace UAlbion.Game.Gui
             return new Vector2(window.UiWidth, window.UiHeight);
         }
 
-        public void Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        public int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
             Rebuild(extents.Width, extents.Height, order);
             addFunc(_sprite);
+            return order;
         }
     }
 }

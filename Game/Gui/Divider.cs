@@ -25,7 +25,7 @@ namespace UAlbion.Game.Gui
         }
         public Vector2 GetSize() => new Vector2(0, 1);
 
-        public void Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        public int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
             var window = Exchange.Resolve<IWindowManager>();
             var size = window.UiToNormRelative(new Vector2(extents.Width, extents.Height));
@@ -48,6 +48,7 @@ namespace UAlbion.Game.Gui
                 Instances = instances,
                 Flags = SpriteFlags.LeftAligned
             });
+            return order;
         }
     }
 }

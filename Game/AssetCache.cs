@@ -33,8 +33,8 @@ namespace UAlbion.Game
         };
 
         readonly object _syncRoot = new object();
-        IDictionary<AssetType, IDictionary<int, object>> _assetCache = new Dictionary<AssetType, IDictionary<int, object>>();
-        IDictionary<AssetType, IDictionary<int, object>> _oldAssetCache = new Dictionary<AssetType, IDictionary<int, object>>();
+        IDictionary<AssetType, IDictionary<Tuple<int, GameLanguage>, object>> _assetCache = new Dictionary<AssetType, IDictionary<Tuple<int, GameLanguage>, object>>();
+        IDictionary<AssetType, IDictionary<Tuple<int, GameLanguage>, object>> _oldAssetCache = new Dictionary<AssetType, IDictionary<Tuple<int, GameLanguage>, object>>();
 
         public AssetCache() : base(Handlers) { }
 
@@ -43,27 +43,28 @@ namespace UAlbion.Game
             lock (_syncRoot)
             {
                 _oldAssetCache = _assetCache;
-                _assetCache = new Dictionary<AssetType, IDictionary<int, object>>();
+                _assetCache = new Dictionary<AssetType, IDictionary<Tuple<int, GameLanguage>, object>>();
             }
         }
 
-        public object Get(AssetType type, int id)
-        { 
+        public object Get(AssetType type, int id, GameLanguage language = GameLanguage.English)
+        {
+            var tuple = Tuple.Create(id, language);
             lock (_syncRoot)
             {
                 if (_assetCache.TryGetValue(type, out var typeCache))
                 {
-                    if (typeCache.TryGetValue(id, out var cachedAsset))
+                    if (typeCache.TryGetValue(tuple, out var cachedAsset))
                         return cachedAsset;
                 }
-                else _assetCache[type] = new Dictionary<int, object>();
+                else _assetCache[type] = new Dictionary<Tuple<int, GameLanguage>, object>();
 
                 // Check old cache
-                if (_oldAssetCache.TryGetValue(type, out var oldTypeCache) && oldTypeCache.TryGetValue(id, out var oldCachedAsset))
+                if (_oldAssetCache.TryGetValue(type, out var oldTypeCache) && oldTypeCache.TryGetValue(tuple, out var oldCachedAsset))
                 {
                     if (!(oldCachedAsset is Exception))
                     {
-                        _assetCache[type][id] = oldCachedAsset;
+                        _assetCache[type][tuple] = oldCachedAsset;
                         return oldCachedAsset;
                     }
                 }
@@ -72,11 +73,12 @@ namespace UAlbion.Game
             return null;
         }
 
-        public void Add(object asset, AssetType type, int id)
+        public void Add(object asset, AssetType type, int id, GameLanguage language = GameLanguage.English)
         {
+            var tuple = Tuple.Create(id, language);
             lock (_syncRoot)
             {
-                _assetCache[type][id] = asset;
+                _assetCache[type][tuple] = asset;
             }
         }
     }

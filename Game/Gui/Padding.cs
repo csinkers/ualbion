@@ -11,6 +11,6 @@ namespace UAlbion.Game.Gui
         public Padding(int x, int y) : base(null) { _size = new Vector2(x, y); }
         public Vector2 GetSize() => _size;
 
-        public void Render(Rectangle extents, int order, Action<IRenderable> addFunc) { }
+        public int Render(Rectangle extents, int order, Action<IRenderable> addFunc) => order;
     }
 }

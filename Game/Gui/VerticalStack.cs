@@ -30,15 +30,17 @@ namespace UAlbion.Game.Gui
             return size;
         }
 
-        public void Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        public int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
             int offset = extents.Y;
+            int maxOrder = order;
             foreach(var child in Children.OfType<IUiElement>())
             {
                 int height = (int)child.GetSize().Y;
-                child.Render(new Rectangle(extents.X,  offset, extents.Width, height), order + 1, addFunc);
+                maxOrder = Math.Max(maxOrder, child.Render(new Rectangle(extents.X,  offset, extents.Width, height), order + 1, addFunc));
                 offset += height;
             }
+            return maxOrder;
         }
     }
 }

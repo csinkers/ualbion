@@ -12,7 +12,7 @@ namespace UAlbion.Game.Gui
         // Button _okButton;
         public Vector2 GetSize() => Vector2.Zero;
 
-        public void Render(Rectangle position, int order, Action<IRenderable> addFunc)
+        public int Render(Rectangle position, int order, Action<IRenderable> addFunc)
         {
             throw new NotImplementedException();
         }

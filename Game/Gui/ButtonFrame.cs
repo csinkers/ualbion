@@ -37,7 +37,7 @@ namespace UAlbion.Game.Gui
 
         public override Vector2 GetSize() => GetMaxChildSize() + 4 * Vector2.One;
 
-        public override void Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
             var window = Exchange.Resolve<IWindowManager>();
             // TODO: Cache sprite and rebuild when necessary
@@ -101,11 +101,8 @@ namespace UAlbion.Game.Gui
                 Flags = SpriteFlags.LeftAligned
             });
 
-            foreach(var child in Children.OfType<IUiElement>())
-                child.Render(
-                    new Rectangle(extents.X + 2, extents.Y + 2, extents.Width - 4, extents.Height - 4),
-                    order + 1, 
-                    addFunc);
+            var innerExtents = new Rectangle(extents.X + 2, extents.Y + 2, extents.Width - 4, extents.Height - 4);
+            return RenderChildren(innerExtents, order, addFunc);
         }
     }
 }

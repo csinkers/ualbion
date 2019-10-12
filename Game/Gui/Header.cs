@@ -39,10 +39,12 @@ namespace UAlbion.Game.Gui
         {
         }
 
-        public void Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        public int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
+            int maxOrder = order;
             foreach(var child in Children.OfType<IUiElement>())
-                child.Render(extents, order + 1, addFunc);
+                maxOrder = Math.Max(maxOrder, child.Render(extents, order + 1, addFunc));
+            return maxOrder;
         }
     }
 }

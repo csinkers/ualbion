@@ -144,7 +144,7 @@ namespace UAlbion.Game.Entities
 
         public Vector2 GetSize() => _size;
 
-        public void Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        public int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
             var window = Exchange.Resolve<IWindowManager>();
             if (_sprite.RenderOrder != order)
@@ -176,6 +176,7 @@ namespace UAlbion.Game.Entities
             if (_sprite.Position != newPosition) // Check first to avoid excessive triggering of the ExtentsChanged event.
                 _sprite.Position = newPosition;
             addFunc(_sprite);
+            return order;
         }
     }
 }

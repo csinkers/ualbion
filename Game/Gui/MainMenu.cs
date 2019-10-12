@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using ImGuiNET;
 using UAlbion.Core;
@@ -10,7 +9,7 @@ using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    public class MainMenu : Component, IUiElement
+    public class MainMenu : UiElement
     {
         static readonly IList<Handler> Handlers = new Handler[]
         {
@@ -56,13 +55,8 @@ namespace UAlbion.Game.Gui
         }
 
         public IUiElement Parent => null;
-        public Vector2 GetSize() => _frame.GetSize();
-
-        public void Render(Rectangle extents, int order, Action<IRenderable> addFunc)
-        {
-            foreach (var child in Children.OfType<IUiElement>())
-                child.Render(extents, order + 1, addFunc);
-        }
+        public override Vector2 GetSize() => _frame.GetSize();
+        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc) => RenderChildren(extents, order, addFunc);
 
         void PrimaryMenu()
         {

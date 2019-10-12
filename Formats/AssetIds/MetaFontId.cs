@@ -73,21 +73,28 @@ namespace UAlbion.Formats.AssetIds
         MidGrey       = 255  // #5b5363 
     }
 
+    public enum FontColor
+    {
+        White,
+        Yellow,
+        Red
+    }
+
     public class MetaFontId : IConvertible
     {
-        public MetaFontId(bool isBold = false, CommonColor color = CommonColor.White)
+        public MetaFontId(bool isBold = false, FontColor color = FontColor.White)
         {
             IsBold = isBold;
             Color = color;
         }
 
         public bool IsBold { get; }
-        public CommonColor Color { get; }
+        public FontColor Color { get; }
         public FontId FontId => IsBold ? FontId.BoldFont : FontId.RegularFont;
 
         public static explicit operator int(MetaFontId id) => (int)id.Color << 8 | (id.IsBold ? 1 : 0);
 
-        public static explicit operator MetaFontId(int id) => new MetaFontId((id & 1) != 0, (CommonColor)((id & 0xff00) >> 8));
+        public static explicit operator MetaFontId(int id) => new MetaFontId((id & 1) != 0, (FontColor)((id & 0xff00) >> 8));
 
         public int ToInt32(IFormatProvider provider) => (int)this;
 

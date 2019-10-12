@@ -32,7 +32,7 @@ namespace UAlbion.Game
         ITexture LoadTexture(FontId id);
         ITexture LoadTexture(MetaFontId id);
         ITexture LoadTexture(CoreSpriteId id);
-        ITexture LoadFont(CommonColor color, bool isBold);
+        ITexture LoadFont(FontColor color, bool isBold);
         TilesetData LoadTileData(IconDataId id);
         LabyrinthData LoadLabyrinthData(LabyrinthDataId id);
         CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id);

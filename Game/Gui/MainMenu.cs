@@ -5,6 +5,8 @@ using ImGuiNET;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Game.Events;
+using UAlbion.Game.State;
 using Veldrid;
 
 namespace UAlbion.Game.Gui
@@ -14,16 +16,35 @@ namespace UAlbion.Game.Gui
         static readonly IList<Handler> Handlers = new Handler[]
         {
             new Handler<MainMenu, EngineUpdateEvent>((x, _) => x._menuFunc()),
+            new Handler<MainMenu, UpdateEvent>((x, e) => x.Update(e)),
         };
 
-        readonly Frame _frame;
         Action _menuFunc;
+        int _extraWidth = 0;
+        int _extraHeight = 0;
 
         public MainMenu() : base(Handlers)
         {
             _menuFunc = PrimaryMenu;
-            StringId S(SystemTextId id) => new StringId(AssetType.SystemText, 0, (int)id);
+        }
 
+        void Update(UpdateEvent updateEvent)
+        {
+            var state = Exchange.Resolve<IStateManager>();
+            _extraWidth = 92 + state.FrameCount % 97;
+            _extraHeight = state.FrameCount % 63;
+            Rebuild();
+        }
+
+        void Rebuild()
+        {
+            var exchange = Exchange;
+            var layout = Exchange.Resolve<ILayoutManager>();
+            layout.Remove(this);
+            Detach();
+            Children.Clear();
+
+            StringId S(SystemTextId id) => new StringId(AssetType.SystemText, 0, (int)id);
             var elements = new List<IUiElement>
             {
                 new Padding(0,2),
@@ -41,11 +62,11 @@ namespace UAlbion.Game.Gui
                 new Button(S(SystemTextId.MainMenu_Credits)),
                 new Padding(0,3),
                 new Button(S(SystemTextId.MainMenu_QuitGame)),
-                new Padding(0,2),
+                new Padding(_extraWidth,2 + _extraHeight),
             };
             var stack = new VerticalStack(elements);
-            _frame = new Frame(stack); //140, 40, 79, 112
-            Children.Add(_frame);
+            Children.Add(new Frame(stack)); //140, 40, 79, 112
+            Attach(exchange);
         }
 
         protected override void Subscribed()
@@ -55,7 +76,7 @@ namespace UAlbion.Game.Gui
         }
 
         public IUiElement Parent => null;
-        public override Vector2 GetSize() => _frame.GetSize();
+        public override Vector2 GetSize() => GetMaxChildSize();
         public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc) => RenderChildren(extents, order, addFunc);
 
         void PrimaryMenu()

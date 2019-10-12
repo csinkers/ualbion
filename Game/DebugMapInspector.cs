@@ -4,6 +4,8 @@ using System.Numerics;
 using ImGuiNET;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Core.Textures;
+using UAlbion.Game.Events;
 using UAlbion.Game.State;
 
 namespace UAlbion.Game
@@ -17,6 +19,16 @@ namespace UAlbion.Game
             {
                 x._hits = e.Selections;
                 x._mousePosition = e.MousePosition;
+            }),
+            new Handler<DebugMapInspector, SetTextureOffsetEvent>((x, e) =>
+            {
+                EightBitTexture.OffsetX = e.X;
+                EightBitTexture.OffsetY = e.Y;
+            }),
+            new Handler<DebugMapInspector, SetTextureScaleEvent>((x, e) =>
+            {
+                EightBitTexture.ScaleAdjustX = e.X;
+                EightBitTexture.ScaleAdjustY = e.Y;
             }),
         };
 

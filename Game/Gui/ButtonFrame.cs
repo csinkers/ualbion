@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
@@ -11,7 +10,7 @@ namespace UAlbion.Game.Gui
 {
     class ButtonFrame : UiElement
     {
-        static readonly ITexture _borderTexture = new EightBitTexture(
+        static readonly ITexture BorderTexture = new EightBitTexture(
             "ButtonBorder",
             1, 1, 1, 2,
             new[]
@@ -94,7 +93,7 @@ namespace UAlbion.Game.Gui
                 ),
             };
 
-            addFunc(new UiMultiSprite(new SpriteKey(_borderTexture, order, false))
+            addFunc(new UiMultiSprite(new SpriteKey(BorderTexture, order, false))
             {
                 Position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0),
                 Instances = instances,

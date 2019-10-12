@@ -29,7 +29,7 @@ namespace UAlbion.Core
             new Handler<Engine, ToggleFullscreenEvent>((x, _) => x.ToggleFullscreenState()),
             new Handler<Engine, ToggleResizableEvent>((x, _) => x.Window.Resizable = !x.Window.Resizable),
             new Handler<Engine, ToggleVisibleBorderEvent>((x, _) => x.Window.BorderVisible = !x.Window.BorderVisible),
-            new Handler<Engine, RunRenderDocEvent>((x,_) => _renderDoc?.LaunchReplayUI())
+            new Handler<Engine, RunRenderDocEvent>((x,_) => _renderDoc?.LaunchReplayUI()),
         };
 
         static RenderDoc _renderDoc;

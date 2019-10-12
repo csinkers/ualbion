@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
@@ -31,6 +30,9 @@ namespace UAlbion.Game.Gui
 
     public class Frame : UiElement
     {
+        bool _hideCorners = false;
+        bool _truncateLines = true;
+
         const int TileSize = 16;
         MultiSprite _sprite;
         Vector2 _lastPixelSize;
@@ -40,7 +42,7 @@ namespace UAlbion.Game.Gui
         {
             var window = Exchange.Resolve<IWindowManager>();
 
-            {
+            { // Check if we need to rebuild
                 var normSize = window.UiToNormRelative(new Vector2(width, height));
                 var pixelSize = window.NormToPixelRelative(normSize);
 
@@ -51,65 +53,50 @@ namespace UAlbion.Game.Gui
 
             var assets = Exchange.Resolve<IAssetManager>();
             var multi = new MultiTexture("MainMenu", assets.LoadPalette(PaletteId.Main3D).GetCompletePalette());
-            var background = assets.LoadTexture(CoreSpriteId.UiBackground);
-            multi.AddTexture(1, background, 16, 16, 0, true, (uint)width - 32, (uint)height - 32);
-            int tilesW = width / TileSize;
-            int tilesH = height / TileSize;
-            for (int j = 0; j < tilesH; j++)
+
+            void DrawLine(uint y)
             {
-                for (int i = 0; i < tilesW; i++)
+                uint x = 16;
+                uint n = 0;
+                while(x < width - TileSize)
                 {
-                    void Set(CoreSpriteId textureId, int offsetx, int offsety)
-                    {
-                        multi.AddTexture(
-                            1,
-                            assets.LoadTexture(textureId),
-                            (uint)(TileSize*i + offsetx),
-                            (uint)(TileSize*j + offsety),
-                            0,
-                            true);
-                    }
-
-                    void SetLine(bool vertical, int offsetx, int offsety)
-                    {
-                        int modulo = vertical ? j % 4 : i % 4;
-                        var texture = assets.LoadTexture(CoreSpriteId.UiBackgroundLines1 + modulo);
-                        if (vertical)
-                            texture = Core.Util.BuildRotatedTexture((EightBitTexture)texture);
-
-                        multi.AddTexture(
-                            1,
-                            texture,
-                            (uint)(TileSize*i + offsetx),
-                            (uint)(TileSize*j + offsety),
-                            0,
-                            true);
-                    }
-
-                    /*
-                    if(i % 2 == 0 && j % 4 == 0) // Background is 32x64 compared to 16x16 for the corners
-                        Set(CoreSpriteId.UiBackground, 6);
-                    */
-
-                    if (j == 0) // Top
-                    {
-                        if (i == 0)               Set(CoreSpriteId.UiWindowTopLeft, 9, 9);
-                        else if (i == tilesW - 1) Set(CoreSpriteId.UiWindowTopRight, 3, 9);
-                        else                      SetLine(false, 9, 13);
-                    }
-                    else if (j == tilesH - 1) // Bottom
-                    {
-                        if (i == 0)               Set(CoreSpriteId.UiWindowBottomLeft, 9, -6);
-                        else if (i == tilesW - 1) Set(CoreSpriteId.UiWindowBottomRight, 3, -6);
-                        else                      SetLine(false, 9, 3);
-                    }
-                    else
-                    {
-                        if (i == 0)               SetLine(true, 13, 9); // Left edge
-                        else if (i == tilesW - 1) SetLine(true, 12, 9); // Right edge
-                    }
+                    var texture = assets.LoadTexture((CoreSpriteId)((int)CoreSpriteId.UiBackgroundLines1 + n % 4));
+                    uint? w = x + 2*TileSize > width ? (uint)(width - TileSize - x) : (uint?)null;
+                    multi.AddTexture(1, texture, x, y, 0, true, w, null);
+                    n++;
+                    x += TileSize;
                 }
             }
+
+            void DrawVerticalLine(uint x)
+            {
+                uint y = 16;
+                uint n = 0;
+                var texture = assets.LoadTexture((CoreSpriteId)((int)CoreSpriteId.UiBackgroundLines1 + n % 4));
+                texture = Util.BuildRotatedTexture((EightBitTexture)texture);
+                while (y < height - TileSize)
+                {
+                    uint? h = y + 2*TileSize > height ? (uint)(height - TileSize - y) : (uint?)null;
+                    multi.AddTexture(1, texture, x, y, 0, true, null, h);
+                    n++;
+                    y += TileSize;
+                }
+            }
+
+            // Background
+            var background = assets.LoadTexture(CoreSpriteId.UiBackground);
+            multi.AddTexture(1, background, 7, 7, 0, true, (uint)width - 14, (uint)height - 14);
+
+            // Corners
+            multi.AddTexture(1, assets.LoadTexture(CoreSpriteId.UiWindowTopLeft), 0, 0, 0, true);
+            multi.AddTexture(1, assets.LoadTexture(CoreSpriteId.UiWindowTopRight), (uint)width - 16, 0, 0, true);
+            multi.AddTexture(1, assets.LoadTexture(CoreSpriteId.UiWindowBottomLeft), 0, (uint)height - 16, 0, true);
+            multi.AddTexture(1, assets.LoadTexture(CoreSpriteId.UiWindowBottomRight), (uint)width - 16, (uint)height - 16, 0, true);
+
+            DrawLine(4); // Left
+            DrawLine((uint)height - 7); // Right
+            DrawVerticalLine(4); // Top
+            DrawVerticalLine((uint)width - 7); // Bottom
 
             multi.GetSubImageDetails(multi.GetSubImageAtTime(1, 0), out var size, out var offset, out var texSize, out var layer);
             var normalisedSize = window.UiToNormRelative(new Vector2(size.X, size.Y));
@@ -125,7 +112,7 @@ namespace UAlbion.Game.Gui
                 };
         }
 
-        public override Vector2 GetSize() => Children.OfType<IUiElement>().Max(x => x.GetSize()) + Vector2.One * TileSize * 2;
+        public override Vector2 GetSize() => GetMaxChildSize() + Vector2.One * 14;
 
         public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
@@ -133,10 +120,10 @@ namespace UAlbion.Game.Gui
 
             var window = Exchange.Resolve<IWindowManager>();
             var innerExtents = new Rectangle(
-                extents.X + TileSize,
-                 extents.Y + TileSize,
-                extents.Width - TileSize * 2,
-                extents.Height - TileSize * 2);
+                extents.X + 7,
+                 extents.Y + 7,
+                extents.Width - 14,
+                extents.Height - 14);
 
             _sprite.Position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);
             _sprite.RenderOrder = order; // Render the frame in front of its children

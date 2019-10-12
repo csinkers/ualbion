@@ -56,7 +56,7 @@ namespace UAlbion.Game.Entities
             new Handler<Text, SubscribedEvent>((x,e) => x.Rebuild()),
         };
 
-        CommonColor _color;
+        FontColor _color;
         bool _isBold;
         Justification _justification;
         Vector2 _size;
@@ -70,7 +70,6 @@ namespace UAlbion.Game.Entities
             var font = assets.LoadFont(_color, false);
             var text = assets.LoadString(_id, settings.Language);
 
-            font.GetSubImageDetails(0, out var fontSize, out _, out var texSize, out _);
             var instances = new SpriteInstanceData[text.Length * (_isBold ? 4 : 2)];
             int offset = 0;
             for (int i = 0; i < text.Length; i++)
@@ -79,7 +78,10 @@ namespace UAlbion.Game.Entities
                 char c = text[i];
                 if (_fontMapping.TryGetValue(c, out var index))
                 {
-                    font.GetSubImageDetails(index, out var size, out var texOffset, out texSize, out var layer);
+                    font.GetSubImageDetails(index, out var size, out var texOffset, out var texSize, out var layer);
+
+                    // Adjust texture coordinates slightly to avoid bleeding
+                    texOffset.Y += 0.1f / font.Height;
 
                     var normPosition = window.UiToNormRelative(new Vector2(offset, 0));
                     var baseInstance = new SpriteInstanceData(
@@ -124,6 +126,7 @@ namespace UAlbion.Game.Entities
                 Flags = SpriteFlags.LeftAligned
             };
 
+            font.GetSubImageDetails(0, out var fontSize, out _, out _, out _);
             _size = new Vector2(offset + 1, fontSize.Y + 1); // +1 for the drop shadow
         }
 
@@ -131,13 +134,13 @@ namespace UAlbion.Game.Entities
         {
             // TODO: Left & right justification, kerning, line wrapping
             _id = id;
-            _color = CommonColor.White;
+            _color = FontColor.White;
             _isBold = false;
             _justification = Justification.Left;
         }
 
         public Text Bold() { _isBold = true; return this; }
-        public Text Color(CommonColor color) { _color = color; return this; }
+        public Text Color(FontColor color) { _color = color; return this; }
         public Text Left() { _justification = Justification.Left; return this; }
         public Text Center() { _justification = Justification.Center; return this; }
         public Text Right() { _justification = Justification.Right; return this; }

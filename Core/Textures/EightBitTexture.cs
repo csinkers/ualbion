@@ -9,6 +9,10 @@ namespace UAlbion.Core.Textures
 {
     public class EightBitTexture : ITexture
     {
+        public static float OffsetX = 0;
+        public static float OffsetY = 0;
+        public static float ScaleAdjustX = 0;
+        public static float ScaleAdjustY = 0;
         public struct SubImage
         {
             public SubImage(uint x, uint y, uint w, uint h, uint layer)
@@ -97,8 +101,8 @@ namespace UAlbion.Core.Textures
 
             var subImage = _subImages[id];
             size = new Vector2(subImage.W, subImage.H);
-            texOffset = new Vector2((float)subImage.X / Width, (float)subImage.Y / Height);
-            texSize = new Vector2((float)subImage.W / Width, (float)subImage.H / Height);
+            texOffset = new Vector2((subImage.X + OffsetX) / Width, (subImage.Y + OffsetY) / Height);
+            texSize = new Vector2((subImage.W + ScaleAdjustX) / Width, (subImage.H + ScaleAdjustY) / Height);
             layer = subImage.Layer;
         }
 

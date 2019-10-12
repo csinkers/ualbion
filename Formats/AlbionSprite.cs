@@ -26,5 +26,7 @@ namespace UAlbion.Formats
             public int Width { get; }
             public int Height { get; }
         }
+
+        public override string ToString() => $"AlbionSprite {Name} {Width}x{Height} ({Frames.Count} frames)";
     }
 }

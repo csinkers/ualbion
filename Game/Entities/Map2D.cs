@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
@@ -16,7 +15,7 @@ namespace UAlbion.Game.Entities
         Vector2 LogicalSize { get; }
     }
 
-    public class Map2D : Component, IMap, INamed
+    public class Map2D : Component, IMap
     {
         MapData2D _mapData;
         TilesetData _tileData;
@@ -29,8 +28,6 @@ namespace UAlbion.Game.Entities
         public Vector2 TileSize => _renderable.TileSize;
         public Vector3 Position => Vector3.Zero;
         public Vector3 Normal => Vector3.UnitZ;
-        public string Name => $"Map2D {MapId}";
-
         static readonly HandlerSet Handlers = new HandlerSet(
             H<Map2D, WorldCoordinateSelectEvent>((x, e) => x.Select(e))
             // H<Map2D, UnloadMapEvent>((x, e) => x.Unload()),

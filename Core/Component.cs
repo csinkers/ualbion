@@ -85,9 +85,13 @@ namespace UAlbion.Core
 
         public void Detach()
         {
+            if (Exchange == null)
+                return;
+
             foreach (var child in Children)
                 child.Detach();
-            Exchange?.Unsubscribe(this);
+
+            Exchange.Unsubscribe(this);
             Exchange = null;
         }
 

@@ -1,11 +1,11 @@
 {
     "Global": {
-        "Escape": "toggle_menu",
-        "Tilde": "push_input_mode Console",
+        "Escape": "main_menu",
+        "Tilde": "toggle_console",
         "Alt+F4": "quit",
         "BracketLeft": "e:mag -1",
         "BracketRight": "e:mag 1",
-        "V": "push_input_mode 2",
+        "V": "push_mouse_mode DebugPick",
         "F5": "start_clock",
         "F6": "stop_clock",
         "F10": "update 1",
@@ -26,7 +26,6 @@
     "Console": {
         "Tilde": "pop_input_mode"
     },
-    "DebugPick": {},
     "World2D": {
         "W": "+camera_move  0 -4",
         "A": "+camera_move -4  0",

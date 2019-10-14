@@ -19,7 +19,10 @@ namespace UAlbion.Game
 
         static object GetPropertySafe(PropertyInfo x, object o)
         {
-            try { return x.GetValue(o); }
+            try
+            {
+                return !x.CanRead ? "<< No Getter! >>" : x.GetValue(o);
+            }
             catch (Exception e) { return e; }
         }
 

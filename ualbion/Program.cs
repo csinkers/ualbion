@@ -78,9 +78,9 @@ namespace UAlbion
             engine.AddRenderer(new ExtrudedTileMapRenderer());
 
             var allScenesExchange = new EventExchange("Scenes", engine.GlobalExchange);
+            var map = new MapScene(allScenesExchange);
             var flat = new FlatScene(allScenesExchange);
             var dungeon = new DungeonScene(allScenesExchange);
-            var map = new MapScene(allScenesExchange);
             var menuScene = new MenuScene(allScenesExchange);
             var inventory = new InventoryScene(allScenesExchange);
 
@@ -90,6 +90,7 @@ namespace UAlbion
             engine.AddScene(menuScene);
             engine.AddScene(inventory);
 
+            var inputManager = new InputManager();
             engine.GlobalExchange
                 .Register<IAssetManager>(assets)
                 .Register<IStateManager>(new StateManager())
@@ -102,19 +103,24 @@ namespace UAlbion
                 .Register<IMapScene>(map)
                 .Register<IMenuScene>(menuScene)
                 .Register<IInventoryScene>(inventory)
+                .Register<IInputManager>(inputManager)
                 .Attach(new ConsoleLogger())
                 .Attach(new GameClock())
                 .Attach(new MapManager(mapExchange))
                 .Attach(new DebugMapInspector())
-                .Attach(new World2DInputMode())
-                .Attach(new DebugPickInputMode())
-                .Attach(new ContextMenuInputMode())
-                .Attach(new MouseLookInputMode())
                 .Attach(new InputBinder(inputConfig))
                 .Attach(new InputModeStack())
+                .Attach(new MouseModeStack())
                 .Attach(new SceneStack())
                 .Attach(new CursorManager())
                 .Attach(new PaletteManager())
+                ;
+
+            inputManager
+                .RegisterInputMode(InputMode.World2D, new World2DInputMode())
+                .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
+                .RegisterInputMode(InputMode.MouseLook, new MouseLookInputMode())
+                .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
                 ;
 
             /*

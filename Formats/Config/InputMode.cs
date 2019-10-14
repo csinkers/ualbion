@@ -4,7 +4,6 @@
     {
         Global = 0,
         Console,
-        DebugPick,
         Dialog,
         Map,
         World2D,

@@ -8,11 +8,11 @@ using Veldrid;
 
 namespace UAlbion.Game.Input
 {
-    public class DebugPickInputMode : Component
+    public class DebugPickMouseMode : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<DebugPickInputMode, SetInputModeEvent>((x,e) => x._isActive = e.Mode == InputMode.DebugPick),
-            H<DebugPickInputMode, InputEvent>((x,e) => x.OnInput(e))
+            H<DebugPickMouseMode, SetMouseModeEvent>((x,e) => x._isActive = e.Mode == MouseMode.DebugPick),
+            H<DebugPickMouseMode, InputEvent>((x,e) => x.OnInput(e))
         );
 
         bool _isActive;
@@ -24,8 +24,7 @@ namespace UAlbion.Game.Input
 
             if(e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && x.Down))
             {
-                //Raise(new PopInputModeEvent());
-                Raise(new PopInputModeEvent());
+                Raise(new PopMouseModeEvent());
                 return;
             }
 
@@ -35,6 +34,6 @@ namespace UAlbion.Game.Input
             Raise(new ShowDebugInfoEvent(orderedHits, e.Snapshot.MousePosition));
         }
 
-        public DebugPickInputMode() : base(Handlers) { }
+        public DebugPickMouseMode() : base(Handlers) { }
     }
 }

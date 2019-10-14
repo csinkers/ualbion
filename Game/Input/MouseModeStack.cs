@@ -5,30 +5,30 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Input
 {
-    public class InputModeStack : Component
+    public class MouseModeStack : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<InputModeStack, PushInputModeEvent>((x, e) =>
+            H<MouseModeStack, PushMouseModeEvent>((x, e) =>
             {
                 var inputManager = x.Exchange.Resolve<IInputManager>();
-                x._stack.Push(inputManager.InputMode);
-                x.Raise(new SetInputModeEvent(e.Mode));
+                x._stack.Push(inputManager.MouseMode);
+                x.Raise(new SetMouseModeEvent(e.Mode));
             }),
-            H<InputModeStack, PopInputModeEvent>((x, e) =>
+            H<MouseModeStack, PopMouseModeEvent>((x, e) =>
             {
                 if (x._stack.Count > 0)
                 {
                     var newMode = x._stack.Pop();
-                    x.Raise(new SetInputModeEvent(newMode));
+                    x.Raise(new SetMouseModeEvent(newMode));
                 }
             }),
-            H<InputModeStack, SetMouseModeEvent>((x, e) =>
+            H<MouseModeStack, SetMouseModeEvent>((x, e) =>
             {
                 x._stack.Clear();
             })
         );
 
-        readonly Stack<InputMode> _stack = new Stack<InputMode>();
-        public InputModeStack() : base(Handlers) { }
+        readonly Stack<MouseMode> _stack = new Stack<MouseMode>();
+        public MouseModeStack() : base(Handlers) { }
     }
 }

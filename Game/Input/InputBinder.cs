@@ -11,21 +11,11 @@ using Veldrid;
 
 namespace UAlbion.Game.Input
 {
-    public struct KeyBinding : IEquatable<KeyBinding>
-    {
-        public Key Key { get; }
-        public ModifierKeys Modifiers { get; }
-        public KeyBinding(Key key, ModifierKeys modifiers) { Key = key; Modifiers = modifiers; }
-        public bool Equals(KeyBinding other) { return Key == other.Key && Modifiers == other.Modifiers; }
-        public override bool Equals(object obj) { return obj is KeyBinding other && Equals(other); }
-        public override int GetHashCode() { unchecked { return ((int)Key * 397) ^ (int)Modifiers; } }
-        public override string ToString() => $"{Modifiers} + {Key}";
-    }
-
     public class InputBinder : Component
     {
+        class Bindings : Dictionary<InputMode, IDictionary<KeyBinding, string>> { }
+
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<InputBinder, SetInputModeEvent>((x, e) => x.OnInputModeChanged(e)),
             H<InputBinder, InputEvent>((x, e) => x.OnInput(e)),
             H<InputBinder, LoadMapEvent>((x, e) => x._mapId = e.MapId)
         );
@@ -57,9 +47,9 @@ namespace UAlbion.Game.Input
             }
         }
 
-        readonly IDictionary<InputMode, IDictionary<KeyBinding, string>> _bindings = new Dictionary<InputMode, IDictionary<KeyBinding, string>>();
+        readonly Bindings _bindings = new Bindings();
         readonly HashSet<Key> _pressedKeys = new HashSet<Key>();
-        InputMode _activeMode = InputMode.World2D;
+        // InputMode _activeMode = InputMode.Global;
         MapDataId _mapId = (MapDataId)100;
 
         ModifierKeys Modifiers
@@ -80,13 +70,9 @@ namespace UAlbion.Game.Input
             }
         }
 
-        void OnInputModeChanged(SetInputModeEvent e)
-        {
-            _activeMode = e.Mode;
-        }
-
         void OnInput(InputEvent e)
         {
+            var inputManager = Exchange.Resolve<IInputManager>();
             foreach (var keyEvent in e.Snapshot.KeyEvents)
             {
                 if (!keyEvent.Down)
@@ -98,7 +84,7 @@ namespace UAlbion.Game.Input
                 _pressedKeys.Add(keyEvent.Key);
 
                 var binding = new KeyBinding(keyEvent.Key, keyEvent.Modifiers);
-                if (!_bindings[_activeMode].TryGetValue(binding, out var action))
+                if (!_bindings[inputManager.InputMode].TryGetValue(binding, out var action))
                     if (!_bindings[InputMode.Global].TryGetValue(binding, out action))
                         continue;
 
@@ -127,7 +113,7 @@ namespace UAlbion.Game.Input
             foreach(var key in _pressedKeys)
             {
                 var binding = new KeyBinding(key, Modifiers);
-                if (!_bindings[_activeMode].TryGetValue(binding, out var action))
+                if (!_bindings[inputManager.InputMode].TryGetValue(binding, out var action))
                     if (!_bindings[InputMode.Global].TryGetValue(binding, out action))
                         continue;
 

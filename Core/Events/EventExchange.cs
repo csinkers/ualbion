@@ -97,8 +97,11 @@ namespace UAlbion.Core.Events
             var exchanges = new HashSet<EventExchange>();
             lock(_syncRoot)
                 CollectExchanges(exchanges);
-            foreach(var exchange in exchanges)
+            foreach (var exchange in exchanges)
+            {
+                if (e is BeginFrameEvent) exchange._frameEvents.Clear();
                 exchange.Collect(subscribers, type, interfaces);
+            }
 
             foreach(var subscriber in subscribers)
                 subscriber.Receive(e, sender);
@@ -134,8 +137,9 @@ namespace UAlbion.Core.Events
                 _subscriptions[eventType].Add(subscriber);
                 _subscribers[subscriber].Add(eventType);
             }
+
             if (newSubscriber)
-                    subscriber.Receive(_subscribedEvent, this);
+                subscriber.Receive(_subscribedEvent, this);
         }
 
         public void Unsubscribe(IComponent subscriber)

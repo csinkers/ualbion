@@ -56,23 +56,11 @@ namespace UAlbion.Game
             int hitId = 0;
             foreach (var hit in _hits)
             {
-                var p = hit.IntersectionPoint;
-                ImGui.SetNextItemOpen(true);
-                if (ImGui.TreeNode($"Hit {hitId}"))
+                if (ImGui.TreeNode($"{hitId} {hit.Target}"))
                 {
-                    Reflector.ReflectedObject reflected;
-                    if (hit.Target is INamed named)
-                    {
-                        ImGui.TextColored(new Vector4(1.0f, 0.8f, 0.0f, 1.0f), $"{named.Name} ({p.X}, {p.Y}, {p.Z})");
-                        reflected = Reflector.Reflect(named.Name, hit.Target);
-                    }
-                    else
-                    {
-                        ImGui.TextColored(new Vector4(1.0f, 0.8f, 0.0f, 1.0f), $"{hit.Target} ({p.X}, {p.Y}, {p.Z})");
-                        reflected = Reflector.Reflect(null, hit.Target);
-                    }
-
-                    RenderNode(reflected);
+                    var reflected = Reflector.Reflect(null, hit.Target);
+                    foreach (var child in reflected.SubObjects)
+                        RenderNode(child);
                     ImGui.TreePop();
                 }
 
@@ -95,10 +83,11 @@ namespace UAlbion.Game
 
         void RenderNode(Reflector.ReflectedObject reflected)
         {
+            var typeName = reflected.Object?.GetType().Name ?? "null";
             var description = 
                 reflected.Name == null
-                ? $"{reflected.Value} ({reflected.Object.GetType().Name})"
-                : $"{reflected.Name}: {reflected.Value} ({reflected.Object.GetType().Name})";
+                ? $"{reflected.Value} ({typeName})"
+                : $"{reflected.Name}: {reflected.Value} ({typeName})";
 
             if (reflected.SubObjects != null)
             {

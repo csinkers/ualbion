@@ -120,6 +120,7 @@ namespace UAlbion
                 .RegisterInputMode(InputMode.World2D, new World2DInputMode())
                 .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
                 .RegisterInputMode(InputMode.MouseLook, new MouseLookInputMode())
+                .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
                 .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
                 ;
 
@@ -140,7 +141,9 @@ namespace UAlbion
                 ;
 
             engine.GlobalExchange.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
-            engine.GlobalExchange.Raise(new SetCursorEvent((int)CoreSpriteId.Cursor), null);
+            engine.GlobalExchange.Raise(new SetCursorEvent(CoreSpriteId.Cursor), null);
+            engine.GlobalExchange.Raise(new SetMouseModeEvent(MouseMode.Normal), null);
+            engine.GlobalExchange.Raise(new SetInputModeEvent(InputMode.Dialog), null);
             //*/
             engine.Run();
         }

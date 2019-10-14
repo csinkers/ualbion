@@ -83,7 +83,7 @@ namespace UAlbion.Core
                 handler.Invoke(this, @event);
         }
 
-        public void Detach()
+        public virtual void Detach()
         {
             if (Exchange == null)
                 return;

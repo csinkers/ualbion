@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
@@ -16,7 +17,7 @@ namespace UAlbion.Game.Gui
             White,
             Grey,
             Black,
-            Red,
+            Orange,
             Green
         }
 
@@ -40,7 +41,9 @@ namespace UAlbion.Game.Gui
                 new EightBitTexture.SubImage(0, 0, 1, 1, 4),
             });
 
-        static readonly HandlerSet Handlers = new HandlerSet();
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<ButtonFrame, WindowResizedEvent>((x, _) => x._lastExtents = new Rectangle())
+            );
         UiMultiSprite _sprite;
         Rectangle _lastExtents;
         ButtonState _state = ButtonState.Normal;

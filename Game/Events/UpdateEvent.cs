@@ -8,9 +8,4 @@ namespace UAlbion.Game.Events
         public UpdateEvent(int frames) { Frames = frames; }
         [EventPart("frames")] public int Frames { get; }
     }
-
-    [Event("post_update")]
-    public class PostUpdateEvent : GameEvent, IVerboseEvent
-    {
-    }
 }

@@ -11,17 +11,11 @@ namespace UAlbion.Game.Input
     public class DebugPickMouseMode : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<DebugPickMouseMode, SetMouseModeEvent>((x,e) => x._isActive = e.Mode == MouseMode.DebugPick),
             H<DebugPickMouseMode, InputEvent>((x,e) => x.OnInput(e))
         );
 
-        bool _isActive;
-
         void OnInput(InputEvent e)
         {
-            if (!_isActive)
-                return;
-
             if(e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && x.Down))
             {
                 Raise(new PopMouseModeEvent());

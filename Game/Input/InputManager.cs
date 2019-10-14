@@ -15,7 +15,7 @@ namespace UAlbion.Game.Input
         readonly IDictionary<InputMode, IComponent> _inputModes = new Dictionary<InputMode, IComponent>();
         readonly IDictionary<MouseMode, IComponent> _mouseModes = new Dictionary<MouseMode, IComponent>();
         public InputMode InputMode { get; private set; } = InputMode.Global;
-        public MouseMode MouseMode { get; private set; } = MouseMode.Normal;
+        public MouseMode MouseMode { get; private set; } = (MouseMode)(-1);
 
         public InputManager() : base(Handlers) { }
 

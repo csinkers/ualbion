@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Game.Gui
+﻿using System;
+
+namespace UAlbion.Game.Gui
 {
     internal class SliderThumb : UiElement
     {
@@ -21,7 +23,7 @@
         readonly SliderThumb _thumb;
         */
 
-        public Slider() : base(null)
+        public Slider(string id, Func<int> getter, Action<int> setter, int min, int max) : base(null)
         {
             // _thumb = new SliderThumb(this);
         }

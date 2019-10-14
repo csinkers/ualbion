@@ -12,19 +12,37 @@ namespace UAlbion.Game.Gui
     {
         static readonly HandlerSet Handlers = new HandlerSet(
             H<Button, UiHoverEvent>((x, _) =>
-                x._frame.State = x._frame.State == ButtonState.Pressed
+                x._frame.State = x.IsPressed
                     ? ButtonState.HoverPressed
                     : ButtonState.Hover),
             H<Button, UiBlurEvent>((x, _) =>
-                x._frame.State = x._frame.State == ButtonState.HoverPressed
+                x._frame.State = x.IsPressed
                     ? ButtonState.Pressed
-                    : ButtonState.Normal)
-        );
+                    : ButtonState.Normal),
+
+            H<Button, UiLeftClickEvent>((x, e) =>
+            {
+                x._frame.State = ButtonState.Clicked;
+                e.Propagating = false;
+            }),
+            H<Button, UiLeftReleaseEvent>((x, _) =>
+                {
+                    if(x._frame.State == ButtonState.Clicked)
+                        x.Raise(new ButtonPressEvent(x.Id));
+
+                    x._frame.State = x.IsPressed
+                        ? ButtonState.Pressed
+                        : ButtonState.Normal;
+                })
+            );
 
         readonly ButtonFrame _frame;
+        public string Id { get; }
+        public bool IsPressed { get; set; }
 
-        public Button(StringId textId) : base(Handlers)
+        public Button(string buttonId, StringId textId) : base(Handlers)
         {
+            Id = buttonId;
             var text = new Text(textId).Center();
             _frame = new ButtonFrame(text);
             Children.Add(_frame);
@@ -48,13 +66,4 @@ namespace UAlbion.Game.Gui
             registerHitFunc(order, this);
         }
     }
-
-    public class UiLeftClickEvent : UiEvent { } // Target event, never broadcast
-    public class UiLeftReleaseEvent : UiEvent { } // Target event, never broadcast
-    public class UiRightClickEvent : UiEvent { } // Target event, never broadcast
-    public class UiRightReleaseEvent : UiEvent { } // Target event, never broadcast
-    public class UiHoverEvent : UiEvent { } // Targeted event, never broadcast
-    public class UiBlurEvent : UiEvent { } // Targeted event, never broadcast
-    public abstract class UiEvent : GameEvent { }
-    public interface IUiEvent : IGameEvent { }
 }

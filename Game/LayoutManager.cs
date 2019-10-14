@@ -5,6 +5,7 @@ using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
 using Veldrid;
 
@@ -15,6 +16,7 @@ namespace UAlbion.Game
         void Add(IUiElement topLevelElement, DialogPositioning positioning);
         void Remove(IUiElement topLevelElement);
     }
+
     public enum DialogPositioning
     {
         Center,
@@ -122,13 +124,19 @@ namespace UAlbion.Game
             var focused = newSelection.Except(_lastSelection);
             var blurred = _lastSelection.Except(newSelection);
 
-            IEvent e = new UiHoverEvent();
-            foreach(var element in focused)
+            IUiEvent e = new UiHoverEvent();
+            foreach (var element in focused)
+            {
+                if (!e.Propagating) break;
                 element.Receive(e, this);
+            }
 
             e = new UiBlurEvent();
-            foreach(var element in blurred)
+            foreach (var element in blurred)
+            {
+                if (!e.Propagating) break;
                 element.Receive(e, this);
+            }
 
             _lastSelection = newSelection;
         }

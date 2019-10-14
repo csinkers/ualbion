@@ -9,14 +9,6 @@ using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    public enum ButtonState
-    {
-        Normal,
-        Hover,
-        Pressed,
-        HoverPressed,
-    }
-
     class ButtonFrame : UiElement
     {
         enum Color
@@ -48,10 +40,10 @@ namespace UAlbion.Game.Gui
                 new EightBitTexture.SubImage(0, 0, 1, 1, 4),
             });
 
-        static readonly Handler[] Handlers = { };
+        static readonly HandlerSet Handlers = new HandlerSet();
         UiMultiSprite _sprite;
         Rectangle _lastExtents;
-        ButtonState _state = ButtonState.Hover;
+        ButtonState _state = ButtonState.Normal;
         public ButtonState State
         {
             get => _state;
@@ -89,6 +81,7 @@ namespace UAlbion.Game.Gui
                 case ButtonState.Hover:
                     background = (uint)Color.White;
                     break;
+                case ButtonState.Clicked:
                 case ButtonState.Pressed:
                     topLeft = (uint)Color.Black;
                     bottomRight = (uint)Color.White;

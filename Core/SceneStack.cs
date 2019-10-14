@@ -5,15 +5,14 @@ namespace UAlbion.Core
 {
     public class SceneStack : Component
     {
-        static readonly Handler[] Handlers =
-        {
-            new Handler<SceneStack, PushSceneEvent>((x, e) =>
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<SceneStack, PushSceneEvent>((x, e) =>
             {
                 x._stack.Push(x._sceneId);
                 x._sceneId = e.SceneId;
                 x.Raise(new SetSceneEvent(e.SceneId));
             }),
-            new Handler<SceneStack, PopSceneEvent>((x, e) =>
+            H<SceneStack, PopSceneEvent>((x, e) =>
             {
                 if (x._stack.Count > 0)
                 {
@@ -22,12 +21,12 @@ namespace UAlbion.Core
                     x.Raise(new SetSceneEvent(newSceneId));
                 }
             }),
-            new Handler<SceneStack, SetSceneEvent>((x, e) =>
+            H<SceneStack, SetSceneEvent>((x, e) =>
             {
                 x._stack.Clear();
                 x._sceneId = e.SceneId;
             })
-        };
+        );
 
         readonly Stack<int> _stack = new Stack<int>();
         int _sceneId = 0;

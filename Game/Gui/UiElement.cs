@@ -26,7 +26,7 @@ namespace UAlbion.Game.Gui
             return size;
         }
 
-        protected UiElement(IList<Handler> handlers) : base(handlers) { }
+        protected UiElement(IDictionary<Type, Handler> handlers) : base(handlers) { }
 
         protected int RenderChildren(Rectangle extents, int order, Action<IRenderable> addFunc)
         {

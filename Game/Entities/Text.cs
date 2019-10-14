@@ -46,12 +46,11 @@ namespace UAlbion.Game.Entities
             { 'û', 105 }, { 'ù', 106 }, { 'á', 107 }, { 'í', 108 }, { 'ó', 109 }, { 'ú', 110 },
         };
 
-        static readonly Handler[] Handlers =
-        {
-            new Handler<Text, WindowResizedEvent>((x,e) => x.Rebuild()),
-            new Handler<Text, SetLanguageEvent>((x,e) => x.Rebuild()),
-            new Handler<Text, SubscribedEvent>((x,e) => x.Rebuild()),
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<Text, WindowResizedEvent>((x,e) => x.Rebuild()),
+            H<Text, SetLanguageEvent>((x,e) => x.Rebuild()),
+            H<Text, SubscribedEvent>((x,e) => x.Rebuild())
+        );
 
         // Driving properties
         readonly StringId _id;

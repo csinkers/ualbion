@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Numerics;
-using ImGuiNET;
+﻿using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
@@ -38,9 +36,8 @@ namespace UAlbion.Game.Input
 
     public class MouseLookInputMode : Component
     {
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<MouseLookInputMode, SetInputModeEvent>((x,e) =>
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<MouseLookInputMode, SetInputModeEvent>((x,e) =>
             {
                 var activating = e.Mode == InputMode.MouseLook && !x._isActive;
                 var deactivating = e.Mode != InputMode.MouseLook && x._isActive;
@@ -53,14 +50,14 @@ namespace UAlbion.Game.Input
                 if (deactivating)
                     x._isActive = false;
             }),
-            new Handler<MouseLookInputMode, InputEvent>((x,e) => x.OnInput(e)), 
-            new Handler<MouseLookInputMode, PostUpdateEvent>((x, e) =>
+            H<MouseLookInputMode, InputEvent>((x,e) => x.OnInput(e)), 
+            H<MouseLookInputMode, PostUpdateEvent>((x, e) =>
             {
                 if (!x._isActive) return;
                 var windowState = x.Exchange.Resolve<IWindowManager>();
                 x.Raise(new SetCursorPositionEvent(windowState.PixelWidth / 2, windowState.PixelHeight / 2));
-            }),
-        };
+            })
+        );
 
         void OnInput(InputEvent e)
         {

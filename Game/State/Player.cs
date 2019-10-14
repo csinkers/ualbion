@@ -1,6 +1,4 @@
-﻿using UAlbion.Game.Entities;
-
-namespace UAlbion.Game.State
+﻿namespace UAlbion.Game.State
 {
     public class CharacterSheet
     {

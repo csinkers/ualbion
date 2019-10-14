@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Numerics;
+﻿using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -11,12 +10,11 @@ namespace UAlbion.Game.Entities
 {
     public class MapObjectSprite : Component
     {
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<MapObjectSprite, RenderEvent>((x,e) => x.Render(e)),
-            new Handler<MapObjectSprite, UpdateEvent>((x, e) => x._frame += e.Frames)
-            //new Handler<MapObjectSprite, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<MapObjectSprite, RenderEvent>((x,e) => x.Render(e)),
+            H<MapObjectSprite, UpdateEvent>((x, e) => x._frame += e.Frames)
+            //H<MapObjectSprite, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
+        );
 
         readonly DungeonObjectId _id;
         readonly Vector3 _position;

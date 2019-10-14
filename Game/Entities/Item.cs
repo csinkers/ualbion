@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using UAlbion.Formats;
-
-namespace UAlbion.Game.Entities
+﻿namespace UAlbion.Game.Entities
 {
     class Item
     {

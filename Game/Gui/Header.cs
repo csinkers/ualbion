@@ -5,7 +5,7 @@ namespace UAlbion.Game.Gui
 {
     class Header : UiElement
     {
-        static readonly Handler[] Handlers = { };
+        static readonly HandlerSet Handlers = null;
 
         public Header(StringId id) : base(Handlers)
         {

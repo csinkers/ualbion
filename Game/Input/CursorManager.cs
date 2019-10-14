@@ -18,12 +18,12 @@ namespace UAlbion.Game.Input
 
         public CursorManager() : base(Handlers) { }
 
-        static readonly Handler[] Handlers = {
-            new Handler<CursorManager, InputEvent>((x,e) => x._position = e.Snapshot.MousePosition - x._hotspot),
-            new Handler<CursorManager, RenderEvent>((x,e) => x.Render(e)),
-            new Handler<CursorManager, SetCursorEvent>((x,e) => x.SetCursor(e.CursorId)),
-            new Handler<CursorManager, SetCursorPositionEvent>((x,e) => x._position = new Vector2(e.X, e.Y) - x._hotspot),
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<CursorManager, InputEvent>((x,e) => x._position = e.Snapshot.MousePosition - x._hotspot),
+            H<CursorManager, RenderEvent>((x,e) => x.Render(e)),
+            H<CursorManager, SetCursorEvent>((x,e) => x.SetCursor(e.CursorId)),
+            H<CursorManager, SetCursorPositionEvent>((x,e) => x._position = new Vector2(e.X, e.Y) - x._hotspot)
+        );
 
         void SetCursor(CoreSpriteId id)
         {

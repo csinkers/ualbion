@@ -12,11 +12,7 @@ namespace UAlbion.Core
     {
         readonly Octree<ISceneObject> _octree = new Octree<ISceneObject>(new BoundingBox(-Vector3.One, Vector3.One), 2);
 
-        static readonly Handler[] Handlers =
-        {
-        };
-
-        public SceneGraph() : base(Handlers)
+        public SceneGraph() : base(null)
         {
         }
     }

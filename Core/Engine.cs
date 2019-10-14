@@ -14,9 +14,9 @@ namespace UAlbion.Core
 {
     public class Engine : Component, IDisposable
     {
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<Engine, LoadRenderDocEvent>((x, _) =>
+        static readonly HandlerSet Handlers = new HandlerSet
+        (
+            H<Engine, LoadRenderDocEvent>((x, _) =>
             {
                 if (_renderDoc == null && RenderDoc.Load(out _renderDoc))
                 {
@@ -24,13 +24,13 @@ namespace UAlbion.Core
                     x.ChangeBackend(x.GraphicsDevice.BackendType, true);
                 }
             }),
-            new Handler<Engine, QuitEvent>((x, e) => x._done = true),
-            new Handler<Engine, SetCursorPositionEvent>((x, e) => x._pendingCursorUpdate = new Vector2(e.X, e.Y)),
-            new Handler<Engine, ToggleFullscreenEvent>((x, _) => x.ToggleFullscreenState()),
-            new Handler<Engine, ToggleResizableEvent>((x, _) => x.Window.Resizable = !x.Window.Resizable),
-            new Handler<Engine, ToggleVisibleBorderEvent>((x, _) => x.Window.BorderVisible = !x.Window.BorderVisible),
-            new Handler<Engine, RunRenderDocEvent>((x,_) => _renderDoc?.LaunchReplayUI()),
-        };
+            H<Engine, QuitEvent>((x, e) => x._done = true),
+            H<Engine, SetCursorPositionEvent>((x, e) => x._pendingCursorUpdate = new Vector2(e.X, e.Y)),
+            H<Engine, ToggleFullscreenEvent>((x, _) => x.ToggleFullscreenState()),
+            H<Engine, ToggleResizableEvent>((x, _) => x.Window.Resizable = !x.Window.Resizable),
+            H<Engine, ToggleVisibleBorderEvent>((x, _) => x.Window.BorderVisible = !x.Window.BorderVisible),
+            H<Engine, RunRenderDocEvent>((x,_) => _renderDoc?.LaunchReplayUI())
+        );
 
         static RenderDoc _renderDoc;
         public EventExchange GlobalExchange { get; }

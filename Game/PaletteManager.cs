@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UAlbion.Core;
+﻿using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
@@ -13,17 +12,16 @@ namespace UAlbion.Game
 
     public class PaletteManager : Component
     {
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<PaletteManager, UpdateEvent>((x, e) =>
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<PaletteManager, UpdateEvent>((x, e) =>
             {
                 x._ticks++;
                 if(x._palette.IsAnimated)
                     x.EmitPalette();
             }),
-            new Handler<PaletteManager, SubscribedEvent>((x, e) => x.SetPalette(PaletteId.Main3D)),
-            new Handler<PaletteManager, LoadPaletteEvent>((x, e) => x.SetPalette((PaletteId)e.PaletteId))
-        };
+            H<PaletteManager, SubscribedEvent>((x, e) => x.SetPalette(PaletteId.Main3D)),
+            H<PaletteManager, LoadPaletteEvent>((x, e) => x.SetPalette(e.PaletteId))
+        );
 
         AlbionPalette _palette;
         int _ticks;

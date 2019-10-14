@@ -23,10 +23,9 @@ namespace UAlbion.Game
             _assetCache = new AssetCache();
         }
 
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<Assets,SubscribedEvent>((x,e) => x._assetCache.Attach(x.Exchange)),
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<Assets,SubscribedEvent>((x,e) => x._assetCache.Attach(x.Exchange))
+        );
 
         readonly AssetConfig _assetConfig;
         readonly CoreSpriteConfig _coreSpriteConfig;

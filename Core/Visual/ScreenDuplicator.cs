@@ -9,7 +9,9 @@ namespace UAlbion.Core.Visual
 {
     public class ScreenDuplicator : Component, IRenderable, IRenderer
     {
-        static readonly IList<Handler> Handlers = new Handler[] {new Handler<ScreenDuplicator, RenderEvent>((x, e) => e.Add(x)),};
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<ScreenDuplicator, RenderEvent>((x, e) => e.Add(x)));
+
         static readonly ushort[] s_quadIndices = { 0, 1, 2, 0, 2, 3 };
         DisposeCollector _disposeCollector;
         Pipeline _pipeline;

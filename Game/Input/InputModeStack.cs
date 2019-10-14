@@ -7,15 +7,14 @@ namespace UAlbion.Game.Input
 {
     public class InputModeStack : Component
     {
-        static readonly Handler[] Handlers =
-        {
-            new Handler<InputModeStack, PushInputModeEvent>((x, e) =>
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<InputModeStack, PushInputModeEvent>((x, e) =>
             {
                 x._stack.Push(x._currentMode);
                 x.Raise(new SetInputModeEvent(e.Mode));
                 x._currentMode = e.Mode;
             }),
-            new Handler<InputModeStack, PopInputModeEvent>((x, e) =>
+            H<InputModeStack, PopInputModeEvent>((x, e) =>
             {
                 if (x._stack.Count > 0)
                 {
@@ -24,12 +23,12 @@ namespace UAlbion.Game.Input
                     x._currentMode = newMode;
                 }
             }),
-            new Handler<InputModeStack, SetInputModeEvent>((x, e) =>
+            H<InputModeStack, SetInputModeEvent>((x, e) =>
             {
                 x._stack.Clear();
                 x._currentMode = e.Mode;
             })
-        };
+        );
 
         readonly Stack<InputMode> _stack = new Stack<InputMode>();
         InputMode _currentMode = InputMode.Global;

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core.Events;
 
@@ -7,18 +6,18 @@ namespace UAlbion.Core
 {
     public class PerspectiveCamera : Component, ICamera
     {
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<PerspectiveCamera, BackendChangedEvent>((x, e) => x.UpdateBackend(e)),
+        static readonly HandlerSet Handlers = new HandlerSet
+        (
+            H<PerspectiveCamera, BackendChangedEvent>((x, e) => x.UpdateBackend(e)),
             // BUG: This event is not received when the screen is resized while a 2D scene is active.
-            new Handler<PerspectiveCamera, WindowResizedEvent> ((x, e) => x.WindowResized(e.Width, e.Height)),
-            new Handler<PerspectiveCamera, SetCameraDirectionEvent>((x, e) => { x.Yaw = e.Yaw; x.Pitch = e.Pitch; }),
-            new Handler<PerspectiveCamera, SetFieldOfViewEvent>((x, e) =>
+            H<PerspectiveCamera, WindowResizedEvent> ((x, e) => x.WindowResized(e.Width, e.Height)),
+            H<PerspectiveCamera, SetCameraDirectionEvent>((x, e) => { x.Yaw = e.Yaw; x.Pitch = e.Pitch; }),
+            H<PerspectiveCamera, SetFieldOfViewEvent>((x, e) =>
             {
                 x._fov = (float)(Math.PI * e.Degrees / 180);
                 x.UpdatePerspectiveMatrix();
-            }),
-        };
+            })
+        );
 
         Matrix4x4 _viewMatrix;
         Matrix4x4 _projectionMatrix;

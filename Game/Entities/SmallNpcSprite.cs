@@ -30,18 +30,16 @@ namespace UAlbion.Game.Entities
             { Animation.WalkW, new[] { 9,10,11 } },
         };
 
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<SmallNpcSprite, RenderEvent>((x,e) => x.Render(e)),
-            new Handler<SmallNpcSprite, SetTileSizeEvent>((x,e) => x._tileSize = new Vector2(e.TileSize.X, e.TileSize.Y)),
-            new Handler<SmallNpcSprite, UpdateEvent>((x, e) =>
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<SmallNpcSprite, RenderEvent>((x,e) => x.Render(e)),
+            H<SmallNpcSprite, SetTileSizeEvent>((x,e) => x._tileSize = new Vector2(e.TileSize.X, e.TileSize.Y)),
+            H<SmallNpcSprite, UpdateEvent>((x, e) =>
             {
                 var cycle = Frames[x._animation];
                 x._frame++;
                 if (!cycle.Contains(x._frame))
                     x._frame = cycle[0];
-            })
-        };
+            }));
 
         readonly SmallNpcId _id;
         readonly MapNpc.Waypoint[] _waypoints;

@@ -18,13 +18,12 @@ namespace UAlbion.Core
     {
         readonly IList<Type> _activeRendererTypes;
 
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<Scene, SetRawPaletteEvent>((x, e) => x._palette = new Palette(e.Name, e.Entries)),
-            new Handler<Scene, SetSceneEvent>((x, e) => x.SceneExchange.IsActive = e.SceneId == x.Id),
-            new Handler<Scene, SetClearColourEvent>((x, e) => x._clearColour = new RgbaFloat(e.Red, e.Green, e.Blue, 1.0f)),
-            new Handler<Scene, SubscribedEvent>((x, e) => x.SceneExchange.Attach(x.Camera))
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<Scene, SetRawPaletteEvent>((x, e) => x._palette = new Palette(e.Name, e.Entries)),
+            H<Scene, SetSceneEvent>((x, e) => x.SceneExchange.IsActive = e.SceneId == x.Id),
+            H<Scene, SetClearColourEvent>((x, e) => x._clearColour = new RgbaFloat(e.Red, e.Green, e.Blue, 1.0f)),
+            H<Scene, SubscribedEvent>((x, e) => x.SceneExchange.Attach(x.Camera))
+        );
 
         readonly IDictionary<Type, IList<IRenderable>> _renderables = new Dictionary<Type, IList<IRenderable>>();
         readonly IDictionary<int, IList<IRenderable>> _processedRenderables = new Dictionary<int, IList<IRenderable>>();

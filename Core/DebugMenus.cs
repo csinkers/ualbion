@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using ImGuiNET;
 using UAlbion.Core.Events;
 using Veldrid;
@@ -8,7 +7,9 @@ namespace UAlbion.Core
 {
     class DebugMenus : Component
     {
-        static readonly IList<Handler> Handlers = new Handler[] { new Handler<DebugMenus, EngineUpdateEvent>((x, _) => x.RenderDebugMenu()) };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<DebugMenus, EngineUpdateEvent>((x, _) => x.RenderDebugMenu()));
+
         static readonly string[] MsaaOptions = { "Off", "2x", "4x", "8x", "16x", "32x" };
         readonly Engine _engine;
         int _msaaOption = 0;

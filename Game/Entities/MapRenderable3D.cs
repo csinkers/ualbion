@@ -21,12 +21,11 @@ namespace UAlbion.Game.Entities
         readonly IDictionary<int, IList<int>> _tilesByDistance = new Dictionary<int, IList<int>>();
         bool _isSorting = false;
 
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<MapRenderable3D, RenderEvent>((x, e) => x.Render(e)),
-            new Handler<MapRenderable3D, PostUpdateEvent>((x, _) => x.PostUpdate()),
-            new Handler<MapRenderable3D, SortMapTilesEvent>((x, e) => x._isSorting = e.IsSorting),
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<MapRenderable3D, RenderEvent>((x, e) => x.Render(e)),
+            H<MapRenderable3D, PostUpdateEvent>((x, _) => x.PostUpdate()),
+            H<MapRenderable3D, SortMapTilesEvent>((x, e) => x._isSorting = e.IsSorting)
+        );
 
         public MapRenderable3D(IAssetManager assets, MapData3D mapData, LabyrinthData labyrinthData, Vector3 tileSize) : base(Handlers)
         {

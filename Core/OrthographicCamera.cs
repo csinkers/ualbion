@@ -6,10 +6,10 @@ namespace UAlbion.Core
 {
     public class OrthographicCamera : Component, ICamera
     {
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<OrthographicCamera, ScreenCoordinateSelectEvent>((x, e) => x.TransformSelect(e)),
-            new Handler<OrthographicCamera, MagnifyEvent>((x, e) =>
+        static readonly HandlerSet Handlers = new HandlerSet
+        (
+            H<OrthographicCamera, ScreenCoordinateSelectEvent>((x, e) => x.TransformSelect(e)),
+            H<OrthographicCamera, MagnifyEvent>((x, e) =>
             {
                 if (x._magnification < 1.0f && e.Delta > 0)
                     x._magnification = 0.0f;
@@ -23,13 +23,13 @@ namespace UAlbion.Core
             }),
 
             // BUG: This event is not received when the screen is resized while a 3D scene is active.
-            new Handler<OrthographicCamera, WindowResizedEvent>((x, e) =>
+            H<OrthographicCamera, WindowResizedEvent>((x, e) =>
             {
                 x.WindowWidth = e.Width;
                 x.WindowHeight = e.Height;
                 x.UpdatePerspectiveMatrix();
             })
-        };
+        );
 
         void TransformSelect(ScreenCoordinateSelectEvent e)
         {

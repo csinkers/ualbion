@@ -9,17 +9,16 @@ namespace UAlbion.Game
 {
     public class AssetCache : Component
     {
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<AssetCache, ReloadAssetsEvent>((x, e) =>
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<AssetCache, ReloadAssetsEvent>((x, e) =>
             {
                 lock (x._syncRoot)
                 {
                     x._assetCache.Clear();
                 }
             }),
-            new Handler<AssetCache, CycleCacheEvent>((x, e) => { x.CycleCacheEvent(); }),
-            new Handler<AssetCache, AssetStatsEvent>((x, e) =>
+            H<AssetCache, CycleCacheEvent>((x, e) => { x.CycleCacheEvent(); }),
+            H<AssetCache, AssetStatsEvent>((x, e) =>
             {
                 Console.WriteLine("Asset Statistics:");
                 lock (x._syncRoot)
@@ -29,8 +28,8 @@ namespace UAlbion.Game
                         Console.WriteLine("    {0}: {1} items", key, x._assetCache[key].Values.Count);
                     }
                 }
-            }),
-        };
+            })
+        );
 
         readonly object _syncRoot = new object();
         IDictionary<AssetType, IDictionary<Tuple<int, GameLanguage>, object>> _assetCache = new Dictionary<AssetType, IDictionary<Tuple<int, GameLanguage>, object>>();

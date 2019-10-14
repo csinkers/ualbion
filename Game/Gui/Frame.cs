@@ -80,10 +80,17 @@ namespace UAlbion.Game.Gui
             _sprite =
                 new UiMultiSprite(new SpriteKey(multi, order, false))
                 {
-                    Instances = new[] { new SpriteInstanceData(
-                        Vector3.Zero,
-                        normalisedSize,
-                    offset, texSize, layer, SpriteFlags.NoTransform)
+                    Instances = new[] {
+                        new SpriteInstanceData( // Drop shadow
+                            new Vector3(window.UiToNormRelative(new Vector2(10, 10)), 0),
+                         window.UiToNormRelative(new Vector2(size.X - 10, size.Y - 10)),
+                        Vector2.Zero, Vector2.Zero, 0,
+                            SpriteFlags.NoTransform.SetOpacity(0.5f)),
+                        new SpriteInstanceData( // Frame
+                            Vector3.Zero,
+                            normalisedSize,
+                        offset, texSize, layer, SpriteFlags.NoTransform),
+
                     },
                     Flags = SpriteFlags.LeftAligned
                 };

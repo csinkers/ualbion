@@ -31,11 +31,10 @@ namespace UAlbion.Game.Entities
         public Vector3 Normal => Vector3.UnitZ;
         public string Name => $"Map2D {MapId}";
 
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<Map2D, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
-            // new Handler<Map2D, UnloadMapEvent>((x, e) => x.Unload()),
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<Map2D, WorldCoordinateSelectEvent>((x, e) => x.Select(e))
+            // H<Map2D, UnloadMapEvent>((x, e) => x.Unload()),
+        );
 
         public override string ToString() { return $"Map2D: {MapId} ({(int)MapId}"; }
 

@@ -13,10 +13,9 @@ namespace UAlbion.Core.Textures
         float _lastCleanup;
         float _totalTime;
 
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<TextureManager, EngineUpdateEvent>((x,e) => x.OnUpdate(e)), 
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<TextureManager, EngineUpdateEvent>((x,e) => x.OnUpdate(e))
+        );
 
         class CacheEntry : IDisposable
         {

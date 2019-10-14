@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UAlbion.Core;
+﻿using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
@@ -10,11 +9,10 @@ namespace UAlbion.Game
 {
     public class MapManager : Component
     {
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<MapManager, LoadMapEvent>((x, e) => x._pendingMapChange = (MapDataId)e.MapId), 
-            new Handler<MapManager, BeginFrameEvent>((x, e) => x.LoadMap()), 
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<MapManager, LoadMapEvent>((x, e) => x._pendingMapChange = (MapDataId)e.MapId), 
+            H<MapManager, BeginFrameEvent>((x, e) => x.LoadMap())
+        );
 
         readonly EventExchange _mapExchange;
         MapDataId? _pendingMapChange;

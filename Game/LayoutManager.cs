@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
@@ -29,13 +30,13 @@ namespace UAlbion.Game
 
     public class LayoutManager : Component, ILayoutManager
     {
-        static readonly Handler[] Handlers =
-        {
-            new Handler<LayoutManager, RenderEvent>((x,e) => x.Render(e)), 
-            new Handler<LayoutManager, ScreenCoordinateSelectEvent>((x,e) => x.Select(e)), 
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<LayoutManager, RenderEvent>((x,e) => x.Render(e)), 
+            H<LayoutManager, ScreenCoordinateSelectEvent>((x,e) => x.Select(e))
+        );
 
         readonly IDictionary<IUiElement, DialogPositioning> _elements = new Dictionary<IUiElement, DialogPositioning>(); // Top-level elements
+        IList<IUiElement> _lastSelection = new List<IUiElement>();
 
         void DoLayout(Action<Rectangle, IUiElement> action)
         {
@@ -102,17 +103,34 @@ namespace UAlbion.Game
             var window = Exchange.Resolve<IWindowManager>();
             var normPosition = window.PixelToNorm(selectEvent.Position);
             var uiPosition = window.NormToUi(normPosition);
+
+            var newSelection = new List<IUiElement>();
             DoLayout((extents, element) =>
                 {
                     element.Select(uiPosition, extents, (int)DrawLayer.Interface, 
                         (order, target) =>
                         {
                             float z = 1.0f - order / (float)DrawLayer.MaxLayer;
-                                var intersectionPoint = new Vector3(normPosition, z);
+                            var intersectionPoint = new Vector3(normPosition, z);
                             selectEvent.RegisterHit(z, new Selection(intersectionPoint, target));
+                            if(target is IUiElement subElement)
+                                newSelection.Add(subElement);
                         }
                     );
                 });
+
+            var focused = newSelection.Except(_lastSelection);
+            var blurred = _lastSelection.Except(newSelection);
+
+            IEvent e = new UiHoverEvent();
+            foreach(var element in focused)
+                element.Receive(e, this);
+
+            e = new UiBlurEvent();
+            foreach(var element in blurred)
+                element.Receive(e, this);
+
+            _lastSelection = newSelection;
         }
 
         public LayoutManager() : base(Handlers) { }

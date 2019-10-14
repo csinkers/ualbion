@@ -40,19 +40,17 @@ namespace UAlbion.Game.Entities
             { Animation.UpperBody, new[] { 16 } },
         };
 
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<LargeNpcSprite, RenderEvent>((x,e) => x.Render(e)),
-            new Handler<LargeNpcSprite, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
-            new Handler<LargeNpcSprite, SetTileSizeEvent>((x,e) => x._tileSize = new Vector2(e.TileSize.X, e.TileSize.Y)),
-            new Handler<LargeNpcSprite, UpdateEvent>((x, e) =>
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<LargeNpcSprite, RenderEvent>((x,e) => x.Render(e)),
+            H<LargeNpcSprite, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
+            H<LargeNpcSprite, SetTileSizeEvent>((x,e) => x._tileSize = new Vector2(e.TileSize.X, e.TileSize.Y)),
+            H<LargeNpcSprite, UpdateEvent>((x, e) =>
             {
                 var cycle = Frames[x._animation];
                 x._frame--;
                 if (!cycle.Contains(x._frame))
                     x._frame = cycle[0];
-            })
-        };
+            }));
 
         readonly LargeNpcId _id;
         readonly MapNpc.Waypoint[] _waypoints;

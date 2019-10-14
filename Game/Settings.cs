@@ -5,9 +5,8 @@ namespace UAlbion.Game
 {
     public class Settings : Component, ISettings
     {
-        static readonly Handler[] Handlers =
-        {
-            new Handler<Settings, SetLanguageEvent>((x, e) =>
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<Settings, SetLanguageEvent>((x, e) =>
             {
                 if (x.Language != e.Language)
                 {
@@ -15,7 +14,7 @@ namespace UAlbion.Game
                     x.Raise(e); // Re-raise to ensure any consumers who received it before Settings will get it again.
                 }
             })
-        };
+        );
         public Settings() : base(Handlers) { }
         public GameLanguage Language { get; private set; }
     }

@@ -24,11 +24,10 @@ namespace UAlbion.Game.Entities
         readonly MultiSprite _overlay;
         int _frameCount;
 
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<MapRenderable2D, RenderEvent>((x, e) => x.Render(e)),
-            new Handler<MapRenderable2D, UpdateEvent>((x, e) => x.Update()),
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<MapRenderable2D, RenderEvent>((x, e) => x.Render(e)),
+            H<MapRenderable2D, UpdateEvent>((x, e) => x.Update())
+        );
 
         public Vector2 TileSize { get; }
         public PaletteId Palette => (PaletteId)_mapData.PaletteId;

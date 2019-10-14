@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
@@ -11,12 +10,11 @@ namespace UAlbion.Game.Entities
 {
     public class ScreenSpaceSprite<T> : Component where T : Enum
     {
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<ScreenSpaceSprite<T>, RenderEvent>((x,e) => x.Render(e)),
-            new Handler<ScreenSpaceSprite<T>, UpdateEvent>((x, e) => x._frame += e.Frames)
-            //new Handler<MapObjectSprite, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<ScreenSpaceSprite<T>, RenderEvent>((x,e) => x.Render(e)),
+            H<ScreenSpaceSprite<T>, UpdateEvent>((x, e) => x._frame += e.Frames)
+            //H<MapObjectSprite, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
+        );
 
         readonly T _id;
         readonly Vector3 _position;

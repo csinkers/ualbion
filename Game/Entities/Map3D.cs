@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -11,11 +10,10 @@ namespace UAlbion.Game.Entities
 {
     public class Map3D : Component, IMap
     {
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<Map3D, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
-            // new Handler<Map3D, UnloadMapEvent>((x, e) => x.Unload()),
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<Map3D, WorldCoordinateSelectEvent>((x, e) => x.Select(e))
+            // H<Map3D, UnloadMapEvent>((x, e) => x.Unload()),
+        );
 
         Skybox _skybox;
         MapRenderable3D _renderable;

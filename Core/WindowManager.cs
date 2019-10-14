@@ -7,10 +7,9 @@ namespace UAlbion.Core
 {
     public class WindowManager : Component, IWindowManager
     {
-        public WindowManager() : base(new Handler[]
-        {
-            new Handler<WindowManager, WindowResizedEvent>((x, _) => x.Recalculate()), 
-        }) { }
+        public WindowManager() : base(new HandlerSet(
+            H<WindowManager, WindowResizedEvent>((x, _) => x.Recalculate())
+        )) { }
 
         internal Sdl2Window Window
         {

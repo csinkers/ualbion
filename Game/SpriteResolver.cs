@@ -40,10 +40,10 @@ namespace UAlbion.Game
             {typeof(CoreSpriteId), AssetType.CoreGraphics}
         };
 
-        static readonly Handler[] Handlers = {
-            new Handler<SpriteResolver, SubscribedEvent>((x, _) =>
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<SpriteResolver, SubscribedEvent>((x, _) =>
                 x._defaultTexture = x.Exchange.Resolve<IAssetManager>().LoadTexture(DungeonWallId.DefaultTexture))
-        };
+        );
         public SpriteResolver() : base(Handlers) { }
 
         public Tuple<SpriteKey, SpriteInstanceData> Resolve(SpriteDefinition spriteDefinition)

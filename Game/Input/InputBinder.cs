@@ -24,11 +24,11 @@ namespace UAlbion.Game.Input
 
     public class InputBinder : Component
     {
-        static readonly Handler[] Handlers = {
-            new Handler<InputBinder, SetInputModeEvent>((x, e) => x.OnInputModeChanged(e)),
-            new Handler<InputBinder, InputEvent>((x, e) => x.OnInput(e)),
-            new Handler<InputBinder, LoadMapEvent>((x, e) => x._mapId = e.MapId),
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<InputBinder, SetInputModeEvent>((x, e) => x.OnInputModeChanged(e)),
+            H<InputBinder, InputEvent>((x, e) => x.OnInput(e)),
+            H<InputBinder, LoadMapEvent>((x, e) => x._mapId = e.MapId)
+        );
 
         public InputBinder(InputConfig config) : base(Handlers)
         {

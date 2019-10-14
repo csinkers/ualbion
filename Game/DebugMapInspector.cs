@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Numerics;
 using ImGuiNET;
 using UAlbion.Api;
@@ -13,25 +12,23 @@ namespace UAlbion.Game
 {
     public class DebugMapInspector : Component
     {
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<DebugMapInspector, EngineUpdateEvent>((x, _) => x.RenderDialog()),
-            new Handler<DebugMapInspector, ShowDebugInfoEvent>((x, e) =>
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<DebugMapInspector, EngineUpdateEvent>((x, _) => x.RenderDialog()),
+            H<DebugMapInspector, ShowDebugInfoEvent>((x, e) =>
             {
                 x._hits = e.Selections;
                 x._mousePosition = e.MousePosition;
             }),
-            new Handler<DebugMapInspector, SetTextureOffsetEvent>((x, e) =>
+            H<DebugMapInspector, SetTextureOffsetEvent>((x, e) =>
             {
                 EightBitTexture.OffsetX = e.X;
                 EightBitTexture.OffsetY = e.Y;
             }),
-            new Handler<DebugMapInspector, SetTextureScaleEvent>((x, e) =>
+            H<DebugMapInspector, SetTextureScaleEvent>((x, e) =>
             {
                 EightBitTexture.ScaleAdjustX = e.X;
                 EightBitTexture.ScaleAdjustY = e.Y;
-            }),
-        };
+            }));
 
         IList<Selection> _hits;
         Vector2 _mousePosition;

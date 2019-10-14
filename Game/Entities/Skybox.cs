@@ -13,11 +13,10 @@ namespace UAlbion.Game.Entities
     {
         readonly TileMap _tilemap;
 
-        static readonly Handler[] Handlers =
-        {
-            new Handler<Skybox, RenderEvent>((x, e) => x.Render(e)),
-            new Handler<Skybox, PostUpdateEvent>((x, _) => x.PostUpdate()),
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<Skybox, RenderEvent>((x, e) => x.Render(e)),
+            H<Skybox, PostUpdateEvent>((x, _) => x.PostUpdate())
+        );
 
         void PostUpdate()
         {

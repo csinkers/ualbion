@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UAlbion.Core;
+﻿using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Events;
 
@@ -13,11 +12,10 @@ namespace UAlbion.Game
 
         public GameClock() : base(Handlers) { }
 
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<GameClock, StopClockEvent>((x,e) => x._running = false),
-            new Handler<GameClock, StartClockEvent>((x,e) => x._running = true),
-            new Handler<GameClock, EngineUpdateEvent>((x, e) =>
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<GameClock, StopClockEvent>((x,e) => x._running = false),
+            H<GameClock, StartClockEvent>((x,e) => x._running = true),
+            H<GameClock, EngineUpdateEvent>((x, e) =>
             {
                 if (x._running)
                 {
@@ -34,7 +32,7 @@ namespace UAlbion.Game
                 }
 
                 x.Raise(new PostUpdateEvent());
-            }),
-        };
+            })
+        );
     }
 }

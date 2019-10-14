@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UAlbion.Core;
+﻿using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
@@ -9,9 +8,8 @@ namespace UAlbion.Game.Input
 {
     public class World2DInputMode : Component
     {
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<World2DInputMode, SetInputModeEvent>((x,e) =>
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<World2DInputMode, SetInputModeEvent>((x,e) =>
             {
                 var activating = e.Mode == InputMode.World2D && !x._isActive;
                 var deactivating = e.Mode != InputMode.World2D && x._isActive;
@@ -27,8 +25,8 @@ namespace UAlbion.Game.Input
                     x._isActive = false;
                 }
             }),
-            new Handler<World2DInputMode, InputEvent>((x,e) => x.OnInput(e)), 
-        };
+            H<World2DInputMode, InputEvent>((x,e) => x.OnInput(e))
+        );
 
         void OnInput(InputEvent e)
         {

@@ -11,12 +11,11 @@ namespace UAlbion.Core.Visual
 {
     public class DebugGuiRenderer : Component, IRenderer, IRenderable
     {
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<DebugGuiRenderer, RenderEvent>((x, e) => e.Add(x)),
-            new Handler<DebugGuiRenderer, InputEvent>((x,e) => x._imguiRenderer.Update((float)e.DeltaSeconds, e.Snapshot)), 
-            new Handler<DebugGuiRenderer, WindowResizedEvent>((x,e) => x._imguiRenderer.WindowResized(e.Width, e.Height))
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<DebugGuiRenderer, RenderEvent>((x, e) => e.Add(x)),
+            H<DebugGuiRenderer, InputEvent>((x, e) => x._imguiRenderer.Update((float)e.DeltaSeconds, e.Snapshot)),
+            H<DebugGuiRenderer, WindowResizedEvent>((x, e) => x._imguiRenderer.WindowResized(e.Width, e.Height))
+        );
 
         ImGuiRenderer _imguiRenderer;
 

@@ -10,11 +10,10 @@ namespace UAlbion.Game.Gui
 {
     public class MainMenu : UiElement
     {
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<MainMenu, EngineUpdateEvent>((x, _) => x._menuFunc()),
-            new Handler<MainMenu, UpdateEvent>((x, e) => x.Update(e)),
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<MainMenu, EngineUpdateEvent>((x, _) => x._menuFunc()),
+            H<MainMenu, UpdateEvent>((x, e) => x.Update(e))
+        );
 
         Action _menuFunc;
         int _extraWidth = 0;

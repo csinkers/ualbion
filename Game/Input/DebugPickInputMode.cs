@@ -10,11 +10,10 @@ namespace UAlbion.Game.Input
 {
     public class DebugPickInputMode : Component
     {
-        static readonly IList<Handler> Handlers = new Handler[]
-        {
-            new Handler<DebugPickInputMode, SetInputModeEvent>((x,e) => x._isActive = e.Mode == InputMode.DebugPick),
-            new Handler<DebugPickInputMode, InputEvent>((x,e) => x.OnInput(e)), 
-        };
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<DebugPickInputMode, SetInputModeEvent>((x,e) => x._isActive = e.Mode == InputMode.DebugPick),
+            H<DebugPickInputMode, InputEvent>((x,e) => x.OnInput(e))
+        );
 
         bool _isActive;
 

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Numerics;
 using ImGuiNET;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
@@ -62,8 +63,18 @@ namespace UAlbion.Game
                 ImGui.SetNextItemOpen(true);
                 if (ImGui.TreeNode($"Hit {hitId}"))
                 {
-                    ImGui.TextColored(new Vector4(1.0f, 0.8f, 0.0f, 1.0f), $"{hit.Name} ({ p.X}, {p.Y}, {p.Z})");
-                    var reflected = Reflector.Reflect(hit.Target.ToString(), hit.Target);
+                    Reflector.ReflectedObject reflected;
+                    if (hit.Target is INamed named)
+                    {
+                        ImGui.TextColored(new Vector4(1.0f, 0.8f, 0.0f, 1.0f), $"{named.Name} ({p.X}, {p.Y}, {p.Z})");
+                        reflected = Reflector.Reflect(named.Name, hit.Target);
+                    }
+                    else
+                    {
+                        ImGui.TextColored(new Vector4(1.0f, 0.8f, 0.0f, 1.0f), $"{hit.Target} ({p.X}, {p.Y}, {p.Z})");
+                        reflected = Reflector.Reflect(null, hit.Target);
+                    }
+
                     RenderNode(reflected);
                     ImGui.TreePop();
                 }
@@ -87,9 +98,14 @@ namespace UAlbion.Game
 
         void RenderNode(Reflector.ReflectedObject reflected)
         {
+            var description = 
+                reflected.Name == null
+                ? $"{reflected.Value} ({reflected.Object.GetType().Name})"
+                : $"{reflected.Name}: {reflected.Value} ({reflected.Object.GetType().Name})";
+
             if (reflected.SubObjects != null)
             {
-                if (ImGui.TreeNode($"{reflected.Name}: {reflected.Value} ({reflected.Object.GetType().Name})"))
+                if (ImGui.TreeNode(description))
                 {
                     foreach (var child in reflected.SubObjects)
                         RenderNode(child);
@@ -98,7 +114,7 @@ namespace UAlbion.Game
             }
             else
             {
-                ImGui.TextWrapped($"{reflected.Name}: {reflected.Value} ({reflected.Object?.GetType().Name})");
+                ImGui.TextWrapped(description);
             }
         }
 

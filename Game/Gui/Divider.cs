@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
@@ -9,7 +8,7 @@ using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    public class Divider : Component, IUiElement
+    public class Divider : UiElement
     {
         readonly ITexture _pixel;
 
@@ -23,9 +22,9 @@ namespace UAlbion.Game.Gui
                 new[] { paletteColor },
                 new[] { new EightBitTexture.SubImage(0, 0, 1, 1, 0), });
         }
-        public Vector2 GetSize() => new Vector2(0, 1);
+        public override Vector2 GetSize() => new Vector2(0, 1);
 
-        public int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
             var window = Exchange.Resolve<IWindowManager>();
             var size = window.UiToNormRelative(new Vector2(extents.Width, extents.Height));

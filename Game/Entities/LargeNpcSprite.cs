@@ -12,7 +12,7 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities
 {
-    public class LargeNpcSprite : Component
+    public class LargeNpcSprite : Component, INamed
     {
         public enum Animation
         {
@@ -62,6 +62,7 @@ namespace UAlbion.Game.Entities
         Animation _animation;
         int _frame;
         public Vector3 Normal => Vector3.UnitZ;
+        public string Name => $"NPC {_id}";
 
         public LargeNpcSprite(LargeNpcId id, MapNpc.Waypoint[] waypoints, IAssetManager assets) : base(Handlers)
         {
@@ -97,7 +98,7 @@ namespace UAlbion.Game.Entities
                 y < 0 || y >= _size.Y)
                 return;
 
-            e.RegisterHit(t, $"NPC {_id}", this);
+            e.RegisterHit(t, this);
         }
 
         void Render(RenderEvent e)

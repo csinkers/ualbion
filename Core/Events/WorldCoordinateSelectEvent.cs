@@ -18,7 +18,6 @@ namespace UAlbion.Core.Events
         public Vector3 Origin { get; }
         public Vector3 Direction { get; }
 
-        public void RegisterHit(float t, string name, object target) => 
-            _registerHit(t, new Selection(Origin + t * Direction, name, target));
+        public void RegisterHit(float t, object target) => _registerHit(t, new Selection(Origin + t * Direction, target));
     }
 }

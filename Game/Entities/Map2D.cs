@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using UAlbion.Api;
+using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Parsers;
 using UAlbion.Game.Events;
-using Component = UAlbion.Core.Component;
-using IComponent = UAlbion.Core.IComponent;
 
 namespace UAlbion.Game.Entities
 {
@@ -16,7 +16,7 @@ namespace UAlbion.Game.Entities
         Vector2 LogicalSize { get; }
     }
 
-    public class Map2D : Component, IMap
+    public class Map2D : Component, IMap, INamed
     {
         MapData2D _mapData;
         TilesetData _tileData;
@@ -29,6 +29,7 @@ namespace UAlbion.Game.Entities
         public Vector2 TileSize => _renderable.TileSize;
         public Vector3 Position => Vector3.Zero;
         public Vector3 Normal => Vector3.UnitZ;
+        public string Name => $"Map2D {MapId}";
 
         static readonly IList<Handler> Handlers = new Handler[]
         {
@@ -68,20 +69,20 @@ namespace UAlbion.Game.Entities
             int OverlayId = _mapData.Overlay[index];
             int zoneIndex = _mapData.ZoneLookup[index];
 
-            e.RegisterHit(t, $"Overlay @ ({x}, {y})", _tileData.Tiles[OverlayId]);
-            e.RegisterHit(t, $"Underlay @ ({x}, {y})", _tileData.Tiles[UnderlayId]);
-            e.RegisterHit(t, "Map", this);
+            e.RegisterHit(t, _tileData.Tiles[OverlayId]);
+            e.RegisterHit(t, _tileData.Tiles[UnderlayId]);
+            e.RegisterHit(t, this);
 
             if (zoneIndex != -1)
             {
                 var zone = _mapData.Zones[zoneIndex];
-                e.RegisterHit(t, $"Zone @ ({x}, {y})", zone);
+                e.RegisterHit(t, zone);
                 HashSet<int> printedEvents = new HashSet<int>();
                 int eventNumber = zone.EventNumber;
                 while (eventNumber != 0xffff && !printedEvents.Contains(eventNumber))
                 {
                     var zoneEvent = _mapData.Events[eventNumber];
-                    e.RegisterHit(t, "Event", zoneEvent);
+                    e.RegisterHit(t, zoneEvent);
                     printedEvents.Add(eventNumber);
                     eventNumber = zoneEvent.NextEventId ?? 0xffff;
                 } 

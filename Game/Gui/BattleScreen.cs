@@ -1,18 +1,10 @@
-﻿using System;
-using System.Numerics;
-using UAlbion.Core;
-using Veldrid;
+﻿using System.Numerics;
 
 namespace UAlbion.Game.Gui
 {
-    internal class BattleScreen : Component, IUiElement
+    internal class BattleScreen : UiElement
     {
         public BattleScreen() : base(null) { }
-        public Vector2 GetSize() => Vector2.Zero;
-
-        public int Render(Rectangle position, int order, Action<IRenderable> addFunc)
-        {
-            throw new NotImplementedException();
-        }
+        public override Vector2 GetSize() => Vector2.Zero;
     }
 }

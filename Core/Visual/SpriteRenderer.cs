@@ -50,19 +50,20 @@ namespace UAlbion.Core.Visual
             layout(location = 4) in vec2 _TexOffset;
             layout(location = 5) in vec2 _TexSize;
             layout(location = 6) in int _TexLayer;
-            layout(location = 7) in int _Flags;
+            layout(location = 7) in uint _Flags;
             layout(location = 8) in float _Rotation;
 
             // Outputs to fragment shader
             layout(location = 0) out vec2 fsin_0;     // Texture Coordinates
             layout(location = 1) out flat float fsin_1; // Texture Layer
-            layout(location = 2) out flat int fsin_2; /* Flags:
+            layout(location = 2) out flat uint fsin_2; /* Flags:
                NoTransform  = 0x1,  Highlight      = 0x2,
                UsePalette   = 0x4,  OnlyEvenFrames = 0x8,
                RedTint      = 0x10,  GreenTint     = 0x20,
-               BlueTint     = 0x40,  Transparent   = 0x80 
+               BlueTint     = 0x40,  --DEPRECATED Transparent -- = 0x80 
                FlipVertical = 0x100, FloorTile     = 0x200,
-               Billboard    = 0x400, DropShadow    = 0x800 */
+               Billboard    = 0x400, DropShadow    = 0x800 
+               Opacity = High order byte  */
 
             void main()
             {
@@ -106,7 +107,7 @@ namespace UAlbion.Core.Visual
             // Inputs from vertex shader
             layout(location = 0) in vec2 fsin_0;       // Texture Coordinates
             layout(location = 1) in flat float fsin_1; // Texture Layer
-            layout(location = 2) in flat int fsin_2;   // Flags
+            layout(location = 2) in flat uint fsin_2;   // Flags
 
             // Fragment shader outputs
             layout(location = 0) out vec4 OutputColor;
@@ -140,7 +141,12 @@ namespace UAlbion.Core.Visual
                 if((fsin_2 & 0x10) != 0) color = vec4(color.x * 1.5f + 0.3f, color.yzw);         // Red tint
                 if((fsin_2 & 0x20) != 0) color = vec4(color.x, color.y * 1.5f + 0.3f, color.zw); // Green tint
                 if((fsin_2 & 0x40) != 0) color = vec4(color.xy, color.z * 1.5f + 0.f, color.w); // Blue tint
-                if((fsin_2 & 0x80) != 0) color = vec4(color.xyz, color.w * 0.5f); // Transparent
+                // if((fsin_2 & 0x80) != 0) color = vec4(color.xyz, color.w * 0.5f); // Transparent
+                if((fsin_2 & 0xff000000) != 0) 
+                {
+                    float opacity = (((fsin_2 & 0xff000000) >> 24) / 255.0f);
+                    color = vec4(color.xyz, color.w * opacity);
+                }
 
                 OutputColor = color;
             }";

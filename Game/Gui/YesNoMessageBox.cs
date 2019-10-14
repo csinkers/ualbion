@@ -1,20 +1,8 @@
-﻿using System;
-using System.Numerics;
-using UAlbion.Core;
-using Veldrid;
-
-namespace UAlbion.Game.Gui
+﻿namespace UAlbion.Game.Gui
 {
-    class YesNoMessageBox : Component, IUiElement
+    class YesNoMessageBox : UiElement
     {
         public YesNoMessageBox() : base(null) { }
         // Label _label;
-
-        public Vector2 GetSize() => Vector2.Zero;
-
-        public int Render(Rectangle position, int order, Action<IRenderable> addFunc)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
 using ImGuiNET;
-using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
-using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
@@ -74,10 +71,6 @@ namespace UAlbion.Game.Gui
             var layout = Exchange.Resolve<ILayoutManager>();
             layout.Add(this, DialogPositioning.Center);
         }
-
-        public IUiElement Parent => null;
-        public override Vector2 GetSize() => GetMaxChildSize();
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc) => RenderChildren(extents, order, addFunc);
 
         void PrimaryMenu()
         {

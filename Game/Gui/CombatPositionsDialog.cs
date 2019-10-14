@@ -1,20 +1,12 @@
-﻿using System;
-using System.Numerics;
-using UAlbion.Core;
-using Veldrid;
+﻿using System.Numerics;
 
 namespace UAlbion.Game.Gui
 {
-    class CombatPositionsDialog : Component, IUiElement
+    class CombatPositionsDialog : UiElement
     {
         public CombatPositionsDialog() : base(null) { }
         // readonly InventoryButton[] _buttons = new InventoryButton[12];
         // Button _okButton;
-        public Vector2 GetSize() => Vector2.Zero;
-
-        public int Render(Rectangle position, int order, Action<IRenderable> addFunc)
-        {
-            throw new NotImplementedException();
-        }
+        public override Vector2 GetSize() => Vector2.Zero;
     }
 }

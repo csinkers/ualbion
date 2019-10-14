@@ -8,7 +8,7 @@ using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    public class Starfield : Component, IUiElement // UI-grid for testing
+    public class Starfield : UiElement // UI-grid for testing
     {
         readonly ITexture _pixel;
         MultiSprite _sprite;
@@ -79,13 +79,13 @@ namespace UAlbion.Game.Gui
             layout.Add(this, DialogPositioning.Center);
         }
 
-        public Vector2 GetSize()
+        public override Vector2 GetSize()
         {
             var window = Exchange.Resolve<IWindowManager>();
             return new Vector2(window.UiWidth, window.UiHeight);
         }
 
-        public int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
             Rebuild(extents.Width, extents.Height, order);
             addFunc(_sprite);

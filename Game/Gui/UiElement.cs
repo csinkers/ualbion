@@ -33,10 +33,24 @@ namespace UAlbion.Game.Gui
             int maxOrder = order;
             foreach (var child in Children.OfType<IUiElement>())
                 maxOrder = Math.Max(maxOrder, child.Render(extents, order + 1, addFunc));
-            return maxOrder + 1;
+            return maxOrder;
         }
 
-        public abstract Vector2 GetSize();
-        public abstract int Render(Rectangle extents, int order, Action<IRenderable> addFunc);
+        protected void SelectChildren(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+        {
+            foreach (var child in Children.OfType<IUiElement>())
+                child.Select(uiPosition, extents, order + 1, registerHitFunc);
+        }
+
+        public virtual Vector2 GetSize() => GetMaxChildSize();
+        public virtual int Render(Rectangle extents, int order, Action<IRenderable> addFunc) => RenderChildren(extents, order, addFunc);
+        public virtual void Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+        {
+            if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
+                return;
+
+            SelectChildren(uiPosition, extents, order, registerHitFunc);
+            registerHitFunc(order, this);
+        }
     }
 }

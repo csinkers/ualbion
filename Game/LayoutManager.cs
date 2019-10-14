@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -31,11 +32,12 @@ namespace UAlbion.Game
         static readonly Handler[] Handlers =
         {
             new Handler<LayoutManager, RenderEvent>((x,e) => x.Render(e)), 
+            new Handler<LayoutManager, ScreenCoordinateSelectEvent>((x,e) => x.Select(e)), 
         };
 
         readonly IDictionary<IUiElement, DialogPositioning> _elements = new Dictionary<IUiElement, DialogPositioning>(); // Top-level elements
 
-        void Render(RenderEvent renderEvent)
+        void DoLayout(Action<Rectangle, IUiElement> action)
         {
             foreach (var (element, positioning) in _elements)
             {
@@ -86,11 +88,31 @@ namespace UAlbion.Game
                         throw new ArgumentOutOfRangeException();
                 }
 
-                element.Render(
-                    new Rectangle(x, y, (int)size.X, (int)size.Y), 
-                    (int)DrawLayer.Interface,
-                    renderEvent.Add);
+                action(new Rectangle(x, y, (int)size.X, (int)size.Y), element);
             }
+        }
+
+        void Render(RenderEvent renderEvent)
+        {
+            DoLayout((extents, element) => element.Render(extents, (int)DrawLayer.Interface, renderEvent.Add));
+        }
+
+        void Select(ScreenCoordinateSelectEvent selectEvent)
+        {
+            var window = Exchange.Resolve<IWindowManager>();
+            var normPosition = window.PixelToNorm(selectEvent.Position);
+            var uiPosition = window.NormToUi(normPosition);
+            DoLayout((extents, element) =>
+                {
+                    element.Select(uiPosition, extents, (int)DrawLayer.Interface, 
+                        (order, target) =>
+                        {
+                            float z = 1.0f - order / (float)DrawLayer.MaxLayer;
+                                var intersectionPoint = new Vector3(normPosition, z);
+                            selectEvent.RegisterHit(z, new Selection(intersectionPoint, target));
+                        }
+                    );
+                });
         }
 
         public LayoutManager() : base(Handlers) { }

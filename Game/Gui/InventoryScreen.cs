@@ -1,11 +1,6 @@
-﻿using System;
-using System.Numerics;
-using UAlbion.Core;
-using Veldrid;
-
-namespace UAlbion.Game.Gui
+﻿namespace UAlbion.Game.Gui
 {
-    internal class InventoryScreen : Component, IUiElement
+    internal class InventoryScreen : UiElement
     {
         public InventoryScreen() : base(null) { }
         /*
@@ -122,12 +117,5 @@ namespace UAlbion.Game.Gui
         bool _isChest;
         Item _itemInHand;
         */
-
-        public Vector2 GetSize() => Vector2.Zero;
-
-        public int Render(Rectangle position, int order, Action<IRenderable> addFunc)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

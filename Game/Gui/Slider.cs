@@ -1,11 +1,6 @@
-﻿using System;
-using System.Numerics;
-using UAlbion.Core;
-using Veldrid;
-
-namespace UAlbion.Game.Gui
+﻿namespace UAlbion.Game.Gui
 {
-    internal class SliderThumb : Component, IUiElement
+    internal class SliderThumb : UiElement
     {
         Slider _owner;
 
@@ -13,16 +8,9 @@ namespace UAlbion.Game.Gui
         {
             _owner = owner;
         }
-
-        public Vector2 GetSize() => Vector2.Zero;
-
-        public int Render(Rectangle position, int order, Action<IRenderable> addFunc)
-        {
-            throw new NotImplementedException();
-        }
     }
 
-    internal class Slider : Component, IUiElement
+    internal class Slider : UiElement
     {
         /*
         int _value = 0;
@@ -36,13 +24,6 @@ namespace UAlbion.Game.Gui
         public Slider() : base(null)
         {
             // _thumb = new SliderThumb(this);
-        }
-
-        public Vector2 GetSize() => Vector2.Zero;
-
-        public int Render(Rectangle position, int order, Action<IRenderable> addFunc)
-        {
-            throw new NotImplementedException();
         }
     }
 }

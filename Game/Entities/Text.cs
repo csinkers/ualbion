@@ -12,7 +12,7 @@ using Veldrid;
 
 namespace UAlbion.Game.Entities
 {
-    public class Text : Component, IUiElement
+    public class Text : UiElement
     {
         enum Justification
         {
@@ -21,7 +21,7 @@ namespace UAlbion.Game.Entities
             Right
         }
 
-        readonly IDictionary<char, int> _fontMapping = new Dictionary<char, int>
+        static readonly IDictionary<char, int> FontMapping = new Dictionary<char, int>
         {
             { 'a',  0 }, { 'b',  1 }, { 'c',  2 }, { 'd',  3 }, { 'e',  4 },
             { 'f',  5 }, { 'g',  6 }, { 'h',  7 }, { 'i',  8 }, { 'j',  9 },
@@ -46,9 +46,6 @@ namespace UAlbion.Game.Entities
             { 'û', 105 }, { 'ù', 106 }, { 'á', 107 }, { 'í', 108 }, { 'ó', 109 }, { 'ú', 110 },
         };
 
-        readonly StringId _id;
-        UiMultiSprite _sprite;
-
         static readonly Handler[] Handlers =
         {
             new Handler<Text, WindowResizedEvent>((x,e) => x.Rebuild()),
@@ -56,10 +53,26 @@ namespace UAlbion.Game.Entities
             new Handler<Text, SubscribedEvent>((x,e) => x.Rebuild()),
         };
 
+        // Driving properties
+        readonly StringId _id;
         FontColor _color;
         bool _isBold;
         Justification _justification;
+
+        // Dependent properties
+        UiMultiSprite _sprite;
         Vector2 _size;
+
+        public override string ToString()
+        {
+            var assets = Exchange?.Resolve<IAssetManager>();
+            var settings = Exchange?.Resolve<ISettings>();
+            if(assets == null || settings == null)
+                return $"Text:{_id}";
+
+            var text = assets.LoadString(_id, settings.Language);
+            return $"Text:\"{text}\" {_color} {(_isBold ? "Bold" : "")} {_justification} ({_size.X}x{_size.Y})";
+        }
 
         void Rebuild()
         {
@@ -76,7 +89,7 @@ namespace UAlbion.Game.Entities
             {
                 int n = i * (_isBold ? 4 : 2);
                 char c = text[i];
-                if (_fontMapping.TryGetValue(c, out var index))
+                if (FontMapping.TryGetValue(c, out var index))
                 {
                     font.GetSubImageDetails(index, out var size, out var texOffset, out var texSize, out var layer);
 
@@ -132,7 +145,6 @@ namespace UAlbion.Game.Entities
 
         public Text(StringId id) : base(Handlers)
         {
-            // TODO: Left & right justification, kerning, line wrapping
             _id = id;
             _color = FontColor.White;
             _isBold = false;
@@ -145,9 +157,9 @@ namespace UAlbion.Game.Entities
         public Text Center() { _justification = Justification.Center; return this; }
         public Text Right() { _justification = Justification.Right; return this; }
 
-        public Vector2 GetSize() => _size;
+        public override Vector2 GetSize() => _size;
 
-        public int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
             var window = Exchange.Resolve<IWindowManager>();
             if (_sprite.RenderOrder != order)

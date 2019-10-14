@@ -8,34 +8,11 @@ using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    /*
-    public static class GuiHelper
-    {
-        public static IRenderable HorizontalLine(int x1, int x2, int y, byte color)
-        {
-        }
-
-        public static IRenderable VerticalLine(int x, int y1, int y2, byte color)
-        {
-        }
-
-        public static IRenderable HollowRectangle(int x1, int y1, int x2, int y2, byte color1, byte color2)
-        {
-        }
-
-        public static IRenderable FilledRectangle(int x1, int y1, int x2, int y2, byte color1, byte color2, byte fillColor)
-        {
-        }
-    }*/
-
     public class Frame : UiElement
     {
-        bool _hideCorners = false;
-        bool _truncateLines = true;
-
         const int TileSize = 16;
         MultiSprite _sprite;
-        Vector2 _lastPixelSize;
+        Vector2 _lastPixelSize; // For dirty state detection
 
         public Frame(IUiElement child) : base(null) => Children.Add(child);
         void Rebuild(int width, int height, int order)
@@ -130,6 +107,23 @@ namespace UAlbion.Game.Gui
             addFunc(_sprite);
 
             return RenderChildren(innerExtents, order, addFunc);
+        }
+
+        public override void Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+        {
+            if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
+                return;
+
+            Rebuild(extents.Width, extents.Height, order);
+
+            var innerExtents = new Rectangle(
+                extents.X + 7,
+                 extents.Y + 7,
+                extents.Width - 14,
+                extents.Height - 14);
+
+            SelectChildren(uiPosition, innerExtents, order, registerHitFunc);
+            registerHitFunc(order, this);
         }
     }
 }

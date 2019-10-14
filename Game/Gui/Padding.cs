@@ -1,16 +1,11 @@
-﻿using System;
-using System.Numerics;
-using UAlbion.Core;
-using Veldrid;
+﻿using System.Numerics;
 
 namespace UAlbion.Game.Gui
 {
-    public class Padding : Component, IUiElement
+    public class Padding : UiElement
     {
         readonly Vector2 _size;
         public Padding(int x, int y) : base(null) { _size = new Vector2(x, y); }
-        public Vector2 GetSize() => _size;
-
-        public int Render(Rectangle extents, int order, Action<IRenderable> addFunc) => order;
+        public override Vector2 GetSize() => _size;
     }
 }

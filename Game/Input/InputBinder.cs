@@ -36,7 +36,12 @@ namespace UAlbion.Game.Input
                     for (int i = 0; i < parts.Length; i++)
                     {
                         if (i == parts.Length - 1)
-                            key = Enum.Parse<Key>(parts[i], true);
+                        {
+                            if (int.TryParse(parts[i], out var numeric))
+                                key = Key.Number0 + numeric;
+                            else
+                                key = Enum.Parse<Key>(parts[i], true);
+                        }
                         else
                             modifiers |= Enum.Parse<ModifierKeys>(parts[i], true);
                     }

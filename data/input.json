@@ -21,7 +21,9 @@
         "Shift+W": "+camera_move  0 -4",
         "Shift+A": "+camera_move -4  0",
         "Shift+S": "+camera_move  0  4",
-        "Shift+D": "+camera_move  4  0"
+        "Shift+D": "+camera_move  4  0",
+        "Alt+1":  "set_language English",
+        "Alt+2":  "set_language German"
     },
     "Console": {
         "Tilde": "pop_input_mode"

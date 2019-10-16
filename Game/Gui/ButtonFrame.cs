@@ -49,31 +49,26 @@ namespace UAlbion.Game.Gui
         Rectangle _lastExtents;
         ButtonState _state = ButtonState.Normal;
         ColorScheme _scheme = ColorScheme.Monochrome;
+        int _padding = 2;
+
         public ColorScheme Scheme
         {
             get => _scheme;
-            set
-            {
-                if(_scheme != value)
-                {
-                    _scheme = value;
-                    _lastExtents = new Rectangle();
-                }
-            }
+            set { if(_scheme != value) { _scheme = value; _lastExtents = new Rectangle(); } }
         }
 
         public ButtonState State
         {
             get => _state;
-            set
-            {
-                if (value != _state)
-                {
-                    _state = value;
-                    _lastExtents = new Rectangle();
-                }
-            }
+            set { if (value != _state) { _state = value; _lastExtents = new Rectangle(); } }
         }
+
+        public int Padding // Adjust by 1 pixel to account for the border.
+        {
+            get => _padding - 1;
+            set { if (value != (_padding - 1)) { _padding = value + 1; _lastExtents = new Rectangle(); } }
+        }
+
 
         public ButtonFrame(IUiElement child) : base(Handlers)
         {
@@ -156,7 +151,7 @@ namespace UAlbion.Game.Gui
             };
         }
 
-        public override Vector2 GetSize() => GetMaxChildSize() + 4 * Vector2.One;
+        public override Vector2 GetSize() => GetMaxChildSize() + _padding * 2 * Vector2.One;
 
         public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
@@ -166,7 +161,12 @@ namespace UAlbion.Game.Gui
                 _sprite.RenderOrder = order;
 
             addFunc(_sprite);
-            var innerExtents = new Rectangle(extents.X + 2, extents.Y + 2, extents.Width - 4, extents.Height - 4);
+            var innerExtents = new Rectangle(
+                extents.X + _padding,
+                extents.Y + _padding,
+                extents.Width - _padding * 2,
+                extents.Height - _padding * 2);
+
             return RenderChildren(innerExtents, order, addFunc);
         }
 
@@ -176,7 +176,12 @@ namespace UAlbion.Game.Gui
                 return;
             Rebuild(extents);
 
-            var innerExtents = new Rectangle(extents.X + 2, extents.Y + 2, extents.Width - 4, extents.Height - 4);
+            var innerExtents = new Rectangle(
+                extents.X + _padding,
+                extents.Y + _padding,
+                extents.Width - _padding * 2,
+                extents.Height - _padding * 2);
+
             SelectChildren(uiPosition, innerExtents, order, registerHitFunc);
             registerHitFunc(order, this);
         }

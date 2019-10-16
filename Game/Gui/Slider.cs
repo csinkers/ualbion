@@ -55,8 +55,13 @@ namespace UAlbion.Game.Gui
             _track = new SliderTrack(ThumbKey, getter, min, max);
             _increment = new Button(IncrementKey, ">");
 
+            _frame = new ButtonFrame(_track)
+            {
+                State = ButtonState.Pressed,
+                Padding = 0
+            };
+
             Children.Add(_decrement);
-            _frame = new ButtonFrame(_track) { State = ButtonState.Pressed };
             Children.Add(_frame);
             Children.Add(_increment);
         }

@@ -54,13 +54,17 @@ namespace UAlbion.Game.Entities
 
         // Driving properties
         readonly StringId _id;
-        FontColor _color;
+        string _literal;
         bool _isBold;
-        Justification _justification;
+        FontColor _color = FontColor.White;
+        Justification _justification = Justification.Left;
 
         // Dependent properties
         UiMultiSprite _sprite;
         Vector2 _size;
+
+        public Text(string literal) : base(Handlers) { _literal = literal; }
+        public Text(StringId id) : base(Handlers) { _id = id; }
 
         public override string ToString()
         {
@@ -69,7 +73,7 @@ namespace UAlbion.Game.Entities
             if(assets == null || settings == null)
                 return $"Text:{_id}";
 
-            var text = assets.LoadString(_id, settings.Language);
+            var text = _literal ?? assets.LoadString(_id, settings.Language);
             return $"Text:\"{text}\" {_color} {(_isBold ? "Bold" : "")} {_justification} ({_size.X}x{_size.Y})";
         }
 
@@ -80,7 +84,7 @@ namespace UAlbion.Game.Entities
             var settings = Exchange.Resolve<ISettings>();
 
             var font = assets.LoadFont(_color, false);
-            var text = assets.LoadString(_id, settings.Language);
+            var text = _literal ?? assets.LoadString(_id, settings.Language);
 
             var instances = new SpriteInstanceData[text.Length * (_isBold ? 4 : 2)];
             int offset = 0;
@@ -142,19 +146,21 @@ namespace UAlbion.Game.Entities
             _size = new Vector2(offset + 1, fontSize.Y + 1); // +1 for the drop shadow
         }
 
-        public Text(StringId id) : base(Handlers)
-        {
-            _id = id;
-            _color = FontColor.White;
-            _isBold = false;
-            _justification = Justification.Left;
-        }
-
         public Text Bold() { _isBold = true; return this; }
         public Text Color(FontColor color) { _color = color; return this; }
         public Text Left() { _justification = Justification.Left; return this; }
         public Text Center() { _justification = Justification.Center; return this; }
         public Text Right() { _justification = Justification.Right; return this; }
+        public Text LiteralString(string literal)
+        {
+            if (_literal != literal)
+            {
+                _literal = literal;
+                Rebuild();
+            }
+
+            return this;
+        }
 
         public override Vector2 GetSize() => _size;
 
@@ -192,5 +198,6 @@ namespace UAlbion.Game.Entities
             addFunc(_sprite);
             return order;
         }
+
     }
 }

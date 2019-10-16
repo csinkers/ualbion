@@ -272,6 +272,7 @@ namespace UAlbion.Core.Visual
 
             foreach(var multiSprite in renderables.OfType<MultiSprite>())
             {
+                if (multiSprite.Instances.Length == 0) continue;
                 SetupMultiSpriteResources(multiSprite);
                 yield return multiSprite;
             }

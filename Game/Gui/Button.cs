@@ -48,6 +48,14 @@ namespace UAlbion.Game.Gui
             Children.Add(_frame);
         }
 
+        public Button(string buttonId, string literalText) : base(Handlers)
+        {
+            Id = buttonId;
+            var text = new Text(literalText).Center();
+            _frame = new ButtonFrame(text);
+            Children.Add(_frame);
+        }
+
         public override Vector2 GetSize() => GetMaxChildSize() + new Vector2(4, 0);
 
         public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)

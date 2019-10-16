@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -12,41 +13,55 @@ namespace UAlbion.Game.Gui
 {
     class ButtonFrame : UiElement
     {
-        enum Color
+        public enum ColorScheme
         {
-            White,
-            Grey,
-            Black,
-            Orange,
-            Green
+            Monochrome,
+            BlueGrey
         }
+
+        static readonly IDictionary<CommonColor, uint> Palette =
+            new[]
+            {
+                CommonColor.White,
+                CommonColor.Grey8,
+                CommonColor.Black2,
+                CommonColor.BlueGrey3,
+                CommonColor.BlueGrey4,
+                CommonColor.BlueGrey6,
+                CommonColor.Teal1,
+                CommonColor.Teal3,
+                CommonColor.Teal4,
+            }.Select((x, i) => (x, i)).ToDictionary(x => x.x, x => (uint)x.i);
 
         static readonly ITexture BorderTexture = new EightBitTexture(
             "ButtonBorder",
-            1, 1, 1, 5,
-            new[]
-            {
-                (byte) CommonColor.White,
-                (byte) CommonColor.Grey8,
-                (byte) CommonColor.Black2,
-                (byte) CommonColor.Red,
-                (byte) CommonColor.Green4,
-            },
-            new[]
-            {
-                new EightBitTexture.SubImage(0, 0, 1, 1, 0),
-                new EightBitTexture.SubImage(0, 0, 1, 1, 1),
-                new EightBitTexture.SubImage(0, 0, 1, 1, 2),
-                new EightBitTexture.SubImage(0, 0, 1, 1, 3),
-                new EightBitTexture.SubImage(0, 0, 1, 1, 4),
-            });
+            1, 1, 1, (uint)Palette.Count,
+            Palette.OrderBy(x => x.Value).Select(x => (byte)x.Key).ToArray(),
+            Palette.OrderBy(x => x.Value)
+                .Select(x => new EightBitTexture.SubImage(0, 0, 1, 1, x.Value))
+                .ToArray());
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<ButtonFrame, WindowResizedEvent>((x, _) => x._lastExtents = new Rectangle())
             );
+
         UiMultiSprite _sprite;
         Rectangle _lastExtents;
         ButtonState _state = ButtonState.Normal;
+        ColorScheme _scheme = ColorScheme.Monochrome;
+        public ColorScheme Scheme
+        {
+            get => _scheme;
+            set
+            {
+                if(_scheme != value)
+                {
+                    _scheme = value;
+                    _lastExtents = new Rectangle();
+                }
+            }
+        }
+
         public ButtonState State
         {
             get => _state;
@@ -55,7 +70,7 @@ namespace UAlbion.Game.Gui
                 if (value != _state)
                 {
                     _state = value;
-                    _lastExtents = new Rectangle(0, 0, 0, 0);
+                    _lastExtents = new Rectangle();
                 }
             }
         }
@@ -71,36 +86,10 @@ namespace UAlbion.Game.Gui
             if (_lastExtents == extents) return;
             _lastExtents = extents;
 
-            uint topLeft = (uint)Color.White;
-            uint bottomRight = (uint)Color.Black;
-            uint corners = (uint)Color.Grey;
-            uint? background = null;
-            switch (_state)
-            {
-                case ButtonState.Normal:
-                    topLeft = (uint)Color.White;
-                    bottomRight = (uint)Color.Black;
-                    break;
-                case ButtonState.Hover:
-                    background = (uint)Color.White;
-                    break;
-                case ButtonState.Clicked:
-                case ButtonState.Pressed:
-                    topLeft = (uint)Color.Black;
-                    bottomRight = (uint)Color.White;
-                    background = (uint)Color.Black;
-                    break;
-                case ButtonState.HoverPressed:
-                    topLeft = (uint)Color.Black;
-                    bottomRight = (uint)Color.White;
-                    background = (uint)Color.White;
-                    break;
-                default: throw new ArgumentOutOfRangeException();
-            }
-
             var window = Exchange.Resolve<IWindowManager>();
-            // TODO: Cache sprite and rebuild when necessary
-            var flags = (SpriteFlags.NoTransform | SpriteFlags.UsePalette).SetOpacity(0.4f);
+            GetFrameColors(out var topLeft, out var bottomRight, out var corners, out var background, out float alpha);
+            var flags = (SpriteFlags.NoTransform | SpriteFlags.UsePalette).SetOpacity(alpha);
+
             var instances = new List<SpriteInstanceData>
             {
                 new SpriteInstanceData( // Top
@@ -156,7 +145,7 @@ namespace UAlbion.Game.Gui
                     Vector2.Zero,
                     Vector2.One,
                     background.Value,
-                    flags.SetOpacity(0.2f)));
+                    flags.SetOpacity(alpha < 1.0f ? alpha / 2 : alpha)));
             }
 
             _sprite = new UiMultiSprite(new SpriteKey(BorderTexture, 0, false))
@@ -190,6 +179,72 @@ namespace UAlbion.Game.Gui
             var innerExtents = new Rectangle(extents.X + 2, extents.Y + 2, extents.Width - 4, extents.Height - 4);
             SelectChildren(uiPosition, innerExtents, order, registerHitFunc);
             registerHitFunc(order, this);
+        }
+
+        void GetFrameColors(out uint topLeft, out uint bottomRight, out uint corners, out uint? background, out float alpha)
+        {
+            uint C(CommonColor color) => Palette[color];
+            if (_scheme == ColorScheme.Monochrome)
+            {
+                alpha = 0.4f;
+                corners = C(CommonColor.Grey8);
+                switch (_state)
+                {
+                    case ButtonState.Normal:
+                        topLeft = C(CommonColor.White);
+                        bottomRight = C(CommonColor.Black2);
+                        background = null;
+                        break;
+                    case ButtonState.Hover:
+                        topLeft = C(CommonColor.White);
+                        bottomRight = C(CommonColor.Black2);
+                        background = C(CommonColor.White);
+                        break;
+                    case ButtonState.Clicked:
+                    case ButtonState.Pressed:
+                        topLeft = C(CommonColor.Black2);
+                        bottomRight = C(CommonColor.White);
+                        background = C(CommonColor.Black2);
+                        break;
+                    case ButtonState.HoverPressed:
+                        topLeft = C(CommonColor.Black2);
+                        bottomRight = C(CommonColor.White);
+                        background = C(CommonColor.White);
+                        break;
+                    default: throw new ArgumentOutOfRangeException();
+                }
+            }
+            else if (_scheme == ColorScheme.BlueGrey)
+            {
+                alpha = 1.0f;
+                corners = C(CommonColor.BlueGrey4);
+                switch (_state)
+                {
+                    case ButtonState.Normal:
+                        topLeft = C(CommonColor.BlueGrey6);
+                        bottomRight = C(CommonColor.BlueGrey3);
+                        background = C(CommonColor.BlueGrey4);
+                        break;
+                    case ButtonState.Hover:
+                        topLeft = C(CommonColor.Teal4);
+                        bottomRight = C(CommonColor.Teal1);
+                        background = C(CommonColor.Teal3);
+                        break;
+                    case ButtonState.Clicked:
+                    case ButtonState.Pressed:
+                        topLeft = C(CommonColor.Teal4);
+                        bottomRight = C(CommonColor.Teal1);
+                        background = C(CommonColor.Teal3);
+                        break;
+                    case ButtonState.HoverPressed:
+                        topLeft = C(CommonColor.Teal4);
+                        bottomRight = C(CommonColor.Teal1);
+                        background = C(CommonColor.Teal3);
+                        break;
+                    default: throw new ArgumentOutOfRangeException();
+                }
+            }
+            else throw new ArgumentOutOfRangeException();
         }
     }
 }

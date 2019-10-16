@@ -3,5 +3,10 @@
     public interface ISettings
     {
         GameLanguage Language { get; }
+        int MusicVolume { get; }
+        int FxVolume { get; }
+        int WindowSize3d { get; }
+        int CombatDetailLevel { get; }
+        int CombatDelay { get; }
     }
 }

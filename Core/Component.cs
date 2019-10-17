@@ -79,8 +79,22 @@ namespace UAlbion.Core
 
         public void Receive(IEvent @event, object sender)
         {
-            if (sender != this && _handlers.TryGetValue(@event.GetType(), out var handler))
+            if (sender == this)
+                return;
+            if (_handlers.TryGetValue(@event.GetType(), out var handler))
                 handler.Invoke(this, @event);
+            else
+            {
+                var interfaces = @event.GetType().GetInterfaces();
+                foreach (var i in interfaces)
+                {
+                    if (_handlers.TryGetValue(i, out var interfaceHandler))
+                    {
+                        interfaceHandler.Invoke(this, @event);
+                        break;
+                    }
+                }
+            }
         }
 
         public virtual void Detach()

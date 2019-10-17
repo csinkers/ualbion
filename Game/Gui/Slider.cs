@@ -9,9 +9,9 @@ namespace UAlbion.Game.Gui
 {
     public class Slider : UiElement
     {
-        readonly string DecrementKey;
-        readonly string IncrementKey;
-        readonly string ThumbKey;
+        readonly string _decrementKey;
+        readonly string _incrementKey;
+        readonly string _id;
 
         readonly Func<int> _getter;
         readonly Action<int> _setter;
@@ -26,12 +26,19 @@ namespace UAlbion.Game.Gui
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<Slider, ButtonPressEvent>((x, e) =>
-            {
-                if(e.ButtonId == x.DecrementKey)
-                    x.Adjust(-1);
-                else if (e.ButtonId == x.IncrementKey)
-                    x.Adjust(1);
-            }));
+                {
+                    if (e.ButtonId == x._decrementKey)
+                        x.Adjust(-1);
+                    else if (e.ButtonId == x._incrementKey)
+                        x.Adjust(1);
+                }),
+            H<Slider, SliderMovedEvent>((x, e) =>
+                {
+                    if (e.SliderId == x._id && e.Position >= x._min && e.Position <= x._max)
+                        x._setter(e.Position);
+                })
+            );
+
 
         void Adjust(int amount)
         {
@@ -47,13 +54,13 @@ namespace UAlbion.Game.Gui
             _min = min;
             _max = max;
 
-            DecrementKey = $"{id}.Slider.Decrement";
-            IncrementKey = $"{id}.Slider.Increment";
-            ThumbKey = $"{id}.Thumb";
+            _decrementKey = $"{id}.Slider.Decrement";
+            _incrementKey = $"{id}.Slider.Increment";
+            _id = id;
 
-            _decrement = new Button(DecrementKey, "<");
-            _track = new SliderTrack(ThumbKey, getter, min, max);
-            _increment = new Button(IncrementKey, ">");
+            _decrement = new Button(_decrementKey, "<") { Typematic = true };
+            _track = new SliderTrack(_id, getter, min, max);
+            _increment = new Button(_incrementKey, ">") { Typematic = true };
 
             _frame = new ButtonFrame(_track)
             {
@@ -65,7 +72,6 @@ namespace UAlbion.Game.Gui
             Children.Add(_frame);
             Children.Add(_increment);
         }
-
 
         public override Vector2 GetSize()
         {

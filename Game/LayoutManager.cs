@@ -38,7 +38,7 @@ namespace UAlbion.Game
         );
 
         readonly IDictionary<IUiElement, DialogPositioning> _elements = new Dictionary<IUiElement, DialogPositioning>(); // Top-level elements
-        IList<IUiElement> _lastSelection = new List<IUiElement>();
+        IReadOnlyList<IUiElement> _lastSelection = new List<IUiElement>();
 
         void DoLayout(Action<Rectangle, IUiElement> action)
         {
@@ -123,22 +123,9 @@ namespace UAlbion.Game
 
             var focused = newSelection.Except(_lastSelection);
             var blurred = _lastSelection.Except(newSelection);
-
-            IUiEvent e = new UiHoverEvent();
-            foreach (var element in focused)
-            {
-                if (!e.Propagating) break;
-                element.Receive(e, this);
-            }
-
-            e = new UiBlurEvent();
-            foreach (var element in blurred)
-            {
-                if (!e.Propagating) break;
-                element.Receive(e, this);
-            }
-
             _lastSelection = newSelection;
+
+            Raise(new UiSelectedEvent(newSelection, focused, blurred));
         }
 
         public LayoutManager() : base(Handlers) { }
@@ -150,6 +137,20 @@ namespace UAlbion.Game
         public void Remove(IUiElement topLevelElement)
         {
             _elements.Remove(topLevelElement);
+        }
+    }
+
+    public class UiSelectedEvent : GameEvent, IVerboseEvent
+    {
+        public IReadOnlyList<IUiElement> SelectedItems { get; }
+        public IReadOnlyList<IUiElement> FocusedItems { get; }
+        public IReadOnlyList<IUiElement> BlurredItems { get; }
+
+        public UiSelectedEvent(IList<IUiElement> selectedItems, IEnumerable<IUiElement> focused, IEnumerable<IUiElement> blurred)
+        {
+            SelectedItems = selectedItems.ToList();
+            FocusedItems = new List<IUiElement>(focused);
+            BlurredItems = new List<IUiElement>(blurred);
         }
     }
 }

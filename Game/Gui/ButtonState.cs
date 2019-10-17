@@ -7,5 +7,6 @@
         Clicked,
         Pressed,
         HoverPressed,
+        ClickedBlurred
     }
 }

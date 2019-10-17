@@ -3,7 +3,7 @@
     public enum MouseMode
     {
         Normal,
-        ButtonDown,
+        Exclusive,
         ItemInHand,
         MouseLook,
         DebugPick,

@@ -1,10 +1,11 @@
-﻿using UAlbion.Api;
+﻿using System.Collections.Generic;
+using UAlbion.Api;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.Events
 {
     [Event("set_mouse_mode", "Emitted to change the currently active mouse mode")]
-    public class SetMouseModeEvent : GameEvent
+    public class SetMouseModeEvent : GameEvent, ISetMouseModeEvent
     {
         public SetMouseModeEvent(MouseMode mode)
         {

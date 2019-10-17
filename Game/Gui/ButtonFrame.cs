@@ -189,13 +189,14 @@ namespace UAlbion.Game.Gui
         void GetFrameColors(out uint topLeft, out uint bottomRight, out uint corners, out uint? background, out float alpha)
         {
             uint C(CommonColor color) => Palette[color];
-            if (_scheme == ColorScheme.Monochrome)
+            if (_scheme == ColorScheme.Monochrome) // Used for most buttons
             {
                 alpha = 0.4f;
                 corners = C(CommonColor.Grey8);
                 switch (_state)
                 {
                     case ButtonState.Normal:
+                    case ButtonState.ClickedBlurred:
                         topLeft = C(CommonColor.White);
                         bottomRight = C(CommonColor.Black2);
                         background = null;
@@ -219,7 +220,7 @@ namespace UAlbion.Game.Gui
                     default: throw new ArgumentOutOfRangeException();
                 }
             }
-            else if (_scheme == ColorScheme.BlueGrey)
+            else if (_scheme == ColorScheme.BlueGrey) // Used for slider thumbs
             {
                 alpha = 1.0f;
                 corners = C(CommonColor.BlueGrey4);
@@ -236,6 +237,7 @@ namespace UAlbion.Game.Gui
                         background = C(CommonColor.Teal3);
                         break;
                     case ButtonState.Clicked:
+                    case ButtonState.ClickedBlurred:
                     case ButtonState.Pressed:
                         topLeft = C(CommonColor.Teal4);
                         bottomRight = C(CommonColor.Teal1);

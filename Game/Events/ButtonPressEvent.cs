@@ -3,7 +3,7 @@
 namespace UAlbion.Game.Events
 {
     [Event("button_press", "Emitted when a button is pressed")]
-    class ButtonPressEvent : GameEvent
+    public class ButtonPressEvent : GameEvent
     {
         [EventPart("id", "The identifier of the button that was pressed")]
         public string ButtonId { get; }

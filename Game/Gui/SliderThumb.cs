@@ -26,6 +26,7 @@ namespace UAlbion.Game.Gui
             Children.Add(_frame);
         }
 
+        public ButtonState State { get => _frame.State; set => _frame.State = value; }
         protected override void Subscribed() => Rebuild();
 
         void Rebuild()

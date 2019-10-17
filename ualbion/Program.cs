@@ -121,6 +121,7 @@ namespace UAlbion
                 .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
                 .RegisterInputMode(InputMode.MouseLook, new MouseLookInputMode())
                 .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
+                .RegisterMouseMode(MouseMode.Exclusive, new ExclusiveMouseMode())
                 .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
                 ;
 

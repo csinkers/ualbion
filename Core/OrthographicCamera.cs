@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Numerics;
+﻿using System.Numerics;
 using UAlbion.Core.Events;
 
 namespace UAlbion.Core

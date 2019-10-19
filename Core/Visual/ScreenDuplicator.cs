@@ -12,7 +12,7 @@ namespace UAlbion.Core.Visual
         static readonly HandlerSet Handlers = new HandlerSet(
             H<ScreenDuplicator, RenderEvent>((x, e) => e.Add(x)));
 
-        static readonly ushort[] s_quadIndices = { 0, 1, 2, 0, 2, 3 };
+        static readonly ushort[] QuadIndices = { 0, 1, 2, 0, 2, 3 };
         DisposeCollector _disposeCollector;
         Pipeline _pipeline;
         DeviceBuffer _ib;
@@ -55,7 +55,7 @@ namespace UAlbion.Core.Visual
                     },
                     new[] { vs, fs, },
                     ShaderHelper.GetSpecializations(gd)),
-                new ResourceLayout[] { resourceLayout },
+                new[] { resourceLayout },
                 sc.DuplicatorFramebuffer.OutputDescription);
             _pipeline = factory.CreateGraphicsPipeline(ref pd);
             _pipeline.Name = "P_ScreenDuplicator";
@@ -66,8 +66,8 @@ namespace UAlbion.Core.Visual
             cl.UpdateBuffer(_vb, 0, verts);
 
             _ib = factory.CreateBuffer(
-                new BufferDescription((uint)s_quadIndices.Length * sizeof(ushort), BufferUsage.IndexBuffer));
-            cl.UpdateBuffer(_ib, 0, s_quadIndices);
+                new BufferDescription((uint)QuadIndices.Length * sizeof(ushort), BufferUsage.IndexBuffer));
+            cl.UpdateBuffer(_ib, 0, QuadIndices);
         }
 
         public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable r)

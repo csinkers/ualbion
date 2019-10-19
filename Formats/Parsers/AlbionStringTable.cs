@@ -7,13 +7,6 @@ using System.Text;
 
 namespace UAlbion.Formats.Parsers
 {
-    public enum StringTableType
-    {
-        Lookup,
-        SystemText,
-        ItemNames
-    }
-
     public class AlbionStringTable
     {
         readonly IDictionary<int, string> _strings = new Dictionary<int, string>();

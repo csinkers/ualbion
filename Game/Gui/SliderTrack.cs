@@ -13,6 +13,7 @@ namespace UAlbion.Game.Gui
         readonly Func<int> _getter;
         readonly int _min;
         readonly int _max;
+
         float _clickPosition;
         SliderState _state;
 
@@ -82,7 +83,8 @@ namespace UAlbion.Game.Gui
                 case SliderState.Clicked:
                     if (thumbExtents.Contains((int) uiPosition.X, (int) uiPosition.Y))
                     {
-                        _clickPosition = uiPosition.X - thumbExtents.X - 1;
+                        // Not sure why the -1 is necessary, can't be bothered investigating further as it works well enough.
+                        _clickPosition = uiPosition.X - thumbExtents.X - 1; 
                         _state = SliderState.DraggingThumb;
                     }
                     else if (uiPosition.X < thumbExtents.X)

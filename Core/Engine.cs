@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
-using ImGuiNET;
+using System;
 using UAlbion.Core.Events;
-using Veldrid;
-using Veldrid.Sdl2;
-using Veldrid.StartupUtilities;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
+using ImGuiNET;
+using Veldrid.Sdl2;
+using Veldrid.StartupUtilities;
+using Veldrid;
 
 namespace UAlbion.Core
 {
@@ -228,8 +228,10 @@ namespace UAlbion.Core
                 Window.Resized += () => _windowResized = true;
             }
 
-            GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(false, null, false,
-                ResourceBindingModel.Improved, true, true, false /*, true*/)
+            GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(
+                false, null, false,
+                ResourceBindingModel.Improved, true,
+                true, false, true)
             {
                 Debug = true,
                 SyncToVerticalBlank = true

@@ -12,8 +12,8 @@
         // Effects,
         Diagnostic  = 0x300, // Missing textures etc
         Interface   = 0x400, // GUI
-        Debug = 0x500, // ImGui
 
+        Debug = 0xffe, // ImGui
         MaxLayer    = 0xfff // Mouse cursor
     }
 }

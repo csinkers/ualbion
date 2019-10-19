@@ -17,12 +17,11 @@ namespace UAlbion.Game.Gui
         readonly Action<int> _setter;
 
         readonly Button _decrement;
-        readonly SliderTrack _track;
         readonly ButtonFrame _frame;
         readonly Button _increment;
 
-        int _min = 0;
-        int _max = 100;
+        readonly int _min;
+        readonly int _max;
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<Slider, ButtonPressEvent>((x, e) =>
@@ -59,10 +58,10 @@ namespace UAlbion.Game.Gui
             _id = id;
 
             _decrement = new Button(_decrementKey, "<") { Typematic = true };
-            _track = new SliderTrack(_id, getter, min, max);
             _increment = new Button(_incrementKey, ">") { Typematic = true };
 
-            _frame = new ButtonFrame(_track)
+            var track = new SliderTrack(_id, getter, min, max);
+            _frame = new ButtonFrame(track)
             {
                 State = ButtonState.Pressed,
                 Padding = 0

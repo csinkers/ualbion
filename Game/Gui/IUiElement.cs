@@ -7,6 +7,10 @@ namespace UAlbion.Game.Gui
 {
     public interface IUiElement : IComponent
     {
+        /// <summary>
+        /// Reports the minimum required size for the element
+        /// </summary>
+        /// <returns></returns>
         Vector2 GetSize();
 
         /// <summary>

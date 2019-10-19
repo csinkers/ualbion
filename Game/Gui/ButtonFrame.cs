@@ -66,9 +66,8 @@ namespace UAlbion.Game.Gui
         public int Padding // Adjust by 1 pixel to account for the border.
         {
             get => _padding - 1;
-            set { if (value != (_padding - 1)) { _padding = value + 1; _lastExtents = new Rectangle(); } }
+            set { if (value != _padding - 1) { _padding = value + 1; _lastExtents = new Rectangle(); } }
         }
-
 
         public ButtonFrame(IUiElement child) : base(Handlers)
         {

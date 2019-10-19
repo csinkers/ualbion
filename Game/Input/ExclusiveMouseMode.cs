@@ -16,6 +16,8 @@ namespace UAlbion.Game.Input
             H<ExclusiveMouseMode, SetExclusiveMouseModeEvent>((x, e) => x._exclusiveItem = e.ExclusiveElement)
         );
 
+        public ExclusiveMouseMode() : base(Handlers) { }
+
         void OnSelect(UiSelectedEvent e)
         {
             IUiEvent newEvent = new UiHoverEvent();
@@ -45,7 +47,5 @@ namespace UAlbion.Game.Input
                 Raise(new SetMouseModeEvent(MouseMode.Normal));
             }
         }
-
-        public ExclusiveMouseMode() : base(Handlers) { }
     }
 }

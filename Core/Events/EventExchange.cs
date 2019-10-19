@@ -8,7 +8,7 @@ namespace UAlbion.Core.Events
 {
     public class EventExchange
     {
-        static readonly object _syncRoot = new object();
+        static readonly object SyncRoot = new object();
         readonly IDictionary<Type, IList<IComponent>> _subscriptions = new Dictionary<Type, IList<IComponent>>();
         readonly IDictionary<IComponent, IList<Type>> _subscribers = new Dictionary<IComponent, IList<Type>>();
         readonly IDictionary<Type, object> _registrations = new Dictionary<Type, object>();
@@ -16,6 +16,7 @@ namespace UAlbion.Core.Events
         readonly IList<EventExchange> _children = new List<EventExchange>();
         readonly SubscribedEvent _subscribedEvent = new SubscribedEvent();
 #if DEBUG
+        // ReSharper disable once CollectionNeverQueried.Local
         readonly IList<IEvent> _frameEvents = new List<IEvent>();
 #endif
 
@@ -24,7 +25,7 @@ namespace UAlbion.Core.Events
 
         public override string ToString() => $"EventExchange \"{Name}\" (IsActive={IsActive})";
 
-        public IReadOnlyList<EventExchange> Children { get { lock (_syncRoot) return _children.ToList(); } }
+        public IReadOnlyList<EventExchange> Children { get { lock (SyncRoot) return _children.ToList(); } }
 
         public EventExchange(string name, EventExchange parent = null)
         {
@@ -35,15 +36,15 @@ namespace UAlbion.Core.Events
 
         void AddChild(EventExchange eventExchange)
         {
-            lock(_syncRoot)
+            lock(SyncRoot)
                 _children.Add(eventExchange);
         }
 
-        public bool Contains(IComponent component) { lock(_syncRoot) return _subscribers.ContainsKey(component); }
+        public bool Contains(IComponent component) { lock(SyncRoot) return _subscribers.ContainsKey(component); }
 
         void Collect(HashSet<IComponent> subscribers, Type type, Type[] interfaces)
         {
-            lock (_syncRoot)
+            lock (SyncRoot)
             {
                 if (_subscriptions.TryGetValue(type, out var tempSubscribers))
                     foreach (var subscriber in tempSubscribers)
@@ -95,7 +96,7 @@ namespace UAlbion.Core.Events
             }
 
             var exchanges = new HashSet<EventExchange>();
-            lock(_syncRoot)
+            lock(SyncRoot)
                 CollectExchanges(exchanges);
             foreach (var exchange in exchanges)
             {
@@ -118,7 +119,7 @@ namespace UAlbion.Core.Events
         public void Subscribe(Type eventType, IComponent subscriber)
         {
             bool newSubscriber = false;
-            lock (_syncRoot)
+            lock (SyncRoot)
             {
                 if (_subscribers.TryGetValue(subscriber, out var subscribedTypes))
                 {
@@ -144,7 +145,7 @@ namespace UAlbion.Core.Events
 
         public void Unsubscribe(IComponent subscriber)
         {
-            lock (_syncRoot)
+            lock (SyncRoot)
             {
                 if (!_subscribers.TryGetValue(subscriber, out var subscribedTypes))
                     return;
@@ -158,7 +159,7 @@ namespace UAlbion.Core.Events
 
         public void Unsubscribe<T>(IComponent subscriber)
         {
-            lock (_syncRoot)
+            lock (SyncRoot)
             {
                 if (!_subscribers.TryGetValue(subscriber, out var subscribedTypes))
                     return;
@@ -197,7 +198,7 @@ namespace UAlbion.Core.Events
 
         public void PruneInactiveChildren()
         {
-            lock (_syncRoot)
+            lock (SyncRoot)
             {
                 for (int i = 0; i < _children.Count;)
                 {

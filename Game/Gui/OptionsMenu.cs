@@ -14,12 +14,13 @@ namespace UAlbion.Game.Gui
         const string CombatDelayKey = "Options.CombatDelay";
         const string DoneKey = "Options.Done";
 
-        public int MusicVolume { get; set; }
-        public int FxVolume { get; set; }
-        public int WindowSize3d { get; set; }
-        public int CombatDetailLevel { get; set; }
-        public int CombatDelay { get; set; }
         public event EventHandler Closed;
+
+        int _musicVolume;
+        int _fxVolume;
+        int _windowSize3d;
+        int _combatDetailLevel;
+        int _combatDelay;
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<OptionsMenu, ButtonPressEvent>((x, e) =>
@@ -28,16 +29,16 @@ namespace UAlbion.Game.Gui
                 {
                     case DoneKey:
                         var settings = x.Exchange.Resolve<ISettings>();
-                        if(x.MusicVolume != settings.MusicVolume)
-                            x.Raise(new SetMusicVolumeEvent(x.MusicVolume));
-                        if(x.FxVolume != settings.FxVolume)
-                            x.Raise(new SetFxVolumeEvent(x.FxVolume));
-                        if(x.WindowSize3d != settings.WindowSize3d)
-                            x.Raise(new SetWindowSize3dEvent(x.WindowSize3d));
-                        if(x.CombatDetailLevel != settings.CombatDetailLevel)
-                            x.Raise(new SetCombatDetailLevelEvent(x.CombatDetailLevel));
-                        if(x.CombatDelay != settings.CombatDelay)
-                            x.Raise(new SetCombatDelayEvent(x.CombatDelay));
+                        if(x._musicVolume != settings.MusicVolume)
+                            x.Raise(new SetMusicVolumeEvent(x._musicVolume));
+                        if(x._fxVolume != settings.FxVolume)
+                            x.Raise(new SetFxVolumeEvent(x._fxVolume));
+                        if(x._windowSize3d != settings.WindowSize3d)
+                            x.Raise(new SetWindowSize3dEvent(x._windowSize3d));
+                        if(x._combatDetailLevel != settings.CombatDetailLevel)
+                            x.Raise(new SetCombatDetailLevelEvent(x._combatDetailLevel));
+                        if(x._combatDelay != settings.CombatDelay)
+                            x.Raise(new SetCombatDelayEvent(x._combatDelay));
 
                         x.Closed?.Invoke(x, EventArgs.Empty);
                         x.Detach();
@@ -53,19 +54,19 @@ namespace UAlbion.Game.Gui
             {
                 new Padding(0,2),
                 new Label(S(SystemTextId.Options_MusicVolume)),
-                new Slider(MusicVolumeKey, () => MusicVolume, x => MusicVolume = x, 0, 127),
+                new Slider(MusicVolumeKey, () => _musicVolume, x => _musicVolume = x, 0, 127),
                 new Padding(0,2),
                 new Label(S(SystemTextId.Options_FXVolume)),
-                new Slider(FxVolumeKey, () => FxVolume, x => FxVolume = x, 0, 127),
+                new Slider(FxVolumeKey, () => _fxVolume, x => _fxVolume = x, 0, 127),
                 new Padding(0,2),
                 new Label(S(SystemTextId.Options_3DWindowSize)),
-                new Slider(WindowSizeKey, () => WindowSize3d, x => WindowSize3d = x, 0, 100),
+                new Slider(WindowSizeKey, () => _windowSize3d, x => _windowSize3d = x, 0, 100),
                 new Padding(0,2),
                 new Label(S(SystemTextId.Options_CombatDetailLevel)),
-                new Slider(CombatDetailKey, () => CombatDetailLevel, x => CombatDetailLevel = x, 1, 5),
+                new Slider(CombatDetailKey, () => _combatDetailLevel, x => _combatDetailLevel = x, 1, 5),
                 new Padding(0,2),
                 new Label(S(SystemTextId.Options_CombatTextDelay)),
-                new Slider(CombatDelayKey, () => CombatDelay, x => CombatDelay = x, 1, 50),
+                new Slider(CombatDelayKey, () => _combatDelay, x => _combatDelay = x, 1, 50),
                 new Padding(0,2),
                 new Button(DoneKey, S(SystemTextId.MsgBox_OK)),
                 new Padding(0,2),
@@ -80,11 +81,11 @@ namespace UAlbion.Game.Gui
             layout.Add(this, DialogPositioning.Center);
 
             var settings = Exchange.Resolve<ISettings>();
-            MusicVolume = settings.MusicVolume;
-            FxVolume = settings.FxVolume;
-            WindowSize3d = settings.WindowSize3d;
-            CombatDetailLevel = settings.CombatDetailLevel;
-            CombatDelay = settings.CombatDelay;
+            _musicVolume = settings.MusicVolume;
+            _fxVolume = settings.FxVolume;
+            _windowSize3d = settings.WindowSize3d;
+            _combatDetailLevel = settings.CombatDetailLevel;
+            _combatDelay = settings.CombatDelay;
         }
     }
 }

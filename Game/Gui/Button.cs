@@ -43,12 +43,8 @@ namespace UAlbion.Game.Gui
             H<Button, UiLeftReleaseEvent>((x, _) =>
             {
                 if (x.Typematic)
-                {
                     x._typematicAccrual = 0;
-                    return;
-                }
-
-                if (x._frame.State == ButtonState.Clicked)
+                else if (x._frame.State == ButtonState.Clicked)
                     x.Raise(new ButtonPressEvent(x.Id));
 
                 x._frame.State = x.IsPressed

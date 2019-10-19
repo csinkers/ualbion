@@ -146,9 +146,9 @@ namespace UAlbion.Game
         public IReadOnlyList<IUiElement> FocusedItems { get; }
         public IReadOnlyList<IUiElement> BlurredItems { get; }
 
-        public UiSelectedEvent(IList<IUiElement> selectedItems, IEnumerable<IUiElement> focused, IEnumerable<IUiElement> blurred)
+        public UiSelectedEvent(IEnumerable<IUiElement> selectedItems, IEnumerable<IUiElement> focused, IEnumerable<IUiElement> blurred)
         {
-            SelectedItems = selectedItems.ToList();
+            SelectedItems = new List<IUiElement>(selectedItems);
             FocusedItems = new List<IUiElement>(focused);
             BlurredItems = new List<IUiElement>(blurred);
         }

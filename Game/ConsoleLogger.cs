@@ -24,7 +24,7 @@ namespace UAlbion.Game
             Task.Run(ConsoleReaderThread);
         }
 
-        void PrintHelpSummary(IEnumerable<Event.EventMetadata> events)
+        void PrintHelpSummary(IEnumerable<EventMetadata> events)
         {
             foreach (var e in events)
             {
@@ -37,7 +37,7 @@ namespace UAlbion.Game
             }
         }
 
-        void PrintDetailedHelp(Event.EventMetadata metadata)
+        void PrintDetailedHelp(EventMetadata metadata)
         {
             var paramList = metadata.Parts.Length == 0
                 ? ""

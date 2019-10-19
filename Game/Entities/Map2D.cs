@@ -9,12 +9,6 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities
 {
-    public interface IMap
-    {
-        MapDataId MapId { get; }
-        Vector2 LogicalSize { get; }
-    }
-
     public class Map2D : Component, IMap
     {
         MapData2D _mapData;

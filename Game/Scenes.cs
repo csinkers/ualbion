@@ -6,6 +6,7 @@ using UAlbion.Game.Entities;
 
 namespace UAlbion.Game
 {
+    // Interfaces just for resolving specific scenes in dependent components
     public interface IFlatScene : IScene { }
     public interface IDungeonScene : IScene { }
     public interface IMapScene : IScene { }

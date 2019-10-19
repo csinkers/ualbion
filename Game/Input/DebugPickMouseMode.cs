@@ -2,7 +2,6 @@
 using System.Linq;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 using Veldrid;
 

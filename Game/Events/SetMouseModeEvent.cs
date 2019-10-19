@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UAlbion.Api;
+﻿using UAlbion.Api;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.Events

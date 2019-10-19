@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using System.Runtime.InteropServices;
 
 namespace UAlbion.Core
 {
@@ -15,14 +14,5 @@ namespace UAlbion.Core
         float AspectRatio { get; }
         float Magnification { get; set; }
         CameraInfo GetCameraInfo();
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct CameraInfo
-    {
-        public Vector3 CameraPosition_WorldSpace;
-        readonly float _padding1;
-        public Vector3 CameraLookDirection;
-        readonly float _padding2;
     }
 }

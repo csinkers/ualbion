@@ -6,10 +6,6 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
-    public interface IPaletteManager
-    {
-    }
-
     public class PaletteManager : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(

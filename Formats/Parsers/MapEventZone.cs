@@ -57,9 +57,6 @@ namespace UAlbion.Formats.Parsers
             return zone;
         }
 
-        public override string ToString()
-        {
-            return $"Zone ({X}, {Y}) T:{Trigger} Mode:{Unk1} E:{EventNumber}";
-        }
+        public override string ToString() => $"Zone ({X}, {Y}) T:{Trigger} Mode:{Unk1} E:{EventNumber}";
     }
 }

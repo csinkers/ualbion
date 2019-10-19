@@ -39,7 +39,7 @@ namespace UAlbion.Game.Gui
                 {
                     var texture = assets.LoadTexture((CoreSpriteId)((int)CoreSpriteId.UiBackgroundLines1 + n % 4));
                     uint? w = x + 2*TileSize > width ? (uint)(width - TileSize - x) : (uint?)null;
-                    multi.AddTexture(1, texture, x, y, 0, true, w, null);
+                    multi.AddTexture(1, texture, x, y, 0, true, w);
                     n++;
                     x += TileSize;
                 }

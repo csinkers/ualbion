@@ -13,7 +13,7 @@ namespace UAlbion.Formats
         public string Name { get; }
         public bool IsAnimated => AnimatedRanges.ContainsKey(Id);
         public int Period { get; }
-        readonly uint[] Entries = new uint[0x100];
+        readonly uint[] _entries = new uint[0x100];
         readonly IList<uint[]> _cache = new List<uint[]>();
 
         static readonly IDictionary<int, IList<(byte, byte)>> AnimatedRanges = new Dictionary<int, IList<(int, int)>> {
@@ -38,10 +38,10 @@ namespace UAlbion.Formats
             long startingOffset = br.BaseStream.Position;
             for (int i = 0; i < 192; i++)
             {
-                Entries[i]  = (uint)br.ReadByte() << 0; // Red
-                Entries[i] |= (uint)br.ReadByte() << 8; // Green
-                Entries[i] |= (uint)br.ReadByte() << 16; // Blue
-                Entries[i] |= (uint)(i == 0 ? 0 : 0xff) << 24; // Alpha
+                _entries[i]  = (uint)br.ReadByte() << 0; // Red
+                _entries[i] |= (uint)br.ReadByte() << 8; // Green
+                _entries[i] |= (uint)br.ReadByte() << 16; // Blue
+                _entries[i] |= (uint)(i == 0 ? 0 : 0xff) << 24; // Alpha
 
             }
             Debug.Assert(br.BaseStream.Position == startingOffset + streamLength);
@@ -53,7 +53,7 @@ namespace UAlbion.Formats
             for (int cacheIndex = 0; cacheIndex < Period; cacheIndex++)
             {
                 var result = new uint[256];
-                for (int i = 0; i < Entries.Length; i++)
+                for (int i = 0; i < _entries.Length; i++)
                 {
                     int index = i;
                     foreach (var range in ranges)
@@ -67,7 +67,7 @@ namespace UAlbion.Formats
                         }
                     }
 
-                    result[i] = Entries[index];
+                    result[i] = _entries[index];
                 }
                 _cache.Add(result);
             }
@@ -80,13 +80,13 @@ namespace UAlbion.Formats
 
             for (int i = 192; i < 256; i++)
             {
-                Entries[i]  = (uint)commonPalette[(i - 192) * 3 + 0] << 0; // Red
-                Entries[i] |= (uint)commonPalette[(i - 192) * 3 + 1] << 8; // Green
-                Entries[i] |= (uint)commonPalette[(i - 192) * 3 + 2] << 16; // Blue
-                Entries[i] |= (uint)0xff << 24; // Alpha
+                _entries[i]  = (uint)commonPalette[(i - 192) * 3 + 0] << 0; // Red
+                _entries[i] |= (uint)commonPalette[(i - 192) * 3 + 1] << 8; // Green
+                _entries[i] |= (uint)commonPalette[(i - 192) * 3 + 2] << 16; // Blue
+                _entries[i] |= (uint)0xff << 24; // Alpha
 
                 foreach (var frame in _cache)
-                    frame[i] = Entries[i];
+                    frame[i] = _entries[i];
             }
         }
 

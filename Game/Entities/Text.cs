@@ -198,6 +198,5 @@ namespace UAlbion.Game.Entities
             addFunc(_sprite);
             return order;
         }
-
     }
 }

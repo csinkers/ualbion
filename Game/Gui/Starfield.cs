@@ -14,7 +14,6 @@ namespace UAlbion.Game.Gui
         MultiSprite _sprite;
         Vector2 _lastPixelSize;
 
-
         public Starfield() : base(null)
         {
             _pixel = new EightBitTexture(

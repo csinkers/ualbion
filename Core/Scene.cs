@@ -7,13 +7,6 @@ using Veldrid;
 
 namespace UAlbion.Core
 {
-    public interface IScene
-    {
-        void Add(IRenderable renderable);
-        void Remove(IRenderable renderable);
-        EventExchange SceneExchange { get; }
-    }
-
     public class Scene : Component, IScene
     {
         readonly IList<Type> _activeRendererTypes;
@@ -45,13 +38,8 @@ namespace UAlbion.Core
             SceneExchange = sceneExchange;
         }
 
-        public void Add(IRenderable renderable)
-        {
-        }
-
-        public void Remove(IRenderable renderable)
-        {
-        }
+        public void Add(IRenderable renderable) { } // TODO
+        public void Remove(IRenderable renderable) { } // TODO
 
         public override string ToString() => $"Scene:{Name} {(SceneExchange.IsActive ? "Active" : "")}";
 

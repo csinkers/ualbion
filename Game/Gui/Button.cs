@@ -71,6 +71,7 @@ namespace UAlbion.Game.Gui
         readonly ButtonFrame _frame;
         public string Id { get; }
         public bool IsPressed { get; set; }
+        public bool DoubleFrame { get; set; }
         public bool Typematic { get; set; }
         float _typematicAccrual;
 

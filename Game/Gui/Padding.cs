@@ -2,7 +2,7 @@
 
 namespace UAlbion.Game.Gui
 {
-    public class Padding : UiElement
+    public class Padding : UiElement, IFixedSizeUiElement
     {
         readonly Vector2 _size;
         public Padding(int x, int y) : base(null) { _size = new Vector2(x, y); }

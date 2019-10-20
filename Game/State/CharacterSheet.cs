@@ -1,44 +1,82 @@
 ﻿namespace UAlbion.Game.State
 {
-    public class CharacterSheet
+    public class ICharacterSheet
     {
-        /*
-        int _level;
+        int Level { get; }
 
-        int _lifePoints;
-        int _lifePointsMax;
-        int _spellPoints;
-        int _spellPointsMax;
-        int _experiencePoints;
-        int _trainingPoints;
+        int LifePoints { get; }
+        int LifePointsMax { get; }
+        int SpellPoints { get; }
+        int SpellPointsMax { get; }
+        int ExperiencePoints { get; }
+        int TrainingPoints { get; }
 
-        int _strength;
-        int _intelligence;
-        int _dexterity;
-        int _speed;
-        int _stamina;
-        int _luck;
-        int _magicResistance;
-        int _magicTalent;
+        int Strength { get; }
+        int Intelligence { get; }
+        int Dexterity { get; }
+        int Speed { get; }
+        int Stamina { get; }
+        int Luck { get; }
+        int MagicResistance { get; }
+        int MagicTalent { get; }
 
-        int _closeCombat;
-        int _rangedCombat;
-        int _criticalChance;
-        int _lockPicking;
+        int CloseCombat { get; }
+        int RangedCombat { get; }
+        int CriticalChance { get; }
+        int LockPicking { get; }
 
-        int _strengthMax;
-        int _intelligenceMax;
-        int _dexterityMax;
-        int _speedMax;
-        int _staminaMax;
-        int _luckMax;
-        int _magicResistanceMax;
-        int _magicTalentMax;
+        int StrengthMax { get; }
+        int IntelligenceMax { get; }
+        int DexterityMax { get; }
+        int SpeedMax { get; }
+        int StaminaMax { get; }
+        int LuckMax { get; }
+        int MagicResistanceMax { get; }
+        int MagicTalentMax { get; }
 
-        int _closeCombatMax;
-        int _rangedCombatMax;
-        int _criticalChanceMax;
-        int _lockPickingMax;
-        */
+        int CloseCombatMax { get; }
+        int RangedCombatMax { get; }
+        int CriticalChanceMax { get; }
+        int LockPickingMax { get; }
+    }
+
+    public class CharacterSheet : ICharacterSheet
+    {
+        public int Level { get; set; }
+
+        public int LifePoints { get; set; }
+        public int LifePointsMax { get; set; }
+        public int SpellPoints { get; set; }
+        public int SpellPointsMax { get; set; }
+        public int ExperiencePoints { get; set; }
+        public int TrainingPoints { get; set; }
+
+        public int Strength { get; set; }
+        public int Intelligence { get; set; }
+        public int Dexterity { get; set; }
+        public int Speed { get; set; }
+        public int Stamina { get; set; }
+        public int Luck { get; set; }
+        public int MagicResistance { get; set; }
+        public int MagicTalent { get; set; }
+
+        public int CloseCombat { get; set; }
+        public int RangedCombat { get; set; }
+        public int CriticalChance { get; set; }
+        public int LockPicking { get; set; }
+
+        public int StrengthMax { get; set; }
+        public int IntelligenceMax { get; set; }
+        public int DexterityMax { get; set; }
+        public int SpeedMax { get; set; }
+        public int StaminaMax { get; set; }
+        public int LuckMax { get; set; }
+        public int MagicResistanceMax { get; set; }
+        public int MagicTalentMax { get; set; }
+
+        public int CloseCombatMax { get; set; }
+        public int RangedCombatMax { get; set; }
+        public int CriticalChanceMax { get; set; }
+        public int LockPickingMax { get; set; }
     }
 }

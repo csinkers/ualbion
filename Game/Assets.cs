@@ -33,58 +33,69 @@ namespace UAlbion.Game
 
         // ReSharper disable StringLiteralTypo
         readonly IDictionary<AssetType, (AssetLocation, string)> _assetFiles = new Dictionary<AssetType, (AssetLocation, string)> {
-            { AssetType.MapData,            (AssetLocation.Base,      "MAPDATA!.XLD") }, // Map2d
-            { AssetType.IconData,           (AssetLocation.Base,      "ICONDAT!.XLD") }, // Texture
-            { AssetType.IconGraphics,       (AssetLocation.Base,      "ICONGFX!.XLD") }, // Texture
-            { AssetType.Palette,            (AssetLocation.Base,      "PALETTE!.XLD") }, // PaletteView
-            { AssetType.PaletteNull,        (AssetLocation.BaseRaw,   "PALETTE.000" ) }, // PaletteView (supplementary)
-            { AssetType.Slab,               (AssetLocation.BaseRaw,   "SLAB"        ) }, // Texture
-            { AssetType.BigPartyGraphics,   (AssetLocation.Base,      "PARTGR!.XLD" ) }, // Texture
-            { AssetType.SmallPartyGraphics, (AssetLocation.Base,      "PARTKL!.XLD" ) }, // Texture
-            { AssetType.LabData,            (AssetLocation.Base,      "LABDATA!.XLD") }, //
-            { AssetType.Wall3D,             (AssetLocation.Base,      "3DWALLS!.XLD") }, // Texture
-            { AssetType.Object3D,           (AssetLocation.Base,      "3DOBJEC!.XLD") }, // Texture
-            { AssetType.Overlay3D,          (AssetLocation.Base,      "3DOVERL!.XLD") }, // Texture
-            { AssetType.Floor3D,            (AssetLocation.Base,      "3DFLOOR!.XLD") }, // Texture
-            { AssetType.BigNpcGraphics,     (AssetLocation.Base,      "NPCGR!.XLD"  ) }, // Texture
-            { AssetType.BackgroundGraphics, (AssetLocation.Base,      "3DBCKGR!.XLD") }, // Texture
-            { AssetType.Font,               (AssetLocation.Base,      "FONTS!.XLD"  ) }, // Font (raw, 8 wide. 00 = normal, 01 = bold)
-            { AssetType.MetaFont,           (AssetLocation.Meta,      null          ) }, // Generated from a font, setting colours appropriately
-            { AssetType.BlockList,          (AssetLocation.Base,      "BLKLIST!.XLD") }, //
-            { AssetType.PartyCharacterData, (AssetLocation.Initial,   "PRTCHAR!.XLD") }, //
-            { AssetType.SmallPortrait,      (AssetLocation.Base,      "SMLPORT!.XLD") }, // Texture
-            { AssetType.SystemText,         (AssetLocation.LocalisedRaw, "SYSTEXTS" ) }, // Strings
-            { AssetType.EventSet,           (AssetLocation.Base,      "EVNTSET!.XLD") }, //
-            { AssetType.EventText,          (AssetLocation.Localised, "EVNTTXT!.XLD") }, // Strings
-            { AssetType.MapText,            (AssetLocation.Localised, "MAPTEXT!.XLD") }, // Strings
-            { AssetType.ItemList,           (AssetLocation.Base,      "ITEMLIST.DAT") }, //
-            { AssetType.ItemNames,          (AssetLocation.Base,      "ITEMNAME.DAT") }, // Strings
-            { AssetType.ItemGraphics,       (AssetLocation.BaseRaw,   "ITEMGFX"     ) }, // Texture
-            { AssetType.FullBodyPicture,    (AssetLocation.Base,      "FBODPIX!.XLD") }, // Texture
-            { AssetType.Automap,            (AssetLocation.Initial,   "AUTOMAP!.XLD") }, //
-            { AssetType.AutomapGraphics,    (AssetLocation.Base,      "AUTOGFX!.XLD") }, // Texture
-            { AssetType.Song,               (AssetLocation.Base,      "SONGS!.XLD"  ) }, // Midi
-            { AssetType.Sample,             (AssetLocation.Base,      "SAMPLES!.XLD") }, // Sample
-            { AssetType.WaveLibrary,        (AssetLocation.Base,      "WAVELIB!.XLD") }, // Sample
-            // { AssetType.Unnamed2,        (AssetLocation.Base,      ""            ) },
-            { AssetType.ChestData,          (AssetLocation.Initial,   "CHESTDT!.XLD") }, //
-            { AssetType.MerchantData,       (AssetLocation.Initial,   "MERCHDT!.XLD") }, //
-            { AssetType.NpcCharacterData,   (AssetLocation.Initial,   "NPCCHAR!.XLD") }, //
-            { AssetType.MonsterGroup,       (AssetLocation.Base,      "MONGRP!.XLD" ) }, //
-            { AssetType.MonsterCharacter,   (AssetLocation.Base,      "MONCHAR!.XLD") }, // Texture
-            { AssetType.MonsterGraphics,    (AssetLocation.Base,      "MONGFX!.XLD" ) }, // Texture
-            { AssetType.CombatBackground,   (AssetLocation.Base,      "COMBACK!.XLD") }, // Texture
-            { AssetType.CombatGraphics,     (AssetLocation.Base,      "COMGFX!.XLD" ) }, // Texture
-            { AssetType.TacticalIcon,       (AssetLocation.Base,      "TACTICO!.XLD") }, // Texture
-            { AssetType.SpellData,          (AssetLocation.Base,      "SPELLDAT.DAT") }, // Spell
-            { AssetType.SmallNpcGraphics,   (AssetLocation.Base,      "NPCKL!.XLD"  ) }, // Texture
-            { AssetType.Flic,               (AssetLocation.Localised, "FLICS!.XLD"  ) }, // Video
-            { AssetType.Dictionary,         (AssetLocation.Localised, "WORDLIS!.XLD") }, // Dictionary
-            { AssetType.Script,             (AssetLocation.Base,      "SCRIPT!.XLD" ) }, // Script
-            { AssetType.Picture,            (AssetLocation.Base,      "PICTURE!.XLD") }, // Texture (ILBM)
-            { AssetType.TransparencyTables, (AssetLocation.Base,      "TRANSTB!.XLD") },
-            { AssetType.CoreGraphics,       (AssetLocation.MainExe,   "MAIN.EXE") },
+            // General game assets
+            { AssetType.Palette,            (AssetLocation.Base,      "PALETTE!.XLD") }, // Palettes (first 192 colours)
+            { AssetType.PaletteNull,        (AssetLocation.BaseRaw,   "PALETTE.000" ) }, // The 64 colours above 192 that are shared by all palettes.
+            { AssetType.SmallPortrait,      (AssetLocation.Base,      "SMLPORT!.XLD") }, // Small portraits of players and NPCs for conversations etc
+            { AssetType.EventSet,           (AssetLocation.Base,      "EVNTSET!.XLD") }, // 
+            { AssetType.Song,               (AssetLocation.Base,      "SONGS!.XLD"  ) }, // XMI audio, can be translated to MIDI
+            { AssetType.Sample,             (AssetLocation.Base,      "SAMPLES!.XLD") }, // General sound effects
+            { AssetType.WaveLibrary,        (AssetLocation.Base,      "WAVELIB!.XLD") }, // General sound effects
+            { AssetType.BlockList,          (AssetLocation.Base,      "BLKLIST!.XLD") }, // 
+            { AssetType.Flic,               (AssetLocation.Localised, "FLICS!.XLD"  ) }, // Videos
+            { AssetType.Dictionary,         (AssetLocation.Localised, "WORDLIS!.XLD") }, // The words that can be used as conversation topics
+            { AssetType.Script,             (AssetLocation.Base,      "SCRIPT!.XLD" ) }, // Scripted sequences of events for narrative sequences etc
+            { AssetType.Picture,            (AssetLocation.Base,      "PICTURE!.XLD") }, // Full screen graphics for various special events, menu backgrounds etc (in the obscure ILBM / interlaced bitmap format from IBM)
+            { AssetType.TransparencyTables, (AssetLocation.Base,      "TRANSTB!.XLD") }, // 
+            { AssetType.CoreGraphics,       (AssetLocation.MainExe,   "MAIN.EXE") }, // Various UI graphics that get loaded directly from the original game executable
             { AssetType.CoreGraphicsMetadata, (AssetLocation.MainExe, "MAIN.EXE") },
+            // { AssetType.Unnamed2,        (AssetLocation.Base,      ""            ) },
+
+            // Text
+            { AssetType.Font,       (AssetLocation.Base,              "FONTS!.XLD"  ) }, // Fonts (raw, 8 wide. 00 = normal, 01 = bold)
+            { AssetType.MetaFont,   (AssetLocation.Meta,              null          ) }, // Generated from a Font, with colours changed appropriately
+            { AssetType.SystemText, (AssetLocation.LocalisedRaw,      "SYSTEXTS"    ) }, // Core game strings for things like menus etc
+            { AssetType.EventText,  (AssetLocation.Localised,         "EVNTTXT!.XLD") }, // Text to show for various gameplay events
+            { AssetType.MapText,    (AssetLocation.Localised,         "MAPTEXT!.XLD") }, // Map-specific text
+
+            // Inventory / merchant assets
+            { AssetType.Slab,               (AssetLocation.BaseRaw,   "SLAB"        ) }, // The background texture for the inventory screen
+            { AssetType.ItemNames,          (AssetLocation.BaseRaw,   "ITEMNAME.DAT") }, // Item names (array of fixed length strings)
+            { AssetType.ItemList,           (AssetLocation.BaseRaw,   "ITEMLIST.DAT") }, // Item statistics
+            { AssetType.ItemGraphics,       (AssetLocation.BaseRaw,   "ITEMGFX"     ) }, // Inventory item sprites
+            { AssetType.FullBodyPicture,    (AssetLocation.Base,      "FBODPIX!.XLD") }, // Full body party member images for the inventory screen
+            { AssetType.ChestData,          (AssetLocation.Initial,   "CHESTDT!.XLD") }, // Chest contents
+            { AssetType.MerchantData,       (AssetLocation.Initial,   "MERCHDT!.XLD") }, // Merchant inventories
+
+            // 2D map assets
+            { AssetType.MapData,            (AssetLocation.Base,      "MAPDATA!.XLD") }, // 2D maps
+            { AssetType.IconData,           (AssetLocation.Base,      "ICONDAT!.XLD") }, // Tileset info for the 2D maps, including animated tile ranges etc
+            { AssetType.IconGraphics,       (AssetLocation.Base,      "ICONGFX!.XLD") }, // Tiles for the 2D maps
+            { AssetType.BigPartyGraphics,   (AssetLocation.Base,      "PARTGR!.XLD" ) }, // Regular scale party-member sprites.
+            { AssetType.BigNpcGraphics,     (AssetLocation.Base,      "NPCGR!.XLD"  ) }, // Regular scale NPC sprites
+            { AssetType.SmallPartyGraphics, (AssetLocation.Base,      "PARTKL!.XLD" ) }, // Small scale party-member sprites (i.e. on outdoor maps)
+            { AssetType.SmallNpcGraphics,   (AssetLocation.Base,      "NPCKL!.XLD"  ) }, // Small scale NPC sprites (i.e. on outdoor maps)
+
+            // 3D map assets
+            { AssetType.LabData,            (AssetLocation.Base,      "LABDATA!.XLD") }, // Labyrinth data, defines tileset etc for 3D maps.
+            { AssetType.Wall3D,             (AssetLocation.Base,      "3DWALLS!.XLD") }, // Wall textures for 3D maps
+            { AssetType.Object3D,           (AssetLocation.Base,      "3DOBJEC!.XLD") }, // Object sprites for 3D maps
+            { AssetType.Overlay3D,          (AssetLocation.Base,      "3DOVERL!.XLD") }, // Wall decals for 3D maps
+            { AssetType.Floor3D,            (AssetLocation.Base,      "3DFLOOR!.XLD") }, // Floor and ceiling textures for 3D maps
+            { AssetType.BackgroundGraphics, (AssetLocation.Base,      "3DBCKGR!.XLD") }, // Skybox textures for 3D maps
+            { AssetType.Automap,            (AssetLocation.Initial,   "AUTOMAP!.XLD") }, //
+            { AssetType.AutomapGraphics,    (AssetLocation.Base,      "AUTOGFX!.XLD") }, // Tiles for the map screen on 3D maps
+
+            // Combat assets
+            { AssetType.PartyCharacterData, (AssetLocation.Initial,   "PRTCHAR!.XLD") }, // Character statistics for party members
+            { AssetType.NpcCharacterData,   (AssetLocation.Initial,   "NPCCHAR!.XLD") }, // NPC character statistics
+            { AssetType.MonsterCharacter,   (AssetLocation.Base,      "MONCHAR!.XLD") }, // Monster character statistics
+            { AssetType.MonsterGroup,       (AssetLocation.Base,      "MONGRP!.XLD" ) }, // Pre-defined monster groupings for combat
+            { AssetType.MonsterGraphics,    (AssetLocation.Base,      "MONGFX!.XLD" ) }, // Monster sprites on the 3D combat screen
+            { AssetType.CombatGraphics,     (AssetLocation.Base,      "COMGFX!.XLD" ) }, // Various sprites and effects for 3D combat screen, spells etc
+            { AssetType.TacticalIcon,       (AssetLocation.Base,      "TACTICO!.XLD") }, // Sprites for the combat chessboard-view
+            { AssetType.CombatBackground,   (AssetLocation.Base,      "COMBACK!.XLD") }, // Background graphics for combat
+            { AssetType.SpellData,          (AssetLocation.Base,      "SPELLDAT.DAT") }, // Spell definitions & statistics
         };
         // ReSharper restore StringLiteralTypo
 
@@ -161,9 +172,26 @@ namespace UAlbion.Game
             return result;
         }
 
+        public class ReaderScope : IDisposable
+        {
+            readonly BinaryReader _br;
+            readonly Stream _stream;
+
+            public ReaderScope(BinaryReader br, Stream stream)
+            {
+                _br = br;
+                _stream = stream;
+            }
+
+            public void Dispose()
+            {
+                _br?.Dispose();
+                _stream?.Dispose();
+            }
+        }
+
         object LoadAsset(AssetType type, int id, string name, GameLanguage language)
         {
-            var (location, baseName) = _assetFiles[type];
             if (type == AssetType.CoreGraphics)
                 return AssetLoader.LoadCoreSprite((CoreSpriteId)id, _assetConfig.BasePath, _coreSpriteConfig);
 
@@ -178,6 +206,7 @@ namespace UAlbion.Game
             Debug.Assert(xldIndex <= 9);
             int objectIndex = id % 100;
 
+            var (location, baseName) = _assetFiles[type];
             var paths = GetAssetPaths(location, language, baseName, xldIndex, objectIndex);
             var xldConfig = _assetConfig.Xlds[paths.XldNameInConfig];
             xldConfig.Assets.TryGetValue(objectIndex, out var assetConfig);
@@ -258,6 +287,19 @@ namespace UAlbion.Game
 
         public MapData2D LoadMap2D(MapDataId id) => LoadAssetCached(AssetType.MapData, id) as MapData2D;
         public MapData3D LoadMap3D(MapDataId id) => LoadAssetCached(AssetType.MapData, id) as MapData3D;
+        public ItemData LoadItem(ItemId id)
+        {
+            var data = (IList<ItemData>)LoadAssetCached(AssetType.ItemList, 0);
+            if (data[0].Names == null)
+            {
+                var names = (IList<string>) LoadAssetCached(AssetType.ItemNames, 0);
+                for (int i = 0; i < data.Count; i++)
+                    data[i].Names = names.Skip(i * 3).Take(3).ToArray();
+            }
+
+            var soEinQuatsch = data.OrderBy(x => x.ToString()).ToList();
+            return data[(int)id];
+        }
 
         public AlbionPalette LoadPalette(PaletteId id)
         {
@@ -284,7 +326,6 @@ namespace UAlbion.Game
                 case AssetType.Floor3D: return LoadTexture((DungeonFloorId)id);
                 case AssetType.Font: return LoadTexture((FontId)id);
                 case AssetType.FullBodyPicture: return LoadTexture((FullBodyPictureId)id);
-                case AssetType.IconData: return LoadTexture((IconDataId)id);
                 case AssetType.IconGraphics: return LoadTexture((IconGraphicsId)id);
                 case AssetType.ItemGraphics: return LoadTexture((ItemId)id);
                 case AssetType.MonsterGraphics: return LoadTexture((MonsterGraphicsId)id);
@@ -311,7 +352,6 @@ namespace UAlbion.Game
         public ITexture LoadTexture(DungeonOverlayId id) => (ITexture)LoadAssetCached(AssetType.Overlay3D, id);
         public ITexture LoadTexture(DungeonWallId id) => (ITexture)LoadAssetCached(AssetType.Wall3D, id);
         public ITexture LoadTexture(FullBodyPictureId id) => (ITexture)LoadAssetCached(AssetType.FullBodyPicture, id);
-        public ITexture LoadTexture(IconDataId id) => (ITexture)LoadAssetCached(AssetType.IconData, id);
         public ITexture LoadTexture(IconGraphicsId id) => (ITexture)LoadAssetCached(AssetType.IconGraphics, id);
         public ITexture LoadTexture(ItemId id) => (ITexture)LoadAssetCached(AssetType.ItemGraphics, id); // TODO: Enum
         public ITexture LoadTexture(LargeNpcId id) => (ITexture)LoadAssetCached(AssetType.BigNpcGraphics, id);

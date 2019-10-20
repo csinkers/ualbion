@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Game
+﻿using UAlbion.Formats;
+
+namespace UAlbion.Game
 {
     public interface ISettings
     {

@@ -83,8 +83,8 @@ namespace UAlbion.Game.Entities
         {
             var assets = Exchange.Resolve<IAssetManager>();
             _mapData = assets.LoadMap2D(MapId);
-            var tileset = assets.LoadTexture((IconGraphicsId) _mapData.TilesetId);
-            _tileData = assets.LoadTileData((IconDataId) _mapData.TilesetId);
+            var tileset = assets.LoadTexture((IconGraphicsId)_mapData.TilesetId);
+            _tileData = assets.LoadTileData((IconDataId)_mapData.TilesetId);
             _renderable = new MapRenderable2D(_mapData, tileset, _tileData);
             _useSmallSprites = _tileData.UseSmallGraphics;
 

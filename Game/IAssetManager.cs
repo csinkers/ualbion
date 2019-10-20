@@ -18,7 +18,6 @@ namespace UAlbion.Game
         ITexture LoadTexture(DungeonOverlayId id);
         ITexture LoadTexture(DungeonWallId id);
         ITexture LoadTexture(FullBodyPictureId id);
-        ITexture LoadTexture(IconDataId id);
         ITexture LoadTexture(IconGraphicsId id);
         ITexture LoadTexture(ItemId id);
         ITexture LoadTexture(LargeNpcId id);
@@ -46,5 +45,6 @@ namespace UAlbion.Game
         AlbionPalette LoadPalette(PaletteId id);
         MapData2D LoadMap2D(MapDataId id);
         MapData3D LoadMap3D(MapDataId id);
+        ItemData LoadItem(ItemId id);
     }
 }

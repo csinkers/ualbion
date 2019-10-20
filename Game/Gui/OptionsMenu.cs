@@ -5,7 +5,7 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Gui
 {
-    public class OptionsMenu : UiElement
+    public class OptionsMenu : Dialog
     {
         const string MusicVolumeKey = "Options.MusicVolume";
         const string FxVolumeKey = "Options.FxVolume";
@@ -77,15 +77,13 @@ namespace UAlbion.Game.Gui
 
         protected override void Subscribed()
         {
-            var layout = Exchange.Resolve<ILayoutManager>();
-            layout.Add(this, DialogPositioning.Center);
-
             var settings = Exchange.Resolve<ISettings>();
             _musicVolume = settings.MusicVolume;
             _fxVolume = settings.FxVolume;
             _windowSize3d = settings.WindowSize3d;
             _combatDetailLevel = settings.CombatDetailLevel;
             _combatDelay = settings.CombatDelay;
+            base.Subscribed();
         }
     }
 }

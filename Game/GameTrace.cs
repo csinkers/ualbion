@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Tracing;
+using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game

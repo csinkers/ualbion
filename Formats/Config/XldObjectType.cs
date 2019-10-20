@@ -38,5 +38,7 @@
         SpellData,
         TranslationTable,
         LabyrinthData,
+        ItemData,
+        ItemNames
     }
 }

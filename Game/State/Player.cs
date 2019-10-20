@@ -1,23 +1,28 @@
-﻿namespace UAlbion.Game.State
+﻿using System.Numerics;
+using UAlbion.Game.Entities;
+
+namespace UAlbion.Game.State
 {
     internal class Player : IPlayer
     {
         public string Name { get; }
-        public CharacterSheet Stats { get; }
-/*
-        int _age;
-        bool _isMale;
-        int _combatPosition;
 
-        Item[] _inventory = new Item[24]; // 4x6
-        Item _head;
-        Item _neck;
-        Item _leftHand;
-        Item _rightHand;
-        Item _leftRing;
-        Item _rightRing;
-        Item _feet;
-        Item _torso;
-        */
+        public IInventory Inventory { get; }
+        public Vector2 Position { get; }
+
+        public ICharacterSheet Stats { get; }
+
+        public int Age { get; }
+        public bool IsMale { get; }
+        public int CombatPosition { get; }
+
+        public Item Head { get; }
+        public Item Neck { get; }
+        public Item LeftHand { get; }
+        public Item RightHand { get; }
+        public Item LeftRing { get; }
+        public Item RightRing { get; }
+        public Item Feet { get; }
+        public Item Torso { get; }
     }
 }

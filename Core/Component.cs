@@ -77,6 +77,9 @@ namespace UAlbion.Core
                 exchange.Subscribe(kvp.Key, this);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected T Resolve<T>() => Exchange.Resolve<T>(); // Convenience method to save a bit of typing
+
         public void Receive(IEvent @event, object sender)
         {
             if (sender == this)

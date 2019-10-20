@@ -5,7 +5,7 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Gui
 {
-    public class MainMenu : UiElement
+    public class MainMenu : Dialog
     {
         const string ContinueKey  = "MainMenu.ContinueGame";
         const string NewGameKey   = "MainMenu.NewGame";
@@ -15,20 +15,34 @@ namespace UAlbion.Game.Gui
         const string ViewIntroKey = "MainMenu.ViewIntro";
         const string CreditsKey   = "MainMenu.Credits";
         const string QuitGameKey  = "MainMenu.QuitGame";
+        static StringId S(SystemTextId id) => new StringId(AssetType.SystemText, 0, (int)id);
+
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<MainMenu, ButtonPressEvent>((x, e) =>
             {
-                switch(e.ButtonId)
+                var exchange = x.Exchange;
+                switch (e.ButtonId)
                 {
+                    case NewGameKey:
+                        var yesNoDialog = new YesNoMessageBox(S(SystemTextId.MainMenu_DoYouReallyWantToStartANewGame));
+                        yesNoDialog.Closed += (args, _) =>
+                        {
+                            x.Attach(exchange);
+                            if(yesNoDialog.Result)
+                                exchange.Raise(new NewGameEvent(), x);
+                        };
+                        x.Exchange.Attach(yesNoDialog);
+                        x.Detach();
+                        break;
+
                     case OptionsKey:
-                        var exchange = x.Exchange;
                         var optionsMenu = new OptionsMenu();
                         optionsMenu.Closed += (args, _) => x.Attach(exchange);
-
                         x.Exchange.Attach(optionsMenu);
                         x.Detach();
                         break;
+
                     case QuitGameKey:
                         x.Raise(new QuitEvent());
                         break;
@@ -38,7 +52,6 @@ namespace UAlbion.Game.Gui
 
         public MainMenu() : base(Handlers)
         {
-            StringId S(SystemTextId id) => new StringId(AssetType.SystemText, 0, (int)id);
             var elements = new List<IUiElement>
             {
                 new Padding(0,2),
@@ -60,12 +73,6 @@ namespace UAlbion.Game.Gui
             };
             var stack = new VerticalStack(elements);
             Children.Add(new Frame(stack));
-        }
-
-        protected override void Subscribed()
-        {
-            var layout = Exchange.Resolve<ILayoutManager>();
-            layout.Add(this, DialogPositioning.Center);
         }
     }
 }

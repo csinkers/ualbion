@@ -9,6 +9,7 @@ namespace UAlbion.Game.Gui
 {
     public class HorizontalStack : UiElement
     {
+        public HorizontalStack(params IUiElement[] args) : this((IList<IUiElement>)args) { }
         public HorizontalStack(IList<IUiElement> children) : base(null)
         {
             foreach(var child in children)
@@ -30,32 +31,43 @@ namespace UAlbion.Game.Gui
             return size;
         }
 
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        void VisitChildren(Rectangle extents, Action<IUiElement, Rectangle> action)
         {
-            int offset = extents.X;
-            int maxOrder = order;
+            int minWidth = 0;
+            int nonFixedCount = 0;
             foreach(var child in Children.OfType<IUiElement>())
             {
                 int width = (int)child.GetSize().X;
-                maxOrder = Math.Max(maxOrder, child.Render(new Rectangle(offset, extents.Y, width, extents.Height), order + 1, addFunc));
-                offset += width;
+                if (!(child is IFixedSizeUiElement))
+                    nonFixedCount++;
+                minWidth += width;
             }
+
+            int spareWidth = extents.Width - minWidth;
+            int offset = extents.X;
+            foreach (var child in Children.OfType<IUiElement>())
+            {
+                int width = (int)child.GetSize().X;
+                var rect = new Rectangle(offset, extents.Y, width, extents.Height);
+                if(!(child is IFixedSizeUiElement))
+                    rect = new Rectangle(rect.X, rect.Y, rect.Width + spareWidth / nonFixedCount, rect.Height);
+                action(child, rect);
+                offset += rect.Width;
+            }
+        }
+
+        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        {
+            int maxOrder = order;
+            VisitChildren(extents, (x, rect) => maxOrder = Math.Max(maxOrder, x.Render(rect, order + 1, addFunc)));
             return maxOrder;
         }
 
         public override void Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
-            if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
+            if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y)) 
                 return;
-
-            int offset = extents.X;
-            foreach(var child in Children.OfType<IUiElement>())
-            {
-                int width = (int)child.GetSize().X;
-                child.Select(uiPosition, new Rectangle(offset, extents.Y, width, extents.Height), order + 1, registerHitFunc);
-                offset += width;
-            }
-
+            VisitChildren(extents, (x, rect) => x.Select(uiPosition, rect, order + 1, registerHitFunc));
             registerHitFunc(order, this);
         }
     }

@@ -9,6 +9,7 @@ namespace UAlbion.Game.Gui
 {
     public class VerticalStack : UiElement
     {
+        public VerticalStack(params IUiElement[] children) : this((IList<IUiElement>)children) { }
         public VerticalStack(IList<IUiElement> children) : base(null)
         {
             foreach(var child in children)

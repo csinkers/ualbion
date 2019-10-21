@@ -55,7 +55,7 @@
         "Q": "cursor_mode look",
         "E": "cursor_mode manipulate"
     },
-    "MouseLook": {
+    "World3D": {
         "Tab": "open_inventory",
 
         "Number1": "set_active_member 0",

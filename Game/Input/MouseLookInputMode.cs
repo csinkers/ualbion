@@ -34,13 +34,13 @@ namespace UAlbion.Game.Input
     UpdateViewMatrix();
     */
 
-    public class MouseLookInputMode : Component
+    public class MouseLookMouseMode : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<MouseLookInputMode, SetInputModeEvent>((x,e) =>
+            H<MouseLookMouseMode, SetMouseModeEvent>((x,e) =>
             {
-                var activating = e.Mode == InputMode.MouseLook && !x._isActive;
-                var deactivating = e.Mode != InputMode.MouseLook && x._isActive;
+                var activating = e.Mode == MouseMode.MouseLook && !x._isActive;
+                var deactivating = e.Mode != MouseMode.MouseLook && x._isActive;
                 if (activating)
                 {
                     x._isActive = true;
@@ -50,11 +50,11 @@ namespace UAlbion.Game.Input
                 if (deactivating)
                     x._isActive = false;
             }),
-            H<MouseLookInputMode, InputEvent>((x,e) => x.OnInput(e)), 
-            H<MouseLookInputMode, PostUpdateEvent>((x, e) =>
+            H<MouseLookMouseMode, InputEvent>((x,e) => x.OnInput(e)), 
+            H<MouseLookMouseMode, PostUpdateEvent>((x, e) =>
             {
                 if (!x._isActive) return;
-                var windowState = x.Exchange.Resolve<IWindowManager>();
+                var windowState = x.Resolve<IWindowManager>();
                 x.Raise(new SetCursorPositionEvent(windowState.PixelWidth / 2, windowState.PixelHeight / 2));
             })
         );
@@ -64,8 +64,8 @@ namespace UAlbion.Game.Input
             if (!_isActive /*|| ImGui.GetIO().WantCaptureMouse*/)
                 return;
 
-            var windowState = Exchange.Resolve<IWindowManager>();
-            var delta = e.Snapshot.MousePosition - new Vector2((float)windowState.PixelWidth / 2, (float)windowState.PixelHeight / 2);
+            var windowState = Resolve<IWindowManager>();
+            var delta = e.Snapshot.MousePosition - new Vector2((int)(windowState.PixelWidth / 2), (int)(windowState.PixelHeight / 2));
 
             if (delta.LengthSquared() > float.Epsilon)
                 Raise(new CameraRotateEvent(delta.X * -0.003f, delta.Y * -0.003f));
@@ -73,6 +73,6 @@ namespace UAlbion.Game.Input
 
         bool _isActive;
 
-        public MouseLookInputMode() : base(Handlers) { }
+        public MouseLookMouseMode() : base(Handlers) { }
     }
 }

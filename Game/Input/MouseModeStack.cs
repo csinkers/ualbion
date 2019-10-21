@@ -10,7 +10,7 @@ namespace UAlbion.Game.Input
         static readonly HandlerSet Handlers = new HandlerSet(
             H<MouseModeStack, PushMouseModeEvent>((x, e) =>
             {
-                var inputManager = x.Exchange.Resolve<IInputManager>();
+                var inputManager = x.Resolve<IInputManager>();
                 x._stack.Push(inputManager.MouseMode);
                 x.Raise(new SetMouseModeEvent(e.Mode));
             }),

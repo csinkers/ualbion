@@ -11,7 +11,7 @@ namespace UAlbion.Game.Gui
         protected Dialog(IDictionary<Type, Handler> handlers) : base(handlers) { }
         protected override void Subscribed()
         {
-            var layout = Exchange.Resolve<ILayoutManager>();
+            var layout = Resolve<ILayoutManager>();
             layout.Add(this, DialogPositioning.Center);
         }
     }
@@ -64,7 +64,7 @@ namespace UAlbion.Game.Gui
                 new Padding(6, 0)
             );
 
-            Children.Add(new Frame(horizontalPad));
+            Children.Add(new DialogFrame(horizontalPad));
         }
 
         public event EventHandler Closed;

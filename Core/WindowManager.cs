@@ -1,10 +1,18 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Core.Events;
+using Veldrid;
 using Veldrid.Sdl2;
 
 namespace UAlbion.Core
 {
+    public static class UiConstants
+    {
+        public static readonly Rectangle UiExtents = new Rectangle(0, 0, 360, 240);
+        public static readonly Rectangle StatusBarExtents = new Rectangle(0, 192, 360, 64);
+        public static readonly Rectangle ActiveAreaExtents = new Rectangle(0, 0, 360, 192);
+    }
+
     public class WindowManager : Component, IWindowManager
     {
         static readonly HandlerSet Handlers = new HandlerSet(
@@ -23,13 +31,12 @@ namespace UAlbion.Core
             }
         }
 
-        public int UiWidth => 360;
-        public int UiHeight => 240;
-        const int StatusBarHeight = 48;
+        public int UiWidth => UiConstants.UiExtents.Width;
+        public int UiHeight => UiConstants.UiExtents.Height;
         public int PixelWidth => Window.Width;
         public int PixelHeight => Window.Height;
         public Vector2 Size => new Vector2(Window.Width, Window.Height);
-        Vector2 UiSize => new Vector2(UiWidth, UiHeight);
+        Vector2 UiSize => new Vector2(UiConstants.UiExtents.Width, UiConstants.UiExtents.Height);
 
         void Recalculate()
         {
@@ -38,28 +45,37 @@ namespace UAlbion.Core
             int scale = (int)Math.Min(widthRatio, heightRatio);
             GuiScale = scale == 0 ? 1 : scale;
 
-            _uiToNormX =  2.0f * GuiScale / Window.Width;
-            _uiToNormY = -2.0f * GuiScale / Window.Height;
+            _uiToNorm = new Vector2(
+                 2.0f * GuiScale / Window.Width,
+                -2.0f * GuiScale / Window.Height);
 
-            _normToUiX =  Window.Width  / (2.0f * GuiScale);
-            _normToUiY = -Window.Height / (2.0f * GuiScale);
+            _normToUi = new Vector2(
+                 Window.Width / (2.0f * GuiScale),
+                -Window.Height / (2.0f * GuiScale));
 
-            _normToPixelX =  Window.Width  / 2.0f;
-            _normToPixelY = -Window.Height / 2.0f;
+            _normToPixel = new Vector2(
+                 Window.Width / 2.0f,
+                -Window.Height / 2.0f);
 
-            _pixelToNormX =  2.0f / Window.Width;
-            _pixelToNormY = -2.0f / Window.Height;
+            _pixelToNorm = new Vector2(
+                 2.0f / Window.Width,
+                -2.0f / Window.Height);
+
+            _uiOffset = new Vector2(
+                UiSize.X * GuiScale / Window.Width,
+                1.0f - 2 * GuiScale * UiSize.Y / Window.Height);
+
+            // Snap to the nearest pixel
+            var uiPos = NormToUiRelative(_uiOffset);
+            _uiOffset = UiToNormRelative(new Vector2((int)uiPos.X, (int)uiPos.Y));
         }
 
         public int GuiScale { get; private set; }
-        float _uiToNormX;
-        float _uiToNormY;
-        float _normToUiX;
-        float _normToUiY;
-        float _normToPixelX;
-        float _normToPixelY;
-        float _pixelToNormX;
-        float _pixelToNormY;
+        Vector2 _uiOffset;
+        Vector2 _uiToNorm;
+        Vector2 _normToUi;
+        Vector2 _normToPixel;
+        Vector2 _pixelToNorm;
         Sdl2Window _window;
 
         // UI Coordinates:
@@ -68,13 +84,13 @@ namespace UAlbion.Core
         // + bottom 48 pixels reserved for status bar, so viewport is 192 high.
         // Scaled up to nearest whole multiple that will fit
         // w/ letterboxing to compensate for aspect ratio differences.
-        public Vector2 UiToNorm(Vector2 pos) => UiToNormRelative(pos - UiSize / 2.0f);
-        public Vector2 NormToUi(Vector2 pos) => NormToUiRelative(pos) + UiSize / 2.0f;
+        public Vector2 UiToNorm(Vector2 pos) => UiToNormRelative(pos) - _uiOffset;
+        public Vector2 NormToUi(Vector2 pos) => NormToUiRelative(pos + _uiOffset);
         public Vector2 NormToPixel(Vector2 pos) => NormToPixelRelative(new Vector2(pos.X + 1.0f, pos.Y - 1.0f));
         public Vector2 PixelToNorm(Vector2 pos) => PixelToNormRelative(pos - Size / 2.0f);
-        public Vector2 UiToNormRelative(Vector2 pos) => new Vector2(_uiToNormX * pos.X, _uiToNormY * pos.Y);
-        public Vector2 NormToUiRelative(Vector2 pos) => new Vector2(pos.X * _normToUiX, pos.Y * _normToUiY);
-        public Vector2 NormToPixelRelative(Vector2 pos) => new Vector2(pos.X * _normToPixelX, pos.Y * _normToPixelY);
-        public Vector2 PixelToNormRelative(Vector2 pos) => new Vector2(pos.X * _pixelToNormX, pos.Y * _pixelToNormY);
+        public Vector2 UiToNormRelative(Vector2 pos) => pos * _uiToNorm;
+        public Vector2 NormToUiRelative(Vector2 pos) => pos * _normToUi;
+        public Vector2 NormToPixelRelative(Vector2 pos) => pos * _normToPixel;
+        public Vector2 PixelToNormRelative(Vector2 pos) => pos * _pixelToNorm;
     }
 }

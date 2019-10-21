@@ -77,7 +77,7 @@ namespace UAlbion.Game.Input
 
         void OnInput(InputEvent e)
         {
-            var inputManager = Exchange.Resolve<IInputManager>();
+            var inputManager = Resolve<IInputManager>();
             foreach (var keyEvent in e.Snapshot.KeyEvents)
             {
                 if (!keyEvent.Down)

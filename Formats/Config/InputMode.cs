@@ -10,7 +10,6 @@
         Inventory,
         Combat,
         World3D,
-        MouseLook,
         ContextMenu,
     }
 }

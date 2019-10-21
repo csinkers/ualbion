@@ -107,7 +107,6 @@ namespace UAlbion.Game.Entities
                 _frame,
                 positionLayered,
                 (int)DrawLayer.Characters1,
-                true,
                 0);
 
             e.Add(npcSprite);

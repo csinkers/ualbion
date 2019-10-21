@@ -33,7 +33,7 @@ namespace UAlbion.Game.Gui
             if (Exchange == null)
                 return;
 
-            var layout = Exchange.Resolve<ILayoutManager>();
+            var layout = Resolve<ILayoutManager>();
             layout?.Remove(this);
             base.Detach();
         }

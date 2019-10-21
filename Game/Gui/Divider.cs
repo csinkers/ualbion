@@ -26,8 +26,10 @@ namespace UAlbion.Game.Gui
 
         public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
-            var window = Exchange.Resolve<IWindowManager>();
+            var window = Resolve<IWindowManager>();
             var size = window.UiToNormRelative(new Vector2(extents.Width, extents.Height));
+            var flags = SpriteFlags.NoTransform | SpriteFlags.UsePalette | SpriteFlags.LeftAligned | SpriteFlags.NoDepthTest;
+
             // TODO: Cache sprite and rebuild when necessary
             var instances = new []
             {
@@ -37,15 +39,14 @@ namespace UAlbion.Game.Gui
                     Vector2.Zero,
                     Vector2.One,
                     0,
-                    SpriteFlags.NoTransform | SpriteFlags.UsePalette
+                    flags
                 )
             };
 
-            addFunc(new UiMultiSprite(new SpriteKey(_pixel, order, false))
+            addFunc(new UiMultiSprite(new SpriteKey(_pixel, order, flags))
             {
                 Position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0),
                 Instances = instances,
-                Flags = SpriteFlags.LeftAligned
             });
             return order;
         }

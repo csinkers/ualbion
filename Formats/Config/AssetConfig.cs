@@ -63,7 +63,7 @@ namespace UAlbion.Formats.Config
                         o.Value.Parent = xld.Value;
                         o.Value.Id = o.Key;
                         o.Value.Type = xld.Value.Type;
-                        o.Value.PaletteHints = o.Value.PaletteHints ?? new List<int>();
+                        o.Value.PaletteHints ??= new List<int>();
                     }
                 }
             }

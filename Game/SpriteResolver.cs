@@ -37,11 +37,12 @@ namespace UAlbion.Game
             {typeof(SmallPartyGraphicsId), AssetType.SmallPartyGraphics},
             {typeof(SmallPortraitId), AssetType.SmallPortrait},
             {typeof(TacticId), AssetType.TacticalIcon},
+            {typeof(SlabId), AssetType.Slab}
         };
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<SpriteResolver, SubscribedEvent>((x, _) =>
-                x._defaultTexture = x.Exchange.Resolve<IAssetManager>().LoadTexture(DungeonWallId.DefaultTexture))
+                x._defaultTexture = x.Resolve<IAssetManager>().LoadTexture(DungeonWallId.DefaultTexture))
         );
         public SpriteResolver() : base(Handlers) { }
 
@@ -49,10 +50,10 @@ namespace UAlbion.Game
         {
             var assetType = AssetTypeLookup[spriteDefinition.IdType];
             var id = spriteDefinition.NumericId;
-            ITexture texture = Exchange.Resolve<IAssetManager>().LoadTexture(assetType, id);
+            ITexture texture = Resolve<IAssetManager>().LoadTexture(assetType, id);
             if (texture == null)
             {
-                return Tuple.Create(new SpriteKey(_defaultTexture, (int)DrawLayer.Diagnostic, spriteDefinition.DepthTested),
+                return Tuple.Create(new SpriteKey(_defaultTexture, (int)DrawLayer.Diagnostic, spriteDefinition.Flags),
                     new SpriteInstanceData(spriteDefinition.Position,
                         new Vector2(_defaultTexture.Width, _defaultTexture.Height),
                         Vector2.Zero, Vector2.One, 0, 0));
@@ -60,7 +61,7 @@ namespace UAlbion.Game
 
             texture.GetSubImageDetails(spriteDefinition.SubObject, out var size, out var texOffset, out var texSize, out var layer);
 
-            var key = new SpriteKey(texture, spriteDefinition.RenderOrder, spriteDefinition.DepthTested);
+            var key = new SpriteKey(texture, spriteDefinition.RenderOrder, spriteDefinition.Flags);
             var instance = new SpriteInstanceData(
                 spriteDefinition.Position,
                 spriteDefinition.Size ?? size, texOffset, texSize, layer,

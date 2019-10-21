@@ -80,9 +80,9 @@ namespace UAlbion.Game.Gui
             if (_lastExtents == extents) return;
             _lastExtents = extents;
 
-            var window = Exchange.Resolve<IWindowManager>();
+            var window = Resolve<IWindowManager>();
             GetFrameColors(out var topLeft, out var bottomRight, out var corners, out var background, out float alpha);
-            var flags = (SpriteFlags.NoTransform | SpriteFlags.UsePalette).SetOpacity(alpha);
+            var flags = (SpriteFlags.NoTransform | SpriteFlags.UsePalette | SpriteFlags.LeftAligned | SpriteFlags.NoDepthTest).SetOpacity(alpha);
 
             var instances = new List<SpriteInstanceData>
             {
@@ -142,11 +142,10 @@ namespace UAlbion.Game.Gui
                     flags.SetOpacity(alpha < 1.0f ? alpha / 2 : alpha)));
             }
 
-            _sprite = new UiMultiSprite(new SpriteKey(BorderTexture, 0, false))
+            _sprite = new UiMultiSprite(new SpriteKey(BorderTexture, 0, flags))
             {
                 Position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0),
-                Instances = instances.ToArray(),
-                Flags = SpriteFlags.LeftAligned
+                Instances = instances.ToArray()
             };
         }
 

@@ -63,6 +63,7 @@ namespace UAlbion.Core.Visual
                BlueTint     = 0x40,  --DEPRECATED Transparent -- = 0x80 
                FlipVertical = 0x100, FloorTile     = 0x200,
                Billboard    = 0x400, DropShadow    = 0x800 
+               LeftAligned = 0x1000
                Opacity = High order byte  */
 
             void main()
@@ -239,8 +240,8 @@ namespace UAlbion.Core.Visual
 
         public IEnumerable<IRenderable> UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IEnumerable<IRenderable> renderables)
         {
-            ITextureManager textureManager = Exchange.Resolve<ITextureManager>();
-            ISpriteResolver spriteResolver = Exchange.Resolve<ISpriteResolver>();
+            ITextureManager textureManager = Resolve<ITextureManager>();
+            ISpriteResolver spriteResolver = Resolve<ISpriteResolver>();
 
             foreach (var buffer in _instanceBuffers)
                 buffer.Dispose();
@@ -265,7 +266,10 @@ namespace UAlbion.Core.Visual
             var grouped = resolved.GroupBy(x => x.Item1, x => x.Item2);
             foreach (var group in grouped)
             {
-                var multiSprite = new MultiSprite(group.Key, _instanceBuffers.Count, group);
+                var multiSprite = group.Key.Flags.HasFlag(SpriteFlags.NoTransform)
+                    ? new UiMultiSprite(group.Key, _instanceBuffers.Count, group) 
+                    : new MultiSprite(group.Key, _instanceBuffers.Count, group);
+
                 SetupMultiSpriteResources(multiSprite);
                 yield return multiSprite;
             }
@@ -280,7 +284,7 @@ namespace UAlbion.Core.Visual
 
         public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable renderable)
         {
-            ITextureManager textureManager = Exchange.Resolve<ITextureManager>();
+            ITextureManager textureManager = Resolve<ITextureManager>();
             // float depth = gd.IsDepthRangeZeroToOne ? 0 : 1;
             var sprite = (MultiSprite)renderable;
             cl.PushDebugGroup($"Sprite:{sprite.Key.Texture.Name}:{sprite.Key.RenderOrder}");
@@ -296,9 +300,9 @@ namespace UAlbion.Core.Visual
 
             _resourceSets.Add(resourceSet);
 
-            cl.SetPipeline(sprite.DepthTested ? _depthTestPipeline : _noDepthPipeline);
+            cl.SetPipeline(sprite.Flags.HasFlag(SpriteFlags.NoDepthTest) ? _noDepthPipeline : _depthTestPipeline);
             cl.SetGraphicsResourceSet(0, resourceSet);
-            cl.SetVertexBuffer(0, ((sprite.Flags & SpriteFlags.LeftAligned) != 0) ? _leftVb : _centeredVb);
+            cl.SetVertexBuffer(0, sprite.Flags.HasFlag(SpriteFlags.LeftAligned) ? _leftVb : _centeredVb);
             cl.SetIndexBuffer(_ib, IndexFormat.UInt16);
             cl.SetVertexBuffer(1, _instanceBuffers[sprite.BufferId]);
 

@@ -56,8 +56,8 @@ namespace UAlbion.Game.Entities
                 }
             }
 
-            _underlay = new MultiSprite(new SpriteKey(_tileset, (int)DrawLayer.Underlay, true)) { Instances = underlay.ToArray() };
-            _overlay = new MultiSprite(new SpriteKey(_tileset, (int)DrawLayer.Overlay3, true)) { Instances = overlay.ToArray() };
+            _underlay = new MultiSprite(new SpriteKey(_tileset, (int)DrawLayer.Underlay, underlay[0].Flags)) { Instances = underlay.ToArray() };
+            _overlay = new MultiSprite(new SpriteKey(_tileset, (int)DrawLayer.Overlay3, overlay[0].Flags)) { Instances = overlay.ToArray() };
         }
 
         protected override void Subscribed() { Raise(new LoadPaletteEvent(Palette)); }

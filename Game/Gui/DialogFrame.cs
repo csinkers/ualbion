@@ -8,16 +8,16 @@ using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    public class Frame : UiElement
+    public class DialogFrame : UiElement
     {
         const int TileSize = 16;
         MultiSprite _sprite;
         Vector2 _lastPixelSize; // For dirty state detection
 
-        public Frame(IUiElement child) : base(null) => Children.Add(child);
+        public DialogFrame(IUiElement child) : base(null) => Children.Add(child);
         void Rebuild(int width, int height, int order)
         {
-            var window = Exchange.Resolve<IWindowManager>();
+            var window = Resolve<IWindowManager>();
 
             { // Check if we need to rebuild
                 var normSize = window.UiToNormRelative(new Vector2(width, height));
@@ -28,7 +28,7 @@ namespace UAlbion.Game.Gui
                 _lastPixelSize = pixelSize;
             }
 
-            var assets = Exchange.Resolve<IAssetManager>();
+            var assets = Resolve<IAssetManager>();
             var multi = new MultiTexture("MainMenu", assets.LoadPalette(PaletteId.Main3D).GetCompletePalette());
 
             void DrawLine(uint y)
@@ -77,22 +77,22 @@ namespace UAlbion.Game.Gui
 
             multi.GetSubImageDetails(multi.GetSubImageAtTime(1, 0), out var size, out var offset, out var texSize, out var layer);
             var normalisedSize = window.UiToNormRelative(new Vector2(size.X, size.Y));
+            var flags = (SpriteFlags.NoTransform | SpriteFlags.LeftAligned).SetOpacity(0.5f);
             _sprite =
-                new UiMultiSprite(new SpriteKey(multi, order, false))
+                new UiMultiSprite(new SpriteKey(multi, order, flags))
                 {
                     Instances = new[] {
                         new SpriteInstanceData( // Drop shadow
                             new Vector3(window.UiToNormRelative(new Vector2(10, 10)), 0),
                          window.UiToNormRelative(new Vector2(size.X - 10, size.Y - 10)),
                         Vector2.Zero, Vector2.Zero, 0,
-                            SpriteFlags.NoTransform.SetOpacity(0.5f)),
-                        new SpriteInstanceData( // Frame
+                            flags),
+                        new SpriteInstanceData( // DialogFrame
                             Vector3.Zero,
                             normalisedSize,
                         offset, texSize, layer, SpriteFlags.NoTransform),
 
                     },
-                    Flags = SpriteFlags.LeftAligned
                 };
         }
 
@@ -102,7 +102,7 @@ namespace UAlbion.Game.Gui
         {
             Rebuild(extents.Width, extents.Height, order);
 
-            var window = Exchange.Resolve<IWindowManager>();
+            var window = Resolve<IWindowManager>();
             var innerExtents = new Rectangle(
                 extents.X + 7,
                  extents.Y + 7,

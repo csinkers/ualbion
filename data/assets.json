@@ -11988,8 +11988,13 @@
     },
     "SLAB": {
       "Type": "FixedSizeSprite",
+      "EnumName": "SlabId",
       "Width": 360,
-      "Assets": {}
+      "Assets": {
+        "0": { 
+          "Name": "SLAB" 
+        }
+      }
     },
     "SMLPORT0.XLD": {
       "EnumName": "SmallPortraitId",

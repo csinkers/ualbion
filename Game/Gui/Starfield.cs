@@ -25,7 +25,7 @@ namespace UAlbion.Game.Gui
 
         void Rebuild(int width, int height, int order)
         {
-            var window = Exchange.Resolve<IWindowManager>();
+            var window = Resolve<IWindowManager>();
 
             {
                 var normSize = window.UiToNormRelative(new Vector2(width, height));
@@ -45,7 +45,7 @@ namespace UAlbion.Game.Gui
                 for (int i = extents.X; i < extents.Width; i++)
                 {
                     int n = instances.Count;
-                    SpriteFlags flags = SpriteFlags.NoTransform;
+                    SpriteFlags flags = SpriteFlags.NoTransform | SpriteFlags.NoDepthTest;
                     if ((n & 1) != 0) flags |= SpriteFlags.BlueTint;
                     if ((n & 2) != 0) flags |= SpriteFlags.GreenTint;
                     if ((n & 4) != 0) flags |= SpriteFlags.RedTint;
@@ -53,20 +53,11 @@ namespace UAlbion.Game.Gui
 
                     var position = new Vector3(window.UiToNorm(new Vector2(i, j)), 0);
                     var size = 2 * Vector2.One / window.Size;
-                    instances.Add(
-                        new SpriteInstanceData(
-                            position,
-                            size,
-                            Vector2.Zero,
-                            Vector2.One,
-                            0,
-                            flags
-                        )
-                    );
+                    instances.Add(new SpriteInstanceData(position, size, Vector2.Zero, Vector2.One, 0, flags));
                 }
             }
 
-            _sprite = new MultiSprite(new SpriteKey(_pixel, order, false))
+            _sprite = new MultiSprite(new SpriteKey(_pixel, order, instances[0].Flags))
             {
                 Instances = instances.ToArray()
             };
@@ -74,13 +65,13 @@ namespace UAlbion.Game.Gui
 
         protected override void Subscribed()
         {
-            var layout = Exchange.Resolve<ILayoutManager>();
+            var layout = Resolve<ILayoutManager>();
             layout.Add(this, DialogPositioning.Center);
         }
 
         public override Vector2 GetSize()
         {
-            var window = Exchange.Resolve<IWindowManager>();
+            var window = Resolve<IWindowManager>();
             return new Vector2(window.UiWidth, window.UiHeight);
         }
 

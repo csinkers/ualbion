@@ -28,7 +28,7 @@ namespace UAlbion.Game.Gui
                 switch(e.ButtonId)
                 {
                     case DoneKey:
-                        var settings = x.Exchange.Resolve<ISettings>();
+                        var settings = x.Resolve<ISettings>();
                         if(x._musicVolume != settings.MusicVolume)
                             x.Raise(new SetMusicVolumeEvent(x._musicVolume));
                         if(x._fxVolume != settings.FxVolume)
@@ -72,12 +72,12 @@ namespace UAlbion.Game.Gui
                 new Padding(0,2),
             };
             var stack = new VerticalStack(elements);
-            Children.Add(new Frame(stack));
+            Children.Add(new DialogFrame(stack));
         }
 
         protected override void Subscribed()
         {
-            var settings = Exchange.Resolve<ISettings>();
+            var settings = Resolve<ISettings>();
             _musicVolume = settings.MusicVolume;
             _fxVolume = settings.FxVolume;
             _windowSize3d = settings.WindowSize3d;

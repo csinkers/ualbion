@@ -39,7 +39,7 @@ namespace UAlbion.Game.Entities
 
         protected override void Subscribed()
         {
-            var assets = Exchange.Resolve<IAssetManager>();
+            var assets = Resolve<IAssetManager>();
             _mapData = assets.LoadMap3D(MapId);
 
             _labyrinthData = assets.LoadLabyrinthData(_mapData.LabDataId);

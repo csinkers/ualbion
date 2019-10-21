@@ -14,7 +14,7 @@ namespace UAlbion.Core.Visual
     public class MultiSprite : IRenderable
     {
         public MultiSprite(SpriteKey key) { Key = key; }
-        public override string ToString() => $"Multi:{Name} {RenderOrder} Depth:{DepthTested} ({Instances.Length} instances)";
+        public override string ToString() => $"Multi:{Name} {RenderOrder} Flags:{Flags} ({Instances.Length} instances)";
 
         public MultiSprite(SpriteKey key, int bufferId, IEnumerable<SpriteInstanceData> sprites)
         {
@@ -71,7 +71,7 @@ namespace UAlbion.Core.Visual
         public int RenderOrder
         {
             get => Key.RenderOrder;
-            set => Key = new SpriteKey(Key.Texture, value, Key.DepthTested);
+            set => Key = new SpriteKey(Key.Texture, value, Key.Flags);
         }
 
         public Type Renderer => typeof(SpriteRenderer);
@@ -80,10 +80,9 @@ namespace UAlbion.Core.Visual
         public Matrix4x4 Transform { get; private set; } = Matrix4x4.Identity;
 
         public event EventHandler ExtentsChanged;
-        public bool DepthTested => Key.DepthTested;
         public SpriteKey Key { get; private set; }
         public int BufferId { get; set; }
-        public SpriteFlags Flags { get; set; } // Common flags, mostly ignored.
+        public SpriteFlags Flags => Key.Flags; // Common flags, mostly ignored.
 
         public Vector3 Position
         {

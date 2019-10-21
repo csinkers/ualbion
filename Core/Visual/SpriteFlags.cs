@@ -18,8 +18,18 @@ namespace UAlbion.Core.Visual
         Billboard = 0x400,
         DropShadow = 0x800,
         LeftAligned = 0x1000, // Multi-sprite flag.
+        NoDepthTest = 0x2000,
 
-        OpacityMask = 0xff000000
+        OpacityMask = 0xff000000,
+    }
+
+    // If we put masks that overlap single flags directly into the flags enum then it messes up the ToString() results, making debugging harder.
+    public enum SpriteFlagMask : uint
+    {
+        SpriteKey = // Within a multi-sprite, all the instances need to share these flags.
+            SpriteFlags.LeftAligned | 
+            SpriteFlags.NoDepthTest |
+            SpriteFlags.NoTransform
     }
 
     public static class SpriteFlagExtensions

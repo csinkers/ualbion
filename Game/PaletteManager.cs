@@ -26,7 +26,7 @@ namespace UAlbion.Game
 
         void SetPalette(PaletteId paletteId)
         {
-            var palette = Exchange.Resolve<IAssetManager>().LoadPalette(paletteId);
+            var palette = Resolve<IAssetManager>().LoadPalette(paletteId);
             if (palette == null)
             {
                 Raise(new LogEvent(LogEvent.Level.Error, $"Palette ID {paletteId} could not be loaded!"));

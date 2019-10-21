@@ -21,7 +21,7 @@ namespace GenerateEnums
         public IList<EnumEntry> Entries { get; } = new List<EnumEntry>();
     }
 
-    class Program
+    static class GenerateEnums
     {
         static readonly char[] ForbiddenCharacters = { ' ', '\t', '-', '(', ')', ',', '?', '.', '"' };
         static string Sanitise(string x)

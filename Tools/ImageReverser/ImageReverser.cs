@@ -6,7 +6,7 @@ using UAlbion.Formats.Config;
 
 namespace UAlbion.Tools.ImageReverser
 {
-    static class Program
+    static class ImageReverser
     {
         /// <summary>
         /// The main entry point for the application.

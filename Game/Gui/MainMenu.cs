@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Numerics;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Gui
@@ -72,7 +74,7 @@ namespace UAlbion.Game.Gui
                 new Padding(0,2),
             };
             var stack = new VerticalStack(elements);
-            Children.Add(new Frame(stack));
+            Children.Add(new DialogFrame(stack));
         }
     }
 }

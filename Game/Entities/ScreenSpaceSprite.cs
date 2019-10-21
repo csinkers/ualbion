@@ -31,29 +31,6 @@ namespace UAlbion.Game.Entities
 
         public override string ToString() => $"{_id} @ {_position} {_size.X}x{_size.Y}";
 
-        /*
-        void Select(WorldCoordinateSelectEvent e)
-        {
-            float denominator = Vector3.Dot(Normal, e.Direction);
-            if (Math.Abs(denominator) < 0.00001f)
-                return;
-
-            var pixelPosition = _position * _tileSize;
-            float t = Vector3.Dot(new Vector3(pixelPosition, 0.0f) - e.Origin, Normal) / denominator;
-            if (t < 0)
-                return;
-
-            var intersectionPoint = e.Origin + t * e.Direction;
-            int x = (int)(intersectionPoint.X - pixelPosition.X);
-            int y = (int)(intersectionPoint.Y - pixelPosition.Y);
-
-            if (x < 0 || x >= _size.X ||
-                y < 0 || y >= _size.Y)
-                return;
-
-            e.RegisterHit(t, $"NPC {_id}", this);
-        }//*/
-
         void Render(RenderEvent e)
         {
             var sprite = new SpriteDefinition<T>(
@@ -61,7 +38,6 @@ namespace UAlbion.Game.Entities
                 _frame,
                 _position,
                 (int)DrawLayer.Interface,
-                true,
                 SpriteFlags.NoTransform,
                 _size);
 

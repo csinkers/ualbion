@@ -81,7 +81,7 @@ namespace UAlbion.Game.Entities
 
         protected override void Subscribed()
         {
-            var assets = Exchange.Resolve<IAssetManager>();
+            var assets = Resolve<IAssetManager>();
             _mapData = assets.LoadMap2D(MapId);
             var tileset = assets.LoadTexture((IconGraphicsId)_mapData.TilesetId);
             _tileData = assets.LoadTileData((IconDataId)_mapData.TilesetId);

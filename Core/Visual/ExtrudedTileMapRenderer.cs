@@ -270,7 +270,7 @@ namespace UAlbion.Core.Visual
 
         public IEnumerable<IRenderable> UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IEnumerable<IRenderable> renderables)
         {
-            ITextureManager textureManager = Exchange.Resolve<ITextureManager>();
+            ITextureManager textureManager = Resolve<ITextureManager>();
             foreach (var buffer in _instanceBuffers)
                 buffer.Dispose();
             _instanceBuffers.Clear();
@@ -308,7 +308,7 @@ namespace UAlbion.Core.Visual
 
         public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable renderable)
         {
-            ITextureManager textureManager = Exchange.Resolve<ITextureManager>();
+            ITextureManager textureManager = Resolve<ITextureManager>();
             var window = renderable as TileMapWindow;
             if (window == null)
                 return;

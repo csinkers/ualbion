@@ -84,7 +84,7 @@ namespace UAlbion.Game.Entities
 
         void PostUpdate()
         {
-            var state = Exchange.Resolve<IStateManager>();
+            var state = Resolve<IStateManager>();
             if (state == null)
                 return;
 

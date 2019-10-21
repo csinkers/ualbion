@@ -89,7 +89,7 @@ namespace UAlbion.Core
                 GlobalExchange.Attach(component);
         }
 
-        public void AddScene(Scene scene) => _scenes.Add(scene);
+        public Engine AddScene(Scene scene) { _scenes.Add(scene); return this; }
 
         public void Run()
         {
@@ -276,7 +276,7 @@ namespace UAlbion.Core
             foreach (var scene in _scenes)
                 scene.DestroyAllDeviceObjects();
             StaticResourceCache.DestroyAllDeviceObjects();
-            Exchange.Resolve<ITextureManager>()?.DestroyDeviceObjects();
+            Resolve<ITextureManager>()?.DestroyDeviceObjects();
             GraphicsDevice.WaitForIdle();
         }
 

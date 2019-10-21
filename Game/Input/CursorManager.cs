@@ -10,7 +10,6 @@ namespace UAlbion.Game.Input
 {
     public class CursorManager : Component
     {
-        const float UiScaleFactor = 4.0f; // TODO: Use config / heuristic
         CoreSpriteId _cursorId = CoreSpriteId.Cursor;
         Vector2 _position;
         Vector2 _hotspot;
@@ -27,8 +26,8 @@ namespace UAlbion.Game.Input
 
         void SetCursor(CoreSpriteId id)
         {
-            var assets = Exchange.Resolve<IAssetManager>();
-            var window = Exchange.Resolve<IWindowManager>();
+            var assets = Resolve<IAssetManager>();
+            var window = Resolve<IWindowManager>();
             var texture = assets.LoadTexture(id);
             var config = assets.LoadCoreSpriteInfo(id);
             _cursorId = id;
@@ -38,7 +37,7 @@ namespace UAlbion.Game.Input
 
         void Render(RenderEvent e)
         {
-            var window = Exchange.Resolve<IWindowManager>();
+            var window = Resolve<IWindowManager>();
             if (window.Size.X < 1 || window.Size.Y < 1)
                 return;
 
@@ -50,14 +49,13 @@ namespace UAlbion.Game.Input
                 window.PixelToNorm(_position),
                 0.0f);
 
-            var size = new Vector2(UiScaleFactor, -UiScaleFactor) * _size / window.Size;
+            var size = new Vector2(window.GuiScale, -window.GuiScale) * _size / window.Size;
 
             e.Add(new SpriteDefinition<CoreSpriteId>(_cursorId,
                 0,
                 position,
                 (int)drawLayer,
-                false,
-                SpriteFlags.NoTransform,
+                SpriteFlags.NoTransform | SpriteFlags.NoDepthTest,
                 size));
         }
     }

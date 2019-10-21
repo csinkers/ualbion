@@ -79,15 +79,17 @@ namespace UAlbion.Game.Entities
 
         void Rebuild()
         {
-            var assets = Exchange.Resolve<IAssetManager>();
-            var window = Exchange.Resolve<IWindowManager>();
-            var settings = Exchange.Resolve<ISettings>();
+            var assets = Resolve<IAssetManager>();
+            var window = Resolve<IWindowManager>();
+            var settings = Resolve<ISettings>();
 
             var font = assets.LoadFont(_color, false);
             var text = _literal ?? assets.LoadString(_id, settings.Language);
 
             var instances = new SpriteInstanceData[text.Length * (_isBold ? 4 : 2)];
             int offset = 0;
+            var flags = SpriteFlags.UsePalette | SpriteFlags.NoTransform | SpriteFlags.NoDepthTest | SpriteFlags.LeftAligned;
+
             for (int i = 0; i < text.Length; i++)
             {
                 int n = i * (_isBold ? 4 : 2);
@@ -103,8 +105,7 @@ namespace UAlbion.Game.Entities
                     var baseInstance = new SpriteInstanceData(
                         new Vector3(normPosition, 0),
                         window.UiToNormRelative(new Vector2(size.X, size.Y)),
-                        texOffset, texSize, layer,
-                        SpriteFlags.UsePalette | SpriteFlags.NoTransform);
+                        texOffset, texSize, layer, flags);
 
                     instances[n] = baseInstance;
                     instances[n+1] = baseInstance;
@@ -136,12 +137,7 @@ namespace UAlbion.Game.Entities
                 }
             }
 
-            _sprite = new UiMultiSprite(new SpriteKey(font, (int)DrawLayer.Interface, false))
-            {
-                Instances = instances,
-                Flags = SpriteFlags.LeftAligned
-            };
-
+            _sprite = new UiMultiSprite(new SpriteKey(font, (int)DrawLayer.Interface, flags)) { Instances = instances, };
             font.GetSubImageDetails(0, out var fontSize, out _, out _, out _);
             _size = new Vector2(offset + 1, fontSize.Y + 1); // +1 for the drop shadow
         }
@@ -166,7 +162,7 @@ namespace UAlbion.Game.Entities
 
         public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
-            var window = Exchange.Resolve<IWindowManager>();
+            var window = Resolve<IWindowManager>();
             if (_sprite.RenderOrder != order)
                 _sprite.RenderOrder = order;
 

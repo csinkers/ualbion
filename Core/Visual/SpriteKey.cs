@@ -5,20 +5,20 @@ namespace UAlbion.Core.Visual
 {
     public struct SpriteKey : IEquatable<SpriteKey>
     {
-        public SpriteKey(ITexture texture, int renderOrder, bool depthTested)
+        public SpriteKey(ITexture texture, int renderOrder, SpriteFlags flags)
         {
             Texture = texture;
             RenderOrder = renderOrder;
-            DepthTested = depthTested;
+            Flags = flags & (SpriteFlags)SpriteFlagMask.SpriteKey;
         }
         public ITexture Texture { get; }
         public int RenderOrder { get; }
-        public bool DepthTested { get; }
+        public SpriteFlags Flags { get; }
 
         public bool Equals(SpriteKey other) =>
             Equals(Texture, other.Texture) && 
             RenderOrder == other.RenderOrder && 
-            DepthTested == other.DepthTested;
+            Flags == other.Flags;
 
         public override bool Equals(object obj) => obj is SpriteKey other && Equals(other);
         public override int GetHashCode()
@@ -27,7 +27,7 @@ namespace UAlbion.Core.Visual
             {
                 var hashCode = (Texture != null ? Texture.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ RenderOrder;
-                hashCode = (hashCode * 397) ^ DepthTested.GetHashCode();
+                hashCode = (hashCode * 397) ^ Flags.GetHashCode();
                 return hashCode;
             }
         }

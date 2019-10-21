@@ -37,8 +37,8 @@ namespace UAlbion.Game
             if (_hits == null)
                 return;
 
-            var state = Exchange.Resolve<IStateManager>();
-            var window = Exchange.Resolve<IWindowManager>();
+            var state = Resolve<IStateManager>();
+            var window = Resolve<IWindowManager>();
             if (state == null)
                 return;
 

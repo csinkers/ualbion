@@ -34,7 +34,7 @@ namespace UAlbion.Game
                 exchange.IsActive = false;
             _mapExchange.PruneInactiveChildren();
 
-            var assets = Exchange.Resolve<IAssetManager>();
+            var assets = Resolve<IAssetManager>();
             var mapData2D = assets.LoadMap2D(_pendingMapChange.Value);
             if (mapData2D != null)
             {
@@ -43,6 +43,7 @@ namespace UAlbion.Game
                 Raise(new SetSceneEvent((int)SceneId.World2D)); // Set the scene first to ensure scene-local components from other scenes are disabled.
                 exchange.Attach(map);
                 Raise(new SetInputModeEvent(InputMode.World2D));
+                Raise(new SetMouseModeEvent(MouseMode.Normal));
                 Raise(new CameraJumpEvent((int)map.LogicalSize.X / 2, (int)map.LogicalSize.Y / 2));
                 Raise(new LogEvent(LogEvent.Level.Info, $"Loaded map {(int)_pendingMapChange}: {_pendingMapChange}"));
             }
@@ -54,7 +55,8 @@ namespace UAlbion.Game
                 var map = new Map3D(_pendingMapChange.Value);
                 Raise(new SetSceneEvent((int)SceneId.World3D)); // Set the scene first to ensure scene-local components from other scenes are disabled.
                 exchange.Attach(map);
-                Raise(new SetInputModeEvent(InputMode.MouseLook));
+                Raise(new SetInputModeEvent(InputMode.World3D));
+                Raise(new SetMouseModeEvent(MouseMode.MouseLook));
                 Raise(new CameraJumpEvent((int)map.LogicalSize.X / 2, (int)map.LogicalSize.Y / 2));
                 Raise(new LogEvent(LogEvent.Level.Info, $"Loaded map {(int)_pendingMapChange}: {_pendingMapChange}"));
             }

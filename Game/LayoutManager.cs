@@ -42,50 +42,50 @@ namespace UAlbion.Game
 
         void DoLayout(Action<Rectangle, IUiElement> action)
         {
+            int uiWidth = UiConstants.ActiveAreaExtents.Width;
+            int uiHeight = UiConstants.ActiveAreaExtents.Height;
             foreach (var (element, positioning) in _elements)
             {
                 var size = element.GetSize();
-                int x;
-                int y;
-                var window = Exchange.Resolve<IWindowManager>();
 
+                int x; int y;
                 switch(positioning)
                 {
                     case DialogPositioning.Center:
-                        x = (window.UiWidth - (int)size.X) / 2;
-                        y = (window.UiHeight - (int)size.Y) / 2;
+                        x = (uiWidth - (int)size.X) / 2;
+                        y = (uiHeight - (int)size.Y) / 2;
                         break;
                     case DialogPositioning.Bottom:
-                        x = (window.UiWidth - (int)size.X) / 2;
-                        y = window.UiHeight - (int)size.Y;
+                        x = (uiWidth - (int)size.X) / 2;
+                        y = uiHeight - (int)size.Y;
                         break;
                     case DialogPositioning.Top:
-                        x = (window.UiWidth - (int)size.X) / 2;
+                        x = (uiWidth - (int)size.X) / 2;
                         y = 0;
                         break;
                     case DialogPositioning.Left:
                         x = 0;
-                        y = (window.UiHeight - (int)size.Y) / 2;
+                        y = (uiHeight - (int)size.Y) / 2;
                         break;
                     case DialogPositioning.Right:
-                        x = window.UiWidth - (int)size.X;
-                        y = (window.UiHeight - (int)size.Y) / 2;
+                        x = uiWidth - (int)size.X;
+                        y = (uiHeight - (int)size.Y) / 2;
                         break;
                     case DialogPositioning.BottomLeft:
                         x = 0;
-                        y = window.UiHeight - (int)size.Y;
+                        y = uiHeight - (int)size.Y;
                         break;
                     case DialogPositioning.TopLeft:
                         x = 0; 
                         y = 0;
                         break;
                     case DialogPositioning.TopRight:
-                        x = window.UiWidth - (int)size.X;
+                        x = uiWidth - (int)size.X;
                         y = 0;
                         break;
                     case DialogPositioning.BottomRight:
-                        x = window.UiWidth - (int)size.X;
-                        y = window.UiHeight - (int)size.Y;
+                        x = uiWidth - (int)size.X;
+                        y = uiHeight - (int)size.Y;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -102,7 +102,7 @@ namespace UAlbion.Game
 
         void Select(ScreenCoordinateSelectEvent selectEvent)
         {
-            var window = Exchange.Resolve<IWindowManager>();
+            var window = Resolve<IWindowManager>();
             var normPosition = window.PixelToNorm(selectEvent.Position);
             var uiPosition = window.NormToUi(normPosition);
 

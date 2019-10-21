@@ -82,13 +82,14 @@ namespace UAlbion
             var flat = new FlatScene(allScenesExchange);
             var dungeon = new DungeonScene(allScenesExchange);
             var menuScene = new MenuScene(allScenesExchange);
-            var inventory = new InventoryScene(allScenesExchange);
+            var inventoryScene = new InventoryScene(allScenesExchange);
+            var statusBar = new UiSpaceSprite<PictureId>(PictureId.StatusBar, UiConstants.StatusBarExtents);
 
-            engine.AddScene(flat);
-            engine.AddScene(dungeon);
-            engine.AddScene(map);
-            engine.AddScene(menuScene);
-            engine.AddScene(inventory);
+            engine.AddScene(flat)
+                .AddScene(dungeon)
+                .AddScene(map)
+                .AddScene(menuScene)
+                .AddScene(inventoryScene);
 
             var inputManager = new InputManager();
             engine.GlobalExchange
@@ -103,7 +104,7 @@ namespace UAlbion
                 .Register<IDungeonScene>(dungeon)
                 .Register<IMapScene>(map)
                 .Register<IMenuScene>(menuScene)
-                .Register<IInventoryScene>(inventory)
+                .Register<IInventoryScene>(inventoryScene)
                 .Attach(new ConsoleLogger())
                 .Attach(new GameClock())
                 .Attach(new MapManager(mapExchange))
@@ -114,15 +115,16 @@ namespace UAlbion
                 .Attach(new SceneStack())
                 .Attach(new CursorManager())
                 .Attach(new PaletteManager())
+                .Attach(statusBar)
                 ;
 
             inputManager
-                .RegisterInputMode(InputMode.World2D, new World2DInputMode())
                 .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
-                .RegisterInputMode(InputMode.MouseLook, new MouseLookInputMode())
+                .RegisterInputMode(InputMode.World2D, new World2DInputMode())
                 .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
                 .RegisterMouseMode(MouseMode.Exclusive, new ExclusiveMouseMode())
                 .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
+                .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
                 ;
 
             /*
@@ -130,14 +132,12 @@ namespace UAlbion
             engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.Jirinaar3D), null); /*
             engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.HausDesJägerclans), null); //*/
 
-            //*
+            /*
             var menu = new MainMenu();
-            var background = new ScreenSpaceSprite<PictureId>(PictureId.MenuBackground8, new Vector2(0.0f, 1.0f), new Vector2(2.0f, -1.6f));
-            var status = new ScreenSpaceSprite<PictureId>(PictureId.StatusBar, new Vector2(0.0f, -0.6f), new Vector2(2.0f, -0.4f));
+            var menuBackground = new ScreenSpaceSprite<PictureId>(PictureId.MenuBackground8, new Vector2(0.0f, 1.0f), new Vector2(2.0f, -2.0f));
             menuScene.SceneExchange
                 .Attach(menu)
-                .Attach(background)
-                .Attach(status)
+                .Attach(menuBackground)
                 //.Attach(new Starfield())
                 ;
 
@@ -146,6 +146,19 @@ namespace UAlbion
             engine.GlobalExchange.Raise(new SetMouseModeEvent(MouseMode.Normal), null);
             engine.GlobalExchange.Raise(new SetInputModeEvent(InputMode.Dialog), null);
             //*/
+
+            //*
+            var inventory = new InventoryScreen();
+            inventoryScene.SceneExchange
+                .Attach(inventory)
+                ;
+
+            engine.GlobalExchange.Raise(new SetSceneEvent((int)SceneId.Inventory), null);
+            engine.GlobalExchange.Raise(new SetCursorEvent(CoreSpriteId.Cursor), null);
+            engine.GlobalExchange.Raise(new SetMouseModeEvent(MouseMode.Normal), null);
+            engine.GlobalExchange.Raise(new SetInputModeEvent(InputMode.Dialog), null);
+            //*/
+
             engine.Run();
         }
 

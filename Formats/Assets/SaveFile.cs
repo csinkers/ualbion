@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Formats.Parsers
+﻿namespace UAlbion.Formats.Assets
 {
     internal class SaveFile
     {

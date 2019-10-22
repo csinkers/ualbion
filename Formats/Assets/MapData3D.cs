@@ -5,7 +5,7 @@ using System.Text;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 
-namespace UAlbion.Formats.Parsers
+namespace UAlbion.Formats.Assets
 {
     public class MapData3D
     {

@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Entities;
 
 namespace UAlbion.Game.State

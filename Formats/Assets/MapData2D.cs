@@ -1,10 +1,10 @@
-﻿using System.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using UAlbion.Formats.MapEvents;
 
-namespace UAlbion.Formats.Parsers
+namespace UAlbion.Formats.Assets
 {
     public class MapData2D
     {

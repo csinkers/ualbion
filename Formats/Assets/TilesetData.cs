@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UAlbion.Formats.Parsers
+namespace UAlbion.Formats.Assets
 {
     /*
     Indoors: Stairs up broken.

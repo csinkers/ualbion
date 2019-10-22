@@ -8,6 +8,7 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.Parsers;
 using UAlbion.Game.Events;

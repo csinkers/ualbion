@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers

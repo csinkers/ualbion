@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Formats.AssetIds;
 
-namespace UAlbion.Formats.Parsers
+namespace UAlbion.Formats.Assets
 {
     public class LabyrinthData
     {

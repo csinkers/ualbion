@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UAlbion.Formats.Parsers
+namespace UAlbion.Formats.Assets
 {
     [Flags]
     public enum PlayerClass : ushort

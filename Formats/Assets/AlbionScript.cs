@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace UAlbion.Formats.Parsers
+namespace UAlbion.Formats.Assets
 {
     public class AlbionScript
     {

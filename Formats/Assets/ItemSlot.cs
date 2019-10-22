@@ -1,6 +1,6 @@
-﻿namespace UAlbion.Formats.Parsers
+﻿namespace UAlbion.Formats.Assets
 {
-    public enum ItemSlot : byte
+    public enum ItemSlotId : byte
     {
         None = 0,
         Neck = 1,

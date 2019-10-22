@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using UAlbion.Formats.AssetIds;
 
-namespace UAlbion.Formats.Parsers
+namespace UAlbion.Formats.Assets
 {
     public class ItemData
     {

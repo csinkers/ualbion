@@ -3,7 +3,6 @@ using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
-using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Game
 {
@@ -47,5 +46,6 @@ namespace UAlbion.Game
         MapData2D LoadMap2D(MapDataId id);
         MapData3D LoadMap3D(MapDataId id);
         ItemData LoadItem(ItemId id);
+        CharacterSheet LoadCharacter(AssetType type, int id);
     }
 }

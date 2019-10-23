@@ -20,7 +20,7 @@ namespace UAlbion.Formats.Parsers
                 item.Id = (ItemId)i;
                 item.Unknown = br.ReadByte();
                 item.TypeId = (ItemType)br.ReadByte();
-                item.SlotType = (ItemSlot)br.ReadByte();
+                item.SlotType = (ItemSlotId)br.ReadByte();
                 item.BreakRate = br.ReadByte();
                 item.AllowedGender = (Gender)br.ReadByte();
                 item.Hands = br.ReadByte();

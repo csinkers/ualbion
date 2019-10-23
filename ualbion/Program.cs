@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
@@ -8,6 +10,7 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game;
 using UAlbion.Game.Entities;
@@ -147,7 +150,7 @@ namespace UAlbion
             engine.GlobalExchange.Raise(new SetInputModeEvent(InputMode.Dialog), null);
             //*/
 
-            //*
+            /*
             var inventory = new InventoryScreen();
             inventoryScene.SceneExchange
                 .Attach(inventory)
@@ -231,6 +234,20 @@ namespace UAlbion
                     sw.WriteLine(
                         $"    Extra {j}: {o.TextureNumber} {o.AnimationFrames} {o.Width}x{o.Height} M:{o.MapWidth}x{o.MapHeight}");
                 }
+            }
+        }
+
+        static void DumpCharacterSheets(IAssetManager assets)
+        {
+            var chars = new List<CharacterSheet>();
+            foreach (var charId in Enum.GetValues(typeof(PartyCharacterId)))
+                chars.Add(assets.LoadCharacter(AssetType.PartyCharacterData, (int)charId));
+            foreach (var charId in Enum.GetValues(typeof(NpcCharacterId)))
+                chars.Add(assets.LoadCharacter(AssetType.NpcCharacterData, (int)charId));
+
+            foreach (var c in chars)
+            {
+                
             }
         }
     }

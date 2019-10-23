@@ -19,7 +19,7 @@ namespace UAlbion.Formats.Assets
 
         public byte Unknown { get; set; }   //  0 Always 0
         public ItemType TypeId { get; set; }   //  1 Item type
-        public ItemSlot SlotType { get; set; }   //  2 Slot that can hold the item
+        public ItemSlotId SlotType { get; set; }   //  2 Slot that can hold the item
         public byte BreakRate { get; set; }   //  3 Chance to break the item
         public Gender AllowedGender { get; set; }   //  4 Determines which gender can use this item. 2 = female, 3 = any
         public byte Hands { get; set; }   //  5 Determines how many free hands are required to equip the item.

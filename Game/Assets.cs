@@ -302,6 +302,7 @@ namespace UAlbion.Game
             return data[(int)id];
         }
 
+
         public AlbionPalette LoadPalette(PaletteId id)
         {
             var palette = (AlbionPalette)LoadAssetCached(AssetType.Palette, id);
@@ -383,6 +384,7 @@ namespace UAlbion.Game
 
         public AlbionSample LoadSample(AssetType type, int id) => (AlbionSample)LoadAssetCached(type, id);
         public AlbionVideo LoadVideo(VideoId id, GameLanguage language) => (AlbionVideo)LoadAsset(AssetType.Flic, (int)id, $"Video:{id}", language); // Don't cache videos.
+        public CharacterSheet LoadCharacter(AssetType type, int id) => (CharacterSheet)LoadAssetCached(type, id);
 
         public void Dispose()
         {

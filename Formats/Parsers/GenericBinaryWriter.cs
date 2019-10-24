@@ -85,19 +85,19 @@ namespace UAlbion.Formats.Parsers
         public void NullTerminatedString(string name, Func<string> getter, Action<string> setter)
         {
             var v = getter();
-            var bytes = System.Text.Encoding.Unicode.GetBytes(v);
+            var bytes = FormatUtil.BytesFrom850String(v);
             bw.Write(bytes);
-            bw.Write((ushort)0);
-            offset += bytes.Length + 2; // add 2 bytes for the null terminator
+            bw.Write((byte)0);
+            offset += bytes.Length + 1; // add 2 bytes for the null terminator
         }
         public void FixedLengthString(string name, Func<string> getter, Action<string> setter, int length)
         {
             var v = getter();
-            var bytes = System.Text.Encoding.Unicode.GetBytes(v);
-            if (bytes.Length > length + 2) throw new InvalidOperationException("Tried to write overlength string");
+            var bytes = FormatUtil.BytesFrom850String(v);
+            if (bytes.Length > length + 1) throw new InvalidOperationException("Tried to write overlength string");
             bw.Write(bytes);
             bw.Write(Enumerable.Repeat((byte)0, length - bytes.Length).ToArray());
-            offset += length; // add 2 bytes for the null terminator
+            offset += length; // Pad out to the full length
         }
 
         public void RepeatU8(string name, byte v, int length)
@@ -107,5 +107,6 @@ namespace UAlbion.Formats.Parsers
         }
 
         public void Meta(string name, Action<ISerializer> serializer, Action<ISerializer> deserializer) => serializer(this);
+        public void Check() { }
     }
 }

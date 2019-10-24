@@ -11,6 +11,7 @@ namespace UAlbion.Formats.Parsers
         void Unindent(); // Only affects annotating writers
         void NewLine(); // Only affects annotating writers
         void Seek(long offset); // For overwriting pre-recorded offsets
+        void Check(); // Ensure offset matches stream position
 
         void Int8(string name, Func<sbyte> getter, Action<sbyte> setter);
         void Int16(string name, Func<short> getter, Action<short> setter);

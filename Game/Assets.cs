@@ -10,7 +10,6 @@ using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
-using UAlbion.Formats.Parsers;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game
@@ -145,7 +144,7 @@ namespace UAlbion.Game
 
                 case AssetLocation.Localised:
                     result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, lang, baseName);
-                    result.OverridePath = Path.Combine(_assetConfig.BaseDataPath, lang, baseName, objectNumber.ToString());
+                    result.OverridePath = Try(Path.Combine(_assetConfig.BaseDataPath, lang, baseName, objectNumber.ToString()));
                     result.XldNameInConfig = "$(LANG)/" + baseName;
                     break;
 
@@ -157,13 +156,13 @@ namespace UAlbion.Game
 
                 case AssetLocation.Initial:
                     result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, "INITIAL", baseName);
-                    result.OverridePath = Path.Combine(_assetConfig.BaseDataPath, "INITIAL", baseName, objectNumber.ToString());
+                    result.OverridePath = Try(Path.Combine(_assetConfig.BaseDataPath, "INITIAL", baseName, objectNumber.ToString()));
                     result.XldNameInConfig = "INITIAL/" + baseName;
                     break;
 
                 case AssetLocation.Current:
                     result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, "CURRENT", baseName);
-                    result.OverridePath = Path.Combine(_assetConfig.BaseDataPath, "CURRENT", baseName, objectNumber.ToString());
+                    result.OverridePath = Try(Path.Combine(_assetConfig.BaseDataPath, "CURRENT", baseName, objectNumber.ToString()));
                     result.XldNameInConfig = "INITIAL/" + baseName; // Note: Use the same metadata for CURRENT & INITIAL
                     break;
 
@@ -298,7 +297,6 @@ namespace UAlbion.Game
                     data[i].Names = names.Skip(i * 3).Take(3).ToArray();
             }
 
-            var soEinQuatsch = data.OrderBy(x => x.ToString()).ToList();
             return data[(int)id];
         }
 
@@ -306,11 +304,11 @@ namespace UAlbion.Game
         public AlbionPalette LoadPalette(PaletteId id)
         {
             var palette = (AlbionPalette)LoadAssetCached(AssetType.Palette, id);
-            if (palette != null)
-            {
-                var commonPalette = (byte[])LoadAssetCached(AssetType.PaletteNull, 0);
-                palette.SetCommonPalette(commonPalette);
-            }
+            if (palette == null)
+                return null;
+
+            var commonPalette = (byte[])LoadAssetCached(AssetType.PaletteNull, 0);
+            palette.SetCommonPalette(commonPalette);
 
             return palette;
         }

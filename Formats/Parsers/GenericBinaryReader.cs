@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 
 namespace UAlbion.Formats.Parsers
 {
@@ -14,7 +13,7 @@ namespace UAlbion.Formats.Parsers
         public GenericBinaryReader(BinaryReader br)
         {
             this.br = br;
-            offset = 0L;
+            offset = br.BaseStream.Position;
         }
 
         public SerializerMode Mode => SerializerMode.Reading;
@@ -53,7 +52,7 @@ namespace UAlbion.Formats.Parsers
 
         public void EnumU16<T>(string name, Func<T> getter, Action<T> setter, Func<T, (ushort, string)> infoFunc) where T : Enum
         {
-            setter((T)(object)br.ReadUInt16()); offset += 2L;
+            setter((T)(object)(int)br.ReadUInt16()); offset += 2L;
         }
 
         public void EnumU32<T>(string name, Func<T> getter, Action<T> setter, Func<T, (uint, string)> infoFunc) where T : Enum
@@ -64,72 +63,50 @@ namespace UAlbion.Formats.Parsers
         public void Guid(string name, Func<Guid> getter, Action<Guid> setter)
         {
             setter(new Guid(br.ReadBytes(16)));
-            offset = offset + 16L;
+            offset += 16L;
         }
 
         public void ByteArray(string name, Func<byte[]> getter, Action<byte[]> setter, int n)
         {
             var v = br.ReadBytes(n);
             setter(v);
-            offset = offset + v.Length;
+            offset += v.Length;
         }
 
         public void ByteArray2(string name, Func<byte[]> getter, Action<byte[]> setter, int n, string comment)
         {
             var v = br.ReadBytes(n);
             setter(v);
-            offset = offset + v.Length;
+            offset += v.Length;
         }
 
         public void ByteArrayHex(string name, Func<byte[]> getter, Action<byte[]> setter, int n)
         {
             var v = br.ReadBytes(n);
             setter(v);
-            offset = offset + v.Length;
+            offset += v.Length;
         }
 
         public void NullTerminatedString(string name, Func<string> getter, Action<string> setter)
         {
-            IEnumerable<char> Aux()
+            var bytes = new List<byte>();
+            for(;;)
             {
-                for (;;)
-                {
-                    var bytes = br.ReadBytes(2);
-                    offset += 2L;
-                    var codePoint = System.Text.Encoding.Unicode.GetChars(bytes)[0];
-                    if (codePoint == (char) 0) yield break;
-                    yield return codePoint;
-                }
+               var b = br.ReadByte();
+               if (b == 0)
+                   break;
+               bytes.Add(b);
             }
 
-            var str = new string(Aux().ToArray());
+            var str = FormatUtil.BytesTo850String(bytes.ToArray());
             setter(str);
         }
 
         public void FixedLengthString(string name, Func<string> getter, Action<string> setter, int length)
         {
-            IEnumerable<char> aux(int remaining)
-            {
-                for (; ; )
-                {
-                    var bytes = br.ReadBytes(2);
-                    var codePoint = System.Text.Encoding.Unicode.GetChars(bytes)[0];
-                    if (codePoint == (char)0) yield break;
-                    if (remaining > 2)
-                        br.ReadBytes(remaining - 2);
-                    else
-                        yield return codePoint;
-                    if (remaining < 0)
-                        throw new InvalidOperationException("Non-even string length passed to readUnicodeString");
-
-                    if (remaining == 0) yield break;
-                    remaining -= 2;
-                }
-            }
-
-            var str = new string(aux(length).ToArray());
+            var str = FormatUtil.BytesTo850String(br.ReadBytes(length));
             setter(str);
-            offset = offset + length;
+            offset += length;
             Debug.Assert(offset == br.BaseStream.Position);
         }
 
@@ -138,9 +115,14 @@ namespace UAlbion.Formats.Parsers
             var bytes = br.ReadBytes(length);
             foreach(var b in bytes)
                 if (b != v) throw new InvalidOperationException("Unexpected value found in repeating byte pattern");
-            offset = offset + length;
+            offset += length;
         }
 
         public void Meta(string name, Action<ISerializer> serializer, Action<ISerializer> deserializer) => deserializer(this);
+
+        public void Check()
+        {
+            Debug.Assert(offset == br.BaseStream.Position);
+        }
     }
 }

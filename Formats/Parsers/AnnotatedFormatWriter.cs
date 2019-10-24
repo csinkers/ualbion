@@ -241,5 +241,6 @@ namespace UAlbion.Formats.Parsers
             serializer(this);
             indent -= 4;
         }
+        public void Check() { }
     }
 }

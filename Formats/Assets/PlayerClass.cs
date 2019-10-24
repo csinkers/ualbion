@@ -2,8 +2,21 @@
 
 namespace UAlbion.Formats.Assets
 {
+    public enum PlayerClass : byte
+    {
+        Pilot = 0,
+        Scientist = 1,
+        IskaiWarrior = 2,
+        DjiKasMage = 3,
+        Druid = 4,
+        EnlightenedOne = 5,
+        Technician = 6,
+        OquloKamulos = 8,
+        Warrior = 9
+    }
+
     [Flags]
-    public enum PlayerClass : ushort
+    public enum PlayerClassMask : ushort
     {
         Pilot = 0x1,
         Scientist = 0x2,

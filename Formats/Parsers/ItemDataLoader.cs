@@ -22,7 +22,7 @@ namespace UAlbion.Formats.Parsers
                 item.TypeId = (ItemType)br.ReadByte();
                 item.SlotType = (ItemSlotId)br.ReadByte();
                 item.BreakRate = br.ReadByte();
-                item.AllowedGender = (Gender)br.ReadByte();
+                item.AllowedGender = (GenderMask)br.ReadByte();
                 item.Hands = br.ReadByte();
                 item.LpMaxBonus = br.ReadByte();
                 item.SpMaxBonus = br.ReadByte();
@@ -50,7 +50,7 @@ namespace UAlbion.Formats.Parsers
                 item.Weight = br.ReadUInt16();
                 item.Value = br.ReadUInt16();
                 item.Icon = br.ReadUInt16();
-                item.Class = (PlayerClass)br.ReadUInt16();
+                item.Class = (PlayerClassMask)br.ReadUInt16();
                 item.Race = br.ReadUInt16();
                 items.Add(item);
                 i++;

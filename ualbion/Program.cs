@@ -52,7 +52,8 @@ namespace UAlbion
 
             using var assets = new Assets(assetConfig, coreSpriteConfig);
             //DumpCoreSprites(assets, baseDir); return;
-            RunGame(assets, baseDir);
+            DumpCharacterSheets(assets);
+            // RunGame(assets, baseDir);
         }
 
         static void RunGame(IAssetManager assets, string baseDir)
@@ -245,6 +246,7 @@ namespace UAlbion
             foreach (var charId in Enum.GetValues(typeof(NpcCharacterId)))
                 chars.Add(assets.LoadCharacter(AssetType.NpcCharacterData, (int)charId));
 
+            chars = chars.Where(x => x != null).ToList();
             foreach (var c in chars)
             {
                 

@@ -21,7 +21,7 @@ namespace UAlbion.Formats.Assets
         public ItemType TypeId { get; set; }   //  1 Item type
         public ItemSlotId SlotType { get; set; }   //  2 Slot that can hold the item
         public byte BreakRate { get; set; }   //  3 Chance to break the item
-        public Gender AllowedGender { get; set; }   //  4 Determines which gender can use this item. 2 = female, 3 = any
+        public GenderMask AllowedGender { get; set; }   //  4 Determines which gender can use this item. 2 = female, 3 = any
         public byte Hands { get; set; }   //  5 Determines how many free hands are required to equip the item.
         public byte LpMaxBonus { get; set; }   //  6 Bonus value to life points.
         public byte SpMaxBonus { get; set; }   //  7 Bonus value to spell points.
@@ -49,7 +49,7 @@ namespace UAlbion.Formats.Assets
         public ushort Weight { get; set; }   // 30 weight of the item in grams
         public ushort Value { get; set; }   // 32 Base resell value * 10.
         public ushort Icon { get; set; }   // 34 Image for the item
-        public PlayerClass Class { get; set; }   // 36 A bitfield that controls which classes can use the item.
+        public PlayerClassMask Class { get; set; }   // 36 A bitfield that controls which classes can use the item.
         public ushort Race { get; set; }   // 38 Likely meant to control which race can use the item – but does not seem to work ?
 
         public override string ToString()
@@ -111,7 +111,7 @@ namespace UAlbion.Formats.Assets
                 sb.Append(' ');
             }
 
-            if(AllowedGender != Gender.Any)
+            if(AllowedGender != GenderMask.Any)
             {
                 sb.Append(AllowedGender.ToString());
                 sb.Append("Only ");

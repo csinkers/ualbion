@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets
@@ -11,11 +10,6 @@ namespace UAlbion.Formats.Assets
     public class AlbionStringTable
     {
         readonly IDictionary<int, string> _strings = new Dictionary<int, string>();
-
-        string BytesTo850String(byte[] bytes)
-        {
-            return Encoding.GetEncoding(850).GetString(bytes).Replace("×", "ß").TrimEnd((char) 0);
-        }
 
         public string this[int i] => _strings[i];
 
@@ -35,7 +29,7 @@ namespace UAlbion.Formats.Assets
                     for (int i = 1; i <= stringCount; i++)
                     {
                         var bytes = br.ReadBytes(stringLengths[i]);
-                        _strings[i] = BytesTo850String(bytes);
+                        _strings[i] = FormatUtil.BytesTo850String(bytes);
                     }
 
                     break;
@@ -43,7 +37,7 @@ namespace UAlbion.Formats.Assets
 
                 case StringTableType.SystemText:
                 {
-                    var fullText = BytesTo850String(br.ReadBytes((int)streamLength));
+                    var fullText = FormatUtil.BytesTo850String(br.ReadBytes((int)streamLength));
                     var lines = fullText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var line in lines)
                     {
@@ -63,7 +57,7 @@ namespace UAlbion.Formats.Assets
                     for (int i = 0; i < streamLength / stringSize; i++)
                     {
                         var bytes = br.ReadBytes(stringSize).Where(x => x != (char)0).ToArray();
-                        _strings[i] = BytesTo850String(bytes);
+                        _strings[i] = FormatUtil.BytesTo850String(bytes);
                     }
                     break;
                 }

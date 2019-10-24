@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets
@@ -128,7 +129,48 @@ namespace UAlbion.Formats.Assets
         public byte Unknown14 { get; set; }
         public byte Unknown15 { get; set; }
         public byte Unknown16 { get; set; }
-        public ushort Unknown1c { get; set; }
+        public ushort Unknown1C { get; set; }
+        public ushort Unknown20 { get; set; }
+        public ushort Unknown22 { get; set; }
+
+        public ushort Unknown24 { get; set; }
+        public ushort Unknown26 { get; set; }
+        public ushort Unknown28 { get; set; }
+        public ushort Unknown2E { get; set; }
+        public ushort Unknown30 { get; set; }
+        public ushort Unknown36 { get; set; }
+        public ushort Unknown38 { get; set; }
+        public ushort Unknown3E { get; set; }
+        public ushort Unknown40 { get; set; }
+        public ushort Unknown46 { get; set; }
+        public ushort Unknown48 { get; set; }
+        public ushort Unknown4E { get; set; }
+        public ushort Unknown50 { get; set; }
+        public ushort Unknown56 { get; set; }
+        public ushort Unknown58 { get; set; }
+        public ushort Unknown5E { get; set; }
+        public ushort Unknown60 { get; set; }
+        public ushort Unknown66 { get; set; }
+        public ushort Unknown68 { get; set; }
+        public byte[] UnknownBlock6C { get; set; }
+        public ushort Unknown7E { get; set; }
+        public ushort Unknown80 { get; set; }
+        public ushort Unknown86 { get; set; }
+        public ushort Unknown88 { get; set; }
+        public ushort Unknown8E { get; set; }
+        public ushort Unknown90 { get; set; }
+        public byte[] UnknownBlock96 { get; set; }
+        public ushort Unknownce { get; set; }
+        public ushort UnknownD6 { get; set; }
+        public byte[] UnknownBlockDA { get; set; }
+        public ushort UnknownFA { get; set; }
+        public ushort UnknownFC { get; set; }
+        public ushort BaseProtection { get; set; }
+        public ushort BaseDamage { get; set; }
+        public uint Experience { get; set; }
+        public uint[] KnownSpells { get; set; }
+        public byte[][] SpellsStrengths { get; set; }
+        public List<ItemSlot> BackpackSlots { get; set; }
     }
 
     public class ItemSlot

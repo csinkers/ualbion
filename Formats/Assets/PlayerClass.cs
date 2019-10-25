@@ -12,7 +12,8 @@ namespace UAlbion.Formats.Assets
         EnlightenedOne = 5,
         Technician = 6,
         OquloKamulos = 8,
-        Warrior = 9
+        Warrior = 9,
+        Monster = 31
     }
 
     [Flags]

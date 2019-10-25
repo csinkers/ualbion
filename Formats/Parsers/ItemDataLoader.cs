@@ -39,7 +39,7 @@ namespace UAlbion.Formats.Parsers
                 item.SkillTax2 = br.ReadByte();
                 item.Activate = br.ReadByte();
                 item.AmmoAnim = br.ReadByte();
-                item.SpellClass = (SpellClassId)br.ReadByte();
+                item.SpellClass = (SpellClassMask)br.ReadByte();
                 item.SpellEffect = br.ReadByte();
                 item.Charges = br.ReadByte();
                 item.EnchantmentCount = br.ReadByte();

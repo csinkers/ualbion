@@ -36,4 +36,63 @@ namespace UAlbion.Formats.Parsers
         void EnumU16<T>(string name, Func<T> getter, Action<T> setter, Func<T, (ushort, string)> getMeta) where T : Enum;
         void EnumU32<T>(string name, Func<T> getter, Action<T> setter, Func<T, (uint, string)> getMeta) where T : Enum;
     }
+
+    public static class SerializerExtensions
+    {
+        static ushort SwapBytes16(ushort x)
+        {
+            // swap adjacent 8-bit blocks
+            ushort a = (ushort) ((x & 0xFF00) >> 8);
+            ushort b = (ushort) ((x & 0x00FF) << 8);
+            return (ushort) (a | b);
+        }
+
+        static uint SwapBytes32(uint x)
+        {
+            // swap adjacent 16-bit blocks
+            x = ((x & 0xFFFF0000) >> 16) | ((x & 0x0000FFFF) << 16);
+            // swap adjacent 8-bit blocks
+            return ((x & 0xFF00FF00) >> 8) | ((x & 0x00FF00FF) << 8);
+        }
+
+        static ulong SwapBytes64(ulong x)
+        {
+            // swap adjacent 32-bit blocks
+            x = (x >> 32) | (x << 32);
+            // swap adjacent 16-bit blocks
+            x = ((x & 0xFFFF0000FFFF0000) >> 16) | ((x & 0x0000FFFF0000FFFF) << 16);
+            // swap adjacent 8-bit blocks
+            return ((x & 0xFF00FF00FF00FF00) >> 8) | ((x & 0x00FF00FF00FF00FF) << 8);
+        }
+
+        public static void Int16LE(this ISerializer s, string name, Func<short> getter, Action<short> setter) =>
+            s.Int16(name,
+                () => (short)SwapBytes16((ushort)getter()),
+                x => setter((short)SwapBytes16((ushort)x)));
+
+        public static void Int32LE(this ISerializer s, string name, Func<int> getter, Action<int> setter) =>
+            s.Int32(name,
+                () => (int)SwapBytes32((uint)getter()),
+                x => setter((int)SwapBytes32((uint)x)));
+
+        public static void Int64LE(this ISerializer s, string name, Func<long> getter, Action<long> setter) =>
+            s.Int64(name,
+                () => (long)SwapBytes64((ulong)getter()),
+                x => setter((long)SwapBytes64((ulong)x)));
+
+        public static void UInt16LE(this ISerializer s, string name, Func<ushort> getter, Action<ushort> setter) =>
+            s.UInt16(name,
+                () => SwapBytes16(getter()),
+                x => setter(SwapBytes16(x)));
+
+        public static void UInt32LE(this ISerializer s, string name, Func<uint> getter, Action<uint> setter) =>
+            s.UInt32(name,
+                () => SwapBytes32(getter()),
+                x => setter(SwapBytes32(x)));
+
+        public static void UInt64LE(this ISerializer s, string name, Func<ulong> getter, Action<ulong> setter) =>
+            s.UInt64(name,
+                () => SwapBytes64(getter()),
+                x => setter(SwapBytes64(x)));
+    }
 }

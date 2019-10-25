@@ -241,12 +241,14 @@ namespace UAlbion
         static void DumpCharacterSheets(IAssetManager assets)
         {
             var chars = new List<CharacterSheet>();
-            foreach (var charId in Enum.GetValues(typeof(PartyCharacterId)))
-                chars.Add(assets.LoadCharacter(AssetType.PartyCharacterData, (int)charId));
-            foreach (var charId in Enum.GetValues(typeof(NpcCharacterId)))
-                chars.Add(assets.LoadCharacter(AssetType.NpcCharacterData, (int)charId));
+            foreach (PartyCharacterId charId in Enum.GetValues(typeof(PartyCharacterId)))
+                chars.Add(assets.LoadCharacter(AssetType.PartyMember, charId));
+            foreach (NpcCharacterId charId in Enum.GetValues(typeof(NpcCharacterId)))
+                chars.Add(assets.LoadCharacter(AssetType.Npc, charId));
+            foreach (MonsterCharacterId charId in Enum.GetValues(typeof(MonsterCharacterId)))
+                chars.Add(assets.LoadCharacter(AssetType.Monster, charId));
 
-            chars = chars.Where(x => x != null).ToList();
+            chars = chars.Where(x => x != null && (x.GermanName != "" || x.PortraitId != 0)).ToList();
             foreach (var c in chars)
             {
                 

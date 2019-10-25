@@ -38,7 +38,7 @@ namespace UAlbion.Formats.Assets
         public byte SkillTax2 { get; set; }   // 18 Skill Tax 2 value. Ranged Values
         public byte Activate { get; set; }   // 19 Activate enables compass (0), monster eye (1) or clock (3) (if type=0×13) / Torch intensity (if type=0×16)
         public byte AmmoAnim { get; set; }   // 20 Ammo combat animation (long-range weapons only)
-        public SpellClassId SpellClass { get; set; }   // 21 Spell Class
+        public SpellClassMask SpellClass { get; set; }   // 21 Spell Class (TODO: Is this SpellClass or SpellClassMask?)
         public byte SpellEffect { get; set; }   // 22 Spell Id
         public byte Charges { get; set; }   // 23 Charges left in item / Torch lifetime (if type=0×16)
         public byte EnchantmentCount { get; set; }   // 24 Number of times item was enchanted/recharged

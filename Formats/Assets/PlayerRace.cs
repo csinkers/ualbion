@@ -7,5 +7,9 @@ namespace UAlbion.Formats.Assets
     {
         Terran,
         Iskai,
+        Celt,
+        KengetKamulos,
+        DjiCantos,
+        Mahino
     }
 }

@@ -1,5 +1,8 @@
-﻿namespace UAlbion.Formats.Assets
+﻿using System;
+
+namespace UAlbion.Formats.Assets
 {
+    [Flags]
     public enum PlayerLanguage : byte
     {
         Terran = 1,

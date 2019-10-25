@@ -4,6 +4,7 @@
     {
         Male = 0,
         Female = 1,
+        Neuter = 1,
     }
 
     public enum GenderMask : byte

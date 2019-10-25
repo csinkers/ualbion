@@ -87,9 +87,9 @@ namespace UAlbion.Game
             { AssetType.AutomapGraphics,    (AssetLocation.Base,      "AUTOGFX!.XLD") }, // Tiles for the map screen on 3D maps
 
             // Combat assets
-            { AssetType.PartyCharacterData, (AssetLocation.Initial,   "PRTCHAR!.XLD") }, // Character statistics for party members
-            { AssetType.NpcCharacterData,   (AssetLocation.Initial,   "NPCCHAR!.XLD") }, // NPC character statistics
-            { AssetType.MonsterCharacter,   (AssetLocation.Base,      "MONCHAR!.XLD") }, // Monster character statistics
+            { AssetType.PartyMember, (AssetLocation.Initial,   "PRTCHAR!.XLD") }, // Character statistics for party members
+            { AssetType.Npc,   (AssetLocation.Initial,   "NPCCHAR!.XLD") }, // NPC character statistics
+            { AssetType.Monster,   (AssetLocation.Base,      "MONCHAR!.XLD") }, // Monster character statistics
             { AssetType.MonsterGroup,       (AssetLocation.Base,      "MONGRP!.XLD" ) }, // Pre-defined monster groupings for combat
             { AssetType.MonsterGraphics,    (AssetLocation.Base,      "MONGFX!.XLD" ) }, // Monster sprites on the 3D combat screen
             { AssetType.CombatGraphics,     (AssetLocation.Base,      "COMGFX!.XLD" ) }, // Various sprites and effects for 3D combat screen, spells etc
@@ -382,7 +382,9 @@ namespace UAlbion.Game
 
         public AlbionSample LoadSample(AssetType type, int id) => (AlbionSample)LoadAssetCached(type, id);
         public AlbionVideo LoadVideo(VideoId id, GameLanguage language) => (AlbionVideo)LoadAsset(AssetType.Flic, (int)id, $"Video:{id}", language); // Don't cache videos.
-        public CharacterSheet LoadCharacter(AssetType type, int id) => (CharacterSheet)LoadAssetCached(type, id);
+        public CharacterSheet LoadCharacter(AssetType type, PartyCharacterId id) => (CharacterSheet)LoadAssetCached(type, id);
+        public CharacterSheet LoadCharacter(AssetType type, NpcCharacterId id) => (CharacterSheet)LoadAssetCached(type, id);
+        public CharacterSheet LoadCharacter(AssetType type, MonsterCharacterId id) => (CharacterSheet)LoadAssetCached(type, id);
 
         public void Dispose()
         {

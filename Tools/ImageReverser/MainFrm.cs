@@ -63,7 +63,7 @@ namespace UAlbion.Tools.ImageReverser
             foreach (var file in files)
             {
                 var absDir = Path.GetDirectoryName(file);
-                var relativeDir = absDir.Substring(exportedDir.Length).TrimStart('\\');
+                var relativeDir = absDir.Substring(exportedDir.Length).TrimStart('\\').Replace("\\", "/");
                 if (relativeDir.Length == 0)
                     continue;
 

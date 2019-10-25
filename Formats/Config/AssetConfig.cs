@@ -71,7 +71,7 @@ namespace UAlbion.Formats.Config
             {
                 config = new AssetConfig
                 {
-                    XldPath = @"albion_sr\CD\XLDLIBS",
+                    XldPath = @"albion_sr/CD/XLDLIBS",
                     ExportedXldPath = @"exported"
                 };
             }

@@ -1,6 +1,6 @@
 {
     "Global": {
-        "Escape": "main_menu",
+        "Escape": "push_scene MainMenu",
         "Tilde": "toggle_console",
         "Alt+F4": "quit",
         "BracketLeft": "e:mag -1",

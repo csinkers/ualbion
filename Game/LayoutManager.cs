@@ -13,8 +13,6 @@ namespace UAlbion.Game
 {
     public interface ILayoutManager
     {
-        void Add(IUiElement topLevelElement, DialogPositioning positioning);
-        void Remove(IUiElement topLevelElement);
     }
 
     public enum DialogPositioning
@@ -38,14 +36,15 @@ namespace UAlbion.Game
             H<LayoutManager, ScreenCoordinateSelectEvent>((x,e) => x.Select(e))
         );
 
-        readonly IDictionary<IUiElement, DialogPositioning> _elements = new Dictionary<IUiElement, DialogPositioning>(); // Top-level elements
         IReadOnlyList<IUiElement> _lastSelection = new List<IUiElement>();
 
         void DoLayout(Action<Rectangle, IUiElement> action)
         {
             int uiWidth = UiConstants.ActiveAreaExtents.Width;
             int uiHeight = UiConstants.ActiveAreaExtents.Height;
-            foreach (var (element, positioning) in _elements)
+            var elements = new List<(IUiElement, DialogPositioning)>();
+            Raise(new CollectDialogsEvent(elements.Add));
+            foreach (var (element, positioning) in elements)
             {
                 var size = element.GetSize();
 
@@ -135,28 +134,6 @@ namespace UAlbion.Game
         }
 
         public LayoutManager() : base(Handlers) { }
-        public void Add(IUiElement topLevelElement, DialogPositioning positioning)
-        {
-            _elements[topLevelElement] = positioning;
-        }
-
-        public void Remove(IUiElement topLevelElement)
-        {
-            _elements.Remove(topLevelElement);
-        }
     }
 
-    public class UiSelectedEvent : GameEvent, IVerboseEvent
-    {
-        public IReadOnlyList<IUiElement> SelectedItems { get; }
-        public IReadOnlyList<IUiElement> FocusedItems { get; }
-        public IReadOnlyList<IUiElement> BlurredItems { get; }
-
-        public UiSelectedEvent(IEnumerable<IUiElement> selectedItems, IEnumerable<IUiElement> focused, IEnumerable<IUiElement> blurred)
-        {
-            SelectedItems = new List<IUiElement>(selectedItems);
-            FocusedItems = new List<IUiElement>(focused);
-            BlurredItems = new List<IUiElement>(blurred);
-        }
-    }
 }

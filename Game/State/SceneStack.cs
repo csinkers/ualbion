@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
-using UAlbion.Core.Events;
+using UAlbion.Core;
+using UAlbion.Game.Events;
 
-namespace UAlbion.Core
+namespace UAlbion.Game.State
 {
     public class SceneStack : Component
     {
@@ -28,8 +29,8 @@ namespace UAlbion.Core
             })
         );
 
-        readonly Stack<int> _stack = new Stack<int>();
-        int _sceneId = 0;
+        readonly Stack<SceneId> _stack = new Stack<SceneId>();
+        SceneId _sceneId;
         public SceneStack() : base(Handlers) { }
     }
 }

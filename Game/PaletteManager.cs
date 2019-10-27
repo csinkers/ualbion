@@ -1,28 +1,35 @@
 ﻿using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Core.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
-    public class PaletteManager : Component
+    public class PaletteManager : Component, IPaletteManager
     {
         static readonly HandlerSet Handlers = new HandlerSet(
             H<PaletteManager, UpdateEvent>((x, e) =>
             {
                 x._ticks++;
-                if(x._palette.IsAnimated)
-                    x.EmitPalette();
+                if(x._logicalPalette.IsAnimated)
+                    x.GeneratePalette();
             }),
             H<PaletteManager, SubscribedEvent>((x, e) => x.SetPalette(PaletteId.Main3D)),
             H<PaletteManager, LoadPaletteEvent>((x, e) => x.SetPalette(e.PaletteId))
         );
 
-        AlbionPalette _palette;
+        AlbionPalette _logicalPalette;
+        public Palette Palette { get; private set; }
         int _ticks;
 
         public PaletteManager() : base(Handlers) { }
+        protected override void Subscribed()
+        {
+            SetPalette(PaletteId.Toronto2D);
+            base.Subscribed();
+        }
 
         void SetPalette(PaletteId paletteId)
         {
@@ -33,13 +40,13 @@ namespace UAlbion.Game
                 return;
             }
 
-            _palette = palette;
-            EmitPalette();
+            _logicalPalette = palette;
+            GeneratePalette();
         }
 
-        void EmitPalette()
+        void GeneratePalette()
         {
-            Exchange.Raise(new SetRawPaletteEvent(_palette.Name, _palette.GetPaletteAtTime(_ticks)), this);
+            Palette = new Palette(_logicalPalette.Name, _logicalPalette.GetPaletteAtTime(_ticks));
         }
     }
 }

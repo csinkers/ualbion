@@ -71,7 +71,7 @@ namespace UAlbion.Game.Gui
         IUiElement GetActivePage() =>
             _modeGetter() switch
             {
-                InventoryMode.Merchant => _merchant,
+                InventoryMode.Merchant => (IUiElement)_merchant,
                 InventoryMode.Chest => _chest,
                 InventoryMode.Summary => _summary,
                 InventoryMode.Stats => _stats,
@@ -92,10 +92,6 @@ namespace UAlbion.Game.Gui
         Label _lblExperiencePoints;
         Label _lblTrainingPoints;
         public Vector2 Size { get; }
-
-        public void Render(Rectangle position, int order, Action<IRenderable> addFunc)
-        {
-        }
     }
 
     public class InventoryStatsPage : UiElement // Stats
@@ -117,10 +113,6 @@ namespace UAlbion.Game.Gui
         AlbionIndicator _criticalChance;
         AlbionIndicator _lockPicking;
         public Vector2 Size { get; }
-
-        public void Render(Rectangle position, int order, Action<IRenderable> addFunc)
-        {
-        }
     }
 
     public class InventoryMiscPage : UiElement
@@ -135,10 +127,6 @@ namespace UAlbion.Game.Gui
 
         Button _combatPositions;
         public Vector2 Size { get; }
-
-        public void Render(Rectangle position, int order, Action<IRenderable> addFunc)
-        {
-        }
     }
     public class InventoryMerchantPage : UiElement
     {
@@ -177,10 +165,6 @@ namespace UAlbion.Game.Gui
         Label _weight;
         Label _protection;
         public Vector2 Size { get; }
-
-        public void Render(Rectangle position, int order, Action<IRenderable> addFunc)
-        {
-        }
     }
 
     public class InventoryRightPane : UiElement

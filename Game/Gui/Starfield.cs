@@ -63,12 +63,6 @@ namespace UAlbion.Game.Gui
             };
         }
 
-        protected override void Subscribed()
-        {
-            var layout = Resolve<ILayoutManager>();
-            layout.Add(this, DialogPositioning.Center);
-        }
-
         public override Vector2 GetSize()
         {
             var window = Resolve<IWindowManager>();

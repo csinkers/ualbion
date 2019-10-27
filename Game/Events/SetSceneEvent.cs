@@ -1,16 +1,16 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion.Core.Events
+namespace UAlbion.Game.Events
 {
     [Event("set_scene", "Set the active scene")]
-    public class SetSceneEvent : EngineEvent
+    public class SetSceneEvent : GameEvent
     {
-        public SetSceneEvent(int sceneId)
+        public SetSceneEvent(SceneId sceneId)
         {
             SceneId = sceneId;
         }
 
         [EventPart("id", "The identifier of the scene to activate")]
-        public int SceneId { get; }
+        public SceneId SceneId { get; }
     }
 }

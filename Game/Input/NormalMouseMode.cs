@@ -16,15 +16,15 @@ namespace UAlbion.Game.Input
 
         void OnSelect(UiSelectedEvent e)
         {
-            IUiEvent newEvent = new UiHoverEvent();
-            foreach (var element in e.FocusedItems)
+            IUiEvent newEvent = new UiBlurEvent();
+            foreach (var element in e.BlurredItems)
             {
                 if (!newEvent.Propagating) break;
                 element.Receive(newEvent, this);
             }
 
-            newEvent = new UiBlurEvent();
-            foreach (var element in e.BlurredItems)
+            newEvent = new UiHoverEvent();
+            foreach (var element in e.FocusedItems)
             {
                 if (!newEvent.Propagating) break;
                 element.Receive(newEvent, this);

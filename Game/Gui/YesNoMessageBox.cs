@@ -1,22 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Gui
 {
-    public class Dialog : UiElement
-    {
-        protected Dialog(IDictionary<Type, Handler> handlers) : base(handlers) { }
-        protected DialogPositioning Positioning { get; set; } = DialogPositioning.Center;
-        protected override void Subscribed()
-        {
-            var layout = Resolve<ILayoutManager>();
-            layout.Add(this, Positioning);
-        }
-    }
-
     class YesNoMessageBox : Dialog
     {
         const string YesButtonKey = "YesNoDialog.YesButton";

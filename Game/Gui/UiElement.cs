@@ -28,16 +28,6 @@ namespace UAlbion.Game.Gui
 
         protected UiElement(IDictionary<Type, Handler> handlers) : base(handlers) { }
 
-        public override void Detach()
-        {
-            if (Exchange == null)
-                return;
-
-            var layout = Resolve<ILayoutManager>();
-            layout?.Remove(this);
-            base.Detach();
-        }
-
         protected int RenderChildren(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
             int maxOrder = order;

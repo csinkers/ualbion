@@ -9,45 +9,36 @@ namespace UAlbion.Core
 {
     public class Scene : Component, IScene
     {
-        readonly IList<Type> _activeRendererTypes;
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<Scene, SetRawPaletteEvent>((x, e) => x._palette = new Palette(e.Name, e.Entries)),
-            H<Scene, SetSceneEvent>((x, e) => x.SceneExchange.IsActive = e.SceneId == x.Id),
-            H<Scene, SetClearColourEvent>((x, e) => x._clearColour = new RgbaFloat(e.Red, e.Green, e.Blue, 1.0f)),
-            H<Scene, SubscribedEvent>((x, e) => x.SceneExchange.Attach(x.Camera))
+            H<Scene, CollectScenesEvent>((x, e) => e.Register(x)),
+            H<Scene, SetClearColourEvent>((x, e) => x._clearColour = new RgbaFloat(e.Red, e.Green, e.Blue, 1.0f))
         );
 
         readonly IDictionary<Type, IList<IRenderable>> _renderables = new Dictionary<Type, IList<IRenderable>>();
         readonly IDictionary<int, IList<IRenderable>> _processedRenderables = new Dictionary<int, IList<IRenderable>>();
+        readonly IList<Type> _activeRendererTypes;
         Palette _palette;
-        CommandList _resourceUpdateCl;
         RgbaFloat _clearColour;
 
-        int Id { get; }
-        public EventExchange SceneExchange { get; }
         public string Name { get; }
         public ICamera Camera { get; }
 
-        protected Scene(int sceneId, string name, ICamera camera, IList<Type> activeActiveRendererTypeTypes, EventExchange sceneExchange) : base(Handlers)
+        protected Scene(string name, ICamera camera, IList<Type> activeRendererTypes) : base(Handlers)
         {
-            Id = sceneId;
             Name = name;
             Camera = camera;
-            _activeRendererTypes = activeActiveRendererTypeTypes;
-            SceneExchange = sceneExchange;
+            Children.Add(Camera);
+            _activeRendererTypes = activeRendererTypes;
         }
 
         public void Add(IRenderable renderable) { } // TODO
         public void Remove(IRenderable renderable) { } // TODO
 
-        public override string ToString() => $"Scene:{Name} {(SceneExchange.IsActive ? "Active" : "")}";
+        public override string ToString() => $"Scene:{Name}";
 
         public void RenderAllStages(GraphicsDevice gd, CommandList cl, SceneContext sc, IDictionary<Type, IRenderer> renderers)
         {
-            if (!SceneExchange.IsActive)
-                return;
-
             sc.SetCurrentScene(this);
 
             // Collect all renderables from components
@@ -66,21 +57,25 @@ namespace UAlbion.Core
             foreach(var renderer in _renderables)
                 CoreTrace.Log.CollectedRenderables(renderer.Key.Name, 0, renderer.Value.Count);
 
-            sc.PaletteView?.Dispose();
-            sc.PaletteTexture?.Dispose();
-            CoreTrace.Log.Info("Scene", "Disposed palette device texture");
-            sc.PaletteTexture = _palette.CreateDeviceTexture(gd, gd.ResourceFactory, TextureUsage.Sampled);
-            sc.PaletteView = gd.ResourceFactory.CreateTextureView(sc.PaletteTexture);
+            var newPalette = Resolve<IPaletteManager>().Palette;
+            if (_palette != newPalette)
+            {
+                sc.PaletteView?.Dispose();
+                sc.PaletteTexture?.Dispose();
+                CoreTrace.Log.Info("Scene", "Disposed palette device texture");
+                _palette = newPalette;
+                sc.PaletteTexture = _palette.CreateDeviceTexture(gd, gd.ResourceFactory, TextureUsage.Sampled);
+                sc.PaletteView = gd.ResourceFactory.CreateTextureView(sc.PaletteTexture);
+            }
             CoreTrace.Log.Info("Scene", "Created palette device texture");
 
-            _resourceUpdateCl.Begin();
-            using (new RenderDebugGroup(_resourceUpdateCl, "Prepare per-frame resources"))
+            using (new RenderDebugGroup(cl, "Prepare per-frame resources"))
             {
                 _processedRenderables.Clear();
                 foreach (var renderableGroup in _renderables)
                 {
                     var renderer = renderers[renderableGroup.Key];
-                    foreach (var renderable in renderer.UpdatePerFrameResources(gd, _resourceUpdateCl, sc,
+                    foreach (var renderable in renderer.UpdatePerFrameResources(gd, cl, sc,
                         renderableGroup.Value))
                     {
                         if (!_processedRenderables.ContainsKey(renderable.RenderOrder))
@@ -93,9 +88,6 @@ namespace UAlbion.Core
                     _processedRenderables.Count,
                     _processedRenderables.Sum(x => x.Value.Count));
             }
-            _resourceUpdateCl.End();
-            gd.SubmitCommands(_resourceUpdateCl);
-            CoreTrace.Log.Info("Scene", "Submitted resource update commandlist");
 
             var orderedKeys = _processedRenderables.Keys.OrderBy(x => x).ToList();
             CoreTrace.Log.Info("Scene", "Sorted processed renderables");
@@ -167,17 +159,6 @@ namespace UAlbion.Core
                 if ((renderer.RenderPasses & pass) != 0)
                     renderer.Render(gd, cl, sc, pass, renderable);
             }
-        }
-
-        internal void DestroyAllDeviceObjects()
-        {
-            _resourceUpdateCl.Dispose();
-        }
-
-        internal void CreateAllDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
-        {
-            _resourceUpdateCl = gd.ResourceFactory.CreateCommandList();
-            _resourceUpdateCl.Name = "Scene Resource Update Command List";
         }
     }
 }

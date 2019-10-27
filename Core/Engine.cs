@@ -4,8 +4,8 @@ using System.Numerics;
 using System;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
-using UAlbion.Core.Visual;
 using ImGuiNET;
+using UAlbion.Api;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 using Veldrid;
@@ -37,14 +37,10 @@ namespace UAlbion.Core
         Sdl2Window Window => _windowManager.Window;
 
         readonly IDictionary<Type, IRenderer> _renderers = new Dictionary<Type, IRenderer>();
-        readonly IList<Scene> _scenes = new List<Scene>();
         readonly FrameTimeAverager _frameTimeAverager = new FrameTimeAverager(0.5);
-        readonly FullScreenQuad _fullScreenQuad;
-        readonly DebugGuiRenderer _igRenderable;
         readonly SceneContext _sceneContext = new SceneContext();
         readonly WindowManager _windowManager = new WindowManager();
 
-        //public Scene Scene { get; private set; }
         CommandList _frameCommands;
         TextureSampleCount? _newSampleCount;
         bool _windowResized;
@@ -69,27 +65,19 @@ namespace UAlbion.Core
             CheckForErrors();
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
 
-            _igRenderable = new DebugGuiRenderer();
-            _fullScreenQuad = new FullScreenQuad();
-            var duplicator = new ScreenDuplicator();
-
-            AddRenderer(_igRenderable);
-            AddRenderer(duplicator);
-            AddRenderer(_fullScreenQuad);
             GlobalExchange
                 .Register<IWindowManager>(_windowManager)
                 .Attach(this)
                 .Attach(new DebugMenus(this));
         }
 
-        public void AddRenderer(IRenderer renderer)
+        public Engine AddRenderer(IRenderer renderer)
         {
             _renderers.Add(renderer.GetType(), renderer);
             if (renderer is IComponent component)
                 GlobalExchange.Attach(component);
+            return this;
         }
-
-        public Engine AddScene(Scene scene) { _scenes.Add(scene); return this; }
 
         public void Run()
         {
@@ -191,7 +179,11 @@ namespace UAlbion.Core
             }
 
             _frameCommands.Begin();
-            foreach (var scene in _scenes)
+
+            var scenes = new List<Scene>();
+            Raise(new CollectScenesEvent(scenes.Add));
+
+            foreach (var scene in scenes)
                 scene.RenderAllStages(GraphicsDevice, _frameCommands, _sceneContext, _renderers);
             CoreTrace.Log.Info("Engine", "Swapping buffers...");
             GraphicsDevice.SwapBuffers();
@@ -258,8 +250,6 @@ namespace UAlbion.Core
             foreach (var r in _renderers.Values)
                 r.CreateDeviceObjects(GraphicsDevice, initCL, _sceneContext);
 
-            foreach (var scene in _scenes)
-                scene.CreateAllDeviceObjects(GraphicsDevice, initCL, _sceneContext);
             initCL.End();
             GraphicsDevice.SubmitCommands(initCL);
             initCL.Dispose();
@@ -273,8 +263,6 @@ namespace UAlbion.Core
             foreach (var r in _renderers.Values)
                 r.DestroyDeviceObjects();
 
-            foreach (var scene in _scenes)
-                scene.DestroyAllDeviceObjects();
             StaticResourceCache.DestroyAllDeviceObjects();
             Resolve<ITextureManager>()?.DestroyDeviceObjects();
             GraphicsDevice.WaitForIdle();
@@ -282,9 +270,11 @@ namespace UAlbion.Core
 
         public void Dispose()
         {
-            _igRenderable?.Dispose();
             _frameCommands?.Dispose();
-            _fullScreenQuad?.Dispose();
+            foreach(var renderer in _renderers.Values)
+                if (renderer is IDisposable disposable)
+                    disposable.Dispose();
+
             //_graphicsDevice?.Dispose();
         }
 
@@ -292,6 +282,12 @@ namespace UAlbion.Core
         {
             /*GraphicsDevice?.CheckForErrors();*/
         }
+    }
+
+    public class CollectScenesEvent : EngineEvent, IVerboseEvent
+    {
+        public CollectScenesEvent(Action<Scene> register) { Register = register; }
+        public Action<Scene> Register { get; }
     }
 }
 

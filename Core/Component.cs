@@ -65,6 +65,9 @@ namespace UAlbion.Core
 
         public void Attach(EventExchange exchange)
         {
+            if (Exchange == exchange)
+                return;
+
             if (Exchange != null)
                 throw new InvalidOperationException("A component can only be registered in one exchange at a time.");
 

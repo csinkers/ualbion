@@ -46,7 +46,7 @@ namespace UAlbion.Game.Gui
 
         public override Vector2 GetSize() => new Vector2(UiConstants.StatusBarExtents.Width, UiConstants.StatusBarExtents.Height);
 
-        void DoLayout(Rectangle extents, Action<Rectangle, IUiElement> action)
+        void DoLayout(Rectangle extents, Action<Rectangle, IUiElement> action, bool trimOverlap)
         {
             action(extents, _sprite);
             action(extents, _hoverTextContainer);
@@ -65,24 +65,32 @@ namespace UAlbion.Game.Gui
                 var portraitExtents = new Rectangle(
                     extents.X + 4 + 28 * i,
                     extents.Y + 3,
-                    (int)portrait.GetSize().X,
+                    (int)portrait.GetSize().X - (trimOverlap ? 6 : 0),
                     (int)portrait.GetSize().Y);
                 action(portraitExtents, portrait);
             }
         }
 
-        public override void Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+        public override void Select(
+            Vector2 uiPosition,
+            Rectangle extents,
+            int order,
+            Action<int, object> registerHitFunc)
         {
             if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
                 return;
 
-            DoLayout(extents, (rect, x) => x.Select(uiPosition, rect, order, registerHitFunc));
+            DoLayout(extents,
+                (rect, x) => x.Select(uiPosition, rect, order, registerHitFunc),
+                true);
         }
 
         public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
             int maxOrder = order;
-            DoLayout(extents, (rect, x) => { maxOrder = Math.Max(maxOrder, x.Render(rect, order, addFunc)); });
+            DoLayout(extents,
+                (rect, x) => { maxOrder = Math.Max(maxOrder, x.Render(rect, order, addFunc)); },
+                false);
             return maxOrder;
         }
     }

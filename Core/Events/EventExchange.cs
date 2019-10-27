@@ -169,13 +169,17 @@ namespace UAlbion.Core.Events
             }
         }
 
-        public EventExchange Register<T>(T system)
+        public EventExchange Register<T>(T system) => Register(typeof(T), system);
+        public EventExchange Register(Type type, object system)
         {
-            if(_registrations.ContainsKey(typeof(T)))
-                throw new InvalidOperationException("Only one instance can be registered per type / interface in a given exchange.");
-            _registrations.Add(typeof(T), system);
+            if (_registrations.ContainsKey(type))
+            {
+                if (_registrations[type] != system)
+                    throw new InvalidOperationException("Only one instance can be registered per type / interface in a given exchange.");
+            }
+            else _registrations.Add(type, system);
 
-            if(system is IComponent component && !_subscribers.ContainsKey(component))
+            if (system is IComponent component && !_subscribers.ContainsKey(component))
                 Attach(component);
 
             return this;

@@ -1,6 +1,5 @@
-﻿namespace UAlbion.Game
+﻿using UAlbion.Core.Textures;
+
+namespace UAlbion.Game
 {
-    public interface IPaletteManager
-    {
-    }
 }

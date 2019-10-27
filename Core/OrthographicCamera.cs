@@ -21,12 +21,15 @@ namespace UAlbion.Core
                 x.Raise(new SetCameraMagnificationEvent(x._magnification));
             }),
 
-            // BUG: This event is not received when the screen is resized while a 3D scene is active.
-            H<OrthographicCamera, WindowResizedEvent>((x, e) =>
+            H<OrthographicCamera, RenderEvent>((x, e) =>
             {
-                x.WindowWidth = e.Width;
-                x.WindowHeight = e.Height;
-                x.UpdatePerspectiveMatrix();
+                var window = x.Resolve<IWindowManager>();
+                var size = new Vector2(window.PixelWidth, window.PixelHeight);
+                if (x._windowSize != size)
+                {
+                    x._windowSize = size;
+                    x.UpdatePerspectiveMatrix();
+                }
             })
         );
 
@@ -34,7 +37,7 @@ namespace UAlbion.Core
         {
             var totalMatrix = ViewMatrix * ProjectionMatrix;
             var inverse = totalMatrix.Inverse();
-            var normalisedScreenPosition = new Vector3(2 * e.Position.X / WindowWidth - 1.0f, -2 * e.Position.Y / WindowHeight + 1.0f, 0.0f);
+            var normalisedScreenPosition = new Vector3(2 * e.Position.X / _windowSize.X - 1.0f, -2 * e.Position.Y / _windowSize.Y + 1.0f, 0.0f);
             var rayOrigin = Vector3.Transform(normalisedScreenPosition + Vector3.UnitZ, inverse);
             var rayDirection = Vector3.Transform(normalisedScreenPosition, inverse) - rayOrigin;
             rayOrigin = new Vector3(rayOrigin.X, rayOrigin.Y, rayOrigin.Z);
@@ -45,8 +48,7 @@ namespace UAlbion.Core
         Matrix4x4 _viewMatrix;
         Matrix4x4 _projectionMatrix;
         float _magnification = 1.0f;
-        public float WindowWidth { get; private set; }
-        public float WindowHeight { get; private set; }
+        Vector2 _windowSize = Vector2.One;
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;
@@ -57,12 +59,10 @@ namespace UAlbion.Core
         public float FieldOfView => 1f;
         public float NearDistance => 0.1f;
 
-        public float AspectRatio => WindowWidth / WindowHeight;
+        public float AspectRatio => _windowSize.X / _windowSize.Y;
 
         public OrthographicCamera() : base(Handlers)
         {
-            WindowWidth = 1;
-            WindowHeight = 1;
             UpdatePerspectiveMatrix();
             UpdateViewMatrix();
         }
@@ -70,8 +70,8 @@ namespace UAlbion.Core
         void UpdatePerspectiveMatrix()
         {
             _projectionMatrix = Matrix4x4.Identity;
-            _projectionMatrix.M11 = (2.0f * _magnification) / WindowWidth;
-            _projectionMatrix.M22 = (-2.0f * _magnification) / WindowHeight;
+            _projectionMatrix.M11 = (2.0f * _magnification) / _windowSize.X;
+            _projectionMatrix.M22 = (-2.0f * _magnification) / _windowSize.Y;
         }
 
         void UpdateViewMatrix()

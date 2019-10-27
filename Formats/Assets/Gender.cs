@@ -1,16 +1,20 @@
-﻿namespace UAlbion.Formats.Assets
+﻿using System;
+
+namespace UAlbion.Formats.Assets
 {
     public enum Gender : byte
     {
         Male = 0,
         Female = 1,
-        Neuter = 1,
+        Neuter = 2,
     }
 
+    [Flags]
     public enum GenderMask : byte
     {
         Male = 1,
         Female = 2,
-        Any = 3
+        Any = 3,
+        Neutral = 4,
     }
 }

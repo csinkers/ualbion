@@ -13,7 +13,9 @@ namespace UAlbion.Game.Gui
         Chest,
         Summary,
         Stats,
-        Misc
+        Misc,
+        LockedDoor,
+        LockedChest
     }
 
     public class InventoryScreen : UiElement
@@ -30,7 +32,7 @@ namespace UAlbion.Game.Gui
             // 141 - 141+135 (276) .375
             // 276 - 276+84 (360)   .233333
 
-            var background = new UiSpaceSprite<SlabId>(SlabId.SLAB, UiConstants.UiExtents);
+            var background = new UiFixedPositionSprite<SlabId>(SlabId.SLAB, UiConstants.UiExtents);
             var leftPane = new InventoryLeftPane(() => _mode);
             var middlePane = new InventoryMidPane();
             var rightPane = new InventoryRightPane(() => _mode);

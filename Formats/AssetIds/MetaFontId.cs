@@ -4,9 +4,6 @@ namespace UAlbion.Formats.AssetIds
 {
     public enum CommonColor : byte
     {
-        Red = 208,
-        Yellow = 219,
-
         Black1        = 192, // #000000 
         Black2        = 193, // #000000 
         White         = 194, // #ffffff 

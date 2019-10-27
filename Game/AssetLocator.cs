@@ -8,15 +8,14 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
-    public class Assets : Component, IDisposable, IAssetManager
+    public class AssetLocator : Component, IDisposable
     {
-        public Assets(AssetConfig assetConfig, CoreSpriteConfig coreSpriteConfig) : base(Handlers)
+        public AssetLocator(AssetConfig assetConfig, CoreSpriteConfig coreSpriteConfig) : base(Handlers)
         {
             _assetConfig = assetConfig;
             _coreSpriteConfig = coreSpriteConfig;
@@ -24,7 +23,7 @@ namespace UAlbion.Game
         }
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<Assets, SubscribedEvent>((x, e) => x._assetCache.Attach(x.Exchange))
+            H<AssetLocator, SubscribedEvent>((x, e) => x._assetCache.Attach(x.Exchange))
         );
 
         readonly AssetConfig _assetConfig;
@@ -87,9 +86,9 @@ namespace UAlbion.Game
             { AssetType.AutomapGraphics,    (AssetLocation.Base,      "AUTOGFX!.XLD") }, // Tiles for the map screen on 3D maps
 
             // Combat assets
-            { AssetType.PartyMember, (AssetLocation.Initial,   "PRTCHAR!.XLD") }, // Character statistics for party members
-            { AssetType.Npc,   (AssetLocation.Initial,   "NPCCHAR!.XLD") }, // NPC character statistics
-            { AssetType.Monster,   (AssetLocation.Base,      "MONCHAR!.XLD") }, // Monster character statistics
+            { AssetType.PartyMember,        (AssetLocation.Initial,   "PRTCHAR!.XLD") }, // Character statistics for party members
+            { AssetType.Npc,                (AssetLocation.Initial,   "NPCCHAR!.XLD") }, // NPC character statistics
+            { AssetType.Monster,            (AssetLocation.Base,      "MONCHAR!.XLD") }, // Monster character statistics
             { AssetType.MonsterGroup,       (AssetLocation.Base,      "MONGRP!.XLD" ) }, // Pre-defined monster groupings for combat
             { AssetType.MonsterGraphics,    (AssetLocation.Base,      "MONGFX!.XLD" ) }, // Monster sprites on the 3D combat screen
             { AssetType.CombatGraphics,     (AssetLocation.Base,      "COMGFX!.XLD" ) }, // Various sprites and effects for 3D combat screen, spells etc
@@ -190,16 +189,18 @@ namespace UAlbion.Game
             }
         }
 
-        object LoadAsset(AssetType type, int id, string name, GameLanguage language)
+        public object LoadAsset(AssetType type, int id, string name, GameLanguage language)
         {
             if (type == AssetType.CoreGraphics)
-                return AssetLoader.LoadCoreSprite((CoreSpriteId)id, _assetConfig.BasePath, _coreSpriteConfig);
+                return AssetLoaderRegistry.LoadCoreSprite((CoreSpriteId)id, _assetConfig.BasePath, _coreSpriteConfig);
 
             if (type == AssetType.CoreGraphicsMetadata)
-                return AssetLoader.LoadCoreSpriteMetadata((CoreSpriteId)id, _assetConfig.BasePath, _coreSpriteConfig);
+                return AssetLoaderRegistry.LoadCoreSpriteMetadata((CoreSpriteId)id, _assetConfig.BasePath, _coreSpriteConfig);
 
             if (type == AssetType.MetaFont)
-                return FontLoader.Load((MetaFontId)id, LoadTexture(FontId.RegularFont), LoadTexture(FontId.BoldFont));
+                return FontLoader.Load((MetaFontId)id,
+                    (ITexture)LoadAssetCached(AssetType.Font, (int)FontId.RegularFont),
+                    (ITexture)LoadAssetCached(AssetType.Font, (int)FontId.BoldFont));
 
             int xldIndex = id / 100;
             Debug.Assert(xldIndex >= 0);
@@ -216,7 +217,7 @@ namespace UAlbion.Game
                 var path = paths.OverridePath ?? paths.XldPath;
                 using var stream = File.OpenRead(path);
                 using var br = new BinaryReader(stream);
-                var asset = AssetLoader.Load(br, name, (int)stream.Length, assetConfig);
+                var asset = AssetLoaderRegistry.Load(br, name, (int)stream.Length, assetConfig);
                 if (asset == null)
                     throw new AssetNotFoundException($"Object {type}:{id} could not be loaded from file {path}", type, id);
                 GameTrace.Log.AssetLoaded(type, id, name, language, path);
@@ -240,7 +241,7 @@ namespace UAlbion.Game
                 if (length == 0)
                     return null;
 
-                var asset = AssetLoader.Load(br, name, length, assetConfig);
+                var asset = AssetLoaderRegistry.Load(br, name, length, assetConfig);
                 if (asset == null)
                     throw new AssetNotFoundException($"Object {type}:{id} could not be loaded from XLD {xld.Filename}", type, id);
                 GameTrace.Log.AssetLoaded(type, id, name, language, paths.XldPath);
@@ -260,7 +261,7 @@ namespace UAlbion.Game
             }
         }
 
-        object LoadAssetCached<T>(AssetType type, T enumId, GameLanguage language = GameLanguage.English)
+        public object LoadAssetCached<T>(AssetType type, T enumId, GameLanguage language = GameLanguage.English)
         {
             int id = Convert.ToInt32(enumId);
             object asset = _assetCache.Get(type, id, language);
@@ -285,106 +286,6 @@ namespace UAlbion.Game
             return asset is Exception ? null : asset;
         }
 
-        public MapData2D LoadMap2D(MapDataId id) => LoadAssetCached(AssetType.MapData, id) as MapData2D;
-        public MapData3D LoadMap3D(MapDataId id) => LoadAssetCached(AssetType.MapData, id) as MapData3D;
-        public ItemData LoadItem(ItemId id)
-        {
-            var data = (IList<ItemData>)LoadAssetCached(AssetType.ItemList, 0);
-            if (data[0].Names == null)
-            {
-                var names = (IList<string>) LoadAssetCached(AssetType.ItemNames, 0);
-                for (int i = 0; i < data.Count; i++)
-                    data[i].Names = names.Skip(i * 3).Take(3).ToArray();
-            }
-
-            return data[(int)id];
-        }
-
-
-        public AlbionPalette LoadPalette(PaletteId id)
-        {
-            var palette = (AlbionPalette)LoadAssetCached(AssetType.Palette, id);
-            if (palette == null)
-                return null;
-
-            var commonPalette = (byte[])LoadAssetCached(AssetType.PaletteNull, 0);
-            palette.SetCommonPalette(commonPalette);
-
-            return palette;
-        }
-
-        public ITexture LoadTexture(AssetType type, int id)
-        {
-            switch (type)
-            {
-                case AssetType.AutomapGraphics: return LoadTexture((AutoMapId)id);
-                case AssetType.BackgroundGraphics: return LoadTexture((DungeonBackgroundId)id);
-                case AssetType.BigNpcGraphics: return LoadTexture((LargeNpcId)id);
-                case AssetType.BigPartyGraphics: return LoadTexture((LargePartyGraphicsId)id);
-                case AssetType.CombatBackground: return LoadTexture((CombatBackgroundId)id);
-                case AssetType.CombatGraphics: return LoadTexture((CombatGraphicsId)id);
-                case AssetType.Floor3D: return LoadTexture((DungeonFloorId)id);
-                case AssetType.Font: return LoadTexture((FontId)id);
-                case AssetType.FullBodyPicture: return LoadTexture((FullBodyPictureId)id);
-                case AssetType.IconGraphics: return LoadTexture((IconGraphicsId)id);
-                case AssetType.ItemGraphics: return LoadTexture((ItemId)id);
-                case AssetType.MonsterGraphics: return LoadTexture((MonsterGraphicsId)id);
-                case AssetType.Object3D: return LoadTexture((DungeonObjectId)id);
-                case AssetType.Overlay3D: return LoadTexture((DungeonOverlayId)id);
-                case AssetType.Picture: return LoadTexture((PictureId)id);
-                case AssetType.SmallNpcGraphics: return LoadTexture((SmallNpcId)id);
-                case AssetType.SmallPartyGraphics: return LoadTexture((SmallPartyGraphicsId)id);
-                case AssetType.SmallPortrait: return LoadTexture((SmallPortraitId)id);
-                case AssetType.TacticalIcon: return LoadTexture((TacticId)id);
-                case AssetType.Wall3D: return LoadTexture((DungeonWallId)id);
-                case AssetType.CoreGraphics: return LoadTexture((CoreSpriteId)id);
-                case AssetType.Slab: return (ITexture)LoadAssetCached(AssetType.Slab, 0);
-                default: return (ITexture)LoadAssetCached(type, id);
-            }
-        }
-
-        public ITexture LoadTexture(AutoMapId id) => (ITexture)LoadAssetCached(AssetType.AutomapGraphics, id);
-        public ITexture LoadTexture(CombatBackgroundId id) => (ITexture)LoadAssetCached(AssetType.CombatBackground, id);
-        public ITexture LoadTexture(CombatGraphicsId id) => (ITexture)LoadAssetCached(AssetType.CombatGraphics, id);
-        public ITexture LoadTexture(DungeonBackgroundId id) => (ITexture)LoadAssetCached(AssetType.BackgroundGraphics, id);
-        public ITexture LoadTexture(DungeonFloorId id) => (ITexture)LoadAssetCached(AssetType.Floor3D, id);
-        public ITexture LoadTexture(DungeonObjectId id) => (ITexture)LoadAssetCached(AssetType.Object3D, id);
-        public ITexture LoadTexture(DungeonOverlayId id) => (ITexture)LoadAssetCached(AssetType.Overlay3D, id);
-        public ITexture LoadTexture(DungeonWallId id) => (ITexture)LoadAssetCached(AssetType.Wall3D, id);
-        public ITexture LoadTexture(FullBodyPictureId id) => (ITexture)LoadAssetCached(AssetType.FullBodyPicture, id);
-        public ITexture LoadTexture(IconGraphicsId id) => (ITexture)LoadAssetCached(AssetType.IconGraphics, id);
-        public ITexture LoadTexture(ItemId id) => (ITexture)LoadAssetCached(AssetType.ItemGraphics, id); // TODO: Enum
-        public ITexture LoadTexture(LargeNpcId id) => (ITexture)LoadAssetCached(AssetType.BigNpcGraphics, id);
-        public ITexture LoadTexture(LargePartyGraphicsId id) => (ITexture)LoadAssetCached(AssetType.BigPartyGraphics, id);
-        public ITexture LoadTexture(MonsterGraphicsId id) => (ITexture)LoadAssetCached(AssetType.MonsterGraphics, id);
-        public ITexture LoadTexture(PictureId id) => (ITexture)LoadAssetCached(AssetType.Picture, id);
-        public ITexture LoadTexture(SmallNpcId id) => (ITexture)LoadAssetCached(AssetType.SmallNpcGraphics, id);
-        public ITexture LoadTexture(SmallPartyGraphicsId id) => (ITexture)LoadAssetCached(AssetType.SmallPartyGraphics, id);
-        public ITexture LoadTexture(SmallPortraitId id) => (ITexture)LoadAssetCached(AssetType.SmallPortrait, id);
-        public ITexture LoadTexture(TacticId id) => (ITexture)LoadAssetCached(AssetType.TacticalIcon, id);
-        public ITexture LoadTexture(FontId id) => (ITexture)LoadAssetCached(AssetType.Font, id);
-        public ITexture LoadTexture(MetaFontId id) => (ITexture)LoadAssetCached(AssetType.MetaFont, id);
-        public ITexture LoadTexture(CoreSpriteId id) => (ITexture)LoadAssetCached(AssetType.CoreGraphics, id);
-        public TilesetData LoadTileData(IconDataId id) => (TilesetData)LoadAssetCached(AssetType.IconData, id);
-        public LabyrinthData LoadLabyrinthData(LabyrinthDataId id) => (LabyrinthData)LoadAssetCached(AssetType.LabData, id);
-        public ITexture LoadFont(FontColor color, bool isBold) => LoadTexture(new MetaFontId(isBold, color));
-        public CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id) =>
-            (CoreSpriteConfig.BinaryResource)LoadAssetCached(AssetType.CoreGraphicsMetadata, id);
-
-        public string LoadString(StringId id, GameLanguage language)
-        {
-            var stringTable = (IDictionary<int, string>)LoadAssetCached(id.Type, id.Id, language);
-            return stringTable[id.SubId];
-        }
-
-        public string LoadString(SystemTextId id, GameLanguage language) => LoadString(new StringId(AssetType.SystemText, 0, (int)id), language);
-        public string LoadString(WordId id, GameLanguage language) => LoadString(new StringId(AssetType.Dictionary, (int)id / 500, (int)id), language);
-
-        public AlbionSample LoadSample(AssetType type, int id) => (AlbionSample)LoadAssetCached(type, id);
-        public AlbionVideo LoadVideo(VideoId id, GameLanguage language) => (AlbionVideo)LoadAsset(AssetType.Flic, (int)id, $"Video:{id}", language); // Don't cache videos.
-        public CharacterSheet LoadCharacter(AssetType type, PartyCharacterId id) => (CharacterSheet)LoadAssetCached(type, id);
-        public CharacterSheet LoadCharacter(AssetType type, NpcCharacterId id) => (CharacterSheet)LoadAssetCached(type, id);
-        public CharacterSheet LoadCharacter(AssetType type, MonsterCharacterId id) => (CharacterSheet)LoadAssetCached(type, id);
 
         public void Dispose()
         {

@@ -28,6 +28,7 @@ namespace UAlbion.Game
         TopLeft,
         TopRight,
         BottomRight,
+        StatusBar,
     }
 
     public class LayoutManager : Component, ILayoutManager
@@ -87,6 +88,11 @@ namespace UAlbion.Game
                         x = uiWidth - (int)size.X;
                         y = uiHeight - (int)size.Y;
                         break;
+                    case DialogPositioning.StatusBar:
+                        x = (uiWidth - (int)size.X) / 2;
+                        y = UiConstants.UiExtents.Height - (int)size.Y;
+                        break;
+
                     default:
                         throw new ArgumentOutOfRangeException();
                 }

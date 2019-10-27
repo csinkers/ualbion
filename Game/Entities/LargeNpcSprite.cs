@@ -8,7 +8,6 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Parsers;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities

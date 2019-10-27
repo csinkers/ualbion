@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Formats.Assets
+﻿using UAlbion.Formats.AssetIds;
+
+namespace UAlbion.Formats.Assets
 {
     public interface ICharacterSheet
     {
@@ -6,6 +8,7 @@
         string EnglishName { get; }
         string GermanName { get; }
         string FrenchName { get; }
+        string GetName(GameLanguage language);
 
         CharacterType Type { get; }
         Gender Gender { get; }
@@ -18,7 +21,8 @@
 
         PlayerLanguage Languages { get; }
         byte SpriteId { get; }
-        byte PortraitId { get; }
+        AssetType SpriteType { get; }
+        SmallPortraitId? PortraitId { get; }
         ushort EventSetId { get; }
         ushort WordSet { get; }
 

@@ -1,19 +1,39 @@
-﻿namespace UAlbion.Formats.Assets
+﻿using System;
+using UAlbion.Formats.AssetIds;
+
+namespace UAlbion.Formats.Assets
 {
     public class CharacterSheet : ICharacterSheet
     {
+        // Grouped
+        public IMagicSkills Magic { get; } = new MagicSkills();
+        public ICharacterInventory Inventory { get; } = new CharacterInventory();
+        public ICharacterAttributes Attributes { get; } = new CharacterAttributes();
+        public ICharacterSkills Skills { get; } = new CharacterSkills();
+
         public override string ToString() => 
             Type switch {
             CharacterType.Party => $"{Name} {Race} {Class} {Age} EN:{EnglishName} DE:{GermanName} {Magic.SpellStrengths.Count} spells",
-            CharacterType.Npc => $"{Name} P{PortraitId} S{SpriteId} E{EventSetId} W{WordSet}",
+            CharacterType.Npc => $"{Name} {PortraitId} S{SpriteId} E{EventSetId} W{WordSet}",
             CharacterType.Monster => $"{Name} {Class} {Gender} AP{ActionPoints} Lvl{Level} LP{LifePoints}/{LifePointsMax} {Magic.SpellStrengths.Count} spells",
             _ => $"{Name} UNKNOWN TYPE {Type}" };
 
+        // Names
         public string Name { get; set; } // Debug name, not displayed to the player
         public string EnglishName { get; set; }
         public string GermanName { get; set; }
         public string FrenchName { get; set; }
 
+        public string GetName(GameLanguage language) => language switch
+        {
+            GameLanguage.English => EnglishName,
+            GameLanguage.German => GermanName,
+            GameLanguage.French => FrenchName,
+            _ => throw new InvalidOperationException($"Unexpected language {language}")
+        };
+
+
+        // Basic stats
         public CharacterType Type { get; set; }
         public Gender Gender { get; set; }
         public PlayerRace Race { get; set; }
@@ -23,9 +43,11 @@
         public uint ExperiencePoints { get; set; }
         public ushort TrainingPoints { get; set; }
 
+        // Display and behaviour
         public PlayerLanguage Languages { get; set; }
         public byte SpriteId { get; set; }
-        public byte PortraitId { get; set; }
+        public AssetType SpriteType { get; set; }
+        public SmallPortraitId? PortraitId { get; set; }
         public ushort EventSetId { get; set; }
         public ushort WordSet { get; set; }
 
@@ -38,12 +60,7 @@
         public PhysicalCondition PhysicalConditions { get; set; }
         public MentalCondition MentalConditions { get; set; }
 
-        // Grouped
-        public IMagicSkills Magic { get; } = new MagicSkills();
-        public ICharacterInventory Inventory { get; } = new CharacterInventory();
-        public ICharacterAttributes Attributes { get; } = new CharacterAttributes();
-        public ICharacterSkills Skills { get; } = new CharacterSkills();
-
+        // Pending further reversing
         public byte Unknown6 { get; set; }
         public byte Unknown7 { get; set; }
         public byte Unknown11 { get; set; }

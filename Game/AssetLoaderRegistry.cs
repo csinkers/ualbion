@@ -14,7 +14,7 @@ using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Game
 {
-    public static class AssetLoader
+    public static class AssetLoaderRegistry
     {
         static readonly IDictionary<XldObjectType, IAssetLoader> Loaders = GetAssetLoaders();
         static IDictionary<XldObjectType, IAssetLoader> GetAssetLoaders()

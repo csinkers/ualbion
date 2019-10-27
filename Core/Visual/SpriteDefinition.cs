@@ -33,7 +33,7 @@ namespace UAlbion.Core.Visual
         public Matrix4x4 Transform { get; private set; } = Matrix4x4.Identity;
         public event EventHandler ExtentsChanged;
         public int RenderOrder { get; }
-        public SpriteFlags Flags { get; }
+        public SpriteFlags Flags { get; set; }
         public int SubObject { get; }
         
         public Vector3 Position
@@ -46,7 +46,7 @@ namespace UAlbion.Core.Visual
                 ExtentsChanged?.Invoke(this, EventArgs.Empty);
             }
         }
-        public Vector2? Size { get; }
+        public Vector2? Size { get; set; }
         public abstract Type IdType { get; }
         public abstract int NumericId { get; }
     }

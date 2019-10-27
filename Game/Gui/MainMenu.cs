@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Numerics;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Gui

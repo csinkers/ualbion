@@ -1,0 +1,16 @@
+﻿using UAlbion.Api;
+
+namespace UAlbion.Game.Events
+{
+    [Event("description_text", "Displays some text in the description area of the status bar (lower right)")]
+    public class DescriptionTextEvent : GameEvent
+    {
+        public DescriptionTextEvent(string text)
+        {
+            Text = text;
+        }
+
+        [EventPart("text", "The text to display")]
+        public string Text { get; }
+    }
+}

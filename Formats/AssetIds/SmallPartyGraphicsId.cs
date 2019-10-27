@@ -10,12 +10,12 @@ namespace UAlbion.Formats.AssetIds
         Tom = 0,
         Rainer = 1,
         Drirr = 2,
-        Unknown3 = 3,
-        Unknown4 = 4,
-        Unknown5 = 5,
-        Unknown6 = 6,
+        Sira = 3,
+        Mellthas = 4,
+        Harriet = 5,
+        Joe = 6,
         Unknown7 = 7,
-        Unknown8 = 8,
-        Unknown9 = 9,
+        Khunag = 8,
+        Siobhan = 9,
     }
 }

@@ -50,10 +50,11 @@ namespace UAlbion
             AssetConfig assetConfig = AssetConfig.Load(baseDir);
             CoreSpriteConfig coreSpriteConfig = CoreSpriteConfig.Load(baseDir);
 
-            using var assets = new Assets(assetConfig, coreSpriteConfig);
-            //DumpCoreSprites(assets, baseDir); return;
-            DumpCharacterSheets(assets);
-            // RunGame(assets, baseDir);
+            using var assets = new AssetManager(assetConfig, coreSpriteConfig);
+            // DumpCoreSprites(assets, baseDir); return;
+            // DumpCharacterSheets(assets);
+            // DumpChests(assets);
+            RunGame(assets, baseDir);
         }
 
         static void RunGame(IAssetManager assets, string baseDir)
@@ -87,7 +88,7 @@ namespace UAlbion
             var dungeon = new DungeonScene(allScenesExchange);
             var menuScene = new MenuScene(allScenesExchange);
             var inventoryScene = new InventoryScene(allScenesExchange);
-            var statusBar = new UiSpaceSprite<PictureId>(PictureId.StatusBar, UiConstants.StatusBarExtents);
+            var statusBar = new StatusBar();
 
             engine.AddScene(flat)
                 .AddScene(dungeon)
@@ -131,6 +132,7 @@ namespace UAlbion
                 .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
                 ;
 
+            engine.GlobalExchange.Raise(new NewGameEvent(), null);
             /*
             engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude), null); /*
             engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.Jirinaar3D), null); /*
@@ -252,6 +254,14 @@ namespace UAlbion
             foreach (var c in chars)
             {
                 
+            }
+        }
+        static void DumpChests(IAssetManager assets)
+        {
+            var chests = Enum.GetValues(typeof(ChestId)).Cast<ChestId>().ToDictionary(x => x, assets.LoadChest);
+            var merchants = Enum.GetValues(typeof(MerchantId)).Cast<MerchantId>().ToDictionary(x => x, assets.LoadMerchant);
+            foreach (var chest in chests)
+            {
             }
         }
     }

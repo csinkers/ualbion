@@ -9,10 +9,11 @@ namespace UAlbion.Game.Gui
     public class Dialog : UiElement
     {
         protected Dialog(IDictionary<Type, Handler> handlers) : base(handlers) { }
+        protected DialogPositioning Positioning { get; set; } = DialogPositioning.Center;
         protected override void Subscribed()
         {
             var layout = Resolve<ILayoutManager>();
-            layout.Add(this, DialogPositioning.Center);
+            layout.Add(this, Positioning);
         }
     }
 

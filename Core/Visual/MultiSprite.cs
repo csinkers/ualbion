@@ -66,8 +66,14 @@ namespace UAlbion.Core.Visual
 
         BoundingBox _extents;
         Vector3 _position;
+        string _name;
 
-        public string Name => Key.Texture.Name;
+        public string Name
+        {
+            get => _name ?? Key.Texture.Name;
+            set { _name = value; }
+        }
+
         public int RenderOrder
         {
             get => Key.RenderOrder;

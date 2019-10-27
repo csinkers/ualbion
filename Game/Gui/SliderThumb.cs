@@ -8,6 +8,7 @@ namespace UAlbion.Game.Gui
 {
     public class SliderThumb : UiElement
     {
+        static readonly ButtonFrame.ITheme Theme = new SliderThumbTheme();
         readonly Text _text;
         readonly ButtonFrame _frame;
         readonly Func<int> _getter;
@@ -22,7 +23,7 @@ namespace UAlbion.Game.Gui
         {
             _getter = getter;
             _text = new Text("").Center();
-            _frame = new ButtonFrame(_text) { Scheme = ButtonFrame.ColorScheme.BlueGrey };
+            _frame = new ButtonFrame(_text) { Theme = Theme };
             Children.Add(_frame);
         }
 

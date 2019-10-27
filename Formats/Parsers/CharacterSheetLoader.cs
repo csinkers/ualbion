@@ -27,8 +27,17 @@ namespace UAlbion.Formats.Parsers
             s.EnumU8("Languages", () => sheet.Languages, x => sheet.Languages = x, x => ((byte)x, x.ToString()));
             s.Check();
 
+            sheet.SpriteType =
+                sheet.Type switch
+                {
+                    CharacterType.Party => AssetType.BigPartyGraphics,
+                    CharacterType.Npc => AssetType.BigNpcGraphics,
+                    CharacterType.Monster => AssetType.MonsterGraphics,
+                    _ => throw new InvalidOperationException($"Unhandled character type {sheet.Type}")
+                };
+
             s.UInt8("SpriteId ", () => sheet.SpriteId, x => sheet.SpriteId = x);
-            s.UInt8("PortraitId ", () => sheet.PortraitId, x => sheet.PortraitId = x);
+            s.UInt8("PortraitId ", () => (byte)((int?)sheet.PortraitId + 1 ?? 0), x => sheet.PortraitId = x == 0 ? null : (SmallPortraitId?)(x - 1));
             s.UInt8("Unknown11 ", () => sheet.Unknown11, x => sheet.Unknown11 = x);
             s.UInt8("Unknown12", () => sheet.Unknown12, x => sheet.Unknown12 = x);
             s.UInt8("Unknown13", () => sheet.Unknown13, x => sheet.Unknown13 = x);

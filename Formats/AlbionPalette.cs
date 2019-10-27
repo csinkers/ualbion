@@ -47,7 +47,7 @@ namespace UAlbion.Formats
             Debug.Assert(br.BaseStream.Position == startingOffset + streamLength);
 
             AnimatedRanges.TryGetValue(Id, out var ranges);
-            ranges = ranges ?? new List<(byte, byte)>();
+            ranges ??= new List<(byte, byte)>();
             Period = (int)Util.LCM(ranges.Select(x => (long)(x.Item2 - x.Item1 + 1)).Append(1));
 
             for (int cacheIndex = 0; cacheIndex < Period; cacheIndex++)

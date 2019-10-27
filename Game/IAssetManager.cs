@@ -8,6 +8,7 @@ namespace UAlbion.Game
 {
     public interface IAssetManager
     {
+        string GetName(AssetType type, int id);
         ITexture LoadTexture(AssetType type, int id);
         ITexture LoadTexture(AutoMapId id);
         ITexture LoadTexture(CombatBackgroundId id);
@@ -49,5 +50,8 @@ namespace UAlbion.Game
         CharacterSheet LoadCharacter(AssetType type, PartyCharacterId id);
         CharacterSheet LoadCharacter(AssetType type, NpcCharacterId id);
         CharacterSheet LoadCharacter(AssetType type, MonsterCharacterId id);
+        Chest LoadChest(ChestId chestId);
+        Chest LoadMerchant(MerchantId merchantId);
+        WordId? ParseWord(string word);
     }
 }

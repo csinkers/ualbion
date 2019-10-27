@@ -46,6 +46,16 @@ namespace UAlbion.Game
         );
         public SpriteResolver() : base(Handlers) { }
 
+        public Vector2 GetSize(Type idType, int id, int subObject)
+        {
+            var assetType =  AssetTypeLookup[idType];
+            ITexture texture = Resolve<IAssetManager>().LoadTexture(assetType, id);
+            if(texture == null)
+                return Vector2.One;
+            texture.GetSubImageDetails(subObject, out var size, out var _, out var _, out var _);
+            return size;
+        }
+
         public Tuple<SpriteKey, SpriteInstanceData> Resolve(SpriteDefinition spriteDefinition)
         {
             var assetType = AssetTypeLookup[spriteDefinition.IdType];

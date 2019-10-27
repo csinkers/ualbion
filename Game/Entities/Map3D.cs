@@ -4,7 +4,6 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Parsers;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities

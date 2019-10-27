@@ -1,4 +1,4 @@
-{
+  {
   "XldPath": "albion_sr/CD/ALBION/XLDLIBS",
   "ExportedXldPath": "data/Exported",
   "Xlds": {
@@ -8962,7 +8962,7 @@
       "Height": 16,
       "Assets": {
         "0": {
-            "Name": "Item Sprites"
+          "Name": "Item Sprites"
         }
       }
     },
@@ -9885,65 +9885,177 @@
       "EnumName": "MonsterCharacterId",
       "Type": "CharacterData",
       "Assets": {
-        "0": { "Name": "Fear1" },
-        "1": { "Name": "Brogg1" },
-        "2": { "Name": "Skrinn1" },
-        "3": { "Name": "Krondir1" },
-        "4": { "Name": "Kizz1" },
-        "5": { "Name": "Argim" },
-        "6": { "Name": "Warniak1" },
-        "7": { "Name": "Rinrii1" },
+        "0": {
+          "Name": "Fear1"
+        },
+        "1": {
+          "Name": "Brogg1"
+        },
+        "2": {
+          "Name": "Skrinn1"
+        },
+        "3": {
+          "Name": "Krondir1"
+        },
+        "4": {
+          "Name": "Kizz1"
+        },
+        "5": {
+          "Name": "Argim"
+        },
+        "6": {
+          "Name": "Warniak1"
+        },
+        "7": {
+          "Name": "Rinrii1"
+        },
         "8": {},
-        "9": { "Name": "Magician1" },
-        "10": { "Name": "Secu1" },
-        "11": { "Name": "Animal1" },
-        "12": { "Name": "Fear2" },
-        "13": { "Name": "Fear3" },
-        "14": { "Name": "Brogg2" },
-        "15": { "Name": "Brogg3" },
-        "16": { "Name": "Skrinn2" },
-        "17": { "Name": "Krondir2" },
-        "18": { "Name": "Kizz2" },
-        "19": { "Name": "Kizz3" },
-        "20": { "Name": "Warniak2" },
-        "21": { "Name": "Warniak3" },
-        "22": { "Name": "Rinrii2" },
-        "23": { "Name": "Rinrii3" },
+        "9": {
+          "Name": "Magician1"
+        },
+        "10": {
+          "Name": "Secu1"
+        },
+        "11": {
+          "Name": "Animal1"
+        },
+        "12": {
+          "Name": "Fear2"
+        },
+        "13": {
+          "Name": "Fear3"
+        },
+        "14": {
+          "Name": "Brogg2"
+        },
+        "15": {
+          "Name": "Brogg3"
+        },
+        "16": {
+          "Name": "Skrinn2"
+        },
+        "17": {
+          "Name": "Krondir2"
+        },
+        "18": {
+          "Name": "Kizz2"
+        },
+        "19": {
+          "Name": "Kizz3"
+        },
+        "20": {
+          "Name": "Warniak2"
+        },
+        "21": {
+          "Name": "Warniak3"
+        },
+        "22": {
+          "Name": "Rinrii2"
+        },
+        "23": {
+          "Name": "Rinrii3"
+        },
         "24": {},
         "25": {},
-        "26": { "Name": "Magician2" },
-        "27": { "Name": "Magician3" },
-        "28": { "Name": "Secu2" },
-        "29": { "Name": "Animal2" },
-        "30": { "Name": "Animal3" },
-        "31": { "Name": "Storm1" },
-        "32": { "Name": "Storm2" },
-        "33": { "Name": "Storm3" },
-        "34": { "Name": "Plague1" },
-        "35": { "Name": "Plague2" },
-        "36": { "Name": "Plague3" },
-        "37": { "Name": "Beastmaster" },
-        "38": { "Name": "Kledo Kamulos1" },
-        "39": { "Name": "Kledo Kamulos2" },
-        "40": { "Name": "Kledo Kamulos3" },
-        "41": { "Name": "Sanddiver1" },
-        "42": { "Name": "Sanddiver2" },
-        "43": { "Name": "Sanddiver3" },
-        "44": { "Name": "Service robot" },
-        "45": { "Name": "AI Body1" },
-        "46": { "Name": "AI Body2" },
-        "47": { "Name": "Bandit1" },
-        "48": { "Name": "Bandit2" },
-        "49": { "Name": "Bandit3" },
-        "50": { "Name": "Kamulos" },
-        "51": { "Name": "AI" },
-        "52": { "Name": "Kritah1" },
-        "53": { "Name": "Kritah2" },
-        "54": { "Name": "Kritah3" },
-        "55": { "Name": "Bradir" },
-        "56": { "Name": "Nodd" },
-        "57": { "Name": "Kontos" },
-        "58": { "Name": "AI Body2" }
+        "26": {
+          "Name": "Magician2"
+        },
+        "27": {
+          "Name": "Magician3"
+        },
+        "28": {
+          "Name": "Secu2"
+        },
+        "29": {
+          "Name": "Animal2"
+        },
+        "30": {
+          "Name": "Animal3"
+        },
+        "31": {
+          "Name": "Storm1"
+        },
+        "32": {
+          "Name": "Storm2"
+        },
+        "33": {
+          "Name": "Storm3"
+        },
+        "34": {
+          "Name": "Plague1"
+        },
+        "35": {
+          "Name": "Plague2"
+        },
+        "36": {
+          "Name": "Plague3"
+        },
+        "37": {
+          "Name": "Beastmaster"
+        },
+        "38": {
+          "Name": "Kledo Kamulos1"
+        },
+        "39": {
+          "Name": "Kledo Kamulos2"
+        },
+        "40": {
+          "Name": "Kledo Kamulos3"
+        },
+        "41": {
+          "Name": "Sanddiver1"
+        },
+        "42": {
+          "Name": "Sanddiver2"
+        },
+        "43": {
+          "Name": "Sanddiver3"
+        },
+        "44": {
+          "Name": "Service robot"
+        },
+        "45": {
+          "Name": "AI Body1"
+        },
+        "46": {
+          "Name": "AI Body2"
+        },
+        "47": {
+          "Name": "Bandit1"
+        },
+        "48": {
+          "Name": "Bandit2"
+        },
+        "49": {
+          "Name": "Bandit3"
+        },
+        "50": {
+          "Name": "Kamulos"
+        },
+        "51": {
+          "Name": "AI"
+        },
+        "52": {
+          "Name": "Kritah1"
+        },
+        "53": {
+          "Name": "Kritah2"
+        },
+        "54": {
+          "Name": "Kritah3"
+        },
+        "55": {
+          "Name": "Bradir"
+        },
+        "56": {
+          "Name": "Nodd"
+        },
+        "57": {
+          "Name": "Kontos"
+        },
+        "58": {
+          "Name": "AI Body2"
+        }
       }
     },
     "MONGFX0.XLD": {
@@ -11328,23 +11440,64 @@
       "Type": "SingleHeaderSprite",
       "Assets": {
         "0": {
-          "Name": "Tom"
+          "Name": "Tom",
+          "PaletteHints": [
+            19
+          ]
         },
         "1": {
-          "Name": "Rainer"
+          "Name": "Rainer",
+          "PaletteHints": [
+            19
+          ]
         },
         "2": {
-          "Name": "Driir"
+          "Name": "Drirr",
+          "PaletteHints": [
+            19
+          ]
         },
-        "3": {},
-        "4": {},
-        "5": {},
-        "6": {},
+        "3": {
+          "Name": "Sira",
+          "PaletteHints": [
+            19
+          ]
+        },
+        "4": {
+          "Name": "Mellthas",
+          "PaletteHints": [
+            19
+          ]
+        },
+        "5": {
+          "Name": "Harriet",
+          "PaletteHints": [
+            19
+          ]
+        },
+        "6": {
+          "Name": "Joe",
+          "PaletteHints": [
+            19
+          ]
+        },
         "7": {
-          "Name": "Tom"
+          "PaletteHints": [
+            19
+          ]
         },
-        "8": {},
-        "9": {}
+        "8": {
+          "Name": "Khunag",
+          "PaletteHints": [
+            19
+          ]
+        },
+        "9": {
+          "Name": "Siobhan",
+          "PaletteHints": [
+            19
+          ]
+        }
       }
     },
     "PARTKL0.XLD": {
@@ -11352,21 +11505,64 @@
       "Type": "SingleHeaderSprite",
       "Assets": {
         "0": {
-          "Name": "Tom"
+          "Name": "Tom",
+          "PaletteHints": [
+            0
+          ]
         },
         "1": {
-          "Name": "Rainer"
+          "Name": "Rainer",
+          "PaletteHints": [
+            0
+          ]
         },
         "2": {
-          "Name": "Drirr"
+          "Name": "Drirr",
+          "PaletteHints": [
+            0
+          ]
         },
-        "3": {},
-        "4": {},
-        "5": {},
-        "6": {},
-        "7": {},
-        "8": {},
-        "9": {}
+        "3": {
+          "Name": "Sira",
+          "PaletteHints": [
+            0
+          ]
+        },
+        "4": {
+          "Name": "Mellthas",
+          "PaletteHints": [
+            0
+          ]
+        },
+        "5": {
+          "Name": "Harriet",
+          "PaletteHints": [
+            0
+          ]
+        },
+        "6": {
+          "Name": "Joe",
+          "PaletteHints": [
+            0
+          ]
+        },
+        "7": {
+          "PaletteHints": [
+            0
+          ]
+        },
+        "8": {
+          "Name": "Khunag",
+          "PaletteHints": [
+            0
+          ]
+        },
+        "9": {
+          "Name": "Siobhan",
+          "PaletteHints": [
+            0
+          ]
+        }
       }
     },
     "PICTURE0.XLD": {
@@ -11987,12 +12183,12 @@
       }
     },
     "SLAB": {
-      "Type": "FixedSizeSprite",
       "EnumName": "SlabId",
+      "Type": "FixedSizeSprite",
       "Width": 360,
       "Assets": {
-        "0": { 
-          "Name": "SLAB" 
+        "0": {
+          "Name": "SLAB"
         }
       }
     },
@@ -12008,15 +12204,27 @@
           "Name": "Rainer"
         },
         "2": {
-          "Name": "Driir"
+          "Name": "Drirr"
         },
-        "3": {},
-        "4": {},
-        "5": {},
-        "6": {},
+        "3": {
+          "Name": "Sira"
+        },
+        "4": {
+          "Name": "Mellthas"
+        },
+        "5": {
+          "Name": "Harriet"
+        },
+        "6": {
+          "Name": "Joe"
+        },
         "7": {},
-        "8": {},
-        "9": {},
+        "8": {
+          "Name": "Khunag"
+        },
+        "9": {
+          "Name": "Siobhan"
+        },
         "10": {},
         "11": {},
         "12": {},
@@ -13623,16 +13831,16 @@
           "Name": "Meta_She"
         },
         "77": {
-          "Name": "Meta_It"
+          "Name": "Meta_ItNominative"
         },
         "78": {
-          "Name": "Meta_Him"
+          "Name": "Meta_HimAccusative"
         },
         "79": {
-          "Name": "Meta_Her"
+          "Name": "Meta_HerAccusative"
         },
         "80": {
-          "Name": "Meta_It"
+          "Name": "Meta_ItAccusative"
         },
         "81": {
           "Name": "Meta_His"
@@ -13653,13 +13861,13 @@
           "Name": "Meta_Creature"
         },
         "758": {
-          "Name": "Meta_Him"
+          "Name": "Meta_HimDative"
         },
         "776": {
-          "Name": "Meta_Her"
+          "Name": "Meta_HerDative"
         },
         "777": {
-          "Name": "Meta_It"
+          "Name": "Meta_ItDative"
         },
         "456": {
           "Name": "Race_Terran"
@@ -17362,33 +17570,85 @@
       "EnumName": "NpcCharacterId",
       "Type": "CharacterData",
       "Assets": {
-        "0": { "Name": "Khunagh" },
-        "1": { "Name": "Cuarnainn" },
-        "2": { "Name": "Branagh" },
-        "3": { "Name": "Rhuainaigh" },
-        "4": { "Name": "Pardhainn" },
-        "5": { "Name": "Jonatharh" },
-        "6": { "Name": "Rhunagh" },
-        "7": { "Name": "Arthor" },
-        "8": { "Name": "Cairnain" },
-        "9": { "Name": "Rhain" },
-        "10": { "Name": "Brann" },
-        "11": { "Name": "Colonel Priver" },
-        "12": { "Name": "Ned, die AI" },
-        "13": { "Name": "Drannagh" },
-        "14": { "Name": "Llanaer" },
-        "15": { "Name": "Irkith" },
-        "16": { "Name": "Birrh" },
-        "17": { "Name": "Maire" },
+        "0": {
+          "Name": "Khunagh"
+        },
+        "1": {
+          "Name": "Cuarnainn"
+        },
+        "2": {
+          "Name": "Branagh"
+        },
+        "3": {
+          "Name": "Rhuainaigh"
+        },
+        "4": {
+          "Name": "Pardhainn"
+        },
+        "5": {
+          "Name": "Jonatharh"
+        },
+        "6": {
+          "Name": "Rhunagh"
+        },
+        "7": {
+          "Name": "Arthor"
+        },
+        "8": {
+          "Name": "Cairnain"
+        },
+        "9": {
+          "Name": "Rhain"
+        },
+        "10": {
+          "Name": "Brann"
+        },
+        "11": {
+          "Name": "Colonel Priver"
+        },
+        "12": {
+          "Name": "Ned, die AI"
+        },
+        "13": {
+          "Name": "Drannagh"
+        },
+        "14": {
+          "Name": "Llanaer"
+        },
+        "15": {
+          "Name": "Irkith"
+        },
+        "16": {
+          "Name": "Birrh"
+        },
+        "17": {
+          "Name": "Maire"
+        },
         "18": {},
-        "19": { "Name": "Frill" },
-        "20": { "Name": "Nemos" },
-        "21": { "Name": "Rainer Hofstedt" },
-        "22": { "Name": "Joe Bernard" },
-        "23": { "Name": "Althea" },
-        "24": { "Name": "Harriet" },
-        "25": { "Name": "Drirr" },
-        "26": { "Name": "Mellthas" },
+        "19": {
+          "Name": "Frill"
+        },
+        "20": {
+          "Name": "Nemos"
+        },
+        "21": {
+          "Name": "Rainer Hofstedt"
+        },
+        "22": {
+          "Name": "Joe Bernard"
+        },
+        "23": {
+          "Name": "Althea"
+        },
+        "24": {
+          "Name": "Harriet"
+        },
+        "25": {
+          "Name": "Drirr"
+        },
+        "26": {
+          "Name": "Mellthas"
+        },
         "27": {},
         "28": {},
         "29": {},
@@ -17456,169 +17716,422 @@
         "91": {},
         "92": {},
         "93": {},
-        "94": {},
-        "95": {},
-        "96": {},
-        "97": {},
-        "98": {},
-        "99": {},
+        "94": {}
       }
     },
     "INITIAL/NPCCHAR1.XLD": {
       "EnumName": "NpcCharacterId",
       "Type": "CharacterData",
       "Assets": {
-        "00": {},
-        "01": {},
-        "02": {},
-        "03": { "Name": "Giria" },
-        "04": { "Name": "Sebai-Li Wrinn" },
-        "05": { "Name": "Fradh" },
-        "06": { "Name": "Klirna" },
-        "07": { "Name": "Gridri" },
-        "08": { "Name": "Sarrin" },
-        "09": { "Name": "Krinn" },
-        "10": { "Name": "Larina" },
-        "11": { "Name": "Frill" },
-        "12": { "Name": "Nisrii" },
-        "13": { "Name": "Nadri" },
-        "14": { "Name": "Vris" },
-        "15": { "Name": "Janiis" },
-        "16": { "Name": "Janiis" },
-        "17": { "Name": "Janiis" },
-        "18": { "Name": "Griibo" },
-        "19": { "Name": "Srelan" },
-        "20": { "Name": "Sira" },
-        "21": { "Name": "Kriis" },
-        "22": { "Name": "Fasiir" },
-        "23": { "Name": "Fasiir" },
-        "24": { "Name": "Cera" },
-        "25": { "Name": "Birin" },
-        "26": { "Name": "Jalia" },
-        "27": { "Name": "Rejira" },
-        "28": { "Name": "Bradir" },
-        "29": { "Name": "Bradir" },
-        "30": { "Name": "Bradir" },
-        "31": { "Name": "Aliis" },
-        "32": { "Name": "Brid" },
-        "33": { "Name": "Zirna" },
-        "34": { "Name": "Krai" },
-        "35": { "Name": "Hanii" },
-        "36": { "Name": "Akiir" },
-        "37": { "Name": "Rabir" },
-        "38": { "Name": "Vrik" },
-        "39": { "Name": "Laila" },
-        "40": { "Name": "Osini" },
-        "41": { "Name": "Jila" },
-        "42": { "Name": "Bewir" },
-        "43": { "Name": "Wania" },
-        "44": { "Name": "Zirr" },
-        "45": { "Name": "Viri" },
-        "46": { "Name": "Snird" },
-        "47": { "Name": "Frinja" },
-        "48": { "Name": "Krinn" },
-        "49": { "Name": "Jiris" },
+        "0": {},
+        "1": {},
+        "2": {},
+        "3": {
+          "Name": "Giria"
+        },
+        "4": {
+          "Name": "Sebai-Li Wrinn"
+        },
+        "5": {
+          "Name": "Fradh"
+        },
+        "6": {
+          "Name": "Klirna"
+        },
+        "7": {
+          "Name": "Gridri"
+        },
+        "8": {
+          "Name": "Sarrin"
+        },
+        "9": {
+          "Name": "Krinn"
+        },
+        "10": {
+          "Name": "Larina"
+        },
+        "11": {
+          "Name": "Frill"
+        },
+        "12": {
+          "Name": "Nisrii"
+        },
+        "13": {
+          "Name": "Nadri"
+        },
+        "14": {
+          "Name": "Vris"
+        },
+        "15": {
+          "Name": "Janiis"
+        },
+        "16": {
+          "Name": "Janiis"
+        },
+        "17": {
+          "Name": "Janiis"
+        },
+        "18": {
+          "Name": "Griibo"
+        },
+        "19": {
+          "Name": "Srelan"
+        },
+        "20": {
+          "Name": "Sira"
+        },
+        "21": {
+          "Name": "Kriis"
+        },
+        "22": {
+          "Name": "Fasiir"
+        },
+        "23": {
+          "Name": "Fasiir"
+        },
+        "24": {
+          "Name": "Cera"
+        },
+        "25": {
+          "Name": "Birin"
+        },
+        "26": {
+          "Name": "Jalia"
+        },
+        "27": {
+          "Name": "Rejira"
+        },
+        "28": {
+          "Name": "Bradir"
+        },
+        "29": {
+          "Name": "Bradir"
+        },
+        "30": {
+          "Name": "Bradir"
+        },
+        "31": {
+          "Name": "Aliis"
+        },
+        "32": {
+          "Name": "Brid"
+        },
+        "33": {
+          "Name": "Zirna"
+        },
+        "34": {
+          "Name": "Krai"
+        },
+        "35": {
+          "Name": "Hanii"
+        },
+        "36": {
+          "Name": "Akiir"
+        },
+        "37": {
+          "Name": "Rabir"
+        },
+        "38": {
+          "Name": "Vrik"
+        },
+        "39": {
+          "Name": "Laila"
+        },
+        "40": {
+          "Name": "Osini"
+        },
+        "41": {
+          "Name": "Jila"
+        },
+        "42": {
+          "Name": "Bewir"
+        },
+        "43": {
+          "Name": "Wania"
+        },
+        "44": {
+          "Name": "Zirr"
+        },
+        "45": {
+          "Name": "Viri"
+        },
+        "46": {
+          "Name": "Snird"
+        },
+        "47": {
+          "Name": "Frinja"
+        },
+        "48": {
+          "Name": "Krinn"
+        },
+        "49": {
+          "Name": "Jiris"
+        },
         "50": {},
         "51": {},
         "52": {},
         "53": {},
         "54": {},
-        "55": { "Name": "Tharnos" },
-        "56": { "Name": "Garris" },
-        "57": { "Name": "Firina" },
-        "58": { "Name": "Sarena" },
-        "59": { "Name": "Ferina" },
-        "60": { "Name": "Oibelos" },
-        "61": { "Name": "Aretha" },
-        "62": { "Name": "Rifrako" },
-        "63": { "Name": "Dranbar" },
-        "64": { "Name": "Peleitos" },
-        "65": { "Name": "Bragona" },
-        "66": { "Name": "Winion" },
-        "67": { "Name": "Tamno" },
-        "68": { "Name": "Bennos" },
-        "69": { "Name": "Leitos" },
-        "70": { "Name": "Nemos" },
-        "71": { "Name": "Makaio" },
-        "72": { "Name": "Ouktero" },
-        "73": { "Name": "Torko" },
-        "74": { "Name": "Bero" },
-        "75": { "Name": "Frinos" },
-        "76": { "Name": "Roves" },
+        "55": {
+          "Name": "Tharnos"
+        },
+        "56": {
+          "Name": "Garris"
+        },
+        "57": {
+          "Name": "Firina"
+        },
+        "58": {
+          "Name": "Sarena"
+        },
+        "59": {
+          "Name": "Ferina"
+        },
+        "60": {
+          "Name": "Oibelos"
+        },
+        "61": {
+          "Name": "Aretha"
+        },
+        "62": {
+          "Name": "Rifrako"
+        },
+        "63": {
+          "Name": "Dranbar"
+        },
+        "64": {
+          "Name": "Peleitos"
+        },
+        "65": {
+          "Name": "Bragona"
+        },
+        "66": {
+          "Name": "Winion"
+        },
+        "67": {
+          "Name": "Tamno"
+        },
+        "68": {
+          "Name": "Bennos"
+        },
+        "69": {
+          "Name": "Leitos"
+        },
+        "70": {
+          "Name": "Nemos"
+        },
+        "71": {
+          "Name": "Makaio"
+        },
+        "72": {
+          "Name": "Ouktero"
+        },
+        "73": {
+          "Name": "Torko"
+        },
+        "74": {
+          "Name": "Bero"
+        },
+        "75": {
+          "Name": "Frinos"
+        },
+        "76": {
+          "Name": "Roves"
+        },
         "77": {},
         "78": {},
         "79": {},
         "80": {},
         "81": {},
         "82": {},
-        "83": { "Name": "Christine" },
-        "84": { "Name": "Joe Bernard" },
-        "85": { "Name": "Colonel Priver" },
-        "86": { "Name": "Robert Shaw" },
-        "87": { "Name": "Akira Mitsamati" },
-        "88": { "Name": "Michelle Laton" },
-        "89": { "Name": "Anne Dorbeck" },
-        "90": { "Name": "Alice Takashi" },
-        "91": { "Name": "Robert Ashley" },
-        "92": { "Name": "Rainer Hofstedt" },
-        "93": { "Name": "Kapitän Brandt" },
-        "94": { "Name": "Ned" },
-        "95": { "Name": "Argim" },
-        "96": { "Name": "Ned" },
-        "97": { "Name": "Stiriik" },
-        "98": { "Name": "Stiriik" },
-        "99": { "Name": "Rhain" }
+        "83": {
+          "Name": "Christine"
+        },
+        "84": {
+          "Name": "Joe Bernard"
+        },
+        "85": {
+          "Name": "Colonel Priver"
+        },
+        "86": {
+          "Name": "Robert Shaw"
+        },
+        "87": {
+          "Name": "Akira Mitsamati"
+        },
+        "88": {
+          "Name": "Michelle Laton"
+        },
+        "89": {
+          "Name": "Anne Dorbeck"
+        },
+        "90": {
+          "Name": "Alice Takashi"
+        },
+        "91": {
+          "Name": "Robert Ashley"
+        },
+        "92": {
+          "Name": "Rainer Hofstedt"
+        },
+        "93": {
+          "Name": "Kapitän Brandt"
+        },
+        "94": {
+          "Name": "Ned"
+        },
+        "95": {
+          "Name": "Argim"
+        },
+        "96": {
+          "Name": "Ned"
+        },
+        "97": {
+          "Name": "Stiriik"
+        },
+        "98": {
+          "Name": "Stiriik"
+        },
+        "99": {
+          "Name": "Rhain"
+        }
       }
     },
     "INITIAL/NPCCHAR2.XLD": {
       "EnumName": "NpcCharacterId",
       "Type": "CharacterData",
       "Assets": {
-        "00": { "Name": "Gerwad" },
-        "01": { "Name": "Agida" },
-        "02": { "Name": "Merdger" },
-        "03": { "Name": "Tori" },
-        "04": { "Name": "Nelly" },
-        "05": { "Name": "Morpatt" },
-        "06": {},
-        "07": { "Name": "Konny" },
-        "08": { "Name": "Ohl" },
-        "09": { "Name": "Amine" },
-        "10": { "Name": "Synja" },
-        "11": { "Name": "Zebenno" },
-        "12": { "Name": "Kyla" },
-        "13": { "Name": "Zeibe" },
-        "14": { "Name": "Jeros" },
-        "15": { "Name": "Mykonou" },
-        "16": { "Name": "Coskon" },
-        "17": { "Name": "Kossea" },
-        "18": { "Name": "Sojekos" },
+        "0": {
+          "Name": "Gerwad"
+        },
+        "1": {
+          "Name": "Agida"
+        },
+        "2": {
+          "Name": "Merdger"
+        },
+        "3": {
+          "Name": "Tori"
+        },
+        "4": {
+          "Name": "Nelly"
+        },
+        "5": {
+          "Name": "Morpatt"
+        },
+        "6": {},
+        "7": {
+          "Name": "Konny"
+        },
+        "8": {
+          "Name": "Ohl"
+        },
+        "9": {
+          "Name": "Amine"
+        },
+        "10": {
+          "Name": "Synja"
+        },
+        "11": {
+          "Name": "Zebenno"
+        },
+        "12": {
+          "Name": "Kyla"
+        },
+        "13": {
+          "Name": "Zeibe"
+        },
+        "14": {
+          "Name": "Jeros"
+        },
+        "15": {
+          "Name": "Mykonou"
+        },
+        "16": {
+          "Name": "Coskon"
+        },
+        "17": {
+          "Name": "Kossea"
+        },
+        "18": {
+          "Name": "Sojekos"
+        },
         "19": {},
-        "20": { "Name": "Kontos" },
-        "21": { "Name": "Perron" },
-        "22": { "Name": "Gard" },
-        "23": { "Name": "Riko" },
-        "24": { "Name": "Herras" },
-        "25": { "Name": "Darios" },
-        "26": { "Name": "Nodd" },
-        "27": { "Name": "Nadje" },
-        "28": { "Name": "Arrim" },
-        "29": { "Name": "Edjirr" },
-        "30": { "Name": "Kryte" },
-        "31": { "Name": "Aurino" },
-        "32": { "Name": "Kariah" },
-        "33": { "Name": "Bagga" },
-        "34": { "Name": "Posch" },
-        "35": { "Name": "Riolea" },
-        "36": { "Name": "Melthar" },
-        "37": { "Name": "Zerruma" },
-        "38": { "Name": "Dolo" },
-        "39": { "Name": "Jikraii" },
-        "40": { "Name": "Ramina" },
-        "41": { "Name": "Otikro" },
-        "42": { "Name": "Frill" },
-        "43": { "Name": "Khunag" },
-        "44": { "Name": "Siobhan" },
+        "20": {
+          "Name": "Kontos"
+        },
+        "21": {
+          "Name": "Perron"
+        },
+        "22": {
+          "Name": "Gard"
+        },
+        "23": {
+          "Name": "Riko"
+        },
+        "24": {
+          "Name": "Herras"
+        },
+        "25": {
+          "Name": "Darios"
+        },
+        "26": {
+          "Name": "Nodd"
+        },
+        "27": {
+          "Name": "Nadje"
+        },
+        "28": {
+          "Name": "Arrim"
+        },
+        "29": {
+          "Name": "Edjirr"
+        },
+        "30": {
+          "Name": "Kryte"
+        },
+        "31": {
+          "Name": "Aurino"
+        },
+        "32": {
+          "Name": "Kariah"
+        },
+        "33": {
+          "Name": "Bagga"
+        },
+        "34": {
+          "Name": "Posch"
+        },
+        "35": {
+          "Name": "Riolea"
+        },
+        "36": {
+          "Name": "Melthar"
+        },
+        "37": {
+          "Name": "Zerruma"
+        },
+        "38": {
+          "Name": "Dolo"
+        },
+        "39": {
+          "Name": "Jikraii"
+        },
+        "40": {
+          "Name": "Ramina"
+        },
+        "41": {
+          "Name": "Otikro"
+        },
+        "42": {
+          "Name": "Frill"
+        },
+        "43": {
+          "Name": "Khunag"
+        },
+        "44": {
+          "Name": "Siobhan"
+        },
         "45": {},
         "46": {},
         "47": {},
@@ -17629,67 +18142,41 @@
         "52": {},
         "53": {},
         "54": {},
-        "55": {},
-        "56": {},
-        "57": {},
-        "58": {},
-        "59": {},
-        "60": {},
-        "61": {},
-        "62": {},
-        "63": {},
-        "64": {},
-        "65": {},
-        "66": {},
-        "67": {},
-        "68": {},
-        "69": {},
-        "70": {},
-        "71": {},
-        "72": {},
-        "73": {},
-        "74": {},
-        "75": {},
-        "76": {},
-        "77": {},
-        "78": {},
-        "79": {},
-        "80": {},
-        "81": {},
-        "82": {},
-        "83": {},
-        "84": {},
-        "85": {},
-        "86": {},
-        "87": {},
-        "88": {},
-        "89": {},
-        "90": {},
-        "91": {},
-        "92": {},
-        "93": {},
-        "94": {},
-        "95": {},
-        "96": {},
-        "97": {},
-        "98": {},
-        "99": {}
+        "55": {}
       }
     },
     "INITIAL/PRTCHAR0.XLD": {
       "EnumName": "PartyCharacterId",
       "Type": "CharacterData",
       "Assets": {
-        "0": { "Name": "Tom" },
-        "1": { "Name": "Rainer" },
-        "2": { "Name": "Drirr" },
-        "3": { "Name": "Sira" },
-        "4": { "Name": "Mellthas" },
-        "5": { "Name": "Harriet" },
-        "6": { "Name": "Joe" },
+        "0": {
+          "Name": "Tom"
+        },
+        "1": {
+          "Name": "Rainer"
+        },
+        "2": {
+          "Name": "Drirr"
+        },
+        "3": {
+          "Name": "Sira"
+        },
+        "4": {
+          "Name": "Mellthas"
+        },
+        "5": {
+          "Name": "Harriet"
+        },
+        "6": {
+          "Name": "Joe"
+        },
         "7": {},
-        "8": { "Name": "Khunag" },
-        "9": { "Name": "Siobhan" },
+        "8": {
+          "Name": "Khunag"
+        },
+        "9": {
+          "Name": "Siobhan"
+        },
         "10": {},
         "11": {},
         "12": {},
@@ -17953,6 +18440,202 @@
       }
     },
     "MAIN.EXE": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "ENGLISH/EVNTTXT0.XLD": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "ENGLISH/EVNTTXT1.XLD": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "ENGLISH/EVNTTXT2.XLD": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "ENGLISH/EVNTTXT3.XLD": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "ENGLISH/EVNTTXT9.XLD": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "ENGLISH/FLICS0.XLD": {
+      "Type": "Unknown",
+      "Assets": {
+        "0": {
+          "Width": 32
+        },
+        "1": {
+          "Width": 32
+        },
+        "2": {
+          "Width": 32
+        },
+        "3": {
+          "Width": 32
+        },
+        "4": {
+          "Width": 32
+        },
+        "5": {
+          "Width": 32
+        },
+        "6": {
+          "Width": 32
+        },
+        "7": {
+          "Width": 32
+        },
+        "8": {
+          "Width": 32
+        },
+        "9": {
+          "Width": 32
+        },
+        "10": {
+          "Width": 32
+        },
+        "11": {
+          "Width": 32
+        },
+        "12": {
+          "Width": 32
+        },
+        "13": {
+          "Width": 32
+        },
+        "14": {
+          "Width": 32
+        },
+        "15": {
+          "Width": 32
+        },
+        "16": {
+          "Width": 32
+        },
+        "17": {
+          "Width": 32
+        },
+        "18": {
+          "Width": 32
+        }
+      }
+    },
+    "ENGLISH/MAPTEXT1.XLD": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "ENGLISH/MAPTEXT2.XLD": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "ENGLISH/MAPTEXT3.XLD": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "ENGLISH/WORDLIS0.XLD": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "GERMAN/EVNTTXT0.XLD": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "GERMAN/EVNTTXT1.XLD": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "GERMAN/EVNTTXT2.XLD": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "GERMAN/EVNTTXT3.XLD": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "GERMAN/EVNTTXT9.XLD": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "GERMAN/FLICS0.XLD": {
+      "Type": "Unknown",
+      "Assets": {
+        "0": {
+          "Width": 32
+        },
+        "1": {
+          "Width": 32
+        },
+        "2": {
+          "Width": 32
+        },
+        "3": {
+          "Width": 32
+        },
+        "4": {
+          "Width": 32
+        },
+        "5": {
+          "Width": 32
+        },
+        "6": {
+          "Width": 32
+        },
+        "7": {
+          "Width": 32
+        },
+        "8": {
+          "Width": 32
+        },
+        "9": {
+          "Width": 32
+        },
+        "10": {
+          "Width": 32
+        },
+        "11": {
+          "Width": 32
+        },
+        "12": {
+          "Width": 32
+        },
+        "13": {
+          "Width": 32
+        },
+        "14": {
+          "Width": 32
+        },
+        "15": {
+          "Width": 32
+        },
+        "16": {
+          "Width": 32
+        },
+        "17": {
+          "Width": 32
+        },
+        "18": {
+          "Width": 32
+        }
+      }
+    },
+    "GERMAN/MAPTEXT1.XLD": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "GERMAN/MAPTEXT2.XLD": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "GERMAN/MAPTEXT3.XLD": {
+      "Type": "Unknown",
+      "Assets": {}
+    },
+    "GERMAN/WORDLIS0.XLD": {
       "Type": "Unknown",
       "Assets": {}
     }

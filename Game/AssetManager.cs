@@ -1,0 +1,146 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using UAlbion.Core.Textures;
+using UAlbion.Formats;
+using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
+using UAlbion.Formats.Config;
+
+namespace UAlbion.Game
+{
+    public class AssetManager : IAssetManager, IDisposable
+    {
+        static readonly IReadOnlyDictionary<AssetType, Type> IdTypes =
+            Enum.GetValues(typeof(AssetType)).Cast<AssetType>().Select(x =>
+            {
+                var members = typeof(AssetType).GetMember(x.ToString());
+                var member = members.FirstOrDefault(m => m.DeclaringType == typeof(AssetType));
+                var attributes = member?.GetCustomAttributes(typeof(EnumTypeAttribute), false);
+                if (attributes?.Any() ?? false)
+                    return (x, ((EnumTypeAttribute) attributes[0]).EnumType);
+
+                return (x, null);
+            }).Where(x => x.EnumType != null).ToDictionary(x => x.x, x => x.EnumType);
+
+        readonly AssetLocator _assetLocator;
+
+        public AssetManager(AssetConfig assetConfig, CoreSpriteConfig coreSpriteConfig)
+        {
+            _assetLocator = new AssetLocator(assetConfig, coreSpriteConfig);
+        }
+
+        public string GetName(AssetType type, int id) => IdTypes.TryGetValue(type, out var enumType) ? Enum.GetName(enumType, id) : id.ToString();
+        public void Dispose() { _assetLocator.Dispose(); }
+
+        public MapData2D LoadMap2D(MapDataId id) => _assetLocator.LoadAssetCached(AssetType.MapData, id) as MapData2D;
+        public MapData3D LoadMap3D(MapDataId id) => _assetLocator.LoadAssetCached(AssetType.MapData, id) as MapData3D;
+        public ItemData LoadItem(ItemId id)
+        {
+            var data = (IList<ItemData>)_assetLocator.LoadAssetCached(AssetType.ItemList, 0);
+            if (data[0].Names == null)
+            {
+                var names = (IList<string>) _assetLocator.LoadAssetCached(AssetType.ItemNames, 0);
+                for (int i = 0; i < data.Count; i++)
+                    data[i].Names = names.Skip(i * 3).Take(3).ToArray();
+            }
+
+            return data[(int)id];
+        }
+
+        public AlbionPalette LoadPalette(PaletteId id)
+        {
+            var palette = (AlbionPalette)_assetLocator.LoadAssetCached(AssetType.Palette, id);
+            if (palette == null)
+                return null;
+
+            var commonPalette = (byte[])_assetLocator.LoadAssetCached(AssetType.PaletteNull, 0);
+            palette.SetCommonPalette(commonPalette);
+
+            return palette;
+        }
+
+        public ITexture LoadTexture(AssetType type, int id) => type switch
+            {
+                AssetType.AutomapGraphics    => LoadTexture((AutoMapId)id),
+                AssetType.BackgroundGraphics => LoadTexture((DungeonBackgroundId)id),
+                AssetType.BigNpcGraphics     => LoadTexture((LargeNpcId)id),
+                AssetType.BigPartyGraphics   => LoadTexture((LargePartyGraphicsId)id),
+                AssetType.CombatBackground   => LoadTexture((CombatBackgroundId)id),
+                AssetType.CombatGraphics     => LoadTexture((CombatGraphicsId)id),
+                AssetType.Floor3D            => LoadTexture((DungeonFloorId)id),
+                AssetType.Font               => LoadTexture((FontId)id),
+                AssetType.FullBodyPicture    => LoadTexture((FullBodyPictureId)id),
+                AssetType.IconGraphics       => LoadTexture((IconGraphicsId)id),
+                AssetType.ItemGraphics       => LoadTexture((ItemId)id),
+                AssetType.MonsterGraphics    => LoadTexture((MonsterGraphicsId)id),
+                AssetType.Object3D           => LoadTexture((DungeonObjectId)id),
+                AssetType.Overlay3D          => LoadTexture((DungeonOverlayId)id),
+                AssetType.Picture            => LoadTexture((PictureId)id),
+                AssetType.SmallNpcGraphics   => LoadTexture((SmallNpcId)id),
+                AssetType.SmallPartyGraphics => LoadTexture((SmallPartyGraphicsId)id),
+                AssetType.SmallPortrait      => LoadTexture((SmallPortraitId)id),
+                AssetType.TacticalIcon       => LoadTexture((TacticId)id),
+                AssetType.Wall3D             => LoadTexture((DungeonWallId)id),
+                AssetType.CoreGraphics       => LoadTexture((CoreSpriteId)id),
+                AssetType.Slab               => (ITexture)_assetLocator.LoadAssetCached(AssetType.Slab, 0),
+                _ => (ITexture)_assetLocator.LoadAssetCached(type, id)
+            };
+
+        public ITexture LoadTexture(AutoMapId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.AutomapGraphics, id);
+        public ITexture LoadTexture(CombatBackgroundId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.CombatBackground, id);
+        public ITexture LoadTexture(CombatGraphicsId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.CombatGraphics, id);
+        public ITexture LoadTexture(CoreSpriteId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.CoreGraphics, id);
+        public ITexture LoadTexture(DungeonBackgroundId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.BackgroundGraphics, id);
+        public ITexture LoadTexture(DungeonFloorId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.Floor3D, id);
+        public ITexture LoadTexture(DungeonObjectId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.Object3D, id);
+        public ITexture LoadTexture(DungeonOverlayId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.Overlay3D, id);
+        public ITexture LoadTexture(DungeonWallId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.Wall3D, id);
+        public ITexture LoadTexture(FontId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.Font, id);
+        public ITexture LoadTexture(FullBodyPictureId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.FullBodyPicture, id);
+        public ITexture LoadTexture(IconGraphicsId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.IconGraphics, id);
+        public ITexture LoadTexture(ItemId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.ItemGraphics, id); // TODO: Enum
+        public ITexture LoadTexture(LargeNpcId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.BigNpcGraphics, id);
+        public ITexture LoadTexture(LargePartyGraphicsId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.BigPartyGraphics, id);
+        public ITexture LoadTexture(MetaFontId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.MetaFont, id);
+        public ITexture LoadTexture(MonsterGraphicsId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.MonsterGraphics, id);
+        public ITexture LoadTexture(PictureId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.Picture, id);
+        public ITexture LoadTexture(SmallNpcId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.SmallNpcGraphics, id);
+        public ITexture LoadTexture(SmallPartyGraphicsId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.SmallPartyGraphics, id);
+        public ITexture LoadTexture(SmallPortraitId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.SmallPortrait, id);
+        public ITexture LoadTexture(TacticId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.TacticalIcon, id);
+        public TilesetData LoadTileData(IconDataId id) => (TilesetData)_assetLocator.LoadAssetCached(AssetType.IconData, id);
+        public LabyrinthData LoadLabyrinthData(LabyrinthDataId id) => (LabyrinthData)_assetLocator.LoadAssetCached(AssetType.LabData, id);
+        public ITexture LoadFont(FontColor color, bool isBold) => LoadTexture(new MetaFontId(isBold, color));
+        public CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id) =>
+            (CoreSpriteConfig.BinaryResource)_assetLocator.LoadAssetCached(AssetType.CoreGraphicsMetadata, id);
+
+        public string LoadString(StringId id, GameLanguage language)
+        {
+            var stringTable = (IDictionary<int, string>)_assetLocator.LoadAssetCached(id.Type, id.Id, language);
+            return stringTable[id.SubId];
+        }
+
+        public string LoadString(SystemTextId id, GameLanguage language) => LoadString(new StringId(AssetType.SystemText, 0, (int)id), language);
+        public string LoadString(WordId id, GameLanguage language) => LoadString(new StringId(AssetType.Dictionary, (int)id / 500, (int)id), language);
+
+        public AlbionSample LoadSample(AssetType type, int id) => (AlbionSample)_assetLocator.LoadAssetCached(type, id);
+        public AlbionVideo LoadVideo(VideoId id, GameLanguage language) => (AlbionVideo)_assetLocator.LoadAsset(AssetType.Flic, (int)id, $"Video:{id}", language); // Don't cache videos.
+        public CharacterSheet LoadCharacter(AssetType type, PartyCharacterId id) => (CharacterSheet)_assetLocator.LoadAssetCached(type, id);
+        public CharacterSheet LoadCharacter(AssetType type, NpcCharacterId id) => (CharacterSheet)_assetLocator.LoadAssetCached(type, id);
+        public CharacterSheet LoadCharacter(AssetType type, MonsterCharacterId id) => (CharacterSheet)_assetLocator.LoadAssetCached(type, id);
+        public Chest LoadChest(ChestId id) => (Chest)_assetLocator.LoadAssetCached(AssetType.ChestData, id);
+        public Chest LoadMerchant(MerchantId id)=> (Chest)_assetLocator.LoadAssetCached(AssetType.MerchantData, id);
+        public WordId? ParseWord(string word)
+        {
+            var words = // Inefficient code, if it ends up being a problem then we can build a reverse dictionary and cache it.
+                new[]
+                {
+                    (IDictionary<int, string>) _assetLocator.LoadAssetCached(AssetType.Dictionary, 0, GameLanguage.English),
+                    (IDictionary<int, string>) _assetLocator.LoadAssetCached(AssetType.Dictionary, 1, GameLanguage.English),
+                    (IDictionary<int, string>) _assetLocator.LoadAssetCached(AssetType.Dictionary, 2, GameLanguage.English)
+                };
+            return words.SelectMany(x => x).Where(x => x.Value == word).Select(x => (WordId?)x.Key).FirstOrDefault();
+        }
+    }
+}

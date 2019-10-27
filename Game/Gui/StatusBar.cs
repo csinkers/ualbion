@@ -24,9 +24,8 @@ namespace UAlbion.Game.Gui
             H<StatusBar, DescriptionTextEvent>((x,e) => x._descriptionText.LiteralString(e.Text))
         );
 
-        public StatusBar() : base(Handlers)
+        public StatusBar() : base(Handlers, DialogPositioning.StatusBar, Int32.MaxValue)
         {
-            Positioning = DialogPositioning.StatusBar;
             _sprite = new UiSprite<PictureId>(PictureId.StatusBar);
             Children.Add(_sprite);
             _portraits = new StatusBarPortrait[MaxPortraits];
@@ -71,18 +70,21 @@ namespace UAlbion.Game.Gui
             }
         }
 
-        public override void Select(
+        public override int Select(
             Vector2 uiPosition,
             Rectangle extents,
             int order,
             Action<int, object> registerHitFunc)
         {
             if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
-                return;
+                return order;
 
+            int maxOrder = order;
             DoLayout(extents,
-                (rect, x) => x.Select(uiPosition, rect, order, registerHitFunc),
+                (rect, x) => { maxOrder = Math.Max(maxOrder, x.Select(uiPosition, rect, order, registerHitFunc)); },
                 true);
+            registerHitFunc(order, this);
+            return maxOrder;
         }
 
         public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)

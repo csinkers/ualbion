@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets
 {
@@ -36,7 +37,7 @@ namespace UAlbion.Formats.Assets
             public override string ToString() => $"({X}, {Y})";
         }
 
-        public byte Id { get; set; }
+        public NpcCharacterId Id { get; set; }
         public byte Sound { get; set; }
         public ushort? EventNumber { get; set; }
         public ushort ObjectNumber { get; set; }
@@ -49,7 +50,7 @@ namespace UAlbion.Formats.Assets
         public static MapNpc Load(BinaryReader br)
         {
             var npc = new MapNpc();
-            npc.Id = br.ReadByte(); // +0
+            npc.Id = (NpcCharacterId)br.ReadByte(); // +0
             npc.Sound = br.ReadByte(); // +1
             npc.EventNumber = br.ReadUInt16(); // +2
             if (npc.EventNumber == 0xffff) npc.EventNumber = null;
@@ -86,6 +87,6 @@ namespace UAlbion.Formats.Assets
             }
         }
 
-        public override string ToString() => $"Npc{Id} Obj{ObjectNumber} F={Flags:x} M{Movement} Amount={Unk8} Unk9={Unk9} S{Sound} E{EventNumber}";
+        public override string ToString() => $"Npc{(int)Id} {Id} Obj{ObjectNumber} F:{Flags:x} M{Movement} Amount:{Unk8} Unk9:{Unk9} S{Sound} E{EventNumber}";
     }
 }

@@ -63,12 +63,16 @@ namespace UAlbion.Game.Gui
             return maxOrder;
         }
 
-        public override void Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
-            if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y)) 
-                return;
-            VisitChildren(extents, (x, rect) => x.Select(uiPosition, rect, order + 1, registerHitFunc));
+            int maxOrder = order;
+            if (!extents.Contains((int) uiPosition.X, (int) uiPosition.Y)) 
+                return maxOrder;
+
+            VisitChildren(extents, (x, rect) => { maxOrder = Math.Max(maxOrder, x.Select(uiPosition, rect, order + 1, registerHitFunc)); });
             registerHitFunc(order, this);
+
+            return maxOrder;
         }
     }
 }

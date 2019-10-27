@@ -6,8 +6,8 @@ namespace UAlbion.Game.Events
 {
     public class CollectDialogsEvent : GameEvent, IVerboseEvent
     {
-        public Action<(IUiElement, DialogPositioning)> AddDialog { get; }
+        public Action<IDialog> AddDialog { get; }
 
-        public CollectDialogsEvent(Action<(IUiElement, DialogPositioning)> addDialog) { AddDialog = addDialog; }
+        public CollectDialogsEvent(Action<IDialog> addDialog) { AddDialog = addDialog; }
     }
 }

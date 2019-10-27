@@ -38,18 +38,19 @@ namespace UAlbion.Game
 
         IReadOnlyList<IUiElement> _lastSelection = new List<IUiElement>();
 
-        void DoLayout(Action<Rectangle, IUiElement> action)
+        void DoLayout(Func<Rectangle, int, IUiElement, int> action)
         {
+            int order = (int)DrawLayer.Interface;
             int uiWidth = UiConstants.ActiveAreaExtents.Width;
             int uiHeight = UiConstants.ActiveAreaExtents.Height;
-            var elements = new List<(IUiElement, DialogPositioning)>();
-            Raise(new CollectDialogsEvent(elements.Add));
-            foreach (var (element, positioning) in elements)
+            var dialogs = new List<IDialog>();
+            Raise(new CollectDialogsEvent(dialogs.Add));
+            foreach (var dialog in dialogs.OrderBy(x => x.Depth))
             {
-                var size = element.GetSize();
+                var size = dialog.GetSize();
 
                 int x; int y;
-                switch(positioning)
+                switch(dialog.Positioning)
                 {
                     case DialogPositioning.Center:
                         x = (uiWidth - (int)size.X) / 2;
@@ -96,13 +97,13 @@ namespace UAlbion.Game
                         throw new ArgumentOutOfRangeException();
                 }
 
-                action(new Rectangle(x, y, (int)size.X, (int)size.Y), element);
+                order = action(new Rectangle(x, y, (int)size.X, (int)size.Y), order, dialog);
             }
         }
 
         void Render(RenderEvent renderEvent)
         {
-            DoLayout((extents, element) => element.Render(extents, (int)DrawLayer.Interface, renderEvent.Add));
+            DoLayout((extents, order, element) => element.Render(extents, order, renderEvent.Add));
         }
 
         void Select(ScreenCoordinateSelectEvent selectEvent)
@@ -112,19 +113,15 @@ namespace UAlbion.Game
             var uiPosition = window.NormToUi(normPosition);
 
             var newSelection = new List<IUiElement>();
-            DoLayout((extents, element) =>
-                {
-                    element.Select(uiPosition, extents, (int)DrawLayer.Interface, 
-                        (order, target) =>
+            DoLayout((extents, dialogOrder, element) =>
+                    element.Select(uiPosition, extents, dialogOrder, (order, target) =>
                         {
                             float z = 1.0f - order / (float)DrawLayer.MaxLayer;
                             var intersectionPoint = new Vector3(normPosition, z);
                             selectEvent.RegisterHit(z, new Selection(intersectionPoint, target));
                             if(target is IUiElement subElement)
                                 newSelection.Add(subElement);
-                        }
-                    );
-                });
+                        }));
 
             var focused = newSelection.Except(_lastSelection);
             var blurred = _lastSelection.Except(newSelection);
@@ -135,5 +132,4 @@ namespace UAlbion.Game
 
         public LayoutManager() : base(Handlers) { }
     }
-
 }

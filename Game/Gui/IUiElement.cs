@@ -29,7 +29,7 @@ namespace UAlbion.Game.Gui
         /// <param name="extents"></param>
         /// <param name="order"></param>
         /// <param name="registerHitFunc"></param>
-        void Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc);
+        int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc);
     }
 
     public interface IFixedSizeUiElement { } // Any elements with this interface won't get stretched to fill available space

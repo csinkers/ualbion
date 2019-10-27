@@ -78,7 +78,7 @@ namespace UAlbion.Game.Gui
         protected override void Subscribed() { LoadSprite(); base.Subscribed(); }
         public override Vector2 GetSize() => _portrait.GetSize() + new Vector2(0,6); // Add room for health + mana bars
 
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        int DoLayout(Rectangle extents, int order, Func<Rectangle, int, IUiElement, int> func)
         {
             var stateManager = Resolve<IStateManager>();
             var member = stateManager.State.Party.Players.ElementAt(_order);
@@ -89,24 +89,39 @@ namespace UAlbion.Game.Gui
             int maxOrder = order;
             var portraitExtents = new Rectangle(extents.X, extents.Y + (highlighted ? 0 : 3), extents.Width, extents.Height - 6);
 
-            maxOrder = Math.Max(maxOrder, _portrait.Render(portraitExtents, order, addFunc));
-            maxOrder = Math.Max(maxOrder, _health.Render(new Rectangle(
+            maxOrder = Math.Max(maxOrder, func(portraitExtents, order, _portrait));
+            maxOrder = Math.Max(maxOrder, func(new Rectangle(
                     extents.X + 5,
                     extents.Y + extents.Height - 7,
                     extents.Width - 12,
                     4),
-                order, addFunc));
+                order, _health));
 
             if (sheet.Magic.SpellPointsMax > 0)
             {
-                maxOrder = Math.Max(maxOrder, _mana.Render(new Rectangle(
+                maxOrder = Math.Max(maxOrder, func(new Rectangle(
                         extents.X + 5,
                         extents.Y + extents.Height - 4,
                         extents.Width - 12,
                         4),
-                    order, addFunc));
+                    order, _mana));
             }
 
+            return maxOrder;
+        }
+
+        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc) => 
+            DoLayout(extents, order, (elementExtents, elementOrder, element) => element.Render(elementExtents, elementOrder, addFunc));
+
+        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+        {
+            if (!extents.Contains((int) uiPosition.X, (int) uiPosition.Y))
+                return order;
+
+            int maxOrder = DoLayout(extents, order, (elementExtents, elementOrder, element) =>
+                    element.Select(uiPosition, elementExtents, elementOrder, registerHitFunc));
+
+            registerHitFunc(order, this);
             return maxOrder;
         }
     }

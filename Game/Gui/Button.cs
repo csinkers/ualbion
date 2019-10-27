@@ -100,13 +100,14 @@ namespace UAlbion.Game.Gui
             return RenderChildren(innerExtents, order, addFunc);
         }
 
-        public override void Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
             if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
-                return;
+                return order;
             var innerExtents = new Rectangle(extents.X + 2, extents.Y, extents.Width - 4, extents.Height);
-            SelectChildren(uiPosition, innerExtents, order, registerHitFunc);
+            var maxOrder = SelectChildren(uiPosition, innerExtents, order, registerHitFunc);
             registerHitFunc(order, this);
+            return maxOrder;
         }
     }
 }

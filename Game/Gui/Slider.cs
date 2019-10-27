@@ -110,29 +110,31 @@ namespace UAlbion.Game.Gui
             return maxOrder;
         }
 
-        public override void Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
             if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
-                return;
+                return order;
 
             var decWidth = (int)_decrement.GetSize().X;
             var incWidth = (int)_increment.GetSize().X;
 
-             _decrement.Select(uiPosition,
+            int maxOrder = order;
+            maxOrder = Math.Max(maxOrder, _decrement.Select(uiPosition,
                 new Rectangle(extents.X, extents.Y, decWidth, extents.Height),
-                order + 1, registerHitFunc);
+                order + 1, registerHitFunc));
 
-             _frame.Select(uiPosition,
+            maxOrder = Math.Max(maxOrder, _frame.Select(uiPosition,
                  new Rectangle(
                     extents.X + decWidth,
                     extents.Y,
                 extents.Width - decWidth - incWidth,
                     extents.Height
-                ), order + 1, registerHitFunc);
+                ), order + 1, registerHitFunc));
 
-             _increment.Select(uiPosition,
-                new Rectangle(extents.X + extents.Width - incWidth, extents.Y, incWidth, extents.Height),
-                order + 1, registerHitFunc);
+            maxOrder = Math.Max(maxOrder, _increment.Select(uiPosition,
+               new Rectangle(extents.X + extents.Width - incWidth, extents.Y, incWidth, extents.Height),
+               order + 1, registerHitFunc));
+            return maxOrder;
         }
     }
 }

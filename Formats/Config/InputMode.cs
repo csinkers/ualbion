@@ -5,7 +5,7 @@
         Global = 0,
         Console,
         Dialog,
-        Map,
+        Automap,
         World2D,
         Inventory,
         Combat,

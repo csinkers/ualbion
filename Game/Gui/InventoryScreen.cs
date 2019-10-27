@@ -18,14 +18,14 @@ namespace UAlbion.Game.Gui
         LockedChest
     }
 
-    public class InventoryScreen : UiElement
+    public class InventoryScreen : Dialog
     {
         static readonly HandlerSet Handlers = new HandlerSet(
         );
 
         InventoryMode _mode;
 
-        public InventoryScreen() : base(Handlers)
+        public InventoryScreen() : base(Handlers, DialogPositioning.Bottom)
         {
             // 0 - 135 .375
             // 6 pix gap .0166667
@@ -80,7 +80,7 @@ namespace UAlbion.Game.Gui
             };
 
         public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc) => GetActivePage().Render(extents, order, addFunc);
-        public override void Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc) => GetActivePage().Select(uiPosition, extents, order, registerHitFunc);
+        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc) => GetActivePage().Select(uiPosition, extents, order, registerHitFunc);
     }
 
     public class InventorySummaryPage : UiElement // Summary

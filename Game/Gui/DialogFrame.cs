@@ -116,10 +116,10 @@ namespace UAlbion.Game.Gui
             return RenderChildren(innerExtents, order, addFunc);
         }
 
-        public override void Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
             if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
-                return;
+                return order;
 
             Rebuild(extents.Width, extents.Height, order);
 
@@ -129,8 +129,9 @@ namespace UAlbion.Game.Gui
                 extents.Width - 14,
                 extents.Height - 14);
 
-            SelectChildren(uiPosition, innerExtents, order, registerHitFunc);
+            var maxOrder = SelectChildren(uiPosition, innerExtents, order, registerHitFunc);
             registerHitFunc(order, this);
+            return maxOrder;
         }
     }
 }

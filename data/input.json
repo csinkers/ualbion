@@ -1,7 +1,7 @@
 {
     "Global": {
         "Escape": "push_scene MainMenu",
-        "Tilde": "toggle_console",
+        "Tilde": "push_input_mode console",
         "Alt+F4": "quit",
         "BracketLeft": "e:mag -1",
         "BracketRight": "e:mag 1",
@@ -11,7 +11,7 @@
         "F10": "update 1",
         "Control+A": "!loadnextmap",
         "Control+X": "!loadprevmap",
-        "Pause":  "e:renderdoc",
+        "Pause": "e:renderdoc",
 
         "W": "+camera_move  0 -2",
         "A": "+camera_move -2  0",
@@ -44,7 +44,7 @@
         "Left":  "+party_move -1  0",
         "Right": "+party_move  1  0",
 
-        "Tab": "open_inventory",
+        "Tab": "push_scene inventory",
 
         "Number1": "set_active_member 0",
         "Number2": "set_active_member 1",
@@ -56,7 +56,7 @@
         "E": "cursor_mode manipulate"
     },
     "World3D": {
-        "Tab": "open_inventory",
+        "Tab": "push_scene inventory",
 
         "Number1": "set_active_member 0",
         "Number2": "set_active_member 1",
@@ -68,8 +68,8 @@
         "T": "wait"
     },
     "Inventory": {
-        "Control+A": "take_all",
-        "Escape": "close_inventory"
+        "Control+A": "inv_take_all",
+        "Escape": "pop_scene"
     },
     "Dialog": {
         "Number1": "respond 1",

@@ -8,8 +8,8 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Scenes
 {
-    public interface IFlatScene : IScene { }
-    public class FlatScene : GameScene, IFlatScene
+    public interface IAutoMapScene : IScene { }
+    public class AutomapScene : GameScene, IAutoMapScene
     {
         static readonly Type[] Renderers = {
             typeof(DebugGuiRenderer),
@@ -18,7 +18,7 @@ namespace UAlbion.Game.Scenes
             typeof(SpriteRenderer),
         };
 
-        public FlatScene() : base(SceneId.World2D, new OrthographicCamera(), Renderers)
+        public AutomapScene() : base(SceneId.Automap, new OrthographicCamera(), Renderers)
         {
             var cameraMotion = new CameraMotion2D((OrthographicCamera)Camera);
             Children.Add(cameraMotion);
@@ -27,7 +27,7 @@ namespace UAlbion.Game.Scenes
         protected override void Subscribed()
         {
             Raise(new SetCursorEvent(CoreSpriteId.Cursor));
-            Raise(new SetInputModeEvent(InputMode.World2D));
+            Raise(new SetInputModeEvent(InputMode.Automap));
             Raise(new SetMouseModeEvent(MouseMode.Normal));
             base.Subscribed();
         }

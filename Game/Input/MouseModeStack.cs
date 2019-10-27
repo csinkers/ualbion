@@ -21,10 +21,6 @@ namespace UAlbion.Game.Input
                     var newMode = x._stack.Pop();
                     x.Raise(new SetMouseModeEvent(newMode));
                 }
-            }),
-            H<MouseModeStack, ISetMouseModeEvent>((x, e) =>
-            {
-                x._stack.Clear();
             })
         );
 

@@ -55,11 +55,11 @@ namespace UAlbion.Game.Entities
 
         public override string ToString() => $"{_id}";
         public override Vector2 GetSize() => _size;
-        public override void Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
-            if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
-                return;
-            registerHitFunc(order, this);
+            if (extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
+                registerHitFunc(order, this);
+            return order;
         }
 
         public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)

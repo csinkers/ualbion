@@ -27,7 +27,7 @@ namespace UAlbion.Game.Entities
             // H<Map2D, UnloadMapEvent>((x, e) => x.Unload()),
         );
 
-        public override string ToString() { return $"Map2D: {MapId} ({(int)MapId}"; }
+        public override string ToString() { return $"Map2D: {MapId} ({(int)MapId})"; }
 
         public Map2D(MapDataId mapId) : base(Handlers)
         {

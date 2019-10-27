@@ -22,7 +22,7 @@ namespace UAlbion.Game.Gui
             H<MainMenu, ButtonPressEvent>((x, e) => x.OnButton(e.ButtonId))
         );
 
-        public MainMenu() : base(Handlers) { }
+        public MainMenu() : base(Handlers, DialogPositioning.Center) { }
 
         void OnButton(string buttonId)
         {

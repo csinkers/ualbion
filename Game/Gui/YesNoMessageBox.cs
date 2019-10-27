@@ -31,7 +31,7 @@ namespace UAlbion.Game.Gui
             })
         );
 
-        public YesNoMessageBox(StringId stringId) : base(Handlers)
+        public YesNoMessageBox(StringId stringId) : base(Handlers, DialogPositioning.Center)
         {
             var elements = new VerticalStack(
                 new Padding(0, 5),

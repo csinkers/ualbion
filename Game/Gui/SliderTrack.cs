@@ -69,10 +69,10 @@ namespace UAlbion.Game.Gui
             return _thumb.Render(ThumbExtents(extents), order, addFunc);
         }
 
-        public override void Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
             if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
-                return;
+                return order;
 
             var thumbExtents = ThumbExtents(extents);
             int value = _getter();
@@ -110,8 +110,9 @@ namespace UAlbion.Game.Gui
                     break;
             }
 
-            _thumb.Select(uiPosition, thumbExtents, order + 1, registerHitFunc);
+            var maxOrder = _thumb.Select(uiPosition, thumbExtents, order + 1, registerHitFunc);
             registerHitFunc(order, this);
+            return maxOrder;
         }
     }
 }

@@ -44,20 +44,22 @@ namespace UAlbion.Game.Gui
             return maxOrder;
         }
 
-        public override void Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
             if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
-                return;
+                return order;
 
             int offset = extents.Y;
+            int maxOrder = order;
             foreach(var child in Children.OfType<IUiElement>())
             {
                 int height = (int)child.GetSize().Y;
-                child.Select(uiPosition, new Rectangle(extents.X,  offset, extents.Width, height), order + 1, registerHitFunc);
+                maxOrder = Math.Max(maxOrder, child.Select(uiPosition, new Rectangle(extents.X,  offset, extents.Width, height), order + 1, registerHitFunc));
                 offset += height;
             }
 
             registerHitFunc(order, this);
+            return maxOrder;
         }
     }
 }

@@ -83,7 +83,7 @@ namespace UAlbion
                 ;
 
             var sceneManager = new SceneManager(engine)
-                .AddScene(new MapScene())
+                .AddScene(new AutomapScene())
                 .AddScene(new FlatScene())
                 .AddScene(new DungeonScene())
                 .AddScene(new MenuScene())
@@ -100,7 +100,7 @@ namespace UAlbion
                 .Register<ISpriteResolver>(new SpriteResolver())
                 .Register<ISettings>(new Settings())
                 .Register<IStateManager>(new StateManager())
-                .Attach(sceneManager)
+                .Register<ISceneManager>(sceneManager)
                 .Attach(new ConsoleLogger())
                 .Attach(new GameClock())
                 .Attach(new MapManager())
@@ -122,28 +122,22 @@ namespace UAlbion
                 .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
                 ;
 
+            sceneManager.GetExchange(SceneId.Inventory).Attach(new InventoryScreen());
+            var menuBackground = new ScreenSpaceSprite<PictureId>(PictureId.MenuBackground8, new Vector2(0.0f, 1.0f), new Vector2(2.0f, -2.0f));
+            sceneManager.GetExchange(SceneId.MainMenu)
+                .Attach(new MainMenu())
+                .Attach(menuBackground)
+                ;
+
+            engine.GlobalExchange.Raise(new NewGameEvent(), null);
             /*
             engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude), null); /*
             engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.Jirinaar3D), null); /*
             engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.HausDesJägerclans), null); //*/
-
-            //*
-            var menu = new MainMenu();
-            var menuBackground = new ScreenSpaceSprite<PictureId>(PictureId.MenuBackground8, new Vector2(0.0f, 1.0f), new Vector2(2.0f, -2.0f));
-            sceneManager.GetExchange(SceneId.MainMenu)
-                .Attach(menu)
-                .Attach(menuBackground)
-                ;
-
+            /*
             engine.GlobalExchange.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
             //*/
-
             /*
-            var inventory = new InventoryScreen();
-            sceneManager.GetExchange(SceneId.Inventory)
-                .Attach(inventory)
-                ;
-
             engine.GlobalExchange.Raise(new SetSceneEvent(SceneId.Inventory), null);
             //*/
 

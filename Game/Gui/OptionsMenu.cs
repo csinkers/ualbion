@@ -47,7 +47,7 @@ namespace UAlbion.Game.Gui
             })
         );
 
-        public OptionsMenu() : base(Handlers)
+        public OptionsMenu() : base(Handlers, DialogPositioning.Center)
         {
             StringId S(SystemTextId id) => new StringId(AssetType.SystemText, 0, (int)id);
             var elements = new List<IUiElement>

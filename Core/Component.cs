@@ -14,26 +14,15 @@ namespace UAlbion.Core
         protected abstract class Handler
         {
             public Type Type { get; }
-
             protected Handler(Type type) { Type = type; }
-
             public abstract void Invoke(Component instance, IEvent @event);
         }
 
         protected class Handler<TInstance, TEvent> : Handler where TInstance : Component
         {
             readonly Action<TInstance, TEvent> _callback;
-
-            public Handler(Action<TInstance, TEvent> callback)
-                : base(typeof(TEvent))
-            {
-                _callback = callback;
-            }
-
-            public override void Invoke(Component instance, IEvent @event)
-            {
-                _callback((TInstance)instance, (TEvent)@event);
-            }
+            public Handler(Action<TInstance, TEvent> callback) : base(typeof(TEvent)) { _callback = callback; }
+            public override void Invoke(Component instance, IEvent @event) => _callback((TInstance)instance, (TEvent)@event);
         }
 
         protected class HandlerSet : Dictionary<Type, Handler>

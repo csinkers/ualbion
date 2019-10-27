@@ -1,7 +1,10 @@
 ﻿using System;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
+using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Entities;
+using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Scenes
 {
@@ -20,6 +23,14 @@ namespace UAlbion.Game.Scenes
         {
             var cameraMotion = new CameraMotion3D((PerspectiveCamera)Camera);
             Children.Add(cameraMotion);
+        }
+
+        protected override void Subscribed()
+        {
+            Raise(new SetCursorEvent(CoreSpriteId.Cursor));
+            Raise(new SetInputModeEvent(InputMode.World3D));
+            Raise(new SetMouseModeEvent(MouseMode.MouseLook));
+            base.Subscribed();
         }
     }
 }

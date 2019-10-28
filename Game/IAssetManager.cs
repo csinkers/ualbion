@@ -8,7 +8,6 @@ namespace UAlbion.Game
 {
     public interface IAssetManager
     {
-        string GetName(AssetType type, int id);
         ITexture LoadTexture(AssetType type, int id);
         ITexture LoadTexture(AutoMapId id);
         ITexture LoadTexture(CombatBackgroundId id);

@@ -4,7 +4,7 @@
   "Xlds": {
     "3DBCKGR0.XLD": {
       "EnumName": "DungeonBackgroundId",
-      "Type": "SingleHeaderSprite",
+      "Format": "SingleHeaderSprite",
       "Assets": {
         "0": {
           "Name": "EarlyGameS",
@@ -32,7 +32,7 @@
     },
     "3DFLOOR0.XLD": {
       "EnumName": "DungeonFloorId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Width": 64,
       "Height": 64,
       "Assets": {
@@ -656,7 +656,7 @@
     },
     "3DFLOOR1.XLD": {
       "EnumName": "DungeonFloorId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Width": 64,
       "Height": 64,
       "Assets": {
@@ -1803,7 +1803,7 @@
     },
     "3DFLOOR2.XLD": {
       "EnumName": "DungeonFloorId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Width": 64,
       "Height": 64,
       "Assets": {
@@ -2373,7 +2373,7 @@
     },
     "3DOBJEC0.XLD": {
       "EnumName": "DungeonObjectId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Assets": {
         "0": {
           "Name": "LightCover",
@@ -3152,7 +3152,7 @@
     },
     "3DOBJEC1.XLD": {
       "EnumName": "DungeonObjectId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Assets": {
         "0": {
           "Name": "TorchPedestal",
@@ -3975,7 +3975,7 @@
     },
     "3DOBJEC2.XLD": {
       "EnumName": "DungeonObjectId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Assets": {
         "0": {
           "Name": "Stalagmite",
@@ -4802,7 +4802,7 @@
     },
     "3DOBJEC3.XLD": {
       "EnumName": "DungeonObjectId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Assets": {
         "0": {
           "Name": "Celt",
@@ -5226,7 +5226,7 @@
     },
     "3DOVERL0.XLD": {
       "EnumName": "DungeonOverlayId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Transposed": true,
       "Assets": {
         "0": {
@@ -5847,7 +5847,7 @@
     },
     "3DOVERL1.XLD": {
       "EnumName": "DungeonOverlayId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Transposed": true,
       "Assets": {
         "0": {
@@ -6522,7 +6522,7 @@
     },
     "3DOVERL2.XLD": {
       "EnumName": "DungeonOverlayId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Transposed": true,
       "Assets": {
         "0": {
@@ -6962,7 +6962,7 @@
     },
     "3DWALLS0.XLD": {
       "EnumName": "DungeonWallId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Transposed": true,
       "Assets": {
         "0": {
@@ -7638,7 +7638,7 @@
     },
     "3DWALLS1.XLD": {
       "EnumName": "DungeonWallId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Transposed": true,
       "Assets": {
         "0": {
@@ -8062,7 +8062,7 @@
     },
     "AUTOGFX0.XLD": {
       "EnumName": "AutoGraphicsId",
-      "Type": "AmorphousSprite",
+      "Format": "AmorphousSprite",
       "Assets": {
         "0": {
           "Name": "Set",
@@ -8076,7 +8076,7 @@
     },
     "BLKLIST0.XLD": {
       "EnumName": "BlockListId",
-      "Type": "BlockList",
+      "Format": "BlockList",
       "Assets": {
         "0": {},
         "1": {},
@@ -8093,7 +8093,7 @@
     },
     "COMBACK0.XLD": {
       "EnumName": "CombatBackgroundId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Width": 360,
       "Assets": {
         "0": {
@@ -8214,7 +8214,7 @@
     },
     "COMGFX0.XLD": {
       "EnumName": "CombatGraphicsId",
-      "Type": "HeaderPerSubImageSprite",
+      "Format": "HeaderPerSubImageSprite",
       "Assets": {
         "0": {},
         "1": {},
@@ -8305,7 +8305,7 @@
     },
     "EVNTSET0.XLD": {
       "EnumName": "EventSetId",
-      "Type": "EventSet",
+      "Format": "EventSet",
       "Assets": {
         "0": {},
         "1": {},
@@ -8343,7 +8343,7 @@
     },
     "EVNTSET1.XLD": {
       "EnumName": "EventSetId",
-      "Type": "EventSet",
+      "Format": "EventSet",
       "Assets": {
         "0": {},
         "1": {},
@@ -8449,7 +8449,7 @@
     },
     "EVNTSET2.XLD": {
       "EnumName": "EventSetId",
-      "Type": "EventSet",
+      "Format": "EventSet",
       "Assets": {
         "0": {},
         "1": {},
@@ -8555,7 +8555,7 @@
     },
     "EVNTSET3.XLD": {
       "EnumName": "EventSetId",
-      "Type": "EventSet",
+      "Format": "EventSet",
       "Assets": {
         "0": {},
         "1": {},
@@ -8661,7 +8661,7 @@
     },
     "EVNTSET9.XLD": {
       "EnumName": "EventSetId",
-      "Type": "EventSet",
+      "Format": "EventSet",
       "Assets": {
         "0": {},
         "1": {},
@@ -8767,7 +8767,7 @@
     },
     "FBODPIX0.XLD": {
       "EnumName": "FullBodyPictureId",
-      "Type": "SingleHeaderSprite",
+      "Format": "SingleHeaderSprite",
       "Assets": {
         "0": {
           "PaletteHints": [
@@ -8819,7 +8819,7 @@
     },
     "FONTS0.XLD": {
       "EnumName": "FontId",
-      "Type": "Font",
+      "Format": "Font",
       "Width": 8,
       "Height": 8,
       "Assets": {
@@ -8833,7 +8833,7 @@
     },
     "ICONDAT0.XLD": {
       "EnumName": "IconDataId",
-      "Type": "IconData",
+      "Format": "IconData",
       "Width": 8,
       "Height": 8,
       "Assets": {
@@ -8884,7 +8884,7 @@
     },
     "ICONGFX0.XLD": {
       "EnumName": "IconGraphicsId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Width": 16,
       "Height": 16,
       "Assets": {
@@ -8957,7 +8957,7 @@
       }
     },
     "ITEMGFX": {
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Width": 16,
       "Height": 16,
       "Assets": {
@@ -8967,7 +8967,7 @@
       }
     },
     "ITEMLIST.DAT": {
-      "Type": "ItemData",
+      "Format": "ItemData",
       "Assets": {
         "0": {
           "Name": "Item Data"
@@ -8975,7 +8975,7 @@
       }
     },
     "ITEMNAME.DAT": {
-      "Type": "ItemNames",
+      "Format": "ItemNames",
       "Assets": {
         "0": {
           "Name": "Item Names"
@@ -8984,7 +8984,7 @@
     },
     "LABDATA0.XLD": {
       "EnumName": "LabyrinthDataId",
-      "Type": "LabyrinthData",
+      "Format": "LabyrinthData",
       "Assets": {
         "0": {},
         "1": {},
@@ -8999,7 +8999,7 @@
     },
     "LABDATA1.XLD": {
       "EnumName": "LabyrinthDataId",
-      "Type": "LabyrinthData",
+      "Format": "LabyrinthData",
       "Assets": {
         "0": {},
         "1": {},
@@ -9105,7 +9105,7 @@
     },
     "LABDATA2.XLD": {
       "EnumName": "LabyrinthDataId",
-      "Type": "LabyrinthData",
+      "Format": "LabyrinthData",
       "Assets": {
         "0": {},
         "1": {},
@@ -9211,7 +9211,7 @@
     },
     "MAPDATA1.XLD": {
       "EnumName": "MapDataId",
-      "Type": "MapData",
+      "Format": "MapData",
       "Assets": {
         "0": {
           "Name": "Test-Map Iskai"
@@ -9479,7 +9479,7 @@
     },
     "MAPDATA2.XLD": {
       "EnumName": "MapDataId",
-      "Type": "MapData",
+      "Format": "MapData",
       "Assets": {
         "0": {
           "Name": "Nakiridaani Kontinentkarte"
@@ -9743,7 +9743,7 @@
     },
     "MAPDATA3.XLD": {
       "EnumName": "MapDataId",
-      "Type": "MapData",
+      "Format": "MapData",
       "Assets": {
         "0": {
           "Name": "Toronto 2D Gesamtkarte Spielbeginn"
@@ -9883,7 +9883,7 @@
     },
     "MONCHAR0.XLD": {
       "EnumName": "MonsterCharacterId",
-      "Type": "CharacterData",
+      "Format": "CharacterData",
       "Assets": {
         "0": {
           "Name": "Fear1"
@@ -10060,7 +10060,7 @@
     },
     "MONGFX0.XLD": {
       "EnumName": "MonsterGraphicsId",
-      "Type": "HeaderPerSubImageSprite",
+      "Format": "HeaderPerSubImageSprite",
       "Assets": {
         "0": {
           "Name": "FloatingHand",
@@ -10380,7 +10380,7 @@
     },
     "MONGRP0.XLD": {
       "EnumName": "MonsterGroupId",
-      "Type": "MonsterGroup",
+      "Format": "MonsterGroup",
       "Assets": {
         "0": {},
         "1": {},
@@ -10485,7 +10485,7 @@
     },
     "MONGRP1.XLD": {
       "EnumName": "MonsterGroupId",
-      "Type": "MonsterGroup",
+      "Format": "MonsterGroup",
       "Assets": {
         "0": {},
         "1": {},
@@ -10591,7 +10591,7 @@
     },
     "MONGRP2.XLD": {
       "EnumName": "MonsterGroupId",
-      "Type": "MonsterGroup",
+      "Format": "MonsterGroup",
       "Assets": {
         "0": {},
         "1": {},
@@ -10697,7 +10697,7 @@
     },
     "NPCGR0.XLD": {
       "EnumName": "LargeNpcId",
-      "Type": "SingleHeaderSprite",
+      "Format": "SingleHeaderSprite",
       "Assets": {
         "0": {
           "Name": "Iskai",
@@ -11087,7 +11087,7 @@
     },
     "NPCGR1.XLD": {
       "EnumName": "LargeNpcId",
-      "Type": "SingleHeaderSprite",
+      "Format": "SingleHeaderSprite",
       "Assets": {
         "0": {},
         "1": {},
@@ -11193,7 +11193,7 @@
     },
     "NPCKL0.XLD": {
       "EnumName": "SmallNpcId",
-      "Type": "SingleHeaderSprite",
+      "Format": "SingleHeaderSprite",
       "Assets": {
         "0": {
           "Name": "Iskai"
@@ -11285,7 +11285,7 @@
       }
     },
     "PALETTE.000": {
-      "Type": "PaletteCommon",
+      "Format": "PaletteCommon",
       "Assets": {
         "0": {
           "Name": "Common Palette"
@@ -11294,7 +11294,7 @@
     },
     "PALETTE0.XLD": {
       "EnumName": "PaletteId",
-      "Type": "Palette",
+      "Format": "Palette",
       "Assets": {
         "0": {
           "Name": "Outdoors2D"
@@ -11437,7 +11437,7 @@
     },
     "PARTGR0.XLD": {
       "EnumName": "LargePartyGraphicsId",
-      "Type": "SingleHeaderSprite",
+      "Format": "SingleHeaderSprite",
       "Assets": {
         "0": {
           "Name": "Tom",
@@ -11502,7 +11502,7 @@
     },
     "PARTKL0.XLD": {
       "EnumName": "SmallPartyGraphicsId",
-      "Type": "SingleHeaderSprite",
+      "Format": "SingleHeaderSprite",
       "Assets": {
         "0": {
           "Name": "Tom",
@@ -11567,7 +11567,7 @@
     },
     "PICTURE0.XLD": {
       "EnumName": "PictureId",
-      "Type": "InterlacedBitmap",
+      "Format": "InterlacedBitmap",
       "Assets": {
         "0": {
           "Name": "SmallWizard"
@@ -11714,7 +11714,7 @@
     },
     "SAMPLES0.XLD": {
       "EnumName": "SampleId",
-      "Type": "AudioSample",
+      "Format": "AudioSample",
       "Assets": {
         "0": {},
         "1": {},
@@ -11798,7 +11798,7 @@
     },
     "SAMPLES1.XLD": {
       "EnumName": "SampleId",
-      "Type": "AudioSample",
+      "Format": "AudioSample",
       "Assets": {
         "0": {},
         "1": {},
@@ -11904,7 +11904,7 @@
     },
     "SAMPLES2.XLD": {
       "EnumName": "SampleId",
-      "Type": "AudioSample",
+      "Format": "AudioSample",
       "Assets": {
         "0": {},
         "1": {},
@@ -12010,7 +12010,7 @@
     },
     "SCRIPT0.XLD": {
       "EnumName": "ScriptId",
-      "Type": "Script",
+      "Format": "Script",
       "Assets": {
         "0": {},
         "1": {},
@@ -12078,7 +12078,7 @@
     },
     "SCRIPT2.XLD": {
       "EnumName": "ScriptId",
-      "Type": "Script",
+      "Format": "Script",
       "Assets": {
         "0": {},
         "1": {},
@@ -12184,7 +12184,7 @@
     },
     "SLAB": {
       "EnumName": "SlabId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Width": 360,
       "Assets": {
         "0": {
@@ -12194,7 +12194,7 @@
     },
     "SMLPORT0.XLD": {
       "EnumName": "SmallPortraitId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Width": 34,
       "Assets": {
         "0": {
@@ -12318,7 +12318,7 @@
     },
     "SMLPORT1.XLD": {
       "EnumName": "SmallPortraitId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Width": 34,
       "Assets": {
         "0": {},
@@ -12431,7 +12431,7 @@
     },
     "SONGS0.XLD": {
       "EnumName": "SongId",
-      "Type": "Song",
+      "Format": "Song",
       "Assets": {
         "0": {},
         "1": {},
@@ -12482,12 +12482,12 @@
       }
     },
     "SPELLDAT.DAT": {
-      "Type": "SpellData",
+      "Format": "SpellData",
       "Assets": {}
     },
     "TACTICO0.XLD": {
       "EnumName": "TacticalGraphicsId",
-      "Type": "FixedSizeSprite",
+      "Format": "FixedSizeSprite",
       "Width": 32,
       "Assets": {
         "0": {},
@@ -12566,7 +12566,7 @@
     },
     "TRANSTB0.XLD": {
       "EnumName": "TranslationTableId",
-      "Type": "TranslationTable",
+      "Format": "TranslationTable",
       "Assets": {
         "0": {},
         "1": {},
@@ -12626,7 +12626,7 @@
     },
     "WAVELIB0.XLD": {
       "EnumName": "WaveLibraryId",
-      "Type": "SampleLibrary",
+      "Format": "SampleLibrary",
       "Assets": {
         "0": {},
         "1": {},
@@ -12668,7 +12668,7 @@
     },
     "$(LANG)/EVNTTXT0.XLD": {
       "EnumName": "EventTextId",
-      "Type": "StringTable",
+      "Format": "StringTable",
       "Assets": {
         "0": {},
         "1": {},
@@ -12677,7 +12677,7 @@
     },
     "$(LANG)/EVNTTXT1.XLD": {
       "EnumName": "EventTextId",
-      "Type": "StringTable",
+      "Format": "StringTable",
       "Assets": {
         "0": {},
         "1": {},
@@ -12783,7 +12783,7 @@
     },
     "$(LANG)/EVNTTXT2.XLD": {
       "EnumName": "EventTextId",
-      "Type": "StringTable",
+      "Format": "StringTable",
       "Assets": {
         "0": {},
         "1": {},
@@ -12889,7 +12889,7 @@
     },
     "$(LANG)/EVNTTXT3.XLD": {
       "EnumName": "EventTextId",
-      "Type": "StringTable",
+      "Format": "StringTable",
       "Assets": {
         "0": {},
         "1": {},
@@ -12995,7 +12995,7 @@
     },
     "$(LANG)/EVNTTXT9.XLD": {
       "EnumName": "EventTextId",
-      "Type": "StringTable",
+      "Format": "StringTable",
       "Assets": {
         "0": {},
         "1": {},
@@ -13101,7 +13101,7 @@
     },
     "$(LANG)/FLICS0.XLD": {
       "EnumName": "VideoId",
-      "Type": "Video",
+      "Format": "Video",
       "Assets": {
         "0": {},
         "1": {},
@@ -13126,7 +13126,7 @@
     },
     "$(LANG)/MAPTEXT1.XLD": {
       "EnumName": "MapTextId",
-      "Type": "StringTable",
+      "Format": "StringTable",
       "Assets": {
         "0": {},
         "1": {},
@@ -13232,7 +13232,7 @@
     },
     "$(LANG)/MAPTEXT2.XLD": {
       "EnumName": "MapTextId",
-      "Type": "StringTable",
+      "Format": "StringTable",
       "Assets": {
         "0": {},
         "1": {},
@@ -13338,7 +13338,7 @@
     },
     "$(LANG)/MAPTEXT3.XLD": {
       "EnumName": "MapTextId",
-      "Type": "StringTable",
+      "Format": "StringTable",
       "Assets": {
         "0": {},
         "1": {},
@@ -13444,7 +13444,7 @@
     },
     "$(LANG)/SYSTEXTS": {
       "EnumName": "SystemTextId",
-      "Type": "SystemText",
+      "Format": "SystemText",
       "Assets": {
         "0": {
           "Name": "PartyPortrait_XLifeMana"
@@ -15091,7 +15091,7 @@
     },
     "$(LANG)/WORDLIS0.XLD": {
       "EnumName": "WordId",
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {
         "1": {
           "Name": "Zero"
@@ -16705,7 +16705,7 @@
     },
     "INITIAL/AUTOMAP1.XLD": {
       "EnumName": "AutoMapId",
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {
         "0": {},
         "1": {},
@@ -16811,7 +16811,7 @@
     },
     "INITIAL/AUTOMAP2.XLD": {
       "EnumName": "AutoMapId",
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {
         "0": {},
         "1": {},
@@ -16917,7 +16917,7 @@
     },
     "INITIAL/AUTOMAP3.XLD": {
       "EnumName": "AutoMapId",
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {
         "0": {},
         "1": {},
@@ -17023,7 +17023,7 @@
     },
     "INITIAL/CHESTDT0.XLD": {
       "EnumName": "ChestId",
-      "Type": "Inventory",
+      "Format": "Inventory",
       "Assets": {
         "0": {},
         "1": {}
@@ -17031,7 +17031,7 @@
     },
     "INITIAL/CHESTDT1.XLD": {
       "EnumName": "ChestId",
-      "Type": "Inventory",
+      "Format": "Inventory",
       "Assets": {
         "0": {},
         "1": {},
@@ -17137,7 +17137,7 @@
     },
     "INITIAL/CHESTDT2.XLD": {
       "EnumName": "ChestId",
-      "Type": "Inventory",
+      "Format": "Inventory",
       "Assets": {
         "0": {},
         "1": {},
@@ -17243,7 +17243,7 @@
     },
     "INITIAL/CHESTDT5.XLD": {
       "EnumName": "ChestId",
-      "Type": "Inventory",
+      "Format": "Inventory",
       "Assets": {
         "0": {},
         "1": {},
@@ -17349,14 +17349,14 @@
     },
     "INITIAL/MERCHDT0.XLD": {
       "EnumName": "MerchantId",
-      "Type": "Inventory",
+      "Format": "Inventory",
       "Assets": {
         "0": {}
       }
     },
     "INITIAL/MERCHDT1.XLD": {
       "EnumName": "MerchantId",
-      "Type": "Inventory",
+      "Format": "Inventory",
       "Assets": {
         "0": {},
         "1": {},
@@ -17462,7 +17462,7 @@
     },
     "INITIAL/MERCHDT2.XLD": {
       "EnumName": "MerchantId",
-      "Type": "Inventory",
+      "Format": "Inventory",
       "Assets": {
         "0": {},
         "1": {},
@@ -17568,7 +17568,7 @@
     },
     "INITIAL/NPCCHAR0.XLD": {
       "EnumName": "NpcCharacterId",
-      "Type": "CharacterData",
+      "Format": "CharacterData",
       "Assets": {
         "0": {
           "Name": "Khunagh"
@@ -17721,7 +17721,7 @@
     },
     "INITIAL/NPCCHAR1.XLD": {
       "EnumName": "NpcCharacterId",
-      "Type": "CharacterData",
+      "Format": "CharacterData",
       "Assets": {
         "0": {},
         "1": {},
@@ -17999,7 +17999,7 @@
     },
     "INITIAL/NPCCHAR2.XLD": {
       "EnumName": "NpcCharacterId",
-      "Type": "CharacterData",
+      "Format": "CharacterData",
       "Assets": {
         "0": {
           "Name": "Gerwad"
@@ -18147,7 +18147,7 @@
     },
     "INITIAL/PRTCHAR0.XLD": {
       "EnumName": "PartyCharacterId",
-      "Type": "CharacterData",
+      "Format": "CharacterData",
       "Assets": {
         "0": {
           "Name": "Tom"
@@ -18229,7 +18229,7 @@
     },
     "INITIAL/PRTCHAR1.XLD": {
       "EnumName": "PartyCharacterId",
-      "Type": "CharacterData",
+      "Format": "CharacterData",
       "Assets": {
         "0": {},
         "1": {},
@@ -18335,7 +18335,7 @@
     },
     "INITIAL/PRTCHAR2.XLD": {
       "EnumName": "PartyCharacterId",
-      "Type": "CharacterData",
+      "Format": "CharacterData",
       "Assets": {
         "0": {},
         "1": {},
@@ -18440,31 +18440,31 @@
       }
     },
     "MAIN.EXE": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "ENGLISH/EVNTTXT0.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "ENGLISH/EVNTTXT1.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "ENGLISH/EVNTTXT2.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "ENGLISH/EVNTTXT3.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "ENGLISH/EVNTTXT9.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "ENGLISH/FLICS0.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {
         "0": {
           "Width": 32
@@ -18526,43 +18526,43 @@
       }
     },
     "ENGLISH/MAPTEXT1.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "ENGLISH/MAPTEXT2.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "ENGLISH/MAPTEXT3.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "ENGLISH/WORDLIS0.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "GERMAN/EVNTTXT0.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "GERMAN/EVNTTXT1.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "GERMAN/EVNTTXT2.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "GERMAN/EVNTTXT3.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "GERMAN/EVNTTXT9.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "GERMAN/FLICS0.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {
         "0": {
           "Width": 32
@@ -18624,19 +18624,19 @@
       }
     },
     "GERMAN/MAPTEXT1.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "GERMAN/MAPTEXT2.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "GERMAN/MAPTEXT3.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     },
     "GERMAN/WORDLIS0.XLD": {
-      "Type": "Unknown",
+      "Format": "Unknown",
       "Assets": {}
     }
   }

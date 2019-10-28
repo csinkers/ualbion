@@ -4,7 +4,7 @@ using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(XldObjectType.ItemNames)]
+    [AssetLoader(FileFormat.ItemNames)]
     public class ItemNameLoader : IAssetLoader
     {
         public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)

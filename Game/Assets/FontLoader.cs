@@ -2,7 +2,7 @@
 using UAlbion.Core.Textures;
 using UAlbion.Formats.AssetIds;
 
-namespace UAlbion.Game
+namespace UAlbion.Game.Assets
 {
     public static class FontLoader
     {

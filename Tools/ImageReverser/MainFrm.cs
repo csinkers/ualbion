@@ -106,26 +106,26 @@ namespace UAlbion.Tools.ImageReverser
         {
             switch (conf.Type)
             {
-                case XldObjectType.AmorphousSprite: return new AmorphousSpriteLoader();
-                case XldObjectType.MapData:
-                case XldObjectType.FixedSizeSprite: return new FixedSizeSpriteLoader();
+                case FileFormat.AmorphousSprite: return new AmorphousSpriteLoader();
+                case FileFormat.MapData:
+                case FileFormat.FixedSizeSprite: return new FixedSizeSpriteLoader();
 
-                case XldObjectType.SingleHeaderSprite:
-                case XldObjectType.HeaderPerSubImageSprite: return new HeaderBasedSpriteLoader();
+                case FileFormat.SingleHeaderSprite:
+                case FileFormat.HeaderPerSubImageSprite: return new HeaderBasedSpriteLoader();
 
                 default: throw new NotImplementedException();
             }
         }
 
-        bool IsSprite(XldObjectType type)
+        bool IsSprite(FileFormat type)
         {
             switch (type)
             {
-                case XldObjectType.AmorphousSprite: 
-                case XldObjectType.FixedSizeSprite:
-                case XldObjectType.SingleHeaderSprite:
-                case XldObjectType.HeaderPerSubImageSprite: 
-                case XldObjectType.MapData: return true;
+                case FileFormat.AmorphousSprite: 
+                case FileFormat.FixedSizeSprite:
+                case FileFormat.SingleHeaderSprite:
+                case FileFormat.HeaderPerSubImageSprite: 
+                case FileFormat.MapData: return true;
                 default: return false;
             }
         }
@@ -275,7 +275,7 @@ namespace UAlbion.Tools.ImageReverser
                 var frame = Math.Max(0, trackFrame.Value);
                 bmp = GenerateBitmap(_visualSprite, frame, width, magnify, curPalette);
             }
-            //else if (asset.Layer == XldObjectType.Map2D)
+            //else if (asset.Layer == FileFormat.Map2D)
             //{
             //    _logicalSprite = null;
             //    _visualSprite = null;
@@ -402,7 +402,7 @@ namespace UAlbion.Tools.ImageReverser
             if (_logicalSprite != null)
             {
                 trackFrameCount.Value = _logicalSprite.Frames.Count;
-                if (asset.Type == XldObjectType.FixedSizeSprite &&
+                if (asset.Type == FileFormat.FixedSizeSprite &&
                     asset.Height != null &&
                     _logicalSprite.Frames[0].Height != asset.Height)
                 {
@@ -419,7 +419,7 @@ namespace UAlbion.Tools.ImageReverser
                 return;
 
             if (!asset.Parent.Width.HasValue && 
-                asset.Type == XldObjectType.FixedSizeSprite && 
+                asset.Type == FileFormat.FixedSizeSprite && 
                 asset.Width != trackWidth.Value)
             {
                 asset.Width = trackWidth.Value;
@@ -481,7 +481,7 @@ namespace UAlbion.Tools.ImageReverser
                         : _logicalSprite.Height / trackFrameCount.Value;
 
                 if (!asset.Parent.Height.HasValue && 
-                    asset.Type == XldObjectType.FixedSizeSprite && 
+                    asset.Type == FileFormat.FixedSizeSprite && 
                     asset.Height != newHeight)
                 {
                     asset.Height = newHeight;

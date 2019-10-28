@@ -5,7 +5,7 @@ using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(XldObjectType.SingleHeaderSprite, XldObjectType.HeaderPerSubImageSprite)]
+    [AssetLoader(FileFormat.SingleHeaderSprite, FileFormat.HeaderPerSubImageSprite)]
     public class HeaderBasedSpriteLoader : IAssetLoader
     {
         public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
@@ -14,7 +14,7 @@ namespace UAlbion.Formats.Parsers
             var sprite = new AlbionSprite();
             long initialPosition = br.BaseStream.Position;
             sprite.Name = name;
-            sprite.UniformFrames = config.Type == XldObjectType.SingleHeaderSprite;
+            sprite.UniformFrames = config.Type == FileFormat.SingleHeaderSprite;
 
             int width = br.ReadUInt16();
             int height = br.ReadUInt16();

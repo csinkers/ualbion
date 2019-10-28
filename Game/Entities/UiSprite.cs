@@ -53,7 +53,7 @@ namespace UAlbion.Game.Entities
             _size = spriteResolver.GetSize(typeof(T), (int)(object)_id, 0);
         }
 
-        public override string ToString() => $"{_id}";
+        public override string ToString() => $"UiSprite {_id}";
         public override Vector2 GetSize() => _size;
         public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {

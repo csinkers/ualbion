@@ -1,36 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 
-namespace UAlbion.Game
+namespace UAlbion.Game.Assets
 {
-    public class AssetManager : IAssetManager, IDisposable
+    public class AssetManager : Component, IAssetManager, IDisposable
     {
-        static readonly IReadOnlyDictionary<AssetType, Type> IdTypes =
-            Enum.GetValues(typeof(AssetType)).Cast<AssetType>().Select(x =>
-            {
-                var members = typeof(AssetType).GetMember(x.ToString());
-                var member = members.FirstOrDefault(m => m.DeclaringType == typeof(AssetType));
-                var attributes = member?.GetCustomAttributes(typeof(EnumTypeAttribute), false);
-                if (attributes?.Any() ?? false)
-                    return (x, ((EnumTypeAttribute) attributes[0]).EnumType);
-
-                return (x, null);
-            }).Where(x => x.EnumType != null).ToDictionary(x => x.x, x => x.EnumType);
-
         readonly AssetLocator _assetLocator;
 
-        public AssetManager(AssetConfig assetConfig, CoreSpriteConfig coreSpriteConfig)
+        public AssetManager() : base(null)
         {
-            _assetLocator = new AssetLocator(assetConfig, coreSpriteConfig);
+            _assetLocator = new AssetLocator();
+            Children.Add(_assetLocator);
         }
 
-        public string GetName(AssetType type, int id) => IdTypes.TryGetValue(type, out var enumType) ? Enum.GetName(enumType, id) : id.ToString();
         public void Dispose() { _assetLocator.Dispose(); }
 
         public MapData2D LoadMap2D(MapDataId id) => _assetLocator.LoadAssetCached(AssetType.MapData, id) as MapData2D;
@@ -125,7 +114,7 @@ namespace UAlbion.Game
         public string LoadString(WordId id, GameLanguage language) => LoadString(new StringId(AssetType.Dictionary, (int)id / 500, (int)id), language);
 
         public AlbionSample LoadSample(AssetType type, int id) => (AlbionSample)_assetLocator.LoadAssetCached(type, id);
-        public AlbionVideo LoadVideo(VideoId id, GameLanguage language) => (AlbionVideo)_assetLocator.LoadAsset(AssetType.Flic, (int)id, $"Video:{id}", language); // Don't cache videos.
+        public AlbionVideo LoadVideo(VideoId id, GameLanguage language) => (AlbionVideo)_assetLocator.LoadAssetCached(AssetType.Flic, (int)id, language);
         public CharacterSheet LoadCharacter(AssetType type, PartyCharacterId id) => (CharacterSheet)_assetLocator.LoadAssetCached(type, id);
         public CharacterSheet LoadCharacter(AssetType type, NpcCharacterId id) => (CharacterSheet)_assetLocator.LoadAssetCached(type, id);
         public CharacterSheet LoadCharacter(AssetType type, MonsterCharacterId id) => (CharacterSheet)_assetLocator.LoadAssetCached(type, id);
@@ -135,10 +124,10 @@ namespace UAlbion.Game
         {
             var words = // Inefficient code, if it ends up being a problem then we can build a reverse dictionary and cache it.
                 new[]
-                {
-                    (IDictionary<int, string>) _assetLocator.LoadAssetCached(AssetType.Dictionary, 0, GameLanguage.English),
-                    (IDictionary<int, string>) _assetLocator.LoadAssetCached(AssetType.Dictionary, 1, GameLanguage.English),
-                    (IDictionary<int, string>) _assetLocator.LoadAssetCached(AssetType.Dictionary, 2, GameLanguage.English)
+                {   // Load the english files as all languages use english {WORDxxx} tags
+                    (IDictionary<int, string>) _assetLocator.LoadAssetCached(AssetType.Dictionary, 0),
+                    (IDictionary<int, string>) _assetLocator.LoadAssetCached(AssetType.Dictionary, 1),
+                    (IDictionary<int, string>) _assetLocator.LoadAssetCached(AssetType.Dictionary, 2)
                 };
             return words.SelectMany(x => x).Where(x => x.Value == word).Select(x => (WordId?)x.Key).FirstOrDefault();
         }

@@ -3,33 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using UAlbion.Core;
-using UAlbion.Core.Events;
-using UAlbion.Core.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
-using UAlbion.Game.Events;
 
-namespace UAlbion.Game
+namespace UAlbion.Game.Assets
 {
-    public class AssetLocator : Component, IDisposable
+    public class StandardAssetLocator : IAssetLocator, IDisposable
     {
-        public AssetLocator(AssetConfig assetConfig, CoreSpriteConfig coreSpriteConfig) : base(Handlers)
-        {
-            _assetConfig = assetConfig;
-            _coreSpriteConfig = coreSpriteConfig;
-            _assetCache = new AssetCache();
-        }
-
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<AssetLocator, SubscribedEvent>((x, e) => x._assetCache.Attach(x.Exchange))
-        );
-
-        readonly AssetConfig _assetConfig;
-        readonly CoreSpriteConfig _coreSpriteConfig;
-        readonly IDictionary<AssetType, XldFile[]> _xlds = new Dictionary<AssetType, XldFile[]>();
-
         // ReSharper disable StringLiteralTypo
         readonly IDictionary<AssetType, (AssetLocation, string)> _assetFiles = new Dictionary<AssetType, (AssetLocation, string)> {
             // General game assets
@@ -106,9 +87,9 @@ namespace UAlbion.Game
         }
 
         readonly string[] _overrideExtensions = { "bmp", "png", "wav", "json", "mp3" };
-        readonly AssetCache _assetCache;
+        readonly IDictionary<AssetType, XldFile[]> _xlds = new Dictionary<AssetType, XldFile[]>();
 
-        AssetPaths GetAssetPaths(AssetLocation location, GameLanguage language, string baseName, int number, int objectNumber)
+        AssetPaths GetAssetPaths(AssetConfig assetConfig, AssetLocation location, GameLanguage language, string baseName, int number, int objectNumber)
         {
             string Try(string x)
             {
@@ -130,38 +111,38 @@ namespace UAlbion.Game
             switch (location)
             {
                 case AssetLocation.Base:
-                    result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, baseName);
-                    result.OverridePath = Try(Path.Combine(_assetConfig.BaseDataPath, baseName, objectNumber.ToString()));
+                    result.XldPath = Path.Combine(assetConfig.BasePath, assetConfig.XldPath, baseName);
+                    result.OverridePath = Try(Path.Combine(assetConfig.BaseDataPath, baseName, objectNumber.ToString()));
                     result.XldNameInConfig = baseName;
                     break;
 
                 case AssetLocation.BaseRaw:
-                    result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, baseName);
-                    result.OverridePath = Try(Path.Combine(_assetConfig.BaseDataPath, baseName));
+                    result.XldPath = Path.Combine(assetConfig.BasePath, assetConfig.XldPath, baseName);
+                    result.OverridePath = Try(Path.Combine(assetConfig.BaseDataPath, baseName));
                     result.XldNameInConfig = baseName;
                     break;
 
                 case AssetLocation.Localised:
-                    result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, lang, baseName);
-                    result.OverridePath = Try(Path.Combine(_assetConfig.BaseDataPath, lang, baseName, objectNumber.ToString()));
+                    result.XldPath = Path.Combine(assetConfig.BasePath, assetConfig.XldPath, lang, baseName);
+                    result.OverridePath = Try(Path.Combine(assetConfig.BaseDataPath, lang, baseName, objectNumber.ToString()));
                     result.XldNameInConfig = "$(LANG)/" + baseName;
                     break;
 
                 case AssetLocation.LocalisedRaw:
-                    result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, lang, baseName);
-                    result.OverridePath = Try(Path.Combine(_assetConfig.BaseDataPath, lang, baseName));
+                    result.XldPath = Path.Combine(assetConfig.BasePath, assetConfig.XldPath, lang, baseName);
+                    result.OverridePath = Try(Path.Combine(assetConfig.BaseDataPath, lang, baseName));
                     result.XldNameInConfig = "$(LANG)/" + baseName;
                     break;
 
                 case AssetLocation.Initial:
-                    result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, "INITIAL", baseName);
-                    result.OverridePath = Try(Path.Combine(_assetConfig.BaseDataPath, "INITIAL", baseName, objectNumber.ToString()));
+                    result.XldPath = Path.Combine(assetConfig.BasePath, assetConfig.XldPath, "INITIAL", baseName);
+                    result.OverridePath = Try(Path.Combine(assetConfig.BaseDataPath, "INITIAL", baseName, objectNumber.ToString()));
                     result.XldNameInConfig = "INITIAL/" + baseName;
                     break;
 
                 case AssetLocation.Current:
-                    result.XldPath = Path.Combine(_assetConfig.BasePath, _assetConfig.XldPath, "CURRENT", baseName);
-                    result.OverridePath = Try(Path.Combine(_assetConfig.BaseDataPath, "CURRENT", baseName, objectNumber.ToString()));
+                    result.XldPath = Path.Combine(assetConfig.BasePath, assetConfig.XldPath, "CURRENT", baseName);
+                    result.OverridePath = Try(Path.Combine(assetConfig.BaseDataPath, "CURRENT", baseName, objectNumber.ToString()));
                     result.XldNameInConfig = "INITIAL/" + baseName; // Note: Use the same metadata for CURRENT & INITIAL
                     break;
 
@@ -169,85 +150,6 @@ namespace UAlbion.Game
             }
 
             return result;
-        }
-
-        public class ReaderScope : IDisposable
-        {
-            readonly BinaryReader _br;
-            readonly Stream _stream;
-
-            public ReaderScope(BinaryReader br, Stream stream)
-            {
-                _br = br;
-                _stream = stream;
-            }
-
-            public void Dispose()
-            {
-                _br?.Dispose();
-                _stream?.Dispose();
-            }
-        }
-
-        public object LoadAsset(AssetType type, int id, string name, GameLanguage language)
-        {
-            if (type == AssetType.CoreGraphics)
-                return AssetLoaderRegistry.LoadCoreSprite((CoreSpriteId)id, _assetConfig.BasePath, _coreSpriteConfig);
-
-            if (type == AssetType.CoreGraphicsMetadata)
-                return AssetLoaderRegistry.LoadCoreSpriteMetadata((CoreSpriteId)id, _assetConfig.BasePath, _coreSpriteConfig);
-
-            if (type == AssetType.MetaFont)
-                return FontLoader.Load((MetaFontId)id,
-                    (ITexture)LoadAssetCached(AssetType.Font, (int)FontId.RegularFont),
-                    (ITexture)LoadAssetCached(AssetType.Font, (int)FontId.BoldFont));
-
-            int xldIndex = id / 100;
-            Debug.Assert(xldIndex >= 0);
-            Debug.Assert(xldIndex <= 9);
-            int objectIndex = id % 100;
-
-            var (location, baseName) = _assetFiles[type];
-            var paths = GetAssetPaths(location, language, baseName, xldIndex, objectIndex);
-            var xldConfig = _assetConfig.Xlds[paths.XldNameInConfig];
-            xldConfig.Assets.TryGetValue(objectIndex, out var assetConfig);
-
-            if (paths.OverridePath != null || IsLocationRaw(location))
-            {
-                var path = paths.OverridePath ?? paths.XldPath;
-                using var stream = File.OpenRead(path);
-                using var br = new BinaryReader(stream);
-                var asset = AssetLoaderRegistry.Load(br, name, (int)stream.Length, assetConfig);
-                if (asset == null)
-                    throw new AssetNotFoundException($"Object {type}:{id} could not be loaded from file {path}", type, id);
-                GameTrace.Log.AssetLoaded(type, id, name, language, path);
-
-                return asset;
-            }
-
-            if (!_xlds.ContainsKey(type))
-                _xlds[type] = new XldFile[10];
-
-            if (File.Exists(paths.XldPath) && _xlds[type][xldIndex] == null)
-                _xlds[type][xldIndex] = new XldFile(paths.XldPath);
-
-            var xldArray = _xlds[type];
-            var xld = xldArray[xldIndex];
-            if (xld == null)
-                throw new AssetNotFoundException($"XLD not found for object: {type}:{id} in {baseName} ({location})", type, id);
-
-            using (var br = xld.GetReaderForObject(objectIndex, out var length))
-            {
-                if (length == 0)
-                    return null;
-
-                var asset = AssetLoaderRegistry.Load(br, name, length, assetConfig);
-                if (asset == null)
-                    throw new AssetNotFoundException($"Object {type}:{id} could not be loaded from XLD {xld.Filename}", type, id);
-                GameTrace.Log.AssetLoaded(type, id, name, language, paths.XldPath);
-
-                return asset;
-            }
         }
 
         bool IsLocationRaw(AssetLocation location)
@@ -261,31 +163,60 @@ namespace UAlbion.Game
             }
         }
 
-        public object LoadAssetCached<T>(AssetType type, T enumId, GameLanguage language = GameLanguage.English)
+        object ReadFromFile(string path, Func<string, BinaryReader, long, object> readFunc)
         {
-            int id = Convert.ToInt32(enumId);
-            object asset = _assetCache.Get(type, id, language);
-            if (asset is Exception) // If it failed to load once then stop trying (at least until an asset:reload / cycle)
-                return null;
-
-            if (asset != null)
-                return asset;
-
-            var name = $"{type}.{enumId}";
-            try
-            {
-                asset = LoadAsset(type, id, name, language);
-            }
-            catch (Exception e)
-            {
-                Raise(new LogEvent(LogEvent.Level.Error, $"Could not load asset {name}: {e}"));
-                asset = e;
-            }
-
-            _assetCache.Add(asset, type, id, language);
-            return asset is Exception ? null : asset;
+            using var stream = File.OpenRead(path);
+            using var br = new BinaryReader(stream);
+            return readFunc(path, br, stream.Length);
         }
 
+        object ReadFromXld(AssetPaths paths, AssetKey key, Func<string, BinaryReader, long, object> readFunc)
+        {
+            int xldIndex = key.Id / 100;
+            int objectIndex = key.Id % 100;
+            if (!_xlds.ContainsKey(key.Type))
+                _xlds[key.Type] = new XldFile[10];
+
+            if (File.Exists(paths.XldPath) && _xlds[key.Type][xldIndex] == null)
+                _xlds[key.Type][xldIndex] = new XldFile(paths.XldPath);
+
+            var xldArray = _xlds[key.Type];
+            var xld = xldArray[xldIndex];
+            if (xld == null)
+                throw new AssetNotFoundException($"XLD not found for object: {key.Type}:{key.Id} in {paths.XldPath}", key.Type, key.Id);
+
+            using var br = xld.GetReaderForObject(objectIndex, out var length);
+            if (length == 0)
+                return null;
+            return readFunc(paths.XldPath, br, length);
+        }
+
+        public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)
+        {
+            var config = (AssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig), "AssetConfig");
+            int xldIndex = key.Id / 100;
+            Debug.Assert(xldIndex >= 0);
+            Debug.Assert(xldIndex <= 9);
+            int objectIndex = key.Id % 100;
+
+            var (location, baseName) = _assetFiles[key.Type];
+            var paths = GetAssetPaths(config, location, key.Language, baseName, xldIndex, objectIndex);
+            var xldConfig = config.Xlds[paths.XldNameInConfig];
+            xldConfig.Assets.TryGetValue(objectIndex, out var assetConfig);
+
+            object Reader(string path, BinaryReader br, long length)
+            {
+                var loader = AssetLoaderRegistry.GetLoader(assetConfig.Type);
+                var asset = AssetLoaderRegistry.Load(br, name, (int) length, assetConfig);
+                if (asset == null) throw new AssetNotFoundException($"Object {key.Type}:{key.Id} could not be loaded from file {path}", key.Type, key.Id);
+                GameTrace.Log.AssetLoaded(key, name, path);
+                return asset;
+            }
+
+            return paths.OverridePath != null || IsLocationRaw(location)
+                ? ReadFromFile(paths.OverridePath ?? paths.XldPath, Reader)
+                : ReadFromXld(paths, key, Reader);
+        }
 
         public void Dispose()
         {

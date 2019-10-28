@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Game
+﻿namespace UAlbion.Game.Assets
 {
     enum AssetLocation
     {

@@ -1,83 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Core.Textures;
 using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Config;
-using UAlbion.Formats.Parsers;
 
-namespace UAlbion.Game
+namespace UAlbion.Game.Assets
 {
-    public static class AssetLoaderRegistry
+    [AssetPostProcessor(typeof(AlbionSprite))]
+    public class AlbionSpritePostProcessor : IAssetPostProcessor
     {
-        static readonly IDictionary<XldObjectType, IAssetLoader> Loaders = GetAssetLoaders();
-        static IDictionary<XldObjectType, IAssetLoader> GetAssetLoaders()
+        public object Process(string name, object asset)
         {
-            var dict = new Dictionary<XldObjectType, IAssetLoader>();
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                Type[] types; try { types = assembly.GetTypes(); } catch (ReflectionTypeLoadException e) { types = e.Types; }
-                foreach(var type in types.Where(x => x != null))
-                {
-                    if (typeof(IAssetLoader).IsAssignableFrom(type) && !type.IsAbstract)
-                    {
-                        var eventAttribute = (AssetLoaderAttribute)type.GetCustomAttribute(typeof(AssetLoaderAttribute), false);
-                        if (eventAttribute != null)
-                        {
-                            var constructor = type.GetConstructors().Single();
-
-                            var lambda = (Func<object>)Expression.Lambda(Expression.New(constructor)).Compile();
-                            var loader = (IAssetLoader)lambda();
-                            foreach (var objectType in eventAttribute.SupportedTypes)
-                                dict.Add(objectType, loader);
-                        }
-                    }
-                }
-            }
-
-            return dict;
-        }
-
-        public static object Load(BinaryReader br, string name, int streamLength, AssetConfig.Asset config)
-        {
-            var loader = Loaders[config.Type];
-            object asset = loader.Load(br, streamLength, name, config);
-
-            if(asset is AlbionSprite s)
-                asset = ToTexture(s);
-
-            if (asset is Image<Rgba32> p)
-                asset = ToTexture(name, p);
-
-            return asset;
-        }
-
-        public static object LoadCoreSprite(CoreSpriteId id, string  basePath, CoreSpriteConfig config) =>
-            ToTexture(CoreSpriteLoader.Load(id, basePath, config));
-
-        public static object LoadCoreSpriteMetadata(CoreSpriteId id, string basePath, CoreSpriteConfig config) =>
-            CoreSpriteLoader.GetConfig(id, basePath, config, out _);
-
-        static (int, int) GetAtlasSize(int tileWidth, int tileHeight, int count)
-        {
-            int NextPowerOfTwo(int x) => (int)Math.Pow(2.0, Math.Ceiling(Math.Log(x, 2.0)));
-
-            int tilesPerRow = (int)Math.Ceiling(Math.Sqrt(count));
-            int width = NextPowerOfTwo(tileWidth * tilesPerRow);
-            int requiredHeight = tileHeight * ((count + tilesPerRow - 1) / tilesPerRow);
-            int height = NextPowerOfTwo(requiredHeight);
-            return (width, height);
-        }
-
-        static ITexture ToTexture(string name, Image<Rgba32> image) => new TrueColorTexture(name, image);
-        static ITexture ToTexture(AlbionSprite sprite)
-        {
+            var sprite = (AlbionSprite)asset;
             EightBitTexture.SubImage[] subImages;
             byte[] pixelData;
 
@@ -158,6 +91,17 @@ namespace UAlbion.Game
                     pixelData,
                     subImages);
             }
+        }
+
+        static (int, int) GetAtlasSize(int tileWidth, int tileHeight, int count)
+        {
+            int NextPowerOfTwo(int x) => (int)Math.Pow(2.0, Math.Ceiling(Math.Log(x, 2.0)));
+
+            int tilesPerRow = (int)Math.Ceiling(Math.Sqrt(count));
+            int width = NextPowerOfTwo(tileWidth * tilesPerRow);
+            int requiredHeight = tileHeight * ((count + tilesPerRow - 1) / tilesPerRow);
+            int height = NextPowerOfTwo(requiredHeight);
+            return (width, height);
         }
     }
 }

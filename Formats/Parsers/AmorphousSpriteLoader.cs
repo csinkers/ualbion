@@ -6,7 +6,7 @@ using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(XldObjectType.AmorphousSprite)]
+    [AssetLoader(FileFormat.AmorphousSprite)]
     public class AmorphousSpriteLoader : IAssetLoader
     {
         static readonly Regex SizesRegex = new Regex(@"

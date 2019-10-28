@@ -13,6 +13,8 @@ namespace UAlbion.Formats.AssetIds
 
     public enum AssetType
     {
+        AssetConfig,
+        CoreSpriteConfig,
         CoreGraphicsMetadata,
         MetaFont,
         PaletteNull,

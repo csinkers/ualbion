@@ -6,7 +6,7 @@ using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 
-namespace UAlbion.Game
+namespace UAlbion.Game.Assets
 {
     public class AssetCache : Component
     {
@@ -16,6 +16,7 @@ namespace UAlbion.Game
                 lock (x._syncRoot)
                 {
                     x._assetCache.Clear();
+                    x._oldAssetCache.Clear();
                 }
             }),
             H<AssetCache, CycleCacheEvent>((x, e) => { x.CycleCacheEvent(); }),
@@ -47,24 +48,24 @@ namespace UAlbion.Game
             }
         }
 
-        public object Get(AssetType type, int id, GameLanguage language = GameLanguage.English)
+        public object Get(AssetKey key)
         {
-            var tuple = Tuple.Create(id, language);
+            var subKey = Tuple.Create(key.Id, key.Language);
             lock (_syncRoot)
             {
-                if (_assetCache.TryGetValue(type, out var typeCache))
+                if (_assetCache.TryGetValue(key.Type, out var typeCache))
                 {
-                    if (typeCache.TryGetValue(tuple, out var cachedAsset))
+                    if (typeCache.TryGetValue(subKey, out var cachedAsset))
                         return cachedAsset;
                 }
-                else _assetCache[type] = new Dictionary<Tuple<int, GameLanguage>, object>();
+                else _assetCache[key.Type] = new Dictionary<Tuple<int, GameLanguage>, object>();
 
                 // Check old cache
-                if (_oldAssetCache.TryGetValue(type, out var oldTypeCache) && oldTypeCache.TryGetValue(tuple, out var oldCachedAsset))
+                if (_oldAssetCache.TryGetValue(key.Type, out var oldTypeCache) && oldTypeCache.TryGetValue(subKey, out var oldCachedAsset))
                 {
                     if (!(oldCachedAsset is Exception))
                     {
-                        _assetCache[type][tuple] = oldCachedAsset;
+                        _assetCache[key.Type][subKey] = oldCachedAsset;
                         return oldCachedAsset;
                     }
                 }
@@ -73,12 +74,12 @@ namespace UAlbion.Game
             return null;
         }
 
-        public void Add(object asset, AssetType type, int id, GameLanguage language = GameLanguage.English)
+        public void Add(object asset, AssetKey key)
         {
-            var tuple = Tuple.Create(id, language);
+            var subKey = Tuple.Create(key.Id, key.Language);
             lock (_syncRoot)
             {
-                _assetCache[type][tuple] = asset;
+                _assetCache[key.Type][subKey] = asset;
             }
         }
     }

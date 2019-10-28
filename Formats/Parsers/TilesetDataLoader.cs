@@ -7,7 +7,7 @@ using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(XldObjectType.IconData)]
+    [AssetLoader(FileFormat.IconData)]
     public class TilesetDataLoader : IAssetLoader
     {
         public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)

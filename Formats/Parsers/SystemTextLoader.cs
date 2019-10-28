@@ -6,7 +6,7 @@ using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(XldObjectType.SystemText)]
+    [AssetLoader(FileFormat.SystemText)]
     public class SystemTextLoader : IAssetLoader
     {
         public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)

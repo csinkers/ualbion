@@ -5,10 +5,10 @@ namespace UAlbion.Formats
 {
     public class AssetLoaderAttribute : Attribute
     {
-        public XldObjectType[] SupportedTypes { get; }
-        public AssetLoaderAttribute(params XldObjectType[] supportedTypes)
+        public FileFormat[] SupportedFormats { get; }
+        public AssetLoaderAttribute(params FileFormat[] supportedFormats)
         {
-            SupportedTypes = supportedTypes;
+            SupportedFormats = supportedFormats;
         }
     }
 }

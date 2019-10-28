@@ -4,7 +4,7 @@ using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(XldObjectType.Inventory)]
+    [AssetLoader(FileFormat.Inventory)]
     class ChestLoader : IAssetLoader
     {
         static void Translate(Chest chest, ISerializer s, long length)

@@ -7,7 +7,7 @@ using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(XldObjectType.LabyrinthData)]
+    [AssetLoader(FileFormat.LabyrinthData)]
     public class LabyrinthDataLoader : IAssetLoader
     {
         public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)

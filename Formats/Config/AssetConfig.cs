@@ -13,7 +13,7 @@ namespace UAlbion.Formats.Config
             [JsonIgnore] public string Name;
             public string EnumName;
             [JsonConverter(typeof(StringEnumConverter))]
-            public XldObjectType Type;
+            public FileFormat Format;
             public int? Width;
             public int? Height;
             public bool? Transposed;
@@ -24,7 +24,7 @@ namespace UAlbion.Formats.Config
         {
             [JsonIgnore] public Xld Parent;
             [JsonIgnore] public int Id;
-            [JsonIgnore] public XldObjectType Type;
+            [JsonIgnore] public FileFormat Type;
 
             public string Name;
             public int? Width;
@@ -62,7 +62,7 @@ namespace UAlbion.Formats.Config
                     {
                         o.Value.Parent = xld.Value;
                         o.Value.Id = o.Key;
-                        o.Value.Type = xld.Value.Type;
+                        o.Value.Type = xld.Value.Format;
                         o.Value.PaletteHints ??= new List<int>();
                     }
                 }

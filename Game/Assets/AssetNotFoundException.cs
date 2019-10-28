@@ -1,7 +1,7 @@
 ﻿using System;
 using UAlbion.Formats.AssetIds;
 
-namespace UAlbion.Game
+namespace UAlbion.Game.Assets
 {
     class AssetNotFoundException : Exception
     {

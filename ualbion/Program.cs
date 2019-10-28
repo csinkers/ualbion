@@ -8,6 +8,7 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game;
+using UAlbion.Game.Assets;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
@@ -43,10 +44,7 @@ namespace UAlbion
             if (string.IsNullOrEmpty(baseDir))
                 return;
 
-            AssetConfig assetConfig = AssetConfig.Load(baseDir);
-            CoreSpriteConfig coreSpriteConfig = CoreSpriteConfig.Load(baseDir);
-
-            using var assets = new AssetManager(assetConfig, coreSpriteConfig);
+            using var assets = new AssetManager();
             // Dump.CoreSprites(assets, baseDir); return;
             // Dump.CharacterSheets(assets);
             // Dump.Chests(assets);
@@ -92,34 +90,34 @@ namespace UAlbion
 
             var inputManager = new InputManager();
             engine.GlobalExchange
+                .Register<ISettings>(new Settings { BasePath = baseDir }) // Need to register settings first, as the AssetConfigLocator relies on it.
                 .Register<IAssetManager>(assets)
                 .Register<IInputManager>(inputManager)
                 .Register<ILayoutManager>(new LayoutManager())
-                .Register<ITextureManager>(new TextureManager())
                 .Register<IPaletteManager>(new PaletteManager())
-                .Register<ISpriteResolver>(new SpriteResolver())
-                .Register<ISettings>(new Settings())
-                .Register<IStateManager>(new StateManager())
                 .Register<ISceneManager>(sceneManager)
+                .Register<ISpriteResolver>(new SpriteResolver())
+                .Register<IStateManager>(new StateManager())
+                .Register<ITextureManager>(new TextureManager())
                 .Attach(new ConsoleLogger())
-                .Attach(new GameClock())
-                .Attach(new MapManager())
+                .Attach(new CursorManager())
                 .Attach(new DebugMapInspector())
+                .Attach(new GameClock())
                 .Attach(new InputBinder(inputConfig))
                 .Attach(new InputModeStack())
+                .Attach(new MapManager())
                 .Attach(new MouseModeStack())
                 .Attach(new SceneStack())
-                .Attach(new CursorManager())
                 .Attach(new StatusBar())
                 ;
 
             inputManager
                 .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
                 .RegisterInputMode(InputMode.World2D, new World2DInputMode())
-                .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
-                .RegisterMouseMode(MouseMode.Exclusive, new ExclusiveMouseMode())
                 .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
+                .RegisterMouseMode(MouseMode.Exclusive, new ExclusiveMouseMode())
                 .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
+                .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
                 ;
 
             sceneManager.GetExchange(SceneId.Inventory).Attach(new InventoryScreen());

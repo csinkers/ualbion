@@ -7,7 +7,7 @@ using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(XldObjectType.CharacterData)]
+    [AssetLoader(FileFormat.CharacterData)]
     class CharacterSheetLoader : IAssetLoader
     {
         static void Translate(CharacterSheet sheet, ISerializer s, long length)

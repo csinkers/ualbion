@@ -10,5 +10,6 @@ namespace UAlbion.Game
         int WindowSize3d { get; }
         int CombatDetailLevel { get; }
         int CombatDelay { get; }
+        string BasePath { get; }
     }
 }

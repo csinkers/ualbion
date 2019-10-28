@@ -29,5 +29,6 @@ namespace UAlbion.Game
         public int WindowSize3d { get; private set; } = 15;
         public int CombatDetailLevel { get; private set; } = 1;
         public int CombatDelay { get; private set; } = 3;
+        public string BasePath { get; set; }
     }
 }

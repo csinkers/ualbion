@@ -1,6 +1,6 @@
 ﻿namespace UAlbion.Formats.Config
 {
-    public enum XldObjectType
+    public enum FileFormat
     {
         Unknown,
 

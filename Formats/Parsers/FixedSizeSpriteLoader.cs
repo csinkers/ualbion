@@ -5,7 +5,7 @@ using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(XldObjectType.FixedSizeSprite)]
+    [AssetLoader(FileFormat.FixedSizeSprite)]
     public class FixedSizeSpriteLoader : IAssetLoader
     {
         public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)

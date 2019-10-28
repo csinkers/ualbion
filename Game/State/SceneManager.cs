@@ -10,13 +10,12 @@ namespace UAlbion.Game.State
     public interface ISceneManager
     {
         EventExchange GetExchange(SceneId id);
+        IScene ActiveScene { get; }
         SceneId ActiveSceneId { get; }
     }
 
     public class SceneManager : Component, ISceneManager
     {
-        readonly Engine _engine;
-
         static readonly HandlerSet Handlers = new HandlerSet(
             H<SceneManager, SetSceneEvent>((x, e) => x.Set(e.SceneId))
         );
@@ -50,7 +49,7 @@ namespace UAlbion.Game.State
         readonly IDictionary<SceneId, GameScene> _scenes = new Dictionary<SceneId, GameScene>();
         readonly IDictionary<SceneId, EventExchange> _exchanges = new Dictionary<SceneId, EventExchange>();
 
-        public SceneManager(Engine engine) : base(Handlers) { _engine = engine; }
+        public SceneManager() : base(Handlers) { }
         public SceneId ActiveSceneId { get; private set; }
 
         public SceneManager AddScene(GameScene scene)
@@ -65,5 +64,7 @@ namespace UAlbion.Game.State
                 _exchanges[id] = new EventExchange($"Scene:{id}", Exchange);
             return _exchanges[id];
         }
+
+        public IScene ActiveScene => _scenes[ActiveSceneId];
     }
 }

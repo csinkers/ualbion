@@ -20,7 +20,7 @@ namespace UAlbion.Game.Entities
 
         void PostUpdate()
         {
-            _tilemap.Position = Resolve<IStateManager>().CameraPosition;
+            _tilemap.Position = Resolve<ISceneManager>().ActiveScene.Camera.Position;
         }
 
         void Render(RenderEvent renderEvent)

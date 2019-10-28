@@ -11,7 +11,7 @@ namespace UAlbion.Game.Entities
             H<CameraMotion2D, BeginFrameEvent>((x, e) => x._velocity = Vector2.Zero),
             H<CameraMotion2D, CameraJumpEvent>((x, e) =>
             {
-                x._position = new Vector2(e.X * x._tileSize.X, e.Y * x._tileSize.Y);
+                x._position = new Vector2(e.X * x._tileSize.X + 0.1f, e.Y * x._tileSize.Y + 0.1f);
                 x._camera.Position = new Vector3(x._position, x._height);
             }),
             H<CameraMotion2D, CameraMoveEvent>((x, e) => x._velocity += new Vector2(e.X * x._tileSize.X, e.Y * x._tileSize.Y)),

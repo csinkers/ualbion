@@ -91,8 +91,10 @@ namespace UAlbion.Game.Entities
             foreach (var list in _tilesByDistance.Values)
                 list.Clear();
 
-            int cameraTileX = (int)state.CameraTilePosition.X;
-            int cameraTileY = (int)state.CameraTilePosition.Z;
+            var scene = Resolve<ISceneManager>().ActiveScene;
+            var cameraTilePosition = scene.Camera.Position / state.TileSize;
+            int cameraTileX = (int)cameraTilePosition.X;
+            int cameraTileY = (int)cameraTilePosition.Y;
 
             for (int j = 0; j < _mapData.Height; j++)
             {

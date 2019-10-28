@@ -96,6 +96,8 @@ namespace UAlbion.Core.Textures
                 layer = 0;
             }
 
+            if (id < 0)
+                id = _subImages.Count + id;
             if (id >= _subImages.Count)
                 id %= _subImages.Count;
 

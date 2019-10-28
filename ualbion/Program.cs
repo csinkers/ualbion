@@ -80,7 +80,7 @@ namespace UAlbion
                 .AddRenderer(new ScreenDuplicator())
                 ;
 
-            var sceneManager = new SceneManager(engine)
+            var sceneManager = new SceneManager()
                 .AddScene(new AutomapScene())
                 .AddScene(new FlatScene())
                 .AddScene(new DungeonScene())

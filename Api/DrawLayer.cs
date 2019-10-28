@@ -23,9 +23,8 @@
     {
         public static float ToZCoordinate(this DrawLayer layer, float yCoordinateInTiles)
         {
-            float adjusted = (int) layer + (255.0f - yCoordinateInTiles);
-            float normalised = 1.0f - adjusted / 4095.0f;
-            return normalised;
+            float adjusted = (int)layer + (255.0f - yCoordinateInTiles);
+            return 1.0f - adjusted / 4095.0f;
         }
     }
 }

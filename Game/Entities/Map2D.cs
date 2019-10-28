@@ -55,12 +55,16 @@ namespace UAlbion.Game.Entities
             int index = y * _mapData.Width + x;
             _renderable.HighlightIndex = index;
 
-            int UnderlayId = _mapData.Underlay[index];
-            int OverlayId = _mapData.Overlay[index];
+            var underlayId = _mapData.Underlay[index];
+            var overlayId = _mapData.Overlay[index];
             int zoneIndex = _mapData.ZoneLookup[index];
 
-            e.RegisterHit(t, _tileData.Tiles[OverlayId]);
-            e.RegisterHit(t, _tileData.Tiles[UnderlayId]);
+            e.RegisterHit(t, $"Hit Tile ({x}, {y})");
+
+            if(overlayId != -1)
+                e.RegisterHit(t, _tileData.Tiles[overlayId]);
+            if (underlayId != -1)
+                e.RegisterHit(t, _tileData.Tiles[underlayId]);
             e.RegisterHit(t, this);
 
             if (zoneIndex != -1)

@@ -1,85 +1,109 @@
 {
-    "Global": {
-        "Escape": "push_scene MainMenu",
-        "Tilde": "push_input_mode console",
-        "Alt+F4": "quit",
-        "BracketLeft": "e:mag -1",
-        "BracketRight": "e:mag 1",
-        "V": "push_mouse_mode DebugPick",
-        "F5": "start_clock",
-        "F6": "stop_clock",
-        "F10": "update 1",
-        "Control+A": "!loadnextmap",
-        "Control+X": "!loadprevmap",
-        "Control+R": "assets:reload",
-        "Pause": "e:renderdoc",
+  "Global": {
+    "Escape": "push_scene MainMenu",
+    "Tilde": "push_input_mode console",
+    "Alt+F4": "quit",
+    "BracketLeft": "e:mag -1",
+    "BracketRight": "e:mag 1",
+    "V": "push_mouse_mode DebugPick",
+    "F5": "start_clock",
+    "F6": "stop_clock",
+    "F10": "update 1",
+    "Control+A": "!loadnextmap",
+    "Control+X": "!loadprevmap",
+    "Control+R": "assets:reload",
+    "Pause": "e:renderdoc",
 
-        "W": "+camera_move  0 -2",
-        "A": "+camera_move -2  0",
-        "S": "+camera_move  0  2",
-        "D": "+camera_move  2  0",
+    "Shift+BracketLeft": "toggle_underlay",
+    "Shift+BracketRight": "toggle_overlay",
 
-        "Shift+W": "+camera_move  0 -4",
-        "Shift+A": "+camera_move -4  0",
-        "Shift+S": "+camera_move  0  4",
-        "Shift+D": "+camera_move  4  0",
-        "Alt+1":  "set_language English",
-        "Alt+2":  "set_language German"
-    },
-    "Console": {
-        "Tilde": "pop_input_mode"
-    },
-    "World2D": {
-        "W": "+camera_move  0 -4",
-        "A": "+camera_move -4  0",
-        "S": "+camera_move  0  4",
-        "D": "+camera_move  4  0",
+    "W": "+camera_move  0 -2",
+    "A": "+camera_move -2  0",
+    "S": "+camera_move  0  2",
+    "D": "+camera_move  2  0",
 
-        "Shift+W": "+camera_move  0 -8",
-        "Shift+A": "+camera_move -8  0",
-        "Shift+S": "+camera_move  0  8",
-        "Shift+D": "+camera_move  8  0",
+    "Shift+W": "+camera_move  0 -4",
+    "Shift+A": "+camera_move -4  0",
+    "Shift+S": "+camera_move  0  4",
+    "Shift+D": "+camera_move  4  0",
+    "Alt+1": "set_language English",
+    "Alt+2": "set_language German",
 
-        "Up":    "+party_move  0 -1",
-        "Down":  "+party_move  0  1",
-        "Left":  "+party_move -1  0",
-        "Right": "+party_move  1  0",
+    "Number1": "special 1",
+    "Number2": "special 2",
+    "Number3": "special 3",
+    "Number4": "special 4",
+    "Number5": "special 5",
+    "Number6": "special 6",
+    "Number7": "special 7",
+    "Number8": "special 8",
+    "Number9": "special 9",
+    "Number0": "special 0",
+    "Shift+Number1": "special2 1",
+    "Shift+Number2": "special2 2",
+    "Shift+Number3": "special2 3",
+    "Shift+Number4": "special2 4",
+    "Shift+Number5": "special2 5",
+    "Shift+Number6": "special2 6",
+    "Shift+Number7": "special2 7",
+    "Shift+Number8": "special2 8",
+    "Shift+Number9": "special2 9",
+    "Shift+Number0": "special2 0"
+  },
+  "Console": {
+    "Tilde": "pop_input_mode"
+  },
+  "World2D": {
+    "W": "+camera_move  0 -4",
+    "A": "+camera_move -4  0",
+    "S": "+camera_move  0  4",
+    "D": "+camera_move  4  0",
 
-        "Tab": "push_scene inventory",
+    "Shift+W": "+camera_move  0 -8",
+    "Shift+A": "+camera_move -8  0",
+    "Shift+S": "+camera_move  0  8",
+    "Shift+D": "+camera_move  8  0",
 
-        "Number1": "set_active_member 0",
-        "Number2": "set_active_member 1",
-        "Number3": "set_active_member 2",
-        "Number4": "set_active_member 3",
-        "Number5": "set_active_member 4",
+    "Up": "+party_move  0 -1",
+    "Down": "+party_move  0  1",
+    "Left": "+party_move -1  0",
+    "Right": "+party_move  1  0",
 
-        "Q": "cursor_mode look",
-        "E": "cursor_mode manipulate"
-    },
-    "World3D": {
-        "Tab": "push_scene inventory",
+    "Tab": "push_scene inventory",
 
-        "Number1": "set_active_member 0",
-        "Number2": "set_active_member 1",
-        "Number3": "set_active_member 2",
-        "Number4": "set_active_member 3",
-        "Number5": "set_active_member 4",
+    "Control+Number1": "set_active_member 0",
+    "Control+Number2": "set_active_member 1",
+    "Control+Number3": "set_active_member 2",
+    "Control+Number4": "set_active_member 3",
+    "Control+Number5": "set_active_member 4",
 
-        "M": "open_map",
-        "T": "wait"
-    },
-    "Inventory": {
-        "Control+A": "inv_take_all",
-        "Escape": "pop_scene"
-    },
-    "Dialog": {
-        "Number1": "respond 1",
-        "Number2": "respond 2",
-        "Number3": "respond 3",
-        "Number4": "respond 4",
-        "Number5": "respond 5",
-        "Number6": "respond 6",
-        "Number7": "respond 7",
-        "Escape": "close_dialog"
-    }
+    "Q": "cursor_mode look",
+    "E": "cursor_mode manipulate"
+  },
+  "World3D": {
+    "Tab": "push_scene inventory",
+
+    "Control+Number1": "set_active_member 0",
+    "Control+Number2": "set_active_member 1",
+    "Control+Number3": "set_active_member 2",
+    "Control+Number4": "set_active_member 3",
+    "Control+Number5": "set_active_member 4",
+
+    "M": "open_map",
+    "T": "wait"
+  },
+  "Inventory": {
+    "Control+A": "inv_take_all",
+    "Escape": "pop_scene"
+  },
+  "Dialog": {
+    "Number1": "respond 1",
+    "Number2": "respond 2",
+    "Number3": "respond 3",
+    "Number4": "respond 4",
+    "Number5": "respond 5",
+    "Number6": "respond 6",
+    "Number7": "respond 7",
+    "Escape": "close_dialog"
+  }
 }

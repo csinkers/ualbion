@@ -216,7 +216,7 @@ namespace UAlbion.Core
 
                 _windowManager.Window = VeldridStartup.CreateWindow(ref windowInfo);
                 //Window.BorderVisible = false;
-                Window.CursorVisible = true;
+                Window.CursorVisible = false;
                 Window.Resized += () => _windowResized = true;
             }
 

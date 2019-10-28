@@ -3,16 +3,6 @@ using System.Collections.Generic;
 
 namespace UAlbion.Formats.Assets
 {
-    /*
-    Indoors: Stairs up broken.
-        // 3572 - 3583
-        3583 3582 3581 3580 3579
-        3578    x    x    x 3577
-        3576 3575 3574 2789 3572
-
-    Outdoors1: 1535 is mapping to -1
-    Outdoors2: 1535 is mapping to -1
-    */
     public class TilesetData
     {
         public enum TileLayer : byte // Upper nibble of first byte
@@ -39,7 +29,7 @@ namespace UAlbion.Formats.Assets
         public enum TileType : byte
         {
             Normal = 0,   // Standard issue
-            UnderlayIat = 1, // Underlay, incorrectly animated tiles (IATs) on crash-landing map (166), IATs on continents + correct floaters on continents
+            UnderlayIat = 1, // Underlay 
             UnderlayCeltFloor = 2, // Underlay, celtic floors, toilet seats, random square next to pumps, top shelves of desks
             Overlay1 = 4, // Overlay
             Overlay2 = 5, // Overlay, only on continent maps?
@@ -62,7 +52,7 @@ namespace UAlbion.Formats.Assets
         {
             Unused0   = 1 << 0, // Not used?
             Unused1   = 1 << 1, // Not used?
-            // Set on messed up stairs on 117
+            // Set on stairs on 117
             // Set on chairs on 129, 130, 131, 139, 141, 142 (+stairs), 213, 230, 231
             // Rock corners, 134, 143 (+stairs)
             // Cliff edges 200-207, 210
@@ -76,7 +66,7 @@ namespace UAlbion.Formats.Assets
             // Rando floor tiles 231, 236, 237
             // Comms room shelf 300
             // Computer terminals 301, 302, 305
-            Unk5   = 1 << 5,
+            Debug = 1 << 5,
 
             // Direction bits:
             // BGR
@@ -128,12 +118,12 @@ namespace UAlbion.Formats.Assets
 
         public class TileData
         {
-            public int TileId;
+            public int TileNumber;
             public TileLayer Layer; // Upper nibble of first byte
             public TileType Type; // Lower nibble of first byte
             public Passability Collision;
             public TileFlags Flags;
-            public ushort TileNumber;
+            public ushort ImageNumber;
             public byte FrameCount;
             public byte Unk7;
             public int GetSubImageForTile(int tickCount)
@@ -143,10 +133,11 @@ namespace UAlbion.Formats.Assets
                     frames = frames > 6 ? frames : (int) (frames + 0.01);
                 if (frames == 0)
                     frames = 1;
-                return TileNumber - (tickCount % frames);
+
+                return ImageNumber + tickCount % frames;
             }
 
-            public override string ToString() => $"Tile{TileId} {Layer} {Type} {Collision} {Flags} ->{TileNumber}:{FrameCount} Unk7: {Unk7}";
+            public override string ToString() => $"Tile{TileNumber} {Layer} {Type} {Collision} {Flags} ->{ImageNumber}:{FrameCount} Unk7: {Unk7}";
         }
 
         public bool UseSmallGraphics { get; set; }

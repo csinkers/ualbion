@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -40,9 +41,9 @@ namespace UAlbion.Formats.Assets
             map.Sound = br.ReadByte(); //3
             map.Width = br.ReadByte(); //4
             map.Height = br.ReadByte(); //5
-            map.TilesetId = br.ReadByte() - 1; //6
+            map.TilesetId = FormatUtil.Tweak(br.ReadByte()) ?? throw new FormatException("Invalid tile-set id encountered"); //6
             map.CombatBackgroundId = br.ReadByte(); //7
-            map.PaletteId = br.ReadByte() - 1; //8
+            map.PaletteId = FormatUtil.Tweak(br.ReadByte()) ?? throw new FormatException("Invalid palette id encountered"); //8
             map.FrameRate = br.ReadByte(); //9
 
             for (int i = 0; i < npcCount; i++)
@@ -61,8 +62,10 @@ namespace UAlbion.Formats.Assets
                 byte b2 = br.ReadByte();
                 byte b3 = br.ReadByte();
 
-                map.Overlay[i] = (b1 << 4) + (b2 >> 4);
-                map.Underlay[i] = ((b2 & 0x0F) << 8) + b3;
+                int overlay = (b1 << 4) + (b2 >> 4) - 2;
+                int underlay = ((b2 & 0x0F) << 8) + b3 - 2;
+                map.Overlay[i] = overlay;
+                map.Underlay[i] = underlay; 
             }
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 

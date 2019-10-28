@@ -42,6 +42,12 @@ namespace UAlbion.Game
             if (state == null)
                 return;
 
+            var scene = Resolve<ISceneManager>().ActiveScene;
+            Vector3 cameraPosition = scene.Camera.Position;
+            Vector3 cameraTilePosition = cameraPosition / state.TileSize;
+            Vector3 cameraDirection = scene.Camera.LookDirection;
+            float cameraMagnification = scene.Camera.Magnification;
+
             ImGui.Begin("Inspector");
             ImGui.BeginChild("Inspector");
 
@@ -49,7 +55,7 @@ namespace UAlbion.Game
             var uiPos = window.NormToUi(normPos);
             uiPos.X = (int) uiPos.X; uiPos.Y = (int) uiPos.Y;
             ImGui.Text($"Cursor Pix: {_mousePosition} UI: {uiPos} Norm: {normPos} Scale: {window.GuiScale} PixSize: {window.Size}");
-            ImGui.Text($"Camera World: {state.CameraPosition} Tile: {state.CameraTilePosition} Dir: {state.CameraDirection} Mag: {state.CameraMagnification}");
+            ImGui.Text($"Camera World: {cameraPosition} Tile: {cameraTilePosition} Dir: {cameraDirection} Mag: {cameraMagnification}");
             ImGui.Text($"TileSize: {state.TileSize}");
 
             int hitId = 0;

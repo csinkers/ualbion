@@ -14,44 +14,49 @@ namespace UAlbion.Formats.Parsers
         {
             var startOffset = br.BaseStream.Position;
 
-            var l = new LabyrinthData();
-            l.WallHeight = br.ReadUInt16(); // 0
-            l.CameraHeight = br.ReadUInt16(); // 2
-            l.Unk4 = br.ReadUInt16(); // 4
-            ushort backgroundId = br.ReadUInt16(); // 6
-            l.BackgroundId = backgroundId == 0 ? null : (DungeonBackgroundId?)(backgroundId - 1);
-            l.BackgroundYPosition = br.ReadUInt16(); // 8
-            l.FogDistance = br.ReadUInt16(); // A
-            l.FogRed = br.ReadUInt16(); // C
-            l.FogGreen = br.ReadUInt16(); // E
-            l.FogBlue = br.ReadUInt16(); // 10
-            l.Unk12 = br.ReadByte(); // 12
-            l.Unk13 = br.ReadByte(); // 13
-            l.BackgroundColour = br.ReadByte(); // 14
-            l.Unk15 = br.ReadByte(); // 15
-            l.FogMode = br.ReadUInt16(); // 16
-            l.MaxLight = br.ReadUInt16(); // 18
-            l.WallWidth = br.ReadUInt16(); // 1A
-            l.BackgroundTileAmount = br.ReadUInt16(); // 1C
-            l.MaxVisibleTiles = br.ReadUInt16(); // 1E
-            l.Unk20 = br.ReadUInt16(); // 20
-            l.Lighting = br.ReadUInt16(); // 22
-            l.Unk24 = br.ReadUInt16(); // 24
+            var l = new LabyrinthData
+            { 
+                WallHeight = br.ReadUInt16(), // 0
+                CameraHeight = br.ReadUInt16(), // 2
+                Unk4 = br.ReadUInt16(), // 4
+                BackgroundId = (DungeonBackgroundId?)FormatUtil.Tweak(br.ReadUInt16()), // 6
+                BackgroundYPosition = br.ReadUInt16(), // 8
+                FogDistance = br.ReadUInt16(), // A
+                FogRed = br.ReadUInt16(), // C
+                FogGreen = br.ReadUInt16(), // E
+                FogBlue = br.ReadUInt16(), // 10
+                Unk12 = br.ReadByte(), // 12
+                Unk13 = br.ReadByte(), // 13
+                BackgroundColour = br.ReadByte(), // 14
+                Unk15 = br.ReadByte(), // 15
+                FogMode = br.ReadUInt16(), // 16
+                MaxLight = br.ReadUInt16(), // 18
+                WallWidth = br.ReadUInt16(), // 1A
+                BackgroundTileAmount = br.ReadUInt16(), // 1C
+                MaxVisibleTiles = br.ReadUInt16(), // 1E
+                Unk20 = br.ReadUInt16(), // 20
+                Lighting = br.ReadUInt16(), // 22
+                Unk24 = br.ReadUInt16(), // 24
+            };
 
             Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);
 
             int objectGroupCount = br.ReadUInt16(); // 26
             for (int i = 0; i < objectGroupCount; i++)
             {
-                var og = new LabyrinthData.ObjectGroup();
-                og.AutoGraphicsId = br.ReadUInt16(); // +0
+                var og = new LabyrinthData.ObjectGroup
+                {
+                    AutoGraphicsId = br.ReadUInt16() // +0
+                };
                 for (int n = 0; n < 8; n++)
                 {
-                    var so = new LabyrinthData.SubObject();
-                    so.X = br.ReadInt16();
-                    so.Z = br.ReadInt16();
-                    so.Y = br.ReadInt16();
-                    so.ObjectInfoNumber = br.ReadUInt16();
+                    var so = new LabyrinthData.SubObject
+                    {
+                        X = br.ReadInt16(),
+                        Z = br.ReadInt16(),
+                        Y = br.ReadInt16(),
+                        ObjectInfoNumber = br.ReadUInt16()
+                    };
                     if (so.ObjectInfoNumber != 0)
                     {
                         so.ObjectInfoNumber--;
@@ -66,23 +71,17 @@ namespace UAlbion.Formats.Parsers
             int floorAndCeilingCount = br.ReadUInt16(); // 28 + objectGroupCount * 42
             for (int i = 0; i < floorAndCeilingCount; i++)
             {
-                var fc = new LabyrinthData.FloorAndCeiling();
-                fc.Properties = (LabyrinthData.FloorAndCeiling.FcFlags)br.ReadByte();
-                fc.Unk1 = br.ReadByte();
-                fc.Unk2 = br.ReadByte();
-                fc.Unk3 = br.ReadByte();
-                fc.AnimationCount = br.ReadByte();
-                fc.Unk5 = br.ReadByte();
-
-                ushort textureNumber = br.ReadUInt16();
-                if (textureNumber == 0)
-                    fc.TextureNumber = null;
-                else if (textureNumber < 100)
-                    fc.TextureNumber = (DungeonFloorId)(textureNumber - 1);
-                else
-                    fc.TextureNumber = (DungeonFloorId)textureNumber;
-
-                fc.Unk8 = br.ReadUInt16();
+                var fc = new LabyrinthData.FloorAndCeiling
+                {
+                    Properties = (LabyrinthData.FloorAndCeiling.FcFlags) br.ReadByte(),
+                    Unk1 = br.ReadByte(),
+                    Unk2 = br.ReadByte(),
+                    Unk3 = br.ReadByte(),
+                    AnimationCount = br.ReadByte(),
+                    Unk5 = br.ReadByte(),
+                    TextureNumber = (DungeonFloorId?) FormatUtil.Tweak(br.ReadUInt16()),
+                    Unk8 = br.ReadUInt16()
+                };
                 l.FloorAndCeilings.Add(fc);
             } 
             Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);
@@ -90,24 +89,18 @@ namespace UAlbion.Formats.Parsers
             int objectCount = br.ReadUInt16(); // 2A + objectGroupCount * 42 + floorAndCeilingCount * A
             for(int i = 0; i < objectCount; i++)
             {
-                var o = new LabyrinthData.Object();
-                o.Properties = (LabyrinthData.Object.ObjectFlags)br.ReadByte();
-                o.CollisionData = br.ReadBytes(3);
-
-                ushort textureNumber = br.ReadUInt16();
-                if (textureNumber == 0)
-                    o.TextureNumber = null;
-                else if (textureNumber < 100)
-                    o.TextureNumber = (DungeonObjectId)(textureNumber - 1);
-                else
-                    o.TextureNumber = (DungeonObjectId)textureNumber;
-
-                o.AnimationFrames = br.ReadByte();
-                o.Unk7 = br.ReadByte();
-                o.Width = br.ReadUInt16();
-                o.Height = br.ReadUInt16();
-                o.MapWidth = br.ReadUInt16();
-                o.MapHeight = br.ReadUInt16();
+                var o = new LabyrinthData.Object
+                {
+                    Properties = (LabyrinthData.Object.ObjectFlags) br.ReadByte(),
+                    CollisionData = br.ReadBytes(3),
+                    TextureNumber = (DungeonObjectId?) FormatUtil.Tweak(br.ReadUInt16()),
+                    AnimationFrames = br.ReadByte(),
+                    Unk7 = br.ReadByte(),
+                    Width = br.ReadUInt16(),
+                    Height = br.ReadUInt16(),
+                    MapWidth = br.ReadUInt16(),
+                    MapHeight = br.ReadUInt16()
+                };
                 l.Objects.Add(o);
             }
             Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);
@@ -123,46 +116,34 @@ namespace UAlbion.Formats.Parsers
             int wallCount = br.ReadUInt16();
             for (int i = 0; i < wallCount; i++)
             {
-                var w = new LabyrinthData.Wall();
-                w.Properties = (LabyrinthData.Wall.WallFlags) br.ReadByte();
-                w.CollisionData = br.ReadBytes(3);
+                var w = new LabyrinthData.Wall
+                {
+                    Properties = (LabyrinthData.Wall.WallFlags) br.ReadByte(),
+                    CollisionData = br.ReadBytes(3),
+                    TextureNumber = (DungeonWallId?) FormatUtil.Tweak(br.ReadUInt16()),
+                    AnimationFrames = br.ReadByte(),
+                    AutoGfxType = br.ReadByte(),
+                    TransparentColour = br.ReadByte(),
+                    Unk9 = br.ReadByte(),
+                    Width = br.ReadUInt16(),
+                    Height = br.ReadUInt16()
+                };
 
-                ushort textureNumber = br.ReadUInt16();
-                if (textureNumber == 0)
-                    w.TextureNumber = null;
-                else if (textureNumber < 100)
-                    w.TextureNumber = (DungeonWallId)(textureNumber - 1);
-                else
-                    w.TextureNumber = (DungeonWallId)textureNumber;
-
-                w.AnimationFrames = br.ReadByte();
-                w.AutoGfxType = br.ReadByte();
-                w.TransparentColour = br.ReadByte();
-                w.Unk9 = br.ReadByte();
-                w.Width = br.ReadUInt16();
-                w.Height = br.ReadUInt16();
                 int overlayCount = br.ReadUInt16();
                 for (int j = 0; j < overlayCount; j++)
                 {
-                    var o = new LabyrinthData.Wall.Overlay();
-
-                    textureNumber = br.ReadUInt16();
-                    if (textureNumber == 0)
-                        o.TextureNumber = null;
-                    else if (textureNumber < 100)
-                        o.TextureNumber = (DungeonOverlayId)(textureNumber - 1);
-                    else
-                        o.TextureNumber = (DungeonOverlayId)textureNumber;
-
-                    o.AnimationFrames = br.ReadByte();
-                    o.WriteZero = br.ReadByte();
-                    o.XOffset = br.ReadUInt16();
-                    o.YOffset = br.ReadUInt16();
-                    o.Width = br.ReadUInt16();
-                    o.Height = br.ReadUInt16();
+                    var o = new LabyrinthData.Wall.Overlay
+                    {
+                        TextureNumber = (DungeonOverlayId?) FormatUtil.Tweak(br.ReadUInt16()),
+                        AnimationFrames = br.ReadByte(),
+                        WriteZero = br.ReadByte(),
+                        XOffset = br.ReadUInt16(),
+                        YOffset = br.ReadUInt16(),
+                        Width = br.ReadUInt16(),
+                        Height = br.ReadUInt16()
+                    };
                     w.Overlays.Add(o);
                 }
-
                 l.Walls.Add(w);
             }
             Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);

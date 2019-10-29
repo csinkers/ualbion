@@ -9,7 +9,11 @@ namespace UAlbion.Game
     public class MapManager : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<MapManager, LoadMapEvent>((x, e) => x._pendingMapChange = e.MapId), 
+            H<MapManager, LoadMapEvent>((x, e) =>
+            {
+                x._pendingMapChange = e.MapId;
+                x.LoadMap();
+            }), 
             H<MapManager, BeginFrameEvent>((x, e) => x.LoadMap())
         );
 

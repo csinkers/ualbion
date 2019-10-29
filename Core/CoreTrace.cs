@@ -53,27 +53,27 @@ namespace UAlbion.Core
         }
 
         [Event(8, Level = EventLevel.Informational, Opcode = EventOpcode.Start)]
-        public void StartRaise(string type, string details)
+        public void StartRaise(int nesting, string type, string details)
         {
             WriteEvent(8, type, details);
         }
 
         [Event(9, Level = EventLevel.Informational, Opcode = EventOpcode.Stop)]
-        public void StopRaise(string type, string details, int subscriberCount)
+        public void StopRaise(int nesting, string type, string details, int subscriberCount)
         {
             WriteEvent(9, type, details, subscriberCount);
         }
 
         [Event(10, Level = EventLevel.Verbose, Opcode = EventOpcode.Start)]
-        public void StartRaiseVerbose(string type, string details)
+        public void StartRaiseVerbose(int nesting, string type, string details)
         {
-            WriteEvent(10, type, details);
+            WriteEvent(10, nesting, type, details);
         }
 
         [Event(11, Level = EventLevel.Verbose, Opcode = EventOpcode.Stop)]
-        public void StopRaiseVerbose(string type, string details, int subscriberCount)
+        public void StopRaiseVerbose(int nesting, string type, string details, int subscriberCount)
         {
-            WriteEvent(11, type, details, subscriberCount);
+            WriteEvent(11, nesting, type, details, subscriberCount);
         }
 
         public void CreatedDeviceTexture(string name, uint width, uint height, uint layers)

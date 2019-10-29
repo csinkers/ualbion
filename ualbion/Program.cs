@@ -63,7 +63,8 @@ namespace UAlbion
                 //*/
                 ;
 
-            using var engine = new Engine(backend,
+            var logger = new ConsoleLogger();
+            using var engine = new Engine(logger, backend,
 #if DEBUG
                 true);
 #else
@@ -99,7 +100,6 @@ namespace UAlbion
                 .Register<ISpriteResolver>(new SpriteResolver())
                 .Register<IStateManager>(new StateManager())
                 .Register<ITextureManager>(new TextureManager())
-                .Attach(new ConsoleLogger())
                 .Attach(new CursorManager())
                 .Attach(new DebugMapInspector())
                 .Attach(new GameClock())

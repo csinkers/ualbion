@@ -1,6 +1,6 @@
-﻿namespace UAlbion.Game.Events
+﻿using UAlbion.Api;
+
+namespace UAlbion.Game.Events
 {
-    public class UnloadMapEvent : GameEvent
-    {
-    }
+    [Event("unload_map")] public class UnloadMapEvent : GameEvent { }
 }

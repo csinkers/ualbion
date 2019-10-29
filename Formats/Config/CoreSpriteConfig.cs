@@ -28,7 +28,7 @@ namespace UAlbion.Formats.Config
         {
             var configPath = Path.Combine(basePath, "data", "core_sprites.json");
             if (!File.Exists(configPath))
-                throw new FileNotFoundException();
+                throw new FileNotFoundException($"Could not find core_sprites.json, was expected to be at {configPath}");
 
             var configText = File.ReadAllText(configPath);
             return JsonConvert.DeserializeObject<CoreSpriteConfig>(configText);

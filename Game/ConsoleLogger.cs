@@ -20,7 +20,9 @@ namespace UAlbion.Game
         public void Attach(EventExchange exchange)
         {
             _exchange = exchange;
-            exchange.Subscribe<IEvent>(this);
+            // Only need to subscribe to verbose events, as all non-verbose events will be delivered
+            // here anyway as long as this was given to Engine as the logger component.
+            exchange.Subscribe<BeginFrameEvent>(this);
             Task.Run(ConsoleReaderThread);
         }
 
@@ -77,6 +79,10 @@ namespace UAlbion.Game
                             Console.ForegroundColor = ConsoleColor.Red;
                             break;
                     }
+
+                    int nesting = EventExchange.Nesting;
+                    if(nesting > 0)
+                        Console.Write(new string(' ', nesting * 2));
                     Console.WriteLine(e.Message);
                     Console.ForegroundColor = ConsoleColor.Gray;
                     break;
@@ -125,9 +131,14 @@ namespace UAlbion.Game
                     break;
 
                 default:
+                { 
                     if (sender == this) return;
+                    int nesting = EventExchange.Nesting;
+                    if(nesting > 0)
+                        Console.Write(new string(' ', nesting * 2));
                     Console.WriteLine(@event.ToString());
                     break;
+                }
             }
         }
 

@@ -55,9 +55,9 @@ namespace UAlbion.Core
         internal string FrameTimeText => _frameTimeAverager.CurrentAverageFramesPerSecond.ToString("000.0 fps / ") +
                                          _frameTimeAverager.CurrentAverageFrameTimeMilliseconds.ToString("#00.00 ms");
 
-        public Engine(GraphicsBackend backend, bool useRenderDoc) : base(Handlers)
+        public Engine(IComponent logger, GraphicsBackend backend, bool useRenderDoc) : base(Handlers)
         {
-            GlobalExchange = new EventExchange("Global");
+            GlobalExchange = new EventExchange("Global", logger);
 
             if (useRenderDoc)
                 RenderDoc.Load(out _renderDoc);

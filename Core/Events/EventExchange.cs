@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using UAlbion.Api;
 
 namespace UAlbion.Core.Events
 {
     public class EventExchange
     {
+        static IComponent _logger;
+        static int _nesting = -1;
         static readonly object SyncRoot = new object();
         readonly IDictionary<Type, IList<IComponent>> _subscriptions = new Dictionary<Type, IList<IComponent>>();
         readonly IDictionary<IComponent, IList<Type>> _subscribers = new Dictionary<IComponent, IList<Type>>();
@@ -20,7 +23,7 @@ namespace UAlbion.Core.Events
         readonly IList<IEvent> _frameEvents = new List<IEvent>();
         bool _isActive = true;
 #endif
-
+        public static int Nesting => _nesting;
         public string Name { get; }
 
         public bool IsActive
@@ -30,8 +33,8 @@ namespace UAlbion.Core.Events
             {
                 if (_isActive == value)
                     return;
-                _isActive = value;
 
+                _isActive = value;
                 if (value)
                 {
                     IList<IComponent> subscribers;
@@ -52,11 +55,18 @@ namespace UAlbion.Core.Events
 
         public IReadOnlyList<EventExchange> Children { get { lock (SyncRoot) return _children.ToList(); } }
 
-        public EventExchange(string name, EventExchange parent = null)
+        public EventExchange(string name, EventExchange parent)
         {
             Name = name;
             _parent = parent;
             _parent?.AddChild(this);
+        }
+
+        public EventExchange(string name, IComponent logger)
+        {
+            Name = name;
+            _logger = logger;
+            Attach(_logger);
         }
 
         void AddChild(EventExchange eventExchange)
@@ -105,8 +115,15 @@ namespace UAlbion.Core.Events
             if (!IsActive)
                 return;
 
+            bool verbose = e is IVerboseEvent;
+            if (!verbose)
+            {
+                Interlocked.Increment(ref _nesting);
+                _logger.Receive(e, sender);
+            }
+
 #if DEBUG
-            if(e is BeginFrameEvent) _frameEvents.Clear();
+            if (e is BeginFrameEvent) _frameEvents.Clear();
             else _frameEvents.Add(e);
 #endif
 
@@ -118,12 +135,12 @@ namespace UAlbion.Core.Events
             if (CoreTrace.Log.IsEnabled())
             {
                 eventText = e.ToString();
-                if(e is IVerboseEvent) CoreTrace.Log.StartRaiseVerbose(e.GetType().Name, eventText);
-                else CoreTrace.Log.StartRaise(e.GetType().Name, eventText);
+                if (verbose) CoreTrace.Log.StartRaiseVerbose(_nesting, e.GetType().Name, eventText);
+                else CoreTrace.Log.StartRaise(_nesting, e.GetType().Name, eventText);
             }
 
             var exchanges = new HashSet<EventExchange>();
-            lock(SyncRoot)
+            lock (SyncRoot)
                 CollectExchanges(exchanges);
             foreach (var exchange in exchanges)
             {
@@ -131,14 +148,17 @@ namespace UAlbion.Core.Events
                 exchange.Collect(subscribers, type, interfaces);
             }
 
-            foreach(var subscriber in subscribers)
+            foreach (var subscriber in subscribers)
                 subscriber.Receive(e, sender);
 
             if (eventText != null)
             {
-                if (e is IVerboseEvent) CoreTrace.Log.StopRaiseVerbose(e.GetType().Name, eventText, subscribers.Count);
-                else CoreTrace.Log.StopRaise(e.GetType().Name, eventText, subscribers.Count);
+                if (verbose) CoreTrace.Log.StopRaiseVerbose(_nesting, e.GetType().Name, eventText, subscribers.Count);
+                else CoreTrace.Log.StopRaise(_nesting, e.GetType().Name, eventText, subscribers.Count);
             }
+
+            if (!verbose)
+                Interlocked.Decrement(ref _nesting);
         }
 
         public EventExchange Attach(IComponent component) { component.Attach(this); return this; }

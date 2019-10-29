@@ -29,7 +29,8 @@ namespace UAlbion.Core
             H<Engine, ToggleFullscreenEvent>((x, _) => x.ToggleFullscreenState()),
             H<Engine, ToggleResizableEvent>((x, _) => x.Window.Resizable = !x.Window.Resizable),
             H<Engine, ToggleVisibleBorderEvent>((x, _) => x.Window.BorderVisible = !x.Window.BorderVisible),
-            H<Engine, RunRenderDocEvent>((x,_) => _renderDoc?.LaunchReplayUI())
+            H<Engine, RunRenderDocEvent>((x,_) => _renderDoc?.LaunchReplayUI()),
+            H<Engine, ToggleHardwareCursorEvent>((x,_) => x.Window.CursorVisible = !x.Window.CursorVisible)
         );
 
         static RenderDoc _renderDoc;

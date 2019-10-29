@@ -11,22 +11,6 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities
 {
-    [Event("special", "Event for ad-hoc debugging / investigation purposes")]
-    public class SpecialEvent : GameEvent
-    {
-        public SpecialEvent(int argument) { Argument = argument; }
-        [EventPart("argument")]
-        public int Argument { get; }
-    }
-    [Event("special2", "Event for ad-hoc debugging / investigation purposes")]
-    public class Special2Event : GameEvent
-    {
-        public Special2Event(int argument) { Argument = argument; }
-        [EventPart("argument")]
-        public int Argument { get; }
-    }
-    [Event("toggle_underlay")] public class ToggleUnderlayEvent : GameEvent {  }
-    [Event("toggle_overlay")] public class ToggleOverlayEvent : GameEvent {  }
     public class MapRenderable2D : Component
     {
         readonly SpriteInstanceData _blankInstance = new SpriteInstanceData(

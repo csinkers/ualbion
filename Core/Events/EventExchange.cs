@@ -18,10 +18,35 @@ namespace UAlbion.Core.Events
 #if DEBUG
         // ReSharper disable once CollectionNeverQueried.Local
         readonly IList<IEvent> _frameEvents = new List<IEvent>();
+        bool _isActive = true;
 #endif
 
         public string Name { get; }
-        public bool IsActive { get; set; } = true;
+
+        public bool IsActive
+        {
+            get => _isActive;
+            set
+            {
+                if (_isActive == value)
+                    return;
+                _isActive = value;
+
+                if (value)
+                {
+                    IList<IComponent> subscribers;
+                    lock (SyncRoot)
+                    {
+                        var exchanges = new HashSet<EventExchange>();
+                        CollectExchanges(exchanges, false);
+                        subscribers = exchanges.SelectMany(x => x._subscribers.Keys).ToList();
+                    }
+
+                    foreach (var subscriber in subscribers)
+                        subscriber.Receive(_subscribedEvent, this);
+                }
+            }
+        }
 
         public override string ToString() => $"EventExchange \"{Name}\" (IsActive={IsActive})";
 
@@ -57,7 +82,7 @@ namespace UAlbion.Core.Events
             }
         }
 
-        void CollectExchanges(ISet<EventExchange> exchanges)
+        void CollectExchanges(ISet<EventExchange> exchanges, bool includeParent = true)
         {
             if (!IsActive)
                 return;
@@ -65,7 +90,9 @@ namespace UAlbion.Core.Events
             if (!exchanges.Add(this))
                 return;
 
-            _parent?.CollectExchanges(exchanges);
+            if(includeParent)
+                _parent?.CollectExchanges(exchanges);
+
             foreach (var childExchange in _children)
                 childExchange.CollectExchanges(exchanges);
         }

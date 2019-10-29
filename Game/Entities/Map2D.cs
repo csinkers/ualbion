@@ -46,7 +46,7 @@ namespace UAlbion.Game.Entities
                 return;
 
             var intersectionPoint = e.Origin + t * e.Direction;
-            int x = (int)(intersectionPoint.X / TileSize.X);
+            int x = (int)((intersectionPoint.X + TileSize.X/2) / TileSize.X);
             int y = (int)(intersectionPoint.Y / TileSize.Y);
             if (x < 0 || x >= _mapData.Width ||
                 y < 0 || y >= _mapData.Height)
@@ -59,9 +59,9 @@ namespace UAlbion.Game.Entities
             var overlayId = _mapData.Overlay[index];
             int zoneIndex = _mapData.ZoneLookup[index];
 
-            e.RegisterHit(t, $"Hit Tile ({x}, {y})");
+            e.RegisterHit(t, $"Hit Tile ({(intersectionPoint.X + TileSize.X/2) / TileSize.X}, {intersectionPoint.Y / TileSize.Y})");
 
-            if(overlayId != -1)
+            if (overlayId != -1)
                 e.RegisterHit(t, _tileData.Tiles[overlayId]);
             if (underlayId != -1)
                 e.RegisterHit(t, _tileData.Tiles[underlayId]);
@@ -85,22 +85,25 @@ namespace UAlbion.Game.Entities
 
         protected override void Subscribed()
         {
-            var assets = Resolve<IAssetManager>();
-            _mapData = assets.LoadMap2D(MapId);
-            var tileset = assets.LoadTexture((IconGraphicsId)_mapData.TilesetId);
-            _tileData = assets.LoadTileData((IconDataId)_mapData.TilesetId);
-            _renderable = new MapRenderable2D(_mapData, tileset, _tileData);
-            _useSmallSprites = _tileData.UseSmallGraphics;
-
-            Exchange.Attach(_renderable);
-            foreach (var npc in _mapData.Npcs)
+            if (_mapData == null)
             {
-                IComponent sprite = 
-                    _useSmallSprites
-                        ? new SmallNpcSprite((SmallNpcId)npc.ObjectNumber, npc.Waypoints) as IComponent
-                        : new LargeNpcSprite((LargeNpcId)npc.ObjectNumber, npc.Waypoints, assets);
+                var assets = Resolve<IAssetManager>();
+                _mapData = assets.LoadMap2D(MapId);
+                var tileset = assets.LoadTexture((IconGraphicsId) _mapData.TilesetId);
+                _tileData = assets.LoadTileData((IconDataId) _mapData.TilesetId);
+                _renderable = new MapRenderable2D(_mapData, tileset, _tileData);
+                _useSmallSprites = _tileData.UseSmallGraphics;
 
-                Exchange.Attach(sprite);
+                Exchange.Attach(_renderable);
+                foreach (var npc in _mapData.Npcs)
+                {
+                    IComponent sprite =
+                        _useSmallSprites
+                            ? new SmallNpcSprite((SmallNpcId) npc.ObjectNumber, npc.Waypoints) as IComponent
+                            : new LargeNpcSprite((LargeNpcId) npc.ObjectNumber, npc.Waypoints, assets);
+
+                    Exchange.Attach(sprite);
+                }
             }
 
             Raise(new SetClearColourEvent(0,0,0));

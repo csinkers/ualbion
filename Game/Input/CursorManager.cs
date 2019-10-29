@@ -14,6 +14,8 @@ namespace UAlbion.Game.Input
         Vector2 _position;
         Vector2 _hotspot;
         Vector2 _size;
+        float _special;
+        float _special2;
 
         public CursorManager() : base(Handlers) { }
 
@@ -22,7 +24,9 @@ namespace UAlbion.Game.Input
             H<CursorManager, RenderEvent>((x,e) => x.Render(e)),
             H<CursorManager, SetCursorEvent>((x,e) => x.SetCursor(e.CursorId)),
             H<CursorManager, SetCursorPositionEvent>((x,e) => x._position = new Vector2(e.X, e.Y) - x._hotspot),
-            H<CursorManager, WindowResizedEvent>((x,e) => x.SetCursor(x._cursorId))
+            H<CursorManager, WindowResizedEvent>((x,e) => x.SetCursor(x._cursorId)),
+            H<CursorManager, SpecialEvent>((x, e) => { x._special += (float)e.Argument / 4; x.SetCursor(x._cursorId); }),
+            H<CursorManager, Special2Event>((x, e) => { x._special2 += (float)e.Argument / 4; x.SetCursor(x._cursorId); })
         );
 
         void SetCursor(CoreSpriteId id)
@@ -36,6 +40,7 @@ namespace UAlbion.Game.Input
             _hotspot = config.Hotspot == null 
                 ? Vector2.Zero
                 : window.GuiScale * new Vector2(config.Hotspot.X, config.Hotspot.Y);
+            _hotspot += window.GuiScale * new Vector2(_special, _special2);
         }
 
         void Render(RenderEvent e)

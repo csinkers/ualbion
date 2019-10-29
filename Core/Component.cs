@@ -74,7 +74,7 @@ namespace UAlbion.Core
 
         public void Receive(IEvent @event, object sender)
         {
-            if (sender == this)
+            if (sender == this || Exchange == null)
                 return;
             if (_handlers.TryGetValue(@event.GetType(), out var handler))
                 handler.Invoke(this, @event);

@@ -20,7 +20,7 @@ namespace UAlbion.Game
 
         protected override void Subscribed()
         {
-            _mapExchange = new EventExchange("Maps", Exchange);
+            _mapExchange ??= new EventExchange("Maps", Exchange);
             base.Subscribed();
         }
 

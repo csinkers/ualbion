@@ -19,7 +19,8 @@ namespace UAlbion.Game.Gui
         static StringId S(SystemTextId id) => new StringId(AssetType.SystemText, 0, (int)id);
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<MainMenu, ButtonPressEvent>((x, e) => x.OnButton(e.ButtonId))
+            H<MainMenu, ButtonPressEvent>((x, e) => x.OnButton(e.ButtonId)),
+            H<MainMenu, CloseDialogEvent>((x, e) => x.OnButton(ContinueKey))
         );
 
         public MainMenu() : base(Handlers, DialogPositioning.Center) { }

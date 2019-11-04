@@ -83,7 +83,7 @@ namespace UAlbion.Game
                                     case "JUST": yield return (Token.Justify, null); break;
                                     case "FAHI": yield return (Token.FatHigh, null); break;
                                     case "HIGH": yield return (Token.High, null); break;
-                                    case "NORS": yield return (Token.Nors, null); break;
+                                    case "NORS": yield return (Token.NormalSize, null); break;
                                     case "TECF": yield return (Token.Tecf, null); break;
                                     case "UNKN": yield return (Token.Unknown, null); break;
                                     default:

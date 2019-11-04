@@ -10,29 +10,6 @@ namespace UAlbion.Game
 {
     public class TextFormatter
     {
-        public class TextBlock
-        {
-            public enum TextStyle
-            {
-                Normal,
-                Big,
-                Fat,
-                High,
-                FatAndHigh
-            }
-
-            public enum TextAlignment
-            {
-                Left,
-                Center,
-                Justified
-            }
-
-            public IList<WordId> Words { get; }
-            public string Text { get; }
-            public CommonColor Color { get; }
-        }
-
         readonly IAssetManager _assets;
         ICharacterSheet _leader;
         ICharacterSheet _subject;
@@ -171,7 +148,7 @@ namespace UAlbion.Game
                         break;
                     }
 
-                        // Change context
+                    // Change context
                     case Token.Combatant: active = _combatant; break;
                     case Token.Inventory: active = _inventory; break;
                     case Token.Leader: active = _leader; break;
@@ -189,19 +166,56 @@ namespace UAlbion.Game
             }
         }
 
-        public string Format(string template, params object[] arguments)
+        public IEnumerable<TextBlock> Format(string template, params object[] arguments)
         {
             var tokens = Tokeniser.Tokenise(template).ToList();
-            var words = tokens.Where(x => x.Item1 == Token.Word).Select(x => (string)x.Item2);
+            var words = tokens
+                .Where(x => x.Item1 == Token.Word)
+                .Select(x => (string)x.Item2)
+                .Select(Enum.Parse<WordId>)
+                .ToList();
+
             var substituted = Substitute(tokens, arguments);
+
             var sb = new StringBuilder();
+            var block = new TextBlock(words);
             foreach(var (token, p) in substituted)
             {
-                if (token != Token.Text)
-                    continue;
-                sb.Append((string) p);
+                if (sb.Length > 0 && token != Token.Text)
+                {
+                    block.Text = sb.ToString();
+                    yield return block;
+                    sb.Clear();
+                    block = new TextBlock(words);
+                }
+
+                switch(token)
+                {
+                    case Token.Ink: block.Color = (FontColor)(int)p; break;
+                    case Token.NormalSize: block.Style = TextStyle.Normal; break;
+                    case Token.Big: block.Style = TextStyle.Big; break;
+                    case Token.Fat: block.Style = TextStyle.Fat; break;
+                    case Token.FatHigh: block.Style = TextStyle.FatAndHigh; break;
+                    case Token.High: block.Style = TextStyle.High; break;
+                    case Token.Left: block.Alignment = TextAlignment.Left; break;
+                    case Token.Centre: block.Alignment = TextAlignment.Center; break;
+                    case Token.Justify: block.Alignment = TextAlignment.Justified; break;
+                    case Token.NewLine: block.ForceLineBreak = true; break;
+
+                    case Token.Text:
+                        sb.Append((string) p);
+                        break;
+
+                    case Token.Block: break; // ???
+                    case Token.Tecf: break; // ???
+                }
             }
-            return sb.ToString();
+
+            if (sb.Length > 0)
+            {
+                block.Text = sb.ToString();
+                yield return block;
+            }
         }
     }
 }

@@ -6,12 +6,6 @@ namespace UAlbion.Formats.Config
 {
     public class CoreSpriteConfig
     {
-        public class Position2D
-        {
-            public float X { get; set; }
-            public float Y { get; set; }
-        }
-
         public class BinaryResource
         {
             public long Offset { get; set; }

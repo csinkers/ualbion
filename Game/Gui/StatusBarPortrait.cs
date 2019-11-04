@@ -23,8 +23,38 @@ namespace UAlbion.Game.Gui
             {
                 x._portrait.Highlighted = false;
                 x.Raise(new HoverTextEvent(""));
-            })
+            }),
+            H<StatusBarPortrait, UiLeftClickEvent>((x,e) => x.OnClick(e)),
+            H<StatusBarPortrait, TimerElapsedEvent>((x,e) => x.OnTimer())
         );
+
+        void OnClick(UiLeftClickEvent e)
+        {
+            if (_isClickTimerPending)
+            {
+                var stateManager = Resolve<IStateManager>();
+                var memberId = stateManager.State?.Party.Players.ElementAtOrDefault(_order)?.Id;
+                if(memberId.HasValue)
+                    Raise(new OpenCharacterInventoryEvent(memberId.Value));
+                _isClickTimerPending = false;
+            }
+            else
+            {
+                Raise(new StartTimerEvent("StatusBarPortrait.ClickTimer", 300, this));
+                _isClickTimerPending = true;
+            }
+        }
+        void OnTimer()
+        {
+            if (!_isClickTimerPending) // They've already double-clicked
+                return;
+
+            var stateManager = Resolve<IStateManager>();
+            var memberId = stateManager.State?.Party.Players.ElementAtOrDefault(_order)?.Id;
+            if (memberId.HasValue)
+                Raise(new SetActiveMemberEvent(memberId.Value));
+            _isClickTimerPending = false;
+        }
 
         void Hover()
         {
@@ -44,13 +74,14 @@ namespace UAlbion.Game.Gui
                 member.LifePoints,
                 member.Magic.SpellPoints);
 
-            Raise(new HoverTextEvent(text));
+            Raise(new HoverTextEvent(text.First().Text));
         }
 
         readonly UiSprite<SmallPortraitId> _portrait;
         readonly StatusBarHealthBar _health;
         readonly StatusBarHealthBar _mana;
         readonly int _order;
+        bool _isClickTimerPending;
 
         public StatusBarPortrait(int order) : base(Handlers)
         {

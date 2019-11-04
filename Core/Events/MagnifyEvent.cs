@@ -14,6 +14,7 @@ namespace UAlbion.Core.Events
         public int Delta { get; }
     }
 
+    [Event("e:set_mag", "Sets the current magnification level")]
     public class SetCameraMagnificationEvent : EngineEvent
     {
         public SetCameraMagnificationEvent(float magnification)
@@ -21,6 +22,7 @@ namespace UAlbion.Core.Events
             Magnification = magnification;
         }
 
+        [EventPart("magnification", "The magnification level")]
         public float Magnification { get; }
     }
 }

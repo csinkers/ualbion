@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Game.Gui
+﻿using System.Numerics;
+
+namespace UAlbion.Game.Gui.Inventory
 {
     class InventorySlot : UiElement
     {
@@ -17,6 +19,9 @@
         // ItemIJ: (16i, 20j):(16,20) border 1
 
         public InventorySlot(int order) { }
+
+        public override Vector2 GetSize() => new Vector2(16, 20);
+
         // Func<Item> _itemGetter;
     }
 }

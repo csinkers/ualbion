@@ -12,5 +12,10 @@ namespace UAlbion.Game.Gui
             var text = new Text(id).Bold().Center();
             Children.Add(text);
         }
+        public Header(ITextSource source) : base(Handlers)
+        {
+            var text = new Text(source).Bold().Center();
+            Children.Add(text);
+        }
     }
 }

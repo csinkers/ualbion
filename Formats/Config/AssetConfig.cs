@@ -24,7 +24,7 @@ namespace UAlbion.Formats.Config
         {
             [JsonIgnore] public Xld Parent;
             [JsonIgnore] public int Id;
-            [JsonIgnore] public FileFormat Type;
+            [JsonIgnore] public FileFormat Format;
 
             public string Name;
             public int? Width;
@@ -61,7 +61,7 @@ namespace UAlbion.Formats.Config
                     {
                         o.Value.Parent = xld.Value;
                         o.Value.Id = o.Key;
-                        o.Value.Type = xld.Value.Format;
+                        o.Value.Format = xld.Value.Format;
                         o.Value.PaletteHints ??= new List<int>();
                     }
                 }

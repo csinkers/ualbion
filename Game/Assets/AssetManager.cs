@@ -88,7 +88,7 @@ namespace UAlbion.Game.Assets
         public ITexture LoadTexture(FontId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.Font, id);
         public ITexture LoadTexture(FullBodyPictureId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.FullBodyPicture, id);
         public ITexture LoadTexture(IconGraphicsId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.IconGraphics, id);
-        public ITexture LoadTexture(ItemId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.ItemGraphics, id); // TODO: Enum
+        public ITexture LoadTexture(ItemId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.ItemGraphics, 0);
         public ITexture LoadTexture(LargeNpcId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.BigNpcGraphics, id);
         public ITexture LoadTexture(LargePartyGraphicsId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.BigPartyGraphics, id);
         public ITexture LoadTexture(MetaFontId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.MetaFont, id);

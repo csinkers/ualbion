@@ -12,6 +12,7 @@ using UAlbion.Game.Assets;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
+using UAlbion.Game.Gui.Inventory;
 using UAlbion.Game.Input;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.State;
@@ -120,25 +121,24 @@ namespace UAlbion
                 .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
                 ;
 
-            sceneManager.GetExchange(SceneId.Inventory).Attach(new InventoryScreen());
+            var inventoryConfig = InventoryConfig.Load(baseDir);
+            sceneManager.GetExchange(SceneId.Inventory).Attach(new InventoryScreen(inventoryConfig));
             var menuBackground = new ScreenSpaceSprite<PictureId>(PictureId.MenuBackground8, new Vector2(0.0f, 1.0f), new Vector2(2.0f, -2.0f));
             sceneManager.GetExchange(SceneId.MainMenu)
                 .Attach(new MainMenu())
                 .Attach(menuBackground)
                 ;
 
-            engine.GlobalExchange.Raise(new NewGameEvent(), null);
+            //engine.GlobalExchange.Raise(new NewGameEvent(), null);
             /*
             engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude), null); /*
             engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.Jirinaar3D), null); /*
             engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.HausDesJägerclans), null); //*/
             /*
-            engine.GlobalExchange.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
-            //*/
-            /*
             engine.GlobalExchange.Raise(new SetSceneEvent(SceneId.Inventory), null);
             //*/
 
+            engine.GlobalExchange.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
             engine.Run();
         }
     }

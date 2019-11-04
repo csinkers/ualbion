@@ -52,7 +52,7 @@ namespace UAlbion.Game.Gui
             StringId S(SystemTextId id) => new StringId(AssetType.SystemText, 0, (int)id);
             var elements = new List<IUiElement>
             {
-                new Padding(0,2),
+                new Padding(156,2),
                 new Label(S(SystemTextId.Options_MusicVolume)),
                 new Slider(MusicVolumeKey, () => _musicVolume, x => _musicVolume = x, 0, 127),
                 new Padding(0,2),

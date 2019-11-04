@@ -14,7 +14,7 @@ namespace UAlbion.Formats.Parsers
             var sprite = new AlbionSprite();
             long initialPosition = br.BaseStream.Position;
             sprite.Name = name;
-            sprite.UniformFrames = config.Type == FileFormat.SingleHeaderSprite;
+            sprite.UniformFrames = config.Format == FileFormat.SingleHeaderSprite;
 
             int width = br.ReadUInt16();
             int height = br.ReadUInt16();

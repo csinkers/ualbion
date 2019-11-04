@@ -8,6 +8,12 @@ namespace UAlbion.Core
         static readonly HandlerSet Handlers = new HandlerSet
         (
             H<OrthographicCamera, ScreenCoordinateSelectEvent>((x, e) => x.TransformSelect(e)),
+            H<OrthographicCamera, SetCameraMagnificationEvent>((x, e) =>
+            {
+                x._magnification = e.Magnification;
+                x.UpdatePerspectiveMatrix();
+            }),
+
             H<OrthographicCamera, MagnifyEvent>((x, e) =>
             {
                 if (x._magnification < 1.0f && e.Delta > 0)

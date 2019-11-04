@@ -2,6 +2,7 @@
 using System.Linq;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using UAlbion.Game.Scenes;
 
@@ -17,8 +18,16 @@ namespace UAlbion.Game.State
     public class SceneManager : Component, ISceneManager
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<SceneManager, SetSceneEvent>((x, e) => x.Set(e.SceneId))
+            H<SceneManager, SetSceneEvent>((x, e) => x.Set(e.SceneId)),
+            H<SceneManager, OpenCharacterInventoryEvent>((x,e) => x.OpenInventory(e.MemberId))
         );
+
+        void OpenInventory(PartyCharacterId memberId)
+        {
+            if(ActiveSceneId != SceneId.Inventory)
+                Raise(new PushSceneEvent(SceneId.Inventory));
+            Raise(new SetInventoryModeEvent(memberId));
+        }
 
         void Set(SceneId activatingSceneId)
         {

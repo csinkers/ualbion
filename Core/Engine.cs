@@ -30,7 +30,8 @@ namespace UAlbion.Core
             H<Engine, ToggleResizableEvent>((x, _) => x.Window.Resizable = !x.Window.Resizable),
             H<Engine, ToggleVisibleBorderEvent>((x, _) => x.Window.BorderVisible = !x.Window.BorderVisible),
             H<Engine, RunRenderDocEvent>((x,_) => _renderDoc?.LaunchReplayUI()),
-            H<Engine, ToggleHardwareCursorEvent>((x,_) => x.Window.CursorVisible = !x.Window.CursorVisible)
+            H<Engine, ToggleHardwareCursorEvent>((x,_) => x.Window.CursorVisible = !x.Window.CursorVisible),
+            H<Engine, GarbageCollectionEvent>((x,_) => GC.Collect())
         );
 
         static RenderDoc _renderDoc;

@@ -26,13 +26,21 @@ namespace UAlbion.Game.Entities
             {
                 if ((int)(object)_id == (int)(object)value) return;
                 _id = value;
-                _sprite =
-                    new SpriteDefinition<T>(
-                        _id, 0,
-                        Vector3.Zero,
-                        (int)DrawLayer.Interface,
-                        SpriteFlags.NoTransform | SpriteFlags.LeftAligned | SpriteFlags.NoDepthTest);
-                UpdateSize();
+                if ((int)(object)_id == -1)
+                {
+                    _sprite = null;
+                    _size = Vector2.One;
+                }
+                else
+                {
+                    _sprite =
+                        new SpriteDefinition<T>(
+                            _id, 0,
+                            Vector3.Zero,
+                            (int) DrawLayer.Interface,
+                            SpriteFlags.NoTransform | SpriteFlags.LeftAligned | SpriteFlags.NoDepthTest);
+                    UpdateSize();
+                }
             }
         }
 

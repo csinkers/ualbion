@@ -1,5 +1,5 @@
 ﻿using UAlbion.Api;
-using UAlbion.Game.Gui;
+using UAlbion.Game.Gui.Inventory;
 
 namespace UAlbion.Game.Events
 {

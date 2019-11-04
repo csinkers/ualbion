@@ -8770,47 +8770,56 @@
       "Format": "SingleHeaderSprite",
       "Assets": {
         "0": {
+          "Name": "Tom",
           "PaletteHints": [
             18
           ]
         },
         "1": {
+          "Name": "Rainer",
           "PaletteHints": [
             18
           ]
         },
         "2": {
+          "Name": "Drirr",
           "PaletteHints": [
             18
           ]
         },
         "3": {
+          "Name": "Sira",
           "PaletteHints": [
             18
           ]
         },
         "4": {
+          "Name": "Mellthas",
           "PaletteHints": [
             18
           ]
         },
         "5": {
+          "Name": "Harriet",
           "PaletteHints": [
             18
           ]
         },
         "6": {
+          "Name": "Joe",
           "PaletteHints": [
             18
           ]
         },
         "7": {},
         "8": {
+          "Name": "Khunag",
           "PaletteHints": [
             18
           ]
         },
         "9": {
+          "Name": "Siobhan",
           "PaletteHints": [
             18
           ]

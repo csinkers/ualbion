@@ -24,7 +24,7 @@ namespace UAlbion.Game.Gui
             H<StatusBar, DescriptionTextEvent>((x,e) => x._descriptionText.LiteralString(e.Text))
         );
 
-        public StatusBar() : base(Handlers, DialogPositioning.StatusBar, Int32.MaxValue)
+        public StatusBar() : base(Handlers, DialogPositioning.StatusBar, int.MaxValue)
         {
             _sprite = new UiSprite<PictureId>(PictureId.StatusBar);
             Children.Add(_sprite);

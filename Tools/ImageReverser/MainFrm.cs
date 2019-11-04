@@ -104,7 +104,7 @@ namespace UAlbion.Tools.ImageReverser
 
         IAssetLoader GetLoader(AssetConfig.Asset conf)
         {
-            switch (conf.Type)
+            switch (conf.Format)
             {
                 case FileFormat.AmorphousSprite: return new AmorphousSpriteLoader();
                 case FileFormat.MapData:
@@ -153,7 +153,7 @@ namespace UAlbion.Tools.ImageReverser
             sb.AppendLine($"{filename}");
             sb.AppendLine($"File Size: {fileInfo.Length}");
             sb.AppendLine($"XLD: {asset.Parent.Name}");
-            sb.AppendLine($"Layer: {asset.Type}");
+            sb.AppendLine($"Layer: {asset.Format}");
             sb.AppendLine($"Conf Width: {asset.EffectiveWidth}");
             sb.AppendLine($"Conf Height: {asset.EffectiveHeight}");
             sb.AppendLine();
@@ -244,7 +244,7 @@ namespace UAlbion.Tools.ImageReverser
                 return;
 
             Bitmap bmp;
-            if (IsSprite(asset.Type))
+            if (IsSprite(asset.Format))
             {
                 if (filename != _logicalSprite?.Name)
                 {
@@ -402,7 +402,7 @@ namespace UAlbion.Tools.ImageReverser
             if (_logicalSprite != null)
             {
                 trackFrameCount.Value = _logicalSprite.Frames.Count;
-                if (asset.Type == FileFormat.FixedSizeSprite &&
+                if (asset.Format == FileFormat.FixedSizeSprite &&
                     asset.Height != null &&
                     _logicalSprite.Frames[0].Height != asset.Height)
                 {
@@ -419,7 +419,7 @@ namespace UAlbion.Tools.ImageReverser
                 return;
 
             if (!asset.Parent.Width.HasValue && 
-                asset.Type == FileFormat.FixedSizeSprite && 
+                asset.Format == FileFormat.FixedSizeSprite && 
                 asset.Width != trackWidth.Value)
             {
                 asset.Width = trackWidth.Value;
@@ -481,7 +481,7 @@ namespace UAlbion.Tools.ImageReverser
                         : _logicalSprite.Height / trackFrameCount.Value;
 
                 if (!asset.Parent.Height.HasValue && 
-                    asset.Type == FileFormat.FixedSizeSprite && 
+                    asset.Format == FileFormat.FixedSizeSprite && 
                     asset.Height != newHeight)
                 {
                     asset.Height = newHeight;

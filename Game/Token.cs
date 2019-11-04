@@ -22,7 +22,7 @@
         Me,
         Name,
         NewLine,
-        Nors,
+        NormalSize,
         Parameter,
         Price,
         Race,

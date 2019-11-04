@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Parsers
     {
         public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
         {
-            if(config.Type == FileFormat.Palette)
+            if(config.Format == FileFormat.Palette)
                 return new AlbionPalette(br, (int)streamLength, name, config.Id);
 
             return br.ReadBytes(192); // Common palette

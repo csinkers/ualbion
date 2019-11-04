@@ -5,7 +5,7 @@ using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using Veldrid;
 
-namespace UAlbion.Game.Gui
+namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryExitButton : UiElement
     {

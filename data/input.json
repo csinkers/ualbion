@@ -94,7 +94,7 @@
   },
   "Inventory": {
     "Control+A": "inv_take_all",
-    "Escape": "pop_scene"
+    "Escape": "button_press Inventory.Exit"
   },
   "Dialog": {
     "Number1": "respond 1",

@@ -11,7 +11,7 @@ namespace UAlbion.Game.Gui
 {
     public class UiRectangle : UiElement
     {
-        readonly CommonColor _color;
+        CommonColor _color;
         UiMultiSprite _sprite;
         bool _dirty = true;
         Vector2 _drawSize;
@@ -35,6 +35,19 @@ namespace UAlbion.Game.Gui
         public UiRectangle(CommonColor color) : base(Handlers)
         {
             _color = color;
+        }
+
+        public CommonColor Color
+        {
+            get => _color;
+            set
+            {
+                if (_color == value)
+                    return;
+
+                _color = value;
+                _dirty = true;
+            }
         }
 
         public override Vector2 GetSize() => MeasureSize;

@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Gui.Inventory
 {
@@ -12,6 +13,11 @@ namespace UAlbion.Game.Gui.Inventory
         Label _temporarySpells;
 
         Button _combatPositions;
+
+        public InventoryMiscPage(PartyCharacterId activeCharacter)
+        {
+        }
+
         public Vector2 Size { get; }
     }
 }

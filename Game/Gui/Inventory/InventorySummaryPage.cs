@@ -108,7 +108,7 @@ namespace UAlbion.Game.Gui.Inventory
         {
             var state = Resolve<IStateManager>();
             var member = state.State.GetPartyMember(_activeMember);
-            yield return new TextBlock($"{member.LifePoints}/{member.LifePointsMax}") { ForceLineBreak = true };
+            yield return new TextBlock($"{member.LifePoints}/{member.LifePointsMax}");
 
             yield return new TextBlock(
                 member.Magic.SpellPointsMax > 0

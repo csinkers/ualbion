@@ -17,8 +17,8 @@ namespace UAlbion.Game.Gui.Inventory
         {
             _getPage = getPage;
             _summary = new InventorySummaryPage(activeCharacter);
-            _stats = new InventoryStatsPage();
-            _misc = new InventoryMiscPage();
+            _stats = new InventoryStatsPage(activeCharacter);
+            _misc = new InventoryMiscPage(activeCharacter);
             Children.Add(_summary);
             Children.Add(_stats);
             Children.Add(_misc);

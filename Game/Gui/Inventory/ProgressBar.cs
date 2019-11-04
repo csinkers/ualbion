@@ -1,0 +1,82 @@
+﻿using System;
+using System.Linq;
+using System.Numerics;
+using UAlbion.Core;
+using UAlbion.Formats.AssetIds;
+using UAlbion.Game.Events;
+using Veldrid;
+
+namespace UAlbion.Game.Gui.Inventory
+{
+    public class ProgressBar : UiElement
+    {
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<ProgressBar, UiHoverEvent>((x, e) => x.Hover()),
+            H<ProgressBar, UiBlurEvent>((x, e) => x.Raise(new HoverTextEvent("")))
+        );
+
+        readonly ButtonFrame _frame;
+        readonly UiRectangle _bar;
+        readonly ITextSource _hover;
+        readonly Func<int> _getValue;
+        readonly Func<int> _getMax;
+        readonly int _absoluteMax;
+        Rectangle _lastExtents;
+
+        public ProgressBar(ITextSource hover, Func<int> getValue, Func<int> getMax, int absoluteMax) : base(Handlers)
+        {
+            _hover = hover;
+            _getValue = getValue;
+            _getMax = getMax;
+            _absoluteMax = absoluteMax;
+
+            _bar = new UiRectangle(CommonColor.Blue4);
+            _frame = new ButtonFrame(_bar) { State = ButtonState.Pressed, Padding = 0 };
+            Children.Add(_frame);
+        }
+
+        void Hover()
+        {
+            if (_hover == null)
+                return;
+
+            var text = _hover.Get().First();
+            Raise(new HoverTextEvent(text.Text));
+        }
+
+        void Update(Rectangle extents)
+        {
+            if (_lastExtents == extents) return;
+            _lastExtents = extents;
+
+            var value = _getValue();
+            var max = _getMax();
+
+            bool isSuperCharged = value > max;
+            if (isSuperCharged) value = max;
+            if (max == 0) max = 1;
+
+            _bar.Color = isSuperCharged ? CommonColor.Yellow4 : CommonColor.Blue4;
+            _bar.MeasureSize = new Vector2((extents.Width - 3) * (float)max / _absoluteMax, 6);
+            _bar.DrawSize = new Vector2(_bar.MeasureSize.X * value / max, _bar.MeasureSize.Y);
+        }
+
+        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+        {
+            if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
+                return order;
+
+            var frameExtents = new Rectangle(extents.X, extents.Y, (int)_frame.GetSize().X, extents.Height);
+            int maxOrder = _frame.Select(uiPosition, frameExtents, order, registerHitFunc);
+            registerHitFunc(order, this);
+            return maxOrder;
+        }
+
+        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        {
+            Update(extents);
+            var frameExtents = new Rectangle(extents.X, extents.Y, (int)_frame.GetSize().X, extents.Height);
+            return _frame.Render(frameExtents, order, addFunc);
+        }
+    }
+}

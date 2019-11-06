@@ -33,7 +33,7 @@ namespace UAlbion.Game.Gui.Inventory
                 var player = state.State.GetPartyMember(_activeCharacter);
                 var weight = 12; // TODO: Include items!
                 var template = assets.LoadString(SystemTextId.Inv_WeightNKg, settings.Language); // Weight : %d Kg
-                return new TextFormatter(assets, settings.Language).Format(template, weight);
+                return new TextFormatter(assets, settings.Language).Format(template, weight).Item1;
             }, () => _version);
 
             Children.Add(new ButtonFrame(new Text(source)) { State = ButtonState.Pressed });
@@ -51,7 +51,7 @@ namespace UAlbion.Game.Gui.Inventory
 
             // Carried Weight : %ld of %ld g
             var template = assets.LoadString(SystemTextId.Inv_CarriedWeightNdOfNdG, settings.Language);
-            var text = new TextFormatter(assets, settings.Language).Format(template, weight, maxWeight);
+            var (text, _) = new TextFormatter(assets, settings.Language).Format(template, weight, maxWeight);
             Raise(new HoverTextEvent(text.First().Text));
         }
     }

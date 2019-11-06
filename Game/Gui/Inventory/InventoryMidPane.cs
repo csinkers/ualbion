@@ -18,7 +18,7 @@ namespace UAlbion.Game.Gui.Inventory
                 bodyStack.Add(new InventoryBodyPart(itemSlotId), (int)position.X, (int)position.Y);
             }
 
-            var frame = new ButtonFrame(bodyStack) { State = ButtonState.Pressed, Theme = new FrameTheme() };
+            var frame = new ButtonFrame(bodyStack) { Theme = new FrameTheme() };
             var labelStack = new HorizontalStack(
                 new InventoryOffensiveLabel(activeCharacter),
                 new InventoryWeightLabel(activeCharacter),

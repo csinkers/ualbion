@@ -66,7 +66,7 @@ namespace UAlbion.Game.Entities
             foreach (var child in Children.OfType<TextChunk>())
             {
                 var size = child.GetSize();
-                if (child.Block.ForceLineBreak || line.Width > 0 && line.Width + size.X < extents.Width)
+                if (child.Block.ForceLineBreak || line.Width > 0 && line.Width + size.X > extents.Width)
                 {
                     yield return line;
                     line = new Line();

@@ -53,7 +53,7 @@ namespace UAlbion.Game.Gui.Inventory
             var damage = player.BaseDamage; // TODO: Include items!
 
             var template = assets.LoadString(SystemTextId.Inv_DamageN, settings.Language);
-            var text = new TextFormatter(assets, settings.Language).Format(
+            var (text, _) = new TextFormatter(assets, settings.Language).Format(
                 template, // Damage : %d
                 damage);
 

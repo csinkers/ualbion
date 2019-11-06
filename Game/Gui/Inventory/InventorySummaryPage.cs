@@ -53,7 +53,7 @@ namespace UAlbion.Game.Gui.Inventory
             var member = state.State.GetPartyMember(_activeMember);
 
             // {INVE}{NAME} ({SEXC}), %u years old, {RACE}, {CLAS}, level %d.
-            var formatBlocks = new TextFormatter(assets, settings.Language)
+            var (formatBlocks, _) = new TextFormatter(assets, settings.Language)
                 .Inventory(member)
                 .Format(
                     assets.LoadString(SystemTextId.Inv1_NYearsOldRaceClassLevelN, settings.Language),
@@ -72,7 +72,7 @@ namespace UAlbion.Game.Gui.Inventory
             var formatter = new TextFormatter(assets, settings.Language);
             string S(SystemTextId id) => assets.LoadString(id, settings.Language);
 
-            foreach (var block in formatter.Format(S(SystemTextId.Inv1_LifePoints)))
+            foreach (var block in formatter.Format(S(SystemTextId.Inv1_LifePoints)).Item1)
             {
                 block.Alignment = TextAlignment.Right;
                 yield return block;
@@ -80,7 +80,7 @@ namespace UAlbion.Game.Gui.Inventory
 
             if (member.Magic.SpellPointsMax > 0)
             {
-                foreach (var block in formatter.Format(S(SystemTextId.Inv1_SpellPoints)))
+                foreach (var block in formatter.Format(S(SystemTextId.Inv1_SpellPoints)).Item1)
                 {
                     block.ForceLineBreak = true;
                     block.Alignment = TextAlignment.Right;
@@ -89,14 +89,14 @@ namespace UAlbion.Game.Gui.Inventory
             }
             else yield return new TextBlock("") { ForceLineBreak = true };
 
-            foreach (var block in formatter.Format(S(SystemTextId.Inv1_ExperiencePoints)))
+            foreach (var block in formatter.Format(S(SystemTextId.Inv1_ExperiencePoints)).Item1)
             {
                 block.ForceLineBreak = true;
                 block.Alignment = TextAlignment.Right;
                 yield return block;
             }
 
-            foreach (var block in formatter.Format(S(SystemTextId.Inv1_TrainingPoints)))
+            foreach (var block in formatter.Format(S(SystemTextId.Inv1_TrainingPoints)).Item1)
             {
                 block.ForceLineBreak = true;
                 block.Alignment = TextAlignment.Right;

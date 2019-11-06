@@ -53,7 +53,7 @@ namespace UAlbion.Game.Gui.Inventory
             var protection = player.BaseProtection; // TODO: Include items!
 
             var template = assets.LoadString(SystemTextId.Inv_ProtectionN, settings.Language);
-            var text = new TextFormatter(assets, settings.Language).Format(
+            var (text, _) = new TextFormatter(assets, settings.Language).Format(
                 template, // Protection : %d
                 protection);
 

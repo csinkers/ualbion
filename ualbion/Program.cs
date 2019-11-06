@@ -67,7 +67,7 @@ namespace UAlbion
             var logger = new ConsoleLogger();
             using var engine = new Engine(logger, backend,
 #if DEBUG
-                true);
+                false);
 #else
                  false);
 #endif

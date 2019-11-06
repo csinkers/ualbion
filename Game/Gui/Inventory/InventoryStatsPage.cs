@@ -20,7 +20,7 @@ namespace UAlbion.Game.Gui.Inventory
             var formatter = new TextFormatter(assets, settings.Language);
             var member = state.GetPartyMember(_activeCharacter);
 
-            var block = formatter.Format(assets.LoadString(id, settings.Language)).First();
+            var block = formatter.Format(assets.LoadString(id, settings.Language)).Item1.First();
             block.Text += $" {getValue(member)} / {getMax(member)}";
             yield return block;
         }

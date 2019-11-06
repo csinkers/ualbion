@@ -7,13 +7,13 @@ namespace UAlbion.Game.Gui
     {
         public ButtonFrame.ColorScheme GetColors(ButtonState state)
         {
-            var c = new ButtonFrame.ColorScheme { Alpha = 0.4f, Corners = CommonColor.Grey8 };
+            var c = new ButtonFrame.ColorScheme { Alpha = 0.5f, Corners = CommonColor.Grey8 };
             switch (state)
             {
                 case ButtonState.Normal:
                 case ButtonState.ClickedBlurred:
-                    c.TopLeft = CommonColor.White;
-                    c.BottomRight = CommonColor.Black2;
+                    c.TopLeft = CommonColor.Black2;
+                    c.BottomRight = CommonColor.White;
                     c.Background = null;
                     break;
                 case ButtonState.Hover:
@@ -25,7 +25,7 @@ namespace UAlbion.Game.Gui
                 case ButtonState.Pressed:
                     c.TopLeft = CommonColor.Black2;
                     c.BottomRight = CommonColor.White;
-                    c.Background = null;
+                    c.Background = CommonColor.Black2;
                     break;
                 case ButtonState.HoverPressed:
                     c.TopLeft = CommonColor.Black2;

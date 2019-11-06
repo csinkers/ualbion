@@ -68,7 +68,7 @@ namespace UAlbion.Game.Gui
             var settings = Resolve<ISettings>();
             var assets = Resolve<IAssetManager>();
             var template = assets.LoadString(SystemTextId.PartyPortrait_XLifeMana, settings.Language);
-            var text = new TextFormatter(assets, settings.Language).Format(
+            var (text, _) = new TextFormatter(assets, settings.Language).Format(
                 template, // %s (LP:%d, SP:%d)
                 member.GetName(settings.Language),
                 member.LifePoints,

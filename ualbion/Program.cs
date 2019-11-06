@@ -52,7 +52,7 @@ namespace UAlbion
             RunGame(assets, baseDir);
         }
 
-        static void RunGame(IAssetManager assets, string baseDir)
+        static void RunGame(AssetManager assets, string baseDir)
         {
             var backend =
                 //VeldridStartup.GetPlatformDefaultBackend()

@@ -18,6 +18,7 @@ namespace UAlbion.Game.Gui.Inventory
 
         readonly InventoryConfig _config;
         InventoryMode _mode;
+        InventoryPage _page;
         PartyCharacterId _activeCharacter;
 
         public InventoryScreen(InventoryConfig config) : base(Handlers, DialogPositioning.Bottom)
@@ -44,9 +45,11 @@ namespace UAlbion.Game.Gui.Inventory
             var exchange = Exchange;
             switch (buttonId)
             {
-                case ExitButtonId:
-                    Raise(new PopSceneEvent());
-                    break;
+                case ExitButtonId: Raise(new PopSceneEvent()); break;
+                case InventoryCharacterPane.SummaryButtonId: _page = InventoryPage.Summary; break;
+                case InventoryCharacterPane.StatsButtonId: _page = InventoryPage.Stats; break;
+                case InventoryCharacterPane.MiscButtonId: _page = InventoryPage.Misc; break;
+                default: return;
             }
         }
 
@@ -60,7 +63,7 @@ namespace UAlbion.Game.Gui.Inventory
             var leftPane =
                 _mode switch
                 {
-                    InventoryMode.Character => (IUiElement)new InventoryCharacterPane(_activeCharacter),
+                    InventoryMode.Character => (IUiElement)new InventoryCharacterPane(_activeCharacter, () => _page),
                     InventoryMode.Merchant => new InventoryChestPane(false),
                     InventoryMode.Chest => new InventoryChestPane(true),
                     InventoryMode.LockedChest => new InventoryLockPane(true),

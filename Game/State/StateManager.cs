@@ -22,7 +22,6 @@ namespace UAlbion.Game.State
             H<StateManager, NewGameEvent>((x,e) => x.NewGame())
         );
 
-
         void NewGame()
         {
             var assets = Resolve<IAssetManager>();

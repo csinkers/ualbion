@@ -70,7 +70,8 @@ namespace UAlbion.Core
             GlobalExchange
                 .Register<IWindowManager>(_windowManager)
                 .Attach(this)
-                .Attach(new DebugMenus(this));
+                //.Attach(new DebugMenus(this))
+                ;
         }
 
         public Engine AddRenderer(IRenderer renderer)

@@ -2,7 +2,7 @@
 
 namespace UAlbion.Game.Events
 {
-    [Event("set_window_size")]
+    [Event("set_3d_window_size")]
     public class SetWindowSize3dEvent : GameEvent
     {
         public SetWindowSize3dEvent(int value)

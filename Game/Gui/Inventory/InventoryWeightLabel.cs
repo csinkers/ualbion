@@ -41,7 +41,11 @@ namespace UAlbion.Game.Gui.Inventory
                     .Item1;
             }, () => _version);
 
-            Children.Add(new ButtonFrame(new Text(source)) { State = ButtonState.Pressed });
+            Children.Add(new ButtonFrame(new Text(source))
+            {
+                State = ButtonState.Pressed,
+                Padding = 0
+            });
         }
 
         void Hover()

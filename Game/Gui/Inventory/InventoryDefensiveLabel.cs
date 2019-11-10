@@ -35,7 +35,8 @@ namespace UAlbion.Game.Gui.Inventory
             Children.Add(
                 new ButtonFrame(
                         new HorizontalStack(
-                            new FixedSize(8, 8, new UiSprite<CoreSpriteId>(CoreSpriteId.UiDefensiveValue)),
+                            new FixedSize(8, 8,
+                                new UiSprite<CoreSpriteId>(CoreSpriteId.UiDefensiveValue) { Highlighted = true }),
                             new Text(source)
                         )
                     )

@@ -26,10 +26,7 @@ namespace UAlbion.Game.Gui
             public int Y { get; }
             public int? Width { get; }
             public int? Height { get; }
-        }
-
-        public FixedPositionStack() : base(null)
-        {
+            public override string ToString() => $"{Element} @ <{X}, {Y}>";
         }
 
         public FixedPositionStack Add(IUiElement child, int x, int y)

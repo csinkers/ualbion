@@ -9,8 +9,11 @@ namespace UAlbion.Game.Gui.Inventory
     {
         public InventoryMidPane(PartyCharacterId activeCharacter,  InventoryConfig.PlayerInventory config)
         {
+            var background = new FixedPositionStack();
+            background.Add(new UiSprite<FullBodyPictureId>((FullBodyPictureId) activeCharacter), 1, -3);
+            Children.Add(background);
+
             var bodyStack = new FixedPositionStack();
-            bodyStack.Add(new UiSprite<FullBodyPictureId>((FullBodyPictureId)activeCharacter), 0, 0);
             foreach (var bodyPart in config)
             {
                 var itemSlotId = bodyPart.Key;
@@ -23,7 +26,7 @@ namespace UAlbion.Game.Gui.Inventory
                 new InventoryOffensiveLabel(activeCharacter),
                 new InventoryWeightLabel(activeCharacter),
                 new InventoryDefensiveLabel(activeCharacter)
-                );
+            );
 
             var mainStack = new VerticalStack(
                 new Header(new DynamicText(() =>
@@ -34,7 +37,10 @@ namespace UAlbion.Game.Gui.Inventory
                         var name = member.GetName(settings.Language);
                         return new[] { new TextBlock(name) { Alignment = TextAlignment.Center } };
                     })),
-                frame,
+                new HorizontalStack(
+                    new Padding(3, 0),
+                    frame,
+                    new Padding(3, 0)),
                 labelStack
                 );
 

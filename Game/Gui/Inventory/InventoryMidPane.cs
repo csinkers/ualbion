@@ -18,7 +18,7 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 var itemSlotId = bodyPart.Key;
                 var position = bodyPart.Value;
-                bodyStack.Add(new InventoryBodyPart(itemSlotId), (int)position.X, (int)position.Y);
+                bodyStack.Add(new InventoryBodyPart(activeCharacter, itemSlotId), (int)position.X, (int)position.Y);
             }
 
             var frame = new ButtonFrame(bodyStack) { Theme = new FrameTheme() };

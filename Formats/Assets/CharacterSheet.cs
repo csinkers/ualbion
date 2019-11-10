@@ -6,10 +6,15 @@ namespace UAlbion.Formats.Assets
     public class CharacterSheet : ICharacterSheet
     {
         // Grouped
-        public IMagicSkills Magic { get; } = new MagicSkills();
-        public ICharacterInventory Inventory { get; } = new CharacterInventory();
-        public ICharacterAttributes Attributes { get; } = new CharacterAttributes();
-        public ICharacterSkills Skills { get; } = new CharacterSkills();
+        public MagicSkills Magic { get; } = new MagicSkills();
+        public CharacterInventory Inventory { get; } = new CharacterInventory();
+        public CharacterAttributes Attributes { get; } = new CharacterAttributes();
+        public CharacterSkills Skills { get; } = new CharacterSkills();
+
+        IMagicSkills ICharacterSheet.Magic => Magic;
+        ICharacterInventory ICharacterSheet.Inventory => Inventory;
+        ICharacterAttributes ICharacterSheet.Attributes => Attributes;
+        ICharacterSkills ICharacterSheet.Skills => Skills;
 
         public override string ToString() => 
             Type switch {

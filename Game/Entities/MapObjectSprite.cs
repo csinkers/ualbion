@@ -58,7 +58,7 @@ namespace UAlbion.Game.Entities
 
         void Render(RenderEvent e)
         {
-            var sprite = new SpriteDefinition<DungeonObjectId>(
+            var sprite = new Sprite<DungeonObjectId>(
                 _id,
                 _frame,
                 _position,

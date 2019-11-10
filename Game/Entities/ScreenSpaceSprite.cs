@@ -33,7 +33,7 @@ namespace UAlbion.Game.Entities
 
         void Render(RenderEvent e)
         {
-            var sprite = new SpriteDefinition<T>(
+            var sprite = new Sprite<T>(
                 _id,
                 _frame,
                 _position,

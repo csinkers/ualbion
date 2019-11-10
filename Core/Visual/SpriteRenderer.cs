@@ -262,7 +262,7 @@ namespace UAlbion.Core.Visual
                 _instanceBuffers.Add(buffer);
             }
 
-            var resolved = renderables.OfType<SpriteDefinition>().Select(spriteResolver.Resolve);
+            var resolved = renderables.OfType<Sprite>().Select(spriteResolver.Resolve);
             var grouped = resolved.GroupBy(x => x.Item1, x => x.Item2);
             foreach (var group in grouped)
             {

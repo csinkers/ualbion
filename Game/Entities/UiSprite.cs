@@ -12,7 +12,7 @@ namespace UAlbion.Game.Entities
     {
         T _id = (T)(object)-1;
         Vector2 _size;
-        SpriteDefinition<T> _sprite;
+        Sprite<T> _sprite;
 
         public UiSprite(T id) : base(null)
         {
@@ -34,7 +34,7 @@ namespace UAlbion.Game.Entities
                 else
                 {
                     _sprite =
-                        new SpriteDefinition<T>(
+                        new Sprite<T>(
                             _id, 0,
                             Vector3.Zero,
                             (int) DrawLayer.Interface,

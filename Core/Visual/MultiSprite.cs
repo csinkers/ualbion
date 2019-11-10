@@ -29,7 +29,7 @@ namespace UAlbion.Core.Visual
             CalculateExtents();
         }
 
-        public void CalculateExtents()
+        void CalculateExtents()
         {
             Vector3 min = Vector3.Zero;
             Vector3 max = Vector3.Zero;
@@ -72,7 +72,7 @@ namespace UAlbion.Core.Visual
         public string Name
         {
             get => _name ?? Key.Texture.Name;
-            set { _name = value; }
+            set => _name = value;
         }
 
         public int RenderOrder
@@ -84,7 +84,7 @@ namespace UAlbion.Core.Visual
         public Type Renderer => typeof(SpriteRenderer);
 
         public BoundingBox? Extents => new BoundingBox(_extents.Min + Position, _extents.Max + Position);
-        public Matrix4x4 Transform { get; set; } = Matrix4x4.Identity;
+        public Matrix4x4 Transform { get; private set; } = Matrix4x4.Identity;
 
         public event EventHandler ExtentsChanged;
         public SpriteKey Key { get; private set; }

@@ -56,26 +56,26 @@ namespace UAlbion.Game
             return size;
         }
 
-        public Tuple<SpriteKey, SpriteInstanceData> Resolve(SpriteDefinition spriteDefinition)
+        public Tuple<SpriteKey, SpriteInstanceData> Resolve(Sprite sprite)
         {
-            var assetType = AssetTypeLookup[spriteDefinition.IdType];
-            var id = spriteDefinition.NumericId;
+            var assetType = AssetTypeLookup[sprite.IdType];
+            var id = sprite.NumericId;
             ITexture texture = Resolve<IAssetManager>().LoadTexture(assetType, id);
             if (texture == null)
             {
-                return Tuple.Create(new SpriteKey(_defaultTexture, (int)DrawLayer.Diagnostic, spriteDefinition.Flags),
-                    new SpriteInstanceData(spriteDefinition.Position,
+                return Tuple.Create(new SpriteKey(_defaultTexture, (int)DrawLayer.Diagnostic, sprite.Flags),
+                    new SpriteInstanceData(sprite.Position,
                         new Vector2(_defaultTexture.Width, _defaultTexture.Height),
                         Vector2.Zero, Vector2.One, 0, 0));
             }
 
-            texture.GetSubImageDetails(spriteDefinition.SubObject, out var size, out var texOffset, out var texSize, out var layer);
+            texture.GetSubImageDetails(sprite.SubObject, out var size, out var texOffset, out var texSize, out var layer);
 
-            var key = new SpriteKey(texture, spriteDefinition.RenderOrder, spriteDefinition.Flags);
+            var key = new SpriteKey(texture, sprite.RenderOrder, sprite.Flags);
             var instance = new SpriteInstanceData(
-                spriteDefinition.Position,
-                spriteDefinition.Size ?? size, texOffset, texSize, layer,
-                spriteDefinition.Flags | (texture.Format == PixelFormat.R8_UNorm ? SpriteFlags.UsePalette : 0)
+                sprite.Position,
+                sprite.Size ?? size, texOffset, texSize, layer,
+                sprite.Flags | (texture.Format == PixelFormat.R8_UNorm ? SpriteFlags.UsePalette : 0)
             );
             return Tuple.Create(key, instance);
         }

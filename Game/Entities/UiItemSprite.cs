@@ -12,7 +12,7 @@ namespace UAlbion.Game.Entities
     public class UiItemSprite : UiElement
     {
         ItemSpriteId _id = ItemSpriteId.Nothing;
-        SpriteDefinition<ItemSpriteId> _sprite;
+        Sprite<ItemSpriteId> _sprite;
 
         public UiItemSprite(ItemSpriteId id) : base(null)
         {
@@ -27,7 +27,7 @@ namespace UAlbion.Game.Entities
                 if (_id == value) return;
                 _id = value;
                 _sprite =
-                    new SpriteDefinition<ItemSpriteId>(
+                    new Sprite<ItemSpriteId>(
                         0, (int)_id,
                         Vector3.Zero,
                         (int)DrawLayer.Interface,

@@ -17,7 +17,7 @@ namespace UAlbion.Game.Entities
 
         readonly T _id;
         readonly Rectangle _extents;
-        SpriteDefinition<T> _sprite;
+        Sprite<T> _sprite;
 
         public UiFixedPositionSprite(T id, Rectangle extents) : base(Handlers)
         {
@@ -35,7 +35,7 @@ namespace UAlbion.Game.Entities
             var size = window.UiToNormRelative(new Vector2(_extents.Width, _extents.Height));
 
             _sprite = 
-                new SpriteDefinition<T>(
+                new Sprite<T>(
                 _id,
             0,
                 position,

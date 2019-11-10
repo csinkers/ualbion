@@ -59,7 +59,7 @@ namespace UAlbion.Game.Input
 
             var size = new Vector2(window.GuiScale, -window.GuiScale) * _size / window.Size;
 
-            e.Add(new SpriteDefinition<CoreSpriteId>(_cursorId,
+            e.Add(new Sprite<CoreSpriteId>(_cursorId,
                 0,
                 position,
                 (int)drawLayer,

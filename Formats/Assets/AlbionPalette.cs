@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using UAlbion.Api;
 
-namespace UAlbion.Formats
+namespace UAlbion.Formats.Assets
 {
     public class AlbionPalette
     {
@@ -99,6 +99,5 @@ namespace UAlbion.Formats
         }
 
         public override string ToString() { return string.IsNullOrEmpty(Name) ? $"Palette {Id}" : $"{Name} ({Id})"; }
-
     }
 }

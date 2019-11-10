@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using UAlbion.Api;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers

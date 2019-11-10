@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers

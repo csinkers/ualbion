@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
@@ -7,13 +6,6 @@ using UAlbion.Core.Visual;
 
 namespace UAlbion.Game.Entities
 {
-    public interface ITextManager
-    {
-        Vector2 Measure(TextBlock block);
-        IPositionedRenderable BuildRenderable(TextBlock block, out Vector2 size);
-        IEnumerable<TextBlock> SplitBlocksToSingleWords(IEnumerable<TextBlock> blocks);
-    }
-
     public class TextManager : Component, ITextManager
     {
         const int SpaceSize = 3;
@@ -64,41 +56,6 @@ namespace UAlbion.Game.Entities
 
             font.GetSubImageDetails(0, out var fontSize, out _, out _, out _);
             return new Vector2(offset + 1, fontSize.Y + 1); // +1 for the drop shadow
-        }
-
-        IEnumerable<TextBlock> ConsolidateAdjacentBlocks(IEnumerable<TextBlock> blocks)
-        {
-            foreach (var block in blocks)
-                yield return block;
-        }
-
-        IEnumerable<IEnumerable<TextBlock>> BuildLines(IEnumerable<TextBlock> words, int maxWidth)
-        {
-            var line = new List<TextBlock>();
-            int lineWidth = 0;
-            foreach (var word in words)
-            {
-                var width = (int)Measure(word).X;
-                if (!line.Any() || width + lineWidth <= maxWidth)
-                {
-                    line.Add(word);
-                    lineWidth += width;
-                }
-                else
-                {
-                    yield return line;
-                    line = new List<TextBlock> { word };
-                    lineWidth = width;
-                }
-            }
-
-            if (line.Any())
-                yield return line;
-        }
-
-        public IEnumerable<IEnumerable<TextBlock>> ArrangeText(IEnumerable<TextBlock> blocks, int maxWidth)
-        {
-            return BuildLines(blocks, maxWidth).Select(ConsolidateAdjacentBlocks);
         }
 
         public IPositionedRenderable BuildRenderable(TextBlock block, out Vector2 size)
@@ -215,6 +172,5 @@ namespace UAlbion.Game.Entities
                 }
             }
         }
-
     }
 }

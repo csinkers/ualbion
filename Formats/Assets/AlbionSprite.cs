@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UAlbion.Formats
+namespace UAlbion.Formats.Assets
 {
     public class AlbionSprite
     {

@@ -102,7 +102,7 @@ namespace UAlbion.Game.Entities
         void Render(RenderEvent e)
         {
             var positionLayered = new Vector3(_position * _tileSize, DrawLayer.Characters1.ToZCoordinate(_position.Y));
-            var npcSprite = new SpriteDefinition<LargeNpcId>(
+            var npcSprite = new Sprite<LargeNpcId>(
                 _id,
                 _frame,
                 positionLayered,

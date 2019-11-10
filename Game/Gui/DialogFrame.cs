@@ -98,40 +98,33 @@ namespace UAlbion.Game.Gui
 
         public override Vector2 GetSize() => GetMaxChildSize() + Vector2.One * 14;
 
+        protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+        {
+            var innerExtents = new Rectangle(
+                extents.X + 7,
+                 extents.Y + 7,
+                extents.Width - 14,
+                extents.Height - 14);
+
+            return base.DoLayout(innerExtents, order, func);
+        }
+
         public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
             Rebuild(extents.Width, extents.Height, order);
 
             var window = Resolve<IWindowManager>();
-            var innerExtents = new Rectangle(
-                extents.X + 7,
-                 extents.Y + 7,
-                extents.Width - 14,
-                extents.Height - 14);
-
             _sprite.Position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);
             _sprite.RenderOrder = order; // Render the frame in front of its children
             addFunc(_sprite);
 
-            return RenderChildren(innerExtents, order, addFunc);
+            return base.Render(extents, order, addFunc);
         }
 
         public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
-            if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
-                return order;
-
             Rebuild(extents.Width, extents.Height, order);
-
-            var innerExtents = new Rectangle(
-                extents.X + 7,
-                 extents.Y + 7,
-                extents.Width - 14,
-                extents.Height - 14);
-
-            var maxOrder = SelectChildren(uiPosition, innerExtents, order, registerHitFunc);
-            registerHitFunc(order, this);
-            return maxOrder;
+            return base.Select(uiPosition, extents, order, registerHitFunc);
         }
     }
 }

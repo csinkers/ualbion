@@ -5,7 +5,7 @@ using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    public class FixedPosition : UiElement
+    public class FixedPosition : UiElement, IFixedSizeUiElement
     {
         readonly Rectangle _extents;
 
@@ -16,7 +16,7 @@ namespace UAlbion.Game.Gui
         }
 
         public override Vector2 GetSize() => new Vector2(_extents.Width, _extents.Height);
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc) => RenderChildren(_extents, order, addFunc);
-        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc) => SelectChildren(uiPosition, _extents, order, registerHitFunc);
+        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc) => base.Render(_extents, order, addFunc);
+        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc) => base.Select(uiPosition, _extents, order, registerHitFunc);
     }
 }

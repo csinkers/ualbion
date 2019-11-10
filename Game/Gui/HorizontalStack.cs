@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using UAlbion.Core;
 using Veldrid;
 
 namespace UAlbion.Game.Gui
@@ -31,10 +30,12 @@ namespace UAlbion.Game.Gui
             return size;
         }
 
-        void VisitChildren(Rectangle extents, Action<IUiElement, Rectangle> action)
+        protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
+            int maxOrder = order;
             int minWidth = 0;
             int nonFixedCount = 0;
+
             foreach(var child in Children.OfType<IUiElement>())
             {
                 int width = (int)child.GetSize().X;
@@ -49,28 +50,12 @@ namespace UAlbion.Game.Gui
             {
                 int width = (int)child.GetSize().X;
                 var rect = new Rectangle(offset, extents.Y, width, extents.Height);
-                if(!(child is IFixedSizeUiElement))
+                if (!(child is IFixedSizeUiElement))
                     rect = new Rectangle(rect.X, rect.Y, rect.Width + spareWidth / nonFixedCount, rect.Height);
-                action(child, rect);
+
+                maxOrder = Math.Max(maxOrder, func(child, rect, order));
                 offset += rect.Width;
             }
-        }
-
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
-        {
-            int maxOrder = order;
-            VisitChildren(extents, (x, rect) => maxOrder = Math.Max(maxOrder, x.Render(rect, order + 1, addFunc)));
-            return maxOrder;
-        }
-
-        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
-        {
-            int maxOrder = order;
-            if (!extents.Contains((int) uiPosition.X, (int) uiPosition.Y)) 
-                return maxOrder;
-
-            VisitChildren(extents, (x, rect) => { maxOrder = Math.Max(maxOrder, x.Select(uiPosition, rect, order + 1, registerHitFunc)); });
-            registerHitFunc(order, this);
 
             return maxOrder;
         }

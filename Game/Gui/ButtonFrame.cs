@@ -141,38 +141,31 @@ namespace UAlbion.Game.Gui
 
         public override Vector2 GetSize() => GetMaxChildSize() + _padding * 2 * Vector2.One;
 
+        protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+        {
+            var innerExtents = new Rectangle(
+                extents.X + _padding,
+                extents.Y + _padding,
+                extents.Width - _padding * 2,
+                extents.Height - _padding * 2);
+
+            return base.DoLayout(innerExtents, order, func);
+        }
+
         public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
             Rebuild(extents);
-
             if (_sprite.RenderOrder != order)
                 _sprite.RenderOrder = order;
 
             addFunc(_sprite);
-            var innerExtents = new Rectangle(
-                extents.X + _padding,
-                extents.Y + _padding,
-                extents.Width - _padding * 2,
-                extents.Height - _padding * 2);
-
-            return RenderChildren(innerExtents, order, addFunc);
+            return base.Render(extents, order, addFunc);
         }
 
         public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
-            if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
-                return order;
             Rebuild(extents);
-
-            var innerExtents = new Rectangle(
-                extents.X + _padding,
-                extents.Y + _padding,
-                extents.Width - _padding * 2,
-                extents.Height - _padding * 2);
-
-            int maxOrder = SelectChildren(uiPosition, innerExtents, order, registerHitFunc);
-            registerHitFunc(order, this);
-            return maxOrder;
+            return base.Select(uiPosition, extents, order, registerHitFunc);
         }
     }
 }

@@ -6,12 +6,13 @@ using Veldrid.Utilities;
 
 namespace UAlbion.Core.Visual
 {
-    public class UiMultiSprite : MultiSprite, IScreenSpaceRenderable {
+    public class UiMultiSprite : MultiSprite, IScreenSpaceRenderable
+    {
         public UiMultiSprite(SpriteKey key) : base(key) { }
         public UiMultiSprite(SpriteKey key, int bufferId, IEnumerable<SpriteInstanceData> sprites) : base(key, bufferId, sprites) { }
     }
 
-    public class MultiSprite : IRenderable
+    public class MultiSprite : IPositionedRenderable
     {
         public MultiSprite(SpriteKey key) { Key = key; }
         public override string ToString() => $"Multi:{Name} {RenderOrder} Flags:{Flags} ({Instances.Length} instances)";
@@ -83,7 +84,7 @@ namespace UAlbion.Core.Visual
         public Type Renderer => typeof(SpriteRenderer);
 
         public BoundingBox? Extents => new BoundingBox(_extents.Min + Position, _extents.Max + Position);
-        public Matrix4x4 Transform { get; private set; } = Matrix4x4.Identity;
+        public Matrix4x4 Transform { get; set; } = Matrix4x4.Identity;
 
         public event EventHandler ExtentsChanged;
         public SpriteKey Key { get; private set; }

@@ -34,5 +34,6 @@
         Victim,
         Weapon,
         Word,
+        NoWrap
     }
 }

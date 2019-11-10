@@ -21,7 +21,7 @@ namespace UAlbion.Core.Visual
         public ScreenDuplicator() : base(Handlers) { }
         public string Name => "ScreenDuplicator";
         public RenderPasses RenderPasses => RenderPasses.Duplicator;
-        public int RenderOrder => int.MaxValue;
+        public int RenderOrder { get; set; } = int.MaxValue;
         public Type Renderer => typeof(ScreenDuplicator);
         public BoundingBox? Extents => null;
         public Matrix4x4 Transform => Matrix4x4.Identity;

@@ -61,22 +61,10 @@ namespace UAlbion.Game.Gui.Inventory
             _bar.DrawSize = new Vector2(_bar.MeasureSize.X * value / max, _bar.MeasureSize.Y);
         }
 
-        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+        protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
-            if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
-                return order;
-
             var frameExtents = new Rectangle(extents.X, extents.Y, (int)_frame.GetSize().X, extents.Height);
-            int maxOrder = _frame.Select(uiPosition, frameExtents, order, registerHitFunc);
-            registerHitFunc(order, this);
-            return maxOrder;
-        }
-
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
-        {
-            Update(extents);
-            var frameExtents = new Rectangle(extents.X, extents.Y, (int)_frame.GetSize().X, extents.Height);
-            return _frame.Render(frameExtents, order, addFunc);
+            return base.DoLayout(frameExtents, order, func);
         }
     }
 }

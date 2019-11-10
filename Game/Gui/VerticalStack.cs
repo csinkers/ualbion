@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using UAlbion.Core;
 using Veldrid;
 
 namespace UAlbion.Game.Gui
@@ -33,7 +32,7 @@ namespace UAlbion.Game.Gui
             return size;
         }
 
-        int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+        protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
             int offset = extents.Y;
             int maxOrder = order;
@@ -45,18 +44,12 @@ namespace UAlbion.Game.Gui
                     : new Rectangle(extents.X, offset, (int)child.GetSize().X, height);
 
                 maxOrder = Math.Max(maxOrder, func(child, childExtents, order + 1));
+                // Rendering may have altered the size of any text elements, so retrieve it
+                // again to ensure correct rendering on the first frame.
+                height = (int)child.GetSize().Y; 
                 offset += height;
             }
             return maxOrder;
-        }
-
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc) => DoLayout(extents, order, (x, y, z) => x.Render(y, z, addFunc));
-        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
-        {
-            if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
-                return order;
-
-            return DoLayout(extents, order, (x, y, z) => x.Select(uiPosition, y, z, registerHitFunc));
         }
     }
 }

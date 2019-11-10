@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
-using UAlbion.Core;
 using UAlbion.Game.Events;
 using Veldrid;
 
@@ -86,54 +85,27 @@ namespace UAlbion.Game.Gui
             return size;
         }
 
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
             int maxOrder = order;
             var decWidth = (int)_decrement.GetSize().X;
             var incWidth = (int)_increment.GetSize().X;
 
-            maxOrder = Math.Max(maxOrder, _decrement.Render(
+            maxOrder = Math.Max(maxOrder, func(_decrement,
                 new Rectangle(extents.X, extents.Y, decWidth, extents.Height),
-                order + 1, addFunc));
+                order + 1));
 
-            maxOrder = Math.Max(maxOrder, _frame.Render(new Rectangle(
+            maxOrder = Math.Max(maxOrder, func(_frame, new Rectangle(
                     extents.X + decWidth,
                     extents.Y,
                 extents.Width - decWidth - incWidth,
                     extents.Height
-                ), order + 1, addFunc));
+                ), order + 1));
 
-            maxOrder = Math.Max(maxOrder, _increment.Render(
+            maxOrder = Math.Max(maxOrder, func(_increment,
                 new Rectangle(extents.X + extents.Width - incWidth, extents.Y, incWidth, extents.Height),
-                order + 1, addFunc));
+                order + 1));
 
-            return maxOrder;
-        }
-
-        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
-        {
-            if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
-                return order;
-
-            var decWidth = (int)_decrement.GetSize().X;
-            var incWidth = (int)_increment.GetSize().X;
-
-            int maxOrder = order;
-            maxOrder = Math.Max(maxOrder, _decrement.Select(uiPosition,
-                new Rectangle(extents.X, extents.Y, decWidth, extents.Height),
-                order + 1, registerHitFunc));
-
-            maxOrder = Math.Max(maxOrder, _frame.Select(uiPosition,
-                 new Rectangle(
-                    extents.X + decWidth,
-                    extents.Y,
-                extents.Width - decWidth - incWidth,
-                    extents.Height
-                ), order + 1, registerHitFunc));
-
-            maxOrder = Math.Max(maxOrder, _increment.Select(uiPosition,
-               new Rectangle(extents.X + extents.Width - incWidth, extents.Y, incWidth, extents.Height),
-               order + 1, registerHitFunc));
             return maxOrder;
         }
     }

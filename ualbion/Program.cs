@@ -100,6 +100,7 @@ namespace UAlbion
                 .Register<ISceneManager>(sceneManager)
                 .Register<ISpriteResolver>(new SpriteResolver())
                 .Register<IStateManager>(new StateManager())
+                .Register<ITextManager>(new TextManager())
                 .Register<ITextureManager>(new TextureManager())
                 .Attach(new CursorManager())
                 .Attach(new DebugMapInspector())
@@ -122,7 +123,10 @@ namespace UAlbion
                 ;
 
             var inventoryConfig = InventoryConfig.Load(baseDir);
-            sceneManager.GetExchange(SceneId.Inventory).Attach(new InventoryScreen(inventoryConfig));
+            sceneManager.GetExchange(SceneId.Inventory)
+                .Attach(new InventoryScreen(inventoryConfig))
+                ;
+
             var menuBackground = new ScreenSpaceSprite<PictureId>(PictureId.MenuBackground8, new Vector2(0.0f, 1.0f), new Vector2(2.0f, -2.0f));
             sceneManager.GetExchange(SceneId.MainMenu)
                 .Attach(new MainMenu())

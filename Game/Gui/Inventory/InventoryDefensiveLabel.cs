@@ -39,7 +39,10 @@ namespace UAlbion.Game.Gui.Inventory
                             new Text(source)
                         )
                     )
-                    { State = ButtonState.Pressed }
+                {
+                    State = ButtonState.Pressed,
+                    Padding = 0
+                }
             );
         }
 

@@ -74,6 +74,7 @@ namespace UAlbion.Game.Gui.Inventory
 
             foreach (var block in formatter.Format(S(SystemTextId.Inv1_LifePoints)).Item1)
             {
+                block.Arrangement = TextArrangement.NoWrap;
                 block.Alignment = TextAlignment.Right;
                 yield return block;
             }
@@ -82,23 +83,23 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 foreach (var block in formatter.Format(S(SystemTextId.Inv1_SpellPoints)).Item1)
                 {
-                    block.ForceLineBreak = true;
+                    block.Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap;
                     block.Alignment = TextAlignment.Right;
                     yield return block;
                 }
             }
-            else yield return new TextBlock("") { ForceLineBreak = true };
+            else yield return new TextBlock("") { Arrangement = TextArrangement.ForceNewLine };
 
             foreach (var block in formatter.Format(S(SystemTextId.Inv1_ExperiencePoints)).Item1)
             {
-                block.ForceLineBreak = true;
+                block.Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap;
                 block.Alignment = TextAlignment.Right;
                 yield return block;
             }
 
             foreach (var block in formatter.Format(S(SystemTextId.Inv1_TrainingPoints)).Item1)
             {
-                block.ForceLineBreak = true;
+                block.Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap;
                 block.Alignment = TextAlignment.Right;
                 yield return block;
             }
@@ -108,18 +109,18 @@ namespace UAlbion.Game.Gui.Inventory
         {
             var state = Resolve<IStateManager>();
             var member = state.State.GetPartyMember(_activeMember);
-            yield return new TextBlock($"{member.LifePoints}/{member.LifePointsMax}");
+            yield return new TextBlock($"{member.LifePoints}/{member.LifePointsMax}") { Arrangement = TextArrangement.NoWrap };
 
             yield return new TextBlock(
                 member.Magic.SpellPointsMax > 0
                     ? $"{member.Magic.SpellPoints}/{member.Magic.SpellPointsMax}"
                     : "")
             {
-                ForceLineBreak = true
+                Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap
             };
 
-            yield return new TextBlock($"{member.ExperiencePoints}") { ForceLineBreak = true };
-            yield return new TextBlock($"{member.TrainingPoints}") { ForceLineBreak = true };
+            yield return new TextBlock($"{member.ExperiencePoints}") { Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap };
+            yield return new TextBlock($"{member.TrainingPoints}") { Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap };
         }
     }
 }

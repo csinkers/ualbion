@@ -229,7 +229,7 @@ namespace UAlbion.Core
             {
                 Debug = true,
                 SyncToVerticalBlank = true,
-                SingleThreaded = true
+                // SingleThreaded = true
             };
 
             GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, gdOptions, backend);

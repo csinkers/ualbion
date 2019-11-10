@@ -7,7 +7,8 @@ namespace UAlbion.Core.Visual
     public class TileMapWindow : IRenderable
     {
         public string Name => TileMap.Name;
-        public int RenderOrder => TileMap.RenderOrder;
+        public int RenderOrder { get => TileMap.RenderOrder; set => throw new NotImplementedException(); }
+
         public Type Renderer => TileMap.Renderer;
         public BoundingBox? Extents => TileMap.Extents;
         public Matrix4x4 Transform => Matrix4x4.Identity;

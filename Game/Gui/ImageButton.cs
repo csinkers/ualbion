@@ -93,21 +93,11 @@ namespace UAlbion.Game.Gui
 
         public override Vector2 GetSize() => GetMaxChildSize() + new Vector2(4, 0);
 
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
             // TODO: Emit rectangle/border renderable & hovered state highlight renderable
             var innerExtents = new Rectangle(extents.X + 2, extents.Y, extents.Width - 4, extents.Height);
-            return RenderChildren(innerExtents, order, addFunc);
-        }
-
-        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
-        {
-            if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
-                return order;
-            var innerExtents = new Rectangle(extents.X + 2, extents.Y, extents.Width - 4, extents.Height);
-            var maxOrder = SelectChildren(uiPosition, innerExtents, order, registerHitFunc);
-            registerHitFunc(order, this);
-            return maxOrder;
+            return base.DoLayout(innerExtents, order, func);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
-using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
@@ -30,15 +29,15 @@ namespace UAlbion.Game.Gui
 
         void OnClick(UiLeftClickEvent e)
         {
-            if (_isClickTimerPending)
+            if (_isClickTimerPending) // If they double-clicked...
             {
                 var stateManager = Resolve<IStateManager>();
                 var memberId = stateManager.State?.Party.Players.ElementAtOrDefault(_order)?.Id;
                 if(memberId.HasValue)
                     Raise(new OpenCharacterInventoryEvent(memberId.Value));
-                _isClickTimerPending = false;
+                _isClickTimerPending = false; // Ensure the single-click behaviour doesn't happen.
             }
-            else
+            else // For the first click, just start the double-click timer.
             {
                 Raise(new StartTimerEvent("StatusBarPortrait.ClickTimer", 300, this));
                 _isClickTimerPending = true;
@@ -109,7 +108,7 @@ namespace UAlbion.Game.Gui
         protected override void Subscribed() { LoadSprite(); base.Subscribed(); }
         public override Vector2 GetSize() => _portrait.GetSize() + new Vector2(0,6); // Add room for health + mana bars
 
-        int DoLayout(Rectangle extents, int order, Func<Rectangle, int, IUiElement, int> func)
+        protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
             var stateManager = Resolve<IStateManager>();
             var member = stateManager.State.Party.Players.ElementAt(_order);
@@ -120,39 +119,24 @@ namespace UAlbion.Game.Gui
             int maxOrder = order;
             var portraitExtents = new Rectangle(extents.X, extents.Y + (highlighted ? 0 : 3), extents.Width, extents.Height - 6);
 
-            maxOrder = Math.Max(maxOrder, func(portraitExtents, order, _portrait));
-            maxOrder = Math.Max(maxOrder, func(new Rectangle(
+            maxOrder = Math.Max(maxOrder, func(_portrait, portraitExtents, order));
+            maxOrder = Math.Max(maxOrder, func(_health, new Rectangle(
                     extents.X + 5,
                     extents.Y + extents.Height - 7,
                     extents.Width - 12,
                     4),
-                order, _health));
+                order));
 
             if (sheet.Magic.SpellPointsMax > 0)
             {
-                maxOrder = Math.Max(maxOrder, func(new Rectangle(
+                maxOrder = Math.Max(maxOrder, func(_mana, new Rectangle(
                         extents.X + 5,
                         extents.Y + extents.Height - 4,
                         extents.Width - 12,
                         4),
-                    order, _mana));
+                    order));
             }
 
-            return maxOrder;
-        }
-
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc) => 
-            DoLayout(extents, order, (elementExtents, elementOrder, element) => element.Render(elementExtents, elementOrder, addFunc));
-
-        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
-        {
-            if (!extents.Contains((int) uiPosition.X, (int) uiPosition.Y))
-                return order;
-
-            int maxOrder = DoLayout(extents, order, (elementExtents, elementOrder, element) =>
-                    element.Select(uiPosition, elementExtents, elementOrder, registerHitFunc));
-
-            registerHitFunc(order, this);
             return maxOrder;
         }
     }

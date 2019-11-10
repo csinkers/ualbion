@@ -50,7 +50,7 @@ namespace UAlbion.Core.Visual
         }
 
         public string Name { get; set; }
-        public int RenderOrder { get; }
+        public int RenderOrder { get; set; }
         public Vector3 Position { get; set; }
         public Vector3 TileSize { get; }
         public Type Renderer => typeof(ExtrudedTileMapRenderer);

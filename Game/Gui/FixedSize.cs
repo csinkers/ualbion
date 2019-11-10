@@ -2,7 +2,7 @@
 
 namespace UAlbion.Game.Gui
 {
-    public class FixedSize : UiElement
+    public class FixedSize : UiElement, IFixedSizeUiElement
     {
         readonly int _width;
         readonly int _height;

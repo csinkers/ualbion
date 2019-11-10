@@ -1,6 +1,6 @@
 ﻿namespace UAlbion.Game.Gui
 {
-    public class FixedSizePanel : UiElement
+    public class FixedSizePanel : UiElement, IFixedSizeUiElement
     {
         public FixedSizePanel(int width, int height, IUiElement content) : base(null)
         {

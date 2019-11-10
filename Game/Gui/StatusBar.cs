@@ -35,7 +35,7 @@ namespace UAlbion.Game.Gui
                 Children.Add(_portraits[i]);
             }
 
-            _hoverText = new Text("").Center();
+            _hoverText = new Text("").Center().NoWrap();
             _descriptionText = new Text("").Center();
             _hoverTextContainer = new FixedPosition(new Rectangle(181, 196, 177, 10), _hoverText);
             _descriptionTextContainer = new FixedPosition(new Rectangle(181, 208, 177, 30), _descriptionText);

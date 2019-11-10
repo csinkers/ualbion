@@ -74,13 +74,6 @@ namespace UAlbion.Game.Gui
             };
         }
 
-        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
-        {
-            if (extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
-                registerHitFunc(order, this);
-            return order;
-        }
-
         public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
         {
             if(_dirty) Rebuild();

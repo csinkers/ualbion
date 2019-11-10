@@ -29,30 +29,22 @@ namespace UAlbion.Game.Gui
         protected UiElement() : this(null) { }
         protected UiElement(IDictionary<Type, Handler> handlers) : base(handlers) { }
 
-        protected int RenderChildren(Rectangle extents, int order, Action<IRenderable> addFunc)
+        protected virtual int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
             int maxOrder = order;
             foreach (var child in Children.OfType<IUiElement>())
-                maxOrder = Math.Max(maxOrder, child.Render(extents, order + 1, addFunc));
-            return maxOrder;
-        }
-
-        protected int SelectChildren(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
-        {
-            int maxOrder = order;
-            foreach (var child in Children.OfType<IUiElement>())
-                maxOrder = Math.Max(maxOrder, child.Select(uiPosition, extents, order + 1, registerHitFunc));
+                maxOrder = Math.Max(maxOrder, func(child, extents, order + 1));
             return maxOrder;
         }
 
         public virtual Vector2 GetSize() => GetMaxChildSize();
-        public virtual int Render(Rectangle extents, int order, Action<IRenderable> addFunc) => RenderChildren(extents, order, addFunc);
+        public virtual int Render(Rectangle extents, int order, Action<IRenderable> addFunc) => DoLayout(extents, order, (x,y,z) => x.Render(y, z, addFunc));
         public virtual int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
             if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
                 return order;
 
-            var maxOrder = SelectChildren(uiPosition, extents, order, registerHitFunc);
+            var maxOrder = DoLayout(extents, order, (x,y,z) => x.Select(uiPosition, y, z, registerHitFunc));
             registerHitFunc(order, this);
             return maxOrder;
         }

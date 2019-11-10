@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using UAlbion.Core;
 using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
-    public class FixedPositionStack : UiElement
+    public class FixedPositionStack : UiElement, IFixedSizeUiElement
     {
         readonly IList<Child> _positions = new List<Child>();
 
@@ -68,7 +67,7 @@ namespace UAlbion.Game.Gui
             return size;
         }
 
-        int DoLayout(Rectangle extents, int order, Func<Rectangle, int, IUiElement, int> func)
+        protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
             int maxOrder = order;
             foreach (var child in _positions)
@@ -80,19 +79,9 @@ namespace UAlbion.Game.Gui
                     (int)(child.Width ?? childSize.X),
                     (int)(child.Height ?? childSize.Y));
 
-                maxOrder = Math.Max(maxOrder, func(childExtents, order + 1, child.Element));
+                maxOrder = Math.Max(maxOrder, func(child.Element, childExtents, order + 1));
             }
             return maxOrder;
-        }
-
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc) 
-            => DoLayout(extents, order, (childExtents, childOrder, child) => child.Render(childExtents, childOrder, addFunc));
-        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc) 
-        {
-            if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
-                return order;
-
-            return DoLayout(extents, order, (childExtents, childOrder, child) => child.Select(uiPosition, childExtents, childOrder, registerHitFunc));
         }
     }
 }

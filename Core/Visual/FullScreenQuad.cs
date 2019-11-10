@@ -16,7 +16,7 @@ namespace UAlbion.Core.Visual
         static readonly ushort[] QuadIndices = { 0, 1, 2, 0, 2, 3 };
         public string Name => "FullScreenQuad";
         public RenderPasses RenderPasses => RenderPasses.SwapchainOutput;
-        public int RenderOrder => int.MaxValue;
+        public int RenderOrder { get; set; } = int.MaxValue;
         public Type Renderer => typeof(FullScreenQuad);
         public BoundingBox? Extents => null;
         public Matrix4x4 Transform => Matrix4x4.Identity;

@@ -32,7 +32,7 @@ namespace UAlbion.Core.Visual
         }
         public Matrix4x4 Transform { get; private set; } = Matrix4x4.Identity;
         public event EventHandler ExtentsChanged;
-        public int RenderOrder { get; }
+        public int RenderOrder { get; set; }
         public SpriteFlags Flags { get; set; }
         public int SubObject { get; }
         

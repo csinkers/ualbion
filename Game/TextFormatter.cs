@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +11,7 @@ namespace UAlbion.Game
     public class TextFormatter
     {
         readonly IAssetManager _assets;
+        readonly IList<(Token, object)> _implicitTokens = new List<(Token, object)>();
         ICharacterSheet _leader;
         ICharacterSheet _subject;
         ICharacterSheet _inventory;
@@ -33,6 +33,8 @@ namespace UAlbion.Game
         public TextFormatter Victim(ICharacterSheet character) { _victim = character; return this; }
         public TextFormatter Weapon(ItemData weapon) { _weapon = weapon; return this; }
         public TextFormatter Language(GameLanguage language) { _language = language; return this; }
+        public TextFormatter NoWrap() { _implicitTokens.Add((Token.NoWrap, null)); return this; }
+        public TextFormatter Centre() { _implicitTokens.Add((Token.Centre, null)); return this; }
 
         IEnumerable<(Token, object)> Substitute(IEnumerable<(Token, object)> tokens, object[] args)
         {
@@ -167,11 +169,11 @@ namespace UAlbion.Game
             }
         }
 
-        IEnumerable<TextBlock> ToBlocks(IEnumerable<(Token, object)> tokens)
+        IEnumerable<TextBlock> TokensToBlocks(IEnumerable<(Token, object)> tokens)
         {
             var sb = new StringBuilder();
             var block = new TextBlock();
-            foreach(var (token, p) in tokens)
+            foreach (var (token, p) in tokens)
             {
                 if (sb.Length > 0 && token != Token.Text)
                 {
@@ -195,7 +197,8 @@ namespace UAlbion.Game
                     case Token.Centre: block.Alignment = TextAlignment.Center; break;
                     case Token.Justify: block.Alignment = TextAlignment.Justified; break;
 
-                    case Token.NewLine: block.ForceLineBreak = true; break;
+                    case Token.NewLine: block.Arrangement |= TextArrangement.ForceNewLine; break;
+                    case Token.NoWrap: block.Arrangement |= TextArrangement.NoWrap; break;
 
                     case Token.Text:
                         sb.Append((string) p);
@@ -213,51 +216,12 @@ namespace UAlbion.Game
             }
         }
 
-        IEnumerable<TextBlock> ToWords(IEnumerable<TextBlock> blocks)
-        {
-            foreach (var block in blocks)
-            {
-                var parts = block.Text.Split(' ');
-                bool first = true;
-                foreach (var part in parts)
-                {
-                    if (!first)
-                    {
-                        yield return new TextBlock(" ")
-                        {
-                            Alignment = block.Alignment,
-                            Color = block.Color,
-                            Style = block.Style,
-                        };
-
-                        if (part.Length > 0)
-                        {
-                            yield return new TextBlock(part)
-                            {
-                                Alignment = block.Alignment,
-                                Color = block.Color,
-                                Style = block.Style,
-                            };
-                        }
-                    }
-                    else
-                    {
-                        yield return new TextBlock(part)
-                        {
-                            Alignment = block.Alignment,
-                            Color = block.Color,
-                            Style = block.Style,
-                            ForceLineBreak = block.ForceLineBreak
-                        };
-                        first = false;
-                    }
-                }
-            }
-        }
-
         public (IEnumerable<TextBlock>, IList<WordId>) Format(string template, params object[] arguments)
         {
-            var tokens = Tokeniser.Tokenise(template).ToList();
+            var tokens = 
+                _implicitTokens.Concat(
+                    Tokeniser.Tokenise(template)
+                ).ToList();
             var words = tokens
                 .Where(x => x.Item1 == Token.Word)
                 .Select(x => (string)x.Item2)
@@ -265,7 +229,8 @@ namespace UAlbion.Game
                 .ToList();
 
             var substituted = Substitute(tokens, arguments);
-            return (ToWords(ToBlocks(substituted)), words);
+            var blocks = TokensToBlocks(substituted);
+            return (blocks, words);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace UAlbion
 {
     static class Dump
     {
-        static void CoreSprites(IAssetManager assets, string baseDir)
+        public static void CoreSprites(IAssetManager assets, string baseDir)
         {
             var dir = $@"{baseDir}\data\exported\MAIN.EXE";
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
@@ -28,7 +28,7 @@ namespace UAlbion
             }
         }
 
-        static void MapAndLabData(IAssetManager assets, string baseDir)
+        public static void MapAndLabData(IAssetManager assets, string baseDir)
         {
             using var sw = File.CreateText($@"{baseDir}\re\3DInfo.txt");
             // Dump map and lab data 
@@ -83,7 +83,7 @@ namespace UAlbion
             }
         }
 
-        static void CharacterSheets(IAssetManager assets)
+        public static void CharacterSheets(IAssetManager assets)
         {
             var chars = new List<CharacterSheet>();
             foreach (PartyCharacterId charId in Enum.GetValues(typeof(PartyCharacterId)))
@@ -99,12 +99,33 @@ namespace UAlbion
                 
             }
         }
-        static void Chests(IAssetManager assets)
+
+        public static void Chests(IAssetManager assets)
         {
             var chests = Enum.GetValues(typeof(ChestId)).Cast<ChestId>().ToDictionary(x => x, assets.LoadChest);
             var merchants = Enum.GetValues(typeof(MerchantId)).Cast<MerchantId>().ToDictionary(x => x, assets.LoadMerchant);
             foreach (var chest in chests)
             {
+            }
+        }
+
+        public static void ItemData(IAssetManager assets, string baseDir)
+        {
+            using var sw = File.CreateText($@"{baseDir}\re\ItemInfo.txt");
+            foreach (ItemId itemId in Enum.GetValues(typeof(ItemId)))
+            {
+                sw.Write($"{(int)itemId} {itemId} ");
+                var data = assets.LoadItem(itemId);
+                if (data == null)
+                    sw.Write("null");
+                else
+                {
+                    sw.Write($"Gfx:{(ushort)data.Icon} {data.IconAnim} frames ");
+                    sw.Write($"Type:{data.TypeId} Slot:{data.SlotType} ");
+                    sw.Write($"F:{data.Flags} A:{data.Activate}");
+                }
+
+                sw.WriteLine();
             }
         }
     }

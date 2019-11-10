@@ -27,6 +27,8 @@ namespace UAlbion.Game.State
         {
             var tom = _state.PartyMembers[PartyCharacterId.Tom];
             var inv = tom.Inventory;
+            inv.Gold = 256;
+            inv.Rations = 72;
             inv.Slots[0] = new ItemSlot { Amount = 1, Id = ItemId.Knife };
             inv.Slots[1] = new ItemSlot { Amount = 1, Id = ItemId.Shoes1 };
             inv.Slots[2] = new ItemSlot { Amount = 1, Id = ItemId.LeatherArmour };
@@ -40,6 +42,9 @@ namespace UAlbion.Game.State
             inv.Slots[10] = new ItemSlot { Amount = 1, Id = ItemId.Clock };
             inv.Slots[11] = new ItemSlot { Amount = 1, Id = ItemId.RingOfWrath };
             inv.Slots[12] = new ItemSlot { Amount = 1, Id = ItemId.StrengthAmulet };
+            inv.Slots[13] = new ItemSlot { Amount = 5, Id = ItemId.Torch };
+            inv.Slots[14] = new ItemSlot { Amount = 1, Id = ItemId.TorchBurning };
+            inv.Slots[15] = new ItemSlot { Amount = 1, Id = ItemId.Sword, Flags = ItemSlotFlags.Broken };
         }
 
         void NewGame()

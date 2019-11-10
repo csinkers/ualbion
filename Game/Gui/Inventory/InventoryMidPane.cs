@@ -10,7 +10,7 @@ namespace UAlbion.Game.Gui.Inventory
         public InventoryMidPane(PartyCharacterId activeCharacter,  InventoryConfig.PlayerInventory config)
         {
             var background = new FixedPositionStack();
-            background.Add(new UiSprite<FullBodyPictureId>((FullBodyPictureId) activeCharacter), 1, -3);
+            background.Add(new UiSprite<FullBodyPictureId>((FullBodyPictureId)activeCharacter), 1, -3);
             Children.Add(background);
 
             var bodyStack = new FixedPositionStack();

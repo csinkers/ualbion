@@ -12,6 +12,8 @@
         LeftFinger = 7,
         Feet = 8,
         RightFinger = 9,
-        Tail = 10
+        Tail = 10,
+
+        Slot0 = 11,
     }
 }

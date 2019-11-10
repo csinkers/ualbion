@@ -45,15 +45,16 @@ namespace UAlbion.Game.Gui
 
         public override Vector2 GetSize() => new Vector2(UiConstants.StatusBarExtents.Width, UiConstants.StatusBarExtents.Height);
 
-        void DoLayout(Rectangle extents, Action<Rectangle, IUiElement> action, bool trimOverlap)
+        int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func, bool trimOverlap)
         {
-            action(extents, _sprite);
-            action(extents, _hoverTextContainer);
-            action(extents, _descriptionTextContainer);
+            int maxOrder = order;
+            maxOrder = Math.Max(maxOrder, func(_sprite, extents, order + 1));
+            maxOrder = Math.Max(maxOrder, func(_hoverTextContainer, extents, order + 1));
+            maxOrder = Math.Max(maxOrder, func(_descriptionTextContainer, extents, order + 1));
 
             var stateManager = Resolve<IStateManager>();
             if (stateManager.State == null)
-                return;
+                return maxOrder;
 
             for (int i = 0; i < _portraits.Length; i++)
             {
@@ -66,8 +67,9 @@ namespace UAlbion.Game.Gui
                     extents.Y + 3,
                     (int)portrait.GetSize().X - (trimOverlap ? 6 : 0),
                     (int)portrait.GetSize().Y);
-                action(portraitExtents, portrait);
+                maxOrder = Math.Max(maxOrder, func(portrait, portraitExtents, order + 1));
             }
+            return maxOrder;
         }
 
         public override int Select(
@@ -79,21 +81,15 @@ namespace UAlbion.Game.Gui
             if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
                 return order;
 
-            int maxOrder = order;
-            DoLayout(extents,
-                (rect, x) => { maxOrder = Math.Max(maxOrder, x.Select(uiPosition, rect, order, registerHitFunc)); },
+            int maxOrder = DoLayout(extents,
+                order,
+                (x, y, z) =>  x.Select(uiPosition, y, z, registerHitFunc),
                 true);
             registerHitFunc(order, this);
             return maxOrder;
         }
 
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
-        {
-            int maxOrder = order;
-            DoLayout(extents,
-                (rect, x) => { maxOrder = Math.Max(maxOrder, x.Render(rect, order, addFunc)); },
-                false);
-            return maxOrder;
-        }
+        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc) =>
+            DoLayout(extents, order, (x, y, z) => x.Render(y, z, addFunc), false);
     }
 }

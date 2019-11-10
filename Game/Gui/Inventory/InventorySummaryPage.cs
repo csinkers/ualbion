@@ -109,7 +109,7 @@ namespace UAlbion.Game.Gui.Inventory
         {
             var state = Resolve<IStateManager>();
             var member = state.State.GetPartyMember(_activeMember);
-            yield return new TextBlock($"{member.LifePoints}/{member.LifePointsMax}") { Arrangement = TextArrangement.NoWrap };
+            yield return new TextBlock($"{member.Combat.LifePoints}/{member.Combat.LifePointsMax}") { Arrangement = TextArrangement.NoWrap };
 
             yield return new TextBlock(
                 member.Magic.SpellPointsMax > 0
@@ -119,8 +119,8 @@ namespace UAlbion.Game.Gui.Inventory
                 Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap
             };
 
-            yield return new TextBlock($"{member.ExperiencePoints}") { Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap };
-            yield return new TextBlock($"{member.TrainingPoints}") { Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap };
+            yield return new TextBlock($"{member.Combat.ExperiencePoints}") { Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap };
+            yield return new TextBlock($"{member.Combat.TrainingPoints}") { Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap };
         }
     }
 }

@@ -72,7 +72,7 @@ namespace UAlbion.Game.Gui.Inventory
                 };
 
             var middlePane = new InventoryMidPane(_activeCharacter, _config.Positions[_activeCharacter]);
-            var rightPane = new InventoryRightPane(ExitButtonId, _mode == InventoryMode.Merchant);
+            var rightPane = new InventoryRightPane(_activeCharacter, ExitButtonId, _mode == InventoryMode.Merchant);
             // var frameDivider = new FrameDivider(135, 0, 4, 192);
 
             var leftContainer = new FixedPosition(

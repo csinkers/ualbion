@@ -10,17 +10,18 @@ namespace UAlbion.Formats.Assets
         public CharacterInventory Inventory { get; } = new CharacterInventory();
         public CharacterAttributes Attributes { get; } = new CharacterAttributes();
         public CharacterSkills Skills { get; } = new CharacterSkills();
-
+        public CombatAttributes Combat { get; } = new CombatAttributes();
         IMagicSkills ICharacterSheet.Magic => Magic;
         ICharacterInventory ICharacterSheet.Inventory => Inventory;
         ICharacterAttributes ICharacterSheet.Attributes => Attributes;
         ICharacterSkills ICharacterSheet.Skills => Skills;
+        ICombatAttributes ICharacterSheet.Combat => Combat;
 
         public override string ToString() => 
             Type switch {
             CharacterType.Party => $"{Name} {Race} {Class} {Age} EN:{EnglishName} DE:{GermanName} {Magic.SpellStrengths.Count} spells",
             CharacterType.Npc => $"{Name} {PortraitId} S{SpriteId} E{EventSetId} W{WordSet}",
-            CharacterType.Monster => $"{Name} {Class} {Gender} AP{ActionPoints} Lvl{Level} LP{LifePoints}/{LifePointsMax} {Magic.SpellStrengths.Count} spells",
+            CharacterType.Monster => $"{Name} {Class} {Gender} AP{Combat.ActionPoints} Lvl{Level} LP{Combat.LifePoints}/{Combat.LifePointsMax} {Magic.SpellStrengths.Count} spells",
             _ => $"{Name} UNKNOWN TYPE {Type}" };
 
         // Names
@@ -29,15 +30,6 @@ namespace UAlbion.Formats.Assets
         public string GermanName { get; set; }
         public string FrenchName { get; set; }
 
-        public string GetName(GameLanguage language) => language switch
-        {
-            GameLanguage.English => EnglishName,
-            GameLanguage.German => GermanName,
-            GameLanguage.French => FrenchName,
-            _ => throw new InvalidOperationException($"Unexpected language {language}")
-        };
-
-
         // Basic stats
         public CharacterType Type { get; set; }
         public Gender Gender { get; set; }
@@ -45,8 +37,6 @@ namespace UAlbion.Formats.Assets
         public PlayerClass Class { get; set; }
         public ushort Age { get; set; }
         public byte Level { get; set; }
-        public uint ExperiencePoints { get; set; }
-        public ushort TrainingPoints { get; set; }
 
         // Display and behaviour
         public PlayerLanguage Languages { get; set; }
@@ -56,14 +46,38 @@ namespace UAlbion.Formats.Assets
         public ushort EventSetId { get; set; }
         public ushort WordSet { get; set; }
 
-        // Combat
-        public ushort LifePoints { get; set; }
-        public ushort LifePointsMax { get; set; }
-        public byte ActionPoints { get; set; }
-        public ushort BaseProtection { get; set; }
-        public ushort BaseDamage { get; set; }
-        public PhysicalCondition PhysicalConditions { get; set; }
-        public MentalCondition MentalConditions { get; set; }
+        public string GetName(GameLanguage language) => language switch
+        {
+            GameLanguage.English => EnglishName,
+            GameLanguage.German => GermanName,
+            GameLanguage.French => FrenchName,
+            _ => throw new InvalidOperationException($"Unexpected language {language}")
+        };
+
+        public ItemSlot GetSlot(ItemSlotId itemSlotId)
+        {
+            ItemSlot FromSlot()
+            {
+                int slotNumber = (int)itemSlotId - (int)ItemSlotId.Slot0;
+                if (slotNumber < 0 || slotNumber >= Inventory.Slots.Length)
+                    throw new ArgumentOutOfRangeException($"Unexpected slot id: {itemSlotId}");
+                return Inventory.Slots[slotNumber];
+            }
+
+            return itemSlotId switch
+            {
+                ItemSlotId.Neck => Inventory.Neck,
+                ItemSlotId.Head => Inventory.Head,
+                ItemSlotId.LeftHand => Inventory.LeftHand,
+                ItemSlotId.Torso => Inventory.Chest,
+                ItemSlotId.RightHand => Inventory.RightHand,
+                ItemSlotId.LeftFinger => Inventory.LeftFinger,
+                ItemSlotId.Feet => Inventory.Feet,
+                ItemSlotId.RightFinger => Inventory.RightFinger,
+                ItemSlotId.Tail => Inventory.Tail,
+                _ => FromSlot()
+            };
+        }
 
         // Pending further reversing
         public byte Unknown6 { get; set; }

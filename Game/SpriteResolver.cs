@@ -28,7 +28,7 @@ namespace UAlbion.Game
             {typeof(DungeonWallId), AssetType.Wall3D},
             {typeof(FullBodyPictureId), AssetType.FullBodyPicture},
             {typeof(IconGraphicsId), AssetType.IconGraphics},
-            {typeof(ItemId), AssetType.ItemGraphics},
+            {typeof(ItemSpriteId), AssetType.ItemGraphics},
             {typeof(LargeNpcId), AssetType.BigNpcGraphics},
             {typeof(LargePartyGraphicsId), AssetType.BigPartyGraphics},
             {typeof(MonsterGraphicsId), AssetType.MonsterGraphics},

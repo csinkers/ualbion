@@ -38,10 +38,11 @@ namespace UAlbion.Game.Gui
             int maxOrder = order;
             foreach(var child in Children.OfType<IUiElement>())
             {
-                int height = (int)child.GetSize().Y;
+                var childSize = child.GetSize();
+                int height = (int)childSize.Y;
                 var childExtents = Greedy
                     ? new Rectangle(extents.X, offset, extents.Width, height)
-                    : new Rectangle(extents.X, offset, (int)child.GetSize().X, height);
+                    : new Rectangle(extents.X + (int)(extents.Width - childSize.X) / 2, offset, (int)childSize.X, height);
 
                 maxOrder = Math.Max(maxOrder, func(child, childExtents, order + 1));
                 // Rendering may have altered the size of any text elements, so retrieve it

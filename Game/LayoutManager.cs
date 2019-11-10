@@ -90,7 +90,7 @@ namespace UAlbion.Game
                         break;
                     case DialogPositioning.StatusBar:
                         x = (uiWidth - (int)size.X) / 2;
-                        y = UiConstants.UiExtents.Height - (int)size.Y;
+                        y = UiConstants.StatusBarExtents.Y;
                         break;
 
                     default:

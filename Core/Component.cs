@@ -45,6 +45,7 @@ namespace UAlbion.Core
         protected EventExchange Exchange { get; private set; } // N.B. will be null until subscribed.
         protected IList<IComponent> Children { get; } = new List<IComponent>();
 
+        protected Component() : this(null) { }
         protected Component(IDictionary<Type, Handler> handlers)
         {
             _handlers = handlers ?? EmptySet;

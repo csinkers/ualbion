@@ -3,6 +3,7 @@ using System.Numerics;
 using System.Reflection;
 using System.Text;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
@@ -46,9 +47,6 @@ namespace UAlbion
                 return;
 
             using var assets = new AssetManager();
-            // Dump.CoreSprites(assets, baseDir); return;
-            // Dump.CharacterSheets(assets);
-            // Dump.Chests(assets);
             RunGame(assets, baseDir);
         }
 
@@ -67,7 +65,7 @@ namespace UAlbion
             var logger = new ConsoleLogger();
             using var engine = new Engine(logger, backend,
 #if DEBUG
-                false);
+                true);
 #else
                  false);
 #endif
@@ -94,6 +92,7 @@ namespace UAlbion
             engine.GlobalExchange
                 .Register<ISettings>(new Settings { BasePath = baseDir }) // Need to register settings first, as the AssetConfigLocator relies on it.
                 .Register<IAssetManager>(assets)
+                .Register<ICharacterManager>(new CharacterManager())
                 .Register<IInputManager>(inputManager)
                 .Register<ILayoutManager>(new LayoutManager())
                 .Register<IPaletteManager>(new PaletteManager())
@@ -132,6 +131,11 @@ namespace UAlbion
                 .Attach(new MainMenu())
                 .Attach(menuBackground)
                 ;
+
+            // Dump.CoreSprites(assets, baseDir); return;
+            // Dump.CharacterSheets(assets);
+            // Dump.Chests(assets);
+            // Dump.ItemData(assets, baseDir);
 
             //engine.GlobalExchange.Raise(new NewGameEvent(), null);
             /*

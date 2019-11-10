@@ -149,7 +149,7 @@ namespace UAlbion.Game.Gui
                 extents.Width - _padding * 2,
                 extents.Height - _padding * 2);
 
-            return base.DoLayout(innerExtents, order, func);
+            return base.DoLayout(innerExtents, order + 1, func);
         }
 
         public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)

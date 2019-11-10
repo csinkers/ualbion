@@ -80,7 +80,7 @@ namespace UAlbion.Core.Visual
         }
 
         public IEnumerable<IRenderable> UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IEnumerable<IRenderable> renderables) => renderables;
-        public void DestroyDeviceObjects() { _disposeCollector.DisposeAll(); }
+        public void DestroyDeviceObjects() { _disposeCollector?.DisposeAll(); }
         public void Dispose() { DestroyDeviceObjects(); }
     }
 }

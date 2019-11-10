@@ -14,6 +14,8 @@ namespace UAlbion.Core
 {
     public class Engine : Component, IDisposable
     {
+        const int DefaultWidth = 720;
+        const int DefaultHeight = 480;
         static readonly HandlerSet Handlers = new HandlerSet
         (
             H<Engine, LoadRenderDocEvent>((x, _) =>
@@ -97,6 +99,9 @@ namespace UAlbion.Core
 
                 Sdl2Events.ProcessEvents();
                 InputSnapshot snapshot = Window.PumpEvents();
+                if (!Window.Exists)
+                    break;
+
                 if (_pendingCursorUpdate.HasValue)
                 {
                     Sdl2Native.SDL_WarpMouseInWindow(
@@ -209,10 +214,10 @@ namespace UAlbion.Core
 
                 WindowCreateInfo windowInfo = new WindowCreateInfo
                 {
-                    X = Window?.X ?? 684,
-                    Y = Window?.Y ?? 456,
-                    WindowWidth = Window?.Width ?? 684,
-                    WindowHeight = Window?.Height ?? 456,
+                    X = Window?.X ?? 648,
+                    Y = Window?.Y ?? 431,
+                    WindowWidth = Window?.Width ?? DefaultWidth,
+                    WindowHeight = Window?.Height ?? DefaultHeight,
                     WindowInitialState = Window?.WindowState ?? WindowState.Normal,
                     WindowTitle = "UAlbion"
                 };

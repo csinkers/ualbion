@@ -8,7 +8,7 @@ open FSharp.Json
 
 let baseDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) |> (fun x -> Directory.GetParent(x).Parent.Parent.Parent.Parent.FullName)
 let xldDir = Path.Combine(baseDir, @"albion_sr\CD\XLDLIBS")
-let mainOutputDir = Path.Combine(baseDir, @"exported")
+let mainOutputDir = Path.Combine(baseDir, @"data\exported")
 let xmiToMidiPath = Path.Combine(baseDir, @"Tools\XmiToMidi\Debug\UAlbion.Tools.XmiToMidi.exe")
 let bytesTo850String (bytes:byte array) = Encoding.GetEncoding(850).GetString(bytes).Replace("×", "ß").TrimEnd((char)0)
 
@@ -264,7 +264,7 @@ Total size: 0x1ae3b (110,139 bytes)
             if (Util.stringNotEmpty errors) then printfn "XmiToMidi errors: %s" errors
         )
 
-    static member export path exportFunc outputDir =
+    static member export exportFunc path outputDir =
         let header = [| byte 'X'; byte 'L'; byte 'D'; byte '0'; byte 'I'; 0uy |]
         use stream = File.OpenRead(path)
         use br = new BinaryReader(stream)
@@ -275,112 +275,122 @@ Total size: 0x1ae3b (110,139 bytes)
         let objectLengths = Array.ofSeq <| seq { for _ in [1..objectCount] do yield int <| br.ReadUInt32() }
         objectLengths |> Seq.iteri (fun i length -> exportFunc br outputDir i length)
 
+let copyRaw extension path outputDir =
+    use stream = File.OpenRead(path)
+    use br = new BinaryReader(stream)
+    if(not <| Directory.Exists(outputDir)) then Directory.CreateDirectory(outputDir) |> ignore
+
+    let length = br.BaseStream.Length |> int
+    if(length = 0) then () else
+    let bytes = br.ReadBytes(length)
+    File.WriteAllBytes(Path.Combine(outputDir, sprintf "%02d.%s" 0 extension), bytes)
+
 let files =
     [
 //    (*
-        @"3DBCKGR0.XLD", XldFile.graphics  // Large background images for 3D
-        @"3DFLOOR0.XLD", XldFile.graphics  // Floor textures for 3D
-        @"3DFLOOR1.XLD", XldFile.graphics  // Floor textures for 3D
-        @"3DFLOOR2.XLD", XldFile.graphics  // Floor textures for 3D
-        @"3DOBJEC0.XLD", XldFile.graphics  // Sprites for 3D
-        @"3DOBJEC1.XLD", XldFile.graphics  // Sprites for 3D
-        @"3DOBJEC2.XLD", XldFile.graphics  // Sprites for 3D
-        @"3DOBJEC3.XLD", XldFile.graphics  // Sprites for 3D
-        @"3DOVERL0.XLD", XldFile.graphics  // Misc sprites for 3D
-        @"3DOVERL1.XLD", XldFile.graphics  // Misc sprites for 3D
-        @"3DOVERL2.XLD", XldFile.graphics  // Misc sprites for 3D
-        @"3DWALLS0.XLD", XldFile.graphics  // Wall textures for 3D
-        @"3DWALLS1.XLD", XldFile.graphics  // Wall textures for 3D
-        @"AUTOGFX0.XLD", XldFile.raw "bin" // Tiny sprite maps?
-        @"BLKLIST0.XLD", XldFile.raw "bin" // ???
-        @"COMBACK0.XLD", XldFile.graphics  // Combat backgrounds
-        @"COMGFX0.XLD", XldFile.graphics   // Combat sprites / particles etc
-        @"EVNTSET0.XLD", XldFile.raw "bin" // ???
-        @"EVNTSET1.XLD", XldFile.raw "bin"
-        @"EVNTSET2.XLD", XldFile.raw "bin"
-        @"EVNTSET3.XLD", XldFile.raw "bin"
-        @"EVNTSET9.XLD", XldFile.raw "bin"
-        @"FBODPIX0.XLD", XldFile.graphics  // Playable character pictures
-        @"FONTS0.XLD", XldFile.raw "bin"   // Fonts, unknown format
-        @"ICONDAT0.XLD", XldFile.graphics  // Sprite-maps?
-        @"ICONGFX0.XLD", XldFile.graphics  // Sprite-maps?
-        // @"ITEMGFX", NONXLD              // Just an array of 16x16 sprites appended together
+        @"3DBCKGR0.XLD", (XldFile.export XldFile.graphics)  // Large background images for 3D
+        @"3DFLOOR0.XLD", (XldFile.export XldFile.graphics)  // Floor textures for 3D
+        @"3DFLOOR1.XLD", (XldFile.export XldFile.graphics)  // Floor textures for 3D
+        @"3DFLOOR2.XLD", (XldFile.export XldFile.graphics)  // Floor textures for 3D
+        @"3DOBJEC0.XLD", (XldFile.export XldFile.graphics)  // Sprites for 3D
+        @"3DOBJEC1.XLD", (XldFile.export XldFile.graphics)  // Sprites for 3D
+        @"3DOBJEC2.XLD", (XldFile.export XldFile.graphics)  // Sprites for 3D
+        @"3DOBJEC3.XLD", (XldFile.export XldFile.graphics)  // Sprites for 3D
+        @"3DOVERL0.XLD", (XldFile.export XldFile.graphics)  // Misc sprites for 3D
+        @"3DOVERL1.XLD", (XldFile.export XldFile.graphics)  // Misc sprites for 3D
+        @"3DOVERL2.XLD", (XldFile.export XldFile.graphics)  // Misc sprites for 3D
+        @"3DWALLS0.XLD", (XldFile.export XldFile.graphics)  // Wall textures for 3D
+        @"3DWALLS1.XLD", (XldFile.export XldFile.graphics)  // Wall textures for 3D
+        @"AUTOGFX0.XLD", (XldFile.export XldFile.graphics) // Tiny sprite maps?
+        @"BLKLIST0.XLD", (XldFile.export XldFile.graphics) // ???
+        @"COMBACK0.XLD", (XldFile.export XldFile.graphics)  // Combat backgrounds
+        @"COMGFX0.XLD",  (XldFile.export XldFile.graphics)   // Combat sprites / particles etc
+        @"EVNTSET0.XLD", (XldFile.export XldFile.graphics) // ???
+        @"EVNTSET1.XLD", (XldFile.export XldFile.graphics)
+        @"EVNTSET2.XLD", (XldFile.export XldFile.graphics)
+        @"EVNTSET3.XLD", (XldFile.export XldFile.graphics)
+        @"EVNTSET9.XLD", (XldFile.export XldFile.graphics)
+        @"FBODPIX0.XLD", (XldFile.export XldFile.graphics)  // Playable character pictures
+        @"FONTS0.XLD",   (XldFile.export XldFile.graphics)   // Fonts, unknown format
+        @"ICONDAT0.XLD", (XldFile.export XldFile.graphics)  // Sprite-maps?
+        @"ICONGFX0.XLD", (XldFile.export XldFile.graphics)  // Sprite-maps?
+        @"ITEMGFX",      copyRaw "bin"     // Just an array of 16x16 sprites appended together
         // @"ITEMLIST.DAT", NONXLD            // Probably contains weapon damage etc stats
         // @"ITEMNAME.DAT", NONXLD            // Item names, char[20][], ordered in groups of DE, EN, FR (462 items)
-        @"LABDATA0.XLD", XldFile.raw "bin" // Not graphics, but definitely orderly
-        @"LABDATA1.XLD", XldFile.raw "bin"
-        @"LABDATA2.XLD", XldFile.raw "bin"
-        @"MAPDATA1.XLD", XldFile.raw "bin"       // 2D map data
-        @"MAPDATA2.XLD", XldFile.raw "bin"       // 2D map data
-        @"MAPDATA3.XLD", XldFile.raw "bin"       // 2D map data
-        @"MONCHAR0.XLD", XldFile.graphics  // Monster combat spritemaps (heterogeneous)
-        @"MONGFX0.XLD", XldFile.raw "bin"  // Tiny files
-        @"MONGRP0.XLD", XldFile.raw "bin"  // Tiny files
-        @"MONGRP1.XLD", XldFile.raw "bin"  // Tiny files
-        @"MONGRP2.XLD", XldFile.raw "bin"  // Tiny files
-        @"NPCGR0.XLD", XldFile.graphics    // 2D NPC graphics. Spritemaps, 32 wide. (GR=Groß)
-        @"NPCGR1.XLD", XldFile.graphics    // 2D NPC graphics
-        @"NPCKL0.XLD", XldFile.graphics    // 2D NPCs on the world map (KL=Klein)
-        @"PALETTE.000", XldFile.raw "bin"  // ?? 192 bytes
-        @"PALETTE0.XLD", XldFile.raw "bin" // Palette data, 576 bytes/palette. 64 byte header + 256*16bit colour
-        @"PARTGR0.XLD", XldFile.raw "bin"  // 2D Player characters
-        @"PARTKL0.XLD", XldFile.raw "bin"  // 2D Player characters on the world map
-        @"PICTURE0.XLD", XldFile.graphics  // Heterogeneous spritemaps?
-        @"SAMPLES0.XLD", XldFile.samples   // Raw audio samples
-        @"SAMPLES1.XLD", XldFile.samples   // Raw audio samples
-        @"SAMPLES2.XLD", XldFile.samples   // Raw audio samples
-        @"SCRIPT0.XLD", XldFile.raw "txt"  // Plain text scripts
-        @"SCRIPT2.XLD", XldFile.raw "txt"  // Plain text scripts
-        @"SLAB", XldFile.raw "bin"         // Some sort of bitfield, everything is either 0xc_ or 0xf_. 86400 bytes (2^7, 3^3, 5^2)
-        @"SMLPORT0.XLD", XldFile.graphics  // Small portraits, mostly 34 wide.
-        @"SMLPORT1.XLD", XldFile.graphics  // Small portraits, mostly 34 wide.
-        @"SONGS0.XLD", XldFile.xmi         // XMI music files, can be converted to MIDI (imperfectly)
-        @"SPELLDAT.DAT", XldFile.raw "bin" // ???
-        @"TACTICO0.XLD", XldFile.graphics  // Battle sprites, all 32 wide.
-        @"TRANSTB0.XLD", XldFile.raw "bin" // ?? All files are 196608 bytes, some periodicity
-        @"WAVELIB0.XLD", XldFile.wavelib   // Sound effects
-        @"ENGLISH\EVNTTXT0.XLD", XldFile.strings // Translated text
-        @"ENGLISH\EVNTTXT1.XLD", XldFile.strings // Translated text
-        @"ENGLISH\EVNTTXT2.XLD", XldFile.strings // Translated text
-        @"ENGLISH\EVNTTXT3.XLD", XldFile.strings // Translated text
-        @"ENGLISH\EVNTTXT9.XLD", XldFile.strings // Translated text
-        @"ENGLISH\FLICS0.XLD", XldFile.raw "bin" // Probably SMK video
-        @"ENGLISH\MAPTEXT1.XLD", XldFile.strings // Translated text
-        @"ENGLISH\MAPTEXT2.XLD", XldFile.strings // Translated text
-        @"ENGLISH\MAPTEXT3.XLD", XldFile.strings // Translated text
-        @"ENGLISH\SYSTEXTS", XldFile.raw "txt"   // Plain text [%04d:format string]
-        @"ENGLISH\WORDLIS0.XLD", XldFile.chunkedStrings 21 // Topic words in zero padded chunks of 21 bytes
+        @"LABDATA0.XLD", (XldFile.export XldFile.graphics) // Not graphics, but definitely orderly
+        @"LABDATA1.XLD", (XldFile.export XldFile.graphics)
+        @"LABDATA2.XLD", (XldFile.export XldFile.graphics)
+        @"MAPDATA1.XLD", (XldFile.export XldFile.graphics)       // 2D map data
+        @"MAPDATA2.XLD", (XldFile.export XldFile.graphics)       // 2D map data
+        @"MAPDATA3.XLD", (XldFile.export XldFile.graphics)       // 2D map data
+        @"MONCHAR0.XLD", (XldFile.export XldFile.graphics)  // Monster combat spritemaps (heterogeneous)
+        @"MONGFX0.XLD",  (XldFile.export XldFile.graphics)  // Tiny files
+        @"MONGRP0.XLD",  (XldFile.export XldFile.graphics)  // Tiny files
+        @"MONGRP1.XLD",  (XldFile.export XldFile.graphics)  // Tiny files
+        @"MONGRP2.XLD",  (XldFile.export XldFile.graphics)  // Tiny files
+        @"NPCGR0.XLD",   (XldFile.export XldFile.graphics)    // 2D NPC graphics. Spritemaps, 32 wide. (GR=Groß)
+        @"NPCGR1.XLD",   (XldFile.export XldFile.graphics)    // 2D NPC graphics
+        @"NPCKL0.XLD",   (XldFile.export XldFile.graphics)    // 2D NPCs on the world map (KL=Klein)
+        @"PALETTE.000",  (XldFile.export XldFile.graphics)  // ?? 192 bytes
+        @"PALETTE0.XLD", (XldFile.export XldFile.graphics) // Palette data, 576 bytes/palette. 64 byte header + 256*16bit colour
+        @"PARTGR0.XLD",  (XldFile.export XldFile.graphics)  // 2D Player characters
+        @"PARTKL0.XLD",  (XldFile.export XldFile.graphics)  // 2D Player characters on the world map
+        @"PICTURE0.XLD", (XldFile.export XldFile.graphics)  // Heterogeneous spritemaps?
+        @"SAMPLES0.XLD", (XldFile.export XldFile.samples)   // Raw audio samples
+        @"SAMPLES1.XLD", (XldFile.export XldFile.samples)   // Raw audio samples
+        @"SAMPLES2.XLD", (XldFile.export XldFile.samples)   // Raw audio samples
+        @"SCRIPT0.XLD",  (XldFile.export (XldFile.raw "txt"))  // Plain text scripts
+        @"SCRIPT2.XLD",  (XldFile.export (XldFile.raw "txt"))  // Plain text scripts
+        @"SLAB",         copyRaw "bin"         // Some sort of bitfield, everything is either 0xc_ or 0xf_. 86400 bytes (2^7, 3^3, 5^2)
+        @"SMLPORT0.XLD", (XldFile.export XldFile.graphics)  // Small portraits, mostly 34 wide.
+        @"SMLPORT1.XLD", (XldFile.export XldFile.graphics)  // Small portraits, mostly 34 wide.
+        @"SONGS0.XLD",   (XldFile.export XldFile.xmi)         // XMI music files, can be converted to MIDI (imperfectly)
+        @"SPELLDAT.DAT", (XldFile.export XldFile.graphics) // ???
+        @"TACTICO0.XLD", (XldFile.export XldFile.graphics)  // Battle sprites, all 32 wide.
+        @"TRANSTB0.XLD", (XldFile.export XldFile.graphics) // ?? All files are 196608 bytes, some periodicity
+        @"WAVELIB0.XLD", (XldFile.export XldFile.wavelib)   // Sound effects
+        @"ENGLISH\EVNTTXT0.XLD", (XldFile.export XldFile.strings) // Translated text
+        @"ENGLISH\EVNTTXT1.XLD", (XldFile.export XldFile.strings) // Translated text
+        @"ENGLISH\EVNTTXT2.XLD", (XldFile.export XldFile.strings) // Translated text
+        @"ENGLISH\EVNTTXT3.XLD", (XldFile.export XldFile.strings) // Translated text
+        @"ENGLISH\EVNTTXT9.XLD", (XldFile.export XldFile.strings) // Translated text
+        @"ENGLISH\FLICS0.XLD",   (XldFile.export XldFile.graphics) // Probably SMK video
+        @"ENGLISH\MAPTEXT1.XLD", (XldFile.export XldFile.strings) // Translated text
+        @"ENGLISH\MAPTEXT2.XLD", (XldFile.export XldFile.strings) // Translated text
+        @"ENGLISH\MAPTEXT3.XLD", (XldFile.export XldFile.strings) // Translated text
+        @"ENGLISH\SYSTEXTS",     (XldFile.export (XldFile.raw "txt"))   // Plain text [%04d:format string]
+        @"ENGLISH\WORDLIS0.XLD", (XldFile.export (XldFile.chunkedStrings 21)) // Topic words in zero padded chunks of 21 bytes
 
-        @"GERMAN\EVNTTXT0.XLD", XldFile.strings  // Translated text
-        @"GERMAN\EVNTTXT1.XLD", XldFile.strings  // Translated text
-        @"GERMAN\EVNTTXT2.XLD", XldFile.strings  // Translated text
-        @"GERMAN\EVNTTXT3.XLD", XldFile.strings  // Translated text
-        @"GERMAN\EVNTTXT9.XLD", XldFile.strings  // Translated text
-        @"GERMAN\FLICS0.XLD", XldFile.raw "bin" // Probably SMK video
-        @"GERMAN\MAPTEXT1.XLD", XldFile.strings  // Translated text
-        @"GERMAN\MAPTEXT2.XLD", XldFile.strings  // Translated text
-        @"GERMAN\MAPTEXT3.XLD", XldFile.strings  // Translated text
-        @"GERMAN\SYSTEXTS", XldFile.raw "txt"   // Plain text [%04d:format string]
-        @"GERMAN\WORDLIS0.XLD", XldFile.chunkedStrings 21 // Topic words in zero padded chunks of 21 bytes
+        @"GERMAN\EVNTTXT0.XLD", (XldFile.export XldFile.strings)  // Translated text
+        @"GERMAN\EVNTTXT1.XLD", (XldFile.export XldFile.strings)  // Translated text
+        @"GERMAN\EVNTTXT2.XLD", (XldFile.export XldFile.strings)  // Translated text
+        @"GERMAN\EVNTTXT3.XLD", (XldFile.export XldFile.strings)  // Translated text
+        @"GERMAN\EVNTTXT9.XLD", (XldFile.export XldFile.strings)  // Translated text
+        @"GERMAN\FLICS0.XLD",   (XldFile.export XldFile.graphics) // Probably SMK video
+        @"GERMAN\MAPTEXT1.XLD", (XldFile.export XldFile.strings)  // Translated text
+        @"GERMAN\MAPTEXT2.XLD", (XldFile.export XldFile.strings)  // Translated text
+        @"GERMAN\MAPTEXT3.XLD", (XldFile.export XldFile.strings)  // Translated text
+        @"GERMAN\SYSTEXTS",     (XldFile.export (XldFile.raw "txt"))   // Plain text [%04d:format string]
+        @"GERMAN\WORDLIS0.XLD", (XldFile.export (XldFile.chunkedStrings 21)) // Topic words in zero padded chunks of 21 bytes
 
         // Map metadata?
-        @"INITIAL\AUTOMAP1.XLD", XldFile.raw "bin"
-        @"INITIAL\AUTOMAP2.XLD", XldFile.raw "bin"
-        @"INITIAL\AUTOMAP3.XLD", XldFile.raw "bin"
-        @"INITIAL\CHESTDT0.XLD", XldFile.raw "bin"
-        @"INITIAL\CHESTDT1.XLD", XldFile.raw "bin"
-        @"INITIAL\CHESTDT2.XLD", XldFile.raw "bin"
-        @"INITIAL\CHESTDT5.XLD", XldFile.raw "bin"
-        @"INITIAL\MERCHDT0.XLD", XldFile.raw "bin"
-        @"INITIAL\MERCHDT1.XLD", XldFile.raw "bin"
-        @"INITIAL\MERCHDT2.XLD", XldFile.raw "bin"
-        @"INITIAL\NPCCHAR0.XLD", XldFile.raw "bin"
-        @"INITIAL\NPCCHAR1.XLD", XldFile.raw "bin"
-        @"INITIAL\NPCCHAR2.XLD", XldFile.raw "bin"
-        @"INITIAL\PRTCHAR0.XLD", XldFile.raw "bin"
-        @"INITIAL\PRTCHAR1.XLD", XldFile.raw "bin"
+        @"INITIAL\AUTOMAP1.XLD", (XldFile.export XldFile.graphics)
+        @"INITIAL\AUTOMAP2.XLD", (XldFile.export XldFile.graphics)
+        @"INITIAL\AUTOMAP3.XLD", (XldFile.export XldFile.graphics)
+        @"INITIAL\CHESTDT0.XLD", (XldFile.export XldFile.graphics)
+        @"INITIAL\CHESTDT1.XLD", (XldFile.export XldFile.graphics)
+        @"INITIAL\CHESTDT2.XLD", (XldFile.export XldFile.graphics)
+        @"INITIAL\CHESTDT5.XLD", (XldFile.export XldFile.graphics)
+        @"INITIAL\MERCHDT0.XLD", (XldFile.export XldFile.graphics)
+        @"INITIAL\MERCHDT1.XLD", (XldFile.export XldFile.graphics)
+        @"INITIAL\MERCHDT2.XLD", (XldFile.export XldFile.graphics)
+        @"INITIAL\NPCCHAR0.XLD", (XldFile.export XldFile.graphics)
+        @"INITIAL\NPCCHAR1.XLD", (XldFile.export XldFile.graphics)
+        @"INITIAL\NPCCHAR2.XLD", (XldFile.export XldFile.graphics)
+        @"INITIAL\PRTCHAR0.XLD", (XldFile.export XldFile.graphics)
+        @"INITIAL\PRTCHAR1.XLD", (XldFile.export XldFile.graphics)
         //*)
-        @"INITIAL\PRTCHAR2.XLD", XldFile.raw "bin"
+        @"INITIAL\PRTCHAR2.XLD", (XldFile.export XldFile.graphics)
     ]
 
 [<EntryPoint>]
@@ -389,7 +399,7 @@ let main argv =
 
     files
     |> Seq.iter (fun (path, exportFunc) -> 
-        XldFile.export (Path.Combine(xldDir, path)) exportFunc (Path.Combine(mainOutputDir, path))
+        exportFunc (Path.Combine(xldDir, path)) (Path.Combine(mainOutputDir, path))
     )
     0
 

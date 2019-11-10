@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
-using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using Veldrid;
@@ -63,6 +62,7 @@ namespace UAlbion.Game.Gui.Inventory
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
+            Update(extents);
             var frameExtents = new Rectangle(extents.X, extents.Y, (int)_frame.GetSize().X, extents.Height);
             return base.DoLayout(frameExtents, order, func);
         }

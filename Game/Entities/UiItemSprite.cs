@@ -11,34 +11,27 @@ namespace UAlbion.Game.Entities
 {
     public class UiItemSprite : UiElement
     {
-        ItemId _id = (ItemId)(object)-1;
-        SpriteDefinition<ItemId> _sprite;
+        ItemSpriteId _id = ItemSpriteId.Nothing;
+        SpriteDefinition<ItemSpriteId> _sprite;
 
-        public UiItemSprite(ItemId id) : base(null)
+        public UiItemSprite(ItemSpriteId id) : base(null)
         {
             Id = id;
         }
 
-        public ItemId Id
+        public ItemSpriteId Id
         {
             get => _id;
             set
             {
-                if ((int)(object)_id == (int)(object)value) return;
+                if (_id == value) return;
                 _id = value;
-                if ((int)(object)_id == -1)
-                {
-                    _sprite = null;
-                }
-                else
-                {
-                    _sprite =
-                        new SpriteDefinition<ItemId>(
-                            0, (int)_id,
-                            Vector3.Zero,
-                            (int) DrawLayer.Interface,
-                            SpriteFlags.NoTransform | SpriteFlags.LeftAligned | SpriteFlags.NoDepthTest);
-                }
+                _sprite =
+                    new SpriteDefinition<ItemSpriteId>(
+                        0, (int)_id,
+                        Vector3.Zero,
+                        (int)DrawLayer.Interface,
+                        SpriteFlags.NoTransform | SpriteFlags.LeftAligned | SpriteFlags.NoDepthTest);
             }
         }
 
@@ -68,6 +61,8 @@ namespace UAlbion.Game.Entities
 
             _sprite.Position = position;
             _sprite.Size = size;
+            if (_sprite.RenderOrder != order)
+                _sprite.RenderOrder = order;
             addFunc(_sprite);
             return order;
         }

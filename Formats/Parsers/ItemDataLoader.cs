@@ -49,7 +49,7 @@ namespace UAlbion.Formats.Parsers
                 item.IconAnim = br.ReadByte();
                 item.Weight = br.ReadUInt16();
                 item.Value = br.ReadUInt16();
-                item.Icon = br.ReadUInt16();
+                item.Icon = (ItemSpriteId)br.ReadUInt16();
                 item.Class = (PlayerClassMask)br.ReadUInt16();
                 item.Race = br.ReadUInt16();
                 items.Add(item);

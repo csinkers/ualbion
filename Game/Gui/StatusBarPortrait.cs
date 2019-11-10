@@ -23,11 +23,11 @@ namespace UAlbion.Game.Gui
                 x._portrait.Highlighted = false;
                 x.Raise(new HoverTextEvent(""));
             }),
-            H<StatusBarPortrait, UiLeftClickEvent>((x,e) => x.OnClick(e)),
-            H<StatusBarPortrait, TimerElapsedEvent>((x,e) => x.OnTimer())
+            H<StatusBarPortrait, UiLeftClickEvent>((x, _) => x.OnClick()),
+            H<StatusBarPortrait, TimerElapsedEvent>((x, e) => x.OnTimer())
         );
 
-        void OnClick(UiLeftClickEvent e)
+        void OnClick()
         {
             if (_isClickTimerPending) // If they double-clicked...
             {
@@ -70,7 +70,7 @@ namespace UAlbion.Game.Gui
             var (text, _) = new TextFormatter(assets, settings.Language).Format(
                 template, // %s (LP:%d, SP:%d)
                 member.GetName(settings.Language),
-                member.LifePoints,
+                member.Combat.LifePoints,
                 member.Magic.SpellPoints);
 
             Raise(new HoverTextEvent(text.First().Text));

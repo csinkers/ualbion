@@ -1,9 +1,56 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
+using UAlbion.Core;
+using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
+using UAlbion.Game.Entities;
+using UAlbion.Game.Events;
+using UAlbion.Game.State;
+using Veldrid;
 
 namespace UAlbion.Game.Gui.Inventory
 {
     class InventorySlot : UiElement
     {
+        readonly PartyCharacterId _activeCharacter;
+        readonly int _slotNumber;
+        readonly ButtonFrame _frame;
+        readonly UiItemSprite _sprite;
+
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<InventorySlot, UiHoverEvent>((x, e) =>
+            {
+                x.Hover(); 
+                e.Propagating = false;
+            }),
+            H<InventorySlot, UiBlurEvent>((x, _) =>
+            {
+                x._frame.State = ButtonState.Pressed;
+                x.Raise(new HoverTextEvent(""));
+            })
+        );
+
+
+        void Hover()
+        {
+            var state = Resolve<IStateManager>();
+            var assets = Resolve<IAssetManager>();
+            var settings = Resolve<ISettings>();
+
+            var member = state.State.GetPartyMember(_activeCharacter);
+            var slotInfo = member.GetSlot((ItemSlotId)((int)ItemSlotId.Slot0 + _slotNumber));
+            if (slotInfo == null)
+                return;
+
+            var item = assets.LoadItem(slotInfo.Id);
+            if (item == null)
+                return;
+
+            _frame.State = ButtonState.HoverPressed;
+            var text = item.GetName(settings.Language);
+            Raise(new HoverTextEvent(text));
+        }
+
         // 70 * 128, 4 * 6
 
         // Tiles are 16x20 => 64x120
@@ -18,10 +65,49 @@ namespace UAlbion.Game.Gui.Inventory
         // Item5: (0,20):(16,20) border 1
         // ItemIJ: (16i, 20j):(16,20) border 1
 
-        public InventorySlot(int order) { }
+        public InventorySlot(PartyCharacterId activeCharacter, int slotNumber)
+            : base(Handlers)
+        {
+            _activeCharacter = activeCharacter;
+            _slotNumber = slotNumber;
+            _sprite = new UiItemSprite(ItemSpriteId.Nothing);
+            _frame = new ButtonFrame(new FixedSize(16, 16, _sprite))
+            {
+                Padding = -1,
+                Theme = new InventorySlotTheme(),
+                State = ButtonState.Pressed
+            };
+
+            Children.Add(_frame);
+        }
+
+        void Rebuild()
+        {
+            var state = Resolve<IStateManager>();
+            var assets = Resolve<IAssetManager>();
+            var member = state.State.GetPartyMember(_activeCharacter);
+            var slotInfo = member.GetSlot((ItemSlotId)((int)ItemSlotId.Slot0 + _slotNumber));
+
+            if(slotInfo == null)
+            {
+                _sprite.Id = ItemSpriteId.Nothing;
+                return;
+            }
+
+            var item = assets.LoadItem(slotInfo.Id);
+            int frames = item.IconAnim == 0 ? 1 : item.IconAnim;
+            int sprite = (int)item.Icon + state.FrameCount % frames;
+            _sprite.Id = (ItemSpriteId)sprite;
+            // TODO: Show item.Amount
+            // TODO: Show broken overlay if item.Flags.HasFlag(ItemSlotFlags.Broken)
+        }
+
+        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        {
+            Rebuild();
+            return base.Render(extents, order, addFunc);
+        }
 
         public override Vector2 GetSize() => new Vector2(16, 20);
-
-        // Func<Item> _itemGetter;
     }
 }

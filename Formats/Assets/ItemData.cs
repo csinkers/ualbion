@@ -48,7 +48,7 @@ namespace UAlbion.Formats.Assets
         public byte IconAnim { get; set; }   // 29 Number of animated images
         public ushort Weight { get; set; }   // 30 weight of the item in grams
         public ushort Value { get; set; }   // 32 Base resell value * 10.
-        public ushort Icon { get; set; }   // 34 Image for the item
+        public ItemSpriteId Icon { get; set; }   // 34 Image for the item
         public PlayerClassMask Class { get; set; }   // 36 A bitfield that controls which classes can use the item.
         public ushort Race { get; set; }   // 38 Likely meant to control which race can use the item – but does not seem to work ?
 

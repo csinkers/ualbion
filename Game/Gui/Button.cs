@@ -87,21 +87,15 @@ namespace UAlbion.Game.Gui
         float _typematicAccrual;
         bool _isPressed;
 
-        public Button(string buttonId, StringId textId) : base(Handlers)
+        public Button(string buttonId, IUiElement content) : base(Handlers)
         {
             Id = buttonId;
-            var text = new Text(textId).Center().NoWrap();
-            _frame = new ButtonFrame(text);
+            _frame = new ButtonFrame(content);
             Children.Add(_frame);
         }
 
-        public Button(string buttonId, string literalText) : base(Handlers)
-        {
-            Id = buttonId;
-            var text = new Text(literalText).Center().NoWrap();
-            _frame = new ButtonFrame(text);
-            Children.Add(_frame);
-        }
+        public Button(string buttonId, StringId textId) : this(buttonId, new Text(textId).Center().NoWrap()) { }
+        public Button(string buttonId, string literalText) : this(buttonId, new Text(literalText).Center().NoWrap()) { }
 
         public override Vector2 GetSize() => GetMaxChildSize() + new Vector2(4, 0);
 

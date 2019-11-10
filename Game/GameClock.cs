@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
 
@@ -60,25 +58,5 @@ namespace UAlbion.Game
 
             Raise(new PostUpdateEvent());
         }
-    }
-
-    public class StartTimerEvent : GameEvent
-    {
-        public StartTimerEvent(string id, float intervalMilliseconds, IComponent target)
-        {
-            Id = id;
-            IntervalMilliseconds = intervalMilliseconds;
-            Target = target;
-        }
-
-        public string Id { get; }
-        public float IntervalMilliseconds { get; }
-        public IComponent Target { get; }
-    }
-
-    public class TimerElapsedEvent : GameEvent
-    {
-        public TimerElapsedEvent(string id) { Id = id; }
-        public string Id { get; }
     }
 }

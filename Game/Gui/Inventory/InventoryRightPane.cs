@@ -1,4 +1,7 @@
 ﻿using UAlbion.Formats.AssetIds;
+using UAlbion.Game.Entities;
+using UAlbion.Game.Events;
+using UAlbion.Game.State;
 
 namespace UAlbion.Game.Gui.Inventory
 {
@@ -10,7 +13,14 @@ namespace UAlbion.Game.Gui.Inventory
         const string FoodButtonId = "Inventory.Food";
         const string GoldSummaryButtonId = "Inventory.GoldSummary";
 
-        public InventoryRightPane(string exitButtonId, bool showTotalPartyGold)
+        int _version;
+
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<InventoryRightPane, InventoryChangedEvent>((x, e) => x._version++)
+        );
+
+        public InventoryRightPane(PartyCharacterId activeCharacter, string exitButtonId, bool showTotalPartyGold)
+            : base(Handlers)
         {
             var header = new Header(new StringId(AssetType.SystemText, 0, (int)SystemTextId.Inv_Backpack));
 
@@ -21,33 +31,69 @@ namespace UAlbion.Game.Gui.Inventory
                 for (int i = 0; i < InventoryWidth; i++)
                 {
                     int index = j * InventoryWidth + i;
-                    slotsInRow[i] = new InventorySlot(index);
+                    slotsInRow[i] = new InventorySlot(activeCharacter, index);
                 }
                 slotSpans[j] = new HorizontalStack(slotsInRow);
             }
 
             var slotStack = new VerticalStack(slotSpans);
-            var slotFrame = new ButtonFrame(slotStack) { State = ButtonState.Pressed, Theme = new FrameTheme() };
+            //var slotFrame = new ButtonFrame(slotStack) { State = ButtonState.Pressed, Theme = new FrameTheme() };
 
             HorizontalStack moneyAndFoodStack;
             if (showTotalPartyGold)
             {
-                var money = new ImageButton(GoldSummaryButtonId, "Total party gold $10.0") { IsPressed = true };
+                var money = new Button(GoldSummaryButtonId,
+                    new VerticalStack(
+                        new Padding(64, 0),
+                        new UiSprite<CoreSpriteId>(CoreSpriteId.UiGold) { Highlighted = true },
+                        new Text("Total party gold $10.0")
+                    ) { Greedy = false}
+                ) { IsPressed = true };
                 moneyAndFoodStack = new HorizontalStack(money);
             }
             else
             {
-                var money = new ImageButton(GoldButtonId, "$0.0");
-                var food = new ImageButton(FoodButtonId, "FOOD");
-                moneyAndFoodStack = new HorizontalStack(money, food);
+                var goldSource = new DynamicText(() =>
+                {
+                    var state = Resolve<IStateManager>();
+                    var player = state.State.GetPartyMember(activeCharacter);
+                    var gold = player.Inventory.Gold;
+                    return new[] {new TextBlock($"{gold / 10}.{gold % 10}")};
+                }, x => _version);
+
+
+                var goldButton = new Button(GoldButtonId,
+                    new VerticalStack(
+                        new Padding(31, 0),
+                        new UiSprite<CoreSpriteId>(CoreSpriteId.UiGold),
+                        new Text(goldSource)
+                    ) { Greedy = false });
+
+                var foodSource = new DynamicText(() =>
+                {
+                    var state = Resolve<IStateManager>();
+                    var player = state.State.GetPartyMember(activeCharacter);
+                    var food = player.Inventory.Rations;
+                    return new[] { new TextBlock(food.ToString()) };
+                }, x => _version);
+
+                var foodButton = new Button(FoodButtonId,
+                    new VerticalStack(
+                        new Padding(31, 0),
+                        new UiSprite<CoreSpriteId>(CoreSpriteId.UiFood),
+                        new Text(foodSource)
+                    ) { Greedy = false });
+                moneyAndFoodStack = new HorizontalStack(goldButton, foodButton);
             }
 
             var stack = new VerticalStack(
                 header,
-                slotFrame,
+                slotStack, // slotFrame,
+                new Padding(0, 2),
                 moneyAndFoodStack,
-                 new InventoryExitButton(exitButtonId)
-            );
+                new Padding(0, 9),
+                new InventoryExitButton(exitButtonId)
+            ) { Greedy = false };
 
             Children.Add(stack);
         }

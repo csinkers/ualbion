@@ -34,6 +34,9 @@ namespace UAlbion.Game.Assets
                     data[i].Names = names.Skip(i * 3).Take(3).ToArray();
             }
 
+            if ((int)id >= data.Count)
+                return null;
+
             return data[(int)id];
         }
 
@@ -61,7 +64,7 @@ namespace UAlbion.Game.Assets
                 AssetType.Font               => LoadTexture((FontId)id),
                 AssetType.FullBodyPicture    => LoadTexture((FullBodyPictureId)id),
                 AssetType.IconGraphics       => LoadTexture((IconGraphicsId)id),
-                AssetType.ItemGraphics       => LoadTexture((ItemId)id),
+                AssetType.ItemGraphics       => LoadTexture((ItemSpriteId)id),
                 AssetType.MonsterGraphics    => LoadTexture((MonsterGraphicsId)id),
                 AssetType.Object3D           => LoadTexture((DungeonObjectId)id),
                 AssetType.Overlay3D          => LoadTexture((DungeonOverlayId)id),
@@ -88,7 +91,7 @@ namespace UAlbion.Game.Assets
         public ITexture LoadTexture(FontId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.Font, id);
         public ITexture LoadTexture(FullBodyPictureId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.FullBodyPicture, id);
         public ITexture LoadTexture(IconGraphicsId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.IconGraphics, id);
-        public ITexture LoadTexture(ItemId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.ItemGraphics, 0);
+        public ITexture LoadTexture(ItemSpriteId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.ItemGraphics, 0);
         public ITexture LoadTexture(LargeNpcId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.BigNpcGraphics, id);
         public ITexture LoadTexture(LargePartyGraphicsId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.BigPartyGraphics, id);
         public ITexture LoadTexture(MetaFontId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.MetaFont, id);

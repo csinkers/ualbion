@@ -26,11 +26,10 @@ namespace UAlbion.Game.Gui.Inventory
             _activeCharacter = activeCharacter;
             var source = new DynamicText(() =>
             {
-                var state = Resolve<IStateManager>();
-                var player = state.State.GetPartyMember(_activeCharacter);
-                var damage = player.BaseDamage; // TODO: Include items!
+                var characterManager = Resolve<ICharacterManager>();
+                var damage = characterManager.GetTotalDamage(_activeCharacter);
                 return new[] { new TextBlock($": {damage}") };
-            }, () => _version);
+            }, x => _version);
 
             Children.Add(
                 new ButtonFrame(
@@ -49,13 +48,11 @@ namespace UAlbion.Game.Gui.Inventory
 
         void Hover()
         {
-            var state = Resolve<IStateManager>();
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
+            var characterManager = Resolve<ICharacterManager>();
 
-            var player = state.State.GetPartyMember(_activeCharacter);
-            var damage = player.BaseDamage; // TODO: Include items!
-
+            var damage = characterManager.GetTotalDamage(_activeCharacter);
             var template = assets.LoadString(SystemTextId.Inv_DamageN, settings.Language);
             var (text, _) = new TextFormatter(assets, settings.Language).Format(
                 template, // Damage : %d

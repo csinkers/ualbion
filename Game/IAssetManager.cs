@@ -19,7 +19,7 @@ namespace UAlbion.Game
         ITexture LoadTexture(DungeonWallId id);
         ITexture LoadTexture(FullBodyPictureId id);
         ITexture LoadTexture(IconGraphicsId id);
-        ITexture LoadTexture(ItemId id);
+        ITexture LoadTexture(ItemSpriteId id);
         ITexture LoadTexture(LargeNpcId id);
         ITexture LoadTexture(LargePartyGraphicsId id);
         ITexture LoadTexture(MonsterGraphicsId id);

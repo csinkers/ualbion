@@ -83,6 +83,8 @@ namespace UAlbion.Game.Entities
 
             _sprite.Position = position;
             _sprite.Size = size;
+            if (_sprite.RenderOrder != order)
+                _sprite.RenderOrder = order;
             addFunc(_sprite);
             return order;
         }

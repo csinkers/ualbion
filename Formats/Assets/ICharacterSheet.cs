@@ -27,7 +27,5 @@ namespace UAlbion.Formats.Assets
         ICharacterAttributes Attributes { get; }
         ICharacterSkills Skills { get; }
         ICombatAttributes Combat { get; }
-
-        ItemSlot GetSlot(ItemSlotId itemSlotId);
     }
 }

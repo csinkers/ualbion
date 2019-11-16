@@ -48,7 +48,7 @@ namespace UAlbion.Game.Gui.Inventory
             var settings = Resolve<ISettings>();
 
             var member = state.State.GetPartyMember(_activeCharacter);
-            var slotInfo = member.GetSlot(_itemSlotId);
+            var slotInfo = member.Inventory.GetSlot(_itemSlotId);
             if (slotInfo == null)
                 return;
 
@@ -66,7 +66,7 @@ namespace UAlbion.Game.Gui.Inventory
             var state = Resolve<IStateManager>();
             var assets = Resolve<IAssetManager>();
             var member = state.State.GetPartyMember(_activeCharacter);
-            var slotInfo = member.GetSlot(_itemSlotId);
+            var slotInfo = member.Inventory.GetSlot(_itemSlotId);
 
             if(slotInfo == null)
             {

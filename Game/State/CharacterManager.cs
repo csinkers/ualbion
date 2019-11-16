@@ -18,8 +18,8 @@ namespace UAlbion.Game.State
                 weight += item.Weight * itemSlot.Amount;
             }
 
-            weight += member.Inventory.Gold * 50; // TODO: Check actual values
-            weight += member.Inventory.Rations * 100;
+            weight += member.Inventory.Gold * 2;
+            weight += member.Inventory.Rations * 250;
 
             return weight;
         }

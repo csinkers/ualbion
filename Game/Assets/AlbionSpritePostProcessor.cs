@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using UAlbion.Core.Textures;
-using UAlbion.Formats;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Assets
 {

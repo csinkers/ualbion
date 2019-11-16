@@ -16,8 +16,10 @@ namespace UAlbion.Game.Gui.Inventory
         readonly int _slotNumber;
         readonly ButtonFrame _frame;
         readonly UiItemSprite _sprite;
+        int _version;
 
         static readonly HandlerSet Handlers = new HandlerSet(
+            H<InventorySlot, InventoryChangedEvent>((x, e) => x._version++),
             H<InventorySlot, UiHoverEvent>((x, e) =>
             {
                 x.Hover(); 
@@ -38,7 +40,7 @@ namespace UAlbion.Game.Gui.Inventory
             var settings = Resolve<ISettings>();
 
             var member = state.State.GetPartyMember(_activeCharacter);
-            var slotInfo = member.GetSlot((ItemSlotId)((int)ItemSlotId.Slot0 + _slotNumber));
+            var slotInfo = member.Inventory.GetSlot((ItemSlotId)((int)ItemSlotId.Slot0 + _slotNumber));
             if (slotInfo == null)
                 return;
 
@@ -71,7 +73,21 @@ namespace UAlbion.Game.Gui.Inventory
             _activeCharacter = activeCharacter;
             _slotNumber = slotNumber;
             _sprite = new UiItemSprite(ItemSpriteId.Nothing);
-            _frame = new ButtonFrame(new FixedSize(16, 16, _sprite))
+
+            var amountSource = new DynamicText(() =>
+            {
+                GetSlot(out _, out var slotInfo, out _);
+                return slotInfo == null || slotInfo.Amount < 2 
+                    ? new TextBlock[0] 
+                    : new[] { new TextBlock(slotInfo.Amount.ToString()) { Alignment = TextAlignment.Right } };
+            }, x => _version);
+
+            var text = new Text(amountSource);
+
+            _frame = new ButtonFrame(new FixedPositionStack()
+                .Add(_sprite, 0, 0, 16, 16)
+                .Add(text, 0, 20 - 9, 16, 9)
+            )
             {
                 Padding = -1,
                 Theme = new InventorySlotTheme(),
@@ -81,20 +97,26 @@ namespace UAlbion.Game.Gui.Inventory
             Children.Add(_frame);
         }
 
-        void Rebuild()
+        void GetSlot(out ICharacterSheet member, out ItemSlot slotInfo, out ItemData item)
         {
             var state = Resolve<IStateManager>();
             var assets = Resolve<IAssetManager>();
-            var member = state.State.GetPartyMember(_activeCharacter);
-            var slotInfo = member.GetSlot((ItemSlotId)((int)ItemSlotId.Slot0 + _slotNumber));
+            member = state.State.GetPartyMember(_activeCharacter);
+            slotInfo = member.Inventory.GetSlot((ItemSlotId)((int)ItemSlotId.Slot0 + _slotNumber));
+            item = slotInfo == null ? null : assets.LoadItem(slotInfo.Id);
+        }
 
-            if(slotInfo == null)
+        void Rebuild()
+        {
+            var state = Resolve<IStateManager>();
+            GetSlot(out _, out _, out var item);
+
+            if(item == null)
             {
                 _sprite.Id = ItemSpriteId.Nothing;
                 return;
             }
 
-            var item = assets.LoadItem(slotInfo.Id);
             int frames = item.IconAnim == 0 ? 1 : item.IconAnim;
             int sprite = (int)item.Icon + state.FrameCount % frames;
             _sprite.Id = (ItemSpriteId)sprite;

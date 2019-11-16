@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace UAlbion.Formats.Assets
@@ -19,6 +20,7 @@ namespace UAlbion.Formats.Assets
         ItemSlot[] Slots { get; }
         IEnumerable<ItemSlot> EnumerateAll();
         IEnumerable<ItemSlot> EnumerateBodyParts();
+        ItemSlot GetSlot(ItemSlotId itemSlotId);
     }
     public class CharacterInventory : ICharacterInventory
     {
@@ -56,5 +58,31 @@ namespace UAlbion.Formats.Assets
             if(Feet != null) yield return Feet;
             if(RightFinger != null) yield return RightFinger;
         }
+
+        public ItemSlot GetSlot(ItemSlotId itemSlotId)
+        {
+            ItemSlot FromSlot()
+            {
+                int slotNumber = (int)itemSlotId - (int)ItemSlotId.Slot0;
+                if (slotNumber < 0 || slotNumber >= Slots.Length)
+                    throw new ArgumentOutOfRangeException($"Unexpected slot id: {itemSlotId}");
+                return Slots[slotNumber];
+            }
+
+            return itemSlotId switch
+            {
+                ItemSlotId.Neck => Neck,
+                ItemSlotId.Head => Head,
+                ItemSlotId.LeftHand => LeftHand,
+                ItemSlotId.Torso => Chest,
+                ItemSlotId.RightHand => RightHand,
+                ItemSlotId.LeftFinger => LeftFinger,
+                ItemSlotId.Feet => Feet,
+                ItemSlotId.RightFinger => RightFinger,
+                ItemSlotId.Tail => Tail,
+                _ => FromSlot()
+            };
+        }
+
     }
 }

@@ -54,31 +54,6 @@ namespace UAlbion.Formats.Assets
             _ => throw new InvalidOperationException($"Unexpected language {language}")
         };
 
-        public ItemSlot GetSlot(ItemSlotId itemSlotId)
-        {
-            ItemSlot FromSlot()
-            {
-                int slotNumber = (int)itemSlotId - (int)ItemSlotId.Slot0;
-                if (slotNumber < 0 || slotNumber >= Inventory.Slots.Length)
-                    throw new ArgumentOutOfRangeException($"Unexpected slot id: {itemSlotId}");
-                return Inventory.Slots[slotNumber];
-            }
-
-            return itemSlotId switch
-            {
-                ItemSlotId.Neck => Inventory.Neck,
-                ItemSlotId.Head => Inventory.Head,
-                ItemSlotId.LeftHand => Inventory.LeftHand,
-                ItemSlotId.Torso => Inventory.Chest,
-                ItemSlotId.RightHand => Inventory.RightHand,
-                ItemSlotId.LeftFinger => Inventory.LeftFinger,
-                ItemSlotId.Feet => Inventory.Feet,
-                ItemSlotId.RightFinger => Inventory.RightFinger,
-                ItemSlotId.Tail => Inventory.Tail,
-                _ => FromSlot()
-            };
-        }
-
         // Pending further reversing
         public byte Unknown6 { get; set; }
         public byte Unknown7 { get; set; }

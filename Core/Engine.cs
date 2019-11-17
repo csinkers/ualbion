@@ -6,6 +6,7 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using ImGuiNET;
 using UAlbion.Api;
+using UAlbion.Core.Visual;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 using Veldrid;
@@ -71,6 +72,7 @@ namespace UAlbion.Core
 
             GlobalExchange
                 .Register<IWindowManager>(_windowManager)
+                .Register<IShaderCache>(new ShaderCache())
                 .Attach(this)
                 //.Attach(new DebugMenus(this))
                 ;
@@ -193,6 +195,12 @@ namespace UAlbion.Core
 
             foreach (var scene in scenes)
                 scene.RenderAllStages(GraphicsDevice, _frameCommands, _sceneContext, _renderers);
+
+            _frameCommands.End();
+            CoreTrace.Log.Info("Scene", "Submitting Commands");
+            GraphicsDevice.SubmitCommands(_frameCommands);
+            CoreTrace.Log.Info("Scene", "Submitted commands");
+
             CoreTrace.Log.Info("Engine", "Swapping buffers...");
             GraphicsDevice.SwapBuffers();
             CoreTrace.Log.Info("Engine", "Draw complete");
@@ -235,7 +243,7 @@ namespace UAlbion.Core
             {
                 Debug = true,
                 SyncToVerticalBlank = true,
-                // SingleThreaded = true
+                // NoThreading = true
             };
 
             GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, gdOptions, backend);

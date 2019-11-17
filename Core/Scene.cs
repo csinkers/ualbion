@@ -134,11 +134,6 @@ namespace UAlbion.Core
                 foreach (var key in orderedKeys)
                     Render(gd, cl, sc, RenderPasses.SwapchainOutput, renderers, _processedRenderables[key]);
             }
-
-            cl.End();
-            CoreTrace.Log.Info("Scene", "Submitting Commands");
-            gd.SubmitCommands(cl);
-            CoreTrace.Log.Info("Scene", "Submitted commands");
         }
 
         void Render(GraphicsDevice gd,

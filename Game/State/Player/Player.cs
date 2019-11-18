@@ -15,6 +15,7 @@ namespace UAlbion.Game.State.Player
             Id = id;
             _base = sheet;
             _inventoryManager = new PlayerInventoryManager(id, _base, inventoryScreenState);
+            Children.Add(_inventoryManager);
         }
 
         public PartyCharacterId Id { get; }

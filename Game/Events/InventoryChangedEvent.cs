@@ -1,8 +1,9 @@
-﻿using UAlbion.Formats.AssetIds;
+﻿using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Events
 {
-    public class InventoryChangedEvent : GameEvent, IPartyEvent
+    public class InventoryChangedEvent : GameEvent, IPartyEvent, IVerboseEvent
     {
         public InventoryChangedEvent(PartyCharacterId memberId)
         {

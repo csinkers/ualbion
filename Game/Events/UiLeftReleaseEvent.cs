@@ -3,5 +3,5 @@
 namespace UAlbion.Game.Events
 {
     [Event("ui_left_release")]
-    public class UiLeftReleaseEvent : UiEvent { }
+    public class UiLeftReleaseEvent : UiEvent, IVerboseEvent { }
 }

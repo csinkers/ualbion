@@ -50,10 +50,7 @@ namespace UAlbion.Game.State
         }
 
         Player.Player BuildPlayer(PartyCharacterId id, InventoryScreenState inventoryScreenState) =>
-            new Player.Player(_state.PartyMembers[id], inventoryScreenState)
-            {
-                Id = id, Position = Vector2.Zero
-            };
+            new Player.Player(id, _state.PartyMembers[id], inventoryScreenState);
 
         void NewGame()
         {

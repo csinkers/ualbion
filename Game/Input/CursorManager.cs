@@ -28,8 +28,8 @@ namespace UAlbion.Game.Input
             H<CursorManager, SetCursorEvent>((x,e) => x.SetCursor(e.CursorId)),
             H<CursorManager, SetCursorPositionEvent>((x,e) => x._position = new Vector2(e.X, e.Y) - x._hotspot),
             H<CursorManager, WindowResizedEvent>((x,e) => x.SetCursor(x._cursorId)),
-            H<CursorManager, SpecialEvent>((x, e) => { x._special += (float)e.Argument / 4; x.SetCursor(x._cursorId); }),
-            H<CursorManager, Special2Event>((x, e) => { x._special2 += (float)e.Argument / 4; x.SetCursor(x._cursorId); })
+            H<CursorManager, SpecialEvent>((x, e) => { x._special += e.Argument / 4; x.SetCursor(x._cursorId); }),
+            H<CursorManager, Special2Event>((x, e) => { x._special2 += e.Argument / 4; x.SetCursor(x._cursorId); })
         );
 
         void SetCursor(CoreSpriteId id)

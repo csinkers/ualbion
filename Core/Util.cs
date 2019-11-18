@@ -224,5 +224,7 @@ namespace UAlbion.Core
                 rotatedPixels,
                 new[] { new EightBitTexture.SubImage(0, 0, texture.Height, texture.Width, 0) });
         }
+
+        public static float Lerp(float a, float b, float t) => t * (b - a) + a;
     }
 }

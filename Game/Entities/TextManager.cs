@@ -41,6 +41,8 @@ namespace UAlbion.Game.Entities
             int offset = 0;
             var assets = Resolve<IAssetManager>();
             var font = assets.LoadFont(block.Color, block.Style == TextStyle.Big);
+            if(block.Text == null)
+                return Vector2.Zero;
 
             foreach (var c in block.Text)
             {
@@ -64,7 +66,7 @@ namespace UAlbion.Game.Entities
             var window = Resolve<IWindowManager>();
 
             var font = assets.LoadFont(block.Color, block.Style == TextStyle.Big);
-            var text = block.Text;
+            var text = block.Text ?? "";
             var isFat = block.Style == TextStyle.Fat || block.Style == TextStyle.FatAndHigh;
 
             var instances = new SpriteInstanceData[text.Length * (isFat ? 4 : 2)];

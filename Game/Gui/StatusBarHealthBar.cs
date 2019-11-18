@@ -27,8 +27,8 @@ namespace UAlbion.Game.Gui
             var playerId = stateManager.State.Party.Players.ElementAt(_order).Id;
             var highlighted = playerId == stateManager.State.Party.Leader;
             var sheet = stateManager.State.GetPartyMember(playerId);
-            var value = _isHealth ? sheet.Combat.LifePoints : sheet.Magic.SpellPoints;
-            var valueMax = _isHealth ? sheet.Combat.LifePointsMax : sheet.Magic.SpellPointsMax;
+            var value = _isHealth ? sheet.Apparent.Combat.LifePoints : sheet.Apparent.Magic.SpellPoints;
+            var valueMax = _isHealth ? sheet.Apparent.Combat.LifePointsMax : sheet.Apparent.Magic.SpellPointsMax;
             if (valueMax == 0) valueMax = 1;
             _bar.DrawSize = new Vector2(_bar.MeasureSize.X * value / valueMax, _bar.MeasureSize.Y);
             _frame.State = highlighted ? ButtonState.Hover : ButtonState.Normal;

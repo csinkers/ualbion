@@ -21,7 +21,9 @@ namespace UAlbion.Game.Gui
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<StatusBar, HoverTextEvent>((x,e) => x._hoverText.LiteralString(e.Text)),
-            H<StatusBar, DescriptionTextEvent>((x,e) => x._descriptionText.LiteralString(e.Text))
+            H<StatusBar, DescriptionTextEvent>((x,e) => x._descriptionText.LiteralString(e.Text)),
+            H<StatusBar, HoverTextExEvent>((x,e) => x._hoverText.Source(e.Source)),
+            H<StatusBar, DescriptionTextExEvent>((x,e) => x._descriptionText.Source(e.Source))
         );
 
         public StatusBar() : base(Handlers, DialogPositioning.StatusBar, int.MaxValue)

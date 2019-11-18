@@ -21,6 +21,8 @@ namespace UAlbion.Game.Gui.Inventory
         readonly Func<int> _getMax;
         readonly int _absoluteMax;
         Rectangle _lastExtents;
+        int _lastValue;
+        int _lastMax;
 
         public ProgressBar(ITextSource hover, Func<int> getValue, Func<int> getMax, int absoluteMax) : base(Handlers)
         {
@@ -45,11 +47,15 @@ namespace UAlbion.Game.Gui.Inventory
 
         void Update(Rectangle extents)
         {
-            if (_lastExtents == extents) return;
-            _lastExtents = extents;
-
             var value = _getValue();
             var max = _getMax();
+
+            if (_lastExtents == extents && _lastValue == value && _lastMax == max) 
+                return;
+
+            _lastExtents = extents;
+            _lastValue = value;
+            _lastMax = max;
 
             bool isSuperCharged = value > max;
             if (isSuperCharged) value = max;

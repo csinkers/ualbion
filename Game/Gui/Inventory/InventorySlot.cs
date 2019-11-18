@@ -1,25 +1,17 @@
 ﻿using System;
-using System.Numerics;
-using UAlbion.Core;
+using System.Collections.Generic;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
-using Veldrid;
+using UAlbion.Game.State.Player;
 
 namespace UAlbion.Game.Gui.Inventory
 {
-    class InventorySlot : UiElement
+    abstract class InventorySlot : UiElement
     {
-        readonly PartyCharacterId _activeCharacter;
-        readonly int _slotNumber;
-        readonly ButtonFrame _frame;
-        readonly UiItemSprite _sprite;
-        int _version;
-
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<InventorySlot, InventoryChangedEvent>((x, e) => x._version++),
+        const string TimerName = "InventorySlot.ClickTimer";
+        protected static readonly HandlerSet SlotHandlers = new HandlerSet(
             H<InventorySlot, UiHoverEvent>((x, e) =>
             {
                 x.Hover(); 
@@ -27,11 +19,65 @@ namespace UAlbion.Game.Gui.Inventory
             }),
             H<InventorySlot, UiBlurEvent>((x, _) =>
             {
-                x._frame.State = ButtonState.Pressed;
+                x.Frame.State = ButtonState.Normal;
                 x.Raise(new HoverTextEvent(""));
-            })
+            }),
+            H<InventorySlot, UiLeftClickEvent>((x, _) => x.OnClick()),
+            H<InventorySlot, TimerElapsedEvent>((x, e) => { if (e.Id == TimerName) x.OnTimer(); })
         );
 
+        protected abstract ItemSlotId SlotId { get; }
+        protected abstract ButtonFrame Frame { get; }
+        protected PartyCharacterId ActiveCharacter { get; }
+        bool _isClickTimerPending;
+
+        protected InventorySlot(PartyCharacterId activeCharacter, IDictionary<Type, Handler> handlers)
+            : base(handlers)
+        {
+            ActiveCharacter = activeCharacter;
+        }
+
+        protected void GetSlot(out ItemSlot slotInfo, out ItemData item)
+        {
+            var state = Resolve<IStateManager>();
+            var assets = Resolve<IAssetManager>();
+            var member = state.State.GetPartyMember(ActiveCharacter);
+            slotInfo = member.Apparent.Inventory.GetSlot(SlotId);
+            item = slotInfo == null ? null : assets.LoadItem(slotInfo.Id);
+        }
+
+        void OnClick()
+        {
+            if (_isClickTimerPending) // If they double-clicked...
+            {
+                Raise(new InventoryPickupItemEvent(ActiveCharacter, SlotId, null));
+                _isClickTimerPending = false; // Ensure the single-click behaviour doesn't happen.
+            }
+            else // For the first click, just start the double-click timer.
+            {
+                // TODO: If single item, fire the pickup event immediately
+                Raise(new StartTimerEvent(TimerName, 300, this));
+                _isClickTimerPending = true;
+            }
+        }
+        void OnTimer()
+        {
+            if (!_isClickTimerPending) // They've already double-clicked
+                return;
+
+            // TODO: Show quantity selection dialog
+            Raise(new InventoryPickupItemEvent(ActiveCharacter, SlotId, 1));
+            _isClickTimerPending = false;
+        }
+
+        DynamicText BuildHoverText(SystemTextId template, params object[] arguments) =>
+            new DynamicText(() =>
+            {
+                var assets = Resolve<IAssetManager>();
+                var settings = Resolve<ISettings>();
+                var textFormatter = new TextFormatter(assets, settings.Language);
+                return textFormatter.Format(template, arguments).Item1;
+            });
 
         void Hover()
         {
@@ -39,97 +85,78 @@ namespace UAlbion.Game.Gui.Inventory
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
 
-            var member = state.State.GetPartyMember(_activeCharacter);
-            var slotInfo = member.Inventory.GetSlot((ItemSlotId)((int)ItemSlotId.Slot0 + _slotNumber));
-            if (slotInfo == null)
-                return;
+            var hand = state.State.InventoryScreenState.ItemInHand;
+            if (hand is GoldInHand || hand is RationsInHand)
+                return; // Don't show hover text when holding gold / food
 
-            var item = assets.LoadItem(slotInfo.Id);
-            if (item == null)
-                return;
-
-            _frame.State = ButtonState.HoverPressed;
-            var text = item.GetName(settings.Language);
-            Raise(new HoverTextEvent(text));
-        }
-
-        // 70 * 128, 4 * 6
-
-        // Tiles are 16x20 => 64x120
-        // 1 pix grid between and around, double thick on right and bottom
-        // 1 + 16 + 1 + 16 + 1 + 16 + 1 + 16 + 2
-        // = 4*1 + 4*16 + 2 = 70
-        // Height = 6 * (1+20) + 2 = 128
-
-        // Button Frame @ (0,0): (70,128) border 1
-        // Item0: (0,0):(16,20) border 1
-        // Item1: (16,0):(16,20) border 1
-        // Item5: (0,20):(16,20) border 1
-        // ItemIJ: (16i, 20j):(16,20) border 1
-
-        public InventorySlot(PartyCharacterId activeCharacter, int slotNumber)
-            : base(Handlers)
-        {
-            _activeCharacter = activeCharacter;
-            _slotNumber = slotNumber;
-            _sprite = new UiItemSprite(ItemSpriteId.Nothing);
-
-            var amountSource = new DynamicText(() =>
+            var member = state.State.GetPartyMember(ActiveCharacter);
+            var slotInfo = member.Effective.Inventory.GetSlot(SlotId);
+            string itemName = null;
+            if (slotInfo != null)
             {
-                GetSlot(out _, out var slotInfo, out _);
-                return slotInfo == null || slotInfo.Amount < 2 
-                    ? new TextBlock[0] 
-                    : new[] { new TextBlock(slotInfo.Amount.ToString()) { Alignment = TextAlignment.Right } };
-            }, x => _version);
-
-            var text = new Text(amountSource);
-
-            _frame = new ButtonFrame(new FixedPositionStack()
-                .Add(_sprite, 0, 0, 16, 16)
-                .Add(text, 0, 20 - 9, 16, 9)
-            )
-            {
-                Padding = -1,
-                Theme = new InventorySlotTheme(),
-                State = ButtonState.Pressed
-            };
-
-            Children.Add(_frame);
-        }
-
-        void GetSlot(out ICharacterSheet member, out ItemSlot slotInfo, out ItemData item)
-        {
-            var state = Resolve<IStateManager>();
-            var assets = Resolve<IAssetManager>();
-            member = state.State.GetPartyMember(_activeCharacter);
-            slotInfo = member.Inventory.GetSlot((ItemSlotId)((int)ItemSlotId.Slot0 + _slotNumber));
-            item = slotInfo == null ? null : assets.LoadItem(slotInfo.Id);
-        }
-
-        void Rebuild()
-        {
-            var state = Resolve<IStateManager>();
-            GetSlot(out _, out _, out var item);
-
-            if(item == null)
-            {
-                _sprite.Id = ItemSpriteId.Nothing;
-                return;
+                var item = assets.LoadItem(slotInfo.Id);
+                if (item != null)
+                    itemName = item.GetName(settings.Language);
             }
 
-            int frames = item.IconAnim == 0 ? 1 : item.IconAnim;
-            int sprite = (int)item.Icon + state.FrameCount % frames;
-            _sprite.Id = (ItemSpriteId)sprite;
-            // TODO: Show item.Amount
-            // TODO: Show broken overlay if item.Flags.HasFlag(ItemSlotFlags.Broken)
-        }
+            string itemInHandName = null;
+            if (hand is ItemSlot handSlot)
+            {
+                var itemInHand = assets.LoadItem(handSlot.Id);
+                itemInHandName = itemInHand.GetName(settings.Language);
+            }
 
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
-        {
-            Rebuild();
-            return base.Render(extents, order, addFunc);
-        }
+            var action = member.GetInventoryAction(SlotId);
+            switch(action)
+            {
+                case InventoryAction.Pickup:
+                {   
+                    // <Item name>
+                    if (itemName != null)
+                    {
+                        Raise(new HoverTextEvent(itemName));
+                        Frame.State = ButtonState.Hover;
+                    }
+                    break;
+                }
+                case InventoryAction.Drop:
+                {
+                    if (itemInHandName != null)
+                    {
+                        // Put down %s
+                        Raise(new HoverTextExEvent(BuildHoverText(SystemTextId.Item_PutDownX, itemInHandName)));
+                        Frame.State = ButtonState.Hover;
+                    }
 
-        public override Vector2 GetSize() => new Vector2(16, 20);
+                    break;
+                }
+                case InventoryAction.Swap:
+                {
+                    if (itemInHandName != null && itemName != null)
+                    {
+                        // Swap %s with %s
+                        Raise(new HoverTextExEvent(BuildHoverText(SystemTextId.Item_SwapXWithX, itemInHandName,
+                            itemName)));
+                        Frame.State = ButtonState.Hover;
+                    }
+
+                    break;
+                }
+                case InventoryAction.Coalesce:
+                {   
+                    // Add
+                    Raise(new HoverTextExEvent(BuildHoverText(SystemTextId.Item_Add)));
+                    Frame.State = ButtonState.Hover;
+                    break;
+                }
+                case InventoryAction.NoCoalesceFullStack:
+                {   
+                    // {YELLOW}This space is occupied!
+                    Raise(new HoverTextExEvent(BuildHoverText(SystemTextId.Item_ThisSpaceIsOccupied)));
+                    Frame.State = ButtonState.Hover;
+                    break;
+                }
+            }
+        }
     }
 }

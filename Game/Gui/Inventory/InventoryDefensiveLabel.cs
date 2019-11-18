@@ -27,8 +27,8 @@ namespace UAlbion.Game.Gui.Inventory
 
             var source = new DynamicText(() =>
             {
-                var characterManager = Resolve<ICharacterManager>();
-                var protection = characterManager.GetTotalProtection(_activeCharacter);
+                var player = Resolve<IStateManager>().State.GetPartyMember(_activeCharacter);
+                var protection = player.Apparent.Combat.Protection;
                 return new[] { new TextBlock($": {protection}") };
             }, x => _version);
 
@@ -51,9 +51,9 @@ namespace UAlbion.Game.Gui.Inventory
         {
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
-            var characterManager = Resolve<ICharacterManager>();
+            var player = Resolve<IStateManager>().State.GetPartyMember(_activeCharacter);
 
-            var protection = characterManager.GetTotalProtection(_activeCharacter);
+            var protection = player.Effective.Combat.Protection;
             var template = assets.LoadString(SystemTextId.Inv_ProtectionN, settings.Language);
             var (text, _) = new TextFormatter(assets, settings.Language).Format(
                 template, // Protection : %d

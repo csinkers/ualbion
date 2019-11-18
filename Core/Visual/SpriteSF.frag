@@ -22,10 +22,10 @@ layout(set = 0, binding = 3) uniform texture2DArray Sprite; // vdspv_0_3
 #else
 //layout(set = 0, binding = 4) uniform sampler2D Sprite; // vdspv_0_2
 layout(set = 0, binding = 2) uniform sampler SpriteSampler;   // vdspv_0_2
-layout(set = 0, binding = 3) uniform texture2D Sprite; // vdspv_0_3
+layout(set = 0, binding = 3) uniform texture2D Sprite; //! // vdspv_0_3
 #endif
 //layout(set = 0, binding = 5) uniform sampler2D Palette; // vdspv_0_3
-layout(set = 0, binding = 4) uniform texture2D Palette;   // vdspv_0_4
+layout(set = 0, binding = 4) uniform texture2D Palette;   //! // vdspv_0_4
 
 // Inputs from vertex shader
 layout(location = 0) in vec2 fsin_0;       // Texture Coordinates
@@ -46,7 +46,7 @@ void main()
 	vec4 color = texture(sampler2DArray(Sprite, SpriteSampler), vec3(uv, fsin_1));
 #else
 	// vec4 color = texture(Sprite, uv);
-	vec4 color = texture(sampler2D(Sprite, SpriteSampler), uv);
+	vec4 color = texture(sampler2D(Sprite, SpriteSampler), uv); //! vec4 color;
 #endif
 
 	if ((fsin_2 & USE_PALETTE) != 0)
@@ -54,7 +54,7 @@ void main()
 		float redChannel = color[0];
 		float index = 255.0f * redChannel;
 		// color = texture(Palette, vec2(redChannel, 0.0f));
-		color = texture(sampler2D(Palette, SpriteSampler), vec2(redChannel, 0.0f));
+		color = texture(sampler2D(Palette, SpriteSampler), vec2(redChannel, 0.0f)); //!
 		if(index == 0)
 			color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 	}

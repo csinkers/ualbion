@@ -11,6 +11,7 @@ namespace UAlbion.Game.Gui
 {
     public class StatusBarPortrait : UiElement
     {
+        const string TimerName = "StatusBarPortrait.ClickTimer";
         static readonly HandlerSet Handlers = new HandlerSet(
             H<StatusBarPortrait, PartyChangedEvent>((x, _) => x.LoadSprite()),
             H<StatusBarPortrait, UiHoverEvent>((x, e) =>
@@ -24,7 +25,7 @@ namespace UAlbion.Game.Gui
                 x.Raise(new HoverTextEvent(""));
             }),
             H<StatusBarPortrait, UiLeftClickEvent>((x, _) => x.OnClick()),
-            H<StatusBarPortrait, TimerElapsedEvent>((x, e) => x.OnTimer())
+            H<StatusBarPortrait, TimerElapsedEvent>((x, e) => { if (e.Id == TimerName) x.OnTimer(); })
         );
 
         void OnClick()
@@ -39,7 +40,7 @@ namespace UAlbion.Game.Gui
             }
             else // For the first click, just start the double-click timer.
             {
-                Raise(new StartTimerEvent("StatusBarPortrait.ClickTimer", 300, this));
+                Raise(new StartTimerEvent(TimerName, 300, this));
                 _isClickTimerPending = true;
             }
         }
@@ -69,9 +70,9 @@ namespace UAlbion.Game.Gui
             var template = assets.LoadString(SystemTextId.PartyPortrait_XLifeMana, settings.Language);
             var (text, _) = new TextFormatter(assets, settings.Language).Format(
                 template, // %s (LP:%d, SP:%d)
-                member.GetName(settings.Language),
-                member.Combat.LifePoints,
-                member.Magic.SpellPoints);
+                member.Apparent.GetName(settings.Language),
+                member.Apparent.Combat.LifePoints,
+                member.Apparent.Magic.SpellPoints);
 
             Raise(new HoverTextEvent(text.First().Text));
         }
@@ -101,11 +102,11 @@ namespace UAlbion.Game.Gui
                 return;
 
             var member = stateManager.State.GetPartyMember(memberId.Value);
-            if (member.PortraitId.HasValue)
-                _portrait.Id = member.PortraitId.Value;
+            if (member.Apparent.PortraitId.HasValue)
+                _portrait.Id = member.Apparent.PortraitId.Value;
         }
 
-        protected override void Subscribed() { LoadSprite(); base.Subscribed(); }
+        protected override void Subscribed() => LoadSprite();
         public override Vector2 GetSize() => _portrait.GetSize() + new Vector2(0,6); // Add room for health + mana bars
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
@@ -127,7 +128,7 @@ namespace UAlbion.Game.Gui
                     4),
                 order));
 
-            if (sheet.Magic.SpellPointsMax > 0)
+            if (sheet.Apparent.Magic.SpellPointsMax > 0)
             {
                 maxOrder = Math.Max(maxOrder, func(_mana, new Rectangle(
                         extents.X + 5,

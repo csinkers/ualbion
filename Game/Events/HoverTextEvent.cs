@@ -13,4 +13,10 @@ namespace UAlbion.Game.Events
         [EventPart("text", "The text to display")]
         public string Text { get; }
     }
+
+    public class HoverTextExEvent : GameEvent
+    {
+        public HoverTextExEvent(ITextSource source) { Source = source; }
+        public ITextSource Source { get; }
+    }
 }

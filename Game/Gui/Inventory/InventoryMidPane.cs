@@ -34,7 +34,7 @@ namespace UAlbion.Game.Gui.Inventory
                         var state = Resolve<IStateManager>();
                         var settings = Resolve<ISettings>();
                         var member = state.State.GetPartyMember(activeCharacter);
-                        var name = member.GetName(settings.Language);
+                        var name = member.Apparent.GetName(settings.Language);
                         return new[] { new TextBlock(name) { Alignment = TextAlignment.Center } };
                     })),
                 new HorizontalStack(

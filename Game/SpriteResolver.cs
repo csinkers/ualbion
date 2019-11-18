@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
@@ -40,11 +39,7 @@ namespace UAlbion.Game
             {typeof(SlabId), AssetType.Slab}
         };
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<SpriteResolver, SubscribedEvent>((x, _) =>
-                x._defaultTexture = x.Resolve<IAssetManager>().LoadTexture(DungeonWallId.DefaultTexture))
-        );
-        public SpriteResolver() : base(Handlers) { }
+        protected override void Subscribed() { _defaultTexture = Resolve<IAssetManager>().LoadTexture(DungeonWallId.DefaultTexture); }
 
         public Vector2 GetSize(Type idType, int id, int subObject)
         {
@@ -52,7 +47,7 @@ namespace UAlbion.Game
             ITexture texture = Resolve<IAssetManager>().LoadTexture(assetType, id);
             if(texture == null)
                 return Vector2.One;
-            texture.GetSubImageDetails(subObject, out var size, out var _, out var _, out var _);
+            texture.GetSubImageDetails(subObject, out var size, out _, out _, out _);
             return size;
         }
 

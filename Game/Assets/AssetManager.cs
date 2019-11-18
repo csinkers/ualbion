@@ -29,7 +29,7 @@ namespace UAlbion.Game.Assets
             var data = (IList<ItemData>)_assetLocator.LoadAssetCached(AssetType.ItemList, 0);
             if (data[0].Names == null)
             {
-                var names = (IList<string>) _assetLocator.LoadAssetCached(AssetType.ItemNames, 0);
+                var names = (IList<string>)_assetLocator.LoadAssetCached(AssetType.ItemNames, 0);
                 for (int i = 0; i < data.Count; i++)
                     data[i].Names = names.Skip(i * 3).Take(3).ToArray();
             }

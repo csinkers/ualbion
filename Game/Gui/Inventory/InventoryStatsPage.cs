@@ -18,7 +18,7 @@ namespace UAlbion.Game.Gui.Inventory
             var state = Resolve<IStateManager>().State;
             var settings = Resolve<ISettings>();
             var formatter = new TextFormatter(assets, settings.Language);
-            var member = state.GetPartyMember(_activeCharacter);
+            var member = state.GetPartyMember(_activeCharacter).Apparent;
 
             var block = formatter.Format(assets.LoadString(id, settings.Language)).Item1.First();
             block.Text += $" {getValue(member)} / {getMax(member)}";
@@ -36,12 +36,12 @@ namespace UAlbion.Game.Gui.Inventory
                 return new ProgressBar(source, () =>
                     {
                         var state = Resolve<IStateManager>().State;
-                        var member = state.GetPartyMember(activeCharacter);
+                        var member = state.GetPartyMember(activeCharacter).Apparent;
                         return getValue(member);
                     }, () =>
                     {
                         var state = Resolve<IStateManager>().State;
-                        var member = state.GetPartyMember(activeCharacter);
+                        var member = state.GetPartyMember(activeCharacter).Apparent;
                         return getMax(member);
                     }, 100);
             }

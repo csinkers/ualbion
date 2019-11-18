@@ -9,7 +9,6 @@ namespace UAlbion.Core
 {
     public class Scene : Component, IScene
     {
-
         static readonly HandlerSet Handlers = new HandlerSet(
             H<Scene, CollectScenesEvent>((x, e) => e.Register(x)),
             H<Scene, SetClearColourEvent>((x, e) => x._clearColour = new RgbaFloat(e.Red, e.Green, e.Blue, 1.0f))

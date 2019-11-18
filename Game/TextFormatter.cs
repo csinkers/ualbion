@@ -216,6 +216,11 @@ namespace UAlbion.Game
             }
         }
 
+        public (IEnumerable<TextBlock>, IList<WordId>) Format(SystemTextId template, params object[] arguments)
+        {
+            var templateText = _assets.LoadString(template, _language);
+            return Format(templateText, arguments);
+        }
         public (IEnumerable<TextBlock>, IList<WordId>) Format(string template, params object[] arguments)
         {
             var tokens = 

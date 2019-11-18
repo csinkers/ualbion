@@ -3,6 +3,7 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.State
 {
+    /*
     public class CharacterManager : Component, ICharacterManager
     {
         public int GetTotalWeight(PartyCharacterId id)
@@ -63,4 +64,5 @@ namespace UAlbion.Game.State
             return protection;
         }
     }
+    */
 }

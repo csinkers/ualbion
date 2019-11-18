@@ -31,7 +31,7 @@ namespace UAlbion.Game.Gui.Inventory
                 for (int i = 0; i < InventoryWidth; i++)
                 {
                     int index = j * InventoryWidth + i;
-                    slotsInRow[i] = new InventorySlot(activeCharacter, index);
+                    slotsInRow[i] = new InventoryBackpackSlot(activeCharacter, index);
                 }
                 slotSpans[j] = new HorizontalStack(slotsInRow);
             }
@@ -57,10 +57,9 @@ namespace UAlbion.Game.Gui.Inventory
                 {
                     var state = Resolve<IStateManager>();
                     var player = state.State.GetPartyMember(activeCharacter);
-                    var gold = player.Inventory.Gold;
+                    var gold = player.Apparent.Inventory.Gold;
                     return new[] {new TextBlock($"{gold / 10}.{gold % 10}")};
                 }, x => _version);
-
 
                 var goldButton = new Button(GoldButtonId,
                     new VerticalStack(
@@ -73,7 +72,7 @@ namespace UAlbion.Game.Gui.Inventory
                 {
                     var state = Resolve<IStateManager>();
                     var player = state.State.GetPartyMember(activeCharacter);
-                    var food = player.Inventory.Rations;
+                    var food = player.Apparent.Inventory.Rations;
                     return new[] { new TextBlock(food.ToString()) };
                 }, x => _version);
 

@@ -45,5 +45,6 @@
         public ushort LuckMax { get; set; }
         public ushort MagicResistanceMax { get; set; }
         public ushort MagicTalentMax { get; set; }
+        public CharacterAttributes DeepClone() => (CharacterAttributes)MemberwiseClone();
     }
 }

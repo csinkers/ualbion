@@ -11,8 +11,8 @@ namespace UAlbion.Game.State
 
     public class Party : IParty
     {
-        readonly List<Player> _players = new List<Player>();
-        public IList<Player> Players => _players;  // Max of 6
+        readonly List<Player.Player> _players = new List<Player.Player>();
+        public IList<Player.Player> Players => _players;  // Max of 6
         public PartyCharacterId Leader { get; set; } // The current party leader (shown with a white outline on health bar and slightly raised in the status bar)
         IReadOnlyCollection<IPlayer> IParty.Players => _players;  // Max of 6
     }

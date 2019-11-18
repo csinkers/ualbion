@@ -28,4 +28,9 @@ namespace UAlbion.Formats.Assets
         ICharacterSkills Skills { get; }
         ICombatAttributes Combat { get; }
     }
+    public interface IEffectiveCharacterSheet : ICharacterSheet
+    {
+        int TotalWeight { get; }
+        int MaxWeight { get; }
+    }
 }

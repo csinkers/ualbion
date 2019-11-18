@@ -49,6 +49,7 @@ namespace UAlbion.Game.Entities
         public Text Center() { _block.Alignment = TextAlignment.Center; return this; }
         public Text Right() { _block.Alignment = TextAlignment.Right; return this; }
         public Text NoWrap() { _block.Arrangement |= TextArrangement.NoWrap; return this; }
+        public Text Source(ITextSource source) { _source = source; _lastVersion = 0; return this; }
         public Text LiteralString(string literal)
         {
             _source = new DynamicText(() =>

@@ -13,4 +13,10 @@ namespace UAlbion.Game.Events
         [EventPart("text", "The text to display")]
         public string Text { get; }
     }
+
+    public class DescriptionTextExEvent : GameEvent
+    {
+        public DescriptionTextExEvent(ITextSource source) { Source = source; }
+        public ITextSource Source { get; }
+    }
 }

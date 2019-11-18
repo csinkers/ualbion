@@ -7,9 +7,11 @@
         public ushort LifePoints { get; set; }
         public ushort LifePointsMax { get; set; }
         public byte ActionPoints { get; set; }
-        public ushort BaseProtection { get; set; }
-        public ushort BaseDamage { get; set; }
+        public ushort Protection { get; set; }
+        public ushort Damage { get; set; }
         public PhysicalCondition PhysicalConditions { get; set; }
         public MentalCondition MentalConditions { get; set; }
+
+        public CombatAttributes DeepClone() => (CombatAttributes) MemberwiseClone();
     }
 }

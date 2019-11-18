@@ -7,8 +7,9 @@ namespace UAlbion.Game.State
     public interface IGameState
     {
         IParty Party { get; }
+        IInventoryScreenState InventoryScreenState { get; }
         DateTime Time { get; }
-        Func<PartyCharacterId, ICharacterSheet> GetPartyMember { get; }
+        Func<PartyCharacterId, IPlayer> GetPartyMember { get; }
         Func<NpcCharacterId, ICharacterSheet> GetNpc { get; }
 
         Func<ChestId, IChest> GetChest { get; }

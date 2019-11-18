@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.InteropServices;
+using System.Text;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets
@@ -51,6 +52,22 @@ namespace UAlbion.Formats.Assets
         public ItemSpriteId Icon { get; set; }   // 34 Image for the item
         public PlayerClassMask Class { get; set; }   // 36 A bitfield that controls which classes can use the item.
         public ushort Race { get; set; }   // 38 Likely meant to control which race can use the item – but does not seem to work ?
+
+        public bool IsStackable =>
+            TypeId == ItemType.Ammo
+            //|| TypeId == ItemType.Document // ?
+            //|| TypeId == ItemType.SpellScroll // ?
+            || TypeId == ItemType.Drink
+            //|| TypeId == ItemType.Amulet
+            //|| TypeId == ItemType.MagicRing
+            || TypeId == ItemType.Valuable // ?
+            || TypeId == ItemType.Tool // ?
+            || TypeId == ItemType.Key // ?
+            || TypeId == ItemType.Misc
+            //|| TypeId == ItemType.MagicItem
+            //|| TypeId == ItemType.HeadsUpDisplayItem
+            || TypeId == ItemType.Lockpick
+            || TypeId == ItemType.LightSource;
 
         public override string ToString()
         {

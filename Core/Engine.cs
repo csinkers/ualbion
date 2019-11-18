@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
-using System;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using ImGuiNET;
-using UAlbion.Api;
 using UAlbion.Core.Visual;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
@@ -27,14 +26,14 @@ namespace UAlbion.Core
                     x.ChangeBackend(x.GraphicsDevice.BackendType, true);
                 }
             }),
+            H<Engine, GarbageCollectionEvent>((x,_) => GC.Collect()),
             H<Engine, QuitEvent>((x, e) => x._done = true),
+            H<Engine, RunRenderDocEvent>((x,_) => _renderDoc?.LaunchReplayUI()),
             H<Engine, SetCursorPositionEvent>((x, e) => x._pendingCursorUpdate = new Vector2(e.X, e.Y)),
             H<Engine, ToggleFullscreenEvent>((x, _) => x.ToggleFullscreenState()),
-            H<Engine, ToggleResizableEvent>((x, _) => x.Window.Resizable = !x.Window.Resizable),
-            H<Engine, ToggleVisibleBorderEvent>((x, _) => x.Window.BorderVisible = !x.Window.BorderVisible),
-            H<Engine, RunRenderDocEvent>((x,_) => _renderDoc?.LaunchReplayUI()),
             H<Engine, ToggleHardwareCursorEvent>((x,_) => x.Window.CursorVisible = !x.Window.CursorVisible),
-            H<Engine, GarbageCollectionEvent>((x,_) => GC.Collect())
+            H<Engine, ToggleResizableEvent>((x, _) => x.Window.Resizable = !x.Window.Resizable),
+            H<Engine, ToggleVisibleBorderEvent>((x, _) => x.Window.BorderVisible = !x.Window.BorderVisible)
         );
 
         static RenderDoc _renderDoc;
@@ -67,7 +66,6 @@ namespace UAlbion.Core
                 RenderDoc.Load(out _renderDoc);
 
             ChangeBackend(backend);
-            CheckForErrors();
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
 
             GlobalExchange
@@ -123,9 +121,9 @@ namespace UAlbion.Core
                 Draw();
             }
 
-            Window.Close();
             DestroyAllObjects();
             GraphicsDevice.Dispose();
+            Window.Close();
         }
 
         void Update(float deltaSeconds)
@@ -247,7 +245,7 @@ namespace UAlbion.Core
             };
 
             GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, gdOptions, backend);
-            CheckForErrors();
+            GraphicsDevice.WaitForIdle();
             Window.Title = GraphicsDevice.BackendType.ToString();
 
             Raise(new BackendChangedEvent(GraphicsDevice));
@@ -269,7 +267,9 @@ namespace UAlbion.Core
 
             initCL.End();
             GraphicsDevice.SubmitCommands(initCL);
+            GraphicsDevice.WaitForIdle();
             initCL.Dispose();
+            GraphicsDevice.WaitForIdle();
         }
 
         void DestroyAllObjects()
@@ -294,17 +294,6 @@ namespace UAlbion.Core
 
             //_graphicsDevice?.Dispose();
         }
-
-        public void CheckForErrors()
-        {
-            /*GraphicsDevice?.CheckForErrors();*/
-        }
-    }
-
-    public class CollectScenesEvent : EngineEvent, IVerboseEvent
-    {
-        public CollectScenesEvent(Action<Scene> register) { Register = register; }
-        public Action<Scene> Register { get; }
     }
 }
 

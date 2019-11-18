@@ -33,4 +33,22 @@ namespace UAlbion.Formats.Assets
         MagicianMask = 0x138,
         HumanMask = 0xfff3,
     }
+
+    public static class PlayerClassExtensions
+    {
+        public static bool IsAllowed(this PlayerClassMask mask, PlayerClass playerClass) =>
+            playerClass switch
+            {
+                PlayerClass.Pilot => mask.HasFlag(PlayerClassMask.Pilot),
+                PlayerClass.Scientist => mask.HasFlag(PlayerClassMask.Scientist),
+                PlayerClass.IskaiWarrior => mask.HasFlag(PlayerClassMask.IskaiWarrior),
+                PlayerClass.DjiKasMage => mask.HasFlag(PlayerClassMask.DjiKasMage),
+                PlayerClass.Druid => mask.HasFlag(PlayerClassMask.Druid),
+                PlayerClass.EnlightenedOne => mask.HasFlag(PlayerClassMask.EnlightenedOne),
+                PlayerClass.Technician => mask.HasFlag(PlayerClassMask.Technician),
+                PlayerClass.OquloKamulos => mask.HasFlag(PlayerClassMask.OquloKamulos),
+                PlayerClass.Warrior => mask.HasFlag(PlayerClassMask.Warrior),
+                _ => false
+            };
+    }
 }

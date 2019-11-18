@@ -27,6 +27,18 @@ namespace UAlbion.Core
 
         protected class HandlerSet : Dictionary<Type, Handler>
         {
+            public HandlerSet(HandlerSet parent, params Handler[] handlers)
+            {
+                foreach (var handler in parent)
+                    Add(handler.Key, handler.Value);
+
+                if (handlers == null)
+                    return;
+
+                foreach (var handler in handlers)
+                    this[handler.Type] = handler;
+            }
+
             public HandlerSet(params Handler[] handlers)
             {
                 if (handlers == null)
@@ -44,7 +56,6 @@ namespace UAlbion.Core
         readonly IDictionary<Type, Handler> _handlers; 
         protected EventExchange Exchange { get; private set; } // N.B. will be null until subscribed.
         protected IList<IComponent> Children { get; } = new List<IComponent>();
-
         protected Component() : this(null) { }
         protected Component(IDictionary<Type, Handler> handlers)
         {

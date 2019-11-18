@@ -30,8 +30,8 @@ namespace UAlbion.Game.State
             inv.Gold = 256;
             inv.Rations = 72;
             inv.Slots[0] = new ItemSlot { Amount = 1, Id = ItemId.Knife };
-            inv.Slots[1] = new ItemSlot { Amount = 1, Id = ItemId.Shoes1 };
-            inv.Slots[2] = new ItemSlot { Amount = 1, Id = ItemId.LeatherArmour };
+            inv.Slots[1] = new ItemSlot { Amount = 1, Id = ItemId.Shoes };
+            inv.Slots[2] = new ItemSlot { Amount = 1, Id = ItemId.LeatherArmor };
             inv.Slots[3] = new ItemSlot { Amount = 1, Id = ItemId.Dagger };
             inv.Slots[4] = new ItemSlot { Amount = 1, Id = ItemId.LeatherCap };
             inv.Slots[5] = new ItemSlot { Amount = 12, Id = ItemId.Canister };
@@ -44,8 +44,16 @@ namespace UAlbion.Game.State
             inv.Slots[12] = new ItemSlot { Amount = 1, Id = ItemId.StrengthAmulet };
             inv.Slots[13] = new ItemSlot { Amount = 5, Id = ItemId.Torch };
             inv.Slots[14] = new ItemSlot { Amount = 1, Id = ItemId.TorchBurning };
+            inv.Slots[14] = new ItemSlot { Amount = 99, Id = ItemId.TurqHealingPotion };
             inv.Slots[15] = new ItemSlot { Amount = 1, Id = ItemId.Sword, Flags = ItemSlotFlags.Broken };
+            Raise(new InventoryChangedEvent(PartyCharacterId.Tom));
         }
+
+        Player.Player BuildPlayer(PartyCharacterId id, InventoryScreenState inventoryScreenState) =>
+            new Player.Player(_state.PartyMembers[id], inventoryScreenState)
+            {
+                Id = id, Position = Vector2.Zero
+            };
 
         void NewGame()
         {
@@ -65,14 +73,20 @@ namespace UAlbion.Game.State
                 _state.Merchants.Add(id, assets.LoadMerchant(id));
 
             _party = new Party { Leader = PartyCharacterId.Tom };
-            _party.Players.Add(new Player { Id = PartyCharacterId.Tom,      Position = Vector2.Zero });
-            _party.Players.Add(new Player { Id = PartyCharacterId.Rainer,   Position = Vector2.Zero });
-            _party.Players.Add(new Player { Id = PartyCharacterId.Drirr,    Position = Vector2.Zero });
-            _party.Players.Add(new Player { Id = PartyCharacterId.Sira,     Position = Vector2.Zero });
-            _party.Players.Add(new Player { Id = PartyCharacterId.Mellthas, Position = Vector2.Zero });
-            _party.Players.Add(new Player { Id = PartyCharacterId.Khunag,   Position = Vector2.Zero });
+            _party.Players.Add(BuildPlayer(PartyCharacterId.Tom, _state.InventoryScreenState));
+            _party.Players.Add(BuildPlayer(PartyCharacterId.Rainer, _state.InventoryScreenState));
+            _party.Players.Add(BuildPlayer(PartyCharacterId.Drirr, _state.InventoryScreenState));
+            _party.Players.Add(BuildPlayer(PartyCharacterId.Sira, _state.InventoryScreenState));
+            _party.Players.Add(BuildPlayer(PartyCharacterId.Mellthas, _state.InventoryScreenState));
+            _party.Players.Add(BuildPlayer(PartyCharacterId.Khunag, _state.InventoryScreenState));
+            foreach (var player in _party.Players)
+            {
+                Exchange.Attach(player);
+                Children.Add(player);
+            }
 
             _state.Party = _party;
+
             SetupTestState();
             Raise(new ReloadAssetsEvent()); // No need to keep character info cached once we've loaded it. New game is also a good point to clear out state.
             Raise(new PartyChangedEvent());

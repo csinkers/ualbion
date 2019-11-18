@@ -10,8 +10,7 @@ namespace UAlbion.Game.Entities
     public class TextChunk : UiElement // Renders a single TextBlock in the UI
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<TextChunk, WindowResizedEvent>((x,e) => x.IsDirty = true),
-            H<TextChunk, SubscribedEvent>((x,e) => x.IsDirty = true)
+            H<TextChunk, WindowResizedEvent>((x,e) => x.IsDirty = true)
         );
 
         // Driving properties
@@ -23,7 +22,7 @@ namespace UAlbion.Game.Entities
         Vector2 _size;
 
         public TextChunk(TextBlock block) : base(Handlers) { Block = block; }
-
+        protected override void Subscribed() { IsDirty = true;}
         public override string ToString() => $"TextChunk:{Block} ({_size.X}x{_size.Y})";
 
         void Rebuild()

@@ -13,7 +13,10 @@
         Feet = 8,
         RightFinger = 9,
         Tail = 10,
+        Gold = 11,
+        Rations = 12,
+        CharacterBody = 13,
 
-        Slot0 = 11,
+        Slot0 = 14,
     }
 }

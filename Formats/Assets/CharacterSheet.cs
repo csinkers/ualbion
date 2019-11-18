@@ -3,21 +3,27 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets
 {
+    public class EffectiveCharacterSheet : CharacterSheet, IEffectiveCharacterSheet
+    {
+        public int TotalWeight { get; set; }
+        public int MaxWeight { get; set; }
+    }
+
     public class CharacterSheet : ICharacterSheet
     {
         // Grouped
-        public MagicSkills Magic { get; } = new MagicSkills();
-        public CharacterInventory Inventory { get; } = new CharacterInventory();
-        public CharacterAttributes Attributes { get; } = new CharacterAttributes();
-        public CharacterSkills Skills { get; } = new CharacterSkills();
-        public CombatAttributes Combat { get; } = new CombatAttributes();
+        public MagicSkills Magic { get; set; } = new MagicSkills();
+        public CharacterInventory Inventory { get; set; } = new CharacterInventory();
+        public CharacterAttributes Attributes { get; set; } = new CharacterAttributes();
+        public CharacterSkills Skills { get; set; } = new CharacterSkills();
+        public CombatAttributes Combat { get; set; } = new CombatAttributes();
         IMagicSkills ICharacterSheet.Magic => Magic;
         ICharacterInventory ICharacterSheet.Inventory => Inventory;
         ICharacterAttributes ICharacterSheet.Attributes => Attributes;
         ICharacterSkills ICharacterSheet.Skills => Skills;
         ICombatAttributes ICharacterSheet.Combat => Combat;
 
-        public override string ToString() => 
+        public override string ToString() =>
             Type switch {
             CharacterType.Party => $"{Name} {Race} {Class} {Age} EN:{EnglishName} DE:{GermanName} {Magic.SpellStrengths.Count} spells",
             CharacterType.Npc => $"{Name} {PortraitId} S{SpriteId} E{EventSetId} W{WordSet}",

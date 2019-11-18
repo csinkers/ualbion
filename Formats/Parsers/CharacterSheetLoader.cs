@@ -120,9 +120,9 @@ namespace UAlbion.Formats.Parsers
             s.UInt16("UnknownCE", () => sheet.UnknownCE, x => sheet.UnknownCE = x);
             s.UInt16("SpellPoints", () => sheet.Magic.SpellPoints, x => sheet.Magic.SpellPoints = x);
             s.UInt16("SpellPointsMax", () => sheet.Magic.SpellPointsMax, x => sheet.Magic.SpellPointsMax = x);
-            s.UInt16("BaseProtection", () => sheet.Combat.BaseProtection, x => sheet.Combat.BaseProtection = x);
+            s.UInt16("Protection", () => sheet.Combat.Protection, x => sheet.Combat.Protection = x);
             s.UInt16("UnknownD6", () => sheet.UnknownD6, x => sheet.UnknownD6 = x);
-            s.UInt16("BaseDamage", () => sheet.Combat.BaseDamage, x => sheet.Combat.BaseDamage = x);
+            s.UInt16("Damage", () => sheet.Combat.Damage, x => sheet.Combat.Damage = x);
             s.ByteArray("UnknownBlockDA", () => sheet.UnknownBlockDA, x => sheet.UnknownBlockDA = x, 20);
             s.UInt32("Experience", () => sheet.Combat.ExperiencePoints, x => sheet.Combat.ExperiencePoints = x); // EE
             // e.g. 98406 = 0x18066 => 6680 0100 in file

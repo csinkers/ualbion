@@ -2,6 +2,7 @@
 
 namespace UAlbion.Game.State
 {
+    /*
     public interface ICharacterManager
     {
         int GetTotalWeight(PartyCharacterId id);
@@ -9,4 +10,5 @@ namespace UAlbion.Game.State
         int GetTotalDamage(PartyCharacterId id);
         int GetTotalProtection(PartyCharacterId id);
     }
+    */
 }

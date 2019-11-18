@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
 using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
@@ -94,7 +91,6 @@ namespace UAlbion
             engine.GlobalExchange
                 .Register<ISettings>(new Settings { BasePath = baseDir }) // Need to register settings first, as the AssetConfigLocator relies on it.
                 .Register<IAssetManager>(assets)
-                .Register<ICharacterManager>(new CharacterManager())
                 .Register<IInputManager>(inputManager)
                 .Register<ILayoutManager>(new LayoutManager())
                 .Register<IPaletteManager>(new PaletteManager())
@@ -139,7 +135,7 @@ namespace UAlbion
             // Dump.Chests(assets);
             // Dump.ItemData(assets, baseDir);
 
-            //engine.GlobalExchange.Raise(new NewGameEvent(), null);
+            engine.GlobalExchange.Raise(new NewGameEvent(), null);
             /*
             engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude), null); /*
             engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.Jirinaar3D), null); /*
@@ -148,7 +144,7 @@ namespace UAlbion
             engine.GlobalExchange.Raise(new SetSceneEvent(SceneId.Inventory), null);
             //*/
 
-            engine.GlobalExchange.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
+            //engine.GlobalExchange.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
             engine.Run();
         }
     }

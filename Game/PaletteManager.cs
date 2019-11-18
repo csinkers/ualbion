@@ -1,5 +1,4 @@
 ﻿using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
@@ -16,7 +15,6 @@ namespace UAlbion.Game
                 if(x._logicalPalette.IsAnimated)
                     x.GeneratePalette();
             }),
-            H<PaletteManager, SubscribedEvent>((x, e) => x.SetPalette(PaletteId.Main3D)),
             H<PaletteManager, LoadPaletteEvent>((x, e) => x.SetPalette(e.PaletteId))
         );
 
@@ -25,6 +23,7 @@ namespace UAlbion.Game
         int _ticks;
 
         public PaletteManager() : base(Handlers) { }
+
         protected override void Subscribed()
         {
             SetPalette(PaletteId.Toronto2D);

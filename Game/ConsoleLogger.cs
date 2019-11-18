@@ -25,6 +25,7 @@ namespace UAlbion.Game
             exchange.Subscribe<BeginFrameEvent>(this);
             Task.Run(ConsoleReaderThread);
         }
+        public void Subscribed() { }
 
         void PrintHelpSummary(IEnumerable<EventMetadata> events)
         {
@@ -170,5 +171,6 @@ namespace UAlbion.Game
 
             } while (!_done);
         }
+
     }
 }

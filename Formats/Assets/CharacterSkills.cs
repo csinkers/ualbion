@@ -26,5 +26,7 @@
         public ushort RangedCombatMax { get; set; }
         public ushort CriticalChanceMax { get; set; }
         public ushort LockPickingMax { get; set; }
+
+        public CharacterSkills DeepClone() => (CharacterSkills)MemberwiseClone();
     }
 }

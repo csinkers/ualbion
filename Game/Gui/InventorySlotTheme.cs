@@ -15,7 +15,7 @@ namespace UAlbion.Game.Gui
                 Background = CommonColor.Black2
             };
 
-            if (state == ButtonState.HoverPressed)
+            if (state == ButtonState.Hover)
                 c.Background = CommonColor.White;
 
             return c;

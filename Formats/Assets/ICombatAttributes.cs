@@ -7,8 +7,8 @@
         ushort LifePoints { get; }
         ushort LifePointsMax { get; }
         byte ActionPoints { get; }
-        ushort BaseProtection { get; }
-        ushort BaseDamage { get; }
+        ushort Protection { get; }
+        ushort Damage { get; }
         PhysicalCondition PhysicalConditions { get; }
         MentalCondition MentalConditions { get; }
     }

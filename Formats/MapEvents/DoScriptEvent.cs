@@ -23,5 +23,6 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk4 { get; }
         public byte Unk5 { get; }
         public ushort Unk8 { get; }
+        public override string ToString() => $"do_script {ScriptId} ({Unk1} {Unk2} {Unk3} {Unk4} {Unk5} {Unk8})";
     }
 }

@@ -22,5 +22,6 @@ namespace UAlbion.Formats.MapEvents
         public byte OpenedMessageId { get; set; }
         public ushort ChestId { get; set; }
         public ushort TrapEvent { get; set; }
+        public override string ToString() => $"open_chest {ChestId} Trap:{TrapEvent} Key:{KeyItemId} Lock:{LockStrength} Opened:{OpenedMessageId} Closed:{ClosedMessageId} ({Unk3})";
     }
 }

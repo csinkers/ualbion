@@ -33,5 +33,6 @@ namespace UAlbion.Formats.MapEvents
         public byte RestartProbability { get; } // 0 - 100
         public ushort FrequencyOverride { get; }
         public ushort Unk8 { get; }
+        public override string ToString() => $"sound {SoundId} {Mode} Vol:{Volume} Prob:{RestartProbability}% Freq:{FrequencyOverride} ({Unk3} {Unk8})";
     }
 }

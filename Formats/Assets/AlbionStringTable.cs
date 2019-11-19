@@ -1,68 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using UAlbion.Formats.Parsers;
+using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Assets
 {
-    public class AlbionStringTable
+    [AssetLoader(FileFormat.StringTable)]
+    public class AlbionStringTableLoader : IAssetLoader
     {
-        readonly IDictionary<int, string> _strings = new Dictionary<int, string>();
-
-        public string this[int i] => _strings[i];
-
-        public AlbionStringTable(BinaryReader br, long streamLength, StringTableType type = StringTableType.Lookup)
+        public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
         {
+            IDictionary<int, string> strings = new Dictionary<int, string>();
             var startOffset = br.BaseStream.Position;
-            switch (type)
+            var stringCount = br.ReadUInt16();
+            var stringLengths = new int[stringCount];
+
+            for (int i = 0; i < stringCount; i++)
+                stringLengths[i] = br.ReadUInt16();
+
+            for (int i = 0; i < stringCount; i++)
             {
-                case StringTableType.Lookup:
-                {
-                    var stringCount = br.ReadUInt16();
-                    var stringLengths = new int[stringCount + 1];
-
-                    for (int i = 1; i <= stringCount; i++)
-                        stringLengths[i] = br.ReadUInt16();
-
-                    for (int i = 1; i <= stringCount; i++)
-                    {
-                        var bytes = br.ReadBytes(stringLengths[i]);
-                        _strings[i] = FormatUtil.BytesTo850String(bytes);
-                    }
-
-                    break;
-                }
-
-                case StringTableType.SystemText:
-                {
-                    var fullText = FormatUtil.BytesTo850String(br.ReadBytes((int)streamLength));
-                    var lines = fullText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var line in lines)
-                    {
-                        if (line[0] != '[')
-                            continue;
-                        var untilColon = line.Substring(1, line.IndexOf(':') - 1);
-                        int id = int.Parse(untilColon);
-                        _strings[id] = line.Substring(line.IndexOf(':') + 1).TrimEnd(']');
-                    }
-
-                    break;
-                }
-                case StringTableType.ItemNames:
-                {
-                    const int stringSize = 20;
-                    Debug.Assert(streamLength % stringSize == 0);
-                    for (int i = 0; i < streamLength / stringSize; i++)
-                    {
-                        var bytes = br.ReadBytes(stringSize).Where(x => x != (char)0).ToArray();
-                        _strings[i] = FormatUtil.BytesTo850String(bytes);
-                    }
-                    break;
-                }
+                var bytes = br.ReadBytes(stringLengths[i]);
+                strings[i] = FormatUtil.BytesTo850String(bytes);
             }
+
             Debug.Assert(br.BaseStream.Position == startOffset + streamLength);
+            return strings;
         }
     }
 }

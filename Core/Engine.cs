@@ -37,7 +37,7 @@ namespace UAlbion.Core
         );
 
         static RenderDoc _renderDoc;
-        public EventExchange GlobalExchange { get; }
+        // public EventExchange GlobalExchange { get; }
         Sdl2Window Window => _windowManager.Window;
 
         readonly IDictionary<Type, IRenderer> _renderers = new Dictionary<Type, IRenderer>();
@@ -51,6 +51,7 @@ namespace UAlbion.Core
         bool _done;
         bool _recreateWindow = true;
         Vector2? _pendingCursorUpdate;
+        GraphicsBackend _backend;
 
         internal GraphicsDevice GraphicsDevice { get; private set; }
         internal RenderDoc RenderDoc => _renderDoc;
@@ -58,20 +59,23 @@ namespace UAlbion.Core
         internal string FrameTimeText => _frameTimeAverager.CurrentAverageFramesPerSecond.ToString("000.0 fps / ") +
                                          _frameTimeAverager.CurrentAverageFrameTimeMilliseconds.ToString("#00.00 ms");
 
-        public Engine(IComponent logger, GraphicsBackend backend, bool useRenderDoc) : base(Handlers)
+        public Engine(GraphicsBackend backend, bool useRenderDoc) : base(Handlers)
         {
-            GlobalExchange = new EventExchange("Global", logger);
+            _backend = backend;
+            // GlobalExchange = new EventExchange("Global", logger);
 
             if (useRenderDoc)
                 RenderDoc.Load(out _renderDoc);
+        }
 
-            ChangeBackend(backend);
+        protected override void Subscribed()
+        {
+            ChangeBackend(_backend);
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
 
-            GlobalExchange
+            Exchange
                 .Register<IWindowManager>(_windowManager)
                 .Register<IShaderCache>(new ShaderCache())
-                .Attach(this)
                 //.Attach(new DebugMenus(this))
                 ;
         }
@@ -80,7 +84,11 @@ namespace UAlbion.Core
         {
             _renderers.Add(renderer.GetType(), renderer);
             if (renderer is IComponent component)
-                GlobalExchange.Attach(component);
+            {
+                Exchange.Attach(component);
+                Children.Add(component);
+            }
+
             return this;
         }
 
@@ -208,6 +216,7 @@ namespace UAlbion.Core
 
         void ChangeBackend(GraphicsBackend backend, bool forceRecreateWindow)
         {
+            _backend = backend;
             if (GraphicsDevice != null)
             {
                 DestroyAllObjects();

@@ -3,6 +3,7 @@ using System.Numerics;
 using System.Reflection;
 using System.Text;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
@@ -46,10 +47,26 @@ namespace UAlbion
                 return;
 
             using var assets = new AssetManager();
-            RunGame(assets, baseDir);
+            var logger = new ConsoleLogger();
+            var globalExchange = new EventExchange("Global", logger);
+            globalExchange
+                // Need to register settings first, as the AssetConfigLocator relies on it.
+                .Register<ISettings>(new Settings { BasePath = baseDir }) 
+                .Register<IAssetManager>(assets)
+                ;
+
+            // Dump.CoreSprites(assets, baseDir);
+            // Dump.CharacterSheets(assets);
+            // Dump.Chests(assets);
+            // Dump.ItemData(assets, baseDir);
+            Dump.MapEvents(assets, baseDir, MapDataId.Toronto2DGesamtkarteSpielbeginn);
+
+            //return;
+
+            RunGame(globalExchange, baseDir);
         }
 
-        static void RunGame(AssetManager assets, string baseDir)
+        static void RunGame(EventExchange global, string baseDir)
         {
             var backend =
                 //VeldridStartup.GetPlatformDefaultBackend()
@@ -61,14 +78,14 @@ namespace UAlbion
                 //*/
                 ;
 
-            var logger = new ConsoleLogger();
-            using var engine = new Engine(logger, backend,
+            using var engine = new Engine(backend,
 #if DEBUG
                 true);
 #else
                  false);
 #endif
 
+            global.Attach(engine);
             InputConfig inputConfig = InputConfig.Load(baseDir);
 
             engine
@@ -88,9 +105,7 @@ namespace UAlbion
                 ;
 
             var inputManager = new InputManager();
-            engine.GlobalExchange
-                .Register<ISettings>(new Settings { BasePath = baseDir }) // Need to register settings first, as the AssetConfigLocator relies on it.
-                .Register<IAssetManager>(assets)
+            global
                 .Register<IInputManager>(inputManager)
                 .Register<ILayoutManager>(new LayoutManager())
                 .Register<IPaletteManager>(new PaletteManager())
@@ -130,21 +145,16 @@ namespace UAlbion
                 .Attach(menuBackground)
                 ;
 
-            // Dump.CoreSprites(assets, baseDir); return;
-            // Dump.CharacterSheets(assets);
-            // Dump.Chests(assets);
-            // Dump.ItemData(assets, baseDir);
-
-            engine.GlobalExchange.Raise(new NewGameEvent(), null);
+            global.Raise(new NewGameEvent(), null);
             /*
-            engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude), null); /*
-            engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.Jirinaar3D), null); /*
-            engine.GlobalExchange.Raise(new LoadMapEvent(MapDataId.HausDesJägerclans), null); //*/
+            global.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude), null); /*
+            global.Raise(new LoadMapEvent(MapDataId.Jirinaar3D), null); /*
+            global.Raise(new LoadMapEvent(MapDataId.HausDesJägerclans), null); //*/
             /*
-            engine.GlobalExchange.Raise(new SetSceneEvent(SceneId.Inventory), null);
+            global.Raise(new SetSceneEvent(SceneId.Inventory), null);
             //*/
 
-            //engine.GlobalExchange.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
+            //global.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
             engine.Run();
         }
     }

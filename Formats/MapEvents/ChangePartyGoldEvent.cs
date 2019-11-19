@@ -20,5 +20,6 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk5 { get; set; }
         public ushort Amount { get; }
         public ushort Unk8 { get; set; }
+        public override string ToString() => $"change_party_gold {Operation} {Amount} ({Unk3} {Unk4} {Unk5} {Unk8})";
     }
 }

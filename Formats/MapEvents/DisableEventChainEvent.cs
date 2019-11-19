@@ -22,5 +22,6 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk5 { get; set; }
         public ushort Unk6 { get; }
         public ushort Unk8 { get; set; }
+        public override string ToString() => $"disable_event_chain {ChainNumber} ({Unk2} {Unk4} {Unk5} {Unk6} {Unk8})";
     }
 }

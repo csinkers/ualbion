@@ -22,5 +22,6 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk5 { get; }
         public ushort Unk6 { get; }
         public ushort Unk8 { get; }
+        public override string ToString() => $"door ({Unk1} {Unk2} {Unk3} {Unk4} {Unk5} {Unk6} {Unk8})";
     }
 }

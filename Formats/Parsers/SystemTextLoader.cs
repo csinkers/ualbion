@@ -9,9 +9,9 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.SystemText)]
     public class SystemTextLoader : IAssetLoader
     {
+        static readonly Regex regex = new Regex(@"\[(\d+):(.*)\]");
         public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
         {
-            var regex = new Regex(@"\[(\d+):(.*)\]");
             var results = new Dictionary<int, string>();
             var bytes = br.ReadBytes((int)streamLength);
             var data = StringUtils.BytesTo850String(bytes);
@@ -28,6 +28,18 @@ namespace UAlbion.Formats.Parsers
             }
 
             return results;
+/*
+            var fullText = FormatUtil.BytesTo850String(br.ReadBytes((int)streamLength));
+            var lines = fullText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in lines)
+            {
+                if (line[0] != '[')
+                    continue;
+                var untilColon = line.Substring(1, line.IndexOf(':') - 1);
+                int id = int.Parse(untilColon);
+                strings[id] = line.Substring(line.IndexOf(':') + 1).TrimEnd(']');
+            }
+*/
         }
     }
 }

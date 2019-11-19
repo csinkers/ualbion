@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -29,5 +30,14 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk3 { get; }
         public byte Unk4 { get; }
         public byte Unk5 { get; }
+
+        string ItemIdString =>
+            ChestType switch
+            {
+                SimpleChestItemType.Item => ((ItemId)ItemId).ToString(),
+                _ => ItemId.ToString()
+            };
+
+        public override string ToString() => $"simple_chest {ChestType} {Amount}x{ItemIdString} ({Unk2} {Unk3} {Unk4} {Unk5})";
     }
 }

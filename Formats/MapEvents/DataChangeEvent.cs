@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -12,8 +14,8 @@ namespace UAlbion.Formats.MapEvents
             Unk3 = br.ReadByte(); // 3
             Unk4 = br.ReadByte(); // 4
             Debug.Assert(Unk4 == 0 || Unk4 == 3); // Always 0 for 2D?
-            PartyMemberId = br.ReadByte(); // 5
-            Unk6 = br.ReadUInt16(); // 8
+            PartyMemberId = (PartyCharacterId)br.ReadByte(); // 5
+            Value = br.ReadUInt16(); // 8
             Amount = br.ReadUInt16(); // 8
         }
 
@@ -47,11 +49,21 @@ namespace UAlbion.Formats.MapEvents
 
         public ChangeProperty Property { get; set; }
         public QuantityChangeOperation Mode { get; set;  } // No mode for adding XP
-        public byte PartyMemberId { get; set;  }
+        public PartyCharacterId PartyMemberId { get; set;  }
         public ushort Amount { get; set;  } // Or language id
 
         public byte Unk3 { get; set; }
         public byte Unk4 { get; set; }
-        public ushort Unk6 { get; set; }
+        public ushort Value { get; set; }
+
+        string ItemString =>
+            Property switch
+            {
+                ChangeProperty.Status => ((PlayerStatus)Value).ToString(),
+                ChangeProperty.AddLanguage => ((PlayerLanguage)Value).ToString(),
+                ChangeProperty.ReceiveOrRemoveItem => ((ItemId)Value-1).ToString(),
+                _ => Value.ToString()
+            };
+        public override string ToString() => $"data_change {PartyMemberId} {Property} {Mode} {Amount}x{ItemString} ({Unk3} {Unk4})";
     }
 }

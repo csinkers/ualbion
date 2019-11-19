@@ -35,5 +35,6 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk3 { get; }
         public ushort Unk6 { get; }
         public ushort Unk8 { get; }
+        public override string ToString() => $"text {TextId} {PortraitId} ({Unk1} {Unk2} {Unk3} {Unk6} {Unk8})";
     }
 }

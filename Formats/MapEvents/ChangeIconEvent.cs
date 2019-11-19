@@ -6,8 +6,8 @@ namespace UAlbion.Formats.MapEvents
     {
         public ChangeIconEvent(BinaryReader br, int id, EventType type) : base(id, type)
         {
-            X = br.ReadByte(); // 1
-            Y = br.ReadByte(); // 2
+            X = br.ReadSByte(); // 1
+            Y = br.ReadSByte(); // 2
             Permanent = br.ReadByte(); // 3
             ChangeType = (IconChangeType) br.ReadByte(); // 4
             Unk5 = br.ReadByte(); // 5
@@ -30,12 +30,13 @@ namespace UAlbion.Formats.MapEvents
             ChangeTileEventTrigger = 0xA, // ???? Might not be 0xA
         }
 
-        public byte X { get; }
-        public byte Y { get; }
+        public sbyte X { get; }
+        public sbyte Y { get; }
         public byte Permanent { get; }
         public IconChangeType ChangeType { get; }
         public byte Unk5 { get; }
         public ushort Value { get; }
         public ushort Unk8 { get; set; }
+        public override string ToString() => $"change_icon <{X}, {Y}> {(Permanent != 0 ? "Perm" : "Temp")} {ChangeType} {Value} ({Unk5} {Unk8})";
     }
 }

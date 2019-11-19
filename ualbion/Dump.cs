@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UAlbion.Core.Textures;
+using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game;
+using UAlbion.Game.Events;
+using TextEvent = UAlbion.Formats.MapEvents.TextEvent;
 
 namespace UAlbion
 {
@@ -128,5 +132,78 @@ namespace UAlbion
                 sw.WriteLine();
             }
         }
+
+        static void PrintChain(EventFormatter formatter, MapEvent e, int indent)
+        {
+            do
+            {
+                Console.Write($"{e.Id:000}");
+                Console.Write("".PadRight(indent * 4));
+                if(e is QueryEvent query)
+                {
+                    Console.WriteLine($"if (!{formatter.GetText(e)}) {{");
+                    if (query.FalseEvent != null)
+                        PrintChain(formatter, query.FalseEvent, indent + 1);
+                    Console.WriteLine("}".PadLeft(4 + indent * 4));
+                    Console.WriteLine("else...".PadLeft(10 + indent * 4));
+                }
+                else Console.WriteLine(formatter.GetText(e));
+                e = e.NextEvent;
+            } while (e != null);
+        }
+
+        public static void MapEvents(IAssetManager assets, string baseDir, MapDataId mapId)
+        {
+            var map = assets.LoadMap2D(mapId);
+            if (map == null) // Just handle 2D for now
+                return;
+
+            var formatter = new EventFormatter(assets, mapId);
+            var rootNodes = new HashSet<(bool, MapEventZone.TriggerType, int)>();
+            foreach(var zone in map.Zones)
+                rootNodes.Add((zone.Global, zone.Trigger, zone.EventNumber));
+
+            var sorted =
+                    rootNodes
+                        .OrderByDescending(x => x.Item1)
+                        .ThenBy(x => x.Item2)
+                        .ThenBy(x => x.Item3)
+                ;
+
+            foreach(var (global, trigger, number) in sorted)
+            {
+                var e = map.Events[number];
+                Console.WriteLine($"{(global ? "Global" : "Local")} {trigger}:");
+                PrintChain(formatter, e, 1);
+            }
+
+            Console.ReadLine();
+        }
+    }
+
+    class EventFormatter
+    {
+        readonly IAssetManager _assets;
+        readonly MapDataId _mapContext;
+
+        public EventFormatter(IAssetManager assets, MapDataId mapContext)
+        {
+            _assets = assets;
+            _mapContext = mapContext;
+        }
+
+        public string GetText(MapEvent e)
+        {
+            if(e is TextEvent textEvent) // Same as npc text event?
+            {
+                var text = _assets.LoadString(
+                    new StringId(AssetType.MapText, (int)_mapContext, textEvent.TextId), 
+                    GameLanguage.English);
+
+                return $"text Portrait:{textEvent.PortraitId} \"{text}\"";
+            }
+            else return e.ToString();
+        }
+
     }
 }

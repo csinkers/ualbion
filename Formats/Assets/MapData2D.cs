@@ -95,6 +95,9 @@ namespace UAlbion.Formats.Assets
                     q.FalseEvent = map.Events[q.FalseEventId.Value];
             }
 
+            foreach(var zone in map.Zones)
+                zone.Event = map.Events[zone.EventNumber];
+
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
             foreach (var npc in map.Npcs)

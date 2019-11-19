@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets
 {
@@ -33,6 +34,7 @@ namespace UAlbion.Formats.Assets
         public ushort Y;
         public TriggerType Trigger;
         public ushort EventNumber;
+        public MapEvent Event { get; set; }
 
         public static MapEventZone LoadGlobalZone(BinaryReader br)
         {

@@ -8,7 +8,7 @@ namespace UAlbion.Formats.MapEvents
         public SetNpcActiveEvent(BinaryReader br, int id, EventType type, ModifyType subType) : base(id, type, subType)
         {
             IsActive = br.ReadByte(); // 2
-            NpcId = (NpcCharacterId)br.ReadByte(); // 3
+            NpcId = (NpcCharacterId)br.ReadByte() - 1; // 3
             Unk4 = br.ReadByte(); // 4
             Unk5 = br.ReadByte(); // 5
             Unk6 = br.ReadUInt16(); // 6
@@ -21,5 +21,6 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk5 { get; set; }
         public ushort Unk6 { get; }
         public ushort Unk8 { get; set; }
+        public override string ToString() => $"set_npc_active {NpcId} {IsActive} ({Unk4} {Unk6} {Unk8})";
     }
 }

@@ -20,5 +20,6 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk4 { get; set; }
         public byte Unk5 { get; set; }
         public ushort Unk8 { get; set; }
+        public override string ToString() => $"add_remove_inv_item {Operation} {Amount}x{ItemId} ({Unk4} {Unk5} {Unk8})";
     }
 }

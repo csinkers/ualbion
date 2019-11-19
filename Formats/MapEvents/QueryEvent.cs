@@ -27,6 +27,14 @@ namespace UAlbion.Formats.MapEvents
             PromptPlayerNumeric = 0x2B
         }
 
+        public enum QueryOperation
+        {
+            Unk0,
+            Unk1,
+            Unk2,
+            Equals,
+        }
+
         public QueryEvent(int id, EventType type) : base(id, type) { }
 
         public static QueryEvent Load(BinaryReader br, int id, EventType type) 
@@ -78,6 +86,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort Argument { get; protected set;  }
         public MapEvent FalseEvent { get; set; }
 
-        public override string ToString() => $"Query {SubType} {Argument} (method {Unk2})";
+        public override string ToString() => $"query({SubType} {Argument} ({Unk2} {Unk3} {Unk4} {Unk5}))";
     }
 }

@@ -27,5 +27,6 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk5 { get; set; }
         public LightingLevel LightLevel { get; }
         public ushort Unk8 { get; set; }
+        public override string ToString() => $"set_map_lighting {LightLevel} ({Unk2} {Unk3} {Unk4} {Unk5} {Unk8})";
     }
 }

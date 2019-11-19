@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -10,7 +11,7 @@ namespace UAlbion.Formats.MapEvents
             Unk3 = br.ReadByte(); // 3
             Unk4 = br.ReadByte(); // 4
             Unk5 = br.ReadByte(); // 5
-            PartyMemberId = br.ReadUInt16(); // 6
+            PartyMemberId = (PartyCharacterId)br.ReadUInt16(); // 6
             Unk8 = br.ReadUInt16(); // 8
         }
 
@@ -18,7 +19,8 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk3 { get; set; }
         public byte Unk4 { get; set; }
         public byte Unk5 { get; set; }
-        public ushort PartyMemberId { get; }
+        public PartyCharacterId PartyMemberId { get; } // stored as ushort
         public ushort Unk8 { get; set; }
+        public override string ToString() => $"set_party_leader {PartyMemberId} ({Unk2} {Unk3} {Unk4} {Unk5} {Unk8})";
     }
 }

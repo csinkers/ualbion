@@ -92,6 +92,7 @@ namespace UAlbion.Core.Textures
         public uint ArrayLayers { get { if (_isMetadataDirty) RebuildLayers(); return (uint)_layerSizes.Count; } }
         public int SubImageCount => _layerSizes.Count;
         public bool IsDirty { get; private set; }
+        public int SizeInBytes => (int)(Width * Height * _layerSizes.Count * sizeof(uint));
 
         public int GetSubImageAtTime(int logicalId, int tick)
         {

@@ -52,7 +52,7 @@ namespace UAlbion.Game.Entities
             TileSize = new Vector3(_labyrinthData.EffectiveWallWidth, _labyrinthData.WallHeight,
                 _labyrinthData.EffectiveWallWidth);
 
-            _renderable = new MapRenderable3D(assets, _mapData, _labyrinthData, TileSize);
+            _renderable = new MapRenderable3D(MapId, assets, _mapData, _labyrinthData, TileSize);
             Exchange.Attach(_renderable);
             Children.Add(_renderable);
 

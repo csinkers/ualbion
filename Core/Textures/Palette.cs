@@ -17,6 +17,7 @@ namespace UAlbion.Core.Textures
         public string Name { get; }
         public bool IsDirty { get; private set; }
         uint[] TextureData { get;  }
+        public int SizeInBytes => TextureData.Length * sizeof(uint);
 
         public Palette(string name, uint[] paletteData)
         {

@@ -17,5 +17,6 @@ namespace UAlbion.Core.Textures
         int SubImageCount { get; }
         void GetSubImageDetails(int subImage, out Vector2 size, out Vector2 texOffset, out Vector2 texSize, out uint layer);
         Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage);
+        int SizeInBytes { get; }
     }
 }

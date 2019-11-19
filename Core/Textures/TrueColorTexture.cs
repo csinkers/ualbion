@@ -18,6 +18,7 @@ namespace UAlbion.Core.Textures
         public uint ArrayLayers => 1;
         public int SubImageCount => 1;
         public bool IsDirty { get; private set; }
+        public int SizeInBytes => (int)(_texture.Width * _texture.Height * _texture.PixelSizeInBytes);
         readonly ImageSharpTexture _texture;
 
         public TrueColorTexture(string name, Image<Rgba32> image)

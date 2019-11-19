@@ -7,11 +7,12 @@ namespace UAlbion.Game
         public TextBlock() : this(string.Empty) { }
         public TextBlock(string text)
         {
-            Text = text;
+            Text = text ?? "";
             Color = FontColor.White;
         }
 
-        public string Text { get; set; }
+        string _text;
+        public string Text { get => _text; set => _text = value ?? ""; } 
         public FontColor Color { get; set; }
         public TextStyle Style { get; set; }
         public TextAlignment Alignment { get; set; }

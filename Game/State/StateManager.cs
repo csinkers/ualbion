@@ -44,8 +44,8 @@ namespace UAlbion.Game.State
             inv.Slots[12] = new ItemSlot { Amount = 1, Id = ItemId.StrengthAmulet };
             inv.Slots[13] = new ItemSlot { Amount = 5, Id = ItemId.Torch };
             inv.Slots[14] = new ItemSlot { Amount = 1, Id = ItemId.TorchBurning };
-            inv.Slots[14] = new ItemSlot { Amount = 99, Id = ItemId.TurqHealingPotion };
-            inv.Slots[15] = new ItemSlot { Amount = 1, Id = ItemId.Sword, Flags = ItemSlotFlags.Broken };
+            inv.Slots[15] = new ItemSlot { Amount = 99, Id = ItemId.TurqHealingPotion };
+            inv.Slots[16] = new ItemSlot { Amount = 1, Id = ItemId.Sword, Flags = ItemSlotFlags.Broken };
             Raise(new InventoryChangedEvent(PartyCharacterId.Tom));
         }
 

@@ -37,7 +37,7 @@ namespace UAlbion.Core.Visual
             public override string ToString() => $"({TilePosition.X}, {TilePosition.Y}): {Floor}.{Ceiling}.{Wall} ({Flags})";
         }
 
-        public TileMap(int renderOrder, Vector3 tileSize, uint width, uint height, IList<uint[]> palette)
+        public TileMap(string name, int renderOrder, Vector3 tileSize, uint width, uint height, IList<uint[]> palette)
         {
             _palette = palette;
             RenderOrder = renderOrder;
@@ -45,8 +45,8 @@ namespace UAlbion.Core.Visual
             Width = width;
             Height = height;
             Tiles = new Tile[width * height];
-            Floors = new MultiTexture("FloorTiles", palette);
-            Walls = new MultiTexture("WallTiles", palette);
+            Floors = new MultiTexture("FloorTiles:" + name, palette);
+            Walls = new MultiTexture("WallTiles:" + name, palette);
         }
 
         public string Name { get; set; }

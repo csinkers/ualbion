@@ -33,6 +33,7 @@ namespace UAlbion.Game.Entities
             var palette = assets.LoadPalette(paletteId);
             float size = 512.0f * 256.0f;
             _tilemap = new TileMap(
+                "Skybox_" + id,
                 (int)DrawLayer.Background, 
                 new Vector3(-size, size / 3, size), // Just make sure it's bigger than the largest map
                 1, 1, 

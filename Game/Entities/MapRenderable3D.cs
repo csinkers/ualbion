@@ -7,6 +7,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
@@ -27,12 +28,13 @@ namespace UAlbion.Game.Entities
             H<MapRenderable3D, SortMapTilesEvent>((x, e) => x._isSorting = e.IsSorting)
         );
 
-        public MapRenderable3D(IAssetManager assets, MapData3D mapData, LabyrinthData labyrinthData, Vector3 tileSize) : base(Handlers)
+        public MapRenderable3D(MapDataId mapId, IAssetManager assets, MapData3D mapData, LabyrinthData labyrinthData, Vector3 tileSize) : base(Handlers)
         {
             _mapData = mapData;
             _labyrinthData = labyrinthData;
             var palette = assets.LoadPalette(_mapData.PaletteId);
             _tilemap = new TileMap(
+                mapId.ToString(),
                 (int)DrawLayer.Background, 
                 tileSize,
                 _mapData.Width, _mapData.Height, 

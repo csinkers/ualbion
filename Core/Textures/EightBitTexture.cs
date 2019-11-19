@@ -41,6 +41,7 @@ namespace UAlbion.Core.Textures
         public int SubImageCount => _subImages.Count;
         public bool IsDirty { get; private set; }
         public IReadOnlyList<SubImage> SubImages => new ReadOnlyCollection<SubImage>(_subImages);
+        public int SizeInBytes => TextureData.Length;
         readonly IList<SubImage> _subImages = new List<SubImage>();
         public override string ToString() => $"8Bit {Name} ({Width}x{Height}, {_subImages.Count} subimages)";
 

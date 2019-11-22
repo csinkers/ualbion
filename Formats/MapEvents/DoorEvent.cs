@@ -1,27 +1,31 @@
 ﻿using System.IO;
+using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class DoorEvent : MapEvent
+    public class DoorEvent : IEvent
     {
-        public DoorEvent(BinaryReader br, int id, EventType type) : base(id, type)
+        public static EventNode Load(BinaryReader br, int id, MapEventType type)
         {
-            Unk1 = br.ReadByte(); // +1
-            Unk2 = br.ReadByte(); // +2
-            Unk3 = br.ReadByte(); // +3
-            Unk4 = br.ReadByte(); // +4
-            Unk5 = br.ReadByte(); // +5
-            Unk6 = br.ReadUInt16(); // +6
-            Unk8 = br.ReadUInt16(); // +8
+            return new EventNode(id, new DoorEvent
+            {
+                Unk1 = br.ReadByte(), // +1
+                Unk2 = br.ReadByte(), // +2
+                Unk3 = br.ReadByte(), // +3
+                Unk4 = br.ReadByte(), // +4
+                Unk5 = br.ReadByte(), // +5
+                Unk6 = br.ReadUInt16(), // +6
+                Unk8 = br.ReadUInt16(), // +8
+            });
         }
 
-        public byte Unk1 { get; }
-        public byte Unk2 { get; }
-        public byte Unk3 { get; }
-        public byte Unk4 { get; }
-        public byte Unk5 { get; }
-        public ushort Unk6 { get; }
-        public ushort Unk8 { get; }
+        public byte Unk1 { get; private set; }
+        public byte Unk2 { get; private set; }
+        public byte Unk3 { get; private set; }
+        public byte Unk4 { get; private set; }
+        public byte Unk5 { get; private set; }
+        public ushort Unk6 { get; private set; }
+        public ushort Unk8 { get; private set; }
         public override string ToString() => $"door ({Unk1} {Unk2} {Unk3} {Unk4} {Unk5} {Unk6} {Unk8})";
     }
 }

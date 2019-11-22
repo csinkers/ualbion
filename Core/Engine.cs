@@ -70,9 +70,6 @@ namespace UAlbion.Core
 
         protected override void Subscribed()
         {
-            ChangeBackend(_backend);
-            Sdl2Native.SDL_Init(SDLInitFlags.GameController);
-
             Exchange
                 .Register<IWindowManager>(_windowManager)
                 .Register<IShaderCache>(new ShaderCache())
@@ -85,7 +82,7 @@ namespace UAlbion.Core
             _renderers.Add(renderer.GetType(), renderer);
             if (renderer is IComponent component)
             {
-                Exchange.Attach(component);
+                Exchange?.Attach(component);
                 Children.Add(component);
             }
 
@@ -94,6 +91,9 @@ namespace UAlbion.Core
 
         public void Run()
         {
+            ChangeBackend(_backend);
+            Sdl2Native.SDL_Init(SDLInitFlags.GameController);
+
             CreateAllObjects();
             ImGui.StyleColorsClassic();
             Raise(new WindowResizedEvent(Window.Width, Window.Height));

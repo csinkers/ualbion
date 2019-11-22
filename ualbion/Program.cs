@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
@@ -8,6 +10,7 @@ using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Entities;
@@ -25,6 +28,7 @@ namespace UAlbion
     {
         static unsafe void Main()
         {
+            // GraphTests();
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
 
             /*
@@ -80,15 +84,11 @@ namespace UAlbion
 
             using var engine = new Engine(backend,
 #if DEBUG
-                true);
+                true
 #else
-                 false);
+                 false
 #endif
-
-            global.Attach(engine);
-            InputConfig inputConfig = InputConfig.Load(baseDir);
-
-            engine
+                )
                 .AddRenderer(new SpriteRenderer())
                 .AddRenderer(new ExtrudedTileMapRenderer())
                 .AddRenderer(new FullScreenQuad())
@@ -96,28 +96,33 @@ namespace UAlbion
                 .AddRenderer(new ScreenDuplicator())
                 ;
 
-            var sceneManager = new SceneManager()
-                .AddScene(new AutomapScene())
-                .AddScene(new FlatScene())
-                .AddScene(new DungeonScene())
-                .AddScene(new MenuScene())
-                .AddScene(new InventoryScene())
-                ;
-
-            var inputManager = new InputManager();
             global
-                .Register<IInputManager>(inputManager)
+                .Register<IInputManager>(new InputManager()
+                    .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
+                    .RegisterInputMode(InputMode.World2D, new World2DInputMode())
+                    .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
+                    .RegisterMouseMode(MouseMode.Exclusive, new ExclusiveMouseMode())
+                    .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
+                    .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
+                )
                 .Register<ILayoutManager>(new LayoutManager())
                 .Register<IPaletteManager>(new PaletteManager())
-                .Register<ISceneManager>(sceneManager)
+                .Register<ISceneManager>(new SceneManager()
+                    .AddScene(new AutomapScene())
+                    .AddScene(new FlatScene())
+                    .AddScene(new DungeonScene())
+                    .AddScene(new MenuScene())
+                    .AddScene(new InventoryScene())
+                )
                 .Register<ISpriteResolver>(new SpriteResolver())
                 .Register<IStateManager>(new StateManager())
                 .Register<ITextManager>(new TextManager())
                 .Register<ITextureManager>(new TextureManager())
+                .Attach(engine)
                 .Attach(new CursorManager())
                 .Attach(new DebugMapInspector())
                 .Attach(new GameClock())
-                .Attach(new InputBinder(inputConfig))
+                .Attach(new InputBinder(InputConfig.Load(baseDir)))
                 .Attach(new InputModeStack())
                 .Attach(new MapManager())
                 .Attach(new MouseModeStack())
@@ -125,22 +130,17 @@ namespace UAlbion
                 .Attach(new StatusBar())
                 ;
 
-            inputManager
-                .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
-                .RegisterInputMode(InputMode.World2D, new World2DInputMode())
-                .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
-                .RegisterMouseMode(MouseMode.Exclusive, new ExclusiveMouseMode())
-                .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
-                .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
-                ;
-
             var inventoryConfig = InventoryConfig.Load(baseDir);
-            sceneManager.GetExchange(SceneId.Inventory)
+            global.Resolve<ISceneManager>().GetExchange(SceneId.Inventory)
                 .Attach(new InventoryScreen(inventoryConfig))
                 ;
 
-            var menuBackground = new ScreenSpaceSprite<PictureId>(PictureId.MenuBackground8, new Vector2(0.0f, 1.0f), new Vector2(2.0f, -2.0f));
-            sceneManager.GetExchange(SceneId.MainMenu)
+            var menuBackground = new ScreenSpaceSprite<PictureId>(
+                PictureId.MenuBackground8,
+                new Vector2(0.0f, 1.0f),
+                new Vector2(2.0f, -2.0f));
+
+            global.Resolve<ISceneManager>().GetExchange(SceneId.MainMenu)
                 .Attach(new MainMenu())
                 .Attach(menuBackground)
                 ;
@@ -157,5 +157,101 @@ namespace UAlbion
             //global.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
             engine.Run();
         }
+
+        /*
+        interface IStatement { }
+
+        class Statement : IStatement
+        {
+            public Statement(IEventNode node) { Node = node; }
+            public IEventNode Node { get; }
+            public string Name => Node.ToString();
+        }
+
+        class Block : IStatement
+        {
+            public IList<IStatement> Nodes { get; } = new List<IStatement>();
+        }
+
+        class If : IStatement
+        {
+            public If(string condition, IStatement @true, IStatement @false)
+            {
+                Condition = condition;
+                True = @true;
+                False = @false;
+            }
+
+            public string Condition { get; }
+            public IStatement True { get; }
+            public IStatement False { get; }
+        }
+
+        static string FormatBlock(Block b)
+        {
+            var sb = new StringBuilder();
+            FormatChain(sb, b, 0);
+            return sb.ToString();
+        }
+
+        static void FormatChain(StringBuilder sb, Block b, int level)
+        {
+            void Indent() { if (level > 0) sb.Append("".PadLeft(4 * level)); }
+            foreach(var node in b.Nodes)
+            {
+                Indent();
+                if (node is BranchNode b)
+                {
+                    sb.AppendLine($"if({e.Name}) {{");
+                    FormatChain(sb, b.Next, level + 1);
+
+                    Indent();
+                    sb.AppendLine("} else {");
+
+                    FormatChain(sb, b.Next, level + 1);
+                    Indent();
+                    sb.AppendLine("}");
+
+                }
+                else
+                {
+                    
+                }
+            }
+        }
+
+        static void GraphTests()
+        {
+            var sequence = new Node("A", new Node("B", null));
+            Console.WriteLine(FormatChain(sequence));
+            // a; b;
+            var noFalse = new Branch("A", new Node("B", null), null);
+            Console.WriteLine(FormatChain(noFalse));
+            // if(a) { b; }
+            var noTrue = new Branch("A", null, new Node("B", null));
+            Console.WriteLine(FormatChain(noTrue));
+            // if(!a) { b; }
+            var d = new Node("D", null);
+            var diamond = new Branch("A", new Node("B", d), new Node("C", d));
+            Console.WriteLine(FormatChain(diamond));
+            // if(a) { b } else { c } d;
+
+
+            /*
+
+            if(a)
+            {
+                b;
+                if(c)
+                {
+                    d;
+                    return;
+                }
+            }
+            e;
+
+            null = return;
+        }
+         */
     }
 }

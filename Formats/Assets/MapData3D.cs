@@ -22,7 +22,7 @@ namespace UAlbion.Formats.Assets
         public int[] Ceilings { get; set; }
         public IList<MapNpc> Npcs { get; } = new List<MapNpc>();
         public IList<MapEventZone> Zones { get; } = new List<MapEventZone>();
-        public IList<MapEvent> Events { get; } = new List<MapEvent>();
+        public IList<IEventNode> Events { get; } = new List<IEventNode>();
         public IList<AutomapInfo> Automap { get; } = new List<AutomapInfo>();
         public byte[] AutomapGraphics { get; set; }
         public IList<ushort> ActiveMapEvents { get; } = new List<ushort>();
@@ -89,7 +89,7 @@ namespace UAlbion.Formats.Assets
 
             int eventCount = br.ReadUInt16();
             for (int i = 0; i < eventCount; i++)
-                map.Events.Add(MapEvent.Load(br, i));
+                map.Events.Add(EventNode.Load(br, i));
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
             foreach(var npc in map.Npcs)

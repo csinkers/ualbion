@@ -1,8 +1,9 @@
 ﻿using System.IO;
+using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class TextEvent : MapEvent
+    public class TextEvent : IEvent
     {
         public enum TextType
         {
@@ -17,24 +18,27 @@ namespace UAlbion.Formats.MapEvents
             ListDefaultDialogOptions
         }
 
-        public TextEvent(BinaryReader br, int id, EventType type) : base(id, type)
+        public static EventNode Load(BinaryReader br, int id, MapEventType type)
         {
-            Unk1 = br.ReadByte(); // +1
-            Unk2 = br.ReadByte(); // +2
-            Unk3 = br.ReadByte(); // +3
-            PortraitId = br.ReadByte(); // +4
-            TextId = br.ReadByte(); // +5
-            Unk6 = br.ReadUInt16(); // +6
-            Unk8 = br.ReadUInt16(); // +8
+            return new EventNode(id, new TextEvent
+            {
+                Unk1 = br.ReadByte(), // +1
+                Unk2 = br.ReadByte(), // +2
+                Unk3 = br.ReadByte(), // +3
+                PortraitId = br.ReadByte(), // +4
+                TextId = br.ReadByte(), // +5
+                Unk6 = br.ReadUInt16(), // +6
+                Unk8 = br.ReadUInt16(), // +8
+            });
         }
 
-        public byte PortraitId { get; }
-        public byte TextId { get; }
-        public byte Unk1 { get; }
-        public byte Unk2 { get; }
-        public byte Unk3 { get; }
-        public ushort Unk6 { get; }
-        public ushort Unk8 { get; }
+        public byte PortraitId { get; private set; }
+        public byte TextId { get; private set; }
+        public byte Unk1 { get; private set; }
+        public byte Unk2 { get; private set; }
+        public byte Unk3 { get; private set; }
+        public ushort Unk6 { get; private set; }
+        public ushort Unk8 { get; private set; }
         public override string ToString() => $"text {TextId} {PortraitId} ({Unk1} {Unk2} {Unk3} {Unk6} {Unk8})";
     }
 }

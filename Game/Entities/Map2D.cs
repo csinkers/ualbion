@@ -5,6 +5,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities
@@ -71,14 +72,13 @@ namespace UAlbion.Game.Entities
             {
                 var zone = _mapData.Zones[zoneIndex];
                 e.RegisterHit(t, zone);
-                HashSet<int> printedEvents = new HashSet<int>();
-                int eventNumber = zone.EventNumber;
-                while (eventNumber != 0xffff && !printedEvents.Contains(eventNumber))
+                HashSet<IEventNode> printedEvents = new HashSet<IEventNode>();
+                var zoneEvent = zone.Event;
+                while (zoneEvent != null && !printedEvents.Contains(zoneEvent))
                 {
-                    var zoneEvent = _mapData.Events[eventNumber];
                     e.RegisterHit(t, zoneEvent);
-                    printedEvents.Add(eventNumber);
-                    eventNumber = zoneEvent.NextEventId ?? 0xffff;
+                    printedEvents.Add(zoneEvent);
+                    zoneEvent = zoneEvent.NextEvent;
                 } 
             }
         }

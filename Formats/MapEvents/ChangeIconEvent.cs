@@ -1,18 +1,22 @@
 ﻿using System.IO;
+using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class ChangeIconEvent : MapEvent
+    public class ChangeIconEvent : IEvent
     {
-        public ChangeIconEvent(BinaryReader br, int id, EventType type) : base(id, type)
+        public static EventNode Load(BinaryReader br, int id, MapEventType type)
         {
-            X = br.ReadSByte(); // 1
-            Y = br.ReadSByte(); // 2
-            Permanent = br.ReadByte(); // 3
-            ChangeType = (IconChangeType) br.ReadByte(); // 4
-            Unk5 = br.ReadByte(); // 5
-            Value = br.ReadUInt16(); // 6
-            Unk8 = br.ReadUInt16();
+            return new EventNode(id, new ChangeIconEvent
+            {
+                X = br.ReadSByte(), // 1
+                Y = br.ReadSByte(), // 2
+                Permanent = br.ReadByte(), // 3
+                ChangeType = (IconChangeType) br.ReadByte(), // 4
+                Unk5 = br.ReadByte(), // 5
+                Value = br.ReadUInt16(), // 6
+                Unk8 = br.ReadUInt16(),
+            });
         }
 
         public enum IconChangeType : byte
@@ -30,12 +34,12 @@ namespace UAlbion.Formats.MapEvents
             ChangeTileEventTrigger = 0xA, // ???? Might not be 0xA
         }
 
-        public sbyte X { get; }
-        public sbyte Y { get; }
-        public byte Permanent { get; }
-        public IconChangeType ChangeType { get; }
-        public byte Unk5 { get; }
-        public ushort Value { get; }
+        public sbyte X { get; private set; }
+        public sbyte Y { get; private set; }
+        public byte Permanent { get; private set; }
+        public IconChangeType ChangeType { get; private set; }
+        public byte Unk5 { get; private set; }
+        public ushort Value { get; private set; }
         public ushort Unk8 { get; set; }
         public override string ToString() => $"change_icon <{X}, {Y}> {(Permanent != 0 ? "Perm" : "Temp")} {ChangeType} {Value} ({Unk5} {Unk8})";
     }

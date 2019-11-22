@@ -1,9 +1,10 @@
 ﻿using System.IO;
+using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class SimpleChestEvent : MapEvent
+    public class SimpleChestEvent : IEvent
     {
         public enum SimpleChestItemType : byte
         {
@@ -12,24 +13,27 @@ namespace UAlbion.Formats.MapEvents
             Rations = 2 // ??
         }
 
-        public SimpleChestEvent(BinaryReader br, int id, EventType type) : base(id, type)
+        public static EventNode Load(BinaryReader br, int id, MapEventType type)
         {
-            ChestType = (SimpleChestItemType)br.ReadByte(); // +1
-            Unk2 = br.ReadByte(); // +2
-            Unk3 = br.ReadByte(); // +3
-            Unk4 = br.ReadByte(); // +4
-            Unk5 = br.ReadByte(); // +5
-            ItemId = br.ReadUInt16(); // +6
-            Amount = br.ReadUInt16(); // +8
+            return new EventNode(id, new SimpleChestEvent
+            {
+                ChestType = (SimpleChestItemType) br.ReadByte(), // +1
+                Unk2 = br.ReadByte(), // +2
+                Unk3 = br.ReadByte(), // +3
+                Unk4 = br.ReadByte(), // +4
+                Unk5 = br.ReadByte(), // +5
+                ItemId = br.ReadUInt16(), // +6
+                Amount = br.ReadUInt16(), // +8
+            });
         }
 
-        public SimpleChestItemType ChestType { get; }
-        public ushort ItemId { get; }
-        public ushort Amount { get; }
-        public byte Unk2 { get; }
-        public byte Unk3 { get; }
-        public byte Unk4 { get; }
-        public byte Unk5 { get; }
+        public SimpleChestItemType ChestType { get; private set; }
+        public ushort ItemId { get; private set; }
+        public ushort Amount { get; private set; }
+        public byte Unk2 { get; private set; }
+        public byte Unk3 { get; private set; }
+        public byte Unk4 { get; private set; }
+        public byte Unk5 { get; private set; }
 
         string ItemIdString =>
             ChestType switch

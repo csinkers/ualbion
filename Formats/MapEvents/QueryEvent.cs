@@ -1,8 +1,9 @@
 ﻿using System.IO;
+using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class QueryEvent : MapEvent
+    public class QueryEvent : IEvent
     {
         public enum QueryType : byte
         {
@@ -35,56 +36,50 @@ namespace UAlbion.Formats.MapEvents
             Equals,
         }
 
-        public QueryEvent(int id, EventType type) : base(id, type) { }
-
-        public static QueryEvent Load(BinaryReader br, int id, EventType type) 
+        public static BranchNode Load(BinaryReader br, int id, MapEventType type)
         {
             var subType = (QueryType)br.ReadByte(); // 1
-            QueryEvent e;
             switch (subType)
             {
                 case QueryType.InventoryHasItem:
                 case QueryType.UsedItemId:
-                    e = new QueryItemEvent(id, type);
-                    break;
+                    return QueryItemEvent.Load(br, id, subType);
 
                 case QueryType.ChosenVerb:
-                    e = new QueryVerbEvent(id, type);
-                    break;
+                    return QueryVerbEvent.Load(br, id);
 
                 case QueryType.PreviousActionResult:
                 case QueryType.Ticker:
                 case QueryType.CurrentMapId:
                 case QueryType.PromptPlayer:
                 case QueryType.TriggerType:
-                    e = new QueryEvent(id, type);
-                    break;
-
                 default:
-                    e = new QueryEvent(id, type);
                     break;
             }
 
-            e.SubType = subType;
-            e.Unk2 = br.ReadByte(); // 2
-            e.Unk3 = br.ReadByte(); // 3
-            e.Unk4 = br.ReadByte(); // 4
-            e.Unk5 = br.ReadByte(); // 5
-            e.Argument = br.ReadUInt16(); // 6
-            e.FalseEventId = br.ReadUInt16(); // 8
-            if (e.FalseEventId == 0xffff) e.FalseEventId = null;
-            return e;
+            var e = new QueryEvent
+            {
+                SubType = subType,
+                Unk2 = br.ReadByte(), // 2
+                Unk3 = br.ReadByte(), // 3
+                Unk4 = br.ReadByte(), // 4
+                Unk5 = br.ReadByte(), // 5
+                Argument = br.ReadUInt16(), // 6
+            };
+
+            ushort? falseEventId = br.ReadUInt16(); // 8
+            if (falseEventId == 0xffff)
+                falseEventId = null;
+            return new BranchNode(id, e, falseEventId);
         }
 
-        public byte Unk2 { get; protected set;  } // method to use for check?
-        public byte Unk3 { get; protected set;  }
-        public byte Unk4 { get; protected set;  }
-        public byte Unk5 { get; protected set;  }
+        public byte Unk2 { get; protected set; } // method to use for check?
+        public byte Unk3 { get; protected set; }
+        public byte Unk4 { get; protected set; }
+        public byte Unk5 { get; protected set; }
 
-        public QueryType SubType { get; protected set;  }
-        public ushort? FalseEventId { get; protected set;  }
-        public ushort Argument { get; protected set;  }
-        public MapEvent FalseEvent { get; set; }
+        public QueryType SubType { get; protected set; }
+        public ushort Argument { get; protected set; }
 
         public override string ToString() => $"query({SubType} {Argument} ({Unk2} {Unk3} {Unk4} {Unk5}))";
     }

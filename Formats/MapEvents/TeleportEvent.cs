@@ -1,28 +1,32 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class TeleportEvent : MapEvent
+    public class TeleportEvent : IEvent
     {
-        public TeleportEvent(BinaryReader br, int id, EventType type) : base(id, type)
+        public static EventNode Load(BinaryReader br, int id, MapEventType type)
         {
-            X = br.ReadByte(); // +1
-            Y = br.ReadByte(); // +2
-            Direction = br.ReadByte(); // +3
-            Unk4 = br.ReadByte(); // +4
-            Debug.Assert(Unk4 == 255 
-                || Unk4 == 6 
-                || Unk4 == 1 
-                || Unk4 == 106
-                || Unk4 == 0
-                || Unk4 == 2
-                || Unk4 == 3
-                );
-            Unk5 = br.ReadByte(); // +5
-            MapId = (MapDataId)br.ReadUInt16(); // +6
-            Unk8 = br.ReadUInt16(); // +8
+            var e = new TeleportEvent
+            {
+                X = br.ReadByte(), // +1
+                Y = br.ReadByte(), // +2
+                Direction = br.ReadByte(), // +3
+                Unk4 = br.ReadByte(), // +4
+                Unk5 = br.ReadByte(), // +5
+                MapId = (MapDataId) br.ReadUInt16(), // +6
+                Unk8 = br.ReadUInt16(), // +8
+            };
+            Debug.Assert(e.Unk4 == 255
+                         || e.Unk4 == 6
+                         || e.Unk4 == 1
+                         || e.Unk4 == 106
+                         || e.Unk4 == 0
+                         || e.Unk4 == 2
+                         || e.Unk4 == 3);
+            return new EventNode(id, e);
         }
 
         public byte X { get; set; }

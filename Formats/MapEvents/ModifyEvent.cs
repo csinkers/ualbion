@@ -1,27 +1,28 @@
 ﻿using System;
 using System.IO;
+using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public abstract class ModifyEvent : MapEvent
+    public abstract class ModifyEvent : IEvent
     {
-        public static MapEvent Load(BinaryReader br, int id, EventType type)
+        public static EventNode Load(BinaryReader br, int id, MapEventType type)
         {
             var subType = (ModifyType) br.ReadByte();
             switch (subType)
             {
-                case ModifyType.SetTemporarySwitch:     return new SetTemporarySwitchEvent(br, id, type, subType);
-                case ModifyType.DisableEventChain:      return new DisableEventChainEvent(br, id, type, subType);
-                case ModifyType.SetNpcActive:           return new SetNpcActiveEvent(br, id, type, subType);
-                case ModifyType.AddPartyMember:         return new AddPartyMemberEvent(br, id, type, subType);
-                case ModifyType.AddRemoveInventoryItem: return new AddRemoveInventoryItemEvent(br, id, type, subType);
-                case ModifyType.SetMapLighting:         return new SetMapLightingEvent(br, id, type, subType);
-                case ModifyType.ChangePartyGold:        return new ChangePartyGoldEvent(br, id, type, subType);
-                case ModifyType.ChangePartyRations:     return new ChangePartyRationsEvent(br, id, type, subType);
-                case ModifyType.ChangeTime:             return new ChangeTimeEvent(br, id, type, subType);
-                case ModifyType.SetPartyLeader:         return new SetPartyLeaderEvent(br, id, type, subType);
-                case ModifyType.SetTicker:              return new SetTickerEvent(br, id, type, subType);
-                case ModifyType.Unk2:                   return new DummyModifyEvent(br, id, type, subType);
+                case ModifyType.SetTemporarySwitch:     return SetTemporarySwitchEvent.Load(br, id, type, subType);
+                case ModifyType.DisableEventChain:      return DisableEventChainEvent.Load(br, id, type, subType);
+                case ModifyType.SetNpcActive:           return SetNpcActiveEvent.Load(br, id, type, subType);
+                case ModifyType.AddPartyMember:         return AddPartyMemberEvent.Load(br, id, type, subType);
+                case ModifyType.AddRemoveInventoryItem: return AddRemoveInventoryItemEvent.Load(br, id, type, subType);
+                case ModifyType.SetMapLighting:         return SetMapLightingEvent.Load(br, id, type, subType);
+                case ModifyType.ChangePartyGold:        return ChangePartyGoldEvent.Load(br, id, type, subType);
+                case ModifyType.ChangePartyRations:     return ChangePartyRationsEvent.Load(br, id, type, subType);
+                case ModifyType.ChangeTime:             return ChangeTimeEvent.Load(br, id, type, subType);
+                case ModifyType.SetPartyLeader:         return SetPartyLeaderEvent.Load(br, id, type, subType);
+                case ModifyType.SetTicker:              return SetTickerEvent.Load(br, id, type, subType);
+                case ModifyType.Unk2:                   return DummyModifyEvent.Load(br, id, type, subType);
                 default: throw new ArgumentOutOfRangeException();
             }
         }
@@ -42,11 +43,6 @@ namespace UAlbion.Formats.MapEvents
             SetTicker = 0x1C
         }
 
-        public ModifyType SubType { get; }
-
-        protected ModifyEvent(int id, EventType type, ModifyType subType) : base(id, type)
-        {
-            SubType = subType;
-        }
+        public ModifyType SubType { get; protected set; }
     }
 }

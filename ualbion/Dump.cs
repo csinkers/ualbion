@@ -133,17 +133,17 @@ namespace UAlbion
             }
         }
 
-        static void PrintChain(EventFormatter formatter, MapEvent e, int indent)
+        static void PrintChain(EventFormatter formatter, IEventNode e, int indent)
         {
             do
             {
                 Console.Write($"{e.Id:000}");
                 Console.Write("".PadRight(indent * 4));
-                if(e is QueryEvent query)
+                if(e is IBranchNode branch)
                 {
                     Console.WriteLine($"if (!{formatter.GetText(e)}) {{");
-                    if (query.FalseEvent != null)
-                        PrintChain(formatter, query.FalseEvent, indent + 1);
+                    if (branch.NextEventWhenFalse != null)
+                        PrintChain(formatter, branch.NextEventWhenFalse, indent + 1);
                     Console.WriteLine("}".PadLeft(4 + indent * 4));
                     Console.WriteLine("else...".PadLeft(10 + indent * 4));
                 }
@@ -192,9 +192,9 @@ namespace UAlbion
             _mapContext = mapContext;
         }
 
-        public string GetText(MapEvent e)
+        public string GetText(IEventNode e)
         {
-            if(e is TextEvent textEvent) // Same as npc text event?
+            if(e.Event is TextEvent textEvent) // Same as npc text event?
             {
                 var text = _assets.LoadString(
                     new StringId(AssetType.MapText, (int)_mapContext, textEvent.TextId), 
@@ -202,8 +202,7 @@ namespace UAlbion
 
                 return $"text Portrait:{textEvent.PortraitId} \"{text}\"";
             }
-            else return e.ToString();
+            else return e.Event?.ToString();
         }
-
     }
 }

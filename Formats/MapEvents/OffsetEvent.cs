@@ -1,27 +1,31 @@
 ﻿using System.IO;
+using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class OffsetEvent : MapEvent
+    public class OffsetEvent : IEvent
     {
-        public OffsetEvent(BinaryReader br, int id, EventType type) : base(id, type)
+        public static EventNode Load(BinaryReader br, int id, MapEventType type)
         {
-            X = br.ReadSByte(); // +1
-            Y = br.ReadSByte(); // +2
-            Unk3 = br.ReadByte(); // +3
-            Unk4 = br.ReadByte(); // +4
-            Unk5 = br.ReadByte(); // +5
-            Unk6 = br.ReadUInt16(); // +6
-            Unk8 = br.ReadUInt16(); // +8
+            return new EventNode(id, new OffsetEvent
+            {
+                X = br.ReadSByte(), // +1
+                Y = br.ReadSByte(), // +2
+                Unk3 = br.ReadByte(), // +3
+                Unk4 = br.ReadByte(), // +4
+                Unk5 = br.ReadByte(), // +5
+                Unk6 = br.ReadUInt16(), // +6
+                Unk8 = br.ReadUInt16(), // +8
+            });
         }
 
-        public sbyte X { get; }
-        public sbyte Y { get; }
-        public byte Unk3 { get; }
-        public byte Unk4 { get; }
-        public byte Unk5 { get; }
-        public ushort Unk6 { get; }
-        public ushort Unk8 { get; }
+        public sbyte X { get; private set; }
+        public sbyte Y { get; private set; }
+        public byte Unk3 { get; private set; }
+        public byte Unk4 { get; private set; }
+        public byte Unk5 { get; private set; }
+        public ushort Unk6 { get; private set; }
+        public ushort Unk8 { get; private set; }
         public override string ToString() => $"offset <{X}, {Y}> ({Unk3} {Unk4} {Unk5} {Unk6} {Unk8})";
     }
 }

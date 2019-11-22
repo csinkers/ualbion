@@ -1,22 +1,27 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class DataChangeEvent : MapEvent
+    public class DataChangeEvent : IEvent
     {
-        public DataChangeEvent(BinaryReader br, int id, EventType type) : base(id, type)
+        public static EventNode Load(BinaryReader br, int id, MapEventType type)
         {
-            Property = (ChangeProperty)br.ReadByte(); // 1
-            Mode = (QuantityChangeOperation) br.ReadByte(); // 2
-            Unk3 = br.ReadByte(); // 3
-            Unk4 = br.ReadByte(); // 4
-            Debug.Assert(Unk4 == 0 || Unk4 == 3); // Always 0 for 2D?
-            PartyMemberId = (PartyCharacterId)br.ReadByte(); // 5
-            Value = br.ReadUInt16(); // 8
-            Amount = br.ReadUInt16(); // 8
+            var e = new DataChangeEvent
+            {
+                Property = (ChangeProperty) br.ReadByte(), // 1
+                Mode = (QuantityChangeOperation) br.ReadByte(), // 2
+                Unk3 = br.ReadByte(), // 3
+                Unk4 = br.ReadByte(), // 4
+                PartyMemberId = (PartyCharacterId) br.ReadByte(), // 5
+                Value = br.ReadUInt16(), // 8
+                Amount = br.ReadUInt16(), // 8
+            };
+            Debug.Assert(e.Unk4 == 0 || e.Unk4 == 3); // Always 0 for 2D?
+            return new EventNode(id, e);
         }
 
         public enum ChangeProperty : byte

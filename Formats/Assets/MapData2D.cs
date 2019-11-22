@@ -12,7 +12,7 @@ namespace UAlbion.Formats.Assets
         public int[] Underlay { get; set; }
         public int[] Overlay { get; set; }
         public IList<MapNpc> Npcs { get; } = new List<MapNpc>();
-        public IList<MapEvent> Events { get; } = new List<MapEvent>();
+        public IList<IEventNode> Events { get; } = new List<IEventNode>();
         public IList<MapEventZone> Zones { get; } = new List<MapEventZone>();
         public int[] ZoneLookup { get; private set; }
 
@@ -84,15 +84,15 @@ namespace UAlbion.Formats.Assets
 
             int eventCount = br.ReadUInt16();
             for (int i = 0; i < eventCount; i++)
-                map.Events.Add(MapEvent.Load(br, i));
+                map.Events.Add(EventNode.Load(br, i));
 
-            foreach (var mapEvent in map.Events)
+            foreach (var mapEvent in map.Events.OfType<EventNode>())
             {
                 if (mapEvent.NextEventId.HasValue)
                     mapEvent.NextEvent = map.Events[mapEvent.NextEventId.Value];
 
-                if (mapEvent is QueryEvent q && q.FalseEventId.HasValue)
-                    q.FalseEvent = map.Events[q.FalseEventId.Value];
+                if (mapEvent is BranchNode q && q.NextEventWhenFalseId.HasValue)
+                    q.NextEventWhenFalse = map.Events[q.NextEventWhenFalseId.Value];
             }
 
             foreach(var zone in map.Zones)

@@ -10,11 +10,15 @@ namespace UAlbion.Game.State.Player
         readonly PlayerInventoryManager _inventoryManager;
         readonly CharacterSheet _base;
 
-        public Player(PartyCharacterId id, CharacterSheet sheet, InventoryScreenState inventoryScreenState)
+        static readonly HandlerSet Handlers = new HandlerSet(
+        );
+
+        public Player(PartyCharacterId id, CharacterSheet sheet, InventoryScreenState inventoryScreenState) : base(Handlers)
         {
             Id = id;
             _base = sheet;
             _inventoryManager = new PlayerInventoryManager(id, _base, inventoryScreenState);
+            // _sprite = new PlayerSprite()
             Children.Add(_inventoryManager);
         }
 

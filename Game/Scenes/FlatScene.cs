@@ -1,4 +1,5 @@
 ﻿using System;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
@@ -29,7 +30,12 @@ namespace UAlbion.Game.Scenes
             Raise(new SetCursorEvent(CoreSpriteId.Cursor));
             Raise(new SetInputModeEvent(InputMode.World2D));
             Raise(new SetMouseModeEvent(MouseMode.Normal));
+            Raise(new RefreshMapSubscribersEvent());
             base.Subscribed();
         }
+    }
+
+    public class RefreshMapSubscribersEvent : IEvent
+    {
     }
 }

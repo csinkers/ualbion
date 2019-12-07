@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
@@ -26,9 +28,11 @@ namespace UAlbion
 {
     static class Program
     {
+        public static EventExchange Global { get; private set; }
         static unsafe void Main()
         {
-            // GraphTests();
+            //GraphTests();
+            //return;
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
 
             /*
@@ -52,8 +56,8 @@ namespace UAlbion
 
             using var assets = new AssetManager();
             var logger = new ConsoleLogger();
-            var globalExchange = new EventExchange("Global", logger);
-            globalExchange
+            Global = new EventExchange("Global", logger);
+            Global
                 // Need to register settings first, as the AssetConfigLocator relies on it.
                 .Register<ISettings>(new Settings { BasePath = baseDir }) 
                 .Register<IAssetManager>(assets)
@@ -63,11 +67,11 @@ namespace UAlbion
             // Dump.CharacterSheets(assets);
             // Dump.Chests(assets);
             // Dump.ItemData(assets, baseDir);
-            Dump.MapEvents(assets, baseDir, MapDataId.Toronto2DGesamtkarteSpielbeginn);
+            // Dump.MapEvents(assets, baseDir, MapDataId.Toronto2DGesamtkarteSpielbeginn);
 
             //return;
 
-            RunGame(globalExchange, baseDir);
+            RunGame(Global, baseDir);
         }
 
         static void RunGame(EventExchange global, string baseDir)
@@ -84,7 +88,7 @@ namespace UAlbion
 
             using var engine = new Engine(backend,
 #if DEBUG
-                true
+                false//true
 #else
                  false
 #endif
@@ -106,6 +110,7 @@ namespace UAlbion
                     .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
                 )
                 .Register<ILayoutManager>(new LayoutManager())
+                .Register<IMapManager>(new MapManager())
                 .Register<IPaletteManager>(new PaletteManager())
                 .Register<ISceneManager>(new SceneManager()
                     .AddScene(new AutomapScene())
@@ -124,7 +129,6 @@ namespace UAlbion
                 .Attach(new GameClock())
                 .Attach(new InputBinder(InputConfig.Load(baseDir)))
                 .Attach(new InputModeStack())
-                .Attach(new MapManager())
                 .Attach(new MouseModeStack())
                 .Attach(new SceneStack())
                 .Attach(new StatusBar())
@@ -154,104 +158,305 @@ namespace UAlbion
             global.Raise(new SetSceneEvent(SceneId.Inventory), null);
             //*/
 
-            //global.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
+            // global.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
+            ReflectionHelper.ClearTypeCache();
             engine.Run();
         }
 
-        /*
-        interface IStatement { }
-
-        class Statement : IStatement
+        static string FormatChain(IEventNode node)
         {
-            public Statement(IEventNode node) { Node = node; }
-            public IEventNode Node { get; }
-            public string Name => Node.ToString();
-        }
-
-        class Block : IStatement
-        {
-            public IList<IStatement> Nodes { get; } = new List<IStatement>();
-        }
-
-        class If : IStatement
-        {
-            public If(string condition, IStatement @true, IStatement @false)
-            {
-                Condition = condition;
-                True = @true;
-                False = @false;
-            }
-
-            public string Condition { get; }
-            public IStatement True { get; }
-            public IStatement False { get; }
-        }
-
-        static string FormatBlock(Block b)
-        {
+            var graph = new ControlFlowGraph(node);
             var sb = new StringBuilder();
-            FormatChain(sb, b, 0);
+            FormatBlock(sb, graph.Start, 0);
+            sb.AppendLine();
             return sb.ToString();
         }
 
-        static void FormatChain(StringBuilder sb, Block b, int level)
+        class Block
         {
-            void Indent() { if (level > 0) sb.Append("".PadLeft(4 * level)); }
-            foreach(var node in b.Nodes)
+            public override string ToString() => "{ " + string.Join("; ", Nodes) + " } ";
+            public IList<IEventNode> Nodes { get; } = new List<IEventNode>();
+            public IList<Block> Targets { get; } = new List<Block>();
+            public IList<Block> Sources { get; } = new List<Block>();
+            public void Add(IEventNode node) { Nodes.Add(node); }
+        }
+
+        class ControlFlowGraph
+        {
+            public ControlFlowGraph(IEventNode node)
+            {
+                var entryNode = new EventNode(-1, null) { NextEvent = node };
+                var terminalNode = new EventNode(-2, null);
+                //var leaders = new HashSet<IEventNode> { entryNode, node, terminalNode }; // Entry and exit nodes are always leaders
+                //FindLeaders(entryNode, leaders, terminalNode);
+                BuildBlocks(entryNode, terminalNode);//, leaders);
+                LinkBlocks();
+                Start = Blocks[entryNode];
+                if (!Blocks.ContainsKey(terminalNode))
+                    throw new InvalidOperationException("Invalid procedure: never exits");
+                End = Blocks[terminalNode];
+                CombineBlocks();
+            }
+
+            void CombineBlocks()
+            {
+                foreach(var node in Blocks.Keys.ToList())
+                {
+                    var block = Blocks[node];
+                    if (block.Targets.Count == 1 && block.Targets[0].Sources.Count == 1)
+                    {
+                        var oldTarget = block.Targets[0];
+                        if (block == Start || oldTarget == End)
+                            continue;
+
+                        block.Targets.Clear();
+                        foreach (var target in oldTarget.Targets)
+                        {
+                            block.Targets.Add(target);
+                            target.Sources.Remove(oldTarget);
+                            target.Sources.Add(block);
+                        }
+
+                        foreach (var nodeInBlock in oldTarget.Nodes)
+                        {
+                            block.Nodes.Add(nodeInBlock);
+                            Blocks[nodeInBlock] = block;
+                        }
+                    }
+                }
+            }
+
+/*
+            void FindLeaders(IEventNode node, ISet<IEventNode> leaders, IEventNode terminus)
+            {
+                if (node is IBranchNode branch)
+                {
+                    leaders.Add(node);
+                    leaders.Add(branch.NextEvent);
+                    leaders.Add(branch.NextEventWhenFalse);
+                    if (branch.NextEventWhenFalse != null)
+                        FindLeaders(branch.NextEventWhenFalse, leaders, terminus);
+                    else
+                        branch.NextEventWhenFalse = terminus;
+                }
+
+                if (node.NextEvent != null)
+                    FindLeaders(node.NextEvent, leaders, terminus);
+                else
+                    node.NextEvent = terminus;
+            }
+*/
+            void BuildBlocks(IEventNode node, IEventNode terminus)//, HashSet<IEventNode> leaders)
+            {
+                while (node != null)
+                {
+                    if (Blocks.ContainsKey(node))
+                        return;
+
+                    var block = new Block();
+                    block.Add(node);
+                    Blocks[node] = block;
+
+                    if (node is IBranchNode branch)
+                    {
+                        if (branch.NextEventWhenFalse == null)
+                            branch.NextEventWhenFalse = terminus;
+                        BuildBlocks(branch.NextEventWhenFalse, terminus);
+                    }
+
+                    if (node.NextEvent == null && node != terminus)
+                        node.NextEvent = terminus;
+
+                    node = node.NextEvent;
+                }
+                /*
+                while (node != null)
+                {
+                    if (Blocks.ContainsKey(node))
+                        return;
+
+                    var block = new Block();
+                    while (node != null )
+                    {
+                        block.Add(node);
+                        Blocks[node] = block;
+
+                        if (node is IBranchNode branch)
+                            BuildBlocks(branch.NextEventWhenFalse, leaders);
+
+                        node = node.NextEvent;
+                        if (leaders.Contains(node))
+                            break;
+                    }
+                }
+                */
+            }
+
+            void LinkBlocks()
+            {
+                foreach(var node in Blocks.Keys)
+                {
+                    if (node.NextEvent == null) // Terminus doesn't link to anything, skip.
+                        continue;
+
+                    var block = Blocks[node];
+                    var nextBlock = Blocks[node.NextEvent];
+                    if (nextBlock != block)
+                    {
+                        block.Targets.Add(nextBlock);
+                        nextBlock.Sources.Add(block);
+                    }
+
+                    if (node is IBranchNode branch)
+                    {
+                        var falseBlock = Blocks[branch.NextEventWhenFalse];
+                        block.Targets.Add(falseBlock);
+                        falseBlock.Sources.Add(block);
+                    }
+                }
+            }
+
+            public IDictionary<IEventNode, Block> Blocks { get; } = new Dictionary<IEventNode, Block>();
+            public Block Start { get; }
+            public Block End { get; }
+        }
+
+        static void FormatBlock(StringBuilder sb, Block block, int level)
+        {
+            void Indent() => sb.Append("".PadLeft(level * 2));
+            foreach (var node in block.Nodes)
             {
                 Indent();
-                if (node is BranchNode b)
+                sb.AppendLine(node.Event?.ToString());
+            }
+
+            foreach (var child in block.Targets)
+                FormatBlock(sb, child, level + 1);
+
+            // a -> b -> c
+            // Block(a,b,c)
+
+            // if(a) b; else c;
+            // If(a, Block(b), Block(c))
+
+            // if(a) b; c;
+            // Block(If(a, Block(b)), c);
+
+            // if(a) b; else { c; d; }
+            // Block(If(a, Block(b), Block(c, d)));
+        }
+
+        class DummyEvent : IEvent
+        {
+            public DummyEvent(string name) { Name = name; }
+            public string Name { get; }
+            public override string ToString() => Name;
+        }
+
+        public class Chain
+        {
+            readonly IList<IEventNode> _nodes = new List<IEventNode>();
+
+            public Chain Do(string name, ushort? next)
+            {
+                _nodes.Add(new EventNode(_nodes.Count, new DummyEvent(name)) { NextEventId = next });
+                return this;
+            }
+
+            public Chain If(string name, ushort? ifTrue, ushort? ifFalse)
+            {
+                _nodes.Add(new BranchNode(_nodes.Count, new DummyEvent(name), ifFalse) { NextEventId = ifTrue });
+                return this;
+            }
+
+            public IEventNode Build()
+            {
+                foreach(var node in _nodes)
                 {
-                    sb.AppendLine($"if({e.Name}) {{");
-                    FormatChain(sb, b.Next, level + 1);
+                    switch (node)
+                    {
+                        case BranchNode bn:
+                            if (bn.NextEventId.HasValue)
+                                bn.NextEvent = _nodes[bn.NextEventId.Value];
+                            if (bn.NextEventWhenFalseId.HasValue)
+                                bn.NextEventWhenFalse = _nodes[bn.NextEventWhenFalseId.Value];
+                            break;
 
-                    Indent();
-                    sb.AppendLine("} else {");
-
-                    FormatChain(sb, b.Next, level + 1);
-                    Indent();
-                    sb.AppendLine("}");
-
+                        case EventNode en:
+                            if (en.NextEventId.HasValue)
+                                en.NextEvent = _nodes[en.NextEventId.Value];
+                            break;
+                    }
                 }
-                else
-                {
-                    
-                }
+
+                return _nodes[0];
             }
         }
 
         static void GraphTests()
         {
-            var sequence = new Node("A", new Node("B", null));
-            Console.WriteLine(FormatChain(sequence));
+            // a
+            var singleStatement = new Chain().Do("A", null).Build();
+            Console.WriteLine(FormatChain(singleStatement));
+
             // a; b;
-            var noFalse = new Branch("A", new Node("B", null), null);
-            Console.WriteLine(FormatChain(noFalse));
+            var sequence = new Chain()
+                .Do("A", 1)
+                .Do("B", null).Build();
+            Console.WriteLine(FormatChain(sequence));
+
             // if(a) { b; }
-            var noTrue = new Branch("A", null, new Node("B", null));
-            Console.WriteLine(FormatChain(noTrue));
+            var noFalse = new Chain()
+                .If("A", 1, null)
+                .Do("B", null).Build();
+            Console.WriteLine(FormatChain(noFalse));
+
             // if(!a) { b; }
-            var d = new Node("D", null);
-            var diamond = new Branch("A", new Node("B", d), new Node("C", d));
-            Console.WriteLine(FormatChain(diamond));
+            var noTrue = new Chain()
+                .If("A", null, 1)
+                .Do("B", null).Build();
+            Console.WriteLine(FormatChain(noTrue));
+
+            // if(a) b; else c;
+            var ifElse = new Chain()
+                .If("A", 1, 2)
+                .Do("B", null)
+                .Do("C", null).Build();
+            Console.WriteLine(FormatChain(ifElse));
+
             // if(a) { b } else { c } d;
+            var diamond = new Chain()
+                .If("A", 1, 2)
+                .Do("B", 3)
+                .Do("C", 3)
+                .Do("D", null).Build();
+            Console.WriteLine(FormatChain(diamond));
 
+            // if(a) { b; } c;
+            var aside = new Chain()
+                .If("A", 1, 2)
+                .Do("B", 2)
+                .Do("C", null).Build();
+            Console.WriteLine(FormatChain(aside));
 
-            /*
+            // if(a) { b; if(c) { d; return; } } e;
+            var foo = new Chain()
+                .If("A", 1, 4)
+                .Do("B", 2)
+                .If("C", 3, 4)
+                .Do("D", null)
+                .Do("E", null)
+                .Build();
+            Console.WriteLine(FormatChain(foo));
 
-            if(a)
-            {
-                b;
-                if(c)
-                {
-                    d;
-                    return;
-                }
-            }
-            e;
+            // for(;;) A
+            var infLoop = new Chain()
+                .If("A", 1, null)
+                .Do("B", 0)
+                .Build();
+            Console.WriteLine(FormatChain(infLoop));
 
-            null = return;
+            Console.ReadLine();
         }
-         */
     }
 }

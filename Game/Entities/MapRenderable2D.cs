@@ -112,9 +112,10 @@ namespace UAlbion.Game.Entities
 
             instance.Flags =
                 (_tileset is EightBitTexture ? SpriteFlags.UsePalette : 0)
-                | (HighlightIndex == index ? SpriteFlags.Highlight : 0)
+                // | (HighlightIndex == index ? SpriteFlags.Highlight : 0)
                 //| (eventNum != -1 && _highLightEvent != eventNum ? SpriteFlags.Highlight : 0)
-                | (_highLightEvent == eventNum ? SpriteFlags.GreenTint : 0)
+                // | (_highLightEvent == eventNum ? SpriteFlags.GreenTint : 0)
+                // | (tile.Collision != TilesetData.Passability.Passable ? SpriteFlags.RedTint : 0)
                 //| ((tile.Flags & TilesetData.TileFlags.TextId) != 0 ? SpriteFlags.RedTint : 0)
                 //| (((int) tile.Type) == 8 ? SpriteFlags.GreenTint : 0)
                 //| (((int) tile.Type) == 12 ? SpriteFlags.BlueTint : 0)

@@ -17,15 +17,15 @@
     "Shift+BracketLeft": "toggle_underlay",
     "Shift+BracketRight": "toggle_overlay",
 
-    "W": "+camera_move  0 -2",
-    "A": "+camera_move -2  0",
-    "S": "+camera_move  0  2",
-    "D": "+camera_move  2  0",
+    "W": "+camera_move  0 -4",
+    "A": "+camera_move -4  0",
+    "S": "+camera_move  0  4",
+    "D": "+camera_move  4  0",
 
-    "Shift+W": "+camera_move  0 -4",
-    "Shift+A": "+camera_move -4  0",
-    "Shift+S": "+camera_move  0  4",
-    "Shift+D": "+camera_move  4  0",
+    "Shift+W": "+camera_move  0 -8",
+    "Shift+A": "+camera_move -8  0",
+    "Shift+S": "+camera_move  0  8",
+    "Shift+D": "+camera_move  8  0",
     "Alt+1": "set_language English",
     "Alt+2": "set_language German",
 
@@ -54,21 +54,31 @@
     "Tilde": "pop_input_mode"
   },
   "World2D": {
-    "W": "+camera_move  0 -4",
-    "A": "+camera_move -4  0",
-    "S": "+camera_move  0  4",
-    "D": "+camera_move  4  0",
+    "W": "+camera_move  0 -8",
+    "A": "+camera_move -8  0",
+    "S": "+camera_move  0  8",
+    "D": "+camera_move  8  0",
 
-    "Shift+W": "+camera_move  0 -8",
-    "Shift+A": "+camera_move -8  0",
-    "Shift+S": "+camera_move  0  8",
-    "Shift+D": "+camera_move  8  0",
+    "Shift+W": "+camera_move  0 -16",
+    "Shift+A": "+camera_move -16  0",
+    "Shift+S": "+camera_move  0  16",
+    "Shift+D": "+camera_move  16  0",
 
+    "Up": "+camera_move  0 -16",
+    "Left": "+camera_move -16  0",
+    "Down": "+camera_move  0  16",
+    "Right": "+camera_move  16  0",
+
+    "Shift+Up": "+camera_move  0 -32",
+    "Shift+Left": "+camera_move -32  0",
+    "Shift+Down": "+camera_move  0  32",
+    "Shift+Right": "+camera_move  32  0",
+/*
     "Up": "+party_move  0 -1",
     "Down": "+party_move  0  1",
     "Left": "+party_move -1  0",
     "Right": "+party_move  1  0",
-
+*/
     "Tab": "push_scene inventory",
 
     "Control+Number1": "set_active_member 0",

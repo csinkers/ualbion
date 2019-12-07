@@ -6,7 +6,6 @@ using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
-using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities
 {
@@ -18,9 +17,11 @@ namespace UAlbion.Game.Entities
         bool _useSmallSprites;
 
         public MapDataId MapId { get; }
+        public MapType MapType => _useSmallSprites ? MapType.Small : MapType.Large;
         public Vector2 LogicalSize => new Vector2(_mapData.Width, _mapData.Height);
         public Vector2 PhysicalSize => _renderable.SizePixels;
-        public Vector2 TileSize => _renderable.TileSize;
+        public Vector3 TileSize => new Vector3(_renderable.TileSize, 1.0f);
+        public float BaseCameraHeight => 1.0f;
         public Vector3 Position => Vector3.Zero;
         public Vector3 Normal => Vector3.UnitZ;
         static readonly HandlerSet Handlers = new HandlerSet(
@@ -99,15 +100,14 @@ namespace UAlbion.Game.Entities
                 {
                     IComponent sprite =
                         _useSmallSprites
-                            ? new SmallNpcSprite((SmallNpcId) npc.ObjectNumber, npc.Waypoints) as IComponent
-                            : new LargeNpcSprite((LargeNpcId) npc.ObjectNumber, npc.Waypoints, assets);
+                            ? new SmallNpcSprite((SmallNpcId)npc.ObjectNumber, npc.Waypoints) as IComponent
+                            : new LargeNpcSprite((LargeNpcId)npc.ObjectNumber, npc.Waypoints);
 
                     Exchange.Attach(sprite);
                 }
             }
 
             Raise(new SetClearColourEvent(0,0,0));
-            Raise(new SetTileSizeEvent(new Vector3(TileSize, 0.0f), 1.0f));
         }
     }
 }

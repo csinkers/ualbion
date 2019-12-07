@@ -94,7 +94,12 @@ namespace UAlbion.Game.Entities
                 list.Clear();
 
             var scene = Resolve<ISceneManager>().ActiveScene;
-            var cameraTilePosition = scene.Camera.Position / state.TileSize;
+            var cameraTilePosition = scene.Camera.Position;
+
+            var map = Resolve<IMapManager>().Current;
+            if (map != null)
+                cameraTilePosition /= map.TileSize;
+
             int cameraTileX = (int)cameraTilePosition.X;
             int cameraTileY = (int)cameraTilePosition.Y;
 

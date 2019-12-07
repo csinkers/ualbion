@@ -9,21 +9,21 @@ namespace UAlbion.Formats.Assets
 {
     public class MapData2D
     {
-        public int[] Underlay { get; set; }
-        public int[] Overlay { get; set; }
+        public byte Unk0 { get; private set; } // Wait/Rest, Light-Environment, NPC converge range
+        public byte Sound { get; private set; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+        public int TilesetId { get; private set; }
+        public int CombatBackgroundId { get; private set; }
+        public int PaletteId { get; private set; }
+        public byte FrameRate { get; private set; }
+
+        public int[] Underlay { get; private set; }
+        public int[] Overlay { get; private set; }
         public IList<MapNpc> Npcs { get; } = new List<MapNpc>();
         public IList<IEventNode> Events { get; } = new List<IEventNode>();
         public IList<MapEventZone> Zones { get; } = new List<MapEventZone>();
         public int[] ZoneLookup { get; private set; }
-
-        public byte Unk0 { get; set; } // Wait/Rest, Light-Environment, NPC converge range
-        public byte Sound { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public int TilesetId { get; set; }
-        public int CombatBackgroundId { get; set; }
-        public int PaletteId { get; set; }
-        public byte FrameRate { get; set; }
 
         public static MapData2D Load(BinaryReader br, long streamLength, string name)
         {
@@ -96,7 +96,8 @@ namespace UAlbion.Formats.Assets
             }
 
             foreach(var zone in map.Zones)
-                zone.Event = map.Events[zone.EventNumber];
+                if (zone.EventNumber != 65535)
+                    zone.Event = map.Events[zone.EventNumber];
 
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 

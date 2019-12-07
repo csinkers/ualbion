@@ -9,22 +9,22 @@ namespace UAlbion.Formats.Assets
 {
     public class MapData3D
     {
-        public byte CeilingFlags { get; set; }
-        public byte Width { get; set; }
-        public byte Height { get; set; }
-        public SongId SongId { get; set; }
-        public LabyrinthDataId LabDataId { get; set; }
-        public byte Unk7 { get; set; }
-        public PaletteId PaletteId { get; set; }
-        public int Sound { get; set; }
-        public int[] Contents { get; set; }
-        public int[] Floors { get; set; }
-        public int[] Ceilings { get; set; }
+        public byte CeilingFlags { get; private set; }
+        public byte Width { get; private set; }
+        public byte Height { get; private set; }
+        public SongId SongId { get; private set; }
+        public LabyrinthDataId LabDataId { get; private set; }
+        public byte Unk7 { get; private set; }
+        public PaletteId PaletteId { get; private set; }
+        public int Sound { get; private set; }
+        public int[] Contents { get; private set; }
+        public int[] Floors { get; private set; }
+        public int[] Ceilings { get; private set; }
         public IList<MapNpc> Npcs { get; } = new List<MapNpc>();
         public IList<MapEventZone> Zones { get; } = new List<MapEventZone>();
         public IList<IEventNode> Events { get; } = new List<IEventNode>();
         public IList<AutomapInfo> Automap { get; } = new List<AutomapInfo>();
-        public byte[] AutomapGraphics { get; set; }
+        public byte[] AutomapGraphics { get; private set; }
         public IList<ushort> ActiveMapEvents { get; } = new List<ushort>();
 
         public static MapData3D Load(BinaryReader br, long streamLength, string name)
@@ -121,19 +121,21 @@ namespace UAlbion.Formats.Assets
 
         public class AutomapInfo
         {
-            public byte X;
-            public byte Y;
-            public byte Unk2;
-            public byte Unk3;
-            public string Name; // Map length = 15
+            public byte X { get; private set; }
+            public byte Y { get; private set; }
+            public byte Unk2 { get; private set; }
+            public byte Unk3 { get; private set; }
+            public string Name { get; private set; } // Map length = 15
 
             public static AutomapInfo Load(BinaryReader br)
             {
-                var i = new AutomapInfo();
-                i.X = br.ReadByte();
-                i.Y = br.ReadByte();
-                i.Unk2 = br.ReadByte();
-                i.Unk3 = br.ReadByte();
+                var i = new AutomapInfo
+                {
+                    X = br.ReadByte(),
+                    Y = br.ReadByte(),
+                    Unk2 = br.ReadByte(),
+                    Unk3 = br.ReadByte()
+                };
                 var nameBytes = br.ReadBytes(15);
 
                 bool done = false; // Verify that strings contain no embedded nulls.

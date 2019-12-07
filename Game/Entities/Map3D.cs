@@ -34,8 +34,10 @@ namespace UAlbion.Game.Entities
 
         public override string ToString() => $"Map3D:{MapId} {LogicalSize.X}x{LogicalSize.Y} TileSize: {TileSize}";
         public MapDataId MapId { get; }
+        public MapType MapType => MapType.ThreeD;
         public Vector2 LogicalSize { get; private set; }
         public Vector3 TileSize { get; private set; }
+        public float BaseCameraHeight => _labyrinthData.CameraHeight != 0 ? _labyrinthData.CameraHeight * 8 : TileSize.Y / 2;
 
         void LoadMap()
         {
@@ -123,7 +125,6 @@ namespace UAlbion.Game.Entities
             if (_mapData == null)
                 LoadMap();
             Raise(new SetClearColourEvent(_backgroundRed, _backgroundGreen, _backgroundBlue));
-            Raise(new SetTileSizeEvent(TileSize, _labyrinthData.CameraHeight != 0 ? _labyrinthData.CameraHeight * 8 : TileSize.Y/2));
         }
 
         MapObjectSprite BuildSprite(int tileX, int tileY, LabyrinthData.SubObject subObject, float objectYScaling)
@@ -137,7 +138,11 @@ namespace UAlbion.Game.Entities
             // We should probably be offsetting the main tilemap by half a tile to centre the objects
             // rather than fiddling with the object positions... will need to reevaluate when working on
             // collision detection, path-finding etc.
-            var objectBias = new Vector3(-1.0f, 0, -1.0f); // / 2;
+            var objectBias =
+                (MapId == MapDataId.Jirinaar3D || MapId == MapDataId.AltesFormergebäude || MapId == MapDataId.FormergebäudeNachKampfGegenArgim)
+                    ? new Vector3(-1.0f, 0, -1.0f) / 2
+                    : new Vector3(-1.0f, 0, -1.0f); // / 2;
+
             var tilePosition = (new Vector3(tileX, 0, tileY) + objectBias) * TileSize;
             var offset = new Vector3(
                 subObject.X,

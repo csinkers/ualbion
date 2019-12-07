@@ -44,7 +44,12 @@ namespace UAlbion.Game
 
             var scene = Resolve<ISceneManager>().ActiveScene;
             Vector3 cameraPosition = scene.Camera.Position;
-            Vector3 cameraTilePosition = cameraPosition / state.TileSize;
+            Vector3 cameraTilePosition = cameraPosition;
+
+            var map = Resolve<IMapManager>().Current;
+            if (map != null)
+                cameraTilePosition /= map.TileSize;
+
             Vector3 cameraDirection = scene.Camera.LookDirection;
             float cameraMagnification = scene.Camera.Magnification;
 
@@ -56,7 +61,7 @@ namespace UAlbion.Game
             uiPos.X = (int) uiPos.X; uiPos.Y = (int) uiPos.Y;
             ImGui.Text($"Cursor Pix: {_mousePosition} UI: {uiPos} Norm: {normPos} Scale: {window.GuiScale} PixSize: {window.Size}");
             ImGui.Text($"Camera World: {cameraPosition} Tile: {cameraTilePosition} Dir: {cameraDirection} Mag: {cameraMagnification}");
-            ImGui.Text($"TileSize: {state.TileSize}");
+            ImGui.Text($"TileSize: {map?.TileSize}");
 
             int hitId = 0;
             foreach (var hit in _hits)
@@ -64,8 +69,9 @@ namespace UAlbion.Game
                 if (ImGui.TreeNode($"{hitId} {hit.Target}"))
                 {
                     var reflected = Reflector.Reflect(null, hit.Target);
-                    foreach (var child in reflected.SubObjects)
-                        RenderNode(child);
+                    if (reflected.SubObjects != null)
+                        foreach (var child in reflected.SubObjects)
+                            RenderNode(child);
                     ImGui.TreePop();
                 }
 

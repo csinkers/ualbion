@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Entities
 {
-    public class LargeNpcSprite : LargeCharacterSprite<LargeNpcId>
+    public class LargePlayerSprite : LargeCharacterSprite<LargePartyGraphicsId>
     {
-        readonly MapNpc.Waypoint[] _waypoints;
         public override string ToString() => $"LNpcSprite {Id} {Animation}";
 
-        public LargeNpcSprite(LargeNpcId id, MapNpc.Waypoint[] waypoints) : base(id, new Vector2(waypoints[0].X, waypoints[0].Y))
+        public LargePlayerSprite(LargePartyGraphicsId id) : base(id, Vector2.Zero)
         {
-            _waypoints = waypoints;
             Animation = (LargeSpriteAnimation)new Random().Next((int)LargeSpriteAnimation.UpperBody);
         }
     }

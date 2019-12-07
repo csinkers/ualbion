@@ -44,12 +44,12 @@ namespace UAlbion.Formats.MapEvents
     {
         int Id { get; }
         IEvent Event { get; }
-        IEventNode NextEvent { get; }
+        IEventNode NextEvent { get; set; }
     }
 
     public interface IBranchNode : IEventNode
     {
-        IEventNode NextEventWhenFalse { get; }
+        IEventNode NextEventWhenFalse { get; set; }
     }
 
     public class BranchNode : EventNode, IBranchNode
@@ -58,15 +58,17 @@ namespace UAlbion.Formats.MapEvents
         {
             NextEventWhenFalseId = falseEventId;
         }
+        public override string ToString() => $"{Id}: if ({Event}) {{";
         public IEventNode NextEventWhenFalse { get; set; }
         public ushort? NextEventWhenFalseId { get; private set; }
     }
 
     public class EventNode : IEventNode
     {
+        public override string ToString() => $"{Id}:{Event}";
         public int Id { get; private set; }
         public IEvent Event { get; private set; }
-        public ushort? NextEventId { get; private set; }
+        public ushort? NextEventId { get; set; }
         public IEventNode NextEvent { get; set; }
 
         public EventNode(int id, IEvent @event)

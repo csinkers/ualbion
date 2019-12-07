@@ -14,11 +14,9 @@ namespace UAlbion.Game.State
 
         public IGameState State => _state;
         public int FrameCount { get; private set; }
-        public Vector3 TileSize { get; private set; } = Vector3.One;
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<StateManager, UpdateEvent>((x, e) => { x.FrameCount += e.Frames; }),
-            H<StateManager, SetTileSizeEvent>((x, e) => { x.TileSize = e.TileSize; }),
             H<StateManager, SetActiveMemberEvent>((x, e) => { x._party.Leader = e.MemberId; x.Raise(e); }),
             H<StateManager, NewGameEvent>((x,e) => x.NewGame())
         );

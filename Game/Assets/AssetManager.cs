@@ -79,6 +79,33 @@ namespace UAlbion.Game.Assets
                 _ => (ITexture)_assetLocator.LoadAssetCached(type, id)
             };
 
+        public ITexture LoadTexture<T>(T id)
+        {
+            if (id is AutoMapId autoMapId) return LoadTexture(autoMapId);
+            if (id is CombatBackgroundId combatBackgroundId)     return LoadTexture(combatBackgroundId);
+            if (id is CombatGraphicsId combatGraphicsId)         return LoadTexture(combatGraphicsId);
+            if (id is CoreSpriteId coreSpriteId)                 return LoadTexture(coreSpriteId);
+            if (id is DungeonBackgroundId dungeonBackgroundId)   return LoadTexture(dungeonBackgroundId);
+            if (id is DungeonFloorId dungeonFloorId)             return LoadTexture(dungeonFloorId);
+            if (id is DungeonObjectId dungeonObjectId)           return LoadTexture(dungeonObjectId);
+            if (id is DungeonOverlayId dungeonOverlayeId)        return LoadTexture(dungeonOverlayeId);
+            if (id is DungeonWallId dungeonWallId)               return LoadTexture(dungeonWallId);
+            if (id is FontId fontId)                             return LoadTexture(fontId);
+            if (id is FullBodyPictureId fullBodyPictureId)       return LoadTexture(fullBodyPictureId);
+            if (id is IconGraphicsId iconGraphicsId)             return LoadTexture(iconGraphicsId);
+            if (id is ItemSpriteId itemSpriteId)                 return LoadTexture(itemSpriteId);
+            if (id is LargeNpcId largeNpcId)                     return LoadTexture(largeNpcId);
+            if (id is LargePartyGraphicsId largePartyGraphicsId) return LoadTexture(largePartyGraphicsId);
+            if (id is MetaFontId metaFontId)                     return LoadTexture(metaFontId);
+            if (id is MonsterGraphicsId monsterGraphicsId)       return LoadTexture(monsterGraphicsId);
+            if (id is PictureId pictureId)                       return LoadTexture(pictureId);
+            if (id is SmallNpcId smallNpcId)                     return LoadTexture(smallNpcId);
+            if (id is SmallPartyGraphicsId smallPartyGraphicsId) return LoadTexture(smallPartyGraphicsId);
+            if (id is SmallPortraitId smallPortraitId)           return LoadTexture(smallPortraitId);
+            if (id is TacticId tacticId)                         return LoadTexture(tacticId);
+            throw new NotImplementedException();
+        }
+
         public ITexture LoadTexture(AutoMapId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.AutomapGraphics, id);
         public ITexture LoadTexture(CombatBackgroundId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.CombatBackground, id);
         public ITexture LoadTexture(CombatGraphicsId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.CombatGraphics, id);

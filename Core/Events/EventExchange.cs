@@ -14,6 +14,8 @@ namespace UAlbion.Core.Events
         static readonly object SyncRoot = new object();
         readonly IDictionary<Type, IList<IComponent>> _subscriptions = new Dictionary<Type, IList<IComponent>>();
         readonly IDictionary<IComponent, IList<Type>> _subscribers = new Dictionary<IComponent, IList<Type>>();
+        readonly ISet<IComponent> _topLevelSubscribers = new HashSet<IComponent>();
+        readonly ThreadLocal<bool> _isTopLevel = new ThreadLocal<bool>(() => true);
         readonly IDictionary<Type, object> _registrations = new Dictionary<Type, object>();
         readonly EventExchange _parent;
         readonly IList<EventExchange> _children = new List<EventExchange>();
@@ -187,7 +189,15 @@ namespace UAlbion.Core.Events
             }
 
             if (newSubscriber)
+            {
+                var wasTopLevel = _isTopLevel.Value;
+                if (wasTopLevel)
+                    _topLevelSubscribers.Add(subscriber);
+
+                _isTopLevel.Value = false;
                 subscriber.Receive(_subscribedEvent, this);
+                _isTopLevel.Value = wasTopLevel;
+            }
         }
 
         public void Unsubscribe(IComponent subscriber)

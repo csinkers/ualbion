@@ -53,10 +53,10 @@ namespace UAlbion.Game.Gui.Inventory
             var member = state.State.GetPartyMember(_activeMember);
 
             // {INVE}{NAME} ({SEXC}), %u years old, {RACE}, {CLAS}, level %d.
-            var (formatBlocks, _) = new TextFormatter(assets, settings.Language)
+            var (formatBlocks, _) = new TextFormatter(assets, settings.Gameplay.Language)
                 .Inventory(member.Apparent)
                 .Format(
-                    assets.LoadString(SystemTextId.Inv1_NYearsOldRaceClassLevelN, settings.Language),
+                    assets.LoadString(SystemTextId.Inv1_NYearsOldRaceClassLevelN, settings.Gameplay.Language),
                     member.Apparent.Age, member.Apparent.Level);
 
             foreach (var block in formatBlocks)
@@ -69,8 +69,8 @@ namespace UAlbion.Game.Gui.Inventory
             var settings = Resolve<ISettings>();
             var state = Resolve<IStateManager>();
             var member = state.State.GetPartyMember(_activeMember);
-            var formatter = new TextFormatter(assets, settings.Language);
-            string S(SystemTextId id) => assets.LoadString(id, settings.Language);
+            var formatter = new TextFormatter(assets, settings.Gameplay.Language);
+            string S(SystemTextId id) => assets.LoadString(id, settings.Gameplay.Language);
 
             foreach (var block in formatter.Format(S(SystemTextId.Inv1_LifePoints)).Item1)
             {

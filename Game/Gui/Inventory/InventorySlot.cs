@@ -75,7 +75,7 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 var assets = Resolve<IAssetManager>();
                 var settings = Resolve<ISettings>();
-                var textFormatter = new TextFormatter(assets, settings.Language);
+                var textFormatter = new TextFormatter(assets, settings.Gameplay.Language);
                 return textFormatter.Format(template, arguments).Item1;
             });
 
@@ -96,14 +96,14 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 var item = assets.LoadItem(slotInfo.Id);
                 if (item != null)
-                    itemName = item.GetName(settings.Language);
+                    itemName = item.GetName(settings.Gameplay.Language);
             }
 
             string itemInHandName = null;
             if (hand is ItemSlot handSlot)
             {
                 var itemInHand = assets.LoadItem(handSlot.Id);
-                itemInHandName = itemInHand.GetName(settings.Language);
+                itemInHandName = itemInHand.GetName(settings.Gameplay.Language);
             }
 
             var action = member.GetInventoryAction(SlotId);

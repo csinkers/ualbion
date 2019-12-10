@@ -54,8 +54,8 @@ namespace UAlbion.Game.Gui.Inventory
             var player = Resolve<IStateManager>().State.GetPartyMember(_activeCharacter);
 
             var protection = player.Effective.Combat.Protection;
-            var template = assets.LoadString(SystemTextId.Inv_ProtectionN, settings.Language);
-            var (text, _) = new TextFormatter(assets, settings.Language).Format(
+            var template = assets.LoadString(SystemTextId.Inv_ProtectionN, settings.Gameplay.Language);
+            var (text, _) = new TextFormatter(assets, settings.Gameplay.Language).Format(
                 template, // Protection : %d
                 protection);
 

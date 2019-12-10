@@ -53,8 +53,8 @@ namespace UAlbion.Game.Gui.Inventory
             var player = Resolve<IStateManager>().State.GetPartyMember(_activeCharacter);
 
             var damage = player.Effective.Combat.Damage;
-            var template = assets.LoadString(SystemTextId.Inv_DamageN, settings.Language);
-            var (text, _) = new TextFormatter(assets, settings.Language).Format(
+            var template = assets.LoadString(SystemTextId.Inv_DamageN, settings.Gameplay.Language);
+            var (text, _) = new TextFormatter(assets, settings.Gameplay.Language).Format(
                 template, // Damage : %d
                 damage);
 

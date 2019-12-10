@@ -29,15 +29,15 @@ namespace UAlbion.Game.Gui
                 {
                     case DoneKey:
                         var settings = x.Resolve<ISettings>();
-                        if(x._musicVolume != settings.MusicVolume)
+                        if(x._musicVolume != settings.Audio.MusicVolume)
                             x.Raise(new SetMusicVolumeEvent(x._musicVolume));
-                        if(x._fxVolume != settings.FxVolume)
+                        if(x._fxVolume != settings.Audio.FxVolume)
                             x.Raise(new SetFxVolumeEvent(x._fxVolume));
-                        if(x._windowSize3d != settings.WindowSize3d)
+                        if(x._windowSize3d != settings.Graphics.WindowSize3d)
                             x.Raise(new SetWindowSize3dEvent(x._windowSize3d));
-                        if(x._combatDetailLevel != settings.CombatDetailLevel)
+                        if(x._combatDetailLevel != settings.Graphics.CombatDetailLevel)
                             x.Raise(new SetCombatDetailLevelEvent(x._combatDetailLevel));
-                        if(x._combatDelay != settings.CombatDelay)
+                        if(x._combatDelay != settings.Gameplay.CombatDelay)
                             x.Raise(new SetCombatDelayEvent(x._combatDelay));
 
                         x.Closed?.Invoke(x, EventArgs.Empty);
@@ -78,11 +78,11 @@ namespace UAlbion.Game.Gui
         protected override void Subscribed()
         {
             var settings = Resolve<ISettings>();
-            _musicVolume = settings.MusicVolume;
-            _fxVolume = settings.FxVolume;
-            _windowSize3d = settings.WindowSize3d;
-            _combatDetailLevel = settings.CombatDetailLevel;
-            _combatDelay = settings.CombatDelay;
+            _musicVolume = settings.Audio.MusicVolume;
+            _fxVolume = settings.Audio.FxVolume;
+            _windowSize3d = settings.Graphics.WindowSize3d;
+            _combatDetailLevel = settings.Graphics.CombatDetailLevel;
+            _combatDelay = settings.Gameplay.CombatDelay;
             base.Subscribed();
         }
     }

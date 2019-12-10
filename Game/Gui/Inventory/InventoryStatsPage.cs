@@ -17,10 +17,10 @@ namespace UAlbion.Game.Gui.Inventory
             var assets = Resolve<IAssetManager>();
             var state = Resolve<IStateManager>().State;
             var settings = Resolve<ISettings>();
-            var formatter = new TextFormatter(assets, settings.Language);
+            var formatter = new TextFormatter(assets, settings.Gameplay.Language);
             var member = state.GetPartyMember(_activeCharacter).Apparent;
 
-            var block = formatter.Format(assets.LoadString(id, settings.Language)).Item1.First();
+            var block = formatter.Format(assets.LoadString(id, settings.Gameplay.Language)).Item1.First();
             block.Text += $" {getValue(member)} / {getMax(member)}";
             yield return block;
         }

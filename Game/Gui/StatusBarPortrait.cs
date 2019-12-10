@@ -67,10 +67,10 @@ namespace UAlbion.Game.Gui
             var member = stateManager.State.GetPartyMember(memberId.Value);
             var settings = Resolve<ISettings>();
             var assets = Resolve<IAssetManager>();
-            var template = assets.LoadString(SystemTextId.PartyPortrait_XLifeMana, settings.Language);
-            var (text, _) = new TextFormatter(assets, settings.Language).Format(
+            var template = assets.LoadString(SystemTextId.PartyPortrait_XLifeMana, settings.Gameplay.Language);
+            var (text, _) = new TextFormatter(assets, settings.Gameplay.Language).Format(
                 template, // %s (LP:%d, SP:%d)
-                member.Apparent.GetName(settings.Language),
+                member.Apparent.GetName(settings.Gameplay.Language),
                 member.Apparent.Combat.LifePoints,
                 member.Apparent.Magic.SpellPoints);
 

@@ -33,8 +33,8 @@ namespace UAlbion.Game.Gui.Inventory
                 var player = Resolve<IStateManager>().State.GetPartyMember(_activeCharacter);
 
                 // Carried Weight : %ld of %ld g
-                var template = assets.LoadString(SystemTextId.Inv_CarriedWeightNdOfNdG, settings.Language);
-                var (text, _) = new TextFormatter(assets, settings.Language).Format(template, player.Apparent.TotalWeight, player.Apparent.MaxWeight);
+                var template = assets.LoadString(SystemTextId.Inv_CarriedWeightNdOfNdG, settings.Gameplay.Language);
+                var (text, _) = new TextFormatter(assets, settings.Gameplay.Language).Format(template, player.Apparent.TotalWeight, player.Apparent.MaxWeight);
                 return text;
             }, x => _version);
 
@@ -45,9 +45,9 @@ namespace UAlbion.Game.Gui.Inventory
                 var player = Resolve<IStateManager>().State.GetPartyMember(_activeCharacter);
 
                 int weight = player.Apparent.TotalWeight / 1000;
-                var template = assets.LoadString(SystemTextId.Inv_WeightNKg, settings.Language); // Weight : %d Kg
+                var template = assets.LoadString(SystemTextId.Inv_WeightNKg, settings.Gameplay.Language); // Weight : %d Kg
                 return new 
-                    TextFormatter(assets, settings.Language)
+                    TextFormatter(assets, settings.Gameplay.Language)
                     .NoWrap()
                     .Centre()
                     .Format(template, weight)

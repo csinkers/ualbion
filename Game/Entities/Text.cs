@@ -34,7 +34,7 @@ namespace UAlbion.Game.Entities
             {
                 var assets = Resolve<IAssetManager>();
                 var settings = Resolve<ISettings>();
-                var text =  assets.LoadString(id, settings.Language);
+                var text =  assets.LoadString(id, settings.Gameplay.Language);
                 _block.Text = text;
                 return new[] { _block };
             });

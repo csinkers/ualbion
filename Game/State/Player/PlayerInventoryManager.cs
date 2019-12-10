@@ -399,7 +399,7 @@ namespace UAlbion.Game.State.Player
         {
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
-            var text = assets.LoadString(textId, settings.Language);
+            var text = assets.LoadString(textId, settings.Gameplay.Language);
             Raise(new DescriptionTextEvent(text));
         }
     }

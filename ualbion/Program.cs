@@ -21,6 +21,7 @@ using UAlbion.Game.Gui;
 using UAlbion.Game.Gui.Inventory;
 using UAlbion.Game.Input;
 using UAlbion.Game.Scenes;
+using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 using Veldrid;
 
@@ -88,9 +89,9 @@ namespace UAlbion
 
             using var engine = new Engine(backend,
 #if DEBUG
-                false//true
+                true
 #else
-                 false
+                false
 #endif
                 )
                 .AddRenderer(new SpriteRenderer())

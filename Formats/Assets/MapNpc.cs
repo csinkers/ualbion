@@ -55,7 +55,7 @@ namespace UAlbion.Formats.Assets
             npc.EventNumber = br.ReadUInt16(); // +2
             if (npc.EventNumber == 0xffff) npc.EventNumber = null;
 
-            npc.ObjectNumber = (ushort)(br.ReadUInt16() - 1); // +4
+            npc.ObjectNumber = FormatUtil.Tweak(br.ReadUInt16()) ?? 0; // +4
             npc.Flags = (NpcFlags)br.ReadByte(); // +6 // Combine this & MovementType ?
             npc.Movement = (MovementType)br.ReadByte(); // +7
             npc.Unk8 = br.ReadByte(); // +8

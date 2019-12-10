@@ -96,6 +96,7 @@ namespace UAlbion.Game.Entities
                 _useSmallSprites = _tileData.UseSmallGraphics;
 
                 Exchange.Attach(_renderable);
+                Children.Add(_renderable);
                 foreach (var npc in _mapData.Npcs)
                 {
                     IComponent sprite =
@@ -104,6 +105,7 @@ namespace UAlbion.Game.Entities
                             : new LargeNpcSprite((LargeNpcId)npc.ObjectNumber, npc.Waypoints);
 
                     Exchange.Attach(sprite);
+                    Children.Add(sprite);
                 }
             }
 

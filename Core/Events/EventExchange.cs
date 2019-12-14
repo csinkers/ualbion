@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using UAlbion.Api;
 
 namespace UAlbion.Core.Events
@@ -23,8 +24,8 @@ namespace UAlbion.Core.Events
 #if DEBUG
         // ReSharper disable once CollectionNeverQueried.Local
         readonly IList<IEvent> _frameEvents = new List<IEvent>();
-        bool _isActive = true;
 #endif
+        bool _isActive = true;
         public static int Nesting => _nesting;
         public string Name { get; }
 
@@ -146,7 +147,9 @@ namespace UAlbion.Core.Events
                 CollectExchanges(exchanges);
             foreach (var exchange in exchanges)
             {
+#if DEBUG
                 if (e is BeginFrameEvent) exchange._frameEvents.Clear();
+#endif
                 exchange.Collect(subscribers, type, interfaces);
             }
 
@@ -163,7 +166,13 @@ namespace UAlbion.Core.Events
                 Interlocked.Decrement(ref _nesting);
         }
 
-        public EventExchange Attach(IComponent component) { component.Attach(this); return this; }
+        public EventExchange Attach(IComponent component)
+        {
+            PerfTracker.StartupEvent($"Attaching {component.GetType().Name}");
+            component.Attach(this);
+            PerfTracker.StartupEvent($"Attached {component.GetType().Name}");
+            return this;
+        }
         public void Subscribe<T>(IComponent subscriber) { Subscribe(typeof(T), subscriber); }
         public void Subscribe(Type eventType, IComponent subscriber)
         {
@@ -192,7 +201,8 @@ namespace UAlbion.Core.Events
             {
                 var wasTopLevel = _isTopLevel.Value;
                 if (wasTopLevel)
-                    _topLevelSubscribers.Add(subscriber);
+                    lock(SyncRoot)
+                        _topLevelSubscribers.Add(subscriber);
 
                 _isTopLevel.Value = false;
                 subscriber.Receive(_subscribedEvent, this);
@@ -229,16 +239,30 @@ namespace UAlbion.Core.Events
         public EventExchange Register<T>(T system) => Register(typeof(T), system);
         public EventExchange Register(Type type, object system)
         {
-            if (_registrations.ContainsKey(type))
+            bool doAttach;
+            lock (SyncRoot)
             {
-                if (_registrations[type] != system)
-                    throw new InvalidOperationException("Only one instance can be registered per type / interface in a given exchange.");
+                if (_registrations.ContainsKey(type))
+                {
+                    if (_registrations[type] != system)
+                        throw new InvalidOperationException(
+                            "Only one instance can be registered per type / interface in a given exchange.");
+                }
+                else _registrations.Add(type, system);
+
+
+                doAttach = system is IComponent component && !_subscribers.ContainsKey(component);
             }
-            else _registrations.Add(type, system);
 
-            if (system is IComponent component && !_subscribers.ContainsKey(component))
-                Attach(component);
+            if (doAttach)
+                Attach((IComponent)system);
 
+            return this;
+        }
+
+        public EventExchange RegisterAsync<T>(object system)
+        {
+            Task.Run(() => Register(typeof(T), system));
             return this;
         }
 

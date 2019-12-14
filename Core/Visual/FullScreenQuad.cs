@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core.Events;
 using Veldrid;
-using Veldrid.SPIRV;
 using Veldrid.Utilities;
 
 namespace UAlbion.Core.Visual
 {
     public class FullScreenQuad : Component, IRenderer, IRenderable
     {
+        const string VertexShaderName = "FullScreenQuadSV.vert";
+        const string FragmentShaderName = "FullScreenQuadSF.frag";
+
         static readonly HandlerSet Handlers = new HandlerSet(
             H<FullScreenQuad, RenderEvent>((x, e) => e.Add(x)));
 
@@ -27,33 +29,6 @@ namespace UAlbion.Core.Visual
         DeviceBuffer _ib;
         DeviceBuffer _vb;
 
-        const string VertexShader = @"
-#version 450
-layout(location = 0) in vec2 Position;
-layout(location = 1) in vec2 TexCoords;
-
-layout(location = 0) out vec2 fsin_0;
-
-void main()
-{
-    fsin_0 = TexCoords;
-    gl_Position = vec4(Position.x, Position.y, 0, 1);
-}";
-
-        const string FragmentShader = @"
-#version 450
-
-layout(set = 0, binding = 0) uniform texture2D SourceTexture;
-layout(set = 0, binding = 1) uniform sampler SourceSampler;
-
-layout(location = 0) in vec2 fsin_TexCoords;
-layout(location = 0) out vec4 OutputColor;
-
-void main()
-{
-    vec4 color = texture(sampler2D(SourceTexture, SourceSampler), fsin_TexCoords);
-    OutputColor = color;
-}";
 
         public FullScreenQuad() : base(Handlers) { }
 
@@ -66,8 +41,12 @@ void main()
                 ResourceLayoutHelper.Texture("vdspv_0_0"),
                 ResourceLayoutHelper.Sampler("SourceSampler")));
 
-            var shaderSet = new ShaderSetDescription(new[] { Vertex2DTextured.VertexLayout },
-                factory.CreateFromSpirv(ShaderHelper.Vertex(VertexShader), ShaderHelper.Fragment(FragmentShader)));
+            var shaderCache = Resolve<IShaderCache>();
+            var shaders = shaderCache.GetShaderPair(gd.ResourceFactory,
+                VertexShaderName,
+                FragmentShaderName,
+                shaderCache.GetGlsl(VertexShaderName),
+                shaderCache.GetGlsl(FragmentShaderName));
 
             var rasterizerState = new RasterizerStateDescription(
                 FaceCullMode.Back, PolygonFillMode.Solid, FrontFace.Clockwise, 
@@ -78,7 +57,7 @@ void main()
                 DepthStencilStateDescription.Disabled,
                 rasterizerState,
                 PrimitiveTopology.TriangleList,
-                new ShaderSetDescription(new[] { Vertex2DTextured.VertexLayout }, shaderSet.Shaders, ShaderHelper.GetSpecializations(gd)),
+                new ShaderSetDescription(new[] { Vertex2DTextured.VertexLayout }, shaders, ShaderHelper.GetSpecializations(gd)),
                 new[] { layout },
                 gd.SwapchainFramebuffer.OutputDescription);
             _pipeline = factory.CreateGraphicsPipeline(ref pd);

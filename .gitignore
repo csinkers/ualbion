@@ -20,4 +20,5 @@ SDL2.dll
 libveldrid-spirv.dll
 imgui.ini
 /data/Saves
+/data/ShaderCache
 /re/Screenshots

@@ -12,12 +12,10 @@ namespace UAlbion.Formats.Parsers
     {
         static string GetHash(string filename)
         {
-            using (var md5 = MD5.Create())
-            using (var stream = File.OpenRead(filename))
-            {
-                var hashBytes = md5.ComputeHash(stream);
-                return string.Join("", hashBytes.Select(x => x.ToString("x2")));
-            }
+            using var md5 = MD5.Create();
+            using var stream = File.OpenRead(filename);
+            var hashBytes = md5.ComputeHash(stream);
+            return string.Join("", hashBytes.Select(x => x.ToString("x2")));
         }
 
         static byte[] LoadSection(string filename, CoreSpriteConfig.BinaryResource resource)

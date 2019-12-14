@@ -2,6 +2,7 @@
   "profiles": {
     "UAlbion": {
       "commandName": "Project",
+      "commandLineArgs": "-d3d",
       "workingDirectory": "..",
       "nativeDebugging": true
     }

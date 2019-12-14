@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UAlbion.Api;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using Veldrid;
@@ -57,7 +58,7 @@ namespace UAlbion.Core
                 CoreTrace.Log.CollectedRenderables(renderer.Key.Name, 0, renderer.Value.Count);
 
             var newPalette = Resolve<IPaletteManager>().Palette;
-            if (_palette != newPalette)
+            if (sc.PaletteView == null || _palette != newPalette)
             {
                 sc.PaletteView?.Dispose();
                 sc.PaletteTexture?.Dispose();

@@ -9,6 +9,8 @@ namespace UAlbion.Core.Visual
 {
     public class ScreenDuplicator : Component, IRenderable, IRenderer
     {
+        const string VertexShaderName = "ScreenDuplicatorSV.vert";
+        const string FragmentShaderName = "ScreenDuplicatorSF.frag";
         static readonly HandlerSet Handlers = new HandlerSet(
             H<ScreenDuplicator, RenderEvent>((x, e) => e.Add(x)));
 
@@ -36,7 +38,12 @@ namespace UAlbion.Core.Visual
                 new ResourceLayoutElementDescription("vdspv_0_0", ResourceKind.TextureReadOnly, ShaderStages.Fragment),
                 new ResourceLayoutElementDescription("SourceSampler", ResourceKind.Sampler, ShaderStages.Fragment)));
 
-            (Shader vs, Shader fs) = StaticResourceCache.GetShaders(gd, gd.ResourceFactory, "ScreenDuplicator");
+            var shaderCache = Resolve<IShaderCache>();
+            var shaders = shaderCache.GetShaderPair(gd.ResourceFactory,
+                VertexShaderName,
+                FragmentShaderName,
+                shaderCache.GetGlsl(VertexShaderName),
+                shaderCache.GetGlsl(FragmentShaderName));
 
             GraphicsPipelineDescription pd = new GraphicsPipelineDescription(
                 new BlendStateDescription(
@@ -53,7 +60,7 @@ namespace UAlbion.Core.Visual
                             new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
                             new VertexElementDescription("TexCoords", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2))
                     },
-                    new[] { vs, fs, },
+                    shaders,
                     ShaderHelper.GetSpecializations(gd)),
                 new[] { resourceLayout },
                 sc.DuplicatorFramebuffer.OutputDescription);

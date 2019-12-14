@@ -13,6 +13,7 @@
     "Control+X": "!loadprevmap",
     "Control+R": "assets:reload",
     "Pause": "e:renderdoc",
+    "Alt+Enter":  "e:toggle",
 
     "Shift+BracketLeft": "toggle_underlay",
     "Shift+BracketRight": "toggle_overlay",

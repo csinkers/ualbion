@@ -88,6 +88,7 @@ namespace UAlbion.Game.Assets
 
         readonly string[] _overrideExtensions = { "bmp", "png", "wav", "json", "mp3" };
         readonly IDictionary<AssetType, XldFile[]> _xlds = new Dictionary<AssetType, XldFile[]>();
+        readonly object _syncRoot = new object();
 
         AssetPaths GetAssetPaths(AssetConfig assetConfig, AssetLocation location, GameLanguage language, string baseName, int number, int objectNumber)
         {
@@ -172,23 +173,27 @@ namespace UAlbion.Game.Assets
 
         object ReadFromXld(AssetPaths paths, AssetKey key, Func<string, BinaryReader, long, object> readFunc)
         {
-            int xldIndex = key.Id / 100;
-            int objectIndex = key.Id % 100;
-            if (!_xlds.ContainsKey(key.Type))
-                _xlds[key.Type] = new XldFile[10];
+            lock (_syncRoot)
+            {
+                int xldIndex = key.Id / 100;
+                int objectIndex = key.Id % 100;
+                if (!_xlds.ContainsKey(key.Type))
+                    _xlds[key.Type] = new XldFile[10];
 
-            if (File.Exists(paths.XldPath) && _xlds[key.Type][xldIndex] == null)
-                _xlds[key.Type][xldIndex] = new XldFile(paths.XldPath);
+                if (File.Exists(paths.XldPath) && _xlds[key.Type][xldIndex] == null)
+                    _xlds[key.Type][xldIndex] = new XldFile(paths.XldPath);
 
-            var xldArray = _xlds[key.Type];
-            var xld = xldArray[xldIndex];
-            if (xld == null)
-                throw new AssetNotFoundException($"XLD not found for object: {key.Type}:{key.Id} in {paths.XldPath}", key.Type, key.Id);
+                var xldArray = _xlds[key.Type];
+                var xld = xldArray[xldIndex];
+                if (xld == null)
+                    throw new AssetNotFoundException(
+                        $"XLD not found for object: {key.Type}:{key.Id} in {paths.XldPath}", key.Type, key.Id);
 
-            using var br = xld.GetReaderForObject(objectIndex, out var length);
-            if (length == 0)
-                return null;
-            return readFunc(paths.XldPath, br, length);
+                using var br = xld.GetReaderForObject(objectIndex, out var length);
+                if (length == 0)
+                    return null;
+                return readFunc(paths.XldPath, br, length);
+            }
         }
 
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)

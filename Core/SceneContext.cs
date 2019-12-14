@@ -89,6 +89,9 @@ namespace UAlbion.Core
             TextureSamplerResourceLayout.Dispose();
             PaletteView?.Dispose();
             PaletteTexture?.Dispose();
+
+            PaletteView = null;
+            PaletteTexture = null;
         }
 
         public void SetCurrentScene(Scene scene)

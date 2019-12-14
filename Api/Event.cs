@@ -10,8 +10,12 @@ namespace UAlbion.Api
     {
         static IEnumerable<Type> GetAllEventTypes()
         {
+            PerfTracker.StartupEvent("Building event types");
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
+                if (!assembly.FullName.Contains("Albion"))
+                    continue;
+
                 Type[] types; try { types = assembly.GetTypes(); } catch (ReflectionTypeLoadException e) { types = e.Types; }
                 foreach (var type in types.Where(x => x != null))
                 {
@@ -23,6 +27,7 @@ namespace UAlbion.Api
                     }
                 }
             }
+            PerfTracker.StartupEvent("Built event types");
         }
 
         static readonly IDictionary<Type, EventMetadata> Serializers = GetAllEventTypes().ToDictionary(x => x, x => new EventMetadata(x));

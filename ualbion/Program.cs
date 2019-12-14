@@ -29,32 +29,41 @@ namespace UAlbion
 {
     static class Program
     {
+        static GraphicsBackend _backend = GraphicsBackend.Direct3D11;
+        static bool _startupOnly;
+        static bool _useRenderDoc;
+
         public static EventExchange Global { get; private set; }
-        static unsafe void Main()
+        static void Main(string[] args)
         {
+            _startupOnly = args.Contains("--startuponly");
+            _useRenderDoc = args.Contains("--renderdoc") || args.Contains("-rd");
+            if (args.Contains("-gl") || args.Contains("--opengl")) _backend = GraphicsBackend.OpenGL;
+            if (args.Contains("-gles") || args.Contains("--opengles")) _backend = GraphicsBackend.OpenGLES;
+            if (args.Contains("-vk") || args.Contains("--vulkan")) _backend = GraphicsBackend.Vulkan;
+            if (args.Contains("-metal") || args.Contains("--metal")) _backend = GraphicsBackend.Metal;
+            if (args.Contains("-d3d") || args.Contains("--direct3d")) _backend = GraphicsBackend.OpenGL;
+
+            PerfTracker.StartupEvent("Entered main");
             //GraphTests();
             //return;
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
+            PerfTracker.StartupEvent("Registered encodings");
 
             /*
             Console.WriteLine("Entry point reached. Press enter to continue");
             Console.ReadLine(); //*/
 
-            Veldrid.Sdl2.SDL_version version;
-            Veldrid.Sdl2.Sdl2Native.SDL_GetVersion(&version);
+            var curDir = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            while (curDir != null && !File.Exists(Path.Combine(curDir.FullName, "data", "assets.json")))
+                curDir = curDir.Parent;
 
-            var baseDir = Directory.GetParent(
-                Path.GetDirectoryName(
-                Assembly.GetExecutingAssembly()
-                .Location)) // ./ualbion/bin/Debug
-                ?.Parent    // ./ualbion/bin
-                ?.Parent    // ./ualbion
-                ?.Parent    // .
-                ?.FullName;
-
+            var baseDir = curDir?.FullName; 
             if (string.IsNullOrEmpty(baseDir))
                 return;
 
+            PerfTracker.StartupEvent($"Found base directory {baseDir}");
+            PerfTracker.StartupEvent("Registering asset manager");
             using var assets = new AssetManager();
             var logger = new ConsoleLogger();
             Global = new EventExchange("Global", logger);
@@ -63,6 +72,7 @@ namespace UAlbion
                 .Register<ISettings>(new Settings { BasePath = baseDir }) 
                 .Register<IAssetManager>(assets)
                 ;
+            PerfTracker.StartupEvent("Registered asset manager");
 
             // Dump.CoreSprites(assets, baseDir);
             // Dump.CharacterSheets(assets);
@@ -77,23 +87,8 @@ namespace UAlbion
 
         static void RunGame(EventExchange global, string baseDir)
         {
-            var backend =
-                //VeldridStartup.GetPlatformDefaultBackend()
-                //GraphicsBackend.Metal /*
-                //GraphicsBackend.Vulkan /*
-                //GraphicsBackend.OpenGL /*
-                //GraphicsBackend.OpenGLES /*
-                GraphicsBackend.Direct3D11 /*
-                //*/
-                ;
-
-            using var engine = new Engine(backend,
-#if DEBUG
-                true
-#else
-                false
-#endif
-                )
+            PerfTracker.StartupEvent("Creating engine");
+            using var engine = new Engine(_backend, _useRenderDoc)
                 .AddRenderer(new SpriteRenderer())
                 .AddRenderer(new ExtrudedTileMapRenderer())
                 .AddRenderer(new FullScreenQuad())
@@ -101,7 +96,11 @@ namespace UAlbion
                 .AddRenderer(new ScreenDuplicator())
                 ;
 
+            PerfTracker.StartupEvent("Creating main components");
             global
+                .Register<IShaderCache>(new ShaderCache(
+                    Path.Combine(baseDir, "Core", "Visual"),
+                    Path.Combine(baseDir, "data", "ShaderCache")))
                 .Register<IInputManager>(new InputManager()
                     .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
                     .RegisterInputMode(InputMode.World2D, new World2DInputMode())
@@ -135,6 +134,7 @@ namespace UAlbion
                 .Attach(new StatusBar())
                 ;
 
+            PerfTracker.StartupEvent("Creating scene-specific components");
             var inventoryConfig = InventoryConfig.Load(baseDir);
             global.Resolve<ISceneManager>().GetExchange(SceneId.Inventory)
                 .Attach(new InventoryScreen(inventoryConfig))
@@ -150,6 +150,7 @@ namespace UAlbion
                 .Attach(menuBackground)
                 ;
 
+            PerfTracker.StartupEvent("Starting new game");
             global.Raise(new NewGameEvent(), null);
             /*
             global.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude), null); /*
@@ -161,6 +162,10 @@ namespace UAlbion
 
             // global.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
             ReflectionHelper.ClearTypeCache();
+            PerfTracker.StartupEvent("Running game");
+            if(_startupOnly)
+                global.Raise(new QuitEvent(), null);
+
             engine.Run();
         }
 

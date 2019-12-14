@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using UAlbion.Api;
+using UAlbion.Core;
 
 namespace UAlbion.Game
 {
@@ -11,9 +13,12 @@ namespace UAlbion.Game
         static Type[] _typeCache = BuildTypeCache();
         static Type[] BuildTypeCache()
         {
+            PerfTracker.StartupEvent("Start building reflection cache");
             var types = new List<Type>();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
+                if (!assembly.FullName.Contains("Albion"))
+                    continue;
                 Type[] assemblyTypes;
                 try
                 {
@@ -32,6 +37,7 @@ namespace UAlbion.Game
                     types.Add(type);
                 }
             }
+            PerfTracker.StartupEvent("Done building reflection cache");
             return types.ToArray();
         }
 

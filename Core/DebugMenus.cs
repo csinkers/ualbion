@@ -12,7 +12,7 @@ namespace UAlbion.Core
 
         static readonly string[] MsaaOptions = { "Off", "2x", "4x", "8x", "16x", "32x" };
         readonly Engine _engine;
-        int _msaaOption = 0;
+        int _msaaOption;
 
         public DebugMenus(Engine engine) : base(Handlers)
         {
@@ -27,14 +27,23 @@ namespace UAlbion.Core
                 {
                     if (ImGui.BeginMenu("Graphics Backend"))
                     {
-                        bool Selected(GraphicsBackend b) => _engine.GraphicsDevice.BackendType == b;
-                        bool Enabled(GraphicsBackend b) => GraphicsDevice.IsBackendSupported(b);
+                        void BackendOption(string name, GraphicsBackend backend)
+                        {
+                            if (ImGui.MenuItem(
+                                name,
+                                string.Empty,
+                                _engine.GraphicsDevice.BackendType == backend,
+                                GraphicsDevice.IsBackendSupported(backend)))
+                            {
+                                Raise(new Engine.SetBackendEvent(GraphicsBackend.Vulkan));
+                            }
+                        }
 
-                        if (ImGui.MenuItem("Vulkan", string.Empty, Selected(GraphicsBackend.Vulkan), Enabled(GraphicsBackend.Vulkan))) _engine.ChangeBackend(GraphicsBackend.Vulkan);
-                        if (ImGui.MenuItem("OpenGL", string.Empty, Selected(GraphicsBackend.OpenGL), Enabled(GraphicsBackend.OpenGL))) _engine.ChangeBackend(GraphicsBackend.OpenGL);
-                        if (ImGui.MenuItem("OpenGL ES", string.Empty, Selected(GraphicsBackend.OpenGLES), Enabled(GraphicsBackend.OpenGLES))) _engine.ChangeBackend(GraphicsBackend.OpenGLES);
-                        if (ImGui.MenuItem("Direct3D 11", string.Empty, Selected(GraphicsBackend.Direct3D11), Enabled(GraphicsBackend.Direct3D11))) _engine.ChangeBackend(GraphicsBackend.Direct3D11);
-                        if (ImGui.MenuItem("Metal", string.Empty, Selected(GraphicsBackend.Metal), Enabled(GraphicsBackend.Metal))) _engine.ChangeBackend(GraphicsBackend.Metal);
+                        BackendOption("Vulkan", GraphicsBackend.Vulkan);
+                        BackendOption("OpenGL", GraphicsBackend.OpenGL);
+                        BackendOption("OpenGL ES",GraphicsBackend.OpenGLES);
+                        BackendOption("Direct3D 11",GraphicsBackend.Direct3D11);
+                        BackendOption("Metal",GraphicsBackend.Metal);
 
                         ImGui.EndMenu();
                     }
@@ -42,7 +51,7 @@ namespace UAlbion.Core
                     if (ImGui.BeginMenu("MSAA"))
                     {
                         if (ImGui.Combo("MSAA", ref _msaaOption, MsaaOptions, MsaaOptions.Length))
-                            _engine.ChangeMsaa(_msaaOption);
+                            Raise(new Engine.SetMsaaLevelEvent((TextureSampleCount)_msaaOption));
                         ImGui.EndMenu();
                     }
 
@@ -86,7 +95,7 @@ namespace UAlbion.Core
                     if (_engine.RenderDoc == null)
                     {
                         if (ImGui.MenuItem("Load"))
-                            Raise(new LoadRenderDocEvent());
+                            Raise(new Engine.LoadRenderDocEvent());
                     }
                     else
                     {

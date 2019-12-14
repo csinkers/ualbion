@@ -5,6 +5,7 @@ using System.Numerics;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using ImGuiNET;
+using UAlbion.Api;
 using UAlbion.Core.Visual;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
@@ -33,8 +34,19 @@ namespace UAlbion.Core
             H<Engine, ToggleFullscreenEvent>((x, _) => x.ToggleFullscreenState()),
             H<Engine, ToggleHardwareCursorEvent>((x,_) => x.Window.CursorVisible = !x.Window.CursorVisible),
             H<Engine, ToggleResizableEvent>((x, _) => x.Window.Resizable = !x.Window.Resizable),
-            H<Engine, ToggleVisibleBorderEvent>((x, _) => x.Window.BorderVisible = !x.Window.BorderVisible)
-        );
+            H<Engine, ToggleVisibleBorderEvent>((x, _) => x.Window.BorderVisible = !x.Window.BorderVisible),
+            H<Engine, SetMsaaLevelEvent>((x,e) => x._newSampleCount = e.SampleCount),
+            H<Engine, SetVSyncEvent>((x, e) =>
+            {
+                if (x._vsync == e.Value) return;
+                x._vsync = e.Value;
+                x.ChangeBackend(x._backend);
+            }),
+            H<Engine, SetBackendEvent>((x, e) =>
+            {
+                if (x._backend == e.Value) return;
+                x.ChangeBackend(e.Value);
+            }));
 
         static RenderDoc _renderDoc;
         // public EventExchange GlobalExchange { get; }
@@ -50,6 +62,7 @@ namespace UAlbion.Core
         bool _windowResized;
         bool _done;
         bool _recreateWindow = true;
+        bool _vsync = true;
         Vector2? _pendingCursorUpdate;
         GraphicsBackend _backend;
 
@@ -65,14 +78,19 @@ namespace UAlbion.Core
             // GlobalExchange = new EventExchange("Global", logger);
 
             if (useRenderDoc)
-                RenderDoc.Load(out _renderDoc);
+                using(PerfTracker.InfrequentEvent("Loading renderdoc"))
+                    RenderDoc.Load(out _renderDoc);
         }
 
         protected override void Subscribed()
         {
+            var shaderCache = Resolve<IShaderCache>();
+            if(shaderCache == null)
+                throw new InvalidOperationException("An instance of IShaderCache must be registered.");
+            shaderCache.ShadersUpdated += (sender, args) => ChangeBackend(_backend);
+
             Exchange
                 .Register<IWindowManager>(_windowManager)
-                .Register<IShaderCache>(new ShaderCache())
                 //.Attach(new DebugMenus(this))
                 ;
         }
@@ -92,41 +110,58 @@ namespace UAlbion.Core
         public void Run()
         {
             ChangeBackend(_backend);
+            PerfTracker.StartupEvent("Set up backend");
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
 
             CreateAllObjects();
+            PerfTracker.StartupEvent("Created objects");
             ImGui.StyleColorsClassic();
             Raise(new WindowResizedEvent(Window.Width, Window.Height));
             Raise(new BeginFrameEvent());
 
             var frameCounter = new FrameCounter();
+            PerfTracker.StartupEvent("Startup done, rendering first frame");
             while (!_done)
             {
+                PerfTracker.BeginFrame();
                 double deltaSeconds = frameCounter.StartFrame();
-                Raise(new BeginFrameEvent());
+                using(PerfTracker.FrameEvent("Raising begin frame"))
+                    Raise(new BeginFrameEvent());
 
-                Sdl2Events.ProcessEvents();
-                InputSnapshot snapshot = Window.PumpEvents();
+                InputSnapshot snapshot;
+                using (PerfTracker.FrameEvent("Processing SDL events"))
+                {
+                    Sdl2Events.ProcessEvents();
+                    snapshot = Window.PumpEvents();
+                }
+
                 if (!Window.Exists)
                     break;
 
                 if (_pendingCursorUpdate.HasValue)
                 {
-                    Sdl2Native.SDL_WarpMouseInWindow(
-                        Window.SdlWindowHandle,
-                        (int)_pendingCursorUpdate.Value.X,
-                        (int)_pendingCursorUpdate.Value.Y);
+                    using (PerfTracker.FrameEvent("Warping mouse"))
+                    {
+                        Sdl2Native.SDL_WarpMouseInWindow(
+                            Window.SdlWindowHandle,
+                            (int) _pendingCursorUpdate.Value.X,
+                            (int) _pendingCursorUpdate.Value.Y);
 
-                    _pendingCursorUpdate = null;
+                        _pendingCursorUpdate = null;
+                    }
                 }
 
-                Raise(new InputEvent(deltaSeconds, snapshot, Window.MouseDelta));
+                using (PerfTracker.FrameEvent("Raising input event"))
+                    Raise(new InputEvent(deltaSeconds, snapshot, Window.MouseDelta));
 
-                Update((float)deltaSeconds);
+                using (PerfTracker.FrameEvent("Performing update"))
+                    Update((float)deltaSeconds);
+
                 if (!Window.Exists)
                     break;
 
-                Draw();
+                using (PerfTracker.FrameEvent("Drawing"))
+                    Draw();
             }
 
             DestroyAllObjects();
@@ -138,11 +173,6 @@ namespace UAlbion.Core
         {
             _frameTimeAverager.AddTime(deltaSeconds);
             Raise(new EngineUpdateEvent(deltaSeconds));
-        }
-
-        internal void ChangeMsaa(int msaaOption)
-        {
-            _newSampleCount = (TextureSampleCount)msaaOption;
         }
 
         internal void RefreshDeviceObjects(int numTimes)
@@ -194,104 +224,121 @@ namespace UAlbion.Core
                 CreateAllObjects();
             }
 
-            _frameCommands.Begin();
+            using (PerfTracker.FrameEvent("Render scenes"))
+            {
+                _frameCommands.Begin();
 
-            var scenes = new List<Scene>();
-            Raise(new CollectScenesEvent(scenes.Add));
+                var scenes = new List<Scene>();
+                Raise(new CollectScenesEvent(scenes.Add));
 
-            foreach (var scene in scenes)
-                scene.RenderAllStages(GraphicsDevice, _frameCommands, _sceneContext, _renderers);
+                foreach (var scene in scenes)
+                    scene.RenderAllStages(GraphicsDevice, _frameCommands, _sceneContext, _renderers);
 
-            _frameCommands.End();
-            CoreTrace.Log.Info("Scene", "Submitting Commands");
-            GraphicsDevice.SubmitCommands(_frameCommands);
-            CoreTrace.Log.Info("Scene", "Submitted commands");
+                _frameCommands.End();
+            }
 
-            CoreTrace.Log.Info("Engine", "Swapping buffers...");
-            GraphicsDevice.SwapBuffers();
-            CoreTrace.Log.Info("Engine", "Draw complete");
+            using (PerfTracker.FrameEvent("Submit commandlist"))
+            {
+                CoreTrace.Log.Info("Scene", "Submitting Commands");
+                GraphicsDevice.SubmitCommands(_frameCommands);
+                CoreTrace.Log.Info("Scene", "Submitted commands");
+            }
+
+            using (PerfTracker.FrameEvent("Swap buffers"))
+            {
+                CoreTrace.Log.Info("Engine", "Swapping buffers...");
+                GraphicsDevice.SwapBuffers();
+                CoreTrace.Log.Info("Engine", "Draw complete");
+            }
         }
 
-        internal void ChangeBackend(GraphicsBackend backend) => ChangeBackend(backend, false);
-
-        void ChangeBackend(GraphicsBackend backend, bool forceRecreateWindow)
+        void ChangeBackend(GraphicsBackend backend, bool forceRecreateWindow = false)
         {
-            _backend = backend;
-            if (GraphicsDevice != null)
+            using (PerfTracker.InfrequentEvent($"change backend to {backend}"))
             {
-                DestroyAllObjects();
-                GraphicsDevice.Dispose();
-            }
-
-            if (Window == null || _recreateWindow || forceRecreateWindow)
-            {
-                Window?.Close();
-
-                WindowCreateInfo windowInfo = new WindowCreateInfo
+                _backend = backend;
+                if (GraphicsDevice != null)
                 {
-                    X = Window?.X ?? 648,
-                    Y = Window?.Y ?? 431,
-                    WindowWidth = Window?.Width ?? DefaultWidth,
-                    WindowHeight = Window?.Height ?? DefaultHeight,
-                    WindowInitialState = Window?.WindowState ?? WindowState.Normal,
-                    WindowTitle = "UAlbion"
+                    DestroyAllObjects();
+                    GraphicsDevice.Dispose();
+                }
+
+                if (Window == null || _recreateWindow || forceRecreateWindow)
+                {
+                    Window?.Close();
+
+                    WindowCreateInfo windowInfo = new WindowCreateInfo
+                    {
+                        X = Window?.X ?? 648,
+                        Y = Window?.Y ?? 431,
+                        WindowWidth = Window?.Width ?? DefaultWidth,
+                        WindowHeight = Window?.Height ?? DefaultHeight,
+                        WindowInitialState = Window?.WindowState ?? WindowState.Normal,
+                        WindowTitle = "UAlbion"
+                    };
+
+                    _windowManager.Window = VeldridStartup.CreateWindow(ref windowInfo);
+                    //Window.BorderVisible = false;
+                    Window.CursorVisible = false;
+                    Window.Resized += () => _windowResized = true;
+                }
+
+                GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(
+                    false, null, false,
+                    ResourceBindingModel.Improved, true,
+                    true, false)
+                {
+                    Debug = (_renderDoc != null),
+                    SyncToVerticalBlank = _vsync,
+                    // NoThreading = true
                 };
 
-                _windowManager.Window = VeldridStartup.CreateWindow(ref windowInfo);
-                //Window.BorderVisible = false;
-                Window.CursorVisible = false;
-                Window.Resized += () => _windowResized = true;
+                GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, gdOptions, backend);
+                GraphicsDevice.WaitForIdle();
+                Window.Title = GraphicsDevice.BackendType.ToString();
+
+                Raise(new BackendChangedEvent(GraphicsDevice));
+                CreateAllObjects();
             }
-
-            GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(
-                false, null, false,
-                ResourceBindingModel.Improved, true,
-                true, false)
-            {
-                Debug = true,
-                SyncToVerticalBlank = true,
-                // NoThreading = true
-            };
-
-            GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, gdOptions, backend);
-            GraphicsDevice.WaitForIdle();
-            Window.Title = GraphicsDevice.BackendType.ToString();
-
-            Raise(new BackendChangedEvent(GraphicsDevice));
-            CreateAllObjects();
         }
 
         void CreateAllObjects()
         {
-            _frameCommands = GraphicsDevice.ResourceFactory.CreateCommandList();
-            _frameCommands.Name = "Frame Commands List";
+            using(PerfTracker.InfrequentEvent("Create objects"))
+            {
+                _frameCommands = GraphicsDevice.ResourceFactory.CreateCommandList();
+                _frameCommands.Name = "Frame Commands List";
 
-            CommandList initCL = GraphicsDevice.ResourceFactory.CreateCommandList();
-            initCL.Name = "Recreation Initialization Command List";
-            initCL.Begin();
-            _sceneContext.CreateDeviceObjects(GraphicsDevice, initCL, _sceneContext);
+                CommandList initCL = GraphicsDevice.ResourceFactory.CreateCommandList();
+                initCL.Name = "Recreation Initialization Command List";
+                initCL.Begin();
+                _sceneContext.CreateDeviceObjects(GraphicsDevice, initCL, _sceneContext);
 
-            foreach (var r in _renderers.Values)
-                r.CreateDeviceObjects(GraphicsDevice, initCL, _sceneContext);
+                foreach (var r in _renderers.Values)
+                    r.CreateDeviceObjects(GraphicsDevice, initCL, _sceneContext);
 
-            initCL.End();
-            GraphicsDevice.SubmitCommands(initCL);
-            GraphicsDevice.WaitForIdle();
-            initCL.Dispose();
-            GraphicsDevice.WaitForIdle();
+                initCL.End();
+                GraphicsDevice.SubmitCommands(initCL);
+                GraphicsDevice.WaitForIdle();
+                initCL.Dispose();
+                GraphicsDevice.WaitForIdle();
+            }
         }
 
         void DestroyAllObjects()
         {
-            GraphicsDevice.WaitForIdle();
-            _frameCommands.Dispose();
-            _sceneContext.DestroyDeviceObjects();
-            foreach (var r in _renderers.Values)
-                r.DestroyDeviceObjects();
+            using (PerfTracker.InfrequentEvent("Destroying objects"))
+            {
+                GraphicsDevice.WaitForIdle();
+                _frameCommands.Dispose();
+                _sceneContext.DestroyDeviceObjects();
+                foreach (var r in _renderers.Values)
+                    r.DestroyDeviceObjects();
 
-            StaticResourceCache.DestroyAllDeviceObjects();
-            Resolve<ITextureManager>()?.DestroyDeviceObjects();
-            GraphicsDevice.WaitForIdle();
+                Resolve<IShaderCache>().DestroyAllDeviceObjects();
+                Resolve<ITextureManager>()?.DestroyDeviceObjects();
+                GraphicsDevice.WaitForIdle();
+            }
         }
 
         public void Dispose()
@@ -303,6 +350,39 @@ namespace UAlbion.Core
 
             //_graphicsDevice?.Dispose();
         }
+
+        [Event("e:set_vsync", "Enables or disables VSync")]
+        public class SetVSyncEvent : EngineEvent
+        {
+            public SetVSyncEvent(bool value) { Value = value; }
+            [EventPart("value")] public bool Value { get; } 
+        }
+
+        [Event("e:set_backend", "Sets the current graphics backend to use")]
+        public class SetBackendEvent : EngineEvent
+        {
+            public SetBackendEvent(GraphicsBackend value) { Value = value; }
+            [EventPart("value", "Valid values: OpenGL, OpenGLES, Vulkan, Metal or Direct3D11")] public GraphicsBackend Value { get; } 
+        }
+
+        [Event("e:set_msaa", "Sets the multisample anti-asliasing level")]
+        public class SetMsaaLevelEvent : IEvent
+        {
+            [EventPart("sample_count")]
+            public TextureSampleCount SampleCount { get; }
+
+            public SetMsaaLevelEvent(TextureSampleCount msaaOption)
+            {
+                SampleCount = msaaOption;
+            }
+        }
+
+        [Event("e:toggle_fullscreen")] public class ToggleFullscreenEvent : EngineEvent { }
+        [Event("e:toggle_hw_cursor", "Toggles displaying the default windows cursor")] public class ToggleHardwareCursorEvent : EngineEvent { }
+        [Event("e:toggle_resizable")] public class ToggleResizableEvent : EngineEvent { }
+        [Event("e:run_renderdoc")] public class RunRenderDocEvent : EngineEvent { }
+        [Event("e:load_renderdoc")] public class LoadRenderDocEvent : EngineEvent { }
+        [Event("e:toggle_visible_border")] public class ToggleVisibleBorderEvent : EngineEvent { }
     }
 }
 

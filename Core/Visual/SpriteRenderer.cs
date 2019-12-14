@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UAlbion.Core.Textures;
 using Veldrid;
@@ -68,28 +67,25 @@ namespace UAlbion.Core.Visual
 
         public RenderPasses RenderPasses => RenderPasses.Standard;
 
-        string GetShader(string relativeName)
-        {
-            // var validNames = GetType().Assembly.GetManifestResourceNames();
-            var fullName = $"{GetType().Namespace}.{relativeName}";
-            using Stream resource = GetType().Assembly.GetManifestResourceStream(fullName);
-            using var streamReader = new StreamReader(resource ?? throw new InvalidOperationException("The shader {name} could not be found"));
-            return streamReader.ReadToEnd();
-        }
-
         Pipeline BuildPipeline(GraphicsDevice gd, OutputDescription outputDescription, SpriteShaderKey key)
         {
             var shaderCache = Resolve<IShaderCache>();
-            var vertexShader = GetShader("SpriteSV.vert");
-            var fragmentShader = GetShader("SpriteSF.frag");
+            var vertexShaderName = "SpriteSV.vert";
+            var fragmentShaderName = "SpriteSF.frag";
+            var vertexShaderContent = shaderCache.GetGlsl(vertexShaderName);
+            var fragmentShaderContent = shaderCache.GetGlsl(fragmentShaderName);
+
             if (key.UseArrayTexture)
             {
-                fragmentShader =
+                fragmentShaderName += ".array";
+                fragmentShaderContent =
                     @"#define USE_ARRAY_TEXTURE
-" + fragmentShader;
+" + fragmentShaderContent;
             }
 
-            var shaderSet = new ShaderSetDescription(new[] { VertexLayout, InstanceLayout }, shaderCache.Get(gd.ResourceFactory, vertexShader, fragmentShader));
+            var shaderSet = new ShaderSetDescription(
+                new[] { VertexLayout, InstanceLayout },
+                shaderCache.GetShaderPair(gd.ResourceFactory, vertexShaderName, fragmentShaderName, vertexShaderContent, fragmentShaderContent));
 
             var depthStencilMode = 
                 key.PerformDepthTest

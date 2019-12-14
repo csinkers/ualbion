@@ -1,7 +1,10 @@
 ﻿using System.IO;
+using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
+    [Event("add_remove_inv")]
     public class AddRemoveInventoryItemEvent : ModifyEvent
     {
         public static EventNode Load(BinaryReader br, int id, MapEventType type, ModifyType subType)
@@ -12,17 +15,26 @@ namespace UAlbion.Formats.MapEvents
                 Amount = br.ReadByte(), // 3
                 Unk4 = br.ReadByte(), // 4
                 Unk5 = br.ReadByte(), // 5
-                ItemId = br.ReadUInt16(), // 6
+                ItemId = (ItemId)br.ReadUInt16(), // 6
                 Unk8 = br.ReadUInt16(), // 8
             });
         }
 
-        public QuantityChangeOperation Operation { get; private set; }
-        public byte Amount { get; set; }
-        public ushort ItemId { get; private set; }
-        public byte Unk4 { get; set; }
-        public byte Unk5 { get; set; }
-        public ushort Unk8 { get; set; }
+        AddRemoveInventoryItemEvent() { }
+        public AddRemoveInventoryItemEvent(QuantityChangeOperation operation, byte amount, ItemId itemId)
+        {
+            Operation = operation;
+            Amount = amount;
+            ItemId = itemId;
+        }
+
+        [EventPart("operation")] public QuantityChangeOperation Operation { get; private set; }
+        [EventPart("amount")] public byte Amount { get; private set; }
+        [EventPart("item_id")] public ItemId ItemId { get; private set; }
+
+        public byte Unk4 { get; private set; }
+        public byte Unk5 { get; private set; }
+        public ushort Unk8 { get; private set; }
         public override string ToString() => $"add_remove_inv_item {Operation} {Amount}x{ItemId} ({Unk4} {Unk5} {Unk8})";
     }
 }

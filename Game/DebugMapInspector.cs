@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using ImGuiNET;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
@@ -57,6 +58,13 @@ namespace UAlbion.Game
 
             ImGui.Begin("Inspector");
             ImGui.BeginChild("Inspector");
+            if (ImGui.Button("Close"))
+            {
+                _hits = null;
+                ImGui.EndChild();
+                ImGui.End();
+                return;
+            }
 
             void BoolOption(string name, Func<bool> getter, Action<bool> setter)
             {
@@ -66,6 +74,8 @@ namespace UAlbion.Game
                 if (value != initialValue)
                     setter(value);
             }
+
+            ImGui.Text(PerfTracker.GetFrameStats());
 
             var settings = Resolve<ISettings>();
             ImGui.BeginGroup();

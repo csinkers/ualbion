@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
@@ -32,11 +33,13 @@ namespace UAlbion.Game.Assets
 
         public AssetLocator() : base(null)
         {
+            PerfTracker.StartupEvent("Building AssetLocator");
             _standardAssetLocator = new StandardAssetLocator();
             _assetCache = new AssetCache();
             Children.Add(_assetCache);
             foreach(var locator in Locators.Values.OfType<IComponent>())
                 Children.Add(locator);
+            PerfTracker.StartupEvent("Built AssetLocator");
         }
 
         readonly AssetCache _assetCache;

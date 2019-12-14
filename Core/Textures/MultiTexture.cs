@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using UAlbion.Api;
 using Veldrid;
 
 namespace UAlbion.Core.Textures

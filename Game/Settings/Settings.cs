@@ -11,67 +11,54 @@ namespace UAlbion.Game.Settings
     [Event("highlight_zones")] public class SetHighlightEventChainZonesEvent : GameEvent {[EventPart("value")] public bool Value { get; } public SetHighlightEventChainZonesEvent(bool value) { Value = value; } }
     [Event("show_paths")] public class SetShowPathsEvent : GameEvent {[EventPart("value")] public bool Value { get; } public SetShowPathsEvent(bool value) { Value = value; } }
 
-    public class Settings : Component, ISettings
+    public class Settings : Component, ISettings, IDebugSettings, IAudioSettings, IGraphicsSettings, IGameplaySettings
     {
         static readonly HandlerSet Handlers = new HandlerSet(
             H<Settings, SetLanguageEvent>((x, e) =>
             {
-                if (x.Gameplay.Language != e.Language)
+                if (x.Language != e.Language)
                 {
-                    x.Gameplay.Language = e.Language;
+                    x.Language = e.Language;
                     x.Raise(e); // Re-raise to ensure any consumers who received it before Settings will get it again.
                 }
             }),
-            H<Settings, SetMusicVolumeEvent>((x, e)       => x.Audio.MusicVolume = e.Value),
-            H<Settings, SetFxVolumeEvent>((x, e)          => x.Audio.FxVolume = e.Value),
-            H<Settings, SetWindowSize3dEvent>((x, e)      => x.Graphics.WindowSize3d = e.Value),
-            H<Settings, SetCombatDetailLevelEvent>((x, e) => x.Graphics.CombatDetailLevel = e.Value),
-            H<Settings, SetCombatDelayEvent>((x, e)       => x.Gameplay.CombatDelay = e.Value),
-            H<Settings, SetDrawPositionsEvent>((x, e)     => x.Debug.DrawPositions = e.Value),
-            H<Settings, SetHighlightTileEvent>((x, e)     => x.Debug.HighlightTile = e.Value),
-            H<Settings, SetHighlightSelectionEvent>((x, e) => x.Debug.HighlightSelection = e.Value),
-            H<Settings, SetHighlightEventChainZonesEvent>((x, e) => x.Debug.HighlightEventChainZones = e.Value),
-            H<Settings, SetShowPathsEvent>((x, e)         => x.Debug.ShowPaths = e.Value)
+            H<Settings, SetMusicVolumeEvent>((x, e)       => x.MusicVolume = e.Value),
+            H<Settings, SetFxVolumeEvent>((x, e)          => x.FxVolume = e.Value),
+            H<Settings, SetWindowSize3dEvent>((x, e)      => x.WindowSize3d = e.Value),
+            H<Settings, SetCombatDetailLevelEvent>((x, e) => x.CombatDetailLevel = e.Value),
+            H<Settings, SetCombatDelayEvent>((x, e)       => x.CombatDelay = e.Value),
+            H<Settings, SetDrawPositionsEvent>((x, e)     => x.DrawPositions = e.Value),
+            H<Settings, SetHighlightTileEvent>((x, e)     => x.HighlightTile = e.Value),
+            H<Settings, SetHighlightSelectionEvent>((x, e) => x.HighlightSelection = e.Value),
+            H<Settings, SetHighlightEventChainZonesEvent>((x, e) => x.HighlightEventChainZones = e.Value),
+            H<Settings, SetShowPathsEvent>((x, e)         => x.ShowPaths = e.Value)
         );
 
         public Settings() : base(Handlers) { }
         public string BasePath { get; set; }
 
-        readonly DebugSettings Debug = new DebugSettings();
-        readonly AudioSettings Audio = new AudioSettings();
-        readonly GraphicsSettings Graphics = new GraphicsSettings();
-        readonly GameplaySettings Gameplay = new GameplaySettings();
+        IDebugSettings ISettings.Debug => this;
+        IAudioSettings ISettings.Audio => this;
+        IGraphicsSettings ISettings.Graphics => this;
+        IGameplaySettings ISettings.Gameplay => this;
 
-        IDebugSettings ISettings.Debug => Debug;
-        IAudioSettings ISettings.Audio => Audio;
-        IGraphicsSettings ISettings.Graphics => Graphics;
-        IGameplaySettings ISettings.Gameplay => Gameplay;
+        // Debug
+        public bool DrawPositions { get; private set; }
+        public bool HighlightTile { get; private set; }
+        public bool HighlightSelection { get; private set; }
+        public bool HighlightEventChainZones { get; private set; }
+        public bool ShowPaths { get; private set; }
 
-        class DebugSettings : IDebugSettings
-        {
-            public bool DrawPositions { get; set; }
-            public bool HighlightTile { get; set; }
-            public bool HighlightSelection { get; set; }
-            public bool HighlightEventChainZones { get; set; }
-            public bool ShowPaths { get; set; }
-        }
+        // Audio
+        public int MusicVolume { get; private set; } = 32;
+        public int FxVolume { get; private set; } = 48;
 
-        class AudioSettings : IAudioSettings
-        {
-            public int MusicVolume { get; set; } = 32;
-            public int FxVolume { get; set; } = 48;
-        }
+        // Graphics
+        public int WindowSize3d { get; private set; } = 15;
+        public int CombatDetailLevel { get; private set; } = 1;
 
-        class GraphicsSettings : IGraphicsSettings
-        {
-            public int WindowSize3d { get; set; } = 15;
-            public int CombatDetailLevel { get; set; } = 1;
-        }
-
-        class GameplaySettings : IGameplaySettings
-        {
-            public GameLanguage Language { get; set; }
-            public int CombatDelay { get; set; } = 3;
-        }
+        // Gameplay
+        public GameLanguage Language { get; private set; }
+        public int CombatDelay { get; private set; } = 3;
     }
 }

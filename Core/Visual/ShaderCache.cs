@@ -20,16 +20,16 @@ namespace UAlbion.Core.Visual
 
         class CacheEntry
         {
-            public CacheEntry(string vertexHash, string fragmentHash, ShaderDescription vertexShader, ShaderDescription fragmentShader)
+            public CacheEntry(string vertexPath, string fragmentPath, ShaderDescription vertexShader, ShaderDescription fragmentShader)
             {
-                VertexHash = vertexHash;
-                FragmentHash = fragmentHash;
+                VertexPath = vertexPath;
+                FragmentPath = fragmentPath;
                 VertexShader = vertexShader;
                 FragmentShader = fragmentShader;
             }
 
-            public string VertexHash { get; }
-            public string FragmentHash { get; }
+            public string VertexPath { get; }
+            public string FragmentPath { get; }
             public ShaderDescription VertexShader { get; }
             public ShaderDescription FragmentShader { get; }
         }
@@ -66,35 +66,33 @@ namespace UAlbion.Core.Visual
             return streamReader.ReadToEnd();
         }
 
-        string GetShaderHash(string content)
+        string GetShaderPath(string name, string content)
         {
             using var md5 = MD5.Create();
             var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(content));
-            return string.Join("", hash.Select(x => x.ToString("X2")));
+            var hashString = string.Join("", hash.Select(x => x.ToString("X2")));
+            return Path.Combine(_shaderCachePath, $"{name}.{hashString}.spv");
         }
 
-        byte[] LoadSpirvByteCode(string name, string content, ShaderStages stage)
+        (string, byte[]) LoadSpirvByteCode(string name, string content, ShaderStages stage)
         {
-            if (!content.StartsWith("#version"))
-            {
-                content = @"#version 450
-" + content;
-            }
-
-            // SpriteSF.frag.3814e1fd1.spv
-
-            var hash = GetShaderHash(content);
-            var cachePath = Path.Combine(_shaderCachePath, $"{name}.{hash}.spv");
+            var cachePath = GetShaderPath(name, content);
             if (File.Exists(cachePath))
-                return File.ReadAllBytes(cachePath);
+                return (cachePath, File.ReadAllBytes(cachePath));
 
             using (PerfTracker.InfrequentEvent($"Compiling {name} to SPIR-V"))
             {
+                if (!content.StartsWith("#version"))
+                {
+                    content = @"#version 450
+" + content;
+                }
+
                 var options = GlslCompileOptions.Default;
                 options.Debug = true;
                 var glslCompileResult = SpirvCompilation.CompileGlslToSpirv(content, name, stage, options);
                 File.WriteAllBytes(cachePath, glslCompileResult.SpirvBytes);
-                return glslCompileResult.SpirvBytes;
+                return (cachePath, glslCompileResult.SpirvBytes);
             }
         }
 
@@ -112,7 +110,7 @@ namespace UAlbion.Core.Visual
             _ => throw new SpirvCompilationException($"Invalid GraphicsBackend: {backend}")
         };
 
-        (ShaderDescription, ShaderDescription) BuildShaderPair(
+        CacheEntry BuildShaderPair(
             GraphicsBackend backendType,
             string vertexName, string fragmentName, 
             string vertexContent, string fragmentContent)
@@ -120,14 +118,14 @@ namespace UAlbion.Core.Visual
             GraphicsBackend backend = backendType;
             string entryPoint = (backend == GraphicsBackend.Metal) ? "main0" : "main";
 
-            var vertexSpirv = LoadSpirvByteCode(vertexName, vertexContent, ShaderStages.Vertex);
-            var fragmentSpirv = LoadSpirvByteCode(fragmentName, fragmentContent, ShaderStages.Fragment);
+            var (vertexPath, vertexSpirv) = LoadSpirvByteCode(vertexName, vertexContent, ShaderStages.Vertex);
+            var (fragmentPath, fragmentSpirv) = LoadSpirvByteCode(fragmentName, fragmentContent, ShaderStages.Fragment);
 
             var vertexShaderDescription = new ShaderDescription(ShaderStages.Vertex, vertexSpirv, entryPoint);
             var fragmentShaderDescription = new ShaderDescription(ShaderStages.Fragment, fragmentSpirv, entryPoint);
 
             if (backend == GraphicsBackend.Vulkan)
-                return (vertexShaderDescription, fragmentShaderDescription);
+                return new CacheEntry(vertexPath, fragmentPath, vertexShaderDescription, fragmentShaderDescription);
 
             CrossCompileTarget target = GetCompilationTarget(backendType);
             var options = new CrossCompileOptions();
@@ -137,7 +135,7 @@ namespace UAlbion.Core.Visual
                 vertexShaderDescription.ShaderBytes = GetBytes(backend, compilationResult.VertexShader);
                 fragmentShaderDescription.ShaderBytes = GetBytes(backend, compilationResult.FragmentShader);
 
-                return (vertexShaderDescription, fragmentShaderDescription);
+                return new CacheEntry(vertexPath, fragmentPath, vertexShaderDescription, fragmentShaderDescription);
             }
         }
 
@@ -146,18 +144,17 @@ namespace UAlbion.Core.Visual
             string vertexName, string fragmentName,
             string vertexContent, string fragmentContent)
         {
-            var vertexHash = GetShaderHash(vertexContent);
-            var fragmentHash = GetShaderHash(fragmentContent);
+            var vertexPath = GetShaderPath(vertexName, vertexContent);
+            var fragmentPath = GetShaderPath(fragmentName, fragmentContent);
 
             lock (_syncRoot)
             {
                 var cacheKey = vertexName + fragmentName;
-                if (!_cache.TryGetValue(cacheKey, out var entry) || entry.VertexHash != vertexHash || entry.FragmentHash != fragmentHash)
+                if (!_cache.TryGetValue(cacheKey, out var entry) || entry.VertexPath != vertexPath || entry.FragmentPath != fragmentPath)
                 {
                     try
                     {
-                        var (vertex, fragment) = BuildShaderPair(factory.BackendType, vertexName, fragmentName, vertexContent, fragmentContent);
-                        entry = new CacheEntry(vertexHash, fragmentHash, vertex, fragment);
+                        entry = BuildShaderPair(factory.BackendType, vertexName, fragmentName, vertexContent, fragmentContent);
                         _cache[cacheKey] = entry;
                     }
                     catch (Exception e)
@@ -177,9 +174,28 @@ namespace UAlbion.Core.Visual
             }
         }
 
+        public void CleanupOldFiles()
+        {
+            lock (_syncRoot)
+            {
+                var files = Directory.EnumerateFiles(_shaderCachePath, "*.spv").ToHashSet();
+                foreach (var entry in _cache)
+                {
+                    files.Remove(entry.Value.VertexPath);
+                    files.Remove(entry.Value.FragmentPath);
+                }
+
+                foreach (var file in files)
+                {
+                    //if(DateTime.Now - File.GetLastAccessTime(file) > TimeSpan.FromDays(7))
+                    File.Delete(file);
+                }
+            }
+        }
+
         public void DestroyAllDeviceObjects()
         {
-            lock (_cache)
+            lock (_syncRoot)
             {
                 _cache.Clear();
             }

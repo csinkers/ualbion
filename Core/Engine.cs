@@ -110,9 +110,6 @@ namespace UAlbion.Core
             ChangeBackend();
             PerfTracker.StartupEvent("Set up backend");
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
-
-            CreateAllObjects();
-            PerfTracker.StartupEvent("Created objects");
             ImGui.StyleColorsClassic();
             Raise(new WindowResizedEvent(Window.Width, Window.Height));
             Raise(new BeginFrameEvent());
@@ -329,6 +326,7 @@ namespace UAlbion.Core
                 GraphicsDevice.WaitForIdle();
                 initCL.Dispose();
                 GraphicsDevice.WaitForIdle();
+                Resolve<IShaderCache>().CleanupOldFiles();
             }
         }
 

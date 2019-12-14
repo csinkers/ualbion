@@ -11,6 +11,8 @@ namespace UAlbion.Core.Visual
             string vertexShaderName, string fragmentShaderName,
             string vertexShaderContent, string fragmentShaderContent);
 
+        void CleanupOldFiles();
         void DestroyAllDeviceObjects();
+
     }
 }

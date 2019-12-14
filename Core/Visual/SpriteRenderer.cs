@@ -103,7 +103,7 @@ namespace UAlbion.Core.Visual
             var rasterizerMode = new RasterizerStateDescription(
                 FaceCullMode.None, 
                 PolygonFillMode.Solid, 
-                FrontFace.Clockwise, 
+                FrontFace.Clockwise,
                 key.PerformDepthTest, // depth test
                 true); // scissor test
 

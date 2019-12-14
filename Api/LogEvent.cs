@@ -1,9 +1,7 @@
-﻿using UAlbion.Api;
-
-namespace UAlbion.Game.Events
+﻿namespace UAlbion.Api
 {
     [Event("log", "Writes to the game log.")]
-    public class LogEvent : GameEvent
+    public class LogEvent : Event
     {
         public enum Level
         {

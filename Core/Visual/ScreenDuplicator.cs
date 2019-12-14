@@ -19,6 +19,7 @@ namespace UAlbion.Core.Visual
         Pipeline _pipeline;
         DeviceBuffer _ib;
         DeviceBuffer _vb;
+        Shader[] _shaders;
 
         public ScreenDuplicator() : base(Handlers) { }
         public string Name => "ScreenDuplicator";
@@ -39,7 +40,7 @@ namespace UAlbion.Core.Visual
                 new ResourceLayoutElementDescription("SourceSampler", ResourceKind.Sampler, ShaderStages.Fragment)));
 
             var shaderCache = Resolve<IShaderCache>();
-            var shaders = shaderCache.GetShaderPair(gd.ResourceFactory,
+            _shaders = shaderCache.GetShaderPair(gd.ResourceFactory,
                 VertexShaderName,
                 FragmentShaderName,
                 shaderCache.GetGlsl(VertexShaderName),
@@ -60,7 +61,7 @@ namespace UAlbion.Core.Visual
                             new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
                             new VertexElementDescription("TexCoords", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2))
                     },
-                    shaders,
+                    _shaders,
                     ShaderHelper.GetSpecializations(gd)),
                 new[] { resourceLayout },
                 sc.DuplicatorFramebuffer.OutputDescription);
@@ -87,7 +88,16 @@ namespace UAlbion.Core.Visual
         }
 
         public IEnumerable<IRenderable> UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IEnumerable<IRenderable> renderables) => renderables;
-        public void DestroyDeviceObjects() { _disposeCollector?.DisposeAll(); }
-        public void Dispose() { DestroyDeviceObjects(); }
+
+        public void DestroyDeviceObjects()
+        {
+            if (_shaders != null)
+                foreach (var shader in _shaders)
+                    shader.Dispose();
+            _shaders = null;
+
+            _disposeCollector?.DisposeAll();
+        }
+        public void Dispose() => DestroyDeviceObjects();
     }
 }

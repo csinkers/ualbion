@@ -95,6 +95,7 @@ namespace UAlbion.Core.Visual
         Pipeline _pipeline;
         ResourceLayout _layout;
         Sampler _textureSampler;
+        Shader[] _shaders;
 
         public struct MiscUniformData
         {
@@ -119,13 +120,13 @@ namespace UAlbion.Core.Visual
             cl.UpdateBuffer(_ib, 0, Indices);
 
             var shaderCache = Resolve<IShaderCache>();
-            var shaders = shaderCache.GetShaderPair(gd.ResourceFactory,
+            _shaders = shaderCache.GetShaderPair(gd.ResourceFactory,
                 VertexShaderName,
                 FragmentShaderName,
                 shaderCache.GetGlsl(VertexShaderName),
                 shaderCache.GetGlsl(FragmentShaderName));
 
-            var shaderSet = new ShaderSetDescription(new[] { VertexLayout, InstanceLayout }, shaders);
+            var shaderSet = new ShaderSetDescription(new[] { VertexLayout, InstanceLayout }, _shaders);
 
             _layout = factory.CreateResourceLayout(PerSpriteLayoutDescription);
             _textureSampler = gd.ResourceFactory.CreateSampler(new SamplerDescription(
@@ -244,9 +245,14 @@ namespace UAlbion.Core.Visual
                 resourceSet.Dispose();
             _resourceSets.Clear();
 
+            if (_shaders != null)
+                foreach (var shader in _shaders)
+                    shader.Dispose();
+            _shaders = null;
+
             _disposeCollector.DisposeAll();
         }
 
-        public void Dispose() { DestroyDeviceObjects(); }
+        public void Dispose() => DestroyDeviceObjects();
     }
 }

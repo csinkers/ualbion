@@ -23,8 +23,8 @@ namespace UAlbion.Core
             {
                 if (_renderDoc == null && RenderDoc.Load(out _renderDoc))
                 {
-                    _renderDoc.OverlayEnabled = false;
-                    x.ChangeBackend(x.GraphicsDevice.BackendType, true);
+                    x._newBackend = x.GraphicsDevice.BackendType;
+                    x._recreateWindow = true;
                 }
             }),
             H<Engine, GarbageCollectionEvent>((x,_) => GC.Collect()),
@@ -40,12 +40,12 @@ namespace UAlbion.Core
             {
                 if (x._vsync == e.Value) return;
                 x._vsync = e.Value;
-                x.ChangeBackend(x._backend);
+                x._newBackend = x.GraphicsDevice.BackendType;
             }),
             H<Engine, SetBackendEvent>((x, e) =>
             {
-                if (x._backend == e.Value) return;
-                x.ChangeBackend(e.Value);
+                if (x.GraphicsDevice.BackendType == e.Value) return;
+                x._newBackend = e.Value;
             }));
 
         static RenderDoc _renderDoc;
@@ -61,10 +61,10 @@ namespace UAlbion.Core
         TextureSampleCount? _newSampleCount;
         bool _windowResized;
         bool _done;
-        bool _recreateWindow = true;
+        bool _recreateWindow = false;
         bool _vsync = true;
         Vector2? _pendingCursorUpdate;
-        GraphicsBackend _backend;
+        GraphicsBackend? _newBackend;
 
         internal GraphicsDevice GraphicsDevice { get; private set; }
         internal RenderDoc RenderDoc => _renderDoc;
@@ -74,9 +74,7 @@ namespace UAlbion.Core
 
         public Engine(GraphicsBackend backend, bool useRenderDoc) : base(Handlers)
         {
-            _backend = backend;
-            // GlobalExchange = new EventExchange("Global", logger);
-
+            _newBackend = backend;
             if (useRenderDoc)
                 using(PerfTracker.InfrequentEvent("Loading renderdoc"))
                     RenderDoc.Load(out _renderDoc);
@@ -87,7 +85,7 @@ namespace UAlbion.Core
             var shaderCache = Resolve<IShaderCache>();
             if(shaderCache == null)
                 throw new InvalidOperationException("An instance of IShaderCache must be registered.");
-            shaderCache.ShadersUpdated += (sender, args) => ChangeBackend(_backend);
+            shaderCache.ShadersUpdated += (sender, args) => _newBackend = GraphicsDevice?.BackendType;
 
             Exchange
                 .Register<IWindowManager>(_windowManager)
@@ -109,7 +107,7 @@ namespace UAlbion.Core
 
         public void Run()
         {
-            ChangeBackend(_backend);
+            ChangeBackend();
             PerfTracker.StartupEvent("Set up backend");
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
 
@@ -123,6 +121,9 @@ namespace UAlbion.Core
             PerfTracker.StartupEvent("Startup done, rendering first frame");
             while (!_done)
             {
+                if(_newBackend != null)
+                    ChangeBackend();
+
                 PerfTracker.BeginFrame();
                 double deltaSeconds = frameCounter.StartFrame();
                 using(PerfTracker.FrameEvent("Raising begin frame"))
@@ -252,19 +253,25 @@ namespace UAlbion.Core
             }
         }
 
-        void ChangeBackend(GraphicsBackend backend, bool forceRecreateWindow = false)
+        void ChangeBackend()
         {
+            if (_newBackend == null) return;
+            var backend = _newBackend.Value;
+            _newBackend = null;
+
             using (PerfTracker.InfrequentEvent($"change backend to {backend}"))
             {
-                _backend = backend;
                 if (GraphicsDevice != null)
                 {
                     DestroyAllObjects();
+                    if(GraphicsDevice.BackendType != backend)
+                        Resolve<IShaderCache>().DestroyAllDeviceObjects();
                     GraphicsDevice.Dispose();
                 }
 
-                if (Window == null || _recreateWindow || forceRecreateWindow)
+                if (Window == null || _recreateWindow)
                 {
+                    _recreateWindow = false;
                     Window?.Close();
 
                     WindowCreateInfo windowInfo = new WindowCreateInfo
@@ -335,7 +342,6 @@ namespace UAlbion.Core
                 foreach (var r in _renderers.Values)
                     r.DestroyDeviceObjects();
 
-                Resolve<IShaderCache>().DestroyAllDeviceObjects();
                 Resolve<ITextureManager>()?.DestroyDeviceObjects();
                 GraphicsDevice.WaitForIdle();
             }

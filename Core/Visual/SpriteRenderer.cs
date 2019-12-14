@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Core.Textures;
@@ -57,6 +58,7 @@ namespace UAlbion.Core.Visual
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
         readonly IList<DeviceBuffer> _instanceBuffers = new List<DeviceBuffer>();
         readonly IList<ResourceSet> _resourceSets = new List<ResourceSet>();
+        readonly List<Shader> _shaders = new List<Shader>();
 
         // Context objects
         DeviceBuffer _centeredVb;
@@ -83,9 +85,13 @@ namespace UAlbion.Core.Visual
 " + fragmentShaderContent;
             }
 
-            var shaderSet = new ShaderSetDescription(
-                new[] { VertexLayout, InstanceLayout },
-                shaderCache.GetShaderPair(gd.ResourceFactory, vertexShaderName, fragmentShaderName, vertexShaderContent, fragmentShaderContent));
+            var shaders = shaderCache.GetShaderPair(
+                gd.ResourceFactory,
+                vertexShaderName, fragmentShaderName,
+                vertexShaderContent, fragmentShaderContent);
+
+            _shaders.AddRange(shaders);
+            var shaderSet = new ShaderSetDescription(new[] { VertexLayout, InstanceLayout }, shaders);
 
             var depthStencilMode = 
                 key.PerformDepthTest
@@ -208,6 +214,9 @@ namespace UAlbion.Core.Visual
             cl.PushDebugGroup($"Sprite:{sprite.Key.Texture.Name}:{sprite.Key.RenderOrder}");
             TextureView textureView = textureManager?.GetTexture(sprite.Key.Texture);
 
+            if (sc.PaletteView == null)
+                return;
+
             var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
                 _perSpriteResourceLayout,
                 sc.ProjectionMatrixBuffer,
@@ -250,6 +259,10 @@ namespace UAlbion.Core.Visual
             foreach (var resourceSet in _resourceSets)
                 resourceSet.Dispose();
             _resourceSets.Clear();
+
+            foreach(var shader in _shaders)
+                shader.Dispose();
+            _shaders.Clear();
         }
 
         public void Dispose() => DestroyDeviceObjects();

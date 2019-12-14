@@ -8,7 +8,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Core.Events
 {
-    public class EventExchange
+    public class EventExchange : IDisposable
     {
         static IComponent _logger;
         static int _nesting = -1;
@@ -55,6 +55,16 @@ namespace UAlbion.Core.Events
         }
 
         public override string ToString() => $"EventExchange \"{Name}\" (IsActive={IsActive})";
+        public void Dispose()
+        {
+            lock(SyncRoot)
+                foreach (var disposableSystem in _registrations.Values.OfType<IDisposable>())
+                    disposableSystem.Dispose();
+
+            foreach(var child in _children)
+                child.Dispose();
+            _children.Clear();
+        }
 
         public IReadOnlyList<EventExchange> Children { get { lock (SyncRoot) return _children.ToList(); } }
 

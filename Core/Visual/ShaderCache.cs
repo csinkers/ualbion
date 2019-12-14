@@ -10,12 +10,29 @@ using Veldrid.SPIRV;
 
 namespace UAlbion.Core.Visual
 {
-    public class ShaderCache : IShaderCache
+    public class ShaderCache : Component, IShaderCache, IDisposable
     {
         readonly object _syncRoot = new object();
-        readonly IDictionary<string, Shader[]> _cache = new Dictionary<string, Shader[]>();
+        readonly IDictionary<string, CacheEntry> _cache = new Dictionary<string, CacheEntry>();
         readonly string _debugShaderPath;
         readonly string _shaderCachePath;
+        readonly FileSystemWatcher _watcher;
+
+        class CacheEntry
+        {
+            public CacheEntry(string vertexHash, string fragmentHash, ShaderDescription vertexShader, ShaderDescription fragmentShader)
+            {
+                VertexHash = vertexHash;
+                FragmentHash = fragmentHash;
+                VertexShader = vertexShader;
+                FragmentShader = fragmentShader;
+            }
+
+            public string VertexHash { get; }
+            public string FragmentHash { get; }
+            public ShaderDescription VertexShader { get; }
+            public ShaderDescription FragmentShader { get; }
+        }
 
         public ShaderCache(string debugShaderPath, string shaderCachePath)
         {
@@ -28,11 +45,11 @@ namespace UAlbion.Core.Visual
                     nameof(shaderCachePath));
             }
 
-            var watcher = new FileSystemWatcher(debugShaderPath);
-            watcher.Filters.Add("*.frag");
-            watcher.Filters.Add("*.vert");
-            watcher.Changed += (sender, e) => ShadersUpdated?.Invoke(sender, new EventArgs());
-            watcher.EnableRaisingEvents = true;
+            _watcher = new FileSystemWatcher(debugShaderPath);
+            //_watcher.Filters.Add("*.frag");
+            //_watcher.Filters.Add("*.vert");
+            _watcher.Changed += (sender, e) => ShadersUpdated?.Invoke(sender, new EventArgs());
+            _watcher.EnableRaisingEvents = true;
         }
 
         public event EventHandler<EventArgs> ShadersUpdated;
@@ -95,9 +112,12 @@ namespace UAlbion.Core.Visual
             _ => throw new SpirvCompilationException($"Invalid GraphicsBackend: {backend}")
         };
 
-        Shader[] BuildShaderPair(ResourceFactory factory, string vertexName, string fragmentName, string vertexContent, string fragmentContent)
+        (ShaderDescription, ShaderDescription) BuildShaderPair(
+            GraphicsBackend backendType,
+            string vertexName, string fragmentName, 
+            string vertexContent, string fragmentContent)
         {
-            GraphicsBackend backend = factory.BackendType;
+            GraphicsBackend backend = backendType;
             string entryPoint = (backend == GraphicsBackend.Metal) ? "main0" : "main";
 
             var vertexSpirv = LoadSpirvByteCode(vertexName, vertexContent, ShaderStages.Vertex);
@@ -107,15 +127,9 @@ namespace UAlbion.Core.Visual
             var fragmentShaderDescription = new ShaderDescription(ShaderStages.Fragment, fragmentSpirv, entryPoint);
 
             if (backend == GraphicsBackend.Vulkan)
-            {
-                return new[]
-                {
-                    factory.CreateShader(ref vertexShaderDescription),
-                    factory.CreateShader(ref fragmentShaderDescription)
-                };
-            }
+                return (vertexShaderDescription, fragmentShaderDescription);
 
-            CrossCompileTarget target = GetCompilationTarget(factory.BackendType);
+            CrossCompileTarget target = GetCompilationTarget(backendType);
             var options = new CrossCompileOptions();
             using (PerfTracker.InfrequentEvent($"cross compiling {vertexName} to {target}"))
             {
@@ -123,11 +137,7 @@ namespace UAlbion.Core.Visual
                 vertexShaderDescription.ShaderBytes = GetBytes(backend, compilationResult.VertexShader);
                 fragmentShaderDescription.ShaderBytes = GetBytes(backend, compilationResult.FragmentShader);
 
-                return new[]
-                {
-                    factory.CreateShader(vertexShaderDescription),
-                    factory.CreateShader(fragmentShaderDescription)
-                };
+                return (vertexShaderDescription, fragmentShaderDescription);
             }
         }
 
@@ -136,16 +146,34 @@ namespace UAlbion.Core.Visual
             string vertexName, string fragmentName,
             string vertexContent, string fragmentContent)
         {
+            var vertexHash = GetShaderHash(vertexContent);
+            var fragmentHash = GetShaderHash(fragmentContent);
+
             lock (_syncRoot)
             {
                 var cacheKey = vertexName + fragmentName;
-                if (!_cache.TryGetValue(cacheKey, out Shader[] set))
+                if (!_cache.TryGetValue(cacheKey, out var entry) || entry.VertexHash != vertexHash || entry.FragmentHash != fragmentHash)
                 {
-                    set = BuildShaderPair(factory, vertexName, fragmentName, vertexContent, fragmentContent);
-                    _cache.Add(cacheKey, set);
+                    try
+                    {
+                        var (vertex, fragment) = BuildShaderPair(factory.BackendType, vertexName, fragmentName, vertexContent, fragmentContent);
+                        entry = new CacheEntry(vertexHash, fragmentHash, vertex, fragment);
+                        _cache[cacheKey] = entry;
+                    }
+                    catch (Exception e)
+                    {
+                        Raise(new LogEvent(LogEvent.Level.Error, $"Error compiling shaders ({vertexName}, {fragmentName}): {e}"));
+                    }
                 }
 
-                return set;
+                if (entry == null)
+                    throw new InvalidOperationException($"No shader could be built for ({vertexName}, {fragmentName})");
+
+                return new[]
+                {
+                    factory.CreateShader(entry.VertexShader),
+                    factory.CreateShader(entry.FragmentShader)
+                };
             }
         }
 
@@ -153,12 +181,14 @@ namespace UAlbion.Core.Visual
         {
             lock (_cache)
             {
-                foreach (var kvp in _cache)
-                    foreach (var shader in kvp.Value)
-                        shader.Dispose();
-
                 _cache.Clear();
             }
+        }
+
+        public void Dispose()
+        {
+            _watcher.Dispose();
+            DestroyAllDeviceObjects();
         }
     }
 }

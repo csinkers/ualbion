@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities
 {

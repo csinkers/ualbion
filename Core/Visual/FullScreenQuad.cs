@@ -28,6 +28,7 @@ namespace UAlbion.Core.Visual
         Pipeline _pipeline;
         DeviceBuffer _ib;
         DeviceBuffer _vb;
+        Shader[] _shaders;
 
 
         public FullScreenQuad() : base(Handlers) { }
@@ -42,7 +43,7 @@ namespace UAlbion.Core.Visual
                 ResourceLayoutHelper.Sampler("SourceSampler")));
 
             var shaderCache = Resolve<IShaderCache>();
-            var shaders = shaderCache.GetShaderPair(gd.ResourceFactory,
+            _shaders = shaderCache.GetShaderPair(gd.ResourceFactory,
                 VertexShaderName,
                 FragmentShaderName,
                 shaderCache.GetGlsl(VertexShaderName),
@@ -57,7 +58,7 @@ namespace UAlbion.Core.Visual
                 DepthStencilStateDescription.Disabled,
                 rasterizerState,
                 PrimitiveTopology.TriangleList,
-                new ShaderSetDescription(new[] { Vertex2DTextured.VertexLayout }, shaders, ShaderHelper.GetSpecializations(gd)),
+                new ShaderSetDescription(new[] { Vertex2DTextured.VertexLayout }, _shaders, ShaderHelper.GetSpecializations(gd)),
                 new[] { layout },
                 gd.SwapchainFramebuffer.OutputDescription);
             _pipeline = factory.CreateGraphicsPipeline(ref pd);
@@ -82,7 +83,15 @@ namespace UAlbion.Core.Visual
             cl.DrawIndexed(6, 1, 0, 0, 0);
         }
 
-        public void DestroyDeviceObjects() { _disposeCollector?.DisposeAll(); }
-        public void Dispose() { DestroyDeviceObjects(); }
+        public void DestroyDeviceObjects()
+        {
+            if (_shaders != null)
+                foreach (var shader in _shaders)
+                    shader.Dispose();
+            _shaders = null;
+
+            _disposeCollector?.DisposeAll();
+        }
+        public void Dispose() => DestroyDeviceObjects();
     }
 }

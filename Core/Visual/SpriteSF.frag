@@ -66,7 +66,7 @@ void main()
 		color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	if((fsin_2 & HIGHLIGHT)  != 0) color = color * 1.2;
-	if((fsin_2 & RED_TINT)   != 0) color = vec4(color.x * 1.5f + 0.3f, color.yzw);
+  	if((fsin_2 & RED_TINT)   != 0) color = vec4(color.x * 1.5f + 0.3f, color.yzw);
 	if((fsin_2 & GREEN_TINT) != 0) color = vec4(color.x, color.y * 1.5f + 0.3f, color.zw);
 	if((fsin_2 & BLUE_TINT)  != 0) color = vec4(color.xy, color.z * 1.5f + 0.f, color.w);
 	// if((fsin_2 & 0x80) != 0) color = vec4(color.xyz, color.w * 0.5f); // Transparent

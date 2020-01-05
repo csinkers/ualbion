@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Core.Textures;
@@ -35,8 +34,8 @@ namespace UAlbion.Core.Visual
 
         // Resource Sets
         static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
-            ResourceLayoutHelper.Uniform("vdspv_0_0"), // Perspective Matrix
-            ResourceLayoutHelper.Uniform("vdspv_0_1"), // View-Model Matrix
+            ResourceLayoutHelper.UniformV("vdspv_0_0"), // Perspective Matrix
+            ResourceLayoutHelper.UniformV("vdspv_0_1"), // View-Model Matrix
             ResourceLayoutHelper.Sampler("vdspv_0_2"), // SpriteSampler
             ResourceLayoutHelper.Texture("vdspv_0_3"), // SpriteTexture
             ResourceLayoutHelper.Texture("vdspv_0_4")  // PaletteTexture
@@ -69,7 +68,7 @@ namespace UAlbion.Core.Visual
 
         public RenderPasses RenderPasses => RenderPasses.Standard;
 
-        Pipeline BuildPipeline(GraphicsDevice gd, OutputDescription outputDescription, SpriteShaderKey key)
+        Pipeline BuildPipeline(GraphicsDevice gd, SceneContext sc, SpriteShaderKey key)
         {
             var shaderCache = Resolve<IShaderCache>();
             var vertexShaderName = "SpriteSV.vert";
@@ -115,8 +114,8 @@ namespace UAlbion.Core.Visual
                 new ShaderSetDescription(new[] { VertexLayout, InstanceLayout },
                     shaderSet.Shaders,
                     ShaderHelper.GetSpecializations(gd)),
-                new[] { _perSpriteResourceLayout },
-                outputDescription);
+                new[] { _perSpriteResourceLayout, sc.CommonResourceLayout },
+                sc.MainSceneFramebuffer.OutputDescription);
 
             var pipeline = gd.ResourceFactory.CreateGraphicsPipeline(ref pipelineDescription);
             pipeline.Name = $"P_Sprite_{key}";
@@ -151,7 +150,7 @@ namespace UAlbion.Core.Visual
                 new SpriteShaderKey(false, false)
             };
             _perSpriteResourceLayout = factory.CreateResourceLayout(PerSpriteLayoutDescription);
-            _pipelines = keys.ToDictionary(x => x, x => BuildPipeline(gd, sc.MainSceneFramebuffer.OutputDescription, x));
+            _pipelines = keys.ToDictionary(x => x, x => BuildPipeline(gd, sc, x));
             _disposeCollector.Add(_centeredVb, _leftVb, _ib, _perSpriteResourceLayout);
         }
 
@@ -231,6 +230,7 @@ namespace UAlbion.Core.Visual
 
             cl.SetPipeline(_pipelines[shaderKey]);
             cl.SetGraphicsResourceSet(0, resourceSet);
+            cl.SetGraphicsResourceSet(1, sc.CommonResourceSet);
             cl.SetVertexBuffer(0, sprite.Flags.HasFlag(SpriteFlags.LeftAligned) ? _leftVb : _centeredVb);
             cl.SetIndexBuffer(_ib, IndexFormat.UInt16);
             cl.SetVertexBuffer(1, _instanceBuffers[sprite.BufferId]);

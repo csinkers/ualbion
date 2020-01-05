@@ -62,6 +62,7 @@ namespace UAlbion
             PerfTracker.StartupEvent($"Found base directory {baseDir}");
 
             var logger = new ConsoleLogger();
+            var settings = new Settings { BasePath = baseDir };
             PerfTracker.StartupEvent("Registering asset manager");
             using var assets = new AssetManager();
             using var global = new EventExchange("Global", logger);
@@ -69,7 +70,8 @@ namespace UAlbion
 
             Global
                 // Need to register settings first, as the AssetConfigLocator relies on it.
-                .Register<ISettings>(new Settings { BasePath = baseDir }) 
+                .Register<ISettings>(settings) 
+                .Register<IEngineSettings>(settings)
                 .Register<IAssetManager>(assets)
                 ;
             PerfTracker.StartupEvent("Registered asset manager");
@@ -119,6 +121,7 @@ namespace UAlbion
                     .AddScene(new MenuScene())
                     .AddScene(new InventoryScene())
                 )
+                .Register<IClock>(new GameClock())
                 .Register<ISpriteResolver>(new SpriteResolver())
                 .Register<IStateManager>(new StateManager())
                 .Register<ITextManager>(new TextManager())
@@ -126,7 +129,6 @@ namespace UAlbion
                 .Attach(engine)
                 .Attach(new CursorManager())
                 .Attach(new DebugMapInspector())
-                .Attach(new GameClock())
                 .Attach(new InputBinder(InputConfig.Load(baseDir)))
                 .Attach(new InputModeStack())
                 .Attach(new MouseModeStack())

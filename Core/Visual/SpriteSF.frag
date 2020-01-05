@@ -16,16 +16,19 @@
 
 // Resource Sets
 #ifdef USE_ARRAY_TEXTURE
-//layout(set = 0, binding = 4) uniform sampler2DArray Sprite; // vdspv_0_2
-layout(set = 0, binding = 2) uniform sampler SpriteSampler;   // vdspv_0_2
-layout(set = 0, binding = 3) uniform texture2DArray Sprite; // vdspv_0_3
+//layout(binding = 4) uniform sampler2DArray Sprite; // vdspv_0_2
+layout(binding = 2) uniform sampler SpriteSampler; // vdspv_0_2
+layout(binding = 3) uniform texture2DArray Sprite; // vdspv_0_3
 #else
-//layout(set = 0, binding = 4) uniform sampler2D Sprite; // vdspv_0_2
-layout(set = 0, binding = 2) uniform sampler SpriteSampler;   // vdspv_0_2
-layout(set = 0, binding = 3) uniform texture2D Sprite; //! // vdspv_0_3
+//layout(binding = 4) uniform sampler2D Sprite; // vdspv_0_2
+layout(binding = 2) uniform sampler SpriteSampler; // vdspv_0_2
+layout(binding = 3) uniform texture2D Sprite; //! // vdspv_0_3
 #endif
-//layout(set = 0, binding = 5) uniform sampler2D Palette; // vdspv_0_3
-layout(set = 0, binding = 4) uniform texture2D Palette;   //! // vdspv_0_4
+//layout(binding = 5) uniform sampler2D Palette; // vdspv_0_3
+layout(binding = 4) uniform texture2D Palette;   //! // vdspv_0_4
+
+// Shared set
+#include "CommonResources.glsl"
 
 // Inputs from vertex shader
 layout(location = 0) in vec2 fsin_0;       // Texture Coordinates
@@ -75,6 +78,14 @@ void main()
 		float opacity = (((fsin_2 & 0xff000000) >> 24) / 255.0f);
 		color = vec4(color.xyz, color.w * opacity);
 	}
+	
+	// Outline
+	if((u_engine_flags & EF_SHOW_BOUNDING_BOXES) != 0)
+	{
+		color = vec4(1.0); // TODO
+	}
+
+  	// color = vec4(color.x + 0.3f * sin(u_time * 6.28), color.yzw); // Ensure time is being passed through
 
 	OutputColor = color;
 }

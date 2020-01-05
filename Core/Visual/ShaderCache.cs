@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using UAlbion.Api;
 using Veldrid;
 using Veldrid.SPIRV;
@@ -54,16 +55,44 @@ namespace UAlbion.Core.Visual
 
         public event EventHandler<EventArgs> ShadersUpdated;
 
-        public string GetGlsl(string shaderName)
+        IEnumerable<string> ReadGlsl(string shaderName)
         {
             var debugPath = Path.Combine(_debugShaderPath, shaderName);
             if (File.Exists(debugPath))
-                return File.ReadAllText(debugPath);
+            {
+                foreach (var line in File.ReadAllLines(debugPath))
+                    yield return line;
+            }
+            else
+            {
+                var fullName = $"{GetType().Namespace}.{shaderName}";
+                using var resource = GetType().Assembly.GetManifestResourceStream(fullName);
+                using var streamReader = new StreamReader(resource ?? throw new InvalidOperationException("The shader {name} could not be found"));
+                while (!streamReader.EndOfStream)
+                    yield return streamReader.ReadLine();
+            }
+        }
 
-            var fullName = $"{GetType().Namespace}.{shaderName}";
-            using var resource = GetType().Assembly.GetManifestResourceStream(fullName);
-            using var streamReader = new StreamReader(resource ?? throw new InvalidOperationException("The shader {name} could not be found"));
-            return streamReader.ReadToEnd();
+        static readonly Regex IncludeRegex = new Regex("^#include\\s+\"([^\"]+)\"");
+        public string GetGlsl(string shaderName)
+        {
+            var lines = ReadGlsl(shaderName);
+
+            // Substitute include files
+            var sb = new StringBuilder();
+            foreach(var line in lines)
+            {
+                var match = IncludeRegex.Match(line);
+                if (match.Success)
+                {
+                    var filename = match.Groups[1].Value;
+                    var includedContent = GetGlsl(filename);
+                    sb.AppendLine(includedContent);
+                }
+                else sb.AppendLine(line);
+            }
+
+            return sb.ToString();
         }
 
         string GetShaderPath(string name, string content)

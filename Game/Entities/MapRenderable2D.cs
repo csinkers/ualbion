@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
@@ -8,6 +9,7 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
+using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities
 {
@@ -17,12 +19,13 @@ namespace UAlbion.Game.Entities
             Vector3.Zero, Vector2.Zero, 
             Vector2.Zero, Vector2.Zero, 0, 0);
 
+        int[] _animatedUnderlayIndices;
+        int[] _animatedOverlayIndices;
         readonly MapData2D _mapData;
         readonly ITexture _tileset;
         readonly TilesetData _tileData;
         readonly MultiSprite _underlay;
         readonly MultiSprite _overlay;
-        int _frameCount;
         bool _renderUnderlay = true;
         bool _renderOverlay = true;
 
@@ -69,7 +72,7 @@ namespace UAlbion.Game.Entities
         protected override void Subscribed()
         {
             Raise(new LoadPaletteEvent(Palette));
-            Update();
+            Update(true);
         }
 
         SpriteInstanceData BuildInstanceData(int i, int j, TilesetData.TileData tile, int tickCount)
@@ -125,8 +128,9 @@ namespace UAlbion.Game.Entities
             return instance;
         }
 
-        void Update()
+        void Update(bool updateAll = false)
         {
+            var state = Resolve<IStateManager>();
             if (HighlightIndex.HasValue)
             {
                 int zoneNum = _mapData.ZoneLookup[HighlightIndex.Value];
@@ -136,27 +140,58 @@ namespace UAlbion.Game.Entities
             }
             else _highLightEvent = null;
 
-            int underlayIndex = 0;
-            int overlayIndex = 0;
-            for (int j = 0; j < _mapData.Height; j++)
+            if (updateAll)
             {
-                for (int i = 0; i < _mapData.Width; i++)
-                {
-                    var underlayTileId = _mapData.Underlay[j * _mapData.Width + i];
-                    var underlayTile = underlayTileId == -1 ? null : _tileData.Tiles[underlayTileId];
-                    _underlay.Instances[underlayIndex] =
-                        BuildInstanceData(i, j, underlayTile, 3 * _frameCount / 2);
-                    underlayIndex++;
+                var animatedUnderlayTiles = new List<int>();
+                var animatedOverlayTiles = new List<int>();
 
-                    var overlayTileId = _mapData.Overlay[j * _mapData.Width + i];
+                int index = 0;
+                for (int j = 0; j < _mapData.Height; j++)
+                {
+                    for (int i = 0; i < _mapData.Width; i++)
+                    {
+                        var underlayTileId = _mapData.Underlay[index];
+                        var underlayTile = underlayTileId == -1 ? null : _tileData.Tiles[underlayTileId];
+                        _underlay.Instances[index] = BuildInstanceData(i, j, underlayTile, 3 * state.FrameCount / 2);
+                        if(underlayTile?.FrameCount > 1)
+                            animatedUnderlayTiles.Add(index);
+
+                        var overlayTileId = _mapData.Overlay[index];
+                        var overlayTile = overlayTileId == -1 ? null : _tileData.Tiles[overlayTileId];
+                        _overlay.Instances[index] = BuildInstanceData(i, j, overlayTile, state.FrameCount / 2);
+                        if(overlayTile?.FrameCount > 1)
+                            animatedOverlayTiles.Add(index);
+                        index++;
+                    }
+                }
+
+                _animatedUnderlayIndices = animatedUnderlayTiles.ToArray();
+                _animatedOverlayIndices = animatedOverlayTiles.ToArray();
+            }
+            else
+            {
+                foreach (var index in _animatedUnderlayIndices)
+                {
+                    var underlayTileId = _mapData.Underlay[index];
+                    var underlayTile = underlayTileId == -1 ? null : _tileData.Tiles[underlayTileId];
+                    _underlay.Instances[index] = BuildInstanceData(
+                        index % _mapData.Width,
+                        index / _mapData.Width,
+                        underlayTile,
+                        3 * state.FrameCount / 2);
+                }
+
+                foreach(var index in _animatedOverlayIndices)
+                {
+                    var overlayTileId = _mapData.Overlay[index];
                     var overlayTile = overlayTileId == -1 ? null : _tileData.Tiles[overlayTileId];
-                    _overlay.Instances[overlayIndex] =
-                        BuildInstanceData(i, j, overlayTile, 3 * _frameCount / 2);
-                    overlayIndex++;
+                    _overlay.Instances[index] = BuildInstanceData(
+                        index % _mapData.Width,
+                        index / _mapData.Width,
+                        overlayTile,
+                        3 * state.FrameCount / 2);
                 }
             }
-
-            _frameCount++;
         }
 
         void Render(RenderEvent e)

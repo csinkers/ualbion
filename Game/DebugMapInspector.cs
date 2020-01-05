@@ -98,6 +98,15 @@ namespace UAlbion.Game
             ImGui.Text($"TileSize: {map?.TileSize}");
 
             int hitId = 0;
+            if (ImGui.TreeNode("Global"))
+            {
+                var reflected = Reflector.Reflect(null, Exchange);
+                if (reflected.SubObjects != null)
+                    foreach (var child in reflected.SubObjects)
+                        RenderNode(child);
+                ImGui.TreePop();
+            }
+
             foreach (var hit in _hits)
             {
                 if (ImGui.TreeNode($"{hitId} {hit.Target}"))

@@ -51,10 +51,10 @@ namespace UAlbion.Core
         }
 
         Vector3 _position = new Vector3(0, 0, 1);
+        Vector2 _windowSize = Vector2.One;
         Matrix4x4 _viewMatrix;
         Matrix4x4 _projectionMatrix;
         float _magnification = 1.0f;
-        Vector2 _windowSize = Vector2.One;
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;
@@ -87,10 +87,21 @@ namespace UAlbion.Core
             _viewMatrix.M42 = -_position.Y;
         }
 
-        public CameraInfo GetCameraInfo() => new CameraInfo
+        public CameraInfo GetCameraInfo()
         {
-            CameraPosition_WorldSpace = _position,
-            CameraLookDirection = LookDirection
-        };
+            var clock = Resolve<IClock>();
+            var settings = Resolve<IEngineSettings>();
+
+            return new CameraInfo
+            {
+                WorldSpacePosition = _position,
+                CameraLookDirection = LookDirection,
+                Resolution = _windowSize,
+                Time = clock.ElapsedTime,
+                Special1 = settings.Special1,
+                Special2 = settings.Special2,
+                EngineFlags = (uint)settings.Flags
+            };
+        }
     }
 }

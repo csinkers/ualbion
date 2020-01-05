@@ -1,8 +1,11 @@
 ﻿//!#version 450
 
 // Resource Sets
-layout(set = 0, binding = 0) uniform _Projection { mat4 Projection; }; // vdspv_0_0
-layout(set = 0, binding = 1) uniform _View { mat4 View; }; // vdspv_0_1
+layout(binding = 0) uniform _Projection { mat4 Projection; }; // vdspv_0_0
+layout(binding = 1) uniform _View { mat4 View; }; // vdspv_0_1
+
+// Shared set
+#include "CommonResources.glsl"
 
 // Vertex Data
 layout(location = 0) in vec2 _Position;

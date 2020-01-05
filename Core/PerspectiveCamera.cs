@@ -24,13 +24,12 @@ namespace UAlbion.Core
 
         Vector3 _position = new Vector3(0, 0, 0);
         Vector3 _lookDirection = new Vector3(0, -.3f, -1f);
+        Vector2 _windowSize = Vector2.One;
 
         float _yaw;
         float _pitch;
         bool _useReverseDepth;
         bool _isClipSpaceYInverted;
-        float _windowWidth;
-        float _windowHeight;
         float _fov = 1f;
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
@@ -54,8 +53,6 @@ namespace UAlbion.Core
 
         public PerspectiveCamera() : base(Handlers)
         {
-            _windowWidth = 1;
-            _windowHeight = 1;
             UpdatePerspectiveMatrix();
             UpdateViewMatrix();
         }
@@ -67,7 +64,7 @@ namespace UAlbion.Core
             UpdatePerspectiveMatrix();
         }
 
-        public float AspectRatio => _windowWidth / _windowHeight;
+        public float AspectRatio => _windowSize.X / _windowSize.Y;
         public float Magnification { get; set; } // Ignored.
 
         public float Yaw { get => _yaw; set { _yaw = value; UpdateViewMatrix(); } }
@@ -84,8 +81,8 @@ namespace UAlbion.Core
 
         void WindowResized(float width, float height)
         {
-            _windowWidth = width;
-            _windowHeight = height;
+            _windowSize.X = width;
+            _windowSize.Y = height;
             UpdatePerspectiveMatrix();
         }
 
@@ -95,7 +92,7 @@ namespace UAlbion.Core
                 _isClipSpaceYInverted,
                 _useReverseDepth,
                 FieldOfView,
-                _windowWidth / _windowHeight,
+                AspectRatio,
                 NearDistance,
                 FarDistance);
         }
@@ -108,10 +105,21 @@ namespace UAlbion.Core
             _viewMatrix = Matrix4x4.CreateLookAt(_position, _position + _lookDirection, Vector3.UnitY);
         }
 
-        public CameraInfo GetCameraInfo() => new CameraInfo
+        public CameraInfo GetCameraInfo()
         {
-            CameraPosition_WorldSpace = _position,
-            CameraLookDirection = _lookDirection
-        };
+            var clock = Resolve<IClock>();
+            var settings = Resolve<IEngineSettings>();
+
+            return new CameraInfo
+            {
+                WorldSpacePosition = _position,
+                CameraLookDirection = LookDirection,
+                Resolution = _windowSize,
+                Time = clock.ElapsedTime,
+                Special1 = settings.Special1,
+                Special2 = settings.Special2,
+                EngineFlags = (uint)settings.Flags
+            };
+        }
     }
 }

@@ -11,9 +11,10 @@
     "F10": "update 1",
     "Control+A": "!loadnextmap",
     "Control+X": "!loadprevmap",
-    "Control+R": "assets:reload",
-    "Pause": "e:renderdoc",
+    "Pause": "e:run_renderdoc",
+    "Control+R": "e:run_renderdoc",
     "Alt+Enter":  "e:toggle",
+    "B": "engine_flag toggle ShowBoundingBoxes",
 
     "Shift+BracketLeft": "toggle_underlay",
     "Shift+BracketRight": "toggle_overlay",

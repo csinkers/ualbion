@@ -24,9 +24,9 @@ namespace UAlbion.Core.Visual
         ) { InstanceStepRate = 1 };
 
         static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
-            ResourceLayoutHelper.Uniform("vdspv_0_0"),  // Projection Matrix
-            ResourceLayoutHelper.Uniform("vdspv_0_1"),  // View Matrix
-            ResourceLayoutHelper.Uniform("vdspv_0_2"),  // Misc Uniform Data
+            ResourceLayoutHelper.UniformV("vdspv_0_0"),  // Projection Matrix
+            ResourceLayoutHelper.UniformV("vdspv_0_1"),  // View Matrix
+            ResourceLayoutHelper.UniformV("vdspv_0_2"),  // Misc Uniform Data
             ResourceLayoutHelper.Sampler("vdspv_0_3"),  // Point Sampler
             ResourceLayoutHelper.Texture("vdspv_0_4"),  // Palette
             ResourceLayoutHelper.Sampler("vdspv_0_5"),  // Texture Sampler

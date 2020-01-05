@@ -6,17 +6,17 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game
 {
-    public class GameClock : Component
+    public class GameClock : Component, IClock
     {
         const float TickDurationSeconds = 1 / 6.0f;
         const int TicksPerCacheCycle = 360; // Cycle the cache every minute
 
         readonly IList<(string, float)> _activeTimers = new List<(string, float)>();
         float _elapsedTimeThisGameFrame;
-        float _totalElapsedTime;
         bool _running = false;
 
         public GameClock() : base(Handlers) { }
+        public float ElapsedTime { get; private set; }
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<GameClock, StartClockEvent>((x,e) => x._running = true),
@@ -25,14 +25,14 @@ namespace UAlbion.Game
             H<GameClock, StartTimerEvent>((x,e) => x.StartTimer(e))
         );
 
-        void StartTimer(StartTimerEvent e) => _activeTimers.Add((e.Id, _totalElapsedTime + e.IntervalMilliseconds/1000));
+        void StartTimer(StartTimerEvent e) => _activeTimers.Add((e.Id, ElapsedTime + e.IntervalMilliseconds/1000));
 
         void OnEngineUpdate(EngineUpdateEvent e)
         {
-            _totalElapsedTime += e.DeltaSeconds;
+            ElapsedTime += e.DeltaSeconds;
             for (int i = 0; i < _activeTimers.Count; i++)
             {
-                if (!(_activeTimers[i].Item2 <= _totalElapsedTime)) 
+                if (!(_activeTimers[i].Item2 <= ElapsedTime)) 
                     continue;
 
                 Raise(new TimerElapsedEvent(_activeTimers[i].Item1));

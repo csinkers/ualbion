@@ -1,11 +1,14 @@
 ﻿//!#version 450
 
-// Resource Sets / Uniforms
-layout(set = 0, binding = 3) uniform sampler PaletteSampler;  // vdspv_0_3
-layout(set = 0, binding = 4) uniform texture2D PaletteView;   // vdspv_0_4
-layout(set = 0, binding = 5) uniform sampler TextureSampler;  // vdspv_0_5
-layout(set = 0, binding = 6) uniform texture2DArray Floors;   // vdspv_0_6
-layout(set = 0, binding = 7) uniform texture2DArray Walls;    // vdspv_0_7
+// Resource Sets / Uniforms 
+layout(binding = 3) uniform sampler PaletteSampler;  // vdspv_0_3
+layout(binding = 4) uniform texture2D PaletteView;   // vdspv_0_4
+layout(binding = 5) uniform sampler TextureSampler;  // vdspv_0_5
+layout(binding = 6) uniform texture2DArray Floors;   // vdspv_0_6
+layout(binding = 7) uniform texture2DArray Walls;    // vdspv_0_7
+
+#include "CommonResources.glsl"
+
 // TODO: Lighting info
 
 // Vertex & Instance data piped through from vertex shader

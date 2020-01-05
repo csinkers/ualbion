@@ -1,9 +1,13 @@
 ﻿//!#version 450
+//!#define gl_VertexIndex gl_VertexID
 
 // Resource Sets / Uniforms
-layout(set = 0, binding = 0) uniform _Projection { mat4 Projection; }; // vdspv_0_0
-layout(set = 0, binding = 1) uniform _View       { mat4 View; };       // vdspv_0_1
-layout(set = 0, binding = 2) uniform _Misc       { vec3 Position; int Unused1; vec3 TileSize; int Unused2; }; // vdspv_0_2
+layout(binding = 0) uniform _Projection { mat4 Projection; }; // vdspv_0_0
+layout(binding = 1) uniform _View       { mat4 View; };       // vdspv_0_1
+layout(binding = 2) uniform _Misc       { vec3 Position; int Unused1; vec3 TileSize; int Unused2; }; // vdspv_0_2
+
+#include "CommonResources.glsl"
+
 // TODO: Lighting info
 
 // Vertex Data

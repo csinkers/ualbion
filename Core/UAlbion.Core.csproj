@@ -13,17 +13,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Visual\ExtrudedTileMapSF.frag" />
-    <None Remove="Visual\ExtrudedTileMapSV.vert" />
-    <None Remove="Visual\SpriteSF.frag" />
-    <None Remove="Visual\SpriteSV.vert" />
+    <None Remove="Visual\*.frag" />
+    <None Remove="Visual\*.vert" />
+    <None Remove="Visual\*.glsl" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Visual\ExtrudedTileMapSF.frag" />
-    <EmbeddedResource Include="Visual\ExtrudedTileMapSV.vert" />
-    <EmbeddedResource Include="Visual\SpriteSF.frag" />
-    <EmbeddedResource Include="Visual\SpriteSV.vert" />
+    <EmbeddedResource Include="Visual\*.frag" />
+    <EmbeddedResource Include="Visual\*.vert" />
+    <EmbeddedResource Include="Visual\*.glsl" />
   </ItemGroup>
 
   <ItemGroup>

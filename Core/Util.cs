@@ -226,5 +226,27 @@ namespace UAlbion.Core
         }
 
         public static float Lerp(float a, float b, float t) => t * (b - a) + a;
+
+        public static uint UpdateFlag(uint flags, FlagOperation operation, uint flag)
+        {
+            switch(operation)
+            {
+                case FlagOperation.Set: return flags | flag;
+                case FlagOperation.Clear: return flags & ~flag;
+                case FlagOperation.Toggle: return flags ^ flag;
+                default: return flags;
+            }
+        }
+
+        public static float UpdateValue(float value, ValueOperation operation, float argument)
+        {
+            switch(operation)
+            {
+                case ValueOperation.Set: return argument;
+                case ValueOperation.Add: return value + argument;
+                case ValueOperation.Mult: return value * argument;
+                default: return value;
+            }
+        }
     }
 }

@@ -205,12 +205,7 @@ namespace UAlbion.Core
 
                 GraphicsDevice.ResizeMainWindow((uint)width, (uint)height);
                 Raise(new WindowResizedEvent(width, height));
-                CommandList cl = GraphicsDevice.ResourceFactory.CreateCommandList();
-                cl.Begin();
-                _sceneContext.RecreateWindowSizedResources(GraphicsDevice, cl);
-                cl.End();
-                GraphicsDevice.SubmitCommands(cl);
-                cl.Dispose();
+                _sceneContext.RecreateWindowSizedResources(GraphicsDevice);
                 CoreTrace.Log.Info("Engine", "Resize finished");
             }
 
@@ -294,7 +289,7 @@ namespace UAlbion.Core
                 {
                     Debug = (_renderDoc != null),
                     SyncToVerticalBlank = _vsync,
-                    // NoThreading = true
+                    SingleThreaded = true
                 };
 
                 GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, gdOptions, backend);
@@ -316,7 +311,7 @@ namespace UAlbion.Core
                 CommandList initCL = GraphicsDevice.ResourceFactory.CreateCommandList();
                 initCL.Name = "Recreation Initialization Command List";
                 initCL.Begin();
-                _sceneContext.CreateDeviceObjects(GraphicsDevice, initCL, _sceneContext);
+                _sceneContext.CreateDeviceObjects(GraphicsDevice, initCL);
 
                 foreach (var r in _renderers.Values)
                     r.CreateDeviceObjects(GraphicsDevice, initCL, _sceneContext);

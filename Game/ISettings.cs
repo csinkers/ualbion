@@ -1,4 +1,5 @@
-﻿using UAlbion.Game.Settings;
+﻿using UAlbion.Core;
+using UAlbion.Game.Settings;
 
 namespace UAlbion.Game
 {
@@ -9,5 +10,6 @@ namespace UAlbion.Game
         IAudioSettings Audio { get; }
         IGraphicsSettings Graphics { get; }
         IGameplaySettings Gameplay { get; }
+        IEngineSettings Engine { get; }
     }
 }

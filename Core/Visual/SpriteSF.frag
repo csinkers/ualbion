@@ -34,6 +34,7 @@ layout(binding = 4) uniform texture2D Palette;   //! // vdspv_0_4
 layout(location = 0) in vec2 fsin_0;       // Texture Coordinates
 layout(location = 1) in flat float fsin_1; // Texture Layer
 layout(location = 2) in flat uint fsin_2;  // Flags
+layout(location = 3) in vec2 fsin_3; // Normalised sprite coordinates
 
 // Fragment shader outputs
 layout(location = 0) out vec4 OutputColor;
@@ -62,6 +63,13 @@ void main()
 			color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 
+	// Outline
+	if((u_engine_flags & EF_SHOW_BOUNDING_BOXES) != 0)
+	{
+		vec2 factor = step(vec2(0.02), min(fsin_3, 1.0f - fsin_3));
+		color = mix(color, vec4(1.0f), vec4(1.0f - min(factor.x, factor.y)));
+	}
+
 	if(color.w == 0.0f)
 		discard;
 
@@ -79,12 +87,6 @@ void main()
 		color = vec4(color.xyz, color.w * opacity);
 	}
 	
-	// Outline
-	if((u_engine_flags & EF_SHOW_BOUNDING_BOXES) != 0)
-	{
-		color = vec4(1.0); // TODO
-	}
-
   	// color = vec4(color.x + 0.3f * sin(u_time * 6.28), color.yzw); // Ensure time is being passed through
 
 	OutputColor = color;

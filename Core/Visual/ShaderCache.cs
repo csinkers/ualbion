@@ -40,11 +40,7 @@ namespace UAlbion.Core.Visual
             _debugShaderPath = debugShaderPath;
             _shaderCachePath = shaderCachePath;
             if (!Directory.Exists(shaderCachePath))
-            {
-                throw new ArgumentException(
-                    $"The shader cache directory given: \"{shaderCachePath}\" does not exist.",
-                    nameof(shaderCachePath));
-            }
+                Directory.CreateDirectory(shaderCachePath);
 
             _watcher = new FileSystemWatcher(debugShaderPath);
             //_watcher.Filters.Add("*.frag");

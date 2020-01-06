@@ -12,16 +12,16 @@ layout(location = 0) in vec2 _Position;
 layout(location = 1) in vec2 _TexCoords;
 
 // Instance Data
-layout(location = 2) in vec3 _Offset;
-layout(location = 3) in vec2 _Size;
-layout(location = 4) in vec2 _TexOffset;
-layout(location = 5) in vec2 _TexSize;
-layout(location = 6) in int _TexLayer;
-layout(location = 7) in uint _Flags;
+layout(location = 2) in vec3  _Offset;
+layout(location = 3) in vec2  _Size;
+layout(location = 4) in vec2  _TexOffset;
+layout(location = 5) in vec2  _TexSize;
+layout(location = 6) in int   _TexLayer;
+layout(location = 7) in uint  _Flags;
 layout(location = 8) in float _Rotation;
 
 // Outputs to fragment shader
-layout(location = 0) out vec2 fsin_0;     // Texture Coordinates
+layout(location = 0) out vec2 fsin_0;       // Texture Coordinates
 layout(location = 1) out flat float fsin_1; // Texture Layer
 layout(location = 2) out flat uint fsin_2; /* Flags:
    NoTransform  = 0x1,  Highlight      = 0x2,
@@ -32,6 +32,7 @@ layout(location = 2) out flat uint fsin_2; /* Flags:
    Billboard    = 0x400, DropShadow    = 0x800 
    LeftAligned = 0x1000
    Opacity = High order byte  */
+layout(location = 3) out vec2 fsin_3; // Normalised sprite coordinates
 
 void main()
 {
@@ -62,5 +63,6 @@ void main()
 	fsin_0 = _TexCoords * _TexSize + _TexOffset;
 	fsin_1 = float(_TexLayer);
 	fsin_2 = _Flags;
+	fsin_3 = _TexCoords;
 }
 

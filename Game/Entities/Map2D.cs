@@ -6,6 +6,7 @@ using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities
 {
@@ -106,6 +107,14 @@ namespace UAlbion.Game.Entities
 
                     Exchange.Attach(sprite);
                     Children.Add(sprite);
+                }
+
+                var state = Resolve<IStateManager>().State;
+                foreach(var player in state.Party.Players)
+                {
+                    var playerSprite = new PlayerSprite((LargePartyGraphicsId)player.Id, player.Position);
+                    Exchange.Attach(playerSprite);
+                    Children.Add(playerSprite);
                 }
             }
 

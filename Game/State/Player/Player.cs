@@ -2,6 +2,7 @@
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Game.Entities;
 
 namespace UAlbion.Game.State.Player
 {
@@ -13,12 +14,12 @@ namespace UAlbion.Game.State.Player
         static readonly HandlerSet Handlers = new HandlerSet(
         );
 
+
         public Player(PartyCharacterId id, CharacterSheet sheet, InventoryScreenState inventoryScreenState) : base(Handlers)
         {
             Id = id;
             _base = sheet;
             _inventoryManager = new PlayerInventoryManager(id, _base, inventoryScreenState);
-            // _sprite = new PlayerSprite()
             Children.Add(_inventoryManager);
         }
 

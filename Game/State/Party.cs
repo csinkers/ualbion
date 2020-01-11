@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
+using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.State
@@ -16,4 +17,15 @@ namespace UAlbion.Game.State
         IReadOnlyCollection<IPlayer> IParty.Players => _players;  // Max of 6
         public Vector2 GetPastPosition(int index) => Vector2.Zero;
     }
+/*
+    public class PartyMovement : Component
+    {
+        struct Breadcrumb
+        {
+            public Vector2 Position;
+            public 
+        }
+
+    }
+    */
 }

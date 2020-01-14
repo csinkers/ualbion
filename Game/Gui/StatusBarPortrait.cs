@@ -112,8 +112,8 @@ namespace UAlbion.Game.Gui
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
             var stateManager = Resolve<IStateManager>();
-            var member = stateManager.State.Party.Players.ElementAt(_order);
-            var leader = stateManager.State.Party.Leader;
+            var member = stateManager.State.Party.Players[_order];
+            var leader = stateManager.State.Party.Players[0].Id;
             var sheet = stateManager.State.GetPartyMember(member.Id);
             bool highlighted = member.Id == leader;
 

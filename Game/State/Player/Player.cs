@@ -2,7 +2,6 @@
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Game.Entities;
 
 namespace UAlbion.Game.State.Player
 {

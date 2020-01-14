@@ -8,7 +8,7 @@ namespace UAlbion.Game
 {
     public class GameClock : Component, IClock
     {
-        const float TickDurationSeconds = 1 / 6.0f;
+        const float TickDurationSeconds = 1 / 18.0f;
         const int TicksPerCacheCycle = 360; // Cycle the cache every minute
 
         readonly IList<(string, float)> _activeTimers = new List<(string, float)>();

@@ -10,7 +10,7 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities
 {
-    public class Map2D : Component, IMap
+    public class Map2D : Component, IMap, ICollider
     {
         MapData2D _mapData;
         TilesetData _tileData;
@@ -31,6 +31,23 @@ namespace UAlbion.Game.Entities
         );
 
         public override string ToString() { return $"Map2D: {MapId} ({(int)MapId})"; }
+
+        public bool IsOccupied(Vector2 tilePosition)
+        {
+            int index = (int)tilePosition.Y * _mapData.Width + (int)tilePosition.X;
+            if (index >= _mapData.Underlay.Length)
+                return true;
+
+            var underlayTileId = _mapData.Underlay[index];
+            var overlayTileId = _mapData.Overlay[index];
+            var underlayTile = underlayTileId == -1 ? null : _tileData.Tiles[underlayTileId];
+            var overlayTile = overlayTileId == -1 ? null : _tileData.Tiles[overlayTileId];
+
+            return 
+                underlayTile != null && underlayTile.Collision != TilesetData.Passability.Passable 
+                || 
+                overlayTile != null && overlayTile.Collision != TilesetData.Passability.Passable;
+        }
 
         public Map2D(MapDataId mapId) : base(Handlers)
         {
@@ -109,10 +126,19 @@ namespace UAlbion.Game.Entities
                     Children.Add(sprite);
                 }
 
+                IMovement partyMovement = /*_useSmallSprites 
+                    ? new SmallPartyMovement() 
+                    :*/ new LargePartyMovement(Vector2.Zero, LargePartyMovement.Direction.Right); // TODO: Initial position.
+
+                Exchange.Register(partyMovement);
+                Children.Add(partyMovement);
+
                 var state = Resolve<IStateManager>().State;
                 foreach(var player in state.Party.Players)
                 {
-                    var playerSprite = new PlayerSprite((LargePartyGraphicsId)player.Id, player.Position);
+                    var playerSprite = /*_useSmallSprites 
+                        ? new PlayerSprite(player.Id, (SmallPartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id)); // TODO: Use a function to translate logical to sprite id
+                        :*/ new PlayerSprite(player.Id, (LargePartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id)); // TODO: Use a function to translate logical to sprite id
                     Exchange.Attach(playerSprite);
                     Children.Add(playerSprite);
                 }

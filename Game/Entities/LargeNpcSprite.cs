@@ -13,7 +13,7 @@ namespace UAlbion.Game.Entities
         public LargeNpcSprite(LargeNpcId id, MapNpc.Waypoint[] waypoints) : base(id, new Vector2(waypoints[0].X, waypoints[0].Y))
         {
             _waypoints = waypoints;
-            Animation = (LargeSpriteAnimation)new Random().Next((int)LargeSpriteAnimation.UpperBody);
+            Animation = (SpriteAnimation)new Random().Next((int)SpriteAnimation.Sleeping);
         }
     }
 }

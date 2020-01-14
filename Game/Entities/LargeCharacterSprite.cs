@@ -4,24 +4,36 @@ using System.Numerics;
 
 namespace UAlbion.Game.Entities
 {
-    public class LargeCharacterSprite<TSpriteId> : CharacterSprite<TSpriteId, LargeSpriteAnimation>
+    public class LargeSpriteAnimations
+    {
+        public static readonly IDictionary<SpriteAnimation, int[]> Frames = new Dictionary<SpriteAnimation, int[]>
+        {
+            { SpriteAnimation.WalkN, new[] {  0,  1,  2 } },
+            { SpriteAnimation.WalkE, new[] {  3,  4,  5 } },
+            { SpriteAnimation.WalkS, new[] {  6,  7,  8 } },
+            { SpriteAnimation.WalkW, new[] {  9, 10, 11 } },
+            { SpriteAnimation.SitN,  new[] { 12 } },
+            { SpriteAnimation.SitE,  new[] { 13 } },
+            { SpriteAnimation.SitS,  new[] { 14 } },
+            { SpriteAnimation.SitW,  new[] { 15 } },
+            { SpriteAnimation.Sleeping, new[] { 16 } },
+        };
+    }
+
+    public class SmallSpriteAnimations
+    {
+        public static readonly IDictionary<SpriteAnimation, int[]> Frames = new Dictionary<SpriteAnimation, int[]>
+        {
+            { SpriteAnimation.WalkN, new[] { 0,  1,  2 } },
+            { SpriteAnimation.WalkE, new[] { 3,  4,  5 } },
+            { SpriteAnimation.WalkS, new[] { 6,  7,  8 } },
+            { SpriteAnimation.WalkW, new[] { 9, 10, 11 } },
+        };
+    }
+
+    public class LargeCharacterSprite<TSpriteId> : CharacterSprite<TSpriteId, SpriteAnimation>
         where TSpriteId : Enum
     {
-        static readonly IDictionary<LargeSpriteAnimation, int[]> Frames = new Dictionary<LargeSpriteAnimation, int[]>
-        {
-            { LargeSpriteAnimation.WalkN, new[] {  0,  1,  2 } },
-            { LargeSpriteAnimation.WalkE, new[] {  3,  4,  5 } },
-            { LargeSpriteAnimation.WalkS, new[] {  6,  7,  8 } },
-            { LargeSpriteAnimation.WalkW, new[] {  9, 10, 11 } },
-            { LargeSpriteAnimation.SitN,  new[] { 12 } },
-            { LargeSpriteAnimation.SitE,  new[] { 13 } },
-            { LargeSpriteAnimation.SitS,  new[] { 14 } },
-            { LargeSpriteAnimation.SitW,  new[] { 15 } },
-            { LargeSpriteAnimation.UpperBody, new[] { 16 } },
-        };
-
-        public LargeCharacterSprite(TSpriteId id, Vector2 position) : base(id, position, Frames)
-        {
-        }
+        public LargeCharacterSprite(TSpriteId id, Vector2 position) : base(id, position, LargeSpriteAnimations.Frames) { }
     }
 }

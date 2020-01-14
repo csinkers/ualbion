@@ -22,7 +22,7 @@ namespace UAlbion.Game.State.Player
                 var elapsed = (DateTime.Now - x._lastChangeTime).TotalMilliseconds;
                 var oldLerp = x._lerp;
                 x._lerp = elapsed > TransitionSpeedMilliseconds ? 1.0f : (float)(elapsed / TransitionSpeedMilliseconds);
-                if(x._lerp != oldLerp)
+                if (Math.Abs(x._lerp - oldLerp) > float.Epsilon)
                     x.Raise(new InventoryChangedEvent(x._id));
             })
         );

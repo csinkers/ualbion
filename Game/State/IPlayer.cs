@@ -8,7 +8,6 @@ namespace UAlbion.Game.State
     public interface IPlayer
     {
         PartyCharacterId Id { get; }
-        Vector2 Position { get; }
         int CombatPosition { get; }
         IEffectiveCharacterSheet Effective { get; }
         IEffectiveCharacterSheet Apparent { get; }

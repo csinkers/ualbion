@@ -90,7 +90,7 @@ namespace UAlbion.Game.Entities
                 out var texSize,
                 out var layer);
 
-            DrawLayer drawLayer = ((int) tile.Layer & 0x7) switch
+            DrawLayer drawLayer = ((int)tile.Layer & 0x7) switch
             {
                 (int)TilesetData.TileLayer.Normal => DrawLayer.Underlay,
                 (int)TilesetData.TileLayer.Layer1 => DrawLayer.Overlay1,

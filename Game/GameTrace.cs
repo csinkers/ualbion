@@ -2,6 +2,7 @@
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Assets;
+using UAlbion.Game.Entities;
 
 namespace UAlbion.Game
 {
@@ -20,6 +21,11 @@ namespace UAlbion.Game
         void AssetLoaded(AssetType type, int id, string name, GameLanguage language, string path)
         {
             WriteEvent(1, type, id, name, language, path);
+        }
+
+        public void Move(LargePartyMovement.Direction oldDir, LargePartyMovement.Direction desiredDir, LargePartyMovement.Direction facingDir, float fromX, float fromY, float toX, float toY, int frame)
+        {
+            WriteEvent(2, oldDir, desiredDir, facingDir, fromX, fromY, toX, toY, frame);
         }
     }
 }

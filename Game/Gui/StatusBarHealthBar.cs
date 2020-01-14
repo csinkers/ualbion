@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Numerics;
+﻿using System.Numerics;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
@@ -24,8 +23,8 @@ namespace UAlbion.Game.Gui
             if (stateManager.State == null)
                 return;
 
-            var playerId = stateManager.State.Party.Players.ElementAt(_order).Id;
-            var highlighted = playerId == stateManager.State.Party.Leader;
+            var playerId = stateManager.State.Party.Players[_order].Id;
+            var highlighted = playerId == stateManager.State.Party.Players[0].Id;
             var sheet = stateManager.State.GetPartyMember(playerId);
             var value = _isHealth ? sheet.Apparent.Combat.LifePoints : sheet.Apparent.Magic.SpellPoints;
             var valueMax = _isHealth ? sheet.Apparent.Combat.LifePointsMax : sheet.Apparent.Magic.SpellPointsMax;

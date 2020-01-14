@@ -8,7 +8,7 @@ namespace UAlbion.Game.Entities
     {
         public SmallPlayerSprite(SmallPartyGraphicsId id, Vector2 position) : base(id, position)
         {
-            Animation = (SmallSpriteAnimation)new Random().Next((int)SmallSpriteAnimation.WalkW + 1);
+            Animation = (SpriteAnimation)new Random().Next((int)SpriteAnimation.WalkW + 1);
         }
     }
 }

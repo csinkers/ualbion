@@ -21,7 +21,8 @@ namespace UAlbion.Game.Entities
         public Vector3 Normal => Vector3.UnitZ;
         readonly IDictionary<TAnim, int[]> _frames;
         public TSpriteId Id { get; }
-        Vector2 _position;
+        protected Vector2 _position;
+        protected int _frame;
         Vector2 _size = Vector2.One;
         public TAnim Animation { get; set; }
 
@@ -69,19 +70,19 @@ namespace UAlbion.Game.Entities
             e.RegisterHit(t, this);
         }
 
-        void Render(RenderEvent e)
+        protected virtual void Render(RenderEvent e)
         {
             var map = Resolve<IMapManager>().Current;
             var pixelPosition = _position * new Vector2(map.TileSize.X, map.TileSize.Y);
             var positionLayered = new Vector3(pixelPosition, DrawLayer.Characters1.ToZCoordinate(_position.Y));
 
-            var frameCount = Resolve<IStateManager>()?.FrameCount ?? 0;
-            var cycle = _frames[Animation];
-            var frame = cycle[frameCount % cycle.Length];
+            // var frameCount = Resolve<IStateManager>()?.FrameCount ?? 0;
+            // var cycle = _frames[Animation];
+            // var frame = cycle[frameCount % cycle.Length];
 
             var npcSprite = new Sprite<TSpriteId>(
                 Id,
-                frame,
+                _frame,
                 positionLayered,
                 (int)DrawLayer.Characters1,
                 0);

@@ -10,7 +10,7 @@ namespace UAlbion.Game.Entities
 
         public LargePlayerSprite(LargePartyGraphicsId id) : base(id, Vector2.Zero)
         {
-            Animation = (LargeSpriteAnimation)new Random().Next((int)LargeSpriteAnimation.UpperBody);
+            Animation = (SpriteAnimation)new Random().Next((int)SpriteAnimation.Sleeping);
         }
     }
 }

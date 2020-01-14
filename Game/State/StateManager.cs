@@ -51,6 +51,10 @@ namespace UAlbion.Game.State
 
         void NewGame()
         {
+            foreach(var child in Children)
+                child.Detach();
+            Children.Clear();
+
             var assets = Resolve<IAssetManager>();
             _state = new GameState();
 

@@ -12,7 +12,7 @@ namespace UAlbion.Game.Entities
         public SmallNpcSprite(SmallNpcId id, MapNpc.Waypoint[] waypoints) : base(id, new Vector2(waypoints[0].X, waypoints[0].Y))
         {
             _waypoints = waypoints;
-            Animation = (SmallSpriteAnimation)new Random().Next((int)SmallSpriteAnimation.WalkW + 1);
+            Animation = (SpriteAnimation)new Random().Next((int)SpriteAnimation.MaxWalk + 1);
         }
     }
 }

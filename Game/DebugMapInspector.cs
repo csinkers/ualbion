@@ -40,7 +40,7 @@ namespace UAlbion.Game
             if (_hits == null)
                 return;
 
-            var state = Resolve<IStateManager>();
+            var state = Resolve<IGameState>();
             var window = Resolve<IWindowManager>();
             if (state == null)
                 return;

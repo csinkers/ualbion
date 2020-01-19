@@ -1,33 +1,97 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
+using UAlbion.Formats.MapEvents;
+using UAlbion.Game.Events;
 
 namespace UAlbion.Game.State
 {
-    public class Party : IParty
+    public class Party : ServiceComponent<IParty>, IParty
     {
         public const int MaxPartySize = 6;
-        readonly List<Player.Player> _players = new List<Player.Player>();
-        public IList<Player.Player> Players => _players;  // Max of 6
+
+        readonly IDictionary<PartyCharacterId, CharacterSheet> _characterSheets;
+        readonly List<Player.Player> _statusBarOrder = new List<Player.Player>();
+        readonly List<Player.Player> _walkOrder = new List<Player.Player>();
+        readonly IReadOnlyList<Player.Player> _readOnlyStatusBarOrder;
+        readonly IReadOnlyList<Player.Player> _readOnlyWalkOrder;
+
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<Party, AddPartyMemberEvent>((x,e) => x.AddMember(e.PartyMemberId)),
+            H<Party, RemovePartyMemberEvent>((x,e) => x.RemoveMember(e.PartyMemberId))
+        );
+
+        public Party(IDictionary<PartyCharacterId, CharacterSheet> characterSheets) : base(Handlers)
+        {
+            _characterSheets = characterSheets;
+            _readOnlyStatusBarOrder = new ReadOnlyCollection<Player.Player>(_statusBarOrder);
+            _readOnlyWalkOrder = new ReadOnlyCollection<Player.Player>(_walkOrder);
+        }
+
+        public IPlayer this[PartyCharacterId id] => _statusBarOrder.Single(x => x.Id == id);
+        public IReadOnlyList<IPlayer> StatusBarOrder => _readOnlyStatusBarOrder;
+        public IReadOnlyList<IPlayer> WalkOrder => _readOnlyWalkOrder;
 
         // The current party leader (shown with a white outline on
         // health bar and slightly raised in the status bar)
         public PartyCharacterId Leader
         {
+            get => _walkOrder[0].Id;
             set
             {
-                int index = _players.FindIndex(x => x.Id == value);
+                int index = _walkOrder.FindIndex(x => x.Id == value);
                 if (index == -1) 
                     return;
 
-                var player = _players[index];
-                _players.RemoveAt(index);
-                _players.Insert(0, player);
+                var player = _walkOrder[index];
+                _walkOrder.RemoveAt(index);
+                _walkOrder.Insert(0, player);
             }
         }
 
-        IReadOnlyList<IPlayer> IParty.Players => _players;  // Max of 6
+        void AddMember(PartyCharacterId id)
+        {
+            if (_statusBarOrder.Any(x => x.Id == id))
+                return;
+
+            var player = new Player.Player(id, _characterSheets[id]);
+            for (int i = 0; i < MaxPartySize; i++)
+            {
+                if (_statusBarOrder.Count == i || _statusBarOrder[i].Id > id)
+                {
+                    _statusBarOrder.Insert(i, player);
+                    break;
+                }
+            }
+
+            _walkOrder.Add(player);
+            Exchange.Attach(player);
+            Children.Add(player);
+
+            Raise(new PartyChangedEvent());
+        }
+
+        void RemoveMember(PartyCharacterId id)
+        {
+            var player = _statusBarOrder.FirstOrDefault(x => x.Id == id);
+            if (player == null)
+                return;
+
+            _walkOrder.Remove(player);
+            _statusBarOrder.Remove(player);
+            player.Detach();
+            Raise(new PartyChangedEvent());
+        }
+
+        public void Clear()
+        {
+            foreach(var id in _statusBarOrder.Select(x => x.Id).ToList())
+                RemoveMember(id);
+        }
     }
 
     public interface IMovement : IComponent
@@ -35,3 +99,4 @@ namespace UAlbion.Game.State
         (Vector2, int) GetPositionHistory(PartyCharacterId partyMember);
     }
 }
+

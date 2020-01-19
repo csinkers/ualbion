@@ -55,8 +55,7 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 var goldSource = new DynamicText(() =>
                 {
-                    var state = Resolve<IStateManager>();
-                    var player = state.State.GetPartyMember(activeCharacter);
+                    var player = Resolve<IParty>()[activeCharacter];
                     var gold = player.Apparent.Inventory.Gold;
                     return new[] {new TextBlock($"{gold / 10}.{gold % 10}")};
                 }, x => _version);
@@ -70,8 +69,7 @@ namespace UAlbion.Game.Gui.Inventory
 
                 var foodSource = new DynamicText(() =>
                 {
-                    var state = Resolve<IStateManager>();
-                    var player = state.State.GetPartyMember(activeCharacter);
+                    var player = Resolve<IParty>()[activeCharacter];
                     var food = player.Apparent.Inventory.Rations;
                     return new[] { new TextBlock(food.ToString()) };
                 }, x => _version);

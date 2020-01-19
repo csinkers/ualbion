@@ -30,7 +30,7 @@ namespace UAlbion.Game
         public IMap Current { get; private set; }
         public MapManager() : base(Handlers) { }
 
-        protected override void Subscribed()
+        public override void Subscribed()
         {
             _allMapsExchange ??= new EventExchange("Maps", Exchange);
             base.Subscribed();
@@ -67,7 +67,8 @@ namespace UAlbion.Game
 
                 // Set the scene first to ensure scene-local components from other scenes are disabled.
                 Raise(new SetSceneEvent(map is Map3D ? SceneId.World3D : SceneId.World2D)); 
-                // Raise(new CameraJumpEvent((int) map.LogicalSize.X / 2, (int) map.LogicalSize.Y / 2));
+                Raise(new CameraJumpEvent((int) map.LogicalSize.X / 2, (int) map.LogicalSize.Y / 2));
+                Raise(new PartyJumpEvent((int) map.LogicalSize.X / 2, (int) map.LogicalSize.Y / 2));
                 Raise(new LogEvent(LogEvent.Level.Info, $"Loaded map {(int) pendingMapChange}: {pendingMapChange}"));
             }
         }

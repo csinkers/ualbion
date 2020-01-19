@@ -102,7 +102,7 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        protected override void Subscribed()
+        public override void Subscribed()
         {
             if (_mapData == null)
             {
@@ -133,8 +133,8 @@ namespace UAlbion.Game.Entities
                 Exchange.Register(partyMovement);
                 Children.Add(partyMovement);
 
-                var state = Resolve<IStateManager>().State;
-                foreach(var player in state.Party.Players)
+                var state = Resolve<IGameState>();
+                foreach(var player in state.Party.StatusBarOrder)
                 {
                     var playerSprite = /*_useSmallSprites 
                         ? new PlayerSprite(player.Id, (SmallPartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id)); // TODO: Use a function to translate logical to sprite id

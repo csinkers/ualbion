@@ -123,7 +123,7 @@ namespace UAlbion
                 )
                 .Register<IClock>(new GameClock())
                 .Register<ISpriteResolver>(new SpriteResolver())
-                .Register<IStateManager>(new StateManager())
+                .Register<IGameState>(new GameState())
                 .Register<ITextManager>(new TextManager())
                 .Register<ITextureManager>(new TextureManager())
                 .Attach(engine)

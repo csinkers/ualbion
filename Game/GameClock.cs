@@ -48,8 +48,8 @@ namespace UAlbion.Game
                     _elapsedTimeThisGameFrame -= TickDurationSeconds;
                     Raise(new UpdateEvent(1));
 
-                    var stateManager = Resolve<IStateManager>();
-                    if ((stateManager?.FrameCount ?? 0) % TicksPerCacheCycle == TicksPerCacheCycle - 1) Raise(new CycleCacheEvent());
+                    var state = Resolve<IGameState>();
+                    if ((state?.FrameCount ?? 0) % TicksPerCacheCycle == TicksPerCacheCycle - 1) Raise(new CycleCacheEvent());
                 }
 
                 // If the game was paused for a while don't try and catch up

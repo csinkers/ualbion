@@ -49,8 +49,7 @@ namespace UAlbion.Game.Gui.Inventory
         {
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
-            var state = Resolve<IStateManager>();
-            var member = state.State.GetPartyMember(_activeMember);
+            var member = Resolve<IParty>()[_activeMember];
 
             // {INVE}{NAME} ({SEXC}), %u years old, {RACE}, {CLAS}, level %d.
             var (formatBlocks, _) = new TextFormatter(assets, settings.Gameplay.Language)
@@ -67,8 +66,7 @@ namespace UAlbion.Game.Gui.Inventory
         {
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
-            var state = Resolve<IStateManager>();
-            var member = state.State.GetPartyMember(_activeMember);
+            var member = Resolve<IParty>()[_activeMember];
             var formatter = new TextFormatter(assets, settings.Gameplay.Language);
             string S(SystemTextId id) => assets.LoadString(id, settings.Gameplay.Language);
 
@@ -107,8 +105,7 @@ namespace UAlbion.Game.Gui.Inventory
 
         IEnumerable<TextBlock> BuildPoints()
         {
-            var state = Resolve<IStateManager>();
-            var member = state.State.GetPartyMember(_activeMember);
+            var member = Resolve<IParty>()[_activeMember];
             yield return new TextBlock($"{member.Apparent.Combat.LifePoints}/{member.Apparent.Combat.LifePointsMax}") { Arrangement = TextArrangement.NoWrap };
 
             yield return new TextBlock(

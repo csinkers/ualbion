@@ -6,7 +6,7 @@ using System.Text;
 
 namespace UAlbion.Api
 {
-    public abstract class Event : IEvent
+    public abstract class Event : IEvent // Contains no fields, only helper methods for reflection-based parsing and serialization.
     {
         static IEnumerable<Type> GetAllEventTypes()
         {

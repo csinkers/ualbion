@@ -5,7 +5,6 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities
 {
@@ -34,7 +33,7 @@ namespace UAlbion.Game.Entities
             _frames = frames;
         }
 
-        protected override void Subscribed()
+        public override void Subscribed()
         {
             var assets = Resolve<IAssetManager>();
             var texture = assets?.LoadTexture(Id);

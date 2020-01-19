@@ -31,9 +31,8 @@ namespace UAlbion.Game.Gui.Inventory
             var mainStack = new VerticalStack(
                 new Header(new DynamicText(() =>
                     {
-                        var state = Resolve<IStateManager>();
+                        var member = Resolve<IParty>()[activeCharacter];
                         var settings = Resolve<ISettings>();
-                        var member = state.State.GetPartyMember(activeCharacter);
                         var name = member.Apparent.GetName(settings.Gameplay.Language);
                         return new[] { new TextBlock(name) { Alignment = TextAlignment.Center } };
                     })),

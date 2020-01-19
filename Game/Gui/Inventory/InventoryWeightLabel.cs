@@ -30,7 +30,7 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 var assets = Resolve<IAssetManager>();
                 var settings = Resolve<ISettings>();
-                var player = Resolve<IStateManager>().State.GetPartyMember(_activeCharacter);
+                var player = Resolve<IParty>()[_activeCharacter];
 
                 // Carried Weight : %ld of %ld g
                 var template = assets.LoadString(SystemTextId.Inv_CarriedWeightNdOfNdG, settings.Gameplay.Language);
@@ -42,7 +42,7 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 var assets = Resolve<IAssetManager>();
                 var settings = Resolve<ISettings>();
-                var player = Resolve<IStateManager>().State.GetPartyMember(_activeCharacter);
+                var player = Resolve<IParty>()[_activeCharacter];
 
                 int weight = player.Apparent.TotalWeight / 1000;
                 var template = assets.LoadString(SystemTextId.Inv_WeightNKg, settings.Gameplay.Language); // Weight : %d Kg

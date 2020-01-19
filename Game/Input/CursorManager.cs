@@ -60,8 +60,9 @@ namespace UAlbion.Game.Input
             if (_cursorId == CoreSpriteId.CursorSmall) // Inventory screen, check what's being held.
             {
                 var assets = Resolve<IAssetManager>();
-                var state = Resolve<IStateManager>();
-                var held = state.State.InventoryScreenState.ItemInHand;
+                var state = Resolve<IGameState>();
+                var held = Resolve<IInventoryScreenState>().ItemInHand;
+
                 if (held is GoldInHand)
                 {
                     var spriteId = CoreSpriteId.UiGold;

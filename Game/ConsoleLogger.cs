@@ -25,33 +25,9 @@ namespace UAlbion.Game
             exchange.Subscribe<BeginFrameEvent>(this);
             Task.Run(ConsoleReaderThread);
         }
+        public void Detach() => _exchange = null;
         public void Subscribed() { }
-
-        void PrintHelpSummary(IEnumerable<EventMetadata> events)
-        {
-            foreach (var e in events)
-            {
-                var paramList = e.Parts.Length == 0
-                    ? ""
-                    : " " + string.Join(" ",
-                        e.Parts.Select(x => x.IsOptional ? $"[{x.Name}]" : x.Name));
-
-                Console.WriteLine("    {0}{1}: {2}", e.Name, paramList, e.HelpText);
-            }
-        }
-
-        void PrintDetailedHelp(EventMetadata metadata)
-        {
-            var paramList = metadata.Parts.Length == 0
-                ? ""
-                : " " + string.Join(" ",
-                    metadata.Parts.Select(x => x.IsOptional ? $"[{x.Name}]" : x.Name));
-
-            Console.WriteLine("    {0}{1}: {2}", metadata.Name, paramList, metadata.HelpText);
-            foreach (var param in metadata.Parts)
-                Console.WriteLine("        {0} ({1}): {2}", param.Name, param.PropertyType, param.HelpText);
-        }
-
+        public bool IsSubscriber(EventExchange exchange) => exchange == _exchange;
         public void Receive(IEvent @event, object sender)
         {
             switch(@event)
@@ -143,9 +119,29 @@ namespace UAlbion.Game
             }
         }
 
-        public void Detach()
+        void PrintHelpSummary(IEnumerable<EventMetadata> events)
         {
-            _exchange = null;
+            foreach (var e in events)
+            {
+                var paramList = e.Parts.Length == 0
+                    ? ""
+                    : " " + string.Join(" ",
+                        e.Parts.Select(x => x.IsOptional ? $"[{x.Name}]" : x.Name));
+
+                Console.WriteLine("    {0}{1}: {2}", e.Name, paramList, e.HelpText);
+            }
+        }
+
+        void PrintDetailedHelp(EventMetadata metadata)
+        {
+            var paramList = metadata.Parts.Length == 0
+                ? ""
+                : " " + string.Join(" ",
+                    metadata.Parts.Select(x => x.IsOptional ? $"[{x.Name}]" : x.Name));
+
+            Console.WriteLine("    {0}{1}: {2}", metadata.Name, paramList, metadata.HelpText);
+            foreach (var param in metadata.Parts)
+                Console.WriteLine("        {0} ({1}): {2}", param.Name, param.PropertyType, param.HelpText);
         }
 
         void ConsoleReaderThread()
@@ -171,6 +167,5 @@ namespace UAlbion.Game
 
             } while (!_done);
         }
-
     }
 }

@@ -12,7 +12,9 @@ namespace UAlbion.Game.Gui.Inventory
     {
         const string ExitButtonId = "Inventory.Exit";
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<InventoryScreen, ISetInventoryModeEvent>((x,e) => x.SetMode(e)),
+            H<InventoryScreen, SetInventoryModeEvent>((x,e) => x.SetMode(e)),
+            H<InventoryScreen, SetInventoryChestModeEvent>((x,e) => x.SetMode(e)),
+            H<InventoryScreen, SetInventoryMerchantModeEvent>((x,e) => x.SetMode(e)),
             H<InventoryScreen, ButtonPressEvent>((x, e) => x.OnButton(e.ButtonId))
         );
 
@@ -26,7 +28,7 @@ namespace UAlbion.Game.Gui.Inventory
             _config = config;
         }
 
-        protected override void Subscribed()
+        public override void Subscribed()
         {
             Rebuild();
             base.Subscribed();

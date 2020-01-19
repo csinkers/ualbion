@@ -56,13 +56,13 @@ namespace UAlbion.Game.Gui
             }
         }
 
-        protected override void Subscribed()
+        public override void Subscribed()
         {
             foreach (var child in Children)
                 child.Detach();
             Children.Clear();
 
-            var state = Resolve<IStateManager>();
+            var state = Resolve<IGameState>();
             var elements = new List<IUiElement>
             {
                 new Padding(0, 2),
@@ -71,7 +71,7 @@ namespace UAlbion.Game.Gui
                 new Padding(0, 2),
             };
 
-            if (state.State != null)
+            if (state.Loaded)
             {
                 elements.AddRange(new IUiElement[]
                 {
@@ -86,7 +86,7 @@ namespace UAlbion.Game.Gui
                 new Button(LoadGameKey, S(SystemTextId.MainMenu_LoadGame)),
             });
 
-            if (state.State != null)
+            if (state.Loaded)
                 elements.Add(new Button(SaveGameKey, S(SystemTextId.MainMenu_SaveGame)));
 
             elements.AddRange(new IUiElement[]

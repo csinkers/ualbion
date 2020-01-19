@@ -68,7 +68,7 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        protected override void Subscribed() { Raise(new LoadPaletteEvent(_mapData.PaletteId)); }
+        public override void Subscribed() { Raise(new LoadPaletteEvent(_mapData.PaletteId)); }
 
         void SetTile(int index, int order, int frame)
         {
@@ -86,7 +86,7 @@ namespace UAlbion.Game.Entities
 
         void PostUpdate()
         {
-            var state = Resolve<IStateManager>();
+            var state = Resolve<IGameState>();
             if (state == null)
                 return;
 

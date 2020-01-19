@@ -13,12 +13,11 @@ namespace UAlbion.Game.State.Player
         static readonly HandlerSet Handlers = new HandlerSet(
         );
 
-
-        public Player(PartyCharacterId id, CharacterSheet sheet, InventoryScreenState inventoryScreenState) : base(Handlers)
+        public Player(PartyCharacterId id, CharacterSheet sheet) : base(Handlers)
         {
             Id = id;
             _base = sheet;
-            _inventoryManager = new PlayerInventoryManager(id, _base, inventoryScreenState);
+            _inventoryManager = new PlayerInventoryManager(id, _base);
             Children.Add(_inventoryManager);
         }
 
@@ -28,6 +27,7 @@ namespace UAlbion.Game.State.Player
         public IEffectiveCharacterSheet Effective => _inventoryManager.Effective;
         public IEffectiveCharacterSheet Apparent => _inventoryManager.Apparent;
         public InventoryAction GetInventoryAction(ItemSlotId slotId) => _inventoryManager.GetInventoryAction(slotId);
+        public override string ToString() => $"Player {Id}";
     }
 }
 

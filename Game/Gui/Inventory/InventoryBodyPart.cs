@@ -15,7 +15,6 @@ namespace UAlbion.Game.Gui.Inventory
         protected override ButtonFrame Frame { get; }
         readonly UiItemSprite _sprite;
 
-
         // Inner area 16x16 w/ 1-pixel button frame
         public InventoryBodyPart(PartyCharacterId activeCharacter, ItemSlotId itemSlotId)
             : base(activeCharacter, SlotHandlers)
@@ -28,9 +27,9 @@ namespace UAlbion.Game.Gui.Inventory
 
         void Rebuild()
         {
-            var state = Resolve<IStateManager>();
+            var state = Resolve<IGameState>();
             var assets = Resolve<IAssetManager>();
-            var member = state.State.GetPartyMember(ActiveCharacter);
+            var member = state.Party[ActiveCharacter];
             var slotInfo = member.Apparent.Inventory.GetSlot(SlotId);
 
             if(slotInfo == null)

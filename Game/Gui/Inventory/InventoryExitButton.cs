@@ -33,7 +33,7 @@ namespace UAlbion.Game.Gui.Inventory
             _buttonId = buttonId;
         }
 
-        protected override void Subscribed()
+        public override void Subscribed()
         {
             _normal = new UiSprite<CoreSpriteId>(CoreSpriteId.UiExitButton);
             _hover = new UiSprite<CoreSpriteId>(CoreSpriteId.UiExitButtonHover);

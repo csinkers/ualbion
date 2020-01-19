@@ -80,7 +80,7 @@ namespace UAlbion.Core
                     RenderDoc.Load(out _renderDoc);
         }
 
-        protected override void Subscribed()
+        public override void Subscribed()
         {
             var shaderCache = Resolve<IShaderCache>();
             if(shaderCache == null)
@@ -364,7 +364,7 @@ namespace UAlbion.Core
             [EventPart("value", "Valid values: OpenGL, OpenGLES, Vulkan, Metal or Direct3D11")] public GraphicsBackend Value { get; } 
         }
 
-        [Event("e:set_msaa", "Sets the multisample anti-asliasing level")]
+        [Event("e:set_msaa", "Sets the multisample anti-aliasing level")]
         public class SetMsaaLevelEvent : IEvent
         {
             [EventPart("sample_count")]

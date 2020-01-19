@@ -20,14 +20,13 @@ namespace UAlbion.Game.Gui.Inventory
             }),
             H<InventoryDefensiveLabel, UiBlurEvent>((x, _) => x.Raise(new HoverTextEvent(""))));
 
-
         public InventoryDefensiveLabel(PartyCharacterId activeCharacter) : base(Handlers)
         {
             _activeCharacter = activeCharacter;
 
             var source = new DynamicText(() =>
             {
-                var player = Resolve<IStateManager>().State.GetPartyMember(_activeCharacter);
+                var player = Resolve<IParty>()[_activeCharacter];
                 var protection = player.Apparent.Combat.Protection;
                 return new[] { new TextBlock($": {protection}") };
             }, x => _version);
@@ -49,9 +48,9 @@ namespace UAlbion.Game.Gui.Inventory
 
         void Hover()
         {
+            var player = Resolve<IParty>()[_activeCharacter];
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
-            var player = Resolve<IStateManager>().State.GetPartyMember(_activeCharacter);
 
             var protection = player.Effective.Combat.Protection;
             var template = assets.LoadString(SystemTextId.Inv_ProtectionN, settings.Gameplay.Language);

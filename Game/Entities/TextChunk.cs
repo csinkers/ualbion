@@ -22,7 +22,7 @@ namespace UAlbion.Game.Entities
         Vector2 _size;
 
         public TextChunk(TextBlock block) : base(Handlers) { Block = block; }
-        protected override void Subscribed() { IsDirty = true;}
+        public override void Subscribed() { IsDirty = true;}
         public override string ToString() => $"TextChunk:{Block} ({_size.X}x{_size.Y})";
 
         void Rebuild()

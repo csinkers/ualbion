@@ -25,7 +25,7 @@ namespace UAlbion.Game.Scenes
             Children.Add(cameraMotion);
         }
 
-        protected override void Subscribed()
+        public override void Subscribed()
         {
             Raise(new SetCursorEvent(CoreSpriteId.Cursor));
             Raise(new SetInputModeEvent(InputMode.World2D));

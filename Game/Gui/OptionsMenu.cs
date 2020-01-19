@@ -75,7 +75,7 @@ namespace UAlbion.Game.Gui
             Children.Add(new DialogFrame(stack));
         }
 
-        protected override void Subscribed()
+        public override void Subscribed()
         {
             var settings = Resolve<ISettings>();
             _musicVolume = settings.Audio.MusicVolume;

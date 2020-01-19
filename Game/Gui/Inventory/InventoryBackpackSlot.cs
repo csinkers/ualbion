@@ -66,7 +66,7 @@ namespace UAlbion.Game.Gui.Inventory
 
         void Rebuild()
         {
-            var state = Resolve<IStateManager>();
+            var state = Resolve<IGameState>();
             GetSlot(out _, out var item);
 
             if(item == null)

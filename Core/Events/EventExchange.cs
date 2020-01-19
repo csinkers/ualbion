@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 using UAlbion.Api;
 
 namespace UAlbion.Core.Events
@@ -13,22 +12,23 @@ namespace UAlbion.Core.Events
         static IComponent _logger;
         static int _nesting = -1;
         static readonly object SyncRoot = new object();
+        public static int Nesting => _nesting;
+
         readonly IDictionary<Type, IList<IComponent>> _subscriptions = new Dictionary<Type, IList<IComponent>>();
         readonly IDictionary<IComponent, IList<Type>> _subscribers = new Dictionary<IComponent, IList<Type>>();
         readonly ISet<IComponent> _topLevelSubscribers = new HashSet<IComponent>();
-        readonly ThreadLocal<bool> _isTopLevel = new ThreadLocal<bool>(() => true);
         readonly IDictionary<Type, object> _registrations = new Dictionary<Type, object>();
+        readonly ThreadLocal<bool> _isTopLevel = new ThreadLocal<bool>(() => true);
         readonly EventExchange _parent;
         readonly IList<EventExchange> _children = new List<EventExchange>();
-        readonly SubscribedEvent _subscribedEvent = new SubscribedEvent();
 #if DEBUG
         // ReSharper disable once CollectionNeverQueried.Local
         readonly IList<IEvent> _frameEvents = new List<IEvent>();
 #endif
-        bool _isActive = true;
-        public static int Nesting => _nesting;
+
         public string Name { get; }
 
+        bool _isActive = true;
         public bool IsActive
         {
             get => _isActive;
@@ -49,7 +49,8 @@ namespace UAlbion.Core.Events
                     }
 
                     foreach (var subscriber in subscribers)
-                        subscriber.Receive(_subscribedEvent, this);
+                        if (subscriber.IsSubscriber(this))
+                            subscriber.Subscribed();
                 }
             }
         }
@@ -183,6 +184,7 @@ namespace UAlbion.Core.Events
             PerfTracker.StartupEvent($"Attached {component.GetType().Name}");
             return this;
         }
+
         public void Subscribe<T>(IComponent subscriber) { Subscribe(typeof(T), subscriber); }
         public void Subscribe(Type eventType, IComponent subscriber)
         {
@@ -194,17 +196,20 @@ namespace UAlbion.Core.Events
                     if (subscribedTypes.Contains(eventType))
                         return;
                 }
-                else
+                else 
                 {
                     _subscribers[subscriber] = new List<Type>();
                     newSubscriber = true;
                 }
 
-                if (!_subscriptions.ContainsKey(eventType))
-                    _subscriptions.Add(eventType, new List<IComponent>());
+                if (eventType != null)
+                {
+                    if (!_subscriptions.ContainsKey(eventType))
+                        _subscriptions.Add(eventType, new List<IComponent>());
 
-                _subscriptions[eventType].Add(subscriber);
-                _subscribers[subscriber].Add(eventType);
+                    _subscriptions[eventType].Add(subscriber);
+                    _subscribers[subscriber].Add(eventType);
+                }
             }
 
             if (newSubscriber)
@@ -215,7 +220,7 @@ namespace UAlbion.Core.Events
                         _topLevelSubscribers.Add(subscriber);
 
                 _isTopLevel.Value = false;
-                subscriber.Receive(_subscribedEvent, this);
+                subscriber.Subscribed();
                 _isTopLevel.Value = wasTopLevel;
             }
         }
@@ -260,7 +265,6 @@ namespace UAlbion.Core.Events
                 }
                 else _registrations.Add(type, system);
 
-
                 doAttach = system is IComponent component && !_subscribers.ContainsKey(component);
             }
 
@@ -270,10 +274,14 @@ namespace UAlbion.Core.Events
             return this;
         }
 
-        public EventExchange RegisterAsync<T>(object system)
+        public void Unregister<T>(T system) => Unregister(typeof(T), system);
+        public void Unregister(Type type, object system)
         {
-            Task.Run(() => Register(typeof(T), system));
-            return this;
+            lock (SyncRoot)
+            {
+                if (_registrations.TryGetValue(type, out var current) && current == system)
+                    _registrations.Remove(type);
+            }
         }
 
         public T Resolve<T>()

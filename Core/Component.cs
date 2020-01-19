@@ -11,6 +11,7 @@ namespace UAlbion.Core
         // Used when null is passed to the constructor so we
         // won't need null checks when accessing _handlers.
         static readonly HandlerSet EmptySet = new HandlerSet();
+
         protected abstract class Handler
         {
             public Type Type { get; }
@@ -56,12 +57,11 @@ namespace UAlbion.Core
         readonly IDictionary<Type, Handler> _handlers; 
         protected EventExchange Exchange { get; private set; } // N.B. will be null until subscribed.
         protected IList<IComponent> Children { get; } = new List<IComponent>();
+
         protected Component() : this(null) { }
         protected Component(IDictionary<Type, Handler> handlers)
         {
             _handlers = handlers ?? EmptySet;
-            if (!_handlers.ContainsKey(typeof(SubscribedEvent)))
-                _handlers.Add(typeof(SubscribedEvent), new Handler<Component, SubscribedEvent>((x, e) => x.Subscribed()));
         }
 
         public void Attach(EventExchange exchange)
@@ -77,6 +77,7 @@ namespace UAlbion.Core
             foreach (var child in Children)
                 child.Attach(exchange);
 
+            exchange.Subscribe(null, this); // Ensure we always get added to the subscriber list, even if this component only uses subscription notifications.
             foreach (var kvp in _handlers)
                 exchange.Subscribe(kvp.Key, this);
         }
@@ -88,20 +89,9 @@ namespace UAlbion.Core
         {
             if (sender == this || Exchange == null)
                 return;
+
             if (_handlers.TryGetValue(@event.GetType(), out var handler))
                 handler.Invoke(this, @event);
-            else
-            {
-                var interfaces = @event.GetType().GetInterfaces();
-                foreach (var i in interfaces)
-                {
-                    if (_handlers.TryGetValue(i, out var interfaceHandler))
-                    {
-                        interfaceHandler.Invoke(this, @event);
-                        break;
-                    }
-                }
-            }
         }
 
         public virtual void Detach()
@@ -116,7 +106,9 @@ namespace UAlbion.Core
             Exchange = null;
         }
 
-        protected virtual void Subscribed() { }
+        public virtual void Subscribed() { }
+        public bool IsSubscriber(EventExchange exchange) => Exchange == exchange;
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void Raise(IEvent @event) { Exchange?.Raise(@event, this); }

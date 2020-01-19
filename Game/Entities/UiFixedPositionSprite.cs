@@ -27,7 +27,7 @@ namespace UAlbion.Game.Entities
 
         public override string ToString() => $"{_id} @ {_extents}";
         public override Vector2 GetSize() => new Vector2(_extents.Width, _extents.Height);
-        protected override void Subscribed() { Rebuild(); base.Subscribed(); }
+        public override void Subscribed() { Rebuild(); base.Subscribed(); }
         void Rebuild()
         {
             var window = Resolve<IWindowManager>();

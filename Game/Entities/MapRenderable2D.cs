@@ -69,7 +69,7 @@ namespace UAlbion.Game.Entities
             };
         }
 
-        protected override void Subscribed()
+        public override void Subscribed()
         {
             Raise(new LoadPaletteEvent(Palette));
             Update(true);
@@ -130,7 +130,7 @@ namespace UAlbion.Game.Entities
 
         void Update(bool updateAll = false)
         {
-            var state = Resolve<IStateManager>();
+            var state = Resolve<IGameState>();
             if (HighlightIndex.HasValue)
             {
                 int zoneNum = _mapData.ZoneLookup[HighlightIndex.Value];

@@ -6,7 +6,9 @@ namespace UAlbion.Core
     public interface IComponent
     {
         void Attach(EventExchange exchange);
-        void Receive(IEvent @event, object sender);
         void Detach();
+        void Receive(IEvent @event, object sender);
+        void Subscribed(); // Should only be called by EventExchange
+        bool IsSubscriber(EventExchange exchange);
     }
 }

@@ -19,7 +19,7 @@ namespace UAlbion.Game.Scenes
         public MenuScene() : base(SceneId.MainMenu, new OrthographicCamera(), Renderers)
         { }
 
-        protected override void Subscribed()
+        public override void Subscribed()
         {
             Raise(new SetCursorEvent(CoreSpriteId.Cursor));
             Raise(new SetMouseModeEvent(MouseMode.Normal));

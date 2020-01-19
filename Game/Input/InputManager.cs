@@ -9,7 +9,8 @@ namespace UAlbion.Game.Input
     {
         static readonly HandlerSet Handlers = new HandlerSet(
             H<InputManager, SetInputModeEvent>((x,e) => x.SetInputMode(e)),
-            H<InputManager, ISetMouseModeEvent>((x,e) => x.SetMouseMode(e))
+            H<InputManager, SetMouseModeEvent>((x,e) => x.SetMouseMode(e)),
+            H<InputManager, SetExclusiveMouseModeEvent>((x,e) => x.SetMouseMode(e))
         );
 
         readonly IDictionary<InputMode, IComponent> _inputModes = new Dictionary<InputMode, IComponent>();

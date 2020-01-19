@@ -186,14 +186,15 @@ namespace UAlbion.Game.Entities
 
         public (Vector2, int) GetPositionHistory(PartyCharacterId partyMember)
         {
-            var players = Resolve<IStateManager>().State.Party.Players;
+            var players = Resolve<IParty>().WalkOrder;
             int index = 0;
             for (; index < players.Count && players[index].Id != partyMember; index++) { }
 
             if (index == players.Count)
                 return (Vector2.Zero, 0);
 
-            return _trail[_playerOffsets[index].Item1];
+            var (pos, frame) = _trail[_playerOffsets[index].Item1];
+            return (pos + new Vector2(0.5f, 0.0f), frame);
         }
     }
 }

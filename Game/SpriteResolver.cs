@@ -39,7 +39,7 @@ namespace UAlbion.Game
             {typeof(SlabId), AssetType.Slab}
         };
 
-        protected override void Subscribed() { _defaultTexture = Resolve<IAssetManager>().LoadTexture(DungeonWallId.DefaultTexture); }
+        public override void Subscribed() { _defaultTexture = Resolve<IAssetManager>().LoadTexture(DungeonWallId.DefaultTexture); }
 
         public Vector2 GetSize(Type idType, int id, int subObject)
         {

@@ -54,13 +54,13 @@ namespace UAlbion.Game.Gui
             maxOrder = Math.Max(maxOrder, func(_hoverTextContainer, extents, order + 1));
             maxOrder = Math.Max(maxOrder, func(_descriptionTextContainer, extents, order + 1));
 
-            var stateManager = Resolve<IStateManager>();
-            if (stateManager.State == null)
+            var party = Resolve<IParty>();
+            if (party == null)
                 return maxOrder;
 
             for (int i = 0; i < _portraits.Length; i++)
             {
-                if (i >= stateManager.State.Party.Players.Count)
+                if (i >= party.StatusBarOrder.Count)
                     break;
 
                 var portrait = _portraits[i];

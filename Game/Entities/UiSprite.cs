@@ -46,7 +46,7 @@ namespace UAlbion.Game.Entities
 
         public bool Highlighted { get; set; }
 
-        protected override void Subscribed()
+        public override void Subscribed()
         {
             UpdateSize();
             base.Subscribed();

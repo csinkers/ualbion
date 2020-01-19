@@ -19,7 +19,7 @@ namespace UAlbion.Game.Scenes
         public InventoryScene() : base(SceneId.Inventory, new OrthographicCamera(), Renderers)
         { }
 
-        protected override void Subscribed()
+        public override void Subscribed()
         {
             Raise(new SetCursorEvent(CoreSpriteId.Cursor));
             Raise(new PushMouseModeEvent(MouseMode.Normal));

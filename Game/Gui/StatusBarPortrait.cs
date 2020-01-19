@@ -28,55 +28,6 @@ namespace UAlbion.Game.Gui
             H<StatusBarPortrait, TimerElapsedEvent>((x, e) => { if (e.Id == TimerName) x.OnTimer(); })
         );
 
-        void OnClick()
-        {
-            if (_isClickTimerPending) // If they double-clicked...
-            {
-                var stateManager = Resolve<IStateManager>();
-                var memberId = stateManager.State?.Party.Players.ElementAtOrDefault(_order)?.Id;
-                if(memberId.HasValue)
-                    Raise(new OpenCharacterInventoryEvent(memberId.Value));
-                _isClickTimerPending = false; // Ensure the single-click behaviour doesn't happen.
-            }
-            else // For the first click, just start the double-click timer.
-            {
-                Raise(new StartTimerEvent(TimerName, 300, this));
-                _isClickTimerPending = true;
-            }
-        }
-        void OnTimer()
-        {
-            if (!_isClickTimerPending) // They've already double-clicked
-                return;
-
-            var stateManager = Resolve<IStateManager>();
-            var memberId = stateManager.State?.Party.Players.ElementAtOrDefault(_order)?.Id;
-            if (memberId.HasValue)
-                Raise(new SetActiveMemberEvent(memberId.Value));
-            _isClickTimerPending = false;
-        }
-
-        void Hover()
-        {
-            _portrait.Highlighted = true;
-            var stateManager = Resolve<IStateManager>();
-            var memberId = stateManager.State?.Party.Players.ElementAtOrDefault(_order)?.Id;
-            if (!memberId.HasValue)
-                return;
-
-            var member = stateManager.State.GetPartyMember(memberId.Value);
-            var settings = Resolve<ISettings>();
-            var assets = Resolve<IAssetManager>();
-            var template = assets.LoadString(SystemTextId.PartyPortrait_XLifeMana, settings.Gameplay.Language);
-            var (text, _) = new TextFormatter(assets, settings.Gameplay.Language).Format(
-                template, // %s (LP:%d, SP:%d)
-                member.Apparent.GetName(settings.Gameplay.Language),
-                member.Apparent.Combat.LifePoints,
-                member.Apparent.Magic.SpellPoints);
-
-            Raise(new HoverTextEvent(text.First().Text));
-        }
-
         readonly UiSprite<SmallPortraitId> _portrait;
         readonly StatusBarHealthBar _health;
         readonly StatusBarHealthBar _mana;
@@ -94,29 +45,18 @@ namespace UAlbion.Game.Gui
             Children.Add(_mana);
         }
 
-        void LoadSprite()
-        {
-            var stateManager = Resolve<IStateManager>();
-            var memberId = stateManager.State?.Party.Players.ElementAtOrDefault(_order)?.Id;
-            if (!memberId.HasValue)
-                return;
-
-            var member = stateManager.State.GetPartyMember(memberId.Value);
-            if (member.Apparent.PortraitId.HasValue)
-                _portrait.Id = member.Apparent.PortraitId.Value;
-        }
-
-        protected override void Subscribed() => LoadSprite();
+        public override void Subscribed() => LoadSprite();
         public override Vector2 GetSize() => _portrait.GetSize() + new Vector2(0,6); // Add room for health + mana bars
+        IPlayer PartyMember => Resolve<IParty>()?.StatusBarOrder.ElementAtOrDefault(_order);
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
-            var stateManager = Resolve<IStateManager>();
-            var member = stateManager.State.Party.Players[_order];
-            var leader = stateManager.State.Party.Players[0].Id;
-            var sheet = stateManager.State.GetPartyMember(member.Id);
-            bool highlighted = member.Id == leader;
+            var party = Resolve<IParty>();
+            var member = PartyMember;
+            if (member == null)
+                return order;
 
+            bool highlighted = member.Id == party.Leader;
             int maxOrder = order;
             var portraitExtents = new Rectangle(extents.X, extents.Y + (highlighted ? 0 : 3), extents.Width, extents.Height - 6);
 
@@ -128,7 +68,7 @@ namespace UAlbion.Game.Gui
                     4),
                 order));
 
-            if (sheet.Apparent.Magic.SpellPointsMax > 0)
+            if (member.Apparent.Magic.SpellPointsMax > 0)
             {
                 maxOrder = Math.Max(maxOrder, func(_mana, new Rectangle(
                         extents.X + 5,
@@ -139,6 +79,59 @@ namespace UAlbion.Game.Gui
             }
 
             return maxOrder;
+        }
+
+        void LoadSprite()
+        {
+            var portraitId = PartyMember?.Apparent.PortraitId;
+            if (portraitId.HasValue)
+                _portrait.Id = portraitId.Value;
+        }
+
+        void OnClick()
+        {
+            if (_isClickTimerPending) // If they double-clicked...
+            {
+                var memberId = PartyMember?.Id;
+                if(memberId.HasValue)
+                    Raise(new OpenCharacterInventoryEvent(memberId.Value));
+                _isClickTimerPending = false; // Ensure the single-click behaviour doesn't happen.
+            }
+            else // For the first click, just start the double-click timer.
+            {
+                Raise(new StartTimerEvent(TimerName, 300, this));
+                _isClickTimerPending = true;
+            }
+        }
+
+        void OnTimer()
+        {
+            if (!_isClickTimerPending) // They've already double-clicked
+                return;
+
+            var memberId = PartyMember?.Id;
+            if (memberId.HasValue)
+                Raise(new SetActiveMemberEvent(memberId.Value));
+            _isClickTimerPending = false;
+        }
+
+        void Hover()
+        {
+            _portrait.Highlighted = true;
+            var member = PartyMember;
+            if (member == null)
+                return;
+
+            var settings = Resolve<ISettings>();
+            var assets = Resolve<IAssetManager>();
+            var template = assets.LoadString(SystemTextId.PartyPortrait_XLifeMana, settings.Gameplay.Language);
+            var (text, _) = new TextFormatter(assets, settings.Gameplay.Language).Format(
+                template, // %s (LP:%d, SP:%d)
+                member.Apparent.GetName(settings.Gameplay.Language),
+                member.Apparent.Combat.LifePoints,
+                member.Apparent.Magic.SpellPoints);
+
+            Raise(new HoverTextEvent(text.First().Text));
         }
     }
 }

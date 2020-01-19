@@ -19,13 +19,13 @@ namespace UAlbion.Game.Gui
 
         void Update()
         {
-            var stateManager = Resolve<IStateManager>();
-            if (stateManager.State == null)
+            var party = Resolve<IParty>();
+            if (party == null)
                 return;
 
-            var playerId = stateManager.State.Party.Players[_order].Id;
-            var highlighted = playerId == stateManager.State.Party.Players[0].Id;
-            var sheet = stateManager.State.GetPartyMember(playerId);
+            var playerId = party.StatusBarOrder[_order].Id;
+            var highlighted = playerId == party.Leader;
+            var sheet = party[playerId];
             var value = _isHealth ? sheet.Apparent.Combat.LifePoints : sheet.Apparent.Magic.SpellPoints;
             var valueMax = _isHealth ? sheet.Apparent.Combat.LifePointsMax : sheet.Apparent.Magic.SpellPointsMax;
             if (valueMax == 0) valueMax = 1;

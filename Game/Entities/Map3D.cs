@@ -120,7 +120,7 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        protected override void Subscribed()
+        public override void Subscribed()
         {
             if (_mapData == null)
                 LoadMap();

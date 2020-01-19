@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Api
+﻿using System;
+
+namespace UAlbion.Api
 {
     public enum DrawLayer : ushort
     {
@@ -23,7 +25,7 @@
     {
         public static float ToZCoordinate(this DrawLayer layer, float yCoordinateInTiles)
         {
-            float adjusted = (int)layer + yCoordinateInTiles; //(255.0f - yCoordinateInTiles);
+            int adjusted = (int)layer + (int)Math.Ceiling(yCoordinateInTiles); //(255.0f - yCoordinateInTiles);
             return 1.0f - adjusted / 4095.0f;
         }
     }

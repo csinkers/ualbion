@@ -136,6 +136,7 @@ namespace UAlbion.Game.Entities
                 var state = Resolve<IGameState>();
                 foreach(var player in state.Party.StatusBarOrder)
                 {
+                    player.GetPosition = () => partyMovement.GetPositionHistory(player.Id).Item1;
                     var playerSprite = /*_useSmallSprites 
                         ? new PlayerSprite(player.Id, (SmallPartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id)); // TODO: Use a function to translate logical to sprite id
                         :*/ new PlayerSprite(player.Id, (LargePartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id)); // TODO: Use a function to translate logical to sprite id

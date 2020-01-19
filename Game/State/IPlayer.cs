@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.State.Player;
@@ -12,5 +13,6 @@ namespace UAlbion.Game.State
         IEffectiveCharacterSheet Effective { get; }
         IEffectiveCharacterSheet Apparent { get; }
         InventoryAction GetInventoryAction(ItemSlotId slotId);
+        Func<Vector2> GetPosition { get; set; } // TODO: Find a better solution
     }
 }

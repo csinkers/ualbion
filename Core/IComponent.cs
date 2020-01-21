@@ -9,6 +9,6 @@ namespace UAlbion.Core
         void Detach();
         void Receive(IEvent @event, object sender);
         void Subscribed(); // Should only be called by EventExchange
-        bool IsSubscriber(EventExchange exchange);
+        bool IsSubscribed { get; }
     }
 }

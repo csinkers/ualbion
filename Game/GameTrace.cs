@@ -23,7 +23,7 @@ namespace UAlbion.Game
             WriteEvent(1, type, id, name, language, path);
         }
 
-        public void Move(LargePartyMovement.Direction oldDir, LargePartyMovement.Direction desiredDir, LargePartyMovement.Direction facingDir, float fromX, float fromY, float toX, float toY, int frame)
+        public void Move(PartyMovement.Direction oldDir, PartyMovement.Direction desiredDir, PartyMovement.Direction facingDir, float fromX, float fromY, float toX, float toY, int frame)
         {
             WriteEvent(2, oldDir, desiredDir, facingDir, fromX, fromY, toX, toY, frame);
         }

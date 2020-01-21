@@ -54,6 +54,7 @@ namespace UAlbion.Core.Visual
         {
             Debug.Assert(renderPass == RenderPasses.Standard);
             _imguiRenderer.Render(gd, cl);
+            cl.SetFullScissorRects();
         }
 
         public void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IRenderable r) { }

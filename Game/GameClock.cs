@@ -8,7 +8,7 @@ namespace UAlbion.Game
 {
     public class GameClock : Component, IClock
     {
-        const float TickDurationSeconds = 1 / 18.0f;
+        const float TickDurationSeconds = 1 / 60.0f;
         const int TicksPerCacheCycle = 360; // Cycle the cache every minute
 
         readonly IList<(string, float)> _activeTimers = new List<(string, float)>();
@@ -42,14 +42,16 @@ namespace UAlbion.Game
 
             if (_running)
             {
+                var state = Resolve<IGameState>();
                 _elapsedTimeThisGameFrame += e.DeltaSeconds;
-                if (_elapsedTimeThisGameFrame > TickDurationSeconds)
+
+                while (_elapsedTimeThisGameFrame > TickDurationSeconds)
                 {
                     _elapsedTimeThisGameFrame -= TickDurationSeconds;
                     Raise(new UpdateEvent(1));
 
-                    var state = Resolve<IGameState>();
-                    if ((state?.FrameCount ?? 0) % TicksPerCacheCycle == TicksPerCacheCycle - 1) Raise(new CycleCacheEvent());
+                    if ((state?.FrameCount ?? 0) % TicksPerCacheCycle == TicksPerCacheCycle - 1)
+                        Raise(new CycleCacheEvent());
                 }
 
                 // If the game was paused for a while don't try and catch up

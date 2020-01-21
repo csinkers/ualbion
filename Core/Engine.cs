@@ -105,6 +105,11 @@ namespace UAlbion.Core
             return this;
         }
 
+        public void Initialise()
+        {
+            ChangeBackend();
+        }
+
         public void Run()
         {
             ChangeBackend();

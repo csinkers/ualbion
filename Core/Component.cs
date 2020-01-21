@@ -107,10 +107,10 @@ namespace UAlbion.Core
         }
 
         public virtual void Subscribed() { }
-        public bool IsSubscriber(EventExchange exchange) => Exchange == exchange;
+        public bool IsSubscribed => Exchange != null;
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void Raise(IEvent @event) { Exchange?.Raise(@event, this); }
+        protected void Raise(IEvent @event) => Exchange?.Raise(@event, this);
     }
 }

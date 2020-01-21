@@ -73,7 +73,7 @@ namespace UAlbion.Game.Entities
         {
             var map = Resolve<IMapManager>().Current;
             var pixelPosition = _position * new Vector2(map.TileSize.X, map.TileSize.Y);
-            var positionLayered = new Vector3(pixelPosition, DrawLayer.Characters1.ToZCoordinate(_position.Y));
+            var positionLayered = new Vector3(pixelPosition, DrawLayer.Characters2.ToZCoordinate(_position.Y));
 
             // var frameCount = Resolve<IStateManager>()?.FrameCount ?? 0;
             // var cycle = _frames[Animation];

@@ -27,7 +27,7 @@ namespace UAlbion.Game
         }
         public void Detach() => _exchange = null;
         public void Subscribed() { }
-        public bool IsSubscriber(EventExchange exchange) => exchange == _exchange;
+        public bool IsSubscribed => _exchange != null;
         public void Receive(IEvent @event, object sender)
         {
             switch(@event)

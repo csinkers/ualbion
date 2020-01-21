@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
@@ -79,12 +80,16 @@ namespace UAlbion.Game.Entities
             var overlayId = _mapData.Overlay[index];
             int zoneIndex = _mapData.ZoneLookup[index];
 
-            e.RegisterHit(t, $"Hit Tile ({(intersectionPoint.X + TileSize.X/2) / TileSize.X}, {intersectionPoint.Y / TileSize.Y})");
+            var underlayTile = underlayId != -1 ? _tileData.Tiles[underlayId] : null;
+            var overlayTile = overlayId != -1 ? _tileData.Tiles[overlayId] : null;
 
-            if (overlayId != -1)
-                e.RegisterHit(t, _tileData.Tiles[overlayId]);
-            if (underlayId != -1)
-                e.RegisterHit(t, _tileData.Tiles[underlayId]);
+            int? underlayZ = underlayTile?.Layer.ToDrawLayer().ToDebugZCoordinate(y);
+            int? overlayZ = overlayTile?.Layer.ToDrawLayer().ToDebugZCoordinate(y);
+
+            e.RegisterHit(t, $"Hit Tile ({(intersectionPoint.X + TileSize.X/2) / TileSize.X}, {intersectionPoint.Y / TileSize.Y}) Z: ({underlayZ}, {overlayZ})");
+
+            if (underlayId != -1) e.RegisterHit(t, underlayTile);
+            if (overlayId != -1) e.RegisterHit(t, overlayTile);
             e.RegisterHit(t, this);
 
             if (zoneIndex != -1)
@@ -126,10 +131,7 @@ namespace UAlbion.Game.Entities
                     Children.Add(sprite);
                 }
 
-                IMovement partyMovement = /*_useSmallSprites 
-                    ? new SmallPartyMovement() 
-                    :*/ new LargePartyMovement(Vector2.Zero, LargePartyMovement.Direction.Right); // TODO: Initial position.
-
+                IMovement partyMovement =  new PartyMovement(_useSmallSprites, Vector2.Zero, PartyMovement.Direction.Right); // TODO: Initial position.
                 Exchange.Register(partyMovement);
                 Children.Add(partyMovement);
 
@@ -137,9 +139,10 @@ namespace UAlbion.Game.Entities
                 foreach(var player in state.Party.StatusBarOrder)
                 {
                     player.GetPosition = () => partyMovement.GetPositionHistory(player.Id).Item1;
-                    var playerSprite = /*_useSmallSprites 
-                        ? new PlayerSprite(player.Id, (SmallPartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id)); // TODO: Use a function to translate logical to sprite id
-                        :*/ new PlayerSprite(player.Id, (LargePartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id)); // TODO: Use a function to translate logical to sprite id
+                    var playerSprite = _useSmallSprites 
+                        ? (IComponent)new SmallPlayerSprite(player.Id, (SmallPartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id)) // TODO: Use a function to translate logical to sprite id
+                        : new LargePlayerSprite(player.Id, (LargePartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id)); // TODO: Use a function to translate logical to sprite id
+
                     Exchange.Attach(playerSprite);
                     Children.Add(playerSprite);
                 }

@@ -49,7 +49,7 @@ namespace UAlbion.Core.Events
                     }
 
                     foreach (var subscriber in subscribers)
-                        if (subscriber.IsSubscriber(this))
+                        if (subscriber.IsSubscribed) // Another components subscribe call may have detached some of the subscribers
                             subscriber.Subscribed();
                 }
             }

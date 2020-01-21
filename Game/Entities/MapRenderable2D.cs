@@ -19,6 +19,7 @@ namespace UAlbion.Game.Entities
             Vector3.Zero, Vector2.Zero, 
             Vector2.Zero, Vector2.Zero, 0, 0);
 
+        const int TicksPerFrame = 10;
         int[] _animatedUnderlayIndices;
         int[] _animatedOverlayIndices;
         readonly MapData2D _mapData;
@@ -90,15 +91,7 @@ namespace UAlbion.Game.Entities
                 out var texSize,
                 out var layer);
 
-            DrawLayer drawLayer = ((int)tile.Layer & 0x7) switch
-            {
-                (int)TilesetData.TileLayer.Normal => DrawLayer.Underlay,
-                (int)TilesetData.TileLayer.Layer1 => DrawLayer.Overlay1,
-                (int)TilesetData.TileLayer.Layer2 => DrawLayer.Overlay2,
-                (int)TilesetData.TileLayer.Layer3 => DrawLayer.Overlay3,
-                _ => DrawLayer.Underlay
-            };
-
+            DrawLayer drawLayer = tile.Layer.ToDrawLayer();
             var instance = new SpriteInstanceData
             {
                 Offset = new Vector3(
@@ -152,13 +145,13 @@ namespace UAlbion.Game.Entities
                     {
                         var underlayTileId = _mapData.Underlay[index];
                         var underlayTile = underlayTileId == -1 ? null : _tileData.Tiles[underlayTileId];
-                        _underlay.Instances[index] = BuildInstanceData(i, j, underlayTile, 3 * state.FrameCount / 2);
+                        _underlay.Instances[index] = BuildInstanceData(i, j, underlayTile, state.FrameCount / TicksPerFrame);
                         if(underlayTile?.FrameCount > 1)
                             animatedUnderlayTiles.Add(index);
 
                         var overlayTileId = _mapData.Overlay[index];
                         var overlayTile = overlayTileId == -1 ? null : _tileData.Tiles[overlayTileId];
-                        _overlay.Instances[index] = BuildInstanceData(i, j, overlayTile, state.FrameCount / 2);
+                        _overlay.Instances[index] = BuildInstanceData(i, j, overlayTile, state.FrameCount / TicksPerFrame);
                         if(overlayTile?.FrameCount > 1)
                             animatedOverlayTiles.Add(index);
                         index++;

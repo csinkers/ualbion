@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UAlbion.Api;
 
 namespace UAlbion.Formats.Assets
 {
@@ -142,5 +143,20 @@ namespace UAlbion.Formats.Assets
 
         public bool UseSmallGraphics { get; set; }
         public IList<TileData> Tiles { get; } = new List<TileData>();
+    }
+
+    public static class TilesetDataExtensions
+    {
+        public static DrawLayer ToDrawLayer(this TilesetData.TileLayer tileLayer)
+        {
+            return ((int) tileLayer & 0x7) switch
+            {
+                (int) TilesetData.TileLayer.Normal => DrawLayer.Underlay,
+                (int) TilesetData.TileLayer.Layer1 => DrawLayer.Overlay1,
+                (int) TilesetData.TileLayer.Layer2 => DrawLayer.Overlay2,
+                (int) TilesetData.TileLayer.Layer3 => DrawLayer.Overlay3,
+                _ => DrawLayer.Underlay
+            };
+        }
     }
 }

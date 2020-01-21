@@ -50,7 +50,6 @@ namespace UAlbion.Game.State
                     scene.Detach();
                     sceneExchange.IsActive = false;
                 }
-
             }
             ActiveSceneId = activatingSceneId;
         }

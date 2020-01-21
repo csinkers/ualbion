@@ -28,5 +28,7 @@ namespace UAlbion.Api
             int adjusted = (int)layer + (int)Math.Ceiling(yCoordinateInTiles); //(255.0f - yCoordinateInTiles);
             return 1.0f - adjusted / 4095.0f;
         }
+
+        public static int ToDebugZCoordinate(this DrawLayer layer, float yCoordinateInTiles) => (int)layer + (int)Math.Ceiling(yCoordinateInTiles);
     }
 }

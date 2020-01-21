@@ -3,6 +3,7 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -98,72 +99,81 @@ namespace UAlbion
                 .AddRenderer(new ScreenDuplicator())
                 ;
 
-            PerfTracker.StartupEvent("Creating main components");
             global
                 .Register<IShaderCache>(new ShaderCache(
                     Path.Combine(baseDir, "Core", "Visual"),
                     Path.Combine(baseDir, "data", "ShaderCache")))
-                .Register<IInputManager>(new InputManager()
-                    .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
-                    .RegisterInputMode(InputMode.World2D, new World2DInputMode())
-                    .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
-                    .RegisterMouseMode(MouseMode.Exclusive, new ExclusiveMouseMode())
-                    .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
-                    .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
-                )
-                .Register<ILayoutManager>(new LayoutManager())
-                .Register<IMapManager>(new MapManager())
-                .Register<IPaletteManager>(new PaletteManager())
-                .Register<ISceneManager>(new SceneManager()
-                    .AddScene(new AutomapScene())
-                    .AddScene(new FlatScene())
-                    .AddScene(new DungeonScene())
-                    .AddScene(new MenuScene())
-                    .AddScene(new InventoryScene())
-                )
-                .Register<IClock>(new GameClock())
-                .Register<ISpriteResolver>(new SpriteResolver())
-                .Register<IGameState>(new GameState())
-                .Register<ITextManager>(new TextManager())
-                .Register<ITextureManager>(new TextureManager())
-                .Attach(engine)
-                .Attach(new CursorManager())
-                .Attach(new DebugMapInspector())
-                .Attach(new InputBinder(InputConfig.Load(baseDir)))
-                .Attach(new InputModeStack())
-                .Attach(new MouseModeStack())
-                .Attach(new SceneStack())
-                .Attach(new StatusBar())
-                ;
+                .Attach(engine);
 
-            PerfTracker.StartupEvent("Creating scene-specific components");
-            var inventoryConfig = InventoryConfig.Load(baseDir);
-            global.Resolve<ISceneManager>().GetExchange(SceneId.Inventory)
-                .Attach(new InventoryScreen(inventoryConfig))
-                ;
+            var backgroundThreadInitTask = Task.Run(() =>
+            {
+                PerfTracker.StartupEvent("Creating main components");
+                global
+                    .Register<IInputManager>(new InputManager()
+                        .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
+                        .RegisterInputMode(InputMode.World2D, new World2DInputMode())
+                        .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
+                        .RegisterMouseMode(MouseMode.Exclusive, new ExclusiveMouseMode())
+                        .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
+                        .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
+                    )
+                    .Register<ILayoutManager>(new LayoutManager())
+                    .Register<IMapManager>(new MapManager())
+                    .Register<IPaletteManager>(new PaletteManager())
+                    .Register<ISceneManager>(new SceneManager()
+                        .AddScene(new AutomapScene())
+                        .AddScene(new FlatScene())
+                        .AddScene(new DungeonScene())
+                        .AddScene(new MenuScene())
+                        .AddScene(new InventoryScene())
+                    )
+                    .Register<IClock>(new GameClock())
+                    .Register<ISpriteResolver>(new SpriteResolver())
+                    .Register<IGameState>(new GameState())
+                    .Register<ITextManager>(new TextManager())
+                    .Register<ITextureManager>(new TextureManager())
+                    .Attach(new CursorManager())
+                    .Attach(new DebugMapInspector())
+                    .Attach(new InputBinder(InputConfig.Load(baseDir)))
+                    .Attach(new InputModeStack())
+                    .Attach(new MouseModeStack())
+                    .Attach(new SceneStack())
+                    .Attach(new StatusBar())
+                    ;
 
-            var menuBackground = new ScreenSpaceSprite<PictureId>(
-                PictureId.MenuBackground8,
-                new Vector2(0.0f, 1.0f),
-                new Vector2(2.0f, -2.0f));
+                PerfTracker.StartupEvent("Creating scene-specific components");
+                var inventoryConfig = InventoryConfig.Load(baseDir);
+                global.Resolve<ISceneManager>().GetExchange(SceneId.Inventory)
+                    .Attach(new InventoryScreen(inventoryConfig))
+                    ;
 
-            global.Resolve<ISceneManager>().GetExchange(SceneId.MainMenu)
-                .Attach(new MainMenu())
-                .Attach(menuBackground)
-                ;
+                var menuBackground = new ScreenSpaceSprite<PictureId>(
+                    PictureId.MenuBackground8,
+                    new Vector2(0.0f, 1.0f),
+                    new Vector2(2.0f, -2.0f));
 
-            PerfTracker.StartupEvent("Starting new game");
-            global.Raise(new NewGameEvent(), null);
-            /*
-            global.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude), null); /*
-            global.Raise(new LoadMapEvent(MapDataId.Jirinaar3D), null); /*
-            global.Raise(new LoadMapEvent(MapDataId.HausDesJägerclans), null); //*/
-            /*
-            global.Raise(new SetSceneEvent(SceneId.Inventory), null);
-            //*/
+                global.Resolve<ISceneManager>().GetExchange(SceneId.MainMenu)
+                    .Attach(new MainMenu())
+                    .Attach(menuBackground)
+                    ;
 
-            // global.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
-            ReflectionHelper.ClearTypeCache();
+                PerfTracker.StartupEvent("Starting new game");
+                global.Raise(new NewGameEvent(), null);
+                /*
+                global.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude), null); /*
+                global.Raise(new LoadMapEvent(MapDataId.Jirinaar3D), null); /*
+                global.Raise(new LoadMapEvent(MapDataId.HausDesJägerclans), null); //*/
+                /*
+                global.Raise(new SetSceneEvent(SceneId.Inventory), null);
+                //*/
+
+                // global.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
+                ReflectionHelper.ClearTypeCache();
+            });
+
+            engine.Initialise();
+            backgroundThreadInitTask.Wait();
+
             PerfTracker.StartupEvent("Running game");
             if(_startupOnly)
                 global.Raise(new QuitEvent(), null);

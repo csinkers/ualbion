@@ -7,20 +7,20 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities
 {
-    public class LargePartyMovement : Component, IMovement
+    public class PartyMovement : Component, IMovement
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<LargePartyMovement, UpdateEvent>((x,e) => x.Update()),
-            H<LargePartyMovement, PartyJumpEvent>((x, e) =>
+            H<PartyMovement, UpdateEvent>((x,e) => x.Update()),
+            H<PartyMovement, PartyJumpEvent>((x, e) =>
                 {
                     var position = new Vector2(e.X, e.Y);
                     for(int i = 0; i < x._trail.Length; i++)
                         x._trail[i] = (position, 0);
                     x._target = null;
                 }),
-            H<LargePartyMovement, BeginFrameEvent>((x, e) => x._direction = Vector2.Zero),
-            H<LargePartyMovement, PartyMoveEvent>((x, e) => x._direction += new Vector2(e.X, e.Y)),
-            H<LargePartyMovement, PartyTurnEvent>((x, e) => { })
+            H<PartyMovement, BeginFrameEvent>((x, e) => x._direction = Vector2.Zero),
+            H<PartyMovement, PartyMoveEvent>((x, e) => x._direction += new Vector2(e.X, e.Y)),
+            H<PartyMovement, PartyTurnEvent>((x, e) => { })
         );
 
         public enum Direction
@@ -35,22 +35,27 @@ namespace UAlbion.Game.Entities
             public int StartTick;
         }
 
-        const int TicksPerTile = 4; // Number of game ticks it takes to move across a map tile
-        const int TicksPerFrame = 3; // Number of game ticks it takes to advance to the next animation frame
-        const int MinTrailDistance = 4; 
-        const int MaxTrailDistance = 6; // Max number of positions between each character in the party. Looks best if coprime to TicksPerPile and TicksPerFrame.
-        const int TrailLength = Party.MaxPartySize * MaxTrailDistance; // Number of past positions to store
+        const int TicksPerTile = 12; // Number of game ticks it takes to move across a map tile
+        const int TicksPerFrame = 9; // Number of game ticks it takes to advance to the next animation frame
+        int MinTrailDistance => _useSmallSprites ? 6 : 12; 
+        int MaxTrailDistance => _useSmallSprites ? 12 : 18; // Max number of positions between each character in the party. Looks best if coprime to TicksPerPile and TicksPerFrame.
+        int TrailLength => Party.MaxPartySize * MaxTrailDistance; // Number of past positions to store
 
-        readonly (Vector2, int)[] _trail = new (Vector2, int)[TrailLength];
+        readonly (Vector2, int)[] _trail;
         readonly (int, bool)[] _playerOffsets = new (int, bool)[Party.MaxPartySize]; // int = trail offset, bool = isMoving
+        readonly bool _useSmallSprites;
         int _trailOffset;
         Vector2 _direction;
         Direction _facingDirection;
         MoveTarget? _target;
         int _movementTick;
 
-        public LargePartyMovement(Vector2 initialPosition, Direction initialDirection) : base(Handlers)
+        public PartyMovement(bool useSmallSprites, Vector2 initialPosition, Direction initialDirection) : base(Handlers)
         {
+            _useSmallSprites = useSmallSprites;
+            _facingDirection = initialDirection;
+            _trail = new (Vector2, int)[TrailLength];
+
             _trailOffset = _trail.Length - 1;
             for (int i = 0; i < _playerOffsets.Length; i++)
                 _playerOffsets[i] = (_trailOffset - i * MinTrailDistance, false);
@@ -64,7 +69,6 @@ namespace UAlbion.Game.Entities
                     _ => Vector2.Zero
                 } / TicksPerTile;
 
-            _facingDirection = initialDirection;
             for (int i = 0; i < _trail.Length; i++)
                 _trail[_trailOffset - i] = (initialPosition + offset * i, SpriteFrame);
         }
@@ -84,7 +88,7 @@ namespace UAlbion.Game.Entities
                     _ => SpriteAnimation.Sleeping
                 };
 
-                var frames = LargeSpriteAnimations.Frames[anim];
+                var frames = _useSmallSprites ? SmallSpriteAnimations.Frames[anim] : LargeSpriteAnimations.Frames[anim];
                 return frames[(_movementTick / TicksPerFrame) % frames.Length];
             }
         }

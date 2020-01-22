@@ -20,7 +20,7 @@ namespace UAlbion.Game.Gui
         void Update()
         {
             var party = Resolve<IParty>();
-            if (party == null)
+            if (party == null || party.StatusBarOrder.Count <= _order)
                 return;
 
             var playerId = party.StatusBarOrder[_order].Id;

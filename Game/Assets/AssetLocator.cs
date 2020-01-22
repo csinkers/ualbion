@@ -5,7 +5,6 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Assets
 {

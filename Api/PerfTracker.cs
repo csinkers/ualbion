@@ -8,6 +8,9 @@ namespace UAlbion.Api
 {
     public static class PerfTracker
     {
+        // TODO: Enqueue console writes in debug mode to a queue with an output
+        // task / thread, so ensure that writing to the console doesn't affect
+        // the perf stats
         class FrameTimeTracker : IDisposable
         {
             readonly Stopwatch _stopwatch = Stopwatch.StartNew();

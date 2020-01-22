@@ -121,7 +121,6 @@ namespace UAlbion.Core.Events
                 childExchange.CollectExchanges(exchanges);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Raise(IEvent e, object sender)
         {
             // Event raising goes both up and down the hierarchy (i.e. all events will be delivered to all interested subscribers on all active exchanges)

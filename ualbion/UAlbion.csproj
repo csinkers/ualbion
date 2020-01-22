@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishReadyToRunShowWarnings>true</PublishReadyToRunShowWarnings>
     <PublishTrimmed>true</PublishTrimmed>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

@@ -228,7 +228,7 @@ namespace UAlbion.Formats.Parsers
             // 0x384 == 0n900 ???? should be 940
         }
 
-        public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
+        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
             var sheet = new CharacterSheet { Name = name };
             Translate(sheet, new GenericBinaryReader(br), streamLength);

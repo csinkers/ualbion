@@ -18,7 +18,7 @@ namespace UAlbion.Game.Assets
                 return CoreSpriteConfig.Load(settings.BasePath);
             }
 
-            var assetConfig = (AssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig), "AssetConfig");
+            var assetConfig = (BasicAssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig), "AssetConfig");
             var coreSpriteConfig = (CoreSpriteConfig)loaderFunc(new AssetKey(AssetType.CoreSpriteConfig), "CoreSpriteConfig");
 
             if (key.Type == AssetType.CoreGraphics)

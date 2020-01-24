@@ -10,7 +10,7 @@ namespace UAlbion.Formats.Parsers
     public class SystemTextLoader : IAssetLoader
     {
         static readonly Regex regex = new Regex(@"\[(\d+):(.*)\]");
-        public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
+        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
             var results = new Dictionary<int, string>();
             var bytes = br.ReadBytes((int)streamLength);

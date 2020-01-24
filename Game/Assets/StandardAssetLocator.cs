@@ -90,7 +90,7 @@ namespace UAlbion.Game.Assets
         readonly IDictionary<AssetType, XldFile[]> _xlds = new Dictionary<AssetType, XldFile[]>();
         readonly object _syncRoot = new object();
 
-        AssetPaths GetAssetPaths(AssetConfig assetConfig, AssetLocation location, GameLanguage language, string baseName, int number, int objectNumber)
+        AssetPaths GetAssetPaths(BasicAssetConfig assetConfig, AssetLocation location, GameLanguage language, string baseName, int number, int objectNumber)
         {
             string Try(string x)
             {
@@ -198,7 +198,7 @@ namespace UAlbion.Game.Assets
 
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)
         {
-            var config = (AssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig), "AssetConfig");
+            var config = (BasicAssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig), "AssetConfig");
             int xldIndex = key.Id / 100;
             Debug.Assert(xldIndex >= 0);
             Debug.Assert(xldIndex <= 9);
@@ -206,12 +206,11 @@ namespace UAlbion.Game.Assets
 
             var (location, baseName) = _assetFiles[key.Type];
             var paths = GetAssetPaths(config, location, key.Language, baseName, xldIndex, objectIndex);
-            var xldConfig = config.Xlds[paths.XldNameInConfig];
-            xldConfig.Assets.TryGetValue(objectIndex, out var assetConfig);
+            var assetConfig = config.GetAsset(paths.XldNameInConfig, objectIndex);
 
             object Reader(string path, BinaryReader br, long length)
             {
-                var loader = AssetLoaderRegistry.GetLoader(assetConfig?.Format ?? xldConfig.Format);
+                var loader = AssetLoaderRegistry.GetLoader(assetConfig.Format);
                 var asset = loader.Load(br, (int)length, name, assetConfig);
                 if (asset == null) throw new AssetNotFoundException($"Object {key.Type}:{key.Id} could not be loaded from file {path}", key.Type, key.Id);
                 GameTrace.Log.AssetLoaded(key, name, path);

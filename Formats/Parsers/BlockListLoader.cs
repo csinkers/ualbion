@@ -7,7 +7,7 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.BlockList)]
     public class BlockListLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
+        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
             var bl = new BlockList();
             bl.Width = br.ReadByte();

@@ -11,7 +11,7 @@ namespace UAlbion.Game.Assets
     [AssetLoader(FileFormat.InterlacedBitmap)]
     public class InterlacedBitmapLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
+        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
             return Image.Load(br.BaseStream);
         }

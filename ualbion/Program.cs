@@ -1,7 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UAlbion.Api;
@@ -9,6 +9,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
+using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game;
@@ -52,13 +53,9 @@ namespace UAlbion
             Console.WriteLine("Entry point reached. Press enter to continue");
             Console.ReadLine(); //*/
 
-            var curDir = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-            while (curDir != null && !File.Exists(Path.Combine(curDir.FullName, "data", "assets.json")))
-                curDir = curDir.Parent;
-
-            var baseDir = curDir?.FullName; 
-            if (string.IsNullOrEmpty(baseDir))
-                return;
+            var baseDir = FormatUtil.FindBasePath();
+            if(baseDir == null)
+                throw new InvalidOperationException("No base directory could be found.");
 
             PerfTracker.StartupEvent($"Found base directory {baseDir}");
 

@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.FixedSizeSprite)]
     public class FixedSizeSpriteLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
+        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
             if (streamLength == 0)
                 return null;
@@ -50,7 +50,7 @@ namespace UAlbion.Formats.Parsers
                 currentY += height;
             }
 
-            if (config.Parent.Transposed == true)
+            if (config.Transposed)
             {
                 var rotatedSprite = new AlbionSprite
                 {

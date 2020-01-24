@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.ItemData)]
     public class ItemDataLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
+        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
             long end = br.BaseStream.Position + streamLength;
             var items = new List<ItemData>();

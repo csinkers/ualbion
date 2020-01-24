@@ -2,40 +2,12 @@
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace UAlbion.Formats.Config
 {
-    public class AssetConfig
+    public class FullAssetConfig
     {
-        public class Xld
-        {
-            [JsonIgnore] public string Name;
-            public string EnumName;
-            [JsonConverter(typeof(StringEnumConverter))]
-            public FileFormat Format;
-            public int? Width;
-            public int? Height;
-            public bool? Transposed;
-            public IDictionary<int, Asset> Assets { get; } = new Dictionary<int, Asset>();
-        }
-
-        public class Asset
-        {
-            [JsonIgnore] public Xld Parent;
-            [JsonIgnore] public int Id;
-            [JsonIgnore] public FileFormat Format;
-
-            public string Name;
-            public int? Width;
-            public int? Height;
-            public string SubSprites;
-            public IList<int> PaletteHints;
-            public bool? UseSmallGraphics;
-            [JsonIgnore] public int EffectiveWidth => Width ?? Parent.Width ?? 0;
-            [JsonIgnore] public int EffectiveHeight => Height ?? Parent.Height ?? 0;
-        }
-
+        public const string Filename = "assets.json";
         [JsonIgnore]
         public string BasePath { get; set; }
 
@@ -43,16 +15,16 @@ namespace UAlbion.Formats.Config
         public string XldPath { get; set; }
         public string ExportedXldPath { get; set; }
 
-        public IDictionary<string, Xld> Xlds { get; } = new Dictionary<string, Xld>();
+        public IDictionary<string, FullXldInfo> Xlds { get; } = new Dictionary<string, FullXldInfo>();
 
-        public static AssetConfig Load(string basePath)
+        public static FullAssetConfig Load(string basePath)
         {
-            var configPath = Path.Combine(basePath, "data", "assets.json");
-            AssetConfig config;
+            var configPath = Path.Combine(basePath, "data", Filename);
+            FullAssetConfig config;
             if (File.Exists(configPath))
             {
                 var configText = File.ReadAllText(configPath);
-                config = JsonConvert.DeserializeObject<AssetConfig>(configText);
+                config = JsonConvert.DeserializeObject<FullAssetConfig>(configText);
 
                 foreach (var xld in config.Xlds)
                 {
@@ -61,14 +33,13 @@ namespace UAlbion.Formats.Config
                     {
                         o.Value.Parent = xld.Value;
                         o.Value.Id = o.Key;
-                        o.Value.Format = xld.Value.Format;
                         o.Value.PaletteHints ??= new List<int>();
                     }
                 }
             }
             else
             {
-                config = new AssetConfig
+                config = new FullAssetConfig
                 {
                     XldPath = @"albion_sr/CD/XLDLIBS",
                     ExportedXldPath = @"exported"
@@ -94,10 +65,13 @@ namespace UAlbion.Formats.Config
                 }
             }
 
-            var configPath = Path.Combine(BasePath, "data", "assets.json");
+            var configPath = Path.Combine(BasePath, "data", Filename);
             var serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, NullValueHandling = NullValueHandling.Ignore };
             var json = JsonConvert.SerializeObject(this, serializerSettings);
             File.WriteAllText(configPath, json);
+
+            var basicConfig = BasicAssetConfig.Extract(this);
+            basicConfig.Save();
 
             foreach (var xld in Xlds)
             {
@@ -107,6 +81,20 @@ namespace UAlbion.Formats.Config
                         asset.Value.PaletteHints = new List<int>();
                 }
             }
+        }
+
+        public FullAssetInfo GetAsset(string xldName, int id)
+        {
+            if (!Xlds.TryGetValue(xldName, out var xld))
+                return null;
+
+            if (!xld.Assets.TryGetValue(id, out var asset))
+            {
+                asset = new FullAssetInfo {Parent = xld,};
+                xld.Assets[id] = asset;
+            }
+
+            return asset;
         }
     }
 }

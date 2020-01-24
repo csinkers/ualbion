@@ -1,7 +1,6 @@
 ﻿using System;
-using System.IO;
-using System.Reflection;
 using System.Windows.Forms;
+using UAlbion.Formats;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Tools.ImageReverser
@@ -14,8 +13,8 @@ namespace UAlbion.Tools.ImageReverser
         [STAThread]
         static void Main()
         {
-            var baseDir = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Parent.Parent.Parent.FullName;
-            AssetConfig config = AssetConfig.Load(baseDir);
+            var baseDir = FormatUtil.FindBasePath();
+            var config = FullAssetConfig.Load(baseDir);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

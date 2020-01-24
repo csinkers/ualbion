@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
+using UAlbion.Formats;
 using UAlbion.Formats.Config;
 
 namespace GenerateEnums
@@ -46,32 +46,32 @@ namespace GenerateEnums
 
         static void Main()
         {
-            var baseDir = Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Parent.Parent.Parent.Parent.FullName;
-            AssetConfig config = AssetConfig.Load(baseDir);
+            var baseDir = FormatUtil.FindBasePath();
+            var config = FullAssetConfig.Load(baseDir);
             var outpathPath = Path.Combine(baseDir, @"Formats/AssetIds");
             var xldPattern = new Regex(@"([0-9]+).XLD$");
 
             var enums = new Dictionary<string, EnumData>();
-            foreach (var xld in config.Xlds)
+            foreach (var xld in config.Xlds.Values)
             {
-                if (string.IsNullOrEmpty(xld.Value.EnumName))
+                if (string.IsNullOrEmpty(xld.EnumName))
                     continue;
 
                 int offset = 0;
-                var match = xldPattern.Match(xld.Key);
+                var match = xldPattern.Match(xld.Name);
                 if (match.Success)
                     offset = 100 * int.Parse(match.Groups[1].Value);
 
-                if (!enums.ContainsKey(xld.Value.EnumName))
-                    enums[xld.Value.EnumName] = new EnumData { Name = xld.Value.EnumName };
-                var e = enums[xld.Value.EnumName];
+                if (!enums.ContainsKey(xld.EnumName))
+                    enums[xld.EnumName] = new EnumData { Name = xld.EnumName };
+                var e = enums[xld.EnumName];
 
-                foreach (var o in xld.Value.Assets)
+                foreach (var o in xld.Assets.Values.OrderBy(x => x.Id))
                 {
-                    var id = offset + o.Key;
-                    e.Entries.Add(string.IsNullOrEmpty(o.Value.Name)
+                    var id = offset + o.Id;
+                    e.Entries.Add(string.IsNullOrEmpty(o.Name)
                         ? new EnumEntry { Name = $"Unknown{id}", Value = id }
-                        : new EnumEntry { Name = Sanitise(o.Value.Name), Value= id});
+                        : new EnumEntry { Name = Sanitise(o.Name), Value = id });
                 }
             }
 

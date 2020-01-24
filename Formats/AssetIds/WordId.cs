@@ -8,9 +8,9 @@ namespace UAlbion.Formats.AssetIds
     public enum WordId
     {
         Zero = 1,
+        One = 15,
         Two = 101,
         Three = 117,
-        One = 15,
         Four = 201,
         Sofa = 501,
         Flesh = 502,

@@ -9,9 +9,9 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.SingleHeaderSprite, FileFormat.HeaderPerSubImageSprite)]
     public class HeaderBasedSpriteLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
+        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
-            Debug.Assert(config.Parent.Transposed != true);
+            Debug.Assert(config.Transposed != true);
             var sprite = new AlbionSprite();
             long initialPosition = br.BaseStream.Position;
             sprite.Name = name;

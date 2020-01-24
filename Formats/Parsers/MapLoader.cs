@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.MapData)]
     public class MapLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
+        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
             var startPosition = br.BaseStream.Position;
             br.ReadUInt16(); // Initial flags + npc count, will be re-read by the 2D/3D specific map loader

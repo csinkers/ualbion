@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Parsers
     public class ItemNameLoader : IAssetLoader
     {
         const int stringSize = 20;
-        public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
+        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
             Debug.Assert(streamLength % stringSize == 0);
             var results = new List<string>(); // Returns item names in the following order: German, English, French.

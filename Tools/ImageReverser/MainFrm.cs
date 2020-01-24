@@ -16,18 +16,18 @@ namespace UAlbion.Tools.ImageReverser
     public partial class MainFrm : Form
     {
         readonly DateTime _startTime;
-        readonly AssetConfig _config;
+        readonly FullAssetConfig _config;
         readonly Timer _timer;
         readonly Font _boldFont = new Font(DefaultFont, FontStyle.Bold);
         readonly Font _defaultFont = new Font(DefaultFont, 0);
-        readonly IDictionary<AssetConfig.Asset, TreeNode> _nodes = new Dictionary<AssetConfig.Asset, TreeNode>();
+        readonly IDictionary<FullAssetInfo, TreeNode> _nodes = new Dictionary<FullAssetInfo, TreeNode>();
 
         TreeNode _rootNode;
         AlbionSprite _logicalSprite;
         AlbionSprite _visualSprite;
         IList<int> _savedPalettes;
 
-        public MainFrm(AssetConfig config)
+        public MainFrm(FullAssetConfig config)
         {
             _startTime = DateTime.Now;
             _config = config;
@@ -69,7 +69,7 @@ namespace UAlbion.Tools.ImageReverser
                     continue;
 
                 if (!_config.Xlds.ContainsKey(relativeDir))
-                    _config.Xlds.Add(relativeDir, new AssetConfig.Xld());
+                    _config.Xlds.Add(relativeDir, new FullXldInfo());
 
                 var relative = file.Substring(exportedDir.Length + 1);
                 var xld = _config.Xlds[relativeDir];
@@ -103,9 +103,9 @@ namespace UAlbion.Tools.ImageReverser
             _timer.Start();
         }
 
-        IAssetLoader GetLoader(AssetConfig.Asset conf)
+        IAssetLoader GetLoader(FullAssetInfo conf)
         {
-            switch (conf.Format)
+            switch (conf.Parent.Format)
             {
                 case FileFormat.AmorphousSprite: return new AmorphousSpriteLoader();
                 case FileFormat.MapData:
@@ -131,7 +131,7 @@ namespace UAlbion.Tools.ImageReverser
             }
         }
 
-        AlbionSprite LoadSprite(string filename, AssetConfig.Asset conf)
+        AlbionSprite LoadSprite(string filename, FullAssetInfo conf)
         {
             using (var stream = File.OpenRead(filename))
             using (var br = new BinaryReader(stream))
@@ -154,7 +154,7 @@ namespace UAlbion.Tools.ImageReverser
             sb.AppendLine($"{filename}");
             sb.AppendLine($"File Size: {fileInfo.Length}");
             sb.AppendLine($"XLD: {asset.Parent.Name}");
-            sb.AppendLine($"Layer: {asset.Format}");
+            sb.AppendLine($"Layer: {asset.Parent.Format}");
             sb.AppendLine($"Conf Width: {asset.EffectiveWidth}");
             sb.AppendLine($"Conf Height: {asset.EffectiveHeight}");
             sb.AppendLine();
@@ -245,7 +245,7 @@ namespace UAlbion.Tools.ImageReverser
                 return;
 
             Bitmap bmp;
-            if (IsSprite(asset.Format))
+            if (IsSprite(asset.Parent.Format))
             {
                 if (filename != _logicalSprite?.Name)
                 {
@@ -293,7 +293,7 @@ namespace UAlbion.Tools.ImageReverser
             UpdateInfo();
         }
 
-        void AddToTree(string location, AssetConfig.Xld xld)
+        void AddToTree(string location, FullXldInfo xld)
         {
             var parts = location.Split('\\');
             TreeNode node = _rootNode;
@@ -310,9 +310,9 @@ namespace UAlbion.Tools.ImageReverser
             int number = int.Parse(key);
 
             if (!xld.Assets.ContainsKey(number))
-                xld.Assets[number] = new AssetConfig.Asset { Width = 32 };
+                xld.Assets[number] = new FullAssetInfo { Width = 32 };
 
-            AssetConfig.Asset asset = xld.Assets[number];
+            FullAssetInfo asset = xld.Assets[number];
 
             string name = string.IsNullOrEmpty(asset.Name)
                 ? key
@@ -327,7 +327,7 @@ namespace UAlbion.Tools.ImageReverser
             }
         }
 
-        (string, AssetConfig.Xld) CurrentXld
+        (string, FullXldInfo) CurrentXld
         {
             get
             {
@@ -353,7 +353,7 @@ namespace UAlbion.Tools.ImageReverser
             }
         }
 
-        (string, AssetConfig.Asset) CurrentObject
+        (string, FullAssetInfo) CurrentObject
         {
             get
             {
@@ -403,7 +403,7 @@ namespace UAlbion.Tools.ImageReverser
             if (_logicalSprite != null)
             {
                 trackFrameCount.Value = _logicalSprite.Frames.Count;
-                if (asset.Format == FileFormat.FixedSizeSprite &&
+                if (asset.Parent.Format == FileFormat.FixedSizeSprite &&
                     asset.Height != null &&
                     _logicalSprite.Frames[0].Height != asset.Height)
                 {
@@ -420,7 +420,7 @@ namespace UAlbion.Tools.ImageReverser
                 return;
 
             if (!asset.Parent.Width.HasValue && 
-                asset.Format == FileFormat.FixedSizeSprite && 
+                asset.Parent.Format == FileFormat.FixedSizeSprite && 
                 asset.Width != trackWidth.Value)
             {
                 asset.Width = trackWidth.Value;
@@ -482,7 +482,7 @@ namespace UAlbion.Tools.ImageReverser
                         : _logicalSprite.Height / trackFrameCount.Value;
 
                 if (!asset.Parent.Height.HasValue && 
-                    asset.Format == FileFormat.FixedSizeSprite && 
+                    asset.Parent.Format == FileFormat.FixedSizeSprite && 
                     asset.Height != newHeight)
                 {
                     asset.Height = newHeight;

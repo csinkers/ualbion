@@ -13,7 +13,7 @@ namespace UAlbion.Game.Assets
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)
         {
             var settings = Resolve<ISettings>();
-            return AssetConfig.Load(settings.BasePath);
+            return BasicAssetConfig.Load(settings.BasePath);
         }
     }
 }

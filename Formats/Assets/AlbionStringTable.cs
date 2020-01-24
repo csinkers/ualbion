@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Assets
     [AssetLoader(FileFormat.StringTable)]
     public class AlbionStringTableLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
+        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
             IDictionary<int, string> strings = new Dictionary<int, string>();
             var startOffset = br.BaseStream.Position;

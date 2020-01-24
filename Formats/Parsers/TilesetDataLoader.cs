@@ -10,7 +10,7 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.IconData)]
     public class TilesetDataLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
+        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
             var td = new TilesetData();
             td.UseSmallGraphics = config.UseSmallGraphics ?? false;

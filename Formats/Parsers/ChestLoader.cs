@@ -20,7 +20,7 @@ namespace UAlbion.Formats.Parsers
             s.UInt16("Rations", () => chest.Rations, x => chest.Rations = x);
         }
 
-        public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
+        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
             var chest = new Chest();
             Translate(chest, new GenericBinaryReader(br), streamLength);

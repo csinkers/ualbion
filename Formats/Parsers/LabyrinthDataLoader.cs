@@ -10,7 +10,7 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.LabyrinthData)]
     public class LabyrinthDataLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetConfig.Asset config)
+        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
             var startOffset = br.BaseStream.Position;
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -7,6 +8,9 @@ namespace UAlbion.Formats.Parsers
 {
     class GenericBinaryWriter : ISerializer
     {
+        static readonly object serializerLock = new object();
+        static readonly IDictionary<(Type, string), SerializationInfo> serializers = new Dictionary<(Type, string), SerializationInfo>();
+
         readonly BinaryWriter bw;
         long offset;
 
@@ -108,5 +112,23 @@ namespace UAlbion.Formats.Parsers
 
         public void Meta(string name, Action<ISerializer> serializer, Action<ISerializer> deserializer) => serializer(this);
         public void Check() { }
+
+        public void Dynamic<TTarget>(TTarget target, string propertyName)
+        {
+            var serializer = SerializationInfo.Get<TTarget>(propertyName);
+            switch (serializer)
+            {
+                case SerializationInfo<TTarget, byte>   s: bw.Write(s.Getter(target)); break;
+                case SerializationInfo<TTarget, sbyte>  s: bw.Write(s.Getter(target)); break;
+                case SerializationInfo<TTarget, ushort> s: bw.Write(s.Getter(target)); break;
+                case SerializationInfo<TTarget, short>  s: bw.Write(s.Getter(target)); break;
+                case SerializationInfo<TTarget, uint>   s: bw.Write(s.Getter(target)); break;
+                case SerializationInfo<TTarget, int>    s: bw.Write(s.Getter(target)); break;
+                case SerializationInfo<TTarget, ulong>  s: bw.Write(s.Getter(target)); break;
+                case SerializationInfo<TTarget, long>   s: bw.Write(s.Getter(target)); break;
+                default: throw new InvalidOperationException($"Tried to serialize unexpected type {serializer.Type}");
+            }
+            offset += serializer.Size;
+        }
     }
 }

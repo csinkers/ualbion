@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
@@ -10,145 +11,189 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.LabyrinthData)]
     public class LabyrinthDataLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
+        static void Translate(LabyrinthData d, ISerializer s, long length)
         {
-            var startOffset = br.BaseStream.Position;
+            PerfTracker.StartupEvent("Start loading labyrinth data");
+            var start = s.Offset;
+            // s.ByteArray("UnknownBlock6C", () => sheet.UnknownBlock6C, x => sheet.UnknownBlock6C = x, 14);
 
-            var l = new LabyrinthData
-            { 
-                WallHeight = br.ReadUInt16(), // 0
-                CameraHeight = br.ReadUInt16(), // 2
-                Unk4 = br.ReadUInt16(), // 4
-                BackgroundId = (DungeonBackgroundId?)FormatUtil.Tweak(br.ReadUInt16()), // 6
-                BackgroundYPosition = br.ReadUInt16(), // 8
-                FogDistance = br.ReadUInt16(), // A
-                FogRed = br.ReadUInt16(), // C
-                FogGreen = br.ReadUInt16(), // E
-                FogBlue = br.ReadUInt16(), // 10
-                Unk12 = br.ReadByte(), // 12
-                Unk13 = br.ReadByte(), // 13
-                BackgroundColour = br.ReadByte(), // 14
-                Unk15 = br.ReadByte(), // 15
-                FogMode = br.ReadUInt16(), // 16
-                MaxLight = br.ReadUInt16(), // 18
-                WallWidth = br.ReadUInt16(), // 1A
-                BackgroundTileAmount = br.ReadUInt16(), // 1C
-                MaxVisibleTiles = br.ReadUInt16(), // 1E
-                Unk20 = br.ReadUInt16(), // 20
-                Lighting = br.ReadUInt16(), // 22
-                Unk24 = br.ReadUInt16(), // 24
-            };
+            s.Dynamic(d, nameof(d.WallHeight));           // 0
+            s.Dynamic(d, nameof(d.CameraHeight));         // 2
+            s.Dynamic(d, nameof(d.Unk4));                 // 4
 
-            Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);
+            s.UInt16(nameof(d.BackgroundId),
+                () => FormatUtil.Untweak((ushort?)d.BackgroundId),
+                x => d.BackgroundId = (DungeonBackgroundId?)FormatUtil.Tweak(x));  // 6
 
-            int objectGroupCount = br.ReadUInt16(); // 26
+            s.Dynamic(d, nameof(d.BackgroundYPosition));  // 8
+            s.Dynamic(d, nameof(d.FogDistance));          // A
+            s.Dynamic(d, nameof(d.FogRed));               // C
+            s.Dynamic(d, nameof(d.FogGreen));             // E
+            s.Dynamic(d, nameof(d.FogBlue));              // 10
+            s.Dynamic(d, nameof(d.Unk12));                // 12
+            s.Dynamic(d, nameof(d.Unk13));                // 13
+            s.Dynamic(d, nameof(d.BackgroundColour));     // 14
+            s.Dynamic(d, nameof(d.Unk15));                // 15
+            s.Dynamic(d, nameof(d.FogMode));              // 16
+            s.Dynamic(d, nameof(d.MaxLight));             // 18
+            s.Dynamic(d, nameof(d.WallWidth));            // 1A
+            s.Dynamic(d, nameof(d.BackgroundTileAmount)); // 1C
+            s.Dynamic(d, nameof(d.MaxVisibleTiles));      // 1E
+            s.Dynamic(d, nameof(d.Unk20));                // 20
+            s.Dynamic(d, nameof(d.Lighting));             // 22
+            s.Dynamic(d, nameof(d.Unk24));                // 24
+            s.Check();
+
+            Debug.Assert(s.Offset - start <= length);
+
+            ushort objectGroupCount = (ushort)d.ObjectGroups.Count; // 26
+            s.UInt16("ObjectGroupCount", () => (ushort)d.ObjectGroups.Count, x => objectGroupCount = x);
             for (int i = 0; i < objectGroupCount; i++)
             {
-                var og = new LabyrinthData.ObjectGroup
-                {
-                    AutoGraphicsId = br.ReadUInt16() // +0
-                };
+                var og = s.Mode == SerializerMode.Reading 
+                    ? new LabyrinthData.ObjectGroup()
+                    : d.ObjectGroups[i];
+
+                s.Dynamic(og, nameof(og.AutoGraphicsId));
+
                 for (int n = 0; n < 8; n++)
                 {
-                    var so = new LabyrinthData.SubObject
-                    {
-                        X = br.ReadInt16(),
-                        Z = br.ReadInt16(),
-                        Y = br.ReadInt16(),
-                        ObjectInfoNumber = br.ReadUInt16()
-                    };
+                    var so = og.SubObjects.Count <= n
+                        ? new LabyrinthData.SubObject()
+                        : og.SubObjects[n];
+
+                    if (og.SubObjects.Count > n)
+                        so.ObjectInfoNumber++;
+
+                    s.Dynamic(so, nameof(so.X));
+                    s.Dynamic(so, nameof(so.Z));
+                    s.Dynamic(so, nameof(so.Y));
+                    s.Dynamic(so, nameof(so.ObjectInfoNumber));
+
                     if (so.ObjectInfoNumber != 0)
                     {
                         so.ObjectInfoNumber--;
-                        og.SubObjects.Add(so);
+                        if (og.SubObjects.Count <= n)
+                            og.SubObjects.Add(so);
                     }
                 } // +64
 
-                l.ObjectGroups.Add(og);
+                if (d.ObjectGroups.Count <= i)
+                    d.ObjectGroups.Add(og);
             }
-            Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);
+            Debug.Assert(s.Offset - start <= length);
 
-            int floorAndCeilingCount = br.ReadUInt16(); // 28 + objectGroupCount * 42
+            var floorAndCeilingCount = (ushort)d.FloorAndCeilings.Count; // 28 + objectGroupCount * 42
+            s.UInt16("FloorAndCeilingCount", () => floorAndCeilingCount, x => floorAndCeilingCount = x);
             for (int i = 0; i < floorAndCeilingCount; i++)
             {
-                var fc = new LabyrinthData.FloorAndCeiling
-                {
-                    Properties = (LabyrinthData.FloorAndCeiling.FcFlags) br.ReadByte(),
-                    Unk1 = br.ReadByte(),
-                    Unk2 = br.ReadByte(),
-                    Unk3 = br.ReadByte(),
-                    AnimationCount = br.ReadByte(),
-                    Unk5 = br.ReadByte(),
-                    TextureNumber = (DungeonFloorId?) FormatUtil.Tweak(br.ReadUInt16()),
-                    Unk8 = br.ReadUInt16()
-                };
-                l.FloorAndCeilings.Add(fc);
-            } 
-            Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);
+                var fc = s.Mode == SerializerMode.Reading 
+                    ? new LabyrinthData.FloorAndCeiling()
+                    : d.FloorAndCeilings[i];
 
-            int objectCount = br.ReadUInt16(); // 2A + objectGroupCount * 42 + floorAndCeilingCount * A
-            for(int i = 0; i < objectCount; i++)
-            {
-                var o = new LabyrinthData.Object
-                {
-                    Properties = (LabyrinthData.Object.ObjectFlags) br.ReadByte(),
-                    CollisionData = br.ReadBytes(3),
-                    TextureNumber = (DungeonObjectId?) FormatUtil.Tweak(br.ReadUInt16()),
-                    AnimationFrames = br.ReadByte(),
-                    Unk7 = br.ReadByte(),
-                    Width = br.ReadUInt16(),
-                    Height = br.ReadUInt16(),
-                    MapWidth = br.ReadUInt16(),
-                    MapHeight = br.ReadUInt16()
-                };
-                l.Objects.Add(o);
+                s.EnumU8(nameof(fc.Properties), () => fc.Properties, x => fc.Properties = x, x => ((byte)x, x.ToString()));
+                s.Dynamic(fc, nameof(fc.Unk1));
+                s.Dynamic(fc, nameof(fc.Unk2));
+                s.Dynamic(fc, nameof(fc.Unk3));
+                s.Dynamic(fc, nameof(fc.AnimationCount));
+                s.Dynamic(fc, nameof(fc.Unk5));
+                s.UInt16(nameof(fc.TextureNumber),
+                    () => FormatUtil.Untweak((ushort?)fc.TextureNumber),
+                    x => fc.TextureNumber = (DungeonFloorId?)FormatUtil.Tweak(x));
+
+                s.Dynamic(fc, nameof(fc.Unk8));
+                if(d.FloorAndCeilings.Count <= i)
+                    d.FloorAndCeilings.Add(fc);
             }
-            Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);
+            Debug.Assert(s.Offset - start <= length);
+
+            ushort objectCount = (ushort)d.Objects.Count; // 2A + objectGroupCount * 42 + floorAndCeilingCount * A
+            s.UInt16("ObjectCount", () => objectCount, x => objectCount = x);
+            for (int i = 0; i < objectCount; i++)
+            {
+                var o = s.Mode == SerializerMode.Reading 
+                    ? new LabyrinthData.Object()
+                    : d.Objects[i];
+
+                s.EnumU8(nameof(o.Properties), () => o.Properties, x => o.Properties = x, x => ((byte)x, x.ToString()));
+                s.ByteArray(nameof(o.CollisionData), () => o.CollisionData, x => o.CollisionData = x, 3);
+                s.UInt16(nameof(o.TextureNumber), 
+                    () => FormatUtil.Untweak((ushort?)o.TextureNumber),
+                    x => o.TextureNumber = (DungeonObjectId?)FormatUtil.Tweak(x));
+                s.Dynamic(o, nameof(o.AnimationFrames));
+                s.Dynamic(o, nameof(o.Unk7));
+                s.Dynamic(o, nameof(o.Width));
+                s.Dynamic(o, nameof(o.Height));
+                s.Dynamic(o, nameof(o.MapWidth));
+                s.Dynamic(o, nameof(o.MapHeight));
+
+                if (d.Objects.Count <= i)
+                    d.Objects.Add(o);
+            }
+            Debug.Assert(s.Offset - start <= length);
 
             // Populate objectIds on subobjects to improve debugging experience
-            foreach (var so in l.ObjectGroups.SelectMany(x => x.SubObjects))
+            foreach (var so in d.ObjectGroups.SelectMany(x => x.SubObjects))
             {
-                if (so.ObjectInfoNumber >= l.Objects.Count)
+                if (so.ObjectInfoNumber >= d.Objects.Count)
                     continue;
-                so.ObjectId = l.Objects[so.ObjectInfoNumber].TextureNumber;
+                so.ObjectId = d.Objects[so.ObjectInfoNumber].TextureNumber;
             }
 
-            int wallCount = br.ReadUInt16();
+            ushort wallCount = (ushort)d.Walls.Count;
+            s.UInt16("WallCount", () => wallCount, x => wallCount = x);
             for (int i = 0; i < wallCount; i++)
             {
-                var w = new LabyrinthData.Wall
-                {
-                    Properties = (LabyrinthData.Wall.WallFlags) br.ReadByte(),
-                    CollisionData = br.ReadBytes(3),
-                    TextureNumber = (DungeonWallId?) FormatUtil.Tweak(br.ReadUInt16()),
-                    AnimationFrames = br.ReadByte(),
-                    AutoGfxType = br.ReadByte(),
-                    TransparentColour = br.ReadByte(),
-                    Unk9 = br.ReadByte(),
-                    Width = br.ReadUInt16(),
-                    Height = br.ReadUInt16()
-                };
+                var w = s.Mode == SerializerMode.Reading 
+                    ? new LabyrinthData.Wall()
+                    : d.Walls[i];
 
-                int overlayCount = br.ReadUInt16();
+                s.EnumU8(nameof(w.Properties), () => w.Properties, x => w.Properties = x, x => ((byte)x, x.ToString()));
+                s.ByteArray(nameof(w.CollisionData), () => w.CollisionData, x => w.CollisionData = x, 3);
+                s.UInt16(nameof(w.TextureNumber), 
+                    () => FormatUtil.Untweak((ushort?)w.TextureNumber),
+                    x => w.TextureNumber = (DungeonWallId?)FormatUtil.Tweak(x));
+                s.Dynamic(w, nameof(w.AnimationFrames));
+                s.Dynamic(w, nameof(w.AutoGfxType));
+                s.Dynamic(w, nameof(w.TransparentColour));
+                s.Dynamic(w, nameof(w.Unk9));
+                s.Dynamic(w, nameof(w.Width));
+                s.Dynamic(w, nameof(w.Height));
+
+                ushort overlayCount = (ushort)w.Overlays.Count;
+                s.UInt16("overlayCount", () => overlayCount, x => overlayCount = x);
                 for (int j = 0; j < overlayCount; j++)
                 {
-                    var o = new LabyrinthData.Wall.Overlay
-                    {
-                        TextureNumber = (DungeonOverlayId?) FormatUtil.Tweak(br.ReadUInt16()),
-                        AnimationFrames = br.ReadByte(),
-                        WriteZero = br.ReadByte(),
-                        XOffset = br.ReadUInt16(),
-                        YOffset = br.ReadUInt16(),
-                        Width = br.ReadUInt16(),
-                        Height = br.ReadUInt16()
-                    };
-                    w.Overlays.Add(o);
-                }
-                l.Walls.Add(w);
-            }
-            Debug.Assert( br.BaseStream.Position <= startOffset + streamLength);
+                    var o = s.Mode == SerializerMode.Reading 
+                        ? new LabyrinthData.Wall.Overlay()
+                        : w.Overlays[i];
 
-            return l;
+                    s.UInt16(nameof(o.TextureNumber), 
+                        () => FormatUtil.Untweak((ushort?)o.TextureNumber),
+                        x => o.TextureNumber = (DungeonOverlayId?)FormatUtil.Tweak(x));
+                    s.Dynamic(o, nameof(o.AnimationFrames));
+                    s.Dynamic(o, nameof(o.WriteZero));
+                    s.Dynamic(o, nameof(o.XOffset));
+                    s.Dynamic(o, nameof(o.YOffset));
+                    s.Dynamic(o, nameof(o.Width));
+                    s.Dynamic(o, nameof(o.Height));
+
+                    if (w.Overlays.Count <= j)
+                        w.Overlays.Add(o);
+                }
+
+                if (d.Walls.Count <= i)
+                    d.Walls.Add(w);
+            }
+            Debug.Assert(s.Offset - start <= length);
+            PerfTracker.StartupEvent("Finish loading labyrinth data");
+        }
+
+        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
+        {
+            var labyrinth = new LabyrinthData();
+            Translate(labyrinth, new GenericBinaryReader(br), streamLength);
+            return labyrinth;
         }
     }
 }

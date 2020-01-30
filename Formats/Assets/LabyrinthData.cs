@@ -45,12 +45,12 @@ namespace UAlbion.Formats.Assets
 
         public class SubObject
         {
-            public int X;
-            public int Y;
-            public int Z;
-            public int ObjectInfoNumber;
+            public short X { get; set; }
+            public short Y { get; set; }
+            public short Z { get; set; }
+            public ushort ObjectInfoNumber { get; set; }
             public override string ToString() => $"{ObjectInfoNumber}({ObjectId}) @ ({X}, {Y}, {Z})";
-            internal DungeonObjectId? ObjectId;
+            internal DungeonObjectId? ObjectId { get; set; }
         }
 
         public class FloorAndCeiling
@@ -68,14 +68,14 @@ namespace UAlbion.Formats.Assets
                 SelfIlluminatingColour = 1 << 7,
             }
 
-            public FcFlags Properties;
-            public byte Unk1;
-            public byte Unk2;
-            public byte Unk3;
-            public byte AnimationCount;
-            public byte Unk5;
-            public DungeonFloorId? TextureNumber; // ushort
-            public ushort Unk8;
+            public FcFlags Properties { get; set; }
+            public byte Unk1 { get; set; }
+            public byte Unk2 {get; set; }
+            public byte Unk3 {get; set; }
+            public byte AnimationCount {get; set; }
+            public byte Unk5 {get; set;}
+            public DungeonFloorId? TextureNumber { get; set; } // ushort
+            public ushort Unk8 {get; set; }
             public override string ToString() => $"FC.{TextureNumber}:{AnimationCount} {Properties}";
         }
 
@@ -94,15 +94,15 @@ namespace UAlbion.Formats.Assets
                 Unk7 = 1 << 7,
             }
 
-            public ObjectFlags Properties; // 0
-            public byte[] CollisionData; // 1, len = 3 bytes
-            public DungeonObjectId? TextureNumber; // 4, ushort
-            public byte AnimationFrames; // 6
-            public byte Unk7; // 7
-            public ushort Width; // 8
-            public ushort Height; // A
-            public ushort MapWidth; // C
-            public ushort MapHeight; // E
+            public ObjectFlags Properties { get; set; } // 0
+            public byte[] CollisionData { get; set; } // 1, len = 3 bytes
+            public DungeonObjectId? TextureNumber { get; set; } // 4, ushort
+            public byte AnimationFrames { get; set; } // 6
+            public byte Unk7 { get; set; } // 7
+            public ushort Width { get; set; } // 8
+            public ushort Height { get; set; } // A
+            public ushort MapWidth { get; set; } // C
+            public ushort MapHeight { get; set; } // E
 
             public override string ToString() =>
                 $"EO.{TextureNumber}:{AnimationFrames} {Width}x{Height} [{MapWidth}x{MapHeight}] {Properties}";
@@ -123,26 +123,26 @@ namespace UAlbion.Formats.Assets
                 SelfIlluminatingColour = 1 << 6,
             }
 
-            public WallFlags Properties; // 0
-            public byte[] CollisionData; // 1, len = 3 bytes
-            public DungeonWallId? TextureNumber; // 4, ushort
-            public byte AnimationFrames; // 6
-            public byte AutoGfxType;     // 7
-            public byte TransparentColour;            // 8 (PaletteId??)
-            public byte Unk9;            // 9
-            public ushort Width;         // A
-            public ushort Height;        // C
+            public WallFlags Properties { get; set; } // 0
+            public byte[] CollisionData { get; set; } // 1, len = 3 bytes
+            public DungeonWallId? TextureNumber { get; set; } // 4, ushort
+            public byte AnimationFrames { get; set; } // 6
+            public byte AutoGfxType { get; set; }     // 7
+            public byte TransparentColour { get; set; }            // 8 (PaletteId??)
+            public byte Unk9 { get; set; }            // 9
+            public ushort Width { get; set; }         // A
+            public ushort Height { get; set; }        // C
             public IList<Overlay> Overlays = new List<Overlay>();
 
             public class Overlay
             {
-                public DungeonOverlayId? TextureNumber; // 0, ushort
-                public byte AnimationFrames; // 2
-                public byte WriteZero; // 3
-                public ushort YOffset; // 4
-                public ushort XOffset; // 6
-                public ushort Width;   // 8
-                public ushort Height;  // A
+                public DungeonOverlayId? TextureNumber { get; set; } // 0, ushort
+                public byte AnimationFrames { get; set; } // 2
+                public byte WriteZero { get; set; } // 3
+                public ushort YOffset { get; set; } // 4
+                public ushort XOffset { get; set; } // 6
+                public ushort Width { get; set; }   // 8
+                public ushort Height { get; set; }  // A
 
                 public override string ToString() =>
                     $"O.{TextureNumber}:{AnimationFrames} ({XOffset}, {YOffset}) {Width}x{Height}";

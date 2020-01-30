@@ -42,8 +42,8 @@ namespace UAlbion.Formats.Assets
                 _entries[i] |= (uint)br.ReadByte() << 8; // Green
                 _entries[i] |= (uint)br.ReadByte() << 16; // Blue
                 _entries[i] |= (uint)(i == 0 ? 0 : 0xff) << 24; // Alpha
-
             }
+
             Debug.Assert(br.BaseStream.Position == startingOffset + streamLength);
 
             AnimatedRanges.TryGetValue(Id, out var ranges);

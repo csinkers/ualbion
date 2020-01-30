@@ -124,5 +124,23 @@ namespace UAlbion.Formats.Parsers
         {
             Debug.Assert(offset == br.BaseStream.Position);
         }
+
+        public void Dynamic<TTarget>(TTarget target, string propertyName)
+        {
+            var serializer = SerializationInfo.Get<TTarget>(propertyName);
+            switch (serializer)
+            {
+                case SerializationInfo<TTarget, byte>   s: s.Setter(target, br.ReadByte()); break;
+                case SerializationInfo<TTarget, sbyte>  s: s.Setter(target, br.ReadSByte()); break;
+                case SerializationInfo<TTarget, ushort> s: s.Setter(target, br.ReadUInt16()); break;
+                case SerializationInfo<TTarget, short>  s: s.Setter(target, br.ReadInt16()); break;
+                case SerializationInfo<TTarget, uint>   s: s.Setter(target, br.ReadUInt32()); break;
+                case SerializationInfo<TTarget, int>    s: s.Setter(target, br.ReadInt32()); break;
+                case SerializationInfo<TTarget, ulong>  s: s.Setter(target, br.ReadUInt64()); break;
+                case SerializationInfo<TTarget, long>   s: s.Setter(target, br.ReadInt64()); break;
+                default: throw new InvalidOperationException($"Tried to serialize unexpected type {serializer.Type}");
+            }
+            offset += serializer.Size;
+        }
     }
 }

@@ -35,6 +35,8 @@ namespace UAlbion.Formats.Parsers
         void EnumU8<T>(string name, Func<T> getter, Action<T> setter, Func<T, (byte, string)> getMeta) where T : Enum;
         void EnumU16<T>(string name, Func<T> getter, Action<T> setter, Func<T, (ushort, string)> getMeta) where T : Enum;
         void EnumU32<T>(string name, Func<T> getter, Action<T> setter, Func<T, (uint, string)> getMeta) where T : Enum;
+
+        void Dynamic<TTarget>(TTarget target, string propertyName);
     }
 
     public static class SerializerExtensions

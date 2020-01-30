@@ -242,5 +242,22 @@ namespace UAlbion.Formats.Parsers
             indent -= 4;
         }
         public void Check() { }
+
+        public void Dynamic<TTarget>(TTarget target, string propertyName)
+        {
+            var serializer = SerializationInfo.Get<TTarget>(propertyName);
+            switch (serializer)
+            {
+                case SerializationInfo<TTarget, byte>   s: UInt8( s.Name, () => s.Getter(target), x => s.Setter(target, x)); break;
+                case SerializationInfo<TTarget, sbyte>  s:  Int8( s.Name, () => s.Getter(target), x => s.Setter(target, x)); break;
+                case SerializationInfo<TTarget, ushort> s: UInt16(s.Name, () => s.Getter(target), x => s.Setter(target, x)); break;
+                case SerializationInfo<TTarget, short>  s:  Int16(s.Name, () => s.Getter(target), x => s.Setter(target, x)); break;
+                case SerializationInfo<TTarget, uint>   s: UInt32(s.Name, () => s.Getter(target), x => s.Setter(target, x)); break;
+                case SerializationInfo<TTarget, int>    s:  Int32(s.Name, () => s.Getter(target), x => s.Setter(target, x)); break;
+                case SerializationInfo<TTarget, ulong>  s: UInt64(s.Name, () => s.Getter(target), x => s.Setter(target, x)); break;
+                case SerializationInfo<TTarget, long>   s:  Int64(s.Name, () => s.Getter(target), x => s.Setter(target, x)); break;
+                default: throw new InvalidOperationException($"Tried to serialize unexpected type {serializer.Type}");
+            }
+        }
     }
 }

@@ -9,6 +9,7 @@ using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
 
@@ -54,7 +55,7 @@ namespace UAlbion.Game.Entities
                     continue;
 
                 ITexture wall = assets.LoadTexture(wallInfo.TextureNumber.Value);
-                bool isAlphaTested = (wallInfo.Properties & LabyrinthData.Wall.WallFlags.AlphaTested) != 0;
+                bool isAlphaTested = (wallInfo.Properties & Wall.WallFlags.AlphaTested) != 0;
                 _tilemap.DefineWall(i + 1, wall, 0, 0, wallInfo.TransparentColour, isAlphaTested);
 
                 foreach(var overlayInfo in wallInfo.Overlays)

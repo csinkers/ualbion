@@ -5,6 +5,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Labyrinth;
 
 namespace UAlbion.Game.Entities
 {
@@ -127,13 +128,13 @@ namespace UAlbion.Game.Entities
             Raise(new SetClearColourEvent(_backgroundRed, _backgroundGreen, _backgroundBlue));
         }
 
-        MapObjectSprite BuildSprite(int tileX, int tileY, LabyrinthData.SubObject subObject, float objectYScaling)
+        MapObjectSprite BuildSprite(int tileX, int tileY, SubObject subObject, float objectYScaling)
         {
             var definition = _labyrinthData.Objects[subObject.ObjectInfoNumber];
             if (definition.TextureNumber == null)
                 return null;
 
-            bool onFloor = (definition.Properties & LabyrinthData.Object.ObjectFlags.FloorObject) != 0;
+            bool onFloor = (definition.Properties & Object.ObjectFlags.FloorObject) != 0;
 
             // We should probably be offsetting the main tilemap by half a tile to centre the objects
             // rather than fiddling with the object positions... will need to reevaluate when working on
@@ -159,7 +160,7 @@ namespace UAlbion.Game.Entities
                 definition.TextureNumber.Value,
                 position,
                 new Vector2(definition.MapWidth, definition.MapHeight),
-                (definition.Properties & LabyrinthData.Object.ObjectFlags.FloorObject) != 0
+                (definition.Properties & Object.ObjectFlags.FloorObject) != 0
             );
         }
     }

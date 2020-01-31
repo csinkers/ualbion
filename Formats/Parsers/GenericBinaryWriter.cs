@@ -130,5 +130,14 @@ namespace UAlbion.Formats.Parsers
             }
             offset += serializer.Size;
         }
+
+        public void List<TTarget>(IList<TTarget> list, int count, Action<TTarget, ISerializer> serializer, Func<TTarget> constructor)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                var og = list[i];
+                serializer(og, this);
+            }
+        }
     }
 }

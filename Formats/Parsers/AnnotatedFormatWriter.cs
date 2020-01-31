@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -258,6 +259,20 @@ namespace UAlbion.Formats.Parsers
                 case SerializationInfo<TTarget, long>   s:  Int64(s.Name, () => s.Getter(target), x => s.Setter(target, x)); break;
                 default: throw new InvalidOperationException($"Tried to serialize unexpected type {serializer.Type}");
             }
+        }
+
+        public void List<TTarget>(IList<TTarget> list, int count, Action<TTarget, ISerializer> serializer, Func<TTarget> constructor)
+        {
+            indent += 4;
+            doIndent();
+            tw.Write("[ ");
+            for (int i = 0; i < count; i++)
+            {
+                var og = list[i];
+                serializer(og, this);
+            }
+            tw.Write(" ]");
+            indent -= 4;
         }
     }
 }

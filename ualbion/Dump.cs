@@ -8,7 +8,6 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game;
-using UAlbion.Game.Events;
 using TextEvent = UAlbion.Formats.MapEvents.TextEvent;
 
 namespace UAlbion

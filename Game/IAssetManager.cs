@@ -2,6 +2,7 @@
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Game

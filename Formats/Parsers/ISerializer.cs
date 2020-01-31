@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace UAlbion.Formats.Parsers
 {
@@ -37,6 +38,8 @@ namespace UAlbion.Formats.Parsers
         void EnumU32<T>(string name, Func<T> getter, Action<T> setter, Func<T, (uint, string)> getMeta) where T : Enum;
 
         void Dynamic<TTarget>(TTarget target, string propertyName);
+
+        void List<TTarget>(IList<TTarget> list, int count, Action<TTarget, ISerializer> serializer, Func<TTarget> constructor);
     }
 
     public static class SerializerExtensions

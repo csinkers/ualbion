@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
@@ -141,6 +142,16 @@ namespace UAlbion.Formats.Parsers
                 default: throw new InvalidOperationException($"Tried to serialize unexpected type {serializer.Type}");
             }
             offset += serializer.Size;
+        }
+
+        public void List<TTarget>(IList<TTarget> list, int count, Action<TTarget, ISerializer> serializer, Func<TTarget> constructor)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                var og = constructor();
+                serializer(og, this);
+                list.Add(og);
+            }
         }
     }
 }

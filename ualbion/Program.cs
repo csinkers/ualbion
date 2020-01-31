@@ -154,7 +154,7 @@ namespace UAlbion
                     ;
 
                 PerfTracker.StartupEvent("Starting new game");
-                global.Raise(new NewGameEvent(), null);
+                //global.Raise(new NewGameEvent(), null);
                 //global.Raise(new LoadMapEvent(MapDataId.Jirinaar3D), null); /*
                 /*
                 global.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude), null); /*
@@ -163,7 +163,7 @@ namespace UAlbion
                 global.Raise(new SetSceneEvent(SceneId.Inventory), null);
                 //*/
 
-                // global.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
+                global.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
                 ReflectionHelper.ClearTypeCache();
             });
 

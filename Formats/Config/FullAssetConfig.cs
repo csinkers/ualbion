@@ -54,7 +54,7 @@ namespace UAlbion.Formats.Config
 
             var configPath = Path.Combine(basePath, "data", Filename);
             var serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, NullValueHandling = NullValueHandling.Ignore };
-            var json = JsonConvert.SerializeObject(this, serializerSettings);
+            var json = JsonConvert.SerializeObject(Xlds, serializerSettings);
             File.WriteAllText(configPath, json);
 
             var basicConfig = BasicAssetConfig.Extract(this);

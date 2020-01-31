@@ -77,7 +77,7 @@ namespace UAlbion.Formats.Config
 
             if (!xld.Assets.TryGetValue(id, out var asset))
             {
-                asset = new FullAssetInfo {Parent = xld,};
+                asset = new FullAssetInfo {Parent = xld, Id = id };
                 xld.Assets[id] = asset;
             }
 

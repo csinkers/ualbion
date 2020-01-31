@@ -16,7 +16,6 @@ namespace UAlbion.Formats.Config
 
         public readonly IDictionary<int, string> CoreSpriteIds = new Dictionary<int, string>();
         public readonly IDictionary<string, IDictionary<int, BinaryResource>> Hashes = new Dictionary<string, IDictionary<int, BinaryResource>>();
-        public string ExePath { get; set; }
 
         public static CoreSpriteConfig Load(string basePath)
         {

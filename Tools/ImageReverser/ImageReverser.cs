@@ -14,14 +14,15 @@ namespace UAlbion.Tools.ImageReverser
         static void Main()
         {
             var baseDir = FormatUtil.FindBasePath();
+            var generalConfig = GeneralConfig.Load(baseDir);
             var config = FullAssetConfig.Load(baseDir);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            void SaveChanges(object sender, EventArgs e) => config.Save();
+            void SaveChanges(object sender, EventArgs e) => config.Save(baseDir);
 
-            var form = new MainFrm(config);
+            var form = new MainFrm(generalConfig, config);
             form.SaveClicked += SaveChanges;
             Application.Run(form);
             form.SaveClicked -= SaveChanges;

@@ -7,23 +7,11 @@ namespace UAlbion.Formats.Config
     public class BasicAssetConfig
     {
         public const string Filename = "assets_min.json";
-        [JsonIgnore] public string BasePath { get; set; }
-        [JsonIgnore] public string BaseDataPath => Path.Combine(BasePath, "data");
-        public string XldPath { get; set; }
-        public string ExportedXldPath { get; set; }
-
         public IDictionary<string, BasicXldInfo> Xlds { get; } = new Dictionary<string, BasicXldInfo>();
-
-        public BasicAssetConfig() { }
 
         public static BasicAssetConfig Extract(FullAssetConfig full)
         {
-            var min = new BasicAssetConfig
-            {
-                BasePath = full.BasePath,
-                XldPath = full.XldPath,
-                ExportedXldPath = full.ExportedXldPath,
-            };
+            var min = new BasicAssetConfig();
 
             foreach (var kvp in full.Xlds)
             {
@@ -46,13 +34,13 @@ namespace UAlbion.Formats.Config
         public static BasicAssetConfig Load(string basePath)
         {
             var configPath = Path.Combine(basePath, "data", Filename);
-            BasicAssetConfig config;
+            BasicAssetConfig config = new BasicAssetConfig();
             if (File.Exists(configPath))
             {
                 var configText = File.ReadAllText(configPath);
-                config = JsonConvert.DeserializeObject<BasicAssetConfig>(configText);
+                var xlds = JsonConvert.DeserializeObject<Dictionary<string, BasicXldInfo>>(configText);
 
-                foreach (var xld in config.Xlds)
+                foreach (var xld in xlds)
                 {
                     xld.Value.Name = xld.Key;
                     foreach(var o in xld.Value.Assets)
@@ -60,23 +48,17 @@ namespace UAlbion.Formats.Config
                         o.Value.Parent = xld.Value;
                         o.Value.Id = o.Key;
                     }
+
+                    config.Xlds[xld.Key] = xld.Value;
                 }
             }
-            else
-            {
-                config = new BasicAssetConfig
-                {
-                    XldPath = @"albion_sr/CD/XLDLIBS",
-                    ExportedXldPath = @"exported"
-                };
-            }
-            config.BasePath = basePath;
+
             return config;
         }
 
-        public void Save()
+        public void Save(string basePath)
         {
-            var configPath = Path.Combine(BasePath, "data", Filename);
+            var configPath = Path.Combine(basePath, "data", Filename);
             var serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, NullValueHandling = NullValueHandling.Ignore };
             var json = JsonConvert.SerializeObject(this, serializerSettings);
             File.WriteAllText(configPath, json);

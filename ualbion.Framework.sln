@@ -23,9 +23,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{E4F7A1D2-3
 	ProjectSection(SolutionItems) = preProject
 		data\assets.json = data\assets.json
 		data\assets_min.json = data\assets_min.json
+		data\config.json = data\config.json
 		data\core_sprites.json = data\core_sprites.json
-		Data\input.json = Data\input.json
-		Data\inventory.json = Data\inventory.json
+		data\input.json = data\input.json
+		data\inventory.json = data\inventory.json
 		data\items.json = data\items.json
 		data\savefile.txt = data\savefile.txt
 	EndProjectSection

@@ -64,7 +64,7 @@ namespace UAlbion.Game.Settings
         public int CombatDetailLevel { get; private set; } = 1;
 
         // Gameplay
-        public GameLanguage Language { get; private set; }
+        public GameLanguage Language { get; private set; } = GameLanguage.English;
         public int CombatDelay { get; private set; } = 3;
 
         // Engine

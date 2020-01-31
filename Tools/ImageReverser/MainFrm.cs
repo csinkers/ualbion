@@ -17,6 +17,7 @@ namespace UAlbion.Tools.ImageReverser
     {
         readonly DateTime _startTime;
         readonly FullAssetConfig _config;
+        readonly GeneralConfig _generalConfig;
         readonly Timer _timer;
         readonly Font _boldFont = new Font(DefaultFont, FontStyle.Bold);
         readonly Font _defaultFont = new Font(DefaultFont, 0);
@@ -27,9 +28,10 @@ namespace UAlbion.Tools.ImageReverser
         AlbionSprite _visualSprite;
         IList<int> _savedPalettes;
 
-        public MainFrm(FullAssetConfig config)
+        public MainFrm(GeneralConfig generalConfig, FullAssetConfig config)
         {
             _startTime = DateTime.Now;
+            _generalConfig = generalConfig;
             _config = config;
             _timer = new Timer { Interval = 250 };
             _timer.Tick += OnTimerTick;
@@ -59,7 +61,7 @@ namespace UAlbion.Tools.ImageReverser
         void MainFrm_Load(object sender, EventArgs e)
         {
             _rootNode = fileTree.Nodes.Add("Files");
-            var exportedDir = Path.GetFullPath(Path.Combine(_config.BasePath, _config.ExportedXldPath));
+            var exportedDir = Path.GetFullPath(Path.Combine(_generalConfig.BasePath, _generalConfig.ExportedXldPath));
             var files = Directory.EnumerateFiles(exportedDir, "*.*", SearchOption.AllDirectories);
             foreach (var file in files)
             {
@@ -76,7 +78,7 @@ namespace UAlbion.Tools.ImageReverser
                 AddToTree(relative, xld);
             }
 
-            var commonPalette = File.ReadAllBytes(Path.Combine(_config.BasePath, _config.XldPath, "PALETTE.000"));
+            var commonPalette = File.ReadAllBytes(Path.Combine(_generalConfig.BasePath, _generalConfig.XldPath, "PALETTE.000"));
 
             var palettesPath = Path.Combine(exportedDir, "PALETTE0.XLD");
             files = Directory.EnumerateFiles(palettesPath, "*.*", SearchOption.AllDirectories);
@@ -346,7 +348,7 @@ namespace UAlbion.Tools.ImageReverser
                 }
 
                 filename = filename.TrimEnd('\\');
-                var fullXldPath = Path.GetFullPath(Path.Combine(Path.Combine(_config.BasePath, _config.ExportedXldPath), filename));
+                var fullXldPath = Path.GetFullPath(Path.Combine(Path.Combine(_generalConfig.BasePath, _generalConfig.ExportedXldPath), filename));
                 return _config.Xlds.ContainsKey(filename) 
                     ? (fullXldPath, _config.Xlds[filename]) 
                     : (null, null);

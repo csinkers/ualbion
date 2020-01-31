@@ -24,13 +24,16 @@
     <EmbeddedResource Include="Visual\*.glsl" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="SharpDX.XAudio2" Version="4.2.0" />
+  <ItemGroup Condition="!Exists('..\veldrid\')">
+    <PackageReference Include="Veldrid" Version="4.7.0" />
+    <PackageReference Include="Veldrid.ImageSharp" Version="4.7.0" />
+    <PackageReference Include="Veldrid.ImGui" Version="5.72.0" />
+    <PackageReference Include="Veldrid.RenderDoc" Version="1.0.0" />
+    <PackageReference Include="Veldrid.Sdl2" Version="4.7.0" />
+    <PackageReference Include="Veldrid.StartupUtilities" Version="4.7.0" />
+    <PackageReference Include="Veldrid.Utilities" Version="4.7.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Api\UAlbion.Api.csproj" />
-    <ProjectReference Include="..\veldrid-spirv\src\Veldrid.SPIRV\Veldrid.SPIRV.csproj" />
+  <ItemGroup Condition="Exists('..\veldrid\')">
     <ProjectReference Include="..\veldrid\src\Veldrid.ImageSharp\Veldrid.ImageSharp.csproj" />
     <ProjectReference Include="..\veldrid\src\Veldrid.ImGui\Veldrid.ImGui.csproj" />
     <ProjectReference Include="..\veldrid\src\Veldrid.OpenGLBindings\Veldrid.OpenGLBindings.csproj" />
@@ -39,5 +42,15 @@
     <ProjectReference Include="..\veldrid\src\Veldrid.StartupUtilities\Veldrid.StartupUtilities.csproj" />
     <ProjectReference Include="..\veldrid\src\Veldrid.Utilities\Veldrid.Utilities.csproj" />
     <ProjectReference Include="..\veldrid\src\Veldrid\Veldrid.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('..\veldrid-spirv\')">
+    <PackageReference Include="Veldrid.SPIRV" Version="1.0.13" />
+  </ItemGroup>
+  <ItemGroup Condition="Exists('..\veldrid-spirv\')">
+    <ProjectReference Include="..\veldrid-spirv\src\Veldrid.SPIRV\Veldrid.SPIRV.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Api\UAlbion.Api.csproj" />
   </ItemGroup>
 </Project>

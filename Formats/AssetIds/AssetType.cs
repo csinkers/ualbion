@@ -16,6 +16,7 @@ namespace UAlbion.Formats.AssetIds
         AssetConfig,
         CoreSpriteConfig,
         CoreGraphicsMetadata,
+        GeneralConfig,
         MetaFont,
         PaletteNull,
         Slab,

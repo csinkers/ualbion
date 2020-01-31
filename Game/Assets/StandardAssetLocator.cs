@@ -90,7 +90,7 @@ namespace UAlbion.Game.Assets
         readonly IDictionary<AssetType, XldFile[]> _xlds = new Dictionary<AssetType, XldFile[]>();
         readonly object _syncRoot = new object();
 
-        AssetPaths GetAssetPaths(BasicAssetConfig assetConfig, AssetLocation location, GameLanguage language, string baseName, int number, int objectNumber)
+        AssetPaths GetAssetPaths(GeneralConfig config, AssetLocation location, GameLanguage language, string baseName, int number, int objectNumber)
         {
             string Try(string x)
             {
@@ -112,38 +112,38 @@ namespace UAlbion.Game.Assets
             switch (location)
             {
                 case AssetLocation.Base:
-                    result.XldPath = Path.Combine(assetConfig.BasePath, assetConfig.XldPath, baseName);
-                    result.OverridePath = Try(Path.Combine(assetConfig.BaseDataPath, baseName, objectNumber.ToString()));
+                    result.XldPath = Path.Combine(config.BasePath, config.XldPath, baseName);
+                    result.OverridePath = Try(Path.Combine(config.BaseDataPath, baseName, objectNumber.ToString()));
                     result.XldNameInConfig = baseName;
                     break;
 
                 case AssetLocation.BaseRaw:
-                    result.XldPath = Path.Combine(assetConfig.BasePath, assetConfig.XldPath, baseName);
-                    result.OverridePath = Try(Path.Combine(assetConfig.BaseDataPath, baseName));
+                    result.XldPath = Path.Combine(config.BasePath, config.XldPath, baseName);
+                    result.OverridePath = Try(Path.Combine(config.BaseDataPath, baseName));
                     result.XldNameInConfig = baseName;
                     break;
 
                 case AssetLocation.Localised:
-                    result.XldPath = Path.Combine(assetConfig.BasePath, assetConfig.XldPath, lang, baseName);
-                    result.OverridePath = Try(Path.Combine(assetConfig.BaseDataPath, lang, baseName, objectNumber.ToString()));
+                    result.XldPath = Path.Combine(config.BasePath, config.XldPath, lang, baseName);
+                    result.OverridePath = Try(Path.Combine(config.BaseDataPath, lang, baseName, objectNumber.ToString()));
                     result.XldNameInConfig = "$(LANG)/" + baseName;
                     break;
 
                 case AssetLocation.LocalisedRaw:
-                    result.XldPath = Path.Combine(assetConfig.BasePath, assetConfig.XldPath, lang, baseName);
-                    result.OverridePath = Try(Path.Combine(assetConfig.BaseDataPath, lang, baseName));
+                    result.XldPath = Path.Combine(config.BasePath, config.XldPath, lang, baseName);
+                    result.OverridePath = Try(Path.Combine(config.BaseDataPath, lang, baseName));
                     result.XldNameInConfig = "$(LANG)/" + baseName;
                     break;
 
                 case AssetLocation.Initial:
-                    result.XldPath = Path.Combine(assetConfig.BasePath, assetConfig.XldPath, "INITIAL", baseName);
-                    result.OverridePath = Try(Path.Combine(assetConfig.BaseDataPath, "INITIAL", baseName, objectNumber.ToString()));
+                    result.XldPath = Path.Combine(config.BasePath, config.XldPath, "INITIAL", baseName);
+                    result.OverridePath = Try(Path.Combine(config.BaseDataPath, "INITIAL", baseName, objectNumber.ToString()));
                     result.XldNameInConfig = "INITIAL/" + baseName;
                     break;
 
                 case AssetLocation.Current:
-                    result.XldPath = Path.Combine(assetConfig.BasePath, assetConfig.XldPath, "CURRENT", baseName);
-                    result.OverridePath = Try(Path.Combine(assetConfig.BaseDataPath, "CURRENT", baseName, objectNumber.ToString()));
+                    result.XldPath = Path.Combine(config.BasePath, config.XldPath, "CURRENT", baseName);
+                    result.OverridePath = Try(Path.Combine(config.BaseDataPath, "CURRENT", baseName, objectNumber.ToString()));
                     result.XldNameInConfig = "INITIAL/" + baseName; // Note: Use the same metadata for CURRENT & INITIAL
                     break;
 
@@ -198,15 +198,17 @@ namespace UAlbion.Game.Assets
 
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)
         {
-            var config = (BasicAssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig), "AssetConfig");
+            var basicAssetConfig = (BasicAssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig), "AssetConfig");
+            var generalConfig = (GeneralConfig)loaderFunc(new AssetKey(AssetType.GeneralConfig), "GeneralConfig");
+
             int xldIndex = key.Id / 100;
             Debug.Assert(xldIndex >= 0);
             Debug.Assert(xldIndex <= 9);
             int objectIndex = key.Id % 100;
 
             var (location, baseName) = _assetFiles[key.Type];
-            var paths = GetAssetPaths(config, location, key.Language, baseName, xldIndex, objectIndex);
-            var assetConfig = config.GetAsset(paths.XldNameInConfig, objectIndex);
+            var paths = GetAssetPaths(generalConfig, location, key.Language, baseName, xldIndex, objectIndex);
+            var assetConfig = basicAssetConfig.GetAsset(paths.XldNameInConfig, objectIndex);
 
             object Reader(string path, BinaryReader br, long length)
             {

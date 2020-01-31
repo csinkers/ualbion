@@ -31,6 +31,26 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{E4F7A1D2-3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateEnums", "Tools\GenerateEnums\GenerateEnums.csproj", "{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid", "veldrid\src\Veldrid\Veldrid.csproj", "{229A9BFA-B737-40B3-87FA-BACE20587C46}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.ImageSharp", "veldrid\src\Veldrid.ImageSharp\Veldrid.ImageSharp.csproj", "{0E8DF225-AFF9-41E1-BE3F-CDDDCF0CE32E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.ImGui", "veldrid\src\Veldrid.ImGui\Veldrid.ImGui.csproj", "{433026E0-3C04-490D-85C6-BCBFF4ABA75A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.OpenGLBindings", "veldrid\src\Veldrid.OpenGLBindings\Veldrid.OpenGLBindings.csproj", "{E3615811-FD58-43C0-98F6-925C19595880}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.RenderDoc", "veldrid\src\Veldrid.RenderDoc\Veldrid.RenderDoc.csproj", "{C1AA221E-83B2-42DB-9BD3-D221DF7D85DB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.SDL2", "veldrid\src\Veldrid.SDL2\Veldrid.SDL2.csproj", "{CBDF8BE3-7BBE-4931-96D7-74F192FA8B43}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.StartupUtilities", "veldrid\src\Veldrid.StartupUtilities\Veldrid.StartupUtilities.csproj", "{FDCD4C59-2D82-43EF-B148-064AAEBA02D9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.Utilities", "veldrid\src\Veldrid.Utilities\Veldrid.Utilities.csproj", "{8F54D7C3-67CF-4058-BFB5-8FBCF327B355}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Veldrid", "Veldrid", "{DB6A1F1D-5617-4750-A609-506067B01336}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.SPIRV", "veldrid-spirv\src\Veldrid.SPIRV\Veldrid.SPIRV.csproj", "{8E4A3651-9264-4FD6-AA1C-E48AEF26EFCA}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Api", "Api\UAlbion.Api.csproj", "{20D41E69-C260-461F-A0B9-89920F133F60}"
 EndProject
 Global

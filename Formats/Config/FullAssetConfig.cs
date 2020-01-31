@@ -8,25 +8,19 @@ namespace UAlbion.Formats.Config
     public class FullAssetConfig
     {
         public const string Filename = "assets.json";
-        [JsonIgnore]
-        public string BasePath { get; set; }
-
-        [JsonIgnore] public string BaseDataPath => Path.Combine(BasePath, "data");
-        public string XldPath { get; set; }
-        public string ExportedXldPath { get; set; }
 
         public IDictionary<string, FullXldInfo> Xlds { get; } = new Dictionary<string, FullXldInfo>();
 
         public static FullAssetConfig Load(string basePath)
         {
             var configPath = Path.Combine(basePath, "data", Filename);
-            FullAssetConfig config;
+            FullAssetConfig config = new FullAssetConfig();
             if (File.Exists(configPath))
             {
                 var configText = File.ReadAllText(configPath);
-                config = JsonConvert.DeserializeObject<FullAssetConfig>(configText);
+                var xlds = JsonConvert.DeserializeObject<IDictionary<string, FullXldInfo>>(configText);
 
-                foreach (var xld in config.Xlds)
+                foreach (var xld in xlds)
                 {
                     xld.Value.Name = xld.Key;
                     foreach(var o in xld.Value.Assets)
@@ -35,21 +29,14 @@ namespace UAlbion.Formats.Config
                         o.Value.Id = o.Key;
                         o.Value.PaletteHints ??= new List<int>();
                     }
+
+                    config.Xlds[xld.Key] = xld.Value;
                 }
             }
-            else
-            {
-                config = new FullAssetConfig
-                {
-                    XldPath = @"albion_sr/CD/XLDLIBS",
-                    ExportedXldPath = @"exported"
-                };
-            }
-            config.BasePath = basePath;
             return config;
         }
 
-        public void Save()
+        public void Save(string basePath)
         {
             foreach (var xld in Xlds)
             {
@@ -65,13 +52,13 @@ namespace UAlbion.Formats.Config
                 }
             }
 
-            var configPath = Path.Combine(BasePath, "data", Filename);
+            var configPath = Path.Combine(basePath, "data", Filename);
             var serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, NullValueHandling = NullValueHandling.Ignore };
             var json = JsonConvert.SerializeObject(this, serializerSettings);
             File.WriteAllText(configPath, json);
 
             var basicConfig = BasicAssetConfig.Extract(this);
-            basicConfig.Save();
+            basicConfig.Save(basePath);
 
             foreach (var xld in Xlds)
             {

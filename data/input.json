@@ -1,4 +1,5 @@
 {
+  // Global key-bindings that are active in every game mode / scene
   "Global": {
     "Escape": "push_scene MainMenu",
     "Tilde": "push_input_mode console",

@@ -7,9 +7,9 @@ open System.Text
 open FSharp.Json
 
 let baseDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) |> (fun x -> Directory.GetParent(x).Parent.Parent.Parent.Parent.FullName)
-let xldDir = Path.Combine(baseDir, @"albion_sr\CD\XLDLIBS")
+let xldDir = Path.Combine(baseDir, @"albion\CD\XLDLIBS")
 let mainOutputDir = Path.Combine(baseDir, @"data\exported")
-let xmiToMidiPath = Path.Combine(baseDir, @"Tools\XmiToMidi\Debug\UAlbion.Tools.XmiToMidi.exe")
+let xmiToMidiPath = Path.Combine(baseDir, @"Tools\XmiToMidi.exe")
 let bytesTo850String (bytes:byte array) = Encoding.GetEncoding(850).GetString(bytes).Replace("×", "ß").TrimEnd((char)0)
 
 type OText =
@@ -255,6 +255,8 @@ Total size: 0x1ae3b (110,139 bytes)
         *)
 
     static member xmi (br:BinaryReader) outputDir i length =
+        if (File.Exists xmiToMidiPath |> not) then () else
+
         let bytes = br.ReadBytes(length)
         let xmiPath = Path.Combine(outputDir, sprintf "%02d.xmi" i)
         File.WriteAllBytes(xmiPath, bytes)

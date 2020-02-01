@@ -30,7 +30,7 @@ namespace UAlbion.Core
         float _pitch;
         bool _useReverseDepth;
         bool _isClipSpaceYInverted;
-        float _fov = 1f;
+        float _fov = (float)(Math.PI * 80 / 180);
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;

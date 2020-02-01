@@ -9,7 +9,7 @@ namespace UAlbion.Core
         string Name { get; }
         int RenderOrder { get; set; }
         Type Renderer { get; }
-        BoundingBox? Extents { get; }
+        // BoundingBox? Extents { get; }
         Matrix4x4 Transform { get; }
         event EventHandler ExtentsChanged;
     }

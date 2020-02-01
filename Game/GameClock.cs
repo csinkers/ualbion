@@ -50,7 +50,7 @@ namespace UAlbion.Game
                     _elapsedTimeThisGameFrame -= TickDurationSeconds;
                     Raise(new UpdateEvent(1));
 
-                    if ((state?.FrameCount ?? 0) % TicksPerCacheCycle == TicksPerCacheCycle - 1)
+                    if ((state?.TickCount ?? 0) % TicksPerCacheCycle == TicksPerCacheCycle - 1)
                         Raise(new CycleCacheEvent());
                 }
 

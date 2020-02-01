@@ -76,7 +76,7 @@ namespace UAlbion.Game.Gui.Inventory
             }
 
             int frames = item.IconAnim == 0 ? 1 : item.IconAnim;
-            int sprite = (int)item.Icon + state.FrameCount % frames;
+            int sprite = (int)item.Icon + state.TickCount % frames;
             _sprite.Id = (ItemSpriteId)sprite;
             // TODO: Show item.Amount
             // TODO: Show broken overlay if item.Flags.HasFlag(ItemSlotFlags.Broken)

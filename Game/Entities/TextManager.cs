@@ -97,19 +97,19 @@ namespace UAlbion.Game.Entities
                         instances[n + 2] = baseInstance;
                         instances[n + 3] = baseInstance;
 
-                        instances[n].Offset += new Vector3(window.UiToNormRelative(new Vector2(2, 1)), 0);
+                        instances[n].OffsetBy(new Vector3(window.UiToNormRelative(new Vector2(2, 1)), 0));
                         instances[n].Flags |= SpriteFlags.DropShadow;
 
-                        instances[n+1].Offset += new Vector3(window.UiToNormRelative(new Vector2(1,1)), 0);
+                        instances[n+1].OffsetBy(new Vector3(window.UiToNormRelative(new Vector2(1,1)), 0));
                         instances[n+1].Flags |= SpriteFlags.DropShadow;
 
-                        instances[n + 2].Offset += new Vector3(window.UiToNormRelative(new Vector2(1, 0)), 0);
+                        instances[n + 2].OffsetBy(new Vector3(window.UiToNormRelative(new Vector2(1, 0)), 0));
                         offset += 1;
                     }
                     else
                     {
                         instances[n].Flags |= SpriteFlags.DropShadow;
-                        instances[n].Offset += new Vector3(window.UiToNormRelative(new Vector2(1,1)), 0);
+                        instances[n].OffsetBy(new Vector3(window.UiToNormRelative(new Vector2(1,1)), 0));
                     }
 
                     offset += (int)characterSize.X;

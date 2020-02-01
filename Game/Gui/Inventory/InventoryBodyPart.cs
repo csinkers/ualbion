@@ -39,7 +39,7 @@ namespace UAlbion.Game.Gui.Inventory
             }
 
             var item = assets.LoadItem(slotInfo.Id);
-            int sprite = (int)item.Icon + state.FrameCount % item.IconAnim;
+            int sprite = (int)item.Icon + state.TickCount % item.IconAnim;
             _sprite.Id = (ItemSpriteId)sprite;
             // TODO: Show item.Amount
             // TODO: Show broken overlay if item.Flags.HasFlag(ItemSlotFlags.Broken)

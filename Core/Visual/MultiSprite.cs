@@ -26,9 +26,9 @@ namespace UAlbion.Core.Visual
                 Instances = array;
             else
                 Instances = sprites.ToArray();
-            CalculateExtents();
+            // CalculateExtents();
         }
-
+/*
         void CalculateExtents()
         {
             Vector3 min = Vector3.Zero;
@@ -64,8 +64,8 @@ namespace UAlbion.Core.Visual
                 Instances[i].Rotation = -(float)Math.Atan2(delta.X, delta.Z);
             }
         }
-
         BoundingBox _extents;
+*/
         Vector3 _position;
         string _name;
 
@@ -83,7 +83,7 @@ namespace UAlbion.Core.Visual
 
         public Type Renderer => typeof(SpriteRenderer);
 
-        public BoundingBox? Extents => new BoundingBox(_extents.Min + Position, _extents.Max + Position);
+//        public BoundingBox? Extents => new BoundingBox(_extents.Min + Position, _extents.Max + Position);
         public Matrix4x4 Transform { get; private set; } = Matrix4x4.Identity;
 
         public event EventHandler ExtentsChanged;

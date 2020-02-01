@@ -25,7 +25,7 @@ namespace UAlbion.Game.State
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<GameState, NewGameEvent>((x,e) => x.NewGame()),
-            H<GameState, UpdateEvent>((x, e) => { x.FrameCount += e.Frames; }),
+            H<GameState, UpdateEvent>((x, e) => { x.TickCount += e.Frames; }),
             H<GameState, SetActiveMemberEvent>((x, e) => { x._party.Leader = e.MemberId; x.Raise(e); })
         );
 
@@ -36,7 +36,7 @@ namespace UAlbion.Game.State
             Children.Add(new InventoryScreenState());
         }
 
-        public int FrameCount { get; private set; }
+        public int TickCount { get; private set; }
         public bool Loaded { get; private set; }
 
         void SetupTestState()

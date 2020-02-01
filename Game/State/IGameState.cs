@@ -6,7 +6,7 @@ namespace UAlbion.Game.State
 {
     public interface IGameState
     {
-        int FrameCount { get; }
+        int TickCount { get; }
         IParty Party { get; }
         DateTime Time { get; }
         Func<NpcCharacterId, ICharacterSheet> GetNpc { get; }

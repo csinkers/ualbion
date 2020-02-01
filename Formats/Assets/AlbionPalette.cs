@@ -9,6 +9,7 @@ namespace UAlbion.Formats.Assets
 {
     public class AlbionPalette
     {
+        const int TicksPerPaletteChange = 8;
         public int Id { get; }
         public string Name { get; }
         public bool IsAnimated => AnimatedRanges.ContainsKey(Id);
@@ -93,7 +94,7 @@ namespace UAlbion.Formats.Assets
         public IList<uint[]> GetCompletePalette() => _cache;
         public uint[] GetPaletteAtTime(int tick)
         {
-            tick = int.MaxValue - tick;
+            tick = int.MaxValue - (tick / TicksPerPaletteChange);
             int index = tick % Period;
             return _cache[index];
         }

@@ -114,7 +114,9 @@ namespace UAlbion.Core.Visual
                 }
 
                 var options = GlslCompileOptions.Default;
+#if DEBUG
                 options.Debug = true;
+#endif
                 var glslCompileResult = SpirvCompilation.CompileGlslToSpirv(content, name, stage, options);
                 File.WriteAllBytes(cachePath, glslCompileResult.SpirvBytes);
                 return (cachePath, glslCompileResult.SpirvBytes);

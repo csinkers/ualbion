@@ -80,7 +80,7 @@ namespace UAlbion.Game.Input
                 else if (held is ItemSlot itemInHand)
                 {
                     var item = assets.LoadItem(itemInHand.Id);
-                    ItemSpriteId spriteId = item.Icon + state.FrameCount % item.IconAnim;
+                    ItemSpriteId spriteId = item.Icon + state.TickCount % item.IconAnim;
                     var texture = assets.LoadTexture(spriteId);
                     texture.GetSubImageDetails((int)spriteId, out var itemSize, out _, out _, out _);
                     e.Add(new Sprite<ItemSpriteId>(spriteId,

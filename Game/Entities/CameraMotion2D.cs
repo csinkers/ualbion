@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -39,7 +39,7 @@ namespace UAlbion.Game.Entities
             else
             {
                 var party = Resolve<IParty>();
-                if (map == null || party == null) return;
+                if (map == null || party == null || !party.StatusBarOrder.Any()) return;
                 var leader = party[party.Leader];
                 var position = leader.GetPosition() * new Vector2(map.TileSize.X, map.TileSize.Y);
                 const float lerpRate = 3.0f; // TODO: Data driven

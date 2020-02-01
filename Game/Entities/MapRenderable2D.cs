@@ -48,7 +48,8 @@ namespace UAlbion.Game.Entities
             _mapData = mapData;
             _tileset = tileset;
             _tileData = tileData;
-            TileSize = BuildInstanceData(0, 0, _tileData.Tiles[1], 0).Size;
+            _tileset.GetSubImageDetails(0, out var tileSize, out _, out _, out _);
+            TileSize = tileSize;
 
             var underlay = new SpriteInstanceData[_mapData.Width * _mapData.Height];
             var overlay = new SpriteInstanceData[_mapData.Width * _mapData.Height];
@@ -92,16 +93,15 @@ namespace UAlbion.Game.Entities
                 out var layer);
 
             DrawLayer drawLayer = tile.Layer.ToDrawLayer();
-            var instance = new SpriteInstanceData
-            {
-                Offset = new Vector3(
+            var instance = new SpriteInstanceData(
+                new Vector3(
                     new Vector2(i, j) * tileSize,
                     drawLayer.ToZCoordinate(j)),
-                Size = tileSize,
-                TexPosition = texPosition,
-                TexSize = texSize,
-                TexLayer = layer
-            };
+                tileSize,
+                texPosition,
+                texSize,
+                layer,
+                0);
 
             int zoneNum = _mapData.ZoneLookup[index];
             int eventNum = zoneNum == -1 ? -1 : _mapData.Zones[zoneNum].EventNumber;
@@ -145,13 +145,13 @@ namespace UAlbion.Game.Entities
                     {
                         var underlayTileId = _mapData.Underlay[index];
                         var underlayTile = underlayTileId == -1 ? null : _tileData.Tiles[underlayTileId];
-                        _underlay.Instances[index] = BuildInstanceData(i, j, underlayTile, state.FrameCount / TicksPerFrame);
+                        _underlay.Instances[index] = BuildInstanceData(i, j, underlayTile, state.TickCount / TicksPerFrame);
                         if(underlayTile?.FrameCount > 1)
                             animatedUnderlayTiles.Add(index);
 
                         var overlayTileId = _mapData.Overlay[index];
                         var overlayTile = overlayTileId == -1 ? null : _tileData.Tiles[overlayTileId];
-                        _overlay.Instances[index] = BuildInstanceData(i, j, overlayTile, state.FrameCount / TicksPerFrame);
+                        _overlay.Instances[index] = BuildInstanceData(i, j, overlayTile, state.TickCount / TicksPerFrame);
                         if(overlayTile?.FrameCount > 1)
                             animatedOverlayTiles.Add(index);
                         index++;
@@ -171,7 +171,7 @@ namespace UAlbion.Game.Entities
                         index % _mapData.Width,
                         index / _mapData.Width,
                         underlayTile,
-                        3 * state.FrameCount / 2);
+                        3 * state.TickCount / 2);
                 }
 
                 foreach(var index in _animatedOverlayIndices)
@@ -182,7 +182,7 @@ namespace UAlbion.Game.Entities
                         index % _mapData.Width,
                         index / _mapData.Width,
                         overlayTile,
-                        3 * state.FrameCount / 2);
+                        3 * state.TickCount / 2);
                 }
             }
         }

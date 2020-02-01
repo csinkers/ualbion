@@ -39,7 +39,7 @@ namespace UAlbion.Core.Visual
             _disposeCollector = factory.DisposeCollector;
 
             var layout = factory.CreateResourceLayout(new ResourceLayoutDescription(
-                ResourceLayoutHelper.Texture("vdspv_0_0"),
+                ResourceLayoutHelper.Texture("SourceTexture"),
                 ResourceLayoutHelper.Sampler("SourceSampler")));
 
             var shaderCache = Resolve<IShaderCache>();

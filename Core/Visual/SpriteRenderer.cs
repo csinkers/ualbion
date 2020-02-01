@@ -25,10 +25,14 @@ namespace UAlbion.Core.Visual
 
         // Instance Layout
         static readonly VertexLayoutDescription InstanceLayout = new VertexLayoutDescription(
-                VertexLayoutHelper.Vector3D("Offset"), VertexLayoutHelper.Vector2D("Size"),
+                VertexLayoutHelper.Vector3D("Transform1"),
+                VertexLayoutHelper.Vector3D("Transform2"),
+                VertexLayoutHelper.Vector3D("Transform3"),
+                VertexLayoutHelper.Vector3D("Transform4"),
+                //VertexLayoutHelper.Vector3D("Offset"), VertexLayoutHelper.Vector2D("Size"),
                 VertexLayoutHelper.Vector2D("TexPosition"), VertexLayoutHelper.Vector2D("TexSize"),
-                VertexLayoutHelper.Int("TexLayer"), VertexLayoutHelper.Int("Flags"),
-                VertexLayoutHelper.Float("Rotation")
+                VertexLayoutHelper.Int("TexLayer"), VertexLayoutHelper.Int("Flags")
+                //VertexLayoutHelper.Float("Rotation")
             )
             {InstanceStepRate = 1};
 
@@ -171,7 +175,7 @@ namespace UAlbion.Core.Visual
             {
                 textureManager?.PrepareTexture(multiSprite.Key.Texture, gd);
                 multiSprite.BufferId = _instanceBuffers.Count;
-                multiSprite.RotateSprites(sc.Camera.Position);
+                // multiSprite.RotateSprites(sc.Camera.Position);
                 var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)multiSprite.Instances.Length * SpriteInstanceData.StructSize, BufferUsage.VertexBuffer));
                 buffer.Name = $"B_SpriteInst{_instanceBuffers.Count}";
                 cl.UpdateBuffer(buffer, 0, multiSprite.Instances);

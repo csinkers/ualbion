@@ -71,8 +71,9 @@ namespace UAlbion.Game.Entities
 
         public override void Subscribed() { Raise(new LoadPaletteEvent(_mapData.PaletteId)); }
 
-        void SetTile(int index, int order, int frame)
+        void SetTile(int index, int order, int ticks)
         {
+            const int TicksPerFrame = 8;
             byte i = (byte)(index % _mapData.Width);
             byte j = (byte)(index / _mapData.Width);
             byte floorIndex = (byte)_mapData.Floors[index];
@@ -82,7 +83,7 @@ namespace UAlbion.Game.Entities
                 ? 0
                 : contents - 100);
 
-            _tilemap.Set(order, i, j, floorIndex, ceilingIndex, wallIndex, frame);
+            _tilemap.Set(order, i, j, floorIndex, ceilingIndex, wallIndex, ticks / TicksPerFrame);
         }
 
         void PostUpdate()
@@ -119,7 +120,7 @@ namespace UAlbion.Game.Entities
                     if(_isSorting)
                         list.Add(index);
                     else
-                        SetTile(index, index, state.FrameCount);
+                        SetTile(index, index, state.TickCount);
                 }
             }
 
@@ -136,7 +137,7 @@ namespace UAlbion.Game.Entities
 
                     foreach (var index in distance.Value)
                     {
-                        SetTile(index, order, state.FrameCount);
+                        SetTile(index, order, state.TickCount);
                         order++;
                     }
                 }

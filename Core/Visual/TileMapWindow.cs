@@ -10,9 +10,7 @@ namespace UAlbion.Core.Visual
         public int RenderOrder { get => TileMap.RenderOrder; set => throw new NotImplementedException(); }
 
         public Type Renderer => TileMap.Renderer;
-        public BoundingBox? Extents => TileMap.Extents;
         public Matrix4x4 Transform => Matrix4x4.Identity;
-        public event EventHandler ExtentsChanged;
 
         public int Offset { get; }
         public int Length { get; }
@@ -24,7 +22,6 @@ namespace UAlbion.Core.Visual
             TileMap = tileMap;
             Offset = offset;
             Length = length;
-            TileMap.ExtentsChanged += (e, sender) => ExtentsChanged?.Invoke(sender, EventArgs.Empty);
         }
     }
 }

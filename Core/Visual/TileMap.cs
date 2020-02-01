@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using UAlbion.Core.Textures;
-using Veldrid.Utilities;
 
 namespace UAlbion.Core.Visual
 {
@@ -55,15 +54,13 @@ namespace UAlbion.Core.Visual
         public Vector3 TileSize { get; }
         public Type Renderer => typeof(ExtrudedTileMapRenderer);
 
-        public BoundingBox? Extents => new BoundingBox(Position, Position + TileSize * new Vector3(Width, 1, Height));
+        // public BoundingBox? Extents => new BoundingBox(Position, Position + TileSize * new Vector3(Width, 1, Height));
         public Matrix4x4 Transform => Matrix4x4.Identity;
-        public event EventHandler ExtentsChanged; // Never fires, tilemaps remain static.
         public Tile[] Tiles { get; }
         public uint Width { get; }
         public uint Height { get; }
         public MultiTexture Floors { get; }
         public MultiTexture Walls { get; }
-        public int InstanceBufferId { get; set; }
 
         public void DefineFloor(int id, ITexture texture) { Floors.AddTexture(id, texture, 0, 0, null, false); }
         public void DefineWall(int id, ITexture texture, uint x, uint y, byte transparentColour, bool isAlphaTested) { Walls.AddTexture(id, texture, x, y, transparentColour, isAlphaTested); }

@@ -20,9 +20,7 @@ namespace UAlbion.Core.Visual
         public RenderPasses RenderPasses => RenderPasses.SwapchainOutput;
         public int RenderOrder { get; set; } = int.MaxValue;
         public Type Renderer => typeof(FullScreenQuad);
-        public BoundingBox? Extents => null;
         public Matrix4x4 Transform => Matrix4x4.Identity;
-        public event EventHandler ExtentsChanged;
 
         DisposeCollector _disposeCollector;
         Pipeline _pipeline;

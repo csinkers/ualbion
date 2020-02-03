@@ -13,7 +13,7 @@ namespace UAlbion.Core.Events
 
         [EventPart("operation", "Valid values: set, clear, toggle")]
         public FlagOperation Operation { get; }
-        [EventPart("flag", "Valid values: ShowBoundingBoxes")]
+        [EventPart("flag", "Valid values: ShowBoundingBoxes ShowCameraPosition, FlipDepthRange, FlipYSpace")]
         public EngineFlags Flag { get; }
     }
 }

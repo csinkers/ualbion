@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
@@ -18,19 +17,16 @@ namespace UAlbion.Game.Entities
         );
 
         public Vector3 Normal => Vector3.UnitZ;
-        readonly IDictionary<TAnim, int[]> _frames;
         public TSpriteId Id { get; }
-        protected Vector2 _position;
-        protected int _frame;
+        protected Vector2 Position { get; set; }
+        protected int Frame { get; set; }
         Vector2 _size = Vector2.One;
-        public TAnim Animation { get; set; }
 
-        public CharacterSprite(TSpriteId id, Vector2 position, IDictionary<TAnim, int[]> frames)
+        public CharacterSprite(TSpriteId id, Vector2 position)
             : base(Handlers)
         {
             Id = id;
-            _position = position;
-            _frames = frames;
+            Position = position;
         }
 
         public override void Subscribed()
@@ -53,7 +49,7 @@ namespace UAlbion.Game.Entities
             if (Math.Abs(denominator) < 0.00001f)
                 return;
 
-            var pixelPosition = _position * new Vector2(map.TileSize.X, map.TileSize.Y);
+            var pixelPosition = Position * new Vector2(map.TileSize.X, map.TileSize.Y);
             float t = Vector3.Dot(new Vector3(pixelPosition, 0.0f) - e.Origin, Normal) / denominator;
             if (t < 0)
                 return;
@@ -72,15 +68,15 @@ namespace UAlbion.Game.Entities
         protected virtual void Render(RenderEvent e)
         {
             var map = Resolve<IMapManager>().Current;
-            var pixelPosition = _position * new Vector2(map.TileSize.X, map.TileSize.Y);
-            var positionLayered = new Vector3(pixelPosition, DrawLayer.Characters2.ToZCoordinate(_position.Y));
+            var pixelPosition = Position * new Vector2(map.TileSize.X, map.TileSize.Y);
+            var positionLayered = new Vector3(pixelPosition, DrawLayer.Characters1.ToZCoordinate(Position.Y));
 
             var npcSprite = new Sprite<TSpriteId>(
                 Id,
-                _frame,
+                Frame,
                 positionLayered,
                 (int)DrawLayer.Characters1,
-                0);
+                SpriteFlags.BottomAligned);
 
             e.Add(npcSprite);
         }

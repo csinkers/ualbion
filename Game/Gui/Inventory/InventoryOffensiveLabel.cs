@@ -27,7 +27,7 @@ namespace UAlbion.Game.Gui.Inventory
             var source = new DynamicText(() =>
             {
                 var player = Resolve<IParty>()[_activeCharacter];
-                var damage = player.Apparent.Combat.Damage;
+                var damage = player?.Apparent.Combat.Damage ?? 0;
                 return new[] { new TextBlock($": {damage}") };
             }, x => _version);
 
@@ -52,7 +52,7 @@ namespace UAlbion.Game.Gui.Inventory
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
 
-            var damage = player.Effective.Combat.Damage;
+            var damage = player?.Effective.Combat.Damage ?? 0;
             var template = assets.LoadString(SystemTextId.Inv_DamageN, settings.Gameplay.Language);
             var (text, _) = new TextFormatter(assets, settings.Gameplay.Language).Format(
                 template, // Damage : %d

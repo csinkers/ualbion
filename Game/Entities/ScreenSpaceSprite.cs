@@ -38,7 +38,7 @@ namespace UAlbion.Game.Entities
                 _frame,
                 _position,
                 (int)DrawLayer.Interface,
-                SpriteFlags.NoTransform,
+                SpriteFlags.NoTransform | SpriteFlags.LeftAligned,
                 _size);
 
             e.Add(sprite);

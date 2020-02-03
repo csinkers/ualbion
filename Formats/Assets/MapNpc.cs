@@ -68,10 +68,8 @@ namespace UAlbion.Formats.Assets
             if ((Movement & MovementType.RandomMask) != 0)
             {
                 var wp = new Waypoint();
-                byte x = br.ReadByte();
-                byte y = br.ReadByte();
-                wp.X = (byte)(x - 1);
-                wp.Y = (byte)(y - 1);
+                wp.X = br.ReadByte();
+                wp.Y = br.ReadByte();
                 Waypoints = new[] { wp };
             }
             else
@@ -79,10 +77,8 @@ namespace UAlbion.Formats.Assets
                 Waypoints = new Waypoint[0x480];
                 for (int i = 0; i < Waypoints.Length; i++)
                 {
-                    byte x = br.ReadByte();
-                    byte y = br.ReadByte();
-                    Waypoints[i].X = (byte)(x - 1);
-                    Waypoints[i].Y = (byte)(y - 1);
+                    Waypoints[i].X = br.ReadByte();
+                    Waypoints[i].Y = br.ReadByte();
                 }
             }
         }

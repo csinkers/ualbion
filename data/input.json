@@ -15,7 +15,7 @@
     "Pause": "e:run_renderdoc",
     "Control+R": "e:run_renderdoc",
     "Alt+Enter":  "e:toggle",
-    "B": "engine_flag toggle ShowBoundingBoxes",
+    "Control+B": "engine_flag toggle ShowBoundingBoxes",
 
     "Shift+BracketLeft": "toggle_underlay",
     "Shift+BracketRight": "toggle_overlay",
@@ -79,6 +79,7 @@
     "Control+Number3": "set_active_member 2",
     "Control+Number4": "set_active_member 3",
     "Control+Number5": "set_active_member 4",
+    "Control+Number6": "set_active_member 5",
 
     "Q": "cursor_mode look",
     "E": "cursor_mode manipulate"
@@ -91,9 +92,12 @@
     "Control+Number3": "set_active_member 2",
     "Control+Number4": "set_active_member 3",
     "Control+Number5": "set_active_member 4",
+    "Control+Number6": "set_active_member 5",
 
     "M": "open_map",
-    "T": "wait"
+    "T": "wait",
+    "Control+Shift+M": "set_mouse_mode MouseLook",
+    "Control+Shift+N": "set_mouse_mode Normal"
   },
   "Inventory": {
     "Control+A": "inv_take_all",
@@ -108,5 +112,10 @@
     "Number6": "respond 6",
     "Number7": "respond 7",
     "Escape": "close_dialog"
-  }
+  },
+  "MainMenu": {
+    "Control+N": "new_game",
+    "Control+Shift+N": "new_game",
+    "Escape": "close_dialog"
+  } 
 }

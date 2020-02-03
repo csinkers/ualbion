@@ -52,16 +52,14 @@ namespace UAlbion.Game.Entities
                 return;
             }
 
-            TileSize = new Vector3(_labyrinthData.EffectiveWallWidth, _labyrinthData.WallHeight,
-                _labyrinthData.EffectiveWallWidth);
-
-            _renderable = new MapRenderable3D(MapId, assets, _mapData, _labyrinthData, TileSize);
+            TileSize = new Vector3(_labyrinthData.EffectiveWallWidth, _labyrinthData.WallHeight, _labyrinthData.EffectiveWallWidth);
+            _renderable = new MapRenderable3D(MapId, _mapData, _labyrinthData, TileSize);
             Exchange.Attach(_renderable);
             Children.Add(_renderable);
 
             if (_labyrinthData.BackgroundId.HasValue)
             {
-                _skybox = new Skybox(assets, _labyrinthData.BackgroundId.Value, _mapData.PaletteId);
+                _skybox = new Skybox(_labyrinthData.BackgroundId.Value);
                 Exchange.Attach(_skybox);
                 Children.Add(_skybox);
             }

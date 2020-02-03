@@ -10,6 +10,7 @@ namespace UAlbion.Game.Entities
 {
     public class MapObjectSprite : Component
     {
+        const int TicksPerFrame = 8;
         static readonly HandlerSet Handlers = new HandlerSet(
             H<MapObjectSprite, RenderEvent>((x,e) => x.Render(e)),
             H<MapObjectSprite, UpdateEvent>((x, e) => x._frame += e.Frames)
@@ -60,10 +61,10 @@ namespace UAlbion.Game.Entities
         {
             var sprite = new Sprite<DungeonObjectId>(
                 _id,
-                _frame,
+                _frame / TicksPerFrame,
                 _position,
                 (int)DrawLayer.Underlay,
-                SpriteFlags.FlipVertical | SpriteFlags.Billboard | (_onFloor ? SpriteFlags.Floor : 0),
+                SpriteFlags.FlipVertical | (_onFloor ? (SpriteFlags.Floor | SpriteFlags.MidAligned) : SpriteFlags.Billboard),
                 _size);
 
             e.Add(sprite);

@@ -4,7 +4,7 @@ using Veldrid;
 
 namespace UAlbion.Core.Textures
 {
-    public class Palette : ITexture
+    public class PaletteTexture : ITexture
     {
         public PixelFormat Format => PixelFormat.R8_G8_B8_A8_UNorm;
         public TextureType Type => TextureType.Texture2D;
@@ -19,7 +19,7 @@ namespace UAlbion.Core.Textures
         uint[] TextureData { get;  }
         public int SizeInBytes => TextureData.Length * sizeof(uint);
 
-        public Palette(string name, uint[] paletteData)
+        public PaletteTexture(string name, uint[] paletteData)
         {
             Name = name;
             TextureData = paletteData;

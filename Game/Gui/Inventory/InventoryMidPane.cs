@@ -33,6 +33,9 @@ namespace UAlbion.Game.Gui.Inventory
                     {
                         var member = Resolve<IParty>()[activeCharacter];
                         var settings = Resolve<ISettings>();
+                        if (member == null)
+                            return new TextBlock[0];
+
                         var name = member.Apparent.GetName(settings.Gameplay.Language);
                         return new[] { new TextBlock(name) { Alignment = TextAlignment.Center } };
                     })),

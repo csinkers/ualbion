@@ -53,7 +53,7 @@ namespace UAlbion.Game.Gui
 
                     var position = new Vector3(window.UiToNorm(new Vector2(i, j)), 0);
                     var size = 2 * Vector2.One / window.Size;
-                    instances.Add(new SpriteInstanceData(position, size, Vector2.Zero, Vector2.One, 0, flags));
+                    instances.Add(SpriteInstanceData.Centred(position, size, Vector2.Zero, Vector2.One, 0, flags));
                 }
             }
 

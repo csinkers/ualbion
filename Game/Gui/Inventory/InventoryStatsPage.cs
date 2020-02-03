@@ -18,7 +18,9 @@ namespace UAlbion.Game.Gui.Inventory
             var party = Resolve<IParty>();
             var settings = Resolve<ISettings>();
             var formatter = new TextFormatter(assets, settings.Gameplay.Language);
-            var member = party[_activeCharacter].Apparent;
+            var member = party[_activeCharacter]?.Apparent;
+            if (member == null)
+                yield break;
 
             var block = formatter.Format(assets.LoadString(id, settings.Gameplay.Language)).Item1.First();
             block.Text += $" {getValue(member)} / {getMax(member)}";
@@ -34,8 +36,16 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 var source = new DynamicText(() => BuildHoverText(id, getValue, getMax));
                 return new ProgressBar(source,
-                    () => getValue(Resolve<IParty>()[activeCharacter].Apparent),
-                    () => getMax(Resolve<IParty>()[activeCharacter].Apparent),
+                    () =>
+                    {
+                        var member = Resolve<IParty>()[activeCharacter];
+                        return member == null ? 0 : getValue(member.Apparent);
+                    },
+                    () =>
+                    {
+                        var member = Resolve<IParty>()[activeCharacter];
+                        return member == null ? 0 : getMax(member.Apparent);
+                    },
                     100);
             }
 

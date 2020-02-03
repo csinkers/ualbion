@@ -33,7 +33,7 @@ namespace UAlbion.Game.Gui
             // TODO: Cache sprite and rebuild when necessary
             var instances = new []
             {
-                new SpriteInstanceData(
+                SpriteInstanceData.TopLeft(
                     Vector3.Zero,
                     size,
                     Vector2.Zero,

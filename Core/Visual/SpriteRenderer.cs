@@ -33,8 +33,7 @@ namespace UAlbion.Core.Visual
                 VertexLayoutHelper.Vector2D("TexPosition"), VertexLayoutHelper.Vector2D("TexSize"),
                 VertexLayoutHelper.Int("TexLayer"), VertexLayoutHelper.Int("Flags")
                 //VertexLayoutHelper.Float("Rotation")
-            )
-            {InstanceStepRate = 1};
+            ) { InstanceStepRate = 1 };
 
         // Resource Sets
         static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
@@ -45,16 +44,10 @@ namespace UAlbion.Core.Visual
             ResourceLayoutHelper.Texture("vdspv_0_4")  // PaletteTexture
         );
 
-        static readonly Vertex2DTextured[] CenteredVertices =
+        static readonly Vertex2DTextured[] Vertices =
         {
             new Vertex2DTextured(-0.5f, 0.0f, 0.0f, 0.0f), new Vertex2DTextured(0.5f, 0.0f, 1.0f, 0.0f),
             new Vertex2DTextured(-0.5f, 1.0f, 0.0f, 1.0f), new Vertex2DTextured(0.5f, 1.0f, 1.0f, 1.0f),
-        };
-
-        static readonly Vertex2DTextured[] LeftAlignedVertices =
-        {
-            new Vertex2DTextured(0.0f, 0.0f, 0.0f, 0.0f), new Vertex2DTextured(1.0f, 0.0f, 1.0f, 0.0f),
-            new Vertex2DTextured(0.0f, 1.0f, 0.0f, 1.0f), new Vertex2DTextured(1.0f, 1.0f, 1.0f, 1.0f),
         };
 
         static readonly ushort[] Indices = {0, 1, 2, 2, 1, 3};
@@ -64,9 +57,8 @@ namespace UAlbion.Core.Visual
         readonly List<Shader> _shaders = new List<Shader>();
 
         // Context objects
-        DeviceBuffer _centeredVb;
-        DeviceBuffer _leftVb;
-        DeviceBuffer _ib;
+        DeviceBuffer _vertexBuffer;
+        DeviceBuffer _indexBuffer;
         Dictionary<SpriteShaderKey, Pipeline> _pipelines = new Dictionary<SpriteShaderKey, Pipeline>();
         ResourceLayout _perSpriteResourceLayout;
 
@@ -96,6 +88,7 @@ namespace UAlbion.Core.Visual
             _shaders.AddRange(shaders);
             var shaderSet = new ShaderSetDescription(new[] { VertexLayout, InstanceLayout }, shaders);
 
+            Console.WriteLine($"-- Build SpriteRenderer-- IsDepth0..1: {gd.IsDepthRangeZeroToOne} YInvert: {gd.IsClipSpaceYInverted} UV TopLeft: {gd.IsUvOriginTopLeft}");
             var depthStencilMode = 
                 key.PerformDepthTest
                 ?  gd.IsDepthRangeZeroToOne
@@ -130,15 +123,12 @@ namespace UAlbion.Core.Visual
         {
             ResourceFactory factory = gd.ResourceFactory;
 
-            _centeredVb = factory.CreateBuffer(new BufferDescription(CenteredVertices.SizeInBytes(), BufferUsage.VertexBuffer));
-            _leftVb = factory.CreateBuffer(new BufferDescription(CenteredVertices.SizeInBytes(), BufferUsage.VertexBuffer));
-            _ib = factory.CreateBuffer(new BufferDescription(Indices.SizeInBytes(), BufferUsage.IndexBuffer));
-            _centeredVb.Name = "SpriteVertexBufferC";
-            _leftVb.Name = "SpriteVertexBufferL";
-            _ib.Name = "SpriteIndexBuffer";
-            cl.UpdateBuffer(_centeredVb, 0, CenteredVertices);
-            cl.UpdateBuffer(_leftVb, 0, LeftAlignedVertices);
-            cl.UpdateBuffer(_ib, 0, Indices);
+            _vertexBuffer = factory.CreateBuffer(new BufferDescription(Vertices.SizeInBytes(), BufferUsage.VertexBuffer));
+            _indexBuffer = factory.CreateBuffer(new BufferDescription(Indices.SizeInBytes(), BufferUsage.IndexBuffer));
+            _vertexBuffer.Name = "SpriteVertexBuffer";
+            _indexBuffer.Name = "SpriteIndexBuffer";
+            cl.UpdateBuffer(_vertexBuffer, 0, Vertices);
+            cl.UpdateBuffer(_indexBuffer, 0, Indices);
 
             if (_pipelines != null)
             {
@@ -155,7 +145,7 @@ namespace UAlbion.Core.Visual
             };
             _perSpriteResourceLayout = factory.CreateResourceLayout(PerSpriteLayoutDescription);
             _pipelines = keys.ToDictionary(x => x, x => BuildPipeline(gd, sc, x));
-            _disposeCollector.Add(_centeredVb, _leftVb, _ib, _perSpriteResourceLayout);
+            _disposeCollector.Add(_vertexBuffer, _indexBuffer, _perSpriteResourceLayout);
         }
 
         public IEnumerable<IRenderable> UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IEnumerable<IRenderable> renderables)
@@ -235,8 +225,8 @@ namespace UAlbion.Core.Visual
             cl.SetPipeline(_pipelines[shaderKey]);
             cl.SetGraphicsResourceSet(0, resourceSet);
             cl.SetGraphicsResourceSet(1, sc.CommonResourceSet);
-            cl.SetVertexBuffer(0, sprite.Flags.HasFlag(SpriteFlags.LeftAligned) ? _leftVb : _centeredVb);
-            cl.SetIndexBuffer(_ib, IndexFormat.UInt16);
+            cl.SetVertexBuffer(0, _vertexBuffer);
+            cl.SetIndexBuffer(_indexBuffer, IndexFormat.UInt16);
             cl.SetVertexBuffer(1, _instanceBuffers[sprite.BufferId]);
 
             //cl.SetViewport(0, new Viewport(0, 0, sc.MainSceneColorTexture.Width, sc.MainSceneColorTexture.Height, depth, depth));

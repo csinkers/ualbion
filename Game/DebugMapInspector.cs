@@ -75,27 +75,50 @@ namespace UAlbion.Game
                     setter(value);
             }
 
-            ImGui.Text(PerfTracker.GetFrameStats());
+            if (ImGui.TreeNode("Stats"))
+            {
+                if (ImGui.Button("Clear"))
+                    PerfTracker.Clear();
+                ImGui.BeginGroup();
+                var (descriptions, stats) = PerfTracker.GetFrameStats();
+                ImGui.Columns(2);
+                foreach (var description in descriptions)
+                    ImGui.Text(description);
+                ImGui.NextColumn();
+                foreach(var stat in stats)
+                    ImGui.Text(stat);
+                ImGui.TreePop();
+                ImGui.EndGroup();
+                ImGui.Columns(1);
+            }
 
-            var settings = Resolve<ISettings>();
-            ImGui.BeginGroup();
-            ImGui.Columns(3);
-            BoolOption("DrawPositions",            () => settings.Debug.DrawPositions,            x => Raise(new SetDrawPositionsEvent(x)));
-            BoolOption("HighlightTile",            () => settings.Debug.HighlightTile,            x => Raise(new SetHighlightTileEvent(x)));
-            ImGui.NextColumn();
-            BoolOption("HighlightSelection",       () => settings.Debug.HighlightSelection,       x => Raise(new SetHighlightSelectionEvent(x)));
-            BoolOption("HighlightEventChainZones", () => settings.Debug.HighlightEventChainZones, x => Raise(new SetHighlightEventChainZonesEvent(x)));
-            ImGui.NextColumn();
-            BoolOption("ShowPaths",                () => settings.Debug.ShowPaths,                x => Raise(new SetShowPathsEvent(x)));
-            ImGui.Columns(1);
-            ImGui.EndGroup();
+            if (ImGui.TreeNode("Settings"))
+            {
+                var settings = Resolve<ISettings>();
+                ImGui.BeginGroup();
+                BoolOption("DrawPositions", () => settings.Debug.DrawPositions, x => Raise(new SetDrawPositionsEvent(x)));
+                BoolOption("FlipDepthRange", () => settings.Engine.Flags.HasFlag(EngineFlags.FlipDepthRange), x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.FlipDepthRange)));
+                BoolOption("FlipYSpace", () => settings.Engine.Flags.HasFlag(EngineFlags.FlipYSpace), x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.FlipYSpace)));
+                BoolOption("HighlightEventChainZones", () => settings.Debug.HighlightEventChainZones, x => Raise(new SetHighlightEventChainZonesEvent(x)));
+                BoolOption("HighlightSelection", () => settings.Debug.HighlightSelection, x => Raise(new SetHighlightSelectionEvent(x)));
+                BoolOption("HighlightTile", () => settings.Debug.HighlightTile, x => Raise(new SetHighlightTileEvent(x)));
+                BoolOption("ShowBoundingBoxes", () => settings.Engine.Flags.HasFlag(EngineFlags.ShowBoundingBoxes), x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.ShowBoundingBoxes)));
+                BoolOption("ShowCameraPosition", () => settings.Engine.Flags.HasFlag(EngineFlags.ShowCameraPosition), x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.ShowCameraPosition)));
+                BoolOption("ShowPaths", () => settings.Debug.ShowPaths, x => Raise(new SetShowPathsEvent(x)));
+                ImGui.EndGroup();
+                ImGui.TreePop();
+            }
 
-            var normPos = window.PixelToNorm(_mousePosition);
-            var uiPos = window.NormToUi(normPos);
-            uiPos.X = (int) uiPos.X; uiPos.Y = (int) uiPos.Y;
-            ImGui.Text($"Cursor Pix: {_mousePosition} UI: {uiPos} Norm: {normPos} Scale: {window.GuiScale} PixSize: {window.Size}");
-            ImGui.Text($"Camera World: {cameraPosition} Tile: {cameraTilePosition} Dir: {cameraDirection} Mag: {cameraMagnification}");
-            ImGui.Text($"TileSize: {map?.TileSize}");
+            if (ImGui.TreeNode("Positions"))
+            {
+                var normPos = window.PixelToNorm(_mousePosition);
+                var uiPos = window.NormToUi(normPos);
+                uiPos.X = (int) uiPos.X; uiPos.Y = (int) uiPos.Y;
+                ImGui.Text($"Cursor Pix: {_mousePosition} UI: {uiPos} Norm: {normPos} Scale: {window.GuiScale} PixSize: {window.Size}");
+                ImGui.Text($"Camera World: {cameraPosition} Tile: {cameraTilePosition} Dir: {cameraDirection} Mag: {cameraMagnification}");
+                ImGui.Text($"TileSize: {map?.TileSize}");
+                ImGui.TreePop();
+            }
 
             int hitId = 0;
             if (ImGui.TreeNode("Global"))

@@ -28,6 +28,8 @@ namespace UAlbion.Core.Events
         public string Name { get; }
 
         bool _isActive = true;
+
+        public IEnumerable<object> SortedSubscribers { get { lock(SyncRoot) { return _subscribers.Keys.OrderBy(x => x.ToString()).ToList(); } } } 
         public bool IsActive
         {
             get => _isActive;

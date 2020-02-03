@@ -146,7 +146,7 @@ namespace UAlbion
 
                 var menuBackground = new ScreenSpaceSprite<PictureId>(
                     PictureId.MenuBackground8,
-                    new Vector2(0.0f, 1.0f),
+                    new Vector2(-1.0f, 1.0f),
                     new Vector2(2.0f, -2.0f));
 
                 global.Resolve<ISceneManager>().GetExchange(SceneId.MainMenu)
@@ -155,7 +155,6 @@ namespace UAlbion
                     ;
 
                 PerfTracker.StartupEvent("Starting new game");
-                //global.Raise(new NewGameEvent(), null);
                 //global.Raise(new LoadMapEvent(MapDataId.Jirinaar3D), null); /*
                 /*
                 global.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude), null); /*
@@ -164,7 +163,8 @@ namespace UAlbion
                 global.Raise(new SetSceneEvent(SceneId.Inventory), null);
                 //*/
 
-                global.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
+                //global.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
+                global.Raise(new NewGameEvent(), null);
                 ReflectionHelper.ClearTypeCache();
             });
 
@@ -207,7 +207,7 @@ namespace UAlbion
             }
 
             SpriteInstanceData Make(Vector3 position, Vector2 size) =>
-                new SpriteInstanceData(
+                SpriteInstanceData.TopLeft(
                     position, size,
                     Vector2.Zero, Vector2.One,
                     0, 0);

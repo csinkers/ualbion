@@ -14,7 +14,7 @@ namespace UAlbion.Core
             H<PerspectiveCamera, SetCameraDirectionEvent>((x, e) => { x.Yaw = e.Yaw; x.Pitch = e.Pitch; }),
             H<PerspectiveCamera, SetFieldOfViewEvent>((x, e) =>
             {
-                x._fov = (float)(Math.PI * e.Degrees / 180);
+                x.FieldOfView = (float)(Math.PI * e.Degrees / 180);
                 x.UpdatePerspectiveMatrix();
             })
         );
@@ -30,7 +30,6 @@ namespace UAlbion.Core
         float _pitch;
         bool _useReverseDepth;
         bool _isClipSpaceYInverted;
-        float _fov = (float)(Math.PI * 80 / 180);
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;
@@ -47,7 +46,7 @@ namespace UAlbion.Core
         }
 
         public Vector3 LookDirection => _lookDirection;
-        public float FieldOfView => _fov;
+        public float FieldOfView { get; private set; } = (float)(Math.PI * 80 / 180);
         public float NearDistance => 10f;
         public float FarDistance => 512.0f * 256.0f * 2.0f;
 
@@ -59,8 +58,15 @@ namespace UAlbion.Core
 
         void UpdateBackend(BackendChangedEvent e)
         {
-            _useReverseDepth = e.GraphicsDevice.IsDepthRangeZeroToOne;
-            _isClipSpaceYInverted = e.GraphicsDevice.IsClipSpaceYInverted;
+            var settings = Resolve<IEngineSettings>();
+            _useReverseDepth = settings?.Flags.HasFlag(EngineFlags.FlipDepthRange) == true
+                ? !e.GraphicsDevice.IsDepthRangeZeroToOne
+                : e.GraphicsDevice.IsDepthRangeZeroToOne;
+
+            _isClipSpaceYInverted = (settings?.Flags.HasFlag(EngineFlags.FlipYSpace) == true)
+                ? !e.GraphicsDevice.IsClipSpaceYInverted 
+                : e.GraphicsDevice.IsClipSpaceYInverted;
+;
             UpdatePerspectiveMatrix();
         }
 
@@ -113,7 +119,8 @@ namespace UAlbion.Core
             return new CameraInfo
             {
                 WorldSpacePosition = _position,
-                CameraLookDirection = LookDirection,
+                CameraPitch = Pitch,
+                CameraYaw = Yaw,
                 Resolution = _windowSize,
                 Time = clock.ElapsedTime,
                 Special1 = settings.Special1,

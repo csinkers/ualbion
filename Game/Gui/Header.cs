@@ -9,12 +9,12 @@ namespace UAlbion.Game.Gui
 
         public Header(StringId id) : base(Handlers)
         {
-            var text = new Text(id).Bold().Center();
+            var text = new Text(id).NoWrap().Bold().Center();
             Children.Add(text);
         }
         public Header(ITextSource source) : base(Handlers)
         {
-            var text = new Text(source).Bold().Center();
+            var text = new Text(source).NoWrap().Bold().Center();
             Children.Add(text);
         }
     }

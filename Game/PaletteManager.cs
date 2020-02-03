@@ -2,26 +2,23 @@
 using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
     public class PaletteManager : Component, IPaletteManager
     {
+        const int TicksPerPaletteChange = 8;
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<PaletteManager, UpdateEvent>((x, e) =>
-            {
-                x._ticks++;
-                if(x._logicalPalette.IsAnimated)
-                    x.GeneratePalette();
-            }),
+            H<PaletteManager, UpdateEvent>((x, e) => x.OnTick(e.Frames)),
             H<PaletteManager, LoadPaletteEvent>((x, e) => x.SetPalette(e.PaletteId))
         );
 
-        AlbionPalette _logicalPalette;
-        public Palette Palette { get; private set; }
         int _ticks;
+
+        public IPalette Palette { get; private set; }
+        public PaletteTexture PaletteTexture { get; private set; }
+        public int PaletteFrame { get; private set; }
 
         public PaletteManager() : base(Handlers) { }
 
@@ -29,6 +26,21 @@ namespace UAlbion.Game
         {
             SetPalette(PaletteId.Toronto2D);
             base.Subscribed();
+        }
+
+        void OnTick(int frames)
+        {
+            _ticks += frames;
+            while (_ticks >= TicksPerPaletteChange)
+            {
+                _ticks -= TicksPerPaletteChange;
+                PaletteFrame++;
+                if (PaletteFrame >= Palette.GetCompletePalette().Count)
+                    PaletteFrame = 0;
+
+                if (Palette.IsAnimated)
+                    GeneratePalette();
+            }
         }
 
         void SetPalette(PaletteId paletteId)
@@ -40,13 +52,16 @@ namespace UAlbion.Game
                 return;
             }
 
-            _logicalPalette = palette;
+            Palette = palette;
+            if (PaletteFrame >= Palette.GetCompletePalette().Count)
+                PaletteFrame = 0;
+
             GeneratePalette();
         }
 
         void GeneratePalette()
         {
-            Palette = new Palette(_logicalPalette.Name, _logicalPalette.GetPaletteAtTime(_ticks));
+            PaletteTexture = new PaletteTexture(Palette.Name, Palette.GetPaletteAtTime(PaletteFrame));
         }
     }
 }

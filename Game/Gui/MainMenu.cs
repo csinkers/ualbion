@@ -66,7 +66,7 @@ namespace UAlbion.Game.Gui
             var elements = new List<IUiElement>
             {
                 new Padding(0, 2),
-                new Header(S(SystemTextId.MainMenu_MainMenu)),
+                new HorizontalStack(new Padding(5, 0), new Header(S(SystemTextId.MainMenu_MainMenu)), new Padding(5, 0)),
                 new Divider(CommonColor.Yellow3),
                 new Padding(0, 2),
             };

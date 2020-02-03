@@ -75,6 +75,20 @@ namespace UAlbion.Game.Input
             }
         }
 
+        static bool IsModifier(Key key)
+        {
+            switch(key)
+            {
+                case Key.LControl: case Key.RControl:
+                case Key.LShift:   case Key.RShift:
+                case Key.LAlt:     case Key.RAlt:
+                case Key.LWin:     case Key.RWin:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         void OnInput(InputEvent e)
         {
             var inputManager = Resolve<IInputManager>();
@@ -87,6 +101,9 @@ namespace UAlbion.Game.Input
                 }
 
                 _pressedKeys.Add(keyEvent.Key);
+
+                if (IsModifier(keyEvent.Key))
+                    continue;
 
                 var binding = new KeyBinding(keyEvent.Key, keyEvent.Modifiers);
                 if (!_bindings[inputManager.InputMode].TryGetValue(binding, out var action))

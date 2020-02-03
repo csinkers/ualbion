@@ -31,6 +31,8 @@ namespace UAlbion.Game.Gui.Inventory
                 var assets = Resolve<IAssetManager>();
                 var settings = Resolve<ISettings>();
                 var player = Resolve<IParty>()[_activeCharacter];
+                if(player == null)
+                    return new TextBlock[0];
 
                 // Carried Weight : %ld of %ld g
                 var template = assets.LoadString(SystemTextId.Inv_CarriedWeightNdOfNdG, settings.Gameplay.Language);
@@ -43,6 +45,8 @@ namespace UAlbion.Game.Gui.Inventory
                 var assets = Resolve<IAssetManager>();
                 var settings = Resolve<ISettings>();
                 var player = Resolve<IParty>()[_activeCharacter];
+                if(player == null)
+                    return new TextBlock[0];
 
                 int weight = player.Apparent.TotalWeight / 1000;
                 var template = assets.LoadString(SystemTextId.Inv_WeightNKg, settings.Gameplay.Language); // Weight : %d Kg
@@ -61,6 +65,6 @@ namespace UAlbion.Game.Gui.Inventory
             });
         }
 
-        void Hover() => Raise(new HoverTextEvent(_hoverSource.Get().First().Text));
+        void Hover() => Raise(new HoverTextEvent(_hoverSource.Get().FirstOrDefault()?.Text));
     }
 }

@@ -11,5 +11,6 @@
         Combat,
         World3D,
         ContextMenu,
+        MainMenu
     }
 }

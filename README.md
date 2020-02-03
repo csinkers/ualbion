@@ -3,6 +3,12 @@ A remake of the 1996 RPG Albion (requires data from an install of the original g
 
 Prerequisites: .NET Core 3.0
 
+![Example Screenshot 1](/data/Screenshots/1_FirstLevel.png?raw=true)
+![Example Screenshot 2](/data/Screenshots/2_3DWorld.png?raw=true)
+![Example Screenshot 3](/data/Screenshots/3_Outdoors.png?raw=true)
+![Example Screenshot 4](/data/Screenshots/4_Inventory.png?raw=true)
+![Example Screenshot 5](/data/Screenshots/5_MainMenu.png?raw=true)
+
 See run.bat / run.sh for how to invoke dotnet to build and run it from the command line. Alternatively, open up the solution file with Visual Studio.
 Configure data/config.json to set the path for the files from the original game (currently only version v1.38 where MAIN.EXE is 1,109,655 bytes is supported)
 

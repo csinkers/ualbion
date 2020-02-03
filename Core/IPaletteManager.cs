@@ -1,9 +1,12 @@
-﻿using UAlbion.Core.Textures;
+﻿using UAlbion.Api;
+using UAlbion.Core.Textures;
 
 namespace UAlbion.Core
 {
     public interface IPaletteManager
     {
-        Palette Palette { get; }
+        IPalette Palette { get; }
+        PaletteTexture PaletteTexture { get; }
+        int PaletteFrame { get; }
     }
 }

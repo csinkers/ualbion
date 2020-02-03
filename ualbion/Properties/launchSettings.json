@@ -2,7 +2,7 @@
   "profiles": {
     "UAlbion": {
       "commandName": "Project",
-      "commandLineArgs": "-vk -rd",
+      "commandLineArgs": "-vk",
       "workingDirectory": "..",
       "nativeDebugging": true
     }

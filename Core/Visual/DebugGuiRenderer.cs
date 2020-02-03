@@ -5,7 +5,6 @@ using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core.Events;
 using Veldrid;
-using Veldrid.Utilities;
 
 namespace UAlbion.Core.Visual
 {

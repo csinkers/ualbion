@@ -20,12 +20,12 @@ namespace UAlbion
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
             // Dump all core sprites
-            var palette = assets.LoadPalette(PaletteId.Main3D);
+            var palette = assets.LoadPalette(PaletteId.Inventory);
             for (int i = 0; i < 86; i++)
             {
                 var name = $"{i}_{(CoreSpriteId)i}";
                 var coreSprite = assets.LoadTexture((CoreSpriteId)i);
-                var multiTexture = new MultiTexture(name, palette.GetCompletePalette());
+                var multiTexture = new MultiTexture(name, new DummyPaletteManager(palette));
                 multiTexture.AddTexture(1, coreSprite, 0, 0, null, false);
                 multiTexture.SavePng(1, 0, $@"{dir}\{name}.bmp");
             }

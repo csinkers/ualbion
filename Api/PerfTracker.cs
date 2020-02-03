@@ -24,13 +24,12 @@ namespace UAlbion.Api
                 {
                     long ticks = _stopwatch.ElapsedTicks;
                     if (!_frameTimes.ContainsKey(_name))
-                        _frameTimes[_name] = new Stats { Fast = ticks, Med = ticks, Slow = ticks };
+                        _frameTimes[_name] = new Stats { Fast = ticks };
 
                     var stats = _frameTimes[_name];
+                    stats.Count++;
                     stats.Total += ticks;
                     stats.Fast = (ticks + 8*stats.Fast) / 9.0f;
-                    stats.Med = (ticks + 60*stats.Med) / 61.0f;
-                    stats.Slow = (ticks + 600*stats.Slow) / 601.0f;
                     if (stats.Min > ticks) stats.Min = ticks;
                     if (stats.Max < ticks) stats.Max = ticks;
                 }
@@ -62,12 +61,11 @@ namespace UAlbion.Api
 
         class Stats
         {
+            public long Count { get; set; }
             public long Total { get; set; }
             public long Min { get; set; } = long.MaxValue;
             public long Max { get; set; } = long.MinValue;
             public float Fast { get; set; }
-            public float Med { get; set; }
-            public float Slow { get; set; }
         }
 
         static readonly Stopwatch _startupStopwatch = Stopwatch.StartNew();
@@ -91,25 +89,38 @@ namespace UAlbion.Api
         public static IDisposable InfrequentEvent(string name) => new InfrequentTracker(name);
 
         public static IDisposable FrameEvent(string name) => new FrameTimeTracker(name);
-        public static string GetFrameStats()
+
+        public static void Clear()
+        {
+            lock (_syncRoot)
+            {
+                _frameTimes.Clear();
+                _frameCount = 0;
+            }
+        }
+
+        public static (IList<string>, IList<string>) GetFrameStats()
         {
             var sb = new StringBuilder();
+            var descriptions = new List<string>();
+            var results = new List<string>();
             lock(_syncRoot)
             {
                 foreach (var kvp in _frameTimes.OrderBy(x => x.Key))
                 {
-                    sb.Append(kvp.Key);
-                    sb.Append($" Avg: {(float) kvp.Value.Total / (10000 * _frameCount):F3}");
-                    sb.Append($" Min: {(float) kvp.Value.Min / 10000:F3}");
-                    sb.Append($" Max: {(float) kvp.Value.Max / 10000:F3}");
+                    sb.Append($"Avg/frame: {(float)kvp.Value.Total / (10000 * _frameCount):F3}");
+                    sb.Append($" Min: {(float)kvp.Value.Min / 10000:F3}");
+                    sb.Append($" Max: {(float)kvp.Value.Max / 10000:F3}");
                     sb.Append($" F:{kvp.Value.Fast / 10000:F3}");
-                    sb.Append($" M:{kvp.Value.Med / 10000:F3}");
-                    sb.Append($" S:{kvp.Value.Slow / 10000:F3}");
-                    sb.AppendLine();
+                    sb.Append($" Avg/call: {(float)kvp.Value.Total / (10000 * kvp.Value.Count):F3}");
+                    sb.Append($" Calls/Frame: {(float)kvp.Value.Count / _frameCount:F3}");
+                    descriptions.Add(kvp.Key);
+                    results.Add(sb.ToString());
+                    sb.Clear();
                 }
             }
 
-            return sb.ToString();
+            return (descriptions, results);
         }
     }
 }

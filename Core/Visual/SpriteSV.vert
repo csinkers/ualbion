@@ -31,11 +31,25 @@ layout(location = 4) out vec3 oWorldPosition; // World position
 void main()
 {
 	mat4 transform = mat4(vec4(iT1, 0), vec4(iT2, 0), vec4(iT3, 0), vec4(iT4, 1));
+
+	if ((iFlags & SF_BILLBOARD) != 0)
+	{
+		float c = cos(-u_camera_look_direction.x);
+		float s = sin(-u_camera_look_direction.x);
+		transform = transform * mat4(
+			c, 0, s, 0,
+			0, 1, 0, 0,
+		   -s, 0, c, 0,
+			0, 0, 0, 1);
+	}
+
 	vec4 worldSpace = transform * vec4(vPosition, 0, 1);
 
-	gl_Position = ((iFlags & SF_NO_TRANSFORM) == 0)
+	vec4 normPosition = ((iFlags & SF_NO_TRANSFORM) == 0)
 		? uProjection * uView * worldSpace
 		:               uView * worldSpace;
+
+	gl_Position = normPosition;
 
 	oTexPosition = vTexCoords * iTexSize + iTexOffset;
 	oLayer = float(iTexLayer);

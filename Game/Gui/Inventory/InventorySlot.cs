@@ -41,7 +41,7 @@ namespace UAlbion.Game.Gui.Inventory
         {
             var assets = Resolve<IAssetManager>();
             var member = Resolve<IParty>()[ActiveCharacter];
-            slotInfo = member.Apparent.Inventory.GetSlot(SlotId);
+            slotInfo = member?.Apparent.Inventory.GetSlot(SlotId);
             item = slotInfo == null ? null : assets.LoadItem(slotInfo.Id);
         }
 
@@ -90,6 +90,9 @@ namespace UAlbion.Game.Gui.Inventory
                 return; // Don't show hover text when holding gold / food
 
             var member = party[ActiveCharacter];
+            if (member == null)
+                return;
+
             var slotInfo = member.Effective.Inventory.GetSlot(SlotId);
             string itemName = null;
             if (slotInfo != null)

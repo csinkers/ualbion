@@ -59,7 +59,7 @@ namespace UAlbion.Game
             if (texture == null)
             {
                 return Tuple.Create(new SpriteKey(_defaultTexture, (int)DrawLayer.Diagnostic, sprite.Flags),
-                    new SpriteInstanceData(sprite.Position,
+                    SpriteInstanceData.Centred(sprite.Position,
                         new Vector2(_defaultTexture.Width, _defaultTexture.Height),
                         Vector2.Zero, Vector2.One, 0, 0));
             }
@@ -67,7 +67,7 @@ namespace UAlbion.Game
             texture.GetSubImageDetails(sprite.SubObject, out var size, out var texOffset, out var texSize, out var layer);
 
             var key = new SpriteKey(texture, sprite.RenderOrder, sprite.Flags);
-            var instance = new SpriteInstanceData(
+            var instance = SpriteInstanceData.CopyFlags(
                 sprite.Position,
                 sprite.Size ?? size, texOffset, texSize, layer,
                 sprite.Flags | (texture.Format == PixelFormat.R8_UNorm ? SpriteFlags.UsePalette : 0)

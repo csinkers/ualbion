@@ -198,7 +198,7 @@ namespace UAlbion.Game.Entities
                 return (Vector2.Zero, 0);
 
             var (pos, frame) = _trail[_playerOffsets[index].Item1];
-            return (pos + new Vector2(0.5f, 0.0f), frame);
+            return (pos, frame);
         }
     }
 }

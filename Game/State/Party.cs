@@ -32,7 +32,7 @@ namespace UAlbion.Game.State
             _readOnlyWalkOrder = new ReadOnlyCollection<Player.Player>(_walkOrder);
         }
 
-        public IPlayer this[PartyCharacterId id] => _statusBarOrder.Single(x => x.Id == id);
+        public IPlayer this[PartyCharacterId id] => _statusBarOrder.FirstOrDefault(x => x.Id == id);
         public IReadOnlyList<IPlayer> StatusBarOrder => _readOnlyStatusBarOrder;
         public IReadOnlyList<IPlayer> WalkOrder => _readOnlyWalkOrder;
 

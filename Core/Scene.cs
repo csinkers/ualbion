@@ -18,7 +18,7 @@ namespace UAlbion.Core
         readonly IDictionary<Type, IList<IRenderable>> _renderables = new Dictionary<Type, IList<IRenderable>>();
         readonly IDictionary<int, IList<IRenderable>> _processedRenderables = new Dictionary<int, IList<IRenderable>>();
         readonly IList<Type> _activeRendererTypes;
-        Palette _palette;
+        PaletteTexture _paletteTexture;
         RgbaFloat _clearColour;
 
         public string Name { get; }
@@ -45,30 +45,34 @@ namespace UAlbion.Core
             foreach(var renderer in _renderables.Values)
                 renderer.Clear();
 
-            Exchange.Raise(new RenderEvent(x =>
+            using (PerfTracker.FrameEvent("6.1.1 Collect renderables"))
             {
-                if (x == null || !_activeRendererTypes.Contains(x.Renderer))
-                    return;
-                if (!_renderables.ContainsKey(x.Renderer))
-                    _renderables[x.Renderer] = new List<IRenderable>();
-                _renderables[x.Renderer].Add(x);
-            }), this);
+                Exchange.Raise(new RenderEvent(x =>
+                {
+                    if (x == null || !_activeRendererTypes.Contains(x.Renderer))
+                        return;
+                    if (!_renderables.ContainsKey(x.Renderer))
+                        _renderables[x.Renderer] = new List<IRenderable>();
+                    _renderables[x.Renderer].Add(x);
+                }), this);
+            }
 
             foreach(var renderer in _renderables)
                 CoreTrace.Log.CollectedRenderables(renderer.Key.Name, 0, renderer.Value.Count);
 
-            var newPalette = Resolve<IPaletteManager>().Palette;
-            if (sc.PaletteView == null || _palette != newPalette)
+            var newPalette = Resolve<IPaletteManager>().PaletteTexture;
+            if (sc.PaletteView == null || _paletteTexture != newPalette)
             {
                 sc.PaletteView?.Dispose();
                 sc.PaletteTexture?.Dispose();
                 CoreTrace.Log.Info("Scene", "Disposed palette device texture");
-                _palette = newPalette;
-                sc.PaletteTexture = _palette.CreateDeviceTexture(gd, gd.ResourceFactory, TextureUsage.Sampled);
+                _paletteTexture = newPalette;
+                sc.PaletteTexture = _paletteTexture.CreateDeviceTexture(gd, gd.ResourceFactory, TextureUsage.Sampled);
                 sc.PaletteView = gd.ResourceFactory.CreateTextureView(sc.PaletteTexture);
             }
             CoreTrace.Log.Info("Scene", "Created palette device texture");
 
+            using (PerfTracker.FrameEvent("6.1.2 Prepare per-frame resources"))
             using (new RenderDebugGroup(cl, "Prepare per-frame resources"))
             {
                 _processedRenderables.Clear();
@@ -94,6 +98,7 @@ namespace UAlbion.Core
             float depthClear = gd.IsDepthRangeZeroToOne ? 1f : 0f;
 
             // Main scene
+            using (PerfTracker.FrameEvent("6.1.3 Main scene pass"))
             using (new RenderDebugGroup(cl, "Main Scene Pass"))
             {
                 sc.UpdateCameraBuffers(cl);

@@ -3,7 +3,6 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using UAlbion.Core.Textures;
 using Veldrid;
-using Veldrid.Utilities;
 
 namespace UAlbion.Core
 {
@@ -12,88 +11,6 @@ namespace UAlbion.Core
         internal static uint SizeInBytes<T>(this T[] array) where T : struct
         {
             return (uint)(array.Length * Unsafe.SizeOf<T>());
-        }
-
-        // Code adapted from https://bitbucket.org/sinbad/ogre/src/9db75e3ba05c/OgreMain/include/OgreVector3.h
-        internal static Quaternion FromToRotation(Vector3 from, Vector3 to, Vector3 fallbackAxis = default(Vector3))
-        {
-            // Based on Stan Melax's article in Game Programming Gems
-            Quaternion q;
-            // Copy, since cannot modify local
-            Vector3 v0 = from;
-            Vector3 v1 = to;
-            v0 = Vector3.Normalize(v0);
-            v1 = Vector3.Normalize(v1);
-
-            float d = Vector3.Dot(v0, v1);
-            // If dot == 1, vectors are the same
-            if (d >= 1.0f)
-            {
-                return Quaternion.Identity;
-            }
-            if (d < (1e-6f - 1.0f))
-            {
-                if (fallbackAxis != Vector3.Zero)
-                {
-                    // rotate 180 degrees about the fallback axis
-                    q = Quaternion.CreateFromAxisAngle(fallbackAxis, (float)Math.PI);
-                }
-                else
-                {
-                    // Generate an axis
-                    Vector3 axis = Vector3.Cross(Vector3.UnitX, from);
-                    if (axis.LengthSquared() == 0) // pick another if colinear
-                    {
-                        axis = Vector3.Cross(Vector3.UnitY, from);
-                    }
-
-                    axis = Vector3.Normalize(axis);
-                    q = Quaternion.CreateFromAxisAngle(axis, (float)Math.PI);
-                }
-            }
-            else
-            {
-                float s = (float)Math.Sqrt((1 + d) * 2);
-                float invs = 1.0f / s;
-
-                Vector3 c = Vector3.Cross(v0, v1);
-
-                q.X = c.X * invs;
-                q.Y = c.Y * invs;
-                q.Z = c.Z * invs;
-                q.W = s * 0.5f;
-                q = Quaternion.Normalize(q);
-            }
-            return q;
-        }
-
-        // modifies projection matrix in place
-        // clipPlane is in camera space
-        public static void CalculateObliqueMatrixPerspective(ref Matrix4x4 projection, Matrix4x4 view, Plane clipPlane)
-        {
-            Matrix4x4 invTransposeView = VdUtilities.CalculateInverseTranspose(view);
-            Vector4 clipV4 = new Vector4(clipPlane.Normal, clipPlane.D);
-            clipV4 = Vector4.Transform(clipV4, invTransposeView);
-
-            Vector4 q = new Vector4(
-                (Math.Sign(clipV4.X) + projection.M13) / projection.M11,
-                (Math.Sign(clipV4.Y) + projection.M23) / projection.M22,
-                -1f,
-                (1 + projection.M33) / projection.M34);
-
-            Vector4 c = clipV4 * (1f / Vector4.Dot(clipV4, q));
-
-            projection.M31 = c.X;
-            projection.M32 = c.Y;
-            projection.M33 = c.Z;
-            projection.M34 = c.W;
-        }
-
-        static float sgn(float x)
-        {
-            if (x > 0) return 1;
-            else if (x < 0) return -1;
-            else return 0;
         }
 
         public static Matrix4x4 Inverse(this Matrix4x4 src)
@@ -163,29 +80,6 @@ namespace UAlbion.Core
             return result;
         }
 
-        internal static Matrix4x4 CreateOrtho(
-            GraphicsDevice gd,
-            bool useReverseDepth,
-            float left, float right,
-            float bottom, float top,
-            float near, float far)
-        {
-            var ortho = useReverseDepth 
-                ? Matrix4x4.CreateOrthographicOffCenter(left, right, bottom, top, far, near) 
-                : Matrix4x4.CreateOrthographicOffCenter(left, right, bottom, top, near, far);
-
-            if (gd.IsClipSpaceYInverted)
-            {
-                ortho *= new Matrix4x4(
-                    1, 0, 0, 0,
-                    0, -1, 0, 0,
-                    0, 0, 1, 0,
-                    0, 0, 0, 1);
-            }
-
-            return ortho;
-        }
-
         public static float[] GetFullScreenQuadVerts(GraphicsDevice gd)
         {
             if (gd.IsClipSpaceYInverted)
@@ -247,6 +141,91 @@ namespace UAlbion.Core
                 case ValueOperation.Mult: return value * argument;
                 default: return value;
             }
+        }
+
+        static unsafe void Blit8To32Transparent(
+            uint width, uint height,
+            byte* from, uint* to,
+            int fromStride, int toStride,
+            uint[] palette, byte? transparentColor)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                for (int i = 0; i < width; i++)
+                {
+                    if (*from != transparentColor)
+                        *to = palette[*from];
+
+                    from++;
+                    to++;
+                }
+
+                from += fromStride - width;
+                to += toStride - width;
+            }
+        }
+
+        static unsafe void Blit8To32Opaque(
+            uint width, uint height,
+            byte* from, uint* to,
+            int fromStride, int toStride,
+            uint[] palette)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                for (int i = 0; i < width; i++)
+                {
+                    *to = palette[*from];
+                    from++;
+                    to++;
+                }
+
+                from += fromStride - width;
+                to += toStride - width;
+            }
+        }
+
+        internal static unsafe void Blit8To32(
+            uint fromWidth, uint fromHeight, 
+            uint toWidth, uint toHeight,
+            byte* fromBuffer, uint* toBuffer, 
+            int fromStride, int toStride,
+            uint[] palette, byte? transparentColor)
+        {
+            uint initialToWidth = toWidth;
+            int y = 0;
+            do
+            {
+                int x = 0;
+                uint height = Math.Min(fromHeight, toHeight);
+                uint* rowStart = toBuffer;
+                do
+                {
+                    uint width = Math.Min(fromWidth, toWidth);
+
+                    if (transparentColor.HasValue)
+                        Blit8To32Transparent(
+                            width, height,
+                            fromBuffer, toBuffer,
+                            fromStride, toStride,
+                            palette, transparentColor.Value);
+                    else
+                        Blit8To32Opaque(
+                            width, height,
+                            fromBuffer, toBuffer,
+                            fromStride, toStride,
+                            palette);
+
+                    toBuffer += width;
+                    toWidth -= width;
+                    x++;
+                } while (toWidth > 0);
+
+                toBuffer = rowStart + height * toStride;
+                toHeight -= height;
+                toWidth = initialToWidth;
+                y++;
+            } while (toHeight > 0);
         }
     }
 }

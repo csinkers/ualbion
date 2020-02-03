@@ -11297,22 +11297,22 @@
     "Format": "Palette",
     "Assets": {
       "0": {
-        "Name": "Outdoors2D"
+        "Name": "FirstIslandDay"
       },
       "1": {
-        "Name": "Outdoors2D"
+        "Name": "SecondIslandDay"
       },
       "2": {
-        "Name": "Main3D"
+        "Name": "JirinaarDay"
       },
       "3": {
-        "Name": "Desert2D"
+        "Name": "DesertDay"
       },
       "4": {
-        "Name": "Stoney2D"
+        "Name": "StoneyDay"
       },
       "5": {
-        "Name": "Iskai2D"
+        "Name": "IskaiIndoorLight"
       },
       "6": {
         "Name": "Light2D"
@@ -11342,7 +11342,7 @@
         "Name": "Inventory"
       },
       "19": {
-        "Name": "Iskai2D"
+        "Name": "IskaiIndoorDark"
       },
       "20": {},
       "21": {},
@@ -11352,7 +11352,9 @@
       "23": {
         "Name": "DungeonCombat"
       },
-      "24": {},
+      "24": {
+        "Name": "BelovenoDay"
+      },
       "25": {
         "Name": "Toronto2D"
       },
@@ -11412,11 +11414,17 @@
         "Name": "OutdoorsNight"
       },
       "47": {
-        "Name": "OutdoorsDusk"
+        "Name": "DesertNight"
       },
-      "48": {},
-      "49": {},
-      "50": {},
+      "48": {
+        "Name": "BelovenoNight"
+      },
+      "49": {
+        "Name": "VeryBlue"
+      },
+      "50": {
+        "Name": "BelovenoDusk"
+      },
       "51": {
         "Name": "DesertNightCombat"
       },
@@ -11426,7 +11434,9 @@
       "53": {
         "Name": "ForestNightCombat"
       },
-      "54": {},
+      "54": {
+        "Name": "JirinaarNight"
+      },
       "55": {
         "Name": "TileSet10"
       }
@@ -18557,6 +18567,10 @@
     "Assets": {}
   },
   "GERMAN/WORDLIS0.XLD": {
+    "Format": "Unknown",
+    "Assets": {}
+  },
+  "ENGLISH": {
     "Format": "Unknown",
     "Assets": {}
   }

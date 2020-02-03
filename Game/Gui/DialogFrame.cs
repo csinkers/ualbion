@@ -29,7 +29,7 @@ namespace UAlbion.Game.Gui
             }
 
             var assets = Resolve<IAssetManager>();
-            var multi = new MultiTexture("MainMenu", assets.LoadPalette(PaletteId.Main3D).GetCompletePalette());
+            var multi = new MultiTexture("MainMenu", new DummyPaletteManager(assets.LoadPalette(PaletteId.Inventory)));
 
             void DrawLine(uint y)
             {
@@ -77,17 +77,17 @@ namespace UAlbion.Game.Gui
 
             multi.GetSubImageDetails(multi.GetSubImageAtTime(1, 0), out var size, out var offset, out var texSize, out var layer);
             var normalisedSize = window.UiToNormRelative(new Vector2(size.X, size.Y));
-            var flags = (SpriteFlags.NoTransform | SpriteFlags.LeftAligned).SetOpacity(0.5f);
+            var flags = SpriteFlags.NoTransform.SetOpacity(0.5f);
             _sprite =
                 new UiMultiSprite(new SpriteKey(multi, order, flags))
                 {
                     Instances = new[] {
-                        new SpriteInstanceData( // Drop shadow
+                        SpriteInstanceData.TopLeft( // Drop shadow
                             new Vector3(window.UiToNormRelative(new Vector2(10, 10)), 0),
                          window.UiToNormRelative(new Vector2(size.X - 10, size.Y - 10)),
                         Vector2.Zero, Vector2.Zero, 0,
                             flags),
-                        new SpriteInstanceData( // DialogFrame
+                        SpriteInstanceData.TopLeft( // DialogFrame
                             Vector3.Zero,
                             normalisedSize,
                         offset, texSize, layer, SpriteFlags.NoTransform),

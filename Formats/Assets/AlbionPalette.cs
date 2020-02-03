@@ -7,9 +7,8 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.Assets
 {
-    public class AlbionPalette
+    public class AlbionPalette : IPalette
     {
-        const int TicksPerPaletteChange = 8;
         public int Id { get; }
         public string Name { get; }
         public bool IsAnimated => AnimatedRanges.ContainsKey(Id);
@@ -18,8 +17,8 @@ namespace UAlbion.Formats.Assets
         readonly IList<uint[]> _cache = new List<uint[]>();
 
         static readonly IDictionary<int, IList<(byte, byte)>> AnimatedRanges = new Dictionary<int, IList<(int, int)>> {
-            { 0,  new[] { (0x99, 0x9f), (0xb0, 0xbf) } }, // 7, 16 => 112
-            { 1,  new[] { (0x99, 0x9f), (0xb0, 0xb4), (0xb5, 0xbf) } }, // 7, 5, 11 => 385
+            { 0,  new[] { (0x99, 0x9f), (0xb0, 0xbf) } }, // 7, 16 => 112 // Outdoors Green (first island)
+            { 1,  new[] { (0x99, 0x9f), (0xb0, 0xb4), (0xb5, 0xbf) } }, // 7, 5, 11 => 385 // Outdoors Green (slightly brighter, used for second island)
             { 2,  new[] { (0x40, 0x43), (0x44, 0x4f) } }, // 4, 12 => 12
             { 5,  new[] { (0xb0, 0xb4), (0xb5, 0xbf) } }, // 5, 11 => 55
             { 13, new[] { (0xb0, 0xb3), (0xb4, 0xbf) } }, // 4, 12 => 12
@@ -27,7 +26,10 @@ namespace UAlbion.Formats.Assets
             { 24, new[] { (0xb0, 0xb3), (0xb4, 0xbf) } }, // 4, 12 => 12
             { 25, new[] { (0xb4, 0xb7), (0xb8, 0xbb), (0xbc, 0xbf) } }, // 4, 11, 4 => 44
             { 30, new[] { (0x10, 0x4f) } }, // 80 => 80
-            { 50, new[] { (0xb0, 0xb3), (0xb4, 0xbf) } }, // 4, 12 => 12
+            { 46,  new[] { (0x99, 0x9f), (0xb0, 0xb4), (0xb5, 0xbf) } }, // 7, 5, 11 => 385 // Outdoors Green - Night
+            { 48, new[] { (0xb0, 0xb3), (0xb4, 0xbf) } }, // 4, 12 => 12 // Night-palette for 24
+            { 50, new[] { (0xb0, 0xb3), (0xb4, 0xbf) } }, // 4, 12 => 12 // Dusk-palette for 24
+            { 54,  new[] { (0x40, 0x43), (0x44, 0x4f) } }, // 4, 12 => 12 // Night-palette for 2
         }.ToDictionary(
             x => x.Key,
             x => (IList<(byte, byte)>)x.Value.Select(y => ((byte)y.Item1, (byte)y.Item2)).ToArray());
@@ -94,7 +96,7 @@ namespace UAlbion.Formats.Assets
         public IList<uint[]> GetCompletePalette() => _cache;
         public uint[] GetPaletteAtTime(int tick)
         {
-            tick = int.MaxValue - (tick / TicksPerPaletteChange);
+            tick = int.MaxValue - tick;
             int index = tick % Period;
             return _cache[index];
         }

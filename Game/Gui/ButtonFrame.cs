@@ -71,32 +71,32 @@ namespace UAlbion.Game.Gui
             uint corners = C(colors.Corners);
             uint? background = colors.Background.HasValue ? C(colors.Background.Value) : (uint?)null;
 
-            var flags = (SpriteFlags.NoTransform | SpriteFlags.UsePalette | SpriteFlags.LeftAligned | SpriteFlags.NoDepthTest).SetOpacity(colors.Alpha);
+            var flags = (SpriteFlags.NoTransform | SpriteFlags.UsePalette | SpriteFlags.NoDepthTest).SetOpacity(colors.Alpha);
 
             var instances = new List<SpriteInstanceData>
             {
-                new SpriteInstanceData( // Top
+                SpriteInstanceData.TopLeft( // Top
                     Vector3.Zero,
                     window.UiToNormRelative(new Vector2(extents.Width - 1, 1)),
                     Vector2.Zero,
                     Vector2.One,
                     topLeft,
                     flags),
-                new SpriteInstanceData( // Bottom
+                SpriteInstanceData.TopLeft( // Bottom
                     new Vector3(window.UiToNormRelative(new Vector2(1, extents.Height - 1)), 0),
                     window.UiToNormRelative(new Vector2(extents.Width - 1, 1)),
                     Vector2.Zero,
                     Vector2.One,
                     bottomRight,
                     flags),
-                new SpriteInstanceData( // Left
+                SpriteInstanceData.TopLeft( // Left
                     new Vector3(window.UiToNormRelative(new Vector2(0, 1)), 0),
                     window.UiToNormRelative(new Vector2(1, extents.Height - 2)),
                     Vector2.Zero,
                     Vector2.One,
                     topLeft,
                     flags),
-                new SpriteInstanceData( // Right
+                SpriteInstanceData.TopLeft( // Right
                     new Vector3(window.UiToNormRelative(new Vector2(extents.Width - 1, 1)), 0),
                     window.UiToNormRelative(new Vector2(1, extents.Height - 2)),
                     Vector2.Zero,
@@ -104,14 +104,14 @@ namespace UAlbion.Game.Gui
                     bottomRight,
                     flags),
 
-                new SpriteInstanceData( // Bottom Left Corner
+                SpriteInstanceData.TopLeft( // Bottom Left Corner
                     new Vector3(window.UiToNormRelative(new Vector2(0, extents.Height - 1)), 0),
                     window.UiToNormRelative(Vector2.One),
                     Vector2.Zero,
                     Vector2.One,
                     corners,
                     flags),
-                new SpriteInstanceData( // Top Right Corner
+                SpriteInstanceData.TopLeft( // Top Right Corner
                     new Vector3(window.UiToNormRelative(new Vector2(extents.Width - 1, 0)), 0),
                     window.UiToNormRelative(Vector2.One),
                     Vector2.Zero,
@@ -122,7 +122,7 @@ namespace UAlbion.Game.Gui
 
             if (background.HasValue)
             {
-                instances.Add(new SpriteInstanceData( // Background
+                instances.Add(SpriteInstanceData.TopLeft( // Background
                     new Vector3(window.UiToNormRelative(new Vector2(1, 1)), 0),
                     window.UiToNormRelative(new Vector2(extents.Width - 2, extents.Height - 2)),
                     Vector2.Zero,

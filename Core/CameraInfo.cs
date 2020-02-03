@@ -9,7 +9,9 @@ namespace UAlbion.Core
         public Vector3 WorldSpacePosition;
         readonly uint _padding1;
 
-        public Vector3 CameraLookDirection;
+        public float CameraYaw;
+        public float CameraPitch;
+        public float CameraRoll;
         readonly uint _padding2;
 
         public Vector2 Resolution;

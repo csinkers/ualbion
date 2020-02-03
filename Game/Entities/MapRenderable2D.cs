@@ -15,7 +15,7 @@ namespace UAlbion.Game.Entities
 {
     public class MapRenderable2D : Component
     {
-        readonly SpriteInstanceData _blankInstance = new SpriteInstanceData(
+        readonly SpriteInstanceData _blankInstance = SpriteInstanceData.TopMid(
             Vector3.Zero, Vector2.Zero, 
             Vector2.Zero, Vector2.Zero, 0, 0);
 
@@ -93,15 +93,25 @@ namespace UAlbion.Game.Entities
                 out var layer);
 
             DrawLayer drawLayer = tile.Layer.ToDrawLayer();
-            var instance = new SpriteInstanceData(
-                new Vector3(
+            var position = new Vector3(
                     new Vector2(i, j) * tileSize,
-                    drawLayer.ToZCoordinate(j)),
-                tileSize,
-                texPosition,
-                texSize,
-                layer,
-                0);
+                    drawLayer.ToZCoordinate(j));
+
+            var instance = _tileData.UseSmallGraphics 
+                ?  SpriteInstanceData.TopMid(
+                    position,
+                    tileSize,
+                    texPosition,
+                    texSize,
+                    layer,
+                    0)
+                : SpriteInstanceData.TopLeft(
+                    position,
+                    tileSize,
+                    texPosition,
+                    texSize,
+                    layer,
+                    0);
 
             int zoneNum = _mapData.ZoneLookup[index];
             int eventNum = zoneNum == -1 ? -1 : _mapData.Zones[zoneNum].EventNumber;
@@ -123,7 +133,8 @@ namespace UAlbion.Game.Entities
 
         void Update(bool updateAll = false)
         {
-            var state = Resolve<IGameState>();
+            var frameCount =  (Resolve<IGameState>()?.TickCount ?? 0) / TicksPerFrame;
+
             if (HighlightIndex.HasValue)
             {
                 int zoneNum = _mapData.ZoneLookup[HighlightIndex.Value];
@@ -145,13 +156,13 @@ namespace UAlbion.Game.Entities
                     {
                         var underlayTileId = _mapData.Underlay[index];
                         var underlayTile = underlayTileId == -1 ? null : _tileData.Tiles[underlayTileId];
-                        _underlay.Instances[index] = BuildInstanceData(i, j, underlayTile, state.TickCount / TicksPerFrame);
+                        _underlay.Instances[index] = BuildInstanceData(i, j, underlayTile, frameCount);
                         if(underlayTile?.FrameCount > 1)
                             animatedUnderlayTiles.Add(index);
 
                         var overlayTileId = _mapData.Overlay[index];
                         var overlayTile = overlayTileId == -1 ? null : _tileData.Tiles[overlayTileId];
-                        _overlay.Instances[index] = BuildInstanceData(i, j, overlayTile, state.TickCount / TicksPerFrame);
+                        _overlay.Instances[index] = BuildInstanceData(i, j, overlayTile, frameCount);
                         if(overlayTile?.FrameCount > 1)
                             animatedOverlayTiles.Add(index);
                         index++;
@@ -171,7 +182,7 @@ namespace UAlbion.Game.Entities
                         index % _mapData.Width,
                         index / _mapData.Width,
                         underlayTile,
-                        3 * state.TickCount / 2);
+                        frameCount);
                 }
 
                 foreach(var index in _animatedOverlayIndices)
@@ -182,7 +193,7 @@ namespace UAlbion.Game.Entities
                         index % _mapData.Width,
                         index / _mapData.Width,
                         overlayTile,
-                        3 * state.TickCount / 2);
+                        frameCount);
                 }
             }
         }

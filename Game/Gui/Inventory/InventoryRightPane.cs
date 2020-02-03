@@ -56,7 +56,7 @@ namespace UAlbion.Game.Gui.Inventory
                 var goldSource = new DynamicText(() =>
                 {
                     var player = Resolve<IParty>()[activeCharacter];
-                    var gold = player.Apparent.Inventory.Gold;
+                    var gold = player?.Apparent.Inventory.Gold ?? 0;
                     return new[] {new TextBlock($"{gold / 10}.{gold % 10}")};
                 }, x => _version);
 
@@ -70,7 +70,7 @@ namespace UAlbion.Game.Gui.Inventory
                 var foodSource = new DynamicText(() =>
                 {
                     var player = Resolve<IParty>()[activeCharacter];
-                    var food = player.Apparent.Inventory.Rations;
+                    var food = player?.Apparent.Inventory.Rations ?? 0;
                     return new[] { new TextBlock(food.ToString()) };
                 }, x => _version);
 

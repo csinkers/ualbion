@@ -41,7 +41,7 @@ namespace UAlbion.Game.Gui.Inventory
             if (_hover == null)
                 return;
 
-            var text = _hover.Get().First();
+            var text = _hover.Get().FirstOrDefault() ?? new TextBlock();
             Raise(new HoverTextEvent(text.Text));
         }
 

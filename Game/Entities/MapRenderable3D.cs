@@ -17,29 +17,44 @@ namespace UAlbion.Game.Entities
 {
     public class MapRenderable3D : Component
     {
-        readonly TileMap _tilemap;
+        const int TicksPerFrame = 8;
+        readonly MapDataId _mapId;
         readonly MapData3D _mapData;
         readonly LabyrinthData _labyrinthData;
+        readonly Vector3 _tileSize;
         readonly IDictionary<int, IList<int>> _tilesByDistance = new Dictionary<int, IList<int>>();
+        TileMap _tilemap;
         bool _isSorting = false;
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<MapRenderable3D, RenderEvent>((x, e) => x.Render(e)),
             H<MapRenderable3D, PostUpdateEvent>((x, _) => x.PostUpdate()),
-            H<MapRenderable3D, SortMapTilesEvent>((x, e) => x._isSorting = e.IsSorting)
+            H<MapRenderable3D, SortMapTilesEvent>((x, e) => x._isSorting = e.IsSorting),
+            H<MapRenderable3D, LoadPaletteEvent>((x, e) => {})
         );
 
-        public MapRenderable3D(MapDataId mapId, IAssetManager assets, MapData3D mapData, LabyrinthData labyrinthData, Vector3 tileSize) : base(Handlers)
+        public MapRenderable3D(MapDataId mapId, MapData3D mapData, LabyrinthData labyrinthData, Vector3 tileSize) : base(Handlers)
         {
+            _mapId = mapId;
             _mapData = mapData;
             _labyrinthData = labyrinthData;
-            var palette = assets.LoadPalette(_mapData.PaletteId);
+            _tileSize = tileSize;
+        }
+
+        public override void Subscribed()
+        {
+            Raise(new LoadPaletteEvent(_mapData.PaletteId));
+
+            if (_tilemap != null)
+                return;
+
+            var assets = Resolve<IAssetManager>();
             _tilemap = new TileMap(
-                mapId.ToString(),
+                _mapId.ToString(),
                 (int)DrawLayer.Background, 
-                tileSize,
-                _mapData.Width, _mapData.Height, 
-                palette.GetCompletePalette());
+                _tileSize,
+                _mapData.Width, _mapData.Height,
+                Resolve<IPaletteManager>());
 
             for(int i = 0; i < _labyrinthData.FloorAndCeilings.Count; i++)
             {
@@ -67,13 +82,11 @@ namespace UAlbion.Game.Entities
                     _tilemap.DefineWall(i + 1, overlay, overlayInfo.XOffset, overlayInfo.YOffset, wallInfo.TransparentColour, isAlphaTested);
                 }
             }
-        }
 
-        public override void Subscribed() { Raise(new LoadPaletteEvent(_mapData.PaletteId)); }
+        }
 
         void SetTile(int index, int order, int ticks)
         {
-            const int TicksPerFrame = 8;
             byte i = (byte)(index % _mapData.Width);
             byte j = (byte)(index / _mapData.Width);
             byte floorIndex = (byte)_mapData.Floors[index];
@@ -92,6 +105,7 @@ namespace UAlbion.Game.Entities
             if (state == null)
                 return;
 
+            using var _ = PerfTracker.FrameEvent("Update tilemap");
             foreach (var list in _tilesByDistance.Values)
                 list.Clear();
 

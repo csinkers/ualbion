@@ -58,7 +58,7 @@ namespace UAlbion.Game.Gui
             var flags = SpriteFlags.NoTransform | SpriteFlags.UsePalette | SpriteFlags.LeftAligned | SpriteFlags.NoDepthTest;
             var instances = new[]
             {
-                new SpriteInstanceData(
+                SpriteInstanceData.TopLeft(
                     Vector3.Zero,
                     window.UiToNormRelative(DrawSize),
                     Vector2.Zero,

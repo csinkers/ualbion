@@ -123,16 +123,15 @@ namespace UAlbion.Core
             PerfTracker.StartupEvent("Startup done, rendering first frame");
             while (!_done)
             {
-                if(_newBackend != null)
-                    ChangeBackend();
+                ChangeBackend();
 
                 PerfTracker.BeginFrame();
                 double deltaSeconds = frameCounter.StartFrame();
-                using(PerfTracker.FrameEvent("Raising begin frame"))
+                using(PerfTracker.FrameEvent("1 Raising begin frame"))
                     Raise(new BeginFrameEvent());
 
                 InputSnapshot snapshot;
-                using (PerfTracker.FrameEvent("Processing SDL events"))
+                using (PerfTracker.FrameEvent("2 Processing SDL events"))
                 {
                     Sdl2Events.ProcessEvents();
                     snapshot = Window.PumpEvents();
@@ -143,7 +142,7 @@ namespace UAlbion.Core
 
                 if (_pendingCursorUpdate.HasValue)
                 {
-                    using (PerfTracker.FrameEvent("Warping mouse"))
+                    using (PerfTracker.FrameEvent("3 Warping mouse"))
                     {
                         Sdl2Native.SDL_WarpMouseInWindow(
                             Window.SdlWindowHandle,
@@ -154,17 +153,24 @@ namespace UAlbion.Core
                     }
                 }
 
-                using (PerfTracker.FrameEvent("Raising input event"))
+                using (PerfTracker.FrameEvent("4 Raising input event"))
                     Raise(new InputEvent(deltaSeconds, snapshot, Window.MouseDelta));
 
-                using (PerfTracker.FrameEvent("Performing update"))
+                using (PerfTracker.FrameEvent("5 Performing update"))
                     Update((float)deltaSeconds);
 
                 if (!Window.Exists)
                     break;
 
-                using (PerfTracker.FrameEvent("Drawing"))
+                using (PerfTracker.FrameEvent("6 Drawing"))
                     Draw();
+
+                using (PerfTracker.FrameEvent("7 Swap buffers"))
+                {
+                    CoreTrace.Log.Info("Engine", "Swapping buffers...");
+                    GraphicsDevice.SwapBuffers();
+                    CoreTrace.Log.Info("Engine", "Draw complete");
+                }
             }
 
             DestroyAllObjects();
@@ -222,7 +228,7 @@ namespace UAlbion.Core
                 CreateAllObjects();
             }
 
-            using (PerfTracker.FrameEvent("Render scenes"))
+            using (PerfTracker.FrameEvent("6.1 Render scenes"))
             {
                 _frameCommands.Begin();
 
@@ -235,18 +241,12 @@ namespace UAlbion.Core
                 _frameCommands.End();
             }
 
-            using (PerfTracker.FrameEvent("Submit commandlist"))
+            using (PerfTracker.FrameEvent("6.2 Submit commandlist"))
             {
                 CoreTrace.Log.Info("Scene", "Submitting Commands");
                 GraphicsDevice.SubmitCommands(_frameCommands);
                 CoreTrace.Log.Info("Scene", "Submitted commands");
-            }
-
-            using (PerfTracker.FrameEvent("Swap buffers"))
-            {
-                CoreTrace.Log.Info("Engine", "Swapping buffers...");
-                GraphicsDevice.SwapBuffers();
-                CoreTrace.Log.Info("Engine", "Draw complete");
+                GraphicsDevice.WaitForIdle();
             }
         }
 
@@ -288,14 +288,17 @@ namespace UAlbion.Core
                 }
 
                 GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(
-                    false, null, false,
+                    _renderDoc != null, PixelFormat.R32_Float, false,
                     ResourceBindingModel.Improved, true,
                     true, false)
                 {
-                    Debug = (_renderDoc != null),
                     SyncToVerticalBlank = _vsync,
-                    // SingleThreaded = true
                 };
+
+                // Currently this field only exists in my local build of veldrid, so set it via reflection.
+                var singleThreadedProperty = typeof(GraphicsDeviceOptions).GetField("SingleThreaded");
+                if(singleThreadedProperty != null)
+                    singleThreadedProperty.SetValueDirect(__makeref(gdOptions), true);
 
                 GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, gdOptions, backend);
                 GraphicsDevice.WaitForIdle();

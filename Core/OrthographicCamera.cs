@@ -95,7 +95,6 @@ namespace UAlbion.Core
             return new CameraInfo
             {
                 WorldSpacePosition = _position,
-                CameraLookDirection = LookDirection,
                 Resolution = _windowSize,
                 Time = clock.ElapsedTime,
                 Special1 = settings.Special1,

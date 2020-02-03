@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -13,6 +14,8 @@ namespace UAlbion.Core.Textures
 {
     public class MultiTexture : ITexture
     {
+        readonly IPaletteManager _paletteManager;
+
         class SubImageComponent
         {
             public ITexture Source { get; set; }
@@ -59,23 +62,15 @@ namespace UAlbion.Core.Textures
         readonly IList<LogicalSubImage> _logicalSubImages = new List<LogicalSubImage>();
         readonly IDictionary<LayerKey, int> _layerLookup = new Dictionary<LayerKey, int>();
         readonly IList<Vector2> _layerSizes = new List<Vector2>();
-        readonly IList<uint[]> _palette;
-        readonly HashSet<byte> _animatedRange;
         bool _isMetadataDirty = true;
         bool _isAnySubImagePaletteAnimated = false;
-        int _paletteFrame;
-        public int PaletteFrame { set { _paletteFrame = value; IsDirty |= _isAnySubImagePaletteAnimated; } }
+        int _lastPaletteFrame;
+        int _lastPaletteId;
+        bool _isDirty;
 
-        public MultiTexture(string name, IList<uint[]> palette)
+        public MultiTexture(string name, IPaletteManager paletteManager)
         {
-            _palette = palette;
-            _animatedRange =
-                _palette
-                    .SelectMany(x => x.Select((y, i) => (y, i)))
-                    .GroupBy(x => x.i)
-                    .Where(x => x.Distinct().Count() > 1)
-                    .Select(x => (byte)x.Key)
-                    .ToHashSet();
+            _paletteManager = paletteManager;
             Name = name;
             MipLevels = 1; //(uint)Math.Min(Math.Log(Width, 2.0), Math.Log(Height, 2.0));
 
@@ -92,7 +87,24 @@ namespace UAlbion.Core.Textures
         public uint MipLevels { get; }
         public uint ArrayLayers { get { if (_isMetadataDirty) RebuildLayers(); return (uint)_layerSizes.Count; } }
         public int SubImageCount => _layerSizes.Count;
-        public bool IsDirty { get; private set; }
+
+        public bool IsDirty
+        {
+            get
+            {
+                var frame = _paletteManager.PaletteFrame;
+                if ((_isAnySubImagePaletteAnimated && frame != _lastPaletteFrame) || _paletteManager.Palette.Id != _lastPaletteId)
+                {
+                    _lastPaletteFrame = frame;
+                    _lastPaletteId = _paletteManager.Palette.Id;
+                    return true;
+                }
+
+                return _isDirty;
+            }
+            private set => _isDirty = value;
+        }
+
         public int SizeInBytes => (int)(Width * Height * _layerSizes.Count * sizeof(uint));
 
         public int GetSubImageAtTime(int logicalId, int tick)
@@ -120,41 +132,6 @@ namespace UAlbion.Core.Textures
             layer = (uint)subImage;
         }
 
-        unsafe void Blit8To32(
-            uint fromWidth, uint fromHeight, 
-            uint toWidth, uint toHeight,
-            byte* fromBuffer, uint* toBuffer, 
-            int fromStride, int toStride,
-            uint[] palette, byte? transparentColor)
-        {
-            if (transparentColor.HasValue)
-            {
-                for (int j = 0; j < toHeight; j++)
-                {
-                    for (int i = 0; i < toWidth; i++)
-                    {
-                        byte* from = fromBuffer + (j % fromHeight) * fromStride + i % fromWidth;
-                        uint* to = toBuffer + j * toStride + i;
-
-                        if (*from != transparentColor.Value)
-                            *to = palette[*from];
-                    }
-                }
-            }
-            else
-            {
-                for (int j = 0; j < toHeight; j++)
-                {
-                    for (int i = 0; i < toWidth; i++)
-                    {
-                        byte* from = fromBuffer + (j % fromHeight) * fromStride + i % fromWidth;
-                        uint* to = toBuffer + j * toStride + i;
-                        *to = palette[*from];
-                    }
-                }
-            }
-        }
-
         [DllImport("Kernel32.dll", EntryPoint = "RtlZeroMemory", SetLastError = false)]
         static extern void ZeroMemory(IntPtr dest, IntPtr size);
 
@@ -169,103 +146,21 @@ namespace UAlbion.Core.Textures
                     *(buffer + i) = 0;
         }
 
-        public Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
-        {
-            if(_isMetadataDirty)
-                RebuildLayers();
-
-            using (Texture staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, TextureUsage.Staging, Type)))
-            {
-                staging.Name = "T_" + Name + "_Staging";
-
-                unsafe
-                {
-                    uint* toBuffer = stackalloc uint[(int)(Width * Height)];
-                    foreach (var lsi in _logicalSubImages)
-                    {
-                        //if (!rebuildAll && !lsi.IsPaletteAnimated) // TODO: Requires caching a single Texture and then modifying it
-                        //    continue;
-
-                        for (int i = 0; i < lsi.Frames; i++)
-                        {
-                            if(lsi.IsAlphaTested)
-                                MemsetZero((byte*)toBuffer, (int)(Width * Height * sizeof(uint)));
-                            else
-                            {
-                                for(int j = 0; j < Width*Height;j++)
-                                    toBuffer[j] = 0xff000000;
-                            }
-
-                            uint destinationLayer = (uint)_layerLookup[new LayerKey(lsi.Id, i)];
-
-                            foreach (var component in lsi.Components)
-                            {
-                                if (component.Source == null)
-                                    continue;
-
-                                var eightBitTexture = (EightBitTexture)component.Source;
-                                int frame = i % eightBitTexture.SubImageCount;
-                                eightBitTexture.GetSubImageOffset(frame, out var sourceWidth, out var sourceHeight, out var sourceOffset, out var sourceStride);
-                                uint destWidth = component.W ?? (uint) sourceWidth;
-                                uint destHeight = component.H ?? (uint) sourceHeight;
-
-                                if (component.X + destWidth > Width || component.Y + destHeight > Height)
-                                {
-                                    CoreTrace.Log.Warning(
-                                        "MultiTexture",
-                                        $"Tried to write an oversize component to {Name}: {component.Source.Name}:{frame} is ({destWidth}x{destHeight}) @ ({component.X}, {component.Y}) but multitexture is only ({Width}x{Height})");
-                                    continue;
-                                }
-
-                                fixed (byte* fromBuffer = &eightBitTexture.TextureData[0])
-                                {
-                                    Blit8To32(
-                                        (uint)sourceWidth, (uint)sourceHeight,
-                                        destWidth, destHeight,
-                                        fromBuffer + sourceOffset,
-                                        toBuffer + (int)(component.Y * Width + component.X),
-                                        sourceStride,
-                                        (int)Width,
-                                        _palette[_paletteFrame],
-                                        lsi.TransparentColor);
-                                }
-                            }
-
-                            gd.UpdateTexture(
-                                staging, (IntPtr)toBuffer, Width * Height * sizeof(uint),
-                                0, 0, 0, Width, Height, 1,
-                                0, destinationLayer);
-                        }
-                    }
-                }
-
-                /* TODO: Mipmap
-                for (uint level = 1; level < MipLevels; level++)
-                {
-                } //*/
-
-                var texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, usage, Type));
-                texture.Name = "T_" + Name;
-
-                using (CommandList cl = rf.CreateCommandList())
-                {
-                    cl.Begin();
-                    cl.CopyTexture(staging, texture);
-                    cl.End();
-                    gd.SubmitCommands(cl);
-                }
-
-                IsDirty = false;
-                return texture;
-            }
-        }
-
         void RebuildLayers()
         {
             _isAnySubImagePaletteAnimated = false;
             _isMetadataDirty = false;
             _layerLookup.Clear();
             _layerSizes.Clear();
+
+            var palette = _paletteManager.Palette.GetCompletePalette();
+            var animatedRange =
+                palette
+                    .SelectMany(x => x.Select((y, i) => (y, i)))
+                    .GroupBy(x => x.i)
+                    .Where(x => x.Distinct().Count() > 1)
+                    .Select(x => (byte)x.Key)
+                    .ToHashSet();
 
             foreach (var lsi in _logicalSubImages)
             {
@@ -286,7 +181,7 @@ namespace UAlbion.Core.Textures
                         lsi.H = component.Y + (uint)size.Y;
 
                     if (!lsi.IsPaletteAnimated && component.Source is EightBitTexture t)
-                        lsi.IsPaletteAnimated = t.ContainsColors(_animatedRange);
+                        lsi.IsPaletteAnimated = t.ContainsColors(animatedRange);
 
                     if (lsi.IsPaletteAnimated)
                         _isAnySubImagePaletteAnimated = true;
@@ -356,11 +251,107 @@ namespace UAlbion.Core.Textures
             return Math.Max(1, ret);
         }
 
+        public Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
+        {
+            using var _ = PerfTracker.FrameEvent("6.1.2.1 Rebuild MultiTextures");
+            if(_isMetadataDirty)
+                RebuildLayers();
+
+            var palette = _paletteManager.Palette.GetCompletePalette();
+            using var staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, TextureUsage.Staging, Type));
+            staging.Name = "T_" + Name + "_Staging";
+
+            unsafe
+            {
+                uint* toBuffer = stackalloc uint[(int)(Width * Height)];
+                foreach (var lsi in _logicalSubImages)
+                {
+                    //if (!rebuildAll && !lsi.IsPaletteAnimated) // TODO: Requires caching a single Texture and then modifying it
+                    //    continue;
+
+                    for (int i = 0; i < lsi.Frames; i++)
+                    {
+                        if(lsi.IsAlphaTested)
+                            MemsetZero((byte*)toBuffer, (int)(Width * Height * sizeof(uint)));
+                        else
+                        {
+                            for (int j = 0; j < Width * Height; j++)
+                                toBuffer[j] = 0xff000000;
+                        }
+
+                        BuildFrame(lsi, i, toBuffer, palette);
+
+                        uint destinationLayer = (uint)_layerLookup[new LayerKey(lsi.Id, i)];
+                        gd.UpdateTexture(
+                            staging, (IntPtr)toBuffer, Width * Height * sizeof(uint),
+                            0, 0, 0, Width, Height, 1,
+                            0, destinationLayer);
+                    }
+                }
+            }
+
+            /* TODO: Mipmap
+                for (uint level = 1; level < MipLevels; level++)
+                {
+                } //*/
+
+            var texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, usage, Type));
+            texture.Name = "T_" + Name;
+
+            using (CommandList cl = rf.CreateCommandList())
+            {
+                cl.Begin();
+                cl.CopyTexture(staging, texture);
+                cl.End();
+                gd.SubmitCommands(cl);
+            }
+
+            IsDirty = false;
+            return texture;
+        }
+
+        unsafe void BuildFrame(LogicalSubImage lsi, int frameNumber, uint* toBuffer, IList<uint[]> palette)
+        {
+            foreach (var component in lsi.Components)
+            {
+                if (component.Source == null)
+                    continue;
+
+                var eightBitTexture = (EightBitTexture)component.Source;
+                int frame = frameNumber % eightBitTexture.SubImageCount;
+                eightBitTexture.GetSubImageOffset(frame, out var sourceWidth, out var sourceHeight, out var sourceOffset, out var sourceStride);
+                uint destWidth = component.W ?? (uint)sourceWidth;
+                uint destHeight = component.H ?? (uint)sourceHeight;
+
+                if (component.X + destWidth > Width || component.Y + destHeight > Height)
+                {
+                    CoreTrace.Log.Warning(
+                        "MultiTexture",
+                        $"Tried to write an oversize component to {Name}: {component.Source.Name}:{frame} is ({destWidth}x{destHeight}) @ ({component.X}, {component.Y}) but multitexture is only ({Width}x{Height})");
+                    continue;
+                }
+
+                fixed (byte* fromBuffer = &eightBitTexture.TextureData[0])
+                {
+                    Util.Blit8To32(
+                        (uint)sourceWidth, (uint)sourceHeight,
+                        destWidth, destHeight,
+                        fromBuffer + sourceOffset,
+                        toBuffer + (int)(component.Y * Width + component.X),
+                        sourceStride,
+                        (int)Width,
+                        palette[_paletteManager.PaletteFrame],
+                        lsi.TransparentColor);
+                }
+            }
+        }
+
         public void SavePng(int logicalId, int tick, string path)
         {
             if(_isMetadataDirty)
                 RebuildLayers();
 
+            var palette = _paletteManager.Palette.GetCompletePalette();
             var logicalImage = _logicalSubImages[logicalId];
             if (!_layerLookup.TryGetValue(new LayerKey(logicalId, tick % logicalImage.Frames), out var subImageId))
                 return;
@@ -370,48 +361,18 @@ namespace UAlbion.Core.Textures
             int height = (int)size.Y;
             Rgba32[] pixels = new Rgba32[width * height];
 
-            foreach (var component in logicalImage.Components)
+            unsafe
             {
-                if (component.Source == null)
-                    continue;
-
-                var eightBitTexture = (EightBitTexture)component.Source;
-                int frame = tick % eightBitTexture.SubImageCount;
-                eightBitTexture.GetSubImageOffset(frame, out var sourceWidth, out var sourceHeight, out var sourceOffset, out var sourceStride);
-                uint destWidth = component.W ?? (uint) sourceWidth;
-                uint destHeight = component.H ?? (uint) sourceHeight;
-
-                if (component.X + sourceWidth > Width || component.Y + sourceHeight > Height)
-                {
-                    CoreTrace.Log.Warning(
-                        "MultiTexture",
-                        $"Tried to write an oversize component to {Name}: {component.Source.Name}:{frame} is ({sourceWidth}x{sourceHeight}) @ ({component.X}, {component.Y}) but multitexture is only ({Width}x{Height})");
-                    continue;
-                }
-
-                unsafe
-                {
-                    fixed (Rgba32* toBuffer = &pixels[0])
-                    fixed (byte* fromBuffer = &eightBitTexture.TextureData[0])
-                    {
-                        Blit8To32(
-                            (uint)sourceWidth, (uint)sourceHeight,
-                            destWidth, destHeight,
-                            fromBuffer + sourceOffset,
-                            (uint*)toBuffer + (int)(component.Y * Width + component.X),
-                            sourceStride,
-                            (int)Width,
-                            _palette[_paletteFrame],
-                            logicalImage.TransparentColor);
-                    }
-                }
+                fixed (Rgba32* toBuffer = &pixels[0])
+                    BuildFrame(logicalImage, tick, (uint*)toBuffer, palette);
             }
 
             Image<Rgba32> image = new Image<Rgba32>(width, height);
             image.Frames.AddFrame(pixels);
             image.Frames.RemoveFrame(0);
-            using(var stream = File.OpenWrite(path))
-                image.SaveAsBmp(stream);
+            using var stream = File.OpenWrite(path);
+            image.SaveAsBmp(stream);
         }
+
     }
 }

@@ -71,7 +71,7 @@ namespace UAlbion.Game.Entities
 
             var instances = new SpriteInstanceData[text.Length * (isFat ? 4 : 2)];
             int offset = 0;
-            var flags = SpriteFlags.UsePalette | SpriteFlags.NoTransform | SpriteFlags.NoDepthTest | SpriteFlags.LeftAligned;
+            var flags = SpriteFlags.UsePalette | SpriteFlags.NoTransform | SpriteFlags.NoDepthTest;
 
             for (int i = 0; i < text.Length; i++)
             {
@@ -85,7 +85,7 @@ namespace UAlbion.Game.Entities
                     texOffset.Y += 0.1f / font.Height;
 
                     var normPosition = window.UiToNormRelative(new Vector2(offset, 0));
-                    var baseInstance = new SpriteInstanceData(
+                    var baseInstance = SpriteInstanceData.TopLeft(
                         new Vector3(normPosition, 0),
                         window.UiToNormRelative(new Vector2(characterSize.X, characterSize.Y)),
                         texOffset, texSize, layer, flags);

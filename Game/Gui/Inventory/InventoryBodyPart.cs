@@ -30,7 +30,7 @@ namespace UAlbion.Game.Gui.Inventory
             var state = Resolve<IGameState>();
             var assets = Resolve<IAssetManager>();
             var member = state.Party[ActiveCharacter];
-            var slotInfo = member.Apparent.Inventory.GetSlot(SlotId);
+            var slotInfo = member?.Apparent.Inventory.GetSlot(SlotId);
 
             if(slotInfo == null)
             {

@@ -23,7 +23,7 @@ namespace UAlbion.Game.Scenes
         {
             Raise(new SetCursorEvent(CoreSpriteId.Cursor));
             Raise(new SetMouseModeEvent(MouseMode.Normal));
-            Raise(new SetInputModeEvent(InputMode.Dialog));
+            Raise(new SetInputModeEvent(InputMode.MainMenu));
             base.Subscribed();
         }
     }

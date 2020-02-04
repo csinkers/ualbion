@@ -153,7 +153,7 @@ namespace UAlbion.Core.Visual
                 new ShaderSetDescription(new[] { VertexLayout, InstanceLayout },
                     shaderSet.Shaders,
                     ShaderHelper.GetSpecializations(gd)),
-                new[] { _layout },
+                new[] { _layout, sc.CommonResourceLayout },
                 sc.MainSceneFramebuffer.OutputDescription);
 
             _pipeline = factory.CreateGraphicsPipeline(ref pd);
@@ -227,6 +227,7 @@ namespace UAlbion.Core.Visual
 
             cl.SetPipeline(_pipeline);
             cl.SetGraphicsResourceSet(0, resourceSet);
+            cl.SetGraphicsResourceSet(1, sc.CommonResourceSet);
             cl.SetVertexBuffer(0, _vb);
             cl.SetVertexBuffer(1, _instanceBuffers[window.InstanceBufferId]);
             cl.SetIndexBuffer(_ib, IndexFormat.UInt16);

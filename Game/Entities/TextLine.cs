@@ -19,6 +19,9 @@ namespace UAlbion.Game.Entities
         /// <param name="size"></param>
         public void Add(TextBlock block, Vector2 size)
         {
+            if (string.IsNullOrEmpty(block.Text))
+                return;
+
             Width += (int)size.X;
             Height = Math.Max(Height, (int)size.Y);
             _alignment = block.Alignment;

@@ -1,10 +1,8 @@
-﻿//!#version 450
+﻿//!#version 450 // Comments with //! are for tricking the Visual Studio GLSL plugin into doing the right thing
 //!#define gl_VertexIndex gl_VertexID
 
 // Resource Sets / Uniforms
-layout(binding = 0) uniform _Projection { mat4 Projection; }; // vdspv_0_0
-layout(binding = 1) uniform _View       { mat4 View; };       // vdspv_0_1
-layout(binding = 2) uniform _Misc       { vec3 Position; int Unused1; vec3 TileSize; int Unused2; }; // vdspv_0_2
+layout(binding = 0) uniform _Misc { vec3 uPosition; int Unused1; vec3 TileSize; int Unused2; }; // vdspv_0_0
 
 #include "CommonResources.glsl"
 
@@ -44,5 +42,5 @@ void main()
 	)
 		gl_Position = vec4(0, 1e12, 0, 1); // Inactive faces/vertices get relegated to waaaay above the origin
 	else
-		gl_Position = Projection * View * vec4(Position + ( vVertexPosition + vec3(iTilePosition.x, 0.0f, iTilePosition.y)) * TileSize, 1);
+		gl_Position = uProjection * uView * vec4(uPosition + (vVertexPosition + vec3(iTilePosition.x, 0.0f, iTilePosition.y)) * TileSize, 1);
 }

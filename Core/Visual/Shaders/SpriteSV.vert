@@ -1,8 +1,12 @@
-﻿//!#version 450
+﻿//!#version 450 // Comments with //! are for tricking the Visual Studio GLSL plugin into doing the right thing
 
 // Resource Sets
-layout(binding = 0) uniform _Projection { mat4 uProjection; };
-layout(binding = 1) uniform _View { mat4 uView; };
+layout(binding = 2) uniform _Uniform {
+	uint uFlags;
+	uint _u_padding_1;
+	uint _u_padding_2;
+	uint _u_padding_3;
+};
 
 // Shared set
 #include "CommonResources.glsl"
@@ -10,6 +14,7 @@ layout(binding = 1) uniform _View { mat4 uView; };
 // Vertex Data
 layout(location = 0) in vec2 vPosition;
 layout(location = 1) in vec2 vTexCoords;
+layout(location = 2)
 
 // Instance Data
 layout(location = 2) in vec3 iT1;
@@ -45,9 +50,9 @@ void main()
 
 	vec4 worldSpace = transform * vec4(vPosition, 0, 1);
 
-	vec4 normPosition = ((iFlags & SF_NO_TRANSFORM) == 0)
+	vec4 normPosition = ((uFlags & SKF_NO_TRANSFORM) == 0)
 		? uProjection * uView * worldSpace
-		:               uView * worldSpace;
+		: worldSpace;
 
 	gl_Position = normPosition;
 

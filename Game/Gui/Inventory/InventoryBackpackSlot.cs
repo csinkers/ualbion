@@ -1,6 +1,4 @@
-﻿using System;
-using System.Numerics;
-using UAlbion.Core;
+﻿using System.Numerics;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Entities;
@@ -13,7 +11,7 @@ namespace UAlbion.Game.Gui.Inventory
     sealed class InventoryBackpackSlot : InventorySlot
     {
         protected override ButtonFrame Frame { get; }
-        readonly UiItemSprite _sprite;
+        readonly UiSpriteElement<ItemSpriteId> _sprite;
         readonly int _slotNumber;
         int _version;
         protected override ItemSlotId SlotId => (ItemSlotId)((int)ItemSlotId.Slot0 + _slotNumber);
@@ -39,7 +37,7 @@ namespace UAlbion.Game.Gui.Inventory
             : base(activeCharacter, BackpackHandlers)
         {
             _slotNumber = slotNumber;
-            _sprite = new UiItemSprite(ItemSpriteId.Nothing);
+            _sprite = new UiSpriteElement<ItemSpriteId>(0) { SubId = (int)ItemSpriteId.Nothing };
 
             var amountSource = new DynamicText(() =>
             {
@@ -71,21 +69,21 @@ namespace UAlbion.Game.Gui.Inventory
 
             if(item == null)
             {
-                _sprite.Id = ItemSpriteId.Nothing;
+                _sprite.SubId = (int)ItemSpriteId.Nothing;
                 return;
             }
 
             int frames = item.IconAnim == 0 ? 1 : item.IconAnim;
-            int sprite = (int)item.Icon + state.TickCount % frames;
-            _sprite.Id = (ItemSpriteId)sprite;
+            int itemSpriteId = (int)item.Icon + state.TickCount % frames;
+            _sprite.SubId = itemSpriteId;
             // TODO: Show item.Amount
             // TODO: Show broken overlay if item.Flags.HasFlag(ItemSlotFlags.Broken)
         }
 
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        public override int Render(Rectangle extents, int order)
         {
             Rebuild();
-            return base.Render(extents, order, addFunc);
+            return base.Render(extents, order);
         }
 
         public override Vector2 GetSize() => new Vector2(16, 20);

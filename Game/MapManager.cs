@@ -57,13 +57,12 @@ namespace UAlbion.Game
             var map = BuildMap(pendingMapChange);
             if (map != null)
             {
+                Current = map;
                 var mapExchange = new EventExchange(pendingMapChange.ToString(), _allMapsExchange);
 
                 mapExchange.Attach(map);
                 if (map is ICollider collider)
                     mapExchange.Register(collider);
-
-                Current = map;
 
                 // Set the scene first to ensure scene-local components from other scenes are disabled.
                 Raise(new SetSceneEvent(map is Map3D ? SceneId.World3D : SceneId.World2D)); 

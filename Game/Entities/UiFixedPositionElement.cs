@@ -9,17 +9,17 @@ using Veldrid;
 
 namespace UAlbion.Game.Entities
 {
-    public class UiFixedPositionSprite<T> : UiElement where T : Enum
+    public class UiFixedPositionElement<T> : UiElement where T : Enum
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<UiFixedPositionSprite<T>, WindowResizedEvent>((x,_) => x.Rebuild())
-        );
+            H<UiFixedPositionElement<T>, WindowResizedEvent>((x,_) => x.Rebuild()),
+            H<UiFixedPositionElement<T>, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; }));
 
         readonly T _id;
         readonly Rectangle _extents;
-        Sprite<T> _sprite;
+        SpriteLease _sprite;
 
-        public UiFixedPositionSprite(T id, Rectangle extents) : base(Handlers)
+        public UiFixedPositionElement(T id, Rectangle extents) : base(Handlers)
         {
             _id = id;
             _extents = extents;
@@ -27,27 +27,29 @@ namespace UAlbion.Game.Entities
 
         public override string ToString() => $"{_id} @ {_extents}";
         public override Vector2 GetSize() => new Vector2(_extents.Width, _extents.Height);
-        public override void Subscribed() { Rebuild(); base.Subscribed(); }
+
+        public override void Subscribed()
+        {
+            if (_sprite == null)
+            {
+                var assets = Resolve<IAssetManager>();
+                var texture = assets.LoadTexture(_id);
+                var key = new SpriteKey(texture, DrawLayer.Interface, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
+                _sprite = Resolve<ISpriteManager>().Borrow(key, 1, this);
+            }
+
+            Rebuild();
+            base.Subscribed();
+        }
+
         void Rebuild()
         {
             var window = Resolve<IWindowManager>();
             var position = new Vector3(window.UiToNorm(new Vector2(_extents.X, _extents.Y)), 0);
             var size = window.UiToNormRelative(new Vector2(_extents.Width, _extents.Height));
 
-            _sprite = 
-                new Sprite<T>(
-                _id,
-            0,
-                position,
-                (int)DrawLayer.Interface,
-                SpriteFlags.NoTransform | SpriteFlags.LeftAligned | SpriteFlags.NoDepthTest,
-                size);
-        }
-
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
-        {
-            addFunc(_sprite);
-            return order;
+            var instances = _sprite.Access();
+            instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, 0, 0);
         }
 
         public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)

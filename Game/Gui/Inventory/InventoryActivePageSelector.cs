@@ -32,7 +32,7 @@ namespace UAlbion.Game.Gui.Inventory
                 InventoryPage.Misc => _misc, 
                 InventoryPage x => throw new NotImplementedException($"Unhandled inventory page \"{x}\"")
             };
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc) => GetActivePage().Render(extents, order, addFunc);
+        public override int Render(Rectangle extents, int order) => GetActivePage().Render(extents, order);
         public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc) => GetActivePage().Select(uiPosition, extents, order, registerHitFunc);
     }
 }

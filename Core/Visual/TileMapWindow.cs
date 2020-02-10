@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Numerics;
-using Veldrid.Utilities;
+using UAlbion.Api;
 
 namespace UAlbion.Core.Visual
 {
     public class TileMapWindow : IRenderable
     {
         public string Name => TileMap.Name;
-        public int RenderOrder { get => TileMap.RenderOrder; set => throw new NotImplementedException(); }
-
+        public DrawLayer RenderOrder => TileMap.RenderOrder;
         public Type Renderer => TileMap.Renderer;
-        public Matrix4x4 Transform => Matrix4x4.Identity;
-
         public int Offset { get; }
         public int Length { get; }
         public TileMap TileMap { get; }

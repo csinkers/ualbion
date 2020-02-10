@@ -35,7 +35,5 @@ namespace UAlbion.Game.Scenes
         }
     }
 
-    public class RefreshMapSubscribersEvent : IEvent
-    {
-    }
+    public class RefreshMapSubscribersEvent : IEvent { }
 }

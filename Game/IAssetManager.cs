@@ -1,4 +1,5 @@
 ﻿using UAlbion.Core.Textures;
+using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
@@ -7,9 +8,8 @@ using UAlbion.Formats.Config;
 
 namespace UAlbion.Game
 {
-    public interface IAssetManager
+    public interface IAssetManager : ITextureLoader
     {
-        ITexture LoadTexture<T>(T id);
         ITexture LoadTexture(AssetType type, int id);
         ITexture LoadTexture(AutoMapId id);
         ITexture LoadTexture(CombatBackgroundId id);

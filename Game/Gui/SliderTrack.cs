@@ -64,10 +64,7 @@ namespace UAlbion.Game.Gui
             return new Rectangle(position, extents.Y, (int)size.X, extents.Height);
         }
 
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
-        {
-            return _thumb.Render(ThumbExtents(extents), order, addFunc);
-        }
+        public override int Render(Rectangle extents, int order) => _thumb.Render(ThumbExtents(extents), order);
 
         public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {

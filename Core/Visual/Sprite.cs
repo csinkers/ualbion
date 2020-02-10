@@ -1,62 +1,140 @@
 ﻿using System;
 using System.Numerics;
-using Veldrid.Utilities;
+using UAlbion.Api;
+using UAlbion.Core.Events;
 
 namespace UAlbion.Core.Visual
 {
-    public abstract class Sprite : IRenderable
+    public class Sprite<T> : Component where T : Enum 
     {
-        protected Sprite(string name, int subObject, Vector3 position, int renderOrder, SpriteFlags flags, Vector2? size)
-        {
-            Name = name;
-            SubObject = subObject;
-            Position = position;
-            RenderOrder = renderOrder;
-            Flags = flags;
-            Size = size;
-        }
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<Sprite<T>, RenderEvent>((x,e) => x.UpdateSprite()),
+            H<Sprite<T>, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; }),
+            H<Sprite<T>, WorldCoordinateSelectEvent>((x,e) => x.Select(e))
+        );
 
-        public string Name { get; }
-        public Type Renderer => typeof(SpriteRenderer);
+        public Vector3 Normal => Vector3.UnitZ; // TODO
+        public T Id { get; }
 
-        public Matrix4x4 Transform { get; private set; } = Matrix4x4.Identity;
-        public event EventHandler ExtentsChanged;
-        public int RenderOrder { get; set; }
-        public SpriteFlags Flags { get; set; }
-        public int SubObject { get; }
-        
-        Vector3 _position;
-        public Vector3 Position
+        public Vector3 Position { get => _position; set { if (_position == value) return; _position = value; Dirty = true; } }
+        public Vector2 Size { get => _size ?? Vector2.One; set { if (_size == value) return; _size = value; Dirty = true; } }
+
+        public int Frame
         {
-            get => _position;
+            get => _frame;
             set
             {
-                _position = value;
-                Transform = Matrix4x4.CreateTranslation(_position);
-                ExtentsChanged?.Invoke(this, EventArgs.Empty);
+                if (_frame == value) return;
+
+                while (value >= FrameCount)
+                    value -= FrameCount;
+
+                if (_frame == value) return;
+
+                _frame = value;
+                Dirty = true;
             }
         }
-        public Vector2? Size { get; set; }
-        public abstract Type IdType { get; }
-        public abstract int NumericId { get; }
-        public BoundingBox? Extents
+
+        public int FrameCount { get; private set; } = 1;
+        public SpriteFlags Flags { get => _flags; set { if (_flags == value) return; _flags = value; Dirty = true; } }
+
+        readonly DrawLayer _layer;
+        readonly SpriteKeyFlags _keyFlags;
+        SpriteLease _sprite;
+        Vector3 _position;
+        Vector2? _size;
+        int _frame;
+        SpriteFlags _flags;
+
+        bool _dirty = true;
+        bool Dirty
         {
-            get
+            set
             {
-                var min = Position;
-                var max = Position + new Vector3(Size?.X ?? 1, Size?.Y ?? 1, Size?.X ?? 1);
-                return new BoundingBox(min, max);
+                if (value == _dirty)
+                    return;
+
+                if(value) Exchange.Subscribe(typeof(RenderEvent), this);
+                    else Exchange.Unsubscribe<RenderEvent>(this);
+
+                _dirty = value;
             }
         }
-    }
 
-    public class Sprite<T> : Sprite where T : Enum
-    {
-        public Sprite(T id, int subObject, Vector3 position, int renderOrder, SpriteFlags flags, Vector2? size = null)
-            : base(id.ToString(), subObject, position, renderOrder, flags, size) { Id = id; }
+        public Sprite(T id, Vector3 position, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags) : base(Handlers)
+        {
+            Id = id;
+            Position = position;
+            _layer = layer;
+            _keyFlags = keyFlags;
+            _flags = flags;
+        }
 
-        public T Id { get; }
-        public override Type IdType => typeof(T);
-        public override int NumericId => (int)(object)Id;
+        public static Sprite<T> CharacterSprite(T id) =>
+            new Sprite<T>(id, Vector3.Zero, DrawLayer.Characters1, 0, SpriteFlags.BottomAligned);
+
+        public static Sprite<T> ScreenSpaceSprite(T id, Vector2 position, Vector2 size) =>
+            new Sprite<T>(id, new Vector3(position, 0), DrawLayer.Interface,
+                SpriteKeyFlags.NoTransform,
+                SpriteFlags.LeftAligned) { Size = size };
+
+        void UpdateSprite()
+        {
+            if (!_dirty)
+                return;
+            Dirty = false;
+
+            var assets = Resolve<ITextureLoader>();
+            var sm = Resolve<ISpriteManager>();
+
+            if (_sprite == null)
+            {
+                var texture = assets.LoadTexture(Id);
+                if (texture == null)
+                {
+                    _sprite?.Dispose();
+                    _sprite = null;
+                    return;
+                }
+
+                FrameCount = texture.SubImageCount;
+                var key = new SpriteKey(texture, _layer, _keyFlags);
+                _sprite = sm.Borrow(key, 1, this);
+            }
+
+            var instances = _sprite.Access();
+
+            _sprite.Key.Texture.GetSubImageDetails(Frame, out var size, out var texPosition, out var texSize, out var texLayer);
+            _size ??= size;
+            instances[0] = SpriteInstanceData.CopyFlags(_position, _size.Value, texPosition, texSize, texLayer, _flags);
+        }
+
+        void Select(WorldCoordinateSelectEvent e)
+        {
+            float denominator = Vector3.Dot(Normal, e.Direction);
+            if (Math.Abs(denominator) < 0.00001f)
+                return;
+
+            float t = Vector3.Dot(_position - e.Origin, Normal) / denominator;
+            if (t < 0)
+                return;
+
+            var intersectionPoint = e.Origin + t * e.Direction;
+            int x = (int)(intersectionPoint.X - _position.X);
+            int y = (int)(intersectionPoint.Y - _position.Y);
+
+            if (x < 0 || x >= Size.X ||
+                y < 0 || y >= Size.Y)
+                return;
+
+            e.RegisterHit(t, this);
+        }
+
+        public override void Subscribed()
+        {
+            Dirty = true;
+            base.Subscribed();
+        }
     }
 }

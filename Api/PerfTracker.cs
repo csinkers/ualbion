@@ -27,11 +27,7 @@ namespace UAlbion.Api
                         _frameTimes[_name] = new Stats { Fast = ticks };
 
                     var stats = _frameTimes[_name];
-                    stats.Count++;
-                    stats.Total += ticks;
-                    stats.Fast = (ticks + 8*stats.Fast) / 9.0f;
-                    if (stats.Min > ticks) stats.Min = ticks;
-                    if (stats.Max < ticks) stats.Max = ticks;
+                    stats.AddTicks(ticks);
                 }
             }
         }
@@ -66,14 +62,40 @@ namespace UAlbion.Api
             public long Min { get; set; } = long.MaxValue;
             public long Max { get; set; } = long.MinValue;
             public float Fast { get; set; }
+
+            public void AddTicks(long ticks)
+            {
+                Count++;
+                Total += ticks;
+                Fast = (ticks + 8 * Fast) / 9.0f;
+                if (Min > ticks) Min = ticks;
+                if (Max < ticks) Max = ticks;
+            }
+
+            public void AddMs(long ms) => AddTicks(ms * 10000);
         }
 
         static readonly Stopwatch _startupStopwatch = Stopwatch.StartNew();
         static readonly IDictionary<string, Stats> _frameTimes = new Dictionary<string, Stats>();
+        static readonly IDictionary<string, int> _frameCounters = new Dictionary<string, int>();
         static readonly object _syncRoot = new object();
         static int _frameCount;
 
-        public static void BeginFrame() { _frameCount++; }
+        public static void BeginFrame()
+        {
+            _frameCount++;
+            foreach (var key in _frameCounters.Keys.ToList())
+            {
+                var count = _frameCounters[key];
+                if (!_frameTimes.ContainsKey(key))
+                    _frameTimes[key] = new Stats { Fast = count * 10000 };
+
+                var stats = _frameTimes[key];
+                stats.AddMs(count);
+
+                _frameCounters[key] = 0;
+            }
+        }
 
         public static void StartupEvent(string name)
         {
@@ -114,6 +136,8 @@ namespace UAlbion.Api
                     sb.Append($" F:{kvp.Value.Fast / 10000:F3}");
                     sb.Append($" Avg/call: {(float)kvp.Value.Total / (10000 * kvp.Value.Count):F3}");
                     sb.Append($" Calls/Frame: {(float)kvp.Value.Count / _frameCount:F3}");
+                    sb.Append($" Total: {kvp.Value.Total / 10000}");
+                    sb.Append($" Count: {kvp.Value.Count}");
                     descriptions.Add(kvp.Key);
                     results.Add(sb.ToString());
                     sb.Clear();
@@ -121,6 +145,15 @@ namespace UAlbion.Api
             }
 
             return (descriptions, results);
+        }
+
+        public static void IncrementFrameCounter(string name)
+        {
+            lock(_syncRoot)
+            {
+                _frameCounters.TryGetValue(name, out var count);
+                _frameCounters[name] = count + 1;
+            }
         }
     }
 }

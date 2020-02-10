@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
@@ -11,10 +11,15 @@ namespace UAlbion.Game.Gui
 {
     public class UiRectangle : UiElement
     {
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<UiRectangle, WindowResizedEvent>((x, _) => x._dirty = true),
+            H<UiRectangle, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; }));
+
         CommonColor _color;
-        UiMultiSprite _sprite;
+        SpriteLease _sprite;
         bool _dirty = true;
         Vector2 _drawSize;
+        Vector3 _lastPosition;
 
         public Vector2 DrawSize
         {
@@ -29,9 +34,6 @@ namespace UAlbion.Game.Gui
 
         public Vector2 MeasureSize { get; set; }
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<UiRectangle, WindowResizedEvent>((x, _) => x._dirty = true)
-        );
         public UiRectangle(CommonColor color) : base(Handlers)
         {
             _color = color;
@@ -51,36 +53,38 @@ namespace UAlbion.Game.Gui
         }
 
         public override Vector2 GetSize() => MeasureSize;
-        void Rebuild()
+        void Rebuild(Vector3 position, DrawLayer order)
         {
             _dirty = false;
-            var window = Resolve<IWindowManager>();
-            var flags = SpriteFlags.NoTransform | SpriteFlags.UsePalette | SpriteFlags.LeftAligned | SpriteFlags.NoDepthTest;
-            var instances = new[]
-            {
-                SpriteInstanceData.TopLeft(
-                    Vector3.Zero,
-                    window.UiToNormRelative(DrawSize),
-                    Vector2.Zero,
-                    Vector2.One,
-                    CommonColors.Palette[_color],
-                    flags),
-            };
+            _lastPosition = position;
 
-            _sprite = new UiMultiSprite(new SpriteKey(CommonColors.BorderTexture, 0, flags))
+            var window = Resolve<IWindowManager>();
+            var sm = Resolve<ISpriteManager>();
+
+            var key = new SpriteKey(CommonColors.BorderTexture, order, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
+            if (key != _sprite?.Key)
             {
-                Instances = instances.ToArray(),
-                Name = $"UiRect {DrawSize} of {MeasureSize}"
-            };
+                _sprite?.Dispose();
+                _sprite = sm.Borrow(key, 1, this);
+            }
+
+            var instances = _sprite.Access();
+            instances[0] = SpriteInstanceData.TopLeft(
+                position,
+                window.UiToNormRelative(DrawSize),
+                Vector2.Zero,
+                Vector2.One,
+                CommonColors.Palette[_color],
+                SpriteFlags.None);
         }
 
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        public override int Render(Rectangle extents, int order)
         {
-            if(_dirty) Rebuild();
             var window = Resolve<IWindowManager>();
-            _sprite.Position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);
-            _sprite.RenderOrder = order;
-            addFunc(_sprite);
+            var position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);
+            if (_dirty || position != _lastPosition || _sprite?.Key.RenderOrder != (DrawLayer)order)
+                Rebuild(position, (DrawLayer)order);
+
             return order;
         }
     }

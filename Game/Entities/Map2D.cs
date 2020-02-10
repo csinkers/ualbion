@@ -124,8 +124,8 @@ namespace UAlbion.Game.Entities
                 {
                     IComponent sprite =
                         _useSmallSprites
-                            ? new SmallNpcSprite((SmallNpcId)npc.ObjectNumber, npc.Waypoints) as IComponent
-                            : new LargeNpcSprite((LargeNpcId)npc.ObjectNumber, npc.Waypoints);
+                            ? new SmallNpc((SmallNpcId)npc.ObjectNumber, npc.Waypoints) as IComponent
+                            : new LargeNpc((LargeNpcId)npc.ObjectNumber, npc.Waypoints);
 
                     Exchange.Attach(sprite);
                     Children.Add(sprite);
@@ -140,8 +140,8 @@ namespace UAlbion.Game.Entities
                 {
                     player.GetPosition = () => partyMovement.GetPositionHistory(player.Id).Item1;
                     var playerSprite = _useSmallSprites 
-                        ? (IComponent)new SmallPlayerSprite(player.Id, (SmallPartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id)) // TODO: Use a function to translate logical to sprite id
-                        : new LargePlayerSprite(player.Id, (LargePartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id)); // TODO: Use a function to translate logical to sprite id
+                        ? (IComponent)new SmallPlayer(player.Id, (SmallPartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id)) // TODO: Use a function to translate logical to sprite id
+                        : new LargePlayer(player.Id, (LargePartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id)); // TODO: Use a function to translate logical to sprite id
 
                     Exchange.Attach(playerSprite);
                     Children.Add(playerSprite);

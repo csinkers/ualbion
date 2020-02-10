@@ -40,10 +40,10 @@ namespace UAlbion.Game.Gui
             }
         }
 
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        public override int Render(Rectangle extents, int order)
         {
             Rebuild();
-            return base.Render(extents, order, addFunc);
+            return base.Render(extents, order);
         }
     }
 }

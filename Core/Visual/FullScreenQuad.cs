@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core.Events;
 using Veldrid;
 using Veldrid.Utilities;
@@ -18,7 +19,7 @@ namespace UAlbion.Core.Visual
         static readonly ushort[] QuadIndices = { 0, 1, 2, 0, 2, 3 };
         public string Name => "FullScreenQuad";
         public RenderPasses RenderPasses => RenderPasses.SwapchainOutput;
-        public int RenderOrder { get; set; } = int.MaxValue;
+        public DrawLayer RenderOrder => DrawLayer.MaxLayer;
         public Type Renderer => typeof(FullScreenQuad);
         public Matrix4x4 Transform => Matrix4x4.Identity;
 

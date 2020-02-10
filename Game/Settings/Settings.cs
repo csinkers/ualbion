@@ -70,6 +70,6 @@ namespace UAlbion.Game.Settings
         // Engine
         public float Special1 { get; private set; }
         public float Special2 { get; private set; }
-        public EngineFlags Flags { get; private set; }
+        public EngineFlags Flags { get; private set; } = EngineFlags.VSync;
     }
 }

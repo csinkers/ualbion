@@ -1,23 +1,33 @@
 ﻿using System;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Game.Entities;
 using Veldrid;
+using Util = UAlbion.Core.Util;
 
 namespace UAlbion.Game.Gui
 {
     public class DialogFrame : UiElement
     {
         const int TileSize = 16;
-        MultiSprite _sprite;
+
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<DialogFrame, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; })
+        );
+
+        PositionedSpriteBatch _sprite;
         Vector2 _lastPixelSize; // For dirty state detection
 
-        public DialogFrame(IUiElement child) : base(null) => Children.Add(child);
-        void Rebuild(int width, int height, int order)
+        public DialogFrame(IUiElement child) : base(Handlers) => Children.Add(child);
+        void Rebuild(int width, int height, DrawLayer order)
         {
             var window = Resolve<IWindowManager>();
+            var sm = Resolve<ISpriteManager>();
 
             { // Check if we need to rebuild
                 var normSize = window.UiToNormRelative(new Vector2(width, height));
@@ -75,25 +85,21 @@ namespace UAlbion.Game.Gui
             DrawVerticalLine(4); // Top
             DrawVerticalLine((uint)width - 7); // Bottom
 
-            multi.GetSubImageDetails(multi.GetSubImageAtTime(1, 0), out var size, out var offset, out var texSize, out var layer);
+            multi.GetSubImageDetails(multi.GetSubImageAtTime(1, 0), out var size, out var texOffset, out var texSize, out var layer);
             var normalisedSize = window.UiToNormRelative(new Vector2(size.X, size.Y));
-            var flags = SpriteFlags.NoTransform.SetOpacity(0.5f);
-            _sprite =
-                new UiMultiSprite(new SpriteKey(multi, order, flags))
-                {
-                    Instances = new[] {
-                        SpriteInstanceData.TopLeft( // Drop shadow
-                            new Vector3(window.UiToNormRelative(new Vector2(10, 10)), 0),
-                         window.UiToNormRelative(new Vector2(size.X - 10, size.Y - 10)),
-                        Vector2.Zero, Vector2.Zero, 0,
-                            flags),
-                        SpriteInstanceData.TopLeft( // DialogFrame
-                            Vector3.Zero,
-                            normalisedSize,
-                        offset, texSize, layer, SpriteFlags.NoTransform),
 
-                    },
-                };
+            var key = new SpriteKey(multi, order, SpriteKeyFlags.NoTransform);
+            _sprite?.Dispose();
+
+            var lease = sm.Borrow(key, 2, this);
+            var flags = SpriteFlags.None.SetOpacity(0.5f);
+            var instances = lease.Access();
+
+            var shadowPosition = new Vector3(window.UiToNormRelative(new Vector2(10, 10)), 0);
+            var shadowSize = window.UiToNormRelative(new Vector2(size.X - 10, size.Y - 10));
+            instances[0] = SpriteInstanceData.TopLeft(shadowPosition, shadowSize, Vector2.Zero, Vector2.Zero, 0, flags);// Drop shadow
+            instances[1] = SpriteInstanceData.TopLeft(Vector3.Zero, normalisedSize, texOffset, texSize, layer, 0); // DialogFrame
+            _sprite = new PositionedSpriteBatch(lease, normalisedSize);
         }
 
         public override Vector2 GetSize() => GetMaxChildSize() + Vector2.One * 14;
@@ -109,21 +115,19 @@ namespace UAlbion.Game.Gui
             return base.DoLayout(innerExtents, order, func);
         }
 
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        public override int Render(Rectangle extents, int order)
         {
-            Rebuild(extents.Width, extents.Height, order);
+            Rebuild(extents.Width, extents.Height, (DrawLayer)order);
 
             var window = Resolve<IWindowManager>();
             _sprite.Position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);
-            _sprite.RenderOrder = order; // Render the frame in front of its children
-            addFunc(_sprite);
 
-            return base.Render(extents, order, addFunc);
+            return base.Render(extents, order);
         }
 
         public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
-            Rebuild(extents.Width, extents.Height, order);
+            Rebuild(extents.Width, extents.Height, (DrawLayer)order);
             return base.Select(uiPosition, extents, order, registerHitFunc);
         }
     }

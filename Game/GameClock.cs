@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Events;
@@ -6,6 +7,18 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game
 {
+    public class SlowClockEvent : GameEvent, IVerboseEvent
+    {
+        public int Delta { get; }
+        public int FrameCount { get; }
+
+        public SlowClockEvent(int delta, int frameCount)
+        {
+            Delta = delta;
+            FrameCount = frameCount;
+        }
+    }
+
     public class GameClock : Component, IClock
     {
         const float TickDurationSeconds = 1 / 60.0f;

@@ -50,14 +50,19 @@ namespace UAlbion.Api
                 var method = typeof(float).GetMethod("Parse", new[] { typeof(string) });
                 Parser = Expression.Call(method, part);
             }
+            else if (PropertyType == typeof(bool?))
+            {
+                var method = GetType().GetMethod("ParseNullableBool", BindingFlags.NonPublic | BindingFlags.Static);
+                Parser = Expression.Call(method, part);
+            }
             else if (PropertyType == typeof(int?))
             {
                 var method = GetType().GetMethod("ParseNullableInt", BindingFlags.NonPublic | BindingFlags.Static);
                 Parser = Expression.Call(method, part);
             }
-            else if (PropertyType == typeof(bool?))
+            else if (PropertyType == typeof(float?))
             {
-                var method = GetType().GetMethod("ParseNullableBool", BindingFlags.NonPublic | BindingFlags.Static);
+                var method = GetType().GetMethod("ParseNullableFloat", BindingFlags.NonPublic | BindingFlags.Static);
                 Parser = Expression.Call(method, part);
             }
             else if (PropertyType.IsEnum)
@@ -69,6 +74,13 @@ namespace UAlbion.Api
             else throw new NotImplementedException();
         }
 
+        static bool? ParseNullableBool(string s)
+        {
+            if (string.IsNullOrEmpty(s))
+                return null;
+            return bool.Parse(s);
+        }
+
         static int? ParseNullableInt(string s)
         {
             if (string.IsNullOrEmpty(s))
@@ -76,11 +88,11 @@ namespace UAlbion.Api
             return int.Parse(s);
         }
 
-        static bool? ParseNullableBool(string s)
+        static float? ParseNullableFloat(string s)
         {
             if (string.IsNullOrEmpty(s))
                 return null;
-            return bool.Parse(s);
+            return float.Parse(s);
         }
 
         static T ParseEnum<T>(string s) => (T)Enum.Parse(typeof(T), s, true);

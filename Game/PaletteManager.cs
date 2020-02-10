@@ -8,13 +8,10 @@ namespace UAlbion.Game
 {
     public class PaletteManager : Component, IPaletteManager
     {
-        const int TicksPerPaletteChange = 8;
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<PaletteManager, UpdateEvent>((x, e) => x.OnTick(e.Frames)),
+            H<PaletteManager, SlowClockEvent>((x, e) => x.OnTick(e.Delta)),
             H<PaletteManager, LoadPaletteEvent>((x, e) => x.SetPalette(e.PaletteId))
         );
-
-        int _ticks;
 
         public IPalette Palette { get; private set; }
         public PaletteTexture PaletteTexture { get; private set; }
@@ -30,17 +27,12 @@ namespace UAlbion.Game
 
         void OnTick(int frames)
         {
-            _ticks += frames;
-            while (_ticks >= TicksPerPaletteChange)
-            {
-                _ticks -= TicksPerPaletteChange;
-                PaletteFrame++;
-                if (PaletteFrame >= Palette.GetCompletePalette().Count)
-                    PaletteFrame = 0;
+            PaletteFrame += frames;
+            while (PaletteFrame >= Palette.GetCompletePalette().Count)
+                PaletteFrame -= Palette.GetCompletePalette().Count;
 
-                if (Palette.IsAnimated)
-                    GeneratePalette();
-            }
+            if (Palette.IsAnimated)
+                GeneratePalette();
         }
 
         void SetPalette(PaletteId paletteId)
@@ -53,8 +45,8 @@ namespace UAlbion.Game
             }
 
             Palette = palette;
-            if (PaletteFrame >= Palette.GetCompletePalette().Count)
-                PaletteFrame = 0;
+            while (PaletteFrame >= Palette.GetCompletePalette().Count)
+                PaletteFrame -= Palette.GetCompletePalette().Count;
 
             GeneratePalette();
         }

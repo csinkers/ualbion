@@ -1,5 +1,4 @@
 ﻿using System;
-using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
@@ -10,9 +9,9 @@ namespace UAlbion.Game.Gui.Inventory
     public class InventoryExitButton : UiElement
     {
         readonly string _buttonId;
-        UiSprite<CoreSpriteId> _normal;
-        UiSprite<CoreSpriteId> _hover;
-        UiSprite<CoreSpriteId> _clicked;
+        UiSpriteElement<CoreSpriteId> _normal;
+        UiSpriteElement<CoreSpriteId> _hover;
+        UiSpriteElement<CoreSpriteId> _clicked;
         ButtonState _state;
 
         static readonly HandlerSet Handlers = new HandlerSet(
@@ -35,9 +34,9 @@ namespace UAlbion.Game.Gui.Inventory
 
         public override void Subscribed()
         {
-            _normal = new UiSprite<CoreSpriteId>(CoreSpriteId.UiExitButton);
-            _hover = new UiSprite<CoreSpriteId>(CoreSpriteId.UiExitButtonHover);
-            _clicked = new UiSprite<CoreSpriteId>(CoreSpriteId.UiExitButtonPressed);
+            _normal = new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiExitButton);
+            _hover = new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiExitButtonHover);
+            _clicked = new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiExitButtonPressed);
             Exchange
                 .Attach(_normal)
                 .Attach(_hover)
@@ -48,12 +47,12 @@ namespace UAlbion.Game.Gui.Inventory
             base.Subscribed();
         }
 
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc) =>
+        protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func) =>
             _state switch
             {
-                ButtonState.Normal => _normal.Render(extents, order, addFunc),
-                ButtonState.Hover => _hover.Render(extents, order, addFunc),
-                ButtonState.Clicked => _clicked.Render(extents, order, addFunc),
+                ButtonState.Normal => func(_normal, extents, order),
+                ButtonState.Hover => func(_hover, extents, order),
+                ButtonState.Clicked => func(_clicked, extents, order),
                 _ => order
             };
     }

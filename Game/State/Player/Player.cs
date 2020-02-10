@@ -28,7 +28,7 @@ namespace UAlbion.Game.State.Player
         public IEffectiveCharacterSheet Effective => _inventoryManager.Effective;
         public IEffectiveCharacterSheet Apparent => _inventoryManager.Apparent;
         public InventoryAction GetInventoryAction(ItemSlotId slotId) => _inventoryManager.GetInventoryAction(slotId);
-        public Func<Vector2> GetPosition { get; set; }
+        public Func<Vector3> GetPosition { get; set; }
         public override string ToString() => $"Player {Id}";
     }
 }

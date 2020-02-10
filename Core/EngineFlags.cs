@@ -9,5 +9,6 @@ namespace UAlbion.Core
         ShowCameraPosition = 2,
         FlipDepthRange = 4,
         FlipYSpace = 8,
+        VSync = 16,
     }
 }

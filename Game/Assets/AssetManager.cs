@@ -104,6 +104,7 @@ namespace UAlbion.Game.Assets
             if (id is SmallPartyGraphicsId smallPartyGraphicsId) return LoadTexture(smallPartyGraphicsId);
             if (id is SmallPortraitId smallPortraitId)           return LoadTexture(smallPortraitId);
             if (id is TacticId tacticId)                         return LoadTexture(tacticId);
+            if (id is SlabId _) return (ITexture)_assetLocator.LoadAssetCached(AssetType.Slab, 0);
             throw new NotImplementedException();
         }
 

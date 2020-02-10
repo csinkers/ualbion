@@ -61,7 +61,7 @@ namespace UAlbion.Game.Gui.Inventory
                 child.Detach();
             Children.Clear();
 
-            var background = new UiFixedPositionSprite<SlabId>(SlabId.SLAB, UiConstants.UiExtents);
+            var background = new UiFixedPositionElement<SlabId>(SlabId.SLAB, UiConstants.UiExtents);
             var leftPane =
                 _mode switch
                 {

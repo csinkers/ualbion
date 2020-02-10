@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
@@ -14,8 +15,11 @@ namespace UAlbion.Game.Entities
             H<PartyMovement, PartyJumpEvent>((x, e) =>
                 {
                     var position = new Vector2(e.X, e.Y);
-                    for(int i = 0; i < x._trail.Length; i++)
-                        x._trail[i] = (position, 0);
+                    for (int i = 0; i < x._trail.Length; i++)
+                    {
+                        x._trail[i] = (To3D(position), 0);
+                    }
+
                     x._target = null;
                 }),
             H<PartyMovement, BeginFrameEvent>((x, e) => x._direction = Vector2.Zero),
@@ -41,7 +45,7 @@ namespace UAlbion.Game.Entities
         int MaxTrailDistance => _useSmallSprites ? 12 : 18; // Max number of positions between each character in the party. Looks best if coprime to TicksPerPile and TicksPerFrame.
         int TrailLength => Party.MaxPartySize * MaxTrailDistance; // Number of past positions to store
 
-        readonly (Vector2, int)[] _trail;
+        readonly (Vector3, int)[] _trail;
         readonly (int, bool)[] _playerOffsets = new (int, bool)[Party.MaxPartySize]; // int = trail offset, bool = isMoving
         readonly bool _useSmallSprites;
         int _trailOffset;
@@ -54,7 +58,7 @@ namespace UAlbion.Game.Entities
         {
             _useSmallSprites = useSmallSprites;
             _facingDirection = initialDirection;
-            _trail = new (Vector2, int)[TrailLength];
+            _trail = new (Vector3, int)[TrailLength];
 
             _trailOffset = _trail.Length - 1;
             for (int i = 0; i < _playerOffsets.Length; i++)
@@ -70,7 +74,10 @@ namespace UAlbion.Game.Entities
                 } / TicksPerTile;
 
             for (int i = 0; i < _trail.Length; i++)
-                _trail[_trailOffset - i] = (initialPosition + offset * i, SpriteFrame);
+            {
+                var position = initialPosition + offset * i;
+                _trail[_trailOffset - i] = (To3D(position), SpriteFrame);
+            }
         }
 
         int OffsetAge(int offset) => offset > _trailOffset ? _trailOffset - (offset - _trail.Length) : _trailOffset - offset;
@@ -95,7 +102,8 @@ namespace UAlbion.Game.Entities
 
         void Update()
         {
-            var (position, _) = _trail[_trailOffset];
+            var (position3d, _) = _trail[_trailOffset];
+            var position = new Vector2(position3d.X, position3d.Y);
 
             if (_target == null && _direction.LengthSquared() > float.Epsilon)
             {
@@ -165,7 +173,7 @@ namespace UAlbion.Game.Entities
             if (_trailOffset >= _trail.Length)
                 _trailOffset = 0;
 
-            _trail[_trailOffset] = (position, SpriteFrame);
+            _trail[_trailOffset] = (To3D(position), SpriteFrame);
             _playerOffsets[0] = (_trailOffset, true);
         }
 
@@ -188,17 +196,19 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        public (Vector2, int) GetPositionHistory(PartyCharacterId partyMember)
+        public (Vector3, int) GetPositionHistory(PartyCharacterId partyMember)
         {
             var players = Resolve<IParty>().WalkOrder;
             int index = 0;
             for (; index < players.Count && players[index].Id != partyMember; index++) { }
 
             if (index == players.Count)
-                return (Vector2.Zero, 0);
+                return (Vector3.Zero, 0);
 
             var (pos, frame) = _trail[_playerOffsets[index].Item1];
             return (pos, frame);
         }
+
+        static Vector3 To3D(Vector2 position) => new Vector3(position, DrawLayer.Characters1.ToZCoordinate(position.Y));
     }
 }

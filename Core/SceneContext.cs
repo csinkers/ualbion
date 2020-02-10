@@ -5,7 +5,7 @@ using Veldrid.Utilities;
 
 namespace UAlbion.Core
 {
-    public class SceneContext
+    public sealed class SceneContext
     {
         readonly DisposeCollector _disposer = new DisposeCollector();
         WindowSizedSceneContext _windowSized;
@@ -36,7 +36,7 @@ namespace UAlbion.Core
         public ResourceSet DuplicatorTargetSet0 => _windowSized.DuplicatorTargetSet0;
         public Framebuffer DuplicatorFramebuffer => _windowSized.DuplicatorFramebuffer;
 
-        public virtual void CreateDeviceObjects(GraphicsDevice gd, CommandList cl)
+        public void CreateDeviceObjects(GraphicsDevice gd, CommandList cl)
         {
             var factory = new DisposingResourceFactoryFacade(gd.ResourceFactory, _disposer);
             DeviceBuffer MakeBuffer(uint size, string name)
@@ -55,46 +55,51 @@ namespace UAlbion.Core
 
             cl.UpdateBuffer(IdentityMatrixBuffer, 0, Matrix4x4.Identity);
 
-            if (Camera != null)
-                UpdateCameraBuffers(cl);
-
             var commonLayoutDescription = new ResourceLayoutDescription(
-                ResourceLayoutHelper.Uniform("vdspv_1_0")); // CameraInfo / common data buffer
+                ResourceLayoutHelper.Uniform("vdspv_1_0"), // CameraInfo / common data buffer
+                ResourceLayoutHelper.UniformV("vdspv_1_1"), // Perspective Matrix
+                ResourceLayoutHelper.UniformV("vdspv_1_2"), // View Matrix
+                ResourceLayoutHelper.Texture("vdspv_1_3")); // PaletteTexture
+
             CommonResourceLayout = factory.CreateResourceLayout(commonLayoutDescription);
-            CommonResourceSet = factory.CreateResourceSet(new ResourceSetDescription(
-                CommonResourceLayout,
-                CameraInfoBuffer));
             CommonResourceLayout.Name = "RL_Common";
-            CommonResourceSet.Name = "RS_Common";
 
             _windowSized = new WindowSizedSceneContext(gd, MainSceneSampleCount);
-            _disposer.Add(_windowSized);
+            _disposer.Add(_windowSized, CommonResourceLayout);
         }
 
-        public virtual void DestroyDeviceObjects()
+        public void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl)
+        {
+            CommonResourceSet?.Dispose();
+            CommonResourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
+                CommonResourceLayout,
+                CameraInfoBuffer,
+                ProjectionMatrixBuffer,
+                ModelViewMatrixBuffer,
+                PaletteView));
+
+            CommonResourceSet.Name = "RS_Common";
+
+            cl.UpdateBuffer(ProjectionMatrixBuffer, 0, Camera.ProjectionMatrix);
+            cl.UpdateBuffer(ModelViewMatrixBuffer, 0, Camera.ViewMatrix);
+            cl.UpdateBuffer(CameraInfoBuffer, 0, Camera.GetCameraInfo());
+        }
+
+        public void DestroyDeviceObjects()
         {
             _disposer.DisposeAll();
             PaletteView?.Dispose();
             PaletteTexture?.Dispose();
+            CommonResourceSet?.Dispose();
 
             PaletteView = null;
             PaletteTexture = null;
+            CommonResourceSet = null;
         }
 
         public void SetCurrentScene(Scene scene)
         {
             Camera = scene.Camera;
-        }
-
-        public void UpdateCameraBuffers(CommandList cl)
-        {
-            cl.UpdateBuffer(ProjectionMatrixBuffer, 0, Camera.ProjectionMatrix);
-            cl.UpdateBuffer(CameraInfoBuffer, 0, Camera.GetCameraInfo());
-        }
-
-        public void UpdateModelTransform(CommandList cl, Matrix4x4 transform)
-        {
-            cl.UpdateBuffer(ModelViewMatrixBuffer, 0, transform);
         }
 
         public void RecreateWindowSizedResources(GraphicsDevice graphicsDevice)

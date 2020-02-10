@@ -40,7 +40,7 @@ namespace UAlbion.Game.Entities
             var assets = Resolve<IAssetManager>();
             _tilemap = new TileMap(
                     "Skybox_" + _id,
-                    (int)DrawLayer.Background,
+                    DrawLayer.Background,
                     new Vector3(-size, size / 3, size), // Just make sure it's bigger than the largest map
                     1, 1,
                     Resolve<IPaletteManager>());

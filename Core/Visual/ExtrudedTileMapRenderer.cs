@@ -24,14 +24,11 @@ namespace UAlbion.Core.Visual
         ) { InstanceStepRate = 1 };
 
         static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
-            ResourceLayoutHelper.UniformV("vdspv_0_0"),  // Projection Matrix
-            ResourceLayoutHelper.UniformV("vdspv_0_1"),  // View Matrix
-            ResourceLayoutHelper.UniformV("vdspv_0_2"),  // Misc Uniform Data
-            ResourceLayoutHelper.Sampler("vdspv_0_3"),  // Point Sampler
-            ResourceLayoutHelper.Texture("vdspv_0_4"),  // Palette
-            ResourceLayoutHelper.Sampler("vdspv_0_5"),  // Texture Sampler
-            ResourceLayoutHelper.Texture("vdspv_0_6"),  // Floors
-            ResourceLayoutHelper.Texture("vdspv_0_7")); // Walls
+            ResourceLayoutHelper.UniformV("vdspv_0_0"),  // Misc Uniform Data
+            ResourceLayoutHelper.Sampler("vdspv_0_1"),  // Point Sampler
+            ResourceLayoutHelper.Sampler("vdspv_0_2"),  // Texture Sampler
+            ResourceLayoutHelper.Texture("vdspv_0_3"),  // Floors
+            ResourceLayoutHelper.Texture("vdspv_0_4")); // Walls
 
         const string VertexShaderName = "ExtrudedTileMapSV.vert";
         const string FragmentShaderName = "ExtrudedTileMapSF.frag";
@@ -215,14 +212,12 @@ namespace UAlbion.Core.Visual
             cl.UpdateBuffer(_miscUniformBuffer, 0, miscUniformData);
 
             var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_layout,
-                sc.ProjectionMatrixBuffer,
-                sc.ModelViewMatrixBuffer,
                 _miscUniformBuffer,
                 gd.PointSampler,
-                sc.PaletteView,
                 _textureSampler,
                 floors,
                 walls));
+            resourceSet.Name = $"RS_TileMap:{tilemap.Name}";
             _resourceSets.Add(resourceSet);
 
             cl.SetPipeline(_pipeline);

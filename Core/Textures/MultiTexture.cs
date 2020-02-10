@@ -106,6 +106,16 @@ namespace UAlbion.Core.Textures
         }
 
         public int SizeInBytes => (int)(Width * Height * _layerSizes.Count * sizeof(uint));
+        public bool IsAnimated(int logicalId)
+        {
+            if(_isMetadataDirty)
+                RebuildLayers();
+
+            if (logicalId >= _logicalSubImages.Count)
+                return false;
+
+            return _logicalSubImages[logicalId].Frames > 1;
+        }
 
         public int GetSubImageAtTime(int logicalId, int tick)
         {
@@ -373,6 +383,5 @@ namespace UAlbion.Core.Textures
             using var stream = File.OpenWrite(path);
             image.SaveAsBmp(stream);
         }
-
     }
 }

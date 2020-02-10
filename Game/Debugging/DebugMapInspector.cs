@@ -10,12 +10,16 @@ using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 
-namespace UAlbion.Game
+namespace UAlbion.Game.Debugging
 {
+    [Event("hide_debug_window", "Hide the debug window")]
+    public class HideDebugWindowEvent : Event { }
+
     public class DebugMapInspector : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
             H<DebugMapInspector, EngineUpdateEvent>((x, _) => x.RenderDialog()),
+            H<DebugMapInspector, HideDebugWindowEvent>((x, _) => x._hits = null),
             H<DebugMapInspector, ShowDebugInfoEvent>((x, e) =>
             {
                 x._hits = e.Selections;
@@ -32,8 +36,12 @@ namespace UAlbion.Game
                 EightBitTexture.ScaleAdjustY = e.Y;
             }));
 
+        readonly IDictionary<Type, Action<DebugInspectorAction, Reflector.ReflectedObject>> _behaviours =
+            new Dictionary<Type, Action<DebugInspectorAction, Reflector.ReflectedObject>>();
+
         IList<Selection> _hits;
         Vector2 _mousePosition;
+        Reflector.ReflectedObject _lastHoveredItem;
 
         void RenderDialog()
         {
@@ -79,32 +87,46 @@ namespace UAlbion.Game
             {
                 if (ImGui.Button("Clear"))
                     PerfTracker.Clear();
+
                 ImGui.BeginGroup();
                 var (descriptions, stats) = PerfTracker.GetFrameStats();
                 ImGui.Columns(2);
+                ImGui.SetColumnWidth(0, 300);
                 foreach (var description in descriptions)
                     ImGui.Text(description);
+
                 ImGui.NextColumn();
-                foreach(var stat in stats)
+                foreach (var stat in stats)
                     ImGui.Text(stat);
-                ImGui.TreePop();
-                ImGui.EndGroup();
+
                 ImGui.Columns(1);
+                ImGui.EndGroup();
+                ImGui.TreePop();
             }
 
             if (ImGui.TreeNode("Settings"))
             {
                 var settings = Resolve<ISettings>();
                 ImGui.BeginGroup();
-                BoolOption("DrawPositions", () => settings.Debug.DrawPositions, x => Raise(new SetDrawPositionsEvent(x)));
-                BoolOption("FlipDepthRange", () => settings.Engine.Flags.HasFlag(EngineFlags.FlipDepthRange), x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.FlipDepthRange)));
-                BoolOption("FlipYSpace", () => settings.Engine.Flags.HasFlag(EngineFlags.FlipYSpace), x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.FlipYSpace)));
-                BoolOption("HighlightEventChainZones", () => settings.Debug.HighlightEventChainZones, x => Raise(new SetHighlightEventChainZonesEvent(x)));
-                BoolOption("HighlightSelection", () => settings.Debug.HighlightSelection, x => Raise(new SetHighlightSelectionEvent(x)));
-                BoolOption("HighlightTile", () => settings.Debug.HighlightTile, x => Raise(new SetHighlightTileEvent(x)));
-                BoolOption("ShowBoundingBoxes", () => settings.Engine.Flags.HasFlag(EngineFlags.ShowBoundingBoxes), x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.ShowBoundingBoxes)));
-                BoolOption("ShowCameraPosition", () => settings.Engine.Flags.HasFlag(EngineFlags.ShowCameraPosition), x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.ShowCameraPosition)));
+                BoolOption("DrawPositions", () => settings.Debug.DrawPositions,
+                    x => Raise(new SetDrawPositionsEvent(x)));
+                BoolOption("FlipDepthRange", () => settings.Engine.Flags.HasFlag(EngineFlags.FlipDepthRange),
+                    x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.FlipDepthRange)));
+                BoolOption("FlipYSpace", () => settings.Engine.Flags.HasFlag(EngineFlags.FlipYSpace),
+                    x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.FlipYSpace)));
+                BoolOption("HighlightEventChainZones", () => settings.Debug.HighlightEventChainZones,
+                    x => Raise(new SetHighlightEventChainZonesEvent(x)));
+                BoolOption("HighlightSelection", () => settings.Debug.HighlightSelection,
+                    x => Raise(new SetHighlightSelectionEvent(x)));
+                BoolOption("HighlightTile", () => settings.Debug.HighlightTile,
+                    x => Raise(new SetHighlightTileEvent(x)));
+                BoolOption("ShowBoundingBoxes", () => settings.Engine.Flags.HasFlag(EngineFlags.ShowBoundingBoxes),
+                    x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.ShowBoundingBoxes)));
+                BoolOption("ShowCameraPosition", () => settings.Engine.Flags.HasFlag(EngineFlags.ShowCameraPosition),
+                    x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.ShowCameraPosition)));
                 BoolOption("ShowPaths", () => settings.Debug.ShowPaths, x => Raise(new SetShowPathsEvent(x)));
+                BoolOption("VSync", () => settings.Engine.Flags.HasFlag(EngineFlags.VSync),
+                    x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.VSync)));
                 ImGui.EndGroup();
                 ImGui.TreePop();
             }
@@ -113,20 +135,24 @@ namespace UAlbion.Game
             {
                 var normPos = window.PixelToNorm(_mousePosition);
                 var uiPos = window.NormToUi(normPos);
-                uiPos.X = (int) uiPos.X; uiPos.Y = (int) uiPos.Y;
-                ImGui.Text($"Cursor Pix: {_mousePosition} UI: {uiPos} Norm: {normPos} Scale: {window.GuiScale} PixSize: {window.Size}");
-                ImGui.Text($"Camera World: {cameraPosition} Tile: {cameraTilePosition} Dir: {cameraDirection} Mag: {cameraMagnification}");
+                uiPos.X = (int)uiPos.X;
+                uiPos.Y = (int)uiPos.Y;
+                ImGui.Text(
+                    $"Cursor Pix: {_mousePosition} UI: {uiPos} Norm: {normPos} Scale: {window.GuiScale} PixSize: {window.Size}");
+                ImGui.Text(
+                    $"Camera World: {cameraPosition} Tile: {cameraTilePosition} Dir: {cameraDirection} Mag: {cameraMagnification}");
                 ImGui.Text($"TileSize: {map?.TileSize}");
                 ImGui.TreePop();
             }
 
             int hitId = 0;
+            bool anyHovered = false;
             if (ImGui.TreeNode("Global"))
             {
-                var reflected = Reflector.Reflect(null, Exchange);
+                var reflected = Reflector.Reflect(null, Exchange, null, 0);
                 if (reflected.SubObjects != null)
                     foreach (var child in reflected.SubObjects)
-                        RenderNode(child);
+                        anyHovered |= RenderNode(child);
                 ImGui.TreePop();
             }
 
@@ -134,17 +160,22 @@ namespace UAlbion.Game
             {
                 if (ImGui.TreeNode($"{hitId} {hit.Target}"))
                 {
-                    var reflected = Reflector.Reflect(null, hit.Target);
+                    var reflected = Reflector.Reflect(null, hit.Target, null, 0);
                     if (reflected.SubObjects != null)
                         foreach (var child in reflected.SubObjects)
-                            RenderNode(child);
+                            anyHovered |= RenderNode(child);
                     ImGui.TreePop();
                 }
 
                 hitId++;
             }
+
             ImGui.EndChild();
             ImGui.End();
+
+            if (!anyHovered && _lastHoveredItem?.Object != null &&
+                _behaviours.TryGetValue(_lastHoveredItem.Object.GetType(), out var blurredCallback))
+                blurredCallback(DebugInspectorAction.Blur, _lastHoveredItem);
 
             /*
 
@@ -158,29 +189,63 @@ namespace UAlbion.Game
             */
         }
 
-        void RenderNode(Reflector.ReflectedObject reflected)
+        bool CheckHover(Reflector.ReflectedObject reflected)
+        {
+            if (!ImGui.IsItemHovered()) 
+                return false;
+
+            if (_lastHoveredItem != reflected)
+            {
+                if (_lastHoveredItem?.Object != null &&
+                    _behaviours.TryGetValue(_lastHoveredItem.Object.GetType(), out var blurredCallback))
+                    blurredCallback(DebugInspectorAction.Blur, _lastHoveredItem);
+
+                if (reflected.Object != null &&
+                    _behaviours.TryGetValue(reflected.Object.GetType(), out var hoverCallback))
+                    hoverCallback(DebugInspectorAction.Hover, reflected);
+
+                _lastHoveredItem = reflected;
+            }
+
+            return true;
+        }
+
+        bool RenderNode(Reflector.ReflectedObject reflected)
         {
             var typeName = reflected.Object?.GetType().Name ?? "null";
-            var description = 
+            var description =
                 reflected.Name == null
-                ? $"{reflected.Value} ({typeName})"
-                : $"{reflected.Name}: {reflected.Value} ({typeName})";
+                    ? $"{reflected.Value} ({typeName})"
+                    : $"{reflected.Name}: {reflected.Value} ({typeName})";
 
+            bool anyHovered = false;
             if (reflected.SubObjects != null)
             {
                 if (ImGui.TreeNode(description))
                 {
+                    anyHovered |= CheckHover(reflected);
+
                     foreach (var child in reflected.SubObjects)
-                        RenderNode(child);
+                        anyHovered |= RenderNode(child);
                     ImGui.TreePop();
                 }
+                else anyHovered |= CheckHover(reflected);
             }
             else
             {
                 ImGui.TextWrapped(description);
+                anyHovered |= CheckHover(reflected);
             }
+
+            return anyHovered;
         }
 
         public DebugMapInspector() : base(Handlers) { }
+
+        public DebugMapInspector AddBehaviour(IDebugBehaviour behaviour)
+        {
+            _behaviours[behaviour.HandledType] = behaviour.Handle;
+            return this;
+        }
     }
 }

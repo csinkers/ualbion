@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core.Events;
 using Veldrid;
 using Veldrid.Utilities;
@@ -24,9 +24,8 @@ namespace UAlbion.Core.Visual
         public ScreenDuplicator() : base(Handlers) { }
         public string Name => "ScreenDuplicator";
         public RenderPasses RenderPasses => RenderPasses.Duplicator;
-        public int RenderOrder { get; set; } = int.MaxValue;
+        public DrawLayer RenderOrder => DrawLayer.MaxLayer;
         public Type Renderer => typeof(ScreenDuplicator);
-        public Matrix4x4 Transform => Matrix4x4.Identity;
 
         public void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)
         {

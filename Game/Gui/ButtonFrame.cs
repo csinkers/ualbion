@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
@@ -24,10 +24,10 @@ namespace UAlbion.Game.Gui
         static readonly ITheme DefaultTheme = new ButtonTheme();
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<ButtonFrame, WindowResizedEvent>((x, _) => x._lastExtents = new Rectangle())
-            );
+            H<ButtonFrame, WindowResizedEvent>((x, _) => x._lastExtents = new Rectangle()),
+            H<ButtonFrame, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; }));
 
-        UiMultiSprite _sprite;
+        SpriteLease _sprite;
         Rectangle _lastExtents;
         ButtonState _state = ButtonState.Normal;
         ITheme _theme = DefaultTheme;
@@ -57,12 +57,15 @@ namespace UAlbion.Game.Gui
                 Children.Add(child);
         }
 
-        void Rebuild(Rectangle extents)
+        void Rebuild(Rectangle extents, DrawLayer order)
         {
-            if (_lastExtents == extents) return;
+            if (_sprite != null && _lastExtents == extents && _sprite.Key.RenderOrder == order)
+                return;
+
             _lastExtents = extents;
 
             var window = Resolve<IWindowManager>();
+            var sm = Resolve<ISpriteManager>();
             var colors = _theme.GetColors(_state);
 
             uint C(CommonColor color) => CommonColors.Palette[color];
@@ -70,73 +73,75 @@ namespace UAlbion.Game.Gui
             uint bottomRight = C(colors.BottomRight);
             uint corners = C(colors.Corners);
             uint? background = colors.Background.HasValue ? C(colors.Background.Value) : (uint?)null;
+            int instanceCount = background.HasValue ? 7 : 6;
 
-            var flags = (SpriteFlags.NoTransform | SpriteFlags.UsePalette | SpriteFlags.NoDepthTest).SetOpacity(colors.Alpha);
-
-            var instances = new List<SpriteInstanceData>
+            if (_sprite?.Key.RenderOrder != order || instanceCount != _sprite?.Length)
             {
-                SpriteInstanceData.TopLeft( // Top
-                    Vector3.Zero,
-                    window.UiToNormRelative(new Vector2(extents.Width - 1, 1)),
-                    Vector2.Zero,
-                    Vector2.One,
-                    topLeft,
-                    flags),
-                SpriteInstanceData.TopLeft( // Bottom
-                    new Vector3(window.UiToNormRelative(new Vector2(1, extents.Height - 1)), 0),
-                    window.UiToNormRelative(new Vector2(extents.Width - 1, 1)),
-                    Vector2.Zero,
-                    Vector2.One,
-                    bottomRight,
-                    flags),
-                SpriteInstanceData.TopLeft( // Left
-                    new Vector3(window.UiToNormRelative(new Vector2(0, 1)), 0),
-                    window.UiToNormRelative(new Vector2(1, extents.Height - 2)),
-                    Vector2.Zero,
-                    Vector2.One,
-                    topLeft,
-                    flags),
-                SpriteInstanceData.TopLeft( // Right
-                    new Vector3(window.UiToNormRelative(new Vector2(extents.Width - 1, 1)), 0),
-                    window.UiToNormRelative(new Vector2(1, extents.Height - 2)),
-                    Vector2.Zero,
-                    Vector2.One,
-                    bottomRight,
-                    flags),
+                _sprite?.Dispose();
 
-                SpriteInstanceData.TopLeft( // Bottom Left Corner
-                    new Vector3(window.UiToNormRelative(new Vector2(0, extents.Height - 1)), 0),
-                    window.UiToNormRelative(Vector2.One),
-                    Vector2.Zero,
-                    Vector2.One,
-                    corners,
-                    flags),
-                SpriteInstanceData.TopLeft( // Top Right Corner
-                    new Vector3(window.UiToNormRelative(new Vector2(extents.Width - 1, 0)), 0),
-                    window.UiToNormRelative(Vector2.One),
-                    Vector2.Zero,
-                    Vector2.One,
-                    corners,
-                    flags),
-            };
+                var key = new SpriteKey(CommonColors.BorderTexture, order, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
+                _sprite = sm.Borrow(key, instanceCount, this);
+            }
+
+            var instances = _sprite.Access();
+
+            var position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);
+            var flags = SpriteFlags.None.SetOpacity(colors.Alpha);
+
+            instances[0] = SpriteInstanceData.TopLeft( // Top
+                position,
+                window.UiToNormRelative(new Vector2(extents.Width - 1, 1)),
+                Vector2.Zero,
+                Vector2.One,
+                topLeft,
+                flags);
+            instances[1] = SpriteInstanceData.TopLeft( // Bottom
+                position + new Vector3(window.UiToNormRelative(new Vector2(1, extents.Height - 1)), 0),
+                window.UiToNormRelative(new Vector2(extents.Width - 1, 1)),
+                Vector2.Zero,
+                Vector2.One,
+                bottomRight,
+                flags);
+            instances[2] = SpriteInstanceData.TopLeft( // Left
+                position + new Vector3(window.UiToNormRelative(new Vector2(0, 1)), 0),
+                window.UiToNormRelative(new Vector2(1, extents.Height - 2)),
+                Vector2.Zero,
+                Vector2.One,
+                topLeft,
+                flags);
+            instances[3] = SpriteInstanceData.TopLeft( // Right
+                position + new Vector3(window.UiToNormRelative(new Vector2(extents.Width - 1, 1)), 0),
+                window.UiToNormRelative(new Vector2(1, extents.Height - 2)),
+                Vector2.Zero,
+                Vector2.One,
+                bottomRight,
+                flags);
+
+            instances[4] = SpriteInstanceData.TopLeft( // Bottom Left Corner
+                position + new Vector3(window.UiToNormRelative(new Vector2(0, extents.Height - 1)), 0),
+                window.UiToNormRelative(Vector2.One),
+                Vector2.Zero,
+                Vector2.One,
+                corners,
+                flags);
+            instances[5] = SpriteInstanceData.TopLeft( // Top Right Corner
+                position + new Vector3(window.UiToNormRelative(new Vector2(extents.Width - 1, 0)), 0),
+                window.UiToNormRelative(Vector2.One),
+                Vector2.Zero,
+                Vector2.One,
+                corners,
+                flags);
 
             if (background.HasValue)
             {
-                instances.Add(SpriteInstanceData.TopLeft( // Background
-                    new Vector3(window.UiToNormRelative(new Vector2(1, 1)), 0),
+                instances[6] = SpriteInstanceData.TopLeft( // Background
+                    position + new Vector3(window.UiToNormRelative(new Vector2(1, 1)), 0),
                     window.UiToNormRelative(new Vector2(extents.Width - 2, extents.Height - 2)),
                     Vector2.Zero,
                     Vector2.One,
                     background.Value,
-                    flags.SetOpacity(colors.Alpha < 1.0f ? colors.Alpha / 2 : colors.Alpha)));
+                    flags.SetOpacity(colors.Alpha < 1.0f ? colors.Alpha / 2 : colors.Alpha));
             }
-
-            _sprite = new UiMultiSprite(new SpriteKey(CommonColors.BorderTexture, 0, flags))
-            {
-                Position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0),
-                Instances = instances.ToArray(),
-                Name = $"ButtonFrame:{State} {extents.X} {extents.Y} {extents.Width} {extents.Height}"
-            };
         }
 
         public override Vector2 GetSize() => GetMaxChildSize() + _padding * 2 * Vector2.One;
@@ -152,19 +157,15 @@ namespace UAlbion.Game.Gui
             return base.DoLayout(innerExtents, order + 1, func);
         }
 
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        public override int Render(Rectangle extents, int order)
         {
-            Rebuild(extents);
-            if (_sprite.RenderOrder != order)
-                _sprite.RenderOrder = order;
-
-            addFunc(_sprite);
-            return base.Render(extents, order, addFunc);
+            Rebuild(extents, (DrawLayer)order);
+            return base.Render(extents, order);
         }
 
         public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
-            Rebuild(extents);
+            Rebuild(extents, (DrawLayer)order);
             return base.Select(uiPosition, extents, order, registerHitFunc);
         }
     }

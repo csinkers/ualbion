@@ -165,6 +165,10 @@ namespace UAlbion.Core
                 using (PerfTracker.FrameEvent("6 Drawing"))
                     Draw();
 
+                var flags = Resolve<IEngineSettings>().Flags;
+                if (GraphicsDevice.SyncToVerticalBlank != flags.HasFlag(EngineFlags.VSync))
+                    GraphicsDevice.SyncToVerticalBlank = flags.HasFlag(EngineFlags.VSync);
+
                 using (PerfTracker.FrameEvent("7 Swap buffers"))
                 {
                     CoreTrace.Log.Info("Engine", "Swapping buffers...");

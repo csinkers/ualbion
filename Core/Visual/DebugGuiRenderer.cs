@@ -22,7 +22,7 @@ namespace UAlbion.Core.Visual
 
         public string Name => "DebugGuiRenderer";
         public RenderPasses RenderPasses => RenderPasses.Standard;
-        public int RenderOrder { get; set; } = (int)DrawLayer.Debug;
+        public DrawLayer RenderOrder => DrawLayer.Debug;
 
         public Type Renderer => typeof(DebugGuiRenderer);
         public Matrix4x4 Transform => Matrix4x4.Identity;

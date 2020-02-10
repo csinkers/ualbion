@@ -77,7 +77,7 @@ namespace UAlbion.Core.Textures
             }
 
             if (id >= _subImages.Count)
-                id = id % _subImages.Count;
+                id %= _subImages.Count;
 
             var subImage = _subImages[id];
             uint subresourceSize = Width * Height * Depth * GetFormatSize(Format);

@@ -1,8 +1,8 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
@@ -17,14 +17,27 @@ namespace UAlbion.Game.Input
         Vector2 _position;
         Vector2 _hotspot;
         Vector2 _size;
+        SpriteLease _cursorSprite;
+        SpriteLease _itemSprite;
+        bool _dirty = true;
 
         public CursorManager() : base(Handlers) { }
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<CursorManager, InputEvent>((x,e) => x._position = e.Snapshot.MousePosition - x._hotspot),
-            H<CursorManager, RenderEvent>((x,e) => x.Render(e)),
+            H<CursorManager, InputEvent>((x,e) =>
+            {
+                x._position = e.Snapshot.MousePosition - x._hotspot;
+                x._dirty = true;
+            }),
+            H<CursorManager, SetCursorPositionEvent>((x,e) =>
+            {
+                x._position = new Vector2(e.X, e.Y) - x._hotspot;
+                x._dirty = true;
+            }),
+            H<CursorManager, ClearInventoryItemInHandEvent>((x, e) => x._dirty = true),
+            H<CursorManager, SetInventoryItemInHandEvent>((x, e) => x._dirty = true),
+            H<CursorManager, RenderEvent>((x,e) => x.Render()),
             H<CursorManager, SetCursorEvent>((x,e) => x.SetCursor(e.CursorId)),
-            H<CursorManager, SetCursorPositionEvent>((x,e) => x._position = new Vector2(e.X, e.Y) - x._hotspot),
             H<CursorManager, WindowResizedEvent>((x,e) => x.SetCursor(x._cursorId))
         );
 
@@ -39,70 +52,89 @@ namespace UAlbion.Game.Input
             _hotspot = config.Hotspot == null 
                 ? Vector2.Zero
                 : window.GuiScale * new Vector2(config.Hotspot.X, config.Hotspot.Y);
+            _dirty = true;
         }
 
-        void Render(RenderEvent e)
+        void Render()
         {
+            if (!_dirty)
+                return;
+            _dirty = false;
+
+            var assets = Resolve<IAssetManager>();
+            var sm = Resolve<ISpriteManager>();
             var window = Resolve<IWindowManager>();
+
             if (window.Size.X < 1 || window.Size.Y < 1)
                 return;
 
+            var cursorTexture = assets.LoadTexture(_cursorId);
+            if (cursorTexture == null)
+                return;
+
+            if (cursorTexture != _cursorSprite?.Key.Texture)
+            {
+                _cursorSprite?.Dispose();
+                _cursorSprite = sm.Borrow(new SpriteKey(cursorTexture, DrawLayer.MaxLayer, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform), 1, this);
+            }
+
+            var instances = _cursorSprite.Access();
             var position = new Vector3(window.PixelToNorm(_position), 0.0f);
             var size = new Vector2(window.GuiScale, -window.GuiScale) * _size / window.Size;
-
-            e.Add(new Sprite<CoreSpriteId>(_cursorId,
-                0,
-                position,
-                (int)DrawLayer.MaxLayer,
-                SpriteFlags.NoTransform | SpriteFlags.NoDepthTest,
-                size));
+            instances[0] = SpriteInstanceData.TopMid(position, size, _cursorSprite, 0, 0);
 
             if (_cursorId == CoreSpriteId.CursorSmall) // Inventory screen, check what's being held.
             {
-                var assets = Resolve<IAssetManager>();
                 var state = Resolve<IGameState>();
                 var held = Resolve<IInventoryScreenState>().ItemInHand;
 
+                int subItem = 0;
+                ITexture texture = null;
+
                 if (held is GoldInHand)
                 {
-                    var spriteId = CoreSpriteId.UiGold;
-                    var texture = assets.LoadTexture(spriteId);
-                    texture.GetSubImageDetails(0, out var itemSize, out _, out _, out _);
-                    e.Add(BuildItemInHandSprite(spriteId, itemSize, position));
+                    texture = assets.LoadTexture(CoreSpriteId.UiGold);
                 }
                 else if (held is RationsInHand)
                 {
-                    var spriteId = CoreSpriteId.UiFood;
-                    var texture = assets.LoadTexture(spriteId);
-                    texture.GetSubImageDetails(0, out var itemSize, out _, out _, out _);
-                    e.Add(BuildItemInHandSprite(spriteId, itemSize, position));
+                    texture = assets.LoadTexture(CoreSpriteId.UiFood);
                 }
                 else if (held is ItemSlot itemInHand)
                 {
                     var item = assets.LoadItem(itemInHand.Id);
                     ItemSpriteId spriteId = item.Icon + state.TickCount % item.IconAnim;
-                    var texture = assets.LoadTexture(spriteId);
-                    texture.GetSubImageDetails((int)spriteId, out var itemSize, out _, out _, out _);
-                    e.Add(new Sprite<ItemSpriteId>(spriteId,
-                        (int)spriteId,
-                        position + new Vector3(window.UiToNormRelative(new Vector2(6, 0)), 0),
-                        (int)DrawLayer.MaxLayer,
-                        SpriteFlags.NoTransform | SpriteFlags.NoDepthTest,
-                        window.UiToNormRelative(itemSize)));
-                    // TODO: Quantity text
+                    texture = assets.LoadTexture(spriteId);
+                    subItem = (int)spriteId;
                 }
-            }
-        }
 
-        IRenderable BuildItemInHandSprite<T>(T spriteId, Vector2 size, Vector3 position) where T : Enum
-        {
-            var window = Resolve<IWindowManager>();
-            return new Sprite<T>(spriteId,
-                0,
-                position + new Vector3(window.UiToNormRelative(new Vector2(6, 6)), 0),
-                (int)DrawLayer.MaxLayer,
-                SpriteFlags.NoTransform | SpriteFlags.NoDepthTest,
-                window.UiToNormRelative(size));
+                if(texture == null)
+                {
+                    _itemSprite?.Dispose();
+                    _itemSprite = null;
+                    return;
+                }
+
+                if (texture != _itemSprite?.Key.Texture)
+                {
+                    _itemSprite?.Dispose();
+                    var key = new SpriteKey(texture, DrawLayer.MaxLayer, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
+                    _itemSprite = sm.Borrow(key, 1, this);
+                }
+
+                // TODO: Quantity text
+                instances = _itemSprite.Access();
+                instances[0] = SpriteInstanceData.TopMid(
+                    position + new Vector3(window.UiToNormRelative(new Vector2(6, 6)), 0),
+                    window.UiToNormRelative(size),
+                    _itemSprite,
+                    subItem,
+                    0);
+            }
+            else
+            {
+                _itemSprite?.Dispose();
+                _itemSprite = null;
+            }
         }
     }
 }

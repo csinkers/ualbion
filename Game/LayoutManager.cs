@@ -32,8 +32,8 @@ namespace UAlbion.Game
     public class LayoutManager : Component, ILayoutManager
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<LayoutManager, RenderEvent>((x,e) => x.Render(e)), 
-            H<LayoutManager, ScreenCoordinateSelectEvent>((x,e) => x.Select(e))
+            H<LayoutManager, RenderEvent>((x, _) => x.Render()),
+            H<LayoutManager, ScreenCoordinateSelectEvent>((x, e) => x.Select(e))
         );
 
         IReadOnlyList<IUiElement> _lastSelection = new List<IUiElement>();
@@ -50,7 +50,7 @@ namespace UAlbion.Game
                 var size = dialog.GetSize();
 
                 int x; int y;
-                switch(dialog.Positioning)
+                switch (dialog.Positioning)
                 {
                     case DialogPositioning.Center:
                         x = (uiWidth - (int)size.X) / 2;
@@ -77,7 +77,7 @@ namespace UAlbion.Game
                         y = uiHeight - (int)size.Y;
                         break;
                     case DialogPositioning.TopLeft:
-                        x = 0; 
+                        x = 0;
                         y = 0;
                         break;
                     case DialogPositioning.TopRight:
@@ -101,10 +101,7 @@ namespace UAlbion.Game
             }
         }
 
-        void Render(RenderEvent renderEvent)
-        {
-            DoLayout((extents, order, element) => element.Render(extents, order, renderEvent.Add));
-        }
+        void Render() => DoLayout((extents, order, element) => element.Render(extents, order));
 
         void Select(ScreenCoordinateSelectEvent selectEvent)
         {
@@ -119,7 +116,7 @@ namespace UAlbion.Game
                             float z = 1.0f - order / (float)DrawLayer.MaxLayer;
                             var intersectionPoint = new Vector3(normPosition, z);
                             selectEvent.RegisterHit(z, new Selection(intersectionPoint, target));
-                            if(target is IUiElement subElement)
+                            if (target is IUiElement subElement)
                                 newSelection.Add(subElement);
                         }));
 

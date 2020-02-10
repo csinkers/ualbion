@@ -1,106 +1,109 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using Veldrid.Utilities;
+using UAlbion.Api;
 
 namespace UAlbion.Core.Visual
 {
-    public class UiMultiSprite : MultiSprite, IScreenSpaceRenderable
+    public class MultiSprite : IRenderable
     {
-        public UiMultiSprite(SpriteKey key) : base(key) { }
-        public UiMultiSprite(SpriteKey key, int bufferId, IEnumerable<SpriteInstanceData> sprites) : base(key, bufferId, sprites) { }
-    }
+        const int MinSize = 4;
+        const double GrowthFactor = 1.5;
+        const double ShrinkFactor = 0.3;
 
-    public class MultiSprite : IPositionedRenderable
-    {
         public MultiSprite(SpriteKey key) { Key = key; }
-        public override string ToString() => $"Multi:{Name} {RenderOrder} Flags:{Flags} ({Instances.Length} instances)";
+        public override string ToString() => $"Multi:{Name} {RenderOrder} Flags:{Key.Flags} ({ActiveInstances}/{Instances.Length} instances)";
 
-        public MultiSprite(SpriteKey key, int bufferId, IEnumerable<SpriteInstanceData> sprites)
-        {
-            Key = key;
-            BufferId = bufferId;
-
-            if (sprites is SpriteInstanceData[] array)
-                Instances = array;
-            else
-                Instances = sprites.ToArray();
-            // CalculateExtents();
-        }
-/*
-        void CalculateExtents()
-        {
-            Vector3 min = Vector3.Zero;
-            Vector3 max = Vector3.Zero;
-            bool first = true;
-            foreach(var instance in Instances)
-            {
-                if (first)
-                {
-                    min = instance.Offset;
-                    max = instance.Offset + new Vector3(instance.Size.X, instance.Size.Y, instance.Size.X);
-                }
-                else
-                {
-                    min = Vector3.Min(min, instance.Offset);
-                    max = Vector3.Max(max, instance.Offset + new Vector3(instance.Size.X, instance.Size.Y, instance.Size.X));
-                }
-
-                first = false;
-            }
-            _extents = new BoundingBox(min, max);
-            ExtentsChanged?.Invoke(this, EventArgs.Empty);
-        }
-
-        public void RotateSprites(Vector3 cameraPosition)
-        {
-            for(int i = 0; i < Instances.Length; i++)
-            {
-                if ((Instances[i].Flags & SpriteFlags.Billboard) == 0)
-                    continue;
-
-                var delta = Instances[i].Offset - cameraPosition;
-                Instances[i].Rotation = -(float)Math.Atan2(delta.X, delta.Z);
-            }
-        }
-        BoundingBox _extents;
-*/
-        Vector3 _position;
         string _name;
-
         public string Name
         {
             get => _name ?? Key.Texture.Name;
             set => _name = value;
         }
 
-        public int RenderOrder
-        {
-            get => Key.RenderOrder;
-            set => Key = new SpriteKey(Key.Texture, value, Key.Flags);
-        }
-
+        public DrawLayer RenderOrder => Key.RenderOrder;
         public Type Renderer => typeof(SpriteRenderer);
 
-//        public BoundingBox? Extents => new BoundingBox(_extents.Min + Position, _extents.Max + Position);
-        public Matrix4x4 Transform { get; private set; } = Matrix4x4.Identity;
-
-        public event EventHandler ExtentsChanged;
-        public SpriteKey Key { get; private set; }
+        public SpriteKey Key { get; }
         public int BufferId { get; set; }
-        public SpriteFlags Flags => Key.Flags; // Common flags, mostly ignored.
+        public bool InstancesDirty { get; private set; }
+        public int ActiveInstances { get; private set; }
+        internal SpriteInstanceData[] Instances { get; private set; } = new SpriteInstanceData[MinSize];
+        readonly List<SpriteLease> _leases = new List<SpriteLease>();
 
-        public Vector3 Position
+        internal SpriteLease Grow(int length, object caller)
         {
-            get => _position;
-            set
+            PerfTracker.IncrementFrameCounter("Sprite Borrows");
+            int from = ActiveInstances;
+            ActiveInstances += length;
+            if (ActiveInstances >= Instances.Length)
             {
-                _position = value;
-                Transform = Matrix4x4.CreateTranslation(_position);
-                ExtentsChanged?.Invoke(this, EventArgs.Empty);
+                int newSize = Instances.Length;
+                while (newSize <= ActiveInstances)
+                    newSize = (int)(newSize * GrowthFactor);
+
+                var newArray = new SpriteInstanceData[newSize];
+                for (int i = 0; i < Instances.Length; i++)
+                    newArray[i] = Instances[i];
+                Instances = newArray;
+            }
+
+            var lease = new SpriteLease(this, from, ActiveInstances);
+#if DEBUG
+            lease.Owner = caller;
+#endif
+            _leases.Add(lease);
+            return lease;
+        }
+
+        internal void Shrink(SpriteLease leaseToRemove)
+        {
+            // TODO: Use a more efficient algorithm, e.g. look for equal sized lease at end of list and swap, use linked list for lease list etc
+
+            PerfTracker.IncrementFrameCounter("Sprite Returns");
+            bool shifting = false;
+            for (int n = 0; n < _leases.Count; n++)
+            {
+                if (!shifting && _leases[n].From == leaseToRemove.From)
+                {
+                    _leases.RemoveAt(n);
+                    ActiveInstances -= leaseToRemove.Length;
+                    shifting = true;
+                }
+
+                if (shifting && n < _leases.Count)
+                {
+                    var lease = _leases[n];
+                    for (int i = lease.From; i < lease.To; i++)
+                        Instances[i - leaseToRemove.Length] = Instances[i];
+                    lease.From -= leaseToRemove.Length;
+                    lease.To -= leaseToRemove.Length;
+                }
+            }
+
+            if ((double)ActiveInstances / Instances.Length < ShrinkFactor)
+            {
+                int newSize = Instances.Length;
+                while ((double) ActiveInstances / newSize > ShrinkFactor)
+                    newSize = (int)(newSize * ShrinkFactor);
+                newSize = Math.Max(newSize, ActiveInstances);
+                newSize = Math.Max(newSize, MinSize);
+
+                if (newSize != Instances.Length)
+                {
+                    var newArray = new SpriteInstanceData[newSize];
+                    for (int i = 0; i < ActiveInstances; i++)
+                        newArray[i] = Instances[i];
+                    Instances = newArray;
+                }
             }
         }
-        public SpriteInstanceData[] Instances { get; set; }
+
+        internal Span<SpriteInstanceData> GetSpan(SpriteLease lease)
+        {
+            PerfTracker.IncrementFrameCounter("Sprite Accesses");
+            InstancesDirty = true;
+            return new Span<SpriteInstanceData>(Instances, lease.From, lease.Length);
+        }
     }
 }
+

@@ -88,7 +88,7 @@ namespace UAlbion.Game.Entities
                 var objectData = _labyrinthData.ObjectGroups[npc.ObjectNumber - 1];
                 foreach (var subObject in objectData.SubObjects)
                 {
-                    var sprite = BuildSprite(npc.Waypoints[0].X, npc.Waypoints[0].Y, subObject, objectYScaling);
+                    var sprite = BuildMapObject(npc.Waypoints[0].X, npc.Waypoints[0].Y, subObject, objectYScaling);
                     if (sprite == null)
                         continue;
 
@@ -108,7 +108,7 @@ namespace UAlbion.Game.Entities
                     var objectInfo = _labyrinthData.ObjectGroups[contents - 1];
                     foreach (var subObject in objectInfo.SubObjects)
                     {
-                        var sprite = BuildSprite(x, y, subObject, objectYScaling);
+                        var sprite = BuildMapObject(x, y, subObject, objectYScaling);
                         if (sprite == null)
                             continue;
 
@@ -126,7 +126,7 @@ namespace UAlbion.Game.Entities
             Raise(new SetClearColourEvent(_backgroundRed, _backgroundGreen, _backgroundBlue));
         }
 
-        MapObjectSprite BuildSprite(int tileX, int tileY, SubObject subObject, float objectYScaling)
+        MapObject BuildMapObject(int tileX, int tileY, SubObject subObject, float objectYScaling)
         {
             var definition = _labyrinthData.Objects[subObject.ObjectInfoNumber];
             if (definition.TextureNumber == null)
@@ -152,9 +152,9 @@ namespace UAlbion.Game.Entities
                 ? new Vector3(0,offset.Y < float.Epsilon ? 0.5f : -0.5f, 0) 
                 : Vector3.Zero;
 
-            var position = tilePosition + offset + smidgeon;
+            Vector3 position = (tilePosition + offset + smidgeon) / TileSize;
 
-            return new MapObjectSprite(
+            return new MapObject(
                 definition.TextureNumber.Value,
                 position,
                 new Vector2(definition.MapWidth, definition.MapHeight),

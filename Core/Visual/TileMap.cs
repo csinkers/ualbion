@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using UAlbion.Api;
 using UAlbion.Core.Textures;
 
 namespace UAlbion.Core.Visual
@@ -33,7 +35,7 @@ namespace UAlbion.Core.Visual
             public override string ToString() => $"({TilePosition.X}, {TilePosition.Y}): {Floor}.{Ceiling}.{Wall} ({Flags})";
         }
 
-        public TileMap(string name, int renderOrder, Vector3 tileSize, uint width, uint height, IPaletteManager paletteManager)
+        public TileMap(string name, DrawLayer renderOrder, Vector3 tileSize, uint width, uint height, IPaletteManager paletteManager)
         {
             RenderOrder = renderOrder;
             TileSize = tileSize;
@@ -45,14 +47,13 @@ namespace UAlbion.Core.Visual
         }
 
         public string Name { get; set; }
-        public int RenderOrder { get; set; }
+        public DrawLayer RenderOrder { get; }
         public Vector3 Position { get; set; }
         public Vector3 TileSize { get; }
         public Type Renderer => typeof(ExtrudedTileMapRenderer);
 
-        // public BoundingBox? Extents => new BoundingBox(Position, Position + TileSize * new Vector3(Width, 1, Height));
-        public Matrix4x4 Transform => Matrix4x4.Identity;
         public Tile[] Tiles { get; }
+        public ISet<int> AnimatedTiles { get; } = new HashSet<int>();
         public uint Width { get; }
         public uint Height { get; }
         public MultiTexture Floors { get; }
@@ -63,6 +64,10 @@ namespace UAlbion.Core.Visual
 
         public void Set(int index, int x, int y, byte floorSubImage, byte ceilingSubImage, byte wallSubImage, int frame)
         {
+            bool isAnimated = Floors.IsAnimated(floorSubImage) || Floors.IsAnimated(ceilingSubImage) || Walls.IsAnimated(wallSubImage);
+            if (isAnimated) AnimatedTiles.Add(index);
+            else AnimatedTiles.Remove(index);
+
             unsafe
             {
                 fixed (Tile* tile = &Tiles[index])
@@ -70,7 +75,7 @@ namespace UAlbion.Core.Visual
                     tile->TilePosition = new Vector2(x, y);
                     tile->Floor = (byte)Floors.GetSubImageAtTime(floorSubImage, frame);
                     tile->Ceiling = (byte)Floors.GetSubImageAtTime(ceilingSubImage, frame);
-                    tile->Wall = (byte) Walls.GetSubImageAtTime(wallSubImage, frame);
+                    tile->Wall = (byte)Walls.GetSubImageAtTime(wallSubImage, frame);
                     tile->Flags = 0; // TileFlags.UsePalette;
                     Walls.GetSubImageDetails(tile->Wall, out _, out _, out var wallSize, out _);
                     tile->WallSize = wallSize;

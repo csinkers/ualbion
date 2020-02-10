@@ -12,7 +12,7 @@ namespace UAlbion.Game.Gui
     public class StatusBar : Dialog
     {
         const int MaxPortraits = 6;
-        readonly UiSprite<PictureId> _sprite;
+        readonly UiSpriteElement<PictureId> _sprite;
         readonly StatusBarPortrait[] _portraits;
         readonly Text _hoverText;
         readonly Text _descriptionText;
@@ -28,7 +28,7 @@ namespace UAlbion.Game.Gui
 
         public StatusBar() : base(Handlers, DialogPositioning.StatusBar, int.MaxValue)
         {
-            _sprite = new UiSprite<PictureId>(PictureId.StatusBar);
+            _sprite = new UiSpriteElement<PictureId>(PictureId.StatusBar);
             Children.Add(_sprite);
             _portraits = new StatusBarPortrait[MaxPortraits];
             for (int i = 0; i < _portraits.Length; i++)
@@ -91,7 +91,7 @@ namespace UAlbion.Game.Gui
             return maxOrder;
         }
 
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc) =>
-            DoLayout(extents, order, (x, y, z) => x.Render(y, z, addFunc), false);
+        public override int Render(Rectangle extents, int order) =>
+            DoLayout(extents, order, (x, y, z) => x.Render(y, z), false);
     }
 }

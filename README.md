@@ -1,5 +1,5 @@
 # UAlbion
-A remake of the 1996 RPG Albion (requires data from an install of the original game)
+A remake of the 1995 RPG Albion (requires data from an install of the original game)
 
 Prerequisites: .NET Core 3.0
 ## Screenshots:

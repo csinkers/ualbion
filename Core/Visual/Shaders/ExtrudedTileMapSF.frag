@@ -1,12 +1,11 @@
-﻿//!#version 450
+﻿//!#version 450 // Comments with //! are for tricking the Visual Studio GLSL plugin into doing the right thing
 //!#extension GL_KHR_vulkan_glsl: enable
 
 // Resource Sets / Uniforms 
-layout(binding = 3) uniform sampler PaletteSampler;  //! // vdspv_0_3
-layout(binding = 4) uniform texture2D PaletteView;   //! // vdspv_0_4
-layout(binding = 5) uniform sampler TextureSampler;  //! // vdspv_0_5
-layout(binding = 6) uniform texture2DArray Floors;   //! // vdspv_0_6
-layout(binding = 7) uniform texture2DArray Walls;    //! // vdspv_0_7
+layout(binding = 1) uniform sampler PaletteSampler;  //! // vdspv_0_3
+layout(binding = 2) uniform sampler TextureSampler;  //! // vdspv_0_5
+layout(binding = 3) uniform texture2DArray Floors;   //! // vdspv_0_6
+layout(binding = 4) uniform texture2DArray Walls;    //! // vdspv_0_7
 
 #include "CommonResources.glsl"
 
@@ -40,15 +39,15 @@ void main()
 			break;
 	}
 
-	if ((iFlags & TF_USE_PALETTE) != 0)
-	{
-		float redChannel = color[0];
-		float index = 255.0f * redChannel;
-		if(index == 0)
-			color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-		else
-			color = texture(sampler2D(PaletteView, PaletteSampler), vec2(redChannel, 0.0f)); //! {}
-	}
+#ifdef USE_PALETTE
+	float redChannel = color[0];
+	float index = 255.0f * redChannel;
+	if(index == 0)
+		color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+		color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	else
+		color = texture(sampler2D(uPalette, PaletteSampler), vec2(redChannel, 0.0f)); //! {}
+#endif
 	// else if(color.x != 0) color = vec4(color.xx, 0.5f, 1.0f);
 
 	if(color.w == 0.0f)
@@ -69,6 +68,7 @@ void main()
 	}
 
 	OutputColor = color;
-	gl_FragDepth = ((u_engine_flags & EF_FLIP_DEPTH_RANGE) != 0) ? 1.0f - gl_FragCoord.z : gl_FragCoord.z;
+	float depth = (color.w == 0.0f) ? 0.0f : gl_FragCoord.z;
+	gl_FragDepth = ((u_engine_flags & EF_FLIP_DEPTH_RANGE) != 0) ? 1.0f - depth : depth;
 }
 

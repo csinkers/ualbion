@@ -17,7 +17,6 @@ namespace UAlbion.Game.Entities
 {
     public class MapRenderable3D : Component
     {
-        const int TicksPerFrame = 8;
         readonly MapDataId _mapId;
         readonly MapData3D _mapData;
         readonly LabyrinthData _labyrinthData;
@@ -25,10 +24,12 @@ namespace UAlbion.Game.Entities
         readonly IDictionary<int, IList<int>> _tilesByDistance = new Dictionary<int, IList<int>>();
         TileMap _tilemap;
         bool _isSorting = false;
+        bool _fullUpdate = true;
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<MapRenderable3D, RenderEvent>((x, e) => x.Render(e)),
-            H<MapRenderable3D, PostUpdateEvent>((x, _) => x.PostUpdate()),
+            H<MapRenderable3D, SlowClockEvent>((x, e) => x.OnSlowClock(e)),
+            H<MapRenderable3D, ExchangeDisabledEvent>((x,_) => x._tilemap = null),
             H<MapRenderable3D, SortMapTilesEvent>((x, e) => x._isSorting = e.IsSorting),
             H<MapRenderable3D, LoadPaletteEvent>((x, e) => {})
         );
@@ -51,7 +52,7 @@ namespace UAlbion.Game.Entities
             var assets = Resolve<IAssetManager>();
             _tilemap = new TileMap(
                 _mapId.ToString(),
-                (int)DrawLayer.Background, 
+                DrawLayer.Background, 
                 _tileSize,
                 _mapData.Width, _mapData.Height,
                 Resolve<IPaletteManager>());
@@ -83,9 +84,10 @@ namespace UAlbion.Game.Entities
                 }
             }
 
+            _fullUpdate = true;
         }
 
-        void SetTile(int index, int order, int ticks)
+        void SetTile(int index, int order, int frameCount)
         {
             byte i = (byte)(index % _mapData.Width);
             byte j = (byte)(index / _mapData.Width);
@@ -96,16 +98,41 @@ namespace UAlbion.Game.Entities
                 ? 0
                 : contents - 100);
 
-            _tilemap.Set(order, i, j, floorIndex, ceilingIndex, wallIndex, ticks / TicksPerFrame);
+            _tilemap.Set(order, i, j, floorIndex, ceilingIndex, wallIndex, frameCount);
         }
 
-        void PostUpdate()
+        void OnSlowClock(SlowClockEvent e)
         {
-            var state = Resolve<IGameState>();
-            if (state == null)
+            if (_isSorting)
+            {
+                SortingUpdate(e);
                 return;
+            }
 
-            using var _ = PerfTracker.FrameEvent("Update tilemap");
+            using var _ = PerfTracker.FrameEvent("5.1 Update tilemap");
+
+            if (_fullUpdate)
+            {
+                for (int j = 0; j < _mapData.Height; j++)
+                {
+                    for (int i = 0; i < _mapData.Width; i++)
+                    {
+                        int index = j * _mapData.Width + i;
+                        SetTile(index, index, e.FrameCount);
+                    }
+                }
+
+                _fullUpdate = false;
+            }
+            else
+                foreach (var index in _tilemap.AnimatedTiles)
+                    SetTile(index, index, e.FrameCount);
+        }
+
+        void SortingUpdate(SlowClockEvent e)
+        {
+            using var _ = PerfTracker.FrameEvent("5.1 Update tilemap (sorting)");
+
             foreach (var list in _tilesByDistance.Values)
                 list.Clear();
 
@@ -131,29 +158,23 @@ namespace UAlbion.Game.Entities
                     }
 
                     int index = j * _mapData.Width + i;
-                    if(_isSorting)
-                        list.Add(index);
-                    else
-                        SetTile(index, index, state.TickCount);
+                    list.Add(index);
                 }
             }
 
-            if (_isSorting)
+            int order = 0;
+            foreach (var distance in _tilesByDistance.OrderByDescending(x => x.Key).ToList())
             {
-                int order = 0;
-                foreach (var distance in _tilesByDistance.OrderByDescending(x => x.Key).ToList())
+                if (distance.Value.Count == 0)
                 {
-                    if (distance.Value.Count == 0)
-                    {
-                        _tilesByDistance.Remove(distance.Key);
-                        continue;
-                    }
+                    _tilesByDistance.Remove(distance.Key);
+                    continue;
+                }
 
-                    foreach (var index in distance.Value)
-                    {
-                        SetTile(index, order, state.TickCount);
-                        order++;
-                    }
+                foreach (var index in distance.Value)
+                {
+                    SetTile(index, order, e.FrameCount);
+                    order++;
                 }
             }
         }

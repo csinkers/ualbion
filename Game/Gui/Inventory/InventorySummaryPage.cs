@@ -15,7 +15,7 @@ namespace UAlbion.Game.Gui.Inventory
             _activeMember = activeMember;
             var background = new FixedPosition(
                 new Rectangle(0, 26, 135, 144),
-                new UiSprite<SmallPortraitId>((SmallPortraitId)(int)activeMember));
+                new UiSpriteElement<SmallPortraitId>((SmallPortraitId)(int)activeMember));
 
             var summarySource = new DynamicText(BuildSummary);
             var pointsSource = new DynamicText(BuildPoints);

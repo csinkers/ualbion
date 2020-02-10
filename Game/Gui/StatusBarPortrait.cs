@@ -28,7 +28,7 @@ namespace UAlbion.Game.Gui
             H<StatusBarPortrait, TimerElapsedEvent>((x, e) => { if (e.Id == TimerName) x.OnTimer(); })
         );
 
-        readonly UiSprite<SmallPortraitId> _portrait;
+        readonly UiSpriteElement<SmallPortraitId> _portrait;
         readonly StatusBarHealthBar _health;
         readonly StatusBarHealthBar _mana;
         readonly int _order;
@@ -37,7 +37,7 @@ namespace UAlbion.Game.Gui
         public StatusBarPortrait(int order) : base(Handlers)
         {
             _order = order;
-            _portrait = new UiSprite<SmallPortraitId>(SmallPortraitId.Tom);
+            _portrait = new UiSpriteElement<SmallPortraitId>(SmallPortraitId.Tom);
             _health = new StatusBarHealthBar(order, true);
             _mana = new StatusBarHealthBar(order, false);
             Children.Add(_portrait);

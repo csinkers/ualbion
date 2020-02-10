@@ -13,15 +13,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Visual\*.frag" />
-    <None Remove="Visual\*.vert" />
-    <None Remove="Visual\*.glsl" />
+    <None Remove="Visual\Shaders\*.frag" />
+    <None Remove="Visual\Shaders\*.vert" />
+    <None Remove="Visual\Shaders\*.glsl" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Visual\*.frag" />
-    <EmbeddedResource Include="Visual\*.vert" />
-    <EmbeddedResource Include="Visual\*.glsl" />
+    <EmbeddedResource Include="Visual\Shaders\*.frag" />
+    <EmbeddedResource Include="Visual\Shaders\*.vert" />
+    <EmbeddedResource Include="Visual\Shaders\*.glsl" />
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\veldrid\')">

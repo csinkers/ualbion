@@ -11,6 +11,7 @@ namespace UAlbion.Core.Events
         static IComponent _logger;
         static int _nesting = -1;
         static readonly object SyncRoot = new object();
+        static readonly ExchangeDisabledEvent DisabledEvent = new ExchangeDisabledEvent();
         public static int Nesting => _nesting;
 
         readonly IDictionary<Type, IList<IComponent>> _subscriptions = new Dictionary<Type, IList<IComponent>>();
@@ -23,13 +24,25 @@ namespace UAlbion.Core.Events
 #if DEBUG
         // ReSharper disable once CollectionNeverQueried.Local
         readonly IList<IEvent> _frameEvents = new List<IEvent>();
+        IList<IComponent> _sortedSubscribersCached;
+        public IList<IComponent> SortedSubscribers
+        {
+            get
+            {
+                lock (SyncRoot)
+                {
+                    if (_sortedSubscribersCached?.Count != _subscribers.Count)
+                        _sortedSubscribersCached = _subscribers.Keys.OrderBy(x => x.ToString()).ToList();
+                    return _sortedSubscribersCached;
+                }
+            }
+        } 
 #endif
 
         public string Name { get; }
 
         bool _isActive = true;
 
-        public IEnumerable<object> SortedSubscribers { get { lock(SyncRoot) { return _subscribers.Keys.OrderBy(x => x.ToString()).ToList(); } } } 
         public bool IsActive
         {
             get => _isActive;
@@ -38,9 +51,9 @@ namespace UAlbion.Core.Events
                 if (_isActive == value)
                     return;
 
-                _isActive = value;
                 if (value)
                 {
+                    _isActive = true;
                     IList<IComponent> subscribers;
                     lock (SyncRoot)
                     {
@@ -52,6 +65,11 @@ namespace UAlbion.Core.Events
                     foreach (var subscriber in subscribers)
                         if (subscriber.IsSubscribed) // Another components subscribe call may have detached some of the subscribers
                             subscriber.Subscribed();
+                }
+                else
+                {
+                    Raise(DisabledEvent, this, false);
+                    _isActive = false;
                 }
             }
         }
@@ -119,10 +137,10 @@ namespace UAlbion.Core.Events
                 _parent?.CollectExchanges(exchanges);
 
             foreach (var childExchange in _children)
-                childExchange.CollectExchanges(exchanges);
+                childExchange.CollectExchanges(exchanges, includeParent);
         }
 
-        public void Raise(IEvent e, object sender)
+        public void Raise(IEvent e, object sender, bool includeParent = true)
         {
             // Event raising goes both up and down the hierarchy (i.e. all events will be delivered to all interested subscribers on all active exchanges)
             // As such, the number of exchanges should be kept to a minimum. e.g. one global, one for the active scene etc
@@ -155,7 +173,7 @@ namespace UAlbion.Core.Events
 
             var exchanges = new HashSet<EventExchange>();
             lock (SyncRoot)
-                CollectExchanges(exchanges);
+                CollectExchanges(exchanges, includeParent);
             foreach (var exchange in exchanges)
             {
 #if DEBUG
@@ -229,10 +247,12 @@ namespace UAlbion.Core.Events
         {
             lock (SyncRoot)
             {
-                if (!_subscribers.TryGetValue(subscriber, out var subscribedTypes))
+                subscriber.Receive(DisabledEvent, this);
+
+                if (!_subscribers.TryGetValue(subscriber, out var subscribedEventTypes))
                     return;
 
-                foreach (var type in subscribedTypes.ToList())
+                foreach (var type in subscribedEventTypes.ToList())
                     _subscriptions[type].Remove(subscriber);
 
                 _subscribers.Remove(subscriber);
@@ -243,11 +263,11 @@ namespace UAlbion.Core.Events
         {
             lock (SyncRoot)
             {
-                if (!_subscribers.TryGetValue(subscriber, out var subscribedTypes))
+                if (!_subscribers.TryGetValue(subscriber, out var subscribedEventTypes))
                     return;
 
-                subscribedTypes.Remove(typeof(T));
-                _subscriptions[typeof(T)].Remove(subscriber);
+                if (subscribedEventTypes.Remove(typeof(T)))
+                    _subscriptions[typeof(T)].Remove(subscriber);
             }
         }
 

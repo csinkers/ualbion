@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core.Events;
 
 namespace UAlbion.Core
@@ -14,8 +15,15 @@ namespace UAlbion.Core
             H<PerspectiveCamera, SetCameraDirectionEvent>((x, e) => { x.Yaw = e.Yaw; x.Pitch = e.Pitch; }),
             H<PerspectiveCamera, SetFieldOfViewEvent>((x, e) =>
             {
-                x.FieldOfView = (float)(Math.PI * e.Degrees / 180);
-                x.UpdatePerspectiveMatrix();
+                if(e.Degrees == null)
+                {
+                    x.Raise(new LogEvent(LogEvent.Level.Info, $"FOV {Util.RadToDeg(x.FieldOfView)}"));
+                }
+                else
+                {
+                    x.FieldOfView = Util.DegToRad(e.Degrees.Value);
+                    x.UpdatePerspectiveMatrix();
+                }
             })
         );
 

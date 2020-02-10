@@ -14,6 +14,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
+using UAlbion.Game.Debugging;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
@@ -43,6 +44,11 @@ namespace UAlbion
             if (args.Contains("-vk") || args.Contains("--vulkan")) _backend = GraphicsBackend.Vulkan;
             if (args.Contains("-metal") || args.Contains("--metal")) _backend = GraphicsBackend.Metal;
             if (args.Contains("-d3d") || args.Contains("--direct3d")) _backend = GraphicsBackend.Direct3D11;
+            if (args.Contains("-h") || args.Contains("--help") || args.Contains("/?") || args.Contains("help"))
+            {
+                DisplayUsage();
+                return;
+            }
 
             PerfTracker.StartupEvent("Entered main");
             //GraphTests();
@@ -72,6 +78,7 @@ namespace UAlbion
                 .Register<ISettings>(settings) 
                 .Register<IEngineSettings>(settings)
                 .Register<IAssetManager>(assets)
+                .Register<ITextureLoader>(assets)
                 ;
             PerfTracker.StartupEvent("Registered asset manager");
 
@@ -98,7 +105,7 @@ namespace UAlbion
 
             global
                 .Register<IShaderCache>(new ShaderCache(
-                    Path.Combine(baseDir, "Core", "Visual"),
+                    Path.Combine(baseDir, "Core", "Visual", "Shaders"),
                     Path.Combine(baseDir, "data", "ShaderCache")))
                 .Attach(engine);
 
@@ -118,6 +125,7 @@ namespace UAlbion
                     .Register<IMapManager>(new MapManager())
                     .Register<IPaletteManager>(new PaletteManager())
                     .Register<ISceneManager>(new SceneManager()
+                        .AddScene(new EmptyScene())
                         .AddScene(new AutomapScene())
                         .AddScene(new FlatScene())
                         .AddScene(new DungeonScene())
@@ -125,12 +133,14 @@ namespace UAlbion
                         .AddScene(new InventoryScene())
                     )
                     .Register<IClock>(new GameClock())
-                    .Register<ISpriteResolver>(new SpriteResolver())
+                    .Register<ISpriteManager>(new SpriteManager())
                     .Register<IGameState>(new GameState())
                     .Register<ITextManager>(new TextManager())
                     .Register<ITextureManager>(new TextureManager())
+                    .Attach(new SlowClock())
                     .Attach(new CursorManager())
-                    .Attach(new DebugMapInspector())
+                    .Attach(new DebugMapInspector()
+                        .AddBehaviour(new SpriteInstanceDataDebugBehaviour()))
                     .Attach(new InputBinder(InputConfig.Load(baseDir)))
                     .Attach(new InputModeStack())
                     .Attach(new MouseModeStack())
@@ -144,7 +154,7 @@ namespace UAlbion
                     .Attach(new InventoryScreen(inventoryConfig))
                     ;
 
-                var menuBackground = new ScreenSpaceSprite<PictureId>(
+                var menuBackground = Sprite<PictureId>.ScreenSpaceSprite(
                     PictureId.MenuBackground8,
                     new Vector2(-1.0f, 1.0f),
                     new Vector2(2.0f, -2.0f));
@@ -163,8 +173,8 @@ namespace UAlbion
                 global.Raise(new SetSceneEvent(SceneId.Inventory), null);
                 //*/
 
-                //global.Raise(new SetSceneEvent((int)SceneId.MainMenu), null);
-                global.Raise(new NewGameEvent(), null);
+                global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
+                //global.Raise(new NewGameEvent(), null);
                 ReflectionHelper.ClearTypeCache();
             });
 
@@ -176,6 +186,25 @@ namespace UAlbion
                 global.Raise(new QuitEvent(), null);
 
             engine.Run();
+            // TODO: Ensure all sprite leases returned etc to weed out memory leaks
+        }
+
+        static void DisplayUsage()
+        {
+            Console.WriteLine(@"UAlbion
+Command Line Options:
+
+    -h --help /? help  : Display this help
+    --startuponly      : Exit immediately after the first frame (for profiling startup time etc)
+    -rd    --renderdoc : Load the RenderDoc plugin on startup
+
+Set Rendering Backend:
+    -gl    --opengl     Use OpenGL
+    -gles  --opengles   Use OpenGLES
+    -vk    --vulkan     Use Vulkan
+    -metal --metal      Use Metal
+    -d3d   --direct3d   Use Direct3D11
+");
         }
 
         static void TransformTests()

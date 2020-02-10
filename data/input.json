@@ -7,6 +7,7 @@
     "BracketLeft": "e:mag -1",
     "BracketRight": "e:mag 1",
     "V": "push_mouse_mode DebugPick",
+    "Shift+V": "hide_debug_window",
     "F5": "start_clock",
     "F6": "stop_clock",
     "F10": "update 1",

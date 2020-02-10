@@ -120,6 +120,8 @@ namespace UAlbion.Core
         }
 
         public static float Lerp(float a, float b, float t) => t * (b - a) + a;
+        public static float DegToRad(float degrees) => (float)Math.PI * degrees / 180.0f;
+        public static float RadToDeg(float radians) => 180.0f * radians / (float)Math.PI;
 
         public static uint UpdateFlag(uint flags, FlagOperation operation, uint flag)
         {

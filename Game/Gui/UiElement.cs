@@ -38,7 +38,7 @@ namespace UAlbion.Game.Gui
         }
 
         public virtual Vector2 GetSize() => GetMaxChildSize();
-        public virtual int Render(Rectangle extents, int order, Action<IRenderable> addFunc) => DoLayout(extents, order, (x,y,z) => x.Render(y, z, addFunc));
+        public virtual int Render(Rectangle extents, int order) => DoLayout(extents, order, (x,y,z) => x.Render(y, z));
         public virtual int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
             if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))

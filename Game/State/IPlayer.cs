@@ -13,6 +13,6 @@ namespace UAlbion.Game.State
         IEffectiveCharacterSheet Effective { get; }
         IEffectiveCharacterSheet Apparent { get; }
         InventoryAction GetInventoryAction(ItemSlotId slotId);
-        Func<Vector2> GetPosition { get; set; } // TODO: Find a better solution
+        Func<Vector3> GetPosition { get; set; } // TODO: Find a better solution
     }
 }

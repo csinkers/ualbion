@@ -1,5 +1,5 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Gui;
@@ -10,7 +10,8 @@ namespace UAlbion.Game.Entities
     public class TextChunk : UiElement // Renders a single TextBlock in the UI
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<TextChunk, WindowResizedEvent>((x,e) => x.IsDirty = true)
+            H<TextChunk, WindowResizedEvent>((x,e) => x.IsDirty = true),
+            H<TextChunk, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; })
         );
 
         // Driving properties
@@ -18,36 +19,35 @@ namespace UAlbion.Game.Entities
         public bool IsDirty { get; set; }
 
         // Dependent properties
-        IPositionedRenderable _sprite;
-        Vector2 _size;
+        PositionedSpriteBatch _sprite;
+        DrawLayer _lastOrder = DrawLayer.Interface;
 
         public TextChunk(TextBlock block) : base(Handlers) { Block = block; }
         public override void Subscribed() { IsDirty = true;}
-        public override string ToString() => $"TextChunk:{Block} ({_size.X}x{_size.Y})";
+        public override string ToString() => _sprite == null ? $"TextChunk:{Block} (unloaded)" : $"TextChunk:{Block} ({_sprite.Size.X}x{_sprite.Size.Y})";
 
-        void Rebuild()
+        void Rebuild(DrawLayer order)
         {
-            if (!IsDirty)
+            if (!IsDirty && order == _sprite?.RenderOrder)
                 return;
-            var textManager = Resolve<ITextManager>();
-            _sprite = textManager.BuildRenderable(Block, out var size);
-            _size = size;
+
+            _sprite?.Dispose();
+            _sprite = Resolve<ITextManager>().BuildRenderable(Block, order, this);
+            _lastOrder = order;
             IsDirty = false;
         }
 
         public override Vector2 GetSize()
         {
-            Rebuild();
-            return _size;
+            Rebuild(_lastOrder);
+            return _sprite.Size;
         }
 
-        public override int Render(Rectangle extents, int order, Action<IRenderable> addFunc)
+        public override int Render(Rectangle extents, int order)
         {
-            Rebuild();
+            Rebuild((DrawLayer)order);
 
             var window = Resolve<IWindowManager>();
-            if (_sprite.RenderOrder != order)
-                _sprite.RenderOrder = order;
 
             var newPosition = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);
             switch (Block.Alignment)
@@ -58,23 +58,21 @@ namespace UAlbion.Game.Entities
                     newPosition += 
                         new Vector3(
                             window.UiToNormRelative(new Vector2(
-                                (extents.Width - _size.X) / 2,
-                                (extents.Height - _size.Y) / 2)), 
+                                (extents.Width - _sprite.Size.X) / 2,
+                                (extents.Height - _sprite.Size.Y) / 2)), 
                             0);
                     break;
                 case TextAlignment.Right:
                     newPosition += 
                         new Vector3(
                             window.UiToNormRelative(new Vector2(
-                                extents.Width - _size.X,
-                                extents.Height - _size.Y)), 
+                                extents.Width - _sprite.Size.X,
+                                extents.Height - _sprite.Size.Y)), 
                             0);
                     break;
             }
 
-            if (_sprite.Position != newPosition) // Check first to avoid excessive triggering of the ExtentsChanged event.
-                _sprite.Position = newPosition;
-            addFunc(_sprite);
+            _sprite.Position = newPosition;
             return order;
         }
     }

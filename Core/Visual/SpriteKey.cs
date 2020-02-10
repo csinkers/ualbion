@@ -1,35 +1,26 @@
 ﻿using System;
+using UAlbion.Api;
 using UAlbion.Core.Textures;
 
 namespace UAlbion.Core.Visual
 {
     public struct SpriteKey : IEquatable<SpriteKey>
     {
-        public SpriteKey(ITexture texture, int renderOrder, SpriteFlags flags)
+        public SpriteKey(ITexture texture, DrawLayer renderOrder, SpriteKeyFlags flags)
         {
             Texture = texture;
             RenderOrder = renderOrder;
-            Flags = flags & (SpriteFlags)SpriteFlagMask.SpriteKey;
+            Flags = flags;
         }
+
         public ITexture Texture { get; }
-        public int RenderOrder { get; }
-        public SpriteFlags Flags { get; }
+        public DrawLayer RenderOrder { get; }
+        public SpriteKeyFlags Flags { get; }
 
-        public bool Equals(SpriteKey other) =>
-            Equals(Texture, other.Texture) && 
-            RenderOrder == other.RenderOrder && 
-            Flags == other.Flags;
-
+        public bool Equals(SpriteKey other) => Equals(Texture, other.Texture) && RenderOrder == other.RenderOrder && Flags == other.Flags;
         public override bool Equals(object obj) => obj is SpriteKey other && Equals(other);
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = (Texture != null ? Texture.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ RenderOrder;
-                hashCode = (hashCode * 397) ^ Flags.GetHashCode();
-                return hashCode;
-            }
-        }
+        public override int GetHashCode() => HashCode.Combine(Texture, RenderOrder, (int)Flags);
+        public static bool operator ==(SpriteKey a, SpriteKey b) => Equals(a, b);
+        public static bool operator !=(SpriteKey a, SpriteKey b) => !(a == b);
     }
 }

@@ -16,7 +16,7 @@ namespace UAlbion.Core
         );
 
         readonly IDictionary<Type, IList<IRenderable>> _renderables = new Dictionary<Type, IList<IRenderable>>();
-        readonly IDictionary<int, IList<IRenderable>> _processedRenderables = new Dictionary<int, IList<IRenderable>>();
+        readonly IDictionary<DrawLayer, IList<IRenderable>> _processedRenderables = new Dictionary<DrawLayer, IList<IRenderable>>();
         readonly IList<Type> _activeRendererTypes;
         PaletteTexture _paletteTexture;
         RgbaFloat _clearColour;
@@ -34,7 +34,6 @@ namespace UAlbion.Core
 
         public void Add(IRenderable renderable) { } // TODO
         public void Remove(IRenderable renderable) { } // TODO
-
         public override string ToString() => $"Scene:{Name}";
 
         public void RenderAllStages(GraphicsDevice gd, CommandList cl, SceneContext sc, IDictionary<Type, IRenderer> renderers)
@@ -79,8 +78,7 @@ namespace UAlbion.Core
                 foreach (var renderableGroup in _renderables)
                 {
                     var renderer = renderers[renderableGroup.Key];
-                    foreach (var renderable in renderer.UpdatePerFrameResources(gd, cl, sc,
-                        renderableGroup.Value))
+                    foreach (var renderable in renderer.UpdatePerFrameResources(gd, cl, sc, renderableGroup.Value))
                     {
                         if (!_processedRenderables.ContainsKey(renderable.RenderOrder))
                             _processedRenderables[renderable.RenderOrder] = new List<IRenderable>();
@@ -91,6 +89,8 @@ namespace UAlbion.Core
                 CoreTrace.Log.CollectedRenderables("ProcessedRenderables",
                     _processedRenderables.Count,
                     _processedRenderables.Sum(x => x.Value.Count));
+
+                sc.UpdatePerFrameResources(gd, cl);
             }
 
             var orderedKeys = _processedRenderables.Keys.OrderBy(x => x).ToList();
@@ -101,7 +101,6 @@ namespace UAlbion.Core
             using (PerfTracker.FrameEvent("6.1.3 Main scene pass"))
             using (new RenderDebugGroup(cl, "Main Scene Pass"))
             {
-                sc.UpdateCameraBuffers(cl);
                 cl.SetFramebuffer(sc.MainSceneFramebuffer);
                 var fbWidth = sc.MainSceneFramebuffer.Width;
                 var fbHeight = sc.MainSceneFramebuffer.Height;
@@ -150,11 +149,6 @@ namespace UAlbion.Core
         {
             foreach (IRenderable renderable in renderableList)
             {
-                if(renderable is IScreenSpaceRenderable)
-                    sc.UpdateModelTransform(cl, renderable.Transform);
-                else
-                    sc.UpdateModelTransform(cl, Camera.ViewMatrix * renderable.Transform);
-
                 var renderer = renderers[renderable.Renderer];
                 if ((renderer.RenderPasses & pass) != 0)
                     renderer.Render(gd, cl, sc, pass, renderable);

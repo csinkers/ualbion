@@ -60,6 +60,8 @@ namespace UAlbion.Game.Entities
             else
             {
                 var texture = assets.LoadTexture(_id);
+                if (texture == null)
+                    return;
                 var key = new SpriteKey(texture, order, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
                 texture.GetSubImageDetails(0, out var size, out _, out _, out _);
                 _sprite = sm.Borrow(key, 1, this);
@@ -82,6 +84,9 @@ namespace UAlbion.Game.Entities
                 _dirty = true;
 
             UpdateSprite((DrawLayer)order);
+
+            if(_sprite == null)
+                return order;
 
             var window = Resolve<IWindowManager>();
             var position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);

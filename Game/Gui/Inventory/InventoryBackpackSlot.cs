@@ -3,7 +3,6 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
-using UAlbion.Game.State;
 using Veldrid;
 
 namespace UAlbion.Game.Gui.Inventory
@@ -14,9 +13,11 @@ namespace UAlbion.Game.Gui.Inventory
         readonly UiSpriteElement<ItemSpriteId> _sprite;
         readonly int _slotNumber;
         int _version;
+        int _frameNumber;
         protected override ItemSlotId SlotId => (ItemSlotId)((int)ItemSlotId.Slot0 + _slotNumber);
         static readonly HandlerSet BackpackHandlers = new HandlerSet(SlotHandlers,
-            H<InventoryBackpackSlot, InventoryChangedEvent>((x, e) => x._version++)
+            H<InventoryBackpackSlot, InventoryChangedEvent>((x, e) => x._version++),
+            H<InventoryBackpackSlot, SlowClockEvent>((x, e) => x._frameNumber += e.Delta)
         );
 
         // 70 * 128, 4 * 6
@@ -64,7 +65,6 @@ namespace UAlbion.Game.Gui.Inventory
 
         void Rebuild()
         {
-            var state = Resolve<IGameState>();
             GetSlot(out _, out var item);
 
             if(item == null)
@@ -74,7 +74,10 @@ namespace UAlbion.Game.Gui.Inventory
             }
 
             int frames = item.IconAnim == 0 ? 1 : item.IconAnim;
-            int itemSpriteId = (int)item.Icon + state.TickCount % frames;
+            while (_frameNumber >= frames)
+                _frameNumber -= frames;
+
+            int itemSpriteId = (int)item.Icon + _frameNumber;
             _sprite.SubId = itemSpriteId;
             // TODO: Show item.Amount
             // TODO: Show broken overlay if item.Flags.HasFlag(ItemSlotFlags.Broken)

@@ -1,5 +1,4 @@
 ﻿using System;
-using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using Veldrid;
 

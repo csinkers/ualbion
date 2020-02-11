@@ -169,7 +169,7 @@ namespace UAlbion.Game.Entities
                 _animatedUnderlayIndices = animatedUnderlayTiles.ToArray();
                 _animatedOverlayIndices = animatedOverlayTiles.ToArray();
             }
-            else if(frameCount != _lastFrameCount)
+            else if (frameCount != _lastFrameCount)
             {
                 var underlayInstances = _underlay.Access();
                 foreach (var index in _animatedUnderlayIndices)

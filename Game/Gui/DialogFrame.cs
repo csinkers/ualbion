@@ -33,7 +33,7 @@ namespace UAlbion.Game.Gui
                 var normSize = window.UiToNormRelative(new Vector2(width, height));
                 var pixelSize = window.NormToPixelRelative(normSize);
 
-                if ((pixelSize - _lastPixelSize).LengthSquared() < float.Epsilon && _sprite.RenderOrder == order)
+                if ((pixelSize - _lastPixelSize).LengthSquared() < float.Epsilon && _sprite?.RenderOrder == order)
                     return;
                 _lastPixelSize = pixelSize;
             }

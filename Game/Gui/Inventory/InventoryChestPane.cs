@@ -1,6 +1,4 @@
-﻿using UAlbion.Game.Events;
-
-namespace UAlbion.Game.Gui.Inventory
+﻿namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryChestPane : UiElement
     {

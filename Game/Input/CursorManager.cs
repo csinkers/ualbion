@@ -20,6 +20,7 @@ namespace UAlbion.Game.Input
         SpriteLease _cursorSprite;
         SpriteLease _itemSprite;
         bool _dirty = true;
+        int _frame;
 
         public CursorManager() : base(Handlers) { }
 
@@ -37,9 +38,11 @@ namespace UAlbion.Game.Input
             H<CursorManager, ClearInventoryItemInHandEvent>((x, e) => x._dirty = true),
             H<CursorManager, SetInventoryItemInHandEvent>((x, e) => x._dirty = true),
             H<CursorManager, RenderEvent>((x,e) => x.Render()),
+            H<CursorManager, SlowClockEvent>((x, e) => x._frame += e.Delta),
             H<CursorManager, SetCursorEvent>((x,e) => x.SetCursor(e.CursorId)),
             H<CursorManager, WindowResizedEvent>((x,e) => x.SetCursor(x._cursorId))
         );
+
 
         void SetCursor(CoreSpriteId id)
         {
@@ -75,17 +78,20 @@ namespace UAlbion.Game.Input
             if (cursorTexture != _cursorSprite?.Key.Texture)
             {
                 _cursorSprite?.Dispose();
-                _cursorSprite = sm.Borrow(new SpriteKey(cursorTexture, DrawLayer.MaxLayer, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform), 1, this);
+
+                var key = new SpriteKey(cursorTexture, DrawLayer.MaxLayer,
+                    SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
+
+                _cursorSprite = sm.Borrow(key, 1, this);
             }
 
             var instances = _cursorSprite.Access();
             var position = new Vector3(window.PixelToNorm(_position), 0.0f);
-            var size = new Vector2(window.GuiScale, -window.GuiScale) * _size / window.Size;
+            var size = window.UiToNormRelative(_size) / 2;
             instances[0] = SpriteInstanceData.TopMid(position, size, _cursorSprite, 0, 0);
 
             if (_cursorId == CoreSpriteId.CursorSmall) // Inventory screen, check what's being held.
             {
-                var state = Resolve<IGameState>();
                 var held = Resolve<IInventoryScreenState>().ItemInHand;
 
                 int subItem = 0;
@@ -102,7 +108,7 @@ namespace UAlbion.Game.Input
                 else if (held is ItemSlot itemInHand)
                 {
                     var item = assets.LoadItem(itemInHand.Id);
-                    ItemSpriteId spriteId = item.Icon + state.TickCount % item.IconAnim;
+                    ItemSpriteId spriteId = item.Icon + _frame % item.IconAnim;
                     texture = assets.LoadTexture(spriteId);
                     subItem = (int)spriteId;
                 }
@@ -117,18 +123,21 @@ namespace UAlbion.Game.Input
                 if (texture != _itemSprite?.Key.Texture)
                 {
                     _itemSprite?.Dispose();
-                    var key = new SpriteKey(texture, DrawLayer.MaxLayer, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
+
+                    var key = new SpriteKey(texture, DrawLayer.MaxLayer,
+                        SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
+
                     _itemSprite = sm.Borrow(key, 1, this);
                 }
+
+                texture.GetSubImageDetails(subItem, out size, out var to, out var ts, out var tl);
 
                 // TODO: Quantity text
                 instances = _itemSprite.Access();
                 instances[0] = SpriteInstanceData.TopMid(
                     position + new Vector3(window.UiToNormRelative(new Vector2(6, 6)), 0),
                     window.UiToNormRelative(size),
-                    _itemSprite,
-                    subItem,
-                    0);
+                    to, ts, tl, 0);
             }
             else
             {

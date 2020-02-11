@@ -11,7 +11,7 @@ namespace UAlbion.Core.Visual
         None = 0,
         // LSB is SpriteFlags
         AlignmentMask = 0x7,
-        DebugFlags = 0xf00,
+        DebugFlags = 0xe00,
         OpacityMask = 0xff000000, // MSB is opacity
 
         LeftAligned    =    0x1, // Horizontal alignment

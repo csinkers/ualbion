@@ -38,9 +38,9 @@ namespace UAlbion.Game.Entities
         }
 
         int _subId;
+        bool _highlighted;
         public int SubId { get => _subId; set { if (_subId == value) return; _subId = value; _dirty = true; } }
-
-        public bool Highlighted { get; set; }
+        public bool Highlighted { get => _highlighted; set { if (_highlighted == value) return; _highlighted = value; _dirty = true; } }
 
         void UpdateSprite(DrawLayer order)
         {
@@ -91,7 +91,7 @@ namespace UAlbion.Game.Entities
                 return order;
 
             var instances = _sprite.Access();
-            instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, _subId, 0);
+            instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, _subId, Highlighted ? SpriteFlags.Highlight : 0);
             _lastPosition = position;
             _lastSize = size;
             _dirty = false;

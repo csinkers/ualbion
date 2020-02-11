@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Numerics;
-using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using Veldrid;
 
@@ -8,31 +7,48 @@ namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryActivePageSelector : UiElement
     {
+        readonly PartyCharacterId _activeCharacter;
         readonly Func<InventoryPage> _getPage;
-        readonly InventorySummaryPage _summary;
-        readonly InventoryStatsPage _stats;
-        readonly InventoryMiscPage _misc;
+        InventoryPage _lastPage = (InventoryPage)(object)-1;
 
         public InventoryActivePageSelector(PartyCharacterId activeCharacter, Func<InventoryPage> getPage)
         {
+            _activeCharacter = activeCharacter;
             _getPage = getPage;
-            _summary = new InventorySummaryPage(activeCharacter);
-            _stats = new InventoryStatsPage(activeCharacter);
-            _misc = new InventoryMiscPage(activeCharacter);
-            Children.Add(_summary);
-            Children.Add(_stats);
-            Children.Add(_misc);
         }
 
-        IUiElement GetActivePage() =>
-            _getPage() switch
+        void ChangePage()
+        {
+            var pageId = _getPage();
+            if (pageId == _lastPage)
+                return;
+
+            _lastPage = pageId;
+            foreach(var child in Children)
+                child.Detach();
+            Children.Clear();
+
+            IUiElement page = pageId switch
             {
-                InventoryPage.Summary => (IUiElement)_summary,
-                InventoryPage.Stats => _stats,
-                InventoryPage.Misc => _misc, 
+                InventoryPage.Summary => new InventorySummaryPage(_activeCharacter),
+                InventoryPage.Stats => new InventoryStatsPage(_activeCharacter),
+                InventoryPage.Misc => new InventoryMiscPage(_activeCharacter),
                 InventoryPage x => throw new NotImplementedException($"Unhandled inventory page \"{x}\"")
             };
-        public override int Render(Rectangle extents, int order) => GetActivePage().Render(extents, order);
-        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc) => GetActivePage().Select(uiPosition, extents, order, registerHitFunc);
+
+            Children.Add(page);
+            page.Attach(Exchange);
+        }
+        public override int Render(Rectangle extents, int order)
+        {
+            ChangePage();
+            return base.Render(extents, order);
+        }
+
+        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+        {
+            ChangePage();
+            return base.Select(uiPosition, extents, order, registerHitFunc);
+        }
     }
 }

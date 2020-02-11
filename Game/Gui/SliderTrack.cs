@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Numerics;
-using UAlbion.Core;
 using UAlbion.Game.Events;
 using Veldrid;
 

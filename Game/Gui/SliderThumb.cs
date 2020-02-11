@@ -1,5 +1,4 @@
 ﻿using System;
-using UAlbion.Core;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using Veldrid;

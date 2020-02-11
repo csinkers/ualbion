@@ -6,28 +6,11 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Events;
-using UAlbion.Game.Gui;
 using Veldrid;
 
-namespace UAlbion.Game
+namespace UAlbion.Game.Gui
 {
-    public interface ILayoutManager
-    {
-    }
-
-    public enum DialogPositioning
-    {
-        Center,
-        Bottom,
-        Top,
-        Left,
-        Right,
-        BottomLeft,
-        TopLeft,
-        TopRight,
-        BottomRight,
-        StatusBar,
-    }
+    public interface ILayoutManager { }
 
     public class LayoutManager : Component, ILayoutManager
     {

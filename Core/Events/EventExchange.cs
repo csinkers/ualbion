@@ -21,6 +21,8 @@ namespace UAlbion.Core.Events
         readonly ThreadLocal<bool> _isTopLevel = new ThreadLocal<bool>(() => true);
         readonly EventExchange _parent;
         readonly IList<EventExchange> _children = new List<EventExchange>();
+        readonly Stack<HashSet<IComponent>> _dispatchLists = new Stack<HashSet<IComponent>>();
+
 #if DEBUG
         // ReSharper disable once CollectionNeverQueried.Local
         readonly IList<IEvent> _frameEvents = new List<IEvent>();
@@ -115,8 +117,11 @@ namespace UAlbion.Core.Events
             lock (SyncRoot)
             {
                 if (_subscriptions.TryGetValue(type, out var tempSubscribers))
+                {
+                    subscribers.EnsureCapacity(tempSubscribers.Count);
                     foreach (var subscriber in tempSubscribers)
                         subscribers.Add(subscriber);
+                }
 
                 foreach(var @interface in interfaces)
                     if (_subscriptions.TryGetValue(@interface, out var interfaceSubscribers))
@@ -159,7 +164,6 @@ namespace UAlbion.Core.Events
             else _frameEvents.Add(e);
 #endif
 
-            HashSet<IComponent> subscribers = new HashSet<IComponent>();
             var type = e.GetType();
             var interfaces = type.GetInterfaces();
             string eventText = null;
@@ -172,8 +176,14 @@ namespace UAlbion.Core.Events
             }
 
             var exchanges = new HashSet<EventExchange>();
+            HashSet<IComponent> subscribers;
             lock (SyncRoot)
+            {
                 CollectExchanges(exchanges, includeParent);
+                if (!_dispatchLists.TryPop(out subscribers))
+                    subscribers = new HashSet<IComponent>();
+            }
+
             foreach (var exchange in exchanges)
             {
 #if DEBUG
@@ -190,6 +200,10 @@ namespace UAlbion.Core.Events
                 if (verbose) CoreTrace.Log.StopRaiseVerbose(_nesting, e.GetType().Name, eventText, subscribers.Count);
                 else CoreTrace.Log.StopRaise(_nesting, e.GetType().Name, eventText, subscribers.Count);
             }
+
+            subscribers.Clear();
+            lock (SyncRoot)
+                _dispatchLists.Push(subscribers);
 
             if (!verbose)
                 Interlocked.Decrement(ref _nesting);

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using UAlbion.Api;
-using UAlbion.Core;
 
 namespace UAlbion.Game
 {

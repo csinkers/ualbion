@@ -1,1 +1,1 @@
-dotnet build -c Release ualbion.sln 
+dotnet build -c Release ualbion.sln --runtime linux-x64

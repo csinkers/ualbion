@@ -1,4 +1,4 @@
 ﻿namespace UAlbion.Core.Events
 {
-    public class ExchangeDisabledEvent : EngineEvent { }
+    public class ExchangeDisabledEvent : EngineEvent, IVerboseEvent { }
 }

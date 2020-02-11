@@ -9,9 +9,7 @@ namespace UAlbion.Game.Gui.Inventory
     public class InventoryExitButton : UiElement
     {
         readonly string _buttonId;
-        UiSpriteElement<CoreSpriteId> _normal;
-        UiSpriteElement<CoreSpriteId> _hover;
-        UiSpriteElement<CoreSpriteId> _clicked;
+        UiSpriteElement<CoreSpriteId> _sprite;
         ButtonState _state;
 
         static readonly HandlerSet Handlers = new HandlerSet(
@@ -27,33 +25,29 @@ namespace UAlbion.Game.Gui.Inventory
                 }
             })
         );
-        public InventoryExitButton(string buttonId) : base(Handlers)
-        {
-            _buttonId = buttonId;
-        }
+        public InventoryExitButton(string buttonId) : base(Handlers) => _buttonId = buttonId;
 
         public override void Subscribed()
         {
-            _normal = new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiExitButton);
-            _hover = new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiExitButtonHover);
-            _clicked = new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiExitButtonPressed);
-            Exchange
-                .Attach(_normal)
-                .Attach(_hover)
-                .Attach(_clicked);
-            Children.Add(_normal);
-            Children.Add(_hover);
-            Children.Add(_clicked);
+            if (_sprite == null)
+            {
+                _sprite = new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiExitButton);
+                Exchange.Attach(_sprite);
+                Children.Add(_sprite);
+            }
             base.Subscribed();
         }
 
-        protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func) =>
-            _state switch
-            {
-                ButtonState.Normal => func(_normal, extents, order),
-                ButtonState.Hover => func(_hover, extents, order),
-                ButtonState.Clicked => func(_clicked, extents, order),
-                _ => order
-            };
+        protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+        {
+            _sprite.Id = _state switch
+                {
+                    ButtonState.Normal  => CoreSpriteId.UiExitButton,
+                    ButtonState.Hover   => CoreSpriteId.UiExitButtonHover,
+                    ButtonState.Clicked => CoreSpriteId.UiExitButtonPressed,
+                    _ => _sprite.Id
+                };
+            return base.DoLayout(extents, order, func);
+        }
     }
 }

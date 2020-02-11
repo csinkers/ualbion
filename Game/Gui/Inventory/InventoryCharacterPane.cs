@@ -22,19 +22,17 @@ namespace UAlbion.Game.Gui.Inventory
             _summaryButton = new Button(SummaryButtonId, "I") { DoubleFrame = true, IsPressed = page == InventoryPage.Summary };
             _statsButton = new Button(StatsButtonId, "II") { DoubleFrame = true, IsPressed = page == InventoryPage.Stats };
             _miscButton = new Button(MiscButtonId, "III") { DoubleFrame = true, IsPressed = page == InventoryPage.Misc };
-            var buttonStack = new HorizontalStack(
-                new Padding(84,0),
-                new FixedSize(16, 15, _summaryButton),
-                new FixedSize(16, 15, _statsButton),
-                new FixedSize(16, 15, _miscButton));
+            var buttonStack =
+                new FixedPosition(
+                    new Rectangle(84, 174, 50, 15),
+                    new HorizontalStack(
+                    new FixedSize(16, 15, _summaryButton),
+                    new FixedSize(16, 15, _statsButton),
+                    new FixedSize(16, 15, _miscButton)
+                ));
 
-            var stack = new VerticalStack(
-                new InventoryActivePageSelector(activeCharacter, getPage),
-                new Padding(0, 4),
-                buttonStack
-                );
-
-            Children.Add(stack);
+            Children.Add(buttonStack);
+            Children.Add(new InventoryActivePageSelector(activeCharacter, getPage));
         }
 
         public override int Render(Rectangle extents, int order)

@@ -9,7 +9,12 @@ namespace UAlbion.Game.Entities
     public class MapObject : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<MapObject, SlowClockEvent>((x, e) => { x._sprite.Frame += e.Delta; }));
+            H<MapObject, SlowClockEvent>((x, e) =>
+            {
+                if (x._sprite.FrameCount == 1)
+                    x.Exchange.Unsubscribe<SlowClockEvent>(x);
+                x._sprite.Frame += e.Delta;
+            }));
 
         readonly Vector3 _initialPosition;
         readonly MapSprite<DungeonObjectId> _sprite;

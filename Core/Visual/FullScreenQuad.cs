@@ -20,6 +20,7 @@ namespace UAlbion.Core.Visual
         public string Name => "FullScreenQuad";
         public RenderPasses RenderPasses => RenderPasses.SwapchainOutput;
         public DrawLayer RenderOrder => DrawLayer.MaxLayer;
+        public int PipelineId => 1;
         public Type Renderer => typeof(FullScreenQuad);
         public Matrix4x4 Transform => Matrix4x4.Identity;
 

@@ -13,7 +13,7 @@ using Veldrid;
 
 namespace UAlbion.Core
 {
-    public class Engine : Component, IDisposable
+    public class Engine : Component, IEngine, IDisposable
     {
         const int DefaultWidth = 720;
         const int DefaultHeight = 480;
@@ -69,7 +69,7 @@ namespace UAlbion.Core
         internal GraphicsDevice GraphicsDevice { get; private set; }
         internal RenderDoc RenderDoc => _renderDoc;
 
-        internal string FrameTimeText => _frameTimeAverager.CurrentAverageFramesPerSecond.ToString("000.0 fps / ") +
+        public string FrameTimeText => _frameTimeAverager.CurrentAverageFramesPerSecond.ToString("000.0 fps / ") +
                                          _frameTimeAverager.CurrentAverageFrameTimeMilliseconds.ToString("#00.00 ms");
 
         public Engine(GraphicsBackend backend, bool useRenderDoc) : base(Handlers)
@@ -348,6 +348,7 @@ namespace UAlbion.Core
                     r.DestroyDeviceObjects();
 
                 Resolve<ITextureManager>()?.DestroyDeviceObjects();
+                Resolve<IDeviceObjectManager>()?.DestroyDeviceObjects();
                 GraphicsDevice.WaitForIdle();
             }
         }

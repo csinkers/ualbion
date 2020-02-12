@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using UAlbion.Api;
 using UAlbion.Core.Textures;
 using Veldrid;
 using Veldrid.Utilities;
@@ -15,6 +16,10 @@ namespace UAlbion.Core.Visual
         public bool PerformDepthTest { get; }
         public bool UsePalette { get; }
 
+        public SpriteShaderKey(MultiSprite sprite) : this(
+                sprite.Key.Texture.ArrayLayers > 1,
+                !sprite.Key.Flags.HasFlag(SpriteKeyFlags.NoDepthTest),
+                sprite.Key.Texture is EightBitTexture) { }
         public SpriteShaderKey(bool useArrayTexture, bool performDepthTest, bool usePalette)
         {
             UseArrayTexture = useArrayTexture;
@@ -75,8 +80,6 @@ namespace UAlbion.Core.Visual
 
 
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
-        readonly IList<DeviceBuffer> _instanceBuffers = new List<DeviceBuffer>();
-        readonly IList<ResourceSet> _resourceSets = new List<ResourceSet>();
         readonly List<Shader> _shaders = new List<Shader>();
 
         // Context objects
@@ -191,30 +194,46 @@ namespace UAlbion.Core.Visual
         public IEnumerable<IRenderable> UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, SceneContext sc, IEnumerable<IRenderable> renderables)
         {
             ITextureManager textureManager = Resolve<ITextureManager>();
+            IDeviceObjectManager dom = Resolve<IDeviceObjectManager>();
 
-            foreach (var buffer in _instanceBuffers)
-                buffer.Dispose();
-            _instanceBuffers.Clear();
-
-            foreach (var resourceSet in _resourceSets)
-                resourceSet.Dispose();
-            _resourceSets.Clear();
-
-            void SetupMultiSpriteResources(MultiSprite multiSprite)
+            foreach(var sprite in renderables.OfType<MultiSprite>())
             {
-                textureManager?.PrepareTexture(multiSprite.Key.Texture, gd);
-                multiSprite.BufferId = _instanceBuffers.Count;
-                var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)multiSprite.Instances.Length * SpriteInstanceData.StructSize, BufferUsage.VertexBuffer));
-                buffer.Name = $"B_SpriteInst{_instanceBuffers.Count}";
-                cl.UpdateBuffer(buffer, 0, multiSprite.Instances);
-                _instanceBuffers.Add(buffer);
-            }
+                if (sprite.ActiveInstances == 0) continue;
 
-            foreach(var multiSprite in renderables.OfType<MultiSprite>())
-            {
-                if (multiSprite.ActiveInstances == 0) continue;
-                SetupMultiSpriteResources(multiSprite);
-                yield return multiSprite;
+                uint bufferSize = (uint) sprite.Instances.Length * SpriteInstanceData.StructSize;
+                var buffer = dom.Prepare((sprite, sprite),
+                    () =>
+                    {
+                        var newBuffer = gd.ResourceFactory.CreateBuffer(new BufferDescription(bufferSize, BufferUsage.VertexBuffer));
+                        newBuffer.Name = $"B_SpriteInst:{sprite.Name}";
+                        PerfTracker.IncrementFrameCounter("Create InstanceBuffer");
+                        return newBuffer;
+                    }, existing => existing.SizeInBytes != bufferSize);
+
+                if (sprite.InstancesDirty)
+                {
+                    cl.UpdateBuffer(buffer, 0, sprite.Instances);
+                    PerfTracker.IncrementFrameCounter("Update InstanceBuffers");
+                }
+
+                textureManager?.PrepareTexture(sprite.Key.Texture, gd);
+                TextureView textureView = textureManager?.GetTexture(sprite.Key.Texture);
+                dom.Prepare((sprite, textureView),
+                    () =>
+                    {
+                        var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
+                            _perSpriteResourceLayout,
+                            gd.PointSampler,
+                            textureView,
+                            _uniformBuffer));
+                        resourceSet.Name = $"RS_Sprite:{sprite.Key.Texture.Name}";
+                        PerfTracker.IncrementFrameCounter("Create ResourceSet");
+                        return resourceSet;
+                    }, _ => false
+                );
+
+                sprite.InstancesDirty = false;
+                yield return sprite;
             }
 
             Resolve<ISpriteManager>().Cleanup();
@@ -223,12 +242,11 @@ namespace UAlbion.Core.Visual
         public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable renderable)
         {
             ITextureManager textureManager = Resolve<ITextureManager>();
+            IDeviceObjectManager dom = Resolve<IDeviceObjectManager>();
             // float depth = gd.IsDepthRangeZeroToOne ? 0 : 1;
             var sprite = (MultiSprite)renderable;
-            var shaderKey = new SpriteShaderKey(
-                sprite.Key.Texture.ArrayLayers > 1,
-                !sprite.Key.Flags.HasFlag(SpriteKeyFlags.NoDepthTest),
-                sprite.Key.Texture is EightBitTexture);
+            var shaderKey = new SpriteShaderKey(sprite);
+            sprite.PipelineId = shaderKey.GetHashCode();
 
             //if (!shaderKey.UseArrayTexture)
             //    return;
@@ -237,26 +255,20 @@ namespace UAlbion.Core.Visual
 
             var uniformInfo = new SpriteUniformInfo { Flags = sprite.Key.Flags };
             cl.UpdateBuffer(_uniformBuffer, 0, uniformInfo);
-            TextureView textureView = textureManager?.GetTexture(sprite.Key.Texture);
 
             if (sc.PaletteView == null)
                 return;
 
-            var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
-                _perSpriteResourceLayout,
-                gd.PointSampler,
-                textureView,
-                _uniformBuffer));
-
-            resourceSet.Name = $"RS_Sprite:{sprite.Key.Texture.Name}";
-            _resourceSets.Add(resourceSet);
+            TextureView textureView = textureManager?.GetTexture(sprite.Key.Texture);
+            var resourceSet = dom.Get<ResourceSet>((sprite, textureView));
+            var instanceBuffer = dom.Get<DeviceBuffer>((sprite, sprite));
 
             cl.SetPipeline(_pipelines[shaderKey]);
             cl.SetGraphicsResourceSet(0, resourceSet);
             cl.SetGraphicsResourceSet(1, sc.CommonResourceSet);
             cl.SetVertexBuffer(0, _vertexBuffer);
             cl.SetIndexBuffer(_indexBuffer, IndexFormat.UInt16);
-            cl.SetVertexBuffer(1, _instanceBuffers[sprite.BufferId]);
+            cl.SetVertexBuffer(1, instanceBuffer);
 
             //cl.SetViewport(0, new Viewport(0, 0, sc.MainSceneColorTexture.Width, sc.MainSceneColorTexture.Height, depth, depth));
             cl.DrawIndexed((uint)Indices.Length, (uint)sprite.ActiveInstances, 0, 0, 0);
@@ -274,14 +286,6 @@ namespace UAlbion.Core.Visual
                     pipeline.Value.Dispose();
                 _pipelines = null;
             }
-
-            foreach (var buffer in _instanceBuffers)
-                buffer.Dispose();
-            _instanceBuffers.Clear();
-
-            foreach (var resourceSet in _resourceSets)
-                resourceSet.Dispose();
-            _resourceSets.Clear();
 
             foreach(var shader in _shaders)
                 shader.Dispose();

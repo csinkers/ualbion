@@ -6,6 +6,7 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
+using UAlbion.Core.Visual;
 using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
@@ -89,6 +90,8 @@ namespace UAlbion.Game.Debugging
                     PerfTracker.Clear();
 
                 ImGui.BeginGroup();
+                ImGui.Text(Resolve<IEngine>().FrameTimeText);
+
                 var (descriptions, stats) = PerfTracker.GetFrameStats();
                 ImGui.Columns(2);
                 ImGui.SetColumnWidth(0, 300);
@@ -101,6 +104,18 @@ namespace UAlbion.Game.Debugging
 
                 ImGui.Columns(1);
                 ImGui.EndGroup();
+                if (ImGui.TreeNode("Textures"))
+                {
+                    ImGui.Text(Resolve<ITextureManager>()?.Stats());
+                    ImGui.TreePop();
+                }
+
+                if (ImGui.TreeNode("DeviceObjects"))
+                {
+                    ImGui.Text(Resolve<IDeviceObjectManager>()?.Stats());
+                    ImGui.TreePop();
+                }
+
                 ImGui.TreePop();
             }
 

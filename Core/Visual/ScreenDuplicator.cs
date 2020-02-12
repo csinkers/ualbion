@@ -25,6 +25,7 @@ namespace UAlbion.Core.Visual
         public string Name => "ScreenDuplicator";
         public RenderPasses RenderPasses => RenderPasses.Duplicator;
         public DrawLayer RenderOrder => DrawLayer.MaxLayer;
+        public int PipelineId => 1;
         public Type Renderer => typeof(ScreenDuplicator);
 
         public void CreateDeviceObjects(GraphicsDevice gd, CommandList cl, SceneContext sc)

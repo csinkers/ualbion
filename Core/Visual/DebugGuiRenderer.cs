@@ -23,6 +23,7 @@ namespace UAlbion.Core.Visual
         public string Name => "DebugGuiRenderer";
         public RenderPasses RenderPasses => RenderPasses.Standard;
         public DrawLayer RenderOrder => DrawLayer.Debug;
+        public int PipelineId => 1;
 
         public Type Renderer => typeof(DebugGuiRenderer);
         public Matrix4x4 Transform => Matrix4x4.Identity;

@@ -107,7 +107,7 @@ namespace UAlbion
                 .Register<IShaderCache>(new ShaderCache(
                     Path.Combine(baseDir, "Core", "Visual", "Shaders"),
                     Path.Combine(baseDir, "data", "ShaderCache")))
-                .Attach(engine);
+                .Register<IEngine>(engine);
 
             var backgroundThreadInitTask = Task.Run(() =>
             {
@@ -137,6 +137,7 @@ namespace UAlbion
                     .Register<IGameState>(new GameState())
                     .Register<ITextManager>(new TextManager())
                     .Register<ITextureManager>(new TextureManager())
+                    .Register<IDeviceObjectManager>(new DeviceObjectManager())
                     .Attach(new SlowClock())
                     .Attach(new CursorManager())
                     .Attach(new DebugMapInspector()

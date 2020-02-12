@@ -7,5 +7,6 @@ namespace UAlbion.Core.Textures
         TextureView GetTexture(ITexture texture);
         void PrepareTexture(ITexture texture, GraphicsDevice gd);
         void DestroyDeviceObjects();
+        string Stats();
     }
 }

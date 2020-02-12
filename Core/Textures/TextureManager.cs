@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UAlbion.Api;
 using UAlbion.Core.Events;
 using Veldrid;
@@ -20,24 +21,27 @@ namespace UAlbion.Core.Textures
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<TextureManager, EngineUpdateEvent>((x,e) => x.OnUpdate(e)),
-            H<TextureManager, TextureStatsEvent>((x,e) => x.Stats())
+            H<TextureManager, TextureStatsEvent>((x, e) => x.Raise(new LogEvent(LogEvent.Level.Info, x.Stats())))
         );
 
-        void Stats()
+        public string Stats()
         {
-            Console.WriteLine("Texture Statistics:");
-            Console.WriteLine($"    Total Time: {_totalTime} Last Cleanup: {_lastCleanup}");
+            var sb = new StringBuilder();
+            sb.AppendLine("Texture Statistics:");
+            sb.AppendLine($"    Total Time: {_totalTime} Last Cleanup: {_lastCleanup}");
             var now = DateTime.Now;
             lock (_syncRoot)
             {
                 long totalSize = 0;
                 foreach (var entry in _cache.OrderBy(x => x.Key.SizeInBytes))
                 {
-                    Console.WriteLine($"    {entry.Key.Name}: {entry.Key.SizeInBytes:N0} bytes LastAccess: {(now - entry.Value.LastAccessDateTime).TotalSeconds:F3} seconds ago");
+                    sb.AppendLine($"    {entry.Key.Name}: {entry.Key.SizeInBytes:N0} bytes LastAccess: {(now - entry.Value.LastAccessDateTime).TotalSeconds:F3} seconds ago");
                     totalSize += entry.Key.SizeInBytes;
                 }
-                Console.WriteLine($"    Total: {_cache.Count:N0} entries, {totalSize:N0} bytes");
+                sb.AppendLine($"    Total: {_cache.Count:N0} entries, {totalSize:N0} bytes");
             }
+
+            return sb.ToString();
         }
 
         class CacheEntry : IDisposable

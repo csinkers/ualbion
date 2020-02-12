@@ -16,7 +16,7 @@ namespace UAlbion.Core
         );
 
         readonly IDictionary<Type, IList<IRenderable>> _renderables = new Dictionary<Type, IList<IRenderable>>();
-        readonly IDictionary<DrawLayer, IList<IRenderable>> _processedRenderables = new Dictionary<DrawLayer, IList<IRenderable>>();
+        readonly IDictionary<(DrawLayer, int), IList<IRenderable>> _processedRenderables = new Dictionary<(DrawLayer, int), IList<IRenderable>>();
         readonly IList<Type> _activeRendererTypes;
         PaletteTexture _paletteTexture;
         RgbaFloat _clearColour;
@@ -80,9 +80,10 @@ namespace UAlbion.Core
                     var renderer = renderers[renderableGroup.Key];
                     foreach (var renderable in renderer.UpdatePerFrameResources(gd, cl, sc, renderableGroup.Value))
                     {
-                        if (!_processedRenderables.ContainsKey(renderable.RenderOrder))
-                            _processedRenderables[renderable.RenderOrder] = new List<IRenderable>();
-                        _processedRenderables[renderable.RenderOrder].Add(renderable);
+                        var key = (renderable.RenderOrder, renderable.PipelineId);
+                        if (!_processedRenderables.ContainsKey(key))
+                            _processedRenderables[key] = new List<IRenderable>();
+                        _processedRenderables[key].Add(renderable);
                     }
                 }
 

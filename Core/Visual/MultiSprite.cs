@@ -21,11 +21,11 @@ namespace UAlbion.Core.Visual
         }
 
         public DrawLayer RenderOrder => Key.RenderOrder;
+        public int PipelineId { get; set; }
         public Type Renderer => typeof(SpriteRenderer);
 
         public SpriteKey Key { get; }
-        public int BufferId { get; set; }
-        public bool InstancesDirty { get; private set; }
+        public bool InstancesDirty { get; set; }
         public int ActiveInstances { get; private set; }
         internal SpriteInstanceData[] Instances { get; private set; } = new SpriteInstanceData[MinSize];
         readonly List<SpriteLease> _leases = new List<SpriteLease>();

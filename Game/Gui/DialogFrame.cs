@@ -39,7 +39,7 @@ namespace UAlbion.Game.Gui
             }
 
             var assets = Resolve<IAssetManager>();
-            var multi = new MultiTexture("MainMenu", new DummyPaletteManager(assets.LoadPalette(PaletteId.Inventory)));
+            var multi = new MultiTexture($"DialogFrame {width}x{height}", new DummyPaletteManager(assets.LoadPalette(PaletteId.Inventory)));
 
             void DrawLine(uint y)
             {

@@ -11,7 +11,12 @@ namespace UAlbion.Game.Entities
     public class LargePlayer : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<LargePlayer, UpdateEvent>((x, e) => (x._sprite.TilePosition, x._sprite.Frame) = x._positionFunc())
+            H<LargePlayer, UpdateEvent>((x, e) =>
+            {
+                var (pos, frame) = x._positionFunc();
+                x._sprite.TilePosition = pos + new Vector3(0.0f, 1.0f, 0.0f);
+                x._sprite.Frame = frame;
+            })
         );
 
         readonly PartyCharacterId _id;

@@ -28,6 +28,7 @@ namespace UAlbion.Core.Visual
         GreenTint      =  0x400,
         BlueTint       =  0x800,
         DropShadow     = 0x1000,
+        NoBoundingBox  = 0x2000,
     }
 
     public static class SpriteFlagExtensions

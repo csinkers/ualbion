@@ -24,7 +24,7 @@ namespace UAlbion.Core.Visual
             get => _frame;
             set
             {
-                if (_frame == value) return;
+                if (_frame == value || FrameCount == 0) return;
 
                 while (value >= FrameCount)
                     value -= FrameCount;
@@ -36,7 +36,7 @@ namespace UAlbion.Core.Visual
             }
         }
 
-        public int FrameCount { get; private set; } = 1;
+        public int FrameCount { get; private set; }
         public SpriteFlags Flags { get => _flags; set { if (_flags == value) return; _flags = value; Dirty = true; } }
 
         readonly DrawLayer _layer;

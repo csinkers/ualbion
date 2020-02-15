@@ -5,10 +5,10 @@ namespace UAlbion.Core
     [Flags]
     public enum EngineFlags : uint
     {
-        ShowBoundingBoxes = 1,
-        ShowCameraPosition = 2,
-        FlipDepthRange = 4,
-        FlipYSpace = 8,
-        VSync = 16,
+        ShowBoundingBoxes  = 0x1,
+        ShowCameraPosition = 0x2,
+        FlipDepthRange     = 0x4,
+        FlipYSpace         = 0x8,
+        VSync              = 0x10,
     }
 }

@@ -45,7 +45,7 @@ void main()
 #endif
 
 	// Outline
-	if((u_engine_flags & EF_SHOW_BOUNDING_BOXES) != 0)
+	if((u_engine_flags & EF_SHOW_BOUNDING_BOXES) != 0 && (iFlags & SF_NO_BOUNDING_BOX) == 0)
 	{
 		vec2 factor = step(vec2(0.02), min(iNormCoords, 1.0f - iNormCoords));
 		color = mix(color, vec4(1.0f), vec4(1.0f - min(factor.x, factor.y)));

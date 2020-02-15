@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using ImGuiNET;
 using UAlbion.Api;
@@ -7,6 +8,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
+using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
@@ -123,25 +125,43 @@ namespace UAlbion.Game.Debugging
             {
                 var settings = Resolve<ISettings>();
                 ImGui.BeginGroup();
-                BoolOption("DrawPositions", () => settings.Debug.DrawPositions,
-                    x => Raise(new SetDrawPositionsEvent(x)));
-                BoolOption("FlipDepthRange", () => settings.Engine.Flags.HasFlag(EngineFlags.FlipDepthRange),
-                    x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.FlipDepthRange)));
-                BoolOption("FlipYSpace", () => settings.Engine.Flags.HasFlag(EngineFlags.FlipYSpace),
-                    x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.FlipYSpace)));
-                BoolOption("HighlightEventChainZones", () => settings.Debug.HighlightEventChainZones,
-                    x => Raise(new SetHighlightEventChainZonesEvent(x)));
-                BoolOption("HighlightSelection", () => settings.Debug.HighlightSelection,
-                    x => Raise(new SetHighlightSelectionEvent(x)));
-                BoolOption("HighlightTile", () => settings.Debug.HighlightTile,
-                    x => Raise(new SetHighlightTileEvent(x)));
-                BoolOption("ShowBoundingBoxes", () => settings.Engine.Flags.HasFlag(EngineFlags.ShowBoundingBoxes),
-                    x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.ShowBoundingBoxes)));
-                BoolOption("ShowCameraPosition", () => settings.Engine.Flags.HasFlag(EngineFlags.ShowCameraPosition),
-                    x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.ShowCameraPosition)));
-                BoolOption("ShowPaths", () => settings.Debug.ShowPaths, x => Raise(new SetShowPathsEvent(x)));
-                BoolOption("VSync", () => settings.Engine.Flags.HasFlag(EngineFlags.VSync),
-                    x => Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.VSync)));
+
+#if DEBUG
+                if (ImGui.TreeNode("Debug"))
+                {
+                    void DebugFlagOption(DebugFlags flag)
+                    {
+                        BoolOption(flag.ToString(), () => settings.Debug.DebugFlags.HasFlag(flag),
+                            x => Raise(new DebugFlagEvent(x ? FlagOperation.Set : FlagOperation.Clear, flag)));
+                    }
+
+                    DebugFlagOption(DebugFlags.DrawPositions);
+                    DebugFlagOption(DebugFlags.HighlightTile);
+                    DebugFlagOption(DebugFlags.HighlightSelection);
+                    DebugFlagOption(DebugFlags.HighlightEventChainZones);
+                    DebugFlagOption(DebugFlags.HighlightCollision);
+                    DebugFlagOption(DebugFlags.ShowPaths);
+                    DebugFlagOption(DebugFlags.NoMapTileBoundingBoxes);
+                    ImGui.TreePop();
+                }
+#endif
+
+                if (ImGui.TreeNode("Engine"))
+                {
+                    void EngineFlagOption(EngineFlags flag)
+                    {
+                        BoolOption(flag.ToString(), () => settings.Engine.Flags.HasFlag(flag),
+                            x => Raise(new EngineFlagEvent(x ? FlagOperation.Set : FlagOperation.Clear, flag)));
+                    }
+
+                    EngineFlagOption(EngineFlags.ShowBoundingBoxes);
+                    EngineFlagOption(EngineFlags.ShowCameraPosition);
+                    EngineFlagOption(EngineFlags.FlipDepthRange);
+                    EngineFlagOption(EngineFlags.FlipYSpace);
+                    EngineFlagOption(EngineFlags.VSync);
+                    ImGui.TreePop();
+                }
+
                 ImGui.EndGroup();
                 ImGui.TreePop();
             }
@@ -152,11 +172,12 @@ namespace UAlbion.Game.Debugging
                 var uiPos = window.NormToUi(normPos);
                 uiPos.X = (int)uiPos.X;
                 uiPos.Y = (int)uiPos.Y;
-                ImGui.Text(
-                    $"Cursor Pix: {_mousePosition} UI: {uiPos} Norm: {normPos} Scale: {window.GuiScale} PixSize: {window.Size}");
-                ImGui.Text(
-                    $"Camera World: {cameraPosition} Tile: {cameraTilePosition} Dir: {cameraDirection} Mag: {cameraMagnification}");
-                ImGui.Text($"TileSize: {map?.TileSize}");
+
+                Vector3? playerTilePos = Resolve<IParty>()?.WalkOrder.FirstOrDefault()?.GetPosition();
+
+                ImGui.Text($"Cursor Pix: {_mousePosition} UI: {uiPos} Scale: {window.GuiScale} PixSize: {window.Size} Norm: {normPos}");
+                ImGui.Text($"Camera World: {cameraPosition} Tile: {cameraTilePosition} Dir: {cameraDirection} Mag: {cameraMagnification}");
+                ImGui.Text($"TileSize: {map?.TileSize} PlayerTilePos: {playerTilePos}");
                 ImGui.TreePop();
             }
 

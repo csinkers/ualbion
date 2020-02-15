@@ -23,7 +23,6 @@ namespace UAlbion.Game.State.Player
         }
 
         public PartyCharacterId Id { get; }
-        public Vector2 Position { get; set; }
         public int CombatPosition { get; set; }
         public IEffectiveCharacterSheet Effective => _inventoryManager.Effective;
         public IEffectiveCharacterSheet Apparent => _inventoryManager.Apparent;

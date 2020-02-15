@@ -88,6 +88,7 @@ namespace UAlbion.Game.Entities
                 var objectData = _labyrinthData.ObjectGroups[npc.ObjectNumber - 1];
                 foreach (var subObject in objectData.SubObjects)
                 {
+                    // TODO: Build proper NPC objects with AI, sound effects etc
                     var sprite = BuildMapObject(npc.Waypoints[0].X, npc.Waypoints[0].Y, subObject, objectYScaling);
                     if (sprite == null)
                         continue;

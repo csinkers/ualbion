@@ -27,8 +27,9 @@ namespace UAlbion.Game.Entities
         public Vector3 Position => Vector3.Zero;
         public Vector3 Normal => Vector3.UnitZ;
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<Map2D, WorldCoordinateSelectEvent>((x, e) => x.Select(e))
-            // H<Map2D, UnloadMapEvent>((x, e) => x.Unload()),
+            H<Map2D, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
+            H<Map2D, ExchangeDisabledEvent>((x, e) => x.Resolve<ICollisionManager>()?.Unregister(x))
+        // H<Map2D, UnloadMapEvent>((x, e) => x.Unload()),
         );
 
         public override string ToString() { return $"Map2D: {MapId} ({(int)MapId})"; }
@@ -44,10 +45,28 @@ namespace UAlbion.Game.Entities
             var underlayTile = underlayTileId == -1 ? null : _tileData.Tiles[underlayTileId];
             var overlayTile = overlayTileId == -1 ? null : _tileData.Tiles[overlayTileId];
 
-            return 
-                underlayTile != null && underlayTile.Collision != TilesetData.Passability.Passable 
-                || 
-                overlayTile != null && overlayTile.Collision != TilesetData.Passability.Passable;
+            bool underlayBlocked = underlayTile != null
+                 && underlayTile.Collision != TilesetData.Passability.Passable
+                ;
+
+            bool overlayBlocked = overlayTile != null
+                 && overlayTile.Collision != TilesetData.Passability.Passable
+                ;
+            return underlayBlocked || overlayBlocked;
+        }
+
+        public TilesetData.Passability GetPassability(Vector2 tilePosition)
+        {
+            int index = (int)tilePosition.Y * _mapData.Width + (int)tilePosition.X;
+            if (index >= _mapData.Underlay.Length)
+                return TilesetData.Passability.Passable;
+
+            var underlayTileId = _mapData.Underlay[index];
+            var overlayTileId = _mapData.Overlay[index];
+            var underlayTile = underlayTileId == -1 ? null : _tileData.Tiles[underlayTileId];
+            var overlayTile = overlayTileId == -1 ? null : _tileData.Tiles[overlayTileId];
+
+            return underlayTile?.Collision ?? overlayTile?.Collision ?? TilesetData.Passability.Passable;
         }
 
         public Map2D(MapDataId mapId) : base(Handlers)
@@ -148,6 +167,7 @@ namespace UAlbion.Game.Entities
                 }
             }
 
+            Resolve<ICollisionManager>()?.Register(this);
             Raise(new SetClearColourEvent(0,0,0));
         }
     }

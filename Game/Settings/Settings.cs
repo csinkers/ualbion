@@ -1,5 +1,4 @@
-﻿using UAlbion.Api;
-using UAlbion.Core;
+﻿using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats;
 using UAlbion.Game.Events;
@@ -7,12 +6,6 @@ using Util = UAlbion.Core.Util;
 
 namespace UAlbion.Game.Settings
 {
-    [Event("draw_positions")] public class SetDrawPositionsEvent : GameEvent {[EventPart("value")] public bool Value { get; } public SetDrawPositionsEvent(bool value) { Value = value; } }
-    [Event("highlight_tile")] public class SetHighlightTileEvent : GameEvent {[EventPart("value")] public bool Value { get; } public SetHighlightTileEvent(bool value) { Value = value; } }
-    [Event("highlight_selection")] public class SetHighlightSelectionEvent : GameEvent {[EventPart("value")] public bool Value { get; } public SetHighlightSelectionEvent(bool value) { Value = value; } }
-    [Event("highlight_zones")] public class SetHighlightEventChainZonesEvent : GameEvent {[EventPart("value")] public bool Value { get; } public SetHighlightEventChainZonesEvent(bool value) { Value = value; } }
-    [Event("show_paths")] public class SetShowPathsEvent : GameEvent {[EventPart("value")] public bool Value { get; } public SetShowPathsEvent(bool value) { Value = value; } }
-
     public class Settings : Component, ISettings, IDebugSettings, IAudioSettings, IGraphicsSettings, IGameplaySettings, IEngineSettings
     {
         static readonly HandlerSet Handlers = new HandlerSet(
@@ -29,11 +22,7 @@ namespace UAlbion.Game.Settings
             H<Settings, SetWindowSize3dEvent>      ((x, e) => x.WindowSize3d       = e.Value),
             H<Settings, SetCombatDetailLevelEvent> ((x, e) => x.CombatDetailLevel  = e.Value),
             H<Settings, SetCombatDelayEvent>       ((x, e) => x.CombatDelay        = e.Value),
-            H<Settings, SetDrawPositionsEvent>     ((x, e) => x.DrawPositions      = e.Value),
-            H<Settings, SetHighlightTileEvent>     ((x, e) => x.HighlightTile      = e.Value),
-            H<Settings, SetHighlightSelectionEvent>((x, e) => x.HighlightSelection = e.Value),
-            H<Settings, SetHighlightEventChainZonesEvent>((x, e) => x.HighlightEventChainZones = e.Value),
-            H<Settings, SetShowPathsEvent> ((x, e) => x.ShowPaths = e.Value),
+            H<Settings, DebugFlagEvent>    ((x, e) => x.DebugFlags = (DebugFlags)Util.UpdateFlag((uint)x.DebugFlags, e.Operation, (uint)e.Flag)),
             H<Settings, SpecialEvent>      ((x, e) => x.Special1 = Util.UpdateValue(x.Special1, e.Operation, e.Argument)),
             H<Settings, Special2Event>     ((x, e) => x.Special2 = Util.UpdateValue(x.Special2, e.Operation, e.Argument)),
             H<Settings, EngineFlagEvent>   ((x, e) => x.Flags = (EngineFlags)Util.UpdateFlag((uint)x.Flags, e.Operation, (uint)e.Flag))
@@ -49,11 +38,7 @@ namespace UAlbion.Game.Settings
         IEngineSettings ISettings.Engine => this;
 
         // Debug
-        public bool DrawPositions { get; private set; }
-        public bool HighlightTile { get; private set; }
-        public bool HighlightSelection { get; private set; }
-        public bool HighlightEventChainZones { get; private set; }
-        public bool ShowPaths { get; private set; }
+        public DebugFlags DebugFlags { get; private set; }
 
         // Audio
         public int MusicVolume { get; private set; } = 32;

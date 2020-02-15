@@ -77,6 +77,7 @@ namespace UAlbion
                 // Need to register settings first, as the AssetConfigLocator relies on it.
                 .Register<ISettings>(settings) 
                 .Register<IEngineSettings>(settings)
+                .Register<IDebugSettings>(settings)
                 .Register<IAssetManager>(assets)
                 .Register<ITextureLoader>(assets)
                 ;
@@ -138,6 +139,7 @@ namespace UAlbion
                     .Register<ITextManager>(new TextManager())
                     .Register<ITextureManager>(new TextureManager())
                     .Register<IDeviceObjectManager>(new DeviceObjectManager())
+                    .Register<ICollisionManager>(new CollisionManager())
                     .Attach(new SlowClock())
                     .Attach(new CursorManager())
                     .Attach(new DebugMapInspector()
@@ -174,8 +176,8 @@ namespace UAlbion
                 global.Raise(new SetSceneEvent(SceneId.Inventory), null);
                 //*/
 
-                global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
-                //global.Raise(new NewGameEvent(), null);
+                //global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
+                global.Raise(new NewGameEvent(), null);
                 ReflectionHelper.ClearTypeCache();
             });
 

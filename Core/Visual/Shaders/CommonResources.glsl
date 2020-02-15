@@ -43,6 +43,7 @@ layout(set = 1, binding = 3) uniform texture2D uPalette; //! // vdspv_1_3
 #define SF_GREEN_TINT       0x400
 #define SF_BLUE_TINT        0x800
 #define SF_DROP_SHADOW     0x1000
+#define SF_NO_BOUNDING_BOX 0x2000
 
 #define SF_ALIGNMENT_MASK      0x7
 #define SF_OPACITY_MASK 0xff000000

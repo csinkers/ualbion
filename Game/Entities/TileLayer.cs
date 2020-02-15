@@ -43,7 +43,9 @@ namespace UAlbion.Game.Entities
         readonly int[] _tileIds;
         readonly DrawLayer _drawLayer;
 
+#if DEBUG
         DebugFlags _lastDebugFlags;
+#endif
         SpriteLease _lease;
         int[] _animatedIndices;
         int _lastFrameCount;

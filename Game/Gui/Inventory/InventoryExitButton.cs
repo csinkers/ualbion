@@ -31,11 +31,7 @@ namespace UAlbion.Game.Gui.Inventory
         public override void Subscribed()
         {
             if (_sprite == null)
-            {
-                _sprite = new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiExitButton);
-                Exchange.Attach(_sprite);
-                Children.Add(_sprite);
-            }
+                _sprite = AttachChild(new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiExitButton));
             base.Subscribed();
         }
 

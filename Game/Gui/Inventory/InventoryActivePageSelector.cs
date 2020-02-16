@@ -36,8 +36,7 @@ namespace UAlbion.Game.Gui.Inventory
                 InventoryPage x => throw new NotImplementedException($"Unhandled inventory page \"{x}\"")
             };
 
-            Children.Add(page);
-            page.Attach(Exchange);
+            AttachChild(page);
         }
         public override int Render(Rectangle extents, int order)
         {

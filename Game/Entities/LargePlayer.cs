@@ -28,8 +28,7 @@ namespace UAlbion.Game.Entities
         {
             _id = charId;
             _positionFunc = positionFunc;
-            _sprite = new MapSprite<LargePartyGraphicsId>(graphicsId, DrawLayer.Characters2 + 1, 0, SpriteFlags.BottomAligned); // TODO: Hack, fix.
-            Children.Add(_sprite);
+            _sprite = AttachChild(new MapSprite<LargePartyGraphicsId>(graphicsId, DrawLayer.Characters2 + 1, 0, SpriteFlags.BottomAligned)); // TODO: Hack, fix.
         }
     }
 }

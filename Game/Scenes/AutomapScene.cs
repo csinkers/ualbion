@@ -19,8 +19,7 @@ namespace UAlbion.Game.Scenes
 
         public AutomapScene() : base(SceneId.Automap, new OrthographicCamera(), Renderers)
         {
-            var cameraMotion = new CameraMotion2D((OrthographicCamera)Camera);
-            Children.Add(cameraMotion);
+            AttachChild(new CameraMotion2D((OrthographicCamera)Camera));
         }
 
         public override void Subscribed()

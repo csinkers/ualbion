@@ -42,8 +42,7 @@ namespace UAlbion.Game.Gui
                 MeasureSize = new Vector2(20, 2)
             };
 
-            _frame = new ButtonFrame(_bar) { Theme = isHealth ? HealthTheme : ManaTheme, Padding = 0 };
-            Children.Add(_frame);
+            _frame = AttachChild(new ButtonFrame(_bar) { Theme = isHealth ? HealthTheme : ManaTheme, Padding = 0 });
         }
     }
 }

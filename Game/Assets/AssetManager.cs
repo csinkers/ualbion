@@ -15,14 +15,8 @@ namespace UAlbion.Game.Assets
     {
         readonly AssetLocator _assetLocator;
 
-        public AssetManager() : base(null)
-        {
-            _assetLocator = new AssetLocator();
-            Children.Add(_assetLocator);
-        }
-
+        public AssetManager() : base(null) => _assetLocator = AttachChild(new AssetLocator());
         public void Dispose() { _assetLocator.Dispose(); }
-
         public MapData2D LoadMap2D(MapDataId id) => _assetLocator.LoadAssetCached(AssetType.MapData, id) as MapData2D;
         public MapData3D LoadMap3D(MapDataId id) => _assetLocator.LoadAssetCached(AssetType.MapData, id) as MapData3D;
         public ItemData LoadItem(ItemId id)

@@ -34,10 +34,9 @@ namespace UAlbion.Game.Assets
         {
             PerfTracker.StartupEvent("Building AssetLocator");
             _standardAssetLocator = new StandardAssetLocator();
-            _assetCache = new AssetCache();
-            Children.Add(_assetCache);
+            _assetCache = AttachChild(new AssetCache());
             foreach(var locator in Locators.Values.OfType<IComponent>())
-                Children.Add(locator);
+                AttachChild(locator);
             PerfTracker.StartupEvent("Built AssetLocator");
         }
 

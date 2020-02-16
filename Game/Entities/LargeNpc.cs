@@ -18,8 +18,7 @@ namespace UAlbion.Game.Entities
         public LargeNpc(LargeNpcId id, MapNpc.Waypoint[] waypoints) : base(Handlers)
         {
             _waypoints = waypoints;
-            _sprite = new MapSprite<LargeNpcId>(id, DrawLayer.Characters1, 0, SpriteFlags.BottomAligned);
-            Children.Add(_sprite);
+            _sprite = AttachChild(new MapSprite<LargeNpcId>(id, DrawLayer.Characters1, 0, SpriteFlags.BottomAligned));
         }
 
         public override void Subscribed()

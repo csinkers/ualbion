@@ -20,8 +20,7 @@ namespace UAlbion.Game.Scenes
 
         public FlatScene() : base(SceneId.World2D, new OrthographicCamera(), Renderers)
         {
-            var cameraMotion = new CameraMotion2D((OrthographicCamera)Camera);
-            Children.Add(cameraMotion);
+            AttachChild(new CameraMotion2D((OrthographicCamera)Camera));
         }
 
         public override void Subscribed()

@@ -97,10 +97,7 @@ namespace UAlbion.Core
         {
             _renderers.Add(renderer.GetType(), renderer);
             if (renderer is IComponent component)
-            {
-                Exchange?.Attach(component);
-                Children.Add(component);
-            }
+                AttachChild(component);
 
             return this;
         }

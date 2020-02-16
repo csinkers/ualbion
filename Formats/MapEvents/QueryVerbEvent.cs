@@ -8,7 +8,7 @@ namespace UAlbion.Formats.MapEvents
         {
             Examine = 1,
             Manipulate = 2,
-            Speak = 3,
+            TalkTo = 3,
             UseItem = 4,
         }
 

@@ -1,32 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Numerics;
+﻿using System.Collections.Generic;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Gui
 {
-    public class ContextMenuEvent : GameEvent
-    {
-        public ContextMenuEvent(Vector2 position, ITextSource heading, IEnumerable<ContextMenuOption> options)
-        {
-            if (options == null) throw new ArgumentNullException(nameof(options));
-            Heading = heading ?? throw new ArgumentNullException(nameof(heading));
-            Position = position;
-            Options = new ReadOnlyCollection<ContextMenuOption>(
-                options
-                    .OrderBy(x => x.Group)
-                    .ToList());
-        }
-
-        public Vector2 Position { get; }
-        public ITextSource Heading { get; }
-        public IReadOnlyList<ContextMenuOption> Options { get; }
-    }
-
     public class ContextMenu : Dialog
     {
         const string ButtonKeyPattern = "Context.Option";
@@ -35,11 +14,9 @@ namespace UAlbion.Game.Gui
             H<ContextMenu, ButtonPressEvent>((x, e) => x.OnButton(e.ButtonId)),
             H<ContextMenu, CloseDialogEvent>((x, e) => x.Display(null))
         );
-
         ContextMenuEvent _event;
 
         public ContextMenu() : base(Handlers, DialogPositioning.TopLeft) { }
-
         void OnButton(string buttonId)
         {
             if (_event == null || !buttonId.StartsWith(ButtonKeyPattern))
@@ -53,8 +30,8 @@ namespace UAlbion.Game.Gui
             }
 
             var option = _event.Options[id];
-            Raise(option.Event);
             Close();
+            Raise(option.Event);
         }
 
         void Close()
@@ -63,11 +40,14 @@ namespace UAlbion.Game.Gui
                 child.Detach();
             Children.Clear();
             _event = null;
+            Raise(new PopInputModeEvent());
         }
 
         void Display(ContextMenuEvent contextMenuEvent)
         {
-            Close();
+            if (_event != null)
+                Close();
+
             if (contextMenuEvent == null)
                 return;
 
@@ -92,11 +72,11 @@ namespace UAlbion.Game.Gui
                 elements.Add(new Button(ButtonKeyPattern + i, option.Text));
             }
 
-            var stack = new VerticalStack(elements);
-            Children.Add(new DialogFrame(stack));
-
-            foreach (var child in Children)
-                child.Attach(Exchange);
+            var frame = new DialogFrame(new VerticalStack(elements));
+            var fixedStack = new FixedPositionStack();
+            fixedStack.Add(frame, (int)contextMenuEvent.UiPosition.X, (int)contextMenuEvent.UiPosition.Y);
+            AttachChild(fixedStack);
+            Raise(new PushInputModeEvent(InputMode.ContextMenu));
         }
     }
 }

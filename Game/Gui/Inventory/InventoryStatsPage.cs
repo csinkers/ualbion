@@ -22,7 +22,7 @@ namespace UAlbion.Game.Gui.Inventory
             if (member == null)
                 yield break;
 
-            var block = formatter.Format(assets.LoadString(id, settings.Gameplay.Language)).Item1.First();
+            var block = formatter.Format(assets.LoadString(id, settings.Gameplay.Language)).Blocks.First();
             block.Text += $" {getValue(member)} / {getMax(member)}";
             yield return block;
         }

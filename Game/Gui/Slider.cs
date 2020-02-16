@@ -66,9 +66,9 @@ namespace UAlbion.Game.Gui
                 Padding = 0
             };
 
-            Children.Add(_decrement);
-            Children.Add(_frame);
-            Children.Add(_increment);
+            AttachChild(_decrement);
+            AttachChild(_frame);
+            AttachChild(_increment);
         }
 
         public override Vector2 GetSize()

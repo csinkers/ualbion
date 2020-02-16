@@ -14,5 +14,7 @@ namespace UAlbion.Core
         float AspectRatio { get; }
         float Magnification { get; }
         CameraInfo GetCameraInfo();
+        Vector3 ProjectWorldToNorm(Vector3 worldPosition);
+        Vector3 UnprojectNormToWorld(Vector3 normPosition);
     }
 }

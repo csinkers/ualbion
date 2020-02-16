@@ -216,12 +216,13 @@ namespace UAlbion.Game
             }
         }
 
-        public (IEnumerable<TextBlock>, IList<WordId>) Format(SystemTextId template, params object[] arguments)
+        public TextFormatResult Format(SystemTextId template, params object[] arguments)
         {
             var templateText = _assets.LoadString(template, _language);
             return Format(templateText, arguments);
         }
-        public (IEnumerable<TextBlock>, IList<WordId>) Format(string template, params object[] arguments)
+
+        public TextFormatResult Format(string template, params object[] arguments)
         {
             var tokens = 
                 _implicitTokens.Concat(
@@ -235,7 +236,19 @@ namespace UAlbion.Game
 
             var substituted = Substitute(tokens, arguments);
             var blocks = TokensToBlocks(substituted);
-            return (blocks, words);
+            return new TextFormatResult(blocks, words);
         }
+    }
+
+    public class TextFormatResult
+    {
+        public TextFormatResult(IEnumerable<TextBlock> blocks, IList<WordId> words)
+        {
+            Blocks = blocks;
+            Words = words;
+        }
+
+        public IEnumerable<TextBlock> Blocks { get; }
+        public IList<WordId> Words { get; }
     }
 }

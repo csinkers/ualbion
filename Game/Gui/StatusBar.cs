@@ -28,8 +28,7 @@ namespace UAlbion.Game.Gui
 
         public StatusBar() : base(Handlers, DialogPositioning.StatusBar, int.MaxValue)
         {
-            _sprite = new UiSpriteElement<PictureId>(PictureId.StatusBar);
-            Children.Add(_sprite);
+            _sprite = AttachChild(new UiSpriteElement<PictureId>(PictureId.StatusBar));
             _portraits = new StatusBarPortrait[MaxPortraits];
             for (int i = 0; i < _portraits.Length; i++)
             {
@@ -39,10 +38,8 @@ namespace UAlbion.Game.Gui
 
             _hoverText = new Text("").Center().NoWrap();
             _descriptionText = new Text("").Center();
-            _hoverTextContainer = new FixedPosition(new Rectangle(181, 196, 177, 10), _hoverText);
-            _descriptionTextContainer = new FixedPosition(new Rectangle(181, 208, 177, 30), _descriptionText);
-            Children.Add(_hoverTextContainer);
-            Children.Add(_descriptionTextContainer);
+            _hoverTextContainer = AttachChild(new FixedPosition(new Rectangle(181, 196, 177, 10), _hoverText));
+            _descriptionTextContainer = AttachChild(new FixedPosition(new Rectangle(181, 208, 177, 30), _descriptionText));
         }
 
         public override Vector2 GetSize() => new Vector2(UiConstants.StatusBarExtents.Width, UiConstants.StatusBarExtents.Height);

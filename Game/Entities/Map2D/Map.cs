@@ -19,7 +19,6 @@ namespace UAlbion.Game.Entities.Map2D
 
         public float BaseCameraHeight => 1.0f;
         static readonly HandlerSet Handlers = new HandlerSet(
-            //H<Map2D, UiRightClickEvent>((x, e) => x.OnRightClick())
             // H<Map2D, UnloadMapEvent>((x, e) => x.Unload()),
         );
 
@@ -41,6 +40,7 @@ namespace UAlbion.Game.Entities.Map2D
             var selector = AttachChild(new SelectionHandler(_logicalMap, renderable.TileSize));
             selector.HighlightIndexChanged += (sender, x) => renderable.HighlightIndex = x;
             TileSize = new Vector3(renderable.TileSize, 1.0f);
+            _logicalMap.TileSize = renderable.TileSize;
 
             AttachChild(new Collider(_logicalMap));
             IMovement partyMovement = AttachChild(_logicalMap.UseSmallSprites

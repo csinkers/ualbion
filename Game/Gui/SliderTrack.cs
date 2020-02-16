@@ -46,7 +46,7 @@ namespace UAlbion.Game.Gui
             _min = min;
             _max = max;
             _thumb = new SliderThumb(getter);
-            Children.Add(_thumb);
+            AttachChild(_thumb);
         }
 
         public override Vector2 GetSize() => _thumb.GetSize();

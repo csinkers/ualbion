@@ -28,8 +28,7 @@ namespace UAlbion.Core
         protected Scene(string name, ICamera camera, IList<Type> activeRendererTypes) : base(Handlers)
         {
             Name = name;
-            Camera = camera;
-            Children.Add(Camera);
+            Camera = AttachChild(camera);
             _activeRendererTypes = activeRendererTypes;
         }
 
@@ -37,7 +36,6 @@ namespace UAlbion.Core
         public void Remove(IRenderable renderable) { } // TODO
         public override string ToString() => $"Scene:{Name}";
         protected virtual void Unsubscribed() { }
-
 
         public void RenderAllStages(GraphicsDevice gd, CommandList cl, SceneContext sc, IDictionary<Type, IRenderer> renderers)
         {

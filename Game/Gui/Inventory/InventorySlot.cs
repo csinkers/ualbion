@@ -76,7 +76,7 @@ namespace UAlbion.Game.Gui.Inventory
                 var assets = Resolve<IAssetManager>();
                 var settings = Resolve<ISettings>();
                 var textFormatter = new TextFormatter(assets, settings.Gameplay.Language);
-                return textFormatter.Format(template, arguments).Item1;
+                return textFormatter.Format(template, arguments).Blocks;
             });
 
         void Hover()

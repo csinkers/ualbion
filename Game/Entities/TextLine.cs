@@ -34,9 +34,7 @@ namespace UAlbion.Game.Entities
             }
             else
             {
-                var chunk = new TextChunk(block);
-                Children.Add(chunk);
-                Exchange?.Attach(chunk);
+                 AttachChild(new TextChunk(block));
             }
         }
 

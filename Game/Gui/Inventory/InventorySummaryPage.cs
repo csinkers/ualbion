@@ -41,8 +41,8 @@ namespace UAlbion.Game.Gui.Inventory
                     ),
                     new Padding(4,0)
                 );
-            Children.Add(background);
-            Children.Add(stack);
+            AttachChild(background);
+            AttachChild(stack);
         }
 
         IEnumerable<TextBlock> BuildSummary()
@@ -54,11 +54,11 @@ namespace UAlbion.Game.Gui.Inventory
                 yield break;
 
             // {INVE}{NAME} ({SEXC}), %u years old, {RACE}, {CLAS}, level %d.
-            var (formatBlocks, _) = new TextFormatter(assets, settings.Gameplay.Language)
+            var formatBlocks = new TextFormatter(assets, settings.Gameplay.Language)
                 .Inventory(member.Apparent)
                 .Format(
                     assets.LoadString(SystemTextId.Inv1_NYearsOldRaceClassLevelN, settings.Gameplay.Language),
-                    member.Apparent.Age, member.Apparent.Level);
+                    member.Apparent.Age, member.Apparent.Level).Blocks;
 
             foreach (var block in formatBlocks)
                 yield return block;
@@ -75,7 +75,7 @@ namespace UAlbion.Game.Gui.Inventory
             if (member == null)
                 yield break;
 
-            foreach (var block in formatter.Format(S(SystemTextId.Inv1_LifePoints)).Item1)
+            foreach (var block in formatter.Format(S(SystemTextId.Inv1_LifePoints)).Blocks)
             {
                 block.Arrangement = TextArrangement.NoWrap;
                 block.Alignment = TextAlignment.Right;
@@ -84,7 +84,7 @@ namespace UAlbion.Game.Gui.Inventory
 
             if (member.Apparent.Magic.SpellPointsMax > 0)
             {
-                foreach (var block in formatter.Format(S(SystemTextId.Inv1_SpellPoints)).Item1)
+                foreach (var block in formatter.Format(S(SystemTextId.Inv1_SpellPoints)).Blocks)
                 {
                     block.Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap;
                     block.Alignment = TextAlignment.Right;
@@ -93,14 +93,14 @@ namespace UAlbion.Game.Gui.Inventory
             }
             else yield return new TextBlock("") { Arrangement = TextArrangement.ForceNewLine };
 
-            foreach (var block in formatter.Format(S(SystemTextId.Inv1_ExperiencePoints)).Item1)
+            foreach (var block in formatter.Format(S(SystemTextId.Inv1_ExperiencePoints)).Blocks)
             {
                 block.Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap;
                 block.Alignment = TextAlignment.Right;
                 yield return block;
             }
 
-            foreach (var block in formatter.Format(S(SystemTextId.Inv1_TrainingPoints)).Item1)
+            foreach (var block in formatter.Format(S(SystemTextId.Inv1_TrainingPoints)).Blocks)
             {
                 block.Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap;
                 block.Alignment = TextAlignment.Right;

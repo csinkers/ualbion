@@ -69,8 +69,7 @@ namespace UAlbion.Game.State
             }
 
             _walkOrder.Add(player);
-            Exchange.Attach(player);
-            Children.Add(player);
+            AttachChild(player);
 
             Raise(new PartyChangedEvent());
         }

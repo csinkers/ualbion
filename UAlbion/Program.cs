@@ -117,11 +117,12 @@ namespace UAlbion
                     .Register<IInputManager>(new InputManager()
                         .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
                         .RegisterInputMode(InputMode.World2D, new World2DInputMode())
-                        .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
+                            .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
                         .RegisterMouseMode(MouseMode.Exclusive, new ExclusiveMouseMode())
                         .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
                         .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
                         .RegisterMouseMode(MouseMode.RightButtonHeld, new RightButtonHeldMouseMode())
+                        .RegisterMouseMode(MouseMode.ContextMenu, new ContextMenuMouseMode())
                     )
                     .Register<ILayoutManager>(new LayoutManager())
                     .Register<IMapManager>(new MapManager())
@@ -152,6 +153,7 @@ namespace UAlbion
                     .Attach(new SceneStack())
                     .Attach(new StatusBar())
                     .Attach(new ContextMenu())
+                    .Attach(new EventChainManager())
                     ;
 
                 PerfTracker.StartupEvent("Creating scene-specific components");

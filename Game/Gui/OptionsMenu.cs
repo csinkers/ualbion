@@ -72,7 +72,7 @@ namespace UAlbion.Game.Gui
                 new Padding(0,2),
             };
             var stack = new VerticalStack(elements);
-            Children.Add(new DialogFrame(stack));
+            AttachChild(new DialogFrame(stack));
         }
 
         public override void Subscribed()

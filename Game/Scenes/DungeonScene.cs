@@ -21,8 +21,7 @@ namespace UAlbion.Game.Scenes
 
         public DungeonScene() : base(SceneId.World3D, new PerspectiveCamera(), Renderers)
         {
-            var cameraMotion = new CameraMotion3D((PerspectiveCamera)Camera);
-            Children.Add(cameraMotion);
+            AttachChild(new CameraMotion3D((PerspectiveCamera)Camera));
         }
 
         public override void Subscribed()

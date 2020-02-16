@@ -5,7 +5,7 @@ using UAlbion.Core.Events;
 
 namespace UAlbion.Core
 {
-    public class PerspectiveCamera : Component, ICamera
+    public class PerspectiveCamera : ServiceComponent<ICamera>, ICamera
     {
         static readonly HandlerSet Handlers = new HandlerSet
         (
@@ -135,6 +135,14 @@ namespace UAlbion.Core
                 Special2 = settings.Special2,
                 EngineFlags = (uint)settings.Flags
             };
+        }
+
+        public Vector3 ProjectWorldToNorm(Vector3 worldPosition) => Vector3.Transform(worldPosition + Vector3.UnitZ, ViewMatrix * ProjectionMatrix);
+        public Vector3 UnprojectNormToWorld(Vector3 normPosition)
+        {
+            var totalMatrix = ViewMatrix * ProjectionMatrix;
+            var inverse = totalMatrix.Inverse();
+            return Vector3.Transform(normPosition + Vector3.UnitZ, inverse);
         }
     }
 }

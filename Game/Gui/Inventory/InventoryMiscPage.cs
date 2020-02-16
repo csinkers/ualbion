@@ -18,7 +18,7 @@ namespace UAlbion.Game.Gui.Inventory
                 new Padding(0, 45),
                 new Button(CombatPositionButtonId, S(SystemTextId.Inv3_CombatPositions))
             );
-            Children.Add(stack);
+            AttachChild(stack);
         }
     }
 }

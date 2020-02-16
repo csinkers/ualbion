@@ -31,9 +31,8 @@ namespace UAlbion.Game.State
 
         public GameState() : base(Handlers)
         {
-            _party = new Party(PartyMembers);
-            Children.Add(_party);
-            Children.Add(new InventoryScreenState());
+            _party = AttachChild(new Party(PartyMembers));
+            AttachChild(new InventoryScreenState());
         }
 
         public int TickCount { get; private set; }

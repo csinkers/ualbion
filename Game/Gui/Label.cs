@@ -5,10 +5,6 @@ namespace UAlbion.Game.Gui
 {
     class Label : UiElement
     {
-        public Label(StringId stringId) : base(null)
-        {
-            var text = new Text(stringId).Center();
-            Children.Add(text);
-        }
+        public Label(StringId stringId) : base(null) => AttachChild(new Text(stringId).Center());
     }
 }

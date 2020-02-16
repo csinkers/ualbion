@@ -61,7 +61,6 @@ namespace UAlbion.Game.Gui.Inventory
                 child.Detach();
             Children.Clear();
 
-            var background = new UiFixedPositionElement<SlabId>(SlabId.SLAB, UiConstants.UiExtents);
             var leftPane =
                 _mode switch
                 {
@@ -77,25 +76,10 @@ namespace UAlbion.Game.Gui.Inventory
             var rightPane = new InventoryRightPane(_activeCharacter, ExitButtonId, _mode == InventoryMode.Merchant);
             // var frameDivider = new FrameDivider(135, 0, 4, 192);
 
-            var leftContainer = new FixedPosition(
-                new Rectangle(0, 0, 135, UiConstants.ActiveAreaExtents.Height), leftPane);
-
-            var middleContainer = new FixedPosition(
-                new Rectangle(142, 0, 134, UiConstants.ActiveAreaExtents.Height), middlePane);
-
-            var rightContainer = new FixedPosition(
-                new Rectangle(280, 0, 71, UiConstants.ActiveAreaExtents.Height), rightPane);
-
-            Exchange
-                .Attach(background)
-                .Attach(leftContainer)
-                .Attach(middleContainer)
-                .Attach(rightContainer)
-                ;
-            Children.Add(background);
-            Children.Add(leftContainer);
-            Children.Add(middleContainer);
-            Children.Add(rightContainer);
+            AttachChild(new UiFixedPositionElement<SlabId>(SlabId.SLAB, UiConstants.UiExtents));
+            AttachChild(new FixedPosition( new Rectangle(0, 0, 135, UiConstants.ActiveAreaExtents.Height), leftPane));
+            AttachChild(new FixedPosition( new Rectangle(142, 0, 134, UiConstants.ActiveAreaExtents.Height), middlePane));
+            AttachChild(new FixedPosition( new Rectangle(280, 0, 71, UiConstants.ActiveAreaExtents.Height), rightPane));
         }
     }
 }

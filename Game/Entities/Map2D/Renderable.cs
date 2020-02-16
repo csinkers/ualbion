@@ -36,10 +36,8 @@ namespace UAlbion.Game.Entities.Map2D
             _logicalMap = logicalMap;
             tileset.GetSubImageDetails(0, out var tileSize, out _, out _, out _);
             TileSize = tileSize;
-            _underlay = new TileLayer(logicalMap, tileset, logicalMap.GetUnderlay, DrawLayer.Underlay);
-            _overlay = new TileLayer(logicalMap, tileset, logicalMap.GetOverlay, DrawLayer.Overlay3);
-            Children.Add(_underlay);
-            Children.Add(_overlay);
+            _underlay = AttachChild(new TileLayer(logicalMap, tileset, logicalMap.GetUnderlay, DrawLayer.Underlay));
+            _overlay = AttachChild(new TileLayer(logicalMap, tileset, logicalMap.GetOverlay, DrawLayer.Overlay3));
         }
 
         public override void Subscribed() => Raise(new LoadPaletteEvent(Palette));

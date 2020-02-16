@@ -90,8 +90,7 @@ namespace UAlbion.Game.Gui
         public Button(string buttonId, IUiElement content) : base(Handlers)
         {
             Id = buttonId;
-            _frame = new ButtonFrame(content);
-            Children.Add(_frame);
+            _frame = AttachChild(new ButtonFrame(content));
         }
 
         public Button(string buttonId, StringId textId) : this(buttonId, new Text(textId).Center().NoWrap()) { }

@@ -60,7 +60,7 @@ namespace UAlbion.Game.Gui.Inventory
                 State = ButtonState.Pressed
             };
 
-            Children.Add(Frame);
+            AttachChild(Frame);
         }
 
         void Rebuild()

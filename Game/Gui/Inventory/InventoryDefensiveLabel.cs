@@ -32,7 +32,7 @@ namespace UAlbion.Game.Gui.Inventory
                 return new[] { new TextBlock($": {protection}") };
             }, x => _version);
 
-            Children.Add(
+            AttachChild(
                 new ButtonFrame(
                         new HorizontalStack(
                             new FixedSize(8, 8,
@@ -55,9 +55,9 @@ namespace UAlbion.Game.Gui.Inventory
 
             var protection = player?.Effective.Combat.Protection ?? 0;
             var template = assets.LoadString(SystemTextId.Inv_ProtectionN, settings.Gameplay.Language);
-            var (text, _) = new TextFormatter(assets, settings.Gameplay.Language).Format(
+            var text = new TextFormatter(assets, settings.Gameplay.Language).Format(
                 template, // Protection : %d
-                protection);
+                protection).Blocks;
 
             Raise(new HoverTextEvent(text.First().Text));
         }

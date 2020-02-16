@@ -38,12 +38,9 @@ namespace UAlbion.Game.Gui
         public StatusBarPortrait(int order) : base(Handlers)
         {
             _order = order;
-            _portrait = new UiSpriteElement<SmallPortraitId>(SmallPortraitId.Tom);
-            _health = new StatusBarHealthBar(order, true);
-            _mana = new StatusBarHealthBar(order, false);
-            Children.Add(_portrait);
-            Children.Add(_health);
-            Children.Add(_mana);
+            _portrait = AttachChild(new UiSpriteElement<SmallPortraitId>(SmallPortraitId.Tom));
+            _health = AttachChild(new StatusBarHealthBar(order, true));
+            _mana = AttachChild(new StatusBarHealthBar(order, false));
         }
 
         public override void Subscribed() => LoadSprite();
@@ -126,11 +123,11 @@ namespace UAlbion.Game.Gui
             var settings = Resolve<ISettings>();
             var assets = Resolve<IAssetManager>();
             var template = assets.LoadString(SystemTextId.PartyPortrait_XLifeMana, settings.Gameplay.Language);
-            var (text, _) = new TextFormatter(assets, settings.Gameplay.Language).Format(
+            var text = new TextFormatter(assets, settings.Gameplay.Language).Format(
                 template, // %s (LP:%d, SP:%d)
                 member.Apparent.GetName(settings.Gameplay.Language),
                 member.Apparent.Combat.LifePoints,
-                member.Apparent.Magic.SpellPoints);
+                member.Apparent.Magic.SpellPoints).Blocks;
 
             Raise(new HoverTextEvent(text.First().Text));
         }

@@ -24,7 +24,7 @@ namespace UAlbion.Game.Gui
             _getter = getter;
             _text = new Text("").Center();
             _frame = new ButtonFrame(_text) { Theme = Theme };
-            Children.Add(_frame);
+            AttachChild(_frame);
         }
 
         public ButtonState State { get => _frame.State; set => _frame.State = value; }

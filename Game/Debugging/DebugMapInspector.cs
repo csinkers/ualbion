@@ -41,12 +41,14 @@ namespace UAlbion.Game.Debugging
         readonly IDictionary<Type, Action<DebugInspectorAction, Reflector.ReflectedObject>> _behaviours =
             new Dictionary<Type, Action<DebugInspectorAction, Reflector.ReflectedObject>>();
 
+        readonly IList<object> _fixedObjects = new List<object>();
         IList<Selection> _hits;
         Vector2 _mousePosition;
         Reflector.ReflectedObject _lastHoveredItem;
 
         void RenderDialog()
         {
+            bool anyHovered = false;
             if (_hits == null)
                 return;
 
@@ -83,6 +85,17 @@ namespace UAlbion.Game.Debugging
                 ImGui.Checkbox(name, ref value);
                 if (value != initialValue)
                     setter(value);
+            }
+
+            if (ImGui.TreeNode("Fixed"))
+            {
+                for (int i = 0; i < _fixedObjects.Count; i++)
+                {
+                    var thing = _fixedObjects[i];
+                    Reflector.ReflectedObject reflected = Reflector.Reflect($"Fixed{i}", thing, null, 0);
+                    anyHovered |= RenderNode(reflected, true);
+                }
+                ImGui.TreePop();
             }
 
             if (ImGui.TreeNode("Stats"))
@@ -182,13 +195,12 @@ namespace UAlbion.Game.Debugging
             }
 
             int hitId = 0;
-            bool anyHovered = false;
             if (ImGui.TreeNode("Global"))
             {
                 var reflected = Reflector.Reflect(null, Exchange, null, 0);
                 if (reflected.SubObjects != null)
                     foreach (var child in reflected.SubObjects)
-                        anyHovered |= RenderNode(child);
+                        anyHovered |= RenderNode(child, false);
                 ImGui.TreePop();
             }
 
@@ -199,7 +211,7 @@ namespace UAlbion.Game.Debugging
                     var reflected = Reflector.Reflect(null, hit.Target, null, 0);
                     if (reflected.SubObjects != null)
                         foreach (var child in reflected.SubObjects)
-                            anyHovered |= RenderNode(child);
+                            anyHovered |= RenderNode(child, false);
                     ImGui.TreePop();
                 }
 
@@ -246,7 +258,7 @@ namespace UAlbion.Game.Debugging
             return true;
         }
 
-        bool RenderNode(Reflector.ReflectedObject reflected)
+        bool RenderNode(Reflector.ReflectedObject reflected, bool fixedObject)
         {
             var typeName = reflected.Object?.GetType().Name ?? "null";
             var description =
@@ -257,15 +269,19 @@ namespace UAlbion.Game.Debugging
             bool anyHovered = false;
             if (reflected.SubObjects != null)
             {
-                if (ImGui.TreeNode(description))
+                if(ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowItemOverlap))
                 {
-                    anyHovered |= CheckHover(reflected);
+                    if (!fixedObject && ImGui.Button("Track"))
+                        _fixedObjects.Add(reflected.Object);
 
+                    if (fixedObject && ImGui.Button("Stop tracking"))
+                        _fixedObjects.Remove(reflected.Object);
+
+                    anyHovered |= CheckHover(reflected);
                     foreach (var child in reflected.SubObjects)
-                        anyHovered |= RenderNode(child);
+                        anyHovered |= RenderNode(child, false);
                     ImGui.TreePop();
                 }
-                else anyHovered |= CheckHover(reflected);
             }
             else
             {

@@ -32,7 +32,7 @@ namespace UAlbion.Game.Gui.Inventory
                 return new[] { new TextBlock($": {damage}") };
             }, x => _version);
 
-            Children.Add(
+            AttachChild(
                 new ButtonFrame(
                         new HorizontalStack(
                             new FixedSize(8, 8, 
@@ -55,9 +55,9 @@ namespace UAlbion.Game.Gui.Inventory
 
             var damage = player?.Effective.Combat.Damage ?? 0;
             var template = assets.LoadString(SystemTextId.Inv_DamageN, settings.Gameplay.Language);
-            var (text, _) = new TextFormatter(assets, settings.Gameplay.Language).Format(
+            var text = new TextFormatter(assets, settings.Gameplay.Language).Format(
                 template, // Damage : %d
-                damage);
+                damage).Blocks;
 
             Raise(new HoverTextEvent(text.First().Text));
         }

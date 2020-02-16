@@ -3,7 +3,7 @@ using UAlbion.Core.Events;
 
 namespace UAlbion.Core
 {
-    public class OrthographicCamera : Component, ICamera
+    public class OrthographicCamera : ServiceComponent<ICamera>, ICamera
     {
         static readonly HandlerSet Handlers = new HandlerSet
         (
@@ -41,12 +41,9 @@ namespace UAlbion.Core
 
         void TransformSelect(ScreenCoordinateSelectEvent e)
         {
-            var totalMatrix = ViewMatrix * ProjectionMatrix;
-            var inverse = totalMatrix.Inverse();
             var normalisedScreenPosition = new Vector3(2 * e.Position.X / _windowSize.X - 1.0f, -2 * e.Position.Y / _windowSize.Y + 1.0f, 0.0f);
-            var rayOrigin = Vector3.Transform(normalisedScreenPosition + Vector3.UnitZ, inverse);
-            var rayDirection = Vector3.Transform(normalisedScreenPosition, inverse) - rayOrigin;
-            rayOrigin = new Vector3(rayOrigin.X, rayOrigin.Y, rayOrigin.Z);
+            var rayOrigin = UnprojectNormToWorld(normalisedScreenPosition + Vector3.UnitZ);
+            var rayDirection = UnprojectNormToWorld(normalisedScreenPosition) - rayOrigin;
             Raise(new WorldCoordinateSelectEvent(rayOrigin, rayDirection, e.RegisterHit));
         }
 
@@ -54,7 +51,7 @@ namespace UAlbion.Core
         Vector2 _windowSize = Vector2.One;
         Matrix4x4 _viewMatrix;
         Matrix4x4 _projectionMatrix;
-        float _magnification = 1.0f;
+        float _magnification = 4.0f; // TODO: Ensure this defaults to something sensible, and at some point lock it to a value that fits the gameplay and map design.
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;
@@ -101,6 +98,14 @@ namespace UAlbion.Core
                 Special2 = settings.Special2,
                 EngineFlags = (uint)settings.Flags
             };
+        }
+
+        public Vector3 ProjectWorldToNorm(Vector3 worldPosition) => Vector3.Transform(worldPosition + Vector3.UnitZ, ViewMatrix * ProjectionMatrix);
+        public Vector3 UnprojectNormToWorld(Vector3 normPosition)
+        {
+            var totalMatrix = ViewMatrix * ProjectionMatrix;
+            var inverse = totalMatrix.Inverse();
+            return Vector3.Transform(normPosition + Vector3.UnitZ, inverse);
         }
     }
 }

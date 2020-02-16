@@ -31,8 +31,8 @@ namespace UAlbion.Game.Gui.Inventory
                     new FixedSize(16, 15, _miscButton)
                 ));
 
-            Children.Add(buttonStack);
-            Children.Add(new InventoryActivePageSelector(activeCharacter, getPage));
+            AttachChild(buttonStack);
+            AttachChild(new InventoryActivePageSelector(activeCharacter, getPage));
         }
 
         public override int Render(Rectangle extents, int order)

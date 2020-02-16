@@ -4,9 +4,9 @@ namespace UAlbion.Formats.AssetIds
 {
     public enum FontColor
     {
-        White,
-        Yellow,
-        Red
+        White = 1,
+        Yellow = 2,
+        YellowOrange = 6
         /* Inks:
         1: Regular white
         2: Yellow

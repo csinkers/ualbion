@@ -92,7 +92,7 @@ namespace UAlbion.Game.Gui.Inventory
                 new InventoryExitButton(exitButtonId)
             ) { Greedy = false };
 
-            Children.Add(stack);
+            AttachChild(stack);
         }
     }
 }

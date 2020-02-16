@@ -53,7 +53,7 @@ namespace UAlbion.Game.Gui
                 new Padding(6, 0)
             );
 
-            Children.Add(new DialogFrame(horizontalPad));
+            AttachChild(new DialogFrame(horizontalPad));
         }
 
         public event EventHandler Closed;

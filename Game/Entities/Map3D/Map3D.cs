@@ -53,16 +53,10 @@ namespace UAlbion.Game.Entities.Map3D
             }
 
             TileSize = new Vector3(_labyrinthData.EffectiveWallWidth, _labyrinthData.WallHeight, _labyrinthData.EffectiveWallWidth);
-            _renderable = new MapRenderable3D(MapId, _mapData, _labyrinthData, TileSize);
-            Exchange.Attach(_renderable);
-            Children.Add(_renderable);
+            _renderable = AttachChild(new MapRenderable3D(MapId, _mapData, _labyrinthData, TileSize));
 
             if (_labyrinthData.BackgroundId.HasValue)
-            {
-                _skybox = new Skybox(_labyrinthData.BackgroundId.Value);
-                Exchange.Attach(_skybox);
-                Children.Add(_skybox);
-            }
+                _skybox = AttachChild(new Skybox(_labyrinthData.BackgroundId.Value));
 
             var palette = assets.LoadPalette(_mapData.PaletteId);
             uint backgroundColour = palette.GetPaletteAtTime(0)[_labyrinthData.BackgroundColour];
@@ -93,8 +87,7 @@ namespace UAlbion.Game.Entities.Map3D
                     if (sprite == null)
                         continue;
 
-                    Exchange.Attach(sprite);
-                    Children.Add(sprite);
+                    AttachChild(sprite);
                 }
             }
 
@@ -113,8 +106,7 @@ namespace UAlbion.Game.Entities.Map3D
                         if (sprite == null)
                             continue;
 
-                        Exchange.Attach(sprite);
-                        Children.Add(sprite);
+                        AttachChild(sprite);
                     }
                 }
             }

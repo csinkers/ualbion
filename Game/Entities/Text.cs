@@ -40,9 +40,7 @@ namespace UAlbion.Game.Entities
             });
         }
         public Text(ITextSource source) : base(Handlers) { _source = source; }
-
         public override string ToString() => $"Text {_source?.ToString() ?? _block?.ToString()}";
-
         public Text Bold() { _block.Style = TextStyle.Fat; return this; }
         public Text Color(FontColor color) { _block.Color = color; return this; }
         public Text Left() { _block.Alignment = TextAlignment.Left; return this; }
@@ -94,10 +92,7 @@ namespace UAlbion.Game.Entities
             Children.Clear();
 
             foreach (var line in BuildLines(extents, _source.Get()))
-            {
-                Exchange.Attach(line);
-                Children.Add(line);
-            }
+                AttachChild(line);
         }
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)

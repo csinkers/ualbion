@@ -22,13 +22,12 @@ namespace UAlbion.Game.Entities
         public MapObject(DungeonObjectId id, Vector3 initialPosition, Vector2 size, bool onFloor) : base(Handlers)
         {
             _initialPosition = initialPosition;
-            _sprite = new MapSprite<DungeonObjectId>(id, DrawLayer.Underlay, 0,
+            _sprite = AttachChild(new MapSprite<DungeonObjectId>(id, DrawLayer.Underlay, 0,
                 SpriteFlags.FlipVertical |
                 (onFloor
                     ? SpriteFlags.Floor | SpriteFlags.MidAligned
-                    : SpriteFlags.Billboard));
+                    : SpriteFlags.Billboard)));
             _sprite.Size = size;
-            Children.Add(_sprite);
         }
 
         public override void Subscribed()

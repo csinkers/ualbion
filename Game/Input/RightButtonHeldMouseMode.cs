@@ -26,8 +26,7 @@ namespace UAlbion.Game.Input
 
         public RightButtonHeldMouseMode() : base(Handlers)
         {
-            _cursor = new MapSprite<CoreSpriteId>(CoreSpriteId.Select, DrawLayer.MaxLayer, 0, SpriteFlags.LeftAligned);
-            Children.Add(_cursor);
+            _cursor = AttachChild(new MapSprite<CoreSpriteId>(CoreSpriteId.Select, DrawLayer.MaxLayer, 0, SpriteFlags.LeftAligned));
         }
 
         public override void Subscribed()

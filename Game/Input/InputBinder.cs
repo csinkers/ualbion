@@ -106,7 +106,8 @@ namespace UAlbion.Game.Input
                     continue;
 
                 var binding = new KeyBinding(keyEvent.Key, keyEvent.Modifiers);
-                if (!_bindings[inputManager.InputMode].TryGetValue(binding, out var action))
+                var mode = _bindings.ContainsKey(inputManager.InputMode) ? inputManager.InputMode : InputMode.Global;
+                if (!_bindings[mode].TryGetValue(binding, out var action))
                     if (!_bindings[InputMode.Global].TryGetValue(binding, out action))
                         continue;
 
@@ -135,7 +136,8 @@ namespace UAlbion.Game.Input
             foreach(var key in _pressedKeys)
             {
                 var binding = new KeyBinding(key, Modifiers);
-                if (!_bindings[inputManager.InputMode].TryGetValue(binding, out var action))
+                var mode = _bindings.ContainsKey(inputManager.InputMode) ? inputManager.InputMode : InputMode.Global;
+                if (!_bindings[mode].TryGetValue(binding, out var action))
                     if (!_bindings[InputMode.Global].TryGetValue(binding, out action))
                         continue;
 

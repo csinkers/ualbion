@@ -33,8 +33,7 @@ namespace UAlbion.Game.Gui.Inventory
             _absoluteMax = absoluteMax;
 
             _bar = new UiRectangle(CommonColor.Blue4);
-            _frame = new ButtonFrame(_bar) { State = ButtonState.Pressed, Padding = 0 };
-            Children.Add(_frame);
+            _frame = AttachChild(new ButtonFrame(_bar) { State = ButtonState.Pressed, Padding = 0 });
         }
 
         void Hover()

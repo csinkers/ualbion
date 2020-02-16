@@ -158,7 +158,7 @@ namespace UAlbion
                 return;
 
             var formatter = new EventFormatter(assets, mapId);
-            var rootNodes = new HashSet<(bool, MapEventZone.TriggerType, int)>();
+            var rootNodes = new HashSet<(bool, TriggerType, int)>();
             foreach(var zone in map.Zones)
                 rootNodes.Add((zone.Global, zone.Trigger, zone.EventNumber));
 

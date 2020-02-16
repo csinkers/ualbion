@@ -101,10 +101,7 @@ namespace UAlbion.Game.Gui
             });
 
             var stack = new VerticalStack(elements);
-            Children.Add(new DialogFrame(stack));
-
-            foreach (var child in Children)
-                child.Attach(Exchange);
+            AttachChild(new DialogFrame(stack));
 
             base.Subscribed();
         }

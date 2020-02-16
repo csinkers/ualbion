@@ -1,4 +1,5 @@
 ﻿using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 
@@ -7,11 +8,17 @@ namespace UAlbion.Game.Input
     public class ContextMenuInputMode : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<ContextMenuInputMode, SetInputModeEvent>((x,e) => x._isActive = e.Mode == InputMode.ContextMenu)
+            H<ContextMenuInputMode, ExchangeDisabledEvent>((x, e) => x.Unsubscribed())
         );
 
-        bool _isActive;
-
         public ContextMenuInputMode() : base(Handlers) { }
+
+        public override void Subscribed()
+        {
+            Raise(new PushMouseModeEvent(MouseMode.ContextMenu));
+            base.Subscribed();
+        }
+
+        void Unsubscribed() => Raise(new PopMouseModeEvent());
     }
 }

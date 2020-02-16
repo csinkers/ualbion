@@ -3,15 +3,22 @@ using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Game.Events;
+using UAlbion.Game.Gui;
+using UAlbion.Game.Scenes;
 
 namespace UAlbion.Game.Entities.Map2D
 {
     public sealed class SelectionHandler : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<SelectionHandler, WorldCoordinateSelectEvent>((x, e) => x.OnSelect(e))
+            H<SelectionHandler, WorldCoordinateSelectEvent>((x, e) => x.OnSelect(e)),
+            H<SelectionHandler, UiRightClickEvent>((x, e) => x.OnRightClick())
         );
+
 
         static readonly Vector3 Normal = Vector3.UnitZ;
         readonly LogicalMap _map;
@@ -69,5 +76,110 @@ namespace UAlbion.Game.Entities.Map2D
                 _lastHighlightIndex = highlightIndex;
             }
         }
+
+        void OnRightClick()
+        {
+            int x = _lastHighlightIndex % _map.Width;
+            int y = _lastHighlightIndex / _map.Width;
+            var window = Resolve<IWindowManager>();
+            var camera = Resolve<ICamera>();
+            var assets = Resolve<IAssetManager>();
+            var settings = Resolve<ISettings>();
+
+            ITextSource S(SystemTextId textId) => new DynamicText(() =>
+                {
+                    var template = assets.LoadString(textId, settings.Gameplay.Language);
+                    return new TextFormatter(assets, settings.Gameplay.Language).Centre().Format(template).Blocks;
+                });
+
+            var worldPosition = (new Vector2(x, y) + Vector2.One) * _map.TileSize;
+            var normPosition = camera.ProjectWorldToNorm(new Vector3(worldPosition, 0.0f));
+            var uiPosition = window.NormToUi(new Vector2(normPosition.X, normPosition.Y));
+            var heading = S(SystemTextId.MapPopup_Environment);
+            var zone = _map.GetZone(x, y);
+
+            var options = new List<ContextMenuOption>();
+            if(zone != null)
+            {
+                if (zone.Trigger.HasFlag(TriggerType.Examine))
+                {
+                    options.Add(new ContextMenuOption(
+                        S(SystemTextId.MapPopup_Examine),
+                        new TriggerChainEvent(zone.Event, TriggerType.Examine),
+                        ContextMenuGroup.Actions));
+                }
+
+                if (zone.Trigger.HasFlag(TriggerType.Manipulate))
+                {
+                    options.Add(new ContextMenuOption(
+                        S(SystemTextId.MapPopup_Manipulate),
+                        new TriggerChainEvent(zone.Event, TriggerType.Manipulate),
+                        ContextMenuGroup.Actions));
+                }
+
+                if (zone.Trigger.HasFlag(TriggerType.Take))
+                {
+                    options.Add(new ContextMenuOption(
+                        S(SystemTextId.MapPopup_Take),
+                        new TriggerChainEvent(zone.Event, TriggerType.Take),
+                        ContextMenuGroup.Actions));
+                }
+
+                if (zone.Trigger.HasFlag(TriggerType.TalkTo))
+                {
+                    options.Add(new ContextMenuOption(
+                        S(SystemTextId.MapPopup_TalkTo),
+                        new TriggerChainEvent(zone.Event, TriggerType.TalkTo),
+                        ContextMenuGroup.Actions));
+                }
+            }
+
+            // Check if map allows Rest
+
+            options.Add(new ContextMenuOption(
+                    S(SystemTextId.MapPopup_MainMenu),
+                    new PushSceneEvent(SceneId.MainMenu), 
+                    ContextMenuGroup.System
+                ));
+
+            Raise(new ContextMenuEvent(uiPosition, heading, options));
+        }
     }
 }
+
+/*
+
+    Headers:
+        MapPopup_Environment
+
+    Actions:
+      x MapPopup_Examine
+      x MapPopup_Manipulate
+      x MapPopup_Take
+      x MapPopup_TalkTo
+        MapPopup_Rest
+      x MapPopup_MainMenu
+        MapPopup_Map (3D only0
+        MapPopup_Wait (3D only0
+
+        MapPopup_Blocked1
+        MapPopup_Blocked2
+        MapPopup_CannotCarryThatMuch <--- consequence of "Take"
+        MapPopup_ItsTooDangerousHere <-- consequence of "Rest"
+        MapPopup_NoSpaceLeft <--- consequence of "Take"
+        MapPopup_Person
+        MapPopup_ReallyRest <--- consequence of "Rest"
+        MapPopup_ThesePeopleDoNotSpeakTheSameLanguage <-- consequence of "TalkTo"
+        MapPopup_ThisItemDoesntWorkHere
+        MapPopup_ThisPersonIsAsleep
+        MapPopup_ThisPersonSpeaksALanguageLeaderDoesntUnderstand <-- consequence of "TalkTo"
+        MapPopup_ThisWordDoesntWorkHere
+        MapPopup_TooFarAway1
+        MapPopup_TooFarAway2
+        MapPopup_TooFarAwayToTalkTo <-- consequence of "TalkTo"
+        MapPopup_TooFarAwayToTouch
+        MapPopup_TravelOnFoot
+        MapPopup_UseItem
+        MapPopup_UseWhichItem
+        MapPopup_WaitForHowManyHours <-- consequence of "Wait"
+*/

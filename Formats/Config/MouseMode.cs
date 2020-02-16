@@ -7,6 +7,7 @@
         ItemInHand,
         MouseLook,
         DebugPick,
-        RightButtonHeld
+        RightButtonHeld,
+        ContextMenu
     }
 }

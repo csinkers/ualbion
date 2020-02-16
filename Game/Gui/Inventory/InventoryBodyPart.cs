@@ -25,7 +25,7 @@ namespace UAlbion.Game.Gui.Inventory
             SlotId = itemSlotId;
             _sprite = new UiSpriteElement<ItemSpriteId>(0) { SubId = (int)ItemSpriteId.Nothing };
             Frame = new ButtonFrame(new FixedSize(16, 16, _sprite)) { Padding = -1 };
-            Children.Add(Frame);
+            AttachChild(Frame);
         }
 
         void Rebuild()

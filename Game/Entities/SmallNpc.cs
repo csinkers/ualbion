@@ -19,8 +19,7 @@ namespace UAlbion.Game.Entities
         public SmallNpc(SmallNpcId id, MapNpc.Waypoint[] waypoints) : base(Handlers)
         {
             _waypoints = waypoints;
-            _sprite = new MapSprite<SmallNpcId>(id, DrawLayer.Characters1, 0, SpriteFlags.BottomAligned);
-            Children.Add(_sprite);
+            _sprite = AttachChild(new MapSprite<SmallNpcId>(id, DrawLayer.Characters1, 0, SpriteFlags.BottomAligned));
         }
 
         public override void Subscribed()

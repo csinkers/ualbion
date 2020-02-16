@@ -37,8 +37,7 @@ namespace UAlbion.Game.Gui.Inventory
 
                 // Carried Weight : %ld of %ld g
                 var template = assets.LoadString(SystemTextId.Inv_CarriedWeightNdOfNdG, settings.Gameplay.Language);
-                var (text, _) = new TextFormatter(assets, settings.Gameplay.Language).Format(template, player.Apparent.TotalWeight, player.Apparent.MaxWeight);
-                return text;
+                return new TextFormatter(assets, settings.Gameplay.Language).Format(template, player.Apparent.TotalWeight, player.Apparent.MaxWeight).Blocks;
             }, x => _version);
 
             var source = new DynamicText(() =>
@@ -56,10 +55,10 @@ namespace UAlbion.Game.Gui.Inventory
                     .NoWrap()
                     .Centre()
                     .Format(template, weight)
-                    .Item1;
+                    .Blocks;
             }, x => _version);
 
-            Children.Add(new ButtonFrame(new Text(source))
+            AttachChild(new ButtonFrame(new Text(source))
             {
                 State = ButtonState.Pressed,
                 Padding = 0

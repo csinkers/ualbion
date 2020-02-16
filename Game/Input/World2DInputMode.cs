@@ -22,10 +22,12 @@ namespace UAlbion.Game.Input
 
         void OnInput(InputEvent e)
         {
+            /*
             if(e.Snapshot.WheelDelta < 0)
                 Raise(new MagnifyEvent(-1));
             if(e.Snapshot.WheelDelta > 0)
                 Raise(new MagnifyEvent(1));
+                */
         }
 
         public World2DInputMode() : base(Handlers) { }

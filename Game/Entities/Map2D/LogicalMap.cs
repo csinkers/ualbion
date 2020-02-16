@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Numerics;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 
@@ -22,6 +23,7 @@ namespace UAlbion.Game.Entities.Map2D
         public PaletteId PaletteId => (PaletteId)_mapData.PaletteId;
         public IconGraphicsId TilesetId => (IconGraphicsId)_mapData.TilesetId;
         public IEnumerable<MapNpc> Npcs => _mapData.Npcs;
+        public Vector2 TileSize { get; set; } // TODO: Tidy up
 
         public int Index(int x, int y) => y * _mapData.Width + x;
 

@@ -31,26 +31,27 @@ namespace UAlbion.Game.State
 
         void Set(SceneId activatingSceneId)
         {
-            foreach (var sceneId in _scenes.Keys.ToList())
+            foreach (var sceneId in _scenes.Keys.Where(x => x != activatingSceneId).ToList())
             {
                 var sceneExchange = GetExchange(sceneId);
                 var scene = _scenes[sceneId];
-                if (activatingSceneId == sceneId)
-                {
-                    var interfaces = scene.GetType().GetInterfaces();
-                    var sceneInterface = interfaces.FirstOrDefault(x => typeof(IScene).IsAssignableFrom(x) && x != typeof(IScene));
-                    if (sceneInterface != null)
-                        Exchange.Register(sceneInterface, scene);
-                    else
-                        Exchange.Attach(scene);
-                    sceneExchange.IsActive = true;
-                }
-                else
-                {
-                    scene.Detach();
-                    sceneExchange.IsActive = false;
-                }
+                scene.Detach();
+                sceneExchange.IsActive = false;
             }
+
+            foreach (var sceneId in _scenes.Keys.Where(x => x == activatingSceneId).ToList())
+            {
+                var sceneExchange = GetExchange(sceneId);
+                var scene = _scenes[sceneId];
+                var interfaces = scene.GetType().GetInterfaces();
+                var sceneInterface = interfaces.FirstOrDefault(x => typeof(IScene).IsAssignableFrom(x) && x != typeof(IScene));
+                if (sceneInterface != null)
+                    Exchange.Register(sceneInterface, scene);
+                else
+                    Exchange.Attach(scene);
+                sceneExchange.IsActive = true;
+            }
+
             ActiveSceneId = activatingSceneId;
         }
 

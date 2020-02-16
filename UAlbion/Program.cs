@@ -121,6 +121,7 @@ namespace UAlbion
                         .RegisterMouseMode(MouseMode.Exclusive, new ExclusiveMouseMode())
                         .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
                         .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
+                        .RegisterMouseMode(MouseMode.RightButtonHeld, new RightButtonHeldMouseMode())
                     )
                     .Register<ILayoutManager>(new LayoutManager())
                     .Register<IMapManager>(new MapManager())
@@ -140,8 +141,9 @@ namespace UAlbion
                     .Register<ITextureManager>(new TextureManager())
                     .Register<IDeviceObjectManager>(new DeviceObjectManager())
                     .Register<ICollisionManager>(new CollisionManager())
+                    .Register<ICursorManager>(new CursorManager())
+                    .Register<ISelectionManager>(new SelectionManager())
                     .Attach(new SlowClock())
-                    .Attach(new CursorManager())
                     .Attach(new DebugMapInspector()
                         .AddBehaviour(new SpriteInstanceDataDebugBehaviour()))
                     .Attach(new InputBinder(InputConfig.Load(baseDir)))
@@ -149,6 +151,7 @@ namespace UAlbion
                     .Attach(new MouseModeStack())
                     .Attach(new SceneStack())
                     .Attach(new StatusBar())
+                    .Attach(new ContextMenu())
                     ;
 
                 PerfTracker.StartupEvent("Creating scene-specific components");
@@ -176,8 +179,8 @@ namespace UAlbion
                 global.Raise(new SetSceneEvent(SceneId.Inventory), null);
                 //*/
 
-                //global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
-                global.Raise(new NewGameEvent(), null);
+                global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
+                //global.Raise(new NewGameEvent(), null);
                 ReflectionHelper.ClearTypeCache();
             });
 

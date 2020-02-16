@@ -10,5 +10,6 @@ namespace UAlbion.Core
         FlipDepthRange     = 0x4,
         FlipYSpace         = 0x8,
         VSync              = 0x10,
+        HighlightSelection = 0x20,
     }
 }

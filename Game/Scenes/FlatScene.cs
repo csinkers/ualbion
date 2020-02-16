@@ -2,7 +2,6 @@
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
@@ -27,11 +26,15 @@ namespace UAlbion.Game.Scenes
 
         public override void Subscribed()
         {
-            Raise(new SetCursorEvent(CoreSpriteId.Cursor));
-            Raise(new SetInputModeEvent(InputMode.World2D));
-            Raise(new SetMouseModeEvent(MouseMode.Normal));
-            Raise(new RefreshMapSubscribersEvent());
+            Raise(new PushInputModeEvent(InputMode.World2D));
+            Raise(new RefreshMapSubscribersEvent()); // TODO: Is this still needed?
             base.Subscribed();
+        }
+
+        protected override void Unsubscribed()
+        {
+            Raise(new PopInputModeEvent());
+            base.Unsubscribed();
         }
     }
 

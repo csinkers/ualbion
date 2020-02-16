@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
+using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using Veldrid;
@@ -10,8 +11,8 @@ namespace UAlbion.Game.Gui.Inventory
     public class ProgressBar : UiElement
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<ProgressBar, UiHoverEvent>((x, e) => x.Hover()),
-            H<ProgressBar, UiBlurEvent>((x, e) => x.Raise(new HoverTextEvent("")))
+            H<ProgressBar, HoverEvent>((x, e) => x.Hover()),
+            H<ProgressBar, BlurEvent>((x, e) => x.Raise(new HoverTextEvent("")))
         );
 
         readonly ButtonFrame _frame;

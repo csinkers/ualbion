@@ -21,11 +21,17 @@ namespace UAlbion.Game.Scenes
 
         public override void Subscribed()
         {
-            Raise(new SetCursorEvent(CoreSpriteId.Cursor));
             Raise(new PushMouseModeEvent(MouseMode.Normal));
             Raise(new PushInputModeEvent(InputMode.Inventory));
             Raise(new LoadPaletteEvent(PaletteId.Inventory));
             base.Subscribed();
+        }
+
+        protected override void Unsubscribed()
+        {
+            Raise(new PopMouseModeEvent());
+            Raise(new PopInputModeEvent());
+            base.Unsubscribed();
         }
     }
 }

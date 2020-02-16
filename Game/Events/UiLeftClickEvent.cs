@@ -3,5 +3,5 @@
 namespace UAlbion.Game.Events
 {
     [Event("ui_left_click")]
-    public class UiLeftClickEvent : UiEvent { }
+    public class UiLeftClickEvent : CancellableEvent { }
 }

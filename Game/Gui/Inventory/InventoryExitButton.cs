@@ -1,4 +1,5 @@
 ﻿using System;
+using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
@@ -13,8 +14,8 @@ namespace UAlbion.Game.Gui.Inventory
         ButtonState _state;
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<InventoryExitButton, UiHoverEvent>((x,e) => x._state = ButtonState.Hover),
-            H<InventoryExitButton, UiBlurEvent>((x,e) => x._state = ButtonState.Normal),
+            H<InventoryExitButton, HoverEvent>((x,e) => x._state = ButtonState.Hover),
+            H<InventoryExitButton, BlurEvent>((x,e) => x._state = ButtonState.Normal),
             H<InventoryExitButton, UiLeftClickEvent>((x, e) => x._state = ButtonState.Clicked),
             H<InventoryExitButton, UiLeftReleaseEvent>((x, _) =>
             {

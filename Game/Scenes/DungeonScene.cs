@@ -27,10 +27,16 @@ namespace UAlbion.Game.Scenes
 
         public override void Subscribed()
         {
-            Raise(new SetCursorEvent(CoreSpriteId.Cursor));
-            Raise(new SetInputModeEvent(InputMode.World3D));
-            Raise(new SetMouseModeEvent(MouseMode.MouseLook));
+            Raise(new PushMouseModeEvent(MouseMode.MouseLook));
+            Raise(new PushInputModeEvent(InputMode.World3D));
             base.Subscribed();
+        }
+
+        protected override void Unsubscribed()
+        {
+            Raise(new PopMouseModeEvent());
+            Raise(new PopInputModeEvent());
+            base.Unsubscribed();
         }
     }
 }

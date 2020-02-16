@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 using Veldrid;
 
@@ -10,41 +11,27 @@ namespace UAlbion.Game.Input
     public class NormalMouseMode : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<NormalMouseMode, InputEvent>((x, e) => x.OnInput(e)),
-            H<NormalMouseMode, UiSelectedEvent>((x,e) => x.OnSelect(e))
+            H<NormalMouseMode, InputEvent>((x, e) => x.OnInput(e))
         );
 
-        void OnSelect(UiSelectedEvent e)
+        public override void Subscribed()
         {
-            IUiEvent newEvent = new UiBlurEvent();
-            foreach (var element in e.BlurredItems)
-            {
-                if (!newEvent.Propagating) break;
-                element.Receive(newEvent, this);
-            }
-
-            newEvent = new UiHoverEvent();
-            foreach (var element in e.FocusedItems)
-            {
-                if (!newEvent.Propagating) break;
-                element.Receive(newEvent, this);
-            }
+            Raise(new SetCursorEvent(CoreSpriteId.Cursor));
+            base.Subscribed();
         }
 
         void OnInput(InputEvent e)
         {
-            IList<(float, Selection)> hits = new List<(float, Selection)>();
-            Raise(new ScreenCoordinateSelectEvent(e.Snapshot.MousePosition, (t, selection) => hits.Add((t, selection))));
-            var orderedHits = hits.OrderBy(x => x.Item1).Select(x => x.Item2).ToList();
+            var hits = Resolve<ISelectionManager>()?.CastRayFromScreenSpace(e.Snapshot.MousePosition, true);
 
             // Clicks are targeted, releases are broadcast. e.g. if you click and drag a slider and move outside
             // its hover area, then it should switch to "ClickedBlurred". If you then release the button while
             // still outside its hover area and releases were broadcast, it would never receive the release and
             // it wouldn't be able to transition back to Normal
-            if(e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && x.Down))
+            if (hits != null && e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && x.Down))
             {
                 var clickEvent = new UiLeftClickEvent();
-                foreach (var hit in orderedHits)
+                foreach (var hit in hits)
                 {
                     if (!clickEvent.Propagating) break;
                     var component = hit.Target as IComponent;
@@ -52,6 +39,10 @@ namespace UAlbion.Game.Input
                 }
             }
 
+            if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && x.Down))
+                Raise(new PushMouseModeEvent(MouseMode.RightButtonHeld));
+
+            /*
             if(e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && x.Down))
             {
                 var clickEvent = new UiRightClickEvent();
@@ -62,6 +53,7 @@ namespace UAlbion.Game.Input
                     component?.Receive(clickEvent, this);
                 }
             }
+            */
 
             if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && !x.Down))
                 Raise(new UiLeftReleaseEvent());

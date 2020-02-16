@@ -17,8 +17,9 @@ namespace UAlbion.Api
 
         StatusBar = 0xf00,
 
-        Debug = 0xffe, // ImGui
-        MaxLayer    = 0xfff // Mouse cursor
+        Debug = 0xff0, // ImGui
+        Cursor = 0xffe, // Mouse cursor
+        MaxLayer = 0xfff // Mouse cursor hotspot
     }
 
     public static class DrawLayerExtensions

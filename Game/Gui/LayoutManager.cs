@@ -19,8 +19,6 @@ namespace UAlbion.Game.Gui
             H<LayoutManager, ScreenCoordinateSelectEvent>((x, e) => x.Select(e))
         );
 
-        IReadOnlyList<IUiElement> _lastSelection = new List<IUiElement>();
-
         void DoLayout(Func<Rectangle, int, IUiElement, int> action)
         {
             int order = (int)DrawLayer.Interface;
@@ -92,22 +90,13 @@ namespace UAlbion.Game.Gui
             var normPosition = window.PixelToNorm(selectEvent.Position);
             var uiPosition = window.NormToUi(normPosition);
 
-            var newSelection = new List<IUiElement>();
             DoLayout((extents, dialogOrder, element) =>
-                    element.Select(uiPosition, extents, dialogOrder, (order, target) =>
-                        {
-                            float z = 1.0f - order / (float)DrawLayer.MaxLayer;
-                            var intersectionPoint = new Vector3(normPosition, z);
-                            selectEvent.RegisterHit(z, new Selection(intersectionPoint, target));
-                            if (target is IUiElement subElement)
-                                newSelection.Add(subElement);
-                        }));
-
-            var focused = newSelection.Except(_lastSelection);
-            var blurred = _lastSelection.Except(newSelection);
-            _lastSelection = newSelection;
-
-            Raise(new UiSelectedEvent(newSelection, focused, blurred));
+                element.Select(uiPosition, extents, dialogOrder, (order, target) =>
+                    {
+                        float z = 1.0f - order / (float)DrawLayer.MaxLayer;
+                        var intersectionPoint = new Vector3(normPosition, z);
+                        selectEvent.RegisterHit(z, new Selection(intersectionPoint, target));
+                    }));
         }
 
         public LayoutManager() : base(Handlers) { }

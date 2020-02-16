@@ -38,15 +38,14 @@ namespace UAlbion.Game.Input
             if (MouseMode == e.Mode) return;
 
             foreach (var mode in _mouseModes)
-            {
+                if (mode.Key != e.Mode)
+                    mode.Value.Detach();
+
+            foreach (var mode in _mouseModes)
                 if (mode.Key == e.Mode)
                     Exchange.Attach(mode.Value);
-                else
-                    mode.Value.Detach();
-            }
 
             MouseMode = e.Mode;
-            Raise(e); // Re-raise after changing in case the new mouse mode needs to access event properties / other controls need to refresh state.
         }
 
         void SetInputMode(SetInputModeEvent e)
@@ -54,12 +53,12 @@ namespace UAlbion.Game.Input
             if (InputMode == e.Mode) return;
 
             foreach (var mode in _inputModes)
-            {
+                if (mode.Key != e.Mode)
+                    mode.Value.Detach();
+
+            foreach (var mode in _inputModes)
                 if (mode.Key == e.Mode)
                     Exchange.Attach(mode.Value);
-                else
-                    mode.Value.Detach();
-            }
 
             InputMode = e.Mode;
         }

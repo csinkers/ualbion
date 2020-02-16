@@ -7,12 +7,12 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 
-namespace UAlbion.Game.Entities
+namespace UAlbion.Game.Entities.Map3D
 {
-    public class Map3D : Component, IMap
+    public class Map : Component, IMap
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<Map3D, WorldCoordinateSelectEvent>((x, e) => x.Select(e))
+            H<Map, WorldCoordinateSelectEvent>((x, e) => x.Select(e))
             // H<Map3D, UnloadMapEvent>((x, e) => x.Unload()),
         );
 
@@ -28,7 +28,7 @@ namespace UAlbion.Game.Entities
         {
         }
 
-        public Map3D(MapDataId mapId) : base(Handlers)
+        public Map(MapDataId mapId) : base(Handlers)
         {
             MapId = mapId;
         }

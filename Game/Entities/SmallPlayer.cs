@@ -11,7 +11,13 @@ namespace UAlbion.Game.Entities
     public class SmallPlayer : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<SmallPlayer, UpdateEvent>((x, e) => (x._sprite.TilePosition, x._sprite.Frame) = x._positionFunc())
+            H<SmallPlayer, UpdateEvent>((x, e) =>
+            {
+                //(x._sprite.TilePosition, x._sprite.Frame) = x._positionFunc();
+                var (pos, frame) = x._positionFunc();
+                x._sprite.TilePosition = pos + new Vector3(0.0f, -1.0f, 0.0f); // TODO: Hacky, find a better way of fixing.
+                x._sprite.Frame = frame;
+            })
         );
 
         readonly PartyCharacterId _id;
@@ -23,7 +29,7 @@ namespace UAlbion.Game.Entities
         {
             _id = charId;
             _positionFunc = positionFunc;
-            _sprite = new MapSprite<SmallPartyGraphicsId>(graphicsId, DrawLayer.Characters1, 0, SpriteFlags.BottomAligned);
+            _sprite = new MapSprite<SmallPartyGraphicsId>(graphicsId, DrawLayer.Characters1, 0, SpriteFlags.LeftAligned);
             Children.Add(_sprite);
         }
     }

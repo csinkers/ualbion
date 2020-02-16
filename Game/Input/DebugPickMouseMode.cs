@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Events;
@@ -21,10 +20,8 @@ namespace UAlbion.Game.Input
                 return;
             }
 
-            IList<(float, Selection)> hits = new List<(float, Selection)>();
-            Raise(new ScreenCoordinateSelectEvent(e.Snapshot.MousePosition, (t, selection) => hits.Add((t, selection))));
-            var orderedHits = hits.OrderBy(x => x.Item1).Select(x => x.Item2).ToList();
-            Raise(new ShowDebugInfoEvent(orderedHits, e.Snapshot.MousePosition));
+            var hits = Resolve<ISelectionManager>()?.CastRayFromScreenSpace(e.Snapshot.MousePosition, true);
+            Raise(new ShowDebugInfoEvent(hits, e.Snapshot.MousePosition));
         }
 
         public DebugPickMouseMode() : base(Handlers) { }

@@ -14,7 +14,7 @@ namespace UAlbion.Game.Entities
             H<LargePlayer, UpdateEvent>((x, e) =>
             {
                 var (pos, frame) = x._positionFunc();
-                x._sprite.TilePosition = pos + new Vector3(0.0f, 1.0f, 0.0f);
+                x._sprite.TilePosition = pos + new Vector3(0.0f, 1.0f, 0.0f); // TODO: Hacky, find a better way of fixing.
                 x._sprite.Frame = frame;
             })
         );
@@ -28,7 +28,7 @@ namespace UAlbion.Game.Entities
         {
             _id = charId;
             _positionFunc = positionFunc;
-            _sprite = new MapSprite<LargePartyGraphicsId>(graphicsId, DrawLayer.Characters1, 0, SpriteFlags.BottomAligned);
+            _sprite = new MapSprite<LargePartyGraphicsId>(graphicsId, DrawLayer.Characters2 + 1, 0, SpriteFlags.BottomAligned); // TODO: Hack, fix.
             Children.Add(_sprite);
         }
     }

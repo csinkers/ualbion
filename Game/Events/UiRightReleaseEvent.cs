@@ -3,5 +3,5 @@
 namespace UAlbion.Game.Events
 {
     [Event("ui_right_release")]
-    public class UiRightReleaseEvent : UiEvent { }
+    public class UiRightReleaseEvent : CancellableEvent { }
 }

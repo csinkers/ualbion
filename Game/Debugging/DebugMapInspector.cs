@@ -8,7 +8,6 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
-using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
@@ -137,11 +136,11 @@ namespace UAlbion.Game.Debugging
 
                     DebugFlagOption(DebugFlags.DrawPositions);
                     DebugFlagOption(DebugFlags.HighlightTile);
-                    DebugFlagOption(DebugFlags.HighlightSelection);
                     DebugFlagOption(DebugFlags.HighlightEventChainZones);
                     DebugFlagOption(DebugFlags.HighlightCollision);
                     DebugFlagOption(DebugFlags.ShowPaths);
                     DebugFlagOption(DebugFlags.NoMapTileBoundingBoxes);
+                    DebugFlagOption(DebugFlags.ShowCursorHotspot);
                     ImGui.TreePop();
                 }
 #endif
@@ -159,6 +158,7 @@ namespace UAlbion.Game.Debugging
                     EngineFlagOption(EngineFlags.FlipDepthRange);
                     EngineFlagOption(EngineFlags.FlipYSpace);
                     EngineFlagOption(EngineFlags.VSync);
+                    EngineFlagOption(EngineFlags.HighlightSelection);
                     ImGui.TreePop();
                 }
 

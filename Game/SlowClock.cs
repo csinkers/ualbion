@@ -1,4 +1,5 @@
-﻿using UAlbion.Core;
+﻿using UAlbion.Api;
+using UAlbion.Core;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game
@@ -24,10 +25,28 @@ namespace UAlbion.Game
                 delta++;
             }
 
+            if (delta <= 0) 
+                return;
+
             _frameCount += delta;
             Raise(new SlowClockEvent(delta, _frameCount));
         }
 
         public SlowClock() : base(Handlers) { }
+    }
+
+    [Event("slow_clock")]
+    public class SlowClockEvent : GameEvent, IVerboseEvent
+    {
+        [EventPart("delta")]
+        public int Delta { get; }
+        [EventPart("frame_count")]
+        public int FrameCount { get; }
+
+        public SlowClockEvent(int delta, int frameCount)
+        {
+            Delta = delta;
+            FrameCount = frameCount;
+        }
     }
 }

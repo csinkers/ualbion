@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
+using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
@@ -14,12 +15,12 @@ namespace UAlbion.Game.Gui
         const string TimerName = "StatusBarPortrait.ClickTimer";
         static readonly HandlerSet Handlers = new HandlerSet(
             H<StatusBarPortrait, PartyChangedEvent>((x, _) => x.LoadSprite()),
-            H<StatusBarPortrait, UiHoverEvent>((x, e) =>
+            H<StatusBarPortrait, HoverEvent>((x, e) =>
             {
                 x.Hover(); 
                 e.Propagating = false;
             }),
-            H<StatusBarPortrait, UiBlurEvent>((x, _) =>
+            H<StatusBarPortrait, BlurEvent>((x, _) =>
             {
                 x._portrait.Highlighted = false;
                 x.Raise(new HoverTextEvent(""));

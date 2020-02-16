@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
@@ -10,7 +11,7 @@ using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 
-namespace UAlbion.Game.Entities
+namespace UAlbion.Game.Entities.Map2D
 {
     public class TileLayer : Component
     {
@@ -28,26 +29,24 @@ namespace UAlbion.Game.Entities
             })
         );
 
-        public TileLayer(MapData2D mapData, TilesetData tileData, ITexture tileset, int[] tileIds, DrawLayer drawLayer) : base(Handlers)
+        public TileLayer(LogicalMap logicalMap, ITexture tileset, Func<int, TilesetData.TileData> tileFunc, DrawLayer drawLayer) : base(Handlers)
         {
-            _mapData = mapData;
-            _tileData = tileData;
+            _logicalMap = logicalMap;
             _tileset = tileset;
-            _tileIds = tileIds;
+            _tileFunc = tileFunc;
             _drawLayer = drawLayer;
         }
 
-        readonly MapData2D _mapData;
+        readonly LogicalMap _logicalMap;
         readonly ITexture _tileset;
-        readonly TilesetData _tileData;
-        readonly int[] _tileIds;
+        readonly Func<int, TilesetData.TileData> _tileFunc;
         readonly DrawLayer _drawLayer;
 
 #if DEBUG
         DebugFlags _lastDebugFlags;
 #endif
         SpriteLease _lease;
-        int[] _animatedIndices;
+        (int, int)[] _animatedTiles;
         int _lastFrameCount;
         bool _isActive = true;
 
@@ -82,7 +81,7 @@ namespace UAlbion.Game.Entities
             if (tile == null || tile.Flags.HasFlag(TilesetData.TileFlags.Debug))
                 return BlankInstance;
 
-            int index = j * _mapData.Width + i;
+            int index = _logicalMap.Index(i, j);
             int subImage = tile.GetSubImageForTile(tickCount);
 
             _tileset.GetSubImageDetails(
@@ -97,15 +96,7 @@ namespace UAlbion.Game.Entities
                 new Vector2(i, j) * tileSize,
                 drawLayer.ToZCoordinate(j));
 
-            var instance = _tileData.UseSmallGraphics 
-                ? SpriteInstanceData.TopMid(
-                    position,
-                    tileSize,
-                    texPosition,
-                    texSize,
-                    layer,
-                    0)
-                : SpriteInstanceData.TopLeft(
+            var instance = SpriteInstanceData.TopLeft(
                     position,
                     tileSize,
                     texPosition,
@@ -113,8 +104,8 @@ namespace UAlbion.Game.Entities
                     layer,
                     0);
 
-            int zoneNum = _mapData.ZoneLookup[index];
-            int eventNum = zoneNum == -1 ? -1 : _mapData.Zones[zoneNum].EventNumber;
+            var zone = _logicalMap.GetZone(index);
+            int eventNum = zone?.EventNumber ?? -1;
 
             instance.Flags = 0
 #if DEBUG
@@ -134,24 +125,24 @@ namespace UAlbion.Game.Entities
 
         void Update(bool updateAll)
         {
+            var frameCount =  (Resolve<IGameState>()?.TickCount ?? 0) / TicksPerFrame;
 #if DEBUG
             var debug = Resolve<IDebugSettings>()?.DebugFlags ?? 0;
             if (_lastDebugFlags != debug)
                 updateAll = true;
             _lastDebugFlags = debug;
 
-            if (debug.HasFlag(DebugFlags.HighlightEventChainZones)
-             || debug.HasFlag(DebugFlags.HighlightTile)
-             || debug.HasFlag(DebugFlags.HighlightSelection))
+            if (frameCount != _lastFrameCount && (
+                    debug.HasFlag(DebugFlags.HighlightEventChainZones)
+                 || debug.HasFlag(DebugFlags.HighlightTile)))
                 updateAll = true;
 #endif
 
-            var frameCount =  (Resolve<IGameState>()?.TickCount ?? 0) / TicksPerFrame;
             var sm = Resolve<ISpriteManager>();
             if (_isActive && _lease == null)
             {
                 var key = new SpriteKey(_tileset, _drawLayer, 0);
-                _lease = sm.Borrow(key, _mapData.Width * _mapData.Height, this);
+                _lease = sm.Borrow(key, _logicalMap.Width * _logicalMap.Height, this);
                 updateAll = true;
             }
 
@@ -160,8 +151,8 @@ namespace UAlbion.Game.Entities
 
             if (HighlightIndex.HasValue)
             {
-                int zoneNum = _mapData.ZoneLookup[HighlightIndex.Value];
-                _highlightEvent = zoneNum == -1 ? -1 : _mapData.Zones[zoneNum].EventNumber;
+                var zone = _logicalMap.GetZone(HighlightIndex.Value);
+                _highlightEvent = zone?.EventNumber ?? -1;
                 if (_highlightEvent == -1)
                     _highlightEvent = null;
             }
@@ -170,35 +161,34 @@ namespace UAlbion.Game.Entities
             if (updateAll)
             {
                 var instances = _lease.Access();
-                var animatedTiles = new List<int>();
+                var animatedTiles = new List<(int, int)>();
 
                 int index = 0;
-                for (int j = 0; j < _mapData.Height; j++)
+                for (int j = 0; j < _logicalMap.Height; j++)
                 {
-                    for (int i = 0; i < _mapData.Width; i++)
+                    for (int i = 0; i < _logicalMap.Width; i++)
                     {
-                        int tileId = _tileIds[index];
-                        var tile = tileId == -1 ? null : _tileData.Tiles[tileId];
+                        var tile = _tileFunc(index);
                         instances[index] = BuildInstanceData(i, j, tile, frameCount);
                         if(tile?.FrameCount > 1)
-                            animatedTiles.Add(index);
+                            animatedTiles.Add((i, j));
 
                         index++;
                     }
                 }
 
-                _animatedIndices = animatedTiles.ToArray();
+                _animatedTiles = animatedTiles.ToArray();
             }
             else if (frameCount != _lastFrameCount)
             {
                 var instances = _lease.Access();
-                foreach (var index in _animatedIndices)
+                foreach (var (x,y) in _animatedTiles)
                 {
-                    var tileId = _tileIds[index];
-                    var tile = tileId == -1 ? null : _tileData.Tiles[tileId];
+                    int index = _logicalMap.Index(x, y);
+                    var tile = _tileFunc(index);
                     instances[index] = BuildInstanceData(
-                        index % _mapData.Width,
-                        index / _mapData.Width,
+                        x,
+                        y,
                         tile,
                         frameCount);
                 }

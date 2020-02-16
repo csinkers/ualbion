@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
@@ -12,12 +13,12 @@ namespace UAlbion.Game.Gui.Inventory
     {
         const string TimerName = "InventorySlot.ClickTimer";
         protected static readonly HandlerSet SlotHandlers = new HandlerSet(
-            H<InventorySlot, UiHoverEvent>((x, e) =>
+            H<InventorySlot, HoverEvent>((x, e) =>
             {
                 x.Hover(); 
                 e.Propagating = false;
             }),
-            H<InventorySlot, UiBlurEvent>((x, _) =>
+            H<InventorySlot, BlurEvent>((x, _) =>
             {
                 x.Frame.State = ButtonState.Normal;
                 x.Raise(new HoverTextEvent(""));

@@ -10,6 +10,7 @@ namespace UAlbion.Core.Events
     {
         static IComponent _logger;
         static int _nesting = -1;
+        static long _nextEventId;
         static readonly object SyncRoot = new object();
         static readonly ExchangeDisabledEvent DisabledEvent = new ExchangeDisabledEvent();
         public static int Nesting => _nesting;
@@ -166,13 +167,14 @@ namespace UAlbion.Core.Events
 
             var type = e.GetType();
             var interfaces = type.GetInterfaces();
+            long eventId = Interlocked.Increment(ref _nextEventId);
             string eventText = null;
 
             if (CoreTrace.Log.IsEnabled())
             {
                 eventText = e.ToString();
-                if (verbose) CoreTrace.Log.StartRaiseVerbose(_nesting, e.GetType().Name, eventText);
-                else CoreTrace.Log.StartRaise(_nesting, e.GetType().Name, eventText);
+                if (verbose) CoreTrace.Log.StartRaiseVerbose(eventId, _nesting, e.GetType().Name, eventText, Name);
+                else CoreTrace.Log.StartRaise(eventId, _nesting, e.GetType().Name, eventText, Name);
             }
 
             var exchanges = new HashSet<EventExchange>();
@@ -197,8 +199,8 @@ namespace UAlbion.Core.Events
 
             if (eventText != null)
             {
-                if (verbose) CoreTrace.Log.StopRaiseVerbose(_nesting, e.GetType().Name, eventText, subscribers.Count);
-                else CoreTrace.Log.StopRaise(_nesting, e.GetType().Name, eventText, subscribers.Count);
+                if (verbose) CoreTrace.Log.StopRaiseVerbose(eventId, _nesting, e.GetType().Name, eventText, Name, subscribers.Count);
+                else CoreTrace.Log.StopRaise(eventId, _nesting, e.GetType().Name, eventText, Name, subscribers.Count);
             }
 
             subscribers.Clear();

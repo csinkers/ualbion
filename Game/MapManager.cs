@@ -61,11 +61,9 @@ namespace UAlbion.Game
                 var mapExchange = new EventExchange(pendingMapChange.ToString(), _allMapsExchange);
 
                 mapExchange.Attach(map);
-                if (map is ICollider collider)
-                    mapExchange.Register(collider);
 
                 // Set the scene first to ensure scene-local components from other scenes are disabled.
-                Raise(new SetSceneEvent(map is Map3D ? SceneId.World3D : SceneId.World2D)); 
+                Raise(new SetSceneEvent(map is Entities.Map3D.Map ? SceneId.World3D : SceneId.World2D)); 
                 Raise(new CameraJumpEvent((int) map.LogicalSize.X / 2, (int) map.LogicalSize.Y / 2));
                 Raise(new PartyJumpEvent((int) map.LogicalSize.X / 2, (int) map.LogicalSize.Y / 2));
                 Raise(new LogEvent(LogEvent.Level.Info, $"Loaded map {(int) pendingMapChange}: {pendingMapChange}"));
@@ -76,10 +74,10 @@ namespace UAlbion.Game
         {
             var assets = Resolve<IAssetManager>();
             if (assets.LoadMap2D(mapId) != null)
-                return new Map2D(mapId);
+                return new Entities.Map2D.Map(mapId);
 
             if (assets.LoadMap3D(mapId) != null)
-                return new Map3D(mapId);
+                return new Entities.Map3D.Map(mapId);
 
             return null;
         }

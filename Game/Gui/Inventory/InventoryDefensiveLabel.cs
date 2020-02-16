@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
@@ -13,12 +14,12 @@ namespace UAlbion.Game.Gui.Inventory
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<InventoryDefensiveLabel, InventoryChangedEvent>((x,e) => x._version++),
-            H<InventoryDefensiveLabel, UiHoverEvent>((x, e) =>
+            H<InventoryDefensiveLabel, HoverEvent>((x, e) =>
             {
                 x.Hover(); 
                 e.Propagating = false;
             }),
-            H<InventoryDefensiveLabel, UiBlurEvent>((x, _) => x.Raise(new HoverTextEvent(""))));
+            H<InventoryDefensiveLabel, BlurEvent>((x, _) => x.Raise(new HoverTextEvent(""))));
 
         public InventoryDefensiveLabel(PartyCharacterId activeCharacter) : base(Handlers)
         {

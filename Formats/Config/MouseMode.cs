@@ -7,5 +7,6 @@
         ItemInHand,
         MouseLook,
         DebugPick,
+        RightButtonHeld
     }
 }

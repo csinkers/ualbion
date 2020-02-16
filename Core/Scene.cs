@@ -12,7 +12,8 @@ namespace UAlbion.Core
     {
         static readonly HandlerSet Handlers = new HandlerSet(
             H<Scene, CollectScenesEvent>((x, e) => e.Register(x)),
-            H<Scene, SetClearColourEvent>((x, e) => x._clearColour = new RgbaFloat(e.Red, e.Green, e.Blue, 1.0f))
+            H<Scene, SetClearColourEvent>((x, e) => x._clearColour = new RgbaFloat(e.Red, e.Green, e.Blue, 1.0f)),
+            H<Scene, ExchangeDisabledEvent>((x,e) => x.Unsubscribed())
         );
 
         readonly IDictionary<Type, IList<IRenderable>> _renderables = new Dictionary<Type, IList<IRenderable>>();
@@ -35,6 +36,8 @@ namespace UAlbion.Core
         public void Add(IRenderable renderable) { } // TODO
         public void Remove(IRenderable renderable) { } // TODO
         public override string ToString() => $"Scene:{Name}";
+        protected virtual void Unsubscribed() { }
+
 
         public void RenderAllStages(GraphicsDevice gd, CommandList cl, SceneContext sc, IDictionary<Type, IRenderer> renderers)
         {

@@ -11,7 +11,7 @@ namespace UAlbion.Game.Gui
     class Button : UiElement
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<Button, UiHoverEvent>((x, _) =>
+            H<Button, HoverEvent>((x, _) =>
             {
                 if (x._frame.State == ButtonState.ClickedBlurred)
                     x._frame.State = ButtonState.Clicked;
@@ -20,7 +20,7 @@ namespace UAlbion.Game.Gui
                         ? ButtonState.HoverPressed
                         : ButtonState.Hover;
             }),
-            H<Button, UiBlurEvent>((x, _) =>
+            H<Button, BlurEvent>((x, _) =>
             {
                 if (x._frame.State == ButtonState.Clicked)
                     x._frame.State = ButtonState.ClickedBlurred;
@@ -95,6 +95,7 @@ namespace UAlbion.Game.Gui
         }
 
         public Button(string buttonId, StringId textId) : this(buttonId, new Text(textId).Center().NoWrap()) { }
+        public Button(string buttonId, ITextSource textSource) : this(buttonId, new Text(textSource).Center().NoWrap()) { }
         public Button(string buttonId, string literalText) : this(buttonId, new Text(literalText).Center().NoWrap()) { }
 
         public override Vector2 GetSize() => GetMaxChildSize() + new Vector2(4, 0);

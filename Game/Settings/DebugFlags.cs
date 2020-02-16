@@ -7,10 +7,10 @@ namespace UAlbion.Game.Settings
     {
         DrawPositions            = 0x1,
         HighlightTile            = 0x2,
-        HighlightSelection       = 0x4,
-        HighlightEventChainZones = 0x8,
-        HighlightCollision       = 0x10,
-        ShowPaths                = 0x20,
-        NoMapTileBoundingBoxes   = 0x40,
+        HighlightEventChainZones = 0x4,
+        HighlightCollision       = 0x8,
+        ShowPaths                = 0x10,
+        NoMapTileBoundingBoxes   = 0x20,
+        ShowCursorHotspot        = 0x40,
     }
 }

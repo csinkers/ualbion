@@ -8,15 +8,14 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
-using Vulkan.Xcb;
 
-namespace UAlbion.Game.Entities
+namespace UAlbion.Game.Entities.Map2D
 {
-    public class PartyMovement : Component, IMovement
+    public class LargePartyMovement : ServiceComponent<IMovement>, IMovement
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<PartyMovement, UpdateEvent>((x,e) => x.Update()),
-            H<PartyMovement, PartyJumpEvent>((x, e) =>
+            H<LargePartyMovement, UpdateEvent>((x,e) => x.Update()),
+            H<LargePartyMovement, PartyJumpEvent>((x, e) =>
                 {
                     var position = new Vector2(e.X, e.Y);
                     for (int i = 0; i < x._trail.Length; i++)
@@ -24,17 +23,15 @@ namespace UAlbion.Game.Entities
 
                     x._target = null;
                 }),
-            H<PartyMovement, BeginFrameEvent>((x, e) => x._direction = Vector2.Zero),
-            H<PartyMovement, PartyMoveEvent>((x, e) => x._direction += new Vector2(e.X, e.Y)),
-            H<PartyMovement, PartyTurnEvent>((x, e) => { }),
-            H<PartyMovement, NoClipEvent>((x, e) => x._clipping = !x._clipping)
+            H<LargePartyMovement, BeginFrameEvent>((x, e) => x._direction = Vector2.Zero),
+            H<LargePartyMovement, PartyMoveEvent>((x, e) => x._direction += new Vector2(e.X, e.Y)),
+            H<LargePartyMovement, PartyTurnEvent>((x, e) => { }),
+            H<LargePartyMovement, NoClipEvent>((x, e) =>
+            {
+                x._clipping = !x._clipping;
+                x.Raise(new LogEvent(LogEvent.Level.Info, $"Clipping {(x._clipping ? "on" : "off")}"));
+            })
         );
-
-        public enum Direction
-        {
-            Left, Right, Up, Down,
-            UpLeft, UpRight, DownLeft, DownRight
-        }
 
         struct MoveTarget
         {
@@ -45,23 +42,21 @@ namespace UAlbion.Game.Entities
 
         const int TicksPerTile = 12; // Number of game ticks it takes to move across a map tile
         const int TicksPerFrame = 9; // Number of game ticks it takes to advance to the next animation frame
-        int MinTrailDistance => _useSmallSprites ? 6 : 12; 
-        int MaxTrailDistance => _useSmallSprites ? 12 : 18; // Max number of positions between each character in the party. Looks best if coprime to TicksPerPile and TicksPerFrame.
+        const int MinTrailDistance = 12;
+        const int MaxTrailDistance = 18; // Max number of positions between each character in the party. Looks best if coprime to TicksPerPile and TicksPerFrame.
         int TrailLength => Party.MaxPartySize * MaxTrailDistance; // Number of past positions to store
 
         readonly (Vector3, int)[] _trail; // Positions (tile coordinates) and frame numbers.
         readonly (int, bool)[] _playerOffsets = new (int, bool)[Party.MaxPartySize]; // int = trail offset, bool = isMoving
-        readonly bool _useSmallSprites;
         int _trailOffset;
         Vector2 _direction;
-        Direction _facingDirection;
+        MovementDirection _facingDirection;
         MoveTarget? _target;
         int _movementTick;
         bool _clipping = true;
 
-        public PartyMovement(bool useSmallSprites, Vector2 initialPosition, Direction initialDirection) : base(Handlers)
+        public LargePartyMovement(Vector2 initialPosition, MovementDirection initialDirection) : base(Handlers)
         {
-            _useSmallSprites = useSmallSprites;
             _facingDirection = initialDirection;
             _trail = new (Vector3, int)[TrailLength];
 
@@ -71,10 +66,10 @@ namespace UAlbion.Game.Entities
 
             var offset = initialDirection switch
                 {
-                    Direction.Left  => new Vector2(1.0f, 0.0f), 
-                    Direction.Right => new Vector2(-1.0f, 0.0f), 
-                    Direction.Up    => new Vector2(0.0f, -1.0f), 
-                    Direction.Down  => new Vector2(0.0f, 1.0f),
+                    MovementDirection.Left  => new Vector2(1.0f, 0.0f), 
+                    MovementDirection.Right => new Vector2(-1.0f, 0.0f), 
+                    MovementDirection.Up    => new Vector2(0.0f, -1.0f), 
+                    MovementDirection.Down  => new Vector2(0.0f, 1.0f),
                     _ => Vector2.Zero
                 } / TicksPerTile;
 
@@ -93,14 +88,14 @@ namespace UAlbion.Game.Entities
             {
                 var anim = _facingDirection switch
                 {
-                    Direction.Left => SpriteAnimation.WalkW,
-                    Direction.Right => SpriteAnimation.WalkE,
-                    Direction.Up => SpriteAnimation.WalkN,
-                    Direction.Down => SpriteAnimation.WalkS,
+                    MovementDirection.Left => SpriteAnimation.WalkW,
+                    MovementDirection.Right => SpriteAnimation.WalkE,
+                    MovementDirection.Up => SpriteAnimation.WalkN,
+                    MovementDirection.Down => SpriteAnimation.WalkS,
                     _ => SpriteAnimation.Sleeping
                 };
 
-                var frames = _useSmallSprites ? SmallSpriteAnimations.Frames[anim] : LargeSpriteAnimations.Frames[anim];
+                var frames = LargeSpriteAnimations.Frames[anim];
                 return frames[(_movementTick / TicksPerFrame) % frames.Length];
             }
         }
@@ -115,35 +110,35 @@ namespace UAlbion.Game.Entities
 
             if (_target == null && _direction.LengthSquared() > float.Epsilon)
             {
-                Direction desiredDirection = _facingDirection;
-                if (_direction.X > 0) desiredDirection = Direction.Right;
-                else if (_direction.X < 0) desiredDirection = Direction.Left;
-                else if (_direction.Y > 0) desiredDirection = Direction.Down;
-                else if (_direction.Y < 0) desiredDirection = Direction.Up;
+                MovementDirection desiredDirection = _facingDirection;
+                if (_direction.X > 0) desiredDirection = MovementDirection.Right;
+                else if (_direction.X < 0) desiredDirection = MovementDirection.Left;
+                else if (_direction.Y > 0) desiredDirection = MovementDirection.Down;
+                else if (_direction.Y < 0) desiredDirection = MovementDirection.Up;
 
                 var target = new MoveTarget { From = position, To = position + _direction, StartTick = _movementTick };
                 var oldDirection = _facingDirection;
                 (_facingDirection, _target) = (_facingDirection, desiredDirection) switch
                 {
-                    (Direction.Left, Direction.Left) => (Direction.Left, target),
-                    (Direction.Left, Direction.Right) => (Direction.Down, (MoveTarget?)null),
-                    (Direction.Left, Direction.Up) => (Direction.Up, null),
-                    (Direction.Left, Direction.Down) => (Direction.Down, null),
+                    (MovementDirection.Left, MovementDirection.Left) => (MovementDirection.Left, target),
+                    (MovementDirection.Left, MovementDirection.Right) => (MovementDirection.Down, (MoveTarget?)null),
+                    (MovementDirection.Left, MovementDirection.Up) => (MovementDirection.Up, null),
+                    (MovementDirection.Left, MovementDirection.Down) => (MovementDirection.Down, null),
 
-                    (Direction.Right, Direction.Left) => (Direction.Down, null),
-                    (Direction.Right, Direction.Right) => (Direction.Right, target),
-                    (Direction.Right, Direction.Up) => (Direction.Up, null),
-                    (Direction.Right, Direction.Down) => (Direction.Down, null),
+                    (MovementDirection.Right, MovementDirection.Left) => (MovementDirection.Down, null),
+                    (MovementDirection.Right, MovementDirection.Right) => (MovementDirection.Right, target),
+                    (MovementDirection.Right, MovementDirection.Up) => (MovementDirection.Up, null),
+                    (MovementDirection.Right, MovementDirection.Down) => (MovementDirection.Down, null),
 
-                    (Direction.Up, Direction.Left) => (Direction.Left, null),
-                    (Direction.Up, Direction.Right) => (Direction.Right, null),
-                    (Direction.Up, Direction.Up) => (Direction.Up, target),
-                    (Direction.Up, Direction.Down) => (Direction.Right, null),
+                    (MovementDirection.Up, MovementDirection.Left) => (MovementDirection.Left, null),
+                    (MovementDirection.Up, MovementDirection.Right) => (MovementDirection.Right, null),
+                    (MovementDirection.Up, MovementDirection.Up) => (MovementDirection.Up, target),
+                    (MovementDirection.Up, MovementDirection.Down) => (MovementDirection.Right, null),
 
-                    (Direction.Down, Direction.Left) => (Direction.Left, null),
-                    (Direction.Down, Direction.Right) => (Direction.Right, null),
-                    (Direction.Down, Direction.Up) => (Direction.Right, null),
-                    (Direction.Down, Direction.Down) => (Direction.Down, target),
+                    (MovementDirection.Down, MovementDirection.Left) => (MovementDirection.Left, null),
+                    (MovementDirection.Down, MovementDirection.Right) => (MovementDirection.Right, null),
+                    (MovementDirection.Down, MovementDirection.Up) => (MovementDirection.Right, null),
+                    (MovementDirection.Down, MovementDirection.Down) => (MovementDirection.Down, target),
                     _ => (_facingDirection, null)
                 };
 
@@ -174,8 +169,6 @@ namespace UAlbion.Game.Entities
 
             MoveFollowers();
         }
-
-
 
         Vector2 CheckForCollisions(Vector2 position, Vector2 direction) // Returns direction to move in
         {
@@ -304,9 +297,6 @@ namespace UAlbion.Game.Entities
             return (pos, frame);
         }
 
-        static Vector3 To3D(Vector2 position) => new Vector3(position, DrawLayer.Characters1.ToZCoordinate(position.Y));
+        static Vector3 To3D(Vector2 position) => new Vector3(position, DrawLayer.Characters1.ToZCoordinate(position.Y - 1));
     }
-
-    [Event("noclip", "Toggles collision detection for the player(s)")]
-    public class NoClipEvent : GameEvent { }
 }

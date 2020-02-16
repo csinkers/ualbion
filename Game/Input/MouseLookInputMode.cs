@@ -2,7 +2,6 @@
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Input
@@ -37,41 +36,28 @@ namespace UAlbion.Game.Input
     public class MouseLookMouseMode : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<MouseLookMouseMode, SetMouseModeEvent>((x,e) =>
-            {
-                var activating = e.Mode == MouseMode.MouseLook && !x._isActive;
-                var deactivating = e.Mode != MouseMode.MouseLook && x._isActive;
-                if (activating)
-                {
-                    x._isActive = true;
-                    x.Raise(new SetCursorEvent(CoreSpriteId.CursorCrossUnselected));
-                }
-
-                if (deactivating)
-                    x._isActive = false;
-            }),
             H<MouseLookMouseMode, InputEvent>((x,e) => x.OnInput(e)), 
             H<MouseLookMouseMode, PostUpdateEvent>((x, e) =>
             {
-                if (!x._isActive) return;
                 var windowState = x.Resolve<IWindowManager>();
                 x.Raise(new SetCursorPositionEvent(windowState.PixelWidth / 2, windowState.PixelHeight / 2));
             })
         );
 
+        public override void Subscribed()
+        {
+            Raise(new SetCursorEvent(CoreSpriteId.CursorCrossUnselected));
+            base.Subscribed();
+        }
+
         void OnInput(InputEvent e)
         {
-            if (!_isActive /*|| ImGui.GetIO().WantCaptureMouse*/)
-                return;
-
             var windowState = Resolve<IWindowManager>();
             var delta = e.Snapshot.MousePosition - new Vector2((int)(windowState.PixelWidth / 2), (int)(windowState.PixelHeight / 2));
 
             if (delta.LengthSquared() > float.Epsilon)
                 Raise(new CameraRotateEvent(delta.X * -0.003f, delta.Y * -0.003f));
         }
-
-        bool _isActive;
 
         public MouseLookMouseMode() : base(Handlers) { }
     }

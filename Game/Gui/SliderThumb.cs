@@ -1,4 +1,5 @@
 ﻿using System;
+using UAlbion.Core.Events;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using Veldrid;
@@ -14,8 +15,8 @@ namespace UAlbion.Game.Gui
         int _lastValue = int.MaxValue;
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<SliderThumb, UiHoverEvent>((x, _) => x._frame.State = ButtonState.Hover),
-            H<SliderThumb, UiBlurEvent>((x, _) => x._frame.State = ButtonState.Normal)
+            H<SliderThumb, HoverEvent>((x, _) => x._frame.State = ButtonState.Hover),
+            H<SliderThumb, BlurEvent>((x, _) => x._frame.State = ButtonState.Normal)
         );
 
         public SliderThumb(Func<int> getter) : base(Handlers)

@@ -7,42 +7,46 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
+using UAlbion.Game.Gui;
+using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 
 namespace UAlbion.Game.Input
 {
-    public class CursorManager : Component
+    public class CursorManager : Component, ICursorManager
     {
         CoreSpriteId _cursorId = CoreSpriteId.Cursor;
-        Vector2 _position;
+        public Vector2 Position { get; private set; }
         Vector2 _hotspot;
         Vector2 _size;
         SpriteLease _cursorSprite;
         SpriteLease _itemSprite;
+        SpriteLease _hotspotSprite;
         bool _dirty = true;
+        bool _showCursor = true;
         int _frame;
 
         public CursorManager() : base(Handlers) { }
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<CursorManager, InputEvent>((x,e) =>
+            H<CursorManager, InputEvent>((x, e) =>
             {
-                x._position = e.Snapshot.MousePosition - x._hotspot;
+                x.Position = e.Snapshot.MousePosition;
                 x._dirty = true;
             }),
-            H<CursorManager, SetCursorPositionEvent>((x,e) =>
+            H<CursorManager, SetCursorPositionEvent>((x, e) =>
             {
-                x._position = new Vector2(e.X, e.Y) - x._hotspot;
+                x.Position = new Vector2(e.X, e.Y);
                 x._dirty = true;
             }),
             H<CursorManager, ClearInventoryItemInHandEvent>((x, e) => x._dirty = true),
             H<CursorManager, SetInventoryItemInHandEvent>((x, e) => x._dirty = true),
-            H<CursorManager, RenderEvent>((x,e) => x.Render()),
+            H<CursorManager, RenderEvent>((x, e) => x.Render()),
             H<CursorManager, SlowClockEvent>((x, e) => x._frame += e.Delta),
-            H<CursorManager, SetCursorEvent>((x,e) => x.SetCursor(e.CursorId)),
-            H<CursorManager, WindowResizedEvent>((x,e) => x.SetCursor(x._cursorId))
+            H<CursorManager, SetCursorEvent>((x, e) => x.SetCursor(e.CursorId)),
+            H<CursorManager, ShowCursorEvent>((x, e) => { x._showCursor = e.Show; x._dirty = true; }),
+            H<CursorManager, WindowResizedEvent>((x, e) => x.SetCursor(x._cursorId))
         );
-
 
         void SetCursor(CoreSpriteId id)
         {
@@ -60,6 +64,10 @@ namespace UAlbion.Game.Input
 
         void Render()
         {
+            var showHotspot = (Resolve<IDebugSettings>()?.DebugFlags ?? 0).HasFlag(DebugFlags.ShowCursorHotspot);
+            if (showHotspot != (_hotspotSprite == null))
+                _dirty = true;
+
             if (!_dirty)
                 return;
             _dirty = false;
@@ -71,6 +79,44 @@ namespace UAlbion.Game.Input
             if (window.Size.X < 1 || window.Size.Y < 1)
                 return;
 
+            var position = new Vector3(window.PixelToNorm(Position - _hotspot), 1.0f);
+            RenderCursor(assets, sm, window, position);
+            RenderItemInHandCursor(assets, sm, window, position);
+            RenderHotspot(sm, window, showHotspot);
+        }
+
+        void RenderHotspot(ISpriteManager sm, IWindowManager window, bool showHotspot)
+        {
+            if(!showHotspot)
+            {
+                _hotspotSprite?.Dispose();
+                _hotspotSprite = null;
+                return;
+            }
+
+            if (_hotspotSprite == null)
+            {
+                var key = new SpriteKey(CommonColors.BorderTexture, DrawLayer.MaxLayer, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
+                _hotspotSprite = sm.Borrow(key, 1, this);
+            }
+
+            var instances = _hotspotSprite.Access();
+            var position = new Vector3(window.PixelToNorm(Position), 0.0f);
+            var size = window.UiToNormRelative(Vector2.One);
+            instances[0] = SpriteInstanceData.TopLeft(position, size, _hotspotSprite, (int)CommonColors.Palette[CommonColor.Yellow3], 0);
+        }
+
+        void RenderCursor(IAssetManager assets, ISpriteManager sm, IWindowManager window, Vector3 position)
+        {
+            if (!_showCursor)
+            {
+                _cursorSprite?.Dispose();
+                _itemSprite?.Dispose();
+                _cursorSprite = null;
+                _itemSprite = null;
+                return;
+            }
+
             var cursorTexture = assets.LoadTexture(_cursorId);
             if (cursorTexture == null)
                 return;
@@ -78,72 +124,70 @@ namespace UAlbion.Game.Input
             if (cursorTexture != _cursorSprite?.Key.Texture)
             {
                 _cursorSprite?.Dispose();
-
-                var key = new SpriteKey(cursorTexture, DrawLayer.MaxLayer,
-                    SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
-
+                var key = new SpriteKey(cursorTexture, DrawLayer.Cursor, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
                 _cursorSprite = sm.Borrow(key, 1, this);
             }
 
             var instances = _cursorSprite.Access();
-            var position = new Vector3(window.PixelToNorm(_position), 0.0f);
             var size = window.UiToNormRelative(_size) / 2;
             instances[0] = SpriteInstanceData.TopMid(position, size, _cursorSprite, 0, 0);
+        }
 
-            if (_cursorId == CoreSpriteId.CursorSmall) // Inventory screen, check what's being held.
-            {
-                var held = Resolve<IInventoryScreenState>().ItemInHand;
-
-                int subItem = 0;
-                ITexture texture = null;
-
-                if (held is GoldInHand)
-                {
-                    texture = assets.LoadTexture(CoreSpriteId.UiGold);
-                }
-                else if (held is RationsInHand)
-                {
-                    texture = assets.LoadTexture(CoreSpriteId.UiFood);
-                }
-                else if (held is ItemSlot itemInHand)
-                {
-                    var item = assets.LoadItem(itemInHand.Id);
-                    ItemSpriteId spriteId = item.Icon + _frame % item.IconAnim;
-                    texture = assets.LoadTexture(spriteId);
-                    subItem = (int)spriteId;
-                }
-
-                if(texture == null)
-                {
-                    _itemSprite?.Dispose();
-                    _itemSprite = null;
-                    return;
-                }
-
-                if (texture != _itemSprite?.Key.Texture)
-                {
-                    _itemSprite?.Dispose();
-
-                    var key = new SpriteKey(texture, DrawLayer.MaxLayer,
-                        SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
-
-                    _itemSprite = sm.Borrow(key, 1, this);
-                }
-
-                texture.GetSubImageDetails(subItem, out size, out var to, out var ts, out var tl);
-
-                // TODO: Quantity text
-                instances = _itemSprite.Access();
-                instances[0] = SpriteInstanceData.TopMid(
-                    position + new Vector3(window.UiToNormRelative(new Vector2(6, 6)), 0),
-                    window.UiToNormRelative(size),
-                    to, ts, tl, 0);
-            }
-            else
+        void RenderItemInHandCursor(IAssetManager assets, ISpriteManager sm, IWindowManager window, Vector3 normPosition)
+        {
+            if (_cursorId != CoreSpriteId.CursorSmall) // Inventory screen, check what's being held.
             {
                 _itemSprite?.Dispose();
                 _itemSprite = null;
+                return;
             }
+
+            var held = Resolve<IInventoryScreenState>().ItemInHand;
+
+            int subItem = 0;
+            ITexture texture = null;
+
+            if (held is GoldInHand)
+            {
+                texture = assets.LoadTexture(CoreSpriteId.UiGold);
+            }
+            else if (held is RationsInHand)
+            {
+                texture = assets.LoadTexture(CoreSpriteId.UiFood);
+            }
+            else if (held is ItemSlot itemInHand)
+            {
+                var item = assets.LoadItem(itemInHand.Id);
+                ItemSpriteId spriteId = item.Icon + _frame % item.IconAnim;
+                texture = assets.LoadTexture(spriteId);
+                subItem = (int)spriteId;
+            }
+
+            if (texture == null)
+            {
+                _itemSprite?.Dispose();
+                _itemSprite = null;
+                return;
+            }
+
+            if (texture != _itemSprite?.Key.Texture)
+            {
+                _itemSprite?.Dispose();
+
+                var key = new SpriteKey(texture, DrawLayer.Cursor,
+                    SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
+
+                _itemSprite = sm.Borrow(key, 1, this);
+            }
+
+            texture.GetSubImageDetails(subItem, out var size, out var to, out var ts, out var tl);
+
+            // TODO: Quantity text
+            var instances = _itemSprite.Access();
+            instances[0] = SpriteInstanceData.TopMid(
+                normPosition + new Vector3(window.UiToNormRelative(new Vector2(6, 6)), 0),
+                window.UiToNormRelative(size),
+                to, ts, tl, 0);
         }
     }
 }

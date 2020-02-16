@@ -2,7 +2,7 @@
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Assets;
-using UAlbion.Game.Entities;
+using UAlbion.Game.Entities.Map2D;
 
 namespace UAlbion.Game
 {
@@ -23,7 +23,7 @@ namespace UAlbion.Game
             WriteEvent(1, type, id, name, language, path);
         }
 
-        public void Move(PartyMovement.Direction oldDir, PartyMovement.Direction desiredDir, PartyMovement.Direction facingDir, float fromX, float fromY, float toX, float toY, int frame)
+        public void Move(MovementDirection oldDir, MovementDirection desiredDir, MovementDirection facingDir, float fromX, float fromY, float toX, float toY, int frame)
         {
             WriteEvent(2, oldDir, desiredDir, facingDir, fromX, fromY, toX, toY, frame);
         }

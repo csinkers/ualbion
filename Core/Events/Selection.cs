@@ -10,6 +10,8 @@ namespace UAlbion.Core.Events
             Target = target;
         }
 
+        public override string ToString() => $"{Target} @ {IntersectionPoint}";
+
         public Vector3 IntersectionPoint { get; }
         public object Target { get; }
     }

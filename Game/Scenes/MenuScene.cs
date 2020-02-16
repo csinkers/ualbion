@@ -1,7 +1,6 @@
 ﻿using System;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 
@@ -21,10 +20,16 @@ namespace UAlbion.Game.Scenes
 
         public override void Subscribed()
         {
-            Raise(new SetCursorEvent(CoreSpriteId.Cursor));
-            Raise(new SetMouseModeEvent(MouseMode.Normal));
-            Raise(new SetInputModeEvent(InputMode.MainMenu));
+            Raise(new PushMouseModeEvent(MouseMode.Normal));
+            Raise(new PushInputModeEvent(InputMode.MainMenu));
             base.Subscribed();
+        }
+
+        protected override void Unsubscribed()
+        {
+            Raise(new PopMouseModeEvent());
+            Raise(new PopInputModeEvent());
+            base.Unsubscribed();
         }
     }
 }

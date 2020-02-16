@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Events;
@@ -7,18 +6,6 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game
 {
-    public class SlowClockEvent : GameEvent, IVerboseEvent
-    {
-        public int Delta { get; }
-        public int FrameCount { get; }
-
-        public SlowClockEvent(int delta, int frameCount)
-        {
-            Delta = delta;
-            FrameCount = frameCount;
-        }
-    }
-
     public class GameClock : Component, IClock
     {
         const float TickDurationSeconds = 1 / 60.0f;
@@ -26,14 +13,14 @@ namespace UAlbion.Game
 
         readonly IList<(string, float)> _activeTimers = new List<(string, float)>();
         float _elapsedTimeThisGameFrame;
-        bool _running = false;
 
         public GameClock() : base(Handlers) { }
         public float ElapsedTime { get; private set; }
+        public bool IsRunning { get; private set; }
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<GameClock, StartClockEvent>((x,e) => x._running = true),
-            H<GameClock, StopClockEvent>((x,e) => x._running = false),
+            H<GameClock, StartClockEvent>((x,e) => x.IsRunning = true),
+            H<GameClock, StopClockEvent>((x,e) => x.IsRunning = false),
             H<GameClock, EngineUpdateEvent>((x,e) => x.OnEngineUpdate(e)),
             H<GameClock, StartTimerEvent>((x,e) => x.StartTimer(e))
         );
@@ -53,12 +40,15 @@ namespace UAlbion.Game
                 i--;
             }
 
-            if (_running)
+            if (IsRunning)
             {
                 var state = Resolve<IGameState>();
                 _elapsedTimeThisGameFrame += e.DeltaSeconds;
 
-                while (_elapsedTimeThisGameFrame > TickDurationSeconds)
+                // If the game was paused for a while don't try and catch up
+                if (_elapsedTimeThisGameFrame > 4 * TickDurationSeconds) _elapsedTimeThisGameFrame = 4 * TickDurationSeconds;
+
+                while (_elapsedTimeThisGameFrame >= TickDurationSeconds)
                 {
                     _elapsedTimeThisGameFrame -= TickDurationSeconds;
                     Raise(new UpdateEvent(1));
@@ -66,9 +56,6 @@ namespace UAlbion.Game
                     if ((state?.TickCount ?? 0) % TicksPerCacheCycle == TicksPerCacheCycle - 1)
                         Raise(new CycleCacheEvent());
                 }
-
-                // If the game was paused for a while don't try and catch up
-                if (_elapsedTimeThisGameFrame > 2 * TickDurationSeconds) _elapsedTimeThisGameFrame = 0;
             }
 
             Raise(new PostUpdateEvent());

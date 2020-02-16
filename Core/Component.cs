@@ -64,6 +64,13 @@ namespace UAlbion.Core
             _handlers = handlers ?? EmptySet;
         }
 
+        protected T AttachChild<T>(T child) where T : IComponent
+        {
+            Exchange?.Attach(child);
+            Children.Add(child);
+            return child;
+        }
+
         public void Attach(EventExchange exchange)
         {
             if (Exchange == exchange)

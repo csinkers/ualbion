@@ -2,15 +2,26 @@
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core.Events;
+using Veldrid;
 
 namespace UAlbion.Core.Visual
 {
-    public class Sprite<T> : Component where T : Enum 
+    public class Sprite<T> : Component where T : Enum
     {
         static readonly HandlerSet Handlers = new HandlerSet(
             H<Sprite<T>, RenderEvent>((x,e) => x.UpdateSprite()),
             H<Sprite<T>, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; }),
-            H<Sprite<T>, WorldCoordinateSelectEvent>((x,e) => x.Select(e))
+            H<Sprite<T>, HoverEvent>((x, _) =>
+            {
+                if (x.Resolve<IEngineSettings>()?.Flags.HasFlag(EngineFlags.HighlightSelection) ?? false)
+                    x.Flags |= SpriteFlags.Highlight;
+            }),
+            H<Sprite<T>, BlurEvent>((x, _) =>
+            {
+                if (x.Resolve<IEngineSettings>()?.Flags.HasFlag(EngineFlags.HighlightSelection) ?? false)
+                    x.Flags &= ~SpriteFlags.Highlight;
+            }),
+            H<Sprite<T>, WorldCoordinateSelectEvent>((x, e) => x.Select(e))
         );
 
         public Vector3 Normal => Vector3.UnitZ; // TODO
@@ -124,12 +135,21 @@ namespace UAlbion.Core.Visual
             int x = (int)(intersectionPoint.X - _position.X);
             int y = (int)(intersectionPoint.Y - _position.Y);
 
-            if (x < 0 || x >= Size.X ||
-                y < 0 || y >= Size.Y)
-                return;
-
-            e.RegisterHit(t, this);
+            var rectangle = CalculateBoundingRectangle();
+            if(rectangle.Contains(x, y))
+                e.RegisterHit(t, this);
         }
+
+        Rectangle CalculateBoundingRectangle() => (Flags & SpriteFlags.AlignmentMask) switch 
+            {
+                SpriteFlags.LeftAligned =>                             new Rectangle(               0,                0, (int)Size.X, (int)Size.Y), // TopLeft
+                SpriteFlags.LeftAligned | SpriteFlags.MidAligned =>    new Rectangle(               0, -(int)Size.Y / 2, (int)Size.X, (int)Size.Y), // MidLeft
+                SpriteFlags.LeftAligned | SpriteFlags.BottomAligned => new Rectangle(               0, -(int)Size.Y    , (int)Size.X, (int)Size.Y), // BottomLeft
+                0 =>                                                   new Rectangle(-(int)Size.X / 2,                0, (int)Size.X, (int)Size.Y), // TopMid
+                SpriteFlags.MidAligned =>                              new Rectangle(-(int)Size.X / 2, -(int)Size.Y / 2, (int)Size.X, (int)Size.Y), // Centred
+                SpriteFlags.BottomAligned =>                           new Rectangle(-(int)Size.X / 2, -(int)Size.Y    , (int)Size.X, (int)Size.Y), // BottomMid
+                _ => new Rectangle()
+            };
 
         public override void Subscribed()
         {

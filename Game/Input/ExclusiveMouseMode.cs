@@ -12,28 +12,16 @@ namespace UAlbion.Game.Input
     {
         static readonly HandlerSet Handlers = new HandlerSet(
             H<ExclusiveMouseMode, InputEvent>((x, e) => x.OnInput(e)),
-            H<ExclusiveMouseMode, UiSelectedEvent>((x,e) => x.OnSelect(e)),
             H<ExclusiveMouseMode, SetExclusiveMouseModeEvent>((x, e) => x._exclusiveItem = e.ExclusiveElement)
         );
 
         public ExclusiveMouseMode() : base(Handlers) { }
 
-        void OnSelect(UiSelectedEvent e)
-        {
-            IUiEvent newEvent = new UiHoverEvent();
-            foreach (var element in e.FocusedItems.Where(x => x == _exclusiveItem))
-                element.Receive(newEvent, this);
-
-            newEvent = new UiBlurEvent();
-            foreach (var element in e.BlurredItems.Where(x => x == _exclusiveItem))
-                element.Receive(newEvent, this);
-        }
-
         IUiElement _exclusiveItem;
 
         void OnInput(InputEvent e)
         {
-            Raise(new ScreenCoordinateSelectEvent(e.Snapshot.MousePosition, (t, selection) => {}));
+            Resolve<ISelectionManager>()?.CastRayFromScreenSpace(e.Snapshot.MousePosition, true);
 
             if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && !x.Down))
             {

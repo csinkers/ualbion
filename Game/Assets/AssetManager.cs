@@ -157,5 +157,7 @@ namespace UAlbion.Game.Assets
                 };
             return words.SelectMany(x => x).Where(x => x.Value == word).Select(x => (WordId?)x.Key).FirstOrDefault();
         }
+
+        public IList<Block> LoadBlockList(BlockListId blockListId) => (IList<Block>)_assetLocator.LoadAssetCached(AssetType.BlockList, blockListId);
     }
 }

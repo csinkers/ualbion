@@ -3,7 +3,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class ChangeIconEvent : IEvent
+    public class ChangeIconEvent : IPositionedEvent
     {
         public static EventNode Load(BinaryReader br, int id, MapEventType type)
         {
@@ -34,6 +34,20 @@ namespace UAlbion.Formats.MapEvents
             ChangeTileEventTrigger = 0xA, // ???? Might not be 0xA
         }
 
+        public IPositionedEvent OffsetClone(int x, int y) =>
+            new ChangeIconEvent
+            {
+                X = (sbyte) (X + x),
+                Y = (sbyte) (Y + y),
+                Permanent = Permanent,
+                ChangeType = ChangeType,
+                Unk5 = Unk5,
+                Value = Value,
+                Unk8 = Unk8
+            };
+
+        int IPositionedEvent.X => X;
+        int IPositionedEvent.Y => Y;
         public sbyte X { get; private set; }
         public sbyte Y { get; private set; }
         public byte Permanent { get; private set; }

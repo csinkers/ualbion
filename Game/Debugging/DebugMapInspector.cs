@@ -8,6 +8,8 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
+using UAlbion.Formats.MapEvents;
+using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
@@ -38,8 +40,8 @@ namespace UAlbion.Game.Debugging
                 EightBitTexture.ScaleAdjustY = e.Y;
             }));
 
-        readonly IDictionary<Type, Action<DebugInspectorAction, Reflector.ReflectedObject>> _behaviours =
-            new Dictionary<Type, Action<DebugInspectorAction, Reflector.ReflectedObject>>();
+        readonly IDictionary<Type, Func<DebugInspectorAction, Reflector.ReflectedObject, object>> _behaviours =
+            new Dictionary<Type, Func<DebugInspectorAction, Reflector.ReflectedObject, object>>();
 
         readonly IList<object> _fixedObjects = new List<object>();
         IList<Selection> _hits;
@@ -260,11 +262,19 @@ namespace UAlbion.Game.Debugging
 
         bool RenderNode(Reflector.ReflectedObject reflected, bool fixedObject)
         {
-            var typeName = reflected.Object?.GetType().Name ?? "null";
+            var type = reflected.Object?.GetType();
+            var typeName = type?.Name ?? "null";
             var description =
                 reflected.Name == null
                     ? $"{reflected.Value} ({typeName})"
                     : $"{reflected.Name}: {reflected.Value} ({typeName})";
+
+            if (type != null &&
+                _behaviours.TryGetValue(type, out var callback) &&
+                callback(DebugInspectorAction.Format, reflected) is string formatted)
+            {
+                description += " " + formatted;
+            }
 
             bool anyHovered = false;
             if (reflected.SubObjects != null)
@@ -298,6 +308,18 @@ namespace UAlbion.Game.Debugging
         {
             _behaviours[behaviour.HandledType] = behaviour.Handle;
             return this;
+        }
+    }
+
+    public class FormatTextEventBehaviour : IDebugBehaviour
+    {
+        public Type HandledType => typeof(TextEvent);
+        public object Handle(DebugInspectorAction action, Reflector.ReflectedObject reflected)
+        {
+            if (!(reflected.Object is TextEvent text))
+                return null;
+
+            return Engine.Global?.Resolve<ITextManager>()?.GetTextFromTextEvent(text);
         }
     }
 }

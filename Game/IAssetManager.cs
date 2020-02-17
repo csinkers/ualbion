@@ -1,4 +1,5 @@
-﻿using UAlbion.Core.Textures;
+﻿using System.Collections.Generic;
+using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
@@ -54,5 +55,6 @@ namespace UAlbion.Game
         Chest LoadChest(ChestId chestId);
         Chest LoadMerchant(MerchantId merchantId);
         WordId? ParseWord(string word);
+        IList<Block> LoadBlockList(BlockListId blockListId);
     }
 }

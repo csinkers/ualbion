@@ -105,7 +105,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(SystemTextId.MapPopup_Examine),
-                        new TriggerChainEvent(zone.Event, TriggerType.Examine),
+                        new TriggerChainEvent(zone.Event, TriggerType.Examine, x, y),
                         ContextMenuGroup.Actions));
                 }
 
@@ -113,7 +113,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(SystemTextId.MapPopup_Manipulate),
-                        new TriggerChainEvent(zone.Event, TriggerType.Manipulate),
+                        new TriggerChainEvent(zone.Event, TriggerType.Manipulate, x, y),
                         ContextMenuGroup.Actions));
                 }
 
@@ -121,7 +121,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(SystemTextId.MapPopup_Take),
-                        new TriggerChainEvent(zone.Event, TriggerType.Take),
+                        new TriggerChainEvent(zone.Event, TriggerType.Take, x, y),
                         ContextMenuGroup.Actions));
                 }
 
@@ -129,7 +129,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(SystemTextId.MapPopup_TalkTo),
-                        new TriggerChainEvent(zone.Event, TriggerType.TalkTo),
+                        new TriggerChainEvent(zone.Event, TriggerType.TalkTo, x, y),
                         ContextMenuGroup.Actions));
                 }
             }

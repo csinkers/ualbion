@@ -16,9 +16,19 @@ namespace UAlbion.Game
         {
             public TriggerType Trigger { get; set; }
             public IEventNode Node { get; set; }
+            public int X { get; set; }
+            public int Y { get; set; }
         }
 
         public EventChainManager() : base(Handlers) { }
+
+        void RaiseWithContext(EventChainContext context, IEvent e)
+        {
+            if(e is IPositionedEvent positioned)
+                Raise(positioned.OffsetClone(context.X, context.Y));
+            else 
+                Raise(e);
+        }
 
         void Resume(EventChainContext context)
         {
@@ -29,7 +39,7 @@ namespace UAlbion.Game
                     context.Node = context.Node.NextEvent;
                     asyncEvent.SetCallback(() => Resume(context));
 
-                    Raise(asyncEvent);
+                    RaiseWithContext(context, asyncEvent);
 
                     if (asyncEvent.Acknowledged)
                         return;
@@ -48,7 +58,7 @@ namespace UAlbion.Game
                     }
                     else
                     {
-                        Raise(context.Node.Event);
+                        RaiseWithContext(context, context.Node.Event);
                         context.Node = context.Node.NextEvent;
                     }
                 }
@@ -178,7 +188,13 @@ namespace UAlbion.Game
 
         void Trigger(TriggerChainEvent e)
         {
-            var context = new EventChainContext {Trigger = e.Trigger, Node = e.Chain};
+            var context = new EventChainContext
+            {
+                Trigger = e.Trigger,
+                Node = e.Chain,
+                X = e.X,
+                Y = e.Y
+            };
             Resume(context);
         }
     }

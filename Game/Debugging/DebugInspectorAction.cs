@@ -2,6 +2,7 @@
 {
     public enum DebugInspectorAction
     {
+        Format,
         Hover,
         Blur,
     }

@@ -63,6 +63,8 @@
     "S": "+camera_move  0  8",
     "D": "+camera_move  8  0",
 
+    "C": "noclip",
+
     "Shift+W": "+camera_move  0 -16",
     "Shift+A": "+camera_move -16  0",
     "Shift+S": "+camera_move  0  16",

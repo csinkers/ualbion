@@ -9,8 +9,8 @@ namespace UAlbion.Game.Assets
         static readonly IDictionary<FontColor, IList<byte>> Mappings = new Dictionary<FontColor, IList<byte>>
         {
             { FontColor.White, new byte[] { 0, 194, 194, 195, 196, 197 } },
-            { FontColor.Yellow, new byte[] { 0, 194, 194, 195, 196, 197 } },
-            { FontColor.YellowOrange, new byte[] { 0, 194, 194, 195, 196, 197 } }
+            { FontColor.Yellow, new byte[] { 0, 194, 194, 219, 220, 221 } },
+            { FontColor.YellowOrange, new byte[] { 0, 194, 194, 208, 209, 210 } }
         };
 
         public static ITexture Load(MetaFontId id, ITexture regular, ITexture bold)

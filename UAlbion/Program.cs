@@ -33,7 +33,6 @@ namespace UAlbion
         static bool _startupOnly;
         static bool _useRenderDoc;
 
-        public static EventExchange Global { get; private set; }
         static void Main(string[] args)
         {
             //TransformTests();
@@ -71,9 +70,9 @@ namespace UAlbion
             PerfTracker.StartupEvent("Registering asset manager");
             using var assets = new AssetManager();
             using var global = new EventExchange("Global", logger);
-            Global = global;
+            Engine.Global = global;
 
-            Global
+            global
                 // Need to register settings first, as the AssetConfigLocator relies on it.
                 .Register<ISettings>(settings) 
                 .Register<IEngineSettings>(settings)
@@ -90,7 +89,7 @@ namespace UAlbion
             // Dump.MapEvents(assets, baseDir, MapDataId.Toronto2DGesamtkarteSpielbeginn);
             //return;
 
-            RunGame(Global, baseDir);
+            RunGame(global, baseDir);
         }
 
         static void RunGame(EventExchange global, string baseDir)
@@ -146,7 +145,8 @@ namespace UAlbion
                     .Register<ISelectionManager>(new SelectionManager())
                     .Attach(new SlowClock())
                     .Attach(new DebugMapInspector()
-                        .AddBehaviour(new SpriteInstanceDataDebugBehaviour()))
+                        .AddBehaviour(new SpriteInstanceDataDebugBehaviour())
+                        .AddBehaviour(new FormatTextEventBehaviour()))
                     .Attach(new InputBinder(InputConfig.Load(baseDir)))
                     .Attach(new InputModeStack())
                     .Attach(new MouseModeStack())

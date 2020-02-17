@@ -184,14 +184,16 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        void OnTextEvent(TextEvent textEvent)
+        public string GetTextFromTextEvent(TextEvent textEvent)
         {
             var id = textEvent.TextId;
             var mapId = (int)Resolve<IMapManager>().Current.MapId;
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
             var text = assets.LoadString(new StringId(AssetType.MapText, mapId, id), settings.Gameplay.Language);
-            Raise(new HoverTextEvent(text));
+            return text;
         }
+
+        void OnTextEvent(TextEvent textEvent) => Raise(new HoverTextEvent(GetTextFromTextEvent(textEvent)));
     }
 }

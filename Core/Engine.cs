@@ -48,8 +48,8 @@ namespace UAlbion.Core
                 x._newBackend = e.Value;
             }));
 
+        public static EventExchange Global { get; set; }
         static RenderDoc _renderDoc;
-        // public EventExchange GlobalExchange { get; }
         Sdl2Window Window => _windowManager.Window;
 
         readonly IDictionary<Type, IRenderer> _renderers = new Dictionary<Type, IRenderer>();

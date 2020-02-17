@@ -98,6 +98,7 @@ namespace UAlbion.Game.State
             Raise(new PartyChangedEvent());
             Raise(new LoadMapEvent(MapDataId.Toronto2DGesamtkarteSpielbeginn));
             Raise(new StartClockEvent());
+            Raise(new PartyJumpEvent(30, 75));
             Loaded = true;
         }
     }

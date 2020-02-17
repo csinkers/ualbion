@@ -22,7 +22,7 @@ namespace UAlbion.Game.Entities.Map2D
             Vector2.Zero, Vector2.Zero, 0, 0);
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<TileLayer, UpdateEvent>((x, e) => x.Update(false)),
+            H<TileLayer, UpdateEvent>((x, e) => x.Update()),
             H<TileLayer, ExchangeDisabledEvent>((x, _) =>
             {
                 x._lease?.Dispose();
@@ -33,6 +33,7 @@ namespace UAlbion.Game.Entities.Map2D
         public TileLayer(LogicalMap logicalMap, ITexture tileset, Func<int, TilesetData.TileData> tileFunc, DrawLayer drawLayer) : base(Handlers)
         {
             _logicalMap = logicalMap;
+            _logicalMap.Dirty += (sender, args) => _dirty = true;
             _tileset = tileset;
             _tileFunc = tileFunc;
             _drawLayer = drawLayer;
@@ -50,15 +51,10 @@ namespace UAlbion.Game.Entities.Map2D
         (int, int)[] _animatedTiles;
         int _lastFrameCount;
         bool _isActive = true;
+        bool _dirty = true;
 
         public int? HighlightIndex { get; set; }
         int? _highlightEvent;
-
-        public override void Subscribed()
-        {
-            Update(true);
-            base.Subscribed();
-        }
 
         public bool IsActive
         {
@@ -124,19 +120,19 @@ namespace UAlbion.Game.Entities.Map2D
             return instance;
         }
 
-        void Update(bool updateAll)
+        void Update()
         {
             var frameCount =  (Resolve<IGameState>()?.TickCount ?? 0) / TicksPerFrame;
 #if DEBUG
             var debug = Resolve<IDebugSettings>()?.DebugFlags ?? 0;
             if (_lastDebugFlags != debug)
-                updateAll = true;
+                _dirty = true;
             _lastDebugFlags = debug;
 
             if (frameCount != _lastFrameCount && (
                     debug.HasFlag(DebugFlags.HighlightEventChainZones)
                  || debug.HasFlag(DebugFlags.HighlightTile)))
-                updateAll = true;
+                _dirty = true;
 #endif
 
             var sm = Resolve<ISpriteManager>();
@@ -144,7 +140,7 @@ namespace UAlbion.Game.Entities.Map2D
             {
                 var key = new SpriteKey(_tileset, _drawLayer, 0);
                 _lease = sm.Borrow(key, _logicalMap.Width * _logicalMap.Height, this);
-                updateAll = true;
+                _dirty = true;
             }
 
             if (_lease == null)
@@ -159,7 +155,7 @@ namespace UAlbion.Game.Entities.Map2D
             }
             else _highlightEvent = null;
 
-            if (updateAll)
+            if (_dirty)
             {
                 var instances = _lease.Access();
                 var animatedTiles = new List<(int, int)>();
@@ -179,6 +175,7 @@ namespace UAlbion.Game.Entities.Map2D
                 }
 
                 _animatedTiles = animatedTiles.ToArray();
+                _dirty = false;
             }
             else if (frameCount != _lastFrameCount)
             {

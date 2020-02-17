@@ -1,9 +1,10 @@
-﻿using System.IO;
+﻿using System.Diagnostics.Tracing;
+using System.IO;
 using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    [Event("text")]
+    [Api.Event("text")]
     public class TextEvent : IEvent
     {
         /* public enum TextTypes

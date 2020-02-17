@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 
@@ -9,24 +10,32 @@ namespace UAlbion.Formats.Parsers
     {
         public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
-            var bl = new BlockList();
-            bl.Width = br.ReadByte();
-            bl.Height = br.ReadByte();
-            if (bl.Width == 0 && bl.Height == 0) return null;
+            var initial = br.BaseStream.Position;
 
-            for(int j = 0; j < bl.Height; j++)
+            var blockList = new List<Block>();
+            while (br.BaseStream.Position < initial + streamLength)
             {
-                for(int i = 0; i < bl.Width; i++)
+                var block = new Block();
+                block.Width = br.ReadByte();
+                block.Height = br.ReadByte();
+                block.Underlay = new int[block.Width * block.Height];
+                block.Overlay = new int[block.Width * block.Height];
+
+                for (int i = 0; i < block.Underlay.Length; i++)
                 {
-                    var ble = new BlockList.BlockListEntry();
-                    ble.b1 = br.ReadByte();
-                    ble.b2 = br.ReadByte();
-                    ble.b3 = br.ReadByte();
-                    bl.Entries.Add(ble);
+                    byte b1 = br.ReadByte();
+                    byte b2 = br.ReadByte();
+                    byte b3 = br.ReadByte();
+
+                    int underlay = ((b2 & 0x0F) << 8) + b3 - 2;
+                    int overlay = (b1 << 4) + (b2 >> 4) - 2;
+                    block.Underlay[i] = underlay; 
+                    block.Overlay[i] = overlay;
                 }
+                blockList.Add(block);
             }
 
-            return bl;
+            return blockList;
         }
     }
 }

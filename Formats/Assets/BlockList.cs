@@ -1,18 +1,12 @@
-﻿using System.Collections.Generic;
-
-namespace UAlbion.Formats.Assets
+﻿namespace UAlbion.Formats.Assets
 {
-    public class BlockList
+    public class Block
     {
-        public class BlockListEntry
-        {
-            public byte b1;
-            public byte b2;
-            public byte b3;
-        }
+        public int[] Underlay { get; set; }
+        public int[] Overlay { get; set; }
 
         public byte Width { get; set; }
         public byte Height { get; set; }
-        public IList<BlockListEntry> Entries { get; } = new List<BlockListEntry>();
+        public override string ToString() => $"BLK {Width}x{Height}";
     }
 }

@@ -6,18 +6,20 @@ namespace UAlbion.Game.Debugging
     public class SpriteInstanceDataDebugBehaviour : IDebugBehaviour
     {
         public Type HandledType => typeof(SpriteInstanceData);
-        public void Handle(DebugInspectorAction action, Reflector.ReflectedObject reflected)
+        public object Handle(DebugInspectorAction action, Reflector.ReflectedObject reflected)
         {
-            if (reflected?.Parent == null) return;
+            if (reflected?.Parent == null) return null;
 
             if (!(reflected.Parent.Object is SpriteInstanceData[] array))
-                return;
+                return null;
 
             switch (action)
             {
                 case DebugInspectorAction.Hover: array[reflected.CollectionIndex].Flags |= SpriteFlags.RedTint; break;
                 case DebugInspectorAction.Blur: array[reflected.CollectionIndex].Flags &= ~SpriteFlags.RedTint; break;
             }
+
+            return null;
         }
     }
 }

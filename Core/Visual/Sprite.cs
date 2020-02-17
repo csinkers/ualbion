@@ -24,9 +24,9 @@ namespace UAlbion.Core.Visual
             H<Sprite<T>, WorldCoordinateSelectEvent>((x, e) => x.Select(e))
         );
 
+        public event EventHandler<SpriteSelectedEventArgs> Selected;
         public Vector3 Normal => Vector3.UnitZ; // TODO
         public T Id { get; }
-
         public Vector3 Position { get => _position; set { if (_position == value) return; _position = value; Dirty = true; } }
         public Vector2 Size { get => _size ?? Vector2.One; set { if (_size == value) return; _size = value; Dirty = true; } }
 
@@ -90,6 +90,12 @@ namespace UAlbion.Core.Visual
                 SpriteKeyFlags.NoTransform,
                 SpriteFlags.LeftAligned) { Size = size };
 
+        public override void Subscribed()
+        {
+            Dirty = true;
+            base.Subscribed();
+        }
+
         void UpdateSprite()
         {
             if (!_dirty)
@@ -136,8 +142,14 @@ namespace UAlbion.Core.Visual
             int y = (int)(intersectionPoint.Y - _position.Y);
 
             var rectangle = CalculateBoundingRectangle();
-            if(rectangle.Contains(x, y))
-                e.RegisterHit(t, this);
+            if (rectangle.Contains(x, y))
+            {
+                var args = new SpriteSelectedEventArgs(t, e);
+                OnSelected(args);
+
+                if(!args.Handled)
+                    e.RegisterHit(t, this);
+            }
         }
 
         Rectangle CalculateBoundingRectangle() => (Flags & SpriteFlags.AlignmentMask) switch 
@@ -151,10 +163,6 @@ namespace UAlbion.Core.Visual
                 _ => new Rectangle()
             };
 
-        public override void Subscribed()
-        {
-            Dirty = true;
-            base.Subscribed();
-        }
+        protected virtual void OnSelected(SpriteSelectedEventArgs e) => Selected?.Invoke(this, e);
     }
 }

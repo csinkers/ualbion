@@ -2,5 +2,5 @@
 
 namespace UAlbion.Core.Events
 {
-    public class BlurEvent : CancellableEvent { }
+    [Event("blur")] public class BlurEvent : CancellableEvent { }
 }

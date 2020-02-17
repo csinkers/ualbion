@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
 
@@ -144,6 +142,8 @@ namespace UAlbion.Game.Entities.Map2D
 
                 if (_target == null) // If it's just a direction change, we should still update the active frame
                     MoveLeader(position);
+                else
+                    Raise(new PlayerEnteredTileEvent((int)_target.Value.To.X, (int)_target.Value.To.Y));
 
                 GameTrace.Log.Move(
                     oldDirection, desiredDirection, _facingDirection,
@@ -178,6 +178,7 @@ namespace UAlbion.Game.Entities.Map2D
             if (!_clipping || detector == null)
                 return direction;
 
+#if false // Print passability of adjacent tiles for debugging
             {
                 var testPoints = new[]
                 {
@@ -210,7 +211,7 @@ namespace UAlbion.Game.Entities.Map2D
                 Raise(new LogEvent(LogEvent.Level.Info, $"{R(5)}{R(6)}{R(7)}"));
                 Raise(new LogEvent(LogEvent.Level.Info, ""));
             }
-
+#endif
             bool Probe(Vector2 x) => !detector.IsOccupied(position + x);
             if (Probe(direction))
                 return direction;

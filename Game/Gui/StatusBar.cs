@@ -12,7 +12,7 @@ namespace UAlbion.Game.Gui
     public class StatusBar : Dialog
     {
         const int MaxPortraits = 6;
-        readonly UiSpriteElement<PictureId> _sprite;
+        readonly UiSpriteElement<SlabId> _sprite;
         readonly StatusBarPortrait[] _portraits;
         readonly Text _hoverText;
         readonly Text _descriptionText;
@@ -28,7 +28,8 @@ namespace UAlbion.Game.Gui
 
         public StatusBar() : base(Handlers, DialogPositioning.StatusBar, int.MaxValue)
         {
-            _sprite = AttachChild(new UiSpriteElement<PictureId>(PictureId.StatusBar));
+            _sprite = AttachChild(new UiSpriteElement<SlabId>(SlabId.SLAB));
+            _sprite.SubId = 1;
             _portraits = new StatusBarPortrait[MaxPortraits];
             for (int i = 0; i < _portraits.Length; i++)
             {
@@ -48,8 +49,8 @@ namespace UAlbion.Game.Gui
         {
             int maxOrder = order;
             maxOrder = Math.Max(maxOrder, func(_sprite, extents, order + 1));
-            maxOrder = Math.Max(maxOrder, func(_hoverTextContainer, extents, order + 1));
-            maxOrder = Math.Max(maxOrder, func(_descriptionTextContainer, extents, order + 1));
+            maxOrder = Math.Max(maxOrder, func(_hoverTextContainer, extents, order + 2));
+            maxOrder = Math.Max(maxOrder, func(_descriptionTextContainer, extents, order + 2));
 
             var party = Resolve<IParty>();
             if (party == null)
@@ -66,7 +67,7 @@ namespace UAlbion.Game.Gui
                     extents.Y + 3,
                     (int)portrait.GetSize().X - (trimOverlap ? 6 : 0),
                     (int)portrait.GetSize().Y);
-                maxOrder = Math.Max(maxOrder, func(portrait, portraitExtents, order + 1));
+                maxOrder = Math.Max(maxOrder, func(portrait, portraitExtents, order + 2));
             }
             return maxOrder;
         }

@@ -1,5 +1,4 @@
-﻿using System;
-using UAlbion.Api;
+﻿using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
@@ -13,40 +12,50 @@ namespace UAlbion.Game
             H<EventChainManager, TriggerChainEvent>((x, e) => x.Trigger(e))
         );
 
-        class EventContext
+        class EventChainContext
         {
             public TriggerType Trigger { get; set; }
+            public IEventNode Node { get; set; }
         }
 
-        readonly EventContext _context = new EventContext();
+        public EventChainManager() : base(Handlers) { }
 
-        public EventChainManager() : base(Handlers)
-        { }
-
-        void Resume(IEventNode node)
+        void Resume(EventChainContext context)
         {
             do
             {
-                if (node.Event is AsyncEvent asyncEvent)
+                if (context.Node.Event is AsyncEvent asyncEvent)
                 {
-                    asyncEvent.SetCallback(() => Resume(node));
-                    Raise(asyncEvent);
-                    break;
-                }
+                    context.Node = context.Node.NextEvent;
+                    asyncEvent.SetCallback(() => Resume(context));
 
-                if (node is IBranchNode branch && node.Event is QueryEvent query)
-                {
-                    node = Query(query) ? branch.NextEvent : branch.NextEventWhenFalse;
+                    Raise(asyncEvent);
+
+                    if (asyncEvent.Acknowledged)
+                        return;
+
+                    Raise(new LogEvent(LogEvent.Level.Warning, $"Async event {asyncEvent} not acknowledged. Continuing immediately."));
                 }
                 else
                 {
-                    Raise(node.Event);
-                    node = node.NextEvent;
+                    if (context.Node is IBranchNode branch && context.Node.Event is QueryEvent query)
+                    {
+                        var result = Query(context, query);
+#if DEBUG
+                        Raise(new LogEvent(LogEvent.Level.Info, $"if ({query}) => {result}"));
+#endif
+                        context.Node = result ? branch.NextEvent : branch.NextEventWhenFalse;
+                    }
+                    else
+                    {
+                        Raise(context.Node.Event);
+                        context.Node = context.Node.NextEvent;
+                    }
                 }
-            } while (node != null);
+            } while (context.Node != null);
         }
 
-        bool Query(QueryEvent query)
+        bool Query(EventChainContext context, QueryEvent query)
         {
             switch (query, query.SubType)
             {
@@ -60,7 +69,6 @@ namespace UAlbion.Game
                         {
                             Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query UsedItemId"));
                         }
-
                         break;
                     }
                 case (QueryVerbEvent verb, _):
@@ -69,10 +77,10 @@ namespace UAlbion.Game
                         {
                             switch (verb.Verb)
                             {
-                                case QueryVerbEvent.VerbType.Examine: return _context.Trigger.HasFlag(TriggerType.Examine);
-                                case QueryVerbEvent.VerbType.Manipulate: return _context.Trigger.HasFlag(TriggerType.Manipulate);
-                                case QueryVerbEvent.VerbType.TalkTo: return _context.Trigger.HasFlag(TriggerType.TalkTo);
-                                case QueryVerbEvent.VerbType.UseItem: return _context.Trigger.HasFlag(TriggerType.UseItem);
+                                case QueryVerbEvent.VerbType.Examine: return context.Trigger.HasFlag(TriggerType.Examine);
+                                case QueryVerbEvent.VerbType.Manipulate: return context.Trigger.HasFlag(TriggerType.Manipulate);
+                                case QueryVerbEvent.VerbType.TalkTo: return context.Trigger.HasFlag(TriggerType.TalkTo);
+                                case QueryVerbEvent.VerbType.UseItem: return context.Trigger.HasFlag(TriggerType.UseItem);
                                 default: Raise(new LogEvent(LogEvent.Level.Error, $"Unhandled query verb type {verb.Verb}")); return false;
                             }
                         }
@@ -170,8 +178,8 @@ namespace UAlbion.Game
 
         void Trigger(TriggerChainEvent e)
         {
-            _context.Trigger = e.Trigger;
-            Resume(e.Chain);
+            var context = new EventChainContext {Trigger = e.Trigger, Node = e.Chain};
+            Resume(context);
         }
     }
 }

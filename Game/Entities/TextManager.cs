@@ -4,6 +4,9 @@ using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
+using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.MapEvents;
+using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities
 {
@@ -35,7 +38,11 @@ namespace UAlbion.Game.Entities
             { 'û', 105 }, { 'ù', 106 }, { 'á', 107 }, { 'í', 108 }, { 'ó', 109 }, { 'ú', 110 },
         };
 
-        public TextManager() : base(null) { }
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<TextManager, TextEvent>((x,e) => x.OnTextEvent(e))
+        );
+
+        public TextManager() : base(Handlers) { }
 
         public Vector2 Measure(TextBlock block)
         {
@@ -175,6 +182,16 @@ namespace UAlbion.Game.Entities
                     }
                 }
             }
+        }
+
+        void OnTextEvent(TextEvent textEvent)
+        {
+            var id = textEvent.TextId;
+            var mapId = (int)Resolve<IMapManager>().Current.MapId;
+            var assets = Resolve<IAssetManager>();
+            var settings = Resolve<ISettings>();
+            var text = assets.LoadString(new StringId(AssetType.MapText, mapId, id), settings.Gameplay.Language);
+            Raise(new HoverTextEvent(text));
         }
     }
 }

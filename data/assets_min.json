@@ -3068,7 +3068,7 @@
     "Assets": {}
   },
   "SLAB": {
-    "Format": "FixedSizeSprite",
+    "Format": "Slab",
     "Width": 360,
     "Assets": {}
   },

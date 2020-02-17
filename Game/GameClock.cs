@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Events;
@@ -6,15 +7,20 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game
 {
+    public class HourElapsedEvent : GameEvent { }
+    public class DayElapsedEvent : GameEvent { }
+
     public class GameClock : Component, IClock
     {
         const float TickDurationSeconds = 1 / 60.0f;
-        const int TicksPerCacheCycle = 360; // Cycle the cache every minute
+        const float GameSecondsPerSecond = 60;
+        const int TicksPerCacheCycle = 3600; // Cycle the cache every minute
 
         readonly IList<(string, float)> _activeTimers = new List<(string, float)>();
         float _elapsedTimeThisGameFrame;
 
         public GameClock() : base(Handlers) { }
+        public DateTime GameTime { get; private set; } = new DateTime(2000, 1, 1);
         public float ElapsedTime { get; private set; }
         public bool IsRunning { get; private set; }
 
@@ -25,11 +31,20 @@ namespace UAlbion.Game
             H<GameClock, StartTimerEvent>((x,e) => x.StartTimer(e))
         );
 
-        void StartTimer(StartTimerEvent e) => _activeTimers.Add((e.Id, ElapsedTime + e.IntervalMilliseconds/1000));
+        void StartTimer(StartTimerEvent e) => _activeTimers.Add((e.Id, ElapsedTime + e.IntervalMilliseconds / 1000));
 
         void OnEngineUpdate(EngineUpdateEvent e)
         {
             ElapsedTime += e.DeltaSeconds;
+
+            var lastGameTime = GameTime;
+            GameTime += TimeSpan.FromSeconds(e.DeltaSeconds * GameSecondsPerSecond); 
+            if(GameTime.Hour != lastGameTime.Hour)
+                Raise(new HourElapsedEvent());
+
+            if(GameTime.Date != lastGameTime.Date)
+                Raise(new DayElapsedEvent());
+
             for (int i = 0; i < _activeTimers.Count; i++)
             {
                 if (!(_activeTimers[i].Item2 <= ElapsedTime)) 

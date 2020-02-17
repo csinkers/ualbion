@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
@@ -104,7 +105,7 @@ namespace UAlbion.Game.Entities.Map2D
                     layer,
                     0);
 
-            var zone = _logicalMap.GetZone(index);
+            var zone = _logicalMap.GetZones(index).FirstOrDefault();
             int eventNum = zone?.EventNumber ?? -1;
 
             instance.Flags = 0
@@ -151,7 +152,7 @@ namespace UAlbion.Game.Entities.Map2D
 
             if (HighlightIndex.HasValue)
             {
-                var zone = _logicalMap.GetZone(HighlightIndex.Value);
+                var zone = _logicalMap.GetZones(HighlightIndex.Value).FirstOrDefault();
                 _highlightEvent = zone?.EventNumber ?? -1;
                 if (_highlightEvent == -1)
                     _highlightEvent = null;

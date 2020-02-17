@@ -16,7 +16,7 @@ namespace UAlbion.Game.Entities.Map2D
     {
         static readonly HandlerSet Handlers = new HandlerSet(
             H<SelectionHandler, WorldCoordinateSelectEvent>((x, e) => x.OnSelect(e)),
-            H<SelectionHandler, UiRightClickEvent>((x, e) => x.OnRightClick())
+            H<SelectionHandler, RightClickEvent>((x, e) => x.OnRightClick())
         );
 
 
@@ -50,14 +50,14 @@ namespace UAlbion.Game.Entities.Map2D
             int highlightIndex = y * _map.Width + x;
             var underlayTile = _map.GetUnderlay(x, y);
             var overlayTile = _map.GetOverlay(x, y);
-            var zone = _map.GetZone(x, y);
+            var zones = _map.GetZones(x, y);
 
             e.RegisterHit(t, new MapTileHit(new Vector2(x, y), intersectionPoint));
             if (underlayTile != null) e.RegisterHit(t, underlayTile);
             if (overlayTile != null) e.RegisterHit(t, overlayTile);
             e.RegisterHit(t, this);
 
-            if (zone != null)
+            foreach(var zone in zones)
             {
                 e.RegisterHit(t, zone);
                 HashSet<IEventNode> printedEvents = new HashSet<IEventNode>();
@@ -96,10 +96,10 @@ namespace UAlbion.Game.Entities.Map2D
             var normPosition = camera.ProjectWorldToNorm(new Vector3(worldPosition, 0.0f));
             var uiPosition = window.NormToUi(new Vector2(normPosition.X, normPosition.Y));
             var heading = S(SystemTextId.MapPopup_Environment);
-            var zone = _map.GetZone(x, y);
+            var zones = _map.GetZones(x, y);
 
             var options = new List<ContextMenuOption>();
-            if(zone != null)
+            foreach(var zone in zones)
             {
                 if (zone.Trigger.HasFlag(TriggerType.Examine))
                 {

@@ -73,7 +73,7 @@ namespace UAlbion.Game.Input
         {
             Raise(new PopMouseModeEvent());
 
-            var clickEvent = new UiRightClickEvent();
+            var clickEvent = new RightClickEvent();
             foreach (var hit in orderedHits)
             {
                 if (!clickEvent.Propagating) break;

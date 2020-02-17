@@ -1,7 +1,10 @@
-﻿using System.Numerics;
+﻿using System.Linq;
+using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
+using UAlbion.Game.Events;
 using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities.Map2D
@@ -19,13 +22,19 @@ namespace UAlbion.Game.Entities.Map2D
 
         public float BaseCameraHeight => 1.0f;
         static readonly HandlerSet Handlers = new HandlerSet(
-            // H<Map2D, UnloadMapEvent>((x, e) => x.Unload()),
+            H<Map, SlowClockEvent>((x, e) => x.FireEventChains(TriggerType.EveryStep)),
+            H<Map, HourElapsedEvent>((x, e) => x.FireEventChains(TriggerType.EveryHour)),
+            H<Map, DayElapsedEvent>((x, e) => x.FireEventChains(TriggerType.EveryDay)),
+            H<Map, PlayerEnteredTileEvent>((x,e) => x.OnPlayerEnteredTile(e)),
+            H<Map, NpcEnteredTileEvent>((x,e) => x.OnNpcEnteredTile(e))
+            // H<Map, UnloadMapEvent>((x, e) => x.Unload()),
         );
 
         public override string ToString() { return $"Map2D: {MapId} ({(int)MapId})"; }
 
         public Map(MapDataId mapId) : base(Handlers) => MapId = mapId;
 
+        public void RunInitialEvents() => FireEventChains(TriggerType.MapInit);
         public override void Subscribed()
         {
             Raise(new SetClearColourEvent(0,0,0));
@@ -50,8 +59,8 @@ namespace UAlbion.Game.Entities.Map2D
             foreach (var npc in _logicalMap.Npcs)
             {
                 AttachChild(_logicalMap.UseSmallSprites
-                    ? new SmallNpc((SmallNpcId)npc.ObjectNumber, npc.Waypoints) as IComponent
-                    : new LargeNpc((LargeNpcId)npc.ObjectNumber, npc.Waypoints));
+                    ? new SmallNpc(npc) as IComponent
+                    : new LargeNpc(npc));
             }
 
             var state = Resolve<IGameState>();
@@ -63,5 +72,27 @@ namespace UAlbion.Game.Entities.Map2D
                     : new LargePlayer(player.Id, (LargePartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id))); // TODO: Use a function to translate logical to sprite id
             }
         }
+
+        void FireEventChains(TriggerType type)
+        {
+            var chains = _logicalMap.GetGlobalZonesOfType(type);
+            foreach (var chain in chains)
+                Raise(new TriggerChainEvent(chain.Event, type));
+        }
+
+        void OnNpcEnteredTile(NpcEnteredTileEvent e)
+        {
+            var chains = _logicalMap.GetZones(e.X, e.Y).Where(x => x.Trigger.HasFlag(TriggerType.Npc));
+            foreach (var chain in chains)
+                Raise(new TriggerChainEvent(chain.Event, TriggerType.Npc));
+        }
+
+        void OnPlayerEnteredTile(PlayerEnteredTileEvent e)
+        {
+            var chains = _logicalMap.GetZones(e.X, e.Y).Where(x => x.Trigger.HasFlag(TriggerType.Normal));
+            foreach (var chain in chains)
+                Raise(new TriggerChainEvent(chain.Event, TriggerType.Normal));
+        }
+
     }
 }

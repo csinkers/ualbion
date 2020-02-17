@@ -2,6 +2,7 @@
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Scenes;
@@ -21,7 +22,8 @@ namespace UAlbion.Game
             {
                 x._allMapsExchange.IsActive = false;
                 x._allMapsExchange.IsActive = true;
-            })
+            }),
+            H<MapManager, TeleportEvent>((x,e) => x.Teleport(e))
         );
 
         EventExchange _allMapsExchange;
@@ -59,14 +61,14 @@ namespace UAlbion.Game
             {
                 Current = map;
                 var mapExchange = new EventExchange(pendingMapChange.ToString(), _allMapsExchange);
-
                 mapExchange.Attach(map);
 
                 // Set the scene first to ensure scene-local components from other scenes are disabled.
                 Raise(new SetSceneEvent(map is Entities.Map3D.Map ? SceneId.World3D : SceneId.World2D)); 
                 Raise(new CameraJumpEvent((int) map.LogicalSize.X / 2, (int) map.LogicalSize.Y / 2));
-                Raise(new PartyJumpEvent((int) map.LogicalSize.X / 2, (int) map.LogicalSize.Y / 2));
+                // Raise(new PartyJumpEvent((int) map.LogicalSize.X / 2, (int) map.LogicalSize.Y / 2));
                 Raise(new LogEvent(LogEvent.Level.Info, $"Loaded map {(int) pendingMapChange}: {pendingMapChange}"));
+                map.RunInitialEvents();
             }
         }
 
@@ -80,6 +82,18 @@ namespace UAlbion.Game
                 return new Entities.Map3D.Map(mapId);
 
             return null;
+        }
+
+        void Teleport(TeleportEvent e)
+        {
+            if (e.MapId != Current.MapId)
+            {
+                _pendingMapChange = e.MapId;
+                LoadMap();
+            }
+
+            Raise(new PartyJumpEvent(e.X, e.Y));
+            Raise(new PartyTurnEvent(e.Direction));
         }
     }
 }

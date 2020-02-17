@@ -12191,7 +12191,7 @@
   },
   "SLAB": {
     "EnumName": "SlabId",
-    "Format": "FixedSizeSprite",
+    "Format": "Slab",
     "Width": 360,
     "Assets": {
       "0": {

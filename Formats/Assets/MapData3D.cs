@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
@@ -22,6 +23,8 @@ namespace UAlbion.Formats.Assets
         public int[] Ceilings { get; private set; }
         public IList<MapNpc> Npcs { get; } = new List<MapNpc>();
         public IList<MapEventZone> Zones { get; } = new List<MapEventZone>();
+        public IDictionary<int, MapEventZone[]> ZoneLookup { get; } = new Dictionary<int, MapEventZone[]>(); 
+        public IDictionary<TriggerType, MapEventZone[]> ZoneTypeLookup { get; } = new Dictionary<TriggerType, MapEventZone[]>();
         public IList<IEventNode> Events { get; } = new List<IEventNode>();
         public IList<AutomapInfo> Automap { get; } = new List<AutomapInfo>();
         public byte[] AutomapGraphics { get; private set; }
@@ -115,6 +118,30 @@ namespace UAlbion.Formats.Assets
                 map.ActiveMapEvents.Add(eventId);
             }
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
+
+            // Resolve event indices to pointers
+            foreach (var mapEvent in map.Events.OfType<EventNode>())
+            {
+                if (mapEvent.NextEventId.HasValue)
+                    mapEvent.NextEvent = map.Events[mapEvent.NextEventId.Value];
+
+                if (mapEvent is BranchNode q && q.NextEventWhenFalseId.HasValue)
+                    q.NextEventWhenFalse = map.Events[q.NextEventWhenFalseId.Value];
+            }
+
+            foreach(var npc in map.Npcs)
+                if (npc.EventNumber.HasValue)
+                    npc.EventChain = map.Events[npc.EventNumber.Value];
+
+            foreach(var zone in map.Zones)
+                if (zone.EventNumber != 65535)
+                    zone.Event = map.Events[zone.EventNumber];
+
+            foreach (var position in map.Zones.GroupBy(x => x.Y * map.Width + x.X))
+                map.ZoneLookup[position.Key] = position.ToArray();
+
+            foreach (var triggerType in map.Zones.Where(x => x.Global || x.Y == 0).GroupBy(x => x.Trigger))
+                map.ZoneTypeLookup[triggerType.Key] = triggerType.ToArray();
 
             return map;
         }

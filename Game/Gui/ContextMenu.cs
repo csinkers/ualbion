@@ -114,7 +114,6 @@ Status bar:
     Make leader (white, if multiple players & not leader)
     Talk to (if not Tom)
 
-
 Inventory:
     Gold / Rations (header)
     divider

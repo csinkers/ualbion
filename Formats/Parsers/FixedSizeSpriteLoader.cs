@@ -24,7 +24,7 @@ namespace UAlbion.Formats.Parsers
             // Debug.Assert(streamLength % width == 0);
             // Debug.Assert(streamLength % (width * height) == 0);
 
-            long initialPosition = br.BaseStream.Position;
+            // long initialPosition = br.BaseStream.Position;
             int spriteCount = unchecked((int) (streamLength / (width * height)));
             height = (int) streamLength / (width * spriteCount);
 

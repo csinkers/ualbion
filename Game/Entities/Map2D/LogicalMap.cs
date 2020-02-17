@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
@@ -47,14 +48,13 @@ namespace UAlbion.Game.Entities.Map2D
             return tileIndex != -1 ? _tileData.Tiles[tileIndex] : null;
         }
 
-        public MapEventZone GetZone(int x, int y) => GetZone(Index(x, y));
-        public MapEventZone GetZone(int index)
-        {
-            if (index < 0 || index >= _mapData.ZoneLookup.Length)
-                return null;
+        public IEnumerable<MapEventZone> GetZones(int x, int y) => GetZones(Index(x, y));
+        public IEnumerable<MapEventZone> GetZones(int index) => _mapData.ZoneLookup.TryGetValue(index, out var zones) ? zones : Enumerable.Empty<MapEventZone>();
 
-            int zoneIndex = _mapData.ZoneLookup[index];
-            return zoneIndex != -1 ? _mapData.Zones[zoneIndex] : null;
+        public IEnumerable<MapEventZone> GetGlobalZonesOfType(TriggerType triggerType)
+        {
+            var matchingKeys = _mapData.ZoneTypeLookup.Keys.Where(x => (x & triggerType) == triggerType);
+            return matchingKeys.SelectMany(x => _mapData.ZoneTypeLookup[x]);
         }
     }
 }

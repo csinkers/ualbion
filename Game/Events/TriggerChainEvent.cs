@@ -13,6 +13,8 @@ namespace UAlbion.Game.Events
             Trigger = trigger;
         }
 
+        public override string ToString() => $"Triggering chain {Chain.Id} due to {Trigger}";
+
         public IEventNode Chain { get; }
         public TriggerType Trigger { get; }
     }

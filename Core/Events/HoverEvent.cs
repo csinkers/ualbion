@@ -2,5 +2,5 @@
 
 namespace UAlbion.Core.Events
 {
-    public class HoverEvent : CancellableEvent {}
+    [Event("hover")] public class HoverEvent : CancellableEvent {}
 }

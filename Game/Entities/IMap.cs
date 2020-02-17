@@ -18,5 +18,6 @@ namespace UAlbion.Game.Entities
         Vector2 LogicalSize { get; }
         Vector3 TileSize { get; }
         float BaseCameraHeight { get; }
+        void RunInitialEvents();
     }
 }

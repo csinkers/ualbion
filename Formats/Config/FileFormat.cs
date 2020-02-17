@@ -14,6 +14,7 @@
         SingleHeaderSprite,
         Video,
         Font,
+        Slab, // Just a FixedSizeSprite, but custom loader to add a subimage for the status bar
 
         // Maps
         MapData,

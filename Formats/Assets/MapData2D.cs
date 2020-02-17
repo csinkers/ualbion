@@ -23,7 +23,8 @@ namespace UAlbion.Formats.Assets
         public IList<MapNpc> Npcs { get; } = new List<MapNpc>();
         public IList<IEventNode> Events { get; } = new List<IEventNode>();
         public IList<MapEventZone> Zones { get; } = new List<MapEventZone>();
-        public int[] ZoneLookup { get; private set; }
+        public IDictionary<int, MapEventZone[]> ZoneLookup { get; } = new Dictionary<int, MapEventZone[]>(); 
+        public IDictionary<TriggerType, MapEventZone[]> ZoneTypeLookup { get; } = new Dictionary<TriggerType, MapEventZone[]>();
 
         public static MapData2D Load(BinaryReader br, long streamLength, string name)
         {
@@ -86,6 +87,14 @@ namespace UAlbion.Formats.Assets
             for (int i = 0; i < eventCount; i++)
                 map.Events.Add(EventNode.Load(br, i));
 
+            Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
+
+            foreach (var npc in map.Npcs)
+                npc.LoadWaypoints(br);
+
+            Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
+
+            // Resolve event indices to pointers
             foreach (var mapEvent in map.Events.OfType<EventNode>())
             {
                 if (mapEvent.NextEventId.HasValue)
@@ -95,23 +104,20 @@ namespace UAlbion.Formats.Assets
                     q.NextEventWhenFalse = map.Events[q.NextEventWhenFalseId.Value];
             }
 
+            foreach(var npc in map.Npcs)
+                if (npc.EventNumber.HasValue)
+                    npc.EventChain = map.Events[npc.EventNumber.Value];
+
             foreach(var zone in map.Zones)
                 if (zone.EventNumber != 65535)
                     zone.Event = map.Events[zone.EventNumber];
 
-            Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
+            foreach (var position in map.Zones.GroupBy(x => x.Y * map.Width + x.X))
+                map.ZoneLookup[position.Key] = position.ToArray();
 
-            foreach (var npc in map.Npcs)
-                npc.LoadWaypoints(br);
+            foreach (var triggerType in map.Zones.Where(x => x.Global || x.Y == 0).GroupBy(x => x.Trigger))
+                map.ZoneTypeLookup[triggerType.Key] = triggerType.ToArray();
 
-            Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
-
-            map.ZoneLookup = Enumerable.Repeat(-1, map.Width * map.Height).ToArray();
-            for (int i = 0; i < map.Zones.Count; i++)
-            {
-                var z = map.Zones[i];
-                map.ZoneLookup[z.Y * map.Width + z.X] = i;
-            }
             return map;
         }
     }

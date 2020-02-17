@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets
 {
@@ -46,6 +47,7 @@ namespace UAlbion.Formats.Assets
         public ushort Unk8 { get; set; }
         public int Unk9 { get; set; }
         public Waypoint[] Waypoints { get; set; }
+        public IEventNode EventChain { get; set; }
 
         public static MapNpc Load(BinaryReader br)
         {

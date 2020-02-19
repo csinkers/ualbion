@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
@@ -7,7 +8,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static EventNode Load(BinaryReader br, int id, MapEventType type)
         {
-            return new EventNode(id, new SpinnerEvent
+            var spinnerEvent = new SpinnerEvent
             {
                 // 3D only?
                 Unk1 = br.ReadByte(), // +1
@@ -17,16 +18,23 @@ namespace UAlbion.Formats.MapEvents
                 Unk5 = br.ReadByte(), // +5
                 Unk6 = br.ReadUInt16(), // +6
                 Unk8 = br.ReadUInt16(), // +8
-            });
+            };
+            Debug.Assert(spinnerEvent.Unk2 == 0);
+            Debug.Assert(spinnerEvent.Unk3 == 0);
+            Debug.Assert(spinnerEvent.Unk4 == 0);
+            Debug.Assert(spinnerEvent.Unk5 == 0);
+            Debug.Assert(spinnerEvent.Unk6 == 0);
+            Debug.Assert(spinnerEvent.Unk8 == 0);
+            return new EventNode(id, spinnerEvent);
         }
 
         public byte Unk1 { get; private set; }
-        public byte Unk2 { get; private set; }
-        public byte Unk3 { get; private set; }
-        public byte Unk4 { get; private set; }
-        public byte Unk5 { get; private set; }
-        public ushort Unk6 { get; private set; }
-        public ushort Unk8 { get; private set; }
-        public override string ToString() => $"spinner ({Unk1} {Unk2} {Unk3} {Unk4} {Unk5} {Unk6} {Unk8})";
+        byte Unk2 { get; set; }
+        byte Unk3 { get; set; }
+        byte Unk4 { get; set; }
+        byte Unk5 { get; set; }
+        ushort Unk6 { get; set; }
+        ushort Unk8 { get; set; }
+        public override string ToString() => $"spinner {Unk1}";
     }
 }

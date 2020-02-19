@@ -37,14 +37,6 @@ namespace UAlbion.Game
         {
             ElapsedTime += e.DeltaSeconds;
 
-            var lastGameTime = GameTime;
-            GameTime += TimeSpan.FromSeconds(e.DeltaSeconds * GameSecondsPerSecond); 
-            if(GameTime.Hour != lastGameTime.Hour)
-                Raise(new HourElapsedEvent());
-
-            if(GameTime.Date != lastGameTime.Date)
-                Raise(new DayElapsedEvent());
-
             for (int i = 0; i < _activeTimers.Count; i++)
             {
                 if (!(_activeTimers[i].Item2 <= ElapsedTime)) 
@@ -57,6 +49,14 @@ namespace UAlbion.Game
 
             if (IsRunning)
             {
+                var lastGameTime = GameTime;
+                GameTime += TimeSpan.FromSeconds(e.DeltaSeconds * GameSecondsPerSecond);
+                if (GameTime.Hour != lastGameTime.Hour)
+                    Raise(new HourElapsedEvent());
+
+                if (GameTime.Date != lastGameTime.Date)
+                    Raise(new DayElapsedEvent());
+
                 var state = Resolve<IGameState>();
                 _elapsedTimeThisGameFrame += e.DeltaSeconds;
 

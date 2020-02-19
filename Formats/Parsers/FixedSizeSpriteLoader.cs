@@ -69,7 +69,7 @@ namespace UAlbion.Formats.Parsers
                         0, rotatedFrameHeight * n, 
                         rotatedSprite.Width, rotatedFrameHeight);
 
-                    Util.RotateImage(width, height,
+                    ApiUtil.RotateImage(width, height,
                         new Span<byte>(sprite.PixelData, n * width * height, width * height),
                         new Span<byte>(rotatedSprite.PixelData, n * width * height, width * height));
                 }

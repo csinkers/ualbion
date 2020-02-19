@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core.Events;
 
 namespace UAlbion.Core

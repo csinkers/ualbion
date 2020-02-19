@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Core;
+using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 
@@ -19,8 +19,8 @@ namespace UAlbion.Game.State.Player
             _getLerp = getLerp;
         }
 
-        public ushort SpellPoints => (ushort)Util.Lerp(_a().SpellPoints, _b().SpellPoints, _getLerp());
-        public ushort SpellPointsMax => (ushort)Util.Lerp(_a().SpellPoints, _b().SpellPoints, _getLerp());
+        public ushort SpellPoints => (ushort)ApiUtil.Lerp(_a().SpellPoints, _b().SpellPoints, _getLerp());
+        public ushort SpellPointsMax => (ushort)ApiUtil.Lerp(_a().SpellPoints, _b().SpellPoints, _getLerp());
         public SpellClassMask SpellClasses => _b().SpellClasses;
         public IDictionary<SpellId, (bool, ushort)> SpellStrengths => _b().SpellStrengths;
     }

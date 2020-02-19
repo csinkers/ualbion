@@ -6,10 +6,15 @@ namespace UAlbion.Formats.MapEvents
     {
         public enum VerbType : byte
         {
+            Unk0 = 0,
             Examine = 1,
             Manipulate = 2,
             TalkTo = 3,
             UseItem = 4,
+            Unk5 = 5,
+            Unk6 = 6,
+            Unk8 = 8,
+            Unk11 = 11,
         }
 
         public static BranchNode Load(BinaryReader br, int id)

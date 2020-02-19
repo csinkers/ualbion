@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 
@@ -76,7 +77,10 @@ namespace UAlbion.Game.Entities.Map2D
         public void PlaceBlock(sbyte x, sbyte y, ushort blockId, bool overwrite)
         {
             if (blockId >= _blockList.Count)
-                return; // TODO: Raise log event
+            {
+                CoreUtil.LogError($"Tried to set out-of-range block {blockId} (max id {_blockList.Count-1})");
+                return;
+            }
 
             var block = _blockList[blockId];
             for (int j = 0; j < block.Height; j++)
@@ -85,6 +89,12 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     var targetIndex = Index(x + i, y + j);
                     var targetBlockIndex = j * block.Width + i;
+
+                    if(targetIndex < 0 || targetIndex > _mapData.Underlay.Length)
+                    {
+                        CoreUtil.LogError($"Tried to set out-of-range index {targetIndex}, @ ({x},{y}) + ({i},{j}) for block {blockId}");
+                        return;
+                    }
 
                     int underlay = _mapData.Underlay[targetIndex];
                     int newUnderlay = block.Underlay[targetBlockIndex];
@@ -100,6 +110,5 @@ namespace UAlbion.Game.Entities.Map2D
 
             Dirty?.Invoke(this, EventArgs.Empty);
         }
-
     }
 }

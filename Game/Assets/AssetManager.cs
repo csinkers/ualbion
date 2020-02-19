@@ -133,7 +133,12 @@ namespace UAlbion.Game.Assets
         public string LoadString(StringId id, GameLanguage language)
         {
             var stringTable = (IDictionary<int, string>)_assetLocator.LoadAssetCached(id.Type, id.Id, language);
-            return stringTable[id.SubId];
+            if (stringTable == null)
+                return $"!MISSING STRING-TABLE {id.Type}:{id.Id}:{id.SubId}:{language}!";
+
+            return stringTable.TryGetValue(id.SubId, out var value) 
+                ? value 
+                : $"!MISSING STRING {id.Type}:{id.Id}:{id.SubId}:{language}!";
         }
 
         public string LoadString(SystemTextId id, GameLanguage language) => LoadString(new StringId(AssetType.SystemText, 0, (int)id), language);

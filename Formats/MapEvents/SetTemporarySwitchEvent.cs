@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -6,7 +7,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static EventNode Load(BinaryReader br, int id, MapEventType type, ModifyType subType)
         {
-            return new EventNode(id, new SetTemporarySwitchEvent
+            var e = new SetTemporarySwitchEvent
             {
                 SwitchValue = br.ReadByte(), // 2
                 Unk3 = br.ReadByte(), // 3
@@ -14,15 +15,19 @@ namespace UAlbion.Formats.MapEvents
                 Unk5 = br.ReadByte(), // 5
                 SwitchId = br.ReadUInt16(), // 6
                 Unk8 = br.ReadUInt16(), // 8
-            });
+            };
+            Debug.Assert(e.Unk4 == 0);
+            Debug.Assert(e.Unk5 == 0);
+            Debug.Assert(e.Unk8 == 0);
+            return new EventNode(id, e);
         }
 
-        public byte SwitchValue { get; private set; }
-        public ushort SwitchId { get; private set; }
-        public byte Unk3 { get; set; }
-        public byte Unk4 { get; set; }
-        public byte Unk5 { get; set; }
-        public ushort Unk8 { get; set; }
-        public override string ToString() => $"set_temporary_switch {SwitchId} {SwitchValue} ({Unk3} {Unk4} {Unk5} {Unk8})";
+        public byte SwitchValue { get; private set; } // 0,1,2
+        public ushort SwitchId { get; private set; } // [0..599]
+        public byte Unk3 { get; set; } // 0,1,21
+        byte Unk4 { get; set; }
+        byte Unk5 { get; set; }
+        ushort Unk8 { get; set; }
+        public override string ToString() => $"set_temporary_switch {SwitchId} {SwitchValue} ({Unk3})";
     }
 }

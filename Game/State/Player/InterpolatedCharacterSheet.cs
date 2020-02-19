@@ -1,5 +1,5 @@
 ﻿using System;
-using UAlbion.Core;
+using UAlbion.Api;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
@@ -43,7 +43,7 @@ namespace UAlbion.Game.State.Player
         public ICharacterAttributes Attributes { get; }
         public ICharacterSkills Skills { get; }
         public ICombatAttributes Combat { get; }
-        public int TotalWeight => (int)Util.Lerp(_a().TotalWeight, _b().TotalWeight, _getLerp());
-        public int MaxWeight => (int)Util.Lerp(_a().MaxWeight, _b().MaxWeight, _getLerp());
+        public int TotalWeight => (int)ApiUtil.Lerp(_a().TotalWeight, _b().TotalWeight, _getLerp());
+        public int MaxWeight => (int)ApiUtil.Lerp(_a().MaxWeight, _b().MaxWeight, _getLerp());
     }
 }

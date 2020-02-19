@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Core;
+using UAlbion.Api;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.State.Player
@@ -18,8 +18,8 @@ namespace UAlbion.Game.State.Player
             _getLerp = getLerp;
         }
 
-        public ushort Gold => (ushort)Util.Lerp(_a().Gold, _b().Gold, _getLerp());
-        public ushort Rations => (ushort)Util.Lerp(_a().Rations, _b().Rations, _getLerp());
+        public ushort Gold => (ushort)ApiUtil.Lerp(_a().Gold, _b().Gold, _getLerp());
+        public ushort Rations => (ushort)ApiUtil.Lerp(_a().Rations, _b().Rations, _getLerp());
         public ItemSlot Neck => _b().Neck;
         public ItemSlot Head => _b().Head;
         public ItemSlot Tail => _b().Tail;

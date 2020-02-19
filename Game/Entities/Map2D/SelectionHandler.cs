@@ -92,7 +92,7 @@ namespace UAlbion.Game.Entities.Map2D
                     return new TextFormatter(assets, settings.Gameplay.Language).Centre().Format(template).Blocks;
                 });
 
-            var worldPosition = (new Vector2(x, y) + Vector2.One) * _map.TileSize;
+            var worldPosition = new Vector2(x, y) * _map.TileSize;
             var normPosition = camera.ProjectWorldToNorm(new Vector3(worldPosition, 0.0f));
             var uiPosition = window.NormToUi(new Vector2(normPosition.X, normPosition.Y));
             var heading = S(SystemTextId.MapPopup_Environment);

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
@@ -7,25 +8,32 @@ namespace UAlbion.Formats.MapEvents
     {
         public static EventNode Load(BinaryReader br, int id, MapEventType type)
         {
-            return new EventNode(id, new SignalEvent
+            var signalEvent = new SignalEvent
             {
-                Unk1 = br.ReadByte(), // +1
+                SignalId = br.ReadByte(), // +1
                 Unk2 = br.ReadByte(), // +2
                 Unk3 = br.ReadByte(), // +3
                 Unk4 = br.ReadByte(), // +4
                 Unk5 = br.ReadByte(), // +5
                 Unk6 = br.ReadUInt16(), // +6
                 Unk8 = br.ReadUInt16(), // +8
-            });
+            };
+            Debug.Assert(signalEvent.Unk2 == 0);
+            Debug.Assert(signalEvent.Unk3 == 0);
+            Debug.Assert(signalEvent.Unk4 == 0);
+            Debug.Assert(signalEvent.Unk5 == 0);
+            Debug.Assert(signalEvent.Unk6 == 0);
+            Debug.Assert(signalEvent.Unk8 == 0);
+            return new EventNode(id, signalEvent);
         }
 
-        public byte Unk1 { get; private set; }
-        public byte Unk2 { get; private set; }
-        public byte Unk3 { get; private set; }
-        public byte Unk4 { get; private set; }
-        public byte Unk5 { get; private set; }
-        public ushort Unk6 { get; private set; }
-        public ushort Unk8 { get; private set; }
-        public override string ToString() => $"signal ({Unk1} {Unk2} {Unk3} {Unk4} {Unk5} {Unk6} {Unk8})";
+        public byte SignalId { get; private set; }
+        byte Unk2 { get; set; }
+        byte Unk3 { get; set; }
+        byte Unk4 { get; set; }
+        byte Unk5 { get; set; }
+        ushort Unk6 { get; set; }
+        ushort Unk8 { get; set; }
+        public override string ToString() => $"signal {SignalId}";
     }
 }

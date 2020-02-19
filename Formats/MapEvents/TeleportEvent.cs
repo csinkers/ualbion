@@ -19,24 +19,25 @@ namespace UAlbion.Formats.MapEvents
                 MapId = (MapDataId) br.ReadUInt16(), // +6
                 Unk8 = br.ReadUInt16(), // +8
             };
-            Debug.Assert(e.Unk4 == 255
-                         || e.Unk4 == 6
+            Debug.Assert(e.Unk4 == 0
                          || e.Unk4 == 1
-                         || e.Unk4 == 106
-                         || e.Unk4 == 0
                          || e.Unk4 == 2
-                         || e.Unk4 == 3);
+                         || e.Unk4 == 3
+                         || e.Unk4 == 6
+                         || e.Unk4 == 106
+                         || e.Unk4 == 255); // Always 255 in maps
+            Debug.Assert(e.Unk8 == 0);
             return new EventNode(id, e);
         }
 
         public byte X { get; set; }
         public byte Y { get; set; }
-        public byte Direction { get; set; }
+        public byte Direction { get; set; } // 0,1,2,3,255
         public MapDataId MapId { get; set; } // 0 = stay on current map
 
         public byte Unk4 { get; set; } // 255 on 2D maps, (1,6) on 3D maps
-        public byte Unk5 { get; set; }
-        public ushort Unk8 { get; set; }
-        public override string ToString() => $"teleport {MapId} <{X}, {Y}> Dir:{Direction} ({Unk4} {Unk5} {Unk8})";
+        public byte Unk5 { get; set; } // 2,3,4,5,6,8,9
+        ushort Unk8 { get; set; } 
+        public override string ToString() => $"teleport {MapId} <{X}, {Y}> Dir:{Direction} ({Unk4} {Unk5})";
     }
 }

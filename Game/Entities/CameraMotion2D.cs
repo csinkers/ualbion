@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Events;
@@ -44,8 +45,8 @@ namespace UAlbion.Game.Entities
                 var position = leader.GetPosition() * map.TileSize;
                 const float lerpRate = 3.0f; // TODO: Data driven
                 _position = new Vector2(
-                    Util.Lerp(_position.X, position.X, lerpRate * e.DeltaSeconds),
-                    Util.Lerp(_position.Y, position.Y, lerpRate * e.DeltaSeconds));
+                    ApiUtil.Lerp(_position.X, position.X, lerpRate * e.DeltaSeconds),
+                    ApiUtil.Lerp(_position.Y, position.Y, lerpRate * e.DeltaSeconds));
             }
 
             if (map == null) return;

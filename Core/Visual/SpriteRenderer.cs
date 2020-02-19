@@ -81,12 +81,12 @@ namespace UAlbion.Core.Visual
 
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
         readonly List<Shader> _shaders = new List<Shader>();
+        readonly Dictionary<SpriteShaderKey, Pipeline> _pipelines = new Dictionary<SpriteShaderKey, Pipeline>();
 
         // Context objects
         DeviceBuffer _vertexBuffer;
         DeviceBuffer _indexBuffer;
         DeviceBuffer _uniformBuffer;
-        Dictionary<SpriteShaderKey, Pipeline> _pipelines = new Dictionary<SpriteShaderKey, Pipeline>();
         ResourceLayout _perSpriteResourceLayout;
 
         public RenderPasses RenderPasses => RenderPasses.Standard;
@@ -124,7 +124,6 @@ namespace UAlbion.Core.Visual
             _shaders.AddRange(shaders);
             var shaderSet = new ShaderSetDescription(new[] { VertexLayout, InstanceLayout }, shaders);
 
-            Console.WriteLine($"-- Build SpriteRenderer-- IsDepth0..1: {gd.IsDepthRangeZeroToOne} YInvert: {gd.IsClipSpaceYInverted} UV TopLeft: {gd.IsUvOriginTopLeft}");
             var depthStencilMode = 
                 key.PerformDepthTest
                 ?  gd.IsDepthRangeZeroToOne
@@ -168,26 +167,7 @@ namespace UAlbion.Core.Visual
             cl.UpdateBuffer(_vertexBuffer, 0, Vertices);
             cl.UpdateBuffer(_indexBuffer, 0, Indices);
 
-            if (_pipelines != null)
-            {
-                foreach (var pipeline in _pipelines)
-                    pipeline.Value.Dispose();
-            }
-
-            var keys = new[] // TODO: Use shader customisation constants instead
-            {
-                new SpriteShaderKey(true, true, false),
-                new SpriteShaderKey(true, false, false),
-                new SpriteShaderKey(false, true, false),
-                new SpriteShaderKey(false, false, false),
-                new SpriteShaderKey(true, true, true),
-                new SpriteShaderKey(true, false, true),
-                new SpriteShaderKey(false, true, true),
-                new SpriteShaderKey(false, false, true)
-            };
-
             _perSpriteResourceLayout = factory.CreateResourceLayout(PerSpriteLayoutDescription);
-            _pipelines = keys.ToDictionary(x => x, x => BuildPipeline(gd, sc, x));
             _disposeCollector.Add(_vertexBuffer, _indexBuffer, _uniformBuffer, _perSpriteResourceLayout);
         }
 
@@ -199,6 +179,10 @@ namespace UAlbion.Core.Visual
             foreach(var sprite in renderables.OfType<MultiSprite>())
             {
                 if (sprite.ActiveInstances == 0) continue;
+
+                var shaderKey = new SpriteShaderKey(sprite);
+                if(!_pipelines.ContainsKey(shaderKey))
+                    _pipelines.Add(shaderKey, BuildPipeline(gd, sc, shaderKey));
 
                 uint bufferSize = (uint) sprite.Instances.Length * SpriteInstanceData.StructSize;
                 var buffer = dom.Prepare((sprite, sprite),
@@ -280,14 +264,11 @@ namespace UAlbion.Core.Visual
         {
             _disposeCollector.DisposeAll();
 
-            if (_pipelines != null)
-            {
-                foreach (var pipeline in _pipelines)
-                    pipeline.Value.Dispose();
-                _pipelines = null;
-            }
+            foreach (var pipeline in _pipelines)
+                pipeline.Value.Dispose();
+            _pipelines.Clear();
 
-            foreach(var shader in _shaders)
+            foreach (var shader in _shaders)
                 shader.Dispose();
             _shaders.Clear();
         }

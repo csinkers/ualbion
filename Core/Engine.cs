@@ -17,6 +17,7 @@ namespace UAlbion.Core
     {
         const int DefaultWidth = 720;
         const int DefaultHeight = 480;
+
         static readonly HandlerSet Handlers = new HandlerSet
         (
             H<Engine, LoadRenderDocEvent>((x, _) =>
@@ -27,26 +28,25 @@ namespace UAlbion.Core
                     x._recreateWindow = true;
                 }
             }),
-            H<Engine, GarbageCollectionEvent>((x,_) => GC.Collect()),
+            H<Engine, GarbageCollectionEvent>((x, _) => GC.Collect()),
             H<Engine, QuitEvent>((x, e) => x._done = true),
-            H<Engine, RunRenderDocEvent>((x,_) => _renderDoc?.LaunchReplayUI()),
+            H<Engine, RunRenderDocEvent>((x, _) => _renderDoc?.LaunchReplayUI()),
             H<Engine, SetCursorPositionEvent>((x, e) => x._pendingCursorUpdate = new Vector2(e.X, e.Y)),
             H<Engine, ToggleFullscreenEvent>((x, _) => x.ToggleFullscreenState()),
-            H<Engine, ToggleHardwareCursorEvent>((x,_) => x.Window.CursorVisible = !x.Window.CursorVisible),
+            H<Engine, ToggleHardwareCursorEvent>((x, _) => x.Window.CursorVisible = !x.Window.CursorVisible),
             H<Engine, ToggleResizableEvent>((x, _) => x.Window.Resizable = !x.Window.Resizable),
             H<Engine, ToggleVisibleBorderEvent>((x, _) => x.Window.BorderVisible = !x.Window.BorderVisible),
-            H<Engine, SetMsaaLevelEvent>((x,e) => x._newSampleCount = e.SampleCount),
+            H<Engine, SetMsaaLevelEvent>((x, e) => x._newSampleCount = e.SampleCount),
+            H<Engine, RefreshDeviceObjectsEvent>((x, e) => x.RefreshDeviceObjects(e.Count ?? 1)),
+            H<Engine, RecreateWindowEvent>((x, e) => { x._recreateWindow = true; x._newBackend = x.GraphicsDevice.BackendType; }),
+            H<Engine, SetBackendEvent>((x, e) => x._newBackend = e.Value),
             H<Engine, SetVSyncEvent>((x, e) =>
             {
                 if (x._vsync == e.Value) return;
                 x._vsync = e.Value;
                 x._newBackend = x.GraphicsDevice.BackendType;
-            }),
-            H<Engine, SetBackendEvent>((x, e) =>
-            {
-                if (x.GraphicsDevice.BackendType == e.Value) return;
-                x._newBackend = e.Value;
-            }));
+            })
+        );
 
         public static EventExchange Global { get; set; }
         static RenderDoc _renderDoc;
@@ -259,6 +259,7 @@ namespace UAlbion.Core
 
             using (PerfTracker.InfrequentEvent($"change backend to {backend}"))
             {
+                bool firstCreate = GraphicsDevice == null;
                 if (GraphicsDevice != null)
                 {
                     DestroyAllObjects();
@@ -307,6 +308,9 @@ namespace UAlbion.Core
 
                 Raise(new BackendChangedEvent(GraphicsDevice));
                 CreateAllObjects();
+
+                if (!firstCreate)
+                    Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.FlipDepthRange));
             }
         }
 
@@ -392,6 +396,16 @@ namespace UAlbion.Core
         [Event("e:run_renderdoc")] public class RunRenderDocEvent : EngineEvent { }
         [Event("e:load_renderdoc")] public class LoadRenderDocEvent : EngineEvent { }
         [Event("e:toggle_visible_border")] public class ToggleVisibleBorderEvent : EngineEvent { }
+        [Event("e:recreate_window")] public class RecreateWindowEvent : EngineEvent { }
+
+        [Event("e:refresh_objects", "Refresh the graphics device objects")]
+        public class RefreshDeviceObjectsEvent : EngineEvent
+        {
+            public RefreshDeviceObjectsEvent(int? count) { Count = count; }
+
+            [EventPart("n", "Number of times to refresh")]
+            public int? Count { get; }
+        }
     }
 }
 

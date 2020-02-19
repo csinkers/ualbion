@@ -122,10 +122,10 @@ namespace UAlbion.Formats.Assets
             // Resolve event indices to pointers
             foreach (var mapEvent in map.Events.OfType<EventNode>())
             {
-                if (mapEvent.NextEventId.HasValue)
+                if (mapEvent.NextEventId.HasValue && mapEvent.NextEventId < map.Events.Count)
                     mapEvent.NextEvent = map.Events[mapEvent.NextEventId.Value];
 
-                if (mapEvent is BranchNode q && q.NextEventWhenFalseId.HasValue)
+                if (mapEvent is BranchNode q && q.NextEventWhenFalseId.HasValue && q.NextEventWhenFalseId < map.Events.Count)
                     q.NextEventWhenFalse = map.Events[q.NextEventWhenFalseId.Value];
             }
 

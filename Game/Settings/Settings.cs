@@ -2,7 +2,6 @@
 using UAlbion.Core.Events;
 using UAlbion.Formats;
 using UAlbion.Game.Events;
-using Util = UAlbion.Core.Util;
 
 namespace UAlbion.Game.Settings
 {
@@ -22,10 +21,10 @@ namespace UAlbion.Game.Settings
             H<Settings, SetWindowSize3dEvent>      ((x, e) => x.WindowSize3d       = e.Value),
             H<Settings, SetCombatDetailLevelEvent> ((x, e) => x.CombatDetailLevel  = e.Value),
             H<Settings, SetCombatDelayEvent>       ((x, e) => x.CombatDelay        = e.Value),
-            H<Settings, DebugFlagEvent>    ((x, e) => x.DebugFlags = (DebugFlags)Util.UpdateFlag((uint)x.DebugFlags, e.Operation, (uint)e.Flag)),
-            H<Settings, SpecialEvent>      ((x, e) => x.Special1 = Util.UpdateValue(x.Special1, e.Operation, e.Argument)),
-            H<Settings, Special2Event>     ((x, e) => x.Special2 = Util.UpdateValue(x.Special2, e.Operation, e.Argument)),
-            H<Settings, EngineFlagEvent>   ((x, e) => x.Flags = (EngineFlags)Util.UpdateFlag((uint)x.Flags, e.Operation, (uint)e.Flag))
+            H<Settings, DebugFlagEvent>    ((x, e) => x.DebugFlags = (DebugFlags)CoreUtil.UpdateFlag((uint)x.DebugFlags, e.Operation, (uint)e.Flag)),
+            H<Settings, SpecialEvent>      ((x, e) => x.Special1 = CoreUtil.UpdateValue(x.Special1, e.Operation, e.Argument)),
+            H<Settings, Special2Event>     ((x, e) => x.Special2 = CoreUtil.UpdateValue(x.Special2, e.Operation, e.Argument)),
+            H<Settings, EngineFlagEvent>   ((x, e) => x.Flags = (EngineFlags)CoreUtil.UpdateFlag((uint)x.Flags, e.Operation, (uint)e.Flag))
         );
 
         public Settings() : base(Handlers) { }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
@@ -11,12 +12,17 @@ namespace UAlbion.Game.State
     public class GameState : ServiceComponent<IGameState>, IGameState
     {
         readonly Party _party;
+        readonly IDictionary<int, int> _tickers = new Dictionary<int, int>();
+        readonly IDictionary<int, int> _temporarySwitches = new Dictionary<int, int>();
+
         public DateTime Time { get; private set; }
 
         public IDictionary<PartyCharacterId, CharacterSheet> PartyMembers { get; } = new Dictionary<PartyCharacterId, CharacterSheet>();
         public IDictionary<NpcCharacterId, CharacterSheet> Npcs { get; } = new Dictionary<NpcCharacterId, CharacterSheet>();
         public IDictionary<ChestId, Chest> Chests { get; } = new Dictionary<ChestId, Chest>();
         public IDictionary<MerchantId, Chest> Merchants { get; } = new Dictionary<MerchantId, Chest>();
+        public IReadOnlyDictionary<int, int> Tickers { get; }
+        public IReadOnlyDictionary<int, int> TemporarySwitches { get; }
 
         IParty IGameState.Party => _party;
         Func<NpcCharacterId, ICharacterSheet> IGameState.GetNpc => x => Npcs[x];
@@ -31,6 +37,9 @@ namespace UAlbion.Game.State
 
         public GameState() : base(Handlers)
         {
+            Tickers = new ReadOnlyDictionary<int, int>(_tickers);
+            TemporarySwitches = new ReadOnlyDictionary<int, int>(_temporarySwitches);
+
             _party = AttachChild(new Party(PartyMembers));
             AttachChild(new InventoryScreenState());
         }

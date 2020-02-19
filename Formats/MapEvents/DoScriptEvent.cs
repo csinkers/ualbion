@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
@@ -7,7 +8,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static EventNode Load(BinaryReader br, int id)
         {
-            return new EventNode(id, new DoScriptEvent
+            var e = new DoScriptEvent
             {
                 Unk1 = br.ReadByte(), // +1
                 Unk2 = br.ReadByte(), // +2
@@ -16,17 +17,24 @@ namespace UAlbion.Formats.MapEvents
                 Unk5 = br.ReadByte(), // +5
                 ScriptId = br.ReadUInt16(), // +6
                 Unk8 = br.ReadUInt16(), // +8
-            });
+            };
+            Debug.Assert(e.Unk1 == 0);
+            Debug.Assert(e.Unk2 == 0);
+            Debug.Assert(e.Unk3 == 0);
+            Debug.Assert(e.Unk4 == 0);
+            Debug.Assert(e.Unk5 == 0);
+            Debug.Assert(e.Unk8 == 0);
+            return new EventNode(id, e);
         }
 
         public ushort ScriptId { get; private set; }
 
-        public byte Unk1 { get; private set; }
-        public byte Unk2 { get; private set; }
-        public byte Unk3 { get; private set; }
-        public byte Unk4 { get; private set; }
-        public byte Unk5 { get; private set; }
-        public ushort Unk8 { get; private set; }
-        public override string ToString() => $"do_script {ScriptId} ({Unk1} {Unk2} {Unk3} {Unk4} {Unk5} {Unk8})";
+        byte Unk1 { get; set; }
+        byte Unk2 { get; set; }
+        byte Unk3 { get; set; }
+        byte Unk4 { get; set; }
+        byte Unk5 { get; set; }
+        ushort Unk8 { get; set; }
+        public override string ToString() => $"do_script {ScriptId}";
     }
 }

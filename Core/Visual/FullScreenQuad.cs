@@ -64,7 +64,7 @@ namespace UAlbion.Core.Visual
             _pipeline = factory.CreateGraphicsPipeline(ref pd);
             _pipeline.Name = "P_FullScreenQuad";
 
-            float[] verts = Util.GetFullScreenQuadVerts(gd);
+            float[] verts = CoreUtil.GetFullScreenQuadVerts(gd);
             _vb = factory.CreateBuffer(new BufferDescription(verts.SizeInBytes() * sizeof(float), BufferUsage.VertexBuffer));
             cl.UpdateBuffer(_vb, 0, verts);
 

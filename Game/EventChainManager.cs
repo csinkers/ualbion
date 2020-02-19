@@ -1,5 +1,6 @@
 ﻿using UAlbion.Api;
 using UAlbion.Core;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
@@ -18,6 +19,7 @@ namespace UAlbion.Game
             public IEventNode Node { get; set; }
             public int X { get; set; }
             public int Y { get; set; }
+            public ItemId? UsedItem { get; set; }
         }
 
         public EventChainManager() : base(Handlers) { }
@@ -153,7 +155,7 @@ namespace UAlbion.Game
                         Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query map id"));
                         break;
                     }
-                case (_, QueryType.PromptPlayer):
+                case (_, QueryType.PromptPlayer): // Async
                     {
                         Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query prompt"));
                         break;
@@ -173,7 +175,7 @@ namespace UAlbion.Game
                         Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query is demo"));
                         break;
                     }
-                case (_, QueryType.PromptPlayerNumeric):
+                case (_, QueryType.PromptPlayerNumeric): // Async
                     {
                         Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query numeric prompt"));
                         break;

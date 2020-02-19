@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using UAlbion.Api;
 using UAlbion.Core.Textures;
 using Veldrid;
 using Veldrid.Utilities;

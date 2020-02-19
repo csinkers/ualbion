@@ -86,8 +86,8 @@ namespace UAlbion
             // Dump.CharacterSheets(assets);
             // Dump.Chests(assets);
             // Dump.ItemData(assets, baseDir);
-            // Dump.MapEvents(assets, baseDir, MapDataId.Toronto2DGesamtkarteSpielbeginn);
-            //return;
+            // Dump.MapEvents(assets, baseDir);
+            // return;
 
             RunGame(global, baseDir);
         }

@@ -1,24 +1,13 @@
 ﻿using System;
 using System.Numerics;
-using System.Runtime.CompilerServices;
+using UAlbion.Api;
 using UAlbion.Core.Textures;
 using Veldrid;
 
 namespace UAlbion.Core
 {
-    public static class Util
+    public static class CoreUtil
     {
-        internal static uint SizeInBytes<T>(this T[] array) where T : struct
-        {
-            return (uint)(array.Length * Unsafe.SizeOf<T>());
-        }
-
-        public static Matrix4x4 Inverse(this Matrix4x4 src)
-        {
-            Matrix4x4.Invert(src, out Matrix4x4 result);
-            return result;
-        }
-
         public static Matrix4x4 CreatePerspective(
             bool isClipSpaceYInverted,
             bool useReverseDepth,
@@ -26,15 +15,10 @@ namespace UAlbion.Core
             float aspectRatio,
             float near, float far)
         {
-            Matrix4x4 persp;
-            if (useReverseDepth)
-            {
-                persp = CreatePerspective(fov, aspectRatio, far, near);
-            }
-            else
-            {
-                persp = CreatePerspective(fov, aspectRatio, near, far);
-            }
+            var persp = useReverseDepth 
+                ? CreatePerspective(fov, aspectRatio, far, near) 
+                : CreatePerspective(fov, aspectRatio, near, far);
+
             if (isClipSpaceYInverted)
             {
                 persp *= new Matrix4x4(
@@ -107,7 +91,7 @@ namespace UAlbion.Core
         public static ITexture BuildRotatedTexture(EightBitTexture texture)
         {
             var rotatedPixels = new byte[texture.Width * texture.Height];
-            Api.Util.RotateImage((int)texture.Width, (int)texture.Height, 
+            ApiUtil.RotateImage((int)texture.Width, (int)texture.Height, 
                new Span<byte>(texture.TextureData),
                new Span<byte>(rotatedPixels));
 
@@ -118,10 +102,6 @@ namespace UAlbion.Core
                 rotatedPixels,
                 new[] { new EightBitTexture.SubImage(0, 0, texture.Height, texture.Width, 0) });
         }
-
-        public static float Lerp(float a, float b, float t) => t * (b - a) + a;
-        public static float DegToRad(float degrees) => (float)Math.PI * degrees / 180.0f;
-        public static float RadToDeg(float radians) => 180.0f * radians / (float)Math.PI;
 
         public static uint UpdateFlag(uint flags, FlagOperation operation, uint flag)
         {
@@ -229,5 +209,10 @@ namespace UAlbion.Core
                 y++;
             } while (toHeight > 0);
         }
+
+        public static void LogInfo(string msg) => Engine.Global?.Raise(new LogEvent(LogEvent.Level.Info, msg), null);
+        public static void LogWarn(string msg) => Engine.Global?.Raise(new LogEvent(LogEvent.Level.Warning, msg), null);
+        public static void LogError(string msg) => Engine.Global?.Raise(new LogEvent(LogEvent.Level.Error, msg), null);
+        public static void LogCritical(string msg) => Engine.Global?.Raise(new LogEvent(LogEvent.Level.Critical, msg), null);
     }
 }

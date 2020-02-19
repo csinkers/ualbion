@@ -17,11 +17,11 @@ namespace UAlbion.Core
             {
                 if(e.Degrees == null)
                 {
-                    x.Raise(new LogEvent(LogEvent.Level.Info, $"FOV {Util.RadToDeg(x.FieldOfView)}"));
+                    x.Raise(new LogEvent(LogEvent.Level.Info, $"FOV {ApiUtil.RadToDeg(x.FieldOfView)}"));
                 }
                 else
                 {
-                    x.FieldOfView = Util.DegToRad(e.Degrees.Value);
+                    x.FieldOfView = ApiUtil.DegToRad(e.Degrees.Value);
                     x.UpdatePerspectiveMatrix();
                 }
             })
@@ -74,7 +74,7 @@ namespace UAlbion.Core
             _isClipSpaceYInverted = (settings?.Flags.HasFlag(EngineFlags.FlipYSpace) == true)
                 ? !e.GraphicsDevice.IsClipSpaceYInverted 
                 : e.GraphicsDevice.IsClipSpaceYInverted;
-;
+
             UpdatePerspectiveMatrix();
         }
 
@@ -102,7 +102,7 @@ namespace UAlbion.Core
 
         void UpdatePerspectiveMatrix()
         {
-            _projectionMatrix = Util.CreatePerspective(
+            _projectionMatrix = CoreUtil.CreatePerspective(
                 _isClipSpaceYInverted,
                 _useReverseDepth,
                 FieldOfView,

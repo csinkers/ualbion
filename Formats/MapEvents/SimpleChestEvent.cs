@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
@@ -15,7 +16,7 @@ namespace UAlbion.Formats.MapEvents
 
         public static EventNode Load(BinaryReader br, int id, MapEventType type)
         {
-            return new EventNode(id, new SimpleChestEvent
+            var chestEvent = new SimpleChestEvent
             {
                 ChestType = (SimpleChestItemType) br.ReadByte(), // +1
                 Unk2 = br.ReadByte(), // +2
@@ -24,16 +25,21 @@ namespace UAlbion.Formats.MapEvents
                 Unk5 = br.ReadByte(), // +5
                 ItemId = br.ReadUInt16(), // +6
                 Amount = br.ReadUInt16(), // +8
-            });
+            };
+            Debug.Assert(chestEvent.Unk2 == 0);
+            Debug.Assert(chestEvent.Unk3 == 0);
+            Debug.Assert(chestEvent.Unk4 == 0);
+            Debug.Assert(chestEvent.Unk5 == 0);
+            return new EventNode(id, chestEvent);
         }
 
         public SimpleChestItemType ChestType { get; private set; }
         public ushort ItemId { get; private set; }
         public ushort Amount { get; private set; }
-        public byte Unk2 { get; private set; }
-        public byte Unk3 { get; private set; }
-        public byte Unk4 { get; private set; }
-        public byte Unk5 { get; private set; }
+        byte Unk2 { get; set; }
+        byte Unk3 { get; set; }
+        byte Unk4 { get; set; }
+        byte Unk5 { get; set; }
 
         string ItemIdString =>
             ChestType switch
@@ -42,6 +48,6 @@ namespace UAlbion.Formats.MapEvents
                 _ => ItemId.ToString()
             };
 
-        public override string ToString() => $"simple_chest {ChestType} {Amount}x{ItemIdString} ({Unk2} {Unk3} {Unk4} {Unk5})";
+        public override string ToString() => $"simple_chest {ChestType} {Amount}x{ItemIdString}";
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -197,7 +196,7 @@ namespace UAlbion.Core.Textures
                         _isAnySubImagePaletteAnimated = true;
                 }
 
-                lsi.Frames = (int)Api.Util.LCM(lsi.Components.Select(x => (long)x.Source.SubImageCount).Append(1));
+                lsi.Frames = (int)ApiUtil.LCM(lsi.Components.Select(x => (long)x.Source.SubImageCount).Append(1));
                 for (int i = 0; i < lsi.Frames; i++)
                 {
                     _layerLookup[new LayerKey(lsi.Id, i)] = _layerSizes.Count;
@@ -343,7 +342,7 @@ namespace UAlbion.Core.Textures
 
                 fixed (byte* fromBuffer = &eightBitTexture.TextureData[0])
                 {
-                    Util.Blit8To32(
+                    CoreUtil.Blit8To32(
                         (uint)sourceWidth, (uint)sourceHeight,
                         destWidth, destHeight,
                         fromBuffer + sourceOffset,

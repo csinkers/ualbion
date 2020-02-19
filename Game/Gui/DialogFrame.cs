@@ -8,7 +8,6 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
 using Veldrid;
-using Util = UAlbion.Core.Util;
 
 namespace UAlbion.Game.Gui
 {
@@ -60,7 +59,7 @@ namespace UAlbion.Game.Gui
                 uint y = 16;
                 uint n = 0;
                 var texture = assets.LoadTexture((CoreSpriteId)((int)CoreSpriteId.UiBackgroundLines1 + n % 4));
-                texture = Util.BuildRotatedTexture((EightBitTexture)texture);
+                texture = CoreUtil.BuildRotatedTexture((EightBitTexture)texture);
                 while (y < height - TileSize)
                 {
                     uint? h = y + 2*TileSize > height ? (uint)(height - TileSize - y) : (uint?)null;

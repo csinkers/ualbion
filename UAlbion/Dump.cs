@@ -132,34 +132,39 @@ namespace UAlbion
             }
         }
 
-        static void PrintChain(EventFormatter formatter, IEventNode e, int indent)
+        static void PrintChain(StreamWriter sw, EventFormatter formatter, IEventNode e, int indent)
         {
             do
             {
-                Console.Write($"{e.Id:000}");
-                Console.Write("".PadRight(indent * 4));
+                sw.Write($"{e.Id:000}");
+                sw.Write("".PadRight(indent * 4));
                 if(e is IBranchNode branch)
                 {
-                    Console.WriteLine($"if (!{formatter.GetText(e)}) {{");
+                    sw.WriteLine($"if (!{formatter.GetText(e)}) {{");
                     if (branch.NextEventWhenFalse != null)
-                        PrintChain(formatter, branch.NextEventWhenFalse, indent + 1);
-                    Console.WriteLine("}".PadLeft(4 + indent * 4));
-                    Console.WriteLine("else...".PadLeft(10 + indent * 4));
+                        PrintChain(sw, formatter, branch.NextEventWhenFalse, indent + 1);
+                    sw.WriteLine("}".PadLeft(4 + indent * 4));
+                    sw.WriteLine("else...".PadLeft(10 + indent * 4));
                 }
-                else Console.WriteLine(formatter.GetText(e));
+                else sw.WriteLine(formatter.GetText(e));
                 e = e.NextEvent;
             } while (e != null);
         }
 
-        public static void MapEvents(IAssetManager assets, string baseDir, MapDataId mapId)
+        static void PrintEvent(StreamWriter sw, EventFormatter formatter, IEventNode e)
         {
-            var map = assets.LoadMap2D(mapId);
-            if (map == null) // Just handle 2D for now
-                return;
+            sw.Write($"{e.Id:000} ");
+            sw.WriteLine(formatter.GetText(e));
+        }
 
+        static void DumpMapEvents2D(StreamWriter sw, IAssetManager assets, MapDataId mapId, MapData2D map)
+        {
             var formatter = new EventFormatter(assets, mapId);
+            foreach(var e in map.Events)
+                PrintEvent(sw, formatter, e);
+            /*
             var rootNodes = new HashSet<(bool, TriggerType, int)>();
-            foreach(var zone in map.Zones)
+            foreach (var zone in map.Zones)
                 rootNodes.Add((zone.Global, zone.Trigger, zone.EventNumber));
 
             var sorted =
@@ -169,14 +174,57 @@ namespace UAlbion
                         .ThenBy(x => x.Item3)
                 ;
 
-            foreach(var (global, trigger, number) in sorted)
+            foreach (var (global, trigger, number) in sorted)
             {
                 var e = map.Events[number];
-                Console.WriteLine($"{(global ? "Global" : "Local")} {trigger}:");
-                PrintChain(formatter, e, 1);
-            }
+                sw.WriteLine($"{(global ? "Global" : "Local")} {trigger}:");
+                PrintChain(sw, formatter, e, 1);
+            }*/
+        }
 
-            Console.ReadLine();
+        static void DumpMapEvents3D(StreamWriter sw, IAssetManager assets, MapDataId mapId, MapData3D map)
+        {
+            var formatter = new EventFormatter(assets, mapId);
+            foreach(var e in map.Events)
+                PrintEvent(sw, formatter, e);
+            /*
+            var rootNodes = new HashSet<(bool, TriggerType, int)>();
+            foreach (var zone in map.Zones)
+                rootNodes.Add((zone.Global, zone.Trigger, zone.EventNumber));
+
+            var sorted =
+                    rootNodes
+                        .OrderByDescending(x => x.Item1)
+                        .ThenBy(x => x.Item2)
+                        .ThenBy(x => x.Item3)
+                ;
+
+            foreach (var (global, trigger, number) in sorted)
+            {
+                var e = map.Events[number];
+                sw.WriteLine($"{(global ? "Global" : "Local")} {trigger}:");
+                PrintChain(sw, formatter, e, 1);
+            }
+            */
+        }
+
+        public static void MapEvents(IAssetManager assets, string baseDir)
+        {
+            using var sw = File.CreateText($@"{baseDir}\re\AllMapEvents.txt");
+            foreach (var mapId in Enum.GetValues(typeof(MapDataId)).Cast<MapDataId>())
+            {
+                var map2d = assets.LoadMap2D(mapId);
+                if (map2d != null)
+                {
+                    DumpMapEvents2D(sw, assets, mapId, map2d);
+                }
+                else
+                {
+                    var map3d = assets.LoadMap3D(mapId);
+                    if (map3d != null)
+                        DumpMapEvents3D(sw, assets, mapId, map3d);
+                }
+            }
         }
     }
 

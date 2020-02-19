@@ -51,7 +51,7 @@ namespace UAlbion.Formats.Assets
 
             AnimatedRanges.TryGetValue(Id, out var ranges);
             ranges ??= new List<(byte, byte)>();
-            Period = (int)Util.LCM(ranges.Select(x => (long)(x.Item2 - x.Item1 + 1)).Append(1));
+            Period = (int)ApiUtil.LCM(ranges.Select(x => (long)(x.Item2 - x.Item1 + 1)).Append(1));
 
             for (int cacheIndex = 0; cacheIndex < Period; cacheIndex++)
             {

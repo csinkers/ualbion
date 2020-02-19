@@ -10,7 +10,7 @@ namespace UAlbion.Formats.MapEvents
         {
             var e = new SoundEvent
             {
-                Mode = (SoundMode) br.ReadByte(), // +1
+                Mode = (SoundMode)br.ReadByte(), // +1
                 SoundId = br.ReadByte(), // +2 // TODO: SoundId
                 Unk3 = br.ReadByte(), // +3
                 Volume = br.ReadByte(), // +4
@@ -21,6 +21,7 @@ namespace UAlbion.Formats.MapEvents
             Debug.Assert(e.Unk3 <= 100);
             Debug.Assert(e.Volume <= 150);
             Debug.Assert(e.RestartProbability <= 102);
+            Debug.Assert(e.Unk8 == 0);
             return new EventNode(id, e);
         }
 
@@ -32,12 +33,12 @@ namespace UAlbion.Formats.MapEvents
         }
 
         public SoundMode Mode { get; private set; }
-        public byte SoundId { get; private set; }
-        public byte Unk3 { get; private set; } // 0 - 100?
-        public byte Volume { get; private set; } // 0 - 150
-        public byte RestartProbability { get; private set; } // 0 - 100
-        public ushort FrequencyOverride { get; private set; }
-        public ushort Unk8 { get; private set; }
-        public override string ToString() => $"sound {SoundId} {Mode} Vol:{Volume} Prob:{RestartProbability}% Freq:{FrequencyOverride} ({Unk3} {Unk8})";
+        public byte SoundId { get; private set; } // [0..78], 153
+        public byte Unk3 { get; private set; } // [0..100] (multiples of 5)
+        public byte Volume { get; private set; } // [0..150]
+        public byte RestartProbability { get; private set; } // [0..100]
+        public ushort FrequencyOverride { get; private set; } // 0,8, [5..22]*1000
+        ushort Unk8 { get; set; }
+        public override string ToString() => $"sound {SoundId} {Mode} Vol:{Volume} Prob:{RestartProbability}% Freq:{FrequencyOverride} ({Unk3})";
     }
 }

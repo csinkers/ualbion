@@ -50,5 +50,6 @@ namespace UAlbion.Formats.Config
         [JsonIgnore] public override int EffectiveWidth => Width ?? Parent.Width ?? 0;
         [JsonIgnore] public override int EffectiveHeight => Height ?? Parent.Height ?? 0;
         [JsonIgnore] public override bool Transposed => Parent.Transposed ?? false;
+        [JsonIgnore] public string Filename;
     }
 }

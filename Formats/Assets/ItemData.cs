@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using System.Text;
+﻿using System.Text;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets

@@ -1,30 +1,22 @@
 ﻿using System.Diagnostics;
-using System.IO;
-using UAlbion.Api;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class QueryEvent : IEvent
+    public class QueryEvent : IQueryEvent
     {
-        public enum QueryOperation
+        public static IQueryEvent Translate(IQueryEvent genericEvent, ISerializer s)
         {
-            Unk0,
-            Unk1,
-            Unk2,
-            Equals,
-        }
-
-        public static BranchNode Load(BinaryReader br, int id, MapEventType type)
-        {
-            var subType = (QueryType)br.ReadByte(); // 1
+            var subType = genericEvent?.QueryType ?? QueryType.IsScriptDebugModeActive;
+            s.EnumU8(nameof(subType), () => subType, x => subType = x, x => ((byte)x, x.ToString()));
             switch (subType)
             {
                 case QueryType.InventoryHasItem:
                 case QueryType.UsedItemId:
-                    return QueryItemEvent.Load(br, id, subType);
+                    return QueryItemEvent.Translate((QueryItemEvent)genericEvent, s, subType);
 
                 case QueryType.ChosenVerb:
-                    return QueryVerbEvent.Load(br, id);
+                    return QueryVerbEvent.Translate((QueryVerbEvent)genericEvent, s);
 
                 case QueryType.PreviousActionResult:
                 case QueryType.Ticker:
@@ -35,32 +27,41 @@ namespace UAlbion.Formats.MapEvents
                     break;
             }
 
-            var e = new QueryEvent
-            {
-                SubType = subType,
-                Unk2 = br.ReadByte(), // 2
-                Unk3 = br.ReadByte(), // 3
-                Unk4 = br.ReadByte(), // 4
-                Unk5 = br.ReadByte(), // 5
-                Argument = br.ReadUInt16(), // 6
-            };
+            var e = (QueryEvent)genericEvent ?? new QueryEvent { SubType = subType };
+            s.Dynamic(e, nameof(Unk2));
+            s.Dynamic(e, nameof(Unk3));
+            s.Dynamic(e, nameof(Unk4));
+            s.Dynamic(e, nameof(Unk5));
+            s.Dynamic(e, nameof(Argument));
+            s.UInt16(nameof(FalseEventId),
+                () => e.FalseEventId ?? 0xffff,
+                x => e.FalseEventId = x == 0xffff ? (ushort?)null : x);
+
             Debug.Assert(e.Unk4 == 0);
             Debug.Assert(e.Unk5 == 0);
 
-            ushort? falseEventId = br.ReadUInt16(); // 8
-            if (falseEventId == 0xffff)
-                falseEventId = null;
-            return new BranchNode(id, e, falseEventId);
+            return e;
         }
 
-        public byte Unk2 { get; protected set; } // method to use for check? 0,1,2,3,4,5
-        public byte Unk3 { get; protected set; } // immediate value?
-        protected byte Unk4 { get; set; }
-        protected byte Unk5 { get; set; }
+        public enum QueryOperation
+        {
+            Unk0,
+            Unk1,
+            Unk2,
+            Equals,
+        }
 
-        public QueryType SubType { get; protected set; }
-        public ushort Argument { get; protected set; }
+        public byte Unk2 { get; private set; } // method to use for check? 0,1,2,3,4,5
+        public byte Unk3 { get; private set; } // immediate value?
+        byte Unk4 { get; set; }
+        byte Unk5 { get; set; }
+
+        public QueryType SubType { get; private set; }
+        public ushort Argument { get; private set; }
 
         public override string ToString() => $"query {SubType} {Argument} ({Unk2} {Unk3})";
+        public MapEventType EventType => MapEventType.Query;
+        public QueryType QueryType { get; }
+        public ushort? FalseEventId { get; set; }
     }
 }

@@ -1,29 +1,26 @@
 ﻿using System.Diagnostics;
-using System.IO;
-using UAlbion.Api;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class OffsetEvent : IEvent
+    public class OffsetEvent : IMapEvent
     {
-        public static EventNode Load(BinaryReader br, int id, MapEventType type)
+        public static OffsetEvent Translate(OffsetEvent e, ISerializer s)
         {
-            var e = new OffsetEvent
-            {
-                X = br.ReadSByte(), // +1
-                Y = br.ReadSByte(), // +2
-                Unk3 = br.ReadByte(), // +3
-                Unk4 = br.ReadByte(), // +4
-                Unk5 = br.ReadByte(), // +5
-                Unk6 = br.ReadUInt16(), // +6
-                Unk8 = br.ReadUInt16(), // +8
-            };
+            e ??= new OffsetEvent();
+            s.Dynamic(e, nameof(X));
+            s.Dynamic(e, nameof(Y));
+            s.Dynamic(e, nameof(Unk3));
+            s.Dynamic(e, nameof(Unk4));
+            s.Dynamic(e, nameof(Unk5));
+            s.Dynamic(e, nameof(Unk6));
+            s.Dynamic(e, nameof(Unk8));
             Debug.Assert(e.Unk3 == 1 || e.Unk3 == 3);
             Debug.Assert(e.Unk4 == 0);
             Debug.Assert(e.Unk5 == 0);
             Debug.Assert(e.Unk6 == 0);
             Debug.Assert(e.Unk8 == 0);
-            return new EventNode(id, e);
+            return e;
         }
 
         public sbyte X { get; private set; }
@@ -34,5 +31,6 @@ namespace UAlbion.Formats.MapEvents
         ushort Unk6 { get; set; }
         ushort Unk8 { get; set; }
         public override string ToString() => $"offset <{X}, {Y}> ({Unk3} {Unk4} {Unk5} {Unk6} {Unk8})";
+        public MapEventType EventType => MapEventType.Offset;
     }
 }

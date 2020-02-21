@@ -1,36 +1,33 @@
 ﻿using System.Diagnostics;
 using System.IO;
-using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class SimpleChestEvent : IEvent
+    public class SimpleChestEvent : IMapEvent
     {
+        public static SimpleChestEvent Translate(SimpleChestEvent e, ISerializer s)
+        {
+            e ??= new SimpleChestEvent();
+            s.EnumU8(nameof(ChestType), () => e.ChestType, x => e.ChestType = x, x => ((byte)x, x.ToString()));
+            s.Dynamic(e, nameof(Unk2));
+            s.Dynamic(e, nameof(Unk3));
+            s.Dynamic(e, nameof(Unk4));
+            s.Dynamic(e, nameof(Unk5));
+            s.Dynamic(e, nameof(ItemId));
+            s.Dynamic(e, nameof(Amount));
+            Debug.Assert(e.Unk2 == 0);
+            Debug.Assert(e.Unk3 == 0);
+            Debug.Assert(e.Unk4 == 0);
+            Debug.Assert(e.Unk5 == 0);
+            return e;
+        }
         public enum SimpleChestItemType : byte
         {
             Item = 0,
             Gold = 1, // ??
             Rations = 2 // ??
-        }
-
-        public static EventNode Load(BinaryReader br, int id, MapEventType type)
-        {
-            var chestEvent = new SimpleChestEvent
-            {
-                ChestType = (SimpleChestItemType) br.ReadByte(), // +1
-                Unk2 = br.ReadByte(), // +2
-                Unk3 = br.ReadByte(), // +3
-                Unk4 = br.ReadByte(), // +4
-                Unk5 = br.ReadByte(), // +5
-                ItemId = br.ReadUInt16(), // +6
-                Amount = br.ReadUInt16(), // +8
-            };
-            Debug.Assert(chestEvent.Unk2 == 0);
-            Debug.Assert(chestEvent.Unk3 == 0);
-            Debug.Assert(chestEvent.Unk4 == 0);
-            Debug.Assert(chestEvent.Unk5 == 0);
-            return new EventNode(id, chestEvent);
         }
 
         public SimpleChestItemType ChestType { get; private set; }
@@ -49,5 +46,6 @@ namespace UAlbion.Formats.MapEvents
             };
 
         public override string ToString() => $"simple_chest {ChestType} {Amount}x{ItemIdString}";
+        public MapEventType EventType => MapEventType.SimpleChest;
     }
 }

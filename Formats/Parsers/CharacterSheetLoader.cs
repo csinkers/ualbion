@@ -205,15 +205,15 @@ namespace UAlbion.Formats.Parsers
             if (s.Offset - start >= length)
                 return;
 
-            s.Meta("Neck", ItemSlotLoader.Write(sheet.Inventory.Neck), ItemSlotLoader.Read(x => sheet.Inventory.Neck = x));
-            s.Meta("Head", ItemSlotLoader.Write(sheet.Inventory.Head), ItemSlotLoader.Read(x => sheet.Inventory.Head = x));
-            s.Meta("Tail", ItemSlotLoader.Write(sheet.Inventory.Tail), ItemSlotLoader.Read(x => sheet.Inventory.Tail = x));
-            s.Meta("LeftHand", ItemSlotLoader.Write(sheet.Inventory.LeftHand), ItemSlotLoader.Read(x => sheet.Inventory.LeftHand = x));
-            s.Meta("Chest", ItemSlotLoader.Write(sheet.Inventory.Chest), ItemSlotLoader.Read(x => sheet.Inventory.Chest = x));
-            s.Meta("RightHand", ItemSlotLoader.Write(sheet.Inventory.RightHand), ItemSlotLoader.Read(x => sheet.Inventory.RightHand = x));
-            s.Meta("LeftFinger", ItemSlotLoader.Write(sheet.Inventory.LeftFinger), ItemSlotLoader.Read(x => sheet.Inventory.LeftFinger = x));
-            s.Meta("Feet", ItemSlotLoader.Write(sheet.Inventory.Feet), ItemSlotLoader.Read(x => sheet.Inventory.Feet = x));
-            s.Meta("RightFinger", ItemSlotLoader.Write(sheet.Inventory.RightFinger), ItemSlotLoader.Read(x => sheet.Inventory.RightFinger = x));
+            s.Meta("Neck", ItemSlotLoader.Read(x => sheet.Inventory.Neck = x), ItemSlotLoader.Write(sheet.Inventory.Neck));
+            s.Meta("Head", ItemSlotLoader.Read(x => sheet.Inventory.Head = x), ItemSlotLoader.Write(sheet.Inventory.Head));
+            s.Meta("Tail", ItemSlotLoader.Read(x => sheet.Inventory.Tail = x), ItemSlotLoader.Write(sheet.Inventory.Tail));
+            s.Meta("LeftHand", ItemSlotLoader.Read(x => sheet.Inventory.LeftHand = x), ItemSlotLoader.Write(sheet.Inventory.LeftHand));
+            s.Meta("Chest", ItemSlotLoader.Read(x => sheet.Inventory.Chest = x), ItemSlotLoader.Write(sheet.Inventory.Chest));
+            s.Meta("RightHand", ItemSlotLoader.Read(x => sheet.Inventory.RightHand = x), ItemSlotLoader.Write(sheet.Inventory.RightHand));
+            s.Meta("LeftFinger", ItemSlotLoader.Read(x => sheet.Inventory.LeftFinger = x), ItemSlotLoader.Write(sheet.Inventory.LeftFinger));
+            s.Meta("Feet", ItemSlotLoader.Read(x => sheet.Inventory.Feet = x), ItemSlotLoader.Write(sheet.Inventory.Feet));
+            s.Meta("RightFinger", ItemSlotLoader.Read(x => sheet.Inventory.RightFinger = x), ItemSlotLoader.Write(sheet.Inventory.RightFinger));
 
             if (sheet.Inventory.Slots == null)
                 sheet.Inventory.Slots = new ItemSlot[24];
@@ -231,7 +231,7 @@ namespace UAlbion.Formats.Parsers
         public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
             var sheet = new CharacterSheet { Name = name };
-            Translate(sheet, new GenericBinaryReader(br), streamLength);
+            Translate(sheet, new GenericBinaryReader(br, streamLength), streamLength);
             return sheet;
         }
     }

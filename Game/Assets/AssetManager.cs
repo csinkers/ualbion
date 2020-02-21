@@ -165,6 +165,6 @@ namespace UAlbion.Game.Assets
         }
 
         public IList<Block> LoadBlockList(BlockListId blockListId) => (IList<Block>)_assetLocator.LoadAssetCached(AssetType.BlockList, blockListId);
-        public IList<IEventNode> LoadEventSet(EventSetId eventSetId) => (IList<IEventNode>) _assetLocator.LoadAssetCached(AssetType.EventSet, eventSetId);
+        public EventSet LoadEventSet(EventSetId eventSetId) => (EventSet)_assetLocator.LoadAssetCached(AssetType.EventSet, eventSetId);
     }
 }

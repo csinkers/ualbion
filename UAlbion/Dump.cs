@@ -8,6 +8,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game;
+using UAlbion.Game.Assets;
 using TextEvent = UAlbion.Formats.MapEvents.TextEvent;
 
 namespace UAlbion
@@ -159,7 +160,7 @@ namespace UAlbion
 
         static void DumpMapEvents2D(StreamWriter sw, IAssetManager assets, MapDataId mapId, MapData2D map)
         {
-            var formatter = new EventFormatter(assets, mapId);
+            var formatter = new EventFormatter(assets, AssetType.MapText, (int)mapId);
             foreach(var e in map.Events)
                 PrintEvent(sw, formatter, e);
             /*
@@ -184,7 +185,7 @@ namespace UAlbion
 
         static void DumpMapEvents3D(StreamWriter sw, IAssetManager assets, MapDataId mapId, MapData3D map)
         {
-            var formatter = new EventFormatter(assets, mapId);
+            var formatter = new EventFormatter(assets, AssetType.MapText, (int)mapId);
             foreach(var e in map.Events)
                 PrintEvent(sw, formatter, e);
             /*
@@ -226,17 +227,35 @@ namespace UAlbion
                 }
             }
         }
+
+        public static void EventSets(AssetManager assets, string baseDir)
+        {
+            using var sw = File.CreateText($@"{baseDir}\re\AllEventSets.txt");
+            foreach (var eventSetId in Enum.GetValues(typeof(EventSetId)).Cast<EventSetId>())
+            {
+                sw.WriteLine($"EventSet{(int)eventSetId}:");
+                var set = assets.LoadEventSet(eventSetId);
+                if (set == null)
+                    continue;
+
+                var formatter = new EventFormatter(assets, AssetType.EventText, (int)eventSetId);
+                foreach (var e in set.Chains)
+                    PrintEvent(sw, formatter, e);
+            }
+        }
     }
 
     class EventFormatter
     {
         readonly IAssetManager _assets;
-        readonly MapDataId _mapContext;
+        readonly AssetType _textType;
+        readonly int _context;
 
-        public EventFormatter(IAssetManager assets, MapDataId mapContext)
+        public EventFormatter(IAssetManager assets, AssetType textType, int context)
         {
             _assets = assets;
-            _mapContext = mapContext;
+            _textType = textType;
+            _context = context;
         }
 
         public string GetText(IEventNode e)
@@ -244,7 +263,7 @@ namespace UAlbion
             if(e.Event is TextEvent textEvent) // Same as npc text event?
             {
                 var text = _assets.LoadString(
-                    new StringId(AssetType.MapText, (int)_mapContext, textEvent.TextId), 
+                    new StringId(_textType, _context, textEvent.TextId), 
                     GameLanguage.English);
 
                 return $"text Portrait:{textEvent.PortraitId} \"{text}\"";

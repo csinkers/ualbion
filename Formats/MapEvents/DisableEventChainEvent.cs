@@ -1,23 +1,21 @@
 ﻿using System.Diagnostics;
-using System.IO;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
     public class DisableEventChainEvent : ModifyEvent
     {
-        public static EventNode Load(BinaryReader br, int id, MapEventType type, ModifyType subType)
+        public static DisableEventChainEvent Translate(DisableEventChainEvent e, ISerializer s)
         {
-            var e = new DisableEventChainEvent
-            {
-                Unk2 = br.ReadByte(), // 2
-                ChainNumber = br.ReadByte(), // 3
-                Unk4 = br.ReadByte(), // 4
-                Unk5 = br.ReadByte(), // 5
-                Unk6 = br.ReadUInt16(), // 6
-                Unk8 = br.ReadUInt16(), // 8
-            };
+            e ??= new DisableEventChainEvent();
+            s.Dynamic(e, nameof(Unk2));
+            s.Dynamic(e, nameof(ChainNumber));
+            s.Dynamic(e, nameof(Unk4));
+            s.Dynamic(e, nameof(Unk5));
+            s.Dynamic(e, nameof(Unk6));
+            s.Dynamic(e, nameof(Unk8));
             Debug.Assert(e.Unk2 == 1 || e.Unk2 == 0 || e.Unk2 == 2); // Usually 1
-            return new EventNode(id, e);
+            return e;
         }
 
         public byte Unk2 { get; private set; }
@@ -27,5 +25,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort Unk6 { get; private set; }
         public ushort Unk8 { get; set; }
         public override string ToString() => $"disable_event_chain {ChainNumber} ({Unk2} {Unk4} {Unk5} {Unk6} {Unk8})";
+        public override ModifyType SubType => ModifyType.DisableEventChain;
     }
 }

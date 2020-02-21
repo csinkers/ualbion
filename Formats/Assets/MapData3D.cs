@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets
 {
@@ -92,7 +93,7 @@ namespace UAlbion.Formats.Assets
 
             int eventCount = br.ReadUInt16();
             for (int i = 0; i < eventCount; i++)
-                map.Events.Add(EventNode.Load(br, i));
+                map.Events.Add(EventNode.Translate(null, new GenericBinaryReader(br, EventNode.SizeInBytes), i));
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
             foreach(var npc in map.Npcs)

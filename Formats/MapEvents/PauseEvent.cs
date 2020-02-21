@@ -1,30 +1,27 @@
 ﻿using System.Diagnostics;
-using System.IO;
-using UAlbion.Api;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class PauseEvent : IEvent
+    public class PauseEvent : IMapEvent
     {
-        public static EventNode Load(BinaryReader br, int id, MapEventType type)
+        public static PauseEvent Translate(PauseEvent e, ISerializer s)
         {
-            var e = new PauseEvent
-            {
-                Length = br.ReadByte(), // +1
-                Unk2 = br.ReadByte(), // +2
-                Unk3 = br.ReadByte(), // +3
-                Unk4 = br.ReadByte(), // +4
-                Unk5 = br.ReadByte(), // +5
-                Unk6 = br.ReadUInt16(), // +6
-                Unk8 = br.ReadUInt16(), // +8
-            };
+            e ??= new PauseEvent();
+            s.Dynamic(e, nameof(Length));
+            s.Dynamic(e, nameof(Unk2));
+            s.Dynamic(e, nameof(Unk3));
+            s.Dynamic(e, nameof(Unk4));
+            s.Dynamic(e, nameof(Unk5));
+            s.Dynamic(e, nameof(Unk6));
+            s.Dynamic(e, nameof(Unk8));
             Debug.Assert(e.Unk2 == 0);
             Debug.Assert(e.Unk3 == 0);
             Debug.Assert(e.Unk4 == 0);
             Debug.Assert(e.Unk5 == 0);
             Debug.Assert(e.Unk6 == 0);
             Debug.Assert(e.Unk8 == 0);
-            return new EventNode(id, e);
+            return e;
         }
 
         public byte Length { get; private set; }
@@ -35,5 +32,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort Unk6 { get; private set; }
         public ushort Unk8 { get; private set; }
         public override string ToString() => $"pause {Length}";
+        public MapEventType EventType => MapEventType.Pause;
     }
 }

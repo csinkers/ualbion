@@ -112,6 +112,7 @@ namespace UAlbion.Formats.Parsers
 
         public void Meta(string name, Action<ISerializer> serializer, Action<ISerializer> deserializer) => serializer(this);
         public void Check() { }
+        public void CheckEntireLengthRead() { }
 
         public void Dynamic<TTarget>(TTarget target, string propertyName)
         {

@@ -1,12 +1,23 @@
-﻿using System.Diagnostics.Tracing;
-using System.IO;
-using UAlbion.Api;
+﻿using UAlbion.Api;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
     [Api.Event("text")]
-    public class TextEvent : IEvent
+    public class TextEvent : IMapEvent
     {
+        public static TextEvent Translate(TextEvent node, ISerializer s)
+        {
+            node ??= new TextEvent();
+            s.Dynamic(node, nameof(TextType));
+            s.Dynamic(node, nameof(Unk2));
+            s.Dynamic(node, nameof(Unk3));
+            s.Dynamic(node, nameof(PortraitId));
+            s.Dynamic(node, nameof(TextId));
+            s.Dynamic(node, nameof(Unk6));
+            s.Dynamic(node, nameof(Unk8));
+            return node;
+        }
         /* public enum TextTypes
         {
             TextInWindow,
@@ -20,17 +31,6 @@ namespace UAlbion.Formats.MapEvents
             ListDefaultDialogOptions
         } */
 
-        public static EventNode Load(BinaryReader br, int id, MapEventType type) =>
-            new EventNode(id, new TextEvent
-            {
-                TextType = br.ReadByte(), // +1
-                Unk2 = br.ReadByte(), // +2
-                Unk3 = br.ReadByte(), // +3
-                PortraitId = br.ReadByte(), // +4
-                TextId = br.ReadByte(), // +5
-                Unk6 = br.ReadUInt16(), // +6
-                Unk8 = br.ReadUInt16(), // +8
-            });
         TextEvent() { }
 
         public TextEvent(byte textId)
@@ -46,5 +46,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort Unk6 { get; private set; }
         public ushort Unk8 { get; private set; }
         public override string ToString() => $"text {TextId} {PortraitId} ({TextType} {Unk2} {Unk3} {Unk6} {Unk8})";
+        public MapEventType EventType => MapEventType.Text;
     }
 }

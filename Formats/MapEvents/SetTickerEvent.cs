@@ -1,25 +1,23 @@
 ﻿using System.Diagnostics;
-using System.IO;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
     public class SetTickerEvent : ModifyEvent
     {
-        public static EventNode Load(BinaryReader br, int id, MapEventType type, ModifyType subType)
+        public static SetTickerEvent Translate(SetTickerEvent e, ISerializer s)
         {
-            var tickerEvent = new SetTickerEvent
-            {
-                Operation = (QuantityChangeOperation) br.ReadByte(), // 2
-                Amount = br.ReadByte(), // 3
-                Unk4 = br.ReadByte(), // 4
-                Unk5 = br.ReadByte(), // 5
-                TickerId = br.ReadUInt16(), // 6
-                Unk8 = br.ReadUInt16(), // 8
-            };
-            Debug.Assert(tickerEvent.Unk4 == 0 || tickerEvent.Unk4 == 1);
-            Debug.Assert(tickerEvent.Unk5 == 0);
-            Debug.Assert(tickerEvent.Unk8 == 0);
-            return new EventNode(id, tickerEvent);
+            e ??= new SetTickerEvent();
+            s.EnumU8(nameof(Operation), () => e.Operation, x => e.Operation = x, x => ((byte)x, x.ToString()));
+            s.Dynamic(e, nameof(Amount));
+            s.Dynamic(e, nameof(Unk4));
+            s.Dynamic(e, nameof(Unk5));
+            s.Dynamic(e, nameof(TickerId));
+            s.Dynamic(e, nameof(Unk8));
+            Debug.Assert(e.Unk4 == 0 || e.Unk4 == 1);
+            Debug.Assert(e.Unk5 == 0);
+            Debug.Assert(e.Unk8 == 0);
+            return e;
         }
 
         public QuantityChangeOperation Operation { get; private set; }
@@ -30,5 +28,6 @@ namespace UAlbion.Formats.MapEvents
         byte Unk5 { get; set; }
         ushort Unk8 { get; set; }
         public override string ToString() => $"set_ticker {TickerId} {Operation} {Amount} ({Unk4})";
+        public override ModifyType SubType => ModifyType.SetTicker;
     }
 }

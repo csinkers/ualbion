@@ -1,28 +1,29 @@
 ﻿using System;
-using System.IO;
-using UAlbion.Api;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public abstract class ModifyEvent : IEvent
+    public abstract class ModifyEvent : IMapEvent
     {
-        public static EventNode Load(BinaryReader br, int id, MapEventType type)
+        public static ModifyEvent Translate(ModifyEvent genericEvent, ISerializer s)
         {
-            var subType = (ModifyType) br.ReadByte();
+            var subType = genericEvent?.SubType ?? ModifyType.Unk2;
+            s.EnumU8(nameof(subType), () => subType, x => subType = x, x => ((byte)x, x.ToString()));
+
             switch (subType)
             {
-                case ModifyType.SetTemporarySwitch:     return SetTemporarySwitchEvent.Load(br, id, type, subType);
-                case ModifyType.DisableEventChain:      return DisableEventChainEvent.Load(br, id, type, subType);
-                case ModifyType.SetNpcActive:           return SetNpcActiveEvent.Load(br, id, type, subType);
-                case ModifyType.AddPartyMember:         return AddPartyMemberEvent.Load(br, id, type, subType);
-                case ModifyType.AddRemoveInventoryItem: return AddRemoveInventoryItemEvent.Load(br, id, type, subType);
-                case ModifyType.SetMapLighting:         return SetMapLightingEvent.Load(br, id, type, subType);
-                case ModifyType.ChangePartyGold:        return ChangePartyGoldEvent.Load(br, id, type, subType);
-                case ModifyType.ChangePartyRations:     return ChangePartyRationsEvent.Load(br, id, type, subType);
-                case ModifyType.ChangeTime:             return ChangeTimeEvent.Load(br, id, type, subType);
-                case ModifyType.SetPartyLeader:         return SetPartyLeaderEvent.Load(br, id, type, subType);
-                case ModifyType.SetTicker:              return SetTickerEvent.Load(br, id, type, subType);
-                case ModifyType.Unk2:                   return DummyModifyEvent.Load(br, id, type, subType);
+                case ModifyType.SetTemporarySwitch:     return SetTemporarySwitchEvent.Translate((SetTemporarySwitchEvent)genericEvent, s);
+                case ModifyType.DisableEventChain:      return DisableEventChainEvent.Translate((DisableEventChainEvent)genericEvent, s);
+                case ModifyType.SetNpcActive:           return SetNpcActiveEvent.Translate((SetNpcActiveEvent)genericEvent, s);
+                case ModifyType.AddPartyMember:         return AddPartyMemberEvent.Translate((AddPartyMemberEvent)genericEvent, s);
+                case ModifyType.AddRemoveInventoryItem: return AddRemoveInventoryItemEvent.Translate((AddRemoveInventoryItemEvent)genericEvent, s);
+                case ModifyType.SetMapLighting:         return SetMapLightingEvent.Translate((SetMapLightingEvent)genericEvent, s);
+                case ModifyType.ChangePartyGold:        return ChangePartyGoldEvent.Translate((ChangePartyGoldEvent)genericEvent, s);
+                case ModifyType.ChangePartyRations:     return ChangePartyRationsEvent.Translate((ChangePartyRationsEvent)genericEvent, s);
+                case ModifyType.ChangeTime:             return ChangeTimeEvent.Translate((ChangeTimeEvent)genericEvent, s);
+                case ModifyType.SetPartyLeader:         return SetPartyLeaderEvent.Translate((SetPartyLeaderEvent)genericEvent, s);
+                case ModifyType.SetTicker:              return SetTickerEvent.Translate((SetTickerEvent)genericEvent, s);
+                case ModifyType.Unk2:                   return DummyModifyEvent.Translate((DummyModifyEvent)genericEvent, s);
                 default: throw new ArgumentOutOfRangeException();
             }
         }
@@ -43,6 +44,7 @@ namespace UAlbion.Formats.MapEvents
             SetTicker = 0x1C
         }
 
-        public ModifyType SubType { get; protected set; }
+        public abstract ModifyType SubType { get; }
+        public MapEventType EventType => MapEventType.Modify;
     }
 }

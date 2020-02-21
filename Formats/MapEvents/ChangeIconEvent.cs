@@ -1,22 +1,21 @@
-﻿using System.IO;
-using UAlbion.Api;
+﻿using UAlbion.Api;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class ChangeIconEvent : IPositionedEvent
+    public class ChangeIconEvent : IPositionedEvent, IMapEvent
     {
-        public static EventNode Load(BinaryReader br, int id, MapEventType type)
+        public static ChangeIconEvent Translate(ChangeIconEvent node, ISerializer s)
         {
-            return new EventNode(id, new ChangeIconEvent
-            {
-                X = br.ReadSByte(), // 1
-                Y = br.ReadSByte(), // 2
-                Permanent = br.ReadByte(), // 3
-                ChangeType = (IconChangeType) br.ReadByte(), // 4
-                Unk5 = br.ReadByte(), // 5
-                Value = br.ReadUInt16(), // 6
-                Unk8 = br.ReadUInt16(),
-            });
+            node ??= new ChangeIconEvent();
+            s.Dynamic(node, nameof(X));
+            s.Dynamic(node, nameof(Y));
+            s.Dynamic(node, nameof(Permanent));
+            s.EnumU8(nameof(ChangeType), () => node.ChangeType, x => node.ChangeType = x, x => ((byte) x, x.ToString()));
+            s.Dynamic(node, nameof(Unk5));
+            s.Dynamic(node, nameof(Value));
+            s.Dynamic(node, nameof(Unk8));
+            return node;
         }
 
         public enum IconChangeType : byte
@@ -48,13 +47,14 @@ namespace UAlbion.Formats.MapEvents
 
         int IPositionedEvent.X => X;
         int IPositionedEvent.Y => Y;
-        public sbyte X { get; private set; }
-        public sbyte Y { get; private set; }
-        public byte Permanent { get; private set; }
-        public IconChangeType ChangeType { get; private set; }
-        public byte Unk5 { get; private set; }
-        public ushort Value { get; private set; }
+        public sbyte X { get; set; }
+        public sbyte Y { get; set; }
+        public byte Permanent { get; set; }
+        public IconChangeType ChangeType { get; set; }
+        public byte Unk5 { get; set; }
+        public ushort Value { get; set; }
         public ushort Unk8 { get; set; }
         public override string ToString() => $"change_icon <{X}, {Y}> {(Permanent != 0 ? "Perm" : "Temp")} {ChangeType} {Value} ({Unk5} {Unk8})";
+        public MapEventType EventType => MapEventType.ChangeIcon;
     }
 }

@@ -1,22 +1,20 @@
-﻿using System.IO;
-using UAlbion.Api;
+﻿using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class OpenChestEvent : IEvent
+    public class OpenChestEvent : IMapEvent
     {
-        public static EventNode Load(BinaryReader br, int id, MapEventType type)
+        public static OpenChestEvent Translate(OpenChestEvent node, ISerializer s)
         {
-            return new EventNode(id, new OpenChestEvent
-            {
-                LockStrength = br.ReadByte(), // 1
-                KeyItemId = br.ReadByte(), // 2
-                Unk3 = br.ReadByte(), // 3
-                ClosedMessageId = br.ReadByte(), // 4
-                OpenedMessageId = br.ReadByte(), // 5
-                ChestId = br.ReadUInt16(), // 6
-                TrapEvent = br.ReadUInt16(), // 8
-            });
+            node ??= new OpenChestEvent();
+            s.Dynamic(node, nameof(LockStrength));
+            s.Dynamic(node, nameof(KeyItemId));
+            s.Dynamic(node, nameof(Unk3));
+            s.Dynamic(node, nameof(ClosedMessageId));
+            s.Dynamic(node, nameof(OpenedMessageId));
+            s.Dynamic(node, nameof(ChestId));
+            s.Dynamic(node, nameof(TrapEvent));
+            return node;
         }
 
         public byte LockStrength { get; set; }
@@ -27,5 +25,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort ChestId { get; set; }
         public ushort TrapEvent { get; set; }
         public override string ToString() => $"open_chest {ChestId} Trap:{TrapEvent} Key:{KeyItemId} Lock:{LockStrength} Opened:{OpenedMessageId} Closed:{ClosedMessageId} ({Unk3})";
+        public MapEventType EventType => MapEventType.Chest;
     }
 }

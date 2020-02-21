@@ -1,29 +1,42 @@
-﻿using System.IO;
-using UAlbion.Formats.AssetIds;
+﻿using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class QueryItemEvent : QueryEvent
+    public class QueryItemEvent : IQueryEvent
     {
-        public static BranchNode Load(BinaryReader br, int id, QueryType subType)
+        QueryItemEvent(QueryType subType)
         {
-            var e = new QueryItemEvent
-            {
-                SubType = subType,
-                Unk2 = br.ReadByte(), // 2
-                Unk3 = br.ReadByte(), // 3
-                Unk4 = br.ReadByte(), // 4
-                Unk5 = br.ReadByte(), // 5
-                Argument = br.ReadUInt16(), // 6
-            };
-
-            ushort? falseEventId = br.ReadUInt16(); // 8
-            if (falseEventId == 0xffff)
-                falseEventId = null;
-
-            return new BranchNode(id, e, falseEventId);
+            QueryType = subType;
         }
-        public ItemId ItemId => (ItemId)Argument-1;
-        public override string ToString() => $"query_item {SubType} {ItemId} (method {Unk2})";
+
+        public static QueryItemEvent Translate(QueryItemEvent e, ISerializer s, QueryType subType)
+        {
+            e ??= new QueryItemEvent(subType);
+            s.Dynamic(e, nameof(Unk2));
+            s.Dynamic(e, nameof(Unk3));
+            s.Dynamic(e, nameof(Unk4));
+            s.Dynamic(e, nameof(Unk5));
+            s.UInt16(nameof(ItemId),
+                () => (ushort)(e.ItemId + 1),
+                x => e.ItemId = (ItemId)(x - 1));
+
+            s.UInt16(nameof(FalseEventId),
+                () => e.FalseEventId ?? 0xffff,
+                x => e.FalseEventId = x == 0xffff ? (ushort?)null : x);
+
+            return e;
+        }
+
+        public byte Unk2 { get; private set; } // method to use for check? 0,1,2,3,4,5
+        public byte Unk3 { get; private set; } // immediate value?
+        byte Unk4 { get; set; }
+        byte Unk5 { get; set; }
+        public ItemId ItemId { get; set; }//=> (ItemId)Argument-1;
+        public ushort? FalseEventId { get; set; }
+
+        public override string ToString() => $"query_item {QueryType} {ItemId} (method {Unk2})";
+        public MapEventType EventType => MapEventType.Query;
+        public QueryType QueryType { get; }
     }
 }

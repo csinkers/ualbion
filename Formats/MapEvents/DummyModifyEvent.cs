@@ -1,20 +1,19 @@
-﻿using System.IO;
+﻿using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
     public class DummyModifyEvent : ModifyEvent
     {
-        public static EventNode Load(BinaryReader br, int id, MapEventType type, ModifyType subType)
+        public static DummyModifyEvent Translate(DummyModifyEvent e, ISerializer s)
         {
-            return new EventNode(id, new DummyModifyEvent
-            {
-                Unk2 = br.ReadByte(), // 2
-                Unk3 = br.ReadByte(), // 3
-                Unk4 = br.ReadByte(), // 4
-                Unk5 = br.ReadByte(), // 5
-                Unk6 = br.ReadUInt16(), // 6
-                Unk8 = br.ReadUInt16(), // 8
-            });
+            e ??= new DummyModifyEvent();
+            s.Dynamic(e, nameof(Unk2));
+            s.Dynamic(e, nameof(Unk3));
+            s.Dynamic(e, nameof(Unk4));
+            s.Dynamic(e, nameof(Unk5));
+            s.Dynamic(e, nameof(Unk6));
+            s.Dynamic(e, nameof(Unk8));
+            return e;
         }
 
         public byte Unk2 { get; private set; }
@@ -23,5 +22,6 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk5 { get; set; }
         public ushort Unk6 { get; private set; }
         public ushort Unk8 { get; set; }
+        public override ModifyType SubType => ModifyType.Unk2;
     }
 }

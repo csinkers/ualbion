@@ -50,7 +50,7 @@ namespace UAlbion.Game
                 }
                 else
                 {
-                    if (context.Node is IBranchNode branch && context.Node.Event is QueryEvent query)
+                    if (context.Node is IBranchNode branch && context.Node.Event is IQueryEvent query)
                     {
                         var result = Query(context, query);
 #if DEBUG
@@ -67,17 +67,17 @@ namespace UAlbion.Game
             } while (context.Node != null);
         }
 
-        bool Query(EventChainContext context, QueryEvent query)
+        bool Query(EventChainContext context, IQueryEvent query)
         {
-            switch (query, query.SubType)
+            switch (query, query.QueryType)
             {
                 case (QueryItemEvent item, _):
                     {
-                        if (item.SubType == QueryType.InventoryHasItem)
+                        if (item.QueryType == QueryType.InventoryHasItem)
                         {
                             Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query InventoryHasItem"));
                         }
-                        else if (item.SubType == QueryType.UsedItemId)
+                        else if (item.QueryType == QueryType.UsedItemId)
                         {
                             Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query UsedItemId"));
                         }
@@ -85,7 +85,7 @@ namespace UAlbion.Game
                     }
                 case (QueryVerbEvent verb, _):
                     {
-                        if (verb.SubType == QueryType.ChosenVerb)
+                        if (verb.QueryType == QueryType.ChosenVerb)
                         {
                             switch (verb.Verb)
                             {
@@ -97,7 +97,7 @@ namespace UAlbion.Game
                             }
                         }
 
-                        Raise(new LogEvent(LogEvent.Level.Error, $"Unhandled query event {query} (subtype {query.SubType}"));
+                        Raise(new LogEvent(LogEvent.Level.Error, $"Unhandled query event {query} (subtype {query.QueryType}"));
                         break;
                     }
                 case (_, QueryType.TemporarySwitch):
@@ -181,7 +181,7 @@ namespace UAlbion.Game
                         break;
                     }
                 default:
-                    Raise(new LogEvent(LogEvent.Level.Error, $"Unhandled query event {query} (subtype {query.SubType}"));
+                    Raise(new LogEvent(LogEvent.Level.Error, $"Unhandled query event {query} (subtype {query.QueryType}"));
                     break;
             }
 

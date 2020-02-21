@@ -1,28 +1,28 @@
 ﻿using System.Diagnostics;
 using System.IO;
-using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class RemovePartyMemberEvent : IEvent
+    public class RemovePartyMemberEvent : IMapEvent
     {
-        public static EventNode Load(BinaryReader br, int id, MapEventType type)
+        public static RemovePartyMemberEvent Translate(RemovePartyMemberEvent e, ISerializer s)
         {
-            var e = new RemovePartyMemberEvent
-            {
-                PartyMemberId = (PartyCharacterId) br.ReadByte(), // +1
-                Unk2 = br.ReadByte(), // +2
-                Unk3 = br.ReadByte(), // +3
-                Unk4 = br.ReadByte(), // +4
-                Unk5 = br.ReadByte(), // +5
-                Unk6 = br.ReadUInt16(), // +6
-                Unk8 = br.ReadUInt16(), // +8
-            };
+            e ??= new RemovePartyMemberEvent();
+            s.UInt8(nameof(PartyMemberId),
+                () => (byte)e.PartyMemberId,
+                x => e.PartyMemberId = (PartyCharacterId)x);
+            s.Dynamic(e, nameof(Unk2));
+            s.Dynamic(e, nameof(Unk3));
+            s.Dynamic(e, nameof(Unk4));
+            s.Dynamic(e, nameof(Unk5));
+            s.Dynamic(e, nameof(Unk6));
+            s.Dynamic(e, nameof(Unk8));
             Debug.Assert(e.Unk4 == 0);
             Debug.Assert(e.Unk5 == 0);
             Debug.Assert(e.Unk8 == 0);
-            return new EventNode(id, e);
+            return e;
         }
 
         public RemovePartyMemberEvent(PartyCharacterId partyMemberId) { PartyMemberId = partyMemberId;}
@@ -36,5 +36,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort Unk6 { get; private set; }
         ushort Unk8 { get; set; }
         public override string ToString() => $"remove_party_member ({PartyMemberId} {Unk2} {Unk3} {Unk6})";
+        public MapEventType EventType => MapEventType.RemovePartyMember;
     }
 }

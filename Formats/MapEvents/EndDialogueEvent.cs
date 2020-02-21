@@ -1,11 +1,22 @@
-﻿using System;
-using System.IO;
-using UAlbion.Api;
+﻿using System.IO;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class EndDialogueEvent : IEvent
+    public class EndDialogueEvent : IMapEvent
     {
+        public static EndDialogueEvent Translate(EndDialogueEvent node, ISerializer s)
+        {
+            node ??= new EndDialogueEvent();
+            s.Dynamic(node, nameof(Unk1));
+            s.Dynamic(node, nameof(Unk2));
+            s.Dynamic(node, nameof(Unk3));
+            s.Dynamic(node, nameof(Unk4));
+            s.Dynamic(node, nameof(Unk5));
+            s.Dynamic(node, nameof(Unk6));
+            s.Dynamic(node, nameof(Unk8));
+            return node;
+        }
         public static EventNode Load(BinaryReader br, int id, MapEventType type)
         {
             return new EventNode(id, new EndDialogueEvent
@@ -27,5 +38,6 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk5 { get; private set; }
         public ushort Unk6 { get; private set; }
         public ushort Unk8 { get; private set; }
+        public MapEventType EventType => MapEventType.EndDialogue;
     }
 }

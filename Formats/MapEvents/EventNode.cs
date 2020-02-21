@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
-using UAlbion.Api;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -43,7 +42,7 @@ namespace UAlbion.Formats.MapEvents
     public interface IEventNode
     {
         int Id { get; }
-        IEvent Event { get; }
+        IMapEvent Event { get; }
         IEventNode NextEvent { get; set; }
     }
 
@@ -54,7 +53,7 @@ namespace UAlbion.Formats.MapEvents
 
     public class BranchNode : EventNode, IBranchNode
     {
-        public BranchNode(int id, IEvent @event, ushort? falseEventId) : base(id, @event)
+        public BranchNode(int id, IMapEvent @event, ushort? falseEventId) : base(id, @event)
         {
             NextEventWhenFalseId = falseEventId;
         }
@@ -65,69 +64,79 @@ namespace UAlbion.Formats.MapEvents
 
     public class EventNode : IEventNode
     {
+        public const long SizeInBytes = 12;
         public override string ToString() => $"{Id}:{Event}";
-        public int Id { get; private set; }
-        public IEvent Event { get; private set; }
+        public int Id { get; }
+        public IMapEvent Event { get; }
         public ushort? NextEventId { get; set; }
         public IEventNode NextEvent { get; set; }
 
-        public EventNode(int id, IEvent @event)
+        public EventNode(int id, IMapEvent @event)
         {
             Id = id;
             Event = @event;
         }
 
-        public static IEventNode Load(BinaryReader br, int id)
+        public static EventNode Translate(EventNode node, ISerializer s, int id)
         {
-            var initialPosition = br.BaseStream.Position;
-            var type = (MapEventType)br.ReadByte(); // +0
+            var initialPosition = s.Offset;
+            MapEventType type = node?.Event?.EventType ?? MapEventType.UnkFF;
+            s.UInt8("Type", () => (byte)type, x => type = (MapEventType)x);
 
-            EventNode result;
-            switch (type) // Individual parsers handle byte range [1,9]
-            {
-                case MapEventType.Action: result = ActionEvent.Load(br, id, type); break;
-                case MapEventType.AskSurrender: result = AskSurrenderEvent.Load(br, id, type); break;
-                case MapEventType.ChangeIcon: result = ChangeIconEvent.Load(br, id, type); break;
-                case MapEventType.ChangeUsedItem: result = ChangeUsedItemEvent.Load(br, id, type); break;
-                case MapEventType.Chest: result = OpenChestEvent.Load(br, id, type); break;
-                case MapEventType.CloneAutomap: result = CloneAutomapEvent.Load(br, id, type); break;
-                case MapEventType.CreateTransport: result = CreateTransportEvent.Load(br, id, type); break;
-                case MapEventType.DataChange: result = DataChangeEvent.Load(br, id, type); break;
-                case MapEventType.DoScript: result = DoScriptEvent.Load(br, id); break;
-                case MapEventType.Door: result = DoorEvent.Load(br, id, type); break;
-                case MapEventType.Encounter: result = EncounterEvent.Load(br, id, type); break;
-                case MapEventType.EndDialogue: result = EndDialogueEvent.Load(br, id, type); break;
-                case MapEventType.Execute: result = ExecuteEvent.Load(br, id, type); break;
-                case MapEventType.MapExit: result = TeleportEvent.Load(br, id, type); break;
-                case MapEventType.Modify: result = ModifyEvent.Load(br, id, type); break;
-                case MapEventType.Offset: result = OffsetEvent.Load(br, id, type); break;
-                case MapEventType.Pause: result = PauseEvent.Load(br, id, type); break;
-                case MapEventType.PlaceAction: result = PlaceActionEvent.Load(br, id, type); break;
-                case MapEventType.PlayAnimation: result = PlayAnimationEvent.Load(br, id, type); break;
-                case MapEventType.Query: result = QueryEvent.Load(br, id, type); break;
-                case MapEventType.RemovePartyMember: result = RemovePartyMemberEvent.Load(br, id, type); break;
-                case MapEventType.Script: result = RunScriptEvent.Load(br, id, type); break;
-                case MapEventType.Signal: result = SignalEvent.Load(br, id, type); break;
-                case MapEventType.SimpleChest: result = SimpleChestEvent.Load(br, id, type); break;
-                case MapEventType.Sound: result = SoundEvent.Load(br, id, type); break;
-                case MapEventType.Spinner: result = SpinnerEvent.Load(br, id, type); break;
-                case MapEventType.StartDialogue: result = StartDialogueEvent.Load(br, id, type); break;
-                case MapEventType.Text: result = TextEvent.Load(br, id, type); break;
-                case MapEventType.Trap: result = TrapEvent.Load(br, id, type); break;
-                case MapEventType.UnkFF: result = DummyMapEvent.Load(br, id, type); break;
-                case MapEventType.Wipe: result = WipeEvent.Load(br, id, type); break;
-                default: throw new ArgumentOutOfRangeException();
-            }
+            var @event = TranslateByType(node, s, type);
+
+            if (@event is IQueryEvent query)
+                node ??= new BranchNode(id, @event, query.FalseEventId);
+            else
+                node ??= new EventNode(id, @event);
 
             long expectedPosition = initialPosition + 10;
-            long actualPosition = br.BaseStream.Position;
+            long actualPosition = s.Offset;
             Debug.Assert(expectedPosition == actualPosition,
                 $"Expected to have read {expectedPosition - initialPosition} bytes, but {actualPosition - initialPosition} have been read.");
 
-            result.NextEventId = br.ReadUInt16(); // +A
-            if (result.NextEventId == 0xffff) result.NextEventId = null;
+            s.UInt16(nameof(NextEventId),
+                () => node.NextEventId ?? 0xffff,
+                x => node.NextEventId = x == 0xffff ? (ushort?)null : x);
 
-            return result;
+            return node;
         }
+
+        static IMapEvent TranslateByType(EventNode node, ISerializer s, MapEventType type) =>
+            type switch // Individual parsers handle byte range [1,9]
+            {
+                MapEventType.Action => ActionEvent.Translate((ActionEvent)node?.Event, s),
+                MapEventType.AskSurrender => AskSurrenderEvent.Translate((AskSurrenderEvent)node?.Event, s),
+                MapEventType.ChangeIcon => ChangeIconEvent.Translate((ChangeIconEvent)node?.Event, s),
+                MapEventType.ChangeUsedItem => ChangeUsedItemEvent.Translate((ChangeUsedItemEvent)node?.Event, s),
+                MapEventType.Chest => OpenChestEvent.Translate((OpenChestEvent)node?.Event, s),
+                MapEventType.CloneAutomap => CloneAutomapEvent.Translate((CloneAutomapEvent)node?.Event, s),
+                MapEventType.CreateTransport => CreateTransportEvent.Translate((CreateTransportEvent)node?.Event, s),
+                MapEventType.DataChange => DataChangeEvent.Translate((DataChangeEvent)node?.Event, s),
+                MapEventType.DoScript => DoScriptEvent.Translate((DoScriptEvent)node?.Event, s),
+                MapEventType.Door => DoorEvent.Translate((DoorEvent)node?.Event, s),
+                MapEventType.Encounter => EncounterEvent.Translate((EncounterEvent)node?.Event, s),
+                MapEventType.EndDialogue => EndDialogueEvent.Translate((EndDialogueEvent)node?.Event, s),
+                MapEventType.Execute => ExecuteEvent.Translate((ExecuteEvent)node?.Event, s),
+                MapEventType.MapExit => TeleportEvent.Translate((TeleportEvent)node?.Event, s),
+                MapEventType.Modify => ModifyEvent.Translate((ModifyEvent)node?.Event, s),
+                MapEventType.Offset => OffsetEvent.Translate((OffsetEvent)node?.Event, s),
+                MapEventType.Pause => PauseEvent.Translate((PauseEvent)node?.Event, s),
+                MapEventType.PlaceAction => PlaceActionEvent.Translate((PlaceActionEvent)node?.Event, s),
+                MapEventType.PlayAnimation => PlayAnimationEvent.Translate((PlayAnimationEvent)node?.Event, s),
+                MapEventType.Query => QueryEvent.Translate((QueryEvent)node?.Event, s),
+                MapEventType.RemovePartyMember => RemovePartyMemberEvent.Translate((RemovePartyMemberEvent)node?.Event, s),
+                MapEventType.Script => RunScriptEvent.Translate((RunScriptEvent)node?.Event, s),
+                MapEventType.Signal => SignalEvent.Translate((SignalEvent)node?.Event, s),
+                MapEventType.SimpleChest => SimpleChestEvent.Translate((SimpleChestEvent)node?.Event, s),
+                MapEventType.Sound => SoundEvent.Translate((SoundEvent)node?.Event, s),
+                MapEventType.Spinner => SpinnerEvent.Translate((SpinnerEvent)node?.Event, s),
+                MapEventType.StartDialogue => StartDialogueEvent.Translate((StartDialogueEvent)node?.Event, s),
+                MapEventType.Text => TextEvent.Translate((TextEvent)node?.Event, s),
+                MapEventType.Trap => TrapEvent.Translate((TrapEvent)node?.Event, s),
+                MapEventType.UnkFF => DummyMapEvent.Translate((DummyMapEvent)node?.Event, s),
+                MapEventType.Wipe => WipeEvent.Translate((WipeEvent)node?.Event, s),
+                _ => null
+            };
     }
 }

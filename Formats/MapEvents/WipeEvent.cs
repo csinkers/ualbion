@@ -1,40 +1,37 @@
 ﻿using System.Diagnostics;
-using System.IO;
-using UAlbion.Api;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class WipeEvent : IEvent
+    public class WipeEvent : IMapEvent
     {
-        public static EventNode Load(BinaryReader br, int id, MapEventType type)
+        public static WipeEvent Translate(WipeEvent node, ISerializer s)
         {
-            var wipeEvent = new WipeEvent
-            {
-                Value = br.ReadByte(), // +1
-                Unk2 = br.ReadByte(), // +2
-                Unk3 = br.ReadByte(), // +3
-                Unk4 = br.ReadByte(), // +4
-                Unk5 = br.ReadByte(), // +5
-                Unk6 = br.ReadUInt16(), // +6
-                Unk8 = br.ReadUInt16(), // +8
-            };
-
-            Debug.Assert(wipeEvent.Unk2 == 0);
-            Debug.Assert(wipeEvent.Unk3 == 0);
-            Debug.Assert(wipeEvent.Unk4 == 0);
-            Debug.Assert(wipeEvent.Unk5 == 0);
-            Debug.Assert(wipeEvent.Unk6 == 0);
-            Debug.Assert(wipeEvent.Unk8 == 0);
-            return new EventNode(id, wipeEvent);
+            node ??= new WipeEvent();
+            s.Dynamic(node, nameof(Value));
+            s.Dynamic(node, nameof(Unk2));
+            s.Dynamic(node, nameof(Unk3));
+            s.Dynamic(node, nameof(Unk4));
+            s.Dynamic(node, nameof(Unk5));
+            s.Dynamic(node, nameof(Unk6));
+            s.Dynamic(node, nameof(Unk8));
+            Debug.Assert(node.Unk2 == 0);
+            Debug.Assert(node.Unk3 == 0);
+            Debug.Assert(node.Unk4 == 0);
+            Debug.Assert(node.Unk5 == 0);
+            Debug.Assert(node.Unk6 == 0);
+            Debug.Assert(node.Unk8 == 0);
+            return node;
         }
 
         public byte Value { get; private set; }
-        public byte Unk2 { get; private set; }
-        public byte Unk3 { get; private set; }
-        public byte Unk4 { get; private set; }
-        public byte Unk5 { get; private set; }
-        public ushort Unk6 { get; private set; }
-        public ushort Unk8 { get; private set; }
+        byte Unk2 { get; set; }
+        byte Unk3 { get; set; }
+        byte Unk4 { get; set; }
+        byte Unk5 { get; set; }
+        ushort Unk6 { get; set; }
+        ushort Unk8 { get; set; }
         public override string ToString() => $"wipe {Value}";
+        public MapEventType EventType => MapEventType.Wipe;
     }
 }

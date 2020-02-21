@@ -87,6 +87,7 @@ namespace UAlbion
             // Dump.Chests(assets);
             // Dump.ItemData(assets, baseDir);
             // Dump.MapEvents(assets, baseDir);
+            // Dump.EventSets(assets, baseDir);
             // return;
 
             RunGame(global, baseDir);

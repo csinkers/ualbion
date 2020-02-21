@@ -11,7 +11,7 @@ namespace UAlbion.Formats.Parsers
         {
             var start = s.Offset;
             for (int i = 0; i < Chest.SlotCount; i++)
-                s.Meta($"Slot{i}", ItemSlotLoader.Write(chest.Slots[i]), ItemSlotLoader.Read(x => chest.Slots[i] = x));
+                s.Meta($"Slot{i}", ItemSlotLoader.Read(x => chest.Slots[i] = x), ItemSlotLoader.Write(chest.Slots[i]));
 
             if (s.Offset - start >= length) // If it's a merchant record then we're all done
                 return;
@@ -23,7 +23,7 @@ namespace UAlbion.Formats.Parsers
         public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
             var chest = new Chest();
-            Translate(chest, new GenericBinaryReader(br), streamLength);
+            Translate(chest, new GenericBinaryReader(br, streamLength), streamLength);
             return chest;
         }
     }

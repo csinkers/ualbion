@@ -6,25 +6,22 @@ namespace UAlbion.Formats.Parsers
 {
     static class ItemSlotLoader
     {
-        public static void Translate(ItemSlot slot, ISerializer s)  // 6 per slot
+        public static ItemSlot Translate(ItemSlot slot, ISerializer s)  // 6 per slot
         {
-            if(slot == null)
-                slot = new ItemSlot { Amount = 0, Id = ItemId.Knife };
-
-            s.UInt8("Amount", () => slot.Amount, x => slot.Amount = x);
-            s.UInt8("Charges", () => slot.Charges, x => slot.Charges = x);
-            s.UInt8("Enchantment", () => slot.Enchantment, x => slot.Enchantment = x);
-            s.EnumU8("Flags", () => slot.Flags, x => slot.Flags = x, x => ((byte)x, x.ToString()));
-            s.EnumU16("Id",
-                () => (int)slot.Id >= 100 ? slot.Id + 1 : slot.Id,
-                x => slot.Id = (int)x > 100 ? x - 1 : x,
-                x => ((ushort)x, x.ToString()));
+            slot ??= new ItemSlot { Amount = 0, Id = ItemId.Knife };
+            s.UInt8(nameof(slot.Amount), () => slot.Amount, x => slot.Amount = x);
+            s.UInt8(nameof(slot.Charges), () => slot.Charges, x => slot.Charges = x);
+            s.UInt8(nameof(slot.Enchantment), () => slot.Enchantment, x => slot.Enchantment = x);
+            s.EnumU8(nameof(slot.Flags), () => slot.Flags, x => slot.Flags = x, x => ((byte)x, x.ToString()));
+            s.UInt16(nameof(slot.Id),
+                () => (ushort) ((int) slot.Id >= 100 ? (int) slot.Id + 1 : (int) slot.Id),
+                x => slot.Id = (ItemId)(x > 100 ? x - 1 : x));
+            return slot;
         }
 
         public static Action<ISerializer> Read(Action<ItemSlot> setter) => s =>
         {
-            var slot = new ItemSlot();
-            Translate(slot, s);
+            var slot = Translate(null, s);
             setter(slot.Amount == 0 ? null : slot);
         };
 

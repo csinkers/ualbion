@@ -1,21 +1,20 @@
-﻿using System.IO;
-using UAlbion.Formats.AssetIds;
+﻿using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
     public class SetNpcActiveEvent : ModifyEvent
     {
-        public static EventNode Load(BinaryReader br, int id, MapEventType type, ModifyType subType)
+        public static SetNpcActiveEvent Translate(SetNpcActiveEvent e, ISerializer s)
         {
-            return new EventNode(id, new SetNpcActiveEvent
-            {
-                IsActive = br.ReadByte(), // 2
-                NpcId = (NpcCharacterId) br.ReadByte() - 1, // 3
-                Unk4 = br.ReadByte(), // 4
-                Unk5 = br.ReadByte(), // 5
-                Unk6 = br.ReadUInt16(), // 6
-                Unk8 = br.ReadUInt16(), // 8
-            });
+            e ??= new SetNpcActiveEvent();
+            s.Dynamic(e, nameof(IsActive));
+            s.EnumU8(nameof(NpcId), () => e.NpcId, x => e.NpcId = x, x => ((byte)x, x.ToString()));
+            s.Dynamic(e, nameof(Unk4));
+            s.Dynamic(e, nameof(Unk5));
+            s.Dynamic(e, nameof(Unk6));
+            s.Dynamic(e, nameof(Unk8));
+            return e;
         }
 
         public byte IsActive { get; private set; }
@@ -25,5 +24,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort Unk6 { get; private set; }
         public ushort Unk8 { get; set; }
         public override string ToString() => $"set_npc_active {NpcId} {IsActive} ({Unk4} {Unk6} {Unk8})";
+        public override ModifyType SubType => ModifyType.SetNpcActive;
     }
 }

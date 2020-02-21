@@ -10,7 +10,7 @@ namespace UAlbion.Formats.Parsers
         public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
             var labyrinth = new LabyrinthData();
-            LabyrinthData.Serialize(labyrinth, new GenericBinaryReader(br), streamLength);
+            LabyrinthData.Serialize(labyrinth, new GenericBinaryReader(br, streamLength), streamLength);
             return labyrinth;
         }
     }

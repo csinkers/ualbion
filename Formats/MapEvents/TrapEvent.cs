@@ -1,11 +1,23 @@
 ﻿using System.Diagnostics;
 using System.IO;
-using UAlbion.Api;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class TrapEvent : IEvent
+    public class TrapEvent : IMapEvent
     {
+        public static TrapEvent Translate(TrapEvent node, ISerializer s)
+        {
+            node ??= new TrapEvent();
+            s.Dynamic(node, nameof(Unk1));
+            s.Dynamic(node, nameof(Unk2));
+            s.Dynamic(node, nameof(Unk3));
+            s.Dynamic(node, nameof(Unk4));
+            s.Dynamic(node, nameof(Unk5));
+            s.Dynamic(node, nameof(Unk6));
+            s.Dynamic(node, nameof(Unk8));
+            return node;
+        }
         public static EventNode Load(BinaryReader br, int id, MapEventType type)
         {
             var trapEvent = new TrapEvent
@@ -34,5 +46,6 @@ namespace UAlbion.Formats.MapEvents
         byte Unk4 { get; set; }
         ushort Unk8 { get; set; }
         public override string ToString() => $"trap ({Unk1} {Unk2} {Unk3} {Unk5} {Unk6})";
+        public MapEventType EventType => MapEventType.Trap;
     }
 }

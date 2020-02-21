@@ -1,20 +1,19 @@
-﻿using System.IO;
+﻿using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
     public class ChangeTimeEvent : ModifyEvent
     {
-        public static EventNode Load(BinaryReader br, int id, MapEventType type, ModifyType subType)
+        public static ChangeTimeEvent Translate(ChangeTimeEvent e, ISerializer s)
         {
-            return new EventNode(id, new ChangeTimeEvent
-            {
-                Operation = (QuantityChangeOperation) br.ReadByte(), // 2
-                Unk3 = br.ReadByte(), // 3
-                Unk4 = br.ReadByte(), // 4
-                Unk5 = br.ReadByte(), // 5
-                Amount = br.ReadUInt16(), // 6
-                Unk8 = br.ReadUInt16(), // 8
-            });
+            e ??= new ChangeTimeEvent();
+            s.EnumU8(nameof(Operation), () => e.Operation, x => e.Operation = x, x => ((byte)x, x.ToString()));
+            s.Dynamic(e, nameof(Unk3));
+            s.Dynamic(e, nameof(Unk4));
+            s.Dynamic(e, nameof(Unk5));
+            s.Dynamic(e, nameof(Amount));
+            s.Dynamic(e, nameof(Unk8));
+            return e;
         }
 
         public QuantityChangeOperation Operation { get; private set; }
@@ -24,5 +23,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort Amount { get; private set; }
         public ushort Unk8 { get; set; }
         public override string ToString() => $"change_time {Operation} {Amount} ({Unk3} {Unk4} {Unk5} {Unk8})";
+        public override ModifyType SubType => ModifyType.ChangeTime;
     }
 }

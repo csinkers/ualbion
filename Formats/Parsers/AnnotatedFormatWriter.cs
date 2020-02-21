@@ -243,6 +243,7 @@ namespace UAlbion.Formats.Parsers
             indent -= 4;
         }
         public void Check() { }
+        public void CheckEntireLengthRead() { }
 
         public void Dynamic<TTarget>(TTarget target, string propertyName)
         {

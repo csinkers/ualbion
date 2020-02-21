@@ -39,20 +39,21 @@ namespace UAlbion.Formats.Parsers
         }
         static SerializationInfo<TTarget> Create<TTarget>(string propertyName)
         {
-            var property = typeof(TTarget).GetProperty(propertyName);
-            if(property == null)
+            var property = typeof(TTarget).GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (property == null)
                 throw new InvalidOperationException();
 
             var type = property.PropertyType;
-            return 0 switch {
-                _ when type == typeof(byte)   => new SerializationInfo<TTarget, byte>(property, sizeof(byte)),
-                _ when type == typeof(sbyte)  => new SerializationInfo<TTarget, sbyte>(property, sizeof(sbyte)),
+            return 0 switch
+            {
+                _ when type == typeof(byte) => new SerializationInfo<TTarget, byte>(property, sizeof(byte)),
+                _ when type == typeof(sbyte) => new SerializationInfo<TTarget, sbyte>(property, sizeof(sbyte)),
                 _ when type == typeof(ushort) => new SerializationInfo<TTarget, ushort>(property, sizeof(ushort)),
-                _ when type == typeof(short)  => new SerializationInfo<TTarget, short>(property, sizeof(short)),
-                _ when type == typeof(uint)   => new SerializationInfo<TTarget, uint>(property, sizeof(uint)),
-                _ when type == typeof(int)    => new SerializationInfo<TTarget, int>(property, sizeof(int)),
-                _ when type == typeof(ulong)  => new SerializationInfo<TTarget, ulong>(property, sizeof(ulong)),
-                _ when type == typeof(long)   => new SerializationInfo<TTarget, long>(property, sizeof(long)),
+                _ when type == typeof(short) => new SerializationInfo<TTarget, short>(property, sizeof(short)),
+                _ when type == typeof(uint) => new SerializationInfo<TTarget, uint>(property, sizeof(uint)),
+                _ when type == typeof(int) => new SerializationInfo<TTarget, int>(property, sizeof(int)),
+                _ when type == typeof(ulong) => new SerializationInfo<TTarget, ulong>(property, sizeof(ulong)),
+                _ when type == typeof(long) => new SerializationInfo<TTarget, long>(property, sizeof(long)),
                 _ => null
             };
         }

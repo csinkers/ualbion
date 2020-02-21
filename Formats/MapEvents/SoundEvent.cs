@@ -1,31 +1,29 @@
 ﻿using System.Diagnostics;
 using System.IO;
-using UAlbion.Api;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class SoundEvent : IEvent
+    public class SoundEvent : IMapEvent
     {
-        public static EventNode Load(BinaryReader br, int id, MapEventType type)
+        public static SoundEvent Translate(SoundEvent e, ISerializer s)
         {
-            var e = new SoundEvent
-            {
-                Mode = (SoundMode)br.ReadByte(), // +1
-                SoundId = br.ReadByte(), // +2 // TODO: SoundId
-                Unk3 = br.ReadByte(), // +3
-                Volume = br.ReadByte(), // +4
-                RestartProbability = br.ReadByte(), // +5
-                FrequencyOverride = br.ReadUInt16(), // +6
-                Unk8 = br.ReadUInt16(), // +8
-            };
+            e ??= new SoundEvent();
+            s.EnumU8(nameof(Mode), () => e.Mode, x => e.Mode = x, x => ((byte)x, x.ToString()));
+            s.Dynamic(e, nameof(SoundId));
+            s.Dynamic(e, nameof(Unk3));
+            s.Dynamic(e, nameof(Volume));
+            s.Dynamic(e, nameof(RestartProbability));
+            s.Dynamic(e, nameof(FrequencyOverride));
+            s.Dynamic(e, nameof(Unk8));
             Debug.Assert(e.Unk3 <= 100);
             Debug.Assert(e.Volume <= 150);
             Debug.Assert(e.RestartProbability <= 102);
             Debug.Assert(e.Unk8 == 0);
-            return new EventNode(id, e);
+            return e;
         }
 
-        public enum SoundMode
+        public enum SoundMode : byte
         {
             Silent = 0, // ??
             GlobalOneShot = 1,
@@ -40,5 +38,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort FrequencyOverride { get; private set; } // 0,8, [5..22]*1000
         ushort Unk8 { get; set; }
         public override string ToString() => $"sound {SoundId} {Mode} Vol:{Volume} Prob:{RestartProbability}% Freq:{FrequencyOverride} ({Unk3})";
+        public MapEventType EventType => MapEventType.Sound;
     }
 }

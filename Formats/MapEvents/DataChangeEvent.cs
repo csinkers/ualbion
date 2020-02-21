@@ -1,27 +1,24 @@
-﻿using System.Diagnostics;
-using System.IO;
-using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+﻿using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class DataChangeEvent : IEvent
+    public class DataChangeEvent : IMapEvent
     {
-        public static EventNode Load(BinaryReader br, int id, MapEventType type)
+        public static DataChangeEvent Translate(DataChangeEvent node, ISerializer s)
         {
-            var e = new DataChangeEvent
-            {
-                Property = (ChangeProperty) br.ReadByte(), // 1
-                Mode = (QuantityChangeOperation) br.ReadByte(), // 2
-                Unk3 = br.ReadByte(), // 3
-                Unk4 = br.ReadByte(), // 4
-                PartyMemberId = (PartyCharacterId) br.ReadByte(), // 5
-                Value = br.ReadUInt16(), // 8
-                Amount = br.ReadUInt16(), // 8
-            };
-            Debug.Assert(e.Unk4 == 0 || e.Unk4 == 3); // Always 0 for 2D?
-            return new EventNode(id, e);
+            node ??= new DataChangeEvent();
+            s.EnumU8(nameof(Property), () => node.Property, x => node.Property = x, x => ((byte)x, x.ToString()));
+            s.EnumU8(nameof(Mode), () => node.Mode, x => node.Mode = x, x => ((byte)x, x.ToString()));
+            s.Dynamic(node, nameof(Unk3));
+            s.Dynamic(node, nameof(Unk4));
+            s.UInt8(nameof(PartyMemberId),
+                () => (byte)node.PartyMemberId,
+                x => node.PartyMemberId = (PartyCharacterId)x);
+            s.Dynamic(node, nameof(Value));
+            s.Dynamic(node, nameof(Amount));
+            return node;
         }
 
         public enum ChangeProperty : byte
@@ -70,5 +67,6 @@ namespace UAlbion.Formats.MapEvents
                 _ => Value.ToString()
             };
         public override string ToString() => $"data_change {PartyMemberId} {Property} {Mode} {Amount}x{ItemString} ({Unk3} {Unk4})";
+        public MapEventType EventType => MapEventType.DataChange;
     }
 }

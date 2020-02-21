@@ -22,7 +22,8 @@ namespace UAlbion.Tools.ImageReverser
 
             void SaveChanges(object sender, EventArgs e) => config.Save(baseDir);
 
-            var form = new MainFrm(generalConfig, config);
+            var core = new ReverserCore(generalConfig, config);
+            var form = new MainFrm(core);
             form.SaveClicked += SaveChanges;
             Application.Run(form);
             form.SaveClicked -= SaveChanges;

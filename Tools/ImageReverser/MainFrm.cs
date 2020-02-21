@@ -209,7 +209,7 @@ namespace UAlbion.Tools.ImageReverser
                     break;
 
                 case FileFormat.MapData:
-                case FileFormat.IconData:
+                case FileFormat.Tileset:
                 case FileFormat.CharacterData:
                 case FileFormat.SpellData:
                 case FileFormat.LabyrinthData:

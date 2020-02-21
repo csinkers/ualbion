@@ -2936,7 +2936,7 @@
     "Assets": {}
   },
   "ICONDAT0.XLD": {
-    "Format": "IconData",
+    "Format": "Tileset",
     "Width": 8,
     "Height": 8,
     "Assets": {

@@ -18,7 +18,7 @@
 
         // Maps
         MapData,
-        IconData,
+        Tileset,
 
         // Audio
         AudioSample,

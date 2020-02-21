@@ -17,7 +17,7 @@ namespace UAlbion.Game.Entities.Map2D
         public LogicalMap(IAssetManager assetManager, MapDataId mapId)
         {
             _mapData = assetManager.LoadMap2D(mapId);
-            _tileData = assetManager.LoadTileData((IconDataId)_mapData.TilesetId);
+            _tileData = assetManager.LoadTileData((TilesetId)_mapData.TilesetId);
             _blockList = assetManager.LoadBlockList((BlockListId) _mapData.TilesetId);
             UseSmallSprites = _tileData.UseSmallGraphics;
         }

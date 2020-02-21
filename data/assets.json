@@ -8841,8 +8841,8 @@
     }
   },
   "ICONDAT0.XLD": {
-    "EnumName": "IconDataId",
-    "Format": "IconData",
+    "EnumName": "TilesetId",
+    "Format": "Tileset",
     "Width": 8,
     "Height": 8,
     "Assets": {

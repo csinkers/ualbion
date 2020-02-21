@@ -35,7 +35,7 @@ namespace UAlbion.Game
         ITexture LoadTexture(MetaFontId id);
         ITexture LoadTexture(CoreSpriteId id);
         ITexture LoadFont(FontColor color, bool isBold);
-        TilesetData LoadTileData(IconDataId id);
+        TilesetData LoadTileData(TilesetId id);
         LabyrinthData LoadLabyrinthData(LabyrinthDataId id);
         CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id);
 

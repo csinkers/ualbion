@@ -49,7 +49,7 @@ namespace UAlbion.Game.Assets
 
             // 2D map assets
             { AssetType.MapData,            (AssetLocation.Base,      "MAPDATA!.XLD") }, // 2D maps
-            { AssetType.IconData,           (AssetLocation.Base,      "ICONDAT!.XLD") }, // Tileset info for the 2D maps, including animated tile ranges etc
+            { AssetType.Tileset,           (AssetLocation.Base,      "ICONDAT!.XLD") }, // Tileset info for the 2D maps, including animated tile ranges etc
             { AssetType.IconGraphics,       (AssetLocation.Base,      "ICONGFX!.XLD") }, // Tiles for the 2D maps
             { AssetType.BigPartyGraphics,   (AssetLocation.Base,      "PARTGR!.XLD" ) }, // Regular scale party-member sprites.
             { AssetType.BigNpcGraphics,     (AssetLocation.Base,      "NPCGR!.XLD"  ) }, // Regular scale NPC sprites

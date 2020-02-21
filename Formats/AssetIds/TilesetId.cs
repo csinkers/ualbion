@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum IconDataId
+    public enum TilesetId
     {
         Outdoors1 = 0,
         Outdoors2 = 1,

@@ -19,55 +19,54 @@ namespace UAlbion.Formats.AssetIds
         GeneralConfig,
         MetaFont,
         PaletteNull,
-        Slab,
+        Slab, // Graphics
         Unnamed2, // Unused
-        [EnumType(typeof(AutoMapId))] Automap,
-        [EnumType(typeof(AutoMapId))] AutomapGraphics,
-        [EnumType(typeof(BlockListId))] BlockList,
-        [EnumType(typeof(ChestId))] ChestData,
-        [EnumType(typeof(CombatBackgroundId))] CombatBackground,
-        [EnumType(typeof(CombatGraphicsId))] CombatGraphics,
-        [EnumType(typeof(CoreSpriteId))] CoreGraphics,
-        [EnumType(typeof(DungeonBackgroundId))] BackgroundGraphics,
-        [EnumType(typeof(DungeonFloorId))] Floor3D,
-        [EnumType(typeof(DungeonObjectId))] Object3D,
-        [EnumType(typeof(DungeonOverlayId))] Overlay3D,
-        [EnumType(typeof(DungeonWallId))] Wall3D,
-        [EnumType(typeof(EventSetId))] EventSet,
-        [EnumType(typeof(EventTextId))] EventText,
-        [EnumType(typeof(FontId))] Font,
-        [EnumType(typeof(FullBodyPictureId))] FullBodyPicture,
-        [EnumType(typeof(IconDataId))] IconData,
-        [EnumType(typeof(IconGraphicsId))] IconGraphics,
-        [EnumType(typeof(ItemId))] ItemGraphics,
-        [EnumType(typeof(ItemId))] ItemList,
-        [EnumType(typeof(ItemId))] ItemNames,
-        [EnumType(typeof(LabyrinthDataId))] LabData,
-        [EnumType(typeof(LargeNpcId))] BigNpcGraphics,
-        [EnumType(typeof(LargePartyGraphicsId))] BigPartyGraphics,
-        [EnumType(typeof(MapDataId))] MapData,
-        [EnumType(typeof(MapTextId))] MapText,
-        [EnumType(typeof(MerchantId))] MerchantData,
-        [EnumType(typeof(MonsterCharacterId))] Monster,
-        [EnumType(typeof(MonsterGraphicsId))] MonsterGraphics,
-        [EnumType(typeof(MonsterGroupId))]MonsterGroup,
-        [EnumType(typeof(NpcCharacterId))] Npc,
-        [EnumType(typeof(PaletteId))] Palette,
-        [EnumType(typeof(PartyCharacterId))] PartyMember,
-        [EnumType(typeof(PictureId))] Picture,
-        [EnumType(typeof(SampleId))] Sample,
-        [EnumType(typeof(ScriptId))] Script,
-        [EnumType(typeof(SmallNpcId))] SmallNpcGraphics,
-        [EnumType(typeof(SmallPartyGraphicsId))] SmallPartyGraphics,
-        [EnumType(typeof(SmallPortraitId))] SmallPortrait,
-        [EnumType(typeof(SongId))] Song,
-        [EnumType(typeof(SpellId))] SpellData,
-        [EnumType(typeof(SystemTextId))] SystemText,
-        [EnumType(typeof(TacticId))] TacticalIcon,
-        [EnumType(typeof(TranslationTableId))] TransparencyTables,
-        [EnumType(typeof(VideoId))] Flic,
-        [EnumType(typeof(WaveLibraryId))] WaveLibrary,
-        [EnumType(typeof(WordId))] Dictionary,
+        [EnumType(typeof(AutoMapId))]            Automap,            // Map
+        [EnumType(typeof(AutoMapId))]            AutomapGraphics,    // Graphics
+        [EnumType(typeof(BlockListId))]          BlockList,          // Map
+        [EnumType(typeof(ChestId))]              ChestData,          // Inventory
+        [EnumType(typeof(CombatBackgroundId))]   CombatBackground,   // Graphics
+        [EnumType(typeof(CombatGraphicsId))]     CombatGraphics,     // Graphics
+        [EnumType(typeof(CoreSpriteId))]         CoreGraphics,       // Graphics
+        [EnumType(typeof(DungeonBackgroundId))]  BackgroundGraphics, // Graphics
+        [EnumType(typeof(DungeonFloorId))]       Floor3D,            // Graphics
+        [EnumType(typeof(DungeonObjectId))]      Object3D,           // Graphics
+        [EnumType(typeof(DungeonOverlayId))]     Overlay3D,          // Graphics
+        [EnumType(typeof(DungeonWallId))]        Wall3D,             // Graphics
+        [EnumType(typeof(EventSetId))]           EventSet,           // Events
+        [EnumType(typeof(EventTextId))]          EventText,          // Text
+        [EnumType(typeof(FontId))]               Font,               // Graphics
+        [EnumType(typeof(FullBodyPictureId))]    FullBodyPicture,    // Graphics
+        [EnumType(typeof(TilesetId))]            Tileset,            // Map
+        [EnumType(typeof(IconGraphicsId))]       IconGraphics,       // Graphics
+        [EnumType(typeof(ItemId))]               ItemGraphics,       // Graphics
+        [EnumType(typeof(ItemId))]               ItemList,           // Misc
+        [EnumType(typeof(ItemId))]               ItemNames,          // Text
+        [EnumType(typeof(LabyrinthDataId))]      LabData,            // Map
+        [EnumType(typeof(LargeNpcId))]           BigNpcGraphics,     // Graphics
+        [EnumType(typeof(LargePartyGraphicsId))] BigPartyGraphics,   // Graphics
+        [EnumType(typeof(MapDataId))]            MapData,            // Map
+        [EnumType(typeof(MapTextId))]            MapText,            // Text
+        [EnumType(typeof(MerchantId))]           MerchantData,       // Inventory
+        [EnumType(typeof(MonsterCharacterId))]   Monster,            // CharacterSheets
+        [EnumType(typeof(MonsterGraphicsId))]    MonsterGraphics,    // Graphics
+        [EnumType(typeof(MonsterGroupId))]       MonsterGroup,       // Misc
+        [EnumType(typeof(NpcCharacterId))]       Npc,                // CharacterSheets
+        [EnumType(typeof(PaletteId))]            Palette,            // Graphics
+        [EnumType(typeof(PartyCharacterId))]     PartyMember,        // CharacterSheets
+        [EnumType(typeof(PictureId))]            Picture,            // Graphics
+        [EnumType(typeof(SampleId))]             Sample,             // Audio
+        [EnumType(typeof(ScriptId))]             Script,             // Events
+        [EnumType(typeof(SmallNpcId))]           SmallNpcGraphics,   // Graphics
+        [EnumType(typeof(SmallPartyGraphicsId))] SmallPartyGraphics, // Graphics
+        [EnumType(typeof(SmallPortraitId))]      SmallPortrait,      // Graphics
+        [EnumType(typeof(SongId))]               Song,               // Audio
+        [EnumType(typeof(SpellId))]              SpellData,          // Misc
+        [EnumType(typeof(SystemTextId))]         SystemText,         // Text
+        [EnumType(typeof(TacticId))]             TacticalIcon,       // Graphics
+        [EnumType(typeof(TranslationTableId))]   TransparencyTables, // Misc
+        [EnumType(typeof(VideoId))]              Flic,               // Graphics
+        [EnumType(typeof(WaveLibraryId))]        WaveLibrary,        // Audio
+        [EnumType(typeof(WordId))]               Dictionary,         // Text
     }
-
 }

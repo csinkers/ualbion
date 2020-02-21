@@ -8,6 +8,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Config;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Assets
 {
@@ -124,7 +125,7 @@ namespace UAlbion.Game.Assets
         public ITexture LoadTexture(SmallPartyGraphicsId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.SmallPartyGraphics, id);
         public ITexture LoadTexture(SmallPortraitId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.SmallPortrait, id);
         public ITexture LoadTexture(TacticId id) => (ITexture)_assetLocator.LoadAssetCached(AssetType.TacticalIcon, id);
-        public TilesetData LoadTileData(IconDataId id) => (TilesetData)_assetLocator.LoadAssetCached(AssetType.IconData, id);
+        public TilesetData LoadTileData(TilesetId id) => (TilesetData)_assetLocator.LoadAssetCached(AssetType.Tileset, id);
         public LabyrinthData LoadLabyrinthData(LabyrinthDataId id) => (LabyrinthData)_assetLocator.LoadAssetCached(AssetType.LabData, id);
         public ITexture LoadFont(FontColor color, bool isBold) => LoadTexture(new MetaFontId(isBold, color));
         public CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id) =>
@@ -164,5 +165,6 @@ namespace UAlbion.Game.Assets
         }
 
         public IList<Block> LoadBlockList(BlockListId blockListId) => (IList<Block>)_assetLocator.LoadAssetCached(AssetType.BlockList, blockListId);
+        public IList<IEventNode> LoadEventSet(EventSetId eventSetId) => (IList<IEventNode>) _assetLocator.LoadAssetCached(AssetType.EventSet, eventSetId);
     }
 }

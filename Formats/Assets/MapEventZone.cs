@@ -13,7 +13,7 @@ namespace UAlbion.Formats.Assets
         public ushort Y;
         public TriggerType Trigger;
         public ushort EventNumber;
-        public IEventNode Event { get; set; }
+        public IEventNode EventNode { get; set; }
 
         public static MapEventZone LoadGlobalZone(BinaryReader br)
         {

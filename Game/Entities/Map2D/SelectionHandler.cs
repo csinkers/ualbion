@@ -62,7 +62,7 @@ namespace UAlbion.Game.Entities.Map2D
             {
                 e.RegisterHit(t, zone);
                 HashSet<IEventNode> printedEvents = new HashSet<IEventNode>();
-                var zoneEvent = zone.Event;
+                var zoneEvent = zone.EventNode;
                 while (zoneEvent != null && !printedEvents.Contains(zoneEvent))
                 {
                     e.RegisterHit(t, zoneEvent);
@@ -106,7 +106,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(SystemTextId.MapPopup_Examine),
-                        new TriggerChainEvent(zone.Event, TriggerType.Examine, x, y),
+                        new TriggerChainEvent(zone.EventNode, TriggerType.Examine, x, y),
                         ContextMenuGroup.Actions));
                 }
 
@@ -114,7 +114,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(SystemTextId.MapPopup_Manipulate),
-                        new TriggerChainEvent(zone.Event, TriggerType.Manipulate, x, y),
+                        new TriggerChainEvent(zone.EventNode, TriggerType.Manipulate, x, y),
                         ContextMenuGroup.Actions));
                 }
 
@@ -122,7 +122,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(SystemTextId.MapPopup_Take),
-                        new TriggerChainEvent(zone.Event, TriggerType.Take, x, y),
+                        new TriggerChainEvent(zone.EventNode, TriggerType.Take, x, y),
                         ContextMenuGroup.Actions));
                 }
 
@@ -130,7 +130,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(SystemTextId.MapPopup_TalkTo),
-                        new TriggerChainEvent(zone.Event, TriggerType.TalkTo, x, y),
+                        new TriggerChainEvent(zone.EventNode, TriggerType.TalkTo, x, y),
                         ContextMenuGroup.Actions));
                 }
             }

@@ -64,14 +64,30 @@ namespace UAlbion.Game.Entities.Map2D
 
         public void ChangeUnderlay(sbyte x, sbyte y, ushort value)
         {
-            _mapData.Underlay[Index(x, y)] = value;
-            Dirty?.Invoke(this, EventArgs.Empty);
+            var index = Index(x, y);
+            if (index < 0 || index >= _mapData.Underlay.Length)
+            {
+                CoreUtil.LogError($"Tried to update invalid underlay index {index} (max {_mapData.Underlay.Length}");
+            }
+            else
+            {
+                _mapData.Underlay[Index(x, y)] = value;
+                Dirty?.Invoke(this, EventArgs.Empty);
+            }
         }
 
         public void ChangeOverlay(sbyte x, sbyte y, ushort value)
         {
-            _mapData.Overlay[Index(x, y)] = value;
-            Dirty?.Invoke(this, EventArgs.Empty);
+            var index = Index(x, y);
+            if (index < 0 || index >= _mapData.Overlay.Length)
+            {
+                CoreUtil.LogError($"Tried to update invalid overlay index {index} (max {_mapData.Overlay.Length}");
+            }
+            else
+            {
+                _mapData.Overlay[Index(x, y)] = value;
+                Dirty?.Invoke(this, EventArgs.Empty);
+            }
         }
 
         public void PlaceBlock(sbyte x, sbyte y, ushort blockId, bool overwrite)

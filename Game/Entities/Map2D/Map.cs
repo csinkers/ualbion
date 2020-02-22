@@ -80,7 +80,7 @@ namespace UAlbion.Game.Entities.Map2D
         {
             var chains = _logicalMap.GetGlobalZonesOfType(type);
             foreach (var chain in chains)
-                Raise(new TriggerChainEvent(chain.Event, type));
+                Raise(new TriggerChainEvent(chain.EventNode, type));
         }
 
         void OnNpcEnteredTile(NpcEnteredTileEvent e)
@@ -88,10 +88,10 @@ namespace UAlbion.Game.Entities.Map2D
             var chains = _logicalMap.GetZones(e.X, e.Y).Where(x => x.Trigger.HasFlag(TriggerType.Npc));
             foreach (var chain in chains)
             {
-                if(chain.Event.Event is OffsetEvent offset)
+                if(chain.EventNode.Event is OffsetEvent offset)
                     OnNpcEnteredTile(new NpcEnteredTileEvent(e.Id, e.X + offset.X, e.Y + offset.Y));
                 else
-                    Raise(new TriggerChainEvent(chain.Event, TriggerType.Npc));
+                    Raise(new TriggerChainEvent(chain.EventNode, TriggerType.Npc));
             }
         }
 
@@ -100,10 +100,10 @@ namespace UAlbion.Game.Entities.Map2D
             var chains = _logicalMap.GetZones(e.X, e.Y).Where(x => x.Trigger.HasFlag(TriggerType.Normal));
             foreach (var chain in chains)
             {
-                if(chain.Event.Event is OffsetEvent offset)
+                if(chain?.EventNode.Event is OffsetEvent offset)
                     OnPlayerEnteredTile(new PlayerEnteredTileEvent(e.X + offset.X, e.Y + offset.Y));
                 else
-                    Raise(new TriggerChainEvent(chain.Event, TriggerType.Normal, e.X, e.Y));
+                    Raise(new TriggerChainEvent(chain.EventNode, TriggerType.Normal, e.X, e.Y));
             }
         }
 

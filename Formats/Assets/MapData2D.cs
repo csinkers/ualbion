@@ -111,7 +111,7 @@ namespace UAlbion.Formats.Assets
 
             foreach(var zone in map.Zones)
                 if (zone.EventNumber != 65535)
-                    zone.Event = map.Events[zone.EventNumber];
+                    zone.EventNode = map.Events[zone.EventNumber];
 
             foreach (var position in map.Zones.GroupBy(x => x.Y * map.Width + x.X))
                 map.ZoneLookup[position.Key] = position.ToArray();

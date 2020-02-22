@@ -128,10 +128,10 @@ namespace UAlbion.Game.Entities.Map3D
             var chains = _mapData.Zones.Where(x => x.Global && (x.Trigger & type) != 0);
             foreach (var chain in chains)
             {
-                if(chain.Event == null)
+                if(chain.EventNode == null)
                     Raise(new LogEvent(LogEvent.Level.Error, $"Tried to raise event {chain.EventNumber}, but it doesn't exist in the map."));
                 else
-                    Raise(new TriggerChainEvent(chain.Event, type));
+                    Raise(new TriggerChainEvent(chain.EventNode, type));
             }
         }
 

@@ -7,6 +7,7 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Entities
 {

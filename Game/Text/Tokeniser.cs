@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace UAlbion.Game
+namespace UAlbion.Game.Text
 {
     public static class Tokeniser
     {

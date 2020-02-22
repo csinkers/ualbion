@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Game.Events;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui
 {

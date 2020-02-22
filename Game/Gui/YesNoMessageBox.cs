@@ -35,7 +35,7 @@ namespace UAlbion.Game.Gui
         {
             var elements = new VerticalStack(
                 new Padding(0, 5),
-                new FixedSizePanel(231, 30, new Text(stringId)),
+                new FixedSizePanel(231, 30, new TextSection(stringId)),
                 new Padding(0, 5),
                 new HorizontalStack(
                     new Padding(11, 0),

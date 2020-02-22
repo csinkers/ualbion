@@ -3,6 +3,7 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Gui;
+using UAlbion.Game.Text;
 using Veldrid;
 
 namespace UAlbion.Game.Entities

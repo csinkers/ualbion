@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UAlbion.Game
+namespace UAlbion.Game.Text
 {
     [Flags]
     public enum TextArrangement

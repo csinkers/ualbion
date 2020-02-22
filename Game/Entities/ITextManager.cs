@@ -2,6 +2,7 @@
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Entities
 {

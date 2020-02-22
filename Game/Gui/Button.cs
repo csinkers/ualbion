@@ -4,6 +4,7 @@ using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
+using UAlbion.Game.Text;
 using Veldrid;
 
 namespace UAlbion.Game.Gui
@@ -93,9 +94,9 @@ namespace UAlbion.Game.Gui
             _frame = AttachChild(new ButtonFrame(content));
         }
 
-        public Button(string buttonId, StringId textId) : this(buttonId, new Text(textId).Center().NoWrap()) { }
-        public Button(string buttonId, ITextSource textSource) : this(buttonId, new Text(textSource).Center().NoWrap()) { }
-        public Button(string buttonId, string literalText) : this(buttonId, new Text(literalText).Center().NoWrap()) { }
+        public Button(string buttonId, StringId textId) : this(buttonId, new TextSection(textId).Center().NoWrap()) { }
+        public Button(string buttonId, ITextSource textSource) : this(buttonId, new TextSection(textSource).Center().NoWrap()) { }
+        public Button(string buttonId, string literalText) : this(buttonId, new TextSection(literalText).Center().NoWrap()) { }
 
         public override Vector2 GetSize() => GetMaxChildSize() + new Vector2(4, 0);
 

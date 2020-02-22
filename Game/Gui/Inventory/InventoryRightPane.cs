@@ -2,6 +2,7 @@
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Inventory
 {
@@ -46,7 +47,7 @@ namespace UAlbion.Game.Gui.Inventory
                     new VerticalStack(
                         new Padding(64, 0),
                         new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiGold) { Highlighted = true },
-                        new Text("Total party gold $10.0")
+                        new TextSection("Total party gold $10.0")
                     ) { Greedy = false}
                 ) { IsPressed = true };
                 moneyAndFoodStack = new HorizontalStack(money);
@@ -64,7 +65,7 @@ namespace UAlbion.Game.Gui.Inventory
                     new VerticalStack(
                         new Padding(31, 0),
                         new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiGold),
-                        new Text(goldSource)
+                        new TextSection(goldSource)
                     ) { Greedy = false });
 
                 var foodSource = new DynamicText(() =>
@@ -78,7 +79,7 @@ namespace UAlbion.Game.Gui.Inventory
                     new VerticalStack(
                         new Padding(31, 0),
                         new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiFood),
-                        new Text(foodSource)
+                        new TextSection(foodSource)
                     ) { Greedy = false });
                 moneyAndFoodStack = new HorizontalStack(goldButton, foodButton);
             }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UAlbion.Game
+namespace UAlbion.Game.Text
 {
     public interface ITextSource
     {

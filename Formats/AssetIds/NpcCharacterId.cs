@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum NpcCharacterId : byte
+    public enum NpcCharacterId
     {
         Khunagh = 0,
         Cuarnainn = 1,

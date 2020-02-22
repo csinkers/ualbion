@@ -6,6 +6,7 @@ using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
 using UAlbion.Game.State.Player;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Inventory
 {

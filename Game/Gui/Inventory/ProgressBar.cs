@@ -4,6 +4,7 @@ using System.Numerics;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
+using UAlbion.Game.Text;
 using Veldrid;
 
 namespace UAlbion.Game.Gui.Inventory

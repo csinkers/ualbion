@@ -3,6 +3,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
+using UAlbion.Game.Text;
 using Veldrid;
 
 namespace UAlbion.Game.Gui.Inventory
@@ -48,7 +49,7 @@ namespace UAlbion.Game.Gui.Inventory
                     : new[] { new TextBlock(slotInfo.Amount.ToString()) { Alignment = TextAlignment.Right } };
             }, x => _version);
 
-            var text = new Text(amountSource);
+            var text = new TextSection(amountSource);
 
             Frame = new ButtonFrame(new FixedPositionStack()
                 .Add(_sprite, 0, 0, 16, 16)

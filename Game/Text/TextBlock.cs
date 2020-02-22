@@ -1,8 +1,8 @@
 ﻿using UAlbion.Formats.AssetIds;
 
-namespace UAlbion.Game
+namespace UAlbion.Game.Text
 {
-    public class TextBlock
+    public class TextBlock // Logical segment of text where all glyphs share the same formatting.
     {
         public TextBlock() : this(string.Empty) { }
         public TextBlock(string text)

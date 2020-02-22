@@ -5,6 +5,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Entities;
 using UAlbion.Game.State;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Inventory
 {
@@ -53,21 +54,21 @@ namespace UAlbion.Game.Gui.Inventory
                 new Header(S(SystemTextId.Inv2_Attributes)),
                 new HorizontalStack(
                     new VerticalStack(
-                        new Text(S(SystemTextId.Attrib_STR)).Right(),
+                        new TextSection(S(SystemTextId.Attrib_STR)).Right(),
                         new Padding(0,2),
-                        new Text(S(SystemTextId.Attrib_INT)).Right(),
+                        new TextSection(S(SystemTextId.Attrib_INT)).Right(),
                         new Padding(0,2),
-                        new Text(S(SystemTextId.Attrib_DEX)).Right(),
+                        new TextSection(S(SystemTextId.Attrib_DEX)).Right(),
                         new Padding(0,2),
-                        new Text(S(SystemTextId.Attrib_SPD)).Right(),
+                        new TextSection(S(SystemTextId.Attrib_SPD)).Right(),
                         new Padding(0,2),
-                        new Text(S(SystemTextId.Attrib_STA)).Right(),
+                        new TextSection(S(SystemTextId.Attrib_STA)).Right(),
                         new Padding(0,2),
-                        new Text(S(SystemTextId.Attrib_LUC)).Right(),
+                        new TextSection(S(SystemTextId.Attrib_LUC)).Right(),
                         new Padding(0,2),
-                        new Text(S(SystemTextId.Attrib_MR)).Right(),
+                        new TextSection(S(SystemTextId.Attrib_MR)).Right(),
                         new Padding(0,2),
-                        new Text(S(SystemTextId.Attrib_MT)).Right()
+                        new TextSection(S(SystemTextId.Attrib_MT)).Right()
                     ),
                     new Padding(2,0),
                     new VerticalStack(
@@ -92,13 +93,13 @@ namespace UAlbion.Game.Gui.Inventory
                 new Header(S(SystemTextId.Inv2_Skills)),
                 new HorizontalStack(
                     new VerticalStack(
-                        new Text(S(SystemTextId.Skill_CLO)).Right(),
+                        new TextSection(S(SystemTextId.Skill_CLO)).Right(),
                         new Padding(0,2),
-                        new Text(S(SystemTextId.Skill_LON)).Right(),
+                        new TextSection(S(SystemTextId.Skill_LON)).Right(),
                         new Padding(0,2),
-                        new Text(S(SystemTextId.Skill_CRI)).Right(),
+                        new TextSection(S(SystemTextId.Skill_CRI)).Right(),
                         new Padding(0,2),
-                        new Text(S(SystemTextId.Skill_LP)).Right()
+                        new TextSection(S(SystemTextId.Skill_LP)).Right()
                     ),
                     new Padding(2,0),
                     new VerticalStack(

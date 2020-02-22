@@ -1,4 +1,5 @@
 ﻿using UAlbion.Api;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui
 {

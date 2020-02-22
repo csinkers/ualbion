@@ -2,11 +2,12 @@
 using System.Linq;
 using System.Numerics;
 using UAlbion.Game.Gui;
+using UAlbion.Game.Text;
 using Veldrid;
 
 namespace UAlbion.Game.Entities
 {
-    public class TextLine : UiElement
+    public class TextLine : UiElement // Multiple TextChunks arranged on a line
     {
         public int Width { get; private set; }
         public int Height { get; private set; } = 8;

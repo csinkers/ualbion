@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace UAlbion.Game
+namespace UAlbion.Game.Text
 {
     public class DynamicText : ITextSource
     {

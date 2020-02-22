@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Game
+﻿namespace UAlbion.Game.Text
 {
     public enum Token
     {

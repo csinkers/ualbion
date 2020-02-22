@@ -4,6 +4,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Inventory
 {
@@ -37,7 +38,7 @@ namespace UAlbion.Game.Gui.Inventory
                         new HorizontalStack(
                             new FixedSize(8, 8, 
                                 new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiOffensiveValue) { Highlighted = true }),
-                            new Text(source)
+                            new TextSection(source)
                         )
                     )
                 {

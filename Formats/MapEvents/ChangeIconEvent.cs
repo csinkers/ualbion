@@ -5,13 +5,13 @@ namespace UAlbion.Formats.MapEvents
 {
     public class ChangeIconEvent : IPositionedEvent, IMapEvent
     {
-        public static ChangeIconEvent Translate(ChangeIconEvent node, ISerializer s)
+        public static ChangeIconEvent Serdes(ChangeIconEvent node, ISerializer s)
         {
             node ??= new ChangeIconEvent();
             s.Dynamic(node, nameof(X));
             s.Dynamic(node, nameof(Y));
             s.Dynamic(node, nameof(Permanent));
-            s.EnumU8(nameof(ChangeType), () => node.ChangeType, x => node.ChangeType = x, x => ((byte) x, x.ToString()));
+            node.ChangeType = s.EnumU8(nameof(ChangeType), node.ChangeType);
             s.Dynamic(node, nameof(Unk5));
             s.Dynamic(node, nameof(Value));
             s.Dynamic(node, nameof(Unk8));

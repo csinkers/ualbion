@@ -9,12 +9,12 @@ using Veldrid;
 
 namespace UAlbion.Game.Entities
 {
-    public class UiSpriteElement<T> : UiElement where T : Enum
+    public class UiSpriteElement<T> : UiElement where T : struct, Enum
     {
         static readonly HandlerSet Handlers = new HandlerSet(
             H<UiSpriteElement<T>, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; }));
 
-        T _id = (T)(object)-1;
+        T? _id;
         Vector2 _size;
         SpriteLease _sprite;
         bool _dirty = true;
@@ -28,10 +28,13 @@ namespace UAlbion.Game.Entities
 
         public T Id
         {
-            get => _id;
+            get => _id ?? (T)(object)0;
             set
             {
-                if ((int)(object)_id == (int)(object)value) return;
+                int existing = _id == null ? -1 : Convert.ToInt32(_id.Value);
+                int newValue = Convert.ToInt32(value);
+
+                if (existing == newValue) return;
                 _id = value;
                 _dirty = true;
             }
@@ -53,13 +56,13 @@ namespace UAlbion.Game.Entities
             _sprite?.Dispose();
             _sprite = null;
 
-            if ((int)(object)_id == -1)
+            if (_id == null)
             {
                 _size = Vector2.One;
             }
             else
             {
-                var texture = assets.LoadTexture(_id);
+                var texture = assets.LoadTexture(_id.Value);
                 if (texture == null)
                     return;
                 var key = new SpriteKey(texture, order, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);

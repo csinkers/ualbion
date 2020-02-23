@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum VideoId
+    public enum VideoId : byte
     {
         Unknown0 = 0,
         Unknown1 = 1,

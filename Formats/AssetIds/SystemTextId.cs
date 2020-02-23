@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum SystemTextId
+    public enum SystemTextId : ushort
     {
         PartyPortrait_XLifeMana = 0,
         Combat_Attack = 1,

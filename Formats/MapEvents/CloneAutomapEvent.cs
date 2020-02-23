@@ -4,7 +4,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class CloneAutomapEvent : IMapEvent
     {
-        public static CloneAutomapEvent Translate(CloneAutomapEvent node, ISerializer s)
+        public static CloneAutomapEvent Serdes(CloneAutomapEvent node, ISerializer s)
         {
             node ??= new CloneAutomapEvent();
             s.Dynamic(node, nameof(Unk1));

@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum MonsterGraphicsId
+    public enum MonsterGraphicsId : byte
     {
         FloatingHand = 0,
         Unknown1 = 1,

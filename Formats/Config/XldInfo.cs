@@ -32,7 +32,8 @@ namespace UAlbion.Formats.Config
 
     public class FullXldInfo : XldInfo
     {
-        public string EnumName;
+        public string EnumName { get; set; }
+        public string EnumType { get; set; }
         public IDictionary<int, FullAssetInfo> Assets { get; } = new Dictionary<int, FullAssetInfo>();
     }
 }

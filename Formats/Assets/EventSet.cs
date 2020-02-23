@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Assets
     public class EventSet
     {
         ushort[] _chainStarts;
-        IEventNode[] _events;
+        EventNode[] _events;
 
         public IEventNode GetChain(int chainId)
         {
@@ -32,44 +32,37 @@ namespace UAlbion.Formats.Assets
             }
         }
 
-        public static void Translate(EventSet set, ISerializer s, string name, AssetInfo config)
+        public static EventSet Serdes(EventSet set, ISerializer s)
         {
-            ushort chainCount = (ushort)(set._chainStarts?.Length ?? 0);
-            ushort eventCount = (ushort)(set._events?.Length ?? 0);
-            s.UInt16("ChainCount", () => chainCount, x => chainCount = x);
-            s.UInt16("TotalEventCount", () => eventCount, x => eventCount = x);
+            set ??= new EventSet();
+            ushort chainCount = s.UInt16("ChainCount", (ushort)(set._chainStarts?.Length ?? 0));
+            ushort eventCount = s.UInt16("TotalEventCount", (ushort)(set._events?.Length ?? 0));
 
             if (set._chainStarts == null) set._chainStarts = new ushort[chainCount];
-            if (set._events == null) set._events = new IEventNode[eventCount];
+            if (set._events == null) set._events = new EventNode[eventCount];
 
             for (int i = 0; i < set._chainStarts.Length; i++)
-                s.UInt16("c" + i, () => set._chainStarts[i], x => set._chainStarts[i] = x);
+                set._chainStarts[i] = s.UInt16(null, set._chainStarts[i]);
 
             for (int i = 0; i < set._events.Length; i++)
-            {
-                s.Meta("e" + i,
-                    x => set._events[i] = EventNode.Translate(null, x, i),
-                    x => EventNode.Translate((EventNode)set._events[i], x, i)
-                );
-            }
+                set._events[i] = EventNode.Serdes(i, set._events[i], s);
 
             foreach (var e in set._events)
             {
-                if (e is EventNode en)
-                {
-                    ushort? nextId = en.NextEventId;
-                    en.NextEvent = nextId.HasValue ? set._events[nextId.Value] : null;
-                }
+                ushort? nextId = e.NextEventId;
+                e.NextEvent = nextId.HasValue ? set._events[nextId.Value] : null;
+
                 if (e is BranchNode bn)
                 {
-                    ushort? nextId = bn.NextEventId;
+                    nextId = bn.NextEventId;
                     // TODO: Warn if index invalid
                     bn.NextEvent = nextId >= eventCount ? null : nextId.HasValue ? set._events[nextId.Value] : null;
                     nextId = bn.NextEventWhenFalseId;
                     bn.NextEventWhenFalse = nextId >= eventCount ? null : nextId.HasValue ? set._events[nextId.Value] : null;
                 }
             }
-            s.CheckEntireLengthRead();
+
+            return set;
         }
     }
 }

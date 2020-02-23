@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum WordId
+    public enum WordId : ushort
     {
         Zero = 1,
         One = 15,

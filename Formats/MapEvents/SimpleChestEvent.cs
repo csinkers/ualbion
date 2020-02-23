@@ -7,10 +7,10 @@ namespace UAlbion.Formats.MapEvents
 {
     public class SimpleChestEvent : IMapEvent
     {
-        public static SimpleChestEvent Translate(SimpleChestEvent e, ISerializer s)
+        public static SimpleChestEvent Serdes(SimpleChestEvent e, ISerializer s)
         {
             e ??= new SimpleChestEvent();
-            s.EnumU8(nameof(ChestType), () => e.ChestType, x => e.ChestType = x, x => ((byte)x, x.ToString()));
+            e.ChestType = s.EnumU8(nameof(ChestType), e.ChestType);
             s.Dynamic(e, nameof(Unk2));
             s.Dynamic(e, nameof(Unk3));
             s.Dynamic(e, nameof(Unk4));

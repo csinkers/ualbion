@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class RunScriptEvent : IMapEvent
     {
-        public static RunScriptEvent Translate(RunScriptEvent node, ISerializer s)
+        public static RunScriptEvent Serdes(RunScriptEvent node, ISerializer s)
         {
             node ??= new RunScriptEvent();
             s.Dynamic(node, nameof(Unk1));

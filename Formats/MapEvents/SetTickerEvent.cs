@@ -8,7 +8,7 @@ namespace UAlbion.Formats.MapEvents
         public static SetTickerEvent Translate(SetTickerEvent e, ISerializer s)
         {
             e ??= new SetTickerEvent();
-            s.EnumU8(nameof(Operation), () => e.Operation, x => e.Operation = x, x => ((byte)x, x.ToString()));
+            e.Operation = s.EnumU8(nameof(Operation), e.Operation);
             s.Dynamic(e, nameof(Amount));
             s.Dynamic(e, nameof(Unk4));
             s.Dynamic(e, nameof(Unk5));

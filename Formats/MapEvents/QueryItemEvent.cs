@@ -17,14 +17,8 @@ namespace UAlbion.Formats.MapEvents
             s.Dynamic(e, nameof(Unk3));
             s.Dynamic(e, nameof(Unk4));
             s.Dynamic(e, nameof(Unk5));
-            s.UInt16(nameof(ItemId),
-                () => (ushort)(e.ItemId + 1),
-                x => e.ItemId = (ItemId)(x - 1));
-
-            s.UInt16(nameof(FalseEventId),
-                () => e.FalseEventId ?? 0xffff,
-                x => e.FalseEventId = x == 0xffff ? (ushort?)null : x);
-
+            e.ItemId = (ItemId)StoreIncremented.Serdes(nameof(ItemId), (ushort)e.ItemId, s.UInt16);
+            e.FalseEventId = ConvertMaxToNull.Serdes(nameof(FalseEventId), e.FalseEventId, s.UInt16);
             return e;
         }
 

@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class PlaceActionEvent : IMapEvent
     {
-        public static PlaceActionEvent Translate(PlaceActionEvent node, ISerializer s)
+        public static PlaceActionEvent Serdes(PlaceActionEvent node, ISerializer s)
         {
             node ??= new PlaceActionEvent();
             s.Dynamic(node, nameof(Unk1));

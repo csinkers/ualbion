@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum BlockListId
+    public enum BlockListId : byte
     {
         Unknown0 = 0,
         Unknown1 = 1,

@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum LargePartyGraphicsId
+    public enum LargePartyGraphicsId : byte
     {
         Tom = 0,
         Rainer = 1,

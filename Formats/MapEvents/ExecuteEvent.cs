@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class ExecuteEvent : IMapEvent
     {
-        public static ExecuteEvent Translate(ExecuteEvent node, ISerializer s)
+        public static ExecuteEvent Serdes(ExecuteEvent node, ISerializer s)
         {
             node ??= new ExecuteEvent();
             s.Dynamic(node, nameof(Unk1));

@@ -45,11 +45,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
             s.Dynamic(d, nameof(d.WallHeight));           // 0
             s.Dynamic(d, nameof(d.CameraHeight));         // 2
             s.Dynamic(d, nameof(d.Unk4));                 // 4
-
-            s.UInt16(nameof(d.BackgroundId),
-                () => FormatUtil.Untweak((ushort?)d.BackgroundId),
-                x => d.BackgroundId = (DungeonBackgroundId?)FormatUtil.Tweak(x));  // 6
-
+            d.BackgroundId = (DungeonBackgroundId?)Tweak.Serdes(nameof(BackgroundId), (ushort?)d.BackgroundId, s.UInt16); // 6
             s.Dynamic(d, nameof(d.BackgroundYPosition));  // 8
             s.Dynamic(d, nameof(d.FogDistance));          // A
             s.Dynamic(d, nameof(d.FogRed));               // C
@@ -71,19 +67,16 @@ namespace UAlbion.Formats.Assets.Labyrinth
 
             Debug.Assert(s.Offset - start <= length);
 
-            ushort objectGroupCount = (ushort)d.ObjectGroups.Count; // 26
-            s.UInt16("ObjectGroupCount", () => (ushort)d.ObjectGroups.Count, x => objectGroupCount = x);
-            s.List(d.ObjectGroups, objectGroupCount, ObjectGroup.Serialize, () => new ObjectGroup());
+            ushort objectGroupCount = s.UInt16("ObjectGroupCount", (ushort)d.ObjectGroups.Count); // 26
+            s.List(d.ObjectGroups, objectGroupCount, ObjectGroup.Serdes);
             Debug.Assert(s.Offset - start <= length);
 
-            var floorAndCeilingCount = (ushort)d.FloorAndCeilings.Count; // 28 + objectGroupCount * 42
-            s.UInt16("FloorAndCeilingCount", () => floorAndCeilingCount, x => floorAndCeilingCount = x);
-            s.List(d.FloorAndCeilings, floorAndCeilingCount, FloorAndCeiling.Serialize, () => new FloorAndCeiling	());
+            var floorAndCeilingCount = s.UInt16("FloorAndCeilingCount", (ushort)d.FloorAndCeilings.Count); // 28 + objectGroupCount * 42
+            s.List(d.FloorAndCeilings, floorAndCeilingCount, FloorAndCeiling.Serdes);
             Debug.Assert(s.Offset - start <= length);
 
-            ushort objectCount = (ushort)d.Objects.Count; // 2A + objectGroupCount * 42 + floorAndCeilingCount * A
-            s.UInt16("ObjectCount", () => objectCount, x => objectCount = x);
-            s.List(d.Objects, objectCount, Object.Serialize, () => new Object());
+            ushort objectCount = s.UInt16("ObjectCount", (ushort)d.Objects.Count); // 2A + objectGroupCount * 42 + floorAndCeilingCount * A
+            s.List(d.Objects, objectCount, Object.Serdes);
             Debug.Assert(s.Offset - start <= length);
 
             // Populate objectIds on subobjects to improve debugging experience
@@ -94,9 +87,8 @@ namespace UAlbion.Formats.Assets.Labyrinth
                 so.ObjectId = d.Objects[so.ObjectInfoNumber].TextureNumber;
             }
 
-            ushort wallCount = (ushort)d.Walls.Count;
-            s.UInt16("WallCount", () => wallCount, x => wallCount = x);
-            s.List(d.Walls, wallCount, Wall.Serialize, () => new Wall());
+            ushort wallCount = s.UInt16("WallCount", (ushort)d.Walls.Count);
+            s.List(d.Walls, wallCount, Wall.Serdes);
             Debug.Assert(s.Offset - start <= length);
             PerfTracker.StartupEvent("Finish loading labyrinth data");
         }

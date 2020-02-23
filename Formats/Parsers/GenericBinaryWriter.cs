@@ -8,15 +8,12 @@ namespace UAlbion.Formats.Parsers
 {
     class GenericBinaryWriter : ISerializer
     {
-        static readonly object serializerLock = new object();
-        static readonly IDictionary<(Type, string), SerializationInfo> serializers = new Dictionary<(Type, string), SerializationInfo>();
-
-        readonly BinaryWriter bw;
-        long offset;
+        readonly BinaryWriter _bw;
+        long _offset;
 
         public GenericBinaryWriter(BinaryWriter bw)
         {
-            this.bw = bw;
+            _bw = bw;
         }
 
         public SerializerMode Mode => SerializerMode.Writing;
@@ -28,117 +25,140 @@ namespace UAlbion.Formats.Parsers
         {
             get
             {
-                Debug.Assert(offset == bw.BaseStream.Position);
-                return offset;
+                Debug.Assert(_offset == _bw.BaseStream.Position);
+                return _offset;
             }
         }
 
         public void Seek(long newOffset)
         {
-            bw.Seek((int)newOffset, SeekOrigin.Begin);
-            offset = newOffset;
+            _bw.Seek((int)newOffset, SeekOrigin.Begin);
+            _offset = newOffset;
         }
 
-        public void Int8(string name, Func<sbyte> getter, Action<sbyte> setter) { bw.Write(getter()); offset += 1L; }
-        public void Int16(string name, Func<short> getter, Action<short> setter) { bw.Write(getter()); offset += 2L; }
-        public void Int32(string name, Func<int> getter, Action<int> setter) { bw.Write(getter()); offset += 4L; }
-        public void Int64(string name, Func<long> getter, Action<long> setter) { bw.Write(getter()); offset += 8L; }
-        public void UInt8(string name, Func<byte> getter, Action<byte> setter) { bw.Write(getter()); offset += 1L; }
-        public void UInt16(string name, Func<ushort> getter, Action<ushort> setter) { bw.Write(getter()); offset += 2L; }
-        public void UInt32(string name, Func<uint> getter, Action<uint> setter) { bw.Write(getter()); offset += 4L; }
-        public void UInt64(string name, Func<ulong> getter, Action<ulong> setter) { bw.Write(getter()); offset += 8L; }
-        public void EnumU8<T>(string name, Func<T> getter, Action<T> setter, Func<T, (byte, string)> infoFunc) where T : Enum
+        public sbyte Int8(string name, sbyte existing)     { _bw.Write(existing); _offset += 1L; return existing; }
+        public short Int16(string name, short existing)    { _bw.Write(existing); _offset += 2L; return existing; }
+        public int Int32(string name, int existing)        { _bw.Write(existing); _offset += 4L; return existing; }
+        public long Int64(string name, long existing)      { _bw.Write(existing); _offset += 8L; return existing; }
+        public byte UInt8(string name, byte existing)      { _bw.Write(existing); _offset += 1L; return existing; }
+        public ushort UInt16(string name, ushort existing) { _bw.Write(existing); _offset += 2L; return existing; }
+        public uint UInt32(string name, uint existing)     { _bw.Write(existing); _offset += 4L; return existing; }
+        public ulong UInt64(string name, ulong existing)   { _bw.Write(existing); _offset += 8L; return existing; }
+        public T EnumU8<T>(string name, T existing) where T : struct, Enum
         {
-            bw.Write(infoFunc(getter()).Item1); offset += 1L;
-        }
-        public void EnumU16<T>(string name, Func<T> getter, Action<T> setter, Func<T, (ushort, string)> infoFunc) where T : Enum
-        {
-            bw.Write(infoFunc(getter()).Item1); offset += 2L;
-        }
-        public void EnumU32<T>(string name, Func<T> getter, Action<T> setter, Func<T, (uint, string)> infoFunc) where T : Enum
-        {
-            bw.Write(infoFunc(getter()).Item1); offset += 4L;
+            _bw.Write((byte)(object)existing);
+            _offset += 1L;
+            return existing;
         }
 
-        public void Guid(string name, Func<Guid> getter, Action<Guid> setter)
+        public T EnumU16<T>(string name, T existing) where T : struct, Enum
         {
-            var v = getter();
-            bw.Write(v.ToByteArray());
-            offset += 16L;
+            _bw.Write((ushort)(object)existing);
+            _offset += 2L;
+            return existing;
         }
 
-        public void ByteArray(string name, Func<byte[]> getter, Action<byte[]> setter, int n)
+        public T EnumU32<T>(string name, T existing) where T : struct, Enum
         {
-            var v = getter();
-            bw.Write(v);
-            offset += v.Length;
-        }
-        public void ByteArray2(string name, Func<byte[]> getter, Action<byte[]> setter, int n, string comment)
-        {
-            var v = getter();
-            bw.Write(v);
-            offset += v.Length;
-        }
-        public void ByteArrayHex(string name, Func<byte[]> getter, Action<byte[]> setter, int n)
-        {
-            var v = getter();
-            bw.Write(v);
-            offset += v.Length;
+            _bw.Write((uint)(object)existing);
+            _offset += 4L;
+            return existing;
         }
 
-        public void NullTerminatedString(string name, Func<string> getter, Action<string> setter)
+        public Guid Guid(string name, Guid existing)
         {
-            var v = getter();
+            var v = existing;
+            _bw.Write(v.ToByteArray());
+            _offset += 16L;
+            return existing;
+        }
+
+        public byte[] ByteArray(string name, byte[] existing, int n)
+        {
+            var v = existing;
+            _bw.Write(v);
+            _offset += v.Length;
+            return existing;
+        }
+        public byte[] ByteArray2(string name, byte[] existing, int n, string comment)
+        {
+            var v = existing;
+            _bw.Write(v);
+            _offset += v.Length;
+            return existing;
+        }
+        public byte[] ByteArrayHex(string name, byte[] existing, int n)
+        {
+            var v = existing;
+            _bw.Write(v);
+            _offset += v.Length;
+            return existing;
+        }
+
+        public string NullTerminatedString(string name, string existing)
+        {
+            var v = existing;
             var bytes = FormatUtil.BytesFrom850String(v);
-            bw.Write(bytes);
-            bw.Write((byte)0);
-            offset += bytes.Length + 1; // add 2 bytes for the null terminator
+            _bw.Write(bytes);
+            _bw.Write((byte)0);
+            _offset += bytes.Length + 1; // add 2 bytes for the null terminator
+            return existing;
         }
-        public void FixedLengthString(string name, Func<string> getter, Action<string> setter, int length)
+
+        public string FixedLengthString(string name, string existing, int length)
         {
-            var v = getter();
+            var v = existing;
             var bytes = FormatUtil.BytesFrom850String(v);
             if (bytes.Length > length + 1) throw new InvalidOperationException("Tried to write overlength string");
-            bw.Write(bytes);
-            bw.Write(Enumerable.Repeat((byte)0, length - bytes.Length).ToArray());
-            offset += length; // Pad out to the full length
+            _bw.Write(bytes);
+            _bw.Write(Enumerable.Repeat((byte)0, length - bytes.Length).ToArray());
+            _offset += length; // Pad out to the full length
+            return existing;
         }
 
         public void RepeatU8(string name, byte v, int length)
         {
-            bw.Write(Enumerable.Repeat(v, length).ToArray());
-            offset += length;
+            _bw.Write(Enumerable.Repeat(v, length).ToArray());
+            _offset += length;
         }
 
+        public TMemory Transform<TPersistent, TMemory>(string name, TMemory existing, Func<string, TPersistent, TPersistent> serializer, IConverter<TPersistent, TMemory> converter) =>
+            converter.ToMemory(serializer(name, converter.ToPersistent(existing)));
+
         public void Meta(string name, Action<ISerializer> serializer, Action<ISerializer> deserializer) => serializer(this);
+        public T Meta<T>(string name, T existing, Func<int, T, ISerializer, T> serdes) => serdes(0, existing, this);
+
         public void Check() { }
-        public void CheckEntireLengthRead() { }
+        public bool IsComplete() => false;
 
         public void Dynamic<TTarget>(TTarget target, string propertyName)
         {
             var serializer = SerializationInfo.Get<TTarget>(propertyName);
             switch (serializer)
             {
-                case SerializationInfo<TTarget, byte>   s: bw.Write(s.Getter(target)); break;
-                case SerializationInfo<TTarget, sbyte>  s: bw.Write(s.Getter(target)); break;
-                case SerializationInfo<TTarget, ushort> s: bw.Write(s.Getter(target)); break;
-                case SerializationInfo<TTarget, short>  s: bw.Write(s.Getter(target)); break;
-                case SerializationInfo<TTarget, uint>   s: bw.Write(s.Getter(target)); break;
-                case SerializationInfo<TTarget, int>    s: bw.Write(s.Getter(target)); break;
-                case SerializationInfo<TTarget, ulong>  s: bw.Write(s.Getter(target)); break;
-                case SerializationInfo<TTarget, long>   s: bw.Write(s.Getter(target)); break;
+                case SerializationInfo<TTarget, byte>   s: _bw.Write(s.Getter(target)); break;
+                case SerializationInfo<TTarget, sbyte>  s: _bw.Write(s.Getter(target)); break;
+                case SerializationInfo<TTarget, ushort> s: _bw.Write(s.Getter(target)); break;
+                case SerializationInfo<TTarget, short>  s: _bw.Write(s.Getter(target)); break;
+                case SerializationInfo<TTarget, uint>   s: _bw.Write(s.Getter(target)); break;
+                case SerializationInfo<TTarget, int>    s: _bw.Write(s.Getter(target)); break;
+                case SerializationInfo<TTarget, ulong>  s: _bw.Write(s.Getter(target)); break;
+                case SerializationInfo<TTarget, long>   s: _bw.Write(s.Getter(target)); break;
                 default: throw new InvalidOperationException($"Tried to serialize unexpected type {serializer.Type}");
             }
-            offset += serializer.Size;
+            _offset += serializer.Size;
         }
 
-        public void List<TTarget>(IList<TTarget> list, int count, Action<TTarget, ISerializer> serializer, Func<TTarget> constructor)
+        public void List<TTarget>(IList<TTarget> list, int count, Func<int, TTarget, ISerializer, TTarget> serializer) where TTarget : class
         {
             for (int i = 0; i < count; i++)
-            {
-                var og = list[i];
-                serializer(og, this);
-            }
+                serializer(i, list[i], this);
+        }
+
+        public void List<TTarget>(IList<TTarget> list, int count, int offset, Func<int, TTarget, ISerializer, TTarget> serializer) where TTarget : class
+        {
+            for (int i = offset; i < count + offset; i++)
+                serializer(i, list[i], this);
         }
     }
 }

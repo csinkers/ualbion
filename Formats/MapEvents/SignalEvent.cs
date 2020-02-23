@@ -6,7 +6,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class SignalEvent : IMapEvent
     {
-        public static SignalEvent Translate(SignalEvent e, ISerializer s)
+        public static SignalEvent Serdes(SignalEvent e, ISerializer s)
         {
             e ??= new SignalEvent();
             s.Dynamic(e, nameof(SignalId));

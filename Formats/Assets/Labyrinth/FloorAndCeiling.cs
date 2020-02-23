@@ -29,19 +29,18 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public ushort Unk8 { get; set; }
         public override string ToString() => $"FC.{TextureNumber}:{AnimationCount} {Properties}";
 
-        public static void Serialize(FloorAndCeiling fc, ISerializer s)
+        public static FloorAndCeiling Serdes(int _, FloorAndCeiling existing, ISerializer s)
         {
-            s.EnumU8(nameof(fc.Properties), () => fc.Properties, x => fc.Properties = x, x => ((byte)x, x.ToString()));
+            var fc = existing ?? new FloorAndCeiling();
+            fc.Properties = s.EnumU8(nameof(fc.Properties), fc.Properties);
             s.Dynamic(fc, nameof(fc.Unk1));
             s.Dynamic(fc, nameof(fc.Unk2));
             s.Dynamic(fc, nameof(fc.Unk3));
             s.Dynamic(fc, nameof(fc.AnimationCount));
             s.Dynamic(fc, nameof(fc.Unk5));
-            s.UInt16(nameof(fc.TextureNumber),
-                () => FormatUtil.Untweak((ushort?)fc.TextureNumber),
-                x => fc.TextureNumber = (DungeonFloorId?)FormatUtil.Tweak(x));
-
+            fc.TextureNumber = (DungeonFloorId?)s.Transform<ushort, ushort?>(nameof(TextureNumber), (ushort?)fc.TextureNumber, s.UInt16, Tweak.Instance);
             s.Dynamic(fc, nameof(fc.Unk8));
+            return fc;
         }
     }
 }

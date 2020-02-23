@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class OffsetEvent : IMapEvent
     {
-        public static OffsetEvent Translate(OffsetEvent e, ISerializer s)
+        public static OffsetEvent Serdes(OffsetEvent e, ISerializer s)
         {
             e ??= new OffsetEvent();
             s.Dynamic(e, nameof(X));

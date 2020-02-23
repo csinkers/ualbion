@@ -13,34 +13,42 @@ namespace UAlbion.Formats.Parsers
         void NewLine(); // Only affects annotating writers
         void Seek(long offset); // For overwriting pre-recorded offsets
         void Check(); // Ensure offset matches stream position
-        void CheckEntireLengthRead(); // Ensure offset matches stream position
+        bool IsComplete(); // Ensure offset matches stream position
 
-        void Int8(string name, Func<sbyte> getter, Action<sbyte> setter);
-        void Int16(string name, Func<short> getter, Action<short> setter);
-        void Int32(string name, Func<int> getter, Action<int> setter);
-        void Int64(string name, Func<long> getter, Action<long> setter);
-        void UInt8(string name, Func<byte> getter, Action<byte> setter);
-        void UInt16(string name, Func<ushort> getter, Action<ushort> setter);
-        void UInt32(string name, Func<uint> getter, Action<uint> setter);
-        void UInt64(string name, Func<ulong> getter, Action<ulong> setter);
+        sbyte Int8(string name, sbyte existing);
+        short Int16(string name, short existing);
+        int Int32(string name, int existing);
+        long Int64(string name, long existing);
+        byte UInt8(string name, byte existing);
+        ushort UInt16(string name, ushort existing);
+        uint UInt32(string name, uint existing);
+        ulong UInt64(string name, ulong existing);
 
-        void Guid(string name, Func<Guid> getter, Action<Guid> setter);
-        void ByteArray(string name, Func<byte[]> getter, Action<byte[]> setter, int length);
-        void ByteArrayHex(string name, Func<byte[]> getter, Action<byte[]> setter, int length);
-        void ByteArray2(string name, Func<byte[]> getter, Action<byte[]> setter, int length, string coment);
-        void NullTerminatedString(string name, Func<string> getter, Action<string> setter);
-        void FixedLengthString(string name, Func<string> getter, Action<string> setter, int length);
+        T EnumU8<T>(string name, T existing) where T : struct, Enum;
+        T EnumU16<T>(string name, T existing) where T : struct, Enum;
+        T EnumU32<T>(string name, T existing) where T : struct, Enum;
+
+        TMemory Transform<TPersistent, TMemory>(string name, TMemory existing, Func<string, TPersistent, TPersistent> serializer, IConverter<TPersistent, TMemory> converter);
+        /*
+            var persistent = converter.ToPersistent(existing);
+            persistent = serializer(persistent);
+            return converter.ToMemory(persistent);
+         */
+
+        Guid Guid(string name, Guid existing);
+        byte[] ByteArray(string name, byte[] existing, int length);
+        byte[] ByteArrayHex(string name, byte[] existing, int length);
+        byte[] ByteArray2(string name, byte[] existing, int length, string coment);
+        string NullTerminatedString(string name, string existing);
+        string FixedLengthString(string name, string existing, int length);
 
         void RepeatU8(string name, byte value, int count); // Either writes a block of padding or verifies the consistency of one while reading
         void Meta(string name, Action<ISerializer> reader, Action<ISerializer> writer); // name serializer deserializer
-
-        void EnumU8<T>(string name, Func<T> getter, Action<T> setter, Func<T, (byte, string)> getMeta) where T : Enum;
-        void EnumU16<T>(string name, Func<T> getter, Action<T> setter, Func<T, (ushort, string)> getMeta) where T : Enum;
-        void EnumU32<T>(string name, Func<T> getter, Action<T> setter, Func<T, (uint, string)> getMeta) where T : Enum;
+        T Meta<T>(string name, T existing, Func<int, T, ISerializer, T> serdes);
 
         void Dynamic<TTarget>(TTarget target, string propertyName);
-
-        void List<TTarget>(IList<TTarget> list, int count, Action<TTarget, ISerializer> serializer, Func<TTarget> constructor);
+        void List<TTarget>(IList<TTarget> list, int count, Func<int, TTarget, ISerializer, TTarget> serdes) where TTarget : class;
+        void List<TTarget>(IList<TTarget> list, int count, int offset, Func<int, TTarget, ISerializer, TTarget> serializer) where TTarget : class;
     }
 
     public static class SerializerExtensions
@@ -70,7 +78,7 @@ namespace UAlbion.Formats.Parsers
             // swap adjacent 8-bit blocks
             return ((x & 0xFF00FF00FF00FF00) >> 8) | ((x & 0x00FF00FF00FF00FF) << 8);
         }
-
+/*
         public static void Int16LE(this ISerializer s, string name, Func<short> getter, Action<short> setter) =>
             s.Int16(name,
                 () => (short)SwapBytes16((ushort)getter()),
@@ -100,5 +108,6 @@ namespace UAlbion.Formats.Parsers
             s.UInt64(name,
                 () => SwapBytes64(getter()),
                 x => setter(SwapBytes64(x)));
+                */
     }
 }

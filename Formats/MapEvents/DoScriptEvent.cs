@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class DoScriptEvent : IMapEvent
     {
-        public static DoScriptEvent Translate(DoScriptEvent e, ISerializer s)
+        public static DoScriptEvent Serdes(DoScriptEvent e, ISerializer s)
         {
             e ??= new DoScriptEvent();
             s.Dynamic(e, nameof(Unk1));

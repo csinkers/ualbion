@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum CombatBackgroundId
+    public enum CombatBackgroundId : byte
     {
         Plains1 = 0,
         Dungeon = 1,

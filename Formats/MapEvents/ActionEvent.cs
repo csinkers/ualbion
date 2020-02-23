@@ -27,14 +27,10 @@ namespace UAlbion.Formats.MapEvents
             Unk61 = 61
         }
 
-        public static ActionEvent Translate(ActionEvent e, ISerializer s)
+        public static ActionEvent Serdes(ActionEvent e, ISerializer s)
         {
             e ??= new ActionEvent();
-            s.EnumU8(nameof(ActionType),
-                () => e.SubType,
-                x => e.SubType = x,
-                x => ((byte)x,x.ToString()));
-
+            e.SubType = s.EnumU8(nameof(ActionType), e.SubType);
             s.Dynamic(e, nameof(Unk2));
             s.Dynamic(e, nameof(Unk3));
             s.Dynamic(e, nameof(Unk4));

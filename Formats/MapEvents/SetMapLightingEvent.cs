@@ -18,10 +18,7 @@ namespace UAlbion.Formats.MapEvents
             s.Dynamic(e, nameof(Unk3));
             s.Dynamic(e, nameof(Unk4));
             s.Dynamic(e, nameof(Unk5));
-            s.EnumU16(nameof(LightLevel),
-                () => e.LightLevel,
-                x => e.LightLevel = x,
-                x => ((ushort)x, x.ToString()));
+            e.LightLevel = s.EnumU16(nameof(LightLevel), e.LightLevel);
             s.Dynamic(e, nameof(Unk8));
             return e;
         }

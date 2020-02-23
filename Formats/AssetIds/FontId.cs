@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum FontId
+    public enum FontId : byte
     {
         RegularFont = 0,
         BoldFont = 1,

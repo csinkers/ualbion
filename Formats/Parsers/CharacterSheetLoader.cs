@@ -10,21 +10,19 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.CharacterData)]
     class CharacterSheetLoader : IAssetLoader
     {
-        static void Translate(CharacterSheet sheet, ISerializer s, long length)
+        static CharacterSheet Serdes(CharacterSheet sheet, ISerializer s)
         {
-            var start = s.Offset;
+            sheet ??= new CharacterSheet();
             s.Check();
-            s.EnumU8("Type", () => sheet.Type, x => sheet.Type = x, x => ((byte)x, x.ToString()));
-            s.EnumU8("Gender", () => sheet.Gender, x => sheet.Gender = x, x => ((byte)x, x.ToString()));
-            s.EnumU8("Race", () => sheet.Race, x => sheet.Race = x, x => ((byte)x, x.ToString()));
-            s.EnumU8("Class", () => sheet.Class, x => sheet.Class = x, x => ((byte)x, x.ToString()));
-            s.EnumU8("SpellClasses",
-                () => sheet.Magic.SpellClasses,
-                x => sheet.Magic.SpellClasses = x, x => ((byte)x, x.ToString()));
-            s.UInt8("Level", () => sheet.Level, x => sheet.Level = x);
-            s.UInt8("Unknown6", () => sheet.Unknown6, x => sheet.Unknown6 = x);
-            s.UInt8("Unknown7", () => sheet.Unknown7, x => sheet.Unknown7 = x);
-            s.EnumU8("Languages", () => sheet.Languages, x => sheet.Languages = x, x => ((byte)x, x.ToString()));
+            sheet.Type = s.EnumU8("Type", sheet.Type);
+            sheet.Gender = s.EnumU8("Gender", sheet.Gender);
+            sheet.Race = s.EnumU8("Race", sheet.Race);
+            sheet.Class = s.EnumU8("Class", sheet.Class);
+            sheet.Magic.SpellClasses = s.EnumU8("SpellClasses", sheet.Magic.SpellClasses);
+            sheet.Level = s.UInt8("Level", sheet.Level);
+            sheet.Unknown6 = s.UInt8("Unknown6", sheet.Unknown6);
+            sheet.Unknown7 = s.UInt8("Unknown7", sheet.Unknown7);
+            sheet.Languages = s.EnumU8("Languages", sheet.Languages);
             s.Check();
 
             sheet.SpriteType =
@@ -36,95 +34,95 @@ namespace UAlbion.Formats.Parsers
                     _ => throw new InvalidOperationException($"Unhandled character type {sheet.Type}")
                 };
 
-            s.UInt8("SpriteId ", () => sheet.SpriteId, x => sheet.SpriteId = x);
-            s.UInt8("PortraitId ", () => (byte)((int?)sheet.PortraitId + 1 ?? 0), x => sheet.PortraitId = x == 0 ? null : (SmallPortraitId?)(x - 1));
-            s.UInt8("Unknown11 ", () => sheet.Unknown11, x => sheet.Unknown11 = x);
-            s.UInt8("Unknown12", () => sheet.Unknown12, x => sheet.Unknown12 = x);
-            s.UInt8("Unknown13", () => sheet.Unknown13, x => sheet.Unknown13 = x);
-            s.UInt8("Unknown14", () => sheet.Unknown14, x => sheet.Unknown14 = x);
-            s.UInt8("Unknown15", () => sheet.Unknown15, x => sheet.Unknown15 = x);
-            s.UInt8("Unknown16", () => sheet.Unknown16, x => sheet.Unknown16 = x);
-            s.UInt8("ActionPoints", () => sheet.Combat.ActionPoints, x => sheet.Combat.ActionPoints = x);
+            sheet.SpriteId = s.UInt8("SpriteId ", sheet.SpriteId);
+            sheet.PortraitId = (SmallPortraitId?)Tweak.Serdes("PortraitId ", (byte?)sheet.PortraitId, s.UInt8);
+            sheet.Unknown11 = s.UInt8("Unknown11 ", sheet.Unknown11);
+            sheet.Unknown12 = s.UInt8("Unknown12", sheet.Unknown12);
+            sheet.Unknown13 = s.UInt8("Unknown13", sheet.Unknown13);
+            sheet.Unknown14 = s.UInt8("Unknown14", sheet.Unknown14);
+            sheet.Unknown15 = s.UInt8("Unknown15", sheet.Unknown15);
+            sheet.Unknown16 = s.UInt8("Unknown16", sheet.Unknown16);
+            sheet.Combat.ActionPoints = s.UInt8("ActionPoints", sheet.Combat.ActionPoints);
             s.Check();
 
-            s.UInt16("EventSetId", () => sheet.EventSetId, x => sheet.EventSetId = x);
-            s.UInt16("WordSet", () => sheet.WordSet, x => sheet.WordSet = x);
-            s.UInt16("TrainingPoints", () => sheet.Combat.TrainingPoints, x => sheet.Combat.TrainingPoints = x);
-            s.UInt16("Gold", () => sheet.Inventory.Gold, x => sheet.Inventory.Gold = x);
-            s.UInt16("Rations", () => sheet.Inventory.Rations, x => sheet.Inventory.Rations = x);
-            s.UInt16("Unknown1C", () => sheet.Unknown1C, x => sheet.Unknown1C = x);
+            sheet.EventSetId = s.UInt16("EventSetId", sheet.EventSetId);
+            sheet.WordSet = s.UInt16("WordSet", sheet.WordSet);
+            sheet.Combat.TrainingPoints = s.UInt16("TrainingPoints", sheet.Combat.TrainingPoints);
+            sheet.Inventory.Gold = s.UInt16("Gold", sheet.Inventory.Gold);
+            sheet.Inventory.Rations = s.UInt16("Rations", sheet.Inventory.Rations);
+            sheet.Unknown1C = s.UInt16("Unknown1C", sheet.Unknown1C);
             s.Check();
 
-            s.EnumU8("PhysicalCondition", () => sheet.Combat.PhysicalConditions, x => sheet.Combat.PhysicalConditions = x, x => ((byte)x, x.ToString()));
-            s.EnumU8("MentalCondition", () => sheet.Combat.MentalConditions, x => sheet.Combat.MentalConditions = x, x => ((byte)x, x.ToString()));
+            sheet.Combat.PhysicalConditions = s.EnumU8("PhysicalCondition", sheet.Combat.PhysicalConditions);
+            sheet.Combat.MentalConditions = s.EnumU8("MentalCondition", sheet.Combat.MentalConditions);
             s.Check();
 
-            s.UInt16("Unknown20", () => sheet.Unknown20, x => sheet.Unknown20 = x);
-            s.UInt16("Unknown22", () => sheet.Unknown22, x => sheet.Unknown22 = x);
-            s.UInt16("Unknown24", () => sheet.Unknown24, x => sheet.Unknown24 = x);
-            s.UInt16("Unknown26", () => sheet.Unknown26, x => sheet.Unknown26 = x);
-            s.UInt16("Unknown28", () => sheet.Unknown28, x => sheet.Unknown28 = x);
-            s.UInt16("Strength", () => sheet.Attributes.Strength, x => sheet.Attributes.Strength = x);
-            s.UInt16("StrengthMax", () => sheet.Attributes.StrengthMax, x => sheet.Attributes.StrengthMax = x);
-            s.UInt16("Unknown2E", () => sheet.Unknown2E, x => sheet.Unknown2E = x);
-            s.UInt16("Unknown30", () => sheet.Unknown30, x => sheet.Unknown30 = x);
-            s.UInt16("Intelligence", () => sheet.Attributes.Intelligence, x => sheet.Attributes.Intelligence = x);
-            s.UInt16("IntelligenceMax", () => sheet.Attributes.IntelligenceMax, x => sheet.Attributes.IntelligenceMax = x);
-            s.UInt16("Unknown36", () => sheet.Unknown36, x => sheet.Unknown36 = x);
-            s.UInt16("Unknown38", () => sheet.Unknown38, x => sheet.Unknown38 = x);
-            s.UInt16("Dexterity", () => sheet.Attributes.Dexterity, x => sheet.Attributes.Dexterity = x);
-            s.UInt16("DexterityMax", () => sheet.Attributes.DexterityMax, x => sheet.Attributes.DexterityMax = x);
-            s.UInt16("Unknown3E", () => sheet.Unknown3E, x => sheet.Unknown3E = x);
-            s.UInt16("Unknown40", () => sheet.Unknown40, x => sheet.Unknown40 = x);
-            s.UInt16("Speed", () => sheet.Attributes.Speed, x => sheet.Attributes.Speed = x);
-            s.UInt16("SpeedMax", () => sheet.Attributes.SpeedMax, x => sheet.Attributes.SpeedMax = x);
-            s.UInt16("Unknown46", () => sheet.Unknown46, x => sheet.Unknown46 = x);
-            s.UInt16("Unknown48", () => sheet.Unknown48, x => sheet.Unknown48 = x);
-            s.UInt16("Stamina", () => sheet.Attributes.Stamina, x => sheet.Attributes.Stamina = x);
-            s.UInt16("StaminaMax", () => sheet.Attributes.StaminaMax, x => sheet.Attributes.StaminaMax = x);
-            s.UInt16("Unknown4E", () => sheet.Unknown4E, x => sheet.Unknown4E = x);
-            s.UInt16("Unknown50", () => sheet.Unknown50, x => sheet.Unknown50 = x);
-            s.UInt16("Luck", () => sheet.Attributes.Luck, x => sheet.Attributes.Luck = x);
-            s.UInt16("LuckMax", () => sheet.Attributes.LuckMax, x => sheet.Attributes.LuckMax = x);
-            s.UInt16("Unknown56", () => sheet.Unknown56, x => sheet.Unknown56 = x);
-            s.UInt16("Unknown58", () => sheet.Unknown58, x => sheet.Unknown58 = x);
-            s.UInt16("MagicResistance", () => sheet.Attributes.MagicResistance, x => sheet.Attributes.MagicResistance = x);
-            s.UInt16("MagicResistanceMax", () => sheet.Attributes.MagicResistanceMax, x => sheet.Attributes.MagicResistanceMax = x);
-            s.UInt16("Unknown5E", () => sheet.Unknown5E, x => sheet.Unknown5E = x);
-            s.UInt16("Unknown60", () => sheet.Unknown60, x => sheet.Unknown60 = x);
-            s.UInt16("MagicTalent", () => sheet.Attributes.MagicTalent, x => sheet.Attributes.MagicTalent = x);
-            s.UInt16("MagicTalentMax", () => sheet.Attributes.MagicTalentMax, x => sheet.Attributes.MagicTalentMax = x);
-            s.UInt16("Unknown66", () => sheet.Unknown66, x => sheet.Unknown66 = x);
-            s.UInt16("Unknown68", () => sheet.Unknown68, x => sheet.Unknown68 = x);
+            sheet.Unknown20 = s.UInt16("Unknown20", sheet.Unknown20);
+            sheet.Unknown22 = s.UInt16("Unknown22", sheet.Unknown22);
+            sheet.Unknown24 = s.UInt16("Unknown24", sheet.Unknown24);
+            sheet.Unknown26 = s.UInt16("Unknown26", sheet.Unknown26);
+            sheet.Unknown28 = s.UInt16("Unknown28", sheet.Unknown28);
+            sheet.Attributes.Strength = s.UInt16("Strength", sheet.Attributes.Strength);
+            sheet.Attributes.StrengthMax = s.UInt16("StrengthMax", sheet.Attributes.StrengthMax);
+            sheet.Unknown2E = s.UInt16("Unknown2E", sheet.Unknown2E);
+            sheet.Unknown30 = s.UInt16("Unknown30", sheet.Unknown30);
+            sheet.Attributes.Intelligence = s.UInt16("Intelligence", sheet.Attributes.Intelligence);
+            sheet.Attributes.IntelligenceMax = s.UInt16("IntelligenceMax", sheet.Attributes.IntelligenceMax);
+            sheet.Unknown36 = s.UInt16("Unknown36", sheet.Unknown36);
+            sheet.Unknown38 = s.UInt16("Unknown38", sheet.Unknown38);
+            sheet.Attributes.Dexterity = s.UInt16("Dexterity", sheet.Attributes.Dexterity);
+            sheet.Attributes.DexterityMax = s.UInt16("DexterityMax", sheet.Attributes.DexterityMax);
+            sheet.Unknown3E = s.UInt16("Unknown3E", sheet.Unknown3E);
+            sheet.Unknown40 = s.UInt16("Unknown40", sheet.Unknown40);
+            sheet.Attributes.Speed = s.UInt16("Speed", sheet.Attributes.Speed);
+            sheet.Attributes.SpeedMax = s.UInt16("SpeedMax", sheet.Attributes.SpeedMax);
+            sheet.Unknown46 = s.UInt16("Unknown46", sheet.Unknown46);
+            sheet.Unknown48 = s.UInt16("Unknown48", sheet.Unknown48);
+            sheet.Attributes.Stamina = s.UInt16("Stamina", sheet.Attributes.Stamina);
+            sheet.Attributes.StaminaMax = s.UInt16("StaminaMax", sheet.Attributes.StaminaMax);
+            sheet.Unknown4E = s.UInt16("Unknown4E", sheet.Unknown4E);
+            sheet.Unknown50 = s.UInt16("Unknown50", sheet.Unknown50);
+            sheet.Attributes.Luck = s.UInt16("Luck", sheet.Attributes.Luck);
+            sheet.Attributes.LuckMax = s.UInt16("LuckMax", sheet.Attributes.LuckMax);
+            sheet.Unknown56 = s.UInt16("Unknown56", sheet.Unknown56);
+            sheet.Unknown58 = s.UInt16("Unknown58", sheet.Unknown58);
+            sheet.Attributes.MagicResistance = s.UInt16("MagicResistance", sheet.Attributes.MagicResistance);
+            sheet.Attributes.MagicResistanceMax = s.UInt16("MagicResistanceMax", sheet.Attributes.MagicResistanceMax);
+            sheet.Unknown5E = s.UInt16("Unknown5E", sheet.Unknown5E);
+            sheet.Unknown60 = s.UInt16("Unknown60", sheet.Unknown60);
+            sheet.Attributes.MagicTalent = s.UInt16("MagicTalent", sheet.Attributes.MagicTalent);
+            sheet.Attributes.MagicTalentMax = s.UInt16("MagicTalentMax", sheet.Attributes.MagicTalentMax);
+            sheet.Unknown66 = s.UInt16("Unknown66", sheet.Unknown66);
+            sheet.Unknown68 = s.UInt16("Unknown68", sheet.Unknown68);
             s.Check();
 
-            s.UInt16("Age", () => sheet.Age, x => sheet.Age = x);
-            s.ByteArray("UnknownBlock6C", () => sheet.UnknownBlock6C, x => sheet.UnknownBlock6C = x, 14);
-            s.UInt16("CloseCombat", () => sheet.Skills.CloseCombat, x => sheet.Skills.CloseCombat = x);
-            s.UInt16("CloseCombatMax", () => sheet.Skills.CloseCombatMax, x => sheet.Skills.CloseCombatMax = x);
-            s.UInt16("Unknown7E", () => sheet.Unknown7E, x => sheet.Unknown7E = x);
-            s.UInt16("Unknown80", () => sheet.Unknown80, x => sheet.Unknown80 = x);
-            s.UInt16("RangedCombat", () => sheet.Skills.RangedCombat, x => sheet.Skills.RangedCombat = x);
-            s.UInt16("RangedCombatMax", () => sheet.Skills.RangedCombatMax, x => sheet.Skills.RangedCombatMax = x);
-            s.UInt16("Unknown86", () => sheet.Unknown86, x => sheet.Unknown86 = x);
-            s.UInt16("Unknown88", () => sheet.Unknown88, x => sheet.Unknown88 = x);
-            s.UInt16("CriticalChance", () => sheet.Skills.CriticalChance, x => sheet.Skills.CriticalChance = x);
-            s.UInt16("CriticalChanceMax", () => sheet.Skills.CriticalChanceMax, x => sheet.Skills.CriticalChanceMax = x);
-            s.UInt16("Unknown8E", () => sheet.Unknown8E, x => sheet.Unknown8E = x);
-            s.UInt16("Unknown90", () => sheet.Unknown90, x => sheet.Unknown90 = x);
-            s.UInt16("LockPicking", () => sheet.Skills.LockPicking, x => sheet.Skills.LockPicking = x);
-            s.UInt16("LockPickingMax", () => sheet.Skills.LockPickingMax, x => sheet.Skills.LockPickingMax = x);
-            s.ByteArray("UnknownBlock96 ", () => sheet.UnknownBlock96, x => sheet.UnknownBlock96 = x, 52);
-            s.UInt16("LifePoints", () => sheet.Combat.LifePoints, x => sheet.Combat.LifePoints = x);
-            s.UInt16("LifePointsMax", () => sheet.Combat.LifePointsMax, x => sheet.Combat.LifePointsMax = x);
-            s.UInt16("UnknownCE", () => sheet.UnknownCE, x => sheet.UnknownCE = x);
-            s.UInt16("SpellPoints", () => sheet.Magic.SpellPoints, x => sheet.Magic.SpellPoints = x);
-            s.UInt16("SpellPointsMax", () => sheet.Magic.SpellPointsMax, x => sheet.Magic.SpellPointsMax = x);
-            s.UInt16("Protection", () => sheet.Combat.Protection, x => sheet.Combat.Protection = x);
-            s.UInt16("UnknownD6", () => sheet.UnknownD6, x => sheet.UnknownD6 = x);
-            s.UInt16("Damage", () => sheet.Combat.Damage, x => sheet.Combat.Damage = x);
-            s.ByteArray("UnknownBlockDA", () => sheet.UnknownBlockDA, x => sheet.UnknownBlockDA = x, 20);
-            s.UInt32("Experience", () => sheet.Combat.ExperiencePoints, x => sheet.Combat.ExperiencePoints = x); // EE
+            sheet.Age = s.UInt16("Age", sheet.Age);
+            sheet.UnknownBlock6C = s.ByteArray("UnknownBlock6C", sheet.UnknownBlock6C, 14);
+            sheet.Skills.CloseCombat = s.UInt16("CloseCombat", sheet.Skills.CloseCombat);
+            sheet.Skills.CloseCombatMax = s.UInt16("CloseCombatMax", sheet.Skills.CloseCombatMax);
+            sheet.Unknown7E = s.UInt16("Unknown7E", sheet.Unknown7E);
+            sheet.Unknown80 = s.UInt16("Unknown80", sheet.Unknown80);
+            sheet.Skills.RangedCombat = s.UInt16("RangedCombat", sheet.Skills.RangedCombat);
+            sheet.Skills.RangedCombatMax = s.UInt16("RangedCombatMax", sheet.Skills.RangedCombatMax);
+            sheet.Unknown86 = s.UInt16("Unknown86", sheet.Unknown86);
+            sheet.Unknown88 = s.UInt16("Unknown88", sheet.Unknown88);
+            sheet.Skills.CriticalChance = s.UInt16("CriticalChance", sheet.Skills.CriticalChance);
+            sheet.Skills.CriticalChanceMax = s.UInt16("CriticalChanceMax", sheet.Skills.CriticalChanceMax);
+            sheet.Unknown8E = s.UInt16("Unknown8E", sheet.Unknown8E);
+            sheet.Unknown90 = s.UInt16("Unknown90", sheet.Unknown90);
+            sheet.Skills.LockPicking = s.UInt16("LockPicking", sheet.Skills.LockPicking);
+            sheet.Skills.LockPickingMax = s.UInt16("LockPickingMax", sheet.Skills.LockPickingMax);
+            sheet.UnknownBlock96 = s.ByteArray("UnknownBlock96 ", sheet.UnknownBlock96, 52);
+            sheet.Combat.LifePoints = s.UInt16("LifePoints", sheet.Combat.LifePoints);
+            sheet.Combat.LifePointsMax = s.UInt16("LifePointsMax", sheet.Combat.LifePointsMax);
+            sheet.UnknownCE = s.UInt16("UnknownCE", sheet.UnknownCE);
+            sheet.Magic.SpellPoints = s.UInt16("SpellPoints", sheet.Magic.SpellPoints);
+            sheet.Magic.SpellPointsMax = s.UInt16("SpellPointsMax", sheet.Magic.SpellPointsMax);
+            sheet.Combat.Protection = s.UInt16("Protection", sheet.Combat.Protection);
+            sheet.UnknownD6 = s.UInt16("UnknownD6", sheet.UnknownD6);
+            sheet.Combat.Damage = s.UInt16("Damage", sheet.Combat.Damage);
+            sheet.UnknownBlockDA = s.ByteArray("UnknownBlockDA", sheet.UnknownBlockDA, 20);
+            sheet.Combat.ExperiencePoints = s.UInt32("Experience", sheet.Combat.ExperiencePoints);
             // e.g. 98406 = 0x18066 => 6680 0100 in file
             s.Check();
 
@@ -151,16 +149,16 @@ namespace UAlbion.Formats.Parsers
                 spellStrengthBytes = spellStrengths.Select(BitConverter.GetBytes).SelectMany(x => x).ToArray();
             }
 
-            s.ByteArray("KnownSpells", () => knownSpellBytes, x => knownSpellBytes = x, SpellSchoolCount * sizeof(uint));
+            knownSpellBytes = s.ByteArray("KnownSpells", knownSpellBytes, SpellSchoolCount * sizeof(uint));
             s.Check();
 
-            s.UInt16("UnknownFA", () => sheet.UnknownFA, x => sheet.UnknownFA = x);
-            s.UInt16("UnknownFC", () => sheet.UnknownFC, x => sheet.UnknownFC = x);
+            sheet.UnknownFA = s.UInt16("UnknownFA", sheet.UnknownFA);
+            sheet.UnknownFC = s.UInt16("UnknownFC", sheet.UnknownFC);
             s.Check();
 
-            s.FixedLengthString("GermanName", () => sheet.GermanName, x => sheet.GermanName = x, 16); // 112
-            s.FixedLengthString("EnglishName", () => sheet.EnglishName, x => sheet.EnglishName = x, 16);
-            s.FixedLengthString("FrenchName", () => sheet.FrenchName, x => sheet.FrenchName = x, 16);
+            sheet.GermanName = s.FixedLengthString("GermanName", sheet.GermanName, 16); // 112
+            sheet.EnglishName = s.FixedLengthString("EnglishName", sheet.EnglishName, 16);
+            sheet.FrenchName = s.FixedLengthString("FrenchName", sheet.FrenchName, 16);
             if (s.Mode == SerializerMode.Reading)
             {
                 if (sheet.EnglishName == "") sheet.EnglishName = sheet.GermanName;
@@ -169,10 +167,7 @@ namespace UAlbion.Formats.Parsers
 
             s.Check();
 
-            s.ByteArray("SpellStrength",
-                () => spellStrengthBytes,
-                x => spellStrengthBytes = x,
-                MaxSpellsPerSchool * SpellSchoolCount * sizeof(ushort));
+            spellStrengthBytes = s.ByteArray("SpellStrength", spellStrengthBytes, MaxSpellsPerSchool * SpellSchoolCount * sizeof(ushort));
 
             if (s.Mode == SerializerMode.Reading)
             {
@@ -202,36 +197,31 @@ namespace UAlbion.Formats.Parsers
                 }
             }
 
-            if (s.Offset - start >= length)
-                return;
+            if (s.IsComplete())
+                return sheet;
 
-            s.Meta("Neck", ItemSlotLoader.Read(x => sheet.Inventory.Neck = x), ItemSlotLoader.Write(sheet.Inventory.Neck));
-            s.Meta("Head", ItemSlotLoader.Read(x => sheet.Inventory.Head = x), ItemSlotLoader.Write(sheet.Inventory.Head));
-            s.Meta("Tail", ItemSlotLoader.Read(x => sheet.Inventory.Tail = x), ItemSlotLoader.Write(sheet.Inventory.Tail));
-            s.Meta("LeftHand", ItemSlotLoader.Read(x => sheet.Inventory.LeftHand = x), ItemSlotLoader.Write(sheet.Inventory.LeftHand));
-            s.Meta("Chest", ItemSlotLoader.Read(x => sheet.Inventory.Chest = x), ItemSlotLoader.Write(sheet.Inventory.Chest));
-            s.Meta("RightHand", ItemSlotLoader.Read(x => sheet.Inventory.RightHand = x), ItemSlotLoader.Write(sheet.Inventory.RightHand));
-            s.Meta("LeftFinger", ItemSlotLoader.Read(x => sheet.Inventory.LeftFinger = x), ItemSlotLoader.Write(sheet.Inventory.LeftFinger));
-            s.Meta("Feet", ItemSlotLoader.Read(x => sheet.Inventory.Feet = x), ItemSlotLoader.Write(sheet.Inventory.Feet));
-            s.Meta("RightFinger", ItemSlotLoader.Read(x => sheet.Inventory.RightFinger = x), ItemSlotLoader.Write(sheet.Inventory.RightFinger));
+            sheet.Inventory.Neck        = s.Meta("Neck",        sheet.Inventory.Neck,        ItemSlotLoader.Serdes);
+            sheet.Inventory.Head        = s.Meta("Head",        sheet.Inventory.Head,        ItemSlotLoader.Serdes);
+            sheet.Inventory.Tail        = s.Meta("Tail",        sheet.Inventory.Tail,        ItemSlotLoader.Serdes);
+            sheet.Inventory.LeftHand    = s.Meta("LeftHand",    sheet.Inventory.LeftHand,    ItemSlotLoader.Serdes);
+            sheet.Inventory.Chest       = s.Meta("Chest",       sheet.Inventory.Chest,       ItemSlotLoader.Serdes);
+            sheet.Inventory.RightHand   = s.Meta("RightHand",   sheet.Inventory.RightHand,   ItemSlotLoader.Serdes);
+            sheet.Inventory.LeftFinger  = s.Meta("LeftFinger",  sheet.Inventory.LeftFinger,  ItemSlotLoader.Serdes);
+            sheet.Inventory.Feet        = s.Meta("Feet",        sheet.Inventory.Feet,        ItemSlotLoader.Serdes);
+            sheet.Inventory.RightFinger = s.Meta("RightFinger", sheet.Inventory.RightFinger, ItemSlotLoader.Serdes);
 
-            if (sheet.Inventory.Slots == null)
-                sheet.Inventory.Slots = new ItemSlot[24];
-
+            sheet.Inventory.Slots ??= new ItemSlot[24];
             for (int i = 0; i < 24; i++)
-            {
-                s.Meta($"Slot{i}",
-                    ItemSlotLoader.Read(x => sheet.Inventory.Slots[i] = x),
-                    ItemSlotLoader.Write(sheet.Inventory.Slots[i]));
-            }
+                sheet.Inventory.Slots[i] = s.Meta($"Slot{i}", sheet.Inventory.Slots[i], ItemSlotLoader.Serdes);
 
             // 0x384 == 0n900 ???? should be 940
+            return sheet;
         }
 
         public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
-            var sheet = new CharacterSheet { Name = name };
-            Translate(sheet, new GenericBinaryReader(br, streamLength), streamLength);
+            var sheet = Serdes(null, new GenericBinaryReader(br, streamLength));
+            sheet.Name = name;
             return sheet;
         }
     }

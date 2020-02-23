@@ -4,7 +4,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class CreateTransportEvent : IMapEvent
     {
-        public static CreateTransportEvent Translate(CreateTransportEvent node, ISerializer s)
+        public static CreateTransportEvent Serdes(CreateTransportEvent node, ISerializer s)
         {
             node ??= new CreateTransportEvent();
             s.Dynamic(node, nameof(Unk1));

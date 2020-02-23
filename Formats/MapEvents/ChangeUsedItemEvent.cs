@@ -4,7 +4,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class ChangeUsedItemEvent : IMapEvent
     {
-        public static ChangeUsedItemEvent Translate(ChangeUsedItemEvent node, ISerializer s)
+        public static ChangeUsedItemEvent Serdes(ChangeUsedItemEvent node, ISerializer s)
         {
             node ??= new ChangeUsedItemEvent();
             s.Dynamic(node, nameof(Unk1));

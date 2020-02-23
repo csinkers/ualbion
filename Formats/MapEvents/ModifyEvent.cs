@@ -5,11 +5,9 @@ namespace UAlbion.Formats.MapEvents
 {
     public abstract class ModifyEvent : IMapEvent
     {
-        public static ModifyEvent Translate(ModifyEvent genericEvent, ISerializer s)
+        public static ModifyEvent Serdes(ModifyEvent genericEvent, ISerializer s)
         {
-            var subType = genericEvent?.SubType ?? ModifyType.Unk2;
-            s.EnumU8(nameof(subType), () => subType, x => subType = x, x => ((byte)x, x.ToString()));
-
+            var subType = s.EnumU8("SubType", genericEvent?.SubType ?? ModifyType.Unk2);
             switch (subType)
             {
                 case ModifyType.SetTemporarySwitch:     return SetTemporarySwitchEvent.Translate((SetTemporarySwitchEvent)genericEvent, s);

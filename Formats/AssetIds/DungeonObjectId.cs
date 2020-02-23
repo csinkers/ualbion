@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum DungeonObjectId
+    public enum DungeonObjectId  
     {
         LightCover = 0,
         Pylon = 1,

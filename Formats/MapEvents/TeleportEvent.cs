@@ -6,7 +6,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class TeleportEvent : IMapEvent
     {
-        public static TeleportEvent Translate(TeleportEvent e, ISerializer s)
+        public static TeleportEvent Serdes(TeleportEvent e, ISerializer s)
         {
             e ??= new TeleportEvent();
             s.Dynamic(e, nameof(X));
@@ -14,9 +14,7 @@ namespace UAlbion.Formats.MapEvents
             s.Dynamic(e, nameof(Direction));
             s.Dynamic(e, nameof(Unk4));
             s.Dynamic(e, nameof(Unk5));
-            s.UInt16(nameof(MapId),
-                () => (ushort)e.MapId,
-                x => e.MapId = (MapDataId)x);
+            e.MapId = s.EnumU16(nameof(MapId), e.MapId);
             s.Dynamic(e, nameof(Unk8));
             Debug.Assert(e.Unk4 == 0
                          || e.Unk4 == 1

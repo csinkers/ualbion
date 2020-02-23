@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum SongId
+    public enum SongId : byte
     {
         SomewhatMenacing = 0,
         DrumsMarkTreeAndFlute = 1,

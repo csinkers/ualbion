@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum WaveLibraryId
+    public enum WaveLibraryId : byte
     {
         Unknown0 = 0,
         Unknown1 = 1,

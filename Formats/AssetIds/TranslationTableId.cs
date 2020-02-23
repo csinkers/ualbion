@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum TranslationTableId
+    public enum TranslationTableId : byte
     {
         Unknown0 = 0,
         Unknown1 = 1,

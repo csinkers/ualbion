@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum SlabId
+    public enum SlabId : byte
     {
         SLAB = 0,
     }

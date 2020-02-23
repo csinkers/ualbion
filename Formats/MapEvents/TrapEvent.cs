@@ -6,7 +6,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class TrapEvent : IMapEvent
     {
-        public static TrapEvent Translate(TrapEvent node, ISerializer s)
+        public static TrapEvent Serdes(TrapEvent node, ISerializer s)
         {
             node ??= new TrapEvent();
             s.Dynamic(node, nameof(Unk1));

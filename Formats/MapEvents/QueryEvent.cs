@@ -5,10 +5,9 @@ namespace UAlbion.Formats.MapEvents
 {
     public class QueryEvent : IQueryEvent
     {
-        public static IQueryEvent Translate(IQueryEvent genericEvent, ISerializer s)
+        public static IQueryEvent Serdes(IQueryEvent genericEvent, ISerializer s)
         {
-            var subType = genericEvent?.QueryType ?? QueryType.IsScriptDebugModeActive;
-            s.EnumU8(nameof(subType), () => subType, x => subType = x, x => ((byte)x, x.ToString()));
+            var subType = s.EnumU8("SubType", genericEvent?.QueryType ?? QueryType.IsScriptDebugModeActive);
             switch (subType)
             {
                 case QueryType.InventoryHasItem:
@@ -33,9 +32,7 @@ namespace UAlbion.Formats.MapEvents
             s.Dynamic(e, nameof(Unk4));
             s.Dynamic(e, nameof(Unk5));
             s.Dynamic(e, nameof(Argument));
-            s.UInt16(nameof(FalseEventId),
-                () => e.FalseEventId ?? 0xffff,
-                x => e.FalseEventId = x == 0xffff ? (ushort?)null : x);
+            e.FalseEventId = ConvertMaxToNull.Serdes(nameof(FalseEventId), e.FalseEventId, s.UInt16);
 
             Debug.Assert(e.Unk4 == 0);
             Debug.Assert(e.Unk5 == 0);

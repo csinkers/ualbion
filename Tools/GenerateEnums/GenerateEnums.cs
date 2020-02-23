@@ -18,6 +18,7 @@ namespace GenerateEnums
     public class EnumData
     {
         public string Name { get; set; }
+        public string Type { get; set; }
         public IList<EnumEntry> Entries { get; } = new List<EnumEntry>();
     }
 
@@ -63,12 +64,16 @@ namespace GenerateEnums
                     offset = 100 * int.Parse(match.Groups[1].Value);
 
                 if (!enums.ContainsKey(xld.EnumName))
-                    enums[xld.EnumName] = new EnumData { Name = xld.EnumName };
+                    enums[xld.EnumName] = new EnumData { Name = xld.EnumName, Type = xld.EnumType};
                 var e = enums[xld.EnumName];
 
                 foreach (var o in xld.Assets.Values.OrderBy(x => x.Id))
                 {
                     var id = offset + o.Id;
+
+                    if (e.Type == "byte" && id > 0xff)
+                        continue;
+
                     e.Entries.Add(string.IsNullOrEmpty(o.Name)
                         ? new EnumEntry { Name = $"Unknown{id}", Value = id }
                         : new EnumEntry { Name = Sanitise(o.Name), Value = id });
@@ -76,14 +81,14 @@ namespace GenerateEnums
             }
 
             ItemConfig itemConfig = ItemConfig.Load(baseDir);
-            enums["ItemId"] = new EnumData { Name = "ItemId" };
+            enums["ItemId"] = new EnumData { Name = "ItemId", Type = "ushort" };
             foreach (var item in itemConfig.Items)
                 enums["ItemId"].Entries.Add(string.IsNullOrEmpty(item.Value.Name)
                     ? new EnumEntry { Name = $"Unknown{item.Key}", Value = item.Key }
                     : new EnumEntry { Name = Sanitise(item.Value.Name), Value= item.Key});
 
             CoreSpriteConfig coreSpriteConfig = CoreSpriteConfig.Load(baseDir);
-            enums["CoreSpriteId"] = new EnumData { Name = "CoreSpriteId" };
+            enums["CoreSpriteId"] = new EnumData { Name = "CoreSpriteId", Type = "byte" };
             foreach (var item in coreSpriteConfig.CoreSpriteIds)
                 enums["CoreSpriteId"].Entries.Add(new EnumEntry { Name = Sanitise(item.Value), Value = item.Key });
 
@@ -113,7 +118,7 @@ $@"// Note: This file was automatically generated using Tools/GenerateEnums.
 
 namespace UAlbion.Formats.AssetIds
 {{
-    public enum {e.Name}
+    public enum {e.Name} {(e.Type != null ? ":" : "")} {e.Type}
     {{
 " +
                 string.Join(Environment.NewLine, e.Entries.Select(x => $"        {x.Name} = {x.Value},"))

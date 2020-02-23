@@ -4,7 +4,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class AskSurrenderEvent : IMapEvent
     {
-        public static AskSurrenderEvent Translate(AskSurrenderEvent node, ISerializer s)
+        public static AskSurrenderEvent Serdes(AskSurrenderEvent node, ISerializer s)
         {
             node ??= new AskSurrenderEvent();
             s.Dynamic(node, nameof(Unk1));

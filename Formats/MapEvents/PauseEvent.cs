@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class PauseEvent : IMapEvent
     {
-        public static PauseEvent Translate(PauseEvent e, ISerializer s)
+        public static PauseEvent Serdes(PauseEvent e, ISerializer s)
         {
             e ??= new PauseEvent();
             s.Dynamic(e, nameof(Length));

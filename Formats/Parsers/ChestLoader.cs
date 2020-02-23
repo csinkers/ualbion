@@ -11,13 +11,13 @@ namespace UAlbion.Formats.Parsers
         {
             var start = s.Offset;
             for (int i = 0; i < Chest.SlotCount; i++)
-                s.Meta($"Slot{i}", ItemSlotLoader.Read(x => chest.Slots[i] = x), ItemSlotLoader.Write(chest.Slots[i]));
+                chest.Slots[i] = s.Meta($"Slot{i}", chest.Slots[i], ItemSlotLoader.Serdes);
 
             if (s.Offset - start >= length) // If it's a merchant record then we're all done
                 return;
 
-            s.UInt16("Gold", () => chest.Gold, x => chest.Gold = x);
-            s.UInt16("Rations", () => chest.Rations, x => chest.Rations = x);
+            chest.Gold = s.UInt16("Gold", chest.Gold);
+            chest.Rations = s.UInt16("Rations", chest.Rations);
         }
 
         public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)

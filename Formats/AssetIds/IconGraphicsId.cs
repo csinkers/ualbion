@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum IconGraphicsId
+    public enum IconGraphicsId : ushort
     {
         Outdoors1 = 0,
         Outdoors2 = 1,

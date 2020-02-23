@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum TacticalGraphicsId
+    public enum TacticalGraphicsId : byte
     {
         Unknown0 = 0,
         Unknown1 = 1,

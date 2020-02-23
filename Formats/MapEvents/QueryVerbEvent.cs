@@ -24,12 +24,8 @@ namespace UAlbion.Formats.MapEvents
             s.Dynamic(e, nameof(Unk3));
             s.Dynamic(e, nameof(Unk4));
             s.Dynamic(e, nameof(Unk5));
-            s.EnumU16(nameof(Verb), () => e.Verb, x => e.Verb = x, x => ((ushort)x, x.ToString()));
-
-            s.UInt16(nameof(FalseEventId),
-                () => e.FalseEventId ?? 0xffff,
-                x => e.FalseEventId = x == 0xffff ? (ushort?)null : x);
-
+            e.Verb = s.EnumU16(nameof(Verb), e.Verb);
+            e.FalseEventId = ConvertMaxToNull.Serdes(nameof(FalseEventId), e.FalseEventId, s.UInt16);
             return e;
         }
 

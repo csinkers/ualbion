@@ -6,7 +6,7 @@ namespace UAlbion.Formats.MapEvents
     [Api.Event("text")]
     public class TextEvent : IMapEvent
     {
-        public static TextEvent Translate(TextEvent node, ISerializer s)
+        public static TextEvent Serdes(TextEvent node, ISerializer s)
         {
             node ??= new TextEvent();
             s.Dynamic(node, nameof(TextType));

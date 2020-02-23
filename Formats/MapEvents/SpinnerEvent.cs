@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class SpinnerEvent : IMapEvent
     {
-        public static SpinnerEvent Translate(SpinnerEvent e, ISerializer s)
+        public static SpinnerEvent Serdes(SpinnerEvent e, ISerializer s)
         {
             e ??= new SpinnerEvent();
             s.Dynamic(e, nameof(Unk1));

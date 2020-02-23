@@ -7,111 +7,7 @@ namespace UAlbion.Formats.Parsers
 {
     class AnnotatedFormatWriter : ISerializer
     {
-        public AnnotatedFormatWriter(TextWriter textWriter)
-        {
-            tw = textWriter;
-        }
-
-        readonly TextWriter tw;
-        int indent = 0;
-        void doIndent() => tw.Write(new string(' ', indent));
-
-        public SerializerMode Mode => SerializerMode.WritingAnnotated;
-        public void Comment(string msg) { doIndent(); tw.WriteLine("// {0}", msg); }
-        public void Indent() => indent += 4;
-        public void Unindent() => indent -= 4;
-        public void NewLine() => tw.WriteLine();
-        public long Offset { get; private set; }
-
-        public void Seek(long newOffset) { tw.WriteLine("Seek to {0} for overwrite", newOffset); Offset = newOffset; }
-
-        public void Int8(string name, Func<sbyte> getter, Action<sbyte> setter)
-        {
-            doIndent();
-            tw.WriteLine("{0:X} {1} = {2} (0x{2:X} y)", Offset, name, getter());
-            Offset += 1L;
-        }
-        public void Int16(string name, Func<short> getter, Action<short> setter)
-        {
-            doIndent();
-            tw.WriteLine("{0:X} {1} = {2} (0x{2:X} s)", Offset, name, getter());
-            Offset += 2L;
-        }
-        public void Int32(string name, Func<int> getter, Action<int> setter)
-        {
-            doIndent();
-            tw.WriteLine("{0:X} {1} = {2} (0x{2:X})", Offset, name, getter());
-            Offset += 4L;
-        }
-        public void Int64(string name, Func<long> getter, Action<long> setter)
-        {
-            doIndent();
-            tw.WriteLine("{0:X} {1} = {2} (0x{2:X} L)", Offset, name, getter());
-            Offset += 8L;
-        }
-
-        public void UInt8(string name, Func<byte> getter, Action<byte> setter)
-        {
-            doIndent();
-            tw.WriteLine("{0:X} {1} = {2} (0x{2:X} uy)", Offset, name, getter());
-            Offset += 1L;
-        }
-        public void UInt16(string name, Func<ushort> getter, Action<ushort> setter)
-        {
-            doIndent();
-            tw.WriteLine("{0:X} {1} = {2} (0x{2:X} us)", Offset, name, getter());
-            Offset += 2L;
-        }
-        public void UInt32(string name, Func<uint> getter, Action<uint> setter)
-        {
-            doIndent();
-            tw.WriteLine("{0:X} {1} = {2} (0x{2:X} u)", Offset, name, getter());
-            Offset += 4L;
-        }
-        public void UInt64(string name, Func<ulong> getter, Action<ulong> setter)
-        {
-            var v = getter();
-            doIndent();
-            tw.WriteLine("{0:X} {1} = 0x{2:X}`{3:X8} UL ({4})", Offset, name, (v & 0xffffffff00000000UL) >> 32, v & 0xffffffffUL, v);
-            Offset += 8L;
-        }
-
-        public void EnumU8<T>(string name, Func<T> getter, Action<T> setter, Func<T, (byte, string)> infoFunc) where T : Enum
-        {
-            var v = getter();
-            var (value, label) = infoFunc(v);
-            doIndent();
-            tw.WriteLine("{0:X} {1} = {2} (0x{2:X} uy) // {3}", Offset, name, value, label);
-            Offset += 1L;
-        }
-
-        public void EnumU16<T>(string name, Func<T> getter, Action<T> setter, Func<T, (ushort, string)> infoFunc) where T : Enum
-        {
-            var v = getter();
-            var (value, label) = infoFunc(v);
-            doIndent();
-            tw.WriteLine("{0:X} {1} = {2} (0x{2:X} us) // {3}", Offset, name, value, label);
-            Offset += 2L;
-        }
-
-        public void EnumU32<T>(string name, Func<T> getter, Action<T> setter, Func<T, (uint, string)> infoFunc) where T : Enum
-        {
-            var v = getter();
-            var (value, label) = infoFunc(v);
-            doIndent();
-            tw.WriteLine("{0:X} {1} = {2} (0x{2:X} u) // {3}", Offset, name, value, label);
-            Offset += 4L;
-        }
-
-        public void Guid(string name, Func<Guid> getter, Action<Guid> setter)
-        {
-            var v = getter();
-            doIndent();
-            tw.WriteLine("{0:X} {1} = {2:B}", Offset, name, v);
-            Offset += 16L;
-        }
-
-        static readonly string[] hexStringTable =
+        static readonly string[] HexStringTable =
         {
             "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0A", "0B", "0C", "0D", "0E", "0F",
             "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "1A", "1B", "1C", "1D", "1E", "1F",
@@ -131,35 +27,153 @@ namespace UAlbion.Formats.Parsers
             "F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "FA", "FB", "FC", "FD", "FE", "FF"
         };
 
+        public AnnotatedFormatWriter(TextWriter textWriter)
+        {
+            _tw = textWriter;
+        }
+
+        readonly TextWriter _tw;
+        int _indent = 0;
+        void DoIndent() => _tw.Write(new string(' ', _indent));
+
+        public SerializerMode Mode => SerializerMode.WritingAnnotated;
+        public void Comment(string msg) { DoIndent(); _tw.WriteLine("// {0}", msg); }
+        public void Indent() => _indent += 4;
+        public void Unindent() => _indent -= 4;
+        public void NewLine() => _tw.WriteLine();
+        public long Offset { get; private set; }
+
+        public void Seek(long newOffset) { _tw.WriteLine("Seek to {0} for overwrite", newOffset); Offset = newOffset; }
+
+        public sbyte Int8(string name, sbyte existing)
+        {
+            DoIndent();
+            _tw.WriteLine("{0:X} {1} = {2} (0x{2:X} y)", Offset, name, existing);
+            Offset += 1L;
+            return existing;
+        }
+        public short Int16(string name, short existing)
+        {
+            DoIndent();
+            _tw.WriteLine("{0:X} {1} = {2} (0x{2:X} s)", Offset, name, existing);
+            Offset += 2L;
+            return existing;
+        }
+        public int Int32(string name, int existing)
+        {
+            DoIndent();
+            _tw.WriteLine("{0:X} {1} = {2} (0x{2:X})", Offset, name, existing);
+            Offset += 4L;
+            return existing;
+        }
+        public long Int64(string name, long existing)
+        {
+            DoIndent();
+            _tw.WriteLine("{0:X} {1} = {2} (0x{2:X} L)", Offset, name, existing);
+            Offset += 8L;
+            return existing;
+        }
+
+        public byte UInt8(string name, byte existing)
+        {
+            DoIndent();
+            _tw.WriteLine("{0:X} {1} = {2} (0x{2:X} uy)", Offset, name, existing);
+            Offset += 1L;
+            return existing;
+        }
+        public ushort UInt16(string name, ushort existing)
+        {
+            DoIndent();
+            _tw.WriteLine("{0:X} {1} = {2} (0x{2:X} us)", Offset, name, existing);
+            Offset += 2L;
+            return existing;
+        }
+        public uint UInt32(string name, uint existing)
+        {
+            DoIndent();
+            _tw.WriteLine("{0:X} {1} = {2} (0x{2:X} u)", Offset, name, existing);
+            Offset += 4L;
+            return existing;
+        }
+        public ulong UInt64(string name, ulong existing)
+        {
+            var v = existing;
+            DoIndent();
+            _tw.WriteLine("{0:X} {1} = 0x{2:X}`{3:X8} UL ({4})", Offset, name, (v & 0xffffffff00000000UL) >> 32, v & 0xffffffffUL, v);
+            Offset += 8L;
+            return existing;
+        }
+
+        public T EnumU8<T>(string name, T existing) where T : struct, Enum
+        {
+            var label = Enum.GetName(typeof(T), existing);
+            var value = (byte)(object)existing;
+            DoIndent();
+            _tw.WriteLine("{0:X} {1} = {2} (0x{2:X} uy) // {3}", Offset, name, value, label);
+            Offset += 1L;
+            return existing;
+        }
+
+        public T EnumU16<T>(string name, T existing) where T : struct, Enum
+        {
+            var label = Enum.GetName(typeof(T), existing);
+            var value = (ushort)(object)existing;
+            DoIndent();
+            _tw.WriteLine("{0:X} {1} = {2} (0x{2:X} us) // {3}", Offset, name, value, label);
+            Offset += 2L;
+            return existing;
+        }
+
+        public T EnumU32<T>(string name, T existing) where T : struct, Enum
+        {
+            var label = Enum.GetName(typeof(T), existing);
+            var value = (uint)(object)existing;
+            DoIndent();
+            _tw.WriteLine("{0:X} {1} = {2} (0x{2:X} u) // {3}", Offset, name, value, label);
+            Offset += 4L;
+            return existing;
+        }
+
+        public Guid Guid(string name, Guid existing)
+        {
+            var v = existing;
+            DoIndent();
+            _tw.WriteLine("{0:X} {1} = {2:B}", Offset, name, v);
+            Offset += 16L;
+            return existing;
+        }
+
         static string ConvertToHexString(byte[] bytes)
         {
             var result = new System.Text.StringBuilder(bytes.Length * 2);
             foreach (var b in bytes)
-                result.Append(hexStringTable[b]);
+                result.Append(HexStringTable[b]);
             return result.ToString();
         }
 
-        public void ByteArray(string name, Func<byte[]> getter, Action<byte[]> setter, int n)
+        public byte[] ByteArray(string name, byte[] existing, int n)
         {
-            var v = getter();
-            doIndent();
-            tw.WriteLine("{0:X} {1} = {2}", Offset, name, ConvertToHexString(v));
+            var v = existing;
+            DoIndent();
+            _tw.WriteLine("{0:X} {1} = {2}", Offset, name, ConvertToHexString(v));
             Offset += v.Length;
+            return existing;
         }
 
-        public void ByteArray2(string name, Func<byte[]> getter, Action<byte[]> setter, int n, string comment)
+        public byte[] ByteArray2(string name, byte[] existing, int n, string comment)
         {
-            var v = getter();
-            doIndent();
-            tw.WriteLine("{0:X} {1} = {2}", Offset, name, comment);
+            var v = existing;
+            DoIndent();
+            _tw.WriteLine("{0:X} {1} = {2}", Offset, name, comment);
             Offset += v.Length;
+            return existing;
         }
 
-        public void ByteArrayHex(string name, Func<byte[]> getter, Action<byte[]> setter, int n)
+        public byte[] ByteArrayHex(string name, byte[] existing, int n)
         {
-            var v = getter();
-            doIndent();
-            tw.Write("{0:X} {1} = ", Offset, name);
+            var v = existing;
+            DoIndent();
+            _tw.Write("{0:X} {1} = ", Offset, name);
 
             Indent();
             var payloadOffset = 0;
@@ -168,17 +182,17 @@ namespace UAlbion.Formats.Parsers
             {
                 if (payloadOffset % 16 == 0)
                 {
-                    tw.Write(' ');
-                    tw.Write(sb.ToString());
+                    _tw.Write(' ');
+                    _tw.Write(sb.ToString());
                     sb.Clear();
-                    tw.WriteLine();
-                    doIndent();
-                    tw.Write("{0:X4}: ", payloadOffset);
+                    _tw.WriteLine();
+                    DoIndent();
+                    _tw.Write("{0:X4}: ", payloadOffset);
                 }
-                else if (payloadOffset % 8 == 0) tw.Write('-');
-                else if (payloadOffset % 2 == 0) tw.Write(' ');
+                else if (payloadOffset % 8 == 0) _tw.Write('-');
+                else if (payloadOffset % 2 == 0) _tw.Write(' ');
 
-                tw.Write("{0:X2}", b);
+                _tw.Write("{0:X2}", b);
 
                 if (b >= (byte)' ' && b <= 0x7e) sb.Append(Convert.ToChar(b));
                 else sb.Append('.');
@@ -190,41 +204,44 @@ namespace UAlbion.Formats.Parsers
             {
                 var missingChars = 16 - sb.Length;
                 var spaceCount = missingChars * 2 + missingChars / 2 + 1;
-                tw.Write(Enumerable.Repeat(' ', spaceCount));
-                tw.Write(sb.ToString());
+                _tw.Write(Enumerable.Repeat(' ', spaceCount));
+                _tw.Write(sb.ToString());
             }
 
-            tw.WriteLine();
+            _tw.WriteLine();
             Unindent();
             Offset += v.Length;
+            return existing;
         }
 
-        public void NullTerminatedString(string name, Func<string> getter, Action<string> setter)
+        public string NullTerminatedString(string name, string existing)
         {
-            var v = getter();
-            doIndent();
-            tw.Write("{0:X} {1} = {2}", Offset, name, v);
+            var v = existing;
+            DoIndent();
+            _tw.Write("{0:X} {1} = {2}", Offset, name, v);
 
             var bytes = System.Text.Encoding.Unicode.GetBytes(v);
             Offset += bytes.Length + 2; // add 2 bytes for the null terminator
+            return existing;
         }
 
-        public void FixedLengthString(string name, Func<string> getter, Action<string> setter, int length)
+        public string FixedLengthString(string name, string existing, int length)
         {
-            var v = getter();
-            doIndent();
-            tw.Write("{0:X} {1} = {2}", Offset, name, v);
+            var v = existing;
+            DoIndent();
+            _tw.Write("{0:X} {1} = {2}", Offset, name, v);
 
             var bytes = System.Text.Encoding.Unicode.GetBytes(v);
             if (bytes.Length > length + 2) throw new InvalidOperationException("Tried to write overlength string");
 
             Offset += length; // add 2 bytes for the null terminator
+            return existing;
         }
 
         public void RepeatU8(string name, byte v, int length)
         {
-            doIndent();
-            tw.WriteLine(
+            DoIndent();
+            _tw.WriteLine(
                 "{0:X} {1} = [{2} bytes (0x{2:X}) of 0x{3:X}]",
                 Offset,
                 name,
@@ -234,46 +251,68 @@ namespace UAlbion.Formats.Parsers
             Offset += length;
         }
 
+        public TMemory Transform<TPersistent, TMemory>(string name, TMemory existing, Func<string, TPersistent, TPersistent> serializer, IConverter<TPersistent, TMemory> converter) =>
+            converter.ToMemory(serializer(name, converter.ToPersistent(existing)));
+
         public void Meta(string name, Action<ISerializer> serializer, Action<ISerializer> deserializer)
         {
-            indent += 4;
-            doIndent();
-            tw.WriteLine("// {0}", name);
+            _indent += 4;
+            DoIndent();
+            _tw.WriteLine("// {0}", name);
             serializer(this);
-            indent -= 4;
+            _indent -= 4;
         }
+
+        public T Meta<T>(string name, T existing, Func<int, T, ISerializer, T> serdes)
+        {
+            _indent += 4;
+            DoIndent();
+            _tw.WriteLine("// {0}", name);
+            var result = serdes(0, existing, this);
+            _indent -= 4;
+            return result;
+        }
+
         public void Check() { }
-        public void CheckEntireLengthRead() { }
+        public bool IsComplete() => false;
 
         public void Dynamic<TTarget>(TTarget target, string propertyName)
         {
             var serializer = SerializationInfo.Get<TTarget>(propertyName);
             switch (serializer)
             {
-                case SerializationInfo<TTarget, byte>   s: UInt8( s.Name, () => s.Getter(target), x => s.Setter(target, x)); break;
-                case SerializationInfo<TTarget, sbyte>  s:  Int8( s.Name, () => s.Getter(target), x => s.Setter(target, x)); break;
-                case SerializationInfo<TTarget, ushort> s: UInt16(s.Name, () => s.Getter(target), x => s.Setter(target, x)); break;
-                case SerializationInfo<TTarget, short>  s:  Int16(s.Name, () => s.Getter(target), x => s.Setter(target, x)); break;
-                case SerializationInfo<TTarget, uint>   s: UInt32(s.Name, () => s.Getter(target), x => s.Setter(target, x)); break;
-                case SerializationInfo<TTarget, int>    s:  Int32(s.Name, () => s.Getter(target), x => s.Setter(target, x)); break;
-                case SerializationInfo<TTarget, ulong>  s: UInt64(s.Name, () => s.Getter(target), x => s.Setter(target, x)); break;
-                case SerializationInfo<TTarget, long>   s:  Int64(s.Name, () => s.Getter(target), x => s.Setter(target, x)); break;
+                case SerializationInfo<TTarget, byte>   s: UInt8( s.Name, s.Getter(target)); break;
+                case SerializationInfo<TTarget, sbyte>  s:  Int8( s.Name, s.Getter(target)); break;
+                case SerializationInfo<TTarget, ushort> s: UInt16(s.Name, s.Getter(target)); break;
+                case SerializationInfo<TTarget, short>  s:  Int16(s.Name, s.Getter(target)); break;
+                case SerializationInfo<TTarget, uint>   s: UInt32(s.Name, s.Getter(target)); break;
+                case SerializationInfo<TTarget, int>    s:  Int32(s.Name, s.Getter(target)); break;
+                case SerializationInfo<TTarget, ulong>  s: UInt64(s.Name, s.Getter(target)); break;
+                case SerializationInfo<TTarget, long>   s:  Int64(s.Name, s.Getter(target)); break;
                 default: throw new InvalidOperationException($"Tried to serialize unexpected type {serializer.Type}");
             }
         }
 
-        public void List<TTarget>(IList<TTarget> list, int count, Action<TTarget, ISerializer> serializer, Func<TTarget> constructor)
+        public void List<TTarget>(IList<TTarget> list, int count, Func<int, TTarget, ISerializer, TTarget> serializer) where TTarget : class
         {
-            indent += 4;
-            doIndent();
-            tw.Write("[ ");
+            _indent += 4;
+            DoIndent();
+            _tw.Write("[ ");
             for (int i = 0; i < count; i++)
-            {
-                var og = list[i];
-                serializer(og, this);
-            }
-            tw.Write(" ]");
-            indent -= 4;
+                serializer(i, list[i], this);
+            _tw.Write(" ]");
+            _indent -= 4;
+        }
+
+        public void List<TTarget>(IList<TTarget> list, int count, int offset, Func<int, TTarget, ISerializer, TTarget> serializer) where TTarget : class
+        {
+            _indent += 4;
+            DoIndent();
+            _tw.Write("[ ");
+            for (int i = offset; i < offset + count; i++)
+                serializer(i, list[i], this);
+            _tw.Write(" ]");
+            _indent -= 4;
         }
     }
 }

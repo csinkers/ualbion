@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum FullBodyPictureId
+    public enum FullBodyPictureId : byte
     {
         Tom = 0,
         Rainer = 1,

@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum DungeonBackgroundId
+    public enum DungeonBackgroundId : byte
     {
         EarlyGameS = 0,
         EarlyGameL = 1,

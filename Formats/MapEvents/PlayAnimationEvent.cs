@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class PlayAnimationEvent : IMapEvent
     {
-        public static PlayAnimationEvent Translate(PlayAnimationEvent node, ISerializer s)
+        public static PlayAnimationEvent Serdes(PlayAnimationEvent node, ISerializer s)
         {
             node ??= new PlayAnimationEvent();
             s.Dynamic(node, nameof(Unk1));

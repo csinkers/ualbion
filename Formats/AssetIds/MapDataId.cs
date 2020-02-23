@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum MapDataId
+    public enum MapDataId : ushort
     {
         TestMapIskai = 100,
         TestMapToronto1 = 101,

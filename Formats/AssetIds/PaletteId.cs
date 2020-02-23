@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum PaletteId
+    public enum PaletteId : byte
     {
         FirstIslandDay = 0,
         SecondIslandDay = 1,

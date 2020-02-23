@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum ChestId
+    public enum ChestId : ushort
     {
         Unknown0 = 0,
         Unknown1 = 1,

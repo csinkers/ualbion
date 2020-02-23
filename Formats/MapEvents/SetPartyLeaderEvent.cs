@@ -12,9 +12,7 @@ namespace UAlbion.Formats.MapEvents
             s.Dynamic(e, nameof(Unk3));
             s.Dynamic(e, nameof(Unk4));
             s.Dynamic(e, nameof(Unk5));
-            s.UInt16(nameof(PartyMemberId),
-                () => (ushort)e.PartyMemberId,
-                x => e.PartyMemberId = (PartyCharacterId)x);
+            e.PartyMemberId = (PartyCharacterId)s.UInt16(nameof(PartyMemberId), (ushort)e.PartyMemberId);
             s.Dynamic(e, nameof(Unk8));
             return e;
         }

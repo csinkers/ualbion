@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum SmallPortraitId
+    public enum SmallPortraitId : byte
     {
         Tom = 0,
         Rainer = 1,

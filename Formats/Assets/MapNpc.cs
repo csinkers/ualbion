@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets
 {
@@ -49,6 +51,20 @@ namespace UAlbion.Formats.Assets
         public Waypoint[] Waypoints { get; set; }
         public IEventNode EventChain { get; set; }
 
+        public static MapNpc Serdes(MapNpc existing, ISerializer s)
+        {
+            var npc = existing ?? new MapNpc();
+            s.Dynamic(npc, nameof(Id));
+            s.Dynamic(npc, nameof(Sound));
+            s.Dynamic(npc, nameof(EventNumber)); // max => null
+            s.Dynamic(npc, nameof(ObjectNumber)); // tweak
+            s.Dynamic(npc, nameof(Flags));
+            s.Dynamic(npc, nameof(Movement));
+            s.Dynamic(npc, nameof(Unk8));
+            s.Dynamic(npc, nameof(Unk9));
+            return npc;
+        }
+
         public static MapNpc Load(BinaryReader br)
         {
             var npc = new MapNpc();
@@ -63,6 +79,26 @@ namespace UAlbion.Formats.Assets
             npc.Unk8 = br.ReadByte(); // +8
             npc.Unk9 = br.ReadByte(); // +9
             return npc;
+        }
+
+        public void LoadWaypoints(ISerializer s)
+        {
+            if ((Movement & MovementType.RandomMask) != 0)
+            {
+                var wp = Waypoints?.FirstOrDefault() ?? new Waypoint();
+                wp.X = s.UInt8("X", wp.X);
+                wp.Y = s.UInt8("Y", wp.Y);
+                Waypoints = new[] { wp };
+            }
+            else
+            {
+                Waypoints ??= new Waypoint[0x480];
+                for (int i = 0; i < Waypoints.Length; i++)
+                {
+                    Waypoints[i].X = s.UInt8(null, Waypoints[i].X);
+                    Waypoints[i].Y = s.UInt8(null, Waypoints[i].Y);
+                }
+            }
         }
 
         public void LoadWaypoints(BinaryReader br)

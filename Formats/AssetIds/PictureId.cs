@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum PictureId
+    public enum PictureId : byte
     {
         SmallWizard = 0,
         HarbourTown = 1,

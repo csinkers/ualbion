@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class StartDialogueEvent : IMapEvent
     {
-        public static StartDialogueEvent Translate(StartDialogueEvent e, ISerializer s)
+        public static StartDialogueEvent Serdes(StartDialogueEvent e, ISerializer s)
         {
             e ??= new StartDialogueEvent();
             s.Dynamic(e, nameof(Unk1));

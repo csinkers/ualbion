@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum ItemId
+    public enum ItemId : ushort
     {
         Knife = 0,
         ShortDagger = 1,

@@ -32,19 +32,19 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public override string ToString() =>
             $"EO.{TextureNumber}:{AnimationFrames} {Width}x{Height} [{MapWidth}x{MapHeight}] {Properties}";
 
-        public static void Serialize(Object o, ISerializer s)
+        public static Object Serdes(int _, Object o, ISerializer s)
         {
-            s.EnumU8(nameof(o.Properties), () => o.Properties, x => o.Properties = x, x => ((byte)x, x.ToString()));
-            s.ByteArray(nameof(o.CollisionData), () => o.CollisionData, x => o.CollisionData = x, 3);
-            s.UInt16(nameof(o.TextureNumber),
-                () => FormatUtil.Untweak((ushort?)o.TextureNumber),
-                x => o.TextureNumber = (DungeonObjectId?)FormatUtil.Tweak(x));
+            o ??= new Object();
+            o.Properties = s.EnumU8(nameof(o.Properties), o.Properties);
+            o.CollisionData = s.ByteArray(nameof(o.CollisionData), o.CollisionData, 3);
+            o.TextureNumber = (DungeonObjectId?)s.Transform<ushort, ushort?>(nameof(TextureNumber), (ushort?)o.TextureNumber, s.UInt16, Tweak.Instance);
             s.Dynamic(o, nameof(o.AnimationFrames));
             s.Dynamic(o, nameof(o.Unk7));
             s.Dynamic(o, nameof(o.Width));
             s.Dynamic(o, nameof(o.Height));
             s.Dynamic(o, nameof(o.MapWidth));
             s.Dynamic(o, nameof(o.MapHeight));
+            return o;
         }
     }
 }

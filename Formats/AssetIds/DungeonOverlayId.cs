@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum DungeonOverlayId
+    public enum DungeonOverlayId  
     {
         JiriDoor1 = 0,
         JiriWindow1 = 1,

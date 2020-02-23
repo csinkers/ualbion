@@ -10,17 +10,11 @@ namespace UAlbion.Formats.MapEvents
         public static AddRemoveInventoryItemEvent Translate(AddRemoveInventoryItemEvent e, ISerializer s)
         {
             e ??= new AddRemoveInventoryItemEvent();
-            s.EnumU8(nameof(Operation), 
-                () => e.Operation,
-                x => e.Operation = x,
-                    x => ((byte)x, x.ToString()));
-
+            e.Operation = s.EnumU8(nameof(Operation), e.Operation);
             s.Dynamic(e, nameof(Amount));
             s.Dynamic(e, nameof(Unk4));
             s.Dynamic(e, nameof(Unk5));
-            s.UInt16(nameof(ItemId),
-                () => (ushort)e.ItemId,
-                x => e.ItemId = (ItemId)x);
+            e.ItemId = s.EnumU16(nameof(ItemId), e.ItemId);
             s.Dynamic(e, nameof(Unk8));
             return e;
         }

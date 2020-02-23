@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum LargeNpcId
+    public enum LargeNpcId : byte
     {
         Iskai1 = 0,
         Iskai2 = 1,

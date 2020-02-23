@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum MapTextId
+    public enum MapTextId : ushort
     {
         Unknown100 = 100,
         Unknown101 = 101,

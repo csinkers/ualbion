@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum MonsterCharacterId
+    public enum MonsterCharacterId : byte
     {
         Fear1 = 0,
         Brogg1 = 1,

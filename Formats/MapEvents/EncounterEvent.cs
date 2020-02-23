@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class EncounterEvent : IMapEvent
     {
-        public static EncounterEvent Translate(EncounterEvent node, ISerializer s)
+        public static EncounterEvent Serdes(EncounterEvent node, ISerializer s)
         {
             node ??= new EncounterEvent();
             s.Dynamic(node, nameof(Unk1));

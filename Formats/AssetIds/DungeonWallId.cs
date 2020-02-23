@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum DungeonWallId
+    public enum DungeonWallId  
     {
         JiriTileAndStone = 0,
         JiriSpider = 1,

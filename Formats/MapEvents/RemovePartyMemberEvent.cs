@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.IO;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Parsers;
 
@@ -7,12 +6,10 @@ namespace UAlbion.Formats.MapEvents
 {
     public class RemovePartyMemberEvent : IMapEvent
     {
-        public static RemovePartyMemberEvent Translate(RemovePartyMemberEvent e, ISerializer s)
+        public static RemovePartyMemberEvent Serdes(RemovePartyMemberEvent e, ISerializer s)
         {
             e ??= new RemovePartyMemberEvent();
-            s.UInt8(nameof(PartyMemberId),
-                () => (byte)e.PartyMemberId,
-                x => e.PartyMemberId = (PartyCharacterId)x);
+            e.PartyMemberId = s.EnumU8(nameof(PartyMemberId), e.PartyMemberId);
             s.Dynamic(e, nameof(Unk2));
             s.Dynamic(e, nameof(Unk3));
             s.Dynamic(e, nameof(Unk4));

@@ -12,8 +12,9 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public override string ToString() =>
             $"Obj: AG{AutoGraphicsId} [ {string.Join("; ", SubObjects.Select(x => x.ToString()))} ]";
 
-        public static void Serialize(ObjectGroup og, ISerializer s)
+        public static ObjectGroup Serdes(int _, ObjectGroup og, ISerializer s)
         {
+            og ??= new ObjectGroup();
             s.Dynamic(og, nameof(og.AutoGraphicsId));
 
             for (int n = 0; n < 8; n++)
@@ -37,6 +38,8 @@ namespace UAlbion.Formats.Assets.Labyrinth
                         og.SubObjects.Add(so);
                 }
             } // +64
+
+            return og;
         }
     }
 }

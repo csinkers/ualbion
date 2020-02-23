@@ -6,10 +6,10 @@ namespace UAlbion.Formats.MapEvents
 {
     public class SoundEvent : IMapEvent
     {
-        public static SoundEvent Translate(SoundEvent e, ISerializer s)
+        public static SoundEvent Serdes(SoundEvent e, ISerializer s)
         {
             e ??= new SoundEvent();
-            s.EnumU8(nameof(Mode), () => e.Mode, x => e.Mode = x, x => ((byte)x, x.ToString()));
+            e.Mode = s.EnumU8(nameof(Mode), e.Mode);
             s.Dynamic(e, nameof(SoundId));
             s.Dynamic(e, nameof(Unk3));
             s.Dynamic(e, nameof(Volume));

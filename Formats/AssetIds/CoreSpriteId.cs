@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum CoreSpriteId
+    public enum CoreSpriteId : byte
     {
         Cursor = 0,
         Cursor3dUp = 1,

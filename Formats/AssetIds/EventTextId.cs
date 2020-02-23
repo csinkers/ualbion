@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum EventTextId
+    public enum EventTextId : ushort
     {
         Unknown0 = 0,
         Unknown1 = 1,

@@ -3,26 +3,29 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets
 {
-    public class MapData2D
+    public class MapData2D : IMapData
     {
+        public MapType MapType => MapType.TwoD;
         public byte Unk0 { get; private set; } // Wait/Rest, Light-Environment, NPC converge range
         public byte Sound { get; private set; }
-        public int Width { get; private set; }
-        public int Height { get; private set; }
+        public byte Width { get; private set; }
+        public byte Height { get; private set; }
         public int TilesetId { get; private set; }
-        public int CombatBackgroundId { get; private set; }
-        public int PaletteId { get; private set; }
+        public CombatBackgroundId CombatBackgroundId { get; private set; }
+        public PaletteId PaletteId { get; private set; }
         public byte FrameRate { get; private set; }
 
         public int[] Underlay { get; private set; }
         public int[] Overlay { get; private set; }
         public IList<MapNpc> Npcs { get; } = new List<MapNpc>();
-        public IList<IEventNode> Events { get; } = new List<IEventNode>();
+        public IList<EventNode> Events { get; } = new List<EventNode>();
         public IList<MapEventZone> Zones { get; } = new List<MapEventZone>();
         public IDictionary<int, MapEventZone[]> ZoneLookup { get; } = new Dictionary<int, MapEventZone[]>(); 
         public IDictionary<TriggerType, MapEventZone[]> ZoneTypeLookup { get; } = new Dictionary<TriggerType, MapEventZone[]>();
@@ -44,8 +47,8 @@ namespace UAlbion.Formats.Assets
             map.Width = br.ReadByte(); //4
             map.Height = br.ReadByte(); //5
             map.TilesetId = FormatUtil.Tweak(br.ReadByte()) ?? throw new FormatException("Invalid tile-set id encountered"); //6
-            map.CombatBackgroundId = br.ReadByte(); //7
-            map.PaletteId = FormatUtil.Tweak(br.ReadByte()) ?? throw new FormatException("Invalid palette id encountered"); //8
+            map.CombatBackgroundId = (CombatBackgroundId)br.ReadByte(); //7
+            map.PaletteId = (PaletteId)(FormatUtil.Tweak(br.ReadByte()) ?? throw new FormatException("Invalid palette id encountered")); //8
             map.FrameRate = br.ReadByte(); //9
 
             for (int i = 0; i < npcCount; i++)
@@ -73,7 +76,7 @@ namespace UAlbion.Formats.Assets
 
             int zoneCount = br.ReadUInt16();
             for (int i = 0; i < zoneCount; i++)
-                map.Zones.Add(MapEventZone.LoadGlobalZone(br));
+                map.Zones.Add(MapEventZone.LoadZone(br, 0xffff));
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
             for (int j = 0; j < map.Height; j++)
@@ -86,7 +89,7 @@ namespace UAlbion.Formats.Assets
 
             int eventCount = br.ReadUInt16();
             for (int i = 0; i < eventCount; i++)
-                map.Events.Add(EventNode.Translate(null, new GenericBinaryReader(br, EventNode.SizeInBytes), i));
+                map.Events.Add(EventNode.Serdes(i, null, new GenericBinaryReader(br, EventNode.SizeInBytes)));
 
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
@@ -96,7 +99,7 @@ namespace UAlbion.Formats.Assets
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
             // Resolve event indices to pointers
-            foreach (var mapEvent in map.Events.OfType<EventNode>())
+            foreach (var mapEvent in map.Events)
             {
                 if (mapEvent.NextEventId.HasValue)
                     mapEvent.NextEvent = map.Events[mapEvent.NextEventId.Value];
@@ -120,6 +123,11 @@ namespace UAlbion.Formats.Assets
                 map.ZoneTypeLookup[triggerType.Key] = triggerType.ToArray();
 
             return map;
+        }
+
+        public static MapData2D Serdes(MapData2D existing, ISerializer s, string name, AssetInfo config)
+        {
+            return existing;
         }
     }
 }

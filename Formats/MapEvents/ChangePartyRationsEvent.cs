@@ -7,7 +7,7 @@ namespace UAlbion.Formats.MapEvents
         public static ChangePartyRationsEvent Translate(ChangePartyRationsEvent e, ISerializer s)
         {
             e ??= new ChangePartyRationsEvent();
-            s.EnumU8(nameof(Operation), () => e.Operation, x => e.Operation = x, x => ((byte)x, x.ToString()));
+            e.Operation = s.EnumU8(nameof(Operation), e.Operation);
             s.Dynamic(e, nameof(Unk3));
             s.Dynamic(e, nameof(Unk4));
             s.Dynamic(e, nameof(Unk5));

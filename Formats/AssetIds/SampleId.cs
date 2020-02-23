@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum SampleId
+    public enum SampleId : ushort
     {
         CreakyWoodenDoor = 0,
         SqueekyMetalDoor = 1,

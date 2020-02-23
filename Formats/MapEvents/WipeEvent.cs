@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class WipeEvent : IMapEvent
     {
-        public static WipeEvent Translate(WipeEvent node, ISerializer s)
+        public static WipeEvent Serdes(WipeEvent node, ISerializer s)
         {
             node ??= new WipeEvent();
             s.Dynamic(node, nameof(Value));

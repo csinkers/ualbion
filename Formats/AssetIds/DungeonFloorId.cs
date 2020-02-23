@@ -5,7 +5,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public enum DungeonFloorId
+    public enum DungeonFloorId  
     {
         Brick = 0,
         MossyBrick = 1,

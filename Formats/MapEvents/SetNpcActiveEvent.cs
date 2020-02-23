@@ -9,7 +9,7 @@ namespace UAlbion.Formats.MapEvents
         {
             e ??= new SetNpcActiveEvent();
             s.Dynamic(e, nameof(IsActive));
-            s.UInt8(nameof(NpcId), () => (byte)e.NpcId, x => e.NpcId = (NpcCharacterId)x);
+            e.NpcId = s.EnumU8(nameof(NpcId), e.NpcId);
             s.Dynamic(e, nameof(Unk4));
             s.Dynamic(e, nameof(Unk5));
             s.Dynamic(e, nameof(Unk6));

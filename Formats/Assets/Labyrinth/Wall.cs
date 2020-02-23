@@ -32,43 +32,15 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public ushort Height { get; set; }        // C
         public IList<Overlay> Overlays { get; } = new List<Overlay>();
 
-        public class Overlay
-        {
-            public DungeonOverlayId? TextureNumber { get; set; } // 0, ushort
-            public byte AnimationFrames { get; set; } // 2
-            public byte WriteZero { get; set; } // 3
-            public ushort YOffset { get; set; } // 4
-            public ushort XOffset { get; set; } // 6
-            public ushort Width { get; set; }   // 8
-            public ushort Height { get; set; }  // A
-
-            public override string ToString() =>
-                $"O.{TextureNumber}:{AnimationFrames} ({XOffset}, {YOffset}) {Width}x{Height}";
-
-            public static void Serialize(Overlay o, ISerializer s)
-            {
-                s.UInt16(nameof(o.TextureNumber),
-                    () => FormatUtil.Untweak((ushort?)o.TextureNumber),
-                    x => o.TextureNumber = (DungeonOverlayId?)FormatUtil.Tweak(x));
-                s.Dynamic(o, nameof(o.AnimationFrames));
-                s.Dynamic(o, nameof(o.WriteZero));
-                s.Dynamic(o, nameof(o.XOffset));
-                s.Dynamic(o, nameof(o.YOffset));
-                s.Dynamic(o, nameof(o.Width));
-                s.Dynamic(o, nameof(o.Height));
-            }
-        }
-
         public override string ToString() =>
             $"Wall.{TextureNumber}:{AnimationFrames} {Width}x{Height} ({Properties}) [ {string.Join(", ", Overlays.Select(x => x.ToString()))} ]";
 
-        public static void Serialize(Wall w, ISerializer s)
+        public static Wall Serdes(int _, Wall w, ISerializer s)
         {
-            s.EnumU8(nameof(w.Properties), () => w.Properties, x => w.Properties = x, x => ((byte)x, x.ToString()));
-            s.ByteArray(nameof(w.CollisionData), () => w.CollisionData, x => w.CollisionData = x, 3);
-            s.UInt16(nameof(w.TextureNumber),
-                () => FormatUtil.Untweak((ushort?)w.TextureNumber),
-                x => w.TextureNumber = (DungeonWallId?)FormatUtil.Tweak(x));
+            w ??= new Wall();
+            w.Properties = s.EnumU8(nameof(w.Properties), w.Properties);
+            w.CollisionData = s.ByteArray(nameof(w.CollisionData), w.CollisionData, 3);
+            w.TextureNumber = (DungeonWallId?)Tweak.Serdes(nameof(w.TextureNumber), (ushort?)w.TextureNumber, s.UInt16);
             s.Dynamic(w, nameof(w.AnimationFrames));
             s.Dynamic(w, nameof(w.AutoGfxType));
             s.Dynamic(w, nameof(w.TransparentColour));
@@ -76,9 +48,9 @@ namespace UAlbion.Formats.Assets.Labyrinth
             s.Dynamic(w, nameof(w.Width));
             s.Dynamic(w, nameof(w.Height));
 
-            ushort overlayCount = (ushort)w.Overlays.Count;
-            s.UInt16("overlayCount", () => overlayCount, x => overlayCount = x);
-            s.List(w.Overlays, overlayCount, Overlay.Serialize, () => new Overlay());
+            ushort overlayCount = s.UInt16("overlayCount", (ushort)w.Overlays.Count);
+            s.List(w.Overlays, overlayCount, Overlay.Serdes);
+            return w;
         }
     }
 }

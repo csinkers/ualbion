@@ -1,6 +1,7 @@
 {
   "3DBCKGR0.XLD": {
     "EnumName": "DungeonBackgroundId",
+    "EnumType": "byte",
     "Format": "SingleHeaderSprite",
     "Assets": {
       "0": {
@@ -8062,6 +8063,7 @@
   },
   "AUTOGFX0.XLD": {
     "EnumName": "AutoGraphicsId",
+    "EnumType": "byte",
     "Format": "AmorphousSprite",
     "Assets": {
       "0": {
@@ -8076,6 +8078,7 @@
   },
   "BLKLIST0.XLD": {
     "EnumName": "BlockListId",
+    "EnumType": "byte",
     "Format": "BlockList",
     "Assets": {
       "0": {},
@@ -8093,6 +8096,7 @@
   },
   "COMBACK0.XLD": {
     "EnumName": "CombatBackgroundId",
+    "EnumType": "byte", 
     "Format": "FixedSizeSprite",
     "Width": 360,
     "Assets": {
@@ -8214,6 +8218,7 @@
   },
   "COMGFX0.XLD": {
     "EnumName": "CombatGraphicsId",
+    "EnumType": "byte",
     "Format": "HeaderPerSubImageSprite",
     "Assets": {
       "0": {},
@@ -8305,6 +8310,7 @@
   },
   "EVNTSET0.XLD": {
     "EnumName": "EventSetId",
+    "EnumType": "ushort", 
     "Format": "EventSet",
     "Assets": {
       "0": {},
@@ -8343,6 +8349,7 @@
   },
   "EVNTSET1.XLD": {
     "EnumName": "EventSetId",
+    "EnumType": "ushort", 
     "Format": "EventSet",
     "Assets": {
       "0": {},
@@ -8449,6 +8456,7 @@
   },
   "EVNTSET2.XLD": {
     "EnumName": "EventSetId",
+    "EnumType": "ushort", 
     "Format": "EventSet",
     "Assets": {
       "0": {},
@@ -8555,6 +8563,7 @@
   },
   "EVNTSET3.XLD": {
     "EnumName": "EventSetId",
+    "EnumType": "ushort", 
     "Format": "EventSet",
     "Assets": {
       "0": {},
@@ -8661,6 +8670,7 @@
   },
   "EVNTSET9.XLD": {
     "EnumName": "EventSetId",
+    "EnumType": "ushort", 
     "Format": "EventSet",
     "Assets": {
       "0": {},
@@ -8767,6 +8777,7 @@
   },
   "FBODPIX0.XLD": {
     "EnumName": "FullBodyPictureId",
+    "EnumType": "byte",
     "Format": "SingleHeaderSprite",
     "Assets": {
       "0": {
@@ -8828,6 +8839,7 @@
   },
   "FONTS0.XLD": {
     "EnumName": "FontId",
+    "EnumType": "byte",
     "Format": "Font",
     "Width": 8,
     "Height": 8,
@@ -8842,6 +8854,7 @@
   },
   "ICONDAT0.XLD": {
     "EnumName": "TilesetId",
+    "EnumType": "byte",
     "Format": "Tileset",
     "Width": 8,
     "Height": 8,
@@ -8884,6 +8897,7 @@
   },
   "ICONGFX0.XLD": {
     "EnumName": "IconGraphicsId",
+    "EnumType": "ushort", 
     "Format": "FixedSizeSprite",
     "Width": 16,
     "Height": 16,
@@ -8984,6 +8998,7 @@
   },
   "LABDATA0.XLD": {
     "EnumName": "LabyrinthDataId",
+    "EnumType": "byte",
     "Format": "LabyrinthData",
     "Assets": {
       "0": {},
@@ -8999,6 +9014,7 @@
   },
   "LABDATA1.XLD": {
     "EnumName": "LabyrinthDataId",
+    "EnumType": "byte",
     "Format": "LabyrinthData",
     "Assets": {
       "0": {},
@@ -9105,6 +9121,7 @@
   },
   "LABDATA2.XLD": {
     "EnumName": "LabyrinthDataId",
+    "EnumType": "byte",
     "Format": "LabyrinthData",
     "Assets": {
       "0": {},
@@ -9211,6 +9228,7 @@
   },
   "MAPDATA1.XLD": {
     "EnumName": "MapDataId",
+    "EnumType": "ushort", 
     "Format": "MapData",
     "Assets": {
       "0": {
@@ -9479,6 +9497,7 @@
   },
   "MAPDATA2.XLD": {
     "EnumName": "MapDataId",
+    "EnumType": "ushort", 
     "Format": "MapData",
     "Assets": {
       "0": {
@@ -9743,6 +9762,7 @@
   },
   "MAPDATA3.XLD": {
     "EnumName": "MapDataId",
+    "EnumType": "ushort", 
     "Format": "MapData",
     "Assets": {
       "0": {
@@ -9883,6 +9903,7 @@
   },
   "MONCHAR0.XLD": {
     "EnumName": "MonsterCharacterId",
+    "EnumType": "byte",
     "Format": "CharacterData",
     "Assets": {
       "0": {
@@ -10060,6 +10081,7 @@
   },
   "MONGFX0.XLD": {
     "EnumName": "MonsterGraphicsId",
+    "EnumType": "byte",
     "Format": "HeaderPerSubImageSprite",
     "Assets": {
       "0": {
@@ -10380,6 +10402,7 @@
   },
   "MONGRP0.XLD": {
     "EnumName": "MonsterGroupId",
+    "EnumType": "byte",
     "Format": "MonsterGroup",
     "Assets": {
       "0": {},
@@ -10485,6 +10508,7 @@
   },
   "MONGRP1.XLD": {
     "EnumName": "MonsterGroupId",
+    "EnumType": "byte",
     "Format": "MonsterGroup",
     "Assets": {
       "0": {},
@@ -10591,6 +10615,7 @@
   },
   "MONGRP2.XLD": {
     "EnumName": "MonsterGroupId",
+    "EnumType": "byte",
     "Format": "MonsterGroup",
     "Assets": {
       "0": {},
@@ -10697,6 +10722,7 @@
   },
   "NPCGR0.XLD": {
     "EnumName": "LargeNpcId",
+    "EnumType": "byte",
     "Format": "SingleHeaderSprite",
     "Assets": {
       "0": {
@@ -11087,6 +11113,7 @@
   },
   "NPCGR1.XLD": {
     "EnumName": "LargeNpcId",
+    "EnumType": "byte",
     "Format": "SingleHeaderSprite",
     "Assets": {
       "0": {},
@@ -11193,6 +11220,7 @@
   },
   "NPCKL0.XLD": {
     "EnumName": "SmallNpcId",
+    "EnumType": "byte",
     "Format": "SingleHeaderSprite",
     "Assets": {
       "0": {
@@ -11294,6 +11322,7 @@
   },
   "PALETTE0.XLD": {
     "EnumName": "PaletteId",
+    "EnumType": "byte",
     "Format": "Palette",
     "Assets": {
       "0": {
@@ -11444,6 +11473,7 @@
   },
   "PARTGR0.XLD": {
     "EnumName": "LargePartyGraphicsId",
+    "EnumType": "byte",
     "Format": "SingleHeaderSprite",
     "Assets": {
       "0": {
@@ -11509,6 +11539,7 @@
   },
   "PARTKL0.XLD": {
     "EnumName": "SmallPartyGraphicsId",
+    "EnumType": "byte",
     "Format": "SingleHeaderSprite",
     "Assets": {
       "0": {
@@ -11574,6 +11605,7 @@
   },
   "PICTURE0.XLD": {
     "EnumName": "PictureId",
+    "EnumType": "byte",
     "Format": "InterlacedBitmap",
     "Assets": {
       "0": {
@@ -11721,6 +11753,7 @@
   },
   "SAMPLES0.XLD": {
     "EnumName": "SampleId",
+    "EnumType": "ushort", 
     "Format": "AudioSample",
     "Assets": {
       "0": {
@@ -11931,6 +11964,7 @@
   },
   "SAMPLES1.XLD": {
     "EnumName": "SampleId",
+    "EnumType": "ushort", 
     "Format": "AudioSample",
     "Assets": {
       "0": {
@@ -12071,6 +12105,7 @@
   },
   "SAMPLES2.XLD": {
     "EnumName": "SampleId",
+    "EnumType": "ushort", 
     "Format": "AudioSample",
     "Assets": {
       "0": {},
@@ -12221,6 +12256,7 @@
   },
   "SCRIPT0.XLD": {
     "EnumName": "ScriptId",
+    "EnumType": "byte",
     "Format": "Script",
     "Assets": {
       "0": {},
@@ -12289,6 +12325,7 @@
   },
   "SCRIPT2.XLD": {
     "EnumName": "ScriptId",
+    "EnumType": "byte",
     "Format": "Script",
     "Assets": {
       "0": {},
@@ -12395,6 +12432,7 @@
   },
   "SLAB": {
     "EnumName": "SlabId",
+    "EnumType": "byte",
     "Format": "Slab",
     "Width": 360,
     "Assets": {
@@ -12405,6 +12443,7 @@
   },
   "SMLPORT0.XLD": {
     "EnumName": "SmallPortraitId",
+    "EnumType": "byte",
     "Format": "FixedSizeSprite",
     "Width": 34,
     "Assets": {
@@ -12529,6 +12568,7 @@
   },
   "SMLPORT1.XLD": {
     "EnumName": "SmallPortraitId",
+    "EnumType": "byte",
     "Format": "FixedSizeSprite",
     "Width": 34,
     "Assets": {
@@ -12642,6 +12682,7 @@
   },
   "SONGS0.XLD": {
     "EnumName": "SongId",
+    "EnumType": "byte",
     "Format": "Song",
     "Assets": {
       "0": {
@@ -12768,6 +12809,7 @@
   },
   "TACTICO0.XLD": {
     "EnumName": "TacticalGraphicsId",
+    "EnumType": "byte",
     "Format": "FixedSizeSprite",
     "Width": 32,
     "Assets": {
@@ -12847,6 +12889,7 @@
   },
   "TRANSTB0.XLD": {
     "EnumName": "TranslationTableId",
+    "EnumType": "byte",
     "Format": "TranslationTable",
     "Assets": {
       "0": {},
@@ -12907,6 +12950,7 @@
   },
   "WAVELIB0.XLD": {
     "EnumName": "WaveLibraryId",
+    "EnumType": "byte",
     "Format": "SampleLibrary",
     "Assets": {
       "0": {},
@@ -12949,6 +12993,7 @@
   },
   "$(LANG)/EVNTTXT0.XLD": {
     "EnumName": "EventTextId",
+    "EnumType": "ushort", 
     "Format": "StringTable",
     "Assets": {
       "0": {},
@@ -12958,6 +13003,7 @@
   },
   "$(LANG)/EVNTTXT1.XLD": {
     "EnumName": "EventTextId",
+    "EnumType": "ushort", 
     "Format": "StringTable",
     "Assets": {
       "0": {},
@@ -13064,6 +13110,7 @@
   },
   "$(LANG)/EVNTTXT2.XLD": {
     "EnumName": "EventTextId",
+    "EnumType": "ushort", 
     "Format": "StringTable",
     "Assets": {
       "0": {},
@@ -13170,6 +13217,7 @@
   },
   "$(LANG)/EVNTTXT3.XLD": {
     "EnumName": "EventTextId",
+    "EnumType": "ushort", 
     "Format": "StringTable",
     "Assets": {
       "0": {},
@@ -13276,6 +13324,7 @@
   },
   "$(LANG)/EVNTTXT9.XLD": {
     "EnumName": "EventTextId",
+    "EnumType": "ushort", 
     "Format": "StringTable",
     "Assets": {
       "0": {},
@@ -13382,6 +13431,7 @@
   },
   "$(LANG)/FLICS0.XLD": {
     "EnumName": "VideoId",
+    "EnumType": "byte",
     "Format": "Video",
     "Assets": {
       "0": {},
@@ -13407,6 +13457,7 @@
   },
   "$(LANG)/MAPTEXT1.XLD": {
     "EnumName": "MapTextId",
+    "EnumType": "ushort", 
     "Format": "StringTable",
     "Assets": {
       "0": {},
@@ -13513,6 +13564,7 @@
   },
   "$(LANG)/MAPTEXT2.XLD": {
     "EnumName": "MapTextId",
+    "EnumType": "ushort", 
     "Format": "StringTable",
     "Assets": {
       "0": {},
@@ -13619,6 +13671,7 @@
   },
   "$(LANG)/MAPTEXT3.XLD": {
     "EnumName": "MapTextId",
+    "EnumType": "ushort", 
     "Format": "StringTable",
     "Assets": {
       "0": {},
@@ -13725,6 +13778,7 @@
   },
   "$(LANG)/SYSTEXTS": {
     "EnumName": "SystemTextId",
+    "EnumType": "ushort", 
     "Format": "SystemText",
     "Assets": {
       "0": {
@@ -15372,6 +15426,7 @@
   },
   "$(LANG)/WORDLIS0.XLD": {
     "EnumName": "WordId",
+    "EnumType": "ushort", 
     "Format": "Unknown",
     "Assets": {
       "1": {
@@ -16986,6 +17041,7 @@
   },
   "INITIAL/AUTOMAP1.XLD": {
     "EnumName": "AutoMapId",
+    "EnumType": "ushort", 
     "Format": "Unknown",
     "Assets": {
       "0": {},
@@ -17092,6 +17148,7 @@
   },
   "INITIAL/AUTOMAP2.XLD": {
     "EnumName": "AutoMapId",
+    "EnumType": "ushort", 
     "Format": "Unknown",
     "Assets": {
       "0": {},
@@ -17198,6 +17255,7 @@
   },
   "INITIAL/AUTOMAP3.XLD": {
     "EnumName": "AutoMapId",
+    "EnumType": "ushort", 
     "Format": "Unknown",
     "Assets": {
       "0": {},
@@ -17304,6 +17362,7 @@
   },
   "INITIAL/CHESTDT0.XLD": {
     "EnumName": "ChestId",
+    "EnumType": "ushort", 
     "Format": "Inventory",
     "Assets": {
       "0": {},
@@ -17312,6 +17371,7 @@
   },
   "INITIAL/CHESTDT1.XLD": {
     "EnumName": "ChestId",
+    "EnumType": "ushort", 
     "Format": "Inventory",
     "Assets": {
       "0": {},
@@ -17418,6 +17478,7 @@
   },
   "INITIAL/CHESTDT2.XLD": {
     "EnumName": "ChestId",
+    "EnumType": "ushort", 
     "Format": "Inventory",
     "Assets": {
       "0": {},
@@ -17524,6 +17585,7 @@
   },
   "INITIAL/CHESTDT5.XLD": {
     "EnumName": "ChestId",
+    "EnumType": "ushort", 
     "Format": "Inventory",
     "Assets": {
       "0": {},
@@ -17630,6 +17692,7 @@
   },
   "INITIAL/MERCHDT0.XLD": {
     "EnumName": "MerchantId",
+    "EnumType": "byte",
     "Format": "Inventory",
     "Assets": {
       "0": {}
@@ -17637,6 +17700,7 @@
   },
   "INITIAL/MERCHDT1.XLD": {
     "EnumName": "MerchantId",
+    "EnumType": "byte",
     "Format": "Inventory",
     "Assets": {
       "0": {},
@@ -17743,6 +17807,7 @@
   },
   "INITIAL/MERCHDT2.XLD": {
     "EnumName": "MerchantId",
+    "EnumType": "byte",
     "Format": "Inventory",
     "Assets": {
       "0": {},
@@ -17849,6 +17914,7 @@
   },
   "INITIAL/NPCCHAR0.XLD": {
     "EnumName": "NpcCharacterId",
+    "EnumType": "byte",
     "Format": "CharacterData",
     "Assets": {
       "0": {
@@ -18002,6 +18068,7 @@
   },
   "INITIAL/NPCCHAR1.XLD": {
     "EnumName": "NpcCharacterId",
+    "EnumType": "byte",
     "Format": "CharacterData",
     "Assets": {
       "0": {},
@@ -18280,6 +18347,7 @@
   },
   "INITIAL/NPCCHAR2.XLD": {
     "EnumName": "NpcCharacterId",
+    "EnumType": "byte",
     "Format": "CharacterData",
     "Assets": {
       "0": {
@@ -18428,6 +18496,7 @@
   },
   "INITIAL/PRTCHAR0.XLD": {
     "EnumName": "PartyCharacterId",
+    "EnumType": "byte",
     "Format": "CharacterData",
     "Assets": {
       "0": {
@@ -18510,6 +18579,7 @@
   },
   "INITIAL/PRTCHAR1.XLD": {
     "EnumName": "PartyCharacterId",
+    "EnumType": "byte",
     "Format": "CharacterData",
     "Assets": {
       "0": {},
@@ -18616,6 +18686,7 @@
   },
   "INITIAL/PRTCHAR2.XLD": {
     "EnumName": "PartyCharacterId",
+    "EnumType": "byte",
     "Format": "CharacterData",
     "Assets": {
       "0": {},

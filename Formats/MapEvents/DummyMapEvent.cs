@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class DummyMapEvent : IMapEvent
     {
-        public static DummyMapEvent Translate(DummyMapEvent node, ISerializer s)
+        public static DummyMapEvent Serdes(DummyMapEvent node, ISerializer s)
         {
             node ??= new DummyMapEvent();
             s.Dynamic(node, nameof(Unk1));

@@ -4,7 +4,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class OpenChestEvent : IMapEvent
     {
-        public static OpenChestEvent Translate(OpenChestEvent node, ISerializer s)
+        public static OpenChestEvent Serdes(OpenChestEvent node, ISerializer s)
         {
             node ??= new OpenChestEvent();
             s.Dynamic(node, nameof(LockStrength));

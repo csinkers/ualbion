@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class DoorEvent : IMapEvent
     {
-        public static DoorEvent Translate(DoorEvent node, ISerializer s)
+        public static DoorEvent Serdes(DoorEvent node, ISerializer s)
         {
             node ??= new DoorEvent();
             s.Dynamic(node, nameof(Unk1));

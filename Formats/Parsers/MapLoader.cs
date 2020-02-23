@@ -12,14 +12,29 @@ namespace UAlbion.Formats.Parsers
         {
             var startPosition = br.BaseStream.Position;
             br.ReadUInt16(); // Initial flags + npc count, will be re-read by the 2D/3D specific map loader
-            int mapType = br.ReadByte();
+            var mapType = (MapType)br.ReadByte();
             br.BaseStream.Position = startPosition;
-            switch (mapType)
+            return mapType switch
             {
-                case 1: return MapData3D.Load(br, streamLength, name);
-                case 2: return MapData2D.Load(br, streamLength, name);
-                default: throw new NotImplementedException($"Unrecognised map type {mapType} found.");
-            }
+                MapType.TwoD   => MapData2D.Load(br, streamLength, name),
+                MapType.ThreeD => MapData3D.Load(br, streamLength, name),
+                _ => throw new NotImplementedException($"Unrecognised map type {mapType} found.")
+            };
+        }
+
+        public object Serdes(object existing, ISerializer s, string name, AssetInfo config)
+        {
+            var startPosition = s.Offset;
+            s.UInt16("DummyRead", 0); // Initial flags + npc count, will be re-read by the 2D/3D specific map loader
+            MapType mapType = s.EnumU8(nameof(mapType), ((IMapData)existing)?.MapType ?? MapType.Unknown);
+            s.Seek(startPosition);
+
+            return mapType switch
+            {
+                MapType.TwoD => (IMapData)MapData2D.Serdes((MapData2D)existing, s, name, config),
+                MapType.ThreeD => MapData3D.Serdes((MapData3D)existing, s, name, config),
+                _ => throw new NotImplementedException($"Unrecognised map type {mapType} found.")
+            };
         }
     }
 }

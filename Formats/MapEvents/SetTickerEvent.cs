@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class SetTickerEvent : ModifyEvent
     {
-        public static SetTickerEvent Translate(SetTickerEvent e, ISerializer s)
+        public static SetTickerEvent Serdes(SetTickerEvent e, ISerializer s)
         {
             e ??= new SetTickerEvent();
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);

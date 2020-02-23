@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class DisableEventChainEvent : ModifyEvent
     {
-        public static DisableEventChainEvent Translate(DisableEventChainEvent e, ISerializer s)
+        public static DisableEventChainEvent Serdes(DisableEventChainEvent e, ISerializer s)
         {
             e ??= new DisableEventChainEvent();
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);

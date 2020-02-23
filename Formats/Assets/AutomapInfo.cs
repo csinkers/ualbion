@@ -23,32 +23,5 @@ namespace UAlbion.Formats.Assets
             info.Name = s.FixedLengthString(nameof(Name), info.Name, 15); // 4
             return info;
         }
-
-        public static AutomapInfo Load(BinaryReader br)
-        {
-            var i = new AutomapInfo
-            {
-                X = br.ReadByte(),
-                Y = br.ReadByte(),
-                Unk2 = br.ReadByte(),
-                Unk3 = br.ReadByte()
-            };
-            var nameBytes = br.ReadBytes(15);
-
-            bool done = false; // Verify that strings contain no embedded nulls.
-            int length = 0;
-            foreach (var t in nameBytes)
-            {
-                if(done)
-                    Debug.Assert(t == 0);
-                else if (t == 0)
-                    done = true;
-                else
-                    length++;
-            }
-
-            i.Name = Encoding.GetEncoding(850).GetString(nameBytes, 0, length);
-            return i;
-        }
     }
 }

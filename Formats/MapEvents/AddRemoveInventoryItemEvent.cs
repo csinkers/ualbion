@@ -7,7 +7,7 @@ namespace UAlbion.Formats.MapEvents
     [Event("add_remove_inv")]
     public class AddRemoveInventoryItemEvent : ModifyEvent
     {
-        public static AddRemoveInventoryItemEvent Translate(AddRemoveInventoryItemEvent e, ISerializer s)
+        public static AddRemoveInventoryItemEvent Serdes(AddRemoveInventoryItemEvent e, ISerializer s)
         {
             e ??= new AddRemoveInventoryItemEvent();
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);

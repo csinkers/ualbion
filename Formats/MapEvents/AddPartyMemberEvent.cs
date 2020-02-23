@@ -7,7 +7,7 @@ namespace UAlbion.Formats.MapEvents
     [Event("add_party_member")]
     public class AddPartyMemberEvent : ModifyEvent
     {
-        public static AddPartyMemberEvent Translate(AddPartyMemberEvent e, ISerializer s)
+        public static AddPartyMemberEvent Serdes(AddPartyMemberEvent e, ISerializer s)
         {
             e ??= new AddPartyMemberEvent();
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);

@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class SetNpcActiveEvent : ModifyEvent
     {
-        public static SetNpcActiveEvent Translate(SetNpcActiveEvent e, ISerializer s)
+        public static SetNpcActiveEvent Serdes(SetNpcActiveEvent e, ISerializer s)
         {
             e ??= new SetNpcActiveEvent();
             e.IsActive = s.UInt8(nameof(IsActive), e.IsActive);

@@ -12,10 +12,10 @@ namespace UAlbion.Formats.MapEvents
             {
                 case QueryType.InventoryHasItem:
                 case QueryType.UsedItemId:
-                    return QueryItemEvent.Translate((QueryItemEvent)genericEvent, s, subType);
+                    return QueryItemEvent.Serdes((QueryItemEvent)genericEvent, s, subType);
 
                 case QueryType.ChosenVerb:
-                    return QueryVerbEvent.Translate((QueryVerbEvent)genericEvent, s);
+                    return QueryVerbEvent.Serdes((QueryVerbEvent)genericEvent, s);
 
                 case QueryType.PreviousActionResult:
                 case QueryType.Ticker:

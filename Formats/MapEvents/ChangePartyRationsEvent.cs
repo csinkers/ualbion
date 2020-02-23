@@ -4,7 +4,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class ChangePartyRationsEvent : ModifyEvent
     {
-        public static ChangePartyRationsEvent Translate(ChangePartyRationsEvent e, ISerializer s)
+        public static ChangePartyRationsEvent Serdes(ChangePartyRationsEvent e, ISerializer s)
         {
             e ??= new ChangePartyRationsEvent();
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);

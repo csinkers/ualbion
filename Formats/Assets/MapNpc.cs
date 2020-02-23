@@ -67,22 +67,6 @@ namespace UAlbion.Formats.Assets
             return npc;
         }
 
-        public static MapNpc Load(BinaryReader br)
-        {
-            var npc = new MapNpc();
-            npc.Id = (NpcCharacterId)br.ReadByte(); // +0
-            npc.Sound = br.ReadByte(); // +1
-            npc.EventNumber = br.ReadUInt16(); // +2
-            if (npc.EventNumber == 0xffff) npc.EventNumber = null;
-
-            npc.ObjectNumber = FormatUtil.Tweak(br.ReadUInt16()) ?? 0; // +4
-            npc.Flags = (NpcFlags)br.ReadByte(); // +6 // Combine this & MovementType ?
-            npc.Movement = (MovementType)br.ReadByte(); // +7
-            npc.Unk8 = br.ReadByte(); // +8
-            npc.Unk9 = br.ReadByte(); // +9
-            return npc;
-        }
-
         public void LoadWaypoints(ISerializer s)
         {
             if ((Movement & MovementType.RandomMask) != 0)
@@ -99,26 +83,6 @@ namespace UAlbion.Formats.Assets
                 {
                     Waypoints[i].X = s.UInt8(null, Waypoints[i].X);
                     Waypoints[i].Y = s.UInt8(null, Waypoints[i].Y);
-                }
-            }
-        }
-
-        public void LoadWaypoints(BinaryReader br)
-        {
-            if ((Movement & MovementType.RandomMask) != 0)
-            {
-                var wp = new Waypoint();
-                wp.X = br.ReadByte();
-                wp.Y = br.ReadByte();
-                Waypoints = new[] { wp };
-            }
-            else
-            {
-                Waypoints = new Waypoint[0x480];
-                for (int i = 0; i < Waypoints.Length; i++)
-                {
-                    Waypoints[i].X = br.ReadByte();
-                    Waypoints[i].Y = br.ReadByte();
                 }
             }
         }

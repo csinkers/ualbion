@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class SetPartyLeaderEvent : ModifyEvent
     {
-        public static SetPartyLeaderEvent Translate(SetPartyLeaderEvent e, ISerializer s)
+        public static SetPartyLeaderEvent Serdes(SetPartyLeaderEvent e, ISerializer s)
         {
             e ??= new SetPartyLeaderEvent();
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);

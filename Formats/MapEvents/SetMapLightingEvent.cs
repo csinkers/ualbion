@@ -11,7 +11,7 @@ namespace UAlbion.Formats.MapEvents
             FadeFromBlack = 2
         }
 
-        public static SetMapLightingEvent Translate(SetMapLightingEvent e, ISerializer s)
+        public static SetMapLightingEvent Serdes(SetMapLightingEvent e, ISerializer s)
         {
             e ??= new SetMapLightingEvent();
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);

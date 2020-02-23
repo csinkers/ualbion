@@ -17,7 +17,7 @@ namespace UAlbion.Formats.MapEvents
             Unk11 = 11,
         }
 
-        public static QueryVerbEvent Translate(QueryVerbEvent e, ISerializer s)
+        public static QueryVerbEvent Serdes(QueryVerbEvent e, ISerializer s)
         {
             e ??= new QueryVerbEvent();
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);

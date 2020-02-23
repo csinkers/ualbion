@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class SetTemporarySwitchEvent : ModifyEvent
     {
-        public static SetTemporarySwitchEvent Translate(SetTemporarySwitchEvent e, ISerializer s)
+        public static SetTemporarySwitchEvent Serdes(SetTemporarySwitchEvent e, ISerializer s)
         {
             e ??= new SetTemporarySwitchEvent();
             e.SwitchValue = s.UInt8(nameof(SwitchValue), e.SwitchValue);

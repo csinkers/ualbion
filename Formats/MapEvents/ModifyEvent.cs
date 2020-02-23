@@ -10,18 +10,18 @@ namespace UAlbion.Formats.MapEvents
             var subType = s.EnumU8("SubType", genericEvent?.SubType ?? ModifyType.Unk2);
             switch (subType)
             {
-                case ModifyType.SetTemporarySwitch:     return SetTemporarySwitchEvent.Translate((SetTemporarySwitchEvent)genericEvent, s);
-                case ModifyType.DisableEventChain:      return DisableEventChainEvent.Translate((DisableEventChainEvent)genericEvent, s);
-                case ModifyType.SetNpcActive:           return SetNpcActiveEvent.Translate((SetNpcActiveEvent)genericEvent, s);
-                case ModifyType.AddPartyMember:         return AddPartyMemberEvent.Translate((AddPartyMemberEvent)genericEvent, s);
-                case ModifyType.AddRemoveInventoryItem: return AddRemoveInventoryItemEvent.Translate((AddRemoveInventoryItemEvent)genericEvent, s);
-                case ModifyType.SetMapLighting:         return SetMapLightingEvent.Translate((SetMapLightingEvent)genericEvent, s);
-                case ModifyType.ChangePartyGold:        return ChangePartyGoldEvent.Translate((ChangePartyGoldEvent)genericEvent, s);
-                case ModifyType.ChangePartyRations:     return ChangePartyRationsEvent.Translate((ChangePartyRationsEvent)genericEvent, s);
-                case ModifyType.ChangeTime:             return ChangeTimeEvent.Translate((ChangeTimeEvent)genericEvent, s);
-                case ModifyType.SetPartyLeader:         return SetPartyLeaderEvent.Translate((SetPartyLeaderEvent)genericEvent, s);
-                case ModifyType.SetTicker:              return SetTickerEvent.Translate((SetTickerEvent)genericEvent, s);
-                case ModifyType.Unk2:                   return DummyModifyEvent.Translate((DummyModifyEvent)genericEvent, s);
+                case ModifyType.SetTemporarySwitch:     return SetTemporarySwitchEvent.Serdes((SetTemporarySwitchEvent)genericEvent, s);
+                case ModifyType.DisableEventChain:      return DisableEventChainEvent.Serdes((DisableEventChainEvent)genericEvent, s);
+                case ModifyType.SetNpcActive:           return SetNpcActiveEvent.Serdes((SetNpcActiveEvent)genericEvent, s);
+                case ModifyType.AddPartyMember:         return AddPartyMemberEvent.Serdes((AddPartyMemberEvent)genericEvent, s);
+                case ModifyType.AddRemoveInventoryItem: return AddRemoveInventoryItemEvent.Serdes((AddRemoveInventoryItemEvent)genericEvent, s);
+                case ModifyType.SetMapLighting:         return SetMapLightingEvent.Serdes((SetMapLightingEvent)genericEvent, s);
+                case ModifyType.ChangePartyGold:        return ChangePartyGoldEvent.Serdes((ChangePartyGoldEvent)genericEvent, s);
+                case ModifyType.ChangePartyRations:     return ChangePartyRationsEvent.Serdes((ChangePartyRationsEvent)genericEvent, s);
+                case ModifyType.ChangeTime:             return ChangeTimeEvent.Serdes((ChangeTimeEvent)genericEvent, s);
+                case ModifyType.SetPartyLeader:         return SetPartyLeaderEvent.Serdes((SetPartyLeaderEvent)genericEvent, s);
+                case ModifyType.SetTicker:              return SetTickerEvent.Serdes((SetTickerEvent)genericEvent, s);
+                case ModifyType.Unk2:                   return DummyModifyEvent.Serdes((DummyModifyEvent)genericEvent, s);
                 default: throw new ArgumentOutOfRangeException();
             }
         }

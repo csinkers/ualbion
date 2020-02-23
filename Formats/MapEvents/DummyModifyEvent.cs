@@ -4,7 +4,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class DummyModifyEvent : ModifyEvent
     {
-        public static DummyModifyEvent Translate(DummyModifyEvent e, ISerializer s)
+        public static DummyModifyEvent Serdes(DummyModifyEvent e, ISerializer s)
         {
             e ??= new DummyModifyEvent();
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);

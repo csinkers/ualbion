@@ -32,21 +32,6 @@ namespace UAlbion.Formats.Assets
             return zone;
         }
 
-        public static MapEventZone LoadZone(BinaryReader br, byte y)
-        {
-            bool global = y == 0xff;
-
-            var zone = new MapEventZone();
-            zone.Global = global;
-            zone.X = (byte)(br.ReadByte() - 1); // +0
-            Debug.Assert(global && zone.X == 0xff || !global && zone.X != 0xff);
-            zone.Unk1 = br.ReadByte(); // +1
-            zone.Y = global ? (byte)0 : y;
-            zone.Trigger = (TriggerType)br.ReadUInt16(); // +2
-            zone.EventNumber = br.ReadUInt16(); // +4
-            return zone;
-        }
-
         public override string ToString() => $"Zone ({X}, {Y}) T:{Trigger} Mode:{Unk1} E:{EventNumber}";
     }
 }

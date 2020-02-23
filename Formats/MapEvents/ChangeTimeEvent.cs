@@ -4,7 +4,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class ChangeTimeEvent : ModifyEvent
     {
-        public static ChangeTimeEvent Translate(ChangeTimeEvent e, ISerializer s)
+        public static ChangeTimeEvent Serdes(ChangeTimeEvent e, ISerializer s)
         {
             e ??= new ChangeTimeEvent();
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);

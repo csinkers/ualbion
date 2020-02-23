@@ -17,19 +17,6 @@ namespace UAlbion.Formats.MapEvents
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             return e;
         }
-        public static EventNode Load(BinaryReader br, int id, MapEventType type)
-        {
-            return new EventNode(id, new EndDialogueEvent
-            {
-                Unk1 = br.ReadByte(),   // +1
-                Unk2 = br.ReadByte(),   // +2
-                Unk3 = br.ReadByte(),   // +3
-                Unk4 = br.ReadByte(),   // +4
-                Unk5 = br.ReadByte(),   // +5
-                Unk6 = br.ReadUInt16(), // +6
-                Unk8 = br.ReadUInt16()  // +8
-            });
-        }
 
         public byte Unk1 { get; private set; }
         public byte Unk2 { get; private set; }

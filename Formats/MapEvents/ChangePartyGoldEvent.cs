@@ -4,7 +4,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class ChangePartyGoldEvent : ModifyEvent
     {
-        public static ChangePartyGoldEvent Translate(ChangePartyGoldEvent e, ISerializer s)
+        public static ChangePartyGoldEvent Serdes(ChangePartyGoldEvent e, ISerializer s)
         {
             e ??= new ChangePartyGoldEvent();
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);

@@ -10,7 +10,7 @@ namespace UAlbion.Formats.MapEvents
             QueryType = subType;
         }
 
-        public static QueryItemEvent Translate(QueryItemEvent e, ISerializer s, QueryType subType)
+        public static QueryItemEvent Serdes(QueryItemEvent e, ISerializer s, QueryType subType)
         {
             e ??= new QueryItemEvent(subType);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);

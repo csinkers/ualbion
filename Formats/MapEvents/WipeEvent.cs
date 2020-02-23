@@ -5,23 +5,23 @@ namespace UAlbion.Formats.MapEvents
 {
     public class WipeEvent : IMapEvent
     {
-        public static WipeEvent Serdes(WipeEvent node, ISerializer s)
+        public static WipeEvent Serdes(WipeEvent e, ISerializer s)
         {
-            node ??= new WipeEvent();
-            s.Dynamic(node, nameof(Value));
-            s.Dynamic(node, nameof(Unk2));
-            s.Dynamic(node, nameof(Unk3));
-            s.Dynamic(node, nameof(Unk4));
-            s.Dynamic(node, nameof(Unk5));
-            s.Dynamic(node, nameof(Unk6));
-            s.Dynamic(node, nameof(Unk8));
-            Debug.Assert(node.Unk2 == 0);
-            Debug.Assert(node.Unk3 == 0);
-            Debug.Assert(node.Unk4 == 0);
-            Debug.Assert(node.Unk5 == 0);
-            Debug.Assert(node.Unk6 == 0);
-            Debug.Assert(node.Unk8 == 0);
-            return node;
+            e ??= new WipeEvent();
+            e.Value = s.UInt8(nameof(Value), e.Value);
+            e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
+            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
+            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
+            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
+            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+            Debug.Assert(e.Unk2 == 0);
+            Debug.Assert(e.Unk3 == 0);
+            Debug.Assert(e.Unk4 == 0);
+            Debug.Assert(e.Unk5 == 0);
+            Debug.Assert(e.Unk6 == 0);
+            Debug.Assert(e.Unk8 == 0);
+            return e;
         }
 
         public byte Value { get; private set; }

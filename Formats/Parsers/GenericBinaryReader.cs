@@ -118,7 +118,7 @@ namespace UAlbion.Formats.Parsers
 
         public void Meta(string name, Action<ISerializer> deserializer, Action<ISerializer> serializer) => deserializer(this);
         public T Meta<T>(string name, T existing, Func<int, T, ISerializer, T> serdes) => serdes(0, existing, this);
-
+/*
         public void Dynamic<TTarget>(TTarget target, string propertyName)
         {
             SerializationInfo<TTarget> serializer = SerializationInfo.Get<TTarget>(propertyName);
@@ -135,7 +135,7 @@ namespace UAlbion.Formats.Parsers
                 default: throw new InvalidOperationException($"Tried to serialize unexpected type {serializer.Type}");
             }
             _offset += serializer.Size;
-        }
+        }*/
 
         public void List<TTarget>(IList<TTarget> list, int count, Func<int, TTarget, ISerializer, TTarget> serdes) where TTarget : class
         {

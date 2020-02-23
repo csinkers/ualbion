@@ -6,17 +6,17 @@ namespace UAlbion.Formats.MapEvents
 {
     public class DataChangeEvent : IMapEvent
     {
-        public static DataChangeEvent Serdes(DataChangeEvent node, ISerializer s)
+        public static DataChangeEvent Serdes(DataChangeEvent e, ISerializer s)
         {
-            node ??= new DataChangeEvent();
-            node.Property = s.EnumU8(nameof(Property), node.Property);
-            node.Mode = s.EnumU8(nameof(Mode), node.Mode);
-            s.Dynamic(node, nameof(Unk3));
-            s.Dynamic(node, nameof(Unk4));
-            node.PartyMemberId = s.EnumU8(nameof(PartyMemberId), node.PartyMemberId);
-            s.Dynamic(node, nameof(Value));
-            s.Dynamic(node, nameof(Amount));
-            return node;
+            e ??= new DataChangeEvent();
+            e.Property = s.EnumU8(nameof(Property), e.Property);
+            e.Mode = s.EnumU8(nameof(Mode), e.Mode);
+            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
+            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
+            e.PartyMemberId = s.EnumU8(nameof(PartyMemberId), e.PartyMemberId);
+            e.Value = s.UInt16(nameof(Value), e.Value);
+            e.Amount = s.UInt16(nameof(Amount), e.Amount);
+            return e;
         }
 
         public enum ChangeProperty : byte

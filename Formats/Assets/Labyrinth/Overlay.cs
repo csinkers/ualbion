@@ -20,12 +20,12 @@ namespace UAlbion.Formats.Assets.Labyrinth
         {
             o ??= new Overlay();
             o.TextureNumber = (DungeonOverlayId?)Tweak.Serdes(nameof(o.TextureNumber), (ushort?)o.TextureNumber, s.UInt16);
-            s.Dynamic(o, nameof(o.AnimationFrames));
-            s.Dynamic(o, nameof(o.WriteZero));
-            s.Dynamic(o, nameof(o.XOffset));
-            s.Dynamic(o, nameof(o.YOffset));
-            s.Dynamic(o, nameof(o.Width));
-            s.Dynamic(o, nameof(o.Height));
+            o.AnimationFrames = s.UInt8(nameof(o.AnimationFrames), o.AnimationFrames);
+            o.WriteZero = s.UInt8(nameof(o.WriteZero), o.WriteZero);
+            o.XOffset = s.UInt16(nameof(o.XOffset), o.XOffset);
+            o.YOffset = s.UInt16(nameof(o.YOffset), o.YOffset);
+            o.Width = s.UInt16(nameof(o.Width), o.Width);
+            o.Height = s.UInt16(nameof(o.Height), o.Height);
             return o;
         }
     }

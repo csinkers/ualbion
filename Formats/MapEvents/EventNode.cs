@@ -126,7 +126,7 @@ namespace UAlbion.Formats.MapEvents
                 MapEventType.Pause => PauseEvent.Serdes((PauseEvent)node?.Event, s),
                 MapEventType.PlaceAction => PlaceActionEvent.Serdes((PlaceActionEvent)node?.Event, s),
                 MapEventType.PlayAnimation => PlayAnimationEvent.Serdes((PlayAnimationEvent)node?.Event, s),
-                MapEventType.Query => QueryEvent.Serdes((QueryEvent)node?.Event, s),
+                MapEventType.Query => QueryEvent.Serdes((IQueryEvent)node?.Event, s),
                 MapEventType.RemovePartyMember => RemovePartyMemberEvent.Serdes((RemovePartyMemberEvent)node?.Event, s),
                 MapEventType.Script => RunScriptEvent.Serdes((RunScriptEvent)node?.Event, s),
                 MapEventType.Signal => SignalEvent.Serdes((SignalEvent)node?.Event, s),
@@ -136,9 +136,8 @@ namespace UAlbion.Formats.MapEvents
                 MapEventType.StartDialogue => StartDialogueEvent.Serdes((StartDialogueEvent)node?.Event, s),
                 MapEventType.Text => TextEvent.Serdes((TextEvent)node?.Event, s),
                 MapEventType.Trap => TrapEvent.Serdes((TrapEvent)node?.Event, s),
-                MapEventType.UnkFF => DummyMapEvent.Serdes((DummyMapEvent)node?.Event, s),
                 MapEventType.Wipe => WipeEvent.Serdes((WipeEvent)node?.Event, s),
-                _ => null
+                _ => DummyMapEvent.Serdes((DummyMapEvent)node?.Event, s, type)
             };
     }
 }

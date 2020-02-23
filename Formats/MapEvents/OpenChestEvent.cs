@@ -4,17 +4,17 @@ namespace UAlbion.Formats.MapEvents
 {
     public class OpenChestEvent : IMapEvent
     {
-        public static OpenChestEvent Serdes(OpenChestEvent node, ISerializer s)
+        public static OpenChestEvent Serdes(OpenChestEvent e, ISerializer s)
         {
-            node ??= new OpenChestEvent();
-            s.Dynamic(node, nameof(LockStrength));
-            s.Dynamic(node, nameof(KeyItemId));
-            s.Dynamic(node, nameof(Unk3));
-            s.Dynamic(node, nameof(ClosedMessageId));
-            s.Dynamic(node, nameof(OpenedMessageId));
-            s.Dynamic(node, nameof(ChestId));
-            s.Dynamic(node, nameof(TrapEvent));
-            return node;
+            e ??= new OpenChestEvent();
+            e.LockStrength = s.UInt8(nameof(LockStrength), e.LockStrength);
+            e.KeyItemId = s.UInt8(nameof(KeyItemId), e.KeyItemId);
+            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
+            e.ClosedMessageId = s.UInt8(nameof(ClosedMessageId), e.ClosedMessageId);
+            e.OpenedMessageId = s.UInt8(nameof(OpenedMessageId), e.OpenedMessageId);
+            e.ChestId = s.UInt16(nameof(ChestId), e.ChestId);
+            e.TrapEvent = s.UInt16(nameof(TrapEvent), e.TrapEvent);
+            return e;
         }
 
         public byte LockStrength { get; set; }

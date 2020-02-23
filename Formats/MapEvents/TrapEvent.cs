@@ -6,17 +6,17 @@ namespace UAlbion.Formats.MapEvents
 {
     public class TrapEvent : IMapEvent
     {
-        public static TrapEvent Serdes(TrapEvent node, ISerializer s)
+        public static TrapEvent Serdes(TrapEvent e, ISerializer s)
         {
-            node ??= new TrapEvent();
-            s.Dynamic(node, nameof(Unk1));
-            s.Dynamic(node, nameof(Unk2));
-            s.Dynamic(node, nameof(Unk3));
-            s.Dynamic(node, nameof(Unk4));
-            s.Dynamic(node, nameof(Unk5));
-            s.Dynamic(node, nameof(Unk6));
-            s.Dynamic(node, nameof(Unk8));
-            return node;
+            e ??= new TrapEvent();
+            e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);
+            e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
+            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
+            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
+            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
+            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+            return e;
         }
         public static EventNode Load(BinaryReader br, int id, MapEventType type)
         {

@@ -9,13 +9,13 @@ namespace UAlbion.Formats.MapEvents
         public static TeleportEvent Serdes(TeleportEvent e, ISerializer s)
         {
             e ??= new TeleportEvent();
-            s.Dynamic(e, nameof(X));
-            s.Dynamic(e, nameof(Y));
-            s.Dynamic(e, nameof(Direction));
-            s.Dynamic(e, nameof(Unk4));
-            s.Dynamic(e, nameof(Unk5));
+            e.X = s.UInt8(nameof(X), e.X);
+            e.Y = s.UInt8(nameof(Y), e.Y);
+            e.Direction = s.UInt8(nameof(Direction), e.Direction);
+            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
+            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.MapId = s.EnumU16(nameof(MapId), e.MapId);
-            s.Dynamic(e, nameof(Unk8));
+            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             Debug.Assert(e.Unk4 == 0
                          || e.Unk4 == 1
                          || e.Unk4 == 2

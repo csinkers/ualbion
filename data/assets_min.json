@@ -3176,15 +3176,15 @@
     "Assets": {}
   },
   "INITIAL/MERCHDT0.XLD": {
-    "Format": "Inventory",
+    "Format": "MerchantInventory",
     "Assets": {}
   },
   "INITIAL/MERCHDT1.XLD": {
-    "Format": "Inventory",
+    "Format": "MerchantInventory",
     "Assets": {}
   },
   "INITIAL/MERCHDT2.XLD": {
-    "Format": "Inventory",
+    "Format": "MerchantInventory",
     "Assets": {}
   },
   "INITIAL/NPCCHAR0.XLD": {

@@ -10,12 +10,12 @@ namespace UAlbion.Formats.MapEvents
         {
             e ??= new RemovePartyMemberEvent();
             e.PartyMemberId = s.EnumU8(nameof(PartyMemberId), e.PartyMemberId);
-            s.Dynamic(e, nameof(Unk2));
-            s.Dynamic(e, nameof(Unk3));
-            s.Dynamic(e, nameof(Unk4));
-            s.Dynamic(e, nameof(Unk5));
-            s.Dynamic(e, nameof(Unk6));
-            s.Dynamic(e, nameof(Unk8));
+            e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
+            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
+            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
+            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
+            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             Debug.Assert(e.Unk4 == 0);
             Debug.Assert(e.Unk5 == 0);
             Debug.Assert(e.Unk8 == 0);

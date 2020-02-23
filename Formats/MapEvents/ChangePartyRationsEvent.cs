@@ -8,11 +8,11 @@ namespace UAlbion.Formats.MapEvents
         {
             e ??= new ChangePartyRationsEvent();
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);
-            s.Dynamic(e, nameof(Unk3));
-            s.Dynamic(e, nameof(Unk4));
-            s.Dynamic(e, nameof(Unk5));
-            s.Dynamic(e, nameof(Amount));
-            s.Dynamic(e, nameof(Unk8));
+            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
+            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
+            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            e.Amount = s.UInt16(nameof(Amount), e.Amount);
+            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             return e;
         }
 

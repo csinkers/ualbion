@@ -9,11 +9,11 @@ namespace UAlbion.Formats.MapEvents
         {
             e ??= new SetTickerEvent();
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);
-            s.Dynamic(e, nameof(Amount));
-            s.Dynamic(e, nameof(Unk4));
-            s.Dynamic(e, nameof(Unk5));
-            s.Dynamic(e, nameof(TickerId));
-            s.Dynamic(e, nameof(Unk8));
+            e.Amount = s.UInt8(nameof(Amount), e.Amount);
+            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
+            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            e.TickerId = s.UInt16(nameof(TickerId), e.TickerId);
+            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             Debug.Assert(e.Unk4 == 0 || e.Unk4 == 1);
             Debug.Assert(e.Unk5 == 0);
             Debug.Assert(e.Unk8 == 0);

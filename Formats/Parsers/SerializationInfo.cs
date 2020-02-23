@@ -4,6 +4,7 @@ using System.Reflection;
 
 namespace UAlbion.Formats.Parsers
 {
+    /*
     public class SerializationInfo
     {
         static readonly object SerializerLock = new object();
@@ -91,4 +92,5 @@ namespace UAlbion.Formats.Parsers
         public Func<TTarget, TValue> Getter { get; }
         public Action<TTarget, TValue> Setter { get; }
     }
+    */
 }

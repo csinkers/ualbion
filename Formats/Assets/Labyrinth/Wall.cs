@@ -41,12 +41,12 @@ namespace UAlbion.Formats.Assets.Labyrinth
             w.Properties = s.EnumU8(nameof(w.Properties), w.Properties);
             w.CollisionData = s.ByteArray(nameof(w.CollisionData), w.CollisionData, 3);
             w.TextureNumber = (DungeonWallId?)Tweak.Serdes(nameof(w.TextureNumber), (ushort?)w.TextureNumber, s.UInt16);
-            s.Dynamic(w, nameof(w.AnimationFrames));
-            s.Dynamic(w, nameof(w.AutoGfxType));
-            s.Dynamic(w, nameof(w.TransparentColour));
-            s.Dynamic(w, nameof(w.Unk9));
-            s.Dynamic(w, nameof(w.Width));
-            s.Dynamic(w, nameof(w.Height));
+            w.AnimationFrames = s.UInt8(nameof(w.AnimationFrames), w.AnimationFrames);
+            w.AutoGfxType = s.UInt8(nameof(w.AutoGfxType), w.AutoGfxType);
+            w.TransparentColour = s.UInt8(nameof(w.TransparentColour), w.TransparentColour);
+            w.Unk9 = s.UInt8(nameof(w.Unk9), w.Unk9);
+            w.Width = s.UInt16(nameof(w.Width), w.Width);
+            w.Height = s.UInt16(nameof(w.Height), w.Height);
 
             ushort overlayCount = s.UInt16("overlayCount", (ushort)w.Overlays.Count);
             s.List(w.Overlays, overlayCount, Overlay.Serdes);

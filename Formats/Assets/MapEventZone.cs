@@ -9,36 +9,37 @@ namespace UAlbion.Formats.Assets
     {
         public bool Global;
         public byte Unk1 { get; set; }
-        public ushort X;
-        public ushort Y;
+        public byte X;
+        public byte Y;
         public TriggerType Trigger;
         public ushort EventNumber;
         public IEventNode EventNode { get; set; }
 
-        public static MapEventZone Serdes(MapEventZone existing, ISerializer s, ushort y)
+        public static MapEventZone Serdes(MapEventZone existing, ISerializer s, byte y)
         {
-            bool global = y == 0xffff;
+            bool global = y == 0xff;
             var zone = existing ?? new MapEventZone
             {
                 Global = global,
                 Y = global ? (byte)0 : y
             };
 
-            zone.X = s.Transform<ushort, ushort>(nameof(X), zone.X, s.UInt16, StoreIncremented.Instance);
-            s.Dynamic(zone, nameof(Unk1));
-            s.Dynamic(zone, nameof(Trigger));
-            s.Dynamic(zone, nameof(EventNumber));
+            zone.X = s.Transform<byte, byte>(nameof(X), zone.X, s.UInt8, StoreIncremented.Instance);
+            // Debug.Assert(global && zone.X == 0xff || !global && zone.X != 0xff);
+            zone.Unk1 = s.UInt8(nameof(Unk1), zone.Unk1);
+            zone.Trigger = s.EnumU16(nameof(Trigger), zone.Trigger);
+            zone.EventNumber = s.UInt16(nameof(EventNumber), zone.EventNumber);
             return zone;
         }
 
-        public static MapEventZone LoadZone(BinaryReader br, ushort y)
+        public static MapEventZone LoadZone(BinaryReader br, byte y)
         {
-            bool global = y == 0xffff;
+            bool global = y == 0xff;
 
             var zone = new MapEventZone();
             zone.Global = global;
-            zone.X = (ushort)(br.ReadByte() - 1); // +0
-            Debug.Assert(global && zone.X == 0xffff || !global && zone.X != 0xffff);
+            zone.X = (byte)(br.ReadByte() - 1); // +0
+            Debug.Assert(global && zone.X == 0xff || !global && zone.X != 0xff);
             zone.Unk1 = br.ReadByte(); // +1
             zone.Y = global ? (byte)0 : y;
             zone.Trigger = (TriggerType)br.ReadUInt16(); // +2

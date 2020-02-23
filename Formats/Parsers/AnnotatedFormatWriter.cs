@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace UAlbion.Formats.Parsers
 {
@@ -145,7 +146,7 @@ namespace UAlbion.Formats.Parsers
 
         static string ConvertToHexString(byte[] bytes)
         {
-            var result = new System.Text.StringBuilder(bytes.Length * 2);
+            var result = new StringBuilder(bytes.Length * 2);
             foreach (var b in bytes)
                 result.Append(HexStringTable[b]);
             return result.ToString();
@@ -177,7 +178,7 @@ namespace UAlbion.Formats.Parsers
 
             Indent();
             var payloadOffset = 0;
-            var sb = new System.Text.StringBuilder(16);
+            var sb = new StringBuilder(16);
             foreach (var b in v)
             {
                 if (payloadOffset % 16 == 0)
@@ -220,8 +221,8 @@ namespace UAlbion.Formats.Parsers
             DoIndent();
             _tw.Write("{0:X} {1} = {2}", Offset, name, v);
 
-            var bytes = System.Text.Encoding.Unicode.GetBytes(v);
-            Offset += bytes.Length + 2; // add 2 bytes for the null terminator
+            var bytes = Encoding.GetEncoding(850).GetBytes(v);
+            Offset += bytes.Length + 1; // add a byte for the null terminator
             return existing;
         }
 
@@ -231,10 +232,10 @@ namespace UAlbion.Formats.Parsers
             DoIndent();
             _tw.Write("{0:X} {1} = {2}", Offset, name, v);
 
-            var bytes = System.Text.Encoding.Unicode.GetBytes(v);
-            if (bytes.Length > length + 2) throw new InvalidOperationException("Tried to write overlength string");
+            var bytes = Encoding.GetEncoding(850).GetBytes(v);
+            if (bytes.Length > length + 1) throw new InvalidOperationException("Tried to write overlength string");
 
-            Offset += length; // add 2 bytes for the null terminator
+            Offset += length; // add a byte for the null terminator
             return existing;
         }
 
@@ -275,7 +276,7 @@ namespace UAlbion.Formats.Parsers
 
         public void Check() { }
         public bool IsComplete() => false;
-
+/*
         public void Dynamic<TTarget>(TTarget target, string propertyName)
         {
             var serializer = SerializationInfo.Get<TTarget>(propertyName);
@@ -291,16 +292,16 @@ namespace UAlbion.Formats.Parsers
                 case SerializationInfo<TTarget, long>   s:  Int64(s.Name, s.Getter(target)); break;
                 default: throw new InvalidOperationException($"Tried to serialize unexpected type {serializer.Type}");
             }
-        }
+        } */
 
         public void List<TTarget>(IList<TTarget> list, int count, Func<int, TTarget, ISerializer, TTarget> serializer) where TTarget : class
         {
             _indent += 4;
             DoIndent();
-            _tw.Write("[ ");
+            _tw.WriteLine("[ ");
             for (int i = 0; i < count; i++)
                 serializer(i, list[i], this);
-            _tw.Write(" ]");
+            _tw.WriteLine(" ]");
             _indent -= 4;
         }
 
@@ -308,10 +309,10 @@ namespace UAlbion.Formats.Parsers
         {
             _indent += 4;
             DoIndent();
-            _tw.Write("[ ");
+            _tw.WriteLine("[ ");
             for (int i = offset; i < offset + count; i++)
                 serializer(i, list[i], this);
-            _tw.Write(" ]");
+            _tw.WriteLine(" ]");
             _indent -= 4;
         }
     }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -16,7 +15,7 @@ namespace UAlbion.Formats.Assets
         public byte CeilingFlags { get; private set; }
         public byte Width { get; private set; }
         public byte Height { get; private set; }
-        public SongId SongId { get; private set; }
+        public SongId? SongId { get; private set; }
         public LabyrinthDataId LabDataId { get; private set; }
         public CombatBackgroundId CombatBackgroundId { get; private set; }
         public PaletteId PaletteId { get; private set; }
@@ -33,48 +32,22 @@ namespace UAlbion.Formats.Assets
         public byte[] AutomapGraphics { get; private set; }
         public IList<ushort> ActiveMapEvents { get; } = new List<ushort>();
 
-        class NpcCountTransform : IConverter<byte, int>
-        {
-            public static readonly NpcCountTransform Instance = new NpcCountTransform();
-            private NpcCountTransform() { }
-            public byte ToPersistent(int memory) => memory switch
-            {
-                0x20 => (byte)0,
-                0x60 => (byte)0x40,
-                _ when memory > 0xff => throw new InvalidOperationException("Too many NPCs in map"),
-                _ => (byte)memory
-            };
-
-            public int ToMemory(byte persistent) => persistent switch
-            {
-                0 => 0x20,
-                0x40 => 0x60,
-                _ => persistent
-            };
-        }
-
         public static MapData3D Serdes(MapData3D existing, ISerializer s, string name, AssetInfo config)
         {
-            var startPosition = s.Offset;
-
             var map = existing ?? new MapData3D();
-            s.Dynamic(map, nameof(CeilingFlags)); // 0
-            int npcCount = s.Transform("NpcCount", map.Npcs.Count, s.UInt8, NpcCountTransform.Instance); // 1
+            map.CeilingFlags = s.UInt8(nameof(CeilingFlags), map.CeilingFlags); // 0
+            int npcCount = NpcCountTransform.Serdes("NpcCount", map.Npcs.Count, s.UInt8); // 1
             var _ = s.UInt8("MapType", (byte)map.MapType); // 2
 
-            map.SongId = (SongId)(s.Transform<byte, byte?>(nameof(SongId), (byte)map.SongId, s.UInt8, Tweak.Instance) ?? 0); // 3
-            s.Dynamic(map, nameof(Width)); // 4
-            s.Dynamic(map, nameof(Height)); // 5
-            s.Dynamic(map, nameof(LabDataId)); // 6
-            s.Dynamic(map, nameof(CombatBackgroundId)); // 7 TODO: Verify this is combat background
-            map.PaletteId = (PaletteId)s.Transform<byte, byte>(nameof(PaletteId), (byte)map.PaletteId, s.UInt8, StoreIncremented.Instance);
-            map.Sound = s.Transform<byte, byte>(nameof(Sound), map.Sound, s.UInt8, StoreIncremented.Instance);
+            map.SongId = (SongId?)Tweak.Serdes(nameof(SongId), (byte?)map.SongId, s.UInt8); // 3
+            map.Width = s.UInt8(nameof(Width), map.Width); // 4
+            map.Height = s.UInt8(nameof(Height), map.Height); // 5
+            map.LabDataId = s.EnumU8(nameof(LabDataId), map.LabDataId); // 6
+            map.CombatBackgroundId = s.EnumU8(nameof(CombatBackgroundId), map.CombatBackgroundId); // 7 TODO: Verify this is combat background
+            map.PaletteId = (PaletteId)StoreIncremented.Serdes(nameof(PaletteId), (byte)map.PaletteId, s.UInt8);
+            map.Sound = StoreIncremented.Serdes(nameof(Sound), map.Sound, s.UInt8);
 
-            s.List(map.Npcs, npcCount, (i, x, s) => MapNpc.Serdes(x, s));
-            for (int i = map.Npcs.Count - 1; i >= 0; i--)
-                if (map.Npcs[i].Id == 0)
-                    map.Npcs.RemoveAt(i);
-
+            s.List(map.Npcs, npcCount, MapNpc.Serdes);
             s.Check();
 
             map.Contents ??= new byte[map.Width * map.Height];
@@ -89,30 +62,31 @@ namespace UAlbion.Formats.Assets
             }
             s.Check();
 
-            int zoneCount = map.Zones.Count - map.Height;
-            s.List(map.Zones, zoneCount, (i, x,s) => MapEventZone.Serdes(x, s, 0xffff));
+            int zoneCount = s.UInt16("ZoneCount", (ushort)map.Zones.Count(x => x.Global));
+            s.List(map.Zones, zoneCount, (i, x,serializer) => MapEventZone.Serdes(x, serializer, 0xff));
             s.Check();
 
             int zoneOffset = zoneCount;
-            for (int j = 0; j < map.Height; j++)
+            for (byte y = 0; y < map.Height; y++)
             {
-                zoneCount = map.Zones.Count(x => x.Y == j);
-                s.List(map.Zones, zoneCount, zoneOffset, (i, x, s) => MapEventZone.Serdes(x, s,  (ushort)(i - zoneOffset)));
+                zoneCount = s.UInt16("RowZones", (ushort)map.Zones.Count(x => x.Y == y && !x.Global));
+                s.List(map.Zones, zoneCount, zoneOffset, (i, x, s) => MapEventZone.Serdes(x, s, y));
                 zoneOffset += zoneCount;
             }
 
-            if (!map.Events.Any()) // if (s.Offset == startPosition + streamLength)
+            if (s.Mode == SerializerMode.Reading && s.IsComplete() || s.Mode != SerializerMode.Reading && map.AutomapGraphics == null)
             {
                 Debug.Assert(map.Zones.Count == 0);
                 return map;
             }
 
-            int eventCount = map.Events.Count;
+            ushort eventCount = s.UInt16("EventCount", (ushort)map.Events.Count);
             s.List(map.Events, eventCount, EventNode.Serdes);
             s.Check();
 
             foreach(var npc in map.Npcs)
-                npc.LoadWaypoints(s);
+                if (npc.Id != 0)
+                    npc.LoadWaypoints(s);
             s.Check();
 
             ushort automapInfoCount = s.UInt16("AutomapInfoCount", (ushort)map.Automap.Count);
@@ -126,9 +100,17 @@ namespace UAlbion.Formats.Assets
 
             for(int i = 0; i < 64; i++)
             {
-                var eventId = s.UInt16(null, i >= map.ActiveMapEvents.Count ? (ushort)0xffff : map.ActiveMapEvents[i]);
-                if (eventId != 0xffff && i < map.ActiveMapEvents.Count)
-                    map.ActiveMapEvents.Add(eventId);
+                if(s.Mode == SerializerMode.Reading)
+                {
+                    var eventId = s.UInt16(null, 0);
+                    if (eventId != 0xffff)
+                        map.ActiveMapEvents.Add(eventId);
+                }
+                else
+                {
+                    var eventId = map.ActiveMapEvents.Count <= i ? (ushort)0xffff : map.ActiveMapEvents[i];
+                    s.UInt16(null, eventId);
+                }
             }
             s.Check();
 
@@ -143,7 +125,7 @@ namespace UAlbion.Formats.Assets
             }
 
             foreach(var npc in map.Npcs)
-                if (npc.EventNumber.HasValue)
+                if (npc.Id != 0 && npc.EventNumber.HasValue)
                     npc.EventChain = map.Events[npc.EventNumber.Value];
 
             foreach(var zone in map.Zones)
@@ -172,7 +154,7 @@ namespace UAlbion.Formats.Assets
             var mapType = br.ReadByte(); // 2
             Debug.Assert(1 == mapType);  // 1 = 3D, 2 = 2D
 
-            map.SongId    = (SongId)br.ReadByte() - 1; // 3
+            map.SongId    = (SongId?)FormatUtil.Tweak(br.ReadByte()); // 3
             map.Width     = br.ReadByte(); // 4
             map.Height    = br.ReadByte(); // 5
             byte labData  = br.ReadByte(); // 6
@@ -183,11 +165,7 @@ namespace UAlbion.Formats.Assets
             map.Sound = (byte)(br.ReadByte() - 1); // 9 // TODO: Check 0 handling etc
 
             for (int i = 0; i < npcCount; i++)
-            {
-                var npc = MapNpc.Load(br);
-                if (npc.Id == 0) continue;
-                map.Npcs.Add(npc);
-            }
+                map.Npcs.Add(MapNpc.Load(br));
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
             map.Contents = new byte[map.Width * map.Height];
@@ -203,14 +181,14 @@ namespace UAlbion.Formats.Assets
 
             int zoneCount = br.ReadUInt16();
             for (int i = 0; i < zoneCount; i++)
-                map.Zones.Add(MapEventZone.LoadZone(br, 0xffff));
+                map.Zones.Add(MapEventZone.LoadZone(br, 0xff));
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
-            for (int j = 0; j < map.Height; j++)
+            for (byte j = 0; j < map.Height; j++)
             {
                 zoneCount = br.ReadUInt16();
                 for (int i = 0; i < zoneCount; i++)
-                    map.Zones.Add(MapEventZone.LoadZone(br, (ushort)j));
+                    map.Zones.Add(MapEventZone.LoadZone(br, j));
             }
 
             if (br.BaseStream.Position == startPosition + streamLength)
@@ -225,7 +203,8 @@ namespace UAlbion.Formats.Assets
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
             foreach(var npc in map.Npcs)
-                npc.LoadWaypoints(br);
+                if (npc.Id != 0)
+                    npc.LoadWaypoints(br);
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
             int automapInfoCount = br.ReadUInt16();
@@ -249,7 +228,7 @@ namespace UAlbion.Formats.Assets
             Debug.Assert(br.BaseStream.Position <= startPosition + streamLength);
 
             // Resolve event indices to pointers
-            foreach (var mapEvent in map.Events.OfType<EventNode>())
+            foreach (var mapEvent in map.Events)
             {
                 if (mapEvent.NextEventId.HasValue && mapEvent.NextEventId < map.Events.Count)
                     mapEvent.NextEvent = map.Events[mapEvent.NextEventId.Value];
@@ -259,7 +238,7 @@ namespace UAlbion.Formats.Assets
             }
 
             foreach(var npc in map.Npcs)
-                if (npc.EventNumber.HasValue)
+                if (npc.Id != 0 && npc.EventNumber.HasValue)
                     npc.EventChain = map.Events[npc.EventNumber.Value];
 
             foreach(var zone in map.Zones)

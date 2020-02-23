@@ -130,7 +130,7 @@ namespace UAlbion.Formats.Parsers
 
         public void Check() { }
         public bool IsComplete() => false;
-
+/*
         public void Dynamic<TTarget>(TTarget target, string propertyName)
         {
             var serializer = SerializationInfo.Get<TTarget>(propertyName);
@@ -147,7 +147,7 @@ namespace UAlbion.Formats.Parsers
                 default: throw new InvalidOperationException($"Tried to serialize unexpected type {serializer.Type}");
             }
             _offset += serializer.Size;
-        }
+        } */
 
         public void List<TTarget>(IList<TTarget> list, int count, Func<int, TTarget, ISerializer, TTarget> serializer) where TTarget : class
         {

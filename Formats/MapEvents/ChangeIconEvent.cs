@@ -5,17 +5,17 @@ namespace UAlbion.Formats.MapEvents
 {
     public class ChangeIconEvent : IPositionedEvent, IMapEvent
     {
-        public static ChangeIconEvent Serdes(ChangeIconEvent node, ISerializer s)
+        public static ChangeIconEvent Serdes(ChangeIconEvent e, ISerializer s)
         {
-            node ??= new ChangeIconEvent();
-            s.Dynamic(node, nameof(X));
-            s.Dynamic(node, nameof(Y));
-            s.Dynamic(node, nameof(Permanent));
-            node.ChangeType = s.EnumU8(nameof(ChangeType), node.ChangeType);
-            s.Dynamic(node, nameof(Unk5));
-            s.Dynamic(node, nameof(Value));
-            s.Dynamic(node, nameof(Unk8));
-            return node;
+            e ??= new ChangeIconEvent();
+            e.X = s.Int8(nameof(X), e.X);
+            e.Y = s.Int8(nameof(Y), e.Y);
+            e.Permanent = s.UInt8(nameof(Permanent), e.Permanent);
+            e.ChangeType = s.EnumU8(nameof(ChangeType), e.ChangeType);
+            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            e.Value = s.UInt16(nameof(Value), e.Value);
+            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+            return e;
         }
 
         public enum IconChangeType : byte

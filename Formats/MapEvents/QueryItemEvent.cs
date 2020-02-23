@@ -13,10 +13,10 @@ namespace UAlbion.Formats.MapEvents
         public static QueryItemEvent Translate(QueryItemEvent e, ISerializer s, QueryType subType)
         {
             e ??= new QueryItemEvent(subType);
-            s.Dynamic(e, nameof(Unk2));
-            s.Dynamic(e, nameof(Unk3));
-            s.Dynamic(e, nameof(Unk4));
-            s.Dynamic(e, nameof(Unk5));
+            e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
+            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
+            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
+            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.ItemId = (ItemId)StoreIncremented.Serdes(nameof(ItemId), (ushort)e.ItemId, s.UInt16);
             e.FalseEventId = ConvertMaxToNull.Serdes(nameof(FalseEventId), e.FalseEventId, s.UInt16);
             return e;

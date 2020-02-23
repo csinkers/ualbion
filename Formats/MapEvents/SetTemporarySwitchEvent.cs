@@ -8,12 +8,12 @@ namespace UAlbion.Formats.MapEvents
         public static SetTemporarySwitchEvent Translate(SetTemporarySwitchEvent e, ISerializer s)
         {
             e ??= new SetTemporarySwitchEvent();
-            s.Dynamic(e, nameof(SwitchValue));
-            s.Dynamic(e, nameof(Unk3));
-            s.Dynamic(e, nameof(Unk4));
-            s.Dynamic(e, nameof(Unk5));
-            s.Dynamic(e, nameof(SwitchId));
-            s.Dynamic(e, nameof(Unk8));
+            e.SwitchValue = s.UInt8(nameof(SwitchValue), e.SwitchValue);
+            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
+            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
+            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            e.SwitchId = s.UInt16(nameof(SwitchId), e.SwitchId);
+            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             Debug.Assert(e.Unk4 == 0);
             Debug.Assert(e.Unk5 == 0);
             Debug.Assert(e.Unk8 == 0);

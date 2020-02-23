@@ -35,6 +35,7 @@
         CharacterData,
         EventSet,
         Inventory,
+        MerchantInventory,
         MonsterGroup,
         SpellData,
         TranslationTable,

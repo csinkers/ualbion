@@ -7,7 +7,7 @@ namespace UAlbion.Formats.Assets
     public interface IMapData
     {
         MapType MapType { get; }
-        byte Sound { get;  }
+        SongId? SongId { get; }
         byte Width { get;  }
         byte Height { get;  }
         CombatBackgroundId CombatBackgroundId { get;  }

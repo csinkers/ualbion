@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.IO;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
@@ -10,12 +9,12 @@ namespace UAlbion.Formats.MapEvents
         {
             e ??= new SoundEvent();
             e.Mode = s.EnumU8(nameof(Mode), e.Mode);
-            s.Dynamic(e, nameof(SoundId));
-            s.Dynamic(e, nameof(Unk3));
-            s.Dynamic(e, nameof(Volume));
-            s.Dynamic(e, nameof(RestartProbability));
-            s.Dynamic(e, nameof(FrequencyOverride));
-            s.Dynamic(e, nameof(Unk8));
+            e.SoundId = s.UInt8(nameof(SoundId), e.SoundId);
+            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
+            e.Volume = s.UInt8(nameof(Volume), e.Volume);
+            e.RestartProbability = s.UInt8(nameof(RestartProbability), e.RestartProbability);
+            e.FrequencyOverride = s.UInt16(nameof(FrequencyOverride), e.FrequencyOverride);
+            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             Debug.Assert(e.Unk3 <= 100);
             Debug.Assert(e.Volume <= 150);
             Debug.Assert(e.RestartProbability <= 102);

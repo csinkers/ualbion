@@ -8,12 +8,12 @@ namespace UAlbion.Formats.MapEvents
         public static DisableEventChainEvent Translate(DisableEventChainEvent e, ISerializer s)
         {
             e ??= new DisableEventChainEvent();
-            s.Dynamic(e, nameof(Unk2));
-            s.Dynamic(e, nameof(ChainNumber));
-            s.Dynamic(e, nameof(Unk4));
-            s.Dynamic(e, nameof(Unk5));
-            s.Dynamic(e, nameof(Unk6));
-            s.Dynamic(e, nameof(Unk8));
+            e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
+            e.ChainNumber = s.UInt8(nameof(ChainNumber), e.ChainNumber);
+            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
+            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
+            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             Debug.Assert(e.Unk2 == 1 || e.Unk2 == 0 || e.Unk2 == 2); // Usually 1
             return e;
         }

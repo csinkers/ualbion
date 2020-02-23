@@ -27,11 +27,11 @@ namespace UAlbion.Formats.MapEvents
             }
 
             var e = (QueryEvent)genericEvent ?? new QueryEvent { SubType = subType };
-            s.Dynamic(e, nameof(Unk2));
-            s.Dynamic(e, nameof(Unk3));
-            s.Dynamic(e, nameof(Unk4));
-            s.Dynamic(e, nameof(Unk5));
-            s.Dynamic(e, nameof(Argument));
+            e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
+            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
+            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
+            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            e.Argument = s.UInt16(nameof(Argument), e.Argument);
             e.FalseEventId = ConvertMaxToNull.Serdes(nameof(FalseEventId), e.FalseEventId, s.UInt16);
 
             Debug.Assert(e.Unk4 == 0);

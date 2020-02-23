@@ -46,7 +46,7 @@ namespace UAlbion.Formats.Parsers
         void Meta(string name, Action<ISerializer> reader, Action<ISerializer> writer); // name serializer deserializer
         T Meta<T>(string name, T existing, Func<int, T, ISerializer, T> serdes);
 
-        void Dynamic<TTarget>(TTarget target, string propertyName);
+        // void Dynamic<TTarget>(TTarget target, string propertyName);
         void List<TTarget>(IList<TTarget> list, int count, Func<int, TTarget, ISerializer, TTarget> serdes) where TTarget : class;
         void List<TTarget>(IList<TTarget> list, int count, int offset, Func<int, TTarget, ISerializer, TTarget> serializer) where TTarget : class;
     }

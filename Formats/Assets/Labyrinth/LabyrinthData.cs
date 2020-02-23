@@ -36,48 +36,47 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public IList<FloorAndCeiling> FloorAndCeilings { get; } = new List<FloorAndCeiling>();
         public IList<Wall> Walls { get; } = new List<Wall>();
 
-        public static void Serialize(LabyrinthData d, ISerializer s, long length)
+        public static LabyrinthData Serdes(LabyrinthData d, ISerializer s)
         {
+            d ??= new LabyrinthData();
             PerfTracker.StartupEvent("Start loading labyrinth data");
             var start = s.Offset;
             // s.ByteArray("UnknownBlock6C", () => sheet.UnknownBlock6C, x => sheet.UnknownBlock6C = x, 14);
 
-            s.Dynamic(d, nameof(d.WallHeight));           // 0
-            s.Dynamic(d, nameof(d.CameraHeight));         // 2
-            s.Dynamic(d, nameof(d.Unk4));                 // 4
+            d.WallHeight   = s.UInt16(nameof(d.WallHeight), d.WallHeight);       // 0
+            d.CameraHeight = s.UInt16(nameof(d.CameraHeight), d.CameraHeight); // 2
+            d.Unk4         = s.UInt16(nameof(d.Unk4), d.Unk4);                         // 4
             d.BackgroundId = (DungeonBackgroundId?)Tweak.Serdes(nameof(BackgroundId), (ushort?)d.BackgroundId, s.UInt16); // 6
-            s.Dynamic(d, nameof(d.BackgroundYPosition));  // 8
-            s.Dynamic(d, nameof(d.FogDistance));          // A
-            s.Dynamic(d, nameof(d.FogRed));               // C
-            s.Dynamic(d, nameof(d.FogGreen));             // E
-            s.Dynamic(d, nameof(d.FogBlue));              // 10
-            s.Dynamic(d, nameof(d.Unk12));                // 12
-            s.Dynamic(d, nameof(d.Unk13));                // 13
-            s.Dynamic(d, nameof(d.BackgroundColour));     // 14
-            s.Dynamic(d, nameof(d.Unk15));                // 15
-            s.Dynamic(d, nameof(d.FogMode));              // 16
-            s.Dynamic(d, nameof(d.MaxLight));             // 18
-            s.Dynamic(d, nameof(d.WallWidth));            // 1A
-            s.Dynamic(d, nameof(d.BackgroundTileAmount)); // 1C
-            s.Dynamic(d, nameof(d.MaxVisibleTiles));      // 1E
-            s.Dynamic(d, nameof(d.Unk20));                // 20
-            s.Dynamic(d, nameof(d.Lighting));             // 22
-            s.Dynamic(d, nameof(d.Unk24));                // 24
+            d.BackgroundYPosition  = s.UInt16(nameof(d.BackgroundYPosition), d.BackgroundYPosition);   // 8
+            d.FogDistance          = s.UInt16(nameof(d.FogDistance), d.FogDistance);                   // A
+            d.FogRed               = s.UInt16(nameof(d.FogRed), d.FogRed);                             // C
+            d.FogGreen             = s.UInt16(nameof(d.FogGreen), d.FogGreen);                         // E
+            d.FogBlue              = s.UInt16(nameof(d.FogBlue), d.FogBlue);                           // 10
+            d.Unk12                = s.UInt8(nameof(d.Unk12), d.Unk12);                                // 12
+            d.Unk13                = s.UInt8(nameof(d.Unk13), d.Unk13);                                // 13
+            d.BackgroundColour     = s.UInt8(nameof(d.BackgroundColour), d.BackgroundColour);          // 14
+            d.Unk15                = s.UInt8(nameof(d.Unk15), d.Unk15);                                // 15
+            d.FogMode              = s.UInt16(nameof(d.FogMode), d.FogMode);                           // 16
+            d.MaxLight             = s.UInt16(nameof(d.MaxLight), d.MaxLight);                         // 18
+            d.WallWidth            = s.UInt16(nameof(d.WallWidth), d.WallWidth);                       // 1A
+            d.BackgroundTileAmount = s.UInt16(nameof(d.BackgroundTileAmount), d.BackgroundTileAmount); // 1C
+            d.MaxVisibleTiles      = s.UInt16(nameof(d.MaxVisibleTiles), d.MaxVisibleTiles);           // 1E
+            d.Unk20                = s.UInt16(nameof(d.Unk20), d.Unk20);                               // 20
+            d.Lighting             = s.UInt16(nameof(d.Lighting), d.Lighting);                         // 22
+            d.Unk24                = s.UInt16(nameof(d.Unk24), d.Unk24);                               // 24
             s.Check();
-
-            Debug.Assert(s.Offset - start <= length);
 
             ushort objectGroupCount = s.UInt16("ObjectGroupCount", (ushort)d.ObjectGroups.Count); // 26
             s.List(d.ObjectGroups, objectGroupCount, ObjectGroup.Serdes);
-            Debug.Assert(s.Offset - start <= length);
+            s.Check();
 
             var floorAndCeilingCount = s.UInt16("FloorAndCeilingCount", (ushort)d.FloorAndCeilings.Count); // 28 + objectGroupCount * 42
             s.List(d.FloorAndCeilings, floorAndCeilingCount, FloorAndCeiling.Serdes);
-            Debug.Assert(s.Offset - start <= length);
+            s.Check();
 
             ushort objectCount = s.UInt16("ObjectCount", (ushort)d.Objects.Count); // 2A + objectGroupCount * 42 + floorAndCeilingCount * A
             s.List(d.Objects, objectCount, Object.Serdes);
-            Debug.Assert(s.Offset - start <= length);
+            s.Check();
 
             // Populate objectIds on subobjects to improve debugging experience
             foreach (var so in d.ObjectGroups.SelectMany(x => x.SubObjects))
@@ -89,8 +88,9 @@ namespace UAlbion.Formats.Assets.Labyrinth
 
             ushort wallCount = s.UInt16("WallCount", (ushort)d.Walls.Count);
             s.List(d.Walls, wallCount, Wall.Serdes);
-            Debug.Assert(s.Offset - start <= length);
+            s.Check();
             PerfTracker.StartupEvent("Finish loading labyrinth data");
+            return d;
         }
     }
 }

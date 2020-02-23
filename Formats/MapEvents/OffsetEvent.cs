@@ -8,13 +8,13 @@ namespace UAlbion.Formats.MapEvents
         public static OffsetEvent Serdes(OffsetEvent e, ISerializer s)
         {
             e ??= new OffsetEvent();
-            s.Dynamic(e, nameof(X));
-            s.Dynamic(e, nameof(Y));
-            s.Dynamic(e, nameof(Unk3));
-            s.Dynamic(e, nameof(Unk4));
-            s.Dynamic(e, nameof(Unk5));
-            s.Dynamic(e, nameof(Unk6));
-            s.Dynamic(e, nameof(Unk8));
+            e.X = s.Int8(nameof(X), e.X);
+            e.Y = s.Int8(nameof(Y), e.Y);
+            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
+            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
+            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
+            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             Debug.Assert(e.Unk3 == 1 || e.Unk3 == 3);
             Debug.Assert(e.Unk4 == 0);
             Debug.Assert(e.Unk5 == 0);

@@ -8,9 +8,9 @@ using UAlbion.Formats.Config;
 namespace UAlbion.Formats.Parsers
 {
     [AssetLoader(FileFormat.CharacterData)]
-    class CharacterSheetLoader : IAssetLoader
+    class CharacterSheetLoader : IAssetLoader<CharacterSheet>
     {
-        static CharacterSheet Serdes(CharacterSheet sheet, ISerializer s)
+        public CharacterSheet Serdes(CharacterSheet sheet, ISerializer s, string name, AssetInfo config)
         {
             sheet ??= new CharacterSheet();
             s.Check();
@@ -220,7 +220,7 @@ namespace UAlbion.Formats.Parsers
 
         public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
-            var sheet = Serdes(null, new GenericBinaryReader(br, streamLength));
+            var sheet = Serdes(null, new GenericBinaryReader(br, streamLength), name, config);
             sheet.Name = name;
             return sheet;
         }

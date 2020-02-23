@@ -61,6 +61,9 @@ namespace UAlbion.Game.Entities.Map2D
 
             foreach (var npc in _logicalMap.Npcs)
             {
+                if (npc.Id == 0)
+                    continue;
+
                 AttachChild(_logicalMap.UseSmallSprites
                     ? new SmallNpc(npc) as IComponent
                     : new LargeNpc(npc));

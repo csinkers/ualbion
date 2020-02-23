@@ -38,12 +38,12 @@ namespace UAlbion.Formats.Assets.Labyrinth
             o.Properties = s.EnumU8(nameof(o.Properties), o.Properties);
             o.CollisionData = s.ByteArray(nameof(o.CollisionData), o.CollisionData, 3);
             o.TextureNumber = (DungeonObjectId?)s.Transform<ushort, ushort?>(nameof(TextureNumber), (ushort?)o.TextureNumber, s.UInt16, Tweak.Instance);
-            s.Dynamic(o, nameof(o.AnimationFrames));
-            s.Dynamic(o, nameof(o.Unk7));
-            s.Dynamic(o, nameof(o.Width));
-            s.Dynamic(o, nameof(o.Height));
-            s.Dynamic(o, nameof(o.MapWidth));
-            s.Dynamic(o, nameof(o.MapHeight));
+            o.AnimationFrames = s.UInt8(nameof(o.AnimationFrames), o.AnimationFrames);
+            o.Unk7 = s.UInt8(nameof(o.Unk7), o.Unk7);
+            o.Width = s.UInt16(nameof(o.Width), o.Width);
+            o.Height = s.UInt16(nameof(o.Height), o.Height);
+            o.MapWidth = s.UInt16(nameof(o.MapWidth), o.MapWidth);
+            o.MapHeight = s.UInt16(nameof(o.MapHeight), o.MapHeight);
             return o;
         }
     }

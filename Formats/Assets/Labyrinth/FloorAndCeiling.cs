@@ -33,13 +33,13 @@ namespace UAlbion.Formats.Assets.Labyrinth
         {
             var fc = existing ?? new FloorAndCeiling();
             fc.Properties = s.EnumU8(nameof(fc.Properties), fc.Properties);
-            s.Dynamic(fc, nameof(fc.Unk1));
-            s.Dynamic(fc, nameof(fc.Unk2));
-            s.Dynamic(fc, nameof(fc.Unk3));
-            s.Dynamic(fc, nameof(fc.AnimationCount));
-            s.Dynamic(fc, nameof(fc.Unk5));
-            fc.TextureNumber = (DungeonFloorId?)s.Transform<ushort, ushort?>(nameof(TextureNumber), (ushort?)fc.TextureNumber, s.UInt16, Tweak.Instance);
-            s.Dynamic(fc, nameof(fc.Unk8));
+            fc.Unk1 = s.UInt8(nameof(fc.Unk1), fc.Unk1);
+            fc.Unk2 = s.UInt8(nameof(fc.Unk2), fc.Unk2);
+            fc.Unk3 = s.UInt8(nameof(fc.Unk3), fc.Unk3);
+            fc.AnimationCount = s.UInt8(nameof(fc.AnimationCount), fc.AnimationCount);
+            fc.Unk5 = s.UInt8(nameof(fc.Unk5), fc.Unk5);
+            fc.TextureNumber = (DungeonFloorId?)Tweak.Serdes(nameof(TextureNumber), (ushort?)fc.TextureNumber, s.UInt16);
+            fc.Unk8 = s.UInt16(nameof(fc.Unk8), fc.Unk8);
             return fc;
         }
     }

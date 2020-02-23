@@ -8,12 +8,12 @@ namespace UAlbion.Formats.MapEvents
         public static SetNpcActiveEvent Translate(SetNpcActiveEvent e, ISerializer s)
         {
             e ??= new SetNpcActiveEvent();
-            s.Dynamic(e, nameof(IsActive));
+            e.IsActive = s.UInt8(nameof(IsActive), e.IsActive);
             e.NpcId = s.EnumU8(nameof(NpcId), e.NpcId);
-            s.Dynamic(e, nameof(Unk4));
-            s.Dynamic(e, nameof(Unk5));
-            s.Dynamic(e, nameof(Unk6));
-            s.Dynamic(e, nameof(Unk8));
+            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
+            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
+            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             return e;
         }
 

@@ -9,6 +9,8 @@ namespace UAlbion.Formats.Assets
 {
     public class MapNpc
     {
+        public const int SizeOnDisk = 10;
+
         [Flags]
         public enum NpcFlags : byte
         {
@@ -46,22 +48,22 @@ namespace UAlbion.Formats.Assets
         public ushort ObjectNumber { get; set; }
         public NpcFlags Flags { get; set; } // 1=Dialogue, 2=AutoAttack, 11=ReturnMsg
         public MovementType Movement { get; set; }
-        public ushort Unk8 { get; set; }
-        public int Unk9 { get; set; }
+        public byte Unk8 { get; set; }
+        public byte Unk9 { get; set; }
         public Waypoint[] Waypoints { get; set; }
         public IEventNode EventChain { get; set; }
 
-        public static MapNpc Serdes(MapNpc existing, ISerializer s)
+        public static MapNpc Serdes(int _, MapNpc existing, ISerializer s)
         {
             var npc = existing ?? new MapNpc();
-            s.Dynamic(npc, nameof(Id));
-            s.Dynamic(npc, nameof(Sound));
-            s.Dynamic(npc, nameof(EventNumber)); // max => null
-            s.Dynamic(npc, nameof(ObjectNumber)); // tweak
-            s.Dynamic(npc, nameof(Flags));
-            s.Dynamic(npc, nameof(Movement));
-            s.Dynamic(npc, nameof(Unk8));
-            s.Dynamic(npc, nameof(Unk9));
+            npc.Id = s.EnumU8(nameof(Id), npc.Id);
+            npc.Sound = s.UInt8(nameof(Sound), npc.Sound);
+            npc.EventNumber = ConvertMaxToNull.Serdes(nameof(EventNumber), npc.EventNumber, s.UInt16);
+            npc.ObjectNumber = Tweak.Serdes(nameof(ObjectNumber), npc.ObjectNumber, s.UInt16) ?? 0;
+            npc.Flags = s.EnumU8(nameof(Flags), npc.Flags);
+            npc.Movement = s.EnumU8(nameof(Movement), npc.Movement);
+            npc.Unk8 = s.UInt8(nameof(Unk8), npc.Unk8);
+            npc.Unk9 = s.UInt8(nameof(Unk9), npc.Unk9);
             return npc;
         }
 

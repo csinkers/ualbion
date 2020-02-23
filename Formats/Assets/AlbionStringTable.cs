@@ -1,12 +1,38 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using UAlbion.Formats.Config;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets
 {
+    public class StringTable
+    {
+        readonly string[] _strings;
+        StringTable(string[] strings) => _strings = strings;
+        public string this[int key] => _strings[key];
+
+        public static StringTable Serdes(StringTable existing, ISerializer s)
+        {
+            var strings = existing?._strings;
+            var stringCount = s.UInt16("StringCount", (ushort)(strings?.Length ?? 0));
+            strings ??= new string[stringCount];
+
+            var stringLengths = strings.Select(x => (ushort)(x?.Length ?? 0)).ToArray();
+            for (int i = 0; i < stringCount; i++)
+                stringLengths[i] = s.UInt16(null, stringLengths[i]);
+
+            for (int i = 0; i < stringCount; i++)
+                strings[i] = s.FixedLengthString(null, strings[i], stringLengths[i]);
+
+            s.Check();
+            return existing ?? new StringTable(strings);
+        }
+    }
+
     [AssetLoader(FileFormat.StringTable)]
-    public class AlbionStringTableLoader : IAssetLoader
+    public class AlbionStringTableLoader : IAssetLoader<StringTable>
     {
         public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
@@ -27,5 +53,7 @@ namespace UAlbion.Formats.Assets
             Debug.Assert(br.BaseStream.Position == startOffset + streamLength);
             return strings;
         }
+
+        public StringTable Serdes(StringTable existing, ISerializer s, string name, AssetInfo config) => StringTable.Serdes(existing, s);
     }
 }

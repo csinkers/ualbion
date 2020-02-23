@@ -4,27 +4,25 @@ using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.Inventory)]
-    class ChestLoader : IAssetLoader
+    [AssetLoader(FileFormat.Inventory, FileFormat.MerchantInventory)]
+    class ChestLoader : IAssetLoader<Chest>
     {
-        static void Translate(Chest chest, ISerializer s, long length)
+        public Chest Serdes(Chest chest, ISerializer s, string name, AssetInfo config)
         {
+            chest ??= new Chest();
+
             var start = s.Offset;
             for (int i = 0; i < Chest.SlotCount; i++)
                 chest.Slots[i] = s.Meta($"Slot{i}", chest.Slots[i], ItemSlotLoader.Serdes);
 
-            if (s.Offset - start >= length) // If it's a merchant record then we're all done
-                return;
+            if (config.Format == FileFormat.MerchantInventory)
+                return chest;
 
             chest.Gold = s.UInt16("Gold", chest.Gold);
             chest.Rations = s.UInt16("Rations", chest.Rations);
-        }
-
-        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
-        {
-            var chest = new Chest();
-            Translate(chest, new GenericBinaryReader(br, streamLength), streamLength);
             return chest;
         }
+
+        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config) => Serdes(null, new GenericBinaryReader(br, streamLength), name, config);
     }
 }

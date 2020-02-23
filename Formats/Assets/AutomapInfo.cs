@@ -36,15 +36,18 @@ namespace UAlbion.Formats.Assets
             var nameBytes = br.ReadBytes(15);
 
             bool done = false; // Verify that strings contain no embedded nulls.
+            int length = 0;
             foreach (var t in nameBytes)
             {
                 if(done)
                     Debug.Assert(t == 0);
                 else if (t == 0)
                     done = true;
+                else
+                    length++;
             }
 
-            i.Name = Encoding.ASCII.GetString(nameBytes);
+            i.Name = Encoding.GetEncoding(850).GetString(nameBytes, 0, length);
             return i;
         }
     }

@@ -6,17 +6,17 @@ namespace UAlbion.Formats.MapEvents
     [Api.Event("text")]
     public class TextEvent : IMapEvent
     {
-        public static TextEvent Serdes(TextEvent node, ISerializer s)
+        public static TextEvent Serdes(TextEvent e, ISerializer s)
         {
-            node ??= new TextEvent();
-            s.Dynamic(node, nameof(TextType));
-            s.Dynamic(node, nameof(Unk2));
-            s.Dynamic(node, nameof(Unk3));
-            s.Dynamic(node, nameof(PortraitId));
-            s.Dynamic(node, nameof(TextId));
-            s.Dynamic(node, nameof(Unk6));
-            s.Dynamic(node, nameof(Unk8));
-            return node;
+            e ??= new TextEvent();
+            e.TextType = s.UInt8(nameof(TextType), e.TextType);
+            e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
+            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
+            e.PortraitId = s.UInt8(nameof(PortraitId), e.PortraitId);
+            e.TextId = s.UInt8(nameof(TextId), e.TextId);
+            e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
+            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+            return e;
         }
         /* public enum TextTypes
         {

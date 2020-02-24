@@ -13,7 +13,7 @@ namespace UAlbion.Formats.Parsers
 
             var start = s.Offset;
             for (int i = 0; i < Chest.SlotCount; i++)
-                chest.Slots[i] = s.Meta($"Slot{i}", chest.Slots[i], ItemSlotLoader.Serdes);
+                chest.Slots[i] = s.Meta($"Slot{i}", chest.Slots[i], ItemSlot.Serdes);
 
             if (config.Format == FileFormat.MerchantInventory)
                 return chest;

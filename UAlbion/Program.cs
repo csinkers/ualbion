@@ -57,7 +57,7 @@ namespace UAlbion
 
                 case ExecutionMode.AudioSlave: break; // TODO
                 case ExecutionMode.Editor: break; // TODO
-                case ExecutionMode.SavedGameTests: SavedGameTests.Run(baseDir); break;
+                case ExecutionMode.SavedGameTests: SavedGameTests.RoundTripTest(baseDir); break;
 
                 case ExecutionMode.DumpData:
                     Dump.CoreSprites(assets, baseDir);

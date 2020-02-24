@@ -35,13 +35,13 @@ namespace UAlbion.Game.Gui.Inventory
             var member = state.Party[ActiveCharacter];
             var slotInfo = member?.Apparent.Inventory.GetSlot(SlotId);
 
-            if(slotInfo == null)
+            if(slotInfo?.Id == null)
             {
                 _sprite.SubId = (int)ItemSpriteId.Nothing;
                 return;
             }
 
-            var item = assets.LoadItem(slotInfo.Id);
+            var item = assets.LoadItem(slotInfo.Id.Value);
 
             int frames = item.IconAnim == 0 ? 1 : item.IconAnim;
             while (_frameNumber >= frames)

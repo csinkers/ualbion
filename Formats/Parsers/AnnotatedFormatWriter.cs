@@ -28,9 +28,11 @@ namespace UAlbion.Formats.Parsers
             "F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "FA", "FB", "FC", "FD", "FE", "FF"
         };
 
-        public AnnotatedFormatWriter(TextWriter textWriter)
+        public AnnotatedFormatWriter(TextWriter textWriter, AnnotatedFormatWriter existing = null)
         {
             _tw = textWriter;
+            if (existing != null)
+                _indent = existing._indent + 4;
         }
 
         readonly TextWriter _tw;
@@ -44,7 +46,7 @@ namespace UAlbion.Formats.Parsers
         public void NewLine() => _tw.WriteLine();
         public long Offset { get; private set; }
 
-        public void Seek(long newOffset) { _tw.WriteLine("Seek to {0} for overwrite", newOffset); Offset = newOffset; }
+        public void Seek(long newOffset) { _tw.WriteLine("{1:X} Seek to {0:X} for overwrite", newOffset, Offset); Offset = newOffset; }
 
         public sbyte Int8(string name, sbyte existing)
         {

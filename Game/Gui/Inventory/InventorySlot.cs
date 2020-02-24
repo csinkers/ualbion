@@ -44,7 +44,7 @@ namespace UAlbion.Game.Gui.Inventory
             var assets = Resolve<IAssetManager>();
             var member = Resolve<IParty>()[ActiveCharacter];
             slotInfo = member?.Apparent.Inventory.GetSlot(SlotId);
-            item = slotInfo == null ? null : assets.LoadItem(slotInfo.Id);
+            item = slotInfo?.Id == null ? null : assets.LoadItem(slotInfo.Id.Value);
         }
 
         void OnClick()
@@ -97,17 +97,17 @@ namespace UAlbion.Game.Gui.Inventory
 
             var slotInfo = member.Effective.Inventory.GetSlot(SlotId);
             string itemName = null;
-            if (slotInfo != null)
+            if (slotInfo?.Id != null)
             {
-                var item = assets.LoadItem(slotInfo.Id);
+                var item = assets.LoadItem(slotInfo.Id.Value);
                 if (item != null)
                     itemName = item.GetName(settings.Gameplay.Language);
             }
 
             string itemInHandName = null;
-            if (hand is ItemSlot handSlot)
+            if (hand is ItemSlot handSlot && handSlot.Id.HasValue)
             {
-                var itemInHand = assets.LoadItem(handSlot.Id);
+                var itemInHand = assets.LoadItem(handSlot.Id.Value);
                 itemInHandName = itemInHand.GetName(settings.Gameplay.Language);
             }
 

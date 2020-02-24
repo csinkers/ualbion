@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats
 {
@@ -55,31 +54,5 @@ namespace UAlbion.Formats
         }
 
         public void Dispose() => _stream?.Dispose();
-    }
-
-    public class XldLoader
-    {
-        const string MagicString = "XLD0I";
-        public int HeaderSize(int itemCount) => MagicString.Length + 3 + 4 * itemCount;
-        public int[] Serdes(int[] lengths, ISerializer s)
-        {
-            s.Check();
-            string magic = s.NullTerminatedString("MagicString", MagicString);
-            s.Check();
-            if(magic != MagicString)
-                throw new FormatException("XLD file magic string not found");
-
-            ushort objectCount = s.UInt16("ObjectCount", (ushort)(lengths?.Length ?? 0));
-            s.Check();
-            lengths ??= new int[objectCount];
-
-            for (int i = 0; i < objectCount; i++)
-            {
-                lengths[i] = s.Int32(i.ToString(), lengths[i]);
-                s.Check();
-            }
-
-            return lengths;
-        }
     }
 }

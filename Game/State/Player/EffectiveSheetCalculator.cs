@@ -47,7 +47,9 @@ namespace UAlbion.Game.State.Player
             sheet.TotalWeight = 0;
             foreach (var itemSlot in sheet.Inventory.EnumerateAll())
             {
-                var item = assets.LoadItem(itemSlot.Id);
+                if (itemSlot.Id == null)
+                    continue;
+                var item = assets.LoadItem(itemSlot.Id.Value);
                 sheet.TotalWeight += itemSlot.Amount * item.Weight;
             }
 
@@ -60,7 +62,9 @@ namespace UAlbion.Game.State.Player
         {
             foreach (var itemSlot in sheet.Inventory.EnumerateBodyParts())
             {
-                var item = assets.LoadItem(itemSlot.Id);
+                if (itemSlot.Id == null)
+                    continue;
+                var item = assets.LoadItem(itemSlot.Id.Value);
                 sheet.Combat.Damage += item.Damage;
                 sheet.Combat.Protection += item.Protection;
                 sheet.Combat.LifePointsMax += item.LpMaxBonus;

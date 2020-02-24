@@ -155,9 +155,9 @@ namespace UAlbion.Game.Input
             {
                 texture = assets.LoadTexture(CoreSpriteId.UiFood);
             }
-            else if (held is ItemSlot itemInHand)
+            else if (held is ItemSlot itemInHand && itemInHand.Id.HasValue)
             {
-                var item = assets.LoadItem(itemInHand.Id);
+                var item = assets.LoadItem(itemInHand.Id.Value);
                 ItemSpriteId spriteId = item.Icon + _frame % item.IconAnim;
                 texture = assets.LoadTexture(spriteId);
                 subItem = (int)spriteId;

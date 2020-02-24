@@ -120,10 +120,10 @@ namespace UAlbion.Game.State.Player
             //     return false;
 
             ItemData rightHandItem = null;
-            if (_base.Inventory.RightHand != null)
+            if (_base.Inventory.RightHand?.Id != null)
             {
                 var assets = Resolve<IAssetManager>();
-                rightHandItem = assets.LoadItem(_base.Inventory.RightHand.Id);
+                rightHandItem = assets.LoadItem(_base.Inventory.RightHand.Id.Value);
             }
 
             if (item.SlotType != slotId)
@@ -158,13 +158,13 @@ namespace UAlbion.Game.State.Player
             if(inventoryScreenState.ItemInHand is RationsInHand)
                 return slotId == ItemSlotId.Rations;
 
-            if(inventoryScreenState.ItemInHand is ItemSlot itemInHand)
+            if(inventoryScreenState.ItemInHand is ItemSlot itemInHand && itemInHand.Id.HasValue)
             {
                 if (slotId >= ItemSlotId.Slot0)
                     return true;
 
                 var assets = Resolve<IAssetManager>();
-                var item = assets.LoadItem(itemInHand.Id);
+                var item = assets.LoadItem(itemInHand.Id.Value);
                 return DoesSlotAcceptItem(slotId, item);
             }
 
@@ -177,8 +177,11 @@ namespace UAlbion.Game.State.Player
             if (!(inventoryScreenState.ItemInHand is ItemSlot itemInHand)) // gold, rations etc
                 return slotId;
 
+            if (itemInHand.Id == null)
+                return ItemSlotId.None;
+
             var assets = Resolve<IAssetManager>();
-            var item = assets.LoadItem(itemInHand.Id);
+            var item = assets.LoadItem(itemInHand.Id.Value);
             if (slotId < ItemSlotId.Slot0)
             {
                 if (DoesSlotAcceptItem(slotId, item)) return slotId;
@@ -228,8 +231,11 @@ namespace UAlbion.Game.State.Player
             if (!(inventoryScreenState.ItemInHand is ItemSlot itemInHand))
                 return; // Unknown or null
 
+            if (itemInHand.Id == null)
+                return;
+
             var assets = Resolve<IAssetManager>();
-            var item = assets.LoadItem(itemInHand.Id);
+            var item = assets.LoadItem(itemInHand.Id.Value);
 
             ItemSlotId slotId = ItemSlotId.None;
             if (item.IsStackable)
@@ -285,8 +291,11 @@ namespace UAlbion.Game.State.Player
             if (slotId < ItemSlotId.Slot0) // Can't wield / wear stacks
                 return false;
 
+            if (slot.Id == null)
+                return false;
+
             var assets = Resolve<IAssetManager>();
-            var item = assets.LoadItem(slot.Id);
+            var item = assets.LoadItem(slot.Id.Value);
             return item.IsStackable;
         }
 

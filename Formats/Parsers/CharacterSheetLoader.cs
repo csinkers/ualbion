@@ -10,6 +10,9 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.CharacterData)]
     class CharacterSheetLoader : IAssetLoader<CharacterSheet>
     {
+        const int SpellSchoolCount = 7;
+        const int MaxSpellsPerSchool = 30;
+
         public CharacterSheet Serdes(CharacterSheet sheet, ISerializer s, string name, AssetInfo config)
         {
             sheet ??= new CharacterSheet();
@@ -126,9 +129,6 @@ namespace UAlbion.Formats.Parsers
             // e.g. 98406 = 0x18066 => 6680 0100 in file
             s.Check();
 
-            const int SpellSchoolCount = 7;
-            const int MaxSpellsPerSchool = 30;
-
             byte[] knownSpellBytes = null;
             byte[] spellStrengthBytes = null;
             if (s.Mode != SerializerMode.Reading)
@@ -141,7 +141,7 @@ namespace UAlbion.Formats.Parsers
                     uint schoolId = (uint)spellId / 100;
                     int offset = (int)spellId % 100;
                     if (sheet.Magic.SpellStrengths[spellId].Item1)
-                        knownSpells[schoolId] |= 1U << offset;
+                        knownSpells[schoolId] |= 1U << offset + 1;
                     spellStrengths[schoolId * MaxSpellsPerSchool + offset] = sheet.Magic.SpellStrengths[spellId].Item2;
                 }
 
@@ -159,11 +159,6 @@ namespace UAlbion.Formats.Parsers
             sheet.GermanName = s.FixedLengthString("GermanName", sheet.GermanName, 16); // 112
             sheet.EnglishName = s.FixedLengthString("EnglishName", sheet.EnglishName, 16);
             sheet.FrenchName = s.FixedLengthString("FrenchName", sheet.FrenchName, 16);
-            if (s.Mode == SerializerMode.Reading)
-            {
-                if (sheet.EnglishName == "") sheet.EnglishName = sheet.GermanName;
-                if (sheet.FrenchName == "") sheet.FrenchName = sheet.GermanName;
-            }
 
             s.Check();
 
@@ -197,24 +192,23 @@ namespace UAlbion.Formats.Parsers
                 }
             }
 
-            if (s.IsComplete())
+            if (sheet.Type != CharacterType.Party)
                 return sheet;
 
-            sheet.Inventory.Neck        = s.Meta("Neck",        sheet.Inventory.Neck,        ItemSlotLoader.Serdes);
-            sheet.Inventory.Head        = s.Meta("Head",        sheet.Inventory.Head,        ItemSlotLoader.Serdes);
-            sheet.Inventory.Tail        = s.Meta("Tail",        sheet.Inventory.Tail,        ItemSlotLoader.Serdes);
-            sheet.Inventory.LeftHand    = s.Meta("LeftHand",    sheet.Inventory.LeftHand,    ItemSlotLoader.Serdes);
-            sheet.Inventory.Chest       = s.Meta("Chest",       sheet.Inventory.Chest,       ItemSlotLoader.Serdes);
-            sheet.Inventory.RightHand   = s.Meta("RightHand",   sheet.Inventory.RightHand,   ItemSlotLoader.Serdes);
-            sheet.Inventory.LeftFinger  = s.Meta("LeftFinger",  sheet.Inventory.LeftFinger,  ItemSlotLoader.Serdes);
-            sheet.Inventory.Feet        = s.Meta("Feet",        sheet.Inventory.Feet,        ItemSlotLoader.Serdes);
-            sheet.Inventory.RightFinger = s.Meta("RightFinger", sheet.Inventory.RightFinger, ItemSlotLoader.Serdes);
+            sheet.Inventory.Neck        = s.Meta("Neck",        sheet.Inventory.Neck,        ItemSlot.Serdes);
+            sheet.Inventory.Head        = s.Meta("Head",        sheet.Inventory.Head,        ItemSlot.Serdes);
+            sheet.Inventory.Tail        = s.Meta("Tail",        sheet.Inventory.Tail,        ItemSlot.Serdes);
+            sheet.Inventory.LeftHand    = s.Meta("LeftHand",    sheet.Inventory.LeftHand,    ItemSlot.Serdes);
+            sheet.Inventory.Chest       = s.Meta("Chest",       sheet.Inventory.Chest,       ItemSlot.Serdes);
+            sheet.Inventory.RightHand   = s.Meta("RightHand",   sheet.Inventory.RightHand,   ItemSlot.Serdes);
+            sheet.Inventory.LeftFinger  = s.Meta("LeftFinger",  sheet.Inventory.LeftFinger,  ItemSlot.Serdes);
+            sheet.Inventory.Feet        = s.Meta("Feet",        sheet.Inventory.Feet,        ItemSlot.Serdes);
+            sheet.Inventory.RightFinger = s.Meta("RightFinger", sheet.Inventory.RightFinger, ItemSlot.Serdes);
 
             sheet.Inventory.Slots ??= new ItemSlot[24];
             for (int i = 0; i < 24; i++)
-                sheet.Inventory.Slots[i] = s.Meta($"Slot{i}", sheet.Inventory.Slots[i], ItemSlotLoader.Serdes);
+                sheet.Inventory.Slots[i] = s.Meta($"Slot{i}", sheet.Inventory.Slots[i], ItemSlot.Serdes);
 
-            // 0x384 == 0n900 ???? should be 940
             return sheet;
         }
 

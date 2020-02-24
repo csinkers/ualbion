@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace UAlbion.Formats.Parsers
 {
-    class GenericBinaryWriter : ISerializer
+    public class GenericBinaryWriter : ISerializer
     {
         readonly BinaryWriter _bw;
         long _offset;

@@ -89,9 +89,10 @@ namespace UAlbion.Formats.Parsers
             for (;;)
             {
                 var b = _br.ReadByte();
-               if (b == 0)
-                   break;
-               bytes.Add(b);
+                _offset++;
+                if (b == 0)
+                    break;
+                bytes.Add(b);
             }
 
             return FormatUtil.BytesTo850String(bytes.ToArray());

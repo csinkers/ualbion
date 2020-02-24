@@ -41,6 +41,7 @@
         TranslationTable,
         LabyrinthData,
         ItemData,
-        ItemNames
+        ItemNames,
+        SavedGame
     }
 }

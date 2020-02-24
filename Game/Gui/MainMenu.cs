@@ -11,7 +11,7 @@ namespace UAlbion.Game.Gui
         const string ContinueKey = "MainMenu.ContinueGame";
         const string NewGameKey = "MainMenu.NewGame";
         const string LoadGameKey = "MainMenu.LoadGame";
-        const string SaveGameKey = "MainMenu.SaveGame";
+        const string SaveGameKey = "MainMenu.SavedGame";
         const string OptionsKey = "MainMenu.Options";
         const string ViewIntroKey = "MainMenu.ViewIntro";
         const string CreditsKey = "MainMenu.Credits";

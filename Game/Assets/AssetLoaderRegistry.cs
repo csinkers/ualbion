@@ -18,6 +18,7 @@ namespace UAlbion.Game.Assets
         }
 
         public static IAssetLoader GetLoader(FileFormat type) => Loaders[type];
+        public static IAssetLoader<T> GetLoader<T>(FileFormat type) => (IAssetLoader<T>)Loaders[type];
         public static object Load(BinaryReader br, string name, int streamLength, AssetInfo config) => GetLoader(config.Format).Load(br, streamLength, name, config);
     }
 }

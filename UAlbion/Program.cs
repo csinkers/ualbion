@@ -26,13 +26,14 @@ namespace UAlbion
             var commandLine = new CommandLineOptions(args);
 
             var baseDir = FormatUtil.FindBasePath();
-            if(baseDir == null)
+            if (baseDir == null)
                 throw new InvalidOperationException("No base directory could be found.");
 
             PerfTracker.StartupEvent($"Found base directory {baseDir}");
 
             var logger = new ConsoleLogger();
             var settings = new Settings { BasePath = baseDir };
+
             PerfTracker.StartupEvent("Registering asset manager");
             using var assets = new AssetManager();
             using var global = new EventExchange("Global", logger);
@@ -42,6 +43,7 @@ namespace UAlbion
                 .Register<ISettings>(settings) 
                 .Register<IEngineSettings>(settings)
                 .Register<IDebugSettings>(settings)
+                .Register<IGameplaySettings>(settings)
                 .Register<IAssetManager>(assets)
                 .Register<ITextureLoader>(assets)
                 ;

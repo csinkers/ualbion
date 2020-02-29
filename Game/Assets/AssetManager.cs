@@ -8,7 +8,6 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Config;
-using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Assets
 {
@@ -128,6 +127,9 @@ namespace UAlbion.Game.Assets
         public TilesetData LoadTileData(TilesetId id) => (TilesetData)_assetLocator.LoadAssetCached(AssetType.Tileset, id);
         public LabyrinthData LoadLabyrinthData(LabyrinthDataId id) => (LabyrinthData)_assetLocator.LoadAssetCached(AssetType.LabData, id);
         public ITexture LoadFont(FontColor color, bool isBold) => LoadTexture(new MetaFontId(isBold, color));
+
+        public IAssetConfig LoadAssetConfig() => (IAssetConfig) _assetLocator.LoadAssetCached(AssetType.AssetConfig, 0);
+        public IGeneralConfig LoadGeneralConfig() => (IGeneralConfig) _assetLocator.LoadAssetCached(AssetType.GeneralConfig, 0);
         public CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id) =>
             (CoreSpriteConfig.BinaryResource)_assetLocator.LoadAssetCached(AssetType.CoreGraphicsMetadata, id);
 

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
-using UAlbion.Formats.MapEvents;
+﻿using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets

@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics;
+using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class RemovePartyMemberEvent : IMapEvent
+    public class RemovePartyMemberEvent : Event, IMapEvent
     {
         public static RemovePartyMemberEvent Serdes(RemovePartyMemberEvent e, ISerializer s)
         {

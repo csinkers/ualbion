@@ -1,9 +1,10 @@
-﻿using UAlbion.Formats.AssetIds;
+﻿using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class QueryItemEvent : IQueryEvent
+    public class QueryItemEvent : Event, IQueryEvent
     {
         QueryItemEvent(QueryType subType)
         {

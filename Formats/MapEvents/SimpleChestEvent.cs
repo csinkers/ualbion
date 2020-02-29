@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics;
+using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class SimpleChestEvent : IMapEvent
+    public class SimpleChestEvent : Event, IMapEvent
     {
         public static SimpleChestEvent Serdes(SimpleChestEvent e, ISerializer s)
         {

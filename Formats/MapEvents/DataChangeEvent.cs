@@ -1,10 +1,11 @@
-﻿using UAlbion.Formats.AssetIds;
+﻿using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class DataChangeEvent : IMapEvent
+    public class DataChangeEvent : Event, IMapEvent
     {
         public static DataChangeEvent Serdes(DataChangeEvent e, ISerializer s)
         {

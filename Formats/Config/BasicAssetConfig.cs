@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace UAlbion.Formats.Config
 {
-    public class BasicAssetConfig
+    public class BasicAssetConfig : IAssetConfig
     {
         public const string Filename = "assets_min.json";
         public IDictionary<string, BasicXldInfo> Xlds { get; } = new Dictionary<string, BasicXldInfo>();
@@ -64,7 +64,7 @@ namespace UAlbion.Formats.Config
             File.WriteAllText(configPath, json);
         }
 
-        public BasicAssetInfo GetAsset(string xldName, int id)
+        public AssetInfo GetAsset(string xldName, int id)
         {
             if (!Xlds.TryGetValue(xldName, out var xld))
                 return null;

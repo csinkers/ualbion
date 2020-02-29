@@ -25,22 +25,22 @@ namespace UAlbion.Game.Gui.Inventory
             var frameTheme = new FrameTheme();
             var stack = 
                 new HorizontalStack(
-                    new Padding(4,0),
+                    new Spacing(4,0),
                     new VerticalStack(
-                        new Padding(0, 4),
+                        new Spacing(0, 4),
                         new ButtonFrame(new FixedSize(125, 41, new TextSection(summarySource))) { Theme = frameTheme, State = ButtonState.Pressed},
-                        new Padding(0, 80),
+                        new Spacing(0, 80),
                         new ButtonFrame(
                             new FixedSize(125, 41, 
                                 new HorizontalStack(
                                     new TextSection(pointsHeadingSource),
-                                    new Padding(5,0),
+                                    new Spacing(5,0),
                                     new FixedSize(41, 41,
                                         new TextSection(pointsSource)
                                     ))))
                         { Theme = frameTheme, State = ButtonState.Pressed }
                     ),
-                    new Padding(4,0)
+                    new Spacing(4,0)
                 );
             AttachChild(background);
             AttachChild(stack);

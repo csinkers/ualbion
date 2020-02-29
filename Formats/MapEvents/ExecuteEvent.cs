@@ -1,9 +1,9 @@
-﻿using System.IO;
+﻿using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class ExecuteEvent : IMapEvent
+    public class ExecuteEvent : Event, IMapEvent
     {
         public static ExecuteEvent Serdes(ExecuteEvent e, ISerializer s)
         {

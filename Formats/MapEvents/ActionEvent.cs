@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics;
+using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class ActionEvent : IMapEvent
+    public class ActionEvent : Event, IMapEvent
     {
         public enum ActionType : byte
         {

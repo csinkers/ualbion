@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics;
+using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class PauseEvent : IMapEvent
+    public class PauseEvent : Event, IMapEvent
     {
         public static PauseEvent Serdes(PauseEvent e, ISerializer s)
         {

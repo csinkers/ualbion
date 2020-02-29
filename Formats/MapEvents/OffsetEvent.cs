@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics;
+using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class OffsetEvent : IMapEvent
+    public class OffsetEvent : Event, IMapEvent
     {
         public static OffsetEvent Serdes(OffsetEvent e, ISerializer s)
         {

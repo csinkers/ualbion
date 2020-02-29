@@ -3,8 +3,8 @@ using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    [Api.Event("text")]
-    public class TextEvent : IMapEvent
+    [Event("text")]
+    public class TextEvent : Event, IMapEvent
     {
         public static TextEvent Serdes(TextEvent e, ISerializer s)
         {

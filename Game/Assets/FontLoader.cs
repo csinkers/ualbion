@@ -10,7 +10,8 @@ namespace UAlbion.Game.Assets
         {
             { FontColor.White, new byte[] { 0, 194, 194, 195, 196, 197 } },
             { FontColor.Yellow, new byte[] { 0, 194, 194, 219, 220, 221 } },
-            { FontColor.YellowOrange, new byte[] { 0, 194, 194, 208, 209, 210 } }
+            { FontColor.YellowOrange, new byte[] { 0, 194, 194, 208, 209, 210 } },
+            { FontColor.Gray, new byte[] { 0, 196, 197, 198, 199, 200 } }
         };
 
         public static ITexture Load(MetaFontId id, ITexture regular, ITexture bold)

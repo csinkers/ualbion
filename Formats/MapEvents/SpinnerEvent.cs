@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics;
+using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class SpinnerEvent : IMapEvent
+    public class SpinnerEvent : Event, IMapEvent
     {
         public static SpinnerEvent Serdes(SpinnerEvent e, ISerializer s)
         {

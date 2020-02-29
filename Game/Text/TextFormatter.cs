@@ -35,6 +35,7 @@ namespace UAlbion.Game.Text
         public TextFormatter Language(GameLanguage language) { _language = language; return this; }
         public TextFormatter NoWrap() { _implicitTokens.Add((Token.NoWrap, null)); return this; }
         public TextFormatter Centre() { _implicitTokens.Add((Token.Centre, null)); return this; }
+        public TextFormatter Ink(FontColor color) { _implicitTokens.Add((Token.Ink, (int)color)); return this; }
 
         IEnumerable<(Token, object)> Substitute(IEnumerable<(Token, object)> tokens, object[] args)
         {
@@ -235,7 +236,7 @@ namespace UAlbion.Game.Text
                 .ToList();
 
             var substituted = Substitute(tokens, arguments);
-            var blocks = TokensToBlocks(substituted);
+            var blocks = TokensToBlocks(substituted).ToList();
             return new TextFormatResult(blocks, words);
         }
     }

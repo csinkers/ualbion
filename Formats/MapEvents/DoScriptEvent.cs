@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics;
+using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class DoScriptEvent : IMapEvent
+    public class DoScriptEvent : Event, IMapEvent
     {
         public static DoScriptEvent Serdes(DoScriptEvent e, ISerializer s)
         {

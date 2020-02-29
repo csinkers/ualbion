@@ -34,23 +34,23 @@ namespace UAlbion.Game.Gui
         public YesNoMessageBox(StringId stringId) : base(Handlers, DialogPositioning.Center)
         {
             var elements = new VerticalStack(
-                new Padding(0, 5),
+                new Spacing(0, 5),
                 new FixedSizePanel(231, 30, new TextSection(stringId)),
-                new Padding(0, 5),
+                new Spacing(0, 5),
                 new HorizontalStack(
-                    new Padding(11, 0),
+                    new Spacing(11, 0),
                     new Button(YesButtonKey, S(SystemTextId.MsgBox_Yes)) { DoubleFrame = true },
-                    new Padding(8, 0),
+                    new Spacing(8, 0),
                     new Button(NoButtonKey, S(SystemTextId.MsgBox_No)) { DoubleFrame = true },
-                    new Padding(10, 0)
+                    new Spacing(10, 0)
                 ),
-                new Padding(0, 5)
+                new Spacing(0, 5)
             );
 
             var horizontalPad = new HorizontalStack(
-                new Padding(6, 0),
+                new Spacing(6, 0),
                 elements,
-                new Padding(6, 0)
+                new Spacing(6, 0)
             );
 
             AttachChild(new DialogFrame(horizontalPad));

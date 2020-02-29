@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
@@ -9,7 +10,7 @@ namespace UAlbion.Formats.Assets.Save
 {
     public class SavedGame
     {
-        public string Name { get; private set; }
+        public string Name { get; set; }
         public ushort Version { get; set; }
         public ushort Days { get; set; }
         public ushort Hours { get; set; }
@@ -23,6 +24,8 @@ namespace UAlbion.Formats.Assets.Save
         public IDictionary<AutoMapId, byte[]> Automaps { get; } = new Dictionary<AutoMapId, byte[]>();
         public IDictionary<ChestId, Chest> Chests { get; } = new Dictionary<ChestId, Chest>();
         public IDictionary<MerchantId, Chest> Merchants { get; } = new Dictionary<MerchantId, Chest>();
+        public IDictionary<int, int> Tickers { get; } = new Dictionary<int, int>();
+        public IDictionary<int, int> Switches { get; } = new Dictionary<int, int>();
 
         public ushort Unk0 { get; set; }
         public uint Unk1 { get; set; }
@@ -32,6 +35,17 @@ namespace UAlbion.Formats.Assets.Save
         public MysteryChunk8 Mystery8 { get; set; }
         public MysteryChunk8 Mystery8_2 { get; set; }
         public MysteryChunk6 Mystery6 { get; set; }
+
+        public static string GetName(BinaryReader br)
+        {
+            var s = new GenericBinaryReader(br, br.BaseStream.Length);
+            ushort nameLength = s.UInt16("NameLength", 0);
+            if (nameLength > 1024)
+                return "Invalid";
+
+            s.UInt16(nameof(Unk0), 0);
+            return s.FixedLengthString(nameof(Name), null, nameLength);
+        }
 
         public static SavedGame Serdes(SavedGame save, ISerializer s)
         {
@@ -165,8 +179,7 @@ namespace UAlbion.Formats.Assets.Save
             XldLoader.Serdes(XldCategory.NpcCharacter,1, s, SerdesNpcCharacter, npcIds);
             XldLoader.Serdes(XldCategory.NpcCharacter,2, s, SerdesNpcCharacter, npcIds);
 
-            if(s.Mode != SerializerMode.Reading)
-                s.RepeatU8("Padding", 0, 4);
+            s.RepeatU8("Padding", 0, 4);
 
             return save;
         }

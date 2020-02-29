@@ -1,114 +1,104 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.IO;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Formats.Parsers;
+using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.State
 {
     public class GameState : ServiceComponent<IGameState>, IGameState
     {
-        readonly Party _party;
-        readonly IDictionary<int, int> _tickers = new Dictionary<int, int>();
-        readonly IDictionary<int, int> _temporarySwitches = new Dictionary<int, int>();
+        static readonly DateTime Epoch = new DateTime(2200, 1, 1, 0, 0, 0);
+        SavedGame _game;
+        Party _party;
 
-        public DateTime Time { get; private set; }
-
-        public IDictionary<PartyCharacterId, CharacterSheet> PartyMembers { get; } = new Dictionary<PartyCharacterId, CharacterSheet>();
-        public IDictionary<NpcCharacterId, CharacterSheet> Npcs { get; } = new Dictionary<NpcCharacterId, CharacterSheet>();
-        public IDictionary<ChestId, Chest> Chests { get; } = new Dictionary<ChestId, Chest>();
-        public IDictionary<MerchantId, Chest> Merchants { get; } = new Dictionary<MerchantId, Chest>();
-        public IReadOnlyDictionary<int, int> Tickers { get; }
-        public IReadOnlyDictionary<int, int> TemporarySwitches { get; }
-
+        public DateTime Time => Epoch + new TimeSpan(_game.Days, _game.Hours, _game.Minutes, 0);
         IParty IGameState.Party => _party;
-        Func<NpcCharacterId, ICharacterSheet> IGameState.GetNpc => x => Npcs[x];
-        Func<ChestId, IChest> IGameState.GetChest => x => Chests[x];
-        Func<MerchantId, IChest> IGameState.GetMerchant => x => Merchants[x];
+        Func<NpcCharacterId, ICharacterSheet> IGameState.GetNpc => x => _game.Npcs[x];
+        Func<ChestId, IChest> IGameState.GetChest => x => _game.Chests[x];
+        Func<MerchantId, IChest> IGameState.GetMerchant => x => _game.Merchants[x];
+        public Func<int, int> GetTicker => x => _game.Tickers[x];
+        public Func<int, int> GetSwitch  => x => _game.Switches[x];
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<GameState, NewGameEvent>((x,e) => x.NewGame()),
+            H<GameState, LoadGameEvent>((x,e) => x.LoadGame(e.Filename)),
+            H<GameState, SaveGameEvent>((x,e) => x.SaveGame(e.Filename, e.Name)),
             H<GameState, UpdateEvent>((x, e) => { x.TickCount += e.Frames; }),
             H<GameState, SetActiveMemberEvent>((x, e) => { x._party.Leader = e.MemberId; x.Raise(e); })
         );
 
         public GameState() : base(Handlers)
         {
-            Tickers = new ReadOnlyDictionary<int, int>(_tickers);
-            TemporarySwitches = new ReadOnlyDictionary<int, int>(_temporarySwitches);
-
-            _party = AttachChild(new Party(PartyMembers));
             AttachChild(new InventoryScreenState());
         }
 
         public int TickCount { get; private set; }
-        public bool Loaded { get; private set; }
-
-        void SetupTestState()
-        {
-            var tom = PartyMembers[PartyCharacterId.Tom];
-            var inv = tom.Inventory;
-            inv.Gold = 256;
-            inv.Rations = 72;
-            inv.Slots[0] = new ItemSlot { Amount = 1, Id = ItemId.Knife };
-            inv.Slots[1] = new ItemSlot { Amount = 1, Id = ItemId.Shoes };
-            inv.Slots[2] = new ItemSlot { Amount = 1, Id = ItemId.LeatherArmor };
-            inv.Slots[3] = new ItemSlot { Amount = 1, Id = ItemId.Dagger };
-            inv.Slots[4] = new ItemSlot { Amount = 1, Id = ItemId.LeatherCap };
-            inv.Slots[5] = new ItemSlot { Amount = 12, Id = ItemId.Canister };
-            inv.Slots[6] = new ItemSlot { Amount = 1, Id = ItemId.Pistol };
-            inv.Slots[7] = new ItemSlot { Amount = 6, Id = ItemId.Torch };
-            inv.Slots[8] = new ItemSlot { Amount = 1, Id = ItemId.Compass };
-            inv.Slots[9] = new ItemSlot { Amount = 1, Id = ItemId.MonsterEye };
-            inv.Slots[10] = new ItemSlot { Amount = 1, Id = ItemId.Clock };
-            inv.Slots[11] = new ItemSlot { Amount = 1, Id = ItemId.RingOfWrath };
-            inv.Slots[12] = new ItemSlot { Amount = 1, Id = ItemId.StrengthAmulet };
-            inv.Slots[13] = new ItemSlot { Amount = 5, Id = ItemId.Torch };
-            inv.Slots[14] = new ItemSlot { Amount = 1, Id = ItemId.TorchBurning };
-            inv.Slots[15] = new ItemSlot { Amount = 99, Id = ItemId.TurqHealingPotion };
-            inv.Slots[16] = new ItemSlot { Amount = 1, Id = ItemId.Sword, Flags = ItemSlotFlags.Broken };
-            Raise(new InventoryChangedEvent(PartyCharacterId.Tom));
-        }
+        public bool Loaded => _game != null;
 
         void NewGame()
         {
             var assets = Resolve<IAssetManager>();
+            _game = new SavedGame
+            {
+                MapId = MapDataId.Toronto2DGesamtkarteSpielbeginn,
+                PartyX = 30,
+                PartyY = 75
+            };
 
-            PartyMembers.Clear();
             foreach (PartyCharacterId charId in Enum.GetValues(typeof(PartyCharacterId)))
-                PartyMembers.Add(charId, assets.LoadCharacter(AssetType.PartyMember, charId));
+                _game.PartyMembers.Add(charId, assets.LoadCharacter(AssetType.PartyMember, charId));
 
-            Npcs.Clear();
             foreach (NpcCharacterId charId in Enum.GetValues(typeof(NpcCharacterId)))
-                Npcs.Add(charId, assets.LoadCharacter(AssetType.Npc, charId));
+                _game.Npcs.Add(charId, assets.LoadCharacter(AssetType.Npc, charId));
 
-            Chests.Clear();
             foreach(ChestId id in Enum.GetValues(typeof(ChestId)))
-                Chests.Add(id, assets.LoadChest(id));
+                _game.Chests.Add(id, assets.LoadChest(id));
 
-            Merchants.Clear();
             foreach(MerchantId id in Enum.GetValues(typeof(MerchantId)))
-                Merchants.Add(id, assets.LoadMerchant(id));
+                _game.Merchants.Add(id, assets.LoadMerchant(id));
 
-            _party.Clear();
-
+            _party?.Detach();
+            _party = AttachChild(new Party(_game.PartyMembers));
             Raise(new AddPartyMemberEvent(PartyCharacterId.Tom));
-            Raise(new AddPartyMemberEvent(PartyCharacterId.Rainer));
-            Raise(new AddPartyMemberEvent(PartyCharacterId.Drirr));
-            Raise(new AddPartyMemberEvent(PartyCharacterId.Sira));
-            Raise(new AddPartyMemberEvent(PartyCharacterId.Mellthas));
-            Raise(new AddPartyMemberEvent(PartyCharacterId.Khunag));
-
-            SetupTestState();
-            Raise(new ReloadAssetsEvent()); // No need to keep character info cached once we've loaded it. New game is also a good point to clear out state.
             Raise(new PartyChangedEvent());
-            Raise(new LoadMapEvent(MapDataId.Toronto2DGesamtkarteSpielbeginn));
             Raise(new StartClockEvent());
-            Raise(new PartyJumpEvent(30, 75));
-            Loaded = true;
+            Raise(new LoadMapEvent(_game.MapId));
+            Raise(new StartClockEvent());
+            Raise(new PartyJumpEvent(_game.PartyX, _game.PartyY));
+        }
+
+        void LoadGame(string filename)
+        {
+            var loader = AssetLoaderRegistry.GetLoader<SavedGame>(FileFormat.SavedGame);
+            using var stream = File.Open(filename, FileMode.Open);
+            using var br = new BinaryReader(stream);
+            var save = loader.Serdes(null, new GenericBinaryReader(br, stream.Length), "SavedGame", null);
+            _game = save;
+            _party?.Detach();
+            _party = AttachChild(new Party(_game.PartyMembers));
+            Raise(new PartyChangedEvent());
+            Raise(new LoadMapEvent(_game.MapId));
+            Raise(new StartClockEvent());
+            Raise(new PartyJumpEvent(_game.PartyX, _game.PartyY));
+        }
+
+        void SaveGame(string filename, string name)
+        {
+            if (_game == null)
+                return;
+
+            var loader = AssetLoaderRegistry.GetLoader<SavedGame>(FileFormat.SavedGame);
+            _game.Name = name;
+            using var stream = File.Open(filename, FileMode.Create);
+            using var bw = new BinaryWriter(stream);
+            loader.Serdes(_game, new GenericBinaryWriter(bw), name, null);
         }
     }
 }

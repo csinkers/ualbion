@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics;
+using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class QueryEvent : IQueryEvent
+    public class QueryEvent : Event, IQueryEvent
     {
         public static IQueryEvent Serdes(IQueryEvent genericEvent, ISerializer s)
         {

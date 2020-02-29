@@ -43,6 +43,34 @@ namespace UAlbion.Game.Gui
                     Detach();
                     break;
 
+                case LoadGameKey:
+                {
+                    var menu = new PickSaveSlotMenu(false, S(SystemTextId.MainMenu_WhichSavedGameDoYouWantToLoad), 1);
+                    menu.Closed += (args, filename) =>
+                    {
+                        Attach(exchange);
+                        if(filename != null)
+                            Raise(new LoadGameEvent(filename));
+                    };
+                    Exchange.Attach(menu);
+                    Detach();
+                    break;
+                }
+
+                case SaveGameKey:
+                {
+                    var menu = new PickSaveSlotMenu(true, S(SystemTextId.MainMenu_SaveOnWhichPosition), 1);
+                    menu.Closed += (args, _) =>
+                    {
+                        Attach(exchange);
+                        // TODO: Prompt user for new save name
+                        // Raise(new SaveGameEvent(filename, name));
+                    };
+                    Exchange.Attach(menu);
+                    Detach();
+                    break;
+                }
+
                 case OptionsKey:
                     var optionsMenu = new OptionsMenu();
                     optionsMenu.Closed += (args, _) => Attach(exchange);
@@ -65,10 +93,10 @@ namespace UAlbion.Game.Gui
             var state = Resolve<IGameState>();
             var elements = new List<IUiElement>
             {
-                new Padding(0, 2),
-                new HorizontalStack(new Padding(5, 0), new Header(S(SystemTextId.MainMenu_MainMenu)), new Padding(5, 0)),
+                new Spacing(0, 2),
+                new HorizontalStack(new Spacing(5, 0), new Header(S(SystemTextId.MainMenu_MainMenu)), new Spacing(5, 0)),
                 new Divider(CommonColor.Yellow3),
-                new Padding(0, 2),
+                new Spacing(0, 2),
             };
 
             if (state.Loaded)
@@ -76,7 +104,7 @@ namespace UAlbion.Game.Gui
                 elements.AddRange(new IUiElement[]
                 {
                     new Button(ContinueKey, S(SystemTextId.MainMenu_ContinueGame)),
-                    new Padding(0, 4),
+                    new Spacing(0, 4),
                 });
             }
 
@@ -91,13 +119,13 @@ namespace UAlbion.Game.Gui
 
             elements.AddRange(new IUiElement[]
             {
-                new Padding(0,4),
+                new Spacing(0,4),
                 new Button(OptionsKey, S(SystemTextId.MainMenu_Options)),
                 new Button(ViewIntroKey, S(SystemTextId.MainMenu_ViewIntro)),
                 new Button(CreditsKey, S(SystemTextId.MainMenu_Credits)),
-                new Padding(0,3),
+                new Spacing(0,3),
                 new Button(QuitGameKey, S(SystemTextId.MainMenu_QuitGame)),
-                new Padding(0,2),
+                new Spacing(0,2),
             });
 
             var stack = new VerticalStack(elements);

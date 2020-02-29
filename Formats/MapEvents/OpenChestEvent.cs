@@ -1,8 +1,9 @@
-﻿using UAlbion.Formats.Parsers;
+﻿using UAlbion.Api;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class OpenChestEvent : IMapEvent
+    public class OpenChestEvent : Event, IMapEvent
     {
         public static OpenChestEvent Serdes(OpenChestEvent e, ISerializer s)
         {

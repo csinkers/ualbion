@@ -1,9 +1,10 @@
 ﻿using System;
+using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public abstract class ModifyEvent : IMapEvent
+    public abstract class ModifyEvent : Event, IMapEvent
     {
         public static ModifyEvent Serdes(ModifyEvent genericEvent, ISerializer s)
         {

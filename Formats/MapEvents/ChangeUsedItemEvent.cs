@@ -1,8 +1,9 @@
-﻿using UAlbion.Formats.Parsers;
+﻿using UAlbion.Api;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class ChangeUsedItemEvent : IMapEvent
+    public class ChangeUsedItemEvent : Event, IMapEvent
     {
         public static ChangeUsedItemEvent Serdes(ChangeUsedItemEvent e, ISerializer s)
         {

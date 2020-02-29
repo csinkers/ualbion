@@ -1,10 +1,9 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class TrapEvent : IMapEvent
+    public class TrapEvent : Event, IMapEvent
     {
         public static TrapEvent Serdes(TrapEvent e, ISerializer s)
         {

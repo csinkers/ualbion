@@ -90,7 +90,7 @@ namespace UAlbion.Game.Assets
         readonly IDictionary<AssetType, XldFile[]> _xlds = new Dictionary<AssetType, XldFile[]>();
         readonly object _syncRoot = new object();
 
-        AssetPaths GetAssetPaths(GeneralConfig config, AssetLocation location, GameLanguage language, string baseName, int number, int objectNumber)
+        AssetPaths GetAssetPaths(IGeneralConfig config, AssetLocation location, GameLanguage language, string baseName, int number, int objectNumber)
         {
             string Try(string x)
             {
@@ -198,8 +198,8 @@ namespace UAlbion.Game.Assets
 
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)
         {
-            var basicAssetConfig = (BasicAssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig), "AssetConfig");
-            var generalConfig = (GeneralConfig)loaderFunc(new AssetKey(AssetType.GeneralConfig), "GeneralConfig");
+            var basicAssetConfig = (IAssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig), "AssetConfig");
+            var generalConfig = (IGeneralConfig)loaderFunc(new AssetKey(AssetType.GeneralConfig), "GeneralConfig");
 
             int xldIndex = key.Id / 100;
             Debug.Assert(xldIndex >= 0);

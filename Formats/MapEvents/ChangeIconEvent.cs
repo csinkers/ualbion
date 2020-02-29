@@ -3,14 +3,14 @@ using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class ChangeIconEvent : IPositionedEvent, IMapEvent
+    public class ChangeIconEvent : Event, IPositionedEvent, IMapEvent
     {
         public static ChangeIconEvent Serdes(ChangeIconEvent e, ISerializer s)
         {
             e ??= new ChangeIconEvent();
             e.X = s.Int8(nameof(X), e.X);
             e.Y = s.Int8(nameof(Y), e.Y);
-            e.Permanent = s.UInt8(nameof(Permanent), e.Permanent);
+            e.Scope = s.EnumU8(nameof(Scope), e.Scope);
             e.ChangeType = s.EnumU8(nameof(ChangeType), e.ChangeType);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.Value = s.UInt16(nameof(Value), e.Value);
@@ -25,8 +25,8 @@ namespace UAlbion.Formats.MapEvents
             ChangeWall = 2,
             ChangeFloor = 3,
             ChangeCeiling = 4,
-            ChangeNpcMovementType = 5,
-            ChangeNpcSprite = 6,
+            ChangeNpcMovementType = 5, // X = NpcId, Values: 0=Waypoints, 1=Random, 2=Stay, 3=Follow
+            ChangeNpcSprite = 6, // X = NpcId
             ChangeTileEventChain = 7,
             PlaceTilemapObjectOverwrite = 8, // Objects are in BLKLIST#.XLD
             PlaceTilemapObjectNoOverwrite = 9, // Objects are in BLKLIST#.XLD
@@ -38,7 +38,7 @@ namespace UAlbion.Formats.MapEvents
             {
                 X = (sbyte) (X + x),
                 Y = (sbyte) (Y + y),
-                Permanent = Permanent,
+                Scope = Scope,
                 ChangeType = ChangeType,
                 Unk5 = Unk5,
                 Value = Value,
@@ -49,12 +49,12 @@ namespace UAlbion.Formats.MapEvents
         int IPositionedEvent.Y => Y;
         public sbyte X { get; set; }
         public sbyte Y { get; set; }
-        public byte Permanent { get; set; }
+        public EventScope Scope { get; set; }
         public IconChangeType ChangeType { get; set; }
         public byte Unk5 { get; set; }
         public ushort Value { get; set; }
         public ushort Unk8 { get; set; }
-        public override string ToString() => $"change_icon <{X}, {Y}> {(Permanent != 0 ? "Perm" : "Temp")} {ChangeType} {Value} ({Unk5} {Unk8})";
+        public override string ToString() => $"change_icon <{X}, {Y}> {Scope} {ChangeType} {Value} ({Unk5} {Unk8})";
         public MapEventType EventType => MapEventType.ChangeIcon;
     }
 }

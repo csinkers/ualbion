@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics;
+using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class WipeEvent : IMapEvent
+    public class WipeEvent : Event, IMapEvent
     {
         public static WipeEvent Serdes(WipeEvent e, ISerializer s)
         {

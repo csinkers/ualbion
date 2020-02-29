@@ -13,9 +13,9 @@ namespace UAlbion.Game.Gui
     {
         public class ColorScheme
         {
-            public CommonColor TopLeft { get; set; }
-            public CommonColor BottomRight { get; set; }
-            public CommonColor Corners { get; set; }
+            public CommonColor? TopLeft { get; set; }
+            public CommonColor? BottomRight { get; set; }
+            public CommonColor? Corners { get; set; }
             public CommonColor? Background { get; set; }
             public float Alpha { get; set; }
         }
@@ -68,12 +68,16 @@ namespace UAlbion.Game.Gui
             var sm = Resolve<ISpriteManager>();
             var colors = _theme.GetColors(_state);
 
-            uint C(CommonColor color) => CommonColors.Palette[color];
-            uint topLeft = C(colors.TopLeft);
-            uint bottomRight = C(colors.BottomRight);
-            uint corners = C(colors.Corners);
-            uint? background = colors.Background.HasValue ? C(colors.Background.Value) : (uint?)null;
-            int instanceCount = background.HasValue ? 7 : 6;
+            uint? C(CommonColor? color) => color.HasValue ? CommonColors.Palette[color.Value] : (uint?)null;
+            uint? topLeft = C(colors.TopLeft);
+            uint? bottomRight = C(colors.BottomRight);
+            uint? corners = C(colors.Corners);
+            uint? background = colors.Background.HasValue ? C(colors.Background.Value) : null;
+            int instanceCount = 
+                  (topLeft.HasValue     ? 2 : 0)
+                + (bottomRight.HasValue ? 2 : 0)
+                + (corners.HasValue     ? 2 : 0)
+                + (background.HasValue  ? 1 : 0);
 
             if (_sprite?.Key.RenderOrder != order || instanceCount != _sprite?.Length)
             {
@@ -84,57 +88,70 @@ namespace UAlbion.Game.Gui
             }
 
             var instances = _sprite.Access();
-
             var position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);
             var flags = SpriteFlags.None.SetOpacity(colors.Alpha);
 
-            instances[0] = SpriteInstanceData.TopLeft( // Top
-                position,
-                window.UiToNormRelative(new Vector2(extents.Width - 1, 1)),
-                Vector2.Zero,
-                Vector2.One,
-                topLeft,
-                flags);
-            instances[1] = SpriteInstanceData.TopLeft( // Bottom
-                position + new Vector3(window.UiToNormRelative(new Vector2(1, extents.Height - 1)), 0),
-                window.UiToNormRelative(new Vector2(extents.Width - 1, 1)),
-                Vector2.Zero,
-                Vector2.One,
-                bottomRight,
-                flags);
-            instances[2] = SpriteInstanceData.TopLeft( // Left
-                position + new Vector3(window.UiToNormRelative(new Vector2(0, 1)), 0),
-                window.UiToNormRelative(new Vector2(1, extents.Height - 2)),
-                Vector2.Zero,
-                Vector2.One,
-                topLeft,
-                flags);
-            instances[3] = SpriteInstanceData.TopLeft( // Right
-                position + new Vector3(window.UiToNormRelative(new Vector2(extents.Width - 1, 1)), 0),
-                window.UiToNormRelative(new Vector2(1, extents.Height - 2)),
-                Vector2.Zero,
-                Vector2.One,
-                bottomRight,
-                flags);
+            int curInstance = 0;
+            if (topLeft.HasValue)
+            {
+                instances[curInstance] = SpriteInstanceData.TopLeft( // Top
+                    position,
+                    window.UiToNormRelative(new Vector2(extents.Width - 1, 1)),
+                    Vector2.Zero,
+                    Vector2.One,
+                    topLeft.Value,
+                    flags);
+                instances[curInstance + 1] = SpriteInstanceData.TopLeft( // Left
+                    position + new Vector3(window.UiToNormRelative(new Vector2(0, 1)), 0),
+                    window.UiToNormRelative(new Vector2(1, extents.Height - 2)),
+                    Vector2.Zero,
+                    Vector2.One,
+                    topLeft.Value,
+                    flags);
+                curInstance += 2;
+            }
 
-            instances[4] = SpriteInstanceData.TopLeft( // Bottom Left Corner
-                position + new Vector3(window.UiToNormRelative(new Vector2(0, extents.Height - 1)), 0),
-                window.UiToNormRelative(Vector2.One),
-                Vector2.Zero,
-                Vector2.One,
-                corners,
-                flags);
-            instances[5] = SpriteInstanceData.TopLeft( // Top Right Corner
-                position + new Vector3(window.UiToNormRelative(new Vector2(extents.Width - 1, 0)), 0),
-                window.UiToNormRelative(Vector2.One),
-                Vector2.Zero,
-                Vector2.One,
-                corners,
-                flags);
+            if (bottomRight.HasValue)
+            {
+                instances[curInstance] = SpriteInstanceData.TopLeft( // Bottom
+                    position + new Vector3(window.UiToNormRelative(new Vector2(1, extents.Height - 1)), 0),
+                    window.UiToNormRelative(new Vector2(extents.Width - 1, 1)),
+                    Vector2.Zero,
+                    Vector2.One,
+                    bottomRight.Value,
+                    flags);
+                instances[curInstance + 1] = SpriteInstanceData.TopLeft( // Right
+                    position + new Vector3(window.UiToNormRelative(new Vector2(extents.Width - 1, 1)), 0),
+                    window.UiToNormRelative(new Vector2(1, extents.Height - 2)),
+                    Vector2.Zero,
+                    Vector2.One,
+                    bottomRight.Value,
+                    flags);
+                curInstance += 2;
+            }
+
+            if (corners.HasValue)
+            {
+                instances[curInstance] = SpriteInstanceData.TopLeft( // Bottom Left Corner
+                    position + new Vector3(window.UiToNormRelative(new Vector2(0, extents.Height - 1)), 0),
+                    window.UiToNormRelative(Vector2.One),
+                    Vector2.Zero,
+                    Vector2.One,
+                    corners.Value,
+                    flags);
+                instances[curInstance + 1] = SpriteInstanceData.TopLeft( // Top Right Corner
+                    position + new Vector3(window.UiToNormRelative(new Vector2(extents.Width - 1, 0)), 0),
+                    window.UiToNormRelative(Vector2.One),
+                    Vector2.Zero,
+                    Vector2.One,
+                    corners.Value,
+                    flags);
+                curInstance += 2;
+            }
 
             if (background.HasValue)
             {
-                instances[6] = SpriteInstanceData.TopLeft( // Background
+                instances[curInstance] = SpriteInstanceData.TopLeft( // Background
                     position + new Vector3(window.UiToNormRelative(new Vector2(1, 1)), 0),
                     window.UiToNormRelative(new Vector2(extents.Width - 2, extents.Height - 2)),
                     Vector2.Zero,

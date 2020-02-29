@@ -42,6 +42,9 @@ namespace UAlbion.Game.Entities
                 var party = Resolve<IParty>();
                 if (map == null || party == null || !party.StatusBarOrder.Any()) return;
                 var leader = party[party.Leader];
+                if (leader == null)
+                    return;
+
                 var position = leader.GetPosition() * map.TileSize;
                 const float lerpRate = 3.0f; // TODO: Data driven
                 _position = new Vector2(

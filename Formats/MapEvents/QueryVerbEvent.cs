@@ -1,8 +1,9 @@
-﻿using UAlbion.Formats.Parsers;
+﻿using UAlbion.Api;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class QueryVerbEvent : IQueryEvent
+    public class QueryVerbEvent : Event, IQueryEvent
     {
         public enum VerbType : ushort
         {

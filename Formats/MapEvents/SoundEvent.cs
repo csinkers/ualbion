@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics;
+using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class SoundEvent : IMapEvent
+    public class SoundEvent : Event, IMapEvent
     {
         public static SoundEvent Serdes(SoundEvent e, ISerializer s)
         {

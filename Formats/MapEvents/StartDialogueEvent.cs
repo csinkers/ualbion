@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics;
+using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class StartDialogueEvent : IMapEvent
+    public class StartDialogueEvent : Event, IMapEvent
     {
         public static StartDialogueEvent Serdes(StartDialogueEvent e, ISerializer s)
         {

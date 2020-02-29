@@ -1,8 +1,9 @@
-﻿using UAlbion.Formats.Parsers;
+﻿using UAlbion.Api;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class CreateTransportEvent : IMapEvent
+    public class CreateTransportEvent : Event, IMapEvent
     {
         public static CreateTransportEvent Serdes(CreateTransportEvent e, ISerializer s)
         {

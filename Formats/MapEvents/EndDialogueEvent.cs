@@ -1,9 +1,9 @@
-﻿using System.IO;
+﻿using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class EndDialogueEvent : IMapEvent
+    public class EndDialogueEvent : Event, IMapEvent
     {
         public static EndDialogueEvent Serdes(EndDialogueEvent e, ISerializer s)
         {

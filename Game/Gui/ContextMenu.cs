@@ -54,10 +54,10 @@ namespace UAlbion.Game.Gui
             _event = contextMenuEvent;
             var elements = new List<IUiElement>
             {
-                new Padding(0, 2),
-                new HorizontalStack(new Padding(5, 0), new Header(_event.Heading), new Padding(5, 0)),
+                new Spacing(0, 2),
+                new HorizontalStack(new Spacing(5, 0), new Header(_event.Heading), new Spacing(5, 0)),
                 new Divider(CommonColor.Yellow3),
-                new Padding(0, 2),
+                new Spacing(0, 2),
             };
 
             ContextMenuGroup? lastGroup = null;
@@ -66,7 +66,7 @@ namespace UAlbion.Game.Gui
                 var option = _event.Options[i];
                 lastGroup ??= option.Group;
                 if(lastGroup != option.Group)
-                    elements.Add(new Padding(0, 2));
+                    elements.Add(new Spacing(0, 2));
                 lastGroup = option.Group;
 
                 elements.Add(new Button(ButtonKeyPattern + i, option.Text));

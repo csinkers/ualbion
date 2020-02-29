@@ -1,8 +1,9 @@
-﻿using UAlbion.Formats.Parsers;
+﻿using UAlbion.Api;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class CloneAutomapEvent : IMapEvent
+    public class CloneAutomapEvent : Event, IMapEvent
     {
         public static CloneAutomapEvent Serdes(CloneAutomapEvent e, ISerializer s)
         {

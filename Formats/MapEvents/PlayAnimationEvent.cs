@@ -1,9 +1,9 @@
-﻿using System.IO;
+﻿using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class PlayAnimationEvent : IMapEvent
+    public class PlayAnimationEvent : Event, IMapEvent
     {
         public static PlayAnimationEvent Serdes(PlayAnimationEvent e, ISerializer s)
         {

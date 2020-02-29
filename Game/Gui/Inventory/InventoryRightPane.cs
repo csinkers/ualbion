@@ -45,7 +45,7 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 var money = new Button(GoldSummaryButtonId,
                     new VerticalStack(
-                        new Padding(64, 0),
+                        new Spacing(64, 0),
                         new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiGold) { Highlighted = true },
                         new TextSection("Total party gold $10.0")
                     ) { Greedy = false}
@@ -63,7 +63,7 @@ namespace UAlbion.Game.Gui.Inventory
 
                 var goldButton = new Button(GoldButtonId,
                     new VerticalStack(
-                        new Padding(31, 0),
+                        new Spacing(31, 0),
                         new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiGold),
                         new TextSection(goldSource)
                     ) { Greedy = false });
@@ -77,7 +77,7 @@ namespace UAlbion.Game.Gui.Inventory
 
                 var foodButton = new Button(FoodButtonId,
                     new VerticalStack(
-                        new Padding(31, 0),
+                        new Spacing(31, 0),
                         new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiFood),
                         new TextSection(foodSource)
                     ) { Greedy = false });
@@ -87,9 +87,9 @@ namespace UAlbion.Game.Gui.Inventory
             var stack = new VerticalStack(
                 header,
                 slotStack, // slotFrame,
-                new Padding(0, 2),
+                new Spacing(0, 2),
                 moneyAndFoodStack,
-                new Padding(0, 9),
+                new Spacing(0, 9),
                 new InventoryExitButton(exitButtonId)
             ) { Greedy = false };
 

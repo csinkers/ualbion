@@ -70,6 +70,12 @@ namespace UAlbion.Game.Gui
 
         readonly ButtonFrame _frame;
         public string Id { get; }
+        public ButtonFrame.ITheme Theme
+        {
+            get => _frame.Theme;
+            set => _frame.Theme = value;
+        }
+
 
         public bool IsPressed
         {

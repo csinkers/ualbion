@@ -41,9 +41,9 @@ namespace UAlbion.Game.Gui.Inventory
                         return new[] { new TextBlock(name) { Alignment = TextAlignment.Center } };
                     })),
                 new HorizontalStack(
-                    new Padding(3, 0),
+                    new Spacing(3, 0),
                     frame,
-                    new Padding(3, 0)),
+                    new Spacing(3, 0)),
                 labelStack
                 );
 

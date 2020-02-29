@@ -1,9 +1,9 @@
-﻿using System.IO;
+﻿using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class DummyMapEvent : IMapEvent
+    public class DummyMapEvent : Event, IMapEvent
     {
         public static DummyMapEvent Serdes(DummyMapEvent e, ISerializer s, MapEventType type)
         {

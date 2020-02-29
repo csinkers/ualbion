@@ -6,6 +6,8 @@ namespace UAlbion.Api
 {
     public class EventPartMetadata
     {
+        static readonly EventPartParsers Parsers = new EventPartParsers();
+
         public string Name { get; }
         public string HelpText { get; }
         public bool IsOptional { get; }
@@ -35,66 +37,15 @@ namespace UAlbion.Api
             {
                 Parser = part;
             }
-            else if (PropertyType == typeof(bool))
+            else
             {
-                var method = typeof(bool).GetMethod("Parse", new[] { typeof(string) });
-                Parser = Expression.Call(method, part);
+                var parser = Parsers.GetParser(PropertyType);
+                if (parser != null)
+                {
+                    Parser = Expression.Call(parser, part);
+                }
+                else throw new NotImplementedException($"The property {property.DeclaringType.Name}.{Name} of type {PropertyType.Name} is not handled.");
             }
-            else if (PropertyType == typeof(int))
-            {
-                var method = typeof(int).GetMethod("Parse", new[] { typeof(string) });
-                Parser = Expression.Call(method, part);
-            }
-            else if (PropertyType == typeof(float))
-            {
-                var method = typeof(float).GetMethod("Parse", new[] { typeof(string) });
-                Parser = Expression.Call(method, part);
-            }
-            else if (PropertyType == typeof(bool?))
-            {
-                var method = GetType().GetMethod("ParseNullableBool", BindingFlags.NonPublic | BindingFlags.Static);
-                Parser = Expression.Call(method, part);
-            }
-            else if (PropertyType == typeof(int?))
-            {
-                var method = GetType().GetMethod("ParseNullableInt", BindingFlags.NonPublic | BindingFlags.Static);
-                Parser = Expression.Call(method, part);
-            }
-            else if (PropertyType == typeof(float?))
-            {
-                var method = GetType().GetMethod("ParseNullableFloat", BindingFlags.NonPublic | BindingFlags.Static);
-                Parser = Expression.Call(method, part);
-            }
-            else if (PropertyType.IsEnum)
-            {
-                var method = GetType().GetMethod("ParseEnum", BindingFlags.NonPublic | BindingFlags.Static);
-                var generic = method.MakeGenericMethod(PropertyType);
-                Parser = Expression.Call(generic, part);
-            }
-            else throw new NotImplementedException();
         }
-
-        static bool? ParseNullableBool(string s)
-        {
-            if (string.IsNullOrEmpty(s))
-                return null;
-            return bool.Parse(s);
-        }
-
-        static int? ParseNullableInt(string s)
-        {
-            if (string.IsNullOrEmpty(s))
-                return null;
-            return int.Parse(s);
-        }
-
-        static float? ParseNullableFloat(string s)
-        {
-            if (string.IsNullOrEmpty(s))
-                return null;
-            return float.Parse(s);
-        }
-
-        static T ParseEnum<T>(string s) => (T)Enum.Parse(typeof(T), s, true);
     }
 }

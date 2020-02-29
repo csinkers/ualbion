@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics;
+using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class TeleportEvent : IMapEvent
+    public class TeleportEvent : Event, IMapEvent
     {
         public static TeleportEvent Serdes(TeleportEvent e, ISerializer s)
         {

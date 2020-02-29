@@ -12,8 +12,9 @@ namespace UAlbion.Formats.AssetIds
         2: Yellow
         6: Yellow/orange
         +64: Damaged
-
-        */
+        ??: Gray
+        */,
+        Gray 
     }
 
     public class MetaFontId : IConvertible

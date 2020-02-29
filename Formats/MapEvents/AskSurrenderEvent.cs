@@ -1,8 +1,9 @@
-﻿using UAlbion.Formats.Parsers;
+﻿using UAlbion.Api;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class AskSurrenderEvent : IMapEvent
+    public class AskSurrenderEvent : Event, IMapEvent
     {
         public static AskSurrenderEvent Serdes(AskSurrenderEvent e, ISerializer s)
         {

@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
-using System.IO;
+using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class SignalEvent : IMapEvent
+    public class SignalEvent : Event, IMapEvent
     {
         public static SignalEvent Serdes(SignalEvent e, ISerializer s)
         {

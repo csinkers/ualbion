@@ -37,7 +37,6 @@ namespace UAlbion.Game
         ITexture LoadFont(FontColor color, bool isBold);
         TilesetData LoadTileData(TilesetId id);
         LabyrinthData LoadLabyrinthData(LabyrinthDataId id);
-        CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id);
 
         string LoadString(StringId id, GameLanguage language);
         string LoadString(SystemTextId id, GameLanguage language);
@@ -56,5 +55,9 @@ namespace UAlbion.Game
         Chest LoadMerchant(MerchantId merchantId);
         WordId? ParseWord(string word);
         IList<Block> LoadBlockList(BlockListId blockListId);
+
+        IGeneralConfig LoadGeneralConfig();
+        IAssetConfig LoadAssetConfig();
+        CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id);
     }
 }

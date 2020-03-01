@@ -7,6 +7,7 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
+using UAlbion.Game.Gui;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Entities
@@ -185,16 +186,50 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        public string GetTextFromTextEvent(TextEvent textEvent)
+        public ITextSource GetTextFromTextEvent(TextEvent textEvent)
         {
             var id = textEvent.TextId;
             var mapId = (int)Resolve<IMapManager>().Current.MapId;
-            var assets = Resolve<IAssetManager>();
-            var settings = Resolve<ISettings>();
-            var text = assets.LoadString(new StringId(AssetType.MapText, mapId, id), settings.Gameplay.Language);
-            return text;
+
+            return new DynamicText(() =>
+            {
+                var assets = Resolve<IAssetManager>();
+                var settings = Resolve<ISettings>();
+                var textFormatter = new TextFormatter(assets, settings.Gameplay.Language);
+                return textFormatter.Format(new StringId(AssetType.MapText, mapId, id)).Blocks;
+            });
         }
 
-        void OnTextEvent(TextEvent textEvent) => Raise(new HoverTextEvent(GetTextFromTextEvent(textEvent)));
+        void OnTextEvent(TextEvent textEvent)
+        {
+            textEvent.Acknowledged = true;
+            switch(textEvent.Location)
+            {
+                case TextEvent.TextLocation.TextInWindow:
+                {
+                    var dialog = AttachChild(new TextWindow(GetTextFromTextEvent(textEvent)));
+                    dialog.Closed += (sender, _) => textEvent.Complete();
+                    break;
+                }
+
+                case TextEvent.TextLocation.TextInWindowWithPortrait:
+                case TextEvent.TextLocation.TextInWindowWithPortrait2:
+                { 
+                    var dialog = AttachChild(new TextWindow(GetTextFromTextEvent(textEvent)));
+                    dialog.Closed += (sender, _) => textEvent.Complete();
+                    break;
+                }
+
+                case TextEvent.TextLocation.QuickInfo:
+                    Raise(new DescriptionTextExEvent(GetTextFromTextEvent(textEvent)));
+                    textEvent.Complete();
+                    break;
+
+                default:
+                    Raise(new DescriptionTextExEvent(GetTextFromTextEvent(textEvent))); // TODO:
+                    textEvent.Complete();
+                    break;
+            }
+        }
     }
 }

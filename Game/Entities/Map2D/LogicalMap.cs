@@ -17,8 +17,8 @@ namespace UAlbion.Game.Entities.Map2D
         public LogicalMap(IAssetManager assetManager, MapDataId mapId)
         {
             _mapData = assetManager.LoadMap2D(mapId);
-            _tileData = assetManager.LoadTileData((TilesetId)_mapData.TilesetId);
-            _blockList = assetManager.LoadBlockList((BlockListId) _mapData.TilesetId);
+            _tileData = assetManager.LoadTileData(_mapData.TilesetId);
+            _blockList = assetManager.LoadBlockList((BlockListId)_mapData.TilesetId); // Note: Assuming a 1:1 correspondence between blocklist and tileset ids.
             UseSmallSprites = _tileData.UseSmallGraphics;
         }
 
@@ -26,10 +26,10 @@ namespace UAlbion.Game.Entities.Map2D
         public int Width => _mapData.Width;
         public int Height => _mapData.Height;
         public bool UseSmallSprites { get; }
-        public PaletteId PaletteId => (PaletteId)_mapData.PaletteId;
+        public PaletteId PaletteId => _mapData.PaletteId;
         public IconGraphicsId TilesetId => (IconGraphicsId)_mapData.TilesetId;
         public IEnumerable<MapNpc> Npcs => _mapData.Npcs;
-        public Vector2 TileSize { get; set; } // TODO: Tidy up
+        public Vector2 TileSize { get; set; } // TODO: Tidy up how this gets initialised
 
         public int Index(int x, int y) => y * _mapData.Width + x;
 
@@ -125,6 +125,14 @@ namespace UAlbion.Game.Entities.Map2D
             }
 
             Dirty?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void ChangeTileEventChain(sbyte x, sbyte y, ushort value)
+        {
+        }
+
+        public void ChangeTileEventTrigger(sbyte x, sbyte y, ushort value)
+        {
         }
     }
 }

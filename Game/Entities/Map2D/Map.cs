@@ -121,10 +121,10 @@ namespace UAlbion.Game.Entities.Map2D
                 case ChangeIconEvent.IconChangeType.ChangeCeiling: break; // N/A for 2D map
                 case ChangeIconEvent.IconChangeType.ChangeNpcMovementType: break;
                 case ChangeIconEvent.IconChangeType.ChangeNpcSprite: break;
-                case ChangeIconEvent.IconChangeType.ChangeTileEventChain: break;
+                case ChangeIconEvent.IconChangeType.ChangeTileEventChain: _logicalMap.ChangeTileEventChain(e.X, e.Y, e.Value); break;
                 case ChangeIconEvent.IconChangeType.PlaceTilemapObjectOverwrite: _logicalMap.PlaceBlock(e.X, e.Y, e.Value, true); break;
                 case ChangeIconEvent.IconChangeType.PlaceTilemapObjectNoOverwrite: _logicalMap.PlaceBlock(e.X, e.Y, e.Value, false); break;
-                case ChangeIconEvent.IconChangeType.ChangeTileEventTrigger: break;
+                case ChangeIconEvent.IconChangeType.ChangeTileEventTrigger: _logicalMap.ChangeTileEventTrigger(e.X, e.Y, e.Value); break;
                 default: throw new ArgumentOutOfRangeException();
             }
         }

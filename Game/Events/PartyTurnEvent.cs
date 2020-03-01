@@ -1,11 +1,12 @@
 ﻿using UAlbion.Api;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Events
 {
     [Event("party_turn")]
     public class PartyTurnEvent : GameEvent
     {
-        public PartyTurnEvent(int direction) { Direction = direction; }
-        [EventPart("direction")] public int Direction { get; }
+        public PartyTurnEvent(TeleportDirection direction) { Direction = direction; }
+        [EventPart("direction")] public TeleportDirection Direction { get; }
     }
 }

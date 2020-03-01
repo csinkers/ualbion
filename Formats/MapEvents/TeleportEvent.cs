@@ -12,7 +12,7 @@ namespace UAlbion.Formats.MapEvents
             e ??= new TeleportEvent();
             e.X = s.UInt8(nameof(X), e.X);
             e.Y = s.UInt8(nameof(Y), e.Y);
-            e.Direction = s.UInt8(nameof(Direction), e.Direction);
+            e.Direction = s.EnumU8(nameof(Direction), e.Direction);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.MapId = s.EnumU16(nameof(MapId), e.MapId);
@@ -30,7 +30,7 @@ namespace UAlbion.Formats.MapEvents
 
         public byte X { get; set; }
         public byte Y { get; set; }
-        public byte Direction { get; set; } // 0,1,2,3,255
+        public TeleportDirection Direction { get; set; }
         public MapDataId MapId { get; set; } // 0 = stay on current map
 
         public byte Unk4 { get; set; } // 255 on 2D maps, (1,6) on 3D maps

@@ -217,6 +217,12 @@ namespace UAlbion.Game.Text
             }
         }
 
+        public TextFormatResult Format(StringId template, params object[] arguments)
+        {
+            var templateText = _assets.LoadString(template, _language);
+            return Format(templateText, arguments);
+        }
+
         public TextFormatResult Format(SystemTextId template, params object[] arguments)
         {
             var templateText = _assets.LoadString(template, _language);
@@ -239,17 +245,5 @@ namespace UAlbion.Game.Text
             var blocks = TokensToBlocks(substituted).ToList();
             return new TextFormatResult(blocks, words);
         }
-    }
-
-    public class TextFormatResult
-    {
-        public TextFormatResult(IEnumerable<TextBlock> blocks, IList<WordId> words)
-        {
-            Blocks = blocks;
-            Words = words;
-        }
-
-        public IEnumerable<TextBlock> Blocks { get; }
-        public IList<WordId> Words { get; }
     }
 }

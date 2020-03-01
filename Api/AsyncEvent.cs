@@ -2,18 +2,20 @@
 
 namespace UAlbion.Api
 {
-    public class AsyncEvent : Event, IAsyncEvent
+    public abstract class AsyncEvent : Event, IAsyncEvent
     {
         bool _acknowledged;
         bool _complete;
         Action _completionCallback;
 
-        public void SetCallback(Action completionCallback)
+        public AsyncEvent CloneWithCallback(Action completionCallback)
         {
-            if (_completionCallback != null)
-                throw new InvalidOperationException("Completion callback already set!");
-            _completionCallback = completionCallback ?? throw new ArgumentNullException(nameof(completionCallback));
+            var clone = Clone();
+            clone._completionCallback = completionCallback;
+            return clone;
         }
+
+        protected abstract AsyncEvent Clone();
 
         public bool Acknowledged
         {

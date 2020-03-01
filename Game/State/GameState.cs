@@ -66,12 +66,7 @@ namespace UAlbion.Game.State
 
             _party?.Detach();
             _party = AttachChild(new Party(_game.PartyMembers));
-            Raise(new AddPartyMemberEvent(PartyCharacterId.Tom));
-            Raise(new PartyChangedEvent());
-            Raise(new StartClockEvent());
-            Raise(new LoadMapEvent(_game.MapId));
-            Raise(new StartClockEvent());
-            Raise(new PartyJumpEvent(_game.PartyX, _game.PartyY));
+            InitialiseGame();
         }
 
         void LoadGame(string filename)
@@ -81,12 +76,7 @@ namespace UAlbion.Game.State
             using var br = new BinaryReader(stream);
             var save = loader.Serdes(null, new GenericBinaryReader(br, stream.Length), "SavedGame", null);
             _game = save;
-            _party?.Detach();
-            _party = AttachChild(new Party(_game.PartyMembers));
-            Raise(new PartyChangedEvent());
-            Raise(new LoadMapEvent(_game.MapId));
-            Raise(new StartClockEvent());
-            Raise(new PartyJumpEvent(_game.PartyX, _game.PartyY));
+            InitialiseGame();
         }
 
         void SaveGame(string filename, string name)
@@ -99,6 +89,19 @@ namespace UAlbion.Game.State
             using var stream = File.Open(filename, FileMode.Create);
             using var bw = new BinaryWriter(stream);
             loader.Serdes(_game, new GenericBinaryWriter(bw), name, null);
+        }
+
+        void InitialiseGame()
+        {
+            _party?.Detach();
+            _party = AttachChild(new Party(_game.PartyMembers));
+            Raise(new AddPartyMemberEvent(PartyCharacterId.Tom));
+            Raise(new LoadMapEvent(_game.MapId));
+            // TODO: Replay map modification events from save
+            Raise(new StartClockEvent());
+            Raise(new PartyJumpEvent(_game.PartyX, _game.PartyY));
+            Raise(new CameraJumpEvent(_game.PartyX, _game.PartyY));
+            Raise(new PlayerEnteredTileEvent(_game.PartyX, _game.PartyY));
         }
     }
 }

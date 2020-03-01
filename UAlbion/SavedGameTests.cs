@@ -34,7 +34,7 @@ namespace UAlbion
                 loader.Serdes(save, new AnnotatedFormatWriter(tw), "TestSave", null);
                 ts.Position = 0;
                 File.WriteAllBytes(file + ".txt", ts.ToArray());
-                */
+                //*/
 
                 Debug.Assert(originalBytes.Length == roundTripBytes.Length);
                 Debug.Assert(originalBytes.SequenceEqual(roundTripBytes));

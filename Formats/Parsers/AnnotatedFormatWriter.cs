@@ -221,7 +221,7 @@ namespace UAlbion.Formats.Parsers
         {
             var v = existing;
             DoIndent();
-            _tw.WriteLine("{0:X} {1} = {2}", Offset, name, v);
+            _tw.WriteLine("{0:X} {1} = \"{2}\"", Offset, name, v);
 
             var bytes = Encoding.GetEncoding(850).GetBytes(v);
             Offset += bytes.Length + 1; // add a byte for the null terminator
@@ -232,7 +232,7 @@ namespace UAlbion.Formats.Parsers
         {
             var v = existing;
             DoIndent();
-            _tw.WriteLine("{0:X} {1} = {2}", Offset, name, v);
+            _tw.WriteLine("{0:X} {1} = \"{2}\"", Offset, name, v);
 
             var bytes = Encoding.GetEncoding(850).GetBytes(v);
             if (bytes.Length > length + 1) throw new InvalidOperationException("Tried to write overlength string");

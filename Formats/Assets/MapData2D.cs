@@ -112,7 +112,48 @@ namespace UAlbion.Formats.Assets
             foreach (var triggerType in map.Zones.Where(x => x.Global || x.Y == 0).GroupBy(x => x.Trigger))
                 map.ZoneTypeLookup[triggerType.Key] = triggerType.ToArray();
 
+            int chainNumber = 0;
+            var eventChains = new Dictionary<int, EventChain>();
+            var chainLookup = new Dictionary<int, int>();
+            var nodesToCheck = new Queue<IEventNode>();
+            for (int i = 0; i < map.Events.Count; i++)
+            {
+                if (chainLookup.ContainsKey(i))
+                    continue;
+
+                if (!eventChains.ContainsKey(chainNumber))
+                    eventChains[chainNumber] = new EventChain(chainNumber, map.Events[i]);
+
+                nodesToCheck.Enqueue(map.Events[i]);
+                while (nodesToCheck.Count > 0)
+                {
+                    var node = nodesToCheck.Dequeue();
+                    chainLookup[node.Id] = chainNumber;
+                    if (node.NextEvent != null)
+                        nodesToCheck.Enqueue(node.NextEvent);
+
+                    if(node is IBranchNode branch && branch.NextEventWhenFalse != null)
+                        nodesToCheck.Enqueue(branch.NextEventWhenFalse);
+                }
+
+                chainNumber++;
+            }
+
             return map;
         }
+    }
+
+    public class EventChain
+    {
+        public EventChain(int id, EventNode firstEvent)
+        {
+            Id = id;
+            FirstEvent = firstEvent;
+            Enabled = true;
+        }
+
+        public int Id { get; }
+        public EventNode FirstEvent { get; }
+        public bool Enabled { get; set; }
     }
 }

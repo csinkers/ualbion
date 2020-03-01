@@ -20,6 +20,7 @@ namespace UAlbion.Game
             public int X { get; set; }
             public int Y { get; set; }
             public ItemId? UsedItem { get; set; }
+            public bool ClockWasRunning { get; set; }
         }
 
         public EventChainManager() : base(Handlers) { }
@@ -34,19 +35,19 @@ namespace UAlbion.Game
 
         void Resume(EventChainContext context)
         {
-            do
+            while (context.Node != null)
             {
                 if (context.Node.Event is AsyncEvent asyncEvent)
                 {
                     context.Node = context.Node.NextEvent;
-                    asyncEvent.SetCallback(() => Resume(context));
+                    var clone = asyncEvent.CloneWithCallback(() => Resume(context));
 
-                    RaiseWithContext(context, asyncEvent);
+                    RaiseWithContext(context, clone);
 
-                    if (asyncEvent.Acknowledged)
+                    if (clone.Acknowledged)
                         return;
 
-                    Raise(new LogEvent(LogEvent.Level.Warning, $"Async event {asyncEvent} not acknowledged. Continuing immediately."));
+                    Raise(new LogEvent(LogEvent.Level.Warning, $"Async event {clone} not acknowledged. Continuing immediately."));
                 }
                 else
                 {
@@ -64,7 +65,10 @@ namespace UAlbion.Game
                         context.Node = context.Node.NextEvent;
                     }
                 }
-            } while (context.Node != null);
+            } 
+
+            if(context.ClockWasRunning)
+                Raise(new StartClockEvent());
         }
 
         bool Query(EventChainContext context, IQueryEvent query)
@@ -195,8 +199,12 @@ namespace UAlbion.Game
                 Trigger = e.Trigger,
                 Node = e.Chain,
                 X = e.X,
-                Y = e.Y
+                Y = e.Y,
+                ClockWasRunning = Resolve<IClock>().IsRunning
             };
+
+            if (context.ClockWasRunning)
+                Raise(new StopClockEvent());
             Resume(context);
         }
     }

@@ -65,8 +65,6 @@ namespace UAlbion.Game
 
                 // Set the scene first to ensure scene-local components from other scenes are disabled.
                 Raise(new SetSceneEvent(map is Entities.Map3D.Map ? SceneId.World3D : SceneId.World2D)); 
-                Raise(new CameraJumpEvent((int) map.LogicalSize.X / 2, (int) map.LogicalSize.Y / 2));
-                // Raise(new PartyJumpEvent((int) map.LogicalSize.X / 2, (int) map.LogicalSize.Y / 2));
                 Raise(new LogEvent(LogEvent.Level.Info, $"Loaded map {(int) pendingMapChange}: {pendingMapChange}"));
                 map.RunInitialEvents();
             }
@@ -93,7 +91,9 @@ namespace UAlbion.Game
             }
 
             Raise(new PartyJumpEvent(e.X, e.Y));
-            Raise(new PartyTurnEvent(e.Direction));
+            if(e.Direction != TeleportDirection.Unchanged)
+                Raise(new PartyTurnEvent(e.Direction));
+            Raise(new CameraJumpEvent(e.X, e.Y));
         }
     }
 }

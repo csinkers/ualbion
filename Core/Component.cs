@@ -118,6 +118,9 @@ namespace UAlbion.Core
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void Raise<T>(T @event) where T : IEvent => Exchange?.Raise(@event, this);
+        protected void Raise(IEvent @event) => Exchange?.Raise(@event, this);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected void Enqueue(IEvent @event) => Exchange?.Enqueue(@event, this);
     }
 }

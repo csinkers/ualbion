@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
+using UAlbion.Api;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 
@@ -40,7 +40,7 @@ namespace UAlbion.Formats.Parsers
 
         public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
-            Debug.Assert(config.Transposed != true);
+            ApiUtil.Assert(config.Transposed != true);
             long initialPosition = br.BaseStream.Position;
             var sizes = ParseSpriteSizes(config.SubSprites);
 
@@ -80,7 +80,7 @@ namespace UAlbion.Formats.Parsers
                     sprite.PixelData[(frame.Y + j) * sprite.Width + frame.X + i] = frameBytes[n][j * frame.Width + i];
             }
 
-            Debug.Assert(br.BaseStream.Position == initialPosition + streamLength);
+            ApiUtil.Assert(br.BaseStream.Position == initialPosition + streamLength);
             return sprite;
         }
     }

@@ -53,16 +53,16 @@ namespace UAlbion.Game.Entities.Map2D
             return tileIndex != -1 ? _tileData.Tiles[tileIndex] : null;
         }
 
-        public IEnumerable<MapEventZone> GetZones(int x, int y) => GetZones(Index(x, y));
-        public IEnumerable<MapEventZone> GetZones(int index) => _mapData.ZoneLookup.TryGetValue(index, out var zones) ? zones : Enumerable.Empty<MapEventZone>();
+        public MapEventZone GetZone(int x, int y) => GetZone(Index(x, y));
+        public MapEventZone GetZone(int index) => _mapData.ZoneLookup.TryGetValue(index, out var zone) ? zone : null;
 
-        public IEnumerable<MapEventZone> GetGlobalZonesOfType(TriggerType triggerType)
+        public IEnumerable<MapEventZone> GetZonesOfType(TriggerType triggerType)
         {
             var matchingKeys = _mapData.ZoneTypeLookup.Keys.Where(x => (x & triggerType) == triggerType);
             return matchingKeys.SelectMany(x => _mapData.ZoneTypeLookup[x]);
         }
 
-        public void ChangeUnderlay(sbyte x, sbyte y, ushort value)
+        public void ChangeUnderlay(byte x, byte y, ushort value)
         {
             var index = Index(x, y);
             if (index < 0 || index >= _mapData.Underlay.Length)
@@ -76,7 +76,7 @@ namespace UAlbion.Game.Entities.Map2D
             }
         }
 
-        public void ChangeOverlay(sbyte x, sbyte y, ushort value)
+        public void ChangeOverlay(byte x, byte y, ushort value)
         {
             var index = Index(x, y);
             if (index < 0 || index >= _mapData.Overlay.Length)
@@ -90,7 +90,7 @@ namespace UAlbion.Game.Entities.Map2D
             }
         }
 
-        public void PlaceBlock(sbyte x, sbyte y, ushort blockId, bool overwrite)
+        public void PlaceBlock(byte x, byte y, ushort blockId, bool overwrite)
         {
             if (blockId >= _blockList.Count)
             {
@@ -127,12 +127,15 @@ namespace UAlbion.Game.Entities.Map2D
             Dirty?.Invoke(this, EventArgs.Empty);
         }
 
-        public void ChangeTileEventChain(sbyte x, sbyte y, ushort value)
+        public void ChangeTileEventChain(byte x, byte y, ushort value)
         {
         }
 
-        public void ChangeTileEventTrigger(sbyte x, sbyte y, ushort value)
+        public void ChangeTileEventTrigger(byte x, byte y, ushort value)
         {
+            _mapData.ZoneLookup.TryGetValue(Index(x, y), out var zone);
+            if(zone != null)
+                zone.Trigger = (TriggerType)value;
         }
     }
 }

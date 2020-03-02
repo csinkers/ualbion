@@ -1,6 +1,6 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
+using UAlbion.Api;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 
@@ -25,16 +25,16 @@ namespace UAlbion.Formats.Parsers
 
                 byte firstByte = br.ReadByte(); // 0
                 t.Layer = (TilesetData.TileLayer)(firstByte >> 4); // Upper nibble of first byte (0h)
-                Debug.Assert(validLayers.Contains((byte)t.Layer), "Unexpected tile layer found");
+                ApiUtil.Assert(validLayers.Contains((byte)t.Layer), "Unexpected tile layer found");
 
                 t.Type = (TilesetData.TileType)(firstByte & 0xf); // Lower nibble of first byte (0l)
-                Debug.Assert(validTypes.Contains((byte)t.Type), "Unexpected tile type found");
+                ApiUtil.Assert(validTypes.Contains((byte)t.Type), "Unexpected tile type found");
 
                 t.Collision = (TilesetData.Passability)br.ReadByte(); // 1
-                Debug.Assert(validPassabilities.Contains((int)t.Collision));
+                ApiUtil.Assert(validPassabilities.Contains((int)t.Collision));
 
                 t.Flags = (TilesetData.TileFlags)br.ReadUInt16(); // 2
-                Debug.Assert((t.Flags & TilesetData.TileFlags.UnusedMask) == 0, "Unused flags set");
+                ApiUtil.Assert((t.Flags & TilesetData.TileFlags.UnusedMask) == 0, "Unused flags set");
                 t.ImageNumber = br.ReadUInt16(); // 4
                 t.FrameCount = br.ReadByte(); // 6
                 t.Unk7 = br.ReadByte(); // 7

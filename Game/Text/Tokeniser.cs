@@ -116,7 +116,12 @@ namespace UAlbion.Game.Text
                     case TokeniserState.InPercentage:
                         switch (c)
                         {
-                            case '%': yield return (Token.Text, "%"); state = TokeniserState.Neutral; sb.Clear(); break;
+                            case '%': 
+                                yield return (Token.Text, "%");
+                                state = TokeniserState.Neutral;
+                                sb.Clear();
+                                break;
+
                             case 's':
                             case 'd':
                             case 'u':
@@ -126,7 +131,11 @@ namespace UAlbion.Game.Text
                                 sb.Clear();
                                 break;
 
-                            default: sb.Append(c); break;
+                            default: 
+                                yield return (Token.Text, "%" + c);
+                                state = TokeniserState.Neutral;
+                                sb.Clear();
+                                break;
                         }
                         break;
                 }

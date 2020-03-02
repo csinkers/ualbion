@@ -156,6 +156,9 @@ namespace UAlbion.Core
                 using (PerfTracker.FrameEvent("5 Performing update"))
                     Update((float)deltaSeconds);
 
+                using (PerfTracker.FrameEvent("5.1 Flushing queued events"))
+                    Exchange.FlushQueuedEvents();
+
                 if (!Window.Exists)
                     break;
 
@@ -206,7 +209,7 @@ namespace UAlbion.Core
 
         void Draw()
         {
-            Debug.Assert(Window.Exists);
+            ApiUtil.Assert(Window.Exists);
             int width = Window.Width;
             int height = Window.Height;
 

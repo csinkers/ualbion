@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using UAlbion.Api;
+﻿using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Parsers;
 
@@ -17,14 +16,14 @@ namespace UAlbion.Formats.MapEvents
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.MapId = s.EnumU16(nameof(MapId), e.MapId);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
-            Debug.Assert(e.Unk4 == 0
+            ApiUtil.Assert(e.Unk4 == 0
                          || e.Unk4 == 1
                          || e.Unk4 == 2
                          || e.Unk4 == 3
                          || e.Unk4 == 6
                          || e.Unk4 == 106
                          || e.Unk4 == 255); // Always 255 in maps
-            Debug.Assert(e.Unk8 == 0);
+            ApiUtil.Assert(e.Unk8 == 0);
             return e;
         }
 

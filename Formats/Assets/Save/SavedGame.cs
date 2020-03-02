@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.Parsers;
@@ -58,7 +58,7 @@ namespace UAlbion.Formats.Assets.Save
             save.Unk1 = s.UInt32(nameof(Unk1), save.Unk1);
             var versionOffset = s.Offset;
             save.Version = s.UInt16(nameof(Version), save.Version); // 0
-            Debug.Assert(save.Version == 138); // TODO: Throw error for other versions?
+            ApiUtil.Assert(save.Version == 138); // TODO: Throw error for other versions?
             save.Unk9 = s.ByteArray(nameof(Unk9), save.Unk9, 6); // 2
 
             save.Days    = s.UInt16(nameof(Days), save.Days);       // 8

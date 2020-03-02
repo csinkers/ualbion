@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.Parsers;
 

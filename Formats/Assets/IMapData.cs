@@ -16,7 +16,7 @@ namespace UAlbion.Formats.Assets
         IList<MapNpc> Npcs { get; }
         IList<EventNode> Events { get; }
         IList<MapEventZone> Zones { get; }
-        IDictionary<int, MapEventZone[]> ZoneLookup { get; }
+        IDictionary<int, MapEventZone> ZoneLookup { get; }
         IDictionary<TriggerType, MapEventZone[]> ZoneTypeLookup { get; }
     }
 }

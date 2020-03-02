@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets.Save
@@ -69,12 +69,12 @@ namespace UAlbion.Formats.Assets.Save
             if (s.Mode == SerializerMode.Reading)
             {
                 var descriptor = s.Meta("XldDescriptor", (XldDescriptor)null, XldDescriptor.Serdes);
-                Debug.Assert(descriptor.Category == category);
-                Debug.Assert(xldNumber == descriptor.Number);
+                ApiUtil.Assert(descriptor.Category == category);
+                ApiUtil.Assert(xldNumber == descriptor.Number);
 
                 var lengths = HeaderSerdes(null, s);
 
-                Debug.Assert(lengths.Sum() + HeaderSize(lengths.Length) == descriptor.Size);
+                ApiUtil.Assert(lengths.Sum() + HeaderSize(lengths.Length) == descriptor.Size);
                 long offset = s.Offset;
                 for (int i = 0; i < 100 && i < lengths.Length; i++)
                 {
@@ -82,7 +82,7 @@ namespace UAlbion.Formats.Assets.Save
                         continue;
                     func(i + xldNumber * 100, lengths[i], s);
                     offset += lengths[i];
-                    Debug.Assert(offset == s.Offset);
+                    ApiUtil.Assert(offset == s.Offset);
                 }
             }
             else
@@ -102,7 +102,7 @@ namespace UAlbion.Formats.Assets.Save
                         lengths[i] = WithSerializer(s.Mode, buffers[i], memorySerializer => func(i + xldNumber * 100, 0, memorySerializer), s, ref fakeOffset);
 
                     HeaderSerdes(lengths, s);
-                    Debug.Assert(initialFakeOffset == s.Offset);
+                    ApiUtil.Assert(initialFakeOffset == s.Offset);
                     for (int i = 0; i < lengths.Length; i++)
                     {
                         if (s.Mode == SerializerMode.WritingAnnotated)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -45,5 +46,18 @@ namespace UAlbion.Api
             return result;
         }
 
+        [Conditional("DEBUG")]
+        public static void Assert(bool condition)
+        {
+            if (!condition)
+                Console.Write("Assertion failed!");
+        }
+
+        [Conditional("DEBUG")]
+        public static void Assert(bool condition, string message)
+        {
+            if (!condition)
+                Console.Write($"Assertion failed! {message}");
+        }
     }
 }

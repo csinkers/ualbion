@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-
-namespace UAlbion.Formats.Parsers
+﻿namespace UAlbion.Formats.Parsers
 {
     /*
     public class SerializationInfo

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
@@ -14,9 +14,9 @@ namespace UAlbion.Formats.MapEvents
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.TickerId = s.UInt16(nameof(TickerId), e.TickerId);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
-            Debug.Assert(e.Unk4 == 0 || e.Unk4 == 1);
-            Debug.Assert(e.Unk5 == 0);
-            Debug.Assert(e.Unk8 == 0);
+            ApiUtil.Assert(e.Unk4 == 0 || e.Unk4 == 1);
+            ApiUtil.Assert(e.Unk5 == 0);
+            ApiUtil.Assert(e.Unk8 == 0);
             return e;
         }
 

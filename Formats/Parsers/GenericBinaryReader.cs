@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using UAlbion.Api;
 
 namespace UAlbion.Formats.Parsers
 {
@@ -27,7 +28,7 @@ namespace UAlbion.Formats.Parsers
         {
             get
             {
-                Debug.Assert(_offset == _br.BaseStream.Position);
+                ApiUtil.Assert(_offset == _br.BaseStream.Position);
                 if(_br.BaseStream.Position > _maxOffset)
                     Debug.Fail("Buffer overrun in binary reader");
                 return _offset;
@@ -36,7 +37,7 @@ namespace UAlbion.Formats.Parsers
 
         public void Check()
         {
-            Debug.Assert(_offset == _br.BaseStream.Position);
+            ApiUtil.Assert(_offset == _br.BaseStream.Position);
             if (_br.BaseStream.Position > _maxOffset)
                 Debug.Fail("Buffer overrun in binary reader");
         }
@@ -102,7 +103,7 @@ namespace UAlbion.Formats.Parsers
         {
             var str = FormatUtil.BytesTo850String(_br.ReadBytes(length));
             _offset += length;
-            Debug.Assert(_offset == _br.BaseStream.Position);
+            ApiUtil.Assert(_offset == _br.BaseStream.Position);
             return str;
         }
 

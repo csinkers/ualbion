@@ -10,6 +10,7 @@ namespace UAlbion.Game.State
         IParty Party { get; }
         DateTime Time { get; }
         bool Loaded { get; }
+        MapDataId MapId { get; }
         Func<NpcCharacterId, ICharacterSheet> GetNpc { get; }
 
         Func<ChestId, IChest> GetChest { get; }

@@ -23,15 +23,19 @@ namespace UAlbion.Game.State
         Func<NpcCharacterId, ICharacterSheet> IGameState.GetNpc => x => _game.Npcs[x];
         Func<ChestId, IChest> IGameState.GetChest => x => _game.Chests[x];
         Func<MerchantId, IChest> IGameState.GetMerchant => x => _game.Merchants[x];
-        public Func<int, int> GetTicker => x => _game.Tickers[x];
-        public Func<int, int> GetSwitch  => x => _game.Switches[x];
+        public Func<int, int> GetTicker => x => _game.Tickers.TryGetValue(x, out var value) ? value : 0;
+        public Func<int, int> GetSwitch  => x => _game.Switches.TryGetValue(x, out var value) ? value : 0;
+        public MapDataId MapId => _game.MapId; 
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<GameState, NewGameEvent>((x,e) => x.NewGame()),
-            H<GameState, LoadGameEvent>((x,e) => x.LoadGame(e.Filename)),
-            H<GameState, SaveGameEvent>((x,e) => x.SaveGame(e.Filename, e.Name)),
-            H<GameState, UpdateEvent>((x, e) => { x.TickCount += e.Frames; }),
-            H<GameState, SetActiveMemberEvent>((x, e) => { x._party.Leader = e.MemberId; x.Raise(e); })
+            H<GameState, NewGameEvent>((x, e) => x.NewGame()),
+            H<GameState, LoadGameEvent>((x, e) => x.LoadGame(e.Filename)),
+            H<GameState, SaveGameEvent>((x, e) => x.SaveGame(e.Filename, e.Name)),
+            H<GameState, UpdateEvent>((x, e) => x.TickCount += e.Frames),
+            H<GameState, LoadMapEvent>((x, e) => x._game.MapId = e.MapId),
+            H<GameState, SetTemporarySwitchEvent>((x, e) => { }),
+            H<GameState, SetTickerEvent>((x, e) => { }),
+            H<GameState, ChangeTimeEvent>((x, e) => { })
         );
 
         public GameState() : base(Handlers)

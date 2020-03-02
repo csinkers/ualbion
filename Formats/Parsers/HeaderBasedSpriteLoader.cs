@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
+using UAlbion.Api;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 
@@ -11,7 +11,7 @@ namespace UAlbion.Formats.Parsers
     {
         public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
-            Debug.Assert(config.Transposed != true);
+            ApiUtil.Assert(config.Transposed != true);
             var sprite = new AlbionSprite();
             long initialPosition = br.BaseStream.Position;
             sprite.Name = name;
@@ -20,7 +20,7 @@ namespace UAlbion.Formats.Parsers
             int width = br.ReadUInt16();
             int height = br.ReadUInt16();
             int something = br.ReadByte();
-            Debug.Assert(something == 0);
+            ApiUtil.Assert(something == 0);
             int spriteCount = br.ReadByte();
 
             sprite.Frames = new AlbionSprite.Frame[spriteCount];
@@ -35,9 +35,9 @@ namespace UAlbion.Formats.Parsers
                     width = br.ReadUInt16();
                     height = br.ReadUInt16();
                     something = br.ReadByte();
-                    Debug.Assert(something == 0);
+                    ApiUtil.Assert(something == 0);
                     int spriteCount2 = br.ReadByte();
-                    Debug.Assert(spriteCount2 == spriteCount);
+                    ApiUtil.Assert(spriteCount2 == spriteCount);
                 }
 
                 var bytes = br.ReadBytes(width * height);
@@ -61,7 +61,7 @@ namespace UAlbion.Formats.Parsers
                     sprite.PixelData[(frame.Y + j) * sprite.Width + frame.X + i] = frameBytes[n][j * frame.Width + i];
             }
 
-            Debug.Assert(br.BaseStream.Position == initialPosition + streamLength);
+            ApiUtil.Assert(br.BaseStream.Position == initialPosition + streamLength);
             return sprite;
         }
     }

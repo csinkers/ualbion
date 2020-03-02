@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
@@ -14,7 +14,7 @@ namespace UAlbion.Formats.MapEvents
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
-            Debug.Assert(e.Unk2 == 1 || e.Unk2 == 0 || e.Unk2 == 2); // Usually 1
+            ApiUtil.Assert(e.Unk2 == 1 || e.Unk2 == 0 || e.Unk2 == 2); // Usually 1
             return e;
         }
 

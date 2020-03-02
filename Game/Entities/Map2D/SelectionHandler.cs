@@ -5,7 +5,6 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
 using UAlbion.Game.Scenes;
@@ -19,7 +18,6 @@ namespace UAlbion.Game.Entities.Map2D
             H<SelectionHandler, WorldCoordinateSelectEvent>((x, e) => x.OnSelect(e)),
             H<SelectionHandler, RightClickEvent>((x, e) => x.OnRightClick())
         );
-
 
         static readonly Vector3 Normal = Vector3.UnitZ;
         readonly LogicalMap _map;
@@ -51,25 +49,22 @@ namespace UAlbion.Game.Entities.Map2D
             int highlightIndex = y * _map.Width + x;
             var underlayTile = _map.GetUnderlay(x, y);
             var overlayTile = _map.GetOverlay(x, y);
-            var zones = _map.GetZones(x, y);
 
             e.RegisterHit(t, new MapTileHit(new Vector2(x, y), intersectionPoint));
             if (underlayTile != null) e.RegisterHit(t, underlayTile);
             if (overlayTile != null) e.RegisterHit(t, overlayTile);
             e.RegisterHit(t, this);
 
-            foreach(var zone in zones)
-            {
+            var zone = _map.GetZone(x, y);
+            if (zone != null)
                 e.RegisterHit(t, zone);
-                HashSet<IEventNode> printedEvents = new HashSet<IEventNode>();
-                var zoneEvent = zone.EventNode;
-                while (zoneEvent != null && !printedEvents.Contains(zoneEvent))
-                {
+
+            var chain = zone?.Chain;
+            if (chain != null)
+            {
+                foreach (var zoneEvent in chain.Events)
                     e.RegisterHit(t, zoneEvent);
-                    printedEvents.Add(zoneEvent);
-                    zoneEvent = zoneEvent.NextEvent;
-                } 
-            }
+            } 
 
             if (_lastHighlightIndex != highlightIndex)
             {
@@ -97,16 +92,16 @@ namespace UAlbion.Game.Entities.Map2D
             var normPosition = camera.ProjectWorldToNorm(new Vector3(worldPosition, 0.0f));
             var uiPosition = window.NormToUi(new Vector2(normPosition.X, normPosition.Y));
             var heading = S(SystemTextId.MapPopup_Environment);
-            var zones = _map.GetZones(x, y);
-
             var options = new List<ContextMenuOption>();
-            foreach(var zone in zones)
+
+            var zone = _map.GetZone(x, y);
+            if (zone != null)
             {
                 if (zone.Trigger.HasFlag(TriggerType.Examine))
                 {
                     options.Add(new ContextMenuOption(
                         S(SystemTextId.MapPopup_Examine),
-                        new TriggerChainEvent(zone.EventNode, TriggerType.Examine, x, y),
+                        new TriggerChainEvent(zone.Chain, TriggerType.Examine, x, y),
                         ContextMenuGroup.Actions));
                 }
 
@@ -114,7 +109,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(SystemTextId.MapPopup_Manipulate),
-                        new TriggerChainEvent(zone.EventNode, TriggerType.Manipulate, x, y),
+                        new TriggerChainEvent(zone.Chain, TriggerType.Manipulate, x, y),
                         ContextMenuGroup.Actions));
                 }
 
@@ -122,7 +117,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(SystemTextId.MapPopup_Take),
-                        new TriggerChainEvent(zone.EventNode, TriggerType.Take, x, y),
+                        new TriggerChainEvent(zone.Chain, TriggerType.Take, x, y),
                         ContextMenuGroup.Actions));
                 }
 
@@ -130,7 +125,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(SystemTextId.MapPopup_TalkTo),
-                        new TriggerChainEvent(zone.EventNode, TriggerType.TalkTo, x, y),
+                        new TriggerChainEvent(zone.Chain, TriggerType.TalkTo, x, y),
                         ContextMenuGroup.Actions));
                 }
             }

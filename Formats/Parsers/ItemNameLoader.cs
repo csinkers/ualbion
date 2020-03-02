@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
+using UAlbion.Api;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
@@ -11,7 +11,7 @@ namespace UAlbion.Formats.Parsers
         const int stringSize = 20;
         public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
-            Debug.Assert(streamLength % stringSize == 0);
+            ApiUtil.Assert(streamLength % stringSize == 0);
             var results = new List<string>(); // Returns item names in the following order: German, English, French.
             long end = br.BaseStream.Position + streamLength;
             while (br.BaseStream.Position < end)

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
@@ -73,6 +72,12 @@ namespace UAlbion.Game.Entities.Map2D
             }
         }
 
+        public override void Subscribed()
+        {
+            Update();
+            base.Subscribed();
+        }
+
         SpriteInstanceData BuildInstanceData(int i, int j, TilesetData.TileData tile, int tickCount)
         {
             if (tile == null || tile.Flags.HasFlag(TilesetData.TileFlags.Debug))
@@ -101,7 +106,7 @@ namespace UAlbion.Game.Entities.Map2D
                     layer,
                     0);
 
-            var zone = _logicalMap.GetZones(index).FirstOrDefault();
+            var zone = _logicalMap.GetZone(index);
             int eventNum = zone?.EventNumber ?? -1;
 
             instance.Flags = 0
@@ -148,7 +153,7 @@ namespace UAlbion.Game.Entities.Map2D
 
             if (HighlightIndex.HasValue)
             {
-                var zone = _logicalMap.GetZones(HighlightIndex.Value).FirstOrDefault();
+                var zone = _logicalMap.GetZone(HighlightIndex.Value);
                 _highlightEvent = zone?.EventNumber ?? -1;
                 if (_highlightEvent == -1)
                     _highlightEvent = null;

@@ -10,8 +10,9 @@ namespace UAlbion.Formats.Assets
         public byte X;
         public byte Y;
         public TriggerType Trigger;
-        public ushort EventNumber;
-        public IEventNode EventNode { get; set; }
+        public ushort? EventNumber { get; set; }
+        public EventChain Chain { get; set; }
+        public IEventNode Node { get; set; }
 
         public static MapEventZone Serdes(MapEventZone existing, ISerializer s, byte y)
         {
@@ -23,13 +24,13 @@ namespace UAlbion.Formats.Assets
             };
 
             zone.X = s.Transform<byte, byte>(nameof(X), zone.X, s.UInt8, StoreIncremented.Instance);
-            // Debug.Assert(global && zone.X == 0xff || !global && zone.X != 0xff);
+            // ApiUtil.Assert(global && zone.X == 0xff || !global && zone.X != 0xff);
             zone.Unk1 = s.UInt8(nameof(Unk1), zone.Unk1);
             zone.Trigger = s.EnumU16(nameof(Trigger), zone.Trigger);
-            zone.EventNumber = s.UInt16(nameof(EventNumber), zone.EventNumber);
+            zone.EventNumber = ConvertMaxToNull.Serdes(nameof(EventNumber), zone.EventNumber, s.UInt16);
             return zone;
         }
 
-        public override string ToString() => $"Zone ({X}, {Y}) T:{Trigger} Mode:{Unk1} E:{EventNumber}";
+        public override string ToString() => $"Zone ({X}, {Y}) T:{Trigger} Mode:{Unk1} C:{Chain.Id} E:{EventNumber}";
     }
 }

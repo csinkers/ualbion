@@ -5,6 +5,9 @@ namespace UAlbion.Game.State
 {
     public interface IParty
     {
+        int TotalGold { get; }
+
+        int GetItemCount(ItemId item);
         IReadOnlyList<IPlayer> StatusBarOrder { get; } // Max of 6
         IReadOnlyList<IPlayer> WalkOrder { get; } // Max of 6
         PartyCharacterId Leader { get; }

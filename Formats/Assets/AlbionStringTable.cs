@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
+using UAlbion.Api;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Assets
@@ -24,7 +24,7 @@ namespace UAlbion.Formats.Assets
                 strings[i] = FormatUtil.BytesTo850String(bytes);
             }
 
-            Debug.Assert(br.BaseStream.Position == startOffset + streamLength);
+            ApiUtil.Assert(br.BaseStream.Position == startOffset + streamLength);
             return strings;
         }
 

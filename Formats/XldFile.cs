@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using UAlbion.Api;
 
 namespace UAlbion.Formats
 {
@@ -26,7 +26,7 @@ namespace UAlbion.Formats
                 throw new FormatException("XLD file magic string not found");
 
             byte terminator = br.ReadByte();
-            Debug.Assert(terminator == 0);
+            ApiUtil.Assert(terminator == 0);
 
             int objectCount = br.ReadUInt16();
             _objectOffsets = new int[objectCount + 1];
@@ -39,7 +39,7 @@ namespace UAlbion.Formats
                 offset += length;
             }
 
-            Debug.Assert(offset == _stream.Length);
+            ApiUtil.Assert(offset == _stream.Length);
             _objectOffsets[objectCount] = offset;
         }
 

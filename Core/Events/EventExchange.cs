@@ -23,6 +23,7 @@ namespace UAlbion.Core.Events
         readonly EventExchange _parent;
         readonly IList<EventExchange> _children = new List<EventExchange>();
         readonly Stack<HashSet<IComponent>> _dispatchLists = new Stack<HashSet<IComponent>>();
+        readonly Queue<(IEvent, object)> _queuedEvents = new Queue<(IEvent, object)>();
 
 #if DEBUG
         // ReSharper disable once CollectionNeverQueried.Local
@@ -209,6 +210,20 @@ namespace UAlbion.Core.Events
 
             if (!verbose)
                 Interlocked.Decrement(ref _nesting);
+        }
+
+        public void Enqueue(IEvent e, object sender) => _queuedEvents.Enqueue((e, sender));
+
+        public void FlushQueuedEvents()
+        {
+            while (_queuedEvents.Count > 0)
+            {
+                var (e, sender) = _queuedEvents.Dequeue();
+                Raise(e, sender);
+            }
+
+            foreach(var child in Children)
+                child.FlushQueuedEvents();
         }
 
         public EventExchange Attach(IComponent component)

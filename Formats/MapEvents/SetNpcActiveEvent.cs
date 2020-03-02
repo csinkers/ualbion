@@ -1,5 +1,4 @@
-﻿using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Parsers;
+﻿using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -9,7 +8,7 @@ namespace UAlbion.Formats.MapEvents
         {
             e ??= new SetNpcActiveEvent();
             e.IsActive = s.UInt8(nameof(IsActive), e.IsActive);
-            e.NpcId = s.EnumU8(nameof(NpcId), e.NpcId);
+            e.NpcId = s.UInt8(nameof(NpcId), e.NpcId);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
@@ -18,7 +17,7 @@ namespace UAlbion.Formats.MapEvents
         }
 
         public byte IsActive { get; private set; }
-        public NpcCharacterId NpcId { get; set; }
+        public byte NpcId { get; set; }
         public byte Unk4 { get; set; }
         public byte Unk5 { get; set; }
         public ushort Unk6 { get; private set; }

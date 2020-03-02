@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
     [Flags]
     public enum EventScope : byte
     {
-        RelativePositioning = 1,
-        Temporary = 2,
+        Rel = 1, // Relative positioning (vs. absolute)
+        Temp = 2, // Temporary lifetime (i.e. doesn't survive map reload)
     }
 }

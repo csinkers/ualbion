@@ -98,12 +98,12 @@ namespace UAlbion.Game
                     { Name = name, Object = o, Value = $"({v.X}, {v.Y}, {v.Z})".ToString() };
                 case ICollection e:
                     var coll = new ReflectedObject(parent, index) { Name = name, Object = o, Value = e.Count.ToString() };
-                    coll.SubObjects = e.OfType<object>().Select((x, i) => Reflect(i.ToString(), x, coll, i));
+                    coll.SubObjects = e.Cast<object>().Select((x, i) => Reflect(i.ToString(), x, coll, i));
                     return coll;
 
                 case IEnumerable e:
                     var enumerable = new ReflectedObject(parent, index) { Name = name, Object = o, Value = "", };
-                    enumerable.SubObjects = e.OfType<object>().Select((x, i) => Reflect(i.ToString(), x, enumerable, i));
+                    enumerable.SubObjects = e.Cast<object>().Select((x, i) => Reflect(i.ToString(), x, enumerable, i));
                     return enumerable;
             }
 

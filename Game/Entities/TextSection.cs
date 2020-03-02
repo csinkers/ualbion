@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
@@ -41,7 +42,7 @@ namespace UAlbion.Game.Entities
             });
         }
         public TextSection(ITextSource source) : base(Handlers) { _source = source; }
-        public override string ToString() => $"Text {_source?.ToString() ?? _block?.ToString()}";
+        public override string ToString() => $"TextSection {_source?.ToString() ?? _block?.ToString()}";
         public TextSection Bold() { _block.Style = TextStyle.Fat; return this; }
         public TextSection Color(FontColor color) { _block.Color = color; return this; }
         public TextSection Left() { _block.Alignment = TextAlignment.Left; return this; }
@@ -94,6 +95,21 @@ namespace UAlbion.Game.Entities
 
             foreach (var line in BuildLines(extents, _source.Get()))
                 AttachChild(line);
+        }
+
+        public override Vector2 GetSize()
+        {
+            Vector2 size = Vector2.Zero;
+            foreach (var child in Children.OfType<IUiElement>())
+            {
+                var childSize = child.GetSize();
+                if (childSize.X > size.X)
+                    size.X = childSize.X;
+
+                size.Y += childSize.Y;
+            }
+
+            return size;
         }
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)

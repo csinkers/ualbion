@@ -1,33 +1,20 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
+using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
-using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets
 {
-    public class MapData3D : IMapData
+    public class MapData3D : BaseMapData
     {
-        public MapType MapType => MapType.ThreeD;
+        public override MapType MapType => MapType.ThreeD;
         public byte CeilingFlags { get; private set; }
-        public byte Width { get; private set; }
-        public byte Height { get; private set; }
-        public SongId? SongId { get; private set; }
         public LabyrinthDataId LabDataId { get; private set; }
-        public CombatBackgroundId CombatBackgroundId { get; private set; }
-        public PaletteId PaletteId { get; private set; }
         public byte Sound { get; private set; }
         public byte[] Contents { get; private set; }
         public byte[] Floors { get; private set; }
         public byte[] Ceilings { get; private set; }
-        public IList<MapNpc> Npcs { get; } = new List<MapNpc>();
-        public IList<MapEventZone> Zones { get; } = new List<MapEventZone>();
-        public IDictionary<int, MapEventZone[]> ZoneLookup { get; } = new Dictionary<int, MapEventZone[]>(); 
-        public IDictionary<TriggerType, MapEventZone[]> ZoneTypeLookup { get; } = new Dictionary<TriggerType, MapEventZone[]>();
-        public IList<EventNode> Events { get; } = new List<EventNode>();
         public IList<AutomapInfo> Automap { get; } = new List<AutomapInfo>();
         public byte[] AutomapGraphics { get; private set; }
         public IList<ushort> ActiveMapEvents { get; } = new List<ushort>();
@@ -62,41 +49,33 @@ namespace UAlbion.Formats.Assets
             }
             s.Check();
 
-            int zoneCount = s.UInt16("ZoneCount", (ushort)map.Zones.Count(x => x.Global));
-            s.List(map.Zones, zoneCount, (i, x,serializer) => MapEventZone.Serdes(x, serializer, 0xff));
-            s.Check();
-
-            int zoneOffset = zoneCount;
-            for (byte y = 0; y < map.Height; y++)
-            {
-                zoneCount = s.UInt16("RowZones", (ushort)map.Zones.Count(x => x.Y == y && !x.Global));
-                s.List(map.Zones, zoneCount, zoneOffset, (i, x, s) => MapEventZone.Serdes(x, s, y));
-                zoneOffset += zoneCount;
-            }
+            map.SerdesZones(s);
 
             if (s.Mode == SerializerMode.Reading && s.IsComplete() || s.Mode != SerializerMode.Reading && map.AutomapGraphics == null)
             {
-                Debug.Assert(map.Zones.Count == 0);
+                ApiUtil.Assert(map.Zones.Count == 0);
                 return map;
             }
 
-            ushort eventCount = s.UInt16("EventCount", (ushort)map.Events.Count);
-            s.List(map.Events, eventCount, EventNode.Serdes);
-            s.Check();
+            map.SerdesEvents(s);
+            map.SerdesNpcWaypoints(s);
+            map.SerdesAutomap(s);
+            if(s.Mode != SerializerMode.Reading)
+                map.Unswizzle();
 
-            foreach(var npc in map.Npcs)
-                if (npc.Id != 0)
-                    npc.LoadWaypoints(s);
-            s.Check();
+            return map;
+        }
 
-            ushort automapInfoCount = s.UInt16("AutomapInfoCount", (ushort)map.Automap.Count);
+        void SerdesAutomap(ISerializer s)
+        {
+            ushort automapInfoCount = s.UInt16("AutomapInfoCount", (ushort)Automap.Count);
             if (automapInfoCount != 0xffff)
             {
-                s.List(map.Automap, automapInfoCount, AutomapInfo.Serdes);
+                s.List(Automap, automapInfoCount, AutomapInfo.Serdes);
                 s.Check();
             }
 
-            map.AutomapGraphics = s.ByteArray(nameof(AutomapGraphics), map.AutomapGraphics, 0x40);
+            AutomapGraphics = s.ByteArray(nameof(AutomapGraphics), AutomapGraphics, 0x40);
 
             for(int i = 0; i < 64; i++)
             {
@@ -104,41 +83,15 @@ namespace UAlbion.Formats.Assets
                 {
                     var eventId = s.UInt16(null, 0);
                     if (eventId != 0xffff)
-                        map.ActiveMapEvents.Add(eventId);
+                        ActiveMapEvents.Add(eventId);
                 }
                 else
                 {
-                    var eventId = map.ActiveMapEvents.Count <= i ? (ushort)0xffff : map.ActiveMapEvents[i];
+                    var eventId = ActiveMapEvents.Count <= i ? (ushort)0xffff : ActiveMapEvents[i];
                     s.UInt16(null, eventId);
                 }
             }
             s.Check();
-
-            // Resolve event indices to pointers
-            foreach (var mapEvent in map.Events)
-            {
-                if (mapEvent.NextEventId.HasValue && mapEvent.NextEventId < map.Events.Count)
-                    mapEvent.NextEvent = map.Events[mapEvent.NextEventId.Value];
-
-                if (mapEvent is BranchNode q && q.NextEventWhenFalseId.HasValue && q.NextEventWhenFalseId < map.Events.Count)
-                    q.NextEventWhenFalse = map.Events[q.NextEventWhenFalseId.Value];
-            }
-
-            foreach(var npc in map.Npcs)
-                if (npc.Id != 0 && npc.EventNumber.HasValue)
-                    npc.EventChain = map.Events[npc.EventNumber.Value];
-
-            foreach(var zone in map.Zones)
-                if (zone.EventNumber != 65535)
-                    zone.EventNode = map.Events[zone.EventNumber];
-
-            foreach (var position in map.Zones.GroupBy(x => x.Y * map.Width + x.X))
-                map.ZoneLookup[position.Key] = position.ToArray();
-
-            foreach (var triggerType in map.Zones.Where(x => x.Global || x.Y == 0).GroupBy(x => x.Trigger))
-                map.ZoneTypeLookup[triggerType.Key] = triggerType.ToArray();
-
-            return map;
         }
     }
 }

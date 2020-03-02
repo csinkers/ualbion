@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets.Save
@@ -14,7 +14,7 @@ namespace UAlbion.Formats.Assets.Save
             c ??= new MysteryChunk6();
             c.Size = s.UInt32(nameof(Size), c.Size);
             c.NumChunks = s.UInt16(nameof(NumChunks), c.NumChunks);
-            Debug.Assert(c.NumChunks == c.Size / 6);
+            ApiUtil.Assert(c.NumChunks == c.Size / 6);
             c.Contents ??= new UnkSixByte[(c.Size - 2) / 6];
             for (int i = 0; i < c.Contents.Length; i++)
                 c.Contents[i] = UnkSixByte.Serdes(c.Contents[i], s);

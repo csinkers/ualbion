@@ -62,7 +62,7 @@ namespace UAlbion.Game.Entities
 
             options.Add(new ContextMenuOption(
                 S(SystemTextId.MapPopup_TalkTo),
-                new TriggerChainEvent(_npc.EventChain, TriggerType.TalkTo),
+                new TriggerChainEvent(_npc.EventChain, TriggerType.TalkTo, (byte)_sprite.TilePosition.X, (byte)_sprite.TilePosition.Y),
                 ContextMenuGroup.Actions));
 
             options.Add(new ContextMenuOption(

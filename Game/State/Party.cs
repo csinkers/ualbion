@@ -22,7 +22,11 @@ namespace UAlbion.Game.State
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<Party, AddPartyMemberEvent>((x,e) => x.AddMember(e.PartyMemberId)),
-            H<Party, RemovePartyMemberEvent>((x,e) => x.RemoveMember(e.PartyMemberId))
+            H<Party, RemovePartyMemberEvent>((x,e) => x.RemoveMember(e.PartyMemberId)),
+            H<Party, SetPartyLeaderEvent>((x, e) => { x.Leader = e.PartyMemberId; x.Raise(e); }),
+            H<Party, ChangePartyGoldEvent>((x, e) => {}),
+            H<Party, ChangePartyRationsEvent>((x, e) => {}),
+            H<Party, AddRemoveInventoryItemEvent>((x, e) => {})
         );
 
         public Party(IDictionary<PartyCharacterId, CharacterSheet> characterSheets) : base(Handlers)
@@ -35,13 +39,19 @@ namespace UAlbion.Game.State
         public IPlayer this[PartyCharacterId id] => _statusBarOrder.FirstOrDefault(x => x.Id == id);
         public IReadOnlyList<IPlayer> StatusBarOrder => _readOnlyStatusBarOrder;
         public IReadOnlyList<IPlayer> WalkOrder => _readOnlyWalkOrder;
+        public int TotalGold => _statusBarOrder.Sum(x => x.Effective.Inventory.Gold);
+        public int GetItemCount(ItemId itemId) =>
+            _statusBarOrder
+                .SelectMany(x => x.Effective.Inventory.EnumerateAll())
+                .Where(x => x.Id == itemId)
+                .Sum(x => x.Amount);
 
         // The current party leader (shown with a white outline on
         // health bar and slightly raised in the status bar)
         public PartyCharacterId Leader
         {
             get => _walkOrder[0].Id;
-            set
+            private set
             {
                 int index = _walkOrder.FindIndex(x => x.Id == value);
                 if (index == -1) 

@@ -21,8 +21,8 @@ namespace UAlbion.Formats.Parsers
             if (height == 0)
                 height = (int)streamLength / width;
 
-            // Debug.Assert(streamLength % width == 0);
-            // Debug.Assert(streamLength % (width * height) == 0);
+            // ApiUtil.Assert(streamLength % width == 0);
+            // ApiUtil.Assert(streamLength % (width * height) == 0);
 
             // long initialPosition = br.BaseStream.Position;
             int spriteCount = Math.Max(1, unchecked((int)(streamLength / (width * height))));
@@ -77,7 +77,7 @@ namespace UAlbion.Formats.Parsers
                 return rotatedSprite;
             }
 
-            // Debug.Assert(br.BaseStream.Position == initialPosition + streamLength);
+            // ApiUtil.Assert(br.BaseStream.Position == initialPosition + streamLength);
             return sprite;
         }
     }

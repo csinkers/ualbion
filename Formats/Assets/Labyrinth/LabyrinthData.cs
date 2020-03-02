@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;

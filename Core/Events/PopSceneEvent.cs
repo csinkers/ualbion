@@ -1,5 +1,3 @@
-﻿using UAlbion.Api;
-
-namespace UAlbion.Core.Events
+﻿namespace UAlbion.Core.Events
 {
 }

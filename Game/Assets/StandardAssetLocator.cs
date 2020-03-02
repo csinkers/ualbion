@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using UAlbion.Api;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
@@ -103,8 +103,8 @@ namespace UAlbion.Game.Assets
                 return null;
             }
 
-            Debug.Assert(number >= 0);
-            Debug.Assert(number <= 9);
+            ApiUtil.Assert(number >= 0);
+            ApiUtil.Assert(number <= 9);
 
             var result = new AssetPaths();
             baseName = baseName.Replace("!", number.ToString());
@@ -202,8 +202,8 @@ namespace UAlbion.Game.Assets
             var generalConfig = (IGeneralConfig)loaderFunc(new AssetKey(AssetType.GeneralConfig), "GeneralConfig");
 
             int xldIndex = key.Id / 100;
-            Debug.Assert(xldIndex >= 0);
-            Debug.Assert(xldIndex <= 9);
+            ApiUtil.Assert(xldIndex >= 0);
+            ApiUtil.Assert(xldIndex <= 9);
             int objectIndex = key.Id % 100;
 
             var (location, baseName) = _assetFiles[key.Type];

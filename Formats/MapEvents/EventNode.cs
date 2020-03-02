@@ -1,43 +1,9 @@
 ﻿using System.Diagnostics;
+using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public enum MapEventType : byte
-    {
-        Script = 0,
-        MapExit = 1,
-        Door = 2,
-        Chest = 3,
-        Text = 4,
-        Spinner = 5,
-        Trap = 6,
-        ChangeUsedItem = 7,
-        DataChange = 8,
-        ChangeIcon = 9,
-        Encounter = 0xA,
-        PlaceAction = 0xB,
-        Query = 0xC,
-        Modify = 0xD,
-        Action = 0xE,
-        Signal = 0xF,
-        CloneAutomap = 0x10,
-        Sound = 0x11,
-        StartDialogue = 0x12,
-        CreateTransport = 0x13,
-        Execute = 0x14,
-        RemovePartyMember = 0x15,
-        EndDialogue = 0x16,
-        Wipe = 0x17,
-        PlayAnimation = 0x18,
-        Offset = 0x19,
-        Pause = 0x1A,
-        SimpleChest = 0x1B,
-        AskSurrender = 0x1C,
-        DoScript = 0x1D,
-        UnkFF = 0xFF // 3D only?
-    }
-
     public interface IEventNode
     {
         int Id { get; }
@@ -50,21 +16,23 @@ namespace UAlbion.Formats.MapEvents
         IEventNode NextEventWhenFalse { get; set; }
     }
 
+    [DebuggerDisplay("{ToString()}")]
     public class BranchNode : EventNode, IBranchNode
     {
         public BranchNode(int id, IMapEvent @event, ushort? falseEventId) : base(id, @event)
         {
             NextEventWhenFalseId = falseEventId;
         }
-        public override string ToString() => $"{Id}: if ({Event}) {{";
+        public override string ToString() => $"{Id}?{NextEventId?.ToString() ?? "!"}:{NextEventWhenFalseId?.ToString() ?? "!"}: {Event}";
         public IEventNode NextEventWhenFalse { get; set; }
-        public ushort? NextEventWhenFalseId { get; private set; }
+        public ushort? NextEventWhenFalseId { get; }
     }
 
+    [DebuggerDisplay("{ToString()}")]
     public class EventNode : IEventNode
     {
         public const long SizeInBytes = 12;
-        public override string ToString() => $"{Id}:{Event}";
+        public override string ToString() => $"{Id}=>{NextEventId?.ToString() ?? "!"}:{Event}";
         public int Id { get; }
         public IMapEvent Event { get; }
         public ushort? NextEventId { get; set; }
@@ -97,7 +65,7 @@ namespace UAlbion.Formats.MapEvents
 
             long expectedPosition = initialPosition + 10;
             long actualPosition = s.Offset;
-            Debug.Assert(expectedPosition == actualPosition,
+            ApiUtil.Assert(expectedPosition == actualPosition,
                 $"Expected to have read {expectedPosition - initialPosition} bytes, but {actualPosition - initialPosition} have been read.");
 
             node.NextEventId = s.Transform(nameof(NextEventId), node.NextEventId, s.UInt16, ConvertMaxToNull.Instance);

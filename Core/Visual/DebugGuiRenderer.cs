@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core.Events;
@@ -50,7 +49,7 @@ namespace UAlbion.Core.Visual
 
         public void Render(GraphicsDevice gd, CommandList cl, SceneContext sc, RenderPasses renderPass, IRenderable r)
         {
-            Debug.Assert(renderPass == RenderPasses.Standard);
+            ApiUtil.Assert(renderPass == RenderPasses.Standard);
             _imguiRenderer.Render(gd, cl);
             cl.SetFullScissorRects();
         }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
@@ -42,7 +43,6 @@ namespace UAlbion.Game.Entities.Map3D
         public Vector2 LogicalSize { get; private set; }
         public Vector3 TileSize { get; private set; }
         public float BaseCameraHeight => _labyrinthData.CameraHeight != 0 ? _labyrinthData.CameraHeight * 8 : TileSize.Y / 2;
-        public void RunInitialEvents() => FireEventChains(TriggerType.MapInit);
 
         void LoadMap()
         {
@@ -126,16 +126,17 @@ namespace UAlbion.Game.Entities.Map3D
             Raise(new SetClearColourEvent(_backgroundRed, _backgroundGreen, _backgroundBlue));
         }
 
+        IEnumerable<MapEventZone> GetZonesOfType(TriggerType triggerType)
+        {
+            var matchingKeys = _mapData.ZoneTypeLookup.Keys.Where(x => (x & triggerType) == triggerType);
+            return matchingKeys.SelectMany(x => _mapData.ZoneTypeLookup[x]);
+        }
+
         void FireEventChains(TriggerType type)
         {
-            var chains = _mapData.Zones.Where(x => x.Global && (x.Trigger & type) != 0);
-            foreach (var chain in chains)
-            {
-                if(chain.EventNode == null)
-                    Raise(new LogEvent(LogEvent.Level.Error, $"Tried to raise event {chain.EventNumber}, but it doesn't exist in the map."));
-                else
-                    Raise(new TriggerChainEvent(chain.EventNode, type));
-            }
+            var zones = GetZonesOfType(type);
+            foreach (var zone in zones)
+                Raise(new TriggerChainEvent(zone.Chain, type, zone.X, zone.Y));
         }
 
         MapObject BuildMapObject(int tileX, int tileY, SubObject subObject, float objectYScaling)

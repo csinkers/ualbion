@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using UAlbion.Api;
+﻿using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Parsers;
 
@@ -17,10 +16,10 @@ namespace UAlbion.Formats.MapEvents
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.ItemId = s.UInt16(nameof(ItemId), e.ItemId);
             e.Amount = s.UInt16(nameof(Amount), e.Amount);
-            Debug.Assert(e.Unk2 == 0);
-            Debug.Assert(e.Unk3 == 0);
-            Debug.Assert(e.Unk4 == 0);
-            Debug.Assert(e.Unk5 == 0);
+            ApiUtil.Assert(e.Unk2 == 0);
+            ApiUtil.Assert(e.Unk3 == 0);
+            ApiUtil.Assert(e.Unk4 == 0);
+            ApiUtil.Assert(e.Unk5 == 0);
             return e;
         }
         public enum SimpleChestItemType : byte

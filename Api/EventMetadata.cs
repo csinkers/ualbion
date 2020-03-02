@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -64,7 +63,7 @@ namespace UAlbion.Api
         {
             var constructor = _type.GetConstructors().Single();
             var parameters = constructor.GetParameters();
-            Debug.Assert(parameters.Length == Parts.Length);
+            ApiUtil.Assert(parameters.Length == Parts.Length);
 
             return (Func<string[], Event>)Expression.Lambda(
                 Expression.Convert(

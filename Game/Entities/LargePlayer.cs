@@ -11,12 +11,8 @@ namespace UAlbion.Game.Entities
     public class LargePlayer : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<LargePlayer, UpdateEvent>((x, e) =>
-            {
-                var (pos, frame) = x._positionFunc();
-                x._sprite.TilePosition = pos + new Vector3(0.0f, 1.0f, 0.0f); // TODO: Hacky, find a better way of fixing.
-                x._sprite.Frame = frame;
-            })
+            H<LargePlayer, UpdateEvent>((x, _) => x.Update()),
+            H<LargePlayer, MapInitEvent>((x, _) => x.Update())
         );
 
         readonly PartyCharacterId _id;
@@ -29,6 +25,19 @@ namespace UAlbion.Game.Entities
             _id = charId;
             _positionFunc = positionFunc;
             _sprite = AttachChild(new MapSprite<LargePartyGraphicsId>(graphicsId, DrawLayer.Characters2 + 1, 0, SpriteFlags.BottomAligned)); // TODO: Hack, fix.
+        }
+
+        public override void Subscribed()
+        {
+            Update();
+            base.Subscribed();
+        }
+
+        void Update()
+        {
+            var (pos, frame) = _positionFunc();
+            _sprite.TilePosition = pos + new Vector3(0.0f, 1.0f, 0.0f); // TODO: Hacky, find a better way of fixing.
+            _sprite.Frame = frame;
         }
     }
 }

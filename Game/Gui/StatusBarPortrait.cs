@@ -3,6 +3,7 @@ using System.Linq;
 using System.Numerics;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
@@ -110,7 +111,7 @@ namespace UAlbion.Game.Gui
 
             var memberId = PartyMember?.Id;
             if (memberId.HasValue)
-                Raise(new SetActiveMemberEvent(memberId.Value));
+                Raise(new SetPartyLeaderEvent(memberId.Value));
             _isClickTimerPending = false;
         }
 

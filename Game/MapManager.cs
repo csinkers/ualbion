@@ -66,7 +66,7 @@ namespace UAlbion.Game
                 // Set the scene first to ensure scene-local components from other scenes are disabled.
                 Raise(new SetSceneEvent(map is Entities.Map3D.Map ? SceneId.World3D : SceneId.World2D)); 
                 Raise(new LogEvent(LogEvent.Level.Info, $"Loaded map {(int) pendingMapChange}: {pendingMapChange}"));
-                map.RunInitialEvents();
+                Enqueue(new MapInitEvent());
             }
         }
 

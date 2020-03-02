@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
-using System.Text;
-using UAlbion.Formats.Parsers;
+﻿using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets
 {

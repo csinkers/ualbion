@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UAlbion.Api;
@@ -47,7 +46,7 @@ namespace UAlbion.Formats.Assets
                 _entries[i] |= (uint)(i == 0 ? 0 : 0xff) << 24; // Alpha
             }
 
-            Debug.Assert(br.BaseStream.Position == startingOffset + streamLength);
+            ApiUtil.Assert(br.BaseStream.Position == startingOffset + streamLength);
 
             AnimatedRanges.TryGetValue(Id, out var ranges);
             ranges ??= new List<(byte, byte)>();
@@ -79,7 +78,7 @@ namespace UAlbion.Formats.Assets
         public void SetCommonPalette(byte[] commonPalette)
         {
             if (commonPalette == null) throw new ArgumentNullException(nameof(commonPalette));
-            Debug.Assert(commonPalette.Length == 192);
+            ApiUtil.Assert(commonPalette.Length == 192);
 
             for (int i = 192; i < 256; i++)
             {

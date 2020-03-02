@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
@@ -301,7 +301,7 @@ namespace UAlbion.Game.State.Player
 
         void PickupItem(ItemSlotId slotId, int? quantity)
         {
-            Debug.Assert(Resolve<IInventoryScreenState>().ItemInHand == null);
+            ApiUtil.Assert(Resolve<IInventoryScreenState>().ItemInHand == null);
 
             // Check if the item can be taken
             if (!CanItemBeTaken(slotId))
@@ -348,9 +348,9 @@ namespace UAlbion.Game.State.Player
             var slot = _base.Inventory.GetSlot(slotId);
             var inventoryScreenState = Resolve<IInventoryScreenState>();
             var itemInHand = (ItemSlot)inventoryScreenState.ItemInHand;
-            Debug.Assert(slot.Id == itemInHand.Id);
-            Debug.Assert(CanCoalesce(slotId, slot, itemInHand));
-            Debug.Assert(slot.Amount < MaxSlotAmount);
+            ApiUtil.Assert(slot.Id == itemInHand.Id);
+            ApiUtil.Assert(CanCoalesce(slotId, slot, itemInHand));
+            ApiUtil.Assert(slot.Amount < MaxSlotAmount);
 
             byte amountToMove = (byte)Math.Min(itemInHand.Amount, MaxSlotAmount - slot.Amount);
             itemInHand.Amount -= amountToMove;
@@ -365,7 +365,7 @@ namespace UAlbion.Game.State.Player
             var slot = _base.Inventory.GetSlot(slotId);
             var inventoryScreenState = Resolve<IInventoryScreenState>();
             var itemInHand = (ItemSlot)inventoryScreenState.ItemInHand;
-            Debug.Assert(slot.Id != itemInHand.Id);
+            ApiUtil.Assert(slot.Id != itemInHand.Id);
 
             // Check if the item can be taken
             if (!CanItemBeTaken(slotId))
@@ -380,7 +380,7 @@ namespace UAlbion.Game.State.Player
 
         void Drop(ItemSlotId slotId)
         {
-            Debug.Assert(_base.Inventory.GetSlot(slotId) == null);
+            ApiUtil.Assert(_base.Inventory.GetSlot(slotId) == null);
 
             var inventoryScreenState = Resolve<IInventoryScreenState>();
             if (inventoryScreenState.ItemInHand is GoldInHand gold)

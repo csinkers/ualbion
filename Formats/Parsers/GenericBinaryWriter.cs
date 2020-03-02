@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using UAlbion.Api;
 
 namespace UAlbion.Formats.Parsers
 {
@@ -25,7 +25,7 @@ namespace UAlbion.Formats.Parsers
         {
             get
             {
-                Debug.Assert(_offset == _bw.BaseStream.Position);
+                ApiUtil.Assert(_offset == _bw.BaseStream.Position);
                 return _offset;
             }
         }

@@ -4,6 +4,7 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
 
@@ -23,7 +24,20 @@ namespace UAlbion.Game.Entities.Map2D
                 }),
             H<LargePartyMovement, BeginFrameEvent>((x, e) => x._direction = Vector2.Zero),
             H<LargePartyMovement, PartyMoveEvent>((x, e) => x._direction += new Vector2(e.X, e.Y)),
-            H<LargePartyMovement, PartyTurnEvent>((x, e) => { }),
+            H<LargePartyMovement, PartyTurnEvent>((x, e) =>
+            {
+                var (position3d, _) = x._trail[x._trailOffset];
+                var position = new Vector2(position3d.X, position3d.Y);
+                x._facingDirection = e.Direction switch
+                {
+                    TeleportDirection.Up => MovementDirection.Up,
+                    TeleportDirection.Right => MovementDirection.Right,
+                    TeleportDirection.Down => MovementDirection.Down,
+                    TeleportDirection.Left => MovementDirection.Left,
+                    _ => x._facingDirection
+                };
+                x.MoveLeader(position);
+            }),
             H<LargePartyMovement, NoClipEvent>((x, e) =>
             {
                 x._clipping = !x._clipping;

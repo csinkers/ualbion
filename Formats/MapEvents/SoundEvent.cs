@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using UAlbion.Api;
+﻿using UAlbion.Api;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
@@ -16,10 +15,10 @@ namespace UAlbion.Formats.MapEvents
             e.RestartProbability = s.UInt8(nameof(RestartProbability), e.RestartProbability);
             e.FrequencyOverride = s.UInt16(nameof(FrequencyOverride), e.FrequencyOverride);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
-            Debug.Assert(e.Unk3 <= 100);
-            Debug.Assert(e.Volume <= 150);
-            Debug.Assert(e.RestartProbability <= 102);
-            Debug.Assert(e.Unk8 == 0);
+            ApiUtil.Assert(e.Unk3 <= 100);
+            ApiUtil.Assert(e.Volume <= 150);
+            ApiUtil.Assert(e.RestartProbability <= 102);
+            ApiUtil.Assert(e.Unk8 == 0);
             return e;
         }
 

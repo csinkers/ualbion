@@ -14,7 +14,7 @@ namespace UAlbion
         public CommandLineOptions(string[] args)
         {
             Mode = ExecutionMode.Game;
-            Backend = GraphicsBackend.Direct3D11;
+            Backend = GraphicsBackend.Vulkan;
             StartupOnly = args.Contains("--startuponly");
             UseRenderDoc = args.Contains("--renderdoc") || args.Contains("-rd");
             if (args.Contains("-gl") || args.Contains("--opengl")) Backend = GraphicsBackend.OpenGL;

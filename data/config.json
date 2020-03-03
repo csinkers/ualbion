@@ -1,15 +1,15 @@
 {
   // Directory to look for the main .XLD data files from the original game.
   // This path is relative to the top-level ualbion / repository directory.
-  "XldPath": "albion/CD/XLDLIBS",
+  "XldPath": "ALBION/XLDLIBS",
 
   // Where to look for MAIN.EXE from the original game.
-  "ExePath": "albion",
+  "ExePath": "ALBION/ROOT",
 
   // Where the exporter tool should export its results to. Relative to the base repo dir.
   "ExportedXldPath": "data/Exported",
 
   // Where to save & load saved game files
-  "SavePath":  "albion/saves" 
+  "SavePath":  "ALBION/SAVES" 
 }
 

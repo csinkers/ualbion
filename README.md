@@ -26,9 +26,8 @@ Main goal is to improve the interface and make some visual improvements, the ori
 
 ## Getting started
 
-1. Execute `./build.sh` in Linux or `build.bat` in Windows to compile it. Alternatively, open up the `ualbion.sln` with Visual Studio.
-2. Configure `data/config.json` to set the paths for the files from the original game (currently only version v1.38 where MAIN.EXE is 1,109,655 bytes is supported)
-3. Execute `./run.sh` in Linux or `run.bat` in Windows to play. 
+1. Configure `data/config.json` to set the paths for the files from the original game (currently only version v1.38 where MAIN.EXE is 1,109,655 bytes is supported). If you're running the GOG version, you'll want to mount the `game.gog` file (it's just a .bin format CD image) and then copy the ALBION directory into your UAlbion folder.
+2. To compile and run the project, open `ualbion.sln` in the C# IDE of your choice or run `./run.sh` in Linux / `run.bat` in Windows. Any extra parameters to `run` will be passed through to UAlbion, `--help` will show the available options.
 
 
 Note: Some images (everything in PICTURE0.XLD) currently need to be:

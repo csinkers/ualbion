@@ -1,2 +1,2 @@
 #!/bin/sh
-dotnet run --project UAlbion --runtime linux-x64 -- -vk
+dotnet run --project UAlbion --runtime linux-x64 -- $*

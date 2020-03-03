@@ -15,9 +15,10 @@ namespace UAlbion.Game.Entities.Map3D
     {
         static readonly HandlerSet Handlers = new HandlerSet(
             H<Map, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
-            H<Map, SlowClockEvent>((x, e) => x.FireEventChains(TriggerType.EveryStep)),
-            H<Map, HourElapsedEvent>((x, e) => x.FireEventChains(TriggerType.EveryHour)),
-            H<Map, DayElapsedEvent>((x, e) => x.FireEventChains(TriggerType.EveryDay))
+            H<Map, MapInitEvent>((x, e) => x.FireEventChains(TriggerType.MapInit, true)),
+            H<Map, SlowClockEvent>((x, e) => x.FireEventChains(TriggerType.EveryStep, false)),
+            H<Map, HourElapsedEvent>((x, e) => x.FireEventChains(TriggerType.EveryHour, false)),
+            H<Map, DayElapsedEvent>((x, e) => x.FireEventChains(TriggerType.EveryDay, false))
             // H<Map3D, UnloadMapEvent>((x, e) => x.Unload()),
         );
 
@@ -132,11 +133,17 @@ namespace UAlbion.Game.Entities.Map3D
             return matchingKeys.SelectMany(x => _mapData.ZoneTypeLookup[x]);
         }
 
-        void FireEventChains(TriggerType type)
+        void FireEventChains(TriggerType type, bool log)
         {
             var zones = GetZonesOfType(type);
+            if (!log)
+                Raise(new SetLogLevelEvent(LogEvent.Level.Warning));
+
             foreach (var zone in zones)
-                Raise(new TriggerChainEvent(zone.Chain, type, zone.X, zone.Y));
+                Raise(new TriggerChainEvent(zone.Chain, zone.Node, type, zone.X, zone.Y));
+
+            if (!log)
+                Raise(new SetLogLevelEvent(LogEvent.Level.Info));
         }
 
         MapObject BuildMapObject(int tileX, int tileY, SubObject subObject, float objectYScaling)

@@ -1,17 +1,28 @@
-﻿using UAlbion.Api;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
-    public class EventChainManager : Component
+    public interface IEventManager
+    {
+        IList<EventChainContext> ActiveContexts { get; }
+    }
+
+    public class EventChainManager : ServiceComponent<IEventManager>, IEventManager
     {
         static readonly HandlerSet Handlers = new HandlerSet(
             H<EventChainManager, TriggerChainEvent>((x, e) => x.Trigger(e))
         );
 
         readonly Querier _querier;
+        readonly ISet<EventChainContext> _activeChains = new HashSet<EventChainContext>();
+
+        public IList<EventChainContext> ActiveContexts => new ReadOnlyCollection<EventChainContext>(_activeChains.ToList());
 
         public EventChainManager() : base(Handlers)
         {
@@ -28,6 +39,7 @@ namespace UAlbion.Game
 
         void Resume(EventChainContext context)
         {
+            _activeChains.Add(context);
             while (context.Node != null)
             {
                 if (context.Node.Event is AsyncEvent asyncEvent)
@@ -58,10 +70,12 @@ namespace UAlbion.Game
                         context.Node = context.Node.NextEvent;
                     }
                 }
-            } 
+            }
 
-            if(context.ClockWasRunning)
+            if (context.ClockWasRunning)
                 Raise(new StartClockEvent());
+
+            _activeChains.Remove(context);
         }
 
         void Trigger(TriggerChainEvent e)
@@ -69,7 +83,8 @@ namespace UAlbion.Game
             var context = new EventChainContext
             {
                 Trigger = e.Trigger,
-                Node = e.Chain.Events[0],
+                Chain = e.Chain,
+                Node = e.Node,
                 X = e.X,
                 Y = e.Y,
                 ClockWasRunning = Resolve<IClock>().IsRunning

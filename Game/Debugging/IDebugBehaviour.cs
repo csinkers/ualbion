@@ -4,7 +4,7 @@ namespace UAlbion.Game.Debugging
 {
     public interface IDebugBehaviour
     {
-        Type HandledType { get; }
+        Type[] HandledTypes { get; }
         object Handle(DebugInspectorAction action, Reflector.ReflectedObject reflected);
     }
 }

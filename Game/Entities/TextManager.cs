@@ -186,7 +186,7 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        public ITextSource GetTextFromTextEvent(TextEvent textEvent)
+        public ITextSource GetMapTextFromTextEvent(TextEvent textEvent)
         {
             var id = textEvent.TextId;
             var mapId = (int)Resolve<IMapManager>().Current.MapId;
@@ -207,7 +207,7 @@ namespace UAlbion.Game.Entities
             {
                 case TextEvent.TextLocation.TextInWindow:
                 {
-                    var dialog = AttachChild(new TextWindow(GetTextFromTextEvent(textEvent)));
+                    var dialog = AttachChild(new TextWindow(GetMapTextFromTextEvent(textEvent)));
                     dialog.Closed += (sender, _) => textEvent.Complete();
                     break;
                 }
@@ -215,18 +215,18 @@ namespace UAlbion.Game.Entities
                 case TextEvent.TextLocation.TextInWindowWithPortrait:
                 case TextEvent.TextLocation.TextInWindowWithPortrait2:
                 { 
-                    var dialog = AttachChild(new TextWindow(GetTextFromTextEvent(textEvent)));
+                    var dialog = AttachChild(new TextWindow(GetMapTextFromTextEvent(textEvent)));
                     dialog.Closed += (sender, _) => textEvent.Complete();
                     break;
                 }
 
                 case TextEvent.TextLocation.QuickInfo:
-                    Raise(new DescriptionTextExEvent(GetTextFromTextEvent(textEvent)));
+                    Raise(new DescriptionTextExEvent(GetMapTextFromTextEvent(textEvent)));
                     textEvent.Complete();
                     break;
 
                 default:
-                    Raise(new DescriptionTextExEvent(GetTextFromTextEvent(textEvent))); // TODO:
+                    Raise(new DescriptionTextExEvent(GetMapTextFromTextEvent(textEvent))); // TODO:
                     textEvent.Complete();
                     break;
             }

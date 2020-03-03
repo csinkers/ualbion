@@ -17,8 +17,8 @@ namespace UAlbion.Game.Assets
 
         public AssetManager() : base(null) => _assetLocator = AttachChild(new AssetLocator());
         public void Dispose() { _assetLocator.Dispose(); }
-        public MapData2D LoadMap2D(MapDataId id) => _assetLocator.LoadAssetCached(AssetType.MapData, id) as MapData2D;
-        public MapData3D LoadMap3D(MapDataId id) => _assetLocator.LoadAssetCached(AssetType.MapData, id) as MapData3D;
+        public MapData2D LoadMap2D(MapDataId id) => _assetLocator.LoadAsset(AssetType.MapData, id) as MapData2D; // No caching for map data
+        public MapData3D LoadMap3D(MapDataId id) => _assetLocator.LoadAsset(AssetType.MapData, id) as MapData3D;
         public ItemData LoadItem(ItemId id)
         {
             var data = (IList<ItemData>)_assetLocator.LoadAssetCached(AssetType.ItemList, 0);

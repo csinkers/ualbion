@@ -58,10 +58,14 @@ namespace UAlbion.Core
         public float NearDistance => 10f;
         public float FarDistance => 512.0f * 256.0f * 2.0f;
 
-        public PerspectiveCamera() : base(Handlers)
+        public PerspectiveCamera() : base(Handlers) { }
+
+        public override void Subscribed()
         {
+            _windowSize = Resolve<IWindowManager>().Size;
             UpdatePerspectiveMatrix();
             UpdateViewMatrix();
+            base.Subscribed();
         }
 
         void UpdateBackend(BackendChangedEvent e)

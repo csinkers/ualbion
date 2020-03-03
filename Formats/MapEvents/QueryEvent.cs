@@ -3,17 +3,6 @@ using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public enum QueryOperation : byte
-    {
-        Unk0,
-        NotEqual,
-        Unk2,
-        Equals,
-        Unk3,
-        Unk4,
-        Unk5
-    }
-
     public class QueryEvent : Event, IQueryEvent
     {
         public static IQueryEvent Serdes(IQueryEvent genericEvent, ISerializer s)

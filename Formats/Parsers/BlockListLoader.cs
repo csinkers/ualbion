@@ -27,8 +27,8 @@ namespace UAlbion.Formats.Parsers
                     byte b2 = br.ReadByte();
                     byte b3 = br.ReadByte();
 
-                    int underlay = ((b2 & 0x0F) << 8) + b3 - 2;
-                    int overlay = (b1 << 4) + (b2 >> 4) - 2;
+                    int underlay = ((b2 & 0x0F) << 8) + b3;
+                    int overlay = (b1 << 4) + (b2 >> 4);
                     block.Underlay[i] = underlay; 
                     block.Overlay[i] = overlay;
                 }

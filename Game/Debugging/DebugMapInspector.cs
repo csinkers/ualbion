@@ -8,8 +8,6 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.MapEvents;
-using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
@@ -224,8 +222,8 @@ namespace UAlbion.Game.Debugging
             ImGui.End();
 
             if (!anyHovered && _lastHoveredItem?.Object != null &&
-                _behaviours.TryGetValue(_lastHoveredItem.Object.GetType(), out var blurredCallback))
-                blurredCallback(DebugInspectorAction.Blur, _lastHoveredItem);
+                _behaviours.TryGetValue(_lastHoveredItem.Object.GetType(), out var callback))
+                callback(DebugInspectorAction.Blur, _lastHoveredItem);
 
             /*
 
@@ -292,6 +290,7 @@ namespace UAlbion.Game.Debugging
                         anyHovered |= RenderNode(child, false);
                     ImGui.TreePop();
                 }
+                anyHovered |= CheckHover(reflected);
             }
             else
             {
@@ -306,20 +305,9 @@ namespace UAlbion.Game.Debugging
 
         public DebugMapInspector AddBehaviour(IDebugBehaviour behaviour)
         {
-            _behaviours[behaviour.HandledType] = behaviour.Handle;
+            foreach(var type in behaviour.HandledTypes)
+                _behaviours[type] = behaviour.Handle;
             return this;
-        }
-    }
-
-    public class FormatTextEventBehaviour : IDebugBehaviour
-    {
-        public Type HandledType => typeof(TextEvent);
-        public object Handle(DebugInspectorAction action, Reflector.ReflectedObject reflected)
-        {
-            if (!(reflected.Object is TextEvent text))
-                return null;
-
-            return Engine.Global?.Resolve<ITextManager>()?.GetTextFromTextEvent(text);
         }
     }
 }

@@ -40,7 +40,7 @@ namespace UAlbion.Game.Entities.Map2D
                 return null;
 
             int tileIndex = _mapData.Underlay[index];
-            return tileIndex != -1 ? _tileData.Tiles[tileIndex] : null;
+            return tileIndex > 1 ? _tileData.Tiles[tileIndex] : null;
         }
 
         public TilesetData.TileData GetOverlay(int x, int y) => GetOverlay(Index(x, y));
@@ -50,7 +50,7 @@ namespace UAlbion.Game.Entities.Map2D
                 return null;
 
             int tileIndex = _mapData.Overlay[index];
-            return tileIndex != -1 ? _tileData.Tiles[tileIndex] : null;
+            return tileIndex > 1 ? _tileData.Tiles[tileIndex] : null;
         }
 
         public MapEventZone GetZone(int x, int y) => GetZone(Index(x, y));
@@ -114,12 +114,12 @@ namespace UAlbion.Game.Entities.Map2D
 
                     int underlay = _mapData.Underlay[targetIndex];
                     int newUnderlay = block.Underlay[targetBlockIndex];
-                    if (newUnderlay != -1 && (overwrite || underlay == -1))
+                    if (newUnderlay > 1 && (overwrite || underlay <= 1))
                         _mapData.Underlay[targetIndex] = newUnderlay;
 
                     int overlay = _mapData.Overlay[targetIndex];
                     int newOverlay = block.Overlay[targetBlockIndex];
-                    if (overwrite || overlay == -1)
+                    if (overwrite || overlay > 1)
                         _mapData.Overlay[targetIndex] = newOverlay;
                 }
             }

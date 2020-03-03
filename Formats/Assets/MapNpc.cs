@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets
@@ -49,7 +50,8 @@ namespace UAlbion.Formats.Assets
         public byte Unk8 { get; set; }
         public byte Unk9 { get; set; }
         public Waypoint[] Waypoints { get; set; }
-        public EventChain EventChain { get; set; }
+        public EventChain Chain { get; set; }
+        public IEventNode Node { get; set; }
 
         public static MapNpc Serdes(int _, MapNpc existing, ISerializer s)
         {

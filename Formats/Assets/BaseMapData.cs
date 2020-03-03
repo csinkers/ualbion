@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
@@ -28,7 +29,7 @@ namespace UAlbion.Formats.Assets
         public IList<object>[] EventReferences { get; private set; }
 #endif
 
-        void BuildEventChains()
+        /*void BuildEventChains()
         {
             ChainsByEventId = new (EventChain, IEventNode)[Events.Count];
 
@@ -87,28 +88,26 @@ namespace UAlbion.Formats.Assets
             }
         } //*/
 
-        /* protected void BuildEventChains()
+        protected void BuildEventChains()
         {
-            int chainNumber = 0;
+            ChainsByEventId = new (EventChain, IEventNode)[Events.Count];
             var nodesToCheck = new Queue<IEventNode>();
             for (int i = 0; i < Events.Count; i++)
             {
-                if (ChainsByEventId.ContainsKey(i))
+                if (ChainsByEventId[i] != (null, null))
                     continue;
 
-                if (!Chains.ContainsKey(chainNumber))
-                    Chains[chainNumber] = new EventChain(chainNumber);
-
-                var chain = Chains[chainNumber];
+                var chain = new EventChain(Chains.Count);
+                Chains.Add(chain);
                 nodesToCheck.Enqueue(Events[i]);
 
                 while (nodesToCheck.Count > 0)
                 {
                     var node = nodesToCheck.Dequeue();
-                    if (ChainsByEventId.ContainsKey(node.Id))
+                    if (ChainsByEventId[node.Id] != (null, null))
                         continue;
 
-                    ChainsByEventId[node.Id] = chain;
+                    ChainsByEventId[node.Id] = (chain, node);
                     chain.Events.Add(node);
 
                     if (node.NextEvent != null)
@@ -117,9 +116,23 @@ namespace UAlbion.Formats.Assets
                     if(node is IBranchNode branch && branch.NextEventWhenFalse != null)
                         nodesToCheck.Enqueue(branch.NextEventWhenFalse);
                 }
-
-                chainNumber++;
             }
+
+            foreach (var chain in Chains)
+            {
+                var ordered = chain.Events.OrderBy(x => x.Id).ToList();
+                ApiUtil.Assert(ordered[0] == chain.Events[0]);
+                chain.Events.Clear();
+                foreach(var e in ordered)
+                    chain.Events.Add(e);
+            }
+
+            var disableChainEvents = ChainsByEventId
+                .Where(x => 
+                    x.Item2.Event is DisableEventChainEvent
+                    || (x.Item2.Event is ChangeIconEvent ci && ci.ChangeType == ChangeIconEvent.IconChangeType.Chain)
+                ).ToList();
+            Console.WriteLine(disableChainEvents.Count);
         } //*/
 
         protected void SerdesZones(ISerializer s)
@@ -160,7 +173,7 @@ namespace UAlbion.Formats.Assets
 
             foreach (var npc in Npcs)
                 if (npc.Id != 0 && npc.EventNumber.HasValue)
-                    npc.EventChain = ChainsByEventId[npc.EventNumber.Value].Item1;
+                    (npc.Chain, npc.Node) = ChainsByEventId[npc.EventNumber.Value];
 
             foreach (var zone in Zones)
             {

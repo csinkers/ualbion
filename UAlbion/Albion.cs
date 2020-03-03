@@ -51,8 +51,8 @@ namespace UAlbion
             // global.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude), null); // Uncomment to test 3D map with different object alignment
             // global.Raise(new LoadMapEvent(MapDataId.HausDesJägerclans), null); // Uncomment to test 2D map
             // global.Raise(new SetSceneEvent(SceneId.Inventory), null); // Uncomment to test inventory screen
-            // global.Raise(new NewGameEvent(), null); // Uncomment to test new game process
-            global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
+            global.Raise(new NewGameEvent(), null); // Uncomment to test new game process
+            // global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
             engine.Run();
             // TODO: Ensure all sprite leases returned etc to weed out memory leaks
         }
@@ -94,7 +94,9 @@ namespace UAlbion
                 .Attach(new SlowClock())
                 .Attach(new DebugMapInspector()
                     .AddBehaviour(new SpriteInstanceDataDebugBehaviour())
-                    .AddBehaviour(new FormatTextEventBehaviour()))
+                    .AddBehaviour(new FormatTextEventBehaviour())
+                    .AddBehaviour(new QueryEventDebugBehaviour())
+                )
                 .Attach(new InputBinder(InputConfig.Load(baseDir)))
                 .Attach(new InputModeStack())
                 .Attach(new MouseModeStack())

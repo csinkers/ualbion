@@ -14,6 +14,7 @@ namespace UAlbion.Game
     public class ConsoleLogger : IComponent
     {
         readonly ConcurrentQueue<IEvent> _queuedEvents = new ConcurrentQueue<IEvent>();
+        LogEvent.Level _logLevel = LogEvent.Level.Info;
         EventExchange _exchange;
         bool _done;
 
@@ -23,6 +24,7 @@ namespace UAlbion.Game
             // Only need to subscribe to verbose events, as all non-verbose events will be delivered
             // here anyway as long as this was given to Engine as the logger component.
             exchange.Subscribe<BeginFrameEvent>(this);
+            exchange.Subscribe<SetLogLevelEvent>(this);
             Task.Run(ConsoleReaderThread);
         }
         public void Detach() => _exchange = null;
@@ -40,10 +42,17 @@ namespace UAlbion.Game
                     }
                     break;
 
+                case SetLogLevelEvent e:
+                    _logLevel = e.Level;
+                    break;
+
                 case IVerboseEvent _: break;
                 case LogEvent e:
                 {
-                    switch ((LogEvent.Level)e.Severity)
+                    if (e.Severity < _logLevel)
+                        break;
+
+                    switch (e.Severity)
                     {
                         case LogEvent.Level.Verbose:
                             Console.ForegroundColor = ConsoleColor.Gray;
@@ -53,8 +62,8 @@ namespace UAlbion.Game
                             break;
                         case LogEvent.Level.Error:
                         case LogEvent.Level.Critical:
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            break;
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        break;
                     }
 
                     int nesting = EventExchange.Nesting;
@@ -109,7 +118,7 @@ namespace UAlbion.Game
 
                 default:
                 { 
-                    if (sender == this) return;
+                    if (sender == this || _logLevel > LogEvent.Level.Info) return;
                     int nesting = EventExchange.Nesting;
                     if(nesting > 0)
                         Console.Write(new string(' ', nesting * 2));

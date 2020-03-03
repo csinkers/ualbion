@@ -5,7 +5,7 @@ namespace UAlbion.Game.Debugging
 {
     public class SpriteInstanceDataDebugBehaviour : IDebugBehaviour
     {
-        public Type HandledType => typeof(SpriteInstanceData);
+        public Type[] HandledTypes { get; } = { typeof(SpriteInstanceData) };
         public object Handle(DebugInspectorAction action, Reflector.ReflectedObject reflected)
         {
             if (reflected?.Parent == null) return null;

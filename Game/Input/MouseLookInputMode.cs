@@ -35,6 +35,7 @@ namespace UAlbion.Game.Input
 
     public class MouseLookMouseMode : Component
     {
+        const float Sensitivity = 2;
         static readonly HandlerSet Handlers = new HandlerSet(
             H<MouseLookMouseMode, InputEvent>((x,e) => x.OnInput(e)), 
             H<MouseLookMouseMode, PostUpdateEvent>((x, e) =>
@@ -56,7 +57,7 @@ namespace UAlbion.Game.Input
             var delta = e.Snapshot.MousePosition - new Vector2((int)(windowState.PixelWidth / 2), (int)(windowState.PixelHeight / 2));
 
             if (delta.LengthSquared() > float.Epsilon)
-                Raise(new CameraRotateEvent(delta.X * -0.003f, delta.Y * -0.003f));
+                Raise(new CameraRotateEvent(delta.X * (Sensitivity / -1000), delta.Y * (Sensitivity / -1000)));
         }
 
         public MouseLookMouseMode() : base(Handlers) { }

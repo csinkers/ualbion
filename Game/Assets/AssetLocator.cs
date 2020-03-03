@@ -66,22 +66,42 @@ namespace UAlbion.Game.Assets
                 ? $"{type}.{AssetNameResolver.GetName(type, (int)(object)enumId)}"
                 : $"{type}.{enumId}";
 
+            asset = LoadAssetInternal(key, name, language);
+
+            _assetCache.Add(asset, key);
+            return asset is Exception ? null : asset;
+        }
+
+        public object LoadAsset<T>(AssetType type, T enumId, GameLanguage language = GameLanguage.English)
+        {
+            int id = Convert.ToInt32(enumId);
+            var key = new AssetKey(type, id, language);
+            var name = 
+                typeof(T) == typeof(int)
+                ? $"{type}.{AssetNameResolver.GetName(type, (int)(object)enumId)}"
+                : $"{type}.{enumId}";
+
+            var asset = LoadAssetInternal(key, name, language);
+
+            return asset is Exception ? null : asset;
+        }
+
+        object LoadAssetInternal(AssetKey key, string name, GameLanguage language)
+        {
             try
             {
                 IAssetLocator locator = GetLocator(key.Type);
-                asset = locator.LoadAsset(key, name, (x, y) => LoadAssetCached(x.Type, x.Id, x.Language));
+                var asset = locator.LoadAsset(key, name, (x, y) => LoadAssetCached(x.Type, x.Id, x.Language));
 
                 if (asset != null && PostProcessors.TryGetValue(asset.GetType(), out var processor))
                     asset = processor.Process(name, asset);
+                return asset;
             }
             catch (Exception e)
             {
                 Raise(new LogEvent(LogEvent.Level.Error, $"Could not load asset {name}: {e}"));
-                asset = e;
+                return e;
             }
-
-            _assetCache.Add(asset, key);
-            return asset is Exception ? null : asset;
         }
 
         public void Dispose()

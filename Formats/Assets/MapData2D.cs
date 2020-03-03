@@ -38,8 +38,8 @@ namespace UAlbion.Formats.Assets
             map.Overlay ??= new int[map.Width * map.Height];
             for (int i = 0; i < map.Width * map.Height; i++)
             {
-                ushort underlay = (ushort)(map.Underlay[i] + 2);
-                ushort overlay = (ushort)(map.Overlay[i] + 2);
+                ushort underlay = (ushort)(map.Underlay[i] + 1);
+                ushort overlay = (ushort)(map.Overlay[i] + 1);
 
                 byte b1 = (byte)(overlay >> 4);
                 byte b2 = (byte)(((overlay & 0xf) << 4) | ((underlay & 0xf00) >> 8));
@@ -49,8 +49,8 @@ namespace UAlbion.Formats.Assets
                 b2 = s.UInt8(null, b2);
                 b3 = s.UInt8(null, b3);
 
-                map.Overlay[i] = (b1 << 4) + (b2 >> 4) - 2;
-                map.Underlay[i] = ((b2 & 0x0F) << 8) + b3 - 2;
+                map.Overlay[i] = (b1 << 4) + (b2 >> 4);
+                map.Underlay[i] = ((b2 & 0x0F) << 8) + b3;
             }
             s.Check();
             ApiUtil.Assert(s.Offset == startOffset + 10 + npcCount * MapNpc.SizeOnDisk + 3 * map.Width * map.Height);

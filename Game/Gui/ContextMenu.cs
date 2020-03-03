@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
+using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
@@ -17,6 +20,13 @@ namespace UAlbion.Game.Gui
         ContextMenuEvent _event;
 
         public ContextMenu() : base(Handlers, DialogPositioning.TopLeft) { }
+        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+        {
+            // Just the default condition without the extents check, as the use of a fixed position stack means the extents passed in are ignored.
+            var maxOrder = DoLayout(extents, order, (x,y,z) => x.Select(uiPosition, y, z, registerHitFunc));
+            registerHitFunc(order, this);
+            return maxOrder;
+        }
         void OnButton(string buttonId)
         {
             if (_event == null || !buttonId.StartsWith(ButtonKeyPattern))

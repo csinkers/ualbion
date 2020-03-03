@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
@@ -23,10 +24,10 @@ namespace UAlbion.Game.Entities.Map2D
 
         public float BaseCameraHeight => 1.0f;
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<Map, MapInitEvent>((x, e) => x.FireEventChains(TriggerType.MapInit)),
-            H<Map, SlowClockEvent>((x, e) => x.FireEventChains(TriggerType.EveryStep)),
-            H<Map, HourElapsedEvent>((x, e) => x.FireEventChains(TriggerType.EveryHour)),
-            H<Map, DayElapsedEvent>((x, e) => x.FireEventChains(TriggerType.EveryDay)),
+            H<Map, MapInitEvent>((x, e) => x.FireEventChains(TriggerType.MapInit, true)),
+            H<Map, SlowClockEvent>((x, e) => x.FireEventChains(TriggerType.EveryStep, false)),
+            H<Map, HourElapsedEvent>((x, e) => x.FireEventChains(TriggerType.EveryHour, true)),
+            H<Map, DayElapsedEvent>((x, e) => x.FireEventChains(TriggerType.EveryDay, true)),
             H<Map, PlayerEnteredTileEvent>((x,e) => x.OnPlayerEnteredTile(e)),
             H<Map, NpcEnteredTileEvent>((x,e) => x.OnNpcEnteredTile(e)),
             H<Map, ChangeIconEvent>((x,e) => x.ChangeIcon(e))
@@ -78,35 +79,51 @@ namespace UAlbion.Game.Entities.Map2D
             }
         }
 
-        void FireEventChains(TriggerType type)
+        void FireEventChains(TriggerType type, bool log)
         {
             var zones = _logicalMap.GetZonesOfType(type);
+            if (!log)
+                Raise(new SetLogLevelEvent(LogEvent.Level.Warning));
+
             foreach (var zone in zones)
-                Raise(new TriggerChainEvent(zone.Chain, type, zone.X, zone.Y));
+                Raise(new TriggerChainEvent(zone.Chain, zone.Node, type, zone.X, zone.Y));
+
+            if (!log)
+                Raise(new SetLogLevelEvent(LogEvent.Level.Info));
         }
 
         void OnNpcEnteredTile(NpcEnteredTileEvent e)
         {
-            var zone = _logicalMap.GetZone(e.X, e.Y);
-            if (!zone.Trigger.HasFlag(TriggerType.Npc))
-                return;
+            MapEventZone zone;
+            while (true)
+            {
+                zone = _logicalMap.GetZone(e.X, e.Y);
+                if (zone == null || !zone.Trigger.HasFlag(TriggerType.Npc))
+                    return;
 
-            if (zone.Chain.FirstEvent is OffsetEvent offset)
-                OnNpcEnteredTile(new NpcEnteredTileEvent(e.Id, e.X + offset.X, e.Y + offset.Y));
-            else
-                Raise(new TriggerChainEvent(zone.Chain, TriggerType.Npc, e.X, e.Y));
+                if (!(zone.Chain.FirstEvent is OffsetEvent offset))
+                    break;
+                e = new NpcEnteredTileEvent(e.Id, e.X + offset.X, e.Y + offset.Y);
+            }
+
+            Raise(new TriggerChainEvent(zone.Chain, zone.Node, TriggerType.Npc, e.X, e.Y));
         }
 
         void OnPlayerEnteredTile(PlayerEnteredTileEvent e)
         {
-            var zone = _logicalMap.GetZone(e.X, e.Y);
-            if (zone == null || !zone.Trigger.HasFlag(TriggerType.Normal)) 
-                return;
+            MapEventZone zone;
+            while (true)
+            {
+                zone = _logicalMap.GetZone(e.X, e.Y);
+                if (zone == null || !zone.Trigger.HasFlag(TriggerType.Normal))
+                    return;
 
-            if (zone.Chain.FirstEvent is OffsetEvent offset)
-                OnPlayerEnteredTile(new PlayerEnteredTileEvent(e.X + offset.X, e.Y + offset.Y));
-            else
-                Raise(new TriggerChainEvent(zone.Chain, TriggerType.Normal, e.X, e.Y));
+                if (!(zone.Chain.FirstEvent is OffsetEvent offset))
+                    break;
+                e = new PlayerEnteredTileEvent(e.X + offset.X, e.Y + offset.Y);
+            }
+
+            Raise(new TriggerChainEvent(zone.Chain, zone.Node, TriggerType.Normal, e.X, e.Y));
         }
 
         void ChangeIcon(ChangeIconEvent e)
@@ -118,11 +135,11 @@ namespace UAlbion.Game.Entities.Map2D
                 case ChangeIconEvent.IconChangeType.Wall: break; // N/A for 2D map
                 case ChangeIconEvent.IconChangeType.Floor: break; // N/A for 2D map
                 case ChangeIconEvent.IconChangeType.Ceiling: break; // N/A for 2D map
-                case ChangeIconEvent.IconChangeType.NpcMovementType: break;
+                case ChangeIconEvent.IconChangeType.NpcMovement: break;
                 case ChangeIconEvent.IconChangeType.NpcSprite: break;
-                case ChangeIconEvent.IconChangeType.EventChain: _logicalMap.ChangeTileEventChain((byte)e.X, (byte)e.Y, e.Value); break;
-                case ChangeIconEvent.IconChangeType.TilemapObjectOverwrite: _logicalMap.PlaceBlock((byte)e.X, (byte)e.Y, e.Value, true); break;
-                case ChangeIconEvent.IconChangeType.TilemapObjectNoOverwrite: _logicalMap.PlaceBlock((byte)e.X, (byte)e.Y, e.Value, false); break;
+                case ChangeIconEvent.IconChangeType.Chain: _logicalMap.ChangeTileEventChain((byte)e.X, (byte)e.Y, e.Value); break;
+                case ChangeIconEvent.IconChangeType.BlockHard: _logicalMap.PlaceBlock((byte)e.X, (byte)e.Y, e.Value, true); break;
+                case ChangeIconEvent.IconChangeType.BlockSoft: _logicalMap.PlaceBlock((byte)e.X, (byte)e.Y, e.Value, false); break;
                 case ChangeIconEvent.IconChangeType.Trigger: _logicalMap.ChangeTileEventTrigger((byte)e.X, (byte)e.Y, e.Value); break;
                 default: throw new ArgumentOutOfRangeException();
             }

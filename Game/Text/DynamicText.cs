@@ -9,9 +9,10 @@ namespace UAlbion.Game.Text
         readonly Func<IEnumerable<TextBlock>> _generator;
         readonly Func<int, int> _getVersion;
 #if DEBUG
-        IList<TextBlock> _lastResult = new List<TextBlock>();
+        IList<TextBlock> _lastResult;
         public override string ToString()
         {
+            _lastResult ??= _generator().ToList();
             var lastText = string.Join(" ", _lastResult.Select(x => x.Text));
             return $"DynTxt \"{lastText}\"";
         }

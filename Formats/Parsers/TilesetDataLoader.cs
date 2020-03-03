@@ -18,8 +18,30 @@ namespace UAlbion.Formats.Parsers
             var validLayers = typeof(TilesetData.TileLayer).GetEnumValues().Cast<byte>().ToList();
             var validTypes = typeof(TilesetData.TileType).GetEnumValues().Cast<byte>().ToList();
 
-            int tileCount = (int)(streamLength / 8);
-            for (int i = 0; i < tileCount; i++)
+            int tileCount = (int)(streamLength / 8) + 2;
+            td.Tiles.Add(new TilesetData.TileData
+            {
+                Layer = TilesetData.TileLayer.Normal,
+                Type = TilesetData.TileType.Normal,
+                Collision = TilesetData.Passability.Passable,
+                Flags = 0,
+                ImageNumber = 0xffff,
+                FrameCount = 1,
+                Unk7 = 0
+            });
+
+            td.Tiles.Add(new TilesetData.TileData
+            {
+                Layer = TilesetData.TileLayer.Normal,
+                Type = TilesetData.TileType.Normal,
+                Collision = TilesetData.Passability.Passable,
+                Flags = 0,
+                ImageNumber = 0xffff,
+                FrameCount = 1,
+                Unk7 = 0
+            });
+
+            for (int i = 2; i < tileCount; i++)
             {
                 var t = new TilesetData.TileData { TileNumber = i };
 

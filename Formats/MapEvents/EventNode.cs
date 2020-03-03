@@ -23,7 +23,8 @@ namespace UAlbion.Formats.MapEvents
         {
             NextEventWhenFalseId = falseEventId;
         }
-        public override string ToString() => $"{Id}?{NextEventId?.ToString() ?? "!"}:{NextEventWhenFalseId?.ToString() ?? "!"}: {Event}";
+
+        public override string ToString() => $"!{Id}?{NextEventId?.ToString() ?? "!"}:{NextEventWhenFalseId?.ToString() ?? "!"}: {Event}";
         public IEventNode NextEventWhenFalse { get; set; }
         public ushort? NextEventWhenFalseId { get; }
     }
@@ -32,7 +33,8 @@ namespace UAlbion.Formats.MapEvents
     public class EventNode : IEventNode
     {
         public const long SizeInBytes = 12;
-        public override string ToString() => $"{Id}=>{NextEventId?.ToString() ?? "!"}:{Event}";
+        bool DirectSequence => (NextEventId ?? Id + 1) == Id + 1; 
+        public override string ToString() => $"{(DirectSequence ? " " : "#")}{Id}=>{NextEventId?.ToString() ?? "!"}:{Event}";
         public int Id { get; }
         public IMapEvent Event { get; }
         public ushort? NextEventId { get; set; }

@@ -3,6 +3,7 @@ using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
+    [Event("change_icon")]
     public class ChangeIconEvent : Event, IPositionedEvent, IMapEvent
     {
         public static ChangeIconEvent Serdes(ChangeIconEvent e, ISerializer s)
@@ -14,8 +15,24 @@ namespace UAlbion.Formats.MapEvents
             e.ChangeType = s.EnumU8(nameof(ChangeType), e.ChangeType);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.Value = s.UInt16(nameof(Value), e.Value);
+            // e.Value = StoreIncremented.Serdes(nameof(Value), e.Value, s.UInt16);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+            ApiUtil.Assert(e.Unk5 == 0 
+                    || e.Unk5 == 1 
+                    || e.Unk5 == 2 
+                    || e.Unk5 == 3);
+            ApiUtil.Assert(e.Unk8 == 0); // Is 152 for a single change wall event in the endgame. Probably just an oversight.
             return e;
+        }
+
+        ChangeIconEvent() { }
+        public ChangeIconEvent(short x, short y, EventScope scope, IconChangeType changeType, ushort value)
+        {
+            X = x;
+            Y = y;
+            Scope = scope;
+            ChangeType = changeType;
+            Value = value;
         }
 
         public enum IconChangeType : byte
@@ -25,11 +42,11 @@ namespace UAlbion.Formats.MapEvents
             Wall = 2,
             Floor = 3,
             Ceiling = 4,
-            NpcMovementType = 5, // X = NpcId, Values: 0=Waypoints, 1=Random, 2=Stay, 3=Follow
+            NpcMovement = 5, // X = NpcId, Values: 0=Waypoints, 1=Random, 2=Stay, 3=Follow
             NpcSprite = 6, // X = NpcId
-            EventChain = 7,
-            TilemapObjectOverwrite = 8, // Objects are in BLKLIST#.XLD
-            TilemapObjectNoOverwrite = 9, // Objects are in BLKLIST#.XLD
+            Chain = 7,
+            BlockHard = 8, // Objects are in BLKLIST#.XLD (overwrite existing tiles)
+            BlockSoft = 9, // Objects are in BLKLIST#.XLD (don't overwrite)
             Trigger = 0xA, // ???? Might not be 0xA
         }
 
@@ -47,14 +64,14 @@ namespace UAlbion.Formats.MapEvents
 
         int IPositionedEvent.X => X;
         int IPositionedEvent.Y => Y;
-        public short X { get; set; }
-        public short Y { get; set; }
-        public EventScope Scope { get; set; }
-        public IconChangeType ChangeType { get; set; }
-        public byte Unk5 { get; set; }
-        public ushort Value { get; set; }
-        public ushort Unk8 { get; set; }
-        public override string ToString() => $"change_icon <{X}, {Y}> ({Scope}) {ChangeType} {Value} ({Unk5} {Unk8})";
+        [EventPart("x")] public short X { get; private set; }
+        [EventPart("y")] public short Y { get; private set; }
+        [EventPart("scope")] public EventScope Scope { get; private set; }
+        [EventPart("type")] public IconChangeType ChangeType { get; private set; }
+        [EventPart("value")] public ushort Value { get; private set; }
+        public byte Unk5 { get; private set; }
+        ushort Unk8 { get; set; }
+        // public override string ToString() => $"change_icon <{X}, {Y}> ({Scope}) {ChangeType} {Value} ({Unk5} {Unk8})";
         public MapEventType EventType => MapEventType.ChangeIcon;
     }
 }

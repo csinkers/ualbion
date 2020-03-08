@@ -71,13 +71,13 @@ namespace UAlbion.Core
         void UpdateBackend(BackendChangedEvent e)
         {
             var settings = Resolve<IEngineSettings>();
-            _useReverseDepth = settings?.Flags.HasFlag(EngineFlags.FlipDepthRange) == true
-                ? !e.GraphicsDevice.IsDepthRangeZeroToOne
-                : e.GraphicsDevice.IsDepthRangeZeroToOne;
+            _useReverseDepth = (settings?.Flags & EngineFlags.FlipDepthRange) == EngineFlags.FlipDepthRange
+                ? !e.IsDepthRangeZeroToOne
+                : e.IsDepthRangeZeroToOne;
 
-            _isClipSpaceYInverted = (settings?.Flags.HasFlag(EngineFlags.FlipYSpace) == true)
-                ? !e.GraphicsDevice.IsClipSpaceYInverted 
-                : e.GraphicsDevice.IsClipSpaceYInverted;
+            _isClipSpaceYInverted = (settings?.Flags & EngineFlags.FlipYSpace) == EngineFlags.FlipYSpace
+                ? !e.IsClipSpaceYInverted 
+                : e.IsClipSpaceYInverted;
 
             UpdatePerspectiveMatrix();
         }

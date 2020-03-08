@@ -1,7 +1,7 @@
 ﻿using System;
+using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Entities;
-using Veldrid;
 
 namespace UAlbion.Game.Gui
 {

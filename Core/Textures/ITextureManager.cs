@@ -1,11 +1,9 @@
-﻿using Veldrid;
-
-namespace UAlbion.Core.Textures
+﻿namespace UAlbion.Core.Textures
 {
     public interface ITextureManager : IComponent
     {
-        TextureView GetTexture(ITexture texture);
-        void PrepareTexture(ITexture texture, GraphicsDevice gd);
+        object GetTexture(ITexture texture);
+        void PrepareTexture(ITexture texture, IRendererContext context);
         void DestroyDeviceObjects();
         string Stats();
     }

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Core.Events;
-using UAlbion.Core.Textures;
-using Veldrid;
 
 namespace UAlbion.Core
 {
@@ -12,24 +10,21 @@ namespace UAlbion.Core
     {
         static readonly HandlerSet Handlers = new HandlerSet(
             H<Scene, CollectScenesEvent>((x, e) => e.Register(x)),
-            H<Scene, SetClearColourEvent>((x, e) => x._clearColour = new RgbaFloat(e.Red, e.Green, e.Blue, 1.0f)),
+            H<Scene, SetClearColourEvent>((x, e) => x._clearColour = (e.Red, e.Green, e.Blue)),
             H<Scene, ExchangeDisabledEvent>((x,e) => x.Unsubscribed())
         );
 
         readonly IDictionary<Type, IList<IRenderable>> _renderables = new Dictionary<Type, IList<IRenderable>>();
         readonly IDictionary<(DrawLayer, int), IList<IRenderable>> _processedRenderables = new Dictionary<(DrawLayer, int), IList<IRenderable>>();
-        readonly IList<Type> _activeRendererTypes;
-        PaletteTexture _paletteTexture;
-        RgbaFloat _clearColour;
+        (float Red, float Green, float Blue) _clearColour;
 
         public string Name { get; }
         public ICamera Camera { get; }
 
-        protected Scene(string name, ICamera camera, IList<Type> activeRendererTypes) : base(Handlers)
+        protected Scene(string name, ICamera camera) : base(Handlers)
         {
             Name = name;
             Camera = AttachChild(camera);
-            _activeRendererTypes = activeRendererTypes;
         }
 
         public void Add(IRenderable renderable) { } // TODO
@@ -37,9 +32,10 @@ namespace UAlbion.Core
         public override string ToString() => $"Scene:{Name}";
         protected virtual void Unsubscribed() { }
 
-        public void RenderAllStages(GraphicsDevice gd, CommandList cl, SceneContext sc, IDictionary<Type, IRenderer> renderers)
+        public void RenderAllStages(IRendererContext context, IList<IRenderer> renderers)
         {
-            sc.SetCurrentScene(this);
+            context.SetCurrentScene(this);
+            context.SetClearColor(_clearColour.Red, _clearColour.Green, _clearColour.Blue);
 
             // Collect all renderables from components
             foreach(var renderer in _renderables.Values)
@@ -49,42 +45,41 @@ namespace UAlbion.Core
             {
                 Exchange.Raise(new RenderEvent(x =>
                 {
-                    if (x == null || !_activeRendererTypes.Contains(x.Renderer))
-                        return;
-                    if (!_renderables.ContainsKey(x.Renderer))
-                        _renderables[x.Renderer] = new List<IRenderable>();
-                    _renderables[x.Renderer].Add(x);
+                    var type = x.GetType();
+                    if (!_renderables.ContainsKey(type))
+                        _renderables[type] = new List<IRenderable>();
+                    _renderables[type].Add(x);
                 }), this);
             }
 
             foreach(var renderer in _renderables)
                 CoreTrace.Log.CollectedRenderables(renderer.Key.Name, 0, renderer.Value.Count);
 
-            var newPalette = Resolve<IPaletteManager>().PaletteTexture;
-            if (sc.PaletteView == null || _paletteTexture != newPalette)
-            {
-                sc.PaletteView?.Dispose();
-                sc.PaletteTexture?.Dispose();
-                CoreTrace.Log.Info("Scene", "Disposed palette device texture");
-                _paletteTexture = newPalette;
-                sc.PaletteTexture = _paletteTexture.CreateDeviceTexture(gd, gd.ResourceFactory, TextureUsage.Sampled);
-                sc.PaletteView = gd.ResourceFactory.CreateTextureView(sc.PaletteTexture);
-            }
+            var paletteManager = Resolve<IPaletteManager>();
+            context.SetCurrentPalette(paletteManager.PaletteTexture, paletteManager.Version);
             CoreTrace.Log.Info("Scene", "Created palette device texture");
 
+            var rendererLookup = new Dictionary<Type, IRenderer>();
+
             using (PerfTracker.FrameEvent("6.1.2 Prepare per-frame resources"))
-            using (new RenderDebugGroup(cl, "Prepare per-frame resources"))
+            using (context.Factory.CreateRenderDebugGroup(context, "Prepare per-frame resources"))
             {
                 _processedRenderables.Clear();
                 foreach (var renderableGroup in _renderables)
                 {
-                    var renderer = renderers[renderableGroup.Key];
-                    foreach (var renderable in renderer.UpdatePerFrameResources(gd, cl, sc, renderableGroup.Value))
+                    var renderer = renderers.FirstOrDefault(x => x.CanRender(renderableGroup.Key));
+                    if (renderer == null) continue;
+
+                    foreach (var renderable in renderer.UpdatePerFrameResources(context, renderableGroup.Value))
                     {
                         var key = (renderable.RenderOrder, renderable.PipelineId);
                         if (!_processedRenderables.ContainsKey(key))
                             _processedRenderables[key] = new List<IRenderable>();
                         _processedRenderables[key].Add(renderable);
+
+                        var processedType = renderable.GetType();
+                        if(!rendererLookup.ContainsKey(processedType))
+                            rendererLookup[processedType] = renderers.FirstOrDefault(x => x.CanRender(renderableGroup.Key));
                     }
                 }
 
@@ -92,68 +87,53 @@ namespace UAlbion.Core
                     _processedRenderables.Count,
                     _processedRenderables.Sum(x => x.Value.Count));
 
-                sc.UpdatePerFrameResources(gd, cl);
+                context.UpdatePerFrameResources();
             }
 
             var orderedKeys = _processedRenderables.Keys.OrderBy(x => x).ToList();
             CoreTrace.Log.Info("Scene", "Sorted processed renderables");
-            float depthClear = gd.IsDepthRangeZeroToOne ? 1f : 0f;
 
             // Main scene
             using (PerfTracker.FrameEvent("6.1.3 Main scene pass"))
-            using (new RenderDebugGroup(cl, "Main Scene Pass"))
+            using (context.Factory.CreateRenderDebugGroup(context, "Main Scene Pass"))
             {
-                cl.SetFramebuffer(sc.MainSceneFramebuffer);
-                var fbWidth = sc.MainSceneFramebuffer.Width;
-                var fbHeight = sc.MainSceneFramebuffer.Height;
-                cl.SetViewport(0, new Viewport(0, 0, fbWidth, fbHeight, 0, 1));
-                cl.SetFullViewports();
-                cl.SetFullScissorRects();
-                cl.ClearColorTarget(0, _clearColour);
-                cl.ClearDepthStencil(depthClear);
+                context.StartMainPass();
                 foreach (var key in orderedKeys)
-                    Render(gd, cl, sc, RenderPasses.Standard, renderers, _processedRenderables[key]);
+                    Render(context, RenderPasses.Standard, rendererLookup, _processedRenderables[key]);
             }
 
-            // 2D Overlays
-            using (new RenderDebugGroup(cl, "Overlay"))
+            using (context.Factory.CreateRenderDebugGroup(context, "Overlay"))
             {
+                context.StartOverlayPass();
                 foreach (var key in orderedKeys)
-                    Render(gd, cl, sc, RenderPasses.Overlay, renderers, _processedRenderables[key]);
+                    Render(context, RenderPasses.Overlay, rendererLookup, _processedRenderables[key]);
             }
 
-            if (sc.MainSceneColorTexture.SampleCount != TextureSampleCount.Count1)
-                cl.ResolveTexture(sc.MainSceneColorTexture, sc.MainSceneResolvedColorTexture);
-
-            using (new RenderDebugGroup(cl, "Duplicator"))
+            using (context.Factory.CreateRenderDebugGroup(context, "Duplicator"))
             {
-                cl.SetFramebuffer(sc.DuplicatorFramebuffer);
-                cl.SetFullViewports();
+                context.StartDuplicatorPass();
                 foreach (var key in orderedKeys)
-                    Render(gd, cl, sc, RenderPasses.Duplicator, renderers, _processedRenderables[key]);
+                    Render(context, RenderPasses.Duplicator, rendererLookup, _processedRenderables[key]);
             }
 
-            using (new RenderDebugGroup(cl, "Swapchain Pass"))
+            using (context.Factory.CreateRenderDebugGroup(context, "Swapchain Pass"))
             {
-                cl.SetFramebuffer(gd.SwapchainFramebuffer);
-                cl.SetFullViewports();
+                context.StartSwapchainPass();
                 foreach (var key in orderedKeys)
-                    Render(gd, cl, sc, RenderPasses.SwapchainOutput, renderers, _processedRenderables[key]);
+                    Render(context, RenderPasses.SwapchainOutput, rendererLookup, _processedRenderables[key]);
             }
         }
 
-        void Render(GraphicsDevice gd,
-            CommandList cl,
-            SceneContext sc,
+        void Render(IRendererContext context,
             RenderPasses pass,
             IDictionary<Type, IRenderer> renderers,
             IEnumerable<IRenderable> renderableList)
         {
             foreach (IRenderable renderable in renderableList)
             {
-                var renderer = renderers[renderable.Renderer];
+                var renderer = renderers[renderable.GetType()];
                 if ((renderer.RenderPasses & pass) != 0)
-                    renderer.Render(gd, cl, sc, pass, renderable);
+                    renderer.Render(context, pass, renderable);
             }
         }
     }

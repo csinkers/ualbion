@@ -9,13 +9,14 @@ namespace UAlbion.Game.Scenes
     public interface IMenuScene : IScene { }
     public class MenuScene : GameScene, IMenuScene
     {
+        /*
         static readonly Type[] Renderers = {
             typeof(DebugGuiRenderer),
             typeof(FullScreenQuad),
             typeof(ScreenDuplicator),
             typeof(SpriteRenderer),
-        };
-        public MenuScene() : base(SceneId.MainMenu, new OrthographicCamera(), Renderers)
+        };*/
+        public MenuScene() : base(SceneId.MainMenu, new OrthographicCamera())
         { }
 
         public override void Subscribed()

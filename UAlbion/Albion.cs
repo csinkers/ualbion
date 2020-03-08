@@ -5,6 +5,9 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
+using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Textures;
+using UAlbion.Core.Veldrid.Visual;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
@@ -17,6 +20,8 @@ using UAlbion.Game.Gui.Inventory;
 using UAlbion.Game.Input;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.State;
+using UAlbion.Game.Veldrid.Debugging;
+using UAlbion.Game.Veldrid.Input;
 
 namespace UAlbion
 {
@@ -25,7 +30,7 @@ namespace UAlbion
         public static void RunGame(EventExchange global, string baseDir, CommandLineOptions commandLine)
         {
             PerfTracker.StartupEvent("Creating engine");
-            using var engine = new Engine(commandLine.Backend, commandLine.UseRenderDoc)
+            using var engine = new VeldridEngine(commandLine.Backend, commandLine.UseRenderDoc)
                 .AddRenderer(new SpriteRenderer())
                 .AddRenderer(new ExtrudedTileMapRenderer())
                 .AddRenderer(new FullScreenQuad())
@@ -60,7 +65,9 @@ namespace UAlbion
         static void RegisterComponents(EventExchange global, string baseDir)
         {
             PerfTracker.StartupEvent("Creating main components");
+            var factory = global.Resolve<ICoreFactory>();
             global
+                .Register<ICommonColors>(new CommonColors(factory))
                 .Register<IInputManager>(new InputManager()
                     .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
                     .RegisterInputMode(InputMode.World2D, new World2DInputMode())

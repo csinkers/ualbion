@@ -1,18 +1,9 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Core.Events;
-using Veldrid;
-using Veldrid.Sdl2;
 
 namespace UAlbion.Core
 {
-    public static class UiConstants
-    {
-        public static readonly Rectangle UiExtents = new Rectangle(0, 0, 360, 240);
-        public static readonly Rectangle StatusBarExtents = new Rectangle(0, 192, 360, 48);
-        public static readonly Rectangle ActiveAreaExtents = new Rectangle(0, 0, 360, 192);
-    }
-
     public class WindowManager : Component, IWindowManager
     {
         static readonly HandlerSet Handlers = new HandlerSet(
@@ -21,7 +12,7 @@ namespace UAlbion.Core
 
         public WindowManager() : base(Handlers) { }
 
-        internal Sdl2Window Window
+        public IWindow Window
         {
             get => _window;
             set
@@ -76,7 +67,7 @@ namespace UAlbion.Core
         Vector2 _normToUi;
         Vector2 _normToPixel;
         Vector2 _pixelToNorm;
-        Sdl2Window _window;
+        IWindow _window;
 
         // UI Coordinates:
         // Top left corner in original game = (0,0)

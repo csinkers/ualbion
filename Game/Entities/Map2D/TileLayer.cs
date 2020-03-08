@@ -80,7 +80,7 @@ namespace UAlbion.Game.Entities.Map2D
 
         SpriteInstanceData BuildInstanceData(int i, int j, TilesetData.TileData tile, int tickCount)
         {
-            if (tile == null || tile.Flags.HasFlag(TilesetData.TileFlags.Debug))
+            if (tile == null || (tile.Flags & TilesetData.TileFlags.Debug) != 0)
                 return BlankInstance;
 
             int index = _logicalMap.Index(i, j);
@@ -111,10 +111,10 @@ namespace UAlbion.Game.Entities.Map2D
 
             instance.Flags = 0
 #if DEBUG
-                | (_lastDebugFlags.HasFlag(DebugFlags.HighlightTile) && HighlightIndex == index ? SpriteFlags.Highlight : 0)
-                | (_lastDebugFlags.HasFlag(DebugFlags.HighlightEventChainZones) && _highlightEvent == eventNum ? SpriteFlags.GreenTint : 0)
-                | (_lastDebugFlags.HasFlag(DebugFlags.HighlightCollision) && tile.Collision != TilesetData.Passability.Passable ? SpriteFlags.RedTint : 0)
-                | (_lastDebugFlags.HasFlag(DebugFlags.NoMapTileBoundingBoxes) ? SpriteFlags.NoBoundingBox : 0)
+                | ((_lastDebugFlags & DebugFlags.HighlightTile) != 0 && HighlightIndex == index ? SpriteFlags.Highlight : 0)
+                | ((_lastDebugFlags & DebugFlags.HighlightEventChainZones) != 0 && _highlightEvent == eventNum ? SpriteFlags.GreenTint : 0)
+                | ((_lastDebugFlags & DebugFlags.HighlightCollision) != 0 && tile.Collision != TilesetData.Passability.Passable ? SpriteFlags.RedTint : 0)
+                | ((_lastDebugFlags & DebugFlags.NoMapTileBoundingBoxes) != 0 ? SpriteFlags.NoBoundingBox : 0)
 #endif
                 // | ((tile.Flags & TilesetData.TileFlags.TextId) != 0 ? SpriteFlags.RedTint : 0)
                 // | (((int) tile.Type) == 8 ? SpriteFlags.GreenTint : 0)
@@ -135,8 +135,8 @@ namespace UAlbion.Game.Entities.Map2D
             _lastDebugFlags = debug;
 
             if (frameCount != _lastFrameCount && (
-                    debug.HasFlag(DebugFlags.HighlightEventChainZones)
-                 || debug.HasFlag(DebugFlags.HighlightTile)))
+                    (debug & DebugFlags.HighlightEventChainZones) != 0
+                 || (debug & DebugFlags.HighlightTile) != 0))
                 _dirty = true;
 #endif
 

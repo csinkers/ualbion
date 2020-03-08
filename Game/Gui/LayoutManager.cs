@@ -6,7 +6,6 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Events;
-using Veldrid;
 
 namespace UAlbion.Game.Gui
 {

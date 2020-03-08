@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UAlbion.Core;
+﻿using UAlbion.Core;
 
 namespace UAlbion.Game.Scenes
 {
@@ -8,8 +6,8 @@ namespace UAlbion.Game.Scenes
     {
         public SceneId Id { get; }
 
-        protected GameScene(SceneId sceneId, ICamera camera, IList<Type> activeActiveRendererTypes) 
-            : base(sceneId.ToString(), camera, activeActiveRendererTypes)
+        protected GameScene(SceneId sceneId, ICamera camera) 
+            : base(sceneId.ToString(), camera)
         {
             Id = sceneId;
         }

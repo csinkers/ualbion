@@ -4,7 +4,6 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
-using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
@@ -26,19 +25,20 @@ namespace UAlbion.Game.Gui
 
         void UpdateSprite(Vector3 position, Vector2 size, DrawLayer layer)
         {
+            var commonColors = Resolve<ICommonColors>();
             if(layer != _sprite?.Key.RenderOrder)
             {
                 _sprite?.Dispose();
 
                 var sm = Resolve<ISpriteManager>();
-                var key = new SpriteKey(CommonColors.BorderTexture, layer, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
+                var key = new SpriteKey(commonColors.BorderTexture, layer, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
                 _sprite = sm.Borrow(key, 1, this);
             }
             else if (_lastPosition == position && _lastSize == size)
                 return;
 
             var instances = _sprite.Access();
-            instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, (int)CommonColors.Palette[_color], 0);
+            instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, (int)commonColors.Palette[_color], 0);
             _lastPosition = position;
             _lastSize = size;
         }

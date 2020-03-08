@@ -16,18 +16,16 @@ namespace UAlbion.Core.Visual
         string _name;
         public string Name
         {
-            get => _name ?? Key.Texture.Name;
+            get => _name ?? $"Sprite:{Key.Texture.Name}:{Key.RenderOrder}";
             set => _name = value;
         }
 
         public DrawLayer RenderOrder => Key.RenderOrder;
         public int PipelineId { get; set; }
-        public Type Renderer => typeof(SpriteRenderer);
-
         public SpriteKey Key { get; }
         public bool InstancesDirty { get; set; }
         public int ActiveInstances { get; private set; }
-        internal SpriteInstanceData[] Instances { get; private set; } = new SpriteInstanceData[MinSize];
+        public SpriteInstanceData[] Instances { get; private set; } = new SpriteInstanceData[MinSize];
         readonly List<SpriteLease> _leases = new List<SpriteLease>();
 
         internal SpriteLease Grow(int length, object caller)

@@ -9,7 +9,7 @@ namespace UAlbion.Formats.MapEvents
         public static RemovePartyMemberEvent Serdes(RemovePartyMemberEvent e, ISerializer s)
         {
             e ??= new RemovePartyMemberEvent();
-            e.PartyMemberId = s.EnumU8(nameof(PartyMemberId), e.PartyMemberId);
+            e.PartyMemberId = (PartyCharacterId)StoreIncremented.Serdes(nameof(PartyMemberId), (byte)e.PartyMemberId, s.UInt8);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);

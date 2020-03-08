@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
+using UAlbion.Core;
 using UAlbion.Game.Gui;
 using UAlbion.Game.Text;
-using Veldrid;
 
 namespace UAlbion.Game.Entities
 {

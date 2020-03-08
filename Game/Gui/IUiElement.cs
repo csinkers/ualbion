@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Core;
-using Veldrid;
 
 namespace UAlbion.Game.Gui
 {

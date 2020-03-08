@@ -1,15 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.Assets
 {
-    [AssetLocator(AssetType.AssetConfig, AssetType.GeneralConfig)]
     public class AssetConfigLocator : Component, IAssetLocator
     {
         public AssetConfigLocator() : base(null) { }
-
+        public IEnumerable<AssetType> SupportedTypes => new[] { AssetType.AssetConfig, AssetType.GeneralConfig };
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)
         {
             var settings = Resolve<ISettings>();

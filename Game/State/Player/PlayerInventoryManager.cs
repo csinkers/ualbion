@@ -57,7 +57,7 @@ namespace UAlbion.Game.State.Player
                     return InventoryAction.Pickup;
 
                 var contents = _base.Inventory.GetSlot(slotId);
-                if (contents == null)
+                if (contents?.Id == null)
                     return InventoryAction.Nothing;
 
                 return InventoryAction.Pickup;
@@ -71,7 +71,7 @@ namespace UAlbion.Game.State.Player
                     throw new InvalidOperationException($"Unexpected item in hand of type: {inventoryScreenState.ItemInHand.GetType()}");
 
                 var contents = _base.Inventory.GetSlot(slotId);
-                if (contents == null)
+                if (contents?.Id == null)
                     return InventoryAction.Drop;
 
                 if (CanCoalesce(slotId, contents, (ItemSlot)itemInHand))

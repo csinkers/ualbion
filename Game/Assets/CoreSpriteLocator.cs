@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
@@ -7,10 +8,10 @@ using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Game.Assets
 {
-    [AssetLocator(AssetType.CoreGraphics, AssetType.CoreGraphicsMetadata, AssetType.CoreSpriteConfig)]
     public class CoreSpriteLocator : Component, IAssetLocator
     {
         public CoreSpriteLocator() : base(null) { }
+        public IEnumerable<AssetType> SupportedTypes => new[] { AssetType.CoreGraphics, AssetType.CoreGraphicsMetadata, AssetType.CoreSpriteConfig };
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)
         {
             if (key.Type == AssetType.CoreSpriteConfig)

@@ -1,9 +1,9 @@
 ﻿using System;
+using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
-using Veldrid;
 
 namespace UAlbion.Game.Gui.Inventory
 {

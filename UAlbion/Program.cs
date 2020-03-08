@@ -3,11 +3,13 @@ using System.Text;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Core.Veldrid;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Settings;
+using UAlbion.Game.Veldrid.Assets;
 
 namespace UAlbion
 {
@@ -33,13 +35,23 @@ namespace UAlbion
 
             var logger = new ConsoleLogger();
             var settings = new Settings { BasePath = baseDir };
+            var factory = new VeldridCoreFactory();
 
             PerfTracker.StartupEvent("Registering asset manager");
-            using var assets = new AssetManager();
+            using var assets = new AssetManager()
+                .AddAssetLocator(new StandardAssetLocator())
+                .AddAssetLocator(new AssetConfigLocator())
+                .AddAssetLocator(new CoreSpriteLocator())
+                .AddAssetLocator(new MetaFontLocator(factory))
+                .AddAssetPostProcessor(new AlbionSpritePostProcessor())
+                .AddAssetPostProcessor(new ImageSharpPostProcessor())
+                ;
+
             using var global = new EventExchange("Global", logger);
             Engine.Global = global;
 
             global // Need to register settings first, as the AssetConfigLocator relies on it.
+                .Register<ICoreFactory>(factory)
                 .Register<ISettings>(settings) 
                 .Register<IEngineSettings>(settings)
                 .Register<IDebugSettings>(settings)

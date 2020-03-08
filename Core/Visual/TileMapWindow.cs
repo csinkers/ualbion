@@ -1,5 +1,4 @@
-﻿using System;
-using UAlbion.Api;
+﻿using UAlbion.Api;
 
 namespace UAlbion.Core.Visual
 {
@@ -8,7 +7,7 @@ namespace UAlbion.Core.Visual
         public string Name => TileMap.Name;
         public DrawLayer RenderOrder => TileMap.RenderOrder;
         public int PipelineId => 1;
-        public Type Renderer => TileMap.Renderer;
+        // public Type Renderer => TileMap.Renderer;
         public int Offset { get; }
         public int Length { get; }
         public TileMap TileMap { get; }

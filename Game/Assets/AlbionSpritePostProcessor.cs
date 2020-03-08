@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Assets
 {
-    [AssetPostProcessor(typeof(AlbionSprite))]
     public class AlbionSpritePostProcessor : IAssetPostProcessor
     {
-        public object Process(string name, object asset)
+        public IEnumerable<Type> SupportedTypes => new[] { typeof(AlbionSprite) };
+        public object Process(ICoreFactory factory, string name, object asset)
         {
             var sprite = (AlbionSprite)asset;
             EightBitTexture.SubImage[] subImages;
@@ -48,7 +50,7 @@ namespace UAlbion.Game.Assets
                     }
                 }
 
-                return new EightBitTexture(
+                return factory.CreateEightBitTexture(
                     sprite.Name,
                     (uint)width,
                     (uint)height,
@@ -82,7 +84,7 @@ namespace UAlbion.Game.Assets
                     .Select(x => new EightBitTexture.SubImage((uint)x.X, (uint)x.Y, (uint)x.Width, (uint)x.Height, 0))
                     .ToArray();
 
-                return new EightBitTexture(
+                return factory.CreateEightBitTexture(
                     sprite.Name,
                     (uint)sprite.Width,
                     (uint)sprite.Height,
@@ -92,6 +94,7 @@ namespace UAlbion.Game.Assets
                     subImages);
             }
         }
+
 
         static (int, int) GetAtlasSize(int tileWidth, int tileHeight, int count)
         {

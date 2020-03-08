@@ -43,6 +43,7 @@ namespace UAlbion.Game.Entities
                     DrawLayer.Background,
                     new Vector3(-size, size / 3, size), // Just make sure it's bigger than the largest map
                     1, 1,
+                Resolve<ICoreFactory>(),
                     Resolve<IPaletteManager>());
             var texture = assets.LoadTexture(_id);
             _tilemap.DefineWall(1, texture, 0, 0, 0, false);

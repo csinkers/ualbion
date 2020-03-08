@@ -7,7 +7,6 @@ using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
-using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
@@ -27,6 +26,7 @@ namespace UAlbion.Game.Gui
         {
             var window = Resolve<IWindowManager>();
             var sm = Resolve<ISpriteManager>();
+            var factory = Resolve<ICoreFactory>();
 
             { // Check if we need to rebuild
                 var normSize = window.UiToNormRelative(new Vector2(width, height));
@@ -38,7 +38,7 @@ namespace UAlbion.Game.Gui
             }
 
             var assets = Resolve<IAssetManager>();
-            var multi = new MultiTexture($"DialogFrame {width}x{height}", new DummyPaletteManager(assets.LoadPalette(PaletteId.Inventory)));
+            var multi = factory.CreateMultiTexture($"DialogFrame {width}x{height}", new DummyPaletteManager(assets.LoadPalette(PaletteId.Inventory)));
 
             void DrawLine(uint y)
             {
@@ -59,7 +59,7 @@ namespace UAlbion.Game.Gui
                 uint y = 16;
                 uint n = 0;
                 var texture = assets.LoadTexture((CoreSpriteId)((int)CoreSpriteId.UiBackgroundLines1 + n % 4));
-                texture = CoreUtil.BuildRotatedTexture((EightBitTexture)texture);
+                texture = CoreUtil.BuildRotatedTexture(factory, (EightBitTexture)texture);
                 while (y < height - TileSize)
                 {
                     uint? h = y + 2*TileSize > height ? (uint)(height - TileSize - y) : (uint?)null;

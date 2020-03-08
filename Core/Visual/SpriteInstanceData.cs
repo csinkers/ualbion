@@ -73,7 +73,7 @@ namespace UAlbion.Core.Visual
 
             transform = Matrix4x4.CreateTranslation(offset);
 
-            if (flags.HasFlag(SpriteFlags.Floor)) 
+            if ((flags & SpriteFlags.Floor) != 0) 
             {
                 transform *= new Matrix4x4(
                     1, 0, 0, 0,

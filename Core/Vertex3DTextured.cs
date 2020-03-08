@@ -1,9 +1,8 @@
 ﻿using System.Numerics;
-using Veldrid;
 
 namespace UAlbion.Core
 {
-    internal struct Vertex3DTextured
+    public struct Vertex3DTextured
     {
         public float X;
         public float Y;
@@ -21,9 +20,5 @@ namespace UAlbion.Core
         }
 
         public Vertex3DTextured(float x, float y, float z, float u, float v) { X = x; Y = y; Z = z; U = u; V = v; }
-
-        public static VertexLayoutDescription VertexLayout => new VertexLayoutDescription(
-            VertexLayoutHelper.Vector3D("Position"),
-            VertexLayoutHelper.Vector2D("TexCoords"));
     }
 }

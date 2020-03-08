@@ -5,7 +5,6 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Game.Gui;
-using Veldrid;
 
 namespace UAlbion.Game.Entities
 {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -8,10 +7,11 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Assets
 {
-    public class AssetLocator : Component, IDisposable
+    public class AssetLocatorRegistry : Component, IDisposable
     {
-        static readonly IDictionary<AssetType, IAssetLocator> Locators = GetAssetLocators();
-        static readonly IDictionary<Type, IAssetPostProcessor> PostProcessors = GetPostProcessors();
+        readonly IDictionary<AssetType, IAssetLocator> _locators = new Dictionary<AssetType, IAssetLocator>();
+        readonly IDictionary<Type, IAssetPostProcessor> _postProcessors = new Dictionary<Type, IAssetPostProcessor>();
+        /*
         static IDictionary<AssetType, IAssetLocator> GetAssetLocators()
         {
             var dict = new Dictionary<AssetType, IAssetLocator>();
@@ -29,15 +29,39 @@ namespace UAlbion.Game.Assets
                     dict.Add(type, postProcessor);
             return dict;
         }
+        */
 
-        public AssetLocator() : base(null)
+        public AssetLocatorRegistry()
         {
-            PerfTracker.StartupEvent("Building AssetLocator");
+            PerfTracker.StartupEvent("Building AssetLocatorRegistry");
             _standardAssetLocator = new StandardAssetLocator();
             _assetCache = AttachChild(new AssetCache());
-            foreach(var locator in Locators.Values.OfType<IComponent>())
-                AttachChild(locator);
-            PerfTracker.StartupEvent("Built AssetLocator");
+            //foreach(var locator in Locators.Values.OfType<IComponent>())
+            //    AttachChild(locator);
+            PerfTracker.StartupEvent("Built AssetLocatorRegistry");
+        }
+
+        public void AddAssetLocator(IAssetLocator locator)
+        {
+            if (locator is IComponent component)
+                AttachChild(component);
+
+            foreach (var assetType in locator.SupportedTypes)
+            {
+                if (_locators.ContainsKey(assetType))
+                    throw new InvalidOperationException($"A locator is already defined for {assetType}");
+                _locators[assetType] = locator;
+            }
+        }
+
+        public void AddAssetPostProcessor(IAssetPostProcessor postProcessor)
+        {
+            foreach (var type in postProcessor.SupportedTypes)
+            {
+                if(_postProcessors.ContainsKey(type))
+                    throw new InvalidOperationException($"A post-processor is already defined for {type}");
+                _postProcessors[type] = postProcessor;
+            }
         }
 
         readonly AssetCache _assetCache;
@@ -45,7 +69,7 @@ namespace UAlbion.Game.Assets
 
         IAssetLocator GetLocator(AssetType type)
         {
-            if (Locators.TryGetValue(type, out var locator))
+            if (_locators.TryGetValue(type, out var locator))
                 return locator;
             return _standardAssetLocator;
         }
@@ -90,11 +114,12 @@ namespace UAlbion.Game.Assets
         {
             try
             {
+                ICoreFactory factory = Resolve<ICoreFactory>();
                 IAssetLocator locator = GetLocator(key.Type);
                 var asset = locator.LoadAsset(key, name, (x, y) => LoadAssetCached(x.Type, x.Id, x.Language));
 
-                if (asset != null && PostProcessors.TryGetValue(asset.GetType(), out var processor))
-                    asset = processor.Process(name, asset);
+                if (asset != null && _postProcessors.TryGetValue(asset.GetType(), out var processor))
+                    asset = processor.Process(factory, name, asset);
                 return asset;
             }
             catch (Exception e)

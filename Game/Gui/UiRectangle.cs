@@ -4,7 +4,6 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
-using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
@@ -59,8 +58,9 @@ namespace UAlbion.Game.Gui
 
             var window = Resolve<IWindowManager>();
             var sm = Resolve<ISpriteManager>();
+            var commonColors = Resolve<ICommonColors>();
 
-            var key = new SpriteKey(CommonColors.BorderTexture, order, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
+            var key = new SpriteKey(commonColors.BorderTexture, order, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
             if (key != _sprite?.Key)
             {
                 _sprite?.Dispose();
@@ -73,7 +73,7 @@ namespace UAlbion.Game.Gui
                 window.UiToNormRelative(DrawSize),
                 Vector2.Zero,
                 Vector2.One,
-                CommonColors.Palette[_color],
+                commonColors.Palette[_color],
                 SpriteFlags.None);
         }
 

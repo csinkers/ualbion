@@ -122,6 +122,10 @@ namespace UAlbion.Game.Text
                                 sb.Clear();
                                 break;
 
+                            case 'l':
+                                sb.Append(c);
+                                break;
+
                             case 's':
                             case 'd':
                             case 'u':

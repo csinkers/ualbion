@@ -1,14 +1,14 @@
-﻿using Veldrid;
-
-namespace UAlbion.Core.Events
+﻿namespace UAlbion.Core.Events
 {
     public class BackendChangedEvent : EngineEvent
     {
-        public GraphicsDevice GraphicsDevice { get; }
-
-        public BackendChangedEvent(GraphicsDevice graphicsDevice)
+        public BackendChangedEvent(bool isDepthRangeZeroToOne, bool isClipSpaceYInverted)
         {
-            GraphicsDevice = graphicsDevice;
+            IsDepthRangeZeroToOne = isDepthRangeZeroToOne;
+            IsClipSpaceYInverted = isClipSpaceYInverted;
         }
+
+        public bool IsDepthRangeZeroToOne { get; }
+        public bool IsClipSpaceYInverted { get; }
     }
 }

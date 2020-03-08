@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Formats.AssetIds;
 
@@ -14,7 +15,7 @@ namespace UAlbion.Game.Assets
             { FontColor.Gray, new byte[] { 0, 196, 197, 198, 199, 200 } } // DataLiteral
         };
 
-        public static ITexture Load(MetaFontId id, ITexture regular, ITexture bold)
+        public static ITexture Load(ICoreFactory factory, MetaFontId id, ITexture regular, ITexture bold)
         {
             var texture = (EightBitTexture)(id.IsBold ? bold : regular);
             var bytes = (byte[])texture.TextureData.Clone();
@@ -29,7 +30,7 @@ namespace UAlbion.Game.Assets
                 bytes[i] = mapping[bytes[i]];
             }
 
-            return new EightBitTexture(
+            return factory.CreateEightBitTexture(
                 $"Font{id.Color}{(id.IsBold ? "Bold" : "")}",
                 texture.Width, texture.Height,
                 texture.MipLevels, texture.ArrayLayers, 

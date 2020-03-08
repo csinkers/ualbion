@@ -15,7 +15,8 @@ namespace UAlbion.Game
 
         public IPalette Palette { get; private set; }
         public PaletteTexture PaletteTexture { get; private set; }
-        public int PaletteFrame { get; private set; }
+        public int Version { get; private set; }
+        public int Frame { get; private set; }
 
         public PaletteManager() : base(Handlers) { }
 
@@ -27,12 +28,14 @@ namespace UAlbion.Game
 
         void OnTick(int frames)
         {
-            PaletteFrame += frames;
-            while (PaletteFrame >= Palette.GetCompletePalette().Count)
-                PaletteFrame -= Palette.GetCompletePalette().Count;
+            if (!Palette.IsAnimated)
+                return;
 
-            if (Palette.IsAnimated)
-                GeneratePalette();
+            Frame += frames;
+            while (Frame >= Palette.GetCompletePalette().Count)
+                Frame -= Palette.GetCompletePalette().Count;
+
+            GeneratePalette();
         }
 
         void SetPalette(PaletteId paletteId)
@@ -45,15 +48,17 @@ namespace UAlbion.Game
             }
 
             Palette = palette;
-            while (PaletteFrame >= Palette.GetCompletePalette().Count)
-                PaletteFrame -= Palette.GetCompletePalette().Count;
+            while (Frame >= Palette.GetCompletePalette().Count)
+                Frame -= Palette.GetCompletePalette().Count;
 
             GeneratePalette();
         }
 
         void GeneratePalette()
         {
-            PaletteTexture = new PaletteTexture(Palette.Name, Palette.GetPaletteAtTime(PaletteFrame));
+            var factory = Resolve<ICoreFactory>();
+            PaletteTexture = factory.CreatePaletteTexture(Palette.Name, Palette.GetPaletteAtTime(Frame));
+            Version++;
         }
     }
 }

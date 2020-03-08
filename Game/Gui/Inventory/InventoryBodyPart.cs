@@ -1,9 +1,9 @@
 ﻿using System.Numerics;
+using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Entities;
 using UAlbion.Game.State;
-using Veldrid;
 
 namespace UAlbion.Game.Gui.Inventory
 {

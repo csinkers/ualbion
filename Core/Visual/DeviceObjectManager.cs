@@ -47,17 +47,31 @@ namespace UAlbion.Core.Visual
             }
         }
 
-        public T Get<T>((object, object) owner)
+        public T Get<T>((object, object) owner) where T : IDisposable
         {
             lock(_syncRoot)
             {
                 if (_cache.TryGetValue(owner, out var entry))
-                    return (T)entry.Resource;
+                {
+                    entry.LastAccessed = _frame;
+                    return (T) entry.Resource;
+                }
 
-                throw new KeyNotFoundException();
+                return default;
             }
         }
 
+        public void Set<T>((object, object) owner, T newResource) where T : IDisposable
+        {
+            lock (_syncRoot)
+            {
+                if (_cache.TryGetValue(owner, out var entry))
+                    entry.Dispose();
+
+                _cache[owner] = new CacheEntry(newResource) { LastAccessed = _frame };
+            }
+        }
+/*
         public T Prepare<T>((object, object) owner, Func<T> createFunc, Func<T, bool> dirtyFunc) where T : IDisposable
         {
             lock (_syncRoot)
@@ -75,6 +89,7 @@ namespace UAlbion.Core.Visual
                 return newResource;
             }
         }
+        */
 
         public void DestroyDeviceObjects()
         {

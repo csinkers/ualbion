@@ -1,6 +1,6 @@
 ﻿using System;
+using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
-using Veldrid;
 
 namespace UAlbion.Game.Gui.Inventory
 {

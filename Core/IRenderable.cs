@@ -1,5 +1,4 @@
-﻿using System;
-using UAlbion.Api;
+﻿using UAlbion.Api;
 
 namespace UAlbion.Core
 {
@@ -8,6 +7,6 @@ namespace UAlbion.Core
         string Name { get; }
         DrawLayer RenderOrder { get; }
         int PipelineId { get; }
-        Type Renderer { get; }
+        // Type Renderer { get; }
     }
 }

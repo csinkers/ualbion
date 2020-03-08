@@ -1,5 +1,4 @@
 ﻿using System;
-using Veldrid;
 
 namespace UAlbion.Core
 {
@@ -7,30 +6,23 @@ namespace UAlbion.Core
     {
         public string Name { get; }
         public string Hash { get; }
-        public SpecializationConstant[] Specializations { get; }
 
-        public ShaderSetCacheKey(string name, string hash, SpecializationConstant[] specializations) : this()
+        public ShaderSetCacheKey(string name, string hash) : this()
         {
             Name = name;
             Hash = hash;
-            Specializations = specializations;
         }
 
         public bool Equals(ShaderSetCacheKey other)
         {
-            return Name.Equals(other.Name) 
-                   && Hash.Equals(other.Hash)
-                   && ArraysEqual(Specializations, other.Specializations);
+            return Name.Equals(other.Name)
+                   && Hash.Equals(other.Hash);
         }
 
         public override int GetHashCode()
         {
             int hash = Name.GetHashCode();
             hash ^= Hash.GetHashCode();
-            foreach (var specConst in Specializations)
-            {
-                hash ^= specConst.GetHashCode();
-            }
             return hash;
         }
 

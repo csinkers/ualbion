@@ -2,7 +2,6 @@
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core.Events;
-using Veldrid;
 
 namespace UAlbion.Core.Visual
 {
@@ -13,12 +12,12 @@ namespace UAlbion.Core.Visual
             H<Sprite<T>, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; }),
             H<Sprite<T>, HoverEvent>((x, _) =>
             {
-                if (x.Resolve<IEngineSettings>()?.Flags.HasFlag(EngineFlags.HighlightSelection) ?? false)
+                if ((x.Resolve<IEngineSettings>()?.Flags &EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
                     x.Flags |= SpriteFlags.Highlight;
             }),
             H<Sprite<T>, BlurEvent>((x, _) =>
             {
-                if (x.Resolve<IEngineSettings>()?.Flags.HasFlag(EngineFlags.HighlightSelection) ?? false)
+                if ((x.Resolve<IEngineSettings>()?.Flags & EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
                     x.Flags &= ~SpriteFlags.Highlight;
             }),
             H<Sprite<T>, WorldCoordinateSelectEvent>((x, e) => x.Select(e))

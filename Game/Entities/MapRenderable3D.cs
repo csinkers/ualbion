@@ -55,6 +55,7 @@ namespace UAlbion.Game.Entities
                 DrawLayer.Background, 
                 _tileSize,
                 _mapData.Width, _mapData.Height,
+                Resolve<ICoreFactory>(),
                 Resolve<IPaletteManager>());
 
             for(int i = 0; i < _labyrinthData.FloorAndCeilings.Count; i++)

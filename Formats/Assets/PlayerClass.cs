@@ -39,15 +39,15 @@ namespace UAlbion.Formats.Assets
         public static bool IsAllowed(this PlayerClassMask mask, PlayerClass playerClass) =>
             playerClass switch
             {
-                PlayerClass.Pilot => mask.HasFlag(PlayerClassMask.Pilot),
-                PlayerClass.Scientist => mask.HasFlag(PlayerClassMask.Scientist),
-                PlayerClass.IskaiWarrior => mask.HasFlag(PlayerClassMask.IskaiWarrior),
-                PlayerClass.DjiKasMage => mask.HasFlag(PlayerClassMask.DjiKasMage),
-                PlayerClass.Druid => mask.HasFlag(PlayerClassMask.Druid),
-                PlayerClass.EnlightenedOne => mask.HasFlag(PlayerClassMask.EnlightenedOne),
-                PlayerClass.Technician => mask.HasFlag(PlayerClassMask.Technician),
-                PlayerClass.OquloKamulos => mask.HasFlag(PlayerClassMask.OquloKamulos),
-                PlayerClass.Warrior => mask.HasFlag(PlayerClassMask.Warrior),
+                PlayerClass.Pilot          => 0 != (mask & PlayerClassMask.Pilot),
+                PlayerClass.Scientist      => 0 != (mask & PlayerClassMask.Scientist),
+                PlayerClass.IskaiWarrior   => 0 != (mask & PlayerClassMask.IskaiWarrior),
+                PlayerClass.DjiKasMage     => 0 != (mask & PlayerClassMask.DjiKasMage),
+                PlayerClass.Druid          => 0 != (mask & PlayerClassMask.Druid),
+                PlayerClass.EnlightenedOne => 0 != (mask & PlayerClassMask.EnlightenedOne),
+                PlayerClass.Technician     => 0 != (mask & PlayerClassMask.Technician),
+                PlayerClass.OquloKamulos   => 0 != (mask & PlayerClassMask.OquloKamulos),
+                PlayerClass.Warrior        => 0 != (mask & PlayerClassMask.Warrior),
                 _ => false
             };
     }

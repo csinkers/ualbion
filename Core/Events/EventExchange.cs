@@ -22,6 +22,7 @@ namespace UAlbion.Core.Events
         readonly ThreadLocal<bool> _isTopLevel = new ThreadLocal<bool>(() => true);
         readonly EventExchange _parent;
         readonly IList<EventExchange> _children = new List<EventExchange>();
+        readonly Stack<HashSet<EventExchange>> _collectLists = new Stack<HashSet<EventExchange>>();
         readonly Stack<HashSet<IComponent>> _dispatchLists = new Stack<HashSet<IComponent>>();
         readonly Queue<(IEvent, object)> _queuedEvents = new Queue<(IEvent, object)>();
 
@@ -143,8 +144,9 @@ namespace UAlbion.Core.Events
             if(includeParent)
                 _parent?.CollectExchanges(exchanges);
 
-            foreach (var childExchange in _children)
-                childExchange.CollectExchanges(exchanges, includeParent);
+            // Hot path: don't use foreach so we avoid allocating an enumerator
+            for (int i = 0; i < _children.Count; i++) 
+                _children[i].CollectExchanges(exchanges, includeParent);
         }
 
         public void Raise(IEvent e, object sender, bool includeParent = true)
@@ -178,13 +180,15 @@ namespace UAlbion.Core.Events
                 else CoreTrace.Log.StartRaise(eventId, _nesting, e.GetType().Name, eventText, Name);
             }
 
-            var exchanges = new HashSet<EventExchange>();
-            HashSet<IComponent> subscribers;
+            if (!_collectLists.TryPop(out var exchanges))
+                exchanges = new HashSet<EventExchange>();
+
+            if (!_dispatchLists.TryPop(out var subscribers))
+                    subscribers = new HashSet<IComponent>();
+
             lock (SyncRoot)
             {
                 CollectExchanges(exchanges, includeParent);
-                if (!_dispatchLists.TryPop(out subscribers))
-                    subscribers = new HashSet<IComponent>();
             }
 
             foreach (var exchange in exchanges)
@@ -205,8 +209,9 @@ namespace UAlbion.Core.Events
             }
 
             subscribers.Clear();
-            lock (SyncRoot)
-                _dispatchLists.Push(subscribers);
+            exchanges.Clear();
+            _dispatchLists.Push(subscribers);
+            _collectLists.Push(exchanges);
 
             if (!verbose)
                 Interlocked.Decrement(ref _nesting);

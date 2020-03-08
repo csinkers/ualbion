@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Api;
+using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
-using Veldrid;
 
 namespace UAlbion.Game.Gui
 {

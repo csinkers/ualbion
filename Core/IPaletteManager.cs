@@ -7,6 +7,7 @@ namespace UAlbion.Core
     {
         IPalette Palette { get; }
         PaletteTexture PaletteTexture { get; }
-        int PaletteFrame { get; }
+        int Version { get; }
+        int Frame { get; }
     }
 }

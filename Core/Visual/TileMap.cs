@@ -35,15 +35,15 @@ namespace UAlbion.Core.Visual
             public override string ToString() => $"({TilePosition.X}, {TilePosition.Y}): {Floor}.{Ceiling}.{Wall} ({Flags})";
         }
 
-        public TileMap(string name, DrawLayer renderOrder, Vector3 tileSize, uint width, uint height, IPaletteManager paletteManager)
+        public TileMap(string name, DrawLayer renderOrder, Vector3 tileSize, uint width, uint height, ICoreFactory factory, IPaletteManager paletteManager)
         {
             RenderOrder = renderOrder;
             TileSize = tileSize;
             Width = width;
             Height = height;
             Tiles = new Tile[width * height];
-            Floors = new MultiTexture("FloorTiles:" + name, paletteManager);
-            Walls = new MultiTexture("WallTiles:" + name, paletteManager);
+            Floors = factory.CreateMultiTexture("FloorTiles:" + name, paletteManager);
+            Walls = factory.CreateMultiTexture("WallTiles:" + name, paletteManager);
         }
 
         public string Name { get; set; }
@@ -51,7 +51,7 @@ namespace UAlbion.Core.Visual
         public int PipelineId => 1;
         public Vector3 Position { get; set; }
         public Vector3 TileSize { get; }
-        public Type Renderer => typeof(ExtrudedTileMapRenderer);
+        // public Type Renderer => typeof(ExtrudedTileMapRenderer);
 
         public Tile[] Tiles { get; }
         public ISet<int> AnimatedTiles { get; } = new HashSet<int>();

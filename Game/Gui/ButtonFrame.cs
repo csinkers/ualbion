@@ -5,7 +5,6 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
-using Veldrid;
 
 namespace UAlbion.Game.Gui
 {
@@ -66,9 +65,10 @@ namespace UAlbion.Game.Gui
 
             var window = Resolve<IWindowManager>();
             var sm = Resolve<ISpriteManager>();
+            var commonColors = Resolve<ICommonColors>();
             var colors = _theme.GetColors(_state);
 
-            uint? C(CommonColor? color) => color.HasValue ? CommonColors.Palette[color.Value] : (uint?)null;
+            uint? C(CommonColor? color) => color.HasValue ? commonColors.Palette[color.Value] : (uint?)null;
             uint? topLeft = C(colors.TopLeft);
             uint? bottomRight = C(colors.BottomRight);
             uint? corners = C(colors.Corners);
@@ -83,7 +83,7 @@ namespace UAlbion.Game.Gui
             {
                 _sprite?.Dispose();
 
-                var key = new SpriteKey(CommonColors.BorderTexture, order, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
+                var key = new SpriteKey(commonColors.BorderTexture, order, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
                 _sprite = sm.Borrow(key, instanceCount, this);
             }
 

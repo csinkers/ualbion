@@ -2,7 +2,6 @@
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core.Textures;
-using Veldrid;
 
 namespace UAlbion.Core
 {
@@ -64,38 +63,31 @@ namespace UAlbion.Core
             return result;
         }
 
-        public static float[] GetFullScreenQuadVerts(GraphicsDevice gd)
-        {
-            if (gd.IsClipSpaceYInverted)
-            {
-                return new float[]
+        public static float[] GetFullScreenQuadVerts(bool isClipSpaceYInverted) =>
+            isClipSpaceYInverted
+                ? new float[]
                 {
-                        -1, -1, 0, 0,
-                        1, -1, 1, 0,
-                        1, 1, 1, 1,
-                        -1, 1, 0, 1
-                };
-            }
-            else
-            {
-                return new float[]
+                    -1, -1, 0, 0,
+                    1, -1, 1, 0,
+                    1, 1, 1, 1,
+                    -1, 1, 0, 1
+                }
+                : new float[]
                 {
-                        -1, 1, 0, 0,
-                        1, 1, 1, 0,
-                        1, -1, 1, 1,
-                        -1, -1, 0, 1
+                    -1, 1, 0, 0,
+                    1, 1, 1, 0,
+                    1, -1, 1, 1,
+                    -1, -1, 0, 1
                 };
-            }
-        }
 
-        public static ITexture BuildRotatedTexture(EightBitTexture texture)
+        public static ITexture BuildRotatedTexture(ICoreFactory factory, EightBitTexture texture)
         {
             var rotatedPixels = new byte[texture.Width * texture.Height];
             ApiUtil.RotateImage((int)texture.Width, (int)texture.Height, 
                new Span<byte>(texture.TextureData),
                new Span<byte>(rotatedPixels));
 
-            return new EightBitTexture(
+            return factory.CreateEightBitTexture(
                 texture.Name + "Rotated",
                 texture.Height, texture.Width,
                 texture.MipLevels, texture.ArrayLayers,

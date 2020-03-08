@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UAlbion.Core.Textures;
+using UAlbion.Core.Veldrid;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
@@ -21,12 +21,13 @@ namespace UAlbion
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
             // Dump all core sprites
+            var factory = new VeldridCoreFactory();
             var palette = assets.LoadPalette(PaletteId.Inventory);
             for (int i = 0; i < 86; i++)
             {
                 var name = $"{i}_{(CoreSpriteId)i}";
                 var coreSprite = assets.LoadTexture((CoreSpriteId)i);
-                var multiTexture = new MultiTexture(name, new DummyPaletteManager(palette));
+                var multiTexture = factory.CreateMultiTexture(name, new DummyPaletteManager(palette));
                 multiTexture.AddTexture(1, coreSprite, 0, 0, null, false);
                 multiTexture.SavePng(1, 0, $@"{dir}\{name}.bmp");
             }

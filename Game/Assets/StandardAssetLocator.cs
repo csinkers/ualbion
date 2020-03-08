@@ -26,13 +26,13 @@ namespace UAlbion.Game.Assets
             { AssetType.Script,             (AssetLocation.Base,      "SCRIPT!.XLD" ) }, // Scripted sequences of events for narrative sequences etc
             { AssetType.Picture,            (AssetLocation.Base,      "PICTURE!.XLD") }, // Full screen graphics for various special events, menu backgrounds etc (in the obscure ILBM / interlaced bitmap format from IBM)
             { AssetType.TransparencyTables, (AssetLocation.Base,      "TRANSTB!.XLD") }, // 
-            { AssetType.CoreGraphics,       (AssetLocation.MainExe,   "MAIN.EXE") }, // Various UI graphics that get loaded directly from the original game executable
-            { AssetType.CoreGraphicsMetadata, (AssetLocation.MainExe, "MAIN.EXE") },
+            // { AssetType.CoreGraphics,       (AssetLocation.MainExe,   "MAIN.EXE") }, // Various UI graphics that get loaded directly from the original game executable
+            // { AssetType.CoreGraphicsMetadata, (AssetLocation.MainExe, "MAIN.EXE") },
             // { AssetType.Unnamed2,        (AssetLocation.Base,      ""            ) },
 
             // Text
             { AssetType.Font,       (AssetLocation.Base,              "FONTS!.XLD"  ) }, // Fonts (raw, 8 wide. 00 = normal, 01 = bold)
-            { AssetType.MetaFont,   (AssetLocation.Meta,              null          ) }, // Generated from a Font, with colours changed appropriately
+            // { AssetType.MetaFont,   (AssetLocation.Meta,              null          ) }, // Generated from a Font, with colours changed appropriately
             { AssetType.SystemText, (AssetLocation.LocalisedRaw,      "SYSTEXTS"    ) }, // Core game strings for things like menus etc
             { AssetType.EventText,  (AssetLocation.Localised,         "EVNTTXT!.XLD") }, // Text to show for various gameplay events
             { AssetType.MapText,    (AssetLocation.Localised,         "MAPTEXT!.XLD") }, // Map-specific text
@@ -77,6 +77,7 @@ namespace UAlbion.Game.Assets
             { AssetType.SpellData,          (AssetLocation.Base,      "SPELLDAT.DAT") }, // Spell definitions & statistics
         };
         // ReSharper restore StringLiteralTypo
+
 
         class AssetPaths
         {
@@ -191,6 +192,7 @@ namespace UAlbion.Game.Assets
             }
         }
 
+        public IEnumerable<AssetType> SupportedTypes => _assetFiles.Keys;
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)
         {
             var basicAssetConfig = (IAssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig), "AssetConfig");

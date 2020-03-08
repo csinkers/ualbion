@@ -2,6 +2,7 @@
 {
     public interface IEngine
     {
+        ICoreFactory Factory { get; }
         string FrameTimeText { get; }
     }
 }

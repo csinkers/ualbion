@@ -1,21 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api;
-using Veldrid;
 
 namespace UAlbion.Core.Textures
 {
-    public class MultiTexture : ITexture
+    public abstract class MultiTexture : ITexture
     {
-        readonly IPaletteManager _paletteManager;
+        protected readonly IPaletteManager _paletteManager;
 
-        class SubImageComponent
+        protected class SubImageComponent
         {
             public ITexture Source { get; set; }
             public uint X { get; set; }
@@ -25,7 +21,7 @@ namespace UAlbion.Core.Textures
             public override string ToString() => $"({X}, {Y}) {Source}";
         }
 
-        class LogicalSubImage
+        protected class LogicalSubImage
         {
             public LogicalSubImage(int id) { Id = id; }
 
@@ -41,7 +37,7 @@ namespace UAlbion.Core.Textures
             public override string ToString() => $"LSI{Id} {W}x{H}:{Frames}{(IsPaletteAnimated ? "P":" ")} {string.Join("; ",  Components.Select(x => x.ToString()))}";
         }
 
-        struct LayerKey : IEquatable<LayerKey>
+        protected struct LayerKey : IEquatable<LayerKey>
         {
             public LayerKey(int id, int frame)
             {
@@ -58,12 +54,12 @@ namespace UAlbion.Core.Textures
             public override string ToString() => $"LK{Id}.{Frame}";
         }
 
-        readonly IList<LogicalSubImage> _logicalSubImages = new List<LogicalSubImage>();
-        readonly IDictionary<LayerKey, int> _layerLookup = new Dictionary<LayerKey, int>();
-        readonly IList<Vector2> _layerSizes = new List<Vector2>();
-        bool _isMetadataDirty = true;
+        protected readonly IList<LogicalSubImage> _logicalSubImages = new List<LogicalSubImage>();
+        protected readonly IDictionary<LayerKey, int> _layerLookup = new Dictionary<LayerKey, int>();
+        protected readonly IList<Vector2> _layerSizes = new List<Vector2>();
+        protected bool _isMetadataDirty = true;
         bool _isAnySubImagePaletteAnimated = false;
-        int _lastPaletteFrame;
+        int _lastPaletteVersion;
         int _lastPaletteId;
         bool _isDirty;
 
@@ -77,9 +73,8 @@ namespace UAlbion.Core.Textures
             _logicalSubImages.Add(new LogicalSubImage(0) { W = 1, H = 1, Frames = 1, IsPaletteAnimated = false });
         }
 
+        public abstract uint FormatSize { get; }
         public string Name { get; }
-        public PixelFormat Format => PixelFormat.R8_G8_B8_A8_UNorm;
-        public TextureType Type => TextureType.Texture2D;
         public uint Width { get; private set; }
         public uint Height { get; private set; }
         public uint Depth => 1;
@@ -91,20 +86,21 @@ namespace UAlbion.Core.Textures
         {
             get
             {
-                var frame = _paletteManager.PaletteFrame;
-                if ((_isAnySubImagePaletteAnimated && frame != _lastPaletteFrame) || _paletteManager.Palette.Id != _lastPaletteId)
+                var version = _paletteManager.Version;
+                if ((_isAnySubImagePaletteAnimated && version != _lastPaletteVersion) || _paletteManager.Palette.Id != _lastPaletteId)
                 {
-                    _lastPaletteFrame = frame;
+                    _lastPaletteVersion = version;
                     _lastPaletteId = _paletteManager.Palette.Id;
                     return true;
                 }
 
                 return _isDirty;
             }
-            private set => _isDirty = value;
+            protected set => _isDirty = value;
         }
 
-        public int SizeInBytes => (int)(Width * Height * _layerSizes.Count * sizeof(uint));
+        public int SizeInBytes => (int)(Width * Height * _layerSizes.Count * FormatSize);
+
         public bool IsAnimated(int logicalId)
         {
             if(_isMetadataDirty)
@@ -141,21 +137,7 @@ namespace UAlbion.Core.Textures
             layer = (uint)subImage;
         }
 
-        [DllImport("Kernel32.dll", EntryPoint = "RtlZeroMemory", SetLastError = false)]
-        static extern void ZeroMemory(IntPtr dest, IntPtr size);
-
-        unsafe void MemsetZero(byte* buffer, int size)
-        {
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                ZeroMemory((IntPtr)buffer, (IntPtr)size);
-            }
-            else
-                for (int i = 0; i < size; i++)
-                    *(buffer + i) = 0;
-        }
-
-        void RebuildLayers()
+        protected void RebuildLayers()
         {
             _isAnySubImagePaletteAnimated = false;
             _isMetadataDirty = false;
@@ -240,17 +222,6 @@ namespace UAlbion.Core.Textures
             _isMetadataDirty = true;
         }
 
-        uint GetFormatSize(PixelFormat format)
-        {
-            switch (format)
-            {
-                case PixelFormat.R8_G8_B8_A8_UNorm: return 4;
-                case PixelFormat.R8_UNorm: return 1;
-                case PixelFormat.R8_UInt: return 1;
-                default: throw new NotImplementedException();
-            }
-        }
-
         static uint GetDimension(uint largestLevelDimension, uint mipLevel)
         {
             uint ret = largestLevelDimension;
@@ -260,66 +231,7 @@ namespace UAlbion.Core.Textures
             return Math.Max(1, ret);
         }
 
-        public Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
-        {
-            using var _ = PerfTracker.FrameEvent("6.1.2.1 Rebuild MultiTextures");
-            if(_isMetadataDirty)
-                RebuildLayers();
-
-            var palette = _paletteManager.Palette.GetCompletePalette();
-            using var staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, TextureUsage.Staging, Type));
-            staging.Name = "T_" + Name + "_Staging";
-
-            unsafe
-            {
-                uint* toBuffer = stackalloc uint[(int)(Width * Height)];
-                foreach (var lsi in _logicalSubImages)
-                {
-                    //if (!rebuildAll && !lsi.IsPaletteAnimated) // TODO: Requires caching a single Texture and then modifying it
-                    //    continue;
-
-                    for (int i = 0; i < lsi.Frames; i++)
-                    {
-                        if(lsi.IsAlphaTested)
-                            MemsetZero((byte*)toBuffer, (int)(Width * Height * sizeof(uint)));
-                        else
-                        {
-                            for (int j = 0; j < Width * Height; j++)
-                                toBuffer[j] = 0xff000000;
-                        }
-
-                        BuildFrame(lsi, i, toBuffer, palette);
-
-                        uint destinationLayer = (uint)_layerLookup[new LayerKey(lsi.Id, i)];
-                        gd.UpdateTexture(
-                            staging, (IntPtr)toBuffer, Width * Height * sizeof(uint),
-                            0, 0, 0, Width, Height, 1,
-                            0, destinationLayer);
-                    }
-                }
-            }
-
-            /* TODO: Mipmap
-                for (uint level = 1; level < MipLevels; level++)
-                {
-                } //*/
-
-            var texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, usage, Type));
-            texture.Name = "T_" + Name;
-
-            using (CommandList cl = rf.CreateCommandList())
-            {
-                cl.Begin();
-                cl.CopyTexture(staging, texture);
-                cl.End();
-                gd.SubmitCommands(cl);
-            }
-
-            IsDirty = false;
-            return texture;
-        }
-
-        unsafe void BuildFrame(LogicalSubImage lsi, int frameNumber, uint* toBuffer, IList<uint[]> palette)
+        protected unsafe void BuildFrame(LogicalSubImage lsi, int frameNumber, uint* toBuffer, IList<uint[]> palette)
         {
             foreach (var component in lsi.Components)
             {
@@ -349,38 +261,12 @@ namespace UAlbion.Core.Textures
                         toBuffer + (int)(component.Y * Width + component.X),
                         sourceStride,
                         (int)Width,
-                        palette[_paletteManager.PaletteFrame],
+                        palette[_paletteManager.Frame],
                         lsi.TransparentColor);
                 }
             }
         }
 
-        public void SavePng(int logicalId, int tick, string path)
-        {
-            if(_isMetadataDirty)
-                RebuildLayers();
-
-            var palette = _paletteManager.Palette.GetCompletePalette();
-            var logicalImage = _logicalSubImages[logicalId];
-            if (!_layerLookup.TryGetValue(new LayerKey(logicalId, tick % logicalImage.Frames), out var subImageId))
-                return;
-
-            var size = _layerSizes[subImageId];
-            int width = (int)size.X;
-            int height = (int)size.Y;
-            Rgba32[] pixels = new Rgba32[width * height];
-
-            unsafe
-            {
-                fixed (Rgba32* toBuffer = &pixels[0])
-                    BuildFrame(logicalImage, tick, (uint*)toBuffer, palette);
-            }
-
-            Image<Rgba32> image = new Image<Rgba32>(width, height);
-            image.Frames.AddFrame(pixels);
-            image.Frames.RemoveFrame(0);
-            using var stream = File.OpenWrite(path);
-            image.SaveAsBmp(stream);
-        }
+        public abstract void SavePng(int logicalId, int tick, string path);
     }
 }

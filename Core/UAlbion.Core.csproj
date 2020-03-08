@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>8</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
@@ -22,32 +22,6 @@
     <EmbeddedResource Include="Visual\Shaders\*.frag" />
     <EmbeddedResource Include="Visual\Shaders\*.vert" />
     <EmbeddedResource Include="Visual\Shaders\*.glsl" />
-  </ItemGroup>
-
-  <ItemGroup Condition="!Exists('..\veldrid\')">
-    <PackageReference Include="Veldrid" Version="4.7.0" />
-    <PackageReference Include="Veldrid.ImageSharp" Version="4.7.0" />
-    <PackageReference Include="Veldrid.ImGui" Version="5.72.0" />
-    <PackageReference Include="Veldrid.RenderDoc" Version="1.0.0" />
-    <PackageReference Include="Veldrid.Sdl2" Version="4.7.0" />
-    <PackageReference Include="Veldrid.StartupUtilities" Version="4.7.0" />
-    <PackageReference Include="Veldrid.Utilities" Version="4.7.0" />
-  </ItemGroup>
-  <ItemGroup Condition="Exists('..\veldrid\')">
-    <ProjectReference Include="..\veldrid\src\Veldrid.ImageSharp\Veldrid.ImageSharp.csproj" />
-    <ProjectReference Include="..\veldrid\src\Veldrid.ImGui\Veldrid.ImGui.csproj" />
-    <ProjectReference Include="..\veldrid\src\Veldrid.OpenGLBindings\Veldrid.OpenGLBindings.csproj" />
-    <ProjectReference Include="..\veldrid\src\Veldrid.RenderDoc\Veldrid.RenderDoc.csproj" />
-    <ProjectReference Include="..\veldrid\src\Veldrid.SDL2\Veldrid.SDL2.csproj" />
-    <ProjectReference Include="..\veldrid\src\Veldrid.StartupUtilities\Veldrid.StartupUtilities.csproj" />
-    <ProjectReference Include="..\veldrid\src\Veldrid.Utilities\Veldrid.Utilities.csproj" />
-    <ProjectReference Include="..\veldrid\src\Veldrid\Veldrid.csproj" />
-  </ItemGroup>
-  <ItemGroup Condition="!Exists('..\veldrid-spirv\')">
-    <PackageReference Include="Veldrid.SPIRV" Version="1.0.13" />
-  </ItemGroup>
-  <ItemGroup Condition="Exists('..\veldrid-spirv\')">
-    <ProjectReference Include="..\veldrid-spirv\src\Veldrid.SPIRV\Veldrid.SPIRV.csproj" />
   </ItemGroup>
 
   <ItemGroup>

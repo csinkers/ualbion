@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Formats.AssetIds;
@@ -24,7 +25,7 @@ namespace UAlbion.Game.Gui
                 1, 1, 1, (uint) Palette.Count,
                 Palette.OrderBy(x => x.Value).Select(x => (byte) x.Key).ToArray(),
                 Palette.OrderBy(x => x.Value)
-                    .Select(x => new EightBitTexture.SubImage(0, 0, 1, 1, x.Value))
+                    .Select(x => new SubImage(Vector2.Zero, Vector2.One, Vector2.One, x.Value))
                     .ToArray());
         }
     }

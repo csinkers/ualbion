@@ -7,7 +7,6 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
-using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 
@@ -17,11 +16,12 @@ namespace UAlbion.Game.Entities.Map2D
     {
         const int TicksPerFrame = 10;
         static readonly SpriteInstanceData BlankInstance = SpriteInstanceData.TopMid(
-            Vector3.Zero, Vector2.Zero, 
-            Vector2.Zero, Vector2.Zero, 0, 0);
+            Vector3.Zero, Vector2.Zero,
+            new SubImage(Vector2.Zero, Vector2.Zero, Vector2.Zero, 0),
+            0);
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<TileLayer, UpdateEvent>((x, e) => x.Update()),
+            H<TileLayer, RenderEvent>((x, e) => x.Render()),
             H<TileLayer, ExchangeDisabledEvent>((x, _) =>
             {
                 x._lease?.Dispose();
@@ -72,39 +72,22 @@ namespace UAlbion.Game.Entities.Map2D
             }
         }
 
-        public override void Subscribed()
-        {
-            Update();
-            base.Subscribed();
-        }
-
         SpriteInstanceData BuildInstanceData(int i, int j, TilesetData.TileData tile, int tickCount)
         {
             if (tile == null || (tile.Flags & TilesetData.TileFlags.Debug) != 0)
                 return BlankInstance;
 
             int index = _logicalMap.Index(i, j);
-            int subImage = tile.GetSubImageForTile(tickCount);
+            int subImageId = tile.GetSubImageForTile(tickCount);
 
-            _tileset.GetSubImageDetails(
-                subImage,
-                out var tileSize,
-                out var texPosition,
-                out var texSize,
-                out var layer);
+            var subImage = _tileset.GetSubImageDetails(subImageId);
 
             DrawLayer drawLayer = tile.Layer.ToDrawLayer();
             var position = new Vector3(
-                new Vector2(i, j) * tileSize,
+                new Vector2(i, j) * subImage.Size,
                 drawLayer.ToZCoordinate(j));
 
-            var instance = SpriteInstanceData.TopLeft(
-                    position,
-                    tileSize,
-                    texPosition,
-                    texSize,
-                    layer,
-                    0);
+            var instance = SpriteInstanceData.TopLeft(position, subImage.Size, subImage, 0);
 
             var zone = _logicalMap.GetZone(index);
             int eventNum = zone?.EventNumber ?? -1;
@@ -125,7 +108,7 @@ namespace UAlbion.Game.Entities.Map2D
             return instance;
         }
 
-        void Update()
+        void Render()
         {
             var frameCount =  (Resolve<IGameState>()?.TickCount ?? 0) / TicksPerFrame;
 #if DEBUG

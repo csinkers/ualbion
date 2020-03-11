@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Formats.Assets;
@@ -13,7 +14,7 @@ namespace UAlbion.Game.Assets
         public object Process(ICoreFactory factory, string name, object asset)
         {
             var sprite = (AlbionSprite)asset;
-            EightBitTexture.SubImage[] subImages;
+            SubImage[] subImages;
             byte[] pixelData;
 
             if (sprite.UniformFrames && sprite.Frames.Count >= 256)
@@ -23,7 +24,7 @@ namespace UAlbion.Game.Assets
                 int tileHeight = sprite.Height / sprite.Frames.Count;
                 var (width, height) = GetAtlasSize(tileWidth, tileHeight, sprite.Frames.Count);
                 pixelData = new byte[width * height];
-                subImages = new EightBitTexture.SubImage[sprite.Frames.Count];
+                subImages = new SubImage[sprite.Frames.Count];
 
                 int curX = 0;
                 int curY = 0;
@@ -41,7 +42,12 @@ namespace UAlbion.Game.Assets
                         }
                     }
 
-                    subImages[n] = new EightBitTexture.SubImage((uint)curX, (uint)curY, (uint)tileWidth, (uint)tileHeight, 0);
+                    subImages[n] = new SubImage(
+                        new Vector2(curX, curY),
+                        new Vector2(tileWidth, tileHeight),
+                        new Vector2(width, height),
+                        0);
+
                     curX += tileWidth;
                     if (curX + tileWidth > width)
                     {
@@ -81,7 +87,11 @@ namespace UAlbion.Game.Assets
             {
                 pixelData = sprite.PixelData;
                 subImages = sprite.Frames
-                    .Select(x => new EightBitTexture.SubImage((uint)x.X, (uint)x.Y, (uint)x.Width, (uint)x.Height, 0))
+                    .Select(x => new SubImage(
+                        new Vector2(x.X, x.Y), 
+                        new Vector2(x.Width, x.Height), 
+                        new Vector2(sprite.Width, sprite.Height),
+                        0))
                     .ToArray();
 
                 return factory.CreateEightBitTexture(

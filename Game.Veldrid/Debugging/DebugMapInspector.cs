@@ -27,16 +27,6 @@ namespace UAlbion.Game.Veldrid.Debugging
             {
                 x._hits = e.Selections;
                 x._mousePosition = e.MousePosition;
-            }),
-            H<DebugMapInspector, SetTextureOffsetEvent>((x, e) =>
-            {
-                EightBitTexture.OffsetX = e.X;
-                EightBitTexture.OffsetY = e.Y;
-            }),
-            H<DebugMapInspector, SetTextureScaleEvent>((x, e) =>
-            {
-                EightBitTexture.ScaleAdjustX = e.X;
-                EightBitTexture.ScaleAdjustY = e.Y;
             }));
 
         readonly IDictionary<Type, Func<DebugInspectorAction, Reflector.ReflectedObject, object>> _behaviours =

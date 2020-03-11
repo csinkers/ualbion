@@ -3,6 +3,7 @@ using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 
@@ -91,22 +92,21 @@ namespace UAlbion.Game.Gui
             var position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);
             var flags = SpriteFlags.None.SetOpacity(colors.Alpha);
 
+            SubImage BuildSubImage(uint layer) =>
+                new SubImage(Vector2.Zero, Vector2.One, Vector2.One, layer);
+
             int curInstance = 0;
             if (topLeft.HasValue)
             {
                 instances[curInstance] = SpriteInstanceData.TopLeft( // Top
                     position,
                     window.UiToNormRelative(new Vector2(extents.Width - 1, 1)),
-                    Vector2.Zero,
-                    Vector2.One,
-                    topLeft.Value,
+                    BuildSubImage(topLeft.Value),
                     flags);
                 instances[curInstance + 1] = SpriteInstanceData.TopLeft( // Left
                     position + new Vector3(window.UiToNormRelative(new Vector2(0, 1)), 0),
                     window.UiToNormRelative(new Vector2(1, extents.Height - 2)),
-                    Vector2.Zero,
-                    Vector2.One,
-                    topLeft.Value,
+                    BuildSubImage(topLeft.Value),
                     flags);
                 curInstance += 2;
             }
@@ -116,16 +116,12 @@ namespace UAlbion.Game.Gui
                 instances[curInstance] = SpriteInstanceData.TopLeft( // Bottom
                     position + new Vector3(window.UiToNormRelative(new Vector2(1, extents.Height - 1)), 0),
                     window.UiToNormRelative(new Vector2(extents.Width - 1, 1)),
-                    Vector2.Zero,
-                    Vector2.One,
-                    bottomRight.Value,
+                    BuildSubImage(bottomRight.Value),
                     flags);
                 instances[curInstance + 1] = SpriteInstanceData.TopLeft( // Right
                     position + new Vector3(window.UiToNormRelative(new Vector2(extents.Width - 1, 1)), 0),
                     window.UiToNormRelative(new Vector2(1, extents.Height - 2)),
-                    Vector2.Zero,
-                    Vector2.One,
-                    bottomRight.Value,
+                    BuildSubImage(bottomRight.Value),
                     flags);
                 curInstance += 2;
             }
@@ -135,16 +131,12 @@ namespace UAlbion.Game.Gui
                 instances[curInstance] = SpriteInstanceData.TopLeft( // Bottom Left Corner
                     position + new Vector3(window.UiToNormRelative(new Vector2(0, extents.Height - 1)), 0),
                     window.UiToNormRelative(Vector2.One),
-                    Vector2.Zero,
-                    Vector2.One,
-                    corners.Value,
+                    BuildSubImage(corners.Value),
                     flags);
                 instances[curInstance + 1] = SpriteInstanceData.TopLeft( // Top Right Corner
                     position + new Vector3(window.UiToNormRelative(new Vector2(extents.Width - 1, 0)), 0),
                     window.UiToNormRelative(Vector2.One),
-                    Vector2.Zero,
-                    Vector2.One,
-                    corners.Value,
+                    BuildSubImage(corners.Value),
                     flags);
                 curInstance += 2;
             }
@@ -154,9 +146,7 @@ namespace UAlbion.Game.Gui
                 instances[curInstance] = SpriteInstanceData.TopLeft( // Background
                     position + new Vector3(window.UiToNormRelative(new Vector2(1, 1)), 0),
                     window.UiToNormRelative(new Vector2(extents.Width - 2, extents.Height - 2)),
-                    Vector2.Zero,
-                    Vector2.One,
-                    background.Value,
+                    BuildSubImage(background.Value),
                     flags.SetOpacity(colors.Alpha < 1.0f ? colors.Alpha / 2 : colors.Alpha));
             }
         }

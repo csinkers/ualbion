@@ -183,14 +183,14 @@ namespace UAlbion.Game.Veldrid.Input
                 _itemSprite = sm.Borrow(key, 1, this);
             }
 
-            texture.GetSubImageDetails(subItem, out var size, out var to, out var ts, out var tl);
+            var subImage = texture.GetSubImageDetails(subItem);
 
             // TODO: Quantity text
             var instances = _itemSprite.Access();
             instances[0] = SpriteInstanceData.TopMid(
                 normPosition + new Vector3(window.UiToNormRelative(new Vector2(6, 6)), 0),
-                window.UiToNormRelative(size),
-                to, ts, tl, 0);
+                window.UiToNormRelative(subImage.Size),
+                subImage, 0);
         }
     }
 }

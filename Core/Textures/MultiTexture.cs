@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Runtime.InteropServices;
 using UAlbion.Api;
 
 namespace UAlbion.Core.Textures
@@ -126,15 +125,17 @@ namespace UAlbion.Core.Textures
             return 0;
         }
 
-        public void GetSubImageDetails(int subImage, out Vector2 size, out Vector2 texOffset, out Vector2 texSize, out uint layer)
+        public SubImage GetSubImageDetails(int subImageId)
         {
             if(_isMetadataDirty)
                 RebuildLayers();
 
-            size = _layerSizes[subImage];
-            texOffset = Vector2.Zero;
-            texSize = size / new Vector2(Width, Height);
-            layer = (uint)subImage;
+            var size = _layerSizes[subImageId];
+            return new SubImage(
+                Vector2.Zero,
+                size,
+                new Vector2(Width, Height),
+                (uint)subImageId);
         }
 
         protected void RebuildLayers()
@@ -162,7 +163,7 @@ namespace UAlbion.Core.Textures
                 {
                     if (component.Source == null)
                         continue;
-                    component.Source.GetSubImageDetails(0, out var size, out _, out _, out _);
+                    var size = component.Source.GetSubImageDetails(0).Size;
                     if (component.W.HasValue) size.X = component.W.Value;
                     if (component.H.HasValue) size.Y = component.H.Value;
 

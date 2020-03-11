@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using System.Runtime.CompilerServices;
+using UAlbion.Core.Textures;
 using Matrix4x4 = System.Numerics.Matrix4x4;
 
 namespace UAlbion.Core.Visual
@@ -32,7 +33,7 @@ namespace UAlbion.Core.Visual
             Transform4.X, Transform4.Y, Transform4.Z, 1);
 
         // Main constructor
-        SpriteInstanceData(Vector3 position, Vector2 size, Vector2 texPosition, Vector2 texSize, uint texLayer, SpriteFlags flags)
+        SpriteInstanceData(Vector3 position, Vector2 size, SubImage subImage, SpriteFlags flags)
         {
             BuildTransform(position, size, flags, out Matrix4x4 transform);
 
@@ -42,9 +43,9 @@ namespace UAlbion.Core.Visual
             Transform4 = new Vector3(transform.M41, transform.M42, transform.M43);
             // Assume right column is always 0,0,0,1
 
-            TexPosition = texPosition;
-            TexSize = texSize;
-            TexLayer = texLayer;
+            TexPosition = subImage.TexOffset;
+            TexSize = subImage.TexSize;
+            TexLayer = subImage.Layer;
             Flags = flags;
         }
 
@@ -87,49 +88,49 @@ namespace UAlbion.Core.Visual
         }
 
         // Convenience constructors
-        public static SpriteInstanceData CopyFlags(Vector3 position, Vector2 size, Vector2 texPosition, Vector2 texSize, uint texLayer, SpriteFlags flags) => new SpriteInstanceData(position, size, texPosition, texSize, texLayer, flags);
-        public static SpriteInstanceData TopLeft(Vector3 position, Vector2 size, Vector2 texPosition, Vector2 texSize, uint texLayer, SpriteFlags flags) => new SpriteInstanceData(position, size, texPosition, texSize, texLayer, flags | SpriteFlags.LeftAligned);
-        public static SpriteInstanceData MidLeft(Vector3 position, Vector2 size, Vector2 texPosition, Vector2 texSize, uint texLayer, SpriteFlags flags) => new SpriteInstanceData(position, size, texPosition, texSize, texLayer, flags | SpriteFlags.LeftAligned | SpriteFlags.MidAligned);
-        public static SpriteInstanceData BottomLeft(Vector3 position, Vector2 size, Vector2 texPosition, Vector2 texSize, uint texLayer, SpriteFlags flags) => new SpriteInstanceData(position, size, texPosition, texSize, texLayer, flags | SpriteFlags.LeftAligned | SpriteFlags.BottomAligned);
-        public static SpriteInstanceData TopMid(Vector3 position, Vector2 size, Vector2 texPosition, Vector2 texSize, uint texLayer, SpriteFlags flags) => new SpriteInstanceData(position, size, texPosition, texSize, texLayer, flags);
-        public static SpriteInstanceData Centred(Vector3 position, Vector2 size, Vector2 texPosition, Vector2 texSize, uint texLayer, SpriteFlags flags) => new SpriteInstanceData(position, size, texPosition, texSize, texLayer, flags | SpriteFlags.MidAligned);
-        public static SpriteInstanceData BottomMid(Vector3 position, Vector2 size, Vector2 texPosition, Vector2 texSize, uint texLayer, SpriteFlags flags) => new SpriteInstanceData(position, size, texPosition, texSize, texLayer, flags | SpriteFlags.BottomAligned);
+        public static SpriteInstanceData CopyFlags(Vector3 position, Vector2 size, SubImage subImage, SpriteFlags flags) => new SpriteInstanceData(position, size, subImage, flags);
+        public static SpriteInstanceData TopLeft(Vector3 position, Vector2 size, SubImage subImage, SpriteFlags flags) => new SpriteInstanceData(position, size, subImage, flags | SpriteFlags.LeftAligned);
+        public static SpriteInstanceData MidLeft(Vector3 position, Vector2 size, SubImage subImage, SpriteFlags flags) => new SpriteInstanceData(position, size, subImage, flags | SpriteFlags.LeftAligned | SpriteFlags.MidAligned);
+        public static SpriteInstanceData BottomLeft(Vector3 position, Vector2 size, SubImage subImage, SpriteFlags flags) => new SpriteInstanceData(position, size, subImage, flags | SpriteFlags.LeftAligned | SpriteFlags.BottomAligned);
+        public static SpriteInstanceData TopMid(Vector3 position, Vector2 size, SubImage subImage, SpriteFlags flags) => new SpriteInstanceData(position, size, subImage, flags);
+        public static SpriteInstanceData Centred(Vector3 position, Vector2 size, SubImage subImage, SpriteFlags flags) => new SpriteInstanceData(position, size, subImage, flags | SpriteFlags.MidAligned);
+        public static SpriteInstanceData BottomMid(Vector3 position, Vector2 size, SubImage subImage, SpriteFlags flags) => new SpriteInstanceData(position, size, subImage, flags | SpriteFlags.BottomAligned);
 
-        public static SpriteInstanceData CopyFlags(Vector3 position, Vector2 size, SpriteLease lease, int subImage, SpriteFlags flags)
+        public static SpriteInstanceData CopyFlags(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags)
         {
-            lease.Key.Texture.GetSubImageDetails(subImage, out _, out var tp, out var ts, out var tl);
-            return CopyFlags(position, size, tp, ts, tl, flags);
+            var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
+            return CopyFlags(position, size, subImage, flags);
         }
 
-        public static SpriteInstanceData TopLeft(Vector3 position, Vector2 size, SpriteLease lease, int subImage, SpriteFlags flags) 
+        public static SpriteInstanceData TopLeft(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags) 
         {
-            lease.Key.Texture.GetSubImageDetails(subImage, out _, out var tp, out var ts, out var tl);
-            return TopLeft(position, size, tp, ts, tl, flags);
+            var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
+            return TopLeft(position, size, subImage, flags);
         }
-        public static SpriteInstanceData MidLeft(Vector3 position, Vector2 size, SpriteLease lease, int subImage, SpriteFlags flags) 
+        public static SpriteInstanceData MidLeft(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags) 
         {
-            lease.Key.Texture.GetSubImageDetails(subImage, out _, out var tp, out var ts, out var tl);
-            return MidLeft(position, size, tp, ts, tl, flags);
+            var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
+            return MidLeft(position, size, subImage, flags);
         }
-        public static SpriteInstanceData BottomLeft(Vector3 position, Vector2 size, SpriteLease lease, int subImage, SpriteFlags flags) 
+        public static SpriteInstanceData BottomLeft(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags) 
         {
-            lease.Key.Texture.GetSubImageDetails(subImage, out _, out var tp, out var ts, out var tl);
-            return BottomLeft(position, size, tp, ts, tl, flags);
+            var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
+            return BottomLeft(position, size, subImage, flags);
         }
-        public static SpriteInstanceData TopMid(Vector3 position, Vector2 size, SpriteLease lease, int subImage, SpriteFlags flags) 
+        public static SpriteInstanceData TopMid(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags) 
         {
-            lease.Key.Texture.GetSubImageDetails(subImage, out _, out var tp, out var ts, out var tl);
-            return TopMid(position, size, tp, ts, tl, flags);
+            var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
+            return TopMid(position, size, subImage, flags);
         }
-        public static SpriteInstanceData Centred(Vector3 position, Vector2 size, SpriteLease lease, int subImage, SpriteFlags flags) 
+        public static SpriteInstanceData Centred(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags) 
         {
-            lease.Key.Texture.GetSubImageDetails(subImage, out _, out var tp, out var ts, out var tl);
-            return Centred(position, size, tp, ts, tl, flags);
+            var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
+            return Centred(position, size, subImage, flags);
         }
-        public static SpriteInstanceData BottomMid(Vector3 position, Vector2 size, SpriteLease lease, int subImage, SpriteFlags flags)
+        public static SpriteInstanceData BottomMid(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags)
         {
-            lease.Key.Texture.GetSubImageDetails(subImage, out _, out var tp, out var ts, out var tl);
-            return BottomMid(position, size, tp, ts, tl, flags);
+            var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
+            return BottomMid(position, size, subImage, flags);
         }
     }
 }

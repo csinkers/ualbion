@@ -2,6 +2,7 @@
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 
@@ -68,12 +69,16 @@ namespace UAlbion.Game.Gui
             }
 
             var instances = _sprite.Access();
+            var subImage = new SubImage(
+                Vector2.Zero,
+                Vector2.One,
+                Vector2.One,
+                commonColors.Palette[_color]);
+
             instances[0] = SpriteInstanceData.TopLeft(
                 position,
                 window.UiToNormRelative(DrawSize),
-                Vector2.Zero,
-                Vector2.One,
-                commonColors.Palette[_color],
+                subImage,
                 SpriteFlags.None);
         }
 

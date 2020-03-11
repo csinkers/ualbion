@@ -65,9 +65,8 @@ namespace UAlbion.Game.Entities
                 if (texture == null)
                     return;
                 var key = new SpriteKey(texture, order, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
-                texture.GetSubImageDetails(0, out var size, out _, out _, out _);
                 _sprite = sm.Borrow(key, 1, this);
-                _size = size;
+                _size = texture.GetSubImageDetails(0).Size;
             }
         }
 

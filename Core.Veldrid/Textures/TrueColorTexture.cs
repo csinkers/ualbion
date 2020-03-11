@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using UAlbion.Core.Textures;
 using Veldrid;
 using Veldrid.ImageSharp;
 
@@ -21,6 +22,7 @@ namespace UAlbion.Core.Veldrid.Textures
         public int SizeInBytes => (int)(_texture.Width * _texture.Height * _texture.PixelSizeInBytes);
         public uint FormatSize => _texture.PixelSizeInBytes;
         readonly ImageSharpTexture _texture;
+        readonly SubImage _subImage;
 
         public TrueColorTexture(string name, Image<Rgba32> image)
         {
@@ -28,15 +30,15 @@ namespace UAlbion.Core.Veldrid.Textures
             ImageSharpTexture imageSharpTexture = new ImageSharpTexture(image, false);
             _texture = imageSharpTexture;
             IsDirty = true;
+
+            _subImage = new SubImage(
+                    Vector2.Zero,
+                 new Vector2(_texture.Width, _texture.Height),
+                 new Vector2(_texture.Width, _texture.Height),
+                 0);
         }
 
-        public void GetSubImageDetails(int subImage, out Vector2 size, out Vector2 texOffset, out Vector2 texSize, out uint layer)
-        {
-            size = new Vector2(Width, Height);
-            texOffset = new Vector2(0,0);
-            texSize = new Vector2(1.0f,1.0f);
-            layer = 0;
-        }
+        public SubImage GetSubImageDetails(int subImageId) => _subImage;
 
         public Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
         {

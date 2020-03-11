@@ -34,8 +34,8 @@ namespace UAlbion.Game.Entities.Map2D
         public Renderable(LogicalMap logicalMap, ITexture tileset) : base(Handlers)
         {
             _logicalMap = logicalMap;
-            tileset.GetSubImageDetails(0, out var tileSize, out _, out _, out _);
-            TileSize = tileSize;
+            var subImage = tileset.GetSubImageDetails(0);
+            TileSize = subImage.Size;
             _underlay = AttachChild(new TileLayer(logicalMap, tileset, logicalMap.GetUnderlay, DrawLayer.Underlay));
             _overlay = AttachChild(new TileLayer(logicalMap, tileset, logicalMap.GetOverlay, DrawLayer.Overlay3));
         }

@@ -92,7 +92,12 @@ namespace UAlbion.Core
                 texture.Height, texture.Width,
                 texture.MipLevels, texture.ArrayLayers,
                 rotatedPixels,
-                new[] { new EightBitTexture.SubImage(0, 0, texture.Height, texture.Width, 0) });
+                new[] { new SubImage(
+                    Vector2.Zero,
+                    new Vector2(texture.Height, texture.Width),
+                    new Vector2(texture.Height, texture.Width),
+                    0)
+                });
         }
 
         public static uint UpdateFlag(uint flags, FlagOperation operation, uint flag)

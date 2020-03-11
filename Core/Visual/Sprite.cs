@@ -121,9 +121,9 @@ namespace UAlbion.Core.Visual
 
             var instances = _sprite.Access();
 
-            _sprite.Key.Texture.GetSubImageDetails(Frame, out var size, out var texPosition, out var texSize, out var texLayer);
-            _size ??= size;
-            instances[0] = SpriteInstanceData.CopyFlags(_position, _size.Value, texPosition, texSize, texLayer, _flags);
+            var subImage = _sprite.Key.Texture.GetSubImageDetails(Frame);
+            _size ??= subImage.Size;
+            instances[0] = SpriteInstanceData.CopyFlags(_position, _size.Value, subImage, _flags);
         }
 
         void Select(WorldCoordinateSelectEvent e)

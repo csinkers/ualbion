@@ -15,7 +15,7 @@ namespace UAlbion.Core
             uint mipLevels,
             uint arrayLayers,
             byte[] pixels,
-            IEnumerable<EightBitTexture.SubImage> subImages);
+            IEnumerable<SubImage> subImages);
 
         PaletteTexture CreatePaletteTexture(string name, uint[] colours);
     }

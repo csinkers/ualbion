@@ -24,6 +24,7 @@ namespace UAlbion.Game.Gui
         public DialogFrame(IUiElement child) : base(Handlers) => Children.Add(child);
         void Rebuild(int width, int height, DrawLayer order)
         {
+            var shadowSubImage = new SubImage(Vector2.Zero, Vector2.Zero, Vector2.One, 0);
             var window = Resolve<IWindowManager>();
             var sm = Resolve<ISpriteManager>();
             var factory = Resolve<ICoreFactory>();
@@ -84,8 +85,8 @@ namespace UAlbion.Game.Gui
             DrawVerticalLine(4); // Top
             DrawVerticalLine((uint)width - 7); // Bottom
 
-            multi.GetSubImageDetails(multi.GetSubImageAtTime(1, 0), out var size, out var texOffset, out var texSize, out var layer);
-            var normalisedSize = window.UiToNormRelative(new Vector2(size.X, size.Y));
+            var subImage = multi.GetSubImageDetails(multi.GetSubImageAtTime(1, 0));
+            var normalisedSize = window.UiToNormRelative(subImage.Size);
 
             var key = new SpriteKey(multi, order, SpriteKeyFlags.NoTransform);
             _sprite?.Dispose();
@@ -95,9 +96,9 @@ namespace UAlbion.Game.Gui
             var instances = lease.Access();
 
             var shadowPosition = new Vector3(window.UiToNormRelative(new Vector2(10, 10)), 0);
-            var shadowSize = window.UiToNormRelative(new Vector2(size.X - 10, size.Y - 10));
-            instances[0] = SpriteInstanceData.TopLeft(shadowPosition, shadowSize, Vector2.Zero, Vector2.Zero, 0, flags);// Drop shadow
-            instances[1] = SpriteInstanceData.TopLeft(Vector3.Zero, normalisedSize, texOffset, texSize, layer, 0); // DialogFrame
+            var shadowSize = window.UiToNormRelative(subImage.Size - new Vector2(10, 10));
+            instances[0] = SpriteInstanceData.TopLeft(shadowPosition, shadowSize, shadowSubImage, flags);// Drop shadow
+            instances[1] = SpriteInstanceData.TopLeft(Vector3.Zero, normalisedSize, subImage, 0); // DialogFrame
             _sprite = new PositionedSpriteBatch(lease, normalisedSize);
         }
 

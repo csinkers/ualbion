@@ -78,8 +78,8 @@ namespace UAlbion.Core.Visual
                     tile->Ceiling = (byte)Floors.GetSubImageAtTime(ceilingSubImage, frame);
                     tile->Wall = (byte)Walls.GetSubImageAtTime(wallSubImage, frame);
                     tile->Flags = 0; // TileFlags.UsePalette;
-                    Walls.GetSubImageDetails(tile->Wall, out _, out _, out var wallSize, out _);
-                    tile->WallSize = wallSize;
+                    var subImage = Walls.GetSubImageDetails(tile->Wall);
+                    tile->WallSize = subImage.TexSize;
                 }
             }
         }

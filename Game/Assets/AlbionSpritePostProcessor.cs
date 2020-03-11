@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Assets
@@ -17,7 +18,7 @@ namespace UAlbion.Game.Assets
             SubImage[] subImages;
             byte[] pixelData;
 
-            if (sprite.UniformFrames && sprite.Frames.Count >= 256)
+            if (key.Type == AssetType.Font || sprite.UniformFrames && sprite.Frames.Count >= 256)
             {
                 const int buffer = 1;
                 // For things like tilemaps etc we repack into a texture atlas with buffer pixels.
@@ -47,7 +48,7 @@ namespace UAlbion.Game.Assets
 
                     subImages[n] = new SubImage(
                         new Vector2(curX + buffer, curY + buffer),
-                        new Vector2(srcTileWidth, srcTileHeight),
+                        new Vector2(sprite.Frames[n].Width, sprite.Frames[n].Height),
                         new Vector2(width, height),
                         0);
 

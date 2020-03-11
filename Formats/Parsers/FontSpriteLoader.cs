@@ -17,11 +17,11 @@ namespace UAlbion.Formats.Parsers
             foreach (var oldFrame in font.Frames)
             {
                 int width = 0;
-                for(int j = oldFrame.Y; j < oldFrame.Y + oldFrame.Height; j++)
+                for (int j = oldFrame.Y; j < oldFrame.Y + oldFrame.Height; j++)
                 {
-                    for(int i = oldFrame.X; i < oldFrame.X + oldFrame.Width; i++)
+                    for (int i = oldFrame.X; i < oldFrame.X + oldFrame.Width; i++)
                     {
-                        if (i-oldFrame.X > width && font.PixelData[j * font.Width + i] != 0)
+                        if (i - oldFrame.X > width && font.PixelData[j * font.Width + i] != 0)
                             width = i - oldFrame.X;
                     }
                 }

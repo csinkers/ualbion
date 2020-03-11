@@ -17,7 +17,7 @@ namespace UAlbion.Game.Gui.Inventory
             H<InventoryOffensiveLabel, InventoryChangedEvent>((x, e) => x._version++),
             H<InventoryOffensiveLabel, HoverEvent>((x, e) =>
             {
-                x.Hover(); 
+                x.Hover();
                 e.Propagating = false;
             }),
             H<InventoryOffensiveLabel, BlurEvent>((x, _) => x.Raise(new HoverTextEvent(""))));
@@ -36,7 +36,7 @@ namespace UAlbion.Game.Gui.Inventory
             AttachChild(
                 new ButtonFrame(
                         new HorizontalStack(
-                            new FixedSize(8, 8, 
+                            new FixedSize(8, 8,
                                 new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiOffensiveValue) { Highlighted = true }),
                             new TextSection(source)
                         )

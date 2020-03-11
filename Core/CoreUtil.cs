@@ -14,8 +14,8 @@ namespace UAlbion.Core
             float aspectRatio,
             float near, float far)
         {
-            var persp = useReverseDepth 
-                ? CreatePerspective(fov, aspectRatio, far, near) 
+            var persp = useReverseDepth
+                ? CreatePerspective(fov, aspectRatio, far, near)
                 : CreatePerspective(fov, aspectRatio, near, far);
 
             if (isClipSpaceYInverted)
@@ -83,7 +83,7 @@ namespace UAlbion.Core
         public static ITexture BuildRotatedTexture(ICoreFactory factory, EightBitTexture texture)
         {
             var rotatedPixels = new byte[texture.Width * texture.Height];
-            ApiUtil.RotateImage((int)texture.Width, (int)texture.Height, 
+            ApiUtil.RotateImage((int)texture.Width, (int)texture.Height,
                new Span<byte>(texture.TextureData),
                new Span<byte>(rotatedPixels));
 
@@ -165,9 +165,9 @@ namespace UAlbion.Core
         }
 
         internal static unsafe void Blit8To32(
-            uint fromWidth, uint fromHeight, 
+            uint fromWidth, uint fromHeight,
             uint toWidth, uint toHeight,
-            byte* fromBuffer, uint* toBuffer, 
+            byte* fromBuffer, uint* toBuffer,
             int fromStride, int toStride,
             uint[] palette, byte? transparentColor)
         {

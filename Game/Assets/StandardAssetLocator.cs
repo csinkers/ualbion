@@ -16,16 +16,16 @@ namespace UAlbion.Game.Assets
             { AssetType.Palette,            (AssetLocation.Base,      "PALETTE!.XLD") }, // Palettes (first 192 colours)
             { AssetType.PaletteNull,        (AssetLocation.BaseRaw,   "PALETTE.000" ) }, // The 64 colours above 192 that are shared by all palettes.
             { AssetType.SmallPortrait,      (AssetLocation.Base,      "SMLPORT!.XLD") }, // Small portraits of players and NPCs for conversations etc
-            { AssetType.EventSet,           (AssetLocation.Base,      "EVNTSET!.XLD") }, // 
+            { AssetType.EventSet,           (AssetLocation.Base,      "EVNTSET!.XLD") }, //
             { AssetType.Song,               (AssetLocation.Base,      "SONGS!.XLD"  ) }, // XMI audio, can be translated to MIDI
             { AssetType.Sample,             (AssetLocation.Base,      "SAMPLES!.XLD") }, // General sound effects
             { AssetType.WaveLibrary,        (AssetLocation.Base,      "WAVELIB!.XLD") }, // General sound effects
-            { AssetType.BlockList,          (AssetLocation.Base,      "BLKLIST!.XLD") }, // 
+            { AssetType.BlockList,          (AssetLocation.Base,      "BLKLIST!.XLD") }, //
             { AssetType.Flic,               (AssetLocation.Localised, "FLICS!.XLD"  ) }, // Videos
             { AssetType.Dictionary,         (AssetLocation.Localised, "WORDLIS!.XLD") }, // The words that can be used as conversation topics
             { AssetType.Script,             (AssetLocation.Base,      "SCRIPT!.XLD" ) }, // Scripted sequences of events for narrative sequences etc
             { AssetType.Picture,            (AssetLocation.Base,      "PICTURE!.XLD") }, // Full screen graphics for various special events, menu backgrounds etc (in the obscure ILBM / interlaced bitmap format from IBM)
-            { AssetType.TransparencyTables, (AssetLocation.Base,      "TRANSTB!.XLD") }, // 
+            { AssetType.TransparencyTables, (AssetLocation.Base,      "TRANSTB!.XLD") }, //
             // { AssetType.CoreGraphics,       (AssetLocation.MainExe,   "MAIN.EXE") }, // Various UI graphics that get loaded directly from the original game executable
             // { AssetType.CoreGraphicsMetadata, (AssetLocation.MainExe, "MAIN.EXE") },
             // { AssetType.Unnamed2,        (AssetLocation.Base,      ""            ) },

@@ -154,8 +154,8 @@ namespace UAlbion.Game.Assets
             if (stringTable == null)
                 return $"!MISSING STRING-TABLE {id.Type}:{id.Id}:{id.SubId}:{language}!";
 
-            return stringTable.TryGetValue(id.SubId, out var value) 
-                ? value 
+            return stringTable.TryGetValue(id.SubId, out var value)
+                ? value
                 : $"!MISSING STRING {id.Type}:{id.Id}:{id.SubId}:{language}!";
         }
 

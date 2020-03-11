@@ -56,7 +56,7 @@ namespace UAlbion.Core.Veldrid
         protected override TextureView CreateTextureViewCore(ref TextureViewDescription description)
             => Track(_factory.CreateTextureView(description));
 
-        protected override DeviceBuffer CreateBufferCore(ref BufferDescription description) 
+        protected override DeviceBuffer CreateBufferCore(ref BufferDescription description)
             => Track(_factory.CreateBuffer(description));
 
         protected override Sampler CreateSamplerCore(ref SamplerDescription description)

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using SerdesNet;
 using UAlbion.Formats.MapEvents;
-using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets
 {

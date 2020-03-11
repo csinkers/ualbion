@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using SerdesNet;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Formats.Config;

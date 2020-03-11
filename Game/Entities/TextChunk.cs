@@ -55,19 +55,19 @@ namespace UAlbion.Game.Entities
                 case TextAlignment.Left:
                     break;
                 case TextAlignment.Center:
-                    newPosition += 
+                    newPosition +=
                         new Vector3(
                             window.UiToNormRelative(new Vector2(
                                 (extents.Width - _sprite.Size.X) / 2,
-                                (extents.Height - _sprite.Size.Y) / 2)), 
+                                (extents.Height - _sprite.Size.Y) / 2)),
                             0);
                     break;
                 case TextAlignment.Right:
-                    newPosition += 
+                    newPosition +=
                         new Vector3(
                             window.UiToNormRelative(new Vector2(
                                 extents.Width - _sprite.Size.X,
-                                extents.Height - _sprite.Size.Y)), 
+                                extents.Height - _sprite.Size.Y)),
                             0);
                     break;
             }

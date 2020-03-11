@@ -69,8 +69,8 @@ namespace UAlbion.Game.Entities
             foreach (var block in textManager.SplitBlocksToSingleWords(blocks))
             {
                 var size = textManager.Measure(block);
-                if (block.Arrangement.HasFlag(TextArrangement.ForceNewLine) 
-                    || 
+                if (block.Arrangement.HasFlag(TextArrangement.ForceNewLine)
+                    ||
                     line.Width > 0 && line.Width + size.X > extents.Width)
                 {
                     yield return line;

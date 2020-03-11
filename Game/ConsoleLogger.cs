@@ -96,7 +96,7 @@ namespace UAlbion.Game
                         Console.WriteLine();
                         var metadata = Event.GetEventMetadata()
                             .FirstOrDefault(x => x.Name.Equals(helpEvent.CommandName, StringComparison.InvariantCultureIgnoreCase)
-                            || x.Aliases != null && 
+                            || x.Aliases != null &&
                                x.Aliases.Any(y => y.Equals(helpEvent.CommandName, StringComparison.InvariantCultureIgnoreCase)));
 
                         if (metadata != null)
@@ -117,7 +117,7 @@ namespace UAlbion.Game
                     break;
 
                 default:
-                { 
+                {
                     if (sender == this || _logLevel > LogEvent.Level.Info) return;
                     int nesting = EventExchange.Nesting;
                     if(nesting > 0)

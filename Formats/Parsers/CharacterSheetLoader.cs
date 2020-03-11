@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using SerdesNet;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
@@ -214,7 +215,10 @@ namespace UAlbion.Formats.Parsers
 
         public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
-            var sheet = Serdes(null, new GenericBinaryReader(br, streamLength), name, config);
+            var sheet = Serdes(null,
+                new AlbionReader(br, streamLength),
+                name, config);
+
             sheet.Name = name;
             return sheet;
         }

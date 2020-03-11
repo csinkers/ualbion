@@ -25,7 +25,7 @@ namespace UAlbion.Game.State
             }),
             H<InventoryScreenState, SetInventoryItemInHandEvent>((x, e) =>
             {
-                x.ItemInHand = e.ItemInHand; 
+                x.ItemInHand = e.ItemInHand;
                 x.ReturnItemInHandEvent = new InventoryPickupItemEvent(e.Id, e.SlotId);
             })
         );

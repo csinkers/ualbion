@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using ImGuiNET;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -230,7 +231,7 @@ namespace UAlbion.Game.Veldrid.Debugging
 
         bool CheckHover(Reflector.ReflectedObject reflected)
         {
-            if (!ImGui.IsItemHovered()) 
+            if (!ImGui.IsItemHovered())
                 return false;
 
             if (_lastHoveredItem != reflected)

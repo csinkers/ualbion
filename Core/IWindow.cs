@@ -1,10 +1,8 @@
-﻿using System.Numerics;
-
-namespace UAlbion.Core
+﻿namespace UAlbion.Core
 {
     public interface IWindow
     {
-        public int Width { get; }
-        public int Height { get; }
+        int Width { get; }
+        int Height { get; }
     }
 }

@@ -41,7 +41,7 @@ namespace UAlbion.Core.Events
                     return _sortedSubscribersCached;
                 }
             }
-        } 
+        }
 #endif
 
         public string Name { get; }
@@ -145,7 +145,7 @@ namespace UAlbion.Core.Events
                 _parent?.CollectExchanges(exchanges);
 
             // Hot path: don't use foreach so we avoid allocating an enumerator
-            for (int i = 0; i < _children.Count; i++) 
+            for (int i = 0; i < _children.Count; i++)
                 _children[i].CollectExchanges(exchanges, includeParent);
         }
 
@@ -250,7 +250,7 @@ namespace UAlbion.Core.Events
                     if (subscribedTypes.Contains(eventType))
                         return;
                 }
-                else 
+                else
                 {
                     _subscribers[subscriber] = new List<Type>();
                     newSubscriber = true;

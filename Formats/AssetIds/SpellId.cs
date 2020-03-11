@@ -12,7 +12,7 @@
         PoisonAntidote = 3,
         InsanityAntidote = 4,
         SicknessAntidote = 5,
-        FrostSplinter = 6, 
+        FrostSplinter = 6,
         FrostCrystal = 7,
         FrostAvalanche = 8,
         LightHealing = 9,

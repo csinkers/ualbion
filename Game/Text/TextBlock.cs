@@ -12,7 +12,7 @@ namespace UAlbion.Game.Text
         }
 
         string _text;
-        public string Text { get => _text; set => _text = value ?? ""; } 
+        public string Text { get => _text; set => _text = value ?? ""; }
         public FontColor Color { get; set; }
         public TextStyle Style { get; set; }
         public TextAlignment Alignment { get; set; }

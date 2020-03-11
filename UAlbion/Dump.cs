@@ -36,7 +36,7 @@ namespace UAlbion
         public static void MapAndLabData(IAssetManager assets, string baseDir)
         {
             using var sw = File.CreateText($@"{baseDir}\re\3DInfo.txt");
-            // Dump map and lab data 
+            // Dump map and lab data
             for (int i = 100; i < 400; i++)
             {
                 var map = assets.LoadMap3D((MapDataId) i);
@@ -101,7 +101,7 @@ namespace UAlbion
             chars = chars.Where(x => x != null && (x.GermanName != "" || x.PortraitId != 0)).ToList();
             foreach (var c in chars)
             {
-                
+
             }
         }
 
@@ -264,7 +264,7 @@ namespace UAlbion
             if(e.Event is TextEvent textEvent) // Same as npc text event?
             {
                 var text = _assets.LoadString(
-                    new StringId(_textType, _context, textEvent.TextId), 
+                    new StringId(_textType, _context, textEvent.TextId),
                     GameLanguage.English);
 
                 return $"text Portrait:{textEvent.PortraitId} \"{text}\"";

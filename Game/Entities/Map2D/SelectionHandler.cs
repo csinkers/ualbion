@@ -64,7 +64,7 @@ namespace UAlbion.Game.Entities.Map2D
             {
                 foreach (var zoneEvent in chain.Events)
                     e.RegisterHit(t, zoneEvent);
-            } 
+            }
 
             if (_lastHighlightIndex != highlightIndex)
             {
@@ -134,7 +134,7 @@ namespace UAlbion.Game.Entities.Map2D
 
             options.Add(new ContextMenuOption(
                     S(SystemTextId.MapPopup_MainMenu),
-                    new PushSceneEvent(SceneId.MainMenu), 
+                    new PushSceneEvent(SceneId.MainMenu),
                     ContextMenuGroup.System
                 ));
 

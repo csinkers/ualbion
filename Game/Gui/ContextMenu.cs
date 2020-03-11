@@ -136,7 +136,7 @@ Inventory:
 
 Combat:
     Player
-        Drirr (header) 
+        Drirr (header)
         divider
         Do nothing (white)
         attack (white)

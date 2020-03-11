@@ -21,7 +21,7 @@ namespace UAlbion.Game.Gui
         int Render(Rectangle extents, int order);
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="uiPosition"></param>
         /// <param name="extents"></param>

@@ -5,7 +5,7 @@ using UAlbion.Core.Visual;
 
 namespace UAlbion.Game.Entities
 {
-    public class MapSprite<T> : Sprite<T> where T : Enum 
+    public class MapSprite<T> : Sprite<T> where T : Enum
     {
         Vector3 _tilePosition;
         public Vector3 TilePosition
@@ -23,7 +23,7 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        public MapSprite(T id, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags) 
+        public MapSprite(T id, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags)
             : base(id, Vector3.Zero, layer, keyFlags, flags) { }
     }
 }

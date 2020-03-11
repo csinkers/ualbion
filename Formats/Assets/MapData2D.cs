@@ -1,6 +1,6 @@
-﻿using UAlbion.Api;
+﻿using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets
 {

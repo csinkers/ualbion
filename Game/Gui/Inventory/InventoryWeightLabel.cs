@@ -19,7 +19,7 @@ namespace UAlbion.Game.Gui.Inventory
             H<InventoryWeightLabel, SetLanguageEvent>((x, e) => x._version++),
             H<InventoryWeightLabel, HoverEvent>((x, e) =>
             {
-                x.Hover(); 
+                x.Hover();
                 e.Propagating = false;
             }),
             H<InventoryWeightLabel, BlurEvent>((x, _) => x.Raise(new HoverTextEvent(""))));
@@ -51,7 +51,7 @@ namespace UAlbion.Game.Gui.Inventory
 
                 int weight = player.Apparent.TotalWeight / 1000;
                 var template = assets.LoadString(SystemTextId.Inv_WeightNKg, settings.Gameplay.Language); // Weight : %d Kg
-                return new 
+                return new
                     TextFormatter(assets, settings.Gameplay.Language)
                     .NoWrap()
                     .Centre()

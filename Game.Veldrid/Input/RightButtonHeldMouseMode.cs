@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -33,7 +34,7 @@ namespace UAlbion.Game.Veldrid.Input
         public override void Subscribed()
         {
             _lastTilePosition = Vector2.Zero;
-            Raise(new ShowCursorEvent(false)); 
+            Raise(new ShowCursorEvent(false));
 
             _wasClockRunning = Resolve<IClock>()?.IsRunning ?? false;
             if(_wasClockRunning)

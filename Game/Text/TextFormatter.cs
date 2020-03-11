@@ -70,8 +70,8 @@ namespace UAlbion.Game.Text
                     }
 
                     case Token.He:
-                    case Token.Him: 
-                    case Token.His: 
+                    case Token.Him:
+                    case Token.His:
                     {
                         if (!(active is ICharacterSheet character))
                             throw new FormatException($"Expected the active item to be a character, was actually {active}");
@@ -94,7 +94,7 @@ namespace UAlbion.Game.Text
                         break;
                     }
 
-                    case Token.Name: 
+                    case Token.Name:
                     {
                         if (active is ICharacterSheet character)
                             yield return (Token.Text, character.GetName(_language));
@@ -143,7 +143,7 @@ namespace UAlbion.Game.Text
                     }
 
                     case Token.Word:
-                    { 
+                    {
                         WordId? word = _assets.ParseWord((string)p);
                         if(word == null)
                             yield return (Token.Text, p);
@@ -231,7 +231,7 @@ namespace UAlbion.Game.Text
 
         public TextFormatResult Format(string template, params object[] arguments)
         {
-            var tokens = 
+            var tokens =
                 _implicitTokens.Concat(
                     Tokeniser.Tokenise(template)
                 ).ToList();

@@ -29,7 +29,7 @@ namespace UAlbion.Formats.Parsers
 
                     int underlay = ((b2 & 0x0F) << 8) + b3;
                     int overlay = (b1 << 4) + (b2 >> 4);
-                    block.Underlay[i] = underlay; 
+                    block.Underlay[i] = underlay;
                     block.Overlay[i] = overlay;
                 }
                 blockList.Add(block);

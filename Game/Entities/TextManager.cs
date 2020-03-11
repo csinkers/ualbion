@@ -213,7 +213,7 @@ namespace UAlbion.Game.Entities
 
                 case TextEvent.TextLocation.TextInWindowWithPortrait:
                 case TextEvent.TextLocation.TextInWindowWithPortrait2:
-                { 
+                {
                     var dialog = AttachChild(new TextWindow(GetMapTextFromTextEvent(textEvent)));
                     dialog.Closed += (sender, _) => textEvent.Complete();
                     break;

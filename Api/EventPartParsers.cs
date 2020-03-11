@@ -24,7 +24,7 @@ namespace UAlbion.Api
 
         public MethodInfo GetParser(Type type)
         {
-            if(_parsers.TryGetValue(type, out var parser)) 
+            if (_parsers.TryGetValue(type, out var parser))
                 return parser;
 
             if (type.IsEnum)

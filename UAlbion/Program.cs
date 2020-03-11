@@ -52,7 +52,7 @@ namespace UAlbion
 
             global // Need to register settings first, as the AssetConfigLocator relies on it.
                 .Register<ICoreFactory>(factory)
-                .Register<ISettings>(settings) 
+                .Register<ISettings>(settings)
                 .Register<IEngineSettings>(settings)
                 .Register<IDebugSettings>(settings)
                 .Register<IGameplaySettings>(settings)
@@ -64,9 +64,9 @@ namespace UAlbion
             PerfTracker.StartupEvent($"Running as {commandLine.Mode}");
             switch(commandLine.Mode)
             {
-                case ExecutionMode.Game: 
+                case ExecutionMode.Game:
                 case ExecutionMode.GameWithSlavedAudio:
-                    Albion.RunGame(global, baseDir, commandLine); 
+                    Albion.RunGame(global, baseDir, commandLine);
                     break;
 
                 case ExecutionMode.AudioSlave: break; // TODO

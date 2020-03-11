@@ -33,7 +33,7 @@ namespace UAlbion.Game.Assets
             return factory.CreateEightBitTexture(
                 $"Font{id.Color}{(id.IsBold ? "Bold" : "")}",
                 texture.Width, texture.Height,
-                texture.MipLevels, texture.ArrayLayers, 
+                texture.MipLevels, texture.ArrayLayers,
                 bytes, texture.SubImages);
         }
     }

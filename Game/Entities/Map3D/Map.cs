@@ -168,8 +168,8 @@ namespace UAlbion.Game.Entities.Map3D
                 subObject.Y * objectYScaling,
                 subObject.Z);
 
-            var smidgeon = onFloor 
-                ? new Vector3(0,offset.Y < float.Epsilon ? 0.5f : -0.5f, 0) 
+            var smidgeon = onFloor
+                ? new Vector3(0,offset.Y < float.Epsilon ? 0.5f : -0.5f, 0)
                 : Vector3.Zero;
 
             Vector3 position = (tilePosition + offset + smidgeon) / TileSize;

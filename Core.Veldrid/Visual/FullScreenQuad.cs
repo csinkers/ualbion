@@ -56,7 +56,7 @@ namespace UAlbion.Core.Veldrid.Visual
                 shaderCache.GetGlsl(FragmentShaderName));
 
             var rasterizerState = new RasterizerStateDescription(
-                FaceCullMode.Back, PolygonFillMode.Solid, FrontFace.Clockwise, 
+                FaceCullMode.Back, PolygonFillMode.Solid, FrontFace.Clockwise,
                 true, false);
 
             var pd = new GraphicsPipelineDescription(

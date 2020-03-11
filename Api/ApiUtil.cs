@@ -46,18 +46,23 @@ namespace UAlbion.Api
             return result;
         }
 
+        public static void Assert(string message)
+        {
+            Console.Write("Assertion failed!");
+        }
+
         [Conditional("DEBUG")]
         public static void Assert(bool condition)
         {
             if (!condition)
-                Console.Write("Assertion failed!");
+                Assert("Assertion failed!");
         }
 
         [Conditional("DEBUG")]
         public static void Assert(bool condition, string message)
         {
             if (!condition)
-                Console.Write($"Assertion failed! {message}");
+                Assert($"Assertion failed! {message}");
         }
     }
 }

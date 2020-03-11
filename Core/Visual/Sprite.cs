@@ -151,7 +151,7 @@ namespace UAlbion.Core.Visual
             }
         }
 
-        Rectangle CalculateBoundingRectangle() => (Flags & SpriteFlags.AlignmentMask) switch 
+        Rectangle CalculateBoundingRectangle() => (Flags & SpriteFlags.AlignmentMask) switch
             {
                 SpriteFlags.LeftAligned =>                             new Rectangle(               0,                0, (int)Size.X, (int)Size.Y), // TopLeft
                 SpriteFlags.LeftAligned | SpriteFlags.MidAligned =>    new Rectangle(               0, -(int)Size.Y / 2, (int)Size.X, (int)Size.Y), // MidLeft

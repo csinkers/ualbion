@@ -39,7 +39,7 @@ namespace UAlbion.Game
 
             for (int i = 0; i < _activeTimers.Count; i++)
             {
-                if (!(_activeTimers[i].Item2 <= ElapsedTime)) 
+                if (!(_activeTimers[i].Item2 <= ElapsedTime))
                     continue;
 
                 Raise(new TimerElapsedEvent(_activeTimers[i].Item1));

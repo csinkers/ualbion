@@ -2,12 +2,12 @@
 {
     partial class ImageViewer
     {
-        /// <summary> 
+        /// <summary>
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary> 
+        /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -22,8 +22,8 @@
 
         #region Component Designer generated code
 
-        /// <summary> 
-        /// Required method for Designer support - do not modify 
+        /// <summary>
+        /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
@@ -48,11 +48,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.numWidth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackWidth)).BeginInit();
             this.SuspendLayout();
-            // 
+            //
             // canvas
-            // 
-            this.canvas.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.canvas.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.canvas.Location = new System.Drawing.Point(297, 19);
             this.canvas.Margin = new System.Windows.Forms.Padding(4);
@@ -60,10 +60,10 @@
             this.canvas.Size = new System.Drawing.Size(1465, 1096);
             this.canvas.TabIndex = 5;
             this.canvas.TabStop = false;
-            // 
+            //
             // chkAnimate
-            // 
-            this.chkAnimate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.chkAnimate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chkAnimate.AutoSize = true;
             this.chkAnimate.Checked = true;
@@ -76,10 +76,10 @@
             this.chkAnimate.Text = "Animate";
             this.chkAnimate.UseVisualStyleBackColor = true;
             this.chkAnimate.CheckedChanged += ChkAnimate_CheckedChanged;
-            // 
+            //
             // label3
-            // 
-            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(57, 1330);
@@ -88,10 +88,10 @@
             this.label3.Size = new System.Drawing.Size(79, 25);
             this.label3.TabIndex = 28;
             this.label3.Text = "Frame:";
-            // 
+            //
             // label2
-            // 
-            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(57, 1145);
@@ -100,10 +100,10 @@
             this.label2.Size = new System.Drawing.Size(73, 25);
             this.label2.TabIndex = 27;
             this.label2.Text = "Width:";
-            // 
+            //
             // label1
-            // 
-            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(57, 1238);
@@ -112,9 +112,9 @@
             this.label1.Size = new System.Drawing.Size(142, 25);
             this.label1.TabIndex = 26;
             this.label1.Text = "Frame Count:";
-            // 
+            //
             // numFrame
-            // 
+            //
             this.numFrame.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.numFrame.Location = new System.Drawing.Point(1353, 1330);
             this.numFrame.Margin = new System.Windows.Forms.Padding(4);
@@ -132,10 +132,10 @@
             0,
             0});
             this.numFrame.ValueChanged += NumFrame_ValueChanged;
-            // 
+            //
             // trackFrame
-            // 
-            this.trackFrame.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.trackFrame.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.trackFrame.Location = new System.Drawing.Point(213, 1309);
             this.trackFrame.Margin = new System.Windows.Forms.Padding(4);
@@ -145,9 +145,9 @@
             this.trackFrame.TabIndex = 21;
             this.trackFrame.Value = 32;
             this.trackFrame.ValueChanged += TrackFrame_ValueChanged;
-            // 
+            //
             // numFrameCount
-            // 
+            //
             this.numFrameCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.numFrameCount.Location = new System.Drawing.Point(1589, 1230);
             this.numFrameCount.Margin = new System.Windows.Forms.Padding(4);
@@ -170,10 +170,10 @@
             0,
             0});
             this.numFrameCount.ValueChanged += NumFrameCount_ValueChanged;
-            // 
+            //
             // trackFrameCount
-            // 
-            this.trackFrameCount.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.trackFrameCount.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.trackFrameCount.Location = new System.Drawing.Point(213, 1230);
             this.trackFrameCount.Margin = new System.Windows.Forms.Padding(4);
@@ -184,9 +184,9 @@
             this.trackFrameCount.TabIndex = 20;
             this.trackFrameCount.Value = 1;
             this.trackFrameCount.ValueChanged += TrackFrameCount_ValueChanged;
-            // 
+            //
             // numWidth
-            // 
+            //
             this.numWidth.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.numWidth.Location = new System.Drawing.Point(1589, 1145);
             this.numWidth.Margin = new System.Windows.Forms.Padding(4);
@@ -210,10 +210,10 @@
             0});
             this.numWidth.Enter += NumWidth_Enter;
             this.numWidth.ValueChanged += NumWidth_ValueChanged;
-            // 
+            //
             // trackWidth
-            // 
-            this.trackWidth.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.trackWidth.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.trackWidth.Location = new System.Drawing.Point(213, 1138);
             this.trackWidth.Margin = new System.Windows.Forms.Padding(4);
@@ -225,10 +225,10 @@
             this.trackWidth.Value = 32;
             this.trackWidth.ValueChanged += TrackWidth_ValueChanged;
             this.trackWidth.KeyDown += TrackWidth_KeyDown;
-            // 
+            //
             // chkListPalettes
-            // 
-            this.chkListPalettes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            //
+            this.chkListPalettes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | System.Windows.Forms.AnchorStyles.Left)));
             this.chkListPalettes.FormattingEnabled = true;
             this.chkListPalettes.Location = new System.Drawing.Point(4, 19);
@@ -238,9 +238,9 @@
             this.chkListPalettes.TabIndex = 30;
             this.chkListPalettes.SelectedIndexChanged += ChkListPalettes_SelectedIndexChanged;
             this.chkListPalettes.ItemCheck += ChkListPalettes_ItemCheck;
-            // 
+            //
             // ImageViewer
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.chkListPalettes);

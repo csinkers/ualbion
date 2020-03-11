@@ -34,7 +34,7 @@ namespace UAlbion.Core.Visual
             return _sprite.GetSpan(this);
         }
 
-        // Should only be created by MultiSprite 
+        // Should only be created by MultiSprite
         internal SpriteLease(MultiSprite sprite, int @from, int to)
         {
             _sprite = sprite;

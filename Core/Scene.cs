@@ -11,7 +11,7 @@ namespace UAlbion.Core
         static readonly HandlerSet Handlers = new HandlerSet(
             H<Scene, CollectScenesEvent>((x, e) => e.Register(x)),
             H<Scene, SetClearColourEvent>((x, e) => x._clearColour = (e.Red, e.Green, e.Blue)),
-            H<Scene, ExchangeDisabledEvent>((x,e) => x.Unsubscribed())
+            H<Scene, ExchangeDisabledEvent>((x, e) => x.Unsubscribed())
         );
 
         readonly IDictionary<Type, IList<IRenderable>> _renderables = new Dictionary<Type, IList<IRenderable>>();
@@ -38,7 +38,7 @@ namespace UAlbion.Core
             context.SetClearColor(_clearColour.Red, _clearColour.Green, _clearColour.Blue);
 
             // Collect all renderables from components
-            foreach(var renderer in _renderables.Values)
+            foreach (var renderer in _renderables.Values)
                 renderer.Clear();
 
             using (PerfTracker.FrameEvent("6.1.1 Collect renderables"))
@@ -52,7 +52,7 @@ namespace UAlbion.Core
                 }), this);
             }
 
-            foreach(var renderer in _renderables)
+            foreach (var renderer in _renderables)
                 CoreTrace.Log.CollectedRenderables(renderer.Key.Name, 0, renderer.Value.Count);
 
             var paletteManager = Resolve<IPaletteManager>();
@@ -78,14 +78,14 @@ namespace UAlbion.Core
                         _processedRenderables[key].Add(renderable);
 
                         var processedType = renderable.GetType();
-                        if(!rendererLookup.ContainsKey(processedType))
+                        if (!rendererLookup.ContainsKey(processedType))
                             rendererLookup[processedType] = renderers.FirstOrDefault(x => x.CanRender(renderableGroup.Key));
                     }
                 }
 
                 CoreTrace.Log.CollectedRenderables("ProcessedRenderables",
-                    _processedRenderables.Count,
-                    _processedRenderables.Sum(x => x.Value.Count));
+                        _processedRenderables.Count,
+                        _processedRenderables.Sum(x => x.Value.Count));
 
                 context.UpdatePerFrameResources();
             }

@@ -6,7 +6,7 @@ namespace UAlbion.Game.Scenes
     {
         public SceneId Id { get; }
 
-        protected GameScene(SceneId sceneId, ICamera camera) 
+        protected GameScene(SceneId sceneId, ICamera camera)
             : base(sceneId.ToString(), camera)
         {
             Id = sceneId;

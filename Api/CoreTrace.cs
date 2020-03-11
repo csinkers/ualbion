@@ -3,14 +3,14 @@ using System.Diagnostics.Tracing;
 
 namespace UAlbion.Api
 {
-    [EventSource(Name="UAlbion-CoreTrace")]
+    [EventSource(Name = "UAlbion-CoreTrace")]
     public class CoreTrace : EventSource
     {
         public static CoreTrace Log { get; } = new CoreTrace();
 
         public class Tasks
         {
-            public const EventTask Raise = (EventTask) 1;
+            public const EventTask Raise = (EventTask)1;
         }
 
         public class Opcodes

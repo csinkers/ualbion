@@ -11,7 +11,7 @@ namespace UAlbion.Core
         (
             H<PerspectiveCamera, BackendChangedEvent>((x, e) => x.UpdateBackend(e)),
             // BUG: This event is not received when the screen is resized while a 2D scene is active.
-            H<PerspectiveCamera, WindowResizedEvent> ((x, e) => x.WindowResized(e.Width, e.Height)),
+            H<PerspectiveCamera, WindowResizedEvent>((x, e) => x.WindowResized(e.Width, e.Height)),
             H<PerspectiveCamera, SetCameraDirectionEvent>((x, e) => { x.Yaw = e.Yaw; x.Pitch = e.Pitch; }),
             H<PerspectiveCamera, SetFieldOfViewEvent>((x, e) =>
             {
@@ -76,7 +76,7 @@ namespace UAlbion.Core
                 : e.IsDepthRangeZeroToOne;
 
             _isClipSpaceYInverted = (settings?.Flags & EngineFlags.FlipYSpace) == EngineFlags.FlipYSpace
-                ? !e.IsClipSpaceYInverted 
+                ? !e.IsClipSpaceYInverted
                 : e.IsClipSpaceYInverted;
 
             UpdatePerspectiveMatrix();

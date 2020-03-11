@@ -67,7 +67,7 @@ namespace UAlbion.Game.Entities
 
             options.Add(new ContextMenuOption(
                     S(SystemTextId.MapPopup_MainMenu),
-                    new PushSceneEvent(SceneId.MainMenu), 
+                    new PushSceneEvent(SceneId.MainMenu),
                     ContextMenuGroup.System
                 ));
 

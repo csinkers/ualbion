@@ -51,7 +51,7 @@ namespace UAlbion.Game.Gui.Inventory
             var value = _getValue();
             var max = _getMax();
 
-            if (_lastExtents == extents && _lastValue == value && _lastMax == max) 
+            if (_lastExtents == extents && _lastValue == value && _lastMax == max)
                 return;
 
             _lastExtents = extents;

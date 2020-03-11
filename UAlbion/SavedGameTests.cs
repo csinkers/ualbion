@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Config;
-using UAlbion.Formats.Parsers;
 using UAlbion.Game.Assets;
 
 namespace UAlbion
@@ -17,11 +17,11 @@ namespace UAlbion
             {
                 using var stream = File.Open(file, FileMode.Open);
                 using var br = new BinaryReader(stream);
-                var save = loader.Serdes(null, new GenericBinaryReader(br, stream.Length), "TestSave", null);
+                var save = loader.Serdes(null, new AlbionReader(br, stream.Length), "TestSave", null);
 
                 using var ms = new MemoryStream();
                 using var bw = new BinaryWriter(ms);
-                loader.Serdes(save, new GenericBinaryWriter(bw), "TestSave", null);
+                loader.Serdes(save, new AlbionWriter(bw), "TestSave", null);
 
                 br.BaseStream.Position = 0;
                 var originalBytes = br.ReadBytes((int)stream.Length);

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
-using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets
 {
@@ -20,7 +20,7 @@ namespace UAlbion.Formats.Assets
         public IList<MapNpc> Npcs { get; } = new List<MapNpc>();
 
         public IList<MapEventZone> Zones { get; } = new List<MapEventZone>();
-        public IDictionary<int, MapEventZone> ZoneLookup { get; } = new Dictionary<int, MapEventZone>(); 
+        public IDictionary<int, MapEventZone> ZoneLookup { get; } = new Dictionary<int, MapEventZone>();
         public IDictionary<TriggerType, MapEventZone[]> ZoneTypeLookup { get; } = new Dictionary<TriggerType, MapEventZone[]>();
         public IList<EventNode> Events { get; } = new List<EventNode>();
         public IList<EventChain> Chains { get; } = new List<EventChain>();
@@ -128,7 +128,7 @@ namespace UAlbion.Formats.Assets
             }
 
             var disableChainEvents = ChainsByEventId
-                .Where(x => 
+                .Where(x =>
                     x.Item2.Event is DisableEventChainEvent
                     || (x.Item2.Event is ChangeIconEvent ci && ci.ChangeType == ChangeIconEvent.IconChangeType.Chain)
                 ).ToList();

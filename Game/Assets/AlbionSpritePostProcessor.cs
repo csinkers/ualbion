@@ -87,13 +87,13 @@ namespace UAlbion.Game.Assets
                     (uint)subImages.Length,
                     pixelData, subImages);
             }*/
-            else // For non-uniforms just use the on-disk packing 
+            else // For non-uniforms just use the on-disk packing
             {
                 pixelData = sprite.PixelData;
                 subImages = sprite.Frames
                     .Select(x => new SubImage(
-                        new Vector2(x.X, x.Y), 
-                        new Vector2(x.Width, x.Height), 
+                        new Vector2(x.X, x.Y),
+                        new Vector2(x.Width, x.Height),
                         new Vector2(sprite.Width, sprite.Height),
                         0))
                     .ToArray();

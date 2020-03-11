@@ -54,7 +54,7 @@ namespace UAlbion.Game.State
             private set
             {
                 int index = _walkOrder.FindIndex(x => x.Id == value);
-                if (index == -1) 
+                if (index == -1)
                     return;
 
                 var player = _walkOrder[index];

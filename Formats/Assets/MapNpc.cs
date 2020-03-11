@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
+using SerdesNet;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
-using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets
 {

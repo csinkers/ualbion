@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using SerdesNet;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
@@ -16,7 +17,7 @@ namespace UAlbion.Game.Veldrid.Input
             _mousePressed = true;
             _mousePressedPos = InputTracker.MousePosition;
             Sdl2Native.SDL_ShowCursor(0);
-            // Sdl2Native.SDL_SetWindowGrab(_window.SdlWindowHandle, true); 
+            // Sdl2Native.SDL_SetWindowGrab(_window.SdlWindowHandle, true);
         }
         Vector2 mouseDelta = _mousePressedPos - InputTracker.MousePosition;
         Sdl2Native.SDL_WarpMouseInWindow(_window.SdlWindowHandle, (int)_mousePressedPos.X, (int)_mousePressedPos.Y);
@@ -38,7 +39,7 @@ namespace UAlbion.Game.Veldrid.Input
     {
         const float Sensitivity = 2;
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<MouseLookMouseMode, InputEvent>((x,e) => x.OnInput(e)), 
+            H<MouseLookMouseMode, InputEvent>((x,e) => x.OnInput(e)),
             H<MouseLookMouseMode, PostUpdateEvent>((x, e) =>
             {
                 var windowState = x.Resolve<IWindowManager>();

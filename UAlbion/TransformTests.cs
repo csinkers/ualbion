@@ -38,7 +38,7 @@ namespace UAlbion
             SpriteInstanceData Make(Vector3 position, Vector2 size) =>
                 SpriteInstanceData.TopLeft(
                     position, size,
-                    new SubImage(Vector2.Zero, Vector2.One, Vector2.One, 0), 
+                    new SubImage(Vector2.Zero, Vector2.One, Vector2.One, 0),
                     0);
 
 

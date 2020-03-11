@@ -1,7 +1,7 @@
-﻿using UAlbion.Api;
+﻿using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {

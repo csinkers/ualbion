@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
 using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
-using UAlbion.Formats.Parsers;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
 
@@ -25,7 +25,7 @@ namespace UAlbion.Game.State
         Func<MerchantId, IChest> IGameState.GetMerchant => x => _game.Merchants[x];
         public Func<int, int> GetTicker => x => _game.Tickers.TryGetValue(x, out var value) ? value : 0;
         public Func<int, int> GetSwitch  => x => _game.Switches.TryGetValue(x, out var value) ? value : 0;
-        public MapDataId MapId => _game.MapId; 
+        public MapDataId MapId => _game.MapId;
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<GameState, NewGameEvent>((x, e) => x.NewGame()),
@@ -78,7 +78,9 @@ namespace UAlbion.Game.State
             var loader = AssetLoaderRegistry.GetLoader<SavedGame>(FileFormat.SavedGame);
             using var stream = File.Open(filename, FileMode.Open);
             using var br = new BinaryReader(stream);
-            var save = loader.Serdes(null, new GenericBinaryReader(br, stream.Length), "SavedGame", null);
+            var save = loader.Serdes(
+                null,
+                new AlbionReader(br, stream.Length), "SavedGame", null);
             _game = save;
             InitialiseGame();
         }
@@ -92,7 +94,7 @@ namespace UAlbion.Game.State
             _game.Name = name;
             using var stream = File.Open(filename, FileMode.Create);
             using var bw = new BinaryWriter(stream);
-            loader.Serdes(_game, new GenericBinaryWriter(bw), name, null);
+            loader.Serdes(_game, new AlbionWriter(bw), name, null);
         }
 
         void InitialiseGame()

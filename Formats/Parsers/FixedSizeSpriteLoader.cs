@@ -66,7 +66,7 @@ namespace UAlbion.Formats.Parsers
                 for (int n = 0; n < spriteCount; n++)
                 {
                     rotatedSprite.Frames[n] = new AlbionSprite.Frame(
-                        0, rotatedFrameHeight * n, 
+                        0, rotatedFrameHeight * n,
                         rotatedSprite.Width, rotatedFrameHeight);
 
                     ApiUtil.RotateImage(width, height,

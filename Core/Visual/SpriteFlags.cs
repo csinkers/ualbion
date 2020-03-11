@@ -33,8 +33,8 @@ namespace UAlbion.Core.Visual
 
     public static class SpriteFlagExtensions
     {
-        public static SpriteFlags SetOpacity(this SpriteFlags flags, float opacity) => 
-            (SpriteFlags)(((uint)flags & ~(uint)SpriteFlags.OpacityMask) 
+        public static SpriteFlags SetOpacity(this SpriteFlags flags, float opacity) =>
+            (SpriteFlags)(((uint)flags & ~(uint)SpriteFlags.OpacityMask)
                           |
                           ((uint)(Math.Clamp(opacity, 1/255.0f, 1.0f) * 255) << 24));
     }

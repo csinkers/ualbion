@@ -19,7 +19,7 @@ namespace UAlbion.Game.Gui
             H<StatusBarPortrait, PartyChangedEvent>((x, _) => x.LoadSprite()),
             H<StatusBarPortrait, HoverEvent>((x, e) =>
             {
-                x.Hover(); 
+                x.Hover();
                 e.Propagating = false;
             }),
             H<StatusBarPortrait, BlurEvent>((x, _) =>

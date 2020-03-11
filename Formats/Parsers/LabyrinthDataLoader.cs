@@ -7,6 +7,9 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.LabyrinthData)]
     public class LabyrinthDataLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config) => LabyrinthData.Serdes(null, new GenericBinaryReader(br, streamLength));
+        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
+            => LabyrinthData.Serdes(
+                null,
+                new AlbionReader(br, streamLength));
     }
 }

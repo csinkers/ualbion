@@ -23,9 +23,9 @@
 
     public class CharacterAttributes : ICharacterAttributes
     {
-        public override string ToString() => 
+        public override string ToString() =>
             $"S{Strength}/{StrengthMax} I{Intelligence}/{IntelligenceMax} D{Dexterity}/{DexterityMax} " +
-            $"Sp{Speed}/{SpeedMax} St{Stamina}/{StaminaMax} L{Luck}/{LuckMax} " + 
+            $"Sp{Speed}/{SpeedMax} St{Stamina}/{StaminaMax} L{Luck}/{LuckMax} " +
             $"MR{MagicResistance}/{MagicResistanceMax} MT{MagicTalent}/{MagicTalentMax}";
 
         public ushort Strength { get; set; }

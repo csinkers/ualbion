@@ -41,7 +41,7 @@ namespace UAlbion.Game.Entities.Map2D
         public override void Subscribed()
         {
             Raise(new SetClearColourEvent(0,0,0));
-            if (_logicalMap != null) 
+            if (_logicalMap != null)
                 return;
 
             var assetManager = Resolve<IAssetManager>();
@@ -73,7 +73,7 @@ namespace UAlbion.Game.Entities.Map2D
             foreach(var player in state.Party.StatusBarOrder)
             {
                 player.GetPosition = () => partyMovement.GetPositionHistory(player.Id).Item1;
-                AttachChild(_logicalMap.UseSmallSprites 
+                AttachChild(_logicalMap.UseSmallSprites
                     ? (IComponent)new SmallPlayer(player.Id, (SmallPartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id)) // TODO: Use a function to translate logical to sprite id
                     : new LargePlayer(player.Id, (LargePartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id))); // TODO: Use a function to translate logical to sprite id
             }

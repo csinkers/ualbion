@@ -37,10 +37,10 @@
             this.comboType = new System.Windows.Forms.ComboBox();
             this.mainPanel = new System.Windows.Forms.Panel();
             this.SuspendLayout();
-            // 
+            //
             // fileTree
-            // 
-            this.fileTree.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            //
+            this.fileTree.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | System.Windows.Forms.AnchorStyles.Left)));
             this.fileTree.Location = new System.Drawing.Point(13, 19);
             this.fileTree.Margin = new System.Windows.Forms.Padding(4);
@@ -49,9 +49,9 @@
             this.fileTree.TabIndex = 0;
             this.fileTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.FileTree_AfterSelect);
             this.fileTree.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FileTree_KeyDown);
-            // 
+            //
             // btnSave
-            // 
+            //
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnSave.Location = new System.Drawing.Point(13, 1302);
             this.btnSave.Margin = new System.Windows.Forms.Padding(4);
@@ -61,10 +61,10 @@
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.BtnSave_Click);
-            // 
+            //
             // txtInfo
-            // 
-            this.txtInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            //
+            this.txtInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | System.Windows.Forms.AnchorStyles.Left)));
             this.txtInfo.Location = new System.Drawing.Point(395, 152);
             this.txtInfo.Margin = new System.Windows.Forms.Padding(4);
@@ -73,53 +73,53 @@
             this.txtInfo.ReadOnly = true;
             this.txtInfo.Size = new System.Drawing.Size(380, 1241);
             this.txtInfo.TabIndex = 3;
-            // 
+            //
             // textName
-            // 
+            //
             this.textName.Location = new System.Drawing.Point(395, 62);
             this.textName.Name = "textName";
             this.textName.Size = new System.Drawing.Size(385, 31);
             this.textName.TabIndex = 1;
             this.textName.TextChanged += TextName_TextChanged;
-            // 
+            //
             // label1
-            // 
+            //
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(394, 27);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(74, 25);
             this.label1.TabIndex = 7;
             this.label1.Text = "Name:";
-            // 
+            //
             // label2
-            // 
+            //
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(394, 100);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(66, 25);
             this.label2.TabIndex = 0;
             this.label2.Text = "Type:";
-            // 
+            //
             // comboType
-            // 
+            //
             this.comboType.FormattingEnabled = true;
             this.comboType.Location = new System.Drawing.Point(468, 100);
             this.comboType.Name = "comboType";
             this.comboType.Size = new System.Drawing.Size(312, 33);
             this.comboType.TabIndex = 2;
-            // 
+            //
             // mainPanel
-            // 
-            this.mainPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.mainPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.mainPanel.Location = new System.Drawing.Point(786, 12);
             this.mainPanel.Name = "mainPanel";
             this.mainPanel.Size = new System.Drawing.Size(1306, 1381);
             this.mainPanel.TabIndex = 4;
-            // 
+            //
             // MainFrm
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2104, 1406);

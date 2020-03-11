@@ -33,7 +33,7 @@ namespace UAlbion.Game
         {
             if(e is IPositionedEvent positioned)
                 Raise(positioned.OffsetClone(context.X, context.Y));
-            else 
+            else
                 Raise(e);
         }
 

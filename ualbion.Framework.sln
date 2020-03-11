@@ -55,7 +55,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Api", "Api\UAlbion.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core.Veldrid", "Core.Veldrid\UAlbion.Core.Veldrid.csproj", "{EF1027DF-951A-4544-8780-5D190EE3725E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UAlbion.Game.Veldrid", "Game.Veldrid\UAlbion.Game.Veldrid.csproj", "{8CAAAFFC-3BE8-468B-830D-24610F4F75A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Game.Veldrid", "Game.Veldrid\UAlbion.Game.Veldrid.csproj", "{8CAAAFFC-3BE8-468B-830D-24610F4F75A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -16,7 +16,7 @@ namespace UAlbion.Game
             {
                 x._pendingMapChange = e.MapId;
                 x.LoadMap();
-            }), 
+            }),
             H<MapManager, BeginFrameEvent>((x, e) => x.LoadMap()),
             H<MapManager, RefreshMapSubscribersEvent>((x, e) =>
             {
@@ -64,7 +64,7 @@ namespace UAlbion.Game
                 mapExchange.Attach(map);
 
                 // Set the scene first to ensure scene-local components from other scenes are disabled.
-                Raise(new SetSceneEvent(map is Entities.Map3D.Map ? SceneId.World3D : SceneId.World2D)); 
+                Raise(new SetSceneEvent(map is Entities.Map3D.Map ? SceneId.World3D : SceneId.World2D));
                 Raise(new LogEvent(LogEvent.Level.Info, $"Loaded map {(int) pendingMapChange}: {pendingMapChange}"));
                 Enqueue(new MapInitEvent());
             }

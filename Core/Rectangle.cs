@@ -41,7 +41,7 @@ namespace UAlbion.Core
         public bool Contains(int x, int y)
         {
             return (X <= x && (X + Width) > x)
-                   && (Y <= y && (Y + Height) > y);
+                && (Y <= y && (Y + Height) > y);
         }
 
         public override string ToString() => $"({Left}, {Top}, {Right}, {Bottom})";

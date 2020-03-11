@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SerdesNet;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Core;
@@ -11,7 +12,7 @@ namespace UAlbion.Game.Veldrid.Assets
     public class ImageSharpPostProcessor : IAssetPostProcessor
     {
         public IEnumerable<Type> SupportedTypes => new[] { typeof(Image<Rgba32>) };
-        public object Process(ICoreFactory factory, AssetKey key, string name, object asset) 
+        public object Process(ICoreFactory factory, AssetKey key, string name, object asset)
             => new TrueColorTexture(name, (Image<Rgba32>)asset);
     }
 }

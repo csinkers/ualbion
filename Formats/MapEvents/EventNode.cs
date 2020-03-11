@@ -1,6 +1,6 @@
-﻿using System.Diagnostics;
+﻿using SerdesNet;
+using System.Diagnostics;
 using UAlbion.Api;
-using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -33,7 +33,7 @@ namespace UAlbion.Formats.MapEvents
     public class EventNode : IEventNode
     {
         public const long SizeInBytes = 12;
-        bool DirectSequence => (NextEventId ?? Id + 1) == Id + 1; 
+        bool DirectSequence => (NextEventId ?? Id + 1) == Id + 1;
         public override string ToString() => $"{(DirectSequence ? " " : "#")}{Id}=>{NextEventId?.ToString() ?? "!"}:{Event}";
         public int Id { get; }
         public IMapEvent Event { get; }

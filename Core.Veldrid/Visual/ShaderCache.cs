@@ -123,9 +123,9 @@ namespace UAlbion.Core.Veldrid.Visual
             }
         }
 
-        static byte[] GetBytes(GraphicsBackend backend, string code) => 
-            backend ==  GraphicsBackend.Metal 
-                ? Encoding.UTF8.GetBytes(code) 
+        static byte[] GetBytes(GraphicsBackend backend, string code) =>
+            backend ==  GraphicsBackend.Metal
+                ? Encoding.UTF8.GetBytes(code)
                 : Encoding.ASCII.GetBytes(code);
 
         static CrossCompileTarget GetCompilationTarget(GraphicsBackend backend) => backend switch
@@ -139,7 +139,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
         CacheEntry BuildShaderPair(
             GraphicsBackend backendType,
-            string vertexName, string fragmentName, 
+            string vertexName, string fragmentName,
             string vertexContent, string fragmentContent)
         {
             GraphicsBackend backend = backendType;

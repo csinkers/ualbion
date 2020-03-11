@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
-using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets
 {

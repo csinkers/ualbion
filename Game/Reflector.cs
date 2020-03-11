@@ -40,7 +40,7 @@ namespace UAlbion.Game
             var result = ReflectCommonType(name, o, parent, collectionIndex);
             if (result != null)
                 return result;
-                
+
             result = new ReflectedObject(parent, collectionIndex);
             var t = o.GetType();
             result.Name = name;

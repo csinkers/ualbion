@@ -1,5 +1,5 @@
-﻿using UAlbion.Api;
-using UAlbion.Formats.Parsers;
+﻿using SerdesNet;
+using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -17,9 +17,9 @@ namespace UAlbion.Formats.MapEvents
             e.Value = s.UInt16(nameof(Value), e.Value);
             // e.Value = StoreIncremented.Serdes(nameof(Value), e.Value, s.UInt16);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
-            ApiUtil.Assert(e.Unk5 == 0 
-                    || e.Unk5 == 1 
-                    || e.Unk5 == 2 
+            ApiUtil.Assert(e.Unk5 == 0
+                    || e.Unk5 == 1
+                    || e.Unk5 == 2
                     || e.Unk5 == 3);
             ApiUtil.Assert(e.Unk8 == 0); // Is 152 for a single change wall event in the endgame. Probably just an oversight.
             return e;

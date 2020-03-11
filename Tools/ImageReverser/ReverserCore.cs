@@ -87,7 +87,7 @@ namespace UAlbion.Tools.ImageReverser
         public event EventHandler<AssetChangedArgs> AssetChanged;
 
 
-        public FullXldInfo SelectedXld => 
+        public FullXldInfo SelectedXld =>
             _selectedXldPath != null
             ? Xlds.TryGetValue(_selectedXldPath, out var xld)
                 ? xld
@@ -96,9 +96,9 @@ namespace UAlbion.Tools.ImageReverser
 
         public FullAssetInfo SelectedObject =>
             SelectedXld != null && _selectedItemNumber.HasValue
-                ? SelectedXld.Assets.TryGetValue(_selectedItemNumber.Value, out var asset) 
-                    ? asset 
-                    : null 
+                ? SelectedXld.Assets.TryGetValue(_selectedItemNumber.Value, out var asset)
+                    ? asset
+                    : null
                 : null;
     }
 

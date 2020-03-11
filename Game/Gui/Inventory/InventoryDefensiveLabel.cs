@@ -17,7 +17,7 @@ namespace UAlbion.Game.Gui.Inventory
             H<InventoryDefensiveLabel, InventoryChangedEvent>((x,e) => x._version++),
             H<InventoryDefensiveLabel, HoverEvent>((x, e) =>
             {
-                x.Hover(); 
+                x.Hover();
                 e.Propagating = false;
             }),
             H<InventoryDefensiveLabel, BlurEvent>((x, _) => x.Raise(new HoverTextEvent(""))));

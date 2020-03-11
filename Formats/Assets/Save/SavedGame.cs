@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
@@ -38,7 +39,7 @@ namespace UAlbion.Formats.Assets.Save
 
         public static string GetName(BinaryReader br)
         {
-            var s = new GenericBinaryReader(br, br.BaseStream.Length);
+            var s = new AlbionReader(br, br.BaseStream.Length);
             ushort nameLength = s.UInt16("NameLength", 0);
             if (nameLength > 1024)
                 return "Invalid";

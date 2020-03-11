@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="SerdesNet" Version="1.0.2" />
     <PackageReference Include="System.Memory" Version="4.5.3" />
   </ItemGroup>
 

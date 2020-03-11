@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using SerdesNet;
 using System.IO;
 using System.Linq;
 using System.Text;
 using UAlbion.Api;
-using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets.Save
 {
@@ -41,7 +41,7 @@ namespace UAlbion.Formats.Assets.Save
                 case SerializerMode.Writing:
                 {
                     using var bw = new BinaryWriter(stream, Encoding.GetEncoding(850), true);
-                    var s = new GenericBinaryWriter(bw);
+                    var s = new AlbionWriter(bw);
                     func(s);
                     return (int)s.Offset;
                 }

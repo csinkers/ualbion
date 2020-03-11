@@ -1,4 +1,4 @@
-﻿using UAlbion.Formats.Parsers;
+﻿using SerdesNet;
 
 namespace UAlbion.Formats.MapEvents
 {

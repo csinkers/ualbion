@@ -1,5 +1,5 @@
-﻿using UAlbion.Formats.MapEvents;
-using UAlbion.Formats.Parsers;
+﻿using SerdesNet;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets
 {

@@ -1,6 +1,6 @@
 ﻿using System.IO;
+using SerdesNet;
 using UAlbion.Formats.Config;
-using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats
 {

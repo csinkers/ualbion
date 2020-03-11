@@ -25,7 +25,7 @@ namespace UAlbion.Game
                 delta++;
             }
 
-            if (delta <= 0) 
+            if (delta <= 0)
                 return;
 
             _frameCount += delta;

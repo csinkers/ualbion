@@ -74,7 +74,7 @@ namespace UAlbion.Game.Gui
             uint? bottomRight = C(colors.BottomRight);
             uint? corners = C(colors.Corners);
             uint? background = colors.Background.HasValue ? C(colors.Background.Value) : null;
-            int instanceCount = 
+            int instanceCount =
                   (topLeft.HasValue     ? 2 : 0)
                 + (bottomRight.HasValue ? 2 : 0)
                 + (corners.HasValue     ? 2 : 0)

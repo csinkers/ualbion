@@ -35,8 +35,8 @@ namespace UAlbion.Game
                 case (_, QueryType.IsPartyMemberConscious):  { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query Party member conscious")); break; }
                 case (_, QueryType.EventAlreadyUsed):        { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query event already used")); break; }
                 case (_, QueryType.IsDemoVersion):           { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query is demo")); return false; }
-                case (_, QueryType.PromptPlayer):            { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query prompt")); break; } // Async 
-                case (_, QueryType.PromptPlayerNumeric):     { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query numeric prompt")); break; } // Async 
+                case (_, QueryType.PromptPlayer):            { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query prompt")); break; } // Async
+                case (_, QueryType.PromptPlayerNumeric):     { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query numeric prompt")); break; } // Async
 
                 default:
                     Raise(new LogEvent(LogEvent.Level.Error, $"Unhandled query event {query} (subtype {query.QueryType}"));

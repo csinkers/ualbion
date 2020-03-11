@@ -6,7 +6,7 @@ namespace UAlbion.Formats
 {
     public static class FormatUtil
     {
-        public static string BytesTo850String(byte[] bytes) => 
+        public static string BytesTo850String(byte[] bytes) =>
             Encoding.GetEncoding(850)
                 .GetString(bytes)
                 .Replace("×", "ß")

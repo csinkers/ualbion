@@ -8,8 +8,8 @@ namespace UAlbion.Core.Textures
         protected const uint Height = 256;
         static readonly SubImage SubImage = new SubImage(
             Vector2.Zero,
-            new Vector2(Width, Height), 
-            new Vector2(Width, Height), 
+            new Vector2(Width, Height),
+            new Vector2(Width, Height),
             0);
 
         uint ITexture.Width => 256;

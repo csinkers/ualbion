@@ -1,6 +1,6 @@
 ﻿using System;
+using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {

@@ -138,8 +138,8 @@ namespace UAlbion.Game.State.Player
                     return true;
                 }
                 case ItemSlotId.Tail:
-                    return 
-                        item.TypeId == ItemType.CloseRangeWeapon 
+                    return
+                        item.TypeId == ItemType.CloseRangeWeapon
                         && item.Flags.HasFlag(ItemFlags.TailWieldable);
                 default:
                     return true;
@@ -212,7 +212,7 @@ namespace UAlbion.Game.State.Player
                 if (slotId < ItemSlotId.Slot0 && itemSlot.Flags.HasFlag(ItemSlotFlags.Cursed))
                     return false;
 
-                // TODO: Goddess' amulet etc 
+                // TODO: Goddess' amulet etc
             }
 
             return true;

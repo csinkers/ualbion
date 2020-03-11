@@ -17,10 +17,10 @@ namespace UAlbion.Formats.Assets
             Unk12 = 12,
             Unk14 = 14,
 
-            Unused1 = 1, 
-            Unused3 = 3, 
-            Unused5 = 5, 
-            Unused7 = 7, 
+            Unused1 = 1,
+            Unused3 = 3,
+            Unused5 = 5,
+            Unused7 = 7,
             Unused9 = 9,
             Unused11 = 11,
             Unused13 = 13,
@@ -30,7 +30,7 @@ namespace UAlbion.Formats.Assets
         public enum TileType : byte
         {
             Normal = 0,   // Standard issue
-            UnderlayIat = 1, // Underlay 
+            UnderlayIat = 1, // Underlay
             UnderlayCeltFloor = 2, // Underlay, celtic floors, toilet seats, random square next to pumps, top shelves of desks
             Overlay1 = 4, // Overlay
             Overlay2 = 5, // Overlay, only on continent maps?
@@ -58,7 +58,7 @@ namespace UAlbion.Formats.Assets
             // Rock corners, 134, 143 (+stairs)
             // Cliff edges 200-207, 210
             // Lamps 243
-            Unk2 = 1 << 2, 
+            Unk2 = 1 << 2,
             Unused3   = 1 << 3, // Not used?
             Unused4   = 1 << 4, // Not used?
             // Bed 280, 111, 112
@@ -75,7 +75,7 @@ namespace UAlbion.Formats.Assets
             // 001 = S facing E half of double-wide & top of column?? (300)
             // 010 = S facing W half of double-wide + regular S facing
             // 011 = Terminals & high-backed chair SE section (300)
-            // 100 = 
+            // 100 =
             // 101 = W facing
             // 110 = E facing + beds
             // 111 = S facing E part of triple bench (300)

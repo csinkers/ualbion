@@ -10,7 +10,7 @@ namespace UAlbion.Game
     {
         readonly IList<ICollider> _colliders = new List<ICollider>();
 
-        public bool IsOccupied(Vector2 tilePosition) 
+        public bool IsOccupied(Vector2 tilePosition)
             => _colliders.Aggregate(false, (acc, x) => acc | x.IsOccupied(tilePosition));
 
         public void Register(ICollider collider)

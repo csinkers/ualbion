@@ -78,9 +78,9 @@ namespace UAlbion.Game.Entities.Map2D
 
             var offset = initialDirection switch
                 {
-                    MovementDirection.Left  => new Vector2(1.0f, 0.0f), 
-                    MovementDirection.Right => new Vector2(-1.0f, 0.0f), 
-                    MovementDirection.Up    => new Vector2(0.0f, -1.0f), 
+                    MovementDirection.Left  => new Vector2(1.0f, 0.0f),
+                    MovementDirection.Right => new Vector2(-1.0f, 0.0f),
+                    MovementDirection.Up    => new Vector2(0.0f, -1.0f),
                     MovementDirection.Down  => new Vector2(0.0f, 1.0f),
                     _ => Vector2.Zero
                 } / TicksPerTile;

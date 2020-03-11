@@ -69,7 +69,7 @@ namespace UAlbion.Game.Gui
             int maxOrder = order;
             foreach (var child in _positions)
             {
-                var childSize = child.Width.HasValue && child.Height.HasValue ? Vector2.Zero : child.Element.GetSize(); 
+                var childSize = child.Width.HasValue && child.Height.HasValue ? Vector2.Zero : child.Element.GetSize();
                 var childExtents = new Rectangle(
                     extents.X + child.X,
                     extents.Y + child.Y,

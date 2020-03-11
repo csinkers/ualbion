@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -58,7 +59,7 @@ namespace UAlbion.Game.Veldrid.Input
             var config = assets.LoadCoreSpriteInfo(id);
             _cursorId = id;
             _size = new Vector2(texture.Width, texture.Height);
-            _hotspot = config.Hotspot == null 
+            _hotspot = config.Hotspot == null
                 ? Vector2.Zero
                 : window.GuiScale * new Vector2(config.Hotspot.X, config.Hotspot.Y);
             _dirty = true;

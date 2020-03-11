@@ -34,7 +34,7 @@ namespace UAlbion.Api
 
         public void Complete()
         {
-            if(_complete)
+            if (_complete)
                 throw new InvalidOperationException("Tried to complete a completed async event");
 
             if (_completionCallback == null)

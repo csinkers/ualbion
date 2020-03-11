@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using UAlbion.Api;
@@ -29,9 +28,9 @@ namespace UAlbion.Core.Veldrid.Visual
         }
         public override string ToString() => $"{(UseArrayTexture ? "Array" : "Flat")}_{(PerformDepthTest ? "Depth" : "NoDepth")}{(UsePalette ? "_Pal" : "")}";
 
-        public bool Equals(SpriteShaderKey other) => 
-            UseArrayTexture == other.UseArrayTexture && 
-            PerformDepthTest == other.PerformDepthTest && 
+        public bool Equals(SpriteShaderKey other) =>
+            UseArrayTexture == other.UseArrayTexture &&
+            PerformDepthTest == other.PerformDepthTest &&
             UsePalette == other.UsePalette;
 
         public override bool Equals(object obj) => obj is SpriteShaderKey other && Equals(other);
@@ -126,7 +125,7 @@ namespace UAlbion.Core.Veldrid.Visual
             _shaders.AddRange(shaders);
             var shaderSet = new ShaderSetDescription(new[] { VertexLayout, InstanceLayout }, shaders);
 
-            var depthStencilMode = 
+            var depthStencilMode =
                 key.PerformDepthTest
                 ?  gd.IsDepthRangeZeroToOne
                     ? DepthStencilStateDescription.DepthOnlyLessEqual
@@ -134,8 +133,8 @@ namespace UAlbion.Core.Veldrid.Visual
                 : DepthStencilStateDescription.Disabled;
 
             var rasterizerMode = new RasterizerStateDescription(
-                FaceCullMode.None, 
-                PolygonFillMode.Solid, 
+                FaceCullMode.None,
+                PolygonFillMode.Solid,
                 FrontFace.Clockwise,
                 key.PerformDepthTest, // depth test
                 true); // scissor test

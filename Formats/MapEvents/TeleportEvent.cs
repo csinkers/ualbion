@@ -1,6 +1,6 @@
-﻿using UAlbion.Api;
+﻿using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -34,7 +34,7 @@ namespace UAlbion.Formats.MapEvents
 
         public byte Unk4 { get; set; } // 255 on 2D maps, (1,6) on 3D maps
         public byte Unk5 { get; set; } // 2,3,4,5,6,8,9
-        ushort Unk8 { get; set; } 
+        ushort Unk8 { get; set; }
         public override string ToString() => $"teleport {MapId} <{X}, {Y}> Dir:{Direction} ({Unk4} {Unk5})";
         public MapEventType EventType => MapEventType.MapExit;
     }

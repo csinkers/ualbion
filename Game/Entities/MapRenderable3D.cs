@@ -52,7 +52,7 @@ namespace UAlbion.Game.Entities
             var assets = Resolve<IAssetManager>();
             _tilemap = new TileMap(
                 _mapId.ToString(),
-                DrawLayer.Background, 
+                DrawLayer.Background,
                 _tileSize,
                 _mapData.Width, _mapData.Height,
                 Resolve<ICoreFactory>(),

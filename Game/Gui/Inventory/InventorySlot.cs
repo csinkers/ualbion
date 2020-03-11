@@ -16,7 +16,7 @@ namespace UAlbion.Game.Gui.Inventory
         protected static readonly HandlerSet SlotHandlers = new HandlerSet(
             H<InventorySlot, HoverEvent>((x, e) =>
             {
-                x.Hover(); 
+                x.Hover();
                 e.Propagating = false;
             }),
             H<InventorySlot, BlurEvent>((x, _) =>
@@ -115,7 +115,7 @@ namespace UAlbion.Game.Gui.Inventory
             switch(action)
             {
                 case InventoryAction.Pickup:
-                {   
+                {
                     // <Item name>
                     if (itemName != null)
                     {
@@ -148,14 +148,14 @@ namespace UAlbion.Game.Gui.Inventory
                     break;
                 }
                 case InventoryAction.Coalesce:
-                {   
+                {
                     // Add
                     Raise(new HoverTextExEvent(BuildHoverText(SystemTextId.Item_Add)));
                     Frame.State = ButtonState.Hover;
                     break;
                 }
                 case InventoryAction.NoCoalesceFullStack:
-                {   
+                {
                     // {YELLOW}This space is occupied!
                     Raise(new HoverTextExEvent(BuildHoverText(SystemTextId.Item_ThisSpaceIsOccupied)));
                     Frame.State = ButtonState.Hover;

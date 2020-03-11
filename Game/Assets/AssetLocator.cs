@@ -65,7 +65,7 @@ namespace UAlbion.Game.Assets
         }
 
         readonly AssetCache _assetCache;
-        readonly StandardAssetLocator _standardAssetLocator; 
+        readonly StandardAssetLocator _standardAssetLocator;
 
         IAssetLocator GetLocator(AssetType type)
         {
@@ -85,7 +85,7 @@ namespace UAlbion.Game.Assets
             if (asset != null)
                 return asset;
 
-            var name = 
+            var name =
                 typeof(T) == typeof(int)
                 ? $"{type}.{AssetNameResolver.GetName(type, (int)(object)enumId)}"
                 : $"{type}.{enumId}";
@@ -100,7 +100,7 @@ namespace UAlbion.Game.Assets
         {
             int id = Convert.ToInt32(enumId);
             var key = new AssetKey(type, id, language);
-            var name = 
+            var name =
                 typeof(T) == typeof(int)
                 ? $"{type}.{AssetNameResolver.GetName(type, (int)(object)enumId)}"
                 : $"{type}.{enumId}";

@@ -44,8 +44,8 @@ namespace UAlbion.Game.Gui.Inventory
             var amountSource = new DynamicText(() =>
             {
                 GetSlot(out var slotInfo, out _);
-                return slotInfo == null || slotInfo.Amount < 2 
-                    ? new TextBlock[0] 
+                return slotInfo == null || slotInfo.Amount < 2
+                    ? new TextBlock[0]
                     : new[] { new TextBlock(slotInfo.Amount.ToString()) { Alignment = TextAlignment.Right } };
             }, x => _version);
 

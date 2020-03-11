@@ -47,7 +47,7 @@ namespace UAlbion.Game.Gui
                 maxOrder = Math.Max(maxOrder, func(child, childExtents, order + 1));
                 // Rendering may have altered the size of any text elements, so retrieve it
                 // again to ensure correct rendering on the first frame.
-                height = (int)child.GetSize().Y; 
+                height = (int)child.GetSize().Y;
                 offset += height;
             }
             return maxOrder;

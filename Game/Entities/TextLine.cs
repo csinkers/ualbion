@@ -39,7 +39,7 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        public override string ToString() => 
+        public override string ToString() =>
             "TextLine:[ " +
             string.Join("; ", Children.OfType<TextChunk>().Select(x => x.ToString()))
             + " ]";

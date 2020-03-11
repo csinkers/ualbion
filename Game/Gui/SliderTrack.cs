@@ -80,7 +80,7 @@ namespace UAlbion.Game.Gui
                     if (thumbExtents.Contains((int) uiPosition.X, (int) uiPosition.Y))
                     {
                         // Not sure why the -1 is necessary, can't be bothered investigating further as it works well enough.
-                        _clickPosition = uiPosition.X - thumbExtents.X - 1; 
+                        _clickPosition = uiPosition.X - thumbExtents.X - 1;
                         _state = SliderState.DraggingThumb;
                     }
                     else if (uiPosition.X < thumbExtents.X)

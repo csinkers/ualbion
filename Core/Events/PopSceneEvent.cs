@@ -1,3 +1,0 @@
-﻿namespace UAlbion.Core.Events
-{
-}

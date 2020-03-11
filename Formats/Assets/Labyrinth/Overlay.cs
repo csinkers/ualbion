@@ -1,5 +1,5 @@
-﻿using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Parsers;
+﻿using SerdesNet;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets.Labyrinth
 {

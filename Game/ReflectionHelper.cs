@@ -29,8 +29,8 @@ namespace UAlbion.Game
                 }
 
                 foreach (var type in assemblyTypes.Where(x =>
-                    x != null && 
-                    !x.IsAbstract && 
+                    x != null &&
+                    !x.IsAbstract &&
                     x.GetCustomAttributes(false).Any()))
                 {
                     types.Add(type);
@@ -45,7 +45,7 @@ namespace UAlbion.Game
         {
             foreach (var type in _typeCache)
             {
-                if (!typeof(T).IsAssignableFrom(type)) 
+                if (!typeof(T).IsAssignableFrom(type))
                     continue;
 
                 var attribute = (TAttribute)type.GetCustomAttribute(typeof(TAttribute), false);

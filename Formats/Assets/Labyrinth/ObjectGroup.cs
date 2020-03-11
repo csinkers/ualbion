@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UAlbion.Formats.Parsers;
+using SerdesNet;
 
 namespace UAlbion.Formats.Assets.Labyrinth
 {

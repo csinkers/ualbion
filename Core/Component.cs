@@ -54,7 +54,7 @@ namespace UAlbion.Core
             => new Handler<TComponent, TEvent>(callback);
 
         // Usually set to a static HandlerSet, but can also be per-instance is so desired.
-        readonly IDictionary<Type, Handler> _handlers; 
+        readonly IDictionary<Type, Handler> _handlers;
         protected EventExchange Exchange { get; private set; } // N.B. will be null until subscribed.
         protected IList<IComponent> Children { get; } = new List<IComponent>();
 

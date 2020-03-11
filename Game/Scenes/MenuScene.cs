@@ -1,6 +1,4 @@
-﻿using System;
-using UAlbion.Core;
-using UAlbion.Core.Visual;
+﻿using UAlbion.Core;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 

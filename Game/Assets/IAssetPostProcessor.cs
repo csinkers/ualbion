@@ -6,7 +6,7 @@ namespace UAlbion.Game.Assets
 {
     public interface IAssetPostProcessor
     {
-        object Process(ICoreFactory factory, string name, object asset);
+        object Process(ICoreFactory factory, AssetKey key, string name, object asset);
         IEnumerable<Type> SupportedTypes { get; }
     }
 }

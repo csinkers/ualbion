@@ -46,10 +46,15 @@ namespace UAlbion.Game.Entities
                     return;
 
                 var position = leader.GetPosition() * map.TileSize;
+                var position2 = new Vector2(position.X, position.Y);
                 const float lerpRate = 3.0f; // TODO: Data driven
-                _position = new Vector2(
-                    ApiUtil.Lerp(_position.X, position.X, lerpRate * e.DeltaSeconds),
-                    ApiUtil.Lerp(_position.Y, position.Y, lerpRate * e.DeltaSeconds));
+
+                if ((_position - position2).LengthSquared() < 0.25f)
+                    _position = position2;
+                else
+                    _position = new Vector2(
+                        ApiUtil.Lerp(_position.X, position.X, lerpRate * e.DeltaSeconds),
+                        ApiUtil.Lerp(_position.Y, position.Y, lerpRate * e.DeltaSeconds));
             }
 
             if (map == null) return;

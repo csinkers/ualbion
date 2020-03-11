@@ -11,7 +11,7 @@ namespace UAlbion.Game.Assets
     public class AlbionSpritePostProcessor : IAssetPostProcessor
     {
         public IEnumerable<Type> SupportedTypes => new[] { typeof(AlbionSprite) };
-        public object Process(ICoreFactory factory, string name, object asset)
+        public object Process(ICoreFactory factory, AssetKey key, string name, object asset)
         {
             var sprite = (AlbionSprite)asset;
             SubImage[] subImages;
@@ -19,10 +19,13 @@ namespace UAlbion.Game.Assets
 
             if (sprite.UniformFrames && sprite.Frames.Count >= 256)
             {
-                // For things like tilemaps etc we repack into a power of 2-aligned texture atlas.
-                int tileWidth = sprite.Width;
-                int tileHeight = sprite.Height / sprite.Frames.Count;
-                var (width, height) = GetAtlasSize(tileWidth, tileHeight, sprite.Frames.Count);
+                const int buffer = 1;
+                // For things like tilemaps etc we repack into a texture atlas with buffer pixels.
+                int srcTileWidth = sprite.Width;
+                int srcTileHeight = sprite.Height / sprite.Frames.Count;
+                int destTileWidth = srcTileWidth + buffer * 2;
+                int destTileHeight = srcTileHeight + buffer * 2;
+                var (width, height) = GetAtlasSize(destTileWidth, destTileHeight, sprite.Frames.Count);
                 pixelData = new byte[width * height];
                 subImages = new SubImage[sprite.Frames.Count];
 
@@ -30,29 +33,29 @@ namespace UAlbion.Game.Assets
                 int curY = 0;
                 for (int n = 0; n < sprite.Frames.Count; n++)
                 {
-                    for (int j = 0; j < tileHeight; j++)
+                    for (int j = 0; j < destTileHeight; j++)
                     {
-                        for (int i = 0; i < tileWidth; i++)
+                        for (int i = 0; i < destTileWidth; i++)
                         {
-                            var sourceX = i;
-                            var sourceY = j + n * tileHeight;
+                            var sourceX = Math.Clamp(i - buffer, 0, srcTileWidth - 1);
+                            var sourceY = Math.Clamp(j - buffer, 0, srcTileHeight - 1) + n * srcTileHeight;
                             var destX = curX + i;
                             var destY = curY + j;
-                            pixelData[destY * width + destX] = sprite.PixelData[sourceX + sourceY * tileWidth];
+                            pixelData[destY * width + destX] = sprite.PixelData[sourceX + sourceY * srcTileWidth];
                         }
                     }
 
                     subImages[n] = new SubImage(
-                        new Vector2(curX, curY),
-                        new Vector2(tileWidth, tileHeight),
+                        new Vector2(curX + buffer, curY + buffer),
+                        new Vector2(srcTileWidth, srcTileHeight),
                         new Vector2(width, height),
                         0);
 
-                    curX += tileWidth;
-                    if (curX + tileWidth > width)
+                    curX += destTileWidth;
+                    if (curX + destTileWidth > width)
                     {
                         curX = 0;
-                        curY += tileHeight;
+                        curY += destTileHeight;
                     }
                 }
 

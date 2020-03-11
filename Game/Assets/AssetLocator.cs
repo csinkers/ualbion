@@ -119,7 +119,7 @@ namespace UAlbion.Game.Assets
                 var asset = locator.LoadAsset(key, name, (x, y) => LoadAssetCached(x.Type, x.Id, x.Language));
 
                 if (asset != null && _postProcessors.TryGetValue(asset.GetType(), out var processor))
-                    asset = processor.Process(factory, name, asset);
+                    asset = processor.Process(factory, key, name, asset);
                 return asset;
             }
             catch (Exception e)

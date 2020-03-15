@@ -22,6 +22,7 @@ namespace UAlbion.Game.Gui
         Vector2 _lastPixelSize; // For dirty state detection
 
         public DialogFrame(IUiElement child) : base(Handlers) => Children.Add(child);
+        public DialogFrameBackgroundStyle Background { get; set; }
         void Rebuild(int width, int height, DrawLayer order)
         {
             var shadowSubImage = new SubImage(Vector2.Zero, Vector2.Zero, Vector2.One, 0);
@@ -71,8 +72,22 @@ namespace UAlbion.Game.Gui
             }
 
             // Background
-            var background = assets.LoadTexture(CoreSpriteId.UiBackground);
-            multi.AddTexture(1, background, 7, 7, 0, true, (uint)width - 14, (uint)height - 14);
+            switch (Background)
+            {
+                case DialogFrameBackgroundStyle.MainMenuPattern:
+                {
+                    var background = assets.LoadTexture(CoreSpriteId.UiBackground);
+                    multi.AddTexture(1, background, 7, 7, 0, true, (uint) width - 14, (uint) height - 14);
+                    break;
+                }
+
+                case DialogFrameBackgroundStyle.DarkTint:
+                {
+                    var colors = Resolve<ICommonColors>();
+                    multi.AddTexture(1, colors.BorderTexture, 7, 7, 0, false, (uint)width - 14, (uint)height - 14, 128);
+                    break;
+                }
+            }
 
             // Corners
             multi.AddTexture(1, assets.LoadTexture(CoreSpriteId.UiWindowTopLeft), 0, 0, 0, true);

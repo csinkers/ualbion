@@ -380,8 +380,6 @@ namespace UAlbion.Core.Veldrid
             foreach(var renderer in _renderers)
                 if (renderer is IDisposable disposable)
                     disposable.Dispose();
-
-            //_graphicsDevice?.Dispose();
         }
     }
 }

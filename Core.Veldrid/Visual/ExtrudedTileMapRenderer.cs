@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using UAlbion.Api;
@@ -24,7 +23,8 @@ namespace UAlbion.Core.Veldrid.Visual
             VertexLayoutHelper.Int("Textures"), // 3
             VertexLayoutHelper.Int("Flags"), // 4
             VertexLayoutHelper.Vector2D("WallSize") // 5
-        ) { InstanceStepRate = 1 };
+        )
+        { InstanceStepRate = 1 };
 
         static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
             ResourceLayoutHelper.UniformV("vdspv_0_0"),  // Misc Uniform Data
@@ -109,7 +109,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public void CreateDeviceObjects(IRendererContext context)
         {
-            var c = (VeldridRendererContext) context;
+            var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
             var sc = c.SceneContext;
@@ -169,10 +169,9 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public IEnumerable<IRenderable> UpdatePerFrameResources(IRendererContext context, IEnumerable<IRenderable> renderables)
         {
-            var c = (VeldridRendererContext) context;
+            var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
-            var sc = c.SceneContext;
 
             ITextureManager textureManager = Resolve<ITextureManager>();
             foreach (var buffer in _instanceBuffers)
@@ -196,23 +195,25 @@ namespace UAlbion.Core.Veldrid.Visual
                 textureManager.PrepareTexture(tilemap.Walls, context);
             }
 
-            foreach (var tilemap in renderables.OfType<TileMap>())
+            foreach (var renderable in renderables)
             {
-                var window = new TileMapWindow(tilemap, 0, tilemap.Tiles.Length);
-                UpdateTilemapWindow(window);
-                yield return window;
-            }
-
-            foreach (var window in renderables.OfType<TileMapWindow>())
-            {
-                UpdateTilemapWindow(window);
-                yield return window;
+                if (renderable is TileMap tilemap)
+                {
+                    var dummyWindow = new TileMapWindow(tilemap, 0, tilemap.Tiles.Length);
+                    UpdateTilemapWindow(dummyWindow);
+                    yield return dummyWindow;
+                }
+                else if (renderable is TileMapWindow window)
+                {
+                    UpdateTilemapWindow(window);
+                    yield return window;
+                }
             }
         }
 
         public void Render(IRendererContext context, RenderPasses renderPass, IRenderable renderable)
         {
-            var c = (VeldridRendererContext) context;
+            var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
             var sc = c.SceneContext;

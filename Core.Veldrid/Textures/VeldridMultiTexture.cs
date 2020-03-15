@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api;
@@ -33,35 +32,33 @@ namespace UAlbion.Core.Veldrid.Textures
             if (_isMetadataDirty)
                 RebuildLayers();
 
-            var palette = _paletteManager.Palette.GetCompletePalette();
+            var palette = PaletteManager.Palette.GetCompletePalette();
             using var staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, TextureUsage.Staging, Type));
             staging.Name = "T_" + Name + "_Staging";
 
-            unsafe
+            Span<uint> toBuffer = stackalloc uint[(int)(Width * Height)];
+            foreach (var lsi in _logicalSubImages)
             {
-                uint* toBuffer = stackalloc uint[(int)(Width * Height)];
-                foreach (var lsi in _logicalSubImages)
+                //if (!rebuildAll && !lsi.IsPaletteAnimated) // TODO: Requires caching a single Texture and then modifying it
+                //    continue;
+
+                for (int i = 0; i < lsi.Frames; i++)
                 {
-                    //if (!rebuildAll && !lsi.IsPaletteAnimated) // TODO: Requires caching a single Texture and then modifying it
-                    //    continue;
+                    toBuffer.Fill(lsi.IsAlphaTested ? 0 : 0xff000000);
+                    Rebuild(lsi, i, toBuffer, palette);
 
-                    for (int i = 0; i < lsi.Frames; i++)
+                    uint destinationLayer = (uint)_layerLookup[new LayerKey(lsi.Id, i)];
+
+                    unsafe
                     {
-                        if(lsi.IsAlphaTested)
-                            MemsetZero((byte*)toBuffer, (int)(Width * Height * sizeof(uint)));
-                        else
+                        fixed (uint* toBufferPtr = toBuffer)
                         {
-                            for (int j = 0; j < Width * Height; j++)
-                                toBuffer[j] = 0xff000000;
+                            gd.UpdateTexture(
+                                staging, (IntPtr)toBufferPtr, Width * Height * sizeof(uint),
+                                0, 0, 0,
+                                Width, Height, 1,
+                                0, destinationLayer);
                         }
-
-                        BuildFrame(lsi, i, toBuffer, palette);
-
-                        uint destinationLayer = (uint)_layerLookup[new LayerKey(lsi.Id, i)];
-                        gd.UpdateTexture(
-                            staging, (IntPtr)toBuffer, Width * Height * sizeof(uint),
-                            0, 0, 0, Width, Height, 1,
-                            0, destinationLayer);
                     }
                 }
             }
@@ -91,7 +88,7 @@ namespace UAlbion.Core.Veldrid.Textures
             if(_isMetadataDirty)
                 RebuildLayers();
 
-            var palette = _paletteManager.Palette.GetCompletePalette();
+            var palette = PaletteManager.Palette.GetCompletePalette();
             var logicalImage = _logicalSubImages[logicalId];
             if (!_layerLookup.TryGetValue(new LayerKey(logicalId, tick % logicalImage.Frames), out var subImageId))
                 return;
@@ -103,8 +100,11 @@ namespace UAlbion.Core.Veldrid.Textures
 
             unsafe
             {
-                fixed (Rgba32* toBuffer = &pixels[0])
-                    BuildFrame(logicalImage, tick, (uint*)toBuffer, palette);
+                fixed (Rgba32* pixelPtr = pixels)
+                {
+                    Span<uint> toBuffer = new Span<uint>((uint*)pixelPtr, pixels.Length);
+                    Rebuild(logicalImage, tick, toBuffer, palette);
+                }
             }
 
             Image<Rgba32> image = new Image<Rgba32>(width, height);
@@ -112,20 +112,6 @@ namespace UAlbion.Core.Veldrid.Textures
             image.Frames.RemoveFrame(0);
             using var stream = File.OpenWrite(path);
             image.SaveAsBmp(stream);
-        }
-
-        [DllImport("Kernel32.dll", EntryPoint = "RtlZeroMemory", SetLastError = false)]
-        static extern void ZeroMemory(IntPtr dest, IntPtr size);
-
-        unsafe void MemsetZero(byte* buffer, int size)
-        {
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                ZeroMemory((IntPtr)buffer, (IntPtr)size);
-            }
-            else
-                for (int i = 0; i < size; i++)
-                    *(buffer + i) = 0;
         }
 
         public VeldridMultiTexture(string name, IPaletteManager paletteManager) : base(name, paletteManager)

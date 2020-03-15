@@ -27,11 +27,10 @@ namespace UAlbion.Core.Veldrid.Visual
         public RenderPasses RenderPasses => RenderPasses.Duplicator;
         public DrawLayer RenderOrder => DrawLayer.MaxLayer;
         public int PipelineId => 1;
-        public Type Renderer => typeof(ScreenDuplicator);
 
         public void CreateDeviceObjects(IRendererContext context)
         {
-            var c = (VeldridRendererContext) context;
+            var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
             var sc = c.SceneContext;
@@ -84,9 +83,8 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public void Render(IRendererContext context, RenderPasses renderPass, IRenderable r)
         {
-            var c = (VeldridRendererContext) context;
+            var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
-            var gd = c.GraphicsDevice;
             var sc = c.SceneContext;
 
             cl.SetPipeline(_pipeline);

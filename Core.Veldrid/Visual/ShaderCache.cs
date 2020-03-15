@@ -76,7 +76,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
             // Substitute include files
             var sb = new StringBuilder();
-            foreach(var line in lines)
+            foreach (var line in lines)
             {
                 var match = IncludeRegex.Match(line);
                 if (match.Success)
@@ -124,7 +124,7 @@ namespace UAlbion.Core.Veldrid.Visual
         }
 
         static byte[] GetBytes(GraphicsBackend backend, string code) =>
-            backend ==  GraphicsBackend.Metal
+            backend == GraphicsBackend.Metal
                 ? Encoding.UTF8.GetBytes(code)
                 : Encoding.ASCII.GetBytes(code);
 

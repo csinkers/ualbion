@@ -181,10 +181,16 @@ namespace UAlbion.Game.Text
                     block.Text = sb.ToString();
                     yield return block;
                     sb.Clear();
-                    block = new TextBlock();
+                    block = new TextBlock
+                    {
+                        Alignment = block.Alignment,
+                        Arrangement = block.Arrangement,
+                        Style = block.Style,
+                        Color = block.Color,
+                    };
                 }
 
-                switch(token)
+                switch (token)
                 {
                     case Token.Ink: block.Color = (FontColor)(int)p; break;
 

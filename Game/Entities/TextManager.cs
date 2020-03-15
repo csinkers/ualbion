@@ -185,7 +185,7 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        public ITextSource GetMapTextFromTextEvent(TextEvent textEvent)
+        public ITextSource GetMapTextFromTextEvent(TextEvent textEvent, FontColor color)
         {
             var id = textEvent.TextId;
             var mapId = (int)Resolve<IMapManager>().Current.MapId;
@@ -195,7 +195,10 @@ namespace UAlbion.Game.Entities
                 var assets = Resolve<IAssetManager>();
                 var settings = Resolve<ISettings>();
                 var textFormatter = new TextFormatter(assets, settings.Gameplay.Language);
-                return textFormatter.Format(new StringId(AssetType.MapText, mapId, id)).Blocks;
+                return textFormatter
+                    .Ink(color)
+                    .Format(new StringId(AssetType.MapText, mapId, id))
+                    .Blocks;
             });
         }
 
@@ -206,26 +209,26 @@ namespace UAlbion.Game.Entities
             {
                 case TextEvent.TextLocation.TextInWindow:
                 {
-                    var dialog = AttachChild(new TextWindow(GetMapTextFromTextEvent(textEvent)));
+                    var dialog = AttachChild(new TextWindow(GetMapTextFromTextEvent(textEvent, FontColor.Yellow)));
                     dialog.Closed += (sender, _) => textEvent.Complete();
                     break;
                 }
 
                 case TextEvent.TextLocation.TextInWindowWithPortrait:
                 case TextEvent.TextLocation.TextInWindowWithPortrait2:
-                {
-                    var dialog = AttachChild(new TextWindow(GetMapTextFromTextEvent(textEvent)));
+                { 
+                    var dialog = AttachChild(new TextWindow(GetMapTextFromTextEvent(textEvent, FontColor.Yellow), textEvent.PortraitId));
                     dialog.Closed += (sender, _) => textEvent.Complete();
                     break;
                 }
 
                 case TextEvent.TextLocation.QuickInfo:
-                    Raise(new DescriptionTextExEvent(GetMapTextFromTextEvent(textEvent)));
+                    Raise(new DescriptionTextExEvent(GetMapTextFromTextEvent(textEvent, FontColor.White)));
                     textEvent.Complete();
                     break;
 
                 default:
-                    Raise(new DescriptionTextExEvent(GetMapTextFromTextEvent(textEvent))); // TODO:
+                    Raise(new DescriptionTextExEvent(GetMapTextFromTextEvent(textEvent, FontColor.White))); // TODO:
                     textEvent.Complete();
                     break;
             }

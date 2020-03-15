@@ -52,7 +52,7 @@ namespace UAlbion.Core
         Vector2 _windowSize = Vector2.One;
         Matrix4x4 _viewMatrix;
         Matrix4x4 _projectionMatrix;
-        float _magnification = 4.0f; // TODO: Ensure this defaults to something sensible, and at some point lock it to a value that fits the gameplay and map design.
+        float _magnification = 2.0f; // TODO: Ensure this defaults to something sensible, and at some point lock it to a value that fits the gameplay and map design.
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;

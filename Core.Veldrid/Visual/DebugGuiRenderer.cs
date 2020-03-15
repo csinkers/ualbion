@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
@@ -26,9 +25,6 @@ namespace UAlbion.Core.Veldrid.Visual
         public RenderPasses RenderPasses => RenderPasses.Standard;
         public DrawLayer RenderOrder => DrawLayer.Debug;
         public int PipelineId => 1;
-
-        public Type Renderer => typeof(DebugGuiRenderer);
-        public Matrix4x4 Transform => Matrix4x4.Identity;
 
         public void CreateDeviceObjects(IRendererContext context)
         {
@@ -58,8 +54,6 @@ namespace UAlbion.Core.Veldrid.Visual
             _imguiRenderer.Render(c.GraphicsDevice, c.CommandList);
             c.CommandList.SetFullScissorRects();
         }
-
-        public void UpdatePerFrameResources(IRendererContext context, IRenderable r) { }
 
         public void Dispose() { DestroyDeviceObjects(); }
     }

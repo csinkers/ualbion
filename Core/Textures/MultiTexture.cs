@@ -8,7 +8,7 @@ namespace UAlbion.Core.Textures
 {
     public abstract class MultiTexture : ITexture
     {
-        protected readonly IPaletteManager _paletteManager;
+        protected readonly IPaletteManager PaletteManager;
 
         protected class SubImageComponent
         {
@@ -17,6 +17,7 @@ namespace UAlbion.Core.Textures
             public uint Y { get; set; }
             public uint? W { get; set; }
             public uint? H { get; set; }
+            public byte Alpha { get; set; } = 0xff;
             public override string ToString() => $"({X}, {Y}) {Source}";
         }
 
@@ -64,7 +65,7 @@ namespace UAlbion.Core.Textures
 
         public MultiTexture(string name, IPaletteManager paletteManager)
         {
-            _paletteManager = paletteManager;
+            PaletteManager = paletteManager;
             Name = name;
             MipLevels = 1; //(uint)Math.Min(Math.Log(Width, 2.0), Math.Log(Height, 2.0));
 
@@ -85,11 +86,11 @@ namespace UAlbion.Core.Textures
         {
             get
             {
-                var version = _paletteManager.Version;
-                if ((_isAnySubImagePaletteAnimated && version != _lastPaletteVersion) || _paletteManager.Palette.Id != _lastPaletteId)
+                var version = PaletteManager.Version;
+                if ((_isAnySubImagePaletteAnimated && version != _lastPaletteVersion) || PaletteManager.Palette.Id != _lastPaletteId)
                 {
                     _lastPaletteVersion = version;
-                    _lastPaletteId = _paletteManager.Palette.Id;
+                    _lastPaletteId = PaletteManager.Palette.Id;
                     return true;
                 }
 
@@ -145,7 +146,7 @@ namespace UAlbion.Core.Textures
             _layerLookup.Clear();
             _layerSizes.Clear();
 
-            var palette = _paletteManager.Palette.GetCompletePalette();
+            var palette = PaletteManager.Palette.GetCompletePalette();
             var animatedRange =
                 palette
                     .SelectMany(x => x.Select((y, i) => (y, i)))
@@ -196,7 +197,7 @@ namespace UAlbion.Core.Textures
                 throw new InvalidOperationException("Too many textures added to multi-texture");
         }
 
-        public void AddTexture(int logicalId, ITexture texture, uint x, uint y, byte? transparentColor, bool isAlphaTested, uint? w = null, uint? h = null)
+        public void AddTexture(int logicalId, ITexture texture, uint x, uint y, byte? transparentColor, bool isAlphaTested, uint? w = null, uint? h = null, byte alpha = 255)
         {
             if(logicalId == 0)
                 throw new InvalidOperationException("Logical Subimage Index 0 is reserved for a blank / transparent state");
@@ -216,7 +217,8 @@ namespace UAlbion.Core.Textures
                 X = x,
                 Y = y,
                 W = w,
-                H = h
+                H = h,
+                Alpha = alpha
             });
 
             IsDirty = true;
@@ -232,7 +234,7 @@ namespace UAlbion.Core.Textures
             return Math.Max(1, ret);
         }
 
-        protected unsafe void BuildFrame(LogicalSubImage lsi, int frameNumber, uint* toBuffer, IList<uint[]> palette)
+        protected void Rebuild(LogicalSubImage lsi, int frameNumber, Span<uint> toBuffer, IList<uint[]> palette)
         {
             foreach (var component in lsi.Components)
             {
@@ -253,18 +255,17 @@ namespace UAlbion.Core.Textures
                     continue;
                 }
 
-                fixed (byte* fromBuffer = &eightBitTexture.TextureData[0])
-                {
-                    CoreUtil.Blit8To32(
-                        (uint)sourceWidth, (uint)sourceHeight,
-                        destWidth, destHeight,
-                        fromBuffer + sourceOffset,
-                        toBuffer + (int)(component.Y * Width + component.X),
-                        sourceStride,
-                        (int)Width,
-                        palette[_paletteManager.Frame],
-                        lsi.TransparentColor);
-                }
+                ReadOnlySpan<byte> fromSlice = ((ReadOnlySpan<byte>)eightBitTexture.TextureData).Slice(
+                    sourceOffset,
+                    sourceWidth + (sourceHeight - 1) * sourceStride);
+
+                Span<uint> toSlice = toBuffer.Slice(
+                    (int)(component.Y * Width + component.X),
+                    (int)(destWidth + (destHeight - 1) * Width));
+
+                var from = new ReadOnlyByteImageBuffer((uint)sourceWidth, (uint)sourceHeight, (uint)sourceStride, fromSlice);
+                var to = new UIntImageBuffer(destWidth, destHeight, (int)Width, toSlice);
+                CoreUtil.Blit8To32(from, to, palette[PaletteManager.Frame], component.Alpha, lsi.TransparentColor);
             }
         }
 

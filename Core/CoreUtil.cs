@@ -122,89 +122,78 @@ namespace UAlbion.Core
             }
         }
 
-        static unsafe void Blit8To32Transparent(
-            uint width, uint height,
-            byte* from, uint* to,
-            int fromStride, int toStride,
-            uint[] palette, byte? transparentColor)
+        static void Blit8To32Transparent(ReadOnlyByteImageBuffer from, UIntImageBuffer to, uint[] palette, byte componentAlpha, byte? transparentColor)
         {
-            for (int j = 0; j < height; j++)
-            {
-                for (int i = 0; i < width; i++)
-                {
-                    if (*from != transparentColor)
-                        *to = palette[*from];
+            int fromOffset = 0;
+            int toOffset = 0;
 
-                    from++;
-                    to++;
+            for (int j = 0; j < from.Height; j++)
+            {
+                for (int i = 0; i < from.Width; i++)
+                {
+                    if (from.Buffer[fromOffset] != transparentColor)
+                        to.Buffer[toOffset] = palette[from.Buffer[fromOffset]] & 0x00ffffff | ((uint)componentAlpha << 24);
+
+                    fromOffset++;
+                    toOffset++;
                 }
 
-                from += fromStride - width;
-                to += toStride - width;
+                fromOffset += (int)(from.Stride - from.Width);
+                toOffset += (int)(to.Stride - to.Width);
             }
         }
 
-        static unsafe void Blit8To32Opaque(
-            uint width, uint height,
-            byte* from, uint* to,
-            int fromStride, int toStride,
-            uint[] palette)
+        static void Blit8To32Opaque(ReadOnlyByteImageBuffer from, UIntImageBuffer to, uint[] palette, byte componentAlpha)
         {
-            for (int j = 0; j < height; j++)
+            int fromOffset = 0;
+            int toOffset = 0;
+
+            for (int j = 0; j < from.Height; j++)
             {
-                for (int i = 0; i < width; i++)
+                for (int i = 0; i < from.Width; i++)
                 {
-                    *to = palette[*from];
-                    from++;
-                    to++;
+                    to.Buffer[toOffset] = palette[from.Buffer[fromOffset]] & 0x00ffffff | ((uint) componentAlpha << 24);
+                    fromOffset++;
+                    toOffset++;
                 }
 
-                from += fromStride - width;
-                to += toStride - width;
+                fromOffset += (int)(from.Stride - from.Width);
+                toOffset += (int)(to.Stride - to.Width);
             }
         }
 
-        internal static unsafe void Blit8To32(
-            uint fromWidth, uint fromHeight,
-            uint toWidth, uint toHeight,
-            byte* fromBuffer, uint* toBuffer,
-            int fromStride, int toStride,
-            uint[] palette, byte? transparentColor)
+        internal static void Blit8To32(ReadOnlyByteImageBuffer from, UIntImageBuffer to, uint[] palette, byte componentAlpha, byte? transparentColor)
         {
-            uint initialToWidth = toWidth;
-            int y = 0;
+            uint remainingWidth = to.Width;
+            uint remainingHeight = to.Height;
+            Span<uint> dest = to.Buffer;
+
+            uint chunkHeight = Math.Min(from.Height, to.Height);
             do
             {
-                int x = 0;
-                uint height = Math.Min(fromHeight, toHeight);
-                uint* rowStart = toBuffer;
+                Span<uint> rowStart = dest;
+                chunkHeight = Math.Min(chunkHeight, remainingHeight);
+                uint chunkWidth = Math.Min(from.Width, to.Width);
                 do
                 {
-                    uint width = Math.Min(fromWidth, toWidth);
+                    chunkWidth = Math.Min(chunkWidth, remainingWidth);
+                    var newFrom = new ReadOnlyByteImageBuffer(chunkWidth, chunkHeight, from.Stride, from.Buffer);
+                    var newTo = new UIntImageBuffer(chunkWidth, chunkHeight, to.Stride, dest);
 
                     if (transparentColor.HasValue)
-                        Blit8To32Transparent(
-                            width, height,
-                            fromBuffer, toBuffer,
-                            fromStride, toStride,
-                            palette, transparentColor.Value);
+                        Blit8To32Transparent(newFrom, newTo, palette, componentAlpha, transparentColor.Value);
                     else
-                        Blit8To32Opaque(
-                            width, height,
-                            fromBuffer, toBuffer,
-                            fromStride, toStride,
-                            palette);
+                        Blit8To32Opaque(newFrom, newTo, palette, componentAlpha);
 
-                    toBuffer += width;
-                    toWidth -= width;
-                    x++;
-                } while (toWidth > 0);
+                    dest = dest.Slice((int)chunkWidth);
+                    remainingWidth -= chunkWidth;
+                } while (remainingWidth > 0);
 
-                toBuffer = rowStart + height * toStride;
-                toHeight -= height;
-                toWidth = initialToWidth;
-                y++;
-            } while (toHeight > 0);
+                remainingHeight -= chunkHeight;
+                remainingWidth = to.Width;
+                if (remainingHeight > 0)
+                    dest = rowStart.Slice((int)(chunkHeight * to.Stride));
+            } while (remainingHeight > 0);
         }
 
         public static void LogInfo(string msg) => Engine.Global?.Raise(new LogEvent(LogEvent.Level.Info, msg), null);

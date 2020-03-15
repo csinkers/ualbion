@@ -19,7 +19,9 @@ namespace UAlbion.Core.Veldrid.Visual
         public SpriteShaderKey(MultiSprite sprite) : this(
                 sprite.Key.Texture.ArrayLayers > 1,
                 (sprite.Key.Flags & SpriteKeyFlags.NoDepthTest) == 0,
-                sprite.Key.Texture is EightBitTexture) { }
+                sprite.Key.Texture is EightBitTexture)
+        { }
+
         public SpriteShaderKey(bool useArrayTexture, bool performDepthTest, bool usePalette)
         {
             UseArrayTexture = useArrayTexture;
@@ -50,7 +52,7 @@ namespace UAlbion.Core.Veldrid.Visual
     public class SpriteRenderer : Component, IRenderer
     {
         // Vertex Layout
-        static readonly VertexLayoutDescription VertexLayout =  VertexLayoutHelper.Vertex2DTextured;
+        static readonly VertexLayoutDescription VertexLayout = VertexLayoutHelper.Vertex2DTextured;
 
         // Instance Layout
         static readonly VertexLayoutDescription InstanceLayout = new VertexLayoutDescription(
@@ -61,8 +63,9 @@ namespace UAlbion.Core.Veldrid.Visual
                 //VertexLayoutHelper.Vector3D("Offset"), VertexLayoutHelper.Vector2D("Size"),
                 VertexLayoutHelper.Vector2D("TexPosition"), VertexLayoutHelper.Vector2D("TexSize"),
                 VertexLayoutHelper.Int("TexLayer"), VertexLayoutHelper.Int("Flags")
-                //VertexLayoutHelper.Float("Rotation")
-            ) { InstanceStepRate = 1 };
+            //VertexLayoutHelper.Float("Rotation")
+            )
+        { InstanceStepRate = 1 };
 
         // Resource Sets
         static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
@@ -71,7 +74,7 @@ namespace UAlbion.Core.Veldrid.Visual
             ResourceLayoutHelper.Uniform("vdspv_0_2") // Per-draw call uniform buffer
         );
 
-        static readonly ushort[] Indices = {0, 1, 2, 2, 1, 3};
+        static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
         static readonly Vertex2DTextured[] Vertices =
         {
             new Vertex2DTextured(-0.5f, 0.0f, 0.0f, 0.0f), new Vertex2DTextured(0.5f, 0.0f, 1.0f, 0.0f),
@@ -127,7 +130,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
             var depthStencilMode =
                 key.PerformDepthTest
-                ?  gd.IsDepthRangeZeroToOne
+                ? gd.IsDepthRangeZeroToOne
                     ? DepthStencilStateDescription.DepthOnlyLessEqual
                     : DepthStencilStateDescription.DepthOnlyGreaterEqual
                 : DepthStencilStateDescription.Disabled;
@@ -157,10 +160,9 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public void CreateDeviceObjects(IRendererContext context)
         {
-            var c = (VeldridRendererContext) context;
+            var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
-            var sc = c.SceneContext;
 
             ResourceFactory factory = gd.ResourceFactory;
 
@@ -179,7 +181,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public IEnumerable<IRenderable> UpdatePerFrameResources(IRendererContext context, IEnumerable<IRenderable> renderables)
         {
-            var c = (VeldridRendererContext) context;
+            var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
             var sc = c.SceneContext;
@@ -187,7 +189,7 @@ namespace UAlbion.Core.Veldrid.Visual
             ITextureManager textureManager = Resolve<ITextureManager>();
             IDeviceObjectManager objectManager = Resolve<IDeviceObjectManager>();
 
-            foreach(var renderable in renderables)
+            foreach (var renderable in renderables)
             {
                 var sprite = (MultiSprite)renderable;
                 if (sprite.ActiveInstances == 0) continue;
@@ -216,7 +218,7 @@ namespace UAlbion.Core.Veldrid.Visual
                 TextureView textureView = (TextureView)textureManager?.GetTexture(sprite.Key.Texture);
 
                 var resourceSet = objectManager.Get<ResourceSet>((sprite, textureView));
-                if(resourceSet == null)
+                if (resourceSet == null)
                 {
                     resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
                         _perSpriteResourceLayout,
@@ -237,7 +239,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public void Render(IRendererContext context, RenderPasses renderPass, IRenderable renderable)
         {
-            var c = (VeldridRendererContext) context;
+            var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
             var sc = c.SceneContext;

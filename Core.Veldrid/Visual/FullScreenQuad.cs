@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core.Events;
 using Veldrid;
@@ -24,8 +23,6 @@ namespace UAlbion.Core.Veldrid.Visual
         public RenderPasses RenderPasses => RenderPasses.SwapchainOutput;
         public DrawLayer RenderOrder => DrawLayer.MaxLayer;
         public int PipelineId => 1;
-        public Type Renderer => typeof(FullScreenQuad);
-        public Matrix4x4 Transform => Matrix4x4.Identity;
 
         DisposeCollector _disposeCollector;
         Pipeline _pipeline;
@@ -37,7 +34,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public void CreateDeviceObjects(IRendererContext context)
         {
-            var c = (VeldridRendererContext) context;
+            var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
 
@@ -82,7 +79,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public void Render(IRendererContext context, RenderPasses renderPass, IRenderable r)
         {
-            var c = (VeldridRendererContext) context;
+            var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var sc = c.SceneContext;
 

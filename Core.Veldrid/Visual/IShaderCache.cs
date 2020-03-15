@@ -13,6 +13,5 @@ namespace UAlbion.Core.Veldrid.Visual
 
         void CleanupOldFiles();
         void DestroyAllDeviceObjects();
-
     }
 }

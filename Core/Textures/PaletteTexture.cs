@@ -5,7 +5,7 @@ namespace UAlbion.Core.Textures
     public abstract class PaletteTexture : ITexture
     {
         protected const uint Width = 256;
-        protected const uint Height = 256;
+        protected const uint Height = 1;
         static readonly SubImage SubImage = new SubImage(
             Vector2.Zero,
             new Vector2(Width, Height),

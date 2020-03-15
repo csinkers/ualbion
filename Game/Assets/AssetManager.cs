@@ -162,7 +162,7 @@ namespace UAlbion.Game.Assets
         public string LoadString(SystemTextId id, GameLanguage language) => LoadString(new StringId(AssetType.SystemText, 0, (int)id), language);
         public string LoadString(WordId id, GameLanguage language) => LoadString(new StringId(AssetType.Dictionary, (int)id / 500, (int)id), language);
 
-        public AlbionSample LoadSample(AssetType type, int id) => (AlbionSample)_assetLocatorRegistry.LoadAssetCached(type, id);
+        public AlbionSample LoadSample(SampleId id) => (AlbionSample)_assetLocatorRegistry.LoadAssetCached(AssetType.Sample, id);
         public AlbionVideo LoadVideo(VideoId id, GameLanguage language) => (AlbionVideo)_assetLocatorRegistry.LoadAssetCached(AssetType.Flic, (int)id, language);
         public CharacterSheet LoadCharacter(AssetType type, PartyCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(type, id);
         public CharacterSheet LoadCharacter(AssetType type, NpcCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(type, id);

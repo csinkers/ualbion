@@ -11754,7 +11754,7 @@
   "SAMPLES0.XLD": {
     "Format": "AudioSample",
     "EnumName": "SampleId",
-    "EnumType": "ushort",
+    "EnumType": "byte",
     "Assets": {
       "0": {
         "Name": "CreakyWoodenDoor"
@@ -11965,7 +11965,7 @@
   "SAMPLES1.XLD": {
     "Format": "AudioSample",
     "EnumName": "SampleId",
-    "EnumType": "ushort",
+    "EnumType": "byte",
     "Assets": {
       "0": {
         "Name": "Tick"
@@ -12106,7 +12106,7 @@
   "SAMPLES2.XLD": {
     "Format": "AudioSample",
     "EnumName": "SampleId",
-    "EnumType": "ushort",
+    "EnumType": "byte",
     "Assets": {
       "0": {},
       "1": {

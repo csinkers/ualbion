@@ -7,8 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="OpenAL-Soft" Version="1.16.0" />
+    <PackageReference Include="OpenRA-OpenAL-CS" Version="1.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Api\UAlbion.Api.csproj" />
     <ProjectReference Include="..\Core\UAlbion.Core.csproj" />
+    <ProjectReference Include="..\Formats\UAlbion.Formats.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\veldrid\')">

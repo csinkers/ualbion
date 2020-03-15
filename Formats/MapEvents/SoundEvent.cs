@@ -1,5 +1,6 @@
 ﻿using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -9,7 +10,7 @@ namespace UAlbion.Formats.MapEvents
         {
             e ??= new SoundEvent();
             e.Mode = s.EnumU8(nameof(Mode), e.Mode);
-            e.SoundId = s.UInt8(nameof(SoundId), e.SoundId);
+            e.SoundId = (SampleId)StoreIncremented.Serdes(nameof(SoundId), (byte)e.SoundId, s.UInt8);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
             e.Volume = s.UInt8(nameof(Volume), e.Volume);
             e.RestartProbability = s.UInt8(nameof(RestartProbability), e.RestartProbability);
@@ -30,7 +31,7 @@ namespace UAlbion.Formats.MapEvents
         }
 
         public SoundMode Mode { get; private set; }
-        public byte SoundId { get; private set; } // [0..78], 153
+        public SampleId SoundId { get; private set; } // [0..78], 153
         public byte Unk3 { get; private set; } // [0..100] (multiples of 5)
         public byte Volume { get; private set; } // [0..150]
         public byte RestartProbability { get; private set; } // [0..100]

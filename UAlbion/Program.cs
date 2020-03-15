@@ -10,6 +10,7 @@ using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Settings;
 using UAlbion.Game.Veldrid.Assets;
+using UAlbion.Game.Veldrid.Audio;
 
 namespace UAlbion
 {
@@ -62,6 +63,7 @@ namespace UAlbion
             PerfTracker.StartupEvent("Registered asset manager");
 
             PerfTracker.StartupEvent($"Running as {commandLine.Mode}");
+
             switch(commandLine.Mode)
             {
                 case ExecutionMode.Game:
@@ -69,7 +71,10 @@ namespace UAlbion
                     Albion.RunGame(global, baseDir, commandLine);
                     break;
 
-                case ExecutionMode.AudioSlave: break; // TODO
+                case ExecutionMode.AudioSlave: 
+                    global.Attach(new AudioManager(true));
+                    break;
+
                 case ExecutionMode.Editor: break; // TODO
                 case ExecutionMode.SavedGameTests: SavedGameTests.RoundTripTest(baseDir); break;
 

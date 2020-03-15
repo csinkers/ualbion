@@ -1,12 +1,11 @@
-﻿using System.IO;
-
-namespace UAlbion.Formats.Assets
+﻿namespace UAlbion.Formats.Assets
 {
-    public class AlbionSample
+    public class AlbionSample : ISample
     {
-        public AlbionSample(BinaryReader br, long streamLength)
-        {
-            throw new System.NotImplementedException();
-        }
+        public AlbionSample(byte[] samples) => Samples = samples;
+        public int SampleRate => 11025;
+        public int Channels => 1;
+        public int BytesPerSample => 1;
+        public byte[] Samples { get; }
     }
 }

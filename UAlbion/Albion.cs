@@ -20,6 +20,7 @@ using UAlbion.Game.Gui.Inventory;
 using UAlbion.Game.Input;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.State;
+using UAlbion.Game.Veldrid.Audio;
 using UAlbion.Game.Veldrid.Debugging;
 using UAlbion.Game.Veldrid.Input;
 
@@ -67,7 +68,14 @@ namespace UAlbion
             PerfTracker.StartupEvent("Creating main components");
             var factory = global.Resolve<ICoreFactory>();
             global
+                .Register<IAudioManager>(new AudioManager(false))
+                .Register<IClock>(new GameClock())
+                .Register<ICollisionManager>(new CollisionManager())
                 .Register<ICommonColors>(new CommonColors(factory))
+                .Register<ICursorManager>(new CursorManager())
+                .Register<IDeviceObjectManager>(new DeviceObjectManager())
+                .Register<IGameState>(new GameState())
+                .Register<ILayoutManager>(new LayoutManager())
                 .Register<IInputManager>(new InputManager()
                     .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
                     .RegisterInputMode(InputMode.World2D, new World2DInputMode())
@@ -78,9 +86,9 @@ namespace UAlbion
                     .RegisterMouseMode(MouseMode.RightButtonHeld, new RightButtonHeldMouseMode())
                     .RegisterMouseMode(MouseMode.ContextMenu, new ContextMenuMouseMode())
                 )
-                .Register<ILayoutManager>(new LayoutManager())
                 .Register<IMapManager>(new MapManager())
                 .Register<IPaletteManager>(new PaletteManager())
+                .Register<ISelectionManager>(new SelectionManager())
                 .Register<ISceneManager>(new SceneManager()
                     .AddScene(new EmptyScene())
                     .AddScene(new AutomapScene())
@@ -89,15 +97,9 @@ namespace UAlbion
                     .AddScene(new MenuScene())
                     .AddScene(new InventoryScene())
                 )
-                .Register<IClock>(new GameClock())
                 .Register<ISpriteManager>(new SpriteManager())
-                .Register<IGameState>(new GameState())
                 .Register<ITextManager>(new TextManager())
                 .Register<ITextureManager>(new TextureManager())
-                .Register<IDeviceObjectManager>(new DeviceObjectManager())
-                .Register<ICollisionManager>(new CollisionManager())
-                .Register<ICursorManager>(new CursorManager())
-                .Register<ISelectionManager>(new SelectionManager())
                 .Attach(new SlowClock())
                 .Attach(new DebugMapInspector()
                     .AddBehaviour(new SpriteInstanceDataDebugBehaviour())

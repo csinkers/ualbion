@@ -42,7 +42,7 @@ namespace UAlbion.Game
         string LoadString(SystemTextId id, GameLanguage language);
         string LoadString(WordId id, GameLanguage language);
 
-        AlbionSample LoadSample(AssetType type, int id);
+        AlbionSample LoadSample(SampleId id);
         AlbionVideo LoadVideo(VideoId id, GameLanguage language);
         AlbionPalette LoadPalette(PaletteId id);
         MapData2D LoadMap2D(MapDataId id);

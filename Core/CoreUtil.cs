@@ -122,43 +122,48 @@ namespace UAlbion.Core
             }
         }
 
-        static void Blit8To32Transparent(ReadOnlyByteImageBuffer from, UIntImageBuffer to, uint[] palette, byte componentAlpha, byte? transparentColor)
+        static void Blit8To32Transparent(ReadOnlyByteImageBuffer fromBuffer, UIntImageBuffer toBuffer, uint[] palette, byte componentAlpha, byte transparentColor)
         {
+            var from = fromBuffer.Buffer;
+            var to = toBuffer.Buffer;
             int fromOffset = 0;
             int toOffset = 0;
 
-            for (int j = 0; j < from.Height; j++)
+            for (int j = 0; j < fromBuffer.Height; j++)
             {
-                for (int i = 0; i < from.Width; i++)
+                for (int i = 0; i < fromBuffer.Width; i++)
                 {
-                    if (from.Buffer[fromOffset] != transparentColor)
-                        to.Buffer[toOffset] = palette[from.Buffer[fromOffset]] & 0x00ffffff | ((uint)componentAlpha << 24);
+                    uint pixel = from[fromOffset];
+                    if (pixel != transparentColor)
+                        to[toOffset] = palette[pixel] & 0x00ffffff | ((uint)componentAlpha << 24);
 
                     fromOffset++;
                     toOffset++;
                 }
 
-                fromOffset += (int)(from.Stride - from.Width);
-                toOffset += (int)(to.Stride - to.Width);
+                fromOffset += (int)(fromBuffer.Stride - fromBuffer.Width);
+                toOffset += (int)(toBuffer.Stride - toBuffer.Width);
             }
         }
 
-        static void Blit8To32Opaque(ReadOnlyByteImageBuffer from, UIntImageBuffer to, uint[] palette, byte componentAlpha)
+        static void Blit8To32Opaque(ReadOnlyByteImageBuffer fromBuffer, UIntImageBuffer toBuffer, uint[] palette, byte componentAlpha)
         {
+            var from = fromBuffer.Buffer;
+            var to = toBuffer.Buffer;
             int fromOffset = 0;
             int toOffset = 0;
 
-            for (int j = 0; j < from.Height; j++)
+            for (int j = 0; j < fromBuffer.Height; j++)
             {
-                for (int i = 0; i < from.Width; i++)
+                for (int i = 0; i < fromBuffer.Width; i++)
                 {
-                    to.Buffer[toOffset] = palette[from.Buffer[fromOffset]] & 0x00ffffff | ((uint) componentAlpha << 24);
+                    to[toOffset] = palette[from[fromOffset]] & 0x00ffffff | ((uint) componentAlpha << 24);
                     fromOffset++;
                     toOffset++;
                 }
 
-                fromOffset += (int)(from.Stride - from.Width);
-                toOffset += (int)(to.Stride - to.Width);
+                fromOffset += (int)(fromBuffer.Stride - fromBuffer.Width);
+                toOffset += (int)(toBuffer.Stride - toBuffer.Width);
             }
         }
 

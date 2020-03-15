@@ -11,7 +11,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
         [Flags]
         public enum WallFlags : byte
         {
-            Unknown0 = 1 << 0,
+            Unknown0 = 1,
             SelfIlluminating = 1 << 1,
             WriteOverlay = 1 << 2,
             Unk3 = 1 << 3,

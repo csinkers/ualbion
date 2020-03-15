@@ -6,7 +6,7 @@ namespace UAlbion.Game.Gui.Inventory
     {
         const string CombatPositionButtonId = "Inventory.CombatPositions";
 
-        public InventoryMiscPage(PartyCharacterId activeCharacter)
+        public InventoryMiscPage()
         {
             StringId S(SystemTextId id) => new StringId(AssetType.SystemText, 0, (int)id);
             var stack = new VerticalStack(

@@ -4,21 +4,21 @@ namespace UAlbion.Formats.Assets.Save
 {
     public class UnkEightByte
     {
-        public enum EBEnum1 : byte
+        public enum Enum1 : byte
         {
-            EB1_Unk0,
-            EB1_Unk1,
-            EB1_Unk2,
-            EB1_Unk3,
-            EB1_Unk4,
-            EB1_Unk5,
-            EB1_Unk6,
-            EB1_Unk7,
-            EB1_Unk8,
-            EB1_Unk9,
+            Unk0,
+            Unk1,
+            Unk2,
+            Unk3,
+            Unk4,
+            Unk5,
+            Unk6,
+            Unk7,
+            Unk8,
+            Unk9,
         }
 
-        public enum EBEnum2 : byte
+        public enum Enum2 : byte
         {
             Common,
             Rare1,
@@ -28,8 +28,8 @@ namespace UAlbion.Formats.Assets.Save
 
         public byte X { get; set; } // Broad, mildly lower-biased distribution. Max below 255 (~220)
         public byte Y { get; set; } // Broad, mildly lower-biased distribution. Max below 255 (~220)
-        public EBEnum1 Unk2 { get; set; } // Roughly equal distribution over [0..10], most likely an enum.
-        public EBEnum2 Unk3 { get; set; } // Ranges over [0..3], 3 very popular, 0 moderately, 1 and 2 ~1% each.
+        public Enum1 Unk2 { get; set; } // Roughly equal distribution over [0..10], most likely an enum.
+        public Enum2 Unk3 { get; set; } // Ranges over [0..3], 3 very popular, 0 moderately, 1 and 2 ~1% each.
         public ushort Underlay { get; set; }
         public ushort Overlay { get; set; }
 

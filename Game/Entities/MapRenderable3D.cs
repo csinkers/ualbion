@@ -23,7 +23,7 @@ namespace UAlbion.Game.Entities
         readonly Vector3 _tileSize;
         readonly IDictionary<int, IList<int>> _tilesByDistance = new Dictionary<int, IList<int>>();
         TileMap _tilemap;
-        bool _isSorting = false;
+        bool _isSorting;
         bool _fullUpdate = true;
 
         static readonly HandlerSet Handlers = new HandlerSet(
@@ -92,8 +92,8 @@ namespace UAlbion.Game.Entities
         {
             byte i = (byte)(index % _mapData.Width);
             byte j = (byte)(index / _mapData.Width);
-            byte floorIndex = (byte)_mapData.Floors[index];
-            byte ceilingIndex = (byte)_mapData.Ceilings[index];
+            byte floorIndex = _mapData.Floors[index];
+            byte ceilingIndex = _mapData.Ceilings[index];
             int contents = _mapData.Contents[index];
             byte wallIndex = (byte)(contents < 100 || contents - 100 >= _labyrinthData.Walls.Count
                 ? 0

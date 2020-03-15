@@ -51,7 +51,7 @@ namespace UAlbion.Game.Gui.Inventory
         {
             if (_isClickTimerPending) // If they double-clicked...
             {
-                Raise(new InventoryPickupItemEvent(ActiveCharacter, SlotId, null));
+                Raise(new InventoryPickupItemEvent(ActiveCharacter, SlotId));
                 _isClickTimerPending = false; // Ensure the single-click behaviour doesn't happen.
             }
             else // For the first click, just start the double-click timer.

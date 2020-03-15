@@ -112,11 +112,9 @@ namespace UAlbion.Core.Visual
             sb.AppendLine("DeviceObject Statistics:");
             lock (_syncRoot)
             {
-                long totalCount = 0;
                 foreach (var entry in _cache.GroupBy(x => x.Value.Resource.GetType()).OrderBy(x => x.Key.Name))
                 {
                     long count = entry.Count();
-                    totalCount += count;
                     sb.AppendLine($"    {entry.Key.Name}: {count}");
                 }
                 sb.AppendLine($"    Total: {_cache.Count:N0} entries");

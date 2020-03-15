@@ -54,11 +54,11 @@ namespace UAlbion.Core.Textures
             public override string ToString() => $"LK{Id}.{Frame}";
         }
 
-        protected readonly IList<LogicalSubImage> _logicalSubImages = new List<LogicalSubImage>();
-        protected readonly IDictionary<LayerKey, int> _layerLookup = new Dictionary<LayerKey, int>();
-        protected readonly IList<Vector2> _layerSizes = new List<Vector2>();
-        protected bool _isMetadataDirty = true;
-        bool _isAnySubImagePaletteAnimated = false;
+        protected readonly IList<LogicalSubImage> LogicalSubImages = new List<LogicalSubImage>();
+        protected readonly IDictionary<LayerKey, int> LayerLookup = new Dictionary<LayerKey, int>();
+        protected readonly IList<Vector2> LayerSizes = new List<Vector2>();
+        protected bool IsMetadataDirty = true;
+        bool _isAnySubImagePaletteAnimated;
         int _lastPaletteVersion;
         int _lastPaletteId;
         bool _isDirty;
@@ -70,7 +70,7 @@ namespace UAlbion.Core.Textures
             MipLevels = 1; //(uint)Math.Min(Math.Log(Width, 2.0), Math.Log(Height, 2.0));
 
             // Add empty texture for disabled walls/ceilings etc
-            _logicalSubImages.Add(new LogicalSubImage(0) { W = 1, H = 1, Frames = 1, IsPaletteAnimated = false });
+            LogicalSubImages.Add(new LogicalSubImage(0) { W = 1, H = 1, Frames = 1, IsPaletteAnimated = false });
         }
 
         public abstract uint FormatSize { get; }
@@ -79,8 +79,8 @@ namespace UAlbion.Core.Textures
         public uint Height { get; private set; }
         public uint Depth => 1;
         public uint MipLevels { get; }
-        public uint ArrayLayers { get { if (_isMetadataDirty) RebuildLayers(); return (uint)_layerSizes.Count; } }
-        public int SubImageCount => _layerSizes.Count;
+        public uint ArrayLayers { get { if (IsMetadataDirty) RebuildLayers(); return (uint)LayerSizes.Count; } }
+        public int SubImageCount => LayerSizes.Count;
 
         public bool IsDirty
         {
@@ -99,39 +99,39 @@ namespace UAlbion.Core.Textures
             protected set => _isDirty = value;
         }
 
-        public int SizeInBytes => (int)(Width * Height * _layerSizes.Count * FormatSize);
+        public int SizeInBytes => (int)(Width * Height * LayerSizes.Count * FormatSize);
 
         public bool IsAnimated(int logicalId)
         {
-            if(_isMetadataDirty)
+            if(IsMetadataDirty)
                 RebuildLayers();
 
-            if (logicalId >= _logicalSubImages.Count)
+            if (logicalId >= LogicalSubImages.Count)
                 return false;
 
-            return _logicalSubImages[logicalId].Frames > 1;
+            return LogicalSubImages[logicalId].Frames > 1;
         }
 
         public int GetSubImageAtTime(int logicalId, int tick)
         {
-            if(_isMetadataDirty)
+            if(IsMetadataDirty)
                 RebuildLayers();
 
-            if (logicalId >= _logicalSubImages.Count)
+            if (logicalId >= LogicalSubImages.Count)
                 return 0;
 
-            var logicalImage = _logicalSubImages[logicalId];
-            if (_layerLookup.TryGetValue(new LayerKey(logicalId, tick % logicalImage.Frames), out var result))
+            var logicalImage = LogicalSubImages[logicalId];
+            if (LayerLookup.TryGetValue(new LayerKey(logicalId, tick % logicalImage.Frames), out var result))
                 return result;
             return 0;
         }
 
         public SubImage GetSubImageDetails(int subImageId)
         {
-            if(_isMetadataDirty)
+            if(IsMetadataDirty)
                 RebuildLayers();
 
-            var size = _layerSizes[subImageId];
+            var size = LayerSizes[subImageId];
             return new SubImage(
                 Vector2.Zero,
                 size,
@@ -142,9 +142,9 @@ namespace UAlbion.Core.Textures
         protected void RebuildLayers()
         {
             _isAnySubImagePaletteAnimated = false;
-            _isMetadataDirty = false;
-            _layerLookup.Clear();
-            _layerSizes.Clear();
+            IsMetadataDirty = false;
+            LayerLookup.Clear();
+            LayerSizes.Clear();
 
             var palette = PaletteManager.Palette.GetCompletePalette();
             var animatedRange =
@@ -155,7 +155,7 @@ namespace UAlbion.Core.Textures
                     .Select(x => (byte)x.Key)
                     .ToHashSet();
 
-            foreach (var lsi in _logicalSubImages)
+            foreach (var lsi in LogicalSubImages)
             {
                 lsi.W = 1;
                 lsi.H = 1;
@@ -180,11 +180,11 @@ namespace UAlbion.Core.Textures
                         _isAnySubImagePaletteAnimated = true;
                 }
 
-                lsi.Frames = (int)ApiUtil.LCM(lsi.Components.Select(x => (long)x.Source.SubImageCount).Append(1));
+                lsi.Frames = (int)ApiUtil.Lcm(lsi.Components.Select(x => (long)x.Source.SubImageCount).Append(1));
                 for (int i = 0; i < lsi.Frames; i++)
                 {
-                    _layerLookup[new LayerKey(lsi.Id, i)] = _layerSizes.Count;
-                    _layerSizes.Add(new Vector2(lsi.W, lsi.H));
+                    LayerLookup[new LayerKey(lsi.Id, i)] = LayerSizes.Count;
+                    LayerSizes.Add(new Vector2(lsi.W, lsi.H));
                 }
 
                 if (Width < lsi.W)
@@ -193,7 +193,7 @@ namespace UAlbion.Core.Textures
                     Height = lsi.H;
             }
 
-            if (_layerSizes.Count > 255)
+            if (LayerSizes.Count > 255)
                 throw new InvalidOperationException("Too many textures added to multi-texture");
         }
 
@@ -205,10 +205,10 @@ namespace UAlbion.Core.Textures
             if (texture == null) // Will just end up using layer 0
                 return;
 
-            while(_logicalSubImages.Count <= logicalId)
-                _logicalSubImages.Add(new LogicalSubImage(logicalId));
+            while(LogicalSubImages.Count <= logicalId)
+                LogicalSubImages.Add(new LogicalSubImage(logicalId));
 
-            var lsi = _logicalSubImages[logicalId];
+            var lsi = LogicalSubImages[logicalId];
             lsi.IsAlphaTested = isAlphaTested;
             lsi.TransparentColor = transparentColor;
             lsi.Components.Add(new SubImageComponent
@@ -222,9 +222,10 @@ namespace UAlbion.Core.Textures
             });
 
             IsDirty = true;
-            _isMetadataDirty = true;
+            IsMetadataDirty = true;
         }
 
+        /* TODO: Add mip-mapping
         static uint GetDimension(uint largestLevelDimension, uint mipLevel)
         {
             uint ret = largestLevelDimension;
@@ -233,6 +234,7 @@ namespace UAlbion.Core.Textures
 
             return Math.Max(1, ret);
         }
+        */
 
         protected void Rebuild(LogicalSubImage lsi, int frameNumber, Span<uint> toBuffer, IList<uint[]> palette)
         {

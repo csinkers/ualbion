@@ -5,7 +5,7 @@ namespace UAlbion.Formats.Assets
     [Flags]
     public enum PhysicalCondition : byte
     {
-        Unk0 = 1 << 0,
+        Unk0 = 1,
         Unk1 = 1 << 1,
         Unk2 = 1 << 2,
         Unk3 = 1 << 3,

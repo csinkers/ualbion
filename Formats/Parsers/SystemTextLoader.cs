@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.SystemText)]
     public class SystemTextLoader : IAssetLoader
     {
-        static readonly Regex regex = new Regex(@"\[(\d+):(.*)\]");
+        static readonly Regex Regex = new Regex(@"\[(\d+):(.*)\]");
         public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
         {
             var results = new Dictionary<int, string>();
@@ -18,7 +18,7 @@ namespace UAlbion.Formats.Parsers
             var lines = data.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var line in lines)
             {
-                var m = regex.Match(line);
+                var m = Regex.Match(line);
                 if (!m.Success)
                     continue;
 

@@ -5,10 +5,10 @@ namespace UAlbion.Tools.ImageReverser
 {
     public partial class TextViewer : UserControl, IAssetViewer
     {
-        readonly ReverserCore _core;
-        public TextViewer(ReverserCore core)
+        // readonly ReverserCore _core;
+        public TextViewer()
         {
-            _core = core;
+            // _core = core;
             InitializeComponent();
         }
 

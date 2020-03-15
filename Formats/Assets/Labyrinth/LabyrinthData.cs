@@ -39,7 +39,6 @@ namespace UAlbion.Formats.Assets.Labyrinth
         {
             d ??= new LabyrinthData();
             PerfTracker.StartupEvent("Start loading labyrinth data");
-            var start = s.Offset;
             // s.ByteArray("UnknownBlock6C", () => sheet.UnknownBlock6C, x => sheet.UnknownBlock6C = x, 14);
 
             d.WallHeight   = s.UInt16(nameof(d.WallHeight), d.WallHeight);       // 0

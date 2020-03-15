@@ -29,7 +29,7 @@ namespace UAlbion.Core.Veldrid.Textures
         public Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
         {
             using var _ = PerfTracker.FrameEvent("6.1.2.1 Rebuild MultiTextures");
-            if (_isMetadataDirty)
+            if (IsMetadataDirty)
                 RebuildLayers();
 
             var palette = PaletteManager.Palette.GetCompletePalette();
@@ -37,7 +37,7 @@ namespace UAlbion.Core.Veldrid.Textures
             staging.Name = "T_" + Name + "_Staging";
 
             Span<uint> toBuffer = stackalloc uint[(int)(Width * Height)];
-            foreach (var lsi in _logicalSubImages)
+            foreach (var lsi in LogicalSubImages)
             {
                 //if (!rebuildAll && !lsi.IsPaletteAnimated) // TODO: Requires caching a single Texture and then modifying it
                 //    continue;
@@ -47,7 +47,7 @@ namespace UAlbion.Core.Veldrid.Textures
                     toBuffer.Fill(lsi.IsAlphaTested ? 0 : 0xff000000);
                     Rebuild(lsi, i, toBuffer, palette);
 
-                    uint destinationLayer = (uint)_layerLookup[new LayerKey(lsi.Id, i)];
+                    uint destinationLayer = (uint)LayerLookup[new LayerKey(lsi.Id, i)];
 
                     unsafe
                     {
@@ -85,15 +85,15 @@ namespace UAlbion.Core.Veldrid.Textures
 
         public override void SavePng(int logicalId, int tick, string path)
         {
-            if(_isMetadataDirty)
+            if(IsMetadataDirty)
                 RebuildLayers();
 
             var palette = PaletteManager.Palette.GetCompletePalette();
-            var logicalImage = _logicalSubImages[logicalId];
-            if (!_layerLookup.TryGetValue(new LayerKey(logicalId, tick % logicalImage.Frames), out var subImageId))
+            var logicalImage = LogicalSubImages[logicalId];
+            if (!LayerLookup.TryGetValue(new LayerKey(logicalId, tick % logicalImage.Frames), out var subImageId))
                 return;
 
-            var size = _layerSizes[subImageId];
+            var size = LayerSizes[subImageId];
             int width = (int)size.X;
             int height = (int)size.Y;
             Rgba32[] pixels = new Rgba32[width * height];

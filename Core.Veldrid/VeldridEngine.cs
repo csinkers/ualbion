@@ -72,7 +72,7 @@ namespace UAlbion.Core.Veldrid
         TextureSampleCount? _newSampleCount;
         bool _windowResized;
         bool _done;
-        bool _recreateWindow = false;
+        bool _recreateWindow;
         bool _vsync = true;
         Vector2? _pendingCursorUpdate;
         GraphicsBackend? _newBackend;
@@ -340,19 +340,19 @@ namespace UAlbion.Core.Veldrid
                 _frameCommands = GraphicsDevice.ResourceFactory.CreateCommandList();
                 _frameCommands.Name = "Frame Commands List";
 
-                CommandList initCL = GraphicsDevice.ResourceFactory.CreateCommandList();
-                initCL.Name = "Recreation Initialization Command List";
-                initCL.Begin();
-                _sceneContext.CreateDeviceObjects(GraphicsDevice, initCL);
+                CommandList initList = GraphicsDevice.ResourceFactory.CreateCommandList();
+                initList.Name = "Recreation Initialization Command List";
+                initList.Begin();
+                _sceneContext.CreateDeviceObjects(GraphicsDevice, initList);
 
-                var context = new VeldridRendererContext(GraphicsDevice, initCL, _sceneContext, _coreFactory);
+                var context = new VeldridRendererContext(GraphicsDevice, initList, _sceneContext, _coreFactory);
                 foreach (var r in _renderers)
                     r.CreateDeviceObjects(context);
 
-                initCL.End();
-                GraphicsDevice.SubmitCommands(initCL);
+                initList.End();
+                GraphicsDevice.SubmitCommands(initList);
                 GraphicsDevice.WaitForIdle();
-                initCL.Dispose();
+                initList.Dispose();
                 GraphicsDevice.WaitForIdle();
                 Resolve<IShaderCache>().CleanupOldFiles();
             }

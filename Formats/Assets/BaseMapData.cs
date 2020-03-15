@@ -145,7 +145,8 @@ namespace UAlbion.Formats.Assets
             for (byte y = 0; y < Height; y++)
             {
                 zoneCount = s.UInt16("RowZones", (ushort)Zones.Count(x => x.Y == y && !x.Global));
-                s.List(Zones, zoneCount, zoneOffset, (i, x, s) => MapEventZone.Serdes(x, s, y));
+                var y1 = y;
+                s.List(Zones, zoneCount, zoneOffset, (i, x, s2) => MapEventZone.Serdes(x, s2, y1));
                 zoneOffset += zoneCount;
             }
         }

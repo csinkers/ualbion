@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
         [Flags]
         public enum FcFlags : byte
         {
-            Unknown0 = 1 << 0,
+            Unknown0 = 1,
             SelfIlluminating = 1 << 1,
             NotWalkable = 1 << 2,
             Unknown3 = 1 << 3,

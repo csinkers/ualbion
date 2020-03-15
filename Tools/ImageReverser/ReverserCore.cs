@@ -9,7 +9,7 @@ namespace UAlbion.Tools.ImageReverser
 {
     public class ReverserCore
     {
-        static readonly string[] SupportedExtensions = { "bin", "wav", "json", "xmi" };
+        // static readonly string[] SupportedExtensions = { "bin", "wav", "json", "xmi" };
         public string BaseExportDirectory { get; }
         public FullAssetConfig Config { get; }
         public GeneralConfig GeneralConfig { get; }

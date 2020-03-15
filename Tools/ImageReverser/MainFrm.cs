@@ -27,7 +27,7 @@ namespace UAlbion.Tools.ImageReverser
             _core = core;
             _core.AssetChanged += CoreOnAssetChanged;
             _imageViewer = new ImageViewer(_core) { Visible = false };
-            _textViewer = new TextViewer(_core) { Visible = false };
+            _textViewer = new TextViewer() { Visible = false };
             _soundPlayer = new SoundViewer(_core) { Visible = false };
             InitializeComponent();
             mainPanel.Controls.Add(_imageViewer);

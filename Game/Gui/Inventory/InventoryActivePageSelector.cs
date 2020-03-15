@@ -32,8 +32,8 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 InventoryPage.Summary => new InventorySummaryPage(_activeCharacter),
                 InventoryPage.Stats => new InventoryStatsPage(_activeCharacter),
-                InventoryPage.Misc => new InventoryMiscPage(_activeCharacter),
-                InventoryPage x => throw new NotImplementedException($"Unhandled inventory page \"{x}\"")
+                InventoryPage.Misc => new InventoryMiscPage(),
+                { } x => throw new NotImplementedException($"Unhandled inventory page \"{x}\"")
             };
 
             AttachChild(page);

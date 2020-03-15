@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
         [Flags]
         public enum ObjectFlags : byte
         {
-            Unk0 = 1 << 0,
+            Unk0 = 1,
             Unk1 = 1 << 1,
             FloorObject = 1 << 2,
             Unk3 = 1 << 3,

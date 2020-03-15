@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using SerdesNet;
 using SixLabors.ImageSharp;
 using UAlbion.Formats;
 using UAlbion.Formats.Config;

@@ -7,6 +7,13 @@ namespace UAlbion.Core
 {
     public static class CoreUtil
     {
+        public static bool IsDebug =>
+#if DEBUG
+            true;
+#else
+            false;
+#endif
+
         public static Matrix4x4 CreatePerspective(
             bool isClipSpaceYInverted,
             bool useReverseDepth,
@@ -68,15 +75,15 @@ namespace UAlbion.Core
                 ? new float[]
                 {
                     -1, -1, 0, 0,
-                    1, -1, 1, 0,
-                    1, 1, 1, 1,
-                    -1, 1, 0, 1
+                     1, -1, 1, 0,
+                     1,  1, 1, 1,
+                    -1,  1, 0, 1
                 }
                 : new float[]
                 {
-                    -1, 1, 0, 0,
-                    1, 1, 1, 0,
-                    1, -1, 1, 1,
+                    -1,  1, 0, 0,
+                     1,  1, 1, 0,
+                     1, -1, 1, 1,
                     -1, -1, 0, 1
                 };
 

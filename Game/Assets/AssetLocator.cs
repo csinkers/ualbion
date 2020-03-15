@@ -90,7 +90,7 @@ namespace UAlbion.Game.Assets
                 ? $"{type}.{AssetNameResolver.GetName(type, (int)(object)enumId)}"
                 : $"{type}.{enumId}";
 
-            asset = LoadAssetInternal(key, name, language);
+            asset = LoadAssetInternal(key, name);
 
             _assetCache.Add(asset, key);
             return asset is Exception ? null : asset;
@@ -105,12 +105,12 @@ namespace UAlbion.Game.Assets
                 ? $"{type}.{AssetNameResolver.GetName(type, (int)(object)enumId)}"
                 : $"{type}.{enumId}";
 
-            var asset = LoadAssetInternal(key, name, language);
+            var asset = LoadAssetInternal(key, name);
 
             return asset is Exception ? null : asset;
         }
 
-        object LoadAssetInternal(AssetKey key, string name, GameLanguage language)
+        object LoadAssetInternal(AssetKey key, string name)
         {
             try
             {

@@ -9,10 +9,6 @@ namespace UAlbion.Game.Gui.Inventory
 {
     sealed class InventoryBodyPart : InventorySlot
     {
-        static readonly HandlerSet BackpackHandlers = new HandlerSet(SlotHandlers,
-            H<InventoryBodyPart, SlowClockEvent>((x, e) => x._frameNumber += e.Delta)
-        );
-
         protected override ButtonFrame Frame { get; }
         protected override ItemSlotId SlotId { get; }
         readonly UiSpriteElement<ItemSpriteId> _sprite;

@@ -20,13 +20,13 @@ namespace UAlbion.Api
 
             public void Dispose()
             {
-                lock (_syncRoot)
+                lock (SyncRoot)
                 {
                     long ticks = _stopwatch.ElapsedTicks;
-                    if (!_frameTimes.ContainsKey(_name))
-                        _frameTimes[_name] = new Stats { Fast = ticks };
+                    if (!FrameTimes.ContainsKey(_name))
+                        FrameTimes[_name] = new Stats { Fast = ticks };
 
-                    var stats = _frameTimes[_name];
+                    var stats = FrameTimes[_name];
                     stats.AddTicks(ticks);
                 }
             }
@@ -57,10 +57,10 @@ namespace UAlbion.Api
 
         class Stats
         {
-            public long Count { get; set; }
-            public long Total { get; set; }
-            public long Min { get; set; } = long.MaxValue;
-            public long Max { get; set; } = long.MinValue;
+            public long Count { get; private set; }
+            public long Total { get; private set; }
+            public long Min { get; private set; } = long.MaxValue;
+            public long Max { get; private set; } = long.MinValue;
             public float Fast { get; set; }
 
             public void AddTicks(long ticks)
@@ -75,25 +75,25 @@ namespace UAlbion.Api
             public void AddMs(long ms) => AddTicks(ms * 10000);
         }
 
-        static readonly Stopwatch _startupStopwatch = Stopwatch.StartNew();
-        static readonly IDictionary<string, Stats> _frameTimes = new Dictionary<string, Stats>();
-        static readonly IDictionary<string, int> _frameCounters = new Dictionary<string, int>();
-        static readonly object _syncRoot = new object();
+        static readonly Stopwatch StartupStopwatch = Stopwatch.StartNew();
+        static readonly IDictionary<string, Stats> FrameTimes = new Dictionary<string, Stats>();
+        static readonly IDictionary<string, int> FrameCounters = new Dictionary<string, int>();
+        static readonly object SyncRoot = new object();
         static int _frameCount;
 
         public static void BeginFrame()
         {
             _frameCount++;
-            foreach (var key in _frameCounters.Keys.ToList())
+            foreach (var key in FrameCounters.Keys.ToList())
             {
-                var count = _frameCounters[key];
-                if (!_frameTimes.ContainsKey(key))
-                    _frameTimes[key] = new Stats { Fast = count * 10000 };
+                var count = FrameCounters[key];
+                if (!FrameTimes.ContainsKey(key))
+                    FrameTimes[key] = new Stats { Fast = count * 10000 };
 
-                var stats = _frameTimes[key];
+                var stats = FrameTimes[key];
                 stats.AddMs(count);
 
-                _frameCounters[key] = 0;
+                FrameCounters[key] = 0;
             }
         }
 
@@ -102,7 +102,7 @@ namespace UAlbion.Api
             if (_frameCount == 0)
             {
 //#if DEBUG
-                Console.WriteLine($"at {_startupStopwatch.ElapsedMilliseconds}: {name}");
+                Console.WriteLine($"at {StartupStopwatch.ElapsedMilliseconds}: {name}");
 //#endif
                 CoreTrace.Log.StartupEvent(name);
             }
@@ -114,9 +114,9 @@ namespace UAlbion.Api
 
         public static void Clear()
         {
-            lock (_syncRoot)
+            lock (SyncRoot)
             {
-                _frameTimes.Clear();
+                FrameTimes.Clear();
                 _frameCount = 0;
             }
         }
@@ -126,9 +126,9 @@ namespace UAlbion.Api
             var sb = new StringBuilder();
             var descriptions = new List<string>();
             var results = new List<string>();
-            lock(_syncRoot)
+            lock(SyncRoot)
             {
-                foreach (var kvp in _frameTimes.OrderBy(x => x.Key))
+                foreach (var kvp in FrameTimes.OrderBy(x => x.Key))
                 {
                     sb.Append($"Avg/frame: {(float)kvp.Value.Total / (10000 * _frameCount):F3}");
                     sb.Append($" Min: {(float)kvp.Value.Min / 10000:F3}");
@@ -149,10 +149,10 @@ namespace UAlbion.Api
 
         public static void IncrementFrameCounter(string name)
         {
-            lock(_syncRoot)
+            lock(SyncRoot)
             {
-                _frameCounters.TryGetValue(name, out var count);
-                _frameCounters[name] = count + 1;
+                FrameCounters.TryGetValue(name, out var count);
+                FrameCounters[name] = count + 1;
             }
         }
     }

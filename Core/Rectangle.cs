@@ -3,15 +3,15 @@ using System.Numerics;
 
 namespace UAlbion.Core
 {
-    public struct Rectangle : IEquatable<Rectangle>
+    public readonly struct Rectangle : IEquatable<Rectangle>
     {
-        public int X;
+        public int X { get; }
 
-        public int Y;
+        public int Y { get; }
 
-        public int Width;
+        public int Width { get; }
 
-        public int Height;
+        public int Height { get; }
 
         public Rectangle(int x, int y, int width, int height)
         {

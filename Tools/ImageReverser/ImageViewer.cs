@@ -200,7 +200,7 @@ namespace UAlbion.Tools.ImageReverser
 
                                 p[0] = (byte)((palette[color] & 0x00ff0000) >> 16);
                                 p[1] = (byte)((palette[color] & 0x0000ff00) >> 8);
-                                p[2] = (byte)((palette[color] & 0x000000ff) >> 0);
+                                p[2] = (byte)(palette[color] & 0x000000ff);
                             }
                         }
                     }

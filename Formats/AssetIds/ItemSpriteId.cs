@@ -1,5 +1,7 @@
 namespace UAlbion.Formats.AssetIds
 {
+    // ReSharper disable InconsistentNaming
+    // ReSharper disable UnusedMember.Global
     public enum ItemSpriteId
     {
         Knife = 0,

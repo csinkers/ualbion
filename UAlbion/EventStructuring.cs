@@ -196,7 +196,7 @@ namespace UAlbion
             public DummyEvent(string name) { Name = name; }
             public string Name { get; }
             public override string ToString() => Name;
-            public MapEventType EventType => MapEventType.UnkFF;
+            public MapEventType EventType => MapEventType.UnkFf;
         }
 
         public class Chain

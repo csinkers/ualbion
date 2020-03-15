@@ -40,8 +40,8 @@ namespace UAlbion.Formats.Assets
             long startingOffset = br.BaseStream.Position;
             for (int i = 0; i < 192; i++)
             {
-                _entries[i]  = (uint)br.ReadByte() << 0; // Red
-                _entries[i] |= (uint)br.ReadByte() << 8; // Green
+                _entries[i]  =       br.ReadByte();       // Red
+                _entries[i] |= (uint)br.ReadByte() << 8;  // Green
                 _entries[i] |= (uint)br.ReadByte() << 16; // Blue
                 _entries[i] |= (uint)(i == 0 ? 0 : 0xff) << 24; // Alpha
             }
@@ -50,7 +50,7 @@ namespace UAlbion.Formats.Assets
 
             AnimatedRanges.TryGetValue(Id, out var ranges);
             ranges ??= new List<(byte, byte)>();
-            Period = (int)ApiUtil.LCM(ranges.Select(x => (long)(x.Item2 - x.Item1 + 1)).Append(1));
+            Period = (int)ApiUtil.Lcm(ranges.Select(x => (long)(x.Item2 - x.Item1 + 1)).Append(1));
 
             for (int cacheIndex = 0; cacheIndex < Period; cacheIndex++)
             {
@@ -82,8 +82,8 @@ namespace UAlbion.Formats.Assets
 
             for (int i = 192; i < 256; i++)
             {
-                _entries[i]  = (uint)commonPalette[(i - 192) * 3 + 0] << 0; // Red
-                _entries[i] |= (uint)commonPalette[(i - 192) * 3 + 1] << 8; // Green
+                _entries[i]  =       commonPalette[(i - 192) * 3 + 0];       // Red
+                _entries[i] |= (uint)commonPalette[(i - 192) * 3 + 1] << 8;  // Green
                 _entries[i] |= (uint)commonPalette[(i - 192) * 3 + 2] << 16; // Blue
                 _entries[i] |= (uint)0xff << 24; // Alpha
 

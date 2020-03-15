@@ -10,9 +10,9 @@ namespace UAlbion.Core.Visual
     public class TileMap : IRenderable
     {
         [Flags]
-        public enum TileFlags : int
+        public enum TileFlags
         {
-            TextureType1 = 1 << 0,
+            TextureType1 = 1,
             TextureType2 = 1 << 1,
             UsePalette   = 1 << 2,
             Highlight    = 1 << 3,

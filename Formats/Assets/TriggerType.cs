@@ -5,7 +5,7 @@ namespace UAlbion.Formats.Assets
     [Flags]
     public enum TriggerType : ushort
     {
-        Normal     = 1 << 0,  //    1
+        Normal     = 1,       //    1
         Examine    = 1 << 1,  //    2
         Manipulate = 1 << 2,  //    4
         TalkTo     = 1 << 3,  //    8

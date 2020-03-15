@@ -12,9 +12,9 @@ namespace UAlbion.Api
         public static float Lerp(float a, float b, float t) => t * (b - a) + a;
         public static float DegToRad(float degrees) => (float)Math.PI * degrees / 180.0f;
         public static float RadToDeg(float radians) => 180.0f * radians / (float)Math.PI;
-        public static long LCM(IEnumerable<long> numbers) => numbers.Aggregate(LCM);
-        public static long LCM(long a, long b) => Math.Abs(a * b) / GCD(a, b);
-        public static long GCD(long a, long b) => b == 0 ? a : GCD(b, a % b);
+        public static long Lcm(IEnumerable<long> numbers) => numbers.Aggregate(Lcm);
+        public static long Lcm(long a, long b) => Math.Abs(a * b) / Gcd(a, b);
+        public static long Gcd(long a, long b) => b == 0 ? a : Gcd(b, a % b);
         public static void RotateImage(int width, int height, Span<byte> from, Span<byte> to)
         {
             int rotatedFrameHeight = width;

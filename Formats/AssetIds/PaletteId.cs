@@ -3,6 +3,8 @@
 // files should be modified and then GenerateEnums should be used to regenerate
 // the various ID enums.
 
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 namespace UAlbion.Formats.AssetIds
 {
     public enum PaletteId : byte

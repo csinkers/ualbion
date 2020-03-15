@@ -60,7 +60,7 @@ namespace UAlbion.Game.Entities
                 var size = chunk.GetSize();
                 maxOrder = Math.Max(maxOrder, func(chunk,
                     new Rectangle(
-                        (int)(lineExtents.X + offset),
+                        lineExtents.X + offset,
                         (int)(lineExtents.Y + lineExtents.Height - size.Y),
                         (int)size.X,
                         (int)size.Y),

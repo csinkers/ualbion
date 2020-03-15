@@ -241,7 +241,6 @@ namespace UAlbion.Core.Veldrid.Visual
         {
             var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
-            var gd = c.GraphicsDevice;
             var sc = c.SceneContext;
 
             ITextureManager textureManager = Resolve<ITextureManager>();

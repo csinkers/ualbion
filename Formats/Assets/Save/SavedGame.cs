@@ -102,7 +102,7 @@ namespace UAlbion.Formats.Assets.Save
             void SerdesAutomap(int i, int size, ISerializer serializer)
             {
                 var key = (AutoMapId)i;
-                if (save.Automaps.TryGetValue(key, out var existing))
+                if (save.Automaps.TryGetValue(key, out _))
                     serializer.ByteArray("Automap" + i, save.Automaps[key], save.Automaps[key].Length);
                 else if (serializer.Mode == SerializerMode.Reading)
                     save.Automaps[key] = serializer.ByteArray("Automap" + i, null, size);

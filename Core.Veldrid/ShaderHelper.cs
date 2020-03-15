@@ -11,20 +11,17 @@ namespace UAlbion.Core.Veldrid
     {
         public static ShaderDescription Vertex(string shader) => new ShaderDescription(ShaderStages.Vertex, Encoding.UTF8.GetBytes(shader), "main");
         public static ShaderDescription Fragment(string shader) => new ShaderDescription(ShaderStages.Fragment, Encoding.UTF8.GetBytes(shader), "main");
-        public static (Shader vs, Shader fs) LoadSPIRV(
+        public static (Shader vs, Shader fs) LoadSpirv(
             GraphicsDevice gd,
             ResourceFactory factory,
             string setName)
         {
             byte[] vsBytes = LoadBytecode(GraphicsBackend.Vulkan, setName, ShaderStages.Vertex);
             byte[] fsBytes = LoadBytecode(GraphicsBackend.Vulkan, setName, ShaderStages.Fragment);
-            bool debug = false;
-#if DEBUG
-            debug = true;
-#endif
+
             Shader[] shaders = factory.CreateFromSpirv(
-                new ShaderDescription(ShaderStages.Vertex, vsBytes, "main", debug),
-                new ShaderDescription(ShaderStages.Fragment, fsBytes, "main", debug),
+                new ShaderDescription(ShaderStages.Vertex, vsBytes, "main", CoreUtil.IsDebug),
+                new ShaderDescription(ShaderStages.Fragment, fsBytes, "main", CoreUtil.IsDebug),
                 GetOptions(gd));
 
             Shader vs = shaders[0];
@@ -40,11 +37,8 @@ namespace UAlbion.Core.Veldrid
         {
             SpecializationConstant[] specializations = GetSpecializations(gd);
 
-            bool fixClipZ = (gd.BackendType == GraphicsBackend.OpenGL || gd.BackendType == GraphicsBackend.OpenGLES)
-                && !gd.IsDepthRangeZeroToOne;
-            bool invertY = false;
-
-            return new CrossCompileOptions(fixClipZ, invertY, specializations);
+            bool fixClipZ = (gd.BackendType == GraphicsBackend.OpenGL || gd.BackendType == GraphicsBackend.OpenGLES) && !gd.IsDepthRangeZeroToOne;
+            return new CrossCompileOptions(fixClipZ,false, specializations);
         }
 
         public static SpecializationConstant[] GetSpecializations(GraphicsDevice gd)

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace UAlbion.Api
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Local")]
     public class EventPartParsers
     {
         readonly IDictionary<Type, MethodInfo> _parsers = new Dictionary<Type, MethodInfo>();
@@ -30,6 +32,9 @@ namespace UAlbion.Api
             if (type.IsEnum)
             {
                 var method = GetType().GetMethod("ParseEnum", BindingFlags.NonPublic | BindingFlags.Static);
+                if(method == null)
+                    throw new InvalidOperationException("Method ParseEnum could not be found");
+
                 parser = method.MakeGenericMethod(type);
                 _parsers[type] = parser;
                 return parser;

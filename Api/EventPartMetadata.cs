@@ -17,6 +17,10 @@ namespace UAlbion.Api
 
         public EventPartMetadata(PropertyInfo property, ParameterExpression partsParameter, int index)
         {
+            var declaringType = property.DeclaringType;
+            if(declaringType == null)
+                throw new InvalidOperationException("Property must have a declaring type");
+
             var attribute = (EventPartAttribute)property.GetCustomAttribute(typeof(EventPartAttribute), false);
             Name = attribute.Name;
             HelpText = attribute.HelpText;
@@ -28,7 +32,7 @@ namespace UAlbion.Api
             Getter = (Func<object, object>)
                 Expression.Lambda(
                     Expression.Convert(
-                        Expression.Call(Expression.Convert(instance, property.DeclaringType), getMethod),
+                        Expression.Call(Expression.Convert(instance, declaringType), getMethod),
                         typeof(object)),
                     instance).Compile();
 
@@ -44,7 +48,7 @@ namespace UAlbion.Api
                 {
                     Parser = Expression.Call(parser, part);
                 }
-                else throw new NotImplementedException($"The property {property.DeclaringType.Name}.{Name} of type {PropertyType.Name} is not handled.");
+                else throw new NotImplementedException($"The property {declaringType.Name}.{Name} of type {PropertyType.Name} is not handled.");
             }
         }
     }

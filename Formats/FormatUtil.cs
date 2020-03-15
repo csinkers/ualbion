@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Text;
 
@@ -18,7 +19,8 @@ namespace UAlbion.Formats
 
         public static string FindBasePath()
         {
-            var curDir = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            var exeLocation = Assembly.GetExecutingAssembly().Location;
+            var curDir = new DirectoryInfo(Path.GetDirectoryName(exeLocation) ?? throw new InvalidOperationException());
             while (curDir != null && !File.Exists(Path.Combine(curDir.FullName, "data", "assets.json")))
                 curDir = curDir.Parent;
 

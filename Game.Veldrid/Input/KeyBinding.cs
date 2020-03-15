@@ -1,5 +1,4 @@
 ﻿using System;
-using SerdesNet;
 using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Input

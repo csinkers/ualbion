@@ -100,10 +100,12 @@ namespace UAlbion.Formats.Assets
         public ushort Unknown8E { get; set; }
         public ushort Unknown90 { get; set; }
         public byte[] UnknownBlock96 { get; set; }
+        // ReSharper disable InconsistentNaming
         public ushort UnknownCE { get; set; }
         public ushort UnknownD6 { get; set; }
         public byte[] UnknownBlockDA { get; set; }
         public ushort UnknownFA { get; set; }
         public ushort UnknownFC { get; set; }
+        // ReSharper restore InconsistentNaming
     }
 }

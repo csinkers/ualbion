@@ -101,7 +101,7 @@ namespace UAlbion.Formats.Assets
                     if (slotId >= ItemSlotId.Slot0)
                         Slots[slotId - ItemSlotId.Slot0] = slot;
                     return;
-            };
+            }
         }
 
         public CharacterInventory DeepClone()

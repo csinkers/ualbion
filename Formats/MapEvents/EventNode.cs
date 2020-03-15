@@ -57,7 +57,7 @@ namespace UAlbion.Formats.MapEvents
         public static EventNode Serdes(int id, EventNode node, ISerializer s)
         {
             var initialPosition = s.Offset;
-            MapEventType type = (MapEventType)s.UInt8("Type", (byte)(node?.Event?.EventType ?? MapEventType.UnkFF));
+            MapEventType type = (MapEventType)s.UInt8("Type", (byte)(node?.Event?.EventType ?? MapEventType.UnkFf));
 
             var @event = SerdesByType(node, s, type);
             if (@event is IQueryEvent query)

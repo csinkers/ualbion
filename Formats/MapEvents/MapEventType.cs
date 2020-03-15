@@ -32,6 +32,6 @@
         SimpleChest = 0x1B,
         AskSurrender = 0x1C,
         DoScript = 0x1D,
-        UnkFF = 0xFF // 3D only?
+        UnkFf = 0xFF // 3D only?
     }
 }

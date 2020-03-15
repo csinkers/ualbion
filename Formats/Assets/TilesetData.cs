@@ -51,7 +51,7 @@ namespace UAlbion.Formats.Assets
         [Flags]
         public enum TileFlags : ushort
         {
-            Unused0   = 1 << 0, // Not used?
+            Unused0   = 1, // Not used?
             Unused1   = 1 << 1, // Not used?
             // Set on stairs on 117
             // Set on chairs on 129, 130, 131, 139, 141, 142 (+stairs), 213, 230, 231

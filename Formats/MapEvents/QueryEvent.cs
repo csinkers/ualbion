@@ -18,11 +18,14 @@ namespace UAlbion.Formats.MapEvents
                     return QueryVerbEvent.Serdes((QueryVerbEvent)genericEvent, s);
 
                 case QueryType.PreviousActionResult:
+                    break;
                 case QueryType.Ticker:
+                    break;
                 case QueryType.CurrentMapId:
+                    break;
                 case QueryType.PromptPlayer:
+                    break;
                 case QueryType.TriggerType:
-                default:
                     break;
             }
 

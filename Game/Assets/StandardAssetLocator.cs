@@ -147,7 +147,7 @@ namespace UAlbion.Game.Assets
                     result.XldNameInConfig = "INITIAL/" + baseName; // Note: Use the same metadata for CURRENT & INITIAL
                     break;
 
-                default: throw new ArgumentOutOfRangeException("Invalid asset location");
+                default: throw new ArgumentOutOfRangeException(nameof(config), "Invalid asset location");
             }
 
             return result;

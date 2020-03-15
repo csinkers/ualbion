@@ -2,7 +2,7 @@
 {
     public class FrameTimeAverager
     {
-        const double _decayRate = .3;
+        const double DecayRate = .3;
         readonly double _timeLimit;
         double _accumulatedTime;
         int _frameCount;
@@ -31,8 +31,8 @@
         {
             double total = _accumulatedTime;
             CurrentAverageFrameTimeSeconds =
-                CurrentAverageFrameTimeSeconds * _decayRate
-                + (total / _frameCount) * (1 - _decayRate);
+                CurrentAverageFrameTimeSeconds * DecayRate
+                + (total / _frameCount) * (1 - DecayRate);
 
             _accumulatedTime = 0;
             _frameCount = 0;

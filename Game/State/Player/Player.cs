@@ -9,7 +9,6 @@ namespace UAlbion.Game.State.Player
     public class Player : Component, IPlayer
     {
         readonly PlayerInventoryManager _inventoryManager;
-        readonly CharacterSheet _base;
 
         static readonly HandlerSet Handlers = new HandlerSet(
         );
@@ -17,8 +16,7 @@ namespace UAlbion.Game.State.Player
         public Player(PartyCharacterId id, CharacterSheet sheet) : base(Handlers)
         {
             Id = id;
-            _base = sheet;
-            _inventoryManager = AttachChild(new PlayerInventoryManager(id, _base));
+            _inventoryManager = AttachChild(new PlayerInventoryManager(id, sheet));
         }
 
         public PartyCharacterId Id { get; }

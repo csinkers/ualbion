@@ -18,7 +18,7 @@ namespace UAlbion.Game.Entities
 
         readonly TextBlock _block = new TextBlock();
         ITextSource _source;
-        int _lastVersion = 0;
+        int _lastVersion;
         Rectangle _lastExtents;
 
         public TextSection(string literal) : base(Handlers)

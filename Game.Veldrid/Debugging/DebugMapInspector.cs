@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using ImGuiNET;
-using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -84,7 +83,7 @@ namespace UAlbion.Game.Veldrid.Debugging
                 for (int i = 0; i < _fixedObjects.Count; i++)
                 {
                     var thing = _fixedObjects[i];
-                    Reflector.ReflectedObject reflected = Reflector.Reflect($"Fixed{i}", thing, null, 0);
+                    Reflector.ReflectedObject reflected = Reflector.Reflect($"Fixed{i}", thing, null);
                     anyHovered |= RenderNode(reflected, true);
                 }
                 ImGui.TreePop();
@@ -189,7 +188,7 @@ namespace UAlbion.Game.Veldrid.Debugging
             int hitId = 0;
             if (ImGui.TreeNode("Global"))
             {
-                var reflected = Reflector.Reflect(null, Exchange, null, 0);
+                var reflected = Reflector.Reflect(null, Exchange, null);
                 if (reflected.SubObjects != null)
                     foreach (var child in reflected.SubObjects)
                         anyHovered |= RenderNode(child, false);
@@ -200,7 +199,7 @@ namespace UAlbion.Game.Veldrid.Debugging
             {
                 if (ImGui.TreeNode($"{hitId} {hit.Target}"))
                 {
-                    var reflected = Reflector.Reflect(null, hit.Target, null, 0);
+                    var reflected = Reflector.Reflect(null, hit.Target, null);
                     if (reflected.SubObjects != null)
                         foreach (var child in reflected.SubObjects)
                             anyHovered |= RenderNode(child, false);

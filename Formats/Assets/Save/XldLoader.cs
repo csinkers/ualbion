@@ -108,7 +108,7 @@ namespace UAlbion.Formats.Assets.Save
                         if (s.Mode == SerializerMode.WritingAnnotated)
                         {
                             var content = Encoding.GetEncoding(850).GetString(buffers[i].ToArray());
-                            s.Meta($"XLD{xldNumber}:{i}", content, (i,x,_) => s.NullTerminatedString($"XLD{xldNumber}:{i}", content));
+                            s.Meta($"XLD{xldNumber}:{i}", content, (j,x,_) => s.NullTerminatedString($"XLD{xldNumber}:{j}", content));
                         }
                         else
                         {

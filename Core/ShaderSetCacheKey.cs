@@ -25,15 +25,5 @@ namespace UAlbion.Core
             hash ^= Hash.GetHashCode();
             return hash;
         }
-
-        static bool ArraysEqual<T>(T[] a, T[] b) where T : IEquatable<T>
-        {
-            if (a.Length != b.Length) { return false; }
-
-            for (int i = 0; i < a.Length; i++)
-                if (!a[i].Equals(b[i])) { return false; }
-
-            return true;
-        }
     }
 }

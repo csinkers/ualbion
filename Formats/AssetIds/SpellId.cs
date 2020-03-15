@@ -1,5 +1,7 @@
 ﻿namespace UAlbion.Formats.AssetIds
 {
+    // ReSharper disable InconsistentNaming
+    // ReSharper disable UnusedMember.Global
     public enum SpellId // TODO: Add this info to a JSON file and then auto-generate the enum.
     {
         // Many of these are probably wrong, e.g. Argim currently loading as

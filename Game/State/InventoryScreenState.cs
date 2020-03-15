@@ -9,7 +9,6 @@ namespace UAlbion.Game.State
     {
         IHoldable ItemInHand { get; }
         InventoryPickupItemEvent ReturnItemInHandEvent { get; }
-        PartyCharacterId ActiveCharacterId { get; }
     }
 
     public class GoldInHand : IHoldable { public ushort Amount { get; set; } }
@@ -34,7 +33,6 @@ namespace UAlbion.Game.State
 
         public IHoldable ItemInHand { get; private set; }
         public InventoryPickupItemEvent ReturnItemInHandEvent { get; private set; }
-        public PartyCharacterId ActiveCharacterId { get; private set; }
     }
 
     public class ClearInventoryItemInHandEvent : GameEvent { }

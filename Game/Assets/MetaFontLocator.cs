@@ -19,7 +19,7 @@ namespace UAlbion.Game.Assets
 
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)
         {
-            var regular = (ITexture)loaderFunc(new AssetKey(AssetType.Font, (int)FontId.RegularFont), "RegularFont");
+            var regular = (ITexture)loaderFunc(new AssetKey(AssetType.Font), "RegularFont");
             var bold = (ITexture)loaderFunc(new AssetKey(AssetType.Font, (int)FontId.BoldFont), "BoldFont");
             return FontLoader.Load(_factory, (MetaFontId) key.Id, regular, bold);
         }

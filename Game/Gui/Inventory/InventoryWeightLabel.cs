@@ -12,7 +12,7 @@ namespace UAlbion.Game.Gui.Inventory
     {
         readonly PartyCharacterId _activeCharacter;
         readonly DynamicText _hoverSource;
-        int _version = 0;
+        int _version;
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<InventoryWeightLabel, InventoryChangedEvent>((x, e) => { if (x._activeCharacter == e.MemberId) x._version++; }),

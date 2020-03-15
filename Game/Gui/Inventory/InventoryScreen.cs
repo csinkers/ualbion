@@ -43,7 +43,6 @@ namespace UAlbion.Game.Gui.Inventory
 
         void OnButton(string buttonId)
         {
-            var exchange = Exchange;
             switch (buttonId)
             {
                 case ExitButtonId: Raise(new PopSceneEvent()); break;

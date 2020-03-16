@@ -128,19 +128,21 @@ namespace UAlbion.Game.Entities.Map2D
 
         void ChangeIcon(ChangeIconEvent e)
         {
+            byte x = (byte)(e.X + e.Context.X);
+            byte y = (byte)(e.Y + e.Context.Y);
             switch (e.ChangeType)
             {
-                case ChangeIconEvent.IconChangeType.Underlay: _logicalMap.ChangeUnderlay((byte)e.X, (byte)e.Y, e.Value); break;
-                case ChangeIconEvent.IconChangeType.Overlay: _logicalMap.ChangeOverlay((byte)e.X, (byte)e.Y, e.Value); break;
+                case ChangeIconEvent.IconChangeType.Underlay: _logicalMap.ChangeUnderlay(x, y, e.Value); break;
+                case ChangeIconEvent.IconChangeType.Overlay: _logicalMap.ChangeOverlay(x, y, e.Value); break;
                 case ChangeIconEvent.IconChangeType.Wall: break; // N/A for 2D map
                 case ChangeIconEvent.IconChangeType.Floor: break; // N/A for 2D map
                 case ChangeIconEvent.IconChangeType.Ceiling: break; // N/A for 2D map
                 case ChangeIconEvent.IconChangeType.NpcMovement: break;
                 case ChangeIconEvent.IconChangeType.NpcSprite: break;
-                case ChangeIconEvent.IconChangeType.Chain: _logicalMap.ChangeTileEventChain((byte)e.X, (byte)e.Y, e.Value); break;
-                case ChangeIconEvent.IconChangeType.BlockHard: _logicalMap.PlaceBlock((byte)e.X, (byte)e.Y, e.Value, true); break;
-                case ChangeIconEvent.IconChangeType.BlockSoft: _logicalMap.PlaceBlock((byte)e.X, (byte)e.Y, e.Value, false); break;
-                case ChangeIconEvent.IconChangeType.Trigger: _logicalMap.ChangeTileEventTrigger((byte)e.X, (byte)e.Y, e.Value); break;
+                case ChangeIconEvent.IconChangeType.Chain: _logicalMap.ChangeTileEventChain(x, y, e.Value); break;
+                case ChangeIconEvent.IconChangeType.BlockHard: _logicalMap.PlaceBlock(x, y, e.Value, true); break;
+                case ChangeIconEvent.IconChangeType.BlockSoft: _logicalMap.PlaceBlock(x, y, e.Value, false); break;
+                case ChangeIconEvent.IconChangeType.Trigger: _logicalMap.ChangeTileEventTrigger(x, y, e.Value); break;
                 default: throw new ArgumentOutOfRangeException();
             }
         }

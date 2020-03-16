@@ -1,9 +1,8 @@
 ﻿using SerdesNet;
-using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class EndDialogueEvent : Event, IMapEvent
+    public class EndDialogueEvent : MapEvent
     {
         public static EndDialogueEvent Serdes(EndDialogueEvent e, ISerializer s)
         {
@@ -25,6 +24,6 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk5 { get; private set; }
         public ushort Unk6 { get; private set; }
         public ushort Unk8 { get; private set; }
-        public MapEventType EventType => MapEventType.EndDialogue;
+        public override MapEventType EventType => MapEventType.EndDialogue;
     }
 }

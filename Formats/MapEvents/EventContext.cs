@@ -1,10 +1,9 @@
 ﻿using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.MapEvents;
 
-namespace UAlbion.Game
+namespace UAlbion.Formats.MapEvents
 {
-    public class EventChainContext
+    public class EventContext
     {
         IEventNode _node;
         public TriggerType Trigger { get; set; }
@@ -22,6 +21,6 @@ namespace UAlbion.Game
         public bool ClockWasRunning { get; set; }
         public bool LastEventResult { get; set; }
 
-        public EventChainContext Clone() => (EventChainContext)MemberwiseClone();
+        public EventContext Clone() => (EventContext)MemberwiseClone();
     }
 }

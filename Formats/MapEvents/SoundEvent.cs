@@ -4,7 +4,7 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class SoundEvent : Event, IMapEvent
+    public class SoundEvent : MapEvent
     {
         public static SoundEvent Serdes(SoundEvent e, ISerializer s)
         {
@@ -38,6 +38,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort FrequencyOverride { get; private set; } // 0,8, [5..22]*1000
         ushort Unk8 { get; set; }
         public override string ToString() => $"sound {SoundId} {Mode} Vol:{Volume} Prob:{RestartProbability}% Freq:{FrequencyOverride} ({Unk3})";
-        public MapEventType EventType => MapEventType.Sound;
+        public override MapEventType EventType => MapEventType.Sound;
     }
 }

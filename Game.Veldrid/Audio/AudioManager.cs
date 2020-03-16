@@ -26,20 +26,16 @@ namespace UAlbion.Game.Veldrid.Audio
 
         class ActiveSound
         {
-            public ActiveSound(AudioSource source, SampleId id, int samplingFrequency, int restartProbability, int volume)
+            public ActiveSound(AudioSource source, SampleId id, int restartProbability)
             {
                 Source = source;
                 Id = id;
-                SamplingFrequency = samplingFrequency;
                 RestartProbability = restartProbability;
-                Volume = volume;
             }
 
             public AudioSource Source { get; }
             public SampleId Id { get; }
-            public int SamplingFrequency { get; }
             public int RestartProbability { get; }
-            public int Volume { get; }
         }
 
         AudioBuffer GetBuffer(SampleId id)
@@ -65,28 +61,29 @@ namespace UAlbion.Game.Veldrid.Audio
 
         void Play(SoundEvent e)
         {
-            switch(e.Mode)
-            {
-                case SoundEvent.SoundMode.Silent: return;
-                case SoundEvent.SoundMode.GlobalOneShot:
-                    break;
-                case SoundEvent.SoundMode.LocalLoop:
-                    break;
-            }
+            if (e.Mode == SoundEvent.SoundMode.Silent)
+                return;
 
             var buffer = GetBuffer(e.SoundId);
             if (buffer == null)
                 return;
 
-            var source = new AudioSource(buffer);
+            var source = new AudioSource(buffer)
+            {
+                Volume = e.Volume / 255.0f,
+                Looping = e.Mode == SoundEvent.SoundMode.LocalLoop
+            };
+
+            /*
+            e.FrequencyOverride == 0 
+                ? buffer.SamplingRate 
+                : e.FrequencyOverride
+            */
+
             var active = new ActiveSound(
                 source,
                 e.SoundId,
-                e.FrequencyOverride == 0 
-                    ? buffer.SamplingRate 
-                    : e.FrequencyOverride,
-                e.RestartProbability,
-                e.Volume);
+                e.RestartProbability);
 
             active.Source.Play();
             _activeSounds.Add(active);

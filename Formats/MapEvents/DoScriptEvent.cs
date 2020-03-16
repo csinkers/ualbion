@@ -3,7 +3,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class DoScriptEvent : Event, IMapEvent
+    public class DoScriptEvent : MapEvent
     {
         public static DoScriptEvent Serdes(DoScriptEvent e, ISerializer s)
         {
@@ -32,6 +32,6 @@ namespace UAlbion.Formats.MapEvents
         byte Unk5 { get; set; }
         ushort Unk8 { get; set; }
         public override string ToString() => $"do_script {ScriptId}";
-        public MapEventType EventType => MapEventType.DoScript;
+        public override MapEventType EventType => MapEventType.DoScript;
     }
 }

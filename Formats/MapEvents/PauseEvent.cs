@@ -3,7 +3,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class PauseEvent : Event, IMapEvent
+    public class PauseEvent : MapEvent
     {
         public static PauseEvent Serdes(PauseEvent e, ISerializer s)
         {
@@ -32,6 +32,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort Unk6 { get; private set; }
         public ushort Unk8 { get; private set; }
         public override string ToString() => $"pause {Length}";
-        public MapEventType EventType => MapEventType.Pause;
+        public override MapEventType EventType => MapEventType.Pause;
     }
 }

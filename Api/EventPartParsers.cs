@@ -40,6 +40,17 @@ namespace UAlbion.Api
                 return parser;
             }
 
+            if (Nullable.GetUnderlyingType(type) is { } underlying && underlying.IsEnum)
+            {
+                var method = GetType().GetMethod("ParseNullableEnum", BindingFlags.NonPublic | BindingFlags.Static);
+                if(method == null)
+                    throw new InvalidOperationException("Method ParseNullableEnum could not be found");
+
+                parser = method.MakeGenericMethod(underlying);
+                _parsers[type] = parser;
+                return parser;
+            }
+
             return null;
         }
 
@@ -65,5 +76,6 @@ namespace UAlbion.Api
         }
 
         static T ParseEnum<T>(string s) => (T)Enum.Parse(typeof(T), s, true);
+        static T? ParseNullableEnum<T>(string s) where T : struct, Enum => string.IsNullOrEmpty(s) ? null : (T?)Enum.Parse(typeof(T), s, true);
     }
 }

@@ -1,9 +1,8 @@
 ﻿using SerdesNet;
-using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class CloneAutomapEvent : Event, IMapEvent
+    public class CloneAutomapEvent : MapEvent
     {
         public static CloneAutomapEvent Serdes(CloneAutomapEvent e, ISerializer s)
         {
@@ -26,6 +25,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort Unk6 { get; private set; }
         public ushort Unk8 { get; private set; }
         public override string ToString() => $"clone_automap ({Unk1} {Unk2} {Unk3} {Unk4} {Unk5} {Unk6} {Unk8})";
-        public MapEventType EventType => MapEventType.CloneAutomap;
+        public override MapEventType EventType => MapEventType.CloneAutomap;
     }
 }

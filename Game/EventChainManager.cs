@@ -10,7 +10,7 @@ namespace UAlbion.Game
 {
     public interface IEventManager
     {
-        IList<EventChainContext> ActiveContexts { get; }
+        IList<EventContext> ActiveContexts { get; }
     }
 
     public class EventChainManager : ServiceComponent<IEventManager>, IEventManager
@@ -20,24 +20,22 @@ namespace UAlbion.Game
         );
 
         readonly Querier _querier;
-        readonly ISet<EventChainContext> _activeChains = new HashSet<EventChainContext>();
+        readonly ISet<EventContext> _activeChains = new HashSet<EventContext>();
 
-        public IList<EventChainContext> ActiveContexts => new ReadOnlyCollection<EventChainContext>(_activeChains.ToList());
+        public IList<EventContext> ActiveContexts => new ReadOnlyCollection<EventContext>(_activeChains.ToList());
 
         public EventChainManager() : base(Handlers)
         {
             _querier = AttachChild(new Querier());
         }
 
-        void RaiseWithContext(EventChainContext context, IEvent e)
+        void RaiseWithContext(EventContext context, IMapEvent e)
         {
-            if(e is IPositionedEvent positioned)
-                Raise(positioned.OffsetClone(context.X, context.Y));
-            else
-                Raise(e);
+            e.Context = context;
+            Raise(e);
         }
 
-        void Resume(EventChainContext context)
+        void Resume(EventContext context)
         {
             _activeChains.Add(context);
             while (context.Node != null)
@@ -80,7 +78,7 @@ namespace UAlbion.Game
 
         void Trigger(TriggerChainEvent e)
         {
-            var context = new EventChainContext
+            var context = new EventContext
             {
                 Trigger = e.Trigger,
                 Chain = e.Chain,

@@ -4,7 +4,7 @@ using UAlbion.Api;
 namespace UAlbion.Formats.MapEvents
 {
     [Event("change_icon")]
-    public class ChangeIconEvent : Event, IPositionedEvent, IMapEvent
+    public class ChangeIconEvent : MapEvent
     {
         public static ChangeIconEvent Serdes(ChangeIconEvent e, ISerializer s)
         {
@@ -50,20 +50,6 @@ namespace UAlbion.Formats.MapEvents
             Trigger = 0xA, // ???? Might not be 0xA
         }
 
-        public IPositionedEvent OffsetClone(int x, int y) =>
-            new ChangeIconEvent
-            {
-                X =  Scope.HasFlag(EventScope.Rel) ? (short)(X + x) : X,
-                Y =  Scope.HasFlag(EventScope.Rel) ? (short)(Y + y) : Y,
-                Scope = Scope,
-                ChangeType = ChangeType,
-                Unk5 = Unk5,
-                Value = Value,
-                Unk8 = Unk8
-            };
-
-        int IPositionedEvent.X => X;
-        int IPositionedEvent.Y => Y;
         [EventPart("x")] public short X { get; private set; }
         [EventPart("y")] public short Y { get; private set; }
         [EventPart("scope")] public EventScope Scope { get; private set; }
@@ -72,6 +58,6 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk5 { get; private set; }
         ushort Unk8 { get; set; }
         // public override string ToString() => $"change_icon <{X}, {Y}> ({Scope}) {ChangeType} {Value} ({Unk5} {Unk8})";
-        public MapEventType EventType => MapEventType.ChangeIcon;
+        public override MapEventType EventType => MapEventType.ChangeIcon;
     }
 }

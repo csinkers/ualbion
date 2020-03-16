@@ -1,8 +1,9 @@
 ﻿using System;
+using UAlbion.Api;
 
-namespace UAlbion.Api
+namespace UAlbion.Formats.MapEvents
 {
-    public abstract class AsyncEvent : Event, IAsyncEvent
+    public abstract class AsyncEvent : MapEvent, IAsyncEvent
     {
         bool _acknowledged;
         bool _complete;

@@ -3,7 +3,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class SignalEvent : Event, IMapEvent
+    public class SignalEvent : MapEvent
     {
         public static SignalEvent Serdes(SignalEvent e, ISerializer s)
         {
@@ -32,6 +32,6 @@ namespace UAlbion.Formats.MapEvents
         ushort Unk6 { get; set; }
         ushort Unk8 { get; set; }
         public override string ToString() => $"signal {SignalId}";
-        public MapEventType EventType => MapEventType.Signal;
+        public override MapEventType EventType => MapEventType.Signal;
     }
 }

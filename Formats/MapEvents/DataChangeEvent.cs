@@ -1,11 +1,10 @@
 ﻿using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class DataChangeEvent : Event, IMapEvent
+    public class DataChangeEvent : MapEvent
     {
         public static DataChangeEvent Serdes(DataChangeEvent e, ISerializer s)
         {
@@ -66,6 +65,6 @@ namespace UAlbion.Formats.MapEvents
                 _ => Value.ToString()
             };
         public override string ToString() => $"data_change {PartyMemberId} {Property} {Mode} {Amount}x{ItemString} ({Unk3} {Unk4})";
-        public MapEventType EventType => MapEventType.DataChange;
+        public override MapEventType EventType => MapEventType.DataChange;
     }
 }

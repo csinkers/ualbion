@@ -3,7 +3,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class ActionEvent : Event, IMapEvent
+    public class ActionEvent : MapEvent
     {
         public enum ActionType : byte
         {
@@ -53,6 +53,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort Unk6 { get; private set; } // TextId?? 0..1216 + 30,000 & 32,000
         ushort Unk8 { get; set; }
         public override string ToString() => $"action {SubType} {Unk3}: {Unk6} ({Unk2})";
-        public MapEventType EventType => MapEventType.Action;
+        public override MapEventType EventType => MapEventType.Action;
     }
 }

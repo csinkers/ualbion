@@ -1,9 +1,8 @@
 ﻿using SerdesNet;
-using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class TrapEvent : Event, IMapEvent
+    public class TrapEvent : MapEvent
     {
         public static TrapEvent Serdes(TrapEvent e, ISerializer s)
         {
@@ -27,6 +26,6 @@ namespace UAlbion.Formats.MapEvents
         byte Unk4 { get; set; }
         ushort Unk8 { get; set; }
         public override string ToString() => $"trap ({Unk1} {Unk2} {Unk3} {Unk5} {Unk6})";
-        public MapEventType EventType => MapEventType.Trap;
+        public override MapEventType EventType => MapEventType.Trap;
     }
 }

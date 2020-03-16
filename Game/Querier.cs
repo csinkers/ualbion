@@ -12,7 +12,7 @@ namespace UAlbion.Game
     {
         readonly Random _random = new Random();
         public Querier() : base(null) { }
-        public bool Query(EventChainContext context, IQueryEvent query)
+        public bool Query(EventContext context, IQueryEvent query)
         {
             var game = Resolve<IGameState>();
             switch (query, query.QueryType)

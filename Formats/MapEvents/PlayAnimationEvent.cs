@@ -1,9 +1,8 @@
 ﻿using SerdesNet;
-using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class PlayAnimationEvent : Event, IMapEvent
+    public class PlayAnimationEvent : MapEvent
     {
         public static PlayAnimationEvent Serdes(PlayAnimationEvent e, ISerializer s)
         {
@@ -26,6 +25,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort Unk6 { get; private set; }
         public ushort Unk8 { get; private set; }
         public override string ToString() => $"play_animation ({Unk1} {Unk2} {Unk3} {Unk4} {Unk5} {Unk6} {Unk8})";
-        public MapEventType EventType => MapEventType.PlayAnimation;
+        public override MapEventType EventType => MapEventType.PlayAnimation;
     }
 }

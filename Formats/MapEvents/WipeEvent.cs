@@ -3,7 +3,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class WipeEvent : Event, IMapEvent
+    public class WipeEvent : MapEvent
     {
         public static WipeEvent Serdes(WipeEvent e, ISerializer s)
         {
@@ -32,6 +32,6 @@ namespace UAlbion.Formats.MapEvents
         ushort Unk6 { get; set; }
         ushort Unk8 { get; set; }
         public override string ToString() => $"wipe {Value}";
-        public MapEventType EventType => MapEventType.Wipe;
+        public override MapEventType EventType => MapEventType.Wipe;
     }
 }

@@ -4,7 +4,7 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class RemovePartyMemberEvent : Event, IMapEvent
+    public class RemovePartyMemberEvent : MapEvent
     {
         public static RemovePartyMemberEvent Serdes(RemovePartyMemberEvent e, ISerializer s)
         {
@@ -33,6 +33,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort Unk6 { get; private set; }
         ushort Unk8 { get; set; }
         public override string ToString() => $"remove_party_member ({PartyMemberId} {Unk2} {Unk3} {Unk6})";
-        public MapEventType EventType => MapEventType.RemovePartyMember;
+        public override MapEventType EventType => MapEventType.RemovePartyMember;
     }
 }

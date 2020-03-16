@@ -1,9 +1,8 @@
 ﻿using SerdesNet;
-using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class OpenChestEvent : Event, IMapEvent
+    public class OpenChestEvent : MapEvent
     {
         public static OpenChestEvent Serdes(OpenChestEvent e, ISerializer s)
         {
@@ -26,6 +25,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort ChestId { get; set; }
         public ushort TrapEvent { get; set; }
         public override string ToString() => $"open_chest {ChestId} Trap:{TrapEvent} Key:{KeyItemId} Lock:{LockStrength} Opened:{OpenedMessageId} Closed:{ClosedMessageId} ({Unk3})";
-        public MapEventType EventType => MapEventType.Chest;
+        public override MapEventType EventType => MapEventType.Chest;
     }
 }

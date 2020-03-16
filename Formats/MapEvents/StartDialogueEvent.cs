@@ -3,7 +3,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class StartDialogueEvent : Event, IMapEvent
+    public class StartDialogueEvent : MapEvent
     {
         public static StartDialogueEvent Serdes(StartDialogueEvent e, ISerializer s)
         {
@@ -32,6 +32,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort Unk6 { get; private set; } // TODO: NpcId, EventId, string id?
         ushort Unk8 { get; set; }
         public override string ToString() => $"start_dialogue {Unk6}";
-        public MapEventType EventType => MapEventType.StartDialogue;
+        public override MapEventType EventType => MapEventType.StartDialogue;
     }
 }

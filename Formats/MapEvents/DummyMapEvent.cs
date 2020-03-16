@@ -1,9 +1,8 @@
 ﻿using SerdesNet;
-using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class DummyMapEvent : Event, IMapEvent
+    public class DummyMapEvent : MapEvent
     {
         public static DummyMapEvent Serdes(DummyMapEvent e, ISerializer s, MapEventType type)
         {
@@ -27,6 +26,6 @@ namespace UAlbion.Formats.MapEvents
         public ushort Unk8 { get; private set; }
         public MapEventType Type { get; private set; }
         public override string ToString() => $"Event: {Type} {Unk1} {Unk2} {Unk3} {Unk4} {Unk5} {Unk6} {Unk8}";
-        public MapEventType EventType => MapEventType.UnkFf;
+        public override MapEventType EventType => MapEventType.UnkFf;
     }
 }

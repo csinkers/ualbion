@@ -3,7 +3,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class QueryEvent : Event, IQueryEvent
+    public class QueryEvent : MapEvent, IQueryEvent
     {
         public static IQueryEvent Serdes(IQueryEvent genericEvent, ISerializer s)
         {
@@ -52,7 +52,7 @@ namespace UAlbion.Formats.MapEvents
         public ushort Argument { get; private set; }
 
         public override string ToString() => $"query {QueryType} {Argument} ({Operation} {Immediate})";
-        public MapEventType EventType => MapEventType.Query;
+        public override MapEventType EventType => MapEventType.Query;
         public ushort? FalseEventId { get; set; }
     }
 }

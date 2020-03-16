@@ -21,7 +21,7 @@ namespace UAlbion.Game.Debugging
             if (querier == null || eventManager == null)
                 return null;
 
-            var context = eventManager.ActiveContexts.FirstOrDefault()?.Clone() ?? new EventChainContext();
+            var context = eventManager.ActiveContexts.FirstOrDefault()?.Clone() ?? new EventContext();
             return querier.Query(context, query).ToString();
         }
     }

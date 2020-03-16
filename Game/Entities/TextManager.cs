@@ -8,6 +8,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
+using UAlbion.Game.State;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Entities
@@ -216,8 +217,10 @@ namespace UAlbion.Game.Entities
 
                 case TextEvent.TextLocation.TextInWindowWithPortrait:
                 case TextEvent.TextLocation.TextInWindowWithPortrait2:
-                { 
-                    var dialog = AttachChild(new TextWindow(GetMapTextFromTextEvent(textEvent, FontColor.Yellow), textEvent.PortraitId));
+                {
+                        
+                    SmallPortraitId portraitId = textEvent.PortraitId ?? Resolve<IParty>().Leader.ToPortraitId();
+                    var dialog = AttachChild(new TextWindow(GetMapTextFromTextEvent(textEvent, FontColor.Yellow), portraitId));
                     dialog.Closed += (sender, _) => textEvent.Complete();
                     break;
                 }

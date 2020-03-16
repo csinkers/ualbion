@@ -3,7 +3,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class QueryVerbEvent : Event, IQueryEvent
+    public class QueryVerbEvent : MapEvent, IQueryEvent
     {
         public enum VerbType : ushort
         {
@@ -44,7 +44,7 @@ namespace UAlbion.Formats.MapEvents
         byte Unk5 { get; set; }
 
         public override string ToString() => $"query_verb {Verb} (method {Unk2})";
-        public MapEventType EventType => MapEventType.Query;
+        public override MapEventType EventType => MapEventType.Query;
         public QueryType QueryType => QueryType.ChosenVerb;
         public ushort? FalseEventId { get; set; }
     }

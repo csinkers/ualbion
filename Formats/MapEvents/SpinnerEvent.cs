@@ -3,7 +3,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class SpinnerEvent : Event, IMapEvent
+    public class SpinnerEvent : MapEvent
     {
         public static SpinnerEvent Serdes(SpinnerEvent e, ISerializer s)
         {
@@ -32,6 +32,6 @@ namespace UAlbion.Formats.MapEvents
         ushort Unk6 { get; set; }
         ushort Unk8 { get; set; }
         public override string ToString() => $"spinner {Unk1}";
-        public MapEventType EventType => MapEventType.Spinner;
+        public override MapEventType EventType => MapEventType.Spinner;
     }
 }

@@ -4,7 +4,7 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class SimpleChestEvent : Event, IMapEvent
+    public class SimpleChestEvent : MapEvent
     {
         public static SimpleChestEvent Serdes(SimpleChestEvent e, ISerializer s)
         {
@@ -45,6 +45,6 @@ namespace UAlbion.Formats.MapEvents
             };
 
         public override string ToString() => $"simple_chest {ChestType} {Amount}x{ItemIdString}";
-        public MapEventType EventType => MapEventType.SimpleChest;
+        public override MapEventType EventType => MapEventType.SimpleChest;
     }
 }

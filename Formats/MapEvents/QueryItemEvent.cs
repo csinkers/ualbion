@@ -4,7 +4,7 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class QueryItemEvent : Event, IQueryEvent
+    public class QueryItemEvent : MapEvent, IQueryEvent
     {
         QueryItemEvent(QueryType subType)
         {
@@ -35,7 +35,7 @@ namespace UAlbion.Formats.MapEvents
         public ushort? FalseEventId { get; set; }
 
         public override string ToString() => $"query_item {QueryType} {ItemId} {Operation} {Immediate}";
-        public MapEventType EventType => MapEventType.Query;
+        public override MapEventType EventType => MapEventType.Query;
         public QueryType QueryType { get; }
     }
 }

@@ -3,7 +3,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class OffsetEvent : Event, IMapEvent
+    public class OffsetEvent : MapEvent
     {
         public static OffsetEvent Serdes(OffsetEvent e, ISerializer s)
         {
@@ -31,6 +31,6 @@ namespace UAlbion.Formats.MapEvents
         ushort Unk6 { get; set; }
         ushort Unk8 { get; set; }
         public override string ToString() => $"offset <{X}, {Y}> ({Unk3} {Unk4} {Unk5} {Unk6} {Unk8})";
-        public MapEventType EventType => MapEventType.Offset;
+        public override MapEventType EventType => MapEventType.Offset;
     }
 }

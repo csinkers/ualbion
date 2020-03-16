@@ -1,10 +1,9 @@
 ﻿using System;
 using SerdesNet;
-using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public abstract class ModifyEvent : Event, IMapEvent
+    public abstract class ModifyEvent : MapEvent
     {
         public static ModifyEvent Serdes(ModifyEvent genericEvent, ISerializer s)
         {
@@ -44,6 +43,6 @@ namespace UAlbion.Formats.MapEvents
         }
 
         public abstract ModifyType SubType { get; }
-        public MapEventType EventType => MapEventType.Modify;
+        public override MapEventType EventType => MapEventType.Modify;
     }
 }

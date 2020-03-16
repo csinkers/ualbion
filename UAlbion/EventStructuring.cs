@@ -191,12 +191,12 @@ namespace UAlbion
             // Block(If(a, Block(b), Block(c, d)));
         }
 
-        class DummyEvent : IMapEvent
+        class DummyEvent : MapEvent
         {
             public DummyEvent(string name) { Name = name; }
             public string Name { get; }
             public override string ToString() => Name;
-            public MapEventType EventType => MapEventType.UnkFf;
+            public override MapEventType EventType => MapEventType.UnkFf;
         }
 
         public class Chain

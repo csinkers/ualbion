@@ -4,7 +4,7 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class TeleportEvent : Event, IMapEvent
+    public class TeleportEvent : MapEvent
     {
         public static TeleportEvent Serdes(TeleportEvent e, ISerializer s)
         {
@@ -36,6 +36,6 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk5 { get; set; } // 2,3,4,5,6,8,9
         ushort Unk8 { get; set; }
         public override string ToString() => $"teleport {MapId} <{X}, {Y}> Dir:{Direction} ({Unk4} {Unk5})";
-        public MapEventType EventType => MapEventType.MapExit;
+        public override MapEventType EventType => MapEventType.MapExit;
     }
 }

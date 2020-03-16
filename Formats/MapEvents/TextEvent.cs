@@ -5,7 +5,7 @@ using UAlbion.Formats.AssetIds;
 namespace UAlbion.Formats.MapEvents
 {
     [Event("text")]
-    public class TextEvent : AsyncEvent, IMapEvent
+    public class TextEvent : AsyncEvent
     {
         public static TextEvent Serdes(TextEvent e, ISerializer s)
         {
@@ -13,7 +13,7 @@ namespace UAlbion.Formats.MapEvents
             e.Location = s.EnumU8(nameof(Location), e.Location);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-            e.PortraitId = (SmallPortraitId)StoreIncremented.Serdes(nameof(PortraitId), (byte)e.PortraitId, s.UInt8);
+            e.PortraitId = (SmallPortraitId?)Tweak.Serdes(nameof(PortraitId), (byte?)e.PortraitId, s.UInt8);
             e.TextId = s.UInt8(nameof(TextId), e.TextId);
             e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
@@ -36,7 +36,7 @@ namespace UAlbion.Formats.MapEvents
 
         TextEvent() { }
 
-        public TextEvent(byte textId, TextLocation location, SmallPortraitId portrait)
+        public TextEvent(byte textId, TextLocation location, SmallPortraitId? portrait)
         {
             TextId = textId;
             Location = location;
@@ -47,12 +47,12 @@ namespace UAlbion.Formats.MapEvents
 
         [EventPart("text_id")] public byte TextId { get; private set; }
         [EventPart("location")] public TextLocation Location { get; private set; }
-        [EventPart("portrait")] public SmallPortraitId PortraitId { get; private set; }
+        [EventPart("portrait")] public SmallPortraitId? PortraitId { get; private set; }
         public byte Unk2 { get; private set; }
         public byte Unk3 { get; private set; }
         public ushort Unk6 { get; private set; }
         public ushort Unk8 { get; private set; }
         public override string ToString() => $"text {TextId} {Location} {PortraitId} ({Unk2} {Unk3} {Unk6} {Unk8})";
-        public MapEventType EventType => MapEventType.Text;
+        public override MapEventType EventType => MapEventType.Text;
     }
 }

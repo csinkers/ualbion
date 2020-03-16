@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using UAlbion.Api;
@@ -68,17 +70,19 @@ namespace UAlbion.Game.Veldrid.Audio
             if (buffer == null)
                 return;
 
+            var map = Resolve<IMapManager>()?.Current;
+            var tileSize = map?.TileSize ?? Vector3.One;
             var source = new AudioSource(buffer)
             {
-                Volume = e.Volume / 255.0f,
-                Looping = e.Mode == SoundEvent.SoundMode.LocalLoop
+                Volume = e.Volume == 0 ? 1.0f : e.Volume / 255.0f,
+                Looping = e.Mode == SoundEvent.SoundMode.LocalLoop,
+                Position = tileSize * new Vector3(e.Context.X, e.Context.Y, 0.0f),
+                ReferenceDistance = 4.0f * tileSize.X,
+                RolloffFactor = 4.0f
             };
 
-            /*
-            e.FrequencyOverride == 0 
-                ? buffer.SamplingRate 
-                : e.FrequencyOverride
-            */
+            if (e.FrequencyOverride != 0)
+                source.Pitch = (float)e.FrequencyOverride / buffer.SamplingRate;
 
             var active = new ActiveSound(
                 source,
@@ -86,7 +90,8 @@ namespace UAlbion.Game.Veldrid.Audio
                 e.RestartProbability);
 
             active.Source.Play();
-            _activeSounds.Add(active);
+            lock(_syncRoot)
+                _activeSounds.Add(active);
         }
 
         public AudioManager(bool standalone) : base(Handlers) => _standalone = standalone;
@@ -96,17 +101,34 @@ namespace UAlbion.Game.Veldrid.Audio
             base.Subscribed();
         }
 
+        const int AudioPollIntervalMs = 100;
         void AudioThread()
         {
-            using var d = new AudioDevice();
-            if (_standalone)
+            using var device = new AudioDevice { DistanceModel = DistanceModel.InverseDistance };
+
+            while (!_doneEvent.WaitOne(AudioPollIntervalMs))
             {
-                while (!_doneEvent.WaitOne(500))
-                {
+                if (_standalone)
                     Raise(new BeginFrameEvent());
+
+                lock (_syncRoot) // Reap any dead sounds
+                {
+                    for (int i = 0; i < _activeSounds.Count;)
+                    {
+                        var sound = _activeSounds[i];
+                        if (!sound.Source.Looping && sound.Source.State == SourceState.Stopped)
+                        {
+                            sound.Source.Dispose();
+                            _activeSounds.RemoveAt(i);
+                        }
+                        else i++;
+                    }
                 }
+
+                var camera = Resolve<ICamera>();
+                if (camera != null)
+                    device.Listener.Position = camera.Position;
             }
-            else _doneEvent.WaitOne();
 
             lock (_syncRoot)
             {
@@ -121,6 +143,22 @@ namespace UAlbion.Game.Veldrid.Audio
 
                 _activeSounds.Clear();
                 _sampleCache.Clear();
+            }
+        }
+
+        public IList<string> ActiveSounds
+        {
+            get
+            {
+                var position = Resolve<ICamera>()?.Position ?? Vector3.Zero;
+                lock (_syncRoot)
+                    return _activeSounds
+                        .Select(x =>
+                        {
+                            var distance = (x.Source.Position - position).Length();
+                            return $"{x.Id} {x.Source.Looping} {x.Source.State} {x.Source.Volume} {x.Source.Pitch} {distance} -> {x.Source.Position}";
+                        })
+                        .ToList();
             }
         }
     }

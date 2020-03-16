@@ -12,6 +12,7 @@ using UAlbion.Game.Debugging;
 using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
+using UAlbion.Game.Veldrid.Audio;
 
 namespace UAlbion.Game.Veldrid.Debugging
 {
@@ -118,6 +119,15 @@ namespace UAlbion.Game.Veldrid.Debugging
                 if (ImGui.TreeNode("DeviceObjects"))
                 {
                     ImGui.Text(Resolve<IDeviceObjectManager>()?.Stats());
+                    ImGui.TreePop();
+                }
+
+                if (ImGui.TreeNode("Audio"))
+                {
+                    var audio = Resolve<IAudioManager>();
+                    foreach(var sound in audio.ActiveSounds)
+                        ImGui.Text(sound);
+
                     ImGui.TreePop();
                 }
 

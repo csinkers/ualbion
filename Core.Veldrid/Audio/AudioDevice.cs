@@ -27,6 +27,21 @@ namespace UAlbion.Core.Veldrid.Audio
             _device = ALC10.alcOpenDevice(null); Check();
             _context = ALC10.alcCreateContext(_device, new int[0]); Check();
             ALC10.alcMakeContextCurrent(_context); Check();
+            AL10.alGetError(); // Clear error code for subsequent callers
+        }
+
+        public AudioListener Listener { get; } = new AudioListener();
+
+        public float DopplerFactor
+        {
+            get { var value = AL10.alGetFloat(AL10.AL_DOPPLER_FACTOR); Check(); return value; }
+            set { AL10.alDopplerFactor(value); Check(); }
+        }
+
+        public DistanceModel DistanceModel
+        {
+            get { var value = AL10.alGetInteger(AL10.AL_DOPPLER_FACTOR); Check(); return (DistanceModel)value; }
+            set { AL10.alDistanceModel((int)value); Check(); }
         }
 
         public void Dispose()

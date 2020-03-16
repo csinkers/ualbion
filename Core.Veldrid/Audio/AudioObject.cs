@@ -1,9 +1,11 @@
-﻿using OpenAL;
+﻿using System.Diagnostics;
+using OpenAL;
 
 namespace UAlbion.Core.Veldrid.Audio
 {
     public abstract class AudioObject
     {
+        [Conditional("DEBUG")]
         protected static void Check()
         {
             int error = AL10.alGetError();

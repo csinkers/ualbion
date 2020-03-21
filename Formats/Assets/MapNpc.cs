@@ -26,12 +26,11 @@ namespace UAlbion.Formats.Assets
         [Flags]
         public enum MovementType : byte
         {
+            RandomMask = 3,
             Random1 = 1,
             Random2 = 2,
             FollowParty = 4,
             Stationary = 8,
-
-            RandomMask = 3,
         }
 
         public struct Waypoint
@@ -41,7 +40,8 @@ namespace UAlbion.Formats.Assets
             public override string ToString() => $"({X}, {Y})";
         }
 
-        public NpcCharacterId Id { get; set; }
+        public NpcCharacterId? Id { get; set; }
+        // public SampleId? Sound { get; set; }
         public byte Sound { get; set; }
         public ushort? EventNumber { get; set; }
         public ushort ObjectNumber { get; set; }
@@ -56,7 +56,8 @@ namespace UAlbion.Formats.Assets
         public static MapNpc Serdes(int _, MapNpc existing, ISerializer s)
         {
             var npc = existing ?? new MapNpc();
-            npc.Id = s.EnumU8(nameof(Id), npc.Id);
+            npc.Id = (NpcCharacterId?)Tweak.Serdes(nameof(Id), (byte?)npc.Id, s.UInt8);
+            // npc.Sound = (SampleId?)Tweak.Serdes(nameof(Sound), (byte?)npc.Sound, s.UInt8);
             npc.Sound = s.UInt8(nameof(Sound), npc.Sound);
             npc.EventNumber = ConvertMaxToNull.Serdes(nameof(EventNumber), npc.EventNumber, s.UInt16);
             npc.ObjectNumber = Tweak.Serdes(nameof(ObjectNumber), npc.ObjectNumber, s.UInt16) ?? 0;

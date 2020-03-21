@@ -31,6 +31,8 @@ namespace UAlbion.Formats.Assets
             }
         }
 
+        public IEnumerable<IEventNode> Events => _events;
+
         public static EventSet Serdes(EventSet set, ISerializer s)
         {
             set ??= new EventSet();

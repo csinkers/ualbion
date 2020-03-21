@@ -24,8 +24,11 @@
     <EmbeddedResource Include="Visual\Shaders\*.glsl" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="!Exists('..\..\SerdesNet')">
     <PackageReference Include="SerdesNet" Version="1.0.2" />
+  </ItemGroup>
+  <ItemGroup Condition="Exists('..\..\SerdesNet')">
+    <ProjectReference Include="..\..\\SerdesNet\SerdesNet.csproj" />
   </ItemGroup>
 
   <ItemGroup>

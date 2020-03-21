@@ -1,13 +1,30 @@
-﻿using SerdesNet;
+﻿using System;
+using System.Linq;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets
 {
+    [Flags]
+    public enum MapFlags2D : byte
+    {
+        Unk0 = 1,
+        Unk1 = 1 << 1,
+        Unk2 = 1 << 2,
+        Unk3 = 1 << 3,
+        Unk4 = 1 << 4,
+        Unk5 = 1 << 5,
+        Unk6 = 1 << 6,
+        Unk7 = 1 << 7,
+    }
+
     public class MapData2D : BaseMapData
     {
-        public override MapType MapType => MapType.TwoD;
-        public byte Unk0 { get; private set; } // Wait/Rest, Light-Environment, NPC converge range
+        static readonly TilesetId[] OutdoorTilesets = new TilesetId[0];
+
+        public override MapType MapType => OutdoorTilesets.Contains(TilesetId) ? MapType.TwoDOutdoors : MapType.TwoD;
+        public MapFlags2D Flags { get; private set; } // Wait/Rest, Light-Environment, NPC converge range
         public byte Sound { get; private set; }
         public TilesetId TilesetId { get; private set; }
         public byte FrameRate { get; private set; }
@@ -19,7 +36,7 @@ namespace UAlbion.Formats.Assets
         {
             var startOffset = s.Offset;
             var map = existing ?? new MapData2D();
-            map.Unk0 = s.UInt8(nameof(Unk0), map.Unk0); // 0
+            map.Flags = s.EnumU8(nameof(Flags), map.Flags); // 0
             int npcCount = s.Transform("NpcCount", map.Npcs.Count, s.UInt8, NpcCountTransform.Instance); // 1
             var _ = s.UInt8("MapType", (byte)map.MapType); // 2
 
@@ -31,7 +48,13 @@ namespace UAlbion.Formats.Assets
             map.PaletteId = (PaletteId)StoreIncremented.Serdes(nameof(PaletteId), (byte)map.PaletteId, s.UInt8);
             map.FrameRate = s.UInt8(nameof(FrameRate), map.FrameRate); //9
 
-            s.List(map.Npcs, npcCount, MapNpc.Serdes);
+            for(int i = 0; i < npcCount; i++)
+            {
+                map.Npcs.TryGetValue(i, out var npc);
+                npc = MapNpc.Serdes(i, npc, s);
+                if (npc.Id != null)
+                    map.Npcs[i] = npc;
+            }
             s.Check();
 
             map.Underlay ??= new int[map.Width * map.Height];

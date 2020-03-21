@@ -56,6 +56,7 @@ namespace UAlbion.Game
                 exchange.IsActive = false;
             _allMapsExchange.PruneInactiveChildren();
 
+            Raise(new MuteEvent());
             var map = BuildMap(pendingMapChange);
             if (map != null)
             {

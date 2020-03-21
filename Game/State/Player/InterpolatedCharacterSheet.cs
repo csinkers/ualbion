@@ -35,7 +35,7 @@ namespace UAlbion.Game.State.Player
         public byte SpriteId => _b().SpriteId;
         public AssetType SpriteType => _b().SpriteType;
         public SmallPortraitId? PortraitId => _b().PortraitId;
-        public ushort EventSetId => _b().EventSetId;
+        public EventSetId EventSetId => _b().EventSetId;
         public ushort WordSet => _b().WordSet;
         public PlayerLanguage Languages => _b().Languages;
         public IMagicSkills Magic { get; }

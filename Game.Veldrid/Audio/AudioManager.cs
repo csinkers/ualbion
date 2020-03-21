@@ -9,6 +9,7 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Audio;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Veldrid.Audio
 {
@@ -18,7 +19,8 @@ namespace UAlbion.Game.Veldrid.Audio
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<AudioManager, QuitEvent>((x,e) => x._doneEvent.Set()),
-            H<AudioManager, SoundEvent>((x,e) => x.Play(e))
+            H<AudioManager, SoundEvent>((x,e) => x.Play(e)),
+            H<AudioManager, MuteEvent>((x,e) => x.StopAll())
         );
 
         readonly IDictionary<SampleId, AudioBuffer> _sampleCache = new Dictionary<SampleId, AudioBuffer>();
@@ -92,6 +94,23 @@ namespace UAlbion.Game.Veldrid.Audio
             active.Source.Play();
             lock(_syncRoot)
                 _activeSounds.Add(active);
+        }
+
+        void StopAll()
+        {
+            lock (_syncRoot)
+            {
+                foreach (var sound in _activeSounds)
+                {
+                    sound.Source.Stop();
+                    sound.Source.Dispose();
+                }
+                _activeSounds.Clear();
+
+                foreach(var sample in _sampleCache.Values)
+                    sample.Dispose();
+                _sampleCache.Clear();
+            }
         }
 
         public AudioManager(bool standalone) : base(Handlers) => _standalone = standalone;

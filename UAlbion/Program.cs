@@ -80,11 +80,13 @@ namespace UAlbion
 
                 case ExecutionMode.DumpData:
                     Dump.CoreSprites(assets, baseDir);
-                    Dump.CharacterSheets(assets);
-                    Dump.Chests(assets);
+                    Dump.CharacterSheets(assets, baseDir);
+                    Dump.Chests(assets, baseDir);
                     Dump.ItemData(assets, baseDir);
                     Dump.MapEvents(assets, baseDir);
                     Dump.EventSets(assets, baseDir);
+                    Dump.MapData(assets, baseDir);
+                    Dump.ThreeDMapAndLabInfo(assets, baseDir);
                     break;
 
                 case ExecutionMode.Exit: break;

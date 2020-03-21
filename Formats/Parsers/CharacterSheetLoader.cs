@@ -49,7 +49,7 @@ namespace UAlbion.Formats.Parsers
             sheet.Combat.ActionPoints = s.UInt8("ActionPoints", sheet.Combat.ActionPoints);
             s.Check();
 
-            sheet.EventSetId = s.UInt16("EventSetId", sheet.EventSetId);
+            sheet.EventSetId = s.EnumU16("EventSetId", sheet.EventSetId);
             sheet.WordSet = s.UInt16("WordSet", sheet.WordSet);
             sheet.Combat.TrainingPoints = s.UInt16("TrainingPoints", sheet.Combat.TrainingPoints);
             sheet.Inventory.Gold = s.UInt16("Gold", sheet.Inventory.Gold);

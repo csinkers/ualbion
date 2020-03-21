@@ -7,7 +7,7 @@ namespace UAlbion.Formats.MapEvents
         public static PlaceActionEvent Serdes(PlaceActionEvent e, ISerializer s)
         {
             e ??= new PlaceActionEvent();
-            e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);
+            e.Type = s.EnumU8(nameof(Type), e.Type);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
@@ -17,14 +17,14 @@ namespace UAlbion.Formats.MapEvents
             return e;
         }
 
-        public byte Unk1 { get; private set; }
+        public PlaceActionType Type { get; private set; }
         public byte Unk2 { get; private set; }
         public byte Unk3 { get; private set; }
         public byte Unk4 { get; private set; }
         public byte Unk5 { get; private set; }
         public ushort Unk6 { get; private set; }
         public ushort Unk8 { get; private set; }
-        public override string ToString() => $"place_action ({Unk1} {Unk2} {Unk3} {Unk4} {Unk5} {Unk6} {Unk8})";
+        public override string ToString() => $"place_action {Type} ({Unk2} {Unk3} {Unk4} {Unk5} {Unk6} {Unk8})";
         public override MapEventType EventType => MapEventType.PlaceAction;
     }
 }

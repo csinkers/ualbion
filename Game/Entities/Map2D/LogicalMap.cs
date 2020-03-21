@@ -28,7 +28,7 @@ namespace UAlbion.Game.Entities.Map2D
         public bool UseSmallSprites { get; }
         public PaletteId PaletteId => _mapData.PaletteId;
         public IconGraphicsId TilesetId => (IconGraphicsId)_mapData.TilesetId;
-        public IEnumerable<MapNpc> Npcs => _mapData.Npcs;
+        public IEnumerable<MapNpc> Npcs => _mapData.Npcs.OrderBy(x => x.Key).Select(x => x.Value);
         public Vector2 TileSize { get; set; } // TODO: Tidy up how this gets initialised
 
         public int Index(int x, int y) => y * _mapData.Width + x;

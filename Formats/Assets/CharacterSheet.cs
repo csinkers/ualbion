@@ -49,7 +49,7 @@ namespace UAlbion.Formats.Assets
         public byte SpriteId { get; set; }
         public AssetType SpriteType { get; set; }
         public SmallPortraitId? PortraitId { get; set; }
-        public ushort EventSetId { get; set; }
+        public EventSetId EventSetId { get; set; }
         public ushort WordSet { get; set; }
 
         public string GetName(GameLanguage language) => language switch

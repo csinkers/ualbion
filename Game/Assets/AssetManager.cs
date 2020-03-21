@@ -164,9 +164,9 @@ namespace UAlbion.Game.Assets
 
         public AlbionSample LoadSample(SampleId id) => (AlbionSample)_assetLocatorRegistry.LoadAssetCached(AssetType.Sample, id);
         public AlbionVideo LoadVideo(VideoId id, GameLanguage language) => (AlbionVideo)_assetLocatorRegistry.LoadAssetCached(AssetType.Flic, (int)id, language);
-        public CharacterSheet LoadCharacter(AssetType type, PartyCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(type, id);
-        public CharacterSheet LoadCharacter(AssetType type, NpcCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(type, id);
-        public CharacterSheet LoadCharacter(AssetType type, MonsterCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(type, id);
+        public CharacterSheet LoadCharacter(PartyCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(AssetType.PartyMember, id);
+        public CharacterSheet LoadCharacter(NpcCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(AssetType.Npc, id);
+        public CharacterSheet LoadCharacter(MonsterCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(AssetType.Monster, id);
         public Chest LoadChest(ChestId id) => (Chest)_assetLocatorRegistry.LoadAssetCached(AssetType.ChestData, id);
         public Chest LoadMerchant(MerchantId id)=> (Chest)_assetLocatorRegistry.LoadAssetCached(AssetType.MerchantData, id);
         public WordId? ParseWord(string word)

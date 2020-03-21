@@ -13,7 +13,7 @@ namespace UAlbion.Formats.Assets
         CombatBackgroundId CombatBackgroundId { get;  }
         PaletteId PaletteId { get;  }
 
-        IList<MapNpc> Npcs { get; }
+        IDictionary<int, MapNpc> Npcs { get; }
         IList<EventNode> Events { get; }
         IList<MapEventZone> Zones { get; }
         IDictionary<int, MapEventZone> ZoneLookup { get; }

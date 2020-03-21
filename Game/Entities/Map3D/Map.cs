@@ -82,11 +82,8 @@ namespace UAlbion.Game.Entities.Map3D
 
             Raise(new LogEvent(LogEvent.Level.Info, $"WallHeight: {_labyrinthData.WallHeight} MaxObj: {maxObjectHeightRaw} EffWallWidth: {_labyrinthData.EffectiveWallWidth}"));
 
-            foreach (var npc in _mapData.Npcs)
+            foreach (var npc in _mapData.Npcs.Values)
             {
-                if (npc.Id == 0)
-                    continue;
-
                 var objectData = _labyrinthData.ObjectGroups[npc.ObjectNumber - 1];
                 foreach (var subObject in objectData.SubObjects)
                 {

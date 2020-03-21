@@ -17,7 +17,7 @@ namespace UAlbion.Formats.Assets
         public PaletteId PaletteId { get; protected set; }
         public CombatBackgroundId CombatBackgroundId { get; protected set; }
 
-        public IList<MapNpc> Npcs { get; } = new List<MapNpc>();
+        public IDictionary<int, MapNpc> Npcs { get; } = new Dictionary<int, MapNpc>();
 
         public IList<MapEventZone> Zones { get; } = new List<MapEventZone>();
         public IDictionary<int, MapEventZone> ZoneLookup { get; } = new Dictionary<int, MapEventZone>();
@@ -155,6 +155,9 @@ namespace UAlbion.Formats.Assets
         {
             ushort eventCount = s.UInt16("EventCount", (ushort)Events.Count);
             s.List(Events, eventCount, EventNode.Serdes);
+            foreach(var e in Events)
+                if(e.NextEventId >= eventCount)
+                    throw new InvalidOperationException();
             s.Check();
         }
 
@@ -172,8 +175,8 @@ namespace UAlbion.Formats.Assets
 
             BuildEventChains();
 
-            foreach (var npc in Npcs)
-                if (npc.Id != 0 && npc.EventNumber.HasValue)
+            foreach (var npc in Npcs.Values)
+                if (npc.EventNumber.HasValue)
                     (npc.Chain, npc.Node) = ChainsByEventId[npc.EventNumber.Value];
 
             foreach (var zone in Zones)
@@ -204,7 +207,7 @@ namespace UAlbion.Formats.Assets
                 if (zone.EventNumber.HasValue)
                     AddEventReference(zone.EventNumber.Value, zone);
 
-            foreach (var npc in Npcs)
+            foreach (var npc in Npcs.Values)
                 if (npc.EventNumber.HasValue)
                     AddEventReference(npc.EventNumber.Value, npc);
 
@@ -230,9 +233,8 @@ namespace UAlbion.Formats.Assets
 
         protected void SerdesNpcWaypoints(ISerializer s)
         {
-            foreach (var npc in Npcs)
-                if (npc.Id != 0)
-                    npc.LoadWaypoints(s);
+            foreach (var npc in Npcs.OrderBy(x => x.Key).Select(x => x.Value))
+                npc.LoadWaypoints(s);
         }
     }
 }

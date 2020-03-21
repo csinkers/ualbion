@@ -57,10 +57,10 @@ namespace UAlbion.Game.State
             };
 
             foreach (PartyCharacterId charId in Enum.GetValues(typeof(PartyCharacterId)))
-                _game.PartyMembers.Add(charId, assets.LoadCharacter(AssetType.PartyMember, charId));
+                _game.PartyMembers.Add(charId, assets.LoadCharacter(charId));
 
             foreach (NpcCharacterId charId in Enum.GetValues(typeof(NpcCharacterId)))
-                _game.Npcs.Add(charId, assets.LoadCharacter(AssetType.Npc, charId));
+                _game.Npcs.Add(charId, assets.LoadCharacter(charId));
 
             foreach(ChestId id in Enum.GetValues(typeof(ChestId)))
                 _game.Chests.Add(id, assets.LoadChest(id));

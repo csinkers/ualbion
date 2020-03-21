@@ -101,7 +101,7 @@ type XldFile =
             stringLengths 
             |> Seq.mapi (fun i l -> 
                 let bytes = br.ReadBytes(l)
-                string i, bytesTo850String bytes
+                (sprintf "%2d" i), bytesTo850String bytes
             ) |> Map.ofSeq
         let json = Json.serialize stringTable
         File.WriteAllText(Path.Combine(outputDir, sprintf "%02d.json" i), json)

@@ -48,9 +48,9 @@ namespace UAlbion.Game
         MapData2D LoadMap2D(MapDataId id);
         MapData3D LoadMap3D(MapDataId id);
         ItemData LoadItem(ItemId id);
-        CharacterSheet LoadCharacter(AssetType type, PartyCharacterId id);
-        CharacterSheet LoadCharacter(AssetType type, NpcCharacterId id);
-        CharacterSheet LoadCharacter(AssetType type, MonsterCharacterId id);
+        CharacterSheet LoadCharacter(PartyCharacterId id);
+        CharacterSheet LoadCharacter(NpcCharacterId id);
+        CharacterSheet LoadCharacter(MonsterCharacterId id);
         Chest LoadChest(ChestId chestId);
         Chest LoadMerchant(MerchantId merchantId);
         WordId? ParseWord(string word);
@@ -59,5 +59,6 @@ namespace UAlbion.Game
         IGeneralConfig LoadGeneralConfig();
         IAssetConfig LoadAssetConfig();
         CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id);
+        EventSet LoadEventSet(EventSetId eventSetId);
     }
 }

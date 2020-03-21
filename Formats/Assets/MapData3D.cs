@@ -34,7 +34,13 @@ namespace UAlbion.Formats.Assets
             map.PaletteId = (PaletteId)StoreIncremented.Serdes(nameof(PaletteId), (byte)map.PaletteId, s.UInt8);
             map.Sound = StoreIncremented.Serdes(nameof(Sound), map.Sound, s.UInt8);
 
-            s.List(map.Npcs, npcCount, MapNpc.Serdes);
+            for(int i = 0; i < npcCount; i++)
+            {
+                map.Npcs.TryGetValue(i, out var npc);
+                npc = MapNpc.Serdes(i, npc, s);
+                if (npc.Id != null)
+                    map.Npcs[i] = npc;
+            }
             s.Check();
 
             map.Contents ??= new byte[map.Width * map.Height];

@@ -22,7 +22,7 @@ namespace UAlbion.Formats.Assets
             slot.Charges = s.UInt8(nameof(slot.Charges), slot.Charges);
             slot.Enchantment = s.UInt8(nameof(slot.Enchantment), slot.Enchantment);
             slot.Flags = s.EnumU8(nameof(slot.Flags), slot.Flags);
-            slot.Id = (ItemId?)Tweak.Serdes(nameof(slot.Id), (ushort?)slot.Id, s.UInt16);
+            slot.Id = (ItemId?)StoreIncrementedNullZero.Serdes(nameof(slot.Id), (ushort?)slot.Id, s.UInt16);
             return slot;
         }
     }

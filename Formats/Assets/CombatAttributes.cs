@@ -13,5 +13,6 @@
         public MentalCondition MentalConditions { get; set; }
 
         public CombatAttributes DeepClone() => (CombatAttributes) MemberwiseClone();
+        public override string ToString() => $"XP:{ExperiencePoints} TP:{TrainingPoints} LP:{LifePoints}/{LifePointsMax} AP:{ActionPoints} D:{Damage} P:{Protection} PCond:{PhysicalConditions} MCond:{MentalConditions}";
     }
 }

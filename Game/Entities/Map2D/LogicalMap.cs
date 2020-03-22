@@ -5,14 +5,33 @@ using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Entities.Map2D
 {
+    public class MapDelta
+    {
+        public enum DeltaType
+        {
+            Underlay,
+            Overlay,
+            Chain,
+            Trigger,
+        }
+
+        public DeltaType Type { get; set; }
+        public bool Permanent { get; set; }
+        public byte X { get; set; }
+        public byte Y { get; set; }
+    }
+
     public class LogicalMap
     {
         readonly MapData2D _mapData;
         readonly TilesetData _tileData;
         readonly IList<Block> _blockList;
+
+        readonly IDictionary<int, MapDelta> _changes;
 
         public LogicalMap(IAssetManager assetManager, MapDataId mapId)
         {
@@ -22,7 +41,7 @@ namespace UAlbion.Game.Entities.Map2D
             UseSmallSprites = _tileData.UseSmallGraphics;
         }
 
-        public event EventHandler<EventArgs> Dirty;
+        public event EventHandler<DirtyTileEventArgs> Dirty;
         public int Width => _mapData.Width;
         public int Height => _mapData.Height;
         public bool UseSmallSprites { get; }
@@ -72,7 +91,7 @@ namespace UAlbion.Game.Entities.Map2D
             else
             {
                 _mapData.Underlay[Index(x, y)] = value;
-                Dirty?.Invoke(this, EventArgs.Empty);
+                Dirty?.Invoke(this, new DirtyTileEventArgs(x, y, IconChangeType.Underlay));
             }
         }
 
@@ -86,7 +105,7 @@ namespace UAlbion.Game.Entities.Map2D
             else
             {
                 _mapData.Overlay[Index(x, y)] = value;
-                Dirty?.Invoke(this, EventArgs.Empty);
+                Dirty?.Invoke(this, new DirtyTileEventArgs(x, y, IconChangeType.Overlay));
             }
         }
 
@@ -115,16 +134,20 @@ namespace UAlbion.Game.Entities.Map2D
                     int underlay = _mapData.Underlay[targetIndex];
                     int newUnderlay = block.Underlay[targetBlockIndex];
                     if (newUnderlay > 1 && (overwrite || underlay <= 1))
+                    {
                         _mapData.Underlay[targetIndex] = newUnderlay;
+                        Dirty?.Invoke(this, new DirtyTileEventArgs(x + i, y + j, IconChangeType.Underlay));
+                    }
 
                     int overlay = _mapData.Overlay[targetIndex];
                     int newOverlay = block.Overlay[targetBlockIndex];
                     if (overwrite || overlay > 1)
+                    {
                         _mapData.Overlay[targetIndex] = newOverlay;
+                        Dirty?.Invoke(this, new DirtyTileEventArgs(x + i, y + j, IconChangeType.Overlay));
+                    }
                 }
             }
-
-            Dirty?.Invoke(this, EventArgs.Empty);
         }
 
         public void ChangeTileEventChain(byte x, byte y, ushort value)
@@ -148,5 +171,19 @@ namespace UAlbion.Game.Entities.Map2D
             if(zone != null)
                 zone.Trigger = (TriggerType)value;
         }
+    }
+
+    public class DirtyTileEventArgs : EventArgs
+    {
+        public DirtyTileEventArgs(int x, int y, IconChangeType type)
+        {
+            X = x;
+            Y = y;
+            Type = type;
+        }
+
+        public int X { get; }
+        public int Y { get; }
+        public IconChangeType Type { get; }
     }
 }

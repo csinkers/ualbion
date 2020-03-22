@@ -7,6 +7,7 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 
@@ -29,10 +30,14 @@ namespace UAlbion.Game.Entities.Map2D
             })
         );
 
-        public TileLayer(LogicalMap logicalMap, ITexture tileset, Func<int, TilesetData.TileData> tileFunc, DrawLayer drawLayer) : base(Handlers)
+        public TileLayer(LogicalMap logicalMap, ITexture tileset, Func<int, TilesetData.TileData> tileFunc, DrawLayer drawLayer, IconChangeType iconChangeType) : base(Handlers)
         {
             _logicalMap = logicalMap;
-            _logicalMap.Dirty += (sender, args) => _dirty = true;
+            _logicalMap.Dirty += (sender, args) =>
+            {
+                if (args.Type == iconChangeType)
+                    _dirty.Add((args.X, args.Y));
+            };
             _tileset = tileset;
             _tileFunc = tileFunc;
             _drawLayer = drawLayer;
@@ -50,7 +55,8 @@ namespace UAlbion.Game.Entities.Map2D
         (int, int)[] _animatedTiles;
         int _lastFrameCount;
         bool _isActive = true;
-        bool _dirty = true;
+        bool _allDirty = true;
+        ISet<(int, int)> _dirty = new HashSet<(int, int)>();
 
         public int? HighlightIndex { get; set; }
         int? _highlightEvent;
@@ -114,13 +120,13 @@ namespace UAlbion.Game.Entities.Map2D
 #if DEBUG
             var debug = Resolve<IDebugSettings>()?.DebugFlags ?? 0;
             if (_lastDebugFlags != debug)
-                _dirty = true;
+                _allDirty = true;
             _lastDebugFlags = debug;
 
             if (frameCount != _lastFrameCount && (
                     (debug & DebugFlags.HighlightEventChainZones) != 0
                  || (debug & DebugFlags.HighlightTile) != 0))
-                _dirty = true;
+                _allDirty = true;
 #endif
 
             var sm = Resolve<ISpriteManager>();
@@ -128,7 +134,7 @@ namespace UAlbion.Game.Entities.Map2D
             {
                 var key = new SpriteKey(_tileset, _drawLayer, 0);
                 _lease = sm.Borrow(key, _logicalMap.Width * _logicalMap.Height, this);
-                _dirty = true;
+                _allDirty = true;
             }
 
             if (_lease == null)
@@ -143,7 +149,10 @@ namespace UAlbion.Game.Entities.Map2D
             }
             else _highlightEvent = null;
 
-            if (_dirty)
+            if(!_allDirty && frameCount != _lastFrameCount)
+                _dirty.UnionWith(_animatedTiles);
+
+            if (_allDirty)
             {
                 var instances = _lease.Access();
                 var animatedTiles = new List<(int, int)>();
@@ -163,12 +172,13 @@ namespace UAlbion.Game.Entities.Map2D
                 }
 
                 _animatedTiles = animatedTiles.ToArray();
-                _dirty = false;
+                _dirty.Clear();
+                _allDirty = false;
             }
-            else if (frameCount != _lastFrameCount)
+            else if (_dirty.Count > 0)
             {
                 var instances = _lease.Access();
-                foreach (var (x,y) in _animatedTiles)
+                foreach (var (x,y) in _dirty)
                 {
                     int index = _logicalMap.Index(x, y);
                     var tile = _tileFunc(index);
@@ -178,6 +188,7 @@ namespace UAlbion.Game.Entities.Map2D
                         tile,
                         frameCount);
                 }
+                _dirty.Clear();
             }
 
             _lastFrameCount = frameCount;

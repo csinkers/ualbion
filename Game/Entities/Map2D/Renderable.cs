@@ -3,6 +3,7 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities.Map2D
@@ -36,8 +37,19 @@ namespace UAlbion.Game.Entities.Map2D
             _logicalMap = logicalMap;
             var subImage = tileset.GetSubImageDetails(0);
             TileSize = subImage.Size;
-            _underlay = AttachChild(new TileLayer(logicalMap, tileset, logicalMap.GetUnderlay, DrawLayer.Underlay));
-            _overlay = AttachChild(new TileLayer(logicalMap, tileset, logicalMap.GetOverlay, DrawLayer.Overlay3));
+
+            _underlay = AttachChild(new TileLayer(
+                logicalMap,
+                tileset,
+                logicalMap.GetUnderlay,
+                DrawLayer.Underlay,
+                IconChangeType.Underlay));
+
+            _overlay = AttachChild(new TileLayer(logicalMap,
+                tileset,
+                logicalMap.GetOverlay,
+                DrawLayer.Overlay3,
+                IconChangeType.Overlay));
         }
 
         public override void Subscribed() => Raise(new LoadPaletteEvent(Palette));

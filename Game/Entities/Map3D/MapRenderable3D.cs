@@ -13,7 +13,7 @@ using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
 
-namespace UAlbion.Game.Entities
+namespace UAlbion.Game.Entities.Map3D
 {
     public class MapRenderable3D : Component
     {

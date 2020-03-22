@@ -16,7 +16,7 @@ namespace UAlbion.Game.Events
             Y = y;
         }
 
-        public override string ToString() => $"Triggering chain {Chain.Id} due to {Trigger} (event {Node.Id}, first event {Chain.Events[0].Id})";
+        public override string ToString() => $"Triggering chain {Chain.Id} due to {Trigger} at ({X}, {Y}) (event {Node.Id}, first event {Chain.Events[0].Id})";
 
         public EventChain Chain { get; }
         public IEventNode Node { get; }

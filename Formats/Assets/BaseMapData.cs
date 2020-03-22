@@ -130,7 +130,7 @@ namespace UAlbion.Formats.Assets
             var disableChainEvents = ChainsByEventId
                 .Where(x =>
                     x.Item2.Event is DisableEventChainEvent
-                    || (x.Item2.Event is ChangeIconEvent ci && ci.ChangeType == ChangeIconEvent.IconChangeType.Chain)
+                    || (x.Item2.Event is ChangeIconEvent ci && ci.ChangeType == IconChangeType.Chain)
                 ).ToList();
             Console.WriteLine(disableChainEvents.Count);
         } //*/

@@ -9,8 +9,8 @@ namespace UAlbion.Formats.AssetIds
 {
     public enum DungeonOverlayId  
     {
-        JiriDoor1 = 0,
-        JiriWindow1 = 1,
+        JiriDoor = 0,
+        JiriWindow = 1,
         JiriWindow2 = 2,
         JiriWindow3 = 3,
         JiriWindow4 = 4,
@@ -18,10 +18,10 @@ namespace UAlbion.Formats.AssetIds
         JiriDoor2 = 6,
         JiriScuff = 7,
         JiriDirt = 8,
-        JiriExposedRocks1 = 9,
+        JiriExposedRocks = 9,
         JiriExposedRocks2 = 10,
         JiriExposedRocks3 = 11,
-        JiriDamage1 = 12,
+        JiriDamage = 12,
         JiriDamage2 = 13,
         JiriDamage3 = 14,
         JiriDamage4 = 15,

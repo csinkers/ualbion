@@ -203,6 +203,22 @@ namespace UAlbion.Game.Entities
             });
         }
 
+        public ITextSource GetEventSetTextFromTextEvent(TextEvent textEvent, EventSetId eventSetId, FontColor color)
+        {
+            var id = textEvent.TextId;
+
+            return new DynamicText(() =>
+            {
+                var assets = Resolve<IAssetManager>();
+                var settings = Resolve<ISettings>();
+                var textFormatter = new TextFormatter(assets, settings.Gameplay.Language);
+                return textFormatter
+                    .Ink(color)
+                    .Format(new StringId(AssetType.EventText, (int)eventSetId, id))
+                    .Blocks;
+            });
+        }
+
         void OnTextEvent(TextEvent textEvent)
         {
             textEvent.Acknowledged = true;

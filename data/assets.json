@@ -8067,11 +8067,11 @@
     "EnumType": "byte",
     "Assets": {
       "0": {
-        "Name": "Set",
+        "Name": "Set1",
         "SubSprites": "(8,8,576) (16,16)"
       },
       "1": {
-        "Name": "Set",
+        "Name": "Set2",
         "SubSprites": "(8,8,576) (16,16)"
       }
     }
@@ -15425,7 +15425,7 @@
     }
   },
   "$(LANG)/WORDLIS0.XLD": {
-    "Format": "Unknown",
+    "Format": "WordList",
     "EnumName": "WordId",
     "EnumType": "ushort",
     "Assets": {
@@ -19243,7 +19243,7 @@
     }
   },
   "ENGLISH/WORDLIS0.XLD": {
-    "Format": "Unknown",
+    "Format": "WordList",
     "Assets": {
       "0": {},
       "1": {},
@@ -19699,7 +19699,7 @@
     }
   },
   "GERMAN/WORDLIS0.XLD": {
-    "Format": "Unknown",
+    "Format": "WordList",
     "Assets": {
       "0": {},
       "1": {},

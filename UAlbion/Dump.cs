@@ -9,6 +9,7 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
+using UAlbion.Game.Entities;
 using TextEvent = UAlbion.Formats.MapEvents.TextEvent;
 
 namespace UAlbion
@@ -143,28 +144,28 @@ namespace UAlbion
             }
         }
 
-        public static void CharacterSheets(IAssetManager assets, string baseDir)
+        public static void CharacterSheets(IAssetManager assets, ITextManager textManager, string baseDir)
         {
             {
                 using var sw = File.CreateText($@"{baseDir}\re\PartyCharacters.txt");
                 foreach (PartyCharacterId charId in Enum.GetValues(typeof(PartyCharacterId)))
-                    DumpCharacterSheet(charId, assets.LoadCharacter(charId), sw, assets);
+                    DumpCharacterSheet(charId, assets.LoadCharacter(charId), sw, assets, textManager);
             }
 
             {
                 using var sw = File.CreateText($@"{baseDir}\re\NpcCharacters.txt");
                 foreach (NpcCharacterId charId in Enum.GetValues(typeof(NpcCharacterId)))
-                    DumpCharacterSheet(charId, assets.LoadCharacter(charId), sw, assets);
+                    DumpCharacterSheet(charId, assets.LoadCharacter(charId), sw, assets, textManager);
             }
 
             {
                 using var sw = File.CreateText($@"{baseDir}\re\MonsterCharacters.txt");
                 foreach (MonsterCharacterId charId in Enum.GetValues(typeof(MonsterCharacterId)))
-                    DumpCharacterSheet(charId, assets.LoadCharacter(charId), sw, assets);
+                    DumpCharacterSheet(charId, assets.LoadCharacter(charId), sw, assets, textManager);
             }
         }
 
-        static void DumpCharacterSheet<T>(T id, CharacterSheet c, StreamWriter sw, IAssetManager assets) where T : Enum
+        static void DumpCharacterSheet<T>(T id, CharacterSheet c, StreamWriter sw, IAssetManager assets, ITextManager textManager) where T : Enum
         {
             if (c == null || c.GermanName == "" && c.PortraitId == 0)
                 return;
@@ -206,7 +207,16 @@ namespace UAlbion
             {
                 sw.WriteLine("    Chain Offsets: " + string.Join(", ", eventSet.Chains.Select((x, i) => $"{i}:{x.Id}")));
                 foreach (var e in eventSet.Events)
-                    sw.WriteLine("        " + e);
+                {
+                    if (e.Event is TextEvent textEvent)
+                    {
+                        var textSource = textManager.GetEventSetTextFromTextEvent(textEvent, c.EventSetId, FontColor.White);
+                        var text = string.Join(", ", textSource.Get().Select(x => x.Text));
+                        sw.WriteLine($"        {e} = {text}");
+                    }
+                    else
+                        sw.WriteLine("        " + e);
+                }
             }
 
             if (c.Unknown6 != 0) sw.WriteLine($"    Unknown06:{c.Unknown6}");

@@ -51,12 +51,16 @@ namespace UAlbion.Game.Text
                     case Token.Class:
                     {
                         if (!(active is ICharacterSheet character))
-                            throw new FormatException($"Expected the active item to be a character, was actually {active}");
+                        {
+                            yield return (Token.Text, "{CLAS}");
+                            break; // throw new FormatException($"Expected the active item to be a character, was actually {active ?? "null"}");
+                        }
+
                         switch (character.Class)
                         {
                             case PlayerClass.Pilot: yield return (Token.Text, _assets.LoadString(SystemTextId.Class_Pilot, _language)); break;
                             case PlayerClass.Scientist: yield return (Token.Text, _assets.LoadString(SystemTextId.Class_Scientist, _language)); break;
-                            case PlayerClass.IskaiWarrior: yield return (Token.Text, _assets.LoadString(SystemTextId.Class_Warrior1, _language)); break;
+                            case PlayerClass.IskaiWarrior: yield return (Token.Text, _assets.LoadString(SystemTextId.Class_Warrior, _language)); break;
                             case PlayerClass.DjiKasMage: yield return (Token.Text, _assets.LoadString(SystemTextId.Class_DjiKasMage, _language)); break;
                             case PlayerClass.Druid: yield return (Token.Text, _assets.LoadString(SystemTextId.Class_Druid, _language)); break;
                             case PlayerClass.EnlightenedOne: yield return (Token.Text, _assets.LoadString(SystemTextId.Class_EnlightenedOne, _language)); break;
@@ -74,7 +78,10 @@ namespace UAlbion.Game.Text
                     case Token.His:
                     {
                         if (!(active is ICharacterSheet character))
-                            throw new FormatException($"Expected the active item to be a character, was actually {active}");
+                        {
+                            yield return (Token.Text, $"{{{token}}}");
+                            break; // throw new FormatException($"Expected the active item to be a character, was actually {active ?? "null"}");
+                        }
 
                         var word = (token, character.Gender) switch
                             {
@@ -98,16 +105,20 @@ namespace UAlbion.Game.Text
                     {
                         if (active is ICharacterSheet character)
                             yield return (Token.Text, character.GetName(_language));
-
-                        if (active is ItemData item)
+                        else if (active is ItemData item)
                             yield return (Token.Text, item.GetName(_language));
+                        else yield return (Token.Text, "{NAME}");
                         break;
                     }
 
                     case Token.Price:
                     {
                         if (!(active is ItemData item))
-                            throw new FormatException($"Expected the active item to be an item, was actually {active}");
+                        {
+                            yield return (Token.Text, "{PRIC}");
+                            break; // throw new FormatException($"Expected the active item to be an item, was actually {active ?? "null"}");
+                        }
+
                         yield return (Token.Text, $"${item.Value/10}.{item.Value % 10}"); // TODO: Does this need extra logic?
                         break;
                     }
@@ -115,7 +126,11 @@ namespace UAlbion.Game.Text
                     case Token.Race:
                     {
                         if (!(active is ICharacterSheet character))
-                            throw new FormatException($"Expected the active item to be a character, was actually {active}");
+                        {
+                            yield return (Token.Text, "{RACE}");
+                            break; // throw new FormatException($"Expected the active item to be a character, was actually {active ?? "null"}");
+                        }
+
                         switch (character.Race)
                         {
                             case PlayerRace.Terran: yield return (Token.Text, _assets.LoadString(SystemTextId.Race_Terran, _language)); break;
@@ -132,7 +147,11 @@ namespace UAlbion.Game.Text
                     case Token.Sex:
                     {
                         if (!(active is ICharacterSheet character))
-                            throw new FormatException($"Expected the active item to be a character, was actually {active}");
+                        {
+                            yield return (Token.Text, "{SEX}");
+                            break; // throw new FormatException($"Expected the active item to be a character, was actually {active ?? "null"}");
+                        }
+
                         switch (character.Gender)
                         {
                             case Gender.Male: yield return (Token.Text, "♂"); break;
@@ -241,10 +260,16 @@ namespace UAlbion.Game.Text
                 _implicitTokens.Concat(
                     Tokeniser.Tokenise(template)
                 ).ToList();
+
+            string CleanWord(string word) => word
+                    .Replace(" ", "")
+                    .Replace("'", "")
+                    .Replace("-", "");
+
             var words = tokens
                 .Where(x => x.Item1 == Token.Word)
                 .Select(x => (string)x.Item2)
-                .Select(Enum.Parse<WordId>)
+                .Select(x => Enum.Parse<WordId>(CleanWord(x), true))
                 .ToList();
 
             var substituted = Substitute(tokens, arguments);

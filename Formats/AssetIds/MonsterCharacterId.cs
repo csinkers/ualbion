@@ -55,7 +55,7 @@ namespace UAlbion.Formats.AssetIds
         Sanddiver3 = 43,
         ServiceRobot = 44,
         AIBody1 = 45,
-        AIBody21 = 46,
+        AIBody2 = 46,
         Bandit1 = 47,
         Bandit2 = 48,
         Bandit3 = 49,

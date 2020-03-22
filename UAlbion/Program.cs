@@ -8,6 +8,7 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
+using UAlbion.Game.Entities;
 using UAlbion.Game.Settings;
 using UAlbion.Game.Veldrid.Assets;
 using UAlbion.Game.Veldrid.Audio;
@@ -79,8 +80,11 @@ namespace UAlbion
                 case ExecutionMode.SavedGameTests: SavedGameTests.RoundTripTest(baseDir); break;
 
                 case ExecutionMode.DumpData:
+                    var textManager = new TextManager();
+                    global.Register<ITextManager>(textManager);
+
                     Dump.CoreSprites(assets, baseDir);
-                    Dump.CharacterSheets(assets, baseDir);
+                    Dump.CharacterSheets(assets, textManager, baseDir);
                     Dump.Chests(assets, baseDir);
                     Dump.ItemData(assets, baseDir);
                     Dump.MapEvents(assets, baseDir);

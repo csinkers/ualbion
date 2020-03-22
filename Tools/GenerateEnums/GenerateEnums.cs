@@ -103,7 +103,8 @@ namespace GenerateEnums
                         continue;
                     var name = o.Name;
 
-                    o.Name = name +  counters[name];
+                    int count = counters[name];
+                    o.Name = count == 1 ? name : name + count;
                     counters[name]++;
                 }
             }

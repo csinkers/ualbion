@@ -9,7 +9,7 @@ namespace UAlbion.Formats.AssetIds
 {
     public enum CombatBackgroundId : byte
     {
-        Plains1 = 0,
+        Plains = 0,
         Dungeon = 1,
         Desert = 2,
         WoodDungeon = 3,
@@ -26,7 +26,7 @@ namespace UAlbion.Formats.AssetIds
         Plains2 = 14,
         Plains3 = 15,
         DesertNight = 16,
-        ForestNight1 = 17,
+        ForestNight = 17,
         ForestNight2 = 18,
     }
 }

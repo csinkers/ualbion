@@ -29,6 +29,7 @@
         StringTable,
         SystemText,
         Script,
+        WordList,
 
         // Misc
         BlockList,

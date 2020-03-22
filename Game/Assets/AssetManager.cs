@@ -178,7 +178,12 @@ namespace UAlbion.Game.Assets
                     (IDictionary<int, string>) _assetLocatorRegistry.LoadAssetCached(AssetType.Dictionary, 1),
                     (IDictionary<int, string>) _assetLocatorRegistry.LoadAssetCached(AssetType.Dictionary, 2)
                 };
-            return words.SelectMany(x => x).Where(x => x.Value == word).Select(x => (WordId?)x.Key).FirstOrDefault();
+
+            return words
+                .SelectMany(x => x)
+                .Where(x => x.Value == word)
+                .Select(x => (WordId?)x.Key)
+                .FirstOrDefault();
         }
 
         public IList<Block> LoadBlockList(BlockListId blockListId) => (IList<Block>)_assetLocatorRegistry.LoadAssetCached(AssetType.BlockList, blockListId);

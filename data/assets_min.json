@@ -3144,7 +3144,7 @@
     "Assets": {}
   },
   "$(LANG)/WORDLIS0.XLD": {
-    "Format": "Unknown",
+    "Format": "WordList",
     "Assets": {}
   },
   "INITIAL/AUTOMAP1.XLD": {
@@ -3252,7 +3252,7 @@
     "Assets": {}
   },
   "ENGLISH/WORDLIS0.XLD": {
-    "Format": "Unknown",
+    "Format": "WordList",
     "Assets": {}
   },
   "GERMAN/EVNTTXT0.XLD": {
@@ -3292,7 +3292,7 @@
     "Assets": {}
   },
   "GERMAN/WORDLIS0.XLD": {
-    "Format": "Unknown",
+    "Format": "WordList",
     "Assets": {}
   },
   "ENGLISH": {

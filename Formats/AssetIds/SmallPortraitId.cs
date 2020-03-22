@@ -171,7 +171,7 @@ namespace UAlbion.Formats.AssetIds
         Unknown160 = 160,
         Unknown161 = 161,
         Unknown162 = 162,
-        GibtEsSchon1 = 163,
+        GibtEsSchon = 163,
         GibtEsSchon2 = 164,
         Unknown165 = 165,
         Unknown166 = 166,

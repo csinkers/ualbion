@@ -27,6 +27,7 @@ namespace UAlbion.Core.Visual
         public Vector3 Normal => Vector3.UnitZ; // TODO
         public T Id { get; }
         public Vector3 Position { get => _position; set { if (_position == value) return; _position = value; Dirty = true; } }
+        public int DebugZ => (int)((1.0f - Position.Z) * 4095);
         public Vector2 Size { get => _size ?? Vector2.One; set { if (_size == value) return; _size = value; Dirty = true; } }
 
         public int Frame

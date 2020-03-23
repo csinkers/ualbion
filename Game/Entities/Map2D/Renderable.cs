@@ -2,6 +2,7 @@
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
@@ -22,6 +23,8 @@ namespace UAlbion.Game.Entities.Map2D
         public Vector2 TileSize { get; }
         public PaletteId Palette => _logicalMap.PaletteId;
         public Vector2 SizePixels => new Vector2(_logicalMap.Width, _logicalMap.Height) * TileSize;
+        public WeakSpriteReference GetWeakUnderlayReference(int x, int y) => _underlay.GetWeakSpriteReference(x, y);
+        public WeakSpriteReference GetWeakOverlayReference(int x, int y) => _overlay.GetWeakSpriteReference(x, y);
 
         public int? HighlightIndex
         {

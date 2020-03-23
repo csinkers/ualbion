@@ -139,24 +139,33 @@ namespace UAlbion.Formats.Assets
             }
 
             public override string ToString() => $"Tile{TileNumber} {Layer} {Type} {Collision} {Flags} ->{ImageNumber}:{FrameCount} Unk7: {Unk7}";
+
+            public DrawLayer ToDrawLayer()
+            {
+                var baseLayer = ((int)Type & 0x7) switch
+                {
+                    (int)TileType.Normal => DrawLayer.Underlay,
+                    (int)TileType.Overlay1 => DrawLayer.Overlay1,
+                    (int)TileType.Overlay2 => DrawLayer.Overlay2,
+                    (int)TileType.Overlay3 => DrawLayer.Overlay3,
+                    (int)TileType.Unk7 => DrawLayer.Overlay3,
+                    _ => DrawLayer.Underlay
+                };
+
+                var adjustment = ((int)Layer & 0x7) switch
+                {
+                    (int)TileLayer.Normal => 0,
+                    (int)TileLayer.Layer1 => 1,
+                    (int)TileLayer.Layer2 => 2,
+                    (int)TileLayer.Layer3 => 3,
+                    _ => 0
+                };
+
+                return (DrawLayer)((int)baseLayer + adjustment);
+            }
         }
 
         public bool UseSmallGraphics { get; set; }
         public IList<TileData> Tiles { get; } = new List<TileData>();
-    }
-
-    public static class TilesetDataExtensions
-    {
-        public static DrawLayer ToDrawLayer(this TilesetData.TileLayer tileLayer)
-        {
-            return ((int) tileLayer & 0x7) switch
-            {
-                (int) TilesetData.TileLayer.Normal => DrawLayer.Underlay,
-                (int) TilesetData.TileLayer.Layer1 => DrawLayer.Overlay1,
-                (int) TilesetData.TileLayer.Layer2 => DrawLayer.Overlay2,
-                (int) TilesetData.TileLayer.Layer3 => DrawLayer.Overlay3,
-                _ => DrawLayer.Underlay
-            };
-        }
     }
 }

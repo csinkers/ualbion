@@ -45,5 +45,16 @@ namespace UAlbion.Core.Visual
                     _sprites.Remove(key);
             }
         }
+
+        public WeakSpriteReference MakeWeakReference(SpriteLease lease, int index)
+        {
+            lock (_syncRoot)
+            {
+                if(lease == null)
+                    return new WeakSpriteReference(null, null, 0);
+                _sprites.TryGetValue(lease.Key, out var entry);
+                return new WeakSpriteReference(entry, lease, index);
+            }
+        }
     }
 }

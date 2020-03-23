@@ -9,7 +9,7 @@ namespace UAlbion.Core.Visual
         public int Length => To - From;
         internal int From { get; set; } // [from..to)
         internal int To { get; set; }
-        bool _disposed;
+        public bool Disposed { get; private set; }
 #if DEBUG
         internal object Owner { get; set; }
         public override string ToString() => $"LEASE [{From}-{To}) {_sprite} for {Owner}";
@@ -20,16 +20,16 @@ namespace UAlbion.Core.Visual
 
         public void Dispose()
         {
-            if (_disposed)
+            if (Disposed)
                 throw new InvalidOperationException("SpriteLease already disposed");
 
             _sprite.Shrink(this);
-            _disposed = true;
+            Disposed = true;
         }
 
         public Span<SpriteInstanceData> Access()
         {
-            if (_disposed)
+            if (Disposed)
                 throw new InvalidOperationException("SpriteLease used after return");
             return _sprite.GetSpan(this);
         }

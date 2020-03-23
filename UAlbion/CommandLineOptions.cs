@@ -10,6 +10,7 @@ namespace UAlbion
         public bool StartupOnly { get; }
         public bool UseRenderDoc { get; }
         public ExecutionMode Mode { get; }
+        public AudioMode AudioMode { get; }
 
         public CommandLineOptions(string[] args)
         {
@@ -31,8 +32,12 @@ namespace UAlbion
             }
 
             Mode = ExecutionMode.Game;
-            if (args.Contains("--game-no-audio"))
-                Mode = ExecutionMode.GameWithSlavedAudio;
+            AudioMode = AudioMode.InProcess;
+
+            if (args.Contains("--no-audio"))
+                AudioMode = AudioMode.None;
+            if (args.Contains("--external-audio"))
+                AudioMode = AudioMode.ExternalProcess;
             if (args.Contains("--audio"))
                 Mode = ExecutionMode.AudioSlave;
             if (args.Contains("--editor"))
@@ -61,8 +66,9 @@ Set Rendering Backend:
 
 Execution Mode:
     --game : Runs the game (default)
-    --game-no-audio: Runs the game with audio delegated to a worker process
-    --audio : Runs an audio worker process
+    --no-audio: Runs the game without audio
+    --external-audio: Runs the game with audio delegated to a worker process
+    --audio : Runs as an audio worker process
     --editor : Runs the editor (TODO)
     --save-tests : Runs the saved game tests
     --dump-data : Dumps a variety of game data to text files

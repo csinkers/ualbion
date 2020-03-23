@@ -49,7 +49,7 @@ namespace UAlbion.Game.Entities.Map2D
 
             var tileset = assetManager.LoadTexture(_logicalMap.TilesetId);
             var renderable = AttachChild(new Renderable(_logicalMap, tileset));
-            var selector = AttachChild(new SelectionHandler(_logicalMap, renderable.TileSize));
+            var selector = AttachChild(new SelectionHandler(_logicalMap, renderable.TileSize, renderable));
             selector.HighlightIndexChanged += (sender, x) => renderable.HighlightIndex = x;
             TileSize = new Vector3(renderable.TileSize, 1.0f);
             _logicalMap.TileSize = renderable.TileSize;

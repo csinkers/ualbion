@@ -22,12 +22,14 @@ namespace UAlbion.Game.Entities.Map2D
         static readonly Vector3 Normal = Vector3.UnitZ;
         readonly LogicalMap _map;
         readonly Vector2 _tileSize;
+        readonly Renderable _renderable;
         int _lastHighlightIndex;
 
-        public SelectionHandler(LogicalMap map, Vector2 tileSize) : base(Handlers)
+        public SelectionHandler(LogicalMap map, Vector2 tileSize, Renderable renderable) : base(Handlers)
         {
             _map = map ?? throw new ArgumentNullException(nameof(map));
             _tileSize = tileSize;
+            _renderable = renderable;
         }
 
         public event EventHandler<int> HighlightIndexChanged;
@@ -50,7 +52,12 @@ namespace UAlbion.Game.Entities.Map2D
             var underlayTile = _map.GetUnderlay(x, y);
             var overlayTile = _map.GetOverlay(x, y);
 
-            e.RegisterHit(t, new MapTileHit(new Vector2(x, y), intersectionPoint));
+            e.RegisterHit(t, new MapTileHit(
+                new Vector2(x, y),
+                intersectionPoint,
+                _renderable.GetWeakUnderlayReference(x, y),
+                _renderable.GetWeakOverlayReference(x, y)));
+
             if (underlayTile != null) e.RegisterHit(t, underlayTile);
             if (overlayTile != null) e.RegisterHit(t, overlayTile);
             e.RegisterHit(t, this);

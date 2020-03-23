@@ -39,13 +39,24 @@ void main()
 
 	if ((iFlags & SF_BILLBOARD) != 0)
 	{
-		float c = cos(-u_camera_look_direction.x);
-		float s = sin(-u_camera_look_direction.x);
+		float cx = cos(-u_camera_look_direction.x);
+		float sx = sin(-u_camera_look_direction.x);
+
 		transform = transform * mat4(
-			c, 0, s, 0,
+			cx, 0, sx, 0,
 			0, 1, 0, 0,
-		   -s, 0, c, 0,
+		   -sx, 0, cx, 0,
 			0, 0, 0, 1);
+
+//* // TODO: Get billboarding to work properly
+		float cy = cos(-u_camera_look_direction.y);
+		float sy = sin(-u_camera_look_direction.y);
+
+		transform = transform * mat4(
+			1,  0,   0, 0,
+			0, cy, -sy, 0,
+		    0, sy,  cy, 0,
+			0,  0,   0, 1); //*/
 	}
 
 	vec4 worldSpace = transform * vec4(vPosition, 0, 1);

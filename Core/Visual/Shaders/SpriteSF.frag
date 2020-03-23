@@ -38,9 +38,11 @@ void main()
 
 #ifdef USE_PALETTE
 	float redChannel = color[0];
-	float index = 255.0f * redChannel;
-	color = texture(sampler2D(uPalette, uSpriteSampler), vec2(redChannel, 0.0f)); //!
-	if(index == 0)
+	color = texture(
+		sampler2D(uPalette, uSpriteSampler),
+		vec2((redChannel * 255.0f/256.f) + (0.5f/256.0f), 0)); //!
+
+	if(redChannel == 0)
 		color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 #endif
 

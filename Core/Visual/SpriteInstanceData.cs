@@ -9,7 +9,7 @@ namespace UAlbion.Core.Visual
     {
         public static readonly uint StructSize = (uint)Unsafe.SizeOf<SpriteInstanceData>();
 
-        public override string ToString() => $"SID {Position}:{TexLayer} ({Flags & ~SpriteFlags.DebugFlags})";
+        public override string ToString() => $"SID {Position}:{TexLayer} ({Flags & ~SpriteFlags.DebugFlags}) Z:{DebugZ}";
 
         // State
         public Vector3 Transform1 { get; private set; }
@@ -25,6 +25,7 @@ namespace UAlbion.Core.Visual
         public void OffsetBy(Vector3 offset) => Transform4 += offset;
 
         public Vector3 Position => Transform4;
+        public int DebugZ => (int)((1.0f - Transform4.Z) * 4095);
 
         public Matrix4x4 Transform => new Matrix4x4(
             Transform1.X, Transform1.Y, Transform1.Z, 0,

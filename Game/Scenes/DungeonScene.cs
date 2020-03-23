@@ -26,6 +26,7 @@ namespace UAlbion.Game.Scenes
         {
             Raise(new PushMouseModeEvent(MouseMode.MouseLook));
             Raise(new PushInputModeEvent(InputMode.World3D));
+            Raise(new RefreshMapSubscribersEvent()); // TODO: Is this still needed?
             base.Subscribed();
         }
 

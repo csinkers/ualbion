@@ -47,6 +47,7 @@ namespace UAlbion.Game.Entities.Map2D
         readonly ITexture _tileset;
         readonly Func<int, TilesetData.TileData> _tileFunc;
         readonly DrawLayer _drawLayer;
+        readonly ISet<(int, int)> _dirty = new HashSet<(int, int)>();
 
 #if DEBUG
         DebugFlags _lastDebugFlags;
@@ -56,10 +57,15 @@ namespace UAlbion.Game.Entities.Map2D
         int _lastFrameCount;
         bool _isActive = true;
         bool _allDirty = true;
-        ISet<(int, int)> _dirty = new HashSet<(int, int)>();
 
         public int? HighlightIndex { get; set; }
         int? _highlightEvent;
+
+        public WeakSpriteReference GetWeakSpriteReference(int x, int y)
+        {
+            var sm = Resolve<ISpriteManager>();
+            return sm.MakeWeakReference(_lease, _logicalMap.Index(x, y));
+        }
 
         public bool IsActive
         {
@@ -88,7 +94,7 @@ namespace UAlbion.Game.Entities.Map2D
 
             var subImage = _tileset.GetSubImageDetails(subImageId);
 
-            DrawLayer drawLayer = tile.Layer.ToDrawLayer();
+            DrawLayer drawLayer = tile.ToDrawLayer();
             var position = new Vector3(
                 new Vector2(i, j) * subImage.Size,
                 drawLayer.ToZCoordinate(j));

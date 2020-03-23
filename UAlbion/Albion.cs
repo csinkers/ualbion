@@ -45,7 +45,7 @@ namespace UAlbion
                     Path.Combine(baseDir, "data", "ShaderCache")))
                 .Register<IEngine>(engine);
 
-            var backgroundThreadInitTask = Task.Run(() => RegisterComponents(global, baseDir));
+            var backgroundThreadInitTask = Task.Run(() => RegisterComponents(global, baseDir, commandLine));
             engine.Initialise();
             backgroundThreadInitTask.Wait();
 
@@ -63,12 +63,15 @@ namespace UAlbion
             // TODO: Ensure all sprite leases returned etc to weed out memory leaks
         }
 
-        static void RegisterComponents(EventExchange global, string baseDir)
+        static void RegisterComponents(EventExchange global, string baseDir, CommandLineOptions commandLine)
         {
             PerfTracker.StartupEvent("Creating main components");
             var factory = global.Resolve<ICoreFactory>();
+
+            if (commandLine.AudioMode == AudioMode.InProcess)
+                global.Register<IAudioManager>(new AudioManager(false));
+
             global
-                .Register<IAudioManager>(new AudioManager(false))
                 .Register<IClock>(new GameClock())
                 .Register<ICollisionManager>(new CollisionManager())
                 .Register<ICommonColors>(new CommonColors(factory))

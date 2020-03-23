@@ -27,71 +27,78 @@ namespace UAlbion.Core.Visual
         public int ActiveInstances { get; private set; }
         public SpriteInstanceData[] Instances { get; private set; } = new SpriteInstanceData[MinSize];
         readonly List<SpriteLease> _leases = new List<SpriteLease>();
+        readonly object _syncRoot = new object();
 
         internal SpriteLease Grow(int length, object caller)
         {
-            PerfTracker.IncrementFrameCounter("Sprite Borrows");
-            int from = ActiveInstances;
-            ActiveInstances += length;
-            if (ActiveInstances >= Instances.Length)
+            lock (_syncRoot)
             {
-                int newSize = Instances.Length;
-                while (newSize <= ActiveInstances)
-                    newSize = (int)(newSize * GrowthFactor);
+                PerfTracker.IncrementFrameCounter("Sprite Borrows");
+                int from = ActiveInstances;
+                ActiveInstances += length;
+                if (ActiveInstances >= Instances.Length)
+                {
+                    int newSize = Instances.Length;
+                    while (newSize <= ActiveInstances)
+                        newSize = (int) (newSize * GrowthFactor);
 
-                var newArray = new SpriteInstanceData[newSize];
-                for (int i = 0; i < Instances.Length; i++)
-                    newArray[i] = Instances[i];
-                Instances = newArray;
-            }
+                    var newArray = new SpriteInstanceData[newSize];
+                    for (int i = 0; i < Instances.Length; i++)
+                        newArray[i] = Instances[i];
+                    Instances = newArray;
+                }
 
-            var lease = new SpriteLease(this, from, ActiveInstances);
+                var lease = new SpriteLease(this, from, ActiveInstances);
 #if DEBUG
-            lease.Owner = caller;
+                lease.Owner = caller;
 #endif
-            _leases.Add(lease);
-            return lease;
+                _leases.Add(lease);
+                return lease;
+            }
         }
 
         internal void Shrink(SpriteLease leaseToRemove)
         {
             // TODO: Use a more efficient algorithm, e.g. look for equal sized lease at end of list and swap, use linked list for lease list etc
 
-            PerfTracker.IncrementFrameCounter("Sprite Returns");
-            bool shifting = false;
-            for (int n = 0; n < _leases.Count; n++)
+            lock(_syncRoot)
             {
-                if (!shifting && _leases[n].From == leaseToRemove.From)
+                PerfTracker.IncrementFrameCounter("Sprite Returns");
+                bool shifting = false;
+                for (int n = 0; n < _leases.Count; n++)
                 {
-                    _leases.RemoveAt(n);
-                    ActiveInstances -= leaseToRemove.Length;
-                    shifting = true;
+                    if (!shifting && _leases[n].From == leaseToRemove.From)
+                    {
+                        _leases.RemoveAt(n);
+                        ActiveInstances -= leaseToRemove.Length;
+                        shifting = true;
+                    }
+
+                    if (shifting && n < _leases.Count)
+                    {
+                        var lease = _leases[n];
+                        for (int i = lease.From; i < lease.To; i++)
+                            Instances[i - leaseToRemove.Length] = Instances[i];
+                        lease.From -= leaseToRemove.Length;
+                        lease.To -= leaseToRemove.Length;
+                    }
                 }
 
-                if (shifting && n < _leases.Count)
+                if ((double)ActiveInstances / Instances.Length < ShrinkFactor)
                 {
-                    var lease = _leases[n];
-                    for (int i = lease.From; i < lease.To; i++)
-                        Instances[i - leaseToRemove.Length] = Instances[i];
-                    lease.From -= leaseToRemove.Length;
-                    lease.To -= leaseToRemove.Length;
-                }
-            }
+                    int newSize = Instances.Length;
+                    while ((double)ActiveInstances / newSize > ShrinkFactor)
+                        newSize = (int)(newSize * ShrinkFactor);
+                    newSize = Math.Max(newSize, ActiveInstances);
+                    newSize = Math.Max(newSize, MinSize);
 
-            if ((double)ActiveInstances / Instances.Length < ShrinkFactor)
-            {
-                int newSize = Instances.Length;
-                while ((double) ActiveInstances / newSize > ShrinkFactor)
-                    newSize = (int)(newSize * ShrinkFactor);
-                newSize = Math.Max(newSize, ActiveInstances);
-                newSize = Math.Max(newSize, MinSize);
-
-                if (newSize != Instances.Length)
-                {
-                    var newArray = new SpriteInstanceData[newSize];
-                    for (int i = 0; i < ActiveInstances; i++)
-                        newArray[i] = Instances[i];
-                    Instances = newArray;
+                    if (newSize != Instances.Length)
+                    {
+                        var newArray = new SpriteInstanceData[newSize];
+                        for (int i = 0; i < ActiveInstances; i++)
+                            newArray[i] = Instances[i];
+                        Instances = newArray;
+                    }
                 }
             }
         }

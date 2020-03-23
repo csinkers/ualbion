@@ -9,7 +9,7 @@ namespace UAlbion.Formats.AssetIds
 {
     public enum AutoGraphicsId : byte
     {
-        Set = 0,
+        Set1 = 0,
         Set2 = 1,
     }
 }

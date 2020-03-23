@@ -2,6 +2,7 @@
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
@@ -74,13 +75,12 @@ namespace UAlbion.Game
         IMap BuildMap(MapDataId mapId)
         {
             var assets = Resolve<IAssetManager>();
-            if (assets.LoadMap2D(mapId) != null)
-                return new Entities.Map2D.Map(mapId);
-
-            if (assets.LoadMap3D(mapId) != null)
-                return new Entities.Map3D.Map(mapId);
-
-            return null;
+            return  assets.LoadMap(mapId) switch
+            {
+                MapData2D map2d => new Entities.Map2D.Map(mapId, map2d),
+                MapData3D map3d => new Entities.Map3D.Map(mapId, map3d),
+                _ => null
+            };
         }
 
         void Teleport(TeleportEvent e)

@@ -7,7 +7,7 @@ namespace UAlbion.Core.Veldrid.Audio
     public class AudioSource : AudioObject, IDisposable
     {
         readonly uint _source;
-        readonly uint[] _buffers;
+        // readonly uint[] _buffers;
 
         public AudioSource(AudioBuffer buffer)
         {
@@ -57,11 +57,11 @@ namespace UAlbion.Core.Veldrid.Audio
         public void Dispose()
         {
             AL10.alDeleteSources(1, new[] { _source }); Check();
-            if (_buffers != null)
-            {
-                // TODO: Ensure buffer not still in use, i.e. stop / detach.
-                AL10.alDeleteBuffers(_buffers.Length, _buffers);
-            }
+            // if (_buffers != null)
+            // {
+            //     // TODO: Ensure buffer not still in use, i.e. stop / detach.
+            //     AL10.alDeleteBuffers(_buffers.Length, _buffers);
+            // }
         }
 
         #region Get / set helpers

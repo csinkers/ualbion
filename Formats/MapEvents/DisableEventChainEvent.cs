@@ -18,7 +18,7 @@ namespace UAlbion.Formats.MapEvents
             return e;
         }
 
-        public byte Unk2 { get; private set; }
+        public byte Unk2 { get; private set; } // Temp / permanent?
         public byte ChainNumber { get; set; }
         public byte Unk4 { get; set; }
         public byte Unk5 { get; set; }

@@ -30,7 +30,7 @@ namespace UAlbion.Game
                 case (QueryItemEvent q, QueryType.UsedItemId):       return context.UsedItem == q.ItemId;
                 case (_, QueryType.PreviousActionResult):            return context.LastEventResult;
 
-                case (_, QueryType.IsScriptDebugModeActive): { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query DebugModeActive")); return false; }
+                case (_, QueryType.IsScriptDebugModeActive): { return false; }
                 case (_, QueryType.IsNpcActive):             { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query NpcActive")); break; }
                 case (_, QueryType.IsPartyMemberConscious):  { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query Party member conscious")); break; }
                 case (_, QueryType.EventAlreadyUsed):        { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query event already used")); break; }

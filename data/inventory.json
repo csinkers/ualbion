@@ -10,19 +10,19 @@
         "X": 74,
         "Y": 14
       },
-      "LeftHand": {
-        "X": 5,
-        "Y": 56
-      },
-      "LeftFinger": {
-        "X": 5,
-        "Y": 75
-      },
       "RightHand": {
-        "X": 101,
+        "X": 5,
         "Y": 56
       },
       "RightFinger": {
+        "X": 5,
+        "Y": 75
+      },
+      "LeftHand": {
+        "X": 101,
+        "Y": 56
+      },
+      "LeftFinger": {
         "X": 101,
         "Y": 75
       },
@@ -44,19 +44,19 @@
         "X": 74,
         "Y": 17
       },
-      "LeftHand": {
-        "X": 15,
-        "Y": 66
-      },
-      "LeftFinger": {
-        "X": 15,
-        "Y": 85
-      },
       "RightHand": {
-        "X": 98,
+        "X": 15,
         "Y": 66
       },
       "RightFinger": {
+        "X": 15,
+        "Y": 85
+      },
+      "LeftHand": {
+        "X": 98,
+        "Y": 66
+      },
+      "LeftFinger": {
         "X": 98,
         "Y": 85
       },
@@ -78,19 +78,19 @@
         "X": 45,
         "Y": 21
       },
-      "LeftHand": {
-        "X": 37,
-        "Y": 52
-      },
-      "LeftFinger": {
-        "X": 37,
-        "Y": 71
-      },
       "RightHand": {
-        "X": 108,
+        "X": 37,
         "Y": 52
       },
       "RightFinger": {
+        "X": 37,
+        "Y": 71
+      },
+      "LeftHand": {
+        "X": 108,
+        "Y": 52
+      },
+      "LeftFinger": {
         "X": 108,
         "Y": 71
       },
@@ -116,19 +116,19 @@
         "X": 87,
         "Y": 16
       },
-      "LeftHand": {
+      "RightHand": {
         "X": 22,
         "Y": 34
       },
-      "LeftFinger": {
+      "RightFinger": {
         "X": 22,
         "Y": 53
       },
-      "RightHand": {
+      "LeftHand": {
         "X": 108,
         "Y": 54
       },
-      "RightFinger": {
+      "LeftFinger": {
         "X": 108,
         "Y": 73
       },
@@ -154,19 +154,19 @@
         "X": 92,
         "Y": 16
       },
-      "LeftHand": {
+      "RightHand": {
         "X": 2,
         "Y": 22
       },
-      "LeftFinger": {
+      "RightFinger": {
         "X": 2,
         "Y": 41
       },
-      "RightHand": {
+      "LeftHand": {
         "X": 107,
         "Y": 71
       },
-      "RightFinger": {
+      "LeftFinger": {
         "X": 107,
         "Y": 90
       },
@@ -188,19 +188,19 @@
         "X": 81,
         "Y": 16
       },
-      "LeftHand": {
-        "X": 5,
-        "Y": 66
-      },
-      "LeftFinger": {
-        "X": 5,
-        "Y": 85
-      },
       "RightHand": {
-        "X": 99,
+        "X": 5,
         "Y": 66
       },
       "RightFinger": {
+        "X": 5,
+        "Y": 85
+      },
+      "LeftHand": {
+        "X": 99,
+        "Y": 66
+      },
+      "LeftFinger": {
         "X": 99,
         "Y": 85
       },
@@ -222,19 +222,19 @@
         "X": 82,
         "Y": 22
       },
-      "LeftHand": {
+      "RightHand": {
         "X": 11,
         "Y": 28
       },
-      "LeftFinger": {
+      "RightFinger": {
         "X": 11,
         "Y": 47
       },
-      "RightHand": {
+      "LeftHand": {
         "X": 107,
         "Y": 43
       },
-      "RightFinger": {
+      "LeftFinger": {
         "X": 107,
         "Y": 62
       },
@@ -256,19 +256,19 @@
         "X": 97,
         "Y": 17
       },
-      "LeftHand": {
+      "RightHand": {
         "X": 11,
         "Y": 76
       },
-      "LeftFinger": {
+      "RightFinger": {
         "X": 11,
         "Y": 95
       },
-      "RightHand": {
+      "LeftHand": {
         "X": 105,
         "Y": 65
       },
-      "RightFinger": {
+      "LeftFinger": {
         "X": 105,
         "Y": 84
       },
@@ -290,19 +290,19 @@
         "X": 74,
         "Y": 6
       },
-      "LeftHand": {
-        "X": 6,
-        "Y": 46
-      },
-      "LeftFinger": {
-        "X": 6,
-        "Y": 65
-      },
       "RightHand": {
-        "X": 98,
+        "X": 6,
         "Y": 46
       },
       "RightFinger": {
+        "X": 6,
+        "Y": 65
+      },
+      "LeftHand": {
+        "X": 98,
+        "Y": 46
+      },
+      "LeftFinger": {
         "X": 98,
         "Y": 65
       },

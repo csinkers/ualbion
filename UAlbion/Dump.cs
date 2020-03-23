@@ -40,8 +40,7 @@ namespace UAlbion
             // Dump map and lab data
             for (int i = 100; i < 400; i++)
             {
-                var map = assets.LoadMap3D((MapDataId) i);
-                if (map == null)
+                if (!(assets.LoadMap((MapDataId) i) is MapData3D map))
                     continue;
 
                 sw.WriteLine(
@@ -94,7 +93,7 @@ namespace UAlbion
             using var sw = File.CreateText($@"{baseDir}\re\MapInfo.txt");
             for (int i = 100; i < 400; i++)
             {
-                IMapData map = assets.LoadMap2D((MapDataId)i) ?? (IMapData)assets.LoadMap3D((MapDataId)i);
+                IMapData map = assets.LoadMap((MapDataId)i);
                 if (map == null)
                     continue;
 
@@ -365,7 +364,7 @@ namespace UAlbion
             using var sw = File.CreateText($@"{baseDir}\re\AllMapEvents.txt");
             foreach (var mapId in Enum.GetValues(typeof(MapDataId)).Cast<MapDataId>())
             {
-                IMapData map = assets.LoadMap2D(mapId) ?? (IMapData)assets.LoadMap3D(mapId);
+                IMapData map = assets.LoadMap(mapId);
                 if (map != null)
                     DumpMapEvents(sw, assets, mapId, map);
             }

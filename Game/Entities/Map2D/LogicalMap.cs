@@ -30,12 +30,11 @@ namespace UAlbion.Game.Entities.Map2D
         readonly MapData2D _mapData;
         readonly TilesetData _tileData;
         readonly IList<Block> _blockList;
-
         readonly IDictionary<int, MapDelta> _changes;
 
-        public LogicalMap(IAssetManager assetManager, MapDataId mapId)
+        public LogicalMap(IAssetManager assetManager, MapDataId mapId, MapData2D mapData)
         {
-            _mapData = assetManager.LoadMap2D(mapId);
+            _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
             _tileData = assetManager.LoadTileData(_mapData.TilesetId);
             _blockList = assetManager.LoadBlockList((BlockListId)_mapData.TilesetId); // Note: Assuming a 1:1 correspondence between blocklist and tileset ids.
             UseSmallSprites = _tileData.UseSmallGraphics;
@@ -162,7 +161,15 @@ namespace UAlbion.Game.Entities.Map2D
                     _mapData.Zones.Remove(zone);
                 }
             }
-            // else TODO
+            else
+            {
+                _mapData.ZoneLookup.TryGetValue(index, out var zone);
+                if (zone != null)
+                {
+                    zone.Chain = _mapData.Chains[value];
+                    zone.Node = zone.Chain.Events.First();
+                }
+            }
         }
 
         public void ChangeTileEventTrigger(byte x, byte y, ushort value)
@@ -170,6 +177,12 @@ namespace UAlbion.Game.Entities.Map2D
             _mapData.ZoneLookup.TryGetValue(Index(x, y), out var zone);
             if(zone != null)
                 zone.Trigger = (TriggerType)value;
+        }
+
+        public void DisableChain(byte chainNumber)
+        {
+            var chain = _mapData.Chains[chainNumber];
+            chain.Enabled = false;
         }
     }
 

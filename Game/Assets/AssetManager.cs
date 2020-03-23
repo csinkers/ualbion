@@ -32,8 +32,7 @@ namespace UAlbion.Game.Assets
         }
 
         public void Dispose() { _assetLocatorRegistry.Dispose(); }
-        public MapData2D LoadMap2D(MapDataId id) => _assetLocatorRegistry.LoadAsset(AssetType.MapData, id) as MapData2D; // No caching for map data
-        public MapData3D LoadMap3D(MapDataId id) => _assetLocatorRegistry.LoadAsset(AssetType.MapData, id) as MapData3D;
+        public IMapData LoadMap(MapDataId id) => (IMapData)_assetLocatorRegistry.LoadAsset(AssetType.MapData, id); // No caching for map data
         public ItemData LoadItem(ItemId id)
         {
             var data = (IList<ItemData>)_assetLocatorRegistry.LoadAssetCached(AssetType.ItemList, 0);

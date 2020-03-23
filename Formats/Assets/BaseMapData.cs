@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 
@@ -28,112 +27,6 @@ namespace UAlbion.Formats.Assets
 #if DEBUG
         public IList<object>[] EventReferences { get; private set; }
 #endif
-
-        /*void BuildEventChains()
-        {
-            ChainsByEventId = new (EventChain, IEventNode)[Events.Count];
-
-            var initialNodeIds =
-                Zones.Select(x => x.EventNumber)
-                .Concat(Npcs.Select(x => x.EventNumber))
-                .Where(x => x.HasValue)
-                .Select(x => x.Value)
-                .Distinct()
-                .OrderBy(x => x);
-
-            foreach (var nodeId in initialNodeIds)
-            {
-                var chain = new EventChain(Chains.Count);
-                chain.Events.Add(Events[nodeId]);
-                Chains.Add(chain);
-                ChainsByEventId[nodeId] = (chain, Events[nodeId]);
-            }
-
-            var nodesToCheck = new Queue<IEventNode>();
-            foreach (var chain in Chains)
-            {
-                nodesToCheck.Enqueue(chain.Events[0]);
-                bool headNode = true;
-                while (nodesToCheck.Count > 0)
-                {
-                    var node = nodesToCheck.Dequeue();
-
-                    if (!headNode)
-                    {
-                        if (ChainsByEventId[node.Id] != (null, null))
-                            continue;
-
-                        ChainsByEventId[node.Id] = (chain, node);
-                        if (node != chain.Events[0])
-                            chain.Events.Add(node);
-                    }
-
-                    if (node.NextEvent != null)
-                        nodesToCheck.Enqueue(node.NextEvent);
-
-                    if(node is IBranchNode branch && branch.NextEventWhenFalse != null)
-                        nodesToCheck.Enqueue(branch.NextEventWhenFalse);
-
-                    headNode = false;
-                }
-            }
-
-            foreach (var chain in Chains)
-            {
-                var ordered = chain.Events.OrderBy(x => x.Id).ToList();
-                ApiUtil.Assert(ordered[0] == chain.Events[0]);
-                chain.Events.Clear();
-                foreach(var e in ordered)
-                    chain.Events.Add(e);
-            }
-        } //*/
-
-        protected void BuildEventChains()
-        {
-            ChainsByEventId = new (EventChain, IEventNode)[Events.Count];
-            var nodesToCheck = new Queue<IEventNode>();
-            for (int i = 0; i < Events.Count; i++)
-            {
-                if (ChainsByEventId[i] != (null, null))
-                    continue;
-
-                var chain = new EventChain(Chains.Count);
-                Chains.Add(chain);
-                nodesToCheck.Enqueue(Events[i]);
-
-                while (nodesToCheck.Count > 0)
-                {
-                    var node = nodesToCheck.Dequeue();
-                    if (ChainsByEventId[node.Id] != (null, null))
-                        continue;
-
-                    ChainsByEventId[node.Id] = (chain, node);
-                    chain.Events.Add(node);
-
-                    if (node.NextEvent != null)
-                        nodesToCheck.Enqueue(node.NextEvent);
-
-                    if(node is IBranchNode branch && branch.NextEventWhenFalse != null)
-                        nodesToCheck.Enqueue(branch.NextEventWhenFalse);
-                }
-            }
-
-            foreach (var chain in Chains)
-            {
-                var ordered = chain.Events.OrderBy(x => x.Id).ToList();
-                ApiUtil.Assert(ordered[0] == chain.Events[0]);
-                chain.Events.Clear();
-                foreach(var e in ordered)
-                    chain.Events.Add(e);
-            }
-
-            var disableChainEvents = ChainsByEventId
-                .Where(x =>
-                    x.Item2.Event is DisableEventChainEvent
-                    || (x.Item2.Event is ChangeIconEvent ci && ci.ChangeType == IconChangeType.Chain)
-                ).ToList();
-            Console.WriteLine(disableChainEvents.Count);
-        } //*/
 
         protected void SerdesZones(ISerializer s)
         {
@@ -161,6 +54,49 @@ namespace UAlbion.Formats.Assets
             s.Check();
         }
 
+        protected void SerdesChains(ISerializer s, int chainCount)
+        {
+            var chainOffsets = Chains.Select(x => (ushort)x.Events[0].Id).ToList();
+            for(int i = 0; i < chainCount; i++)
+            {
+                if(s.Mode == SerializerMode.Reading)
+                {
+                    var eventId = s.UInt16(null, 0);
+                    if(eventId != 0xffff)
+                        chainOffsets.Add(eventId);
+                }
+                else
+                {
+                    var eventId = chainOffsets.Count <= i ? (ushort)0xffff : chainOffsets[i];
+                    s.UInt16(null, eventId);
+                }
+            }
+
+            if(s.Mode == SerializerMode.Reading)
+            {
+                ChainsByEventId = new (EventChain, IEventNode)[Events.Count];
+                for (int i = 0; i < chainOffsets.Count; i++)
+                {
+                    var offset = chainOffsets[i];
+                    var chain = new EventChain(i);
+                    var nextOffset = chainOffsets.Count == i + 1
+                        ? Events.Count
+                        : chainOffsets[i + 1];
+
+                    for (int j = offset; j < nextOffset; j++)
+                    {
+                        chain.Events.Add(Events[j]);
+                        ChainsByEventId[j] = (chain, Events[j]);
+                    }
+
+                    Chains.Add(chain);
+                }
+
+            }
+
+            s.Check();
+        }
+
         protected void Unswizzle()
         {
             // Resolve event indices to pointers
@@ -173,8 +109,6 @@ namespace UAlbion.Formats.Assets
                     q.NextEventWhenFalse = Events[q.NextEventWhenFalseId.Value];
             }
 
-            BuildEventChains();
-
             foreach (var npc in Npcs.Values)
                 if (npc.EventNumber.HasValue)
                     (npc.Chain, npc.Node) = ChainsByEventId[npc.EventNumber.Value];
@@ -186,7 +120,7 @@ namespace UAlbion.Formats.Assets
 
                 var node = Events[zone.EventNumber.Value];
                 var chain = ChainsByEventId[zone.EventNumber.Value].Item1;
-                ApiUtil.Assert(chain.Events.First() == node);
+                // ApiUtil.Assert(chain.Events.First() == node);
                 zone.Node = node;
                 zone.Chain = chain;
             }

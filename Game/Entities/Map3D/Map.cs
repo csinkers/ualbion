@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
@@ -8,6 +9,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Game.Events;
+using Object = UAlbion.Formats.Assets.Labyrinth.Object;
 
 namespace UAlbion.Game.Entities.Map3D
 {
@@ -22,8 +24,8 @@ namespace UAlbion.Game.Entities.Map3D
             // H<Map3D, UnloadMapEvent>((x, e) => x.Unload()),
         );
 
+        readonly MapData3D _mapData;
         LabyrinthData _labyrinthData;
-        MapData3D _mapData;
         float _backgroundRed;
         float _backgroundGreen;
         float _backgroundBlue;
@@ -33,9 +35,10 @@ namespace UAlbion.Game.Entities.Map3D
             // TODO
         }
 
-        public Map(MapDataId mapId) : base(Handlers)
+        public Map(MapDataId mapId, MapData3D mapData) : base(Handlers)
         {
             MapId = mapId;
+            _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
         }
 
         public override string ToString() => $"Map3D:{MapId} {LogicalSize.X}x{LogicalSize.Y} TileSize: {TileSize}";
@@ -43,12 +46,11 @@ namespace UAlbion.Game.Entities.Map3D
         public MapType MapType => MapType.ThreeD;
         public Vector2 LogicalSize { get; private set; }
         public Vector3 TileSize { get; private set; }
-        public float BaseCameraHeight => _labyrinthData.CameraHeight != 0 ? _labyrinthData.CameraHeight * 8 : TileSize.Y / 2;
+        public float BaseCameraHeight => (_labyrinthData?.CameraHeight ?? 0) != 0 ? _labyrinthData.CameraHeight * 8 : TileSize.Y / 2;
 
         void LoadMap()
         {
             var assets = Resolve<IAssetManager>();
-            _mapData = assets.LoadMap3D(MapId);
             _labyrinthData = assets.LoadLabyrinthData(_mapData.LabDataId);
 
             if (_labyrinthData == null)
@@ -119,7 +121,7 @@ namespace UAlbion.Game.Entities.Map3D
 
         public override void Subscribed()
         {
-            if (_mapData == null)
+            if (_labyrinthData == null)
                 LoadMap();
             Raise(new SetClearColourEvent(_backgroundRed, _backgroundGreen, _backgroundBlue));
         }

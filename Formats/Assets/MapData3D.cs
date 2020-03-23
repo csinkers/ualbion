@@ -17,7 +17,6 @@ namespace UAlbion.Formats.Assets
         public byte[] Ceilings { get; private set; }
         public IList<AutomapInfo> Automap { get; } = new List<AutomapInfo>();
         public byte[] AutomapGraphics { get; private set; }
-        public IList<ushort> ActiveMapEvents { get; } = new List<ushort>();
 
         public static MapData3D Serdes(MapData3D existing, ISerializer s, string name, AssetInfo config)
         {
@@ -66,7 +65,9 @@ namespace UAlbion.Formats.Assets
             map.SerdesEvents(s);
             map.SerdesNpcWaypoints(s);
             map.SerdesAutomap(s);
-            if(s.Mode != SerializerMode.Reading)
+            map.SerdesChains(s, 64);
+
+            if (s.Mode != SerializerMode.Reading)
                 map.Unswizzle();
 
             return map;
@@ -82,21 +83,6 @@ namespace UAlbion.Formats.Assets
             }
 
             AutomapGraphics = s.ByteArray(nameof(AutomapGraphics), AutomapGraphics, 0x40);
-
-            for(int i = 0; i < 64; i++)
-            {
-                if(s.Mode == SerializerMode.Reading)
-                {
-                    var eventId = s.UInt16(null, 0);
-                    if (eventId != 0xffff)
-                        ActiveMapEvents.Add(eventId);
-                }
-                else
-                {
-                    var eventId = ActiveMapEvents.Count <= i ? (ushort)0xffff : ActiveMapEvents[i];
-                    s.UInt16(null, eventId);
-                }
-            }
             s.Check();
         }
     }

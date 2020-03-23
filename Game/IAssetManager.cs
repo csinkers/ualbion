@@ -45,8 +45,7 @@ namespace UAlbion.Game
         AlbionSample LoadSample(SampleId id);
         AlbionVideo LoadVideo(VideoId id, GameLanguage language);
         AlbionPalette LoadPalette(PaletteId id);
-        MapData2D LoadMap2D(MapDataId id);
-        MapData3D LoadMap3D(MapDataId id);
+        IMapData LoadMap(MapDataId id);
         ItemData LoadItem(ItemId id);
         CharacterSheet LoadCharacter(PartyCharacterId id);
         CharacterSheet LoadCharacter(NpcCharacterId id);

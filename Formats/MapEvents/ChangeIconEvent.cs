@@ -21,7 +21,7 @@ namespace UAlbion.Formats.MapEvents
                     || e.Unk5 == 1
                     || e.Unk5 == 2
                     || e.Unk5 == 3);
-            ApiUtil.Assert(e.Unk8 == 0); // Is 152 for a single change wall event in the endgame. Probably just an oversight.
+            ApiUtil.Assert(e.Unk8 == 0, $"Unexpected unk8 in change_icon: {e.Unk8}"); // Is 152 for a single change wall event in the endgame. Probably just an oversight.
             return e;
         }
 

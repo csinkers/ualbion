@@ -1,4 +1,4 @@
-﻿//!#version 450 // Comments with //! are for tricking the Visual Studio GLSL plugin into doing the right thing
+//!#version 450 // Comments with //! are for tricking the Visual Studio GLSL plugin into doing the right thing
 
 // Resource Sets
 layout(binding = 2) uniform _Uniform {
@@ -37,33 +37,26 @@ void main()
 {
 	mat4 transform = mat4(vec4(iT1, 0), vec4(iT2, 0), vec4(iT3, 0), vec4(iT4, 1));
 
-	if ((iFlags & SF_BILLBOARD) != 0)
-	{
-		float cx = cos(-u_camera_look_direction.x);
-		float sx = sin(-u_camera_look_direction.x);
-
-		transform = transform * mat4(
-			cx, 0, sx, 0,
-			0, 1, 0, 0,
-		   -sx, 0, cx, 0,
-			0, 0, 0, 1);
-
-//* // TODO: Get billboarding to work properly
-		float cy = cos(-u_camera_look_direction.y);
-		float sy = sin(-u_camera_look_direction.y);
-
-		transform = transform * mat4(
-			1,  0,   0, 0,
-			0, cy, -sy, 0,
-		    0, sy,  cy, 0,
-			0,  0,   0, 1); //*/
-	}
-
 	vec4 worldSpace = transform * vec4(vPosition, 0, 1);
 
-	vec4 normPosition = ((uFlags & SKF_NO_TRANSFORM) == 0)
-		? uProjection * uView * worldSpace
-		: worldSpace;
+	vec4 normPosition;
+
+	if ((uFlags & SKF_NO_TRANSFORM) == 0)
+	{
+		mat4 worldTransform = uView * transform;
+
+		if ((iFlags & SF_BILLBOARD) != 0)
+		{
+			worldTransform[0] = transform[0];
+			worldTransform[1] = transform[1];
+		}
+
+		normPosition = uProjection * worldTransform * vec4(vPosition, 0, 1);
+	}
+	else
+	{
+		normPosition = worldSpace;
+	}
 
 	gl_Position = normPosition;
 

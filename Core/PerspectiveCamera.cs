@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core.Events;
@@ -54,11 +54,17 @@ namespace UAlbion.Core
         }
 
         public Vector3 LookDirection => _lookDirection;
-        public float FieldOfView { get; private set; } = (float)(Math.PI * 80 / 180);
+        public float FieldOfView { get; private set; }
         public float NearDistance => 10f;
         public float FarDistance => 512.0f * 256.0f * 2.0f;
+        
+        public bool LegacyPitch { get; private set; }
 
-        public PerspectiveCamera() : base(Handlers) { }
+        public PerspectiveCamera(bool legacyPitch = false) : base(Handlers)
+        {
+            LegacyPitch = legacyPitch;
+            FieldOfView = (float)(Math.PI * (legacyPitch ? 60 : 80) / 180);
+        }
 
         public override void Subscribed()
         {
@@ -92,8 +98,12 @@ namespace UAlbion.Core
             get => _pitch;
             set
             {
-                _pitch = Math.Clamp(value, -1.55f, 1.55f);
-                UpdateViewMatrix();
+                _pitch = LegacyPitch ? Math.Clamp(value, -0.79f, 0.79f) : Math.Clamp(value, -1.55f, 1.55f);
+                
+                if(LegacyPitch)        
+                    UpdatePerspectiveMatrix();
+                else
+                    UpdateViewMatrix();
             }
         }
 
@@ -106,18 +116,27 @@ namespace UAlbion.Core
 
         void UpdatePerspectiveMatrix()
         {
-            _projectionMatrix = CoreUtil.CreatePerspective(
-                _isClipSpaceYInverted,
-                _useReverseDepth,
-                FieldOfView,
-                AspectRatio,
-                NearDistance,
-                FarDistance);
+            _projectionMatrix = LegacyPitch
+                ? CoreUtil.CreateLegacyPerspective(
+                    _isClipSpaceYInverted,
+                    _useReverseDepth,
+                    FieldOfView,
+                    AspectRatio,
+                    NearDistance,
+                    FarDistance,
+                    Pitch)
+                : CoreUtil.CreatePerspective(
+                    _isClipSpaceYInverted,
+                    _useReverseDepth,
+                    FieldOfView,
+                    AspectRatio,
+                    NearDistance,
+                    FarDistance);
         }
 
         void UpdateViewMatrix()
         {
-            Quaternion lookRotation = Quaternion.CreateFromYawPitchRoll(Yaw, Pitch, 0f);
+            Quaternion lookRotation = Quaternion.CreateFromYawPitchRoll(Yaw, LegacyPitch ? 0f : Pitch, 0f);
             Vector3 lookDir = Vector3.Transform(-Vector3.UnitZ, lookRotation);
             _lookDirection = lookDir;
             _viewMatrix = Matrix4x4.CreateLookAt(_position, _position + _lookDirection, Vector3.UnitY);

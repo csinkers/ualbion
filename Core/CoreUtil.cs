@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core.Textures;
@@ -33,6 +33,25 @@ namespace UAlbion.Core
                     0, 0, 1, 0,
                     0, 0, 0, 1);
             }
+
+            return persp;
+        }
+        
+        public static Matrix4x4 CreateLegacyPerspective(
+            bool isClipSpaceYInverted,
+            bool useReverseDepth,
+            float fov,
+            float aspectRatio,
+            float near, float far,
+            float pitch)
+        {
+            var persp = CreatePerspective(isClipSpaceYInverted, useReverseDepth, fov, aspectRatio, near, far);
+
+            persp *= new Matrix4x4(
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, -MathF.Tan(pitch) / MathF.Tan(fov * 0.5f), 0, 1);
 
             return persp;
         }

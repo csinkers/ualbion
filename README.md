@@ -20,7 +20,6 @@ You can walk around, and move things about in your inventory but you can't inter
 - Adding a conversation system (the GUI system it will be built on is mostly done at least)
 - Implementing the combat system (huge job, will require lots of reverse engineering)
 - Wide variety of miscellaneous gameplay behaviours
-- Loading and saving of saved games. Currently most of the loaders are only one-way, need to convert them so they can write as well as read.
 
 Main goal is to improve the interface and make some visual improvements, the original game was very clicky so adding some pathfinding and a more efficient way of examining and manipulating objects should improve usabability.
 
@@ -29,10 +28,9 @@ Main goal is to improve the interface and make some visual improvements, the ori
 1. Configure `data/config.json` to set the paths for the files from the original game (currently only version v1.38 where MAIN.EXE is 1,109,655 bytes is supported). If you're running the GOG version, you'll want to mount the `game.gog` file (it's just a .bin format CD image) and then copy the ALBION directory into your UAlbion folder.
 2. To compile and run the project, open `ualbion.sln` in the C# IDE of your choice or run `./run.sh` in Linux / `run.bat` in Windows. Any extra parameters to `run` will be passed through to UAlbion, `--help` will show the available options.
 
+## Attributions
+Many thanks to Florian Ziesche and the other contributers to the [freealbion wiki](https://github.com/freealbion/freealbion/wiki) for their efforts in discovering and documenting the Albion file formats.
 
-Note: Some images (everything in PICTURE0.XLD) currently need to be:
-* manually exported using the export tool
-* converted from the old IBM interlaced bitmap format into regular bitmaps using a tool like ImageMagick
-* saved in data/PICTURE0.XLD/00.bmp, data/PICTURE0.XLD/01.bmp etc. 
+Thanks to IllidanS4 for the ILBM loading code in [AlbLib](https://github.com/IllidanS4/AlbLib) (MIT License) which my InterlacedBitmap implementation was based on.
 
-If this hasn't been done, then the menu and status bar backgrounds will not be able to load and will be replaced by a red 'invalid image' graphic.
+Thanks also to the authors of and contributers to the dependencies of this project.

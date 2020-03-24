@@ -48,7 +48,7 @@ namespace UAlbion.Api
 
         public static void Assert(string message)
         {
-            Console.Write("Assertion failed! " + message);
+            Console.WriteLine("Assertion failed! " + message);
         }
 
         [Conditional("DEBUG")]

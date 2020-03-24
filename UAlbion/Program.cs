@@ -47,6 +47,7 @@ namespace UAlbion
                 .AddAssetLocator(new MetaFontLocator(factory))
                 .AddAssetPostProcessor(new AlbionSpritePostProcessor())
                 .AddAssetPostProcessor(new ImageSharpPostProcessor())
+                .AddAssetPostProcessor(new InterlacedBitmapPostProcessor())
                 ;
 
             using var global = new EventExchange("Global", logger);

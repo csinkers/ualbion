@@ -28,7 +28,7 @@ namespace UAlbion.Game.State
         public MapDataId MapId => _game.MapId;
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<GameState, NewGameEvent>((x, e) => x.NewGame()),
+            H<GameState, NewGameEvent>((x, e) => x.NewGame(e.MapId, e.X, e.Y)),
             H<GameState, LoadGameEvent>((x, e) => x.LoadGame(e.Filename)),
             H<GameState, SaveGameEvent>((x, e) => x.SaveGame(e.Filename, e.Name)),
             H<GameState, UpdateEvent>((x, e) => x.TickCount += e.Frames),
@@ -46,14 +46,14 @@ namespace UAlbion.Game.State
         public int TickCount { get; private set; }
         public bool Loaded => _game != null;
 
-        void NewGame()
+        void NewGame(MapDataId mapId, ushort x, ushort y)
         {
             var assets = Resolve<IAssetManager>();
             _game = new SavedGame
             {
-                MapId = MapDataId.Toronto2DGesamtkarteSpielbeginn,
-                PartyX = 30,
-                PartyY = 75
+                MapId = mapId,
+                PartyX = x,
+                PartyY = y
             };
 
             foreach (PartyCharacterId charId in Enum.GetValues(typeof(PartyCharacterId)))

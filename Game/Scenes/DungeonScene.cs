@@ -17,7 +17,7 @@ namespace UAlbion.Game.Scenes
             typeof(SpriteRenderer),
         }; */
 
-        public DungeonScene() : base(SceneId.World3D, new PerspectiveCamera())
+        public DungeonScene() : base(SceneId.World3D, new PerspectiveCamera(true))
         {
             AttachChild(new CameraMotion3D((PerspectiveCamera)Camera));
         }

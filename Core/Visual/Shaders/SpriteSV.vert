@@ -14,7 +14,6 @@ layout(binding = 2) uniform _Uniform {
 // Vertex Data
 layout(location = 0) in vec2 vPosition;
 layout(location = 1) in vec2 vTexCoords;
-layout(location = 2)
 
 // Instance Data
 layout(location = 2) in vec3 iT1;
@@ -47,16 +46,6 @@ void main()
 			0, 1, 0, 0,
 		   -sx, 0, cx, 0,
 			0, 0, 0, 1);
-
-//* // TODO: Get billboarding to work properly
-		float cy = cos(-u_camera_look_direction.y);
-		float sy = sin(-u_camera_look_direction.y);
-
-		transform = transform * mat4(
-			1,  0,   0, 0,
-			0, cy, -sy, 0,
-		    0, sy,  cy, 0,
-			0,  0,   0, 1); //*/
 	}
 
 	vec4 worldSpace = transform * vec4(vPosition, 0, 1);

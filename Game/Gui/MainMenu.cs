@@ -37,7 +37,8 @@ namespace UAlbion.Game.Gui
                     {
                         Attach(exchange);
                         if (yesNoDialog.Result)
-                            Raise(new NewGameEvent());
+                            Raise(new NewGameEvent(
+                                MapDataId.Toronto2DGesamtkarteSpielbeginn, 30, 75));
                     };
                     Exchange.Attach(yesNoDialog);
                     Detach();

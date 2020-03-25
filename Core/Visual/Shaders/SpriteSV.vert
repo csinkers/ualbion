@@ -14,7 +14,6 @@ layout(binding = 2) uniform _Uniform {
 // Vertex Data
 layout(location = 0) in vec2 vPosition;
 layout(location = 1) in vec2 vTexCoords;
-layout(location = 2)
 
 // Instance Data
 layout(location = 2) in vec3 iT1;

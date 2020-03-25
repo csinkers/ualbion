@@ -17,6 +17,9 @@ namespace UAlbion.Game
             {
                 x._pendingMapChange = e.MapId;
                 x.LoadMap();
+                x.Raise(new PartyJumpEvent(15, 15));
+                x.Raise(new PartyTurnEvent(TeleportDirection.Right));
+                x.Raise(new CameraJumpEvent(15, 15));
             }),
             H<MapManager, BeginFrameEvent>((x, e) => x.LoadMap()),
             H<MapManager, RefreshMapSubscribersEvent>((x, e) =>

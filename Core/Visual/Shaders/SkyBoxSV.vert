@@ -27,7 +27,7 @@ void main()
 	float pitchFudge = 0.72f;
 	oTexPosition = 
 		vTexCoords 
-		* vec2(1.0f, -0.8f) 
+		* vec2(1.0f, -uVisibleProportion) 
 		+ vec2(-uYaw * fudge, 0.38f + -uPitch * pitchFudge);
 
 	oNormCoords = vTexCoords;

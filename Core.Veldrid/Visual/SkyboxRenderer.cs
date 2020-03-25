@@ -22,7 +22,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
     public class SkyboxRenderer : Component, IRenderer
     {
-        const float VisibleProportion = 0.7f;
+        const float VisibleProportion = 0.8f;
 
         // Vertex Layout
         static readonly VertexLayoutDescription VertexLayout = VertexLayoutHelper.Vertex2DTextured;
@@ -117,7 +117,8 @@ namespace UAlbion.Core.Veldrid.Visual
         {
             var c = (VeldridRendererContext)context;
             var gd = c.GraphicsDevice;
-            var skybox = (SkyboxRenderable)renderables.Single();
+            if(!(renderables.FirstOrDefault() is SkyboxRenderable skybox))
+                yield break;
 
             ITextureManager textureManager = Resolve<ITextureManager>();
             IDeviceObjectManager objectManager = Resolve<IDeviceObjectManager>();

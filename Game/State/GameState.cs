@@ -32,7 +32,11 @@ namespace UAlbion.Game.State
             H<GameState, LoadGameEvent>((x, e) => x.LoadGame(e.Filename)),
             H<GameState, SaveGameEvent>((x, e) => x.SaveGame(e.Filename, e.Name)),
             H<GameState, UpdateEvent>((x, e) => x.TickCount += e.Frames),
-            H<GameState, LoadMapEvent>((x, e) => x._game.MapId = e.MapId),
+            H<GameState, LoadMapEvent>((x, e) =>
+            {
+                if (x._game != null)
+                    x._game.MapId = e.MapId;
+            }),
             H<GameState, SetTemporarySwitchEvent>((x, e) => { }),
             H<GameState, SetTickerEvent>((x, e) => { }),
             H<GameState, ChangeTimeEvent>((x, e) => { })

@@ -7,6 +7,5 @@ namespace UAlbion.Core
         string Name { get; }
         DrawLayer RenderOrder { get; }
         int PipelineId { get; }
-        // Type Renderer { get; }
     }
 }

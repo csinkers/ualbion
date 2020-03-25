@@ -32,6 +32,7 @@ namespace UAlbion
         {
             PerfTracker.StartupEvent("Creating engine");
             using var engine = new VeldridEngine(commandLine.Backend, commandLine.UseRenderDoc)
+                .AddRenderer(new SkyboxRenderer())
                 .AddRenderer(new SpriteRenderer())
                 .AddRenderer(new ExtrudedTileMapRenderer())
                 .AddRenderer(new FullScreenQuad())
@@ -53,12 +54,12 @@ namespace UAlbion
                 global.Raise(new QuitEvent(), null);
 
             PerfTracker.StartupEvent("Running game");
-            // global.Raise(new LoadMapEvent(MapDataId.Jirinaar3D), null); // Uncomment to test 3D map
-            // global.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude), null); // Uncomment to test 3D map with different object alignment
-            // global.Raise(new LoadMapEvent(MapDataId.HausDesJägerclans), null); // Uncomment to test 2D map
+            // global.Raise(new NewGameEvent(MapDataId.Jirinaar3D, 40, 40), null); // Uncomment to test 3D map
+            // global.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude, 10, 10), null); // Uncomment to test 3D map with different object alignment
+            // global.Raise(new LoadMapEvent(MapDataId.HausDesJägerclans, 10, 10), null); // Uncomment to test 2D map
+            // global.Raise(new NewGameEvent(MapDataId.Toronto2DGesamtkarteSpielbeginn, 30, 75), null); // Uncomment to test new game process
             // global.Raise(new SetSceneEvent(SceneId.Inventory), null); // Uncomment to test inventory screen
-            global.Raise(new NewGameEvent(), null); // Uncomment to test new game process
-            // global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
+            global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
             engine.Run();
             // TODO: Ensure all sprite leases returned etc to weed out memory leaks
         }

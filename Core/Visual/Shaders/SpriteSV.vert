@@ -51,6 +51,24 @@ void main()
 		}
 
 		normPosition = uProjection * worldTransform * vec4(vPosition, 0, 1);
+    
+		if ((iFlags & SF_BILLBOARD) != 0)
+		{
+			float cx = cos(-u_camera_look_direction.x + 1.5708);
+			float sx = sin(-u_camera_look_direction.x + 1.5708);
+
+			vec4 rotPosition = uProjection * uView * transform * mat4(
+				cx, 0, sx, 0,
+				0, 1, 0, 0,
+			   -sx, 0, cx, 0,
+				0, 0, 0, 1) * vec4(0.354, 0, 0, 1);
+
+			float depth = rotPosition[2] / rotPosition[3];
+
+			depth = depth <= 0.0 ? min(0, normPosition[2] / normPosition[3]) : depth; // switch to original depth if before the near plane - not working
+
+			normPosition[2] = depth * normPosition[3];
+		}
 	}
 	else
 	{

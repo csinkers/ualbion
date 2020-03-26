@@ -16,16 +16,16 @@ namespace UAlbion.Game.Assets
             { AssetType.Palette,            (AssetLocation.Base,      "PALETTE!.XLD") }, // Palettes (first 192 colours)
             { AssetType.PaletteNull,        (AssetLocation.BaseRaw,   "PALETTE.000" ) }, // The 64 colours above 192 that are shared by all palettes.
             { AssetType.SmallPortrait,      (AssetLocation.Base,      "SMLPORT!.XLD") }, // Small portraits of players and NPCs for conversations etc
-            { AssetType.EventSet,           (AssetLocation.Base,      "EVNTSET!.XLD") }, //
+            { AssetType.EventSet,           (AssetLocation.Base,      "EVNTSET!.XLD") }, // Events for NPC conversations etc
             { AssetType.Song,               (AssetLocation.Base,      "SONGS!.XLD"  ) }, // XMI audio, can be translated to MIDI
             { AssetType.Sample,             (AssetLocation.Base,      "SAMPLES!.XLD") }, // General sound effects
             { AssetType.WaveLibrary,        (AssetLocation.Base,      "WAVELIB!.XLD") }, // General sound effects
-            { AssetType.BlockList,          (AssetLocation.Base,      "BLKLIST!.XLD") }, //
+            { AssetType.BlockList,          (AssetLocation.Base,      "BLKLIST!.XLD") }, // Preset block of 2D map tiles for doors etc
             { AssetType.Flic,               (AssetLocation.Localised, "FLICS!.XLD"  ) }, // Videos
             { AssetType.Dictionary,         (AssetLocation.Localised, "WORDLIS!.XLD") }, // The words that can be used as conversation topics
             { AssetType.Script,             (AssetLocation.Base,      "SCRIPT!.XLD" ) }, // Scripted sequences of events for narrative sequences etc
             { AssetType.Picture,            (AssetLocation.Base,      "PICTURE!.XLD") }, // Full screen graphics for various special events, menu backgrounds etc (in the obscure ILBM / interlaced bitmap format from IBM)
-            { AssetType.TransparencyTables, (AssetLocation.Base,      "TRANSTB!.XLD") }, //
+            { AssetType.TransparencyTables, (AssetLocation.Base,      "TRANSTB!.XLD") }, // Used for transparency / blending of palettised textures. Not needed when we have shaders.
             // { AssetType.CoreGraphics,       (AssetLocation.MainExe,   "MAIN.EXE") }, // Various UI graphics that get loaded directly from the original game executable
             // { AssetType.CoreGraphicsMetadata, (AssetLocation.MainExe, "MAIN.EXE") },
             // { AssetType.Unnamed2,        (AssetLocation.Base,      ""            ) },
@@ -38,7 +38,7 @@ namespace UAlbion.Game.Assets
             { AssetType.MapText,    (AssetLocation.Localised,         "MAPTEXT!.XLD") }, // Map-specific text
 
             // Inventory / merchant assets
-            { AssetType.Slab,               (AssetLocation.BaseRaw,   "SLAB"        ) }, // The background texture for the inventory screen
+            { AssetType.Slab,               (AssetLocation.BaseRaw,   "SLAB"        ) }, // The background texture for the inventory screen and status bar
             { AssetType.ItemNames,          (AssetLocation.BaseRaw,   "ITEMNAME.DAT") }, // Item names (array of fixed length strings)
             { AssetType.ItemList,           (AssetLocation.BaseRaw,   "ITEMLIST.DAT") }, // Item statistics
             { AssetType.ItemGraphics,       (AssetLocation.BaseRaw,   "ITEMGFX"     ) }, // Inventory item sprites
@@ -48,7 +48,7 @@ namespace UAlbion.Game.Assets
 
             // 2D map assets
             { AssetType.MapData,            (AssetLocation.Base,      "MAPDATA!.XLD") }, // 2D maps
-            { AssetType.Tileset,           (AssetLocation.Base,      "ICONDAT!.XLD") }, // Tileset info for the 2D maps, including animated tile ranges etc
+            { AssetType.Tileset,            (AssetLocation.Base,      "ICONDAT!.XLD") }, // Tileset info for the 2D maps, including animated tile ranges etc
             { AssetType.IconGraphics,       (AssetLocation.Base,      "ICONGFX!.XLD") }, // Tiles for the 2D maps
             { AssetType.BigPartyGraphics,   (AssetLocation.Base,      "PARTGR!.XLD" ) }, // Regular scale party-member sprites.
             { AssetType.BigNpcGraphics,     (AssetLocation.Base,      "NPCGR!.XLD"  ) }, // Regular scale NPC sprites
@@ -62,7 +62,7 @@ namespace UAlbion.Game.Assets
             { AssetType.Overlay3D,          (AssetLocation.Base,      "3DOVERL!.XLD") }, // Wall decals for 3D maps
             { AssetType.Floor3D,            (AssetLocation.Base,      "3DFLOOR!.XLD") }, // Floor and ceiling textures for 3D maps
             { AssetType.BackgroundGraphics, (AssetLocation.Base,      "3DBCKGR!.XLD") }, // Skybox textures for 3D maps
-            { AssetType.Automap,            (AssetLocation.Initial,   "AUTOMAP!.XLD") }, //
+            { AssetType.Automap,            (AssetLocation.Initial,   "AUTOMAP!.XLD") }, // Initial (i.e. undiscovered) automap data.
             { AssetType.AutomapGraphics,    (AssetLocation.Base,      "AUTOGFX!.XLD") }, // Tiles for the map screen on 3D maps
 
             // Combat assets
@@ -205,7 +205,7 @@ namespace UAlbion.Game.Assets
 
             var (location, baseName) = _assetFiles[key.Type];
             var paths = GetAssetPaths(generalConfig, location, key.Language, baseName, xldIndex, objectIndex);
-            var assetConfig = basicAssetConfig.GetAsset(paths.XldNameInConfig, objectIndex);
+            var assetConfig = basicAssetConfig.GetAsset(paths.XldNameInConfig, objectIndex, key.Id);
 
             object Reader(string path, BinaryReader br, long length)
             {

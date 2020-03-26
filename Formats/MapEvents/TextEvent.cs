@@ -4,12 +4,11 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
-    [Event("text")]
     public class TextEvent : AsyncEvent
     {
-        public static TextEvent Serdes(TextEvent e, ISerializer s)
+        public static TextEvent Serdes(TextEvent e, ISerializer s, TextSource source)
         {
-            e ??= new TextEvent();
+            e ??= new TextEvent(source);
             e.Location = s.EnumU8(nameof(Location), e.Location);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
@@ -34,16 +33,16 @@ namespace UAlbion.Formats.MapEvents
             // ListDefaultDialogOptions
         }
 
-        TextEvent() { }
-
-        public TextEvent(byte textId, TextLocation location, SmallPortraitId? portrait)
+        TextEvent(TextSource source) { Source = source; }
+        protected TextEvent(byte textId, TextLocation location, SmallPortraitId? portrait, TextSource source)
         {
             TextId = textId;
             Location = location;
             PortraitId = portrait;
+            Source = source;
         }
 
-        protected override AsyncEvent Clone() => new TextEvent(TextId, Location, PortraitId);
+        protected override AsyncEvent Clone() => new TextEvent(TextId, Location, PortraitId, Source);
 
         [EventPart("text_id")] public byte TextId { get; private set; }
         [EventPart("location")] public TextLocation Location { get; private set; }
@@ -54,5 +53,24 @@ namespace UAlbion.Formats.MapEvents
         public ushort Unk8 { get; private set; }
         public override string ToString() => $"text {TextId} {Location} {PortraitId} ({Unk2} {Unk3} {Unk6} {Unk8})";
         public override MapEventType EventType => MapEventType.Text;
+        public TextSource Source { get; set; }
+    }
+
+    // Subclasses just for console / debug access
+    [Event("event_text")]
+    public class EventTextEvent : TextEvent
+    {
+        public EventTextEvent(EventSetId eventSetId, byte textId, TextLocation location, SmallPortraitId? portrait)
+            : base(textId, location, portrait, TextSource.EventSet(eventSetId)) { }
+
+        [EventPart("event_set")] public EventSetId EventSetId => (EventSetId)Source.Id;
+    }
+
+    [Event("map_text")]
+    public class MapTextEvent : TextEvent
+    {
+        public MapTextEvent(MapDataId mapId, byte textId, TextLocation location, SmallPortraitId? portrait)
+            : base(textId, location, portrait, TextSource.Map(mapId)) { }
+        [EventPart("map")] public MapDataId MapId => (MapDataId)Source.Id;
     }
 }

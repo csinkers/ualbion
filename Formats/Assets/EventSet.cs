@@ -1,13 +1,18 @@
 ﻿using System.Collections.Generic;
 using SerdesNet;
+using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets
 {
     public class EventSet
     {
+        public EventSetId Id { get; }
         ushort[] _chainStarts;
         EventNode[] _events;
+
+        EventSet(EventSetId id) { Id = id; }
 
         public IEventNode GetChain(int chainId)
         {
@@ -33,9 +38,10 @@ namespace UAlbion.Formats.Assets
 
         public IEnumerable<IEventNode> Events => _events;
 
-        public static EventSet Serdes(EventSet set, ISerializer s)
+        public static EventSet Serdes(EventSetId eventSetId, EventSet set, ISerializer s)
         {
-            set ??= new EventSet();
+            set ??= new EventSet(eventSetId);
+            ApiUtil.Assert(eventSetId == set.Id);
             ushort chainCount = s.UInt16("ChainCount", (ushort)(set._chainStarts?.Length ?? 0));
             ushort eventCount = s.UInt16("TotalEventCount", (ushort)(set._events?.Length ?? 0));
 
@@ -45,8 +51,9 @@ namespace UAlbion.Formats.Assets
             for (int i = 0; i < set._chainStarts.Length; i++)
                 set._chainStarts[i] = s.UInt16(null, set._chainStarts[i]);
 
+            var source = TextSource.EventSet(eventSetId);
             for (int i = 0; i < set._events.Length; i++)
-                set._events[i] = EventNode.Serdes(i, set._events[i], s);
+                set._events[i] = EventNode.Serdes(i, set._events[i], s, source);
 
             foreach (var e in set._events)
             {

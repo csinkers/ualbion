@@ -2,6 +2,6 @@
 {
     public interface IAudioGenerator
     {
-        public void FillBuffer(uint bufferId);
+        void FillBuffer(uint bufferId);
     }
 }

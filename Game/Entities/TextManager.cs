@@ -186,24 +186,7 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        public ITextSource GetMapTextFromTextEvent(TextEvent textEvent, FontColor color)
-        {
-            var id = textEvent.TextId;
-            var mapId = (int)Resolve<IMapManager>().Current.MapId;
-
-            return new DynamicText(() =>
-            {
-                var assets = Resolve<IAssetManager>();
-                var settings = Resolve<ISettings>();
-                var textFormatter = new TextFormatter(assets, settings.Gameplay.Language);
-                return textFormatter
-                    .Ink(color)
-                    .Format(new StringId(AssetType.MapText, mapId, id))
-                    .Blocks;
-            });
-        }
-
-        public ITextSource GetEventSetTextFromTextEvent(TextEvent textEvent, EventSetId eventSetId, FontColor color)
+        public ITextSource FormatTextEvent(TextEvent textEvent, FontColor color)
         {
             var id = textEvent.TextId;
 
@@ -214,7 +197,7 @@ namespace UAlbion.Game.Entities
                 var textFormatter = new TextFormatter(assets, settings.Gameplay.Language);
                 return textFormatter
                     .Ink(color)
-                    .Format(new StringId(AssetType.EventText, (int)eventSetId, id))
+                    .Format(new StringId(textEvent.Source.Type, textEvent.Source.Id, id))
                     .Blocks;
             });
         }
@@ -226,7 +209,7 @@ namespace UAlbion.Game.Entities
             {
                 case TextEvent.TextLocation.TextInWindow:
                 {
-                    var dialog = AttachChild(new TextWindow(GetMapTextFromTextEvent(textEvent, FontColor.Yellow)));
+                    var dialog = AttachChild(new TextWindow(FormatTextEvent(textEvent, FontColor.Yellow)));
                     dialog.Closed += (sender, _) => textEvent.Complete();
                     break;
                 }
@@ -236,18 +219,18 @@ namespace UAlbion.Game.Entities
                 {
                         
                     SmallPortraitId portraitId = textEvent.PortraitId ?? Resolve<IParty>().Leader.ToPortraitId();
-                    var dialog = AttachChild(new TextWindow(GetMapTextFromTextEvent(textEvent, FontColor.Yellow), portraitId));
+                    var dialog = AttachChild(new TextWindow(FormatTextEvent(textEvent, FontColor.Yellow), portraitId));
                     dialog.Closed += (sender, _) => textEvent.Complete();
                     break;
                 }
 
                 case TextEvent.TextLocation.QuickInfo:
-                    Raise(new DescriptionTextExEvent(GetMapTextFromTextEvent(textEvent, FontColor.White)));
+                    Raise(new DescriptionTextExEvent(FormatTextEvent(textEvent, FontColor.White)));
                     textEvent.Complete();
                     break;
 
                 default:
-                    Raise(new DescriptionTextExEvent(GetMapTextFromTextEvent(textEvent, FontColor.White))); // TODO:
+                    Raise(new DescriptionTextExEvent(FormatTextEvent(textEvent, FontColor.White))); // TODO:
                     textEvent.Complete();
                     break;
             }

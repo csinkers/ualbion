@@ -52,6 +52,7 @@ namespace UAlbion.Formats.Assets
         public Waypoint[] Waypoints { get; set; }
         public EventChain Chain { get; set; }
         public IEventNode Node { get; set; }
+        public EventSet EventSet { get; set; } // TODO: Remove?
 
         public static MapNpc Serdes(int _, MapNpc existing, ISerializer s)
         {

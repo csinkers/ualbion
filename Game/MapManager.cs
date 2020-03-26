@@ -7,6 +7,7 @@ using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Scenes;
+using UAlbion.Game.State;
 
 namespace UAlbion.Game
 {
@@ -78,7 +79,13 @@ namespace UAlbion.Game
         IMap BuildMap(MapDataId mapId)
         {
             var assets = Resolve<IAssetManager>();
-            return  assets.LoadMap(mapId) switch
+            var game = Resolve<IGameState>();
+            var mapData = assets.LoadMap(mapId);
+            mapData.AttachEventSets(
+                x => game.GetNpc(x),
+                x => assets.LoadEventSet(x));
+
+            return mapData switch
             {
                 MapData2D map2d => new Entities.Map2D.Map(mapId, map2d),
                 MapData3D map3d => new Entities.Map3D.Map(mapId, map3d),

@@ -20,9 +20,9 @@ namespace UAlbion.Game.State
 
         public DateTime Time => Epoch + new TimeSpan(_game.Days, _game.Hours, _game.Minutes, 0);
         IParty IGameState.Party => _party;
-        Func<NpcCharacterId, ICharacterSheet> IGameState.GetNpc => x => _game.Npcs[x];
-        Func<ChestId, IChest> IGameState.GetChest => x => _game.Chests[x];
-        Func<MerchantId, IChest> IGameState.GetMerchant => x => _game.Merchants[x];
+        Func<NpcCharacterId, ICharacterSheet> IGameState.GetNpc => x => _game.Npcs.TryGetValue(x, out var sheet) ? sheet : null;
+        Func<ChestId, IChest> IGameState.GetChest => x => _game.Chests.TryGetValue(x, out var chest) ? chest : null;
+        Func<MerchantId, IChest> IGameState.GetMerchant => x => _game.Merchants.TryGetValue(x, out var merchant) ? merchant : null;
         public Func<int, int> GetTicker => x => _game.Tickers.TryGetValue(x, out var value) ? value : 0;
         public Func<int, int> GetSwitch  => x => _game.Switches.TryGetValue(x, out var value) ? value : 0;
         public MapDataId MapId => _game.MapId;

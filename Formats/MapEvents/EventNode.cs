@@ -4,31 +4,6 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public interface IEventNode
-    {
-        int Id { get; }
-        IMapEvent Event { get; }
-        IEventNode NextEvent { get; set; }
-    }
-
-    public interface IBranchNode : IEventNode
-    {
-        IEventNode NextEventWhenFalse { get; set; }
-    }
-
-    [DebuggerDisplay("{ToString()}")]
-    public class BranchNode : EventNode, IBranchNode
-    {
-        public BranchNode(int id, IMapEvent @event, ushort? falseEventId) : base(id, @event)
-        {
-            NextEventWhenFalseId = falseEventId;
-        }
-
-        public override string ToString() => $"!{Id}?{NextEventId?.ToString() ?? "!"}:{NextEventWhenFalseId?.ToString() ?? "!"}: {Event}";
-        public IEventNode NextEventWhenFalse { get; set; }
-        public ushort? NextEventWhenFalseId { get; }
-    }
-
     [DebuggerDisplay("{ToString()}")]
     public class EventNode : IEventNode
     {
@@ -54,12 +29,12 @@ namespace UAlbion.Formats.MapEvents
             public ushort? ToMemory(ushort persistent) => persistent == 0xffff ? (ushort?)null : persistent;
         }
 
-        public static EventNode Serdes(int id, EventNode node, ISerializer s)
+        public static EventNode Serdes(int id, EventNode node, ISerializer s, TextSource source)
         {
             var initialPosition = s.Offset;
             MapEventType type = (MapEventType)s.UInt8("Type", (byte)(node?.Event?.EventType ?? MapEventType.UnkFf));
 
-            var @event = SerdesByType(node, s, type);
+            var @event = SerdesByType(node, s, type, source);
             if (@event is IQueryEvent query)
                 node ??= new BranchNode(id, @event, query.FalseEventId);
             else
@@ -74,7 +49,7 @@ namespace UAlbion.Formats.MapEvents
             return node;
         }
 
-        static IMapEvent SerdesByType(EventNode node, ISerializer s, MapEventType type) =>
+        static IMapEvent SerdesByType(EventNode node, ISerializer s, MapEventType type, TextSource source) =>
             type switch // Individual parsers handle byte range [1,9]
             {
                 MapEventType.Action => ActionEvent.Serdes((ActionEvent)node?.Event, s),
@@ -104,7 +79,7 @@ namespace UAlbion.Formats.MapEvents
                 MapEventType.Sound => SoundEvent.Serdes((SoundEvent)node?.Event, s),
                 MapEventType.Spinner => SpinnerEvent.Serdes((SpinnerEvent)node?.Event, s),
                 MapEventType.StartDialogue => StartDialogueEvent.Serdes((StartDialogueEvent)node?.Event, s),
-                MapEventType.Text => TextEvent.Serdes((TextEvent)node?.Event, s),
+                MapEventType.Text => TextEvent.Serdes((TextEvent)node?.Event, s, source),
                 MapEventType.Trap => TrapEvent.Serdes((TrapEvent)node?.Event, s),
                 MapEventType.Wipe => WipeEvent.Serdes((WipeEvent)node?.Event, s),
                 _ => DummyMapEvent.Serdes((DummyMapEvent)node?.Event, s, type)

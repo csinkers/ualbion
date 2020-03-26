@@ -38,8 +38,8 @@ namespace UAlbion.Game.Assets
                     {
                         for (int i = 0; i < destTileWidth; i++)
                         {
-                            var sourceX = Math.Clamp(i - buffer, 0, srcTileWidth - 1);
-                            var sourceY = Math.Clamp(j - buffer, 0, srcTileHeight - 1) + n * srcTileHeight;
+                            var sourceX = Math.Clamp(i - buffer, 0, srcTileWidth - buffer);
+                            var sourceY = Math.Clamp(j - buffer, 0, srcTileHeight - buffer) + n * srcTileHeight;
                             var destX = curX + i;
                             var destY = curY + j;
                             pixelData[destY * width + destX] = sprite.PixelData[sourceX + sourceY * srcTileWidth];

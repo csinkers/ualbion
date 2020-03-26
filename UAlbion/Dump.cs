@@ -209,7 +209,7 @@ namespace UAlbion
                 {
                     if (e.Event is TextEvent textEvent)
                     {
-                        var textSource = textManager.GetEventSetTextFromTextEvent(textEvent, c.EventSetId, FontColor.White);
+                        var textSource = textManager.FormatTextEvent(textEvent, FontColor.White);
                         var text = string.Join(", ", textSource.Get().Select(x => x.Text));
                         sw.WriteLine($"        {e} = {text}");
                     }

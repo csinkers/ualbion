@@ -6,6 +6,14 @@ using UAlbion.Core.Events;
 
 namespace UAlbion.Core
 {
+    /// <summary>
+    /// Component is effectively the base class of all game objects.
+    /// Each component belongs to a single EventExchange, and ideally communicates with other components primarily via sending and receiving events through the exchange.
+    /// In general, direct calls should only be used for read-only information retrieval.
+    /// Anything that modifies data, has side effects etc should be performed using an event.
+    /// This has benefits for tracing, reproducibility and modularity, and also provides a
+    /// convenient interface for console commands, key-bindings etc.
+    /// </summary>
     public abstract class Component : IComponent
     {
         // Used when null is passed to the constructor so we
@@ -26,7 +34,7 @@ namespace UAlbion.Core
             public override void Invoke(Component instance, IEvent @event) => _callback((TInstance)instance, (TEvent)@event);
         }
 
-        protected class HandlerSet : Dictionary<Type, Handler>
+        protected class HandlerSet : Dictionary<Type, Handler> // This class is essentially some syntactic sugar for declaring handler dictionaries.
         {
             public HandlerSet(HandlerSet parent, params Handler[] handlers)
             {
@@ -53,10 +61,10 @@ namespace UAlbion.Core
         protected static Handler H<TComponent, TEvent>(Action<TComponent, TEvent> callback) where TComponent : Component
             => new Handler<TComponent, TEvent>(callback);
 
-        // Usually set to a static HandlerSet, but can also be per-instance is so desired.
+        // Usually set to a static per-type HandlerSet, but can also be per-instance is so desired.
         readonly IDictionary<Type, Handler> _handlers;
         protected EventExchange Exchange { get; private set; } // N.B. will be null until subscribed.
-        protected IList<IComponent> Children { get; } = new List<IComponent>();
+        protected IList<IComponent> Children { get; } = new List<IComponent>(); // Primary purpose of children is ensuring that the children are also detached when the parent component is.
 
         protected Component() : this(null) { }
         protected Component(IDictionary<Type, Handler> handlers)

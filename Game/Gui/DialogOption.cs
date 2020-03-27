@@ -5,7 +5,7 @@ namespace UAlbion.Game.Gui
 {
     class DialogOption : Button
     {
-        public DialogOption(string buttonId, ITextSource textSource) : base(buttonId,  new TextSection(textSource).Left().NoWrap())
+        public DialogOption(string buttonId, IText textSource) : base(buttonId,  new TextBlockElement(textSource).Left().NoWrap())
         {
             Theme = new DialogOptionTheme();
         }

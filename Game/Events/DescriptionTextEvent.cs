@@ -17,7 +17,7 @@ namespace UAlbion.Game.Events
 
     public class DescriptionTextExEvent : GameEvent
     {
-        public DescriptionTextExEvent(ITextSource source) { Source = source; }
-        public ITextSource Source { get; }
+        public DescriptionTextExEvent(IText source) { Source = source; }
+        public IText Source { get; }
     }
 }

@@ -89,7 +89,7 @@ namespace UAlbion.Game.Entities.Map2D
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
 
-            ITextSource S(SystemTextId textId) => new DynamicText(() =>
+            IText S(SystemTextId textId) => new DynamicText(() =>
                 {
                     var template = assets.LoadString(textId, settings.Gameplay.Language);
                     return new TextFormatter(assets, settings.Gameplay.Language).Centre().Format(template).Blocks;

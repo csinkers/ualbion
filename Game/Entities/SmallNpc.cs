@@ -23,7 +23,7 @@ namespace UAlbion.Game.Entities
 
         readonly MapNpc _npc;
         readonly MapSprite<SmallNpcId> _sprite;
-        public override string ToString() => $"SNpc {_sprite.Id}";
+        public override string ToString() => $"SNpc {_npc.Id} {_sprite.Id}";
 
         public SmallNpc(MapNpc npc) : base(Handlers)
         {
@@ -48,7 +48,7 @@ namespace UAlbion.Game.Entities
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
 
-            ITextSource S(SystemTextId textId) => new DynamicText(() =>
+            IText S(SystemTextId textId) => new DynamicText(() =>
                 {
                     var template = assets.LoadString(textId, settings.Gameplay.Language);
                     return new TextFormatter(assets, settings.Gameplay.Language).Centre().Format(template).Blocks;

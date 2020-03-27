@@ -82,7 +82,7 @@ namespace UAlbion.Game.Gui
             elements.AddRange(buttons);
             elements.Add(new Spacing(0, 4));
 
-            var header = new TextSection(_stringId).Center().NoWrap();
+            var header = new TextBlockElement(_stringId).Center().NoWrap();
             elements.Add(new ButtonFrame(new Padding(header, 2)) { State = ButtonState.Pressed });
 
             var stack = new VerticalStack(elements);

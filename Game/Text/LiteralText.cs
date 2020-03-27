@@ -2,7 +2,7 @@
 
 namespace UAlbion.Game.Text
 {
-    public class LiteralText : ITextSource
+    public class LiteralText : IText
     {
         readonly TextBlock[] _blocks;
         public LiteralText(string text)

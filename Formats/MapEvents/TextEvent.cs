@@ -23,10 +23,10 @@ namespace UAlbion.Formats.MapEvents
         {
             TextInWindow = 0,
             TextInWindowWithPortrait = 2,
+            QuickInfo = 6,
             TextInWindowWithPortrait2 = 10, // Not sure how this one differs
             // TextInWindowWithNpcPortrait,
-            // AddDialogOption,
-            QuickInfo = 6,
+            AddDialogOption = 11,
             // DialogQuestion,
             // DialogResponse,
             // AddDefaultDialogOption,

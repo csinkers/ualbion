@@ -15,9 +15,9 @@ namespace UAlbion.Game.Gui
             H<TextWindow, CloseDialogEvent>((x, e) => x.Close())
         );
 
-        public TextWindow(ITextSource text, SmallPortraitId? portraitId = null, int depth = 0) : base(Handlers, DialogPositioning.Top, depth)
+        public TextWindow(IText text, SmallPortraitId? portraitId = null, int depth = 0) : base(Handlers, DialogPositioning.Top, depth)
         {
-            var textSection = new TextSection(text).Center();
+            var textSection = new TextBlockElement(text).Center();
             var padding = new Padding(textSection, 3, 7);
 
             UiElement content;

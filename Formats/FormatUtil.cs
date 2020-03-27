@@ -27,5 +27,26 @@ namespace UAlbion.Formats
             var baseDir = curDir?.FullName;
             return baseDir;
         }
+
+        public static string WordWrap(string s, int maxLine)
+        {
+            if (s.Length <= maxLine)
+                return s;
+
+            int n = 0;
+            var sb = new StringBuilder();
+            foreach (var c in s)
+            {
+                n = c == '\n' ? 0 : n + 1;
+
+                sb.Append(c);
+                if (n == maxLine)
+                {
+                    sb.AppendLine();
+                    n = 0;
+                }
+            }
+            return sb.ToString();
+        }
     }
 }

@@ -54,21 +54,21 @@ namespace UAlbion.Game.Gui.Inventory
                 new Header(S(SystemTextId.Inv2_Attributes)),
                 new HorizontalStack(
                     new VerticalStack(
-                        new TextSection(S(SystemTextId.Attrib_STR)).Right(),
+                        new TextBlockElement(S(SystemTextId.Attrib_STR)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Attrib_INT)).Right(),
+                        new TextBlockElement(S(SystemTextId.Attrib_INT)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Attrib_DEX)).Right(),
+                        new TextBlockElement(S(SystemTextId.Attrib_DEX)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Attrib_SPD)).Right(),
+                        new TextBlockElement(S(SystemTextId.Attrib_SPD)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Attrib_STA)).Right(),
+                        new TextBlockElement(S(SystemTextId.Attrib_STA)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Attrib_LUC)).Right(),
+                        new TextBlockElement(S(SystemTextId.Attrib_LUC)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Attrib_MR)).Right(),
+                        new TextBlockElement(S(SystemTextId.Attrib_MR)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Attrib_MT)).Right()
+                        new TextBlockElement(S(SystemTextId.Attrib_MT)).Right()
                     ),
                     new Spacing(2,0),
                     new VerticalStack(
@@ -93,13 +93,13 @@ namespace UAlbion.Game.Gui.Inventory
                 new Header(S(SystemTextId.Inv2_Skills)),
                 new HorizontalStack(
                     new VerticalStack(
-                        new TextSection(S(SystemTextId.Skill_CLO)).Right(),
+                        new TextBlockElement(S(SystemTextId.Skill_CLO)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Skill_LON)).Right(),
+                        new TextBlockElement(S(SystemTextId.Skill_LON)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Skill_CRI)).Right(),
+                        new TextBlockElement(S(SystemTextId.Skill_CRI)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Skill_LP)).Right()
+                        new TextBlockElement(S(SystemTextId.Skill_LP)).Right()
                     ),
                     new Spacing(2,0),
                     new VerticalStack(

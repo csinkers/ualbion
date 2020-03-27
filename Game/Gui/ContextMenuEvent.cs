@@ -10,7 +10,7 @@ namespace UAlbion.Game.Gui
 {
     public class ContextMenuEvent : GameEvent
     {
-        public ContextMenuEvent(Vector2 uiPosition, ITextSource heading, IEnumerable<ContextMenuOption> options)
+        public ContextMenuEvent(Vector2 uiPosition, IText heading, IEnumerable<ContextMenuOption> options)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
             Heading = heading ?? throw new ArgumentNullException(nameof(heading));
@@ -22,7 +22,7 @@ namespace UAlbion.Game.Gui
         }
 
         public Vector2 UiPosition { get; }
-        public ITextSource Heading { get; }
+        public IText Heading { get; }
         public IReadOnlyList<ContextMenuOption> Options { get; }
     }
 }

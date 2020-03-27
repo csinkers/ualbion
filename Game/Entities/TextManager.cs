@@ -152,7 +152,7 @@ namespace UAlbion.Game.Entities
                 {
                     if (!first)
                     {
-                        yield return new TextBlock(" ")
+                        yield return new TextBlock(block.BlockId, " ")
                         {
                             Alignment = block.Alignment,
                             Color = block.Color,
@@ -162,7 +162,7 @@ namespace UAlbion.Game.Entities
 
                         if (part.Length > 0)
                         {
-                            yield return new TextBlock(part)
+                            yield return new TextBlock(block.BlockId, part)
                             {
                                 Alignment = block.Alignment,
                                 Color = block.Color,
@@ -173,7 +173,7 @@ namespace UAlbion.Game.Entities
                     }
                     else
                     {
-                        yield return new TextBlock(part)
+                        yield return new TextBlock(block.BlockId, part)
                         {
                             Alignment = block.Alignment,
                             Color = block.Color,
@@ -186,7 +186,7 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        public ITextSource FormatTextEvent(TextEvent textEvent, FontColor color)
+        public IText FormatTextEvent(TextEvent textEvent, FontColor color)
         {
             var id = textEvent.TextId;
 

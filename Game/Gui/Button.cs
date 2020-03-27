@@ -100,9 +100,9 @@ namespace UAlbion.Game.Gui
             _frame = AttachChild(new ButtonFrame(content));
         }
 
-        public Button(string buttonId, StringId textId) : this(buttonId, new TextSection(textId).Center().NoWrap()) { }
-        public Button(string buttonId, ITextSource textSource) : this(buttonId, new TextSection(textSource).Center().NoWrap()) { }
-        public Button(string buttonId, string literalText) : this(buttonId, new TextSection(literalText).Center().NoWrap()) { }
+        public Button(string buttonId, StringId textId) : this(buttonId, new TextBlockElement(textId).Center().NoWrap()) { }
+        public Button(string buttonId, IText textSource) : this(buttonId, new TextBlockElement(textSource).Center().NoWrap()) { }
+        public Button(string buttonId, string literalText) : this(buttonId, new TextBlockElement(literalText).Center().NoWrap()) { }
 
         public override Vector2 GetSize() => GetMaxChildSize() + new Vector2(4, 0);
 

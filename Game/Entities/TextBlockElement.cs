@@ -10,18 +10,21 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Entities
 {
-    public class TextSection : UiElement
+    /// <summary>
+    /// A UI element containing a single TextBlock (i.e. a block of text sharing the same formatting options)
+    /// </summary>
+    public class TextBlockElement : UiElement
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<TextSection, SetLanguageEvent>((x,e) => x._lastVersion = 0) // Force a rebuild on next render
+            H<TextBlockElement, SetLanguageEvent>((x,e) => x._lastVersion = 0) // Force a rebuild on next render
         );
 
         readonly TextBlock _block = new TextBlock();
-        ITextSource _source;
+        IText _source;
         int _lastVersion;
         Rectangle _lastExtents;
 
-        public TextSection(string literal) : base(Handlers)
+        public TextBlockElement(string literal) : base(Handlers)
         {
             _source = new DynamicText(() =>
             {
@@ -30,7 +33,7 @@ namespace UAlbion.Game.Entities
             });
         }
 
-        public TextSection(StringId id) : base(Handlers)
+        public TextBlockElement(StringId id) : base(Handlers)
         {
             _source = new DynamicText(() =>
             {
@@ -41,16 +44,16 @@ namespace UAlbion.Game.Entities
                 return new[] { _block };
             });
         }
-        public TextSection(ITextSource source) : base(Handlers) { _source = source; }
+        public TextBlockElement(IText source) : base(Handlers) { _source = source; }
         public override string ToString() => $"TextSection {_source?.ToString() ?? _block?.ToString()}";
-        public TextSection Bold() { _block.Style = TextStyle.Fat; return this; }
-        public TextSection Color(FontColor color) { _block.Color = color; return this; }
-        public TextSection Left() { _block.Alignment = TextAlignment.Left; return this; }
-        public TextSection Center() { _block.Alignment = TextAlignment.Center; return this; }
-        public TextSection Right() { _block.Alignment = TextAlignment.Right; return this; }
-        public TextSection NoWrap() { _block.Arrangement |= TextArrangement.NoWrap; return this; }
-        public TextSection Source(ITextSource source) { _source = source; _lastVersion = 0; return this; }
-        public TextSection LiteralString(string literal)
+        public TextBlockElement Bold() { _block.Style = TextStyle.Fat; return this; }
+        public TextBlockElement Color(FontColor color) { _block.Color = color; return this; }
+        public TextBlockElement Left() { _block.Alignment = TextAlignment.Left; return this; }
+        public TextBlockElement Center() { _block.Alignment = TextAlignment.Center; return this; }
+        public TextBlockElement Right() { _block.Alignment = TextAlignment.Right; return this; }
+        public TextBlockElement NoWrap() { _block.Arrangement |= TextArrangement.NoWrap; return this; }
+        public TextBlockElement Source(IText source) { _source = source; _lastVersion = 0; return this; }
+        public TextBlockElement LiteralString(string literal)
         {
             _source = new DynamicText(() =>
             {

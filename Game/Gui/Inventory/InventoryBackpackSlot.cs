@@ -49,7 +49,7 @@ namespace UAlbion.Game.Gui.Inventory
                     : new[] { new TextBlock(slotInfo.Amount.ToString()) { Alignment = TextAlignment.Right } };
             }, x => _version);
 
-            var text = new TextSection(amountSource);
+            var text = new TextBlockElement(amountSource);
 
             Frame = new ButtonFrame(new FixedPositionStack()
                 .Add(_sprite, 0, 0, 16, 16)

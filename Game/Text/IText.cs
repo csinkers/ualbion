@@ -2,7 +2,7 @@
 
 namespace UAlbion.Game.Text
 {
-    public interface ITextSource
+    public interface IText
     {
         int Version { get; }
         IEnumerable<TextBlock> Get();

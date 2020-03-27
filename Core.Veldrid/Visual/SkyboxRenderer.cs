@@ -150,7 +150,9 @@ namespace UAlbion.Core.Veldrid.Visual
 
             ITextureManager textureManager = Resolve<ITextureManager>();
             IDeviceObjectManager dom = Resolve<IDeviceObjectManager>();
-            PerspectiveCamera camera = (PerspectiveCamera)Resolve<ICamera>();
+            if (!(Resolve<ICamera>() is PerspectiveCamera camera))
+                return;
+
             var skybox = (SkyboxRenderable)renderable;
 
             cl.PushDebugGroup(skybox.Name);

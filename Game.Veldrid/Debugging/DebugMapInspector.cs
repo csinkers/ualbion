@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Text;
 using ImGuiNET;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
+using UAlbion.Formats;
 using UAlbion.Game.Debugging;
 using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
@@ -268,6 +270,7 @@ namespace UAlbion.Game.Veldrid.Debugging
                     ? $"{reflected.Value} ({typeName})"
                     : $"{reflected.Name}: {reflected.Value} ({typeName})";
 
+
             if (type != null &&
                 _behaviours.TryGetValue(type, out var callback) &&
                 callback(DebugInspectorAction.Format, reflected) is string formatted)
@@ -275,10 +278,11 @@ namespace UAlbion.Game.Veldrid.Debugging
                 description += " " + formatted;
             }
 
+            description = FormatUtil.WordWrap(description, 120);
             bool anyHovered = false;
             if (reflected.SubObjects != null)
             {
-                if(ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowItemOverlap))
+                if (ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowItemOverlap))
                 {
                     if (!fixedObject && ImGui.Button("Track"))
                         _fixedObjects.Add(reflected.Object);

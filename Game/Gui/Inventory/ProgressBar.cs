@@ -18,7 +18,7 @@ namespace UAlbion.Game.Gui.Inventory
 
         readonly ButtonFrame _frame;
         readonly UiRectangle _bar;
-        readonly ITextSource _hover;
+        readonly IText _hover;
         readonly Func<int> _getValue;
         readonly Func<int> _getMax;
         readonly int _absoluteMax;
@@ -26,7 +26,7 @@ namespace UAlbion.Game.Gui.Inventory
         int _lastValue;
         int _lastMax;
 
-        public ProgressBar(ITextSource hover, Func<int> getValue, Func<int> getMax, int absoluteMax) : base(Handlers)
+        public ProgressBar(IText hover, Func<int> getValue, Func<int> getMax, int absoluteMax) : base(Handlers)
         {
             _hover = hover;
             _getValue = getValue;

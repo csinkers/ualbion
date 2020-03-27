@@ -59,7 +59,7 @@ namespace UAlbion.Game.Gui.Inventory
                     .Blocks;
             }, x => _version);
 
-            AttachChild(new ButtonFrame(new TextSection(source))
+            AttachChild(new ButtonFrame(new TextBlockElement(source))
             {
                 State = ButtonState.Pressed,
                 Padding = 0

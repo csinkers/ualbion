@@ -8,7 +8,7 @@ namespace UAlbion.Game.Gui
     public class SliderThumb : UiElement
     {
         static readonly ButtonFrame.ITheme Theme = new SliderThumbTheme();
-        readonly TextSection _text;
+        readonly TextBlockElement _text;
         readonly ButtonFrame _frame;
         readonly Func<int> _getter;
         int _lastValue = int.MaxValue;
@@ -21,7 +21,7 @@ namespace UAlbion.Game.Gui
         public SliderThumb(Func<int> getter) : base(Handlers)
         {
             _getter = getter;
-            _text = new TextSection("").Center();
+            _text = new TextBlockElement("").Center();
             _frame = new ButtonFrame(_text) { Theme = Theme };
             AttachChild(_frame);
         }

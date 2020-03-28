@@ -1,6 +1,7 @@
 ﻿using System;
 using UAlbion.Api;
 using UAlbion.Game.Gui;
+using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Events
 {

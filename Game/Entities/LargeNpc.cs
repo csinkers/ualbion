@@ -9,6 +9,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
+using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.Text;
 
@@ -62,7 +63,7 @@ namespace UAlbion.Game.Entities
 
             options.Add(new ContextMenuOption(
                 S(SystemTextId.MapPopup_TalkTo),
-                new TriggerChainEvent(_npc.Chain, _npc.Node, TriggerType.TalkTo, (byte)_sprite.TilePosition.X, (byte)_sprite.TilePosition.Y),
+                new TriggerChainEvent(_npc.Chain, _npc.Chain.FirstEvent, TriggerType.TalkTo, (byte)_sprite.TilePosition.X, (byte)_sprite.TilePosition.Y),
                 ContextMenuGroup.Actions));
 
             options.Add(new ContextMenuOption(

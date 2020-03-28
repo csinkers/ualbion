@@ -51,9 +51,9 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk3 { get; private set; }
         public ushort Unk6 { get; private set; }
         public ushort Unk8 { get; private set; }
-        public override string ToString() => $"text {TextId} {Location} {PortraitId} ({Unk2} {Unk3} {Unk6} {Unk8})";
+        public override string ToString() => $"text {Source}:{TextId} {Location} {PortraitId} ({Unk2} {Unk3} {Unk6} {Unk8})";
         public override MapEventType EventType => MapEventType.Text;
-        public TextSource Source { get; set; }
+        public TextSource Source { get; }
     }
 
     // Subclasses just for console / debug access

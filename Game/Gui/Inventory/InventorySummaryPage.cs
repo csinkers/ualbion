@@ -2,6 +2,8 @@
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
+using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.Gui.Text;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
 

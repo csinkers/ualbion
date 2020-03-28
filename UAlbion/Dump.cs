@@ -329,7 +329,7 @@ namespace UAlbion
 
         static void PrintEvent(StreamWriter sw, EventFormatter formatter, IEventNode e)
         {
-            sw.Write($"    {e.Id:000} ");
+            sw.Write("    ");
             sw.WriteLine(formatter.GetText(e));
         }
 
@@ -381,7 +381,7 @@ namespace UAlbion
                     continue;
 
                 var formatter = new EventFormatter(assets, AssetType.EventText, (int)eventSetId);
-                foreach (var e in set.Chains)
+                foreach (var e in set.Events)
                     PrintEvent(sw, formatter, e);
             }
         }
@@ -402,15 +402,17 @@ namespace UAlbion
 
         public string GetText(IEventNode e)
         {
+            var nodeText = e.ToString();
             if(e.Event is TextEvent textEvent) // Same as npc text event?
             {
                 var text = _assets.LoadString(
                     new StringId(_textType, _context, textEvent.TextId),
                     GameLanguage.English);
 
-                return $"text Portrait:{textEvent.PortraitId} \"{text}\"";
+                return $"{nodeText} \"{text}\"";
             }
-            else return e.Event?.ToString();
+
+            return nodeText;
         }
     }
 }

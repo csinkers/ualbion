@@ -9,7 +9,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public const long SizeInBytes = 12;
         bool DirectSequence => (NextEventId ?? Id + 1) == Id + 1;
-        public override string ToString() => $"{(DirectSequence ? " " : "#")}{Id}=>{NextEventId?.ToString() ?? "!"}:{Event}";
+        public override string ToString() => $"{(DirectSequence ? " " : "#")}{Id}=>{NextEventId?.ToString() ?? "!"}: {Event}";
         public int Id { get; }
         public IMapEvent Event { get; }
         public ushort? NextEventId { get; set; }

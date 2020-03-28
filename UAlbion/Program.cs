@@ -9,6 +9,7 @@ using UAlbion.Formats;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Entities;
+using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Settings;
 using UAlbion.Game.Veldrid.Assets;
 using UAlbion.Game.Veldrid.Audio;

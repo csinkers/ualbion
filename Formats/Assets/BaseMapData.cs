@@ -79,10 +79,11 @@ namespace UAlbion.Formats.Assets
             if(s.Mode == SerializerMode.Reading)
             {
                 ChainsByEventId = new (EventChain, IEventNode)[Events.Count];
+                var textSource = TextSource.Map(Id);
                 for (int i = 0; i < chainOffsets.Count; i++)
                 {
                     var offset = chainOffsets[i];
-                    var chain = new EventChain(i);
+                    var chain = new EventChain(i, textSource);
                     var nextOffset = chainOffsets.Count == i + 1
                         ? Events.Count
                         : chainOffsets[i + 1];
@@ -95,7 +96,6 @@ namespace UAlbion.Formats.Assets
 
                     Chains.Add(chain);
                 }
-
             }
 
             s.Check();
@@ -185,15 +185,16 @@ namespace UAlbion.Formats.Assets
             // Wire up event sets for NPCs that don't have map-specific events.
             foreach (var npc in Npcs.Values)
             {
-                if (/*npc.Node != null ||*/ npc.Id == null)
+                if (npc.Id == null)
                     continue;
 
                 var characterSheet = characterSheetLoader(npc.Id.Value);
-                if (characterSheet != null)
-                {
-                    var eventSet = eventSetLoader(characterSheet.EventSetId);
-                    npc.EventSet = eventSet;
-                }
+                if (characterSheet == null) 
+                    continue;
+
+                var eventSet = eventSetLoader(characterSheet.EventSetId);
+                npc.EventSet = eventSet;
+                npc.Chain ??= npc.EventSet.Chains.FirstOrDefault();
             }
         }
     }

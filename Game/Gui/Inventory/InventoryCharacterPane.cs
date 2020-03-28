@@ -1,6 +1,7 @@
 ﻿using System;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui.Inventory
 {

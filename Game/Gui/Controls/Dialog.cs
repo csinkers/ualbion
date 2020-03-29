@@ -14,10 +14,10 @@ namespace UAlbion.Game.Gui.Controls
     {
         static IDictionary<Type, Handler> InjectDialogHandler(IDictionary<Type, Handler> handlers)
         {
-            if (handlers.ContainsKey(typeof(CollectDialogsEvent)))
+            if (handlers != null && handlers.ContainsKey(typeof(CollectDialogsEvent)))
                 return handlers;
 
-            return new Dictionary<Type, Handler>(handlers)
+            return new Dictionary<Type, Handler>(handlers ?? EmptyHandlerSet)
             {
                 { typeof(CollectDialogsEvent), new Handler<Dialog, CollectDialogsEvent>((x, e) => e.AddDialog(x)) }
             };

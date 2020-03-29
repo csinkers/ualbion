@@ -23,7 +23,6 @@
         Unk1E = 0x1E,
         PromptPlayer = 0x1F,
         Unk19 = 0x19,
-        Unk1A = 0x1A,
         TriggerType = 0x20,
         Unk21 = 0x21,
         EventAlreadyUsed = 0x22,

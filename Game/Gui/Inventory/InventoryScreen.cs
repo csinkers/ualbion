@@ -2,7 +2,6 @@
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
-using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 
@@ -47,9 +46,6 @@ namespace UAlbion.Game.Gui.Inventory
             switch (buttonId)
             {
                 case ExitButtonId: Raise(new PopSceneEvent()); break;
-                case InventoryCharacterPane.SummaryButtonId: _page = InventoryPage.Summary; break;
-                case InventoryCharacterPane.StatsButtonId: _page = InventoryPage.Stats; break;
-                case InventoryCharacterPane.MiscButtonId: _page = InventoryPage.Misc; break;
                 default: return;
             }
         }
@@ -63,7 +59,11 @@ namespace UAlbion.Game.Gui.Inventory
             var leftPane =
                 _mode switch
                 {
-                    InventoryMode.Character => (IUiElement)new InventoryCharacterPane(_activeCharacter, () => _page),
+                    InventoryMode.Character => (IUiElement)new InventoryCharacterPane(
+                        _activeCharacter,
+                        () => _page,
+                        x => _page = x),
+
                     InventoryMode.Merchant => new InventoryChestPane(false),
                     InventoryMode.Chest => new InventoryChestPane(true),
                     InventoryMode.LockedChest => new InventoryLockPane(true),

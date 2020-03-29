@@ -40,7 +40,7 @@ namespace UAlbion.Game.Gui.Inventory
                         new HorizontalStack(
                             new FixedSize(8, 8,
                                 new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiDefensiveValue) { Highlighted = true }),
-                            new TextBlockElement(source)
+                            new TextElement(source)
                         )
                     )
                 {

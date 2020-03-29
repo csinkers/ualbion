@@ -14,7 +14,7 @@ namespace UAlbion.Formats.Parsers
         {
             var results = new Dictionary<int, string>();
             var bytes = br.ReadBytes((int)streamLength);
-            var data = StringUtils.BytesTo850String(bytes);
+            var data = FormatUtil.BytesTo850String(bytes);
             var lines = data.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var line in lines)
             {

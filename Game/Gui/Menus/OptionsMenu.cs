@@ -8,13 +8,6 @@ namespace UAlbion.Game.Gui.Menus
 {
     public class OptionsMenu : Dialog
     {
-        const string MusicVolumeKey = "Options.MusicVolume";
-        const string FxVolumeKey = "Options.FxVolume";
-        const string WindowSizeKey = "Options.WindowSize";
-        const string CombatDetailKey = "Options.CombatDetail";
-        const string CombatDelayKey = "Options.CombatDelay";
-        const string DoneKey = "Options.Done";
-
         public event EventHandler Closed;
 
         int _musicVolume;
@@ -23,53 +16,27 @@ namespace UAlbion.Game.Gui.Menus
         int _combatDetailLevel;
         int _combatDelay;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<OptionsMenu, ButtonPressEvent>((x, e) =>
-            {
-                switch(e.ButtonId)
-                {
-                    case DoneKey:
-                        var settings = x.Resolve<ISettings>();
-                        if(x._musicVolume != settings.Audio.MusicVolume)
-                            x.Raise(new SetMusicVolumeEvent(x._musicVolume));
-                        if(x._fxVolume != settings.Audio.FxVolume)
-                            x.Raise(new SetFxVolumeEvent(x._fxVolume));
-                        if(x._windowSize3d != settings.Graphics.WindowSize3d)
-                            x.Raise(new SetWindowSize3dEvent(x._windowSize3d));
-                        if(x._combatDetailLevel != settings.Graphics.CombatDetailLevel)
-                            x.Raise(new SetCombatDetailLevelEvent(x._combatDetailLevel));
-                        if(x._combatDelay != settings.Gameplay.CombatDelay)
-                            x.Raise(new SetCombatDelayEvent(x._combatDelay));
-
-                        x.Closed?.Invoke(x, EventArgs.Empty);
-                        x.Detach();
-                        break;
-                }
-            })
-        );
-
-        public OptionsMenu() : base(Handlers, DialogPositioning.Center)
+        public OptionsMenu() : base(null, DialogPositioning.Center)
         {
-            StringId S(SystemTextId id) => new StringId(AssetType.SystemText, 0, (int)id);
             var elements = new List<IUiElement>
             {
                 new Spacing(156,2),
-                new Label(S(SystemTextId.Options_MusicVolume)),
-                new Slider(MusicVolumeKey, () => _musicVolume, x => _musicVolume = x, 0, 127),
+                new Label(SystemTextId.Options_MusicVolume.ToId()),
+                new Slider(() => _musicVolume, x => _musicVolume = x, 0, 127),
                 new Spacing(0,2),
-                new Label(S(SystemTextId.Options_FXVolume)),
-                new Slider(FxVolumeKey, () => _fxVolume, x => _fxVolume = x, 0, 127),
+                new Label(SystemTextId.Options_FXVolume.ToId()),
+                new Slider(() => _fxVolume, x => _fxVolume = x, 0, 127),
                 new Spacing(0,2),
-                new Label(S(SystemTextId.Options_3DWindowSize)),
-                new Slider(WindowSizeKey, () => _windowSize3d, x => _windowSize3d = x, 0, 100),
+                new Label(SystemTextId.Options_3DWindowSize.ToId()),
+                new Slider(() => _windowSize3d, x => _windowSize3d = x, 0, 100),
                 new Spacing(0,2),
-                new Label(S(SystemTextId.Options_CombatDetailLevel)),
-                new Slider(CombatDetailKey, () => _combatDetailLevel, x => _combatDetailLevel = x, 1, 5),
+                new Label(SystemTextId.Options_CombatDetailLevel.ToId()),
+                new Slider(() => _combatDetailLevel, x => _combatDetailLevel = x, 1, 5),
                 new Spacing(0,2),
-                new Label(S(SystemTextId.Options_CombatTextDelay)),
-                new Slider(CombatDelayKey, () => _combatDelay, x => _combatDelay = x, 1, 50),
+                new Label(SystemTextId.Options_CombatTextDelay.ToId()),
+                new Slider(() => _combatDelay, x => _combatDelay = x, 1, 50),
                 new Spacing(0,2),
-                new Button(DoneKey, S(SystemTextId.MsgBox_OK)),
+                new Button(SystemTextId.MsgBox_OK.ToId(), SaveAndClose),
                 new Spacing(0,2),
             };
             var stack = new VerticalStack(elements);
@@ -85,6 +52,19 @@ namespace UAlbion.Game.Gui.Menus
             _combatDetailLevel = settings.Graphics.CombatDetailLevel;
             _combatDelay = settings.Gameplay.CombatDelay;
             base.Subscribed();
+        }
+
+        void SaveAndClose()
+        {
+            var settings = Resolve<ISettings>();
+            if (_musicVolume != settings.Audio.MusicVolume) Raise(new SetMusicVolumeEvent(_musicVolume));
+            if (_fxVolume != settings.Audio.FxVolume) Raise(new SetFxVolumeEvent(_fxVolume));
+            if (_windowSize3d != settings.Graphics.WindowSize3d) Raise(new SetWindowSize3dEvent(_windowSize3d));
+            if (_combatDetailLevel != settings.Graphics.CombatDetailLevel) Raise(new SetCombatDetailLevelEvent(_combatDetailLevel));
+            if (_combatDelay != settings.Gameplay.CombatDelay) Raise(new SetCombatDelayEvent(_combatDelay));
+
+            Closed?.Invoke(this, EventArgs.Empty);
+            Detach();
         }
     }
 }

@@ -1,37 +1,32 @@
 ﻿using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class StartDialogueEvent : MapEvent
+    [Event("start_dialogue")]
+    public class StartDialogueEvent : AsyncEvent
     {
+        StartDialogueEvent() { }
+        public StartDialogueEvent(EventSetId eventSetId) => EventSet = eventSetId;
+
+        [EventPart("event_set")]
+        public EventSetId EventSet { get; private set; }
+
         public static StartDialogueEvent Serdes(StartDialogueEvent e, ISerializer s)
         {
             e ??= new StartDialogueEvent();
-            e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);
-            e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
-            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
-            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-            e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
-            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
-            ApiUtil.Assert(e.Unk1 == 1);
-            ApiUtil.Assert(e.Unk2 == 0);
-            ApiUtil.Assert(e.Unk3 == 0);
-            ApiUtil.Assert(e.Unk4 == 0);
-            ApiUtil.Assert(e.Unk5 == 0);
-            ApiUtil.Assert(e.Unk8 == 0);
+            s.UInt8("Pad1", 1);
+            s.UInt8("Pad2", 0);
+            s.UInt8("Pad3", 0);
+            s.UInt8("Pad4", 0);
+            s.UInt8("Pad5", 0);
+            e.EventSet = s.EnumU16(nameof(EventSet), e.EventSet);
+            s.UInt16("Pad8", 0);
             return e;
         }
 
-        byte Unk1 { get; set; }
-        byte Unk2 { get; set; }
-        byte Unk3 { get; set; }
-        byte Unk4 { get; set; }
-        byte Unk5 { get; set; }
-        public ushort Unk6 { get; private set; } // TODO: NpcId, EventId, string id?
-        ushort Unk8 { get; set; }
-        public override string ToString() => $"start_dialogue {Unk6}";
         public override MapEventType EventType => MapEventType.StartDialogue;
+        protected override AsyncEvent Clone() => new StartDialogueEvent(EventSet);
     }
 }

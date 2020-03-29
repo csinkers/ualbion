@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game
@@ -214,7 +215,12 @@ namespace UAlbion.Game
                 {
                     var @event = Event.Parse(command);
                     if (@event != null)
+                    {
+                        if(@event is AsyncEvent async)
+                            @event = async.CloneWithCallback(() => Console.WriteLine($"Async event \"{async}\" completed."));
+
                         _queuedEvents.Enqueue(@event);
+                    }
                     else
                         Console.WriteLine("Unknown event \"{0}\"", command);
                 }

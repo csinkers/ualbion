@@ -35,7 +35,7 @@ namespace UAlbion.Game.Gui.Controls
             {
                 x._frame.State = ButtonState.Clicked;
                 if (x.Typematic)
-                    x.Raise(new ButtonPressEvent(x.Id));
+                    x._clickAction();
                 e.Propagating = false;
                 x.Raise(new SetExclusiveMouseModeEvent(x));
             }),
@@ -45,7 +45,7 @@ namespace UAlbion.Game.Gui.Controls
                 if (x.Typematic)
                     x._typematicAccrual = 0;
                 else if (x._frame.State == ButtonState.Clicked)
-                    x.Raise(new ButtonPressEvent(x.Id));
+                    x._clickAction();
 
                 x._frame.State = x.IsPressed
                     ? ButtonState.Pressed
@@ -63,19 +63,17 @@ namespace UAlbion.Game.Gui.Controls
                 var oldAmount = (int)(oldAccrual * rate);
                 var newAmount = (int)(x._typematicAccrual * rate);
                 var delta = newAmount - oldAmount;
-                var clickEvent = new ButtonPressEvent(x.Id);
                 for (int i = 0; i < delta; i++)
-                    x.Raise(clickEvent);
+                    x._clickAction();
             }));
 
         readonly ButtonFrame _frame;
-        public string Id { get; }
+        Action _clickAction { get; }
         public ButtonFrame.ITheme Theme
         {
             get => _frame.Theme;
             set => _frame.Theme = value;
         }
-
 
         public bool IsPressed
         {
@@ -94,15 +92,14 @@ namespace UAlbion.Game.Gui.Controls
         float _typematicAccrual;
         bool _isPressed;
 
-        public Button(string buttonId, IUiElement content) : base(Handlers)
+        public Button(IUiElement content, Action action) : base(Handlers)
         {
-            Id = buttonId;
             _frame = AttachChild(new ButtonFrame(content));
+            _clickAction = action;
         }
-
-        public Button(string buttonId, StringId textId) : this(buttonId, new TextBlockElement(textId).Center().NoWrap()) { }
-        public Button(string buttonId, IText textSource) : this(buttonId, new TextBlockElement(textSource).Center().NoWrap()) { }
-        public Button(string buttonId, string literalText) : this(buttonId, new TextBlockElement(literalText).Center().NoWrap()) { }
+        public Button(IText textSource, Action action) : this(new TextElement(textSource), action) { }
+        public Button(StringId textId, Action action) : this(new TextElement(textId).Center().NoWrap(), action) { }
+        public Button(string literalText, Action action) : this(new TextElement(literalText).Center().NoWrap(), action) { }
 
         public override Vector2 GetSize() => GetMaxChildSize() + new Vector2(4, 0);
 

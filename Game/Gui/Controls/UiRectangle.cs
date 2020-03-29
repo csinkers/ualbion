@@ -85,7 +85,7 @@ namespace UAlbion.Game.Gui.Controls
         public override int Render(Rectangle extents, int order)
         {
             var window = Resolve<IWindowManager>();
-            var position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);
+            var position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
             if (_dirty || position != _lastPosition || _sprite?.Key.RenderOrder != (DrawLayer)order)
                 Rebuild(position, (DrawLayer)order);
 

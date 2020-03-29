@@ -17,7 +17,7 @@ namespace UAlbion.Formats.Parsers
             while (br.BaseStream.Position < end)
             {
                 var bytes = br.ReadBytes(StringSize);
-                results.Add(StringUtils.BytesTo850String(bytes));
+                results.Add(FormatUtil.BytesTo850String(bytes));
             }
             return results;
         }

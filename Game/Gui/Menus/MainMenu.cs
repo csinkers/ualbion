@@ -10,82 +10,11 @@ namespace UAlbion.Game.Gui.Menus
 {
     public class MainMenu : Dialog
     {
-        const string ContinueKey  = "MainMenu.ContinueGame";
-        const string NewGameKey   = "MainMenu.NewGame";
-        const string LoadGameKey  = "MainMenu.LoadGame";
-        const string SaveGameKey  = "MainMenu.SavedGame";
-        const string OptionsKey   = "MainMenu.Options";
-        const string ViewIntroKey = "MainMenu.ViewIntro";
-        const string CreditsKey   = "MainMenu.Credits";
-        const string QuitGameKey  = "MainMenu.QuitGame";
-        static StringId S(SystemTextId id) => new StringId(AssetType.SystemText, 0, (int)id);
-
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<MainMenu, ButtonPressEvent>((x, e) => x.OnButton(e.ButtonId)),
-            H<MainMenu, CloseDialogEvent>((x, e) => x.OnButton(ContinueKey))
+            H<MainMenu, CloseWindowEvent>((x, e) => x.Raise(new PopSceneEvent()))
         );
 
         public MainMenu() : base(Handlers, DialogPositioning.Center) { }
-
-        void OnButton(string buttonId)
-        {
-            var exchange = Exchange;
-            switch (buttonId)
-            {
-                case ContinueKey: Raise(new PopSceneEvent()); break;
-                case NewGameKey:
-                    var yesNoDialog = new YesNoMessageBox(S(SystemTextId.MainMenu_DoYouReallyWantToStartANewGame));
-                    yesNoDialog.Closed += (args, _) =>
-                    {
-                        Attach(exchange);
-                        if (yesNoDialog.Result)
-                            Raise(new NewGameEvent(
-                                MapDataId.Toronto2DGesamtkarteSpielbeginn, 30, 75));
-                    };
-                    Exchange.Attach(yesNoDialog);
-                    Detach();
-                    break;
-
-                case LoadGameKey:
-                {
-                    var menu = new PickSaveSlotMenu(false, S(SystemTextId.MainMenu_WhichSavedGameDoYouWantToLoad), 1);
-                    menu.Closed += (args, filename) =>
-                    {
-                        Attach(exchange);
-                        if(filename != null)
-                            Raise(new LoadGameEvent(filename));
-                    };
-                    Exchange.Attach(menu);
-                    Detach();
-                    break;
-                }
-
-                case SaveGameKey:
-                {
-                    var menu = new PickSaveSlotMenu(true, S(SystemTextId.MainMenu_SaveOnWhichPosition), 1);
-                    menu.Closed += (args, _) =>
-                    {
-                        Attach(exchange);
-                        // TODO: Prompt user for new save name
-                        // Raise(new SaveGameEvent(filename, name));
-                    };
-                    Exchange.Attach(menu);
-                    Detach();
-                    break;
-                }
-
-                case OptionsKey:
-                    var optionsMenu = new OptionsMenu();
-                    optionsMenu.Closed += (args, _) => Attach(exchange);
-                    Exchange.Attach(optionsMenu);
-                    Detach();
-                    break;
-
-                case QuitGameKey:
-                    Raise(new QuitEvent());
-                    break;
-            }
-        }
 
         public override void Subscribed()
         {
@@ -97,7 +26,7 @@ namespace UAlbion.Game.Gui.Menus
             var elements = new List<IUiElement>
             {
                 new Spacing(0, 2),
-                new HorizontalStack(new Spacing(5, 0), new Header(S(SystemTextId.MainMenu_MainMenu)), new Spacing(5, 0)),
+                new HorizontalStack(new Spacing(5, 0), new Header(SystemTextId.MainMenu_MainMenu.ToId()), new Spacing(5, 0)),
                 new Divider(CommonColor.Yellow3),
                 new Spacing(0, 2),
             };
@@ -106,28 +35,28 @@ namespace UAlbion.Game.Gui.Menus
             {
                 elements.AddRange(new IUiElement[]
                 {
-                    new Button(ContinueKey, S(SystemTextId.MainMenu_ContinueGame)),
+                    new Button(SystemTextId.MainMenu_ContinueGame.ToId(), Continue),
                     new Spacing(0, 4),
                 });
             }
 
             elements.AddRange(new IUiElement[]
             {
-                new Button(NewGameKey, S(SystemTextId.MainMenu_NewGame)),
-                new Button(LoadGameKey, S(SystemTextId.MainMenu_LoadGame)),
+                new Button(SystemTextId.MainMenu_NewGame.ToId(), NewGame),
+                new Button(SystemTextId.MainMenu_LoadGame.ToId(), LoadGame),
             });
 
             if (state.Loaded)
-                elements.Add(new Button(SaveGameKey, S(SystemTextId.MainMenu_SaveGame)));
+                elements.Add(new Button(SystemTextId.MainMenu_SaveGame.ToId(), SaveGame));
 
             elements.AddRange(new IUiElement[]
             {
                 new Spacing(0,4),
-                new Button(OptionsKey, S(SystemTextId.MainMenu_Options)),
-                new Button(ViewIntroKey, S(SystemTextId.MainMenu_ViewIntro)),
-                new Button(CreditsKey, S(SystemTextId.MainMenu_Credits)),
+                new Button(SystemTextId.MainMenu_Options.ToId(), Options),
+                new Button(SystemTextId.MainMenu_ViewIntro.ToId(), ViewIntro),
+                new Button(SystemTextId.MainMenu_Credits.ToId(), Credits),
                 new Spacing(0,3),
-                new Button(QuitGameKey, S(SystemTextId.MainMenu_QuitGame)),
+                new Button(SystemTextId.MainMenu_QuitGame.ToId(), QuitGame),
                 new Spacing(0,2),
             });
 
@@ -136,5 +65,71 @@ namespace UAlbion.Game.Gui.Menus
 
             base.Subscribed();
         }
+
+        void Continue()
+        {
+            Raise(new PopSceneEvent());
+        }
+
+        void NewGame()
+        {
+            var yesNoDialog = new YesNoMessageBox(SystemTextId.MainMenu_DoYouReallyWantToStartANewGame.ToId());
+            var exchange = Exchange;
+            yesNoDialog.Closed += (args, _) =>
+            {
+                Attach(exchange);
+                if (yesNoDialog.Result)
+                    Raise(new NewGameEvent(
+                        MapDataId.Toronto2DGesamtkarteSpielbeginn, 30, 75));
+            };
+            Exchange.Attach(yesNoDialog);
+            Detach();
+        }
+
+        void LoadGame()
+        {
+            var menu = new PickSaveSlotMenu(false, SystemTextId.MainMenu_WhichSavedGameDoYouWantToLoad.ToId(), 1);
+            var exchange = Exchange;
+            menu.Closed += (args, filename) =>
+            {
+                Attach(exchange);
+                if (filename != null)
+                    Raise(new LoadGameEvent(filename));
+            };
+            Exchange.Attach(menu);
+            Detach();
+        }
+
+        void SaveGame()
+        {
+            var menu = new PickSaveSlotMenu(true, SystemTextId.MainMenu_SaveOnWhichPosition.ToId(), 1);
+            var exchange = Exchange;
+            menu.Closed += (args, _) =>
+            {
+                Attach(exchange);
+                // TODO: Prompt user for new save name
+                // Raise(new SaveGameEvent(filename, name));
+            };
+            Exchange.Attach(menu);
+            Detach();
+        }
+
+        void Options()
+        {
+            var optionsMenu = new OptionsMenu();
+            var exchange = Exchange;
+            optionsMenu.Closed += (args, _) => Attach(exchange);
+            Exchange.Attach(optionsMenu);
+            Detach();
+        }
+
+        void ViewIntro() { }
+        void Credits() { }
+
+        void QuitGame()
+        {
+            Raise(new QuitEvent());
+        }
+
     }
 }

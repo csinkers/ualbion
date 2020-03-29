@@ -12,9 +12,9 @@ namespace UAlbion.Game.State
         bool Loaded { get; }
         MapDataId MapId { get; }
         Func<NpcCharacterId, ICharacterSheet> GetNpc { get; }
-
         Func<ChestId, IChest> GetChest { get; }
         Func<MerchantId, IChest> GetMerchant { get; }
+        Func<PartyCharacterId, ICharacterSheet> GetPartyMember { get; }
         Func<int, int> GetTicker { get; }
         Func<int, int> GetSwitch { get; }
     }

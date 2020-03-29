@@ -79,6 +79,7 @@ namespace UAlbion
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+            // global.Raise(new StartDialogueEvent((EventSetId)112), null);
             engine.Run();
             // TODO: Ensure all sprite leases returned etc to weed out memory leaks
         }

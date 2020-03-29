@@ -89,8 +89,8 @@ namespace UAlbion.Game.Gui.Controls
                 return order;
 
             var window = Resolve<IWindowManager>();
-            var position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);
-            var size = window.UiToNormRelative(new Vector2(extents.Width, extents.Height));
+            var position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
+            var size = window.UiToNormRelative(extents.Width, extents.Height);
 
             if (!_dirty && _lastPosition == position && _lastSize == size)
                 return order;

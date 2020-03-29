@@ -49,7 +49,7 @@ namespace UAlbion.Game.Gui.Text
 
             var window = Resolve<IWindowManager>();
 
-            var newPosition = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);
+            var newPosition = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
             switch (Block.Alignment)
             {
                 case TextAlignment.Left:
@@ -57,17 +57,17 @@ namespace UAlbion.Game.Gui.Text
                 case TextAlignment.Center:
                     newPosition +=
                         new Vector3(
-                            window.UiToNormRelative(new Vector2(
+                            window.UiToNormRelative(
                                 (extents.Width - _sprite.Size.X) / 2,
-                                (extents.Height - _sprite.Size.Y) / 2)),
+                                (extents.Height - _sprite.Size.Y) / 2),
                             0);
                     break;
                 case TextAlignment.Right:
                     newPosition +=
                         new Vector3(
-                            window.UiToNormRelative(new Vector2(
+                            window.UiToNormRelative(
                                 extents.Width - _sprite.Size.X,
-                                extents.Height - _sprite.Size.Y)),
+                                extents.Height - _sprite.Size.Y),
                             0);
                     break;
             }

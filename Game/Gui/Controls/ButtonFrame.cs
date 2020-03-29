@@ -89,7 +89,7 @@ namespace UAlbion.Game.Gui.Controls
             }
 
             var instances = _sprite.Access();
-            var position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);
+            var position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
             var flags = SpriteFlags.None.SetOpacity(colors.Alpha);
 
             SubImage BuildSubImage(uint layer) =>
@@ -100,12 +100,12 @@ namespace UAlbion.Game.Gui.Controls
             {
                 instances[curInstance] = SpriteInstanceData.TopLeft( // Top
                     position,
-                    window.UiToNormRelative(new Vector2(extents.Width - 1, 1)),
+                    window.UiToNormRelative(extents.Width - 1, 1),
                     BuildSubImage(topLeft.Value),
                     flags);
                 instances[curInstance + 1] = SpriteInstanceData.TopLeft( // Left
-                    position + new Vector3(window.UiToNormRelative(new Vector2(0, 1)), 0),
-                    window.UiToNormRelative(new Vector2(1, extents.Height - 2)),
+                    position + new Vector3(window.UiToNormRelative(0, 1), 0),
+                    window.UiToNormRelative(1, extents.Height - 2),
                     BuildSubImage(topLeft.Value),
                     flags);
                 curInstance += 2;
@@ -114,13 +114,13 @@ namespace UAlbion.Game.Gui.Controls
             if (bottomRight.HasValue)
             {
                 instances[curInstance] = SpriteInstanceData.TopLeft( // Bottom
-                    position + new Vector3(window.UiToNormRelative(new Vector2(1, extents.Height - 1)), 0),
-                    window.UiToNormRelative(new Vector2(extents.Width - 1, 1)),
+                    position + new Vector3(window.UiToNormRelative(1, extents.Height - 1), 0),
+                    window.UiToNormRelative(extents.Width - 1, 1),
                     BuildSubImage(bottomRight.Value),
                     flags);
                 instances[curInstance + 1] = SpriteInstanceData.TopLeft( // Right
-                    position + new Vector3(window.UiToNormRelative(new Vector2(extents.Width - 1, 1)), 0),
-                    window.UiToNormRelative(new Vector2(1, extents.Height - 2)),
+                    position + new Vector3(window.UiToNormRelative(extents.Width - 1, 1), 0),
+                    window.UiToNormRelative(1, extents.Height - 2),
                     BuildSubImage(bottomRight.Value),
                     flags);
                 curInstance += 2;
@@ -129,12 +129,12 @@ namespace UAlbion.Game.Gui.Controls
             if (corners.HasValue)
             {
                 instances[curInstance] = SpriteInstanceData.TopLeft( // Bottom Left Corner
-                    position + new Vector3(window.UiToNormRelative(new Vector2(0, extents.Height - 1)), 0),
+                    position + new Vector3(window.UiToNormRelative(0, extents.Height - 1), 0),
                     window.UiToNormRelative(Vector2.One),
                     BuildSubImage(corners.Value),
                     flags);
                 instances[curInstance + 1] = SpriteInstanceData.TopLeft( // Top Right Corner
-                    position + new Vector3(window.UiToNormRelative(new Vector2(extents.Width - 1, 0)), 0),
+                    position + new Vector3(window.UiToNormRelative(extents.Width - 1, 0), 0),
                     window.UiToNormRelative(Vector2.One),
                     BuildSubImage(corners.Value),
                     flags);
@@ -144,8 +144,8 @@ namespace UAlbion.Game.Gui.Controls
             if (background.HasValue)
             {
                 instances[curInstance] = SpriteInstanceData.TopLeft( // Background
-                    position + new Vector3(window.UiToNormRelative(new Vector2(1, 1)), 0),
-                    window.UiToNormRelative(new Vector2(extents.Width - 2, extents.Height - 2)),
+                    position + new Vector3(window.UiToNormRelative(1, 1), 0),
+                    window.UiToNormRelative(extents.Width - 2, extents.Height - 2),
                     BuildSubImage(background.Value),
                     flags.SetOpacity(colors.Alpha < 1.0f ? colors.Alpha / 2 : colors.Alpha));
             }

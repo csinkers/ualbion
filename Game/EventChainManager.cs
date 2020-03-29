@@ -85,6 +85,7 @@ namespace UAlbion.Game
                 Node = e.Node,
                 X = e.X,
                 Y = e.Y,
+                NpcId = e.NpcId,
                 ClockWasRunning = Resolve<IClock>().IsRunning
             };
 

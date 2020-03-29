@@ -17,6 +17,7 @@ namespace UAlbion.Formats.MapEvents
         public IEventNode LastNode { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
+        public NpcCharacterId? NpcId { get; set; }
         public ItemId? UsedItem { get; set; }
         public bool ClockWasRunning { get; set; }
         public bool LastEventResult { get; set; }

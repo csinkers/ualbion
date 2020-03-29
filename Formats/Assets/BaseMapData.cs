@@ -192,9 +192,12 @@ namespace UAlbion.Formats.Assets
                 if (characterSheet == null) 
                     continue;
 
-                var eventSet = eventSetLoader(characterSheet.EventSetId);
-                npc.EventSet = eventSet;
-                npc.Chain ??= npc.EventSet.Chains.FirstOrDefault();
+                if (npc.Chain == null)
+                {
+                    var chain = new EventChain(-1, TextSource.Map(Id));
+                    chain.Events.Add(new EventNode(0, new StartDialogueEvent(characterSheet.EventSetId)));
+                    npc.Chain = chain;
+                }
             }
         }
     }

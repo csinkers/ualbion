@@ -2,16 +2,11 @@
 using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
-using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Gui.Controls
 {
     public class Slider : UiElement
     {
-        readonly string _decrementKey;
-        readonly string _incrementKey;
-        readonly string _id;
-
         readonly Func<int> _getter;
         readonly Action<int> _setter;
 
@@ -23,20 +18,10 @@ namespace UAlbion.Game.Gui.Controls
         readonly int _max;
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<Slider, ButtonPressEvent>((x, e) =>
-                {
-                    if (e.ButtonId == x._decrementKey)
-                        x.Adjust(-1);
-                    else if (e.ButtonId == x._incrementKey)
-                        x.Adjust(1);
-                }),
-            H<Slider, SliderMovedEvent>((x, e) =>
-                {
-                    if (e.SliderId == x._id && e.Position >= x._min && e.Position <= x._max)
-                        x._setter(e.Position);
-                })
             );
 
+        void Decrement() => Adjust(-1);
+        void Increment() => Adjust(1);
 
         void Adjust(int amount)
         {
@@ -45,21 +30,22 @@ namespace UAlbion.Game.Gui.Controls
             _setter(value);
         }
 
-        public Slider(string id, Func<int> getter, Action<int> setter, int min, int max) : base(Handlers)
+        public Slider(Func<int> getter, Action<int> setter, int min, int max) : base(Handlers)
         {
             _getter = getter;
             _setter = setter;
             _min = min;
             _max = max;
 
-            _decrementKey = $"{id}.Slider.Decrement";
-            _incrementKey = $"{id}.Slider.Increment";
-            _id = id;
+            _decrement = new Button("<", Decrement) { Typematic = true };
+            _increment = new Button(">", Increment) { Typematic = true };
 
-            _decrement = new Button(_decrementKey, "<") { Typematic = true };
-            _increment = new Button(_incrementKey, ">") { Typematic = true };
+            var track = new SliderTrack(getter, x =>
+            {
+                if (x >= _min && x <= _max)
+                    _setter(x);
+            }, min, max);
 
-            var track = new SliderTrack(_id, getter, min, max);
             _frame = new ButtonFrame(track)
             {
                 State = ButtonState.Pressed,

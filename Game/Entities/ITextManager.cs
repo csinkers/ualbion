@@ -13,5 +13,6 @@ namespace UAlbion.Game.Entities
         PositionedSpriteBatch BuildRenderable(TextBlock block, DrawLayer layer, object caller);
         IEnumerable<TextBlock> SplitBlocksToSingleWords(IEnumerable<TextBlock> blocks);
         IText FormatTextEvent(TextEvent textEvent, FontColor color);
+        IText FormatText(StringId id, FontColor color);
     }
 }

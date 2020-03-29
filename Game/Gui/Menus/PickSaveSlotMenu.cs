@@ -5,7 +5,6 @@ using System.Linq;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets.Save;
-using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Settings;
@@ -18,9 +17,7 @@ namespace UAlbion.Game.Gui.Menus
         readonly bool _showEmptySlots;
         readonly StringId _stringId;
         const int MaxSaveNumber = 10; // TODO: Add scroll bar and bump up to 99
-        const string BaseButtonKey = "PickSaveSlot.Slot";
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<PickSaveSlotMenu, ButtonPressEvent>((x, e) => x.OnButton(e.ButtonId)),
             H<PickSaveSlotMenu, RightClickEvent>((x, e) =>
             {
                 x.Detach();
@@ -30,13 +27,9 @@ namespace UAlbion.Game.Gui.Menus
 
         public event EventHandler<string> Closed;
 
-        void OnButton(string buttonId)
+        void PickSlot(int slotNumber)
         {
-            if (!buttonId.StartsWith(BaseButtonKey))
-                return;
-
-            int id = int.Parse(buttonId.Substring(BaseButtonKey.Length));
-            Closed?.Invoke(this, BuildSaveFilename(id));
+            Closed?.Invoke(this, BuildSaveFilename(slotNumber));
             Detach();
         }
 
@@ -69,21 +62,22 @@ namespace UAlbion.Game.Gui.Menus
                     using var br = new BinaryReader(stream);
                     var name = SavedGame.GetName(br) ?? "Invalid";
                     var text = $"{i,2}    {name}";
-                    buttons.Add(new DialogOption(BaseButtonKey + i, new LiteralText(text)));
+                    int slotNumber = i;
+                    buttons.Add(new DialogOption(new LiteralText(text), () => PickSlot(slotNumber)));
                 }
                 else if (_showEmptySlots)
                 {
                     var text = BuildEmptySlotText(i);
-                    buttons.Add(new DialogOption(BaseButtonKey + i, text));
+                    int slotNumber = i;
+                    buttons.Add(new DialogOption(text, () => PickSlot(slotNumber)));
                 }
             }
 
-            var elements = new List<IUiElement>();
-            elements.Add(new Spacing(280, 0));
+            var elements = new List<IUiElement> { new Spacing(280, 0) };
             elements.AddRange(buttons);
             elements.Add(new Spacing(0, 4));
 
-            var header = new TextBlockElement(_stringId).Center().NoWrap();
+            var header = new TextElement(_stringId).Center().NoWrap();
             elements.Add(new ButtonFrame(new Padding(header, 2)) { State = ButtonState.Pressed });
 
             var stack = new VerticalStack(elements);

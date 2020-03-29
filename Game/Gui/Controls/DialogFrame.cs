@@ -13,6 +13,10 @@ namespace UAlbion.Game.Gui.Controls
     public class DialogFrame : UiElement
     {
         const int TileSize = 16;
+        const int FrameOffsetX = 7;
+        const int FrameOffsetY = 7;
+        const int ShadowX = 10;
+        const int ShadowY = 10;
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<DialogFrame, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; })
@@ -25,13 +29,12 @@ namespace UAlbion.Game.Gui.Controls
         public DialogFrameBackgroundStyle Background { get; set; }
         void Rebuild(int width, int height, DrawLayer order)
         {
-            var shadowSubImage = new SubImage(Vector2.Zero, Vector2.Zero, Vector2.One, 0);
             var window = Resolve<IWindowManager>();
             var sm = Resolve<ISpriteManager>();
             var factory = Resolve<ICoreFactory>();
 
             { // Check if we need to rebuild
-                var normSize = window.UiToNormRelative(new Vector2(width, height));
+                var normSize = window.UiToNormRelative(width, height);
                 var pixelSize = window.NormToPixelRelative(normSize);
 
                 if ((pixelSize - _lastPixelSize).LengthSquared() < float.Epsilon && _sprite?.RenderOrder == order)
@@ -44,7 +47,7 @@ namespace UAlbion.Game.Gui.Controls
 
             void DrawLine(uint y)
             {
-                uint x = 16;
+                uint x = TileSize;
                 uint n = 0;
                 while(x < width - TileSize)
                 {
@@ -58,7 +61,7 @@ namespace UAlbion.Game.Gui.Controls
 
             void DrawVerticalLine(uint x)
             {
-                uint y = 16;
+                uint y = TileSize;
                 uint n = 0;
                 var texture = assets.LoadTexture((CoreSpriteId)((int)CoreSpriteId.UiBackgroundLines1 + n % 4));
                 texture = CoreUtil.BuildRotatedTexture(factory, (EightBitTexture)texture);
@@ -77,28 +80,32 @@ namespace UAlbion.Game.Gui.Controls
                 case DialogFrameBackgroundStyle.MainMenuPattern:
                 {
                     var background = assets.LoadTexture(CoreSpriteId.UiBackground);
-                    multi.AddTexture(1, background, 7, 7, 0, true, (uint) width - 14, (uint) height - 14);
+                    multi.AddTexture(1, background,
+                        FrameOffsetX, FrameOffsetY, 0, true,
+                        (uint)width - FrameOffsetX * 2, (uint)height - FrameOffsetY * 2);
                     break;
                 }
 
                 case DialogFrameBackgroundStyle.DarkTint:
                 {
                     var colors = Resolve<ICommonColors>();
-                    multi.AddTexture(1, colors.BorderTexture, 7, 7, 0, false, (uint)width - 14, (uint)height - 14, 128);
+                    multi.AddTexture(1, colors.BorderTexture,
+                        FrameOffsetX, FrameOffsetY, 0, false,
+                        (uint)width - FrameOffsetX * 2, (uint)height - FrameOffsetY * 2, 128);
                     break;
                 }
             }
 
             // Corners
             multi.AddTexture(1, assets.LoadTexture(CoreSpriteId.UiWindowTopLeft), 0, 0, 0, true);
-            multi.AddTexture(1, assets.LoadTexture(CoreSpriteId.UiWindowTopRight), (uint)width - 16, 0, 0, true);
-            multi.AddTexture(1, assets.LoadTexture(CoreSpriteId.UiWindowBottomLeft), 0, (uint)height - 16, 0, true);
-            multi.AddTexture(1, assets.LoadTexture(CoreSpriteId.UiWindowBottomRight), (uint)width - 16, (uint)height - 16, 0, true);
+            multi.AddTexture(1, assets.LoadTexture(CoreSpriteId.UiWindowTopRight), (uint)width - TileSize, 0, 0, true);
+            multi.AddTexture(1, assets.LoadTexture(CoreSpriteId.UiWindowBottomLeft), 0, (uint)height - TileSize, 0, true);
+            multi.AddTexture(1, assets.LoadTexture(CoreSpriteId.UiWindowBottomRight), (uint)width - TileSize, (uint)height - TileSize, 0, true);
 
             DrawLine(4); // Left
-            DrawLine((uint)height - 7); // Right
+            DrawLine((uint)height - FrameOffsetY); // Right
             DrawVerticalLine(4); // Top
-            DrawVerticalLine((uint)width - 7); // Bottom
+            DrawVerticalLine((uint)width - FrameOffsetX); // Bottom
 
             var subImage = multi.GetSubImageDetails(multi.GetSubImageAtTime(1, 0));
             var normalisedSize = window.UiToNormRelative(subImage.Size);
@@ -106,26 +113,36 @@ namespace UAlbion.Game.Gui.Controls
             var key = new SpriteKey(multi, order, SpriteKeyFlags.NoTransform);
             _sprite?.Dispose();
 
-            var lease = sm.Borrow(key, 2, this);
+            var lease = sm.Borrow(key, 3, this);
             var flags = SpriteFlags.None.SetOpacity(0.5f);
             var instances = lease.Access();
 
-            var shadowPosition = new Vector3(window.UiToNormRelative(new Vector2(10, 10)), 0);
-            var shadowSize = window.UiToNormRelative(subImage.Size - new Vector2(10, 10));
-            instances[0] = SpriteInstanceData.TopLeft(shadowPosition, shadowSize, shadowSubImage, flags);// Drop shadow
-            instances[1] = SpriteInstanceData.TopLeft(Vector3.Zero, normalisedSize, subImage, 0); // DialogFrame
+            var shadowSubImage = new SubImage(Vector2.Zero, Vector2.Zero, Vector2.One, 0);
+
+            var bottomShadowPosition = new Vector3(window.UiToNormRelative(
+                ShadowX, subImage.Size.Y - ShadowY), 0);
+
+            var sideShadowPosition = new Vector3(window.UiToNormRelative(
+                subImage.Size.X - ShadowX, ShadowY), 0);
+
+            var bottomShadowSize = window.UiToNormRelative(subImage.Size.X - ShadowX, ShadowY);
+            var sideShadowSize = window.UiToNormRelative(ShadowX, subImage.Size.Y - ShadowY * 2);
+
+            instances[0] = SpriteInstanceData.TopLeft(bottomShadowPosition, bottomShadowSize, shadowSubImage, flags);
+            instances[1] = SpriteInstanceData.TopLeft(sideShadowPosition, sideShadowSize, shadowSubImage, flags);
+            instances[2] = SpriteInstanceData.TopLeft(Vector3.Zero, normalisedSize, subImage, 0);
             _sprite = new PositionedSpriteBatch(lease, normalisedSize);
         }
 
-        public override Vector2 GetSize() => GetMaxChildSize() + Vector2.One * 14;
+        public override Vector2 GetSize() => GetMaxChildSize() + new Vector2(FrameOffsetX, FrameOffsetY) * 2;
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
             var innerExtents = new Rectangle(
-                extents.X + 7,
-                 extents.Y + 7,
-                extents.Width - 14,
-                extents.Height - 14);
+                extents.X + FrameOffsetX,
+                 extents.Y + FrameOffsetY,
+                extents.Width - FrameOffsetX * 2,
+                extents.Height - FrameOffsetY * 2);
 
             return base.DoLayout(innerExtents, order, func);
         }
@@ -135,14 +152,14 @@ namespace UAlbion.Game.Gui.Controls
             Rebuild(extents.Width, extents.Height, (DrawLayer)order);
 
             var window = Resolve<IWindowManager>();
-            _sprite.Position = new Vector3(window.UiToNorm(new Vector2(extents.X, extents.Y)), 0);
+            _sprite.Position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
 
             return base.Render(extents, order);
         }
 
         public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
-            Rebuild(extents.Width, extents.Height, (DrawLayer)order);
+            Rebuild(extents.Width, extents.Height, _sprite?.RenderOrder ?? (DrawLayer)order);
             return base.Select(uiPosition, extents, order, registerHitFunc);
         }
     }

@@ -7,9 +7,9 @@ namespace UAlbion.Game.Gui.Controls
 {
     public class SliderTrack : UiElement
     {
-        readonly string _id;
         readonly SliderThumb _thumb;
         readonly Func<int> _getter;
+        readonly Action<int> _setter;
         readonly int _min;
         readonly int _max;
 
@@ -39,10 +39,11 @@ namespace UAlbion.Game.Gui.Controls
             })
         );
 
-        public SliderTrack(string id, Func<int> getter, int min, int max) : base(Handlers)
+
+        public SliderTrack(Func<int> getter, Action<int> setter, int min, int max) : base(Handlers)
         {
-            _id = id;
             _getter = getter;
+            _setter = setter;
             _min = min;
             _max = max;
             _thumb = new SliderThumb(getter);
@@ -86,13 +87,13 @@ namespace UAlbion.Game.Gui.Controls
                     else if (uiPosition.X < thumbExtents.X)
                     {
                         value -= Math.Max(1, (_max - _min) / 10);
-                        Raise(new SliderMovedEvent(_id, value));
+                        _setter(value);
                         _state = SliderState.ClickHandled;
                     }
                     else
                     {
                         value += Math.Max(1, (_max - _min) / 10);
-                        Raise(new SliderMovedEvent(_id, value));
+                        _setter(value);
                         _state = SliderState.ClickHandled;
                     }
                     break;
@@ -102,7 +103,7 @@ namespace UAlbion.Game.Gui.Controls
                     int spareWidth = extents.Width - thumbExtents.Width;
                     int newValue = (int)((_max - _min)*(equivalentThumbPosition - extents.X) / spareWidth) + _min;
                     if (newValue != value)
-                        Raise(new SliderMovedEvent(_id, newValue));
+                        _setter(newValue);
                     break;
             }
 

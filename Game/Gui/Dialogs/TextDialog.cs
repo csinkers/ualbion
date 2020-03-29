@@ -8,17 +8,17 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Dialogs
 {
-    public class TextWindow : Dialog
+    public class TextDialog : Dialog
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<TextWindow, UiLeftClickEvent>((x, e) => x.Close()),
-            H<TextWindow, RightClickEvent>((x, e) => x.Close()),
-            H<TextWindow, CloseDialogEvent>((x, e) => x.Close())
+            H<TextDialog, UiLeftClickEvent>((x, e) => x.Close()),
+            H<TextDialog, RightClickEvent>((x, e) => x.Close()),
+            H<TextDialog, CloseWindowEvent>((x, e) => x.Close())
         );
 
-        public TextWindow(IText text, SmallPortraitId? portraitId = null, int depth = 0) : base(Handlers, DialogPositioning.Top, depth)
+        public TextDialog(IText text, SmallPortraitId? portraitId = null, int depth = 0) : base(Handlers, DialogPositioning.Top, depth)
         {
-            var textSection = new TextBlockElement(text).Center();
+            var textSection = new TextElement(text).Center();
             var padding = new Padding(textSection, 3, 7);
 
             UiElement content;

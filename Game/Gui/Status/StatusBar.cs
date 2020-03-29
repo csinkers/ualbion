@@ -14,8 +14,8 @@ namespace UAlbion.Game.Gui.Status
         const int MaxPortraits = 6;
         readonly UiSpriteElement<SlabId> _sprite;
         readonly StatusBarPortrait[] _portraits;
-        readonly TextBlockElement _hoverText;
-        readonly TextBlockElement _descriptionText;
+        readonly TextElement _hoverText;
+        readonly TextElement _descriptionText;
         readonly FixedPosition _hoverTextContainer;
         readonly FixedPosition _descriptionTextContainer;
 
@@ -37,8 +37,8 @@ namespace UAlbion.Game.Gui.Status
                 Children.Add(_portraits[i]);
             }
 
-            _hoverText = new TextBlockElement("").Center().NoWrap();
-            _descriptionText = new TextBlockElement("").Center();
+            _hoverText = new TextElement("").Center().NoWrap();
+            _descriptionText = new TextElement("").Center();
             _hoverTextContainer = AttachChild(new FixedPosition(new Rectangle(181, 196, 177, 10), _hoverText));
             _descriptionTextContainer = AttachChild(new FixedPosition(new Rectangle(181, 208, 177, 30), _descriptionText));
         }

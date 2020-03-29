@@ -20,12 +20,19 @@ namespace UAlbion.Game.State
 
         public DateTime Time => Epoch + new TimeSpan(_game.Days, _game.Hours, _game.Minutes, 0);
         IParty IGameState.Party => _party;
-        Func<NpcCharacterId, ICharacterSheet> IGameState.GetNpc => x => _game.Npcs.TryGetValue(x, out var sheet) ? sheet : null;
-        Func<ChestId, IChest> IGameState.GetChest => x => _game.Chests.TryGetValue(x, out var chest) ? chest : null;
-        Func<MerchantId, IChest> IGameState.GetMerchant => x => _game.Merchants.TryGetValue(x, out var merchant) ? merchant : null;
-        public Func<int, int> GetTicker => x => _game.Tickers.TryGetValue(x, out var value) ? value : 0;
-        public Func<int, int> GetSwitch  => x => _game.Switches.TryGetValue(x, out var value) ? value : 0;
-        public MapDataId MapId => _game.MapId;
+        Func<NpcCharacterId, ICharacterSheet> IGameState.GetNpc => 
+            x => _game != null && _game.Npcs.TryGetValue(x, out var sheet) ? sheet : null;
+        Func<ChestId, IChest> IGameState.GetChest => 
+            x => _game != null &&_game.Chests.TryGetValue(x, out var chest) ? chest : null;
+        Func<MerchantId, IChest> IGameState.GetMerchant => 
+            x => _game != null &&_game.Merchants.TryGetValue(x, out var merchant) ? merchant : null;
+        Func<PartyCharacterId, ICharacterSheet> IGameState.GetPartyMember => 
+            x => _game != null &&_game.PartyMembers.TryGetValue(x, out var member) ? member : null;
+        public Func<int, int> GetTicker => 
+            x => _game != null &&_game.Tickers.TryGetValue(x, out var value) ? value : 0;
+        public Func<int, int> GetSwitch =>
+            x => _game != null &&_game.Switches.TryGetValue(x, out var value) ? value : 0;
+        public MapDataId MapId => _game?.MapId ?? 0;
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<GameState, NewGameEvent>((x, e) => x.NewGame(e.MapId, e.X, e.Y)),
@@ -37,8 +44,12 @@ namespace UAlbion.Game.State
                 if (x._game != null)
                     x._game.MapId = e.MapId;
             }),
-            H<GameState, SetTemporarySwitchEvent>((x, e) => { }),
-            H<GameState, SetTickerEvent>((x, e) => { }),
+            H<GameState, SetTemporarySwitchEvent>((x, e) => x._game.Switches[e.SwitchId] = e.SwitchValue),
+            H<GameState, SetTickerEvent>((x, e) =>
+            {
+                x._game.Tickers.TryGetValue(e.TickerId, out var curValue);
+                x._game.Tickers[e.TickerId] = e.Operation.Apply(curValue, e.Amount, 0, 255);
+            }),
             H<GameState, ChangeTimeEvent>((x, e) => { })
         );
 

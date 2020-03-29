@@ -10,21 +10,19 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Text
 {
-    /// <summary>
-    /// A UI element containing a single TextBlock (i.e. a block of text sharing the same formatting options)
-    /// </summary>
-    public class TextBlockElement : UiElement
+    public class TextElement : UiElement
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<TextBlockElement, SetLanguageEvent>((x,e) => x._lastVersion = 0) // Force a rebuild on next render
+            H<TextElement, SetLanguageEvent>((x,e) => x._lastVersion = 0) // Force a rebuild on next render
         );
 
         readonly TextBlock _block = new TextBlock();
         IText _source;
         int _lastVersion;
         Rectangle _lastExtents;
+        int? _blockFilter;
 
-        public TextBlockElement(string literal) : base(Handlers)
+        public TextElement(string literal) : base(Handlers)
         {
             _source = new DynamicText(() =>
             {
@@ -33,7 +31,7 @@ namespace UAlbion.Game.Gui.Text
             });
         }
 
-        public TextBlockElement(StringId id) : base(Handlers)
+        public TextElement(StringId id) : base(Handlers)
         {
             _source = new DynamicText(() =>
             {
@@ -44,16 +42,16 @@ namespace UAlbion.Game.Gui.Text
                 return new[] { _block };
             });
         }
-        public TextBlockElement(IText source) : base(Handlers) { _source = source; }
+        public TextElement(IText source) : base(Handlers) { _source = source; }
         public override string ToString() => $"TextSection {_source?.ToString() ?? _block?.ToString()}";
-        public TextBlockElement Bold() { _block.Style = TextStyle.Fat; return this; }
-        public TextBlockElement Color(FontColor color) { _block.Color = color; return this; }
-        public TextBlockElement Left() { _block.Alignment = TextAlignment.Left; return this; }
-        public TextBlockElement Center() { _block.Alignment = TextAlignment.Center; return this; }
-        public TextBlockElement Right() { _block.Alignment = TextAlignment.Right; return this; }
-        public TextBlockElement NoWrap() { _block.Arrangement |= TextArrangement.NoWrap; return this; }
-        public TextBlockElement Source(IText source) { _source = source; _lastVersion = 0; return this; }
-        public TextBlockElement LiteralString(string literal)
+        public TextElement Bold() { _block.Style = TextStyle.Fat; return this; }
+        public TextElement Color(FontColor color) { _block.Color = color; return this; }
+        public TextElement Left() { _block.Alignment = TextAlignment.Left; return this; }
+        public TextElement Center() { _block.Alignment = TextAlignment.Center; return this; }
+        public TextElement Right() { _block.Alignment = TextAlignment.Right; return this; }
+        public TextElement NoWrap() { _block.Arrangement |= TextArrangement.NoWrap; return this; }
+        public TextElement Source(IText source) { _source = source; _lastVersion = 0; return this; }
+        public TextElement LiteralString(string literal)
         {
             _source = new DynamicText(() =>
             {
@@ -62,6 +60,19 @@ namespace UAlbion.Game.Gui.Text
             });
             _lastVersion = 0;
             return this;
+        }
+
+        public int? BlockFilter
+        {
+            get => _blockFilter;
+            set
+            {
+                if (_blockFilter == value)
+                    return;
+
+                _blockFilter = value;
+                _lastVersion = 0;
+            }
         }
 
         IEnumerable<TextLine> BuildLines(Rectangle extents, IEnumerable<TextBlock> blocks)
@@ -89,6 +100,7 @@ namespace UAlbion.Game.Gui.Text
         {
             if (extents == _lastExtents && _source.Version <= _lastVersion)
                 return;
+
             _lastVersion = _source.Version;
             _lastExtents = extents;
 
@@ -96,7 +108,8 @@ namespace UAlbion.Game.Gui.Text
                 child.Detach();
             Children.Clear();
 
-            foreach (var line in BuildLines(extents, _source.Get()))
+            var filtered = _source.Get().Where(x => _blockFilter == null || x.BlockId == _blockFilter);
+            foreach (var line in BuildLines(extents, filtered))
                 AttachChild(line);
         }
 

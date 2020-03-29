@@ -327,18 +327,30 @@ namespace UAlbion
             } while (e != null);
         }
 
-        static void PrintEvent(StreamWriter sw, EventFormatter formatter, IEventNode e)
+        static void PrintEvent(StreamWriter sw, EventFormatter formatter, IEventNode e, int? chainId)
         {
-            sw.Write("    ");
+            if(chainId.HasValue)
+            {
+                sw.Write('C');
+                sw.Write(chainId.Value.ToString().PadRight(3));
+            }
+            else
+                sw.Write("    ");
+
             sw.WriteLine(formatter.GetText(e));
         }
 
         static void DumpMapEvents(StreamWriter sw, IAssetManager assets, MapDataId mapId, IMapData map)
         {
             var formatter = new EventFormatter(assets, AssetType.MapText, (int)mapId);
+            sw.WriteLine();
             sw.WriteLine($"Map {(int)mapId} {mapId}:");
-            foreach(var e in map.Events)
-                PrintEvent(sw, formatter, e);
+            foreach (var e in map.Events)
+            {
+                var chainId = map.Chains.Select((x, i) => x.FirstEvent == e ? i : (int?) null).FirstOrDefault(x => x != null);
+                PrintEvent(sw, formatter, e, chainId);
+            }
+
             /*
             var rootNodes = new HashSet<(bool, TriggerType, int)>();
             foreach (var zone in map.Zones)
@@ -375,6 +387,7 @@ namespace UAlbion
             using var sw = File.CreateText($@"{baseDir}\re\AllEventSets.txt");
             foreach (var eventSetId in Enum.GetValues(typeof(EventSetId)).Cast<EventSetId>())
             {
+                sw.WriteLine();
                 sw.WriteLine($"EventSet{(int)eventSetId}:");
                 var set = assets.LoadEventSet(eventSetId);
                 if (set == null)
@@ -382,7 +395,10 @@ namespace UAlbion
 
                 var formatter = new EventFormatter(assets, AssetType.EventText, (int)eventSetId);
                 foreach (var e in set.Events)
-                    PrintEvent(sw, formatter, e);
+                {
+                    var chainId = set.Chains.Select((x, i) => x.FirstEvent == e ? i : (int?) null).FirstOrDefault(x => x != null);
+                    PrintEvent(sw, formatter, e, chainId);
+                }
             }
         }
     }

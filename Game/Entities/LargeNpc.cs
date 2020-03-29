@@ -8,7 +8,6 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
-using UAlbion.Game.Gui;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.Text;
@@ -41,7 +40,7 @@ namespace UAlbion.Game.Entities
 
         void OnRightClick(RightClickEvent rightClickEvent)
         {
-            if (_npc.Chain == null)
+            if (_npc.Chain == null || _npc.Id == null)
                 return;
 
             var window = Resolve<IWindowManager>();
@@ -49,28 +48,33 @@ namespace UAlbion.Game.Entities
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
 
-            IText S(SystemTextId textId) => new DynamicText(() =>
+            IText S(SystemTextId textId) 
+                => new DynamicText(() =>
                 {
                     var template = assets.LoadString(textId, settings.Gameplay.Language);
-                    return new TextFormatter(assets, settings.Gameplay.Language).Centre().Format(template).Blocks;
+                    return new TextFormatter(assets, settings.Gameplay.Language)
+                        .NoWrap()
+                        .Centre()
+                        .Format(template).Blocks;
                 });
 
             var normPosition = camera.ProjectWorldToNorm(_sprite.Position);
-            var uiPosition = window.NormToUi(new Vector2(normPosition.X, normPosition.Y));
+            var uiPosition = window.NormToUi(normPosition.X, normPosition.Y);
+
             var heading = S(SystemTextId.MapPopup_Person);
+            var options = new List<ContextMenuOption>
+            {
+                new ContextMenuOption(
+                    S(SystemTextId.MapPopup_TalkTo),
+                    new TriggerChainEvent(_npc.Chain, _npc.Chain.FirstEvent, TriggerType.TalkTo, _npc.Id.Value),
+                    ContextMenuGroup.Actions),
 
-            var options = new List<ContextMenuOption>();
-
-            options.Add(new ContextMenuOption(
-                S(SystemTextId.MapPopup_TalkTo),
-                new TriggerChainEvent(_npc.Chain, _npc.Chain.FirstEvent, TriggerType.TalkTo, (byte)_sprite.TilePosition.X, (byte)_sprite.TilePosition.Y),
-                ContextMenuGroup.Actions));
-
-            options.Add(new ContextMenuOption(
+                new ContextMenuOption(
                     S(SystemTextId.MapPopup_MainMenu),
                     new PushSceneEvent(SceneId.MainMenu),
                     ContextMenuGroup.System
-                ));
+                )
+            };
 
             Raise(new ContextMenuEvent(uiPosition, heading, options));
             rightClickEvent.Propagating = false;

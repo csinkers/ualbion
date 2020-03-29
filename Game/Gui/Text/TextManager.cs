@@ -43,7 +43,8 @@ namespace UAlbion.Game.Gui.Text
         };
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<TextManager, TextEvent>((x,e) => x.OnTextEvent(e))
+            H<TextManager, TextEvent>((x,e) => x.OnTextEvent(e)),
+            H<TextManager, StartDialogueEvent>((x, e) => x.StartDialogue(e))
         );
 
         public TextManager() : base(Handlers) { }
@@ -100,7 +101,7 @@ namespace UAlbion.Game.Gui.Text
                 // Adjust texture coordinates slightly to avoid bleeding
                 // var texOffset = subImage.TexOffset.Y + 0.1f / font.Height;
 
-                var normPosition = window.UiToNormRelative(new Vector2(offset, 0));
+                var normPosition = window.UiToNormRelative(offset, 0);
                 var baseInstance = SpriteInstanceData.TopLeft(
                     new Vector3(normPosition, 0),
                     window.UiToNormRelative(subImage.Size),
@@ -113,19 +114,19 @@ namespace UAlbion.Game.Gui.Text
                     instances[n + 2] = baseInstance;
                     instances[n + 3] = baseInstance;
 
-                    instances[n].OffsetBy(new Vector3(window.UiToNormRelative(new Vector2(2, 1)), 0));
+                    instances[n].OffsetBy(new Vector3(window.UiToNormRelative(2, 1), 0));
                     instances[n].Flags |= SpriteFlags.DropShadow;
 
-                    instances[n + 1].OffsetBy(new Vector3(window.UiToNormRelative(new Vector2(1, 1)), 0));
+                    instances[n + 1].OffsetBy(new Vector3(window.UiToNormRelative(1, 1), 0));
                     instances[n + 1].Flags |= SpriteFlags.DropShadow;
 
-                    instances[n + 2].OffsetBy(new Vector3(window.UiToNormRelative(new Vector2(1, 0)), 0));
+                    instances[n + 2].OffsetBy(new Vector3(window.UiToNormRelative(1, 0), 0));
                     offset += 1;
                 }
                 else
                 {
                     instances[n].Flags |= SpriteFlags.DropShadow;
-                    instances[n].OffsetBy(new Vector3(window.UiToNormRelative(new Vector2(1, 1)), 0));
+                    instances[n].OffsetBy(new Vector3(window.UiToNormRelative(1, 1), 0));
                 }
 
                 offset += (int)subImage.Size.X;
@@ -188,9 +189,10 @@ namespace UAlbion.Game.Gui.Text
         }
 
         public IText FormatTextEvent(TextEvent textEvent, FontColor color)
-        {
-            var id = textEvent.TextId;
+            => FormatText(new StringId(textEvent.Source.Type, textEvent.Source.Id, textEvent.TextId), color);
 
+        public IText FormatText(StringId id, FontColor color)
+        {
             return new DynamicText(() =>
             {
                 var assets = Resolve<IAssetManager>();
@@ -198,19 +200,19 @@ namespace UAlbion.Game.Gui.Text
                 var textFormatter = new TextFormatter(assets, settings.Gameplay.Language);
                 return textFormatter
                     .Ink(color)
-                    .Format(new StringId(textEvent.Source.Type, textEvent.Source.Id, id))
+                    .Format(id)
                     .Blocks;
             });
         }
 
         void OnTextEvent(TextEvent textEvent)
         {
-            textEvent.Acknowledged = true;
             switch(textEvent.Location)
             {
                 case TextEvent.TextLocation.TextInWindow:
                 {
-                    var dialog = AttachChild(new TextWindow(FormatTextEvent(textEvent, FontColor.Yellow)));
+                    textEvent.Acknowledged = true;
+                    var dialog = AttachChild(new TextDialog(FormatTextEvent(textEvent, FontColor.Yellow)));
                     dialog.Closed += (sender, _) => textEvent.Complete();
                     break;
                 }
@@ -218,23 +220,45 @@ namespace UAlbion.Game.Gui.Text
                 case TextEvent.TextLocation.TextInWindowWithPortrait:
                 case TextEvent.TextLocation.TextInWindowWithPortrait2:
                 {
-                        
+                    textEvent.Acknowledged = true;
                     SmallPortraitId portraitId = textEvent.PortraitId ?? Resolve<IParty>().Leader.ToPortraitId();
-                    var dialog = AttachChild(new TextWindow(FormatTextEvent(textEvent, FontColor.Yellow), portraitId));
+                    var dialog = AttachChild(new TextDialog(FormatTextEvent(textEvent, FontColor.Yellow), portraitId));
                     dialog.Closed += (sender, _) => textEvent.Complete();
                     break;
                 }
 
                 case TextEvent.TextLocation.QuickInfo:
+                    textEvent.Acknowledged = true;
                     Raise(new DescriptionTextExEvent(FormatTextEvent(textEvent, FontColor.White)));
                     textEvent.Complete();
                     break;
 
+                case TextEvent.TextLocation.Conversation:
+                case TextEvent.TextLocation.ConversationQuery:
+                case TextEvent.TextLocation.ConversationOptions:
+                case TextEvent.TextLocation.StandardOptions:
+                    break; // Handled by Conversation
+
                 default:
+                    textEvent.Acknowledged = true;
                     Raise(new DescriptionTextExEvent(FormatTextEvent(textEvent, FontColor.White))); // TODO:
                     textEvent.Complete();
                     break;
             }
+        }
+
+        void StartDialogue(StartDialogueEvent e)
+        {
+            e.Acknowledged = true;
+            var party = Resolve<IParty>();
+            var assets = Resolve<IAssetManager>();
+            var eventSet = assets.LoadEventSet(e.EventSet);
+            var conversation = AttachChild(new Conversation(
+                party?.Leader ?? PartyCharacterId.Tom,
+                e.Context?.NpcId ?? NpcCharacterId.Ned,
+                eventSet));
+
+            conversation.Complete += (sender, args) => e.Complete();
         }
     }
 }

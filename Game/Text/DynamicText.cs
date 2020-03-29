@@ -8,7 +8,7 @@ namespace UAlbion.Game.Text
 {
     public class DynamicText : IText
     {
-        public delegate  IEnumerable<TextBlock> GeneratorFunc();
+        public delegate IEnumerable<TextBlock> GeneratorFunc();
         readonly GeneratorFunc _generator;
         readonly Func<int, int> _getVersion;
 #if DEBUG

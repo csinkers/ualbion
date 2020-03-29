@@ -8,9 +8,13 @@ namespace UAlbion.Core
 {
     /// <summary>
     /// Component is effectively the base class of all game objects.
-    /// Each component belongs to a single EventExchange, and ideally communicates with other components primarily via sending and receiving events through the exchange.
-    /// In general, direct calls should only be used for read-only information retrieval.
+    /// Each component belongs to a single EventExchange, and ideally communicates with
+    /// other components solely via sending and receiving events through its exchange.
+    ///
+    /// In general, direct calls should only be used for read-only information retrieval, and
+    /// where possible should be done via Resolve to obtain an interface to game sub-systems.
     /// Anything that modifies data, has side effects etc should be performed using an event.
+    ///
     /// This has benefits for tracing, reproducibility and modularity, and also provides a
     /// convenient interface for console commands, key-bindings etc.
     /// </summary>
@@ -18,7 +22,7 @@ namespace UAlbion.Core
     {
         // Used when null is passed to the constructor so we
         // won't need null checks when accessing _handlers.
-        static readonly HandlerSet EmptySet = new HandlerSet();
+        protected static readonly HandlerSet EmptyHandlerSet = new HandlerSet();
 
         protected abstract class Handler
         {
@@ -30,7 +34,7 @@ namespace UAlbion.Core
         protected class Handler<TInstance, TEvent> : Handler where TInstance : Component
         {
             readonly Action<TInstance, TEvent> _callback;
-            public Handler(Action<TInstance, TEvent> callback) : base(typeof(TEvent)) { _callback = callback; }
+            public Handler(Action<TInstance, TEvent> callback) : base(typeof(TEvent)) => _callback = callback;
             public override void Invoke(Component instance, IEvent @event) => _callback((TInstance)instance, (TEvent)@event);
         }
 
@@ -69,7 +73,7 @@ namespace UAlbion.Core
         protected Component() : this(null) { }
         protected Component(IDictionary<Type, Handler> handlers)
         {
-            _handlers = handlers ?? EmptySet;
+            _handlers = handlers ?? EmptyHandlerSet;
         }
 
         protected T AttachChild<T>(T child) where T : IComponent

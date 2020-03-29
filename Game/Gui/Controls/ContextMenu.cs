@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
@@ -11,11 +10,9 @@ namespace UAlbion.Game.Gui.Controls
 {
     public class ContextMenu : Dialog
     {
-        const string ButtonKeyPattern = "Context.Option";
         static readonly HandlerSet Handlers = new HandlerSet(
             H<ContextMenu, ContextMenuEvent>((x, e) => { x.Display(e); }),
-            H<ContextMenu, ButtonPressEvent>((x, e) => x.OnButton(e.ButtonId)),
-            H<ContextMenu, CloseDialogEvent>((x, e) => x.Display(null))
+            H<ContextMenu, CloseWindowEvent>((x, e) => x.Display(null))
         );
         ContextMenuEvent _event;
 
@@ -27,19 +24,9 @@ namespace UAlbion.Game.Gui.Controls
             registerHitFunc(order, this);
             return maxOrder;
         }
-        void OnButton(string buttonId)
+
+        void OnButton(ContextMenuOption option)
         {
-            if (_event == null || !buttonId.StartsWith(ButtonKeyPattern))
-                return;
-
-            if (!int.TryParse(buttonId.Substring(ButtonKeyPattern.Length), out var id) ||
-                id >= _event.Options.Count)
-            {
-                Raise(new LogEvent(LogEvent.Level.Warning, $"Out of range context menu button event received: {buttonId} ({_event.Options.Count} context elements)"));
-                return;
-            }
-
-            var option = _event.Options[id];
             Close();
             Raise(option.Event);
         }
@@ -71,15 +58,15 @@ namespace UAlbion.Game.Gui.Controls
             };
 
             ContextMenuGroup? lastGroup = null;
-            for(int i = 0; i < _event.Options.Count; i++)
+            foreach (var option in _event.Options)
             {
-                var option = _event.Options[i];
                 lastGroup ??= option.Group;
                 if(lastGroup != option.Group)
                     elements.Add(new Spacing(0, 2));
                 lastGroup = option.Group;
 
-                elements.Add(new Button(ButtonKeyPattern + i, option.Text));
+                var option1 = option;
+                elements.Add(new Button(option.Text, () => OnButton(option1)));
             }
 
             var frame = new DialogFrame(new VerticalStack(elements));

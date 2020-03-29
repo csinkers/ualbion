@@ -43,8 +43,8 @@ namespace UAlbion.Game.Gui.Controls
         void Rebuild()
         {
             var window = Resolve<IWindowManager>();
-            var position = new Vector3(window.UiToNorm(new Vector2(_extents.X, _extents.Y)), 0);
-            var size = window.UiToNormRelative(new Vector2(_extents.Width, _extents.Height));
+            var position = new Vector3(window.UiToNorm(_extents.X, _extents.Y), 0);
+            var size = window.UiToNormRelative(_extents.Width, _extents.Height);
 
             var instances = _sprite.Access();
             instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, 0, 0);

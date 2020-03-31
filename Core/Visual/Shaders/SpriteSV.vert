@@ -26,11 +26,12 @@ layout(location = 8) in int  iTexLayer;
 layout(location = 9) in uint iFlags;
 
 // Outputs to fragment shader
-layout(location = 0) out vec2 oTexPosition;   // Texture Coordinates
-layout(location = 1) out flat float oLayer;   // Texture Layer
-layout(location = 2) out flat uint oFlags;    // Flags
-layout(location = 3) out vec2 oNormCoords;    // Normalised sprite coordinates
-layout(location = 4) out vec3 oWorldPosition; // World position
+layout(location = 0) out vec2 oTexPosition;      // Texture Coordinates
+layout(location = 1) out flat float oLayer;      // Texture Layer
+layout(location = 2) out flat uint oFlags;       // Flags
+layout(location = 3) out vec2 oNormCoords;       // Normalised sprite coordinates
+layout(location = 4) out vec3 oWorldPosition;    // World position
+layout(location = 5) out flat float oFrontDepth; // Sprite front depth
 
 void main()
 {
@@ -39,40 +40,53 @@ void main()
 	vec4 worldSpace = transform * vec4(vPosition, 0, 1);
 
 	vec4 normPosition;
+	
+	float frontDepth;
 
 	if ((uFlags & SKF_NO_TRANSFORM) == 0)
 	{
-		mat4 worldTransform = uView * transform;
+		mat4 viewTransform = uView * transform;
 
 		if ((iFlags & SF_BILLBOARD) != 0)
 		{
-			worldTransform[0] = transform[0];
-			worldTransform[1] = transform[1];
+			viewTransform[0] = transform[0];
+			viewTransform[1] = transform[1];
 		}
 
-		normPosition = uProjection * worldTransform * vec4(vPosition, 0, 1);
-    
+		vec4 viewPosition = viewTransform * vec4(vPosition, 0, 1);
+		normPosition = uProjection * viewPosition;
+		
 		if ((iFlags & SF_BILLBOARD) != 0)
 		{
-			float cx = cos(-u_camera_look_direction.x + 1.5708);
-			float sx = sin(-u_camera_look_direction.x + 1.5708);
-
-			vec4 rotPosition = uProjection * uView * transform * mat4(
+			vec4 centerView = uView * transform * vec4(0, 0, 0, 1);
+			float angle = atan(centerView.z, centerView.x) - u_camera_look_direction.x; // rotate to form a line
+			
+			float cx = cos(angle);
+			float sx = sin(angle);
+	
+			vec4 rotPosition = uView * transform * mat4(
 				cx, 0, sx, 0,
 				0, 1, 0, 0,
-			   -sx, 0, cx, 0,
-				0, 0, 0, 1) * vec4(0.354, 0, 0, 1);
-
-			float depth = rotPosition[2] / rotPosition[3];
-
-			depth = depth <= 0.0 ? min(0, normPosition[2] / normPosition[3]) : depth; // switch to original depth if before the near plane - not working
-
-			normPosition[2] = depth * normPosition[3];
+				 -sx, 0, cx, 0,
+				0, 0, 0, 1) * vec4(-0.5, 0, 0, 1); // get the closest point
+				
+			if(rotPosition.z / rotPosition.w >= 0) // beyond the near clip plane
+			{
+				rotPosition.z = max(0, viewPosition.z / viewPosition.w) * rotPosition.w;
+			}
+			
+			rotPosition = uProjection * rotPosition;
+			frontDepth = rotPosition.z / rotPosition.w;
+		}
+		else
+		{
+			frontDepth = normPosition.z;
 		}
 	}
 	else
 	{
 		normPosition = worldSpace;
+		frontDepth = normPosition.z;
 	}
 
 	gl_Position = normPosition;
@@ -82,5 +96,6 @@ void main()
 	oFlags = iFlags;
 	oNormCoords = vTexCoords;
 	oWorldPosition = worldSpace.xyz;
+	oFrontDepth = frontDepth;
 }
 

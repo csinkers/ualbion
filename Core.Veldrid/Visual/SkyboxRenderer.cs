@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -150,7 +150,9 @@ namespace UAlbion.Core.Veldrid.Visual
 
             ITextureManager textureManager = Resolve<ITextureManager>();
             IDeviceObjectManager dom = Resolve<IDeviceObjectManager>();
-            PerspectiveCamera camera = (PerspectiveCamera)Resolve<ICamera>();
+            PerspectiveCamera camera = Resolve<ICamera>() as PerspectiveCamera;
+            if (camera == null)
+                return;
             var skybox = (SkyboxRenderable)renderable;
 
             cl.PushDebugGroup(skybox.Name);

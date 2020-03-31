@@ -1,27 +1,40 @@
 ﻿using System;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryCharacterPane : UiElement
     {
         readonly Func<InventoryPage> _getPage;
-        public const string SummaryButtonId = "Inventory.SummaryPage";
-        public const string StatsButtonId = "Inventory.StatsPage";
-        public const string MiscButtonId = "Inventory.MiscPage";
 
         readonly Button _summaryButton;
         readonly Button _statsButton;
         readonly Button _miscButton;
 
-        public InventoryCharacterPane(PartyCharacterId activeCharacter, Func<InventoryPage> getPage)
+        public InventoryCharacterPane(PartyCharacterId activeCharacter, Func<InventoryPage> getPage, Action<InventoryPage> setPage)
         {
             _getPage = getPage;
             var page = _getPage();
-            _summaryButton = new Button(SummaryButtonId, "I") { DoubleFrame = true, IsPressed = page == InventoryPage.Summary };
-            _statsButton = new Button(StatsButtonId, "II") { DoubleFrame = true, IsPressed = page == InventoryPage.Stats };
-            _miscButton = new Button(MiscButtonId, "III") { DoubleFrame = true, IsPressed = page == InventoryPage.Misc };
+            _summaryButton = new Button("I", () => setPage(InventoryPage.Summary))
+            {
+                DoubleFrame = true,
+                IsPressed = page == InventoryPage.Summary
+            };
+
+            _statsButton = new Button("II", () => setPage(InventoryPage.Stats))
+            {
+                DoubleFrame = true,
+                IsPressed = page == InventoryPage.Stats
+            };
+
+            _miscButton = new Button("III", () => setPage(InventoryPage.Misc))
+            {
+                DoubleFrame = true,
+                IsPressed = page == InventoryPage.Misc
+            };
+
             var buttonStack =
                 new FixedPosition(
                     new Rectangle(84, 174, 50, 15),

@@ -54,9 +54,9 @@ namespace UAlbion.Formats.Assets
 
         public string GetName(GameLanguage language) => language switch
         {
-            GameLanguage.English => EnglishName,
+            GameLanguage.English => string.IsNullOrWhiteSpace(EnglishName) ? GermanName : EnglishName,
             GameLanguage.German => GermanName,
-            GameLanguage.French => FrenchName,
+            GameLanguage.French => string.IsNullOrWhiteSpace(FrenchName) ? GermanName : FrenchName,
             _ => throw new InvalidOperationException($"Unexpected language {language}")
         };
 

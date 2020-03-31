@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Numerics;
 using System.Threading.Tasks;
 using UAlbion.Api;
@@ -16,7 +17,11 @@ using UAlbion.Game.Debugging;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
+using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Inventory;
+using UAlbion.Game.Gui.Menus;
+using UAlbion.Game.Gui.Status;
+using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Input;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.State;
@@ -54,12 +59,27 @@ namespace UAlbion
                 global.Raise(new QuitEvent(), null);
 
             PerfTracker.StartupEvent("Running game");
-            // global.Raise(new NewGameEvent(MapDataId.Jirinaar3D, 40, 40), null); // Uncomment to test 3D map
-            // global.Raise(new LoadMapEvent(MapDataId.AltesFormergebäude, 10, 10), null); // Uncomment to test 3D map with different object alignment
-            // global.Raise(new LoadMapEvent(MapDataId.HausDesJägerclans, 10, 10), null); // Uncomment to test 2D map
-            // global.Raise(new NewGameEvent(MapDataId.Toronto2DGesamtkarteSpielbeginn, 30, 75), null); // Uncomment to test new game process
-            // global.Raise(new SetSceneEvent(SceneId.Inventory), null); // Uncomment to test inventory screen
-            global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
+            switch(commandLine.GameMode)
+            {
+                case GameMode.MainMenu:
+                    global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
+                    break;
+                case GameMode.NewGame:
+                    global.Raise(new NewGameEvent(MapDataId.Toronto2DGesamtkarteSpielbeginn, 30, 75), null);
+                    break;
+                case GameMode.LoadGame:
+                    global.Raise(new LoadGameEvent(commandLine.GameModeArgument), null);
+                    break;
+                case GameMode.LoadMap:
+                    global.Raise(new NewGameEvent((MapDataId)int.Parse(commandLine.GameModeArgument), 40, 40), null); 
+                    break;
+                case GameMode.Inventory:
+                    global.Raise(new SetSceneEvent(SceneId.Inventory), null);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            // global.Raise(new StartDialogueEvent((EventSetId)112), null);
             engine.Run();
             // TODO: Ensure all sprite leases returned etc to weed out memory leaks
         }

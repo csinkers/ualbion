@@ -28,7 +28,7 @@ namespace UAlbion.Game.Veldrid.Input
             }
 
             if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && x.Down))
-                Raise(new CloseDialogEvent());
+                Raise(new CloseWindowEvent());
         }
 
         public ContextMenuMouseMode() : base(Handlers) { }

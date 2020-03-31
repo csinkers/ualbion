@@ -8,29 +8,52 @@ namespace UAlbion.Api
 {
     public abstract class Event : IEvent // Contains no fields, only helper methods for reflection-based parsing and serialization.
     {
-        static IEnumerable<Type> GetAllEventTypes()
-        {
-            PerfTracker.StartupEvent("Building event types");
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                if (!assembly.FullName.Contains("Albion"))
-                    continue;
+        static IEnumerable<Assembly> EventAssemblies => 
+            AppDomain.CurrentDomain.GetAssemblies()
+                .Where(assembly => assembly.FullName.Contains("Albion"));
 
-                Type[] types; try { types = assembly.GetTypes(); } catch (ReflectionTypeLoadException e) { types = e.Types; }
-                foreach (var type in types.Where(x => x != null))
-                {
-                    if (typeof(Event).IsAssignableFrom(type) && !type.IsAbstract)
-                    {
-                        var eventAttribute = (EventAttribute)type.GetCustomAttribute(typeof(EventAttribute), false);
-                        if (eventAttribute != null)
-                            yield return type;
-                    }
-                }
+        static IEnumerable<Type> TypesFromAssembly(Assembly assembly)
+        {
+            Type[] types;
+            try
+            {
+                types = assembly.GetTypes();
             }
-            PerfTracker.StartupEvent("Built event types");
+            catch (ReflectionTypeLoadException e)
+            {
+                types = e.Types;
+            }
+
+            return types.Where(x => x != null);
         }
 
-        static readonly IDictionary<Type, EventMetadata> Serializers = GetAllEventTypes().ToDictionary(x => x, x => new EventMetadata(x));
+        public static IEnumerable<Type> AllEventTypes =>
+            from assembly in EventAssemblies 
+            from type in TypesFromAssembly(assembly) 
+            where typeof(Event).IsAssignableFrom(type) && !type.IsAbstract 
+            select type;
+
+        static IEnumerable<Type> AllSerializableEventTypes
+        {
+            get
+            {
+                PerfTracker.StartupEvent("Building event types");
+                foreach (var type in AllEventTypes)
+                {
+                    var eventAttribute = (EventAttribute)type.GetCustomAttribute(
+                        typeof(EventAttribute),
+                        false);
+
+                    if (eventAttribute != null)
+                        yield return type;
+                }
+                PerfTracker.StartupEvent("Built event types");
+            }
+        }
+
+        static readonly IDictionary<Type, EventMetadata> Serializers =
+            AllSerializableEventTypes.ToDictionary(x => x, x => new EventMetadata(x));
+
         static readonly IDictionary<string, EventMetadata> Events =
             Serializers
             .SelectMany(x =>
@@ -45,7 +68,8 @@ namespace UAlbion.Api
             return GetType().Name;
         }
 
-        public static IEnumerable<EventMetadata> GetEventMetadata() => Events.Values.OrderBy(x => x.Name);
+        public static IEnumerable<EventMetadata> GetEventMetadata() =>
+            Events.Values.OrderBy(x => x.Name);
 
         public static Event Parse(string s)
         {

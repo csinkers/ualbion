@@ -18,9 +18,10 @@ namespace UAlbion.Formats.Assets
         public IList<AutomapInfo> Automap { get; } = new List<AutomapInfo>();
         public byte[] AutomapGraphics { get; private set; }
 
-        public static MapData3D Serdes(MapData3D existing, ISerializer s, string name, AssetInfo config)
+        MapData3D(MapDataId id) : base(id) { }
+        public static MapData3D Serdes(MapData3D existing, ISerializer s, AssetInfo config)
         {
-            var map = existing ?? new MapData3D();
+            var map = existing ?? new MapData3D((MapDataId)config.Id);
             map.CeilingFlags = s.UInt8(nameof(CeilingFlags), map.CeilingFlags); // 0
             int npcCount = NpcCountTransform.Serdes("NpcCount", map.Npcs.Count, s.UInt8); // 1
             var _ = s.UInt8("MapType", (byte)map.MapType); // 2

@@ -13,13 +13,13 @@ namespace UAlbion.Api
         public string HelpText { get; }
         public EventPartMetadata[] Parts { get; }
         public Func<string[], Event> Parser { get; }
-        readonly Type _type;
+        public Type Type { get; }
 
         public EventMetadata(Type type)
         {
             var eventAttribute = (EventAttribute)type.GetCustomAttribute(typeof(EventAttribute), false);
             var properties = type.GetProperties();
-            _type = type;
+            Type = type;
             Name = eventAttribute.Name;
             HelpText = eventAttribute.HelpText;
             Aliases = eventAttribute.Aliases ?? new string[0];
@@ -61,7 +61,7 @@ namespace UAlbion.Api
 
         Func<string[], Event> BuildParser(ParameterExpression partsParameter)
         {
-            var constructor = _type.GetConstructors().Single();
+            var constructor = Type.GetConstructors().Single();
             var parameters = constructor.GetParameters();
             ApiUtil.Assert(parameters.Length == Parts.Length);
 

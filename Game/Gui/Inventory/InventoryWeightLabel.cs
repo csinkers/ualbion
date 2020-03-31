@@ -3,6 +3,8 @@ using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
+using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.Gui.Text;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
 
@@ -59,7 +61,7 @@ namespace UAlbion.Game.Gui.Inventory
                     .Blocks;
             }, x => _version);
 
-            AttachChild(new ButtonFrame(new TextSection(source))
+            AttachChild(new ButtonFrame(new TextElement(source))
             {
                 State = ButtonState.Pressed,
                 Padding = 0

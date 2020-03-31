@@ -1,6 +1,7 @@
 ﻿using UAlbion.Formats.AssetIds;
-using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
+using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.Gui.Text;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
 
@@ -10,9 +11,6 @@ namespace UAlbion.Game.Gui.Inventory
     {
         const int InventoryWidth = 4;
         const int InventoryHeight = 6;
-        const string GoldButtonId = "Inventory.Gold";
-        const string FoodButtonId = "Inventory.Food";
-        const string GoldSummaryButtonId = "Inventory.GoldSummary";
 
         int _version;
 
@@ -43,12 +41,12 @@ namespace UAlbion.Game.Gui.Inventory
             HorizontalStack moneyAndFoodStack;
             if (showTotalPartyGold)
             {
-                var money = new Button(GoldSummaryButtonId,
+                var money = new Button(
                     new VerticalStack(
                         new Spacing(64, 0),
                         new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiGold) { Highlighted = true },
-                        new TextSection("Total party gold $10.0")
-                    ) { Greedy = false}
+                        new TextElement("Total party gold $10.0")
+                    ) { Greedy = false}, () => { } // TODO: Make button functional
                 ) { IsPressed = true };
                 moneyAndFoodStack = new HorizontalStack(money);
             }
@@ -61,12 +59,13 @@ namespace UAlbion.Game.Gui.Inventory
                     return new[] {new TextBlock($"{gold / 10}.{gold % 10}")};
                 }, x => _version);
 
-                var goldButton = new Button(GoldButtonId,
+                var goldButton = new Button(
                     new VerticalStack(
                         new Spacing(31, 0),
                         new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiGold),
-                        new TextSection(goldSource)
-                    ) { Greedy = false });
+                        new TextElement(goldSource)
+                    ) { Greedy = false }, () => { } // TODO: Make button functional
+                );
 
                 var foodSource = new DynamicText(() =>
                 {
@@ -75,12 +74,13 @@ namespace UAlbion.Game.Gui.Inventory
                     return new[] { new TextBlock(food.ToString()) };
                 }, x => _version);
 
-                var foodButton = new Button(FoodButtonId,
+                var foodButton = new Button(
                     new VerticalStack(
                         new Spacing(31, 0),
                         new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiFood),
-                        new TextSection(foodSource)
-                    ) { Greedy = false });
+                        new TextElement(foodSource)
+                    ) { Greedy = false }, () => { } // TODO: Make button functional
+                );
                 moneyAndFoodStack = new HorizontalStack(goldButton, foodButton);
             }
 

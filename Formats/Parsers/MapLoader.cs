@@ -24,9 +24,9 @@ namespace UAlbion.Formats.Parsers
 
             return mapType switch
             {
-                MapType.TwoD => MapData2D.Serdes((MapData2D)existing, s),
-                MapType.TwoDOutdoors => MapData2D.Serdes((MapData2D)existing, s),
-                MapType.ThreeD => MapData3D.Serdes((MapData3D)existing, s, name, config),
+                MapType.TwoD => MapData2D.Serdes((MapData2D)existing, s, config),
+                MapType.TwoDOutdoors => MapData2D.Serdes((MapData2D)existing, s, config),
+                MapType.ThreeD => MapData3D.Serdes((MapData3D)existing, s, config),
                 _ => throw new NotImplementedException($"Unrecognised map type {mapType} found.")
             };
         }

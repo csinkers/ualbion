@@ -6,7 +6,7 @@ using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
-using UAlbion.Game.Gui;
+using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.Text;
 
@@ -89,7 +89,7 @@ namespace UAlbion.Game.Entities.Map2D
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
 
-            ITextSource S(SystemTextId textId) => new DynamicText(() =>
+            IText S(SystemTextId textId) => new DynamicText(() =>
                 {
                     var template = assets.LoadString(textId, settings.Gameplay.Language);
                     return new TextFormatter(assets, settings.Gameplay.Language).Centre().Format(template).Blocks;
@@ -97,7 +97,7 @@ namespace UAlbion.Game.Entities.Map2D
 
             var worldPosition = new Vector2(x, y) * _map.TileSize;
             var normPosition = camera.ProjectWorldToNorm(new Vector3(worldPosition, 0.0f));
-            var uiPosition = window.NormToUi(new Vector2(normPosition.X, normPosition.Y));
+            var uiPosition = window.NormToUi(normPosition.X, normPosition.Y);
             var heading = S(SystemTextId.MapPopup_Environment);
             var options = new List<ContextMenuOption>();
 

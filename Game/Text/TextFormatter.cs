@@ -107,7 +107,8 @@ namespace UAlbion.Game.Text
                             yield return (Token.Text, character.GetName(_language));
                         else if (active is ItemData item)
                             yield return (Token.Text, item.GetName(_language));
-                        else yield return (Token.Text, "{NAME}");
+                        else 
+                            yield return (Token.Text, "{NAME}");
                         break;
                     }
 
@@ -161,16 +162,6 @@ namespace UAlbion.Game.Text
                         break;
                     }
 
-                    case Token.Word:
-                    {
-                        WordId? word = _assets.ParseWord((string)p);
-                        if(word == null)
-                            yield return (Token.Text, p);
-                        else
-                            yield return (Token.Text, _assets.LoadString(word.Value, _language));
-                        break;
-                    }
-
                     // Change context
                     case Token.Combatant: active = _combatant; break;
                     case Token.Inventory: active = _inventory; break;
@@ -189,24 +180,32 @@ namespace UAlbion.Game.Text
             }
         }
 
-        IEnumerable<TextBlock> TokensToBlocks(IEnumerable<(Token, object)> tokens)
+        IEnumerable<TextBlock> TokensToBlocks(IEnumerable<(Token, object)> tokens, string raw)
         {
             var sb = new StringBuilder();
             var block = new TextBlock();
+#if DEBUG
+            block.Raw = raw;
+#endif
             foreach (var (token, p) in tokens)
             {
-                if (sb.Length > 0 && token != Token.Text)
+                if (sb.Length > 0 && token != Token.Text || token == Token.Block)
                 {
                     block.Text = sb.ToString();
                     yield return block;
+
                     sb.Clear();
-                    block = new TextBlock
+                    int blockId = token == Token.Block ? (int)p : block.BlockId;
+                    block = new TextBlock(blockId)
                     {
                         Alignment = block.Alignment,
                         Arrangement = block.Arrangement,
                         Style = block.Style,
                         Color = block.Color,
                     };
+#if DEBUG
+            block.Raw = raw;
+#endif
                 }
 
                 switch (token)
@@ -230,8 +229,23 @@ namespace UAlbion.Game.Text
                         sb.Append((string) p);
                         break;
 
-                    case Token.Block: break; // ???
+                    case Token.Block: break; // Handled above
                     case Token.Tecf: break; // ???
+
+                    case Token.Word:
+                    {
+                        WordId? word = _assets.ParseWord((string)p);
+                        if (word == null)
+                        {
+                            sb.Append((string)p);
+                        }
+                        else
+                        {
+                            // sb.Append(_assets.LoadString(word.Value, _language));
+                            block.AddWord(word.Value);
+                        }
+                        break;
+                    }
                 }
             }
 
@@ -261,20 +275,9 @@ namespace UAlbion.Game.Text
                     Tokeniser.Tokenise(template)
                 ).ToList();
 
-            string CleanWord(string word) => word
-                    .Replace(" ", "")
-                    .Replace("'", "")
-                    .Replace("-", "");
-
-            var words = tokens
-                .Where(x => x.Item1 == Token.Word)
-                .Select(x => (string)x.Item2)
-                .Select(x => Enum.Parse<WordId>(CleanWord(x), true))
-                .ToList();
-
-            var substituted = Substitute(tokens, arguments);
-            var blocks = TokensToBlocks(substituted).ToList();
-            return new TextFormatResult(blocks, words);
+            IEnumerable<(Token, object)> substituted = Substitute(tokens, arguments);
+            var blocks = TokensToBlocks(substituted, template);
+            return new TextFormatResult(blocks);
         }
     }
 }

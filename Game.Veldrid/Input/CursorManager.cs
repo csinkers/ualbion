@@ -188,7 +188,7 @@ namespace UAlbion.Game.Veldrid.Input
             // TODO: Quantity text
             var instances = _itemSprite.Access();
             instances[0] = SpriteInstanceData.TopMid(
-                normPosition + new Vector3(window.UiToNormRelative(new Vector2(6, 6)), 0),
+                normPosition + new Vector3(window.UiToNormRelative(6, 6), 0),
                 window.UiToNormRelative(subImage.Size),
                 subImage, 0);
         }

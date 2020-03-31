@@ -2,6 +2,8 @@
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
+using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.Gui.Text;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
 
@@ -28,15 +30,15 @@ namespace UAlbion.Game.Gui.Inventory
                     new Spacing(4,0),
                     new VerticalStack(
                         new Spacing(0, 4),
-                        new ButtonFrame(new FixedSize(125, 41, new TextSection(summarySource))) { Theme = frameTheme, State = ButtonState.Pressed},
+                        new ButtonFrame(new FixedSize(125, 41, new TextElement(summarySource))) { Theme = frameTheme, State = ButtonState.Pressed},
                         new Spacing(0, 80),
                         new ButtonFrame(
                             new FixedSize(125, 41,
                                 new HorizontalStack(
-                                    new TextSection(pointsHeadingSource),
+                                    new TextElement(pointsHeadingSource),
                                     new Spacing(5,0),
                                     new FixedSize(41, 41,
-                                        new TextSection(pointsSource)
+                                        new TextElement(pointsSource)
                                     ))))
                         { Theme = frameTheme, State = ButtonState.Pressed }
                     ),

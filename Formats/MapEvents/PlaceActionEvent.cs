@@ -21,7 +21,7 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk2 { get; private set; }
         public byte Unk3 { get; private set; }
         public byte Unk4 { get; private set; }
-        public byte Unk5 { get; private set; }
+        public byte Unk5 { get; private set; } // Spell class for learn magic
         public ushort Unk6 { get; private set; }
         public ushort Unk8 { get; private set; }
         public override string ToString() => $"place_action {Type} ({Unk2} {Unk3} {Unk4} {Unk5} {Unk6} {Unk8})";

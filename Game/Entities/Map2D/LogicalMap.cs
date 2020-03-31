@@ -152,23 +152,19 @@ namespace UAlbion.Game.Entities.Map2D
         public void ChangeTileEventChain(byte x, byte y, ushort value)
         {
             var index = Index(x, y);
-            if (value >= 30000)
+            _mapData.ZoneLookup.TryGetValue(index, out var zone);
+            if (zone == null)
+                return;
+
+            if (value >= _mapData.Chains.Count)
             {
-                _mapData.ZoneLookup.TryGetValue(index, out var zone);
-                if (zone != null)
-                {
-                    _mapData.ZoneLookup.Remove(index);
-                    _mapData.Zones.Remove(zone);
-                }
+                _mapData.ZoneLookup.Remove(index);
+                _mapData.Zones.Remove(zone);
             }
             else
             {
-                _mapData.ZoneLookup.TryGetValue(index, out var zone);
-                if (zone != null)
-                {
-                    zone.Chain = _mapData.Chains[value];
-                    zone.Node = zone.Chain.Events.First();
-                }
+                zone.Chain = _mapData.Chains[value];
+                zone.Node = zone.Chain.Events.First();
             }
         }
 

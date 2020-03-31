@@ -17,7 +17,7 @@ namespace UAlbion.Game.Events
 
     public class HoverTextExEvent : GameEvent
     {
-        public HoverTextExEvent(ITextSource source) { Source = source; }
-        public ITextSource Source { get; }
+        public HoverTextExEvent(IText source) { Source = source; }
+        public IText Source { get; }
     }
 }

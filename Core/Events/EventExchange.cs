@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -180,14 +181,16 @@ namespace UAlbion.Core.Events
                 else CoreTrace.Log.StartRaise(eventId, _nesting, e.GetType().Name, eventText, Name);
             }
 
-            if (!_collectLists.TryPop(out var exchanges))
-                exchanges = new HashSet<EventExchange>();
-
-            if (!_dispatchLists.TryPop(out var subscribers))
-                    subscribers = new HashSet<IComponent>();
-
+            HashSet<EventExchange> exchanges;
+            HashSet<IComponent> subscribers;
             lock (SyncRoot)
             {
+                if (!_collectLists.TryPop(out exchanges))
+                    exchanges = new HashSet<EventExchange>();
+
+                if (!_dispatchLists.TryPop(out subscribers))
+                    subscribers = new HashSet<IComponent>();
+
                 CollectExchanges(exchanges, includeParent);
             }
 
@@ -365,6 +368,24 @@ namespace UAlbion.Core.Events
                         _children.RemoveAt(i);
                     else i++;
                 }
+            }
+        }
+
+        public IEnumerable EnumerateRecipients(Type eventType)
+        {
+            lock (SyncRoot)
+            {
+                var exchanges = new HashSet<EventExchange>();
+                var subscribers = new HashSet<IComponent>();
+                var interfaces = eventType.GetInterfaces();
+
+                CollectExchanges(exchanges);
+                foreach (var exchange in exchanges)
+                {
+                    exchange.Collect(subscribers, eventType, interfaces);
+                }
+
+                return subscribers.ToList();
             }
         }
     }

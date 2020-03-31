@@ -3,6 +3,7 @@ using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Assets
 {
@@ -32,10 +33,11 @@ namespace UAlbion.Formats.Assets
         public int[] Underlay { get; private set; }
         public int[] Overlay { get; private set; }
 
-        public static MapData2D Serdes(MapData2D existing, ISerializer s)
+        MapData2D(MapDataId id) : base(id) { }
+        public static MapData2D Serdes(MapData2D existing, ISerializer s, AssetInfo config)
         {
             var startOffset = s.Offset;
-            var map = existing ?? new MapData2D();
+            var map = existing ?? new MapData2D((MapDataId)config.Id);
             map.Flags = s.EnumU8(nameof(Flags), map.Flags); // 0
             int npcCount = s.Transform("NpcCount", map.Npcs.Count, s.UInt8, NpcCountTransform.Instance); // 1
             var _ = s.UInt8("MapType", (byte)map.MapType); // 2

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game
@@ -83,6 +84,7 @@ namespace UAlbion.Game
                     break;
 
                 case HelpEvent helpEvent:
+                {
                     if (string.IsNullOrEmpty(helpEvent.CommandName))
                     {
                         Console.WriteLine();
@@ -93,27 +95,12 @@ namespace UAlbion.Game
                     }
                     else
                     {
-                        Console.WriteLine();
-                        var metadata = Event.GetEventMetadata()
-                            .FirstOrDefault(x => x.Name.Equals(helpEvent.CommandName, StringComparison.InvariantCultureIgnoreCase)
-                            || x.Aliases != null &&
-                               x.Aliases.Any(y => y.Equals(helpEvent.CommandName, StringComparison.InvariantCultureIgnoreCase)));
-
-                        if (metadata != null)
-                        {
-                            PrintDetailedHelp(metadata);
-                        }
-                        else
-                        {
-                            var regex = new Regex(helpEvent.CommandName);
-                            var matchingEvents = Event.GetEventMetadata().Where(x => regex.IsMatch(x.Name)).ToList();
-
-                            if(matchingEvents.Any())
-                                PrintHelpSummary(matchingEvents);
-                            else
-                                Console.WriteLine("The command \"{0}\" is not recognised.", helpEvent.CommandName);
-                        }
+                        PrintHelp(helpEvent.CommandName);
                     }
+                    break;
+                }
+                case WhoEvent whoEvent:
+                    PrintEventConsumers(whoEvent.CommandName);
                     break;
 
                 default:
@@ -125,6 +112,30 @@ namespace UAlbion.Game
                     Console.WriteLine(@event.ToString());
                     break;
                 }
+            }
+        }
+
+        void PrintHelp(string pattern)
+        {
+            Console.WriteLine();
+            var metadata = Event.GetEventMetadata()
+                .FirstOrDefault(x => x.Name.Equals(pattern, StringComparison.InvariantCultureIgnoreCase)
+                || x.Aliases != null &&
+                   x.Aliases.Any(y => y.Equals(pattern, StringComparison.InvariantCultureIgnoreCase)));
+
+            if (metadata != null)
+            {
+                PrintDetailedHelp(metadata);
+            }
+            else
+            {
+                var regex = new Regex(pattern, RegexOptions.IgnoreCase);
+                var matchingEvents = Event.GetEventMetadata().Where(x => regex.IsMatch(x.Name)).ToList();
+
+                if (matchingEvents.Any())
+                    PrintHelpSummary(matchingEvents);
+                else
+                    Console.WriteLine("The command \"{0}\" is not recognised.", pattern);
             }
         }
 
@@ -153,6 +164,45 @@ namespace UAlbion.Game
                 Console.WriteLine("        {0} ({1}): {2}", param.Name, param.PropertyType, param.HelpText);
         }
 
+        void PrintEventConsumers(string pattern)
+        {
+            if (string.IsNullOrEmpty(pattern))
+                return;
+
+            var regex = new Regex(pattern, RegexOptions.IgnoreCase);
+            var matchingEvents = Event.GetEventMetadata()
+                .Where(x => regex.IsMatch(x.Name))
+                .ToList();
+
+            foreach (var e in matchingEvents)
+            {
+                Console.Write("    ");
+                Console.WriteLine(e.Name);
+                foreach (var recipient in _exchange.EnumerateRecipients(e.Type))
+                {
+                    Console.Write("        ");
+                    Console.WriteLine(recipient);
+                }
+            }
+
+            var eventsByTypeName = Event.AllEventTypes
+                .Where(x =>
+                    x.FullName != null &&
+                    regex.IsMatch(x.FullName) &&
+                    matchingEvents.All(y => y.Type != x));
+
+            foreach (var e in eventsByTypeName)
+            {
+                Console.Write("    ");
+                Console.WriteLine(e.Name);
+                foreach (var recipient in _exchange.EnumerateRecipients(e))
+                {
+                    Console.Write("        ");
+                    Console.WriteLine(recipient);
+                }
+            }
+        }
+
         void ConsoleReaderThread()
         {
             do
@@ -165,7 +215,12 @@ namespace UAlbion.Game
                 {
                     var @event = Event.Parse(command);
                     if (@event != null)
+                    {
+                        if(@event is AsyncEvent async)
+                            @event = async.CloneWithCallback(() => Console.WriteLine($"Async event \"{async}\" completed."));
+
                         _queuedEvents.Enqueue(@event);
+                    }
                     else
                         Console.WriteLine("Unknown event \"{0}\"", command);
                 }

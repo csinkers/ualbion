@@ -64,15 +64,15 @@ namespace UAlbion.Formats.Config
             File.WriteAllText(configPath, json);
         }
 
-        public AssetInfo GetAsset(string xldName, int id)
+        public AssetInfo GetAsset(string xldName, int xldSubObject, int id)
         {
             if (!Xlds.TryGetValue(xldName, out var xld))
                 return null;
 
-            if (!xld.Assets.TryGetValue(id, out var asset))
+            if (!xld.Assets.TryGetValue(xldSubObject, out var asset))
             {
                 asset = new BasicAssetInfo { Parent = xld, Id = id };
-                xld.Assets[id] = asset;
+                xld.Assets[xldSubObject] = asset;
             }
 
             return asset;

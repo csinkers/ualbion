@@ -9,6 +9,7 @@ namespace UAlbion.Formats.Assets
 {
     public abstract class BaseMapData : IMapData
     {
+        public MapDataId Id { get; }
         public abstract MapType MapType { get; }
         public byte Width { get; protected set; }
         public byte Height { get; protected set; }
@@ -28,6 +29,8 @@ namespace UAlbion.Formats.Assets
         public IList<object>[] EventReferences { get; private set; }
 #endif
 
+        protected BaseMapData(MapDataId id) { Id = id; }
+
         protected void SerdesZones(ISerializer s)
         {
             int zoneCount = s.UInt16("ZoneCount", (ushort)Zones.Count(x => x.Global));
@@ -46,8 +49,9 @@ namespace UAlbion.Formats.Assets
 
         protected void SerdesEvents(ISerializer s)
         {
+            var source = TextSource.Map(Id);
             ushort eventCount = s.UInt16("EventCount", (ushort)Events.Count);
-            s.List(Events, eventCount, EventNode.Serdes);
+            s.List(Events, eventCount, (i, x, serializer) => EventNode.Serdes(i, x, serializer, source));
             foreach(var e in Events)
                 if(e.NextEventId >= eventCount)
                     throw new InvalidOperationException();
@@ -75,10 +79,11 @@ namespace UAlbion.Formats.Assets
             if(s.Mode == SerializerMode.Reading)
             {
                 ChainsByEventId = new (EventChain, IEventNode)[Events.Count];
+                var textSource = TextSource.Map(Id);
                 for (int i = 0; i < chainOffsets.Count; i++)
                 {
                     var offset = chainOffsets[i];
-                    var chain = new EventChain(i);
+                    var chain = new EventChain(i, textSource);
                     var nextOffset = chainOffsets.Count == i + 1
                         ? Events.Count
                         : chainOffsets[i + 1];
@@ -91,7 +96,6 @@ namespace UAlbion.Formats.Assets
 
                     Chains.Add(chain);
                 }
-
             }
 
             s.Check();
@@ -110,8 +114,13 @@ namespace UAlbion.Formats.Assets
             }
 
             foreach (var npc in Npcs.Values)
+            {
+                // Use map events if the event number is set, otherwise use the event set from the NPC's character sheet.
+                // Note: Event set loading requires IAssetManager, so can't be done directly by UAlbion.Formats code.
+                // Instead, the MapManager will call AttachEventSets with a callback to load the event sets.
                 if (npc.EventNumber.HasValue)
                     (npc.Chain, npc.Node) = ChainsByEventId[npc.EventNumber.Value];
+            }
 
             foreach (var zone in Zones)
             {
@@ -169,6 +178,27 @@ namespace UAlbion.Formats.Assets
         {
             foreach (var npc in Npcs.OrderBy(x => x.Key).Select(x => x.Value))
                 npc.LoadWaypoints(s);
+        }
+
+        public void AttachEventSets(Func<NpcCharacterId, ICharacterSheet> characterSheetLoader, Func<EventSetId, EventSet> eventSetLoader)
+        {
+            // Wire up event sets for NPCs that don't have map-specific events.
+            foreach (var npc in Npcs.Values)
+            {
+                if (npc.Id == null)
+                    continue;
+
+                var characterSheet = characterSheetLoader(npc.Id.Value);
+                if (characterSheet == null) 
+                    continue;
+
+                if (npc.Chain == null)
+                {
+                    var chain = new EventChain(-1, TextSource.Map(Id));
+                    chain.Events.Add(new EventNode(0, new StartDialogueEvent(characterSheet.EventSetId)));
+                    npc.Chain = chain;
+                }
+            }
         }
     }
 }

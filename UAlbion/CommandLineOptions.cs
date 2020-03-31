@@ -4,6 +4,15 @@ using Veldrid;
 
 namespace UAlbion
 {
+    public enum GameMode
+    {
+        MainMenu,
+        NewGame,
+        LoadGame,
+        LoadMap,
+        Inventory
+    }
+
     class CommandLineOptions
     {
         public GraphicsBackend Backend { get; }
@@ -11,6 +20,8 @@ namespace UAlbion
         public bool UseRenderDoc { get; }
         public ExecutionMode Mode { get; }
         public AudioMode AudioMode { get; }
+        public GameMode GameMode { get; }
+        public string GameModeArgument { get; }
 
         public CommandLineOptions(string[] args)
         {
@@ -32,6 +43,7 @@ namespace UAlbion
             }
 
             Mode = ExecutionMode.Game;
+            GameMode = GameMode.MainMenu;
             AudioMode = AudioMode.InProcess;
 
             if (args.Contains("--no-audio"))
@@ -46,6 +58,38 @@ namespace UAlbion
                 Mode = ExecutionMode.SavedGameTests;
             if (args.Contains("--dump-data"))
                 Mode = ExecutionMode.DumpData;
+
+            if (Mode == ExecutionMode.Game)
+            {
+                if (args.Contains("--new-game"))
+                    GameMode = GameMode.NewGame;
+
+                if (args.Contains("--inventory"))
+                    GameMode = GameMode.Inventory;
+
+                var index = FindArgIndex("--load-game", args);
+                if (index > -1)
+                {
+                    GameMode = GameMode.LoadGame;
+                    GameModeArgument = args[index + 1];
+                }
+
+                index = FindArgIndex("--load-map", args);
+                if (index > -1)
+                {
+                    GameMode = GameMode.LoadMap;
+                    GameModeArgument = args[index + 1];
+                }
+            }
+        }
+
+        int FindArgIndex(string argument, string[] arguments)
+        {
+            for (int i = 0; i < arguments.Length; i++)
+                if (arguments[i] == argument)
+                    return i;
+
+            return -1;
         }
 
         void DisplayUsage()
@@ -72,6 +116,13 @@ Execution Mode:
     --editor : Runs the editor (TODO)
     --save-tests : Runs the saved game tests
     --dump-data : Dumps a variety of game data to text files
+
+Game Mode: (if running as game)
+        --main-menu (default)
+        --new-game
+        --load-game <slotNumber>
+        --load-map <mapId>
+        --inventory
 ");
         }
     }

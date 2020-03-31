@@ -12,6 +12,7 @@ namespace UAlbion.Game
     public interface IAssetManager : ITextureLoader
     {
         ITexture LoadTexture(AssetType type, int id);
+        /*
         ITexture LoadTexture(AutoMapId id);
         ITexture LoadTexture(CombatBackgroundId id);
         ITexture LoadTexture(CombatGraphicsId id);
@@ -33,7 +34,7 @@ namespace UAlbion.Game
         ITexture LoadTexture(TacticId id);
         ITexture LoadTexture(FontId id);
         ITexture LoadTexture(MetaFontId id);
-        ITexture LoadTexture(CoreSpriteId id);
+        ITexture LoadTexture(CoreSpriteId id); */
         ITexture LoadFont(FontColor color, bool isBold);
         TilesetData LoadTileData(TilesetId id);
         LabyrinthData LoadLabyrinthData(LabyrinthDataId id);

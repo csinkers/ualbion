@@ -3,12 +3,12 @@
     public enum ActionType : byte
     {
         Word = 0,
-        Unk1 = 1,
-        Unk2 = 2,
+        AskAboutItem = 1,
+        Unk2 = 2, // Pay money? See ES156 (Garris, Gratogel sailor)
         Unk4 = 4,
         Unk5 = 5,
         StartDialogue = 6,
-        Unk7 = 7,
+        FinishDialogue = 7,
         DialogueLine = 8,
         Unk9 = 9,
         Unk14 = 14,

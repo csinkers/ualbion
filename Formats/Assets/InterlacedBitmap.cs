@@ -70,12 +70,12 @@ namespace UAlbion.Formats.Assets
             }
             else
             {
-                img.WriteChunk(s, IFFChunkType.BitmapHeader,  (x, n) => img.SerdesHeader  (x, n) );
-                img.WriteChunk(s, IFFChunkType.ColorMapping, (x, n) => img.SerdesPalette (x, n) );
-                img.WriteChunk(s, IFFChunkType.Hotspot,       (x, n) => img.SerdesHotspot (x, n) );
+                img.WriteChunk(s, IFFChunkType.BitmapHeader, (x, n) => img.SerdesHeader(x, n));
+                img.WriteChunk(s, IFFChunkType.ColorMapping, (x, n) => img.SerdesPalette(x, n));
+                img.WriteChunk(s, IFFChunkType.Hotspot,      (x, n) => img.SerdesHotspot(x, n));
                 s.List(img.ColorRanges, img.ColorRanges.Count, ColorRange.Serdes);
-                img.WriteChunk(s, IFFChunkType.Thumbnail, (x, n) => img.SerdesThumbnail (x, n) );
-                img.WriteChunk(s, IFFChunkType.Body,      (x, n) => img.SerdesPixels    (x, n) );
+                img.WriteChunk(s, IFFChunkType.Thumbnail,    (x, n) => img.SerdesThumbnail(x, n));
+                img.WriteChunk(s, IFFChunkType.Body,         (x, n) => img.SerdesPixels(x, n));
             }
 
             formatChunk.WriteLength(s);
@@ -95,11 +95,11 @@ namespace UAlbion.Formats.Assets
             Height      = s.Int16BE(nameof(Height     ), Height     );
             PosX        = s.Int16BE(nameof(PosX       ), PosX       );
             PosY        = s.Int16BE(nameof(PosY       ), PosY       );
-            NumPlanes   = s.UInt8(nameof(NumPlanes  ), NumPlanes  );
-            Mask        = s.UInt8(nameof(Mask       ), Mask       );
-            Compression = s.UInt8(nameof(Compression), Compression);
-            Padding     = s.UInt8(nameof(Padding    ), Padding    );
-            Transparent = s.Int16(nameof(Transparent), Transparent);
+            NumPlanes   =   s.UInt8(nameof(NumPlanes  ), NumPlanes  );
+            Mask        =   s.UInt8(nameof(Mask       ), Mask       );
+            Compression =   s.UInt8(nameof(Compression), Compression);
+            Padding     =   s.UInt8(nameof(Padding    ), Padding    );
+            Transparent = s.Int16BE(nameof(Transparent), Transparent);
             AspectRatio = s.Int16BE(nameof(AspectRatio), AspectRatio);
             PageWidth   = s.Int16BE(nameof(PageWidth  ), PageWidth  );
             PageHeight  = s.Int16BE(nameof(PageHeight ), PageHeight );
@@ -111,8 +111,8 @@ namespace UAlbion.Formats.Assets
             for (int i = 0; i < pal.Length; i++)
             {
                 var existing = pal[i];
-                pal[i]  =       s.UInt8("R", (byte)(existing & 0xff));
-                pal[i] |= (uint)s.UInt8("G", (byte)((existing & 0xff00) >> 8)) << 8;
+                pal[i]  =       s.UInt8("R", (byte)( existing &     0xff));
+                pal[i] |= (uint)s.UInt8("G", (byte)((existing &   0xff00) >>  8)) <<  8;
                 pal[i] |= (uint)s.UInt8("B", (byte)((existing & 0xff0000) >> 16)) << 16;
                 pal[i] |= (uint)0xff << 24; // Alpha
             }
@@ -169,7 +169,7 @@ namespace UAlbion.Formats.Assets
                 }
             }
 
-            if (size % 2 != 0)
+            if ((size & 1) != 0)
                 s.UInt8("Padding", 0);
 
             return ms.ToArray();

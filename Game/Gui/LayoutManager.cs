@@ -6,6 +6,7 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Events;
+using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui
 {

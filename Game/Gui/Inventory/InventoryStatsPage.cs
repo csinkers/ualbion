@@ -4,6 +4,8 @@ using System.Linq;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Entities;
+using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.Gui.Text;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
 
@@ -54,21 +56,21 @@ namespace UAlbion.Game.Gui.Inventory
                 new Header(S(SystemTextId.Inv2_Attributes)),
                 new HorizontalStack(
                     new VerticalStack(
-                        new TextSection(S(SystemTextId.Attrib_STR)).Right(),
+                        new TextElement(S(SystemTextId.Attrib_STR)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Attrib_INT)).Right(),
+                        new TextElement(S(SystemTextId.Attrib_INT)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Attrib_DEX)).Right(),
+                        new TextElement(S(SystemTextId.Attrib_DEX)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Attrib_SPD)).Right(),
+                        new TextElement(S(SystemTextId.Attrib_SPD)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Attrib_STA)).Right(),
+                        new TextElement(S(SystemTextId.Attrib_STA)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Attrib_LUC)).Right(),
+                        new TextElement(S(SystemTextId.Attrib_LUC)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Attrib_MR)).Right(),
+                        new TextElement(S(SystemTextId.Attrib_MR)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Attrib_MT)).Right()
+                        new TextElement(S(SystemTextId.Attrib_MT)).Right()
                     ),
                     new Spacing(2,0),
                     new VerticalStack(
@@ -93,13 +95,13 @@ namespace UAlbion.Game.Gui.Inventory
                 new Header(S(SystemTextId.Inv2_Skills)),
                 new HorizontalStack(
                     new VerticalStack(
-                        new TextSection(S(SystemTextId.Skill_CLO)).Right(),
+                        new TextElement(S(SystemTextId.Skill_CLO)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Skill_LON)).Right(),
+                        new TextElement(S(SystemTextId.Skill_LON)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Skill_CRI)).Right(),
+                        new TextElement(S(SystemTextId.Skill_CRI)).Right(),
                         new Spacing(0,2),
-                        new TextSection(S(SystemTextId.Skill_LP)).Right()
+                        new TextElement(S(SystemTextId.Skill_LP)).Right()
                     ),
                     new Spacing(2,0),
                     new VerticalStack(

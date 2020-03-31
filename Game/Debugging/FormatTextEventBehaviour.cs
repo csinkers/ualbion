@@ -18,7 +18,7 @@ namespace UAlbion.Game.Debugging
             if (!(reflected.Object is TextEvent text))
                 return null;
 
-            ITextSource textSource = Engine.Global?.Resolve<ITextManager>()?.GetMapTextFromTextEvent(text, FontColor.White);
+            IText textSource = Engine.Global?.Resolve<ITextManager>()?.FormatTextEvent(text, FontColor.White);
             return textSource?.ToString();
         }
     }

@@ -11,25 +11,6 @@ namespace UAlbion.Game.Assets
     {
         readonly IDictionary<AssetType, IAssetLocator> _locators = new Dictionary<AssetType, IAssetLocator>();
         readonly IDictionary<Type, IAssetPostProcessor> _postProcessors = new Dictionary<Type, IAssetPostProcessor>();
-        /*
-        static IDictionary<AssetType, IAssetLocator> GetAssetLocators()
-        {
-            var dict = new Dictionary<AssetType, IAssetLocator>();
-            foreach(var (locator, attribute) in ReflectionHelper.GetAttributeTypes<IAssetLocator, AssetLocatorAttribute>())
-                foreach (var objectType in attribute.SupportedTypes)
-                    dict.Add(objectType, locator);
-            return dict;
-        }
-
-        static IDictionary<Type, IAssetPostProcessor> GetPostProcessors()
-        {
-            var dict = new Dictionary<Type, IAssetPostProcessor>();
-            foreach(var (postProcessor, attribute) in ReflectionHelper.GetAttributeTypes<IAssetPostProcessor, AssetPostProcessorAttribute>())
-                foreach (var type in attribute.Types)
-                    dict.Add(type, postProcessor);
-            return dict;
-        }
-        */
 
         public AssetLocatorRegistry()
         {

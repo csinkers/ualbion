@@ -1,4 +1,4 @@
-﻿//!#version 450 // Comments with //! are for tricking the Visual Studio GLSL plugin into doing the right thing
+//!#version 450 // Comments with //! are for tricking the Visual Studio GLSL plugin into doing the right thing
 //!#extension GL_KHR_vulkan_glsl: enable
 
 // Resource Sets
@@ -14,11 +14,12 @@ layout(binding = 1) uniform texture2D uSprite;  //! // vdspv_0_1
 #include "CommonResources.glsl"
 
 // Inputs from vertex shader
-layout(location = 0) in vec2 iTexPosition;   // Texture Coordinates
-layout(location = 1) in flat float iLayer;   // Texture Layer
-layout(location = 2) in flat uint  iFlags;   // Flags
-layout(location = 3) in vec2 iNormCoords;    // Normalised sprite coordinates
-layout(location = 4) in vec3 iWorldPosition; // World-space position
+layout(location = 0) in vec2 iTexPosition;      // Texture Coordinates
+layout(location = 1) in flat float iLayer;      // Texture Layer
+layout(location = 2) in flat uint  iFlags;      // Flags
+layout(location = 3) in vec2 iNormCoords;       // Normalised sprite coordinates
+layout(location = 4) in vec3 iWorldPosition;    // World-space position
+layout(location = 5) in flat float iFrontDepth; // Sprite front depth
 
 // Fragment shader outputs
 layout(location = 0) out vec4 OutputColor;
@@ -67,7 +68,7 @@ void main()
 		color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	if((iFlags & SF_HIGHLIGHT)  != 0) color = color * 1.2;
-  	if((iFlags & SF_RED_TINT)   != 0) color = vec4(color.x * 1.5f + 0.3f, color.yz * 0.7f,                       color.w);
+	if((iFlags & SF_RED_TINT)   != 0) color = vec4(color.x * 1.5f + 0.3f, color.yz * 0.7f,                       color.w);
 	if((iFlags & SF_GREEN_TINT) != 0) color = vec4(color.x * 0.7f,        color.y * 1.5f + 0.3f, color.z * 0.7f, color.w);
 	if((iFlags & SF_BLUE_TINT)  != 0) color = vec4(color.xy * 0.7f,       color.z * 1.5f + 0.f,                  color.w);
 	// if((iFlags & SF_TRANSPARENT) != 0) color = vec4(color.xyz, color.w * 0.5f); // Transparent
@@ -79,5 +80,14 @@ void main()
 	
 	OutputColor = color;
 	float depth = (color.w == 0.0f) ? 0.0f : gl_FragCoord.z;
+	
+	if((iFlags & SKF_NO_TRANSFORM) == 0 && (iFlags & SF_BILLBOARD) != 0 && iFrontDepth < depth)
+	{
+		float x = iNormCoords.x - 0.5;
+		float coef = (sqrt(0.25 - x * x) * 2);
+		if(coef < 0) coef = 0;
+		depth = depth + (iFrontDepth - depth) * coef;
+	}
+	
 	gl_FragDepth = ((u_engine_flags & EF_FLIP_DEPTH_RANGE) != 0) ? 1.0f - depth : depth;
 }

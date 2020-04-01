@@ -70,7 +70,7 @@ void main()
 				 -sx, 0, cx, 0,
 				0, 0, 0, 1) * vec4(-0.5, 0, 0, 1); // get the closest point
 				
-			if(rotPosition.z / rotPosition.w >= 0) // beyond the near clip plane
+			if (rotPosition.z / rotPosition.w >= 0) // beyond the near clip plane
 			{
 				rotPosition.z = max(0, viewPosition.z / viewPosition.w) * rotPosition.w;
 			}

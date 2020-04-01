@@ -42,23 +42,23 @@ void main()
 #ifdef USE_PALETTE
 	float redChannel = color[0];
 	float index = 255.0f * redChannel;
-	if(index == 0)
+	if (index == 0)
 		color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 		color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 	else
 		color = texture(sampler2D(uPalette, PaletteSampler), vec2(redChannel, 0.0f)); //! {}
 #endif
-	// else if(color.x != 0) color = vec4(color.xx, 0.5f, 1.0f);
+	// else if (color.x != 0) color = vec4(color.xx, 0.5f, 1.0f);
 
-	if(color.w == 0.0f)
+	if (color.w == 0.0f)
 		discard;
 
-	if((iFlags & TF_HIGHLIGHT)  != 0) color = color * 1.2; // Highlight
-	if((iFlags & TF_RED_TINT)   != 0) color = vec4(color.x * 1.5f + 0.3f, color.yzw);         // Red tint
-	if((iFlags & TF_GREEN_TINT) != 0) color = vec4(color.x, color.y * 1.5f + 0.3f, color.zw); // Green tint
-	if((iFlags & TF_BLUE_TINT)  != 0) color = vec4(color.xy, color.z * 1.5f + 0.f, color.w);  // Blue tint
-	if((iFlags & TF_TRANSPARENT) != 0) color = vec4(color.xyz, color.w * 0.5f); // Transparent
-	if((iFlags & TF_NO_TEXTURE) != 0) {
+	if ((iFlags & TF_HIGHLIGHT)  != 0) color = color * 1.2; // Highlight
+	if ((iFlags & TF_RED_TINT)   != 0) color = vec4(color.x * 1.5f + 0.3f, color.yzw);         // Red tint
+	if ((iFlags & TF_GREEN_TINT) != 0) color = vec4(color.x, color.y * 1.5f + 0.3f, color.zw); // Green tint
+	if ((iFlags & TF_BLUE_TINT)  != 0) color = vec4(color.xy, color.z * 1.5f + 0.3f, color.w); // Blue tint
+	if ((iFlags & TF_TRANSPARENT) != 0) color = vec4(color.xyz, color.w * 0.5f); // Transparent
+	if ((iFlags & TF_NO_TEXTURE) != 0) {
 		if ((iFlags & TF_TEXTURE_TYPE_MASK) == TF_TEXTURE_TYPE_FLOOR)
 			color = vec4(floorLayer / 255.0f, floorLayer / 255.0f, floorLayer / 255.0f, 1.0f);
 		else if ((iFlags & TF_TEXTURE_TYPE_MASK) == TF_TEXTURE_TYPE_CEILING)

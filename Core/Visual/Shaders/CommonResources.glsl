@@ -30,23 +30,23 @@ layout(set = 1, binding = 3) uniform texture2D uPalette; //! // vdspv_1_3
 #define SKF_NO_TRANSFORM      0x2
 
 // UAlbion.Core.SpriteFlags
-#define SF_LEFT_ALIGNED       0x1 
-#define SF_MID_ALIGNED        0x2 
-#define SF_BOTTOM_ALIGNED     0x4 
-#define SF_FLIP_VERTICAL      0x8 
+#define SF_LEFT_ALIGNED       0x1
+#define SF_MID_ALIGNED        0x2
+#define SF_BOTTOM_ALIGNED     0x4
+#define SF_FLIP_VERTICAL      0x8
 #define SF_FLOOR             0x10
 #define SF_BILLBOARD         0x20
 #define SF_ONLY_EVEN_FRAMES  0x40
 #define SF_TRANSPARENT       0x80
 #define SF_HIGHLIGHT        0x100
-#define SF_RED_TINT         0x200 
+#define SF_RED_TINT         0x200
 #define SF_GREEN_TINT       0x400
 #define SF_BLUE_TINT        0x800
 #define SF_DROP_SHADOW     0x1000
 #define SF_NO_BOUNDING_BOX 0x2000
 
 #define SF_ALIGNMENT_MASK      0x7
-#define SF_OPACITY_MASK 0xff000000
+#define SF_OPACITY_MASK 0xFF000000U
 
 // UAlbion.Core.TileFlags
 #define TF_TEXTURE_TYPE_FLOOR   0x0

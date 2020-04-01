@@ -36,7 +36,7 @@ void main()
 	oTextures = iTextures;
 	oFlags = (iFlags & ~TF_TEXTURE_TYPE_MASK) | textureType;
 
-	if(    (textureType == TF_TEXTURE_TYPE_FLOOR   && ((oTextures & 0x000000ff) == 0))
+	if (    (textureType == TF_TEXTURE_TYPE_FLOOR   && ((oTextures & 0x000000ff) == 0))
 		|| (textureType == TF_TEXTURE_TYPE_CEILING && ((oTextures & 0x0000ff00) == 0))
 		|| (textureType == TF_TEXTURE_TYPE_WALL    && ((oTextures & 0x00ff0000) == 0))
 	)

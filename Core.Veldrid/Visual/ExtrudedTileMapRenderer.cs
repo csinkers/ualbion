@@ -51,22 +51,22 @@ namespace UAlbion.Core.Veldrid.Visual
             new Vertex3DTextured( 0.5f, 1.0f, -0.5f, 1.0f, 1.0f), //  7 Top Back Right
 
             // Back (facing outward)
-            new Vertex3DTextured(-0.5f, 1.0f, -0.5f, 0.0f, 0.0f), //  8 Back Top Right
-            new Vertex3DTextured( 0.5f, 1.0f, -0.5f, 1.0f, 0.0f), //  9 Back Top Left
-            new Vertex3DTextured(-0.5f, 0.0f, -0.5f, 0.0f, 1.0f), // 10 Back Bottom Right
-            new Vertex3DTextured( 0.5f, 0.0f, -0.5f, 1.0f, 1.0f), // 11 Back Bottom Left
+            new Vertex3DTextured(-0.5f, 1.0f, -0.5f, 1.0f, 0.0f), //  8 Back Top Right
+            new Vertex3DTextured( 0.5f, 1.0f, -0.5f, 0.0f, 0.0f), //  9 Back Top Left
+            new Vertex3DTextured(-0.5f, 0.0f, -0.5f, 1.0f, 1.0f), // 10 Back Bottom Right
+            new Vertex3DTextured( 0.5f, 0.0f, -0.5f, 0.0f, 1.0f), // 11 Back Bottom Left
 
             // Front (facing outward)
-            new Vertex3DTextured( 0.5f, 1.0f,  0.5f, 0.0f, 0.0f), // 12 Front Top Left
-            new Vertex3DTextured(-0.5f, 1.0f,  0.5f, 1.0f, 0.0f), // 13 Front Top Right
-            new Vertex3DTextured( 0.5f, 0.0f,  0.5f, 0.0f, 1.0f), // 14 Front Bottom Left
-            new Vertex3DTextured(-0.5f, 0.0f,  0.5f, 1.0f, 1.0f), // 15 Front Bottom Right
+            new Vertex3DTextured( 0.5f, 1.0f,  0.5f, 1.0f, 0.0f), // 12 Front Top Left
+            new Vertex3DTextured(-0.5f, 1.0f,  0.5f, 0.0f, 0.0f), // 13 Front Top Right
+            new Vertex3DTextured( 0.5f, 0.0f,  0.5f, 1.0f, 1.0f), // 14 Front Bottom Left
+            new Vertex3DTextured(-0.5f, 0.0f,  0.5f, 0.0f, 1.0f), // 15 Front Bottom Right
 
             // Left (facing outward)
-            new Vertex3DTextured(-0.5f, 1.0f,  0.5f, 0.0f, 0.0f), // 16 Back Top Left
-            new Vertex3DTextured(-0.5f, 1.0f, -0.5f, 1.0f, 0.0f), // 17 Front Top Left
-            new Vertex3DTextured(-0.5f, 0.0f,  0.5f, 0.0f, 1.0f), // 18 Back Bottom Left
-            new Vertex3DTextured(-0.5f, 0.0f, -0.5f, 1.0f, 1.0f), // 19 Back Front Left
+            new Vertex3DTextured(-0.5f, 1.0f,  0.5f, 1.0f, 0.0f), // 16 Back Top Left
+            new Vertex3DTextured(-0.5f, 1.0f, -0.5f, 0.0f, 0.0f), // 17 Front Top Left
+            new Vertex3DTextured(-0.5f, 0.0f,  0.5f, 1.0f, 1.0f), // 18 Back Bottom Left
+            new Vertex3DTextured(-0.5f, 0.0f, -0.5f, 0.0f, 1.0f), // 19 Back Front Left
 
             // Right (facing outward)
             new Vertex3DTextured( 0.5f, 1.0f, -0.5f, 0.0f, 0.0f), // 20 Front Top Right

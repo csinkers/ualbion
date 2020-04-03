@@ -83,7 +83,8 @@ namespace UAlbion.Formats.Assets
             map.SerdesZones(s);
             map.SerdesEvents(s);
             map.SerdesNpcWaypoints(s);
-            map.SerdesChains(s, 250);
+            if (map.Events.Any())
+                map.SerdesChains(s, 250);
 
             if (s.Mode == SerializerMode.Reading)
                 map.Unswizzle();

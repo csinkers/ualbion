@@ -73,12 +73,15 @@ namespace UAlbion.Game.Entities.Map2D
             }
 
             var state = Resolve<IGameState>();
-            foreach(var player in state.Party.StatusBarOrder)
+            if (state.Party != null)
             {
-                player.GetPosition = () => partyMovement.GetPositionHistory(player.Id).Item1;
-                AttachChild(_logicalMap.UseSmallSprites
-                    ? (IComponent)new SmallPlayer(player.Id, (SmallPartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id)) // TODO: Use a function to translate logical to sprite id
-                    : new LargePlayer(player.Id, (LargePartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id))); // TODO: Use a function to translate logical to sprite id
+                foreach(var player in state.Party.StatusBarOrder)
+                {
+                    player.GetPosition = () => partyMovement.GetPositionHistory(player.Id).Item1;
+                    AttachChild(_logicalMap.UseSmallSprites
+                        ? (IComponent)new SmallPlayer(player.Id, (SmallPartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id)) // TODO: Use a function to translate logical to sprite id
+                        : new LargePlayer(player.Id, (LargePartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id))); // TODO: Use a function to translate logical to sprite id
+                }
             }
         }
 

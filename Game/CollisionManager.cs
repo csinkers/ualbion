@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Map;
 
 namespace UAlbion.Game
 {
@@ -20,7 +20,7 @@ namespace UAlbion.Game
         }
 
         public void Unregister(ICollider collider) => _colliders.Remove(collider);
-        public TilesetData.Passability GetPassability(Vector2 tilePosition)
+        public Passability GetPassability(Vector2 tilePosition)
             => _colliders.Select(x => x.GetPassability(tilePosition)).FirstOrDefault();
     }
 }

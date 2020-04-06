@@ -101,10 +101,8 @@ namespace UAlbion.Core.Veldrid.Visual
         public struct MiscUniformData
         {
             public static readonly uint SizeInBytes = (uint)Unsafe.SizeOf<MiscUniformData>();
-            public Vector3 Position { get; set; } // 12 bytes
-            public int Unused1 { get; set; } // Need another 8 bytes to reach a multiple of 16.
-            public Vector3 TileSize { get; set; } // +12 bytes = 24
-            public int Unused2 { get; set; } // Need another 8 bytes to reach a multiple of 16.
+            public Vector3 TileSize { get; set; } // 12 bytes
+            public int Unused1 { get; set; } // Need another 4 bytes to reach a multiple of 16.
         }
 
         public void CreateDeviceObjects(IRendererContext context)
@@ -228,7 +226,7 @@ namespace UAlbion.Core.Veldrid.Visual
             TextureView floors = (TextureView)textureManager.GetTexture(tilemap.Floors);
             TextureView walls = (TextureView)textureManager.GetTexture(tilemap.Walls);
 
-            var miscUniformData = new MiscUniformData { Position = tilemap.Position, TileSize = tilemap.TileSize, Unused1 = 0, Unused2 = 0 };
+            var miscUniformData = new MiscUniformData { TileSize = tilemap.TileSize, Unused1 = 0 };
             cl.UpdateBuffer(_miscUniformBuffer, 0, miscUniformData);
 
             var resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_layout,

@@ -4,6 +4,7 @@ using System.Linq;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;

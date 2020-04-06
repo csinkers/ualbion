@@ -6,6 +6,7 @@ using UAlbion.Core.Veldrid;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
@@ -110,6 +111,7 @@ namespace UAlbion
 
                 if (map is MapData3D map3d)
                 {
+                    sw.Write($"Flags: {map3d.Flags} ");
                     sw.Write($"Labyrinth: {map3d.LabDataId} ");
                     sw.Write($"Sound?:{map3d.Sound} ");
                 }

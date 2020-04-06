@@ -2,7 +2,7 @@
 //!#define gl_VertexIndex gl_VertexID
 
 // Resource Sets / Uniforms
-layout(binding = 0) uniform _Misc { vec3 uPosition; int Unused1; vec3 TileSize; int Unused2; }; // vdspv_0_0
+layout(binding = 0) uniform _Misc { vec3 uTileSize; int Unused1; }; // vdspv_0_0
 
 #include "CommonResources.glsl"
 
@@ -36,11 +36,17 @@ void main()
 	oTextures = iTextures;
 	oFlags = (iFlags & ~TF_TEXTURE_TYPE_MASK) | textureType;
 
-	if (    (textureType == TF_TEXTURE_TYPE_FLOOR   && ((oTextures & 0x000000ff) == 0))
-		|| (textureType == TF_TEXTURE_TYPE_CEILING && ((oTextures & 0x0000ff00) == 0))
-		|| (textureType == TF_TEXTURE_TYPE_WALL    && ((oTextures & 0x00ff0000) == 0))
+	if (   (textureType == TF_TEXTURE_TYPE_FLOOR   && ((oTextures & 0x000000ffU) == 0))
+		|| (textureType == TF_TEXTURE_TYPE_CEILING && ((oTextures & 0x0000ff00U) == 0))
+		|| (textureType == TF_TEXTURE_TYPE_WALL    && ((oTextures & 0x00ff0000U) == 0))
 	)
+	{
 		gl_Position = vec4(0, 1e12, 0, 1); // Inactive faces/vertices get relegated to waaaay above the origin
+	}
 	else
-		gl_Position = uProjection * uView * vec4(uPosition + (vVertexPosition + vec3(iTilePosition.x, 0.0f, iTilePosition.y)) * TileSize, 1);
+	{
+		vec3 instanceTilePosition = vec3(iTilePosition.x, 0.0f, iTilePosition.y);
+		vec3 worldSpace = (vVertexPosition + instanceTilePosition) * uTileSize;
+		gl_Position = uProjection * uView * vec4(worldSpace, 1);
+	}
 }

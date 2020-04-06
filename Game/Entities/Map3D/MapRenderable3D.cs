@@ -8,8 +8,8 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
+using UAlbion.Formats.Assets.Map;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
 

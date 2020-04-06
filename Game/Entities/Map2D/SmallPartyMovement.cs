@@ -289,6 +289,7 @@ namespace UAlbion.Game.Entities.Map2D
             return (pos, frame);
         }
 
-        static Vector3 To3D(Vector2 position) => new Vector3(position, DrawLayer.Characters1.ToZCoordinate(position.Y));
+        static Vector3 To3D(Vector2 position) =>
+            new Vector3(position, DepthUtil.OutdoorCharacterDepth(position.Y));
     }
 }

@@ -4,7 +4,7 @@ using SerdesNet;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 
-namespace UAlbion.Formats.Assets
+namespace UAlbion.Formats.Assets.Map
 {
     public class MapNpc
     {

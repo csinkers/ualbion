@@ -1,25 +1,11 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 
-namespace UAlbion.Formats.Assets
+namespace UAlbion.Formats.Assets.Map
 {
-    [Flags]
-    public enum MapFlags2D : byte
-    {
-        Unk0 = 1,
-        Unk1 = 1 << 1,
-        Unk2 = 1 << 2,
-        Unk3 = 1 << 3,
-        Unk4 = 1 << 4,
-        Unk5 = 1 << 5,
-        Unk6 = 1 << 6,
-        Unk7 = 1 << 7,
-    }
-
     public class MapData2D : BaseMapData
     {
         static readonly TilesetId[] OutdoorTilesets = new TilesetId[0];

@@ -68,7 +68,7 @@ void main()
 	}
 
 	OutputColor = color;
-	float depth = (color.w == 0.0f) ? 0.0f : gl_FragCoord.z;
+	float depth = gl_FragCoord.z;
 	gl_FragDepth = ((u_engine_flags & EF_FLIP_DEPTH_RANGE) != 0) ? 1.0f - depth : depth;
 }
 

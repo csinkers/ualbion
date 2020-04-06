@@ -1,5 +1,6 @@
 ﻿using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Map;
 
 namespace UAlbion.Formats.MapEvents
 {

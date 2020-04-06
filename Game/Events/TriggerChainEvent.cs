@@ -2,6 +2,7 @@
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Events

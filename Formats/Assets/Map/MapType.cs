@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Formats.Assets
+﻿namespace UAlbion.Formats.Assets.Map
 {
     public enum MapType : byte
     {

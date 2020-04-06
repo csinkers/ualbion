@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;

@@ -2,7 +2,7 @@
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Map;
 
 namespace UAlbion.Game.Entities.Map2D
 {
@@ -30,16 +30,16 @@ namespace UAlbion.Game.Entities.Map2D
             var underlayTile = _logicalMap.GetUnderlay((int)tilePosition.X, (int)tilePosition.Y);
             var overlayTile = _logicalMap.GetOverlay((int)tilePosition.X, (int)tilePosition.Y);
 
-            bool underlayBlocked = underlayTile != null && underlayTile.Collision != TilesetData.Passability.Passable;
-            bool overlayBlocked = overlayTile != null && overlayTile.Collision != TilesetData.Passability.Passable;
+            bool underlayBlocked = underlayTile != null && underlayTile.Collision != Passability.Passable;
+            bool overlayBlocked = overlayTile != null && overlayTile.Collision != Passability.Passable;
             return underlayBlocked || overlayBlocked;
         }
 
-        public TilesetData.Passability GetPassability(Vector2 tilePosition)
+        public Passability GetPassability(Vector2 tilePosition)
         {
             var underlayTile = _logicalMap.GetUnderlay((int)tilePosition.X, (int)tilePosition.Y);
             var overlayTile = _logicalMap.GetOverlay((int)tilePosition.X, (int)tilePosition.Y);
-            return underlayTile?.Collision ?? overlayTile?.Collision ?? TilesetData.Passability.Passable;
+            return underlayTile?.Collision ?? overlayTile?.Collision ?? Passability.Passable;
         }
     }
 }

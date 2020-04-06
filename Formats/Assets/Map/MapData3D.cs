@@ -4,12 +4,12 @@ using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 
-namespace UAlbion.Formats.Assets
+namespace UAlbion.Formats.Assets.Map
 {
     public class MapData3D : BaseMapData
     {
         public override MapType MapType => MapType.ThreeD;
-        public byte CeilingFlags { get; private set; }
+        public Map3DFlags Flags { get; private set; }
         public LabyrinthDataId LabDataId { get; private set; }
         public byte Sound { get; private set; }
         public byte[] Contents { get; private set; }
@@ -22,7 +22,7 @@ namespace UAlbion.Formats.Assets
         public static MapData3D Serdes(MapData3D existing, ISerializer s, AssetInfo config)
         {
             var map = existing ?? new MapData3D((MapDataId)config.Id);
-            map.CeilingFlags = s.UInt8(nameof(CeilingFlags), map.CeilingFlags); // 0
+            map.Flags = s.EnumU8(nameof(Flags), map.Flags); // 0
             int npcCount = NpcCountTransform.Serdes("NpcCount", map.Npcs.Count, s.UInt8); // 1
             var _ = s.UInt8("MapType", (byte)map.MapType); // 2
 

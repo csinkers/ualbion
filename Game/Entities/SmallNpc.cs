@@ -6,7 +6,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Map;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Scenes;
@@ -28,13 +28,16 @@ namespace UAlbion.Game.Entities
         public SmallNpc(MapNpc npc) : base(Handlers)
         {
             _npc = npc ?? throw new ArgumentNullException(nameof(npc));
-            _sprite = AttachChild(new MapSprite<SmallNpcId>((SmallNpcId)npc.ObjectNumber, DrawLayer.Characters1, 0, SpriteFlags.BottomAligned));
+            _sprite = AttachChild(new MapSprite<SmallNpcId>((SmallNpcId)npc.ObjectNumber, DrawLayer.Underlay - 1, 0, SpriteFlags.BottomAligned));
             _sprite.Selected += (sender, e) => e.SelectEvent.RegisterHit(e.HitPosition, this);
         }
 
         public override void Subscribed()
         {
-            _sprite.TilePosition = new Vector3(_npc.Waypoints[0].X, _npc.Waypoints[0].Y, DrawLayer.Characters1.ToZCoordinate(_npc.Waypoints[0].Y));
+            _sprite.TilePosition = new Vector3(
+                _npc.Waypoints[0].X,
+                _npc.Waypoints[0].Y,
+                DepthUtil.OutdoorCharacterDepth(_npc.Waypoints[0].Y));
             base.Subscribed();
         }
 

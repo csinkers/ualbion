@@ -6,8 +6,8 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
+using UAlbion.Formats.Assets.Map;
 using UAlbion.Game.Events;
 using Object = UAlbion.Formats.Assets.Labyrinth.Object;
 
@@ -156,10 +156,12 @@ namespace UAlbion.Game.Entities.Map3D
             // We should probably be offsetting the main tilemap by half a tile to centre the objects
             // rather than fiddling with the object positions... will need to reevaluate when working on
             // collision detection, path-finding etc.
-            var objectBias =
+            var objectBias = new Vector3(-1.0f, 0, -1.0f) / 2;
+                /*
                 (MapId == MapDataId.Jirinaar3D || MapId == MapDataId.AltesFormergebäude || MapId == MapDataId.FormergebäudeNachKampfGegenArgim)
                     ? new Vector3(-1.0f, 0, -1.0f) / 2
                     : new Vector3(-1.0f, 0, -1.0f); // / 2;
+                */
 
             var tilePosition = (new Vector3(tileX, 0, tileY) + objectBias) * TileSize;
             var offset = new Vector3(

@@ -5,26 +5,11 @@ using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Entities.Map2D
 {
-    public class MapDelta
-    {
-        public enum DeltaType
-        {
-            Underlay,
-            Overlay,
-            Chain,
-            Trigger,
-        }
-
-        public DeltaType Type { get; set; }
-        public bool Permanent { get; set; }
-        public byte X { get; set; }
-        public byte Y { get; set; }
-    }
-
     public class LogicalMap
     {
         readonly MapData2D _mapData;
@@ -51,8 +36,8 @@ namespace UAlbion.Game.Entities.Map2D
 
         public int Index(int x, int y) => y * _mapData.Width + x;
 
-        public TilesetData.TileData GetUnderlay(int x, int y) => GetUnderlay(Index(x, y));
-        public TilesetData.TileData GetUnderlay(int index)
+        public TileData GetUnderlay(int x, int y) => GetUnderlay(Index(x, y));
+        public TileData GetUnderlay(int index)
         {
             if (index < 0 || index >= _mapData.Underlay.Length)
                 return null;
@@ -61,8 +46,8 @@ namespace UAlbion.Game.Entities.Map2D
             return tileIndex > 1 ? _tileData.Tiles[tileIndex] : null;
         }
 
-        public TilesetData.TileData GetOverlay(int x, int y) => GetOverlay(Index(x, y));
-        public TilesetData.TileData GetOverlay(int index)
+        public TileData GetOverlay(int x, int y) => GetOverlay(Index(x, y));
+        public TileData GetOverlay(int index)
         {
             if (index < 0 || index >= _mapData.Overlay.Length)
                 return null;

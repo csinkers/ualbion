@@ -6,7 +6,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
@@ -30,7 +30,7 @@ namespace UAlbion.Game.Entities.Map2D
             })
         );
 
-        public TileLayer(LogicalMap logicalMap, ITexture tileset, Func<int, TilesetData.TileData> tileFunc, DrawLayer drawLayer, IconChangeType iconChangeType) : base(Handlers)
+        public TileLayer(LogicalMap logicalMap, ITexture tileset, Func<int, TileData> tileFunc, DrawLayer drawLayer, IconChangeType iconChangeType) : base(Handlers)
         {
             _logicalMap = logicalMap;
             _logicalMap.Dirty += (sender, args) =>
@@ -45,7 +45,7 @@ namespace UAlbion.Game.Entities.Map2D
 
         readonly LogicalMap _logicalMap;
         readonly ITexture _tileset;
-        readonly Func<int, TilesetData.TileData> _tileFunc;
+        readonly Func<int, TileData> _tileFunc;
         readonly DrawLayer _drawLayer;
         readonly ISet<(int, int)> _dirty = new HashSet<(int, int)>();
 
@@ -84,9 +84,9 @@ namespace UAlbion.Game.Entities.Map2D
             }
         }
 
-        SpriteInstanceData BuildInstanceData(int i, int j, TilesetData.TileData tile, int tickCount)
+        SpriteInstanceData BuildInstanceData(int i, int j, TileData tile, int tickCount)
         {
-            if (tile == null || (tile.Flags & TilesetData.TileFlags.Debug) != 0)
+            if (tile == null || (tile.Flags & TileFlags.Debug) != 0)
                 return BlankInstance;
 
             int index = _logicalMap.Index(i, j);
@@ -94,10 +94,9 @@ namespace UAlbion.Game.Entities.Map2D
 
             var subImage = _tileset.GetSubImageDetails(subImageId);
 
-            DrawLayer drawLayer = tile.ToDrawLayer();
             var position = new Vector3(
                 new Vector2(i, j) * subImage.Size,
-                drawLayer.ToZCoordinate(j));
+                DepthUtil.LayerToDepth(tile.Depth, j));
 
             var instance = SpriteInstanceData.TopLeft(position, subImage.Size, subImage, 0);
 
@@ -108,10 +107,10 @@ namespace UAlbion.Game.Entities.Map2D
 #if DEBUG
                 | ((_lastDebugFlags & DebugFlags.HighlightTile) != 0 && HighlightIndex == index ? SpriteFlags.Highlight : 0)
                 | ((_lastDebugFlags & DebugFlags.HighlightEventChainZones) != 0 && _highlightEvent == eventNum ? SpriteFlags.GreenTint : 0)
-                | ((_lastDebugFlags & DebugFlags.HighlightCollision) != 0 && tile.Collision != TilesetData.Passability.Passable ? SpriteFlags.RedTint : 0)
+                | ((_lastDebugFlags & DebugFlags.HighlightCollision) != 0 && tile.Collision != Passability.Passable ? SpriteFlags.RedTint : 0)
                 | ((_lastDebugFlags & DebugFlags.NoMapTileBoundingBoxes) != 0 ? SpriteFlags.NoBoundingBox : 0)
 #endif
-                // | ((tile.Flags & TilesetData.TileFlags.TextId) != 0 ? SpriteFlags.RedTint : 0)
+                // | ((tile.Flags & TileFlags.TextId) != 0 ? SpriteFlags.RedTint : 0)
                 // | (((int) tile.Type) == 8 ? SpriteFlags.GreenTint : 0)
                 // | (((int) tile.Type) == 12 ? SpriteFlags.BlueTint : 0)
                 // | (((int) tile.Type) == 14 ? SpriteFlags.GreenTint | SpriteFlags.RedTint : 0) //&& tickCount % 2 == 0 ? SpriteFlags.Transparent : 0)

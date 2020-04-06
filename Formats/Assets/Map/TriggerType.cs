@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UAlbion.Formats.Assets
+namespace UAlbion.Formats.Assets.Map
 {
     [Flags]
     public enum TriggerType : ushort

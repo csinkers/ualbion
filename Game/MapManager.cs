@@ -2,7 +2,7 @@
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
@@ -81,6 +81,9 @@ namespace UAlbion.Game
             var assets = Resolve<IAssetManager>();
             var game = Resolve<IGameState>();
             var mapData = assets.LoadMap(mapId);
+            if (mapData == null)
+                return null;
+
             mapData.AttachEventSets(
                 x => game.GetNpc(x),
                 x => assets.LoadEventSet(x));

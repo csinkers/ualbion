@@ -29,7 +29,7 @@ namespace UAlbion.Game.Gui.Dialogs
             foreach(var (text, blockId, action) in options)
                 optionElements.Add(new ConversationOption(text, blockId, action));
 
-            if (standardOptions.Any())
+            if (standardOptions?.Any() == true)
             {
                 if (optionElements.Any())
                     optionElements.Add(new Spacing(0, 10));

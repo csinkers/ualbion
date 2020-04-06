@@ -51,7 +51,7 @@ namespace UAlbion.Game.Entities.Map2D
             _overlay = AttachChild(new TileLayer(logicalMap,
                 tileset,
                 logicalMap.GetOverlay,
-                DrawLayer.Overlay3,
+                DrawLayer.Overlay,
                 IconChangeType.Overlay));
         }
 

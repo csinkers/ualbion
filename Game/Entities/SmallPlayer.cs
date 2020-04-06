@@ -29,7 +29,11 @@ namespace UAlbion.Game.Entities
         {
             _id = charId;
             _positionFunc = positionFunc;
-            _sprite = AttachChild(new MapSprite<SmallPartyGraphicsId>(graphicsId, DrawLayer.Characters1, 0, SpriteFlags.LeftAligned));
+            _sprite = AttachChild(new MapSprite<SmallPartyGraphicsId>(
+                graphicsId,
+                DrawLayer.Character,
+                0,
+                SpriteFlags.LeftAligned));
         }
     }
 }

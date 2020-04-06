@@ -2,6 +2,7 @@
 using System.IO;
 using SerdesNet;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers

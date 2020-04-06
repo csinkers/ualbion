@@ -2,7 +2,7 @@
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Core;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.State;
 

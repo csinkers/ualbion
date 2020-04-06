@@ -24,7 +24,10 @@ namespace UAlbion.Game.Entities
         {
             _id = charId;
             _positionFunc = positionFunc;
-            _sprite = AttachChild(new MapSprite<LargePartyGraphicsId>(graphicsId, DrawLayer.Characters2 + 1, 0, SpriteFlags.BottomAligned)); // TODO: Hack, fix.
+            _sprite = AttachChild(new MapSprite<LargePartyGraphicsId>(
+                graphicsId,
+                DrawLayer.Character,
+                0, SpriteFlags.BottomAligned));
         }
 
         public override void Subscribed()

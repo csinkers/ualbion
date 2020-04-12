@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using ADLMidi.NET;
 using SerdesNet;
@@ -17,6 +18,9 @@ namespace UAlbion.Game
 
         public override void Subscribed()
         {
+            if (!File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "ADLMIDI.dll")))
+                return;
+
             if (_player != null)
                 return;
 

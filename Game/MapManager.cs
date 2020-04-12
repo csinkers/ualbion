@@ -73,6 +73,9 @@ namespace UAlbion.Game
                 Raise(new SetSceneEvent(map is Entities.Map3D.Map ? SceneId.World3D : SceneId.World2D));
                 Raise(new LogEvent(LogEvent.Level.Info, $"Loaded map {(int) pendingMapChange}: {pendingMapChange}"));
                 Enqueue(new MapInitEvent());
+
+                if (map.MapData.SongId.HasValue)
+                    Enqueue(new SongEvent(map.MapData.SongId.Value));
             }
         }
 

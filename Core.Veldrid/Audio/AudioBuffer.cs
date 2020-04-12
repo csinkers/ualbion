@@ -3,32 +3,35 @@ using OpenAL;
 
 namespace UAlbion.Core.Veldrid.Audio
 {
-    public class AudioBuffer : AudioObject, IDisposable
+    public abstract class AudioBuffer : AudioObject, IDisposable
     {
-        internal uint Buffer { get; private set; }
         public int SamplingRate { get; }
+        public DateTime LastUpdatedDateTime { get; protected set; }
+        public int LastUpdatedMs => (int)(DateTime.Now - LastUpdatedDateTime).TotalMilliseconds;
+        public int LastSize { get; protected set; }
 
-        public AudioBuffer( byte[] samples, int samplingRate)
+        internal readonly uint Buffer;
+        bool _disposed;
+
+        protected AudioBuffer(int samplingRate)
         {
             SamplingRate = samplingRate;
-            AL10.alGenBuffers(1, out var buffer); Check();
-            AL10.alBufferData(buffer, AL10.AL_FORMAT_MONO8, samples, samples.Length, samplingRate); Check();
-            Buffer = buffer;
+            AL10.alGenBuffers(1, out Buffer);
+            Check();
+            LastUpdatedDateTime = DateTime.Now;
         }
 
-        protected AudioBuffer(short[] samples, int samplingRate)
-        {
-            SamplingRate = samplingRate;
-            AL10.alGenBuffers(1, out var buffer); Check();
-            AL10.alBufferData(buffer, AL10.AL_FORMAT_MONO16, samples, samples.Length, samplingRate); Check();
-            Buffer = buffer;
-        }
+        public void Dispose() => Dispose(true);
+        ~AudioBuffer() => Dispose(false);
 
-        public void Dispose()
+        protected virtual void Dispose(bool disposing)
         {
+            if (_disposed)
+                return;
+
             AL10.alDeleteBuffers(1, new[] { Buffer });
             Check();
-            Buffer = 0;
+            _disposed = true;
         }
     }
 }

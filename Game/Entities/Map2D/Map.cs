@@ -4,6 +4,7 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
@@ -18,10 +19,8 @@ namespace UAlbion.Game.Entities.Map2D
         public MapDataId MapId { get; }
         public MapType MapType => _logicalMap.UseSmallSprites ? MapType.Small : MapType.Large;
         public Vector2 LogicalSize => new Vector2(_logicalMap.Width, _logicalMap.Height);
-        public Vector3 TileSize
-        {
-            get; private set;
-        }
+        public Vector3 TileSize { get; private set; }
+        public IMapData MapData => _mapData;
 
         public float BaseCameraHeight => 1.0f;
         static readonly HandlerSet Handlers = new HandlerSet(

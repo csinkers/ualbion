@@ -6,6 +6,7 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Map;
 using UAlbion.Game.Events;
@@ -44,6 +45,7 @@ namespace UAlbion.Game.Entities.Map3D
         public override string ToString() => $"Map3D:{MapId} {LogicalSize.X}x{LogicalSize.Y} TileSize: {TileSize}";
         public MapDataId MapId { get; }
         public MapType MapType => MapType.ThreeD;
+        public IMapData MapData => _mapData;
         public Vector2 LogicalSize { get; private set; }
         public Vector3 TileSize { get; private set; }
         public float BaseCameraHeight => (_labyrinthData?.CameraHeight ?? 0) != 0 ? _labyrinthData.CameraHeight * 8 : TileSize.Y / 2;

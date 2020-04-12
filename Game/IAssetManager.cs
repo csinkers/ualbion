@@ -13,29 +13,6 @@ namespace UAlbion.Game
     public interface IAssetManager : ITextureLoader
     {
         ITexture LoadTexture(AssetType type, int id);
-        /*
-        ITexture LoadTexture(AutoMapId id);
-        ITexture LoadTexture(CombatBackgroundId id);
-        ITexture LoadTexture(CombatGraphicsId id);
-        ITexture LoadTexture(DungeonBackgroundId id);
-        ITexture LoadTexture(DungeonFloorId id);
-        ITexture LoadTexture(DungeonObjectId id);
-        ITexture LoadTexture(DungeonOverlayId id);
-        ITexture LoadTexture(DungeonWallId id);
-        ITexture LoadTexture(FullBodyPictureId id);
-        ITexture LoadTexture(IconGraphicsId id);
-        ITexture LoadTexture(ItemSpriteId id);
-        ITexture LoadTexture(LargeNpcId id);
-        ITexture LoadTexture(LargePartyGraphicsId id);
-        ITexture LoadTexture(MonsterGraphicsId id);
-        ITexture LoadTexture(PictureId id);
-        ITexture LoadTexture(SmallNpcId id);
-        ITexture LoadTexture(SmallPartyGraphicsId id);
-        ITexture LoadTexture(SmallPortraitId id);
-        ITexture LoadTexture(TacticId id);
-        ITexture LoadTexture(FontId id);
-        ITexture LoadTexture(MetaFontId id);
-        ITexture LoadTexture(CoreSpriteId id); */
         ITexture LoadFont(FontColor color, bool isBold);
         TilesetData LoadTileData(TilesetId id);
         LabyrinthData LoadLabyrinthData(LabyrinthDataId id);
@@ -61,5 +38,6 @@ namespace UAlbion.Game
         IAssetConfig LoadAssetConfig();
         CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id);
         EventSet LoadEventSet(EventSetId eventSetId);
+        byte[] LoadSong(SongId songId);
     }
 }

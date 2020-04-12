@@ -188,5 +188,6 @@ namespace UAlbion.Game.Assets
 
         public IList<Block> LoadBlockList(BlockListId blockListId) => (IList<Block>)_assetLocatorRegistry.LoadAssetCached(AssetType.BlockList, blockListId);
         public EventSet LoadEventSet(EventSetId eventSetId) => (EventSet)_assetLocatorRegistry.LoadAssetCached(AssetType.EventSet, eventSetId);
+        public byte[] LoadSong(SongId songId) => (byte[]) _assetLocatorRegistry.LoadAssetCached(AssetType.Song, songId);
     }
 }

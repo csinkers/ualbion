@@ -4,30 +4,20 @@ using OpenAL;
 
 namespace UAlbion.Core.Veldrid.Audio
 {
-    public class AudioSource : AudioObject, IDisposable
+    public abstract class AudioSource : AudioObject, IDisposable
     {
-        readonly uint _source;
-        // readonly uint[] _buffers;
+        protected readonly uint Source;
+        bool _disposed;
 
-        public AudioSource(AudioBuffer buffer)
+        protected AudioSource()
         {
-            AL10.alGenSources(1, out _source); Check();
-            AL10.alSourcei(_source, AL10.AL_BUFFER, (int)buffer.Buffer); Check();
+            AL10.alGenSources(1, out Source);
+            Check();
         }
 
-        public AudioSource()
-        {
-            /*
-            const int bufferCount = 3;
-            _buffers = new uint[bufferCount];
-            AL10.alGenBuffers(bufferCount, _buffers);
-            AL10.alSourceQueueBuffers(_source, bufferCount, _buffers);
-            */
-        }
-
-        public void Play() { AL10.alSourcePlay(_source); Check(); }
-        public void Pause() { AL10.alSourcePause(_source); Check(); }
-        public void Stop() { AL10.alSourceStop(_source); Check(); }
+        public void Play() { AL10.alSourcePlay(Source); Check(); }
+        public void Pause() { AL10.alSourcePause(Source); Check(); }
+        public void Stop() { AL10.alSourceStop(Source); Check(); }
         public void Rewind() {}
 
         public bool Looping { get => GetInt(AL10.AL_LOOPING) != AL10.AL_FALSE; set => SetInt(AL10.AL_LOOPING, value ? AL10.AL_TRUE : AL10.AL_FALSE); } 
@@ -45,42 +35,51 @@ namespace UAlbion.Core.Veldrid.Audio
         public Vector3 Direction { get => GetVector(AL10.AL_DIRECTION); set => SetVector(AL10.AL_DIRECTION, value); }
         public bool SourceRelative { get => GetInt(AL10.AL_SOURCE_RELATIVE) != AL10.AL_FALSE; set => SetInt(AL10.AL_SOURCE_RELATIVE, value ? AL10.AL_TRUE : AL10.AL_FALSE); }
         public SourceState State { get => (SourceState) GetInt(AL10.AL_SOURCE_STATE); set => SetInt(AL10.AL_SOURCE_STATE, (int) value); }
-        public int BuffersQueued { get => GetInt(AL10.AL_BUFFERS_QUEUED); set => SetInt(AL10.AL_BUFFERS_QUEUED, value); }
-        public int BuffersProcessed { get => GetInt(AL10.AL_BUFFERS_PROCESSED); set => SetInt(AL10.AL_BUFFERS_PROCESSED, value); }
+        public int BuffersQueued => GetInt(AL10.AL_BUFFERS_QUEUED);
+        public int BuffersProcessed => GetInt(AL10.AL_BUFFERS_PROCESSED);
+        // public float OffsetSeconds => GetFloat(AL11.AL_SEC_OFFSET);
+        // public int OffsetSamples => GetFloat(AL11.AL_SAMPLE_OFFSET);
 
         public SourceType SourceType
         {
-            get => (SourceType)GetInt(AL10.AL_PITCH);
-            set => SetInt(AL10.AL_PITCH, (int)value);
+            get => (SourceType)GetInt(AL10.AL_SOURCE_TYPE);
+            set => SetInt(AL10.AL_SOURCE_TYPE, (int)value);
         }
 
         public void Dispose()
         {
-            AL10.alDeleteSources(1, new[] { _source }); Check();
-            // if (_buffers != null)
-            // {
-            //     // TODO: Ensure buffer not still in use, i.e. stop / detach.
-            //     AL10.alDeleteBuffers(_buffers.Length, _buffers);
-            // }
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                throw new InvalidOperationException("AudioSource already disposed");
+            AL10.alDeleteSources(1, new[] {Source});
+            Check();
+            _disposed = true;
         }
 
         #region Get / set helpers
-        float GetFloat(int param) { AL10.alGetSourcef(_source, param, out var value); Check(); return value; }
-        void SetFloat(int param, float value) { AL10.alSourcef(_source, param, value); Check(); }
-        int GetInt(int param) { AL10.alGetSourcei(_source, param, out var value); Check(); return value; }
-        void SetInt(int param, int value) { AL10.alSourcei(_source, param, value); Check(); }
+
+        float GetFloat(int param) { AL10.alGetSourcef(Source, param, out var value); Check(); return value; }
+        void SetFloat(int param, float value) { AL10.alSourcef(Source, param, value); Check(); }
+        int GetInt(int param) { AL10.alGetSourcei(Source, param, out var value); Check(); return value; }
+        void SetInt(int param, int value) { AL10.alSourcei(Source, param, value); Check(); }
         Vector3 GetVector(int param)
         {
-            AL10.alGetSource3f(_source, param, out var x, out var y, out var z);
+            AL10.alGetSource3f(Source, param, out var x, out var y, out var z);
             Check();
             return new Vector3(x, y, z);
         }
 
         void SetVector(int param, Vector3 value)
         {
-            AL10.alSource3f(_source, param, value.X, value.Y, value.Z);
+            AL10.alSource3f(Source, param, value.X, value.Y, value.Z);
             Check();
         }
+
         #endregion
     }
 }

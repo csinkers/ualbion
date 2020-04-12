@@ -2,15 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Core\UAlbion.Core.csproj" />
     <ProjectReference Include="..\Formats\UAlbion.Formats.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="!Exists('..\..\AdlMidi.NET')">
+    <PackageReference Include="AdlMidi.NET" Version="1.0.0" />
+  </ItemGroup>
+  <ItemGroup Condition="Exists('..\..\AdlMidi.NET')">
+    <ProjectReference Include="..\..\\AdlMidi.NET\src\ADLMidi.NET.csproj" />
   </ItemGroup>
 
 </Project>

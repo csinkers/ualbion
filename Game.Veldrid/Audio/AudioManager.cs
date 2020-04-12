@@ -18,15 +18,20 @@ namespace UAlbion.Game.Veldrid.Audio
         readonly bool _standalone;
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<AudioManager, QuitEvent>((x,e) => x._doneEvent.Set()),
-            H<AudioManager, SoundEvent>((x,e) => x.Play(e)),
-            H<AudioManager, MuteEvent>((x,e) => x.StopAll())
+            H<AudioManager, QuitEvent>((x, e) => x._doneEvent.Set()),
+            H<AudioManager, SoundEvent>((x, e) => x.Play(e)),
+            H<AudioManager, SongEvent>((x, e) => x.PlayMusic(e.SongId)),
+            H<AudioManager, MuteEvent>((x, e) => x.StopAll())
         );
 
         readonly IDictionary<SampleId, AudioBuffer> _sampleCache = new Dictionary<SampleId, AudioBuffer>();
         readonly IList<ActiveSound> _activeSounds = new List<ActiveSound>();
         readonly ManualResetEvent _doneEvent = new ManualResetEvent(false);
         readonly object _syncRoot = new object();
+
+        SongId? _activeSongId;
+        StreamingAudioSource _music;
+        AlbionMusicGenerator _musicGenerator;
 
         class ActiveSound
         {
@@ -44,20 +49,20 @@ namespace UAlbion.Game.Veldrid.Audio
 
         AudioBuffer GetBuffer(SampleId id)
         {
-            lock(_syncRoot)
+            lock (_syncRoot)
             {
                 if (_sampleCache.TryGetValue(id, out var buffer))
                     return buffer;
                 var assets = Resolve<IAssetManager>();
                 var sample = assets.LoadSample(id);
-                if(sample == null)
+                if (sample == null)
                 {
                     Raise(new LogEvent(LogEvent.Level.Error, $"Could not load audio sample {(int)id}: {id}"));
                     _sampleCache[id] = null;
                     return null;
                 }
 
-                buffer = new AudioBuffer(sample.Samples, sample.SampleRate);
+                buffer = new AudioBufferUInt8(sample.Samples, sample.SampleRate);
                 _sampleCache[id] = buffer;
                 return buffer;
             }
@@ -74,7 +79,7 @@ namespace UAlbion.Game.Veldrid.Audio
 
             var map = Resolve<IMapManager>()?.Current;
             var tileSize = map?.TileSize ?? Vector3.One;
-            var source = new AudioSource(buffer)
+            var source = new SimpleAudioSource(buffer)
             {
                 Volume = e.Volume == 0 ? 1.0f : e.Volume / 255.0f,
                 Looping = e.Mode == SoundEvent.SoundMode.LocalLoop,
@@ -92,14 +97,53 @@ namespace UAlbion.Game.Veldrid.Audio
                 e.RestartProbability);
 
             active.Source.Play();
-            lock(_syncRoot)
+            lock (_syncRoot)
                 _activeSounds.Add(active);
+        }
+
+        void PlayMusic(SongId songId)
+        {
+            if (songId == _activeSongId)
+                return;
+
+            lock (_syncRoot)
+            {
+                StopMusic();
+
+                _musicGenerator = AttachChild(new AlbionMusicGenerator(songId));
+
+                _music = new StreamingAudioSource(_musicGenerator)
+                {
+                    Volume = 1.0f,
+                    Looping = false, // Looping is the responsibility of the generator
+                    SourceRelative = true,
+                    Position = Vector3.Zero
+                };
+
+                _music.Play();
+                _activeSongId = songId;
+            }
+        }
+
+        void StopMusic()
+        {
+            if (_music == null)
+                return;
+
+            _music.Stop();
+            _music.Dispose();
+            _musicGenerator.Detach();
+            Children.Remove(_musicGenerator);
+            _music = null;
+            _musicGenerator = null;
+            _activeSongId = null;
         }
 
         void StopAll()
         {
             lock (_syncRoot)
             {
+                StopMusic();
                 foreach (var sound in _activeSounds)
                 {
                     sound.Source.Stop();
@@ -107,7 +151,7 @@ namespace UAlbion.Game.Veldrid.Audio
                 }
                 _activeSounds.Clear();
 
-                foreach(var sample in _sampleCache.Values)
+                foreach (var sample in _sampleCache.Values)
                     sample.Dispose();
                 _sampleCache.Clear();
             }
@@ -130,7 +174,7 @@ namespace UAlbion.Game.Veldrid.Audio
                 if (_standalone)
                     Raise(new BeginFrameEvent());
 
-                lock (_syncRoot) // Reap any dead sounds
+                lock (_syncRoot) // Reap any dead sounds and update any streaming sources
                 {
                     for (int i = 0; i < _activeSounds.Count;)
                     {
@@ -140,8 +184,16 @@ namespace UAlbion.Game.Veldrid.Audio
                             sound.Source.Dispose();
                             _activeSounds.RemoveAt(i);
                         }
-                        else i++;
+                        else
+                        {
+                            if (sound.Source is StreamingAudioSource stream)
+                                stream.CycleBuffers();
+
+                            i++;
+                        }
                     }
+
+                    _music?.CycleBuffers();
                 }
 
                 var camera = Resolve<ICamera>();
@@ -149,20 +201,7 @@ namespace UAlbion.Game.Veldrid.Audio
                     device.Listener.Position = camera.Position;
             }
 
-            lock (_syncRoot)
-            {
-                foreach (var sound in _activeSounds)
-                {
-                    sound.Source.Stop();
-                    sound.Source.Dispose();
-                }
-
-                foreach (var buffer in _sampleCache.Values)
-                    buffer.Dispose();
-
-                _activeSounds.Clear();
-                _sampleCache.Clear();
-            }
+            StopAll();
         }
 
         public IList<string> ActiveSounds

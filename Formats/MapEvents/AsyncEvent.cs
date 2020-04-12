@@ -24,10 +24,10 @@ namespace UAlbion.Formats.MapEvents
             set
             {
                 if (!value)
-                    throw new InvalidOperationException("Async events cannot be unacknowledged");
+                    ApiUtil.Assert("Async events cannot be unacknowledged");
 
                 if (_acknowledged)
-                    throw new InvalidOperationException("Async events should only be acknowledged once!");
+                    ApiUtil.Assert("Async events should only be acknowledged once!");
 
                 _acknowledged = true;
             }
@@ -36,12 +36,14 @@ namespace UAlbion.Formats.MapEvents
         public void Complete()
         {
             if (_complete)
-                throw new InvalidOperationException("Tried to complete a completed async event");
+                ApiUtil.Assert("Tried to complete a completed async event");
+
+            _complete = true;
 
             if (_completionCallback == null)
-                throw new InvalidOperationException("Tried to complete an uninitialised async event");
-            _complete = true;
-            _completionCallback();
+                ApiUtil.Assert("Tried to complete an uninitialised async event");
+            else
+                _completionCallback();
         }
     }
 }

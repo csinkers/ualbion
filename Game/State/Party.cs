@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
@@ -21,12 +21,22 @@ namespace UAlbion.Game.State
         readonly IReadOnlyList<Player.Player> _readOnlyWalkOrder;
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<Party, AddPartyMemberEvent>((x,e) => x.AddMember(e.PartyMemberId)),
-            H<Party, RemovePartyMemberEvent>((x,e) => x.RemoveMember(e.PartyMemberId)),
+            H<Party, AddPartyMemberEvent>((x,e) => e.Context.LastEventResult = x.AddMember(e.PartyMemberId)),
+            H<Party, RemovePartyMemberEvent>((x,e) => e.Context.LastEventResult = x.RemoveMember(e.PartyMemberId)),
             H<Party, SetPartyLeaderEvent>((x, e) => { x.Leader = e.PartyMemberId; x.Raise(e); }),
-            H<Party, ChangePartyGoldEvent>((x, e) => {}),
-            H<Party, ChangePartyRationsEvent>((x, e) => {}),
-            H<Party, AddRemoveInventoryItemEvent>((x, e) => {})
+            H<Party, ChangePartyGoldEvent>((x, e) => e.Context.LastEventResult = x.ChangePartyGold(e.Operation, e.Amount)),
+            H<Party, ChangePartyRationsEvent>((x, e) => e.Context.LastEventResult = x.ChangePartyRations(e.Operation, e.Amount)),
+            H<Party, AddRemoveInventoryItemEvent>((x, e) => e.Context.LastEventResult = x.ChangePartyInventory(e.ItemId, e.Operation, e.Amount)),
+            H<Party, SimpleChestEvent>((x, e) =>
+            {
+                e.Context.LastEventResult = e.ChestType switch
+                {
+                    SimpleChestEvent.SimpleChestItemType.Item => x.ChangePartyInventory(e.ItemId, QuantityChangeOperation.AddAmount, e.Amount),
+                    SimpleChestEvent.SimpleChestItemType.Gold => x.ChangePartyGold(QuantityChangeOperation.AddAmount, e.Amount),
+                    SimpleChestEvent.SimpleChestItemType.Rations => x.ChangePartyRations(QuantityChangeOperation.AddAmount, e.Amount),
+                    _ => false
+                };
+            })
         );
 
         public Party(IDictionary<PartyCharacterId, CharacterSheet> characterSheets) : base(Handlers)
@@ -63,37 +73,45 @@ namespace UAlbion.Game.State
             }
         }
 
-        void AddMember(PartyCharacterId id)
+        bool AddMember(PartyCharacterId id)
         {
+            bool InsertMember(Player.Player newPlayer)
+            {
+                for (int i = 0; i < MaxPartySize; i++)
+                {
+                    if (_statusBarOrder.Count == i || _statusBarOrder[i].Id > id)
+                    {
+                        _statusBarOrder.Insert(i, newPlayer);
+                        return true;
+                    }
+                }
+                return false;
+            }
+
             if (_statusBarOrder.Any(x => x.Id == id))
-                return;
+                return false;
 
             var player = new Player.Player(id, _characterSheets[id]);
-            for (int i = 0; i < MaxPartySize; i++)
-            {
-                if (_statusBarOrder.Count == i || _statusBarOrder[i].Id > id)
-                {
-                    _statusBarOrder.Insert(i, player);
-                    break;
-                }
-            }
+            if (!InsertMember(player)) 
+                return false;
 
             _walkOrder.Add(player);
             AttachChild(player);
-
             Raise(new PartyChangedEvent());
+            return true;
         }
 
-        void RemoveMember(PartyCharacterId id)
+        bool RemoveMember(PartyCharacterId id)
         {
             var player = _statusBarOrder.FirstOrDefault(x => x.Id == id);
             if (player == null)
-                return;
+                return false;
 
             _walkOrder.Remove(player);
             _statusBarOrder.Remove(player);
             player.Detach();
             Raise(new PartyChangedEvent());
+            return true;
         }
 
         public void Clear()
@@ -101,11 +119,20 @@ namespace UAlbion.Game.State
             foreach(var id in _statusBarOrder.Select(x => x.Id).ToList())
                 RemoveMember(id);
         }
-    }
 
-    public interface IMovement : IComponent
-    {
-        (Vector3, int) GetPositionHistory(PartyCharacterId partyMember);
+        bool TryEachMember(Func<Player.Player, bool> func) => _walkOrder.Any(func); // Try and execute an operation on each player until one succeeds.
+
+        bool ChangePartyInventory(ItemId itemId, QuantityChangeOperation operation, int amount) 
+            => TryEachMember(player =>
+                player.TryChangeInventory(itemId, operation, amount));
+
+        bool ChangePartyGold(QuantityChangeOperation operation, int amount)
+            => TryEachMember(player =>
+                player.TryChangeGold(operation, amount));
+
+        bool ChangePartyRations(QuantityChangeOperation operation, int amount)
+            => TryEachMember(player =>
+                player.TryChangeRations(operation, amount));
     }
 }
 

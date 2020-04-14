@@ -78,14 +78,10 @@ namespace UAlbion.Game
 
         void Trigger(TriggerChainEvent e)
         {
-            var context = new EventContext
+            var context = new EventContext(e.Source)
             {
-                Trigger = e.Trigger,
                 Chain = e.Chain,
                 Node = e.Node,
-                X = e.X,
-                Y = e.Y,
-                NpcId = e.NpcId,
                 ClockWasRunning = Resolve<IClock>().IsRunning
             };
 

@@ -136,8 +136,14 @@ namespace UAlbion.Game.Entities.Map2D
 
         void ChangeIcon(ChangeIconEvent e)
         {
-            byte x = (byte)(e.X + e.Context.X);
-            byte y = (byte)(e.Y + e.Context.Y);
+            if (!(e.Context.Source is EventSource.Map mapSource))
+            {
+                ApiUtil.Assert($"Expected event {e} to be triggered from a map event");
+                return;
+            }
+
+            byte x = (byte)(e.X + mapSource.X);
+            byte y = (byte)(e.Y + mapSource.Y);
             switch (e.ChangeType)
             {
                 case IconChangeType.Underlay: _logicalMap.ChangeUnderlay(x, y, e.Value); break;

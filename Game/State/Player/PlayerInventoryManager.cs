@@ -1,17 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.State.Player
 {
     public class PlayerInventoryManager : Component
     {
-        const int MaxSlotAmount = 99;
+        const int MaxSlotAmount = 99; // TODO: Verify
         const int TransitionSpeedMilliseconds = 200;
+        const int MaxGold = 32767;
+        const int MaxRations = 32767;
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<PlayerInventoryManager, InventoryChangedEvent>((x, e) => { if (e.MemberId == x._id) x.Update(); }),
@@ -43,6 +48,8 @@ namespace UAlbion.Game.State.Player
             _base = sheet;
             Apparent = new InterpolatedCharacterSheet(() => _lastEffective, () => _effective, () => _lerp);
         }
+
+        public override void Subscribed() => Update();
 
         public InventoryAction GetInventoryAction(ItemSlotId slotId)
         {
@@ -85,11 +92,6 @@ namespace UAlbion.Game.State.Player
             }
         }
 
-        public override void Subscribed()
-        {
-            Update();
-        }
-
         void Update()
         {
             var assets = Resolve<IAssetManager>();
@@ -105,7 +107,6 @@ namespace UAlbion.Game.State.Player
 
         bool DoesSlotAcceptItem(ItemSlotId slotId, ItemData item)
         {
-
             switch (_base.Gender)
             {
                 case Gender.Male: if (!item.AllowedGender.HasFlag(GenderMask.Male)) return false; break;
@@ -414,6 +415,78 @@ namespace UAlbion.Game.State.Player
             var settings = Resolve<ISettings>();
             var text = assets.LoadString(textId, settings.Gameplay.Language);
             Raise(new DescriptionTextEvent(text));
+        }
+
+        public bool TryChangeInventory(ItemId itemId, QuantityChangeOperation operation, int amount)
+        {
+            // TODO: Ensure weight limit is not exceeded
+            // TODO: Handle non-stacking items.
+            int currentAmount = _base.Inventory.EnumerateAll().Where(x => x.Id == itemId).Sum(x => (int?)x.Amount) ?? 0;
+            int newAmount = operation.Apply(currentAmount, amount, 0, int.MaxValue);
+            int remainingDelta = newAmount - currentAmount;
+            var pendingChanges = new List<(int, int)>(); // Tuples of (slot index, amount)
+
+            for (int i = 0; i < _base.Inventory.Slots.Length && remainingDelta != 0; i++)
+            {
+                var slot = _base.Inventory.Slots[i];
+                // Add items
+                if (remainingDelta > 0) 
+                {
+                    if (slot?.Id != null && slot.Id != itemId)
+                        continue;
+
+                    int amountToChange = Math.Min(MaxSlotAmount - (slot?.Id == null ? 0 : slot.Amount), remainingDelta);
+                    if(amountToChange > 0)
+                    {
+                        remainingDelta -= amountToChange;
+                        pendingChanges.Add((i, amountToChange));
+                    }
+                }
+                else if (slot.Id == itemId) // Remove items
+                {
+                    int amountToChange = Math.Max(-slot.Amount, remainingDelta);
+                    remainingDelta -= amountToChange;
+                    pendingChanges.Add((i, amountToChange));
+                }
+            }
+
+            if (remainingDelta != 0) // Could not perform all the changes
+                return false;
+
+            foreach (var (slotNumber, amountToChange) in pendingChanges)
+            {
+                var slot = _base.Inventory.Slots[slotNumber];
+                if (slot == null)
+                {
+                    slot = new ItemSlot();
+                    _base.Inventory.Slots[slotNumber] = slot;
+                }
+
+                slot.Id ??= itemId;
+                slot.Amount = (byte)(slot.Amount + amountToChange);
+                if (slot.Amount == 0)
+                    slot.Id = null;
+            }
+
+            return true;
+        }
+
+        public bool TryChangeGold(QuantityChangeOperation operation, int amount)
+        {
+            // TODO: Ensure weight limit is not exceeded
+            ushort newValue = (ushort)operation.Apply(_base.Inventory.Gold, amount, 0, 32767);
+            _base.Inventory.Gold = newValue;
+            Update();
+            return true;
+        }
+
+        public bool TryChangeRations(QuantityChangeOperation operation, int amount)
+        {
+            // TODO: Ensure weight limit is not exceeded
+            ushort newValue = (ushort)operation.Apply(_base.Inventory.Rations, amount, 0, 32767);
+            _base.Inventory.Rations = newValue;
+            Update();
+            return true;
         }
     }
 }

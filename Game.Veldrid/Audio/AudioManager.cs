@@ -79,11 +79,13 @@ namespace UAlbion.Game.Veldrid.Audio
 
             var map = Resolve<IMapManager>()?.Current;
             var tileSize = map?.TileSize ?? Vector3.One;
+            var mapSource = e.Context.Source as EventSource.Map;
             var source = new SimpleAudioSource(buffer)
             {
                 Volume = e.Volume == 0 ? 1.0f : e.Volume / 255.0f,
                 Looping = e.Mode == SoundEvent.SoundMode.LocalLoop,
-                Position = tileSize * new Vector3(e.Context.X, e.Context.Y, 0.0f),
+                Position = tileSize * new Vector3(mapSource?.X ?? 0, mapSource?.Y ?? 0, 0.0f),
+                SourceRelative = mapSource == null, // If we couldn't localise the sound then play it at (0,0) relative to the player.
                 ReferenceDistance = 4.0f * tileSize.X,
                 RolloffFactor = 4.0f
             };

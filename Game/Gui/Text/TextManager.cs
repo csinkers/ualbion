@@ -255,7 +255,7 @@ namespace UAlbion.Game.Gui.Text
             var eventSet = assets.LoadEventSet(e.EventSet);
             var conversation = AttachChild(new Conversation(
                 party?.Leader ?? PartyCharacterId.Tom,
-                e.Context?.NpcId ?? NpcCharacterId.Ned,
+                e.Context?.Source is EventSource.Npc npc ? npc.NpcId : NpcCharacterId.Ned,
                 eventSet));
 
             conversation.Complete += (sender, args) => e.Complete();

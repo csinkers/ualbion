@@ -36,7 +36,7 @@ namespace UAlbion.Game.State.Player
                 Combat = sheet.Combat.DeepClone()
             };
 
-            ApplyWieldedItems(assets,effective);
+            ApplyWieldedItems(assets, effective);
             CalculateTotalWeight(assets, effective);
 
             return effective;

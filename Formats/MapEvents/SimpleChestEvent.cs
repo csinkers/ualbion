@@ -14,7 +14,7 @@ namespace UAlbion.Formats.MapEvents
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-            e.ItemId = s.UInt16(nameof(ItemId), e.ItemId);
+            e.ItemId = s.EnumU16(nameof(ItemId), e.ItemId);
             e.Amount = s.UInt16(nameof(Amount), e.Amount);
             ApiUtil.Assert(e.Unk2 == 0);
             ApiUtil.Assert(e.Unk3 == 0);
@@ -30,21 +30,14 @@ namespace UAlbion.Formats.MapEvents
         }
 
         public SimpleChestItemType ChestType { get; private set; }
-        public ushort ItemId { get; private set; }
+        public ItemId ItemId { get; private set; }
         public ushort Amount { get; private set; }
         byte Unk2 { get; set; }
         byte Unk3 { get; set; }
         byte Unk4 { get; set; }
         byte Unk5 { get; set; }
 
-        string ItemIdString =>
-            ChestType switch
-            {
-                SimpleChestItemType.Item => ((ItemId)ItemId).ToString(),
-                _ => ItemId.ToString()
-            };
-
-        public override string ToString() => $"simple_chest {ChestType} {Amount}x{ItemIdString}";
+        public override string ToString() => $"simple_chest {ChestType} {Amount}x{ItemId}";
         public override MapEventType EventType => MapEventType.SimpleChest;
     }
 }

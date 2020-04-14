@@ -25,9 +25,9 @@ namespace UAlbion.Game
                 case (QueryEvent q, QueryType.HasPartyMember):       return game.Party.StatusBarOrder.Any(x => (int)x.Id == q.Argument);
                 case (QueryEvent q, QueryType.IsPartyMemberLeader):  return (int)game.Party.Leader == q.Argument;
                 case (QueryEvent q, QueryType.RandomChance):         return _random.Next(100) < q.Argument;
-                case (QueryEvent q, QueryType.TriggerType):          return (ushort)context.Trigger == q.Argument;
-                case (QueryVerbEvent verb, QueryType.ChosenVerb):    return context.Trigger.HasFlag((TriggerType)(1 << (int)verb.Verb));
-                case (QueryItemEvent q, QueryType.UsedItemId):       return context.UsedItem == q.ItemId;
+                case (QueryEvent q, QueryType.TriggerType):          return (ushort)context.Source.Trigger == q.Argument;
+                case (QueryVerbEvent verb, QueryType.ChosenVerb):    return context.Source.Trigger.HasFlag((TriggerType)(1 << (int)verb.Verb));
+                case (QueryItemEvent q, QueryType.UsedItemId):       return context.Source is EventSource.Item item && item.ItemId == q.ItemId;
                 case (_, QueryType.PreviousActionResult):            return context.LastEventResult;
 
                 case (_, QueryType.IsScriptDebugModeActive): { return false; }

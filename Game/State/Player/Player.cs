@@ -3,6 +3,7 @@ using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.State.Player
 {
@@ -26,6 +27,16 @@ namespace UAlbion.Game.State.Player
         public InventoryAction GetInventoryAction(ItemSlotId slotId) => _inventoryManager.GetInventoryAction(slotId);
         public Func<Vector3> GetPosition { get; set; }
         public override string ToString() => $"Player {Id}";
+
+        public bool TryChangeInventory(ItemId itemId, QuantityChangeOperation operation, int amount)
+            => _inventoryManager.TryChangeInventory(itemId, operation, amount);
+
+        public bool TryChangeGold(QuantityChangeOperation operation, int amount)
+            => _inventoryManager.TryChangeGold(operation, amount);
+
+
+        public bool TryChangeRations(QuantityChangeOperation operation, int amount)
+            => _inventoryManager.TryChangeRations(operation, amount);
     }
 }
 

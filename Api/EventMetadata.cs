@@ -63,7 +63,8 @@ namespace UAlbion.Api
         {
             var constructor = Type.GetConstructors().Single();
             var parameters = constructor.GetParameters();
-            ApiUtil.Assert(parameters.Length == Parts.Length);
+            ApiUtil.Assert(parameters.Length == Parts.Length,
+                $"When building parser for {Type}, the public constructor had {parameters.Length} parameters but {Parts.Length} were expected.");
 
             return (Func<string[], Event>)Expression.Lambda(
                 Expression.Convert(

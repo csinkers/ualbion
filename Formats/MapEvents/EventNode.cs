@@ -11,11 +11,11 @@ namespace UAlbion.Formats.MapEvents
         bool DirectSequence => (NextEventId ?? Id + 1) == Id + 1;
         public override string ToString() => $"{(DirectSequence ? " " : "#")}{Id}=>{NextEventId?.ToString() ?? "!"}: {Event}";
         public int Id { get; }
-        public IMapEvent Event { get; }
+        public IEvent Event { get; }
         public ushort? NextEventId { get; set; }
         public IEventNode NextEvent { get; set; }
 
-        public EventNode(int id, IMapEvent @event)
+        public EventNode(int id, IEvent @event)
         {
             Id = id;
             Event = @event;
@@ -32,7 +32,8 @@ namespace UAlbion.Formats.MapEvents
         public static EventNode Serdes(int id, EventNode node, ISerializer s, TextSource source)
         {
             var initialPosition = s.Offset;
-            MapEventType type = (MapEventType)s.UInt8("Type", (byte)(node?.Event?.EventType ?? MapEventType.UnkFf));
+            var mapEvent = node?.Event as MapEvent;
+            MapEventType type = (MapEventType)s.UInt8("Type", (byte)(mapEvent?.EventType ?? MapEventType.UnkFf));
 
             var @event = SerdesByType(node, s, type, source);
             if (@event is IQueryEvent query)

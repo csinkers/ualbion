@@ -19,6 +19,7 @@ layout(location = 1) in flat float iLayer;      // Texture Layer
 layout(location = 2) in flat uint  iFlags;      // Flags
 layout(location = 3) in vec2 iNormCoords;       // Normalised sprite coordinates
 layout(location = 4) in vec3 iWorldPosition;    // World-space position
+layout(location = 5) in flat float iFrontDepth; // Sprite front depth
 
 // Fragment shader outputs
 layout(location = 0) out vec4 OutputColor;
@@ -77,8 +78,15 @@ void main()
 		color = vec4(color.xyz, color.w * opacity);
 	}
 	
-	float depth = (color.w == 0.0f) ? 0.0f : gl_FragCoord.z;
-
+	float depth = gl_FragCoord.z;
+	
+	if (iFrontDepth < depth)
+	{
+		float x = iNormCoords.x - 0.5;
+		float coef = max(0, (sqrt(0.25 - x * x) * 2));
+		depth += (iFrontDepth - depth) * coef;
+	}
+	
 	if ((u_engine_flags & EF_RENDER_DEPTH) != 0)
 		color = vec4(depth, 10 * (max(depth, 0.9) - 0.9), 10 * min(depth, 0.1), 1.0f);
 	OutputColor = color;

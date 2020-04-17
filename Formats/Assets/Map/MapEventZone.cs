@@ -31,6 +31,6 @@ namespace UAlbion.Formats.Assets.Map
             return zone;
         }
 
-        public override string ToString() => $"Zone ({X}, {Y}) T:{Trigger} Mode:{Unk1} C:{Chain.Id} E:{EventNumber}";
+        public override string ToString() => $"Zone ({X}, {Y}) T:{Trigger} Mode:{Unk1} C:{Chain?.Id} E:{EventNumber}";
     }
 }

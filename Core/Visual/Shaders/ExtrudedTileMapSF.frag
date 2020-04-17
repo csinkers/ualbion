@@ -67,8 +67,15 @@ void main()
 			color = vec4(wallLayer / 255.0f, wallLayer / 255.0f, wallLayer / 255.0f, 1.0f);
 	}
 
-	OutputColor = color;
 	float depth = gl_FragCoord.z;
+
+	if ((iFlags & TF_TEXTURE_TYPE_MASK) == TF_TEXTURE_TYPE_FLOOR)
+		depth = 1.0f;
+ 
+	if ((u_engine_flags & EF_RENDER_DEPTH) != 0)
+		color = vec4(depth, 10 * (max(depth, 0.9) - 0.9), 10 * min(depth, 0.1), 1.0f);
+	OutputColor = color;
+
 	gl_FragDepth = ((u_engine_flags & EF_FLIP_DEPTH_RANGE) != 0) ? 1.0f - depth : depth;
 }
 

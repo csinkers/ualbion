@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using UAlbion.Api;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
@@ -10,45 +9,6 @@ using Veldrid.Utilities;
 
 namespace UAlbion.Core.Veldrid.Visual
 {
-    struct SpriteShaderKey : IEquatable<SpriteShaderKey>
-    {
-        public bool UseArrayTexture { get; }
-        public bool PerformDepthTest { get; }
-        public bool UsePalette { get; }
-
-        public SpriteShaderKey(MultiSprite sprite) : this(
-                sprite.Key.Texture.ArrayLayers > 1,
-                (sprite.Key.Flags & SpriteKeyFlags.NoDepthTest) == 0,
-                sprite.Key.Texture is EightBitTexture)
-        { }
-
-        public SpriteShaderKey(bool useArrayTexture, bool performDepthTest, bool usePalette)
-        {
-            UseArrayTexture = useArrayTexture;
-            PerformDepthTest = performDepthTest;
-            UsePalette = usePalette;
-        }
-        public override string ToString() => $"{(UseArrayTexture ? "Array" : "Flat")}_{(PerformDepthTest ? "Depth" : "NoDepth")}{(UsePalette ? "_Pal" : "")}";
-
-        public bool Equals(SpriteShaderKey other) =>
-            UseArrayTexture == other.UseArrayTexture &&
-            PerformDepthTest == other.PerformDepthTest &&
-            UsePalette == other.UsePalette;
-
-        public override bool Equals(object obj) => obj is SpriteShaderKey other && Equals(other);
-        public override int GetHashCode() => HashCode.Combine(UseArrayTexture, PerformDepthTest, UsePalette);
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    struct SpriteUniformInfo // Length must be multiple of 16
-    {
-        public SpriteKeyFlags Flags { get; set; } // 1 byte
-        readonly byte _pad1;   // 2
-        readonly ushort _pad2; // 4
-        readonly uint _pad3;   // 8
-        readonly double _pad4; // 16
-    }
-
     public class SpriteRenderer : Component, IRenderer
     {
         // Vertex Layout
@@ -98,8 +58,9 @@ namespace UAlbion.Core.Veldrid.Visual
         Pipeline BuildPipeline(GraphicsDevice gd, SceneContext sc, SpriteShaderKey key)
         {
             var shaderCache = Resolve<IShaderCache>();
-            var vertexShaderName = "SpriteSV.vert";
-            var fragmentShaderName = "SpriteSF.frag";
+            var shaderName = key.UseCylindricalShader ? "CylindricalSprite" : "Sprite"; 
+            var vertexShaderName = shaderName + "SV.vert";
+            var fragmentShaderName = shaderName + "SF.frag";
             var vertexShaderContent = shaderCache.GetGlsl(vertexShaderName);
             var fragmentShaderContent = shaderCache.GetGlsl(fragmentShaderName);
 
@@ -188,13 +149,15 @@ namespace UAlbion.Core.Veldrid.Visual
 
             ITextureManager textureManager = Resolve<ITextureManager>();
             IDeviceObjectManager objectManager = Resolve<IDeviceObjectManager>();
+            EngineFlags engineFlags = Resolve<IEngineSettings>().Flags;
 
             foreach (var renderable in renderables)
             {
                 var sprite = (MultiSprite)renderable;
-                if (sprite.ActiveInstances == 0) continue;
+                if (sprite.ActiveInstances == 0)
+                    continue;
 
-                var shaderKey = new SpriteShaderKey(sprite);
+                var shaderKey = new SpriteShaderKey(sprite, engineFlags);
                 if (!_pipelines.ContainsKey(shaderKey))
                     _pipelines.Add(shaderKey, BuildPipeline(gd, sc, shaderKey));
 
@@ -245,9 +208,10 @@ namespace UAlbion.Core.Veldrid.Visual
 
             ITextureManager textureManager = Resolve<ITextureManager>();
             IDeviceObjectManager dom = Resolve<IDeviceObjectManager>();
+            EngineFlags engineFlags = Resolve<IEngineSettings>().Flags;
             // float depth = gd.IsDepthRangeZeroToOne ? 0 : 1;
             var sprite = (MultiSprite)renderable;
-            var shaderKey = new SpriteShaderKey(sprite);
+            var shaderKey = new SpriteShaderKey(sprite, engineFlags);
             sprite.PipelineId = shaderKey.GetHashCode();
 
             //if (!shaderKey.UseArrayTexture)

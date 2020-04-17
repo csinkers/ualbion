@@ -20,10 +20,11 @@ layout(set = 1, binding = 3) uniform texture2D uPalette; //! // vdspv_1_3
 #endif
 
 // UAlbion.Core.EngineFlags
-#define EF_SHOW_BOUNDING_BOXES 1
-#define EF_SHOW_CENTRE         2
-#define EF_FLIP_DEPTH_RANGE    4
-#define EF_FLIP_Y_SPACE        8
+#define EF_SHOW_BOUNDING_BOXES 0x1
+#define EF_SHOW_CENTRE         0x2
+#define EF_FLIP_DEPTH_RANGE    0x4
+#define EF_FLIP_Y_SPACE        0x8
+#define EF_RENDER_DEPTH       0x80
 
 // UAlbion.Core.SpriteKeyFlags
 #define SKF_NO_DEPTH_TEST     0x1

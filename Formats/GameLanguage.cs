@@ -2,8 +2,8 @@
 {
     public enum GameLanguage
     {
-        German,
+        German, // These must match the XLD directory names
         English,
-        French,
+        French
     }
 }

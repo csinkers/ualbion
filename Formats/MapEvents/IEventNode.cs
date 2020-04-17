@@ -1,9 +1,11 @@
-﻿namespace UAlbion.Formats.MapEvents
+﻿using UAlbion.Api;
+
+namespace UAlbion.Formats.MapEvents
 {
     public interface IEventNode
     {
         int Id { get; }
-        IMapEvent Event { get; }
+        IEvent Event { get; }
         IEventNode NextEvent { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 //!#extension GL_KHR_vulkan_glsl: enable
 
 // Resource Sets
-layout(binding = 0) uniform sampler uSampler; // vdspv_0_0
+layout(binding = 0) uniform sampler uSampler; //! // vdspv_0_0
 layout(binding = 1) uniform texture2D uTexture;  //! // vdspv_0_1
 
 // Shared set
@@ -23,8 +23,8 @@ void main()
 	vec4 color = texture(sampler2D(uTexture, uSampler), uv); //! vec4 color;
 
 	float redChannel = color[0];
-	color = texture(
-		sampler2D(uPalette, uSampler),
+	color = texture( //!
+		sampler2D(uPalette, uSampler), //!
 		vec2((redChannel * 255.0f/256.f) + (0.5f/256.0f), 0)); //!
 
 	OutputColor = color;

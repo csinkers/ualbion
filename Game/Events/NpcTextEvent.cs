@@ -1,13 +1,12 @@
 ﻿using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Events
 {
     [Event("npc_text")]
-    public class NpcTextEvent : Event, INpcEvent
+    public class NpcTextEvent : Event
     {
-        public NpcTextEvent(NpcCharacterId npcId, int textId) { NpcId = npcId; TextId = textId; }
-        [EventPart("npcId ")] public NpcCharacterId NpcId { get; }
+        public NpcTextEvent(int npcId, int textId) { NpcId = npcId; TextId = textId; }
+        [EventPart("npcId ")] public int NpcId { get; }
         [EventPart("textId")] public int TextId { get; }
     }
 }

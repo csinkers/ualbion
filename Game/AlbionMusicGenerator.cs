@@ -39,7 +39,6 @@ namespace UAlbion.Game
             byte[] bankData = GetRawWoplBytes(wopl);
 
             _player.OpenBankData(bankData);
-
             _player.OpenData(xmiBytes);
             _player.SetLoopEnabled(true);
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Formats;
@@ -150,8 +151,12 @@ namespace UAlbion.Game.Assets
 
         public string LoadString(StringId id, GameLanguage language)
         {
-            var stringTable = (IDictionary<int, string>)_assetLocatorRegistry.LoadAssetCached(id.Type, id.Id, language);
-            if (stringTable == null)
+            var asset = _assetLocatorRegistry.LoadAssetCached(id.Type, id.Id, language);
+
+            if (asset is string s)
+                return s;
+
+            if (!(asset is IDictionary<int, string> stringTable))
                 return $"!MISSING STRING-TABLE {id.Type}:{id.Id}:{id.SubId}:{language}!";
 
             return stringTable.TryGetValue(id.SubId, out var value)
@@ -189,5 +194,6 @@ namespace UAlbion.Game.Assets
         public IList<Block> LoadBlockList(BlockListId blockListId) => (IList<Block>)_assetLocatorRegistry.LoadAssetCached(AssetType.BlockList, blockListId);
         public EventSet LoadEventSet(EventSetId eventSetId) => (EventSet)_assetLocatorRegistry.LoadAssetCached(AssetType.EventSet, eventSetId);
         public byte[] LoadSong(SongId songId) => (byte[]) _assetLocatorRegistry.LoadAssetCached(AssetType.Song, songId);
+        public IList<IEvent> LoadScript(ScriptId scriptId) => (IList<IEvent>) _assetLocatorRegistry.LoadAsset(AssetType.Script, scriptId);
     }
 }

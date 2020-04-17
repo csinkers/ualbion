@@ -4,6 +4,7 @@
 /data/Saves/
 /data/ShaderCache/
 /data/exported/
+/mods/
 /re/
 /AdlMidi.NET/
 /SerdesNet/
@@ -23,6 +24,7 @@ packages/
 *.lock~
 *.user
 
+/data/settings.json
 SDL2.dll
 imgui.ini
 libveldrid-spirv.dll

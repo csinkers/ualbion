@@ -8,7 +8,8 @@ namespace UAlbion.Core.Visual
     [Flags]
     public enum SpriteKeyFlags : byte
     {
-        NoDepthTest    =   0x1,
-        NoTransform    =   0x2,
+        NoDepthTest    = 0x1,
+        NoTransform    = 0x2,
+        UseCylindrical = 0x4,
     }
 }

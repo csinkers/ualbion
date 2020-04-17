@@ -78,7 +78,6 @@ namespace UAlbion.Game.Assets
         };
         // ReSharper restore StringLiteralTypo
 
-
         class AssetPaths
         {
             public string OverridePath { get; set; }

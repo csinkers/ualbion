@@ -50,8 +50,11 @@ namespace UAlbion.Game.Entities.Map3D
         public Vector3 TileSize { get; private set; }
         public float BaseCameraHeight => (_labyrinthData?.CameraHeight ?? 0) != 0 ? _labyrinthData.CameraHeight * 8 : TileSize.Y / 2;
 
-        void LoadMap()
+        public override void Subscribed()
         {
+            if (_labyrinthData != null)
+                return;
+
             var assets = Resolve<IAssetManager>();
             _labyrinthData = assets.LoadLabyrinthData(_mapData.LabDataId);
 
@@ -63,6 +66,7 @@ namespace UAlbion.Game.Entities.Map3D
 
             TileSize = new Vector3(_labyrinthData.EffectiveWallWidth, _labyrinthData.WallHeight, _labyrinthData.EffectiveWallWidth);
             AttachChild(new MapRenderable3D(MapId, _mapData, _labyrinthData, TileSize));
+            AttachChild(new ScriptManager(_mapData.Id));
 
             if (_labyrinthData.BackgroundId.HasValue)
                 AttachChild(new Skybox(_labyrinthData.BackgroundId.Value));
@@ -119,12 +123,7 @@ namespace UAlbion.Game.Entities.Map3D
                     }
                 }
             }
-        }
 
-        public override void Subscribed()
-        {
-            if (_labyrinthData == null)
-                LoadMap();
             Raise(new SetClearColourEvent(_backgroundRed, _backgroundGreen, _backgroundBlue));
         }
 

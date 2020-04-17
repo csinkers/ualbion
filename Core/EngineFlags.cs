@@ -11,5 +11,7 @@ namespace UAlbion.Core
         FlipYSpace         = 0x8,
         VSync              = 0x10,
         HighlightSelection = 0x20,
+        UseCylindricalBillboards = 0x40,
+        RenderDepth        = 0x80,
     }
 }

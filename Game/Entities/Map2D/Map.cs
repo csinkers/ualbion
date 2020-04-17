@@ -59,6 +59,7 @@ namespace UAlbion.Game.Entities.Map2D
             TileSize = new Vector3(renderable.TileSize, 1.0f);
             _logicalMap.TileSize = renderable.TileSize;
 
+            AttachChild(new ScriptManager(_mapData.Id));
             AttachChild(new Collider(_logicalMap));
             IMovement partyMovement = AttachChild(_logicalMap.UseSmallSprites
                 ?  (IMovement)new SmallPartyMovement(Vector2.Zero, MovementDirection.Right)
@@ -122,7 +123,7 @@ namespace UAlbion.Game.Entities.Map2D
             while (true)
             {
                 zone = _logicalMap.GetZone(e.X, e.Y);
-                if (zone == null || !zone.Trigger.HasFlag(TriggerType.Normal))
+                if (zone?.Chain?.FirstEvent == null || !zone.Trigger.HasFlag(TriggerType.Normal))
                     return;
 
                 if (!(zone.Chain.FirstEvent.Event is OffsetEvent offset))

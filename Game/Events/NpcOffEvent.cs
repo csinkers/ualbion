@@ -1,12 +1,11 @@
 ﻿using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Events
 {
     [Event("npc_off")]
-    public class NpcOffEvent : Event, INpcEvent
+    public class NpcOffEvent : Event
     {
-        public NpcOffEvent(NpcCharacterId npcId) { NpcId = npcId; }
-        [EventPart("npcId")] public NpcCharacterId NpcId { get; }
+        public NpcOffEvent(int npcId) { NpcId = npcId; }
+        [EventPart("npcId")] public int NpcId { get; }
     }
 }

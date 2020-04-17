@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
@@ -12,26 +14,43 @@ namespace UAlbion.Game.Gui.Menus
 
         int _musicVolume;
         int _fxVolume;
-        int _windowSize3d;
-        int _combatDetailLevel;
         int _combatDelay;
 
-        public OptionsMenu() : base(null, DialogPositioning.Center)
+        bool HasLanguageFiles(GameLanguage language)
         {
+            var config = Resolve<IAssetManager>().LoadGeneralConfig();
+            var path = Path.Combine(config.BasePath, config.XldPath, language.ToString().ToUpper());
+            return Directory.Exists(path);
+        }
+
+        public OptionsMenu() : base(null, DialogPositioning.Center) { }
+
+        public override void Subscribed()
+        {
+            var languageButtons = new List<IUiElement>();
+            void SetLanguage(GameLanguage language) => Raise(new SetLanguageEvent(language));
+
+            void AddLang(string label, GameLanguage language)
+            {
+                if (HasLanguageFiles(language))
+                    languageButtons.Add(new Button(label, () => SetLanguage(language)));
+            }
+
+            AddLang("EN", GameLanguage.English);
+            AddLang("DE", GameLanguage.German);
+            AddLang("FR", GameLanguage.French);
+
             var elements = new List<IUiElement>
             {
                 new Spacing(156,2),
+                new Label(UAlbionStringId.LanguageLabel.ToId()),
+                new HorizontalStack(languageButtons),
+                new Spacing(0,2),
                 new Label(SystemTextId.Options_MusicVolume.ToId()),
                 new Slider(() => _musicVolume, x => _musicVolume = x, 0, 127),
                 new Spacing(0,2),
                 new Label(SystemTextId.Options_FXVolume.ToId()),
                 new Slider(() => _fxVolume, x => _fxVolume = x, 0, 127),
-                new Spacing(0,2),
-                new Label(SystemTextId.Options_3DWindowSize.ToId()),
-                new Slider(() => _windowSize3d, x => _windowSize3d = x, 0, 100),
-                new Spacing(0,2),
-                new Label(SystemTextId.Options_CombatDetailLevel.ToId()),
-                new Slider(() => _combatDetailLevel, x => _combatDetailLevel = x, 1, 5),
                 new Spacing(0,2),
                 new Label(SystemTextId.Options_CombatTextDelay.ToId()),
                 new Slider(() => _combatDelay, x => _combatDelay = x, 1, 50),
@@ -41,15 +60,10 @@ namespace UAlbion.Game.Gui.Menus
             };
             var stack = new VerticalStack(elements);
             AttachChild(new DialogFrame(stack));
-        }
 
-        public override void Subscribed()
-        {
             var settings = Resolve<ISettings>();
             _musicVolume = settings.Audio.MusicVolume;
             _fxVolume = settings.Audio.FxVolume;
-            _windowSize3d = settings.Graphics.WindowSize3d;
-            _combatDetailLevel = settings.Graphics.CombatDetailLevel;
             _combatDelay = settings.Gameplay.CombatDelay;
             base.Subscribed();
         }
@@ -59,9 +73,8 @@ namespace UAlbion.Game.Gui.Menus
             var settings = Resolve<ISettings>();
             if (_musicVolume != settings.Audio.MusicVolume) Raise(new SetMusicVolumeEvent(_musicVolume));
             if (_fxVolume != settings.Audio.FxVolume) Raise(new SetFxVolumeEvent(_fxVolume));
-            if (_windowSize3d != settings.Graphics.WindowSize3d) Raise(new SetWindowSize3dEvent(_windowSize3d));
-            if (_combatDetailLevel != settings.Graphics.CombatDetailLevel) Raise(new SetCombatDetailLevelEvent(_combatDetailLevel));
             if (_combatDelay != settings.Gameplay.CombatDelay) Raise(new SetCombatDelayEvent(_combatDelay));
+            settings.Save();
 
             Closed?.Invoke(this, EventArgs.Empty);
             Detach();

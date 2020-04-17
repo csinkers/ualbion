@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UAlbion.Api;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
@@ -7,6 +8,7 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.Config;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game
 {
@@ -39,5 +41,6 @@ namespace UAlbion.Game
         CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id);
         EventSet LoadEventSet(EventSetId eventSetId);
         byte[] LoadSong(SongId songId);
+        IList<IEvent> LoadScript(ScriptId scriptId);
     }
 }

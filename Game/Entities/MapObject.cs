@@ -22,7 +22,10 @@ namespace UAlbion.Game.Entities
         public MapObject(DungeonObjectId id, Vector3 initialPosition, Vector2 size, bool onFloor) : base(Handlers)
         {
             _initialPosition = initialPosition;
-            _sprite = AttachChild(new MapSprite<DungeonObjectId>(id, DrawLayer.Underlay, 0,
+            _sprite = AttachChild(new MapSprite<DungeonObjectId>(
+                id,
+                DrawLayer.Underlay,
+                SpriteKeyFlags.UseCylindrical,
                 SpriteFlags.FlipVertical |
                 (onFloor
                     ? SpriteFlags.Floor | SpriteFlags.MidAligned

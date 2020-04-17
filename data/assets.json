@@ -12257,7 +12257,7 @@
   "SCRIPT0.XLD": {
     "Format": "Script",
     "EnumName": "ScriptId",
-    "EnumType": "byte",
+    "EnumType": "ushort",
     "Assets": {
       "0": {},
       "1": {},
@@ -12326,7 +12326,7 @@
   "SCRIPT2.XLD": {
     "Format": "Script",
     "EnumName": "ScriptId",
-    "EnumType": "byte",
+    "EnumType": "ushort",
     "Assets": {
       "0": {},
       "1": {},

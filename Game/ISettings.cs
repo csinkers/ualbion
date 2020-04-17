@@ -11,5 +11,6 @@ namespace UAlbion.Game
         IGraphicsSettings Graphics { get; }
         IGameplaySettings Gameplay { get; }
         IEngineSettings Engine { get; }
+        void Save();
     }
 }

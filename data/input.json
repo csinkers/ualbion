@@ -13,6 +13,7 @@
     "F10": "update 1",
     "Control+A": "!loadnextmap",
     "Control+X": "!loadprevmap",
+    "Control+D": "engine_flag toggle RenderDepth",
     "Pause": "e:run_renderdoc",
     "Control+R": "e:run_renderdoc",
     "Alt+Enter":  "e:toggle",
@@ -89,6 +90,7 @@
   },
   "World3D": {
     "Tab": "push_scene inventory",
+    "Control+Q": "engine_flag toggle UseCylindricalBillboards",
 
     "Control+Number1": "set_active_member 0",
     "Control+Number2": "set_active_member 1",

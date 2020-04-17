@@ -28,5 +28,6 @@ namespace UAlbion.Game.Events
         public EventChain Chain { get; }
         public IEventNode Node { get; }
         public EventSource Source { get; }
+        public EventContext Context { get; set; }
     }
 }

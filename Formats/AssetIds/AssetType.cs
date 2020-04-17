@@ -68,5 +68,6 @@ namespace UAlbion.Formats.AssetIds
         [EnumType(typeof(VideoId))]              Flic,               // Graphics
         [EnumType(typeof(WaveLibraryId))]        WaveLibrary,        // Audio
         [EnumType(typeof(WordId))]               Dictionary,         // Text
+        [EnumType(typeof(UAlbionStringId))]      UAlbionText,        // JSON text
     }
 }

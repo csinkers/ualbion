@@ -29,9 +29,10 @@ namespace UAlbion.Game
             _querier = AttachChild(new Querier());
         }
 
-        void RaiseWithContext(EventContext context, IMapEvent e)
+        void RaiseWithContext(EventContext context, IEvent e)
         {
-            e.Context = context;
+            if(e is MapEvent mapEvent)
+                mapEvent.Context = context;
             Raise(e);
         }
 
@@ -74,6 +75,14 @@ namespace UAlbion.Game
                 Raise(new StartClockEvent());
 
             _activeChains.Remove(context);
+
+            if (context.Parent == null) 
+                return;
+
+            if (context.Parent.Node.Event is AsyncEvent async)
+                async.Complete();
+            else
+                Resume(context.Parent);
         }
 
         void Trigger(TriggerChainEvent e)
@@ -82,7 +91,8 @@ namespace UAlbion.Game
             {
                 Chain = e.Chain,
                 Node = e.Node,
-                ClockWasRunning = Resolve<IClock>().IsRunning
+                ClockWasRunning = Resolve<IClock>().IsRunning,
+                Parent = e.Context
             };
 
             if (context.ClockWasRunning)

@@ -9,7 +9,12 @@ namespace UAlbion.Game.Assets
     public class AssetConfigLocator : Component, IAssetLocator
     {
         public AssetConfigLocator() : base(null) { }
-        public IEnumerable<AssetType> SupportedTypes => new[] { AssetType.AssetConfig, AssetType.GeneralConfig };
+        public IEnumerable<AssetType> SupportedTypes => new[]
+        {
+            AssetType.AssetConfig,
+            AssetType.GeneralConfig,
+        };
+
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)
         {
             var settings = Resolve<ISettings>();

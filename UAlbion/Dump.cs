@@ -52,6 +52,28 @@ namespace UAlbion
                 sw.WriteLine("    Ceilings: " + string.Join(" ", ceilings.Select(x => $"{x.Item1}:{x.Item2}")));
                 var contents = map.Contents.GroupBy(x => x).Select(x => (x.Key, x.Count())).OrderBy(x => x.Item1);
                 sw.WriteLine("    Contents: " + string.Join(" ", contents.Select(x => $"{x.Item1}:{x.Item2}")));
+
+                var l = assets.LoadLabyrinthData(map.LabDataId);
+                if (l == null) 
+                    continue;
+
+                foreach (var (content, _) in contents)
+                {
+                    if (content == 0 || content >= l.ObjectGroups.Count)
+                        continue;
+
+                    var objectInfo = l.ObjectGroups[content - 1];
+
+                    sw.Write($"        {content}: ");
+                    foreach (var subObject in objectInfo.SubObjects)
+                    {
+                        var definition = l.Objects[subObject.ObjectInfoNumber];
+                        sw.Write(definition.TextureNumber);
+                        sw.Write(" ");
+                    }
+
+                    sw.WriteLine();
+                }
             }
 
             for (int i = 0; i < 300; i++)

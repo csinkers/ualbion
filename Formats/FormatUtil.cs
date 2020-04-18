@@ -7,14 +7,15 @@ namespace UAlbion.Formats
 {
     public static class FormatUtil
     {
+        public static readonly Encoding AlbionEncoding = Encoding.GetEncoding(850);
         public static string BytesTo850String(byte[] bytes) =>
-            Encoding.GetEncoding(850)
+            AlbionEncoding
                 .GetString(bytes)
                 .Replace("×", "ß")
                 .TrimEnd((char) 0);
 
         public static byte[] BytesFrom850String(string str) =>
-            Encoding.GetEncoding(850)
+            AlbionEncoding
                 .GetBytes(str.Replace("ß", "×"));
 
         public static string FindBasePath()

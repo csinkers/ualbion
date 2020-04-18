@@ -50,7 +50,7 @@ namespace UAlbion.Formats
 
             _stream.Seek(_objectOffsets[objectIndex], SeekOrigin.Begin);
             length = _objectOffsets[objectIndex + 1] - _objectOffsets[objectIndex];
-            return new BinaryReader(_stream, Encoding.Default, true);
+            return new BinaryReader(_stream, FormatUtil.AlbionEncoding, true);
         }
 
         public void Dispose() => _stream?.Dispose();

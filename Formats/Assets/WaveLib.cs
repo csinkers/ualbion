@@ -19,6 +19,6 @@ namespace UAlbion.Formats.Assets
             return w;
         }
 
-        public ISample GetSample(int id) => _headers[id];
+        public ISample GetSample(int instrument) => _headers.FirstOrDefault(x => x.Instrument == instrument);
     }
 }

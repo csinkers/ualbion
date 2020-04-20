@@ -37,7 +37,9 @@ namespace UAlbion
             PerfTracker.StartupEvent($"Found base directory {baseDir}");
 
             var logger = new ConsoleLogger();
+            PerfTracker.StartupEvent("Loading settings...");
             var settings = Settings.Load(baseDir);
+            PerfTracker.StartupEvent("Settings loaded");
             var factory = new VeldridCoreFactory();
 
             PerfTracker.StartupEvent("Registering asset manager");
@@ -47,6 +49,7 @@ namespace UAlbion
                 .AddAssetLocator(new CoreSpriteLocator())
                 .AddAssetLocator(new MetaFontLocator(factory))
                 .AddAssetLocator(new NewStringLocator())
+                .AddAssetLocator(new SoundBankLocator())
                 .AddAssetPostProcessor(new AlbionSpritePostProcessor())
                 .AddAssetPostProcessor(new ImageSharpPostProcessor())
                 .AddAssetPostProcessor(new InterlacedBitmapPostProcessor())

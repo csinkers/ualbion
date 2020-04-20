@@ -167,7 +167,12 @@ namespace UAlbion.Game.Assets
         public string LoadString(SystemTextId id, GameLanguage language) => LoadString(new StringId(AssetType.SystemText, 0, (int)id), language);
         public string LoadString(WordId id, GameLanguage language) => LoadString(new StringId(AssetType.Dictionary, (int)id / 500, (int)id), language);
 
-        public AlbionSample LoadSample(SampleId id) => (AlbionSample)_assetLocatorRegistry.LoadAssetCached(AssetType.Sample, id);
+        public ISample LoadSample(SampleId id) => (AlbionSample)_assetLocatorRegistry.LoadAssetCached(AssetType.Sample, id);
+
+        public ISample LoadWaveLib(SongId songId, int instrument)
+            => ((WaveLib) _assetLocatorRegistry.LoadAssetCached(AssetType.WaveLibrary, songId))?.GetSample(instrument);
+
+        public byte[] LoadSoundBanks() => (byte[]) _assetLocatorRegistry.LoadAssetCached(AssetType.SoundBank, 0);
         public AlbionVideo LoadVideo(VideoId id, GameLanguage language) => (AlbionVideo)_assetLocatorRegistry.LoadAssetCached(AssetType.Flic, (int)id, language);
         public CharacterSheet LoadCharacter(PartyCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(AssetType.PartyMember, id);
         public CharacterSheet LoadCharacter(NpcCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(AssetType.Npc, id);

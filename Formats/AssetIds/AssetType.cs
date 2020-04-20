@@ -19,6 +19,7 @@ namespace UAlbion.Formats.AssetIds
         GeneralConfig,
         MetaFont,
         PaletteNull,
+        SoundBank,
         Slab, // Graphics
         Unnamed2, // Unused
         [EnumType(typeof(AutoMapId))]            Automap,            // Map

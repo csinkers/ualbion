@@ -23,7 +23,9 @@ namespace UAlbion.Game
             foreach(var e in events)
                 chain.Events.Add(new EventNode(i++, e));
 
-            var trigger = new TriggerChainEvent(chain, chain.FirstEvent, new EventSource.None()) { Context = doScriptEvent.Context };
+            var trigger = new TriggerChainEvent(chain, chain.FirstEvent, new EventSource.None());
+            doScriptEvent.Acknowledged = true;
+            trigger.OnComplete += (sender, args) => doScriptEvent.Complete();
             Raise(trigger);
         }
 

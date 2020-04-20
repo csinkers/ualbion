@@ -1,4 +1,5 @@
-﻿using UAlbion.Formats.Assets;
+﻿using System;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -17,8 +18,7 @@ namespace UAlbion.Formats.MapEvents
         public EventSource Source { get; }
         public bool ClockWasRunning { get; set; }
         public bool LastEventResult { get; set; }
-        public EventContext Parent { get; set; }
-
+        public Action CompletionCallback { get; set; }
         public EventContext Clone() => (EventContext)MemberwiseClone();
     }
 }

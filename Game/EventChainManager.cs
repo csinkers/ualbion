@@ -75,14 +75,7 @@ namespace UAlbion.Game
                 Raise(new StartClockEvent());
 
             _activeChains.Remove(context);
-
-            if (context.Parent == null) 
-                return;
-
-            if (context.Parent.Node.Event is AsyncEvent async)
-                async.Complete();
-            else
-                Resume(context.Parent);
+            context.CompletionCallback?.Invoke();
         }
 
         void Trigger(TriggerChainEvent e)
@@ -92,7 +85,7 @@ namespace UAlbion.Game
                 Chain = e.Chain,
                 Node = e.Node,
                 ClockWasRunning = Resolve<IClock>().IsRunning,
-                Parent = e.Context
+                CompletionCallback = e.Complete
             };
 
             if (context.ClockWasRunning)

@@ -7,7 +7,7 @@ namespace UAlbion.Formats.Assets
     public class WaveLibSample : ISample
     {
         public int IsValid;
-        public int Type1;
+        public int Instrument;
         public int Type2;
         public uint Offset;
         public uint Length;
@@ -22,7 +22,7 @@ namespace UAlbion.Formats.Assets
         {
             w ??= new WaveLibSample();
             w.IsValid = s.Int32(nameof(IsValid), w.IsValid);
-            w.Type1 = s.Int32(nameof(Type1), w.Type1);
+            w.Instrument = s.Int32(nameof(Instrument), w.Instrument);
             w.Type2 = s.Int32(nameof(Type2), w.Type2);
             w.Offset = s.UInt32(nameof(Offset), w.Offset);
             w.Length = s.UInt32(nameof(Length), w.Length);
@@ -32,7 +32,7 @@ namespace UAlbion.Formats.Assets
 
             // Check for new patterns
             ApiUtil.Assert(w.IsValid == 0 || w.IsValid == -1);
-            ApiUtil.Assert(new[] { 119, 120, 121, 122, 123, 124, 125, 126, 127, -1 }.Contains(w.Type1));
+            ApiUtil.Assert(new[] { 119, 120, 121, 122, 123, 124, 125, 126, 127, -1 }.Contains(w.Instrument));
             ApiUtil.Assert(new[] { 56, 58, 60, 62, 63, 64, 66, 69, 76, 80 }.Contains(w.Type2));
             ApiUtil.Assert(w.Unk14 == 0);
             ApiUtil.Assert(w.Unk18 == 0);

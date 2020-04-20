@@ -1,11 +1,12 @@
 ﻿using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Events
 {
     [Event("ambient")]
     public class AmbientEvent : GameEvent
     {
-        public AmbientEvent(int unk) { Unk = unk; }
-        [EventPart("unk")] public int Unk { get; }
+        public AmbientEvent(SongId songId) { SongId = songId; }
+        [EventPart("songId")] public SongId SongId { get; }
     }
 }

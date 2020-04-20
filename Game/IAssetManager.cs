@@ -8,7 +8,6 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.Config;
-using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game
 {
@@ -23,7 +22,10 @@ namespace UAlbion.Game
         string LoadString(SystemTextId id, GameLanguage language);
         string LoadString(WordId id, GameLanguage language);
 
-        AlbionSample LoadSample(SampleId id);
+        ISample LoadSample(SampleId id);
+        ISample LoadWaveLib(SongId songId, int instrument);
+        byte[] LoadSoundBanks();
+
         AlbionVideo LoadVideo(VideoId id, GameLanguage language);
         AlbionPalette LoadPalette(PaletteId id);
         IMapData LoadMap(MapDataId id);

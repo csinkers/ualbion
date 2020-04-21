@@ -19,20 +19,26 @@ namespace UAlbion.Formats.Assets.Save
         public MapDataId MapId { get; set; }
         public ushort PartyX { get; set; }
         public ushort PartyY { get; set; }
+        public Direction PartyDirection { get; set; }
 
         public IDictionary<PartyCharacterId, CharacterSheet> PartyMembers { get; } = new Dictionary<PartyCharacterId, CharacterSheet>();
         public IDictionary<NpcCharacterId, CharacterSheet> Npcs { get; } = new Dictionary<NpcCharacterId, CharacterSheet>();
         public IDictionary<AutoMapId, byte[]> Automaps { get; } = new Dictionary<AutoMapId, byte[]>();
         public IDictionary<ChestId, Chest> Chests { get; } = new Dictionary<ChestId, Chest>();
         public IDictionary<MerchantId, Chest> Merchants { get; } = new Dictionary<MerchantId, Chest>();
-        public IDictionary<int, int> Tickers { get; } = new Dictionary<int, int>();
-        public IDictionary<int, int> Switches { get; } = new Dictionary<int, int>();
+        TickerSet _tickers { get; } = new TickerSet();
+        FlagSet _switches { get; } = new FlagSet();
+
+        public IDictionary<int, byte> Tickers => _tickers;
+        public IDictionary<int, bool> Switches => _switches;
+        
 
         public ushort Unk0 { get; set; }
         public uint Unk1 { get; set; }
         public byte[] Unk9 { get; set; }
-        public ushort Unk14 { get; set; }
-        public byte[] Unknown { get; set; }
+        public byte[] Unknown1 { get; set; }
+        public byte[] Unknown2 { get; set; }
+        public byte[] Unknown3 { get; set; }
         public MysteryChunk8 Mystery8 { get; set; }
         public MysteryChunk8 Mystery8_2 { get; set; }
         public MysteryChunk6 Mystery6 { get; set; }
@@ -68,9 +74,12 @@ namespace UAlbion.Formats.Assets.Save
             save.MapId   = s.EnumU16(nameof(MapId), save.MapId);    // E
             save.PartyX  = s.UInt16(nameof(PartyX), save.PartyX);   // 10
             save.PartyY  = s.UInt16(nameof(PartyY), save.PartyY);   // 12
-            save.Unk14   = s.UInt16(nameof(Unk14), save.Unk14);     // 14
-            save.Unknown = s.ByteArray(nameof(Unknown), save.Unknown, (int)(0x947C + versionOffset - s.Offset));
-
+            save.PartyDirection = s.EnumU16(nameof(PartyDirection), save.PartyDirection); // 14
+            save.Unknown1 = s.ByteArrayHex(nameof(Unknown1), save.Unknown1, 0x260); // 16
+            save._switches.Packed = s.ByteArrayHex(nameof(Switches), save._switches.Packed, FlagSet.PackedSize); // 276
+            save.Unknown2 = s.ByteArrayHex(nameof(Unknown2), save.Unknown2, 0x5833); // 0x580A);
+            save._tickers.Serdes(s);
+            save.Unknown3 = s.ByteArrayHex(nameof(Unknown3), save.Unknown3, (int)(0x947C + versionOffset - s.Offset));
             save.Mystery8 = s.Meta(nameof(Mystery8), save.Mystery8, MysteryChunk8.Serdes);
             save.Mystery8_2 = s.Meta(nameof(Mystery8_2), save.Mystery8_2, MysteryChunk8.Serdes);
             save.Mystery6 = s.Meta(nameof(Mystery6), save.Mystery6, MysteryChunk6.Serdes);

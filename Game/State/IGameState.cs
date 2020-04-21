@@ -15,7 +15,7 @@ namespace UAlbion.Game.State
         Func<ChestId, IChest> GetChest { get; }
         Func<MerchantId, IChest> GetMerchant { get; }
         Func<PartyCharacterId, ICharacterSheet> GetPartyMember { get; }
-        Func<int, int> GetTicker { get; }
-        Func<int, int> GetSwitch { get; }
+        Func<int, short> GetTicker { get; }
+        Func<int, bool> GetSwitch { get; }
     }
 }

@@ -17,7 +17,7 @@ namespace UAlbion.Game
             var game = Resolve<IGameState>();
             switch (query, query.QueryType)
             {
-                case (QueryEvent q, QueryType.TemporarySwitch):      return Compare(q.Operation, game.GetSwitch(q.Argument), q.Immediate);
+                case (QueryEvent q, QueryType.TemporarySwitch):      return Compare(q.Operation, game.GetSwitch(q.Argument) ? 1 : 0, q.Immediate);
                 case (QueryEvent q, QueryType.Ticker):               return Compare(q.Operation, game.GetTicker(q.Argument), q.Immediate);
                 case (QueryEvent q, QueryType.CurrentMapId):         return Compare(q.Operation, (int)game.MapId, q.Immediate);
                 case (QueryEvent q, QueryType.HasEnoughGold):        return Compare(q.Operation, game.Party.TotalGold, q.Argument);

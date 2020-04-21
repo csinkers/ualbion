@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using SerdesNet;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Config;
@@ -27,7 +28,7 @@ namespace UAlbion
                 var originalBytes = br.ReadBytes((int)stream.Length);
                 var roundTripBytes = ms.ToArray();
 
-                /* Save round-tripped and annotated text output for debugging
+                //* Save round-tripped and annotated text output for debugging
                 File.WriteAllBytes(file + ".bin", roundTripBytes);
                 using var ts = new MemoryStream();
                 using var tw = new StreamWriter(ts);

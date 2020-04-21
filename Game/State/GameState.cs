@@ -28,10 +28,10 @@ namespace UAlbion.Game.State
             x => _game != null &&_game.Merchants.TryGetValue(x, out var merchant) ? merchant : null;
         Func<PartyCharacterId, ICharacterSheet> IGameState.GetPartyMember => 
             x => _game != null &&_game.PartyMembers.TryGetValue(x, out var member) ? member : null;
-        public Func<int, int> GetTicker => 
-            x => _game != null &&_game.Tickers.TryGetValue(x, out var value) ? value : 0;
-        public Func<int, int> GetSwitch =>
-            x => _game != null &&_game.Switches.TryGetValue(x, out var value) ? value : 0;
+        public Func<int, short> GetTicker => 
+            x => _game != null &&_game.Tickers.TryGetValue(x, out var value) ? value : (short)0;
+        public Func<int, bool> GetSwitch =>
+            x => _game != null &&_game.Switches.TryGetValue(x, out var value) && value;
         public MapDataId MapId => _game?.MapId ?? 0;
 
         static readonly HandlerSet Handlers = new HandlerSet(
@@ -44,11 +44,17 @@ namespace UAlbion.Game.State
                 if (x._game != null)
                     x._game.MapId = e.MapId;
             }),
-            H<GameState, SetTemporarySwitchEvent>((x, e) => x._game.Switches[e.SwitchId] = e.SwitchValue),
+            H<GameState, SetTemporarySwitchEvent>((x, e) => x._game.Switches[e.SwitchId] = e.Operation switch
+            {
+                SetTemporarySwitchEvent.SwitchOperation.Reset => false,
+                SetTemporarySwitchEvent.SwitchOperation.Set => true,
+                SetTemporarySwitchEvent.SwitchOperation.Toggle => x._game.Switches.ContainsKey(e.SwitchId) ? !x._game.Switches[e.SwitchId] : true,
+                _ => false
+            }),
             H<GameState, SetTickerEvent>((x, e) =>
             {
                 x._game.Tickers.TryGetValue(e.TickerId, out var curValue);
-                x._game.Tickers[e.TickerId] = e.Operation.Apply(curValue, e.Amount, 0, 255);
+                x._game.Tickers[e.TickerId] = (byte)e.Operation.Apply(curValue, e.Amount, 0, 255);
             }),
             H<GameState, ChangeTimeEvent>((x, e) => { })
         );

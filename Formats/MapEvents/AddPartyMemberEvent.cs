@@ -19,7 +19,7 @@ namespace UAlbion.Formats.MapEvents
             return e;
         }
 
-        public AddPartyMemberEvent(PartyCharacterId partyMemberId) { PartyMemberId = partyMemberId;}
+        public AddPartyMemberEvent(PartyCharacterId partyMemberId) { PartyMemberId = partyMemberId; }
         AddPartyMemberEvent() { }
 
         [EventPart("member_id")]

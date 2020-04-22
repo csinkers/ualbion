@@ -10,7 +10,8 @@ namespace UAlbion.Game.Gui.Controls
     public class UiSpriteElement<T> : UiElement where T : struct, Enum
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<UiSpriteElement<T>, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; }));
+            H<UiSpriteElement<T>, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; })
+        );
 
         T? _id;
         Vector2 _size;
@@ -40,8 +41,24 @@ namespace UAlbion.Game.Gui.Controls
 
         int _subId;
         bool _highlighted;
+        bool _visible = true;
+
         public int SubId { get => _subId; set { if (_subId == value) return; _subId = value; _dirty = true; } }
         public bool Highlighted { get => _highlighted; set { if (_highlighted == value) return; _highlighted = value; _dirty = true; } }
+
+        public bool Visible
+        {
+            get => _visible;
+            set
+            {
+                _visible = value;
+                if (!_visible)
+                {
+                    _sprite?.Dispose();
+                    _sprite = null;
+                }
+            }
+        }
 
         void UpdateSprite(DrawLayer order)
         {
@@ -80,6 +97,9 @@ namespace UAlbion.Game.Gui.Controls
 
         public override int Render(Rectangle extents, int order)
         {
+            if (!_visible)
+                return order;
+
             if (_sprite?.Key.RenderOrder != (DrawLayer) order)
                 _dirty = true;
 

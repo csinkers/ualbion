@@ -39,11 +39,15 @@ namespace UAlbion.Game.State
             })
         );
 
-        public Party(IDictionary<PartyCharacterId, CharacterSheet> characterSheets) : base(Handlers)
+        public Party(IDictionary<PartyCharacterId, CharacterSheet> characterSheets, PartyCharacterId?[] statusBarOrder) : base(Handlers)
         {
             _characterSheets = characterSheets;
             _readOnlyStatusBarOrder = new ReadOnlyCollection<Player.Player>(_statusBarOrder);
             _readOnlyWalkOrder = new ReadOnlyCollection<Player.Player>(_walkOrder);
+
+            foreach (var member in statusBarOrder)
+                if (member.HasValue)
+                    AddMember(member.Value);
         }
 
         public IPlayer this[PartyCharacterId id] => _statusBarOrder.FirstOrDefault(x => x.Id == id);

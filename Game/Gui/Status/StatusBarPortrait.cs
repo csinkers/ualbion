@@ -84,6 +84,7 @@ namespace UAlbion.Game.Gui.Status
         void LoadSprite()
         {
             var portraitId = PartyMember?.Apparent.PortraitId;
+            _portrait.Visible = portraitId.HasValue;
             if (portraitId.HasValue)
                 _portrait.Id = portraitId.Value;
         }

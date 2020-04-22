@@ -4,6 +4,7 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
+    [Event("remove_party_member")]
     public class RemovePartyMemberEvent : MapEvent
     {
         public static RemovePartyMemberEvent Serdes(RemovePartyMemberEvent e, ISerializer s)
@@ -25,6 +26,7 @@ namespace UAlbion.Formats.MapEvents
         public RemovePartyMemberEvent(PartyCharacterId partyMemberId) { PartyMemberId = partyMemberId;}
         RemovePartyMemberEvent() { }
 
+        [EventPart("member_id")]
         public PartyCharacterId PartyMemberId { get; private set; }
         public byte Unk2 { get; private set; }
         public byte Unk3 { get; private set; }

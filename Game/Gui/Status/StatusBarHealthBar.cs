@@ -21,7 +21,10 @@ namespace UAlbion.Game.Gui.Status
         void Update()
         {
             var party = Resolve<IParty>();
-            if (party == null || party.StatusBarOrder.Count <= _order)
+            bool visible = (party != null && _order < party.StatusBarOrder.Count);
+            _bar.Visible = visible;
+            _frame.Visible = visible;
+            if (!visible)
                 return;
 
             var playerId = party.StatusBarOrder[_order].Id;

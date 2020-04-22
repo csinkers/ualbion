@@ -17,6 +17,7 @@ namespace UAlbion.Game.Gui.Controls
         CommonColor _color;
         SpriteLease _sprite;
         bool _dirty = true;
+        bool _visible = true;
         Vector2 _drawSize;
         Vector3 _lastPosition;
 
@@ -48,6 +49,24 @@ namespace UAlbion.Game.Gui.Controls
 
                 _color = value;
                 _dirty = true;
+            }
+        }
+
+        public bool Visible
+        {
+            get => _visible;
+            set
+            {
+                if (_visible == value)
+                    return;
+
+                _visible = value;
+                _dirty = true;
+                if(!_visible)
+                {
+                    _sprite?.Dispose();
+                    _sprite = null;
+                }
             }
         }
 
@@ -84,6 +103,9 @@ namespace UAlbion.Game.Gui.Controls
 
         public override int Render(Rectangle extents, int order)
         {
+            if (!_visible)
+                return order;
+
             var window = Resolve<IWindowManager>();
             var position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
             if (_dirty || position != _lastPosition || _sprite?.Key.RenderOrder != (DrawLayer)order)

@@ -76,6 +76,7 @@ namespace UAlbion.Game.State
                 PartyX = x,
                 PartyY = y
             };
+            _game.ActiveMembers[0] = PartyCharacterId.Tom;
 
             foreach (PartyCharacterId charId in Enum.GetValues(typeof(PartyCharacterId)))
                 _game.PartyMembers.Add(charId, assets.LoadCharacter(charId));
@@ -89,8 +90,6 @@ namespace UAlbion.Game.State
             foreach(MerchantId id in Enum.GetValues(typeof(MerchantId)))
                 _game.Merchants.Add(id, assets.LoadMerchant(id));
 
-            _party?.Detach();
-            _party = AttachChild(new Party(_game.PartyMembers));
             InitialiseGame();
         }
 
@@ -113,6 +112,12 @@ namespace UAlbion.Game.State
 
             var loader = AssetLoaderRegistry.GetLoader<SavedGame>(FileFormat.SavedGame);
             _game.Name = name;
+
+            for (int i = 0; i < SavedGame.MaxPartySize; i++)
+                _game.ActiveMembers[i] = _party.StatusBarOrder.Count > i
+                    ? _party.StatusBarOrder[i].Id
+                    : (PartyCharacterId?)null;
+
             using var stream = File.Open(filename, FileMode.Create);
             using var bw = new BinaryWriter(stream);
             loader.Serdes(_game, new AlbionWriter(bw), name, null);
@@ -121,11 +126,11 @@ namespace UAlbion.Game.State
         void InitialiseGame()
         {
             _party?.Detach();
-            _party = AttachChild(new Party(_game.PartyMembers));
-            Raise(new AddPartyMemberEvent(PartyCharacterId.Tom));
+            _party = AttachChild(new Party(_game.PartyMembers, _game.ActiveMembers));
             Raise(new LoadMapEvent(_game.MapId));
             // TODO: Replay map modification events from save
             Raise(new StartClockEvent());
+            Raise(new PartyChangedEvent());
             Raise(new PartyJumpEvent(_game.PartyX, _game.PartyY));
             Raise(new CameraJumpEvent(_game.PartyX, _game.PartyY));
             Raise(new PlayerEnteredTileEvent(_game.PartyX, _game.PartyY));

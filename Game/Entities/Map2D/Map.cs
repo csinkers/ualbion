@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
@@ -16,6 +17,8 @@ namespace UAlbion.Game.Entities.Map2D
     {
         readonly MapData2D _mapData;
         LogicalMap _logicalMap;
+        IMovement _partyMovement;
+
         public MapDataId MapId { get; }
         public MapType MapType => _logicalMap.UseSmallSprites ? MapType.Small : MapType.Large;
         public Vector2 LogicalSize => new Vector2(_logicalMap.Width, _logicalMap.Height);
@@ -31,7 +34,8 @@ namespace UAlbion.Game.Entities.Map2D
             H<Map, PlayerEnteredTileEvent>((x,e) => x.OnPlayerEnteredTile(e)),
             H<Map, NpcEnteredTileEvent>((x,e) => x.OnNpcEnteredTile(e)),
             H<Map, ChangeIconEvent>((x,e) => x.ChangeIcon(e)),
-            H<Map, DisableEventChainEvent>((x,e) => x._logicalMap.DisableChain(e.ChainNumber))
+            H<Map, DisableEventChainEvent>((x,e) => x._logicalMap.DisableChain(e.ChainNumber)),
+            H<Map, PartyChangedEvent>((x,e) => x.RebuildPartyMembers())
             // H<Map, UnloadMapEvent>((x, e) => x.Unload()),
         );
 
@@ -61,7 +65,7 @@ namespace UAlbion.Game.Entities.Map2D
 
             AttachChild(new ScriptManager(_mapData.Id));
             AttachChild(new Collider(_logicalMap));
-            IMovement partyMovement = AttachChild(_logicalMap.UseSmallSprites
+            _partyMovement = AttachChild(_logicalMap.UseSmallSprites
                 ?  (IMovement)new SmallPartyMovement(Vector2.Zero, MovementDirection.Right)
                 :  new LargePartyMovement(Vector2.Zero, MovementDirection.Right)); // TODO: Initial position.
 
@@ -72,15 +76,27 @@ namespace UAlbion.Game.Entities.Map2D
                     : new LargeNpc(npc));
             }
 
+            RebuildPartyMembers();
+        }
+
+        void RebuildPartyMembers()
+        {
+            var existing = Children.Where(x => x is SmallPlayer || x is LargePlayer).ToList();
+            foreach (var player in existing)
+            {
+                player.Detach();
+                Children.Remove(player);
+            }
+
             var state = Resolve<IGameState>();
             if (state.Party != null)
             {
                 foreach(var player in state.Party.StatusBarOrder)
                 {
-                    player.GetPosition = () => partyMovement.GetPositionHistory(player.Id).Item1;
+                    player.GetPosition = () => _partyMovement.GetPositionHistory(player.Id).Item1;
                     AttachChild(_logicalMap.UseSmallSprites
-                        ? (IComponent)new SmallPlayer(player.Id, (SmallPartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id)) // TODO: Use a function to translate logical to sprite id
-                        : new LargePlayer(player.Id, (LargePartyGraphicsId)player.Id, () => partyMovement.GetPositionHistory(player.Id))); // TODO: Use a function to translate logical to sprite id
+                        ? (IComponent)new SmallPlayer(player.Id, (SmallPartyGraphicsId)player.Id, () => _partyMovement.GetPositionHistory(player.Id)) // TODO: Use a function to translate logical to sprite id
+                        : new LargePlayer(player.Id, (LargePartyGraphicsId)player.Id, () => _partyMovement.GetPositionHistory(player.Id))); // TODO: Use a function to translate logical to sprite id
                 }
             }
         }

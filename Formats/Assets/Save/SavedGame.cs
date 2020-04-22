@@ -11,11 +11,15 @@ namespace UAlbion.Formats.Assets.Save
 {
     public class SavedGame
     {
+        public const int MaxPartySize = 6;
+
         public string Name { get; set; }
         public ushort Version { get; set; }
+
         public ushort Days { get; set; }
         public ushort Hours { get; set; }
         public ushort Minutes { get; set; }
+
         public MapDataId MapId { get; set; }
         public ushort PartyX { get; set; }
         public ushort PartyY { get; set; }
@@ -31,17 +35,18 @@ namespace UAlbion.Formats.Assets.Save
 
         public IDictionary<int, byte> Tickers => _tickers;
         public IDictionary<int, bool> Switches => _switches;
-        
 
         public ushort Unk0 { get; set; }
         public uint Unk1 { get; set; }
         public byte[] Unk9 { get; set; }
-        public byte[] Unknown1 { get; set; }
-        public byte[] Unknown2 { get; set; }
-        public byte[] Unknown3 { get; set; }
+        public byte[] Unknown16 { get; set; }
+        public byte[] Unknown1A6 { get; set; }
+        public byte[] Unknown2C1 { get; set; }
+        public byte[] Unknown5B71 { get; set; }
         public MysteryChunk8 Mystery8 { get; set; }
         public MysteryChunk8 Mystery8_2 { get; set; }
         public MysteryChunk6 Mystery6 { get; set; }
+        public PartyCharacterId?[] ActiveMembers { get; } = new PartyCharacterId?[MaxPartySize];
 
         public static string GetName(BinaryReader br)
         {
@@ -75,11 +80,19 @@ namespace UAlbion.Formats.Assets.Save
             save.PartyX  = s.UInt16(nameof(PartyX), save.PartyX);   // 10
             save.PartyY  = s.UInt16(nameof(PartyY), save.PartyY);   // 12
             save.PartyDirection = s.EnumU16(nameof(PartyDirection), save.PartyDirection); // 14
-            save.Unknown1 = s.ByteArrayHex(nameof(Unknown1), save.Unknown1, 0x260); // 16
+            save.Unknown16 = s.ByteArrayHex(nameof(Unknown16), save.Unknown16, 0x184); // 16
+            for (int i = 0; i < save.ActiveMembers.Length; i++) // 6 x PlayerId @ 19A
+            {
+                save.ActiveMembers[i] = (PartyCharacterId?)StoreIncrementedNullZero.Serdes(
+                    nameof(save.ActiveMembers),
+                    (ushort?)save.ActiveMembers[i],
+                    s.UInt16);
+            }
+            save.Unknown1A6 = s.ByteArrayHex(nameof(Unknown1A6), save.Unknown1A6, 0xD0); // 1A6
             save._switches.Packed = s.ByteArrayHex(nameof(Switches), save._switches.Packed, FlagSet.PackedSize); // 276
-            save.Unknown2 = s.ByteArrayHex(nameof(Unknown2), save.Unknown2, 0x5833); // 0x580A);
-            save._tickers.Serdes(s);
-            save.Unknown3 = s.ByteArrayHex(nameof(Unknown3), save.Unknown3, (int)(0x947C + versionOffset - s.Offset));
+            save.Unknown2C1 = s.ByteArrayHex(nameof(Unknown2C1), save.Unknown2C1, 0x5833); // 0x2C1
+            save._tickers.Serdes(s); // 5AF4
+            save.Unknown5B71 = s.ByteArrayHex(nameof(Unknown5B71), save.Unknown5B71, (int)(0x947C + versionOffset - s.Offset)); // 5B71
             save.Mystery8 = s.Meta(nameof(Mystery8), save.Mystery8, MysteryChunk8.Serdes);
             save.Mystery8_2 = s.Meta(nameof(Mystery8_2), save.Mystery8_2, MysteryChunk8.Serdes);
             save.Mystery6 = s.Meta(nameof(Mystery6), save.Mystery6, MysteryChunk6.Serdes);

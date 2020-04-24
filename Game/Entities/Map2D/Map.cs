@@ -54,7 +54,8 @@ namespace UAlbion.Game.Entities.Map2D
                 return;
 
             var assetManager = Resolve<IAssetManager>();
-            _logicalMap = new LogicalMap(assetManager, MapId, _mapData);
+            var state = Resolve<IGameState>();
+            _logicalMap = new LogicalMap(assetManager, _mapData, state.TemporaryMapChanges, state.PermanentMapChanges);
 
             var tileset = assetManager.LoadTexture(_logicalMap.TilesetId);
             var renderable = AttachChild(new Renderable(_logicalMap, tileset));
@@ -161,21 +162,7 @@ namespace UAlbion.Game.Entities.Map2D
 
             byte x = (byte)(e.X + mapSource.X);
             byte y = (byte)(e.Y + mapSource.Y);
-            switch (e.ChangeType)
-            {
-                case IconChangeType.Underlay: _logicalMap.ChangeUnderlay(x, y, e.Value); break;
-                case IconChangeType.Overlay: _logicalMap.ChangeOverlay(x, y, e.Value); break;
-                case IconChangeType.Wall: break; // N/A for 2D map
-                case IconChangeType.Floor: break; // N/A for 2D map
-                case IconChangeType.Ceiling: break; // N/A for 2D map
-                case IconChangeType.NpcMovement: break;
-                case IconChangeType.NpcSprite: break;
-                case IconChangeType.Chain: _logicalMap.ChangeTileEventChain(x, y, e.Value); break;
-                case IconChangeType.BlockHard: _logicalMap.PlaceBlock(x, y, e.Value, true); break;
-                case IconChangeType.BlockSoft: _logicalMap.PlaceBlock(x, y, e.Value, false); break;
-                case IconChangeType.Trigger: _logicalMap.ChangeTileEventTrigger(x, y, e.Value); break;
-                default: throw new ArgumentOutOfRangeException();
-            }
+            _logicalMap.Modify(x,y, e.ChangeType, e.Value, (e.Scope & EventScope.Temp) != 0);
         }
     }
 }

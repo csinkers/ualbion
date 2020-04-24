@@ -325,8 +325,10 @@ namespace UAlbion
                 {
                     sw.Write($"Gfx:{(ushort)data.Icon} {data.IconAnim} frames ");
                     sw.Write($"Type:{data.TypeId} Slot:{data.SlotType} ");
-                    sw.Write($"F:{data.Flags} A:{data.Activate}");
+                    sw.Write($"F:{data.Flags} A:{data.Activate} ");
+                    sw.Write($"{data.Class}");
                 }
+
 
                 sw.WriteLine();
             }

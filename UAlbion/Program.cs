@@ -6,6 +6,7 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Entities;
@@ -70,6 +71,9 @@ namespace UAlbion
             PerfTracker.StartupEvent("Registered asset manager");
 
             PerfTracker.StartupEvent($"Running as {commandLine.Mode}");
+
+            var longSword = assets.LoadItem(ItemId.IskaiLongSword);
+            var sword = assets.LoadItem(ItemId.IskaiSword);
 
             switch(commandLine.Mode)
             {

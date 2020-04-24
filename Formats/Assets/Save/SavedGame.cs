@@ -43,8 +43,8 @@ namespace UAlbion.Formats.Assets.Save
         public byte[] Unknown1A6 { get; set; }
         public byte[] Unknown2C1 { get; set; }
         public byte[] Unknown5B71 { get; set; }
-        public MysteryChunk8 Mystery8 { get; set; }
-        public MysteryChunk8 Mystery8_2 { get; set; }
+        public MapChangeList PermanentMapChanges { get; set; }
+        public MapChangeList TemporaryMapChanges { get; set; }
         public MysteryChunk6 Mystery6 { get; set; }
         public PartyCharacterId?[] ActiveMembers { get; } = new PartyCharacterId?[MaxPartySize];
 
@@ -92,9 +92,23 @@ namespace UAlbion.Formats.Assets.Save
             save._switches.Packed = s.ByteArrayHex(nameof(Switches), save._switches.Packed, FlagSet.PackedSize); // 276
             save.Unknown2C1 = s.ByteArrayHex(nameof(Unknown2C1), save.Unknown2C1, 0x5833); // 0x2C1
             save._tickers.Serdes(s); // 5AF4
-            save.Unknown5B71 = s.ByteArrayHex(nameof(Unknown5B71), save.Unknown5B71, (int)(0x947C + versionOffset - s.Offset)); // 5B71
-            save.Mystery8 = s.Meta(nameof(Mystery8), save.Mystery8, MysteryChunk8.Serdes);
-            save.Mystery8_2 = s.Meta(nameof(Mystery8_2), save.Mystery8_2, MysteryChunk8.Serdes);
+
+            // Most likely NPC info, 128 bytes per record.
+            save.Unknown5B71 = s.ByteArrayHex(
+                nameof(Unknown5B71),
+                save.Unknown5B71,
+                (int)(0x947C + versionOffset - s.Offset)); // 5B71
+
+            save.PermanentMapChanges = s.Meta(
+                nameof(PermanentMapChanges),
+                save.PermanentMapChanges,
+                MapChangeList.Serdes);
+
+            save.TemporaryMapChanges = s.Meta(
+                nameof(TemporaryMapChanges),
+                save.TemporaryMapChanges,
+                MapChangeList.Serdes);
+
             save.Mystery6 = s.Meta(nameof(Mystery6), save.Mystery6, MysteryChunk6.Serdes);
 
             var charLoader = new CharacterSheetLoader();

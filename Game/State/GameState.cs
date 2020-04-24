@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -32,6 +33,9 @@ namespace UAlbion.Game.State
             x => _game != null &&_game.Tickers.TryGetValue(x, out var value) ? value : (short)0;
         public Func<int, bool> GetSwitch =>
             x => _game != null &&_game.Switches.TryGetValue(x, out var value) && value;
+
+        public IList<MapChange> TemporaryMapChanges => _game.TemporaryMapChanges;
+        public IList<MapChange> PermanentMapChanges => _game.PermanentMapChanges;
         public MapDataId MapId => _game?.MapId ?? 0;
 
         static readonly HandlerSet Handlers = new HandlerSet(

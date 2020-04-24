@@ -6,6 +6,7 @@ using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Entities.Map2D
@@ -15,14 +16,58 @@ namespace UAlbion.Game.Entities.Map2D
         readonly MapData2D _mapData;
         readonly TilesetData _tileData;
         readonly IList<Block> _blockList;
-        readonly IDictionary<int, MapDelta> _changes;
+        readonly IList<MapChange> _tempChanges;
+        readonly IList<MapChange> _permChanges;
 
-        public LogicalMap(IAssetManager assetManager, MapDataId mapId, MapData2D mapData)
+        public LogicalMap(IAssetManager assetManager, MapData2D mapData,
+            IList<MapChange> tempChanges,
+            IList<MapChange> permChanges)
         {
             _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
+            _tempChanges = tempChanges ?? throw new ArgumentNullException(nameof(tempChanges));
+            _permChanges = permChanges ?? throw new ArgumentNullException(nameof(permChanges));
             _tileData = assetManager.LoadTileData(_mapData.TilesetId);
             _blockList = assetManager.LoadBlockList((BlockListId)_mapData.TilesetId); // Note: Assuming a 1:1 correspondence between blocklist and tileset ids.
             UseSmallSprites = _tileData.UseSmallGraphics;
+
+            // Clear out temp changes for other maps
+            for(int i = 0; i < tempChanges.Count;)
+            {
+                if (_tempChanges[i].MapId != mapData.Id)
+                    _tempChanges.RemoveAt(i);
+                else i++;
+            }
+
+            foreach (var change in permChanges.Where(x => x.MapId == mapData.Id))
+                ApplyChange(change.X, change.Y, change.ChangeType, change.Value, change.Unk3);
+
+            foreach (var change in tempChanges)
+                ApplyChange(change.X, change.Y, change.ChangeType, change.Value, change.Unk3);
+        }
+
+        public void Modify(byte x, byte y, IconChangeType changeType, ushort value, bool isTemporary)
+        {
+            ApplyChange(x, y, changeType, value, MapChange.Enum2.Norm);
+            // Add / update temp/perm changes
+        }
+
+        void ApplyChange(byte x, byte y, IconChangeType changeType, ushort value, MapChange.Enum2 unk3)
+        {
+            switch (changeType)
+            {
+                case IconChangeType.Underlay: ChangeUnderlay(x, y, value); break;
+                case IconChangeType.Overlay: ChangeOverlay(x, y, value); break;
+                case IconChangeType.Wall: break; // N/A for 2D map
+                case IconChangeType.Floor: break; // N/A for 2D map
+                case IconChangeType.Ceiling: break; // N/A for 2D map
+                case IconChangeType.NpcMovement: break;
+                case IconChangeType.NpcSprite: break;
+                case IconChangeType.Chain: ChangeTileEventChain(x, y, value); break;
+                case IconChangeType.BlockHard: PlaceBlock(x, y, value, true); break;
+                case IconChangeType.BlockSoft: PlaceBlock(x, y, value, false); break;
+                case IconChangeType.Trigger: ChangeTileEventTrigger(x, y, value); break;
+                default: throw new ArgumentOutOfRangeException();
+            }
         }
 
         public event EventHandler<DirtyTileEventArgs> Dirty;
@@ -65,7 +110,7 @@ namespace UAlbion.Game.Entities.Map2D
             return matchingKeys.SelectMany(x => _mapData.ZoneTypeLookup[x]);
         }
 
-        public void ChangeUnderlay(byte x, byte y, ushort value)
+        void ChangeUnderlay(byte x, byte y, ushort value)
         {
             var index = Index(x, y);
             if (index < 0 || index >= _mapData.Underlay.Length)
@@ -79,7 +124,7 @@ namespace UAlbion.Game.Entities.Map2D
             }
         }
 
-        public void ChangeOverlay(byte x, byte y, ushort value)
+        void ChangeOverlay(byte x, byte y, ushort value)
         {
             var index = Index(x, y);
             if (index < 0 || index >= _mapData.Overlay.Length)
@@ -134,7 +179,7 @@ namespace UAlbion.Game.Entities.Map2D
             }
         }
 
-        public void ChangeTileEventChain(byte x, byte y, ushort value)
+        void ChangeTileEventChain(byte x, byte y, ushort value)
         {
             var index = Index(x, y);
             _mapData.ZoneLookup.TryGetValue(index, out var zone);
@@ -153,7 +198,7 @@ namespace UAlbion.Game.Entities.Map2D
             }
         }
 
-        public void ChangeTileEventTrigger(byte x, byte y, ushort value)
+        void ChangeTileEventTrigger(byte x, byte y, ushort value)
         {
             _mapData.ZoneLookup.TryGetValue(Index(x, y), out var zone);
             if(zone != null)

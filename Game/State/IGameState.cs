@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Save;
 
 namespace UAlbion.Game.State
 {
@@ -17,5 +19,7 @@ namespace UAlbion.Game.State
         Func<PartyCharacterId, ICharacterSheet> GetPartyMember { get; }
         Func<int, short> GetTicker { get; }
         Func<int, bool> GetSwitch { get; }
+        IList<MapChange> TemporaryMapChanges { get; }
+        IList<MapChange> PermanentMapChanges { get; }
     }
 }

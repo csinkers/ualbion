@@ -9229,7 +9229,7 @@
   "MAPDATA1.XLD": {
     "Format": "MapData",
     "EnumName": "MapDataId",
-    "EnumType": "ushort",
+    "EnumType": "ushort", // Note: Hard limit of 2^12 = 4096 due to map modification format in save files.
     "Assets": {
       "0": {
         "Name": "Test-Map Iskai"
@@ -9498,7 +9498,7 @@
   "MAPDATA2.XLD": {
     "Format": "MapData",
     "EnumName": "MapDataId",
-    "EnumType": "ushort",
+    "EnumType": "ushort", // Note: Hard limit of 2^12 = 4096 due to map modification format in save files.
     "Assets": {
       "0": {
         "Name": "Nakiridaani Kontinentkarte"
@@ -9763,7 +9763,7 @@
   "MAPDATA3.XLD": {
     "Format": "MapData",
     "EnumName": "MapDataId",
-    "EnumType": "ushort",
+    "EnumType": "ushort", // Note: Hard limit of 2^12 = 4096 due to map modification format in save files.
     "Assets": {
       "0": {
         "Name": "Toronto 2D Gesamtkarte Spielbeginn"

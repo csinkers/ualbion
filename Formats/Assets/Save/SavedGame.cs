@@ -43,8 +43,8 @@ namespace UAlbion.Formats.Assets.Save
         public byte[] Unknown1A6 { get; set; }
         public byte[] Unknown2C1 { get; set; }
         public byte[] Unknown5B71 { get; set; }
-        public MapChangeList PermanentMapChanges { get; set; }
-        public MapChangeList TemporaryMapChanges { get; set; }
+        public MapChangeList PermanentMapChanges { get; private set; } = new MapChangeList();
+        public MapChangeList TemporaryMapChanges { get; private set; } = new MapChangeList();
         public MysteryChunk6 Mystery6 { get; set; }
         public PartyCharacterId?[] ActiveMembers { get; } = new PartyCharacterId?[MaxPartySize];
 

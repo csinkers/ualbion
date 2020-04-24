@@ -37,7 +37,7 @@ namespace UAlbion.Core.Visual
             {
                 if (_frame == value || FrameCount == 0) return;
 
-                while (value >= FrameCount)
+                while (FrameCount > 0 && value >= FrameCount)
                     value -= FrameCount;
 
                 if (_frame == value) return;
@@ -47,7 +47,7 @@ namespace UAlbion.Core.Visual
             }
         }
 
-        public int FrameCount { get; private set; }
+        public int FrameCount { get; private set; } = -1;
         public SpriteFlags Flags { get => _flags; set { if (_flags == value) return; _flags = value; Dirty = true; } }
 
         readonly DrawLayer _layer;
@@ -116,6 +116,11 @@ namespace UAlbion.Core.Visual
                 }
 
                 FrameCount = texture.SubImageCount;
+
+                var frame = _frame; // Ensure frame is in bounds.
+                Frame = 0;
+                Frame = frame;
+
                 var key = new SpriteKey(texture, _layer, _keyFlags);
                 _sprite = sm.Borrow(key, 1, this);
             }

@@ -9,8 +9,7 @@
         // Effects,
         Diagnostic  = 0x600, // Missing textures etc
         Interface   = 0x700, // GUI
-
-        StatusBar = 0xf00,
+        InterfaceOverlay = 0x800,
 
         Debug = 0xff0, // ImGui
         Cursor = 0xffe, // Mouse cursor

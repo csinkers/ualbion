@@ -24,16 +24,16 @@ namespace UAlbion.Game.State
             H<Party, AddPartyMemberEvent>((x,e) => e.Context.LastEventResult = x.AddMember(e.PartyMemberId)),
             H<Party, RemovePartyMemberEvent>((x,e) => e.Context.LastEventResult = x.RemoveMember(e.PartyMemberId)),
             H<Party, SetPartyLeaderEvent>((x, e) => { x.Leader = e.PartyMemberId; x.Raise(e); }),
-            H<Party, ChangePartyGoldEvent>((x, e) => e.Context.LastEventResult = x.ChangePartyGold(e.Operation, e.Amount)),
-            H<Party, ChangePartyRationsEvent>((x, e) => e.Context.LastEventResult = x.ChangePartyRations(e.Operation, e.Amount)),
-            H<Party, AddRemoveInventoryItemEvent>((x, e) => e.Context.LastEventResult = x.ChangePartyInventory(e.ItemId, e.Operation, e.Amount)),
+            H<Party, ChangePartyGoldEvent>((x, e) => e.Context.LastEventResult = x.ChangePartyGold(e.Operation, e.Amount, e.Context)),
+            H<Party, ChangePartyRationsEvent>((x, e) => e.Context.LastEventResult = x.ChangePartyRations(e.Operation, e.Amount, e.Context)),
+            H<Party, AddRemoveInventoryItemEvent>((x, e) => e.Context.LastEventResult = x.ChangePartyInventory(e.ItemId, e.Operation, e.Amount, e.Context)),
             H<Party, SimpleChestEvent>((x, e) =>
             {
                 e.Context.LastEventResult = e.ChestType switch
                 {
-                    SimpleChestEvent.SimpleChestItemType.Item => x.ChangePartyInventory(e.ItemId, QuantityChangeOperation.AddAmount, e.Amount),
-                    SimpleChestEvent.SimpleChestItemType.Gold => x.ChangePartyGold(QuantityChangeOperation.AddAmount, e.Amount),
-                    SimpleChestEvent.SimpleChestItemType.Rations => x.ChangePartyRations(QuantityChangeOperation.AddAmount, e.Amount),
+                    SimpleChestEvent.SimpleChestItemType.Item => x.ChangePartyInventory(e.ItemId, QuantityChangeOperation.AddAmount, e.Amount, e.Context),
+                    SimpleChestEvent.SimpleChestItemType.Gold => x.ChangePartyGold(QuantityChangeOperation.AddAmount, e.Amount, e.Context),
+                    SimpleChestEvent.SimpleChestItemType.Rations => x.ChangePartyRations(QuantityChangeOperation.AddAmount, e.Amount, e.Context),
                     _ => false
                 };
             })
@@ -126,17 +126,17 @@ namespace UAlbion.Game.State
 
         bool TryEachMember(Func<Player.Player, bool> func) => _walkOrder.Any(func); // Try and execute an operation on each player until one succeeds.
 
-        bool ChangePartyInventory(ItemId itemId, QuantityChangeOperation operation, int amount) 
+        bool ChangePartyInventory(ItemId itemId, QuantityChangeOperation operation, int amount, EventContext context) 
             => TryEachMember(player =>
-                player.TryChangeInventory(itemId, operation, amount));
+                player.TryChangeInventory(itemId, operation, amount, context));
 
-        bool ChangePartyGold(QuantityChangeOperation operation, int amount)
+        bool ChangePartyGold(QuantityChangeOperation operation, int amount, EventContext context)
             => TryEachMember(player =>
-                player.TryChangeGold(operation, amount));
+                player.TryChangeGold(operation, amount, context));
 
-        bool ChangePartyRations(QuantityChangeOperation operation, int amount)
+        bool ChangePartyRations(QuantityChangeOperation operation, int amount, EventContext context)
             => TryEachMember(player =>
-                player.TryChangeRations(operation, amount));
+                player.TryChangeRations(operation, amount, context));
     }
 }
 

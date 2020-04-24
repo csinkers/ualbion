@@ -97,7 +97,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
             foreach (var chain in _eventSet.Chains)
             {
-                if (chain.FirstEvent.Event is DialogueLineActionEvent action &&
+                if (chain.FirstEvent?.Event is DialogueLineActionEvent action &&
                     action.BlockId == blockId &&
                     action.TextId == textId)
                 {

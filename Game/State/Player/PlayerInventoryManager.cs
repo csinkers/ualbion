@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.State.Player
@@ -417,7 +419,7 @@ namespace UAlbion.Game.State.Player
             Raise(new DescriptionTextEvent(text));
         }
 
-        public bool TryChangeInventory(ItemId itemId, QuantityChangeOperation operation, int amount)
+        public bool TryChangeInventory(ItemId itemId, QuantityChangeOperation operation, int amount, EventContext context)
         {
             // TODO: Ensure weight limit is not exceeded
             // TODO: Handle non-stacking items.
@@ -468,10 +470,39 @@ namespace UAlbion.Game.State.Player
                     slot.Id = null;
             }
 
+            Update();
+
+            if(context.Source is EventSource.Map mapEventSource)
+            {
+                var assets = Resolve<IAssetManager>();
+                var scene = Resolve<ISceneManager>()?.ActiveScene;
+                var map = Resolve<IMapManager>()?.Current;
+                var window = Resolve<IWindowManager>();
+
+                if (scene == null || map == null)
+                    return true;
+
+                var worldPosition = new Vector3(mapEventSource.X, mapEventSource.Y, 0) * map.TileSize;
+                var normPosition = scene.Camera.ProjectWorldToNorm(worldPosition);
+                var destPosition = window.UiToNorm(23, 204); // Tom's portrait, hardcoded for now.
+
+                var item = assets.LoadItem(itemId);
+                var icon = assets.LoadTexture(item.Icon).GetSubImageDetails((int)item.Icon);
+                var size = window.UiToNormRelative(icon.Size);
+
+                var transition = new ItemTransition<ItemSpriteId>(
+                    item.Icon, (int)item.Icon,
+                    new Vector2(normPosition.X, normPosition.Y),
+                    destPosition,
+                    0.3f, size);
+
+                Exchange.Attach(transition); // No need to attach as child as transitions clean themselves up.
+            }
+
             return true;
         }
 
-        public bool TryChangeGold(QuantityChangeOperation operation, int amount)
+        public bool TryChangeGold(QuantityChangeOperation operation, int amount, EventContext context)
         {
             // TODO: Ensure weight limit is not exceeded
             ushort newValue = (ushort)operation.Apply(_base.Inventory.Gold, amount, 0, 32767);
@@ -480,7 +511,7 @@ namespace UAlbion.Game.State.Player
             return true;
         }
 
-        public bool TryChangeRations(QuantityChangeOperation operation, int amount)
+        public bool TryChangeRations(QuantityChangeOperation operation, int amount, EventContext context)
         {
             // TODO: Ensure weight limit is not exceeded
             ushort newValue = (ushort)operation.Apply(_base.Inventory.Rations, amount, 0, 32767);

@@ -28,15 +28,15 @@ namespace UAlbion.Game.State.Player
         public Func<Vector3> GetPosition { get; set; }
         public override string ToString() => $"Player {Id}";
 
-        public bool TryChangeInventory(ItemId itemId, QuantityChangeOperation operation, int amount)
-            => _inventoryManager.TryChangeInventory(itemId, operation, amount);
+        public bool TryChangeInventory(ItemId itemId, QuantityChangeOperation operation, int amount, EventContext context)
+            => _inventoryManager.TryChangeInventory(itemId, operation, amount, context);
 
-        public bool TryChangeGold(QuantityChangeOperation operation, int amount)
-            => _inventoryManager.TryChangeGold(operation, amount);
+        public bool TryChangeGold(QuantityChangeOperation operation, int amount, EventContext context)
+            => _inventoryManager.TryChangeGold(operation, amount, context);
 
 
-        public bool TryChangeRations(QuantityChangeOperation operation, int amount)
-            => _inventoryManager.TryChangeRations(operation, amount);
+        public bool TryChangeRations(QuantityChangeOperation operation, int amount, EventContext context)
+            => _inventoryManager.TryChangeRations(operation, amount, context);
     }
 }
 

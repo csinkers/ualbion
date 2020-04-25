@@ -47,7 +47,6 @@ namespace UAlbion.Game.State.Player
         public IHoldable ItemInHand { get; private set; }
         public InventoryPickupItemEvent ReturnItemInHandEvent { get; private set; }
         public InventoryManager(Func<AssetType, int, Inventory> getInventory) : base(Handlers) => _getInventory = getInventory;
-        public override void Subscribed() => Update();
 
         public InventoryAction GetInventoryAction(AssetType type, int id, ItemSlotId slotId)
         {
@@ -151,7 +150,7 @@ namespace UAlbion.Game.State.Player
 
             if(ItemInHand is ItemSlot itemInHand && itemInHand.Id.HasValue)
             {
-                if (slotId >= ItemSlotId.Slot0)
+                if (slotId < ItemSlotId.NormalSlotCount)
                     return true;
 
                 var assets = Resolve<IAssetManager>();

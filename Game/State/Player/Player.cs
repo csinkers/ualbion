@@ -35,7 +35,13 @@ namespace UAlbion.Game.State.Player
             Apparent = new InterpolatedCharacterSheet(() => _lastEffective, () => Effective, () => _lerp);
         }
 
-        void InventoryUpdated()
+        public override void Subscribed()
+        {
+            UpdateInventory();
+            base.Subscribed();
+        }
+
+        void UpdateInventory()
         {
             var assets = Resolve<IAssetManager>();
             _lastEffective = Effective;

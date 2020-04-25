@@ -28,7 +28,7 @@ namespace UAlbion.Formats.Assets
             _format = format;
             Slots = new ItemSlot[(int) (format == FileFormat.PlayerInventory
                 ? ItemSlotId.CharacterSlotCount
-                : ItemSlotId.ChestSlotCount)];
+                : ItemSlotId.NormalSlotCount)];
         }
 
         public static Inventory SerdesCharacter(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, FileFormat.PlayerInventory);
@@ -52,7 +52,7 @@ namespace UAlbion.Formats.Assets
                 inv.RightFinger = s.Meta(nameof(inv.RightFinger), inv.RightFinger, ItemSlot.Serdes);
             }
 
-            for (int i = 0; i < (int)ItemSlotId.ChestSlotCount; i++)
+            for (int i = 0; i < (int)ItemSlotId.NormalSlotCount; i++)
                 inv.Slots[i] = s.Meta($"Slot{i}", inv.Slots[i], ItemSlot.Serdes);
 
             if (format == FileFormat.ChestInventory)

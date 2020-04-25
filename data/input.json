@@ -86,7 +86,9 @@
     "Control+Number6": "set_active_member 5",
 
     "Q": "cursor_mode look",
-    "E": "cursor_mode manipulate"
+    "E": "cursor_mode manipulate",
+    "R": "cursor_mode talk",
+    "Z": "cursor_mode take"
   },
   "World3D": {
     "Tab": "push_scene inventory",

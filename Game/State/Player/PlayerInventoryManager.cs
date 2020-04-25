@@ -13,6 +13,16 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.State.Player
 {
+    /*
+     * Move apparent & effective stuff to Player
+     * Update player's effective sheet on InventoryUpdated event
+     * How to provide RW access to inventories to inv manager?
+        * Make inv manager child of game state, de/re-register on save/load/new
+     * Make InventoryManager a singleton service class
+     * Merge InventoryScreenState into InventoryManager
+     * Specify full inventory context for all operations
+     */
+
     public class PlayerInventoryManager : Component
     {
         const int MaxSlotAmount = 99; // TODO: Verify
@@ -37,18 +47,17 @@ namespace UAlbion.Game.State.Player
         readonly PartyCharacterId _id;
         readonly CharacterSheet _base;
         IEffectiveCharacterSheet _lastEffective;
-        IEffectiveCharacterSheet _effective;
         DateTime _lastChangeTime;
         float _lerp;
 
-        public IEffectiveCharacterSheet Effective => _effective;
+        public IEffectiveCharacterSheet Effective { get; private set; }
         public IEffectiveCharacterSheet Apparent { get; }
 
         public PlayerInventoryManager(PartyCharacterId id, CharacterSheet sheet) : base(Handlers)
         {
             _id = id;
             _base = sheet;
-            Apparent = new InterpolatedCharacterSheet(() => _lastEffective, () => _effective, () => _lerp);
+            Apparent = new InterpolatedCharacterSheet(() => _lastEffective, () => Effective, () => _lerp);
         }
 
         public override void Subscribed() => Update();
@@ -98,9 +107,9 @@ namespace UAlbion.Game.State.Player
         {
             var assets = Resolve<IAssetManager>();
             var inventoryScreenState = Resolve<IInventoryScreenState>();
-            _lastEffective = _effective;
-            _effective = EffectiveSheetCalculator.GetEffectiveSheet(assets, _base);
-            _lastEffective ??= _effective;
+            _lastEffective = Effective;
+            Effective = EffectiveSheetCalculator.GetEffectiveSheet(assets, _base);
+            _lastEffective ??= Effective;
             _lastChangeTime = DateTime.Now;
             _lerp = 0.0f;
             Raise(new InventoryChangedEvent(_id));
@@ -383,7 +392,7 @@ namespace UAlbion.Game.State.Player
 
         void Drop(ItemSlotId slotId)
         {
-            ApiUtil.Assert(_base.Inventory.GetSlot(slotId) == null);
+            ApiUtil.Assert(_base.Inventory.GetSlot(slotId)?.Id == null);
 
             var inventoryScreenState = Resolve<IInventoryScreenState>();
             if (inventoryScreenState.ItemInHand is GoldInHand gold)

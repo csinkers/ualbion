@@ -6,6 +6,6 @@ namespace UAlbion.Formats.Assets
     {
         ushort Gold { get; }
         ushort Rations { get; }
-        IReadOnlyCollection<ItemSlot> Slots { get; }
+        IReadOnlyList<ItemSlot> Slots { get; }
     }
 }

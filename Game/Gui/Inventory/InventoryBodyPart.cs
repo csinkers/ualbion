@@ -16,7 +16,7 @@ namespace UAlbion.Game.Gui.Inventory
 
         // Inner area 16x16 w/ 1-pixel button frame
         public InventoryBodyPart(PartyCharacterId activeCharacter, ItemSlotId itemSlotId)
-            : base(activeCharacter, SlotHandlers)
+            : base(AssetType.PartyMember, (int)activeCharacter, SlotHandlers)
         {
             SlotId = itemSlotId;
             _sprite = new UiSpriteElement<ItemSpriteId>(0) { SubId = (int)ItemSpriteId.Nothing };
@@ -28,7 +28,7 @@ namespace UAlbion.Game.Gui.Inventory
         {
             var state = Resolve<IGameState>();
             var assets = Resolve<IAssetManager>();
-            var member = state.Party[ActiveCharacter];
+            var member = state.Party[(PartyCharacterId)Id];
             var slotInfo = member?.Apparent.Inventory.GetSlot(SlotId);
 
             if(slotInfo?.Id == null)

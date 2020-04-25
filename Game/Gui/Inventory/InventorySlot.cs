@@ -31,20 +31,37 @@ namespace UAlbion.Game.Gui.Inventory
 
         protected abstract ItemSlotId SlotId { get; }
         protected abstract ButtonFrame Frame { get; }
-        protected PartyCharacterId ActiveCharacter { get; }
+        protected AssetType InventoryType { get; }
+        protected int Id { get; }
         bool _isClickTimerPending;
 
-        protected InventorySlot(PartyCharacterId activeCharacter, IDictionary<Type, Handler> handlers)
+        protected InventorySlot(AssetType inventoryType, int id, IDictionary<Type, Handler> handlers)
             : base(handlers)
         {
-            ActiveCharacter = activeCharacter;
+            InventoryType = inventoryType;
+            Id = id;
         }
 
         protected void GetSlot(out ItemSlot slotInfo, out ItemData item)
         {
             var assets = Resolve<IAssetManager>();
-            var member = Resolve<IParty>()[ActiveCharacter];
-            slotInfo = member?.Apparent.Inventory.GetSlot(SlotId);
+            if (InventoryType == AssetType.PartyMember)
+            {
+                var member = Resolve<IParty>()[(PartyCharacterId)Id];
+                slotInfo = member?.Apparent.Inventory.GetSlot(SlotId);
+            }
+            else if (InventoryType == AssetType.ChestData)
+            {
+                var chest = Resolve<IGameState>().GetChest((ChestId)Id);
+                slotInfo = chest.Slots[(int)SlotId - (int)ItemSlotId.Slot0];
+            }
+            else if (InventoryType == AssetType.MerchantData)
+            {
+                var chest = Resolve<IGameState>().GetMerchant((MerchantId)Id);
+                slotInfo = chest.Slots[(int)SlotId - (int)ItemSlotId.Slot0];
+            }
+            else throw new InvalidOperationException($"Unexpected inventory type \"{InventoryType}\"");
+
             item = slotInfo?.Id == null ? null : assets.LoadItem(slotInfo.Id.Value);
         }
 
@@ -52,7 +69,7 @@ namespace UAlbion.Game.Gui.Inventory
         {
             if (_isClickTimerPending) // If they double-clicked...
             {
-                Raise(new InventoryPickupItemEvent(ActiveCharacter, SlotId));
+                Raise(new InventoryPickupItemEvent(InventoryType, Id, SlotId));
                 _isClickTimerPending = false; // Ensure the single-click behaviour doesn't happen.
             }
             else // For the first click, just start the double-click timer.
@@ -68,7 +85,7 @@ namespace UAlbion.Game.Gui.Inventory
                 return;
 
             // TODO: Show quantity selection dialog
-            Raise(new InventoryPickupItemEvent(ActiveCharacter, SlotId, 1));
+            Raise(new InventoryPickupItemEvent(InventoryType, Id, SlotId, 1));
             _isClickTimerPending = false;
         }
 

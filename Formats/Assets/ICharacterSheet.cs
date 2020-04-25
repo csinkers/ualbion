@@ -23,7 +23,7 @@ namespace UAlbion.Formats.Assets
 
         // Grouped
         IMagicSkills Magic { get; }
-        ICharacterInventory Inventory { get; }
+        IInventory Inventory { get; }
         ICharacterAttributes Attributes { get; }
         ICharacterSkills Skills { get; }
         ICombatAttributes Combat { get; }

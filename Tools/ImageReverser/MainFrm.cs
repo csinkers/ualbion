@@ -218,7 +218,9 @@ namespace UAlbion.Tools.ImageReverser
 
                 case FileFormat.BlockList:
                 case FileFormat.EventSet:
-                case FileFormat.Inventory:
+                case FileFormat.PlayerInventory:
+                case FileFormat.ChestInventory:
+                case FileFormat.MerchantInventory:
                 case FileFormat.MonsterGroup:
                 case FileFormat.TranslationTable:
                     break;

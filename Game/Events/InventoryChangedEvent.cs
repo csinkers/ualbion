@@ -3,13 +3,15 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Events
 {
-    public class InventoryChangedEvent : GameEvent, IPartyEvent, IVerboseEvent
+    public class InventoryChangedEvent : GameEvent, IVerboseEvent, IInventoryEvent
     {
-        public InventoryChangedEvent(PartyCharacterId memberId)
+        public InventoryChangedEvent(AssetType type, int id)
         {
-            MemberId = memberId;
+            InventoryType = type;
+            InventoryId = id;
         }
 
-        public PartyCharacterId MemberId { get; }
+        public AssetType InventoryType { get; }
+        public int InventoryId { get; }
     }
 }

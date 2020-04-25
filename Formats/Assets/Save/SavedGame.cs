@@ -4,7 +4,6 @@ using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Config;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets.Save
@@ -28,8 +27,8 @@ namespace UAlbion.Formats.Assets.Save
         public IDictionary<PartyCharacterId, CharacterSheet> PartyMembers { get; } = new Dictionary<PartyCharacterId, CharacterSheet>();
         public IDictionary<NpcCharacterId, CharacterSheet> Npcs { get; } = new Dictionary<NpcCharacterId, CharacterSheet>();
         public IDictionary<AutoMapId, byte[]> Automaps { get; } = new Dictionary<AutoMapId, byte[]>();
-        public IDictionary<ChestId, Chest> Chests { get; } = new Dictionary<ChestId, Chest>();
-        public IDictionary<MerchantId, Chest> Merchants { get; } = new Dictionary<MerchantId, Chest>();
+        public IDictionary<ChestId, Inventory> Chests { get; } = new Dictionary<ChestId, Inventory>();
+        public IDictionary<MerchantId, Inventory> Merchants { get; } = new Dictionary<MerchantId, Inventory>();
         TickerSet _tickers { get; } = new TickerSet();
         FlagSet _switches { get; } = new FlagSet();
 
@@ -112,7 +111,6 @@ namespace UAlbion.Formats.Assets.Save
             save.Mystery6 = s.Meta(nameof(Mystery6), save.Mystery6, MysteryChunk6.Serdes);
 
             var charLoader = new CharacterSheetLoader();
-            var chestLoader = new ChestLoader();
             void SerdesPartyCharacter(int i, int size, ISerializer serializer)
             {
                 if (i > 0xff)
@@ -147,18 +145,10 @@ namespace UAlbion.Formats.Assets.Save
             void SerdesChest(int i, int size, ISerializer serializer)
             {
                 var key = (ChestId)i;
-                Chest existing = null;
-                var chestConfig = new BasicAssetInfo
-                {
-                    Id = i,
-                    Parent = new BasicXldInfo
-                    {
-                        Format = FileFormat.Inventory
-                    }
-                };
+                Inventory existing = null;
 
                 if (serializer.Mode == SerializerMode.Reading || save.Chests.TryGetValue(key, out existing))
-                    save.Chests[key] = chestLoader.Serdes(existing, serializer, key.ToString(), chestConfig);
+                    save.Chests[key] = Inventory.SerdesChest(i, existing, serializer);
             }
 
             void SerdesMerchant(int i, int size, ISerializer serializer)
@@ -167,18 +157,10 @@ namespace UAlbion.Formats.Assets.Save
                     return;
 
                 var key = (MerchantId)i;
-                Chest existing = null;
-                var merchantConfig = new BasicAssetInfo
-                {
-                    Id = i,
-                    Parent = new BasicXldInfo
-                    {
-                        Format = FileFormat.MerchantInventory
-                    }
-                };
+                Inventory existing = null;
 
                 if (serializer.Mode == SerializerMode.Reading || save.Merchants.TryGetValue(key, out existing))
-                    save.Merchants[key] = chestLoader.Serdes(existing, serializer, key.ToString(), merchantConfig);
+                    save.Merchants[key] = Inventory.SerdesMerchant(i, existing, serializer);
             }
 
             var partyIds = save.PartyMembers.Keys.Select(x => (int)x).ToList();

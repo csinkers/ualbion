@@ -10,6 +10,7 @@ using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
+using UAlbion.Game.State.Player;
 
 namespace UAlbion.Game.State
 {
@@ -21,12 +22,11 @@ namespace UAlbion.Game.State
 
         public DateTime Time => Epoch + new TimeSpan(_game.Days, _game.Hours, _game.Minutes, 0);
         IParty IGameState.Party => _party;
+        Func<ChestId, IInventory> IGameState.GetChest => x => GetInventory(AssetType.ChestData, (int)x);
+        Func<MerchantId, IInventory> IGameState.GetMerchant => x => GetInventory(AssetType.MerchantData, (int)x);
+
         Func<NpcCharacterId, ICharacterSheet> IGameState.GetNpc => 
             x => _game != null && _game.Npcs.TryGetValue(x, out var sheet) ? sheet : null;
-        Func<ChestId, IChest> IGameState.GetChest => 
-            x => _game != null &&_game.Chests.TryGetValue(x, out var chest) ? chest : null;
-        Func<MerchantId, IChest> IGameState.GetMerchant => 
-            x => _game != null &&_game.Merchants.TryGetValue(x, out var merchant) ? merchant : null;
         Func<PartyCharacterId, ICharacterSheet> IGameState.GetPartyMember => 
             x => _game != null &&_game.PartyMembers.TryGetValue(x, out var member) ? member : null;
         public Func<int, short> GetTicker => 
@@ -65,7 +65,21 @@ namespace UAlbion.Game.State
 
         public GameState() : base(Handlers)
         {
-            AttachChild(new InventoryScreenState());
+            AttachChild(new InventoryManager(GetInventory));
+        }
+
+        Inventory GetInventory(AssetType type, int id)
+        {
+            if (_game == null)
+                return null;
+
+            return type switch
+            {
+                AssetType.PartyMember => (_game.PartyMembers.TryGetValue((PartyCharacterId) id, out var member) ? member.Inventory : null),
+                AssetType.ChestData => (_game.Chests.TryGetValue((ChestId) id, out var chest) ? chest : null),
+                AssetType.MerchantData => (_game.Merchants.TryGetValue((MerchantId) id, out var merchant) ? merchant : null),
+                _ => throw new InvalidOperationException($"Unexpected inventory type requested: \"{type}\"")
+            };
         }
 
         public int TickCount { get; private set; }

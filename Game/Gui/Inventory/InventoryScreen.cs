@@ -72,8 +72,8 @@ namespace UAlbion.Game.Gui.Inventory
                         () => _page,
                         x => _page = x),
 
-                    InventoryMode.Merchant => new InventoryChestPane(false, _modeSpecificId),
-                    InventoryMode.Chest => new InventoryChestPane(true, _modeSpecificId),
+                    // InventoryMode.Merchant => new InventoryChestPane(false, _modeSpecificId), // TODO
+                    InventoryMode.Chest => new InventoryChestPane((ChestId)_modeSpecificId),
                     InventoryMode.LockedChest => new InventoryLockPane(true),
                     InventoryMode.LockedDoor => new InventoryLockPane(false),
                     _ => throw new InvalidOperationException($"Unexpected inventory mode {_mode}")

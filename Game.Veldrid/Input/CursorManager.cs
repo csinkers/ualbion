@@ -12,6 +12,7 @@ using UAlbion.Game.Gui;
 using UAlbion.Game.Input;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
+using UAlbion.Game.State.Player;
 
 namespace UAlbion.Game.Veldrid.Input
 {
@@ -145,7 +146,7 @@ namespace UAlbion.Game.Veldrid.Input
                 return;
             }
 
-            var held = Resolve<IInventoryScreenState>().ItemInHand;
+            var held = Resolve<IInventoryManager>().ItemInHand;
 
             int subItem = 0;
             ITexture texture = null;
@@ -161,7 +162,7 @@ namespace UAlbion.Game.Veldrid.Input
             else if (held is ItemSlot itemInHand && itemInHand.Id.HasValue)
             {
                 var item = assets.LoadItem(itemInHand.Id.Value);
-                ItemSpriteId spriteId = item.Icon + _frame % item.IconAnim;
+                ItemSpriteId spriteId = (ItemSpriteId)((int)item.Icon + _frame % item.IconAnim);
                 texture = assets.LoadTexture(spriteId);
                 subItem = (int)spriteId;
             }

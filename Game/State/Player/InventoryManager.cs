@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
@@ -21,7 +22,7 @@ namespace UAlbion.Game.State.Player
      * Specify full inventory context for all operations
      */
 
-    public class InventoryManager : Component
+    public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryManager
     {
         readonly Func<AssetType, int, Inventory> _getInventory;
         const int MaxSlotAmount = 99; // TODO: Verify
@@ -95,26 +96,26 @@ namespace UAlbion.Game.State.Player
             Raise(new SetCursorEvent(ItemInHand == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
         }
 
-        bool DoesSlotAcceptItem(ItemSlotId slotId, ItemData item)
+        bool DoesSlotAcceptItem(ICharacterSheet sheet, ItemSlotId slotId, ItemData item)
         {
-            switch (_base.Gender)
+            switch (sheet.Gender)
             {
                 case Gender.Male: if (!item.AllowedGender.HasFlag(GenderMask.Male)) return false; break;
                 case Gender.Female: if (!item.AllowedGender.HasFlag(GenderMask.Female)) return false; break;
                 case Gender.Neuter: if (!item.AllowedGender.HasFlag(GenderMask.Neutral)) return false; break;
             }
 
-            if (!item.Class.IsAllowed(_base.Class))
+            if (!item.Class.IsAllowed(sheet.Class))
                 return false;
 
-            // if (!item.Race.IsAllowed(_base.Race)) // Apparently never implemented in original game?
+            // if (!item.Race.IsAllowed(sheet.Race)) // Apparently never implemented in original game?
             //     return false;
 
             ItemData rightHandItem = null;
-            if (inventory.RightHand?.Id != null)
+            if (sheet.Inventory.RightHand?.Id != null)
             {
                 var assets = Resolve<IAssetManager>();
-                rightHandItem = assets.LoadItem(inventory.RightHand.Id.Value);
+                rightHandItem = assets.LoadItem(sheet.Inventory.RightHand.Id.Value);
             }
 
             if (item.SlotType != slotId)
@@ -153,15 +154,20 @@ namespace UAlbion.Game.State.Player
                 if (slotId < ItemSlotId.NormalSlotCount)
                     return true;
 
+                if (type != AssetType.PartyMember)
+                    return false;
+
                 var assets = Resolve<IAssetManager>();
                 var item = assets.LoadItem(itemInHand.Id.Value);
-                return DoesSlotAcceptItem(slotId, item);
+                var state = Resolve<IGameState>();
+                var sheet = state.GetPartyMember((PartyCharacterId) id);
+                return DoesSlotAcceptItem(sheet, slotId, item);
             }
 
             throw new InvalidOperationException($"Unexpected item type in hand: {ItemInHand.GetType()}");
         }
 
-        ItemSlotId GetBestSlot(ItemSlotId slotId)
+        ItemSlotId GetBestSlot(AssetType type, int id, ItemSlotId slotId)
         {
             if (!(ItemInHand is ItemSlot itemInHand)) // gold, rations etc
                 return slotId;
@@ -171,24 +177,26 @@ namespace UAlbion.Game.State.Player
 
             var assets = Resolve<IAssetManager>();
             var item = assets.LoadItem(itemInHand.Id.Value);
-            if (slotId < ItemSlotId.Slot0)
-            {
-                if (DoesSlotAcceptItem(slotId, item)) return slotId;
-                if (DoesSlotAcceptItem(ItemSlotId.Head, item)) return ItemSlotId.Head;
-                if (DoesSlotAcceptItem(ItemSlotId.Neck, item)) return ItemSlotId.Neck;
-                if (DoesSlotAcceptItem(ItemSlotId.Tail, item)) return ItemSlotId.Tail;
-                if (DoesSlotAcceptItem(ItemSlotId.RightHand, item)) return ItemSlotId.RightHand;
-                if (DoesSlotAcceptItem(ItemSlotId.LeftHand, item)) return ItemSlotId.LeftHand;
-                if (DoesSlotAcceptItem(ItemSlotId.Chest, item)) return ItemSlotId.Chest;
-                if (DoesSlotAcceptItem(ItemSlotId.RightFinger, item)) return ItemSlotId.RightFinger;
-                if (DoesSlotAcceptItem(ItemSlotId.LeftFinger, item)) return ItemSlotId.LeftFinger;
-                if (DoesSlotAcceptItem(ItemSlotId.Feet, item)) return ItemSlotId.Feet;
-            }
+            if (type != AssetType.PartyMember || !slotId.IsBodyPart()) 
+                return ItemSlotId.None;
+
+            var state = Resolve<IGameState>();
+            var sheet = state.GetPartyMember((PartyCharacterId)id);
+            if (DoesSlotAcceptItem(sheet, slotId, item)) return slotId;
+            if (DoesSlotAcceptItem(sheet, ItemSlotId.Head, item)) return ItemSlotId.Head;
+            if (DoesSlotAcceptItem(sheet, ItemSlotId.Neck, item)) return ItemSlotId.Neck;
+            if (DoesSlotAcceptItem(sheet, ItemSlotId.Tail, item)) return ItemSlotId.Tail;
+            if (DoesSlotAcceptItem(sheet, ItemSlotId.RightHand, item)) return ItemSlotId.RightHand;
+            if (DoesSlotAcceptItem(sheet, ItemSlotId.LeftHand, item)) return ItemSlotId.LeftHand;
+            if (DoesSlotAcceptItem(sheet, ItemSlotId.Chest, item)) return ItemSlotId.Chest;
+            if (DoesSlotAcceptItem(sheet, ItemSlotId.RightFinger, item)) return ItemSlotId.RightFinger;
+            if (DoesSlotAcceptItem(sheet, ItemSlotId.LeftFinger, item)) return ItemSlotId.LeftFinger;
+            if (DoesSlotAcceptItem(sheet, ItemSlotId.Feet, item)) return ItemSlotId.Feet;
 
             return ItemSlotId.None;
         }
 
-        bool CanItemBeTaken(ItemSlotId slotId)
+        bool CanItemBeTaken(IInventory inventory, ItemSlotId slotId)
         {
             if (slotId == ItemSlotId.Gold || slotId == ItemSlotId.Rations)
                 return true;
@@ -208,10 +216,12 @@ namespace UAlbion.Game.State.Player
 
         void OnGiveItem(InventoryGiveItemEvent e)
         {
+            var inventory = _getInventory(AssetType.PartyMember, (int) e.MemberId);
+
             if (ItemInHand is GoldInHand)
-                Drop(ItemSlotId.Gold);
+                Drop(inventory, ItemSlotId.Gold);
             if (ItemInHand is RationsInHand)
-                Drop(ItemSlotId.Rations);
+                Drop(inventory, ItemSlotId.Rations);
             if (!(ItemInHand is ItemSlot itemInHand))
                 return; // Unknown or null
 
@@ -241,27 +251,24 @@ namespace UAlbion.Game.State.Player
             }
 
             if(slotId != ItemSlotId.None)
-                Drop(slotId);
-
-            Update();
+                Drop(inventory, slotId);
         }
 
         void OnPickupItem(InventoryPickupItemEvent e)
         {
             var slotId = e.SlotId;
-            if (!DoesSlotAcceptItemInHand(e.SlotId))
-                slotId = GetBestSlot(slotId);
+            if (!DoesSlotAcceptItemInHand(e.InventoryType, e.InventoryId, e.SlotId))
+                slotId = GetBestSlot(e.InventoryType, e.InventoryId, slotId);
 
-            switch(GetInventoryAction(slotId))
+            var inventory = _getInventory(e.InventoryType, e.InventoryId);
+            switch (GetInventoryAction(e.InventoryType, e.InventoryId, slotId))
             {
-                case InventoryAction.Pickup:   PickupItem(slotId, e.Quantity); break;
-                case InventoryAction.Drop:     Drop(slotId);          break;
-                case InventoryAction.Swap:     SwapItems(slotId);     break;
-                case InventoryAction.Coalesce: CoalesceItems(slotId); break;
+                case InventoryAction.Pickup:   PickupItem(e.InventoryType, e.InventoryId, slotId, e.Quantity); break;
+                case InventoryAction.Drop:     Drop(inventory, slotId);          break;
+                case InventoryAction.Swap:     SwapItems(inventory, slotId);     break;
+                case InventoryAction.Coalesce: CoalesceItems(inventory, slotId); break;
                 case InventoryAction.NoCoalesceFullStack: return;
             }
-
-            Update();
         }
 
         bool CanCoalesce(ItemSlotId slotId, ItemSlot slot, ItemSlot itemInHand)
@@ -280,10 +287,11 @@ namespace UAlbion.Game.State.Player
             return item.IsStackable;
         }
 
-        void PickupItem(ItemSlotId slotId, int? quantity)
+        void PickupItem(AssetType inventoryType, int inventoryId, ItemSlotId slotId, int? quantity)
         {
+            var inventory = _getInventory(inventoryType, inventoryId);
             // Check if the item can be taken
-            if (!CanItemBeTaken(slotId))
+            if (!CanItemBeTaken(inventory, slotId))
                 return; // TODO: Message
 
             if (slotId == ItemSlotId.Gold)
@@ -292,7 +300,7 @@ namespace UAlbion.Game.State.Player
                 if (amount == 0)
                     return;
 
-                Raise(new SetInventoryItemInHandEvent(new GoldInHand { Amount = amount }, _id, slotId));
+                Raise(new SetInventoryItemInHandEvent(new GoldInHand { Amount = amount }, inventoryType, inventoryId, slotId));
             }
             else if (slotId == ItemSlotId.Rations)
             {
@@ -300,7 +308,7 @@ namespace UAlbion.Game.State.Player
                 if (amount == 0)
                     return;
 
-                Raise(new SetInventoryItemInHandEvent(new RationsInHand { Amount = amount }, _id, slotId));
+                Raise(new SetInventoryItemInHandEvent(new RationsInHand { Amount = amount }, inventoryType, inventoryId, slotId));
             }
             else
             {
@@ -314,7 +322,7 @@ namespace UAlbion.Game.State.Player
                     Enchantment = slot.Enchantment,
                     Flags = slot.Flags
                 };
-                Raise(new SetInventoryItemInHandEvent(itemInHand, _id, slotId));
+                Raise(new SetInventoryItemInHandEvent(itemInHand, inventoryType, inventoryId, slotId));
 
                 slot.Amount -= amount;
                 if(slot.Amount == 0)
@@ -322,7 +330,7 @@ namespace UAlbion.Game.State.Player
             }
         }
 
-        void CoalesceItems(ItemSlotId slotId)
+        void CoalesceItems(Inventory inventory, ItemSlotId slotId)
         {
             var slot = inventory.GetSlot(slotId);
             var itemInHand = (ItemSlot)ItemInHand;
@@ -345,7 +353,7 @@ namespace UAlbion.Game.State.Player
             ApiUtil.Assert(slot.Id != itemInHand.Id);
 
             // Check if the item can be taken
-            if (!CanItemBeTaken(slotId))
+            if (!CanItemBeTaken(inventory, slotId))
                 return; // TODO: Message
 
             // FIXME: could take a lightweight object from player A (who is at their max carry weight), swap it with a heavy one carried by player B
@@ -392,8 +400,9 @@ namespace UAlbion.Game.State.Player
             Raise(new DescriptionTextEvent(text));
         }
 
-        public bool TryChangeInventory(ItemId itemId, QuantityChangeOperation operation, int amount, EventContext context)
+        public bool TryChangeInventory(AssetType inventoryType, int inventoryId, ItemId itemId, QuantityChangeOperation operation, int amount, EventContext context)
         {
+            var inventory = _getInventory(inventoryType, inventoryId);
             // TODO: Ensure weight limit is not exceeded
             // TODO: Handle non-stacking items.
             int currentAmount = inventory.EnumerateAll().Where(x => x.Id == itemId).Sum(x => (int?)x.Amount) ?? 0;
@@ -443,7 +452,7 @@ namespace UAlbion.Game.State.Player
                     slot.Id = null;
             }
 
-            Update();
+            // Update();
 
             if(context.Source is EventSource.Map mapEventSource)
             {
@@ -475,21 +484,23 @@ namespace UAlbion.Game.State.Player
             return true;
         }
 
-        public bool TryChangeGold(QuantityChangeOperation operation, int amount, EventContext context)
+        public bool TryChangeGold(AssetType inventoryType, int inventoryId, QuantityChangeOperation operation, int amount, EventContext context)
         {
+            var inventory = _getInventory(inventoryType, inventoryId);
             // TODO: Ensure weight limit is not exceeded
             ushort newValue = (ushort)operation.Apply(inventory.Gold, amount, 0, 32767);
             inventory.Gold = newValue;
-            Update();
+            // Update();
             return true;
         }
 
-        public bool TryChangeRations(QuantityChangeOperation operation, int amount, EventContext context)
+        public bool TryChangeRations(AssetType inventoryType, int inventoryId, QuantityChangeOperation operation, int amount, EventContext context)
         {
+            var inventory = _getInventory(inventoryType, inventoryId);
             // TODO: Ensure weight limit is not exceeded
             ushort newValue = (ushort)operation.Apply(inventory.Rations, amount, 0, 32767);
             inventory.Rations = newValue;
-            Update();
+            // Update();
             return true;
         }
     }

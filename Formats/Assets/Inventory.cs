@@ -31,9 +31,9 @@ namespace UAlbion.Formats.Assets
                 : ItemSlotId.NormalSlotCount)];
         }
 
-        public static Inventory SerdesCharacter(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, FileFormat.PlayerInventory);
         public static Inventory SerdesChest(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, FileFormat.ChestInventory);
         public static Inventory SerdesMerchant(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, FileFormat.MerchantInventory);
+        public static Inventory SerdesCharacter(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, FileFormat.PlayerInventory);
         public IEnumerable<ItemSlot> EnumerateAll() => Slots.Where(x => x != null);
 
         static Inventory Serdes(int n, Inventory inv, ISerializer s, FileFormat format)

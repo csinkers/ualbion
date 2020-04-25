@@ -14,6 +14,7 @@ namespace UAlbion.Game.Gui.Inventory
     abstract class InventorySlot : UiElement
     {
         const string TimerName = "InventorySlot.ClickTimer";
+
         protected static readonly HandlerSet SlotHandlers = new HandlerSet(
             H<InventorySlot, HoverEvent>((x, e) =>
             {
@@ -26,7 +27,10 @@ namespace UAlbion.Game.Gui.Inventory
                 x.Raise(new HoverTextEvent(""));
             }),
             H<InventorySlot, UiLeftClickEvent>((x, _) => x.OnClick()),
-            H<InventorySlot, TimerElapsedEvent>((x, e) => { if (e.Id == TimerName) x.OnTimer(); })
+            H<InventorySlot, TimerElapsedEvent>((x, e) =>
+            {
+                if (e.Id == TimerName) x.OnTimer();
+            })
         );
 
         protected abstract ItemSlotId SlotId { get; }
@@ -42,26 +46,25 @@ namespace UAlbion.Game.Gui.Inventory
             Id = id;
         }
 
+        IInventory Inventory
+        {
+            get
+            {
+                var state = Resolve<IGameState>();
+                return InventoryType switch
+                {
+                    AssetType.PartyMember => state.GetPartyMember((PartyCharacterId) Id)?.Inventory,
+                    AssetType.ChestData => state.GetChest((ChestId) Id),
+                    AssetType.MerchantData => state.GetMerchant((MerchantId) Id),
+                    _ => throw new InvalidOperationException($"Invalid inventory type \"{InventoryType}\"")
+                };
+            }
+        }
+
         protected void GetSlot(out ItemSlot slotInfo, out ItemData item)
         {
             var assets = Resolve<IAssetManager>();
-            if (InventoryType == AssetType.PartyMember)
-            {
-                var member = Resolve<IParty>()[(PartyCharacterId)Id];
-                slotInfo = member?.Apparent.Inventory.GetSlot(SlotId);
-            }
-            else if (InventoryType == AssetType.ChestData)
-            {
-                var chest = Resolve<IGameState>().GetChest((ChestId)Id);
-                slotInfo = chest.Slots[(int)SlotId - (int)ItemSlotId.Slot0];
-            }
-            else if (InventoryType == AssetType.MerchantData)
-            {
-                var chest = Resolve<IGameState>().GetMerchant((MerchantId)Id);
-                slotInfo = chest.Slots[(int)SlotId - (int)ItemSlotId.Slot0];
-            }
-            else throw new InvalidOperationException($"Unexpected inventory type \"{InventoryType}\"");
-
+            slotInfo = Inventory.GetSlot(SlotId);
             item = slotInfo?.Id == null ? null : assets.LoadItem(slotInfo.Id.Value);
         }
 
@@ -100,20 +103,15 @@ namespace UAlbion.Game.Gui.Inventory
 
         void Hover()
         {
-            var state = Resolve<IInventoryScreenState>();
-            var party = Resolve<IParty>();
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
+            var inventory = Resolve<IInventoryManager>();
 
-            var hand = state.ItemInHand;
+            var hand = inventory.ItemInHand;
             if (hand is GoldInHand || hand is RationsInHand)
                 return; // Don't show hover text when holding gold / food
 
-            var member = party[ActiveCharacter];
-            if (member == null)
-                return;
-
-            var slotInfo = member.Effective.Inventory.GetSlot(SlotId);
+            var slotInfo = Inventory.GetSlot(SlotId);
             string itemName = null;
             if (slotInfo?.Id != null)
             {
@@ -129,7 +127,8 @@ namespace UAlbion.Game.Gui.Inventory
                 itemInHandName = itemInHand.GetName(settings.Gameplay.Language);
             }
 
-            var action = member.GetInventoryAction(SlotId);
+            var inventoryManager = Resolve<IInventoryManager>();
+            var action = inventoryManager.GetInventoryAction(InventoryType, Id, SlotId);
             switch(action)
             {
                 case InventoryAction.Pickup:

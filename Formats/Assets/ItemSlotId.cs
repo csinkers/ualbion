@@ -84,5 +84,24 @@ namespace UAlbion.Formats.Assets
                 PersistedItemSlotId.Slot0           => ItemSlotId.Slot0,
                 _ => throw new ArgumentOutOfRangeException(nameof(persisted), persisted, null)
             };
+
+        public static bool IsBodyPart(this ItemSlotId id)
+        {
+            return id switch
+            {
+                { } x when
+                    x == ItemSlotId.Neck ||
+                    x == ItemSlotId.Head ||
+                    x == ItemSlotId.Tail ||
+                    x == ItemSlotId.RightHand ||
+                    x == ItemSlotId.Chest ||
+                    x == ItemSlotId.LeftHand ||
+                    x == ItemSlotId.RightFinger ||
+                    x == ItemSlotId.Feet ||
+                    x == ItemSlotId.LeftFinger ||
+                    x == ItemSlotId.RightHandOrTail => true,
+                _ => false
+            };
+        }
     }
 }

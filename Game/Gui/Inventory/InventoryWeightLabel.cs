@@ -16,7 +16,11 @@ namespace UAlbion.Game.Gui.Inventory
         int _version;
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<InventoryWeightLabel, InventoryChangedEvent>((x, e) => { if (x._activeCharacter == e.MemberId) x._version++; }),
+            H<InventoryWeightLabel, InventoryChangedEvent>((x, e) =>
+            {
+                if (e.InventoryType == AssetType.PartyMember && x._activeCharacter == (PartyCharacterId)e.InventoryId)
+                    x._version++;
+            }),
             H<InventoryWeightLabel, SetLanguageEvent>((x, e) => x._version++),
             H<InventoryWeightLabel, HoverEvent>((x, e) =>
             {

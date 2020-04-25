@@ -12,17 +12,15 @@ namespace UAlbion.Game.Gui.Inventory
         const int InventoryWidth = 4;
         const int InventoryHeight = 6;
 
-        readonly bool _isChest;
-        readonly int _id;
+        readonly ChestId _id;
         int _version;
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<InventoryChestPane, InventoryChangedEvent>((x, e) => x._version++)
         );
 
-        public InventoryChestPane(bool isChest, int id) : base(Handlers)
+        public InventoryChestPane(ChestId id) : base(Handlers)
         {
-            _isChest = isChest;
             _id = id;
 
             var background = new FixedPositionStack();
@@ -36,7 +34,7 @@ namespace UAlbion.Game.Gui.Inventory
                 for (int i = 0; i < InventoryWidth; i++)
                 {
                     int index = j * InventoryWidth + i;
-                    slotsInRow[i] = new InventoryBackpackSlot(activeCharacter, index);
+                    slotsInRow[i] = new InventoryChestSlot((ChestId)_id, index);
                 }
                 slotSpans[j] = new HorizontalStack(slotsInRow);
             }
@@ -46,8 +44,8 @@ namespace UAlbion.Game.Gui.Inventory
 
             var goldSource = new DynamicText(() =>
             {
-                var player = Resolve<IParty>()[activeCharacter];
-                var gold = player?.Apparent.Inventory.Gold ?? 0;
+                var chest = Resolve<IGameState>().GetChest(_id);
+                var gold = chest.Gold;
                 return new[] {new TextBlock($"{gold / 10}.{gold % 10}")};
             }, x => _version);
 
@@ -61,8 +59,8 @@ namespace UAlbion.Game.Gui.Inventory
 
             var foodSource = new DynamicText(() =>
             {
-                var player = Resolve<IParty>()[activeCharacter];
-                var food = player?.Apparent.Inventory.Rations ?? 0;
+                var chest = Resolve<IGameState>().GetChest(_id);
+                var food = chest.Rations;
                 return new[] { new TextBlock(food.ToString()) };
             }, x => _version);
 

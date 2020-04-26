@@ -28,6 +28,16 @@ namespace UAlbion.Game.Gui
         /// <param name="order"></param>
         /// <param name="registerHitFunc"></param>
         int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc);
+/* TODO
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="extents"></param>
+        /// <param name="order"></param>
+        /// <param name="trace">Params: rect, order, id, notes</param>
+        /// <returns></returns>
+        int LayoutTrace(Rectangle extents, int order, Action<Rectangle, int, string, string> trace);
+        */
     }
 
     public interface IFixedSizeUiElement { } // Any elements with this interface won't get stretched to fill available space

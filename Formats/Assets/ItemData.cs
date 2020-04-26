@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using SerdesNet;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets
@@ -136,6 +137,47 @@ namespace UAlbion.Formats.Assets
             sb.AppendFormat("{0}D {1}P ", Damage, Protection);
 
             return sb.ToString();
+        }
+
+        public static ItemData Serdes(int i, ItemData item, ISerializer s)
+        {
+            item ??= new ItemData();
+            item.Id = (ItemId)i;
+            item.Unknown = s.UInt8(nameof(item.Unknown), item.Unknown);
+            item.TypeId = s.EnumU8(nameof(item.TypeId), item.TypeId);
+            item.SlotType = ((PersistedItemSlotId)s.UInt8(nameof(item.SlotType), (byte)item.SlotType.ToPersisted())).ToMemory();
+            item.BreakRate = s.UInt8(nameof(item.BreakRate), item.BreakRate);
+            item.AllowedGender = s.EnumU8(nameof(item.AllowedGender), item.AllowedGender);
+            item.Hands = s.UInt8(nameof(item.Hands), item.Hands);
+            item.LpMaxBonus = s.UInt8(nameof(item.LpMaxBonus), item.LpMaxBonus);
+            item.SpMaxBonus = s.UInt8(nameof(item.SpMaxBonus), item.SpMaxBonus);
+            item.AttributeType = s.EnumU8(nameof(item.AttributeType), item.AttributeType);
+            item.AttributeBonus = s.UInt8(nameof(item.AttributeBonus), item.AttributeBonus);
+            item.SkillType = s.EnumU8(nameof(item.SkillType), item.SkillType);
+            item.SkillBonus = s.UInt8(nameof(item.SkillBonus), item.SkillBonus);
+            item.Protection = s.UInt8(nameof(item.Protection), item.Protection);
+            item.Damage = s.UInt8(nameof(item.Damage), item.Damage);
+            item.AmmoType = s.EnumU8(nameof(item.AmmoType), item.AmmoType);
+            item.SkillTax1Type = s.EnumU8(nameof(item.SkillTax1Type), item.SkillTax1Type);
+            item.SkillTax2Type = s.EnumU8(nameof(item.SkillTax2Type), item.SkillTax2Type);
+            item.SkillTax1 = s.UInt8(nameof(item.SkillTax1), item.SkillTax1);
+            item.SkillTax2 = s.UInt8(nameof(item.SkillTax2), item.SkillTax2);
+            item.Activate = s.UInt8(nameof(item.Activate), item.Activate);
+            item.AmmoAnim = s.UInt8(nameof(item.AmmoAnim), item.AmmoAnim);
+            item.SpellClass = s.EnumU8(nameof(item.SpellClass), item.SpellClass);
+            item.SpellEffect = s.UInt8(nameof(item.SpellEffect), item.SpellEffect);
+            item.Charges = s.UInt8(nameof(item.Charges), item.Charges);
+            item.EnchantmentCount = s.UInt8(nameof(item.EnchantmentCount), item.EnchantmentCount);
+            item.MaxEnchantmentCount = s.UInt8(nameof(item.MaxEnchantmentCount), item.MaxEnchantmentCount);
+            item.MaxCharges = s.UInt8(nameof(item.MaxCharges), item.MaxCharges);
+            item.Flags = s.EnumU16(nameof(item.Flags), item.Flags);
+            item.IconAnim = s.UInt8(nameof(item.IconAnim), item.IconAnim);
+            item.Weight = s.UInt16(nameof(item.Weight), item.Weight);
+            item.Value = s.UInt16(nameof(item.Value), item.Value);
+            item.Icon = s.EnumU16(nameof(item.Icon), item.Icon);
+            item.Class = s.EnumU16(nameof(item.Class), item.Class);
+            item.Race = s.UInt16(nameof(item.Race), item.Race);
+            return item;
         }
     }
 }

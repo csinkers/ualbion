@@ -1,4 +1,5 @@
 ﻿using SerdesNet;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -7,24 +8,22 @@ namespace UAlbion.Formats.MapEvents
         public static DoorEvent Serdes(DoorEvent e, ISerializer s)
         {
             e ??= new DoorEvent();
-            e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);
-            e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
-            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
-            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-            e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
-            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+            e.PickDifficulty = s.UInt8(nameof(PickDifficulty), e.PickDifficulty);
+            e.KeyItemId = (ItemId?)StoreIncrementedNullZero.Serdes(nameof(KeyItemId), (ushort?)e.KeyItemId, s.UInt16);
+            e.InitialTextId = s.UInt8(nameof(InitialTextId), e.InitialTextId);
+            e.UnlockedTextId = s.UInt8(nameof(UnlockedTextId), e.UnlockedTextId);
+            e.DoorId = s.UInt16(nameof(DoorId), e.DoorId); // Usually 100+
+            e.NextEventId = s.UInt16(nameof(NextEventId), e.NextEventId); // EventId when failed to pick??
             return e;
         }
 
-        public byte Unk1 { get; private set; }
-        public byte Unk2 { get; private set; }
-        public byte Unk3 { get; private set; }
-        public byte Unk4 { get; private set; }
-        public byte Unk5 { get; private set; }
-        public ushort Unk6 { get; private set; }
-        public ushort Unk8 { get; private set; }
-        public override string ToString() => $"door ({Unk1} {Unk2} {Unk3} {Unk4} {Unk5} {Unk6} {Unk8})";
+        public byte PickDifficulty { get; private set; }
+        public ItemId? KeyItemId { get; private set; }
+        public byte InitialTextId { get; private set; }
+        public byte UnlockedTextId { get; private set; }
+        public ushort DoorId { get; private set; }
+        public ushort NextEventId { get; private set; }
+        public override string ToString() => $"door ({PickDifficulty} {KeyItemId} {InitialTextId} {UnlockedTextId} {DoorId} {NextEventId})";
         public override MapEventType EventType => MapEventType.Door;
     }
 }

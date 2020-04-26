@@ -3160,19 +3160,19 @@
     "Assets": {}
   },
   "INITIAL/CHESTDT0.XLD": {
-    "Format": "Inventory",
+    "Format": "ChestInventory",
     "Assets": {}
   },
   "INITIAL/CHESTDT1.XLD": {
-    "Format": "Inventory",
+    "Format": "ChestInventory",
     "Assets": {}
   },
   "INITIAL/CHESTDT2.XLD": {
-    "Format": "Inventory",
+    "Format": "ChestInventory",
     "Assets": {}
   },
   "INITIAL/CHESTDT5.XLD": {
-    "Format": "Inventory",
+    "Format": "ChestInventory",
     "Assets": {}
   },
   "INITIAL/MERCHDT0.XLD": {

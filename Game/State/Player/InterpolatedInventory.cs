@@ -5,19 +5,21 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.State.Player
 {
-    public class InterpolatedInventory : ICharacterInventory
+    public class InterpolatedInventory : IInventory
     {
-        readonly Func<ICharacterInventory> _a;
-        readonly Func<ICharacterInventory> _b;
+        readonly Func<IInventory> _a;
+        readonly Func<IInventory> _b;
         readonly Func<float> _getLerp;
 
-        public InterpolatedInventory(Func<ICharacterInventory> a, Func<ICharacterInventory> b, Func<float> getLerp)
+        public InterpolatedInventory(Func<IInventory> a, Func<IInventory> b, Func<float> getLerp)
         {
             _a = a;
             _b = b;
             _getLerp = getLerp;
         }
 
+        public InventoryType InventoryType => _b().InventoryType;
+        public int InventoryId => _b().InventoryId;
         public ushort Gold => (ushort)ApiUtil.Lerp(_a().Gold, _b().Gold, _getLerp());
         public ushort Rations => (ushort)ApiUtil.Lerp(_a().Rations, _b().Rations, _getLerp());
         public ItemSlot Neck => _b().Neck;

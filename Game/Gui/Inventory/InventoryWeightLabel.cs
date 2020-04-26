@@ -1,7 +1,9 @@
 ﻿using System.Linq;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
+using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.State;
@@ -16,7 +18,11 @@ namespace UAlbion.Game.Gui.Inventory
         int _version;
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<InventoryWeightLabel, InventoryChangedEvent>((x, e) => { if (x._activeCharacter == e.MemberId) x._version++; }),
+            H<InventoryWeightLabel, InventoryChangedEvent>((x, e) =>
+            {
+                if (e.InventoryType == InventoryType.Player && x._activeCharacter == (PartyCharacterId)e.InventoryId)
+                    x._version++;
+            }),
             H<InventoryWeightLabel, SetLanguageEvent>((x, e) => x._version++),
             H<InventoryWeightLabel, HoverEvent>((x, e) =>
             {

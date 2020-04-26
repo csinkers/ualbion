@@ -6,7 +6,7 @@ namespace UAlbion.Game.State.Player
     {
         public static IEffectiveCharacterSheet GetEffectiveSheet(IAssetManager assets, CharacterSheet sheet)
         {
-            var effective = new EffectiveCharacterSheet
+            var effective = new EffectiveCharacterSheet(sheet.Inventory.InventoryId)
             {
                 // Names
                 Name = sheet.Name,

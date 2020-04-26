@@ -3,6 +3,7 @@ using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
+using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui.Inventory
@@ -11,14 +12,15 @@ namespace UAlbion.Game.Gui.Inventory
     {
         const string ExitButtonId = "Inventory.Exit";
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<InventoryScreen, SetInventoryModeEvent>((x,e) => x.SetMode(e)),
-            H<InventoryScreen, SetInventoryChestModeEvent>((x,e) => x.SetMode(e)),
-            H<InventoryScreen, SetInventoryMerchantModeEvent>((x,e) => x.SetMode(e)),
+            H<InventoryScreen, InventoryModeEvent>((x,e) => x.SetMode(e)),
+            H<InventoryScreen, InventoryChestModeEvent>((x,e) => x.SetMode(e)),
+            H<InventoryScreen, InventoryMerchantModeEvent>((x,e) => x.SetMode(e)),
             H<InventoryScreen, ButtonPressEvent>((x, e) => x.OnButton(e.ButtonId))
         );
 
         readonly InventoryConfig _config;
         InventoryMode _mode;
+        int _modeSpecificId;
         InventoryPage _page;
         PartyCharacterId _activeCharacter;
 
@@ -36,6 +38,13 @@ namespace UAlbion.Game.Gui.Inventory
         void SetMode(ISetInventoryModeEvent e)
         {
             _mode = e.Mode;
+            _modeSpecificId = e switch
+            {
+                InventoryChestModeEvent chest => (int)chest.ChestId,
+                InventoryMerchantModeEvent merchant => (int)merchant.MerchantId,
+                // SetInventoryDoorModeEvent door => (int)door.DoorId
+                _ => 0
+            };
             // TODO: Verify that the party member is currently in the party
             _activeCharacter = e.Member;
             Rebuild();
@@ -64,8 +73,8 @@ namespace UAlbion.Game.Gui.Inventory
                         () => _page,
                         x => _page = x),
 
-                    InventoryMode.Merchant => new InventoryChestPane(false),
-                    InventoryMode.Chest => new InventoryChestPane(true),
+                    // InventoryMode.Merchant => new InventoryChestPane(false, _modeSpecificId), // TODO
+                    InventoryMode.Chest => new InventoryChestPane((ChestId)_modeSpecificId),
                     InventoryMode.LockedChest => new InventoryLockPane(true),
                     InventoryMode.LockedDoor => new InventoryLockPane(false),
                     _ => throw new InvalidOperationException($"Unexpected inventory mode {_mode}")
@@ -76,9 +85,9 @@ namespace UAlbion.Game.Gui.Inventory
             // var frameDivider = new FrameDivider(135, 0, 4, 192);
 
             AttachChild(new UiFixedPositionElement<SlabId>(SlabId.SLAB, UiConstants.UiExtents));
-            AttachChild(new FixedPosition( new Rectangle(0, 0, 135, UiConstants.ActiveAreaExtents.Height), leftPane));
-            AttachChild(new FixedPosition( new Rectangle(142, 0, 134, UiConstants.ActiveAreaExtents.Height), middlePane));
-            AttachChild(new FixedPosition( new Rectangle(280, 0, 71, UiConstants.ActiveAreaExtents.Height), rightPane));
+            AttachChild(new FixedPosition(new Rectangle(0, 0, 135, UiConstants.ActiveAreaExtents.Height), leftPane));
+            AttachChild(new FixedPosition(new Rectangle(142, 0, 134, UiConstants.ActiveAreaExtents.Height), middlePane));
+            AttachChild(new FixedPosition(new Rectangle(280, 0, 71, UiConstants.ActiveAreaExtents.Height), rightPane));
         }
     }
 }

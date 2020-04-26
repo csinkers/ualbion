@@ -17367,7 +17367,7 @@
     }
   },
   "INITIAL/CHESTDT0.XLD": {
-    "Format": "Inventory",
+    "Format": "ChestInventory",
     "EnumName": "ChestId",
     "EnumType": "ushort",
     "Assets": {
@@ -17376,7 +17376,7 @@
     }
   },
   "INITIAL/CHESTDT1.XLD": {
-    "Format": "Inventory",
+    "Format": "ChestInventory",
     "EnumName": "ChestId",
     "EnumType": "ushort",
     "Assets": {
@@ -17483,7 +17483,7 @@
     }
   },
   "INITIAL/CHESTDT2.XLD": {
-    "Format": "Inventory",
+    "Format": "ChestInventory",
     "EnumName": "ChestId",
     "EnumType": "ushort",
     "Assets": {
@@ -17590,7 +17590,7 @@
     }
   },
   "INITIAL/CHESTDT5.XLD": {
-    "Format": "Inventory",
+    "Format": "ChestInventory",
     "EnumName": "ChestId",
     "EnumType": "ushort",
     "Assets": {

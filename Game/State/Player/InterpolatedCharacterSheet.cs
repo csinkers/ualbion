@@ -39,7 +39,7 @@ namespace UAlbion.Game.State.Player
         public ushort WordSet => _b().WordSet;
         public PlayerLanguage Languages => _b().Languages;
         public IMagicSkills Magic { get; }
-        public ICharacterInventory Inventory { get; }
+        public IInventory Inventory { get; }
         public ICharacterAttributes Attributes { get; }
         public ICharacterSkills Skills { get; }
         public ICombatAttributes Combat { get; }

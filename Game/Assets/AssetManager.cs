@@ -177,8 +177,8 @@ namespace UAlbion.Game.Assets
         public CharacterSheet LoadCharacter(PartyCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(AssetType.PartyMember, id);
         public CharacterSheet LoadCharacter(NpcCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(AssetType.Npc, id);
         public CharacterSheet LoadCharacter(MonsterCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(AssetType.Monster, id);
-        public Chest LoadChest(ChestId id) => (Chest)_assetLocatorRegistry.LoadAssetCached(AssetType.ChestData, id);
-        public Chest LoadMerchant(MerchantId id)=> (Chest)_assetLocatorRegistry.LoadAssetCached(AssetType.MerchantData, id);
+        public Inventory LoadChest(ChestId id) => (Inventory)_assetLocatorRegistry.LoadAssetCached(AssetType.ChestData, id);
+        public Inventory LoadMerchant(MerchantId id)=> (Inventory)_assetLocatorRegistry.LoadAssetCached(AssetType.MerchantData, id);
         public WordId? ParseWord(string word)
         {
             var words = // Inefficient code, if it ends up being a problem then we can build a reverse dictionary and cache it.

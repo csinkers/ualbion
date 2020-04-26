@@ -4,6 +4,7 @@
     "Escape": "push_scene MainMenu",
     "Tilde": "push_input_mode console",
     "Alt+F4": "quit",
+    "Alt+Enter":  "e:toggle_fullscreen",
     "BracketLeft": "e:mag -1",
     "BracketRight": "e:mag 1",
     "V": "push_mouse_mode DebugPick",
@@ -16,7 +17,6 @@
     "Control+D": "engine_flag toggle RenderDepth",
     "Pause": "e:run_renderdoc",
     "Control+R": "e:run_renderdoc",
-    "Alt+Enter":  "e:toggle",
     "Control+B": "engine_flag toggle ShowBoundingBoxes",
 
     "Shift+BracketLeft": "toggle_underlay",
@@ -76,7 +76,7 @@
     "Left": "+party_move -1  0",
     "Right": "+party_move  1  0",
 
-    "Tab": "push_scene inventory",
+    "Tab": "open_character_inventory 0",
 
     "Control+Number1": "set_active_member 0",
     "Control+Number2": "set_active_member 1",
@@ -86,7 +86,9 @@
     "Control+Number6": "set_active_member 5",
 
     "Q": "cursor_mode look",
-    "E": "cursor_mode manipulate"
+    "E": "cursor_mode manipulate",
+    "R": "cursor_mode talk",
+    "Z": "cursor_mode take"
   },
   "World3D": {
     "Tab": "push_scene inventory",

@@ -7,6 +7,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
+using UAlbion.Game.State.Player;
 
 namespace UAlbion.Game.State
 {
@@ -124,19 +125,23 @@ namespace UAlbion.Game.State
                 RemoveMember(id);
         }
 
-        bool TryEachMember(Func<Player.Player, bool> func) => _walkOrder.Any(func); // Try and execute an operation on each player until one succeeds.
+        bool TryEachMember(Func<IInventoryManager, PartyCharacterId, bool> func)
+        {
+            var inventoryManager = Resolve<IInventoryManager>();
+            return _walkOrder.Any(x => func(inventoryManager, x.Id));
+        }
 
         bool ChangePartyInventory(ItemId itemId, QuantityChangeOperation operation, int amount, EventContext context) 
-            => TryEachMember(player =>
-                player.TryChangeInventory(itemId, operation, amount, context));
+            => TryEachMember((im, x) =>
+                im.TryChangeInventory(InventoryType.Player, (int)x, itemId, operation, amount, context));
 
         bool ChangePartyGold(QuantityChangeOperation operation, int amount, EventContext context)
-            => TryEachMember(player =>
-                player.TryChangeGold(operation, amount, context));
+            => TryEachMember((im, x) =>
+                im.TryChangeGold(InventoryType.Player, (int)x, operation, amount, context));
 
         bool ChangePartyRations(QuantityChangeOperation operation, int amount, EventContext context)
-            => TryEachMember(player =>
-                player.TryChangeRations(operation, amount, context));
+            => TryEachMember((im, x) =>
+                im.TryChangeRations(InventoryType.Player, (int)x, operation, amount, context));
     }
 }
 

@@ -22,7 +22,7 @@ namespace UAlbion.Formats
             using var br = new BinaryReader(_stream, Encoding.Default, true);
             var headerBytes = Encoding.ASCII.GetBytes(MagicString);
             var actualHeader = br.ReadBytes(headerBytes.Length);
-            if(!actualHeader.SequenceEqual(headerBytes))
+            if (!actualHeader.SequenceEqual(headerBytes))
                 throw new FormatException("XLD file magic string not found");
 
             byte terminator = br.ReadByte();

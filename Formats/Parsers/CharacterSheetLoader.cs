@@ -16,7 +16,7 @@ namespace UAlbion.Formats.Parsers
 
         public CharacterSheet Serdes(CharacterSheet sheet, ISerializer s, string name, AssetInfo config)
         {
-            sheet ??= new CharacterSheet();
+            sheet ??= new CharacterSheet(config.Id);
             s.Check();
             sheet.Type = s.EnumU8("Type", sheet.Type);
             sheet.Gender = s.EnumU8("Gender", sheet.Gender);
@@ -196,19 +196,7 @@ namespace UAlbion.Formats.Parsers
             if (sheet.Type != CharacterType.Party)
                 return sheet;
 
-            sheet.Inventory.Neck        = s.Meta("Neck",        sheet.Inventory.Neck,        ItemSlot.Serdes);
-            sheet.Inventory.Head        = s.Meta("Head",        sheet.Inventory.Head,        ItemSlot.Serdes);
-            sheet.Inventory.Tail        = s.Meta("Tail",        sheet.Inventory.Tail,        ItemSlot.Serdes);
-            sheet.Inventory.LeftHand    = s.Meta("LeftHand",    sheet.Inventory.LeftHand,    ItemSlot.Serdes);
-            sheet.Inventory.Chest       = s.Meta("Chest",       sheet.Inventory.Chest,       ItemSlot.Serdes);
-            sheet.Inventory.RightHand   = s.Meta("RightHand",   sheet.Inventory.RightHand,   ItemSlot.Serdes);
-            sheet.Inventory.LeftFinger  = s.Meta("LeftFinger",  sheet.Inventory.LeftFinger,  ItemSlot.Serdes);
-            sheet.Inventory.Feet        = s.Meta("Feet",        sheet.Inventory.Feet,        ItemSlot.Serdes);
-            sheet.Inventory.RightFinger = s.Meta("RightFinger", sheet.Inventory.RightFinger, ItemSlot.Serdes);
-
-            sheet.Inventory.Slots ??= new ItemSlot[24];
-            for (int i = 0; i < 24; i++)
-                sheet.Inventory.Slots[i] = s.Meta($"Slot{i}", sheet.Inventory.Slots[i], ItemSlot.Serdes);
+            sheet.Inventory = s.Meta(nameof(sheet.Inventory), sheet.Inventory, Inventory.SerdesCharacter);
 
             return sheet;
         }

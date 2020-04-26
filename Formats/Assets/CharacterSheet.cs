@@ -5,20 +5,23 @@ namespace UAlbion.Formats.Assets
 {
     public class EffectiveCharacterSheet : CharacterSheet, IEffectiveCharacterSheet
     {
+        public EffectiveCharacterSheet(int id) : base(id) { }
         public int TotalWeight { get; set; }
         public int MaxWeight { get; set; }
     }
 
     public class CharacterSheet : ICharacterSheet
     {
+        public CharacterSheet(int id) => Inventory = new Inventory(InventoryType.Player, id);
+
         // Grouped
         public MagicSkills Magic { get; set; } = new MagicSkills();
-        public CharacterInventory Inventory { get; set; } = new CharacterInventory();
+        public Inventory Inventory { get; set; }
         public CharacterAttributes Attributes { get; set; } = new CharacterAttributes();
         public CharacterSkills Skills { get; set; } = new CharacterSkills();
         public CombatAttributes Combat { get; set; } = new CombatAttributes();
         IMagicSkills ICharacterSheet.Magic => Magic;
-        ICharacterInventory ICharacterSheet.Inventory => Inventory;
+        IInventory ICharacterSheet.Inventory => Inventory;
         ICharacterAttributes ICharacterSheet.Attributes => Attributes;
         ICharacterSkills ICharacterSheet.Skills => Skills;
         ICombatAttributes ICharacterSheet.Combat => Combat;

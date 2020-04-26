@@ -1,20 +1,41 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Numerics;
+using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
+using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.Gui.Text;
 using UAlbion.Game.State;
 using UAlbion.Game.State.Player;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Inventory
 {
-    abstract class InventorySlot : UiElement
+    public class InventorySlot : UiElement
     {
         const string TimerName = "InventorySlot.ClickTimer";
-        protected static readonly HandlerSet SlotHandlers = new HandlerSet(
+
+        readonly InventoryType _inventoryType;
+        readonly int _id;
+        readonly ItemSlotId _slotId;
+        readonly ButtonFrame _frame;
+        readonly UiSpriteElement<ItemSpriteId> _sprite;
+        readonly Vector2 _size;
+
+        int _version;
+        int _frameNumber;
+        bool _isClickTimerPending;
+
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<InventorySlot, InventoryChangedEvent>((x, e) =>
+            {
+                if (e.InventoryType == x._inventoryType && e.InventoryId == x._id)
+                    x._version++;
+            }),
+            H<InventorySlot, SlowClockEvent>((x, e) => x._frameNumber += e.Delta),
             H<InventorySlot, HoverEvent>((x, e) =>
             {
                 x.Hover();
@@ -22,29 +43,65 @@ namespace UAlbion.Game.Gui.Inventory
             }),
             H<InventorySlot, BlurEvent>((x, _) =>
             {
-                x.Frame.State = ButtonState.Normal;
+                x._frame.State = ButtonState.Normal;
                 x.Raise(new HoverTextEvent(""));
             }),
             H<InventorySlot, UiLeftClickEvent>((x, _) => x.OnClick()),
-            H<InventorySlot, TimerElapsedEvent>((x, e) => { if (e.Id == TimerName) x.OnTimer(); })
+            H<InventorySlot, TimerElapsedEvent>((x, e) =>
+            {
+                if (e.Id == TimerName) x.OnTimer();
+            })
         );
 
-        protected abstract ItemSlotId SlotId { get; }
-        protected abstract ButtonFrame Frame { get; }
-        protected PartyCharacterId ActiveCharacter { get; }
-        bool _isClickTimerPending;
-
-        protected InventorySlot(PartyCharacterId activeCharacter, IDictionary<Type, Handler> handlers)
-            : base(handlers)
+        public InventorySlot(InventoryType inventoryType, int id, ItemSlotId slotId) : base(Handlers)
         {
-            ActiveCharacter = activeCharacter;
+            _inventoryType = inventoryType;
+            _id = id;
+            _slotId = slotId;
+            _size = slotId.IsBodyPart() ? new Vector2(16, 16) : new Vector2(16, 20);
+            _sprite = new UiSpriteElement<ItemSpriteId>(0) { SubId = (int)ItemSpriteId.Nothing };
+
+            var amountSource = new DynamicText(() =>
+            {
+                GetSlot(out var slotInfo, out _);
+                return slotInfo == null || slotInfo.Amount < 2
+                    ? new TextBlock[0]
+                    : new[] { new TextBlock(slotInfo.Amount.ToString()) { Alignment = TextAlignment.Right } };
+            }, x => _version);
+
+            var text = new TextElement(amountSource);
+
+            _frame = AttachChild(new ButtonFrame(new FixedPositionStack()
+                .Add(_sprite, 0, 0, 16, 16)
+                .Add(text, 0, 20 - 9, 16, 9))
+            {
+                Padding = -1,
+                Theme = slotId.IsBodyPart() ? (ButtonFrame.ITheme)new ButtonTheme() : new InventorySlotTheme(),
+                State = slotId.IsBodyPart() ? ButtonState.Normal : ButtonState.Pressed
+            });
         }
 
-        protected void GetSlot(out ItemSlot slotInfo, out ItemData item)
+        public override string ToString() => $"InventorySlot:{_inventoryType}:{_id}:{_slotId}";
+
+        IInventory Inventory
+        {
+            get
+            {
+                var state = Resolve<IGameState>();
+                return _inventoryType switch
+                {
+                    InventoryType.Player => state.GetPartyMember((PartyCharacterId)_id)?.Inventory,
+                    InventoryType.Chest => state.GetChest((ChestId)_id),
+                    InventoryType.Merchant => state.GetMerchant((MerchantId)_id),
+                    _ => throw new InvalidOperationException($"Invalid inventory type \"{_inventoryType}\"")
+                };
+            }
+        }
+
+        void GetSlot(out ItemSlot slotInfo, out ItemData item)
         {
             var assets = Resolve<IAssetManager>();
-            var member = Resolve<IParty>()[ActiveCharacter];
-            slotInfo = member?.Apparent.Inventory.GetSlot(SlotId);
+            slotInfo = Inventory.GetSlot(_slotId);
             item = slotInfo?.Id == null ? null : assets.LoadItem(slotInfo.Id.Value);
         }
 
@@ -52,7 +109,7 @@ namespace UAlbion.Game.Gui.Inventory
         {
             if (_isClickTimerPending) // If they double-clicked...
             {
-                Raise(new InventoryPickupItemEvent(ActiveCharacter, SlotId));
+                Raise(new InventoryPickupDropItemEvent(_inventoryType, _id, _slotId));
                 _isClickTimerPending = false; // Ensure the single-click behaviour doesn't happen.
             }
             else // For the first click, just start the double-click timer.
@@ -62,13 +119,14 @@ namespace UAlbion.Game.Gui.Inventory
                 _isClickTimerPending = true;
             }
         }
+
         void OnTimer()
         {
             if (!_isClickTimerPending) // They've already double-clicked
                 return;
 
             // TODO: Show quantity selection dialog
-            Raise(new InventoryPickupItemEvent(ActiveCharacter, SlotId, 1));
+            Raise(new InventoryPickupDropItemEvent(_inventoryType, _id, _slotId, 1));
             _isClickTimerPending = false;
         }
 
@@ -83,20 +141,15 @@ namespace UAlbion.Game.Gui.Inventory
 
         void Hover()
         {
-            var state = Resolve<IInventoryScreenState>();
-            var party = Resolve<IParty>();
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
+            var inventory = Resolve<IInventoryManager>();
 
-            var hand = state.ItemInHand;
+            var hand = inventory.ItemInHand;
             if (hand is GoldInHand || hand is RationsInHand)
                 return; // Don't show hover text when holding gold / food
 
-            var member = party[ActiveCharacter];
-            if (member == null)
-                return;
-
-            var slotInfo = member.Effective.Inventory.GetSlot(SlotId);
+            var slotInfo = Inventory.GetSlot(_slotId);
             string itemName = null;
             if (slotInfo?.Id != null)
             {
@@ -112,7 +165,8 @@ namespace UAlbion.Game.Gui.Inventory
                 itemInHandName = itemInHand.GetName(settings.Gameplay.Language);
             }
 
-            var action = member.GetInventoryAction(SlotId);
+            var inventoryManager = Resolve<IInventoryManager>();
+            var action = inventoryManager.GetInventoryAction(_inventoryType, _id, _slotId);
             switch(action)
             {
                 case InventoryAction.Pickup:
@@ -121,7 +175,7 @@ namespace UAlbion.Game.Gui.Inventory
                     if (itemName != null)
                     {
                         Raise(new HoverTextEvent(itemName));
-                        Frame.State = ButtonState.Hover;
+                        _frame.State = ButtonState.Hover;
                     }
                     break;
                 }
@@ -131,7 +185,7 @@ namespace UAlbion.Game.Gui.Inventory
                     {
                         // Put down %s
                         Raise(new HoverTextExEvent(BuildHoverText(SystemTextId.Item_PutDownX, itemInHandName)));
-                        Frame.State = ButtonState.Hover;
+                        _frame.State = ButtonState.Hover;
                     }
 
                     break;
@@ -143,7 +197,7 @@ namespace UAlbion.Game.Gui.Inventory
                         // Swap %s with %s
                         Raise(new HoverTextExEvent(BuildHoverText(SystemTextId.Item_SwapXWithX, itemInHandName,
                             itemName)));
-                        Frame.State = ButtonState.Hover;
+                        _frame.State = ButtonState.Hover;
                     }
 
                     break;
@@ -152,17 +206,46 @@ namespace UAlbion.Game.Gui.Inventory
                 {
                     // Add
                     Raise(new HoverTextExEvent(BuildHoverText(SystemTextId.Item_Add)));
-                    Frame.State = ButtonState.Hover;
+                    _frame.State = ButtonState.Hover;
                     break;
                 }
                 case InventoryAction.NoCoalesceFullStack:
                 {
                     // {YELLOW}This space is occupied!
                     Raise(new HoverTextExEvent(BuildHoverText(SystemTextId.Item_ThisSpaceIsOccupied)));
-                    Frame.State = ButtonState.Hover;
+                    _frame.State = ButtonState.Hover;
                     break;
                 }
             }
+
         }
+
+        void Rebuild()
+        {
+            GetSlot(out _, out var item);
+
+            if(item == null)
+            {
+                _sprite.SubId = (int)ItemSpriteId.Nothing;
+                return;
+            }
+
+            int frames = item.IconAnim == 0 ? 1 : item.IconAnim;
+            while (_frameNumber >= frames)
+                _frameNumber -= frames;
+
+            int itemSpriteId = (int)item.Icon + _frameNumber;
+            _sprite.SubId = itemSpriteId;
+            // TODO: Show item.Amount
+            // TODO: Show broken overlay if item.Flags.HasFlag(ItemSlotFlags.Broken)
+        }
+
+        public override int Render(Rectangle extents, int order)
+        {
+            Rebuild();
+            return base.Render(extents, order);
+        }
+
+        public override Vector2 GetSize() => _size;
     }
 }

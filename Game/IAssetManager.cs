@@ -33,8 +33,8 @@ namespace UAlbion.Game
         CharacterSheet LoadCharacter(PartyCharacterId id);
         CharacterSheet LoadCharacter(NpcCharacterId id);
         CharacterSheet LoadCharacter(MonsterCharacterId id);
-        Chest LoadChest(ChestId chestId);
-        Chest LoadMerchant(MerchantId merchantId);
+        Inventory LoadChest(ChestId chestId);
+        Inventory LoadMerchant(MerchantId merchantId);
         WordId? ParseWord(string word);
         IList<Block> LoadBlockList(BlockListId blockListId);
 

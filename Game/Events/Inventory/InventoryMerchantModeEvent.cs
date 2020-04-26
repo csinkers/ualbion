@@ -2,12 +2,12 @@
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Gui.Inventory;
 
-namespace UAlbion.Game.Events
+namespace UAlbion.Game.Events.Inventory
 {
-    [Event("set_inv_merchant_mode", "Sets the current inventory mode")]
-    public class SetInventoryMerchantModeEvent : GameEvent, ISetInventoryModeEvent
+    [Event("inv:merchant_mode", "Sets the current inventory mode")]
+    public class InventoryMerchantModeEvent : GameEvent, ISetInventoryModeEvent
     {
-        public SetInventoryMerchantModeEvent(MerchantId merchantId, PartyCharacterId member)
+        public InventoryMerchantModeEvent(MerchantId merchantId, PartyCharacterId member)
         {
             MerchantId = merchantId;
             Member = member;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
@@ -22,8 +23,8 @@ namespace UAlbion.Game.State
 
         public DateTime Time => Epoch + new TimeSpan(_game.Days, _game.Hours, _game.Minutes, 0);
         IParty IGameState.Party => _party;
-        Func<ChestId, IInventory> IGameState.GetChest => x => GetInventory(AssetType.ChestData, (int)x);
-        Func<MerchantId, IInventory> IGameState.GetMerchant => x => GetInventory(AssetType.MerchantData, (int)x);
+        Func<ChestId, IInventory> IGameState.GetChest => x => GetInventory(InventoryType.Chest, (int)x);
+        Func<MerchantId, IInventory> IGameState.GetMerchant => x => GetInventory(InventoryType.Merchant, (int)x);
 
         Func<NpcCharacterId, ICharacterSheet> IGameState.GetNpc => 
             x => _game != null && _game.Npcs.TryGetValue(x, out var sheet) ? sheet : null;
@@ -68,18 +69,24 @@ namespace UAlbion.Game.State
             AttachChild(new InventoryManager(GetInventory));
         }
 
-        Inventory GetInventory(AssetType type, int id)
+        Inventory GetInventory(InventoryType type, int id)
         {
             if (_game == null)
                 return null;
 
-            return type switch
+            Inventory inventory;
+            switch(type)
             {
-                AssetType.PartyMember => (_game.PartyMembers.TryGetValue((PartyCharacterId) id, out var member) ? member.Inventory : null),
-                AssetType.ChestData => (_game.Chests.TryGetValue((ChestId) id, out var chest) ? chest : null),
-                AssetType.MerchantData => (_game.Merchants.TryGetValue((MerchantId) id, out var merchant) ? merchant : null),
-                _ => throw new InvalidOperationException($"Unexpected inventory type requested: \"{type}\"")
+                case InventoryType.Player:
+                    inventory = _game.PartyMembers.TryGetValue((PartyCharacterId)id, out var member) ? member.Inventory : null;
+                    break;
+                case InventoryType.Chest: _game.Chests.TryGetValue((ChestId)id, out inventory); break;
+                case InventoryType.Merchant: _game.Merchants.TryGetValue((MerchantId)id, out inventory); break;
+                default:
+                    throw new InvalidOperationException($"Unexpected inventory type requested: \"{type}\"");
             };
+            ApiUtil.Assert(inventory?.InventoryType == type && inventory.InventoryId == id);
+            return inventory;
         }
 
         public int TickCount { get; private set; }

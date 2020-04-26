@@ -3,5 +3,6 @@
     public enum UAlbionStringId
     {
         LanguageLabel,
+        TakeAll
     }
 }

@@ -1,4 +1,5 @@
 ﻿using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.State;
@@ -19,7 +20,7 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 var itemSlotId = bodyPart.Key;
                 var position = bodyPart.Value;
-                bodyStack.Add(new InventoryBodyPart(activeCharacter, itemSlotId), (int)position.X, (int)position.Y);
+                bodyStack.Add(new InventorySlot(InventoryType.Player, (int)activeCharacter, itemSlotId), (int)position.X, (int)position.Y);
             }
 
             var frame = new ButtonFrame(bodyStack) { Theme = new FrameTheme() };

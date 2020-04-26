@@ -133,15 +133,15 @@ namespace UAlbion.Game.State
 
         bool ChangePartyInventory(ItemId itemId, QuantityChangeOperation operation, int amount, EventContext context) 
             => TryEachMember((im, x) =>
-                im.TryChangeInventory(AssetType.PartyMember, (int)x, itemId, operation, amount, context));
+                im.TryChangeInventory(InventoryType.Player, (int)x, itemId, operation, amount, context));
 
         bool ChangePartyGold(QuantityChangeOperation operation, int amount, EventContext context)
             => TryEachMember((im, x) =>
-                im.TryChangeGold(AssetType.PartyMember, (int)x, operation, amount, context));
+                im.TryChangeGold(InventoryType.Player, (int)x, operation, amount, context));
 
         bool ChangePartyRations(QuantityChangeOperation operation, int amount, EventContext context)
             => TryEachMember((im, x) =>
-                im.TryChangeRations(AssetType.PartyMember, (int)x, operation, amount, context));
+                im.TryChangeRations(InventoryType.Player, (int)x, operation, amount, context));
     }
 }
 

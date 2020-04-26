@@ -1,4 +1,5 @@
 ﻿using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
@@ -30,7 +31,10 @@ namespace UAlbion.Game.Gui.Inventory
                 for (int i = 0; i < InventoryWidth; i++)
                 {
                     int index = j * InventoryWidth + i;
-                    slotsInRow[i] = new InventoryBackpackSlot(activeCharacter, index);
+                    slotsInRow[i] = new InventorySlot(
+                        InventoryType.Player,
+                        (int)activeCharacter,
+                        (ItemSlotId)((int)ItemSlotId.Slot0 + index));
                 }
                 slotSpans[j] = new HorizontalStack(slotsInRow);
             }

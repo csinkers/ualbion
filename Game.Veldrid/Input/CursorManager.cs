@@ -19,9 +19,9 @@ namespace UAlbion.Game.Veldrid.Input
     public class CursorManager : Component, ICursorManager
     {
         CoreSpriteId _cursorId = CoreSpriteId.Cursor;
+
         public Vector2 Position { get; private set; }
         Vector2 _hotspot;
-        Vector2 _size;
         SpriteLease _cursorSprite;
         SpriteLease _itemSprite;
         SpriteLease _hotspotSprite;
@@ -42,8 +42,6 @@ namespace UAlbion.Game.Veldrid.Input
                 x.Position = new Vector2(e.X, e.Y);
                 x._dirty = true;
             }),
-            H<CursorManager, ClearInventoryItemInHandEvent>((x, e) => x._dirty = true),
-            H<CursorManager, SetInventoryItemInHandEvent>((x, e) => x._dirty = true),
             H<CursorManager, RenderEvent>((x, e) => x.Render()),
             H<CursorManager, SlowClockEvent>((x, e) => x._frame += e.Delta),
             H<CursorManager, SetCursorEvent>((x, e) => x.SetCursor(e.CursorId)),
@@ -51,14 +49,13 @@ namespace UAlbion.Game.Veldrid.Input
             H<CursorManager, WindowResizedEvent>((x, e) => x.SetCursor(x._cursorId))
         );
 
-        void SetCursor(CoreSpriteId id)
+        void SetCursor(CoreSpriteId cursorId)
         {
             var assets = Resolve<IAssetManager>();
             var window = Resolve<IWindowManager>();
-            var texture = assets.LoadTexture(id);
-            var config = assets.LoadCoreSpriteInfo(id);
-            _cursorId = id;
-            _size = new Vector2(texture.Width, texture.Height);
+            var config = assets.LoadCoreSpriteInfo(cursorId);
+
+            _cursorId = cursorId;
             _hotspot = config.Hotspot == null
                 ? Vector2.Zero
                 : window.GuiScale * new Vector2(config.Hotspot.X, config.Hotspot.Y);
@@ -133,7 +130,7 @@ namespace UAlbion.Game.Veldrid.Input
             }
 
             var instances = _cursorSprite.Access();
-            var size = window.UiToNormRelative(_size) / 2;
+            var size = window.UiToNormRelative(new Vector2(cursorTexture.Width, cursorTexture.Height)) / 2;
             instances[0] = SpriteInstanceData.TopMid(position, size, _cursorSprite, 0, 0);
         }
 

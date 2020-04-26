@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
@@ -24,32 +23,21 @@ namespace UAlbion.Game.State.Player
 
     public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryManager
     {
-        readonly Func<AssetType, int, Inventory> _getInventory;
+        readonly Func<InventoryType, int, Inventory> _getInventory;
         const int MaxSlotAmount = 99; // TODO: Verify
         const int MaxGold = 32767;
         const int MaxRations = 32767;
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<InventoryManager, InventoryChangedEvent>((x, e) => { x.Update(e.InventoryType, e.InventoryId); }),
             H<InventoryManager, InventoryPickupItemEvent>((x,e) => x.OnPickupItem(e)),
-            H<InventoryManager, InventoryGiveItemEvent>((x,e) => x.OnGiveItem(e)),
-            H<InventoryManager, ClearInventoryItemInHandEvent>((x, e) =>
-            {
-                x.ItemInHand = null;
-                x.ReturnItemInHandEvent = null;
-            }),
-            H<InventoryManager, SetInventoryItemInHandEvent>((x, e) =>
-            {
-                x.ItemInHand = e.ItemInHand;
-                x.ReturnItemInHandEvent = new InventoryPickupItemEvent(e.InventoryType, e.Id, e.SlotId);
-            })
+            H<InventoryManager, InventoryGiveItemEvent>((x,e) => x.OnGiveItem(e))
         );
 
         public IHoldable ItemInHand { get; private set; }
         public InventoryPickupItemEvent ReturnItemInHandEvent { get; private set; }
-        public InventoryManager(Func<AssetType, int, Inventory> getInventory) : base(Handlers) => _getInventory = getInventory;
+        public InventoryManager(Func<InventoryType, int, Inventory> getInventory) : base(Handlers) => _getInventory = getInventory;
 
-        public InventoryAction GetInventoryAction(AssetType type, int id, ItemSlotId slotId)
+        public InventoryAction GetInventoryAction(InventoryType type, int id, ItemSlotId slotId)
         {
             if (slotId == ItemSlotId.None)
                 return InventoryAction.Nothing;
@@ -90,9 +78,18 @@ namespace UAlbion.Game.State.Player
             }
         }
 
-        void Update(AssetType inventoryType, int inventoryId)
+        void Update(InventoryType inventoryType, int inventoryId)
         {
             Raise(new InventoryChangedEvent(inventoryType, inventoryId));
+        }
+
+        void SetItemInHand(IInventory inventory, ItemSlotId slotId, IHoldable itemInHand)
+        {
+            ItemInHand = itemInHand;
+            ReturnItemInHandEvent = 
+                itemInHand == null 
+                ? null 
+                : new InventoryPickupItemEvent(inventory.InventoryType, inventory.InventoryId, slotId);
             Raise(new SetCursorEvent(ItemInHand == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
         }
 
@@ -138,7 +135,7 @@ namespace UAlbion.Game.State.Player
             }
         }
 
-        bool DoesSlotAcceptItemInHand(AssetType type, int id, ItemSlotId slotId)
+        bool DoesSlotAcceptItemInHand(InventoryType type, int id, ItemSlotId slotId)
         {
             if (ItemInHand == null)
                 return true;
@@ -154,7 +151,7 @@ namespace UAlbion.Game.State.Player
                 if (slotId < ItemSlotId.NormalSlotCount)
                     return true;
 
-                if (type != AssetType.PartyMember)
+                if (type != InventoryType.Player)
                     return false;
 
                 var assets = Resolve<IAssetManager>();
@@ -167,7 +164,7 @@ namespace UAlbion.Game.State.Player
             throw new InvalidOperationException($"Unexpected item type in hand: {ItemInHand.GetType()}");
         }
 
-        ItemSlotId GetBestSlot(AssetType type, int id, ItemSlotId slotId)
+        ItemSlotId GetBestSlot(InventoryType type, int id, ItemSlotId slotId)
         {
             if (!(ItemInHand is ItemSlot itemInHand)) // gold, rations etc
                 return slotId;
@@ -177,7 +174,7 @@ namespace UAlbion.Game.State.Player
 
             var assets = Resolve<IAssetManager>();
             var item = assets.LoadItem(itemInHand.Id.Value);
-            if (type != AssetType.PartyMember || !slotId.IsBodyPart()) 
+            if (type != InventoryType.Player || !slotId.IsBodyPart()) 
                 return ItemSlotId.None;
 
             var state = Resolve<IGameState>();
@@ -216,7 +213,7 @@ namespace UAlbion.Game.State.Player
 
         void OnGiveItem(InventoryGiveItemEvent e)
         {
-            var inventory = _getInventory(AssetType.PartyMember, (int) e.MemberId);
+            var inventory = _getInventory(InventoryType.Player, (int) e.MemberId);
 
             if (ItemInHand is GoldInHand)
                 Drop(inventory, ItemSlotId.Gold);
@@ -287,7 +284,7 @@ namespace UAlbion.Game.State.Player
             return item.IsStackable;
         }
 
-        void PickupItem(AssetType inventoryType, int inventoryId, ItemSlotId slotId, int? quantity)
+        void PickupItem(InventoryType inventoryType, int inventoryId, ItemSlotId slotId, int? quantity)
         {
             var inventory = _getInventory(inventoryType, inventoryId);
             // Check if the item can be taken
@@ -300,7 +297,7 @@ namespace UAlbion.Game.State.Player
                 if (amount == 0)
                     return;
 
-                Raise(new SetInventoryItemInHandEvent(new GoldInHand { Amount = amount }, inventoryType, inventoryId, slotId));
+                SetItemInHand(inventory, slotId, new GoldInHand { Amount = amount });
             }
             else if (slotId == ItemSlotId.Rations)
             {
@@ -308,7 +305,7 @@ namespace UAlbion.Game.State.Player
                 if (amount == 0)
                     return;
 
-                Raise(new SetInventoryItemInHandEvent(new RationsInHand { Amount = amount }, inventoryType, inventoryId, slotId));
+                SetItemInHand(inventory, slotId, new RationsInHand { Amount = amount });
             }
             else
             {
@@ -322,7 +319,7 @@ namespace UAlbion.Game.State.Player
                     Enchantment = slot.Enchantment,
                     Flags = slot.Flags
                 };
-                Raise(new SetInventoryItemInHandEvent(itemInHand, inventoryType, inventoryId, slotId));
+                SetItemInHand(inventory, slotId, itemInHand);
 
                 slot.Amount -= amount;
                 if(slot.Amount == 0)
@@ -343,7 +340,7 @@ namespace UAlbion.Game.State.Player
             slot.Amount += amountToMove;
 
             if (itemInHand.Amount == 0)
-                Raise(new ClearInventoryItemInHandEvent());
+                SetItemInHand(inventory, slotId, null);
         }
 
         void SwapItems(Inventory inventory, ItemSlotId slotId)
@@ -359,7 +356,8 @@ namespace UAlbion.Game.State.Player
             // FIXME: could take a lightweight object from player A (who is at their max carry weight), swap it with a heavy one carried by player B
             // and then close the inventory screen. The return event will fire and drop the heavier object in player A's inventory, taking them above their
             // max carry weight.
-            Raise(new SetInventoryItemInHandEvent(slot, ReturnItemInHandEvent.InventoryType, ReturnItemInHandEvent.InventoryId, ReturnItemInHandEvent.SlotId));
+            var returnInventory = _getInventory(ReturnItemInHandEvent.InventoryType, ReturnItemInHandEvent.InventoryId);
+            SetItemInHand(returnInventory, ReturnItemInHandEvent.SlotId, slot);
             inventory.SetSlot(slotId, itemInHand);
         }
 
@@ -370,13 +368,13 @@ namespace UAlbion.Game.State.Player
             if (ItemInHand is GoldInHand gold)
             {
                 inventory.Gold += gold.Amount;
-                Raise(new ClearInventoryItemInHandEvent());
+                SetItemInHand(inventory, slotId, null);
             }
 
             if (ItemInHand is RationsInHand rations)
             {
                 inventory.Rations += rations.Amount;
-                Raise(new ClearInventoryItemInHandEvent());
+                SetItemInHand(inventory, slotId, null);
             }
 
             var itemInHand = (ItemSlot)ItemInHand;
@@ -389,7 +387,7 @@ namespace UAlbion.Game.State.Player
                 inventory.SetSlot(slotId, itemInHand);
             }
 
-            Raise(new ClearInventoryItemInHandEvent());
+            SetItemInHand(inventory, slotId, null);
         }
 
         void RaiseStatusMessage(SystemTextId textId)
@@ -400,7 +398,7 @@ namespace UAlbion.Game.State.Player
             Raise(new DescriptionTextEvent(text));
         }
 
-        public bool TryChangeInventory(AssetType inventoryType, int inventoryId, ItemId itemId, QuantityChangeOperation operation, int amount, EventContext context)
+        public bool TryChangeInventory(InventoryType inventoryType, int inventoryId, ItemId itemId, QuantityChangeOperation operation, int amount, EventContext context)
         {
             var inventory = _getInventory(inventoryType, inventoryId);
             // TODO: Ensure weight limit is not exceeded
@@ -452,55 +450,31 @@ namespace UAlbion.Game.State.Player
                     slot.Id = null;
             }
 
-            // Update();
+            Update(inventoryType, inventoryId);
 
             if(context.Source is EventSource.Map mapEventSource)
-            {
-                var assets = Resolve<IAssetManager>();
-                var scene = Resolve<ISceneManager>()?.ActiveScene;
-                var map = Resolve<IMapManager>()?.Current;
-                var window = Resolve<IWindowManager>();
-
-                if (scene == null || map == null)
-                    return true;
-
-                var worldPosition = new Vector3(mapEventSource.X, mapEventSource.Y, 0) * map.TileSize;
-                var normPosition = scene.Camera.ProjectWorldToNorm(worldPosition);
-                var destPosition = window.UiToNorm(23, 204); // Tom's portrait, hardcoded for now.
-
-                var item = assets.LoadItem(itemId);
-                var icon = assets.LoadTexture(item.Icon).GetSubImageDetails((int)item.Icon);
-                var size = window.UiToNormRelative(icon.Size);
-
-                var transition = new ItemTransition<ItemSpriteId>(
-                    item.Icon, (int)item.Icon,
-                    new Vector2(normPosition.X, normPosition.Y),
-                    destPosition,
-                    0.3f, size);
-
-                Exchange.Attach(transition); // No need to attach as child as transitions clean themselves up.
-            }
+                ItemTransition<ItemSpriteId>.CreateTransitionFromTilePosition(Exchange, mapEventSource.X, mapEventSource.Y, itemId);
 
             return true;
         }
 
-        public bool TryChangeGold(AssetType inventoryType, int inventoryId, QuantityChangeOperation operation, int amount, EventContext context)
+        public bool TryChangeGold(InventoryType inventoryType, int inventoryId, QuantityChangeOperation operation, int amount, EventContext context)
         {
             var inventory = _getInventory(inventoryType, inventoryId);
             // TODO: Ensure weight limit is not exceeded
             ushort newValue = (ushort)operation.Apply(inventory.Gold, amount, 0, 32767);
             inventory.Gold = newValue;
-            // Update();
+            Update(inventoryType, inventoryId);
             return true;
         }
 
-        public bool TryChangeRations(AssetType inventoryType, int inventoryId, QuantityChangeOperation operation, int amount, EventContext context)
+        public bool TryChangeRations(InventoryType inventoryType, int inventoryId, QuantityChangeOperation operation, int amount, EventContext context)
         {
             var inventory = _getInventory(inventoryType, inventoryId);
             // TODO: Ensure weight limit is not exceeded
             ushort newValue = (ushort)operation.Apply(inventory.Rations, amount, 0, 32767);
             inventory.Rations = newValue;
-            // Update();
+            Update(inventoryType, inventoryId);
             return true;
         }
     }

@@ -7,9 +7,9 @@ namespace UAlbion.Game.State.Player
     public interface IInventoryManager
     {
         IHoldable ItemInHand { get; }
-        InventoryAction GetInventoryAction(AssetType type, int id, ItemSlotId slotId);
-        bool TryChangeInventory(AssetType inventoryType, int inventoryId, ItemId itemId, QuantityChangeOperation operation, int amount, EventContext context);
-        bool TryChangeGold(AssetType inventoryType, int inventoryId, QuantityChangeOperation operation, int amount, EventContext context);
-        bool TryChangeRations(AssetType inventoryType, int inventoryId, QuantityChangeOperation operation, int amount, EventContext context);
+        InventoryAction GetInventoryAction(InventoryType type, int id, ItemSlotId slotId);
+        bool TryChangeInventory(InventoryType inventoryType, int inventoryId, ItemId itemId, QuantityChangeOperation operation, int amount, EventContext context);
+        bool TryChangeGold(InventoryType inventoryType, int inventoryId, QuantityChangeOperation operation, int amount, EventContext context);
+        bool TryChangeRations(InventoryType inventoryType, int inventoryId, QuantityChangeOperation operation, int amount, EventContext context);
     }
 }

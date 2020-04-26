@@ -18,6 +18,8 @@ namespace UAlbion.Game.State.Player
             _getLerp = getLerp;
         }
 
+        public InventoryType InventoryType => _b().InventoryType;
+        public int InventoryId => _b().InventoryId;
         public ushort Gold => (ushort)ApiUtil.Lerp(_a().Gold, _b().Gold, _getLerp());
         public ushort Rations => (ushort)ApiUtil.Lerp(_a().Rations, _b().Rations, _getLerp());
         public ItemSlot Neck => _b().Neck;

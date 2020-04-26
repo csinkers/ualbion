@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using SerdesNet;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Assets
 {
     public class Inventory : IInventory
     {
-        readonly FileFormat _format;
-
+        public InventoryType InventoryType { get; }
+        public int InventoryId { get; }
         public ushort Gold { get; set; }
         public ushort Rations { get; set; }
         public ItemSlot[] Slots { get; }
@@ -23,23 +22,24 @@ namespace UAlbion.Formats.Assets
         public ItemSlot LeftFinger { get => Slots[(int)ItemSlotId.LeftFinger]; private set => Slots[(int)ItemSlotId.LeftFinger] = value; }
         public ItemSlot Feet { get => Slots[(int)ItemSlotId.Feet]; private set => Slots[(int)ItemSlotId.Feet] = value; }
         public ItemSlot RightFinger { get => Slots[(int)ItemSlotId.RightFinger]; private set => Slots[(int)ItemSlotId.RightFinger] = value; }
-        public Inventory(FileFormat format)
+        public Inventory(InventoryType inventoryType, int inventoryId)
         {
-            _format = format;
-            Slots = new ItemSlot[(int) (format == FileFormat.PlayerInventory
+            InventoryType = inventoryType;
+            InventoryId = inventoryId;
+            Slots = new ItemSlot[(int) (inventoryType == InventoryType.Player
                 ? ItemSlotId.CharacterSlotCount
                 : ItemSlotId.NormalSlotCount)];
         }
 
-        public static Inventory SerdesChest(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, FileFormat.ChestInventory);
-        public static Inventory SerdesMerchant(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, FileFormat.MerchantInventory);
-        public static Inventory SerdesCharacter(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, FileFormat.PlayerInventory);
+        public static Inventory SerdesChest(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, InventoryType.Chest);
+        public static Inventory SerdesMerchant(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, InventoryType.Merchant);
+        public static Inventory SerdesCharacter(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, InventoryType.Player);
         public IEnumerable<ItemSlot> EnumerateAll() => Slots.Where(x => x != null);
 
-        static Inventory Serdes(int n, Inventory inv, ISerializer s, FileFormat format)
+        static Inventory Serdes(int n, Inventory inv, ISerializer s, InventoryType type)
         {
-            inv ??= new Inventory(format);
-            if (format == FileFormat.PlayerInventory)
+            inv ??= new Inventory(type, n);
+            if (type == InventoryType.Player)
             {
                 inv.Neck = s.Meta(nameof(inv.Neck), inv.Neck, ItemSlot.Serdes);
                 inv.Head = s.Meta(nameof(inv.Head), inv.Head, ItemSlot.Serdes);
@@ -55,7 +55,7 @@ namespace UAlbion.Formats.Assets
             for (int i = 0; i < (int)ItemSlotId.NormalSlotCount; i++)
                 inv.Slots[i] = s.Meta($"Slot{i}", inv.Slots[i], ItemSlot.Serdes);
 
-            if (format == FileFormat.ChestInventory)
+            if (type == InventoryType.Chest)
             {
                 inv.Gold = s.UInt16(nameof(inv.Gold), inv.Gold);
                 inv.Rations = s.UInt16(nameof(inv.Rations), inv.Rations);
@@ -89,7 +89,7 @@ namespace UAlbion.Formats.Assets
 
         public Inventory DeepClone()
         {
-            var clone = new Inventory(_format)
+            var clone = new Inventory(InventoryType, InventoryId)
             {
                 Gold = Gold,
                 Rations = Rations,

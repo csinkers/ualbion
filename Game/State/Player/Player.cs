@@ -24,7 +24,7 @@ namespace UAlbion.Game.State.Player
                 var oldLerp = x._lerp;
                 x._lerp = elapsed > TransitionSpeedMilliseconds ? 1.0f : (float)(elapsed / TransitionSpeedMilliseconds);
                 if (Math.Abs(x._lerp - oldLerp) > float.Epsilon)
-                    x.Raise(new InventoryChangedEvent(AssetType.PartyMember, (int)x.Id));
+                    x.Raise(new InventoryChangedEvent(InventoryType.Player, (int)x.Id));
             })
         );
 
@@ -55,20 +55,8 @@ namespace UAlbion.Game.State.Player
         public int CombatPosition { get; set; }
         public IEffectiveCharacterSheet Effective { get; private set; }
         public IEffectiveCharacterSheet Apparent { get; }
-        // public InventoryAction GetInventoryAction(ItemSlotId slotId) => _inventoryManager.GetInventoryAction(slotId);
         public Func<Vector3> GetPosition { get; set; }
         public override string ToString() => $"Player {Id}";
-/*
-        public bool TryChangeInventory(ItemId itemId, QuantityChangeOperation operation, int amount, EventContext context)
-            => _inventoryManager.TryChangeInventory(itemId, operation, amount, context);
-
-        public bool TryChangeGold(QuantityChangeOperation operation, int amount, EventContext context)
-            => _inventoryManager.TryChangeGold(operation, amount, context);
-
-
-        public bool TryChangeRations(QuantityChangeOperation operation, int amount, EventContext context)
-            => _inventoryManager.TryChangeRations(operation, amount, context);
-*/
     }
 }
 

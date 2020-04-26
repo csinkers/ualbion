@@ -16,7 +16,7 @@ namespace UAlbion.Formats.Parsers
 
         public CharacterSheet Serdes(CharacterSheet sheet, ISerializer s, string name, AssetInfo config)
         {
-            sheet ??= new CharacterSheet();
+            sheet ??= new CharacterSheet(config.Id);
             s.Check();
             sheet.Type = s.EnumU8("Type", sheet.Type);
             sheet.Gender = s.EnumU8("Gender", sheet.Gender);

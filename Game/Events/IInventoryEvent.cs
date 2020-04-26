@@ -1,10 +1,10 @@
-﻿using UAlbion.Formats.AssetIds;
+﻿using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Events
 {
     public interface IInventoryEvent
     {
-        AssetType InventoryType { get; }
+        InventoryType InventoryType { get; }
         int InventoryId { get; }
     }
 }

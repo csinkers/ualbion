@@ -4,6 +4,8 @@ namespace UAlbion.Formats.Assets
 {
     public interface IInventory
     {
+        InventoryType InventoryType { get; }
+        int InventoryId { get; }
         ushort Gold { get; }
         ushort Rations { get; }
         ItemSlot Neck { get; }

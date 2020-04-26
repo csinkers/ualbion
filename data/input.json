@@ -16,7 +16,7 @@
     "Control+D": "engine_flag toggle RenderDepth",
     "Pause": "e:run_renderdoc",
     "Control+R": "e:run_renderdoc",
-    "Alt+Enter":  "e:toggle",
+    "Alt+Enter":  "e:toggle_fullscreen",
     "Control+B": "engine_flag toggle ShowBoundingBoxes",
 
     "Shift+BracketLeft": "toggle_underlay",

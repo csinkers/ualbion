@@ -1,4 +1,5 @@
 ﻿using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
@@ -9,8 +10,8 @@ namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryChestPane : UiElement
     {
-        const int InventoryWidth = 4;
-        const int InventoryHeight = 6;
+        const int InventoryWidth = 6;
+        const int InventoryHeight = 4;
 
         readonly ChestId _id;
         int _version;
@@ -34,7 +35,7 @@ namespace UAlbion.Game.Gui.Inventory
                 for (int i = 0; i < InventoryWidth; i++)
                 {
                     int index = j * InventoryWidth + i;
-                    slotsInRow[i] = new InventoryChestSlot((ChestId)_id, index);
+                    slotsInRow[i] = new InventorySlot(InventoryType.Chest, (int)_id, (ItemSlotId)((int)ItemSlotId.Slot0 + index));
                 }
                 slotSpans[j] = new HorizontalStack(slotsInRow);
             }
@@ -73,7 +74,7 @@ namespace UAlbion.Game.Gui.Inventory
             );
 
             var takeAllButton = new Button(
-                new TextElement("Take All"),
+                new TextElement(UAlbionStringId.TakeAll.ToId()),
                 () => { }
             );
 

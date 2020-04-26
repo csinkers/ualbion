@@ -2,12 +2,12 @@
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Gui.Inventory;
 
-namespace UAlbion.Game.Events
+namespace UAlbion.Game.Events.Inventory
 {
-    [Event("set_inv_chest_mode", "Sets the current inventory mode")]
-    public class SetInventoryChestModeEvent : GameEvent, ISetInventoryModeEvent
+    [Event("inv:chest_mode", "Sets the current inventory mode")]
+    public class InventoryChestModeEvent : GameEvent, ISetInventoryModeEvent
     {
-        public SetInventoryChestModeEvent(ChestId chestId, PartyCharacterId member)
+        public InventoryChestModeEvent(ChestId chestId, PartyCharacterId member)
         {
             ChestId = chestId;
             Member = member;

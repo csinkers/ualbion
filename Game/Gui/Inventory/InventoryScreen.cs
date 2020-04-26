@@ -3,6 +3,7 @@ using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
+using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui.Inventory
@@ -11,9 +12,9 @@ namespace UAlbion.Game.Gui.Inventory
     {
         const string ExitButtonId = "Inventory.Exit";
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<InventoryScreen, SetInventoryModeEvent>((x,e) => x.SetMode(e)),
-            H<InventoryScreen, SetInventoryChestModeEvent>((x,e) => x.SetMode(e)),
-            H<InventoryScreen, SetInventoryMerchantModeEvent>((x,e) => x.SetMode(e)),
+            H<InventoryScreen, InventoryModeEvent>((x,e) => x.SetMode(e)),
+            H<InventoryScreen, InventoryChestModeEvent>((x,e) => x.SetMode(e)),
+            H<InventoryScreen, InventoryMerchantModeEvent>((x,e) => x.SetMode(e)),
             H<InventoryScreen, ButtonPressEvent>((x, e) => x.OnButton(e.ButtonId))
         );
 
@@ -39,8 +40,8 @@ namespace UAlbion.Game.Gui.Inventory
             _mode = e.Mode;
             _modeSpecificId = e switch
             {
-                SetInventoryChestModeEvent chest => (int)chest.ChestId,
-                SetInventoryMerchantModeEvent merchant => (int)merchant.MerchantId,
+                InventoryChestModeEvent chest => (int)chest.ChestId,
+                InventoryMerchantModeEvent merchant => (int)merchant.MerchantId,
                 // SetInventoryDoorModeEvent door => (int)door.DoorId
                 _ => 0
             };

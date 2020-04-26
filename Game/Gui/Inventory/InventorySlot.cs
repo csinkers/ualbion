@@ -5,6 +5,7 @@ using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
+using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.State;
@@ -108,7 +109,7 @@ namespace UAlbion.Game.Gui.Inventory
         {
             if (_isClickTimerPending) // If they double-clicked...
             {
-                Raise(new InventoryPickupItemEvent(_inventoryType, _id, _slotId));
+                Raise(new InventoryPickupDropItemEvent(_inventoryType, _id, _slotId));
                 _isClickTimerPending = false; // Ensure the single-click behaviour doesn't happen.
             }
             else // For the first click, just start the double-click timer.
@@ -125,7 +126,7 @@ namespace UAlbion.Game.Gui.Inventory
                 return;
 
             // TODO: Show quantity selection dialog
-            Raise(new InventoryPickupItemEvent(_inventoryType, _id, _slotId, 1));
+            Raise(new InventoryPickupDropItemEvent(_inventoryType, _id, _slotId, 1));
             _isClickTimerPending = false;
         }
 

@@ -8,19 +8,10 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
+using UAlbion.Game.Events.Inventory;
 
 namespace UAlbion.Game.State.Player
 {
-    /*
-     * Move apparent & effective stuff to Player
-     * Update player's effective sheet on InventoryUpdated event
-     * How to provide RW access to inventories to inv manager?
-        * Make inv manager child of game state, de/re-register on save/load/new
-     * Make InventoryManager a singleton service class
-     * Merge InventoryScreenState into InventoryManager
-     * Specify full inventory context for all operations
-     */
-
     public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryManager
     {
         readonly Func<InventoryType, int, Inventory> _getInventory;
@@ -29,12 +20,12 @@ namespace UAlbion.Game.State.Player
         const int MaxRations = 32767;
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<InventoryManager, InventoryPickupItemEvent>((x,e) => x.OnPickupItem(e)),
+            H<InventoryManager, InventoryPickupDropItemEvent>((x,e) => x.OnPickupItem(e)),
             H<InventoryManager, InventoryGiveItemEvent>((x,e) => x.OnGiveItem(e))
         );
 
         public IHoldable ItemInHand { get; private set; }
-        public InventoryPickupItemEvent ReturnItemInHandEvent { get; private set; }
+        public InventoryPickupDropItemEvent ReturnItemInHandEvent { get; private set; }
         public InventoryManager(Func<InventoryType, int, Inventory> getInventory) : base(Handlers) => _getInventory = getInventory;
 
         public InventoryAction GetInventoryAction(InventoryType type, int id, ItemSlotId slotId)
@@ -78,10 +69,7 @@ namespace UAlbion.Game.State.Player
             }
         }
 
-        void Update(InventoryType inventoryType, int inventoryId)
-        {
-            Raise(new InventoryChangedEvent(inventoryType, inventoryId));
-        }
+        void Update(Inventory inventory) => Raise(new InventoryChangedEvent(inventory.InventoryType, inventory.InventoryId));
 
         void SetItemInHand(IInventory inventory, ItemSlotId slotId, IHoldable itemInHand)
         {
@@ -89,7 +77,7 @@ namespace UAlbion.Game.State.Player
             ReturnItemInHandEvent = 
                 itemInHand == null 
                 ? null 
-                : new InventoryPickupItemEvent(inventory.InventoryType, inventory.InventoryId, slotId);
+                : new InventoryPickupDropItemEvent(inventory.InventoryType, inventory.InventoryId, slotId);
             Raise(new SetCursorEvent(ItemInHand == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
         }
 
@@ -251,7 +239,7 @@ namespace UAlbion.Game.State.Player
                 Drop(inventory, slotId);
         }
 
-        void OnPickupItem(InventoryPickupItemEvent e)
+        void OnPickupItem(InventoryPickupDropItemEvent e)
         {
             var slotId = e.SlotId;
             if (!DoesSlotAcceptItemInHand(e.InventoryType, e.InventoryId, e.SlotId))
@@ -298,6 +286,8 @@ namespace UAlbion.Game.State.Player
                     return;
 
                 SetItemInHand(inventory, slotId, new GoldInHand { Amount = amount });
+                inventory.Gold -= amount;
+                Update(inventory);
             }
             else if (slotId == ItemSlotId.Rations)
             {
@@ -306,6 +296,8 @@ namespace UAlbion.Game.State.Player
                     return;
 
                 SetItemInHand(inventory, slotId, new RationsInHand { Amount = amount });
+                inventory.Rations -= amount;
+                Update(inventory);
             }
             else
             {
@@ -324,6 +316,7 @@ namespace UAlbion.Game.State.Player
                 slot.Amount -= amount;
                 if(slot.Amount == 0)
                     inventory.SetSlot(slotId, null);
+                Update(inventory);
             }
         }
 
@@ -341,6 +334,8 @@ namespace UAlbion.Game.State.Player
 
             if (itemInHand.Amount == 0)
                 SetItemInHand(inventory, slotId, null);
+
+            Update(inventory);
         }
 
         void SwapItems(Inventory inventory, ItemSlotId slotId)
@@ -359,6 +354,7 @@ namespace UAlbion.Game.State.Player
             var returnInventory = _getInventory(ReturnItemInHandEvent.InventoryType, ReturnItemInHandEvent.InventoryId);
             SetItemInHand(returnInventory, ReturnItemInHandEvent.SlotId, slot);
             inventory.SetSlot(slotId, itemInHand);
+            Update(inventory);
         }
 
         void Drop(Inventory inventory, ItemSlotId slotId)
@@ -388,6 +384,7 @@ namespace UAlbion.Game.State.Player
             }
 
             SetItemInHand(inventory, slotId, null);
+            Update(inventory);
         }
 
         void RaiseStatusMessage(SystemTextId textId)
@@ -450,7 +447,7 @@ namespace UAlbion.Game.State.Player
                     slot.Id = null;
             }
 
-            Update(inventoryType, inventoryId);
+            Update(inventory);
 
             if(context.Source is EventSource.Map mapEventSource)
                 ItemTransition<ItemSpriteId>.CreateTransitionFromTilePosition(Exchange, mapEventSource.X, mapEventSource.Y, itemId);
@@ -464,7 +461,7 @@ namespace UAlbion.Game.State.Player
             // TODO: Ensure weight limit is not exceeded
             ushort newValue = (ushort)operation.Apply(inventory.Gold, amount, 0, 32767);
             inventory.Gold = newValue;
-            Update(inventoryType, inventoryId);
+            Update(inventory);
             return true;
         }
 
@@ -474,7 +471,7 @@ namespace UAlbion.Game.State.Player
             // TODO: Ensure weight limit is not exceeded
             ushort newValue = (ushort)operation.Apply(inventory.Rations, amount, 0, 32767);
             inventory.Rations = newValue;
-            Update(inventoryType, inventoryId);
+            Update(inventory);
             return true;
         }
     }

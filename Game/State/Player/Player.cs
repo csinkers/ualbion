@@ -4,7 +4,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Game.Events;
+using UAlbion.Game.Events.Inventory;
 
 namespace UAlbion.Game.State.Player
 {
@@ -18,6 +18,11 @@ namespace UAlbion.Game.State.Player
         float _lerp;
 
         static readonly HandlerSet Handlers = new HandlerSet(
+            H<Player, InventoryChangedEvent>((x, e) =>
+            {
+                if (e.InventoryType == InventoryType.Player && e.InventoryId == x._base.Inventory.InventoryId)
+                    x.UpdateInventory();
+            }),
             H<Player, EngineUpdateEvent>((x,e) =>
             {
                 var elapsed = (DateTime.Now - x._lastChangeTime).TotalMilliseconds;

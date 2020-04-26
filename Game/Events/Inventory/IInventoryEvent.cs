@@ -1,6 +1,6 @@
 ﻿using UAlbion.Formats.Assets;
 
-namespace UAlbion.Game.Events
+namespace UAlbion.Game.Events.Inventory
 {
     public interface IInventoryEvent
     {

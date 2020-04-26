@@ -1,12 +1,12 @@
 ﻿using UAlbion.Api;
 using UAlbion.Formats.Assets;
 
-namespace UAlbion.Game.Events
+namespace UAlbion.Game.Events.Inventory
 {
-    [Event("inv:pickup", "Pickup one or more items from a party member's equipped items or inventory and/or drop the currently held item(s)'")]
-    public class InventoryPickupItemEvent : GameEvent, IInventoryEvent
+    [Event("inv:pickup_drop", "Pickup one or more items from a party member's equipped items or inventory and/or drop the currently held item(s)'")]
+    public class InventoryPickupDropItemEvent : GameEvent, IInventoryEvent
     {
-        public InventoryPickupItemEvent(InventoryType sourceType, int sourceId, ItemSlotId slotId, int? quantity = null)
+        public InventoryPickupDropItemEvent(InventoryType sourceType, int sourceId, ItemSlotId slotId, int? quantity = null)
         {
             InventoryType = sourceType;
             InventoryId = sourceId;

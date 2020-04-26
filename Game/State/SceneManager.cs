@@ -3,7 +3,9 @@ using System.Linq;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
+using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Scenes;
 
 namespace UAlbion.Game.State
@@ -12,14 +14,25 @@ namespace UAlbion.Game.State
     {
         static readonly HandlerSet Handlers = new HandlerSet(
             H<SceneManager, SetSceneEvent>((x, e) => x.Set(e.SceneId)),
-            H<SceneManager, OpenCharacterInventoryEvent>((x,e) => x.OpenInventory(e.MemberId))
+            H<SceneManager, OpenCharacterInventoryEvent>((x, e) => x.OpenInventory(e.MemberId)),
+            H<SceneManager, OpenChestEvent>((x,e) => x.OpenChest(e))
         );
+
+        void OpenChest(OpenChestEvent e)
+        {
+            if(ActiveSceneId != SceneId.Inventory)
+                Raise(new PushSceneEvent(SceneId.Inventory));
+
+            // TODO: Handle messages, locked chests, traps etc
+            var party = Resolve<IParty>();
+            Raise(new InventoryChestModeEvent(e.ChestId, party.Leader));
+        }
 
         void OpenInventory(PartyCharacterId memberId)
         {
             if(ActiveSceneId != SceneId.Inventory)
                 Raise(new PushSceneEvent(SceneId.Inventory));
-            Raise(new SetInventoryModeEvent(memberId));
+            Raise(new InventoryModeEvent(memberId));
         }
 
         void Set(SceneId activatingSceneId)

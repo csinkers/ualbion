@@ -4,24 +4,29 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
+    [Event("simple_chest", "Pickup some items from the map")]
     public class SimpleChestEvent : MapEvent
     {
+        public SimpleChestEvent(SimpleChestItemType type, ItemId item, ushort amount)
+        {
+            ChestType = type;
+            ItemId = item;
+            Amount = amount;
+        }
+
+        SimpleChestEvent() { }
+
         public static SimpleChestEvent Serdes(SimpleChestEvent e, ISerializer s)
         {
             e ??= new SimpleChestEvent();
             e.ChestType = s.EnumU8(nameof(ChestType), e.ChestType);
-            e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
-            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
-            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            uint padding = s.UInt32(nameof(padding), 0);
+            ApiUtil.Assert(padding == 0);
             e.ItemId = (ItemId)StoreIncremented.Serdes(nameof(e.ItemId), (ushort)e.ItemId, s.UInt16);
             e.Amount = s.UInt16(nameof(Amount), e.Amount);
-            ApiUtil.Assert(e.Unk2 == 0);
-            ApiUtil.Assert(e.Unk3 == 0);
-            ApiUtil.Assert(e.Unk4 == 0);
-            ApiUtil.Assert(e.Unk5 == 0);
             return e;
         }
+
         public enum SimpleChestItemType : byte
         {
             Item = 0,
@@ -29,13 +34,10 @@ namespace UAlbion.Formats.MapEvents
             Rations = 2 // ??
         }
 
+        [EventPart("type", "Can be Item, Gold or Rations")]
         public SimpleChestItemType ChestType { get; private set; }
-        public ItemId ItemId { get; private set; }
-        public ushort Amount { get; private set; }
-        byte Unk2 { get; set; }
-        byte Unk3 { get; set; }
-        byte Unk4 { get; set; }
-        byte Unk5 { get; set; }
+        [EventPart("item")] public ItemId ItemId { get; private set; }
+        [EventPart("amount")] public ushort Amount { get; private set; }
 
         public override string ToString() => $"simple_chest {ChestType} {Amount}x{ItemId}";
         public override MapEventType EventType => MapEventType.SimpleChest;

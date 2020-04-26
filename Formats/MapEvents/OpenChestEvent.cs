@@ -12,7 +12,7 @@ namespace UAlbion.Formats.MapEvents
             e.KeyItemId = (ItemId?)StoreIncrementedNullZero.Serdes(nameof(KeyItemId), (ushort?)e.KeyItemId, s.UInt16);
             e.ClosedMessageId = s.UInt8(nameof(ClosedMessageId), e.ClosedMessageId);
             e.OpenedMessageId = s.UInt8(nameof(OpenedMessageId), e.OpenedMessageId);
-            e.ChestId = s.UInt16(nameof(ChestId), e.ChestId);
+            e.ChestId = s.EnumU16(nameof(ChestId), e.ChestId);
             e.TrapEvent = s.UInt16(nameof(TrapEvent), e.TrapEvent);
             return e;
         }
@@ -21,7 +21,7 @@ namespace UAlbion.Formats.MapEvents
         public ItemId? KeyItemId { get; set; }
         public byte ClosedMessageId { get; set; }
         public byte OpenedMessageId { get; set; }
-        public ushort ChestId { get; set; }
+        public ChestId ChestId { get; set; }
         public ushort TrapEvent { get; set; }
         public override string ToString() => $"open_chest {ChestId} Trap:{TrapEvent} Key:{KeyItemId} Lock:{LockStrength} Opened:{OpenedMessageId} Closed:{ClosedMessageId}";
         public override MapEventType EventType => MapEventType.Chest;

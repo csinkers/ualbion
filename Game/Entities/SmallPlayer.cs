@@ -11,7 +11,7 @@ namespace UAlbion.Game.Entities
     public class SmallPlayer : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<SmallPlayer, UpdateEvent>((x, e) =>
+            H<SmallPlayer, FastClockEvent>((x, e) =>
             {
                 //(x._sprite.TilePosition, x._sprite.Frame) = x._positionFunc();
                 var (pos, frame) = x._positionFunc();

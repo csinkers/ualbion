@@ -18,6 +18,8 @@ namespace UAlbion.Game
 
         readonly IList<(string, float)> _activeTimers = new List<(string, float)>();
         float _elapsedTimeThisGameFrame;
+        int _slowTicksRemaining;
+        UpdateEvent _updateEvent;
 
         public GameClock() : base(Handlers) { }
         public DateTime GameTime { get; private set; } = new DateTime(2000, 1, 1);
@@ -28,8 +30,35 @@ namespace UAlbion.Game
             H<GameClock, StartClockEvent>((x,e) => x.IsRunning = true),
             H<GameClock, StopClockEvent>((x,e) => x.IsRunning = false),
             H<GameClock, EngineUpdateEvent>((x,e) => x.OnEngineUpdate(e)),
-            H<GameClock, StartTimerEvent>((x,e) => x.StartTimer(e))
+            H<GameClock, StartTimerEvent>((x,e) => x.StartTimer(e)),
+            H<GameClock, UpdateEvent>((x,e) =>
+            {
+                if (x.IsRunning || x._updateEvent != null)
+                    return;
+
+                e.Acknowledged = true;
+                x._updateEvent = e;
+                x._slowTicksRemaining = e.Cycles;
+                x.IsRunning = true;
+            }),
+            H<GameClock, SlowClockEvent>((x,e) => x.OnSlowClock(e.Delta))
         );
+
+
+        void OnSlowClock(int ticks)
+        {
+            if (_slowTicksRemaining <= 0)
+                return;
+
+            _slowTicksRemaining -= ticks;
+            if (_slowTicksRemaining > 0) 
+                return;
+
+            IsRunning = false;
+            var updateEvent = _updateEvent;
+            _updateEvent = null;
+            updateEvent?.Complete();
+        }
 
         void StartTimer(StartTimerEvent e) => _activeTimers.Add((e.Id, ElapsedTime + e.IntervalMilliseconds / 1000));
 
@@ -66,7 +95,7 @@ namespace UAlbion.Game
                 while (_elapsedTimeThisGameFrame >= TickDurationSeconds)
                 {
                     _elapsedTimeThisGameFrame -= TickDurationSeconds;
-                    Raise(new UpdateEvent(1));
+                    Raise(new FastClockEvent(1));
 
                     if ((state?.TickCount ?? 0) % TicksPerCacheCycle == TicksPerCacheCycle - 1)
                         Raise(new CycleCacheEvent());

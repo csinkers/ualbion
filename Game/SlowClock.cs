@@ -9,13 +9,13 @@ namespace UAlbion.Game
         const int TicksPerFrame = 8;
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<SlowClock, UpdateEvent>((x,e) => x.OnUpdate(e))
+            H<SlowClock, FastClockEvent>((x,e) => x.OnUpdate(e))
         );
 
         int _ticks;
         int _frameCount;
 
-        void OnUpdate(UpdateEvent updateEvent)
+        void OnUpdate(FastClockEvent updateEvent)
         {
             _ticks += updateEvent.Frames;
             int delta = 0;
@@ -38,10 +38,8 @@ namespace UAlbion.Game
     [Event("slow_clock")]
     public class SlowClockEvent : GameEvent, IVerboseEvent
     {
-        [EventPart("delta")]
-        public int Delta { get; }
-        [EventPart("frame_count")]
-        public int FrameCount { get; }
+        [EventPart("delta")] public int Delta { get; }
+        [EventPart("frame_count")] public int FrameCount { get; }
 
         public SlowClockEvent(int delta, int frameCount)
         {

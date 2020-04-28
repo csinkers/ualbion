@@ -2,7 +2,6 @@
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
@@ -12,7 +11,7 @@ namespace UAlbion.Game.Entities.Map2D
     public class SmallPartyMovement : ServiceComponent<IMovement>, IMovement
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<SmallPartyMovement, UpdateEvent>((x,e) => x.Update()),
+            H<SmallPartyMovement, FastClockEvent>((x,e) => x.Update()),
             H<SmallPartyMovement, PartyJumpEvent>((x, e) =>
             {
                 var position = new Vector2(e.X, e.Y);
@@ -21,7 +20,6 @@ namespace UAlbion.Game.Entities.Map2D
 
                 x._target = null;
             }),
-            H<SmallPartyMovement, BeginFrameEvent>((x, e) => x._direction = Vector2.Zero),
             H<SmallPartyMovement, PartyMoveEvent>((x, e) => x._direction += new Vector2(e.X, e.Y)),
             H<SmallPartyMovement, PartyTurnEvent>((x, e) => { }),
             H<SmallPartyMovement, NoClipEvent>((x, e) =>
@@ -168,6 +166,7 @@ namespace UAlbion.Game.Entities.Map2D
             }
 
             MoveFollowers();
+            _direction = Vector2.Zero;
         }
 
         Vector2 CheckForCollisions(Vector2 position, Vector2 direction) // Returns direction to move in

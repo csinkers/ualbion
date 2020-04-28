@@ -110,7 +110,7 @@ namespace UAlbion.Game.Entities.Map2D
 
             foreach (var zone in zones)
                 if (zone.Chain.Enabled)
-                    Raise(new TriggerChainEvent(zone.Chain, zone.Node, type, zone.X, zone.Y));
+                    Raise(new TriggerChainEvent(zone.Chain, zone.Node, type, _mapData.Id, zone.X, zone.Y));
 
             if (!log)
                 Raise(new SetLogLevelEvent(LogEvent.Level.Info));
@@ -131,7 +131,7 @@ namespace UAlbion.Game.Entities.Map2D
             }
 
             if (zone.Chain.Enabled)
-                Raise(new TriggerChainEvent(zone.Chain, zone.Node, TriggerType.Npc, e.X, e.Y));
+                Raise(new TriggerChainEvent(zone.Chain, zone.Node, TriggerType.Npc, _mapData.Id, e.X, e.Y));
         }
 
         void OnPlayerEnteredTile(PlayerEnteredTileEvent e)
@@ -149,7 +149,7 @@ namespace UAlbion.Game.Entities.Map2D
             }
 
             if (zone.Chain.Enabled)
-                Raise(new TriggerChainEvent(zone.Chain, zone.Node, TriggerType.Normal, e.X, e.Y));
+                Raise(new TriggerChainEvent(zone.Chain, zone.Node, TriggerType.Normal, _mapData.Id, e.X, e.Y));
         }
 
         void ChangeIcon(ChangeIconEvent e)

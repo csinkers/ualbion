@@ -209,6 +209,7 @@ namespace UAlbion.Game.Gui.Text
         {
             switch(textEvent.Location)
             {
+                case null:
                 case TextEvent.TextLocation.TextInWindow:
                 {
                     textEvent.Acknowledged = true;

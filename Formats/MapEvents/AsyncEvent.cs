@@ -3,7 +3,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public abstract class AsyncEvent : MapEvent, IAsyncEvent
+    public abstract class AsyncEvent : Event, IAsyncEvent
     {
         bool _acknowledged;
         bool _complete;

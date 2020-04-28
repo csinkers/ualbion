@@ -1,15 +1,16 @@
 ﻿using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets.Map;
 
 namespace UAlbion.Formats.MapEvents
 {
     [Event("text")]
-    public class TextEvent : AsyncEvent
+    public class TextEvent : AsyncMapEvent
     {
-        public static TextEvent Serdes(TextEvent e, ISerializer s, TextSource source)
+        public static TextEvent Serdes(TextEvent e, ISerializer s)
         {
-            e ??= new TextEvent(source);
+            e ??= new TextEvent();
             e.Location = s.EnumU8(nameof(Location), e.Location ?? TextLocation.TextInWindow);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
@@ -37,7 +38,7 @@ namespace UAlbion.Formats.MapEvents
             // ListDefaultDialogOptions
         }
 
-        TextEvent(TextSource source) { Source = source; }
+        TextEvent() { }
 
         public TextEvent(byte textId, TextLocation? location, SmallPortraitId? portrait)
         {
@@ -46,15 +47,15 @@ namespace UAlbion.Formats.MapEvents
             PortraitId = portrait;
         }
 
-        protected TextEvent(byte textId, TextLocation? location, SmallPortraitId? portrait, TextSource source)
+        protected TextEvent(byte textId, TextLocation? location, SmallPortraitId? portrait, EventSource source)
         {
             TextId = textId;
             Location = location;
             PortraitId = portrait;
-            Source = source;
+            _source = source;
         }
 
-        protected override AsyncEvent Clone() => new TextEvent(TextId, Location, PortraitId, Source);
+        protected override AsyncEvent Clone() => new TextEvent(TextId, Location, PortraitId, _source);
 
         [EventPart("text_id")] public byte TextId { get; private set; }
         [EventPart("location")] public TextLocation? Location { get; private set; }
@@ -65,7 +66,8 @@ namespace UAlbion.Formats.MapEvents
         public ushort Unk8 { get; private set; }
         public override string ToString() => $"text {Source}:{TextId} {Location} {PortraitId} ({Unk2} {Unk3} {Unk6} {Unk8})";
         public override MapEventType EventType => MapEventType.Text;
-        public TextSource Source { get; }
+        readonly EventSource _source;
+        public EventSource Source => _source ?? Context.Source;
     }
 
     // Subclasses just for console / debug access
@@ -73,7 +75,7 @@ namespace UAlbion.Formats.MapEvents
     public class EventTextEvent : TextEvent
     {
         public EventTextEvent(EventSetId eventSetId, byte textId, TextLocation? location, SmallPortraitId? portrait)
-            : base(textId, location, portrait, TextSource.EventSet(eventSetId)) { }
+            : base(textId, location, portrait, new EventSource.EventSet(eventSetId)) { }
 
         [EventPart("event_set")] public EventSetId EventSetId => (EventSetId)Source.Id;
     }
@@ -82,7 +84,7 @@ namespace UAlbion.Formats.MapEvents
     public class MapTextEvent : TextEvent
     {
         public MapTextEvent(MapDataId mapId, byte textId, TextLocation? location, SmallPortraitId? portrait)
-            : base(textId, location, portrait, TextSource.Map(mapId)) { }
+            : base(textId, location, portrait, new EventSource.Map(mapId, TriggerType.Default, 0, 0)) { }
         [EventPart("map")] public MapDataId MapId => (MapDataId)Source.Id;
     }
 }

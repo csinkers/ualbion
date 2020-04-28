@@ -43,7 +43,7 @@ namespace UAlbion.Game.State
             H<GameState, NewGameEvent>((x, e) => x.NewGame(e.MapId, e.X, e.Y)),
             H<GameState, LoadGameEvent>((x, e) => x.LoadGame(e.Filename)),
             H<GameState, SaveGameEvent>((x, e) => x.SaveGame(e.Filename, e.Name)),
-            H<GameState, UpdateEvent>((x, e) => x.TickCount += e.Frames),
+            H<GameState, FastClockEvent>((x, e) => x.TickCount += e.Frames),
             H<GameState, LoadMapEvent>((x, e) =>
             {
                 if (x._game != null)

@@ -4,7 +4,6 @@ using System.Linq;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
@@ -59,7 +58,7 @@ namespace UAlbion.Game.Gui.Dialogs
             // Use enqueue, as we're still in Subscribe and the handlers haven't been registered.
             foreach(var chain in _eventSet.Chains)
                 if(chain.FirstEvent?.Event is ActionEvent action && action.ActionType == ActionType.StartDialogue)
-                    Enqueue(new TriggerChainEvent(chain, chain.FirstEvent, TriggerType.Action, 0, 0));
+                    Enqueue(new TriggerChainEvent(chain, chain.FirstEvent, _eventSet.Id));
         }
 
         void BlockClicked(int blockId, int textId)
@@ -90,7 +89,7 @@ namespace UAlbion.Game.Gui.Dialogs
                 case 3: // Bye
                     foreach (var chain in _eventSet.Chains)
                         if (chain.FirstEvent.Event is ActionEvent action && action.ActionType == ActionType.FinishDialogue)
-                            Raise(new TriggerChainEvent(chain, chain.FirstEvent, TriggerType.Action, 0, 0));
+                            Raise(new TriggerChainEvent(chain, chain.FirstEvent, _eventSet.Id));
 
                     return;
             }
@@ -101,7 +100,7 @@ namespace UAlbion.Game.Gui.Dialogs
                     action.BlockId == blockId &&
                     action.TextId == textId)
                 {
-                    Raise(new TriggerChainEvent(chain, chain.FirstEvent, TriggerType.Action, 0, 0));
+                    Raise(new TriggerChainEvent(chain, chain.FirstEvent, _eventSet.Id));
                 }
             }
         }

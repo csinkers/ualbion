@@ -2,7 +2,6 @@
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
@@ -13,7 +12,7 @@ namespace UAlbion.Game.Entities.Map2D
     public class LargePartyMovement : ServiceComponent<IMovement>, IMovement
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<LargePartyMovement, UpdateEvent>((x,e) => x.Update()),
+            H<LargePartyMovement, FastClockEvent>((x,e) => x.Update()),
             H<LargePartyMovement, PartyJumpEvent>((x, e) =>
                 {
                     var position = new Vector2(e.X, e.Y);
@@ -22,7 +21,6 @@ namespace UAlbion.Game.Entities.Map2D
 
                     x._target = null;
                 }),
-            H<LargePartyMovement, BeginFrameEvent>((x, e) => x._direction = Vector2.Zero),
             H<LargePartyMovement, PartyMoveEvent>((x, e) => x._direction += new Vector2(e.X, e.Y)),
             H<LargePartyMovement, PartyTurnEvent>((x, e) =>
             {
@@ -182,6 +180,7 @@ namespace UAlbion.Game.Entities.Map2D
             }
 
             MoveFollowers();
+            _direction = Vector2.Zero;
         }
 
         Vector2 CheckForCollisions(Vector2 position, Vector2 direction) // Returns direction to move in

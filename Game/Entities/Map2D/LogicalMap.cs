@@ -19,6 +19,8 @@ namespace UAlbion.Game.Entities.Map2D
         readonly IList<MapChange> _tempChanges;
         readonly IList<MapChange> _permChanges;
 
+        public MapDataId Id => _mapData.Id;
+
         public LogicalMap(IAssetManager assetManager, MapData2D mapData,
             IList<MapChange> tempChanges,
             IList<MapChange> permChanges)

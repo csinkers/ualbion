@@ -16,11 +16,14 @@ namespace UAlbion.Game.Events
             Source = source ?? throw new ArgumentNullException(nameof(source));
         }
 
-        public TriggerChainEvent(EventChain chain, IEventNode node, TriggerType trigger, int x, int y) 
-            : this(chain, node, new EventSource.Map(trigger, x, y)) { }
+        public TriggerChainEvent(EventChain chain, IEventNode node, TriggerType trigger, MapDataId mapId, int x, int y) 
+            : this(chain, node, new EventSource.Map(mapId, trigger, x, y)) { }
 
-        public TriggerChainEvent(EventChain chain, IEventNode node, NpcCharacterId npcId)
-            : this(chain, node, new EventSource.Npc(npcId)) { }
+        public TriggerChainEvent(EventChain chain, IEventNode node, NpcCharacterId npcId, MapDataId mapId)
+            : this(chain, node, new EventSource.Npc(mapId, npcId)) { }
+
+        public TriggerChainEvent(EventChain chain, IEventNode node, EventSetId eventSetId) 
+            : this(chain, node, new EventSource.EventSet(eventSetId)) { }
 
         public override string ToString() => 
             $"Triggering chain {Chain.Id} due to {Source} (event {Node.Id}, first event {Chain.Events[0].Id})";

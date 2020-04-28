@@ -11,7 +11,7 @@ namespace UAlbion.Game.Entities
     public class LargePlayer : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<LargePlayer, UpdateEvent>((x, _) => x.Update()),
+            H<LargePlayer, FastClockEvent>((x, _) => x.Update()),
             H<LargePlayer, MapInitEvent>((x, _) => x.Update())
         );
 

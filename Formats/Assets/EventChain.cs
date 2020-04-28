@@ -6,15 +6,13 @@ namespace UAlbion.Formats.Assets
 {
     public class EventChain
     {
-        public EventChain(int id, TextSource textSource)
+        public EventChain(int id)
         {
             Id = id;
-            TextSource = textSource;
             Enabled = true;
         }
 
         public int Id { get; }
-        public TextSource TextSource { get; }
         public IList<IEventNode> Events { get; } = new List<IEventNode>();
         public IEventNode FirstEvent => Events.Count == 0 ? null : Events[0];
         public bool Enabled { get; set; }

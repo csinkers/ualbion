@@ -5,7 +5,7 @@ using UAlbion.Formats.AssetIds;
 namespace UAlbion.Formats.MapEvents
 {
     [Event("do_script")]
-    public class DoScriptEvent : AsyncEvent
+    public class DoScriptEvent : AsyncMapEvent
     {
         DoScriptEvent() { }
         public DoScriptEvent(ScriptId scriptId) => ScriptId = scriptId;

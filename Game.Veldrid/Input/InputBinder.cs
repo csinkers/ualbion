@@ -152,7 +152,7 @@ namespace UAlbion.Game.Veldrid.Input
             }
         }
 
-        void OnUpdate(UpdateEvent engineUpdateEvent)
+        void OnUpdate(FastClockEvent fastClockEvent)
         {
             // TODO: Re-emit any held events
         }

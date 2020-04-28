@@ -45,9 +45,8 @@ namespace UAlbion.Formats.Assets
                 chainStarts[i] = s.UInt16(null, (ushort)chainStarts[i]);
             }
 
-            var source = TextSource.EventSet(eventSetId);
             for (int i = 0; i < set._events.Length; i++)
-                set._events[i] = EventNode.Serdes(i, set._events[i], s, source);
+                set._events[i] = EventNode.Serdes(i, set._events[i], s);
 
             foreach (var e in set._events)
             {
@@ -66,11 +65,10 @@ namespace UAlbion.Formats.Assets
 
             if (set.Chains == null)
             {
-                var textSource = TextSource.EventSet(set.Id);
                 set.Chains = new EventChain[chainStarts.Count];
                 for (int i = 0; i < set.Chains.Length; i++)
                 {
-                    var chain = new EventChain(i, textSource);
+                    var chain = new EventChain(i);
                     int lastEvent = i == chainStarts.Count - 1 ? set._events.Length : chainStarts[i + 1];
                     for (int j = chainStarts[i]; j < lastEvent; j++)
                         chain.Events.Add(set._events[j]);

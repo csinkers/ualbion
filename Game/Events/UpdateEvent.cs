@@ -1,11 +1,15 @@
 ﻿using UAlbion.Api;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Events
 {
-    [Event("update")]
-    public class UpdateEvent : GameEvent, IVerboseEvent
+    [Event("update", "Run the game clock for the specified number of slow-clock cycles")]
+    public class UpdateEvent : AsyncEvent
     {
-        public UpdateEvent(int frames) { Frames = frames; }
-        [EventPart("frames")] public int Frames { get; }
+        public UpdateEvent(int cycles) => Cycles = cycles;
+
+        [EventPart("cycles", "The number of slow-clock cycles to update for")]
+        public int Cycles { get; }
+        protected override AsyncEvent Clone() => new UpdateEvent(Cycles);
     }
 }

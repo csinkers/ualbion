@@ -30,7 +30,20 @@ namespace UAlbion.Api
                 .Select((x, i) => new EventPartMetadata(x, partsParameter, i))
                 .ToArray();
 
-            Parser = BuildParser(partsParameter);
+            var parser = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public);
+            if(parser != null && parser.ReturnParameter?.ParameterType == type)
+            {
+                var parameters = parser.GetParameters();
+                if (parameters.Length == 1 && parameters[0].ParameterType == typeof(string[]))
+                {
+                    Parser = (Func<string[], Event>)Expression.Lambda(
+                    Expression.Convert(
+                        Expression.Call(parser, partsParameter), typeof(Event)),
+                    partsParameter).Compile();
+                }
+            }
+
+            Parser ??= BuildParser(partsParameter);
         }
 
         public string Serialize(object instance)

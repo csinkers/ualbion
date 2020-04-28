@@ -31,7 +31,7 @@ namespace UAlbion.Game
 
         void RaiseWithContext(EventContext context, IEvent e)
         {
-            if(e is MapEvent mapEvent)
+            if(e is IMapEvent mapEvent)
                 mapEvent.Context = context;
             Raise(e);
         }

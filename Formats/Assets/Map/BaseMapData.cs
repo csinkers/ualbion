@@ -49,9 +49,8 @@ namespace UAlbion.Formats.Assets.Map
 
         protected void SerdesEvents(ISerializer s)
         {
-            var source = TextSource.Map(Id);
             ushort eventCount = s.UInt16("EventCount", (ushort)Events.Count);
-            s.List(Events, eventCount, (i, x, serializer) => EventNode.Serdes(i, x, serializer, source));
+            s.List(Events, eventCount, (i, x, serializer) => EventNode.Serdes(i, x, serializer));
             foreach(var e in Events)
                 if(e.NextEventId >= eventCount)
                     throw new InvalidOperationException();
@@ -79,11 +78,10 @@ namespace UAlbion.Formats.Assets.Map
             if(s.Mode == SerializerMode.Reading)
             {
                 ChainsByEventId = new (EventChain, IEventNode)[Events.Count];
-                var textSource = TextSource.Map(Id);
                 for (int i = 0; i < chainOffsets.Count; i++)
                 {
                     var offset = chainOffsets[i];
-                    var chain = new EventChain(i, textSource);
+                    var chain = new EventChain(i);
                     var nextOffset = chainOffsets.Count == i + 1
                         ? Events.Count
                         : chainOffsets[i + 1];
@@ -194,7 +192,7 @@ namespace UAlbion.Formats.Assets.Map
 
                 if (npc.Chain == null)
                 {
-                    var chain = new EventChain(-1, TextSource.Map(Id));
+                    var chain = new EventChain(-1);
                     chain.Events.Add(new EventNode(0, new StartDialogueEvent(characterSheet.EventSetId)));
                     npc.Chain = chain;
                 }

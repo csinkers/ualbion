@@ -29,13 +29,13 @@ namespace UAlbion.Formats.MapEvents
             public ushort? ToMemory(ushort persistent) => persistent == 0xffff ? (ushort?)null : persistent;
         }
 
-        public static EventNode Serdes(int id, EventNode node, ISerializer s, TextSource source)
+        public static EventNode Serdes(int id, EventNode node, ISerializer s)
         {
             var initialPosition = s.Offset;
             var mapEvent = node?.Event as MapEvent;
             MapEventType type = (MapEventType)s.UInt8("Type", (byte)(mapEvent?.EventType ?? MapEventType.UnkFf));
 
-            var @event = SerdesByType(node, s, type, source);
+            var @event = SerdesByType(node, s, type);
             if (@event is IQueryEvent query)
                 node ??= new BranchNode(id, @event, query.FalseEventId);
             else
@@ -50,7 +50,7 @@ namespace UAlbion.Formats.MapEvents
             return node;
         }
 
-        static IMapEvent SerdesByType(EventNode node, ISerializer s, MapEventType type, TextSource source) =>
+        static IMapEvent SerdesByType(EventNode node, ISerializer s, MapEventType type) =>
             type switch // Individual parsers handle byte range [1,9]
             {
                 MapEventType.Action => ActionEvent.Serdes((ActionEvent)node?.Event, s),
@@ -80,7 +80,7 @@ namespace UAlbion.Formats.MapEvents
                 MapEventType.Sound => SoundEvent.Serdes((SoundEvent)node?.Event, s),
                 MapEventType.Spinner => SpinnerEvent.Serdes((SpinnerEvent)node?.Event, s),
                 MapEventType.StartDialogue => StartDialogueEvent.Serdes((StartDialogueEvent)node?.Event, s),
-                MapEventType.Text => TextEvent.Serdes((TextEvent)node?.Event, s, source),
+                MapEventType.Text => TextEvent.Serdes((TextEvent)node?.Event, s),
                 MapEventType.Trap => TrapEvent.Serdes((TrapEvent)node?.Event, s),
                 MapEventType.Wipe => WipeEvent.Serdes((WipeEvent)node?.Event, s),
                 _ => DummyMapEvent.Serdes((DummyMapEvent)node?.Event, s, type)

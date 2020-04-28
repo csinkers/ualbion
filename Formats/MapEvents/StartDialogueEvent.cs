@@ -5,7 +5,7 @@ using UAlbion.Formats.AssetIds;
 namespace UAlbion.Formats.MapEvents
 {
     [Event("start_dialogue")]
-    public class StartDialogueEvent : AsyncEvent
+    public class StartDialogueEvent : AsyncMapEvent
     {
         StartDialogueEvent() { }
         public StartDialogueEvent(EventSetId eventSetId) => EventSet = eventSetId;

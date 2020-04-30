@@ -55,7 +55,8 @@ namespace UAlbion.Formats.MapEvents
             _source = source;
         }
 
-        protected override AsyncEvent Clone() => new TextEvent(TextId, Location, PortraitId, _source);
+        protected override AsyncEvent Clone() 
+            => new TextEvent(TextId, Location, PortraitId, _source) { Context = Context };
 
         [EventPart("text_id")] public byte TextId { get; private set; }
         [EventPart("location")] public TextLocation? Location { get; private set; }

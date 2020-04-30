@@ -4,6 +4,7 @@ using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets.Save
@@ -119,10 +120,16 @@ namespace UAlbion.Formats.Assets.Save
                 var key = (PartyCharacterId)i;
                 CharacterSheet existing = null;
                 if (size > 0 || save.PartyMembers.TryGetValue(key, out existing))
-                    save.PartyMembers[key] = charLoader.Serdes(existing, serializer, key.ToString(), null);
+                {
+                    save.PartyMembers[key] = charLoader.Serdes(
+                        existing,
+                        serializer,
+                        key.ToString(),
+                        new BasicAssetInfo { Id = i });
+                }
             }
 
-            void SerdesNpcCharacter(int i, int size, ISerializer serializer)
+        void SerdesNpcCharacter(int i, int size, ISerializer serializer)
             {
                 if (i > 0xff)
                     return;
@@ -130,7 +137,13 @@ namespace UAlbion.Formats.Assets.Save
                 var key = (NpcCharacterId)i;
                 CharacterSheet existing = null;
                 if (serializer.Mode == SerializerMode.Reading || save.Npcs.TryGetValue(key, out existing))
-                    save.Npcs[key] = charLoader.Serdes(existing, serializer, key.ToString(), null);
+                {
+                    save.Npcs[key] = charLoader.Serdes(
+                        existing,
+                        serializer,
+                        key.ToString(),
+                        new BasicAssetInfo { Id = i });
+                }
             }
 
             void SerdesAutomap(int i, int size, ISerializer serializer)

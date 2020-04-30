@@ -17,16 +17,17 @@ namespace UAlbion.Formats.MapEvents
                 case QueryType.ChosenVerb:
                     return QueryVerbEvent.Serdes((QueryVerbEvent)genericEvent, s);
 
-                case QueryType.PreviousActionResult:
-                    break;
-                case QueryType.Ticker:
-                    break;
-                case QueryType.CurrentMapId:
-                    break;
+                case QueryType.PreviousActionResult: break;
+                case QueryType.Ticker: break;
+                case QueryType.CurrentMapId: break;
+                case QueryType.TriggerType: break;
+
                 case QueryType.PromptPlayer:
-                    break;
-                case QueryType.TriggerType:
-                    break;
+                    return PromptPlayerEvent.Serdes((PromptPlayerEvent) genericEvent, s);
+
+                case QueryType.PromptPlayerNumeric:
+                    return PromptPlayerNumericEvent.Serdes((PromptPlayerNumericEvent) genericEvent, s);
+
             }
 
             var e = (QueryEvent)genericEvent ?? new QueryEvent { QueryType = subType };

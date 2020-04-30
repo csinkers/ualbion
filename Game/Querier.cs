@@ -2,17 +2,51 @@
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Core;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Game.Gui.Dialogs;
 using UAlbion.Game.State;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game
 {
     public class Querier : ServiceComponent<IQuerier>, IQuerier
     {
         readonly Random _random = new Random();
-        public Querier() : base(null) { }
-        public bool Query(EventContext context, IQueryEvent query)
+        static readonly HandlerSet Handlers = new HandlerSet(
+            H<Querier, QueryVerbEvent>((x,e) =>
+            {
+                var result = x.Query(e.Context, e);
+                if (result.HasValue)
+                    e.Context.LastEventResult = result.Value;
+            }),
+            H<Querier, QueryItemEvent>((x,e) =>
+            {
+                var result = x.Query(e.Context, e);
+                if (result.HasValue)
+                    e.Context.LastEventResult = result.Value;
+            }),
+            H<Querier, PromptPlayerEvent>((x,e) =>
+            {
+                var result = x.Query(e.Context, e);
+                if (result.HasValue)
+                    e.Context.LastEventResult = result.Value;
+            }),
+            H<Querier, PromptPlayerNumericEvent>((x,e) =>
+            {
+                var result = x.Query(e.Context, e);
+                if (result.HasValue)
+                    e.Context.LastEventResult = result.Value;
+            }),
+            H<Querier, QueryEvent>((x,e) =>
+            {
+                var result = x.Query(e.Context, e);
+                if (result.HasValue)
+                    e.Context.LastEventResult = result.Value;
+            }));
+        public Querier() : base(Handlers) { }
+        public bool? Query(EventContext context, IQueryEvent query, bool debugInspect = false)
         {
             var game = Resolve<IGameState>();
             switch (query, query.QueryType)
@@ -35,8 +69,57 @@ namespace UAlbion.Game
                 case (_, QueryType.IsPartyMemberConscious):  { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query Party member conscious")); break; }
                 case (_, QueryType.EventAlreadyUsed):        { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query event already used")); break; }
                 case (_, QueryType.IsDemoVersion):           { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query is demo")); return false; }
-                case (_, QueryType.PromptPlayer):            { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query prompt")); break; } // Async
-                case (_, QueryType.PromptPlayerNumeric):     { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query numeric prompt")); break; } // Async
+
+                case (PromptPlayerEvent prompt, QueryType.PromptPlayer):
+                {
+                    if (prompt.Context?.Source == null || debugInspect)
+                        break;
+
+                    var assets = Resolve<IAssetManager>();
+
+                    var stringId = new StringId(
+                        prompt.Context.Source.Type,
+                        prompt.Context.Source.Id,
+                        prompt.TextId);
+
+                    var dialog = AttachChild(new PromptDialog(
+                        new DynamicText(() =>
+                        {
+                            var settings = Resolve<ISettings>();
+                            var template = assets.LoadString(stringId, settings.Gameplay.Language);
+                            return new TextFormatter(assets, settings.Gameplay.Language)
+                                .Format(template).Blocks;
+                        })));
+
+                    prompt.Acknowledged = true;
+                    dialog.Closed += (sender, _) => prompt.Complete();
+                    return null;
+                }
+
+                case (PromptPlayerNumericEvent prompt, QueryType.PromptPlayerNumeric):
+                {
+                    if (prompt.Context?.Source == null || debugInspect)
+                        break;
+
+                    var assets = Resolve<IAssetManager>();
+
+                    var dialog = AttachChild(new NumericPromptDialog(
+                        new DynamicText(() =>
+                        {
+                            var settings = Resolve<ISettings>();
+                            var template = assets.LoadString(SystemTextId.MsgBox_EnterNumber, settings.Gameplay.Language);
+                            return new TextFormatter(assets, settings.Gameplay.Language)
+                                .Format(template).Blocks;
+                        }), 0, 9999));
+
+                    prompt.Acknowledged = true;
+                    dialog.Closed += (sender, _) =>
+                    {
+                        prompt.Context.LastEventResult = prompt.Argument == dialog.Value;
+                        prompt.Complete();
+                    };
+                    return null;
+                }
 
                 default:
                     Raise(new LogEvent(LogEvent.Level.Error, $"Unhandled query event {query} (subtype {query.QueryType}"));

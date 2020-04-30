@@ -137,6 +137,7 @@ namespace UAlbion
                 .Attach(new StatusBar())
                 .Attach(new ContextMenu())
                 .Attach(new EventChainManager())
+                .Attach(new Querier())
                 ;
 
             PerfTracker.StartupEvent("Creating scene-specific components");

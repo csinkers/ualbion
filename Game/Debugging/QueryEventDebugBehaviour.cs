@@ -22,7 +22,7 @@ namespace UAlbion.Game.Debugging
                 return null;
 
             var context = eventManager.ActiveContexts.FirstOrDefault()?.Clone() ?? new EventContext(new EventSource.None());
-            return querier.Query(context, query).ToString();
+            return querier.Query(context, query, true).ToString();
         }
     }
 }

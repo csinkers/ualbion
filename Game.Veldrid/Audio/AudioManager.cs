@@ -102,7 +102,7 @@ namespace UAlbion.Game.Veldrid.Audio
 
             var source = new SimpleAudioSource(buffer)
             {
-                Volume = e.Velocity == 0 ? 1.0f : e.Velocity / 255.0f,
+                Volume = e.Velocity == 0 ? 0.4f : 0.4f * (e.Velocity / 255.0f),
                 SourceRelative = true
             };
 

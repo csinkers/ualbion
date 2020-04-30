@@ -19,19 +19,15 @@ namespace UAlbion.Game
             H<EventChainManager, TriggerChainEvent>((x, e) => x.Trigger(e))
         );
 
-        readonly Querier _querier;
         readonly ISet<EventContext> _activeChains = new HashSet<EventContext>();
 
         public IList<EventContext> ActiveContexts => new ReadOnlyCollection<EventContext>(_activeChains.ToList());
 
-        public EventChainManager() : base(Handlers)
-        {
-            _querier = AttachChild(new Querier());
-        }
+        public EventChainManager() : base(Handlers) { }
 
         void RaiseWithContext(EventContext context, IEvent e)
         {
-            if(e is IMapEvent mapEvent)
+            if(e is IContextualEvent mapEvent)
                 mapEvent.Context = context;
             Raise(e);
         }
@@ -43,8 +39,19 @@ namespace UAlbion.Game
             {
                 if (context.Node.Event is AsyncEvent asyncEvent)
                 {
-                    context.Node = context.Node.NextEvent;
-                    var clone = asyncEvent.CloneWithCallback(() => Resume(context));
+                    var clone = asyncEvent.CloneWithCallback(() =>
+                    {
+                        if (context.Node is IBranchNode branch)
+                        {
+#if DEBUG
+                            Raise(new LogEvent(LogEvent.Level.Info, $"if ({context.Node.Event}) => {context.LastEventResult}"));
+#endif
+                            context.Node = context.LastEventResult ? branch.NextEvent : branch.NextEventWhenFalse;
+                        }
+                        else context.Node = context.Node.NextEvent;
+
+                        Resume(context);
+                    });
 
                     RaiseWithContext(context, clone);
 
@@ -55,19 +62,16 @@ namespace UAlbion.Game
                 }
                 else
                 {
-                    if (context.Node is IBranchNode branch && context.Node.Event is IQueryEvent query)
+                    RaiseWithContext(context, context.Node.Event);
+
+                    if (context.Node is IBranchNode branch)
                     {
-                        var result = _querier.Query(context, query);
 #if DEBUG
-                        Raise(new LogEvent(LogEvent.Level.Info, $"if ({query}) => {result}"));
+                        Raise(new LogEvent(LogEvent.Level.Info, $"if ({context.Node.Event}) => {context.LastEventResult}"));
 #endif
-                        context.Node = result ? branch.NextEvent : branch.NextEventWhenFalse;
+                        context.Node = context.LastEventResult ? branch.NextEvent : branch.NextEventWhenFalse;
                     }
-                    else
-                    {
-                        RaiseWithContext(context, context.Node.Event);
-                        context.Node = context.Node.NextEvent;
-                    }
+                    else context.Node = context.Node.NextEvent;
                 }
             }
 

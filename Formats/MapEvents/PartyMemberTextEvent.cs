@@ -10,9 +10,9 @@ namespace UAlbion.Formats.MapEvents
         {
             int portraitId = int.Parse(parts[1]);
             byte textId = byte.Parse(parts[2]);
-            return new PartyMemberTextEvent(textId, (SmallPortraitId)portraitId);
+            return new PartyMemberTextEvent(textId, portraitId == 0 ? null : (SmallPortraitId?)portraitId - 1);
         }
 
-        public PartyMemberTextEvent(byte textId, SmallPortraitId portraitId) : base(textId, null, portraitId) { }
+        public PartyMemberTextEvent(byte textId, SmallPortraitId? portraitId) : base(textId, TextLocation.TextInWindowWithPortrait, portraitId) { }
     }
 }

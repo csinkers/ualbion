@@ -44,6 +44,7 @@ namespace UAlbion.Game.Gui.Text
 
         static readonly HandlerSet Handlers = new HandlerSet(
             H<TextManager, TextEvent>((x,e) => x.OnTextEvent(e)),
+            H<TextManager, NpcTextEvent>((x,e) => x.OnNpcTextEvent(e)),
             H<TextManager, StartDialogueEvent>((x, e) => x.StartDialogue(e))
         );
 
@@ -205,6 +206,21 @@ namespace UAlbion.Game.Gui.Text
             });
         }
 
+        void OnNpcTextEvent(NpcTextEvent npcTextEvent)
+        {
+            npcTextEvent.Acknowledged = true;
+            var state = Resolve<IGameState>();
+            var sheet = state.GetNpc(npcTextEvent.NpcId);
+
+            var textEvent = new TextEvent(
+                npcTextEvent.TextId,
+                TextEvent.TextLocation.TextInWindowWithPortrait,
+                sheet.PortraitId
+            ) { Context = npcTextEvent.Context };
+
+            OnTextEvent((TextEvent)textEvent.CloneWithCallback(npcTextEvent.Complete));
+        }
+
         void OnTextEvent(TextEvent textEvent)
         {
             switch(textEvent.Location)
@@ -213,7 +229,7 @@ namespace UAlbion.Game.Gui.Text
                 case TextEvent.TextLocation.TextInWindow:
                 {
                     textEvent.Acknowledged = true;
-                    var dialog = AttachChild(new TextDialog(FormatTextEvent(textEvent, FontColor.Yellow)));
+                    var dialog = AttachChild(new TextDialog(FormatTextEvent(textEvent, FontColor.White)));
                     dialog.Closed += (sender, _) => textEvent.Complete();
                     break;
                 }

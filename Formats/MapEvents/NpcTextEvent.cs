@@ -4,14 +4,18 @@ using UAlbion.Formats.AssetIds;
 namespace UAlbion.Formats.MapEvents
 {
     [Event("npc_text")]
-    public class NpcTextEvent : TextEvent
+    public class NpcTextEvent : AsyncEvent, IContextualEvent
     {
-        public static NpcTextEvent Parse(string[] parts)
+        public NpcTextEvent(NpcCharacterId npcId, byte textId)
         {
-            int portraitId = int.Parse(parts[1]);
-            byte textId = byte.Parse(parts[2]);
-            return new NpcTextEvent(textId, (SmallPortraitId)portraitId);
+            TextId = textId;
+            NpcId = npcId;
         }
-        public NpcTextEvent(byte textId, SmallPortraitId portraitId) : base(textId, null, portraitId) { }
+
+        [EventPart("npc")] public NpcCharacterId NpcId { get; }
+        [EventPart("text")] public byte TextId { get; }
+
+        protected override AsyncEvent Clone() => new NpcTextEvent(NpcId, TextId);
+        public EventContext Context { get; set; }
     }
 }

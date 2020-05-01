@@ -68,7 +68,7 @@ namespace UAlbion.Game.Entities.Map2D
             AttachChild(new Collider(_logicalMap, !_logicalMap.UseSmallSprites));
 
             var movementSettings = _logicalMap.UseSmallSprites ? MovementSettings.Small() : MovementSettings.Large();
-            _partyMovement = AttachChild(new Movement(movementSettings, Vector2.Zero, MovementDirection.Right));
+            _partyMovement = AttachChild(new PartyCaterpillar(Vector2.Zero, MovementDirection.Right, movementSettings));
 
             foreach (var npc in _logicalMap.Npcs)
             {

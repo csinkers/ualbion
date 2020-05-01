@@ -65,10 +65,10 @@ namespace UAlbion.Game.Entities.Map2D
             _logicalMap.TileSize = renderable.TileSize;
 
             AttachChild(new ScriptManager(_mapData.Id));
-            AttachChild(new Collider(_logicalMap));
-            _partyMovement = AttachChild(_logicalMap.UseSmallSprites
-                ?  (IMovement)new SmallPartyMovement(Vector2.Zero, MovementDirection.Right)
-                :  new LargePartyMovement(Vector2.Zero, MovementDirection.Right)); // TODO: Initial position.
+            AttachChild(new Collider(_logicalMap, !_logicalMap.UseSmallSprites));
+
+            var movementSettings = _logicalMap.UseSmallSprites ? MovementSettings.Small() : MovementSettings.Large();
+            _partyMovement = AttachChild(new Movement(movementSettings, Vector2.Zero, MovementDirection.Right));
 
             foreach (var npc in _logicalMap.Npcs)
             {

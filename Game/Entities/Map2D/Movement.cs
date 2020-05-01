@@ -9,20 +9,20 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities.Map2D
 {
-    public class LargePartyMovement : ServiceComponent<IMovement>, IMovement
+    public class Movement : ServiceComponent<IMovement>, IMovement
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<LargePartyMovement, FastClockEvent>((x,e) => x.Update()),
-            H<LargePartyMovement, PartyJumpEvent>((x, e) =>
-                {
-                    var position = new Vector2(e.X, e.Y);
-                    for (int i = 0; i < x._trail.Length; i++)
-                        x._trail[i] = (To3D(position), 0);
+            H<Movement, FastClockEvent>((x,e) => x.Update()),
+            H<Movement, PartyJumpEvent>((x, e) =>
+            {
+                var position = new Vector2(e.X, e.Y);
+                for (int i = 0; i < x._trail.Length; i++)
+                    x._trail[i] = (x.To3D(position), 0);
 
-                    x._target = null;
-                }),
-            H<LargePartyMovement, PartyMoveEvent>((x, e) => x._direction += new Vector2(e.X, e.Y)),
-            H<LargePartyMovement, PartyTurnEvent>((x, e) =>
+                x._target = null;
+            }),
+            H<Movement, PartyMoveEvent>((x, e) => x._direction += new Vector2(e.X, e.Y)),
+            H<Movement, PartyTurnEvent>((x, e) =>
             {
                 var (position3d, _) = x._trail[x._trailOffset];
                 var position = new Vector2(position3d.X, position3d.Y);
@@ -36,7 +36,7 @@ namespace UAlbion.Game.Entities.Map2D
                 };
                 x.MoveLeader(position);
             }),
-            H<LargePartyMovement, NoClipEvent>((x, e) =>
+            H<Movement, NoClipEvent>((x, e) =>
             {
                 x._clipping = !x._clipping;
                 x.Raise(new LogEvent(LogEvent.Level.Info, $"Clipping {(x._clipping ? "on" : "off")}"));
@@ -50,11 +50,8 @@ namespace UAlbion.Game.Entities.Map2D
             public int StartTick;
         }
 
-        const int TicksPerTile = 12; // Number of game ticks it takes to move across a map tile
-        const int TicksPerFrame = 9; // Number of game ticks it takes to advance to the next animation frame
-        const int MinTrailDistance = 12;
-        const int MaxTrailDistance = 18; // Max number of positions between each character in the party. Looks best if coprime to TicksPerPile and TicksPerFrame.
-        int TrailLength => Party.MaxPartySize * MaxTrailDistance; // Number of past positions to store
+        readonly MovementSettings _settings;
+        int TrailLength => Party.MaxPartySize * _settings.MaxTrailDistance; // Number of past positions to store
 
         readonly (Vector3, int)[] _trail; // Positions (tile coordinates) and frame numbers.
         readonly (int, bool)[] _playerOffsets = new (int, bool)[Party.MaxPartySize]; // int = trail offset, bool = isMoving
@@ -65,23 +62,24 @@ namespace UAlbion.Game.Entities.Map2D
         int _movementTick;
         bool _clipping = true;
 
-        public LargePartyMovement(Vector2 initialPosition, MovementDirection initialDirection) : base(Handlers)
+        public Movement(MovementSettings settings, Vector2 initialPosition, MovementDirection initialDirection) : base(Handlers)
         {
+            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
             _facingDirection = initialDirection;
             _trail = new (Vector3, int)[TrailLength];
 
             _trailOffset = _trail.Length - 1;
             for (int i = 0; i < _playerOffsets.Length; i++)
-                _playerOffsets[i] = (_trailOffset - i * MinTrailDistance, false);
+                _playerOffsets[i] = (_trailOffset - i * _settings.MinTrailDistance, false);
 
             var offset = (initialDirection switch
-                {
-                    MovementDirection.Left  => new Vector2(1.0f, 0.0f),
-                    MovementDirection.Right => new Vector2(-1.0f, 0.0f),
-                    MovementDirection.Up    => new Vector2(0.0f, -1.0f),
-                    MovementDirection.Down  => new Vector2(0.0f, 1.0f),
-                    _ => Vector2.Zero
-                }) / TicksPerTile;
+            {
+                MovementDirection.Left  => new Vector2(1.0f, 0.0f),
+                MovementDirection.Right => new Vector2(-1.0f, 0.0f),
+                MovementDirection.Up    => new Vector2(0.0f, -1.0f),
+                MovementDirection.Down  => new Vector2(0.0f, 1.0f),
+                _ => Vector2.Zero
+            }) / _settings.TicksPerTile;
 
             for (int i = 0; i < _trail.Length; i++)
             {
@@ -105,8 +103,8 @@ namespace UAlbion.Game.Entities.Map2D
                     _ => SpriteAnimation.Sleeping
                 };
 
-                var frames = LargeSpriteAnimations.Frames[anim];
-                return frames[(_movementTick / TicksPerFrame) % frames.Length];
+                var frames = _settings.Frames[anim];
+                return frames[(_movementTick / _settings.TicksPerFrame) % frames.Length];
             }
         }
 
@@ -167,7 +165,10 @@ namespace UAlbion.Game.Entities.Map2D
             {
                 _movementTick++;
                 var target = _target.Value;
-                position = Vector2.Lerp(target.From, target.To, ((float)_movementTick - target.StartTick) / TicksPerTile);
+                position = Vector2.Lerp(
+                    target.From,
+                    target.To,
+                    ((float)_movementTick - target.StartTick) / _settings.TicksPerTile);
                 MoveLeader(position);
 
                 GameTrace.Log.Move(
@@ -175,7 +176,7 @@ namespace UAlbion.Game.Entities.Map2D
                     _trail[_trailOffset].Item1.X, _trail[_trailOffset].Item1.Y, target.To.X, target.To.Y,
                     _trail[_trailOffset].Item2);
 
-                if (_movementTick - target.StartTick >= TicksPerTile)
+                if (_movementTick - target.StartTick >= _settings.TicksPerTile)
                     _target = null;
             }
 
@@ -195,18 +196,9 @@ namespace UAlbion.Game.Entities.Map2D
             {
                 var testPoints = new[]
                 {
-                    new Vector2(-2.0f, -1.0f), // 0123
-                    new Vector2(-1.0f, -1.0f), // 4 @5
-                    new Vector2(0.0f, -1.0f),  // 6789
-                    new Vector2(1.0f, -1.0f),
-
-                    new Vector2(-2.0f, 0.0f),
-                    new Vector2(1.0f, 0.0f),
-
-                    new Vector2(-2.0f, 1.0f),
-                    new Vector2(-1.0f, 1.0f),
-                    new Vector2(0.0f, 1.0f),
-                    new Vector2(1.0f, 1.0f),
+                    new Vector2(-1.0f, -1.0f), new Vector2(0.0f, -1.0f), new Vector2(1.0f, -1.0f),
+                    new Vector2(-1.0f,  0.0f),                               new Vector2(1.0f,  0.0f),
+                    new Vector2(-1.0f,  1.0f), new Vector2(0.0f,  1.0f), new Vector2(1.0f,  1.0f),
                 }.Select(x => x + position).ToArray();
 
                 var r = testPoints.Select(x => detector.GetPassability(x)).ToArray(); // Results
@@ -228,13 +220,13 @@ namespace UAlbion.Game.Entities.Map2D
                     _ => throw new ArgumentOutOfRangeException()
                 };
                 Raise(new LogEvent(LogEvent.Level.Info, $"Vicinity of {position}"));
-                Raise(new LogEvent(LogEvent.Level.Info, $"{R(0)}{R(1)}{R(2)}{R(3)}"));
-                Raise(new LogEvent(LogEvent.Level.Info, $"{R(4)}@@{R(5)}"));
-                Raise(new LogEvent(LogEvent.Level.Info, $"{R(6)}{R(7)}{R(8)}{R(9)}"));
+                Raise(new LogEvent(LogEvent.Level.Info, $"{R(0)}{R(1)}{R(2)}"));
+                Raise(new LogEvent(LogEvent.Level.Info, $"{R(3)}@{R(4)}"));
+                Raise(new LogEvent(LogEvent.Level.Info, $"{R(5)}{R(6)}{R(7)}"));
                 Raise(new LogEvent(LogEvent.Level.Info, ""));
             }
 #endif
-            bool Probe(Vector2 x) => !detector.IsOccupied(position + x) && !detector.IsOccupied(position + x + new Vector2(-1.0f, 0.0f));
+            bool Probe(Vector2 x) => !detector.IsOccupied(position + x);
             if (Probe(direction))
                 return direction;
 
@@ -286,13 +278,13 @@ namespace UAlbion.Game.Entities.Map2D
                 int predecessorAge = OffsetAge(_playerOffsets[i - 1].Item1);
                 int myAge = OffsetAge(_playerOffsets[i].Item1);
 
-                if (_playerOffsets[i].Item2 || myAge - predecessorAge > MaxTrailDistance)
+                if (_playerOffsets[i].Item2 || myAge - predecessorAge > _settings.MaxTrailDistance)
                 {
                     int newOffset = _playerOffsets[i].Item1 + 1;
                     if (newOffset >= _trail.Length)
                         newOffset = 0;
 
-                    bool keepMoving = (OffsetAge(newOffset) - predecessorAge) > MinTrailDistance;
+                    bool keepMoving = (OffsetAge(newOffset) - predecessorAge) > _settings.MinTrailDistance;
                     _playerOffsets[i] = (newOffset, keepMoving);
                 }
             }
@@ -311,7 +303,6 @@ namespace UAlbion.Game.Entities.Map2D
             return (pos, frame);
         }
 
-        static Vector3 To3D(Vector2 position) 
-            => new Vector3(position, DepthUtil.IndoorCharacterDepth(position.Y));
+        Vector3 To3D(Vector2 position) => new Vector3(position, _settings.GetDepth(position.Y));
     }
 }

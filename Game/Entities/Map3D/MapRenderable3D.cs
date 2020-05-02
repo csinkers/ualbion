@@ -29,7 +29,6 @@ namespace UAlbion.Game.Entities.Map3D
         static readonly HandlerSet Handlers = new HandlerSet(
             H<MapRenderable3D, RenderEvent>((x, e) => x.Render(e)),
             H<MapRenderable3D, SlowClockEvent>((x, e) => x.OnSlowClock(e)),
-            H<MapRenderable3D, ExchangeDisabledEvent>((x,_) => x._tilemap = null),
             H<MapRenderable3D, SortMapTilesEvent>((x, e) => x._isSorting = e.IsSorting),
             H<MapRenderable3D, LoadPaletteEvent>((x, e) => {})
         );
@@ -42,7 +41,7 @@ namespace UAlbion.Game.Entities.Map3D
             _tileSize = tileSize;
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Raise(new LoadPaletteEvent(_mapData.PaletteId));
 
@@ -86,6 +85,12 @@ namespace UAlbion.Game.Entities.Map3D
             }
 
             _fullUpdate = true;
+        }
+
+        public override void Detach()
+        {
+            _tilemap = null;
+            base.Detach();
         }
 
         void SetTile(int index, int order, int frameCount)

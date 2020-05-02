@@ -40,7 +40,7 @@ namespace UAlbion.Game.State.Player
             Apparent = new InterpolatedCharacterSheet(() => _lastEffective, () => Effective, () => _lerp);
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             UpdateInventory();
             base.Subscribed();

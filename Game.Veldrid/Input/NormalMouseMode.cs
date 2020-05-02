@@ -14,7 +14,7 @@ namespace UAlbion.Game.Veldrid.Input
             H<NormalMouseMode, InputEvent>((x, e) => x.OnInput(e))
         );
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Raise(new SetCursorEvent(CoreSpriteId.Cursor));
             base.Subscribed();

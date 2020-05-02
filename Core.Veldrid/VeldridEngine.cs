@@ -94,7 +94,7 @@ namespace UAlbion.Core.Veldrid
                     RenderDoc.Load(out _renderDoc);
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             var shaderCache = Resolve<IShaderCache>();
             if(shaderCache == null)

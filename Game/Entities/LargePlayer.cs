@@ -30,7 +30,7 @@ namespace UAlbion.Game.Entities
                 0, SpriteFlags.BottomAligned));
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Update();
             base.Subscribed();

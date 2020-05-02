@@ -56,10 +56,10 @@ namespace UAlbion
                 .AddAssetPostProcessor(new InterlacedBitmapPostProcessor())
                 ;
 
-            using var global = new EventExchange("Global", logger);
-            Engine.Global = global;
+            using var exchange = new EventExchange(logger);
+            Engine.GlobalExchange = exchange;
 
-            global // Need to register settings first, as the AssetConfigLocator relies on it.
+            exchange // Need to register settings first, as the AssetConfigLocator relies on it.
                 .Register<ICoreFactory>(factory)
                 .Register<ISettings>(settings)
                 .Register<IEngineSettings>(settings)
@@ -79,11 +79,11 @@ namespace UAlbion
             {
                 case ExecutionMode.Game:
                 case ExecutionMode.GameWithSlavedAudio:
-                    Albion.RunGame(global, baseDir, commandLine);
+                    Albion.RunGame(exchange, baseDir, commandLine);
                     break;
 
                 case ExecutionMode.AudioSlave: 
-                    global.Attach(new AudioManager(true));
+                    exchange.Attach(new AudioManager(true));
                     break;
 
                 case ExecutionMode.Editor: break; // TODO
@@ -91,7 +91,7 @@ namespace UAlbion
 
                 case ExecutionMode.DumpData:
                     var textManager = new TextManager();
-                    global.Register<ITextManager>(textManager);
+                    exchange.Register<ITextManager>(textManager);
 
                     Dump.CoreSprites(assets, baseDir);
                     Dump.CharacterSheets(assets, textManager, baseDir);

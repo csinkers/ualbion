@@ -6,12 +6,11 @@ using UAlbion.Core.Events;
 
 namespace UAlbion.Core
 {
-    public class Scene : Component, IScene
+    public class Scene : Container, IScene
     {
         static readonly HandlerSet Handlers = new HandlerSet(
             H<Scene, CollectScenesEvent>((x, e) => e.Register(x)),
-            H<Scene, SetClearColourEvent>((x, e) => x._clearColour = (e.Red, e.Green, e.Blue)),
-            H<Scene, ExchangeDisabledEvent>((x, e) => x.Unsubscribed())
+            H<Scene, SetClearColourEvent>((x, e) => x._clearColour = (e.Red, e.Green, e.Blue))
         );
 
         readonly IDictionary<Type, IList<IRenderable>> _renderables = new Dictionary<Type, IList<IRenderable>>();
@@ -27,10 +26,7 @@ namespace UAlbion.Core
             Camera = AttachChild(camera);
         }
 
-        public void Add(IRenderable renderable) { } // TODO
-        public void Remove(IRenderable renderable) { } // TODO
         public override string ToString() => $"Scene:{Name}";
-        protected virtual void Unsubscribed() { }
 
         public void RenderAllStages(IRendererContext context, IList<IRenderer> renderers)
         {

@@ -23,7 +23,7 @@ namespace UAlbion.Game.Assets
         public NewStringLocator() : base(null) { }
         public IEnumerable<AssetType> SupportedTypes => new[] { AssetType.UAlbionText };
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             var settings = Resolve<ISettings>();
             var filename = Path.Combine(settings.BasePath, "data", "strings.json");

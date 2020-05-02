@@ -18,7 +18,7 @@ namespace UAlbion.Game.Entities
             );
 
         public Skybox(DungeonBackgroundId id) : base(Handlers) => _id = id;
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             var assets = Resolve<IAssetManager>();
             var texture = assets.LoadTexture(_id);

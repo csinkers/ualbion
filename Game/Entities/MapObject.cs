@@ -33,7 +33,7 @@ namespace UAlbion.Game.Entities
             _sprite.Size = size;
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             _sprite.TilePosition = _initialPosition;
             base.Subscribed();

@@ -16,8 +16,7 @@ namespace UAlbion.Game.Veldrid.Input
     public class RightButtonHeldMouseMode : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<RightButtonHeldMouseMode, InputEvent>((x, e) => x.OnInput(e)),
-            H<RightButtonHeldMouseMode, ExchangeDisabledEvent>((x,e) => x.Unsubscribed())
+            H<RightButtonHeldMouseMode, InputEvent>((x, e) => x.OnInput(e))
             // H<RightButtonHeldMouseMode, UiSelectedEvent>((x,e) => x.OnSelect(e))
         );
 
@@ -30,7 +29,7 @@ namespace UAlbion.Game.Veldrid.Input
             _cursor = AttachChild(new MapSprite<CoreSpriteId>(CoreSpriteId.Select, DrawLayer.MaxLayer, 0, SpriteFlags.LeftAligned));
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             _lastTilePosition = Vector2.Zero;
             Raise(new ShowCursorEvent(false));
@@ -42,11 +41,12 @@ namespace UAlbion.Game.Veldrid.Input
             base.Subscribed();
         }
 
-        void Unsubscribed()
+        public override void Detach()
         {
             Raise(new ShowCursorEvent(true));
             if (_wasClockRunning)
                 Raise(new StartClockEvent());
+            base.Detach();
         }
 
         void OnInput(InputEvent e)

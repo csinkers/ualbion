@@ -222,7 +222,7 @@ namespace UAlbion.Game.Veldrid.Audio
         }
 
         public AudioManager(bool standalone) : base(Handlers) => _standalone = standalone;
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Task.Run(AudioThread);
             base.Subscribed();

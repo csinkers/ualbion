@@ -16,7 +16,7 @@ namespace UAlbion.Game.Gui.Menus
 
         public MainMenu() : base(Handlers, DialogPositioning.Center) { }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             foreach (var child in Children)
                 child.Detach();

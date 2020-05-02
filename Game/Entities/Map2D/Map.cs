@@ -47,7 +47,7 @@ namespace UAlbion.Game.Entities.Map2D
             _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Raise(new SetClearColourEvent(0,0,0));
             if (_logicalMap != null)

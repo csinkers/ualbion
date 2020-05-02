@@ -14,7 +14,7 @@ namespace UAlbion.Game
 
         public AlbionMusicGenerator(SongId songId) => _songId = songId;
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             if (!File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "ADLMIDI.dll")))
                 return;

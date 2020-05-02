@@ -45,7 +45,7 @@ namespace UAlbion.Game.Gui.Status
             _mana = AttachChild(new StatusBarHealthBar(order, false));
         }
 
-        public override void Subscribed() => LoadSprite();
+        protected override void Subscribed() => LoadSprite();
         public override Vector2 GetSize() => _portrait.GetSize() + new Vector2(0,6); // Add room for health + mana bars
         IPlayer PartyMember => Resolve<IParty>()?.StatusBarOrder.ElementAtOrDefault(_order);
 

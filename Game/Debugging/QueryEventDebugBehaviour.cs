@@ -16,8 +16,8 @@ namespace UAlbion.Game.Debugging
             if (!(reflected.Object is IQueryEvent query))
                 return null;
 
-            var querier = Engine.Global?.Resolve<IQuerier>();
-            var eventManager = Engine.Global?.Resolve<IEventManager>();
+            var querier = Engine.GlobalExchange?.Resolve<IQuerier>();
+            var eventManager = Engine.GlobalExchange?.Resolve<IEventManager>();
             if (querier == null || eventManager == null)
                 return null;
 

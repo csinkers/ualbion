@@ -29,7 +29,7 @@ namespace UAlbion.Game.Gui.Inventory
             _config = config;
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Rebuild();
             base.Subscribed();

@@ -20,7 +20,7 @@ namespace UAlbion.Game
 
         public PaletteManager() : base(Handlers) { }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             SetPalette(PaletteId.Toronto2D);
             base.Subscribed();

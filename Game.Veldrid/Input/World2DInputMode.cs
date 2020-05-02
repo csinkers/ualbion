@@ -9,17 +9,20 @@ namespace UAlbion.Game.Veldrid.Input
     public class World2DInputMode : Component
     {
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<World2DInputMode, InputEvent>((x,e) => x.OnInput(e)),
-            H<World2DInputMode, ExchangeDisabledEvent>((x,e) => x.Unsubscribed())
+            H<World2DInputMode, InputEvent>((x,e) => x.OnInput(e))
         );
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Raise(new PushMouseModeEvent(MouseMode.Normal));
             base.Subscribed();
         }
 
-        void Unsubscribed() => Raise(new PopMouseModeEvent());
+        public override void Detach()
+        {
+            Raise(new PopMouseModeEvent());
+            base.Detach();
+        }
 
         void OnInput(InputEvent e)
         {

@@ -19,13 +19,19 @@ namespace UAlbion.Game.Gui.Controls
         const int ShadowY = 10;
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<DialogFrame, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; })
         );
 
         PositionedSpriteBatch _sprite;
         Vector2 _lastPixelSize; // For dirty state detection
 
         public DialogFrame(IUiElement child) : base(Handlers) => Children.Add(child);
+        public override void Detach()
+        {
+            _sprite?.Dispose();
+            _sprite = null;
+            base.Detach();
+        }
+
         public DialogFrameBackgroundStyle Background { get; set; }
         void Rebuild(int width, int height, DrawLayer order)
         {

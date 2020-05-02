@@ -55,6 +55,6 @@ namespace UAlbion.Game.Entities.Map2D
                 IconChangeType.Overlay));
         }
 
-        public override void Subscribed() => Raise(new LoadPaletteEvent(Palette));
+        protected override void Subscribed() => Raise(new LoadPaletteEvent(Palette));
     }
 }

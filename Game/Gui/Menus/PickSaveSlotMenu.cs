@@ -40,7 +40,7 @@ namespace UAlbion.Game.Gui.Menus
             return Path.Combine(saveDir, $"SAVE.{i:D3}");
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             DynamicText BuildEmptySlotText(int x) =>
                 new DynamicText(() =>

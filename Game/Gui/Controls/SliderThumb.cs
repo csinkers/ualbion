@@ -27,7 +27,7 @@ namespace UAlbion.Game.Gui.Controls
         }
 
         public ButtonState State { get => _frame.State; set => _frame.State = value; }
-        public override void Subscribed() => Rebuild();
+        protected override void Subscribed() => Rebuild();
 
         void Rebuild()
         {

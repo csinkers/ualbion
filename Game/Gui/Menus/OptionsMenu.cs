@@ -25,7 +25,7 @@ namespace UAlbion.Game.Gui.Menus
 
         public OptionsMenu() : base(null, DialogPositioning.Center) { }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             var languageButtons = new List<IUiElement>();
             void SetLanguage(GameLanguage language) => Raise(new SetLanguageEvent(language));

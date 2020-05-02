@@ -22,19 +22,16 @@ namespace UAlbion.Game.Scenes
             AttachChild(new CameraMotion2D((OrthographicCamera)Camera));
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Raise(new PushInputModeEvent(InputMode.World2D));
-            Raise(new RefreshMapSubscribersEvent()); // TODO: Is this still needed?
             base.Subscribed();
         }
 
-        protected override void Unsubscribed()
+        public override void Detach()
         {
             Raise(new PopInputModeEvent());
-            base.Unsubscribed();
+            base.Detach();
         }
     }
-
-    public class RefreshMapSubscribersEvent : IEvent { }
 }

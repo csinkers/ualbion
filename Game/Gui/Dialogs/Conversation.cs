@@ -39,7 +39,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
         public event EventHandler<EventArgs> Complete;
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             if (Children.Any())
                 return;

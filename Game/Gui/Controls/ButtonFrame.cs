@@ -24,8 +24,8 @@ namespace UAlbion.Game.Gui.Controls
         static readonly ITheme DefaultTheme = new ButtonTheme();
 
         static readonly HandlerSet Handlers = new HandlerSet(
-            H<ButtonFrame, WindowResizedEvent>((x, _) => x._lastExtents = new Rectangle()),
-            H<ButtonFrame, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; }));
+            H<ButtonFrame, WindowResizedEvent>((x, _) => x._lastExtents = new Rectangle())
+        );
 
         SpriteLease _sprite;
         Rectangle _lastExtents;
@@ -70,6 +70,13 @@ namespace UAlbion.Game.Gui.Controls
         {
             if (child != null)
                 Children.Add(child);
+        }
+
+        public override void Detach()
+        {
+            _sprite?.Dispose();
+            _sprite = null;
+            base.Detach();
         }
 
         void Rebuild(Rectangle extents, DrawLayer order)

@@ -67,7 +67,7 @@ namespace UAlbion.Game
                         break;
                     }
 
-                    int nesting = EventExchange.Nesting;
+                    int nesting = _exchange.Nesting;
                     if(nesting > 0)
                         Console.Write(new string(' ', nesting * 2));
                     Console.WriteLine(e.Message);
@@ -106,7 +106,7 @@ namespace UAlbion.Game
                 default:
                 {
                     if (sender == this || _logLevel > LogEvent.Level.Info) return;
-                    int nesting = EventExchange.Nesting;
+                    int nesting = _exchange.Nesting;
                     if(nesting > 0)
                         Console.Write(new string(' ', nesting * 2));
                     Console.WriteLine(@event.ToString());

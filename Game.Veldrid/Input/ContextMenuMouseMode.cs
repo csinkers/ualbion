@@ -32,7 +32,7 @@ namespace UAlbion.Game.Veldrid.Input
         }
 
         public ContextMenuMouseMode() : base(Handlers) { }
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Raise(new SetCursorEvent(CoreSpriteId.Cursor));
             base.Subscribed();

@@ -23,7 +23,7 @@ namespace UAlbion.Game
             _hook = NoteHook;
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             if (_player != null)
                 return;

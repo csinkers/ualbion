@@ -67,31 +67,45 @@ namespace UAlbion.Core
 
         // Usually set to a static per-type HandlerSet, but can also be per-instance is so desired.
         readonly IDictionary<Type, Handler> _handlers;
+        bool _isActive = true;
+        bool _isAttached;
         protected EventExchange Exchange { get; private set; } // N.B. will be null until subscribed.
         protected IList<IComponent> Children { get; } = new List<IComponent>(); // Primary purpose of children is ensuring that the children are also detached when the parent component is.
-
         protected Component() : this(null) { }
-        protected Component(IDictionary<Type, Handler> handlers)
-        {
-            _handlers = handlers ?? EmptyHandlerSet;
-        }
+        protected Component(IDictionary<Type, Handler> handlers) => _handlers = handlers ?? EmptyHandlerSet;
 
         protected T AttachChild<T>(T child) where T : IComponent
         {
-            Exchange?.Attach(child);
+            if (_isActive)
+                Exchange?.Attach(child);
             Children.Add(child);
             return child;
         }
 
+        public bool IsActive
+        {
+            get => _isActive;
+            set
+            {
+                if (value == _isActive)
+                    return;
+
+                _isActive = value;
+
+                if (value) Attach(Exchange);
+                else Detach();
+            }
+        }
+
         public void Attach(EventExchange exchange)
         {
-            if (Exchange == exchange)
+            if (_isAttached)
                 return;
 
-            if (Exchange != null)
-                throw new InvalidOperationException("A component can only be registered in one exchange at a time.");
-
             Exchange = exchange;
+
+            if (!_isActive)
+                return;
 
             foreach (var child in Children)
                 child.Attach(exchange);
@@ -99,6 +113,8 @@ namespace UAlbion.Core
             exchange.Subscribe(null, this); // Ensure we always get added to the subscriber list, even if this component only uses subscription notifications.
             foreach (var kvp in _handlers)
                 exchange.Subscribe(kvp.Key, this);
+            _isAttached = true;
+            Subscribed();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -122,11 +138,11 @@ namespace UAlbion.Core
                 child.Detach();
 
             Exchange.Unsubscribe(this);
-            Exchange = null;
+            _isAttached = false;
         }
 
-        public virtual void Subscribed() { }
-        public bool IsSubscribed => Exchange != null;
+        protected virtual void Subscribed() { }
+        public bool IsSubscribed => _isAttached;
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -22,19 +22,18 @@ namespace UAlbion.Game.Scenes
             AttachChild(new CameraMotion3D((PerspectiveCamera)Camera));
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Raise(new PushMouseModeEvent(MouseMode.MouseLook));
             Raise(new PushInputModeEvent(InputMode.World3D));
-            Raise(new RefreshMapSubscribersEvent()); // TODO: Is this still needed?
             base.Subscribed();
         }
 
-        protected override void Unsubscribed()
+        public override void Detach()
         {
             Raise(new PopMouseModeEvent());
             Raise(new PopInputModeEvent());
-            base.Unsubscribed();
+            base.Detach();
         }
     }
 }

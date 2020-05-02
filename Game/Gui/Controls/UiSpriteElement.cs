@@ -2,17 +2,12 @@
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 
 namespace UAlbion.Game.Gui.Controls
 {
     public class UiSpriteElement<T> : UiElement where T : struct, Enum
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<UiSpriteElement<T>, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; })
-        );
-
         T? _id;
         Vector2 _size;
         SpriteLease _sprite;
@@ -20,9 +15,13 @@ namespace UAlbion.Game.Gui.Controls
         Vector3 _lastPosition;
         Vector2 _lastSize;
 
-        public UiSpriteElement(T id) : base(Handlers)
+        public UiSpriteElement(T id) => Id = id;
+
+        public override void Detach()
         {
-            Id = id;
+            _sprite?.Dispose();
+            _sprite = null;
+            base.Detach();
         }
 
         public T Id

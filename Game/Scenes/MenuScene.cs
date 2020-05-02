@@ -17,18 +17,18 @@ namespace UAlbion.Game.Scenes
         public MenuScene() : base(SceneId.MainMenu, new OrthographicCamera())
         { }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Raise(new PushMouseModeEvent(MouseMode.Normal));
             Raise(new PushInputModeEvent(InputMode.MainMenu));
             base.Subscribed();
         }
 
-        protected override void Unsubscribed()
+        public override void Detach()
         {
             Raise(new PopMouseModeEvent());
             Raise(new PopInputModeEvent());
-            base.Unsubscribed();
+            base.Detach();
         }
     }
 }

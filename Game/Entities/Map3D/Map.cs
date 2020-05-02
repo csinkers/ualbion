@@ -50,7 +50,7 @@ namespace UAlbion.Game.Entities.Map3D
         public Vector3 TileSize { get; private set; }
         public float BaseCameraHeight => (_labyrinthData?.CameraHeight ?? 0) != 0 ? _labyrinthData.CameraHeight * 8 : TileSize.Y / 2;
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             if (_labyrinthData != null)
                 return;

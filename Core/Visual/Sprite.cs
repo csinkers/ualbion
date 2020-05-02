@@ -9,7 +9,6 @@ namespace UAlbion.Core.Visual
     {
         static readonly HandlerSet Handlers = new HandlerSet(
             H<Sprite<T>, RenderEvent>((x,e) => x.UpdateSprite()),
-            H<Sprite<T>, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; }),
             H<Sprite<T>, HoverEvent>((x, _) =>
             {
                 if ((x.Resolve<IEngineSettings>()?.Flags &EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
@@ -90,10 +89,17 @@ namespace UAlbion.Core.Visual
                 SpriteKeyFlags.NoTransform,
                 SpriteFlags.LeftAligned) { Size = size };
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Dirty = true;
             base.Subscribed();
+        }
+
+        public override void Detach()
+        {
+            _sprite?.Dispose();
+            _sprite = null;
+            base.Detach();
         }
 
         void UpdateSprite()

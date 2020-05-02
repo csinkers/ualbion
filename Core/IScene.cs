@@ -1,9 +1,7 @@
 ﻿namespace UAlbion.Core
 {
-    public interface IScene
+    public interface IScene : IContainer
     {
-        void Add(IRenderable renderable);
-        void Remove(IRenderable renderable);
         ICamera Camera { get; }
     }
 }

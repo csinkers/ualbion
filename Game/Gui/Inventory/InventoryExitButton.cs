@@ -28,7 +28,7 @@ namespace UAlbion.Game.Gui.Inventory
         );
         public InventoryExitButton(string buttonId) : base(Handlers) => _buttonId = buttonId;
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             if (_sprite == null)
                 _sprite = AttachChild(new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiExitButton));

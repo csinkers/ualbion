@@ -46,7 +46,7 @@ namespace UAlbion.Game.Veldrid.Input
             })
         );
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Raise(new SetCursorEvent(CoreSpriteId.CursorCrossUnselected));
             base.Subscribed();

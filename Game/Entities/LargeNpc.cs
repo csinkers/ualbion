@@ -32,7 +32,7 @@ namespace UAlbion.Game.Entities
             _sprite.Selected += (sender, e) => e.SelectEvent.RegisterHit(e.HitPosition, this);
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             _sprite.TilePosition = new Vector3(
                 _npc.Waypoints[0].X,

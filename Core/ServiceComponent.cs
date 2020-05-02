@@ -7,7 +7,7 @@ namespace UAlbion.Core
     {
         protected ServiceComponent(IDictionary<Type, Handler> handlers) : base(handlers) { }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Exchange.Register(typeof(T), this);
             base.Subscribed();

@@ -66,7 +66,7 @@ namespace UAlbion.Core
             FieldOfView = (float)(Math.PI * (legacyPitch ? 60 : 80) / 180);
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             _windowSize = Resolve<IWindowManager>().Size;
             UpdatePerspectiveMatrix();

@@ -16,28 +16,21 @@ namespace UAlbion.Game.Entities.Map3D
 {
     public class Map : Component, IMap
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<Map, WorldCoordinateSelectEvent>((x, e) => x.Select(e)),
-            H<Map, MapInitEvent>((x, e) => x.FireEventChains(TriggerType.MapInit, true)),
-            H<Map, SlowClockEvent>((x, e) => x.FireEventChains(TriggerType.EveryStep, false)),
-            H<Map, HourElapsedEvent>((x, e) => x.FireEventChains(TriggerType.EveryHour, false)),
-            H<Map, DayElapsedEvent>((x, e) => x.FireEventChains(TriggerType.EveryDay, false))
-            // H<Map3D, UnloadMapEvent>((x, e) => x.Unload()),
-        );
-
         readonly MapData3D _mapData;
         LabyrinthData _labyrinthData;
         float _backgroundRed;
         float _backgroundGreen;
         float _backgroundBlue;
 
-        void Select(WorldCoordinateSelectEvent worldCoordinateSelectEvent)
+        public Map(MapDataId mapId, MapData3D mapData)
         {
-            // TODO
-        }
+            On<WorldCoordinateSelectEvent>(Select);
+            On<MapInitEvent>(e => FireEventChains(TriggerType.MapInit, true));
+            On<SlowClockEvent>(e => FireEventChains(TriggerType.EveryStep, false));
+            On<HourElapsedEvent>(e => FireEventChains(TriggerType.EveryHour, false));
+            On<DayElapsedEvent>(e => FireEventChains(TriggerType.EveryDay, false));
+            // On<UnloadMapEvent>(e => Unload());
 
-        public Map(MapDataId mapId, MapData3D mapData) : base(Handlers)
-        {
             MapId = mapId;
             _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
         }
@@ -50,7 +43,7 @@ namespace UAlbion.Game.Entities.Map3D
         public Vector3 TileSize { get; private set; }
         public float BaseCameraHeight => (_labyrinthData?.CameraHeight ?? 0) != 0 ? _labyrinthData.CameraHeight * 8 : TileSize.Y / 2;
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             if (_labyrinthData != null)
                 return;
@@ -66,7 +59,7 @@ namespace UAlbion.Game.Entities.Map3D
 
             TileSize = new Vector3(_labyrinthData.EffectiveWallWidth, _labyrinthData.WallHeight, _labyrinthData.EffectiveWallWidth);
             AttachChild(new MapRenderable3D(MapId, _mapData, _labyrinthData, TileSize));
-            AttachChild(new ScriptManager(_mapData.Id));
+            AttachChild(new ScriptManager());
 
             if (_labyrinthData.BackgroundId.HasValue)
                 AttachChild(new Skybox(_labyrinthData.BackgroundId.Value));
@@ -125,6 +118,11 @@ namespace UAlbion.Game.Entities.Map3D
             }
 
             Raise(new SetClearColourEvent(_backgroundRed, _backgroundGreen, _backgroundBlue));
+        }
+
+        void Select(WorldCoordinateSelectEvent worldCoordinateSelectEvent)
+        {
+            // TODO
         }
 
         IEnumerable<MapEventZone> GetZonesOfType(TriggerType triggerType)

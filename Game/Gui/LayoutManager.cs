@@ -14,12 +14,11 @@ namespace UAlbion.Game.Gui
 
     public class LayoutManager : Component, ILayoutManager
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<LayoutManager, RenderEvent>((x, _) => x.Render()),
-            H<LayoutManager, ScreenCoordinateSelectEvent>((x, e) => x.Select(e))
-        );
-
-        public LayoutManager() : base(Handlers) { }
+        public LayoutManager()
+        {
+            On<RenderEvent>(e => Render());
+            On<ScreenCoordinateSelectEvent>(Select);
+        }
 
         void DoLayout(Func<Rectangle, int, IUiElement, int> action)
         {

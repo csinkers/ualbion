@@ -9,21 +9,15 @@ namespace UAlbion.Core.Events
 {
     public class EventExchange : IDisposable
     {
-        static IComponent _logger;
-        static int _nesting = -1;
-        static long _nextEventId;
-        static readonly object SyncRoot = new object();
-        static readonly ExchangeDisabledEvent DisabledEvent = new ExchangeDisabledEvent();
-        public static int Nesting => _nesting;
+        readonly IComponent _logger;
+        readonly object SyncRoot = new object();
+        int _nesting = -1;
+        long _nextEventId;
+        public int Nesting => _nesting;
 
+        readonly IDictionary<Type, object> _registrations = new Dictionary<Type, object>();
         readonly IDictionary<Type, IList<IComponent>> _subscriptions = new Dictionary<Type, IList<IComponent>>();
         readonly IDictionary<IComponent, IList<Type>> _subscribers = new Dictionary<IComponent, IList<Type>>();
-        readonly ISet<IComponent> _topLevelSubscribers = new HashSet<IComponent>();
-        readonly IDictionary<Type, object> _registrations = new Dictionary<Type, object>();
-        readonly ThreadLocal<bool> _isTopLevel = new ThreadLocal<bool>(() => true);
-        readonly EventExchange _parent;
-        readonly IList<EventExchange> _children = new List<EventExchange>();
-        readonly Stack<HashSet<EventExchange>> _collectLists = new Stack<HashSet<EventExchange>>();
         readonly Stack<HashSet<IComponent>> _dispatchLists = new Stack<HashSet<IComponent>>();
         readonly Queue<(IEvent, object)> _queuedEvents = new Queue<(IEvent, object)>();
 
@@ -45,73 +39,17 @@ namespace UAlbion.Core.Events
         }
 #endif
 
-        public string Name { get; }
-
-        bool _isActive = true;
-
-        public bool IsActive
-        {
-            get => _isActive;
-            set
-            {
-                if (_isActive == value)
-                    return;
-
-                if (value)
-                {
-                    _isActive = true;
-                    IList<IComponent> subscribers;
-                    lock (SyncRoot)
-                    {
-                        var exchanges = new HashSet<EventExchange>();
-                        CollectExchanges(exchanges, false);
-                        subscribers = exchanges.SelectMany(x => x._subscribers.Keys).ToList();
-                    }
-
-                    foreach (var subscriber in subscribers)
-                        if (subscriber.IsSubscribed) // Another components subscribe call may have detached some of the subscribers
-                            subscriber.Subscribed();
-                }
-                else
-                {
-                    Raise(DisabledEvent, this, false);
-                    _isActive = false;
-                }
-            }
-        }
-
-        public override string ToString() => $"EventExchange \"{Name}\" (IsActive={IsActive})";
         public void Dispose()
         {
             lock(SyncRoot)
                 foreach (var disposableSystem in _registrations.Values.OfType<IDisposable>())
                     disposableSystem.Dispose();
-
-            foreach(var child in _children)
-                child.Dispose();
-            _children.Clear();
         }
 
-        public IReadOnlyList<EventExchange> Children { get { lock (SyncRoot) return _children.ToList(); } }
-
-        public EventExchange(string name, EventExchange parent)
+        public EventExchange(IComponent logger)
         {
-            Name = name;
-            _parent = parent;
-            _parent?.AddChild(this);
-        }
-
-        public EventExchange(string name, IComponent logger)
-        {
-            Name = name;
             _logger = logger;
             Attach(_logger);
-        }
-
-        void AddChild(EventExchange eventExchange)
-        {
-            lock(SyncRoot)
-                _children.Add(eventExchange);
         }
 
         public bool Contains(IComponent component) { lock(SyncRoot) return _subscribers.ContainsKey(component); }
@@ -134,29 +72,8 @@ namespace UAlbion.Core.Events
             }
         }
 
-        void CollectExchanges(ISet<EventExchange> exchanges, bool includeParent = true)
-        {
-            if (!IsActive)
-                return;
-
-            if (!exchanges.Add(this))
-                return;
-
-            if(includeParent)
-                _parent?.CollectExchanges(exchanges);
-
-            // Hot path: don't use foreach so we avoid allocating an enumerator
-            for (int i = 0; i < _children.Count; i++)
-                _children[i].CollectExchanges(exchanges, includeParent);
-        }
-
         public void Raise(IEvent e, object sender, bool includeParent = true)
         {
-            // Event raising goes both up and down the hierarchy (i.e. all events will be delivered to all interested subscribers on all active exchanges)
-            // As such, the number of exchanges should be kept to a minimum. e.g. one global, one for the active scene etc
-            if (!IsActive)
-                return;
-
             bool verbose = e is IVerboseEvent;
             if (!verbose)
             {
@@ -177,44 +94,33 @@ namespace UAlbion.Core.Events
             if (CoreTrace.Log.IsEnabled())
             {
                 eventText = e.ToString();
-                if (verbose) CoreTrace.Log.StartRaiseVerbose(eventId, _nesting, e.GetType().Name, eventText, Name);
-                else CoreTrace.Log.StartRaise(eventId, _nesting, e.GetType().Name, eventText, Name);
+                if (verbose) CoreTrace.Log.StartRaiseVerbose(eventId, _nesting, e.GetType().Name, eventText);
+                else CoreTrace.Log.StartRaise(eventId, _nesting, e.GetType().Name, eventText);
             }
 
-            HashSet<EventExchange> exchanges;
             HashSet<IComponent> subscribers;
             lock (SyncRoot)
             {
-                if (!_collectLists.TryPop(out exchanges))
-                    exchanges = new HashSet<EventExchange>();
-
                 if (!_dispatchLists.TryPop(out subscribers))
                     subscribers = new HashSet<IComponent>();
-
-                CollectExchanges(exchanges, includeParent);
             }
 
-            foreach (var exchange in exchanges)
-            {
 #if DEBUG
-                if (e is BeginFrameEvent) exchange._frameEvents.Clear();
+            if (e is BeginFrameEvent) _frameEvents.Clear();
 #endif
-                exchange.Collect(subscribers, type, interfaces);
-            }
+            Collect(subscribers, type, interfaces);
 
             foreach (var subscriber in subscribers)
                 subscriber.Receive(e, sender);
 
             if (eventText != null)
             {
-                if (verbose) CoreTrace.Log.StopRaiseVerbose(eventId, _nesting, e.GetType().Name, eventText, Name, subscribers.Count);
-                else CoreTrace.Log.StopRaise(eventId, _nesting, e.GetType().Name, eventText, Name, subscribers.Count);
+                if (verbose) CoreTrace.Log.StopRaiseVerbose(eventId, _nesting, e.GetType().Name, eventText, subscribers.Count);
+                else CoreTrace.Log.StopRaise(eventId, _nesting, e.GetType().Name, eventText, subscribers.Count);
             }
 
             subscribers.Clear();
-            exchanges.Clear();
             _dispatchLists.Push(subscribers);
-            _collectLists.Push(exchanges);
 
             if (!verbose)
                 Interlocked.Decrement(ref _nesting);
@@ -229,9 +135,6 @@ namespace UAlbion.Core.Events
                 var (e, sender) = _queuedEvents.Dequeue();
                 Raise(e, sender);
             }
-
-            foreach(var child in Children)
-                child.FlushQueuedEvents();
         }
 
         public EventExchange Attach(IComponent component)
@@ -245,7 +148,6 @@ namespace UAlbion.Core.Events
         public void Subscribe<T>(IComponent subscriber) { Subscribe(typeof(T), subscriber); }
         public void Subscribe(Type eventType, IComponent subscriber)
         {
-            bool newSubscriber = false;
             lock (SyncRoot)
             {
                 if (_subscribers.TryGetValue(subscriber, out var subscribedTypes))
@@ -256,7 +158,6 @@ namespace UAlbion.Core.Events
                 else
                 {
                     _subscribers[subscriber] = new List<Type>();
-                    newSubscriber = true;
                 }
 
                 if (eventType != null)
@@ -268,26 +169,12 @@ namespace UAlbion.Core.Events
                     _subscribers[subscriber].Add(eventType);
                 }
             }
-
-            if (newSubscriber)
-            {
-                var wasTopLevel = _isTopLevel.Value;
-                if (wasTopLevel)
-                    lock(SyncRoot)
-                        _topLevelSubscribers.Add(subscriber);
-
-                _isTopLevel.Value = false;
-                subscriber.Subscribed();
-                _isTopLevel.Value = wasTopLevel;
-            }
         }
 
         public void Unsubscribe(IComponent subscriber)
         {
             lock (SyncRoot)
             {
-                subscriber.Receive(DisabledEvent, this);
-
                 if (!_subscribers.TryGetValue(subscriber, out var subscribedEventTypes))
                     return;
 
@@ -345,46 +232,17 @@ namespace UAlbion.Core.Events
 
         public T Resolve<T>()
         {
-            // System resolution only goes up
-            var exchange = this;
-            while (exchange != null)
-            {
-                if (exchange._registrations.TryGetValue(typeof(T), out var result))
-                    return (T)result;
-
-                exchange = exchange._parent;
-            }
-
-            return default;
-        }
-
-        public void PruneInactiveChildren()
-        {
             lock (SyncRoot)
-            {
-                for (int i = 0; i < _children.Count;)
-                {
-                    if (!_children[i].IsActive)
-                        _children.RemoveAt(i);
-                    else i++;
-                }
-            }
+                return _registrations.TryGetValue(typeof(T), out var result) ? (T)result : default;
         }
 
         public IEnumerable EnumerateRecipients(Type eventType)
         {
             lock (SyncRoot)
             {
-                var exchanges = new HashSet<EventExchange>();
                 var subscribers = new HashSet<IComponent>();
                 var interfaces = eventType.GetInterfaces();
-
-                CollectExchanges(exchanges);
-                foreach (var exchange in exchanges)
-                {
-                    exchange.Collect(subscribers, eventType, interfaces);
-                }
-
+                Collect(subscribers, eventType, interfaces);
                 return subscribers.ToList();
             }
         }

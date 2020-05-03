@@ -17,13 +17,18 @@ namespace UAlbion.Game.Gui.Menus
         readonly bool _showEmptySlots;
         readonly StringId _stringId;
         const int MaxSaveNumber = 10; // TODO: Add scroll bar and bump up to 99
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<PickSaveSlotMenu, RightClickEvent>((x, e) =>
+
+        public PickSaveSlotMenu(bool showEmptySlots, StringId stringId, int depth) : base(DialogPositioning.Center, depth)
+        {
+            On<RightClickEvent>(e =>
             {
-                x.Detach();
-                x.Closed?.Invoke(x, null);
-            })
-        );
+                Detach();
+                Closed?.Invoke(this, null);
+            });
+
+            _showEmptySlots = showEmptySlots;
+            _stringId = stringId;
+        }
 
         public event EventHandler<string> Closed;
 
@@ -40,7 +45,7 @@ namespace UAlbion.Game.Gui.Menus
             return Path.Combine(saveDir, $"SAVE.{i:D3}");
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             DynamicText BuildEmptySlotText(int x) =>
                 new DynamicText(() =>
@@ -82,13 +87,6 @@ namespace UAlbion.Game.Gui.Menus
 
             var stack = new VerticalStack(elements);
             AttachChild(new DialogFrame(new Padding(stack, 4, 5, 6, 5)));
-            base.Subscribed();
-        }
-
-        public PickSaveSlotMenu(bool showEmptySlots, StringId stringId, int depth) : base(Handlers, DialogPositioning.Center, depth)
-        {
-            _showEmptySlots = showEmptySlots;
-            _stringId = stringId;
         }
     }
 }

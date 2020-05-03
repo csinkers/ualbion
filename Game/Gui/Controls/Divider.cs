@@ -1,7 +1,6 @@
 ﻿using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 
@@ -14,13 +13,14 @@ namespace UAlbion.Game.Gui.Controls
         Vector3 _lastPosition;
         Vector2 _lastSize;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<Divider, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; }));
+        public Divider(CommonColor color) => _color = color;
 
-        public Divider(CommonColor color) : base(Handlers)
+        protected override void Unsubscribed()
         {
-            _color = color;
+            _sprite?.Dispose();
+            _sprite = null;
         }
+
         public override Vector2 GetSize() => new Vector2(0, 1);
 
         void UpdateSprite(Vector3 position, Vector2 size, DrawLayer layer)

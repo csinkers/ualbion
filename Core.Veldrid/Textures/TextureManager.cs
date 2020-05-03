@@ -15,13 +15,15 @@ namespace UAlbion.Core.Veldrid.Textures
         const float CacheCheckIntervalSeconds = 5.0f;
 
         readonly object _syncRoot = new object();
+        readonly IDictionary<ITexture, CacheEntry> _cache = new Dictionary<ITexture, CacheEntry>();
         float _lastCleanup;
         float _totalTime;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<TextureManager, EngineUpdateEvent>((x,e) => x.OnUpdate(e)),
-            H<TextureManager, TextureStatsEvent>((x, e) => x.Raise(new LogEvent(LogEvent.Level.Info, x.Stats())))
-        );
+        public TextureManager()
+        {
+            On<EngineUpdateEvent>(OnUpdate);
+            On<TextureStatsEvent>(e => Raise(new LogEvent(LogEvent.Level.Info, Stats())));
+        }
 
         public string Stats()
         {
@@ -64,10 +66,6 @@ namespace UAlbion.Core.Veldrid.Textures
                 TextureView?.Dispose();
             }
         }
-
-        readonly IDictionary<ITexture, CacheEntry> _cache = new Dictionary<ITexture, CacheEntry>();
-
-        public TextureManager() : base(Handlers) { }
 
         void OnUpdate(EngineUpdateEvent e)
         {

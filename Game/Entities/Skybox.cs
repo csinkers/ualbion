@@ -10,20 +10,22 @@ namespace UAlbion.Game.Entities
         readonly DungeonBackgroundId _id;
         SkyboxRenderable _renderable;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<Skybox, RenderEvent>((x, e) =>
-                {
-                    if (x._renderable != null) e.Add(x._renderable);
-                })
-            );
+        public Skybox(DungeonBackgroundId id)
+        {
+            On<RenderEvent>(e =>
+            {
+                if (_renderable != null)
+                    e.Add(_renderable);
+            });
 
-        public Skybox(DungeonBackgroundId id) : base(Handlers) => _id = id;
-        public override void Subscribed()
+            _id = id;
+        }
+
+        protected override void Subscribed()
         {
             var assets = Resolve<IAssetManager>();
             var texture = assets.LoadTexture(_id);
             _renderable = new SkyboxRenderable(texture);
-            base.Subscribed();
         }
     }
 }

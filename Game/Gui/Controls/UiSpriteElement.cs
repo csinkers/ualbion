@@ -2,27 +2,28 @@
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 
 namespace UAlbion.Game.Gui.Controls
 {
     public class UiSpriteElement<T> : UiElement where T : struct, Enum
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<UiSpriteElement<T>, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; })
-        );
-
         T? _id;
         Vector2 _size;
         SpriteLease _sprite;
-        bool _dirty = true;
         Vector3 _lastPosition;
         Vector2 _lastSize;
+        int _subId;
+        bool _highlighted;
+        bool _dirty = true;
+        bool _visible = true;
 
-        public UiSpriteElement(T id) : base(Handlers)
+        public UiSpriteElement(T id) => Id = id;
+
+        protected override void Unsubscribed()
         {
-            Id = id;
+            _sprite?.Dispose();
+            _sprite = null;
         }
 
         public T Id
@@ -39,10 +40,6 @@ namespace UAlbion.Game.Gui.Controls
             }
         }
 
-        int _subId;
-        bool _highlighted;
-        bool _visible = true;
-
         public int SubId { get => _subId; set { if (_subId == value) return; _subId = value; _dirty = true; } }
         public bool Highlighted { get => _highlighted; set { if (_highlighted == value) return; _highlighted = value; _dirty = true; } }
 
@@ -57,32 +54,6 @@ namespace UAlbion.Game.Gui.Controls
                     _sprite?.Dispose();
                     _sprite = null;
                 }
-            }
-        }
-
-        void UpdateSprite(DrawLayer order)
-        {
-            if (Exchange == null || !_dirty)
-                return;
-
-            var assets = Resolve<IAssetManager>();
-            var sm = Resolve<ISpriteManager>();
-
-            _sprite?.Dispose();
-            _sprite = null;
-
-            if (_id == null)
-            {
-                _size = Vector2.One;
-            }
-            else
-            {
-                var texture = assets.LoadTexture(_id.Value);
-                if (texture == null)
-                    return;
-                var key = new SpriteKey(texture, order, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
-                _sprite = sm.Borrow(key, 1, this);
-                _size = texture.GetSubImageDetails(0).Size;
             }
         }
 
@@ -122,6 +93,32 @@ namespace UAlbion.Game.Gui.Controls
             _dirty = false;
 
             return order;
+        }
+
+        void UpdateSprite(DrawLayer order)
+        {
+            if (Exchange == null || !_dirty)
+                return;
+
+            var assets = Resolve<IAssetManager>();
+            var sm = Resolve<ISpriteManager>();
+
+            _sprite?.Dispose();
+            _sprite = null;
+
+            if (_id == null)
+            {
+                _size = Vector2.One;
+            }
+            else
+            {
+                var texture = assets.LoadTexture(_id.Value);
+                if (texture == null)
+                    return;
+                var key = new SpriteKey(texture, order, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
+                _sprite = sm.Borrow(key, 1, this);
+                _size = texture.GetSubImageDetails(0).Size;
+            }
         }
     }
 }

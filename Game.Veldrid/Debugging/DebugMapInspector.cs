@@ -11,6 +11,7 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Game.Debugging;
 using UAlbion.Game.Events;
+using UAlbion.Game.Input;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 using UAlbion.Game.Veldrid.Audio;
@@ -22,15 +23,6 @@ namespace UAlbion.Game.Veldrid.Debugging
 
     public class DebugMapInspector : Component
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<DebugMapInspector, EngineUpdateEvent>((x, _) => x.RenderDialog()),
-            H<DebugMapInspector, HideDebugWindowEvent>((x, _) => x._hits = null),
-            H<DebugMapInspector, ShowDebugInfoEvent>((x, e) =>
-            {
-                x._hits = e.Selections;
-                x._mousePosition = e.MousePosition;
-            }));
-
         readonly IDictionary<Type, Func<DebugInspectorAction, Reflector.ReflectedObject, object>> _behaviours =
             new Dictionary<Type, Func<DebugInspectorAction, Reflector.ReflectedObject, object>>();
 
@@ -38,6 +30,24 @@ namespace UAlbion.Game.Veldrid.Debugging
         IList<Selection> _hits;
         Vector2 _mousePosition;
         Reflector.ReflectedObject _lastHoveredItem;
+
+        public DebugMapInspector()
+        {
+            On<EngineUpdateEvent>(e => RenderDialog());
+            On<HideDebugWindowEvent>(e => _hits = null);
+            On<ShowDebugInfoEvent>(e =>
+            {
+                _hits = e.Selections;
+                _mousePosition = e.MousePosition;
+            });
+        }
+
+        public DebugMapInspector AddBehaviour(IDebugBehaviour behaviour)
+        {
+            foreach(var type in behaviour.HandledTypes)
+                _behaviours[type] = behaviour.Handle;
+            return this;
+        }
 
         void RenderDialog()
         {
@@ -96,24 +106,32 @@ namespace UAlbion.Game.Veldrid.Debugging
                 if (ImGui.Button("Clear"))
                     PerfTracker.Clear();
 
-                ImGui.BeginGroup();
-                ImGui.Text(Resolve<IEngine>().FrameTimeText);
-
-                var (descriptions, stats) = PerfTracker.GetFrameStats();
-                ImGui.Columns(2);
-                ImGui.SetColumnWidth(0, 300);
-                foreach (var description in descriptions)
-                    ImGui.Text(description);
-
-                ImGui.NextColumn();
-                foreach (var stat in stats)
-                    ImGui.Text(stat);
-
-                ImGui.Columns(1);
-                ImGui.EndGroup();
-                if (ImGui.TreeNode("Textures"))
+                if (ImGui.TreeNode("Perf"))
                 {
-                    ImGui.Text(Resolve<ITextureManager>()?.Stats());
+                    ImGui.BeginGroup();
+                    ImGui.Text(Resolve<IEngine>().FrameTimeText);
+
+                    var (descriptions, stats) = PerfTracker.GetFrameStats();
+                    ImGui.Columns(2);
+                    ImGui.SetColumnWidth(0, 300);
+                    foreach (var description in descriptions)
+                        ImGui.Text(description);
+
+                    ImGui.NextColumn();
+                    foreach (var stat in stats)
+                        ImGui.Text(stat);
+
+                    ImGui.Columns(1);
+                    ImGui.EndGroup();
+                    ImGui.TreePop();
+                }
+
+                if (ImGui.TreeNode("Audio"))
+                {
+                    var audio = Resolve<IAudioManager>();
+                    foreach (var sound in audio.ActiveSounds)
+                        ImGui.Text(sound);
+
                     ImGui.TreePop();
                 }
 
@@ -123,12 +141,33 @@ namespace UAlbion.Game.Veldrid.Debugging
                     ImGui.TreePop();
                 }
 
-                if (ImGui.TreeNode("Audio"))
+                if (ImGui.TreeNode("Input"))
                 {
-                    var audio = Resolve<IAudioManager>();
-                    foreach(var sound in audio.ActiveSounds)
-                        ImGui.Text(sound);
+                    var im = Resolve<IInputManager>();
+                    ImGui.Text($"Input Mode: {im.InputMode}");
+                    ImGui.Text($"Mouse Mode: {im.MouseMode}");
+                    ImGui.Text($"Input Mode Stack: {string.Join(", ", im.InputModeStack)}");
+                    ImGui.Text($"Mouse Mode Stack: {string.Join(", ", im.MouseModeStack)}");
 
+                    if (ImGui.TreeNode("Bindings"))
+                    {
+                        var ib = Resolve<IInputBinder>();
+                        foreach (var mode in ib.Bindings)
+                        {
+                            ImGui.Text(mode.Item1.ToString());
+                            foreach(var binding in mode.Item2)
+                                ImGui.Text($"    {binding.Item1}: {binding.Item2}");
+                        }
+
+                        ImGui.TreePop();
+                    }
+
+                    ImGui.TreePop();
+                }
+
+                if (ImGui.TreeNode("Textures"))
+                {
+                    ImGui.Text(Resolve<ITextureManager>()?.Stats());
                     ImGui.TreePop();
                 }
 
@@ -303,15 +342,6 @@ namespace UAlbion.Game.Veldrid.Debugging
             }
 
             return anyHovered;
-        }
-
-        public DebugMapInspector() : base(Handlers) { }
-
-        public DebugMapInspector AddBehaviour(IDebugBehaviour behaviour)
-        {
-            foreach(var type in behaviour.HandledTypes)
-                _behaviours[type] = behaviour.Handle;
-            return this;
         }
     }
 }

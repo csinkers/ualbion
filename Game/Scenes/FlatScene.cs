@@ -1,5 +1,4 @@
-﻿using UAlbion.Api;
-using UAlbion.Core;
+﻿using UAlbion.Core;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
@@ -17,24 +16,10 @@ namespace UAlbion.Game.Scenes
             typeof(SpriteRenderer),
         };*/
 
-        public FlatScene() : base(SceneId.World2D, new OrthographicCamera())
-        {
-            AttachChild(new CameraMotion2D((OrthographicCamera)Camera));
-        }
+        public FlatScene() : base(SceneId.World2D, new OrthographicCamera()) 
+            => AttachChild(new CameraMotion2D((OrthographicCamera)Camera));
 
-        public override void Subscribed()
-        {
-            Raise(new PushInputModeEvent(InputMode.World2D));
-            Raise(new RefreshMapSubscribersEvent()); // TODO: Is this still needed?
-            base.Subscribed();
-        }
-
-        protected override void Unsubscribed()
-        {
-            Raise(new PopInputModeEvent());
-            base.Unsubscribed();
-        }
+        protected override void Subscribed() => Raise(new PushInputModeEvent(InputMode.World2D));
+        protected override void Unsubscribed() => Raise(new PopInputModeEvent());
     }
-
-    public class RefreshMapSubscribersEvent : IEvent { }
 }

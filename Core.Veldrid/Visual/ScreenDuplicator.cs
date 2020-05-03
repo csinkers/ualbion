@@ -11,8 +11,6 @@ namespace UAlbion.Core.Veldrid.Visual
     {
         const string VertexShaderName = "ScreenDuplicatorSV.vert";
         const string FragmentShaderName = "ScreenDuplicatorSF.frag";
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<ScreenDuplicator, RenderEvent>((x, e) => e.Add(x)));
 
         static readonly ushort[] QuadIndices = { 0, 1, 2, 0, 2, 3 };
         DisposeCollector _disposeCollector;
@@ -21,7 +19,11 @@ namespace UAlbion.Core.Veldrid.Visual
         DeviceBuffer _vb;
         Shader[] _shaders;
 
-        public ScreenDuplicator() : base(Handlers) { }
+        public ScreenDuplicator() 
+        {
+            On<RenderEvent>(e => e.Add(this));
+        }
+
         public string Name => "ScreenDuplicator";
         public bool CanRender(Type renderable) => renderable == typeof(ScreenDuplicator);
         public RenderPasses RenderPasses => RenderPasses.Duplicator;

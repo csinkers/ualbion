@@ -6,11 +6,10 @@ namespace UAlbion.Core
 {
     public class WindowManager : Component, IWindowManager
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<WindowManager, WindowResizedEvent>((x, _) => x.Recalculate())
-        );
-
-        public WindowManager() : base(Handlers) { }
+        public WindowManager()
+        {
+            On<WindowResizedEvent>(_ => Recalculate());
+        }
 
         public IWindow Window
         {

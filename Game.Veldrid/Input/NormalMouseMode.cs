@@ -10,14 +10,14 @@ namespace UAlbion.Game.Veldrid.Input
 {
     public class NormalMouseMode : Component
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<NormalMouseMode, InputEvent>((x, e) => x.OnInput(e))
-        );
+        public NormalMouseMode()
+        {
+            On<InputEvent>(OnInput);
+        }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Raise(new SetCursorEvent(CoreSpriteId.Cursor));
-            base.Subscribed();
         }
 
         void OnInput(InputEvent e)
@@ -45,7 +45,5 @@ namespace UAlbion.Game.Veldrid.Input
             if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && !x.Down))
                 Raise(new UiLeftReleaseEvent());
         }
-
-        public NormalMouseMode() : base(Handlers) { }
     }
 }

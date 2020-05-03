@@ -21,27 +21,25 @@ namespace UAlbion.Game.State
         readonly IReadOnlyList<Player.Player> _readOnlyStatusBarOrder;
         readonly IReadOnlyList<Player.Player> _readOnlyWalkOrder;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<Party, AddPartyMemberEvent>((x,e) => e.Context.LastEventResult = x.AddMember(e.PartyMemberId)),
-            H<Party, RemovePartyMemberEvent>((x,e) => e.Context.LastEventResult = x.RemoveMember(e.PartyMemberId)),
-            H<Party, SetPartyLeaderEvent>((x, e) => { x.Leader = e.PartyMemberId; x.Raise(e); }),
-            H<Party, ChangePartyGoldEvent>((x, e) => e.Context.LastEventResult = x.ChangePartyGold(e.Operation, e.Amount, e.Context)),
-            H<Party, ChangePartyRationsEvent>((x, e) => e.Context.LastEventResult = x.ChangePartyRations(e.Operation, e.Amount, e.Context)),
-            H<Party, AddRemoveInventoryItemEvent>((x, e) => e.Context.LastEventResult = x.ChangePartyInventory(e.ItemId, e.Operation, e.Amount, e.Context)),
-            H<Party, SimpleChestEvent>((x, e) =>
+        public Party(IDictionary<PartyCharacterId, CharacterSheet> characterSheets, PartyCharacterId?[] statusBarOrder)
+        {
+            On<AddPartyMemberEvent>(e => e.Context.LastEventResult = AddMember(e.PartyMemberId));
+            On<RemovePartyMemberEvent>(e => e.Context.LastEventResult = RemoveMember(e.PartyMemberId));
+            On<SetPartyLeaderEvent>(e => { Leader = e.PartyMemberId; Raise(e); });
+            On<ChangePartyGoldEvent>(e => e.Context.LastEventResult = ChangePartyGold(e.Operation, e.Amount, e.Context));
+            On<ChangePartyRationsEvent>(e => e.Context.LastEventResult = ChangePartyRations(e.Operation, e.Amount, e.Context));
+            On<AddRemoveInventoryItemEvent>(e => e.Context.LastEventResult = ChangePartyInventory(e.ItemId, e.Operation, e.Amount, e.Context));
+            On<SimpleChestEvent>(e =>
             {
                 e.Context.LastEventResult = e.ChestType switch
                 {
-                    SimpleChestEvent.SimpleChestItemType.Item => x.ChangePartyInventory(e.ItemId, QuantityChangeOperation.AddAmount, e.Amount, e.Context),
-                    SimpleChestEvent.SimpleChestItemType.Gold => x.ChangePartyGold(QuantityChangeOperation.AddAmount, e.Amount, e.Context),
-                    SimpleChestEvent.SimpleChestItemType.Rations => x.ChangePartyRations(QuantityChangeOperation.AddAmount, e.Amount, e.Context),
+                    SimpleChestEvent.SimpleChestItemType.Item => ChangePartyInventory(e.ItemId, QuantityChangeOperation.AddAmount, e.Amount, e.Context),
+                    SimpleChestEvent.SimpleChestItemType.Gold => ChangePartyGold(QuantityChangeOperation.AddAmount, e.Amount, e.Context),
+                    SimpleChestEvent.SimpleChestItemType.Rations => ChangePartyRations(QuantityChangeOperation.AddAmount, e.Amount, e.Context),
                     _ => false
                 };
-            })
-        );
+            });
 
-        public Party(IDictionary<PartyCharacterId, CharacterSheet> characterSheets, PartyCharacterId?[] statusBarOrder) : base(Handlers)
-        {
             _characterSheets = characterSheets;
             _readOnlyStatusBarOrder = new ReadOnlyCollection<Player.Player>(_statusBarOrder);
             _readOnlyWalkOrder = new ReadOnlyCollection<Player.Player>(_walkOrder);

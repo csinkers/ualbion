@@ -8,16 +8,14 @@ namespace UAlbion.Game.Gui.Dialogs
 {
     public class ConversationTextWindow : Dialog
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<ConversationTextWindow, UiLeftClickEvent>((x, e) => x.Clicked?.Invoke())
-        );
-
         readonly TextSourceWrapper _text = new TextSourceWrapper();
 
         public event Action Clicked;
 
-        public ConversationTextWindow() : base(Handlers, DialogPositioning.Bottom)
+        public ConversationTextWindow() : base(DialogPositioning.Bottom)
         {
+            On<UiLeftClickEvent>(e => Clicked?.Invoke());
+
             var content = new FixedSize(248, 159,
                 new Padding(
                     new TextElement(_text) { BlockFilter = 0 },

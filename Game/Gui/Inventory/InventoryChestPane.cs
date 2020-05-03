@@ -16,12 +16,10 @@ namespace UAlbion.Game.Gui.Inventory
         readonly ChestId _id;
         int _version;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<InventoryChestPane, InventoryChangedEvent>((x, e) => x._version++)
-        );
-
-        public InventoryChestPane(ChestId id) : base(Handlers)
+        public InventoryChestPane(ChestId id)
         {
+            On<InventoryChangedEvent>(e => _version++);
+
             _id = id;
 
             var background = new FixedPositionStack();

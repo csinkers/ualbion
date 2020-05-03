@@ -9,9 +9,15 @@ namespace UAlbion.Game.Veldrid.Input
 {
     public class ContextMenuMouseMode : Component
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<ContextMenuMouseMode, InputEvent>((x,e) => x.OnInput(e))
-        );
+        public ContextMenuMouseMode()
+        {
+            On<InputEvent>(OnInput);
+        }
+
+        protected override void Subscribed()
+        {
+            Raise(new SetCursorEvent(CoreSpriteId.Cursor));
+        }
 
         void OnInput(InputEvent e)
         {
@@ -29,13 +35,6 @@ namespace UAlbion.Game.Veldrid.Input
 
             if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && x.Down))
                 Raise(new CloseWindowEvent());
-        }
-
-        public ContextMenuMouseMode() : base(Handlers) { }
-        public override void Subscribed()
-        {
-            Raise(new SetCursorEvent(CoreSpriteId.Cursor));
-            base.Subscribed();
         }
     }
 }

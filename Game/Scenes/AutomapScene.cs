@@ -21,18 +21,16 @@ namespace UAlbion.Game.Scenes
             AttachChild(new CameraMotion2D((OrthographicCamera)Camera));
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Raise(new PushMouseModeEvent(MouseMode.Normal));
             Raise(new PushInputModeEvent(InputMode.Automap));
-            base.Subscribed();
         }
 
         protected override void Unsubscribed()
         {
             Raise(new PopMouseModeEvent());
             Raise(new PopInputModeEvent());
-            base.Unsubscribed();
         }
     }
 }

@@ -29,25 +29,24 @@ namespace UAlbion.Game.Veldrid.Input
         bool _showCursor = true;
         int _frame;
 
-        public CursorManager() : base(Handlers) { }
-
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<CursorManager, InputEvent>((x, e) =>
+        public CursorManager()
+        {
+            On<InputEvent>(e =>
             {
-                x.Position = e.Snapshot.MousePosition;
-                x._dirty = true;
-            }),
-            H<CursorManager, SetCursorPositionEvent>((x, e) =>
+                Position = e.Snapshot.MousePosition;
+                _dirty = true;
+            });
+            On<SetCursorPositionEvent>(e =>
             {
-                x.Position = new Vector2(e.X, e.Y);
-                x._dirty = true;
-            }),
-            H<CursorManager, RenderEvent>((x, e) => x.Render()),
-            H<CursorManager, SlowClockEvent>((x, e) => x._frame += e.Delta),
-            H<CursorManager, SetCursorEvent>((x, e) => x.SetCursor(e.CursorId)),
-            H<CursorManager, ShowCursorEvent>((x, e) => { x._showCursor = e.Show; x._dirty = true; }),
-            H<CursorManager, WindowResizedEvent>((x, e) => x.SetCursor(x._cursorId))
-        );
+                Position = new Vector2(e.X, e.Y);
+                _dirty = true;
+            });
+            On<RenderEvent>(e => Render());
+            On<SlowClockEvent>(e => _frame += e.Delta);
+            On<SetCursorEvent>(e => SetCursor(e.CursorId));
+            On<ShowCursorEvent>(e => { _showCursor = e.Show; _dirty = true; });
+            On<WindowResizedEvent>(e => SetCursor(_cursorId));
+        }
 
         void SetCursor(CoreSpriteId cursorId)
         {

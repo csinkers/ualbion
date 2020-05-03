@@ -1,4 +1,5 @@
-﻿using UAlbion.Formats.Config;
+﻿using System.Collections.Generic;
+using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.Input
 {
@@ -6,5 +7,8 @@ namespace UAlbion.Game.Input
     {
         InputMode InputMode { get; }
         MouseMode MouseMode { get; }
+
+        IEnumerable<InputMode> InputModeStack { get; }
+        IEnumerable<MouseMode> MouseModeStack { get; }
     }
 }

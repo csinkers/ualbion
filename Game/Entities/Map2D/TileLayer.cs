@@ -21,17 +21,10 @@ namespace UAlbion.Game.Entities.Map2D
             new SubImage(Vector2.Zero, Vector2.Zero, Vector2.Zero, 0),
             0);
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<TileLayer, RenderEvent>((x, e) => x.Render()),
-            H<TileLayer, ExchangeDisabledEvent>((x, _) =>
-            {
-                x._lease?.Dispose();
-                x._lease = null;
-            })
-        );
-
-        public TileLayer(LogicalMap logicalMap, ITexture tileset, Func<int, TileData> tileFunc, DrawLayer drawLayer, IconChangeType iconChangeType) : base(Handlers)
+        public TileLayer(LogicalMap logicalMap, ITexture tileset, Func<int, TileData> tileFunc, DrawLayer drawLayer, IconChangeType iconChangeType)
         {
+            On<RenderEvent>(e => Render());
+
             _logicalMap = logicalMap;
             _logicalMap.Dirty += (sender, args) =>
             {
@@ -55,7 +48,6 @@ namespace UAlbion.Game.Entities.Map2D
         SpriteLease _lease;
         (int, int)[] _animatedTiles;
         int _lastFrameCount;
-        bool _isActive = true;
         bool _allDirty = true;
 
         public int? HighlightIndex { get; set; }
@@ -67,21 +59,10 @@ namespace UAlbion.Game.Entities.Map2D
             return sm.MakeWeakReference(_lease, _logicalMap.Index(x, y));
         }
 
-        public bool IsActive
+        protected override void Unsubscribed()
         {
-            get => _isActive;
-            set
-            {
-                if (_isActive == value)
-                    return;
-
-                _isActive = value;
-                if (!value)
-                {
-                    _lease?.Dispose();
-                    _lease = null;
-                }
-            }
+            _lease?.Dispose();
+            _lease = null;
         }
 
         SpriteInstanceData BuildInstanceData(int i, int j, TileData tile, int tickCount)
@@ -135,7 +116,7 @@ namespace UAlbion.Game.Entities.Map2D
 #endif
 
             var sm = Resolve<ISpriteManager>();
-            if (_isActive && _lease == null)
+            if (_lease == null)
             {
                 var key = new SpriteKey(_tileset, _drawLayer, 0);
                 _lease = sm.Borrow(key, _logicalMap.Width * _logicalMap.Height, this);

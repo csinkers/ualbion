@@ -6,40 +6,6 @@ namespace UAlbion.Core
 {
     public class OrthographicCamera : ServiceComponent<ICamera>, ICamera
     {
-        static readonly HandlerSet Handlers = new HandlerSet
-        (
-            H<OrthographicCamera, ScreenCoordinateSelectEvent>((x, e) => x.TransformSelect(e)),
-            H<OrthographicCamera, SetCameraMagnificationEvent>((x, e) =>
-            {
-                x._magnification = e.Magnification;
-                x.UpdatePerspectiveMatrix();
-            }),
-
-            H<OrthographicCamera, MagnifyEvent>((x, e) =>
-            {
-                if (x._magnification < 1.0f && e.Delta > 0)
-                    x._magnification = 0.0f;
-
-                x._magnification += e.Delta;
-
-                if (x._magnification < 0.5f)
-                    x._magnification = 0.5f;
-                x.UpdatePerspectiveMatrix();
-                x.Raise(new SetCameraMagnificationEvent(x._magnification));
-            }),
-
-            H<OrthographicCamera, RenderEvent>((x, e) =>
-            {
-                var window = x.Resolve<IWindowManager>();
-                var size = new Vector2(window.PixelWidth, window.PixelHeight);
-                if (x._windowSize != size)
-                {
-                    x._windowSize = size;
-                    x.UpdatePerspectiveMatrix();
-                }
-            })
-        );
-
         void TransformSelect(ScreenCoordinateSelectEvent e)
         {
             var normalisedScreenPosition = new Vector3(2 * e.Position.X / _windowSize.X - 1.0f, -2 * e.Position.Y / _windowSize.Y + 1.0f, 0.0f);
@@ -65,8 +31,38 @@ namespace UAlbion.Core
 
         public float AspectRatio => _windowSize.X / _windowSize.Y;
 
-        public OrthographicCamera() : base(Handlers)
+        public OrthographicCamera()
         {
+            On<ScreenCoordinateSelectEvent>(TransformSelect);
+            On<SetCameraMagnificationEvent>(e =>
+            {
+                _magnification = e.Magnification;
+                UpdatePerspectiveMatrix();
+            });
+
+            On<MagnifyEvent>(e =>
+            {
+                if (_magnification < 1.0f && e.Delta > 0)
+                    _magnification = 0.0f;
+
+                _magnification += e.Delta;
+
+                if (_magnification < 0.5f)
+                    _magnification = 0.5f;
+                UpdatePerspectiveMatrix();
+                Raise(new SetCameraMagnificationEvent(_magnification));
+            });
+
+            On<RenderEvent>(e =>
+            {
+                var window = Resolve<IWindowManager>();
+                var size = new Vector2(window.PixelWidth, window.PixelHeight);
+                if (_windowSize != size)
+                {
+                    _windowSize = size;
+                    UpdatePerspectiveMatrix();
+                }
+            });
             UpdatePerspectiveMatrix();
             UpdateViewMatrix();
         }

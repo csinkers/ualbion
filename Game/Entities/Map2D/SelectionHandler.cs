@@ -14,19 +14,17 @@ namespace UAlbion.Game.Entities.Map2D
 {
     public sealed class SelectionHandler : Component
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<SelectionHandler, WorldCoordinateSelectEvent>((x, e) => x.OnSelect(e)),
-            H<SelectionHandler, RightClickEvent>((x, e) => x.OnRightClick())
-        );
-
         static readonly Vector3 Normal = Vector3.UnitZ;
         readonly LogicalMap _map;
         readonly Vector2 _tileSize;
         readonly Renderable _renderable;
         int _lastHighlightIndex;
 
-        public SelectionHandler(LogicalMap map, Vector2 tileSize, Renderable renderable) : base(Handlers)
+        public SelectionHandler(LogicalMap map, Vector2 tileSize, Renderable renderable)
         {
+            On<WorldCoordinateSelectEvent>(OnSelect);
+            On<RightClickEvent>(e => OnRightClick());
+
             _map = map ?? throw new ArgumentNullException(nameof(map));
             _tileSize = tileSize;
             _renderable = renderable;

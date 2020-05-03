@@ -14,7 +14,7 @@ namespace UAlbion.Game
 
         public AlbionMusicGenerator(SongId songId) => _songId = songId;
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             if (!File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "ADLMIDI.dll")))
                 return;
@@ -33,11 +33,10 @@ namespace UAlbion.Game
             _player.SetLoopEnabled(true);
         }
 
-        public override void Detach()
+        protected override void Unsubscribed()
         {
             _player?.Close();
             _player = null;
-            base.Detach();
         }
 
         public int FillBuffer(Span<short> buffer) => _player?.Play(buffer) ?? 0;

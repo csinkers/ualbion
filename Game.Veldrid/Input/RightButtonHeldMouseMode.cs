@@ -15,22 +15,19 @@ namespace UAlbion.Game.Veldrid.Input
 {
     public class RightButtonHeldMouseMode : Component
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<RightButtonHeldMouseMode, InputEvent>((x, e) => x.OnInput(e)),
-            H<RightButtonHeldMouseMode, ExchangeDisabledEvent>((x,e) => x.Unsubscribed())
-            // H<RightButtonHeldMouseMode, UiSelectedEvent>((x,e) => x.OnSelect(e))
-        );
-
         readonly MapSprite<CoreSpriteId> _cursor;
         Vector2 _lastTilePosition;
         bool _wasClockRunning;
 
-        public RightButtonHeldMouseMode() : base(Handlers)
+        public RightButtonHeldMouseMode()
         {
+            On<InputEvent>(OnInput);
+            // On<UiSelectedEvent>(e => OnSelect(e));
+
             _cursor = AttachChild(new MapSprite<CoreSpriteId>(CoreSpriteId.Select, DrawLayer.MaxLayer, 0, SpriteFlags.LeftAligned));
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             _lastTilePosition = Vector2.Zero;
             Raise(new ShowCursorEvent(false));
@@ -38,11 +35,9 @@ namespace UAlbion.Game.Veldrid.Input
             _wasClockRunning = Resolve<IClock>()?.IsRunning ?? false;
             if(_wasClockRunning)
                 Raise(new StopClockEvent());
-
-            base.Subscribed();
         }
 
-        void Unsubscribed()
+        protected override void Unsubscribed()
         {
             Raise(new ShowCursorEvent(true));
             if (_wasClockRunning)

@@ -10,23 +10,23 @@ namespace UAlbion.Game.Settings
     public class Settings : Component, ISettings, IDebugSettings, IAudioSettings, IGraphicsSettings, IGameplaySettings, IEngineSettings
     {
         const string Filename = "settings.json";
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<Settings, SetLanguageEvent>((x, e) =>
-            {
-                if (x.Language == e.Language) return;
-                x.Language = e.Language;
-                x.Raise(e); // Re-raise to ensure any consumers who received it before Settings will get it again.
-            }),
-            H<Settings, SetMusicVolumeEvent> ((x, e) => x.MusicVolume = e.Value),
-            H<Settings, SetFxVolumeEvent>    ((x, e) => x.FxVolume    = e.Value),
-            H<Settings, SetCombatDelayEvent> ((x, e) => x.CombatDelay = e.Value),
-            H<Settings, DebugFlagEvent>      ((x, e) => x.DebugFlags = (DebugFlags)CoreUtil.UpdateFlag((uint)x.DebugFlags, e.Operation, (uint)e.Flag)),
-            H<Settings, SpecialEvent>        ((x, e) => x.Special1 = CoreUtil.UpdateValue(x.Special1, e.Operation, e.Argument)),
-            H<Settings, Special2Event>       ((x, e) => x.Special2 = CoreUtil.UpdateValue(x.Special2, e.Operation, e.Argument)),
-            H<Settings, EngineFlagEvent>     ((x, e) => x.Flags = (EngineFlags)CoreUtil.UpdateFlag((uint)x.Flags, e.Operation, (uint)e.Flag))
-        );
 
-        protected Settings() : base(Handlers) { }
+        protected Settings()
+        {
+            On<SetLanguageEvent>(e =>
+            {
+                if (Language == e.Language) return;
+                Language = e.Language;
+                Raise(e); // Re-raise to ensure any consumers who received it before Settings will get it again.
+            });
+            On<SetMusicVolumeEvent>(e => MusicVolume = e.Value);
+            On<SetFxVolumeEvent>   (e => FxVolume    = e.Value);
+            On<SetCombatDelayEvent>(e => CombatDelay = e.Value);
+            On<DebugFlagEvent>     (e => DebugFlags = (DebugFlags)CoreUtil.UpdateFlag((uint)DebugFlags, e.Operation, (uint)e.Flag));
+            On<SpecialEvent>       (e => Special1 = CoreUtil.UpdateValue(Special1, e.Operation, e.Argument));
+            On<Special2Event>      (e => Special2 = CoreUtil.UpdateValue(Special2, e.Operation, e.Argument));
+            On<EngineFlagEvent>(e => Flags = (EngineFlags) CoreUtil.UpdateFlag((uint) Flags, e.Operation, (uint) e.Flag));
+        }
         [JsonIgnore] public string BasePath { get; set; }
 
         IDebugSettings ISettings.Debug => this;

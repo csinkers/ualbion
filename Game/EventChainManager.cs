@@ -15,15 +15,15 @@ namespace UAlbion.Game
 
     public class EventChainManager : ServiceComponent<IEventManager>, IEventManager
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<EventChainManager, TriggerChainEvent>((x, e) => x.Trigger(e))
-        );
 
         readonly ISet<EventContext> _activeChains = new HashSet<EventContext>();
 
         public IList<EventContext> ActiveContexts => new ReadOnlyCollection<EventContext>(_activeChains.ToList());
 
-        public EventChainManager() : base(Handlers) { }
+        public EventChainManager()
+        {
+            On<TriggerChainEvent>(Trigger);
+        }
 
         void RaiseWithContext(EventContext context, IEvent e)
         {

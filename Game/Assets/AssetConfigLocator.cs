@@ -8,7 +8,6 @@ namespace UAlbion.Game.Assets
 {
     public class AssetConfigLocator : Component, IAssetLocator
     {
-        public AssetConfigLocator() : base(null) { }
         public IEnumerable<AssetType> SupportedTypes => new[]
         {
             AssetType.AssetConfig,

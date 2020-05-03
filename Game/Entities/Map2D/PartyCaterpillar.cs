@@ -18,40 +18,38 @@ namespace UAlbion.Game.Entities.Map2D
         int _trailOffset;
         int TrailLength => Party.MaxPartySize * _settings.MaxTrailDistance; // Number of past positions to store
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<PartyCaterpillar, FastClockEvent>((x,e) => x.Update()),
-            H<PartyCaterpillar, PartyJumpEvent>((x, e) =>
+        public PartyCaterpillar(Vector2 initialPosition, MovementDirection initialDirection, MovementSettings settings)
+        {
+            On<FastClockEvent>(e => Update());
+            On<PartyMoveEvent>(e => _movement.AddDirection(new Vector2(e.X, e.Y)));
+            On<PartyJumpEvent>(e =>
             {
                 var position = new Vector2(e.X, e.Y);
-                for (int i = 0; i < x._trail.Length; i++)
-                    x._trail[i] = (x.To3D(position), 0);
+                for (int i = 0; i < _trail.Length; i++)
+                    _trail[i] = (To3D(position), 0);
 
-                x._movement.Position = position;
-            }),
-            H<PartyCaterpillar, PartyMoveEvent>((x, e) => x._movement.AddDirection(new Vector2(e.X, e.Y))),
-            H<PartyCaterpillar, PartyTurnEvent>((x, e) =>
+                _movement.Position = position;
+            });
+            On<PartyTurnEvent>(e =>
             {
-                var (position3d, _) = x._trail[x._trailOffset];
+                var (position3d, _) = _trail[_trailOffset];
                 var position = new Vector2(position3d.X, position3d.Y);
-                x._movement.FacingDirection = e.Direction switch
+                _movement.FacingDirection = e.Direction switch
                 {
                     TeleportDirection.Up => MovementDirection.Up,
                     TeleportDirection.Right => MovementDirection.Right,
                     TeleportDirection.Down => MovementDirection.Down,
                     TeleportDirection.Left => MovementDirection.Left,
-                    _ => x._movement.FacingDirection
+                    _ => _movement.FacingDirection
                 };
-                x.MoveLeader(position);
-            }),
-            H<PartyCaterpillar, NoClipEvent>((x, e) =>
+                MoveLeader(position);
+            });
+            On<NoClipEvent>(e =>
             {
-                x._movement.Clipping = !x._movement.Clipping;
-                x.Raise(new LogEvent(LogEvent.Level.Info, $"Clipping {(x._movement.Clipping ? "on" : "off")}"));
-            })
-        );
+                _movement.Clipping = !_movement.Clipping;
+                Raise(new LogEvent(LogEvent.Level.Info, $"Clipping {(_movement.Clipping ? "on" : "off")}"));
+            });
 
-        public PartyCaterpillar(Vector2 initialPosition, MovementDirection initialDirection, MovementSettings settings) : base(Handlers)
-        {
             _settings = settings;
             _movement = new Movement(settings);
             _movement.EnteredTile += (sender, coords) => Raise(new PlayerEnteredTileEvent(coords.Item1, coords.Item2));

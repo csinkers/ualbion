@@ -17,22 +17,21 @@ namespace UAlbion.Game.Gui.Inventory
         readonly DynamicText _hoverSource;
         int _version;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<InventoryWeightLabel, InventoryChangedEvent>((x, e) =>
-            {
-                if (e.InventoryType == InventoryType.Player && x._activeCharacter == (PartyCharacterId)e.InventoryId)
-                    x._version++;
-            }),
-            H<InventoryWeightLabel, SetLanguageEvent>((x, e) => x._version++),
-            H<InventoryWeightLabel, HoverEvent>((x, e) =>
-            {
-                x.Hover();
-                e.Propagating = false;
-            }),
-            H<InventoryWeightLabel, BlurEvent>((x, _) => x.Raise(new HoverTextEvent(""))));
-
-        public InventoryWeightLabel(PartyCharacterId activeCharacter) : base(Handlers)
+        public InventoryWeightLabel(PartyCharacterId activeCharacter)
         {
+            On<SetLanguageEvent>(e => _version++);
+            On<BlurEvent>(e => Raise(new HoverTextEvent("")));
+            On<InventoryChangedEvent>(e =>
+            {
+                if (e.InventoryType == InventoryType.Player && _activeCharacter == (PartyCharacterId)e.InventoryId)
+                    _version++;
+            });
+            On<HoverEvent>(e =>
+            {
+                Hover();
+                e.Propagating = false;
+            });
+
             _activeCharacter = activeCharacter;
 
             _hoverSource = new DynamicText(() =>

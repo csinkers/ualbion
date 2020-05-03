@@ -80,7 +80,7 @@ void main()
 	float depth = (color.w == 0.0f) ? 0.0f : gl_FragCoord.z;
 
 	if ((u_engine_flags & EF_RENDER_DEPTH) != 0)
-		color = vec4(depth, 10 * (max(depth, 0.9) - 0.9), 10 * min(depth, 0.1), 1.0f);
+		color = DEPTH_COLOR(depth);
 	OutputColor = color;
 
 	gl_FragDepth = ((u_engine_flags & EF_FLIP_DEPTH_RANGE) != 0) ? 1.0f - depth : depth;

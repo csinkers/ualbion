@@ -9,7 +9,7 @@ namespace UAlbion.Game.Gui.Controls
     public class VerticalStack : UiElement
     {
         public VerticalStack(params IUiElement[] children) : this((IList<IUiElement>)children) { }
-        public VerticalStack(IList<IUiElement> children) : base(null)
+        public VerticalStack(IList<IUiElement> children)
         {
             foreach(var child in children)
                 Children.Add(child);

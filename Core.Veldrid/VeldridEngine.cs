@@ -20,45 +20,6 @@ namespace UAlbion.Core.Veldrid
         const int DefaultWidth = 720;
         const int DefaultHeight = 480;
 
-        static readonly HandlerSet Handlers = new HandlerSet
-        (
-            H<VeldridEngine, LoadRenderDocEvent>((x, _) =>
-            {
-                if (_renderDoc == null && RenderDoc.Load(out _renderDoc))
-                {
-                    x._newBackend = x.GraphicsDevice.BackendType;
-                    x._recreateWindow = true;
-                }
-            }),
-            H<VeldridEngine, GarbageCollectionEvent>((x, _) => GC.Collect()),
-            H<VeldridEngine, QuitEvent>((x, e) => x._done = true),
-            H<VeldridEngine, RunRenderDocEvent>((x, _) => _renderDoc?.LaunchReplayUI()),
-            H<VeldridEngine, SetCursorPositionEvent>((x, e) => x._pendingCursorUpdate = new Vector2(e.X, e.Y)),
-            H<VeldridEngine, ToggleFullscreenEvent>((x, _) => x.ToggleFullscreenState()),
-            H<VeldridEngine, ToggleHardwareCursorEvent>((x, _) => x._window.CursorVisible = !x._window.CursorVisible),
-            H<VeldridEngine, ToggleResizableEvent>((x, _) => x._window.Resizable = !x._window.Resizable),
-            H<VeldridEngine, ToggleVisibleBorderEvent>((x, _) => x._window.BorderVisible = !x._window.BorderVisible),
-            H<VeldridEngine, SetMsaaLevelEvent>((x, e) => x._newSampleCount = e.SampleCount switch
-            {
-                1 => TextureSampleCount.Count1,
-                2 => TextureSampleCount.Count2,
-                4 => TextureSampleCount.Count4,
-                8 => TextureSampleCount.Count8,
-                16 => TextureSampleCount.Count16,
-                32 => TextureSampleCount.Count32,
-                _ => throw new InvalidOperationException($"Invalid sample count {e.SampleCount}")
-            }),
-            H<VeldridEngine, RefreshDeviceObjectsEvent>((x, e) => x.RefreshDeviceObjects(e.Count ?? 1)),
-            H<VeldridEngine, RecreateWindowEvent>((x, e) => { x._recreateWindow = true; x._newBackend = x.GraphicsDevice.BackendType; }),
-            H<VeldridEngine, SetBackendEvent>((x, e) => x._newBackend = e.Value),
-            H<VeldridEngine, SetVSyncEvent>((x, e) =>
-            {
-                if (x._vsync == e.Value) return;
-                x._vsync = e.Value;
-                x._newBackend = x.GraphicsDevice.BackendType;
-            })
-        );
-
         static RenderDoc _renderDoc;
         Sdl2Window _window;
 
@@ -85,8 +46,44 @@ namespace UAlbion.Core.Veldrid
         public override string FrameTimeText => _frameTimeAverager.CurrentAverageFramesPerSecond.ToString("000.0 fps / ") +
                                                 _frameTimeAverager.CurrentAverageFrameTimeMilliseconds.ToString("#00.00 ms");
 
-        public VeldridEngine(GraphicsBackend backend, bool useRenderDoc) : base(Handlers)
+        public VeldridEngine(GraphicsBackend backend, bool useRenderDoc)
         {
+            On<LoadRenderDocEvent>(e =>
+            {
+                if (_renderDoc == null && RenderDoc.Load(out _renderDoc))
+                {
+                    _newBackend = GraphicsDevice.BackendType;
+                    _recreateWindow = true;
+                }
+            });
+            On<GarbageCollectionEvent>(e => GC.Collect());
+            On<QuitEvent>(e => _done = true);
+            On<RunRenderDocEvent>(e => _renderDoc?.LaunchReplayUI());
+            On<SetCursorPositionEvent>(e => _pendingCursorUpdate = new Vector2(e.X, e.Y));
+            On<ToggleFullscreenEvent>(e => ToggleFullscreenState());
+            On<ToggleHardwareCursorEvent>(e => _window.CursorVisible = !_window.CursorVisible);
+            On<ToggleResizableEvent>(e => _window.Resizable = !_window.Resizable);
+            On<ToggleVisibleBorderEvent>(e => _window.BorderVisible = !_window.BorderVisible);
+            On<SetMsaaLevelEvent>(e => _newSampleCount = e.SampleCount switch
+            {
+                1 => TextureSampleCount.Count1,
+                2 => TextureSampleCount.Count2,
+                4 => TextureSampleCount.Count4,
+                8 => TextureSampleCount.Count8,
+                16 => TextureSampleCount.Count16,
+                32 => TextureSampleCount.Count32,
+                _ => throw new InvalidOperationException($"Invalid sample count {e.SampleCount}")
+            });
+            On<RefreshDeviceObjectsEvent>(e => RefreshDeviceObjects(e.Count ?? 1));
+            On<RecreateWindowEvent>(e => { _recreateWindow = true; _newBackend = GraphicsDevice.BackendType; });
+            On<SetBackendEvent>(e => _newBackend = e.Value);
+            On<SetVSyncEvent>(e =>
+            {
+                if (_vsync == e.Value) return;
+                _vsync = e.Value;
+                _newBackend = GraphicsDevice.BackendType;
+            });
+
             _coreFactory = new VeldridCoreFactory();
             _newBackend = backend;
             if (useRenderDoc)
@@ -94,7 +91,7 @@ namespace UAlbion.Core.Veldrid
                     RenderDoc.Load(out _renderDoc);
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             var shaderCache = Resolve<IShaderCache>();
             if(shaderCache == null)

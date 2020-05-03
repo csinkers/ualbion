@@ -11,28 +11,25 @@ namespace UAlbion.Game.Gui.Inventory
     public class InventoryScreen : Dialog
     {
         const string ExitButtonId = "Inventory.Exit";
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<InventoryScreen, InventoryModeEvent>((x,e) => x.SetMode(e)),
-            H<InventoryScreen, InventoryChestModeEvent>((x,e) => x.SetMode(e)),
-            H<InventoryScreen, InventoryMerchantModeEvent>((x,e) => x.SetMode(e)),
-            H<InventoryScreen, ButtonPressEvent>((x, e) => x.OnButton(e.ButtonId))
-        );
-
         readonly InventoryConfig _config;
         InventoryMode _mode;
         int _modeSpecificId;
         InventoryPage _page;
         PartyCharacterId _activeCharacter;
 
-        public InventoryScreen(InventoryConfig config) : base(Handlers, DialogPositioning.Bottom)
+        public InventoryScreen(InventoryConfig config) : base(DialogPositioning.Bottom)
         {
+            On<InventoryModeEvent>(SetMode);
+            On<InventoryChestModeEvent>(SetMode);
+            On<InventoryMerchantModeEvent>(SetMode);
+            On<ButtonPressEvent>(e => OnButton(e.ButtonId));
+
             _config = config;
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Rebuild();
-            base.Subscribed();
         }
 
         void SetMode(ISetInventoryModeEvent e)

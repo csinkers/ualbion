@@ -19,6 +19,8 @@ layout(set = 1, binding = 2) uniform _View { mat4 uView; };
 layout(set = 1, binding = 3) uniform texture2D uPalette; //! // vdspv_1_3
 #endif
 
+#define DEPTH_COLOR(depth) (vec4((int((depth) * 1024) % 10) / 10.0f, 20 * (max((depth), 0.95) - 0.95), 20 * min((depth), 0.05), 1.0f))
+
 // UAlbion.Core.EngineFlags
 #define EF_SHOW_BOUNDING_BOXES 0x1
 #define EF_SHOW_CENTRE         0x2

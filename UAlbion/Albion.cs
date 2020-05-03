@@ -131,8 +131,6 @@ namespace UAlbion
                     .AddBehaviour(new QueryEventDebugBehaviour())
                 )
                 .Attach(new InputBinder(InputConfig.Load(baseDir)))
-                .Attach(new InputModeStack())
-                .Attach(new MouseModeStack())
                 .Attach(new SceneStack())
                 .Attach(new StatusBar())
                 .Attach(new ContextMenu())
@@ -142,8 +140,8 @@ namespace UAlbion
 
             PerfTracker.StartupEvent("Creating scene-specific components");
             var inventoryConfig = InventoryConfig.Load(baseDir);
-            global.Resolve<ISceneManager>().GetExchange(SceneId.Inventory)
-                .Attach(new InventoryScreen(inventoryConfig))
+            global.Resolve<ISceneManager>().GetScene(SceneId.Inventory)
+                .Add(new InventoryScreen(inventoryConfig))
                 ;
 
             var menuBackground = Sprite<PictureId>.ScreenSpaceSprite(
@@ -151,9 +149,9 @@ namespace UAlbion
                 new Vector2(-1.0f, 1.0f),
                 new Vector2(2.0f, -2.0f));
 
-            global.Resolve<ISceneManager>().GetExchange(SceneId.MainMenu)
-                .Attach(new MainMenu())
-                .Attach(menuBackground)
+            global.Resolve<ISceneManager>().GetScene(SceneId.MainMenu)
+                .Add(new MainMenu())
+                .Add(menuBackground)
                 ;
 
             ReflectionHelper.ClearTypeCache();

@@ -18,19 +18,17 @@ namespace UAlbion.Game.Scenes
         public InventoryScene() : base(SceneId.Inventory, new OrthographicCamera())
         { }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Raise(new PushMouseModeEvent(MouseMode.Normal));
             Raise(new PushInputModeEvent(InputMode.Inventory));
             Raise(new LoadPaletteEvent(PaletteId.Inventory));
-            base.Subscribed();
         }
 
         protected override void Unsubscribed()
         {
             Raise(new PopMouseModeEvent());
             Raise(new PopInputModeEvent());
-            base.Unsubscribed();
         }
     }
 }

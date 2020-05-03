@@ -6,14 +6,8 @@ using UAlbion.Core.Events;
 
 namespace UAlbion.Core
 {
-    public class Scene : Component, IScene
+    public class Scene : Container, IScene
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<Scene, CollectScenesEvent>((x, e) => e.Register(x)),
-            H<Scene, SetClearColourEvent>((x, e) => x._clearColour = (e.Red, e.Green, e.Blue)),
-            H<Scene, ExchangeDisabledEvent>((x, e) => x.Unsubscribed())
-        );
-
         readonly IDictionary<Type, IList<IRenderable>> _renderables = new Dictionary<Type, IList<IRenderable>>();
         readonly IDictionary<(DrawLayer, int), IList<IRenderable>> _processedRenderables = new Dictionary<(DrawLayer, int), IList<IRenderable>>();
         (float Red, float Green, float Blue) _clearColour;
@@ -21,16 +15,16 @@ namespace UAlbion.Core
         public string Name { get; }
         public ICamera Camera { get; }
 
-        protected Scene(string name, ICamera camera) : base(Handlers)
+        protected Scene(string name, ICamera camera)
         {
+            On<CollectScenesEvent>(e => e.Register(this));
+            On<SetClearColourEvent>(e => _clearColour = (e.Red, e.Green, e.Blue));
+
             Name = name;
             Camera = AttachChild(camera);
         }
 
-        public void Add(IRenderable renderable) { } // TODO
-        public void Remove(IRenderable renderable) { } // TODO
         public override string ToString() => $"Scene:{Name}";
-        protected virtual void Unsubscribed() { }
 
         public void RenderAllStages(IRendererContext context, IList<IRenderer> renderers)
         {
@@ -43,13 +37,13 @@ namespace UAlbion.Core
 
             using (PerfTracker.FrameEvent("6.1.1 Collect renderables"))
             {
-                Exchange.Raise(new RenderEvent(x =>
+                Raise(new RenderEvent(x =>
                 {
                     var type = x.GetType();
                     if (!_renderables.ContainsKey(type))
                         _renderables[type] = new List<IRenderable>();
                     _renderables[type].Add(x);
-                }), this);
+                }));
             }
 
             foreach (var renderer in _renderables)

@@ -42,13 +42,12 @@ namespace UAlbion.Game.Gui.Text
             { 'û', 105 }, { 'ù', 106 }, { 'á', 107 }, { 'í', 108 }, { 'ó', 109 }, { 'ú', 110 },
         };
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<TextManager, TextEvent>((x,e) => x.OnTextEvent(e)),
-            H<TextManager, NpcTextEvent>((x,e) => x.OnNpcTextEvent(e)),
-            H<TextManager, StartDialogueEvent>((x, e) => x.StartDialogue(e))
-        );
-
-        public TextManager() : base(Handlers) { }
+        public TextManager()
+        {
+            On<TextEvent>(OnTextEvent);
+            On<NpcTextEvent>(OnNpcTextEvent);
+            On<StartDialogueEvent>(StartDialogue);
+        }
 
         public Vector2 Measure(TextBlock block)
         {

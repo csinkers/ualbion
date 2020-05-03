@@ -8,7 +8,7 @@ namespace UAlbion.Game.Gui.Controls
     {
         readonly Rectangle _extents;
 
-        public FixedPosition(Rectangle extents, IUiElement child) : base(null)
+        public FixedPosition(Rectangle extents, IUiElement child)
         {
             _extents = extents;
             Children.Add(child);

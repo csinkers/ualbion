@@ -37,19 +37,20 @@ namespace UAlbion.Game.Veldrid.Input
     public class MouseLookMouseMode : Component
     {
         const float Sensitivity = 2;
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<MouseLookMouseMode, InputEvent>((x,e) => x.OnInput(e)),
-            H<MouseLookMouseMode, PostUpdateEvent>((x, e) =>
-            {
-                var windowState = x.Resolve<IWindowManager>();
-                x.Raise(new SetCursorPositionEvent(windowState.PixelWidth / 2, windowState.PixelHeight / 2));
-            })
-        );
 
-        public override void Subscribed()
+        public MouseLookMouseMode()
+        {
+            On<InputEvent>(OnInput);
+            On<PostUpdateEvent>(e =>
+            {
+                var windowState = Resolve<IWindowManager>();
+                Raise(new SetCursorPositionEvent(windowState.PixelWidth / 2, windowState.PixelHeight / 2));
+            });
+        }
+
+        protected override void Subscribed()
         {
             Raise(new SetCursorEvent(CoreSpriteId.CursorCrossUnselected));
-            base.Subscribed();
         }
 
         void OnInput(InputEvent e)
@@ -60,7 +61,5 @@ namespace UAlbion.Game.Veldrid.Input
             if (delta.LengthSquared() > float.Epsilon)
                 Raise(new CameraRotateEvent(delta.X * (Sensitivity / -1000), delta.Y * (Sensitivity / -1000)));
         }
-
-        public MouseLookMouseMode() : base(Handlers) { }
     }
 }

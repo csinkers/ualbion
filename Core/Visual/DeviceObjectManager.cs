@@ -13,9 +13,10 @@ namespace UAlbion.Core.Visual
         readonly HashSet<(object, object)> _staleOwners = new HashSet<(object, object)>();
         long _frame;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<DeviceObjectManager, BeginFrameEvent>((x,_) => x.BeginFrame())
-        );
+        public DeviceObjectManager()
+        {
+            On<BeginFrameEvent>(e => BeginFrame());
+        }
 
         class CacheEntry : IDisposable
         {
@@ -28,8 +29,6 @@ namespace UAlbion.Core.Visual
             public long LastAccessed { get; set; }
             public void Dispose() => Resource?.Dispose();
         }
-
-        public DeviceObjectManager() : base(Handlers) { }
 
         void BeginFrame()
         {

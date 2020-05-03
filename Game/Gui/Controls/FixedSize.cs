@@ -9,7 +9,7 @@ namespace UAlbion.Game.Gui.Controls
         readonly int _width;
         readonly int _height;
 
-        public FixedSize(int width, int height, IUiElement child) : base(null)
+        public FixedSize(int width, int height, IUiElement child)
         {
             _width = width;
             _height = height;

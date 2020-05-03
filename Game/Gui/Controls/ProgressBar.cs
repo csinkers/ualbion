@@ -11,11 +11,6 @@ namespace UAlbion.Game.Gui.Controls
 {
     public class ProgressBar : UiElement
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<ProgressBar, HoverEvent>((x, e) => x.Hover()),
-            H<ProgressBar, BlurEvent>((x, e) => x.Raise(new HoverTextEvent("")))
-        );
-
         readonly ButtonFrame _frame;
         readonly UiRectangle _bar;
         readonly IText _hover;
@@ -26,8 +21,11 @@ namespace UAlbion.Game.Gui.Controls
         int _lastValue;
         int _lastMax;
 
-        public ProgressBar(IText hover, Func<int> getValue, Func<int> getMax, int absoluteMax) : base(Handlers)
+        public ProgressBar(IText hover, Func<int> getValue, Func<int> getMax, int absoluteMax)
         {
+            On<HoverEvent>(e => Hover());
+            On<BlurEvent>(e => Raise(new HoverTextEvent("")));
+
             _hover = hover;
             _getValue = getValue;
             _getMax = getMax;

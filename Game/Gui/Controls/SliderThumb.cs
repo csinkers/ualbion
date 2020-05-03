@@ -13,13 +13,11 @@ namespace UAlbion.Game.Gui.Controls
         readonly Func<int> _getter;
         int _lastValue = int.MaxValue;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<SliderThumb, HoverEvent>((x, _) => x._frame.State = ButtonState.Hover),
-            H<SliderThumb, BlurEvent>((x, _) => x._frame.State = ButtonState.Normal)
-        );
-
-        public SliderThumb(Func<int> getter) : base(Handlers)
+        public SliderThumb(Func<int> getter)
         {
+            On<HoverEvent>(e => _frame.State = ButtonState.Hover);
+            On<BlurEvent>(e => _frame.State = ButtonState.Normal);
+
             _getter = getter;
             _text = new TextElement("").Center();
             _frame = new ButtonFrame(_text) { Theme = Theme };
@@ -27,7 +25,7 @@ namespace UAlbion.Game.Gui.Controls
         }
 
         public ButtonState State { get => _frame.State; set => _frame.State = value; }
-        public override void Subscribed() => Rebuild();
+        protected override void Subscribed() => Rebuild();
 
         void Rebuild()
         {

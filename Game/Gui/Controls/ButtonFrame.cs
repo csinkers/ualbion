@@ -20,12 +20,7 @@ namespace UAlbion.Game.Gui.Controls
             public float Alpha { get; set; }
         }
         public interface ITheme { ColorScheme GetColors(ButtonState state); }
-
         static readonly ITheme DefaultTheme = new ButtonTheme();
-
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<ButtonFrame, WindowResizedEvent>((x, _) => x._lastExtents = new Rectangle()),
-            H<ButtonFrame, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; }));
 
         SpriteLease _sprite;
         Rectangle _lastExtents;
@@ -66,10 +61,18 @@ namespace UAlbion.Game.Gui.Controls
             }
         }
 
-        public ButtonFrame(IUiElement child) : base(Handlers)
+        public ButtonFrame(IUiElement child)
         {
+            On<WindowResizedEvent>(e => _lastExtents = new Rectangle());
+
             if (child != null)
                 Children.Add(child);
+        }
+
+        protected override void Unsubscribed()
+        {
+            _sprite?.Dispose();
+            _sprite = null;
         }
 
         void Rebuild(Rectangle extents, DrawLayer order)

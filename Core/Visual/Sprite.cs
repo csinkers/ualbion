@@ -7,21 +7,36 @@ namespace UAlbion.Core.Visual
 {
     public class Sprite<T> : Component where T : Enum
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<Sprite<T>, RenderEvent>((x,e) => x.UpdateSprite()),
-            H<Sprite<T>, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; }),
-            H<Sprite<T>, HoverEvent>((x, _) =>
+        readonly DrawLayer _layer;
+        readonly SpriteKeyFlags _keyFlags;
+        SpriteLease _sprite;
+        Vector3 _position;
+        Vector2? _size;
+        int _frame;
+        SpriteFlags _flags;
+        bool _dirty = true;
+
+        public Sprite(T id, Vector3 position, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags)
+        {
+            On<RenderEvent>(e => UpdateSprite());
+            On<WorldCoordinateSelectEvent>(Select);
+            On<HoverEvent>(e =>
             {
-                if ((x.Resolve<IEngineSettings>()?.Flags &EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
-                    x.Flags |= SpriteFlags.Highlight;
-            }),
-            H<Sprite<T>, BlurEvent>((x, _) =>
+                if ((Resolve<IEngineSettings>()?.Flags &EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
+                    Flags |= SpriteFlags.Highlight;
+            });
+            On<BlurEvent>(e =>
             {
-                if ((x.Resolve<IEngineSettings>()?.Flags & EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
-                    x.Flags &= ~SpriteFlags.Highlight;
-            }),
-            H<Sprite<T>, WorldCoordinateSelectEvent>((x, e) => x.Select(e))
-        );
+                if ((Resolve<IEngineSettings>()?.Flags & EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
+                    Flags &= ~SpriteFlags.Highlight;
+            });
+
+            Id = id;
+            Position = position;
+            _layer = layer;
+            _keyFlags = keyFlags;
+            _flags = flags;
+        }
 
         public event EventHandler<SpriteSelectedEventArgs> Selected;
         public Vector3 Normal => Vector3.UnitZ; // TODO
@@ -50,15 +65,6 @@ namespace UAlbion.Core.Visual
         public int FrameCount { get; private set; } = -1;
         public SpriteFlags Flags { get => _flags; set { if (_flags == value) return; _flags = value; Dirty = true; } }
 
-        readonly DrawLayer _layer;
-        readonly SpriteKeyFlags _keyFlags;
-        SpriteLease _sprite;
-        Vector3 _position;
-        Vector2? _size;
-        int _frame;
-        SpriteFlags _flags;
-
-        bool _dirty = true;
         bool Dirty
         {
             set
@@ -73,15 +79,6 @@ namespace UAlbion.Core.Visual
             }
         }
 
-        public Sprite(T id, Vector3 position, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags) : base(Handlers)
-        {
-            Id = id;
-            Position = position;
-            _layer = layer;
-            _keyFlags = keyFlags;
-            _flags = flags;
-        }
-
         public static Sprite<T> CharacterSprite(T id) =>
             new Sprite<T>(id, Vector3.Zero, DrawLayer.Character, 0, SpriteFlags.BottomAligned);
 
@@ -90,10 +87,11 @@ namespace UAlbion.Core.Visual
                 SpriteKeyFlags.NoTransform,
                 SpriteFlags.LeftAligned) { Size = size };
 
-        public override void Subscribed()
+        protected override void Subscribed() => Dirty = true;
+        protected override void Unsubscribed()
         {
-            Dirty = true;
-            base.Subscribed();
+            _sprite?.Dispose();
+            _sprite = null;
         }
 
         void UpdateSprite()

@@ -15,17 +15,8 @@ namespace UAlbion.Game.Veldrid.Audio
 {
     public class AudioManager : Component, IAudioManager
     {
+        const int AudioPollIntervalMs = 100;
         readonly bool _standalone;
-
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<AudioManager, QuitEvent>((x, e) => x._doneEvent.Set()),
-            H<AudioManager, SoundEvent>((x, e) => x.Play(e)),
-            H<AudioManager, WaveLibEvent>((x, e) => x.PlayWaveLib(e)),
-            H<AudioManager, SongEvent>((x, e) => x.PlayMusic(e.SongId)),
-            H<AudioManager, AmbientEvent>((x, e) => x.PlayAmbient(e.SongId)),
-            H<AudioManager, MuteEvent>((x, e) => x.StopAll())
-        );
-
         readonly IDictionary<SampleId, AudioBuffer> _sampleCache = new Dictionary<SampleId, AudioBuffer>();
         readonly IDictionary<(SongId, int), AudioBuffer> _waveLibCache = new Dictionary<(SongId, int), AudioBuffer>();
         readonly IList<ActiveSound> _activeSounds = new List<ActiveSound>();
@@ -36,6 +27,24 @@ namespace UAlbion.Game.Veldrid.Audio
         StreamingAudioSource _music;
         AlbionMusicGenerator _musicGenerator;
         AmbientSoundPlayer _ambientPlayer;
+
+        public AudioManager(bool standalone)
+        {
+            On<SoundEvent>(Play);
+            On<WaveLibEvent>(PlayWaveLib);
+            On<SongEvent>(e => PlayMusic(e.SongId));
+            On<AmbientEvent>(e => PlayAmbient(e.SongId));
+            On<MuteEvent>(e => StopAll());
+            On<QuitEvent>(e => _doneEvent.Set());
+
+            _standalone = standalone;
+        }
+
+        protected override void Subscribed()
+        {
+            Task.Run(AudioThread);
+        }
+
 
         class ActiveSound
         {
@@ -221,14 +230,6 @@ namespace UAlbion.Game.Veldrid.Audio
             }
         }
 
-        public AudioManager(bool standalone) : base(Handlers) => _standalone = standalone;
-        public override void Subscribed()
-        {
-            Task.Run(AudioThread);
-            base.Subscribed();
-        }
-
-        const int AudioPollIntervalMs = 100;
         void AudioThread()
         {
             using var device = new AudioDevice { DistanceModel = DistanceModel.InverseDistance };

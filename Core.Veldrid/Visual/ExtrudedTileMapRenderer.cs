@@ -12,8 +12,6 @@ namespace UAlbion.Core.Veldrid.Visual
 {
     public class ExtrudedTileMapRenderer : Component, IRenderer
     {
-        public ExtrudedTileMapRenderer() : base(null) { }
-
         // Vertex Layout
         static readonly VertexLayoutDescription VertexLayout = VertexLayoutHelper.Vertex3DTextured;
 

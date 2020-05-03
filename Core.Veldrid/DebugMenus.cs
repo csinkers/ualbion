@@ -8,15 +8,14 @@ namespace UAlbion.Core.Veldrid
 {
     class DebugMenus : Component
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<DebugMenus, EngineUpdateEvent>((x, _) => x.RenderDebugMenu()));
-
         static readonly string[] MsaaOptions = { "Off", "2x", "4x", "8x", "16x", "32x" };
         readonly VeldridEngine _engine;
         int _msaaOption;
 
-        public DebugMenus(VeldridEngine engine) : base(Handlers)
+        public DebugMenus(VeldridEngine engine)
         {
+            On<EngineUpdateEvent>(_ => RenderDebugMenu());
+
             _engine = engine;
         }
 

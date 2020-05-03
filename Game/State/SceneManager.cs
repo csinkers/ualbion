@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
@@ -12,11 +11,26 @@ namespace UAlbion.Game.State
 {
     public class SceneManager : Component, ISceneManager
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<SceneManager, SetSceneEvent>((x, e) => x.Set(e.SceneId)),
-            H<SceneManager, OpenCharacterInventoryEvent>((x, e) => x.OpenInventory(e.MemberId)),
-            H<SceneManager, OpenChestEvent>((x,e) => x.OpenChest(e))
-        );
+        readonly IDictionary<SceneId, GameScene> _scenes = new Dictionary<SceneId, GameScene>();
+
+        public SceneManager()
+        {
+            On<SetSceneEvent>(e => Set(e.SceneId));
+            On<OpenCharacterInventoryEvent>(e => OpenInventory(e.MemberId));
+            On<OpenChestEvent>(OpenChest);
+        }
+
+        public SceneId ActiveSceneId { get; private set; }
+        public IScene GetScene(SceneId sceneId) => _scenes.TryGetValue(sceneId, out var scene) ? scene : null;
+        public IScene ActiveScene => _scenes[ActiveSceneId];
+
+        public SceneManager AddScene(GameScene scene)
+        {
+            scene.IsActive = false;
+            AttachChild(scene);
+            _scenes.Add(scene.Id, scene);
+            return this;
+        }
 
         void OpenChest(OpenChestEvent e)
         {
@@ -37,49 +51,24 @@ namespace UAlbion.Game.State
 
         void Set(SceneId activatingSceneId)
         {
-            foreach (var sceneId in _scenes.Keys.Where(x => x != activatingSceneId).ToList())
+            _scenes[ActiveSceneId].IsActive = false;
+            foreach (var sceneId in _scenes.Keys)
             {
-                var sceneExchange = GetExchange(sceneId);
                 var scene = _scenes[sceneId];
-                scene.Detach();
-                sceneExchange.IsActive = false;
-            }
+                scene.IsActive = sceneId == activatingSceneId;
 
-            foreach (var sceneId in _scenes.Keys.Where(x => x == activatingSceneId).ToList())
-            {
-                var sceneExchange = GetExchange(sceneId);
-                var scene = _scenes[sceneId];
+                if (!scene.IsActive)
+                    continue;
+
                 var interfaces = scene.GetType().GetInterfaces();
                 var sceneInterface = interfaces.FirstOrDefault(x => typeof(IScene).IsAssignableFrom(x) && x != typeof(IScene));
                 if (sceneInterface != null)
                     Exchange.Register(sceneInterface, scene);
                 else
                     Exchange.Attach(scene);
-                sceneExchange.IsActive = true;
             }
 
             ActiveSceneId = activatingSceneId;
         }
-
-        readonly IDictionary<SceneId, GameScene> _scenes = new Dictionary<SceneId, GameScene>();
-        readonly IDictionary<SceneId, EventExchange> _exchanges = new Dictionary<SceneId, EventExchange>();
-
-        public SceneManager() : base(Handlers) { }
-        public SceneId ActiveSceneId { get; private set; }
-
-        public SceneManager AddScene(GameScene scene)
-        {
-            _scenes.Add(scene.Id, scene);
-            return this;
-        }
-
-        public EventExchange GetExchange(SceneId id)
-        {
-            if(!_exchanges.ContainsKey(id))
-                _exchanges[id] = new EventExchange($"Scene:{id}", Exchange);
-            return _exchanges[id];
-        }
-
-        public IScene ActiveScene => _scenes[ActiveSceneId];
     }
 }

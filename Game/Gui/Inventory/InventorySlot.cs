@@ -29,32 +29,31 @@ namespace UAlbion.Game.Gui.Inventory
         int _frameNumber;
         bool _isClickTimerPending;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<InventorySlot, InventoryChangedEvent>((x, e) =>
-            {
-                if (e.InventoryType == x._inventoryType && e.InventoryId == x._id)
-                    x._version++;
-            }),
-            H<InventorySlot, SlowClockEvent>((x, e) => x._frameNumber += e.Delta),
-            H<InventorySlot, HoverEvent>((x, e) =>
-            {
-                x.Hover();
-                e.Propagating = false;
-            }),
-            H<InventorySlot, BlurEvent>((x, _) =>
-            {
-                x._frame.State = ButtonState.Normal;
-                x.Raise(new HoverTextEvent(""));
-            }),
-            H<InventorySlot, UiLeftClickEvent>((x, _) => x.OnClick()),
-            H<InventorySlot, TimerElapsedEvent>((x, e) =>
-            {
-                if (e.Id == TimerName) x.OnTimer();
-            })
-        );
-
-        public InventorySlot(InventoryType inventoryType, int id, ItemSlotId slotId) : base(Handlers)
+        public InventorySlot(InventoryType inventoryType, int id, ItemSlotId slotId)
         {
+            On<UiLeftClickEvent>(e => OnClick());
+            On<SlowClockEvent>(e => _frameNumber += e.Delta);
+            On<InventoryChangedEvent>(e =>
+            {
+                if (e.InventoryType == _inventoryType && e.InventoryId == _id)
+                    _version++;
+            });
+            On<HoverEvent>(e =>
+            {
+                Hover();
+                e.Propagating = false;
+            });
+            On<BlurEvent>(e =>
+            {
+                _frame.State = ButtonState.Normal;
+                Raise(new HoverTextEvent(""));
+            });
+            On<TimerElapsedEvent>(e =>
+            {
+                if (e.Id == TimerName)
+                    OnTimer();
+            });
+
             _inventoryType = inventoryType;
             _id = id;
             _slotId = slotId;

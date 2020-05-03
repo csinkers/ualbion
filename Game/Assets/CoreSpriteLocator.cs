@@ -10,7 +10,6 @@ namespace UAlbion.Game.Assets
 {
     public class CoreSpriteLocator : Component, IAssetLocator
     {
-        public CoreSpriteLocator() : base(null) { }
         public IEnumerable<AssetType> SupportedTypes => new[] { AssetType.CoreGraphics, AssetType.CoreGraphicsMetadata, AssetType.CoreSpriteConfig };
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)
         {

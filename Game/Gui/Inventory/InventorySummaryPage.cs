@@ -51,7 +51,7 @@ namespace UAlbion.Game.Gui.Inventory
         {
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
-            var member = Resolve<IParty>()[_activeMember];
+            var member = Resolve<IParty>()?[_activeMember];
             if (member == null)
                 yield break;
 
@@ -70,7 +70,7 @@ namespace UAlbion.Game.Gui.Inventory
         {
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
-            var member = Resolve<IParty>()[_activeMember];
+            var member = Resolve<IParty>()?[_activeMember];
             var formatter = new TextFormatter(assets, settings.Gameplay.Language);
             string S(SystemTextId id) => assets.LoadString(id, settings.Gameplay.Language);
 

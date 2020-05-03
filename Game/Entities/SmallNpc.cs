@@ -16,29 +16,26 @@ namespace UAlbion.Game.Entities
 {
     public class SmallNpc : Component
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<SmallNpc, SlowClockEvent>((x, e) => { x._sprite.Frame = e.FrameCount; }),
-            H<SmallNpc, RightClickEvent>((x, e) => x.OnRightClick(e))
-        );
-
         readonly MapNpc _npc;
         readonly MapSprite<SmallNpcId> _sprite;
         public override string ToString() => $"SNpc {_npc.Id} {_sprite.Id}";
 
-        public SmallNpc(MapNpc npc) : base(Handlers)
+        public SmallNpc(MapNpc npc)
         {
+            On<SlowClockEvent>(e => { _sprite.Frame = e.FrameCount; });
+            On<RightClickEvent>(OnRightClick);
+
             _npc = npc ?? throw new ArgumentNullException(nameof(npc));
             _sprite = AttachChild(new MapSprite<SmallNpcId>((SmallNpcId)npc.ObjectNumber, DrawLayer.Underlay - 1, 0, SpriteFlags.BottomAligned));
             _sprite.Selected += (sender, e) => e.SelectEvent.RegisterHit(e.HitPosition, this);
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             _sprite.TilePosition = new Vector3(
                 _npc.Waypoints[0].X,
                 _npc.Waypoints[0].Y,
                 DepthUtil.OutdoorCharacterDepth(_npc.Waypoints[0].Y));
-            base.Subscribed();
         }
 
         void OnRightClick(RightClickEvent rightClickEvent)

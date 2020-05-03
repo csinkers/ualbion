@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UAlbion.Game.Events;
+﻿using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Gui.Controls
 {
@@ -12,20 +10,9 @@ namespace UAlbion.Game.Gui.Controls
 
     public class Dialog : UiElement, IDialog
     {
-        static IDictionary<Type, Handler> InjectDialogHandler(IDictionary<Type, Handler> handlers)
+        protected Dialog(DialogPositioning position, int depth = 0)
         {
-            if (handlers != null && handlers.ContainsKey(typeof(CollectDialogsEvent)))
-                return handlers;
-
-            return new Dictionary<Type, Handler>(handlers ?? EmptyHandlerSet)
-            {
-                { typeof(CollectDialogsEvent), new Handler<Dialog, CollectDialogsEvent>((x, e) => e.AddDialog(x)) }
-            };
-        }
-
-        protected Dialog(IDictionary<Type, Handler> handlers, DialogPositioning position, int depth = 0)
-            : base(InjectDialogHandler(handlers))
-        {
+            On<CollectDialogsEvent>(e => e.AddDialog(this));
             Positioning = position;
             Depth = depth;
         }

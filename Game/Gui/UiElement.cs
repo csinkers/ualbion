@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
@@ -24,9 +23,6 @@ namespace UAlbion.Game.Gui
             }
             return size;
         }
-
-        protected UiElement() : this(null) { }
-        protected UiElement(IDictionary<Type, Handler> handlers) : base(handlers) { }
 
         protected virtual int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {

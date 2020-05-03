@@ -12,18 +12,16 @@ namespace UAlbion.Game.Gui.Text
 {
     public class TextElement : UiElement
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<TextElement, SetLanguageEvent>((x,e) => x._lastVersion = 0) // Force a rebuild on next render
-        );
-
         readonly TextBlock _block = new TextBlock();
         IText _source;
-        int _lastVersion;
         Rectangle _lastExtents;
+        int _lastVersion;
         int? _blockFilter;
 
-        public TextElement(string literal) : base(Handlers)
+        public TextElement(string literal)
         {
+            On<SetLanguageEvent>(e => _lastVersion = 0); // Force a rebuild on next render
+
             _source = new DynamicText(() =>
             {
                 _block.Text = literal;
@@ -31,7 +29,7 @@ namespace UAlbion.Game.Gui.Text
             });
         }
 
-        public TextElement(StringId id) : base(Handlers)
+        public TextElement(StringId id)
         {
             _source = new DynamicText(() =>
             {
@@ -42,7 +40,7 @@ namespace UAlbion.Game.Gui.Text
                 return new[] { _block };
             });
         }
-        public TextElement(IText source) : base(Handlers) { _source = source; }
+        public TextElement(IText source) { _source = source; }
         public override string ToString() => $"TextSection {_source?.ToString() ?? _block?.ToString()}";
         public TextElement Bold() { _block.Style = TextStyle.Fat; return this; }
         public TextElement Color(FontColor color) { _block.Color = color; return this; }

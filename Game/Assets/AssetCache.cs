@@ -10,34 +10,33 @@ namespace UAlbion.Game.Assets
 {
     public class AssetCache : Component
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<AssetCache, ReloadAssetsEvent>((x, e) =>
-            {
-                lock (x._syncRoot)
-                {
-                    x._assetCache.Clear();
-                    x._oldAssetCache.Clear();
-                }
-            }),
-            H<AssetCache, CycleCacheEvent>((x, e) => { x.CycleCacheEvent(); }),
-            H<AssetCache, AssetStatsEvent>((x, e) =>
-            {
-                Console.WriteLine("Asset Statistics:");
-                lock (x._syncRoot)
-                {
-                    foreach (var key in x._assetCache.Keys.OrderBy(y => y.ToString()))
-                    {
-                        Console.WriteLine("    {0}: {1} items", key, x._assetCache[key].Values.Count);
-                    }
-                }
-            })
-        );
-
         readonly object _syncRoot = new object();
         IDictionary<AssetType, IDictionary<Tuple<int, GameLanguage>, object>> _assetCache = new Dictionary<AssetType, IDictionary<Tuple<int, GameLanguage>, object>>();
         IDictionary<AssetType, IDictionary<Tuple<int, GameLanguage>, object>> _oldAssetCache = new Dictionary<AssetType, IDictionary<Tuple<int, GameLanguage>, object>>();
 
-        public AssetCache() : base(Handlers) { }
+        public AssetCache()
+        {
+            On<CycleCacheEvent>(e => CycleCacheEvent());
+            On<ReloadAssetsEvent>(e =>
+            {
+                lock (_syncRoot)
+                {
+                    _assetCache.Clear();
+                    _oldAssetCache.Clear();
+                }
+            });
+            On<AssetStatsEvent>(e =>
+            {
+                Console.WriteLine("Asset Statistics:");
+                lock (_syncRoot)
+                {
+                    foreach (var key in _assetCache.Keys.OrderBy(y => y.ToString()))
+                    {
+                        Console.WriteLine("    {0}: {1} items", key, _assetCache[key].Values.Count);
+                    }
+                }
+            });
+        }
 
         void CycleCacheEvent()
         {

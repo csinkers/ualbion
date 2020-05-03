@@ -11,11 +11,7 @@ namespace UAlbion.Game.Gui.Dialogs
         // Opaque background
         // Yellow options, gap, then white options.
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-        );
-
-        public ConversationOptionsWindow()
-            : base(Handlers, DialogPositioning.Bottom, 1)
+        public ConversationOptionsWindow() : base(DialogPositioning.Bottom, 1)
         {
         }
 

@@ -2,7 +2,6 @@
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
@@ -12,14 +11,15 @@ namespace UAlbion.Game.Gui.Controls
 {
     public class RepeatedBackground : UiElement
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<RepeatedBackground, ExchangeDisabledEvent>((x, _) => { x._sprite?.Dispose(); x._sprite = null; })
-        );
-
         PositionedSpriteBatch _sprite;
         Vector2 _lastPixelSize; // For dirty state detection
 
-        public RepeatedBackground(IUiElement child) : base(Handlers) => Children.Add(child);
+        public RepeatedBackground(IUiElement child) => Children.Add(child);
+        protected override void Unsubscribed()
+        {
+            _sprite?.Dispose();
+            _sprite = null;
+        }
 
         void Rebuild(int width, int height, DrawLayer order)
         {

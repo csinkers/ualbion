@@ -10,14 +10,12 @@ namespace UAlbion.Game.Gui.Dialogs
 {
     public class TextDialog : Dialog
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<TextDialog, UiLeftClickEvent>((x, e) => x.Close()),
-            H<TextDialog, RightClickEvent>((x, e) => x.Close()),
-            H<TextDialog, CloseWindowEvent>((x, e) => x.Close())
-        );
-
-        public TextDialog(IText text, SmallPortraitId? portraitId = null, int depth = 0) : base(Handlers, DialogPositioning.Top, depth)
+        public TextDialog(IText text, SmallPortraitId? portraitId = null, int depth = 0) : base(DialogPositioning.Top, depth)
         {
+            On<UiLeftClickEvent>(e => Close());
+            On<RightClickEvent>(e => Close());
+            On<CloseWindowEvent>(e => Close());
+
             var textSection = new TextElement(text).Center();
             var padding = new Padding(textSection, 3, 7);
 

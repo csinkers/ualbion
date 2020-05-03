@@ -25,7 +25,7 @@ namespace UAlbion.Game.Gui.Dialogs
         }
 
         public ConversationParticipantLabel(ICharacterSheet sheet, bool isRight)
-            : base(null, isRight ? DialogPositioning.TopRight : DialogPositioning.TopLeft)
+            : base(isRight ? DialogPositioning.TopRight : DialogPositioning.TopLeft)
         {
             var portraitId = sheet.PortraitId ?? SmallPortraitId.GibtEsNicht;
             var name = GetName(sheet, false);

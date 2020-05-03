@@ -10,13 +10,12 @@ namespace UAlbion.Game.Gui.Menus
 {
     public class MainMenu : Dialog
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<MainMenu, CloseWindowEvent>((x, e) => x.Raise(new PopSceneEvent()))
-        );
+        public MainMenu() : base(DialogPositioning.Center)
+        {
+            On<CloseWindowEvent>(e => Raise(new PopSceneEvent()));
+        }
 
-        public MainMenu() : base(Handlers, DialogPositioning.Center) { }
-
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             foreach (var child in Children)
                 child.Detach();
@@ -62,8 +61,6 @@ namespace UAlbion.Game.Gui.Menus
 
             var stack = new VerticalStack(elements);
             AttachChild(new DialogFrame(stack));
-
-            base.Subscribed();
         }
 
         void Continue()

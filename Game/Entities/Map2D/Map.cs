@@ -26,28 +26,27 @@ namespace UAlbion.Game.Entities.Map2D
         public IMapData MapData => _mapData;
 
         public float BaseCameraHeight => 1.0f;
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<Map, MapInitEvent>((x, e) => x.FireEventChains(TriggerType.MapInit, true)),
-            H<Map, SlowClockEvent>((x, e) => x.FireEventChains(TriggerType.EveryStep, false)),
-            H<Map, HourElapsedEvent>((x, e) => x.FireEventChains(TriggerType.EveryHour, true)),
-            H<Map, DayElapsedEvent>((x, e) => x.FireEventChains(TriggerType.EveryDay, true)),
-            H<Map, PlayerEnteredTileEvent>((x,e) => x.OnPlayerEnteredTile(e)),
-            H<Map, NpcEnteredTileEvent>((x,e) => x.OnNpcEnteredTile(e)),
-            H<Map, ChangeIconEvent>((x,e) => x.ChangeIcon(e)),
-            H<Map, DisableEventChainEvent>((x,e) => x._logicalMap.DisableChain(e.ChainNumber)),
-            H<Map, PartyChangedEvent>((x,e) => x.RebuildPartyMembers())
-            // H<Map, UnloadMapEvent>((x, e) => x.Unload()),
-        );
 
         public override string ToString() { return $"Map2D: {MapId} ({(int)MapId})"; }
 
-        public Map(MapDataId mapId, MapData2D mapData) : base(Handlers)
+        public Map(MapDataId mapId, MapData2D mapData)
         {
+            On<PlayerEnteredTileEvent>(OnPlayerEnteredTile);
+            On<NpcEnteredTileEvent>(OnNpcEnteredTile);
+            On<ChangeIconEvent>(ChangeIcon);
+            On<MapInitEvent>(e => FireEventChains(TriggerType.MapInit, true));
+            On<SlowClockEvent>(e => FireEventChains(TriggerType.EveryStep, false));
+            On<HourElapsedEvent>(e => FireEventChains(TriggerType.EveryHour, true));
+            On<DayElapsedEvent>(e => FireEventChains(TriggerType.EveryDay, true));
+            On<DisableEventChainEvent>(e => _logicalMap.DisableChain(e.ChainNumber));
+            On<PartyChangedEvent>(e => RebuildPartyMembers());
+            // On<UnloadMapEvent>(e => Unload());
+
             MapId = mapId;
             _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
         }
 
-        public override void Subscribed()
+        protected override void Subscribed()
         {
             Raise(new SetClearColourEvent(0,0,0));
             if (_logicalMap != null)
@@ -64,7 +63,7 @@ namespace UAlbion.Game.Entities.Map2D
             TileSize = new Vector3(renderable.TileSize, 1.0f);
             _logicalMap.TileSize = renderable.TileSize;
 
-            AttachChild(new ScriptManager(_mapData.Id));
+            AttachChild(new ScriptManager());
             AttachChild(new Collider(_logicalMap, !_logicalMap.UseSmallSprites));
 
             var movementSettings = _logicalMap.UseSmallSprites ? MovementSettings.Small() : MovementSettings.Large();

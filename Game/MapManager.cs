@@ -13,34 +13,22 @@ namespace UAlbion.Game
 {
     public class MapManager : Component, IMapManager
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<MapManager, LoadMapEvent>((x, e) =>
-            {
-                x._pendingMapChange = e.MapId;
-                x.LoadMap();
-                x.Raise(new PartyJumpEvent(15, 15));
-                x.Raise(new PartyTurnEvent(TeleportDirection.Right));
-                x.Raise(new CameraJumpEvent(15, 15));
-            }),
-            H<MapManager, BeginFrameEvent>((x, e) => x.LoadMap()),
-            H<MapManager, RefreshMapSubscribersEvent>((x, e) =>
-            {
-                x._allMapsExchange.IsActive = false;
-                x._allMapsExchange.IsActive = true;
-            }),
-            H<MapManager, TeleportEvent>((x,e) => x.Teleport(e))
-        );
-
-        EventExchange _allMapsExchange;
         MapDataId? _pendingMapChange;
 
         public IMap Current { get; private set; }
-        public MapManager() : base(Handlers) { }
 
-        public override void Subscribed()
+        public MapManager()
         {
-            _allMapsExchange ??= new EventExchange("Maps", Exchange);
-            base.Subscribed();
+            On<BeginFrameEvent>(e => LoadMap());
+            On<TeleportEvent>(Teleport);
+            On<LoadMapEvent>(e =>
+            {
+                _pendingMapChange = e.MapId;
+                LoadMap();
+                Raise(new PartyJumpEvent(15, 15));
+                Raise(new PartyTurnEvent(TeleportDirection.Right));
+                Raise(new CameraJumpEvent(15, 15));
+            });
         }
 
         void LoadMap()
@@ -57,17 +45,18 @@ namespace UAlbion.Game
                 return;
             }
 
-            foreach (var exchange in _allMapsExchange.Children)
-                exchange.IsActive = false;
-            _allMapsExchange.PruneInactiveChildren();
+            // Remove old map
+            foreach(var child in Children)
+                child.Detach();
+            Children.Clear();
+            Current = null;
 
             Raise(new MuteEvent());
             var map = BuildMap(pendingMapChange);
             if (map != null)
             {
                 Current = map;
-                var mapExchange = new EventExchange(pendingMapChange.ToString(), _allMapsExchange);
-                mapExchange.Attach(map);
+                AttachChild(map);
 
                 // Set the scene first to ensure scene-local components from other scenes are disabled.
                 Raise(new SetSceneEvent(map is Entities.Map3D.Map ? SceneId.World3D : SceneId.World2D));

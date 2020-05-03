@@ -20,7 +20,6 @@ namespace UAlbion.Game.Assets
             { "fr", GameLanguage.French },
         };
 
-        public NewStringLocator() : base(null) { }
         public IEnumerable<AssetType> SupportedTypes => new[] { AssetType.UAlbionText };
 
         protected override void Subscribed()
@@ -38,8 +37,6 @@ namespace UAlbion.Game.Assets
                     y => _shortLanguageNames[y.Key],
                     y => y.Value
                 ));
-
-            base.Subscribed();
         }
 
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)

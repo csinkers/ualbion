@@ -9,12 +9,10 @@ namespace UAlbion.Game.Gui.Dialogs
 {
     public class PromptDialog : Dialog
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<PromptDialog, CloseWindowEvent>((x, e) => x.Respond(false))
-        );
-
-        public PromptDialog(IText text, int depth = 0) : base(Handlers, DialogPositioning.Center, depth)
+        public PromptDialog(IText text, int depth = 0) : base(DialogPositioning.Center, depth)
         {
+            On<CloseWindowEvent>(e => Respond(false));
+
             var textSection = new TextElement(text).Center();
 
             UiElement buttons = new HorizontalStack(

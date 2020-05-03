@@ -15,21 +15,6 @@ namespace UAlbion.Game.Gui.Status
     public class StatusBarPortrait : UiElement
     {
         const string TimerName = "StatusBarPortrait.ClickTimer";
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<StatusBarPortrait, PartyChangedEvent>((x, _) => x.LoadSprite()),
-            H<StatusBarPortrait, HoverEvent>((x, e) =>
-            {
-                x.Hover();
-                e.Propagating = false;
-            }),
-            H<StatusBarPortrait, BlurEvent>((x, _) =>
-            {
-                x._portrait.Highlighted = false;
-                x.Raise(new HoverTextEvent(""));
-            }),
-            H<StatusBarPortrait, UiLeftClickEvent>((x, _) => x.OnClick()),
-            H<StatusBarPortrait, TimerElapsedEvent>((x, e) => { if (e.Id == TimerName) x.OnTimer(); })
-        );
 
         readonly UiSpriteElement<SmallPortraitId> _portrait;
         readonly StatusBarHealthBar _health;
@@ -37,8 +22,26 @@ namespace UAlbion.Game.Gui.Status
         readonly int _order;
         bool _isClickTimerPending;
 
-        public StatusBarPortrait(int order) : base(Handlers)
+        public StatusBarPortrait(int order)
         {
+            On<PartyChangedEvent>(e => LoadSprite());
+            On<UiLeftClickEvent>(e => OnClick());
+            On<HoverEvent>(e =>
+            {
+                Hover();
+                e.Propagating = false;
+            });
+            On<BlurEvent>(e =>
+            {
+                _portrait.Highlighted = false;
+                Raise(new HoverTextEvent(""));
+            });
+            On<TimerElapsedEvent>(e =>
+            {
+                if (e.Id == TimerName)
+                    OnTimer();
+            });
+
             _order = order;
             _portrait = AttachChild(new UiSpriteElement<SmallPortraitId>(SmallPortraitId.Tom));
             _health = AttachChild(new StatusBarHealthBar(order, true));

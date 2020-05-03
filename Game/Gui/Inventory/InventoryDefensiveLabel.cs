@@ -15,17 +15,16 @@ namespace UAlbion.Game.Gui.Inventory
         readonly PartyCharacterId _activeCharacter;
         int _version;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<InventoryDefensiveLabel, InventoryChangedEvent>((x,e) => x._version++),
-            H<InventoryDefensiveLabel, HoverEvent>((x, e) =>
-            {
-                x.Hover();
-                e.Propagating = false;
-            }),
-            H<InventoryDefensiveLabel, BlurEvent>((x, _) => x.Raise(new HoverTextEvent(""))));
-
-        public InventoryDefensiveLabel(PartyCharacterId activeCharacter) : base(Handlers)
+        public InventoryDefensiveLabel(PartyCharacterId activeCharacter)
         {
+            On<InventoryChangedEvent>(e => _version++);
+            On<BlurEvent>(e => Raise(new HoverTextEvent("")));
+            On<HoverEvent>(e =>
+            {
+                Hover();
+                e.Propagating = false;
+            });
+
             _activeCharacter = activeCharacter;
 
             var source = new DynamicText(() =>

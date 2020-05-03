@@ -9,25 +9,15 @@ namespace UAlbion.Game.Gui.Controls
 {
     public class UiFixedPositionElement<T> : UiElement where T : Enum
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<UiFixedPositionElement<T>, WindowResizedEvent>((x, _) => x.Rebuild())
-        );
-
         readonly T _id;
         readonly Rectangle _extents;
         SpriteLease _sprite;
 
-        public UiFixedPositionElement(T id, Rectangle extents) : base(Handlers)
+        public UiFixedPositionElement(T id, Rectangle extents)
         {
+            On<WindowResizedEvent>(_ => Rebuild());
             _id = id;
             _extents = extents;
-        }
-
-        public override void Detach()
-        {
-            _sprite?.Dispose();
-            _sprite = null;
-            base.Detach();
         }
 
         public override string ToString() => $"{_id} @ {_extents}";
@@ -44,7 +34,12 @@ namespace UAlbion.Game.Gui.Controls
             }
 
             Rebuild();
-            base.Subscribed();
+        }
+
+        protected override void Unsubscribed()
+        {
+            _sprite?.Dispose();
+            _sprite = null;
         }
 
         void Rebuild()

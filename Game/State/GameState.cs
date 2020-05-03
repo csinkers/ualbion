@@ -39,33 +39,32 @@ namespace UAlbion.Game.State
         public IList<MapChange> PermanentMapChanges => _game.PermanentMapChanges;
         public MapDataId MapId => _game?.MapId ?? 0;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<GameState, NewGameEvent>((x, e) => x.NewGame(e.MapId, e.X, e.Y)),
-            H<GameState, LoadGameEvent>((x, e) => x.LoadGame(e.Filename)),
-            H<GameState, SaveGameEvent>((x, e) => x.SaveGame(e.Filename, e.Name)),
-            H<GameState, FastClockEvent>((x, e) => x.TickCount += e.Frames),
-            H<GameState, LoadMapEvent>((x, e) =>
+
+        public GameState()
+        {
+            On<NewGameEvent>(e => NewGame(e.MapId, e.X, e.Y));
+            On<LoadGameEvent>(e => LoadGame(e.Filename));
+            On<SaveGameEvent>(e => SaveGame(e.Filename, e.Name));
+            On<FastClockEvent>(e => TickCount += e.Frames);
+            On<LoadMapEvent>(e =>
             {
-                if (x._game != null)
-                    x._game.MapId = e.MapId;
-            }),
-            H<GameState, SetTemporarySwitchEvent>((x, e) => x._game.Switches[e.SwitchId] = e.Operation switch
+                if (_game != null)
+                    _game.MapId = e.MapId;
+            });
+            On<SetTemporarySwitchEvent>(e => _game.Switches[e.SwitchId] = e.Operation switch
             {
                 SetTemporarySwitchEvent.SwitchOperation.Reset => false,
                 SetTemporarySwitchEvent.SwitchOperation.Set => true,
-                SetTemporarySwitchEvent.SwitchOperation.Toggle => x._game.Switches.ContainsKey(e.SwitchId) ? !x._game.Switches[e.SwitchId] : true,
+                SetTemporarySwitchEvent.SwitchOperation.Toggle => _game.Switches.ContainsKey(e.SwitchId) ? !_game.Switches[e.SwitchId] : true,
                 _ => false
-            }),
-            H<GameState, SetTickerEvent>((x, e) =>
+            });
+            On<SetTickerEvent>(e =>
             {
-                x._game.Tickers.TryGetValue(e.TickerId, out var curValue);
-                x._game.Tickers[e.TickerId] = (byte)e.Operation.Apply(curValue, e.Amount, 0, 255);
-            }),
-            H<GameState, ChangeTimeEvent>((x, e) => { })
-        );
+                _game.Tickers.TryGetValue(e.TickerId, out var curValue);
+                _game.Tickers[e.TickerId] = (byte)e.Operation.Apply(curValue, e.Amount, 0, 255);
+            });
+            On<ChangeTimeEvent>(e => { });
 
-        public GameState() : base(Handlers)
-        {
             AttachChild(new InventoryManager(GetInventory));
         }
 

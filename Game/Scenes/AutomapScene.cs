@@ -25,14 +25,12 @@ namespace UAlbion.Game.Scenes
         {
             Raise(new PushMouseModeEvent(MouseMode.Normal));
             Raise(new PushInputModeEvent(InputMode.Automap));
-            base.Subscribed();
         }
 
-        public override void Detach()
+        protected override void Unsubscribed()
         {
             Raise(new PopMouseModeEvent());
             Raise(new PopInputModeEvent());
-            base.Detach();
         }
     }
 }

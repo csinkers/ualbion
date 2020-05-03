@@ -15,11 +15,10 @@ namespace UAlbion.Game.Gui.Controls
         Vector2 _lastPixelSize; // For dirty state detection
 
         public RepeatedBackground(IUiElement child) => Children.Add(child);
-        public override void Detach()
+        protected override void Unsubscribed()
         {
             _sprite?.Dispose();
             _sprite = null;
-            base.Detach();
         }
 
         void Rebuild(int width, int height, DrawLayer order)

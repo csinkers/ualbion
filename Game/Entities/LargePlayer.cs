@@ -10,18 +10,16 @@ namespace UAlbion.Game.Entities
 {
     public class LargePlayer : Component
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<LargePlayer, FastClockEvent>((x, _) => x.Update()),
-            H<LargePlayer, MapInitEvent>((x, _) => x.Update())
-        );
-
         readonly PartyCharacterId _id;
         readonly Func<(Vector3, int)> _positionFunc;
         readonly MapSprite<LargePartyGraphicsId> _sprite;
         public override string ToString() => $"LPlayer {_id}";
 
-        public LargePlayer(PartyCharacterId charId, LargePartyGraphicsId graphicsId, Func<(Vector3, int)> positionFunc) : base(Handlers)
+        public LargePlayer(PartyCharacterId charId, LargePartyGraphicsId graphicsId, Func<(Vector3, int)> positionFunc)
         {
+            On<FastClockEvent>(e => Update());
+            On<MapInitEvent>(e => Update());
+
             _id = charId;
             _positionFunc = positionFunc;
             _sprite = AttachChild(new MapSprite<LargePartyGraphicsId>(
@@ -33,7 +31,6 @@ namespace UAlbion.Game.Entities
         protected override void Subscribed()
         {
             Update();
-            base.Subscribed();
         }
 
         void Update()

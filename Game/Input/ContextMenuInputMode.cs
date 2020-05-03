@@ -9,13 +9,11 @@ namespace UAlbion.Game.Input
         protected override void Subscribed()
         {
             Raise(new PushMouseModeEvent(MouseMode.ContextMenu));
-            base.Subscribed();
         }
 
-        public override void Detach()
+        protected override void Unsubscribed()
         {
             Raise(new PopMouseModeEvent());
-            base.Detach();
         }
     }
 }

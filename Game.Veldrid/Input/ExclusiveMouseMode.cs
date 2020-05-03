@@ -10,14 +10,13 @@ namespace UAlbion.Game.Veldrid.Input
 {
     public class ExclusiveMouseMode : Component
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<ExclusiveMouseMode, InputEvent>((x, e) => x.OnInput(e)),
-            H<ExclusiveMouseMode, SetExclusiveMouseModeEvent>((x, e) => x._exclusiveItem = e.ExclusiveElement)
-        );
-
-        public ExclusiveMouseMode() : base(Handlers) { }
-
         IUiElement _exclusiveItem;
+
+        public ExclusiveMouseMode()
+        {
+            On<InputEvent>(OnInput);
+            On<SetExclusiveMouseModeEvent>(e => _exclusiveItem = e.ExclusiveElement);
+        }
 
         void OnInput(InputEvent e)
         {

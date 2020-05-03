@@ -21,17 +21,15 @@ namespace UAlbion.Game.Gui.Dialogs
         ConversationOptionsWindow _optionsWindow;
         ISet<WordId> _mentionedWords = new HashSet<WordId>();
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<Conversation, TextEvent>((x,e) => x.OnText(e)),
-            H<Conversation, EndDialogueEvent>((x, _) =>
-            {
-                x.Detach();
-                x.Complete?.Invoke(x, EventArgs.Empty);
-            })
-        );
-
-        public Conversation(PartyCharacterId partyMemberId, NpcCharacterId npcId, EventSet eventSet) : base(Handlers)
+        public Conversation(PartyCharacterId partyMemberId, NpcCharacterId npcId, EventSet eventSet)
         {
+            On<TextEvent>(OnText);
+            On<EndDialogueEvent>(e =>
+            {
+                Detach();
+                Complete?.Invoke(this, EventArgs.Empty);
+            });
+
             _partyMemberId = partyMemberId;
             _npcId = npcId;
             _eventSet = eventSet ?? throw new ArgumentNullException(nameof(eventSet));

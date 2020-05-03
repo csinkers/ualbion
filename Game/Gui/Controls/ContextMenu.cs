@@ -10,13 +10,14 @@ namespace UAlbion.Game.Gui.Controls
 {
     public class ContextMenu : Dialog
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<ContextMenu, ContextMenuEvent>((x, e) => { x.Display(e); }),
-            H<ContextMenu, CloseWindowEvent>((x, e) => x.Display(null))
-        );
         ContextMenuEvent _event;
 
-        public ContextMenu() : base(Handlers, DialogPositioning.TopLeft) { }
+        public ContextMenu() : base(DialogPositioning.TopLeft)
+        {
+            On<ContextMenuEvent>(Display);
+            On<CloseWindowEvent>(e => Display(null));
+        }
+
         public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
             // Just the default condition without the extents check, as the use of a fixed position stack means the extents passed in are ignored.

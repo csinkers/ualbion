@@ -10,23 +10,20 @@ namespace UAlbion.Game.Entities
 {
     public class SmallPlayer : Component
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<SmallPlayer, FastClockEvent>((x, e) =>
-            {
-                //(x._sprite.TilePosition, x._sprite.Frame) = x._positionFunc();
-                var (pos, frame) = x._positionFunc();
-                x._sprite.TilePosition = pos + new Vector3(0.0f, -1.0f, 0.0f); // TODO: Hacky, find a better way of fixing.
-                x._sprite.Frame = frame;
-            })
-        );
-
         readonly PartyCharacterId _id;
         readonly Func<(Vector3, int)> _positionFunc;
         readonly MapSprite<SmallPartyGraphicsId> _sprite;
-        public override string ToString() => $"SPlayer {_id}";
 
-        public SmallPlayer(PartyCharacterId charId, SmallPartyGraphicsId graphicsId, Func<(Vector3, int)> positionFunc) : base(Handlers)
+        public SmallPlayer(PartyCharacterId charId, SmallPartyGraphicsId graphicsId, Func<(Vector3, int)> positionFunc)
         {
+            On<FastClockEvent>(e =>
+            {
+                //(_sprite.TilePosition, _sprite.Frame) = _positionFunc();
+                var (pos, frame) = _positionFunc();
+                _sprite.TilePosition = pos + new Vector3(0.0f, -1.0f, 0.0f); // TODO: Hacky, find a better way of fixing.
+                _sprite.Frame = frame;
+            });
+
             _id = charId;
             _positionFunc = positionFunc;
             _sprite = AttachChild(new MapSprite<SmallPartyGraphicsId>(
@@ -35,5 +32,7 @@ namespace UAlbion.Game.Entities
                 0,
                 SpriteFlags.LeftAligned));
         }
+
+        public override string ToString() => $"SPlayer {_id}";
     }
 }

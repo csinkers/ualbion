@@ -13,23 +13,23 @@ namespace UAlbion.Game
 {
     public class MapManager : Component, IMapManager
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<MapManager, LoadMapEvent>((x, e) =>
-            {
-                x._pendingMapChange = e.MapId;
-                x.LoadMap();
-                x.Raise(new PartyJumpEvent(15, 15));
-                x.Raise(new PartyTurnEvent(TeleportDirection.Right));
-                x.Raise(new CameraJumpEvent(15, 15));
-            }),
-            H<MapManager, BeginFrameEvent>((x, e) => x.LoadMap()),
-            H<MapManager, TeleportEvent>((x,e) => x.Teleport(e))
-        );
-
         MapDataId? _pendingMapChange;
 
         public IMap Current { get; private set; }
-        public MapManager() : base(Handlers) { }
+
+        public MapManager()
+        {
+            On<BeginFrameEvent>(e => LoadMap());
+            On<TeleportEvent>(Teleport);
+            On<LoadMapEvent>(e =>
+            {
+                _pendingMapChange = e.MapId;
+                LoadMap();
+                Raise(new PartyJumpEvent(15, 15));
+                Raise(new PartyTurnEvent(TeleportDirection.Right));
+                Raise(new CameraJumpEvent(15, 15));
+            });
+        }
 
         void LoadMap()
         {

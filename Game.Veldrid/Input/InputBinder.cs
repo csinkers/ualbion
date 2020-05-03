@@ -12,17 +12,20 @@ using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Input
 {
-    public class InputBinder : Component
+    public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
     {
-        class Bindings : Dictionary<InputMode, IDictionary<KeyBinding, string>> { }
+        class BindingSet : Dictionary<InputMode, IDictionary<KeyBinding, string>> { }
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<InputBinder, InputEvent>((x, e) => x.OnInput(e)),
-            H<InputBinder, LoadMapEvent>((x, e) => x._mapId = e.MapId)
-        );
+        readonly BindingSet _bindings = new BindingSet();
+        readonly HashSet<Key> _pressedKeys = new HashSet<Key>();
+        // InputMode _activeMode = InputMode.Global;
+        MapDataId _mapId = (MapDataId)100;
 
-        public InputBinder(InputConfig config) : base(Handlers)
+        public InputBinder(InputConfig config)
         {
+            On<InputEvent>(OnInput);
+            On<LoadMapEvent>(e => _mapId = e.MapId);
+
             foreach (var rawMode in config.Bindings)
             {
                 if (!_bindings.ContainsKey(rawMode.Key))
@@ -53,10 +56,14 @@ namespace UAlbion.Game.Veldrid.Input
             }
         }
 
-        readonly Bindings _bindings = new Bindings();
-        readonly HashSet<Key> _pressedKeys = new HashSet<Key>();
-        // InputMode _activeMode = InputMode.Global;
-        MapDataId _mapId = (MapDataId)100;
+        public IEnumerable<(InputMode, IEnumerable<(string, string)>)> Bindings
+        {
+            get
+            {
+                foreach (var mode in _bindings)
+                    yield return(mode.Key, mode.Value.Select(x => (x.Key.ToString(), x.Value)));
+            }
+        }
 
         ModifierKeys Modifiers
         {

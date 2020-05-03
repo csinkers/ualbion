@@ -6,8 +6,7 @@ namespace UAlbion.Game.Gui.Controls
 {
     class Header : UiElement
     {
-        static readonly HandlerSet Handlers = null;
-        public Header(StringId id) : base(Handlers) => AttachChild(new TextElement(id).NoWrap().Bold().Center());
-        public Header(IText source) : base(Handlers) => AttachChild(new TextElement(source).NoWrap().Bold().Center());
+        public Header(StringId id) => AttachChild(new TextElement(id).NoWrap().Bold().Center());
+        public Header(IText source) => AttachChild(new TextElement(source).NoWrap().Bold().Center());
     }
 }

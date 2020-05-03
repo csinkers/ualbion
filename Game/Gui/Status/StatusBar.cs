@@ -20,15 +20,13 @@ namespace UAlbion.Game.Gui.Status
         readonly FixedPosition _hoverTextContainer;
         readonly FixedPosition _descriptionTextContainer;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<StatusBar, HoverTextEvent>((x,e) => x._hoverText.LiteralString(e.Text)),
-            H<StatusBar, DescriptionTextEvent>((x,e) => x._descriptionText.LiteralString(e.Text)),
-            H<StatusBar, HoverTextExEvent>((x,e) => x._hoverText.Source(e.Source)),
-            H<StatusBar, DescriptionTextExEvent>((x,e) => x._descriptionText.Source(e.Source))
-        );
-
-        public StatusBar() : base(Handlers, DialogPositioning.StatusBar, int.MaxValue)
+        public StatusBar() : base(DialogPositioning.StatusBar, int.MaxValue)
         {
+            On<HoverTextEvent>(e => _hoverText.LiteralString(e.Text));
+            On<DescriptionTextEvent>(e => _descriptionText.LiteralString(e.Text));
+            On<HoverTextExEvent>(e => _hoverText.Source(e.Source));
+            On<DescriptionTextExEvent>(e => _descriptionText.Source(e.Source));
+
             _sprite = AttachChild(new UiSpriteElement<SlabId>(SlabId.SLAB));
             _sprite.SubId = 1;
             _portraits = new StatusBarPortrait[MaxPortraits];

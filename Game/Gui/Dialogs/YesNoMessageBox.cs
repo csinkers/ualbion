@@ -14,7 +14,7 @@ namespace UAlbion.Game.Gui.Dialogs
             Closed?.Invoke(this, EventArgs.Empty);
         }
 
-        public YesNoMessageBox(StringId stringId) : base(null, DialogPositioning.Center)
+        public YesNoMessageBox(StringId stringId) : base(DialogPositioning.Center)
         {
             var elements = new VerticalStack(
                 new Spacing(0, 5),

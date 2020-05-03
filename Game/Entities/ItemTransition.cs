@@ -17,9 +17,25 @@ namespace UAlbion.Game.Entities
         readonly Sprite<T> _sprite;
         float _elapsedTime;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<ItemTransition<T>, EngineUpdateEvent>((x,e) => x.Update(e.DeltaSeconds))
-        );
+        public ItemTransition(T spriteId, int subImage, Vector2 fromPosition, Vector2 toPosition, float transitionTimeSeconds, Vector2 size)
+        {
+            On<EngineUpdateEvent>(e => Update(e.DeltaSeconds));
+
+            _fromPosition = fromPosition;
+            _toPosition = toPosition;
+            _transitionTimeSeconds = transitionTimeSeconds;
+
+            _sprite = AttachChild(new Sprite<T>(
+                spriteId,
+                new Vector3(fromPosition, 0),
+                DrawLayer.InterfaceOverlay,
+                SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest,
+                SpriteFlags.LeftAligned)
+            {
+                Size = size,
+                Frame = subImage
+            });
+        }
 
         public static void CreateTransitionFromTilePosition(EventExchange exchange, int x, int y, ItemId itemId)
         {
@@ -52,24 +68,6 @@ namespace UAlbion.Game.Entities
                 0.3f, size);
 
             exchange.Attach(transition); // No need to attach as child as transitions clean themselves up.
-        }
-
-        public ItemTransition(T spriteId, int subImage, Vector2 fromPosition, Vector2 toPosition, float transitionTimeSeconds, Vector2 size) : base(Handlers)
-        {
-            _fromPosition = fromPosition;
-            _toPosition = toPosition;
-            _transitionTimeSeconds = transitionTimeSeconds;
-
-            _sprite = AttachChild(new Sprite<T>(
-                spriteId,
-                new Vector3(fromPosition, 0),
-                DrawLayer.InterfaceOverlay,
-                SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest,
-                SpriteFlags.LeftAligned)
-            {
-                Size = size,
-                Frame = subImage
-            });
         }
 
         void Update(float deltaSeconds)

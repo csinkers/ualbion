@@ -19,14 +19,14 @@ namespace UAlbion.Game.State.Player
         const int MaxGold = 32767;
         const int MaxRations = 32767;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<InventoryManager, InventoryPickupDropItemEvent>((x,e) => x.OnPickupItem(e)),
-            H<InventoryManager, InventoryGiveItemEvent>((x,e) => x.OnGiveItem(e))
-        );
-
         public IHoldable ItemInHand { get; private set; }
         public InventoryPickupDropItemEvent ReturnItemInHandEvent { get; private set; }
-        public InventoryManager(Func<InventoryType, int, Inventory> getInventory) : base(Handlers) => _getInventory = getInventory;
+        public InventoryManager(Func<InventoryType, int, Inventory> getInventory)
+        {
+            On<InventoryPickupDropItemEvent>(OnPickupItem);
+            On<InventoryGiveItemEvent>(OnGiveItem);
+            _getInventory = getInventory;
+        }
 
         public InventoryAction GetInventoryAction(InventoryType type, int id, ItemSlotId slotId)
         {

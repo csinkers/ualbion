@@ -131,8 +131,6 @@ namespace UAlbion
                     .AddBehaviour(new QueryEventDebugBehaviour())
                 )
                 .Attach(new InputBinder(InputConfig.Load(baseDir)))
-                .Attach(new InputModeStack())
-                .Attach(new MouseModeStack())
                 .Attach(new SceneStack())
                 .Attach(new StatusBar())
                 .Attach(new ContextMenu())

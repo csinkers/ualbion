@@ -9,10 +9,6 @@ namespace UAlbion.Game.Gui.Text
 {
     public class TextChunk : UiElement // Renders a single TextBlock in the UI
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<TextChunk, WindowResizedEvent>((x,e) => x.IsDirty = true)
-        );
-
         // Driving properties
         public TextBlock Block { get; }
         public bool IsDirty { get; set; }
@@ -21,13 +17,16 @@ namespace UAlbion.Game.Gui.Text
         PositionedSpriteBatch _sprite;
         DrawLayer _lastOrder = DrawLayer.Interface;
 
-        public TextChunk(TextBlock block) : base(Handlers) { Block = block; }
+        public TextChunk(TextBlock block)
+        {
+            On<WindowResizedEvent>(e => IsDirty = true);
+            Block = block;
+        }
         protected override void Subscribed() { IsDirty = true;}
-        public override void Detach()
+        protected override void Unsubscribed()
         {
             _sprite?.Dispose();
             _sprite = null;
-            base.Detach();
         }
 
         public override string ToString() => _sprite == null ? $"TextChunk:{Block} (unloaded)" : $"TextChunk:{Block} ({_sprite.Size.X}x{_sprite.Size.Y})";

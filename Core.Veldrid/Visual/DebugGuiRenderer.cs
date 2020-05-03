@@ -9,15 +9,14 @@ namespace UAlbion.Core.Veldrid.Visual
 {
     public class DebugGuiRenderer : Component, IRenderer, IRenderable
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<DebugGuiRenderer, RenderEvent>((x, e) => e.Add(x)),
-            H<DebugGuiRenderer, InputEvent>((x, e) => x._imguiRenderer.Update((float)e.DeltaSeconds, e.Snapshot)),
-            H<DebugGuiRenderer, WindowResizedEvent>((x, e) => x._imguiRenderer.WindowResized(e.Width, e.Height))
-        );
-
         ImGuiRenderer _imguiRenderer;
 
-        public DebugGuiRenderer() : base(Handlers) { }
+        public DebugGuiRenderer()
+        {
+            On<RenderEvent>(e => e.Add(this));
+            On<InputEvent>(e => _imguiRenderer.Update((float)e.DeltaSeconds, e.Snapshot));
+            On<WindowResizedEvent>(e => _imguiRenderer.WindowResized(e.Width, e.Height));
+        }
 
         public string Name => "DebugGuiRenderer";
         public bool CanRender(Type renderable) => renderable == typeof(DebugGuiRenderer);

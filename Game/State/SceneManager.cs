@@ -11,11 +11,26 @@ namespace UAlbion.Game.State
 {
     public class SceneManager : Component, ISceneManager
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<SceneManager, SetSceneEvent>((x, e) => x.Set(e.SceneId)),
-            H<SceneManager, OpenCharacterInventoryEvent>((x, e) => x.OpenInventory(e.MemberId)),
-            H<SceneManager, OpenChestEvent>((x,e) => x.OpenChest(e))
-        );
+        readonly IDictionary<SceneId, GameScene> _scenes = new Dictionary<SceneId, GameScene>();
+
+        public SceneManager()
+        {
+            On<SetSceneEvent>(e => Set(e.SceneId));
+            On<OpenCharacterInventoryEvent>(e => OpenInventory(e.MemberId));
+            On<OpenChestEvent>(OpenChest);
+        }
+
+        public SceneId ActiveSceneId { get; private set; }
+        public IScene GetScene(SceneId sceneId) => _scenes.TryGetValue(sceneId, out var scene) ? scene : null;
+        public IScene ActiveScene => _scenes[ActiveSceneId];
+
+        public SceneManager AddScene(GameScene scene)
+        {
+            scene.IsActive = false;
+            AttachChild(scene);
+            _scenes.Add(scene.Id, scene);
+            return this;
+        }
 
         void OpenChest(OpenChestEvent e)
         {
@@ -55,21 +70,5 @@ namespace UAlbion.Game.State
 
             ActiveSceneId = activatingSceneId;
         }
-
-        readonly IDictionary<SceneId, GameScene> _scenes = new Dictionary<SceneId, GameScene>();
-
-        public SceneManager() : base(Handlers) { }
-        public SceneId ActiveSceneId { get; private set; }
-        public IScene GetScene(SceneId sceneId) => _scenes.TryGetValue(sceneId, out var scene) ? scene : null;
-
-        public SceneManager AddScene(GameScene scene)
-        {
-            scene.IsActive = false;
-            AttachChild(scene);
-            _scenes.Add(scene.Id, scene);
-            return this;
-        }
-
-        public IScene ActiveScene => _scenes[ActiveSceneId];
     }
 }

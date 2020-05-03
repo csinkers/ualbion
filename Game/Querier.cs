@@ -14,38 +14,40 @@ namespace UAlbion.Game
     public class Querier : ServiceComponent<IQuerier>, IQuerier
     {
         readonly Random _random = new Random();
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<Querier, QueryVerbEvent>((x,e) =>
+
+        public Querier()
+        {
+            On<QueryVerbEvent>(e =>
             {
-                var result = x.Query(e.Context, e);
+                var result = Query(e.Context, e);
                 if (result.HasValue)
                     e.Context.LastEventResult = result.Value;
-            }),
-            H<Querier, QueryItemEvent>((x,e) =>
+            });
+            On<QueryItemEvent>(e =>
             {
-                var result = x.Query(e.Context, e);
+                var result = Query(e.Context, e);
                 if (result.HasValue)
                     e.Context.LastEventResult = result.Value;
-            }),
-            H<Querier, PromptPlayerEvent>((x,e) =>
+            });
+            On<PromptPlayerEvent>(e =>
             {
-                var result = x.Query(e.Context, e);
+                var result = Query(e.Context, e);
                 if (result.HasValue)
                     e.Context.LastEventResult = result.Value;
-            }),
-            H<Querier, PromptPlayerNumericEvent>((x,e) =>
+            });
+            On<PromptPlayerNumericEvent>(e =>
             {
-                var result = x.Query(e.Context, e);
+                var result = Query(e.Context, e);
                 if (result.HasValue)
                     e.Context.LastEventResult = result.Value;
-            }),
-            H<Querier, QueryEvent>((x,e) =>
+            });
+            On<QueryEvent>(e =>
             {
-                var result = x.Query(e.Context, e);
+                var result = Query(e.Context, e);
                 if (result.HasValue)
                     e.Context.LastEventResult = result.Value;
-            }));
-        public Querier() : base(Handlers) { }
+            });
+        }
         public bool? Query(EventContext context, IQueryEvent query, bool debugInspect = false)
         {
             var game = Resolve<IGameState>();

@@ -17,9 +17,6 @@ namespace UAlbion.Game.Gui.Controls
         readonly int _min;
         readonly int _max;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            );
-
         void Decrement() => Adjust(-1);
         void Increment() => Adjust(1);
 
@@ -30,7 +27,7 @@ namespace UAlbion.Game.Gui.Controls
             _setter(value);
         }
 
-        public Slider(Func<int> getter, Action<int> setter, int min, int max) : base(Handlers)
+        public Slider(Func<int> getter, Action<int> setter, int min, int max)
         {
             _getter = getter;
             _setter = setter;

@@ -17,7 +17,7 @@ namespace UAlbion.Game.Assets
     {
         readonly AssetLocatorRegistry _assetLocatorRegistry;
 
-        public AssetManager() : base(null)
+        public AssetManager()
         {
             _assetLocatorRegistry = AttachChild(new AssetLocatorRegistry());
         }

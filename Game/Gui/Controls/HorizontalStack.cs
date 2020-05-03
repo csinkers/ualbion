@@ -9,7 +9,7 @@ namespace UAlbion.Game.Gui.Controls
     public class HorizontalStack : UiElement
     {
         public HorizontalStack(params IUiElement[] args) : this((IList<IUiElement>)args) { }
-        public HorizontalStack(IList<IUiElement> children) : base(null)
+        public HorizontalStack(IList<IUiElement> children)
         {
             foreach(var child in children)
                 Children.Add(child);

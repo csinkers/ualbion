@@ -17,33 +17,37 @@ namespace UAlbion.Game.State.Player
         DateTime _lastChangeTime;
         float _lerp;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<Player, InventoryChangedEvent>((x, e) =>
-            {
-                if (e.InventoryType == InventoryType.Player && e.InventoryId == x._base.Inventory.InventoryId)
-                    x.UpdateInventory();
-            }),
-            H<Player, EngineUpdateEvent>((x,e) =>
-            {
-                var elapsed = (DateTime.Now - x._lastChangeTime).TotalMilliseconds;
-                var oldLerp = x._lerp;
-                x._lerp = elapsed > TransitionSpeedMilliseconds ? 1.0f : (float)(elapsed / TransitionSpeedMilliseconds);
-                if (Math.Abs(x._lerp - oldLerp) > float.Epsilon)
-                    x.Raise(new InventoryChangedEvent(InventoryType.Player, (int)x.Id));
-            })
-        );
-
-        public Player(PartyCharacterId id, CharacterSheet sheet) : base(Handlers)
+        public Player(PartyCharacterId id, CharacterSheet sheet)
         {
+            On<InventoryChangedEvent>(InventoryChanged);
+            On<EngineUpdateEvent>(EngineUpdate);
+
             Id = id;
             _base = sheet ?? throw new ArgumentNullException(nameof(sheet));
             Apparent = new InterpolatedCharacterSheet(() => _lastEffective, () => Effective, () => _lerp);
         }
 
-        protected override void Subscribed()
+        protected override void Subscribed() => UpdateInventory();
+
+        void EngineUpdate(EngineUpdateEvent e)
         {
-            UpdateInventory();
-            base.Subscribed();
+            var elapsed = (DateTime.Now - _lastChangeTime).TotalMilliseconds;
+            var oldLerp = _lerp;
+            _lerp = elapsed > TransitionSpeedMilliseconds ? 1.0f : (float) (elapsed / TransitionSpeedMilliseconds);
+            if (Math.Abs(_lerp - oldLerp) > float.Epsilon) Raise(new InventoryChangedEvent(InventoryType.Player, (int) Id));
+        }
+
+        public PartyCharacterId Id { get; }
+        public int CombatPosition { get; set; }
+        public IEffectiveCharacterSheet Effective { get; private set; }
+        public IEffectiveCharacterSheet Apparent { get; }
+        public Func<Vector3> GetPosition { get; set; }
+        public override string ToString() => $"Player {Id}";
+
+        void InventoryChanged(InventoryChangedEvent e)
+        {
+            if (e.InventoryType == InventoryType.Player && e.InventoryId == _base.Inventory.InventoryId)
+                UpdateInventory();
         }
 
         void UpdateInventory()
@@ -55,13 +59,6 @@ namespace UAlbion.Game.State.Player
             _lastChangeTime = DateTime.Now;
             _lerp = 0.0f;
         }
-
-        public PartyCharacterId Id { get; }
-        public int CombatPosition { get; set; }
-        public IEffectiveCharacterSheet Effective { get; private set; }
-        public IEffectiveCharacterSheet Apparent { get; }
-        public Func<Vector3> GetPosition { get; set; }
-        public override string ToString() => $"Player {Id}";
     }
 }
 

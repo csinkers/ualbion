@@ -23,7 +23,7 @@ namespace UAlbion.Game.Gui.Menus
             return Directory.Exists(path);
         }
 
-        public OptionsMenu() : base(null, DialogPositioning.Center) { }
+        public OptionsMenu() : base(DialogPositioning.Center) { }
 
         protected override void Subscribed()
         {
@@ -65,7 +65,6 @@ namespace UAlbion.Game.Gui.Menus
             _musicVolume = settings.Audio.MusicVolume;
             _fxVolume = settings.Audio.FxVolume;
             _combatDelay = settings.Gameplay.CombatDelay;
-            base.Subscribed();
         }
 
         void SaveAndClose()

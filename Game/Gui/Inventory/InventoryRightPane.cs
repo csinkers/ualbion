@@ -15,13 +15,10 @@ namespace UAlbion.Game.Gui.Inventory
 
         int _version;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<InventoryRightPane, InventoryChangedEvent>((x, e) => x._version++)
-        );
-
         public InventoryRightPane(PartyCharacterId activeCharacter, string exitButtonId, bool showTotalPartyGold)
-            : base(Handlers)
         {
+            On<InventoryChangedEvent>(e => _version++);
+
             var header = new Header(new StringId(AssetType.SystemText, 0, (int)SystemTextId.Inv_Backpack));
 
             var slotSpans = new IUiElement[InventoryHeight];

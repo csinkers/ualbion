@@ -13,26 +13,27 @@ namespace UAlbion.Game.Gui.Inventory
         UiSpriteElement<CoreSpriteId> _sprite;
         ButtonState _state;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<InventoryExitButton, HoverEvent>((x,e) => x._state = ButtonState.Hover),
-            H<InventoryExitButton, BlurEvent>((x,e) => x._state = ButtonState.Normal),
-            H<InventoryExitButton, UiLeftClickEvent>((x, e) => x._state = ButtonState.Clicked),
-            H<InventoryExitButton, UiLeftReleaseEvent>((x, _) =>
+        public InventoryExitButton(string buttonId)
+        {
+            On<HoverEvent>(e => _state = ButtonState.Hover);
+            On<BlurEvent>(e => _state = ButtonState.Normal);
+            On<UiLeftClickEvent>(e => _state = ButtonState.Clicked);
+            On<UiLeftReleaseEvent>(e =>
             {
-                if (x._state == ButtonState.Clicked)
+                if (_state == ButtonState.Clicked)
                 {
-                    x.Raise(new ButtonPressEvent(x._buttonId));
-                    x._state = ButtonState.Normal;
+                    Raise(new ButtonPressEvent(_buttonId));
+                    _state = ButtonState.Normal;
                 }
-            })
-        );
-        public InventoryExitButton(string buttonId) : base(Handlers) => _buttonId = buttonId;
+            });
+
+            _buttonId = buttonId;
+        }
 
         protected override void Subscribed()
         {
             if (_sprite == null)
                 _sprite = AttachChild(new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiExitButton));
-            base.Subscribed();
         }
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)

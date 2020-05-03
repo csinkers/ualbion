@@ -7,26 +7,6 @@ namespace UAlbion.Core
 {
     public class PerspectiveCamera : ServiceComponent<ICamera>, ICamera
     {
-        static readonly HandlerSet Handlers = new HandlerSet
-        (
-            H<PerspectiveCamera, BackendChangedEvent>((x, e) => x.UpdateBackend(e)),
-            // BUG: This event is not received when the screen is resized while a 2D scene is active.
-            H<PerspectiveCamera, WindowResizedEvent>((x, e) => x.WindowResized(e.Width, e.Height)),
-            H<PerspectiveCamera, SetCameraDirectionEvent>((x, e) => { x.Yaw = e.Yaw; x.Pitch = e.Pitch; }),
-            H<PerspectiveCamera, SetFieldOfViewEvent>((x, e) =>
-            {
-                if(e.Degrees == null)
-                {
-                    x.Raise(new LogEvent(LogEvent.Level.Info, $"FOV {ApiUtil.RadToDeg(x.FieldOfView)}"));
-                }
-                else
-                {
-                    x.FieldOfView = ApiUtil.DegToRad(e.Degrees.Value);
-                    x.UpdatePerspectiveMatrix();
-                }
-            })
-        );
-
         Matrix4x4 _viewMatrix;
         Matrix4x4 _projectionMatrix;
 
@@ -57,11 +37,27 @@ namespace UAlbion.Core
         public float FieldOfView { get; private set; }
         public float NearDistance => 10f;
         public float FarDistance => 512.0f * 256.0f * 2.0f;
-        
-        public bool LegacyPitch { get; private set; }
+        public bool LegacyPitch { get; }
 
-        public PerspectiveCamera(bool legacyPitch = false) : base(Handlers)
+        public PerspectiveCamera(bool legacyPitch = false)
         {
+            On<BackendChangedEvent>(UpdateBackend);
+            // BUG: This event is not received when the screen is resized while a 2D scene is active.
+            On<WindowResizedEvent>(e => WindowResized(e.Width, e.Height));
+            On<SetCameraDirectionEvent>(e => { Yaw = e.Yaw; Pitch = e.Pitch; });
+            On<SetFieldOfViewEvent>(e =>
+            {
+                if (e.Degrees == null)
+                {
+                    Raise(new LogEvent(LogEvent.Level.Info, $"FOV {ApiUtil.RadToDeg(FieldOfView)}"));
+                }
+                else
+                {
+                    FieldOfView = ApiUtil.DegToRad(e.Degrees.Value);
+                    UpdatePerspectiveMatrix();
+                }
+            });
+
             LegacyPitch = legacyPitch;
             FieldOfView = (float)(Math.PI * (legacyPitch ? 60 : 80) / 180);
         }

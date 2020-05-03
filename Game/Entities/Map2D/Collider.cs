@@ -16,19 +16,11 @@ namespace UAlbion.Game.Entities.Map2D
             _isLargeMap = isLargeMap;
         }
 
-        protected override void Subscribed()
-        {
-            Resolve<ICollisionManager>()?.Register(this);
-            base.Subscribed();
-        }
-
-        public override void Detach()
-        {
-            Resolve<ICollisionManager>()?.Unregister(this);
-            base.Detach();
-        }
-
-        public bool IsOccupied(Vector2 tilePosition) => IsOccupiedCore(tilePosition) || (_isLargeMap && IsOccupiedCore(tilePosition + new Vector2(-1.0f, 0.0f)));
+        protected override void Subscribed() => Resolve<ICollisionManager>()?.Register(this);
+        protected override void Unsubscribed() => Resolve<ICollisionManager>()?.Unregister(this);
+        public bool IsOccupied(Vector2 tilePosition) => 
+            IsOccupiedCore(tilePosition) || 
+            (_isLargeMap && IsOccupiedCore(tilePosition + new Vector2(-1.0f, 0.0f)));
 
         bool IsOccupiedCore(Vector2 tilePosition)
         {

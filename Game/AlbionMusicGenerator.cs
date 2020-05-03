@@ -33,11 +33,10 @@ namespace UAlbion.Game
             _player.SetLoopEnabled(true);
         }
 
-        public override void Detach()
+        protected override void Unsubscribed()
         {
             _player?.Close();
             _player = null;
-            base.Detach();
         }
 
         public int FillBuffer(Span<short> buffer) => _player?.Play(buffer) ?? 0;

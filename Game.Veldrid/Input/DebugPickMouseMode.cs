@@ -9,9 +9,10 @@ namespace UAlbion.Game.Veldrid.Input
 {
     public class DebugPickMouseMode : Component
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<DebugPickMouseMode, InputEvent>((x,e) => x.OnInput(e))
-        );
+        public DebugPickMouseMode()
+        {
+            On<InputEvent>(OnInput);
+        }
 
         void OnInput(InputEvent e)
         {
@@ -24,7 +25,5 @@ namespace UAlbion.Game.Veldrid.Input
             var hits = Resolve<ISelectionManager>()?.CastRayFromScreenSpace(e.Snapshot.MousePosition, true);
             Raise(new ShowDebugInfoEvent(hits, e.Snapshot.MousePosition));
         }
-
-        public DebugPickMouseMode() : base(Handlers) { }
     }
 }

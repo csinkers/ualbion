@@ -15,8 +15,19 @@ namespace UAlbion.Game.Gui.Status
         readonly ButtonFrame _frame;
         readonly UiRectangle _bar;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<StatusBarHealthBar, PostUpdateEvent>((x,e) => x.Update()));
+        public StatusBarHealthBar(int order, bool isHealth)
+        {
+            On<PostUpdateEvent>(e => Update());
+
+            _order = order;
+            _isHealth = isHealth;
+            _bar = new UiRectangle(isHealth ? CommonColor.Green5 : CommonColor.Teal3)
+            {
+                MeasureSize = new Vector2(20, 2)
+            };
+
+            _frame = AttachChild(new ButtonFrame(_bar) { Theme = isHealth ? HealthTheme : ManaTheme, Padding = 0 });
+        }
 
         void Update()
         {
@@ -35,18 +46,6 @@ namespace UAlbion.Game.Gui.Status
             if (valueMax == 0) valueMax = 1;
             _bar.DrawSize = new Vector2(_bar.MeasureSize.X * value / valueMax, _bar.MeasureSize.Y);
             _frame.State = highlighted ? ButtonState.Hover : ButtonState.Normal;
-        }
-
-        public StatusBarHealthBar(int order, bool isHealth) : base(Handlers)
-        {
-            _order = order;
-            _isHealth = isHealth;
-            _bar = new UiRectangle(isHealth ? CommonColor.Green5 : CommonColor.Teal3)
-            {
-                MeasureSize = new Vector2(20, 2)
-            };
-
-            _frame = AttachChild(new ButtonFrame(_bar) { Theme = isHealth ? HealthTheme : ManaTheme, Padding = 0 });
         }
     }
 }

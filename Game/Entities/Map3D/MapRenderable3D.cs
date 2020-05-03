@@ -26,15 +26,13 @@ namespace UAlbion.Game.Entities.Map3D
         bool _isSorting;
         bool _fullUpdate = true;
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<MapRenderable3D, RenderEvent>((x, e) => x.Render(e)),
-            H<MapRenderable3D, SlowClockEvent>((x, e) => x.OnSlowClock(e)),
-            H<MapRenderable3D, SortMapTilesEvent>((x, e) => x._isSorting = e.IsSorting),
-            H<MapRenderable3D, LoadPaletteEvent>((x, e) => {})
-        );
-
-        public MapRenderable3D(MapDataId mapId, MapData3D mapData, LabyrinthData labyrinthData, Vector3 tileSize) : base(Handlers)
+        public MapRenderable3D(MapDataId mapId, MapData3D mapData, LabyrinthData labyrinthData, Vector3 tileSize)
         {
+            On<RenderEvent>(Render);
+            On<SlowClockEvent>(OnSlowClock);
+            On<SortMapTilesEvent>(e => _isSorting = e.IsSorting);
+            On<LoadPaletteEvent>(e => { });
+
             _mapId = mapId;
             _mapData = mapData;
             _labyrinthData = labyrinthData;
@@ -87,10 +85,9 @@ namespace UAlbion.Game.Entities.Map3D
             _fullUpdate = true;
         }
 
-        public override void Detach()
+        protected override void Unsubscribed()
         {
             _tilemap = null;
-            base.Detach();
         }
 
         void SetTile(int index, int order, int frameCount)

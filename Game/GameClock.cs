@@ -21,29 +21,28 @@ namespace UAlbion.Game
         int _slowTicksRemaining;
         UpdateEvent _updateEvent;
 
-        public GameClock() : base(Handlers) { }
-        public DateTime GameTime { get; private set; } = new DateTime(2000, 1, 1);
-        public float ElapsedTime { get; private set; }
-        public bool IsRunning { get; private set; }
-
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<GameClock, StartClockEvent>((x,e) => x.IsRunning = true),
-            H<GameClock, StopClockEvent>((x,e) => x.IsRunning = false),
-            H<GameClock, EngineUpdateEvent>((x,e) => x.OnEngineUpdate(e)),
-            H<GameClock, StartTimerEvent>((x,e) => x.StartTimer(e)),
-            H<GameClock, UpdateEvent>((x,e) =>
+        public GameClock()
+        {
+            On<StartClockEvent>(e => IsRunning = true);
+            On<StopClockEvent>(e => IsRunning = false);
+            On<EngineUpdateEvent>(e => OnEngineUpdate(e));
+            On<StartTimerEvent>(e => StartTimer(e));
+            On<UpdateEvent>(e =>
             {
-                if (x.IsRunning || x._updateEvent != null)
+                if (IsRunning || _updateEvent != null)
                     return;
 
                 e.Acknowledged = true;
-                x._updateEvent = e;
-                x._slowTicksRemaining = e.Cycles;
-                x.IsRunning = true;
-            }),
-            H<GameClock, SlowClockEvent>((x,e) => x.OnSlowClock(e.Delta))
-        );
+                _updateEvent = e;
+                _slowTicksRemaining = e.Cycles;
+                IsRunning = true;
+            });
+            On<SlowClockEvent>(e => OnSlowClock(e.Delta));
+        }
 
+        public DateTime GameTime { get; private set; } = new DateTime(2000, 1, 1);
+        public float ElapsedTime { get; private set; }
+        public bool IsRunning { get; private set; }
 
         void OnSlowClock(int ticks)
         {
@@ -51,7 +50,7 @@ namespace UAlbion.Game
                 return;
 
             _slowTicksRemaining -= ticks;
-            if (_slowTicksRemaining > 0) 
+            if (_slowTicksRemaining > 0)
                 return;
 
             IsRunning = false;

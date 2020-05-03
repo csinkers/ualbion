@@ -24,24 +24,21 @@ namespace UAlbion.Game.Gui.Controls
             DraggingThumb, // If the click was on the thumb, then we transition to this state.
         }
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<SliderTrack, UiLeftClickEvent>((x, e) =>
-            {
-                x._thumb.State = ButtonState.Clicked;
-                x._state = SliderState.Clicked;
-                e.Propagating = false;
-                x.Raise(new SetExclusiveMouseModeEvent(x));
-            }),
-            H<SliderTrack, UiLeftReleaseEvent>((x, _) =>
-            {
-                x._state = SliderState.Normal;
-                x._thumb.State = ButtonState.Normal;
-            })
-        );
-
-
-        public SliderTrack(Func<int> getter, Action<int> setter, int min, int max) : base(Handlers)
+        public SliderTrack(Func<int> getter, Action<int> setter, int min, int max)
         {
+            On<UiLeftClickEvent>(e =>
+            {
+                _thumb.State = ButtonState.Clicked;
+                _state = SliderState.Clicked;
+                e.Propagating = false;
+                Raise(new SetExclusiveMouseModeEvent(this));
+            });
+            On<UiLeftReleaseEvent>(e =>
+            {
+                _state = SliderState.Normal;
+                _thumb.State = ButtonState.Normal;
+            });
+
             _getter = getter;
             _setter = setter;
             _min = min;

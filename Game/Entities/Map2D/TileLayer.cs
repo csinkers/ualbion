@@ -21,12 +21,10 @@ namespace UAlbion.Game.Entities.Map2D
             new SubImage(Vector2.Zero, Vector2.Zero, Vector2.Zero, 0),
             0);
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<TileLayer, RenderEvent>((x, e) => x.Render())
-        );
-
-        public TileLayer(LogicalMap logicalMap, ITexture tileset, Func<int, TileData> tileFunc, DrawLayer drawLayer, IconChangeType iconChangeType) : base(Handlers)
+        public TileLayer(LogicalMap logicalMap, ITexture tileset, Func<int, TileData> tileFunc, DrawLayer drawLayer, IconChangeType iconChangeType)
         {
+            On<RenderEvent>(e => Render());
+
             _logicalMap = logicalMap;
             _logicalMap.Dirty += (sender, args) =>
             {
@@ -61,11 +59,10 @@ namespace UAlbion.Game.Entities.Map2D
             return sm.MakeWeakReference(_lease, _logicalMap.Index(x, y));
         }
 
-        public override void Detach()
+        protected override void Unsubscribed()
         {
             _lease?.Dispose();
             _lease = null;
-            base.Detach();
         }
 
         SpriteInstanceData BuildInstanceData(int i, int j, TileData tile, int tickCount)

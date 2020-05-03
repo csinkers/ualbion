@@ -7,24 +7,23 @@ namespace UAlbion.Game.State
 {
     public class SceneStack : Component
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<SceneStack, PushSceneEvent>((x, e) =>
-            {
-                var sceneManager = x.Resolve<ISceneManager>();
-                x._stack.Push(sceneManager.ActiveSceneId);
-                x.Raise(new SetSceneEvent(e.SceneId));
-            }),
-            H<SceneStack, PopSceneEvent>((x, e) =>
-            {
-                if (x._stack.Count > 0)
-                {
-                    var newSceneId = x._stack.Pop();
-                    x.Raise(new SetSceneEvent(newSceneId));
-                }
-            })
-        );
-
         readonly Stack<SceneId> _stack = new Stack<SceneId>();
-        public SceneStack() : base(Handlers) { }
+        public SceneStack()
+        {
+            On<PushSceneEvent>(e =>
+            {
+                var sceneManager = Resolve<ISceneManager>();
+                _stack.Push(sceneManager.ActiveSceneId);
+                Raise(new SetSceneEvent(e.SceneId));
+            });
+            On<PopSceneEvent>(e =>
+            {
+                if (_stack.Count > 0)
+                {
+                    var newSceneId = _stack.Pop();
+                    Raise(new SetSceneEvent(newSceneId));
+                }
+            });
+        }
     }
 }

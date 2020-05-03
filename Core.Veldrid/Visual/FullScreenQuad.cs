@@ -12,9 +12,6 @@ namespace UAlbion.Core.Veldrid.Visual
         const string VertexShaderName = "FullScreenQuadSV.vert";
         const string FragmentShaderName = "FullScreenQuadSF.frag";
 
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<FullScreenQuad, RenderEvent>((x, e) => e.Add(x)));
-
         static readonly ushort[] QuadIndices = { 0, 1, 2, 0, 2, 3 };
         public string Name => "FullScreenQuad";
 
@@ -30,7 +27,10 @@ namespace UAlbion.Core.Veldrid.Visual
         DeviceBuffer _vb;
         Shader[] _shaders;
 
-        public FullScreenQuad() : base(Handlers) { }
+        public FullScreenQuad() 
+        {
+            On<RenderEvent>(e => e.Add(this));
+        }
 
         public void CreateDeviceObjects(IRendererContext context)
         {

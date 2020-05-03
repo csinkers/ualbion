@@ -8,22 +8,20 @@ namespace UAlbion.Game
 {
     public class PaletteManager : Component, IPaletteManager
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<PaletteManager, SlowClockEvent>((x, e) => x.OnTick(e.Delta)),
-            H<PaletteManager, LoadPaletteEvent>((x, e) => x.SetPalette(e.PaletteId))
-        );
-
         public IPalette Palette { get; private set; }
         public PaletteTexture PaletteTexture { get; private set; }
         public int Version { get; private set; }
         public int Frame { get; private set; }
 
-        public PaletteManager() : base(Handlers) { }
+        public PaletteManager()
+        {
+            On<SlowClockEvent>(e => OnTick(e.Delta));
+            On<LoadPaletteEvent>(e => SetPalette(e.PaletteId));
+        }
 
         protected override void Subscribed()
         {
             SetPalette(PaletteId.Toronto2D);
-            base.Subscribed();
         }
 
         void OnTick(int frames)

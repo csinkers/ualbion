@@ -6,11 +6,6 @@ namespace UAlbion.Game.Veldrid.Input
 {
     public class UiMouseMode : Component
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-        );
-
-        public UiMouseMode() : base(Handlers) { }
-
         void OnInput(InputEvent e)
         {
             if(e.Snapshot.WheelDelta < 0)

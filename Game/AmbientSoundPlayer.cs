@@ -9,16 +9,14 @@ namespace UAlbion.Game
 {
     public class AmbientSoundPlayer : Component
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<AmbientSoundPlayer, EngineUpdateEvent>((x,e) => x.Tick(e.DeltaSeconds))
-        );
-
         readonly SongId _songId;
         readonly NoteHook _hook;
         MidiPlayer _player;
 
-        public AmbientSoundPlayer(SongId songId) : base(Handlers)
+        public AmbientSoundPlayer(SongId songId)
         {
+            On<EngineUpdateEvent>(e => Tick(e.DeltaSeconds));
+
             _songId = songId;
             _hook = NoteHook;
         }
@@ -38,14 +36,12 @@ namespace UAlbion.Game
             _player.OpenBankData(assets.LoadSoundBanks());
             _player.OpenData(xmiBytes);
             _player.SetLoopEnabled(true);
-            base.Subscribed();
         }
 
-        public override void Detach()
+        protected override void Unsubscribed()
         {
             _player?.Dispose();
             _player = null;
-            base.Detach();
         }
 
         void NoteHook(IntPtr userData, int adlChannel, int note, int instrument, int pressure, double bend) 

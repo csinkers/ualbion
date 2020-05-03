@@ -10,16 +10,18 @@ namespace UAlbion.Game.Gui.Controls
 {
     public class UiRectangle : UiElement
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<UiRectangle, WindowResizedEvent>((x, _) => x._dirty = true)
-        );
-
         CommonColor _color;
         SpriteLease _sprite;
         bool _dirty = true;
         bool _visible = true;
         Vector2 _drawSize;
         Vector3 _lastPosition;
+
+        public UiRectangle(CommonColor color)
+        {
+            On<WindowResizedEvent>(_ => _dirty = true);
+            _color = color;
+        }
 
         public Vector2 DrawSize
         {
@@ -33,13 +35,10 @@ namespace UAlbion.Game.Gui.Controls
         }
 
         public Vector2 MeasureSize { get; set; }
-        public UiRectangle(CommonColor color) : base(Handlers) => _color = color;
-
-        public override void Detach()
+        protected override void Unsubscribed()
         {
             _sprite?.Dispose();
             _sprite = null;
-            base.Detach();
         }
 
         public CommonColor Color

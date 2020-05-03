@@ -9,12 +9,11 @@ namespace UAlbion.Game
 {
     public class ScriptManager : Component
     {
-        readonly MapDataId _mapId;
-
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<ScriptManager, DoScriptEvent>((x,e) => x.Run(e)),
-            H<ScriptManager, DumpScriptEvent>((x,e) => x.Dump(e))
-        );
+        public ScriptManager()
+        {
+            On<DoScriptEvent>(Run);
+            On<DumpScriptEvent>(Dump);
+        }
 
         void Run(DoScriptEvent doScriptEvent)
         {
@@ -46,8 +45,6 @@ namespace UAlbion.Game
             foreach (var e in events)
                 Raise(new LogEvent(LogEvent.Level.Info, e.ToString()));
         }
-
-        public ScriptManager(MapDataId mapId) : base(Handlers) => _mapId = mapId;
     }
 
     [Event("dump_script")]

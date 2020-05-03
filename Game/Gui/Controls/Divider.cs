@@ -15,11 +15,10 @@ namespace UAlbion.Game.Gui.Controls
 
         public Divider(CommonColor color) => _color = color;
 
-        public override void Detach()
+        protected override void Unsubscribed()
         {
             _sprite?.Dispose();
             _sprite = null;
-            base.Detach();
         }
 
         public override Vector2 GetSize() => new Vector2(0, 1);

@@ -9,12 +9,10 @@ namespace UAlbion.Game.Gui.Dialogs
 {
     public class NumericPromptDialog : Dialog
     {
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<NumericPromptDialog, CloseWindowEvent>((x, e) => x.Close())
-        );
-
-        public NumericPromptDialog(IText text, int min, int max, int depth = 0) : base(Handlers, DialogPositioning.Center, depth)
+        public NumericPromptDialog(IText text, int min, int max, int depth = 0) : base(DialogPositioning.Center, depth)
         {
+            On<CloseWindowEvent>(e => Close());
+
             var textSection = new TextElement(text).Center();
             var slider = new Slider(() => Value, x => Value = x, min, max);
             var button = new Button(SystemTextId.MsgBox_OK.ToId(), Close);

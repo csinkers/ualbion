@@ -7,11 +7,11 @@ namespace UAlbion.Core.Visual
     {
         readonly object _syncRoot = new object();
         readonly IDictionary<SpriteKey, MultiSprite> _sprites = new Dictionary<SpriteKey, MultiSprite>();
-        static readonly HandlerSet Handlers = new HandlerSet(
-            H<SpriteManager, RenderEvent>((x,e) => x.Render(e))
-            );
 
-        public SpriteManager() : base(Handlers) { }
+        public SpriteManager()
+        {
+            On<RenderEvent>(Render);
+        }
 
         void Render(RenderEvent renderEvent)
         {

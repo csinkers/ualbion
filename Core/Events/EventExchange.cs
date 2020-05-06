@@ -9,16 +9,16 @@ namespace UAlbion.Core.Events
 {
     public class EventExchange : IDisposable
     {
-        readonly IComponent _logger;
+        readonly ILogExchange _logger;
         readonly object SyncRoot = new object();
         int _nesting = -1;
         long _nextEventId;
         public int Nesting => _nesting;
 
         readonly IDictionary<Type, object> _registrations = new Dictionary<Type, object>();
-        readonly IDictionary<Type, IList<IComponent>> _subscriptions = new Dictionary<Type, IList<IComponent>>();
-        readonly IDictionary<IComponent, IList<Type>> _subscribers = new Dictionary<IComponent, IList<Type>>();
-        readonly Stack<HashSet<IComponent>> _dispatchLists = new Stack<HashSet<IComponent>>();
+        readonly IDictionary<Type, IList<Handler>> _subscriptions = new Dictionary<Type, IList<Handler>>();
+        readonly IDictionary<IComponent, IList<Handler>> _subscribers = new Dictionary<IComponent, IList<Handler>>();
+        readonly Stack<List<Handler>> _dispatchLists = new Stack<List<Handler>>();
         readonly Queue<(IEvent, object)> _queuedEvents = new Queue<(IEvent, object)>();
 
 #if DEBUG
@@ -39,6 +39,12 @@ namespace UAlbion.Core.Events
         }
 #endif
 
+        public EventExchange(ILogExchange logger)
+        {
+            _logger = logger;
+            Attach(_logger);
+        }
+
         public void Dispose()
         {
             lock(SyncRoot)
@@ -46,21 +52,34 @@ namespace UAlbion.Core.Events
                     disposableSystem.Dispose();
         }
 
-        public EventExchange(IComponent logger)
+        public EventExchange Attach(IComponent component)
         {
-            _logger = logger;
-            Attach(_logger);
+            PerfTracker.StartupEvent($"Attaching {component.GetType().Name}");
+            component.Attach(this);
+            PerfTracker.StartupEvent($"Attached {component.GetType().Name}");
+            return this;
         }
 
-        public bool Contains(IComponent component) { lock(SyncRoot) return _subscribers.ContainsKey(component); }
+        public void Enqueue(IEvent e, object sender) => _queuedEvents.Enqueue((e, sender));
 
-        void Collect(HashSet<IComponent> subscribers, Type type, Type[] interfaces)
+        public void FlushQueuedEvents()
+        {
+            while (_queuedEvents.Count > 0)
+            {
+                var (e, sender) = _queuedEvents.Dequeue();
+                Raise(e, sender);
+            }
+        }
+
+        void Collect(List<Handler> subscribers, Type type, Type[] interfaces)
         {
             lock (SyncRoot)
             {
                 if (_subscriptions.TryGetValue(type, out var tempSubscribers))
                 {
-                    subscribers.EnsureCapacity(tempSubscribers.Count);
+                    if (subscribers.Capacity < tempSubscribers.Count)
+                        subscribers.Capacity = tempSubscribers.Count;
+
                     foreach (var subscriber in tempSubscribers)
                         subscribers.Add(subscriber);
                 }
@@ -72,7 +91,7 @@ namespace UAlbion.Core.Events
             }
         }
 
-        public void Raise(IEvent e, object sender, bool includeParent = true)
+        public void Raise(IEvent e, object sender)
         {
             bool verbose = e is IVerboseEvent;
             if (!verbose)
@@ -98,75 +117,66 @@ namespace UAlbion.Core.Events
                 else CoreTrace.Log.StartRaise(eventId, _nesting, e.GetType().Name, eventText);
             }
 
-            HashSet<IComponent> subscribers;
+            List<Handler> handlers;
             lock (SyncRoot)
             {
-                if (!_dispatchLists.TryPop(out subscribers))
-                    subscribers = new HashSet<IComponent>();
+                if (!_dispatchLists.TryPop(out handlers))
+                    handlers = new List<Handler>();
             }
 
 #if DEBUG
             if (e is BeginFrameEvent) _frameEvents.Clear();
 #endif
-            Collect(subscribers, type, interfaces);
+            Collect(handlers, type, interfaces);
 
-            foreach (var subscriber in subscribers)
-                subscriber.Receive(e, sender);
+            foreach (var handler in handlers)
+                if (sender != handler.Component)
+                    handler.Invoke(e);
 
             if (eventText != null)
             {
-                if (verbose) CoreTrace.Log.StopRaiseVerbose(eventId, _nesting, e.GetType().Name, eventText, subscribers.Count);
-                else CoreTrace.Log.StopRaise(eventId, _nesting, e.GetType().Name, eventText, subscribers.Count);
+                if (verbose) CoreTrace.Log.StopRaiseVerbose(eventId, _nesting, e.GetType().Name, eventText, handlers.Count);
+                else CoreTrace.Log.StopRaise(eventId, _nesting, e.GetType().Name, eventText, handlers.Count);
             }
 
-            subscribers.Clear();
-            _dispatchLists.Push(subscribers);
+            handlers.Clear();
+            _dispatchLists.Push(handlers);
 
             if (!verbose)
                 Interlocked.Decrement(ref _nesting);
         }
 
-        public void Enqueue(IEvent e, object sender) => _queuedEvents.Enqueue((e, sender));
+        public void Subscribe<T>(IComponent component) where T : IEvent 
+            => Subscribe(new Handler<T>(e => component.Receive(e, null), component));
 
-        public void FlushQueuedEvents()
-        {
-            while (_queuedEvents.Count > 0)
-            {
-                var (e, sender) = _queuedEvents.Dequeue();
-                Raise(e, sender);
-            }
-        }
-
-        public EventExchange Attach(IComponent component)
-        {
-            PerfTracker.StartupEvent($"Attaching {component.GetType().Name}");
-            component.Attach(this);
-            PerfTracker.StartupEvent($"Attached {component.GetType().Name}");
-            return this;
-        }
-
-        public void Subscribe<T>(IComponent subscriber) { Subscribe(typeof(T), subscriber); }
-        public void Subscribe(Type eventType, IComponent subscriber)
+        public void Subscribe(Handler handler)
         {
             lock (SyncRoot)
             {
-                if (_subscribers.TryGetValue(subscriber, out var subscribedTypes))
+                if (_subscribers.TryGetValue(handler.Component, out var subscribedTypes))
                 {
-                    if (subscribedTypes.Contains(eventType))
+                    if (subscribedTypes.Any(x => x.Type == handler.Type))
+                    {
+                        Raise(new LogEvent(
+                            LogEvent.Level.Error,
+                            $"Component of type \"{handler.Component.GetType()}\" tried to register " +
+                            $"handler for event {handler.Type}, but it has already registered a handler for that event."),
+                            this);
                         return;
+                    }
                 }
                 else
                 {
-                    _subscribers[subscriber] = new List<Type>();
+                    _subscribers[handler.Component] = new List<Handler>();
                 }
 
-                if (eventType != null)
+                if (handler.Type != null)
                 {
-                    if (!_subscriptions.ContainsKey(eventType))
-                        _subscriptions.Add(eventType, new List<IComponent>());
+                    if (!_subscriptions.ContainsKey(handler.Type))
+                        _subscriptions.Add(handler.Type, new List<Handler>());
 
-                    _subscriptions[eventType].Add(subscriber);
-                    _subscribers[subscriber].Add(eventType);
+                    _subscriptions[handler.Type].Add(handler);
+                    _subscribers[handler.Component].Add(handler);
                 }
             }
         }
@@ -175,11 +185,11 @@ namespace UAlbion.Core.Events
         {
             lock (SyncRoot)
             {
-                if (!_subscribers.TryGetValue(subscriber, out var subscribedEventTypes))
+                if (!_subscribers.TryGetValue(subscriber, out var handlersForSubscriber))
                     return;
 
-                foreach (var type in subscribedEventTypes.ToList())
-                    _subscriptions[type].Remove(subscriber);
+                foreach (var handler in handlersForSubscriber.ToList())
+                    _subscriptions[handler.Type].Remove(handler);
 
                 _subscribers.Remove(subscriber);
             }
@@ -189,11 +199,15 @@ namespace UAlbion.Core.Events
         {
             lock (SyncRoot)
             {
-                if (!_subscribers.TryGetValue(subscriber, out var subscribedEventTypes))
+                if (!_subscribers.TryGetValue(subscriber, out var handlersForSubscriber))
                     return;
 
-                if (subscribedEventTypes.Remove(typeof(T)))
-                    _subscriptions[typeof(T)].Remove(subscriber);
+                var handler = handlersForSubscriber.FirstOrDefault(x => x.Type == typeof(T));
+                if (handler == null)
+                    return;
+
+                handlersForSubscriber.Remove(handler);
+                _subscriptions[typeof(T)].Remove(handler);
             }
         }
 
@@ -240,7 +254,7 @@ namespace UAlbion.Core.Events
         {
             lock (SyncRoot)
             {
-                var subscribers = new HashSet<IComponent>();
+                var subscribers = new List<Handler>();
                 var interfaces = eventType.GetInterfaces();
                 Collect(subscribers, eventType, interfaces);
                 return subscribers.ToList();

@@ -2,7 +2,7 @@
   // Global key-bindings that are active in every game mode / scene
   "Global": {
     "Escape": "push_scene MainMenu",
-    "Tilde": "push_input_mode console",
+    "Tilde": "debug_flag toggle ShowConsole",
     "Alt+F4": "quit",
     "Alt+Enter":  "e:toggle_fullscreen",
     "BracketLeft": "e:mag -1",
@@ -32,28 +32,7 @@
     "Shift+S": "+camera_move  0  8",
     "Shift+D": "+camera_move  8  0",
     "Alt+1": "set_language English",
-    "Alt+2": "set_language German",
-
-    "Number0": "special -5",
-    "Number1": "special -4",
-    "Number2": "special -3",
-    "Number3": "special -2",
-    "Number4": "special -1",
-    "Number5": "special 0",
-    "Number6": "special 1",
-    "Number7": "special 2",
-    "Number8": "special 3",
-    "Number9": "special 4",
-    "Shift+Number0": "special2 -5",
-    "Shift+Number1": "special2 -4",
-    "Shift+Number2": "special2 -3",
-    "Shift+Number3": "special2 -2",
-    "Shift+Number4": "special2 -1",
-    "Shift+Number5": "special2 0",
-    "Shift+Number6": "special2 1",
-    "Shift+Number7": "special2 2",
-    "Shift+Number8": "special2 3",
-    "Shift+Number9": "special2 4"
+    "Alt+2": "set_language German"
   },
   "Console": {
     "Tilde": "pop_input_mode"

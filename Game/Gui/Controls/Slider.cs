@@ -37,11 +37,7 @@ namespace UAlbion.Game.Gui.Controls
             _decrement = new Button("<", Decrement) { Typematic = true };
             _increment = new Button(">", Increment) { Typematic = true };
 
-            var track = new SliderTrack(getter, x =>
-            {
-                if (x >= _min && x <= _max)
-                    _setter(x);
-            }, min, max);
+            var track = new SliderTrack(getter, x => _setter(Math.Clamp(x, _min, _max)), min, max);
 
             _frame = new ButtonFrame(track)
             {

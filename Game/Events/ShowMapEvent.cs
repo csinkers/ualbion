@@ -3,5 +3,8 @@
 namespace UAlbion.Game.Events
 {
     [Event("show_map")]
-    public class ShowMapEvent : GameEvent { }
+    public class ShowMapEvent : GameEvent
+    {
+
+    }
 }

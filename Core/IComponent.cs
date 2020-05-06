@@ -8,5 +8,6 @@ namespace UAlbion.Core
         void Attach(EventExchange exchange);
         void Detach();
         void Receive(IEvent @event, object sender);
+        bool IsActive { get; set; }
     }
 }

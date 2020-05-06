@@ -59,6 +59,7 @@ namespace UAlbion
                 global.Raise(new QuitEvent(), null);
 
             PerfTracker.StartupEvent("Running game");
+            global.Raise(new SetSceneEvent(SceneId.Empty), null);
             switch(commandLine.GameMode)
             {
                 case GameMode.MainMenu:
@@ -94,6 +95,8 @@ namespace UAlbion
 
             global
                 .Register<IClock>(new GameClock())
+                .Attach(new IdleClock())
+                .Attach(new SlowClock())
                 .Register<ICollisionManager>(new CollisionManager())
                 .Register<ICommonColors>(new CommonColors(factory))
                 .Register<ICursorManager>(new CursorManager())
@@ -103,28 +106,31 @@ namespace UAlbion
                 .Register<IInputManager>(new InputManager()
                     .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
                     .RegisterInputMode(InputMode.World2D, new World2DInputMode())
-                        .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
-                    .RegisterMouseMode(MouseMode.Exclusive, new ExclusiveMouseMode())
+                    .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
                     .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
                     .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
                     .RegisterMouseMode(MouseMode.RightButtonHeld, new RightButtonHeldMouseMode())
                     .RegisterMouseMode(MouseMode.ContextMenu, new ContextMenuMouseMode())
                 )
                 .Register<IMapManager>(new MapManager())
-                .Register<IPaletteManager>(new PaletteManager())
                 .Register<ISelectionManager>(new SelectionManager())
                 .Register<ISceneManager>(new SceneManager()
-                    .AddScene(new EmptyScene())
-                    .AddScene(new AutomapScene())
-                    .AddScene(new FlatScene())
-                    .AddScene(new DungeonScene())
-                    .AddScene(new MenuScene())
-                    .AddScene(new InventoryScene())
+                    .AddScene((GameScene)new EmptyScene()
+                        .Add(new PaletteManager()))
+                    .AddScene((GameScene)new AutomapScene()
+                        .Add(new PaletteManager()))
+                    .AddScene((GameScene)new FlatScene()
+                        .Add(new PaletteManager()))
+                    .AddScene((GameScene)new DungeonScene()
+                        .Add(new PaletteManager()))
+                    .AddScene((GameScene)new MenuScene()
+                        .Add(new PaletteManager()))
+                    .AddScene((GameScene)new InventoryScene()
+                        .Add(new PaletteManager()))
                 )
                 .Register<ISpriteManager>(new SpriteManager())
                 .Register<ITextManager>(new TextManager())
                 .Register<ITextureManager>(new TextureManager())
-                .Attach(new SlowClock())
                 .Attach(new DebugMapInspector()
                     .AddBehaviour(new SpriteInstanceDataDebugBehaviour())
                     .AddBehaviour(new FormatTextEventBehaviour())
@@ -153,8 +159,6 @@ namespace UAlbion
                 .Add(new MainMenu())
                 .Add(menuBackground)
                 ;
-
-            ReflectionHelper.ClearTypeCache();
         }
     }
 }

@@ -6,7 +6,7 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
-    public class PaletteManager : Component, IPaletteManager
+    public class PaletteManager : ServiceComponent<IPaletteManager>, IPaletteManager
     {
         public IPalette Palette { get; private set; }
         public PaletteTexture PaletteTexture { get; private set; }
@@ -21,6 +21,7 @@ namespace UAlbion.Game
 
         protected override void Subscribed()
         {
+            base.Subscribed();
             SetPalette(PaletteId.Toronto2D);
         }
 

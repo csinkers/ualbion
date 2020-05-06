@@ -3,19 +3,16 @@ using UAlbion.Core;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
-using UAlbion.Game.Gui;
 using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Input
 {
     public class ExclusiveMouseMode : Component
     {
-        IUiElement _exclusiveItem;
 
         public ExclusiveMouseMode()
         {
             On<InputEvent>(OnInput);
-            On<SetExclusiveMouseModeEvent>(e => _exclusiveItem = e.ExclusiveElement);
         }
 
         void OnInput(InputEvent e)

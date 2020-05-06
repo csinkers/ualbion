@@ -16,17 +16,15 @@ namespace UAlbion.Game.Entities.Map2D
     {
         static readonly Vector3 Normal = Vector3.UnitZ;
         readonly LogicalMap _map;
-        readonly Vector2 _tileSize;
         readonly Renderable _renderable;
         int _lastHighlightIndex;
 
-        public SelectionHandler(LogicalMap map, Vector2 tileSize, Renderable renderable)
+        public SelectionHandler(LogicalMap map, Renderable renderable)
         {
             On<WorldCoordinateSelectEvent>(OnSelect);
             On<RightClickEvent>(e => OnRightClick());
 
             _map = map ?? throw new ArgumentNullException(nameof(map));
-            _tileSize = tileSize;
             _renderable = renderable;
         }
 
@@ -43,8 +41,8 @@ namespace UAlbion.Game.Entities.Map2D
                 return;
 
             Vector3 intersectionPoint = e.Origin + t * e.Direction;
-            int x = (int)(intersectionPoint.X / _tileSize.X);
-            int y = (int)(intersectionPoint.Y / _tileSize.Y);
+            int x = (int)(intersectionPoint.X / _renderable.TileSize.X);
+            int y = (int)(intersectionPoint.Y / _renderable.TileSize.Y);
 
             int highlightIndex = y * _map.Width + x;
             var underlayTile = _map.GetUnderlay(x, y);

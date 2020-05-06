@@ -31,6 +31,11 @@ namespace UAlbion.Game.Veldrid.Input
 
         public CursorManager()
         {
+            On<RenderEvent>(e => Render());
+            On<IdleClockEvent>(e => _frame++);
+            On<SetCursorEvent>(e => SetCursor(e.CursorId));
+            On<ShowCursorEvent>(e => { _showCursor = e.Show; _dirty = true; });
+            On<WindowResizedEvent>(e => SetCursor(_cursorId));
             On<InputEvent>(e =>
             {
                 Position = e.Snapshot.MousePosition;
@@ -41,11 +46,6 @@ namespace UAlbion.Game.Veldrid.Input
                 Position = new Vector2(e.X, e.Y);
                 _dirty = true;
             });
-            On<RenderEvent>(e => Render());
-            On<SlowClockEvent>(e => _frame += e.Delta);
-            On<SetCursorEvent>(e => SetCursor(e.CursorId));
-            On<ShowCursorEvent>(e => { _showCursor = e.Show; _dirty = true; });
-            On<WindowResizedEvent>(e => SetCursor(_cursorId));
         }
 
         void SetCursor(CoreSpriteId cursorId)

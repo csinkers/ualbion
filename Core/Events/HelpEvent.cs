@@ -1,9 +1,9 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion.Game.Events
+namespace UAlbion.Core.Events
 {
     [Event("help", "Display help on the available console commands.", new[] {"?", "usage"})]
-    public class HelpEvent : GameEvent
+    public class HelpEvent : Event
     {
         public HelpEvent(string commandName)
         {

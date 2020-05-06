@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
@@ -15,8 +14,8 @@ namespace UAlbion.Game.State
 
         public SceneManager()
         {
-            On<SetSceneEvent>(e => Set(e.SceneId));
-            On<OpenCharacterInventoryEvent>(e => OpenInventory(e.MemberId));
+            On<SetSceneEvent>(Set);
+            On<OpenCharacterInventoryEvent>(OpenInventory);
             On<OpenChestEvent>(OpenChest);
         }
 
@@ -42,20 +41,20 @@ namespace UAlbion.Game.State
             Raise(new InventoryChestModeEvent(e.ChestId, party.Leader));
         }
 
-        void OpenInventory(PartyCharacterId memberId)
+        void OpenInventory(OpenCharacterInventoryEvent e)
         {
             if(ActiveSceneId != SceneId.Inventory)
                 Raise(new PushSceneEvent(SceneId.Inventory));
-            Raise(new InventoryModeEvent(memberId));
+            Raise(new InventoryModeEvent(e.MemberId));
         }
 
-        void Set(SceneId activatingSceneId)
+        void Set(SetSceneEvent e)
         {
             _scenes[ActiveSceneId].IsActive = false;
             foreach (var sceneId in _scenes.Keys)
             {
                 var scene = _scenes[sceneId];
-                scene.IsActive = sceneId == activatingSceneId;
+                scene.IsActive = sceneId == e.SceneId;
 
                 if (!scene.IsActive)
                     continue;
@@ -68,7 +67,7 @@ namespace UAlbion.Game.State
                     Exchange.Attach(scene);
             }
 
-            ActiveSceneId = activatingSceneId;
+            ActiveSceneId = e.SceneId;
         }
     }
 }

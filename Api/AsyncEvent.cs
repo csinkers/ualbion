@@ -1,7 +1,6 @@
 ﻿using System;
-using UAlbion.Api;
 
-namespace UAlbion.Formats.MapEvents
+namespace UAlbion.Api
 {
     public abstract class AsyncEvent : Event, IAsyncEvent
     {

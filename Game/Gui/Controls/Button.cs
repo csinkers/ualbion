@@ -43,7 +43,7 @@ namespace UAlbion.Game.Gui.Controls
                 if (Typematic)
                     _clickAction();
                 e.Propagating = false;
-                Raise(new SetExclusiveMouseModeEvent(this));
+                // Raise(new SetExclusiveMouseModeEvent(this));
             });
 
             On<UiLeftReleaseEvent>(e =>

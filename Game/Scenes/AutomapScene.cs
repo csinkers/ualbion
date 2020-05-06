@@ -8,14 +8,6 @@ namespace UAlbion.Game.Scenes
     public interface IAutoMapScene : IScene { }
     public class AutomapScene : GameScene, IAutoMapScene
     {
-        /*
-        static readonly Type[] Renderers = {
-            typeof(DebugGuiRenderer),
-            typeof(FullScreenQuad),
-            typeof(ScreenDuplicator),
-            typeof(SpriteRenderer),
-        }; */
-
         public AutomapScene() : base(SceneId.Automap, new OrthographicCamera())
         {
             AttachChild(new CameraMotion2D((OrthographicCamera)Camera));

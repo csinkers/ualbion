@@ -25,8 +25,9 @@ namespace UAlbion.Game
         {
             On<StartClockEvent>(e => IsRunning = true);
             On<StopClockEvent>(e => IsRunning = false);
-            On<EngineUpdateEvent>(e => OnEngineUpdate(e));
-            On<StartTimerEvent>(e => StartTimer(e));
+            On<EngineUpdateEvent>(OnEngineUpdate);
+            On<SlowClockEvent>(OnSlowClock);
+            On<StartTimerEvent>(StartTimer);
             On<UpdateEvent>(e =>
             {
                 if (IsRunning || _updateEvent != null)
@@ -37,19 +38,18 @@ namespace UAlbion.Game
                 _slowTicksRemaining = e.Cycles;
                 IsRunning = true;
             });
-            On<SlowClockEvent>(e => OnSlowClock(e.Delta));
         }
 
         public DateTime GameTime { get; private set; } = new DateTime(2000, 1, 1);
         public float ElapsedTime { get; private set; }
         public bool IsRunning { get; private set; }
 
-        void OnSlowClock(int ticks)
+        void OnSlowClock(SlowClockEvent e)
         {
             if (_slowTicksRemaining <= 0)
                 return;
 
-            _slowTicksRemaining -= ticks;
+            _slowTicksRemaining -= e.Delta;
             if (_slowTicksRemaining > 0)
                 return;
 

@@ -51,6 +51,7 @@ namespace UAlbion.Core
 
             var paletteManager = Resolve<IPaletteManager>();
             context.SetCurrentPalette(paletteManager.PaletteTexture, paletteManager.Version);
+
             CoreTrace.Log.Info("Scene", "Created palette device texture");
 
             var rendererLookup = new Dictionary<Type, IRenderer>();

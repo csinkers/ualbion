@@ -33,6 +33,9 @@ namespace UAlbion.Game.Veldrid.Input
                 }
             }
 
+            if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && !x.Down))
+                Raise(new UiLeftReleaseEvent());
+
             if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && x.Down))
                 Raise(new CloseWindowEvent());
         }

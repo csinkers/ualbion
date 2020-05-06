@@ -8,15 +8,6 @@ namespace UAlbion.Game.Scenes
     public interface IDungeonScene : IScene { }
     public class DungeonScene : GameScene, IDungeonScene
     {
-        /*
-        static readonly Type[] Renderers = {
-            typeof(DebugGuiRenderer),
-            typeof(FullScreenQuad),
-            typeof(ScreenDuplicator),
-            typeof(ExtrudedTileMapRenderer),
-            typeof(SpriteRenderer),
-        }; */
-
         public DungeonScene() : base(SceneId.World3D, new PerspectiveCamera(true))
         {
             AttachChild(new CameraMotion3D((PerspectiveCamera)Camera));

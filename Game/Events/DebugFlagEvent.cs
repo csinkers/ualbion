@@ -5,7 +5,7 @@ using UAlbion.Game.Settings;
 namespace UAlbion.Game.Events
 {
     [Event("debug_flag")]
-    public class DebugFlagEvent : GameEvent
+    public class DebugFlagEvent : GameEvent, IVerboseEvent
     {
         public DebugFlagEvent(FlagOperation operation, DebugFlags flag)
         {

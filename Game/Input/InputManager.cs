@@ -13,7 +13,7 @@ namespace UAlbion.Game.Input
         readonly Stack<InputMode> _inputModeStack = new Stack<InputMode>();
 
         public InputMode InputMode { get; private set; } = InputMode.Global;
-        public MouseMode MouseMode { get; private set; } = MouseMode.Normal;
+        public MouseMode MouseMode { get; private set; } = MouseMode.Normal; // (MouseMode)(int)-1;
         public IEnumerable<InputMode> InputModeStack => _inputModeStack;
         public IEnumerable<MouseMode> MouseModeStack => _mouseModeStack;
 
@@ -21,7 +21,6 @@ namespace UAlbion.Game.Input
         {
             On<SetInputModeEvent>(SetInputMode);
             On<SetMouseModeEvent>(SetMouseMode);
-            On<SetExclusiveMouseModeEvent>(SetMouseMode);
             On<PushMouseModeEvent>(e =>
             {
                 var inputManager = Resolve<IInputManager>();
@@ -61,41 +60,45 @@ namespace UAlbion.Game.Input
         public InputManager RegisterMouseMode(MouseMode mouseMode, IComponent implementation)
         {
             _mouseModes.Add(mouseMode, implementation);
+            implementation.IsActive = false;
+            AttachChild(implementation);
             return this;
         }
 
         public InputManager RegisterInputMode(InputMode inputMode, IComponent implementation)
         {
             _inputModes.Add(inputMode, implementation);
+            implementation.IsActive = false;
+            AttachChild(implementation);
             return this;
         }
 
-        void SetMouseMode(ISetMouseModeEvent e)
+        void SetMouseMode(SetMouseModeEvent e)
         {
-            if (MouseMode == e.Mode) return;
+            _mouseModes.TryGetValue(e.Mode, out var activeMode);
+            if (MouseMode == e.Mode && activeMode?.IsActive == true)
+                return;
 
-            foreach (var mode in _mouseModes)
-                if (mode.Key != e.Mode)
-                    mode.Value.Detach();
+            foreach (var mode in _mouseModes.Values)
+                mode.IsActive = false;
 
-            foreach (var mode in _mouseModes)
-                if (mode.Key == e.Mode)
-                    Exchange.Attach(mode.Value);
+            if (activeMode != null)
+                activeMode.IsActive = true;
 
             MouseMode = e.Mode;
         }
 
         void SetInputMode(SetInputModeEvent e)
         {
-            if (InputMode == e.Mode) return;
+            _inputModes.TryGetValue(e.Mode, out var activeMode);
+            if (InputMode == e.Mode && activeMode?.IsActive == true)
+                return;
 
-            foreach (var mode in _inputModes)
-                if (mode.Key != e.Mode)
-                    mode.Value.Detach();
+            foreach (var mode in _inputModes.Values)
+                mode.IsActive = false;
 
-            foreach (var mode in _inputModes)
-                if (mode.Key == e.Mode)
-                    Exchange.Attach(mode.Value);
+            if (activeMode != null)
+                activeMode.IsActive = true;
 
             InputMode = e.Mode;
         }

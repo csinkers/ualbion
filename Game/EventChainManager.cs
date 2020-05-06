@@ -59,6 +59,7 @@ namespace UAlbion.Game
                         return;
 
                     Raise(new LogEvent(LogEvent.Level.Warning, $"Async event {clone} not acknowledged. Continuing immediately."));
+                    context.Node = context.Node.NextEvent;
                 }
                 else
                 {

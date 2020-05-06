@@ -41,7 +41,7 @@ namespace UAlbion.Game.Gui.Text
             });
         }
         public TextElement(IText source) { _source = source; }
-        public override string ToString() => $"TextSection {_source?.ToString() ?? _block?.ToString()}";
+        public override string ToString() => $"TextElement \"{_source?.ToString() ?? _block?.ToString()}";
         public TextElement Bold() { _block.Style = TextStyle.Fat; return this; }
         public TextElement Color(FontColor color) { _block.Color = color; return this; }
         public TextElement Left() { _block.Alignment = TextAlignment.Left; return this; }

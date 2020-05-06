@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Formats.MapEvents
+﻿using UAlbion.Api;
+
+namespace UAlbion.Formats.MapEvents
 {
     public abstract class AsyncMapEvent : AsyncEvent, IMapEvent
     {

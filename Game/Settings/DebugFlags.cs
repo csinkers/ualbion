@@ -12,5 +12,6 @@ namespace UAlbion.Game.Settings
         ShowPaths                = 0x10,
         NoMapTileBoundingBoxes   = 0x20,
         ShowCursorHotspot        = 0x40,
+        ShowConsole              = 0x80,
     }
 }

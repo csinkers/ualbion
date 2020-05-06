@@ -19,6 +19,7 @@ namespace UAlbion.Core
     /// </summary>
     public abstract class Component : IComponent
     {
+        static int _nesting = 0;
         readonly IDictionary<Type, Handler> _handlers = new Dictionary<Type, Handler>();
         bool _isActive = true;
         bool _isSubscribed;
@@ -26,12 +27,28 @@ namespace UAlbion.Core
         protected EventExchange Exchange { get; private set; } // N.B. will be null until subscribed.
         protected IList<IComponent> Children { get; } = new List<IComponent>(); // Primary purpose of children is ensuring that the children are also detached when the parent component is.
 
-        protected void On<T>(Action<T> callback) => _handlers.Add(typeof(T), new Handler<T>(callback));
         protected T Resolve<T>() => Exchange.Resolve<T>(); // Convenience method to save a bit of typing
         protected void Raise(IEvent @event) => Exchange?.Raise(@event, this);
         protected void Enqueue(IEvent @event) => Exchange?.Enqueue(@event, this);
         protected virtual void Subscribed() { }
         protected virtual void Unsubscribed() { }
+
+        protected void On<T>(Action<T> callback)
+        {
+            if (_handlers.ContainsKey(typeof(T)))
+                return;
+
+            var handler = new Handler<T>(callback, this);
+            _handlers.Add(typeof(T), handler);
+            if (_isSubscribed)
+                Exchange.Subscribe(handler);
+        }
+
+        protected void Off<T>()
+        {
+            if (_handlers.Remove(typeof(T)) && _isSubscribed)
+                Exchange.Unsubscribe<T>(this);
+        }
 
         protected T AttachChild<T>(T child) where T : IComponent
         {
@@ -66,26 +83,32 @@ namespace UAlbion.Core
             if (!_isActive)
                 return;
 
+            _nesting++;
+            Console.WriteLine("+".PadLeft(_nesting) + ToString());
             foreach (var child in Children)
                 child.Attach(exchange);
+            _nesting--;
 
-            exchange.Subscribe(null, this); // Ensure we always get added to the subscriber list, even if this component only uses subscription notifications.
+            // exchange.Subscribe(null, this); // Ensure we always get added to the subscriber list, even if this component only uses subscription notifications.
             foreach (var kvp in _handlers)
-                exchange.Subscribe(kvp.Key, this);
+                exchange.Subscribe(kvp.Value);
             _isSubscribed = true;
             Subscribed();
         }
 
         public void Detach()
         {
-            Unsubscribed();
-
             if (Exchange == null)
                 return;
+
+            _nesting++;
+            Console.WriteLine("-".PadLeft(_nesting) + ToString());
+            Unsubscribed();
 
             foreach (var child in Children)
                 child.Detach();
 
+            _nesting--;
             Exchange.Unsubscribe(this);
             _isSubscribed = false;
         }

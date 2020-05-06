@@ -13,6 +13,7 @@ namespace UAlbion.Game.Gui.Controls
         readonly int _min;
         readonly int _max;
 
+        Rectangle _lastExtents;
         float _clickPosition;
         SliderState _state;
 
@@ -31,12 +32,24 @@ namespace UAlbion.Game.Gui.Controls
                 _thumb.State = ButtonState.Clicked;
                 _state = SliderState.Clicked;
                 e.Propagating = false;
-                Raise(new SetExclusiveMouseModeEvent(this));
+                // Raise(new SetExclusiveMouseModeEvent(this));
             });
             On<UiLeftReleaseEvent>(e =>
             {
                 _state = SliderState.Normal;
                 _thumb.State = ButtonState.Normal;
+            });
+            On<UiMouseMoveEvent>(e =>
+            {
+                if (_state != SliderState.DraggingThumb)
+                    return;
+
+                var thumbExtents = ThumbExtents(_lastExtents);
+                float equivalentThumbPosition = e.X - _clickPosition;
+                int spareWidth = _lastExtents.Width - thumbExtents.Width;
+                int newValue = (int)((_max - _min)*(equivalentThumbPosition - _lastExtents.X) / spareWidth) + _min;
+                if (newValue != _getter())
+                    _setter(newValue);
             });
 
             _getter = getter;
@@ -68,6 +81,7 @@ namespace UAlbion.Game.Gui.Controls
             if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
                 return order;
 
+            _lastExtents = extents;
             var thumbExtents = ThumbExtents(extents);
             int value = _getter();
             switch (_state)
@@ -96,11 +110,6 @@ namespace UAlbion.Game.Gui.Controls
                     break;
 
                 case SliderState.DraggingThumb:
-                    float equivalentThumbPosition = uiPosition.X - _clickPosition;
-                    int spareWidth = extents.Width - thumbExtents.Width;
-                    int newValue = (int)((_max - _min)*(equivalentThumbPosition - extents.X) / spareWidth) + _min;
-                    if (newValue != value)
-                        _setter(newValue);
                     break;
             }
 

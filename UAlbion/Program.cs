@@ -6,7 +6,6 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Entities;
@@ -14,6 +13,7 @@ using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Settings;
 using UAlbion.Game.Veldrid.Assets;
 using UAlbion.Game.Veldrid.Audio;
+using UAlbion.Game.Veldrid.Debugging;
 
 namespace UAlbion
 {
@@ -37,7 +37,6 @@ namespace UAlbion
 
             PerfTracker.StartupEvent($"Found base directory {baseDir}");
 
-            var logger = new ConsoleLogger();
             PerfTracker.StartupEvent("Loading settings...");
             var settings = Settings.Load(baseDir);
             PerfTracker.StartupEvent("Settings loaded");
@@ -56,7 +55,11 @@ namespace UAlbion
                 .AddAssetPostProcessor(new InterlacedBitmapPostProcessor())
                 ;
 
-            using var exchange = new EventExchange(logger);
+            var logExchange = new LogExchange();
+            using var exchange = new EventExchange(logExchange)
+                .Attach(new StdioConsoleLogger())
+                .Attach(new ImGuiConsoleLogger());
+
             Engine.GlobalExchange = exchange;
 
             exchange // Need to register settings first, as the AssetConfigLocator relies on it.
@@ -69,11 +72,7 @@ namespace UAlbion
                 .Register<ITextureLoader>(assets)
                 ;
             PerfTracker.StartupEvent("Registered asset manager");
-
             PerfTracker.StartupEvent($"Running as {commandLine.Mode}");
-
-            var longSword = assets.LoadItem(ItemId.IskaiLongSword);
-            var sword = assets.LoadItem(ItemId.IskaiSword);
 
             switch(commandLine.Mode)
             {

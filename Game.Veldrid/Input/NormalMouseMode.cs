@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Formats.AssetIds;
@@ -10,6 +11,7 @@ namespace UAlbion.Game.Veldrid.Input
 {
     public class NormalMouseMode : Component
     {
+        Vector2 _lastPosition;
         public NormalMouseMode()
         {
             On<InputEvent>(OnInput);
@@ -44,6 +46,14 @@ namespace UAlbion.Game.Veldrid.Input
 
             if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && !x.Down))
                 Raise(new UiLeftReleaseEvent());
+
+            if(_lastPosition != e.Snapshot.MousePosition)
+            {
+                _lastPosition = e.Snapshot.MousePosition;
+                var window = Resolve<IWindowManager>();
+                var uiPosition = window.NormToUi(window.PixelToNorm(e.Snapshot.MousePosition));
+                Raise(new UiMouseMoveEvent((int)uiPosition.X, (int)uiPosition.Y));
+            }
         }
     }
 }

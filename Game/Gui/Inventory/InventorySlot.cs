@@ -32,7 +32,7 @@ namespace UAlbion.Game.Gui.Inventory
         public InventorySlot(InventoryType inventoryType, int id, ItemSlotId slotId)
         {
             On<UiLeftClickEvent>(e => OnClick());
-            On<SlowClockEvent>(e => _frameNumber += e.Delta);
+            On<IdleClockEvent>(e => _frameNumber++);
             On<InventoryChangedEvent>(e =>
             {
                 if (e.InventoryType == _inventoryType && e.InventoryId == _id)

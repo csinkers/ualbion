@@ -55,16 +55,15 @@ namespace UAlbion.Game.Entities.Map2D
             var assetManager = Resolve<IAssetManager>();
             var state = Resolve<IGameState>();
             _logicalMap = new LogicalMap(assetManager, _mapData, state.TemporaryMapChanges, state.PermanentMapChanges);
-
             var tileset = assetManager.LoadTexture(_logicalMap.TilesetId);
+            AttachChild(new ScriptManager());
+            AttachChild(new Collider(_logicalMap, !_logicalMap.UseSmallSprites));
             var renderable = AttachChild(new Renderable(_logicalMap, tileset));
-            var selector = AttachChild(new SelectionHandler(_logicalMap, renderable.TileSize, renderable));
+            var selector = AttachChild(new SelectionHandler(_logicalMap, renderable));
             selector.HighlightIndexChanged += (sender, x) => renderable.HighlightIndex = x;
             TileSize = new Vector3(renderable.TileSize, 1.0f);
             _logicalMap.TileSize = renderable.TileSize;
 
-            AttachChild(new ScriptManager());
-            AttachChild(new Collider(_logicalMap, !_logicalMap.UseSmallSprites));
 
             var movementSettings = _logicalMap.UseSmallSprites ? MovementSettings.Small() : MovementSettings.Large();
             _partyMovement = AttachChild(new PartyCaterpillar(Vector2.Zero, MovementDirection.Right, movementSettings));

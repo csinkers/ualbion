@@ -3,17 +3,23 @@ using UAlbion.Api;
 
 namespace UAlbion.Core
 {
-    abstract class Handler
+    public abstract class Handler
     {
         public Type Type { get; }
-        protected Handler(Type type) { Type = type; }
+        public IComponent Component { get; }
+        protected Handler(Type type, IComponent component)
+        {
+            Type = type ?? throw new ArgumentNullException(nameof(type));
+            Component = component ?? throw new ArgumentNullException(nameof(component));
+        }
         public abstract void Invoke(IEvent @event);
+        public override string ToString() => $"H<{Component.GetType().Name}, {Type.Name}>";
     }
 
-    class Handler<TEvent> : Handler
+    public class Handler<TEvent> : Handler
     {
-        readonly Action<TEvent> _callback;
-        public Handler(Action<TEvent> callback) : base(typeof(TEvent)) => _callback = callback;
-        public override void Invoke(IEvent @event) => _callback((TEvent)@event);
+        public Action<TEvent> Callback { get; }
+        public Handler(Action<TEvent> callback, IComponent component) : base(typeof(TEvent), component) => Callback = callback;
+        public override void Invoke(IEvent @event) => Callback((TEvent)@event);
     }
 }

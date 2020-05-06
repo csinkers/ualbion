@@ -72,8 +72,8 @@ namespace UAlbion.Core.Visual
                 if (value == _dirty)
                     return;
 
-                if(value) Exchange.Subscribe(typeof(RenderEvent), this);
-                    else Exchange.Unsubscribe<RenderEvent>(this);
+                if (value) On<RenderEvent>(e => UpdateSprite());
+                else Off<RenderEvent>();
 
                 _dirty = value;
             }

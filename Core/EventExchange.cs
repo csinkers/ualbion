@@ -4,28 +4,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using UAlbion.Api;
+using UAlbion.Core.Events;
 
-namespace UAlbion.Core.Events
+namespace UAlbion.Core
 {
+    /// <summary>
+    /// An event exchange responsible for efficiently distributing events to all
+    /// components that have registered handlers for the event. Also acts as a 
+    /// service locator, via the Register / Resolve methods.
+    /// </summary>
     public class EventExchange : IDisposable
     {
-        readonly ILogExchange _logger;
         readonly object SyncRoot = new object();
+        readonly ILogExchange _logExchange;
         int _nesting = -1;
         long _nextEventId;
         public int Nesting => _nesting;
 
+        readonly Stack<List<Handler>> _dispatchLists = new Stack<List<Handler>>();
+        readonly Queue<(IEvent, object)> _queuedEvents = new Queue<(IEvent, object)>();
         readonly IDictionary<Type, object> _registrations = new Dictionary<Type, object>();
         readonly IDictionary<Type, IList<Handler>> _subscriptions = new Dictionary<Type, IList<Handler>>();
         readonly IDictionary<IComponent, IList<Handler>> _subscribers = new Dictionary<IComponent, IList<Handler>>();
-        readonly Stack<List<Handler>> _dispatchLists = new Stack<List<Handler>>();
-        readonly Queue<(IEvent, object)> _queuedEvents = new Queue<(IEvent, object)>();
 
 #if DEBUG
         // ReSharper disable once CollectionNeverQueried.Local
         readonly IList<IEvent> _frameEvents = new List<IEvent>();
         IList<IComponent> _sortedSubscribersCached;
-        public IList<IComponent> SortedSubscribers
+        public IList<IComponent> SortedSubscribers // Just for debugging
         {
             get
             {
@@ -39,10 +45,10 @@ namespace UAlbion.Core.Events
         }
 #endif
 
-        public EventExchange(ILogExchange logger)
+        public EventExchange(ILogExchange logExchange)
         {
-            _logger = logger;
-            Attach(_logger);
+            _logExchange = logExchange;
+            Attach(_logExchange);
         }
 
         public void Dispose()
@@ -71,24 +77,21 @@ namespace UAlbion.Core.Events
             }
         }
 
-        void Collect(List<Handler> subscribers, Type type, Type[] interfaces)
+        void Collect(List<Handler> subscribers, Type type, Type[] interfaces) // Must be called from inside lock(_syncRoot)!
         {
-            lock (SyncRoot)
+            if (_subscriptions.TryGetValue(type, out var tempSubscribers))
             {
-                if (_subscriptions.TryGetValue(type, out var tempSubscribers))
-                {
-                    if (subscribers.Capacity < tempSubscribers.Count)
-                        subscribers.Capacity = tempSubscribers.Count;
+                if (subscribers.Capacity < tempSubscribers.Count)
+                    subscribers.Capacity = tempSubscribers.Count;
 
-                    foreach (var subscriber in tempSubscribers)
-                        subscribers.Add(subscriber);
-                }
-
-                foreach(var @interface in interfaces)
-                    if (_subscriptions.TryGetValue(@interface, out var interfaceSubscribers))
-                        foreach (var subscriber in interfaceSubscribers)
-                            subscribers.Add(subscriber);
+                foreach (var subscriber in tempSubscribers)
+                    subscribers.Add(subscriber);
             }
+
+            foreach (var @interface in interfaces)
+                if (_subscriptions.TryGetValue(@interface, out var interfaceSubscribers))
+                    foreach (var subscriber in interfaceSubscribers)
+                        subscribers.Add(subscriber);
         }
 
         public void Raise(IEvent e, object sender)
@@ -97,7 +100,7 @@ namespace UAlbion.Core.Events
             if (!verbose)
             {
                 Interlocked.Increment(ref _nesting);
-                _logger.Receive(e, sender);
+                _logExchange.Receive(e, sender);
             }
 
 #if DEBUG
@@ -122,12 +125,11 @@ namespace UAlbion.Core.Events
             {
                 if (!_dispatchLists.TryPop(out handlers))
                     handlers = new List<Handler>();
-            }
-
 #if DEBUG
-            if (e is BeginFrameEvent) _frameEvents.Clear();
+                if (e is BeginFrameEvent) _frameEvents.Clear();
 #endif
-            Collect(handlers, type, interfaces);
+                Collect(handlers, type, interfaces);
+            }
 
             foreach (var handler in handlers)
                 if (sender != handler.Component)
@@ -140,7 +142,8 @@ namespace UAlbion.Core.Events
             }
 
             handlers.Clear();
-            _dispatchLists.Push(handlers);
+            lock (SyncRoot)
+                _dispatchLists.Push(handlers);
 
             if (!verbose)
                 Interlocked.Decrement(ref _nesting);

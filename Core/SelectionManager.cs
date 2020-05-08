@@ -6,7 +6,7 @@ using UAlbion.Core.Events;
 
 namespace UAlbion.Core
 {
-    public class SelectionManager : Component, ISelectionManager
+    public class SelectionManager : ServiceComponent<ISelectionManager>, ISelectionManager
     {
         HashSet<object> _lastSelection = new HashSet<object>();
 

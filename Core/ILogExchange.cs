@@ -1,7 +1,8 @@
 ﻿using System;
 using UAlbion.Api;
+using UAlbion.Core.Events;
 
-namespace UAlbion.Core.Events
+namespace UAlbion.Core
 {
     public interface ILogExchange : IComponent
     {

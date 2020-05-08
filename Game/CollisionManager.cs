@@ -6,7 +6,7 @@ using UAlbion.Formats.Assets.Map;
 
 namespace UAlbion.Game
 {
-    public class CollisionManager : Component, ICollisionManager
+    public class CollisionManager : ServiceComponent<ICollisionManager>, ICollisionManager
     {
         readonly IList<ICollider> _colliders = new List<ICollider>();
 

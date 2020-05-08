@@ -8,8 +8,8 @@ namespace UAlbion.Formats.MapEvents
         public class None : EventSource
         {
             public override TriggerType Trigger => TriggerType.Default;
-
             public None() : base(AssetType.MapText, 0) { }
+            public override string ToString() => "Ø";
         }
         public class Map : EventSource
         {

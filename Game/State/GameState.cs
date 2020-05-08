@@ -27,7 +27,7 @@ namespace UAlbion.Game.State
         Func<MerchantId, IInventory> IGameState.GetMerchant => x => GetInventory(InventoryType.Merchant, (int)x);
 
         Func<NpcCharacterId, ICharacterSheet> IGameState.GetNpc => 
-            x => _game != null && _game.Npcs.TryGetValue(x, out var sheet) ? sheet : null;
+            x => _game != null && _game.NpcStats.TryGetValue(x, out var sheet) ? sheet : null;
         Func<PartyCharacterId, ICharacterSheet> IGameState.GetPartyMember => 
             x => _game != null &&_game.PartyMembers.TryGetValue(x, out var member) ? member : null;
         public Func<int, short> GetTicker => 
@@ -106,7 +106,7 @@ namespace UAlbion.Game.State
                 _game.PartyMembers.Add(charId, assets.LoadCharacter(charId));
 
             foreach (NpcCharacterId charId in Enum.GetValues(typeof(NpcCharacterId)))
-                _game.Npcs.Add(charId, assets.LoadCharacter(charId));
+                _game.NpcStats.Add(charId, assets.LoadCharacter(charId));
 
             foreach(ChestId id in Enum.GetValues(typeof(ChestId)))
                 _game.Chests.Add(id, assets.LoadChest(id));

@@ -21,7 +21,6 @@ namespace UAlbion.Game.Gui.Text
         public TextElement(string literal)
         {
             On<SetLanguageEvent>(e => _lastVersion = 0); // Force a rebuild on next render
-
             _source = new DynamicText(() =>
             {
                 _block.Text = literal;
@@ -31,6 +30,7 @@ namespace UAlbion.Game.Gui.Text
 
         public TextElement(StringId id)
         {
+            On<SetLanguageEvent>(e => _lastVersion = 0); // Force a rebuild on next render
             _source = new DynamicText(() =>
             {
                 var assets = Resolve<IAssetManager>();
@@ -40,7 +40,12 @@ namespace UAlbion.Game.Gui.Text
                 return new[] { _block };
             });
         }
-        public TextElement(IText source) { _source = source; }
+
+        public TextElement(IText source)
+        {
+            On<SetLanguageEvent>(e => _lastVersion = 0); // Force a rebuild on next render
+            _source = source;
+        }
         public override string ToString() => $"TextElement \"{_source?.ToString() ?? _block?.ToString()}";
         public TextElement Bold() { _block.Style = TextStyle.Fat; return this; }
         public TextElement Color(FontColor color) { _block.Color = color; return this; }

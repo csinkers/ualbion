@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Config;
@@ -37,8 +37,8 @@ namespace UAlbion
                 File.WriteAllBytes(file + ".txt", ts.ToArray());
                 //*/
 
-                Debug.Assert(originalBytes.Length == roundTripBytes.Length);
-                Debug.Assert(originalBytes.SequenceEqual(roundTripBytes));
+                ApiUtil.Assert(originalBytes.Length == roundTripBytes.Length);
+                ApiUtil.Assert(originalBytes.SequenceEqual(roundTripBytes));
             }
         }
     }

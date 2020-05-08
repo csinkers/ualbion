@@ -2,7 +2,6 @@
 using System.Text;
 using UAlbion.Api;
 using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
@@ -98,7 +97,7 @@ namespace UAlbion
                     Dump.ItemData(assets, baseDir);
                     Dump.MapEvents(assets, baseDir);
                     Dump.EventSets(assets, baseDir);
-                    Dump.MapData(assets, baseDir);
+                    Dump.MapData(assets, textManager, baseDir);
                     Dump.ThreeDMapAndLabInfo(assets, baseDir);
                     break;
 

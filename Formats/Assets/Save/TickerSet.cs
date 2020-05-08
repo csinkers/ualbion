@@ -6,7 +6,7 @@ namespace UAlbion.Formats.Assets.Save
     public class TickerSet : Dictionary<int, byte>
     {
         const int Min = 100;
-        const int Max = 225;
+        const int Max = 255;
 
         public void Serdes(ISerializer s)
         {

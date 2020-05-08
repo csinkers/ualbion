@@ -22,8 +22,6 @@ namespace UAlbion.Game.Veldrid.Input
         public RightButtonHeldMouseMode()
         {
             On<InputEvent>(OnInput);
-            // On<UiSelectedEvent>(e => OnSelect(e));
-
             _cursor = AttachChild(new MapSprite<CoreSpriteId>(CoreSpriteId.Select, DrawLayer.MaxLayer, 0, SpriteFlags.LeftAligned));
         }
 
@@ -69,7 +67,7 @@ namespace UAlbion.Game.Veldrid.Input
         {
             Raise(new PopMouseModeEvent());
 
-            var clickEvent = new RightClickEvent();
+            var clickEvent = new ShowMapMenuEvent();
             foreach (var hit in orderedHits)
             {
                 if (!clickEvent.Propagating) break;

@@ -5,6 +5,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Scenes;
@@ -22,7 +23,12 @@ namespace UAlbion.Game.Entities.Map2D
         public SelectionHandler(LogicalMap map, Renderable renderable)
         {
             On<WorldCoordinateSelectEvent>(OnSelect);
-            On<RightClickEvent>(e => OnRightClick());
+            On<ShowMapMenuEvent>(e => ShowMapMenu());
+            On<UiRightClickEvent>(e =>
+            {
+                e.Propagating = false;
+                Raise(new PushMouseModeEvent(MouseMode.RightButtonHeld));
+            });
 
             _map = map ?? throw new ArgumentNullException(nameof(map));
             _renderable = renderable;
@@ -76,7 +82,7 @@ namespace UAlbion.Game.Entities.Map2D
             }
         }
 
-        void OnRightClick()
+        void ShowMapMenu()
         {
             int x = _lastHighlightIndex % _map.Width;
             int y = _lastHighlightIndex / _map.Width;

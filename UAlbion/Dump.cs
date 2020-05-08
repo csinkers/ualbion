@@ -1,16 +1,18 @@
-﻿using System;
+﻿using SerdesNet;
+using System;
 using System.IO;
 using System.Linq;
-using SerdesNet;
 using UAlbion.Core.Veldrid;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Entities;
+using MapType = UAlbion.Formats.Assets.Map.MapType;
 using TextEvent = UAlbion.Formats.MapEvents.TextEvent;
 
 namespace UAlbion
@@ -111,7 +113,7 @@ namespace UAlbion
             }
         }
 
-        public static void MapData(IAssetManager assets, string baseDir)
+        public static void MapData(IAssetManager assets, ITextManager textManager, string baseDir)
         {
             using var sw = File.CreateText($@"{baseDir}\re\MapInfo.txt");
             for (int i = 100; i < 400; i++)
@@ -131,11 +133,13 @@ namespace UAlbion
                     sw.Write($"Sound?:{map2d.Sound} ");
                 }
 
+                LabyrinthData lab = null;
                 if (map is MapData3D map3d)
                 {
                     sw.Write($"Flags: {map3d.Flags} ");
                     sw.Write($"Labyrinth: {map3d.LabDataId} ");
                     sw.Write($"Sound?:{map3d.Sound} ");
+                    lab = assets.LoadLabyrinthData(map3d.LabDataId);
                 }
 
                 sw.Write($"Song:{map.SongId} ({(int?)map.SongId}) ");
@@ -146,21 +150,55 @@ namespace UAlbion
                     if (!map.Npcs.TryGetValue(j, out var npc))
                         continue;
 
+                    var wp = npc.Waypoints.FirstOrDefault();
                     var idText = npc.Id.ToString().PadLeft(15);
+
                     sw.Write($"    Npc{j:D3}: {idText} ({(int?)npc.Id:D3}) ");
-                    sw.Write($"Movement:{npc.Movement} ");
-                    sw.Write($"Flags:{npc.Flags} ");
-                    sw.Write($"ObjNum:{npc.ObjectNumber} ");
-                    sw.Write($"Sound:{npc.Sound} ({(int?)npc.Sound}) ");
-                    sw.Write($"Unk8:{npc.Unk8} ");
-                    sw.WriteLine($"Unk9:{npc.Unk9} ");
+                    sw.Write($"X:{wp.X:D3} Y:{wp.Y:D3} ");
+                    sw.Write($"U8:{npc.Unk8} ");
+                    sw.Write($"U9:{npc.Unk9} ");
+                    sw.Write($"F{(int)npc.Flags:X2}:({npc.Flags}) ");
+                    sw.Write($"M:{npc.Movement} ");
+                    sw.Write($"S:{npc.Sound} ({(int?)npc.Sound}) ");
+                    switch (map.MapType)
+                    {
+                        case MapType.TwoD: sw.Write($"O:{(LargeNpcId)npc.ObjectNumber} ({npc.ObjectNumber}) "); break;
+                        case MapType.TwoDOutdoors: sw.Write($"O:{(SmallNpcId)npc.ObjectNumber} ({npc.ObjectNumber}) "); break;
+                        case MapType.ThreeD:
+                            if (lab != null)
+                            {
+                                var objectData = lab.ObjectGroups[npc.ObjectNumber - 1];
+                                foreach (var subObject in objectData.SubObjects)
+                                {
+                                    var def = lab.Objects[subObject.ObjectInfoNumber];
+                                    sw.Write($"O:{def.TextureNumber} ");
+                                }
+                            }
+
+                            break;  
+                    }
+
+                    sw.WriteLine();
+
                     if (npc.Chain != null)
                     {
+                        var context = new EventContext(new EventSource.Map((MapDataId)i, TriggerType.Default, 0, 0));
                         sw.WriteLine($"        EventChain: {npc.Chain?.Id}");
                         foreach (var e in npc.Chain.Events)
                         {
-                            sw.Write("        ");
-                            sw.WriteLine(e.ToString());
+                            if (e.Event is IContextualEvent ce)
+                                ce.Context = context;
+                            if (e.Event is TextEvent textEvent)
+                            {
+                                var textSource = textManager.FormatTextEvent(textEvent, FontColor.White);
+                                var text = string.Join(", ", textSource.Get().Select(x => x.Text));
+                                sw.WriteLine($"        {e} = {text}");
+                            }
+                            else
+                            {
+                                sw.Write("        ");
+                                sw.WriteLine(e.ToString());
+                            }
                         }
                     }
                 }

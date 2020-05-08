@@ -3,7 +3,7 @@ using UAlbion.Core.Events;
 
 namespace UAlbion.Core.Visual
 {
-    public class SpriteManager : Component, ISpriteManager
+    public class SpriteManager : ServiceComponent<ISpriteManager>, ISpriteManager
     {
         readonly object _syncRoot = new object();
         readonly IDictionary<SpriteKey, MultiSprite> _sprites = new Dictionary<SpriteKey, MultiSprite>();

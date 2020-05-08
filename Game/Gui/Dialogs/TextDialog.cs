@@ -1,5 +1,4 @@
 ﻿using System;
-using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
@@ -12,8 +11,8 @@ namespace UAlbion.Game.Gui.Dialogs
     {
         public TextDialog(IText text, SmallPortraitId? portraitId = null, int depth = 0) : base(DialogPositioning.Top, depth)
         {
-            On<UiLeftClickEvent>(e => Close());
-            On<RightClickEvent>(e => Close());
+            On<UiLeftClickEvent>(e => { Close(); e.Propagating = false; });
+            On<UiRightClickEvent>(e => { Close(); e.Propagating = false; });
             On<CloseWindowEvent>(e => Close());
 
             var textSection = new TextElement(text).Center();

@@ -1,5 +1,4 @@
 ﻿using SerdesNet;
-using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {

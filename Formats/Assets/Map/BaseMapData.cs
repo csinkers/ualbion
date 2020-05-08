@@ -175,7 +175,12 @@ namespace UAlbion.Formats.Assets.Map
         protected void SerdesNpcWaypoints(ISerializer s)
         {
             foreach (var npc in Npcs.OrderBy(x => x.Key).Select(x => x.Value))
-                npc.LoadWaypoints(s);
+            {
+                if (npc.Id.HasValue)
+                    npc.LoadWaypoints(s);
+                else 
+                    npc.Waypoints = new MapNpc.Waypoint[1];
+            }
         }
 
         public void AttachEventSets(Func<NpcCharacterId, ICharacterSheet> characterSheetLoader, Func<EventSetId, EventSet> eventSetLoader)

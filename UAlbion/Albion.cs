@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Textures;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Veldrid.Visual;
@@ -14,7 +13,6 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game;
 using UAlbion.Game.Debugging;
-using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
 using UAlbion.Game.Gui.Controls;
@@ -46,10 +44,10 @@ namespace UAlbion
                 ;
 
             global
-                .Register<IShaderCache>(new ShaderCache(
+                .Attach(new ShaderCache(
                     Path.Combine(baseDir, "Core", "Visual", "Shaders"),
                     Path.Combine(baseDir, "data", "ShaderCache")))
-                .Register<IEngine>(engine);
+                .Attach(engine);
 
             var backgroundThreadInitTask = Task.Run(() => RegisterComponents(global, baseDir, commandLine));
             engine.Initialise();
@@ -80,7 +78,6 @@ namespace UAlbion
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            // global.Raise(new StartDialogueEvent((EventSetId)112), null);
             engine.Run();
             // TODO: Ensure all sprite leases returned etc to weed out memory leaks
         }
@@ -94,16 +91,16 @@ namespace UAlbion
                 global.Register<IAudioManager>(new AudioManager(false));
 
             global
-                .Register<IClock>(new GameClock())
+                .Register<ICommonColors>(new CommonColors(factory))
+                .Attach(new GameClock())
                 .Attach(new IdleClock())
                 .Attach(new SlowClock())
-                .Register<ICollisionManager>(new CollisionManager())
-                .Register<ICommonColors>(new CommonColors(factory))
-                .Register<ICursorManager>(new CursorManager())
-                .Register<IDeviceObjectManager>(new DeviceObjectManager())
-                .Register<IGameState>(new GameState())
-                .Register<ILayoutManager>(new LayoutManager())
-                .Register<IInputManager>(new InputManager()
+                .Attach(new CollisionManager())
+                .Attach(new CursorManager())
+                .Attach(new DeviceObjectManager())
+                .Attach(new GameState())
+                .Attach(new LayoutManager())
+                .Attach(new InputManager()
                     .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
                     .RegisterInputMode(InputMode.World2D, new World2DInputMode())
                     .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
@@ -112,9 +109,9 @@ namespace UAlbion
                     .RegisterMouseMode(MouseMode.RightButtonHeld, new RightButtonHeldMouseMode())
                     .RegisterMouseMode(MouseMode.ContextMenu, new ContextMenuMouseMode())
                 )
-                .Register<IMapManager>(new MapManager())
-                .Register<ISelectionManager>(new SelectionManager())
-                .Register<ISceneManager>(new SceneManager()
+                .Attach(new MapManager())
+                .Attach(new SelectionManager())
+                .Attach(new SceneManager()
                     .AddScene((GameScene)new EmptyScene()
                         .Add(new PaletteManager()))
                     .AddScene((GameScene)new AutomapScene()
@@ -128,9 +125,9 @@ namespace UAlbion
                     .AddScene((GameScene)new InventoryScene()
                         .Add(new PaletteManager()))
                 )
-                .Register<ISpriteManager>(new SpriteManager())
-                .Register<ITextManager>(new TextManager())
-                .Register<ITextureManager>(new TextureManager())
+                .Attach(new SpriteManager())
+                .Attach(new TextManager())
+                .Attach(new TextureManager())
                 .Attach(new DebugMapInspector()
                     .AddBehaviour(new SpriteInstanceDataDebugBehaviour())
                     .AddBehaviour(new FormatTextEventBehaviour())

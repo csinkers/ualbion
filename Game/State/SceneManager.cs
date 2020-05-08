@@ -8,7 +8,7 @@ using UAlbion.Game.Scenes;
 
 namespace UAlbion.Game.State
 {
-    public class SceneManager : Component, ISceneManager
+    public class SceneManager : ServiceComponent<ISceneManager>, ISceneManager
     {
         readonly IDictionary<SceneId, GameScene> _scenes = new Dictionary<SceneId, GameScene>();
 

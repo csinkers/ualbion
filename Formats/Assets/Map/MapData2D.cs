@@ -36,11 +36,11 @@ namespace UAlbion.Formats.Assets.Map
             map.PaletteId = (PaletteId)StoreIncremented.Serdes(nameof(PaletteId), (byte)map.PaletteId, s.UInt8);
             map.FrameRate = s.UInt8(nameof(FrameRate), map.FrameRate); //9
 
-            for(int i = 0; i < npcCount; i++)
+            for (int i = 0; i < npcCount; i++)
             {
                 map.Npcs.TryGetValue(i, out var npc);
                 npc = MapNpc.Serdes(i, npc, s);
-                if (npc.Id != null)
+                if (npc.ObjectNumber != 0 || npc.Id != null)
                     map.Npcs[i] = npc;
             }
             s.Check();

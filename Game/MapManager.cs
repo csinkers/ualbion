@@ -11,7 +11,7 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game
 {
-    public class MapManager : Component, IMapManager
+    public class MapManager : ServiceComponent<IMapManager>, IMapManager
     {
         MapDataId? _pendingMapChange;
 
@@ -19,6 +19,7 @@ namespace UAlbion.Game
 
         public MapManager()
         {
+            On<ShowMapEvent>(e => { foreach (var child in Children) child.IsActive = e.Show; });
             On<BeginFrameEvent>(e => LoadMap());
             On<TeleportEvent>(Teleport);
             On<LoadMapEvent>(e =>
@@ -55,12 +56,12 @@ namespace UAlbion.Game
             var map = BuildMap(pendingMapChange);
             if (map != null)
             {
+                // Set the scene first to ensure scene-local components from other scenes are disabled.
+                Raise(new SetSceneEvent(map is Entities.Map3D.Map ? SceneId.World3D : SceneId.World2D));
                 Current = map;
                 AttachChild(map);
 
-                // Set the scene first to ensure scene-local components from other scenes are disabled.
-                Raise(new SetSceneEvent(map is Entities.Map3D.Map ? SceneId.World3D : SceneId.World2D));
-                Raise(new LogEvent(LogEvent.Level.Info, $"Loaded map {(int) pendingMapChange}: {pendingMapChange}"));
+                Raise(new LogEvent(LogEvent.Level.Info, $"Loaded map {(int)pendingMapChange}: {pendingMapChange}"));
                 Enqueue(new MapInitEvent());
 
                 if (map.MapData.SongId.HasValue)

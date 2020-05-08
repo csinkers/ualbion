@@ -12,6 +12,7 @@ namespace UAlbion.Formats.Assets.Save
     public class SavedGame
     {
         public const int MaxPartySize = 6;
+        public const int MaxNpcCount = 96;
 
         public string Name { get; set; }
         public ushort Version { get; set; }
@@ -26,7 +27,7 @@ namespace UAlbion.Formats.Assets.Save
         public Direction PartyDirection { get; set; }
 
         public IDictionary<PartyCharacterId, CharacterSheet> PartyMembers { get; } = new Dictionary<PartyCharacterId, CharacterSheet>();
-        public IDictionary<NpcCharacterId, CharacterSheet> Npcs { get; } = new Dictionary<NpcCharacterId, CharacterSheet>();
+        public IDictionary<NpcCharacterId, CharacterSheet> NpcStats { get; } = new Dictionary<NpcCharacterId, CharacterSheet>();
         public IDictionary<AutoMapId, byte[]> Automaps { get; } = new Dictionary<AutoMapId, byte[]>();
         public IDictionary<ChestId, Inventory> Chests { get; } = new Dictionary<ChestId, Inventory>();
         public IDictionary<MerchantId, Inventory> Merchants { get; } = new Dictionary<MerchantId, Inventory>();
@@ -42,6 +43,8 @@ namespace UAlbion.Formats.Assets.Save
         public byte[] Unknown16 { get; set; }
         public byte[] Unknown1A6 { get; set; }
         public byte[] Unknown2C1 { get; set; }
+        public byte[] Unknown5B9F { get; set; }
+        public NpcState[] Npcs { get; } = new NpcState[MaxNpcCount];
         public byte[] Unknown5B71 { get; set; }
         public MapChangeList PermanentMapChanges { get; private set; } = new MapChangeList();
         public MapChangeList TemporaryMapChanges { get; private set; } = new MapChangeList();
@@ -93,11 +96,13 @@ namespace UAlbion.Formats.Assets.Save
             save.Unknown2C1 = s.ByteArrayHex(nameof(Unknown2C1), save.Unknown2C1, 0x5833); // 0x2C1
             save._tickers.Serdes(s); // 5AF4
 
-            // Most likely NPC info, 128 bytes per record.
+            // Most likely NPC info, 128 bytes per record. (96 records)
+            save.Unknown5B9F = s.ByteArrayHex(nameof(Unknown5B9F), save.Unknown5B9F, 0x2C);
+            s.List(save.Npcs, MaxNpcCount, NpcState.Serdes);
             save.Unknown5B71 = s.ByteArrayHex(
                 nameof(Unknown5B71),
                 save.Unknown5B71,
-                (int)(0x947C + versionOffset - s.Offset)); // 5B71
+                (int)(0x947C + versionOffset - s.Offset)); // 5B9F
 
             save.PermanentMapChanges = s.Meta(
                 nameof(PermanentMapChanges),
@@ -136,9 +141,9 @@ namespace UAlbion.Formats.Assets.Save
 
                 var key = (NpcCharacterId)i;
                 CharacterSheet existing = null;
-                if (serializer.Mode == SerializerMode.Reading || save.Npcs.TryGetValue(key, out existing))
+                if (serializer.Mode == SerializerMode.Reading || save.NpcStats.TryGetValue(key, out existing))
                 {
-                    save.Npcs[key] = charLoader.Serdes(
+                    save.NpcStats[key] = charLoader.Serdes(
                         existing,
                         serializer,
                         key.ToString(),
@@ -205,7 +210,7 @@ namespace UAlbion.Formats.Assets.Save
             XldLoader.Serdes(XldCategory.Merchant,1, s, SerdesMerchant, merchantIds);
             XldLoader.Serdes(XldCategory.Merchant,2, s, SerdesMerchant, merchantIds);
 
-            var npcIds = save.Npcs.Keys.Select(x => (int) x).ToList();
+            var npcIds = save.NpcStats.Keys.Select(x => (int) x).ToList();
             npcIds.Add(299);
             XldLoader.Serdes(XldCategory.NpcCharacter,0, s, SerdesNpcCharacter, npcIds);
             XldLoader.Serdes(XldCategory.NpcCharacter,1, s, SerdesNpcCharacter, npcIds);

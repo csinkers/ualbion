@@ -7,7 +7,6 @@ namespace UAlbion.Formats.MapEvents
     [DebuggerDisplay("{ToString()}")]
     public class EventNode : IEventNode
     {
-        public const long SizeInBytes = 12;
         bool DirectSequence => (NextEventId ?? Id + 1) == Id + 1;
         public override string ToString() => $"{(DirectSequence ? " " : "#")}{Id}=>{NextEventId?.ToString() ?? "!"}: {Event}";
         public int Id { get; }

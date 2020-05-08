@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
-using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Parsers
 {

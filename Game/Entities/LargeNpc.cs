@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets.Map;
@@ -23,7 +22,7 @@ namespace UAlbion.Game.Entities
         public LargeNpc(MapNpc npc)
         {
             On<SlowClockEvent>(e => { _sprite.Frame = e.FrameCount; });
-            On<RightClickEvent>(OnRightClick);
+            On<ShowMapMenuEvent>(OnRightClick);
 
             _npc = npc ?? throw new ArgumentNullException(nameof(npc));
             _sprite = AttachChild(new MapSprite<LargeNpcId>((LargeNpcId)_npc.ObjectNumber, DrawLayer.Underlay - 1, 0, SpriteFlags.BottomAligned));
@@ -39,7 +38,7 @@ namespace UAlbion.Game.Entities
             );
         }
 
-        void OnRightClick(RightClickEvent rightClickEvent)
+        void OnRightClick(ShowMapMenuEvent e)
         {
             if (_npc.Chain == null || _npc.Id == null)
                 return;
@@ -79,7 +78,7 @@ namespace UAlbion.Game.Entities
             };
 
             Raise(new ContextMenuEvent(uiPosition, heading, options));
-            rightClickEvent.Propagating = false;
+            e.Propagating = false;
         }
     }
  }

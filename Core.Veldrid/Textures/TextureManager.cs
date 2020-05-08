@@ -9,7 +9,7 @@ using Veldrid;
 
 namespace UAlbion.Core.Veldrid.Textures
 {
-    public class TextureManager : Component, ITextureManager
+    public class TextureManager : ServiceComponent<ITextureManager>, ITextureManager
     {
         const float CacheLifetimeSeconds = 20.0f;
         const float CacheCheckIntervalSeconds = 5.0f;

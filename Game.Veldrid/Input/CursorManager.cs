@@ -16,7 +16,7 @@ using UAlbion.Game.State.Player;
 
 namespace UAlbion.Game.Veldrid.Input
 {
-    public class CursorManager : Component, ICursorManager
+    public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
     {
         CoreSpriteId _cursorId = CoreSpriteId.Cursor;
 

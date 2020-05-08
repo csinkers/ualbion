@@ -12,7 +12,7 @@ namespace UAlbion.Game.Gui
 {
     public interface ILayoutManager { }
 
-    public class LayoutManager : Component, ILayoutManager
+    public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
     {
         public LayoutManager()
         {

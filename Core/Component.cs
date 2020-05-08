@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UAlbion.Api;
-using UAlbion.Core.Events;
 
 namespace UAlbion.Core
 {
@@ -19,20 +18,67 @@ namespace UAlbion.Core
     /// </summary>
     public abstract class Component : IComponent
     {
-        static int _nesting = 0;
+        static int _nesting;
         readonly IDictionary<Type, Handler> _handlers = new Dictionary<Type, Handler>();
-        bool _isActive = true;
-        bool _isSubscribed;
+        bool _isActive = true; // If false, then this component will not be attached to the exchange even if its parent is.
+        bool _isSubscribed; // True if this component is currently attached to an event exchange
 
-        protected EventExchange Exchange { get; private set; } // N.B. will be null until subscribed.
-        protected IList<IComponent> Children { get; } = new List<IComponent>(); // Primary purpose of children is ensuring that the children are also detached when the parent component is.
+        /// <summary>
+        /// The most recently attached event exchange, may currently be attached but
+        /// not necessarily (e.g. if this component or any of its parents is inactive).
+        /// Will be null until Attach has been called.
+        /// </summary>
+        protected EventExchange Exchange { get; private set; }
 
-        protected T Resolve<T>() => Exchange.Resolve<T>(); // Convenience method to save a bit of typing
+        /// <summary>
+        /// The list of this components child components.
+        /// The primary purpose of children is ensuring that the children are also attached and
+        /// detached when the parent component is.
+        /// </summary>
+        protected IList<IComponent> Children { get; } = new List<IComponent>(); 
+
+        /// <summary>
+        /// Resolve the currently active object that provides the given interface.
+        /// Service interfaces should only have a maximum of one active instance at any time.
+        /// </summary>
+        /// <typeparam name="T">The interface type to resolve</typeparam>
+        /// <returns></returns>
+        protected T Resolve<T>() => Exchange.Resolve<T>();
+
+        /// <summary>
+        /// Raise an event via the currently subscribed event exchange (if subscribed), and
+        /// distribute it to all components that have registered a handler.
+        /// </summary>
+        /// <param name="event">The event to raise</param>
         protected void Raise(IEvent @event) => Exchange?.Raise(@event, this);
+
+        /// <summary>
+        /// Enqueue an event with the currently subscribed event exchange to be raised
+        /// after any currently processing synchronous events have completed.
+        /// </summary>
+        /// <param name="event"></param>
         protected void Enqueue(IEvent @event) => Exchange?.Enqueue(@event, this);
+
+        /// <summary>
+        /// Called when the component is attached / subscribed to an event exchange.
+        /// Does nothing by default, but is provided for individual component implementations
+        /// to override.
+        /// </summary>
         protected virtual void Subscribed() { }
+
+        /// <summary>
+        /// Called when the component is detached / unsubscribed from an event exchange.
+        /// Does nothing by default, but is provided for individual component implementations
+        /// to override.
+        /// </summary>
         protected virtual void Unsubscribed() { }
 
+        /// <summary>
+        /// Add an event handler callback to be called when the relevant event
+        /// type is raised by other components.
+        /// </summary>
+        /// <typeparam name="T">The event type to handle</typeparam>
+        /// <param name="callback">The function to call when the event is raised</param>
         protected void On<T>(Action<T> callback)
         {
             if (_handlers.ContainsKey(typeof(T)))
@@ -44,12 +90,23 @@ namespace UAlbion.Core
                 Exchange.Subscribe(handler);
         }
 
+        /// <summary>
+        /// Cease handling the relevant event type.
+        /// </summary>
+        /// <typeparam name="T">The event type which should no longer be handled by this component.</typeparam>
         protected void Off<T>()
         {
             if (_handlers.Remove(typeof(T)) && _isSubscribed)
                 Exchange.Unsubscribe<T>(this);
         }
 
+        /// <summary>
+        /// Add a component to the collection of this components children, will attach the
+        /// component to this component's exchange if this component is currently attached.
+        /// </summary>
+        /// <typeparam name="T">The type of the child component</typeparam>
+        /// <param name="child">The component to add</param>
+        /// <returns>The child is also returned to allow constructs like _localVar = AttachChild(new SomeType());</returns>
         protected T AttachChild<T>(T child) where T : IComponent
         {
             if (_isActive)
@@ -58,6 +115,11 @@ namespace UAlbion.Core
             return child;
         }
 
+        /// <summary>
+        /// Whether the component is currently active. When a component becomes
+        /// inactive all event handlers are removed from the exchange, all child
+        /// components are also recursively removed from the exchange.
+        /// </summary>
         public bool IsActive
         {
             get => _isActive;
@@ -73,6 +135,11 @@ namespace UAlbion.Core
             }
         }
 
+        /// <summary>
+        /// Attach this component to the given exchange and register all event
+        /// handlers that have been configured using On.
+        /// </summary>
+        /// <param name="exchange">The event exchange that this component should be attached to</param>
         public void Attach(EventExchange exchange)
         {
             if (_isSubscribed)
@@ -96,6 +163,9 @@ namespace UAlbion.Core
             Subscribed();
         }
 
+        /// <summary>
+        /// Detach the current component and its event handlers from any currently active event exchange.
+        /// </summary>
         public void Detach()
         {
             if (Exchange == null)
@@ -113,6 +183,13 @@ namespace UAlbion.Core
             _isSubscribed = false;
         }
 
+        /// <summary>
+        /// Invoke any active handler for the given event. Mostly used for direct
+        /// component-component invocations (rare), event exchange handlers
+        /// typically bypass this step and call into the handler function directly.
+        /// </summary>
+        /// <param name="event">The event being raised</param>
+        /// <param name="sender">The component which generated the event</param>
         public void Receive(IEvent @event, object sender)
         {
             if (sender == this || Exchange == null)

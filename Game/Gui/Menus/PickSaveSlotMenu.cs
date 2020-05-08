@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Settings;
@@ -20,10 +20,11 @@ namespace UAlbion.Game.Gui.Menus
 
         public PickSaveSlotMenu(bool showEmptySlots, StringId stringId, int depth) : base(DialogPositioning.Center, depth)
         {
-            On<RightClickEvent>(e =>
+            On<UiRightClickEvent>(e =>
             {
                 Detach();
                 Closed?.Invoke(this, null);
+                e.Propagating = false;
             });
 
             _showEmptySlots = showEmptySlots;

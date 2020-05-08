@@ -11,7 +11,7 @@ using Veldrid.SPIRV;
 
 namespace UAlbion.Core.Veldrid.Visual
 {
-    public class ShaderCache : Component, IShaderCache, IDisposable
+    public class ShaderCache : ServiceComponent<IShaderCache>, IShaderCache, IDisposable
     {
         readonly object _syncRoot = new object();
         readonly IDictionary<string, CacheEntry> _cache = new Dictionary<string, CacheEntry>();

@@ -5,7 +5,7 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Input
 {
-    public class InputManager : Component, IInputManager
+    public class InputManager : ServiceComponent<IInputManager>, IInputManager
     {
         readonly IDictionary<InputMode, IComponent> _inputModes = new Dictionary<InputMode, IComponent>();
         readonly IDictionary<MouseMode, IComponent> _mouseModes = new Dictionary<MouseMode, IComponent>();

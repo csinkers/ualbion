@@ -14,7 +14,7 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Text
 {
-    public class TextManager : Component, ITextManager
+    public class TextManager : ServiceComponent<ITextManager>, ITextManager
     {
         const int SpaceSize = 3;
         static readonly IDictionary<char, int> FontMapping = new Dictionary<char, int>

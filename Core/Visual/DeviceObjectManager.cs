@@ -6,7 +6,7 @@ using UAlbion.Core.Events;
 
 namespace UAlbion.Core.Visual
 {
-    public class DeviceObjectManager : Component, IDeviceObjectManager
+    public class DeviceObjectManager : ServiceComponent<IDeviceObjectManager>, IDeviceObjectManager
     {
         readonly IDictionary<(object, object), CacheEntry> _cache = new Dictionary<(object, object), CacheEntry>();
         readonly object _syncRoot = new object();

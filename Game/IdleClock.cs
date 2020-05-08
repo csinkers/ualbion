@@ -16,6 +16,7 @@ namespace UAlbion.Game
         {
             On<EngineUpdateEvent>(OnEngineUpdate);
         }
+
         void OnEngineUpdate(EngineUpdateEvent e)
         {
             _elapsedTimeThisGameFrame += e.DeltaSeconds;

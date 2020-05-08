@@ -10,7 +10,7 @@ namespace UAlbion.Game
     public class HourElapsedEvent : GameEvent { }
     public class DayElapsedEvent : GameEvent { }
 
-    public class GameClock : Component, IClock
+    public class GameClock : ServiceComponent<IClock>, IClock
     {
         const float TickDurationSeconds = 1 / 60.0f;
         const float GameSecondsPerSecond = 60;

@@ -26,7 +26,7 @@ namespace UAlbion.Core.Veldrid
         readonly IList<IRenderer> _renderers = new List<IRenderer>();
         readonly FrameTimeAverager _frameTimeAverager = new FrameTimeAverager(0.5);
         readonly SceneContext _sceneContext = new SceneContext();
-        readonly WindowManager _windowManager = new WindowManager();
+        readonly WindowManager _windowManager;
         readonly VeldridCoreFactory _coreFactory;
 
         CommandList _frameCommands;
@@ -85,6 +85,7 @@ namespace UAlbion.Core.Veldrid
             });
 
             _coreFactory = new VeldridCoreFactory();
+            _windowManager = AttachChild(new WindowManager());
             _newBackend = backend;
             if (useRenderDoc)
                 using(PerfTracker.InfrequentEvent("Loading renderdoc"))
@@ -97,11 +98,7 @@ namespace UAlbion.Core.Veldrid
             if(shaderCache == null)
                 throw new InvalidOperationException("An instance of IShaderCache must be registered.");
             shaderCache.ShadersUpdated += (sender, args) => _newBackend = GraphicsDevice?.BackendType;
-
-            Exchange
-                .Register<IWindowManager>(_windowManager)
-                //.Attach(new DebugMenus(this))
-                ;
+            ChangeBackend();
         }
 
         public VeldridEngine AddRenderer(IRenderer renderer)
@@ -111,11 +108,6 @@ namespace UAlbion.Core.Veldrid
                 AttachChild(component);
 
             return this;
-        }
-
-        public void Initialise()
-        {
-            ChangeBackend();
         }
 
         public void Run()

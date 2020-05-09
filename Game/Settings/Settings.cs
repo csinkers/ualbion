@@ -79,5 +79,21 @@ namespace UAlbion.Game.Settings
             var json = JsonConvert.SerializeObject(this, serializerSettings);
             File.WriteAllText(configPath, json);
         }
+
+        protected override void Subscribed()
+        {
+            Exchange.Register<ISettings>(this);
+            Exchange.Register<IEngineSettings>(this);
+            Exchange.Register<IDebugSettings>(this);
+            Exchange.Register<IGameplaySettings>(this);
+        }
+
+        protected override void Unsubscribed()
+        {
+            Exchange.Unregister<ISettings>(this);
+            Exchange.Unregister<IEngineSettings>(this);
+            Exchange.Unregister<IDebugSettings>(this);
+            Exchange.Unregister<IGameplaySettings>(this);
+        }
     }
 }

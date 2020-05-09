@@ -14,7 +14,7 @@ namespace UAlbion.Formats.MapEvents
             e.Amount = s.UInt8(nameof(Amount), e.Amount);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-            e.ItemId = s.EnumU16(nameof(ItemId), e.ItemId);
+            e.ItemId = (ItemId)StoreIncremented.Serdes(nameof(e.ItemId), (ushort)e.ItemId, s.UInt16);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             return e;
         }

@@ -4,7 +4,7 @@ using UAlbion.Core.Events;
 
 namespace UAlbion.Core
 {
-    public class WindowManager : Component, IWindowManager
+    public class WindowManager : ServiceComponent<IWindowManager>, IWindowManager
     {
         public WindowManager()
         {

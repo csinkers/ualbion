@@ -19,7 +19,7 @@ namespace UAlbion.Game
 
         public MapManager()
         {
-            On<ShowMapEvent>(e => { foreach (var child in Children) child.IsActive = e.Show; });
+            On<ShowMapEvent>(e => { foreach (var child in Children) child.IsActive = e.Show ?? true; });
             On<BeginFrameEvent>(e => LoadMap());
             On<TeleportEvent>(Teleport);
             On<LoadMapEvent>(e =>

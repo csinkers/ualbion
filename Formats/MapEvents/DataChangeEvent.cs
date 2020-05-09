@@ -13,7 +13,7 @@ namespace UAlbion.Formats.MapEvents
             e.Mode = s.EnumU8(nameof(Mode), e.Mode);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
-            e.PartyMemberId = s.EnumU8(nameof(PartyMemberId), e.PartyMemberId);
+            e.PartyMemberId = (PartyCharacterId?)StoreIncrementedNullZero.Serdes(nameof(PartyMemberId), (byte?)e.PartyMemberId, s.UInt8);
             e.Value = s.UInt16(nameof(Value), e.Value);
             e.Amount = s.UInt16(nameof(Amount), e.Amount);
             return e;
@@ -21,8 +21,8 @@ namespace UAlbion.Formats.MapEvents
 
         public enum ChangeProperty : byte
         {
-            Health              = 0x0, // Maybe 1?
-            MagicPoints         = 0x1, // Maybe 2?
+            Health              = 0x2, // Maybe 1?
+            MagicPoints         = 0x3, // Maybe 2?
             Status              = 0x5,
             AddLanguage         = 0x7,
             AddExperience       = 0x8,
@@ -49,7 +49,7 @@ namespace UAlbion.Formats.MapEvents
 
         public ChangeProperty Property { get; set; }
         public QuantityChangeOperation Mode { get; set;  } // No mode for adding XP
-        public PartyCharacterId PartyMemberId { get; set;  }
+        public PartyCharacterId? PartyMemberId { get; set;  }
         public ushort Amount { get; set;  } // Or language id
 
         public byte Unk3 { get; set; }
@@ -64,7 +64,7 @@ namespace UAlbion.Formats.MapEvents
                 ChangeProperty.ReceiveOrRemoveItem => ((ItemId)Value-1).ToString(),
                 _ => Value.ToString()
             };
-        public override string ToString() => $"data_change {PartyMemberId} {Property} {Mode} {Amount}x{ItemString} ({Unk3} {Unk4})";
+        public override string ToString() => $"data_change {PartyMemberId?.ToString() ?? "ActivePlayer"} {Property} {Mode} {Amount}x{ItemString} ({Unk3} {Unk4})";
         public override MapEventType EventType => MapEventType.DataChange;
     }
 }

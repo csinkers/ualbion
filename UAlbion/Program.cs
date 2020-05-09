@@ -35,13 +35,8 @@ namespace UAlbion
                 throw new InvalidOperationException("No base directory could be found.");
 
             PerfTracker.StartupEvent($"Found base directory {baseDir}");
-
-            PerfTracker.StartupEvent("Loading settings...");
-            var settings = Settings.Load(baseDir);
-            PerfTracker.StartupEvent("Settings loaded");
-            var factory = new VeldridCoreFactory();
-
             PerfTracker.StartupEvent("Registering asset manager");
+            var factory = new VeldridCoreFactory();
             using var assets = new AssetManager()
                 .AddAssetLocator(new StandardAssetLocator())
                 .AddAssetLocator(new AssetConfigLocator())
@@ -56,20 +51,15 @@ namespace UAlbion
 
             var logExchange = new LogExchange();
             using var exchange = new EventExchange(logExchange)
+                .Register<ICoreFactory>(factory)
                 .Attach(new StdioConsoleLogger())
-                .Attach(new ImGuiConsoleLogger());
+                .Attach(new ImGuiConsoleLogger())
+                .Attach(Settings.Load(baseDir))
+                .Attach(assets) // Need to register settings first, as the AssetConfigLocator relies on it.
+                ;
 
             Engine.GlobalExchange = exchange;
 
-            exchange // Need to register settings first, as the AssetConfigLocator relies on it.
-                .Register<ICoreFactory>(factory)
-                .Register<ISettings>(settings)
-                .Register<IEngineSettings>(settings)
-                .Register<IDebugSettings>(settings)
-                .Register<IGameplaySettings>(settings)
-                .Register<IAssetManager>(assets)
-                .Register<ITextureLoader>(assets)
-                ;
             PerfTracker.StartupEvent("Registered asset manager");
             PerfTracker.StartupEvent($"Running as {commandLine.Mode}");
 
@@ -89,7 +79,7 @@ namespace UAlbion
 
                 case ExecutionMode.DumpData:
                     var textManager = new TextManager();
-                    exchange.Register<ITextManager>(textManager);
+                    exchange.Attach(textManager);
 
                     Dump.CoreSprites(assets, baseDir);
                     Dump.CharacterSheets(assets, textManager, baseDir);

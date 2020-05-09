@@ -77,9 +77,10 @@ namespace UAlbion.Core
             }
         }
 
-        void Collect(List<Handler> subscribers, Type type, Type[] interfaces) // Must be called from inside lock(_syncRoot)!
+        void Collect(List<Handler> subscribers, Type eventType) // Must be called from inside lock(_syncRoot)!
         {
-            if (_subscriptions.TryGetValue(type, out var tempSubscribers))
+            var interfaces = eventType.GetInterfaces();
+            if (_subscriptions.TryGetValue(eventType, out var tempSubscribers))
             {
                 if (subscribers.Capacity < tempSubscribers.Count)
                     subscribers.Capacity = tempSubscribers.Count;
@@ -108,8 +109,6 @@ namespace UAlbion.Core
             else _frameEvents.Add(e);
 #endif
 
-            var type = e.GetType();
-            var interfaces = type.GetInterfaces();
             long eventId = Interlocked.Increment(ref _nextEventId);
             string eventText = null;
 
@@ -128,7 +127,7 @@ namespace UAlbion.Core
 #if DEBUG
                 if (e is BeginFrameEvent) _frameEvents.Clear();
 #endif
-                Collect(handlers, type, interfaces);
+                Collect(handlers, e.GetType());
             }
 
             foreach (var handler in handlers)
@@ -258,8 +257,7 @@ namespace UAlbion.Core
             lock (SyncRoot)
             {
                 var subscribers = new List<Handler>();
-                var interfaces = eventType.GetInterfaces();
-                Collect(subscribers, eventType, interfaces);
+                Collect(subscribers, eventType);
                 return subscribers.ToList();
             }
         }

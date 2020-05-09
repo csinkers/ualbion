@@ -22,7 +22,8 @@ namespace UAlbion.Game
         protected override void Subscribed()
         {
             base.Subscribed();
-            SetPalette(PaletteId.Toronto2D);
+            if (Palette == null)
+                SetPalette(PaletteId.Toronto2D);
         }
 
         void OnTick(int frames)

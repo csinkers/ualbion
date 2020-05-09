@@ -3,7 +3,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    [Event("end_dialogue")]
+    [Event("end_dialogue", null, new [] { "ed" })]
     public class EndDialogueEvent : MapEvent
     {
         public static EndDialogueEvent Serdes(EndDialogueEvent e, ISerializer s)

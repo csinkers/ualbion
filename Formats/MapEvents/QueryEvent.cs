@@ -17,6 +17,11 @@ namespace UAlbion.Formats.MapEvents
                 case QueryType.ChosenVerb:
                     return QueryVerbEvent.Serdes((QueryVerbEvent)genericEvent, s);
 
+                case QueryType.IsPartyMemberConscious:
+                case QueryType.IsPartyMemberLeader:
+                case QueryType.HasPartyMember:
+                    return QueryPartyEvent.Serdes((QueryPartyEvent)genericEvent, s, subType);
+
                 case QueryType.PreviousActionResult: break;
                 case QueryType.Ticker: break;
                 case QueryType.CurrentMapId: break;

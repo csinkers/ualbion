@@ -43,14 +43,13 @@ namespace UAlbion
                 .AddRenderer(new ScreenDuplicator())
                 ;
 
+            var backgroundThreadInitTask = Task.Run(() => RegisterComponents(global, baseDir, commandLine));
             global
                 .Attach(new ShaderCache(
                     Path.Combine(baseDir, "Core", "Visual", "Shaders"),
                     Path.Combine(baseDir, "data", "ShaderCache")))
                 .Attach(engine);
 
-            var backgroundThreadInitTask = Task.Run(() => RegisterComponents(global, baseDir, commandLine));
-            engine.Initialise();
             backgroundThreadInitTask.Wait();
 
             if(commandLine.StartupOnly)
@@ -88,7 +87,7 @@ namespace UAlbion
             var factory = global.Resolve<ICoreFactory>();
 
             if (commandLine.AudioMode == AudioMode.InProcess)
-                global.Register<IAudioManager>(new AudioManager(false));
+                global.Attach(new AudioManager(false));
 
             global
                 .Register<ICommonColors>(new CommonColors(factory))

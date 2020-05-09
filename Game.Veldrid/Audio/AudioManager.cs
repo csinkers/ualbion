@@ -13,7 +13,7 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Veldrid.Audio
 {
-    public class AudioManager : Component, IAudioManager
+    public class AudioManager : ServiceComponent<IAudioManager>, IAudioManager
     {
         const int AudioPollIntervalMs = 100;
         readonly bool _standalone;
@@ -42,9 +42,16 @@ namespace UAlbion.Game.Veldrid.Audio
 
         protected override void Subscribed()
         {
+            _doneEvent.Reset();
             Task.Run(AudioThread);
+            base.Subscribed();
         }
 
+        protected override void Unsubscribed()
+        {
+            _doneEvent.Set();
+            base.Subscribed();
+        }
 
         class ActiveSound
         {

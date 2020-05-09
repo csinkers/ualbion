@@ -4,6 +4,7 @@ using System.Linq;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
+using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
@@ -21,6 +22,19 @@ namespace UAlbion.Game.Assets
         {
             _assetLocatorRegistry = AttachChild(new AssetLocatorRegistry());
         }
+
+        protected override void Subscribed()
+        {
+            Exchange.Register<IAssetManager>(this);
+            Exchange.Register<ITextureLoader>(this);
+        }
+
+        protected override void Unsubscribed()
+        {
+            Exchange.Unregister<IAssetManager>(this);
+            Exchange.Unregister<ITextureLoader>(this);
+        }
+
         public AssetManager AddAssetLocator(IAssetLocator locator)
         {
             _assetLocatorRegistry.AddAssetLocator(locator);

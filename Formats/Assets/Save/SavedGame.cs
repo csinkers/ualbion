@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SerdesNet;
@@ -13,14 +14,11 @@ namespace UAlbion.Formats.Assets.Save
     {
         public const int MaxPartySize = 6;
         public const int MaxNpcCount = 96;
+        public static readonly DateTime Epoch = new DateTime(2200, 1, 1, 0, 0, 0);
 
         public string Name { get; set; }
         public ushort Version { get; set; }
-
-        public ushort Days { get; set; }
-        public ushort Hours { get; set; }
-        public ushort Minutes { get; set; }
-
+        public TimeSpan ElapsedTime { get; set; }
         public MapDataId MapId { get; set; }
         public ushort PartyX { get; set; }
         public ushort PartyY { get; set; }
@@ -76,9 +74,11 @@ namespace UAlbion.Formats.Assets.Save
             ApiUtil.Assert(save.Version == 138); // TODO: Throw error for other versions?
             save.Unk9 = s.ByteArray(nameof(Unk9), save.Unk9, 6); // 2
 
-            save.Days    = s.UInt16(nameof(Days), save.Days);       // 8
-            save.Hours   = s.UInt16(nameof(Hours), save.Hours);     // A
-            save.Minutes = s.UInt16(nameof(Minutes), save.Minutes); // C
+            ushort days    = s.UInt16("Days", (ushort)save.ElapsedTime.TotalDays);  // 8
+            ushort hours   = s.UInt16("Hours", (ushort)save.ElapsedTime.Hours);     // A
+            ushort minutes = s.UInt16("Minutes", (ushort)save.ElapsedTime.Minutes); // C
+            save.ElapsedTime = new TimeSpan(days, hours, minutes, save.ElapsedTime.Seconds, save.ElapsedTime.Milliseconds);
+
             save.MapId   = s.EnumU16(nameof(MapId), save.MapId);    // E
             save.PartyX  = s.UInt16(nameof(PartyX), save.PartyX);   // 10
             save.PartyY  = s.UInt16(nameof(PartyY), save.PartyY);   // 12

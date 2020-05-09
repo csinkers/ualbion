@@ -2,7 +2,16 @@
 {
     public class Container : Component, IContainer
     {
-        public IContainer Add<T>(T child) where T : IComponent
+        public string Name { get; }
+        public Container(string name) { Name = name; }
+        public Container(string name, params IComponent[] components)
+        {
+            Name = name;
+            foreach (var component in components)
+                Add(component);
+        }
+
+        public IContainer Add(IComponent child)
         {
             AttachChild(child);
             return this;
@@ -13,5 +22,7 @@
             if (Children.Remove(child))
                 child.Detach();
         }
+
+        public override string ToString() => Name;
     }
 }

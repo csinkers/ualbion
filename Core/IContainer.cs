@@ -2,7 +2,7 @@
 {
     public interface IContainer
     {
-        IContainer Add<T>(T child) where T : IComponent;
+        IContainer Add(IComponent child);
         void Remove(IComponent child);
     }
 }

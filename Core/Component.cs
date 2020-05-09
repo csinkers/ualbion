@@ -101,7 +101,7 @@ namespace UAlbion.Core
         }
 
         /// <summary>
-        /// Add a component to the collection of this components children, will attach the
+        /// Add a component to the collection of this component's children, will attach the
         /// component to this component's exchange if this component is currently attached.
         /// </summary>
         /// <typeparam name="T">The type of the child component</typeparam>
@@ -111,6 +111,7 @@ namespace UAlbion.Core
         {
             if (_isActive)
                 Exchange?.Attach(child);
+
             Children.Add(child);
             return child;
         }

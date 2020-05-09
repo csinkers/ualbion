@@ -12,15 +12,13 @@ namespace UAlbion.Core
         readonly IDictionary<(DrawLayer, int), IList<IRenderable>> _processedRenderables = new Dictionary<(DrawLayer, int), IList<IRenderable>>();
         (float Red, float Green, float Blue) _clearColour;
 
-        public string Name { get; }
         public ICamera Camera { get; }
 
-        protected Scene(string name, ICamera camera)
+        protected Scene(string name, ICamera camera) : base(name)
         {
             On<CollectScenesEvent>(e => e.Register(this));
             On<SetClearColourEvent>(e => _clearColour = (e.Red, e.Green, e.Blue));
 
-            Name = name;
             Camera = AttachChild(camera);
         }
 

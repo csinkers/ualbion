@@ -4,9 +4,9 @@ using UAlbion.Formats.AssetIds;
 namespace UAlbion.Game.Events.Inventory
 {
     [Event("inv:give", "Give the currently held item(s) to another party member.")]
-    public class InventoryGiveItemEvent : GameEvent, IPartyEvent
+    public class InventoryGiveItemEvent : GameEvent
     {
         public InventoryGiveItemEvent(PartyCharacterId memberId) { MemberId = memberId; }
-        [EventPart("member", "The party member to give to.")] public PartyCharacterId MemberId { get; }
+        [EventPart("memberId", "The party member to give to.")] public PartyCharacterId MemberId { get; }
     }
 }

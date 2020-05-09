@@ -17,11 +17,10 @@ namespace UAlbion.Game.State
 {
     public class GameState : ServiceComponent<IGameState>, IGameState
     {
-        static readonly DateTime Epoch = new DateTime(2200, 1, 1, 0, 0, 0);
         SavedGame _game;
         Party _party;
 
-        public DateTime Time => Epoch + new TimeSpan(_game.Days, _game.Hours, _game.Minutes, 0);
+        public DateTime Time => SavedGame.Epoch + _game.ElapsedTime;
         IParty IGameState.Party => _party;
         Func<ChestId, IInventory> IGameState.GetChest => x => GetInventory(InventoryType.Chest, (int)x);
         Func<MerchantId, IInventory> IGameState.GetMerchant => x => GetInventory(InventoryType.Merchant, (int)x);
@@ -39,13 +38,17 @@ namespace UAlbion.Game.State
         public IList<MapChange> PermanentMapChanges => _game.PermanentMapChanges;
         public MapDataId MapId => _game?.MapId ?? 0;
 
-
         public GameState()
         {
             On<NewGameEvent>(e => NewGame(e.MapId, e.X, e.Y));
             On<LoadGameEvent>(e => LoadGame(e.Filename));
             On<SaveGameEvent>(e => SaveGame(e.Filename, e.Name));
             On<FastClockEvent>(e => TickCount += e.Frames);
+            On<SetTimeEvent>(e =>
+            {
+                if (_game != null)
+                    _game.ElapsedTime = e.Time - SavedGame.Epoch;
+            });
             On<LoadMapEvent>(e =>
             {
                 if (_game != null)

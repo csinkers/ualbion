@@ -22,6 +22,7 @@ namespace UAlbion
         public AudioMode AudioMode { get; }
         public GameMode GameMode { get; }
         public string GameModeArgument { get; }
+        public string[] Commands { get; }
 
         public CommandLineOptions(string[] args)
         {
@@ -34,6 +35,10 @@ namespace UAlbion
             if (args.Contains("-vk") || args.Contains("--vulkan")) Backend = GraphicsBackend.Vulkan;
             if (args.Contains("-metal") || args.Contains("--metal")) Backend = GraphicsBackend.Metal;
             if (args.Contains("-d3d") || args.Contains("--direct3d")) Backend = GraphicsBackend.Direct3D11;
+
+            var commandString = args.SkipWhile(x => x != "-c").Skip(1).FirstOrDefault();
+            if (commandString != null)
+                Commands = commandString.Split(';').Select(x => x.Trim()).ToArray();
 
             if (args.Contains("-h") || args.Contains("--help") || args.Contains("/?") || args.Contains("help"))
             {
@@ -100,6 +105,7 @@ Command Line Options:
     -h --help /? help  : Display this help
     --startuponly      : Exit immediately after the first frame (for profiling startup time etc)
     -rd    --renderdoc : Load the RenderDoc plugin on startup
+    -c ""commands""    : Raise the given events (semicolon separated list) on startup.
 
 Set Rendering Backend:
     -gl    --opengl     Use OpenGL

@@ -26,13 +26,15 @@ namespace UAlbion.Game.Veldrid.Debugging
         readonly IDictionary<Type, Func<DebugInspectorAction, Reflector.ReflectedObject, object>> _behaviours =
             new Dictionary<Type, Func<DebugInspectorAction, Reflector.ReflectedObject, object>>();
 
+        readonly IContainer _services;
         readonly IList<object> _fixedObjects = new List<object>();
         IList<Selection> _hits;
         Vector2 _mousePosition;
         Reflector.ReflectedObject _lastHoveredItem;
 
-        public DebugMapInspector()
+        public DebugMapInspector(IContainer services)
         {
+            _services = services;
             On<EngineUpdateEvent>(e => RenderDialog());
             On<HideDebugWindowEvent>(e => _hits = null);
             On<ShowDebugInfoEvent>(e =>
@@ -235,8 +237,16 @@ namespace UAlbion.Game.Veldrid.Debugging
                 ImGui.TreePop();
             }
 
-            int hitId = 0;
-            if (ImGui.TreeNode("Global"))
+            if (ImGui.TreeNode("Services"))
+            {
+                var reflected = Reflector.Reflect(null, _services, null);
+                if (reflected.SubObjects != null)
+                    foreach (var child in reflected.SubObjects)
+                        anyHovered |= RenderNode(child, false);
+                ImGui.TreePop();
+            }
+
+            if (ImGui.TreeNode("Exchange"))
             {
                 var reflected = Reflector.Reflect(null, Exchange, null);
                 if (reflected.SubObjects != null)
@@ -245,6 +255,7 @@ namespace UAlbion.Game.Veldrid.Debugging
                 ImGui.TreePop();
             }
 
+            int hitId = 0;
             foreach (var hit in _hits)
             {
                 if (ImGui.TreeNode($"{hitId} {hit.Target}"))

@@ -3,11 +3,8 @@ using System.Text;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
-using UAlbion.Core.Visual;
 using UAlbion.Formats;
-using UAlbion.Game;
 using UAlbion.Game.Assets;
-using UAlbion.Game.Entities;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Settings;
 using UAlbion.Game.Veldrid.Assets;
@@ -49,14 +46,17 @@ namespace UAlbion
                 .AddAssetPostProcessor(new InterlacedBitmapPostProcessor())
                 ;
 
-            var logExchange = new LogExchange();
-            using var exchange = new EventExchange(logExchange)
+            var coreServices = new Container("Core",
+                        new StdioConsoleLogger(),
+                        new ImGuiConsoleLogger(),
+                        Settings.Load(baseDir),
+                        assets); // Need to register settings first, as the AssetConfigLocator relies on it.
+
+            var services = new Container("Services", coreServices);
+
+            using var exchange = new EventExchange(new LogExchange())
                 .Register<ICoreFactory>(factory)
-                .Attach(new StdioConsoleLogger())
-                .Attach(new ImGuiConsoleLogger())
-                .Attach(Settings.Load(baseDir))
-                .Attach(assets) // Need to register settings first, as the AssetConfigLocator relies on it.
-                ;
+                .Attach(services);
 
             Engine.GlobalExchange = exchange;
 
@@ -67,7 +67,7 @@ namespace UAlbion
             {
                 case ExecutionMode.Game:
                 case ExecutionMode.GameWithSlavedAudio:
-                    Albion.RunGame(exchange, baseDir, commandLine);
+                    Albion.RunGame(exchange, services, coreServices, baseDir, commandLine);
                     break;
 
                 case ExecutionMode.AudioSlave: 

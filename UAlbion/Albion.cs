@@ -31,7 +31,7 @@ namespace UAlbion
 {
     static class Albion
     {
-        public static void RunGame(EventExchange global, string baseDir, CommandLineOptions commandLine)
+        public static void RunGame(EventExchange global, IContainer services, IContainer coreServices, string baseDir, CommandLineOptions commandLine)
         {
             PerfTracker.StartupEvent("Creating engine");
             using var engine = new VeldridEngine(commandLine.Backend, commandLine.UseRenderDoc)
@@ -43,12 +43,12 @@ namespace UAlbion
                 .AddRenderer(new ScreenDuplicator())
                 ;
 
-            var backgroundThreadInitTask = Task.Run(() => RegisterComponents(global, baseDir, commandLine));
-            global
-                .Attach(new ShaderCache(
+            var backgroundThreadInitTask = Task.Run(() => RegisterComponents(global, services, baseDir, commandLine));
+            coreServices
+                .Add(new ShaderCache(
                     Path.Combine(baseDir, "Core", "Visual", "Shaders"),
                     Path.Combine(baseDir, "data", "ShaderCache")))
-                .Attach(engine);
+                .Add(engine);
 
             backgroundThreadInitTask.Wait();
 
@@ -77,67 +77,83 @@ namespace UAlbion
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
+            if (commandLine.Commands != null)
+            {
+                foreach(var command in commandLine.Commands)
+                    global.Raise(Event.Parse(command), null);
+            }
+
             engine.Run();
             // TODO: Ensure all sprite leases returned etc to weed out memory leaks
         }
 
-        static void RegisterComponents(EventExchange global, string baseDir, CommandLineOptions commandLine)
+        static void RegisterComponents(EventExchange global, IContainer services, string baseDir, CommandLineOptions commandLine)
         {
             PerfTracker.StartupEvent("Creating main components");
             var factory = global.Resolve<ICoreFactory>();
-
-            if (commandLine.AudioMode == AudioMode.InProcess)
-                global.Attach(new AudioManager(false));
-
             global
                 .Register<ICommonColors>(new CommonColors(factory))
-                .Attach(new GameClock())
-                .Attach(new IdleClock())
-                .Attach(new SlowClock())
-                .Attach(new CollisionManager())
-                .Attach(new CursorManager())
-                .Attach(new DeviceObjectManager())
-                .Attach(new GameState())
-                .Attach(new LayoutManager())
-                .Attach(new InputManager()
-                    .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
-                    .RegisterInputMode(InputMode.World2D, new World2DInputMode())
-                    .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
-                    .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
-                    .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
-                    .RegisterMouseMode(MouseMode.RightButtonHeld, new RightButtonHeldMouseMode())
-                    .RegisterMouseMode(MouseMode.ContextMenu, new ContextMenuMouseMode())
-                )
-                .Attach(new MapManager())
-                .Attach(new SelectionManager())
-                .Attach(new SceneManager()
-                    .AddScene((GameScene)new EmptyScene()
-                        .Add(new PaletteManager()))
-                    .AddScene((GameScene)new AutomapScene()
-                        .Add(new PaletteManager()))
-                    .AddScene((GameScene)new FlatScene()
-                        .Add(new PaletteManager()))
-                    .AddScene((GameScene)new DungeonScene()
-                        .Add(new PaletteManager()))
-                    .AddScene((GameScene)new MenuScene()
-                        .Add(new PaletteManager()))
-                    .AddScene((GameScene)new InventoryScene()
-                        .Add(new PaletteManager()))
-                )
-                .Attach(new SpriteManager())
-                .Attach(new TextManager())
-                .Attach(new TextureManager())
-                .Attach(new DebugMapInspector()
-                    .AddBehaviour(new SpriteInstanceDataDebugBehaviour())
-                    .AddBehaviour(new FormatTextEventBehaviour())
-                    .AddBehaviour(new QueryEventDebugBehaviour())
-                )
-                .Attach(new InputBinder(InputConfig.Load(baseDir)))
-                .Attach(new SceneStack())
-                .Attach(new StatusBar())
-                .Attach(new ContextMenu())
-                .Attach(new EventChainManager())
-                .Attach(new Querier())
+                ;
+
+            if (commandLine.AudioMode == AudioMode.InProcess)
+                services.Add(new AudioManager(false));
+
+            services
+                .Add(new GameState())
+                .Add(new Container("Clocks",
+                    new GameClock(),
+                    new IdleClock(),
+                    new SlowClock()))
+
+                .Add(new Container("Graphics",
+                    new DeviceObjectManager(),
+                    new SpriteManager(),
+                    new TextureManager()))
+
+                .Add(new Container("Events",
+                    new EventChainManager(),
+                    new Querier()))
+
+                .Add(new Container("Scenes",
+                    new MapManager(),
+                    new CollisionManager(),
+                    new SceneStack(),
+                    new SceneManager()
+                        .AddScene((GameScene)new EmptyScene()
+                            .Add(new PaletteManager()))
+                        .AddScene((GameScene)new AutomapScene()
+                            .Add(new PaletteManager()))
+                        .AddScene((GameScene)new FlatScene()
+                            .Add(new PaletteManager()))
+                        .AddScene((GameScene)new DungeonScene()
+                            .Add(new PaletteManager()))
+                        .AddScene((GameScene)new MenuScene()
+                            .Add(new PaletteManager()))
+                        .AddScene((GameScene)new InventoryScene()
+                            .Add(new PaletteManager()))
+                    ))
+
+                .Add(new Container("GuiAndInput",
+                    new LayoutManager(),
+                    new TextManager(),
+                    new DebugMapInspector(services)
+                        .AddBehaviour(new SpriteInstanceDataDebugBehaviour())
+                        .AddBehaviour(new FormatTextEventBehaviour())
+                        .AddBehaviour(new QueryEventDebugBehaviour()),
+                    new StatusBar(),
+                    new ContextMenu(),
+                    new CursorManager(),
+                    new InputManager()
+                        .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
+                        .RegisterInputMode(InputMode.World2D, new World2DInputMode())
+                        .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
+                        .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
+                        .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
+                        .RegisterMouseMode(MouseMode.RightButtonHeld, new RightButtonHeldMouseMode())
+                        .RegisterMouseMode(MouseMode.ContextMenu, new ContextMenuMouseMode()),
+                    new SelectionManager(),
+                    new InputBinder(InputConfig.Load(baseDir))))
                 ;
 
             PerfTracker.StartupEvent("Creating scene-specific components");

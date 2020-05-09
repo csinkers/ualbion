@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Events;
@@ -7,9 +6,6 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game
 {
-    public class HourElapsedEvent : GameEvent { }
-    public class DayElapsedEvent : GameEvent { }
-
     public class GameClock : ServiceComponent<IClock>, IClock
     {
         const float TickDurationSeconds = 1 / 60.0f;
@@ -40,7 +36,6 @@ namespace UAlbion.Game
             });
         }
 
-        public DateTime GameTime { get; private set; } = new DateTime(2000, 1, 1);
         public float ElapsedTime { get; private set; }
         public bool IsRunning { get; private set; }
 
@@ -77,19 +72,25 @@ namespace UAlbion.Game
 
             if (IsRunning)
             {
-                var lastGameTime = GameTime;
-                GameTime += TimeSpan.FromSeconds(e.DeltaSeconds * GameSecondsPerSecond);
-                if (GameTime.Hour != lastGameTime.Hour)
-                    Raise(new HourElapsedEvent());
-
-                if (GameTime.Date != lastGameTime.Date)
-                    Raise(new DayElapsedEvent());
-
                 var state = Resolve<IGameState>();
+                if (state != null)
+                {
+                    var lastGameTime = state.Time;
+                    var newGameTime = lastGameTime.AddSeconds(e.DeltaSeconds * GameSecondsPerSecond);
+                    ((IComponent)state).Receive(new SetTimeEvent(newGameTime), this);
+
+                    if (newGameTime.Hour != lastGameTime.Hour)
+                        Raise(new HourElapsedEvent());
+
+                    if (newGameTime.Date != lastGameTime.Date)
+                        Raise(new DayElapsedEvent());
+                }
+
                 _elapsedTimeThisGameFrame += e.DeltaSeconds;
 
                 // If the game was paused for a while don't try and catch up
-                if (_elapsedTimeThisGameFrame > 4 * TickDurationSeconds) _elapsedTimeThisGameFrame = 4 * TickDurationSeconds;
+                if (_elapsedTimeThisGameFrame > 4 * TickDurationSeconds)
+                    _elapsedTimeThisGameFrame = 4 * TickDurationSeconds;
 
                 while (_elapsedTimeThisGameFrame >= TickDurationSeconds)
                 {

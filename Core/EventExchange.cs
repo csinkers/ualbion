@@ -15,17 +15,17 @@ namespace UAlbion.Core
     /// </summary>
     public class EventExchange : IDisposable
     {
-        readonly object SyncRoot = new object();
+        readonly object _syncRoot = new object();
         readonly ILogExchange _logExchange;
-        int _nesting = -1;
-        long _nextEventId;
-        public int Nesting => _nesting;
-
         readonly Stack<List<Handler>> _dispatchLists = new Stack<List<Handler>>();
         readonly Queue<(IEvent, object)> _queuedEvents = new Queue<(IEvent, object)>();
         readonly IDictionary<Type, object> _registrations = new Dictionary<Type, object>();
         readonly IDictionary<Type, IList<Handler>> _subscriptions = new Dictionary<Type, IList<Handler>>();
         readonly IDictionary<IComponent, IList<Handler>> _subscribers = new Dictionary<IComponent, IList<Handler>>();
+
+        int _nesting = -1;
+        long _nextEventId;
+        public int Nesting => _nesting;
 
 #if DEBUG
         // ReSharper disable once CollectionNeverQueried.Local
@@ -35,7 +35,7 @@ namespace UAlbion.Core
         {
             get
             {
-                lock (SyncRoot)
+                lock (_syncRoot)
                 {
                     if (_sortedSubscribersCached?.Count != _subscribers.Count)
                         _sortedSubscribersCached = _subscribers.Keys.OrderBy(x => x.ToString()).ToList();
@@ -53,7 +53,7 @@ namespace UAlbion.Core
 
         public void Dispose()
         {
-            lock(SyncRoot)
+            lock(_syncRoot)
                 foreach (var disposableSystem in _registrations.Values.OfType<IDisposable>())
                     disposableSystem.Dispose();
         }
@@ -120,7 +120,7 @@ namespace UAlbion.Core
             }
 
             List<Handler> handlers;
-            lock (SyncRoot)
+            lock (_syncRoot)
             {
                 if (!_dispatchLists.TryPop(out handlers))
                     handlers = new List<Handler>();
@@ -141,7 +141,7 @@ namespace UAlbion.Core
             }
 
             handlers.Clear();
-            lock (SyncRoot)
+            lock (_syncRoot)
                 _dispatchLists.Push(handlers);
 
             if (!verbose)
@@ -153,7 +153,7 @@ namespace UAlbion.Core
 
         public void Subscribe(Handler handler)
         {
-            lock (SyncRoot)
+            lock (_syncRoot)
             {
                 if (_subscribers.TryGetValue(handler.Component, out var subscribedTypes))
                 {
@@ -185,7 +185,7 @@ namespace UAlbion.Core
 
         public void Unsubscribe(IComponent subscriber)
         {
-            lock (SyncRoot)
+            lock (_syncRoot)
             {
                 if (!_subscribers.TryGetValue(subscriber, out var handlersForSubscriber))
                     return;
@@ -199,7 +199,7 @@ namespace UAlbion.Core
 
         public void Unsubscribe<T>(IComponent subscriber)
         {
-            lock (SyncRoot)
+            lock (_syncRoot)
             {
                 if (!_subscribers.TryGetValue(subscriber, out var handlersForSubscriber))
                     return;
@@ -217,7 +217,7 @@ namespace UAlbion.Core
         public EventExchange Register(Type type, object system)
         {
             bool doAttach;
-            lock (SyncRoot)
+            lock (_syncRoot)
             {
                 if (_registrations.ContainsKey(type))
                 {
@@ -239,7 +239,7 @@ namespace UAlbion.Core
         public void Unregister<T>(T system) => Unregister(typeof(T), system);
         public void Unregister(Type type, object system)
         {
-            lock (SyncRoot)
+            lock (_syncRoot)
             {
                 if (_registrations.TryGetValue(type, out var current) && current == system)
                     _registrations.Remove(type);
@@ -248,13 +248,13 @@ namespace UAlbion.Core
 
         public T Resolve<T>()
         {
-            lock (SyncRoot)
+            lock (_syncRoot)
                 return _registrations.TryGetValue(typeof(T), out var result) ? (T)result : default;
         }
 
         public IEnumerable EnumerateRecipients(Type eventType)
         {
-            lock (SyncRoot)
+            lock (_syncRoot)
             {
                 var subscribers = new List<Handler>();
                 Collect(subscribers, eventType);

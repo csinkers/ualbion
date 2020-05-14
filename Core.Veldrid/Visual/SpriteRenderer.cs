@@ -219,16 +219,20 @@ namespace UAlbion.Core.Veldrid.Visual
 
             cl.PushDebugGroup(sprite.Name);
 
-            var uniformInfo = new SpriteUniformInfo { Flags = sprite.Key.Flags };
-            cl.UpdateBuffer(_uniformBuffer, 0, uniformInfo);
-
             if (sc.PaletteView == null)
                 return;
 
             TextureView textureView = (TextureView)textureManager?.GetTexture(sprite.Key.Texture);
             var resourceSet = dom.Get<ResourceSet>((sprite, textureView));
             var instanceBuffer = dom.Get<DeviceBuffer>((sprite, sprite));
+            var uniformInfo = new SpriteUniformInfo
+            {
+                Flags = sprite.Key.Flags,
+                TextureWidth = textureView?.Target.Width ?? 1,
+                TextureHeight = textureView?.Target.Height ?? 1
+            };
 
+            cl.UpdateBuffer(_uniformBuffer, 0, uniformInfo);
             cl.SetPipeline(_pipelines[shaderKey]);
             cl.SetGraphicsResourceSet(0, resourceSet);
             cl.SetGraphicsResourceSet(1, sc.CommonResourceSet);

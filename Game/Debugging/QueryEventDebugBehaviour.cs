@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using UAlbion.Core;
 using UAlbion.Formats.MapEvents;
 
@@ -21,8 +20,7 @@ namespace UAlbion.Game.Debugging
             if (querier == null || eventManager == null)
                 return null;
 
-            var context = eventManager.ActiveContexts.FirstOrDefault()?.Clone() ?? new EventContext(new EventSource.None());
-            return querier.Query(context, query, true).ToString();
+            return querier.QueryDebug(query).ToString();
         }
     }
 }

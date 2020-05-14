@@ -1,19 +1,26 @@
 ﻿using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class PromptPlayerEvent : AsyncMapEvent, IQueryEvent
+    public class PromptPlayerEvent : AsyncMapEvent, IQueryEvent, ITextEvent
     {
-        public static PromptPlayerEvent Serdes(PromptPlayerEvent e, ISerializer s)
+        public static PromptPlayerEvent Serdes(PromptPlayerEvent e, ISerializer s, AssetType textType, int textSourceId)
         {
-            e ??= new PromptPlayerEvent();
+            e ??= new PromptPlayerEvent(textType, textSourceId);
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);
             e.Immediate = s.UInt8(nameof(Immediate), e.Immediate);
             s.UInt16("Padding", 0);
             e.TextId = s.UInt16(nameof(TextId), e.TextId);
             e.FalseEventId = ConvertMaxToNull.Serdes(nameof(FalseEventId), e.FalseEventId, s.UInt16);
             return e;
+        }
+
+        PromptPlayerEvent(AssetType textType, int textSourceId)
+        {
+            TextType = textType;
+            TextSourceId = textSourceId;
         }
 
         public QueryType QueryType => QueryType.PromptPlayer;
@@ -25,13 +32,15 @@ namespace UAlbion.Formats.MapEvents
         public override MapEventType EventType => MapEventType.Query;
         public ushort? FalseEventId { get; set; }
         protected override AsyncEvent Clone() =>
-            new PromptPlayerEvent
+            new PromptPlayerEvent(TextType, TextSourceId)
             {
                 Operation = Operation,
                 Immediate = Immediate,
                 TextId = TextId,
                 FalseEventId = FalseEventId,
-                Context = Context
             };
+
+        public AssetType TextType { get; }
+        public int TextSourceId { get; }
     }
 }

@@ -19,20 +19,18 @@ namespace UAlbion.Formats.MapEvents
         public QueryType QueryType => QueryType.PromptPlayerNumeric;
         public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
         public byte Immediate { get; private set; } // immediate value?
-
         public ushort Argument { get; private set; }
 
         public override string ToString() => $"query {QueryType} {Argument} ({Operation} {Immediate})";
         public override MapEventType EventType => MapEventType.Query;
         public ushort? FalseEventId { get; set; }
         protected override AsyncEvent Clone() =>
-            new PromptPlayerNumericEvent()
+            new PromptPlayerNumericEvent
             {
                 Operation = Operation,
                 Immediate = Immediate,
                 Argument = Argument,
-                FalseEventId = FalseEventId,
-                Context = Context
+                FalseEventId = FalseEventId
             };
     }
 }

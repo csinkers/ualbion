@@ -19,7 +19,8 @@ namespace UAlbion.Game.Gui.Text
 
         public TextChunk(TextBlock block)
         {
-            On<WindowResizedEvent>(e => IsDirty = true);
+            On<BackendChangedEvent>(_ => IsDirty = true);
+            On<WindowResizedEvent>(_ => IsDirty = true);
             Block = block;
         }
         protected override void Subscribed() { IsDirty = true;}

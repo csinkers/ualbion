@@ -3,6 +3,7 @@ using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
@@ -33,7 +34,7 @@ namespace UAlbion.Game.Gui.Status
             });
             On<BlurEvent>(e =>
             {
-                _portrait.Highlighted = false;
+                _portrait.Flags = 0;
                 Raise(new HoverTextEvent(""));
             });
             On<TimerElapsedEvent>(e =>
@@ -121,7 +122,7 @@ namespace UAlbion.Game.Gui.Status
 
         void Hover()
         {
-            _portrait.Highlighted = true;
+            _portrait.Flags = SpriteFlags.Highlight;
             var member = PartyMember;
             if (member == null)
                 return;

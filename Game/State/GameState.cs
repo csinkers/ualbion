@@ -22,17 +22,12 @@ namespace UAlbion.Game.State
 
         public DateTime Time => SavedGame.Epoch + _game.ElapsedTime;
         IParty IGameState.Party => _party;
-        Func<ChestId, IInventory> IGameState.GetChest => x => GetInventory(InventoryType.Chest, (int)x);
-        Func<MerchantId, IInventory> IGameState.GetMerchant => x => GetInventory(InventoryType.Merchant, (int)x);
-
-        Func<NpcCharacterId, ICharacterSheet> IGameState.GetNpc => 
-            x => _game != null && _game.NpcStats.TryGetValue(x, out var sheet) ? sheet : null;
-        Func<PartyCharacterId, ICharacterSheet> IGameState.GetPartyMember => 
-            x => _game != null &&_game.PartyMembers.TryGetValue(x, out var member) ? member : null;
-        public Func<int, short> GetTicker => 
-            x => _game != null &&_game.Tickers.TryGetValue(x, out var value) ? value : (short)0;
-        public Func<int, bool> GetSwitch =>
-            x => _game != null &&_game.Switches.TryGetValue(x, out var value) && value;
+        public ICharacterSheet GetNpc(NpcCharacterId id) => _game != null && _game.NpcStats.TryGetValue(id, out var sheet) ? sheet : null;
+        public IInventory GetChest(ChestId id) => GetInventory(InventoryType.Chest, (int)id);
+        public IInventory GetMerchant(MerchantId id) => GetInventory(InventoryType.Merchant, (int)id);
+        public ICharacterSheet GetPartyMember(PartyCharacterId id) => _game != null &&_game.PartyMembers.TryGetValue(id, out var member) ? member : null;
+        public short GetTicker(int id) => _game != null && _game.Tickers.TryGetValue(id, out var value) ? value : (short)0;
+        public bool GetSwitch(int id) => _game != null && _game.Switches.TryGetValue(id, out var value) && value;
 
         public IList<MapChange> TemporaryMapChanges => _game.TemporaryMapChanges;
         public IList<MapChange> PermanentMapChanges => _game.PermanentMapChanges;

@@ -8,12 +8,11 @@ namespace UAlbion.Formats.MapEvents
         public class None : EventSource
         {
             public override TriggerType Trigger => TriggerType.Default;
-            public None() : base(AssetType.MapText, 0) { }
             public override string ToString() => "Ø";
         }
         public class Map : EventSource
         {
-            public Map(MapDataId mapId, TriggerType trigger, int x, int y) : base(AssetType.MapText, (int)mapId)
+            public Map(MapDataId mapId, TriggerType trigger, int x, int y)
             {
                 MapId = mapId;
                 Trigger = trigger;
@@ -30,35 +29,28 @@ namespace UAlbion.Formats.MapEvents
 
         public class EventSet : EventSource
         {
-            public EventSet(EventSetId id) : base(AssetType.EventText, (int)id) { }
+            public EventSetId EventSetId { get; }
+            public EventSet(EventSetId id) => EventSetId = id;
             public override TriggerType Trigger => TriggerType.Action;
-            public override string ToString() => $"ES{Id}";
+            public override string ToString() => $"ES:{EventSetId}";
         }
 
         public class Npc : EventSource
         {
-            public Npc(MapDataId mapId, NpcCharacterId npcId) : base(AssetType.MapText, (int)mapId) => NpcId = npcId;
+            public Npc(NpcCharacterId npcId) => NpcId = npcId;
             public NpcCharacterId NpcId { get; }
-            public override string ToString() => $"Npc:M{Id}:{NpcId}";
+            public override string ToString() => $"Npc:{NpcId}";
             public override TriggerType Trigger => TriggerType.TalkTo;
         }
 
         public class Item : EventSource
         {
-            public Item(MapDataId mapId, ItemId usedItem) : base(AssetType.MapText, (int)mapId) => ItemId = usedItem;
+            public Item(ItemId usedItem) => ItemId = usedItem;
             public ItemId ItemId { get; }
-            public override string ToString() => $"Item:M{Id}:{ItemId}";
+            public override string ToString() => $"Item:{ItemId}";
             public override TriggerType Trigger => TriggerType.UseItem;
         }
 
         public abstract TriggerType Trigger { get; }
-        public AssetType Type { get; }
-        public int Id { get; }
-
-        public EventSource(AssetType type, int id)
-        {
-            Type = type;
-            Id = id;
-        }
     }
 }

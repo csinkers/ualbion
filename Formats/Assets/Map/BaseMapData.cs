@@ -50,7 +50,7 @@ namespace UAlbion.Formats.Assets.Map
         protected void SerdesEvents(ISerializer s)
         {
             ushort eventCount = s.UInt16("EventCount", (ushort)Events.Count);
-            s.List(Events, eventCount, (i, x, serializer) => EventNode.Serdes(i, x, serializer));
+            s.List(Events, eventCount, (i, x, serializer) => EventNode.Serdes(i, x, serializer, false, (int)Id));
             foreach(var e in Events)
                 if(e.NextEventId >= eventCount)
                     throw new InvalidOperationException();

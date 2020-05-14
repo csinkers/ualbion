@@ -137,9 +137,10 @@ namespace UAlbion.Game.Veldrid.Audio
             if (buffer == null)
                 return;
 
+            var context = Resolve<IEventManager>().Context;
             var map = Resolve<IMapManager>()?.Current;
             var tileSize = map?.TileSize ?? Vector3.One;
-            var mapSource = e.Context.Source as EventSource.Map;
+            var mapSource = context.Source as EventSource.Map;
             var source = new SimpleAudioSource(buffer)
             {
                 Volume = e.Volume == 0 ? 1.0f : e.Volume / 255.0f,

@@ -17,6 +17,6 @@ namespace UAlbion.Formats.Assets
         public IEventNode FirstEvent => Events.Count == 0 ? null : Events[0];
         public bool Enabled { get; set; }
 
-        public override string ToString() => $"Chain{Id} {(Enabled ? "" : "(Disabled)")}: {Events.Count} events starting at {Events.FirstOrDefault()?.Id}";
+        public override string ToString() => $"Chain{Id} {(Enabled ? "" : "(Disabled)")}: {Events.Count} events @ {Events.FirstOrDefault()?.Id}: {FirstEvent}";
     }
 }

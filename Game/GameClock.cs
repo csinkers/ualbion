@@ -29,7 +29,7 @@ namespace UAlbion.Game
                 if (IsRunning || _updateEvent != null)
                     return;
 
-                e.Acknowledged = true;
+                e.Acknowledge();
                 _updateEvent = e;
                 _slowTicksRemaining = e.Cycles;
                 IsRunning = true;

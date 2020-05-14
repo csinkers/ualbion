@@ -18,6 +18,7 @@ namespace UAlbion.Core.Visual
 
         public Sprite(T id, Vector3 position, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags)
         {
+            On<BackendChangedEvent>(_ => Dirty = true);
             On<RenderEvent>(e => UpdateSprite());
             On<WorldCoordinateSelectEvent>(Select);
             On<HoverEvent>(e =>

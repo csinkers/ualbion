@@ -9,6 +9,12 @@ layout(binding = 1) uniform texture2DArray uSprite; // vdspv_0_1
 layout(binding = 0) uniform sampler uSpriteSampler; //! // vdspv_0_0
 layout(binding = 1) uniform texture2D uSprite;  //! // vdspv_0_1
 #endif
+layout(binding = 2) uniform _Uniform {
+	uint uFlags;
+	float uTexSizeW;
+	float uTexSizeH;
+	uint _u_padding_3;
+};
 
 // Shared set
 #include "CommonResources.glsl"
@@ -45,6 +51,12 @@ void main()
 	if (redChannel == 0)
 		color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 #endif
+
+	if ((iFlags & SF_GRADIENT_PIXELS) != 0)
+	{
+		vec2 subPixelPos = smoothstep(0.0, 0.9, 1 - fract(uv * vec2(uTexSizeW, uTexSizeH)));
+		color = color * vec4(vec3(subPixelPos.x*subPixelPos.y + 0.5), 0.9);
+	}
 
 	// Outline
 	if ((u_engine_flags & EF_SHOW_BOUNDING_BOXES) != 0 && (iFlags & SF_NO_BOUNDING_BOX) == 0)

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.MapEvents;
@@ -8,33 +8,23 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
-    public interface IEventManager
-    {
-        IList<EventContext> ActiveContexts { get; }
-    }
-
     public class EventChainManager : ServiceComponent<IEventManager>, IEventManager
     {
-
-        readonly ISet<EventContext> _activeChains = new HashSet<EventContext>();
-
-        public IList<EventContext> ActiveContexts => new ReadOnlyCollection<EventContext>(_activeChains.ToList());
+        readonly ThreadLocal<Stack<EventContext>> _activeContext = new ThreadLocal<Stack<EventContext>>(() => new Stack<EventContext>());
+        readonly HashSet<EventContext> _pendingAsyncContexts = new HashSet<EventContext>();
 
         public EventChainManager()
         {
             On<TriggerChainEvent>(Trigger);
         }
 
-        void RaiseWithContext(EventContext context, IEvent e)
-        {
-            if(e is IContextualEvent mapEvent)
-                mapEvent.Context = context;
-            Raise(e);
-        }
+        public EventContext Context => _activeContext.Value.FirstOrDefault();
 
         void Resume(EventContext context)
         {
-            _activeChains.Add(context);
+            _activeContext.Value.Push(context);
+            _pendingAsyncContexts.Remove(context);
+
             while (context.Node != null)
             {
                 if (context.Node.Event is AsyncEvent asyncEvent)
@@ -53,17 +43,26 @@ namespace UAlbion.Game
                         Resume(context);
                     });
 
-                    RaiseWithContext(context, clone);
+                    Raise(clone);
 
-                    if (clone.Acknowledged)
-                        return;
+                    switch (clone.AsyncStatus)
+                    {
+                        case AsyncStatus.Unacknowledged:
+                            Raise(new LogEvent(LogEvent.Level.Warning, $"Async event {clone} not acknowledged. Continuing immediately."));
+                            break;
+                        case AsyncStatus.Acknowledged: // Callback will be called later on so return for now
+                            _activeContext.Value.Pop();
+                            _pendingAsyncContexts.Add(context);
+                            return;
+                        case AsyncStatus.Complete: // Completed asynchronously, keep processing events in the chain
+                            break;
+                    }
 
-                    Raise(new LogEvent(LogEvent.Level.Warning, $"Async event {clone} not acknowledged. Continuing immediately."));
                     context.Node = context.Node.NextEvent;
                 }
                 else
                 {
-                    RaiseWithContext(context, context.Node.Event);
+                    Raise(context.Node.Event);
 
                     if (context.Node is IBranchNode branch)
                     {
@@ -79,7 +78,6 @@ namespace UAlbion.Game
             if (context.ClockWasRunning)
                 Raise(new StartClockEvent());
 
-            _activeChains.Remove(context);
             context.CompletionCallback?.Invoke();
         }
 

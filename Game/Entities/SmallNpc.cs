@@ -46,7 +46,6 @@ namespace UAlbion.Game.Entities
             var camera = Resolve<ICamera>();
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
-            var mapId = Resolve<IMapManager>().Current.MapId;
 
             IText S(SystemTextId textId) 
                 => new DynamicText(() =>
@@ -66,7 +65,7 @@ namespace UAlbion.Game.Entities
             {
                 new ContextMenuOption(
                     S(SystemTextId.MapPopup_TalkTo),
-                    new TriggerChainEvent(_npc.Chain, _npc.Chain.FirstEvent, _npc.Id.Value, mapId),
+                    new TriggerChainEvent(_npc.Chain, _npc.Chain.FirstEvent, _npc.Id.Value),
                     ContextMenuGroup.Actions),
 
                 new ContextMenuOption(

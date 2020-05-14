@@ -4,7 +4,7 @@ using UAlbion.Formats.AssetIds;
 namespace UAlbion.Formats.MapEvents
 {
     [Event("npc_text")]
-    public class NpcTextEvent : AsyncEvent, IContextualEvent
+    public class NpcTextEvent : AsyncEvent
     {
         public NpcTextEvent(NpcCharacterId npcId, byte textId)
         {
@@ -16,6 +16,5 @@ namespace UAlbion.Formats.MapEvents
         [EventPart("text")] public byte TextId { get; }
 
         protected override AsyncEvent Clone() => new NpcTextEvent(NpcId, TextId);
-        public EventContext Context { get; set; }
     }
 }

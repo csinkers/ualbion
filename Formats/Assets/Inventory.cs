@@ -44,12 +44,12 @@ namespace UAlbion.Formats.Assets
                 inv.Neck = s.Meta(nameof(inv.Neck), inv.Neck, ItemSlot.Serdes);
                 inv.Head = s.Meta(nameof(inv.Head), inv.Head, ItemSlot.Serdes);
                 inv.Tail = s.Meta(nameof(inv.Tail), inv.Tail, ItemSlot.Serdes);
-                inv.LeftHand = s.Meta(nameof(inv.LeftHand), inv.LeftHand, ItemSlot.Serdes);
-                inv.Chest = s.Meta(nameof(inv.Chest), inv.Chest, ItemSlot.Serdes);
                 inv.RightHand = s.Meta(nameof(inv.RightHand), inv.RightHand, ItemSlot.Serdes);
-                inv.LeftFinger = s.Meta(nameof(inv.LeftFinger), inv.LeftFinger, ItemSlot.Serdes);
-                inv.Feet = s.Meta(nameof(inv.Feet), inv.Feet, ItemSlot.Serdes);
+                inv.Chest = s.Meta(nameof(inv.Chest), inv.Chest, ItemSlot.Serdes);
+                inv.LeftHand = s.Meta(nameof(inv.LeftHand), inv.LeftHand, ItemSlot.Serdes);
                 inv.RightFinger = s.Meta(nameof(inv.RightFinger), inv.RightFinger, ItemSlot.Serdes);
+                inv.Feet = s.Meta(nameof(inv.Feet), inv.Feet, ItemSlot.Serdes);
+                inv.LeftFinger = s.Meta(nameof(inv.LeftFinger), inv.LeftFinger, ItemSlot.Serdes);
             }
 
             for (int i = 0; i < (int)ItemSlotId.NormalSlotCount; i++)

@@ -23,21 +23,21 @@ namespace UAlbion.Game.State
 
         public Party(IDictionary<PartyCharacterId, CharacterSheet> characterSheets, PartyCharacterId?[] statusBarOrder)
         {
-            On<AddPartyMemberEvent>(e => e.Context.LastEventResult = AddMember(e.PartyMemberId));
-            On<RemovePartyMemberEvent>(e => e.Context.LastEventResult = RemoveMember(e.PartyMemberId));
+            On<AddPartyMemberEvent>(e => SetLastResult(AddMember(e.PartyMemberId)));
+            On<RemovePartyMemberEvent>(e => SetLastResult(RemoveMember(e.PartyMemberId)));
             On<SetPartyLeaderEvent>(e => { Leader = e.PartyMemberId; Raise(e); });
-            On<ChangePartyGoldEvent>(e => e.Context.LastEventResult = ChangePartyGold(e.Operation, e.Amount, e.Context));
-            On<ChangePartyRationsEvent>(e => e.Context.LastEventResult = ChangePartyRations(e.Operation, e.Amount, e.Context));
-            On<AddRemoveInventoryItemEvent>(e => e.Context.LastEventResult = ChangePartyInventory(e.ItemId, e.Operation, e.Amount, e.Context));
+            On<ChangePartyGoldEvent>(e => SetLastResult(ChangePartyGold(e.Operation, e.Amount)));
+            On<ChangePartyRationsEvent>(e => SetLastResult(ChangePartyRations(e.Operation, e.Amount)));
+            On<AddRemoveInventoryItemEvent>(e => SetLastResult(ChangePartyInventory(e.ItemId, e.Operation, e.Amount)));
             On<SimpleChestEvent>(e =>
             {
-                e.Context.LastEventResult = e.ChestType switch
+                SetLastResult(e.ChestType switch
                 {
-                    SimpleChestEvent.SimpleChestItemType.Item => ChangePartyInventory(e.ItemId, QuantityChangeOperation.AddAmount, e.Amount, e.Context),
-                    SimpleChestEvent.SimpleChestItemType.Gold => ChangePartyGold(QuantityChangeOperation.AddAmount, e.Amount, e.Context),
-                    SimpleChestEvent.SimpleChestItemType.Rations => ChangePartyRations(QuantityChangeOperation.AddAmount, e.Amount, e.Context),
+                    SimpleChestEvent.SimpleChestItemType.Item => ChangePartyInventory(e.ItemId, QuantityChangeOperation.AddAmount, e.Amount),
+                    SimpleChestEvent.SimpleChestItemType.Gold => ChangePartyGold(QuantityChangeOperation.AddAmount, e.Amount),
+                    SimpleChestEvent.SimpleChestItemType.Rations => ChangePartyRations(QuantityChangeOperation.AddAmount, e.Amount),
                     _ => false
-                };
+                });
             });
 
             _characterSheets = characterSheets;
@@ -117,6 +117,12 @@ namespace UAlbion.Game.State
             return true;
         }
 
+        void SetLastResult(bool result)
+        {
+            var em = Resolve<IEventManager>();
+            em.Context.LastEventResult = result;
+        }
+
         public void Clear()
         {
             foreach(var id in _statusBarOrder.Select(x => x.Id).ToList())
@@ -129,17 +135,17 @@ namespace UAlbion.Game.State
             return _walkOrder.Any(x => func(inventoryManager, x.Id));
         }
 
-        bool ChangePartyInventory(ItemId itemId, QuantityChangeOperation operation, int amount, EventContext context) 
+        bool ChangePartyInventory(ItemId itemId, QuantityChangeOperation operation, int amount) 
             => TryEachMember((im, x) =>
-                im.TryChangeInventory(InventoryType.Player, (int)x, itemId, operation, amount, context));
+                im.TryChangeInventory(InventoryType.Player, (int)x, itemId, operation, amount));
 
-        bool ChangePartyGold(QuantityChangeOperation operation, int amount, EventContext context)
+        bool ChangePartyGold(QuantityChangeOperation operation, int amount)
             => TryEachMember((im, x) =>
-                im.TryChangeGold(InventoryType.Player, (int)x, operation, amount, context));
+                im.TryChangeGold(InventoryType.Player, (int)x, operation, amount));
 
-        bool ChangePartyRations(QuantityChangeOperation operation, int amount, EventContext context)
+        bool ChangePartyRations(QuantityChangeOperation operation, int amount)
             => TryEachMember((im, x) =>
-                im.TryChangeRations(InventoryType.Player, (int)x, operation, amount, context));
+                im.TryChangeRations(InventoryType.Player, (int)x, operation, amount));
     }
 }
 

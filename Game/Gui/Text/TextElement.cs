@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
@@ -20,6 +21,7 @@ namespace UAlbion.Game.Gui.Text
 
         public TextElement(string literal)
         {
+            On<BackendChangedEvent>(_ => _lastVersion = 0);
             On<SetLanguageEvent>(e => _lastVersion = 0); // Force a rebuild on next render
             _source = new DynamicText(() =>
             {

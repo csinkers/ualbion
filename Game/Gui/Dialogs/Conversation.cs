@@ -23,7 +23,8 @@ namespace UAlbion.Game.Gui.Dialogs
 
         public Conversation(PartyCharacterId partyMemberId, NpcCharacterId npcId, EventSet eventSet)
         {
-            On<TextEvent>(OnText);
+            On<BaseTextEvent>(OnText);
+            On<EventTextEvent>(OnText);
             On<EndDialogueEvent>(e =>
             {
                 Detach();
@@ -103,13 +104,13 @@ namespace UAlbion.Game.Gui.Dialogs
             }
         }
 
-        void OnText(TextEvent textEvent)
+        void OnText(BaseTextEvent textEvent)
         {
             var textManager = Resolve<ITextManager>();
             switch(textEvent.Location)
             {
-                case TextEvent.TextLocation.Conversation:
-                    textEvent.Acknowledged = true;
+                case TextLocation.Conversation:
+                    textEvent.Acknowledge();
                     void OnClicked()
                     {
                         _textWindow.Clicked -= OnClicked;
@@ -121,7 +122,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
                     break;
 
-                case TextEvent.TextLocation.ConversationOptions:
+                case TextLocation.ConversationOptions:
                 {
                     var text = textManager.FormatTextEvent(textEvent, FontColor.Yellow);
                     _textWindow.Text = text;
@@ -137,7 +138,7 @@ namespace UAlbion.Game.Gui.Dialogs
                     break;
                 }
 
-                case TextEvent.TextLocation.ConversationQuery:
+                case TextLocation.ConversationQuery:
                 {
                     var text = textManager.FormatTextEvent(textEvent, FontColor.Yellow);
                     var options = new List<(IText, int?, Action)>();
@@ -149,7 +150,7 @@ namespace UAlbion.Game.Gui.Dialogs
                     break;
                 }
 
-                case TextEvent.TextLocation.StandardOptions:
+                case TextLocation.StandardOptions:
                 {
                     var text = textManager.FormatTextEvent(textEvent, FontColor.White);
                     break;

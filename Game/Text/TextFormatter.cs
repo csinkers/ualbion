@@ -199,7 +199,6 @@ namespace UAlbion.Game.Text
                     block = new TextBlock(blockId)
                     {
                         Alignment = block.Alignment,
-                        Arrangement = block.Arrangement,
                         Style = block.Style,
                         Color = block.Color,
                     };

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using UAlbion.Core.Events;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
@@ -38,7 +39,7 @@ namespace UAlbion.Game.Gui.Inventory
                 new ButtonFrame(
                         new HorizontalStack(
                             new FixedSize(8, 8,
-                                new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiDefensiveValue) { Highlighted = true }),
+                                new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiDefensiveValue) { Flags = SpriteFlags.Highlight }),
                             new TextElement(source)
                         )
                     )

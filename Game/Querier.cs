@@ -17,38 +17,28 @@ namespace UAlbion.Game
 
         public Querier()
         {
-            On<QueryVerbEvent>(e =>
-            {
-                var result = Query(e.Context, e);
-                if (result.HasValue)
-                    e.Context.LastEventResult = result.Value;
-            });
-            On<QueryItemEvent>(e =>
-            {
-                var result = Query(e.Context, e);
-                if (result.HasValue)
-                    e.Context.LastEventResult = result.Value;
-            });
-            On<PromptPlayerEvent>(e =>
-            {
-                var result = Query(e.Context, e);
-                if (result.HasValue)
-                    e.Context.LastEventResult = result.Value;
-            });
-            On<PromptPlayerNumericEvent>(e =>
-            {
-                var result = Query(e.Context, e);
-                if (result.HasValue)
-                    e.Context.LastEventResult = result.Value;
-            });
-            On<QueryEvent>(e =>
-            {
-                var result = Query(e.Context, e);
-                if (result.HasValue)
-                    e.Context.LastEventResult = result.Value;
-            });
+            On<QueryVerbEvent>(Query);
+            On<QueryItemEvent>(Query);
+            On<PromptPlayerEvent>(Query);
+            On<PromptPlayerNumericEvent>(Query);
+            On<QueryEvent>(Query);
         }
-        public bool? Query(EventContext context, IQueryEvent query, bool debugInspect = false)
+
+        public void Query(IQueryEvent query)
+        {
+            var context = Resolve<IEventManager>().Context;
+            var result = InnerQuery(context, query, false);
+            if (result.HasValue && context != null)
+                context.LastEventResult = result.Value;
+        }
+
+        public bool? QueryDebug(IQueryEvent query)
+        {
+            var context = Resolve<IEventManager>().Context;
+            return InnerQuery(context, query, true);
+        }
+
+        bool? InnerQuery(EventContext context, IQueryEvent query, bool debugInspect)
         {
             var game = Resolve<IGameState>();
             switch (query, query.QueryType)
@@ -74,15 +64,11 @@ namespace UAlbion.Game
 
                 case (PromptPlayerEvent prompt, QueryType.PromptPlayer):
                 {
-                    if (prompt.Context?.Source == null || debugInspect)
+                    if (context.Source == null || debugInspect)
                         break;
 
                     var assets = Resolve<IAssetManager>();
-
-                    var stringId = new StringId(
-                        prompt.Context.Source.Type,
-                        prompt.Context.Source.Id,
-                        prompt.TextId);
+                    var stringId = new StringId(prompt.TextType, prompt.TextSourceId, prompt.TextId);
 
                     var dialog = AttachChild(new PromptDialog(
                         new DynamicText(() =>
@@ -93,14 +79,14 @@ namespace UAlbion.Game
                                 .Format(template).Blocks;
                         })));
 
-                    prompt.Acknowledged = true;
+                    prompt.Acknowledge();
                     dialog.Closed += (sender, _) => prompt.Complete();
                     return null;
                 }
 
                 case (PromptPlayerNumericEvent prompt, QueryType.PromptPlayerNumeric):
                 {
-                    if (prompt.Context?.Source == null || debugInspect)
+                    if (context?.Source == null || debugInspect)
                         break;
 
                     var assets = Resolve<IAssetManager>();
@@ -114,10 +100,10 @@ namespace UAlbion.Game
                                 .Format(template).Blocks;
                         }), 0, 9999));
 
-                    prompt.Acknowledged = true;
+                    prompt.Acknowledge();
                     dialog.Closed += (sender, _) =>
                     {
-                        prompt.Context.LastEventResult = prompt.Argument == dialog.Value;
+                        context.LastEventResult = prompt.Argument == dialog.Value;
                         prompt.Complete();
                     };
                     return null;

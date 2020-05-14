@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Core;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
@@ -17,7 +18,7 @@ namespace UAlbion.Game.Gui.Inventory
             _activeMember = activeMember;
             var background = new FixedPosition(
                 new Rectangle(0, 25, 135, 145),
-                new UiSpriteElement<SmallPortraitId>((SmallPortraitId)(int)activeMember));
+                new UiSpriteElement<SmallPortraitId>((SmallPortraitId)(int)activeMember) { Flags = SpriteFlags.GradientPixels });
 
             var summarySource = new DynamicText(BuildSummary);
             var pointsSource = new DynamicText(BuildPoints);

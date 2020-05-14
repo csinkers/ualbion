@@ -63,6 +63,7 @@ namespace UAlbion.Game.Gui.Controls
 
         public ButtonFrame(IUiElement child)
         {
+            On<BackendChangedEvent>(_ => _lastExtents = new Rectangle());
             On<WindowResizedEvent>(e => _lastExtents = new Rectangle());
 
             if (child != null)

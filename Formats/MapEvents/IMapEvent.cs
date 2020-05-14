@@ -1,6 +1,8 @@
-﻿namespace UAlbion.Formats.MapEvents
+﻿using UAlbion.Api;
+
+namespace UAlbion.Formats.MapEvents
 {
-    public interface IMapEvent : IContextualEvent
+    public interface IMapEvent : IEvent
     {
         MapEventType EventType { get; }
     }

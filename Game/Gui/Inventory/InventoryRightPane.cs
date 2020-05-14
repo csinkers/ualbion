@@ -1,4 +1,5 @@
-﻿using UAlbion.Formats.AssetIds;
+﻿using UAlbion.Core.Visual;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
@@ -45,7 +46,7 @@ namespace UAlbion.Game.Gui.Inventory
                 var money = new Button(
                     new VerticalStack(
                         new Spacing(64, 0),
-                        new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiGold) { Highlighted = true },
+                        new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiGold) { Flags = SpriteFlags.Highlight },
                         new TextElement("Total party gold $10.0")
                     ) { Greedy = false}, () => { } // TODO: Make button functional
                 ) { IsPressed = true };

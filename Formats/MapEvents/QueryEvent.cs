@@ -1,11 +1,12 @@
 ﻿using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
     public class QueryEvent : MapEvent, IQueryEvent
     {
-        public static IQueryEvent Serdes(IQueryEvent genericEvent, ISerializer s)
+        public static IQueryEvent Serdes(IQueryEvent genericEvent, ISerializer s, AssetType textType, int textSourceId)
         {
             var subType = s.EnumU8("SubType", genericEvent?.QueryType ?? QueryType.IsScriptDebugModeActive);
             switch (subType)
@@ -28,7 +29,7 @@ namespace UAlbion.Formats.MapEvents
                 case QueryType.TriggerType: break;
 
                 case QueryType.PromptPlayer:
-                    return PromptPlayerEvent.Serdes((PromptPlayerEvent) genericEvent, s);
+                    return PromptPlayerEvent.Serdes((PromptPlayerEvent)genericEvent, s, textType, textSourceId);
 
                 case QueryType.PromptPlayerNumeric:
                     return PromptPlayerNumericEvent.Serdes((PromptPlayerNumericEvent) genericEvent, s);

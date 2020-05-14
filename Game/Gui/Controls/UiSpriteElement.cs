@@ -2,6 +2,7 @@
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 
 namespace UAlbion.Game.Gui.Controls
@@ -14,11 +15,15 @@ namespace UAlbion.Game.Gui.Controls
         Vector3 _lastPosition;
         Vector2 _lastSize;
         int _subId;
-        bool _highlighted;
+        SpriteFlags _flags;
         bool _dirty = true;
         bool _visible = true;
 
-        public UiSpriteElement(T id) => Id = id;
+        public UiSpriteElement(T id)
+        {
+            On<BackendChangedEvent>(_ => _dirty = true);
+            Id = id;
+        }
 
         protected override void Unsubscribed()
         {
@@ -41,7 +46,7 @@ namespace UAlbion.Game.Gui.Controls
         }
 
         public int SubId { get => _subId; set { if (_subId == value) return; _subId = value; _dirty = true; } }
-        public bool Highlighted { get => _highlighted; set { if (_highlighted == value) return; _highlighted = value; _dirty = true; } }
+        public SpriteFlags Flags { get => _flags; set { if (_flags == value) return; _flags = value; _dirty = true; } }
 
         public bool Visible
         {
@@ -87,7 +92,7 @@ namespace UAlbion.Game.Gui.Controls
                 return order;
 
             var instances = _sprite.Access();
-            instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, _subId, Highlighted ? SpriteFlags.Highlight : 0);
+            instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, _subId, _flags);
             _lastPosition = position;
             _lastSize = size;
             _dirty = false;

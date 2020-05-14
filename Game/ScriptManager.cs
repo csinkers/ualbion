@@ -2,6 +2,7 @@
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 
@@ -18,6 +19,8 @@ namespace UAlbion.Game
         void Run(DoScriptEvent doScriptEvent)
         {
             var assets = Resolve<IAssetManager>();
+            var mapManager = Resolve<IMapManager>();
+
             var events = assets.LoadScript(doScriptEvent.ScriptId);
             var chain = new EventChain(0);
             for (int i = 0; i < events.Count; i++)
@@ -32,8 +35,10 @@ namespace UAlbion.Game
             for (int i = 0; i < chain.Events.Count - 1; i++)
                 chain.Events[i].NextEvent = chain.Events[i + 1];
 
-            var trigger = new TriggerChainEvent(chain, chain.FirstEvent, doScriptEvent.Context.Source);
-            doScriptEvent.Acknowledged = true;
+            var source = new EventSource.Map(mapManager.Current.MapId, TriggerType.Default, 0, 0); // TODO: Is there a better trigger type for this?
+
+            var trigger = new TriggerChainEvent(chain, chain.FirstEvent, source);
+            doScriptEvent.Acknowledge();
             trigger.OnComplete += (sender, args) => doScriptEvent.Complete();
             Raise(trigger);
         }
@@ -47,7 +52,7 @@ namespace UAlbion.Game
         }
     }
 
-    [Event("dump_script")]
+    [Api.Event("dump_script")]
     public class DumpScriptEvent : GameEvent
     {
         public DumpScriptEvent(ScriptId scriptId) => ScriptId = scriptId;

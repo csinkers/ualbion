@@ -4,6 +4,7 @@ namespace UAlbion.Game
 {
     public interface IQuerier
     {
-        bool? Query(EventContext context, IQueryEvent query, bool debugInspect = false);
+        void Query(IQueryEvent query);
+        bool? QueryDebug(IQueryEvent query);
     }
 }

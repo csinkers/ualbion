@@ -395,8 +395,9 @@ namespace UAlbion.Game.State.Player
             Raise(new DescriptionTextEvent(text));
         }
 
-        public bool TryChangeInventory(InventoryType inventoryType, int inventoryId, ItemId itemId, QuantityChangeOperation operation, int amount, EventContext context)
+        public bool TryChangeInventory(InventoryType inventoryType, int inventoryId, ItemId itemId, QuantityChangeOperation operation, int amount)
         {
+            var context = Resolve<IEventManager>().Context;
             var inventory = _getInventory(inventoryType, inventoryId);
             // TODO: Ensure weight limit is not exceeded
             // TODO: Handle non-stacking items.
@@ -455,7 +456,7 @@ namespace UAlbion.Game.State.Player
             return true;
         }
 
-        public bool TryChangeGold(InventoryType inventoryType, int inventoryId, QuantityChangeOperation operation, int amount, EventContext context)
+        public bool TryChangeGold(InventoryType inventoryType, int inventoryId, QuantityChangeOperation operation, int amount)
         {
             var inventory = _getInventory(inventoryType, inventoryId);
             // TODO: Ensure weight limit is not exceeded
@@ -465,7 +466,7 @@ namespace UAlbion.Game.State.Player
             return true;
         }
 
-        public bool TryChangeRations(InventoryType inventoryType, int inventoryId, QuantityChangeOperation operation, int amount, EventContext context)
+        public bool TryChangeRations(InventoryType inventoryType, int inventoryId, QuantityChangeOperation operation, int amount)
         {
             var inventory = _getInventory(inventoryType, inventoryId);
             // TODO: Ensure weight limit is not exceeded

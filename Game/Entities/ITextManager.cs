@@ -12,7 +12,7 @@ namespace UAlbion.Game.Entities
         Vector2 Measure(TextBlock block);
         PositionedSpriteBatch BuildRenderable(TextBlock block, DrawLayer layer, object caller);
         IEnumerable<TextBlock> SplitBlocksToSingleWords(IEnumerable<TextBlock> blocks);
-        IText FormatTextEvent(TextEvent textEvent, FontColor color);
+        IText FormatTextEvent(BaseTextEvent textEvent, FontColor color);
         IText FormatText(StringId id, FontColor color);
     }
 }

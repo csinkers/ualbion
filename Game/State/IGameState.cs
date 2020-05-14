@@ -8,17 +8,17 @@ namespace UAlbion.Game.State
 {
     public interface IGameState
     {
-        int TickCount { get; }
-        IParty Party { get; }
-        DateTime Time { get; }
         bool Loaded { get; }
+        int TickCount { get; }
+        DateTime Time { get; }
+        IParty Party { get; }
         MapDataId MapId { get; }
-        Func<NpcCharacterId, ICharacterSheet> GetNpc { get; }
-        Func<ChestId, IInventory> GetChest { get; }
-        Func<MerchantId, IInventory> GetMerchant { get; }
-        Func<PartyCharacterId, ICharacterSheet> GetPartyMember { get; }
-        Func<int, short> GetTicker { get; }
-        Func<int, bool> GetSwitch { get; }
+        ICharacterSheet GetNpc(NpcCharacterId id);
+        IInventory GetChest(ChestId id);
+        IInventory GetMerchant(MerchantId id);
+        ICharacterSheet GetPartyMember(PartyCharacterId id);
+        short GetTicker(int id);
+        bool GetSwitch(int id);
         IList<MapChange> TemporaryMapChanges { get; }
         IList<MapChange> PermanentMapChanges { get; }
     }

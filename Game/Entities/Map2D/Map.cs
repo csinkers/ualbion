@@ -152,7 +152,8 @@ namespace UAlbion.Game.Entities.Map2D
 
         void ChangeIcon(ChangeIconEvent e)
         {
-            if (!(e.Context.Source is EventSource.Map mapSource))
+            var context = Resolve<IEventManager>().Context;
+            if (!(context.Source is EventSource.Map mapSource))
             {
                 ApiUtil.Assert($"Expected event {e} to be triggered from a map event");
                 return;

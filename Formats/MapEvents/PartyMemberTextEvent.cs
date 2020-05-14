@@ -4,15 +4,23 @@ using UAlbion.Formats.AssetIds;
 namespace UAlbion.Formats.MapEvents
 {
     [Event("party_member_text")]
-    public class PartyMemberTextEvent : TextEvent
+    public class PartyMemberTextEvent : AsyncEvent
     {
+        [EventPart("member_id")] public PartyCharacterId? MemberId { get; }
+        [EventPart("text_id")] public byte TextId { get; }
+
         public static PartyMemberTextEvent Parse(string[] parts)
         {
-            int portraitId = int.Parse(parts[1]);
+            int memberId = int.Parse(parts[1]);
             byte textId = byte.Parse(parts[2]);
-            return new PartyMemberTextEvent(textId, portraitId == 0 ? null : (SmallPortraitId?)portraitId - 1);
+            return new PartyMemberTextEvent(textId, (PartyCharacterId?)memberId);
         }
 
-        public PartyMemberTextEvent(byte textId, SmallPortraitId? portraitId) : base(textId, TextLocation.TextInWindowWithPortrait, portraitId) { }
+        public PartyMemberTextEvent(byte textId, PartyCharacterId? portraitId)
+        {
+            TextId = textId;
+            MemberId = portraitId;
+        }
+        protected override AsyncEvent Clone() => new PartyMemberTextEvent(TextId, MemberId);
     }
 }

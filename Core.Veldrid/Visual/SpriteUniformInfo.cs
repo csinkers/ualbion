@@ -9,7 +9,8 @@ namespace UAlbion.Core.Veldrid.Visual
         public SpriteKeyFlags Flags { get; set; } // 1 byte
         readonly byte _pad1;   // 2
         readonly ushort _pad2; // 4
-        readonly uint _pad3;   // 8
-        readonly double _pad4; // 16
+        public float TextureWidth { get; set; } // 4 bytes
+        public float TextureHeight { get; set; } // 4 bytes
+        readonly uint _pad4; // total of 16
     }
 }

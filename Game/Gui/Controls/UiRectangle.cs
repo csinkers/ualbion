@@ -19,6 +19,7 @@ namespace UAlbion.Game.Gui.Controls
 
         public UiRectangle(CommonColor color)
         {
+            On<BackendChangedEvent>(_ => _dirty = true);
             On<WindowResizedEvent>(_ => _dirty = true);
             _color = color;
         }

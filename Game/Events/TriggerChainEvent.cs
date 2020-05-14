@@ -19,8 +19,8 @@ namespace UAlbion.Game.Events
         public TriggerChainEvent(EventChain chain, IEventNode node, TriggerType trigger, MapDataId mapId, int x, int y) 
             : this(chain, node, new EventSource.Map(mapId, trigger, x, y)) { }
 
-        public TriggerChainEvent(EventChain chain, IEventNode node, NpcCharacterId npcId, MapDataId mapId)
-            : this(chain, node, new EventSource.Npc(mapId, npcId)) { }
+        public TriggerChainEvent(EventChain chain, IEventNode node, NpcCharacterId npcId)
+            : this(chain, node, new EventSource.Npc(npcId)) { }
 
         public TriggerChainEvent(EventChain chain, IEventNode node, EventSetId eventSetId) 
             : this(chain, node, new EventSource.EventSet(eventSetId)) { }

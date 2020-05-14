@@ -15,6 +15,7 @@ namespace UAlbion.Game.Gui.Controls
 
         public UiFixedPositionElement(T id, Rectangle extents)
         {
+            On<BackendChangedEvent>(_ => Rebuild());
             On<WindowResizedEvent>(_ => Rebuild());
             _id = id;
             _extents = extents;

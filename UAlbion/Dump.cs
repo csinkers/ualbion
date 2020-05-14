@@ -186,9 +186,7 @@ namespace UAlbion
                         sw.WriteLine($"        EventChain: {npc.Chain?.Id}");
                         foreach (var e in npc.Chain.Events)
                         {
-                            if (e.Event is IContextualEvent ce)
-                                ce.Context = context;
-                            if (e.Event is TextEvent textEvent)
+                            if (e.Event is BaseTextEvent textEvent)
                             {
                                 var textSource = textManager.FormatTextEvent(textEvent, FontColor.White);
                                 var text = string.Join(", ", textSource.Get().Select(x => x.Text));
@@ -269,7 +267,7 @@ namespace UAlbion
                 sw.WriteLine("    Chain Offsets: " + string.Join(", ", eventSet.Chains.Select((x, i) => $"{i}:{x.Id}")));
                 foreach (var e in eventSet.Events)
                 {
-                    if (e.Event is TextEvent textEvent)
+                    if (e.Event is BaseTextEvent textEvent)
                     {
                         var textSource = textManager.FormatTextEvent(textEvent, FontColor.White);
                         var text = string.Join(", ", textSource.Get().Select(x => x.Text));

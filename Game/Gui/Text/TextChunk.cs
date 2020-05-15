@@ -10,6 +10,7 @@ namespace UAlbion.Game.Gui.Text
     public class TextChunk : UiElement // Renders a single TextBlock in the UI
     {
         // Driving properties
+        readonly Rectangle? _scissorRegion;
         public TextBlock Block { get; }
         public bool IsDirty { get; set; }
 
@@ -17,8 +18,9 @@ namespace UAlbion.Game.Gui.Text
         PositionedSpriteBatch _sprite;
         DrawLayer _lastOrder = DrawLayer.Interface;
 
-        public TextChunk(TextBlock block)
+        public TextChunk(TextBlock block, Rectangle? scissorRegion)
         {
+            _scissorRegion = scissorRegion;
             On<BackendChangedEvent>(_ => IsDirty = true);
             On<WindowResizedEvent>(_ => IsDirty = true);
             Block = block;
@@ -38,7 +40,7 @@ namespace UAlbion.Game.Gui.Text
                 return;
 
             _sprite?.Dispose();
-            _sprite = Resolve<ITextManager>().BuildRenderable(Block, order, this);
+            _sprite = Resolve<ITextManager>().BuildRenderable(Block, order, _scissorRegion, this);
             _lastOrder = order;
             IsDirty = false;
         }
@@ -54,8 +56,8 @@ namespace UAlbion.Game.Gui.Text
             Rebuild((DrawLayer)order);
 
             var window = Resolve<IWindowManager>();
-
             var newPosition = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
+
             switch (Block.Alignment)
             {
                 case TextAlignment.Left:

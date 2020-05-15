@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Api;
+using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Text;
@@ -10,7 +11,7 @@ namespace UAlbion.Game.Entities
     public interface ITextManager
     {
         Vector2 Measure(TextBlock block);
-        PositionedSpriteBatch BuildRenderable(TextBlock block, DrawLayer layer, object caller);
+        PositionedSpriteBatch BuildRenderable(TextBlock block, DrawLayer layer, Rectangle? scissorRegion, object caller);
         IEnumerable<TextBlock> SplitBlocksToSingleWords(IEnumerable<TextBlock> blocks);
         IText FormatTextEvent(BaseTextEvent textEvent, FontColor color);
         IText FormatText(StringId id, FontColor color);

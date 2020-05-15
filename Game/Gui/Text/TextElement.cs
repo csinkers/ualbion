@@ -13,16 +13,19 @@ namespace UAlbion.Game.Gui.Text
 {
     public class TextElement : UiElement
     {
+        const int ScrollBarWidth = 4;
         readonly TextBlock _block = new TextBlock();
         IText _source;
         Rectangle _lastExtents;
         int _lastVersion;
         int? _blockFilter;
+        int _totalHeight;
+        int _scrollOffset;
+        bool _isScrollable;
 
         public TextElement(string literal)
         {
-            On<BackendChangedEvent>(_ => _lastVersion = 0);
-            On<SetLanguageEvent>(e => _lastVersion = 0); // Force a rebuild on next render
+            RegisterEvents();
             _source = new DynamicText(() =>
             {
                 _block.Text = literal;
@@ -32,7 +35,7 @@ namespace UAlbion.Game.Gui.Text
 
         public TextElement(StringId id)
         {
-            On<SetLanguageEvent>(e => _lastVersion = 0); // Force a rebuild on next render
+            RegisterEvents();
             _source = new DynamicText(() =>
             {
                 var assets = Resolve<IAssetManager>();
@@ -45,9 +48,17 @@ namespace UAlbion.Game.Gui.Text
 
         public TextElement(IText source)
         {
-            On<SetLanguageEvent>(e => _lastVersion = 0); // Force a rebuild on next render
+            RegisterEvents();
             _source = source;
         }
+
+        void RegisterEvents()
+        {
+            On<BackendChangedEvent>(_ => _lastVersion = 0);
+            On<SetLanguageEvent>(e => _lastVersion = 0); // Force a rebuild on next render
+            On<UiScrollEvent>(OnScroll);
+        }
+
         public override string ToString() => $"TextElement \"{_source?.ToString() ?? _block?.ToString()}";
         public TextElement Bold() { _block.Style = TextStyle.Fat; return this; }
         public TextElement Color(FontColor color) { _block.Color = color; return this; }
@@ -56,6 +67,8 @@ namespace UAlbion.Game.Gui.Text
         public TextElement Right() { _block.Alignment = TextAlignment.Right; return this; }
         public TextElement NoWrap() { _block.Arrangement |= TextArrangement.NoWrap; return this; }
         public TextElement Source(IText source) { _source = source; _lastVersion = 0; return this; }
+        public TextElement Scrollable() { _isScrollable = true; return this; }
+        public TextElement Filter(int filter) { _blockFilter = filter; return this; }
         public TextElement LiteralString(string literal)
         {
             _source = new DynamicText(() =>
@@ -80,11 +93,20 @@ namespace UAlbion.Game.Gui.Text
             }
         }
 
+        void OnScroll(UiScrollEvent e)
+        {
+            if (!_isScrollable)
+                return;
+
+            int maxScrollOffset = Math.Max(0, _totalHeight - _lastExtents.Height);
+            _scrollOffset = Math.Clamp(_scrollOffset + e.Delta * 5, -maxScrollOffset, 0);
+        }
+
         IEnumerable<TextLine> BuildLines(Rectangle extents, IEnumerable<TextBlock> blocks)
         {
             var textManager = Resolve<ITextManager>();
 
-            var line = new TextLine();
+            var line = new TextLine(extents);
             foreach (var block in textManager.SplitBlocksToSingleWords(blocks))
             {
                 var size = textManager.Measure(block);
@@ -93,7 +115,7 @@ namespace UAlbion.Game.Gui.Text
                     line.Width > 0 && line.Width + size.X > extents.Width)
                 {
                     yield return line;
-                    line = new TextLine();
+                    line = new TextLine(extents);
                 }
 
                 line.Add(block, size);
@@ -114,8 +136,18 @@ namespace UAlbion.Game.Gui.Text
             Children.Clear();
 
             var filtered = _source.Get().Where(x => _blockFilter == null || x.BlockId == _blockFilter);
+            _totalHeight = 0;
             foreach (var line in BuildLines(extents, filtered))
+            {
+                _totalHeight += line.Height;
                 AttachChild(line);
+            }
+
+            if (_isScrollable)
+                AttachChild(new ScrollBar(
+                    CommonColor.BlueGrey1,
+                    ScrollBarWidth,
+                    () => (-_scrollOffset, _totalHeight, _lastExtents.Height)));
         }
 
         public override Vector2 GetSize()
@@ -138,12 +170,20 @@ namespace UAlbion.Game.Gui.Text
             Rebuild(extents);
 
             int maxOrder = order;
-            var offset = 0;
-            foreach (var line in Children.OfType<TextLine>())
+            var offset = _scrollOffset;
+            foreach (var child in Children)
             {
-                var lineExtents = new Rectangle(extents.X, extents.Y + offset, extents.Width, line.Height);
-                maxOrder = Math.Max(maxOrder, func(line, lineExtents, order + 1));
-                offset += line.Height;
+                if (child is TextLine line)
+                {
+                    var lineExtents = new Rectangle(extents.X, extents.Y + offset, extents.Width, line.Height);
+                    maxOrder = Math.Max(maxOrder, func(line, lineExtents, order + 1));
+                    offset += line.Height;
+                }
+                else if (child is ScrollBar scrollBar)
+                {
+                    var scrollExtents = new Rectangle(extents.Right - scrollBar.Width, extents.Y, scrollBar.Width, extents.Height);
+                    maxOrder = Math.Max(maxOrder, func(scrollBar, scrollExtents, order + 1));
+                }
             }
 
             return order;

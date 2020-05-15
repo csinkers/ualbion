@@ -10,7 +10,11 @@ namespace UAlbion.Game.Gui.Text
     {
         public int Width { get; private set; }
         public int Height { get; private set; } = 8;
+
+        readonly Rectangle? _scissorRegion;
         TextAlignment _alignment;
+
+        public TextLine(Rectangle? scissorRegion) => _scissorRegion = scissorRegion;
 
         /// <summary>
         /// Add a new block to the line.
@@ -34,7 +38,7 @@ namespace UAlbion.Game.Gui.Text
             }
             else
             {
-                 AttachChild(new TextChunk(block));
+                 AttachChild(new TextChunk(block, _scissorRegion));
             }
         }
 

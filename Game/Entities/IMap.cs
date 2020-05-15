@@ -2,16 +2,10 @@
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Map;
 
 namespace UAlbion.Game.Entities
 {
-    public enum MapType
-    {
-        Large,
-        Small,
-        ThreeD
-    }
-
     public interface IMap : IComponent
     {
         MapDataId MapId { get; }

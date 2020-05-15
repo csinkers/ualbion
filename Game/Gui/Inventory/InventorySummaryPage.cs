@@ -24,13 +24,12 @@ namespace UAlbion.Game.Gui.Inventory
             var pointsSource = new DynamicText(BuildPoints);
             var pointsHeadingSource = new DynamicText(BuildPointsHeadings);
 
-            var frameTheme = new FrameTheme();
             var stack =
                 new HorizontalStack(
                     new Spacing(4,0),
                     new VerticalStack(
                         new Spacing(0, 4),
-                        new ButtonFrame(new FixedSize(125, 41, new TextElement(summarySource))) { Theme = frameTheme, State = ButtonState.Pressed},
+                        new ButtonFrame(new FixedSize(125, 41, new TextElement(summarySource))) { Theme = FrameTheme.Get, State = ButtonState.Pressed},
                         new Spacing(0, 80),
                         new ButtonFrame(
                             new FixedSize(125, 41,
@@ -40,7 +39,7 @@ namespace UAlbion.Game.Gui.Inventory
                                     new FixedSize(41, 41,
                                         new TextElement(pointsSource)
                                     ))))
-                        { Theme = frameTheme, State = ButtonState.Pressed }
+                        { Theme = FrameTheme.Get, State = ButtonState.Pressed }
                     ),
                     new Spacing(4,0)
                 );

@@ -3,9 +3,9 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Gui.Controls
 {
-    public class SliderThumbTheme : ButtonFrame.ITheme
+    public static class SliderThumbTheme
     {
-        public ButtonFrame.ColorScheme GetColors(ButtonState state)
+        public static ButtonFrame.ColorScheme Get(ButtonState state)
         {
             var c = new ButtonFrame.ColorScheme { Alpha = 1.0f, Corners = CommonColor.BlueGrey4 };
             switch (state)

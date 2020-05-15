@@ -3,9 +3,9 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Gui.Controls
 {
-    public class ButtonTheme : ButtonFrame.ITheme
+    public static class ButtonTheme
     {
-        public ButtonFrame.ColorScheme GetColors(ButtonState state)
+        public static ButtonFrame.ColorScheme Get(ButtonState state)
         {
             var c = new ButtonFrame.ColorScheme { Alpha = 0.4f, Corners = CommonColor.Grey8 };
             switch (state)

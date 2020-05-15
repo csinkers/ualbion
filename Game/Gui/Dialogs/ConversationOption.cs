@@ -10,7 +10,7 @@ namespace UAlbion.Game.Gui.Dialogs
     {
         public ConversationOption(IText text, int? blockId, Action action)
         {
-            AttachChild(new Button(new TextElement(text) { BlockFilter = blockId }, action));
+            AttachChild(new Button(new TextElement(text) { BlockFilter = blockId }, action) { Theme = FramelessTheme.Get });
         }
 
         public ConversationOption(StringId text, Action action)

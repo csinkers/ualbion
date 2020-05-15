@@ -20,7 +20,7 @@ namespace UAlbion.Game.Entities.Map2D
         IMovement _partyMovement;
 
         public MapDataId MapId { get; }
-        public MapType MapType => _logicalMap.UseSmallSprites ? MapType.Small : MapType.Large;
+        public MapType MapType => _logicalMap.UseSmallSprites ? MapType.TwoDOutdoors : MapType.TwoD;
         public Vector2 LogicalSize => new Vector2(_logicalMap.Width, _logicalMap.Height);
         public Vector3 TileSize { get; private set; }
         public IMapData MapData => _mapData;

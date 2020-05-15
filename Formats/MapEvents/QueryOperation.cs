@@ -2,12 +2,12 @@
 {
     public enum QueryOperation : byte
     {
-        Unk0,
+        IsTrue,
         NotEqual,
-        Unk2,
+        OpUnk2,
         Equals,
-        Unk3,
+        OpUnk3,
         GreaterThan,
-        Unk5
+        OpUnk5
     }
 }

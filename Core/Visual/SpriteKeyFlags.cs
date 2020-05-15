@@ -10,6 +10,6 @@ namespace UAlbion.Core.Visual
     {
         NoDepthTest    = 0x1,
         NoTransform    = 0x2,
-        UseCylindrical = 0x4,
+        UseCylindrical = 0x4
     }
 }

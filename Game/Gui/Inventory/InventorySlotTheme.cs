@@ -3,9 +3,9 @@ using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui.Inventory
 {
-    public class InventorySlotTheme : ButtonFrame.ITheme
+    public static class InventorySlotTheme
     {
-        public ButtonFrame.ColorScheme GetColors(ButtonState state)
+        public static ButtonFrame.ColorScheme Get(ButtonState state)
         {
             var c = new ButtonFrame.ColorScheme
             {

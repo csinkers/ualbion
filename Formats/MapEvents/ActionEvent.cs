@@ -46,7 +46,7 @@ namespace UAlbion.Formats.MapEvents
         protected ushort LargeArg { get; private set; }
         ushort Unk8 { get; set; }
 
-        public override string ToString() => $"action {ActionType} {SmallArg}: {LargeArg} ({Unk2})";
+        public override string ToString() => $"action {ActionType} Block:{SmallArg} From:{LargeArg} ({Unk2})"; // Unk2 is almost always 1
         public override MapEventType EventType => MapEventType.Action;
     }
 

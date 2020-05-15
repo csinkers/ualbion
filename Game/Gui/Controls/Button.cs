@@ -80,7 +80,7 @@ namespace UAlbion.Game.Gui.Controls
         public Button(StringId textId, Action action) : this(new TextElement(textId).Center().NoWrap(), action) { }
         public Button(string literalText, Action action) : this(new TextElement(literalText).Center().NoWrap(), action) { }
 
-        public ButtonFrame.ITheme Theme
+        public ButtonFrame.ThemeFunction Theme
         {
             get => _frame.Theme;
             set => _frame.Theme = value;

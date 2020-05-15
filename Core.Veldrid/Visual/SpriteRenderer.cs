@@ -80,7 +80,6 @@ namespace UAlbion.Core.Veldrid.Visual
 " + fragmentShaderContent;
             }
 
-
             var shaders = shaderCache.GetShaderPair(
                 gd.ResourceFactory,
                 vertexShaderName, fragmentShaderName,
@@ -232,6 +231,13 @@ namespace UAlbion.Core.Veldrid.Visual
                 TextureHeight = textureView?.Target.Height ?? 1
             };
 
+            if (sprite.Key.ScissorRegion.HasValue)
+            {
+                IWindowManager wm = Resolve<IWindowManager>();
+                var screenCoordinates = wm.UiToPixel(sprite.Key.ScissorRegion.Value);
+                cl.SetScissorRect(0, (uint)screenCoordinates.X, (uint)screenCoordinates.Y, (uint)screenCoordinates.Width, (uint)screenCoordinates.Height);
+            }
+
             cl.UpdateBuffer(_uniformBuffer, 0, uniformInfo);
             cl.SetPipeline(_pipelines[shaderKey]);
             cl.SetGraphicsResourceSet(0, resourceSet);
@@ -243,6 +249,8 @@ namespace UAlbion.Core.Veldrid.Visual
             //cl.SetViewport(0, new Viewport(0, 0, sc.MainSceneColorTexture.Width, sc.MainSceneColorTexture.Height, depth, depth));
             cl.DrawIndexed((uint)Indices.Length, (uint)sprite.ActiveInstances, 0, 0, 0);
             //cl.SetViewport(0, new Viewport(0, 0, sc.MainSceneColorTexture.Width, sc.MainSceneColorTexture.Height, 0, 1));
+            if (sprite.Key.ScissorRegion.HasValue)
+                cl.SetFullScissorRect(0);
             cl.PopDebugGroup();
         }
 

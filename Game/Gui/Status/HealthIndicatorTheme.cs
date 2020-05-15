@@ -3,9 +3,9 @@ using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui.Status
 {
-    public class HealthIndicatorTheme : ButtonFrame.ITheme
+    public static class HealthIndicatorTheme
     {
-        public ButtonFrame.ColorScheme GetColors(ButtonState state)
+        public static ButtonFrame.ColorScheme Get(ButtonState state)
         {
             var c = new ButtonFrame.ColorScheme { Alpha = 1.0f };
             switch (state)

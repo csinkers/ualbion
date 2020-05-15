@@ -59,7 +59,7 @@ namespace UAlbion.Game
                 case (_, QueryType.IsScriptDebugModeActive): { return false; }
                 case (_, QueryType.IsNpcActive):             { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query NpcActive")); break; }
                 case (_, QueryType.IsPartyMemberConscious):  { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query Party member conscious")); break; }
-                case (_, QueryType.EventAlreadyUsed):        { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query event already used")); break; }
+                case (_, QueryType.EventAlreadyUsed):        { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query event already used")); return false; }
                 case (_, QueryType.IsDemoVersion):           { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query is demo")); return false; }
 
                 case (PromptPlayerEvent prompt, QueryType.PromptPlayer):
@@ -120,13 +120,13 @@ namespace UAlbion.Game
         bool Compare(QueryOperation operation, int value, int immediate) =>
             operation switch
             {
-                QueryOperation.Unk0 => (value == immediate),
+                QueryOperation.IsTrue => (value != 0),
                 QueryOperation.NotEqual => (value != immediate),
-                QueryOperation.Unk2 => (value == immediate),
+                QueryOperation.OpUnk2 => (value == immediate),
                 QueryOperation.Equals => (value == immediate),
-                QueryOperation.Unk3 => (value == immediate),
+                QueryOperation.OpUnk3 => (value == immediate),
                 QueryOperation.GreaterThan => (value > immediate),
-                QueryOperation.Unk5 => (value == immediate),
+                QueryOperation.OpUnk5 => (value == immediate),
                 _ => true
             };
     }

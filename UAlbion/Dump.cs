@@ -12,8 +12,6 @@ using UAlbion.Formats.MapEvents;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Entities;
-using MapType = UAlbion.Formats.Assets.Map.MapType;
-using TextEvent = UAlbion.Formats.MapEvents.TextEvent;
 
 namespace UAlbion
 {
@@ -481,7 +479,7 @@ namespace UAlbion
         public string GetText(IEventNode e)
         {
             var nodeText = e.ToString();
-            if(e.Event is TextEvent textEvent) // Same as npc text event?
+            if (e.Event is BaseTextEvent textEvent)
             {
                 var text = _assets.LoadString(
                     new StringId(_textType, _context, textEvent.TextId),

@@ -82,5 +82,15 @@ namespace UAlbion.Core
         public Vector2 NormToUiRelative(Vector2 pos) => pos * _normToUi;
         public Vector2 NormToPixelRelative(Vector2 pos) => pos * _normToPixel;
         public Vector2 PixelToNormRelative(Vector2 pos) => pos * _pixelToNorm;
+        public Rectangle UiToPixel(Rectangle rect)
+        {
+            var pos = NormToPixel(UiToNorm(rect.Position));
+            var size = NormToPixelRelative(UiToNormRelative(rect.Size));
+            return new Rectangle(
+                (int)pos.X,
+                (int)pos.Y,
+                (int)size.X,
+                (int)size.Y);
+        }
     }
 }

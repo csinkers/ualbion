@@ -19,17 +19,18 @@ namespace UAlbion.Game.Gui.Controls
             public CommonColor? Background { get; set; }
             public float Alpha { get; set; }
         }
-        public interface ITheme { ColorScheme GetColors(ButtonState state); }
-        static readonly ITheme DefaultTheme = new ButtonTheme();
+
+        public delegate ColorScheme ThemeFunction(ButtonState state);
+        static readonly ThemeFunction DefaultTheme = ButtonTheme.Get;
 
         SpriteLease _sprite;
         Rectangle _lastExtents;
         ButtonState _state = ButtonState.Normal;
-        ITheme _theme = DefaultTheme;
+        ThemeFunction _theme = DefaultTheme;
         int _padding = 2;
         bool _visible = true;
 
-        public ITheme Theme
+        public ThemeFunction Theme
         {
             get => _theme;
             set { if (_theme != value) { _theme = value; _lastExtents = new Rectangle(); } }
@@ -86,7 +87,7 @@ namespace UAlbion.Game.Gui.Controls
             var window = Resolve<IWindowManager>();
             var sm = Resolve<ISpriteManager>();
             var commonColors = Resolve<ICommonColors>();
-            var colors = _theme.GetColors(_state);
+            var colors = _theme(_state);
 
             uint? C(CommonColor? color) => color.HasValue ? commonColors.Palette[color.Value] : (uint?)null;
             uint? topLeft = C(colors.TopLeft);

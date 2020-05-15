@@ -76,7 +76,7 @@ namespace UAlbion.Game.Gui.Text
             return new Vector2(offset + 1, fontSize.Y + 1); // +1 for the drop shadow
         }
 
-        public PositionedSpriteBatch BuildRenderable(TextBlock block, DrawLayer order, object caller)
+        public PositionedSpriteBatch BuildRenderable(TextBlock block, DrawLayer order, Rectangle? scissorRegion, object caller)
         {
             var assets = Resolve<IAssetManager>();
             var sm = Resolve<ISpriteManager>();
@@ -88,7 +88,7 @@ namespace UAlbion.Game.Gui.Text
 
             int offset = 0;
             var flags = SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest;
-            var key = new SpriteKey(font, order, flags);
+            var key = new SpriteKey(font, order, flags, scissorRegion);
             int displayableCharacterCount = text.Count(x => FontMapping.ContainsKey(x));
             int instanceCount = displayableCharacterCount * (isFat ? 4 : 2);
             var lease = sm.Borrow(key, instanceCount, caller);

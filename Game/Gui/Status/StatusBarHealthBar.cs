@@ -8,8 +8,6 @@ namespace UAlbion.Game.Gui.Status
 {
     public class StatusBarHealthBar : UiElement
     {
-        static readonly ButtonFrame.ITheme HealthTheme = new HealthIndicatorTheme();
-        static readonly ButtonFrame.ITheme ManaTheme = new ManaIndicatorTheme();
         readonly int _order;
         readonly bool _isHealth;
         readonly ButtonFrame _frame;
@@ -26,7 +24,13 @@ namespace UAlbion.Game.Gui.Status
                 MeasureSize = new Vector2(20, 2)
             };
 
-            _frame = AttachChild(new ButtonFrame(_bar) { Theme = isHealth ? HealthTheme : ManaTheme, Padding = 0 });
+            _frame = AttachChild(new ButtonFrame(_bar)
+            {
+                Theme = isHealth 
+                    ? (ButtonFrame.ThemeFunction)HealthIndicatorTheme.Get 
+                    : ManaIndicatorTheme.Get,
+                Padding = 0
+            });
         }
 
         void Update()

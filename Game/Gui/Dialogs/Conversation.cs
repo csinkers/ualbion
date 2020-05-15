@@ -124,6 +124,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
                 case TextLocation.ConversationOptions:
                 {
+                    textEvent.Complete();
                     var text = textManager.FormatTextEvent(textEvent, FontColor.Yellow);
                     _textWindow.Text = text;
 
@@ -140,6 +141,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
                 case TextLocation.ConversationQuery:
                 {
+                    textEvent.Complete();
                     var text = textManager.FormatTextEvent(textEvent, FontColor.Yellow);
                     var options = new List<(IText, int?, Action)>();
                     var blocks = text.Get().Select(x => x.BlockId).Distinct();

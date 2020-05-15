@@ -3,7 +3,7 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Gui.Controls
 {
-    public static class DialogOptionTheme
+    public static class FramelessTheme
     {
         public static ButtonFrame.ColorScheme Get(ButtonState state)
         {

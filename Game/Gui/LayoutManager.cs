@@ -16,7 +16,7 @@ namespace UAlbion.Game.Gui
     {
         public LayoutManager()
         {
-            On<RenderEvent>(e => Render());
+            On<LayoutEvent>(OnLayout);
             On<ScreenCoordinateSelectEvent>(Select);
         }
 
@@ -34,7 +34,7 @@ namespace UAlbion.Game.Gui
                 void LayoutDialog(Vector2 dialogSize)
                 {
                     var (x, y) = GetDialogPosition(dialog, dialogSize, uiWidth, uiHeight);
-                    order = action(new Rectangle(x, y, (int)dialogSize.X, (int)dialogSize.Y), order, dialog);
+                    order = action(new Rectangle(x, y, (int)dialogSize.X, (int)dialogSize.Y), order + 1, dialog);
                 }
                 LayoutDialog(size);
 
@@ -44,7 +44,7 @@ namespace UAlbion.Game.Gui
             }
         }
 
-        void Render() => DoLayout((extents, order, element) => element.Render(extents, order));
+        void OnLayout(LayoutEvent e) => DoLayout((extents, order, element) => element.Render(extents, order));
 
         void Select(ScreenCoordinateSelectEvent selectEvent)
         {

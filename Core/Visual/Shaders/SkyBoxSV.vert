@@ -23,7 +23,7 @@ layout(location = 2) out vec3 oWorldPosition; // World position
 void main()
 {
 	gl_Position = vec4(vPosition, 0, 1);
-	float fudge = 0.85f;
+	float fudge = 0.60f;
 	float pitchFudge = 0.72f;
 	oTexPosition = 
 		vTexCoords 

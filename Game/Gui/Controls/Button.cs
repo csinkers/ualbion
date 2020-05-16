@@ -12,55 +12,37 @@ namespace UAlbion.Game.Gui.Controls
     class Button : UiElement
     {
         readonly ButtonFrame _frame;
-        Action _clickAction { get; }
+        readonly Action _clickAction;
         float _typematicAccrual;
         bool _isPressed;
+        bool _isClicked;
+        bool _isHovered;
 
         public Button(IUiElement content, Action action)
         {
-            On<HoverEvent>(e =>
-            {
-                if (_frame.State == ButtonState.ClickedBlurred)
-                    _frame.State = ButtonState.Clicked;
-                else
-                    _frame.State = IsPressed
-                        ? ButtonState.HoverPressed
-                        : ButtonState.Hover;
-            });
-            On<BlurEvent>(e =>
-            {
-                if (_frame.State == ButtonState.Clicked)
-                    _frame.State = ButtonState.ClickedBlurred;
-                else
-                    _frame.State = IsPressed
-                        ? ButtonState.Pressed
-                        : ButtonState.Normal;
-            });
-
+            On<HoverEvent>(_ => IsHovered = true);
+            On<BlurEvent>(_ => IsHovered = false);
             On<UiLeftClickEvent>(e =>
             {
-                _frame.State = ButtonState.Clicked;
+                IsClicked = true;
                 if (Typematic)
                     _clickAction();
                 e.Propagating = false;
-                // Raise(new SetExclusiveMouseModeEvent(this));
             });
 
             On<UiLeftReleaseEvent>(e =>
             {
                 if (Typematic)
                     _typematicAccrual = 0;
-                else if (_frame.State == ButtonState.Clicked)
+                else if (IsClicked && IsHovered)
                     _clickAction();
 
-                _frame.State = IsPressed
-                    ? ButtonState.Pressed
-                    : ButtonState.Normal;
+                IsClicked = false;
             });
 
             On<EngineUpdateEvent>(e =>
             {
-                if (!Typematic || _frame.State != ButtonState.Clicked)
+                if (!Typematic || !IsClicked)
                     return;
 
                 var oldAccrual = _typematicAccrual;
@@ -76,6 +58,7 @@ namespace UAlbion.Game.Gui.Controls
             _frame = AttachChild(new ButtonFrame(content));
             _clickAction = action;
         }
+
         public Button(IText textSource, Action action) : this(new TextElement(textSource), action) { }
         public Button(StringId textId, Action action) : this(new TextElement(textId).Center().NoWrap(), action) { }
         public Button(string literalText, Action action) : this(new TextElement(literalText).Center().NoWrap(), action) { }
@@ -86,6 +69,9 @@ namespace UAlbion.Game.Gui.Controls
             set => _frame.Theme = value;
         }
 
+        public bool DoubleFrame { get; set; }
+        public bool Typematic { get; set; }
+
         public bool IsPressed
         {
             get => _isPressed;
@@ -94,12 +80,44 @@ namespace UAlbion.Game.Gui.Controls
                 if (_isPressed == value)
                     return;
                 _isPressed = value;
-                _frame.State = IsPressed ? ButtonState.Pressed : ButtonState.Normal;
+                _frame.State = State;
             }
         }
 
-        public bool DoubleFrame { get; set; }
-        public bool Typematic { get; set; }
+        bool IsClicked
+        {
+            get => _isClicked;
+            set
+            {
+                if (_isClicked == value)
+                    return;
+                _isClicked = value;
+                _frame.State = State;
+            }
+        }
+
+        bool IsHovered
+        {
+            get => _isHovered;
+            set
+            {
+                if (_isHovered == value)
+                    return;
+                _isHovered = value;
+                _frame.State = State;
+            }
+        }
+
+        ButtonState State => (IsClicked, IsPressed, IsHovered) switch
+        {
+            (false, false, false) => ButtonState.Normal,
+            (false, false, true) => ButtonState.Hover,
+            (false, true, false) => ButtonState.Pressed,
+            (false, true, true) => ButtonState.HoverPressed,
+            (true, _, false) => ButtonState.ClickedBlurred,
+            (true, _, true) => ButtonState.Clicked,
+        };
+
         public override Vector2 GetSize() => GetMaxChildSize() + new Vector2(4, 0);
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)

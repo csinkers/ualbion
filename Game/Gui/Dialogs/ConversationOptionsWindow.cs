@@ -22,12 +22,13 @@ namespace UAlbion.Game.Gui.Dialogs
             Children.Clear();
 
             var optionElements = new List<IUiElement>();
-            foreach(var (text, blockId, action) in options)
-                optionElements.Add(new ConversationOption(text, blockId, action));
+            if (options != null)
+                foreach (var (text, blockId, action) in options)
+                    optionElements.Add(new ConversationOption(text, blockId, action));
 
-            if (standardOptions?.Any() == true)
+            if (standardOptions != null)
             {
-                if (optionElements.Any())
+                if (optionElements.Any() && options?.Any() == true)
                     optionElements.Add(new Spacing(0, 10));
 
                 foreach (var (text, blockId, action) in standardOptions)

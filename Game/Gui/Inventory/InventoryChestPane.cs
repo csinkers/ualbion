@@ -73,8 +73,7 @@ namespace UAlbion.Game.Gui.Inventory
 
             var takeAllButton = new Button(
                 new TextElement(UAlbionStringId.TakeAll.ToId()),
-                () => { }
-            );
+                () => Raise(new InventoryTakeAllEvent(_id)));
 
             var header = new Header(new StringId(AssetType.SystemText, 0, (int)SystemTextId.Chest_Chest));
             var moneyAndFoodStack = new HorizontalStack(goldButton, takeAllButton, foodButton);

@@ -99,7 +99,7 @@ namespace UAlbion.Game.Gui.Text
                 return;
 
             int maxScrollOffset = Math.Max(0, _totalHeight - _lastExtents.Height);
-            _scrollOffset = Math.Clamp(_scrollOffset + e.Delta * 5, -maxScrollOffset, 0);
+            _scrollOffset = Math.Clamp(_scrollOffset - e.Delta * 5, 0, maxScrollOffset);
         }
 
         IEnumerable<TextLine> BuildLines(Rectangle extents, IEnumerable<TextBlock> blocks)
@@ -143,11 +143,14 @@ namespace UAlbion.Game.Gui.Text
                 AttachChild(line);
             }
 
-            if (_isScrollable)
+            if (_isScrollable && _totalHeight > extents.Height)
+            {
                 AttachChild(new ScrollBar(
                     CommonColor.BlueGrey1,
                     ScrollBarWidth,
-                    () => (-_scrollOffset, _totalHeight, _lastExtents.Height)));
+                    () => (_scrollOffset, _totalHeight, _lastExtents.Height)));
+            }
+            else _scrollOffset = 0;
         }
 
         public override Vector2 GetSize()
@@ -170,7 +173,7 @@ namespace UAlbion.Game.Gui.Text
             Rebuild(extents);
 
             int maxOrder = order;
-            var offset = _scrollOffset;
+            var offset = -_scrollOffset;
             foreach (var child in Children)
             {
                 if (child is TextLine line)

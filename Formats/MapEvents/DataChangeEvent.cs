@@ -55,6 +55,7 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk3 { get; set; }
         public byte Unk4 { get; set; }
         public ushort Value { get; set; }
+        public ItemId ItemId => (ItemId)Value - 1;
 
         string ItemString =>
             Property switch

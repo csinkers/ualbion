@@ -42,6 +42,12 @@ namespace UAlbion.Game.Gui.Text
             }
         }
 
+        public override Vector2 GetSize()
+        {
+            var size = base.GetSize();
+            return new Vector2(Math.Max(size.X, Width), Math.Max(size.Y, Height));
+        }
+
         public override string ToString() =>
             "TextLine:[ " +
             string.Join("; ", Children.OfType<TextChunk>().Select(x => x.ToString()))

@@ -91,7 +91,7 @@ namespace UAlbion.Game
 
         void Teleport(TeleportEvent e)
         {
-            if (e.MapId != Current.MapId)
+            if (e.MapId != Current?.MapId)
             {
                 _pendingMapChange = e.MapId;
                 LoadMap();

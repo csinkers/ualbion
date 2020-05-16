@@ -7,6 +7,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
+using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.State.Player;
 
 namespace UAlbion.Game.State
@@ -38,6 +39,23 @@ namespace UAlbion.Game.State
                     SimpleChestEvent.SimpleChestItemType.Rations => ChangePartyRations(QuantityChangeOperation.AddAmount, e.Amount),
                     _ => false
                 });
+            });
+            On<InventoryTakeAllEvent>(e =>
+            {
+                var state = Resolve<IGameState>();
+                var inventoryManager = Resolve<IInventoryManager>();
+                var chest = state.GetChest(e.ChestId);
+                if (ChangePartyGold(QuantityChangeOperation.AddAmount, chest.Gold))
+                    inventoryManager.TryChangeGold(InventoryType.Chest, (int)e.ChestId, QuantityChangeOperation.SubtractAmount, chest.Gold);
+
+                if (ChangePartyRations(QuantityChangeOperation.AddAmount, chest.Rations))
+                    inventoryManager.TryChangeRations(InventoryType.Chest, (int)e.ChestId, QuantityChangeOperation.SubtractAmount, chest.Rations);
+
+                foreach (var item in chest.Slots.Where(x => x.Id.HasValue && x.Amount > 0))
+                {
+                    if (ChangePartyInventory(item.Id.Value, QuantityChangeOperation.AddAmount, item.Amount))
+                        inventoryManager.TryChangeInventory(InventoryType.Chest, (int)e.ChestId, item.Id.Value, QuantityChangeOperation.SubtractAmount, item.Amount);
+                }
             });
 
             _characterSheets = characterSheets;

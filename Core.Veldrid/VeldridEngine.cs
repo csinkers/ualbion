@@ -162,6 +162,9 @@ namespace UAlbion.Core.Veldrid
                 using (PerfTracker.FrameEvent("5.1 Flushing queued events"))
                     Exchange.FlushQueuedEvents();
 
+                using (PerfTracker.FrameEvent("5.2 Calculating UI layout"))
+                    Raise(new LayoutEvent());
+
                 if (!_window.Exists)
                     break;
 

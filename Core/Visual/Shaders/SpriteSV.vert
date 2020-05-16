@@ -3,7 +3,8 @@
 // Resource Sets
 layout(binding = 2) uniform _Uniform {
 	uint uFlags;
-	vec2 uTexSize;
+	float uTexSizeW;
+	float uTexSizeH;
 	uint _u_padding_3;
 };
 

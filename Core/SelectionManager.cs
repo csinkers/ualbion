@@ -16,26 +16,26 @@ namespace UAlbion.Core
             Raise(new ScreenCoordinateSelectEvent(pixelPosition, (t, selection) => hits.Add((t, selection))));
             var orderedHits = hits.OrderBy(x => x.Item1).Select(x => x.Item2).ToList();
 
-            if (performFocusAlerts)
+            if (!performFocusAlerts)
+                return orderedHits;
+
+            var newSelection = orderedHits.Select(x => x.Target).ToHashSet();
+            var focused = newSelection.Except(_lastSelection);
+            var blurred = _lastSelection.Except(newSelection);
+            _lastSelection = newSelection;
+
+            ICancellableEvent newEvent = new BlurEvent();
+            foreach (var component in blurred.OfType<IComponent>())
             {
-                var newSelection = orderedHits.Select(x => x.Target).ToHashSet();
-                var focused = newSelection.Except(_lastSelection);
-                var blurred = _lastSelection.Except(newSelection);
-                _lastSelection = newSelection;
+                if (!newEvent.Propagating) break;
+                component.Receive(newEvent, this);
+            }
 
-                ICancellableEvent newEvent = new BlurEvent();
-                foreach (var component in blurred.OfType<IComponent>())
-                {
-                    if (!newEvent.Propagating) break;
-                    component.Receive(newEvent, this);
-                }
-
-                newEvent = new HoverEvent();
-                foreach (var component in focused.OfType<IComponent>())
-                {
-                    if (!newEvent.Propagating) break;
-                    component.Receive(newEvent, this);
-                }
+            newEvent = new HoverEvent();
+            foreach (var component in focused.OfType<IComponent>())
+            {
+                if (!newEvent.Propagating) break;
+                component.Receive(newEvent, this);
             }
 
             return orderedHits;

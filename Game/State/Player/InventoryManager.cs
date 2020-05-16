@@ -451,7 +451,7 @@ namespace UAlbion.Game.State.Player
             Update(inventory);
 
             if(context.Source is EventSource.Map mapEventSource)
-                ItemTransition<ItemSpriteId>.CreateTransitionFromTilePosition(Exchange, mapEventSource.X, mapEventSource.Y, itemId);
+                ItemTransition.CreateTransitionFromTilePosition(Exchange, mapEventSource.X, mapEventSource.Y, itemId);
 
             return true;
         }

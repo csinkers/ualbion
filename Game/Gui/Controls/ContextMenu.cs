@@ -12,7 +12,7 @@ namespace UAlbion.Game.Gui.Controls
     {
         ContextMenuEvent _event;
 
-        public ContextMenu() : base(DialogPositioning.TopLeft)
+        public ContextMenu() : base(DialogPositioning.TopLeft, int.MaxValue)
         {
             On<ContextMenuEvent>(Display);
             On<CloseWindowEvent>(e => Display(null));

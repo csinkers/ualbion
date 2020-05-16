@@ -15,9 +15,7 @@ layout(set = 1, binding = 0) uniform _Shared {
 
 layout(set = 1, binding = 1) uniform _Projection { mat4 uProjection; };
 layout(set = 1, binding = 2) uniform _View { mat4 uView; };
-#ifdef USE_PALETTE
 layout(set = 1, binding = 3) uniform texture2D uPalette; //! // vdspv_1_3
-#endif
 
 #define DEPTH_COLOR(depth) (vec4((int((depth) * 1024) % 10) / 10.0f, 20 * (max((depth), 0.95) - 0.95), 20 * min((depth), 0.05), 1.0f))
 

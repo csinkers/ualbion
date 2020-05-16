@@ -17,6 +17,9 @@ namespace UAlbion.Game.Gui.Text
     public class TextManager : ServiceComponent<ITextManager>, ITextManager
     {
         const int SpaceSize = 3;
+
+        Conversation _conversation;
+
         static readonly IDictionary<char, int> FontMapping = new Dictionary<char, int>
         {
             { 'a',  0 }, { 'b',  1 }, { 'c',  2 }, { 'd',  3 }, { 'e',  4 },
@@ -302,6 +305,9 @@ namespace UAlbion.Game.Gui.Text
 
         void OnBaseTextEvent(BaseTextEvent textEvent)
         {
+            if (_conversation?.OnText(textEvent) == true)
+                return;
+
             switch(textEvent.Location)
             {
                 case null:
@@ -315,9 +321,14 @@ namespace UAlbion.Game.Gui.Text
 
                 case TextLocation.TextInWindowWithPortrait:
                 case TextLocation.TextInWindowWithPortrait2:
+                case TextLocation.TextInWindowWithPortrait3:
                 {
                     textEvent.Acknowledge();
                     SmallPortraitId portraitId = textEvent.PortraitId ?? Resolve<IParty>().Leader.ToPortraitId();
+
+                    if (textEvent.Location == TextLocation.TextInWindowWithPortrait2) // TODO: ??? work out how this is meant to work.
+                        portraitId = SmallPortraitId.Rainer;
+
                     var dialog = AttachChild(new TextDialog(FormatTextEvent(textEvent, FontColor.Yellow), portraitId));
                     dialog.Closed += (sender, _) => textEvent.Complete();
                     break;
@@ -348,12 +359,18 @@ namespace UAlbion.Game.Gui.Text
             var assets = Resolve<IAssetManager>();
             var eventSet = assets.LoadEventSet(e.EventSet);
             var em = Resolve<IEventManager>();
-            var conversation = AttachChild(new Conversation(
+            _conversation = AttachChild(new Conversation(
                 party?.Leader ?? PartyCharacterId.Tom,
-                em.Context?.Source is EventSource.Npc npc ? npc.NpcId : NpcCharacterId.Ned,
+                em.Context?.Source is EventSource.Npc npc ? npc.NpcId : (NpcCharacterId)e.EventSet,
                 eventSet));
 
-            conversation.Complete += (sender, args) => e.Complete();
+            _conversation.Complete += (sender, args) =>
+            {
+                e.Complete();
+                Children.Remove(_conversation);
+                _conversation.Detach();
+                _conversation = null;
+            };
         }
     }
 }

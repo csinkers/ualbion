@@ -9,7 +9,7 @@ namespace UAlbion.Game.Gui.Controls
         public DialogOption(IText textSource, Action action) 
             : base(new TextElement(textSource).Left().NoWrap(), action)
         {
-            Theme = DialogOptionTheme.Get;
+            Theme = ButtonTheme.DialogOption;
         }
     }
 }

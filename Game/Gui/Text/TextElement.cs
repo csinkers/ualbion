@@ -131,9 +131,7 @@ namespace UAlbion.Game.Gui.Text
             _lastVersion = _source.Version;
             _lastExtents = extents;
 
-            foreach(var child in Children)
-                child.Detach();
-            Children.Clear();
+            RemoveAllChildren();
 
             var filtered = _source.Get().Where(x => _blockFilter == null || x.BlockId == _blockFilter);
             _totalHeight = 0;

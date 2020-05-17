@@ -75,7 +75,7 @@ namespace UAlbion.Game.Gui.Inventory
                 .Add(text, 0, 20 - 9, 16, 9))
             {
                 Padding = -1,
-                Theme = slotId.IsBodyPart() ? (ButtonFrame.ThemeFunction)ButtonTheme.Get : InventorySlotTheme.Get,
+                Theme = slotId.IsBodyPart() ? (ButtonFrame.ThemeFunction)ButtonTheme.Default : ButtonTheme.InventorySlot,
                 State = slotId.IsBodyPart() ? ButtonState.Normal : ButtonState.Pressed
             });
         }

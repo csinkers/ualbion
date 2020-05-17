@@ -7,10 +7,11 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Dialogs
 {
-    public class TextDialog : Dialog
+    public class TextDialog : ModalDialog
     {
         public TextDialog(IText text, SmallPortraitId? portraitId = null, int depth = 0) : base(DialogPositioning.Top, depth)
         {
+            On<DismissMessageEvent>(_ => Close());
             On<UiLeftClickEvent>(e => { Close(); e.Propagating = false; });
             On<UiRightClickEvent>(e => { Close(); e.Propagating = false; });
             On<CloseWindowEvent>(e => Close());

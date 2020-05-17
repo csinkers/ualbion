@@ -20,7 +20,7 @@ namespace UAlbion.Game.Gui.Status
         readonly FixedPosition _hoverTextContainer;
         readonly FixedPosition _descriptionTextContainer;
 
-        public StatusBar() : base(DialogPositioning.StatusBar, int.MaxValue - 1) // MaxValue is reserved for context menu
+        public StatusBar() : base(DialogPositioning.StatusBar)
         {
             On<HoverTextEvent>(e => _hoverText.LiteralString(e.Text));
             On<DescriptionTextEvent>(e => _descriptionText.LiteralString(e.Text));

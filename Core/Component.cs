@@ -116,6 +116,13 @@ namespace UAlbion.Core
             return child;
         }
 
+        protected void RemoveAllChildren()
+        {
+            foreach (var child in Children)
+                child.Detach();
+            Children.Clear();
+        }
+
         /// <summary>
         /// Whether the component is currently active. When a component becomes
         /// inactive all event handlers are removed from the exchange, all child

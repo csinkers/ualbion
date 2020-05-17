@@ -34,9 +34,7 @@ namespace UAlbion.Game.Gui.Controls
 
         void Close()
         {
-            foreach (var child in Children)
-                child.Detach();
-            Children.Clear();
+            RemoveAllChildren();
             _event = null;
             Raise(new PopInputModeEvent());
         }

@@ -17,9 +17,7 @@ namespace UAlbion.Game.Gui.Menus
 
         protected override void Subscribed()
         {
-            foreach (var child in Children)
-                child.Detach();
-            Children.Clear();
+            RemoveAllChildren();
 
             var state = Resolve<IGameState>();
             var elements = new List<IUiElement>

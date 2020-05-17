@@ -7,5 +7,8 @@
 
         public static StringId ToId(this UAlbionStringId id) 
             => new StringId(AssetType.UAlbionText, (int)id, 0);
+
+        public static StringId ToId(this WordId id)
+            => new StringId(AssetType.Dictionary, (int) id / 500, (int) id);
     }
 }

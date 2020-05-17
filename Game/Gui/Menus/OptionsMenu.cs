@@ -8,7 +8,7 @@ using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui.Menus
 {
-    public class OptionsMenu : Dialog
+    public class OptionsMenu : ModalDialog
     {
         public event EventHandler Closed;
 

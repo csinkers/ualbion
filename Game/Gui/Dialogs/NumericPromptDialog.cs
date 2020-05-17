@@ -7,7 +7,7 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Dialogs
 {
-    public class NumericPromptDialog : Dialog
+    public class NumericPromptDialog : ModalDialog
     {
         public NumericPromptDialog(IText text, int min, int max, int depth = 0) : base(DialogPositioning.Center, depth)
         {

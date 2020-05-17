@@ -29,9 +29,9 @@ namespace UAlbion.Game.Gui.Inventory
                     new Spacing(4,0),
                     new VerticalStack(
                         new Spacing(0, 4),
-                        new ButtonFrame(new FixedSize(125, 41, new TextElement(summarySource))) { Theme = FrameTheme.Get, State = ButtonState.Pressed},
+                        new GroupingFrame(new FixedSize(125, 41, new TextElement(summarySource))),
                         new Spacing(0, 80),
-                        new ButtonFrame(
+                        new GroupingFrame(
                             new FixedSize(125, 41,
                                 new HorizontalStack(
                                     new TextElement(pointsHeadingSource),
@@ -39,7 +39,6 @@ namespace UAlbion.Game.Gui.Inventory
                                     new FixedSize(41, 41,
                                         new TextElement(pointsSource)
                                     ))))
-                        { Theme = FrameTheme.Get, State = ButtonState.Pressed }
                     ),
                     new Spacing(4,0)
                 );

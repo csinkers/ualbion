@@ -4,13 +4,14 @@
     {
         Global = 0,
         Console,
-        Dialog,
+        Conversation,
         Automap,
         World2D,
         Inventory,
         Combat,
         World3D,
         ContextMenu,
-        MainMenu
+        MainMenu,
+        TextEntry
     }
 }

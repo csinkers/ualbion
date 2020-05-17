@@ -58,9 +58,7 @@ namespace UAlbion.Game.Gui.Inventory
 
         void Rebuild()
         {
-            foreach(var child in Children)
-                child.Detach();
-            Children.Clear();
+            RemoveAllChildren();
 
             var leftPane =
                 _mode switch

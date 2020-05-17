@@ -24,9 +24,7 @@ namespace UAlbion.Game.Gui.Inventory
                 return;
 
             _lastPage = pageId;
-            foreach(var child in Children)
-                child.Detach();
-            Children.Clear();
+            RemoveAllChildren();
 
             IUiElement page = pageId switch
             {

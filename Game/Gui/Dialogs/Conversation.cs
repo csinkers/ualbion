@@ -4,6 +4,7 @@ using System.Linq;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
@@ -20,6 +21,7 @@ namespace UAlbion.Game.Gui.Dialogs
         readonly ISet<WordId> _mentionedWords = new HashSet<WordId>();
         ConversationTextWindow _textWindow;
         ConversationOptionsWindow _optionsWindow;
+        ConversationTopicWindow _topicsWindow;
 
         public Conversation(PartyCharacterId partyMemberId, NpcCharacterId npcId, EventSet eventSet)
         {
@@ -46,6 +48,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
         protected override void Subscribed()
         {
+            Raise(new PushInputModeEvent(InputMode.Conversation));
             if (Children.Any())
                 return;
 
@@ -58,8 +61,9 @@ namespace UAlbion.Game.Gui.Dialogs
             AttachChild(new ConversationParticipantLabel(npc, true));
 
             _textWindow = AttachChild(new ConversationTextWindow());
-            _optionsWindow = AttachChild(new ConversationOptionsWindow());
-            _optionsWindow.IsActive = false;
+            _optionsWindow = AttachChild(new ConversationOptionsWindow { IsActive = false});
+            _topicsWindow = AttachChild(new ConversationTopicWindow { IsActive = false });
+            _topicsWindow.WordSelected += TopicsWindowOnWordSelected;
 
             // Use enqueue, as we're still in Subscribe and the handlers haven't been registered.
             var chain = _eventSet.Chains.FirstOrDefault(x => x.FirstEvent?.Event is ActionEvent action && action.ActionType == ActionType.StartDialogue);
@@ -70,6 +74,14 @@ namespace UAlbion.Game.Gui.Dialogs
                 Enqueue(triggerEvent);
             }
         }
+
+        void TopicsWindowOnWordSelected(object sender, WordId? e)
+        {
+            _topicsWindow.IsActive = false;
+            DefaultIdleHandler(null, null);
+        }
+
+        protected override void Unsubscribed() => Raise(new PopInputModeEvent());
 
         void Close()
         {
@@ -97,8 +109,13 @@ namespace UAlbion.Game.Gui.Dialogs
                     _textWindow.Text = text;
                     _textWindow.Clicked += OnClicked;
                     return;
-                } 
+                }
                 case 1: // Query word
+                {
+                    _topicsWindow.IsActive = true;
+                    _topicsWindow.SetOptions(_mentionedWords);
+                    return;
+                }
                 case 2: // Query item
                     void OnClicked2()
                     {

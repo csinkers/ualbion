@@ -99,7 +99,7 @@ namespace UAlbion.Game.Gui.Status
             {
                 var memberId = PartyMember?.Id;
                 if(memberId.HasValue)
-                    Raise(new OpenCharacterInventoryEvent(memberId.Value));
+                    Raise(new InventoryOpenEvent(memberId.Value));
                 _isClickTimerPending = false; // Ensure the single-click behaviour doesn't happen.
             }
             else // For the first click, just start the double-click timer.

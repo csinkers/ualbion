@@ -5,7 +5,7 @@ using UAlbion.Game.Gui.Text;
 
 namespace UAlbion.Game.Gui.Dialogs
 {
-    class YesNoMessageBox : Dialog
+    class YesNoMessageBox : ModalDialog
     {
         void OnButton(bool isYes)
         {

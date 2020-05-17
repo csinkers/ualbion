@@ -21,12 +21,11 @@ namespace UAlbion.Game.Gui.Controls
         }
 
         public delegate ColorScheme ThemeFunction(ButtonState state);
-        static readonly ThemeFunction DefaultTheme = ButtonTheme.Get;
 
         SpriteLease _sprite;
         Rectangle _lastExtents;
         ButtonState _state = ButtonState.Normal;
-        ThemeFunction _theme = DefaultTheme;
+        ThemeFunction _theme = ButtonTheme.Default;
         int _padding = 2;
         bool _visible = true;
 

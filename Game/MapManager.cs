@@ -47,9 +47,7 @@ namespace UAlbion.Game
             }
 
             // Remove old map
-            foreach(var child in Children)
-                child.Detach();
-            Children.Clear();
+            RemoveAllChildren();
             Current = null;
 
             Raise(new MuteEvent());

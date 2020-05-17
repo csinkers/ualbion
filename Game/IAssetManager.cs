@@ -20,7 +20,6 @@ namespace UAlbion.Game
 
         string LoadString(StringId id, GameLanguage language);
         string LoadString(SystemTextId id, GameLanguage language);
-        string LoadString(WordId id, GameLanguage language);
 
         ISample LoadSample(SampleId id);
         ISample LoadWaveLib(SongId songId, int instrument);

@@ -3,22 +3,28 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Gui.Controls
 {
-    public static class FramelessTheme
+    public class GroupingFrame : ButtonFrame
     {
-        public static ButtonFrame.ColorScheme Get(ButtonState state)
+        public GroupingFrame(IUiElement child) : base(child)
         {
-            var c = new ButtonFrame.ColorScheme { Alpha = 0.4f, Corners = CommonColor.Grey8 };
+            Theme = FrameTheme;
+            State = ButtonState.Pressed;
+        }
+
+        static ColorScheme FrameTheme(ButtonState state)
+        {
+            var c = new ColorScheme { Alpha = 0.5f, Corners = CommonColor.Grey8 };
             switch (state)
             {
                 case ButtonState.Normal:
                 case ButtonState.ClickedBlurred:
-                    c.TopLeft = null;
-                    c.BottomRight = null;
+                    c.TopLeft = CommonColor.Black2;
+                    c.BottomRight = CommonColor.White;
                     c.Background = null;
                     break;
                 case ButtonState.Hover:
-                    c.TopLeft = null;
-                    c.BottomRight = null;
+                    c.TopLeft = CommonColor.White;
+                    c.BottomRight = CommonColor.Black2;
                     c.Background = CommonColor.White;
                     break;
                 case ButtonState.Clicked:
@@ -30,7 +36,7 @@ namespace UAlbion.Game.Gui.Controls
                 case ButtonState.HoverPressed:
                     c.TopLeft = CommonColor.Black2;
                     c.BottomRight = CommonColor.White;
-                    c.Background = CommonColor.White;
+                    c.Background = null;
                     break;
                 default: throw new ArgumentOutOfRangeException();
             }

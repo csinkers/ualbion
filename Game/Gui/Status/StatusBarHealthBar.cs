@@ -27,8 +27,8 @@ namespace UAlbion.Game.Gui.Status
             _frame = AttachChild(new ButtonFrame(_bar)
             {
                 Theme = isHealth 
-                    ? (ButtonFrame.ThemeFunction)HealthIndicatorTheme.Get 
-                    : ManaIndicatorTheme.Get,
+                    ? (ButtonFrame.ThemeFunction)HealthIndicatorTheme
+                    : ManaIndicatorTheme,
                 Padding = 0
             });
         }
@@ -50,6 +50,47 @@ namespace UAlbion.Game.Gui.Status
             if (valueMax == 0) valueMax = 1;
             _bar.DrawSize = new Vector2(_bar.MeasureSize.X * value / valueMax, _bar.MeasureSize.Y);
             _frame.State = highlighted ? ButtonState.Hover : ButtonState.Normal;
+        }
+        static ButtonFrame.ColorScheme HealthIndicatorTheme(ButtonState state)
+        {
+            var c = new ButtonFrame.ColorScheme { Alpha = 1.0f };
+            switch (state)
+            {
+                case ButtonState.Normal:
+                    c.Corners = CommonColor.Black2;
+                    c.TopLeft = CommonColor.Black2;
+                    c.BottomRight = CommonColor.Black2;
+                    c.Background = CommonColor.Green3;
+                    break;
+                default:
+                    c.Corners = CommonColor.BlueGrey5;
+                    c.TopLeft = CommonColor.BlueGrey5;
+                    c.BottomRight = CommonColor.BlueGrey5;
+                    c.Background = CommonColor.Green3;
+                    break;
+            }
+            return c;
+        }
+
+        static ButtonFrame.ColorScheme ManaIndicatorTheme(ButtonState state)
+        {
+            var c = new ButtonFrame.ColorScheme { Alpha = 1.0f };
+            switch (state)
+            {
+                case ButtonState.Normal:
+                    c.Corners = CommonColor.Black2;
+                    c.TopLeft = CommonColor.Black2;
+                    c.BottomRight = CommonColor.Black2;
+                    c.Background = CommonColor.Teal1;
+                    break;
+                default:
+                    c.Corners = CommonColor.BlueGrey5;
+                    c.TopLeft = CommonColor.BlueGrey5;
+                    c.BottomRight = CommonColor.BlueGrey5;
+                    c.Background = CommonColor.Teal1;
+                    break;
+            }
+            return c;
         }
     }
 }

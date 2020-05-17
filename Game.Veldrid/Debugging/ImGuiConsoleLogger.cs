@@ -6,6 +6,8 @@ using ImGuiNET;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats.Config;
+using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Veldrid.Debugging
@@ -57,6 +59,9 @@ namespace UAlbion.Game.Veldrid.Debugging
             var debugFlags = Resolve<ISettings>().Debug.DebugFlags;
             if ((debugFlags & DebugFlags.ShowConsole) == 0)
             {
+                if(_wasShown)
+                    Raise(new PopInputModeEvent());
+
                 _wasShown = false;
                 return;
             }
@@ -64,6 +69,7 @@ namespace UAlbion.Game.Veldrid.Debugging
             if(!_wasShown)
             {
                 _scrollToBottom = true;
+                Raise(new PushInputModeEvent(InputMode.TextEntry));
             }
 
             ImGui.Begin("Console");
@@ -136,6 +142,7 @@ namespace UAlbion.Game.Veldrid.Debugging
 
             if(!_wasShown)
                 ImGui.SetKeyboardFocusHere(0);
+
             if (ImGui.InputText("", _inputBuffer, (uint)_inputBuffer.Length, inputTextFlags))
             {
                 var logExchange = Resolve<ILogExchange>();

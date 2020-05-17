@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Core;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
@@ -15,7 +16,13 @@ namespace UAlbion.Game.State
         public SceneManager()
         {
             On<SetSceneEvent>(Set);
-            On<OpenCharacterInventoryEvent>(OpenInventory);
+            On<InventoryOpenEvent>(e => OpenInventory(e.MemberId));
+            On<InventoryOpenPositionEvent>(e =>
+            {
+                var party = Resolve<IParty>();
+                if (party?.StatusBarOrder.Count > e.Position)
+                    OpenInventory(party.StatusBarOrder[e.Position].Id);
+            });
             On<OpenChestEvent>(OpenChest);
         }
 
@@ -41,11 +48,11 @@ namespace UAlbion.Game.State
             Raise(new InventoryChestModeEvent(e.ChestId, party.Leader));
         }
 
-        void OpenInventory(OpenCharacterInventoryEvent e)
+        void OpenInventory(PartyCharacterId memberId)
         {
             if(ActiveSceneId != SceneId.Inventory)
                 Raise(new PushSceneEvent(SceneId.Inventory));
-            Raise(new InventoryModeEvent(e.MemberId));
+            Raise(new InventoryModeEvent(memberId));
         }
 
         void Set(SetSceneEvent e)

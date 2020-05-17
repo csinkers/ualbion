@@ -6,7 +6,7 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Dialogs
 {
-    public class ConversationTextWindow : Dialog
+    public class ConversationTextWindow : ModalDialog
     {
         readonly TextSourceWrapper _text = new TextSourceWrapper();
 
@@ -15,6 +15,7 @@ namespace UAlbion.Game.Gui.Dialogs
         public ConversationTextWindow() : base(DialogPositioning.Bottom)
         {
             On<UiLeftClickEvent>(e => Clicked?.Invoke());
+            On<DismissMessageEvent>(e => Clicked?.Invoke());
 
             var content = new FixedSize(248, 159,
                 new Padding(

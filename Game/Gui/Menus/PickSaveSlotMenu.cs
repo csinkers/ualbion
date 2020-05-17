@@ -12,7 +12,7 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Menus
 {
-    public class PickSaveSlotMenu : Dialog
+    public class PickSaveSlotMenu : ModalDialog
     {
         readonly bool _showEmptySlots;
         readonly StringId _stringId;

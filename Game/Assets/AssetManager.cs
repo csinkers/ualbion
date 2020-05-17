@@ -178,11 +178,8 @@ namespace UAlbion.Game.Assets
                 : $"!MISSING STRING {id.Type}:{id.Id}:{id.SubId}:{language}!";
         }
 
-        public string LoadString(SystemTextId id, GameLanguage language) => LoadString(new StringId(AssetType.SystemText, 0, (int)id), language);
-        public string LoadString(WordId id, GameLanguage language) => LoadString(new StringId(AssetType.Dictionary, (int)id / 500, (int)id), language);
-
+        public string LoadString(SystemTextId id, GameLanguage language) => LoadString(id.ToId(), language);
         public ISample LoadSample(SampleId id) => (AlbionSample)_assetLocatorRegistry.LoadAssetCached(AssetType.Sample, id);
-
         public ISample LoadWaveLib(SongId songId, int instrument)
             => ((WaveLib) _assetLocatorRegistry.LoadAssetCached(AssetType.WaveLibrary, songId))?.GetSample(instrument);
 

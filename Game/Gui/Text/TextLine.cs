@@ -73,7 +73,7 @@ namespace UAlbion.Game.Gui.Text
                         (int)(lineExtents.Y + lineExtents.Height - size.Y),
                         (int)size.X,
                         (int)size.Y),
-                    order));
+                    order + 1));
                 offset += (int)size.X;
             }
 

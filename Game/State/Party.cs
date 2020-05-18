@@ -44,7 +44,8 @@ namespace UAlbion.Game.State
             {
                 var state = Resolve<IGameState>();
                 var inventoryManager = Resolve<IInventoryManager>();
-                var chest = state.GetChest(e.ChestId);
+                var chest = state.GetInventory(InventoryType.Chest, (int)e.ChestId);
+
                 if (ChangePartyGold(QuantityChangeOperation.AddAmount, chest.Gold))
                     inventoryManager.TryChangeGold(InventoryType.Chest, (int)e.ChestId, QuantityChangeOperation.SubtractAmount, chest.Gold);
 

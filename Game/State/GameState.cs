@@ -23,8 +23,6 @@ namespace UAlbion.Game.State
         public DateTime Time => SavedGame.Epoch + _game.ElapsedTime;
         IParty IGameState.Party => _party;
         public ICharacterSheet GetNpc(NpcCharacterId id) => _game != null && _game.NpcStats.TryGetValue(id, out var sheet) ? sheet : null;
-        public IInventory GetChest(ChestId id) => GetInventory(InventoryType.Chest, (int)id);
-        public IInventory GetMerchant(MerchantId id) => GetInventory(InventoryType.Merchant, (int)id);
         public ICharacterSheet GetPartyMember(PartyCharacterId id) => _game != null &&_game.PartyMembers.TryGetValue(id, out var member) ? member : null;
         public short GetTicker(int id) => _game != null && _game.Tickers.TryGetValue(id, out var value) ? value : (short)0;
         public bool GetSwitch(int id) => _game != null && _game.Switches.TryGetValue(id, out var value) && value;
@@ -66,6 +64,7 @@ namespace UAlbion.Game.State
             AttachChild(new InventoryManager(GetInventory));
         }
 
+        IInventory IGameState.GetInventory(InventoryType type, int id) => GetInventory(type, id);
         Inventory GetInventory(InventoryType type, int id)
         {
             if (_game == null)
@@ -150,7 +149,6 @@ namespace UAlbion.Game.State
             _party?.Detach();
             _party = AttachChild(new Party(_game.PartyMembers, _game.ActiveMembers));
             Raise(new LoadMapEvent(_game.MapId));
-            // TODO: Replay map modification events from save
             Raise(new StartClockEvent());
             Raise(new PartyChangedEvent());
             Raise(new PartyJumpEvent(_game.PartyX, _game.PartyY));

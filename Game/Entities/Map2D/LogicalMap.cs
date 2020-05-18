@@ -40,6 +40,7 @@ namespace UAlbion.Game.Entities.Map2D
                 else i++;
             }
 
+            // Replay any changes for this map
             foreach (var change in permChanges.Where(x => x.MapId == mapData.Id))
                 ApplyChange(change.X, change.Y, change.ChangeType, change.Value, change.Unk3);
 

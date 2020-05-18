@@ -4,6 +4,7 @@
     {
         Player,
         Chest,
-        Merchant
+        Merchant,
+        CombatLoot
     }
 }

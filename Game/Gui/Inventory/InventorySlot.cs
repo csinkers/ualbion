@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
@@ -82,25 +81,12 @@ namespace UAlbion.Game.Gui.Inventory
 
         public override string ToString() => $"InventorySlot:{_inventoryType}:{_id}:{_slotId}";
 
-        IInventory Inventory
-        {
-            get
-            {
-                var state = Resolve<IGameState>();
-                return _inventoryType switch
-                {
-                    InventoryType.Player => state.GetPartyMember((PartyCharacterId)_id)?.Inventory,
-                    InventoryType.Chest => state.GetChest((ChestId)_id),
-                    InventoryType.Merchant => state.GetMerchant((MerchantId)_id),
-                    _ => throw new InvalidOperationException($"Invalid inventory type \"{_inventoryType}\"")
-                };
-            }
-        }
-
         void GetSlot(out ItemSlot slotInfo, out ItemData item)
         {
             var assets = Resolve<IAssetManager>();
-            slotInfo = Inventory.GetSlot(_slotId);
+            var inventory = Resolve<IGameState>().GetInventory(_inventoryType, _id);
+
+            slotInfo = inventory.GetSlot(_slotId);
             item = slotInfo?.Id == null ? null : assets.LoadItem(slotInfo.Id.Value);
         }
 
@@ -142,13 +128,14 @@ namespace UAlbion.Game.Gui.Inventory
         {
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
-            var inventory = Resolve<IInventoryManager>();
+            var inventoryManager = Resolve<IInventoryManager>();
+            var inventory = Resolve<IGameState>().GetInventory(_inventoryType, _id);
 
-            var hand = inventory.ItemInHand;
+            var hand = inventoryManager.ItemInHand;
             if (hand is GoldInHand || hand is RationsInHand)
                 return; // Don't show hover text when holding gold / food
 
-            var slotInfo = Inventory.GetSlot(_slotId);
+            var slotInfo = inventory.GetSlot(_slotId);
             string itemName = null;
             if (slotInfo?.Id != null)
             {
@@ -164,7 +151,6 @@ namespace UAlbion.Game.Gui.Inventory
                 itemInHandName = itemInHand.GetName(settings.Gameplay.Language);
             }
 
-            var inventoryManager = Resolve<IInventoryManager>();
             var action = inventoryManager.GetInventoryAction(_inventoryType, _id, _slotId);
             switch(action)
             {
@@ -216,7 +202,6 @@ namespace UAlbion.Game.Gui.Inventory
                     break;
                 }
             }
-
         }
 
         void Rebuild()

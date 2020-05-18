@@ -94,7 +94,6 @@ namespace UAlbion.Game.Gui.Dialogs
             _optionsWindow.IsActive = false;
             var textManager = Resolve<ITextManager>();
 
-            // TODO: Special handling for 0,1,2,3
             switch(blockId)
             {
                 case 0: // Profession
@@ -110,12 +109,14 @@ namespace UAlbion.Game.Gui.Dialogs
                     _textWindow.Clicked += OnClicked;
                     return;
                 }
+
                 case 1: // Query word
                 {
                     _topicsWindow.IsActive = true;
                     _topicsWindow.SetOptions(_mentionedWords);
                     return;
                 }
+
                 case 2: // Query item
                     void OnClicked2()
                     {
@@ -130,7 +131,7 @@ namespace UAlbion.Game.Gui.Dialogs
                 case 3: // Bye
                     foreach (var chain in _eventSet.Chains)
                     {
-                        if (chain.FirstEvent.Event is ActionEvent action && action.ActionType == ActionType.FinishDialogue)
+                        if (chain.FirstEvent?.Event is ActionEvent action && action.ActionType == ActionType.FinishDialogue)
                         {
                             var trigger = new TriggerChainEvent(chain, chain.FirstEvent, _eventSet.Id);
                             trigger.OnComplete += (sender, args) => Complete?.Invoke(this, EventArgs.Empty);

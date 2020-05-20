@@ -3,21 +3,20 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.Assets.Save
 {
-    public class MysteryChunk6
+    public class VisitedEventList
     {
         public uint Size { get; set; }
         public ushort NumChunks { get; set; }
-        public UnkSixByte[] Contents { get; set; }
+        public VisitedEvent[] Contents { get; set; }
 
-        public static MysteryChunk6 Serdes(int _, MysteryChunk6 c, ISerializer s)
+        public static VisitedEventList Serdes(int _, VisitedEventList c, ISerializer s)
         {
-            c ??= new MysteryChunk6();
+            c ??= new VisitedEventList();
             c.Size = s.UInt32(nameof(Size), c.Size);
             c.NumChunks = s.UInt16(nameof(NumChunks), c.NumChunks);
             ApiUtil.Assert(c.NumChunks == c.Size / 6);
-            c.Contents ??= new UnkSixByte[(c.Size - 2) / 6];
-            for (int i = 0; i < c.Contents.Length; i++)
-                c.Contents[i] = UnkSixByte.Serdes(c.Contents[i], s);
+            c.Contents ??= new VisitedEvent[(c.Size - 2) / 6];
+            s.List(c.Contents, c.Contents.Length, VisitedEvent.Serdes);
             return c;
         }
     }

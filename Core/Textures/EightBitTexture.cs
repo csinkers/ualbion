@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace UAlbion.Core.Textures
@@ -17,9 +16,9 @@ namespace UAlbion.Core.Textures
         public byte[] TextureData { get; }
         public int SubImageCount => _subImages.Count;
         public bool IsDirty { get; protected set; }
-        public IReadOnlyList<SubImage> SubImages => new ReadOnlyCollection<SubImage>(_subImages);
+        public IReadOnlyList<SubImage> SubImages => _subImages.AsReadOnly();
         public int SizeInBytes => TextureData.Length;
-        readonly IList<SubImage> _subImages = new List<SubImage>();
+        readonly List<SubImage> _subImages = new List<SubImage>();
         public override string ToString() => $"8Bit {Name} ({Width}x{Height}, {_subImages.Count} subimages)";
 
         public EightBitTexture(

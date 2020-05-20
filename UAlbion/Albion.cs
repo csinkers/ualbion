@@ -121,26 +121,29 @@ namespace UAlbion
                     new SceneStack(),
                     new SceneManager()
                         .AddScene((GameScene)new EmptyScene()
-                            .Add(new TextManager())
                             .Add(new PaletteManager()))
+
                         .AddScene((GameScene)new AutomapScene()
-                            .Add(new TextManager())
                             .Add(new PaletteManager()))
+
                         .AddScene((GameScene)new FlatScene()
-                            .Add(new TextManager())
+                            .Add(new ConversationManager())
                             .Add(new PaletteManager()))
+
                         .AddScene((GameScene)new DungeonScene()
-                            .Add(new TextManager())
+                            .Add(new ConversationManager())
                             .Add(new PaletteManager()))
+
                         .AddScene((GameScene)new MenuScene()
-                            .Add(new TextManager())
                             .Add(new PaletteManager()))
+
                         .AddScene((GameScene)new InventoryScene()
-                            .Add(new TextManager())
+                            .Add(new ConversationManager())
                             .Add(new PaletteManager()))
                     ))
 
                 .Add(new Container("GuiAndInput",
+                    new TextManager(),
                     new LayoutManager(),
                     new DebugMapInspector(services)
                         .AddBehaviour(new SpriteInstanceDataDebugBehaviour())

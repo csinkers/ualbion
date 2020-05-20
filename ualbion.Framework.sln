@@ -75,6 +75,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ADLMidi.NET", "..\AdlMidi.NET\src\ADLMidi.NET.csproj", "{097660C0-D1D2-4AA3-801C-C7D0458FC44A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumpSave", "Tools\DumpSave\DumpSave.csproj", "{EE1EC7F8-2D85-49A4-9477-EED30D2B4FB8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -337,6 +339,18 @@ Global
 		{097660C0-D1D2-4AA3-801C-C7D0458FC44A}.Release|x64.Build.0 = Release|Any CPU
 		{097660C0-D1D2-4AA3-801C-C7D0458FC44A}.Release|x86.ActiveCfg = Release|Any CPU
 		{097660C0-D1D2-4AA3-801C-C7D0458FC44A}.Release|x86.Build.0 = Release|Any CPU
+		{EE1EC7F8-2D85-49A4-9477-EED30D2B4FB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE1EC7F8-2D85-49A4-9477-EED30D2B4FB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE1EC7F8-2D85-49A4-9477-EED30D2B4FB8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EE1EC7F8-2D85-49A4-9477-EED30D2B4FB8}.Debug|x64.Build.0 = Debug|Any CPU
+		{EE1EC7F8-2D85-49A4-9477-EED30D2B4FB8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EE1EC7F8-2D85-49A4-9477-EED30D2B4FB8}.Debug|x86.Build.0 = Debug|Any CPU
+		{EE1EC7F8-2D85-49A4-9477-EED30D2B4FB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE1EC7F8-2D85-49A4-9477-EED30D2B4FB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE1EC7F8-2D85-49A4-9477-EED30D2B4FB8}.Release|x64.ActiveCfg = Release|Any CPU
+		{EE1EC7F8-2D85-49A4-9477-EED30D2B4FB8}.Release|x64.Build.0 = Release|Any CPU
+		{EE1EC7F8-2D85-49A4-9477-EED30D2B4FB8}.Release|x86.ActiveCfg = Release|Any CPU
+		{EE1EC7F8-2D85-49A4-9477-EED30D2B4FB8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

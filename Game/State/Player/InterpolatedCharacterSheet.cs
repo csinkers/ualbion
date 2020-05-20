@@ -36,7 +36,7 @@ namespace UAlbion.Game.State.Player
         public AssetType SpriteType => _b().SpriteType;
         public SmallPortraitId? PortraitId => _b().PortraitId;
         public EventSetId EventSetId => _b().EventSetId;
-        public ushort WordSet => _b().WordSet;
+        public EventSetId WordSetId => _b().WordSetId;
         public PlayerLanguage Languages => _b().Languages;
         public IMagicSkills Magic { get; }
         public IInventory Inventory { get; }

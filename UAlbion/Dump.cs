@@ -257,7 +257,7 @@ namespace UAlbion
                     sw.WriteLine($"        {spell.Key} {spell.Value.Item2} ({(spell.Value.Item1 ? "Learnt": "Unknown")})");
             }
 
-            sw.WriteLine($"    WordSet:{c.WordSet}");
+            sw.WriteLine($"    WordSetId:{c.WordSetId}");
             var eventSet = assets.LoadEventSet(c.EventSetId);
             sw.WriteLine($"    Event Set {c.EventSetId}: {(eventSet == null ? "Not Found" : $"{eventSet.Chains.Count()} chains")}");
             if (eventSet != null)

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
@@ -60,8 +59,8 @@ namespace UAlbion.Game.State
             });
 
             _characterSheets = characterSheets;
-            _readOnlyStatusBarOrder = new ReadOnlyCollection<Player.Player>(_statusBarOrder);
-            _readOnlyWalkOrder = new ReadOnlyCollection<Player.Player>(_walkOrder);
+            _readOnlyStatusBarOrder = _statusBarOrder.AsReadOnly();
+            _readOnlyWalkOrder = _walkOrder.AsReadOnly();
 
             foreach (var member in statusBarOrder)
                 if (member.HasValue)

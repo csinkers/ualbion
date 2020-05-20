@@ -43,7 +43,7 @@ namespace UAlbion.Formats.MapEvents
         public byte SmallArg { get; private set; } // Item Class, 255 for 'any'
         byte Unk4 { get; set; }
         byte Unk5 { get; set; }
-        protected ushort LargeArg { get; private set; }
+        public ushort LargeArg { get; private set; }
         ushort Unk8 { get; set; }
 
         public override string ToString() => $"action {ActionType} Block:{SmallArg} From:{LargeArg} ({Unk2})"; // Unk2 is almost always 1
@@ -65,6 +65,6 @@ namespace UAlbion.Formats.MapEvents
     public class WordActionEvent : ActionEvent
     {
         public WordId WordId => (WordId)(LargeArg + 1);
-        public override string ToString() => $"action {ActionType} {SmallArg}: {WordId} ({Unk2})";
+        public override string ToString() => $"action {ActionType} {SmallArg}: {WordId}({(int)WordId}) ({Unk2})";
     }
 }

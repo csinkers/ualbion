@@ -12,7 +12,7 @@ namespace UAlbion.Game.Assets
             { FontColor.White, new byte[] { 0, 194, 194, 195, 196, 197 } }, // DataLiteral
             { FontColor.Yellow, new byte[] { 0, 194, 219, 220, 221, 222 } }, // DataLiteral
             { FontColor.YellowOrange, new byte[] { 0, 194, 208, 209, 210, 211 } }, // DataLiteral
-            { FontColor.Gray, new byte[] { 0, 196, 197, 198, 199, 200 } } // DataLiteral
+            { FontColor.Gray, new byte[] { 0, 196, 197, 198, 199, 200 } }, // DataLiteral
         };
 
         public static ITexture Load(ICoreFactory factory, MetaFontId id, ITexture regular, ITexture bold)

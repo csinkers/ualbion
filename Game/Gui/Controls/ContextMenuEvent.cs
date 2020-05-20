@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Game.Events;
@@ -15,10 +14,7 @@ namespace UAlbion.Game.Gui.Controls
             if (options == null) throw new ArgumentNullException(nameof(options));
             Heading = heading ?? throw new ArgumentNullException(nameof(heading));
             UiPosition = uiPosition;
-            Options = new ReadOnlyCollection<ContextMenuOption>(
-                options
-                    .OrderBy(x => x.Group)
-                    .ToList());
+            Options = options.OrderBy(x => x.Group).ToList().AsReadOnly();
         }
 
         public Vector2 UiPosition { get; }

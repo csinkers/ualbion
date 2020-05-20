@@ -4,14 +4,14 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
-    [Event("start_dialogue", "Initiates a conversation using the given event set id", new [] { "talk" })]
+    [Event("start_dialogue", "Initiates a conversation using the given npc id", new [] { "talk" })]
     public class StartDialogueEvent : AsyncMapEvent
     {
         StartDialogueEvent() { }
-        public StartDialogueEvent(EventSetId eventSetId) => EventSet = eventSetId;
+        public StartDialogueEvent(NpcCharacterId npcId) => NpcId = npcId;
 
-        [EventPart("event_set")]
-        public EventSetId EventSet { get; private set; }
+        [EventPart("npc_id")]
+        public NpcCharacterId NpcId { get; private set; }
 
         public static StartDialogueEvent Serdes(StartDialogueEvent e, ISerializer s)
         {
@@ -21,12 +21,12 @@ namespace UAlbion.Formats.MapEvents
             s.UInt8("Pad3", 0);
             s.UInt8("Pad4", 0);
             s.UInt8("Pad5", 0);
-            e.EventSet = s.EnumU16(nameof(EventSet), e.EventSet);
+            e.NpcId = s.EnumU16(nameof(NpcId), e.NpcId);
             s.UInt16("Pad8", 0);
             return e;
         }
 
         public override MapEventType EventType => MapEventType.StartDialogue;
-        protected override AsyncEvent Clone() => new StartDialogueEvent(EventSet);
+        protected override AsyncEvent Clone() => new StartDialogueEvent(NpcId);
     }
 }

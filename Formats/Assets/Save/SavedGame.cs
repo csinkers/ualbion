@@ -46,7 +46,7 @@ namespace UAlbion.Formats.Assets.Save
         public byte[] Unknown5B71 { get; set; }
         public MapChangeList PermanentMapChanges { get; private set; } = new MapChangeList();
         public MapChangeList TemporaryMapChanges { get; private set; } = new MapChangeList();
-        public MysteryChunk6 Mystery6 { get; set; }
+        public VisitedEventList VisitedEvents { get; set; }
         public PartyCharacterId?[] ActiveMembers { get; } = new PartyCharacterId?[MaxPartySize];
 
         public static string GetName(BinaryReader br)
@@ -78,12 +78,13 @@ namespace UAlbion.Formats.Assets.Save
             ushort hours   = s.UInt16("Hours", (ushort)save.ElapsedTime.Hours);     // A
             ushort minutes = s.UInt16("Minutes", (ushort)save.ElapsedTime.Minutes); // C
             save.ElapsedTime = new TimeSpan(days, hours, minutes, save.ElapsedTime.Seconds, save.ElapsedTime.Milliseconds);
-
             save.MapId   = s.EnumU16(nameof(MapId), save.MapId);    // E
             save.PartyX  = s.UInt16(nameof(PartyX), save.PartyX);   // 10
             save.PartyY  = s.UInt16(nameof(PartyY), save.PartyY);   // 12
             save.PartyDirection = s.EnumU16(nameof(PartyDirection), save.PartyDirection); // 14
+
             save.Unknown16 = s.ByteArrayHex(nameof(Unknown16), save.Unknown16, 0x184); // 16
+
             for (int i = 0; i < save.ActiveMembers.Length; i++) // 6 x PlayerId @ 19A
             {
                 save.ActiveMembers[i] = (PartyCharacterId?)StoreIncrementedNullZero.Serdes(
@@ -91,30 +92,23 @@ namespace UAlbion.Formats.Assets.Save
                     (ushort?)save.ActiveMembers[i],
                     s.UInt16);
             }
+
             save.Unknown1A6 = s.ByteArrayHex(nameof(Unknown1A6), save.Unknown1A6, 0xD0); // 1A6
             save._switches.Packed = s.ByteArrayHex(nameof(Switches), save._switches.Packed, FlagSet.PackedSize); // 276
             save.Unknown2C1 = s.ByteArrayHex(nameof(Unknown2C1), save.Unknown2C1, 0x5833); // 0x2C1
             save._tickers.Serdes(s); // 5AF4
 
-            // Most likely NPC info, 128 bytes per record. (96 records)
             save.Unknown5B9F = s.ByteArrayHex(nameof(Unknown5B9F), save.Unknown5B9F, 0x2C);
             s.List(save.Npcs, MaxNpcCount, NpcState.Serdes);
+
             save.Unknown5B71 = s.ByteArrayHex(
                 nameof(Unknown5B71),
                 save.Unknown5B71,
                 (int)(0x947C + versionOffset - s.Offset)); // 5B9F
 
-            save.PermanentMapChanges = s.Meta(
-                nameof(PermanentMapChanges),
-                save.PermanentMapChanges,
-                MapChangeList.Serdes);
-
-            save.TemporaryMapChanges = s.Meta(
-                nameof(TemporaryMapChanges),
-                save.TemporaryMapChanges,
-                MapChangeList.Serdes);
-
-            save.Mystery6 = s.Meta(nameof(Mystery6), save.Mystery6, MysteryChunk6.Serdes);
+            save.PermanentMapChanges = s.Meta(nameof(PermanentMapChanges), save.PermanentMapChanges, MapChangeList.Serdes);
+            save.TemporaryMapChanges = s.Meta(nameof(TemporaryMapChanges), save.TemporaryMapChanges, MapChangeList.Serdes);
+            save.VisitedEvents = s.Meta(nameof(VisitedEvents), save.VisitedEvents, VisitedEventList.Serdes);
 
             var charLoader = new CharacterSheetLoader();
             void SerdesPartyCharacter(int i, int size, ISerializer serializer)

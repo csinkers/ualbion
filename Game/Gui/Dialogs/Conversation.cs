@@ -16,22 +16,20 @@ namespace UAlbion.Game.Gui.Dialogs
     public class Conversation : Component
     {
         readonly PartyCharacterId _partyMemberId;
-        readonly NpcCharacterId _npcId;
-        readonly EventSet _eventSet;
-        readonly ISet<WordId> _mentionedWords = new HashSet<WordId>();
+        readonly ICharacterSheet _npc;
+        readonly IDictionary<WordId, WordStatus> _topics = new Dictionary<WordId, WordStatus>();
         ConversationTextWindow _textWindow;
-        ConversationOptionsWindow _optionsWindow;
         ConversationTopicWindow _topicsWindow;
+        ConversationOptionsWindow _optionsWindow;
 
-        public Conversation(PartyCharacterId partyMemberId, NpcCharacterId npcId, EventSet eventSet)
+        public Conversation(PartyCharacterId partyMemberId, ICharacterSheet npc)
         {
             On<EndDialogueEvent>(_ => Close());
             On<UnloadMapEvent>(_ => Close());
             On<DataChangeEvent>(OnDataChange);
 
             _partyMemberId = partyMemberId;
-            _npcId = npcId;
-            _eventSet = eventSet ?? throw new ArgumentNullException(nameof(eventSet));
+            _npc = npc ?? throw new ArgumentNullException(nameof(npc));
         }
 
         public event EventHandler<EventArgs> Complete;
@@ -55,24 +53,16 @@ namespace UAlbion.Game.Gui.Dialogs
             var game = Resolve<IGameState>();
             var assets = Resolve<IAssetManager>();
             var partyMember = game?.GetPartyMember(_partyMemberId) ?? assets.LoadCharacter(_partyMemberId);
-            var npc = game?.GetNpc(_npcId) ?? assets.LoadCharacter(_npcId);
 
             AttachChild(new ConversationParticipantLabel(partyMember, false));
-            AttachChild(new ConversationParticipantLabel(npc, true));
+            AttachChild(new ConversationParticipantLabel(_npc, true));
 
             _textWindow = AttachChild(new ConversationTextWindow());
             _optionsWindow = AttachChild(new ConversationOptionsWindow { IsActive = false});
             _topicsWindow = AttachChild(new ConversationTopicWindow { IsActive = false });
             _topicsWindow.WordSelected += TopicsWindowOnWordSelected;
 
-            // Use enqueue, as we're still in Subscribe and the handlers haven't been registered.
-            var chain = _eventSet.Chains.FirstOrDefault(x => x.FirstEvent?.Event is ActionEvent action && action.ActionType == ActionType.StartDialogue);
-            if (chain != null)
-            {
-                var triggerEvent = new TriggerChainEvent(chain, chain.FirstEvent, _eventSet.Id);
-                triggerEvent.OnComplete += DefaultIdleHandler;
-                Enqueue(triggerEvent);
-            }
+            TriggerAction(ActionType.StartDialogue, 0, 0);
         }
 
         void TopicsWindowOnWordSelected(object sender, WordId? e)
@@ -87,6 +77,13 @@ namespace UAlbion.Game.Gui.Dialogs
         {
             IsActive = false;
             Complete?.Invoke(this, EventArgs.Empty);
+        }
+
+        void DiscoverTopics(IEnumerable<WordId> topics)
+        {
+            foreach(var topic in topics)
+                if (!_topics.TryGetValue(topic, out var currentStatus) || currentStatus == WordStatus.Unknown)
+                    _topics[topic] = WordStatus.Mentioned;
         }
 
         void BlockClicked(int blockId, int textId)
@@ -104,7 +101,7 @@ namespace UAlbion.Game.Gui.Dialogs
                         DefaultIdleHandler(null, null);
                     }
 
-                    var text = textManager.FormatText(new StringId(AssetType.EventText, (int)_eventSet.Id, 0), FontColor.Yellow);
+                    var text = textManager.FormatText(new StringId(AssetType.EventText, (int)_npc.EventSetId, 0), FontColor.Yellow);
                     _textWindow.Text = text;
                     _textWindow.Clicked += OnClicked;
                     return;
@@ -113,7 +110,7 @@ namespace UAlbion.Game.Gui.Dialogs
                 case 1: // Query word
                 {
                     _topicsWindow.IsActive = true;
-                    _topicsWindow.SetOptions(_mentionedWords);
+                    _topicsWindow.SetOptions(_topics);
                     return;
                 }
 
@@ -129,30 +126,11 @@ namespace UAlbion.Game.Gui.Dialogs
                     return;
 
                 case 3: // Bye
-                    foreach (var chain in _eventSet.Chains)
-                    {
-                        if (chain.FirstEvent?.Event is ActionEvent action && action.ActionType == ActionType.FinishDialogue)
-                        {
-                            var trigger = new TriggerChainEvent(chain, chain.FirstEvent, _eventSet.Id);
-                            trigger.OnComplete += (sender, args) => Complete?.Invoke(this, EventArgs.Empty);
-                            Raise(trigger);
-                        }
-                    }
-
+                    TriggerAction(ActionType.FinishDialogue, 0, 0, (sender, args) => Complete?.Invoke(this, EventArgs.Empty));
                     return;
             }
 
-            foreach (var chain in _eventSet.Chains)
-            {
-                if (chain.FirstEvent?.Event is DialogueLineActionEvent action &&
-                    action.BlockId == blockId &&
-                    action.TextId == textId)
-                {
-                    var trigger = new TriggerChainEvent(chain, chain.FirstEvent, _eventSet.Id);
-                    trigger.OnComplete += DefaultIdleHandler;
-                    Raise(trigger);
-                }
-            }
+            TriggerLineAction(blockId, textId);
         }
 
         public bool OnText(BaseTextEvent textEvent)
@@ -171,7 +149,7 @@ namespace UAlbion.Game.Gui.Dialogs
                     }
 
                     var text = textManager.FormatTextEvent(textEvent, FontColor.Yellow);
-                    _mentionedWords.UnionWith(text.Get().SelectMany(x => x.Words));
+                    DiscoverTopics(text.Get().SelectMany(x => x.Words));
                     _textWindow.Text = text;
                     _textWindow.Clicked += OnConversationClicked;
                     return true;
@@ -181,7 +159,7 @@ namespace UAlbion.Game.Gui.Dialogs
                 {
                     textEvent.Complete();
                     var text = textManager.FormatTextEvent(textEvent, FontColor.Yellow);
-                    _mentionedWords.UnionWith(text.Get().SelectMany(x => x.Words));
+                    DiscoverTopics(text.Get().SelectMany(x => x.Words));
                     _textWindow.Text = text;
 
                     var options = new List<(IText, int?, Action)>();
@@ -199,7 +177,7 @@ namespace UAlbion.Game.Gui.Dialogs
                 {
                     textEvent.Acknowledge();
                     var text = textManager.FormatTextEvent(textEvent, FontColor.Yellow);
-                    _mentionedWords.UnionWith(text.Get().SelectMany(x => x.Words));
+                    DiscoverTopics(text.Get().SelectMany(x => x.Words));
 
                     void OnQueryClicked()
                     {
@@ -260,6 +238,39 @@ namespace UAlbion.Game.Gui.Dialogs
         {
             if (e.Property == DataChangeEvent.ChangeProperty.ReceiveOrRemoveItem && e.Mode == QuantityChangeOperation.AddAmount)
                 ItemTransition.CreateTransitionFromConversation(Exchange, e.ItemId);
+        }
+
+        bool TriggerWordAction(ushort wordId) => TriggerAction(ActionType.Word, 0, wordId);
+        bool TriggerLineAction(int blockId, int textId) => TriggerAction(ActionType.DialogueLine, (byte)blockId, (ushort)textId);
+        bool TriggerAction(ActionType type, byte small, ushort large, EventHandler<EventArgs> continuation = null)
+        {
+            var assets = Resolve<IAssetManager>();
+            var eventSet = assets.LoadEventSet(_npc.EventSetId);
+            var wordSet = assets.LoadEventSet(_npc.WordSetId);
+
+            bool fromWordSet = false;
+            var chain = eventSet.Chains.FirstOrDefault(x =>
+                x.FirstEvent?.Event is ActionEvent action && 
+                action.ActionType == type && 
+                action.SmallArg == small &&
+                action.LargeArg == large);
+
+            if (chain == null)
+            {
+                chain = wordSet?.Chains.FirstOrDefault(x =>
+                    x.FirstEvent?.Event is ActionEvent action && action.ActionType == type &&
+                    action.SmallArg == small && action.LargeArg == large);
+                fromWordSet = true;
+            }
+
+            if (chain != null)
+            {
+                var triggerEvent = new TriggerChainEvent(chain, chain.FirstEvent, fromWordSet ? wordSet.Id : eventSet.Id);
+                triggerEvent.OnComplete += continuation ?? DefaultIdleHandler;
+                Enqueue(triggerEvent);
+                return true;
+            }
+            return false;
         }
     }
 }

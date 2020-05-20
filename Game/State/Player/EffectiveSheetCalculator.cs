@@ -28,7 +28,7 @@ namespace UAlbion.Game.State.Player
                 SpriteType = sheet.SpriteType,
                 PortraitId = sheet.PortraitId,
                 EventSetId = sheet.EventSetId,
-                WordSet = sheet.WordSet,
+                WordSetId = sheet.WordSetId,
                 Magic = sheet.Magic.DeepClone(),
                 Inventory  = sheet.Inventory.DeepClone(),
                 Attributes = sheet.Attributes.DeepClone(),

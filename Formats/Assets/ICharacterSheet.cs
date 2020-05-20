@@ -18,7 +18,7 @@ namespace UAlbion.Formats.Assets
         AssetType SpriteType { get; }
         SmallPortraitId? PortraitId { get; }
         EventSetId EventSetId { get; }
-        ushort WordSet { get; }
+        EventSetId WordSetId { get; }
         PlayerLanguage Languages { get; }
 
         // Grouped

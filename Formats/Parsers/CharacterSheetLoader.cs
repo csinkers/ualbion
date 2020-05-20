@@ -50,7 +50,7 @@ namespace UAlbion.Formats.Parsers
             s.Check();
 
             sheet.EventSetId = s.EnumU16("EventSetId", sheet.EventSetId);
-            sheet.WordSet = s.UInt16("WordSet", sheet.WordSet);
+            sheet.WordSetId = s.EnumU16("WordSetId", sheet.WordSetId);
             sheet.Combat.TrainingPoints = s.UInt16("TrainingPoints", sheet.Combat.TrainingPoints);
             sheet.Inventory.Gold = s.UInt16("Gold", sheet.Inventory.Gold);
             sheet.Inventory.Rations = s.UInt16("Rations", sheet.Inventory.Rations);

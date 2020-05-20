@@ -4,6 +4,7 @@ using System.Linq;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.Gui.Text;
 
 namespace UAlbion.Game.Gui.Dialogs
 {
@@ -21,15 +22,25 @@ namespace UAlbion.Game.Gui.Dialogs
         public event EventHandler<WordId?> WordSelected;
         void OnWordSelected(WordId? e) => WordSelected?.Invoke(this, e);
 
-        public void SetOptions(IEnumerable<WordId> words)
+        public void SetOptions(IDictionary<WordId, WordStatus> words)
         {
             RemoveAllChildren();
 
             var elements = new List<IUiElement>();
             var wordButtons = words.Select(x =>
-                (IUiElement)new Button(x.ToId(), () => OnWordSelected(x))
                 {
-                    Theme = ButtonTheme.DialogOption
+                    var color = x.Value switch
+                    {
+                        WordStatus.Mentioned => FontColor.Yellow,
+                        WordStatus.Discussed => FontColor.White,
+                        _ => FontColor.Gray,
+                    };
+
+                    var textElement = new TextElement(x.Key.ToId()).Color(color);
+                    return (IUiElement) new Button(textElement, () => OnWordSelected(x.Key))
+                    {
+                        Theme = ButtonTheme.DialogOption
+                    };
                 }
             ).ToArray();
 

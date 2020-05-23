@@ -10,6 +10,11 @@ namespace UAlbion.Game.Text
             _blocks = new[] { new TextBlock(text) };
         }
 
+        public LiteralText(TextBlock text)
+        {
+            _blocks = new[] { text };
+        }
+
         public int Version => 1;
         public IEnumerable<TextBlock> Get() => _blocks;
     }

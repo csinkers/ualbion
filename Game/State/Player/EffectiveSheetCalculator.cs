@@ -60,6 +60,9 @@ namespace UAlbion.Game.State.Player
 
         static void ApplyWieldedItems(IAssetManager assets, EffectiveCharacterSheet sheet)
         {
+            int initialDamage = sheet.Combat.Damage;
+            int initialProtection = sheet.Combat.Protection;
+
             foreach (var itemSlot in sheet.Inventory.EnumerateBodyParts())
             {
                 if (itemSlot.Id == null)
@@ -118,6 +121,9 @@ namespace UAlbion.Game.State.Player
                     }
                 }
             }
+
+            sheet.DisplayDamage = sheet.Combat.Damage - initialDamage;
+            sheet.DisplayProtection = sheet.Combat.Protection - initialProtection;
         }
     }
 }

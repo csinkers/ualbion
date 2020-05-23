@@ -31,7 +31,7 @@ namespace UAlbion.Game.Gui.Inventory
             var source = new DynamicText(() =>
             {
                 var player = Resolve<IParty>()[_activeCharacter];
-                var protection = player?.Apparent.Combat.Protection ?? 0;
+                var protection = player?.Apparent.DisplayProtection ?? 0;
                 return new[] { new TextBlock($": {protection}") };
             }, x => _version);
 

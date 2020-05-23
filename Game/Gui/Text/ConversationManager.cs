@@ -20,6 +20,7 @@ namespace UAlbion.Game.Gui.Text
             On<NpcTextEvent>(OnNpcTextEvent);
             On<PartyMemberTextEvent>(OnPartyMemberTextEvent);
             On<StartDialogueEvent>(StartDialogue);
+            On<StartPartyDialogueEvent>(StartPartyDialogue);
         }
 
         void OnNpcTextEvent(NpcTextEvent e)
@@ -171,6 +172,22 @@ namespace UAlbion.Game.Gui.Text
             var assets = Resolve<IAssetManager>();
             var npc = assets.LoadCharacter(e.NpcId);
             _conversation = AttachChild(new Conversation(party?.Leader ?? PartyCharacterId.Tom, npc));
+
+            _conversation.Complete += (sender, args) =>
+            {
+                e.Complete();
+                Children.Remove(_conversation);
+                _conversation.Detach();
+                _conversation = null;
+            };
+        }
+
+        void StartPartyDialogue(StartPartyDialogueEvent e)
+        {
+            e.Acknowledge();
+            var assets = Resolve<IAssetManager>();
+            var npc = assets.LoadCharacter(e.MemberId);
+            _conversation = AttachChild(new Conversation(PartyCharacterId.Tom, npc));
 
             _conversation.Complete += (sender, args) =>
             {

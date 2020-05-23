@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
@@ -110,10 +111,11 @@ namespace UAlbion.Game.Gui.Text
             foreach (var block in textManager.SplitBlocksToSingleWords(blocks))
             {
                 var size = textManager.Measure(block);
-                if (block.Arrangement.HasFlag(TextArrangement.ForceNewLine)
-                    ||
-                    line.Width > 0 && line.Width + size.X > extents.Width)
+                bool forceNewLine = (block.Arrangement & TextArrangement.ForceNewLine) != 0;
+                if (forceNewLine || line.Width > 0 && line.Width + size.X > extents.Width)
                 {
+                    if (!forceNewLine && string.IsNullOrWhiteSpace(block.Text))
+                        continue;
                     yield return line;
                     line = new TextLine(extents);
                 }

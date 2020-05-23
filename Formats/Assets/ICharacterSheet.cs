@@ -32,5 +32,7 @@ namespace UAlbion.Formats.Assets
     {
         int TotalWeight { get; }
         int MaxWeight { get; }
+        int DisplayDamage { get; }
+        int DisplayProtection { get; }
     }
 }

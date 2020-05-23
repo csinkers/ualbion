@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Collections.Generic;
+using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
@@ -7,6 +8,7 @@ using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
+using UAlbion.Game.Input;
 using UAlbion.Game.State;
 using UAlbion.Game.State.Player;
 using UAlbion.Game.Text;
@@ -31,6 +33,7 @@ namespace UAlbion.Game.Gui.Inventory
         public InventorySlot(InventoryType inventoryType, int id, ItemSlotId slotId)
         {
             On<UiLeftClickEvent>(e => OnClick());
+            On<UiRightClickEvent>(OnRightClick);
             On<IdleClockEvent>(e => _frameNumber++);
             On<InventoryChangedEvent>(e =>
             {
@@ -45,6 +48,9 @@ namespace UAlbion.Game.Gui.Inventory
             On<BlurEvent>(e =>
             {
                 _frame.State = ButtonState.Normal;
+                var inventoryManager = Resolve<IInventoryManager>();
+                var hand = inventoryManager.ItemInHand;
+                Raise(new SetCursorEvent(hand == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
                 Raise(new HoverTextEvent(""));
             });
             On<TimerElapsedEvent>(e =>
@@ -138,18 +144,11 @@ namespace UAlbion.Game.Gui.Inventory
             var slotInfo = inventory.GetSlot(_slotId);
             string itemName = null;
             if (slotInfo?.Id != null)
-            {
-                var item = assets.LoadItem(slotInfo.Id.Value);
-                if (item != null)
-                    itemName = item.GetName(settings.Gameplay.Language);
-            }
+                itemName = assets.LoadString(slotInfo.Id.Value.ToId(), settings.Gameplay.Language);
 
             string itemInHandName = null;
             if (hand is ItemSlot handSlot && handSlot.Id.HasValue)
-            {
-                var itemInHand = assets.LoadItem(handSlot.Id.Value);
-                itemInHandName = itemInHand.GetName(settings.Gameplay.Language);
-            }
+                itemInHandName = assets.LoadString(handSlot.Id.Value.ToId(), settings.Gameplay.Language);
 
             var action = inventoryManager.GetInventoryAction(_inventoryType, _id, _slotId);
             switch(action)
@@ -160,6 +159,7 @@ namespace UAlbion.Game.Gui.Inventory
                     if (itemName != null)
                     {
                         Raise(new HoverTextEvent(itemName));
+                        Raise(new SetCursorEvent(CoreSpriteId.CursorSelected));
                         _frame.State = ButtonState.Hover;
                     }
                     break;
@@ -180,7 +180,9 @@ namespace UAlbion.Game.Gui.Inventory
                     if (itemInHandName != null && itemName != null)
                     {
                         // Swap %s with %s
-                        Raise(new HoverTextExEvent(BuildHoverText(SystemTextId.Item_SwapXWithX, itemInHandName,
+                        Raise(new HoverTextExEvent(BuildHoverText(
+                            SystemTextId.Item_SwapXWithX,
+                            itemInHandName,
                             itemName)));
                         _frame.State = ButtonState.Hover;
                     }
@@ -231,5 +233,91 @@ namespace UAlbion.Game.Gui.Inventory
         }
 
         public override Vector2 GetSize() => _size;
+
+        void OnRightClick(UiRightClickEvent e)
+        {
+            e.Propagating = false;
+
+            var assets = Resolve<IAssetManager>();
+            var window = Resolve<IWindowManager>();
+            var settings = Resolve<ISettings>();
+            var cursorManager = Resolve<ICursorManager>();
+            var inventory = Resolve<IGameState>().GetInventory(_inventoryType, _id);
+            var slotInfo = inventory.GetSlot(_slotId);
+            if (slotInfo?.Id == null) return;
+
+            var item = assets.LoadItem(slotInfo.Id.Value);
+            if (item == null)
+                return;
+
+            var heading = assets.FormatText(item.Id.ToId(), settings.Gameplay.Language, f => { f.Centre().NoWrap().Fat(); });
+
+            IText S(StringId textId, bool disabled = false) => assets.FormatText(textId, settings.Gameplay.Language, f =>
+                    {
+                        f.Centre().NoWrap();
+                        if (disabled)
+                            f.Ink(FontColor.Yellow);
+                    });
+
+            // Drop (Yellow inactive when critical)
+            // Examine
+            // Use (e.g. torch)
+            // Drink
+            // Activate (compass, clock, monster eye)
+            // Activate spell (if has spell, yellow if combat spell & not in combat etc)
+            // Read (e.g. metalmagic knowledge, maps)
+
+            var options = new List<ContextMenuOption>
+            {
+                new ContextMenuOption(
+                    S(SystemTextId.InvPopup_Drop.ToId(), (item.Flags & ItemFlags.PlotItem) != 0),
+                    new InventoryDiscardEvent(_inventoryType, _id, _slotId),
+                    ContextMenuGroup.Actions),
+
+                new ContextMenuOption(
+                    S(SystemTextId.InvPopup_Examine.ToId()),
+                    new InventoryExamineEvent(item.Id),
+                    ContextMenuGroup.Actions)
+            };
+
+            if(item.TypeId == ItemType.Document)
+                options.Add(new ContextMenuOption( S(SystemTextId.InvPopup_Read.ToId()), null, ContextMenuGroup.Actions));
+
+            if(item.TypeId == ItemType.SpellScroll)
+                options.Add(new ContextMenuOption( S(SystemTextId.InvPopup_LearnSpell.ToId()), null, ContextMenuGroup.Actions));
+
+            if(item.TypeId == ItemType.Drink)
+                options.Add(new ContextMenuOption( S(SystemTextId.InvPopup_Drink.ToId()), null, ContextMenuGroup.Actions));
+
+            if(item.TypeId == ItemType.HeadsUpDisplayItem)
+                options.Add(new ContextMenuOption( S(SystemTextId.InvPopup_Activate.ToId()), null, ContextMenuGroup.Actions));
+
+            if (item.Charges > 0) // TODO: Disable based on spell context
+                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_ActivateSpell.ToId()), null, ContextMenuGroup.Actions));
+
+            /*
+            options.Add(new ContextMenuOption( S(SystemTextId.InvPopup_Sell), null, ContextMenuGroup.Actions));
+            options.Add(new ContextMenuOption( S(SystemTextId.InvPopup_Use), null, ContextMenuGroup.Actions));
+
+            IText SL(string text) => new LiteralText(text);
+            if ((item.Flags & ItemFlags.Unk0)  != 0) options.Add(new ContextMenuOption(SL("0"), null, ContextMenuGroup.Actions2));
+            if ((item.Flags & ItemFlags.Unk2)  != 0) options.Add(new ContextMenuOption(SL("2"), null, ContextMenuGroup.Actions2));
+            if ((item.Flags & ItemFlags.Unk3)  != 0) options.Add(new ContextMenuOption(SL("3"), null, ContextMenuGroup.Actions2));
+            if ((item.Flags & ItemFlags.Unk4)  != 0) options.Add(new ContextMenuOption(SL("4"), null, ContextMenuGroup.Actions2));
+            if ((item.Flags & ItemFlags.Unk5)  != 0) options.Add(new ContextMenuOption(SL("5"), null, ContextMenuGroup.Actions2));
+            if ((item.Flags & ItemFlags.Unk6)  != 0) options.Add(new ContextMenuOption(SL("6"), null, ContextMenuGroup.Actions2));
+            if ((item.Flags & ItemFlags.Unk7)  != 0) options.Add(new ContextMenuOption(SL("7"), null, ContextMenuGroup.Actions2));
+            if ((item.Flags & ItemFlags.Unk8)  != 0) options.Add(new ContextMenuOption(SL("8"), null, ContextMenuGroup.Actions2));
+            if ((item.Flags & ItemFlags.Unk9)  != 0) options.Add(new ContextMenuOption(SL("9"), null, ContextMenuGroup.Actions2));
+            if ((item.Flags & ItemFlags.Unk11) != 0) options.Add(new ContextMenuOption(SL("11"), null, ContextMenuGroup.Actions2));
+            if ((item.Flags & ItemFlags.Unk12) != 0) options.Add(new ContextMenuOption(SL("12"), null, ContextMenuGroup.Actions2));
+            if ((item.Flags & ItemFlags.TailWieldable) != 0) options.Add(new ContextMenuOption(SL("13 TailWieldable"), null, ContextMenuGroup.Actions2));
+            if ((item.Flags & ItemFlags.Stackable) != 0) options.Add(new ContextMenuOption(SL("14 Stackable"), null, ContextMenuGroup.Actions2));
+            if ((item.Flags & ItemFlags.TwoHanded) != 0) options.Add(new ContextMenuOption(SL("15 TwoHanded"), null, ContextMenuGroup.Actions2));
+            */
+
+            var uiPosition = window.PixelToUi(cursorManager.Position);
+            Raise(new ContextMenuEvent(uiPosition, heading, options));
+        }
     }
 }

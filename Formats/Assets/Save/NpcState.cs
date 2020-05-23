@@ -130,7 +130,7 @@ namespace UAlbion.Formats.Assets.Save
         public byte Unk52 { get; set; }
         public byte Unk53 { get; set; }
         public ushort Unk54 { get; set; }
-        public ushort Unk56 { get; set; }
+        public ushort Unk56 { get; set; } // Probably flags
         public ushort Unk58 { get; set; }
         public ushort Unk5A { get; set; }
         public ushort Unk5C { get; set; }
@@ -153,5 +153,17 @@ namespace UAlbion.Formats.Assets.Save
         public ushort Unk7A { get; set; }
         public ushort Unk7C { get; set; }
         public ushort Unk7E { get; set; }
+
+
+        public override string ToString() =>
+            $@"{Id} O:{ObjectNumber}:{(LargeNpcId)ObjectNumber}
+    4:{Unk4} 6:{Unk6} 8:{Unk8} 9:{Unk9} 11:{Unk11} 13:{Unk13} 15:{Unk15} 17:{Unk17} 19:{Unk19} 
+    1B:{Unk1B} 1D:{Unk1D} 1F:{Unk1F} 20:{Unk20} 21:{Unk21} 23:{Unk23} 25:{Unk25} 27:{Unk27} 
+    29:{Unk29} {X1} {Y1} {X2} {Y2} 32:{Unk32} 33:{Unk33} 34:{Unk34} 36:{Unk36} 38:{Unk38} 
+    3A:{Unk3A} 3C:{Unk3C} 3E:{Unk3E} 40:{Unk40} 42:{Unk42} {X3} {Y3} {X4} {Y4} 4C:{Unk4C} 
+    4E:{Unk4E} 50:{Unk50} 51:{Unk51} 52:{Unk52} 53:{Unk53} 54:{Unk54} 56:{Unk56} 58:{Unk58} 
+    5A:{Unk5A} 5C:{Unk5C} 5E:{Unk5E} 60:{Unk60} 61:{Unk61} 62:{Unk62} 64:{Unk64} 65:{Unk65} 
+    66:{Unk66} 68:{Unk68} 6A:{Unk6A} 6C:{Unk6C} 6E:{Unk6E} 70:{Unk70} 72:{Unk72} 74:{Unk74} 
+    76:{Unk76} 78:{Unk78} 7A:{Unk7A} 7C:{Unk7C} 7E:{Unk7E}";
     }
 }

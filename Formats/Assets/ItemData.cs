@@ -7,7 +7,7 @@ namespace UAlbion.Formats.Assets
     public class ItemData
     {
         public ItemId Id { get; set; }
-        public string[] Names { get; set; }
+        /*public string[] Names { get; set; }
 
         public string GetName(GameLanguage language) =>
             language switch
@@ -17,6 +17,7 @@ namespace UAlbion.Formats.Assets
                 GameLanguage.French => Names[2],
                 _ => Names[1]
             };
+        */
 
         public byte Unknown { get; set; }   //  0 Always 0
         public ItemType TypeId { get; set; }   //  1 Item type
@@ -39,7 +40,7 @@ namespace UAlbion.Formats.Assets
         public byte SkillTax2 { get; set; }   // 18 Skill Tax 2 value. Ranged Values
         public byte Activate { get; set; }   // 19 Activate enables compass (0), monster eye (1) or clock (3) (if type=0×13) / Torch intensity (if type=0×16)
         public byte AmmoAnim { get; set; }   // 20 Ammo combat animation (long-range weapons only)
-        public SpellClassMask SpellClass { get; set; }   // 21 Spell Class (TODO: Is this SpellClass or SpellClassMask?)
+        public SpellClass SpellClass { get; set; }   // 21 Spell Class
         public byte SpellEffect { get; set; }   // 22 Spell Id
         public byte Charges { get; set; }   // 23 Charges left in item / Torch lifetime (if type=0×16)
         public byte EnchantmentCount { get; set; }   // 24 Number of times item was enchanted/recharged
@@ -72,7 +73,8 @@ namespace UAlbion.Formats.Assets
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append(Id.ToString()); sb.Append(' ');
+            sb.Append(((int)Id).ToString().PadLeft(3)); sb.Append(' ');
+            sb.Append(Id.ToString().PadRight(19)); sb.Append(' ');
             sb.Append(TypeId.ToString()); sb.Append(' ');
             sb.Append(SlotType.ToString()); sb.Append(' ');
 
@@ -121,6 +123,7 @@ namespace UAlbion.Formats.Assets
                 sb.Append(LpMaxBonus);
                 sb.Append(' ');
             }
+
             if(SpMaxBonus != 0)
             {
                 sb.Append("SP+");
@@ -134,7 +137,25 @@ namespace UAlbion.Formats.Assets
                 sb.Append("Only ");
             }
 
-            sb.AppendFormat("{0}D {1}P ", Damage, Protection);
+            if (Damage != 0) sb.AppendFormat("D:{0} ", Damage);
+            if (Protection != 0) sb.AppendFormat("P:{0} ", Protection);
+            if (BreakRate != 0) sb.AppendFormat("BR:{0} ", BreakRate); 
+            if (Activate != 0) sb.AppendFormat("A:{0} ", Activate);
+
+            if (SpellClass != 0 || SpellEffect != 0)
+                sb.AppendFormat("SC:{0} SE:{1} ", SpellClass.ToString().Replace(", ", "|"), SpellEffect);
+
+            if (Charges != 0) sb.AppendFormat("C:{0} ", Charges);
+            if (MaxCharges != 0) sb.AppendFormat("MaxC:{0} ", MaxCharges);
+
+            if(EnchantmentCount != 0 || MaxEnchantmentCount != 0)
+                sb.AppendFormat("E:{0} MaxE:{1} ", EnchantmentCount, MaxEnchantmentCount);
+
+            if(Flags != 0)
+                sb.AppendFormat("F:{0} ", Flags.ToString().Replace(", ", "|"));
+
+            if (Value != 0)
+                sb.Append($"${(decimal)Value / 10:F}");
 
             return sb.ToString();
         }

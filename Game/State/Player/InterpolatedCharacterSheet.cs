@@ -45,5 +45,7 @@ namespace UAlbion.Game.State.Player
         public ICombatAttributes Combat { get; }
         public int TotalWeight => (int)ApiUtil.Lerp(_a().TotalWeight, _b().TotalWeight, _getLerp());
         public int MaxWeight => (int)ApiUtil.Lerp(_a().MaxWeight, _b().MaxWeight, _getLerp());
+        public int DisplayDamage => (int)ApiUtil.Lerp(_a().DisplayDamage, _b().DisplayDamage, _getLerp());
+        public int DisplayProtection  => (int)ApiUtil.Lerp(_a().DisplayProtection, _b().DisplayProtection, _getLerp());
     }
 }

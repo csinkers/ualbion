@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
@@ -8,6 +9,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.Input;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
 
@@ -26,7 +28,8 @@ namespace UAlbion.Game.Gui.Status
         public StatusBarPortrait(int order)
         {
             On<PartyChangedEvent>(e => LoadSprite());
-            On<UiLeftClickEvent>(e => OnClick());
+            On<UiLeftClickEvent>(OnClick);
+            On<UiRightClickEvent>(OnRightClick);
             On<HoverEvent>(e =>
             {
                 Hover();
@@ -47,6 +50,68 @@ namespace UAlbion.Game.Gui.Status
             _portrait = AttachChild(new UiSpriteElement<SmallPortraitId>(SmallPortraitId.Tom));
             _health = AttachChild(new StatusBarHealthBar(order, true));
             _mana = AttachChild(new StatusBarHealthBar(order, false));
+        }
+
+        void OnRightClick(UiRightClickEvent e)
+        {
+            var member = PartyMember;
+            if (member == null)
+                return;
+
+            e.Propagating = false;
+            var party = Resolve<IParty>();
+            var assets = Resolve<IAssetManager>();
+            var window = Resolve<IWindowManager>();
+            var settings = Resolve<ISettings>();
+            var cursorManager = Resolve<ICursorManager>();
+
+            var heading = new LiteralText(
+                new TextBlock(member.Apparent.GetName(settings.Gameplay.Language))
+                {
+                    Style = TextStyle.Fat,
+                    Alignment = TextAlignment.Center
+                });
+
+            IText S(SystemTextId textId) => new DynamicText(() =>
+                {
+                    var template = assets.LoadString(textId, settings.Gameplay.Language);
+                    return new TextFormatter(assets, settings.Gameplay.Language).Centre().NoWrap().Format(template).Blocks;
+                });
+
+            var uiPosition = window.PixelToUi(cursorManager.Position);
+            var options = new List<ContextMenuOption>
+            {
+                new ContextMenuOption(
+                    S(SystemTextId.PartyPopup_CharacterScreen),
+                    new InventoryOpenEvent(member.Id),
+                    ContextMenuGroup.Actions)
+            };
+
+            if (member.Apparent.Magic.SpellStrengths.Any())
+            {
+                options.Add(new ContextMenuOption(
+                    S(SystemTextId.PartyPopup_UseMagic),
+                    null,
+                    ContextMenuGroup.Actions));
+            }
+
+            if (member.Id != party.Leader)
+            {
+                options.Add(new ContextMenuOption(
+                    S(SystemTextId.PartyPopup_MakeLeader),
+                    new SetPartyLeaderEvent(member.Id),
+                    ContextMenuGroup.Actions));
+            }
+
+            if (member.Id != PartyCharacterId.Tom)
+            {
+                options.Add(new ContextMenuOption(
+                    S(SystemTextId.PartyPopup_TalkTo),
+                    new StartPartyDialogueEvent(member.Id), 
+                    ContextMenuGroup.Actions));
+            }
+
+            Raise(new ContextMenuEvent(uiPosition, heading, options));
         }
 
         protected override void Subscribed() => LoadSprite();
@@ -93,7 +158,7 @@ namespace UAlbion.Game.Gui.Status
                 _portrait.Id = portraitId.Value;
         }
 
-        void OnClick()
+        void OnClick(UiLeftClickEvent e)
         {
             if (_isClickTimerPending) // If they double-clicked...
             {

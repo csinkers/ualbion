@@ -23,7 +23,7 @@ namespace UAlbion.Formats.Assets.Save
         public ushort Value { get; set; }
         public MapDataId MapId { get; set; }
 
-        public override string ToString() => $"MapΔ {X:X2} {Y:X2} {ChangeType:X2} {Unk3:X2} {Value:X6} {MapId}";
+        public override string ToString() => $"MapΔ {X:X2} {Y:X2} {ChangeType} {Unk3} {Value:X4} {MapId}";
         public static MapChange Serdes(MapChange u, ISerializer s)
         {
             u ??= new MapChange();

@@ -129,7 +129,7 @@ namespace UAlbion.Game.Veldrid.Input
             }
 
             var instances = _cursorSprite.Access();
-            var size = window.UiToNormRelative(new Vector2(cursorTexture.Width, cursorTexture.Height)) / 2;
+            var size = window.UiToNormRelative(new Vector2(cursorTexture.Width, cursorTexture.Height));
             instances[0] = SpriteInstanceData.TopMid(position, size, _cursorSprite, 0, 0);
         }
 

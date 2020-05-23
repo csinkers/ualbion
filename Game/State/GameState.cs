@@ -116,6 +116,12 @@ namespace UAlbion.Game.State
 
         void LoadGame(string filename)
         {
+            if(!File.Exists(filename))
+            {
+                var generalConfig = Resolve<IAssetManager>().LoadGeneralConfig();
+                filename = Path.Combine(generalConfig.BasePath, generalConfig.ExePath, "SAVES", filename);
+            }
+
             var loader = AssetLoaderRegistry.GetLoader<SavedGame>(FileFormat.SavedGame);
             using var stream = File.Open(filename, FileMode.Open);
             using var br = new BinaryReader(stream);

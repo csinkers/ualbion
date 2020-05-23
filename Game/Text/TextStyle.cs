@@ -3,9 +3,9 @@
     public enum TextStyle
     {
         Normal,
-        Big,
-        Fat,
-        High, // Double size text
+        Big, // Use other font(?)
+        Fat, // Double thickness
+        High, // Double height
         FatAndHigh
     }
 }

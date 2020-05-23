@@ -116,11 +116,26 @@ namespace UAlbion.Core
             return child;
         }
 
+        /// <summary>
+        /// Remove all children of this component and detach them from the exchange.
+        /// </summary>
         protected void RemoveAllChildren()
         {
             foreach (var child in Children)
                 child.Detach();
             Children.Clear();
+        }
+
+        /// <summary>
+        /// If the given component is a child of this component, detach it from the exchange and remove it from this components child list.
+        /// </summary>
+        /// <param name="child">The child component to remove</param>
+        protected void RemoveChild(IComponent child)
+        {
+            int index = Children.IndexOf(child);
+            if (index == -1) return;
+            child.Detach();
+            Children.RemoveAt(index);
         }
 
         /// <summary>

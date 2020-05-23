@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
@@ -11,6 +12,7 @@ namespace UAlbion.Game.Gui.Controls
     public class ContextMenu : Dialog
     {
         ContextMenuEvent _event;
+        Vector2 _uiPosition;
 
         public ContextMenu() : base(DialogPositioning.TopLeft, int.MaxValue)
         {
@@ -26,10 +28,37 @@ namespace UAlbion.Game.Gui.Controls
             return maxOrder;
         }
 
+        protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+        {
+            int maxOrder = order;
+            foreach (var child in Children.OfType<IUiElement>())
+            {
+                var size = child.GetSize();
+                int x = (int)_uiPosition.X;
+                int y = (int)_uiPosition.Y;
+
+                if (x + size.X > UiConstants.UiExtents.Right - 10)
+                    x -= (int)size.X;
+
+                if (y + size.Y > UiConstants.UiExtents.Bottom - 10)
+                    y -= (int)size.Y;
+
+                var childExtents = new Rectangle(
+                    x,
+                    y,
+                    (int)size.X,
+                    (int)size.Y);
+
+                maxOrder = Math.Max(maxOrder, func(child, childExtents, order + 1));
+            }
+            return maxOrder;
+        }
+
         void OnButton(ContextMenuOption option)
         {
             Close();
-            Raise(option.Event);
+            if (option.Event != null)
+                Raise(option.Event);
         }
 
         void Close()
@@ -48,34 +77,36 @@ namespace UAlbion.Game.Gui.Controls
                 return;
 
             _event = contextMenuEvent;
-            var elements = new List<IUiElement>
-            {
-                new Spacing(0, 2),
-                new HorizontalStack(new Spacing(5, 0), new Header(_event.Heading), new Spacing(5, 0)),
-                new Divider(CommonColor.Yellow3),
-                new Spacing(0, 2),
-            };
+            _uiPosition = contextMenuEvent.UiPosition;
 
+            var optionElements = new List<IUiElement>();
             ContextMenuGroup? lastGroup = null;
             foreach (var option in _event.Options)
             {
                 lastGroup ??= option.Group;
                 if(lastGroup != option.Group)
-                    elements.Add(new Spacing(0, 2));
+                    optionElements.Add(new Spacing(0, 2));
                 lastGroup = option.Group;
 
                 var option1 = option;
-                elements.Add(new Button(option.Text, () => OnButton(option1)));
+                optionElements.Add(new Button(option.Text, () => OnButton(option1)));
             }
 
+            var elements = new List<IUiElement>
+            {
+                new Spacing(0, 2),
+                new HorizontalStack(new Spacing(5, 0), new Header(_event.Heading), new Spacing(5, 0)),
+                new Divider(CommonColor.Yellow3),
+                new Padding(new VerticalStack(optionElements), 0, 2)
+            };
+
             var frame = new DialogFrame(new VerticalStack(elements));
-            var fixedStack = new FixedPositionStack();
-            fixedStack.Add(frame, (int)contextMenuEvent.UiPosition.X, (int)contextMenuEvent.UiPosition.Y);
-            AttachChild(fixedStack);
+            AttachChild(frame);
             Raise(new PushInputModeEvent(InputMode.ContextMenu));
         }
     }
 }
+
 /*
 Map objects:
     Environment (header)

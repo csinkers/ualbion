@@ -12,11 +12,11 @@ namespace UAlbion.Game.Gui.Controls
 
     public class ContextMenuOption
     {
-        public ContextMenuOption(IText text, IEvent @event, ContextMenuGroup @group)
+        public ContextMenuOption(IText text, IEvent @event, ContextMenuGroup group)
         {
             Text = text;
             Event = @event;
-            Group = @group;
+            Group = group;
         }
 
         public IText Text { get; }

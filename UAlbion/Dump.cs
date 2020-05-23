@@ -1,5 +1,6 @@
 ﻿using SerdesNet;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UAlbion.Core.Veldrid;
@@ -349,22 +350,39 @@ namespace UAlbion
         public static void ItemData(IAssetManager assets, string baseDir)
         {
             using var sw = File.CreateText($@"{baseDir}\re\ItemInfo.txt");
+            var items = new List<ItemData>();
             foreach (ItemId itemId in Enum.GetValues(typeof(ItemId)))
             {
-                sw.Write($"{(int)itemId} {itemId} ");
+                sw.Write(((int)itemId).ToString().PadLeft(3)); 
+                sw.Write(' ');
+                sw.Write(itemId.ToString().PadRight(20));
+
                 var data = assets.LoadItem(itemId);
                 if (data == null)
                     sw.Write("null");
                 else
                 {
-                    sw.Write($"Gfx:{(ushort)data.Icon} {data.IconAnim} frames ");
+                    items.Add(data);
+                    sw.Write($"Gfx:{(ushort)data.Icon:D3} {data.IconAnim} frames ");
                     sw.Write($"Type:{data.TypeId} Slot:{data.SlotType} ");
                     sw.Write($"F:{data.Flags} A:{data.Activate} ");
                     sw.Write($"{data.Class}");
                 }
 
-
                 sw.WriteLine();
+            }
+
+            sw.WriteLine();
+            sw.WriteLine("Details:");
+
+            ItemType lastType = ItemType.Armor;
+            foreach (var data in items.OrderBy(x => x.TypeId).ThenBy(x => x.Id))
+            {
+                if(lastType != data.TypeId)
+                    sw.WriteLine();
+
+                sw.WriteLine(data.ToString());
+                lastType = data.TypeId;
             }
         }
 

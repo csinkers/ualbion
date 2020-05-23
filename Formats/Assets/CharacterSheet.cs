@@ -8,6 +8,8 @@ namespace UAlbion.Formats.Assets
         public EffectiveCharacterSheet(int id) : base(id) { }
         public int TotalWeight { get; set; }
         public int MaxWeight { get; set; }
+        public int DisplayDamage { get; set; }
+        public int DisplayProtection { get; set; }
     }
 
     public class CharacterSheet : ICharacterSheet

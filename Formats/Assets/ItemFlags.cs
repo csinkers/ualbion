@@ -6,7 +6,7 @@ namespace UAlbion.Formats.Assets
     public enum ItemFlags : ushort
     {
         Unk0 = 1,
-        Unk1 = 1 << 1,
+        PlotItem = 1 << 1,
         Unk2 = 1 << 2,
         Unk3 = 1 << 3,
         Unk4 = 1 << 4,
@@ -15,7 +15,7 @@ namespace UAlbion.Formats.Assets
         Unk7 = 1 << 7,
         Unk8 = 1 << 8,
         Unk9 = 1 << 9,
-        Unk10 = 1 << 10,
+        Cursed = 1 << 10,
         Unk11 = 1 << 11,
         Unk12 = 1 << 12,
         TailWieldable = 1 << 13, // TODO

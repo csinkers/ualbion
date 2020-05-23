@@ -92,6 +92,8 @@ namespace UAlbion
         {
             PerfTracker.StartupEvent("Creating main components");
             var factory = global.Resolve<ICoreFactory>();
+            var inventoryConfig = InventoryConfig.Load(baseDir);
+
             global
                 .Register<ICommonColors>(new CommonColors(factory))
                 ;
@@ -135,11 +137,18 @@ namespace UAlbion
                             .Add(new PaletteManager()))
 
                         .AddScene((GameScene)new MenuScene()
-                            .Add(new PaletteManager()))
+                            .Add(new PaletteManager())
+                            .Add(new MainMenu())
+                            .Add(Sprite<PictureId>.ScreenSpaceSprite(
+                                PictureId.MenuBackground8,
+                                new Vector2(-1.0f, 1.0f),
+                                new Vector2(2.0f, -2.0f))))
 
                         .AddScene((GameScene)new InventoryScene()
                             .Add(new ConversationManager())
-                            .Add(new PaletteManager()))
+                            .Add(new PaletteManager())
+                            .Add(new InventoryInspector())
+                            .Add(new InventoryScreen(inventoryConfig)))
                     ))
 
                 .Add(new Container("GuiAndInput",
@@ -162,22 +171,6 @@ namespace UAlbion
                         .RegisterMouseMode(MouseMode.ContextMenu, new ContextMenuMouseMode()),
                     new SelectionManager(),
                     new InputBinder(InputConfig.Load(baseDir))))
-                ;
-
-            PerfTracker.StartupEvent("Creating scene-specific components");
-            var inventoryConfig = InventoryConfig.Load(baseDir);
-            global.Resolve<ISceneManager>().GetScene(SceneId.Inventory)
-                .Add(new InventoryScreen(inventoryConfig))
-                ;
-
-            var menuBackground = Sprite<PictureId>.ScreenSpaceSprite(
-                PictureId.MenuBackground8,
-                new Vector2(-1.0f, 1.0f),
-                new Vector2(2.0f, -2.0f));
-
-            global.Resolve<ISceneManager>().GetScene(SceneId.MainMenu)
-                .Add(new MainMenu())
-                .Add(menuBackground)
                 ;
         }
     }

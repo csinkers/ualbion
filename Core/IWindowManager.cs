@@ -18,6 +18,7 @@ namespace UAlbion.Core
         Vector2 NormToUiRelative(Vector2 pos);
         Vector2 NormToPixelRelative(Vector2 pos);
         Vector2 PixelToNormRelative(Vector2 pos);
+        Vector2 PixelToUi(Vector2 pos);
         Rectangle UiToPixel(Rectangle rect);
     }
 

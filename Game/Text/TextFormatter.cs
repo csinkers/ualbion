@@ -36,6 +36,7 @@ namespace UAlbion.Game.Text
         public TextFormatter NoWrap() { _implicitTokens.Add((Token.NoWrap, null)); return this; }
         public TextFormatter Centre() { _implicitTokens.Add((Token.Centre, null)); return this; }
         public TextFormatter Ink(FontColor color) { _implicitTokens.Add((Token.Ink, (int)color)); return this; }
+        public TextFormatter Fat() { _implicitTokens.Add((Token.Fat, null)); return this; }
 
         IEnumerable<(Token, object)> Substitute(IEnumerable<(Token, object)> tokens, object[] args)
         {
@@ -106,7 +107,7 @@ namespace UAlbion.Game.Text
                         if (active is ICharacterSheet character)
                             yield return (Token.Text, character.GetName(_language));
                         else if (active is ItemData item)
-                            yield return (Token.Text, item.GetName(_language));
+                            yield return (Token.Text, _assets.LoadString(item.Id.ToId(), _language));
                         else 
                             yield return (Token.Text, "{NAME}");
                         break;

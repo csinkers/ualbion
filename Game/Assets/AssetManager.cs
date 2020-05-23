@@ -11,6 +11,7 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.Config;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Assets
 {
@@ -52,13 +53,6 @@ namespace UAlbion.Game.Assets
         public ItemData LoadItem(ItemId id)
         {
             var data = (IList<ItemData>)_assetLocatorRegistry.LoadAssetCached(AssetType.ItemList, 0);
-            if (data[0].Names == null)
-            {
-                var names = (IList<string>)_assetLocatorRegistry.LoadAssetCached(AssetType.ItemNames, 0);
-                for (int i = 0; i < data.Count; i++)
-                    data[i].Names = names.Skip(i * 3).Take(3).ToArray();
-            }
-
             if ((int)id >= data.Count)
                 return null;
 
@@ -166,16 +160,13 @@ namespace UAlbion.Game.Assets
         public string LoadString(StringId id, GameLanguage language)
         {
             var asset = _assetLocatorRegistry.LoadAssetCached(id.Type, id.Id, language);
-
-            if (asset is string s)
-                return s;
-
-            if (!(asset is IDictionary<int, string> stringTable))
-                return $"!MISSING STRING-TABLE {id.Type}:{id.Id}:{id.SubId}:{language}!";
-
-            return stringTable.TryGetValue(id.SubId, out var value)
-                ? value
-                : $"!MISSING STRING {id.Type}:{id.Id}:{id.SubId}:{language}!";
+            return (asset switch
+            {
+                string s => s,
+                IDictionary<int, string> d => d.GetValueOrDefault(id.SubId),
+                IDictionary<(int, GameLanguage), string> d => d.GetValueOrDefault((id.Id, language)),
+                _ => $"!MISSING STRING-TABLE {id.Type}:{id.Id}:{id.SubId}:{language}!"
+            }) ?? $"!MISSING STRING {id.Type}:{id.Id}:{id.SubId}:{language}!";
         }
 
         public string LoadString(SystemTextId id, GameLanguage language) => LoadString(id.ToId(), language);
@@ -211,5 +202,14 @@ namespace UAlbion.Game.Assets
         public EventSet LoadEventSet(EventSetId eventSetId) => (EventSet)_assetLocatorRegistry.LoadAssetCached(AssetType.EventSet, eventSetId);
         public byte[] LoadSong(SongId songId) => (byte[]) _assetLocatorRegistry.LoadAssetCached(AssetType.Song, songId);
         public IList<IEvent> LoadScript(ScriptId scriptId) => (IList<IEvent>) _assetLocatorRegistry.LoadAsset(AssetType.Script, scriptId);
+
+        public IText FormatText(StringId stringId, GameLanguage language, Action<TextFormatter> action = null) =>
+            new DynamicText(() =>
+            {
+                var template = LoadString(stringId, language);
+                var formatter = new TextFormatter(this, language);
+                action?.Invoke(formatter);
+                return formatter.Format(template).Blocks;
+            });
     }
 }

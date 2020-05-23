@@ -30,7 +30,7 @@ namespace UAlbion.Game.Gui.Inventory
             var source = new DynamicText(() =>
             {
                 var player = Resolve<IParty>()[_activeCharacter];
-                var damage = player?.Apparent.Combat.Damage ?? 0;
+                var damage = player?.Apparent.DisplayDamage ?? 0;
                 return new[] { new TextBlock($": {damage}") };
             }, x => _version);
 

@@ -8,6 +8,7 @@ using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.State.Player;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.State
 {
@@ -25,10 +26,15 @@ namespace UAlbion.Game.State
         {
             On<AddPartyMemberEvent>(e => SetLastResult(AddMember(e.PartyMemberId)));
             On<RemovePartyMemberEvent>(e => SetLastResult(RemoveMember(e.PartyMemberId)));
-            On<SetPartyLeaderEvent>(e => { Leader = e.PartyMemberId; Raise(e); });
             On<ChangePartyGoldEvent>(e => SetLastResult(ChangePartyGold(e.Operation, e.Amount)));
             On<ChangePartyRationsEvent>(e => SetLastResult(ChangePartyRations(e.Operation, e.Amount)));
             On<AddRemoveInventoryItemEvent>(e => SetLastResult(ChangePartyInventory(e.ItemId, e.Operation, e.Amount)));
+            On<SetPartyLeaderEvent>(e =>
+            {
+                Leader = e.PartyMemberId;
+                Raise(new SetContextEvent(ContextType.Leader, AssetType.PartyMember, (int)e.PartyMemberId));
+                Raise(e);
+            });
             On<SimpleChestEvent>(e =>
             {
                 SetLastResult(e.ChestType switch

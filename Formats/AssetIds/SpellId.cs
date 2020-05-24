@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Formats.AssetIds
+﻿using UAlbion.Formats.Assets;
+
+namespace UAlbion.Formats.AssetIds
 {
     // ReSharper disable InconsistentNaming
     // ReSharper disable UnusedMember.Global
@@ -20,7 +22,7 @@
         SleepSpores = 12,
         ThornTrap = 13,
         RemoveTrapDK = 14,
-        Unused15 = 15,
+        HealParalysis = 15, // Disabled in SpellData
         HealIntoxication = 16,
         HealBlindness = 17,
         HealPoisoning = 18,
@@ -43,7 +45,7 @@
         Teleporter = 33,
         HealingDC = 34,
         QuickWithdrawal = 35,
-        Unused36 = 36,
+        Levitation = 36, // Disabled in SpellData
         Unused37 = 37,
         GoddessWrath = 38,
         Irritation = 39,
@@ -227,5 +229,13 @@
         Unused207 = 207,
         Unused208 = 208,
         Unused209 = 209,
+    }
+
+    public static class SpellIdExtensions
+    {
+        public static SpellId ToSpellId(this SpellClass spellClass, int offset)
+            => (SpellId)((int)spellClass * SpellData.MaxSpellsPerClass + offset);
+        public static SpellClass ToClass(this SpellId spellId) => (SpellClass)((int)spellId / SpellData.MaxSpellsPerClass);
+        public static int ToOffset(this SpellId spellId) => (int) spellId % SpellData.MaxSpellsPerClass;
     }
 }

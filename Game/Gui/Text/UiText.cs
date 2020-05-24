@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
@@ -12,11 +11,10 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Text
 {
-    public class TextElement : UiElement
+    public class UiText : UiElement
     {
         const int ScrollBarWidth = 4;
-        readonly TextBlock _block = new TextBlock();
-        IText _source;
+        readonly IText _source;
         Rectangle _lastExtents;
         int _lastVersion;
         int? _blockFilter;
@@ -24,30 +22,9 @@ namespace UAlbion.Game.Gui.Text
         int _scrollOffset;
         bool _isScrollable;
 
-        public TextElement(string literal)
-        {
-            RegisterEvents();
-            _source = new DynamicText(() =>
-            {
-                _block.Text = literal;
-                return new[] { _block };
-            });
-        }
+        // public UiText() => RegisterEvents();
 
-        public TextElement(StringId id)
-        {
-            RegisterEvents();
-            _source = new DynamicText(() =>
-            {
-                var assets = Resolve<IAssetManager>();
-                var settings = Resolve<ISettings>();
-                var text =  assets.LoadString(id, settings.Gameplay.Language);
-                _block.Text = text;
-                return new[] { _block };
-            });
-        }
-
-        public TextElement(IText source)
+        public UiText(IText source)
         {
             RegisterEvents();
             _source = source;
@@ -60,27 +37,10 @@ namespace UAlbion.Game.Gui.Text
             On<UiScrollEvent>(OnScroll);
         }
 
-        public override string ToString() => $"TextElement \"{_source?.ToString() ?? _block?.ToString()}";
-        public TextElement Bold() { _block.Style = TextStyle.Fat; return this; }
-        public TextElement Color(FontColor color) { _block.Color = color; return this; }
-        public TextElement Left() { _block.Alignment = TextAlignment.Left; return this; }
-        public TextElement Center() { _block.Alignment = TextAlignment.Center; return this; }
-        public TextElement Right() { _block.Alignment = TextAlignment.Right; return this; }
-        public TextElement NoWrap() { _block.Arrangement |= TextArrangement.NoWrap; return this; }
-        public TextElement Source(IText source) { _source = source; _lastVersion = 0; return this; }
-        public TextElement Scrollable() { _isScrollable = true; return this; }
-        public TextElement Filter(int filter) { _blockFilter = filter; return this; }
-        public TextElement LiteralString(string literal)
-        {
-            _source = new DynamicText(() =>
-            {
-                _block.Text = literal;
-                return new[] { _block };
-            });
-            _lastVersion = 0;
-            return this;
-        }
-
+        public override string ToString() => $"TextElement \"{_source}";
+        // public UiText Source(IText source) { _source = source; _lastVersion = 0; return this; }
+        public UiText Scrollable() { _isScrollable = true; return this; }
+        public UiText Filter(int filter) { _blockFilter = filter; return this; }
         public int? BlockFilter
         {
             get => _blockFilter;
@@ -127,7 +87,7 @@ namespace UAlbion.Game.Gui.Text
 
         void Rebuild(Rectangle extents)
         {
-            if (extents == _lastExtents && _source.Version <= _lastVersion)
+            if (_source == null || extents == _lastExtents && _source.Version <= _lastVersion)
                 return;
 
             _lastVersion = _source.Version;

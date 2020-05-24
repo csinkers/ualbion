@@ -33,7 +33,10 @@ namespace UAlbion.Game.Gui.Inventory
                 for (int i = 0; i < InventoryWidth; i++)
                 {
                     int index = j * InventoryWidth + i;
-                    slotsInRow[i] = new InventorySlot(InventoryType.Chest, (int)_id, (ItemSlotId)((int)ItemSlotId.Slot0 + index));
+                    slotsInRow[i] = new LogicalInventorySlot(
+                        InventoryType.Chest,
+                        (int)_id,
+                        (ItemSlotId)((int)ItemSlotId.Slot0 + index));
                 }
                 slotSpans[j] = new HorizontalStack(slotsInRow);
             }
@@ -45,14 +48,14 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 var chest = Resolve<IGameState>().GetInventory(InventoryType.Chest, (int)_id);
                 var gold = chest.Gold;
-                return new[] {new TextBlock($"{gold / 10}.{gold % 10}")};
+                return new[] { new TextBlock($"{gold / 10}.{gold % 10}") };
             }, x => _version);
 
             var goldButton = new Button(
                 new VerticalStack(
                     new Spacing(31, 0),
                     new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiGold),
-                    new TextElement(goldSource)
+                    new UiText(goldSource)
                 ) { Greedy = false }, () => { } // TODO: Make button functional
             );
 
@@ -67,12 +70,12 @@ namespace UAlbion.Game.Gui.Inventory
                 new VerticalStack(
                     new Spacing(31, 0),
                     new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiFood),
-                    new TextElement(foodSource)
+                    new UiText(foodSource)
                 ) { Greedy = false }, () => { } // TODO: Make button functional
             );
 
             var takeAllButton = new Button(
-                new TextElement(UAlbionStringId.TakeAll.ToId()).Center(),
+                (UiElement)new UiTextBuilder(UAlbionStringId.TakeAll.ToId()).Center(),
                 () => Raise(new InventoryTakeAllEvent(_id)));
 
             var header = new Header(new StringId(AssetType.SystemText, 0, (int)SystemTextId.Chest_Chest));

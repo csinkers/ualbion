@@ -84,10 +84,9 @@ namespace UAlbion.Game.Entities.Map2D
 
             var detector = Resolve<ICollisionManager>();
             if (_movement.Update(detector, position))
-            {
                 MoveLeader(_movement.Position);
-                MoveFollowers();
-            }
+
+            MoveFollowers();
         }
 
         void MoveLeader(Vector2 position)

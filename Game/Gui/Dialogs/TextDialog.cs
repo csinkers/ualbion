@@ -16,7 +16,7 @@ namespace UAlbion.Game.Gui.Dialogs
             On<UiRightClickEvent>(e => { Close(); e.Propagating = false; });
             On<CloseWindowEvent>(e => Close());
 
-            var textSection = new TextElement(text).Center();
+            var textSection = new UiText(text);
             var padding = new Padding(textSection, 3, 7);
 
             UiElement content;

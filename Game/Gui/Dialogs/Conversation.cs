@@ -39,8 +39,8 @@ namespace UAlbion.Game.Gui.Dialogs
             if (_optionsWindow.IsActive || !IsActive)
                 return;
 
-            var textManager = Resolve<ITextManager>();
-            _optionsWindow.SetOptions(null, GetStandardOptions(textManager));
+            var tf = Resolve<ITextFormatter>();
+            _optionsWindow.SetOptions(null, GetStandardOptions(tf));
             _optionsWindow.IsActive = true;
         }
 
@@ -89,7 +89,7 @@ namespace UAlbion.Game.Gui.Dialogs
         void BlockClicked(int blockId, int textId)
         {
             _optionsWindow.IsActive = false;
-            var textManager = Resolve<ITextManager>();
+            var tf = Resolve<ITextFormatter>();
 
             switch(blockId)
             {
@@ -101,7 +101,7 @@ namespace UAlbion.Game.Gui.Dialogs
                         DefaultIdleHandler(null, null);
                     }
 
-                    var text = textManager.FormatText(new StringId(AssetType.EventText, (int)_npc.EventSetId, 0), FontColor.Yellow);
+                    var text = tf.Ink(FontColor.Yellow).Format(new StringId(AssetType.EventText, (int)_npc.EventSetId, 0));
                     _textWindow.Text = text;
                     _textWindow.Clicked += OnClicked;
                     return;
@@ -135,7 +135,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
         public bool OnText(BaseTextEvent textEvent)
         {
-            var textManager = Resolve<ITextManager>();
+            var tf = Resolve<ITextFormatter>();
             switch(textEvent.Location)
             {
                 case TextLocation.Conversation:
@@ -148,7 +148,7 @@ namespace UAlbion.Game.Gui.Dialogs
                         textEvent.Complete();
                     }
 
-                    var text = textManager.FormatTextEvent(textEvent, FontColor.Yellow);
+                    var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
                     DiscoverTopics(text.Get().SelectMany(x => x.Words));
                     _textWindow.Text = text;
                     _textWindow.Clicked += OnConversationClicked;
@@ -158,7 +158,7 @@ namespace UAlbion.Game.Gui.Dialogs
                 case TextLocation.ConversationOptions:
                 {
                     textEvent.Complete();
-                    var text = textManager.FormatTextEvent(textEvent, FontColor.Yellow);
+                    var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
                     DiscoverTopics(text.Get().SelectMany(x => x.Words));
                     _textWindow.Text = text;
 
@@ -167,7 +167,7 @@ namespace UAlbion.Game.Gui.Dialogs
                     foreach (var blockId in blocks.Where(x => x > 0))
                         options.Add((text, blockId, () => BlockClicked(blockId, textEvent.TextId)));
 
-                    var standardOptions = GetStandardOptions(textManager);
+                    var standardOptions = GetStandardOptions(tf);
                     _optionsWindow.SetOptions(options, standardOptions);
                     _optionsWindow.IsActive = true;
                     return true;
@@ -176,7 +176,8 @@ namespace UAlbion.Game.Gui.Dialogs
                 case TextLocation.ConversationQuery:
                 {
                     textEvent.Acknowledge();
-                    var text = textManager.FormatTextEvent(textEvent, FontColor.Yellow);
+                    var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
+
                     DiscoverTopics(text.Get().SelectMany(x => x.Words));
 
                     void OnQueryClicked()
@@ -201,7 +202,7 @@ namespace UAlbion.Game.Gui.Dialogs
                 case TextLocation.StandardOptions:
                 {
                     textEvent.Complete();
-                    _optionsWindow.SetOptions(null, GetStandardOptions(textManager));
+                    _optionsWindow.SetOptions(null, GetStandardOptions(tf));
                     _optionsWindow.IsActive = true;
                     return true;
                 }
@@ -220,11 +221,11 @@ namespace UAlbion.Game.Gui.Dialogs
             return false;
         }
 
-        IEnumerable<(IText, int?, Action)> GetStandardOptions(ITextManager textManager)
+        IEnumerable<(IText, int?, Action)> GetStandardOptions(ITextFormatter tf)
         {
             (IText, int?, Action) Build(SystemTextId id, int block)
             {
-                var text = textManager.FormatText(id.ToId(), FontColor.White);
+                var text = tf.Format(id.ToId());
                 return (text, null, () => BlockClicked(block, 0));
             }
 

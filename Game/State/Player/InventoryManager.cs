@@ -9,6 +9,7 @@ using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.State.Player
 {
@@ -389,10 +390,7 @@ namespace UAlbion.Game.State.Player
 
         void RaiseStatusMessage(SystemTextId textId)
         {
-            var assets = Resolve<IAssetManager>();
-            var settings = Resolve<ISettings>();
-            var text = assets.LoadString(textId, settings.Gameplay.Language);
-            Raise(new DescriptionTextEvent(text));
+            Raise(new DescriptionTextEvent(Resolve<ITextFormatter>().Format(textId.ToId())));
         }
 
         public bool TryChangeInventory(InventoryType inventoryType, int inventoryId, ItemId itemId, QuantityChangeOperation operation, int amount)

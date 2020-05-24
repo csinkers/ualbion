@@ -15,12 +15,15 @@ namespace UAlbion.Game.Gui.Dialogs
             {
                 var settings = Resolve<IGameplaySettings>();
                 var name = sheet.GetName(settings.Language);
-                return new[] { new TextBlock(name)
+                return new[] 
+                {
+                    new TextBlock(name)
                     {
                         Alignment = isRight ? TextAlignment.Right : TextAlignment.Left,
                         Color = FontColor.White,
                         Arrangement = TextArrangement.NoWrap,
-                    } };
+                    }
+                };
             });
         }
 
@@ -40,7 +43,7 @@ namespace UAlbion.Game.Gui.Dialogs
             fixedPos.Add(
                 new RepeatedBackground(
                     new ButtonFrame(
-                        new TextElement(name))),
+                        new UiText(name))),
                 isRight ? 236 : 45, 4, 79, 12);
 
             AttachChild(fixedPos);

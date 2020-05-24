@@ -7,6 +7,7 @@ using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.State;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Status
 {
@@ -15,17 +16,15 @@ namespace UAlbion.Game.Gui.Status
         const int MaxPortraits = SavedGame.MaxPartySize;
         readonly UiSpriteElement<SlabId> _sprite;
         readonly StatusBarPortrait[] _portraits;
-        readonly TextElement _hoverText;
-        readonly TextElement _descriptionText;
+        readonly TextFilter _hoverSource = new TextFilter(x => x.Alignment = TextAlignment.Center);
+        readonly TextFilter _descriptionSource = new TextFilter(x => x.Alignment = TextAlignment.Center);
         readonly FixedPosition _hoverTextContainer;
         readonly FixedPosition _descriptionTextContainer;
 
         public StatusBar() : base(DialogPositioning.StatusBar)
         {
-            On<HoverTextEvent>(e => _hoverText.LiteralString(e.Text));
-            On<DescriptionTextEvent>(e => _descriptionText.LiteralString(e.Text));
-            On<HoverTextExEvent>(e => _hoverText.Source(e.Source));
-            On<DescriptionTextExEvent>(e => _descriptionText.Source(e.Source));
+            On<HoverTextEvent>(e => _hoverSource.Source = e.Source);
+            On<DescriptionTextEvent>(e => _descriptionSource.Source = e.Source);
 
             _sprite = AttachChild(new UiSpriteElement<SlabId>(SlabId.SLAB));
             _sprite.SubId = 1;
@@ -36,10 +35,10 @@ namespace UAlbion.Game.Gui.Status
                 Children.Add(_portraits[i]);
             }
 
-            _hoverText = new TextElement("").Center().NoWrap();
-            _descriptionText = new TextElement("").Center();
-            _hoverTextContainer = AttachChild(new FixedPosition(new Rectangle(181, 196, 177, 10), _hoverText));
-            _descriptionTextContainer = AttachChild(new FixedPosition(new Rectangle(181, 208, 177, 30), _descriptionText));
+            var hoverText = new UiText(_hoverSource);
+            var descriptionText = new UiText(_descriptionSource);
+            _hoverTextContainer = AttachChild(new FixedPosition(new Rectangle(181, 196, 177, 10), hoverText));
+            _descriptionTextContainer = AttachChild(new FixedPosition(new Rectangle(181, 208, 177, 30), descriptionText));
         }
 
         public override Vector2 GetSize() => new Vector2(UiConstants.StatusBarExtents.Width, UiConstants.StatusBarExtents.Height);

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using UAlbion.Core.Events;
+﻿using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
@@ -19,12 +18,8 @@ namespace UAlbion.Game.Gui.Inventory
         public InventoryOffensiveLabel(PartyCharacterId activeCharacter)
         {
             On<InventoryChangedEvent>(e => _version++);
-            On<BlurEvent>(e => Raise(new HoverTextEvent("")));
-            On<HoverEvent>(e =>
-            {
-                Hover();
-                e.Propagating = false;
-            });
+            On<BlurEvent>(e => Raise(new HoverTextEvent(null)));
+            On<HoverEvent>(Hover);
 
             _activeCharacter = activeCharacter;
             var source = new DynamicText(() =>
@@ -39,7 +34,7 @@ namespace UAlbion.Game.Gui.Inventory
                         new HorizontalStack(
                             new FixedSize(8, 8,
                                 new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiOffensiveValue) { Flags = SpriteFlags.Highlight }),
-                            new TextElement(source)
+                            new UiText(source)
                         )
                     )
                 {
@@ -49,19 +44,14 @@ namespace UAlbion.Game.Gui.Inventory
             );
         }
 
-        void Hover()
+        void Hover(HoverEvent e)
         {
             var player = Resolve<IParty>()[_activeCharacter];
-            var assets = Resolve<IAssetManager>();
-            var settings = Resolve<ISettings>();
-
-            var damage = player?.Effective.Combat.Damage ?? 0;
-            var template = assets.LoadString(SystemTextId.Inv_DamageN, settings.Gameplay.Language);
-            var text = new TextFormatter(assets, settings.Gameplay.Language).Format(
-                template, // Damage : %d
-                damage).Blocks;
-
-            Raise(new HoverTextEvent(text.First().Text));
+            var tf = Resolve<ITextFormatter>();
+            var damage = player?.Apparent.DisplayDamage ?? 0;
+            var text = tf.Format(SystemTextId.Inv_DamageN.ToId(), damage); // Damage : %d
+            Raise(new HoverTextEvent(text));
+            e.Propagating = false;
         }
     }
 }

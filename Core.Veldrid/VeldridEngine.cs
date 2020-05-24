@@ -99,6 +99,7 @@ namespace UAlbion.Core.Veldrid
                 throw new InvalidOperationException("An instance of IShaderCache must be registered.");
             shaderCache.ShadersUpdated += (sender, args) => _newBackend = GraphicsDevice?.BackendType;
             ChangeBackend();
+            base.Subscribed();
         }
 
         public VeldridEngine AddRenderer(IRenderer renderer)

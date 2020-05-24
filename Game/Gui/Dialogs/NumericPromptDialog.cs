@@ -13,7 +13,7 @@ namespace UAlbion.Game.Gui.Dialogs
         {
             On<CloseWindowEvent>(e => Close());
 
-            var textSection = new TextElement(text).Center();
+            var textSection = new UiText(text);
             var slider = new Slider(() => Value, x => Value = x, min, max);
             var button = new Button(SystemTextId.MsgBox_OK.ToId(), Close);
 

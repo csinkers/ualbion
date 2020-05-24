@@ -19,7 +19,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
             var content = new FixedSize(248, 159,
                 new Padding(
-                    new TextElement(_text)
+                    new UiText(_text)
                         .Scrollable()
                         .Filter(0),
                     3));

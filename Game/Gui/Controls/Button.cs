@@ -59,9 +59,9 @@ namespace UAlbion.Game.Gui.Controls
             _clickAction = action;
         }
 
-        public Button(IText textSource, Action action) : this(new TextElement(textSource), action) { }
-        public Button(StringId textId, Action action) : this(new TextElement(textId).Center().NoWrap(), action) { }
-        public Button(string literalText, Action action) : this(new TextElement(literalText).Center().NoWrap(), action) { }
+        public Button(IText textSource, Action action) : this(new UiText(textSource), action) { }
+        public Button(StringId textId, Action action) : this((IUiElement)new UiTextBuilder(textId).Center().NoWrap(), action) { }
+        public Button(string literalText, Action action) : this((IUiElement)new SimpleText(literalText).Center().NoWrap(), action) { }
 
         public ButtonFrame.ThemeFunction Theme
         {

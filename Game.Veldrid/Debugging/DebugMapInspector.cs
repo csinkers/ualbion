@@ -131,8 +131,11 @@ namespace UAlbion.Game.Veldrid.Debugging
                 if (ImGui.TreeNode("Audio"))
                 {
                     var audio = Resolve<IAudioManager>();
-                    foreach (var sound in audio.ActiveSounds)
-                        ImGui.Text(sound);
+                    if (audio == null)
+                        ImGui.Text("Audio Disabled");
+                    else
+                        foreach (var sound in audio.ActiveSounds)
+                            ImGui.Text(sound);
 
                     ImGui.TreePop();
                 }

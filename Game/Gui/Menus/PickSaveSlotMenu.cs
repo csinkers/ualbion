@@ -6,8 +6,8 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.Gui.Dialogs;
 using UAlbion.Game.Gui.Text;
-using UAlbion.Game.Settings;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Menus
@@ -48,17 +48,19 @@ namespace UAlbion.Game.Gui.Menus
 
         protected override void Subscribed()
         {
-            DynamicText BuildEmptySlotText(int x) =>
+            IText BuildEmptySlotText(int x) =>
                 new DynamicText(() =>
                 {
-                    var textFormatter = new TextFormatter(Resolve<IAssetManager>(), Resolve<IGameplaySettings>().Language);
-                    textFormatter.Ink(FontColor.Gray);
-                    var block = textFormatter.Format(SystemTextId.MainMenu_EmptyPosition).Blocks.Single();
+                    var textFormatter = Resolve<ITextFormatter>();
+                    var block = textFormatter
+                        .Ink(FontColor.Gray)
+                        .Format(SystemTextId.MainMenu_EmptyPosition.ToId())
+                        .Get().Single();
                     block.Text = $"{x,2}    {block.Text}";
-                    return new[] {block};
+                    return new[] { block };
                 });
 
-            var buttons = new List<Button>();
+            var buttons = new List<IUiElement>();
             for (int i = 1; i <= MaxSaveNumber; i++)
             {
                 var filename = BuildSaveFilename(i);
@@ -69,13 +71,13 @@ namespace UAlbion.Game.Gui.Menus
                     var name = SavedGame.GetName(br) ?? "Invalid";
                     var text = $"{i,2}    {name}";
                     int slotNumber = i;
-                    buttons.Add(new DialogOption(new LiteralText(text), () => PickSlot(slotNumber)));
+                    buttons.Add(new ConversationOption(new LiteralText(text), null, () => PickSlot(slotNumber)));
                 }
                 else if (_showEmptySlots)
                 {
                     var text = BuildEmptySlotText(i);
                     int slotNumber = i;
-                    buttons.Add(new DialogOption(text, () => PickSlot(slotNumber)));
+                    buttons.Add(new ConversationOption(text, null, () => PickSlot(slotNumber)));
                 }
             }
 
@@ -83,7 +85,7 @@ namespace UAlbion.Game.Gui.Menus
             elements.AddRange(buttons);
             elements.Add(new Spacing(0, 4));
 
-            var header = new TextElement(_stringId).Center().NoWrap();
+            var header = new UiTextBuilder(_stringId).Center().NoWrap();
             elements.Add(new ButtonFrame(new Padding(header, 2)) { State = ButtonState.Pressed });
 
             var stack = new VerticalStack(elements);

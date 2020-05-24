@@ -55,7 +55,7 @@ namespace UAlbion.Game.Veldrid.Input
             var config = assets.LoadCoreSpriteInfo(cursorId);
 
             _cursorId = cursorId;
-            _hotspot = config.Hotspot == null
+            _hotspot = config?.Hotspot == null
                 ? Vector2.Zero
                 : window.GuiScale * new Vector2(config.Hotspot.X, config.Hotspot.Y);
             _dirty = true;

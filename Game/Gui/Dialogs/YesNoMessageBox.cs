@@ -18,7 +18,7 @@ namespace UAlbion.Game.Gui.Dialogs
         {
             var elements = new VerticalStack(
                 new Spacing(0, 5),
-                new FixedSizePanel(231, 30, new TextElement(stringId)),
+                new FixedSizePanel(231, 30, new UiTextBuilder(stringId)),
                 new Spacing(0, 5),
                 new HorizontalStack(
                     new Spacing(11, 0),

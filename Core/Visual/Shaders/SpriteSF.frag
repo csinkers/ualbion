@@ -54,8 +54,13 @@ void main()
 
 	if ((iFlags & SF_GRADIENT_PIXELS) != 0)
 	{
-		vec2 subPixelPos = smoothstep(0.0, 0.9, 1 - fract(uv * vec2(uTexSizeW, uTexSizeH)));
-		color = color * vec4(vec3(subPixelPos.x*subPixelPos.y + 0.5), 0.9);
+		vec2 subPixelPos = smoothstep(
+			0,
+			1,
+			1 - fract(uv * vec2(uTexSizeW, uTexSizeH)));
+		color = color * vec4(
+			vec3(subPixelPos.x*subPixelPos.y + 0.4),
+			1.0);
 	}
 
 	// Outline

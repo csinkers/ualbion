@@ -36,10 +36,10 @@ namespace UAlbion.Game.Gui.Dialogs
                         _ => FontColor.Gray,
                     };
 
-                    var textElement = new TextElement(x.Key.ToId()).Color(color);
-                    return (IUiElement) new Button(textElement, () => OnWordSelected(x.Key))
+                    var textElement = (IUiElement)new UiTextBuilder(x.Key.ToId()).Ink(color);
+                    return (IUiElement)new Button(textElement, () => OnWordSelected(x.Key))
                     {
-                        Theme = ButtonTheme.DialogOption
+                        Theme = ButtonTheme.Frameless
                     };
                 }
             ).ToArray();

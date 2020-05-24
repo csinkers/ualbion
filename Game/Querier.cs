@@ -67,18 +67,8 @@ namespace UAlbion.Game
                     if (context.Source == null || debugInspect)
                         break;
 
-                    var assets = Resolve<IAssetManager>();
-                    var stringId = new StringId(prompt.TextType, prompt.TextSourceId, prompt.TextId);
-
-                    var dialog = AttachChild(new PromptDialog(
-                        new DynamicText(() =>
-                        {
-                            var settings = Resolve<ISettings>();
-                            var template = assets.LoadString(stringId, settings.Gameplay.Language);
-                            return new TextFormatter(assets, settings.Gameplay.Language)
-                                .Format(template).Blocks;
-                        })));
-
+                    var tf = Resolve<ITextFormatter>();
+                    var dialog = AttachChild(new PromptDialog(tf.Format(prompt.ToId())));
                     prompt.Acknowledge();
                     dialog.Closed += (sender, _) => prompt.Complete();
                     return null;
@@ -89,16 +79,10 @@ namespace UAlbion.Game
                     if (context?.Source == null || debugInspect)
                         break;
 
-                    var assets = Resolve<IAssetManager>();
-
+                    var tf = Resolve<ITextFormatter>();
                     var dialog = AttachChild(new NumericPromptDialog(
-                        new DynamicText(() =>
-                        {
-                            var settings = Resolve<ISettings>();
-                            var template = assets.LoadString(SystemTextId.MsgBox_EnterNumber, settings.Gameplay.Language);
-                            return new TextFormatter(assets, settings.Gameplay.Language)
-                                .Format(template).Blocks;
-                        }), 0, 9999));
+                        tf.Format(SystemTextId.MsgBox_EnterNumber.ToId()),
+                        0, 9999));
 
                     prompt.Acknowledge();
                     dialog.Closed += (sender, _) =>

@@ -41,7 +41,7 @@ namespace UAlbion.Formats.Assets
         public byte Activate { get; set; }   // 19 Activate enables compass (0), monster eye (1) or clock (3) (if type=0×13) / Torch intensity (if type=0×16)
         public byte AmmoAnim { get; set; }   // 20 Ammo combat animation (long-range weapons only)
         public SpellClass SpellClass { get; set; }   // 21 Spell Class
-        public byte SpellEffect { get; set; }   // 22 Spell Id
+        public byte? SpellEffect { get; set; }   // 22 Spell Id
         public byte Charges { get; set; }   // 23 Charges left in item / Torch lifetime (if type=0×16)
         public byte EnchantmentCount { get; set; }   // 24 Number of times item was enchanted/recharged
         public byte MaxEnchantmentCount { get; set; }   // 25 Maximum possible enchantments
@@ -142,8 +142,12 @@ namespace UAlbion.Formats.Assets
             if (BreakRate != 0) sb.AppendFormat("BR:{0} ", BreakRate); 
             if (Activate != 0) sb.AppendFormat("A:{0} ", Activate);
 
-            if (SpellClass != 0 || SpellEffect != 0)
-                sb.AppendFormat("SC:{0} SE:{1} ", SpellClass.ToString().Replace(", ", "|"), SpellEffect);
+            if (SpellEffect.HasValue)
+            {
+                var className = SpellClass.ToString().Replace(", ", "|");
+                SpellId spellId = SpellClass.ToSpellId(SpellEffect.Value);
+                sb.AppendFormat($"SC:{className} SE:{SpellEffect}={spellId} ");
+            }
 
             if (Charges != 0) sb.AppendFormat("C:{0} ", Charges);
             if (MaxCharges != 0) sb.AppendFormat("MaxC:{0} ", MaxCharges);
@@ -186,7 +190,7 @@ namespace UAlbion.Formats.Assets
             item.Activate = s.UInt8(nameof(item.Activate), item.Activate);
             item.AmmoAnim = s.UInt8(nameof(item.AmmoAnim), item.AmmoAnim);
             item.SpellClass = s.EnumU8(nameof(item.SpellClass), item.SpellClass);
-            item.SpellEffect = s.UInt8(nameof(item.SpellEffect), item.SpellEffect);
+            item.SpellEffect = StoreIncrementedNullZero.Serdes(nameof(item.SpellEffect), item.SpellEffect, s.UInt8);
             item.Charges = s.UInt8(nameof(item.Charges), item.Charges);
             item.EnchantmentCount = s.UInt8(nameof(item.EnchantmentCount), item.EnchantmentCount);
             item.MaxEnchantmentCount = s.UInt8(nameof(item.MaxEnchantmentCount), item.MaxEnchantmentCount);

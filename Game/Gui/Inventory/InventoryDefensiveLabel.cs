@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using UAlbion.Core.Events;
+﻿using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
@@ -19,12 +18,8 @@ namespace UAlbion.Game.Gui.Inventory
         public InventoryDefensiveLabel(PartyCharacterId activeCharacter)
         {
             On<InventoryChangedEvent>(e => _version++);
-            On<BlurEvent>(e => Raise(new HoverTextEvent("")));
-            On<HoverEvent>(e =>
-            {
-                Hover();
-                e.Propagating = false;
-            });
+            On<BlurEvent>(e => Raise(new HoverTextEvent(null)));
+            On<HoverEvent>(Hover);
 
             _activeCharacter = activeCharacter;
 
@@ -40,7 +35,7 @@ namespace UAlbion.Game.Gui.Inventory
                         new HorizontalStack(
                             new FixedSize(8, 8,
                                 new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiDefensiveValue) { Flags = SpriteFlags.Highlight }),
-                            new TextElement(source)
+                            new UiText(source)
                         )
                     )
                 {
@@ -50,19 +45,16 @@ namespace UAlbion.Game.Gui.Inventory
             );
         }
 
-        void Hover()
+        void Hover(HoverEvent e)
         {
             var player = Resolve<IParty>()[_activeCharacter];
-            var assets = Resolve<IAssetManager>();
-            var settings = Resolve<ISettings>();
+            var tf = Resolve<ITextFormatter>();
 
-            var protection = player?.Effective.Combat.Protection ?? 0;
-            var template = assets.LoadString(SystemTextId.Inv_ProtectionN, settings.Gameplay.Language);
-            var text = new TextFormatter(assets, settings.Gameplay.Language).Format(
-                template, // Protection : %d
-                protection).Blocks;
-
-            Raise(new HoverTextEvent(text.First().Text));
+            // Protection : %d
+            var protection = player?.Apparent.DisplayProtection ?? 0;
+            var text = tf.Format(SystemTextId.Inv_ProtectionN.ToId(), protection);
+            Raise(new HoverTextEvent(text));
+            e.Propagating = false;
         }
     }
 }

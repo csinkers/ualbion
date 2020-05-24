@@ -23,6 +23,7 @@ using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Input;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.State;
+using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid.Audio;
 using UAlbion.Game.Veldrid.Debugging;
 using UAlbion.Game.Veldrid.Input;
@@ -152,6 +153,7 @@ namespace UAlbion
                     ))
 
                 .Add(new Container("GuiAndInput",
+                    new TextFormatter(),
                     new TextManager(),
                     new LayoutManager(),
                     new DebugMapInspector(services)

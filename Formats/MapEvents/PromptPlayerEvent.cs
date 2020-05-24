@@ -42,5 +42,6 @@ namespace UAlbion.Formats.MapEvents
 
         public AssetType TextType { get; }
         public int TextSourceId { get; }
+        public StringId ToId() => new StringId(TextType, TextSourceId, TextId);
     }
 }

@@ -42,17 +42,17 @@ namespace UAlbion.Game.Gui.Inventory
 
             var attribStack = new HorizontalStack(
                 new VerticalStack(
-                    new TextElement(SystemTextId.Examine1_Type.ToId()).NoWrap(),
-                    new TextElement(SystemTextId.Examine1_Weight.ToId()).NoWrap(),
-                    new TextElement(SystemTextId.Examine1_Damage.ToId()).NoWrap(),
-                    new TextElement(SystemTextId.Examine1_Protection.ToId()).NoWrap()
+                    new UiTextBuilder(SystemTextId.Examine1_Type.ToId()).NoWrap(),
+                    new UiTextBuilder(SystemTextId.Examine1_Weight.ToId()).NoWrap(),
+                    new UiTextBuilder(SystemTextId.Examine1_Damage.ToId()).NoWrap(),
+                    new UiTextBuilder(SystemTextId.Examine1_Protection.ToId()).NoWrap()
                 ),
                 new Spacing(2,0),
                 new VerticalStack(
-                    new TextElement(item.TypeId.ToId()).NoWrap(),
-                    new TextElement($"{item.Weight} g").NoWrap(), // Literal String
-                    new TextElement(item.Damage.ToString()).NoWrap(),
-                    new TextElement(item.Protection.ToString()).NoWrap()
+                    new UiTextBuilder(item.TypeId.ToId()).NoWrap(),
+                    new SimpleText($"{item.Weight} g").NoWrap(), // Literal String
+                    new SimpleText(item.Damage.ToString()).NoWrap(),
+                    new SimpleText(item.Protection.ToString()).NoWrap()
                 )
             );
 
@@ -60,7 +60,7 @@ namespace UAlbion.Game.Gui.Inventory
                 Enum.GetValues(typeof(PlayerClass))
                     .Cast<PlayerClass>()
                     .Where(x => item.Class.IsAllowed(x))
-                    .Select(x => (IUiElement)new TextElement(x.ToId()).NoWrap());
+                    .Select(x => (IUiElement)new UiTextBuilder(x.ToId()).NoWrap());
 
             var classStack = new HorizontalStack(
                 new VerticalStack(classElements.Take(5).ToArray()),
@@ -79,7 +79,7 @@ namespace UAlbion.Game.Gui.Inventory
                         new Spacing(0, 2),
                         new Divider(CommonColor.Yellow4),
                         new Spacing(0, 2),
-                        new TextElement(SystemTextId.Misc_CanBeUsedBy.ToId()),
+                        new UiTextBuilder(SystemTextId.Misc_CanBeUsedBy.ToId()),
                         classStack
                     )
                 ),

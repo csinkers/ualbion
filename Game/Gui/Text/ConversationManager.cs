@@ -1,10 +1,10 @@
 ﻿using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
-using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Dialogs;
 using UAlbion.Game.State;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Text
 {
@@ -120,14 +120,14 @@ namespace UAlbion.Game.Gui.Text
             if (_conversation?.OnText(textEvent) == true)
                 return;
 
-            var textManager = Resolve<ITextManager>();
+            var tf = Resolve<ITextFormatter>();
             switch(textEvent.Location)
             {
                 case null:
                 case TextLocation.TextInWindow:
                 {
                     textEvent.Acknowledge();
-                    var dialog = AttachChild(new TextDialog(textManager.FormatTextEvent(textEvent, FontColor.White)));
+                    var dialog = AttachChild(new TextDialog(tf.Format(textEvent.ToId())));
                     dialog.Closed += (sender, _) => textEvent.Complete();
                     break;
                 }
@@ -142,13 +142,14 @@ namespace UAlbion.Game.Gui.Text
                     if (textEvent.Location == TextLocation.TextInWindowWithPortrait2) // TODO: ??? work out how this is meant to work.
                         portraitId = SmallPortraitId.Rainer;
 
-                    var dialog = AttachChild(new TextDialog(textManager.FormatTextEvent(textEvent, FontColor.Yellow), portraitId));
+                    var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
+                    var dialog = AttachChild(new TextDialog(text, portraitId));
                     dialog.Closed += (sender, _) => textEvent.Complete();
                     break;
                 }
 
                 case TextLocation.QuickInfo:
-                    Raise(new DescriptionTextExEvent(textManager.FormatTextEvent(textEvent, FontColor.White)));
+                    Raise(new DescriptionTextEvent(tf.Format(textEvent.ToId())));
                     textEvent.Complete();
                     break;
 
@@ -159,7 +160,7 @@ namespace UAlbion.Game.Gui.Text
                     break; // Handled by Conversation
 
                 default:
-                    Raise(new DescriptionTextExEvent(textManager.FormatTextEvent(textEvent, FontColor.White))); // TODO:
+                    Raise(new DescriptionTextEvent(tf.Format(textEvent.ToId()))); // TODO:
                     textEvent.Complete();
                     break;
             }

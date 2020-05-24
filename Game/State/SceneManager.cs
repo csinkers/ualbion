@@ -6,6 +6,7 @@ using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Scenes;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.State
 {
@@ -53,6 +54,7 @@ namespace UAlbion.Game.State
             if(ActiveSceneId != SceneId.Inventory)
                 Raise(new PushSceneEvent(SceneId.Inventory));
             Raise(new InventoryModeEvent(memberId));
+            Raise(new SetContextEvent(ContextType.Inventory, AssetType.PartyMember, (int)memberId));
         }
 
         void Set(SetSceneEvent e)

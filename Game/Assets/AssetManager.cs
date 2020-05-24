@@ -11,7 +11,6 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.Config;
-using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Assets
 {
@@ -186,14 +185,5 @@ namespace UAlbion.Game.Assets
             var spells = (IList<SpellData>)_assetLocatorRegistry.LoadAssetCached(AssetType.SpellData, 0);
             return spells[(int)spellId];
         }
-
-        public IText FormatText(StringId stringId, GameLanguage language, Action<TextFormatter> action = null) =>
-            new DynamicText(() =>
-            {
-                var template = LoadString(stringId, language);
-                var formatter = new TextFormatter(this, language);
-                action?.Invoke(formatter);
-                return formatter.Format(template).Blocks;
-            });
     }
 }

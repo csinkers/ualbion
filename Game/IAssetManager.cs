@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UAlbion.Api;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
@@ -9,7 +8,6 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.Config;
-using UAlbion.Game.Text;
 
 namespace UAlbion.Game
 {
@@ -46,7 +44,5 @@ namespace UAlbion.Game
         byte[] LoadSong(SongId songId);
         IList<IEvent> LoadScript(ScriptId scriptId);
         SpellData LoadSpell(SpellId spellId);
-
-        IText FormatText(StringId stringId, GameLanguage language, Action<TextFormatter> action = null);
     }
 }

@@ -38,7 +38,7 @@ namespace UAlbion.Game.Gui.Status
             On<BlurEvent>(e =>
             {
                 _portrait.Flags = 0;
-                Raise(new HoverTextEvent(""));
+                Raise(new HoverTextEvent(null));
             });
             On<TimerElapsedEvent>(e =>
             {
@@ -60,10 +60,10 @@ namespace UAlbion.Game.Gui.Status
 
             e.Propagating = false;
             var party = Resolve<IParty>();
-            var assets = Resolve<IAssetManager>();
             var window = Resolve<IWindowManager>();
             var settings = Resolve<ISettings>();
             var cursorManager = Resolve<ICursorManager>();
+            var tf = Resolve<ITextFormatter>();
 
             var heading = new LiteralText(
                 new TextBlock(member.Apparent.GetName(settings.Gameplay.Language))
@@ -72,11 +72,7 @@ namespace UAlbion.Game.Gui.Status
                     Alignment = TextAlignment.Center
                 });
 
-            IText S(SystemTextId textId) => new DynamicText(() =>
-                {
-                    var template = assets.LoadString(textId, settings.Gameplay.Language);
-                    return new TextFormatter(assets, settings.Gameplay.Language).Centre().NoWrap().Format(template).Blocks;
-                });
+            IText S(SystemTextId textId) => tf.Center().NoWrap().Format(textId.ToId());
 
             var uiPosition = window.PixelToUi(cursorManager.Position);
             var options = new List<ContextMenuOption>
@@ -194,14 +190,16 @@ namespace UAlbion.Game.Gui.Status
 
             var settings = Resolve<ISettings>();
             var assets = Resolve<IAssetManager>();
+            var tf = Resolve<ITextFormatter>();
             var template = assets.LoadString(SystemTextId.PartyPortrait_XLifeMana, settings.Gameplay.Language);
-            var text = new TextFormatter(assets, settings.Gameplay.Language).Format(
-                template, // %s (LP:%d, SP:%d)
+            // %s (LP:%d, SP:%d)
+            var text = tf.Format(
+                template, 
                 member.Apparent.GetName(settings.Gameplay.Language),
                 member.Apparent.Combat.LifePoints,
-                member.Apparent.Magic.SpellPoints).Blocks;
+                member.Apparent.Magic.SpellPoints);
 
-            Raise(new HoverTextEvent(text.First().Text));
+            Raise(new HoverTextEvent(text));
         }
     }
 }

@@ -13,7 +13,7 @@ namespace UAlbion.Game.Gui.Dialogs
         {
             On<CloseWindowEvent>(e => Respond(false));
 
-            var textSection = new TextElement(text).Center();
+            var textSection = new UiText(text);
 
             UiElement buttons = new HorizontalStack(
                 new Button(SystemTextId.MsgBox_Yes.ToId(), () => Respond(true)),

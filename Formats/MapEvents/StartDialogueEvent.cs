@@ -21,7 +21,8 @@ namespace UAlbion.Formats.MapEvents
             s.UInt8("Pad3", 0);
             s.UInt8("Pad4", 0);
             s.UInt8("Pad5", 0);
-            e.NpcId = s.EnumU16(nameof(NpcId), e.NpcId);
+            e.NpcId = s.EnumU8(nameof(NpcId), e.NpcId);
+            s.UInt8("Pad7", 0);
             s.UInt16("Pad8", 0);
             return e;
         }

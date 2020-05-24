@@ -7,7 +7,7 @@ namespace UAlbion.Game.Gui.Controls
 {
     public class SliderThumb : UiElement
     {
-        readonly TextElement _text;
+        readonly SimpleText _text;
         readonly ButtonFrame _frame;
         readonly Func<int> _getter;
         int _lastValue = int.MaxValue;
@@ -18,7 +18,7 @@ namespace UAlbion.Game.Gui.Controls
             On<BlurEvent>(e => _frame.State = ButtonState.Normal);
 
             _getter = getter;
-            _text = new TextElement("").Center();
+            _text = new SimpleText("").Center();
             _frame = new ButtonFrame(_text) { Theme = ButtonTheme.SliderThumb };
             AttachChild(_frame);
         }
@@ -31,7 +31,7 @@ namespace UAlbion.Game.Gui.Controls
             int currentValue = _getter();
             if (_lastValue != currentValue)
             {
-                _text.LiteralString(currentValue.ToString());
+                _text.Text = currentValue.ToString();
                 _lastValue = currentValue;
             }
         }

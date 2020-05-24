@@ -44,32 +44,22 @@ namespace UAlbion.Game.Entities
 
             var window = Resolve<IWindowManager>();
             var camera = Resolve<ICamera>();
-            var assets = Resolve<IAssetManager>();
-            var settings = Resolve<ISettings>();
-
-            IText S(SystemTextId textId) 
-                => new DynamicText(() =>
-                {
-                    var template = assets.LoadString(textId, settings.Gameplay.Language);
-                    return new TextFormatter(assets, settings.Gameplay.Language)
-                        .NoWrap()
-                        .Centre()
-                        .Format(template).Blocks;
-                });
+            var tf = Resolve<ITextFormatter>();
 
             var normPosition = camera.ProjectWorldToNorm(_sprite.Position);
             var uiPosition = window.NormToUi(normPosition.X, normPosition.Y);
 
-            var heading = S(SystemTextId.MapPopup_Person);
+            IText S(StringId textId) => tf.NoWrap().Center().Format(textId);
+            var heading = S(SystemTextId.MapPopup_Person.ToId());
             var options = new List<ContextMenuOption>
             {
                 new ContextMenuOption(
-                    S(SystemTextId.MapPopup_TalkTo),
+                    S(SystemTextId.MapPopup_TalkTo.ToId()),
                     new TriggerChainEvent(_npc.Chain, _npc.Chain.FirstEvent, _npc.Id.Value),
                     ContextMenuGroup.Actions),
 
                 new ContextMenuOption(
-                    S(SystemTextId.MapPopup_MainMenu),
+                    S(SystemTextId.MapPopup_MainMenu.ToId()),
                     new PushSceneEvent(SceneId.MainMenu),
                     ContextMenuGroup.System
                 )

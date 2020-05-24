@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -24,7 +23,7 @@ namespace UAlbion.Game.Gui.Controls
         public ProgressBar(IText hover, Func<int> getValue, Func<int> getMax, int absoluteMax)
         {
             On<HoverEvent>(e => Hover());
-            On<BlurEvent>(e => Raise(new HoverTextEvent("")));
+            On<BlurEvent>(e => Raise(new HoverTextEvent(null)));
 
             _hover = hover;
             _getValue = getValue;
@@ -40,8 +39,7 @@ namespace UAlbion.Game.Gui.Controls
             if (_hover == null)
                 return;
 
-            var text = _hover.Get().FirstOrDefault() ?? new TextBlock();
-            Raise(new HoverTextEvent(text.Text));
+            Raise(new HoverTextEvent(_hover));
         }
 
         void Update(Rectangle extents)

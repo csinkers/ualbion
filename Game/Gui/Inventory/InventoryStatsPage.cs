@@ -16,15 +16,13 @@ namespace UAlbion.Game.Gui.Inventory
 
         IEnumerable<TextBlock> BuildHoverText(SystemTextId id, Func<ICharacterSheet, int> getValue, Func<ICharacterSheet, int> getMax)
         {
-            var assets = Resolve<IAssetManager>();
             var party = Resolve<IParty>();
-            var settings = Resolve<ISettings>();
-            var formatter = new TextFormatter(assets, settings.Gameplay.Language);
+            var tf = Resolve<ITextFormatter>();
             var member = party[_activeCharacter]?.Apparent;
             if (member == null)
                 yield break;
 
-            var block = formatter.Format(assets.LoadString(id, settings.Gameplay.Language)).Blocks.First();
+            var block = tf.Format(id.ToId()).Get().First();
             block.Text += $" {getValue(member)} / {getMax(member)}";
             yield return block;
         }
@@ -32,7 +30,6 @@ namespace UAlbion.Game.Gui.Inventory
         public InventoryStatsPage(PartyCharacterId activeCharacter)
         {
             _activeCharacter = activeCharacter;
-            StringId S(SystemTextId id) => new StringId(AssetType.SystemText, 0, (int)id);
 
             ProgressBar Progress(SystemTextId id, Func<ICharacterSheet, int> getValue, Func<ICharacterSheet, int> getMax)
             {
@@ -52,24 +49,24 @@ namespace UAlbion.Game.Gui.Inventory
             }
 
             var stack = new VerticalStack(
-                new Header(S(SystemTextId.Inv2_Attributes)),
+                new Header(SystemTextId.Inv2_Attributes.ToId()),
                 new HorizontalStack(
                     new VerticalStack(
-                        new TextElement(S(SystemTextId.Attrib_STR)).Right(),
+                        new UiTextBuilder(SystemTextId.Attrib_STR.ToId()).Right(),
                         new Spacing(0,2),
-                        new TextElement(S(SystemTextId.Attrib_INT)).Right(),
+                        new UiTextBuilder(SystemTextId.Attrib_INT.ToId()).Right(),
                         new Spacing(0,2),
-                        new TextElement(S(SystemTextId.Attrib_DEX)).Right(),
+                        new UiTextBuilder(SystemTextId.Attrib_DEX.ToId()).Right(),
                         new Spacing(0,2),
-                        new TextElement(S(SystemTextId.Attrib_SPD)).Right(),
+                        new UiTextBuilder(SystemTextId.Attrib_SPD.ToId()).Right(),
                         new Spacing(0,2),
-                        new TextElement(S(SystemTextId.Attrib_STA)).Right(),
+                        new UiTextBuilder(SystemTextId.Attrib_STA.ToId()).Right(),
                         new Spacing(0,2),
-                        new TextElement(S(SystemTextId.Attrib_LUC)).Right(),
+                        new UiTextBuilder(SystemTextId.Attrib_LUC.ToId()).Right(),
                         new Spacing(0,2),
-                        new TextElement(S(SystemTextId.Attrib_MR)).Right(),
+                        new UiTextBuilder(SystemTextId.Attrib_MR.ToId()).Right(),
                         new Spacing(0,2),
-                        new TextElement(S(SystemTextId.Attrib_MT)).Right()
+                        new UiTextBuilder(SystemTextId.Attrib_MT.ToId()).Right()
                     ),
                     new Spacing(2,0),
                     new VerticalStack(
@@ -91,16 +88,16 @@ namespace UAlbion.Game.Gui.Inventory
                         Progress(SystemTextId.Attrib_MagicTalent, x => x.Attributes.MagicTalent, x => x.Attributes.MagicTalentMax)
                     )
                 ),
-                new Header(S(SystemTextId.Inv2_Skills)),
+                new Header(SystemTextId.Inv2_Skills.ToId()),
                 new HorizontalStack(
                     new VerticalStack(
-                        new TextElement(S(SystemTextId.Skill_CLO)).Right(),
+                        new UiTextBuilder(SystemTextId.Skill_CLO.ToId()).Right(),
                         new Spacing(0,2),
-                        new TextElement(S(SystemTextId.Skill_LON)).Right(),
+                        new UiTextBuilder(SystemTextId.Skill_LON.ToId()).Right(),
                         new Spacing(0,2),
-                        new TextElement(S(SystemTextId.Skill_CRI)).Right(),
+                        new UiTextBuilder(SystemTextId.Skill_CRI.ToId()).Right(),
                         new Spacing(0,2),
-                        new TextElement(S(SystemTextId.Skill_LP)).Right()
+                        new UiTextBuilder(SystemTextId.Skill_LP.ToId()).Right()
                     ),
                     new Spacing(2,0),
                     new VerticalStack(

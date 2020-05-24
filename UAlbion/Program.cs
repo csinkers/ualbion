@@ -5,8 +5,8 @@ using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Formats;
 using UAlbion.Game.Assets;
-using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Settings;
+using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid.Assets;
 using UAlbion.Game.Veldrid.Audio;
 using UAlbion.Game.Veldrid.Debugging;
@@ -78,8 +78,8 @@ namespace UAlbion
                 case ExecutionMode.SavedGameTests: SavedGameTests.RoundTripTest(baseDir); break;
 
                 case ExecutionMode.DumpData:
-                    var textManager = new TextManager();
-                    exchange.Attach(textManager);
+                    var tf = new TextFormatter();
+                    exchange.Attach(tf);
                     DumpType dumpTypes = DumpType.All;
                     if (commandLine.GameModeArgument != null)
                     {
@@ -88,14 +88,14 @@ namespace UAlbion
                             dumpTypes |= Enum.Parse<DumpType>(t);
                     }
 
-                    if ((dumpTypes & DumpType.Characters) != 0) Dump.CharacterSheets(assets, textManager, baseDir);
+                    if ((dumpTypes & DumpType.Characters) != 0) Dump.CharacterSheets(assets, tf, baseDir);
                     if ((dumpTypes & DumpType.Chests) != 0) Dump.Chests(assets, baseDir);
                     if ((dumpTypes & DumpType.CoreSprites) != 0) Dump.CoreSprites(assets, baseDir);
                     if ((dumpTypes & DumpType.EventSets) != 0) Dump.EventSets(assets, baseDir);
                     if ((dumpTypes & DumpType.Items) != 0) Dump.ItemData(assets, baseDir);
                     if ((dumpTypes & DumpType.MapEvents) != 0) Dump.MapEvents(assets, baseDir);
-                    if ((dumpTypes & DumpType.Maps) != 0) Dump.MapData(assets, textManager, baseDir);
-                    if ((dumpTypes & DumpType.Spells) != 0) Dump.Spells(assets, textManager, baseDir);
+                    if ((dumpTypes & DumpType.Maps) != 0) Dump.MapData(assets, tf, baseDir);
+                    if ((dumpTypes & DumpType.Spells) != 0) Dump.Spells(assets, tf, baseDir);
                     if ((dumpTypes & DumpType.ThreeDMaps) != 0) Dump.ThreeDMapAndLabInfo(assets, baseDir);
                     break;
 

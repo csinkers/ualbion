@@ -4,8 +4,6 @@ using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Text;
 
@@ -178,23 +176,6 @@ namespace UAlbion.Game.Gui.Text
                     }
                 }
             }
-        }
-
-        public IText FormatTextEvent(BaseTextEvent textEvent, FontColor color)
-            => FormatText(new StringId(textEvent.TextType, textEvent.TextSourceId, textEvent.TextId), color);
-
-        public IText FormatText(StringId id, FontColor color)
-        {
-            return new DynamicText(() =>
-            {
-                var assets = Resolve<IAssetManager>();
-                var settings = Resolve<ISettings>();
-                var textFormatter = new TextFormatter(assets, settings.Gameplay.Language);
-                return textFormatter
-                    .Ink(color)
-                    .Format(id)
-                    .Blocks;
-            });
         }
     }
 }

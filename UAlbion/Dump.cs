@@ -12,8 +12,7 @@ using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
-using UAlbion.Game.Entities;
-using UAlbion.Game.Gui.Text;
+using UAlbion.Game.Text;
 
 namespace UAlbion
 {
@@ -113,7 +112,7 @@ namespace UAlbion
             }
         }
 
-        public static void MapData(IAssetManager assets, ITextManager textManager, string baseDir)
+        public static void MapData(IAssetManager assets, ITextFormatter tf, string baseDir)
         {
             using var sw = File.CreateText($@"{baseDir}\re\MapInfo.txt");
             for (int i = 100; i < 400; i++)
@@ -188,7 +187,7 @@ namespace UAlbion
                         {
                             if (e.Event is BaseTextEvent textEvent)
                             {
-                                var textSource = textManager.FormatTextEvent(textEvent, FontColor.White);
+                                var textSource = tf.Format(textEvent.ToId());
                                 var text = string.Join(", ", textSource.Get().Select(x => x.Text));
                                 sw.WriteLine($"        {e} = {text}");
                             }
@@ -203,28 +202,28 @@ namespace UAlbion
             }
         }
 
-        public static void CharacterSheets(IAssetManager assets, ITextManager textManager, string baseDir)
+        public static void CharacterSheets(IAssetManager assets, ITextFormatter tf, string baseDir)
         {
             {
                 using var sw = File.CreateText($@"{baseDir}\re\PartyCharacters.txt");
                 foreach (PartyCharacterId charId in Enum.GetValues(typeof(PartyCharacterId)))
-                    DumpCharacterSheet(charId, assets.LoadCharacter(charId), sw, assets, textManager);
+                    DumpCharacterSheet(charId, assets.LoadCharacter(charId), sw, assets, tf);
             }
 
             {
                 using var sw = File.CreateText($@"{baseDir}\re\NpcCharacters.txt");
                 foreach (NpcCharacterId charId in Enum.GetValues(typeof(NpcCharacterId)))
-                    DumpCharacterSheet(charId, assets.LoadCharacter(charId), sw, assets, textManager);
+                    DumpCharacterSheet(charId, assets.LoadCharacter(charId), sw, assets, tf);
             }
 
             {
                 using var sw = File.CreateText($@"{baseDir}\re\MonsterCharacters.txt");
                 foreach (MonsterCharacterId charId in Enum.GetValues(typeof(MonsterCharacterId)))
-                    DumpCharacterSheet(charId, assets.LoadCharacter(charId), sw, assets, textManager);
+                    DumpCharacterSheet(charId, assets.LoadCharacter(charId), sw, assets, tf);
             }
         }
 
-        static void DumpCharacterSheet<T>(T id, CharacterSheet c, StreamWriter sw, IAssetManager assets, ITextManager textManager) where T : Enum
+        static void DumpCharacterSheet<T>(T id, CharacterSheet c, StreamWriter sw, IAssetManager assets, ITextFormatter tf) where T : Enum
         {
             if (c == null || c.GermanName == "" && c.PortraitId == 0)
                 return;
@@ -269,7 +268,7 @@ namespace UAlbion
                 {
                     if (e.Event is BaseTextEvent textEvent)
                     {
-                        var textSource = textManager.FormatTextEvent(textEvent, FontColor.White);
+                        var textSource = tf.Format(textEvent.ToId());
                         var text = string.Join(", ", textSource.Get().Select(x => x.Text));
                         sw.WriteLine($"        {e} = {text}");
                     }
@@ -481,7 +480,7 @@ namespace UAlbion
             }
         }
 
-        public static void Spells(AssetManager assets, TextManager textManager, string baseDir)
+        public static void Spells(AssetManager assets, ITextFormatter tf, string baseDir)
         {
             using var sw = File.CreateText($@"{baseDir}\re\Spells.txt");
             foreach (var spellId in Enum.GetValues(typeof(SpellId)).Cast<SpellId>())
@@ -489,7 +488,9 @@ namespace UAlbion
                 var spell = assets.LoadSpell(spellId);
                 var systemTextId = (SystemTextId)((int)spellId + (int)SpellData.SystemTextOffset);
                 var systemText = assets.LoadString(systemTextId.ToId(), GameLanguage.English);
-                sw.Write($"Spell{(int) spellId:D3} ");
+                int classNumber = (int)spellId / SpellData.MaxSpellsPerClass;
+                int offsetInClass = (int)spellId % SpellData.MaxSpellsPerClass;
+                sw.Write($"Spell{(int)spellId:D3} {classNumber}_{offsetInClass}");
                 sw.Write($"({spellId}) ".PadRight(24));
                 sw.Write($"\"{systemText}\" ".PadRight(24));
                 sw.Write($"{spell.Cost} ".PadLeft(4));

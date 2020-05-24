@@ -1,8 +1,6 @@
 ﻿using System;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
-using UAlbion.Game.Entities;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Debugging
@@ -18,7 +16,7 @@ namespace UAlbion.Game.Debugging
             if (!(reflected.Object is BaseTextEvent text))
                 return null;
 
-            IText textSource = Engine.GlobalExchange?.Resolve<ITextManager>()?.FormatTextEvent(text, FontColor.White);
+            IText textSource = Engine.GlobalExchange?.Resolve<ITextFormatter>()?.Format(text.ToId());
             return textSource?.ToString();
         }
     }

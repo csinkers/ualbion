@@ -38,39 +38,6 @@ namespace UAlbion.Game.Gui.Controls
             return c;
         }
 
-        public static ButtonFrame.ColorScheme DialogOption(ButtonState state)
-        {
-            var c = new ButtonFrame.ColorScheme { Alpha = 0.4f, Corners = CommonColor.Grey8 };
-            switch (state)
-            {
-                case ButtonState.Normal:
-                case ButtonState.ClickedBlurred:
-                    c.TopLeft = null;
-                    c.BottomRight = null;
-                    c.Background = null;
-                    break;
-                case ButtonState.Hover:
-                    c.TopLeft = null;
-                    c.BottomRight = null;
-                    c.Background = CommonColor.White;
-                    break;
-                case ButtonState.Clicked:
-                case ButtonState.Pressed:
-                    c.TopLeft = CommonColor.Black2;
-                    c.BottomRight = CommonColor.White;
-                    c.Background = CommonColor.Black2;
-                    break;
-                case ButtonState.HoverPressed:
-                    c.TopLeft = CommonColor.Black2;
-                    c.BottomRight = CommonColor.White;
-                    c.Background = CommonColor.White;
-                    break;
-                default: throw new ArgumentOutOfRangeException();
-            }
-
-            return c;
-        }
-
         public static ButtonFrame.ColorScheme SliderThumb(ButtonState state)
         {
             var c = new ButtonFrame.ColorScheme { Alpha = 1.0f, Corners = CommonColor.BlueGrey4 };

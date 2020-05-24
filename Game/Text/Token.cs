@@ -26,6 +26,7 @@
         Parameter, // Text
         Price, // Property
         Race, // Property
+        Right, // Formatting
         Sex, // Property
         Subject, // Context
         Tecf, // ??

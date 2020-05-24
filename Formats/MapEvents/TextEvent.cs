@@ -39,6 +39,7 @@ namespace UAlbion.Formats.MapEvents
         public override MapEventType EventType => MapEventType.Text;
         public abstract AssetType TextType { get; }
         public int TextSourceId { get; protected set; }
+        public StringId ToId() => new StringId(TextType, TextSourceId, TextId);
     }
 
     // Subclasses just for console / debug access

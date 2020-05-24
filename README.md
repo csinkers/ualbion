@@ -7,14 +7,14 @@ Prerequisites:
 
 Issue tracker at [https://trello.com/b/Tcm2WbU1/ualbion](https://trello.com/b/Tcm2WbU1/ualbion)
 
-## Screenshots:
+## Screenshots
 ![Example Screenshot 1](/data/Screenshots/1_FirstLevel.png?raw=true)
 ![Example Screenshot 2](/data/Screenshots/2_3DWorld.png?raw=true)
 ![Example Screenshot 3](/data/Screenshots/3_Outdoors.png?raw=true)
 ![Example Screenshot 4](/data/Screenshots/4_Inventory.png?raw=true)
 ![Example Screenshot 5](/data/Screenshots/5_MainMenu.png?raw=true)
 
-## Current Status:
+## Current Status
 
 Things that are at least somewhat implemented:
 - Rendering of 2D and 3D environments

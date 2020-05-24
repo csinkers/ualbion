@@ -230,7 +230,7 @@ namespace UAlbion
 
             sw.WriteLine($"{Convert.ToInt32(id):D3} {id} ({c.EnglishName}, {c.GermanName}, {c.FrenchName})");
             sw.WriteLine($"    Type:{c.Type} Gender:{c.Gender} Race:{c.Race} Class:{c.Class} Age:{c.Age} Level:{c.Level}");
-            sw.WriteLine($"    Languages:{c.Languages} Sprite:{c.SpriteType}:{c.SpriteId} Portrait:{(int?)c.PortraitId}");
+            sw.WriteLine($"    Languages:{c.Languages} Sprite:{c.SpriteId} Portrait:{(int?)c.PortraitId}");
             if (c.Inventory.Slots != null)
             {
                 sw.WriteLine($"    Inventory: (Gold:{c.Inventory.Gold / 10.0}, Rations:{c.Inventory.Rations})");
@@ -420,7 +420,7 @@ namespace UAlbion
 
         static void DumpMapEvents(StreamWriter sw, IAssetManager assets, MapDataId mapId, IMapData map)
         {
-            var formatter = new EventFormatter(assets, AssetType.MapText, (int)mapId);
+            var formatter = new EventFormatter(assets, AssetType.MapText, (ushort)mapId);
             sw.WriteLine();
             sw.WriteLine($"Map {(int)mapId} {mapId}:");
             foreach (var e in map.Events)
@@ -471,7 +471,7 @@ namespace UAlbion
                 if (set == null)
                     continue;
 
-                var formatter = new EventFormatter(assets, AssetType.EventText, (int)eventSetId);
+                var formatter = new EventFormatter(assets, AssetType.EventText, (ushort)eventSetId);
                 foreach (var e in set.Events)
                 {
                     var chainId = set.Chains.Select((x, i) => x.FirstEvent == e ? i : (int?) null).FirstOrDefault(x => x != null);
@@ -506,9 +506,9 @@ namespace UAlbion
     {
         readonly IAssetManager _assets;
         readonly AssetType _textType;
-        readonly int _context;
+        readonly ushort _context;
 
-        public EventFormatter(IAssetManager assets, AssetType textType, int context)
+        public EventFormatter(IAssetManager assets, AssetType textType, ushort context)
         {
             _assets = assets;
             _textType = textType;

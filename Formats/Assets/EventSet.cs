@@ -46,7 +46,7 @@ namespace UAlbion.Formats.Assets
             }
 
             for (int i = 0; i < set._events.Length; i++)
-                set._events[i] = EventNode.Serdes(i, set._events[i], s, true, (int)eventSetId);
+                set._events[i] = EventNode.Serdes(i, set._events[i], s, true, (ushort)eventSetId);
 
             foreach (var e in set._events)
             {

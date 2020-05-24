@@ -26,6 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{E4F7A1D2-3
 		data\input.json = data\input.json
 		data\inventory.json = data\inventory.json
 		data\items.json = data\items.json
+		data\settings.json = data\settings.json
 		data\strings.json = data\strings.json
 	EndProjectSection
 EndProject

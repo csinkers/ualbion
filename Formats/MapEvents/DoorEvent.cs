@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class DoorEvent : MapEvent, ITextEvent
     {
-        public static DoorEvent Serdes(DoorEvent e, ISerializer s, AssetType textType, int textSourceId)
+        public static DoorEvent Serdes(DoorEvent e, ISerializer s, AssetType textType, ushort textSourceId)
         {
             e ??= new DoorEvent(textType, textSourceId);
             e.PickDifficulty = s.UInt8(nameof(PickDifficulty), e.PickDifficulty);
@@ -17,7 +17,7 @@ namespace UAlbion.Formats.MapEvents
             return e;
         }
 
-        DoorEvent(AssetType textType, int textSourceId)
+        DoorEvent(AssetType textType, ushort textSourceId)
         {
             TextType = textType;
             TextSourceId = textSourceId;
@@ -32,6 +32,6 @@ namespace UAlbion.Formats.MapEvents
         public override string ToString() => $"door ({PickDifficulty} {KeyItemId} {InitialTextId} {UnlockedTextId} {DoorId} {NextEventId})";
         public override MapEventType EventType => MapEventType.Door;
         public AssetType TextType { get; }
-        public int TextSourceId { get; }
+        public ushort TextSourceId { get; }
     }
 }

@@ -25,7 +25,6 @@ namespace UAlbion.Game.State.Player
                 // Display and behaviour
                 Languages = sheet.Languages,
                 SpriteId = sheet.SpriteId,
-                SpriteType = sheet.SpriteType,
                 PortraitId = sheet.PortraitId,
                 EventSetId = sheet.EventSetId,
                 WordSetId = sheet.WordSetId,

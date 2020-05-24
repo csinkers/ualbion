@@ -14,7 +14,7 @@ namespace UAlbion.Game.Assets
             AssetType.GeneralConfig,
         };
 
-        public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)
+        public object LoadAsset(AssetKey key, string name, Func<AssetKey, object> loaderFunc)
         {
             var settings = Resolve<ISettings>();
             return key.Type switch

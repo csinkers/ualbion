@@ -6,7 +6,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class PromptPlayerEvent : AsyncMapEvent, IQueryEvent, ITextEvent
     {
-        public static PromptPlayerEvent Serdes(PromptPlayerEvent e, ISerializer s, AssetType textType, int textSourceId)
+        public static PromptPlayerEvent Serdes(PromptPlayerEvent e, ISerializer s, AssetType textType, ushort textSourceId)
         {
             e ??= new PromptPlayerEvent(textType, textSourceId);
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);
@@ -17,7 +17,7 @@ namespace UAlbion.Formats.MapEvents
             return e;
         }
 
-        PromptPlayerEvent(AssetType textType, int textSourceId)
+        PromptPlayerEvent(AssetType textType, ushort textSourceId)
         {
             TextType = textType;
             TextSourceId = textSourceId;
@@ -41,7 +41,7 @@ namespace UAlbion.Formats.MapEvents
             };
 
         public AssetType TextType { get; }
-        public int TextSourceId { get; }
+        public ushort TextSourceId { get; }
         public StringId ToId() => new StringId(TextType, TextSourceId, TextId);
     }
 }

@@ -81,7 +81,7 @@ namespace UAlbion.Formats.Assets
         {
             int slotNumber = (int)itemSlotId;
             if (slotNumber < 0 || slotNumber >= Slots.Length)
-                throw new ArgumentOutOfRangeException($"Unexpected slot id: {itemSlotId}");
+                return null;
             return Slots[slotNumber];
         }
 

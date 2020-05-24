@@ -13,7 +13,6 @@ namespace UAlbion.Game
 {
     public interface IAssetManager : ITextureLoader
     {
-        ITexture LoadTexture(AssetType type, int id);
         ITexture LoadFont(FontColor color, bool isBold);
         TilesetData LoadTileData(TilesetId id);
         LabyrinthData LoadLabyrinthData(LabyrinthDataId id);

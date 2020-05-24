@@ -38,7 +38,7 @@ namespace UAlbion.Formats.MapEvents
         public override string ToString() => $"text {TextType}:{TextSourceId}:{TextId} {Location} {PortraitId} ({Unk2} {Unk3} {Unk6} {Unk8})";
         public override MapEventType EventType => MapEventType.Text;
         public abstract AssetType TextType { get; }
-        public int TextSourceId { get; protected set; }
+        public ushort TextSourceId { get; protected set; }
         public StringId ToId() => new StringId(TextType, TextSourceId, TextId);
     }
 
@@ -53,7 +53,7 @@ namespace UAlbion.Formats.MapEvents
         public EventSetId EventSetId
         {
             get => (EventSetId)TextSourceId;
-            set => TextSourceId = (int)value;
+            set => TextSourceId = (ushort)value;
         }
 
         public override AssetType TextType => AssetType.EventText;
@@ -75,7 +75,7 @@ namespace UAlbion.Formats.MapEvents
         public MapDataId MapId
         {
             get => (MapDataId)TextSourceId;
-            set => TextSourceId = (int)value;
+            set => TextSourceId = (ushort)value;
         }
 
         public override AssetType TextType => AssetType.MapText;

@@ -101,7 +101,7 @@ namespace UAlbion.Game.Gui.Dialogs
                         DefaultIdleHandler(null, null);
                     }
 
-                    var text = tf.Ink(FontColor.Yellow).Format(new StringId(AssetType.EventText, (int)_npc.EventSetId, 0));
+                    var text = tf.Ink(FontColor.Yellow).Format(new StringId(AssetType.EventText, (ushort)_npc.EventSetId, 0));
                     _textWindow.Text = text;
                     _textWindow.Clicked += OnClicked;
                     return;

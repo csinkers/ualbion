@@ -46,15 +46,34 @@ namespace UAlbion.Game.Gui.Inventory
             _id = id;
             _slotId = slotId;
 
-            var amountSource = new DynamicText(() =>
+            IText amountSource;
+            if (slotId == ItemSlotId.Gold)
             {
-                var slotInfo = GetSlot();
-                return slotInfo == null || slotInfo.Amount < 2
-                    ? new TextBlock[0]
-                    : new[] { new TextBlock(slotInfo.Amount.ToString()) { Alignment = TextAlignment.Right } };
-            }, x => _version);
-
-            _visual = AttachChild(new VisualInventorySlot(slotId.IsBodyPart(), amountSource, GetItem));
+                amountSource = new DynamicText(() =>
+                {
+                    var gold = Inventory.Gold;
+                    return new[] { new TextBlock($"{gold / 10}.{gold % 10}") };
+                }, x => _version);
+            }
+            else if (slotId == ItemSlotId.Rations)
+            {
+                amountSource = new DynamicText(() =>
+                {
+                    var food = Inventory.Rations;
+                    return new[] { new TextBlock(food.ToString()) };
+                }, x => _version);
+            }
+            else
+            {
+                amountSource = new DynamicText(() =>
+                {
+                    var slotInfo = Slot;
+                    return slotInfo == null || slotInfo.Amount < 2
+                        ? new TextBlock[0]
+                        : new[] { new TextBlock(slotInfo.Amount.ToString()) { Alignment = TextAlignment.Right } };
+                }, x => _version);
+            }
+            _visual = AttachChild(new VisualInventorySlot(slotId, amountSource, GetItem));
             _visual.Clicked += (sender, args) => OnClick();
             _visual.DoubleClicked += (sender, args) => OnDoubleClick();
             _visual.RightClicked += (sender, args) => OnRightClick();
@@ -62,26 +81,18 @@ namespace UAlbion.Game.Gui.Inventory
 
         public override string ToString() => $"InventorySlot:{_inventoryType}:{_id}:{_slotId}";
 
-        ItemSlot GetSlot() =>
-            Resolve<IGameState>()
-            .GetInventory(_inventoryType, _id)
-            .GetSlot(_slotId);
-
+        IInventory Inventory => Resolve<IGameState>().GetInventory(_inventoryType, _id);
+        ItemSlot Slot => Inventory.GetSlot(_slotId);
         ItemData GetItem()
         {
-            var slot = GetSlot();
+            var slot = Slot;
             return slot?.Id == null 
                 ? null 
                 : Resolve<IAssetManager>().LoadItem(slot.Id.Value);
         }
 
-        void OnClick()
-        {
-            // TODO: Amount dialog
-            Raise(new InventoryPickupDropItemEvent(_inventoryType, _id, _slotId, 1));
-        }
-
-        void OnDoubleClick() => Raise(new InventoryPickupDropItemEvent(_inventoryType, _id, _slotId));
+        void OnClick() => Raise(new InventoryPickupDropEvent(_inventoryType, _id, _slotId));
+        void OnDoubleClick() => Raise(new InventoryPickupAllEvent(_inventoryType, _id, _slotId));
 
         void Hover()
         {
@@ -210,6 +221,15 @@ namespace UAlbion.Game.Gui.Inventory
 
             if (item.Charges > 0) // TODO: Disable based on spell context
                 options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_ActivateSpell.ToId()), null, ContextMenuGroup.Actions));
+
+            var inventoryManager = Resolve<IInventoryManager>();
+            if (inventoryManager.ActiveMode == InventoryMode.Merchant)
+            {
+                options.Add(new ContextMenuOption(
+                    S(SystemTextId.InvPopup_Sell.ToId(), (item.Flags & ItemFlags.PlotItem) != 0),
+                    new InventorySellEvent(_inventoryType, _id, _slotId),
+                    ContextMenuGroup.Actions));
+            }
 
             var uiPosition = window.PixelToUi(cursorManager.Position);
             Raise(new ContextMenuEvent(uiPosition, heading, options));

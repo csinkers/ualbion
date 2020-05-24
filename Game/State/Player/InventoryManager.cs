@@ -9,6 +9,7 @@ using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
+using UAlbion.Game.Gui.Inventory;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.State.Player
@@ -21,10 +22,12 @@ namespace UAlbion.Game.State.Player
         const int MaxRations = 32767;
 
         public IHoldable ItemInHand { get; private set; }
-        public InventoryPickupDropItemEvent ReturnItemInHandEvent { get; private set; }
+        public InventoryMode ActiveMode { get; private set; }
+        public InventoryPickupDropEvent ReturnItemInHandEvent { get; private set; }
         public InventoryManager(Func<InventoryType, int, Inventory> getInventory)
         {
-            On<InventoryPickupDropItemEvent>(OnPickupItem);
+            On<InventoryPickupDropEvent>(OnPickupItem);
+            On<InventoryPickupAllEvent>(OnPickupItem);
             On<InventoryGiveItemEvent>(OnGiveItem);
             _getInventory = getInventory;
         }
@@ -78,7 +81,7 @@ namespace UAlbion.Game.State.Player
             ReturnItemInHandEvent = 
                 itemInHand == null 
                 ? null 
-                : new InventoryPickupDropItemEvent(inventory.InventoryType, inventory.InventoryId, slotId);
+                : new InventoryPickupDropEvent(inventory.InventoryType, inventory.InventoryId, slotId);
             Raise(new SetCursorEvent(ItemInHand == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
         }
 
@@ -202,7 +205,7 @@ namespace UAlbion.Game.State.Player
 
         void OnGiveItem(InventoryGiveItemEvent e)
         {
-            var inventory = _getInventory(InventoryType.Player, (int) e.MemberId);
+            var inventory = _getInventory(InventoryType.Player, (int)e.MemberId);
 
             if (ItemInHand is GoldInHand)
                 Drop(inventory, ItemSlotId.Gold);
@@ -240,7 +243,37 @@ namespace UAlbion.Game.State.Player
                 Drop(inventory, slotId);
         }
 
-        void OnPickupItem(InventoryPickupDropItemEvent e)
+        void GetQuantity(bool discard, IInventory inventory, ItemSlotId slotId, Action<int> continuation)
+        {
+            var (maxQuantity, text, icon) = slotId switch
+            {
+                ItemSlotId.Gold => (
+                    inventory.Gold,
+                    discard
+                        ? SystemTextId.Gold_ThrowHowMuchGoldAway.ToId()
+                        : SystemTextId.Gold_TakeHowMuchGold.ToId(),
+                    CoreSpriteId.UiGold.ToAssetId()),
+
+                ItemSlotId.Rations => (
+                    inventory.Rations,
+                    discard
+                        ? SystemTextId.Gold_ThrowHowManyRationsAway.ToId()
+                        : SystemTextId.Gold_TakeHowManyRations.ToId(),
+                    CoreSpriteId.UiFood.ToAssetId()),
+
+                _ => (
+                        inventory.GetSlot(slotId)?.Amount ?? 0,
+                        discard
+                            ? SystemTextId.InvMsg_ThrowHowManyItemsAway.ToId()
+                            : SystemTextId.InvMsg_TakeHowManyItems.ToId(),
+                            Resolve<IAssetManager>()
+                            .LoadItem(inventory.GetSlot(slotId)?.Id ?? ItemId.Knife)
+                            .Icon.ToAssetId())};
+
+            Exchange.Attach(new ItemQuantityDialog(text, icon, maxQuantity, continuation));
+        }
+
+        void OnPickupItem(InventorySlotEvent e)
         {
             var slotId = e.SlotId;
             if (!DoesSlotAcceptItemInHand(e.InventoryType, e.InventoryId, e.SlotId))
@@ -249,7 +282,19 @@ namespace UAlbion.Game.State.Player
             var inventory = _getInventory(e.InventoryType, e.InventoryId);
             switch (GetInventoryAction(e.InventoryType, e.InventoryId, slotId))
             {
-                case InventoryAction.Pickup:   PickupItem(e.InventoryType, e.InventoryId, slotId, e.Quantity); break;
+                case InventoryAction.Pickup:
+                    if (e is InventoryPickupAllEvent)
+                        PickupItem(e.InventoryType, e.InventoryId, slotId, null);
+                    else
+                    {
+                        GetQuantity(false, inventory, e.SlotId, quantity =>
+                        {
+                            if (quantity > 0)
+                                PickupItem(e.InventoryType, e.InventoryId, slotId, quantity);
+                        });
+                    }
+
+                    break;
                 case InventoryAction.Drop:     Drop(inventory, slotId);          break;
                 case InventoryAction.Swap:     SwapItems(inventory, slotId);     break;
                 case InventoryAction.Coalesce: CoalesceItems(inventory, slotId); break;
@@ -388,10 +433,8 @@ namespace UAlbion.Game.State.Player
             Update(inventory);
         }
 
-        void RaiseStatusMessage(SystemTextId textId)
-        {
-            Raise(new DescriptionTextEvent(Resolve<ITextFormatter>().Format(textId.ToId())));
-        }
+        void RaiseStatusMessage(SystemTextId textId) 
+            => Raise(new DescriptionTextEvent(Resolve<ITextFormatter>().Format(textId.ToId())));
 
         public bool TryChangeInventory(InventoryType inventoryType, int inventoryId, ItemId itemId, QuantityChangeOperation operation, int amount)
         {

@@ -55,10 +55,10 @@ namespace UAlbion.Game.Assets
             return _standardAssetLocator;
         }
 
-        public object LoadAssetCached<T>(AssetType type, T enumId, GameLanguage language = GameLanguage.English)
+        public object LoadAssetCached(AssetType type, ushort id) => LoadAssetCached(new AssetKey(type, id));
+        public object LoadAssetCached(AssetId id) => LoadAssetCached(new AssetKey(id));
+        public object LoadAssetCached(AssetKey key)
         {
-            int id = Convert.ToInt32(enumId);
-            var key = new AssetKey(type, id, language);
             object asset = _assetCache.Get(key);
             if (asset is Exception) // If it failed to load once then stop trying (at least until an asset:reload / cycle)
                 return null;
@@ -66,38 +66,26 @@ namespace UAlbion.Game.Assets
             if (asset != null)
                 return asset;
 
-            var name =
-                typeof(T) == typeof(int)
-                ? $"{type}.{AssetNameResolver.GetName(type, (int)(object)enumId)}"
-                : $"{type}.{enumId}";
-
-            asset = LoadAssetInternal(key, name);
-
+            asset = LoadAssetInternal(key);
             _assetCache.Add(asset, key);
             return asset is Exception ? null : asset;
         }
 
-        public object LoadAsset<T>(AssetType type, T enumId, GameLanguage language = GameLanguage.English)
+        public object LoadAsset(AssetId id, GameLanguage language = GameLanguage.English)
         {
-            int id = Convert.ToInt32(enumId);
-            var key = new AssetKey(type, id, language);
-            var name =
-                typeof(T) == typeof(int)
-                ? $"{type}.{AssetNameResolver.GetName(type, (int)(object)enumId)}"
-                : $"{type}.{enumId}";
-
-            var asset = LoadAssetInternal(key, name);
-
+            var key = new AssetKey(id, language);
+            var asset = LoadAssetInternal(key);
             return asset is Exception ? null : asset;
         }
 
-        object LoadAssetInternal(AssetKey key, string name)
+        object LoadAssetInternal(AssetKey key)
         {
+            var name = $"{key.Type}.{key.Id}";
             try
             {
                 ICoreFactory factory = Resolve<ICoreFactory>();
                 IAssetLocator locator = GetLocator(key.Type);
-                var asset = locator.LoadAsset(key, name, (x, y) => LoadAssetCached(x.Type, x.Id, x.Language));
+                var asset = locator.LoadAsset(key, name, LoadAssetCached);
 
                 if (asset != null && _postProcessors.TryGetValue(asset.GetType(), out var processor))
                     asset = processor.Process(factory, key, name, asset);

@@ -17,15 +17,13 @@ namespace UAlbion
     {
         static void Main(string[] args)
         {
-            /*
-            Console.WriteLine("Entry point reached. Press enter to continue");
-            Console.ReadLine(); //*/
-
             PerfTracker.StartupEvent("Entered main");
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
             PerfTracker.StartupEvent("Registered encodings");
 
             var commandLine = new CommandLineOptions(args);
+            if (commandLine.Mode == ExecutionMode.Exit)
+                return;
 
             var baseDir = FormatUtil.FindBasePath();
             if (baseDir == null)

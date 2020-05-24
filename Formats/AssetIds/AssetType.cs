@@ -40,9 +40,9 @@ namespace UAlbion.Formats.AssetIds
         [EnumType(typeof(FullBodyPictureId))]    FullBodyPicture,    // Graphics
         [EnumType(typeof(TilesetId))]            Tileset,            // Map
         [EnumType(typeof(IconGraphicsId))]       IconGraphics,       // Graphics
-        [EnumType(typeof(ItemId))]               ItemGraphics,       // Graphics
+        [EnumType(typeof(ItemSpriteId))]         ItemGraphics,       // Graphics
         [EnumType(typeof(ItemId))]               ItemList,           // Misc
-        [EnumType(typeof(ItemId))]               ItemNames,          // Text
+                                                 ItemNames,          // Text
         [EnumType(typeof(LabyrinthDataId))]      LabData,            // Map
         [EnumType(typeof(LargeNpcId))]           BigNpcGraphics,     // Graphics
         [EnumType(typeof(LargePartyGraphicsId))] BigPartyGraphics,   // Graphics

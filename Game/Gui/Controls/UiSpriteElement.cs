@@ -7,7 +7,7 @@ using UAlbion.Core.Visual;
 
 namespace UAlbion.Game.Gui.Controls
 {
-    public class UiSpriteElement<T> : UiElement where T : struct, Enum
+    public class UiSpriteElement<T> : UiElement where T : struct
     {
         T? _id;
         Vector2 _size;

@@ -18,6 +18,7 @@ namespace UAlbion.Core
     /// </summary>
     public abstract class Component : IComponent
     {
+        public static bool TraceAttachment;
         static int _nesting;
         readonly IDictionary<Type, Handler> _handlers = new Dictionary<Type, Handler>();
         bool _isActive = true; // If false, then this component will not be attached to the exchange even if its parent is.
@@ -174,9 +175,12 @@ namespace UAlbion.Core
                 return;
 
             _nesting++;
-            Console.WriteLine("+".PadLeft(_nesting) + ToString());
+            if (TraceAttachment)
+                Console.WriteLine("+".PadLeft(_nesting) + ToString());
+
             foreach (var child in Children)
                 child.Attach(exchange);
+
             _nesting--;
 
             // exchange.Subscribe(null, this); // Ensure we always get added to the subscriber list, even if this component only uses subscription notifications.
@@ -195,7 +199,9 @@ namespace UAlbion.Core
                 return;
 
             _nesting++;
-            Console.WriteLine("-".PadLeft(_nesting) + ToString());
+            if (TraceAttachment)
+                Console.WriteLine("-".PadLeft(_nesting) + ToString());
+
             Unsubscribed();
 
             foreach (var child in Children)

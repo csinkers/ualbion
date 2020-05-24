@@ -6,6 +6,6 @@ namespace UAlbion.Formats.MapEvents
     public interface ITextEvent : IEvent
     {
         AssetType TextType { get; }
-        int TextSourceId { get; }
+        ushort TextSourceId { get; }
     }
 }

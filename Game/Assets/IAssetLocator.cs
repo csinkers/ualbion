@@ -6,7 +6,7 @@ namespace UAlbion.Game.Assets
 {
     public interface IAssetLocator
     {
-        object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc);
+        object LoadAsset(AssetKey key, string name, Func<AssetKey, object> loaderFunc);
         IEnumerable<AssetType> SupportedTypes { get; }
     }
 }

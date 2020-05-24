@@ -31,7 +31,7 @@ namespace UAlbion.Formats.Assets
         public override string ToString() =>
             Type switch {
             CharacterType.Party => $"{Name} {Race} {Class} {Age} EN:{EnglishName} DE:{GermanName} {Magic.SpellStrengths.Count} spells",
-            CharacterType.Npc => $"{Name} {PortraitId} S{SpriteId} E{EventSetId} W{WordSetId}",
+            CharacterType.Npc => $"{Name} {PortraitId} S:{SpriteId} E{EventSetId} W{WordSetId}",
             CharacterType.Monster => $"{Name} {Class} {Gender} AP{Combat.ActionPoints} Lvl{Level} LP{Combat.LifePoints}/{Combat.LifePointsMax} {Magic.SpellStrengths.Count} spells",
             _ => $"{Name} UNKNOWN TYPE {Type}" };
 
@@ -51,8 +51,7 @@ namespace UAlbion.Formats.Assets
 
         // Display and behaviour
         public PlayerLanguage Languages { get; set; }
-        public byte SpriteId { get; set; }
-        public AssetType SpriteType { get; set; }
+        public AssetId SpriteId { get; set; }
         public SmallPortraitId? PortraitId { get; set; }
         public EventSetId EventSetId { get; set; }
         public EventSetId WordSetId { get; set; }

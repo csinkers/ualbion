@@ -39,7 +39,7 @@ namespace UAlbion.Game.Assets
                 ));
         }
 
-        public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)
+        public object LoadAsset(AssetKey key, string name, Func<AssetKey, object> loaderFunc)
         {
             if (!_strings.TryGetValue((UAlbionStringId)key.Id, out var languages))
             {

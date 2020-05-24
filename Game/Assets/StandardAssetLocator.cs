@@ -192,10 +192,10 @@ namespace UAlbion.Game.Assets
         }
 
         public IEnumerable<AssetType> SupportedTypes => _assetFiles.Keys;
-        public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)
+        public object LoadAsset(AssetKey key, string name, Func<AssetKey, object> loaderFunc)
         {
-            var basicAssetConfig = (IAssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig), "AssetConfig");
-            var generalConfig = (IGeneralConfig)loaderFunc(new AssetKey(AssetType.GeneralConfig), "GeneralConfig");
+            var basicAssetConfig = (IAssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig));
+            var generalConfig = (IGeneralConfig)loaderFunc(new AssetKey(AssetType.GeneralConfig));
 
             int xldIndex = key.Id / 100;
             ApiUtil.Assert(xldIndex >= 0);

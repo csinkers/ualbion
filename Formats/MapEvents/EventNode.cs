@@ -29,7 +29,7 @@ namespace UAlbion.Formats.MapEvents
             public ushort? ToMemory(ushort persistent) => persistent == 0xffff ? (ushort?)null : persistent;
         }
 
-        public static EventNode Serdes(int id, EventNode node, ISerializer s, bool useEventText, int textSourceId)
+        public static EventNode Serdes(int id, EventNode node, ISerializer s, bool useEventText, ushort textSourceId)
         {
             var initialPosition = s.Offset;
             var mapEvent = node?.Event as MapEvent;
@@ -50,7 +50,7 @@ namespace UAlbion.Formats.MapEvents
             return node;
         }
 
-        static IMapEvent SerdesByType(EventNode node, ISerializer s, MapEventType type, bool useEventText, int textSourceId) =>
+        static IMapEvent SerdesByType(EventNode node, ISerializer s, MapEventType type, bool useEventText, ushort textSourceId) =>
             type switch // Individual parsers handle byte range [1,9]
             {
                 MapEventType.Action => ActionEvent.Serdes((ActionEvent)node?.Event, s),

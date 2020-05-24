@@ -17,10 +17,10 @@ namespace UAlbion.Game.Assets
 
         public IEnumerable<AssetType> SupportedTypes => new[] {AssetType.MetaFont};
 
-        public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)
+        public object LoadAsset(AssetKey key, string name, Func<AssetKey, object> loaderFunc)
         {
-            var regular = (ITexture)loaderFunc(new AssetKey(AssetType.Font), "RegularFont");
-            var bold = (ITexture)loaderFunc(new AssetKey(AssetType.Font, (int)FontId.BoldFont), "BoldFont");
+            var regular = (ITexture)loaderFunc(new AssetKey(AssetType.Font));
+            var bold = (ITexture)loaderFunc(new AssetKey(AssetType.Font, (int)FontId.BoldFont));
             return FontLoader.Load(_factory, (MetaFontId) key.Id, regular, bold);
         }
     }

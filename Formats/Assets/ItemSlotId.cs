@@ -49,18 +49,18 @@ namespace UAlbion.Formats.Assets
             id switch
             {
                 ItemSlotId.Slot0 => PersistedItemSlotId.Slot0,
-                ItemSlotId.Neck =>  PersistedItemSlotId.Neck,
-                ItemSlotId.Head =>  PersistedItemSlotId.Head,
-                ItemSlotId.Tail =>  PersistedItemSlotId.Tail,
-                ItemSlotId.RightHand =>  PersistedItemSlotId.RightHand,
-                ItemSlotId.Chest =>  PersistedItemSlotId.Chest,
-                ItemSlotId.LeftHand =>  PersistedItemSlotId.LeftHand,
-                ItemSlotId.RightFinger =>  PersistedItemSlotId.RightFinger,
-                ItemSlotId.Feet =>  PersistedItemSlotId.Feet,
-                ItemSlotId.LeftFinger =>  PersistedItemSlotId.LeftFinger,
-                ItemSlotId.RightHandOrTail =>  PersistedItemSlotId.RightHandOrTail,
-                ItemSlotId.CharacterBody =>  PersistedItemSlotId.CharacterBody,
-                ItemSlotId.None =>  PersistedItemSlotId.None,
+                ItemSlotId.Neck => PersistedItemSlotId.Neck,
+                ItemSlotId.Head => PersistedItemSlotId.Head,
+                ItemSlotId.Tail => PersistedItemSlotId.Tail,
+                ItemSlotId.RightHand => PersistedItemSlotId.RightHand,
+                ItemSlotId.Chest => PersistedItemSlotId.Chest,
+                ItemSlotId.LeftHand => PersistedItemSlotId.LeftHand,
+                ItemSlotId.RightFinger => PersistedItemSlotId.RightFinger,
+                ItemSlotId.Feet => PersistedItemSlotId.Feet,
+                ItemSlotId.LeftFinger => PersistedItemSlotId.LeftFinger,
+                ItemSlotId.RightHandOrTail => PersistedItemSlotId.RightHandOrTail,
+                ItemSlotId.CharacterBody => PersistedItemSlotId.CharacterBody,
+                ItemSlotId.None => PersistedItemSlotId.None,
                 _ => (PersistedItemSlotId)((int)id - (int)ItemSlotId.Slot0 + (int)PersistedItemSlotId.Slot0)
             };
 
@@ -103,5 +103,7 @@ namespace UAlbion.Formats.Assets
                 _ => false
             };
         }
+
+        public static bool IsSpecial(this ItemSlotId id) => id == ItemSlotId.Gold || id == ItemSlotId.Rations;
     }
 }

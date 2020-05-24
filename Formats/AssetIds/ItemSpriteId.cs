@@ -2,7 +2,7 @@ namespace UAlbion.Formats.AssetIds
 {
     // ReSharper disable InconsistentNaming
     // ReSharper disable UnusedMember.Global
-    public enum ItemSpriteId : ushort
+    public enum ItemSpriteId : ushort // Actually sub-image ids
     {
         Knife = 0,
         Laser = 0,

@@ -1,8 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.State;
@@ -15,12 +15,8 @@ namespace UAlbion.Game.Gui.Inventory
         const int InventoryWidth = 4;
         const int InventoryHeight = 6;
 
-        int _version;
-
-        public InventoryRightPane(PartyCharacterId activeCharacter, string exitButtonId, bool showTotalPartyGold)
+        public InventoryRightPane(PartyCharacterId activeCharacter, Action exitButtonCallback, bool showTotalPartyGold)
         {
-            On<InventoryChangedEvent>(e => _version++);
-
             var header = new Header(new StringId(AssetType.SystemText, 0, (int)SystemTextId.Inv_Backpack));
 
             var slotSpans = new IUiElement[InventoryHeight];
@@ -50,45 +46,24 @@ namespace UAlbion.Game.Gui.Inventory
                     new VerticalStack(
                         new Spacing(64, 0),
                         new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiGold) { Flags = SpriteFlags.Highlight },
-                        new UiText(tf.Format(
-                            SystemTextId.Shop_TotalGoldNdN.ToId(),
-                            total / 10,
-                            total % 10)) 
-                    ) { Greedy = false}, () => { } // TODO: Make button functional
+                        new UiText(tf.Format(SystemTextId.Shop_GoldAll.ToId())),
+                        new SimpleText($"{total / 10}.{total % 10}")
+                    ) { Greedy = false}, () => { }
                 ) { IsPressed = true };
                 moneyAndFoodStack = new HorizontalStack(money);
             }
             else
             {
-                var goldSource = new DynamicText(() =>
-                {
-                    var player = Resolve<IParty>()[activeCharacter];
-                    var gold = player?.Apparent.Inventory.Gold ?? 0;
-                    return new[] { new TextBlock($"{gold / 10}.{gold % 10}") };
-                }, x => _version);
+                var goldButton = new LogicalInventorySlot(
+                    InventoryType.Player,
+                    (int)activeCharacter,
+                    ItemSlotId.Gold);
 
-                var goldButton = new Button(
-                    new VerticalStack(
-                        new Spacing(31, 0),
-                        new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiGold),
-                        new UiText(goldSource)
-                    ) { Greedy = false }, () => { } // TODO: Make button functional
-                );
+                var foodButton = new LogicalInventorySlot(
+                    InventoryType.Player,
+                    (int)activeCharacter,
+                    ItemSlotId.Rations);
 
-                var foodSource = new DynamicText(() =>
-                {
-                    var player = Resolve<IParty>()[activeCharacter];
-                    var food = player?.Apparent.Inventory.Rations ?? 0;
-                    return new[] { new TextBlock(food.ToString()) };
-                }, x => _version);
-
-                var foodButton = new Button(
-                    new VerticalStack(
-                        new Spacing(31, 0),
-                        new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiFood),
-                        new UiText(foodSource)
-                    ) { Greedy = false }, () => { } // TODO: Make button functional
-                );
                 moneyAndFoodStack = new HorizontalStack(goldButton, foodButton);
             }
 
@@ -98,7 +73,7 @@ namespace UAlbion.Game.Gui.Inventory
                 new Spacing(0, 2),
                 moneyAndFoodStack,
                 new Spacing(0, 9),
-                new InventoryExitButton(exitButtonId)
+                new InventoryExitButton(exitButtonCallback)
             ) { Greedy = false };
 
             AttachChild(stack);

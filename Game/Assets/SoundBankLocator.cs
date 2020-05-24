@@ -12,12 +12,12 @@ namespace UAlbion.Game.Assets
 {
     public class SoundBankLocator : IAssetLocator
     {
-        public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)
+        public object LoadAsset(AssetKey key, string name, Func<AssetKey, object> loaderFunc)
         {
             if(key.Type != AssetType.SoundBank)
                 throw new InvalidOperationException($"Called SoundBankLocator with unexpected asset type {key.Type}");
 
-            var config = (IGeneralConfig)loaderFunc(new AssetKey(AssetType.GeneralConfig), "");
+            var config = (IGeneralConfig)loaderFunc(new AssetKey(AssetType.GeneralConfig));
             var oplPath = Path.Combine(config.ExePath, "DRIVERS", "ALBISND.OPL");
             GlobalTimbreLibrary oplFile = ReadOpl(oplPath);
             WoplFile wopl = new WoplFile(oplFile);

@@ -6,7 +6,7 @@ namespace UAlbion.Formats.MapEvents
 {
     public class QueryEvent : MapEvent, IQueryEvent
     {
-        public static IQueryEvent Serdes(IQueryEvent genericEvent, ISerializer s, AssetType textType, int textSourceId)
+        public static IQueryEvent Serdes(IQueryEvent genericEvent, ISerializer s, AssetType textType, ushort textSourceId)
         {
             var subType = s.EnumU8("SubType", genericEvent?.QueryType ?? QueryType.IsScriptDebugModeActive);
             switch (subType)

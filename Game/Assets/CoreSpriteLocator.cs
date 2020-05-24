@@ -11,7 +11,7 @@ namespace UAlbion.Game.Assets
     public class CoreSpriteLocator : Component, IAssetLocator
     {
         public IEnumerable<AssetType> SupportedTypes => new[] { AssetType.CoreGraphics, AssetType.CoreGraphicsMetadata, AssetType.CoreSpriteConfig };
-        public object LoadAsset(AssetKey key, string name, Func<AssetKey, string, object> loaderFunc)
+        public object LoadAsset(AssetKey key, string name, Func<AssetKey, object> loaderFunc)
         {
             if (key.Type == AssetType.CoreSpriteConfig)
             {
@@ -19,8 +19,8 @@ namespace UAlbion.Game.Assets
                 return CoreSpriteConfig.Load(settings.BasePath);
             }
 
-            var generalConfig = (GeneralConfig)loaderFunc(new AssetKey(AssetType.GeneralConfig), "GeneralConfig");
-            var coreSpriteConfig = (CoreSpriteConfig)loaderFunc(new AssetKey(AssetType.CoreSpriteConfig), "CoreSpriteConfig");
+            var generalConfig = (GeneralConfig)loaderFunc(new AssetKey(AssetType.GeneralConfig));
+            var coreSpriteConfig = (CoreSpriteConfig)loaderFunc(new AssetKey(AssetType.CoreSpriteConfig));
 
             var exePath = Path.Combine(generalConfig.BasePath, generalConfig.ExePath);
             if (key.Type == AssetType.CoreGraphics)

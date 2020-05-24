@@ -15,14 +15,14 @@ namespace UAlbion.Game.Gui.Inventory
         const string TimerName = "InventorySlot.ClickTimer";
 
         readonly ButtonFrame _frame;
-        readonly UiSpriteElement<ItemSpriteId> _sprite;
+        readonly UiSpriteElement<AssetId> _sprite;
         readonly Func<ItemData> _getItem;
         readonly Vector2 _size;
 
         int _frameNumber;
         bool _isClickTimerPending;
 
-        public VisualInventorySlot(bool isBodyPart, IText amountSource, Func<ItemData> getItem)
+        public VisualInventorySlot(ItemSlotId slotId, IText amountSource, Func<ItemData> getItem)
         {
             On<UiLeftClickEvent>(OnClick);
             On<UiRightClickEvent>(OnRightClicked);
@@ -34,18 +34,52 @@ namespace UAlbion.Game.Gui.Inventory
             });
 
             _getItem = getItem;
-            _size = isBodyPart ? new Vector2(16, 16) : new Vector2(16, 20);
-            _sprite = new UiSpriteElement<ItemSpriteId>(0) { SubId = (int)ItemSpriteId.Nothing };
+            _size = slotId.IsBodyPart() ? new Vector2(16, 16) : new Vector2(16, 20);
             var text = new UiText(amountSource);
 
-            _frame = AttachChild(new ButtonFrame(new FixedPositionStack()
-                .Add(_sprite, 0, 0, 16, 16)
-                .Add(text, 0, 20 - 9, 16, 9))
+            if (!slotId.IsSpecial())
             {
-                Padding = -1,
-                Theme = isBodyPart ? (ButtonFrame.ThemeFunction)ButtonTheme.Default : ButtonTheme.InventorySlot,
-                State = isBodyPart ? ButtonState.Normal : ButtonState.Pressed
-            });
+                _sprite = new UiSpriteElement<AssetId>(ItemSpriteId.Nothing.ToAssetId())
+                {
+                    SubId = (int)ItemSpriteId.Nothing
+                };
+
+                _frame = AttachChild(new ButtonFrame(new FixedPositionStack()
+                    .Add(_sprite, 0, 0, 16, 16)
+                    .Add(text, 0, 20 - 9, 16, 9))
+                {
+                    Padding = -1,
+                    Theme = slotId.IsBodyPart()
+                        ? (ButtonFrame.ThemeFunction) ButtonTheme.Default
+                        : ButtonTheme.InventorySlot,
+                    State = slotId.IsBodyPart() ? ButtonState.Normal : ButtonState.Pressed
+                });
+            }
+            else
+            {
+                _sprite = new UiSpriteElement<AssetId>(
+                    slotId == ItemSlotId.Gold
+                        ? CoreSpriteId.UiGold.ToAssetId()
+                        : CoreSpriteId.UiFood.ToAssetId());
+
+                _frame = AttachChild(new ButtonFrame(
+                    new VerticalStack(
+                        new Spacing(31, 0),
+                        _sprite,
+                        new UiText(amountSource)
+                    ) { Greedy = false }
+                ));
+            }
+/*
+
+            _frame = AttachChild(new ButtonFrame(
+                new VerticalStack(
+                    new Spacing(64, 0),
+                    new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiGold) { Flags = SpriteFlags.Highlight },
+                    new UiText(amountSource) 
+                ) { Greedy = false}, () => { }
+            ) { IsPressed = true });
+*/
         }
 
         public ButtonState State { get => _frame.State; set => _frame.State = value; }

@@ -29,7 +29,7 @@ namespace UAlbion.Formats.Parsers
             sheet.Languages = s.EnumU8("Languages", sheet.Languages);
             s.Check();
 
-            sheet.SpriteType =
+            var spriteType =
                 sheet.Type switch
                 {
                     CharacterType.Party => AssetType.BigPartyGraphics,
@@ -38,7 +38,8 @@ namespace UAlbion.Formats.Parsers
                     _ => throw new InvalidOperationException($"Unhandled character type {sheet.Type}")
                 };
 
-            sheet.SpriteId = s.UInt8("SpriteId ", sheet.SpriteId);
+            byte spriteId = s.UInt8("SpriteId ", (byte)sheet.SpriteId.Id);
+            sheet.SpriteId = new AssetId(spriteType, spriteId);
             sheet.PortraitId = (SmallPortraitId?)Tweak.Serdes("PortraitId ", (byte?)sheet.PortraitId, s.UInt8);
             sheet.Unknown11 = s.UInt8("Unknown11 ", sheet.Unknown11);
             sheet.Unknown12 = s.UInt8("Unknown12", sheet.Unknown12);

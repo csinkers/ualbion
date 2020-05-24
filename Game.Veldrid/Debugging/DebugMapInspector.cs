@@ -200,6 +200,7 @@ namespace UAlbion.Game.Veldrid.Debugging
                     DebugFlagOption(DebugFlags.ShowPaths);
                     DebugFlagOption(DebugFlags.NoMapTileBoundingBoxes);
                     DebugFlagOption(DebugFlags.ShowCursorHotspot);
+                    DebugFlagOption(DebugFlags.TraceAttachment);
                     ImGui.TreePop();
                 }
 #endif

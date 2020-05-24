@@ -10,7 +10,6 @@ namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryScreen : Dialog
     {
-        const string ExitButtonId = "Inventory.Exit";
         readonly InventoryConfig _config;
         InventoryMode _mode;
         int _modeSpecificId;
@@ -22,7 +21,6 @@ namespace UAlbion.Game.Gui.Inventory
             On<InventoryModeEvent>(SetMode);
             On<InventoryChestModeEvent>(SetMode);
             On<InventoryMerchantModeEvent>(SetMode);
-            On<ButtonPressEvent>(e => OnButton(e.ButtonId));
 
             _config = config;
         }
@@ -47,15 +45,6 @@ namespace UAlbion.Game.Gui.Inventory
             Rebuild();
         }
 
-        void OnButton(string buttonId)
-        {
-            switch (buttonId)
-            {
-                case ExitButtonId: Raise(new PopSceneEvent()); break;
-                default: return;
-            }
-        }
-
         void Rebuild()
         {
             RemoveAllChildren();
@@ -76,7 +65,11 @@ namespace UAlbion.Game.Gui.Inventory
                 };
 
             var middlePane = new InventoryMidPane(_activeCharacter, _config.Positions[_activeCharacter]);
-            var rightPane = new InventoryRightPane(_activeCharacter, ExitButtonId, _mode == InventoryMode.Merchant);
+            var rightPane = new InventoryRightPane(
+                _activeCharacter,
+                () => Raise(new PopSceneEvent()),
+                _mode == InventoryMode.Merchant);
+
             // var frameDivider = new FrameDivider(135, 0, 4, 192);
 
             AttachChild(new UiFixedPositionElement<SlabId>(SlabId.SLAB, UiConstants.UiExtents));

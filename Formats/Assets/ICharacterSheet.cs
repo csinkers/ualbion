@@ -14,8 +14,7 @@ namespace UAlbion.Formats.Assets
         ushort Age { get; }
         byte Level { get; }
 
-        byte SpriteId { get; }
-        AssetType SpriteType { get; }
+        AssetId SpriteId { get; }
         SmallPortraitId? PortraitId { get; }
         EventSetId EventSetId { get; }
         EventSetId WordSetId { get; }
@@ -28,6 +27,7 @@ namespace UAlbion.Formats.Assets
         ICharacterSkills Skills { get; }
         ICombatAttributes Combat { get; }
     }
+
     public interface IEffectiveCharacterSheet : ICharacterSheet
     {
         int TotalWeight { get; }

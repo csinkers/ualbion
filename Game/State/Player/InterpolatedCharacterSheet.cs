@@ -32,8 +32,7 @@ namespace UAlbion.Game.State.Player
         public PlayerClass Class => _b().Class;
         public ushort Age => _b().Age;
         public byte Level => _b().Level;
-        public byte SpriteId => _b().SpriteId;
-        public AssetType SpriteType => _b().SpriteType;
+        public AssetId SpriteId => _b().SpriteId;
         public SmallPortraitId? PortraitId => _b().PortraitId;
         public EventSetId EventSetId => _b().EventSetId;
         public EventSetId WordSetId => _b().WordSetId;

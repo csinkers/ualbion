@@ -9,13 +9,13 @@ namespace UAlbion.Formats.AssetIds
             => new StringId(AssetType.SystemText, 0, (int)systemTextId);
 
         public static StringId ToId(this UAlbionStringId id)
-            => new StringId(AssetType.UAlbionText, (int)id, 0);
+            => new StringId(AssetType.UAlbionText, (ushort)id, 0);
 
         public static StringId ToId(this WordId id)
-            => new StringId(AssetType.Dictionary, (int)id / 500, (int)id);
+            => new StringId(AssetType.Dictionary, (ushort)((int)id / 500), (int)id);
 
         public static StringId ToId(this ItemId id)
-            => new StringId(AssetType.ItemNames, (int)id, 0);
+            => new StringId(AssetType.ItemNames, (ushort)id, 0);
 
         public static StringId ToId(this ItemType type)
             => new StringId(AssetType.SystemText, 0, (int)(type switch

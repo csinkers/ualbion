@@ -5,13 +5,13 @@ namespace UAlbion.Formats.MapEvents
 {
     public class OpenChestEvent : MapEvent, ITextEvent
     {
-        OpenChestEvent(AssetType textType, int textSourceId)
+        OpenChestEvent(AssetType textType, ushort textSourceId)
         {
             TextType = textType;
             TextSourceId = textSourceId;
         }
 
-        public static OpenChestEvent Serdes(OpenChestEvent e, ISerializer s, AssetType textType, int textSourceId)
+        public static OpenChestEvent Serdes(OpenChestEvent e, ISerializer s, AssetType textType, ushort textSourceId)
         {
             e ??= new OpenChestEvent(textType, textSourceId);
             e.LockStrength = s.UInt8(nameof(LockStrength), e.LockStrength);
@@ -32,6 +32,6 @@ namespace UAlbion.Formats.MapEvents
         public override string ToString() => $"open_chest {ChestId} Trap:{TrapEvent} Key:{KeyItemId} Lock:{LockStrength} Opened:{OpenedMessageId} Closed:{ClosedMessageId}";
         public override MapEventType EventType => MapEventType.Chest;
         public AssetType TextType { get; }
-        public int TextSourceId { get; }
+        public ushort TextSourceId { get; }
     }
 }

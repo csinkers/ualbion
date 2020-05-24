@@ -9,25 +9,22 @@ namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryExitButton : UiElement
     {
-        readonly string _buttonId;
         UiSpriteElement<CoreSpriteId> _sprite;
         ButtonState _state;
 
-        public InventoryExitButton(string buttonId)
+        public InventoryExitButton(Action action)
         {
             On<HoverEvent>(e => _state = ButtonState.Hover);
             On<BlurEvent>(e => _state = ButtonState.Normal);
             On<UiLeftClickEvent>(e => _state = ButtonState.Clicked);
             On<UiLeftReleaseEvent>(e =>
             {
-                if (_state == ButtonState.Clicked)
-                {
-                    Raise(new ButtonPressEvent(_buttonId));
-                    _state = ButtonState.Normal;
-                }
-            });
+                if (_state != ButtonState.Clicked)
+                    return;
 
-            _buttonId = buttonId;
+                action();
+                _state = ButtonState.Normal;
+            });
         }
 
         protected override void Subscribed()

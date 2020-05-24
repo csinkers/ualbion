@@ -74,7 +74,7 @@ namespace UAlbion.Game.Assets
             { AssetType.CombatGraphics,     (AssetLocation.Base,      "COMGFX!.XLD" ) }, // Various sprites and effects for 3D combat screen, spells etc
             { AssetType.TacticalIcon,       (AssetLocation.Base,      "TACTICO!.XLD") }, // Sprites for the combat chessboard-view
             { AssetType.CombatBackground,   (AssetLocation.Base,      "COMBACK!.XLD") }, // Background graphics for combat
-            { AssetType.SpellData,          (AssetLocation.Base,      "SPELLDAT.DAT") }, // Spell definitions & statistics
+            { AssetType.SpellData,          (AssetLocation.BaseRaw,   "SPELLDAT.DAT") }, // Spell definitions & statistics
         };
         // ReSharper restore StringLiteralTypo
 

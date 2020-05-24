@@ -71,87 +71,65 @@ namespace UAlbion.Game.Assets
             return palette;
         }
 
-        public ITexture LoadTexture(AssetType type, int id) => type switch
+        public ITexture LoadTexture(AssetType type, int id) => (ITexture)(type switch
             {
-                AssetType.AutomapGraphics    => LoadTexture((AutoMapId)id),
-                AssetType.BackgroundGraphics => LoadTexture((DungeonBackgroundId)id),
-                AssetType.BigNpcGraphics     => LoadTexture((LargeNpcId)id),
-                AssetType.BigPartyGraphics   => LoadTexture((LargePartyGraphicsId)id),
-                AssetType.CombatBackground   => LoadTexture((CombatBackgroundId)id),
-                AssetType.CombatGraphics     => LoadTexture((CombatGraphicsId)id),
-                AssetType.Floor3D            => LoadTexture((DungeonFloorId)id),
-                AssetType.Font               => LoadTexture((FontId)id),
-                AssetType.FullBodyPicture    => LoadTexture((FullBodyPictureId)id),
-                AssetType.IconGraphics       => LoadTexture((IconGraphicsId)id),
-                AssetType.ItemGraphics       => LoadTexture((ItemSpriteId)id),
-                AssetType.MonsterGraphics    => LoadTexture((MonsterGraphicsId)id),
-                AssetType.Object3D           => LoadTexture((DungeonObjectId)id),
-                AssetType.Overlay3D          => LoadTexture((DungeonOverlayId)id),
-                AssetType.Picture            => LoadTexture((PictureId)id),
-                AssetType.SmallNpcGraphics   => LoadTexture((SmallNpcId)id),
-                AssetType.SmallPartyGraphics => LoadTexture((SmallPartyGraphicsId)id),
-                AssetType.SmallPortrait      => LoadTexture((SmallPortraitId)id),
-                AssetType.TacticalIcon       => LoadTexture((TacticId)id),
-                AssetType.Wall3D             => LoadTexture((DungeonWallId)id),
-                AssetType.CoreGraphics       => LoadTexture((CoreSpriteId)id),
-                AssetType.Slab               => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.Slab, 0),
-                _ => (ITexture)_assetLocatorRegistry.LoadAssetCached(type, id)
-            };
+                AssetType.AutomapGraphics    => _assetLocatorRegistry.LoadAssetCached(AssetType.AutomapGraphics, id),
+                AssetType.CombatBackground   => _assetLocatorRegistry.LoadAssetCached(AssetType.CombatBackground, id),
+                AssetType.CombatGraphics     => _assetLocatorRegistry.LoadAssetCached(AssetType.CombatGraphics, id),
+                AssetType.CoreGraphics       => _assetLocatorRegistry.LoadAssetCached(AssetType.CoreGraphics, id),
+                AssetType.BackgroundGraphics => _assetLocatorRegistry.LoadAssetCached(AssetType.BackgroundGraphics, id),
+                AssetType.Floor3D            => _assetLocatorRegistry.LoadAssetCached(AssetType.Floor3D, id),
+                AssetType.Object3D           => _assetLocatorRegistry.LoadAssetCached(AssetType.Object3D, id),
+                AssetType.Overlay3D          => _assetLocatorRegistry.LoadAssetCached(AssetType.Overlay3D, id),
+                AssetType.Wall3D             => _assetLocatorRegistry.LoadAssetCached(AssetType.Wall3D, id),
+                AssetType.Font               => _assetLocatorRegistry.LoadAssetCached(AssetType.Font, id),
+                AssetType.FullBodyPicture    => _assetLocatorRegistry.LoadAssetCached(AssetType.FullBodyPicture, id),
+                AssetType.IconGraphics       => _assetLocatorRegistry.LoadAssetCached(AssetType.IconGraphics, id),
+                AssetType.ItemGraphics       => _assetLocatorRegistry.LoadAssetCached(AssetType.ItemGraphics, 0),
+                AssetType.BigNpcGraphics     => _assetLocatorRegistry.LoadAssetCached(AssetType.BigNpcGraphics, id),
+                AssetType.BigPartyGraphics   => _assetLocatorRegistry.LoadAssetCached(AssetType.BigPartyGraphics, id),
+                AssetType.MetaFont           => _assetLocatorRegistry.LoadAssetCached(AssetType.MetaFont, id),
+                AssetType.MonsterGraphics    => _assetLocatorRegistry.LoadAssetCached(AssetType.MonsterGraphics, id),
+                AssetType.Picture            => _assetLocatorRegistry.LoadAssetCached(AssetType.Picture, id),
+                AssetType.SmallNpcGraphics   => _assetLocatorRegistry.LoadAssetCached(AssetType.SmallNpcGraphics, id),
+                AssetType.SmallPartyGraphics => _assetLocatorRegistry.LoadAssetCached(AssetType.SmallPartyGraphics, id),
+                AssetType.SmallPortrait      => _assetLocatorRegistry.LoadAssetCached(AssetType.SmallPortrait, id),
+                AssetType.TacticalIcon       => _assetLocatorRegistry.LoadAssetCached(AssetType.TacticalIcon, id),
+                AssetType.Slab               => _assetLocatorRegistry.LoadAssetCached(AssetType.Slab, 0),
+                _ => _assetLocatorRegistry.LoadAssetCached(type, id)
+            });
 
-        public ITexture LoadTexture<T>(T id)
+        public ITexture LoadTexture<T>(T id) => (ITexture)(id switch
         {
-            if (id is AutoMapId autoMapId) return LoadTexture(autoMapId);
-            if (id is CombatBackgroundId combatBackgroundId)     return LoadTexture(combatBackgroundId);
-            if (id is CombatGraphicsId combatGraphicsId)         return LoadTexture(combatGraphicsId);
-            if (id is CoreSpriteId coreSpriteId)                 return LoadTexture(coreSpriteId);
-            if (id is DungeonBackgroundId dungeonBackgroundId)   return LoadTexture(dungeonBackgroundId);
-            if (id is DungeonFloorId dungeonFloorId)             return LoadTexture(dungeonFloorId);
-            if (id is DungeonObjectId dungeonObjectId)           return LoadTexture(dungeonObjectId);
-            if (id is DungeonOverlayId dungeonOverlayeId)        return LoadTexture(dungeonOverlayeId);
-            if (id is DungeonWallId dungeonWallId)               return LoadTexture(dungeonWallId);
-            if (id is FontId fontId)                             return LoadTexture(fontId);
-            if (id is FullBodyPictureId fullBodyPictureId)       return LoadTexture(fullBodyPictureId);
-            if (id is IconGraphicsId iconGraphicsId)             return LoadTexture(iconGraphicsId);
-            if (id is ItemSpriteId itemSpriteId)                 return LoadTexture(itemSpriteId);
-            if (id is LargeNpcId largeNpcId)                     return LoadTexture(largeNpcId);
-            if (id is LargePartyGraphicsId largePartyGraphicsId) return LoadTexture(largePartyGraphicsId);
-            if (id is MetaFontId metaFontId)                     return LoadTexture(metaFontId);
-            if (id is MonsterGraphicsId monsterGraphicsId)       return LoadTexture(monsterGraphicsId);
-            if (id is PictureId pictureId)                       return LoadTexture(pictureId);
-            if (id is SmallNpcId smallNpcId)                     return LoadTexture(smallNpcId);
-            if (id is SmallPartyGraphicsId smallPartyGraphicsId) return LoadTexture(smallPartyGraphicsId);
-            if (id is SmallPortraitId smallPortraitId)           return LoadTexture(smallPortraitId);
-            if (id is TacticId tacticId)                         return LoadTexture(tacticId);
-            if (id is SlabId _) return (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.Slab, 0);
-            throw new NotImplementedException();
-        }
+            AutoMapId x                  => _assetLocatorRegistry.LoadAssetCached(AssetType.AutomapGraphics, x),
+            CombatBackgroundId x         => _assetLocatorRegistry.LoadAssetCached(AssetType.CombatBackground, x),
+            CombatGraphicsId x           => _assetLocatorRegistry.LoadAssetCached(AssetType.CombatGraphics, x),
+            CoreSpriteId x               => _assetLocatorRegistry.LoadAssetCached(AssetType.CoreGraphics, x),
+            DungeonBackgroundId x        => _assetLocatorRegistry.LoadAssetCached(AssetType.BackgroundGraphics, x),
+            DungeonFloorId x             => _assetLocatorRegistry.LoadAssetCached(AssetType.Floor3D, x),
+            DungeonObjectId x            => _assetLocatorRegistry.LoadAssetCached(AssetType.Object3D, x),
+            DungeonOverlayId x           => _assetLocatorRegistry.LoadAssetCached(AssetType.Overlay3D, x),
+            DungeonWallId x              => _assetLocatorRegistry.LoadAssetCached(AssetType.Wall3D, x),
+            FontId x                     => _assetLocatorRegistry.LoadAssetCached(AssetType.Font, x),
+            FullBodyPictureId x          => _assetLocatorRegistry.LoadAssetCached(AssetType.FullBodyPicture, x),
+            IconGraphicsId x             => _assetLocatorRegistry.LoadAssetCached(AssetType.IconGraphics, x),
+            ItemSpriteId _               => _assetLocatorRegistry.LoadAssetCached(AssetType.ItemGraphics, 0),
+            LargeNpcId x                 => _assetLocatorRegistry.LoadAssetCached(AssetType.BigNpcGraphics, x),
+            LargePartyGraphicsId x       => _assetLocatorRegistry.LoadAssetCached(AssetType.BigPartyGraphics, x),
+            MetaFontId x                 => _assetLocatorRegistry.LoadAssetCached(AssetType.MetaFont, x),
+            MonsterGraphicsId x          => _assetLocatorRegistry.LoadAssetCached(AssetType.MonsterGraphics, x),
+            PictureId x                  => _assetLocatorRegistry.LoadAssetCached(AssetType.Picture, x),
+            SmallNpcId x                 => _assetLocatorRegistry.LoadAssetCached(AssetType.SmallNpcGraphics, x),
+            SmallPartyGraphicsId x       => _assetLocatorRegistry.LoadAssetCached(AssetType.SmallPartyGraphics, x),
+            SmallPortraitId x            => _assetLocatorRegistry.LoadAssetCached(AssetType.SmallPortrait, x),
+            TacticId x                   => _assetLocatorRegistry.LoadAssetCached(AssetType.TacticalIcon, x),
+            SlabId _                     => _assetLocatorRegistry.LoadAssetCached(AssetType.Slab, 0),
+            _ => throw new ArgumentOutOfRangeException(nameof(id), $"Expected texture id, but given a {typeof(T)}")
+        });
 
-        public ITexture LoadTexture(AutoMapId id)                  => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.AutomapGraphics, id);
-        public ITexture LoadTexture(CombatBackgroundId id)         => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.CombatBackground, id);
-        public ITexture LoadTexture(CombatGraphicsId id)           => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.CombatGraphics, id);
-        public ITexture LoadTexture(CoreSpriteId id)               => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.CoreGraphics, id);
-        public ITexture LoadTexture(DungeonBackgroundId id)        => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.BackgroundGraphics, id);
-        public ITexture LoadTexture(DungeonFloorId id)             => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.Floor3D, id);
-        public ITexture LoadTexture(DungeonObjectId id)            => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.Object3D, id);
-        public ITexture LoadTexture(DungeonOverlayId id)           => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.Overlay3D, id);
-        public ITexture LoadTexture(DungeonWallId id)              => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.Wall3D, id);
-        public ITexture LoadTexture(FontId id)                     => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.Font, id);
-        public ITexture LoadTexture(FullBodyPictureId id)          => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.FullBodyPicture, id);
-        public ITexture LoadTexture(IconGraphicsId id)             => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.IconGraphics, id);
-        public ITexture LoadTexture(ItemSpriteId id)               => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.ItemGraphics, 0);
-        public ITexture LoadTexture(LargeNpcId id)                 => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.BigNpcGraphics, id);
-        public ITexture LoadTexture(LargePartyGraphicsId id)       => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.BigPartyGraphics, id);
-        public ITexture LoadTexture(MetaFontId id)                 => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.MetaFont, id);
-        public ITexture LoadTexture(MonsterGraphicsId id)          => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.MonsterGraphics, id);
-        public ITexture LoadTexture(PictureId id)                  => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.Picture, id);
-        public ITexture LoadTexture(SmallNpcId id)                 => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.SmallNpcGraphics, id);
-        public ITexture LoadTexture(SmallPartyGraphicsId id)       => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.SmallPartyGraphics, id);
-        public ITexture LoadTexture(SmallPortraitId id)            => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.SmallPortrait, id);
-        public ITexture LoadTexture(TacticId id)                   => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.TacticalIcon, id);
-        public TilesetData LoadTileData(TilesetId id)              => (TilesetData)_assetLocatorRegistry.LoadAssetCached(AssetType.Tileset, id);
+        public ITexture LoadFont(FontColor color, bool isBold) => (ITexture)_assetLocatorRegistry.LoadAssetCached(AssetType.MetaFont, new MetaFontId(isBold, color));
+        public TilesetData LoadTileData(TilesetId id) => (TilesetData)_assetLocatorRegistry.LoadAssetCached(AssetType.Tileset, id);
         public LabyrinthData LoadLabyrinthData(LabyrinthDataId id) => (LabyrinthData)_assetLocatorRegistry.LoadAssetCached(AssetType.LabData, id);
-        public ITexture LoadFont(FontColor color, bool isBold)     => LoadTexture(new MetaFontId(isBold, color));
-
         public IAssetConfig LoadAssetConfig() => (IAssetConfig) _assetLocatorRegistry.LoadAssetCached(AssetType.AssetConfig, 0);
         public IGeneralConfig LoadGeneralConfig() => (IGeneralConfig) _assetLocatorRegistry.LoadAssetCached(AssetType.GeneralConfig, 0);
         public CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id) =>
@@ -202,6 +180,12 @@ namespace UAlbion.Game.Assets
         public EventSet LoadEventSet(EventSetId eventSetId) => (EventSet)_assetLocatorRegistry.LoadAssetCached(AssetType.EventSet, eventSetId);
         public byte[] LoadSong(SongId songId) => (byte[]) _assetLocatorRegistry.LoadAssetCached(AssetType.Song, songId);
         public IList<IEvent> LoadScript(ScriptId scriptId) => (IList<IEvent>) _assetLocatorRegistry.LoadAsset(AssetType.Script, scriptId);
+
+        public SpellData LoadSpell(SpellId spellId)
+        {
+            var spells = (IList<SpellData>)_assetLocatorRegistry.LoadAssetCached(AssetType.SpellData, 0);
+            return spells[(int)spellId];
+        }
 
         public IText FormatText(StringId stringId, GameLanguage language, Action<TextFormatter> action = null) =>
             new DynamicText(() =>

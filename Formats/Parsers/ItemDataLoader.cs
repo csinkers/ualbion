@@ -9,7 +9,9 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.ItemData)]
     public class ItemDataLoader : IAssetLoader<IList<ItemData>>
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config) => Serdes(null, new AlbionReader(br, streamLength), name, config);
+        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config) =>
+            Serdes(null, new AlbionReader(br, streamLength), name, config);
+
         public IList<ItemData> Serdes(IList<ItemData> items, ISerializer s, string name, AssetInfo config)
         {
             items ??= new List<ItemData>();
@@ -26,7 +28,7 @@ namespace UAlbion.Formats.Parsers
             else
             {
                 foreach (var item in items)
-                    ItemData.Serdes((int)item.Id, item, s);
+                    ItemData.Serdes((int) item.Id, item, s);
             }
 
             return items;

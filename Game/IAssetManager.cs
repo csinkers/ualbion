@@ -45,6 +45,7 @@ namespace UAlbion.Game
         EventSet LoadEventSet(EventSetId eventSetId);
         byte[] LoadSong(SongId songId);
         IList<IEvent> LoadScript(ScriptId scriptId);
+        SpellData LoadSpell(SpellId spellId);
 
         IText FormatText(StringId stringId, GameLanguage language, Action<TextFormatter> action = null);
     }

@@ -3,15 +3,15 @@
 namespace UAlbion.Formats.Assets
 {
     [Flags]
-    public enum SpellTarget
+    public enum SpellTarget : byte
     {
-        Unk0 = 1,
-        Unk1,
-        Unk2,
-        Unk3,
-        Unk4,
-        Unk5,
-        Unk6,
-        Unk7,
+        Party     = 1 << 0,
+        Unk1      = 1 << 1,
+        DeadParty = 1 << 2,
+        Monsters1 = 1 << 3,
+        Monsters2 = 1 << 4,
+        Monsters3 = 1 << 5,
+        Unk6      = 1 << 6,
+        MapTile   = 1 << 7,
     }
 }

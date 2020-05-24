@@ -80,15 +80,23 @@ namespace UAlbion
                 case ExecutionMode.DumpData:
                     var textManager = new TextManager();
                     exchange.Attach(textManager);
+                    DumpType dumpTypes = DumpType.All;
+                    if (commandLine.GameModeArgument != null)
+                    {
+                        dumpTypes = 0;
+                        foreach(var t in commandLine.GameModeArgument.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                            dumpTypes |= Enum.Parse<DumpType>(t);
+                    }
 
-                    Dump.CoreSprites(assets, baseDir);
-                    Dump.CharacterSheets(assets, textManager, baseDir);
-                    Dump.Chests(assets, baseDir);
-                    Dump.ItemData(assets, baseDir);
-                    Dump.MapEvents(assets, baseDir);
-                    Dump.EventSets(assets, baseDir);
-                    Dump.MapData(assets, textManager, baseDir);
-                    Dump.ThreeDMapAndLabInfo(assets, baseDir);
+                    if ((dumpTypes & DumpType.Characters) != 0) Dump.CharacterSheets(assets, textManager, baseDir);
+                    if ((dumpTypes & DumpType.Chests) != 0) Dump.Chests(assets, baseDir);
+                    if ((dumpTypes & DumpType.CoreSprites) != 0) Dump.CoreSprites(assets, baseDir);
+                    if ((dumpTypes & DumpType.EventSets) != 0) Dump.EventSets(assets, baseDir);
+                    if ((dumpTypes & DumpType.Items) != 0) Dump.ItemData(assets, baseDir);
+                    if ((dumpTypes & DumpType.MapEvents) != 0) Dump.MapEvents(assets, baseDir);
+                    if ((dumpTypes & DumpType.Maps) != 0) Dump.MapData(assets, textManager, baseDir);
+                    if ((dumpTypes & DumpType.Spells) != 0) Dump.Spells(assets, textManager, baseDir);
+                    if ((dumpTypes & DumpType.ThreeDMaps) != 0) Dump.ThreeDMapAndLabInfo(assets, baseDir);
                     break;
 
                 case ExecutionMode.Exit: break;

@@ -13,6 +13,22 @@ namespace UAlbion
         Inventory
     }
 
+    [Flags]
+    public enum DumpType
+    {
+        Characters  = 1 << 0,
+        Chests      = 1 << 1,
+        CoreSprites = 1 << 2,
+        EventSets   = 1 << 3,
+        Items       = 1 << 4,
+        MapEvents   = 1 << 5,
+        Maps        = 1 << 6,
+        Spells      = 1 << 7,
+        ThreeDMaps  = 1 << 8,
+
+        All = 0x7fffffff
+    }
+
     class CommandLineOptions
     {
         public GraphicsBackend Backend { get; }
@@ -61,8 +77,16 @@ namespace UAlbion
                 Mode = ExecutionMode.Editor;
             if (args.Contains("--save-tests"))
                 Mode = ExecutionMode.SavedGameTests;
-            if (args.Contains("--dump-data"))
+
+            if (args.Contains("--dump-all"))
                 Mode = ExecutionMode.DumpData;
+
+            var index = FindArgIndex("--dump", args);
+            if (index != -1)
+            {
+                Mode = ExecutionMode.DumpData;
+                GameModeArgument = args[index + 1];
+            }
 
             if (Mode == ExecutionMode.Game)
             {
@@ -72,7 +96,7 @@ namespace UAlbion
                 if (args.Contains("--inventory"))
                     GameMode = GameMode.Inventory;
 
-                var index = FindArgIndex("--load-game", args);
+                index = FindArgIndex("--load-game", args);
                 if (index > -1)
                 {
                     GameMode = GameMode.LoadGame;
@@ -99,7 +123,12 @@ namespace UAlbion
 
         void DisplayUsage()
         {
-            Console.WriteLine(@"UAlbion
+            var dumpTypes = string.Join(" ",
+                Enum.GetValues(typeof(DumpType))
+                    .Cast<DumpType>()
+                    .Select(x => x.ToString()));
+
+            Console.WriteLine($@"UAlbion
 Command Line Options:
 
     -h --help /? help  : Display this help
@@ -121,7 +150,8 @@ Execution Mode:
     --audio : Runs as an audio worker process
     --editor : Runs the editor (TODO)
     --save-tests : Runs the saved game tests
-    --dump-data : Dumps a variety of game data to text files
+    --dump-all : Dumps a variety of game data to text files
+    --dump ""[dumpTypes]"": Dump specific types of game data (space separated list, valid types: {dumpTypes})
 
 Game Mode: (if running as game)
         --main-menu (default)

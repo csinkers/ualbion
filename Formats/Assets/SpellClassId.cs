@@ -8,8 +8,9 @@ namespace UAlbion.Formats.Assets
         DjiKantos    = 1, // Enlightened ones
         Druid        = 2, // Mellthas
         OquloKamulos = 3, // Khunag
-        Unk4         = 4, // Monsters only
+        Unk4         = 4, // Unused
         ZombieMagic  = 5, // Monsters only
+        Unk6         = 6, // Unused
     }
 
     [Flags]

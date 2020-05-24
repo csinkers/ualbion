@@ -13,6 +13,7 @@ using UAlbion.Formats.MapEvents;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Entities;
+using UAlbion.Game.Gui.Text;
 
 namespace UAlbion
 {
@@ -477,6 +478,25 @@ namespace UAlbion
                     var chainId = set.Chains.Select((x, i) => x.FirstEvent == e ? i : (int?) null).FirstOrDefault(x => x != null);
                     PrintEvent(sw, formatter, e, chainId);
                 }
+            }
+        }
+
+        public static void Spells(AssetManager assets, TextManager textManager, string baseDir)
+        {
+            using var sw = File.CreateText($@"{baseDir}\re\Spells.txt");
+            foreach (var spellId in Enum.GetValues(typeof(SpellId)).Cast<SpellId>())
+            {
+                var spell = assets.LoadSpell(spellId);
+                var systemTextId = (SystemTextId)((int)spellId + (int)SpellData.SystemTextOffset);
+                var systemText = assets.LoadString(systemTextId.ToId(), GameLanguage.English);
+                sw.Write($"Spell{(int) spellId:D3} ");
+                sw.Write($"({spellId}) ".PadRight(24));
+                sw.Write($"\"{systemText}\" ".PadRight(24));
+                sw.Write($"{spell.Cost} ".PadLeft(4));
+                sw.Write($"Lvl:{spell.LevelRequirement} ");
+                sw.Write($"Env:{spell.Environment} ");
+                sw.Write($"Target:{spell.Targets} ");
+                sw.WriteLine();
             }
         }
     }

@@ -5,13 +5,16 @@ namespace UAlbion.Formats.Assets
     [Flags]
     public enum SpellEnvironment : byte
     {
-        Unk0 = 1,
-        Unk1,
-        Unk2,
-        Unk3,
-        Unk4,
-        Unk5,
-        Unk6,
-        Unk7,
+        // The first 4 always appear together: reversing of
+        // the exe will be required to see which is actually which
+        Indoors   = 1 << 0, 
+        Outdoors  = 1 << 1,
+        Dungeon   = 1 << 2,
+        Inventory = 1 << 3,
+
+        Unk4   = 1 << 4,
+        Combat = 1 << 5,
+        Unk6   = 1 << 6,
+        Unk7   = 1 << 7,
     }
 }

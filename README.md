@@ -5,6 +5,8 @@ Prerequisites:
 * .NET Core 3.0
 * Game data from an install of the original game
 
+Issue tracker at [https://trello.com/b/Tcm2WbU1/ualbion](https://trello.com/b/Tcm2WbU1/ualbion)
+
 ## Screenshots:
 ![Example Screenshot 1](/data/Screenshots/1_FirstLevel.png?raw=true)
 ![Example Screenshot 2](/data/Screenshots/2_3DWorld.png?raw=true)
@@ -13,15 +15,34 @@ Prerequisites:
 ![Example Screenshot 5](/data/Screenshots/5_MainMenu.png?raw=true)
 
 ## Current Status:
-You can walk around, and move things about in your inventory but you can't interact with the environment much yet. Still a lot to do, e.g.:
 
-- Audio subsystem, file formats are known, but the music is in the old XMI format which is difficult to play without artifacts. Can convert to MIDI, but some notes skip etc and the instruments don't match up too well.
-- Handling all the event chains that are baked into the maps which define a lot of the gameplay
-- Adding a conversation system (the GUI system it will be built on is mostly done at least)
-- Implementing the combat system (huge job, will require lots of reverse engineering)
-- Wide variety of miscellaneous gameplay behaviours
+Things that are at least somewhat implemented:
+- Rendering of 2D and 3D environments
+- Player movement and collision detection in 2D environments
+- Interaction with the environment, e.g. examining objects, accessing chests and opening doors
+- GUI system for menus, dialogs, inventory etc
+- Inventory management
+- Conversations
+- Sound effects and music (music currently requires some manual steps to setup ADLMIDI.NET / libADLMIDI)
+- Loading/saving saved games
 
-Main goal is to improve the interface and make some visual improvements, the original game was very clicky so adding some pathfinding and a more efficient way of examining and manipulating objects should improve usabability.
+Currently unimplemented:
+- Lighting model for 3D levels
+- Event handling and collision detection in 3D environments
+- Automap for 3D environments
+- Day/night cycle
+- Combat system
+- Magic system
+- NPC movement
+- Video playback
+
+Planned improvements / changes from the original gameplay:
+- Add hotkeys to streamline the interface, reduce the amount of right clicking required etc
+- Add some pathfinding logic to make mouse-based movement easier
+- Add a take-all button when looting chests / fallen foes
+- Graphical improvements in 3D environments
+- Fix bugs in original game (with option to toggle when there is a gameplay impact)
+- At some point, modding support
 
 ## Getting started
 

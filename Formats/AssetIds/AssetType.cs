@@ -11,7 +11,7 @@ namespace UAlbion.Formats.AssetIds
         }
     }
 
-    public enum AssetType
+    public enum AssetType : byte
     {
         AssetConfig,
         CoreSpriteConfig,

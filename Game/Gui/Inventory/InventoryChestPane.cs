@@ -3,8 +3,6 @@ using UAlbion.Formats.Assets;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
-using UAlbion.Game.State;
-using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Inventory
 {
@@ -44,39 +42,20 @@ namespace UAlbion.Game.Gui.Inventory
             var slotStack = new VerticalStack(slotSpans);
             //var slotFrame = new ButtonFrame(slotStack) { State = ButtonState.Pressed, Theme = new FrameTheme() };
 
-            var goldSource = new DynamicText(() =>
-            {
-                var chest = Resolve<IGameState>().GetInventory(InventoryType.Chest, (int)_id);
-                var gold = chest.Gold;
-                return new[] { new TextBlock($"{gold / 10}.{gold % 10}") };
-            }, x => _version);
+            var goldButton = new LogicalInventorySlot(
+                InventoryType.Chest,
+                (int)_id,
+                ItemSlotId.Gold);
 
-            var goldButton = new Button(
-                new VerticalStack(
-                    new Spacing(31, 0),
-                    new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiGold),
-                    new UiText(goldSource)
-                ) { Greedy = false }, () => { } // TODO: Make button functional
-            );
+            var foodButton = new LogicalInventorySlot(
+                InventoryType.Chest,
+                (int)_id,
+                ItemSlotId.Rations);
 
-            var foodSource = new DynamicText(() =>
-            {
-                var chest = Resolve<IGameState>().GetInventory(InventoryType.Chest, (int)_id);
-                var food = chest.Rations;
-                return new[] { new TextBlock(food.ToString()) };
-            }, x => _version);
-
-            var foodButton = new Button(
-                new VerticalStack(
-                    new Spacing(31, 0),
-                    new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiFood),
-                    new UiText(foodSource)
-                ) { Greedy = false }, () => { } // TODO: Make button functional
-            );
-
-            var takeAllButton = new Button(
-                (UiElement)new UiTextBuilder(UAlbionStringId.TakeAll.ToId()).Center(),
-                () => Raise(new InventoryTakeAllEvent(_id)));
+            var takeAllButton =
+                new Button(
+                (UiElement)new UiTextBuilder(UAlbionStringId.TakeAll.ToId()).Center()
+                ).OnClick(() => Raise(new InventoryTakeAllEvent(_id)));
 
             var header = new Header(new StringId(AssetType.SystemText, 0, (int)SystemTextId.Chest_Chest));
             var moneyAndFoodStack = new HorizontalStack(goldButton, takeAllButton, foodButton);

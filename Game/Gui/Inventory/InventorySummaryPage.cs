@@ -16,9 +16,6 @@ namespace UAlbion.Game.Gui.Inventory
         public InventorySummaryPage(PartyCharacterId activeMember)
         {
             _activeMember = activeMember;
-            var background = new FixedPosition(
-                new Rectangle(0, 25, 135, 145),
-                new UiSpriteElement<SmallPortraitId>((SmallPortraitId)(int)activeMember) { Flags = SpriteFlags.GradientPixels });
 
             var summarySource = new DynamicText(BuildSummary);
             var pointsSource = new DynamicText(BuildPoints);
@@ -42,8 +39,15 @@ namespace UAlbion.Game.Gui.Inventory
                     ),
                     new Spacing(4,0)
                 );
-            AttachChild(background);
-            AttachChild(stack);
+
+            AttachChild(new LayerStack(
+                 new FixedPosition(
+                    new Rectangle(0, 25, 135, 145),
+                    new UiSpriteElement<SmallPortraitId>((SmallPortraitId)(int)activeMember)
+                    {
+                        Flags = SpriteFlags.GradientPixels
+                    }),
+                stack));
         }
 
         IEnumerable<TextBlock> BuildSummary()

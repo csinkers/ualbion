@@ -7,18 +7,6 @@ namespace UAlbion.Formats.Assets
     public class ItemData
     {
         public ItemId Id { get; set; }
-        /*public string[] Names { get; set; }
-
-        public string GetName(GameLanguage language) =>
-            language switch
-            {
-                GameLanguage.German => Names[0],
-                GameLanguage.English => Names[1],
-                GameLanguage.French => Names[2],
-                _ => Names[1]
-            };
-        */
-
         public byte Unknown { get; set; }   //  0 Always 0
         public ItemType TypeId { get; set; }   //  1 Item type
         public ItemSlotId SlotType { get; set; }   //  2 Slot that can hold the item

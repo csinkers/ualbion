@@ -25,7 +25,7 @@ namespace UAlbion.Game.Gui.Controls
             DraggingThumb, // If the click was on the thumb, then we transition to this state.
         }
 
-        public SliderTrack(Func<int> getter, Action<int> setter, int min, int max)
+        public SliderTrack(Func<int> getter, Action<int> setter, int min, int max, Func<int, string> format = null)
         {
             On<UiLeftClickEvent>(e =>
             {
@@ -56,7 +56,7 @@ namespace UAlbion.Game.Gui.Controls
             _setter = setter;
             _min = min;
             _max = max;
-            _thumb = new SliderThumb(getter);
+            _thumb = new SliderThumb(getter, format);
             AttachChild(_thumb);
         }
 
@@ -66,7 +66,7 @@ namespace UAlbion.Game.Gui.Controls
         {
             var size = _thumb.GetSize();
             size.X = (int)Math.Max(size.X, 8 * 3); // Reserve at least enough space for 3 digits.
-            size.X = (int)Math.Max(size.X, (float)extents.Width / (_max - _min));
+            size.X = (int)Math.Max(size.X, (float)extents.Width / (_max + 1 - _min));
             int spareWidth = extents.Width - (int)size.X;
             int currentValue = _getter();
 

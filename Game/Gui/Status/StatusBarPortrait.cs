@@ -6,11 +6,14 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
+using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Input;
 using UAlbion.Game.State;
+using UAlbion.Game.State.Player;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Status
@@ -30,11 +33,7 @@ namespace UAlbion.Game.Gui.Status
             On<PartyChangedEvent>(e => LoadSprite());
             On<UiLeftClickEvent>(OnClick);
             On<UiRightClickEvent>(OnRightClick);
-            On<HoverEvent>(e =>
-            {
-                Hover();
-                e.Propagating = false;
-            });
+            On<HoverEvent>(Hover);
             On<BlurEvent>(e =>
             {
                 _portrait.Flags = 0;
@@ -149,13 +148,21 @@ namespace UAlbion.Game.Gui.Status
         void LoadSprite()
         {
             var portraitId = PartyMember?.Apparent.PortraitId;
-            _portrait.Visible = portraitId.HasValue;
+            _portrait.IsActive = portraitId.HasValue;
             if (portraitId.HasValue)
                 _portrait.Id = portraitId.Value;
         }
 
         void OnClick(UiLeftClickEvent e)
         {
+            e.Propagating = false;
+            var inventoryManager = Resolve<IInventoryManager>();
+            if(inventoryManager?.ItemInHand != null)
+            {
+                Raise(new InventoryPickupDropEvent(InventoryType.Player, (int)PartyMember.Id, ItemSlotId.None));
+                return;
+            }
+
             if (_isClickTimerPending) // If they double-clicked...
             {
                 var memberId = PartyMember?.Id;
@@ -181,8 +188,9 @@ namespace UAlbion.Game.Gui.Status
             _isClickTimerPending = false;
         }
 
-        void Hover()
+        void Hover(HoverEvent e)
         {
+            e.Propagating = false;
             _portrait.Flags = SpriteFlags.Highlight;
             var member = PartyMember;
             if (member == null)
@@ -190,14 +198,40 @@ namespace UAlbion.Game.Gui.Status
 
             var settings = Resolve<ISettings>();
             var assets = Resolve<IAssetManager>();
+            var inventoryManager = Resolve<IInventoryManager>();
             var tf = Resolve<ITextFormatter>();
-            var template = assets.LoadString(SystemTextId.PartyPortrait_XLifeMana, settings.Gameplay.Language);
-            // %s (LP:%d, SP:%d)
-            var text = tf.Format(
-                template, 
-                member.Apparent.GetName(settings.Gameplay.Language),
-                member.Apparent.Combat.LifePoints,
-                member.Apparent.Magic.SpellPoints);
+
+            IText text;
+            switch (inventoryManager.ItemInHand)
+            {
+                case ItemSlot item when item.Id.HasValue:
+                    // Give %s to %s
+                    text = tf.Format(
+                        SystemTextId.PartyPortrait_GiveXToX.ToId(),
+                        assets.LoadString(item.Id.Value.ToId(), settings.Gameplay.Language),
+                        member.Apparent.GetName(settings.Gameplay.Language));
+                    break;
+                case GoldInHand _:
+                    // Give gold to %s
+                    text = tf.Format(
+                        SystemTextId.PartyPortrait_GiveGoldToX.ToId(),
+                        member.Apparent.GetName(settings.Gameplay.Language));
+                    break;
+                case RationsInHand _:
+                    // Give food to %s
+                    text = tf.Format(
+                        SystemTextId.PartyPortrait_GiveFoodToX.ToId(),
+                        member.Apparent.GetName(settings.Gameplay.Language));
+                    break;
+                default:
+                    // %s (LP:%d, SP:%d)
+                    text = tf.Format(
+                        SystemTextId.PartyPortrait_XLifeMana.ToId(),
+                        member.Apparent.GetName(settings.Gameplay.Language),
+                        member.Apparent.Combat.LifePoints,
+                        member.Apparent.Magic.SpellPoints);
+                    break;
+            }
 
             Raise(new HoverTextEvent(text));
         }

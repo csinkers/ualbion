@@ -12,13 +12,12 @@ namespace UAlbion.Game.Gui.Controls
     class Button : UiElement
     {
         readonly ButtonFrame _frame;
-        readonly Action _clickAction;
         float _typematicAccrual;
         bool _isPressed;
         bool _isClicked;
         bool _isHovered;
 
-        public Button(IUiElement content, Action action)
+        public Button(IUiElement content)
         {
             On<HoverEvent>(_ => IsHovered = true);
             On<BlurEvent>(_ => IsHovered = false);
@@ -26,7 +25,7 @@ namespace UAlbion.Game.Gui.Controls
             {
                 IsClicked = true;
                 if (Typematic)
-                    _clickAction();
+                    Click?.Invoke();
                 e.Propagating = false;
             });
 
@@ -35,7 +34,7 @@ namespace UAlbion.Game.Gui.Controls
                 if (Typematic)
                     _typematicAccrual = 0;
                 else if (IsClicked && IsHovered)
-                    _clickAction();
+                    Click?.Invoke();
 
                 IsClicked = false;
             });
@@ -52,16 +51,24 @@ namespace UAlbion.Game.Gui.Controls
                 var newAmount = (int)(_typematicAccrual * rate);
                 var delta = newAmount - oldAmount;
                 for (int i = 0; i < delta; i++)
-                    _clickAction();
+                    Click?.Invoke();
             });
 
             _frame = AttachChild(new ButtonFrame(content));
-            _clickAction = action;
         }
 
-        public Button(IText textSource, Action action) : this(new UiText(textSource), action) { }
-        public Button(StringId textId, Action action) : this((IUiElement)new UiTextBuilder(textId).Center().NoWrap(), action) { }
-        public Button(string literalText, Action action) : this((IUiElement)new SimpleText(literalText).Center().NoWrap(), action) { }
+        public Button(IText textSource) : this(new UiText(textSource)) { }
+        public Button(StringId textId) : this((IUiElement)new UiTextBuilder(textId).Center().NoWrap()) { }
+        public Button(string literalText) : this((IUiElement)new SimpleText(literalText).Center().NoWrap()) { }
+        public Button OnClick(Action callback) { Click += callback; return this; }
+        // public Button OnRightClick(Action callback) { RightClick += callback; return this; }
+        // public Button OnDoubleClick(Action callback) { DoubleClick += callback; return this; }
+        // public Button OnPressed(Action callback) { Pressed += callback; return this; }
+
+        event Action Click;
+        // event Action RightClick;
+        // event Action DoubleClick;
+        // event Action Pressed;
 
         public ButtonFrame.ThemeFunction Theme
         {

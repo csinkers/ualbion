@@ -38,38 +38,42 @@ namespace UAlbion.Game.State.Player
                 return InventoryAction.Nothing;
 
             var inventory = _getInventory(type, id);
-            var itemInHand = ItemInHand;
-            if (itemInHand == null)
+            switch(ItemInHand)
             {
-                if (slotId == ItemSlotId.Gold || slotId == ItemSlotId.Rations)
-                    return InventoryAction.Pickup;
-
-                var contents = inventory.GetSlot(slotId);
-                if (contents?.Id == null)
-                    return InventoryAction.Nothing;
-
-                return InventoryAction.Pickup;
-            }
-            else
-            {
-                if (itemInHand is GoldInHand || itemInHand is RationsInHand)
-                    return InventoryAction.Drop;
-
-                if (!(itemInHand is ItemSlot))
-                    throw new InvalidOperationException($"Unexpected item in hand of type: {ItemInHand.GetType()}");
-
-                var contents = inventory.GetSlot(slotId);
-                if (contents?.Id == null)
-                    return InventoryAction.Drop;
-
-                if (CanCoalesce(slotId, contents, (ItemSlot)itemInHand))
+                case null:
                 {
-                    return contents.Amount >= MaxSlotAmount
-                        ? InventoryAction.NoCoalesceFullStack
-                        : InventoryAction.Coalesce;
+                    if (slotId == ItemSlotId.Gold || slotId == ItemSlotId.Rations)
+                        return InventoryAction.Pickup;
+
+                    var contents = inventory.GetSlot(slotId);
+                    if (contents?.Id == null)
+                        return InventoryAction.Nothing;
+
+                    return InventoryAction.Pickup;
                 }
 
-                return InventoryAction.Swap;
+                case GoldInHand _:
+                case RationsInHand _:
+                    return InventoryAction.Drop;
+
+                case ItemSlot itemInHand:
+                {
+                    var contents = inventory.GetSlot(slotId);
+                    if (contents?.Id == null)
+                        return InventoryAction.Drop;
+
+                    if (CanCoalesce(slotId, contents, itemInHand))
+                    {
+                        return contents.Amount >= MaxSlotAmount
+                            ? InventoryAction.NoCoalesceFullStack
+                            : InventoryAction.Coalesce;
+                    }
+
+                    return InventoryAction.Swap;
+                }
+
+                default:
+                    throw new InvalidOperationException($"Unexpected item in hand of type: {ItemInHand.GetType()}");
             }
         }
 
@@ -158,8 +162,9 @@ namespace UAlbion.Game.State.Player
 
         ItemSlotId GetBestSlot(InventoryType type, int id, ItemSlotId slotId)
         {
-            if (!(ItemInHand is ItemSlot itemInHand)) // gold, rations etc
-                return slotId;
+            if (ItemInHand is GoldInHand _) return ItemSlotId.Gold;
+            if (ItemInHand is RationsInHand _) return ItemSlotId.Rations;
+            if (!(ItemInHand is ItemSlot itemInHand)) return slotId;// Shouldn't be possible
 
             if (itemInHand.Id == null)
                 return ItemSlotId.None;
@@ -270,12 +275,26 @@ namespace UAlbion.Game.State.Player
                             .LoadItem(inventory.GetSlot(slotId)?.Id ?? ItemId.Knife)
                             .Icon.ToAssetId())};
 
-            Exchange.Attach(new ItemQuantityDialog(text, icon, maxQuantity, continuation));
+            if (maxQuantity == 1)
+                continuation(1);
+            else
+            {
+                var formatFunc = slotId == ItemSlotId.Gold 
+                    ? x => $"{x / 10}.{x % 10}" 
+                    : (Func<int, string>)null;
+
+                Exchange.Attach(new ItemQuantityDialog(
+                    text,
+                    icon,
+                    maxQuantity,
+                    continuation,
+                    formatFunc));
+            }
         }
 
         void OnPickupItem(InventorySlotEvent e)
         {
-            var slotId = e.SlotId;
+                var slotId = e.SlotId;
             if (!DoesSlotAcceptItemInHand(e.InventoryType, e.InventoryId, e.SlotId))
                 slotId = GetBestSlot(e.InventoryType, e.InventoryId, slotId);
 
@@ -407,26 +426,22 @@ namespace UAlbion.Game.State.Player
         {
             ApiUtil.Assert(inventory.GetSlot(slotId)?.Id == null);
 
-            if (ItemInHand is GoldInHand gold)
+            switch (ItemInHand)
             {
-                inventory.Gold += gold.Amount;
-                SetItemInHand(inventory, slotId, null);
-            }
-
-            if (ItemInHand is RationsInHand rations)
-            {
-                inventory.Rations += rations.Amount;
-                SetItemInHand(inventory, slotId, null);
-            }
-
-            var itemInHand = (ItemSlot)ItemInHand;
-            if (slotId >= ItemSlotId.Slot0)
-            {
-                inventory.Slots[slotId - ItemSlotId.Slot0] = itemInHand;
-            }
-            else // Body slot
-            {
-                inventory.SetSlot(slotId, itemInHand);
+                case GoldInHand gold:
+                    inventory.Gold += gold.Amount;
+                    SetItemInHand(inventory, slotId, null);
+                    break;
+                case RationsInHand rations:
+                    inventory.Rations += rations.Amount;
+                    SetItemInHand(inventory, slotId, null);
+                    break;
+                case ItemSlot itemInHand when slotId >= ItemSlotId.Slot0:
+                    inventory.Slots[slotId - ItemSlotId.Slot0] = itemInHand;
+                    break;
+                case ItemSlot itemInHand:
+                    inventory.SetSlot(slotId, itemInHand); // Body slot
+                    break;
             }
 
             SetItemInHand(inventory, slotId, null);

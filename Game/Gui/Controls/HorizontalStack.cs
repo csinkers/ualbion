@@ -6,6 +6,11 @@ using UAlbion.Core;
 
 namespace UAlbion.Game.Gui.Controls
 {
+    /// <summary>
+    /// Arranges a list of elements horizontally. The child elements share
+    /// the available width evenly, excepting elements that implement
+    /// IFixedSizeUiElement.
+    /// </summary>
     public class HorizontalStack : UiElement
     {
         public HorizontalStack(params IUiElement[] args) : this((IList<IUiElement>)args) { }

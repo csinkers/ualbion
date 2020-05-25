@@ -32,28 +32,28 @@ namespace UAlbion.Game.Gui.Menus
             {
                 elements.AddRange(new IUiElement[]
                 {
-                    new Button(SystemTextId.MainMenu_ContinueGame.ToId(), Continue),
+                    new Button(SystemTextId.MainMenu_ContinueGame.ToId()).OnClick(Continue),
                     new Spacing(0, 4),
                 });
             }
 
             elements.AddRange(new IUiElement[]
             {
-                new Button(SystemTextId.MainMenu_NewGame.ToId(), NewGame),
-                new Button(SystemTextId.MainMenu_LoadGame.ToId(), LoadGame),
+                new Button(SystemTextId.MainMenu_NewGame.ToId()).OnClick(NewGame),
+                new Button(SystemTextId.MainMenu_LoadGame.ToId()).OnClick(LoadGame),
             });
 
             if (state.Loaded)
-                elements.Add(new Button(SystemTextId.MainMenu_SaveGame.ToId(), SaveGame));
+                elements.Add(new Button(SystemTextId.MainMenu_SaveGame.ToId()).OnClick(SaveGame));
 
             elements.AddRange(new IUiElement[]
             {
                 new Spacing(0,4),
-                new Button(SystemTextId.MainMenu_Options.ToId(), Options),
-                new Button(SystemTextId.MainMenu_ViewIntro.ToId(), ViewIntro),
-                new Button(SystemTextId.MainMenu_Credits.ToId(), Credits),
+                new Button(SystemTextId.MainMenu_Options.ToId()).OnClick(Options),
+                new Button(SystemTextId.MainMenu_ViewIntro.ToId()).OnClick(ViewIntro),
+                new Button(SystemTextId.MainMenu_Credits.ToId()).OnClick(Credits),
                 new Spacing(0,3),
-                new Button(SystemTextId.MainMenu_QuitGame.ToId(), QuitGame),
+                new Button(SystemTextId.MainMenu_QuitGame.ToId()).OnClick(QuitGame),
                 new Spacing(0,2),
             });
 

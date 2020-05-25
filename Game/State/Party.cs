@@ -57,7 +57,7 @@ namespace UAlbion.Game.State
                 if (ChangePartyRations(QuantityChangeOperation.AddAmount, chest.Rations))
                     inventoryManager.TryChangeRations(InventoryType.Chest, (int)e.ChestId, QuantityChangeOperation.SubtractAmount, chest.Rations);
 
-                foreach (var item in chest.Slots.Where(x => x.Id.HasValue && x.Amount > 0))
+                foreach (var item in chest.Slots.Where(x => x?.Id != null && x.Amount > 0))
                 {
                     if (ChangePartyInventory(item.Id.Value, QuantityChangeOperation.AddAmount, item.Amount))
                         inventoryManager.TryChangeInventory(InventoryType.Chest, (int)e.ChestId, item.Id.Value, QuantityChangeOperation.SubtractAmount, item.Amount);

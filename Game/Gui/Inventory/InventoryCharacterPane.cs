@@ -17,23 +17,23 @@ namespace UAlbion.Game.Gui.Inventory
         {
             _getPage = getPage;
             var page = _getPage();
-            _summaryButton = new Button("I", () => setPage(InventoryPage.Summary))
+            _summaryButton = new Button("I")
             {
                 DoubleFrame = true,
                 IsPressed = page == InventoryPage.Summary
-            };
+            }.OnClick(() => setPage(InventoryPage.Summary));
 
-            _statsButton = new Button("II", () => setPage(InventoryPage.Stats))
+            _statsButton = new Button("II")
             {
                 DoubleFrame = true,
                 IsPressed = page == InventoryPage.Stats
-            };
+            }.OnClick(() => setPage(InventoryPage.Stats));
 
-            _miscButton = new Button("III", () => setPage(InventoryPage.Misc))
+            _miscButton = new Button("III")
             {
                 DoubleFrame = true,
                 IsPressed = page == InventoryPage.Misc
-            };
+            }.OnClick(() => setPage(InventoryPage.Misc));
 
             var buttonStack =
                 new FixedPosition(

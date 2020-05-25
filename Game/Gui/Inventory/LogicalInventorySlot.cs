@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
@@ -73,7 +74,7 @@ namespace UAlbion.Game.Gui.Inventory
                         : new[] { new TextBlock(slotInfo.Amount.ToString()) { Alignment = TextAlignment.Right } };
                 }, x => _version);
             }
-            _visual = AttachChild(new VisualInventorySlot(slotId, amountSource, GetItem));
+            _visual = AttachChild(new VisualInventorySlot(slotId, amountSource, () => Slot));
             _visual.Clicked += (sender, args) => OnClick();
             _visual.DoubleClicked += (sender, args) => OnDoubleClick();
             _visual.RightClicked += (sender, args) => OnRightClick();
@@ -83,13 +84,6 @@ namespace UAlbion.Game.Gui.Inventory
 
         IInventory Inventory => Resolve<IGameState>().GetInventory(_inventoryType, _id);
         ItemSlot Slot => Inventory.GetSlot(_slotId);
-        ItemData GetItem()
-        {
-            var slot = Slot;
-            return slot?.Id == null 
-                ? null 
-                : Resolve<IAssetManager>().LoadItem(slot.Id.Value);
-        }
 
         void OnClick() => Raise(new InventoryPickupDropEvent(_inventoryType, _id, _slotId));
         void OnDoubleClick() => Raise(new InventoryPickupAllEvent(_inventoryType, _id, _slotId));
@@ -123,6 +117,17 @@ namespace UAlbion.Game.Gui.Inventory
                     if (itemName != null)
                     {
                         Raise(new HoverTextEvent(new LiteralText(itemName)));
+                        Raise(new SetCursorEvent(CoreSpriteId.CursorSelected));
+                        _visual.State = ButtonState.Hover;
+                    }
+                    else if(_slotId == ItemSlotId.Gold || _slotId == ItemSlotId.Rations)
+                    {
+                        bool isGold = _slotId == ItemSlotId.Gold;
+                        int amount = isGold ? inventory.Gold : inventory.Rations;
+                        var text = isGold
+                            ? tf.Format(SystemTextId.Gold_NNGold.ToId(), amount / 10, amount % 10)
+                            : tf.Format(SystemTextId.Gold_NRations.ToId(), amount);
+                        Raise(new HoverTextEvent(text));
                         Raise(new SetCursorEvent(CoreSpriteId.CursorSelected));
                         _visual.State = ButtonState.Hover;
                     }
@@ -194,12 +199,18 @@ namespace UAlbion.Game.Gui.Inventory
             // Activate spell (if has spell, yellow if combat spell & not in combat etc)
             // Read (e.g. metalmagic knowledge, maps)
 
+            bool isPlotItem = (item.Flags & ItemFlags.PlotItem) != 0;
             var options = new List<ContextMenuOption>
             {
                 new ContextMenuOption(
-                    S(SystemTextId.InvPopup_Drop.ToId(), (item.Flags & ItemFlags.PlotItem) != 0),
-                    new InventoryDiscardEvent(_inventoryType, _id, _slotId),
-                    ContextMenuGroup.Actions),
+                    S(SystemTextId.InvPopup_Drop.ToId(), isPlotItem),
+                    isPlotItem
+                        ? (IEvent)new HoverTextEvent(
+                            tf.Format(
+                                SystemTextId.InvMsg_ThisIsAVitalItem.ToId()))
+                        : new InventoryDiscardEvent(_inventoryType, _id, _slotId),
+                    ContextMenuGroup.Actions,
+                    isPlotItem),
 
                 new ContextMenuOption(
                     S(SystemTextId.InvPopup_Examine.ToId()),
@@ -207,17 +218,17 @@ namespace UAlbion.Game.Gui.Inventory
                     ContextMenuGroup.Actions)
             };
 
-            if(item.TypeId == ItemType.Document)
-                options.Add(new ContextMenuOption( S(SystemTextId.InvPopup_Read.ToId()), null, ContextMenuGroup.Actions));
+            if (item.TypeId == ItemType.Document)
+                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_Read.ToId()), null, ContextMenuGroup.Actions));
 
-            if(item.TypeId == ItemType.SpellScroll)
-                options.Add(new ContextMenuOption( S(SystemTextId.InvPopup_LearnSpell.ToId()), null, ContextMenuGroup.Actions));
+            if (item.TypeId == ItemType.SpellScroll)
+                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_LearnSpell.ToId()), null, ContextMenuGroup.Actions));
 
-            if(item.TypeId == ItemType.Drink)
-                options.Add(new ContextMenuOption( S(SystemTextId.InvPopup_Drink.ToId()), null, ContextMenuGroup.Actions));
+            if (item.TypeId == ItemType.Drink)
+                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_Drink.ToId()), null, ContextMenuGroup.Actions));
 
-            if(item.TypeId == ItemType.HeadsUpDisplayItem)
-                options.Add(new ContextMenuOption( S(SystemTextId.InvPopup_Activate.ToId()), null, ContextMenuGroup.Actions));
+            if (item.TypeId == ItemType.HeadsUpDisplayItem)
+                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_Activate.ToId()), null, ContextMenuGroup.Actions));
 
             if (item.Charges > 0) // TODO: Disable based on spell context
                 options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_ActivateSpell.ToId()), null, ContextMenuGroup.Actions));
@@ -226,9 +237,14 @@ namespace UAlbion.Game.Gui.Inventory
             if (inventoryManager.ActiveMode == InventoryMode.Merchant)
             {
                 options.Add(new ContextMenuOption(
-                    S(SystemTextId.InvPopup_Sell.ToId(), (item.Flags & ItemFlags.PlotItem) != 0),
-                    new InventorySellEvent(_inventoryType, _id, _slotId),
-                    ContextMenuGroup.Actions));
+                    S(SystemTextId.InvPopup_Sell.ToId(), isPlotItem),
+                    isPlotItem 
+                        ? (IEvent)new HoverTextEvent(
+                            tf.Format(
+                                SystemTextId.InvMsg_ThisIsAVitalItem.ToId()))
+                        : new InventorySellEvent(_inventoryType, _id, _slotId),
+                    ContextMenuGroup.Actions,
+                    isPlotItem));
             }
 
             var uiPosition = window.PixelToUi(cursorManager.Position);

@@ -6,6 +6,11 @@ using UAlbion.Core;
 
 namespace UAlbion.Game.Gui.Controls
 {
+    /// <summary>
+    /// Arranges a list of elements vertically. If Greedy is true, then all child
+    /// elements will be arranged with the width of the widest element (unless the
+    /// entire stack is otherwise constrained).
+    /// </summary>
     public class VerticalStack : UiElement
     {
         public VerticalStack(params IUiElement[] children) : this((IList<IUiElement>)children) { }

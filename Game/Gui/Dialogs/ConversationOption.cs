@@ -12,11 +12,11 @@ namespace UAlbion.Game.Gui.Dialogs
         public ConversationOption(IText text, int? blockId, Action action)
         {
             _action = action;
-            AttachChild(new Button(new UiText(text) { BlockFilter = blockId }, action)
+            AttachChild(new Button(new UiText(text) { BlockFilter = blockId })
             {
                 // Full width, invisible except hover (then white background w/ alpha blend)
                 Theme = ButtonTheme.Frameless
-            });
+            }.OnClick(action));
         }
 
         public void Trigger() => _action();

@@ -17,7 +17,6 @@ namespace UAlbion.Game.Gui.Controls
         int _subId;
         SpriteFlags _flags;
         bool _dirty = true;
-        bool _visible = true;
 
         public UiSpriteElement(T id)
         {
@@ -48,20 +47,6 @@ namespace UAlbion.Game.Gui.Controls
         public int SubId { get => _subId; set { if (_subId == value) return; _subId = value; _dirty = true; } }
         public SpriteFlags Flags { get => _flags; set { if (_flags == value) return; _flags = value; _dirty = true; } }
 
-        public bool Visible
-        {
-            get => _visible;
-            set
-            {
-                _visible = value;
-                if (!_visible)
-                {
-                    _sprite?.Dispose();
-                    _sprite = null;
-                }
-            }
-        }
-
         public override string ToString() => $"UiSpriteElem {_id}";
         public override Vector2 GetSize() => _size;
         public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
@@ -73,10 +58,10 @@ namespace UAlbion.Game.Gui.Controls
 
         public override int Render(Rectangle extents, int order)
         {
-            if (!_visible)
+            if (!IsActive)
                 return order;
 
-            if (_sprite?.Key.RenderOrder != (DrawLayer) order)
+            if (_sprite?.Key.RenderOrder != (DrawLayer)order)
                 _dirty = true;
 
             UpdateSprite((DrawLayer)order);

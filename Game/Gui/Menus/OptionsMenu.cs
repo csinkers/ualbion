@@ -33,7 +33,7 @@ namespace UAlbion.Game.Gui.Menus
             void AddLang(string label, GameLanguage language)
             {
                 if (HasLanguageFiles(language))
-                    languageButtons.Add(new Button(label, () => SetLanguage(language)));
+                    languageButtons.Add(new Button(label).OnClick(() => SetLanguage(language)));
             }
 
             AddLang("EN", GameLanguage.English);
@@ -55,7 +55,7 @@ namespace UAlbion.Game.Gui.Menus
                 new Label(SystemTextId.Options_CombatTextDelay.ToId()),
                 new Slider(() => _combatDelay, x => _combatDelay = x, 1, 50),
                 new Spacing(0,2),
-                new Button(SystemTextId.MsgBox_OK.ToId(), SaveAndClose),
+                new Button(SystemTextId.MsgBox_OK.ToId()).OnClick(SaveAndClose),
                 new Spacing(0,2),
             };
             var stack = new VerticalStack(elements);

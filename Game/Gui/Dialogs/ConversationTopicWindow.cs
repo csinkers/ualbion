@@ -37,10 +37,10 @@ namespace UAlbion.Game.Gui.Dialogs
                     };
 
                     var textElement = (IUiElement)new UiTextBuilder(x.Key.ToId()).Ink(color);
-                    return (IUiElement)new Button(textElement, () => OnWordSelected(x.Key))
+                    return (IUiElement)new Button(textElement)
                     {
                         Theme = ButtonTheme.Frameless
-                    };
+                    }.OnClick(() => OnWordSelected(x.Key));
                 }
             ).ToArray();
 
@@ -50,7 +50,7 @@ namespace UAlbion.Game.Gui.Dialogs
                 elements.Add(new Spacing(0, 3));
             }
 
-            elements.Add(new Button(SystemTextId.MsgBox_EnterWord.ToId(), () =>
+            elements.Add(new Button(SystemTextId.MsgBox_EnterWord.ToId()).OnClick(() =>
             {
                 // TODO
                 OnWordSelected(null);

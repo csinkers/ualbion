@@ -14,7 +14,7 @@ namespace UAlbion.Game.Gui.Inventory
                 new Spacing(0, 23),
                 new Header(SystemTextId.Inv3_TemporarySpells.ToId()),
                 new Spacing(0, 45),
-                new Button(SystemTextId.Inv3_CombatPositions.ToId(), () => {}) // TODO: Make functional
+                new Button(SystemTextId.Inv3_CombatPositions.ToId()) // TODO: Make functional
             );
             AttachChild(stack);
         }

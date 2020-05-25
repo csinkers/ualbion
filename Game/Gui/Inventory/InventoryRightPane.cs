@@ -48,8 +48,8 @@ namespace UAlbion.Game.Gui.Inventory
                         new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiGold) { Flags = SpriteFlags.Highlight },
                         new UiText(tf.Format(SystemTextId.Shop_GoldAll.ToId())),
                         new SimpleText($"{total / 10}.{total % 10}")
-                    ) { Greedy = false}, () => { }
-                ) { IsPressed = true };
+                    ) { Greedy = false})
+                { IsPressed = true };
                 moneyAndFoodStack = new HorizontalStack(money);
             }
             else

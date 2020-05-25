@@ -10,7 +10,7 @@ namespace UAlbion.Game.State.Player
 {
     public class Player : Component, IPlayer
     {
-        const int TransitionSpeedMilliseconds = 200;
+        const int TransitionSpeedMilliseconds = 250;
 
         readonly CharacterSheet _base;
         IEffectiveCharacterSheet _lastEffective;
@@ -34,7 +34,8 @@ namespace UAlbion.Game.State.Player
             var elapsed = (DateTime.Now - _lastChangeTime).TotalMilliseconds;
             var oldLerp = _lerp;
             _lerp = elapsed > TransitionSpeedMilliseconds ? 1.0f : (float) (elapsed / TransitionSpeedMilliseconds);
-            if (Math.Abs(_lerp - oldLerp) > float.Epsilon) Raise(new InventoryChangedEvent(InventoryType.Player, (int) Id));
+            if (Math.Abs(_lerp - oldLerp) > float.Epsilon)
+                Raise(new InventoryChangedEvent(InventoryType.Player, (int) Id));
         }
 
         public PartyCharacterId Id { get; }

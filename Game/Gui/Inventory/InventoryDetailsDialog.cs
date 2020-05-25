@@ -85,7 +85,7 @@ namespace UAlbion.Game.Gui.Inventory
                 ),
                 new Spacing(0, 2),
                 new FixedSize(52, 13,
-                    new Button(SystemTextId.MsgBox_OK.ToId(), Close) { DoubleFrame = true })
+                    new Button(SystemTextId.MsgBox_OK.ToId()) { DoubleFrame = true }.OnClick(Close))
             );
 
             AttachChild(new DialogFrame(new Padding(stack, 6)) { Background = DialogFrameBackgroundStyle.MainMenuPattern });

@@ -5,6 +5,12 @@ using UAlbion.Core;
 
 namespace UAlbion.Game.Gui
 {
+    /// <summary>
+    /// Abstract base class providing reasonable defaults for the methods
+    /// on IUiElement. By default the size will be that of the largest
+    /// child element, and when calculating layout the full extents
+    /// will be passed through to each child.
+    /// </summary>
     public abstract class UiElement : Component, IUiElement
     {
         protected Vector2 GetMaxChildSize()

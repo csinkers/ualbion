@@ -14,14 +14,14 @@ namespace UAlbion.Game.Gui.Inventory
         |/--------\2/---------------------------------\|^5
         ||        | | Take how many items?            ||
         ||ITEM PIC| |                                 ||
-        || 16x16  | |       151x30(inner)             ||
+        ||1:1 size| |       151x30(inner)             ||
         |\--------/ |                                 ||
         |^6         \---------------------------------/|
         |                         ^5                 7^|
         |    [<] [=======[  3  ]==============] [>]    |
         |                   [    OK    ]   ^4          |
         \---------------------------------------------*/ //^5
-        public ItemQuantityDialog(StringId stringId, AssetId id, int max, Action<int> continuation)
+        public ItemQuantityDialog(StringId stringId, AssetId id, int max, Action<int> continuation, Func<int, string> format = null)
             : base(DialogPositioning.Center, 3) // TODO: Fix hacky depths
         {
             _continuation = continuation;
@@ -30,10 +30,8 @@ namespace UAlbion.Game.Gui.Inventory
                 SubId = id.Type == AssetType.ItemGraphics ? id.Id : 0
             };
 
-            var picFrame = new FixedSize(18, 18, new GroupingFrame(itemPic));
-
             var topStack = new HorizontalStack(
-                picFrame,
+                new GroupingFrame(itemPic),
                 new Spacing(2,0),
                 new GroupingFrame(new FixedSize(151, 30, new UiTextBuilder(stringId)))
             );
@@ -41,10 +39,10 @@ namespace UAlbion.Game.Gui.Inventory
             var stack = new VerticalStack(
                 topStack,
                 new Spacing(0, 5),
-                new Slider(() => _quantity, x => _quantity = x, 0, max),
+                new Slider(() => _quantity, x => _quantity = x, 0, max, format),
                 new Spacing(0, 4),
                 new FixedSize(52, 13,
-                    new Button(SystemTextId.MsgBox_OK.ToId(), Close) { DoubleFrame = true })
+                    new Button(SystemTextId.MsgBox_OK.ToId()) { DoubleFrame = true }.OnClick(Close))
             );
 
             AttachChild(new DialogFrame(new Padding(stack, 6))

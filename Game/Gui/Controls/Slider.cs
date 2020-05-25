@@ -27,17 +27,17 @@ namespace UAlbion.Game.Gui.Controls
             _setter(value);
         }
 
-        public Slider(Func<int> getter, Action<int> setter, int min, int max)
+        public Slider(Func<int> getter, Action<int> setter, int min, int max, Func<int, string> format = null)
         {
             _getter = getter;
             _setter = setter;
             _min = min;
             _max = max;
 
-            _decrement = new Button("<", Decrement) { Typematic = true };
-            _increment = new Button(">", Increment) { Typematic = true };
+            _decrement = new Button("<") { Typematic = true }.OnClick(Decrement);
+            _increment = new Button(">") { Typematic = true }.OnClick(Increment);
 
-            var track = new SliderTrack(getter, x => _setter(Math.Clamp(x, _min, _max)), min, max);
+            var track = new SliderTrack(getter, x => _setter(Math.Clamp(x, _min, _max)), min, max, format);
 
             _frame = new ButtonFrame(track)
             {

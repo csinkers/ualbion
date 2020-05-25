@@ -54,9 +54,11 @@ namespace UAlbion.Game.Gui.Controls
             return maxOrder;
         }
 
-        void OnButton(ContextMenuOption option)
+        void OnButton(ContextMenuOption option, bool keepOpen)
         {
-            Close();
+            if (!keepOpen)
+                Close();
+
             if (option.Event != null)
                 Raise(option.Event);
         }
@@ -89,7 +91,7 @@ namespace UAlbion.Game.Gui.Controls
                 lastGroup = option.Group;
 
                 var option1 = option;
-                optionElements.Add(new Button(option.Text, () => OnButton(option1)));
+                optionElements.Add(new Button(option.Text).OnClick(() => OnButton(option1, option1.Disabled)));
             }
 
             var elements = new List<IUiElement>

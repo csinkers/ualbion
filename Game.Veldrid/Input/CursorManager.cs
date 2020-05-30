@@ -147,17 +147,16 @@ namespace UAlbion.Game.Veldrid.Input
             int subItem = 0;
             ITexture texture = null;
 
-            if (held is GoldInHand)
+            if (held.Item is Gold)
             {
                 texture = assets.LoadTexture(CoreSpriteId.UiGold);
             }
-            else if (held is RationsInHand)
+            else if (held.Item is Rations)
             {
                 texture = assets.LoadTexture(CoreSpriteId.UiFood);
             }
-            else if (held is ItemSlot itemInHand && itemInHand.Id.HasValue)
+            else if (held.Item is ItemData item)
             {
-                var item = assets.LoadItem(itemInHand.Id.Value);
                 ItemSpriteId spriteId = (ItemSpriteId)((int)item.Icon + _frame % item.IconAnim);
                 texture = assets.LoadTexture(spriteId);
                 subItem = (int)spriteId;

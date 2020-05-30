@@ -8,13 +8,13 @@ namespace UAlbion.Game.Gui.Inventory
         public InventoryMiscPage()
         {
             var stack = new VerticalStack(
-                new Header(SystemTextId.Inv3_Conditions.ToId()),
+                new Header(SystemTextId.Inv3_Conditions),
                 new Spacing(0, 64),
-                new Header(SystemTextId.Inv3_Languages.ToId()),
+                new Header(SystemTextId.Inv3_Languages),
                 new Spacing(0, 23),
-                new Header(SystemTextId.Inv3_TemporarySpells.ToId()),
+                new Header(SystemTextId.Inv3_TemporarySpells),
                 new Spacing(0, 45),
-                new Button(SystemTextId.Inv3_CombatPositions.ToId()) // TODO: Make functional
+                new Button(SystemTextId.Inv3_CombatPositions) // TODO: Make functional
             );
             AttachChild(stack);
         }

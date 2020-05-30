@@ -36,7 +36,7 @@ namespace UAlbion.Game.Gui.Dialogs
                         _ => FontColor.Gray,
                     };
 
-                    var textElement = (IUiElement)new UiTextBuilder(x.Key.ToId()).Ink(color);
+                    var textElement = (IUiElement)new UiTextBuilder(x.Key).Ink(color);
                     return (IUiElement)new Button(textElement)
                     {
                         Theme = ButtonTheme.Frameless
@@ -50,7 +50,7 @@ namespace UAlbion.Game.Gui.Dialogs
                 elements.Add(new Spacing(0, 3));
             }
 
-            elements.Add(new Button(SystemTextId.MsgBox_EnterWord.ToId()).OnClick(() =>
+            elements.Add(new Button(SystemTextId.MsgBox_EnterWord).OnClick(() =>
             {
                 // TODO
                 OnWordSelected(null);

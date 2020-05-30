@@ -171,7 +171,7 @@ namespace UAlbion.Game.Gui.Text
             e.Acknowledge();
             var party = Resolve<IParty>();
             var assets = Resolve<IAssetManager>();
-            var npc = assets.LoadCharacter(e.NpcId);
+            var npc = assets.LoadNpc(e.NpcId);
             _conversation = AttachChild(new Conversation(party?.Leader ?? PartyCharacterId.Tom, npc));
 
             _conversation.Complete += (sender, args) =>
@@ -187,7 +187,7 @@ namespace UAlbion.Game.Gui.Text
         {
             e.Acknowledge();
             var assets = Resolve<IAssetManager>();
-            var npc = assets.LoadCharacter(e.MemberId);
+            var npc = assets.LoadPartyMember(e.MemberId);
             _conversation = AttachChild(new Conversation(PartyCharacterId.Tom, npc));
 
             _conversation.Complete += (sender, args) =>

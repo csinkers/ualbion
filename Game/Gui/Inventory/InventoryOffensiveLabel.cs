@@ -49,7 +49,7 @@ namespace UAlbion.Game.Gui.Inventory
             var player = Resolve<IParty>()[_activeCharacter];
             var tf = Resolve<ITextFormatter>();
             var damage = player?.Apparent.DisplayDamage ?? 0;
-            var text = tf.Format(SystemTextId.Inv_DamageN.ToId(), damage); // Damage : %d
+            var text = tf.Format(SystemTextId.Inv_DamageN, damage); // Damage : %d
             Raise(new HoverTextEvent(text));
             e.Propagating = false;
         }

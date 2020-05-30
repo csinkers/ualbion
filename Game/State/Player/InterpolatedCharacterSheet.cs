@@ -24,7 +24,7 @@ namespace UAlbion.Game.State.Player
             Combat = new InterpolatedCombat(() => _a().Combat, () => _b().Combat, _getLerp);
         }
 
-        public string Name => _b().Name;
+        public AssetKey Key => _b().Key;
         public string GetName(GameLanguage language) => _b().GetName(language);
         public CharacterType Type => _b().Type;
         public Gender Gender => _b().Gender;

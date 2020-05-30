@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 
@@ -7,9 +8,9 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.Slab)]
     public class SlabLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
-            var sprite = (AlbionSprite)new FixedSizeSpriteLoader().Load(br, streamLength, name, config);
+            var sprite = (AlbionSprite)new FixedSizeSpriteLoader().Load(br, streamLength, key, config);
             sprite.Frames = new[]
             {
                 sprite.Frames[0],

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
@@ -9,7 +10,7 @@ namespace UAlbion.Formats.Parsers
     public class ItemNameLoader : IAssetLoader
     {
         const int StringSize = 20;
-        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
             ApiUtil.Assert(streamLength % StringSize == 0);
             var results = new Dictionary<(int, GameLanguage), string>();

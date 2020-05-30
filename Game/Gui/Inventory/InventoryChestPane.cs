@@ -31,10 +31,10 @@ namespace UAlbion.Game.Gui.Inventory
                 for (int i = 0; i < InventoryWidth; i++)
                 {
                     int index = j * InventoryWidth + i;
-                    slotsInRow[i] = new LogicalInventorySlot(
+                    slotsInRow[i] = new LogicalInventorySlot(new InventorySlotId(
                         InventoryType.Chest,
-                        (int)_id,
-                        (ItemSlotId)((int)ItemSlotId.Slot0 + index));
+                        (ushort)_id,
+                        (ItemSlotId)((int)ItemSlotId.Slot0 + index)));
                 }
                 slotSpans[j] = new HorizontalStack(slotsInRow);
             }
@@ -42,19 +42,19 @@ namespace UAlbion.Game.Gui.Inventory
             var slotStack = new VerticalStack(slotSpans);
             //var slotFrame = new ButtonFrame(slotStack) { State = ButtonState.Pressed, Theme = new FrameTheme() };
 
-            var goldButton = new LogicalInventorySlot(
+            var goldButton = new LogicalInventorySlot(new InventorySlotId(
                 InventoryType.Chest,
-                (int)_id,
-                ItemSlotId.Gold);
+                (ushort)_id,
+                ItemSlotId.Gold));
 
-            var foodButton = new LogicalInventorySlot(
+            var foodButton = new LogicalInventorySlot(new InventorySlotId(
                 InventoryType.Chest,
-                (int)_id,
-                ItemSlotId.Rations);
+                (ushort)_id,
+                ItemSlotId.Rations));
 
             var takeAllButton =
                 new Button(
-                (UiElement)new UiTextBuilder(UAlbionStringId.TakeAll.ToId()).Center()
+                (UiElement)new UiTextBuilder(UAlbionStringId.TakeAll).Center()
                 ).OnClick(() => Raise(new InventoryTakeAllEvent(_id)));
 
             var header = new Header(new StringId(AssetType.SystemText, 0, (int)SystemTextId.Chest_Chest));

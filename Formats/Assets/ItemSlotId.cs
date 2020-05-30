@@ -6,7 +6,10 @@ namespace UAlbion.Formats.Assets
     {
         Slot0 = 0,
         NormalSlotCount = 24,
-        Neck = 24,
+        Gold = 24,
+        Rations = 25,
+        ChestSlotCount = 26,
+        Neck = 26,
         Head,
         Tail,
         RightHand,
@@ -19,8 +22,6 @@ namespace UAlbion.Formats.Assets
         CharacterSlotCount,
 
         CharacterBody = 0xfc,
-        Gold = 0xfd,
-        Rations = 0xfe,
         None = 0xff,
     }
 

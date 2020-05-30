@@ -39,9 +39,11 @@ namespace UAlbion
                 .AddAssetLocator(new MetaFontLocator(factory))
                 .AddAssetLocator(new NewStringLocator())
                 .AddAssetLocator(new SoundBankLocator())
+                .AddAssetLocator(new SavedGameLocator())
                 .AddAssetPostProcessor(new AlbionSpritePostProcessor())
                 .AddAssetPostProcessor(new ImageSharpPostProcessor())
                 .AddAssetPostProcessor(new InterlacedBitmapPostProcessor())
+                .AddAssetPostProcessor(new InventoryPostProcessor())
                 ;
 
             var coreServices = new Container("Core",

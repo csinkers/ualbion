@@ -4,22 +4,21 @@ namespace UAlbion.Formats.Assets
 {
     public interface IInventory
     {
-        InventoryType InventoryType { get; }
-        int InventoryId { get; }
-        ushort Gold { get; }
-        ushort Rations { get; }
-        ItemSlot Neck { get; }
-        ItemSlot Head { get; }
-        ItemSlot Tail { get; }
-        ItemSlot LeftHand { get; }
-        ItemSlot Chest { get; }
-        ItemSlot RightHand { get; }
-        ItemSlot LeftFinger { get; }
-        ItemSlot Feet { get; }
-        ItemSlot RightFinger { get; }
-        ItemSlot[] Slots { get; }
-        IEnumerable<ItemSlot> EnumerateAll();
-        IEnumerable<ItemSlot> EnumerateBodyParts();
-        ItemSlot GetSlot(ItemSlotId itemSlotId);
+        InventoryId Id { get; }
+        IReadOnlyItemSlot Gold { get; }
+        IReadOnlyItemSlot Rations { get; }
+        IReadOnlyItemSlot Neck { get; }
+        IReadOnlyItemSlot Head { get; }
+        IReadOnlyItemSlot Tail { get; }
+        IReadOnlyItemSlot LeftHand { get; }
+        IReadOnlyItemSlot Chest { get; }
+        IReadOnlyItemSlot RightHand { get; }
+        IReadOnlyItemSlot LeftFinger { get; }
+        IReadOnlyItemSlot Feet { get; }
+        IReadOnlyItemSlot RightFinger { get; }
+        IReadOnlyList<IReadOnlyItemSlot> Slots { get; }
+        IEnumerable<IReadOnlyItemSlot> EnumerateAll();
+        IEnumerable<IReadOnlyItemSlot> EnumerateBodyParts();
+        IReadOnlyItemSlot GetSlot(ItemSlotId itemSlotId);
     }
 }

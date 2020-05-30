@@ -10,6 +10,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.Assets
@@ -18,10 +19,7 @@ namespace UAlbion.Game.Assets
     {
         readonly AssetLocatorRegistry _assetLocatorRegistry;
 
-        public AssetManager()
-        {
-            _assetLocatorRegistry = AttachChild(new AssetLocatorRegistry());
-        }
+        public AssetManager() => _assetLocatorRegistry = AttachChild(new AssetLocatorRegistry());
 
         protected override void Subscribed()
         {
@@ -51,7 +49,7 @@ namespace UAlbion.Game.Assets
         public IMapData LoadMap(MapDataId id) => (IMapData)_assetLocatorRegistry.LoadAsset(id.ToAssetId()); // No caching for map data
         public ItemData LoadItem(ItemId id)
         {
-            var data = (IList<ItemData>)_assetLocatorRegistry.LoadAssetCached(AssetType.ItemList, 0);
+            var data = (IList<ItemData>)_assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.ItemList));
             if ((int)id >= data.Count)
                 return null;
 
@@ -64,42 +62,13 @@ namespace UAlbion.Game.Assets
             if (palette == null)
                 return null;
 
-            var commonPalette = (byte[])_assetLocatorRegistry.LoadAssetCached(AssetType.PaletteNull, 0);
+            var commonPalette = (byte[])_assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.PaletteNull));
             palette.SetCommonPalette(commonPalette);
 
             return palette;
         }
 
-        public ITexture LoadTexture(AssetType type, ushort id) =>
-            (ITexture)_assetLocatorRegistry.LoadAssetCached(type, id);
-
-        /*(ITexture)(type switch
-            {
-                AssetType.AutomapGraphics    => _assetLocatorRegistry.LoadAssetCached(AssetType.AutomapGraphics, id),
-                AssetType.CombatBackground   => _assetLocatorRegistry.LoadAssetCached(AssetType.CombatBackground, id),
-                AssetType.CombatGraphics     => _assetLocatorRegistry.LoadAssetCached(AssetType.CombatGraphics, id),
-                AssetType.CoreGraphics       => _assetLocatorRegistry.LoadAssetCached(AssetType.CoreGraphics, id),
-                AssetType.BackgroundGraphics => _assetLocatorRegistry.LoadAssetCached(AssetType.BackgroundGraphics, id),
-                AssetType.Floor3D            => _assetLocatorRegistry.LoadAssetCached(AssetType.Floor3D, id),
-                AssetType.Object3D           => _assetLocatorRegistry.LoadAssetCached(AssetType.Object3D, id),
-                AssetType.Overlay3D          => _assetLocatorRegistry.LoadAssetCached(AssetType.Overlay3D, id),
-                AssetType.Wall3D             => _assetLocatorRegistry.LoadAssetCached(AssetType.Wall3D, id),
-                AssetType.Font               => _assetLocatorRegistry.LoadAssetCached(AssetType.Font, id),
-                AssetType.FullBodyPicture    => _assetLocatorRegistry.LoadAssetCached(AssetType.FullBodyPicture, id),
-                AssetType.IconGraphics       => _assetLocatorRegistry.LoadAssetCached(AssetType.IconGraphics, id),
-                AssetType.ItemGraphics       => _assetLocatorRegistry.LoadAssetCached(AssetType.ItemGraphics, 0),
-                AssetType.BigNpcGraphics     => _assetLocatorRegistry.LoadAssetCached(AssetType.BigNpcGraphics, id),
-                AssetType.BigPartyGraphics   => _assetLocatorRegistry.LoadAssetCached(AssetType.BigPartyGraphics, id),
-                AssetType.MetaFont           => _assetLocatorRegistry.LoadAssetCached(AssetType.MetaFont, id),
-                AssetType.MonsterGraphics    => _assetLocatorRegistry.LoadAssetCached(AssetType.MonsterGraphics, id),
-                AssetType.Picture            => _assetLocatorRegistry.LoadAssetCached(AssetType.Picture, id),
-                AssetType.SmallNpcGraphics   => _assetLocatorRegistry.LoadAssetCached(AssetType.SmallNpcGraphics, id),
-                AssetType.SmallPartyGraphics => _assetLocatorRegistry.LoadAssetCached(AssetType.SmallPartyGraphics, id),
-                AssetType.SmallPortrait      => _assetLocatorRegistry.LoadAssetCached(AssetType.SmallPortrait, id),
-                AssetType.TacticalIcon       => _assetLocatorRegistry.LoadAssetCached(AssetType.TacticalIcon, id),
-                AssetType.Slab               => _assetLocatorRegistry.LoadAssetCached(AssetType.Slab, 0),
-                _ => _assetLocatorRegistry.LoadAssetCached(type, id)
-            });*/
+        // public ITexture LoadTexture(AssetType type, ushort id) => (ITexture)_assetLocatorRegistry.LoadAssetCached(type, id);
 
         public ITexture LoadTexture<T>(T id) => (ITexture)(id switch
         {
@@ -116,30 +85,30 @@ namespace UAlbion.Game.Assets
             FontId x                     => _assetLocatorRegistry.LoadAssetCached(x.ToAssetId()),
             FullBodyPictureId x          => _assetLocatorRegistry.LoadAssetCached(x.ToAssetId()),
             IconGraphicsId x             => _assetLocatorRegistry.LoadAssetCached(x.ToAssetId()),
-            ItemSpriteId _ => _assetLocatorRegistry.LoadAssetCached(AssetType.ItemGraphics, 0),
+            ItemSpriteId _ => _assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.ItemGraphics)),
             LargeNpcId x                 => _assetLocatorRegistry.LoadAssetCached(x.ToAssetId()),
             LargePartyGraphicsId x       => _assetLocatorRegistry.LoadAssetCached(x.ToAssetId()),
-            MetaFontId x => _assetLocatorRegistry.LoadAssetCached(AssetType.MetaFont, (ushort)x),
+            MetaFontId x => _assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.MetaFont, (ushort)x)),
             MonsterGraphicsId x          => _assetLocatorRegistry.LoadAssetCached(x.ToAssetId()),
             PictureId x                  => _assetLocatorRegistry.LoadAssetCached(x.ToAssetId()),
             SmallNpcId x                 => _assetLocatorRegistry.LoadAssetCached(x.ToAssetId()),
             SmallPartyGraphicsId x       => _assetLocatorRegistry.LoadAssetCached(x.ToAssetId()),
             SmallPortraitId x            => _assetLocatorRegistry.LoadAssetCached(x.ToAssetId()),
             TacticId x                   => _assetLocatorRegistry.LoadAssetCached(x.ToAssetId()),
-            SlabId _ => _assetLocatorRegistry.LoadAssetCached(AssetType.Slab, 0),
+            SlabId _ => _assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.Slab)),
             _ => throw new ArgumentOutOfRangeException(nameof(id), $"Expected texture id, but given a {typeof(T)}")
         });
 
         public ITexture LoadFont(FontColor color, bool isBold) 
-            => (ITexture)_assetLocatorRegistry.LoadAssetCached(
-                AssetType.MetaFont, (ushort)new MetaFontId(isBold, color));
+            => (ITexture)_assetLocatorRegistry.LoadAssetCached(new AssetKey(
+                AssetType.MetaFont, (ushort)new MetaFontId(isBold, color)));
 
         public TilesetData LoadTileData(TilesetId id) => (TilesetData)_assetLocatorRegistry.LoadAssetCached(id.ToAssetId());
         public LabyrinthData LoadLabyrinthData(LabyrinthDataId id) => (LabyrinthData)_assetLocatorRegistry.LoadAssetCached(id.ToAssetId());
-        public IAssetConfig LoadAssetConfig() => (IAssetConfig) _assetLocatorRegistry.LoadAssetCached(AssetType.AssetConfig, 0);
-        public IGeneralConfig LoadGeneralConfig() => (IGeneralConfig) _assetLocatorRegistry.LoadAssetCached(AssetType.GeneralConfig, 0);
+        public IAssetConfig LoadAssetConfig() => (IAssetConfig) _assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.AssetConfig));
+        public IGeneralConfig LoadGeneralConfig() => (IGeneralConfig) _assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.GeneralConfig));
         public CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id) =>
-            (CoreSpriteConfig.BinaryResource)_assetLocatorRegistry.LoadAssetCached(AssetType.CoreGraphicsMetadata, (ushort)id);
+            (CoreSpriteConfig.BinaryResource)_assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.CoreGraphicsMetadata, (ushort)id));
 
         public string LoadString(StringId id, GameLanguage language)
         {
@@ -153,16 +122,17 @@ namespace UAlbion.Game.Assets
             }) ?? $"!MISSING STRING {id.Type}:{id.Id}:{id.SubId}:{language}!";
         }
 
-        public string LoadString(SystemTextId id, GameLanguage language) => LoadString(id.ToId(), language);
         public ISample LoadSample(SampleId id) => (AlbionSample)_assetLocatorRegistry.LoadAssetCached(id.ToAssetId());
         public ISample LoadWaveLib(SongId songId, int instrument)
-            => ((WaveLib)_assetLocatorRegistry.LoadAssetCached(AssetType.WaveLibrary, (ushort)songId))?.GetSample(instrument);
+            => ((WaveLib)_assetLocatorRegistry.LoadAssetCached(
+                    new AssetKey(AssetType.WaveLibrary, (ushort)songId)
+               ))?.GetSample(instrument);
 
-        public byte[] LoadSoundBanks() => (byte[]) _assetLocatorRegistry.LoadAssetCached(AssetType.SoundBank, 0);
+        public byte[] LoadSoundBanks() => (byte[]) _assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.SoundBank));
         public AlbionVideo LoadVideo(VideoId id, GameLanguage language) => (AlbionVideo)_assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.Flic, (ushort)id, language));
-        public CharacterSheet LoadCharacter(PartyCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(id.ToAssetId());
-        public CharacterSheet LoadCharacter(NpcCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(id.ToAssetId());
-        public CharacterSheet LoadCharacter(MonsterCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(id.ToAssetId());
+        public CharacterSheet LoadPartyMember(PartyCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(id.ToAssetId());
+        public CharacterSheet LoadNpc(NpcCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(id.ToAssetId());
+        public CharacterSheet LoadMonster(MonsterCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(id.ToAssetId());
         public Inventory LoadChest(ChestId id) => (Inventory)_assetLocatorRegistry.LoadAssetCached(id.ToAssetId());
         public Inventory LoadMerchant(MerchantId id) => (Inventory)_assetLocatorRegistry.LoadAssetCached(id.ToAssetId());
         public WordId? ParseWord(string word)
@@ -170,9 +140,9 @@ namespace UAlbion.Game.Assets
             var words = // Inefficient code, if it ends up being a problem then we can build a reverse dictionary and cache it.
                 new[]
                 {   // Load the english files as all languages use english {WORDxxx} tags
-                    (IDictionary<int, string>) _assetLocatorRegistry.LoadAssetCached(AssetType.Dictionary, 0),
-                    (IDictionary<int, string>) _assetLocatorRegistry.LoadAssetCached(AssetType.Dictionary, 1),
-                    (IDictionary<int, string>) _assetLocatorRegistry.LoadAssetCached(AssetType.Dictionary, 2)
+                    (IDictionary<int, string>) _assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.Dictionary)),
+                    (IDictionary<int, string>) _assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.Dictionary, 1)),
+                    (IDictionary<int, string>) _assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.Dictionary, 2))
                 };
 
             return words
@@ -189,8 +159,10 @@ namespace UAlbion.Game.Assets
 
         public SpellData LoadSpell(SpellId spellId)
         {
-            var spells = (IList<SpellData>)_assetLocatorRegistry.LoadAssetCached(AssetType.SpellData, 0);
+            var spells = (IList<SpellData>)_assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.SpellData));
             return spells[(int)spellId];
         }
+        public SavedGame LoadSavedGame(ushort id) 
+            => (SavedGame)_assetLocatorRegistry.LoadAsset(new AssetKey(AssetType.SavedGame, id));
     }
 }

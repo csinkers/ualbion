@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using SerdesNet;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.Config;
@@ -10,13 +11,10 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.MapData)]
     public class MapLoader : IAssetLoader<IMapData>
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
-            => Serdes(
-                null,
-                new AlbionReader(br, streamLength),
-                name, config);
+        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
+            => Serdes(null, new AlbionReader(br, streamLength), key, config);
 
-        public IMapData Serdes(IMapData existing, ISerializer s, string name, AssetInfo config)
+        public IMapData Serdes(IMapData existing, ISerializer s, AssetKey key, AssetInfo config)
         {
             var startPosition = s.Offset;
             s.UInt16("DummyRead", 0); // Initial flags + npc count, will be re-read by the 2D/3D specific map loader

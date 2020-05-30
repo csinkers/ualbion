@@ -8,6 +8,7 @@ using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
+using UAlbion.Game.State;
 
 namespace UAlbion.Game.Text
 {
@@ -25,12 +26,13 @@ namespace UAlbion.Game.Text
             On<SetContextEvent>(e =>
             {
                 var assets = Resolve<IAssetManager>();
+                var state = Resolve<IGameState>();
 
                 var asset = e.AssetType switch
                 {
-                    AssetType.PartyMember => (object)assets.LoadCharacter((PartyCharacterId)e.AssetId),
-                    AssetType.Npc => assets.LoadCharacter((NpcCharacterId)e.AssetId),
-                    AssetType.Monster => assets.LoadCharacter((MonsterCharacterId)e.AssetId),
+                    AssetType.PartyMember => (object)state.GetPartyMember((PartyCharacterId)e.AssetId),
+                    AssetType.Npc => state.GetNpc((NpcCharacterId)e.AssetId),
+                    AssetType.Monster => assets.LoadMonster((MonsterCharacterId)e.AssetId),
                     AssetType.ItemList => assets.LoadItem((ItemId)e.AssetId),
                     _ => null
                 };
@@ -129,7 +131,7 @@ namespace UAlbion.Game.Text
                         if (active is ICharacterSheet character)
                             yield return (Token.Text, character.GetName(language));
                         else if (active is ItemData item)
-                            yield return (Token.Text, assets.LoadString(item.Id.ToId(), language));
+                            yield return (Token.Text, assets.LoadString(item.Id, language));
                         else 
                             yield return (Token.Text, "{NAME}");
                         break;

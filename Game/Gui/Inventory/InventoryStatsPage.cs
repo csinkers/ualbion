@@ -22,7 +22,7 @@ namespace UAlbion.Game.Gui.Inventory
             if (member == null)
                 yield break;
 
-            var block = tf.Format(id.ToId()).Get().First();
+            var block = tf.Format(id).Get().First();
             block.Text += $" {getValue(member)} / {getMax(member)}";
             yield return block;
         }
@@ -49,24 +49,24 @@ namespace UAlbion.Game.Gui.Inventory
             }
 
             var stack = new VerticalStack(
-                new Header(SystemTextId.Inv2_Attributes.ToId()),
+                new Header(SystemTextId.Inv2_Attributes),
                 new HorizontalStack(
                     new VerticalStack(
-                        new UiTextBuilder(SystemTextId.Attrib_STR.ToId()).Right(),
+                        new UiTextBuilder(SystemTextId.Attrib_STR).Right(),
                         new Spacing(0,2),
-                        new UiTextBuilder(SystemTextId.Attrib_INT.ToId()).Right(),
+                        new UiTextBuilder(SystemTextId.Attrib_INT).Right(),
                         new Spacing(0,2),
-                        new UiTextBuilder(SystemTextId.Attrib_DEX.ToId()).Right(),
+                        new UiTextBuilder(SystemTextId.Attrib_DEX).Right(),
                         new Spacing(0,2),
-                        new UiTextBuilder(SystemTextId.Attrib_SPD.ToId()).Right(),
+                        new UiTextBuilder(SystemTextId.Attrib_SPD).Right(),
                         new Spacing(0,2),
-                        new UiTextBuilder(SystemTextId.Attrib_STA.ToId()).Right(),
+                        new UiTextBuilder(SystemTextId.Attrib_STA).Right(),
                         new Spacing(0,2),
-                        new UiTextBuilder(SystemTextId.Attrib_LUC.ToId()).Right(),
+                        new UiTextBuilder(SystemTextId.Attrib_LUC).Right(),
                         new Spacing(0,2),
-                        new UiTextBuilder(SystemTextId.Attrib_MR.ToId()).Right(),
+                        new UiTextBuilder(SystemTextId.Attrib_MR).Right(),
                         new Spacing(0,2),
-                        new UiTextBuilder(SystemTextId.Attrib_MT.ToId()).Right()
+                        new UiTextBuilder(SystemTextId.Attrib_MT).Right()
                     ),
                     new Spacing(2,0),
                     new VerticalStack(
@@ -88,16 +88,16 @@ namespace UAlbion.Game.Gui.Inventory
                         Progress(SystemTextId.Attrib_MagicTalent, x => x.Attributes.MagicTalent, x => x.Attributes.MagicTalentMax)
                     )
                 ),
-                new Header(SystemTextId.Inv2_Skills.ToId()),
+                new Header(SystemTextId.Inv2_Skills),
                 new HorizontalStack(
                     new VerticalStack(
-                        new UiTextBuilder(SystemTextId.Skill_CLO.ToId()).Right(),
+                        new UiTextBuilder(SystemTextId.Skill_CLO).Right(),
                         new Spacing(0,2),
-                        new UiTextBuilder(SystemTextId.Skill_LON.ToId()).Right(),
+                        new UiTextBuilder(SystemTextId.Skill_LON).Right(),
                         new Spacing(0,2),
-                        new UiTextBuilder(SystemTextId.Skill_CRI.ToId()).Right(),
+                        new UiTextBuilder(SystemTextId.Skill_CRI).Right(),
                         new Spacing(0,2),
-                        new UiTextBuilder(SystemTextId.Skill_LP.ToId()).Right()
+                        new UiTextBuilder(SystemTextId.Skill_LP).Right()
                     ),
                     new Spacing(2,0),
                     new VerticalStack(

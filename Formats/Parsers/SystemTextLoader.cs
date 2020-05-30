@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
@@ -10,7 +11,7 @@ namespace UAlbion.Formats.Parsers
     public class SystemTextLoader : IAssetLoader
     {
         static readonly Regex Regex = new Regex(@"\[(\d+):(.*)\]");
-        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
             var results = new Dictionary<int, string>();
             var bytes = br.ReadBytes((int)streamLength);

@@ -5,14 +5,15 @@ namespace UAlbion.Game.Events
     [Event("save_game", "Save the game")]
     public class SaveGameEvent : GameEvent
     {
-        public SaveGameEvent(string filename, string name)
+        public SaveGameEvent(ushort id, string name)
         {
-            Filename = filename;
+            Id = id;
             Name = name;
         }
 
-        [EventPart("filename")]
-        public string Filename { get; }
+        [EventPart("id", "The slot number to save to")]
+        public ushort Id { get; }
+
         [EventPart("name")]
         public string Name { get; }
     }

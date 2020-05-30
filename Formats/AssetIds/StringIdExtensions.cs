@@ -5,6 +5,7 @@ namespace UAlbion.Formats.AssetIds
 {
     public static class StringIdExtensions
     {
+        /*
         public static StringId ToId(this SystemTextId systemTextId)
             => new StringId(AssetType.SystemText, 0, (int)systemTextId);
 
@@ -16,6 +17,7 @@ namespace UAlbion.Formats.AssetIds
 
         public static StringId ToId(this ItemId id)
             => new StringId(AssetType.ItemNames, (ushort)id, 0);
+            */
 
         public static StringId ToId(this ItemType type)
             => new StringId(AssetType.SystemText, 0, (int)(type switch

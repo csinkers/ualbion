@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets
 {
@@ -33,10 +34,10 @@ namespace UAlbion.Formats.Assets
             x => x.Key,
             x => (IList<(byte, byte)>)x.Value.Select(y => ((byte)y.Item1, (byte)y.Item2)).ToArray());
 
-        public AlbionPalette(BinaryReader br, int streamLength, string name, int id)
+        public AlbionPalette(BinaryReader br, int streamLength, AssetKey key, int id)
         {
             Id = id;
-            Name = name;
+            Name = key.ToString();
             long startingOffset = br.BaseStream.Position;
             for (int i = 0; i < 192; i++)
             {

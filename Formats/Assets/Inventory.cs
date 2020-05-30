@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using SerdesNet;
 
@@ -7,30 +7,37 @@ namespace UAlbion.Formats.Assets
 {
     public class Inventory : IInventory
     {
-        public InventoryType InventoryType { get; }
-        public int InventoryId { get; }
-        public ushort Gold { get; set; }
-        public ushort Rations { get; set; }
-        public ItemSlot[] Slots { get; }
+        readonly IReadOnlyList<IReadOnlyItemSlot> _readOnlyList;
 
-        public ItemSlot Neck { get => Slots[(int)ItemSlotId.Neck]; private set => Slots[(int)ItemSlotId.Neck] = value; } 
-        public ItemSlot Head { get => Slots[(int)ItemSlotId.Head]; private set => Slots[(int)ItemSlotId.Head] = value; }
-        public ItemSlot Tail { get => Slots[(int)ItemSlotId.Tail]; private set => Slots[(int)ItemSlotId.Tail] = value; }
-        public ItemSlot LeftHand { get => Slots[(int)ItemSlotId.LeftHand]; private set => Slots[(int)ItemSlotId.LeftHand] = value; }
-        public ItemSlot Chest { get => Slots[(int)ItemSlotId.Chest]; private set => Slots[(int)ItemSlotId.Chest] = value; }
-        public ItemSlot RightHand { get => Slots[(int)ItemSlotId.RightHand]; private set => Slots[(int)ItemSlotId.RightHand] = value; }
-        public ItemSlot LeftFinger { get => Slots[(int)ItemSlotId.LeftFinger]; private set => Slots[(int)ItemSlotId.LeftFinger] = value; }
-        public ItemSlot Feet { get => Slots[(int)ItemSlotId.Feet]; private set => Slots[(int)ItemSlotId.Feet] = value; }
-        public ItemSlot RightFinger { get => Slots[(int)ItemSlotId.RightFinger]; private set => Slots[(int)ItemSlotId.RightFinger] = value; }
-        public Inventory(InventoryType inventoryType, int inventoryId)
+        public Inventory(InventoryId id)
         {
-            InventoryType = inventoryType;
-            InventoryId = inventoryId;
-            Slots = new ItemSlot[(int) (inventoryType == InventoryType.Player
-                ? ItemSlotId.CharacterSlotCount
-                : ItemSlotId.NormalSlotCount)];
+            Id = id;
+            Slots = new ItemSlot[(int)(id.Type switch
+            {
+                InventoryType.Player => ItemSlotId.CharacterSlotCount,
+                InventoryType.Chest => ItemSlotId.ChestSlotCount,
+                _ => ItemSlotId.NormalSlotCount // e.g. merchants
+            })];
+
+            for (int i = 0; i < Slots.Length; i++)
+                Slots[i] = new ItemSlot(new InventorySlotId(id, (ItemSlotId)i));
+
+            _readOnlyList = new ReadOnlyCollection<IReadOnlyItemSlot>(Slots);
         }
 
+        public InventoryId Id { get; }
+        public ItemSlot[] Slots { get; }
+        public ItemSlot Gold => Slots[(int)ItemSlotId.Gold];
+        public ItemSlot Rations => Slots[(int)ItemSlotId.Rations];
+        public ItemSlot Neck => Slots[(int)ItemSlotId.Neck];
+        public ItemSlot Head => Slots[(int)ItemSlotId.Head];
+        public ItemSlot Tail => Slots[(int)ItemSlotId.Tail];
+        public ItemSlot LeftHand => Slots[(int)ItemSlotId.LeftHand];
+        public ItemSlot Chest => Slots[(int)ItemSlotId.Chest];
+        public ItemSlot RightHand => Slots[(int)ItemSlotId.RightHand];
+        public ItemSlot LeftFinger => Slots[(int)ItemSlotId.LeftFinger];
+        public ItemSlot Feet => Slots[(int)ItemSlotId.Feet];
+        public ItemSlot RightFinger => Slots[(int)ItemSlotId.RightFinger];
         public static Inventory SerdesChest(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, InventoryType.Chest);
         public static Inventory SerdesMerchant(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, InventoryType.Merchant);
         public static Inventory SerdesCharacter(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, InventoryType.Player);
@@ -38,27 +45,39 @@ namespace UAlbion.Formats.Assets
 
         static Inventory Serdes(int n, Inventory inv, ISerializer s, InventoryType type)
         {
-            inv ??= new Inventory(type, n);
+            var invId = new InventoryId(type, (ushort) n);
+            void S(string name, ItemSlot existing, ItemSlotId slotId)
+                => s.Meta(name, existing,
+                    (_, x, s2) => ItemSlot.Serdes(new InventorySlotId(invId, slotId), x, s2));
+
+            inv ??= new Inventory(invId);
             if (type == InventoryType.Player)
             {
-                inv.Neck = s.Meta(nameof(inv.Neck), inv.Neck, ItemSlot.Serdes);
-                inv.Head = s.Meta(nameof(inv.Head), inv.Head, ItemSlot.Serdes);
-                inv.Tail = s.Meta(nameof(inv.Tail), inv.Tail, ItemSlot.Serdes);
-                inv.RightHand = s.Meta(nameof(inv.RightHand), inv.RightHand, ItemSlot.Serdes);
-                inv.Chest = s.Meta(nameof(inv.Chest), inv.Chest, ItemSlot.Serdes);
-                inv.LeftHand = s.Meta(nameof(inv.LeftHand), inv.LeftHand, ItemSlot.Serdes);
-                inv.RightFinger = s.Meta(nameof(inv.RightFinger), inv.RightFinger, ItemSlot.Serdes);
-                inv.Feet = s.Meta(nameof(inv.Feet), inv.Feet, ItemSlot.Serdes);
-                inv.LeftFinger = s.Meta(nameof(inv.LeftFinger), inv.LeftFinger, ItemSlot.Serdes);
+                S(nameof(inv.Neck), inv.Neck, ItemSlotId.Neck);
+                S(nameof(inv.Head), inv.Head, ItemSlotId.Head);
+                S(nameof(inv.Tail), inv.Tail, ItemSlotId.Tail);
+                S(nameof(inv.RightHand), inv.RightHand, ItemSlotId.RightHand);
+                S(nameof(inv.Chest), inv.Chest, ItemSlotId.Chest);
+                S(nameof(inv.LeftHand), inv.LeftHand, ItemSlotId.LeftHand);
+                S(nameof(inv.RightFinger), inv.RightFinger, ItemSlotId.RightFinger);
+                S(nameof(inv.Feet), inv.Feet, ItemSlotId.Feet);
+                S(nameof(inv.LeftFinger), inv.LeftFinger, ItemSlotId.LeftFinger);
             }
 
             for (int i = 0; i < (int)ItemSlotId.NormalSlotCount; i++)
-                inv.Slots[i] = s.Meta($"Slot{i}", inv.Slots[i], ItemSlot.Serdes);
+                S($"Slot{i}", inv.Slots[i], (ItemSlotId)((int)ItemSlotId.Slot0 + i));
 
-            if (type == InventoryType.Chest)
+            if (type != InventoryType.Merchant)
             {
-                inv.Gold = s.UInt16(nameof(inv.Gold), inv.Gold);
-                inv.Rations = s.UInt16(nameof(inv.Rations), inv.Rations);
+                inv.Gold.Item ??= new Gold();
+                inv.Rations.Item ??= new Rations();
+            }
+
+            // Note: Gold + Rations for players are added in the sheet loader. Merchants have no gold/rations.
+            if (type == InventoryType.Chest) 
+            {
+                inv.Gold.Amount = s.UInt16(nameof(inv.Gold), inv.Gold.Amount);
+                inv.Rations.Amount = s.UInt16(nameof(inv.Rations), inv.Rations.Amount);
             }
 
             return inv;
@@ -85,14 +104,12 @@ namespace UAlbion.Formats.Assets
             return Slots[slotNumber];
         }
 
-        public void SetSlot(ItemSlotId slotId, ItemSlot slot) => Slots[(int)slotId] = slot;
-
         public Inventory DeepClone()
         {
-            var clone = new Inventory(InventoryType, InventoryId)
+            var clone = new Inventory(Id)
             {
-                Gold = Gold,
-                Rations = Rations,
+                Gold = { Amount = Gold.Amount },
+                Rations = { Amount = Rations.Amount }
             };
 
             for (int i = 0; i < Slots.Length; i++)
@@ -100,5 +117,21 @@ namespace UAlbion.Formats.Assets
 
             return clone;
         }
+
+        IReadOnlyItemSlot IInventory.Gold => Gold;
+        IReadOnlyItemSlot IInventory.Rations => Rations;
+        IReadOnlyItemSlot IInventory.Neck => Neck;
+        IReadOnlyItemSlot IInventory.Head => Head;
+        IReadOnlyItemSlot IInventory.Tail => Tail;
+        IReadOnlyItemSlot IInventory.LeftHand => LeftHand;
+        IReadOnlyItemSlot IInventory.Chest => Chest;
+        IReadOnlyItemSlot IInventory.RightHand => RightHand;
+        IReadOnlyItemSlot IInventory.LeftFinger => LeftFinger;
+        IReadOnlyItemSlot IInventory.Feet => Feet;
+        IReadOnlyItemSlot IInventory.RightFinger => RightFinger;
+        IReadOnlyList<IReadOnlyItemSlot> IInventory.Slots => _readOnlyList;
+        IEnumerable<IReadOnlyItemSlot> IInventory.EnumerateAll() => EnumerateAll();
+        IEnumerable<IReadOnlyItemSlot> IInventory.EnumerateBodyParts() => EnumerateBodyParts();
+        IReadOnlyItemSlot IInventory.GetSlot(ItemSlotId itemSlotId) => GetSlot(itemSlotId);
     }
 }

@@ -52,7 +52,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
             var game = Resolve<IGameState>();
             var assets = Resolve<IAssetManager>();
-            var partyMember = game?.GetPartyMember(_partyMemberId) ?? assets.LoadCharacter(_partyMemberId);
+            var partyMember = game?.GetPartyMember(_partyMemberId) ?? assets.LoadPartyMember(_partyMemberId);
 
             AttachChild(new ConversationParticipantLabel(partyMember, false));
             AttachChild(new ConversationParticipantLabel(_npc, true));
@@ -225,7 +225,7 @@ namespace UAlbion.Game.Gui.Dialogs
         {
             (IText, int?, Action) Build(SystemTextId id, int block)
             {
-                var text = tf.Format(id.ToId());
+                var text = tf.Format(id);
                 return (text, null, () => BlockClicked(block, 0));
             }
 

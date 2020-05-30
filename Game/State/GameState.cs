@@ -34,8 +34,8 @@ namespace UAlbion.Game.State
         public GameState()
         {
             On<NewGameEvent>(e => NewGame(e.MapId, e.X, e.Y));
-            On<LoadGameEvent>(e => LoadGame(e.Filename));
-            On<SaveGameEvent>(e => SaveGame(e.Filename, e.Name));
+            On<LoadGameEvent>(e => LoadGame(e.Id));
+            On<SaveGameEvent>(e => SaveGame(e.Id, e.Name));
             On<FastClockEvent>(e => TickCount += e.Frames);
             On<SetTimeEvent>(e =>
             {
@@ -64,24 +64,25 @@ namespace UAlbion.Game.State
             AttachChild(new InventoryManager(GetInventory));
         }
 
-        IInventory IGameState.GetInventory(InventoryType type, int id) => GetInventory(type, id);
-        Inventory GetInventory(InventoryType type, int id)
+        IInventory IGameState.GetInventory(InventoryId id) => GetInventory(id);
+        Inventory GetInventory(InventoryId id)
         {
             if (_game == null)
                 return null;
 
             Inventory inventory;
-            switch(type)
+            switch(id.Type)
             {
                 case InventoryType.Player:
-                    inventory = _game.PartyMembers.TryGetValue((PartyCharacterId)id, out var member) ? member.Inventory : null;
+                    inventory = _game.PartyMembers.TryGetValue((PartyCharacterId)id.Id, out var member) ? member.Inventory : null;
                     break;
-                case InventoryType.Chest: _game.Chests.TryGetValue((ChestId)id, out inventory); break;
-                case InventoryType.Merchant: _game.Merchants.TryGetValue((MerchantId)id, out inventory); break;
+                case InventoryType.Chest: _game.Chests.TryGetValue((ChestId)id.Id, out inventory); break;
+                case InventoryType.Merchant: _game.Merchants.TryGetValue((MerchantId)id.Id, out inventory); break;
                 default:
-                    throw new InvalidOperationException($"Unexpected inventory type requested: \"{type}\"");
-            };
-            ApiUtil.Assert(inventory?.InventoryType == type && inventory.InventoryId == id);
+                    throw new InvalidOperationException($"Unexpected inventory type requested: \"{id.Type}\"");
+            }
+
+            ApiUtil.Assert(inventory?.Id != null && inventory.Id == id);
             return inventory;
         }
 
@@ -100,10 +101,10 @@ namespace UAlbion.Game.State
             _game.ActiveMembers[0] = PartyCharacterId.Tom;
 
             foreach (PartyCharacterId charId in Enum.GetValues(typeof(PartyCharacterId)))
-                _game.PartyMembers.Add(charId, assets.LoadCharacter(charId));
+                _game.PartyMembers.Add(charId, assets.LoadPartyMember(charId));
 
             foreach (NpcCharacterId charId in Enum.GetValues(typeof(NpcCharacterId)))
-                _game.NpcStats.Add(charId, assets.LoadCharacter(charId));
+                _game.NpcStats.Add(charId, assets.LoadNpc(charId));
 
             foreach(ChestId id in Enum.GetValues(typeof(ChestId)))
                 _game.Chests.Add(id, assets.LoadChest(id));
@@ -114,25 +115,13 @@ namespace UAlbion.Game.State
             InitialiseGame();
         }
 
-        void LoadGame(string filename)
+        void LoadGame(ushort id)
         {
-            if(!File.Exists(filename))
-            {
-                var generalConfig = Resolve<IAssetManager>().LoadGeneralConfig();
-                filename = Path.Combine(generalConfig.BasePath, generalConfig.ExePath, "SAVES", filename);
-            }
-
-            var loader = AssetLoaderRegistry.GetLoader<SavedGame>(FileFormat.SavedGame);
-            using var stream = File.Open(filename, FileMode.Open);
-            using var br = new BinaryReader(stream);
-            var save = loader.Serdes(
-                null,
-                new AlbionReader(br, stream.Length), "SavedGame", null);
-            _game = save;
+            _game = Resolve<IAssetManager>().LoadSavedGame(id);
             InitialiseGame();
         }
 
-        void SaveGame(string filename, string name)
+        void SaveGame(ushort id, string name)
         {
             if (_game == null)
                 return;
@@ -145,9 +134,13 @@ namespace UAlbion.Game.State
                     ? _party.StatusBarOrder[i].Id
                     : (PartyCharacterId?)null;
 
+            var key = new AssetKey(AssetType.SavedGame, id);
+            var generalConfig = Resolve<IAssetManager>().LoadGeneralConfig();
+            var filename = Path.Combine(generalConfig.BasePath, generalConfig.ExePath, "SAVES", $"SAVE.{key.Id:D3}");
+
             using var stream = File.Open(filename, FileMode.Create);
             using var bw = new BinaryWriter(stream);
-            loader.Serdes(_game, new AlbionWriter(bw), name, null);
+            loader.Serdes(_game, new AlbionWriter(bw), key, null);
         }
 
         void InitialiseGame()

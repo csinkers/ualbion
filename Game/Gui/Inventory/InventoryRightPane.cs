@@ -26,10 +26,10 @@ namespace UAlbion.Game.Gui.Inventory
                 for (int i = 0; i < InventoryWidth; i++)
                 {
                     int index = j * InventoryWidth + i;
-                    slotsInRow[i] = new LogicalInventorySlot(
+                    slotsInRow[i] = new LogicalInventorySlot(new InventorySlotId(
                         InventoryType.Player,
-                        (int)activeCharacter,
-                        (ItemSlotId)((int)ItemSlotId.Slot0 + index));
+                        (ushort)activeCharacter,
+                        (ItemSlotId)((int)ItemSlotId.Slot0 + index)));
                 }
                 slotSpans[j] = new HorizontalStack(slotsInRow);
             }
@@ -41,12 +41,12 @@ namespace UAlbion.Game.Gui.Inventory
             if (showTotalPartyGold)
             {
                 var tf = Resolve<ITextFormatter>();
-                int total = Resolve<IParty>().StatusBarOrder.Sum(x => x.Apparent.Inventory.Gold);
+                int total = Resolve<IParty>().StatusBarOrder.Sum(x => x.Apparent.Inventory.Gold.Amount);
                 var money = new Button(
                     new VerticalStack(
                         new Spacing(64, 0),
                         new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiGold) { Flags = SpriteFlags.Highlight },
-                        new UiText(tf.Format(SystemTextId.Shop_GoldAll.ToId())),
+                        new UiText(tf.Format(SystemTextId.Shop_GoldAll)),
                         new SimpleText($"{total / 10}.{total % 10}")
                     ) { Greedy = false})
                 { IsPressed = true };
@@ -54,15 +54,15 @@ namespace UAlbion.Game.Gui.Inventory
             }
             else
             {
-                var goldButton = new LogicalInventorySlot(
+                var goldButton = new LogicalInventorySlot(new InventorySlotId(
                     InventoryType.Player,
-                    (int)activeCharacter,
-                    ItemSlotId.Gold);
+                    (ushort)activeCharacter,
+                    ItemSlotId.Gold));
 
-                var foodButton = new LogicalInventorySlot(
+                var foodButton = new LogicalInventorySlot(new InventorySlotId(
                     InventoryType.Player,
-                    (int)activeCharacter,
-                    ItemSlotId.Rations);
+                    (ushort)activeCharacter,
+                    ItemSlotId.Rations));
 
                 moneyAndFoodStack = new HorizontalStack(goldButton, foodButton);
             }

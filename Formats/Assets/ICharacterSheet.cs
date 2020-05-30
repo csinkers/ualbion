@@ -4,7 +4,7 @@ namespace UAlbion.Formats.Assets
 {
     public interface ICharacterSheet
     {
-        string Name { get; } // Debug name, not displayed to the player
+        AssetKey Key { get; }
         string GetName(GameLanguage language);
 
         CharacterType Type { get; }

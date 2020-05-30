@@ -181,7 +181,7 @@ namespace UAlbion
 
                     if (npc.Chain != null)
                     {
-                        var context = new EventContext(new EventSource.Map((MapDataId)i, TriggerType.Default, 0, 0));
+                        // var context = new EventContext(new EventSource.Map((MapDataId)i, TriggerType.Default, 0, 0));
                         sw.WriteLine($"        EventChain: {npc.Chain?.Id}");
                         foreach (var e in npc.Chain.Events)
                         {
@@ -207,19 +207,19 @@ namespace UAlbion
             {
                 using var sw = File.CreateText($@"{baseDir}\re\PartyCharacters.txt");
                 foreach (PartyCharacterId charId in Enum.GetValues(typeof(PartyCharacterId)))
-                    DumpCharacterSheet(charId, assets.LoadCharacter(charId), sw, assets, tf);
+                    DumpCharacterSheet(charId, assets.LoadPartyMember(charId), sw, assets, tf);
             }
 
             {
                 using var sw = File.CreateText($@"{baseDir}\re\NpcCharacters.txt");
                 foreach (NpcCharacterId charId in Enum.GetValues(typeof(NpcCharacterId)))
-                    DumpCharacterSheet(charId, assets.LoadCharacter(charId), sw, assets, tf);
+                    DumpCharacterSheet(charId, assets.LoadNpc(charId), sw, assets, tf);
             }
 
             {
                 using var sw = File.CreateText($@"{baseDir}\re\MonsterCharacters.txt");
                 foreach (MonsterCharacterId charId in Enum.GetValues(typeof(MonsterCharacterId)))
-                    DumpCharacterSheet(charId, assets.LoadCharacter(charId), sw, assets, tf);
+                    DumpCharacterSheet(charId, assets.LoadMonster(charId), sw, assets, tf);
             }
         }
 
@@ -233,7 +233,7 @@ namespace UAlbion
             sw.WriteLine($"    Languages:{c.Languages} Sprite:{c.SpriteId} Portrait:{(int?)c.PortraitId}");
             if (c.Inventory.Slots != null)
             {
-                sw.WriteLine($"    Inventory: (Gold:{c.Inventory.Gold / 10.0}, Rations:{c.Inventory.Rations})");
+                sw.WriteLine($"    Inventory: (Gold:{c.Inventory.Gold.Amount / 10.0}, Rations:{c.Inventory.Rations.Amount})");
                 sw.WriteLine($"             Head: {c.Inventory.Head}");
                 sw.WriteLine($"             Neck: {c.Inventory.Neck}");
                 sw.WriteLine($"            Chest: {c.Inventory.Chest}");
@@ -244,7 +244,7 @@ namespace UAlbion
                 sw.WriteLine($"          RFinger: {c.Inventory.RightFinger}");
                 sw.WriteLine($"             Feet: {c.Inventory.Feet}");
                 sw.WriteLine("             Pack:");
-                foreach (var item in c.Inventory.Slots.Where(x => x?.Id != null))
+                foreach (var item in c.Inventory.Slots.Where(x => x?.Item != null))
                     sw.WriteLine($"                 {item}");
             }
 
@@ -329,9 +329,9 @@ namespace UAlbion
                 var chests = Enum.GetValues(typeof(ChestId)).Cast<ChestId>().ToDictionary(x => x, assets.LoadChest);
                 foreach (var chest in chests.Where(x => x.Value != null))
                 {
-                    sw.WriteLine($"Chest {(int)chest.Key} {chest.Key}: ({chest.Value.Gold/10.0} gold, {chest.Value.Rations} rations)");
-                    foreach(var x in chest.Value.Slots.Where(x => x.Id.HasValue))
-                        sw.WriteLine($"    {x.Amount}x{x.Id} Charges:{x.Charges} Enchantment:{x.Enchantment} Flags:{x.Flags}");
+                    sw.WriteLine($"Chest {(int)chest.Key} {chest.Key}: ({chest.Value.Gold.Amount/10.0} gold, {chest.Value.Rations} rations)");
+                    foreach(var x in chest.Value.Slots.Where(x => x.Item != null))
+                        sw.WriteLine($"    {x.Amount}x{x.Item} Charges:{x.Charges} Enchantment:{x.Enchantment} Flags:{x.Flags}");
                 }
             }
 
@@ -340,9 +340,9 @@ namespace UAlbion
                 var merchants = Enum.GetValues(typeof(MerchantId)).Cast<MerchantId>().ToDictionary(x => x, assets.LoadMerchant);
                 foreach (var merchant in merchants.Where(x => x.Value != null))
                 {
-                    sw.WriteLine($"Merchant {(int)merchant.Key} {merchant.Key}: ({merchant.Value.Gold/10.0} gold, {merchant.Value.Rations} rations)");
-                    foreach(var x in merchant.Value.Slots.Where(x => x.Id.HasValue))
-                        sw.WriteLine($"    {x.Amount}x{x.Id} Charges:{x.Charges} Enchantment:{x.Enchantment} Flags:{x.Flags}");
+                    sw.WriteLine($"Merchant {(int)merchant.Key} {merchant.Key}: ({merchant.Value.Gold.Amount/10.0} gold, {merchant.Value.Rations} rations)");
+                    foreach(var x in merchant.Value.Slots.Where(x => x.Item != null))
+                        sw.WriteLine($"    {x.Amount}x{x.Item} Charges:{x.Charges} Enchantment:{x.Enchantment} Flags:{x.Flags}");
                 }
             }
         }
@@ -487,7 +487,7 @@ namespace UAlbion
             {
                 var spell = assets.LoadSpell(spellId);
                 var systemTextId = (SystemTextId)((int)spellId + (int)SpellData.SystemTextOffset);
-                var systemText = assets.LoadString(systemTextId.ToId(), GameLanguage.English);
+                var systemText = assets.LoadString(systemTextId, GameLanguage.English);
                 int classNumber = (int)spellId / SpellData.MaxSpellsPerClass;
                 int offsetInClass = (int)spellId % SpellData.MaxSpellsPerClass;
                 sw.Write($"Spell{(int)spellId:D3} {classNumber}_{offsetInClass}");

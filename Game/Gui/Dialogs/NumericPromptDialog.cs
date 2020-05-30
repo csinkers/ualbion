@@ -15,7 +15,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
             var textSection = new UiText(text);
             var slider = new Slider(() => Value, x => Value = x, min, max);
-            var button = new Button(SystemTextId.MsgBox_OK.ToId()).OnClick(Close);
+            var button = new Button(SystemTextId.MsgBox_OK).OnClick(Close);
 
             // 30
             var stack = new VerticalStack(

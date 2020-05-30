@@ -41,7 +41,7 @@ namespace UAlbion.Game.Gui.Inventory
 
                 // Carried Weight : %ld of %ld g
                 return Resolve<ITextFormatter>().Format(
-                    SystemTextId.Inv_CarriedWeightNdOfNdG.ToId(),
+                    SystemTextId.Inv_CarriedWeightNdOfNdG,
                     player.Apparent.TotalWeight,
                     player.Apparent.MaxWeight).Get();
             }, x => _version);
@@ -57,7 +57,7 @@ namespace UAlbion.Game.Gui.Inventory
                 return Resolve<ITextFormatter>()
                     .NoWrap()
                     .Center()
-                    .Format(SystemTextId.Inv_WeightNKg.ToId(), weight)
+                    .Format(SystemTextId.Inv_WeightNKg, weight)
                     .Get();
             }, x => _version);
 

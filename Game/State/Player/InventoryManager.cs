@@ -49,7 +49,7 @@ namespace UAlbion.Game.State.Player
                 case (Gold _, Gold _):
                 case (Rations _, Rations _): return InventoryAction.Coalesce;
 
-                case (ItemData _, null): return InventoryAction.Drop;
+                case (ItemData _, null): return InventoryAction.PutDown;
                 case (ItemData _, ItemData _) when slot.CanCoalesce(_hand):
                     return slot.Amount >= MaxSlotAmount
                         ? InventoryAction.NoCoalesceFullStack
@@ -75,7 +75,7 @@ namespace UAlbion.Game.State.Player
                 _hand.Item == null 
                 ? null 
                 : new InventoryPickupDropEvent(slot.Id.Type, slot.Id.Id, slot.Id.Slot);
-            Raise(new SetCursorEvent(_hand == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
+            Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
         }
 
         static bool DoesSlotAcceptItem(ICharacterSheet sheet, ItemSlotId slotId, ItemData item)
@@ -178,9 +178,9 @@ namespace UAlbion.Game.State.Player
             var inventory = _getInventory((InventoryId)e.MemberId);
 
             if (_hand.Item is Gold)
-                Drop(inventory.Gold);
+                PutDown(inventory.Gold);
             if (_hand.Item is Rations)
-                Drop(inventory.Rations);
+                PutDown(inventory.Rations);
             if (!(_hand.Item is ItemData item))
                 return; // Unknown or null
 
@@ -195,7 +195,9 @@ namespace UAlbion.Game.State.Player
             slot ??= inventory.Slots.FirstOrDefault(x => x.Item == null);
 
             if(slot != null)
-                Drop(slot);
+                PutDown(slot);
+
+            Update(inventory.Id);
         }
 
         void GetQuantity(bool discard, IInventory inventory, ItemSlotId slotId, Action<int> continuation)
@@ -271,11 +273,13 @@ namespace UAlbion.Game.State.Player
                     }
 
                     break;
-                case InventoryAction.Drop:     Drop(slot);          break;
+                case InventoryAction.PutDown:  PutDown(slot);          break;
                 case InventoryAction.Swap:     SwapItems(slot);     break;
                 case InventoryAction.Coalesce: CoalesceItems(slot); break;
                 case InventoryAction.NoCoalesceFullStack: return;
             }
+
+            Update(slotId.Inventory);
         }
 
         void CoalesceItems(ItemSlot slot)
@@ -284,7 +288,6 @@ namespace UAlbion.Game.State.Player
             ApiUtil.Assert(slot.Amount < MaxSlotAmount);
 
             slot.TransferFrom(_hand, null);
-            Update(slot.Id.Inventory);
         }
 
         void SwapItems(ItemSlot slot)
@@ -298,15 +301,13 @@ namespace UAlbion.Game.State.Player
             // FIXME: could take a lightweight object from player A (who is at their max carry weight), swap it with a heavy one carried by player B
             // and then close the inventory screen. The return event will fire and drop the heavier object in player A's inventory, taking them above their
             // max carry weight.
-            Raise(new SetCursorEvent(_hand == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
-            Update(slot.Id.Inventory);
+            Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
         }
 
-        void Drop(ItemSlot slot)
+        void PutDown(ItemSlot slot)
         {
             ApiUtil.Assert(slot.Item == null);
             slot.TransferFrom(_hand, null);
-            Update(slot.Id.Inventory);
         }
 
         void RaiseStatusMessage(SystemTextId textId) 

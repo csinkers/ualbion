@@ -74,7 +74,7 @@ namespace UAlbion.Game.Gui.Inventory
         {
             var inventoryManager = Resolve<IInventoryManager>();
             var hand = inventoryManager.ItemInHand;
-            Raise(new SetCursorEvent(hand == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
+            Raise(new SetCursorEvent(hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
             Raise(new HoverTextEvent(null));
         }
 
@@ -122,7 +122,7 @@ namespace UAlbion.Game.Gui.Inventory
                     }
                     break;
                 }
-                case InventoryAction.Drop: // Put down %s
+                case InventoryAction.PutDown: // Put down %s
                 {
                     if (itemInHandName != null)
                     {

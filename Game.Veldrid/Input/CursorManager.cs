@@ -8,11 +8,13 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
+using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui;
+using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Input;
 using UAlbion.Game.Settings;
-using UAlbion.Game.State;
 using UAlbion.Game.State.Player;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Veldrid.Input
 {
@@ -24,10 +26,12 @@ namespace UAlbion.Game.Veldrid.Input
         Vector2 _hotspot;
         SpriteLease _cursorSprite;
         SpriteLease _itemSprite;
+        UiText _itemAmount;
         SpriteLease _hotspotSprite;
         bool _dirty = true;
         bool _showCursor = true;
         int _frame;
+        int _version;
 
         public CursorManager()
         {
@@ -36,6 +40,7 @@ namespace UAlbion.Game.Veldrid.Input
             On<SetCursorEvent>(e => SetCursor(e.CursorId));
             On<ShowCursorEvent>(e => { _showCursor = e.Show; _dirty = true; });
             On<WindowResizedEvent>(e => SetCursor(_cursorId));
+            On<InventoryChangedEvent>(_ => _version++);
             On<InputEvent>(e =>
             {
                 Position = e.Snapshot.MousePosition;
@@ -46,6 +51,21 @@ namespace UAlbion.Game.Veldrid.Input
                 Position = new Vector2(e.X, e.Y);
                 _dirty = true;
             });
+
+            var amountSource = new DynamicText(() =>
+            {
+                var hand = Resolve<IInventoryManager>().ItemInHand;
+                var amount = hand.Amount;
+                if (amount < 2)
+                    return new TextBlock[0];
+
+                return 
+                    hand.Item is Gold
+                    ? new[] { new TextBlock($"{amount/10}.{amount%10}") }
+                    : new[] { new TextBlock(amount.ToString()) };
+            }, x => _version);
+            _itemAmount = AttachChild(new UiText(amountSource));
+            _itemAmount.IsActive = false;
         }
 
         void SetCursor(CoreSpriteId cursorId)
@@ -139,10 +159,12 @@ namespace UAlbion.Game.Veldrid.Input
             {
                 _itemSprite?.Dispose();
                 _itemSprite = null;
+                _itemAmount.IsActive = false;
                 return;
             }
 
             var held = Resolve<IInventoryManager>().ItemInHand;
+            _itemAmount.IsActive = true;
 
             int subItem = 0;
             ITexture texture = null;

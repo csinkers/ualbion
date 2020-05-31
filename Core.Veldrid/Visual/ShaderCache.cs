@@ -63,7 +63,7 @@ namespace UAlbion.Core.Veldrid.Visual
             {
                 var fullName = $"{GetType().Namespace}.{shaderName}";
                 using var resource = GetType().Assembly.GetManifestResourceStream(fullName);
-                using var streamReader = new StreamReader(resource ?? throw new InvalidOperationException("The shader {name} could not be found"));
+                using var streamReader = new StreamReader(resource ?? throw new InvalidOperationException($"The shader {fullName} could not be found (checked debug path {debugPath})"));
                 while (!streamReader.EndOfStream)
                     yield return streamReader.ReadLine();
             }

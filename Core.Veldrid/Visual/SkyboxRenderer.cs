@@ -57,8 +57,8 @@ namespace UAlbion.Core.Veldrid.Visual
         Pipeline BuildPipeline(GraphicsDevice gd, SceneContext sc)
         {
             var shaderCache = Resolve<IShaderCache>();
-            var vertexShaderName = "SkyboxSV.vert";
-            var fragmentShaderName = "SkyboxSF.frag";
+            var vertexShaderName = "SkyBoxSV.vert";
+            var fragmentShaderName = "SkyBoxSF.frag";
             var vertexShaderContent = shaderCache.GetGlsl(vertexShaderName);
             var fragmentShaderContent = shaderCache.GetGlsl(fragmentShaderName);
 

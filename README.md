@@ -10,6 +10,7 @@ Issue tracker at [https://trello.com/b/Tcm2WbU1/ualbion](https://trello.com/b/Tc
 ## Screenshots
 <details>
   <summary>Click to expand</summary>
+
   ![Example Screenshot 1](/data/Screenshots/1_FirstLevel.png?raw=true)
   ![Example Screenshot 2](/data/Screenshots/2_3DWorld.png?raw=true)
   ![Example Screenshot 3](/data/Screenshots/3_Outdoors.png?raw=true)

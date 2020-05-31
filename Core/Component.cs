@@ -32,6 +32,11 @@ namespace UAlbion.Core
         protected EventExchange Exchange { get; private set; }
 
         /// <summary>
+        /// The parent of this component, if it is a child.
+        /// </summary>
+        protected IComponent Parent { get; private set; }
+
+        /// <summary>
         /// The list of this components child components.
         /// The primary purpose of children is ensuring that the children are also attached and
         /// detached when the parent component is.
@@ -114,6 +119,9 @@ namespace UAlbion.Core
                 Exchange?.Attach(child);
 
             Children.Add(child);
+            if(child is Component component)
+                component.Parent = this;
+
             return child;
         }
 
@@ -123,7 +131,11 @@ namespace UAlbion.Core
         protected void RemoveAllChildren()
         {
             foreach (var child in Children)
+            {
                 child.Detach();
+                if(child is Component component)
+                    component.Parent = null;
+            }
             Children.Clear();
         }
 
@@ -137,6 +149,8 @@ namespace UAlbion.Core
             if (index == -1) return;
             child.Detach();
             Children.RemoveAt(index);
+            if (child is Component component)
+                component.Parent = null;
         }
 
         /// <summary>

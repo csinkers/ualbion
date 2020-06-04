@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using UAlbion.Formats;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.Parsers;
@@ -376,7 +377,7 @@ namespace UAlbion.Tools.ImageReverser
         {
             using var stream = File.OpenRead(Path.Combine(_core.BaseExportDirectory, filename));
             using var br = new BinaryReader(stream);
-            return (AlbionSprite)GetLoader(conf).Load(br, stream.Length, filename, conf);
+            return (AlbionSprite)GetLoader(conf).Load(br, stream.Length, new AssetKey(AssetType.Picture), conf);
         }
 
         static IAssetLoader GetLoader(FullAssetInfo conf) =>

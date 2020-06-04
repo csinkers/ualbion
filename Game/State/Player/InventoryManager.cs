@@ -59,7 +59,7 @@ namespace UAlbion.Game.State.Player
                     return InventoryAction.Swap;
 
                 default:
-                    throw new InvalidOperationException($"Unexpected item in hand of type: {_hand.GetType()}");
+                    return InventoryAction.Nothing;
             }
         }
 
@@ -82,7 +82,7 @@ namespace UAlbion.Game.State.Player
         {
             switch (sheet.Gender)
             {
-                case Gender.Male: if (!item.AllowedGender.HasFlag(GenderMask.Male)) return false; break;
+                case Gender.Male:   if (!item.AllowedGender.HasFlag(GenderMask.Male)) return false; break;
                 case Gender.Female: if (!item.AllowedGender.HasFlag(GenderMask.Female)) return false; break;
                 case Gender.Neuter: if (!item.AllowedGender.HasFlag(GenderMask.Neutral)) return false; break;
             }
@@ -366,7 +366,7 @@ namespace UAlbion.Game.State.Player
 
             Update(id);
 
-            if(context.Source is EventSource.Map mapEventSource && contents is ItemData item)
+            if(context.Source is EventSource.Map mapEventSource && contents is IItem item)
                 ItemTransition.CreateTransitionFromTilePosition(Exchange, mapEventSource.X, mapEventSource.Y, item.Id);
 
             return true;

@@ -18,7 +18,7 @@ namespace UAlbion.Api
         public EventPartMetadata(PropertyInfo property, ParameterExpression partsParameter, int index)
         {
             var declaringType = property.DeclaringType;
-            if(declaringType == null)
+            if (declaringType == null)
                 throw new InvalidOperationException("Property must have a declaring type");
 
             var attribute = (EventPartAttribute)property.GetCustomAttribute(typeof(EventPartAttribute), false);

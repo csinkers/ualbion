@@ -73,12 +73,12 @@ namespace UAlbion.Api
 
         public static Event Parse(string s)
         {
-            IEnumerable<string> Split()
+            static IEnumerable<string> Split(string input)
             {
                 var sb = new StringBuilder();
                 bool inString = false;
                 bool inEscape = false;
-                foreach (char c in s)
+                foreach (char c in input)
                 {
                     switch (c)
                     {
@@ -94,6 +94,15 @@ namespace UAlbion.Api
                                 sb.Length = 0;
                             }
 
+                            break;
+
+                        case 't':
+                            if(inEscape)
+                            {
+                                sb.Append('\t');
+                                inEscape = false;
+                            }
+                            else sb.Append(c);
                             break;
 
                         case '"':
@@ -127,14 +136,16 @@ namespace UAlbion.Api
                     yield return sb.ToString();
             }
 
-            string[] parts = Split().ToArray();
+            if (s == null)
+                return null;
+
+            string[] parts = Split(s).ToArray();
             if (parts.Length == 0)
                 return null;
 
-            if (!Events.ContainsKey(parts[0]))
+            if (!Events.TryGetValue(parts[0], out var metadata))
                 return null;
 
-            var metadata = Events[parts[0]];
             if (parts.Length < metadata.Parts.Length + 1)
                 parts = parts.Concat(Enumerable.Repeat<string>(null, metadata.Parts.Length + 1 - parts.Length)).ToArray();
 

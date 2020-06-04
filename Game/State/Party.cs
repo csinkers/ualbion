@@ -28,7 +28,7 @@ namespace UAlbion.Game.State
             On<RemovePartyMemberEvent>(e => SetLastResult(RemoveMember(e.PartyMemberId)));
             On<ChangePartyGoldEvent>(e => SetLastResult(ChangePartyInventory(new Gold(),  e.Operation, e.Amount)));
             On<ChangePartyRationsEvent>(e => SetLastResult(ChangePartyInventory(new Rations(), e.Operation, e.Amount)));
-            On<AddRemoveInventoryItemEvent>(e => SetLastResult(ChangePartyInventory(new ItemProxy(e.ItemId), e.Operation, e.Amount)));
+            On<AddRemoveInventoryItemEvent>(e => SetLastResult(ChangePartyInventory(Resolve<IAssetManager>().LoadItem(e.ItemId), e.Operation, e.Amount)));
             On<SetPartyLeaderEvent>(e =>
             {
                 Leader = e.PartyMemberId;
@@ -39,7 +39,7 @@ namespace UAlbion.Game.State
             {
                 SetLastResult(e.ChestType switch
                 {
-                    SimpleChestEvent.SimpleChestItemType.Item => ChangePartyInventory(new ItemProxy(e.ItemId), QuantityChangeOperation.AddAmount, e.Amount),
+                    SimpleChestEvent.SimpleChestItemType.Item => ChangePartyInventory(Resolve<IAssetManager>().LoadItem(e.ItemId), QuantityChangeOperation.AddAmount, e.Amount),
                     SimpleChestEvent.SimpleChestItemType.Gold => ChangePartyInventory(new Gold(), QuantityChangeOperation.AddAmount, e.Amount),
                     SimpleChestEvent.SimpleChestItemType.Rations => ChangePartyInventory(new Rations(), QuantityChangeOperation.AddAmount, e.Amount),
                     _ => false

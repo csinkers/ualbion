@@ -22,6 +22,15 @@ namespace UAlbion.Formats.AssetIds
         public static bool operator !=(AssetKey x, AssetKey y) => !(x == y);
         public bool Equals(AssetKey other) => AssetId.Equals(other.AssetId) && Language == other.Language;
         public override bool Equals(object obj) => obj is AssetKey other && Equals(other);
-        public override int GetHashCode() => HashCode.Combine(AssetId, Language);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = Id.GetHashCode();
+                hashCode = (hashCode * 397) ^ (int) Language;
+                return hashCode;
+            }
+        } 
     }
 }

@@ -35,6 +35,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core.Veldrid", "Cor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UAlbion.Game.Veldrid", "Game.Veldrid\UAlbion.Game.Veldrid.csproj", "{8CAAAFFC-3BE8-468B-830D-24610F4F75A2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{EC61DB68-353D-4825-B221-FADABA7ADFF3}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\Api\UAlbion.Api.Tests.csproj = Tests\Api\UAlbion.Api.Tests.csproj
+		Tests\Core\UAlbion.Core.Tests.csproj = Tests\Core\UAlbion.Core.Tests.csproj
+		Tests\Game\UAlbion.Game.Tests.csproj = Tests\Game\UAlbion.Game.Tests.csproj
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

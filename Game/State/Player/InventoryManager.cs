@@ -25,10 +25,10 @@ namespace UAlbion.Game.State.Player
         ItemSlot GetSlot(InventorySlotId id) => _getInventory(id.Inventory).GetSlot(id.Slot);
         public ReadOnlyItemSlot ItemInHand { get; }
         public InventoryMode ActiveMode { get; private set; }
-        public InventoryPickupDropEvent ReturnItemInHandEvent { get; private set; }
+        public InventorySwapEvent ReturnItemInHandEvent { get; private set; }
         public InventoryManager(Func<InventoryId, Inventory> getInventory)
         {
-            On<InventoryPickupDropEvent>(OnPickupItem);
+            On<InventorySwapEvent>(OnPickupItem);
             On<InventoryPickupAllEvent>(OnPickupItem);
             On<InventoryGiveItemEvent>(OnGiveItem);
             _getInventory = getInventory;
@@ -74,7 +74,7 @@ namespace UAlbion.Game.State.Player
             ReturnItemInHandEvent = 
                 _hand.Item == null 
                 ? null 
-                : new InventoryPickupDropEvent(slot.Id.Type, slot.Id.Id, slot.Id.Slot);
+                : new InventorySwapEvent(slot.Id.Type, slot.Id.Id, slot.Id.Slot);
             Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
         }
 
@@ -92,7 +92,6 @@ namespace UAlbion.Game.State.Player
 
             // if (!item.Race.IsAllowed(sheet.Race)) // Apparently never implemented in original game?
             //     return false;
-
 
             if (item.SlotType != slotId)
                 return false;

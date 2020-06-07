@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Formats.Assets
+﻿using UAlbion.Formats.AssetIds;
+
+namespace UAlbion.Formats.Assets
 {
     public class ReadOnlyItemSlot : IReadOnlyItemSlot
     {
@@ -9,5 +11,6 @@
         public byte Enchantment => _slot.Enchantment;
         public ItemSlotFlags Flags => _slot.Flags;
         public IContents Item => _slot.Item;
+        public ItemId? ItemId => _slot.ItemId;
     }
 }

@@ -58,7 +58,7 @@ namespace UAlbion.Game.Gui.Inventory
             }
 
             _visual = AttachChild(new VisualInventorySlot(_id.Slot, amountSource, () => Slot))
-                .OnClick(() => Raise(new InventoryPickupDropEvent(_id.Type, _id.Id, _id.Slot)))
+                .OnClick(() => Raise(new InventorySwapEvent(_id.Type, _id.Id, _id.Slot)))
                 .OnDoubleClick(() => Raise(new InventoryPickupAllEvent(_id.Type, _id.Id, _id.Slot)))
                 .OnRightClick(OnRightClick)
                 .OnHover(Hover)

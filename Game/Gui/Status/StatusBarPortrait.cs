@@ -159,7 +159,7 @@ namespace UAlbion.Game.Gui.Status
             var inventoryManager = Resolve<IInventoryManager>();
             if(inventoryManager?.ItemInHand.Item != null)
             {
-                Raise(new InventoryPickupDropEvent(InventoryType.Player, (ushort)PartyMember.Id, ItemSlotId.None));
+                Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyMember.Id, ItemSlotId.None));
                 return;
             }
 

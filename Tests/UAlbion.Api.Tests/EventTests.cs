@@ -168,6 +168,7 @@ namespace UAlbion.Api.Tests
                 byte other = byte.Parse(parts[2]);
                 return new CustomParseEvent(other, (SomeEnum?)maybe);
             }
+
             public CustomParseEvent(byte other, SomeEnum? maybe)
             {
                 Other = other;

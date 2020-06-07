@@ -8,9 +8,7 @@ namespace UAlbion.Formats.Assets
     public class ItemSlot : IReadOnlyItemSlot
     {
         ushort _amount;
-
         public ItemSlot(InventorySlotId id) => Id = id;
-
         public InventorySlotId Id { get; }
         public ushort Amount
         {
@@ -35,6 +33,16 @@ namespace UAlbion.Formats.Assets
         public byte Enchantment { get; set; }
         public ItemSlotFlags Flags { get; set; }
         public IContents Item { get; set; }
+
+        public ItemId? ItemId =>
+            Item switch
+            {
+                Gold _ => AssetIds.ItemId.Gold,
+                Rations _ => AssetIds.ItemId.Rations,
+                ItemData item => item.Id,
+                ItemProxy item => item.Id,
+                _ => null
+            };
 
         public ItemSlot DeepClone() => (ItemSlot)MemberwiseClone();
         public override string ToString() => Amount == 0 ? "Empty" : $"{Amount}x{Item} {Flags}";
@@ -122,13 +130,22 @@ namespace UAlbion.Formats.Assets
                 other.Clear();
         }
 
+        public void Set(IItem item, ushort amount, ItemSlotFlags flags = 0, byte charges = 0, byte enchantment = 0) // Just for tests
+        {
+            Item = item;
+            Amount = amount;
+            Flags = flags;
+            Charges = charges;
+            Enchantment = enchantment;
+        }
+
         public bool CanCoalesce(ItemSlot y)
         {
             if (Item == null || y.Item == null) return true; // Anything can coalesce with nothing
-            if (Item is Gold && y.Item is Gold) return true;
-            if (Item is Rations && y.Item is Rations) return true;
+            if (ItemId != y.ItemId) return false; // Can't stack dissimilar items
+            if (Item is Gold) return true;
+            if (Item is Rations) return true;
             if (!(Item is ItemData xi) || !(y.Item is ItemData yi)) return false; // If not gold/rations, then both must be items
-            if (xi.Id != yi.Id) return false; // Can't stack dissimilar items
             if (Id.Slot.IsBodyPart() || y.Id.Slot.IsBodyPart()) return false; // Can't wield / wear stacks
             return xi.IsStackable;
         }

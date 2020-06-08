@@ -128,7 +128,11 @@ namespace UAlbion.Game.Gui.Text
                 {
                     textEvent.Acknowledge();
                     var dialog = AttachChild(new TextDialog(tf.Format(textEvent.ToId())));
-                    dialog.Closed += (sender, _) => textEvent.Complete();
+                    dialog.Closed += (sender, _) =>
+                    {
+                        textEvent.Complete();
+                        RemoveChild(dialog);
+                    };
                     break;
                 }
 
@@ -144,7 +148,11 @@ namespace UAlbion.Game.Gui.Text
 
                     var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
                     var dialog = AttachChild(new TextDialog(text, portraitId));
-                    dialog.Closed += (sender, _) => textEvent.Complete();
+                    dialog.Closed += (sender, _) =>
+                    {
+                        textEvent.Complete();
+                        RemoveChild(dialog);
+                    };
                     break;
                 }
 

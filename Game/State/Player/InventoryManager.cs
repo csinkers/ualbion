@@ -28,8 +28,8 @@ namespace UAlbion.Game.State.Player
         public InventorySwapEvent ReturnItemInHandEvent { get; private set; }
         public InventoryManager(Func<InventoryId, Inventory> getInventory)
         {
-            On<InventorySwapEvent>(OnPickupItem);
-            On<InventoryPickupAllEvent>(OnPickupItem);
+            On<InventorySwapEvent>(OnSlotEvent);
+            On<InventoryPickupAllEvent>(OnSlotEvent);
             On<InventoryGiveItemEvent>(OnGiveItem);
             _getInventory = getInventory;
             ItemInHand = new ReadOnlyItemSlot(_hand);
@@ -75,7 +75,6 @@ namespace UAlbion.Game.State.Player
                 _hand.Item == null 
                 ? null 
                 : new InventorySwapEvent(slot.Id.Type, slot.Id.Id, slot.Id.Slot);
-            Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
         }
 
         static bool DoesSlotAcceptItem(ICharacterSheet sheet, ItemSlotId slotId, ItemData item)
@@ -197,6 +196,7 @@ namespace UAlbion.Game.State.Player
                 PutDown(slot);
 
             Update(inventory.Id);
+            Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
         }
 
         void GetQuantity(bool discard, IInventory inventory, ItemSlotId slotId, Action<int> continuation)
@@ -246,7 +246,7 @@ namespace UAlbion.Game.State.Player
         }
 
 
-        void OnPickupItem(InventorySlotEvent e)
+        void OnSlotEvent(InventorySlotEvent e)
         {
             var slotId = new InventorySlotId(e.InventoryType, e.InventoryId, e.SlotId);
             if (!DoesSlotAcceptItemInHand(e.InventoryType, e.InventoryId, e.SlotId))
@@ -272,13 +272,14 @@ namespace UAlbion.Game.State.Player
                     }
 
                     break;
-                case InventoryAction.PutDown:  PutDown(slot);          break;
+                case InventoryAction.PutDown:  PutDown(slot);       break;
                 case InventoryAction.Swap:     SwapItems(slot);     break;
                 case InventoryAction.Coalesce: CoalesceItems(slot); break;
                 case InventoryAction.NoCoalesceFullStack: return;
             }
 
             Update(slotId.Inventory);
+            Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
         }
 
         void CoalesceItems(ItemSlot slot)
@@ -300,7 +301,6 @@ namespace UAlbion.Game.State.Player
             // FIXME: could take a lightweight object from player A (who is at their max carry weight), swap it with a heavy one carried by player B
             // and then close the inventory screen. The return event will fire and drop the heavier object in player A's inventory, taking them above their
             // max carry weight.
-            Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
         }
 
         void PutDown(ItemSlot slot)

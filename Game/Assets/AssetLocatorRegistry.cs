@@ -6,7 +6,7 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Assets
 {
-    public class AssetLocatorRegistry : Component, IDisposable
+    public class AssetLocatorRegistry : ServiceComponent<IAssetLocatorRegistry>, IAssetLocatorRegistry
     {
         readonly IDictionary<AssetType, IAssetLocator> _locators = new Dictionary<AssetType, IAssetLocator>();
         readonly IDictionary<Type, IAssetPostProcessor> _postProcessors = new Dictionary<Type, IAssetPostProcessor>();
@@ -21,7 +21,7 @@ namespace UAlbion.Game.Assets
             PerfTracker.StartupEvent("Built AssetLocatorRegistry");
         }
 
-        public void AddAssetLocator(IAssetLocator locator)
+        public IAssetLocatorRegistry AddAssetLocator(IAssetLocator locator)
         {
             if (locator is IComponent component)
                 AttachChild(component);
@@ -32,9 +32,11 @@ namespace UAlbion.Game.Assets
                     throw new InvalidOperationException($"A locator is already defined for {assetType}");
                 _locators[assetType] = locator;
             }
+
+            return this;
         }
 
-        public void AddAssetPostProcessor(IAssetPostProcessor postProcessor)
+        public IAssetLocatorRegistry AddAssetPostProcessor(IAssetPostProcessor postProcessor)
         {
             foreach (var type in postProcessor.SupportedTypes)
             {
@@ -42,6 +44,8 @@ namespace UAlbion.Game.Assets
                     throw new InvalidOperationException($"A post-processor is already defined for {type}");
                 _postProcessors[type] = postProcessor;
             }
+
+            return this;
         }
 
         readonly AssetCache _assetCache;

@@ -57,6 +57,7 @@ namespace UAlbion.Game.Gui.Inventory
                         .Add(text, 0, 20 - 9, 16, 9))
                     {
                         Padding = -1,
+                        Margin = 0,
                         Theme = slotId.IsBodyPart()
                             ? (ButtonFrame.ThemeFunction) ButtonTheme.Default
                             : ButtonTheme.InventorySlot,
@@ -127,6 +128,7 @@ namespace UAlbion.Game.Gui.Inventory
             int itemSpriteId = (int)item.Icon + _frameNumber;
             _sprite.SubId = itemSpriteId;
             _overlay.IsActive = (slot.Flags & ItemSlotFlags.Broken) != 0;
+            _button.AllowDoubleClick = slot.Amount > 1;
         }
 
         public override int Render(Rectangle extents, int order)

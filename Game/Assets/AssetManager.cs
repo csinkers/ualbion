@@ -15,14 +15,13 @@ using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.Assets
 {
-    public class AssetManager : Component, IAssetManager, IDisposable
+    public class AssetManager : Component, IAssetManager
     {
-        readonly AssetLocatorRegistry _assetLocatorRegistry;
-
-        public AssetManager() => _assetLocatorRegistry = AttachChild(new AssetLocatorRegistry());
+        IAssetLocatorRegistry _assetLocatorRegistry;
 
         protected override void Subscribed()
         {
+            _assetLocatorRegistry = Resolve<IAssetLocatorRegistry>();
             Exchange.Register<IAssetManager>(this);
             Exchange.Register<ITextureLoader>(this);
         }
@@ -33,19 +32,6 @@ namespace UAlbion.Game.Assets
             Exchange.Unregister<ITextureLoader>(this);
         }
 
-        public AssetManager AddAssetLocator(IAssetLocator locator)
-        {
-            _assetLocatorRegistry.AddAssetLocator(locator);
-            return this;
-        }
-
-        public AssetManager AddAssetPostProcessor(IAssetPostProcessor postProcessor)
-        {
-            _assetLocatorRegistry.AddAssetPostProcessor(postProcessor);
-            return this;
-        }
-
-        public void Dispose() { _assetLocatorRegistry.Dispose(); }
         public IMapData LoadMap(MapDataId id) => (IMapData)_assetLocatorRegistry.LoadAsset(id.ToAssetId()); // No caching for map data
         public ItemData LoadItem(ItemId id)
         {

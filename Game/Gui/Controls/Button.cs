@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Numerics;
 using System.Threading;
+using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
@@ -10,18 +12,29 @@ namespace UAlbion.Game.Gui.Controls
 {
     public class Button : UiElement
     {
+        [Flags]
+        enum ButtonFlags
+        {
+            Pressed           = 1,
+            Hoverable         = 1 << 1,
+            Typematic         = 1 << 2,
+            DoubleFrame       = 1 << 3,
+            AllowDoubleClick  = 1 << 4,
+            Hovered           = 1 << 5,
+            Clicked           = 1 << 6,
+            RightClicked      = 1 << 7,
+            ClickTimerPending = 1 << 8,
+        }
+
         const int DoubleClickIntervalMilliseconds = 250;
         string TimerName => "DoubleClickButton." + _id;
 
         static int _nextId;
         readonly ButtonFrame _frame;
         readonly int _id;
+        int _margin = 2;
         float _typematicAccrual;
-        bool _isPressed;
-        bool _isClicked;
-        bool _isHovered;
-        bool _isClickTimerPending;
-        bool _hoverable = true;
+        ButtonFlags _flags = ButtonFlags.Hoverable;
 
         public Button(IUiElement content)
         {
@@ -29,7 +42,10 @@ namespace UAlbion.Game.Gui.Controls
             On<BlurEvent>(_ => { IsHovered = false; Blur?.Invoke(); });
             On<UiLeftClickEvent>(e =>
             {
-                if(!IsClicked)
+                if (!IsHovered)
+                    return;
+
+                if (!IsClicked)
                     ButtonDown?.Invoke();
 
                 IsClicked = true;
@@ -54,28 +70,35 @@ namespace UAlbion.Game.Gui.Controls
                 if (!IsHovered)
                     return;
 
-                if (DoubleClick == null) // Simple single click only button
+                if (DoubleClick == null || !AllowDoubleClick) // Simple single click only button
                 {
                     Click?.Invoke();
                     return;
                 }
 
-                if (_isClickTimerPending) // If they double-clicked...
+                if (ClickTimerPending) // If they double-clicked...
                 {
                     DoubleClick?.Invoke();
-                    _isClickTimerPending = false; // Ensure the single-click behaviour doesn't happen.
+                    ClickTimerPending = false; // Ensure the single-click behaviour doesn't happen.
                 }
                 else // For the first click, just start the double-click timer.
                 {
                     Raise(new StartTimerEvent(TimerName, DoubleClickIntervalMilliseconds, this));
-                    _isClickTimerPending = true;
+                    ClickTimerPending = true;
                 }
             });
 
             On<UiRightClickEvent>(e =>
             {
                 e.Propagating = false;
-                RightClick?.Invoke();
+                IsRightClicked = true;
+            });
+
+            On<UiRightReleaseEvent>(e =>
+            {
+                if (IsRightClicked && IsHovered)
+                    RightClick?.Invoke();
+                IsRightClicked = false;
             });
 
             On<TimerElapsedEvent>(e =>
@@ -83,11 +106,11 @@ namespace UAlbion.Game.Gui.Controls
                 if (e.Id != TimerName)
                     return;
 
-                if (!_isClickTimerPending) // They've already double-clicked
+                if (!ClickTimerPending) // They've already double-clicked
                     return;
 
                 Click?.Invoke();
-                _isClickTimerPending = false;
+                ClickTimerPending = false;
             });
 
             On<EngineUpdateEvent>(e =>
@@ -114,10 +137,10 @@ namespace UAlbion.Game.Gui.Controls
         public Button(string literalText) : this((IUiElement)new SimpleText(literalText).Center().NoWrap()) { }
         public Button OnClick(Action callback) { Click += callback; return this; }
         public Button OnRightClick(Action callback) { RightClick += callback; return this; }
-        public Button OnDoubleClick(Action callback) { DoubleClick += callback; return this; }
+        public Button OnDoubleClick(Action callback) { DoubleClick += callback; AllowDoubleClick = true; return this; }
         public Button OnButtonDown(Action callback) { ButtonDown += callback; return this; }
-        public Button OnHover(Action callback) { Hover += callback; return this; } 
-        public Button OnBlur(Action callback) { Blur += callback; return this; } 
+        public Button OnHover(Action callback) { Hover += callback; return this; }
+        public Button OnBlur(Action callback) { Blur += callback; return this; }
         event Action Click;
         event Action RightClick;
         event Action DoubleClick;
@@ -126,47 +149,8 @@ namespace UAlbion.Game.Gui.Controls
         event Action Blur;
 
         public ButtonFrame.ThemeFunction Theme { get => _frame.Theme; set => _frame.Theme = value; }
-        public int Padding { get => _frame.Padding; set => _frame.Padding = value; } 
-        public bool DoubleFrame { get; set; }
-        public bool Typematic { get; set; }
-        public bool Hoverable { get => _hoverable; set { _hoverable = value; _frame.State = State; } }
-
-        public bool IsPressed
-        {
-            get => _isPressed;
-            set
-            {
-                if (_isPressed == value)
-                    return;
-                _isPressed = value;
-                _frame.State = State;
-            }
-        }
-
-        bool IsClicked
-        {
-            get => _isClicked;
-            set
-            {
-                if (_isClicked == value)
-                    return;
-                _isClicked = value;
-                _frame.State = State;
-            }
-        }
-
-        bool IsHovered
-        {
-            get => _isHovered;
-            set
-            {
-                if (_isHovered == value)
-                    return;
-                _isHovered = value;
-                _frame.State = State;
-            }
-        }
-
+        public int Padding { get => _frame.Padding; set => _frame.Padding = value; }
+        public int Margin { get => _margin; set => _margin = value; }
         ButtonState State => (IsClicked, IsPressed, IsHovered) switch
         {
             (false, false, false) => ButtonState.Normal,
@@ -176,5 +160,77 @@ namespace UAlbion.Game.Gui.Controls
             (true, _, false) => ButtonState.ClickedBlurred,
             (true, _, true) => ButtonState.Clicked,
         };
+
+        public override Vector2 GetSize() => GetMaxChildSize() + new Vector2(2 * _margin, 0);
+
+        protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+        {
+            var innerExtents = new Rectangle(extents.X + Margin, extents.Y, extents.Width - 2 * Margin, extents.Height);
+            return base.DoLayout(innerExtents, order, func);
+        }
+
+        #region Flag Helpers
+
+        void SetFlag(ButtonFlags flag, bool set)
+        {
+            if (set) _flags |= flag;
+            else _flags &= ~flag;
+        }
+
+        public bool AllowDoubleClick
+        {
+            get => 0 != (_flags & ButtonFlags.AllowDoubleClick);
+            set => SetFlag(ButtonFlags.AllowDoubleClick, value);
+        }
+
+        public bool DoubleFrame
+        {
+            get => 0 != (_flags & ButtonFlags.DoubleFrame);
+            set => SetFlag(ButtonFlags.DoubleFrame, value);
+        }
+
+        public bool Typematic
+        {
+            get => 0 != (_flags & ButtonFlags.Typematic);
+            set => SetFlag(ButtonFlags.Typematic, value);
+        }
+
+        public bool Hoverable
+        {
+            get => 0 != (_flags & ButtonFlags.Hoverable);
+            set { SetFlag(ButtonFlags.Hoverable, value); _frame.State = State; }
+        }
+
+        public bool IsPressed
+        {
+            get => 0 != (_flags & ButtonFlags.Pressed);
+            set { SetFlag(ButtonFlags.Pressed, value); _frame.State = State; }
+        }
+
+        bool ClickTimerPending
+        {
+            get => 0 != (_flags & ButtonFlags.ClickTimerPending);
+            set => SetFlag(ButtonFlags.ClickTimerPending, value);
+        }
+
+        bool IsHovered
+        {
+            get => 0 != (_flags & ButtonFlags.Hovered);
+            set { SetFlag(ButtonFlags.Hovered, value); _frame.State = State; }
+        }
+
+        bool IsClicked
+        {
+            get => 0 != (_flags & ButtonFlags.Clicked);
+            set { SetFlag(ButtonFlags.Clicked, value); _frame.State = State; }
+        }
+
+        bool IsRightClicked
+        {
+            get => 0 != (_flags & ButtonFlags.RightClicked);
+            set { SetFlag(ButtonFlags.RightClicked, value); _frame.State = State; }
+        }
+
+        #endregion
     }
 }

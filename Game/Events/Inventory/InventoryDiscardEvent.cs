@@ -6,7 +6,7 @@ namespace UAlbion.Game.Events.Inventory
     [Event("inv:discard")]
     public class InventoryDiscardEvent : InventorySlotEvent
     {
-        public InventoryDiscardEvent(InventoryType inventoryType, int id, ItemSlotId slotId) 
+        public InventoryDiscardEvent(InventoryType inventoryType, ushort id, ItemSlotId slotId) 
             : base(inventoryType, id, slotId) { }
     }
 }

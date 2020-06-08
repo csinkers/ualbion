@@ -21,10 +21,10 @@ namespace UAlbion.Game.Gui.Inventory
                 var itemSlotId = bodyPart.Key;
                 var position = bodyPart.Value;
                 bodyStack.Add(
-                    new LogicalInventorySlot(
+                    new LogicalInventorySlot(new InventorySlotId(
                         InventoryType.Player,
-                        (int)activeCharacter,
-                        itemSlotId),
+                        (ushort)activeCharacter,
+                        itemSlotId)),
                     (int)position.X,
                     (int)position.Y);
             }

@@ -2,6 +2,7 @@
 using System.IO;
 using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 
@@ -10,7 +11,7 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.AudioSample, FileFormat.SampleLibrary)]
     public class SampleLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
             if (config.Format == FileFormat.AudioSample)
                 return new AlbionSample(br.ReadBytes((int) streamLength));

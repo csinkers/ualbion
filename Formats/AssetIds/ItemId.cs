@@ -471,5 +471,7 @@ namespace UAlbion.Formats.AssetIds
         MellthassNotes = 459,
         MellthassPencil = 460,
         Laser = 461,
+        Rations = 65534,
+        Gold = 65535,
     }
 }

@@ -4,7 +4,7 @@
     {
         Nothing,
         Pickup,
-        Drop,
+        PutDown,
         Swap,
         Coalesce,
         NoCoalesceFullStack,

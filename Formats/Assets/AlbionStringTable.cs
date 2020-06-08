@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Assets
@@ -8,7 +9,7 @@ namespace UAlbion.Formats.Assets
     [AssetLoader(FileFormat.StringTable)]
     public class AlbionStringTableLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
             IDictionary<int, string> strings = new Dictionary<int, string>();
             var startOffset = br.BaseStream.Position;
@@ -28,7 +29,7 @@ namespace UAlbion.Formats.Assets
             return strings;
         }
 
-        // public StringTable Serdes(StringTable existing, ISerializer s, string name, AssetInfo config) => StringTable.Serdes(existing, s);
+        // public StringTable Serdes(StringTable existing, ISerializer s, AssetKey key, AssetInfo config) => StringTable.Serdes(existing, s);
     }
     /*
     public class StringTable

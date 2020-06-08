@@ -35,7 +35,7 @@ namespace UAlbion.Game.State.Player
             var oldLerp = _lerp;
             _lerp = elapsed > TransitionSpeedMilliseconds ? 1.0f : (float) (elapsed / TransitionSpeedMilliseconds);
             if (Math.Abs(_lerp - oldLerp) > float.Epsilon)
-                Raise(new InventoryChangedEvent(InventoryType.Player, (int) Id));
+                Raise(new InventoryChangedEvent(InventoryType.Player, (ushort)Id));
         }
 
         public PartyCharacterId Id { get; }
@@ -47,7 +47,7 @@ namespace UAlbion.Game.State.Player
 
         void InventoryChanged(InventoryChangedEvent e)
         {
-            if (e.InventoryType == InventoryType.Player && e.InventoryId == _base.Inventory.InventoryId)
+            if (e.Id == _base.Inventory.Id)
                 UpdateInventory();
         }
 
@@ -55,7 +55,7 @@ namespace UAlbion.Game.State.Player
         {
             var assets = Resolve<IAssetManager>();
             _lastEffective = Effective;
-            Effective = EffectiveSheetCalculator.GetEffectiveSheet(assets, _base);
+            Effective = EffectiveSheetCalculator.GetEffectiveSheet(_base);
             _lastEffective ??= Effective;
             _lastChangeTime = DateTime.Now;
             _lerp = 0.0f;

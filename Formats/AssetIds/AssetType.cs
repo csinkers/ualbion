@@ -19,6 +19,7 @@ namespace UAlbion.Formats.AssetIds
         GeneralConfig,
         MetaFont,
         PaletteNull,
+        SavedGame,
         SoundBank,
         Slab, // Graphics
         Unnamed2, // Unused

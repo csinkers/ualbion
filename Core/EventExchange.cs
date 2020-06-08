@@ -47,7 +47,7 @@ namespace UAlbion.Core
 
         public EventExchange(ILogExchange logExchange)
         {
-            _logExchange = logExchange;
+            _logExchange = logExchange ?? throw new ArgumentNullException(nameof(logExchange));
             Attach(_logExchange);
         }
 

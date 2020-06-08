@@ -11,6 +11,7 @@ namespace UAlbion.Game.Text
             InBraces,
             InPercentage,
         }
+
         public static IEnumerable<(Token, object)> Tokenise(string template)
         {
             StringBuilder sb = new StringBuilder();

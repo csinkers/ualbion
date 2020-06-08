@@ -461,6 +461,9 @@
         "458": { "Type": "Tool",      "Name": "Treasure map" },
         "459": { "Type": "Misc",      "Name": "Mellthas's notes" },
         "460": { "Type": "Misc",      "Name": "Mellthas's pencil" },
-        "461": { "Type": "Ranged",    "Name": "Laser" }
+        "461": { "Type": "Ranged",    "Name": "Laser" },
+
+        "65534":  {"Type": "Misc", "Name": "Rations" }, // Pseudo-items
+        "65535":  {"Type": "Misc", "Name": "Gold" }
     }
 }

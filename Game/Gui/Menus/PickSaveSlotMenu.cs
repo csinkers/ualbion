@@ -16,7 +16,7 @@ namespace UAlbion.Game.Gui.Menus
     {
         readonly bool _showEmptySlots;
         readonly StringId _stringId;
-        const int MaxSaveNumber = 10; // TODO: Add scroll bar and bump up to 99
+        const ushort MaxSaveNumber = 10; // TODO: Add scroll bar and bump up to 99
 
         public PickSaveSlotMenu(bool showEmptySlots, StringId stringId, int depth) : base(DialogPositioning.Center, depth)
         {
@@ -31,11 +31,11 @@ namespace UAlbion.Game.Gui.Menus
             _stringId = stringId;
         }
 
-        public event EventHandler<string> Closed;
+        public event EventHandler<ushort?> Closed;
 
-        void PickSlot(int slotNumber)
+        void PickSlot(ushort slotNumber)
         {
-            Closed?.Invoke(this, BuildSaveFilename(slotNumber));
+            Closed?.Invoke(this, slotNumber);
             Detach();
         }
 
@@ -54,14 +54,14 @@ namespace UAlbion.Game.Gui.Menus
                     var textFormatter = Resolve<ITextFormatter>();
                     var block = textFormatter
                         .Ink(FontColor.Gray)
-                        .Format(SystemTextId.MainMenu_EmptyPosition.ToId())
+                        .Format(SystemTextId.MainMenu_EmptyPosition)
                         .Get().Single();
                     block.Text = $"{x,2}    {block.Text}";
                     return new[] { block };
                 });
 
             var buttons = new List<IUiElement>();
-            for (int i = 1; i <= MaxSaveNumber; i++)
+            for (ushort i = 1; i <= MaxSaveNumber; i++)
             {
                 var filename = BuildSaveFilename(i);
                 if (File.Exists(filename))
@@ -70,13 +70,13 @@ namespace UAlbion.Game.Gui.Menus
                     using var br = new BinaryReader(stream);
                     var name = SavedGame.GetName(br) ?? "Invalid";
                     var text = $"{i,2}    {name}";
-                    int slotNumber = i;
+                    ushort slotNumber = i;
                     buttons.Add(new ConversationOption(new LiteralText(text), null, () => PickSlot(slotNumber)));
                 }
                 else if (_showEmptySlots)
                 {
                     var text = BuildEmptySlotText(i);
-                    int slotNumber = i;
+                    ushort slotNumber = i;
                     buttons.Add(new ConversationOption(text, null, () => PickSlot(slotNumber)));
                 }
             }

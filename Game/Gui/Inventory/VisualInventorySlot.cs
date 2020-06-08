@@ -3,7 +3,6 @@ using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Text;
@@ -12,36 +11,30 @@ namespace UAlbion.Game.Gui.Inventory
 {
     public sealed class VisualInventorySlot : UiElement
     {
-        const string TimerName = "InventorySlot.ClickTimer";
-
-        readonly ButtonFrame _frame;
+        // const string TimerName = "InventorySlot.ClickTimer";
+        // readonly ButtonFrame _frame;
         readonly UiSpriteElement<AssetId> _sprite;
         readonly UiSpriteElement<AssetId> _overlay;
-        readonly Func<ItemSlot> _getSlot;
+        readonly Func<IReadOnlyItemSlot> _getSlot;
         readonly Vector2 _size;
 
         int _frameNumber;
-        bool _isClickTimerPending;
 
-        ItemData Item
-        {
-            get
-            {
-                var slot = _getSlot();
-                return slot?.Id == null ? null : Resolve<IAssetManager>().LoadItem(slot.Id.Value);
-            }
-        }
+        readonly Button _button;
+        // bool _isClickTimerPending;
 
-        public VisualInventorySlot(ItemSlotId slotId, IText amountSource, Func<ItemSlot> getSlot)
+        ItemData Item => _getSlot().Item as ItemData;
+
+        public VisualInventorySlot(ItemSlotId slotId, IText amountSource, Func<IReadOnlyItemSlot> getSlot)
         {
-            On<UiLeftClickEvent>(OnClick);
-            On<UiRightClickEvent>(OnRightClicked);
+            // On<UiLeftClickEvent>(OnClick);
+            // On<UiRightClickEvent>(OnRightClicked);
             On<IdleClockEvent>(e => _frameNumber++);
-            On<TimerElapsedEvent>(e =>
+            /* On<TimerElapsedEvent>(e =>
             {
                 if (e.Id == TimerName)
                     OnTimer();
-            });
+            }); */
 
             _getSlot = getSlot;
             _overlay = new UiSpriteElement<AssetId>(CoreSpriteId.UiBroken.ToAssetId()) { IsActive = false };
@@ -55,20 +48,28 @@ namespace UAlbion.Game.Gui.Inventory
                     SubId = (int)ItemSpriteId.Nothing
                 };
 
-                _frame = AttachChild(new ButtonFrame(new FixedPositionStack()
-                    .Add(
-                        new LayerStack(
-                            _sprite,
-                            _overlay),
-                        0, 0, 16, 16)
-                    .Add(text, 0, 20 - 9, 16, 9))
-                {
-                    Padding = -1,
-                    Theme = slotId.IsBodyPart()
-                        ? (ButtonFrame.ThemeFunction)ButtonTheme.Default
-                        : ButtonTheme.InventorySlot,
-                    State = slotId.IsBodyPart() ? ButtonState.Normal : ButtonState.Pressed
-                });
+                _button = AttachChild(new Button(new FixedPositionStack()
+                        .Add(
+                            new LayerStack(
+                                _sprite,
+                                _overlay),
+                            0, 0, 16, 16)
+                        .Add(text, 0, 20 - 9, 16, 9))
+                    {
+                        Padding = -1,
+                        Margin = 0,
+                        Theme = slotId.IsBodyPart()
+                            ? (ButtonFrame.ThemeFunction) ButtonTheme.Default
+                            : ButtonTheme.InventorySlot,
+
+                        IsPressed = !slotId.IsBodyPart()
+                    }
+                    .OnHover(() => Hover?.Invoke())
+                    .OnBlur(() => Blur?.Invoke())
+                    .OnClick(() => Click?.Invoke())
+                    .OnRightClick(() => RightClick?.Invoke())
+                    .OnDoubleClick(() => DoubleClick?.Invoke())
+                    .OnButtonDown(() => ButtonDown?.Invoke()));
             }
             else
             {
@@ -77,31 +78,37 @@ namespace UAlbion.Game.Gui.Inventory
                         ? CoreSpriteId.UiGold.ToAssetId()
                         : CoreSpriteId.UiFood.ToAssetId());
 
-                _frame = AttachChild(new ButtonFrame(
+                _button = AttachChild(new Button(
                     new VerticalStack(
                         new Spacing(31, 0),
                         _sprite,
                         new UiText(amountSource)
-                    ) { Greedy = false }
-                ));
+                    ) { Greedy = false })
+                    .OnHover(() => Hover?.Invoke())
+                    .OnBlur(() => Blur?.Invoke())
+                    .OnClick(() => Click?.Invoke())
+                    .OnRightClick(() => RightClick?.Invoke())
+                    .OnDoubleClick(() => DoubleClick?.Invoke())
+                    .OnButtonDown(() => ButtonDown?.Invoke()));
             }
-/*
-
-            _frame = AttachChild(new ButtonFrame(
-                new VerticalStack(
-                    new Spacing(64, 0),
-                    new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiGold) { Flags = SpriteFlags.Highlight },
-                    new UiText(amountSource) 
-                ) { Greedy = false}, () => { }
-            ) { IsPressed = true });
-*/
         }
 
-        public ButtonState State { get => _frame.State; set => _frame.State = value; }
+        // public ButtonState State { get => _frame.State; set => _frame.State = value; }
         public override Vector2 GetSize() => _sprite.Id.Type == AssetType.CoreGraphics ? base.GetSize() : _size;
-        public event EventHandler<EventArgs> Clicked;
-        public event EventHandler<EventArgs> DoubleClicked;
-        public event EventHandler<EventArgs> RightClicked;
+        public VisualInventorySlot OnClick(Action callback) { Click += callback; return this; }
+        public VisualInventorySlot OnRightClick(Action callback) { RightClick += callback; return this; }
+        public VisualInventorySlot OnDoubleClick(Action callback) { DoubleClick += callback; return this; }
+        public VisualInventorySlot OnButtonDown(Action callback) { ButtonDown += callback; return this; }
+        public VisualInventorySlot OnHover(Action callback) { Hover += callback; return this; } 
+        public VisualInventorySlot OnBlur(Action callback) { Blur += callback; return this; } 
+        event Action Click;
+        event Action DoubleClick;
+        event Action RightClick;
+        event Action ButtonDown;
+        event Action Hover;
+        event Action Blur;
+
+        public bool Hoverable { get => _button.Hoverable; set => _button.Hoverable = value; }
 
         void Rebuild()
         {
@@ -121,6 +128,7 @@ namespace UAlbion.Game.Gui.Inventory
             int itemSpriteId = (int)item.Icon + _frameNumber;
             _sprite.SubId = itemSpriteId;
             _overlay.IsActive = (slot.Flags & ItemSlotFlags.Broken) != 0;
+            _button.AllowDoubleClick = slot.Amount > 1;
         }
 
         public override int Render(Rectangle extents, int order)
@@ -128,7 +136,7 @@ namespace UAlbion.Game.Gui.Inventory
             Rebuild();
             return base.Render(extents, order);
         }
-
+/*
         void OnClick(UiLeftClickEvent e)
         {
             e.Propagating = false;
@@ -158,6 +166,6 @@ namespace UAlbion.Game.Gui.Inventory
         {
             e.Propagating = false;
             RightClicked?.Invoke(this, EventArgs.Empty);
-        }
+        }*/
     }
 }

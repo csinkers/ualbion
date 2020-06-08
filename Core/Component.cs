@@ -235,7 +235,7 @@ namespace UAlbion.Core
         /// <param name="sender">The component which generated the event</param>
         public void Receive(IEvent @event, object sender)
         {
-            if (sender == this || Exchange == null)
+            if (sender == this || !_isSubscribed || Exchange == null)
                 return;
 
             if (_handlers.TryGetValue(@event.GetType(), out var handler))

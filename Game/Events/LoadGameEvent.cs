@@ -5,12 +5,9 @@ namespace UAlbion.Game.Events
     [Event("load_game", "Load a saved game")]
     public class LoadGameEvent : GameEvent
     {
-        public LoadGameEvent(string filename)
-        {
-            Filename = filename;
-        }
+        public LoadGameEvent(ushort id) => Id = id;
 
-        [EventPart("filename")]
-        public string Filename { get; }
+        [EventPart("id", "The slot number to load from")]
+        public ushort Id { get; }
     }
 }

@@ -67,7 +67,7 @@ namespace UAlbion
                     global.Raise(new NewGameEvent(MapDataId.Toronto2DGesamtkarteSpielbeginn, 30, 75), null);
                     break;
                 case GameMode.LoadGame:
-                    global.Raise(new LoadGameEvent(commandLine.GameModeArgument), null);
+                    global.Raise(new LoadGameEvent(ushort.Parse(commandLine.GameModeArgument)), null);
                     break;
                 case GameMode.LoadMap:
                     global.Raise(new NewGameEvent((MapDataId)int.Parse(commandLine.GameModeArgument), 40, 40), null); 

@@ -32,22 +32,26 @@ namespace UAlbion
             PerfTracker.StartupEvent($"Found base directory {baseDir}");
             PerfTracker.StartupEvent("Registering asset manager");
             var factory = new VeldridCoreFactory();
-            using var assets = new AssetManager()
+            using var locatorRegistry = new AssetLocatorRegistry()
                 .AddAssetLocator(new StandardAssetLocator())
                 .AddAssetLocator(new AssetConfigLocator())
                 .AddAssetLocator(new CoreSpriteLocator())
                 .AddAssetLocator(new MetaFontLocator(factory))
                 .AddAssetLocator(new NewStringLocator())
                 .AddAssetLocator(new SoundBankLocator())
+                .AddAssetLocator(new SavedGameLocator())
                 .AddAssetPostProcessor(new AlbionSpritePostProcessor())
                 .AddAssetPostProcessor(new ImageSharpPostProcessor())
                 .AddAssetPostProcessor(new InterlacedBitmapPostProcessor())
+                .AddAssetPostProcessor(new InventoryPostProcessor())
                 ;
 
+            var assets = new AssetManager();
             var coreServices = new Container("Core",
                         new StdioConsoleLogger(),
                         new ImGuiConsoleLogger(),
                         Settings.Load(baseDir),
+                        locatorRegistry,
                         assets); // Need to register settings first, as the AssetConfigLocator relies on it.
 
             var services = new Container("Services", coreServices);

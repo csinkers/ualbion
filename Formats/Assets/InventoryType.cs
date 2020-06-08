@@ -5,6 +5,7 @@
         Player,
         Chest,
         Merchant,
-        CombatLoot
+        CombatLoot,
+        Cursor
     }
 }

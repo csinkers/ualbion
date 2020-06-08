@@ -13,17 +13,8 @@ namespace UAlbion.Formats.AssetIds
         public AssetType Type { get; }
         public ushort Id { get; }
 
-        public override string ToString() => Type switch
+        public override string ToString() => Type + ":" + (Type switch
         {
-            AssetType.AssetConfig          => "AssetConfig",
-            AssetType.CoreSpriteConfig     => "CoreSpriteConfig",
-            AssetType.CoreGraphicsMetadata => "CoreGraphicsMetadata",
-            AssetType.GeneralConfig        => "GeneralConfig",
-            AssetType.MetaFont             => "MetaFont:" + Id,
-            AssetType.PaletteNull          => "PaletteNull",
-            AssetType.SoundBank            => "SoundBank",
-            AssetType.Slab                 => "SLAB",
-            AssetType.Unnamed2             => "Unnamed2",
             AssetType.Automap            => ((AutoMapId)Id).ToString(),
             AssetType.AutomapGraphics    => ((AutoMapId)Id).ToString(),
             AssetType.BlockList          => ((BlockListId)Id).ToString(),
@@ -73,13 +64,60 @@ namespace UAlbion.Formats.AssetIds
             AssetType.Dictionary         => ((WordId)Id).ToString(),
             AssetType.UAlbionText        => ((UAlbionStringId)Id).ToString(),
             _ => Id.ToString()
-        };
+        });
 
         public static explicit operator int(AssetId id) => (int)id.Type << 16 | id.Id;
-        public static explicit operator AssetId(int id) 
+        public static explicit operator AssetId(int id)
             => new AssetId(
                 (AssetType)((id & 0x7fff0000) >> 16),
                 (ushort)(id & 0xffff));
+
+        public static implicit operator AssetId(AutoMapId id)            => new AssetId(AssetType.Automap,            (ushort)id);
+        public static implicit operator AssetId(BlockListId id)          => new AssetId(AssetType.BlockList,          (ushort)id);
+        public static implicit operator AssetId(ChestId id)              => new AssetId(AssetType.ChestData,          (ushort)id);
+        public static implicit operator AssetId(CombatBackgroundId id)   => new AssetId(AssetType.CombatBackground,   (ushort)id);
+        public static implicit operator AssetId(CombatGraphicsId id)     => new AssetId(AssetType.CombatGraphics,     (ushort)id);
+        public static implicit operator AssetId(CoreSpriteId id)         => new AssetId(AssetType.CoreGraphics,       (ushort)id);
+        public static implicit operator AssetId(DungeonBackgroundId id)  => new AssetId(AssetType.BackgroundGraphics, (ushort)id);
+        public static implicit operator AssetId(DungeonFloorId id)       => new AssetId(AssetType.Floor3D,            (ushort)id);
+        public static implicit operator AssetId(DungeonObjectId id)      => new AssetId(AssetType.Object3D,           (ushort)id);
+        public static implicit operator AssetId(DungeonOverlayId id)     => new AssetId(AssetType.Overlay3D,          (ushort)id);
+        public static implicit operator AssetId(DungeonWallId id)        => new AssetId(AssetType.Wall3D,             (ushort)id);
+        public static implicit operator AssetId(EventSetId id)           => new AssetId(AssetType.EventSet,           (ushort)id);
+        public static implicit operator AssetId(EventTextId id)          => new AssetId(AssetType.EventText,          (ushort)id);
+        public static implicit operator AssetId(FontId id)               => new AssetId(AssetType.Font,               (ushort)id);
+        public static implicit operator AssetId(FullBodyPictureId id)    => new AssetId(AssetType.FullBodyPicture,    (ushort)id);
+        public static implicit operator AssetId(TilesetId id)            => new AssetId(AssetType.Tileset,            (ushort)id);
+        public static implicit operator AssetId(IconGraphicsId id)       => new AssetId(AssetType.IconGraphics,       (ushort)id);
+        public static implicit operator AssetId(ItemSpriteId id)         => new AssetId(AssetType.ItemGraphics,       (ushort)id);
+        public static implicit operator AssetId(ItemId id)               => new AssetId(AssetType.ItemList,           (ushort)id);
+        public static implicit operator AssetId(LabyrinthDataId id)      => new AssetId(AssetType.LabData,            (ushort)id);
+        public static implicit operator AssetId(LargeNpcId id)           => new AssetId(AssetType.BigNpcGraphics,     (ushort)id);
+        public static implicit operator AssetId(LargePartyGraphicsId id) => new AssetId(AssetType.BigPartyGraphics,   (ushort)id);
+        public static implicit operator AssetId(MapDataId id)            => new AssetId(AssetType.MapData,            (ushort)id);
+        public static implicit operator AssetId(MapTextId id)            => new AssetId(AssetType.MapText,            (ushort)id);
+        public static implicit operator AssetId(MerchantId id)           => new AssetId(AssetType.MerchantData,       (ushort)id);
+        public static implicit operator AssetId(MonsterCharacterId id)   => new AssetId(AssetType.Monster,            (ushort)id);
+        public static implicit operator AssetId(MonsterGraphicsId id)    => new AssetId(AssetType.MonsterGraphics,    (ushort)id);
+        public static implicit operator AssetId(MonsterGroupId id)       => new AssetId(AssetType.MonsterGroup,       (ushort)id);
+        public static implicit operator AssetId(NpcCharacterId id)       => new AssetId(AssetType.Npc,                (ushort)id);
+        public static implicit operator AssetId(PaletteId id)            => new AssetId(AssetType.Palette,            (ushort)id);
+        public static implicit operator AssetId(PartyCharacterId id)     => new AssetId(AssetType.PartyMember,        (ushort)id);
+        public static implicit operator AssetId(PictureId id)            => new AssetId(AssetType.Picture,            (ushort)id);
+        public static implicit operator AssetId(SampleId id)             => new AssetId(AssetType.Sample,             (ushort)id);
+        public static implicit operator AssetId(ScriptId id)             => new AssetId(AssetType.Script,             (ushort)id);
+        public static implicit operator AssetId(SmallNpcId id)           => new AssetId(AssetType.SmallNpcGraphics,   (ushort)id);
+        public static implicit operator AssetId(SmallPartyGraphicsId id) => new AssetId(AssetType.SmallPartyGraphics, (ushort)id);
+        public static implicit operator AssetId(SmallPortraitId id)      => new AssetId(AssetType.SmallPortrait,      (ushort)id);
+        public static implicit operator AssetId(SongId id)               => new AssetId(AssetType.Song,               (ushort)id);
+        public static implicit operator AssetId(SpellId id)              => new AssetId(AssetType.SpellData,          (ushort)id);
+        public static implicit operator AssetId(SystemTextId id)         => new AssetId(AssetType.SystemText,         (ushort)id);
+        public static implicit operator AssetId(TacticId id)             => new AssetId(AssetType.TacticalIcon,       (ushort)id);
+        public static implicit operator AssetId(TranslationTableId id)   => new AssetId(AssetType.TransparencyTables, (ushort)id);
+        public static implicit operator AssetId(VideoId id)              => new AssetId(AssetType.Flic,               (ushort)id);
+        public static implicit operator AssetId(WaveLibraryId id)        => new AssetId(AssetType.WaveLibrary,        (ushort)id);
+        public static implicit operator AssetId(WordId id)               => new AssetId(AssetType.Dictionary,         (ushort)id);
+        public static implicit operator AssetId(UAlbionStringId id)      => new AssetId(AssetType.UAlbionText,        (ushort)id);
 
         public int ToInt32(IFormatProvider provider) => (int)this;
         public TypeCode GetTypeCode() => throw new NotImplementedException();
@@ -99,6 +137,8 @@ namespace UAlbion.Formats.AssetIds
         public ulong ToUInt64(IFormatProvider provider) => throw new NotImplementedException();
         public object ToType(Type conversionType, IFormatProvider provider) => throw new NotImplementedException();
 
+        public static bool operator ==(AssetId x, AssetId y) => x.Equals(y);
+        public static bool operator !=(AssetId x, AssetId y) => !(x == y);
         public bool Equals(AssetId other) => Type == other.Type && Id == other.Id;
         public override bool Equals(object obj) => obj is AssetId other && Equals(other);
         public override int GetHashCode() => (int)this;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 
@@ -58,7 +59,7 @@ namespace UAlbion.Tools.ImageReverser
             foreach (var file in files)
             {
                 var a = file.Substring(palettesPath.Length + 1, 2);
-                int paletteNumber = int.Parse(a);
+                ushort paletteNumber = ushort.Parse(a);
                 var assetConfig = Config.Xlds["PALETTE0.XLD"].Assets[paletteNumber];
                 var paletteName = assetConfig.Name;
                 if (string.IsNullOrEmpty(paletteName))
@@ -67,7 +68,7 @@ namespace UAlbion.Tools.ImageReverser
                 using(var stream = File.Open(file, FileMode.Open))
                 using (var br = new BinaryReader(stream))
                 {
-                    var palette = new AlbionPalette(br, (int)br.BaseStream.Length, paletteName, paletteNumber);
+                    var palette = new AlbionPalette(br, (int)br.BaseStream.Length, new AssetKey(AssetType.Palette, paletteNumber), paletteNumber);
                     palette.SetCommonPalette(commonPalette);
                     Palettes.Add(palette);
                 }

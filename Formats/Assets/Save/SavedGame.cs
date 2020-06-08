@@ -123,7 +123,7 @@ namespace UAlbion.Formats.Assets.Save
                     save.PartyMembers[key] = charLoader.Serdes(
                         existing,
                         serializer,
-                        key.ToString(),
+                        key.ToAssetId(),
                         new BasicAssetInfo { Id = i });
                 }
             }
@@ -140,7 +140,7 @@ namespace UAlbion.Formats.Assets.Save
                     save.NpcStats[key] = charLoader.Serdes(
                         existing,
                         serializer,
-                        key.ToString(),
+                        key.ToAssetId(),
                         new BasicAssetInfo { Id = i });
                 }
             }

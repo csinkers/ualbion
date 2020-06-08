@@ -14,7 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Api\UAlbion.Api.csproj" />
     <ProjectReference Include="..\Core\UAlbion.Core.csproj" />
-    <ProjectReference Include="..\Formats\UAlbion.Formats.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\veldrid\')">

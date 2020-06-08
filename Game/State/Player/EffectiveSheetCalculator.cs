@@ -4,12 +4,14 @@ namespace UAlbion.Game.State.Player
 {
     public static class EffectiveSheetCalculator
     {
-        public static IEffectiveCharacterSheet GetEffectiveSheet(IAssetManager assets, CharacterSheet sheet)
+        const int GramsPerGold = 2;
+        const int GramsPerRation = 250;
+        const int CarryWeightPerStrength = 1000;
+        public static IEffectiveCharacterSheet GetEffectiveSheet(CharacterSheet sheet)
         {
-            var effective = new EffectiveCharacterSheet(sheet.Inventory.InventoryId)
+            var effective = new EffectiveCharacterSheet(sheet.Key)
             {
                 // Names
-                Name = sheet.Name,
                 EnglishName = sheet.EnglishName,
                 GermanName = sheet.GermanName,
                 FrenchName = sheet.FrenchName,
@@ -29,44 +31,43 @@ namespace UAlbion.Game.State.Player
                 EventSetId = sheet.EventSetId,
                 WordSetId = sheet.WordSetId,
                 Magic = sheet.Magic.DeepClone(),
-                Inventory  = sheet.Inventory.DeepClone(),
+                Inventory  = sheet.Inventory?.DeepClone(),
                 Attributes = sheet.Attributes.DeepClone(),
                 Skills = sheet.Skills.DeepClone(),
                 Combat = sheet.Combat.DeepClone()
             };
 
-            ApplyWieldedItems(assets, effective);
-            CalculateTotalWeight(assets, effective);
+            ApplyWieldedItems(effective);
+            CalculateTotalWeight(effective);
 
             return effective;
         }
 
-        static void CalculateTotalWeight(IAssetManager assets, EffectiveCharacterSheet sheet)
+        static void CalculateTotalWeight(EffectiveCharacterSheet sheet)
         {
             sheet.TotalWeight = 0;
             foreach (var itemSlot in sheet.Inventory.EnumerateAll())
             {
-                if (itemSlot.Id == null)
+                if (!(itemSlot.Item is ItemData item))
                     continue;
-                var item = assets.LoadItem(itemSlot.Id.Value);
                 sheet.TotalWeight += itemSlot.Amount * item.Weight;
             }
 
-            sheet.TotalWeight += sheet.Inventory.Gold * 2;
-            sheet.TotalWeight += sheet.Inventory.Rations * 250;
-            sheet.MaxWeight = sheet.Attributes.Strength * 1000;
+            sheet.TotalWeight += sheet.Inventory.Gold.Amount * GramsPerGold;
+            sheet.TotalWeight += sheet.Inventory.Rations.Amount * GramsPerRation;
+            sheet.MaxWeight = sheet.Attributes.Strength * CarryWeightPerStrength;
         }
 
-        static void ApplyWieldedItems(IAssetManager assets, EffectiveCharacterSheet sheet)
+        static void ApplyWieldedItems(EffectiveCharacterSheet sheet)
         {
             int initialDamage = sheet.Combat.Damage;
             int initialProtection = sheet.Combat.Protection;
 
             foreach (var itemSlot in sheet.Inventory.EnumerateBodyParts())
             {
-                if (itemSlot.Id == null)
+                if (!(itemSlot.Item is ItemData item))
                     continue;
-                var item = assets.LoadItem(itemSlot.Id.Value);
+
                 sheet.Combat.Damage += item.Damage;
                 sheet.Combat.Protection += item.Protection;
                 sheet.Combat.LifePointsMax += item.LpMaxBonus;

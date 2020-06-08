@@ -59,7 +59,11 @@ namespace UAlbion.Api
                     if (value != null)
                     {
                         sb.Append('"');
-                        sb.Append(value.Replace("\"", "\\\""));
+                        sb.Append(value
+                            .Replace("\\", "\\\\")
+                            .Replace("\"", "\\\"")
+                            .Replace("\t", "\\t")
+                        );
                         sb.Append('"');
                     }
                 }
@@ -69,7 +73,7 @@ namespace UAlbion.Api
                 }
             }
 
-            return sb.ToString();
+            return sb.ToString().TrimEnd();
         }
 
         Func<string[], Event> BuildParser(ParameterExpression partsParameter)

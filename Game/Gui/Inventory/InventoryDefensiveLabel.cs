@@ -52,7 +52,7 @@ namespace UAlbion.Game.Gui.Inventory
 
             // Protection : %d
             var protection = player?.Apparent.DisplayProtection ?? 0;
-            var text = tf.Format(SystemTextId.Inv_ProtectionN.ToId(), protection);
+            var text = tf.Format(SystemTextId.Inv_ProtectionN, protection);
             Raise(new HoverTextEvent(text));
             e.Propagating = false;
         }

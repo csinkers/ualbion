@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.Config;
 
@@ -9,7 +10,7 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.Tileset)]
     public class TilesetDataLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
             var td = new TilesetData();
             td.UseSmallGraphics = config.UseSmallGraphics ?? false;

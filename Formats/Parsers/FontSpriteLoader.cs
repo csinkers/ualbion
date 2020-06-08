@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 
@@ -8,9 +9,9 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.Font)]
     public class FontSpriteLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
-            var font = (AlbionSprite)new FixedSizeSpriteLoader().Load(br, streamLength, name, config);
+            var font = (AlbionSprite)new FixedSizeSpriteLoader().Load(br, streamLength, key, config);
             var frames = new List<AlbionSprite.Frame>();
 
             // Fix up sub-images for variable size

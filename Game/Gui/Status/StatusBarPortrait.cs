@@ -71,7 +71,7 @@ namespace UAlbion.Game.Gui.Status
                     Alignment = TextAlignment.Center
                 });
 
-            IText S(SystemTextId textId) => tf.Center().NoWrap().Format(textId.ToId());
+            IText S(SystemTextId textId) => tf.Center().NoWrap().Format(textId);
 
             var uiPosition = window.PixelToUi(cursorManager.Position);
             var options = new List<ContextMenuOption>
@@ -157,9 +157,9 @@ namespace UAlbion.Game.Gui.Status
         {
             e.Propagating = false;
             var inventoryManager = Resolve<IInventoryManager>();
-            if(inventoryManager?.ItemInHand != null)
+            if(inventoryManager?.ItemInHand.Item != null)
             {
-                Raise(new InventoryPickupDropEvent(InventoryType.Player, (int)PartyMember.Id, ItemSlotId.None));
+                Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyMember.Id, ItemSlotId.None));
                 return;
             }
 
@@ -202,31 +202,31 @@ namespace UAlbion.Game.Gui.Status
             var tf = Resolve<ITextFormatter>();
 
             IText text;
-            switch (inventoryManager.ItemInHand)
+            switch (inventoryManager.ItemInHand.Item)
             {
-                case ItemSlot item when item.Id.HasValue:
+                case ItemData item:
                     // Give %s to %s
                     text = tf.Format(
-                        SystemTextId.PartyPortrait_GiveXToX.ToId(),
-                        assets.LoadString(item.Id.Value.ToId(), settings.Gameplay.Language),
+                        SystemTextId.PartyPortrait_GiveXToX,
+                        assets.LoadString(item.Id, settings.Gameplay.Language),
                         member.Apparent.GetName(settings.Gameplay.Language));
                     break;
-                case GoldInHand _:
+                case Gold _:
                     // Give gold to %s
                     text = tf.Format(
-                        SystemTextId.PartyPortrait_GiveGoldToX.ToId(),
+                        SystemTextId.PartyPortrait_GiveGoldToX,
                         member.Apparent.GetName(settings.Gameplay.Language));
                     break;
-                case RationsInHand _:
+                case Rations _:
                     // Give food to %s
                     text = tf.Format(
-                        SystemTextId.PartyPortrait_GiveFoodToX.ToId(),
+                        SystemTextId.PartyPortrait_GiveFoodToX,
                         member.Apparent.GetName(settings.Gameplay.Language));
                     break;
                 default:
                     // %s (LP:%d, SP:%d)
                     text = tf.Format(
-                        SystemTextId.PartyPortrait_XLifeMana.ToId(),
+                        SystemTextId.PartyPortrait_XLifeMana,
                         member.Apparent.GetName(settings.Gameplay.Language),
                         member.Apparent.Combat.LifePoints,
                         member.Apparent.Magic.SpellPoints);

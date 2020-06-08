@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 
@@ -9,12 +10,12 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.SingleHeaderSprite, FileFormat.HeaderPerSubImageSprite)]
     public class HeaderBasedSpriteLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
             ApiUtil.Assert(config.Transposed != true);
             var sprite = new AlbionSprite();
             long initialPosition = br.BaseStream.Position;
-            sprite.Name = name;
+            sprite.Name = key.ToString();
             sprite.UniformFrames = config.Format == FileFormat.SingleHeaderSprite;
 
             int width = br.ReadUInt16();

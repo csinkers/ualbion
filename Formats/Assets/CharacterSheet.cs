@@ -5,7 +5,7 @@ namespace UAlbion.Formats.Assets
 {
     public class EffectiveCharacterSheet : CharacterSheet, IEffectiveCharacterSheet
     {
-        public EffectiveCharacterSheet(int id) : base(id) { }
+        public EffectiveCharacterSheet(AssetKey key) : base(key) { }
         public int TotalWeight { get; set; }
         public int MaxWeight { get; set; }
         public int DisplayDamage { get; set; }
@@ -14,7 +14,12 @@ namespace UAlbion.Formats.Assets
 
     public class CharacterSheet : ICharacterSheet
     {
-        public CharacterSheet(int id) => Inventory = new Inventory(InventoryType.Player, id);
+        public CharacterSheet(AssetKey key)
+        {
+            Key = key;
+            if (key.Type == AssetType.PartyMember)
+                Inventory = new Inventory((InventoryId)key);
+        }
 
         // Grouped
         public MagicSkills Magic { get; set; } = new MagicSkills();
@@ -30,13 +35,13 @@ namespace UAlbion.Formats.Assets
 
         public override string ToString() =>
             Type switch {
-            CharacterType.Party => $"{Name} {Race} {Class} {Age} EN:{EnglishName} DE:{GermanName} {Magic.SpellStrengths.Count} spells",
-            CharacterType.Npc => $"{Name} {PortraitId} S:{SpriteId} E{EventSetId} W{WordSetId}",
-            CharacterType.Monster => $"{Name} {Class} {Gender} AP{Combat.ActionPoints} Lvl{Level} LP{Combat.LifePoints}/{Combat.LifePointsMax} {Magic.SpellStrengths.Count} spells",
-            _ => $"{Name} UNKNOWN TYPE {Type}" };
+            CharacterType.Party => $"{Key} {Race} {Class} {Age} EN:{EnglishName} DE:{GermanName} {Magic.SpellStrengths.Count} spells",
+            CharacterType.Npc => $"{Key} {PortraitId} S:{SpriteId} E{EventSetId} W{WordSetId}",
+            CharacterType.Monster => $"{Key} {Class} {Gender} AP{Combat.ActionPoints} Lvl{Level} LP{Combat.LifePoints}/{Combat.LifePointsMax} {Magic.SpellStrengths.Count} spells",
+            _ => $"{Key} UNKNOWN TYPE {Type}" };
 
         // Names
-        public string Name { get; set; } // Debug name, not displayed to the player
+        public AssetKey Key { get; } // Debug name, not displayed to the player
         public string EnglishName { get; set; }
         public string GermanName { get; set; }
         public string FrenchName { get; set; }

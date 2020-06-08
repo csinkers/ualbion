@@ -1,12 +1,14 @@
 ﻿using System.Text;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets
 {
-    public class ItemData
+    public sealed class ItemData : IItem
     {
-        public ItemId Id { get; set; }
+        public ItemData(ItemId id) => Id = id;
+        public ItemId Id { get; }
         public byte Unknown { get; set; }   //  0 Always 0
         public ItemType TypeId { get; set; }   //  1 Item type
         public ItemSlotId SlotType { get; set; }   //  2 Slot that can hold the item
@@ -154,8 +156,8 @@ namespace UAlbion.Formats.Assets
 
         public static ItemData Serdes(int i, ItemData item, ISerializer s)
         {
-            item ??= new ItemData();
-            item.Id = (ItemId)i;
+            item ??= new ItemData((ItemId)i);
+            ApiUtil.Assert(i == (int) item.Id);
             item.Unknown = s.UInt8(nameof(item.Unknown), item.Unknown);
             item.TypeId = s.EnumU8(nameof(item.TypeId), item.TypeId);
             item.SlotType = ((PersistedItemSlotId)s.UInt8(nameof(item.SlotType), (byte)item.SlotType.ToPersisted())).ToMemory();
@@ -192,5 +194,17 @@ namespace UAlbion.Formats.Assets
             item.Race = s.UInt16(nameof(item.Race), item.Race);
             return item;
         }
+
+        bool Equals(ItemData other) => Id == other.Id;
+        public bool Equals(IContents obj) => Equals((object) obj);
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((ItemData) obj);
+        }
+
+        public override int GetHashCode() => (int) Id;
     }
 }

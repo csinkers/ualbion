@@ -23,6 +23,7 @@ packages/
 *.lock
 *.lock~
 *.user
+*.DotSettings
 
 /data/settings.json
 SDL2.dll

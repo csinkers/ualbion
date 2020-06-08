@@ -16,9 +16,9 @@ namespace UAlbion.Game.Gui.Dialogs
             var textSection = new UiText(text);
 
             UiElement buttons = new HorizontalStack(
-                new Button(SystemTextId.MsgBox_Yes.ToId()).OnClick(() => Respond(true)),
+                new Button(SystemTextId.MsgBox_Yes).OnClick(() => Respond(true)),
                 new Spacing(8, 0),
-                new Button(SystemTextId.MsgBox_No.ToId()).OnClick(() => Respond(false)));
+                new Button(SystemTextId.MsgBox_No).OnClick(() => Respond(false)));
 
             var stack = new VerticalStack(
                 new ButtonFrame(textSection) { State = ButtonState.Pressed },

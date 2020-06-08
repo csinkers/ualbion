@@ -81,7 +81,7 @@ namespace UAlbion.Game
 
                     var tf = Resolve<ITextFormatter>();
                     var dialog = AttachChild(new NumericPromptDialog(
-                        tf.Format(SystemTextId.MsgBox_EnterNumber.ToId()),
+                        tf.Format(SystemTextId.MsgBox_EnterNumber),
                         0, 9999));
 
                     prompt.Acknowledge();

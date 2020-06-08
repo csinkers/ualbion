@@ -209,7 +209,7 @@ namespace UAlbion.Game.Assets
             object Reader(string path, BinaryReader br, long length)
             {
                 var loader = AssetLoaderRegistry.GetLoader(assetConfig.Format);
-                var asset = loader.Load(br, (int)length, name, assetConfig);
+                var asset = loader.Load(br, (int)length, key, assetConfig);
                 if (asset == null) throw new AssetNotFoundException($"Object {key.Type}:{key.Id} could not be loaded from file {path}", key.Type, key.Id);
                 GameTrace.Log.AssetLoaded(key, name, path);
                 return asset;

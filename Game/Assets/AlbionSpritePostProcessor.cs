@@ -12,7 +12,7 @@ namespace UAlbion.Game.Assets
     public class AlbionSpritePostProcessor : IAssetPostProcessor
     {
         public IEnumerable<Type> SupportedTypes => new[] { typeof(AlbionSprite) };
-        public object Process(ICoreFactory factory, AssetKey key, string name, object asset)
+        public object Process(ICoreFactory factory, AssetKey key, object asset, Func<AssetKey, object> loaderFunc)
         {
             var sprite = (AlbionSprite)asset;
             SubImage[] subImages;

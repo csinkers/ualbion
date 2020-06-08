@@ -28,7 +28,7 @@ namespace UAlbion.Game.Gui.Inventory
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
 
-            var heading = new Header(item.Id.ToId());
+            var heading = new Header(item.Id);
             var itemPic = new UiSpriteElement<ItemSpriteId>(0)
             {
                 SubId = (int)item.Icon,
@@ -42,10 +42,10 @@ namespace UAlbion.Game.Gui.Inventory
 
             var attribStack = new HorizontalStack(
                 new VerticalStack(
-                    new UiTextBuilder(SystemTextId.Examine1_Type.ToId()).NoWrap(),
-                    new UiTextBuilder(SystemTextId.Examine1_Weight.ToId()).NoWrap(),
-                    new UiTextBuilder(SystemTextId.Examine1_Damage.ToId()).NoWrap(),
-                    new UiTextBuilder(SystemTextId.Examine1_Protection.ToId()).NoWrap()
+                    new UiTextBuilder(SystemTextId.Examine1_Type).NoWrap(),
+                    new UiTextBuilder(SystemTextId.Examine1_Weight).NoWrap(),
+                    new UiTextBuilder(SystemTextId.Examine1_Damage).NoWrap(),
+                    new UiTextBuilder(SystemTextId.Examine1_Protection).NoWrap()
                 ),
                 new Spacing(2,0),
                 new VerticalStack(
@@ -79,13 +79,13 @@ namespace UAlbion.Game.Gui.Inventory
                         new Spacing(0, 2),
                         new Divider(CommonColor.Yellow4),
                         new Spacing(0, 2),
-                        new UiTextBuilder(SystemTextId.Misc_CanBeUsedBy.ToId()),
+                        new UiTextBuilder(SystemTextId.Misc_CanBeUsedBy),
                         classStack
                     )
                 ),
                 new Spacing(0, 2),
                 new FixedSize(52, 13,
-                    new Button(SystemTextId.MsgBox_OK.ToId()) { DoubleFrame = true }.OnClick(Close))
+                    new Button(SystemTextId.MsgBox_OK) { DoubleFrame = true }.OnClick(Close))
             );
 
             AttachChild(new DialogFrame(new Padding(stack, 6)) { Background = DialogFrameBackgroundStyle.MainMenuPattern });

@@ -43,19 +43,19 @@ namespace UAlbion.Game.Gui.Menus
             var elements = new List<IUiElement>
             {
                 new Spacing(156,2),
-                new Label(UAlbionStringId.LanguageLabel.ToId()),
+                new Label(UAlbionStringId.LanguageLabel),
                 new HorizontalStack(languageButtons),
                 new Spacing(0,2),
-                new Label(SystemTextId.Options_MusicVolume.ToId()),
+                new Label(SystemTextId.Options_MusicVolume),
                 new Slider(() => _musicVolume, x => _musicVolume = x, 0, 127),
                 new Spacing(0,2),
-                new Label(SystemTextId.Options_FXVolume.ToId()),
+                new Label(SystemTextId.Options_FXVolume),
                 new Slider(() => _fxVolume, x => _fxVolume = x, 0, 127),
                 new Spacing(0,2),
-                new Label(SystemTextId.Options_CombatTextDelay.ToId()),
+                new Label(SystemTextId.Options_CombatTextDelay),
                 new Slider(() => _combatDelay, x => _combatDelay = x, 1, 50),
                 new Spacing(0,2),
-                new Button(SystemTextId.MsgBox_OK.ToId()).OnClick(SaveAndClose),
+                new Button(SystemTextId.MsgBox_OK).OnClick(SaveAndClose),
                 new Spacing(0,2),
             };
             var stack = new VerticalStack(elements);

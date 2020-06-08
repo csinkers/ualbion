@@ -94,7 +94,7 @@ namespace UAlbion.Game.Entities.Map2D
             var worldPosition = new Vector2(x, y) * _map.TileSize;
             var normPosition = camera.ProjectWorldToNorm(new Vector3(worldPosition, 0.0f));
             var uiPosition = window.NormToUi(normPosition.X, normPosition.Y);
-            var heading = S(SystemTextId.MapPopup_Environment.ToId());
+            var heading = S(SystemTextId.MapPopup_Environment);
             var options = new List<ContextMenuOption>();
 
             var zone = _map.GetZone(x, y);
@@ -103,7 +103,7 @@ namespace UAlbion.Game.Entities.Map2D
                 if (zone.Trigger.HasFlag(TriggerType.Examine))
                 {
                     options.Add(new ContextMenuOption(
-                        S(SystemTextId.MapPopup_Examine.ToId()),
+                        S(SystemTextId.MapPopup_Examine),
                         new TriggerChainEvent(zone.Chain, zone.Node, TriggerType.Examine, _map.Id, x, y),
                         ContextMenuGroup.Actions));
                 }
@@ -111,7 +111,7 @@ namespace UAlbion.Game.Entities.Map2D
                 if (zone.Trigger.HasFlag(TriggerType.Manipulate))
                 {
                     options.Add(new ContextMenuOption(
-                        S(SystemTextId.MapPopup_Manipulate.ToId()),
+                        S(SystemTextId.MapPopup_Manipulate),
                         new TriggerChainEvent(zone.Chain, zone.Node, TriggerType.Manipulate, _map.Id, x, y),
                         ContextMenuGroup.Actions));
                 }
@@ -119,7 +119,7 @@ namespace UAlbion.Game.Entities.Map2D
                 if (zone.Trigger.HasFlag(TriggerType.Take))
                 {
                     options.Add(new ContextMenuOption(
-                        S(SystemTextId.MapPopup_Take.ToId()),
+                        S(SystemTextId.MapPopup_Take),
                         new TriggerChainEvent(zone.Chain, zone.Node, TriggerType.Take, _map.Id, x, y),
                         ContextMenuGroup.Actions));
                 }
@@ -127,7 +127,7 @@ namespace UAlbion.Game.Entities.Map2D
                 if (zone.Trigger.HasFlag(TriggerType.TalkTo))
                 {
                     options.Add(new ContextMenuOption(
-                        S(SystemTextId.MapPopup_TalkTo.ToId()),
+                        S(SystemTextId.MapPopup_TalkTo),
                         new TriggerChainEvent(zone.Chain, zone.Node, TriggerType.TalkTo, _map.Id, x, y),
                         ContextMenuGroup.Actions));
                 }
@@ -136,7 +136,7 @@ namespace UAlbion.Game.Entities.Map2D
             // Check if map allows Rest
 
             options.Add(new ContextMenuOption(
-                    S(SystemTextId.MapPopup_MainMenu.ToId()),
+                    S(SystemTextId.MapPopup_MainMenu),
                     new PushSceneEvent(SceneId.MainMenu),
                     ContextMenuGroup.System
                 ));

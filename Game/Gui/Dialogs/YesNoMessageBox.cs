@@ -22,10 +22,10 @@ namespace UAlbion.Game.Gui.Dialogs
                 new Spacing(0, 5),
                 new HorizontalStack(
                     new Spacing(11, 0),
-                    new Button(SystemTextId.MsgBox_Yes.ToId()) { DoubleFrame = true }
+                    new Button(SystemTextId.MsgBox_Yes) { DoubleFrame = true }
                         .OnClick(() => OnButton(true)),
                     new Spacing(8, 0),
-                    new Button(SystemTextId.MsgBox_No.ToId()) { DoubleFrame = true }
+                    new Button(SystemTextId.MsgBox_No) { DoubleFrame = true }
                         .OnClick(() => OnButton(false)),
                     new Spacing(10, 0)
                 ),

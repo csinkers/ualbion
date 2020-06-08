@@ -42,7 +42,7 @@ namespace UAlbion.Game.Gui.Inventory
                 new Slider(() => _quantity, x => _quantity = x, 0, max, format),
                 new Spacing(0, 4),
                 new FixedSize(52, 13,
-                    new Button(SystemTextId.MsgBox_OK.ToId()) { DoubleFrame = true }.OnClick(Close))
+                    new Button(SystemTextId.MsgBox_OK) { DoubleFrame = true }.OnClick(Close))
             );
 
             AttachChild(new DialogFrame(new Padding(stack, 6))

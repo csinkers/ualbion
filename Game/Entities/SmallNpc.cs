@@ -50,16 +50,16 @@ namespace UAlbion.Game.Entities
             var uiPosition = window.NormToUi(normPosition.X, normPosition.Y);
 
             IText S(StringId textId) => tf.NoWrap().Center().Format(textId);
-            var heading = S(SystemTextId.MapPopup_Person.ToId());
+            var heading = S(SystemTextId.MapPopup_Person);
             var options = new List<ContextMenuOption>
             {
                 new ContextMenuOption(
-                    S(SystemTextId.MapPopup_TalkTo.ToId()),
+                    S(SystemTextId.MapPopup_TalkTo),
                     new TriggerChainEvent(_npc.Chain, _npc.Chain.FirstEvent, _npc.Id.Value),
                     ContextMenuGroup.Actions),
 
                 new ContextMenuOption(
-                    S(SystemTextId.MapPopup_MainMenu.ToId()),
+                    S(SystemTextId.MapPopup_MainMenu),
                     new PushSceneEvent(SceneId.MainMenu),
                     ContextMenuGroup.System
                 )

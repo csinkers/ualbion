@@ -26,9 +26,9 @@ namespace UAlbion.Game.State
         {
             On<AddPartyMemberEvent>(e => SetLastResult(AddMember(e.PartyMemberId)));
             On<RemovePartyMemberEvent>(e => SetLastResult(RemoveMember(e.PartyMemberId)));
-            On<ChangePartyGoldEvent>(e => SetLastResult(ChangePartyGold(e.Operation, e.Amount)));
-            On<ChangePartyRationsEvent>(e => SetLastResult(ChangePartyRations(e.Operation, e.Amount)));
-            On<AddRemoveInventoryItemEvent>(e => SetLastResult(ChangePartyInventory(e.ItemId, e.Operation, e.Amount)));
+            On<ChangePartyGoldEvent>(e => SetLastResult(ChangePartyInventory(new Gold(),  e.Operation, e.Amount)));
+            On<ChangePartyRationsEvent>(e => SetLastResult(ChangePartyInventory(new Rations(), e.Operation, e.Amount)));
+            On<AddRemoveInventoryItemEvent>(e => SetLastResult(ChangePartyInventory(Resolve<IAssetManager>().LoadItem(e.ItemId), e.Operation, e.Amount)));
             On<SetPartyLeaderEvent>(e =>
             {
                 Leader = e.PartyMemberId;
@@ -39,9 +39,9 @@ namespace UAlbion.Game.State
             {
                 SetLastResult(e.ChestType switch
                 {
-                    SimpleChestEvent.SimpleChestItemType.Item => ChangePartyInventory(e.ItemId, QuantityChangeOperation.AddAmount, e.Amount),
-                    SimpleChestEvent.SimpleChestItemType.Gold => ChangePartyGold(QuantityChangeOperation.AddAmount, e.Amount),
-                    SimpleChestEvent.SimpleChestItemType.Rations => ChangePartyRations(QuantityChangeOperation.AddAmount, e.Amount),
+                    SimpleChestEvent.SimpleChestItemType.Item => ChangePartyInventory(Resolve<IAssetManager>().LoadItem(e.ItemId), QuantityChangeOperation.AddAmount, e.Amount),
+                    SimpleChestEvent.SimpleChestItemType.Gold => ChangePartyInventory(new Gold(), QuantityChangeOperation.AddAmount, e.Amount),
+                    SimpleChestEvent.SimpleChestItemType.Rations => ChangePartyInventory(new Rations(), QuantityChangeOperation.AddAmount, e.Amount),
                     _ => false
                 });
             });
@@ -49,18 +49,19 @@ namespace UAlbion.Game.State
             {
                 var state = Resolve<IGameState>();
                 var inventoryManager = Resolve<IInventoryManager>();
-                var chest = state.GetInventory(InventoryType.Chest, (int)e.ChestId);
+                var chestId = new InventoryId(e.ChestId);
+                var chest = state.GetInventory(chestId);
 
-                if (ChangePartyGold(QuantityChangeOperation.AddAmount, chest.Gold))
-                    inventoryManager.TryChangeGold(InventoryType.Chest, (int)e.ChestId, QuantityChangeOperation.SubtractAmount, chest.Gold);
+                if (ChangePartyInventory(new Gold(), QuantityChangeOperation.AddAmount, chest.Gold.Amount))
+                    inventoryManager.TryChangeInventory(chestId, new Gold(), QuantityChangeOperation.SubtractAmount, chest.Gold.Amount);
 
-                if (ChangePartyRations(QuantityChangeOperation.AddAmount, chest.Rations))
-                    inventoryManager.TryChangeRations(InventoryType.Chest, (int)e.ChestId, QuantityChangeOperation.SubtractAmount, chest.Rations);
+                if (ChangePartyInventory(new Rations(), QuantityChangeOperation.AddAmount, chest.Rations.Amount))
+                    inventoryManager.TryChangeInventory(chestId, new Rations(), QuantityChangeOperation.SubtractAmount, chest.Rations.Amount);
 
-                foreach (var item in chest.Slots.Where(x => x?.Id != null && x.Amount > 0))
+                foreach (var slot in chest.Slots.Where(x => x?.Item != null && x.Amount > 0))
                 {
-                    if (ChangePartyInventory(item.Id.Value, QuantityChangeOperation.AddAmount, item.Amount))
-                        inventoryManager.TryChangeInventory(InventoryType.Chest, (int)e.ChestId, item.Id.Value, QuantityChangeOperation.SubtractAmount, item.Amount);
+                    if (ChangePartyInventory(slot.Item, QuantityChangeOperation.AddAmount, slot.Amount))
+                        inventoryManager.TryChangeInventory(chestId, slot.Item, QuantityChangeOperation.SubtractAmount, slot.Amount);
                 }
             });
 
@@ -76,12 +77,12 @@ namespace UAlbion.Game.State
         public IPlayer this[PartyCharacterId id] => _statusBarOrder.FirstOrDefault(x => x.Id == id);
         public IReadOnlyList<IPlayer> StatusBarOrder => _readOnlyStatusBarOrder;
         public IReadOnlyList<IPlayer> WalkOrder => _readOnlyWalkOrder;
-        public int TotalGold => _statusBarOrder.Sum(x => x.Effective.Inventory.Gold);
+        public int TotalGold => _statusBarOrder.Sum(x => x.Effective.Inventory.Gold.Amount);
         public int GetItemCount(ItemId itemId) =>
             _statusBarOrder
-                .SelectMany(x => x.Effective.Inventory.EnumerateAll())
-                .Where(x => x.Id == itemId)
-                .Sum(x => x.Amount);
+            .SelectMany(x => x.Effective.Inventory.EnumerateAll())
+            .Where(x => x.Item is ItemData item && item.Id == itemId)
+            .Sum(x => x.Amount);
 
         // The current party leader (shown with a white outline on
         // health bar and slightly raised in the status bar)
@@ -159,17 +160,9 @@ namespace UAlbion.Game.State
             return _walkOrder.Any(x => func(inventoryManager, x.Id));
         }
 
-        bool ChangePartyInventory(ItemId itemId, QuantityChangeOperation operation, int amount) 
+        bool ChangePartyInventory(IContents item, QuantityChangeOperation operation, int amount) 
             => TryEachMember((im, x) =>
-                im.TryChangeInventory(InventoryType.Player, (int)x, itemId, operation, amount));
-
-        bool ChangePartyGold(QuantityChangeOperation operation, int amount)
-            => TryEachMember((im, x) =>
-                im.TryChangeGold(InventoryType.Player, (int)x, operation, amount));
-
-        bool ChangePartyRations(QuantityChangeOperation operation, int amount)
-            => TryEachMember((im, x) =>
-                im.TryChangeRations(InventoryType.Player, (int)x, operation, amount));
+                im.TryChangeInventory(new InventoryId(x), item, operation, amount));
     }
 }
 

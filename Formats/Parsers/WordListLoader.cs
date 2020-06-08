@@ -2,6 +2,7 @@
 using System.IO;
 using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
@@ -10,7 +11,7 @@ namespace UAlbion.Formats.Parsers
     public class WordListLoader : IAssetLoader
     {
         const int WordLength = 21;
-        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
             int wordListId = config.Id;
             var wordCount = streamLength / WordLength;

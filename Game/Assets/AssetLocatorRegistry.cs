@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using UAlbion.Api;
 using UAlbion.Core;
-using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Assets
 {
-    public class AssetLocatorRegistry : Component, IDisposable
+    public class AssetLocatorRegistry : ServiceComponent<IAssetLocatorRegistry>, IAssetLocatorRegistry
     {
         readonly IDictionary<AssetType, IAssetLocator> _locators = new Dictionary<AssetType, IAssetLocator>();
         readonly IDictionary<Type, IAssetPostProcessor> _postProcessors = new Dictionary<Type, IAssetPostProcessor>();
@@ -22,7 +21,7 @@ namespace UAlbion.Game.Assets
             PerfTracker.StartupEvent("Built AssetLocatorRegistry");
         }
 
-        public void AddAssetLocator(IAssetLocator locator)
+        public IAssetLocatorRegistry AddAssetLocator(IAssetLocator locator)
         {
             if (locator is IComponent component)
                 AttachChild(component);
@@ -33,9 +32,11 @@ namespace UAlbion.Game.Assets
                     throw new InvalidOperationException($"A locator is already defined for {assetType}");
                 _locators[assetType] = locator;
             }
+
+            return this;
         }
 
-        public void AddAssetPostProcessor(IAssetPostProcessor postProcessor)
+        public IAssetLocatorRegistry AddAssetPostProcessor(IAssetPostProcessor postProcessor)
         {
             foreach (var type in postProcessor.SupportedTypes)
             {
@@ -43,6 +44,8 @@ namespace UAlbion.Game.Assets
                     throw new InvalidOperationException($"A post-processor is already defined for {type}");
                 _postProcessors[type] = postProcessor;
             }
+
+            return this;
         }
 
         readonly AssetCache _assetCache;
@@ -55,8 +58,6 @@ namespace UAlbion.Game.Assets
             return _standardAssetLocator;
         }
 
-        public object LoadAssetCached(AssetType type, ushort id) => LoadAssetCached(new AssetKey(type, id));
-        public object LoadAssetCached(AssetId id) => LoadAssetCached(new AssetKey(id));
         public object LoadAssetCached(AssetKey key)
         {
             object asset = _assetCache.Get(key);
@@ -71,9 +72,8 @@ namespace UAlbion.Game.Assets
             return asset is Exception ? null : asset;
         }
 
-        public object LoadAsset(AssetId id, GameLanguage language = GameLanguage.English)
+        public object LoadAsset(AssetKey key)
         {
-            var key = new AssetKey(id, language);
             var asset = LoadAssetInternal(key);
             return asset is Exception ? null : asset;
         }
@@ -88,7 +88,7 @@ namespace UAlbion.Game.Assets
                 var asset = locator.LoadAsset(key, name, LoadAssetCached);
 
                 if (asset != null && _postProcessors.TryGetValue(asset.GetType(), out var processor))
-                    asset = processor.Process(factory, key, name, asset);
+                    asset = processor.Process(factory, key, asset, LoadAssetCached);
                 return asset;
             }
             catch (Exception e)

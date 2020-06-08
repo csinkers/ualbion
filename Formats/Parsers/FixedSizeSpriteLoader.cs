@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 
@@ -9,7 +10,7 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.FixedSizeSprite)]
     public class FixedSizeSpriteLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
             if (streamLength == 0)
                 return null;
@@ -30,7 +31,7 @@ namespace UAlbion.Formats.Parsers
 
             var sprite = new AlbionSprite
             {
-                Name = name,
+                Name = key.ToString(),
                 Width = width,
                 Height = height * spriteCount,
                 Frames = new AlbionSprite.Frame[spriteCount],
@@ -54,7 +55,7 @@ namespace UAlbion.Formats.Parsers
             {
                 var rotatedSprite = new AlbionSprite
                 {
-                    Name = name,
+                    Name = key.ToString(),
                     Width = height,
                     Height = width * spriteCount,
                     Frames = new AlbionSprite.Frame[spriteCount],

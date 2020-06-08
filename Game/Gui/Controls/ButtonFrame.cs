@@ -170,7 +170,10 @@ namespace UAlbion.Game.Gui.Controls
             }
         }
 
-        public override Vector2 GetSize() => GetMaxChildSize() + _padding * 2 * Vector2.One;
+        public override Vector2 GetSize()
+        {
+            return GetMaxChildSize() + _padding * 2 * Vector2.One;
+        }
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {

@@ -15,7 +15,7 @@ namespace UAlbion.Game.State
         MapDataId MapId { get; }
         ICharacterSheet GetNpc(NpcCharacterId id);
         ICharacterSheet GetPartyMember(PartyCharacterId id);
-        IInventory GetInventory(InventoryType type, int id);
+        IInventory GetInventory(InventoryId id);
         short GetTicker(int id);
         bool GetSwitch(int id);
         IList<MapChange> TemporaryMapChanges { get; }

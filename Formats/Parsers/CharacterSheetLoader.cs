@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
@@ -14,9 +15,10 @@ namespace UAlbion.Formats.Parsers
         const int SpellSchoolCount = 7;
         const int MaxSpellsPerSchool = 30;
 
-        public CharacterSheet Serdes(CharacterSheet sheet, ISerializer s, string name, AssetInfo config)
+        public CharacterSheet Serdes(CharacterSheet sheet, ISerializer s, AssetKey key, AssetInfo config)
         {
-            sheet ??= new CharacterSheet(config.Id);
+            var initialOffset = s.Offset;
+            sheet ??= new CharacterSheet(key);
             s.Check();
             sheet.Type = s.EnumU8("Type", sheet.Type);
             sheet.Gender = s.EnumU8("Gender", sheet.Gender);
@@ -53,8 +55,15 @@ namespace UAlbion.Formats.Parsers
             sheet.EventSetId = s.EnumU16("EventSetId", sheet.EventSetId);
             sheet.WordSetId = s.EnumU16("WordSetId", sheet.WordSetId);
             sheet.Combat.TrainingPoints = s.UInt16("TrainingPoints", sheet.Combat.TrainingPoints);
-            sheet.Inventory.Gold = s.UInt16("Gold", sheet.Inventory.Gold);
-            sheet.Inventory.Rations = s.UInt16("Rations", sheet.Inventory.Rations);
+
+            ushort gold = s.UInt16("Gold", sheet.Inventory?.Gold.Amount ?? 0);
+            ushort rations = s.UInt16("Rations", sheet.Inventory?.Rations.Amount ?? 0);
+            if (sheet.Inventory != null)
+            {
+                sheet.Inventory.Gold.Amount = gold;
+                sheet.Inventory.Rations.Amount = rations;
+            }
+
             sheet.Unknown1C = s.UInt16("Unknown1C", sheet.Unknown1C);
             s.Check();
 
@@ -195,20 +204,20 @@ namespace UAlbion.Formats.Parsers
             }
 
             if (sheet.Type != CharacterType.Party)
+            {
+                ApiUtil.Assert(s.Offset - initialOffset == 742, "Expected non-player character sheet to be 742 bytes");
                 return sheet;
+            }
 
-            sheet.Inventory = s.Meta(nameof(sheet.Inventory), sheet.Inventory, Inventory.SerdesCharacter);
+            s.Meta(nameof(sheet.Inventory), sheet.Inventory, Inventory.SerdesCharacter);
 
+            ApiUtil.Assert(s.Offset - initialOffset == 940, "Expected player character sheet to be 940 bytes");
             return sheet;
         }
 
-        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
-            var sheet = Serdes(null,
-                new AlbionReader(br, streamLength),
-                name, config);
-
-            sheet.Name = name;
+            var sheet = Serdes(null, new AlbionReader(br, streamLength), key, config);
             return sheet;
         }
     }

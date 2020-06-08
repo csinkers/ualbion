@@ -15,7 +15,7 @@ namespace UAlbion.Game.Gui.Text
     {
         const int ScrollBarWidth = 4;
         readonly IText _source;
-        Rectangle _lastExtents;
+        Rectangle _lastExtents = UiConstants.UiExtents; // Initial GetSize should give the constraint-free dimensions.
         int _lastVersion;
         int? _blockFilter;
         int _totalHeight;
@@ -115,6 +115,8 @@ namespace UAlbion.Game.Gui.Text
 
         public override Vector2 GetSize()
         {
+            Rebuild(_lastExtents);
+
             Vector2 size = Vector2.Zero;
             foreach (var child in Children.OfType<IUiElement>())
             {

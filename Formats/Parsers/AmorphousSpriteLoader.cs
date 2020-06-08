@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text.RegularExpressions;
 using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 
@@ -38,7 +39,7 @@ namespace UAlbion.Formats.Parsers
             }
         }
 
-        public object Load(BinaryReader br, long streamLength, string name, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
             ApiUtil.Assert(config.Transposed != true);
             long initialPosition = br.BaseStream.Position;
@@ -46,7 +47,7 @@ namespace UAlbion.Formats.Parsers
 
             AlbionSprite sprite = new AlbionSprite
             {
-                Name = name,
+                Name = key.ToString(),
                 Width = 0,
                 UniformFrames = false,
                 Frames = new List<AlbionSprite.Frame>()

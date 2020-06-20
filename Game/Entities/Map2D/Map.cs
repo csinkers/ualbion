@@ -82,10 +82,7 @@ namespace UAlbion.Game.Entities.Map2D
         {
             var existing = Children.Where(x => x is SmallPlayer || x is LargePlayer).ToList();
             foreach (var player in existing)
-            {
-                player.Detach();
-                Children.Remove(player);
-            }
+                player.Remove();
 
             var state = Resolve<IGameState>();
             if (state.Party != null)

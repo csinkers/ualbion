@@ -14,7 +14,5 @@ namespace UAlbion.Formats.MapEvents
 
         [EventPart("npc")] public NpcCharacterId NpcId { get; }
         [EventPart("text")] public byte TextId { get; }
-
-        protected override AsyncEvent Clone() => new NpcTextEvent(NpcId, TextId);
     }
 }

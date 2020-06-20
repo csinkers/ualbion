@@ -236,7 +236,13 @@ namespace UAlbion.Core
             return this;
         }
 
-        public void Unregister<T>(T system) => Unregister(typeof(T), system);
+        public void Unregister(object system)
+        {
+            Unregister(system.GetType(), system);
+            foreach (var i in system.GetType().GetInterfaces())
+                Unregister(i, system);
+        }
+
         public void Unregister(Type type, object system)
         {
             lock (_syncRoot)
@@ -252,13 +258,13 @@ namespace UAlbion.Core
                 return _registrations.TryGetValue(typeof(T), out var result) ? (T)result : default;
         }
 
-        public IEnumerable EnumerateRecipients(Type eventType)
+        public IEnumerable<IComponent> EnumerateRecipients(Type eventType)
         {
             lock (_syncRoot)
             {
                 var subscribers = new List<Handler>();
                 Collect(subscribers, eventType);
-                return subscribers.ToList();
+                return subscribers.Select(x => x.Component).ToList();
             }
         }
     }

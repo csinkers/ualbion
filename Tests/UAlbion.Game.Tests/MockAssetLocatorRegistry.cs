@@ -13,6 +13,6 @@ namespace UAlbion.Game.Tests
         public IAssetLocatorRegistry AddAssetPostProcessor(IAssetPostProcessor postProcessor) => this;
         public object LoadAsset(AssetKey key) => _assets[key];
         public object LoadAssetCached(AssetKey key) => _assets[key];
-        public IAssetLocatorRegistry Add(AssetKey key, object asset) { _assets[key] = asset; return this; }
+        public MockAssetLocatorRegistry Add(AssetKey key, object asset) { _assets[key] = asset; return this; }
     }
 }

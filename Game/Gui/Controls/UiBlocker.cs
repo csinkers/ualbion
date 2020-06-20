@@ -21,5 +21,13 @@ namespace UAlbion.Game.Gui.Controls
             registerHitFunc(order, this);
             return order;
         }
+
+        public int Layout(Rectangle extents, int order, LayoutNode parent)
+        {
+            // Note: Construction is side-effectful: Adds the node to its parent's children.
+            // ReSharper disable once AssignmentIsFullyDiscarded
+            _ = new LayoutNode(parent, this, UiConstants.UiExtents, order);
+            return order;
+        }
     }
 }

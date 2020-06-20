@@ -8,6 +8,5 @@ namespace UAlbion.Formats.MapEvents
     {
         public StartPartyDialogueEvent(PartyCharacterId memberId) => MemberId = memberId;
         [EventPart("member_id")] public PartyCharacterId MemberId { get; }
-        protected override AsyncEvent Clone() => new StartPartyDialogueEvent(MemberId);
     }
 }

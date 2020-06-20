@@ -228,21 +228,19 @@ namespace UAlbion.Game.State.Player
                 { } x => throw new InvalidOperationException($"Unexpected item contents {x}")
             };
 
-            if (maxQuantity == 1)
-                continuation(1);
-            else
-            {
-                var formatFunc = slotId == ItemSlotId.Gold 
-                    ? x => $"{x / 10}.{x % 10}" 
-                    : (Func<int, string>)null;
+            var formatFunc = slotId == ItemSlotId.Gold 
+                ? x => $"{x / 10}.{x % 10}" 
+                : (Func<int, string>)null;
 
-                Exchange.Attach(new ItemQuantityDialog(
-                    text,
-                    icon,
-                    maxQuantity,
-                    continuation,
-                    formatFunc));
-            }
+            /*
+            TODO: Add dialog manager and do this with an async event. Default continuation (e.g. from console) will just echo the chosen amount with a LogEvent.
+            Exchange.Attach(new ItemQuantityDialog(
+                text,
+                icon,
+                maxQuantity,
+                continuation,
+                formatFunc));
+                */
         }
 
 
@@ -260,7 +258,7 @@ namespace UAlbion.Game.State.Player
             switch (GetInventoryAction(slotId))
             {
                 case InventoryAction.Pickup:
-                    if (e is InventoryPickupAllEvent)
+                    if (e is InventoryPickupAllEvent || slot.Amount == 1)
                         PickupItem(slot, null);
                     else
                     {

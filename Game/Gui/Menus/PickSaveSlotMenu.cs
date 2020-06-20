@@ -22,7 +22,7 @@ namespace UAlbion.Game.Gui.Menus
         {
             On<UiRightClickEvent>(e =>
             {
-                Detach();
+                Remove();
                 Closed?.Invoke(this, null);
                 e.Propagating = false;
             });
@@ -36,7 +36,7 @@ namespace UAlbion.Game.Gui.Menus
         void PickSlot(ushort slotNumber)
         {
             Closed?.Invoke(this, slotNumber);
-            Detach();
+            Remove();
         }
 
         string BuildSaveFilename(int i)

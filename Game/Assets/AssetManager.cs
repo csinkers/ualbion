@@ -26,11 +26,7 @@ namespace UAlbion.Game.Assets
             Exchange.Register<ITextureLoader>(this);
         }
 
-        protected override void Unsubscribed()
-        {
-            Exchange.Unregister<IAssetManager>(this);
-            Exchange.Unregister<ITextureLoader>(this);
-        }
+        protected override void Unsubscribed() => Exchange.Unregister(this);
 
         public IMapData LoadMap(MapDataId id) => (IMapData)_assetLocatorRegistry.LoadAsset(id.ToAssetId()); // No caching for map data
         public ItemData LoadItem(ItemId id)

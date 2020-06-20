@@ -9,6 +9,5 @@ namespace UAlbion.Game.Events
 
         [EventPart("cycles", "The number of slow-clock cycles to update for")]
         public int Cycles { get; }
-        protected override AsyncEvent Clone() => new UpdateEvent(Cycles);
     }
 }

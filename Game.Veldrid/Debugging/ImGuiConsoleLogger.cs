@@ -157,7 +157,7 @@ namespace UAlbion.Game.Veldrid.Debugging
                     if (@event != null)
                     {
                         if(@event is AsyncEvent async)
-                            @event = async.CloneWithCallback(() => PrintMessage($"Async event \"{async}\" completed.", ConsoleColor.Gray));
+                            async.SetCallback(() => PrintMessage($"Async event \"{async}\" completed.", ConsoleColor.Gray));
 
                         logExchange.EnqueueEvent(@event);
                     }

@@ -54,8 +54,8 @@ namespace UAlbion.Core
                     var @event = Event.Parse(command);
                     if (@event != null)
                     {
-                        if(@event is AsyncEvent async)
-                            @event = async.CloneWithCallback(() => Console.WriteLine($"Async event \"{async}\" completed."));
+                        if (@event is AsyncEvent async)
+                            async.SetCallback(() => Console.WriteLine($"Async event \"{async}\" completed."));
 
                         logExchange.EnqueueEvent(@event);
                     }

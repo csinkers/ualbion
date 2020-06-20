@@ -57,7 +57,6 @@ namespace UAlbion.Formats.MapEvents
         }
 
         public override AssetType TextType => AssetType.EventText;
-        protected override AsyncEvent Clone() => new EventTextEvent(EventSetId, TextId, Location, PortraitId);
         public static BaseTextEvent Serdes(BaseTextEvent e, ISerializer s, EventSetId eventSetId)
         {
             e ??= new EventTextEvent(eventSetId);
@@ -79,7 +78,6 @@ namespace UAlbion.Formats.MapEvents
         }
 
         public override AssetType TextType => AssetType.MapText;
-        protected override AsyncEvent Clone() => new MapTextEvent(MapId, TextId, Location, PortraitId);
         public static BaseTextEvent Serdes(BaseTextEvent e, ISerializer s, MapDataId mapId)
         {
             e ??= new MapTextEvent(mapId);
@@ -100,6 +98,5 @@ namespace UAlbion.Formats.MapEvents
         [EventPart("text_id")] public byte TextId { get; }
         [EventPart("location")] public TextLocation? Location { get; }
         [EventPart("portrait_id")] public SmallPortraitId? PortraitId { get; }
-        protected override AsyncEvent Clone() => new TextEvent(TextId, Location, PortraitId);
     }
 }

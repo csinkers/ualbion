@@ -76,7 +76,7 @@ namespace UAlbion.Game.Gui.Menus
             settings.Save();
 
             Closed?.Invoke(this, EventArgs.Empty);
-            Detach();
+            Remove();
         }
     }
 }

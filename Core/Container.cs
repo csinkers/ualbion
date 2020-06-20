@@ -19,8 +19,7 @@
 
         public void Remove(IComponent child)
         {
-            if (Children.Remove(child))
-                child.Detach();
+            child.Remove();
         }
 
         public override string ToString() => Name;

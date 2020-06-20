@@ -34,6 +34,14 @@ namespace UAlbion.Game.Gui
         /// <param name="registerHitFunc">A callback for elements containing the probe
         /// point to call to alert the caller to their presence</param>
         int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc);
+
+        /// <summary>
+        /// Used to build a logical representation of the screen layout for debugging and testing purposes.
+        /// </summary>
+        /// <param name="extents">The rectangle the element would normally draw into</param>
+        /// <param name="order">The render order that would be used</param>
+        /// <param name="parent">The LayoutNode corresponding to this element's parent element.</param>
+        int Layout(Rectangle extents, int order, LayoutNode parent);
     }
 
     public interface IFixedSizeUiElement { } // Any elements with this interface won't get stretched to fill available space

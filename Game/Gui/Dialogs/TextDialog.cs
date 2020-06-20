@@ -39,7 +39,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
         void Close()
         {
-            Detach();
+            Remove();
             Closed?.Invoke(this, new EventArgs());
         }
 

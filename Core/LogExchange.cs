@@ -30,9 +30,9 @@ namespace UAlbion.Core
             IsActive = true;
         }
 
-        public void Detach()
+        public void Remove()
         {
-            _exchange.Unregister<ILogExchange>(this);
+            _exchange.Unregister(this);
             _exchange.Unsubscribe(this);
             _exchange = null;
         }

@@ -51,7 +51,8 @@ namespace UAlbion.Game.Gui.Text
                         TextLocation.TextInWindowWithPortrait,
                         sheet.PortraitId);
 
-            OnBaseTextEvent((BaseTextEvent)textEvent.CloneWithCallback(e.Complete));
+            textEvent.SetCallback(e.Complete);
+            OnBaseTextEvent(textEvent);
         }
 
         void OnPartyMemberTextEvent(PartyMemberTextEvent e)
@@ -83,7 +84,8 @@ namespace UAlbion.Game.Gui.Text
                         TextLocation.TextInWindowWithPortrait,
                         sheet.PortraitId);
 
-            OnBaseTextEvent((BaseTextEvent)textEvent.CloneWithCallback(e.Complete));
+            textEvent.SetCallback(e.Complete);
+            OnBaseTextEvent(textEvent);
         }
 
         void OnTextEvent(TextEvent e)
@@ -112,7 +114,8 @@ namespace UAlbion.Game.Gui.Text
                         e.Location,
                         e.PortraitId);
 
-            OnBaseTextEvent((BaseTextEvent)textEvent.CloneWithCallback(e.Complete));
+            textEvent.SetCallback(e.Complete);
+            OnBaseTextEvent(textEvent);
         }
 
         void OnBaseTextEvent(BaseTextEvent textEvent)
@@ -185,8 +188,7 @@ namespace UAlbion.Game.Gui.Text
             _conversation.Complete += (sender, args) =>
             {
                 e.Complete();
-                Children.Remove(_conversation);
-                _conversation.Detach();
+                _conversation.Remove();
                 _conversation = null;
             };
         }
@@ -201,8 +203,7 @@ namespace UAlbion.Game.Gui.Text
             _conversation.Complete += (sender, args) =>
             {
                 e.Complete();
-                Children.Remove(_conversation);
-                _conversation.Detach();
+                _conversation.Remove();
                 _conversation = null;
             };
         }

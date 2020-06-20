@@ -29,7 +29,7 @@ namespace UAlbion.Game
             {
                 if (context.Node.Event is AsyncEvent asyncEvent)
                 {
-                    var clone = asyncEvent.CloneWithCallback(() =>
+                    asyncEvent.SetCallback(() =>
                     {
                         if (context.Node is IBranchNode branch)
                         {
@@ -43,12 +43,12 @@ namespace UAlbion.Game
                         Resume(context);
                     });
 
-                    Raise(clone);
+                    Raise(asyncEvent);
 
-                    switch (clone.AsyncStatus)
+                    switch (asyncEvent.AsyncStatus)
                     {
                         case AsyncStatus.Unacknowledged:
-                            Raise(new LogEvent(LogEvent.Level.Warning, $"Async event {clone} not acknowledged. Continuing immediately."));
+                            Raise(new LogEvent(LogEvent.Level.Warning, $"Async event {asyncEvent} not acknowledged. Continuing immediately."));
                             break;
                         case AsyncStatus.Acknowledged: // Callback will be called later on so return for now
                             _activeContext.Value.Pop();

@@ -53,7 +53,7 @@ namespace UAlbion.Game.Gui.Inventory
 
         void Close()
         {
-            Detach();
+            Remove();
             _continuation(_quantity);
         }
     }

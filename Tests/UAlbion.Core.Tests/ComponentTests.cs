@@ -1,3 +1,4 @@
+using System.Linq;
 using Xunit;
 
 namespace UAlbion.Core.Tests
@@ -28,19 +29,18 @@ namespace UAlbion.Core.Tests
             c.Receive(e, this);
             Assert.Equal(2, c.Handled);
 
-            c.Detach();
+            c.Remove();
             c.Receive(e, this);
             Assert.Equal(2, c.Handled);
 
-            c.Detach();
-            c.Detach();
+            c.Remove();
+            c.Remove();
             c.Receive(e, this);
             Assert.Equal(2, c.Handled);
         }
 
         public interface IBasicInterface { }
         public class BasicImplementation : IBasicInterface { }
-
 
         [Fact]
         public void ResolveTest()
@@ -55,6 +55,9 @@ namespace UAlbion.Core.Tests
             x.Register<IBasicInterface>(imp);
 
             Assert.Equal(imp, c.CallResolve<IBasicInterface>());
+
+            x.Unregister(imp);
+            Assert.Null(c.CallResolve<IBasicInterface>());
         }
 
         [Fact]
@@ -63,10 +66,10 @@ namespace UAlbion.Core.Tests
             var c1 = new BasicComponent();
             var c2 = new BasicComponent();
             var e = new BasicEvent();
-            var x = new EventExchange(new BasicLogExchange());
+            var ee = new EventExchange(new BasicLogExchange());
 
-            x.Attach(c1);
-            x.Attach(c2);
+            ee.Attach(c1);
+            ee.Attach(c2);
 
             Assert.Equal(0, c1.Handled);
             Assert.Equal(0, c2.Handled);
@@ -75,6 +78,11 @@ namespace UAlbion.Core.Tests
 
             Assert.Equal(0, c1.Handled); // Components shouldn't see their own events.
             Assert.Equal(1, c2.Handled);
+
+            var recipients = ee.EnumerateRecipients(typeof(BasicEvent)).ToList();
+            Assert.Collection(recipients,
+                x => Assert.Equal(x, c1),
+                x => Assert.Equal(x, c2));
         }
 
         [Fact]
@@ -166,6 +174,76 @@ namespace UAlbion.Core.Tests
             Assert.Equal(6, parent.Handled);
             Assert.Equal(4, child1.Handled);
             Assert.Equal(2, child2.Handled);
+        }
+
+        [Fact]
+        public void DetachedChildTest()
+        {
+            var x = new EventExchange(new BasicLogExchange());
+            var parent = new BasicComponent();
+            var child = new BasicComponent();
+
+            parent.Add(child);
+            x.Attach(parent);
+
+            child.Remove();
+            x.Raise(new BasicEvent(), this);
+            Assert.Equal(1, parent.Handled);
+            Assert.Equal(0, child.Handled);
+
+            parent.IsActive = false;
+            x.Raise(new BasicEvent(), this);
+            Assert.Equal(1, parent.Handled);
+            Assert.Equal(0, child.Handled);
+
+            parent.IsActive = true;
+            x.Raise(new BasicEvent(), this);
+            Assert.Equal(2, parent.Handled);
+            Assert.Equal(0, child.Handled);
+        }
+
+        [Fact]
+        public void RemoveAllTest()
+        {
+            var x = new EventExchange(new BasicLogExchange());
+            var parent = new BasicComponent();
+            var child1 = new BasicComponent();
+            var child2 = new BasicComponent();
+
+            parent.Add(child1);
+            x.Attach(parent);
+            parent.Add(child2);
+
+            x.Raise(new BasicEvent(), this);
+            Assert.Equal(1, parent.Handled);
+            Assert.Equal(1, child1.Handled);
+            Assert.Equal(1, child2.Handled);
+
+            parent.RemoveAll();
+
+            x.Raise(new BasicEvent(), this);
+            Assert.Equal(2, parent.Handled);
+            Assert.Equal(1, child1.Handled);
+            Assert.Equal(1, child2.Handled);
+
+            var nonChild = new BasicComponent();
+            parent.Remove(nonChild);
+        }
+
+        [Fact]
+        public void EnqueuedEventTest()
+        {
+            var x = new EventExchange(new BasicLogExchange());
+            var c1 = new BasicComponent();
+            var c2 = new BasicComponent();
+            x.Attach(c1);
+            x.Attach(c2);
+            c1.CallEnqueue(new BasicEvent());
+            Assert.Equal(0, c1.Handled);
+            Assert.Equal(0, c2.Handled);
+            x.FlushQueuedEvents();
+            Assert.Equal(0, c1.Handled);
+            Assert.Equal(1, c2.Handled);
         }
     }
 }

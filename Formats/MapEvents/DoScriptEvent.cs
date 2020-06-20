@@ -37,6 +37,5 @@ namespace UAlbion.Formats.MapEvents
         byte Unk5 { get; set; }
         ushort Unk8 { get; set; }
         public override MapEventType EventType => MapEventType.DoScript;
-        protected override AsyncEvent Clone() => new DoScriptEvent(ScriptId);
     }
 }

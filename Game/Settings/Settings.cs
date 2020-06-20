@@ -87,17 +87,13 @@ namespace UAlbion.Game.Settings
         protected override void Subscribed()
         {
             Exchange.Register<ISettings>(this);
-            Exchange.Register<IEngineSettings>(this);
             Exchange.Register<IDebugSettings>(this);
+            Exchange.Register<IAudioSettings>(this);
+            Exchange.Register<IGraphicsSettings>(this);
             Exchange.Register<IGameplaySettings>(this);
+            Exchange.Register<IEngineSettings>(this);
         }
 
-        protected override void Unsubscribed()
-        {
-            Exchange.Unregister<ISettings>(this);
-            Exchange.Unregister<IEngineSettings>(this);
-            Exchange.Unregister<IDebugSettings>(this);
-            Exchange.Unregister<IGameplaySettings>(this);
-        }
+        protected override void Unsubscribed() => Exchange.Unregister(this);
     }
 }

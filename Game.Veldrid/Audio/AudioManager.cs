@@ -197,13 +197,7 @@ namespace UAlbion.Game.Veldrid.Audio
             }
         }
 
-        void StopAmbient()
-        {
-            if (_ambientPlayer == null)
-                return;
-            Children.Remove(_ambientPlayer);
-            _ambientPlayer.Detach();
-        }
+        void StopAmbient() => _ambientPlayer?.Remove();
 
         void StopMusic()
         {
@@ -212,8 +206,7 @@ namespace UAlbion.Game.Veldrid.Audio
 
             _music.Stop();
             _music.Dispose();
-            _musicGenerator.Detach();
-            Children.Remove(_musicGenerator);
+            _musicGenerator.Remove();
             _music = null;
             _musicGenerator = null;
             _activeSongId = null;

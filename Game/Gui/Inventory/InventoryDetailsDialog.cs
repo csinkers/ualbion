@@ -93,7 +93,7 @@ namespace UAlbion.Game.Gui.Inventory
 
         void Close()
         {
-            Detach();
+            Remove();
             Closed?.Invoke(this, new EventArgs());
         }
 

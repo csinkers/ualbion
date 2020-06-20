@@ -12,6 +12,7 @@ namespace UAlbion.Core.Tests
         public int Handled { get; private set; }
         public T CallResolve<T>() => Resolve<T>();
         public void CallRaise(IEvent e) => Raise(e);
+        public void CallEnqueue(IEvent e) => Enqueue(e);
         public void EnableHandler() => On<BasicEvent>(_ => Handled++);
         public void DisableHandler() => Off<BasicEvent>();
         public void Add(IComponent child) => AttachChild(child);
@@ -22,7 +23,7 @@ namespace UAlbion.Core.Tests
     public class BasicLogExchange : ILogExchange
     {
         public void Attach(EventExchange exchange) { }
-        public void Detach() { }
+        public void Remove() { }
         public void Receive(IEvent @event, object sender) { }
         public bool IsActive { get; set; }
         public void EnqueueEvent(IEvent e) { }

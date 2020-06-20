@@ -21,6 +21,5 @@ namespace UAlbion.Formats.MapEvents
             TextId = textId;
             MemberId = portraitId;
         }
-        protected override AsyncEvent Clone() => new PartyMemberTextEvent(TextId, MemberId);
     }
 }

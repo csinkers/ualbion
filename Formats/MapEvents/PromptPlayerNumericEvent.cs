@@ -24,13 +24,5 @@ namespace UAlbion.Formats.MapEvents
         public override string ToString() => $"query {QueryType} {Argument} ({Operation} {Immediate})";
         public override MapEventType EventType => MapEventType.Query;
         public ushort? FalseEventId { get; set; }
-        protected override AsyncEvent Clone() =>
-            new PromptPlayerNumericEvent
-            {
-                Operation = Operation,
-                Immediate = Immediate,
-                Argument = Argument,
-                FalseEventId = FalseEventId
-            };
     }
 }

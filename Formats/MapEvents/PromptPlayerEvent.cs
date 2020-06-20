@@ -31,14 +31,6 @@ namespace UAlbion.Formats.MapEvents
         public override string ToString() => $"query {QueryType} {TextId} ({Operation} {Immediate})";
         public override MapEventType EventType => MapEventType.Query;
         public ushort? FalseEventId { get; set; }
-        protected override AsyncEvent Clone() =>
-            new PromptPlayerEvent(TextType, TextSourceId)
-            {
-                Operation = Operation,
-                Immediate = Immediate,
-                TextId = TextId,
-                FalseEventId = FalseEventId,
-            };
 
         public AssetType TextType { get; }
         public ushort TextSourceId { get; }

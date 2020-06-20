@@ -119,7 +119,7 @@ namespace UAlbion.Core
                 Exchange?.Attach(child);
 
             Children.Add(child);
-            if(child is Component component)
+            if (child is Component component)
                 component.Parent = this;
 
             return child;
@@ -130,13 +130,8 @@ namespace UAlbion.Core
         /// </summary>
         protected void RemoveAllChildren()
         {
-            foreach (var child in Children)
-            {
-                child.Detach();
-                if(child is Component component)
-                    component.Parent = null;
-            }
-            Children.Clear();
+            for (int i = Children.Count - 1; i >= 0; i--)
+                Children[i].Remove(); // O(n²)… refactor if it ever becomes a problem.
         }
 
         /// <summary>
@@ -147,10 +142,11 @@ namespace UAlbion.Core
         {
             int index = Children.IndexOf(child);
             if (index == -1) return;
-            child.Detach();
+            if (child is Component c)
+                c.Parent = null;
+
+            child.Remove();
             Children.RemoveAt(index);
-            if (child is Component component)
-                component.Parent = null;
         }
 
         /// <summary>
@@ -207,7 +203,7 @@ namespace UAlbion.Core
         /// <summary>
         /// Detach the current component and its event handlers from any currently active event exchange.
         /// </summary>
-        public void Detach()
+        void Detach()
         {
             if (Exchange == null)
                 return;
@@ -219,11 +215,27 @@ namespace UAlbion.Core
             Unsubscribed();
 
             foreach (var child in Children)
-                child.Detach();
+                if(child is Component c)
+                    c.Detach();
 
             _nesting--;
             Exchange.Unsubscribe(this);
             _isSubscribed = false;
+        }
+
+        /// <summary>
+        /// Remove this component from the event system
+        /// </summary>
+        public void Remove()
+        {
+            Detach();
+            Exchange = null;
+
+            if (Parent is Component parent)
+            {
+                Parent = null;
+                parent.RemoveChild(this);
+            }
         }
 
         /// <summary>

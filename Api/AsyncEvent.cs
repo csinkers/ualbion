@@ -6,14 +6,12 @@ namespace UAlbion.Api
     {
         Action _completionCallback;
 
-        public AsyncEvent CloneWithCallback(Action completionCallback)
+        public void SetCallback(Action completionCallback)
         {
-            var clone = Clone();
-            clone._completionCallback = completionCallback;
-            return clone;
+            if (_completionCallback != null)
+                ApiUtil.Assert("Overwriting existing async callback");
+            _completionCallback = completionCallback;
         }
-
-        protected abstract AsyncEvent Clone();
 
         public AsyncStatus AsyncStatus { get; private set; } = AsyncStatus.Unacknowledged;
 

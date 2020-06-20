@@ -30,20 +30,10 @@ namespace UAlbion.Game.Tests
 
         public ButtonTests()
         {
-            var fakeFont = new MockTexture(
-                "FakeFont", 6, 8,
-                new byte[6*8*256],
-                Enumerable.Range(0, 256).Select(x => 
-                    new SubImage(
-                        new Vector2(x * 6, 0),
-                        new Vector2(6, 8),
-                        new Vector2(6 * 256, 8),
-                        0)) );
-
             _exchange = new EventExchange(new LogExchange());
             var factory = new MockFactory();
             var locator = new MockAssetLocatorRegistry()
-                .Add(new AssetKey(AssetType.MetaFont, (ushort)new MetaFontId()), fakeFont)
+                .Add(new AssetKey(AssetType.MetaFont, (ushort)new MetaFontId()), MockUniformFont.Font)
                 ;
 
             _exchange

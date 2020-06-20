@@ -137,7 +137,7 @@ namespace UAlbion.Game.State
 
             _walkOrder.Remove(player);
             _statusBarOrder.Remove(player);
-            player.Detach();
+            player.Remove();
             Raise(new PartyChangedEvent());
             return true;
         }

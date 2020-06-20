@@ -22,10 +22,13 @@ namespace UAlbion.Formats.Assets
                 }
                 else if (value > short.MaxValue)
                 {
-                    ApiUtil.Assert($"Tried to put more than {byte.MaxValue} items in an inventory slot");
+                    ApiUtil.Assert($"Tried to put more than {short.MaxValue} items in an inventory slot");
                     _amount = (ushort)short.MaxValue;
                 }
                 else _amount = value;
+
+                if (_amount == 0)
+                    Item = null;
             }
         }
 
@@ -45,7 +48,7 @@ namespace UAlbion.Formats.Assets
             };
 
         public ItemSlot DeepClone() => (ItemSlot)MemberwiseClone();
-        public override string ToString() => Amount == 0 ? "Empty" : $"{Amount}x{Item} {Flags}";
+        public override string ToString() => Amount == 0 ? "Empty" : $"{Amount}x{ItemId} {Flags}";
 
         public static ItemSlot Serdes(InventorySlotId id, ItemSlot slot, ISerializer s)  // 6 per slot
         {
@@ -66,7 +69,7 @@ namespace UAlbion.Formats.Assets
         {
             if (other == null)
             {
-                ApiUtil.Assert("Tried to transfer from non-existant slot");
+                ApiUtil.Assert("Tried to transfer from non-existent slot");
                 return;
             }
 
@@ -109,15 +112,15 @@ namespace UAlbion.Formats.Assets
 
                 case { } when Item == null:
                 {
-                    ushort amountToTransfer = Math.Min(other.Amount, quantity ?? byte.MaxValue);
-                    amountToTransfer = Math.Min((ushort)(byte.MaxValue - Amount), amountToTransfer);
-                    Amount = amountToTransfer;
-                    other.Amount -= amountToTransfer;
-
                     Item = other.Item;
                     Charges = other.Charges;
                     Enchantment = other.Enchantment;
                     Flags = other.Flags;
+
+                    ushort amountToTransfer = Math.Min(other.Amount, quantity ?? byte.MaxValue);
+                    amountToTransfer = Math.Min((ushort)(byte.MaxValue - Amount), amountToTransfer);
+                    Amount = amountToTransfer;
+                    other.Amount -= amountToTransfer;
                     break;
                 }
 

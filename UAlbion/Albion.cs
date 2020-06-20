@@ -156,6 +156,7 @@ namespace UAlbion
                     new TextFormatter(),
                     new TextManager(),
                     new LayoutManager(),
+                    new DialogManager(),
                     new DebugMapInspector(services)
                         .AddBehaviour(new SpriteInstanceDataDebugBehaviour())
                         .AddBehaviour(new FormatTextEventBehaviour())

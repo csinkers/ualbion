@@ -8,7 +8,7 @@ using Xunit;
 
 namespace UAlbion.Game.Tests
 {
-    public class InventoryTests
+    public class InventoryTests : Component
     {
         readonly ItemData _sword; // A non-stackable item
         readonly ItemData _torch; // A stackable item
@@ -37,29 +37,31 @@ namespace UAlbion.Game.Tests
 
             _exchange = new EventExchange(new LogExchange());
             _im = new InventoryManager(x => _inventories[x]);
-            _exchange.Register<IInventoryManager>(_im);
+            _exchange
+                .Register<IInventoryManager>(_im)
+                .Attach(this);
         }
 
         [Fact]
-        public void PickupTest()
+        public void PickupItemTest()
         {
             _tom.Slots[0].Set(_torch, 1);
             Assert.Null(_im.ItemInHand.ItemId);
-            _exchange.Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, 0), null);
+            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, 0));
             Assert.NotNull(_im.ItemInHand.ItemId);
             Assert.Equal(ItemId.Torch, _im.ItemInHand.ItemId);
             Assert.Equal(1, _im.ItemInHand.Amount);
         }
 
         [Fact]
-        public void DropTest()
+        public void PutDownItemTest()
         {
             _tom.Slots[0].Set(_torch, 1);
 
             Assert.Null(_im.ItemInHand.ItemId);
-            _exchange.Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, 0), null);
+            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, 0));
             Assert.NotNull(_im.ItemInHand.ItemId);
-            _exchange.Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, (ItemSlotId)1), null);
+            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, (ItemSlotId)1));
             Assert.Null(_im.ItemInHand.ItemId);
             Assert.Equal(ItemId.Torch, _tom.Slots[1].ItemId);
             Assert.Equal(1, _tom.Slots[1].Amount);
@@ -72,9 +74,9 @@ namespace UAlbion.Game.Tests
             _tom.Slots[1].Set(_torch, 1);
 
             Assert.Null(_im.ItemInHand.ItemId);
-            _exchange.Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, 0), null);
+            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, 0));
             Assert.NotNull(_im.ItemInHand.ItemId);
-            _exchange.Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, (ItemSlotId)1), null);
+            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, (ItemSlotId)1));
             Assert.Null(_im.ItemInHand.ItemId);
             Assert.Equal(ItemId.Torch, _tom.Slots[1].ItemId);
             Assert.Equal(2, _tom.Slots[1].Amount);
@@ -87,9 +89,9 @@ namespace UAlbion.Game.Tests
             _tom.Slots[1].Set(_sword, 1);
 
             Assert.Null(_im.ItemInHand.ItemId);
-            _exchange.Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, 0), null);
+            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, 0));
             Assert.NotNull(_im.ItemInHand.ItemId);
-            _exchange.Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, (ItemSlotId)1), null);
+            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, (ItemSlotId)1));
             Assert.NotNull(_im.ItemInHand.ItemId);
             Assert.Equal(ItemId.Sword, _im.ItemInHand.ItemId);
             Assert.Equal(1, _im.ItemInHand.Amount);
@@ -98,12 +100,12 @@ namespace UAlbion.Game.Tests
         }
 
         [Fact]
-        public void TakeAllTest()
+        public void PickupAllTest()
         {
             _tom.Slots[0].Set(_torch, 5);
 
             Assert.Null(_im.ItemInHand.ItemId);
-            _exchange.Raise(new InventoryPickupAllEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, 0), null);
+            Raise(new InventoryPickupAllEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, 0));
             Assert.Equal(ItemId.Torch, _im.ItemInHand.ItemId);
             Assert.Equal(5, _im.ItemInHand.Amount);
             Assert.Null(_tom.Slots[0].ItemId);
@@ -112,7 +114,67 @@ namespace UAlbion.Game.Tests
         [Fact]
         public void GiveItemTest()
         {
+            _tom.Slots[0].Set(_torch, 1);
+            _tom.Slots[1].Set(_torch, 1);
+            _tom.Slots[2].Set(_sword, 1);
+            _tom.Slots[3].Set(_sword, 1);
+
+            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, 0));
+            Assert.Equal(ItemId.Torch, _im.ItemInHand.ItemId);
+            Assert.Equal(1, _im.ItemInHand.Amount);
+
+            Raise(new InventoryGiveItemEvent(PartyCharacterId.Rainer));
+            Assert.Null(_im.ItemInHand.ItemId);
+            Assert.Equal(ItemId.Torch, _rainer.Slots[0].ItemId);
+            Assert.Equal(1, _rainer.Slots[0].Amount);
+            Assert.Null(_tom.Slots[0].ItemId);
+            Assert.Equal(0, _tom.Slots[0].Amount);
+
+            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, (ItemSlotId)1));
+            Assert.Equal(ItemId.Torch, _im.ItemInHand.ItemId);
+            Assert.Equal(1, _im.ItemInHand.Amount);
+
+            Raise(new InventoryGiveItemEvent(PartyCharacterId.Rainer));
+            Assert.Null(_im.ItemInHand.ItemId);
+            Assert.Equal(ItemId.Torch, _rainer.Slots[0].ItemId);
+            Assert.Equal(2, _rainer.Slots[0].Amount);
+
+            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, (ItemSlotId)2));
+            Assert.Equal(ItemId.Sword, _im.ItemInHand.ItemId);
+            Assert.Equal(1, _im.ItemInHand.Amount);
+
+            Raise(new InventoryGiveItemEvent(PartyCharacterId.Rainer));
+            Assert.Null(_im.ItemInHand.ItemId);
+            Assert.Equal(ItemId.Sword, _rainer.Slots[1].ItemId);
+            Assert.Equal(1, _rainer.Slots[1].Amount);
+
+            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, (ItemSlotId)3));
+            Assert.Equal(ItemId.Sword, _im.ItemInHand.ItemId);
+            Assert.Equal(1, _im.ItemInHand.Amount);
+
+            Raise(new InventoryGiveItemEvent(PartyCharacterId.Rainer));
+            Assert.Null(_im.ItemInHand.ItemId);
+            Assert.Equal(ItemId.Sword, _rainer.Slots[1].ItemId);
+            Assert.Equal(1, _rainer.Slots[1].Amount);
+            Assert.Equal(ItemId.Sword, _rainer.Slots[2].ItemId);
+            Assert.Equal(1, _rainer.Slots[2].Amount);
         }
+
+        [Fact] public void PartialPickupTest() { }
+        [Fact] public void CoalesceWouldOverfillTest() { }
+        [Fact] public void TakeAllFromChestTest() { }
+        [Fact] public void TakeAllFromChestInsufficientRoomTest() { }
+        [Fact] public void TakeGoldTest() { }
+        [Fact] public void TakeRationsTest() { }
+        [Fact] public void GiveGoldTest() { }
+        [Fact] public void GiveRationsTest() { }
+        [Fact] public void DropItemTest() { }
+        [Fact] public void DropGoldTest() { }
+        [Fact] public void DropRationsTest() { }
+        [Fact] public void ContextMenuTest() { }
+        [Fact] public void ExamineItemTest() { }
+        [Fact] public void ReturnItemsTest() { }
+
 
         /*
         Hand      Slot

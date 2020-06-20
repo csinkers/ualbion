@@ -145,7 +145,7 @@ namespace UAlbion.Game.State
 
         void InitialiseGame()
         {
-            _party?.Detach();
+            _party?.Remove();
             _party = AttachChild(new Party(_game.PartyMembers, _game.ActiveMembers));
             Raise(new LoadMapEvent(_game.MapId));
             Raise(new StartClockEvent());

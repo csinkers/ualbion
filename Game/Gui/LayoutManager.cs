@@ -10,13 +10,16 @@ using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui
 {
-    public interface ILayoutManager { }
+    public interface ILayoutManager
+    {
+        LayoutNode GetLayout();
+    }
 
     public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
     {
         public LayoutManager()
         {
-            On<LayoutEvent>(OnLayout);
+            On<LayoutEvent>(RenderLayout);
             On<ScreenCoordinateSelectEvent>(Select);
         }
 
@@ -38,13 +41,18 @@ namespace UAlbion.Game.Gui
                 }
                 LayoutDialog(size);
 
+#if DEBUG
                 var sizeAfter = dialog.GetSize(); // Hacky fix for first frame being different
-                if(sizeAfter != size)
+                if (sizeAfter != size)
+                {
+                    ApiUtil.Assert($"Dialog \"{dialog}\" changed size after rendering, from {size} to {sizeAfter}.");
                     LayoutDialog(sizeAfter);
+                }
+#endif
             }
         }
 
-        void OnLayout(LayoutEvent e) => DoLayout((extents, order, element) => element.Render(extents, order));
+        void RenderLayout(LayoutEvent e) => DoLayout((extents, order, element) => element.Render(extents, order));
 
         void Select(ScreenCoordinateSelectEvent selectEvent)
         {
@@ -113,6 +121,13 @@ namespace UAlbion.Game.Gui
             }
 
             return (x, y);
+        }
+
+        public LayoutNode GetLayout()
+        {
+            var rootNode = new LayoutNode(null, null, UiConstants.UiExtents, 0);
+            DoLayout((extents, order, element) => element.Layout(extents, order, new LayoutNode(rootNode, element, extents, order)));
+            return rootNode;
         }
     }
 }

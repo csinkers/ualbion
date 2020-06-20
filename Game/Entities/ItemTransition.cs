@@ -43,7 +43,7 @@ namespace UAlbion.Game.Entities
             float t = _elapsedTime / _transitionTimeSeconds;
             if (t > 1.0f)
             {
-                Detach();
+                Remove();
                 return;
             }
 

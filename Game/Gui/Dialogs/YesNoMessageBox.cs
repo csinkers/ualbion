@@ -5,16 +5,20 @@ using UAlbion.Game.Gui.Text;
 
 namespace UAlbion.Game.Gui.Dialogs
 {
+    /// <summary>
+    /// Show a yes/no dialog box. These should only be created by DialogManager, if any code
+    /// needs to prompt the player for a yes/no answer it should raise a YesNoPromptEvent.
+    /// </summary>
     class YesNoMessageBox : ModalDialog
     {
         void OnButton(bool isYes)
         {
             Result = isYes;
-            Detach();
+            Remove();
             Closed?.Invoke(this, EventArgs.Empty);
         }
 
-        public YesNoMessageBox(StringId stringId) : base(DialogPositioning.Center)
+        public YesNoMessageBox(StringId stringId, int depth) : base(DialogPositioning.Center, depth)
         {
             var elements = new VerticalStack(
                 new Spacing(0, 5),

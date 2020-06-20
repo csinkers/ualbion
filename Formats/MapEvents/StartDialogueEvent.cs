@@ -28,6 +28,5 @@ namespace UAlbion.Formats.MapEvents
         }
 
         public override MapEventType EventType => MapEventType.StartDialogue;
-        protected override AsyncEvent Clone() => new StartDialogueEvent(NpcId);
     }
 }

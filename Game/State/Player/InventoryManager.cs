@@ -228,21 +228,12 @@ namespace UAlbion.Game.State.Player
                 { } x => throw new InvalidOperationException($"Unexpected item contents {x}")
             };
 
-            var formatFunc = slotId == ItemSlotId.Gold 
-                ? x => $"{x / 10}.{x % 10}" 
-                : (Func<int, string>)null;
-
-            /*
-            TODO: Add dialog manager and do this with an async event. Default continuation (e.g. from console) will just echo the chosen amount with a LogEvent.
-            Exchange.Attach(new ItemQuantityDialog(
-                text,
-                icon,
-                maxQuantity,
-                continuation,
-                formatFunc));
-                */
+            if (RaiseAsync(new ItemQuantityPromptEvent(text, icon, maxQuantity, slotId == ItemSlotId.Gold), continuation) == 0)
+            {
+                ApiUtil.Assert("ItemManager.GetQuantity tried to open a quantity dialog, but no-one was listening for the event.");
+                continuation(0);
+            }
         }
-
 
         void OnSlotEvent(InventorySlotEvent e)
         {

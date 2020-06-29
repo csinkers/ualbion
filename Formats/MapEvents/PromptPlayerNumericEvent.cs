@@ -1,9 +1,8 @@
 ﻿using SerdesNet;
-using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class PromptPlayerNumericEvent : AsyncMapEvent, IQueryEvent
+    public class PromptPlayerNumericEvent : MapEvent, IQueryEvent
     {
         public static PromptPlayerNumericEvent Serdes(PromptPlayerNumericEvent e, ISerializer s)
         {
@@ -12,7 +11,6 @@ namespace UAlbion.Formats.MapEvents
             e.Immediate = s.UInt8(nameof(Immediate), e.Immediate);
             s.UInt16("Padding", 0);
             e.Argument = s.UInt16(nameof(Argument), e.Argument);
-            e.FalseEventId = ConvertMaxToNull.Serdes(nameof(FalseEventId), e.FalseEventId, s.UInt16);
             return e;
         }
 
@@ -23,6 +21,5 @@ namespace UAlbion.Formats.MapEvents
 
         public override string ToString() => $"query {QueryType} {Argument} ({Operation} {Immediate})";
         public override MapEventType EventType => MapEventType.Query;
-        public ushort? FalseEventId { get; set; }
     }
 }

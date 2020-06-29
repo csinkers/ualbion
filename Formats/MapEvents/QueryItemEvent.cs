@@ -19,7 +19,6 @@ namespace UAlbion.Formats.MapEvents
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.ItemId = (ItemId)StoreIncremented.Serdes(nameof(ItemId), (ushort)e.ItemId, s.UInt16);
-            e.FalseEventId = ConvertMaxToNull.Serdes(nameof(FalseEventId), e.FalseEventId, s.UInt16);
 
             ApiUtil.Assert(e.Unk4 == 0);
             ApiUtil.Assert(e.Unk5 == 0);
@@ -31,8 +30,7 @@ namespace UAlbion.Formats.MapEvents
         public byte Immediate { get; private set; } // immediate value?
         byte Unk4 { get; set; }
         byte Unk5 { get; set; }
-        public ItemId ItemId { get; set; }//=> (ItemId)Argument-1;
-        public ushort? FalseEventId { get; set; }
+        public ItemId ItemId { get; private set; }
 
         public override string ToString() => $"query_item {QueryType} {ItemId} {Operation} {Immediate}";
         public override MapEventType EventType => MapEventType.Query;

@@ -27,7 +27,6 @@ namespace UAlbion.Game.Gui.Controls
         ButtonState _state = ButtonState.Normal;
         ThemeFunction _theme = ButtonTheme.Default;
         int _padding = 2;
-        bool _visible = true;
 
         public ThemeFunction Theme
         {
@@ -47,20 +46,6 @@ namespace UAlbion.Game.Gui.Controls
             set { if (value != _padding - 1) { _padding = value + 1; _lastExtents = new Rectangle(); } }
         }
 
-        public bool Visible
-        {
-            get => _visible;
-            set
-            {
-                _visible = value;
-                if(!_visible)
-                {
-                    _sprite?.Dispose();
-                    _sprite = null;
-                }
-            }
-        }
-
         public ButtonFrame(IUiElement child)
         {
             On<BackendChangedEvent>(_ => _lastExtents = new Rectangle());
@@ -78,7 +63,7 @@ namespace UAlbion.Game.Gui.Controls
 
         void Rebuild(Rectangle extents, DrawLayer order)
         {
-            if (!_visible || (_sprite != null && _lastExtents == extents && _sprite.Key.RenderOrder == order))
+            if (!IsSubscribed || _sprite != null && _lastExtents == extents && _sprite.Key.RenderOrder == order)
                 return;
 
             _lastExtents = extents;

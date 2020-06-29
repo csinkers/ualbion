@@ -3,7 +3,8 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Events
 {
-    public class YesNoPromptEvent : AsyncEvent
+    [Event("prompt:yes_no")]
+    public class YesNoPromptEvent : IAsyncEvent<bool>
     {
         public YesNoPromptEvent(AssetType type, ushort id, int subId) : this(new StringId(type, id, subId)) { }
         public YesNoPromptEvent(StringId stringId) => StringId = stringId;
@@ -12,6 +13,5 @@ namespace UAlbion.Game.Events
         [EventPart("sub_id")] public int SubId => StringId.SubId;
 
         public StringId StringId { get; }
-        public bool Response { get; set; }
     }
 }

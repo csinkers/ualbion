@@ -37,7 +37,7 @@ namespace UAlbion.Game.Gui.Text
             On<UiScrollEvent>(OnScroll);
         }
 
-        public override string ToString() => $"TextElement \"{_source}";
+        public override string ToString() => $"UiText source:\"{_source}\"";
         // public UiText Source(IText source) { _source = source; _lastVersion = 0; return this; }
         public UiText Scrollable() { _isScrollable = true; return this; }
         public UiText Filter(int filter) { _blockFilter = filter; return this; }
@@ -118,7 +118,7 @@ namespace UAlbion.Game.Gui.Text
             Rebuild(_lastExtents);
 
             Vector2 size = Vector2.Zero;
-            foreach (var child in Children.OfType<IUiElement>())
+            foreach (var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
             {
                 var childSize = child.GetSize();
                 if (childSize.X > size.X)

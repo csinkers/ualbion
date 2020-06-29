@@ -18,7 +18,7 @@ namespace UAlbion.Game.Gui.Controls
             if (Children == null) 
                 return size;
 
-            foreach (var child in Children.OfType<IUiElement>())
+            foreach (var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
             {
                 if (child == _blocker) // Don't include the blocker in the size calculation
                     continue;
@@ -36,7 +36,7 @@ namespace UAlbion.Game.Gui.Controls
             int maxOrder = order;
             if (extents.Contains((int) uiPosition.X, (int) uiPosition.Y))
             {
-                foreach (var child in Children.OfType<IUiElement>())
+                foreach (var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
                 {
                     if (child == _blocker)
                         continue;

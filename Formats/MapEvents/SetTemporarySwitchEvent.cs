@@ -29,7 +29,7 @@ namespace UAlbion.Formats.MapEvents
 
         public SwitchOperation Operation { get; private set; } // 0,1,2
         public ushort SwitchId { get; private set; } // [0..599]
-        public byte Unk3 { get; set; } // 0,1,21
+        public byte Unk3 { get; private set; } // 0,1,21
         byte Unk4 { get; set; }
         byte Unk5 { get; set; }
         ushort Unk8 { get; set; }

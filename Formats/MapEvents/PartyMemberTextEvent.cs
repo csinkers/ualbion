@@ -4,7 +4,7 @@ using UAlbion.Formats.AssetIds;
 namespace UAlbion.Formats.MapEvents
 {
     [Event("party_member_text")]
-    public class PartyMemberTextEvent : AsyncEvent
+    public class PartyMemberTextEvent : Event, IAsyncEvent
     {
         [EventPart("member_id")] public PartyCharacterId? MemberId { get; }
         [EventPart("text_id")] public byte TextId { get; }

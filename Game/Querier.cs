@@ -5,9 +5,8 @@ using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.MapEvents;
-using UAlbion.Game.Gui.Dialogs;
+using UAlbion.Game.Events;
 using UAlbion.Game.State;
-using UAlbion.Game.Text;
 
 namespace UAlbion.Game
 {
@@ -17,88 +16,73 @@ namespace UAlbion.Game
 
         public Querier()
         {
-            On<QueryVerbEvent>(Query);
-            On<QueryItemEvent>(Query);
-            On<PromptPlayerEvent>(Query);
-            On<PromptPlayerNumericEvent>(Query);
-            On<QueryEvent>(Query);
+            OnAsync<QueryVerbEvent, bool>(Query);
+            OnAsync<QueryItemEvent, bool>(Query);
+            OnAsync<PromptPlayerEvent, bool>(Query);
+            OnAsync<PromptPlayerNumericEvent, bool>(Query);
+            OnAsync<QueryEvent, bool>(Query);
         }
 
-        public void Query(IQueryEvent query)
+        bool Query(IQueryEvent query, Action<bool> continuation)
         {
             var context = Resolve<IEventManager>().Context;
-            var result = InnerQuery(context, query, false);
-            if (result.HasValue && context != null)
-                context.LastEventResult = result.Value;
+            return InnerQuery(context, query, false, continuation);
         }
 
         public bool? QueryDebug(IQueryEvent query)
         {
             var context = Resolve<IEventManager>().Context;
-            return InnerQuery(context, query, true);
+            bool result = true;
+            InnerQuery(context, query, true, x => result = x);
+            return result;
         }
 
-        bool? InnerQuery(EventContext context, IQueryEvent query, bool debugInspect)
+        bool InnerQuery(EventContext context, IQueryEvent query, bool debugInspect, Action<bool> continuation)
         {
             var game = Resolve<IGameState>();
             switch (query, query.QueryType)
             {
-                case (QueryEvent q, QueryType.TemporarySwitch):      return Compare(q.Operation, game.GetSwitch(q.Argument) ? 1 : 0, q.Immediate);
-                case (QueryEvent q, QueryType.Ticker):               return Compare(q.Operation, game.GetTicker(q.Argument), q.Immediate);
-                case (QueryEvent q, QueryType.CurrentMapId):         return Compare(q.Operation, (int)game.MapId, q.Immediate);
-                case (QueryEvent q, QueryType.HasEnoughGold):        return Compare(q.Operation, game.Party.TotalGold, q.Argument);
-                case (QueryItemEvent q, QueryType.InventoryHasItem): return Compare(q.Operation, game.Party.GetItemCount(q.ItemId), q.Immediate);
-                case (QueryEvent q, QueryType.HasPartyMember):       return game.Party.StatusBarOrder.Any(x => (int)x.Id == q.Argument);
-                case (QueryEvent q, QueryType.IsPartyMemberLeader):  return (int)game.Party.Leader == q.Argument;
-                case (QueryEvent q, QueryType.RandomChance):         return _random.Next(100) < q.Argument;
-                case (QueryEvent q, QueryType.TriggerType):          return (ushort)context.Source.Trigger == q.Argument;
-                case (QueryVerbEvent verb, QueryType.ChosenVerb):    return context.Source.Trigger.HasFlag((TriggerType)(1 << (int)verb.Verb));
-                case (QueryItemEvent q, QueryType.UsedItemId):       return context.Source is EventSource.Item item && item.ItemId == q.ItemId;
-                case (_, QueryType.PreviousActionResult):            return context.LastEventResult;
+                case (QueryEvent q, QueryType.TemporarySwitch):      continuation(Compare(q.Operation, game.GetSwitch(q.Argument) ? 1 : 0, q.Immediate)); return true;
+                case (QueryEvent q, QueryType.Ticker):               continuation(Compare(q.Operation, game.GetTicker(q.Argument), q.Immediate)); return true;
+                case (QueryEvent q, QueryType.CurrentMapId):         continuation(Compare(q.Operation, (int)game.MapId, q.Immediate)); return true;
+                case (QueryEvent q, QueryType.HasEnoughGold):        continuation(Compare(q.Operation, game.Party.TotalGold, q.Argument)); return true;
+                case (QueryItemEvent q, QueryType.InventoryHasItem): continuation(Compare(q.Operation, game.Party.GetItemCount(q.ItemId), q.Immediate)); return true;;
+                case (QueryEvent q, QueryType.HasPartyMember):       continuation(game.Party.StatusBarOrder.Any(x => (int)x.Id == q.Argument)); return true;
+                case (QueryEvent q, QueryType.IsPartyMemberLeader):  continuation((int)game.Party.Leader == q.Argument); return true;
+                case (QueryEvent q, QueryType.RandomChance):         continuation(_random.Next(100) < q.Argument); return true;
+                case (QueryEvent q, QueryType.TriggerType):          continuation((ushort)context.Source.Trigger == q.Argument); return true;;
+                case (QueryVerbEvent verb, QueryType.ChosenVerb):    continuation(context.Source.Trigger.HasFlag((TriggerType)(1 << (int)verb.Verb))); return true;
+                case (QueryItemEvent q, QueryType.UsedItemId):       continuation(context.Source is EventSource.Item item && item.ItemId == q.ItemId); return true;
+                case (_, QueryType.PreviousActionResult):            continuation(context.LastEventResult); return true;
 
-                case (_, QueryType.IsScriptDebugModeActive): { return false; }
-                case (_, QueryType.IsNpcActive):             { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query NpcActive")); break; }
-                case (_, QueryType.IsPartyMemberConscious):  { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query Party member conscious")); break; }
-                case (_, QueryType.EventAlreadyUsed):        { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query event already used")); return false; }
-                case (_, QueryType.IsDemoVersion):           { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query is demo")); return false; }
+                case (_, QueryType.IsScriptDebugModeActive): { continuation(false); return true; }
+                case (_, QueryType.IsNpcActive):             { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query NpcActive")); continuation(true); return true; }
+                case (_, QueryType.IsPartyMemberConscious):  { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query Party member conscious")); continuation(true); return true; }
+                case (_, QueryType.EventAlreadyUsed):        { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query event already used")); continuation(false); return true; }
+                case (_, QueryType.IsDemoVersion):           { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query is demo")); continuation(false); return true; }
 
                 case (PromptPlayerEvent prompt, QueryType.PromptPlayer):
                 {
                     if (context.Source == null || debugInspect)
-                        break;
+                        return false;
 
-                    var tf = Resolve<ITextFormatter>();
-                    var dialog = AttachChild(new PromptDialog(tf.Format(prompt.ToId())));
-                    prompt.Acknowledge();
-                    dialog.Closed += (sender, _) => prompt.Complete();
-                    return null;
+                    return RaiseAsync(new YesNoPromptEvent(prompt.TextType, prompt.TextSourceId, prompt.TextId), continuation) > 0;
                 }
 
                 case (PromptPlayerNumericEvent prompt, QueryType.PromptPlayerNumeric):
                 {
                     if (context?.Source == null || debugInspect)
-                        break;
+                        return false;
 
-                    var tf = Resolve<ITextFormatter>();
-                    var dialog = AttachChild(new NumericPromptDialog(
-                        tf.Format(SystemTextId.MsgBox_EnterNumber),
-                        0, 9999));
-
-                    prompt.Acknowledge();
-                    dialog.Closed += (sender, _) =>
-                    {
-                        context.LastEventResult = prompt.Argument == dialog.Value;
-                        prompt.Complete();
-                    };
-                    return null;
+                    return RaiseAsync(
+                               new NumericPromptEvent(SystemTextId.MsgBox_EnterNumber, 0, 9999),
+                               x => continuation(x == prompt.Argument)) > 0;
                 }
 
                 default:
                     Raise(new LogEvent(LogEvent.Level.Error, $"Unhandled query event {query} (subtype {query.QueryType}"));
-                    break;
+                    return false;
             }
-
-            return true;
         }
 
         bool Compare(QueryOperation operation, int value, int immediate) =>

@@ -94,7 +94,7 @@ namespace UAlbion.Core
             get => _pitch;
             set
             {
-                _pitch = LegacyPitch ? Math.Clamp(value, -0.79f, 0.79f) : Math.Clamp(value, -1.55f, 1.55f);
+                _pitch = LegacyPitch ? Math.Clamp(value, -0.48f, 0.48f) : Math.Clamp(value, -1.55f, 1.55f);
                 
                 if(LegacyPitch)        
                     UpdatePerspectiveMatrix();

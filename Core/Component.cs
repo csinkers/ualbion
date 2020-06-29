@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using UAlbion.Api;
 
 namespace UAlbion.Core
@@ -20,9 +21,21 @@ namespace UAlbion.Core
     {
         public static bool TraceAttachment;
         static int _nesting;
+        static int _nextId;
         readonly IDictionary<Type, Handler> _handlers = new Dictionary<Type, Handler>();
         bool _isActive = true; // If false, then this component will not be attached to the exchange even if its parent is.
-        bool _isSubscribed; // True if this component is currently attached to an event exchange
+
+        protected Component() => Id = Interlocked.Increment(ref _nextId);
+
+        /// <summary>
+        /// Sequential id to uniquely identify a given component
+        /// </summary>
+        public int Id { get; }
+
+        /// <summary>
+        /// True if this component is currently attached to an event exchange
+        /// </summary>
+        public bool IsSubscribed { get; private set; }
 
         /// <summary>
         /// The most recently attached event exchange, may currently be attached but
@@ -34,7 +47,7 @@ namespace UAlbion.Core
         /// <summary>
         /// The parent of this component, if it is a child.
         /// </summary>
-        protected IComponent Parent { get; private set; }
+        IComponent Parent { get; set; }
 
         /// <summary>
         /// The list of this components child components.
@@ -57,6 +70,29 @@ namespace UAlbion.Core
         /// </summary>
         /// <param name="event">The event to raise</param>
         protected void Raise(IEvent @event) => Exchange?.Raise(@event, this);
+
+        /// <summary>
+        /// Raise an event via the currently subscribed event exchange (if subscribed), and
+        /// distribute it to all components that have registered a handler. If any components
+        /// have registered an async handler, they can call the continuation function to indicate
+        /// they have completed handling the event.
+        /// </summary>
+        /// <param name="event">The event to raise</param>
+        /// <param name="continuation">The continuation to be called by async handlers upon completion</param>
+        /// <returns>The number of async handlers which have either already called continuation or intend to call it in the future.</returns>
+        protected int RaiseAsync(IAsyncEvent @event, Action continuation) => Exchange?.RaiseAsync(@event, this, continuation) ?? 0;
+
+        /// <summary>
+        /// Raise an event via the currently subscribed event exchange (if subscribed), and
+        /// distribute it to all components that have registered a handler. If any components
+        /// have registered an async handler, they can call the continuation function to indicate
+        /// they have completed handling the event.
+        /// </summary>
+        /// <typeparam name="T">The return value that async handlers should supply upon completion.</typeparam>
+        /// <param name="event">The event to raise</param>
+        /// <param name="continuation">The continuation to be called by async handlers upon completion</param>
+        /// <returns>The number of async handlers which have either already called continuation or intend to call it in the future.</returns>
+        protected int RaiseAsync<T>(IAsyncEvent<T> @event, Action<T> continuation) => Exchange?.RaiseAsync(@event, this, continuation) ?? 0;
 
         /// <summary>
         /// Enqueue an event with the currently subscribed event exchange to be raised
@@ -92,7 +128,42 @@ namespace UAlbion.Core
 
             var handler = new Handler<T>(callback, this);
             _handlers.Add(typeof(T), handler);
-            if (_isSubscribed)
+            if (IsSubscribed)
+                Exchange.Subscribe(handler);
+        }
+
+        /// <summary>
+        /// Add an event handler callback to be called when the relevant event
+        /// type is raised by other components.
+        /// </summary>
+        /// <typeparam name="T">The event type to handle</typeparam>
+        /// <param name="callback">The function to call when the event is raised</param>
+        protected void OnAsync<T>(Func<T, Action, bool> callback) where T : IAsyncEvent
+        {
+            if (_handlers.ContainsKey(typeof(T)))
+                return;
+
+            var handler = new AsyncHandler<T>(callback, this);
+            _handlers.Add(typeof(T), handler);
+            if (IsSubscribed)
+                Exchange.Subscribe(handler);
+        }
+
+        /// <summary>
+        /// Add an event handler callback to be called when the relevant event
+        /// type is raised by other components.
+        /// </summary>
+        /// <typeparam name="TEvent">The event type to handle</typeparam>
+        /// <typeparam name="TReturn">The type of value returned from async handlers for the event</typeparam>
+        /// <param name="callback">The function to call when the event is raised</param>
+        protected void OnAsync<TEvent, TReturn>(Func<TEvent, Action<TReturn>, bool> callback) where TEvent : IAsyncEvent<TReturn>
+        {
+            if (_handlers.ContainsKey(typeof(TEvent)))
+                return;
+
+            var handler = new AsyncHandler<TEvent, TReturn>(callback, this);
+            _handlers.Add(typeof(TEvent), handler);
+            if (IsSubscribed)
                 Exchange.Subscribe(handler);
         }
 
@@ -102,7 +173,7 @@ namespace UAlbion.Core
         /// <typeparam name="T">The event type which should no longer be handled by this component.</typeparam>
         protected void Off<T>()
         {
-            if (_handlers.Remove(typeof(T)) && _isSubscribed)
+            if (_handlers.Remove(typeof(T)) && IsSubscribed)
                 Exchange.Unsubscribe<T>(this);
         }
 
@@ -176,7 +247,7 @@ namespace UAlbion.Core
         /// <param name="exchange">The event exchange that this component should be attached to</param>
         public void Attach(EventExchange exchange)
         {
-            if (_isSubscribed)
+            if (IsSubscribed)
                 return;
 
             Exchange = exchange;
@@ -196,14 +267,14 @@ namespace UAlbion.Core
             // exchange.Subscribe(null, this); // Ensure we always get added to the subscriber list, even if this component only uses subscription notifications.
             foreach (var kvp in _handlers)
                 exchange.Subscribe(kvp.Value);
-            _isSubscribed = true;
+            IsSubscribed = true;
             Subscribed();
         }
 
         /// <summary>
         /// Detach the current component and its event handlers from any currently active event exchange.
         /// </summary>
-        void Detach()
+        protected void Detach()
         {
             if (Exchange == null)
                 return;
@@ -220,7 +291,7 @@ namespace UAlbion.Core
 
             _nesting--;
             Exchange.Unsubscribe(this);
-            _isSubscribed = false;
+            IsSubscribed = false;
         }
 
         /// <summary>
@@ -247,11 +318,11 @@ namespace UAlbion.Core
         /// <param name="sender">The component which generated the event</param>
         public void Receive(IEvent @event, object sender)
         {
-            if (sender == this || !_isSubscribed || Exchange == null)
+            if (sender == this || !IsSubscribed || Exchange == null)
                 return;
 
             if (_handlers.TryGetValue(@event.GetType(), out var handler))
-                handler.Invoke(@event);
+                handler.Invoke(@event, null);
         }
     }
 }

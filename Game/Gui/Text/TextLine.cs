@@ -30,7 +30,7 @@ namespace UAlbion.Game.Gui.Text
             Height = Math.Max(Height, (int)size.Y);
             _alignment = block.Alignment;
 
-            var lastChild = Children.OfType<TextChunk>().LastOrDefault();
+            var lastChild = Children.OfType<TextChunk>().LastOrDefault(x => x.IsActive);
             if(lastChild != null && block.IsMergeableWith(lastChild.Block))
             {
                 lastChild.Block.Merge(block);
@@ -50,7 +50,7 @@ namespace UAlbion.Game.Gui.Text
 
         public override string ToString() =>
             "TextLine:[ " +
-            string.Join("; ", Children.OfType<TextChunk>().Select(x => x.ToString()))
+            string.Join("; ", Children.OfType<TextChunk>().Where(x => x.IsActive).Select(x => x.ToString()))
             + " ]";
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
@@ -64,7 +64,7 @@ namespace UAlbion.Game.Gui.Text
 
             int maxOrder = order;
             int offset = 0;
-            foreach (var chunk in Children.OfType<IUiElement>())
+            foreach (var chunk in Children.OfType<IUiElement>().Where(x => x.IsActive))
             {
                 var size = chunk.GetSize();
                 maxOrder = Math.Max(maxOrder, func(chunk,

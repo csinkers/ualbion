@@ -21,8 +21,8 @@ namespace UAlbion.Game.Gui.Inventory
         |    [<] [=======[  3  ]==============] [>]    |
         |                   [    OK    ]   ^4          |
         \---------------------------------------------*/ //^5
-        public ItemQuantityDialog(StringId stringId, AssetId id, int max, Action<int> continuation, Func<int, string> format = null)
-            : base(DialogPositioning.Center, 3) // TODO: Fix hacky depths
+        public ItemQuantityDialog(int depth, StringId stringId, AssetId id, int max, bool useTenths, Action<int> continuation)
+            : base(DialogPositioning.Center, depth)
         {
             _continuation = continuation;
             IUiElement itemPic = new UiSpriteElement<AssetId>(id)
@@ -36,10 +36,12 @@ namespace UAlbion.Game.Gui.Inventory
                 new GroupingFrame(new FixedSize(151, 30, new UiTextBuilder(stringId)))
             );
 
+            Func<int, string> formatFunc = useTenths ? (Func<int, string>)FormatTenths : FormatUnits;
+
             var stack = new VerticalStack(
                 topStack,
                 new Spacing(0, 5),
-                new Slider(() => _quantity, x => _quantity = x, 0, max, format),
+                new Slider(() => _quantity, x => _quantity = x, 0, max, formatFunc),
                 new Spacing(0, 4),
                 new FixedSize(52, 13,
                     new Button(SystemTextId.MsgBox_OK) { DoubleFrame = true }.OnClick(Close))
@@ -50,6 +52,9 @@ namespace UAlbion.Game.Gui.Inventory
                 Background = DialogFrameBackgroundStyle.MainMenuPattern
             });
         }
+
+        static string FormatTenths(int x) => $"{x / 10}.{x % 10}";
+        static string FormatUnits(int x) => x.ToString();
 
         void Close()
         {

@@ -4,7 +4,7 @@ using UAlbion.Formats.AssetIds;
 namespace UAlbion.Formats.MapEvents
 {
     [Event("npc_text")]
-    public class NpcTextEvent : AsyncEvent
+    public class NpcTextEvent : Event, IAsyncEvent
     {
         public NpcTextEvent(NpcCharacterId npcId, byte textId)
         {

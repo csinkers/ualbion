@@ -5,18 +5,48 @@ using UAlbion.Core.Events;
 namespace UAlbion.Core.Tests
 {
     public class BasicEvent : Event { }
+    public class BasicAsyncEvent : Event, IAsyncEvent<bool> { }
 
     public class BasicComponent : Component
     {
-        public BasicComponent() => On<BasicEvent>(_ => Handled++);
+        public int Seen { get; private set; }
         public int Handled { get; private set; }
         public T CallResolve<T>() => Resolve<T>();
-        public void CallRaise(IEvent e) => Raise(e);
-        public void CallEnqueue(IEvent e) => Enqueue(e);
-        public void EnableHandler() => On<BasicEvent>(_ => Handled++);
-        public void DisableHandler() => Off<BasicEvent>();
-        public void Add(IComponent child) => AttachChild(child);
-        public void Remove(IComponent child) => RemoveChild(child);
+        public new void Raise(IEvent e) => base.Raise(e);
+        public new int RaiseAsync(IAsyncEvent e, Action continuation) => base.RaiseAsync(e, continuation);
+        public new int RaiseAsync<T>(IAsyncEvent<T> e, Action<T> continuation) => base.RaiseAsync(e, continuation);
+        public new void Enqueue(IEvent e) => base.Enqueue(e);
+        public void AddHandler<T>(Action<T> handler)
+        {
+            On<T>(e =>
+            {
+                Seen++;
+                handler(e);
+                Handled++;
+            });
+        }
+
+        public void AddAsyncHandler<T>(Func<T, Action, bool> handler) where T : IAsyncEvent
+        {
+            OnAsync<T>((e,c) =>
+            {
+                Seen++;
+                return handler(e, () => { Handled++; c(); });
+            });
+        }
+
+        public void AddAsyncHandler<TEvent, TReturn>(Func<TEvent, Action<TReturn>, bool> handler) where TEvent : IAsyncEvent<TReturn>
+        {
+            OnAsync<TEvent, TReturn>((e,c) =>
+            {
+                Seen++;
+                return handler(e, x => { Handled++; c(x); });
+            });
+        }
+
+        public void RemoveHandler<T>() => Off<T>();
+        public void AddChild(IComponent child) => AttachChild(child);
+        public new void RemoveChild(IComponent child) => base.RemoveChild(child);
         public void RemoveAll() => RemoveAllChildren();
     }
 

@@ -36,7 +36,7 @@ namespace UAlbion.Game.Gui.Text
 
         void Rebuild(DrawLayer order)
         {
-            if (!IsDirty && order == _sprite?.RenderOrder)
+            if (!IsSubscribed || !IsDirty && order == _sprite?.RenderOrder)
                 return;
 
             _sprite?.Dispose();
@@ -48,12 +48,14 @@ namespace UAlbion.Game.Gui.Text
         public override Vector2 GetSize()
         {
             Rebuild(_lastOrder);
-            return _sprite.Size;
+            return _sprite?.Size ?? Vector2.Zero;
         }
 
         public override int Render(Rectangle extents, int order)
         {
             Rebuild((DrawLayer)order);
+            if (_sprite == null)
+                return order;
 
             var window = Resolve<IWindowManager>();
             var newPosition = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);

@@ -45,23 +45,11 @@ namespace UAlbion.Formats.Assets
                 chainStarts[i] = s.UInt16(null, (ushort)chainStarts[i]);
             }
 
-            for (int i = 0; i < set._events.Length; i++)
+            for (ushort i = 0; i < set._events.Length; i++)
                 set._events[i] = EventNode.Serdes(i, set._events[i], s, true, (ushort)eventSetId);
 
             foreach (var e in set._events)
-            {
-                ushort? nextId = e.NextEventId;
-                e.NextEvent = nextId.HasValue ? set._events[nextId.Value] : null;
-
-                if (e is BranchNode bn)
-                {
-                    nextId = bn.NextEventId;
-                    // TODO: Warn if index invalid
-                    bn.NextEvent = nextId >= eventCount ? null : nextId.HasValue ? set._events[nextId.Value] : null;
-                    nextId = bn.NextEventWhenFalseId;
-                    bn.NextEventWhenFalse = nextId >= eventCount ? null : nextId.HasValue ? set._events[nextId.Value] : null;
-                }
-            }
+                e.Unswizzle(set._events);
 
             if (set.Chains == null)
             {

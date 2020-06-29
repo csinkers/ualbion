@@ -47,14 +47,14 @@ namespace UAlbion.Formats.MapEvents
             Irritated   = 11
         }
 
-        public ChangeProperty Property { get; set; }
-        public QuantityChangeOperation Mode { get; set;  } // No mode for adding XP
-        public PartyCharacterId? PartyMemberId { get; set;  }
-        public ushort Amount { get; set;  } // Or language id
+        public ChangeProperty Property { get; private set; }
+        public QuantityChangeOperation Mode { get; private set;  } // No mode for adding XP
+        public PartyCharacterId? PartyMemberId { get; private set;  }
+        public ushort Amount { get; private set;  } // Or language id
 
-        public byte Unk3 { get; set; }
-        public byte Unk4 { get; set; }
-        public ushort Value { get; set; }
+        public byte Unk3 { get; private set; }
+        public byte Unk4 { get; private set; }
+        public ushort Value { get; private set; }
         public ItemId ItemId => (ItemId)Value - 1;
 
         string ItemString =>

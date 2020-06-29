@@ -17,11 +17,11 @@ namespace UAlbion.Formats.MapEvents
         }
 
         public QuantityChangeOperation Operation { get; private set; }
-        public byte Unk3 { get; set; }
-        public byte Unk4 { get; set; }
-        public byte Unk5 { get; set; }
+        public byte Unk3 { get; private set; }
+        public byte Unk4 { get; private set; }
+        public byte Unk5 { get; private set; }
         public ushort Amount { get; private set; }
-        public ushort Unk8 { get; set; }
+        public ushort Unk8 { get; private set; }
         public override string ToString() => $"change_party_rations {Operation} {Amount} ({Unk3} {Unk4} {Unk5} {Unk8})";
         public override ModifyType SubType => ModifyType.ChangePartyRations;
     }

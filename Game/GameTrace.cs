@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.Tracing;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Game.Assets;
 using UAlbion.Game.Entities.Map2D;
 
 namespace UAlbion.Game

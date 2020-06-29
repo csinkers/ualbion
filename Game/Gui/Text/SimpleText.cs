@@ -37,5 +37,6 @@ namespace UAlbion.Game.Gui.Text
         public SimpleText NoWrap() { _block.Arrangement |= TextArrangement.NoWrap; Version++; return this; }
         public SimpleText Ink(FontColor color) { _block.Color = color; Version++; return this; }
         public SimpleText Language(GameLanguage language) => this;
+        public override string ToString() => $"SimpleText \"{_block.Text}\"";
     }
 }

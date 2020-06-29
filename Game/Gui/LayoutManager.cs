@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
+using System.Text;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -20,6 +22,7 @@ namespace UAlbion.Game.Gui
         public LayoutManager()
         {
             On<LayoutEvent>(RenderLayout);
+            On<DumpLayoutEvent>(DumpLayout);
             On<ScreenCoordinateSelectEvent>(Select);
         }
 
@@ -115,7 +118,6 @@ namespace UAlbion.Game.Gui
                     x = (uiWidth - (int) size.X) / 2;
                     y = UiConstants.StatusBarExtents.Y;
                     break;
-
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -128,6 +130,32 @@ namespace UAlbion.Game.Gui
             var rootNode = new LayoutNode(null, null, UiConstants.UiExtents, 0);
             DoLayout((extents, order, element) => element.Layout(extents, order, new LayoutNode(rootNode, element, extents, order)));
             return rootNode;
+        }
+
+        void DumpLayout(DumpLayoutEvent _)
+        {
+            var root = GetLayout();
+            var sb = new StringBuilder();
+
+            void Aux(LayoutNode node, int level)
+            {
+                var size = node.Element?.GetSize() ?? Vector2.Zero;
+                sb.Append($"{node.Order.ToString().PadLeft(4)} (");
+                sb.Append(node.Extents.X.ToString().PadLeft(3)); sb.Append(", ");
+                sb.Append(node.Extents.Y.ToString().PadLeft(3)); sb.Append(", ");
+                sb.Append(node.Extents.Width.ToString().PadLeft(3)); sb.Append(", ");
+                sb.Append(node.Extents.Height.ToString().PadLeft(3)); sb.Append(") <");
+                sb.Append(size.X.ToString(CultureInfo.InvariantCulture).PadLeft(3)); sb.Append(", ");
+                sb.Append(size.Y.ToString(CultureInfo.InvariantCulture).PadLeft(3)); sb.Append("> ");
+                sb.Append("".PadLeft(level * 2));
+                sb.AppendLine($"{node.Element}");
+                foreach (var child in node.Children)
+                    Aux(child, level + 1);
+            }
+
+            Aux(root, 0);
+            Raise(new LogEvent(LogEvent.Level.Info, sb.ToString()));
+            Raise(new SetClipboardTextEvent(sb.ToString()));
         }
     }
 }

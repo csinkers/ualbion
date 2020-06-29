@@ -34,7 +34,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
         public event EventHandler<EventArgs> Complete;
 
-        void DefaultIdleHandler(object sender, EventArgs args)
+        void DefaultIdleHandler()
         {
             if (_optionsWindow.IsActive || !IsActive)
                 return;
@@ -68,7 +68,7 @@ namespace UAlbion.Game.Gui.Dialogs
         void TopicsWindowOnWordSelected(object sender, WordId? e)
         {
             _topicsWindow.IsActive = false;
-            DefaultIdleHandler(null, null);
+            DefaultIdleHandler();
         }
 
         protected override void Unsubscribed() => Raise(new PopInputModeEvent());
@@ -76,6 +76,7 @@ namespace UAlbion.Game.Gui.Dialogs
         void Close()
         {
             IsActive = false;
+            Remove();
             Complete?.Invoke(this, EventArgs.Empty);
         }
 
@@ -98,7 +99,7 @@ namespace UAlbion.Game.Gui.Dialogs
                     void OnClicked()
                     {
                         _textWindow.Clicked -= OnClicked;
-                        DefaultIdleHandler(null, null);
+                        DefaultIdleHandler();
                     }
 
                     var text = tf.Ink(FontColor.Yellow).Format(new StringId(AssetType.EventText, (ushort)_npc.EventSetId, 0));
@@ -118,7 +119,7 @@ namespace UAlbion.Game.Gui.Dialogs
                     void OnClicked2()
                     {
                         _textWindow.Clicked -= OnClicked2;
-                        DefaultIdleHandler(null, null);
+                        DefaultIdleHandler();
                     }
 
                     _textWindow.Text = new LiteralText("TODO");
@@ -126,14 +127,14 @@ namespace UAlbion.Game.Gui.Dialogs
                     return;
 
                 case 3: // Bye
-                    TriggerAction(ActionType.FinishDialogue, 0, 0, (sender, args) => Complete?.Invoke(this, EventArgs.Empty));
+                    TriggerAction(ActionType.FinishDialogue, 0, 0, () => Complete?.Invoke(this, EventArgs.Empty));
                     return;
             }
 
             TriggerLineAction(blockId, textId);
         }
 
-        public bool OnText(BaseTextEvent textEvent)
+        public bool? OnText(BaseTextEvent textEvent, Action continuation)
         {
             var tf = Resolve<ITextFormatter>();
             switch(textEvent.Location)
@@ -141,11 +142,10 @@ namespace UAlbion.Game.Gui.Dialogs
                 case TextLocation.Conversation:
                 case TextLocation.TextInWindow:
                 {
-                    textEvent.Acknowledge();
                     void OnConversationClicked()
                     {
                         _textWindow.Clicked -= OnConversationClicked;
-                        textEvent.Complete();
+                        continuation();
                     }
 
                     var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
@@ -157,7 +157,6 @@ namespace UAlbion.Game.Gui.Dialogs
 
                 case TextLocation.ConversationOptions:
                 {
-                    textEvent.Complete();
                     var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
                     DiscoverTopics(text.Get().SelectMany(x => x.Words));
                     _textWindow.Text = text;
@@ -170,12 +169,12 @@ namespace UAlbion.Game.Gui.Dialogs
                     var standardOptions = GetStandardOptions(tf);
                     _optionsWindow.SetOptions(options, standardOptions);
                     _optionsWindow.IsActive = true;
+                    continuation();
                     return true;
                 }
 
                 case TextLocation.ConversationQuery:
                 {
-                    textEvent.Acknowledge();
                     var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
 
                     DiscoverTopics(text.Get().SelectMany(x => x.Words));
@@ -191,7 +190,7 @@ namespace UAlbion.Game.Gui.Dialogs
                         _optionsWindow.SetOptions(options, null);
                         _optionsWindow.IsActive = true;
 
-                        textEvent.Complete();
+                        continuation();
                     }
 
                     _textWindow.Text = text;
@@ -201,9 +200,9 @@ namespace UAlbion.Game.Gui.Dialogs
 
                 case TextLocation.StandardOptions:
                 {
-                    textEvent.Complete();
                     _optionsWindow.SetOptions(null, GetStandardOptions(tf));
                     _optionsWindow.IsActive = true;
+                    continuation();
                     return true;
                 }
             }
@@ -218,7 +217,7 @@ namespace UAlbion.Game.Gui.Dialogs
             {
             }
             */
-            return false;
+            return null;
         }
 
         IEnumerable<(IText, int?, Action)> GetStandardOptions(ITextFormatter tf)
@@ -243,7 +242,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
         bool TriggerWordAction(ushort wordId) => TriggerAction(ActionType.Word, 0, wordId);
         bool TriggerLineAction(int blockId, int textId) => TriggerAction(ActionType.DialogueLine, (byte)blockId, (ushort)textId);
-        bool TriggerAction(ActionType type, byte small, ushort large, EventHandler<EventArgs> continuation = null)
+        bool TriggerAction(ActionType type, byte small, ushort large, Action continuation = null)
         {
             var assets = Resolve<IAssetManager>();
             var eventSet = assets.LoadEventSet(_npc.EventSetId);
@@ -267,8 +266,7 @@ namespace UAlbion.Game.Gui.Dialogs
             if (chain != null)
             {
                 var triggerEvent = new TriggerChainEvent(chain, chain.FirstEvent, fromWordSet ? wordSet.Id : eventSet.Id);
-                triggerEvent.OnComplete += continuation ?? DefaultIdleHandler;
-                Enqueue(triggerEvent);
+                RaiseAsync(triggerEvent, () => continuation?.Invoke());
                 return true;
             }
             return false;

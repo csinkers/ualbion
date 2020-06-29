@@ -25,7 +25,7 @@ namespace UAlbion.Game.Gui.Controls
         public override Vector2 GetSize()
         {
             Vector2 size = Vector2.Zero;
-            foreach (var child in Children.OfType<IUiElement>())
+            foreach (var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
             {
                 var childSize = child.GetSize();
                 if (childSize.X > size.X)
@@ -41,7 +41,7 @@ namespace UAlbion.Game.Gui.Controls
         {
             int offset = extents.Y;
             int maxOrder = order;
-            foreach(var child in Children.OfType<IUiElement>())
+            foreach(var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
             {
                 var childSize = child.GetSize();
                 int height = (int)childSize.Y;

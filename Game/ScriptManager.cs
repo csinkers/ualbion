@@ -1,4 +1,5 @@
-﻿using UAlbion.Api;
+﻿using System;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
@@ -12,35 +13,27 @@ namespace UAlbion.Game
     {
         public ScriptManager()
         {
-            On<DoScriptEvent>(Run);
+            OnAsync<DoScriptEvent>(Run);
             On<DumpScriptEvent>(Dump);
         }
 
-        void Run(DoScriptEvent doScriptEvent)
+        bool Run(DoScriptEvent doScriptEvent, Action continuation)
         {
             var assets = Resolve<IAssetManager>();
             var mapManager = Resolve<IMapManager>();
 
             var events = assets.LoadScript(doScriptEvent.ScriptId);
+            var nodes = new EventNode[events.Count];
             var chain = new EventChain(0);
-            for (int i = 0; i < events.Count; i++)
-            {
-                var e = events[i];
-                chain.Events.Add(new EventNode(i, e)
-                {
-                    NextEventId = i + 1 == events.Count ? null : (ushort?)(i + 1)
-                });
-            }
 
-            for (int i = 0; i < chain.Events.Count - 1; i++)
-                chain.Events[i].NextEvent = chain.Events[i + 1];
+            // Create, link and add all the nodes.
+            for (ushort i = 0; i < events.Count;     i++) nodes[i] = new EventNode(i, events[i]);
+            for (ushort i = 0; i < events.Count - 1; i++) nodes[i].Next = nodes[i + 1];
+            for (ushort i = 0; i < events.Count;     i++) chain.Events.Add(nodes[i]);
 
             var source = new EventSource.Map(mapManager.Current.MapId, TriggerType.Default, 0, 0); // TODO: Is there a better trigger type for this?
-
             var trigger = new TriggerChainEvent(chain, chain.FirstEvent, source);
-            doScriptEvent.Acknowledge();
-            trigger.OnComplete += (sender, args) => doScriptEvent.Complete();
-            Raise(trigger);
+            return RaiseAsync(trigger, continuation) > 0;
         }
 
         void Dump(DumpScriptEvent dumpScriptEvent)
@@ -52,7 +45,7 @@ namespace UAlbion.Game
         }
     }
 
-    [Api.Event("dump_script")]
+    [Event("dump_script")]
     public class DumpScriptEvent : GameEvent
     {
         public DumpScriptEvent(ScriptId scriptId) => ScriptId = scriptId;

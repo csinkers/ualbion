@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -15,6 +14,7 @@ namespace UAlbion.Core
     /// </summary>
     public class EventExchange : IDisposable
     {
+        static readonly Action<object> DummyContinuation = _ => { };
         readonly object _syncRoot = new object();
         readonly ILogExchange _logExchange;
         readonly Stack<List<Handler>> _dispatchLists = new Stack<List<Handler>>();
@@ -95,7 +95,21 @@ namespace UAlbion.Core
                         subscribers.Add(subscriber);
         }
 
-        public void Raise(IEvent e, object sender)
+        public void Raise(IEvent e, object sender) => RaiseInternal(e, sender, DummyContinuation);
+        public int RaiseAsync(IAsyncEvent e, object sender, Action continuation) => RaiseInternal(e, sender, _ => continuation?.Invoke());
+        public int RaiseAsync<T>(IAsyncEvent e, object sender, Action<T> continuation) 
+            => RaiseInternal(e, sender, x =>
+            {
+                if (continuation == null)
+                    return;
+
+                if (x is T t)
+                    continuation(t);
+                else
+                    ApiUtil.Assert($"Tried to complete a continuation of type Action<{typeof(T).Name}> with null or a value of a different type.");
+            });
+
+        int RaiseInternal(IEvent e, object sender, Action<object> continuation)
         {
             bool verbose = e is IVerboseEvent;
             if (!verbose)
@@ -130,9 +144,12 @@ namespace UAlbion.Core
                 Collect(handlers, e.GetType());
             }
 
+            int inProgressHandlers = 0;
+
             foreach (var handler in handlers)
                 if (sender != handler.Component)
-                    handler.Invoke(e);
+                    if (handler.Invoke(e, continuation))
+                        inProgressHandlers++;
 
             if (eventText != null)
             {
@@ -146,6 +163,8 @@ namespace UAlbion.Core
 
             if (!verbose)
                 Interlocked.Decrement(ref _nesting);
+
+            return inProgressHandlers;
         }
 
         public void Subscribe<T>(IComponent component) where T : IEvent 

@@ -1,8 +1,9 @@
-﻿namespace UAlbion.Formats.MapEvents
+﻿using UAlbion.Api;
+
+namespace UAlbion.Formats.MapEvents
 {
-    public interface IQueryEvent : IMapEvent
+    public interface IQueryEvent : IMapEvent, IAsyncEvent<bool>
     {
         QueryType QueryType { get; }
-        ushort? FalseEventId { get; }
     }
 }

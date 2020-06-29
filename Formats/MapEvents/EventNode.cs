@@ -1,5 +1,6 @@
-﻿using SerdesNet;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
@@ -8,84 +9,90 @@ namespace UAlbion.Formats.MapEvents
     [DebuggerDisplay("{ToString()}")]
     public class EventNode : IEventNode
     {
-        bool DirectSequence => (NextEventId ?? Id + 1) == Id + 1;
-        public override string ToString() => $"{(DirectSequence ? " " : "#")}{Id}=>{NextEventId?.ToString() ?? "!"}: {Event}";
-        public int Id { get; }
+        bool DirectSequence => (Next?.Id ?? Id + 1) == Id + 1;
+        public override string ToString() => $"{(DirectSequence ? " " : "#")}{Id}=>{Next?.Id.ToString() ?? "!"}: {Event}";
+        public ushort Id { get; set; }
         public IEvent Event { get; }
-        public ushort? NextEventId { get; set; }
-        public IEventNode NextEvent { get; set; }
-
-        public EventNode(int id, IEvent @event)
+        public IEventNode Next { get; set; }
+        public EventNode(ushort id, IEvent @event)
         {
             Id = id;
             Event = @event;
         }
 
-        class ConvertMaxToNull : IConverter<ushort, ushort?>
+        public virtual void Unswizzle(IList<EventNode> nodes)
         {
-            public static readonly ConvertMaxToNull Instance = new ConvertMaxToNull();
-            ConvertMaxToNull() { }
-            public ushort ToPersistent(ushort? memory) => memory ?? 0xffff;
-            public ushort? ToMemory(ushort persistent) => persistent == 0xffff ? (ushort?)null : persistent;
+            if (Next is DummyEventNode dummy)
+                Next = nodes[dummy.Id];
         }
 
-        public static EventNode Serdes(int id, EventNode node, ISerializer s, bool useEventText, ushort textSourceId)
+        public static EventNode Serdes(ushort id, EventNode node, ISerializer s, bool useEventText, ushort textSourceId)
         {
             var initialPosition = s.Offset;
             var mapEvent = node?.Event as MapEvent;
             MapEventType type = (MapEventType)s.UInt8("Type", (byte)(mapEvent?.EventType ?? MapEventType.UnkFf));
 
-            var @event = SerdesByType(node, s, type, useEventText, textSourceId);
-            if (@event is IQueryEvent query)
-                node ??= new BranchNode(id, @event, query.FalseEventId);
+            var @event = SerdesByType(mapEvent, s, type, useEventText, textSourceId);
+            if (@event is IQueryEvent)
+            {
+                node ??= new BranchNode(id, @event);
+                var branch = (BranchNode)node;
+                ushort? falseEventId = s.Transform(nameof(branch.NextIfFalse), branch.NextIfFalse?.Id, s.UInt16, ConvertMaxToNull.Instance);
+                if(falseEventId != null && branch.NextIfFalse == null)
+                    branch.NextIfFalse = new DummyEventNode(falseEventId.Value);
+            }
             else
                 node ??= new EventNode(id, @event);
 
-            long expectedPosition = initialPosition + 10;
+            ushort? nextEventId = s.Transform(nameof(node.Next), node.Next?.Id, s.UInt16, ConvertMaxToNull.Instance);
+            if (nextEventId != null && node.Next == null)
+                node.Next = new DummyEventNode(nextEventId.Value);
+
+            long expectedPosition = initialPosition + 12;
             long actualPosition = s.Offset;
             ApiUtil.Assert(expectedPosition == actualPosition,
                 $"Expected to have read {expectedPosition - initialPosition} bytes, but {actualPosition - initialPosition} have been read.");
 
-            node.NextEventId = s.Transform(nameof(NextEventId), node.NextEventId, s.UInt16, ConvertMaxToNull.Instance);
             return node;
         }
 
-        static IMapEvent SerdesByType(EventNode node, ISerializer s, MapEventType type, bool useEventText, ushort textSourceId) =>
+        static IMapEvent SerdesByType(IEvent e, ISerializer s, MapEventType type, bool useEventText, ushort textSourceId) =>
             type switch // Individual parsers handle byte range [1,9]
             {
-                MapEventType.Action => ActionEvent.Serdes((ActionEvent)node?.Event, s),
-                MapEventType.AskSurrender => AskSurrenderEvent.Serdes((AskSurrenderEvent)node?.Event, s),
-                MapEventType.ChangeIcon => ChangeIconEvent.Serdes((ChangeIconEvent)node?.Event, s),
-                MapEventType.ChangeUsedItem => ChangeUsedItemEvent.Serdes((ChangeUsedItemEvent)node?.Event, s),
-                MapEventType.Chest => OpenChestEvent.Serdes((OpenChestEvent)node?.Event, s, useEventText ? AssetType.EventText : AssetType.MapText, textSourceId),
-                MapEventType.CloneAutomap => CloneAutomapEvent.Serdes((CloneAutomapEvent)node?.Event, s),
-                MapEventType.CreateTransport => CreateTransportEvent.Serdes((CreateTransportEvent)node?.Event, s),
-                MapEventType.DataChange => DataChangeEvent.Serdes((DataChangeEvent)node?.Event, s),
-                MapEventType.DoScript => DoScriptEvent.Serdes((DoScriptEvent)node?.Event, s),
-                MapEventType.Door => DoorEvent.Serdes((DoorEvent)node?.Event, s, useEventText ? AssetType.EventText : AssetType.MapText, textSourceId),
-                MapEventType.Encounter => EncounterEvent.Serdes((EncounterEvent)node?.Event, s),
-                MapEventType.EndDialogue => EndDialogueEvent.Serdes((EndDialogueEvent)node?.Event, s),
-                MapEventType.Execute => ExecuteEvent.Serdes((ExecuteEvent)node?.Event, s),
-                MapEventType.MapExit => TeleportEvent.Serdes((TeleportEvent)node?.Event, s),
-                MapEventType.Modify => ModifyEvent.Serdes((ModifyEvent)node?.Event, s),
-                MapEventType.Offset => OffsetEvent.Serdes((OffsetEvent)node?.Event, s),
-                MapEventType.Pause => PauseEvent.Serdes((PauseEvent)node?.Event, s),
-                MapEventType.PlaceAction => PlaceActionEvent.Serdes((PlaceActionEvent)node?.Event, s),
-                MapEventType.PlayAnimation => PlayAnimationEvent.Serdes((PlayAnimationEvent)node?.Event, s),
-                MapEventType.Query => QueryEvent.Serdes((IQueryEvent)node?.Event, s, useEventText ? AssetType.EventText : AssetType.MapText, textSourceId),
-                MapEventType.RemovePartyMember => RemovePartyMemberEvent.Serdes((RemovePartyMemberEvent)node?.Event, s),
-                MapEventType.Script => RunScriptEvent.Serdes((RunScriptEvent)node?.Event, s),
-                MapEventType.Signal => SignalEvent.Serdes((SignalEvent)node?.Event, s),
-                MapEventType.SimpleChest => SimpleChestEvent.Serdes((SimpleChestEvent)node?.Event, s),
-                MapEventType.Sound => SoundEvent.Serdes((SoundEvent)node?.Event, s),
-                MapEventType.Spinner => SpinnerEvent.Serdes((SpinnerEvent)node?.Event, s),
-                MapEventType.StartDialogue => StartDialogueEvent.Serdes((StartDialogueEvent)node?.Event, s),
+                MapEventType.Action => ActionEvent.Serdes((ActionEvent)e, s),
+                MapEventType.AskSurrender => AskSurrenderEvent.Serdes((AskSurrenderEvent)e, s),
+                MapEventType.ChangeIcon => ChangeIconEvent.Serdes((ChangeIconEvent)e, s),
+                MapEventType.ChangeUsedItem => ChangeUsedItemEvent.Serdes((ChangeUsedItemEvent)e, s),
+                MapEventType.Chest => OpenChestEvent.Serdes((OpenChestEvent)e, s, useEventText ? AssetType.EventText : AssetType.MapText, textSourceId),
+                MapEventType.CloneAutomap => CloneAutomapEvent.Serdes((CloneAutomapEvent)e, s),
+                MapEventType.CreateTransport => CreateTransportEvent.Serdes((CreateTransportEvent)e, s),
+                MapEventType.DataChange => DataChangeEvent.Serdes((DataChangeEvent)e, s),
+                MapEventType.DoScript => DoScriptEvent.Serdes((DoScriptEvent)e, s),
+                MapEventType.Door => DoorEvent.Serdes((DoorEvent)e, s, useEventText ? AssetType.EventText : AssetType.MapText, textSourceId),
+                MapEventType.Encounter => EncounterEvent.Serdes((EncounterEvent)e, s),
+                MapEventType.EndDialogue => EndDialogueEvent.Serdes((EndDialogueEvent)e, s),
+                MapEventType.Execute => ExecuteEvent.Serdes((ExecuteEvent)e, s),
+                MapEventType.MapExit => TeleportEvent.Serdes((TeleportEvent)e, s),
+                MapEventType.Modify => ModifyEvent.Serdes((ModifyEvent)e, s),
+                MapEventType.Offset => OffsetEvent.Serdes((OffsetEvent)e, s),
+                MapEventType.Pause => PauseEvent.Serdes((PauseEvent)e, s),
+                MapEventType.PlaceAction => PlaceActionEvent.Serdes((PlaceActionEvent)e, s),
+                MapEventType.PlayAnimation => PlayAnimationEvent.Serdes((PlayAnimationEvent)e, s),
+                MapEventType.Query => QueryEvent.Serdes((IQueryEvent)e, s, useEventText ? AssetType.EventText : AssetType.MapText, textSourceId),
+                MapEventType.RemovePartyMember => RemovePartyMemberEvent.Serdes((RemovePartyMemberEvent)e, s),
+                MapEventType.Script => RunScriptEvent.Serdes((RunScriptEvent)e, s),
+                MapEventType.Signal => SignalEvent.Serdes((SignalEvent)e, s),
+                MapEventType.SimpleChest => SimpleChestEvent.Serdes((SimpleChestEvent)e, s),
+                MapEventType.Sound => SoundEvent.Serdes((SoundEvent)e, s),
+                MapEventType.Spinner => SpinnerEvent.Serdes((SpinnerEvent)e, s),
+                MapEventType.StartDialogue => StartDialogueEvent.Serdes((StartDialogueEvent)e, s),
                 MapEventType.Text => useEventText
-                        ? EventTextEvent.Serdes((BaseTextEvent)node?.Event, s, (EventSetId)textSourceId)
-                        : MapTextEvent.Serdes((BaseTextEvent)node?.Event, s, (MapDataId)textSourceId),
-                MapEventType.Trap => TrapEvent.Serdes((TrapEvent)node?.Event, s),
-                MapEventType.Wipe => WipeEvent.Serdes((WipeEvent)node?.Event, s),
-                _ => DummyMapEvent.Serdes((DummyMapEvent)node?.Event, s, type)
+                        ? EventTextEvent.Serdes((BaseTextEvent)e, s, (EventSetId)textSourceId)
+                        : MapTextEvent.Serdes((BaseTextEvent)e, s, (MapDataId)textSourceId),
+                MapEventType.Trap => TrapEvent.Serdes((TrapEvent)e, s),
+                MapEventType.Wipe => WipeEvent.Serdes((WipeEvent)e, s),
+                _ => DummyMapEvent.Serdes((DummyMapEvent)e, s, type)
             };
     }
 }
+

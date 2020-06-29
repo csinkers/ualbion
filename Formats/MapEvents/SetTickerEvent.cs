@@ -21,10 +21,10 @@ namespace UAlbion.Formats.MapEvents
         }
 
         public QuantityChangeOperation Operation { get; private set; }
-        public byte Amount { get; set; }
+        public byte Amount { get; private set; }
         public ushort TickerId { get; private set; }
 
-        public byte Unk4 { get; set; } // 0, 1
+        public byte Unk4 { get; private set; } // 0, 1
         byte Unk5 { get; set; }
         ushort Unk8 { get; set; }
         public override string ToString() => $"set_ticker {TickerId} {Operation} {Amount} ({Unk4})";

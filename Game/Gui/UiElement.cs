@@ -18,7 +18,7 @@ namespace UAlbion.Game.Gui
             Vector2 size = Vector2.Zero;
             if (Children != null)
             {
-                foreach (var child in Children.OfType<IUiElement>())
+                foreach (var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
                 {
                     var childSize = child.GetSize();
                     if (childSize.X > size.X)
@@ -33,7 +33,7 @@ namespace UAlbion.Game.Gui
         protected virtual int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
             int maxOrder = order;
-            foreach (var child in Children.OfType<IUiElement>())
+            foreach (var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
                 maxOrder = Math.Max(maxOrder, func(child, extents, order + 1));
             return maxOrder;
         }

@@ -2,6 +2,6 @@
 {
     public interface IBranchNode : IEventNode
     {
-        IEventNode NextEventWhenFalse { get; set; }
+        IEventNode NextIfFalse { get; }
     }
 }

@@ -47,14 +47,14 @@ namespace UAlbion
                 ;
 
             var assets = new AssetManager();
-            var coreServices = new Container("Core",
-                        new StdioConsoleLogger(),
-                        new ImGuiConsoleLogger(),
-                        Settings.Load(baseDir),
-                        locatorRegistry,
-                        assets); // Need to register settings first, as the AssetConfigLocator relies on it.
+            var services = new Container("Services", 
+                new StdioConsoleLogger(),
+                new ClipboardManager(),
+                new ImGuiConsoleLogger(),
+                Settings.Load(baseDir),
+                locatorRegistry,
+                assets); // Need to register settings first, as the AssetConfigLocator relies on it.
 
-            var services = new Container("Services", coreServices);
 
             using var exchange = new EventExchange(new LogExchange())
                 .Register<ICoreFactory>(factory)
@@ -69,7 +69,7 @@ namespace UAlbion
             {
                 case ExecutionMode.Game:
                 case ExecutionMode.GameWithSlavedAudio:
-                    Albion.RunGame(exchange, services, coreServices, baseDir, commandLine);
+                    Albion.RunGame(exchange, services, baseDir, commandLine);
                     break;
 
                 case ExecutionMode.AudioSlave: 

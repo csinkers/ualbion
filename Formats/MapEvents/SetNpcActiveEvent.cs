@@ -17,11 +17,11 @@ namespace UAlbion.Formats.MapEvents
         }
 
         public byte IsActive { get; private set; }
-        public byte NpcId { get; set; }
-        public byte Unk4 { get; set; }
-        public byte Unk5 { get; set; }
+        public byte NpcId { get; private set; }
+        public byte Unk4 { get; private set; }
+        public byte Unk5 { get; private set; }
         public ushort Unk6 { get; private set; }
-        public ushort Unk8 { get; set; }
+        public ushort Unk8 { get; private set; }
         public override string ToString() => $"set_npc_active {NpcId} {IsActive} ({Unk4} {Unk6} {Unk8})";
         public override ModifyType SubType => ModifyType.SetNpcActive;
     }

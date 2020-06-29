@@ -4,7 +4,7 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public abstract class BaseTextEvent : AsyncMapEvent, ITextEvent
+    public abstract class BaseTextEvent : MapEvent, ITextEvent, IAsyncEvent
     {
         protected static BaseTextEvent Serdes(BaseTextEvent e, ISerializer s)
         {
@@ -86,7 +86,7 @@ namespace UAlbion.Formats.MapEvents
     }
 
     [Event("text")]
-    public class TextEvent : AsyncEvent
+    public class TextEvent : IAsyncEvent
     {
         public TextEvent(byte textId, TextLocation? location, SmallPortraitId? portrait)
         {

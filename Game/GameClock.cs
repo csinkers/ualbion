@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Events;
@@ -15,7 +16,7 @@ namespace UAlbion.Game
         readonly IList<(string, float)> _activeTimers = new List<(string, float)>();
         float _elapsedTimeThisGameFrame;
         int _slowTicksRemaining;
-        UpdateEvent _updateEvent;
+        Action _pendingContinuation;
 
         public GameClock()
         {
@@ -24,15 +25,16 @@ namespace UAlbion.Game
             On<EngineUpdateEvent>(OnEngineUpdate);
             On<SlowClockEvent>(OnSlowClock);
             On<StartTimerEvent>(StartTimer);
-            On<UpdateEvent>(e =>
-            {
-                if (IsRunning || _updateEvent != null)
-                    return;
 
-                e.Acknowledge();
-                _updateEvent = e;
+            OnAsync<UpdateEvent>((e, c) =>
+            {
+                if (IsRunning || _pendingContinuation != null)
+                    return false;
+
+                _pendingContinuation = c;
                 _slowTicksRemaining = e.Cycles;
                 IsRunning = true;
+                return true;
             });
         }
 
@@ -49,9 +51,9 @@ namespace UAlbion.Game
                 return;
 
             IsRunning = false;
-            var updateEvent = _updateEvent;
-            _updateEvent = null;
-            updateEvent?.Complete();
+            var continuation = _pendingContinuation;
+            _pendingContinuation = null;
+            continuation?.Invoke();
         }
 
         void StartTimer(StartTimerEvent e) => _activeTimers.Add((e.Id, ElapsedTime + e.IntervalMilliseconds / 1000));

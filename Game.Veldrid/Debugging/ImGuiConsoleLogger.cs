@@ -155,12 +155,7 @@ namespace UAlbion.Game.Veldrid.Debugging
 
                     var @event = Event.Parse(command);
                     if (@event != null)
-                    {
-                        if(@event is AsyncEvent async)
-                            async.SetCallback(() => PrintMessage($"Async event \"{async}\" completed.", ConsoleColor.Gray));
-
                         logExchange.EnqueueEvent(@event);
-                    }
                     else
                         PrintMessage($"Unknown event \"{command}\"", ConsoleColor.Red);
                 }

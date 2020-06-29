@@ -5,7 +5,7 @@ using UAlbion.Formats.AssetIds;
 namespace UAlbion.Formats.MapEvents
 {
     [Event("start_dialogue", "Initiates a conversation using the given npc id", new [] { "talk" })]
-    public class StartDialogueEvent : AsyncMapEvent
+    public class StartDialogueEvent : MapEvent, IAsyncEvent
     {
         StartDialogueEvent() { }
         public StartDialogueEvent(NpcCharacterId npcId) => NpcId = npcId;

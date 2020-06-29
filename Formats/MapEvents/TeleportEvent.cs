@@ -27,13 +27,13 @@ namespace UAlbion.Formats.MapEvents
             return e;
         }
 
-        public byte X { get; set; }
-        public byte Y { get; set; }
-        public TeleportDirection Direction { get; set; }
-        public MapDataId MapId { get; set; } // 0 = stay on current map
+        public byte X { get; private set; }
+        public byte Y { get; private set; }
+        public TeleportDirection Direction { get; private set; }
+        public MapDataId MapId { get; private set; } // 0 = stay on current map
 
-        public byte Unk4 { get; set; } // 255 on 2D maps, (1,6) on 3D maps
-        public byte Unk5 { get; set; } // 2,3,4,5,6,8,9
+        public byte Unk4 { get; private set; } // 255 on 2D maps, (1,6) on 3D maps
+        public byte Unk5 { get; private set; } // 2,3,4,5,6,8,9
         ushort Unk8 { get; set; }
         public override string ToString() => $"teleport {MapId} <{X}, {Y}> Dir:{Direction} ({Unk4} {Unk5})";
         public override MapEventType EventType => MapEventType.MapExit;

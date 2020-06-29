@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Map
@@ -10,7 +11,6 @@ namespace UAlbion.Formats.Assets.Map
         public byte X;
         public byte Y;
         public TriggerType Trigger;
-        public ushort? EventNumber { get; set; }
         public EventChain Chain { get; set; }
         public IEventNode Node { get; set; }
 
@@ -27,10 +27,18 @@ namespace UAlbion.Formats.Assets.Map
             // ApiUtil.Assert(global && zone.X == 0xff || !global && zone.X != 0xff);
             zone.Unk1 = s.UInt8(nameof(Unk1), zone.Unk1);
             zone.Trigger = s.EnumU16(nameof(Trigger), zone.Trigger);
-            zone.EventNumber = ConvertMaxToNull.Serdes(nameof(EventNumber), zone.EventNumber, s.UInt16);
+            ushort? nodeId = ConvertMaxToNull.Serdes(nameof(Node), zone.Node?.Id, s.UInt16);
+            if (nodeId != null && zone.Node == null)
+                zone.Node = new DummyEventNode(nodeId.Value);
             return zone;
         }
 
-        public override string ToString() => $"Zone ({X}, {Y}) T:{Trigger} Mode:{Unk1} C:{Chain?.Id} E:{EventNumber}";
+        public void Unswizzle(Func<ushort, (EventChain, IEventNode)> getEvent)
+        {
+            if (Node is DummyEventNode dummy)
+                (Chain, Node) = getEvent(dummy.Id);
+        }
+
+        public override string ToString() => $"Zone ({X}, {Y}) T:{Trigger} Mode:{Unk1} C:{Chain?.Id} E:{Node?.Id}";
     }
 }

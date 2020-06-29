@@ -58,7 +58,7 @@ namespace UAlbion.Game.Gui.Controls
 
         public override int Render(Rectangle extents, int order)
         {
-            if (!IsActive)
+            if (!IsSubscribed)
                 return order;
 
             if (_sprite?.Key.RenderOrder != (DrawLayer)order)

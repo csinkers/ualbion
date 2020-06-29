@@ -395,13 +395,13 @@ namespace UAlbion
                 if(e is IBranchNode branch)
                 {
                     sw.WriteLine($"if (!{formatter.GetText(e)}) {{");
-                    if (branch.NextEventWhenFalse != null)
-                        PrintChain(sw, formatter, branch.NextEventWhenFalse, indent + 1);
+                    if (branch.NextIfFalse != null)
+                        PrintChain(sw, formatter, branch.NextIfFalse, indent + 1);
                     sw.WriteLine("}".PadLeft(4 + indent * 4));
                     sw.WriteLine("else...".PadLeft(10 + indent * 4));
                 }
                 else sw.WriteLine(formatter.GetText(e));
-                e = e.NextEvent;
+                e = e.Next;
             } while (e != null);
         }
 

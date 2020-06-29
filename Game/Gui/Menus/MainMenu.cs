@@ -69,15 +69,13 @@ namespace UAlbion.Game.Gui.Menus
         {
             var e = new YesNoPromptEvent(SystemTextId.MainMenu_DoYouReallyWantToStartANewGame);
             var exchange = Exchange;
-            e.SetCallback(() =>
+            RaiseAsync(e, response =>
             {
                 Attach(exchange);
-                if (e.Response)
-                    Raise(new NewGameEvent(
-                        MapDataId.Toronto2DGesamtkarteSpielbeginn, 30, 75));
+                if (response)
+                    Raise(new NewGameEvent(MapDataId.Toronto2DGesamtkarteSpielbeginn, 30, 75)); // TODO: Move this to config?
             });
-            Raise(e);
-            Remove();
+            Detach();
         }
 
         void LoadGame()
@@ -91,7 +89,7 @@ namespace UAlbion.Game.Gui.Menus
                     Raise(new LoadGameEvent(id.Value));
             };
             Exchange.Attach(menu);
-            Remove();
+            Detach();
         }
 
         void SaveGame()
@@ -105,7 +103,7 @@ namespace UAlbion.Game.Gui.Menus
                 // Raise(new SaveGameEvent(filename, name));
             };
             Exchange.Attach(menu);
-            Remove();
+            Detach();
         }
 
         void Options()
@@ -114,7 +112,7 @@ namespace UAlbion.Game.Gui.Menus
             var exchange = Exchange;
             optionsMenu.Closed += (args, _) => Attach(exchange);
             Exchange.Attach(optionsMenu);
-            Remove();
+            Detach();
         }
 
         void QuitGame()

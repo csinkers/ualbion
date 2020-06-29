@@ -7,10 +7,9 @@ using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
-using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui;
-using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Input;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State.Player;
@@ -26,12 +25,12 @@ namespace UAlbion.Game.Veldrid.Input
         Vector2 _hotspot;
         SpriteLease _cursorSprite;
         SpriteLease _itemSprite;
-        UiText _itemAmount;
         SpriteLease _hotspotSprite;
+        PositionedSpriteBatch _itemAmountSprite;
+        string _lastItemAmountText;
         bool _dirty = true;
         bool _showCursor = true;
         int _frame;
-        int _version;
 
         public CursorManager()
         {
@@ -40,7 +39,6 @@ namespace UAlbion.Game.Veldrid.Input
             On<SetCursorEvent>(e => SetCursor(e.CursorId));
             On<ShowCursorEvent>(e => { _showCursor = e.Show; _dirty = true; });
             On<WindowResizedEvent>(e => SetCursor(_cursorId));
-            On<InventoryChangedEvent>(_ => _version++);
             On<InputEvent>(e =>
             {
                 Position = e.Snapshot.MousePosition;
@@ -51,21 +49,6 @@ namespace UAlbion.Game.Veldrid.Input
                 Position = new Vector2(e.X, e.Y);
                 _dirty = true;
             });
-
-            var amountSource = new DynamicText(() =>
-            {
-                var hand = Resolve<IInventoryManager>().ItemInHand;
-                var amount = hand.Amount;
-                if (amount < 2)
-                    return new TextBlock[0];
-
-                return 
-                    hand.Item is Gold
-                    ? new[] { new TextBlock($"{amount/10}.{amount%10}") }
-                    : new[] { new TextBlock(amount.ToString()) };
-            }, x => _version);
-            _itemAmount = AttachChild(new UiText(amountSource));
-            _itemAmount.IsActive = false;
         }
 
         void SetCursor(CoreSpriteId cursorId)
@@ -155,33 +138,40 @@ namespace UAlbion.Game.Veldrid.Input
 
         void RenderItemInHandCursor(IAssetManager assets, ISpriteManager sm, IWindowManager window, Vector3 normPosition)
         {
-            if (_cursorId != CoreSpriteId.CursorSmall) // Inventory screen, check what's being held.
+            var held = Resolve<IInventoryManager>().ItemInHand;
+            var itemAmountText = GetAmountText();
+
+            if (_lastItemAmountText != itemAmountText)
             {
-                _itemSprite?.Dispose();
-                _itemSprite = null;
-                _itemAmount.IsActive = false;
-                return;
+                var tm = Resolve<ITextManager>();
+                _lastItemAmountText = itemAmountText;
+                _itemAmountSprite?.Dispose();
+                _itemAmountSprite = itemAmountText == null 
+                    ? null 
+                    : tm.BuildRenderable(new TextBlock(itemAmountText), DrawLayer.MaxLayer, null, this);
             }
 
-            var held = Resolve<IInventoryManager>().ItemInHand;
-            _itemAmount.IsActive = true;
+            if (_cursorId != CoreSpriteId.CursorSmall) // Inventory screen, check what's being held.
+            {
+                _itemSprite?.Dispose(); _itemSprite = null;
+                _itemAmountSprite?.Dispose(); _itemAmountSprite = null;
+                return;
+            }
 
             int subItem = 0;
             ITexture texture = null;
 
-            if (held.Item is Gold)
+            switch (held.Item)
             {
-                texture = assets.LoadTexture(CoreSpriteId.UiGold);
-            }
-            else if (held.Item is Rations)
-            {
-                texture = assets.LoadTexture(CoreSpriteId.UiFood);
-            }
-            else if (held.Item is ItemData item)
-            {
-                ItemSpriteId spriteId = (ItemSpriteId)((int)item.Icon + _frame % item.IconAnim);
-                texture = assets.LoadTexture(spriteId);
-                subItem = (int)spriteId;
+                case Gold _: texture = assets.LoadTexture(CoreSpriteId.UiGold); break;
+                case Rations _: texture = assets.LoadTexture(CoreSpriteId.UiFood); break;
+                case ItemData item:
+                {
+                    ItemSpriteId spriteId = (ItemSpriteId)((int)item.Icon + _frame % item.IconAnim);
+                    texture = assets.LoadTexture(spriteId);
+                    subItem = (int)spriteId;
+                    break;
+                }
             }
 
             if (texture == null)
@@ -209,6 +199,22 @@ namespace UAlbion.Game.Veldrid.Input
                 normPosition + new Vector3(window.UiToNormRelative(6, 6), 0),
                 window.UiToNormRelative(subImage.Size),
                 subImage, 0);
+
+            if (_itemAmountSprite != null)
+                _itemAmountSprite.Position = normPosition + new Vector3(window.UiToNormRelative(6, 18), 0);
+        }
+
+        string GetAmountText()
+        {
+            var hand = Resolve<IInventoryManager>().ItemInHand;
+            var amount = hand.Amount;
+            if (amount < 2)
+                return null;
+
+            return
+                hand.Item is Gold
+                ? $"{amount / 10}.{amount % 10}"
+                : amount.ToString();
         }
     }
 }

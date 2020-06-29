@@ -115,7 +115,7 @@ namespace UAlbion.Game.Veldrid.Debugging
 
                     var (descriptions, stats) = PerfTracker.GetFrameStats();
                     ImGui.Columns(2);
-                    ImGui.SetColumnWidth(0, 300);
+                    ImGui.SetColumnWidth(0, 320);
                     foreach (var description in descriptions)
                         ImGui.Text(description);
 
@@ -223,6 +223,17 @@ namespace UAlbion.Game.Veldrid.Debugging
                 }
 
                 ImGui.EndGroup();
+                ImGui.TreePop();
+            }
+
+            if (ImGui.TreeNode("Event Contexts"))
+            {
+                if (Resolve<IEventManager>() is EventChainManager em)
+                {
+                    foreach (var context in em.DebugActiveContexts)
+                        ImGui.Text(context.ToString());
+                }
+
                 ImGui.TreePop();
             }
 
@@ -335,7 +346,27 @@ namespace UAlbion.Game.Veldrid.Debugging
             bool anyHovered = false;
             if (reflected.SubObjects != null)
             {
-                if (ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowItemOverlap))
+                bool customStyle = false;
+                if (reflected.Object is Component component)
+                {
+                    if (!component.IsSubscribed)
+                    {
+                        ImGui.PushStyleColor(0, new Vector4(0.6f, 0.6f, 0.6f, 1));
+                        customStyle = true;
+                    }
+
+                    bool active = component.IsActive;
+                    ImGui.Checkbox(component.Id.ToString(), ref active);
+                    ImGui.SameLine();
+                    if (active != component.IsActive)
+                        component.IsActive = active;
+                }
+
+                bool treeOpen = ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowItemOverlap);
+                if (customStyle)
+                    ImGui.PopStyleColor();
+
+                if (treeOpen)
                 {
                     if (!fixedObject && ImGui.Button("Track"))
                         _fixedObjects.Add(reflected.Object);

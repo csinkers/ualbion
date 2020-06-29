@@ -7,7 +7,7 @@ using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Events
 {
-    public class TriggerChainEvent : IEvent
+    public class TriggerChainEvent : IAsyncEvent
     {
         public TriggerChainEvent(EventChain chain, IEventNode node, EventSource source)
         {
@@ -31,7 +31,5 @@ namespace UAlbion.Game.Events
         public EventChain Chain { get; }
         public IEventNode Node { get; }
         public EventSource Source { get; }
-        public void Complete() => OnComplete?.Invoke(this, EventArgs.Empty);
-        public event EventHandler<EventArgs> OnComplete;
     }
 }

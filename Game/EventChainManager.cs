@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using UAlbion.Api;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 
@@ -10,90 +12,142 @@ namespace UAlbion.Game
 {
     public class EventChainManager : ServiceComponent<IEventManager>, IEventManager
     {
-        readonly ThreadLocal<Stack<EventContext>> _activeContext = new ThreadLocal<Stack<EventContext>>(() => new Stack<EventContext>());
-        readonly HashSet<EventContext> _pendingAsyncContexts = new HashSet<EventContext>();
+        readonly ThreadLocal<Stack<EventContext>> _threadContexts = new ThreadLocal<Stack<EventContext>>(() => new Stack<EventContext>());
+        readonly HashSet<EventContext> _activeContexts = new HashSet<EventContext>();
 
         public EventChainManager()
         {
-            On<TriggerChainEvent>(Trigger);
+            // Need to enqueue without a sender if we want to handle it ourselves.
+            On<BeginFrameEvent>(_ => Exchange?.Enqueue(new ResumeChainsEvent(), null)); 
+            On<ResumeChainsEvent>(ResumeChains);
+
+            OnAsync<TriggerChainEvent>(Trigger);
         }
 
-        public EventContext Context => _activeContext.Value.FirstOrDefault();
+        public EventContext Context => _threadContexts.Value.FirstOrDefault();
+        public IEnumerable<EventContext> DebugActiveContexts => _activeContexts;
+
+        bool HandleBoolEvent(EventContext context, IAsyncEvent<bool> boolEvent, IBranchNode branch) // Return value = whether to return.
+        {
+            context.Status = EventContextStatus.Waiting;
+            int waiting = RaiseAsync(boolEvent, result =>
+            {
+#if DEBUG
+                Raise(new LogEvent(LogEvent.Level.Info, $"if ({context.Node.Event}) => {context.LastEventResult}"));
+#endif
+                context.Node = result ? branch.Next : branch.NextIfFalse;
+                context.LastEventResult = result;
+                context.Status = EventContextStatus.Ready;
+            });
+
+            if (waiting == 0)
+            {
+                ApiUtil.Assert($"Async event {boolEvent} not acknowledged. Continuing immediately.");
+                context.Node = context.Node.Next;
+                context.Status = EventContextStatus.Ready;
+            }
+            else if (context.Status == EventContextStatus.Waiting)
+            {
+                // If the continuation hasn't been called then stop iterating for now and wait for completion.
+                _threadContexts.Value.Pop();
+                return true;
+            }
+
+            // If the continuation was called already then continue iterating.
+            return false;
+        }
+
+        bool HandleAsyncEvent(EventContext context, IAsyncEvent asyncEvent)
+        {
+            context.Status = EventContextStatus.Waiting;
+            int waiting = RaiseAsync(asyncEvent, () =>
+            {
+                context.Node = context.Node.Next;
+                context.Status = EventContextStatus.Ready;
+            });
+
+            if (waiting == 0)
+            {
+                ApiUtil.Assert($"Async event {asyncEvent} not acknowledged. Continuing immediately.");
+                context.Node = context.Node.Next;
+                context.Status = EventContextStatus.Ready;
+            }
+            else if (context.Status == EventContextStatus.Waiting)
+            {
+                _threadContexts.Value.Pop();
+                return true;
+            }
+            // If the continuation was called already then continue iterating.
+            return false;
+        }
+
+        void HandleChainCompletion(EventContext context)
+        {
+            if (context.ClockWasRunning)
+                Raise(new StartClockEvent());
+
+            context.Status = EventContextStatus.Completing;
+            context.CompletionCallback?.Invoke();
+            context.Status = EventContextStatus.Complete;
+            _threadContexts.Value.Pop();
+            _activeContexts.Remove(context);
+        }
 
         void Resume(EventContext context)
         {
-            _activeContext.Value.Push(context);
-            _pendingAsyncContexts.Remove(context);
+            _threadContexts.Value.Push(context);
+            context.Status = EventContextStatus.Ready;
 
             while (context.Node != null)
             {
-                if (context.Node.Event is AsyncEvent asyncEvent)
+                context.Status = EventContextStatus.Running;
+                if (context.Node is IBranchNode branch && context.Node.Event is IAsyncEvent<bool> boolEvent)
                 {
-                    asyncEvent.SetCallback(() =>
-                    {
-                        if (context.Node is IBranchNode branch)
-                        {
-#if DEBUG
-                            Raise(new LogEvent(LogEvent.Level.Info, $"if ({context.Node.Event}) => {context.LastEventResult}"));
-#endif
-                            context.Node = context.LastEventResult ? branch.NextEvent : branch.NextEventWhenFalse;
-                        }
-                        else context.Node = context.Node.NextEvent;
-
-                        Resume(context);
-                    });
-
-                    Raise(asyncEvent);
-
-                    switch (asyncEvent.AsyncStatus)
-                    {
-                        case AsyncStatus.Unacknowledged:
-                            Raise(new LogEvent(LogEvent.Level.Warning, $"Async event {asyncEvent} not acknowledged. Continuing immediately."));
-                            break;
-                        case AsyncStatus.Acknowledged: // Callback will be called later on so return for now
-                            _activeContext.Value.Pop();
-                            _pendingAsyncContexts.Add(context);
-                            return;
-                        case AsyncStatus.Complete: // Completed asynchronously, keep processing events in the chain
-                            break;
-                    }
-
-                    context.Node = context.Node.NextEvent;
+                    if (HandleBoolEvent(context, boolEvent, branch))
+                        return;
+                }
+                else if (context.Node.Event is IAsyncEvent asyncEvent)
+                {
+                    if (HandleAsyncEvent(context, asyncEvent))
+                        return;
                 }
                 else
                 {
                     Raise(context.Node.Event);
-
-                    if (context.Node is IBranchNode branch)
-                    {
-#if DEBUG
-                        Raise(new LogEvent(LogEvent.Level.Info, $"if ({context.Node.Event}) => {context.LastEventResult}"));
-#endif
-                        context.Node = context.LastEventResult ? branch.NextEvent : branch.NextEventWhenFalse;
-                    }
-                    else context.Node = context.Node.NextEvent;
+                    context.Node = context.Node.Next;
                 }
             }
-
-            if (context.ClockWasRunning)
-                Raise(new StartClockEvent());
-
-            context.CompletionCallback?.Invoke();
+            HandleChainCompletion(context);
         }
 
-        void Trigger(TriggerChainEvent e)
+        void ResumeChains(ResumeChainsEvent obj)
+        {
+            EventContext context;
+            do
+            {
+                context = _activeContexts.FirstOrDefault(x => x.Status == EventContextStatus.Ready);
+                if (context != null)
+                    Resume(context);
+            } while (context != null);
+        }
+
+        bool Trigger(TriggerChainEvent e, Action continuation)
         {
             var context = new EventContext(e.Source)
             {
                 Chain = e.Chain,
                 Node = e.Node,
                 ClockWasRunning = Resolve<IClock>().IsRunning,
-                CompletionCallback = e.Complete
+                CompletionCallback = continuation,
+                Status = EventContextStatus.Ready
             };
 
             if (context.ClockWasRunning)
                 Raise(new StopClockEvent());
+
+            _activeContexts.Add(context);
             Resume(context);
+            return true;
         }
     }
 }

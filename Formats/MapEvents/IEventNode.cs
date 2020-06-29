@@ -4,8 +4,8 @@ namespace UAlbion.Formats.MapEvents
 {
     public interface IEventNode
     {
-        int Id { get; }
+        ushort Id { get; }
         IEvent Event { get; }
-        IEventNode NextEvent { get; set; }
+        IEventNode Next { get; }
     }
 }

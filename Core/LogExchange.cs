@@ -45,7 +45,21 @@ namespace UAlbion.Core
                 case BeginFrameEvent _:
                     while (_queuedEvents.TryDequeue(out var queuedEvent))
                     {
-                        try { _exchange.Raise(queuedEvent, this); }
+                        try
+                        {
+                            switch (queuedEvent)
+                            {
+                                case IAsyncEvent<bool> boolEvent:
+                                    _exchange.RaiseAsync<bool>(boolEvent, this, x => { Console.WriteLine($"{boolEvent}: {x}"); });
+                                    break;
+                                case IAsyncEvent<int> intEvent:
+                                    _exchange.RaiseAsync<int>(intEvent, this, x => { Console.WriteLine($"{intEvent}: {x}"); });
+                                    break;
+                                default:
+                                    _exchange.Raise(queuedEvent, this);
+                                    break;
+                            }
+                        }
                         catch (Exception exception) { Console.WriteLine("Error: {0}", exception.Message); }
                     }
                     break;

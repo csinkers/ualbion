@@ -23,7 +23,7 @@ namespace UAlbion.Game.Gui.Controls
         public override Vector2 GetSize()
         {
             Vector2 size = Vector2.Zero;
-            foreach (var child in Children.OfType<IUiElement>())
+            foreach (var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
             {
                 var childSize = child.GetSize();
                 size.X += childSize.X;
@@ -41,7 +41,7 @@ namespace UAlbion.Game.Gui.Controls
             int minWidth = 0;
             int nonFixedCount = 0;
 
-            foreach(var child in Children.OfType<IUiElement>())
+            foreach(var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
             {
                 int width = (int)child.GetSize().X;
                 if (!(child is IFixedSizeUiElement))
@@ -51,7 +51,7 @@ namespace UAlbion.Game.Gui.Controls
 
             int spareWidth = extents.Width - minWidth;
             int offset = extents.X;
-            foreach (var child in Children.OfType<IUiElement>())
+            foreach (var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
             {
                 int width = (int)child.GetSize().X;
                 var rect = new Rectangle(offset, extents.Y, width, extents.Height);

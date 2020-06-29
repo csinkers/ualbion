@@ -50,18 +50,23 @@ namespace UAlbion.Formats.Assets.Map
         protected void SerdesEvents(ISerializer s)
         {
             ushort eventCount = s.UInt16("EventCount", (ushort)Events.Count);
-            s.List(Events, eventCount, (i, x, serializer) 
-                => EventNode.Serdes(i, x, serializer, false, (ushort)Id));
 
-            foreach(var e in Events)
-                if(e.NextEventId >= eventCount)
-                    throw new InvalidOperationException();
+            if(Events != null) // Ensure ids match up
+                for (ushort i = 0; i < Events.Count; i++)
+                    Events[i].Id = i;
+
+            s.List(Events, eventCount, (i, x, serializer) 
+                => EventNode.Serdes((ushort)i, x, serializer, false, (ushort)Id));
+
+            foreach (var node in Events)
+                node.Unswizzle(Events);
+
             s.Check();
         }
 
         protected void SerdesChains(ISerializer s, int chainCount)
         {
-            var chainOffsets = Chains.Select(x => (ushort)x.Events[0].Id).ToList();
+            var chainOffsets = Chains.Select(x => x.Events[0].Id).ToList();
             for(int i = 0; i < chainCount; i++)
             {
                 if(s.Mode == SerializerMode.Reading)
@@ -101,38 +106,16 @@ namespace UAlbion.Formats.Assets.Map
             s.Check();
         }
 
-        protected void Unswizzle()
+        protected void Unswizzle() // Resolve event indices to pointers
         {
-            // Resolve event indices to pointers
-            foreach (var mapEvent in Events)
-            {
-                if (mapEvent.NextEventId.HasValue)
-                    mapEvent.NextEvent = Events[mapEvent.NextEventId.Value];
-
-                if (mapEvent is BranchNode q && q.NextEventWhenFalseId.HasValue)
-                    q.NextEventWhenFalse = Events[q.NextEventWhenFalseId.Value];
-            }
-
+            // Use map events if the event number is set, otherwise use the event set from the NPC's character sheet.
+            // Note: Event set loading requires IAssetManager, so can't be done directly by UAlbion.Formats code.
+            // Instead, the MapManager will call AttachEventSets with a callback to load the event sets.
             foreach (var npc in Npcs.Values)
-            {
-                // Use map events if the event number is set, otherwise use the event set from the NPC's character sheet.
-                // Note: Event set loading requires IAssetManager, so can't be done directly by UAlbion.Formats code.
-                // Instead, the MapManager will call AttachEventSets with a callback to load the event sets.
-                if (npc.EventNumber.HasValue)
-                    (npc.Chain, npc.Node) = ChainsByEventId[npc.EventNumber.Value];
-            }
+                npc.Unswizzle(x => ChainsByEventId[x]);
 
             foreach (var zone in Zones)
-            {
-                if (zone.EventNumber == null)
-                    continue;
-
-                var node = Events[zone.EventNumber.Value];
-                var chain = ChainsByEventId[zone.EventNumber.Value].Item1;
-                // ApiUtil.Assert(chain.Events.First() == node);
-                zone.Node = node;
-                zone.Chain = chain;
-            }
+                zone.Unswizzle(x => ChainsByEventId[x]);
 
             foreach (var position in Zones.Where(x => !x.Global).GroupBy(x => x.Y * Width + x.X))
             {
@@ -147,20 +130,20 @@ namespace UAlbion.Formats.Assets.Map
 #if DEBUG
             EventReferences = new IList<object>[Events.Count];
             foreach (var zone in Zones)
-                if (zone.EventNumber.HasValue)
-                    AddEventReference(zone.EventNumber.Value, zone);
+                if (zone.Node != null)
+                    AddEventReference(zone.Node.Id, zone);
 
             foreach (var npc in Npcs.Values)
-                if (npc.EventNumber.HasValue)
-                    AddEventReference(npc.EventNumber.Value, npc);
+                if (npc.Node != null)
+                    AddEventReference(npc.Node.Id, npc);
 
             foreach (var e in Events)
             {
-                if (e.NextEventId.HasValue)
-                    AddEventReference(e.NextEventId.Value, e);
+                if (e.Next != null)
+                    AddEventReference(e.Next.Id, e);
 
-                if (e is BranchNode branch && branch.NextEventWhenFalseId.HasValue)
-                    AddEventReference(branch.NextEventWhenFalseId.Value, e);
+                if (e is BranchNode branch && branch.NextIfFalse != null)
+                    AddEventReference(branch.NextIfFalse.Id, e);
             }
 #endif
         }

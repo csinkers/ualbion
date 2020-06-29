@@ -16,7 +16,7 @@ namespace UAlbion.Game.Gui.Inventory
         InventoryPage _page;
         PartyCharacterId _activeCharacter;
 
-        public InventoryScreen(InventoryConfig config) : base(DialogPositioning.Bottom)
+        public InventoryScreen(InventoryConfig config) : base(DialogPositioning.TopLeft)
         {
             On<InventoryModeEvent>(SetMode);
             On<InventoryChestModeEvent>(SetMode);

@@ -19,11 +19,11 @@ namespace UAlbion.Formats.MapEvents
         }
 
         public byte Unk2 { get; private set; } // Temp / permanent?
-        public byte ChainNumber { get; set; }
-        public byte Unk4 { get; set; }
-        public byte Unk5 { get; set; }
+        public byte ChainNumber { get; private set; }
+        public byte Unk4 { get; private set; }
+        public byte Unk5 { get; private set; }
         public ushort Unk6 { get; private set; }
-        public ushort Unk8 { get; set; }
+        public ushort Unk8 { get; private set; }
         public override string ToString() => $"disable_event_chain {ChainNumber} ({Unk2} {Unk4} {Unk5} {Unk6} {Unk8})";
         public override ModifyType SubType => ModifyType.DisableEventChain;
     }

@@ -26,10 +26,10 @@ namespace UAlbion.Formats.MapEvents
         public PartyCharacterId PartyMemberId { get; private set; }
 
         public byte Unk2 { get; private set; }
-        public byte Unk3 { get; set; }
-        public byte Unk4 { get; set; }
-        public byte Unk5 { get; set; }
-        public ushort Unk8 { get; set; }
+        public byte Unk3 { get; private set; }
+        public byte Unk4 { get; private set; }
+        public byte Unk5 { get; private set; }
+        public ushort Unk8 { get; private set; }
         public override string ToString() => $"add_party_member {PartyMemberId} ({Unk2} {Unk3} {Unk4} {Unk5} {Unk8})";
         public override ModifyType SubType => ModifyType.AddPartyMember;
     }

@@ -32,7 +32,7 @@ namespace UAlbion
 {
     static class Albion
     {
-        public static void RunGame(EventExchange global, IContainer services, IContainer coreServices, string baseDir, CommandLineOptions commandLine)
+        public static void RunGame(EventExchange global, IContainer services, string baseDir, CommandLineOptions commandLine)
         {
             PerfTracker.StartupEvent("Creating engine");
             using var engine = new VeldridEngine(commandLine.Backend, commandLine.UseRenderDoc)
@@ -45,7 +45,7 @@ namespace UAlbion
                 ;
 
             var backgroundThreadInitTask = Task.Run(() => RegisterComponents(global, services, baseDir, commandLine));
-            coreServices
+            services
                 .Add(new ShaderCache(
                     Path.Combine(baseDir, "Core", "Visual", "Shaders"),
                     Path.Combine(baseDir, "data", "ShaderCache")))
@@ -104,76 +104,67 @@ namespace UAlbion
 
             services
                 .Add(new GameState())
-                .Add(new Container("Clocks",
-                    new GameClock(),
-                    new IdleClock(),
-                    new SlowClock()))
+                .Add(new GameClock())
+                .Add(new IdleClock())
+                .Add(new SlowClock())
+                .Add(new DeviceObjectManager())
+                .Add(new SpriteManager())
+                .Add(new TextureManager())
+                .Add(new EventChainManager())
+                .Add(new Querier())
+                .Add(new MapManager())
+                .Add(new CollisionManager())
+                .Add(new SceneStack())
+                .Add(new SceneManager()
+                    .AddScene((GameScene)new EmptyScene()
+                        .Add(new PaletteManager()))
 
-                .Add(new Container("Graphics",
-                    new DeviceObjectManager(),
-                    new SpriteManager(),
-                    new TextureManager()))
+                    .AddScene((GameScene)new AutomapScene()
+                        .Add(new PaletteManager()))
 
-                .Add(new Container("Events",
-                    new EventChainManager(),
-                    new Querier()))
+                    .AddScene((GameScene)new FlatScene()
+                        .Add(new ConversationManager())
+                        .Add(new PaletteManager()))
 
-                .Add(new Container("Scenes",
-                    new MapManager(),
-                    new CollisionManager(),
-                    new SceneStack(),
-                    new SceneManager()
-                        .AddScene((GameScene)new EmptyScene()
-                            .Add(new PaletteManager()))
+                    .AddScene((GameScene)new DungeonScene()
+                        .Add(new ConversationManager())
+                        .Add(new PaletteManager()))
 
-                        .AddScene((GameScene)new AutomapScene()
-                            .Add(new PaletteManager()))
+                    .AddScene((GameScene)new MenuScene()
+                        .Add(new PaletteManager())
+                        .Add(new MainMenu())
+                        .Add(Sprite<PictureId>.ScreenSpaceSprite(
+                            PictureId.MenuBackground8,
+                            new Vector2(-1.0f, 1.0f),
+                            new Vector2(2.0f, -2.0f))))
 
-                        .AddScene((GameScene)new FlatScene()
-                            .Add(new ConversationManager())
-                            .Add(new PaletteManager()))
+                    .AddScene((GameScene)new InventoryScene()
+                        .Add(new ConversationManager())
+                        .Add(new PaletteManager())
+                        .Add(new InventoryInspector())
+                        .Add(new InventoryScreen(inventoryConfig))))
 
-                        .AddScene((GameScene)new DungeonScene()
-                            .Add(new ConversationManager())
-                            .Add(new PaletteManager()))
-
-                        .AddScene((GameScene)new MenuScene()
-                            .Add(new PaletteManager())
-                            .Add(new MainMenu())
-                            .Add(Sprite<PictureId>.ScreenSpaceSprite(
-                                PictureId.MenuBackground8,
-                                new Vector2(-1.0f, 1.0f),
-                                new Vector2(2.0f, -2.0f))))
-
-                        .AddScene((GameScene)new InventoryScene()
-                            .Add(new ConversationManager())
-                            .Add(new PaletteManager())
-                            .Add(new InventoryInspector())
-                            .Add(new InventoryScreen(inventoryConfig)))
-                    ))
-
-                .Add(new Container("GuiAndInput",
-                    new TextFormatter(),
-                    new TextManager(),
-                    new LayoutManager(),
-                    new DialogManager(),
-                    new DebugMapInspector(services)
-                        .AddBehaviour(new SpriteInstanceDataDebugBehaviour())
-                        .AddBehaviour(new FormatTextEventBehaviour())
-                        .AddBehaviour(new QueryEventDebugBehaviour()),
-                    new StatusBar(),
-                    new ContextMenu(),
-                    new CursorManager(),
-                    new InputManager()
-                        .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
-                        .RegisterInputMode(InputMode.World2D, new World2DInputMode())
-                        .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
-                        .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
-                        .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
-                        .RegisterMouseMode(MouseMode.RightButtonHeld, new RightButtonHeldMouseMode())
-                        .RegisterMouseMode(MouseMode.ContextMenu, new ContextMenuMouseMode()),
-                    new SelectionManager(),
-                    new InputBinder(InputConfig.Load(baseDir))))
+                .Add(new TextFormatter())
+                .Add(new TextManager())
+                .Add(new LayoutManager())
+                .Add(new DialogManager())
+                .Add(new DebugMapInspector(services)
+                    .AddBehaviour(new SpriteInstanceDataDebugBehaviour())
+                    .AddBehaviour(new FormatTextEventBehaviour())
+                    .AddBehaviour(new QueryEventDebugBehaviour()))
+                .Add(new StatusBar())
+                .Add(new ContextMenu())
+                .Add(new CursorManager())
+                .Add(new InputManager()
+                    .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
+                    .RegisterInputMode(InputMode.World2D, new World2DInputMode())
+                    .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
+                    .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
+                    .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
+                    .RegisterMouseMode(MouseMode.RightButtonHeld, new RightButtonHeldMouseMode())
+                    .RegisterMouseMode(MouseMode.ContextMenu, new ContextMenuMouseMode()))
+                .Add(new SelectionManager())
+                .Add(new InputBinder(InputConfig.Load(baseDir)))
                 ;
         }
     }

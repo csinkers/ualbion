@@ -42,7 +42,6 @@ namespace UAlbion.Formats.MapEvents
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.Argument = s.UInt16(nameof(Argument), e.Argument);
-            e.FalseEventId = ConvertMaxToNull.Serdes(nameof(FalseEventId), e.FalseEventId, s.UInt16);
 
             ApiUtil.Assert(e.Unk4 == 0);
             ApiUtil.Assert(e.Unk5 == 0);
@@ -60,6 +59,5 @@ namespace UAlbion.Formats.MapEvents
 
         public override string ToString() => $"query {QueryType} {Argument} ({Operation} {Immediate})";
         public override MapEventType EventType => MapEventType.Query;
-        public ushort? FalseEventId { get; set; }
     }
 }

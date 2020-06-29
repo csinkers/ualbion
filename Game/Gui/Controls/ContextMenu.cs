@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
@@ -31,7 +32,7 @@ namespace UAlbion.Game.Gui.Controls
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
             int maxOrder = order;
-            foreach (var child in Children.OfType<IUiElement>())
+            foreach (var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
             {
                 var size = child.GetSize();
                 int x = (int)_uiPosition.X;
@@ -59,7 +60,9 @@ namespace UAlbion.Game.Gui.Controls
             if (!keepOpen)
                 Close();
 
-            if (option.Event != null)
+            if (option.Event is IAsyncEvent asyncEvent)
+                RaiseAsync(asyncEvent, null);
+            else if (option.Event != null)
                 Raise(option.Event);
         }
 

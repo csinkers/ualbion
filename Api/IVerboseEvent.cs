@@ -1,4 +1,4 @@
 ﻿namespace UAlbion.Api
 {
-    public interface IVerboseEvent { }
+    public interface IVerboseEvent : IEvent { }
 }

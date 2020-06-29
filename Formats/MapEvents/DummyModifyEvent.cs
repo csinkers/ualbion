@@ -17,11 +17,11 @@ namespace UAlbion.Formats.MapEvents
         }
 
         public byte Unk2 { get; private set; }
-        public byte Unk3 { get; set; }
-        public byte Unk4 { get; set; }
-        public byte Unk5 { get; set; }
+        public byte Unk3 { get; private set; }
+        public byte Unk4 { get; private set; }
+        public byte Unk5 { get; private set; }
         public ushort Unk6 { get; private set; }
-        public ushort Unk8 { get; set; }
+        public ushort Unk8 { get; private set; }
         public override ModifyType SubType => ModifyType.Unk2;
     }
 }

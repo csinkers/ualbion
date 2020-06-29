@@ -23,12 +23,12 @@ namespace UAlbion.Formats.MapEvents
             return e;
         }
 
-        public byte LockStrength { get; set; }
-        public ItemId? KeyItemId { get; set; }
-        public byte ClosedMessageId { get; set; }
-        public byte OpenedMessageId { get; set; }
-        public ChestId ChestId { get; set; }
-        public ushort TrapEvent { get; set; }
+        public byte LockStrength { get; private set; }
+        public ItemId? KeyItemId { get; private set; }
+        public byte ClosedMessageId { get; private set; }
+        public byte OpenedMessageId { get; private set; }
+        public ChestId ChestId { get; private set; }
+        public ushort TrapEvent { get; private set; }
         public override string ToString() => $"open_chest {ChestId} Trap:{TrapEvent} Key:{KeyItemId} Lock:{LockStrength} Opened:{OpenedMessageId} Closed:{ClosedMessageId}";
         public override MapEventType EventType => MapEventType.Chest;
         public AssetType TextType { get; }

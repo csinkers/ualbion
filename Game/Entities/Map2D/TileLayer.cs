@@ -82,7 +82,7 @@ namespace UAlbion.Game.Entities.Map2D
             var instance = SpriteInstanceData.TopLeft(position, subImage.Size, subImage, 0);
 
             var zone = _logicalMap.GetZone(index);
-            int eventNum = zone?.EventNumber ?? -1;
+            int eventNum = zone?.Node?.Id ?? -1;
 
             instance.Flags = 0
 #if DEBUG
@@ -129,7 +129,7 @@ namespace UAlbion.Game.Entities.Map2D
             if (HighlightIndex.HasValue)
             {
                 var zone = _logicalMap.GetZone(HighlightIndex.Value);
-                _highlightEvent = zone?.EventNumber ?? -1;
+                _highlightEvent = zone?.Node?.Id ?? -1;
                 if (_highlightEvent == -1)
                     _highlightEvent = null;
             }

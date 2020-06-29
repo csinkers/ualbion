@@ -53,12 +53,7 @@ namespace UAlbion.Core
                 {
                     var @event = Event.Parse(command);
                     if (@event != null)
-                    {
-                        if (@event is AsyncEvent async)
-                            async.SetCallback(() => Console.WriteLine($"Async event \"{async}\" completed."));
-
                         logExchange.EnqueueEvent(@event);
-                    }
                     else
                         Console.WriteLine("Unknown event \"{0}\"", command);
                 }

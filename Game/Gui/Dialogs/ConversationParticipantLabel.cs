@@ -1,4 +1,5 @@
-﻿using UAlbion.Formats.AssetIds;
+﻿using System;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
@@ -9,27 +10,10 @@ namespace UAlbion.Game.Gui.Dialogs
 {
     public class ConversationParticipantLabel : Dialog
     {
-        IText GetName(ICharacterSheet sheet, bool isRight)
-        {
-            return new DynamicText(() =>
-            {
-                var settings = Resolve<IGameplaySettings>();
-                var name = sheet.GetName(settings.Language);
-                return new[] 
-                {
-                    new TextBlock(name)
-                    {
-                        Alignment = isRight ? TextAlignment.Right : TextAlignment.Left,
-                        Color = FontColor.White,
-                        Arrangement = TextArrangement.NoWrap,
-                    }
-                };
-            });
-        }
-
         public ConversationParticipantLabel(ICharacterSheet sheet, bool isRight)
             : base(isRight ? DialogPositioning.TopRight : DialogPositioning.TopLeft)
         {
+            if (sheet == null) throw new ArgumentNullException(nameof(sheet));
             var portraitId = sheet.PortraitId ?? SmallPortraitId.GibtEsNicht;
             var name = GetName(sheet, false);
 
@@ -74,5 +58,20 @@ namespace UAlbion.Game.Gui.Dialogs
 
              */
         }
+
+        IText GetName(ICharacterSheet sheet, bool isRight) => new DynamicText(() =>
+        {
+            var settings = Resolve<IGameplaySettings>();
+            var name = sheet.GetName(settings.Language);
+            return new[] 
+            {
+                new TextBlock(name)
+                {
+                    Alignment = isRight ? TextAlignment.Right : TextAlignment.Left,
+                    Color = FontColor.White,
+                    Arrangement = TextArrangement.NoWrap,
+                }
+            };
+        });
     }
 }

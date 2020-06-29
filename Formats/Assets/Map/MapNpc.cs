@@ -43,7 +43,6 @@ namespace UAlbion.Formats.Assets.Map
         public NpcCharacterId? Id { get; set; }
         // public SampleId? Sound { get; set; }
         public byte Sound { get; set; }
-        public ushort? EventNumber { get; set; }
         public ushort ObjectNumber { get; set; }
         public NpcFlags Flags { get; set; } // 1=Dialogue, 2=AutoAttack, 11=ReturnMsg
         public MovementType Movement { get; set; }
@@ -59,7 +58,11 @@ namespace UAlbion.Formats.Assets.Map
             npc.Id = (NpcCharacterId?)Tweak.Serdes(nameof(Id), (byte?)npc.Id, s.UInt8);
             // npc.Sound = (SampleId?)Tweak.Serdes(nameof(Sound), (byte?)npc.Sound, s.UInt8);
             npc.Sound = s.UInt8(nameof(Sound), npc.Sound);
-            npc.EventNumber = ConvertMaxToNull.Serdes(nameof(EventNumber), npc.EventNumber, s.UInt16);
+
+            ushort? eventNumber = ConvertMaxToNull.Serdes(nameof(npc.Node), npc.Node?.Id, s.UInt16);
+            if(eventNumber != null && npc.Node == null)
+                npc.Node = new DummyEventNode(eventNumber.Value);
+
             npc.ObjectNumber = Tweak.Serdes(nameof(ObjectNumber), npc.ObjectNumber, s.UInt16) ?? 0;
             npc.Flags = s.EnumU8(nameof(Flags), npc.Flags);
             npc.Movement = s.EnumU8(nameof(Movement), npc.Movement);
@@ -88,6 +91,12 @@ namespace UAlbion.Formats.Assets.Map
             }
         }
 
-        public override string ToString() => $"Npc{(int)Id} {Id} Obj{ObjectNumber} F:{Flags:x} M{Movement} Amount:{Unk8} Unk9:{Unk9} S{Sound} E{EventNumber}";
+        public void Unswizzle(Func<ushort, (EventChain, IEventNode)> getEvent)
+        {
+            if (Node is DummyEventNode dummy)
+                (Chain, Node) = getEvent(dummy.Id);
+        }
+
+        public override string ToString() => $"Npc{(int)Id} {Id} Obj{ObjectNumber} F:{Flags:x} M{Movement} Amount:{Unk8} Unk9:{Unk9} S{Sound} E{Node?.Id}";
     }
 }

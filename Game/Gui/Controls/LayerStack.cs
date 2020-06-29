@@ -21,12 +21,12 @@ namespace UAlbion.Game.Gui.Controls
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
-            foreach(var child in Children.OfType<IUiElement>())
+            foreach(var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
             {
                 var childSize = child.GetSize();
                 var childExtents = new Rectangle(
-                    extents.X + (int)(extents.Width - childSize.X) / 2,
-                    extents.Y + (int)(extents.Height - childSize.Y) / 2,
+                    extents.X,
+                    extents.Y,
                     (int)childSize.X,
                     (int)childSize.Y);
 

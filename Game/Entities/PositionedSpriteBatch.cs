@@ -17,6 +17,9 @@ namespace UAlbion.Game.Entities
 
         public DrawLayer RenderOrder => _sprite.Key.RenderOrder;
 
+        /// <summary>
+        /// Position of the sprite batch in normalised device coordinates.
+        /// </summary>
         public Vector3 Position
         {
             get => _position;

@@ -50,8 +50,7 @@ namespace UAlbion.Game.Tests
             var e = new YesNoPromptEvent(SystemTextId.MainMenu_DoYouReallyWantToQuit);
 
             bool? result = null;
-            e.SetCallback(() => { result = e.Response; });
-            ex.Raise(e, null);
+            ex.RaiseAsync<bool>(e, null, x => result = x);
             Assert.Null(result);
 
             var layout = lm.GetLayout();
@@ -68,8 +67,7 @@ namespace UAlbion.Game.Tests
 
             // Open another yes/no dialog
             e = new YesNoPromptEvent(SystemTextId.MainMenu_DoYouReallyWantToQuit);
-            e.SetCallback(() => { result = e.Response; });
-            ex.Raise(e, null);
+            ex.RaiseAsync<bool>(e, this, x => result = x);
             layout = lm.GetLayout();
             Assert.Equal(1, layout.Children.Count); // Should only be one top-level dialog
             var noText = layout.DepthFirstSearch(x => x.Element is TextLine txt && txt.ToString().Contains("\"No\"")).First();

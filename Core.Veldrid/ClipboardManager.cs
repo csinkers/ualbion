@@ -40,11 +40,11 @@ namespace UAlbion.Core.Veldrid
         static extern bool SetClipboardData(uint uFormat, IntPtr data);
 
 #elif Linux
-        void SetText(SetClipboardTextEvent e) { // TODO }
+        void SetText(SetClipboardTextEvent e) { /* TODO */ }
 #elif OSX
-        void SetText(SetClipboardTextEvent e) { // TODO }
+        void SetText(SetClipboardTextEvent e) { /* TODO */ }
 #else
-        void SetText(SetClipboardTextEvent e) { // TODO }
+        void SetText(SetClipboardTextEvent e) { /* TODO */ }
 #endif
     }
 }

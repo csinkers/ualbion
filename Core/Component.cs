@@ -25,12 +25,12 @@ namespace UAlbion.Core
         readonly IDictionary<Type, Handler> _handlers = new Dictionary<Type, Handler>();
         bool _isActive = true; // If false, then this component will not be attached to the exchange even if its parent is.
 
-        protected Component() => Id = Interlocked.Increment(ref _nextId);
+        protected Component() => ComponentId = Interlocked.Increment(ref _nextId);
 
         /// <summary>
         /// Sequential id to uniquely identify a given component
         /// </summary>
-        public int Id { get; }
+        public int ComponentId { get; }
 
         /// <summary>
         /// True if this component is currently attached to an event exchange

@@ -10,11 +10,13 @@ using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Game.Debugging;
-using UAlbion.Game.Events;
 using UAlbion.Game.Input;
-using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 using UAlbion.Game.Veldrid.Audio;
+#if DEBUG
+using UAlbion.Game.Events;
+using UAlbion.Game.Settings;
+#endif
 
 namespace UAlbion.Game.Veldrid.Debugging
 {
@@ -356,7 +358,7 @@ namespace UAlbion.Game.Veldrid.Debugging
                     }
 
                     bool active = component.IsActive;
-                    ImGui.Checkbox(component.Id.ToString(), ref active);
+                    ImGui.Checkbox(component.ComponentId.ToString(), ref active);
                     ImGui.SameLine();
                     if (active != component.IsActive)
                         component.IsActive = active;

@@ -11,8 +11,6 @@ namespace UAlbion.Game.Gui.Inventory
 {
     public sealed class VisualInventorySlot : UiElement
     {
-        // const string TimerName = "InventorySlot.ClickTimer";
-        // readonly ButtonFrame _frame;
         readonly UiSpriteElement<AssetId> _sprite;
         readonly UiSpriteElement<AssetId> _overlay;
         readonly Func<IReadOnlyItemSlot> _getSlot;
@@ -21,20 +19,12 @@ namespace UAlbion.Game.Gui.Inventory
         int _frameNumber;
 
         readonly Button _button;
-        // bool _isClickTimerPending;
 
         ItemData Item => _getSlot().Item as ItemData;
 
         public VisualInventorySlot(ItemSlotId slotId, IText amountSource, Func<IReadOnlyItemSlot> getSlot)
         {
-            // On<UiLeftClickEvent>(OnClick);
-            // On<UiRightClickEvent>(OnRightClicked);
             On<IdleClockEvent>(e => _frameNumber++);
-            /* On<TimerElapsedEvent>(e =>
-            {
-                if (e.Id == TimerName)
-                    OnTimer();
-            }); */
 
             _getSlot = getSlot;
             _overlay = new UiSpriteElement<AssetId>(CoreSpriteId.UiBroken.ToAssetId()) { IsActive = false };
@@ -109,6 +99,7 @@ namespace UAlbion.Game.Gui.Inventory
         event Action Blur;
 
         public bool Hoverable { get => _button.Hoverable; set => _button.Hoverable = value; }
+        public Vector2 LastUiPosition { get; private set; }
 
         void Rebuild()
         {
@@ -134,38 +125,8 @@ namespace UAlbion.Game.Gui.Inventory
         public override int Render(Rectangle extents, int order)
         {
             Rebuild();
+            LastUiPosition = extents.Position;
             return base.Render(extents, order);
         }
-/*
-        void OnClick(UiLeftClickEvent e)
-        {
-            e.Propagating = false;
-            if (_isClickTimerPending) // If they double-clicked...
-            {
-                DoubleClicked?.Invoke(this, EventArgs.Empty);
-                _isClickTimerPending = false; // Ensure the single-click behaviour doesn't happen.
-            }
-            else // For the first click, just start the double-click timer.
-            {
-                // TODO: If single item, fire the pickup event immediately
-                Raise(new StartTimerEvent(TimerName, 300, this));
-                _isClickTimerPending = true;
-            }
-        }
-
-        void OnTimer()
-        {
-            if (!_isClickTimerPending) // They've already double-clicked
-                return;
-
-            Clicked?.Invoke(this, EventArgs.Empty);
-            _isClickTimerPending = false;
-        }
-
-        void OnRightClicked(UiRightClickEvent e)
-        {
-            e.Propagating = false;
-            RightClicked?.Invoke(this, EventArgs.Empty);
-        }*/
     }
 }

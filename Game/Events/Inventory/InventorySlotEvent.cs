@@ -3,7 +3,7 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Events.Inventory
 {
-    public abstract class InventorySlotEvent : GameEvent, IInventoryEvent
+    public abstract class InventorySlotEvent : GameEvent, IInventoryEvent, IAsyncEvent
     {
         protected InventorySlotEvent(InventoryType inventoryType, ushort inventoryId, ItemSlotId slotId)
         {

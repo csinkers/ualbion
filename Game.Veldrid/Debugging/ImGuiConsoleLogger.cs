@@ -14,6 +14,7 @@ namespace UAlbion.Game.Veldrid.Debugging
 {
     public class ImGuiConsoleLogger : Component
     {
+        // TODO: Initial size
         const int MaxHistory = 1000;
         readonly object _syncRoot = new object();
         readonly Queue<LogEventArgs> _history = new Queue<LogEventArgs>();

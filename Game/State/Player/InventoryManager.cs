@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
@@ -28,9 +29,10 @@ namespace UAlbion.Game.State.Player
         public InventorySwapEvent ReturnItemInHandEvent { get; private set; }
         public InventoryManager(Func<InventoryId, Inventory> getInventory)
         {
-            On<InventorySwapEvent>(OnSlotEvent);
-            On<InventoryPickupAllEvent>(OnSlotEvent);
-            On<InventoryGiveItemEvent>(OnGiveItem);
+            OnAsync<InventorySwapEvent>(OnSlotEvent);
+            OnAsync<InventoryPickupAllEvent>(OnSlotEvent);
+            OnAsync<InventoryGiveItemEvent>(OnGiveItem);
+            OnAsync<InventoryDiscardEvent>(OnDiscard);
             _getInventory = getInventory;
             ItemInHand = new ReadOnlyItemSlot(_hand);
         }
@@ -171,37 +173,47 @@ namespace UAlbion.Game.State.Player
             }
         }
 
-        void OnGiveItem(InventoryGiveItemEvent e)
+        bool OnGiveItem(InventoryGiveItemEvent e, Action continuation)
         {
             var inventory = _getInventory((InventoryId)e.MemberId);
 
             if (_hand.Item is Gold)
                 PutDown(inventory.Gold);
-            if (_hand.Item is Rations)
+            else if (_hand.Item is Rations)
                 PutDown(inventory.Rations);
-            if (!(_hand.Item is ItemData item))
-                return; // Unknown or null
-
-            ItemSlot slot = null;
-            if (item.IsStackable)
+            else if (!(_hand.Item is ItemData item))
+                return false; // Unknown or null
+            else
             {
-                slot = inventory.Slots.FirstOrDefault(x =>
-                    x.Item is ItemData existing &&
-                    existing.Id == item.Id);
+                ItemSlot slot = null;
+                if (item.IsStackable)
+                {
+                    slot = inventory.Slots.FirstOrDefault(x =>
+                        x.Item is ItemData existing &&
+                        existing.Id == item.Id);
+                }
+
+                slot ??= inventory.Slots.FirstOrDefault(x => x.Item == null);
+
+                if (slot != null)
+                    PutDown(slot);
             }
-
-            slot ??= inventory.Slots.FirstOrDefault(x => x.Item == null);
-
-            if(slot != null)
-                PutDown(slot);
 
             Update(inventory.Id);
             Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
+            continuation();
+            return true;
         }
 
         void GetQuantity(bool discard, IInventory inventory, ItemSlotId slotId, Action<int> continuation)
         {
             var slot = inventory.GetSlot(slotId);
+            if (slot.Amount == 1)
+            {
+                continuation(1);
+                return;
+            }
+
             var (maxQuantity, text, icon) = slot.Item switch
             {
                 Gold _ => (
@@ -235,14 +247,14 @@ namespace UAlbion.Game.State.Player
             }
         }
 
-        void OnSlotEvent(InventorySlotEvent e)
+        bool OnSlotEvent(InventorySlotEvent e, Action continuation)
         {
             var slotId = new InventorySlotId(e.InventoryType, e.InventoryId, e.SlotId);
             if (!DoesSlotAcceptItemInHand(e.InventoryType, e.InventoryId, e.SlotId))
                 slotId = new InventorySlotId(slotId.Type, slotId.Id, GetBestSlot(slotId));
 
             if (slotId.Slot == ItemSlotId.None)
-                return;
+                return false;
 
             var inventory = _getInventory(slotId.Inventory);
             var slot = inventory.GetSlot(slotId.Slot);
@@ -250,25 +262,82 @@ namespace UAlbion.Game.State.Player
             {
                 case InventoryAction.Pickup:
                     if (e is InventoryPickupAllEvent || slot.Amount == 1)
+                    {
                         PickupItem(slot, null);
+                        continuation();
+                    }
                     else
                     {
                         GetQuantity(false, inventory, e.SlotId, quantity =>
                         {
                             if (quantity > 0)
                                 PickupItem(slot, (ushort)quantity);
+
+                            Update(slotId.Inventory);
+                            Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
+                            continuation();
                         });
                     }
 
                     break;
-                case InventoryAction.PutDown:  PutDown(slot);       break;
-                case InventoryAction.Swap:     SwapItems(slot);     break;
-                case InventoryAction.Coalesce: CoalesceItems(slot); break;
-                case InventoryAction.NoCoalesceFullStack: return;
+                case InventoryAction.PutDown:  PutDown(slot);       continuation(); break;
+                case InventoryAction.Swap:     SwapItems(slot);     continuation(); break;
+                case InventoryAction.Coalesce: CoalesceItems(slot); continuation(); break;
+                case InventoryAction.NoCoalesceFullStack: continuation(); break;
             }
 
             Update(slotId.Inventory);
             Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
+            return true;
+        }
+
+        bool OnDiscard(InventoryDiscardEvent e, Action continuation)
+        {
+            var inventoryId = new InventoryId(e.InventoryType, e.InventoryId);
+            var inventory = _getInventory(inventoryId);
+            GetQuantity(true, inventory, e.SlotId, quantity =>
+            {
+                if (quantity <= 0)
+                {
+                    continuation();
+                    return;
+                }
+
+                var slot = inventory.GetSlot(e.SlotId);
+                ushort itemsToDrop = Math.Min((ushort) quantity, slot.Amount);
+
+                var prompt = slot.Item switch
+                {
+                    Gold _ => SystemTextId.Gold_ReallyThrowTheGoldAway,
+                    Rations _ => SystemTextId.Gold_ReallyThrowTheRationsAway,
+                    ItemData _ when itemsToDrop == 1 => SystemTextId.InvMsg_ReallyThrowThisItemAway,
+                    _ => SystemTextId.InvMsg_ReallyThrowTheseItemsAway,
+                };
+
+                RaiseAsync(new YesNoPromptEvent(prompt), response =>
+                {
+                    if (!response)
+                    {
+                        continuation();
+                        return;
+                    }
+
+                    if (slot.ItemId.HasValue)
+                    {
+                        for (int i = 0; i < itemsToDrop; i++)
+                            ItemTransition.GravityFromNormPosition(
+                                Exchange,
+                                new Vector2(e.NormX, e.NormY),
+                                slot.ItemId.Value);
+                    }
+
+                    slot.Amount -= itemsToDrop;
+                    Update(inventoryId);
+                    Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
+                    continuation();
+                });
+            });
+            return true;
         }
 
         void CoalesceItems(ItemSlot slot)
@@ -307,7 +376,6 @@ namespace UAlbion.Game.State.Player
             QuantityChangeOperation operation,
             int amount)
         {
-            var context = Resolve<IEventManager>().Context;
             var inventory = _getInventory(id);
             // TODO: Ensure weight limit is not exceeded
             // TODO: Handle non-stacking items.
@@ -354,8 +422,9 @@ namespace UAlbion.Game.State.Player
 
             Update(id);
 
-            if(context.Source is EventSource.Map mapEventSource && contents is IItem item)
-                ItemTransition.CreateTransitionFromTilePosition(Exchange, mapEventSource.X, mapEventSource.Y, item.Id);
+            var context = Resolve<IEventManager>().Context;
+            if (context?.Source is EventSource.Map mapEventSource && contents is IItem item)
+                ItemTransition.LinearFromTilePosition(Exchange, mapEventSource.X, mapEventSource.Y, item.Id);
 
             return true;
         }

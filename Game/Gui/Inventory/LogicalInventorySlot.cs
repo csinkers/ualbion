@@ -66,7 +66,6 @@ namespace UAlbion.Game.Gui.Inventory
         }
 
         public override string ToString() => $"InventorySlot:{_id}";
-
         IInventory Inventory => Resolve<IGameState>().GetInventory(_id.Inventory);
         IReadOnlyItemSlot Slot => Inventory.GetSlot(_id.Slot);
 
@@ -163,6 +162,7 @@ namespace UAlbion.Game.Gui.Inventory
             if (!(slotInfo?.Item is ItemData item))
                 return;
 
+            var itemPosition = window.UiToNorm(_visual.LastUiPosition);
             var heading = tf.Center().NoWrap().Fat().Format(item.Id);
 
             IText S(StringId textId, bool disabled = false)
@@ -189,7 +189,7 @@ namespace UAlbion.Game.Gui.Inventory
                         ? (IEvent)new HoverTextEvent(
                             tf.Format(
                                 SystemTextId.InvMsg_ThisIsAVitalItem))
-                        : new InventoryDiscardEvent(_id.Type, _id.Id, _id.Slot),
+                        : new InventoryDiscardEvent(itemPosition.X, itemPosition.Y,_id.Type, _id.Id, _id.Slot),
                     ContextMenuGroup.Actions,
                     isPlotItem),
 

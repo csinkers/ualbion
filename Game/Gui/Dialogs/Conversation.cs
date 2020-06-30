@@ -237,7 +237,7 @@ namespace UAlbion.Game.Gui.Dialogs
         void OnDataChange(DataChangeEvent e)
         {
             if (e.Property == DataChangeEvent.ChangeProperty.ReceiveOrRemoveItem && e.Mode == QuantityChangeOperation.AddAmount)
-                ItemTransition.CreateTransitionFromConversation(Exchange, e.ItemId);
+                ItemTransition.LinearFromConversation(Exchange, e.ItemId);
         }
 
         bool TriggerWordAction(ushort wordId) => TriggerAction(ActionType.Word, 0, wordId);

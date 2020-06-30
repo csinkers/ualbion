@@ -25,6 +25,7 @@ namespace UAlbion.Game.Veldrid.Debugging
 
     public class DebugMapInspector : Component
     {
+        // TODO: Initial size
         readonly IDictionary<Type, Func<DebugInspectorAction, Reflector.ReflectedObject, object>> _behaviours =
             new Dictionary<Type, Func<DebugInspectorAction, Reflector.ReflectedObject, object>>();
 

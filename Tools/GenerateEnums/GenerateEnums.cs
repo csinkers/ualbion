@@ -80,13 +80,6 @@ namespace GenerateEnums
                 }
             }
 
-            ItemConfig itemConfig = ItemConfig.Load(baseDir);
-            enums["ItemId"] = new EnumData { Name = "ItemId", Type = "ushort" };
-            foreach (var item in itemConfig.Items)
-                enums["ItemId"].Entries.Add(string.IsNullOrEmpty(item.Value.Name)
-                    ? new EnumEntry { Name = $"Unknown{item.Key}", Value = item.Key }
-                    : new EnumEntry { Name = Sanitise(item.Value.Name), Value= item.Key});
-
             CoreSpriteConfig coreSpriteConfig = CoreSpriteConfig.Load(baseDir);
             enums["CoreSpriteId"] = new EnumData { Name = "CoreSpriteId", Type = "byte" };
             foreach (var item in coreSpriteConfig.CoreSpriteIds)

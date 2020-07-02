@@ -53,7 +53,7 @@ namespace UAlbion.Game
                 case (QueryEvent q, QueryType.TriggerType):          continuation((ushort)context.Source.Trigger == q.Argument); return true;;
                 case (QueryVerbEvent verb, QueryType.ChosenVerb):    continuation(context.Source.Trigger.HasFlag((TriggerType)(1 << (int)verb.Verb))); return true;
                 case (QueryItemEvent q, QueryType.UsedItemId):       continuation(context.Source is EventSource.Item item && item.ItemId == q.ItemId); return true;
-                case (_, QueryType.PreviousActionResult):            continuation(context.LastEventResult); return true;
+                case (_, QueryType.PreviousActionResult):            continuation(Resolve<IEventManager>().LastEventResult); return true;
 
                 case (_, QueryType.IsScriptDebugModeActive): { continuation(false); return true; }
                 case (_, QueryType.IsNpcActive):             { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query NpcActive")); continuation(true); return true; }

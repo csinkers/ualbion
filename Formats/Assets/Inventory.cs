@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Numerics;
 using SerdesNet;
 
 namespace UAlbion.Formats.Assets
@@ -27,6 +28,7 @@ namespace UAlbion.Formats.Assets
 
         public InventoryId Id { get; }
         public ItemSlot[] Slots { get; }
+        public IEnumerable<ItemSlot> BackpackSlots { get { for (int i = 0; i < (int)ItemSlotId.NormalSlotCount; i++) yield return Slots[i]; } }
         public ItemSlot Gold => Slots[(int)ItemSlotId.Gold];
         public ItemSlot Rations => Slots[(int)ItemSlotId.Rations];
         public ItemSlot Neck => Slots[(int)ItemSlotId.Neck];
@@ -102,6 +104,13 @@ namespace UAlbion.Formats.Assets
             if (slotNumber < 0 || slotNumber >= Slots.Length)
                 return null;
             return Slots[slotNumber];
+        }
+
+        public void SetSlotUiPosition(ItemSlotId itemSlotId, Vector2 position)
+        {
+            var slot = GetSlot(itemSlotId);
+            if (slot != null)
+                slot.LastUiPosition = position;
         }
 
         public Inventory DeepClone()

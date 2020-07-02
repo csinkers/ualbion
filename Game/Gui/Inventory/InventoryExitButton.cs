@@ -4,6 +4,7 @@ using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.State.Player;
 
 namespace UAlbion.Game.Gui.Inventory
 {
@@ -11,21 +12,34 @@ namespace UAlbion.Game.Gui.Inventory
     {
         UiSpriteElement<CoreSpriteId> _sprite;
         ButtonState _state;
+        event Action Click;
 
-        public InventoryExitButton(Action action)
+        public InventoryExitButton()
         {
-            On<HoverEvent>(e => _state = ButtonState.Hover);
+            On<HoverEvent>(e =>
+            {
+                var im = Resolve<IInventoryManager>();
+                if (im?.ItemInHand?.Item == null)
+                    _state = ButtonState.Hover;
+            });
             On<BlurEvent>(e => _state = ButtonState.Normal);
-            On<UiLeftClickEvent>(e => _state = ButtonState.Clicked);
+            On<UiLeftClickEvent>(e =>
+            {
+                var im = Resolve<IInventoryManager>();
+                if (im?.ItemInHand?.Item == null)
+                    _state = ButtonState.Clicked;
+            });
             On<UiLeftReleaseEvent>(e =>
             {
                 if (_state != ButtonState.Clicked)
                     return;
 
-                action();
                 _state = ButtonState.Normal;
+                Click?.Invoke();
             });
         }
+
+        public InventoryExitButton OnClick(Action callback) { Click += callback; return this; }
 
         protected override void Subscribed()
         {

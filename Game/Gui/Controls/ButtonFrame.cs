@@ -88,6 +88,9 @@ namespace UAlbion.Game.Gui.Controls
             {
                 _sprite?.Dispose();
 
+                if (instanceCount == 0)
+                    return;
+
                 var key = new SpriteKey(commonColors.BorderTexture, order, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
                 _sprite = sm.Borrow(key, instanceCount, this);
             }

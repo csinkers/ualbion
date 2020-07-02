@@ -1,4 +1,5 @@
-﻿using UAlbion.Formats.AssetIds;
+﻿using System.Numerics;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets
 {
@@ -12,5 +13,6 @@ namespace UAlbion.Formats.Assets
         public ItemSlotFlags Flags => _slot.Flags;
         public IContents Item => _slot.Item;
         public ItemId? ItemId => _slot.ItemId;
+        public Vector2 LastUiPosition => _slot.LastUiPosition;
     }
 }

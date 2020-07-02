@@ -5,7 +5,7 @@
     "fr": "Langue"
   },
   "TakeAll": {
-    "en": "Take all",
+    "en": "^Take all",
     "de": "Nimm alles",
     "fr": "Prendre touts"
   } 

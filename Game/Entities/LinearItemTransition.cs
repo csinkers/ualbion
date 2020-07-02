@@ -13,15 +13,17 @@ namespace UAlbion.Game.Entities
         readonly Vector2 _fromPosition;
         readonly Vector2 _toPosition;
         readonly float _transitionTimeSeconds;
+        readonly Action _continuation;
         float _elapsedTime;
 
-        public LinearItemTransition(T spriteId, int subImage, Vector2 fromPosition, Vector2 toPosition, float transitionTimeSeconds, Vector2 size)
+        public LinearItemTransition(T spriteId, int subImage, Vector2 fromPosition, Vector2 toPosition, float transitionTimeSeconds, Vector2 size, Action continuation)
         {
             On<EngineUpdateEvent>(e => Update(e.DeltaSeconds));
 
             _fromPosition = fromPosition;
             _toPosition = toPosition;
             _transitionTimeSeconds = transitionTimeSeconds;
+            _continuation = continuation;
 
             _sprite = AttachChild(new Sprite<T>(
                 spriteId,
@@ -42,6 +44,7 @@ namespace UAlbion.Game.Entities
             if (t > 1.0f)
             {
                 Remove();
+                _continuation?.Invoke();
                 return;
             }
 

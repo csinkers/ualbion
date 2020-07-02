@@ -12,7 +12,6 @@ namespace UAlbion.Formats.MapEvents
         public IEventNode LastNode { get; set; }
         public EventSource Source { get; }
         public bool ClockWasRunning { get; set; }
-        public bool LastEventResult { get; set; }
         public Action CompletionCallback { get; set; }
         public EventContextStatus Status { get; set; } = EventContextStatus.Ready;
         public override string ToString() => $"Context Status:{Status} Src:{Source} Node:{Node}";

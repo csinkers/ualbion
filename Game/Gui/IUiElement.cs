@@ -43,6 +43,4 @@ namespace UAlbion.Game.Gui
         /// <param name="parent">The LayoutNode corresponding to this element's parent element.</param>
         int Layout(Rectangle extents, int order, LayoutNode parent);
     }
-
-    public interface IFixedSizeUiElement { } // Any elements with this interface won't get stretched to fill available space
 }

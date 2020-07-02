@@ -13,8 +13,9 @@ namespace UAlbion.Game.Entities
         protected static readonly object SyncRoot = new object();
     }
 
-    public class GravityItemTransition<T> : GravityItemTransition where T : Enum
+    class GravityItemTransition<T> : GravityItemTransition where T : Enum
     {
+        readonly Action _continuation;
         const float Gravity = 9.8f;
         const float InitialX = 2.0f;
         const float InitialY = 2.2f;
@@ -22,8 +23,9 @@ namespace UAlbion.Game.Entities
         readonly Sprite<T> _sprite;
         Vector2 _velocity;
 
-        public GravityItemTransition(T spriteId, int subImage, Vector2 fromPosition, Vector2 size)
+        public GravityItemTransition(T spriteId, int subImage, Vector2 fromPosition, Vector2 size, Action continuation)
         {
+            _continuation = continuation;
             On<EngineUpdateEvent>(e => Update(e.DeltaSeconds));
 
             lock (SyncRoot)
@@ -50,6 +52,7 @@ namespace UAlbion.Game.Entities
             if (_sprite.Position.Y > UiConstants.StatusBarExtents.Bottom)
             {
                 Remove();
+                _continuation?.Invoke();
                 return;
             }
 

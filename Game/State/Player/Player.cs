@@ -4,6 +4,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
 
 namespace UAlbion.Game.State.Player
@@ -21,6 +22,7 @@ namespace UAlbion.Game.State.Player
         {
             On<InventoryChangedEvent>(InventoryChanged);
             On<EngineUpdateEvent>(EngineUpdate);
+            On<SetPlayerStatusUiPositionEvent>(e => { if (id == e.Id) StatusBarUiPosition = new Vector2(e.CentreX, e.CentreY); });
 
             Id = id;
             _base = sheet ?? throw new ArgumentNullException(nameof(sheet));
@@ -43,6 +45,7 @@ namespace UAlbion.Game.State.Player
         public IEffectiveCharacterSheet Effective { get; private set; }
         public IEffectiveCharacterSheet Apparent { get; }
         public Func<Vector3> GetPosition { get; set; }
+        public Vector2 StatusBarUiPosition { get; private set; }
         public override string ToString() => $"Player {Id}";
 
         void InventoryChanged(InventoryChangedEvent e)

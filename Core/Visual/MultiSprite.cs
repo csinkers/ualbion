@@ -53,6 +53,7 @@ namespace UAlbion.Core.Visual
                 lease.Owner = caller;
 #endif
                 _leases.Add(lease);
+                VerifyConsistency();
                 return lease;
             }
         }
@@ -60,8 +61,9 @@ namespace UAlbion.Core.Visual
         internal void Shrink(SpriteLease leaseToRemove)
         {
             // TODO: Use a more efficient algorithm, e.g. look for equal sized lease at end of list and swap, use linked list for lease list etc
+            VerifyConsistency();
 
-            lock(_syncRoot)
+            lock (_syncRoot)
             {
                 PerfTracker.IncrementFrameCounter("Sprite Returns");
                 bool shifting = false;
@@ -83,6 +85,7 @@ namespace UAlbion.Core.Visual
                         lease.To -= leaseToRemove.Length;
                     }
                 }
+                VerifyConsistency();
 
                 if ((double)ActiveInstances / Instances.Length < ShrinkFactor)
                 {
@@ -101,6 +104,23 @@ namespace UAlbion.Core.Visual
                     }
                 }
             }
+        }
+
+        void VerifyConsistency()
+        {
+#if DEBUG
+            if (_leases.Count > 0)
+            {
+                // Assert that all leases are in order
+                foreach(var lease in _leases)
+                    ApiUtil.Assert(lease.Length > 0);
+                ApiUtil.Assert(_leases[0].From == 0);
+                for (int i = 1; i < _leases.Count; i++)
+                    ApiUtil.Assert(_leases[i - 1].To == _leases[i].From);
+                ApiUtil.Assert(_leases[^1].To == ActiveInstances);
+            }
+            else ApiUtil.Assert(ActiveInstances == 0);
+#endif
         }
 
         internal Span<SpriteInstanceData> GetSpan(SpriteLease lease)

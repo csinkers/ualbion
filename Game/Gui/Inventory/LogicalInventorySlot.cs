@@ -57,7 +57,7 @@ namespace UAlbion.Game.Gui.Inventory
                 }, x => _version);
             }
 
-            _visual = AttachChild(new VisualInventorySlot(_id.Slot, amountSource, () => Slot))
+            _visual = AttachChild(new VisualInventorySlot(_id, amountSource, () => Slot))
                 .OnClick(() => Raise(new InventorySwapEvent(_id.Type, _id.Id, _id.Slot)))
                 .OnDoubleClick(() => Raise(new InventoryPickupAllEvent(_id.Type, _id.Id, _id.Slot)))
                 .OnRightClick(OnRightClick)
@@ -162,7 +162,7 @@ namespace UAlbion.Game.Gui.Inventory
             if (!(slotInfo?.Item is ItemData item))
                 return;
 
-            var itemPosition = window.UiToNorm(_visual.LastUiPosition);
+            var itemPosition = window.UiToNorm(slotInfo.LastUiPosition);
             var heading = tf.Center().NoWrap().Fat().Format(item.Id);
 
             IText S(StringId textId, bool disabled = false)

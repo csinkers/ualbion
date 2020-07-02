@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UAlbion.Core.Events;
 
 namespace UAlbion.Core.Visual
@@ -22,6 +23,7 @@ namespace UAlbion.Core.Visual
 
         public SpriteLease Borrow(SpriteKey key, int length, object caller)
         {
+            if (length <= 0) throw new ArgumentOutOfRangeException(nameof(length));
             lock (_syncRoot)
             {
                 if (!_sprites.ContainsKey(key))

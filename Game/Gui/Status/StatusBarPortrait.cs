@@ -124,6 +124,14 @@ namespace UAlbion.Game.Gui.Status
             int maxOrder = order;
             var portraitExtents = new Rectangle(extents.X, extents.Y + (highlighted ? 0 : 3), extents.Width, extents.Height - 6);
 
+            var centreX = (portraitExtents.Left + portraitExtents.Right) / 2;
+            var centreY = (portraitExtents.Top + portraitExtents.Bottom) / 2;
+            if ((int)PartyMember.StatusBarUiPosition.X != centreX || 
+                (int)PartyMember.StatusBarUiPosition.Y != centreY)
+            {
+                Raise(new SetPlayerStatusUiPositionEvent(PartyMember.Id, centreX, centreY));
+            }
+
             maxOrder = Math.Max(maxOrder, func(_portrait, portraitExtents, order));
             maxOrder = Math.Max(maxOrder, func(_health, new Rectangle(
                     extents.X + 5,
@@ -156,12 +164,6 @@ namespace UAlbion.Game.Gui.Status
         void OnClick(UiLeftClickEvent e)
         {
             e.Propagating = false;
-            var inventoryManager = Resolve<IInventoryManager>();
-            if(inventoryManager?.ItemInHand.Item != null)
-            {
-                Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyMember.Id, ItemSlotId.None));
-                return;
-            }
 
             if (_isClickTimerPending) // If they double-clicked...
             {
@@ -182,10 +184,18 @@ namespace UAlbion.Game.Gui.Status
             if (!_isClickTimerPending) // They've already double-clicked
                 return;
 
+            _isClickTimerPending = false;
+
+            var inventoryManager = Resolve<IInventoryManager>();
+            if (inventoryManager?.ItemInHand.Item != null)
+            {
+                Raise(new InventoryGiveItemEvent(PartyMember.Id));
+                return;
+            }
+
             var memberId = PartyMember?.Id;
             if (memberId.HasValue)
                 Raise(new SetPartyLeaderEvent(memberId.Value));
-            _isClickTimerPending = false;
         }
 
         void Hover(HoverEvent e)

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
-using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
+using UAlbion.Game.Events.Transitions;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
 
@@ -15,6 +16,9 @@ namespace UAlbion.Game.Gui.Dialogs
 {
     public class Conversation : Component
     {
+        static readonly Vector2 ConversationPositionLeft = new Vector2(20, 20); // For give item transitions
+        static readonly Vector2 ConversationPositionRight = new Vector2(335, 20);
+
         readonly PartyCharacterId _partyMemberId;
         readonly ICharacterSheet _npc;
         readonly IDictionary<WordId, WordStatus> _topics = new Dictionary<WordId, WordStatus>();
@@ -236,8 +240,17 @@ namespace UAlbion.Game.Gui.Dialogs
 
         void OnDataChange(DataChangeEvent e)
         {
-            if (e.Property == DataChangeEvent.ChangeProperty.ReceiveOrRemoveItem && e.Mode == QuantityChangeOperation.AddAmount)
-                ItemTransition.LinearFromConversation(Exchange, e.ItemId);
+            if (e.Property == DataChangeEvent.ChangeProperty.ReceiveOrRemoveItem &&
+                e.Mode == QuantityChangeOperation.AddAmount)
+            {
+                var transitionEvent = new LinearItemTransitionEvent(e.ItemId,
+                    (int)ConversationPositionRight.X,
+                    (int)ConversationPositionRight.Y,
+                    (int)ConversationPositionLeft.X,
+                    (int)ConversationPositionLeft.Y, 
+                    null);
+                Raise(transitionEvent);
+            }
         }
 
         bool TriggerWordAction(ushort wordId) => TriggerAction(ActionType.Word, 0, wordId);

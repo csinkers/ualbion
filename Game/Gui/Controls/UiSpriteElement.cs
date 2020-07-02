@@ -76,11 +76,12 @@ namespace UAlbion.Game.Gui.Controls
             if (!_dirty && _lastPosition == position && _lastSize == size)
                 return order;
 
-            var instances = _sprite.Access();
-            instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, _subId, _flags);
             _lastPosition = position;
             _lastSize = size;
             _dirty = false;
+
+            var instances = _sprite.Access();
+            instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, _subId, _flags);
 
             return order;
         }

@@ -73,7 +73,7 @@ namespace UAlbion.Game.Gui.Inventory
                 new Spacing(0, 2),
                 moneyAndFoodStack,
                 new Spacing(0, 9),
-                new InventoryExitButton(exitButtonCallback)
+                new InventoryExitButton().OnClick(exitButtonCallback)
             ) { Greedy = false };
 
             AttachChild(stack);

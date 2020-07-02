@@ -1,6 +1,7 @@
 ﻿using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
+using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
@@ -11,9 +12,12 @@ namespace UAlbion.Game.Gui.Inventory
     {
         public InventoryMidPane(PartyCharacterId activeCharacter,  InventoryConfig.PlayerInventory config)
         {
-            var background = new FixedPositionStack();
-            background.Add(new UiSpriteElement<FullBodyPictureId>((FullBodyPictureId)activeCharacter), 1, -3);
-            AttachChild(background);
+            var backgroundStack = new FixedPositionStack();
+            var background = new UiSpriteElement<FullBodyPictureId>((FullBodyPictureId)activeCharacter);
+            var backgroundButton = new Button(background) { Theme = ButtonTheme.Invisible }
+                .OnClick(() => Raise(new InventorySwapEvent(InventoryType.Player, (ushort)activeCharacter, ItemSlotId.CharacterBody)));
+            backgroundStack.Add(backgroundButton, 1, -3);
+            AttachChild(backgroundStack);
 
             var bodyStack = new FixedPositionStack();
             foreach (var bodyPart in config)

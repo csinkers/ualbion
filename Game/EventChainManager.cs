@@ -25,6 +25,7 @@ namespace UAlbion.Game
         }
 
         public EventContext Context => _threadContexts.Value.FirstOrDefault();
+        public bool LastEventResult { get; set; }
         public IEnumerable<EventContext> DebugActiveContexts => _activeContexts;
 
         bool HandleBoolEvent(EventContext context, IAsyncEvent<bool> boolEvent, IBranchNode branch) // Return value = whether to return.
@@ -33,10 +34,10 @@ namespace UAlbion.Game
             int waiting = RaiseAsync(boolEvent, result =>
             {
 #if DEBUG
-                Raise(new LogEvent(LogEvent.Level.Info, $"if ({context.Node.Event}) => {context.LastEventResult}"));
+                Raise(new LogEvent(LogEvent.Level.Info, $"if ({context.Node.Event}) => {result}"));
 #endif
                 context.Node = result ? branch.Next : branch.NextIfFalse;
-                context.LastEventResult = result;
+                LastEventResult = result;
                 context.Status = EventContextStatus.Ready;
             });
 

@@ -103,6 +103,8 @@ namespace UAlbion.Game.Gui.Controls
             return c;
         }
 
+        public static ButtonFrame.ColorScheme Invisible(ButtonState state) => new ButtonFrame.ColorScheme { Alpha = 0 };
+
         public static ButtonFrame.ColorScheme InventorySlot(ButtonState state)
         {
             var c = new ButtonFrame.ColorScheme

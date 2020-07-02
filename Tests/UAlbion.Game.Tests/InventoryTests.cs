@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
@@ -37,8 +38,14 @@ namespace UAlbion.Game.Tests
 
             _exchange = new EventExchange(new LogExchange());
             _im = new InventoryManager(x => _inventories[x]);
+            var wm = new WindowManager();
+            wm.Window = new MockWindow(1920, 1080);
+            var cm = new MockCursorManager() { Position = new Vector2(1, 1) };
+
             _exchange
                 .Register<IInventoryManager>(_im)
+                .Attach(wm)
+                .Attach(cm)
                 .Attach(this);
         }
 

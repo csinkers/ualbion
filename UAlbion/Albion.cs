@@ -13,6 +13,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game;
 using UAlbion.Game.Debugging;
+using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
 using UAlbion.Game.Gui.Controls;
@@ -165,6 +166,7 @@ namespace UAlbion
                     .RegisterMouseMode(MouseMode.ContextMenu, new ContextMenuMouseMode()))
                 .Add(new SelectionManager())
                 .Add(new InputBinder(InputConfig.Load(baseDir)))
+                .Add(new ItemTransitionManager())
                 ;
         }
     }

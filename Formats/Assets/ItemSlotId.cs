@@ -100,7 +100,8 @@ namespace UAlbion.Formats.Assets
                     x == ItemSlotId.RightFinger ||
                     x == ItemSlotId.Feet ||
                     x == ItemSlotId.LeftFinger ||
-                    x == ItemSlotId.RightHandOrTail => true,
+                    x == ItemSlotId.RightHandOrTail ||
+                    x == ItemSlotId.CharacterBody => true,
                 _ => false
             };
         }

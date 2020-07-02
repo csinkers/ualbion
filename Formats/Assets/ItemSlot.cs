@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
@@ -7,35 +8,49 @@ namespace UAlbion.Formats.Assets
 {
     public class ItemSlot : IReadOnlyItemSlot
     {
-        ushort _amount;
-        public ItemSlot(InventorySlotId id) => Id = id;
-        public InventorySlotId Id { get; }
-        public ushort Amount
-        {
-            get => _amount;
-            set
-            {
-                if (Item is ItemData && value > byte.MaxValue)
-                {
-                    ApiUtil.Assert($"Tried to put more than {byte.MaxValue} items in an inventory slot");
-                    _amount = byte.MaxValue;
-                }
-                else if (value > short.MaxValue)
-                {
-                    ApiUtil.Assert($"Tried to put more than {short.MaxValue} items in an inventory slot");
-                    _amount = (ushort)short.MaxValue;
-                }
-                else _amount = value;
+        // Note: an amount of ushort.MaxValue is used for merchant slots containing an unlimited supply of an item (marked with a * in the UI)
+        public const ushort Unlimited = ushort.MaxValue;
+        public const ushort MaxItemCount = 99;
 
-                if (_amount == 0)
-                    Item = null;
-            }
+        void CheckAssumptions()
+        {
+            if (Item == null && Amount != 0)
+                ApiUtil.Assert("Item is not set but amount is non-zero");
+
+            if (Item != null && Amount == 0)
+                ApiUtil.Assert("Item is set but amount is zero");
+
+            if (Item is ItemData && Amount > MaxItemCount && Amount != Unlimited)
+                ApiUtil.Assert($"Amount ({Amount}) is above the limit of {MaxItemCount}x{Item}");
+
+            if (Amount > short.MaxValue && Amount != Unlimited)
+                ApiUtil.Assert($"Tried to put more than {short.MaxValue} items in a gold/rations inventory slot");
         }
 
+        IContents _item;
+        public ItemSlot(InventorySlotId id) => Id = id;
+        public InventorySlotId Id { get; }
         public byte Charges { get; set; }
         public byte Enchantment { get; set; }
+        public Vector2 LastUiPosition { get; set; }
         public ItemSlotFlags Flags { get; set; }
-        public IContents Item { get; set; }
+        public ushort Amount { get; set; }
+
+        public IContents Item
+        {
+            get => Amount == 0 ? null : _item;
+            set
+            {
+                _item = value;
+                if (_item == null)
+                {
+                    Amount = 0;
+                    Charges = 0;
+                    Enchantment = 0;
+                    Flags = 0;
+                }
+            }
+        }
 
         public ItemId? ItemId =>
             Item switch
@@ -52,8 +67,11 @@ namespace UAlbion.Formats.Assets
 
         public static ItemSlot Serdes(InventorySlotId id, ItemSlot slot, ISerializer s)  // 6 per slot
         {
-            slot ??= new ItemSlot(id) { Amount = 0, Item = null };
-            slot.Amount = s.UInt8(nameof(slot.Amount), (byte)slot.Amount);
+            slot ??= new ItemSlot(id);
+            slot.Amount = s.UInt8(nameof(slot.Amount), (byte)(slot.Amount == Unlimited ? 0xff : slot.Amount));
+            if (slot.Amount == 0xff)
+                slot.Amount = Unlimited;
+
             slot.Charges = s.UInt8(nameof(slot.Charges), slot.Charges);
             slot.Enchantment = s.UInt8(nameof(slot.Enchantment), slot.Enchantment);
             slot.Flags = s.EnumU8(nameof(slot.Flags), slot.Flags);
@@ -65,34 +83,20 @@ namespace UAlbion.Formats.Assets
             return slot;
         }
 
-        public void TransferFrom(ItemSlot other, ushort? quantity)
+        ushort TransferInner(ItemSlot other, ushort? quantity) // Return the number of items transferred
         {
-            if (other == null)
-            {
-                ApiUtil.Assert("Tried to transfer from non-existent slot");
-                return;
-            }
-
             switch (other.Item)
             {
-                case null:
-                    if(Item != null)
-                        ApiUtil.Assert($"Item destroyed! ({Amount}x{Item})");
-                    Item = null;
-                    Amount = 0;
-                    Charges = 0;
-                    Enchantment = 0;
-                    Flags = 0;
-                    break;
+                case null: return 0;
 
                 case Gold _ when Item is Gold:
                 case Rations _ when Item is Rations:
                 {
-                    ushort amountToTransfer = Math.Min(other.Amount, quantity ?? (ushort)(short.MaxValue));
+                    ushort amountToTransfer = Math.Min(other.Amount, quantity ?? (ushort)short.MaxValue);
                     amountToTransfer = Math.Min((ushort)(short.MaxValue - Amount), amountToTransfer);
                     Amount += amountToTransfer;
                     other.Amount -= amountToTransfer;
-                    break;
+                    return amountToTransfer;
                 }
 
                 case ItemData newItem when Item is ItemData item && item.Id == newItem.Id:
@@ -100,14 +104,19 @@ namespace UAlbion.Formats.Assets
                     if (!item.IsStackable)
                     {
                         ApiUtil.Assert($"Tried to combine non-stackable item {item}");
-                        return;
+                        return 0;
                     }
 
-                    ushort amountToTransfer = Math.Min(other.Amount, quantity ?? byte.MaxValue);
-                    amountToTransfer = Math.Min((ushort)(byte.MaxValue - Amount), amountToTransfer);
-                    Amount += amountToTransfer;
-                    other.Amount -= amountToTransfer;
-                    break;
+                    ushort amountToTransfer = Math.Min(other.Amount, quantity ?? MaxItemCount);
+                    if (Amount != Unlimited)
+                    {
+                        amountToTransfer = Math.Min((ushort) (MaxItemCount - Amount), amountToTransfer);
+                        Amount += amountToTransfer;
+                    }
+
+                    if (other.Amount != Unlimited)
+                        other.Amount -= amountToTransfer;
+                    return amountToTransfer;
                 }
 
                 case { } when Item == null:
@@ -116,24 +125,39 @@ namespace UAlbion.Formats.Assets
                     Charges = other.Charges;
                     Enchantment = other.Enchantment;
                     Flags = other.Flags;
+                    ushort max = other.ItemId == AssetIds.ItemId.Gold || other.ItemId == AssetIds.ItemId.Rations 
+                        ? (ushort)short.MaxValue 
+                        : MaxItemCount;
 
-                    ushort amountToTransfer = Math.Min(other.Amount, quantity ?? byte.MaxValue);
-                    amountToTransfer = Math.Min((ushort)(byte.MaxValue - Amount), amountToTransfer);
+                    ushort amountToTransfer = Math.Min(other.Amount, quantity ?? max);
+                    amountToTransfer = Math.Min((ushort)(max - Amount), amountToTransfer);
                     Amount = amountToTransfer;
-                    other.Amount -= amountToTransfer;
-                    break;
+                    if(other.Amount != Unlimited)
+                        other.Amount -= amountToTransfer;
+                    return amountToTransfer;
                 }
 
                 default: 
                     ApiUtil.Assert($"Tried to combine different items: {Item} and {other.Item}");
-                    break;
+                    return 0;
             }
-
-            if (other.Amount == 0 && other.Item is ItemData)
-                other.Clear();
         }
 
-        public void Set(IItem item, ushort amount, ItemSlotFlags flags = 0, byte charges = 0, byte enchantment = 0) // Just for tests
+        public ushort TransferFrom(ItemSlot other, ushort? quantity) // Return the number of items transferred
+        {
+            if (other == null) throw new ArgumentNullException(nameof(other));
+            if (quantity == 0) throw new ArgumentOutOfRangeException(nameof(quantity));
+            CheckAssumptions();
+            other.CheckAssumptions();
+
+            ushort itemsTransferred = TransferInner(other, quantity);
+
+            CheckAssumptions();
+            other.CheckAssumptions();
+            return itemsTransferred;
+        }
+
+        public void Set(IContents item, ushort amount, ItemSlotFlags flags = 0, byte charges = 0, byte enchantment = 0) // Just for tests
         {
             Item = item;
             Amount = amount;

@@ -31,7 +31,7 @@ namespace UAlbion.Game.Gui.Inventory
             };
 
             var topStack = new HorizontalStack(
-                new GroupingFrame(itemPic),
+                new NonGreedy(new GroupingFrame(itemPic)),
                 new Spacing(2,0),
                 new GroupingFrame(new FixedSize(151, 30, new UiTextBuilder(stringId)))
             );
@@ -41,7 +41,7 @@ namespace UAlbion.Game.Gui.Inventory
             var stack = new VerticalStack(
                 topStack,
                 new Spacing(0, 5),
-                new Slider(() => _quantity, x => _quantity = x, 0, max, formatFunc),
+                new FixedSize(106, 14, new Slider(() => _quantity, x => _quantity = x, 0, max, formatFunc)),
                 new Spacing(0, 4),
                 new FixedSize(52, 13,
                     new Button(SystemTextId.MsgBox_OK) { DoubleFrame = true }.OnClick(Close))

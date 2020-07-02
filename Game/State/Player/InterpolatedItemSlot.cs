@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Formats.Assets;
 
@@ -22,5 +23,6 @@ namespace UAlbion.Game.State.Player
         public byte Enchantment => _b().Enchantment;
         public ItemSlotFlags Flags => _b().Flags;
         public IContents Item => _b().Item;
+        public Vector2 LastUiPosition => _b().LastUiPosition;
     }
 }

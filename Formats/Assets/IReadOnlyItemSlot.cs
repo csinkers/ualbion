@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Formats.Assets
+﻿using System.Numerics;
+
+namespace UAlbion.Formats.Assets
 {
     public interface IReadOnlyItemSlot
     {
@@ -7,5 +9,6 @@
         byte Enchantment { get; }
         ItemSlotFlags Flags { get; }
         IContents Item { get; }
+        Vector2 LastUiPosition { get; }
     }
 }

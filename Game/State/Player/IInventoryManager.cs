@@ -1,5 +1,5 @@
-﻿using UAlbion.Formats.Assets;
-using UAlbion.Formats.MapEvents;
+﻿using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Gui.Inventory;
 
 namespace UAlbion.Game.State.Player
@@ -9,6 +9,8 @@ namespace UAlbion.Game.State.Player
         ReadOnlyItemSlot ItemInHand { get; }
         InventoryMode ActiveMode { get; }
         InventoryAction GetInventoryAction(InventorySlotId id);
-        bool TryChangeInventory(InventoryId id, IContents contents, QuantityChangeOperation operation, int amount);
+        int GetItemCount(InventoryId id, ItemId item);
+        ushort TryGiveItems(InventoryId id, ItemSlot donor, ushort? amount); // Return the number of items that were given
+        ushort TryTakeItems(InventoryId id, ItemSlot acceptor, ItemId item, ushort? amount); // Return the number of items that were taken
     }
 }

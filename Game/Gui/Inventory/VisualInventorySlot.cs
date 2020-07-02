@@ -3,6 +3,7 @@ using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Text;
@@ -14,25 +15,26 @@ namespace UAlbion.Game.Gui.Inventory
         readonly UiSpriteElement<AssetId> _sprite;
         readonly UiSpriteElement<AssetId> _overlay;
         readonly Func<IReadOnlyItemSlot> _getSlot;
+        readonly InventorySlotId _slotId;
+        readonly Button _button;
         readonly Vector2 _size;
 
         int _frameNumber;
 
-        readonly Button _button;
+        IContents Contents => _getSlot().Item;
 
-        ItemData Item => _getSlot().Item as ItemData;
-
-        public VisualInventorySlot(ItemSlotId slotId, IText amountSource, Func<IReadOnlyItemSlot> getSlot)
+        public VisualInventorySlot(InventorySlotId slotId, IText amountSource, Func<IReadOnlyItemSlot> getSlot)
         {
             On<IdleClockEvent>(e => _frameNumber++);
 
+            _slotId = slotId;
             _getSlot = getSlot;
             _overlay = new UiSpriteElement<AssetId>(CoreSpriteId.UiBroken.ToAssetId()) { IsActive = false };
             var text = new UiText(amountSource);
 
-            if (!slotId.IsSpecial())
+            if (!slotId.Slot.IsSpecial())
             {
-                _size = slotId.IsBodyPart() ? new Vector2(16, 16) : new Vector2(16, 20);
+                _size = slotId.Slot.IsBodyPart() ? new Vector2(16, 16) : new Vector2(16, 20);
                 _sprite = new UiSpriteElement<AssetId>(ItemSpriteId.Nothing.ToAssetId())
                 {
                     SubId = (int)ItemSpriteId.Nothing
@@ -48,11 +50,11 @@ namespace UAlbion.Game.Gui.Inventory
                     {
                         Padding = -1,
                         Margin = 0,
-                        Theme = slotId.IsBodyPart()
+                        Theme = slotId.Slot.IsBodyPart()
                             ? (ButtonFrame.ThemeFunction) ButtonTheme.Default
                             : ButtonTheme.InventorySlot,
 
-                        IsPressed = !slotId.IsBodyPart()
+                        IsPressed = !slotId.Slot.IsBodyPart()
                     }
                     .OnHover(() => Hover?.Invoke())
                     .OnBlur(() => Blur?.Invoke())
@@ -64,7 +66,7 @@ namespace UAlbion.Game.Gui.Inventory
             else
             {
                 _sprite = new UiSpriteElement<AssetId>(
-                    slotId == ItemSlotId.Gold
+                    slotId.Slot == ItemSlotId.Gold
                         ? CoreSpriteId.UiGold.ToAssetId()
                         : CoreSpriteId.UiFood.ToAssetId());
 
@@ -99,33 +101,36 @@ namespace UAlbion.Game.Gui.Inventory
         event Action Blur;
 
         public bool Hoverable { get => _button.Hoverable; set => _button.Hoverable = value; }
-        public Vector2 LastUiPosition { get; private set; }
 
-        void Rebuild()
+        void Rebuild(in Rectangle extents)
         {
             var slot = _getSlot();
-            var item = Item;
-            if (item == null)
+            var contents = Contents;
+            _button.AllowDoubleClick = slot.Amount > 1;
+
+            if ((int)slot.LastUiPosition.X != extents.X || (int)slot.LastUiPosition.Y != extents.Y)
+                Raise(new SetInventorySlotUiPositionEvent(_slotId.Type, _slotId.Id, _slotId.Slot, extents.X, extents.Y));
+
+            if (contents is ItemData item)
+            {
+                int frames = item.IconAnim == 0 ? 1 : item.IconAnim;
+                while (_frameNumber >= frames)
+                    _frameNumber -= frames;
+
+                int itemSpriteId = (int) item.Icon + _frameNumber;
+                _sprite.SubId = itemSpriteId;
+                _overlay.IsActive = (slot.Flags & ItemSlotFlags.Broken) != 0;
+            }
+            else // Nothing, or gold/rations (subId should still be 0)
             {
                 _sprite.SubId = (int)ItemSpriteId.Nothing;
                 _overlay.IsActive = false;
-                return;
             }
-
-            int frames = item.IconAnim == 0 ? 1 : item.IconAnim;
-            while (_frameNumber >= frames)
-                _frameNumber -= frames;
-
-            int itemSpriteId = (int)item.Icon + _frameNumber;
-            _sprite.SubId = itemSpriteId;
-            _overlay.IsActive = (slot.Flags & ItemSlotFlags.Broken) != 0;
-            _button.AllowDoubleClick = slot.Amount > 1;
         }
 
         public override int Render(Rectangle extents, int order)
         {
-            Rebuild();
-            LastUiPosition = extents.Position;
+            Rebuild(extents);
             return base.Render(extents, order);
         }
     }

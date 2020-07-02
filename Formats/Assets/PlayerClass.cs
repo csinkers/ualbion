@@ -32,6 +32,7 @@ namespace UAlbion.Formats.Assets
         IskaiMask = 0xc,
         MagicianMask = 0x138,
         HumanMask = 0xfff3,
+        EveryoneMask = 0xffff,
     }
 
     public static class PlayerClassExtensions

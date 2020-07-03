@@ -15,15 +15,26 @@ namespace UAlbion.Game
 
         readonly IList<(string, float)> _activeTimers = new List<(string, float)>();
         float _elapsedTimeThisGameFrame;
-        int _slowTicksRemaining;
+        int _ticksRemaining;
+        int _stoppedFrames;
+        float _stoppedMs;
         Action _pendingContinuation;
 
         public GameClock()
         {
-            On<StartClockEvent>(e => IsRunning = true);
-            On<StopClockEvent>(e => IsRunning = false);
+            On<StartClockEvent>(e =>
+            {
+                GameTrace.Log.ClockStart(_stoppedFrames, _stoppedMs);
+                _stoppedFrames = 0;
+                _stoppedMs = 0;
+                IsRunning = true;
+            });
+            On<StopClockEvent>(e =>
+            {
+                GameTrace.Log.ClockStop();
+                IsRunning = false;
+            });
             On<EngineUpdateEvent>(OnEngineUpdate);
-            On<SlowClockEvent>(OnSlowClock);
             On<StartTimerEvent>(StartTimer);
 
             OnAsync<UpdateEvent>((e, c) =>
@@ -31,8 +42,9 @@ namespace UAlbion.Game
                 if (IsRunning || _pendingContinuation != null)
                     return false;
 
+                GameTrace.Log.ClockUpdating(e.Cycles);
                 _pendingContinuation = c;
-                _slowTicksRemaining = e.Cycles;
+                _ticksRemaining = e.Cycles * 3;
                 IsRunning = true;
                 return true;
             });
@@ -40,21 +52,6 @@ namespace UAlbion.Game
 
         public float ElapsedTime { get; private set; }
         public bool IsRunning { get; private set; }
-
-        void OnSlowClock(SlowClockEvent e)
-        {
-            if (_slowTicksRemaining <= 0)
-                return;
-
-            _slowTicksRemaining -= e.Delta;
-            if (_slowTicksRemaining > 0)
-                return;
-
-            IsRunning = false;
-            var continuation = _pendingContinuation;
-            _pendingContinuation = null;
-            continuation?.Invoke();
-        }
 
         void StartTimer(StartTimerEvent e) => _activeTimers.Add((e.Id, ElapsedTime + e.IntervalMilliseconds / 1000));
 
@@ -79,7 +76,7 @@ namespace UAlbion.Game
                 {
                     var lastGameTime = state.Time;
                     var newGameTime = lastGameTime.AddSeconds(e.DeltaSeconds * GameSecondsPerSecond);
-                    ((IComponent)state).Receive(new SetTimeEvent(newGameTime), this);
+                    ((IComponent) state).Receive(new SetTimeEvent(newGameTime), this);
 
                     if (newGameTime.Hour != lastGameTime.Hour)
                         Raise(new HourElapsedEvent());
@@ -94,17 +91,39 @@ namespace UAlbion.Game
                 if (_elapsedTimeThisGameFrame > 4 * TickDurationSeconds)
                     _elapsedTimeThisGameFrame = 4 * TickDurationSeconds;
 
-                while (_elapsedTimeThisGameFrame >= TickDurationSeconds)
+                while (_elapsedTimeThisGameFrame >= TickDurationSeconds && IsRunning)
                 {
                     _elapsedTimeThisGameFrame -= TickDurationSeconds;
-                    Raise(new FastClockEvent(1));
+                    RaiseTick();
 
                     if ((state?.TickCount ?? 0) % TicksPerCacheCycle == TicksPerCacheCycle - 1)
                         Raise(new CycleCacheEvent());
                 }
             }
+            else
+            {
+                _stoppedFrames++;
+                _stoppedMs += 1000.0f * e.DeltaSeconds;
+            }
 
             Raise(new PostUpdateEvent());
+        }
+
+        void RaiseTick()
+        {
+            Raise(new FastClockEvent(1));
+            if (_ticksRemaining <= 0)
+                return;
+
+            _ticksRemaining --;
+            if (_ticksRemaining > 0)
+                return;
+
+            IsRunning = false;
+            GameTrace.Log.ClockUpdateComplete();
+            var continuation = _pendingContinuation;
+            _pendingContinuation = null;
+            continuation?.Invoke();
         }
     }
 }

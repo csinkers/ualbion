@@ -59,7 +59,7 @@ namespace UAlbion.Formats.Assets
                 Rations _ => AssetIds.ItemId.Rations,
                 ItemData item => item.Id,
                 ItemProxy item => item.Id,
-                _ => null
+                _ => (ItemId?)null
             };
 
         public ItemSlot DeepClone() => (ItemSlot)MemberwiseClone();

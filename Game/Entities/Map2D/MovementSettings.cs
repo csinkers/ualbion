@@ -29,8 +29,8 @@ namespace UAlbion.Game.Entities.Map2D
         }
 
         public IDictionary<SpriteAnimation, int[]> Frames { get; }
-        public int TicksPerTile { get; private set; } = 12; // Number of game ticks it takes to move across a map tile
-        public int TicksPerFrame { get; private set; } = 9; // Number of game ticks it takes to advance to the next animation frame
+        public int TicksPerTile { get; } = 12; // Number of game ticks it takes to move across a map tile
+        public int TicksPerFrame { get; } = 9; // Number of game ticks it takes to advance to the next animation frame
         public int MinTrailDistance { get; private set; } = 6; // L=12
         public int MaxTrailDistance { get; private set; } = 12; // L=18 Max number of positions between each character in the party. Looks best if coprime to TicksPerPile and TicksPerFrame.
         public float GetDepth(float y) => _getDepth(y);

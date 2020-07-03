@@ -13,7 +13,7 @@ namespace UAlbion.Formats.MapEvents
         {
             int memberId = int.Parse(parts[1]);
             byte textId = byte.Parse(parts[2]);
-            return new PartyMemberTextEvent(textId, (PartyCharacterId?)memberId);
+            return new PartyMemberTextEvent(textId, memberId == 0 ? null : (PartyCharacterId?)(memberId-1));
         }
 
         public PartyMemberTextEvent(byte textId, PartyCharacterId? portraitId)

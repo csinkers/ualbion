@@ -26,5 +26,10 @@ namespace UAlbion.Game
         {
             WriteEvent(2, oldDir, desiredDir, facingDir, fromX, fromY, toX, toY, frame);
         }
+
+        public void ClockStart(int stoppedFrames, float stoppedMs) => WriteEvent(3, stoppedFrames, stoppedMs);
+        public void ClockStop() => WriteEvent(4);
+        public void ClockUpdating(int cycles) => WriteEvent(5, cycles);
+        public void ClockUpdateComplete() => WriteEvent(6);
     }
 }

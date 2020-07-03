@@ -86,7 +86,7 @@ namespace UAlbion.Formats.MapEvents
     }
 
     [Event("text")]
-    public class TextEvent : IAsyncEvent
+    public class TextEvent : Event, IAsyncEvent
     {
         public TextEvent(byte textId, TextLocation? location, SmallPortraitId? portrait)
         {
@@ -96,7 +96,7 @@ namespace UAlbion.Formats.MapEvents
         }
 
         [EventPart("text_id")] public byte TextId { get; }
-        [EventPart("location")] public TextLocation? Location { get; }
-        [EventPart("portrait_id")] public SmallPortraitId? PortraitId { get; }
+        [EventPart("location", true)] public TextLocation? Location { get; }
+        [EventPart("portrait_id", true)] public SmallPortraitId? PortraitId { get; }
     }
 }

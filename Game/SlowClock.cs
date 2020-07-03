@@ -11,10 +11,7 @@ namespace UAlbion.Game
         int _ticks;
         int _frameCount;
 
-        public SlowClock()
-        {
-            On<FastClockEvent>(OnUpdate);
-        }
+        public SlowClock() => On<FastClockEvent>(OnUpdate);
 
         void OnUpdate(FastClockEvent updateEvent)
         {

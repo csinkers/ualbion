@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
@@ -86,6 +87,8 @@ namespace UAlbion.Game.Input
                 activeMode.IsActive = true;
 
             MouseMode = e.Mode;
+            // Raise(new LogEvent(LogEvent.Level.Info,
+            //     $"MouseMode => {MouseMode} (Stack: {string.Join(", ", _mouseModeStack)})"));
         }
 
         void SetInputMode(SetInputModeEvent e)
@@ -101,6 +104,8 @@ namespace UAlbion.Game.Input
                 activeMode.IsActive = true;
 
             InputMode = e.Mode;
+            // Raise(new LogEvent(LogEvent.Level.Info,
+            //     $"InputMode => {InputMode} (Stack: {string.Join(", ", _inputModeStack)})"));
         }
     }
 }

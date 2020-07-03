@@ -65,7 +65,10 @@ namespace UAlbion.Game.Gui.Dialogs
             _optionsWindow = AttachChild(new ConversationOptionsWindow { IsActive = false});
             _topicsWindow = AttachChild(new ConversationTopicWindow { IsActive = false });
             _topicsWindow.WordSelected += TopicsWindowOnWordSelected;
+        }
 
+        public void StartDialogue()
+        {
             TriggerAction(ActionType.StartDialogue, 0, 0);
         }
 
@@ -79,7 +82,6 @@ namespace UAlbion.Game.Gui.Dialogs
 
         void Close()
         {
-            IsActive = false;
             Remove();
             Complete?.Invoke(this, EventArgs.Empty);
         }

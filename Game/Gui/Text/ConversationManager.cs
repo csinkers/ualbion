@@ -171,14 +171,10 @@ namespace UAlbion.Game.Gui.Text
             var party = Resolve<IParty>();
             var assets = Resolve<IAssetManager>();
             var npc = assets.LoadNpc(e.NpcId);
-            _conversation = AttachChild(new Conversation(party?.Leader ?? PartyCharacterId.Tom, npc));
 
-            _conversation.Complete += (sender, args) =>
-            {
-                _conversation.Remove();
-                _conversation = null;
-                continuation();
-            };
+            _conversation = AttachChild(new Conversation(party?.Leader ?? PartyCharacterId.Tom, npc));
+            _conversation.Complete += (sender, args) => { _conversation = null; continuation(); };
+            _conversation.StartDialogue();
             return true;
         }
 
@@ -195,6 +191,7 @@ namespace UAlbion.Game.Gui.Text
 
             _conversation = AttachChild(new Conversation(PartyCharacterId.Tom, npc));
             _conversation.Complete += (sender, args) => { _conversation = null; continuation(); };
+            _conversation.StartDialogue();
             return true;
         }
     }

@@ -68,7 +68,7 @@ namespace UAlbion.Formats.Assets.Map
             map.SerdesAutomap(s);
             map.SerdesChains(s, 64);
 
-            if (s.Mode != SerializerMode.Reading)
+            if (s.Mode == SerializerMode.Reading)
                 map.Unswizzle();
 
             return map;
@@ -79,7 +79,7 @@ namespace UAlbion.Formats.Assets.Map
             ushort automapInfoCount = s.UInt16("AutomapInfoCount", (ushort)Automap.Count);
             if (automapInfoCount != 0xffff)
             {
-                s.List(Automap, automapInfoCount, AutomapInfo.Serdes);
+                s.List(nameof(Automap), Automap, automapInfoCount, AutomapInfo.Serdes);
                 s.Check();
             }
 

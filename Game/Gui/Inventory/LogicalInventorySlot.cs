@@ -3,6 +3,7 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
@@ -34,7 +35,7 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 amountSource = new DynamicText(() =>
                 {
-                    var gold = Inventory.Gold.Amount;
+                    var gold = Inventory?.Gold.Amount ?? 0;
                     return new[] { new TextBlock($"{gold / 10}.{gold % 10}") };
                 }, x => _version);
             }
@@ -42,7 +43,7 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 amountSource = new DynamicText(() =>
                 {
-                    var food = Inventory.Rations.Amount;
+                    var food = Inventory?.Rations.Amount ?? 0;
                     return new[] { new TextBlock(food.ToString()) };
                 }, x => _version);
             }
@@ -67,7 +68,7 @@ namespace UAlbion.Game.Gui.Inventory
 
         public override string ToString() => $"InventorySlot:{_id}";
         IInventory Inventory => Resolve<IGameState>().GetInventory(_id.Inventory);
-        IReadOnlyItemSlot Slot => Inventory.GetSlot(_id.Slot);
+        IReadOnlyItemSlot Slot => Inventory?.GetSlot(_id.Slot);
 
         void Blur()
         {
@@ -85,7 +86,7 @@ namespace UAlbion.Game.Gui.Inventory
             var inventory = Resolve<IGameState>().GetInventory(_id.Inventory);
             var tf = Resolve<ITextFormatter>();
 
-            var slotInfo = inventory.GetSlot(_id.Slot);
+            var slotInfo = Slot;
             string itemName = null;
             if (slotInfo?.Item is ItemData item)
                 itemName = assets.LoadString(item.Id, settings.Gameplay.Language);
@@ -181,38 +182,7 @@ namespace UAlbion.Game.Gui.Inventory
             // Read (e.g. metalmagic knowledge, maps)
 
             bool isPlotItem = (item.Flags & ItemFlags.PlotItem) != 0;
-            var options = new List<ContextMenuOption>
-            {
-                new ContextMenuOption(
-                    S(SystemTextId.InvPopup_Drop, isPlotItem),
-                    isPlotItem
-                        ? (IEvent)new HoverTextEvent(
-                            tf.Format(
-                                SystemTextId.InvMsg_ThisIsAVitalItem))
-                        : new InventoryDiscardEvent(itemPosition.X, itemPosition.Y,_id.Type, _id.Id, _id.Slot),
-                    ContextMenuGroup.Actions,
-                    isPlotItem),
-
-                new ContextMenuOption(
-                    S(SystemTextId.InvPopup_Examine),
-                    new InventoryExamineEvent(item.Id),
-                    ContextMenuGroup.Actions)
-            };
-
-            if (item.TypeId == ItemType.Document)
-                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_Read), null, ContextMenuGroup.Actions));
-
-            if (item.TypeId == ItemType.SpellScroll)
-                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_LearnSpell), null, ContextMenuGroup.Actions));
-
-            if (item.TypeId == ItemType.Drink)
-                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_Drink), null, ContextMenuGroup.Actions));
-
-            if (item.TypeId == ItemType.HeadsUpDisplayItem)
-                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_Activate), null, ContextMenuGroup.Actions));
-
-            if (item.Charges > 0) // TODO: Disable based on spell context
-                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_ActivateSpell), null, ContextMenuGroup.Actions));
+            var options = new List<ContextMenuOption>();
 
             var inventoryManager = Resolve<IInventoryManager>();
             if (inventoryManager.ActiveMode == InventoryMode.Merchant)
@@ -227,6 +197,40 @@ namespace UAlbion.Game.Gui.Inventory
                     ContextMenuGroup.Actions,
                     isPlotItem));
             }
+            else
+            {
+                options.Add(
+                    new ContextMenuOption(
+                        S(SystemTextId.InvPopup_Drop, isPlotItem),
+                        isPlotItem
+                            ? (IEvent)new HoverTextEvent(
+                                tf.Format(
+                                    SystemTextId.InvMsg_ThisIsAVitalItem))
+                            : new InventoryDiscardEvent(itemPosition.X, itemPosition.Y, _id.Type, _id.Id, _id.Slot),
+                        ContextMenuGroup.Actions,
+                        isPlotItem));
+            }
+
+            options.Add(new ContextMenuOption(
+                S(SystemTextId.InvPopup_Examine),
+                new InventoryExamineEvent(item.Id),
+                ContextMenuGroup.Actions));
+
+            if (item.TypeId == ItemType.Document && _id.Type == InventoryType.Player)
+                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_Read), null, ContextMenuGroup.Actions));
+
+            if (item.TypeId == ItemType.SpellScroll && _id.Type == InventoryType.Player)
+                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_LearnSpell), null, ContextMenuGroup.Actions));
+
+            if (item.TypeId == ItemType.Drink && _id.Type == InventoryType.Player)
+                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_Drink), null, ContextMenuGroup.Actions));
+
+            if (item.TypeId == ItemType.HeadsUpDisplayItem && _id.Type == InventoryType.Player)
+                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_Activate), null, ContextMenuGroup.Actions));
+
+            if (item.Charges > 0 && _id.Type == InventoryType.Player) // TODO: Disable based on spell context
+                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_ActivateSpell), null, ContextMenuGroup.Actions));
+
 
             var uiPosition = window.PixelToUi(cursorManager.Position);
             Raise(new ContextMenuEvent(uiPosition, heading, options));

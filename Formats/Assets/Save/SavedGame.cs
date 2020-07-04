@@ -96,10 +96,10 @@ namespace UAlbion.Formats.Assets.Save
             save.Unknown1A6 = s.ByteArrayHex(nameof(Unknown1A6), save.Unknown1A6, 0xD0); // 1A6
             save._switches.Packed = s.ByteArrayHex(nameof(Switches), save._switches.Packed, FlagSet.PackedSize); // 276
             save.Unknown2C1 = s.ByteArrayHex(nameof(Unknown2C1), save.Unknown2C1, 0x5833); // 0x2C1
-            save._tickers.Serdes(s); // 5AF4
+            s.Meta(nameof(Tickers), save._tickers.Serdes, save._tickers.Serdes); // 5AF4
 
             save.Unknown5B9F = s.ByteArrayHex(nameof(Unknown5B9F), save.Unknown5B9F, 0x2C);
-            s.List(save.Npcs, MaxNpcCount, NpcState.Serdes);
+            s.List(nameof(save.Npcs), save.Npcs, MaxNpcCount, NpcState.Serdes);
 
             save.Unknown5B71 = s.ByteArrayHex(
                 nameof(Unknown5B71),

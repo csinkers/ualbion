@@ -22,8 +22,15 @@ namespace UAlbion.Formats.MapEvents
 
         public virtual void Unswizzle(IList<EventNode> nodes)
         {
-            if (Next is DummyEventNode dummy)
-                Next = nodes[dummy.Id];
+            if (!(Next is DummyEventNode dummy)) 
+                return;
+
+            if (dummy.Id >= nodes.Count)
+            {
+                ApiUtil.Assert($"Invalid event id: {Id} links to {dummy.Id}, but the set only contains {nodes.Count} events");
+                Next = null;
+            }
+            else Next = nodes[dummy.Id];
         }
 
         public static EventNode Serdes(ushort id, EventNode node, ISerializer s, bool useEventText, ushort textSourceId)
@@ -33,7 +40,7 @@ namespace UAlbion.Formats.MapEvents
             MapEventType type = (MapEventType)s.UInt8("Type", (byte)(mapEvent?.EventType ?? MapEventType.UnkFf));
 
             var @event = SerdesByType(mapEvent, s, type, useEventText, textSourceId);
-            if (@event is IQueryEvent)
+            if (@event is IBranchingEvent)
             {
                 node ??= new BranchNode(id, @event);
                 var branch = (BranchNode)node;
@@ -63,7 +70,7 @@ namespace UAlbion.Formats.MapEvents
                 MapEventType.AskSurrender => AskSurrenderEvent.Serdes((AskSurrenderEvent)e, s),
                 MapEventType.ChangeIcon => ChangeIconEvent.Serdes((ChangeIconEvent)e, s),
                 MapEventType.ChangeUsedItem => ChangeUsedItemEvent.Serdes((ChangeUsedItemEvent)e, s),
-                MapEventType.Chest => OpenChestEvent.Serdes((OpenChestEvent)e, s, useEventText ? AssetType.EventText : AssetType.MapText, textSourceId),
+                MapEventType.Chest => ChestEvent.Serdes((ChestEvent)e, s, useEventText ? AssetType.EventText : AssetType.MapText, textSourceId),
                 MapEventType.CloneAutomap => CloneAutomapEvent.Serdes((CloneAutomapEvent)e, s),
                 MapEventType.CreateTransport => CreateTransportEvent.Serdes((CreateTransportEvent)e, s),
                 MapEventType.DataChange => DataChangeEvent.Serdes((DataChangeEvent)e, s),

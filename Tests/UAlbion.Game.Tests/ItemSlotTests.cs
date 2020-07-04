@@ -70,7 +70,7 @@ namespace UAlbion.Game.Tests
         {
             var s1 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, ItemSlotId.Slot0));
             var s2 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, ItemSlotId.Slot0 + 1));
-            var torch = new ItemData(ItemId.Torch) { Flags = ItemFlags.Stackable };
+            var torch = new ItemData(ItemId.Torch) { TypeId = ItemType.LightSource };
 
             s1.Set(torch, 1);
             Assert.Equal(torch, s1.Item);

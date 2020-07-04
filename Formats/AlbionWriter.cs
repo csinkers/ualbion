@@ -6,8 +6,8 @@ namespace UAlbion.Formats
 {
     public class AlbionWriter : GenericBinaryWriter
     {
-        public AlbionWriter(BinaryWriter br)
-            : base(br, FormatUtil.BytesFrom850String, ApiUtil.Assert)
+        public AlbionWriter(BinaryWriter bw)
+            : base(bw, FormatUtil.BytesFrom850String, ApiUtil.Assert)
         {
         }
     }

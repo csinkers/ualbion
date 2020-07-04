@@ -14,6 +14,7 @@ namespace UAlbion.Game
     {
         readonly ThreadLocal<Stack<EventContext>> _threadContexts = new ThreadLocal<Stack<EventContext>>(() => new Stack<EventContext>());
         readonly HashSet<EventContext> _activeContexts = new HashSet<EventContext>();
+        readonly static EventContext BaseContext = new EventContext(new EventSource.None());
 
         public EventChainManager()
         {
@@ -24,7 +25,7 @@ namespace UAlbion.Game
             OnAsync<TriggerChainEvent>(Trigger);
         }
 
-        public EventContext Context => _threadContexts.Value.FirstOrDefault();
+        public EventContext Context => _threadContexts.Value.FirstOrDefault() ?? BaseContext;
         public bool LastEventResult { get; set; }
         public IEnumerable<EventContext> DebugActiveContexts => _activeContexts;
 

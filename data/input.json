@@ -18,7 +18,8 @@
 
     "Alt+1": "set_language English",
     "Alt+2": "set_language German",
-    "Alt+3": "set_language French"
+    "Alt+3": "set_language French",
+    "Alt+F2":  "load_map_prompt" 
   },
   "World2D": {
     "Escape": "push_scene MainMenu",

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using UAlbion.Core;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Dialogs;
@@ -37,6 +38,11 @@ namespace UAlbion.Game.Gui
                 var dialog = AttachChild(new NumericPromptDialog(tf.Format(e.Text), e.Min, e.Max));
                 dialog.Closed += (sender, _) => c(dialog.Value);
                 return true;
+            });
+            On<LoadMapPromptEvent>(e =>
+            {
+                var dialog = AttachChild(new LoadMapPromptDialog(new LiteralText("Select map"), 100, 399));
+                dialog.Closed += (sender, _) => Raise(new LoadMapEvent((MapDataId)dialog.Value));
             });
         }
     }

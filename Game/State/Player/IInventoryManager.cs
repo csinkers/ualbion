@@ -1,6 +1,6 @@
 ﻿using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Game.Gui.Inventory;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.State.Player
 {

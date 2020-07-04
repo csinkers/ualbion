@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Linq;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
-using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.State;
 
 namespace UAlbion.Game.Gui.Inventory
 {
@@ -18,9 +20,10 @@ namespace UAlbion.Game.Gui.Inventory
 
         public InventoryScreen(InventoryConfig config) : base(DialogPositioning.TopLeft)
         {
-            On<InventoryModeEvent>(SetMode);
-            On<InventoryChestModeEvent>(SetMode);
-            On<InventoryMerchantModeEvent>(SetMode);
+            On<InventoryOpenEvent>(SetMode);
+            On<ChestEvent>(SetMode);
+            On<DoorEvent>(SetMode);
+            On<MerchantEvent>(SetMode);
 
             _config = config;
         }
@@ -35,13 +38,17 @@ namespace UAlbion.Game.Gui.Inventory
             _mode = e.Mode;
             _modeSpecificId = e switch
             {
-                InventoryChestModeEvent chest => (int)chest.ChestId,
-                InventoryMerchantModeEvent merchant => (int)merchant.MerchantId,
-                // SetInventoryDoorModeEvent door => (int)door.DoorId
+                MerchantEvent merchant => (int)merchant.MerchantId,
+                ChestEvent chest => (int)chest.ChestId,
+                DoorEvent door => door.DoorId,
                 _ => 0
             };
-            // TODO: Verify that the party member is currently in the party
-            _activeCharacter = e.Member;
+
+            var party = Resolve<IParty>();
+            _activeCharacter = e.Member ?? party.Leader;
+            if (party.WalkOrder.All(x => x.Id != _activeCharacter))
+                _activeCharacter = party.Leader;
+
             Rebuild();
         }
 
@@ -57,7 +64,7 @@ namespace UAlbion.Game.Gui.Inventory
                         () => _page,
                         x => _page = x),
 
-                    // InventoryMode.Merchant => new InventoryChestPane(false, _modeSpecificId), // TODO
+                    // InventoryMode.Merchant => new InventoryMerchantPane((MerchantId)_modeSpecificId),
                     InventoryMode.Chest => new InventoryChestPane((ChestId)_modeSpecificId),
                     InventoryMode.LockedChest => new InventoryLockPane(true),
                     InventoryMode.LockedDoor => new InventoryLockPane(false),

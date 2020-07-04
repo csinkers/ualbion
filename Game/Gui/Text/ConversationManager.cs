@@ -171,6 +171,11 @@ namespace UAlbion.Game.Gui.Text
             var party = Resolve<IParty>();
             var assets = Resolve<IAssetManager>();
             var npc = assets.LoadNpc(e.NpcId);
+            if(npc == null)
+            {
+                ApiUtil.Assert($"Could not load NPC {e.NpcId}");
+                return false;
+            }
 
             _conversation = AttachChild(new Conversation(party?.Leader ?? PartyCharacterId.Tom, npc));
             _conversation.Complete += (sender, args) => { _conversation = null; continuation(); };

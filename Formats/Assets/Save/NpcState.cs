@@ -13,7 +13,7 @@ namespace UAlbion.Formats.Assets.Save
             var startOffset = s.Offset;
 
             npc.Id = (NpcCharacterId?)Tweak.Serdes(nameof(Id), (byte?)npc.Id, s.UInt16); // 0
-            npc.ObjectNumber = Tweak.Serdes(nameof(ObjectNumber), npc.ObjectNumber, s.UInt16) ?? 0; // 2
+            npc.ObjectNumber = Tweak.Serdes(nameof(ObjectNumber), npc.ObjectNumber, s.UInt16); // 2
             npc.Unk4 = s.UInt16(nameof(Unk4), npc.Unk4);
             npc.Unk6 = s.UInt16(nameof(Unk6), npc.Unk6);
             npc.Unk8 = s.UInt8(nameof(Unk8), npc.Unk8);
@@ -86,7 +86,7 @@ namespace UAlbion.Formats.Assets.Save
         }
 
         public NpcCharacterId? Id { get; set; } // 0
-        public ushort ObjectNumber { get; set; } // 2
+        public ushort? ObjectNumber { get; set; } // 2
         public ushort Unk4 { get; set; } // 4
         public ushort Unk6 { get; set; } // 6. Always 0?
         public byte Unk8 { get; set; } // 8. Always 0?

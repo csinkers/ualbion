@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -12,7 +13,15 @@ namespace UAlbion.Formats.MapEvents
         public override void Unswizzle(IList<EventNode> nodes)
         {
             if (NextIfFalse is DummyEventNode dummy)
-                NextIfFalse = nodes[dummy.Id];
+            {
+                if (dummy.Id >= nodes.Count)
+                {
+                    ApiUtil.Assert($"Invalid event id: {Id} links to {dummy.Id} when false, but the set only contains {nodes.Count} events");
+                    NextIfFalse = null;
+                }
+                else NextIfFalse = nodes[dummy.Id];
+
+            }
             base.Unswizzle(nodes);
         }
     }

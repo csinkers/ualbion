@@ -4,55 +4,56 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
-    [Event("inv:door", "Opens the inventory screen for the given door")]
-    public class DoorEvent : MapEvent, ILockedInventoryEvent
+    [Event("inv:chest", "Opens the inventory screen for the given chest")]
+    public class ChestEvent : MapEvent, ILockedInventoryEvent
     {
-        public static DoorEvent Parse(string[] args)
+        public static ChestEvent Parse(string[] args)
         {
-            return new DoorEvent(AssetType.SystemText, 0)
+            return new ChestEvent(AssetType.SystemText, 0)
             {
-                DoorId = ushort.Parse(args[0]),
+                ChestId = (ChestId)int.Parse(args[0]),
                 PickDifficulty = byte.Parse(args[1]),
                 Member = args.Length > 2 ? (PartyCharacterId?)int.Parse(args[2]) : null,
             };
         }
 
-        public static DoorEvent Serdes(DoorEvent e, ISerializer s, AssetType textType, ushort textSourceId)
-        {
-            e ??= new DoorEvent(textType, textSourceId);
-            e.PickDifficulty = s.UInt8(nameof(PickDifficulty), e.PickDifficulty);
-            e.KeyItemId = (ItemId?)StoreIncrementedNullZero.Serdes(nameof(KeyItemId), (ushort?)e.KeyItemId, s.UInt16);
-            e.InitialTextId = s.UInt8(nameof(InitialTextId), e.InitialTextId);
-            e.UnlockedTextId = s.UInt8(nameof(UnlockedTextId), e.UnlockedTextId);
-            e.DoorId = s.UInt16(nameof(DoorId), e.DoorId); // Usually 100+
-            return e;
-        }
-
-        DoorEvent(AssetType textType, ushort textSourceId)
+        ChestEvent(AssetType textType, ushort textSourceId)
         {
             TextType = textType;
             TextSourceId = textSourceId;
         }
 
+        public static ChestEvent Serdes(ChestEvent e, ISerializer s, AssetType textType, ushort textSourceId)
+        {
+            e ??= new ChestEvent(textType, textSourceId);
+            e.PickDifficulty = s.UInt8(nameof(PickDifficulty), e.PickDifficulty);
+            e.KeyItemId = (ItemId?)StoreIncrementedNullZero.Serdes(nameof(KeyItemId), (ushort?)e.KeyItemId, s.UInt16);
+            e.InitialTextId = s.UInt8(nameof(InitialTextId), e.InitialTextId);
+            e.UnlockedTextId = s.UInt8(nameof(UnlockedTextId), e.UnlockedTextId);
+            e.ChestId = s.EnumU16(nameof(ChestId), e.ChestId);
+            return e;
+        }
+
+        public override MapEventType EventType => MapEventType.Chest;
+        public InventoryMode Mode => InventoryMode.Chest;
+        public ChestId ChestId { get; private set; }
         public byte PickDifficulty { get; private set; }
         public ItemId? KeyItemId { get; private set; }
         public byte InitialTextId { get; private set; }
         public byte UnlockedTextId { get; private set; }
-        public ushort DoorId { get; private set; }
-        public override string ToString() => $"inv:door {DoorId} ({PickDifficulty}% {KeyItemId} Initial:{InitialTextId} Opened:{UnlockedTextId})";
-        public override MapEventType EventType => MapEventType.Door;
         public AssetType TextType { get; }
         public ushort TextSourceId { get; }
-        public InventoryMode Mode => InventoryMode.LockedDoor;
         public PartyCharacterId? Member { get; private set; }
-        public ISetInventoryModeEvent CloneForMember(PartyCharacterId member) 
-            => new DoorEvent(TextType, TextSourceId)
+        public override string ToString() => $"inv:chest {ChestId} {PickDifficulty}% Key:{KeyItemId} Initial:{InitialTextId} Opened:{UnlockedTextId}";
+
+        public ISetInventoryModeEvent CloneForMember(PartyCharacterId member)
+            => new ChestEvent(TextType, TextSourceId)
             {
-                DoorId = DoorId,
+                ChestId = ChestId,
                 KeyItemId = KeyItemId,
                 PickDifficulty = PickDifficulty,
-                InitialTextId = InitialTextId,
                 UnlockedTextId = UnlockedTextId,
+                InitialTextId = InitialTextId,
                 Member = member
             };
     }

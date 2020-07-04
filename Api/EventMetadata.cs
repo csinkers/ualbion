@@ -31,7 +31,7 @@ namespace UAlbion.Api
                 .ToArray();
 
             var parser = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public);
-            if(parser != null && parser.ReturnParameter?.ParameterType == type)
+            if (parser != null && parser.ReturnParameter?.ParameterType == type)
             {
                 var parameters = parser.GetParameters();
                 if (parameters.Length == 1 && parameters[0].ParameterType == typeof(string[]))

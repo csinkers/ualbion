@@ -21,12 +21,12 @@ namespace UAlbion.Game.Input
         public InputManager()
         {
             On<SetInputModeEvent>(SetInputMode);
-            On<SetMouseModeEvent>(SetMouseMode);
+            On<MouseModeEvent>(SetMouseMode);
             On<PushMouseModeEvent>(e =>
             {
                 var inputManager = Resolve<IInputManager>();
                 _mouseModeStack.Push(inputManager.MouseMode);
-                var setEvent = new SetMouseModeEvent(e.Mode);
+                var setEvent = new MouseModeEvent(e.Mode);
                 SetMouseMode(setEvent);
                 Raise(setEvent);
             });
@@ -35,7 +35,7 @@ namespace UAlbion.Game.Input
                 if (_mouseModeStack.Count == 0) 
                     return;
 
-                var setEvent = new SetMouseModeEvent(_mouseModeStack.Pop());
+                var setEvent = new MouseModeEvent(_mouseModeStack.Pop());
                 SetMouseMode(setEvent);
                 Raise(setEvent);
             });
@@ -74,9 +74,16 @@ namespace UAlbion.Game.Input
             return this;
         }
 
-        void SetMouseMode(SetMouseModeEvent e)
+        void SetMouseMode(MouseModeEvent e)
         {
-            _mouseModes.TryGetValue(e.Mode, out var activeMode);
+            if (e.Mode == null)
+            {
+                Raise(new LogEvent(LogEvent.Level.Info,
+                    $"MouseMode: {MouseMode} (Stack: {string.Join(", ", _mouseModeStack)})"));
+                return;
+            }
+
+            _mouseModes.TryGetValue(e.Mode.Value, out var activeMode);
             if (MouseMode == e.Mode && activeMode?.IsActive == true)
                 return;
 
@@ -86,14 +93,19 @@ namespace UAlbion.Game.Input
             if (activeMode != null)
                 activeMode.IsActive = true;
 
-            MouseMode = e.Mode;
-            // Raise(new LogEvent(LogEvent.Level.Info,
-            //     $"MouseMode => {MouseMode} (Stack: {string.Join(", ", _mouseModeStack)})"));
+            MouseMode = e.Mode.Value;
         }
 
         void SetInputMode(SetInputModeEvent e)
         {
-            _inputModes.TryGetValue(e.Mode, out var activeMode);
+            if (e.Mode == null)
+            {
+                Raise(new LogEvent(LogEvent.Level.Info,
+                    $"InputMode: {InputMode} (Stack: {string.Join(", ", _inputModeStack)})"));
+                return;
+            }
+
+            _inputModes.TryGetValue(e.Mode.Value, out var activeMode);
             if (InputMode == e.Mode && activeMode?.IsActive == true)
                 return;
 
@@ -103,9 +115,7 @@ namespace UAlbion.Game.Input
             if (activeMode != null)
                 activeMode.IsActive = true;
 
-            InputMode = e.Mode;
-            // Raise(new LogEvent(LogEvent.Level.Info,
-            //     $"InputMode => {InputMode} (Stack: {string.Join(", ", _inputModeStack)})"));
+            InputMode = e.Mode.Value;
         }
     }
 }

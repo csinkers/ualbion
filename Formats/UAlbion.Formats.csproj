@@ -11,10 +11,10 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\SerdesNet')">
-    <PackageReference Include="SerdesNet" Version="1.0.4" />
+    <PackageReference Include="SerdesNet" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\..\SerdesNet')">
-    <ProjectReference Include="..\..\\SerdesNet\SerdesNet.csproj" />
+    <ProjectReference Include="..\..\SerdesNet\SerdesNet.csproj" />
   </ItemGroup>
 
   <ItemGroup>

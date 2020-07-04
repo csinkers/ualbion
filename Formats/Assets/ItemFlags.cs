@@ -18,8 +18,5 @@ namespace UAlbion.Formats.Assets
         Cursed = 1 << 10,
         Unk11 = 1 << 11,
         Unk12 = 1 << 12,
-        TailWieldable = 1 << 13, // TODO
-        Stackable = 1 << 14, // TODO
-        TwoHanded = 1 << 15, // TODO
     }
 }

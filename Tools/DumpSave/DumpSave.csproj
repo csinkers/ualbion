@@ -58,11 +58,18 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\SerdesNet\SerdesNet.csproj">
+
+  <ItemGroup Condition="!Exists('..\..\..\SerdesNet')">
+    <PackageReference Include="SerdesNet" Version="1.1.0" />
+  </ItemGroup>
+  <ItemGroup Condition="Exists('..\..\..\SerdesNet')">
+    <ProjectReference Include="..\..\..\SerdesNet\SerdesNet.csproj" >
       <Project>{88B45D1E-E323-4B3C-B6AF-7EFFB7AEA496}</Project>
       <Name>SerdesNet</Name>
     </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Formats\UAlbion.Formats.csproj">
       <Project>{78b55a1c-1200-4c6e-a9d3-9c04d65f0af9}</Project>
       <Name>UAlbion.Formats</Name>

@@ -13,7 +13,7 @@ namespace UAlbion.Formats.Parsers
         public IList<SpellData> Serdes(IList<SpellData> existing, ISerializer s, AssetKey key, AssetInfo config)
         {
             existing ??= new SpellData[SpellData.SpellClasses * SpellData.MaxSpellsPerClass];
-            s.List(existing, existing.Count, SpellData.Serdes);
+            s.List(nameof(SpellData), existing, existing.Count, SpellData.Serdes);
             return existing;
         }
 

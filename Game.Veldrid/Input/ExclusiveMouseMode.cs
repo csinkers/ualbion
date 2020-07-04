@@ -22,13 +22,13 @@ namespace UAlbion.Game.Veldrid.Input
             if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && !x.Down))
             {
                 Raise(new UiLeftReleaseEvent());
-                Raise(new SetMouseModeEvent(MouseMode.Normal));
+                Raise(new MouseModeEvent(MouseMode.Normal));
             }
 
             if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && !x.Down))
             {
                 Raise(new UiRightReleaseEvent());
-                Raise(new SetMouseModeEvent(MouseMode.Normal));
+                Raise(new MouseModeEvent(MouseMode.Normal));
             }
         }
     }

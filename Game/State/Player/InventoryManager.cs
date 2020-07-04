@@ -5,10 +5,10 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Events.Transitions;
-using UAlbion.Game.Gui.Inventory;
 using UAlbion.Game.Input;
 using UAlbion.Game.Text;
 
@@ -20,7 +20,7 @@ namespace UAlbion.Game.State.Player
         readonly ItemSlot _hand = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, ItemSlotId.None));
         const float RelocationTransitionDurationSeconds = 0.2f;
 
-        ItemSlot GetSlot(InventorySlotId id) => _getInventory(id.Inventory).GetSlot(id.Slot);
+        ItemSlot GetSlot(InventorySlotId id) => _getInventory(id.Inventory)?.GetSlot(id.Slot);
         public ReadOnlyItemSlot ItemInHand { get; }
         public InventoryMode ActiveMode { get; private set; }
         public InventorySwapEvent ReturnItemInHandEvent { get; private set; }
@@ -44,7 +44,7 @@ namespace UAlbion.Game.State.Player
         public InventoryAction GetInventoryAction(InventorySlotId slotId)
         {
             var slot = GetSlot(slotId);
-            if (slot.Id.Slot == ItemSlotId.None)
+            if (slot == null || slot.Id.Slot == ItemSlotId.None)
                 return InventoryAction.Nothing;
 
             switch (_hand.Item, slot.Item)
@@ -107,13 +107,12 @@ namespace UAlbion.Game.State.Player
             {
                 case ItemSlotId.LeftHand:
                     {
-                        return !(sheet.Inventory.RightHand.Item is ItemData rightHandItem)
-                            || !rightHandItem.Flags.HasFlag(ItemFlags.TwoHanded);
+                        return !(sheet.Inventory.RightHand.Item is ItemData rightHandItem) || rightHandItem.Hands <= 1;
                     }
                 case ItemSlotId.Tail:
                     return
                         item.TypeId == ItemType.CloseRangeWeapon
-                        && item.Flags.HasFlag(ItemFlags.TailWieldable);
+                        && (item.SlotType == ItemSlotId.Tail || item.SlotType == ItemSlotId.RightHandOrTail);
                 default:
                     return true;
             }
@@ -269,7 +268,10 @@ namespace UAlbion.Game.State.Player
                 return false;
 
             Inventory inventory = _getInventory(slotId.Inventory);
-            ItemSlot slot = inventory.GetSlot(slotId.Slot);
+            ItemSlot slot = inventory?.GetSlot(slotId.Slot);
+            if (slot == null)
+                return false;
+
             var cursorManager = Resolve<ICursorManager>();
             var window = Resolve<IWindowManager>();
             var cursorUiPosition = window.PixelToUi(cursorManager.Position);

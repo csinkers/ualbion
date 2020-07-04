@@ -49,7 +49,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
             w.Height = s.UInt16(nameof(w.Height), w.Height);
 
             ushort overlayCount = s.UInt16("overlayCount", (ushort)w.Overlays.Count);
-            s.List(w.Overlays, overlayCount, Overlay.Serdes);
+            s.List(nameof(w.Overlays), w.Overlays, overlayCount, Overlay.Serdes);
             return w;
         }
     }

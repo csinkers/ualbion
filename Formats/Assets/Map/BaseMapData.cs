@@ -34,7 +34,7 @@ namespace UAlbion.Formats.Assets.Map
         protected void SerdesZones(ISerializer s)
         {
             int zoneCount = s.UInt16("ZoneCount", (ushort)Zones.Count(x => x.Global));
-            s.List(Zones, zoneCount, (i, x, serializer) => MapEventZone.Serdes(x, serializer, 0xff));
+            s.List(nameof(Zones), Zones, zoneCount, (i, x, serializer) => MapEventZone.Serdes(x, serializer, 0xff));
             s.Check();
 
             int zoneOffset = zoneCount;
@@ -42,7 +42,7 @@ namespace UAlbion.Formats.Assets.Map
             {
                 zoneCount = s.UInt16("RowZones", (ushort)Zones.Count(x => x.Y == y && !x.Global));
                 var y1 = y;
-                s.List(Zones, zoneCount, zoneOffset, (i, x, s2) => MapEventZone.Serdes(x, s2, y1));
+                s.List(nameof(Zones), Zones, zoneCount, zoneOffset, (i, x, s2) => MapEventZone.Serdes(x, s2, y1));
                 zoneOffset += zoneCount;
             }
         }
@@ -55,7 +55,7 @@ namespace UAlbion.Formats.Assets.Map
                 for (ushort i = 0; i < Events.Count; i++)
                     Events[i].Id = i;
 
-            s.List(Events, eventCount, (i, x, serializer) 
+            s.List(nameof(Events), Events, eventCount, (i, x, serializer) 
                 => EventNode.Serdes((ushort)i, x, serializer, false, (ushort)Id));
 
             foreach (var node in Events)

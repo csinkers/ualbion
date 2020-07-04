@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Game.Gui.Inventory
+﻿namespace UAlbion.Formats.MapEvents
 {
     public enum InventoryMode
     {

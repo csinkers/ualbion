@@ -73,7 +73,7 @@ namespace UAlbion.Formats.Assets
                 img.WriteChunk(s, IFFChunkType.BitmapHeader, (x, n) => img.SerdesHeader(x, n));
                 img.WriteChunk(s, IFFChunkType.ColorMapping, (x, n) => img.SerdesPalette(x, n));
                 img.WriteChunk(s, IFFChunkType.Hotspot,      (x, n) => img.SerdesHotspot(x, n));
-                s.List(img.ColorRanges, img.ColorRanges.Count, ColorRange.Serdes);
+                s.List(nameof(img.ColorRanges), img.ColorRanges, img.ColorRanges.Count, ColorRange.Serdes);
                 img.WriteChunk(s, IFFChunkType.Thumbnail,    (x, n) => img.SerdesThumbnail(x, n));
                 img.WriteChunk(s, IFFChunkType.Body,         (x, n) => img.SerdesPixels(x, n));
             }

@@ -7,9 +7,9 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Dialogs
 {
-    public class NumericPromptDialog : ModalDialog
+    public class LoadMapPromptDialog : ModalDialog // TODO: Use textbox
     {
-        public NumericPromptDialog(IText text, int min, int max, int depth = 0) : base(DialogPositioning.Center, depth)
+        public LoadMapPromptDialog(IText text, int min, int max, int depth = 0) : base(DialogPositioning.Center, depth)
         {
             On<CloseWindowEvent>(e => Close());
 

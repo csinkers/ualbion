@@ -4,7 +4,6 @@ using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
-using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.Text;
 
@@ -13,18 +12,20 @@ namespace UAlbion.Game.State
     public class SceneManager : ServiceComponent<ISceneManager>, ISceneManager
     {
         readonly IDictionary<SceneId, GameScene> _scenes = new Dictionary<SceneId, GameScene>();
+        ISetInventoryModeEvent _lastModeEvent;
 
         public SceneManager()
         {
             On<SetSceneEvent>(Set);
-            On<InventoryOpenEvent>(e => OpenInventory(e.MemberId));
+            On<ChestEvent>(OpenChest);
+            On<DoorEvent>(OpenDoor);
+            On<InventoryOpenEvent>(e => OpenInventory(e.Member));
             On<InventoryOpenPositionEvent>(e =>
             {
                 var party = Resolve<IParty>();
                 if (party?.StatusBarOrder.Count > e.Position)
                     OpenInventory(party.StatusBarOrder[e.Position].Id);
             });
-            On<OpenChestEvent>(OpenChest);
         }
 
         public SceneId ActiveSceneId { get; private set; }
@@ -39,21 +40,27 @@ namespace UAlbion.Game.State
             return this;
         }
 
-        void OpenChest(OpenChestEvent e)
+        void OpenChest(ChestEvent e)
         {
             if(ActiveSceneId != SceneId.Inventory)
                 Raise(new PushSceneEvent(SceneId.Inventory));
 
             // TODO: Handle messages, locked chests, traps etc
             var party = Resolve<IParty>();
-            Raise(new InventoryChestModeEvent(e.ChestId, party.Leader));
+            Raise(e.Member.HasValue ? e : e.CloneForMember(party.Leader));
         }
 
-        void OpenInventory(PartyCharacterId memberId)
+        void OpenDoor(DoorEvent obj)
+        {
+        }
+
+        void OpenInventory(PartyCharacterId? memberId)
         {
             if(ActiveSceneId != SceneId.Inventory)
                 Raise(new PushSceneEvent(SceneId.Inventory));
-            Raise(new InventoryModeEvent(memberId));
+
+            var party = Resolve<IParty>();
+            memberId ??= party.Leader;
             Raise(new SetContextEvent(ContextType.Inventory, AssetType.PartyMember, (int)memberId));
         }
 
@@ -77,6 +84,11 @@ namespace UAlbion.Game.State
             }
 
             ActiveSceneId = e.SceneId;
+            if(ActiveSceneId != SceneId.Inventory)
+            {
+                // _inventoryMode = InventoryMode.Character;
+                // _inventoryId = null;
+            }
         }
     }
 }

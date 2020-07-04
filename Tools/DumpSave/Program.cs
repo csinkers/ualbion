@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
@@ -9,29 +11,51 @@ namespace DumpSave
 {
     static class Program
     {
-        static void Main(string[] args)
+        class Command
         {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
-            var filename = args[0];
-            var stream = File.OpenRead(filename);
-            using var br = new BinaryReader(stream, Encoding.GetEncoding(850));
-            var save = SavedGame.Serdes(null, new AlbionReader(br, stream.Length));
+            public Command(string name, Action<SavedGame> action, string description)
+            {
+                Name = name;
+                Action = action;
+                Description = description;
+            }
 
+            public string Name { get; }
+            public Action<SavedGame> Action { get; }
+            public string Description { get; }
+        }
+
+        static readonly Command[] Commands =
+        {
+            new Command("dve", DumpVisitedEvents, "Dump Visited Events: Dump details of events and conversation paths that have been triggered."),
+            new Command("dtc", DumpTempMapChanges, "Dump Temp Changes: Dump details of temporary changes to the current map."),
+            new Command("dpc", DumpPermMapChanges, "Dump Perm Changes: Dump details of permanent changes to all maps."),
+            new Command("dn", DumpNpcs, "Dump NPC states: Dump details of NPCs on the current map.")
+        };
+
+        static void DumpVisitedEvents(SavedGame save)
+        {
             Console.WriteLine("VisitedEvents:");
             foreach (var e in save.VisitedEvents.Contents)
                 Console.WriteLine(e);
+        }
 
-            Console.WriteLine();
+        static void DumpTempMapChanges(SavedGame save)
+        {
             Console.WriteLine("Temp Map Changes:");
             foreach (var e in save.TemporaryMapChanges)
                 Console.WriteLine(e);
+        }
 
-            Console.WriteLine();
+        static void DumpPermMapChanges(SavedGame save)
+        {
             Console.WriteLine("Perm Map Changes:");
             foreach (var e in save.PermanentMapChanges)
                 Console.WriteLine(e);
+        }
 
-            Console.WriteLine();
+        static void DumpNpcs(SavedGame save)
+        {
             Console.WriteLine("NPCs:");
             foreach (var e in save.Npcs)
             {
@@ -112,6 +136,80 @@ namespace DumpSave
                 ColorPrint(0x7E, e.Unk7E);
                 Console.WriteLine();
                 Console.WriteLine();
+            }
+        }
+
+        static bool VerifyRoundTrip(Stream fileStream, SavedGame save)
+        {
+            using var ms = new MemoryStream((int)fileStream.Length);
+            using var bw = new BinaryWriter(ms, Encoding.GetEncoding(850));
+            SavedGame.Serdes(save, new AlbionWriter(bw));
+
+            if (ms.Position != fileStream.Length)
+            {
+                Console.WriteLine($"Assertion failed: Round-trip length mismatch (read {fileStream.Length}, wrote {ms.Position}");
+                return false;
+            }
+
+            ms.Position = 0;
+            fileStream.Position = 0;
+            int errors = 0;
+            const int maxErrors = 20;
+            for (int i = 0; i < ms.Length && i < fileStream.Length && errors < maxErrors; i++)
+            {
+                var a = ms.ReadByte();
+                var b = fileStream.ReadByte();
+                if (a == b) 
+                    continue;
+
+                Console.WriteLine($"Assertion failed: Round-trip mismatch at {ms.Position:X}: read {a}, wrote {b}");
+                errors++;
+            }
+
+            return errors == 0;
+        }
+
+        static void Main(string[] args)
+        {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
+            var commands = ParseCommands(args.Skip(1)).ToList();
+            if (!commands.Any())
+            {
+                PrintUsage();
+                return;
+            }
+
+            var filename = args[0];
+            var stream = File.OpenRead(filename);
+            using var br = new BinaryReader(stream, Encoding.GetEncoding(850));
+            var save = SavedGame.Serdes(null, new AlbionReader(br, stream.Length));
+
+            if (!VerifyRoundTrip(stream, save))
+                return;
+
+            foreach (var command in commands)
+            {
+                command.Action(save);
+                Console.WriteLine();
+            }
+        }
+
+        static void PrintUsage()
+        {
+            Console.WriteLine("UAlbion Save Dumping and Editing Utility");
+            Console.WriteLine("Usage:");
+            var longestCommand = Commands.Max(x => x.Name.Length);
+            foreach(var command in Commands)
+                Console.WriteLine($"    {command.Name.PadRight(longestCommand)}: {command.Description}");
+        }
+
+        static IEnumerable<Command> ParseCommands(IEnumerable<string> args)
+        {
+            foreach(var arg in args)
+            {
+                var command = Commands.FirstOrDefault(x => x.Name == arg);
+                if (command != null)
+                    yield return command;
             }
         }
 

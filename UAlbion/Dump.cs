@@ -231,7 +231,7 @@ namespace UAlbion
             sw.WriteLine($"{Convert.ToInt32(id):D3} {id} ({c.EnglishName}, {c.GermanName}, {c.FrenchName})");
             sw.WriteLine($"    Type:{c.Type} Gender:{c.Gender} Race:{c.Race} Class:{c.Class} Age:{c.Age} Level:{c.Level}");
             sw.WriteLine($"    Languages:{c.Languages} Sprite:{c.SpriteId} Portrait:{(int?)c.PortraitId}");
-            if (c.Inventory.Slots != null)
+            if (c.Inventory?.Slots != null)
             {
                 sw.WriteLine($"    Inventory: (Gold:{c.Inventory.Gold.Amount / 10.0}, Rations:{c.Inventory.Rations.Amount})");
                 sw.WriteLine($"             Head: {c.Inventory.Head}");
@@ -340,7 +340,7 @@ namespace UAlbion
                 var merchants = Enum.GetValues(typeof(MerchantId)).Cast<MerchantId>().ToDictionary(x => x, assets.LoadMerchant);
                 foreach (var merchant in merchants.Where(x => x.Value != null))
                 {
-                    sw.WriteLine($"Merchant {(int)merchant.Key} {merchant.Key}: ({merchant.Value.Gold.Amount/10.0} gold, {merchant.Value.Rations} rations)");
+                    sw.WriteLine($"Merchant {(int)merchant.Key} {merchant.Key}");
                     foreach(var x in merchant.Value.Slots.Where(x => x.Item != null))
                         sw.WriteLine($"    {x.Amount}x{x.Item} Charges:{x.Charges} Enchantment:{x.Enchantment} Flags:{x.Flags}");
                 }

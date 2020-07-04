@@ -65,15 +65,15 @@ namespace UAlbion.Formats.Assets.Labyrinth
             s.Check();
 
             ushort objectGroupCount = s.UInt16("ObjectGroupCount", (ushort)d.ObjectGroups.Count); // 26
-            s.List(d.ObjectGroups, objectGroupCount, ObjectGroup.Serdes);
+            s.List(nameof(d.ObjectGroups), d.ObjectGroups, objectGroupCount, ObjectGroup.Serdes);
             s.Check();
 
             var floorAndCeilingCount = s.UInt16("FloorAndCeilingCount", (ushort)d.FloorAndCeilings.Count); // 28 + objectGroupCount * 42
-            s.List(d.FloorAndCeilings, floorAndCeilingCount, FloorAndCeiling.Serdes);
+            s.List(nameof(d.FloorAndCeilings), d.FloorAndCeilings, floorAndCeilingCount, FloorAndCeiling.Serdes);
             s.Check();
 
             ushort objectCount = s.UInt16("ObjectCount", (ushort)d.Objects.Count); // 2A + objectGroupCount * 42 + floorAndCeilingCount * A
-            s.List(d.Objects, objectCount, Object.Serdes);
+            s.List(nameof(d.Objects), d.Objects, objectCount, Object.Serdes);
             s.Check();
 
             // Populate objectIds on subobjects to improve debugging experience
@@ -85,7 +85,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
             }
 
             ushort wallCount = s.UInt16("WallCount", (ushort)d.Walls.Count);
-            s.List(d.Walls, wallCount, Wall.Serdes);
+            s.List(nameof(d.Walls), d.Walls, wallCount, Wall.Serdes);
             s.Check();
             PerfTracker.StartupEvent("Finish loading labyrinth data");
             return d;

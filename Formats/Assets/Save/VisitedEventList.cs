@@ -16,7 +16,7 @@ namespace UAlbion.Formats.Assets.Save
             c.NumChunks = s.UInt16(nameof(NumChunks), c.NumChunks);
             ApiUtil.Assert(c.NumChunks == c.Size / 6);
             c.Contents ??= new VisitedEvent[(c.Size - 2) / 6];
-            s.List(c.Contents, c.Contents.Length, VisitedEvent.Serdes);
+            s.List(nameof(c.Contents), c.Contents, c.Contents.Length, VisitedEvent.Serdes);
             return c;
         }
     }

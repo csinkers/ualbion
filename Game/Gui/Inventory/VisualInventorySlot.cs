@@ -105,6 +105,9 @@ namespace UAlbion.Game.Gui.Inventory
         void Rebuild(in Rectangle extents)
         {
             var slot = _getSlot();
+            if (slot == null)
+                return;
+
             var contents = Contents;
             _button.AllowDoubleClick = slot.Amount > 1;
 

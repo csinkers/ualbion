@@ -93,7 +93,6 @@ namespace UAlbion.Game.State
                     throw new InvalidOperationException($"Unexpected inventory type requested: \"{id.Type}\"");
             }
 
-            ApiUtil.Assert(inventory?.Id != null && inventory.Id == id);
             return inventory;
         }
 

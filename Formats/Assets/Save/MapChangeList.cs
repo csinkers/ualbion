@@ -16,7 +16,7 @@ namespace UAlbion.Formats.Assets.Save
         public static MapChangeList Serdes(int _, MapChangeList c, ISerializer s)
         {
             c ??= new MapChangeList();
-            uint size = s.UInt32("Size", (uint)(c.Count * MapChange.SizeOnDisk));
+            uint size = s.UInt32("Size", (uint)(c.Count * MapChange.SizeOnDisk + 2));
             ushort count = s.UInt16(nameof(Count), (ushort)c.Count);
             ApiUtil.Assert(count * MapChange.SizeOnDisk == size - 2);
             for (int i = 0; i < count; i++)

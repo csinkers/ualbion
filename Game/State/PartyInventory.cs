@@ -44,8 +44,10 @@ namespace UAlbion.Game.State
             var party = Resolve<IParty>();
             var inventoryManager = Resolve<IInventoryManager>();
             var chest = _getInventory(new InventoryId(e.ChestId));
-            var changedMembers = new HashSet<PartyCharacterId>();
+            if (chest == null)
+                return;
 
+            var changedMembers = new HashSet<PartyCharacterId>();
             foreach (var slot in chest.EnumerateAll())
             {
                 if (slot.ItemId == null) 

@@ -222,6 +222,8 @@ namespace UAlbion.Game.Veldrid.Debugging
                     EngineFlagOption(EngineFlags.FlipYSpace);
                     EngineFlagOption(EngineFlags.VSync);
                     EngineFlagOption(EngineFlags.HighlightSelection);
+                    EngineFlagOption(EngineFlags.UseCylindricalBillboards);
+                    EngineFlagOption(EngineFlags.RenderDepth);
                     ImGui.TreePop();
                 }
 

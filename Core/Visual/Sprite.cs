@@ -66,7 +66,20 @@ namespace UAlbion.Core.Visual
         }
         public Vector3 Dimensions => new Vector3(Size.X, Size.Y, Size.X);
         public int DebugZ => DepthUtil.DepthToLayer(Position.Z);
-        public Vector2 Size { get => _size ?? Vector2.One; set { if (_size == value) return; _size = value; Dirty = true; } }
+
+        public Vector2 Size
+        {
+            get => _size ?? Vector2.One;
+            set
+            {
+                if (_size == value)
+                    return;
+                _size = value;
+                Dirty = true;
+                if (IsSubscribed)
+                    Raise(new PositionedComponentMovedEvent(this));
+            }
+        }
 
         public int Frame
         {
@@ -145,10 +158,11 @@ namespace UAlbion.Core.Visual
             }
 
             var instances = _sprite.Access();
-
             var subImage = _sprite.Key.Texture.GetSubImageDetails(Frame);
-            _size ??= subImage.Size;
-            instances[0] = SpriteInstanceData.CopyFlags(_position, _size.Value, subImage, _flags);
+
+            if (_size == null)
+                Size = subImage.Size;
+            instances[0] = SpriteInstanceData.CopyFlags(_position, Size, subImage, _flags);
         }
 
         bool Select(WorldCoordinateSelectEvent e, Action<Selection> continuation)

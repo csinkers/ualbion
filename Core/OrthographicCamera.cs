@@ -105,7 +105,7 @@ namespace UAlbion.Core
         {
             var totalMatrix = ViewMatrix * ProjectionMatrix;
             var inverse = totalMatrix.Inverse();
-            return Vector3.Transform(normPosition, inverse) - Vector3.UnitZ;
+            return Vector3.Transform(normPosition + Vector3.UnitZ, inverse);
         }
     }
 }

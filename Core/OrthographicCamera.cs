@@ -100,7 +100,7 @@ namespace UAlbion.Core
         }
 
         public Vector3 ProjectWorldToNorm(Vector3 worldPosition) 
-            => Vector3.Transform(worldPosition + Vector3.UnitZ, ViewMatrix * ProjectionMatrix);
+            => Vector3.Transform(worldPosition, ViewMatrix * ProjectionMatrix) - Vector3.UnitZ;
         public Vector3 UnprojectNormToWorld(Vector3 normPosition)
         {
             var totalMatrix = ViewMatrix * ProjectionMatrix;

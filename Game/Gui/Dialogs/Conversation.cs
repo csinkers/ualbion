@@ -69,7 +69,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
         public void StartDialogue()
         {
-            TriggerAction(ActionType.StartDialogue, 0, 0);
+            TriggerAction(ActionType.StartDialogue, 0, 0, DefaultIdleHandler);
         }
 
         void TopicsWindowOnWordSelected(object sender, WordId? e)

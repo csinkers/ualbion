@@ -7,19 +7,17 @@ namespace UAlbion.Game.Entities
 {
     public class MapSprite<T> : Sprite<T> where T : Enum
     {
-        Vector3 _tilePosition;
         public Vector3 TilePosition
         {
-            get => _tilePosition;
+            get => Position / Resolve<IMapManager>().Current.TileSize;
             set
             {
-                if (_tilePosition == value)
+                var map = Resolve<IMapManager>().Current;
+                var tilePosition = Position / map.TileSize;
+                if (tilePosition == value)
                     return;
 
-                _tilePosition = value;
-
-                var map = Resolve<IMapManager>().Current;
-                Position = TilePosition * map.TileSize;
+                Position = value * map.TileSize;
             }
         }
 

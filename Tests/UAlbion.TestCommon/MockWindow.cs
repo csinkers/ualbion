@@ -1,6 +1,6 @@
 ﻿using UAlbion.Core;
 
-namespace UAlbion.Game.Tests
+namespace UAlbion.TestCommon
 {
     public class MockWindow : IWindow
     {

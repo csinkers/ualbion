@@ -21,6 +21,28 @@ namespace UAlbion.Core
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;
+        public Vector3 LookDirection => _lookDirection;
+        public float FieldOfView { get; private set; }
+        public float NearDistance => 10f;
+        public float FarDistance => 512.0f * 256.0f * 2.0f;
+        public bool LegacyPitch { get; }
+        public float AspectRatio => _windowSize.X / _windowSize.Y;
+        public float Magnification { get; set; } // Ignored.
+        public float Yaw { get => _yaw; set { _yaw = value; UpdateViewMatrix(); } } // Radians
+
+        public float Pitch // Radians
+        {
+            get => _pitch;
+            set
+            {
+                _pitch = LegacyPitch ? Math.Clamp(value, -0.48f, 0.48f) : Math.Clamp(value, -1.55f, 1.55f);
+                
+                if(LegacyPitch)        
+                    UpdatePerspectiveMatrix();
+                else
+                    UpdateViewMatrix();
+            }
+        }
 
         public Vector3 Position
         {
@@ -33,14 +55,9 @@ namespace UAlbion.Core
             }
         }
 
-        public Vector3 LookDirection => _lookDirection;
-        public float FieldOfView { get; private set; }
-        public float NearDistance => 10f;
-        public float FarDistance => 512.0f * 256.0f * 2.0f;
-        public bool LegacyPitch { get; }
-
         public PerspectiveCamera(bool legacyPitch = false)
         {
+            OnAsync<ScreenCoordinateSelectEvent, Selection>(TransformSelect);
             On<BackendChangedEvent>(UpdateBackend);
             // BUG: This event is not received when the screen is resized while a 2D scene is active.
             On<WindowResizedEvent>(e => WindowResized(e.Width, e.Height));
@@ -70,6 +87,15 @@ namespace UAlbion.Core
             base.Subscribed();
         }
 
+        bool TransformSelect(ScreenCoordinateSelectEvent e, Action<Selection> continuation)
+        {
+            var normalisedScreenPosition = new Vector3(2 * e.Position.X / _windowSize.X - 1.0f, -2 * e.Position.Y / _windowSize.Y + 1.0f, 0.0f);
+            var rayOrigin = UnprojectNormToWorld(normalisedScreenPosition + Vector3.UnitZ);
+            var rayDirection = UnprojectNormToWorld(normalisedScreenPosition) - rayOrigin;
+            RaiseAsync(new WorldCoordinateSelectEvent(rayOrigin, rayDirection), continuation);
+            return true;
+        }
+
         void UpdateBackend(BackendChangedEvent e)
         {
             var settings = Resolve<IEngineSettings>();
@@ -82,25 +108,6 @@ namespace UAlbion.Core
                 : e.IsClipSpaceYInverted;
 
             UpdatePerspectiveMatrix();
-        }
-
-        public float AspectRatio => _windowSize.X / _windowSize.Y;
-        public float Magnification { get; set; } // Ignored.
-
-        public float Yaw { get => _yaw; set { _yaw = value; UpdateViewMatrix(); } }
-
-        public float Pitch
-        {
-            get => _pitch;
-            set
-            {
-                _pitch = LegacyPitch ? Math.Clamp(value, -0.48f, 0.48f) : Math.Clamp(value, -1.55f, 1.55f);
-                
-                if(LegacyPitch)        
-                    UpdatePerspectiveMatrix();
-                else
-                    UpdateViewMatrix();
-            }
         }
 
         void WindowResized(float width, float height)
@@ -156,12 +163,16 @@ namespace UAlbion.Core
             };
         }
 
-        public Vector3 ProjectWorldToNorm(Vector3 worldPosition) => Vector3.Transform(worldPosition + Vector3.UnitZ, ViewMatrix * ProjectionMatrix);
+        public Vector3 ProjectWorldToNorm(Vector3 worldPosition)
+        {
+            var v = Vector4.Transform(new Vector4(worldPosition, 1.0f), ViewMatrix * ProjectionMatrix);
+            return new Vector3(v.X / v.W, v.Y / v.W, v.Z / v.W);
+        }
+
         public Vector3 UnprojectNormToWorld(Vector3 normPosition)
         {
-            var totalMatrix = ViewMatrix * ProjectionMatrix;
-            var inverse = totalMatrix.Inverse();
-            return Vector3.Transform(normPosition + Vector3.UnitZ, inverse);
+            var v = Vector4.Transform(new Vector4(normPosition, 1.0f), (ViewMatrix * ProjectionMatrix).Inverse());
+            return new Vector3(v.X / v.W, v.Y / v.W, v.Z / v.W);
         }
     }
 }

@@ -18,5 +18,6 @@ namespace UAlbion.Core
             IEnumerable<SubImage> subImages);
 
         PaletteTexture CreatePaletteTexture(string name, uint[] colours);
+        ISceneGraph CreateSceneGraph();
     }
 }

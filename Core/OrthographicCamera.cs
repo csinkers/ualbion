@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core.Events;
 
@@ -6,14 +7,6 @@ namespace UAlbion.Core
 {
     public class OrthographicCamera : ServiceComponent<ICamera>, ICamera
     {
-        void TransformSelect(ScreenCoordinateSelectEvent e)
-        {
-            var normalisedScreenPosition = new Vector3(2 * e.Position.X / _windowSize.X - 1.0f, -2 * e.Position.Y / _windowSize.Y + 1.0f, 0.0f);
-            var rayOrigin = UnprojectNormToWorld(normalisedScreenPosition + Vector3.UnitZ);
-            var rayDirection = UnprojectNormToWorld(normalisedScreenPosition) - rayOrigin;
-            Raise(new WorldCoordinateSelectEvent(rayOrigin, rayDirection, e.RegisterHit));
-        }
-
         Vector3 _position = new Vector3(0, 0, 1);
         Vector2 _windowSize = Vector2.One;
         Matrix4x4 _viewMatrix;
@@ -33,7 +26,7 @@ namespace UAlbion.Core
 
         public OrthographicCamera()
         {
-            On<ScreenCoordinateSelectEvent>(TransformSelect);
+            OnAsync<ScreenCoordinateSelectEvent, Selection>(TransformSelect);
             On<SetCameraMagnificationEvent>(e =>
             {
                 _magnification = e.Magnification;
@@ -67,6 +60,15 @@ namespace UAlbion.Core
             UpdateViewMatrix();
         }
 
+        bool TransformSelect(ScreenCoordinateSelectEvent e, Action<Selection> continuation)
+        {
+            var normalisedScreenPosition = new Vector3(2 * e.Position.X / _windowSize.X - 1.0f, -2 * e.Position.Y / _windowSize.Y + 1.0f, 0.0f);
+            var rayOrigin = UnprojectNormToWorld(normalisedScreenPosition + Vector3.UnitZ);
+            var rayDirection = UnprojectNormToWorld(normalisedScreenPosition) - rayOrigin;
+            RaiseAsync(new WorldCoordinateSelectEvent(rayOrigin, rayDirection), continuation);
+            return true;
+        }
+
         void UpdatePerspectiveMatrix()
         {
             _projectionMatrix = Matrix4x4.Identity;
@@ -97,12 +99,13 @@ namespace UAlbion.Core
             };
         }
 
-        public Vector3 ProjectWorldToNorm(Vector3 worldPosition) => Vector3.Transform(worldPosition + Vector3.UnitZ, ViewMatrix * ProjectionMatrix);
+        public Vector3 ProjectWorldToNorm(Vector3 worldPosition) 
+            => Vector3.Transform(worldPosition + Vector3.UnitZ, ViewMatrix * ProjectionMatrix);
         public Vector3 UnprojectNormToWorld(Vector3 normPosition)
         {
             var totalMatrix = ViewMatrix * ProjectionMatrix;
             var inverse = totalMatrix.Inverse();
-            return Vector3.Transform(normPosition + Vector3.UnitZ, inverse);
+            return Vector3.Transform(normPosition, inverse) - Vector3.UnitZ;
         }
     }
 }

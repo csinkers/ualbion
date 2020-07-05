@@ -23,7 +23,7 @@ namespace UAlbion.Game.Gui
         {
             On<LayoutEvent>(RenderLayout);
             On<DumpLayoutEvent>(DumpLayout);
-            On<ScreenCoordinateSelectEvent>(Select);
+            OnAsync<ScreenCoordinateSelectEvent, Selection>(Select);
         }
 
         void DoLayout(Func<Rectangle, int, IUiElement, int> action)
@@ -57,7 +57,7 @@ namespace UAlbion.Game.Gui
 
         void RenderLayout(LayoutEvent e) => DoLayout((extents, order, element) => element.Render(extents, order));
 
-        void Select(ScreenCoordinateSelectEvent selectEvent)
+        bool Select(ScreenCoordinateSelectEvent selectEvent, Action<Selection> continuation)
         {
             var window = Resolve<IWindowManager>();
             var normPosition = window.PixelToNorm(selectEvent.Position);
@@ -68,8 +68,9 @@ namespace UAlbion.Game.Gui
                     {
                         float z = 1.0f - order / (float)DrawLayer.MaxLayer;
                         var intersectionPoint = new Vector3(normPosition, z);
-                        selectEvent.RegisterHit(z, new Selection(intersectionPoint, target));
+                        continuation(new Selection(intersectionPoint, z, target));
                     }));
+            return true;
         }
 
         static (int, int) GetDialogPosition(IDialog dialog, Vector2 size, int uiWidth, int uiHeight)

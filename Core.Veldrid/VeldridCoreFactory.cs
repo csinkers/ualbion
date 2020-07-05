@@ -13,6 +13,9 @@ namespace UAlbion.Core.Veldrid
 
         public PaletteTexture CreatePaletteTexture(string name, uint[] colours) => new VeldridPaletteTexture(name, colours);
 
+        public ISceneGraph CreateSceneGraph()
+            => new SceneGraph();
+
         public ITexture CreateEightBitTexture(string name, uint width, uint height, uint mipLevels,
             uint arrayLayers, byte[] pixels, IEnumerable<SubImage> subImages)
             => new VeldridEightBitTexture(name, width, height, mipLevels,

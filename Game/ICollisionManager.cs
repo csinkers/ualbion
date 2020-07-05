@@ -7,7 +7,7 @@ namespace UAlbion.Game
     {
         bool IsOccupied(Vector2 tilePosition);
         Passability GetPassability(Vector2 tilePosition);
-        void Register(ICollider collider);
-        void Unregister(ICollider collider);
+        void Register(IMovementCollider collider);
+        void Unregister(IMovementCollider collider);
     }
 }

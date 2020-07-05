@@ -21,7 +21,7 @@ namespace UAlbion.Game.Entities.Map2D
             new SubImage(Vector2.Zero, Vector2.Zero, Vector2.Zero, 0),
             0);
 
-        public TileLayer(LogicalMap logicalMap, ITexture tileset, Func<int, TileData> tileFunc, DrawLayer drawLayer, IconChangeType iconChangeType)
+        public TileLayer(LogicalMap2D logicalMap, ITexture tileset, Func<int, TileData> tileFunc, DrawLayer drawLayer, IconChangeType iconChangeType)
         {
             On<RenderEvent>(e => Render());
 
@@ -36,7 +36,7 @@ namespace UAlbion.Game.Entities.Map2D
             _drawLayer = drawLayer;
         }
 
-        readonly LogicalMap _logicalMap;
+        readonly LogicalMap2D _logicalMap;
         readonly ITexture _tileset;
         readonly Func<int, TileData> _tileFunc;
         readonly DrawLayer _drawLayer;

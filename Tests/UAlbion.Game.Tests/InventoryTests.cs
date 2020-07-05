@@ -5,6 +5,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.State.Player;
+using UAlbion.TestCommon;
 using Xunit;
 
 namespace UAlbion.Game.Tests

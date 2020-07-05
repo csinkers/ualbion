@@ -55,7 +55,7 @@ namespace UAlbion.Game
             if (map != null)
             {
                 // Set the scene first to ensure scene-local components from other scenes are disabled.
-                Raise(new SetSceneEvent(map is Entities.Map3D.Map ? SceneId.World3D : SceneId.World2D));
+                Raise(new SetSceneEvent(map is Entities.Map3D.Map3D ? SceneId.World3D : SceneId.World2D));
                 Current = map;
                 AttachChild(map);
 
@@ -81,8 +81,8 @@ namespace UAlbion.Game
 
             return mapData switch
             {
-                MapData2D map2d => new Entities.Map2D.Map(mapId, map2d),
-                MapData3D map3d => new Entities.Map3D.Map(mapId, map3d),
+                MapData2D map2d => new Entities.Map2D.Map2D(mapId, map2d),
+                MapData3D map3d => new Entities.Map3D.Map3D(mapId, map3d),
                 _ => null
             };
         }

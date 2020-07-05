@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace UAlbion.Game.Entities.Map2D
 {
-    public class Movement
+    public class Movement2D
     {
         struct MoveTarget
         {
@@ -16,7 +16,7 @@ namespace UAlbion.Game.Entities.Map2D
         Vector2 _direction;
         MoveTarget? _target;
         int _movementTick;
-        public Movement(MovementSettings settings) => _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        public Movement2D(MovementSettings settings) => _settings = settings ?? throw new ArgumentNullException(nameof(settings));
 
         public MovementDirection FacingDirection { get; set; }
         public bool Clipping { get; set; } = true;

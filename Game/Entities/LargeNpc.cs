@@ -26,7 +26,7 @@ namespace UAlbion.Game.Entities
 
             _npc = npc ?? throw new ArgumentNullException(nameof(npc));
             _sprite = AttachChild(new MapSprite<LargeNpcId>((LargeNpcId)_npc.ObjectNumber, DrawLayer.Underlay - 1, 0, SpriteFlags.BottomAligned));
-            _sprite.Selected += (sender, e) => e.SelectEvent.RegisterHit(e.HitPosition, this);
+            _sprite.Selected += (sender, e) => { e.RegisterHit(this); e.Handled = true; };
         }
 
         protected override void Subscribed()

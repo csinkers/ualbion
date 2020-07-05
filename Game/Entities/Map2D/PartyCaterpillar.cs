@@ -11,7 +11,7 @@ namespace UAlbion.Game.Entities.Map2D
     public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
     {
         readonly MovementSettings _settings;
-        readonly Movement _movement;
+        readonly Movement2D _movement;
 
         readonly (Vector3, int)[] _trail; // Positions (tile coordinates) and frame numbers.
         readonly (int, bool)[] _playerOffsets = new (int, bool)[Party.MaxPartySize]; // int = trail offset, bool = isMoving
@@ -51,7 +51,7 @@ namespace UAlbion.Game.Entities.Map2D
             });
 
             _settings = settings;
-            _movement = new Movement(settings);
+            _movement = new Movement2D(settings);
             _movement.EnteredTile += (sender, coords) => Raise(new PlayerEnteredTileEvent(coords.Item1, coords.Item2));
 
             _trail = new (Vector3, int)[TrailLength];

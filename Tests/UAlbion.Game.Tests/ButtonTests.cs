@@ -11,6 +11,7 @@ using UAlbion.Game.Gui;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Text;
+using UAlbion.TestCommon;
 using Xunit;
 
 namespace UAlbion.Game.Tests

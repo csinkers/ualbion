@@ -14,7 +14,7 @@ namespace UAlbion.Game
     {
         readonly ThreadLocal<Stack<EventContext>> _threadContexts = new ThreadLocal<Stack<EventContext>>(() => new Stack<EventContext>());
         readonly HashSet<EventContext> _activeContexts = new HashSet<EventContext>();
-        readonly static EventContext BaseContext = new EventContext(new EventSource.None());
+        static readonly EventContext BaseContext = new EventContext(new EventSource.None());
 
         public EventChainManager()
         {

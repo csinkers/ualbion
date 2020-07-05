@@ -9,13 +9,13 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities.Map2D
 {
-    public class Renderable : Component
+    public class MapRenderable2D : Component
     {
-        readonly LogicalMap _logicalMap;
+        readonly LogicalMap2D _logicalMap;
         readonly TileLayer _underlay;
         readonly TileLayer _overlay;
 
-        public Renderable(LogicalMap logicalMap, ITexture tileset)
+        public MapRenderable2D(LogicalMap2D logicalMap, ITexture tileset)
         {
             On<ToggleUnderlayEvent>(e => _underlay.IsActive = !_underlay.IsActive);
             On<ToggleOverlayEvent>(e => _overlay.IsActive = !_overlay.IsActive);

@@ -2,7 +2,7 @@
 using System.Linq;
 using UAlbion.Core.Textures;
 
-namespace UAlbion.Game.Tests
+namespace UAlbion.TestCommon
 {
     public class MockTexture : ITexture
     {

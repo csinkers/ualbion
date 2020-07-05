@@ -5,12 +5,12 @@ using UAlbion.Formats.Assets.Map;
 
 namespace UAlbion.Game.Entities.Map2D
 {
-    public class Collider : Component, ICollider
+    public class Collider2D : Component, IMovementCollider
     {
-        readonly LogicalMap _logicalMap;
+        readonly LogicalMap2D _logicalMap;
         readonly bool _isLargeMap;
 
-        public Collider(LogicalMap logicalMap, bool isLargeMap)
+        public Collider2D(LogicalMap2D logicalMap, bool isLargeMap)
         {
             _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
             _isLargeMap = isLargeMap;

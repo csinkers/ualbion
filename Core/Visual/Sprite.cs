@@ -5,7 +5,7 @@ using UAlbion.Core.Events;
 
 namespace UAlbion.Core.Visual
 {
-    public class Sprite<T> : Component where T : Enum
+    public class Sprite<T> : Component, IPositioned where T : Enum
     {
         readonly DrawLayer _layer;
         readonly SpriteKeyFlags _keyFlags;
@@ -16,14 +16,22 @@ namespace UAlbion.Core.Visual
         SpriteFlags _flags;
         bool _dirty = true;
 
+        public static Sprite<T> CharacterSprite(T id) =>
+            new Sprite<T>(id, Vector3.Zero, DrawLayer.Character, 0, SpriteFlags.BottomAligned);
+
+        public static Sprite<T> ScreenSpaceSprite(T id, Vector2 position, Vector2 size) =>
+            new Sprite<T>(id, new Vector3(position, 0), DrawLayer.Interface,
+                SpriteKeyFlags.NoTransform,
+                SpriteFlags.LeftAligned) { Size = size };
+
         public Sprite(T id, Vector3 position, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags)
         {
             On<BackendChangedEvent>(_ => Dirty = true);
             On<RenderEvent>(e => UpdateSprite());
-            On<WorldCoordinateSelectEvent>(Select);
+            OnAsync<WorldCoordinateSelectEvent, Selection>(Select);
             On<HoverEvent>(e =>
             {
-                if ((Resolve<IEngineSettings>()?.Flags &EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
+                if ((Resolve<IEngineSettings>()?.Flags & EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
                     Flags |= SpriteFlags.Highlight;
             });
             On<BlurEvent>(e =>
@@ -42,7 +50,21 @@ namespace UAlbion.Core.Visual
         public event EventHandler<SpriteSelectedEventArgs> Selected;
         public Vector3 Normal => Vector3.UnitZ; // TODO
         public T Id { get; }
-        public Vector3 Position { get => _position; set { if (_position == value) return; _position = value; Dirty = true; } }
+
+        public Vector3 Position
+        {
+            get => _position;
+            set
+            {
+                if (_position == value)
+                    return;
+                _position = value;
+                Dirty = true;
+                if (IsSubscribed)
+                    Raise(new PositionedComponentMovedEvent(this));
+            }
+        }
+        public Vector3 Dimensions => new Vector3(Size.X, Size.Y, Size.X);
         public int DebugZ => DepthUtil.DepthToLayer(Position.Z);
         public Vector2 Size { get => _size ?? Vector2.One; set { if (_size == value) return; _size = value; Dirty = true; } }
 
@@ -80,17 +102,15 @@ namespace UAlbion.Core.Visual
             }
         }
 
-        public static Sprite<T> CharacterSprite(T id) =>
-            new Sprite<T>(id, Vector3.Zero, DrawLayer.Character, 0, SpriteFlags.BottomAligned);
+        protected override void Subscribed()
+        {
+            Dirty = true;
+            Raise(new AddPositionedComponentEvent(this));
+        }
 
-        public static Sprite<T> ScreenSpaceSprite(T id, Vector2 position, Vector2 size) =>
-            new Sprite<T>(id, new Vector3(position, 0), DrawLayer.Interface,
-                SpriteKeyFlags.NoTransform,
-                SpriteFlags.LeftAligned) { Size = size };
-
-        protected override void Subscribed() => Dirty = true;
         protected override void Unsubscribed()
         {
+            Raise(new RemovePositionedComponentEvent(this));
             _sprite?.Dispose();
             _sprite = null;
         }
@@ -131,29 +151,49 @@ namespace UAlbion.Core.Visual
             instances[0] = SpriteInstanceData.CopyFlags(_position, _size.Value, subImage, _flags);
         }
 
-        void Select(WorldCoordinateSelectEvent e)
+        bool Select(WorldCoordinateSelectEvent e, Action<Selection> continuation)
         {
-            float denominator = Vector3.Dot(Normal, e.Direction);
+            var hit = RayIntersect(e.Origin, e.Direction);
+            if (!hit.HasValue)
+                return false;
+
+            var selected = Selected;
+            bool delegated = false;
+            if (selected != null)
+            {
+                var args = new SpriteSelectedEventArgs(x =>
+                    continuation(new Selection(e.Origin, e.Direction, hit.Value.Item1, x)));
+                selected.Invoke(this, args);
+                delegated = args.Handled;
+            }
+
+            if (!delegated)
+            {
+                continuation(new Selection(hit.Value.Item2, hit.Value.Item1, this));
+                return true;
+            }
+
+            return true;
+        }
+
+        public (float, Vector3)? RayIntersect(Vector3 origin, Vector3 direction)
+        {
+            float denominator = Vector3.Dot(Normal, direction);
             if (Math.Abs(denominator) < 0.00001f)
-                return;
+                return null;
 
-            float t = Vector3.Dot(_position - e.Origin, Normal) / denominator;
+            float t = Vector3.Dot(_position - origin, Normal) / denominator;
             if (t < 0)
-                return;
+                return null;
 
-            var intersectionPoint = e.Origin + t * e.Direction;
+            var intersectionPoint = origin + t * direction;
             int x = (int)(intersectionPoint.X - _position.X);
             int y = (int)(intersectionPoint.Y - _position.Y);
 
-            var rectangle = CalculateBoundingRectangle();
-            if (rectangle.Contains(x, y))
-            {
-                var args = new SpriteSelectedEventArgs(t, e);
-                OnSelected(args);
+            if (CalculateBoundingRectangle().Contains(x, y))
+                return (t, intersectionPoint);
 
-                if(!args.Handled)
-                    e.RegisterHit(t, this);
-            }
+            return null;
         }
 
         Rectangle CalculateBoundingRectangle() => (Flags & SpriteFlags.AlignmentMask) switch
@@ -166,7 +206,5 @@ namespace UAlbion.Core.Visual
                 SpriteFlags.BottomAligned =>                           new Rectangle(-(int)Size.X / 2, -(int)Size.Y    , (int)Size.X, (int)Size.Y), // BottomMid
                 _ => new Rectangle()
             };
-
-        protected virtual void OnSelected(SpriteSelectedEventArgs e) => Selected?.Invoke(this, e);
     }
 }

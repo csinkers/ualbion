@@ -11,7 +11,7 @@ using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Entities.Map2D
 {
-    public class LogicalMap
+    public class LogicalMap2D
     {
         readonly MapData2D _mapData;
         readonly TilesetData _tileData;
@@ -21,7 +21,7 @@ namespace UAlbion.Game.Entities.Map2D
 
         public MapDataId Id => _mapData.Id;
 
-        public LogicalMap(IAssetManager assetManager, MapData2D mapData,
+        public LogicalMap2D(IAssetManager assetManager, MapData2D mapData,
             IList<MapChange> tempChanges,
             IList<MapChange> permChanges)
         {

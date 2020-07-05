@@ -12,9 +12,9 @@ namespace UAlbion.Core
 
         public IList<Selection> CastRayFromScreenSpace(Vector2 pixelPosition, bool performFocusAlerts)
         {
-            IList<(float, Selection)> hits = new List<(float, Selection)>();
-            Raise(new ScreenCoordinateSelectEvent(pixelPosition, (t, selection) => hits.Add((t, selection))));
-            var orderedHits = hits.OrderBy(x => x.Item1).Select(x => x.Item2).ToList();
+            IList<Selection> hits = new List<Selection>();
+            RaiseAsync(new ScreenCoordinateSelectEvent(pixelPosition), x => hits.Add(x));
+            var orderedHits = hits.OrderBy(x => x.Distance).ToList();
 
             if (!performFocusAlerts)
                 return orderedHits;

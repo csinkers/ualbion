@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
 
-namespace UAlbion.Game.Tests
+namespace UAlbion.TestCommon
 {
     public class MockFactory : ICoreFactory
     {
@@ -21,5 +21,8 @@ namespace UAlbion.Game.Tests
 
         public PaletteTexture CreatePaletteTexture(string name, uint[] colours)
             => new MockPaletteTexture(name, colours);
+
+        public ISceneGraph CreateSceneGraph()
+            => new MockSceneGraph();
     }
 }

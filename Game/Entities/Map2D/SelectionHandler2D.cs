@@ -13,16 +13,16 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Entities.Map2D
 {
-    public sealed class SelectionHandler : Component
+    public sealed class SelectionHandler2D : Component
     {
         static readonly Vector3 Normal = Vector3.UnitZ;
-        readonly LogicalMap _map;
-        readonly Renderable _renderable;
+        readonly LogicalMap2D _map;
+        readonly MapRenderable2D _renderable;
         int _lastHighlightIndex;
 
-        public SelectionHandler(LogicalMap map, Renderable renderable)
+        public SelectionHandler2D(LogicalMap2D map, MapRenderable2D renderable)
         {
-            On<WorldCoordinateSelectEvent>(OnSelect);
+            OnAsync<WorldCoordinateSelectEvent, Selection>(OnSelect);
             On<ShowMapMenuEvent>(e => ShowMapMenu());
             On<UiRightClickEvent>(e =>
             {
@@ -36,15 +36,15 @@ namespace UAlbion.Game.Entities.Map2D
 
         public event EventHandler<int> HighlightIndexChanged;
 
-        void OnSelect(WorldCoordinateSelectEvent e)
+        bool OnSelect(WorldCoordinateSelectEvent e, Action<Selection> continuation)
         {
             float denominator = Vector3.Dot(Normal, e.Direction);
             if (Math.Abs(denominator) < 0.00001f)
-                return;
+                return false;
 
             float t = Vector3.Dot(-e.Origin, Normal) / denominator;
             if (t < 0)
-                return;
+                return false;
 
             Vector3 intersectionPoint = e.Origin + t * e.Direction;
             int x = (int)(intersectionPoint.X / _renderable.TileSize.X);
@@ -54,25 +54,25 @@ namespace UAlbion.Game.Entities.Map2D
             var underlayTile = _map.GetUnderlay(x, y);
             var overlayTile = _map.GetOverlay(x, y);
 
-            e.RegisterHit(t, new MapTileHit(
+            continuation(new Selection(e.Origin, e.Direction, t, new MapTileHit(
                 new Vector2(x, y),
                 intersectionPoint,
                 _renderable.GetWeakUnderlayReference(x, y),
-                _renderable.GetWeakOverlayReference(x, y)));
+                _renderable.GetWeakOverlayReference(x, y))));
 
-            if (underlayTile != null) e.RegisterHit(t, underlayTile);
-            if (overlayTile != null) e.RegisterHit(t, overlayTile);
-            e.RegisterHit(t, this);
+            if (underlayTile != null) continuation(new Selection(e.Origin, e.Direction, t, underlayTile));
+            if (overlayTile != null) continuation(new Selection(e.Origin, e.Direction, t, overlayTile));
+            continuation(new Selection(e.Origin, e.Direction, t, this));
 
             var zone = _map.GetZone(x, y);
             if (zone != null)
-                e.RegisterHit(t, zone);
+                continuation(new Selection(e.Origin, e.Direction, t, zone));
 
             var chain = zone?.Chain;
             if (chain != null)
             {
                 foreach (var zoneEvent in chain.Events)
-                    e.RegisterHit(t, zoneEvent);
+                    continuation(new Selection(e.Origin, e.Direction, t, zoneEvent));
             }
 
             if (_lastHighlightIndex != highlightIndex)
@@ -80,6 +80,8 @@ namespace UAlbion.Game.Entities.Map2D
                 HighlightIndexChanged?.Invoke(this, highlightIndex);
                 _lastHighlightIndex = highlightIndex;
             }
+
+            return true;
         }
 
         void ShowMapMenu()
@@ -98,7 +100,7 @@ namespace UAlbion.Game.Entities.Map2D
             var options = new List<ContextMenuOption>();
 
             var zone = _map.GetZone(x, y);
-            if (zone != null)
+            if (zone?.Chain != null && zone.Node != null)
             {
                 if (zone.Trigger.HasFlag(TriggerType.Examine))
                 {

@@ -2,7 +2,7 @@
 using System.Numerics;
 using UAlbion.Core.Textures;
 
-namespace UAlbion.Game.Tests
+namespace UAlbion.TestCommon
 {
     public static class MockUniformFont
     {

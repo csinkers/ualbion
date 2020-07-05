@@ -13,10 +13,10 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities.Map2D
 {
-    public class Map : Component, IMap
+    public class Map2D : Component, IMap
     {
         readonly MapData2D _mapData;
-        LogicalMap _logicalMap;
+        LogicalMap2D _logicalMap;
         IMovement _partyMovement;
 
         public MapDataId MapId { get; }
@@ -29,7 +29,7 @@ namespace UAlbion.Game.Entities.Map2D
 
         public override string ToString() { return $"Map2D: {MapId} ({(int)MapId})"; }
 
-        public Map(MapDataId mapId, MapData2D mapData)
+        public Map2D(MapDataId mapId, MapData2D mapData)
         {
             On<PlayerEnteredTileEvent>(OnPlayerEnteredTile);
             On<NpcEnteredTileEvent>(OnNpcEnteredTile);
@@ -54,12 +54,12 @@ namespace UAlbion.Game.Entities.Map2D
 
             var assetManager = Resolve<IAssetManager>();
             var state = Resolve<IGameState>();
-            _logicalMap = new LogicalMap(assetManager, _mapData, state.TemporaryMapChanges, state.PermanentMapChanges);
+            _logicalMap = new LogicalMap2D(assetManager, _mapData, state.TemporaryMapChanges, state.PermanentMapChanges);
             var tileset = assetManager.LoadTexture(_logicalMap.TilesetId);
             AttachChild(new ScriptManager());
-            AttachChild(new Collider(_logicalMap, !_logicalMap.UseSmallSprites));
-            var renderable = AttachChild(new Renderable(_logicalMap, tileset));
-            var selector = AttachChild(new SelectionHandler(_logicalMap, renderable));
+            AttachChild(new Collider2D(_logicalMap, !_logicalMap.UseSmallSprites));
+            var renderable = AttachChild(new MapRenderable2D(_logicalMap, tileset));
+            var selector = AttachChild(new SelectionHandler2D(_logicalMap, renderable));
             selector.HighlightIndexChanged += (sender, x) => renderable.HighlightIndex = x;
             TileSize = new Vector3(renderable.TileSize, 1.0f);
             _logicalMap.TileSize = renderable.TileSize;

@@ -3,7 +3,7 @@ using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Assets;
 
-namespace UAlbion.Game.Tests
+namespace UAlbion.TestCommon
 {
     public class MockAssetLocatorRegistry : ServiceComponent<IAssetLocatorRegistry>, IAssetLocatorRegistry
     {

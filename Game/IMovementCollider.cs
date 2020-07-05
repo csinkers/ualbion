@@ -3,7 +3,7 @@ using UAlbion.Formats.Assets.Map;
 
 namespace UAlbion.Game
 {
-    public interface ICollider
+    public interface IMovementCollider
     {
         bool IsOccupied(Vector2 tilePosition);
         Passability GetPassability(Vector2 tilePosition);

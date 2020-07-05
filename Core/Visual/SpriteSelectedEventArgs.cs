@@ -1,18 +1,15 @@
 ﻿using System;
-using UAlbion.Core.Events;
 
 namespace UAlbion.Core.Visual
 {
     public class SpriteSelectedEventArgs : EventArgs
     {
-        public float HitPosition { get; }
-        public WorldCoordinateSelectEvent SelectEvent { get; }
+        public Action<object> RegisterHit { get; }
         public bool Handled { get; set; }
 
-        public SpriteSelectedEventArgs(float hitPosition, WorldCoordinateSelectEvent selectEvent)
+        public SpriteSelectedEventArgs(Action<object> registerHit)
         {
-            HitPosition = hitPosition;
-            SelectEvent = selectEvent;
+            RegisterHit = registerHit;
         }
     }
 }

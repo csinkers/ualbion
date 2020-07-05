@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\UAlbion.Core.csproj" />
+    <ProjectReference Include="..\UAlbion.TestCommon\UAlbion.TestCommon.csproj" />
   </ItemGroup>
 
 </Project>

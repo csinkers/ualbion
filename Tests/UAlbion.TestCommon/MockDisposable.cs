@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UAlbion.Game.Tests
+namespace UAlbion.TestCommon
 {
     public class MockDisposable : IDisposable
     {

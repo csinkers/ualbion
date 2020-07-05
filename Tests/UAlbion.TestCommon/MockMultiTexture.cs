@@ -1,7 +1,7 @@
 ﻿using UAlbion.Core;
 using UAlbion.Core.Textures;
 
-namespace UAlbion.Game.Tests
+namespace UAlbion.TestCommon
 {
     public class MockMultiTexture : MultiTexture
     {

@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 namespace UAlbion.Formats.AssetIds
 {
-    public enum DungeonObjectId  
+    public enum DungeonObjectId : ushort
     {
         LightCover = 0,
         Pylon = 1,

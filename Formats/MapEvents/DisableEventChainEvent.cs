@@ -8,6 +8,7 @@ namespace UAlbion.Formats.MapEvents
         public static DisableEventChainEvent Serdes(DisableEventChainEvent e, ISerializer s)
         {
             e ??= new DisableEventChainEvent();
+            s.Begin();
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.ChainNumber = s.UInt8(nameof(ChainNumber), e.ChainNumber);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
@@ -15,6 +16,7 @@ namespace UAlbion.Formats.MapEvents
             e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             ApiUtil.Assert(e.Unk2 == 1 || e.Unk2 == 0 || e.Unk2 == 2); // Usually 1
+            s.End();
             return e;
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using SerdesNet;
 
 namespace UAlbion.Formats.Assets
@@ -7,8 +8,8 @@ namespace UAlbion.Formats.Assets
     {
         public static readonly NpcCountTransform Instance = new NpcCountTransform();
         NpcCountTransform() { }
-        public static int Serdes(string name, int existing, Func<string, byte, byte> serializer) => Instance.ToMemory(serializer(name, Instance.ToPersistent(existing)));
-        public byte ToPersistent(int memory) => memory switch
+        public static int Serdes(string name, int existing, Func<string, byte, byte> serializer) => Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
+        public byte ToNumeric(int memory) => memory switch
         {
             0x20 => (byte)0,
             0x60 => (byte)0x40,
@@ -16,11 +17,14 @@ namespace UAlbion.Formats.Assets
             _ => (byte)memory
         };
 
-        public int ToMemory(byte persistent) => persistent switch
+        public int FromNumeric(byte persistent) => persistent switch
         {
             0 => 0x20,
             0x40 => 0x60,
             _ => persistent
         };
+
+        public string ToSymbolic(int memory) => memory.ToString(CultureInfo.InvariantCulture);
+        public int FromSymbolic(string symbolic) => int.Parse(symbolic, CultureInfo.InvariantCulture);
     }
 }

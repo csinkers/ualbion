@@ -21,6 +21,7 @@ namespace UAlbion.Formats.Assets
         public static WaveLibSample Serdes(int i, WaveLibSample w, ISerializer s)
         {
             w ??= new WaveLibSample();
+            s.Begin();
             w.IsValid = s.Int32(nameof(IsValid), w.IsValid);
             w.Instrument = s.Int32(nameof(Instrument), w.Instrument);
             w.Type2 = s.Int32(nameof(Type2), w.Type2);
@@ -40,6 +41,7 @@ namespace UAlbion.Formats.Assets
 
             if (w.SampleRate == -1)
                 w.SampleRate = 11025;
+            s.End();
             return w;
         }
     }

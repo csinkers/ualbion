@@ -8,12 +8,15 @@ namespace UAlbion.Formats.MapEvents
         public static QueryPartyEvent Serdes(QueryPartyEvent e, ISerializer s, QueryType subType)
         {
             e ??= new QueryPartyEvent();
+            s.Begin();
             e.QueryType = subType;
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);
             e.Immediate = s.UInt8(nameof(Immediate), e.Immediate);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-            e.PartyMemberId = (PartyCharacterId?)StoreIncrementedNullZero.Serdes(nameof(PartyMemberId), (byte?)e.PartyMemberId, s.UInt16);
+            e.PartyMemberId = s.TransformEnumU8(nameof(PartyMemberId), e.PartyMemberId, StoreIncrementedNullZero<PartyCharacterId>.Instance);
+            s.UInt8("pad", 0);
+            s.End();
             return e;
         }
 

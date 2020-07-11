@@ -7,6 +7,7 @@ namespace UAlbion.Formats.MapEvents
         public static PlaceActionEvent Serdes(PlaceActionEvent e, ISerializer s)
         {
             e ??= new PlaceActionEvent();
+            s.Begin();
             e.Type = s.EnumU8(nameof(Type), e.Type);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
@@ -14,6 +15,7 @@ namespace UAlbion.Formats.MapEvents
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+            s.End();
             return e;
         }
 

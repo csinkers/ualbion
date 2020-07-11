@@ -19,13 +19,15 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public static Overlay Serdes(int _, Overlay o, ISerializer s)
         {
             o ??= new Overlay();
-            o.TextureNumber = (DungeonOverlayId?)Tweak.Serdes(nameof(o.TextureNumber), (ushort?)o.TextureNumber, s.UInt16);
+            s.Begin();
+            o.TextureNumber = s.TransformEnumU16(nameof(o.TextureNumber), o.TextureNumber, Tweak<DungeonOverlayId>.Instance);
             o.AnimationFrames = s.UInt8(nameof(o.AnimationFrames), o.AnimationFrames);
             o.WriteZero = s.UInt8(nameof(o.WriteZero), o.WriteZero);
             o.XOffset = s.UInt16(nameof(o.XOffset), o.XOffset);
             o.YOffset = s.UInt16(nameof(o.YOffset), o.YOffset);
             o.Width = s.UInt16(nameof(o.Width), o.Width);
             o.Height = s.UInt16(nameof(o.Height), o.Height);
+            s.End();
             return o;
         }
     }

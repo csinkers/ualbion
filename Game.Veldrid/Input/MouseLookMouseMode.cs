@@ -1,9 +1,13 @@
-﻿using System.Numerics;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
+using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Input
 {
@@ -57,9 +61,39 @@ namespace UAlbion.Game.Veldrid.Input
         {
             var windowState = Resolve<IWindowManager>();
             var delta = e.Snapshot.MousePosition - new Vector2((int)(windowState.PixelWidth / 2), (int)(windowState.PixelHeight / 2));
+            var hits = Resolve<ISelectionManager>()?.CastRayFromScreenSpace(e.Snapshot.MousePosition, true);
 
             if (delta.LengthSquared() > float.Epsilon)
                 Raise(new CameraRotateEvent(delta.X * (Sensitivity / -1000), delta.Y * (Sensitivity / -1000)));
+
+            // Clicks are targeted, releases are broadcast. e.g. if you click and drag a slider and move outside
+            // its hover area, then it should switch to "ClickedBlurred". If you then release the button while
+            // still outside its hover area and releases were broadcast, it would never receive the release and
+            // it wouldn't be able to transition back to Normal
+            if (hits != null)
+            {
+                if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && x.Down))
+                    Distribute(new UiRightClickEvent(), hits);
+
+                if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && x.Down))
+                    Distribute(new UiLeftClickEvent(), hits);
+
+                if ((int)e.Snapshot.WheelDelta != 0)
+                    Distribute(new UiScrollEvent((int)e.Snapshot.WheelDelta), hits);
+            }
+
+            if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && !x.Down))
+                Raise(new UiLeftReleaseEvent());
+        }
+
+        void Distribute(ICancellableEvent e, IList<Selection> hits)
+        {
+            foreach (var hit in hits)
+            {
+                if (!e.Propagating) break;
+                var component = hit.Target as IComponent;
+                component?.Receive(e, this);
+            }
         }
     }
 }

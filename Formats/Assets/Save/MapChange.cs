@@ -24,15 +24,17 @@ namespace UAlbion.Formats.Assets.Save
         public MapDataId MapId { get; set; }
 
         public override string ToString() => $"MapΔ {X:X2} {Y:X2} {ChangeType} {Unk3} {Value:X4} {MapId}";
-        public static MapChange Serdes(MapChange u, ISerializer s)
+        public static MapChange Serdes(int i, MapChange u, ISerializer s)
         {
             u ??= new MapChange();
+            s.Begin();
             u.X = s.UInt8(nameof(X), u.X);
             u.Y = s.UInt8(nameof(Y), u.Y);
             u.ChangeType = s.EnumU8(nameof(ChangeType), u.ChangeType);
             u.Unk3 = s.EnumU8(nameof(Unk3), u.Unk3);
             u.Value = s.UInt16(nameof(Value), u.Value);
             u.MapId = s.EnumU16(nameof(Overlay), u.MapId);
+            s.End();
             return u;
         }
     }

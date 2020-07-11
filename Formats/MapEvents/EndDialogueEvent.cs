@@ -9,6 +9,7 @@ namespace UAlbion.Formats.MapEvents
         public static EndDialogueEvent Serdes(EndDialogueEvent e, ISerializer s)
         {
             e ??= new EndDialogueEvent();
+            s.Begin();
             s.UInt8("Pad1", 0);
             s.UInt8("Pad2", 0);
             s.UInt8("Pad3", 0);
@@ -16,6 +17,7 @@ namespace UAlbion.Formats.MapEvents
             s.UInt8("Pad5", 0);
             s.UInt16("Pad6", 0);
             s.UInt16("Pad8", 0);
+            s.End();
             return e;
         }
 

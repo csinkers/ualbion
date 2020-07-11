@@ -35,6 +35,7 @@ namespace UAlbion.Formats.MapEvents
 
         public static EventNode Serdes(ushort id, EventNode node, ISerializer s, bool useEventText, ushort textSourceId)
         {
+            s.Begin();
             var initialPosition = s.Offset;
             var mapEvent = node?.Event as MapEvent;
             MapEventType type = (MapEventType)s.UInt8("Type", (byte)(mapEvent?.EventType ?? MapEventType.UnkFf));
@@ -60,6 +61,7 @@ namespace UAlbion.Formats.MapEvents
             ApiUtil.Assert(expectedPosition == actualPosition,
                 $"Expected to have read {expectedPosition - initialPosition} bytes, but {actualPosition - initialPosition} have been read.");
 
+            s.End();
             return node;
         }
 

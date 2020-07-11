@@ -2,7 +2,7 @@
   "3DBCKGR0.XLD": {
     "Format": "SingleHeaderSprite",
     "EnumName": "DungeonBackgroundId",
-    "EnumType": "byte",
+    "EnumType": "ushort",
     "Assets": {
       "0": {
         "Name": "EarlyGameS",
@@ -33,6 +33,7 @@
     "Width": 64,
     "Height": 64,
     "EnumName": "DungeonFloorId",
+    "EnumType": "ushort",
     "Assets": {
       "0": {
         "Name": "Brick",
@@ -657,6 +658,7 @@
     "Width": 64,
     "Height": 64,
     "EnumName": "DungeonFloorId",
+    "EnumType": "ushort",
     "Assets": {
       "0": {
         "Name": "DirtToStoneTR",
@@ -1804,6 +1806,7 @@
     "Width": 64,
     "Height": 64,
     "EnumName": "DungeonFloorId",
+    "EnumType": "ushort",
     "Assets": {
       "0": {
         "Name": "OrganicToStoneTR",
@@ -2375,6 +2378,7 @@
   "3DOBJEC0.XLD": {
     "Format": "FixedSizeSprite",
     "EnumName": "DungeonObjectId",
+    "EnumType": "ushort",
     "Assets": {
       "0": {
         "Name": "LightCover",
@@ -3154,6 +3158,7 @@
   "3DOBJEC1.XLD": {
     "Format": "FixedSizeSprite",
     "EnumName": "DungeonObjectId",
+    "EnumType": "ushort",
     "Assets": {
       "0": {
         "Name": "TorchPedestal",
@@ -3977,6 +3982,7 @@
   "3DOBJEC2.XLD": {
     "Format": "FixedSizeSprite",
     "EnumName": "DungeonObjectId",
+    "EnumType": "ushort",
     "Assets": {
       "0": {
         "Name": "Stalagmite",
@@ -4804,6 +4810,7 @@
   "3DOBJEC3.XLD": {
     "Format": "FixedSizeSprite",
     "EnumName": "DungeonObjectId",
+    "EnumType": "ushort",
     "Assets": {
       "0": {
         "Name": "Celt",
@@ -5229,6 +5236,7 @@
     "Format": "FixedSizeSprite",
     "Transposed": true,
     "EnumName": "DungeonOverlayId",
+    "EnumType": "ushort",
     "Assets": {
       "0": {
         "Name": "JiriDoor",
@@ -5850,6 +5858,7 @@
     "Format": "FixedSizeSprite",
     "Transposed": true,
     "EnumName": "DungeonOverlayId",
+    "EnumType": "ushort",
     "Assets": {
       "0": {
         "PaletteHints": [
@@ -6525,6 +6534,7 @@
     "Format": "FixedSizeSprite",
     "Transposed": true,
     "EnumName": "DungeonOverlayId",
+    "EnumType": "ushort",
     "Assets": {
       "0": {
         "PaletteHints": [
@@ -6965,6 +6975,7 @@
     "Format": "FixedSizeSprite",
     "Transposed": true,
     "EnumName": "DungeonWallId",
+    "EnumType": "ushort",
     "Assets": {
       "0": {
         "Name": "JiriTileAndStone",
@@ -7641,6 +7652,7 @@
     "Format": "FixedSizeSprite",
     "Transposed": true,
     "EnumName": "DungeonWallId",
+    "EnumType": "ushort",
     "Assets": {
       "0": {
         "PaletteHints": [
@@ -8313,8 +8325,12 @@
     "EnumName": "EventSetId",
     "EnumType": "ushort",
     "Assets": {
-      "0": {},
-      "1": {},
+      "0": {
+        "Name": "FestivalTime"
+      },
+      "1": {
+        "Name": "InventoryItems"
+      },
       "2": {},
       "3": {},
       "4": {},
@@ -8352,102 +8368,284 @@
     "EnumName": "EventSetId",
     "EnumType": "ushort",
     "Assets": {
-      "0": {},
+      "0": {
+        "Name": "Iskai WordSet"
+      },
       "1": {},
-      "2": {},
-      "3": {},
-      "4": {},
-      "5": {},
-      "6": {},
-      "7": {},
-      "8": {},
-      "9": {},
-      "10": {},
-      "11": {},
-      "12": {},
-      "13": {},
-      "14": {},
-      "15": {},
-      "16": {},
-      "17": {},
-      "18": {},
-      "19": {},
-      "20": {},
-      "21": {},
-      "22": {},
-      "23": {},
-      "24": {},
-      "25": {},
-      "26": {},
-      "27": {},
-      "28": {},
-      "29": {},
-      "30": {},
-      "31": {},
-      "32": {},
-      "33": {},
-      "34": {},
-      "35": {},
-      "36": {},
-      "37": {},
-      "38": {},
-      "39": {},
-      "40": {},
-      "41": {},
-      "42": {},
-      "43": {},
-      "44": {},
-      "45": {},
-      "46": {},
-      "47": {},
-      "48": {},
-      "49": {},
-      "50": {},
-      "51": {},
-      "52": {},
-      "53": {},
-      "54": {},
-      "55": {},
-      "56": {},
-      "57": {},
-      "58": {},
-      "59": {},
-      "60": {},
-      "61": {},
-      "62": {},
-      "63": {},
-      "64": {},
-      "65": {},
-      "66": {},
-      "67": {},
-      "68": {},
-      "69": {},
-      "70": {},
-      "71": {},
-      "72": {},
-      "73": {},
-      "74": {},
-      "75": {},
-      "76": {},
+      "2": {
+        "Name": "Iskai Child WordSet"
+      },
+      "3": {
+        "Name": "Giria"
+      },
+      "4": {
+        "Name": "Sebai-Li Wrinn"
+      },
+      "5": {
+        "Name": "Fradh"
+      },
+      "6": {
+        "Name": "Klirna"
+      },
+      "7": {
+        "Name": "Gridri"
+      },
+      "8": {
+        "Name": "Sarrin"
+      },
+      "9": {
+        "Name": "Krinn"
+      },
+      "10": {
+        "Name": "Larina"
+      },
+      "11": {
+        "Name": "Frill"
+      },
+      "12": {
+        "Name": "Nisrii"
+      },
+      "13": {
+        "Name": "Nadri"
+      },
+      "14": {
+        "Name": "Vris"
+      },
+      "15": {
+        "Name": "Janiis"
+      },
+      "16": {
+        "Name": "Janiis"
+      },
+      "17": {
+        "Name": "Janiis"
+      },
+      "18": {
+        "Name": "Griibo"
+      },
+      "19": {
+        "Name": "Srelan"
+      },
+      "20": {
+        "Name": "Sira"
+      },
+      "21": {
+        "Name": "Kriis"
+      },
+      "22": {
+        "Name": "Fasiir"
+      },
+      "23": {
+        "Name": "Fasiir"
+      },
+      "24": {
+        "Name": "Cera"
+      },
+      "25": {
+        "Name": "Birin"
+      },
+      "26": {
+        "Name": "Jalia"
+      },
+      "27": {
+        "Name": "Rejira"
+      },
+      "28": {
+        "Name": "Bradir"
+      },
+      "29": {
+        "Name": "Bradir"
+      },
+      "30": {
+        "Name": "Bradir"
+      },
+      "31": {
+        "Name": "Aliis"
+      },
+      "32": {
+        "Name": "Brid"
+      },
+      "33": {
+        "Name": "Zirna"
+      },
+      "34": {
+        "Name": "Krai"
+      },
+      "35": {
+        "Name": "Hanii"
+      },
+      "36": {
+        "Name": "Akiir"
+      },
+      "37": {
+        "Name": "Rabir"
+      },
+      "38": {
+        "Name": "Vrik"
+      },
+      "39": {
+        "Name": "Laila"
+      },
+      "40": {
+        "Name": "Osini"
+      },
+      "41": {
+        "Name": "Jila"
+      },
+      "42": {
+        "Name": "Bewir"
+      },
+      "43": {
+        "Name": "Wania"
+      },
+      "44": {
+        "Name": "Zirr"
+      },
+      "45": {
+        "Name": "Viri"
+      },
+      "46": {
+        "Name": "Snird"
+      },
+      "47": {
+        "Name": "Frinja"
+      },
+      "48": {
+        "Name": "Krinn"
+      },
+      "49": {
+        "Name": "Jiris"
+      },
+      "50": {
+        "Name": "Gratogel Clouta WordSet"
+      },
+      "51": {
+        "Name": "Gratogel Arjano WordSet"
+      },
+      "52": {
+        "Name": "Gratogel Vanello WordSet"
+      },
+      "53": {
+        "Name": "Gratogel Aballon WordSet"
+      },
+      "54": {
+        "Name": "Gratogel Child WordSet"
+      },
+      "55": {
+        "Name": "Tharnos"
+      },
+      "56": {
+        "Name": "Garris"
+      },
+      "57": {
+        "Name": "Firina"
+      },
+      "58": {
+        "Name": "Sarena"
+      },
+      "59": {
+        "Name": "Ferina"
+      },
+      "60": {
+        "Name": "Oibelos"
+      },
+      "61": {
+        "Name": "Aretha"
+      },
+      "62": {
+        "Name": "Rifrako"
+      },
+      "63": {
+        "Name": "Dranbar"
+      },
+      "64": {
+        "Name": "Peleitos"
+      },
+      "65": {
+        "Name": "Bragona"
+      },
+      "66": {
+        "Name": "Winion"
+      },
+      "67": {
+        "Name": "Tamno"
+      },
+      "68": {
+        "Name": "Bennos"
+      },
+      "69": {
+        "Name": "Leitos"
+      },
+      "70": {
+        "Name": "Nemos"
+      },
+      "71": {
+        "Name": "Makaio"
+      },
+      "72": {
+        "Name": "Ouktero"
+      },
+      "73": {
+        "Name": "Torko"
+      },
+      "74": {
+        "Name": "Bero"
+      },
+      "75": {
+        "Name": "Frinos"
+      },
+      "76": {
+        "Name": "Roves"
+      },
       "77": {},
       "78": {},
       "79": {},
-      "80": {},
-      "81": {},
+      "80": {
+        "Name": "Toronto WordSet"
+      },
+      "81": {
+        "Name": "Rainer WordSet"
+      },
       "82": {},
-      "83": {},
-      "84": {},
-      "85": {},
-      "86": {},
-      "87": {},
-      "88": {},
-      "89": {},
-      "90": {},
-      "91": {},
-      "92": {},
-      "93": {},
-      "94": {},
-      "95": {},
+      "83": {
+        "Name": "Christine"
+      },
+      "84": {
+        "Name": "Joe Bernard"
+      },
+      "85": {
+        "Name": "Colonel Priver"
+      },
+      "86": {
+        "Name": "Robert Shaw"
+      },
+      "87": {
+        "Name": "Akira Mitsamati"
+      },
+      "88": {
+        "Name": "Michelle Laton"
+      },
+      "89": {
+        "Name": "Anne Dorbeck"
+      },
+      "90": {
+        "Name": "Alice Takashi"
+      },
+      "91": {
+        "Name": "Robert Ashley"
+      },
+      "92": {
+        "Name": "Rainer Hofstedt"
+      },
+      "93": {
+        "Name": "Kapitän Brandt"
+      },
+      "94": {
+        "Name": "Ned"
+      },
+      "95": {
+        "Name": "Argim"
+      },
       "96": {},
       "97": {},
       "98": {},
@@ -8459,103 +8657,193 @@
     "EnumName": "EventSetId",
     "EnumType": "ushort",
     "Assets": {
-      "0": {},
-      "1": {},
-      "2": {},
-      "3": {},
+      "0": {
+        "Name": "Maini Beloveno WordSet"
+      },
+      "1": {
+        "Name": "Maini Kounos WordSet"
+      },
+      "2": {
+        "Name": "Maini Umajo Kenta WordSet"
+      },
+      "3": {
+        "Name": "Maini Srimalinar WordSet"
+      },
       "4": {},
       "5": {},
       "6": {},
       "7": {},
       "8": {},
       "9": {},
-      "10": {},
+      "10": {
+        "Name": "Kryte"
+      },
       "11": {},
       "12": {},
       "13": {},
       "14": {},
       "15": {},
-      "16": {},
+      "16": {
+        "Name": "Aurino"
+      },
       "17": {},
       "18": {},
-      "19": {},
+      "19": {
+        "Name": "Kariah"
+      },
       "20": {},
       "21": {},
       "22": {},
       "23": {},
       "24": {},
       "25": {},
-      "26": {},
+      "26": {
+        "Name": "Kontos"
+      },
       "27": {},
       "28": {},
-      "29": {},
+      "29": {
+        "Name": "Perron"
+      },
       "30": {},
       "31": {},
       "32": {},
-      "33": {},
+      "33": {
+        "Name": "Melthar"
+      },
       "34": {},
       "35": {},
-      "36": {},
+      "36": {
+        "Name": "Gard"
+      },
       "37": {},
       "38": {},
       "39": {},
       "40": {},
-      "41": {},
+      "41": {
+        "Name": "Riko"
+      },
       "42": {},
       "43": {},
       "44": {},
       "45": {},
-      "46": {},
+      "46": {
+        "Name": "Herras"
+      },
       "47": {},
       "48": {},
       "49": {},
       "50": {},
-      "51": {},
+      "51": {
+        "Name": "Zerruma"
+      },
       "52": {},
       "53": {},
       "54": {},
       "55": {},
-      "56": {},
+      "56": {
+        "Name": "Arrim"
+      },
       "57": {},
       "58": {},
       "59": {},
       "60": {},
       "61": {},
-      "62": {},
+      "62": {
+        "Name": "Edjirr"
+      },
       "63": {},
       "64": {},
       "65": {},
       "66": {},
       "67": {},
-      "68": {},
-      "69": {},
-      "70": {},
-      "71": {},
-      "72": {},
-      "73": {},
-      "74": {},
-      "75": {},
-      "76": {},
-      "77": {},
-      "78": {},
-      "79": {},
-      "80": {},
-      "81": {},
-      "82": {},
-      "83": {},
-      "84": {},
-      "85": {},
-      "86": {},
-      "87": {},
-      "88": {},
-      "89": {},
-      "90": {},
-      "91": {},
-      "92": {},
-      "93": {},
-      "94": {},
-      "95": {},
-      "96": {},
+      "68": {
+        "Name": "Nodd"
+      },
+      "69": {
+        "Name": "Nadje"
+      },
+      "70": {
+        "Name": "Bagga"
+      },
+      "71": {
+        "Name": "Posch"
+      },
+      "72": {
+        "Name": "Riolea"
+      },
+      "73": {
+        "Name": "Dolo"
+      },
+      "74": {
+        "Name": "Ramina"
+      },
+      "75": {
+        "Name": "Jikraii"
+      },
+      "76": {
+        "Name": "Otikro"
+      },
+      "77": {
+        "Name": "Siobhan"
+      },
+      "78": {
+        "Name": "Khunag"
+      },
+      "79": {
+        "Name": "Frill"
+      },
+      "80": {
+        "Name": "Gerwad"
+      },
+      "81": {
+        "Name": "Agida"
+      },
+      "82": {
+        "Name": "Merdger"
+      },
+      "83": {
+        "Name": "Nelly"
+      },
+      "84": {
+        "Name": "Morpatt"
+      },
+      "85": {
+        "Name": "Konny"
+      },
+      "86": {
+        "Name": "Ohl"
+      },
+      "87": {
+        "Name": "Amine"
+      },
+      "88": {
+        "Name": "Synja"
+      },
+      "89": {
+        "Name": "Zebenno"
+      },
+      "90": {
+        "Name": "Kyla"
+      },
+      "91": {
+        "Name": "Zeibe"
+      },
+      "92": {
+        "Name": "Jeros"
+      },
+      "93": {
+        "Name": "Mykonou"
+      },
+      "94": {
+        "Name": "Coskon"
+      },
+      "95": {
+        "Name": "Kossea"
+      },
+      "96": {
+        "Name": "Sojekos"
+      },
       "97": {},
       "98": {},
       "99": {}
@@ -8567,30 +8855,72 @@
     "EnumType": "ushort",
     "Assets": {
       "0": {},
-      "1": {},
-      "2": {},
-      "3": {},
-      "4": {},
-      "5": {},
-      "6": {},
-      "7": {},
-      "8": {},
+      "1": {
+        "Name": "Kamulos WordSet"
+      },
+      "2": {
+        "Name": "Cuarnainn"
+      },
+      "3": {
+        "Name": "Branagh"
+      },
+      "4": {
+        "Name": "Rhuainaigh"
+      },
+      "5": {
+        "Name": "Pardhainn"
+      },
+      "6": {
+        "Name": "Jonatharh"
+      },
+      "7": {
+        "Name": "Rhunagh"
+      },
+      "8": {
+        "Name": "Arthor"
+      },
       "9": {},
       "10": {},
-      "11": {},
-      "12": {},
+      "11": {
+        "Name": "Brann"
+      },
+      "12": {
+        "Name": "Colonel Priver"
+      },
       "13": {},
-      "14": {},
-      "15": {},
-      "16": {},
-      "17": {},
-      "18": {},
-      "19": {},
-      "20": {},
-      "21": {},
-      "22": {},
-      "23": {},
-      "24": {},
+      "14": {
+        "Name": "Drannagh"
+      },
+      "15": {
+        "Name": "Llanaer"
+      },
+      "16": {
+        "Name": "Irkith"
+      },
+      "17": {
+        "Name": "Birrh"
+      },
+      "18": {
+        "Name": "Maire"
+      },
+      "19": {
+        "Name": "Dji Cantos WordSet"
+      },
+      "20": {
+        "Name": "Frill"
+      },
+      "21": {
+        "Name": "Nemos"
+      },
+      "22": {
+        "Name": "Rainer Hofstedt"
+      },
+      "23": {
+        "Name": "Joe Bernard"
+      },
+      "24": {
+        "Name": "Althea"
+      },
       "25": {},
       "26": {},
       "27": {},
@@ -8754,16 +9084,34 @@
       "78": {},
       "79": {},
       "80": {},
-      "81": {},
-      "82": {},
-      "83": {},
-      "84": {},
-      "85": {},
-      "86": {},
-      "87": {},
+      "81": {
+        "Name": "Tom"
+      },
+      "82": {
+        "Name": "Rainer"
+      },
+      "83": {
+        "Name": "Drirr"
+      },
+      "84": {
+        "Name": "Sira"
+      },
+      "85": {
+        "Name": "Mellthas"
+      },
+      "86": {
+        "Name": "Harriet"
+      },
+      "87": {
+        "Name": "Joe"
+      },
       "88": {},
-      "89": {},
-      "90": {},
+      "89": {
+        "Name": "Khunag"
+      },
+      "90": {
+        "Name": "Siobhan"
+      },
       "91": {},
       "92": {},
       "93": {},
@@ -12639,93 +12987,241 @@
       },
       "10": {},
       "11": {},
-      "12": {},
-      "13": {},
-      "14": {},
-      "15": {},
-      "16": {},
-      "17": {},
-      "18": {},
-      "19": {},
-      "20": {},
-      "21": {},
-      "22": {},
-      "23": {},
-      "24": {},
-      "25": {},
-      "26": {},
-      "27": {},
-      "28": {},
-      "29": {},
-      "30": {},
-      "31": {},
-      "32": {},
-      "33": {},
-      "34": {},
-      "35": {},
-      "36": {},
-      "37": {},
-      "38": {},
-      "39": {},
-      "40": {},
-      "41": {},
-      "42": {},
-      "43": {},
+      "12": {
+        "Name": "Giria"
+      },
+      "13": {
+        "Name": "Sebai-Li Wrinn"
+      },
+      "14": {
+        "Name": "Fradh"
+      },
+      "15": {
+        "Name": "Klirna"
+      },
+      "16": {
+        "Name": "Gridri"
+      },
+      "17": {
+        "Name": "Sarrin"
+      },
+      "18": {
+        "Name": "Krinn"
+      },
+      "19": {
+        "Name": "Larina"
+      },
+      "20": {
+        "Name": "Frill"
+      },
+      "21": {
+        "Name": "Nisrii"
+      },
+      "22": {
+        "Name": "Nadri"
+      },
+      "23": {
+        "Name": "Vris"
+      },
+      "24": {
+        "Name": "Janiis"
+      },
+      "25": {
+        "Name": "Janiis"
+      },
+      "26": {
+        "Name": "Janiis"
+      },
+      "27": {
+        "Name": "Akiir and Griibo"
+      },
+      "28": {
+        "Name": "Srelan"
+      },
+      "29": {
+        "Name": "Sira"
+      },
+      "30": {
+        "Name": "Kriis"
+      },
+      "31": {
+        "Name": "Fasiir"
+      },
+      "32": {
+        "Name": "Fasiir"
+      },
+      "33": {
+        "Name": "Cera"
+      },
+      "34": {
+        "Name": "Birin"
+      },
+      "35": {
+        "Name": "Hanii and Jalia"
+      },
+      "36": {
+        "Name": "Rejira"
+      },
+      "37": {
+        "Name": "Bradir"
+      },
+      "38": {
+        "Name": "Bradir"
+      },
+      "39": {
+        "Name": "Bradir"
+      },
+      "40": {
+        "Name": "Aliis"
+      },
+      "41": {
+        "Name": "Brid"
+      },
+      "42": {
+        "Name": "Zirna"
+      },
+      "43": {
+        "Name": "Krai"
+      },
       "44": {},
       "45": {},
-      "46": {},
-      "47": {},
-      "48": {},
-      "49": {},
-      "50": {},
-      "51": {},
-      "52": {},
-      "53": {},
-      "54": {},
-      "55": {},
-      "56": {},
-      "57": {},
-      "58": {},
+      "46": {
+        "Name": "Rabir"
+      },
+      "47": {
+        "Name": "Vrik"
+      },
+      "48": {
+        "Name": "Laila"
+      },
+      "49": {
+        "Name": "Osini"
+      },
+      "50": {
+        "Name": "Jila"
+      },
+      "51": {
+        "Name": "Bewir"
+      },
+      "52": {
+        "Name": "Wania"
+      },
+      "53": {
+        "Name": "Zirr"
+      },
+      "54": {
+        "Name": "Viri"
+      },
+      "55": {
+        "Name": "Snird"
+      },
+      "56": {
+        "Name": "Frinja"
+      },
+      "57": {
+        "Name": "Krinn"
+      },
+      "58": {
+        "Name": "Jiris"
+      },
       "59": {},
       "60": {},
       "61": {},
       "62": {},
       "63": {},
-      "64": {},
-      "65": {},
-      "66": {},
-      "67": {},
-      "68": {},
-      "69": {},
-      "70": {},
+      "64": {
+        "Name": "Tharnos"
+      },
+      "65": {
+        "Name": "Garris"
+      },
+      "66": {
+        "Name": "Firina"
+      },
+      "67": {
+        "Name": "Sarena"
+      },
+      "68": {
+        "Name": "Ferina"
+      },
+      "69": {
+        "Name": "Oibelos"
+      },
+      "70": {
+        "Name": "Aretha"
+      },
       "71": {},
-      "72": {},
-      "73": {},
-      "74": {},
-      "75": {},
-      "76": {},
-      "77": {},
-      "78": {},
-      "79": {},
-      "80": {},
-      "81": {},
-      "82": {},
-      "83": {},
-      "84": {},
-      "85": {},
+      "72": {
+        "Name": "Dranbar"
+      },
+      "73": {
+        "Name": "Peleitos"
+      },
+      "74": {
+        "Name": "Bragona"
+      },
+      "75": {
+        "Name": "Winion"
+      },
+      "76": {
+        "Name": "Tamno"
+      },
+      "77": {
+        "Name": "Bennos"
+      },
+      "78": {
+        "Name": "Leitos"
+      },
+      "79": {
+        "Name": "Nemos"
+      },
+      "80": {
+        "Name": "Makaio and Rifrako"
+      },
+      "81": {
+        "Name": "Ouktero"
+      },
+      "82": {
+        "Name": "Torko"
+      },
+      "83": {
+        "Name": "Bero"
+      },
+      "84": {
+        "Name": "Frinos"
+      },
+      "85": {
+        "Name": "Roves"
+      },
       "86": {},
       "87": {},
       "88": {},
       "89": {},
       "90": {},
-      "91": {},
-      "92": {},
-      "93": {},
-      "94": {},
-      "95": {},
-      "96": {},
-      "97": {},
-      "98": {}
+      "91": {
+        "Name": "Ned die AI"
+      },
+      "92": {
+        "Name": "Christine"
+      },
+      "93": {
+        "Name": "Joe Bernard"
+      },
+      "94": {
+        "Name": "Colonel Priver"
+      },
+      "95": {
+        "Name": "Robert Shaw"
+      },
+      "96": {
+        "Name": "Akira Mitsamati"
+      },
+      "97": {
+        "Name": "Michelle Laton"
+      },
+      "98": {
+        "Name": "Anne Dorbeck"
+      }
     }
   },
   "SMLPORT1.XLD": {
@@ -12734,88 +13230,226 @@
     "EnumName": "SmallPortraitId",
     "EnumType": "byte",
     "Assets": {
-      "0": {},
-      "1": {},
-      "2": {},
-      "3": {},
-      "4": {},
-      "5": {},
-      "6": {},
-      "7": {},
-      "8": {},
-      "9": {},
-      "10": {},
-      "11": {},
-      "12": {},
-      "13": {},
-      "14": {},
-      "15": {},
-      "16": {},
-      "17": {},
-      "18": {},
-      "19": {},
-      "20": {},
-      "21": {},
-      "22": {},
-      "23": {},
-      "24": {},
-      "25": {},
-      "26": {},
-      "27": {},
-      "28": {},
-      "29": {
-        "Name": "GibtEsNicht"
+      "0": {
+        "Name": "Alice Takashi"
       },
-      "30": {},
-      "31": {},
-      "32": {},
-      "33": {},
-      "34": {},
-      "35": {},
-      "36": {},
-      "37": {},
-      "38": {},
-      "39": {},
-      "40": {},
-      "41": {},
-      "42": {},
-      "43": {},
-      "44": {},
-      "45": {},
-      "46": {},
-      "47": {},
-      "48": {},
-      "49": {},
-      "50": {},
-      "51": {},
-      "52": {},
-      "53": {},
-      "54": {},
-      "55": {},
-      "56": {},
-      "57": {},
-      "58": {},
-      "59": {},
-      "60": {},
-      "61": {},
-      "62": {},
+      "1": {
+        "Name": "Robert Ashley"
+      },
+      "2": {
+        "Name": "Rainer Hofstedt"
+      },
+      "3": {
+        "Name": "Kapitän Brandt"
+      },
+      "4": {
+        "Name": "Ned and Rhain"
+      },
+      "5": {
+        "Name": "Argim"
+      },
+      "6": {
+        "Name": "Ned"
+      },
+      "7": {
+        "Name": "Stiriik"
+      },
+      "8": {
+        "Name": "Stiriik"
+      },
+      "9": {},
+      "10": {
+        "Name": "Gerwad"
+      },
+      "11": {
+        "Name": "Agida"
+      },
+      "12": {
+        "Name": "Merdger"
+      },
+      "13": {
+        "Name": "Tori"
+      },
+      "14": {
+        "Name": "Nelly"
+      },
+      "15": {
+        "Name": "Morpatt"
+      },
+      "16": {},
+      "17": {
+        "Name": "Konny"
+      },
+      "18": {
+        "Name": "Ohl"
+      },
+      "19": {
+        "Name": "Amine"
+      },
+      "20": {
+        "Name": "Synja"
+      },
+      "21": {
+        "Name": "Zebenno"
+      },
+      "22": {
+        "Name": "Kyla"
+      },
+      "23": {
+        "Name": "Zeibe"
+      },
+      "24": {
+        "Name": "Jeros"
+      },
+      "25": {
+        "Name": "Mykonou"
+      },
+      "26": {
+        "Name": "Coskon"
+      },
+      "27": {
+        "Name": "Kossea"
+      },
+      "28": {
+        "Name": "Sojekos"
+      },
+      "29": {
+        "Name": "Gibt es nicht"
+      },
+      "30": {
+        "Name": "Kontos"
+      },
+      "31": {
+        "Name": "Perron"
+      },
+      "32": {
+        "Name": "Gard"
+      },
+      "33": {
+        "Name": "Riko"
+      },
+      "34": {
+        "Name": "Herras"
+      },
+      "35": {
+        "Name": "Darios"
+      },
+      "36": {
+        "Name": "Nodd"
+      },
+      "37": {
+        "Name": "Nadje"
+      },
+      "38": {
+        "Name": "Arrim"
+      },
+      "39": {
+        "Name": "Edjirr"
+      },
+      "40": {
+        "Name": "Kryte"
+      },
+      "41": {
+        "Name": "Aurino"
+      },
+      "42": {
+        "Name": "Kariah"
+      },
+      "43": {
+        "Name": "Bagga"
+      },
+      "44": {
+        "Name": "Posch"
+      },
+      "45": {
+        "Name": "Riolea"
+      },
+      "46": {
+        "Name": "Melthar"
+      },
+      "47": {
+        "Name": "Zerruma"
+      },
+      "48": {
+        "Name": "Dolo"
+      },
+      "49": {
+        "Name": "Jikraii"
+      },
+      "50": {
+        "Name": "Ramina"
+      },
+      "51": {
+        "Name": "Otikro"
+      },
+      "52": {
+        "Name": "Frill"
+      },
+      "53": {
+        "Name": "Cuarnainn"
+      },
+      "54": {
+        "Name": "Branagh"
+      },
+      "55": {
+        "Name": "Rhuainaigh"
+      },
+      "56": {
+        "Name": "Pardhainn"
+      },
+      "57": {
+        "Name": "Jonatharh"
+      },
+      "58": {
+        "Name": "Rhunagh"
+      },
+      "59": {
+        "Name": "Arthor"
+      },
+      "60": {
+        "Name": "Cairnain"
+      },
+      "61": {
+        "Name": "Rhain"
+      },
+      "62": {
+        "Name": "Brann"
+      },
       "63": {
-        "Name": "GibtEsSchon"
+        "Name": "Gibt es schon"
       },
       "64": {
-        "Name": "GibtEsSchon"
+        "Name": "Gibt es schon"
       },
-      "65": {},
-      "66": {},
-      "67": {},
-      "68": {},
-      "69": {},
-      "70": {},
-      "71": {},
-      "72": {},
+      "65": {
+        "Name": "Drannagh"
+      },
+      "66": {
+        "Name": "Llanaer"
+      },
+      "67": {
+        "Name": "Irkith"
+      },
+      "68": {
+        "Name": "Birrh"
+      },
+      "69": {
+        "Name": "Maire"
+      },
+      "70": {
+        "Name": "Althea"
+      },
+      "71": {
+        "Name": "Harriet"
+      },
+      "72": {
+        "Name": "Mellthas"
+      },
       "73": {},
       "74": {},
-      "75": {},
+      "75": {
+        "Name": "Siobhan"
+      },
       "76": {},
       "77": {},
       "78": {},

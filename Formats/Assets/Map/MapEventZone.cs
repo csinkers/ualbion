@@ -23,6 +23,7 @@ namespace UAlbion.Formats.Assets.Map
                 Y = global ? (byte)0 : y
             };
 
+            s.Begin();
             zone.X = s.Transform<byte, byte>(nameof(X), zone.X, s.UInt8, StoreIncremented.Instance);
             // ApiUtil.Assert(global && zone.X == 0xff || !global && zone.X != 0xff);
             zone.Unk1 = s.UInt8(nameof(Unk1), zone.Unk1);
@@ -30,6 +31,8 @@ namespace UAlbion.Formats.Assets.Map
             ushort? nodeId = ConvertMaxToNull.Serdes(nameof(Node), zone.Node?.Id, s.UInt16);
             if (nodeId != null && zone.Node == null)
                 zone.Node = new DummyEventNode(nodeId.Value);
+
+            s.End();
             return zone;
         }
 

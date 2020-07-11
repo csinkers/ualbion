@@ -9,13 +9,15 @@ namespace UAlbion.Formats.MapEvents
         public static DataChangeEvent Serdes(DataChangeEvent e, ISerializer s)
         {
             e ??= new DataChangeEvent();
+            s.Begin();
             e.Property = s.EnumU8(nameof(Property), e.Property);
             e.Mode = s.EnumU8(nameof(Mode), e.Mode);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
-            e.PartyMemberId = (PartyCharacterId?)StoreIncrementedNullZero.Serdes(nameof(PartyMemberId), (byte?)e.PartyMemberId, s.UInt8);
+            e.PartyMemberId = s.TransformEnumU8(nameof(PartyMemberId), e.PartyMemberId, StoreIncrementedNullZero<PartyCharacterId>.Instance);
             e.Value = s.UInt16(nameof(Value), e.Value);
             e.Amount = s.UInt16(nameof(Amount), e.Amount);
+            s.End();
             return e;
         }
 

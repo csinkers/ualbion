@@ -8,6 +8,7 @@ namespace UAlbion.Formats.MapEvents
         public static OffsetEvent Serdes(OffsetEvent e, ISerializer s)
         {
             e ??= new OffsetEvent();
+            s.Begin();
             e.X = s.Int8(nameof(X), e.X);
             e.Y = s.Int8(nameof(Y), e.Y);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
@@ -20,6 +21,7 @@ namespace UAlbion.Formats.MapEvents
             ApiUtil.Assert(e.Unk5 == 0);
             ApiUtil.Assert(e.Unk6 == 0);
             ApiUtil.Assert(e.Unk8 == 0);
+            s.End();
             return e;
         }
 

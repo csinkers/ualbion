@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 namespace UAlbion.Formats.AssetIds
 {
-    public enum DungeonWallId  
+    public enum DungeonWallId : ushort
     {
         JiriTileAndStone = 0,
         JiriSpider = 1,

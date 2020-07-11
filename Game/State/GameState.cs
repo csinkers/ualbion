@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
@@ -106,9 +105,9 @@ namespace UAlbion.Game.State
             {
                 MapId = mapId,
                 PartyX = x,
-                PartyY = y
+                PartyY = y,
+                ActiveMembers = { [0] = PartyCharacterId.Tom }
             };
-            _game.ActiveMembers[0] = PartyCharacterId.Tom;
 
             foreach (PartyCharacterId charId in Enum.GetValues(typeof(PartyCharacterId)))
                 _game.PartyMembers.Add(charId, assets.LoadPartyMember(charId));

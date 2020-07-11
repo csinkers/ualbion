@@ -9,6 +9,7 @@ namespace UAlbion.Formats.MapEvents
         public static ChangeIconEvent Serdes(ChangeIconEvent e, ISerializer s)
         {
             e ??= new ChangeIconEvent();
+            s.Begin();
             e.X = s.Int8(nameof(X), (sbyte)e.X);
             e.Y = s.Int8(nameof(Y), (sbyte)e.Y);
             e.Scope = s.EnumU8(nameof(Scope), e.Scope);
@@ -22,6 +23,7 @@ namespace UAlbion.Formats.MapEvents
                     || e.Unk5 == 2
                     || e.Unk5 == 3);
             ApiUtil.Assert(e.Unk8 == 0 || e.Unk8 == 152, $"Unexpected unk8 in change_icon: {e.Unk8}"); // Is 152 for a single change wall event in the endgame. Probably just an oversight.
+            s.End();
             return e;
         }
 

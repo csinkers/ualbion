@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
@@ -51,10 +52,9 @@ namespace UAlbion
                 new StdioConsoleLogger(),
                 new ClipboardManager(),
                 new ImGuiConsoleLogger(),
-                Settings.Load(baseDir),
+                Settings.Load(baseDir), // Need to register settings first, as the AssetConfigLocator relies on it.
                 locatorRegistry,
-                assets); // Need to register settings first, as the AssetConfigLocator relies on it.
-
+                assets);
 
             using var exchange = new EventExchange(new LogExchange())
                 .Register<ICoreFactory>(factory)
@@ -65,7 +65,7 @@ namespace UAlbion
             PerfTracker.StartupEvent("Registered asset manager");
             PerfTracker.StartupEvent($"Running as {commandLine.Mode}");
 
-            switch(commandLine.Mode)
+            switch (commandLine.Mode)
             {
                 case ExecutionMode.Game:
                 case ExecutionMode.GameWithSlavedAudio:
@@ -80,6 +80,7 @@ namespace UAlbion
                 case ExecutionMode.SavedGameTests: SavedGameTests.RoundTripTest(baseDir); break;
 
                 case ExecutionMode.DumpData:
+                    PerfTracker.BeginFrame(); // Don't need to show verbose startup logging while dumping
                     var tf = new TextFormatter();
                     exchange.Attach(tf);
                     DumpType dumpTypes = DumpType.All;

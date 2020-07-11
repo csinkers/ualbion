@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
@@ -42,7 +43,14 @@ namespace UAlbion
 
                 ApiUtil.Assert(originalBytes.Length == roundTripBytes.Length);
                 ApiUtil.Assert(originalBytes.SequenceEqual(roundTripBytes));
+
+                var sw = new StringWriter();
+                loader.Serdes(save, new JsonWriter(sw, true), key, null);
+                File.WriteAllText(file + ".json", sw.ToString());
+                break;
             }
+
+            Console.ReadLine();
         }
     }
 }

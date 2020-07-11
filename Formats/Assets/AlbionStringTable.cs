@@ -40,6 +40,7 @@ namespace UAlbion.Formats.Assets
 
         public static StringTable Serdes(StringTable existing, ISerializer s)
         {
+            s.Begin();
             var strings = existing?._strings;
             var stringCount = s.UInt16("StringCount", (ushort)(strings?.Length ?? 0));
             strings ??= new string[stringCount];
@@ -52,6 +53,7 @@ namespace UAlbion.Formats.Assets
                 strings[i] = s.FixedLengthString(null, strings[i], stringLengths[i]);
 
             s.Check();
+            s.End();
             return existing ?? new StringTable(strings);
         }
     }

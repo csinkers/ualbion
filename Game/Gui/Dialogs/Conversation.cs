@@ -260,11 +260,11 @@ namespace UAlbion.Game.Gui.Dialogs
         bool TriggerAction(ActionType type, byte small, ushort large, Action continuation = null)
         {
             var assets = Resolve<IAssetManager>();
-            var eventSet = assets.LoadEventSet(_npc.EventSetId);
-            var wordSet = assets.LoadEventSet(_npc.WordSetId);
+            var eventSet = _npc.EventSetId == null ? null : assets.LoadEventSet(_npc.EventSetId.Value);
+            var wordSet = _npc.WordSetId == null ? null : assets.LoadEventSet(_npc.WordSetId.Value);
 
             bool fromWordSet = false;
-            var chain = eventSet.Chains.FirstOrDefault(x =>
+            var chain = eventSet?.Chains.FirstOrDefault(x =>
                 x.FirstEvent?.Event is ActionEvent action && 
                 action.ActionType == type && 
                 action.SmallArg == small &&

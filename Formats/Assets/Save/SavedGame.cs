@@ -10,6 +10,10 @@ using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets.Save
 {
+    public class Unknown35Byte
+    {
+    }
+
     public class SavedGame
     {
         public const int MaxPartySize = 6;
@@ -43,11 +47,12 @@ namespace UAlbion.Formats.Assets.Save
         public byte[] Unknown2C1 { get; set; }
         public byte[] Unknown5B9F { get; set; }
         public NpcState[] Npcs { get; } = new NpcState[MaxNpcCount];
-        public byte[] Unknown5B71 { get; set; }
-        public MapChangeList PermanentMapChanges { get; private set; } = new MapChangeList();
-        public MapChangeList TemporaryMapChanges { get; private set; } = new MapChangeList();
-        public VisitedEventList VisitedEvents { get; set; }
-        public PartyCharacterId?[] ActiveMembers { get; } = new PartyCharacterId?[MaxPartySize];
+        public byte[] Unknown5B71 { get; set; } 
+        public Unknown35Byte[] Unk35Byte { get; set; } // Len = 16
+        public IList<MapChange> PermanentMapChanges { get; private set; } = new List<MapChange>();
+        public IList<MapChange> TemporaryMapChanges { get; private set; } = new List<MapChange>();
+        public IList<VisitedEvent> VisitedEvents { get; private set; } = new List<VisitedEvent>();
+        public IList<PartyCharacterId?> ActiveMembers { get; private set; } = new PartyCharacterId?[MaxPartySize];
 
         public static string GetName(BinaryReader br)
         {
@@ -63,6 +68,7 @@ namespace UAlbion.Formats.Assets.Save
         public static SavedGame Serdes(SavedGame save, ISerializer s)
         {
             save ??= new SavedGame();
+            s.Begin();
 
             ushort nameLength = s.UInt16("NameLength", (ushort)(save.Name?.Length ?? 0));
             save.Unk0 = s.UInt16(nameof(Unk0), save.Unk0);
@@ -85,13 +91,19 @@ namespace UAlbion.Formats.Assets.Save
 
             save.Unknown16 = s.ByteArrayHex(nameof(Unknown16), save.Unknown16, 0x184); // 16
 
-            for (int i = 0; i < save.ActiveMembers.Length; i++) // 6 x PlayerId @ 19A
-            {
-                save.ActiveMembers[i] = (PartyCharacterId?)StoreIncrementedNullZero.Serdes(
-                    nameof(save.ActiveMembers),
-                    (ushort?)save.ActiveMembers[i],
-                    s.UInt16);
-            }
+            save.ActiveMembers = s.List(
+                nameof(ActiveMembers),
+                save.ActiveMembers,
+                MaxPartySize,
+                (i, x, s2) =>
+                {
+                    var value = s2.TransformEnumU8(
+                        null,
+                        save.ActiveMembers[i],
+                        StoreIncrementedNullZero<PartyCharacterId>.Instance);
+                    s2.UInt8("dummy", 0);
+                    return value;
+                });
 
             save.Unknown1A6 = s.ByteArrayHex(nameof(Unknown1A6), save.Unknown1A6, 0xD0); // 1A6
             save._switches.Packed = s.ByteArrayHex(nameof(Switches), save._switches.Packed, FlagSet.PackedSize); // 276
@@ -106,9 +118,20 @@ namespace UAlbion.Formats.Assets.Save
                 save.Unknown5B71,
                 (int)(0x947C + versionOffset - s.Offset)); // 5B9F
 
-            save.PermanentMapChanges = s.Meta(nameof(PermanentMapChanges), save.PermanentMapChanges, MapChangeList.Serdes);
-            save.TemporaryMapChanges = s.Meta(nameof(TemporaryMapChanges), save.TemporaryMapChanges, MapChangeList.Serdes);
-            save.VisitedEvents = s.Meta(nameof(VisitedEvents), save.VisitedEvents, VisitedEventList.Serdes);
+            uint permChangesSize = s.UInt32("PermanentMapChanges_Size", (uint)(save.PermanentMapChanges.Count * MapChange.SizeOnDisk + 2));
+            ushort permChangesCount = s.UInt16("PermanentMapChanges_Count", (ushort)save.PermanentMapChanges.Count);
+            ApiUtil.Assert(permChangesSize == permChangesCount * MapChange.SizeOnDisk + 2);
+            save.PermanentMapChanges = s.List(nameof(PermanentMapChanges), save.PermanentMapChanges, permChangesCount, MapChange.Serdes);
+
+            uint tempChangesSize = s.UInt32("TemporaryMapChanges_Size", (uint)(save.TemporaryMapChanges.Count * MapChange.SizeOnDisk + 2));
+            ushort tempChangesCount = s.UInt16("TemporaryMapChanges_Count", (ushort)save.TemporaryMapChanges.Count);
+            ApiUtil.Assert(tempChangesSize == tempChangesCount * MapChange.SizeOnDisk + 2);
+            save.TemporaryMapChanges = s.List(nameof(TemporaryMapChanges), save.TemporaryMapChanges, tempChangesCount, MapChange.Serdes);
+
+            uint visitedEventsSize = s.UInt32("VisitedEvents_Size", (uint)(save.VisitedEvents.Count * VisitedEvent.SizeOnDisk + 2));
+            ushort visitedEventsCount = s.UInt16("VisitedEvents_Count", (ushort)save.VisitedEvents.Count);
+            ApiUtil.Assert(visitedEventsSize == visitedEventsCount * VisitedEvent.SizeOnDisk + 2);
+            save.VisitedEvents = s.List(nameof(VisitedEvents), save.VisitedEvents, visitedEventsCount, VisitedEvent.Serdes);
 
             var charLoader = new CharacterSheetLoader();
             void SerdesPartyCharacter(int i, int size, ISerializer serializer)
@@ -149,9 +172,9 @@ namespace UAlbion.Formats.Assets.Save
             {
                 var key = (AutoMapId)i;
                 if (save.Automaps.TryGetValue(key, out _))
-                    serializer.ByteArray("Automap" + i, save.Automaps[key], save.Automaps[key].Length);
+                    serializer.ByteArray(null, save.Automaps[key], save.Automaps[key].Length);
                 else if (serializer.Mode == SerializerMode.Reading)
-                    save.Automaps[key] = serializer.ByteArray("Automap" + i, null, size);
+                    save.Automaps[key] = serializer.ByteArray(null, null, size);
             }
 
             void SerdesChest(int i, int size, ISerializer serializer)
@@ -211,6 +234,7 @@ namespace UAlbion.Formats.Assets.Save
             XldLoader.Serdes(XldCategory.NpcCharacter,2, s, SerdesNpcCharacter, npcIds);
 
             s.RepeatU8("Padding", 0, 4);
+            s.End();
 
             return save;
         }

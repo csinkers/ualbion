@@ -68,6 +68,7 @@ namespace UAlbion.Formats.Assets
         public static ItemSlot Serdes(InventorySlotId id, ItemSlot slot, ISerializer s)  // 6 per slot
         {
             slot ??= new ItemSlot(id);
+            s.Begin();
             slot.Amount = s.UInt8(nameof(slot.Amount), (byte)(slot.Amount == Unlimited ? 0xff : slot.Amount));
             if (slot.Amount == 0xff)
                 slot.Amount = Unlimited;
@@ -77,9 +78,10 @@ namespace UAlbion.Formats.Assets
             slot.Flags = s.EnumU8(nameof(slot.Flags), slot.Flags);
 
             ItemId? itemId = (slot.Item as IItem)?.Id;
-            itemId = (ItemId?)StoreIncrementedNullZero.Serdes(nameof(itemId), (ushort?)itemId, s.UInt16);
+            itemId = s.TransformEnumU16(nameof(ItemId), itemId, StoreIncrementedNullZero<ItemId>.Instance);
             if(slot.Item == null && itemId != null)
                 slot.Item = new ItemProxy(itemId.Value);
+            s.End();
             return slot;
         }
 

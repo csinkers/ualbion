@@ -16,6 +16,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public static ObjectGroup Serdes(int _, ObjectGroup og, ISerializer s)
         {
             og ??= new ObjectGroup();
+            s.Begin();
             og.AutoGraphicsId = s.UInt16(nameof(og.AutoGraphicsId), og.AutoGraphicsId);
 
             for (int n = 0; n < 8; n++)
@@ -43,6 +44,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
                 }
             } // +64
 
+            s.End();
             return og;
         }
     }

@@ -8,6 +8,7 @@ namespace UAlbion.Formats.MapEvents
         public static WipeEvent Serdes(WipeEvent e, ISerializer s)
         {
             e ??= new WipeEvent();
+            s.Begin();
             e.Value = s.UInt8(nameof(Value), e.Value);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
@@ -21,6 +22,7 @@ namespace UAlbion.Formats.MapEvents
             ApiUtil.Assert(e.Unk5 == 0);
             ApiUtil.Assert(e.Unk6 == 0);
             ApiUtil.Assert(e.Unk8 == 0);
+            s.End();
             return e;
         }
 

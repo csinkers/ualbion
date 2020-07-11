@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using SerdesNet;
 
 namespace UAlbion.Formats
@@ -12,20 +13,33 @@ namespace UAlbion.Formats
     {
         public static readonly StoreIncremented Instance = new StoreIncremented();
         StoreIncremented() { }
-        public static byte Serdes(string name, byte existing, Func<string, byte, byte> serializer) => Instance.ToMemory(serializer(name, Instance.ToPersistent(existing)));
-        public static ushort Serdes(string name, ushort existing, Func<string, ushort, ushort> serializer) => Instance.ToMemory(serializer(name, Instance.ToPersistent(existing)));
-        public static uint Serdes(string name, uint existing, Func<string, uint, uint> serializer) => Instance.ToMemory(serializer(name, Instance.ToPersistent(existing)));
-        public static short Serdes(string name, short existing, Func<string, short, short> serializer) => Instance.ToMemory(serializer(name, Instance.ToPersistent(existing)));
-        public static int Serdes(string name, int existing, Func<string, int, int> serializer) => Instance.ToMemory(serializer(name, Instance.ToPersistent(existing)));
-        public uint ToMemory(uint x) => x - 1;
-        public uint ToPersistent(uint x) => x + 1;
-        public ushort ToMemory(ushort x) => (ushort)(x - 1);
-        public ushort ToPersistent(ushort x) => (ushort)(x + 1);
-        public byte ToMemory(byte x) => (byte)(x - 1);
-        public byte ToPersistent(byte x) => (byte)(x + 1);
-        public int ToMemory(int x) => x - 1;
-        public int ToPersistent(int x) => x + 1;
-        public short ToMemory(short x) => (short)(x - 1);
-        public short ToPersistent(short x) => (short)(x + 1);
+        public static byte Serdes(string name, byte existing, Func<string, byte, byte> serializer) => Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
+        public static ushort Serdes(string name, ushort existing, Func<string, ushort, ushort> serializer) => Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
+        public static uint Serdes(string name, uint existing, Func<string, uint, uint> serializer) => Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
+        public static short Serdes(string name, short existing, Func<string, short, short> serializer) => Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
+        public static int Serdes(string name, int existing, Func<string, int, int> serializer) => Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
+
+        public uint   FromNumeric(uint   x) => x - 1;
+        public int    FromNumeric(int    x) => x - 1;
+        public ushort FromNumeric(ushort x) => (ushort)(x - 1);
+        public short  FromNumeric(short  x) => (short)(x - 1);
+        public byte   FromNumeric(byte   x) => (byte)(x - 1);
+
+        public uint   ToNumeric(uint x) => x + 1;
+        public int    ToNumeric(int x) => x + 1;
+        public ushort ToNumeric(ushort x) => (ushort)(x + 1);
+        public short  ToNumeric(short x) => (short)(x + 1);
+        public byte   ToNumeric(byte x) => (byte)(x + 1);
+
+        public string ToSymbolic(uint   memory) => memory.ToString(CultureInfo.InvariantCulture);
+        public string ToSymbolic(int    memory) => memory.ToString(CultureInfo.InvariantCulture);
+        public string ToSymbolic(ushort memory) => memory.ToString(CultureInfo.InvariantCulture);
+        public string ToSymbolic(short  memory) => memory.ToString(CultureInfo.InvariantCulture);
+        public string ToSymbolic(byte   memory) => memory.ToString(CultureInfo.InvariantCulture);
+        uint   IConverter<uint,     uint>.FromSymbolic(string symbolic) =>   uint.Parse(symbolic, CultureInfo.InvariantCulture);
+        int    IConverter<int,       int>.FromSymbolic(string symbolic) =>    int.Parse(symbolic, CultureInfo.InvariantCulture);
+        ushort IConverter<ushort, ushort>.FromSymbolic(string symbolic) => ushort.Parse(symbolic, CultureInfo.InvariantCulture);
+        short  IConverter<short,   short>.FromSymbolic(string symbolic) =>  short.Parse(symbolic, CultureInfo.InvariantCulture);
+        byte   IConverter<byte,     byte>.FromSymbolic(string symbolic) =>   byte.Parse(symbolic, CultureInfo.InvariantCulture);
     }
 }

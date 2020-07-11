@@ -7,6 +7,7 @@ namespace UAlbion.Formats.MapEvents
         public static CloneAutomapEvent Serdes(CloneAutomapEvent e, ISerializer s)
         {
             e ??= new CloneAutomapEvent();
+            s.Begin();
             e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
@@ -14,6 +15,7 @@ namespace UAlbion.Formats.MapEvents
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+            s.End();
             return e;
         }
 

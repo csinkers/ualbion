@@ -19,11 +19,13 @@ namespace UAlbion.Formats.MapEvents
         public static SimpleChestEvent Serdes(SimpleChestEvent e, ISerializer s)
         {
             e ??= new SimpleChestEvent();
+            s.Begin();
             e.ChestType = s.EnumU8(nameof(ChestType), e.ChestType);
             uint padding = s.UInt32(nameof(padding), 0);
             ApiUtil.Assert(padding == 0);
             e.ItemId = (ItemId)StoreIncremented.Serdes(nameof(e.ItemId), (ushort)e.ItemId, s.UInt16);
             e.Amount = s.UInt16(nameof(Amount), e.Amount);
+            s.End();
             return e;
         }
 

@@ -19,6 +19,7 @@ namespace UAlbion.Formats.Assets
         public static EventSet Serdes(EventSetId eventSetId, EventSet set, ISerializer s)
         {
             set ??= new EventSet(eventSetId);
+            s.Begin();
             var chainStarts = new List<int>();
             if (set.Chains != null)
             {
@@ -64,6 +65,7 @@ namespace UAlbion.Formats.Assets
                 }
             }
 
+            s.End();
             return set;
         }
     }

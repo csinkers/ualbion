@@ -57,15 +57,24 @@ namespace UAlbion.Formats.Assets.Save
                     return length;
                 }
 
+                case SerializerMode.WritingJson:
+                {
+                    using var tw = new StreamWriter(stream, Encoding.GetEncoding(850), 1024, true);
+                    var s = new JsonWriter(tw, true, (JsonWriter)parentSerializer);
+                    s.Seek(fakeOffset);
+                    func(s);
+                    int length = (int)s.Offset - fakeOffset;
+                    fakeOffset = (int)s.Offset;
+                    return length;
+                }
+
                 default: throw new InvalidOperationException();
             }
         }
 
         public static void Serdes(XldCategory category, ushort xldNumber, ISerializer s, Action<int, int, ISerializer> func, IList<int> populatedIds)
         {
-            s.Comment($"Xld{category}.{xldNumber}");
-            s.Indent();
-
+            s.Begin($"Xld{category}.{xldNumber}");
             if (s.Mode == SerializerMode.Reading)
             {
                 var descriptor = s.Meta("XldDescriptor", (XldDescriptor)null, XldDescriptor.Serdes);
@@ -99,21 +108,42 @@ namespace UAlbion.Formats.Assets.Save
                     int initialFakeOffset = (int)s.Offset + HeaderSize(maxPopulatedId);
                     int fakeOffset = initialFakeOffset;
                     for (int i = 0; i < maxPopulatedId; i++)
-                        lengths[i] = WithSerializer(s.Mode, buffers[i], memorySerializer => func(i + xldNumber * 100, 0, memorySerializer), s, ref fakeOffset);
+                        lengths[i] = WithSerializer(
+                            s.Mode,
+                            buffers[i],
+                            memorySerializer => func(i + xldNumber * 100, 0, memorySerializer), s, ref fakeOffset);
 
                     HeaderSerdes(lengths, s);
                     ApiUtil.Assert(initialFakeOffset == s.Offset);
-                    for (int i = 0; i < lengths.Length; i++)
+                    switch (s.Mode)
                     {
-                        if (s.Mode == SerializerMode.WritingAnnotated)
+                        case SerializerMode.WritingAnnotated:
                         {
-                            var content = Encoding.GetEncoding(850).GetString(buffers[i].ToArray());
-                            s.Meta($"XLD{xldNumber}:{i}", content, (j,x,_) => s.NullTerminatedString($"XLD{xldNumber}:{j}", content));
+                            for (int i = 0; i < buffers.Length; i++)
+                            {
+                                var content = Encoding.GetEncoding(850).GetString(buffers[i].ToArray());
+                                s.NullTerminatedString($"{xldNumber}{i:D2}", content);
+                            }
+                            break;
                         }
-                        else
+
+                        case SerializerMode.WritingJson:
                         {
-                            s.ByteArray($"XLD{xldNumber}:{i}", buffers[i].ToArray(), (int) buffers[i].Length);
+                            var jw = (JsonWriter)s;
+                            for (int i = 0; i < buffers.Length; i++)
+                            {
+                                if (buffers[i].Length == 0)
+                                    continue;
+                                var content = Encoding.GetEncoding(850).GetString(buffers[i].ToArray());
+                                jw.Raw($"{xldNumber}{i:D2}", content);
+                            }
+                            break;
                         }
+
+                        default:
+                            foreach (var b in buffers)
+                                s.ByteArray("XLD", b.ToArray(), (int)b.Length);
+                            break;
                     }
 
                     var endOffset = s.Offset;
@@ -135,7 +165,7 @@ namespace UAlbion.Formats.Assets.Save
                         buffer.Dispose();
                 }
             }
-            s.Unindent();
+            s.End();
         }
     }
 }

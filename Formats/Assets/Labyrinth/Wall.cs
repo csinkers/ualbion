@@ -38,9 +38,10 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public static Wall Serdes(int _, Wall w, ISerializer s)
         {
             w ??= new Wall();
+            s.Begin();
             w.Properties = s.EnumU8(nameof(w.Properties), w.Properties);
             w.CollisionData = s.ByteArray(nameof(w.CollisionData), w.CollisionData, 3);
-            w.TextureNumber = (DungeonWallId?)Tweak.Serdes(nameof(w.TextureNumber), (ushort?)w.TextureNumber, s.UInt16);
+            w.TextureNumber = s.TransformEnumU16(nameof(w.TextureNumber), w.TextureNumber, Tweak<DungeonWallId>.Instance);
             w.AnimationFrames = s.UInt8(nameof(w.AnimationFrames), w.AnimationFrames);
             w.AutoGfxType = s.UInt8(nameof(w.AutoGfxType), w.AutoGfxType);
             w.TransparentColour = s.UInt8(nameof(w.TransparentColour), w.TransparentColour);
@@ -50,6 +51,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
 
             ushort overlayCount = s.UInt16("overlayCount", (ushort)w.Overlays.Count);
             s.List(nameof(w.Overlays), w.Overlays, overlayCount, Overlay.Serdes);
+            s.End();
             return w;
         }
     }

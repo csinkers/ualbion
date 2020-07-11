@@ -35,6 +35,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public static Object Serdes(int _, Object o, ISerializer s)
         {
             o ??= new Object();
+            s.Begin();
             o.Properties = s.EnumU8(nameof(o.Properties), o.Properties);
             o.CollisionData = s.ByteArray(nameof(o.CollisionData), o.CollisionData, 3);
             o.TextureNumber = (DungeonObjectId?)s.Transform<ushort, ushort?>(nameof(TextureNumber), (ushort?)o.TextureNumber, s.UInt16, Tweak.Instance);
@@ -44,6 +45,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
             o.Height = s.UInt16(nameof(o.Height), o.Height);
             o.MapWidth = s.UInt16(nameof(o.MapWidth), o.MapWidth);
             o.MapHeight = s.UInt16(nameof(o.MapHeight), o.MapHeight);
+            s.End();
             return o;
         }
     }

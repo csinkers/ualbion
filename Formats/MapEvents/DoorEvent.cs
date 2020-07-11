@@ -20,11 +20,13 @@ namespace UAlbion.Formats.MapEvents
         public static DoorEvent Serdes(DoorEvent e, ISerializer s, AssetType textType, ushort textSourceId)
         {
             e ??= new DoorEvent(textType, textSourceId);
+            s.Begin();
             e.PickDifficulty = s.UInt8(nameof(PickDifficulty), e.PickDifficulty);
-            e.KeyItemId = (ItemId?)StoreIncrementedNullZero.Serdes(nameof(KeyItemId), (ushort?)e.KeyItemId, s.UInt16);
-            e.InitialTextId = s.UInt8(nameof(InitialTextId), e.InitialTextId);
+            e.KeyItemId = s.TransformEnumU16(nameof(KeyItemId), e.KeyItemId, StoreIncrementedNullZero<ItemId>.Instance);
             e.UnlockedTextId = s.UInt8(nameof(UnlockedTextId), e.UnlockedTextId);
+            e.InitialTextId = s.UInt8(nameof(InitialTextId), e.InitialTextId);
             e.DoorId = s.UInt16(nameof(DoorId), e.DoorId); // Usually 100+
+            s.End();
             return e;
         }
 
@@ -39,7 +41,7 @@ namespace UAlbion.Formats.MapEvents
         public byte InitialTextId { get; private set; }
         public byte UnlockedTextId { get; private set; }
         public ushort DoorId { get; private set; }
-        public override string ToString() => $"inv:door {DoorId} ({PickDifficulty}% {KeyItemId} Initial:{InitialTextId} Opened:{UnlockedTextId})";
+        public override string ToString() => $"inv:door {DoorId} ({PickDifficulty}% {KeyItemId} Initial:{InitialTextId} Unlocked:{UnlockedTextId})";
         public override MapEventType EventType => MapEventType.Door;
         public AssetType TextType { get; }
         public ushort TextSourceId { get; }

@@ -9,6 +9,7 @@ namespace UAlbion.Formats.MapEvents
         public static TeleportEvent Serdes(TeleportEvent e, ISerializer s)
         {
             e ??= new TeleportEvent();
+            s.Begin();
             e.X = s.UInt8(nameof(X), e.X);
             e.Y = s.UInt8(nameof(Y), e.Y);
             e.Direction = s.EnumU8(nameof(Direction), e.Direction);
@@ -24,6 +25,7 @@ namespace UAlbion.Formats.MapEvents
                          || e.Unk4 == 106
                          || e.Unk4 == 255); // Always 255 in maps
             ApiUtil.Assert(e.Unk8 == 0);
+            s.End();
             return e;
         }
 

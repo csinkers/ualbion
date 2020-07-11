@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets
@@ -58,8 +59,8 @@ namespace UAlbion.Formats.Assets
         public PlayerLanguage Languages { get; set; }
         public AssetId SpriteId { get; set; }
         public SmallPortraitId? PortraitId { get; set; }
-        public EventSetId EventSetId { get; set; }
-        public EventSetId WordSetId { get; set; }
+        public EventSetId? EventSetId { get; set; }
+        public EventSetId? WordSetId { get; set; }
 
         public string GetName(GameLanguage language) => language switch
         {
@@ -101,18 +102,25 @@ namespace UAlbion.Formats.Assets
         public ushort Unknown60 { get; set; }
         public ushort Unknown66 { get; set; }
         public ushort Unknown68 { get; set; }
-        public byte[] UnknownBlock6C { get; set; }
+        public byte Unknown6C { get; set; }
         public ushort Unknown7E { get; set; }
         public ushort Unknown80 { get; set; }
         public ushort Unknown86 { get; set; }
         public ushort Unknown88 { get; set; }
         public ushort Unknown8E { get; set; }
         public ushort Unknown90 { get; set; }
-        public byte[] UnknownBlock96 { get; set; }
+        public IList<uint> UnknownBlock96 { get; set; } = new List<uint>();
         // ReSharper disable InconsistentNaming
         public ushort UnknownCE { get; set; }
         public ushort UnknownD6 { get; set; }
-        public byte[] UnknownBlockDA { get; set; }
+        public ushort UnknownDA { get; set; }
+        public ushort UnknownDC { get; set; }
+        public uint UnknownDE { get; set; }
+        public ushort UnknownE2 { get; set; }
+        public ushort UnknownE4 { get; set; }
+        public uint UnknownE6 { get; set; }
+        public uint UnknownEA { get; set; }
+
         public ushort UnknownFA { get; set; }
         public ushort UnknownFC { get; set; }
         // ReSharper restore InconsistentNaming

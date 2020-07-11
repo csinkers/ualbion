@@ -24,11 +24,12 @@ namespace UAlbion.Formats.Assets.Map
         {
             var startOffset = s.Offset;
             var map = existing ?? new MapData2D((MapDataId)config.Id);
+            s.Begin();
             map.Flags = s.EnumU8(nameof(Flags), map.Flags); // 0
             int npcCount = s.Transform("NpcCount", map.Npcs.Count, s.UInt8, NpcCountTransform.Instance); // 1
             var _ = s.UInt8("MapType", (byte)map.MapType); // 2
 
-            map.SongId = (SongId?)Tweak.Serdes(nameof(SongId), (byte?)map.SongId, s.UInt8); // 3
+            map.SongId = s.TransformEnumU8(nameof(SongId), map.SongId, Tweak<SongId>.Instance); // 3
             map.Width = s.UInt8(nameof(Width), map.Width); // 4
             map.Height = s.UInt8(nameof(Height), map.Height); // 5
             map.TilesetId = (TilesetId)StoreIncremented.Serdes(nameof(TilesetId), (byte)map.TilesetId, s.UInt8);  //6
@@ -74,6 +75,8 @@ namespace UAlbion.Formats.Assets.Map
 
             if (s.Mode == SerializerMode.Reading)
                 map.Unswizzle();
+
+            s.End();
             return map;
         }
     }

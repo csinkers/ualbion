@@ -20,7 +20,10 @@ namespace UAlbion.Game.State
         readonly IReadOnlyList<Player.Player> _readOnlyStatusBarOrder;
         readonly IReadOnlyList<Player.Player> _readOnlyWalkOrder;
 
-        public Party(IDictionary<PartyCharacterId, CharacterSheet> characterSheets, PartyCharacterId?[] statusBarOrder, Func<InventoryId, Inventory> getInventory)
+        public Party(
+            IDictionary<PartyCharacterId, CharacterSheet> characterSheets,
+            IList<PartyCharacterId?> statusBarOrder,
+            Func<InventoryId, Inventory> getInventory)
         {
             On<AddPartyMemberEvent>(e => SetLastResult(AddMember(e.PartyMemberId)));
             On<RemovePartyMemberEvent>(e => SetLastResult(RemoveMember(e.PartyMemberId)));

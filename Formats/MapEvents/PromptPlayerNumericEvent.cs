@@ -7,10 +7,12 @@ namespace UAlbion.Formats.MapEvents
         public static PromptPlayerNumericEvent Serdes(PromptPlayerNumericEvent e, ISerializer s)
         {
             e ??= new PromptPlayerNumericEvent();
+            s.Begin();
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);
             e.Immediate = s.UInt8(nameof(Immediate), e.Immediate);
             s.UInt16("Padding", 0);
             e.Argument = s.UInt16(nameof(Argument), e.Argument);
+            s.End();
             return e;
         }
 

@@ -26,11 +26,13 @@ namespace UAlbion.Formats.MapEvents
         public static ChestEvent Serdes(ChestEvent e, ISerializer s, AssetType textType, ushort textSourceId)
         {
             e ??= new ChestEvent(textType, textSourceId);
+            s.Begin();
             e.PickDifficulty = s.UInt8(nameof(PickDifficulty), e.PickDifficulty);
-            e.KeyItemId = (ItemId?)StoreIncrementedNullZero.Serdes(nameof(KeyItemId), (ushort?)e.KeyItemId, s.UInt16);
-            e.InitialTextId = s.UInt8(nameof(InitialTextId), e.InitialTextId);
+            e.KeyItemId = s.TransformEnumU16(nameof(KeyItemId), e.KeyItemId, StoreIncrementedNullZero<ItemId>.Instance);
             e.UnlockedTextId = s.UInt8(nameof(UnlockedTextId), e.UnlockedTextId);
+            e.InitialTextId = s.UInt8(nameof(InitialTextId), e.InitialTextId);
             e.ChestId = s.EnumU16(nameof(ChestId), e.ChestId);
+            s.End();
             return e;
         }
 
@@ -44,7 +46,7 @@ namespace UAlbion.Formats.MapEvents
         public AssetType TextType { get; }
         public ushort TextSourceId { get; }
         public PartyCharacterId? Member { get; private set; }
-        public override string ToString() => $"inv:chest {ChestId} {PickDifficulty}% Key:{KeyItemId} Initial:{InitialTextId} Opened:{UnlockedTextId}";
+        public override string ToString() => $"inv:chest {ChestId} {PickDifficulty}% Key:{KeyItemId} Initial:{InitialTextId} Unlocked:{UnlockedTextId}";
 
         public ISetInventoryModeEvent CloneForMember(PartyCharacterId member)
             => new ChestEvent(TextType, TextSourceId)

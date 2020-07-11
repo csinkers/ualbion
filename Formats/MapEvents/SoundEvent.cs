@@ -9,6 +9,7 @@ namespace UAlbion.Formats.MapEvents
         public static SoundEvent Serdes(SoundEvent e, ISerializer s)
         {
             e ??= new SoundEvent();
+            s.Begin();
             e.Mode = s.EnumU8(nameof(Mode), e.Mode);
             e.SoundId = (SampleId)StoreIncremented.Serdes(nameof(SoundId), (byte)e.SoundId, s.UInt8);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
@@ -20,6 +21,7 @@ namespace UAlbion.Formats.MapEvents
             ApiUtil.Assert(e.Volume <= 150);
             ApiUtil.Assert(e.RestartProbability <= 102);
             ApiUtil.Assert(e.Unk8 == 0);
+            s.End();
             return e;
         }
 

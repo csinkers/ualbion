@@ -32,14 +32,16 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public static FloorAndCeiling Serdes(int _, FloorAndCeiling existing, ISerializer s)
         {
             var fc = existing ?? new FloorAndCeiling();
+            s.Begin();
             fc.Properties = s.EnumU8(nameof(fc.Properties), fc.Properties);
             fc.Unk1 = s.UInt8(nameof(fc.Unk1), fc.Unk1);
             fc.Unk2 = s.UInt8(nameof(fc.Unk2), fc.Unk2);
             fc.Unk3 = s.UInt8(nameof(fc.Unk3), fc.Unk3);
             fc.AnimationCount = s.UInt8(nameof(fc.AnimationCount), fc.AnimationCount);
             fc.Unk5 = s.UInt8(nameof(fc.Unk5), fc.Unk5);
-            fc.TextureNumber = (DungeonFloorId?)Tweak.Serdes(nameof(TextureNumber), (ushort?)fc.TextureNumber, s.UInt16);
+            fc.TextureNumber = s.TransformEnumU16(nameof(TextureNumber), fc.TextureNumber, Tweak<DungeonFloorId>.Instance);
             fc.Unk8 = s.UInt16(nameof(fc.Unk8), fc.Unk8);
+            s.End();
             return fc;
         }
     }

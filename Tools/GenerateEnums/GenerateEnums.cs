@@ -120,7 +120,8 @@ namespace UAlbion.Formats.AssetIds
                 string.Join(Environment.NewLine, e.Entries.Select(x => $"        {x.Name} = {x.Value},"))
                 + @"
     }
-}");
+}
+");
             }
         }
     }

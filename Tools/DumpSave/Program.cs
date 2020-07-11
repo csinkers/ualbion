@@ -36,7 +36,7 @@ namespace DumpSave
         static void DumpVisitedEvents(SavedGame save)
         {
             Console.WriteLine("VisitedEvents:");
-            foreach (var e in save.VisitedEvents.Contents)
+            foreach (var e in save.VisitedEvents)
                 Console.WriteLine(e);
         }
 

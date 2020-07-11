@@ -10,6 +10,7 @@ namespace UAlbion.Formats.MapEvents
         public static RemovePartyMemberEvent Serdes(RemovePartyMemberEvent e, ISerializer s)
         {
             e ??= new RemovePartyMemberEvent();
+            s.Begin();
             e.PartyMemberId = (PartyCharacterId)StoreIncremented.Serdes(nameof(PartyMemberId), (byte)e.PartyMemberId, s.UInt8);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
@@ -20,6 +21,7 @@ namespace UAlbion.Formats.MapEvents
             ApiUtil.Assert(e.Unk4 == 0);
             ApiUtil.Assert(e.Unk5 == 0);
             ApiUtil.Assert(e.Unk8 == 0);
+            s.End();
             return e;
         }
 

@@ -7,6 +7,7 @@ namespace UAlbion.Formats.MapEvents
         public static DummyMapEvent Serdes(DummyMapEvent e, ISerializer s, MapEventType type)
         {
             e ??= new DummyMapEvent();
+            s.Begin();
             e.Type = type;
             e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
@@ -15,6 +16,7 @@ namespace UAlbion.Formats.MapEvents
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+            s.End();
             return e;
         }
         public byte Unk1 { get; private set; }

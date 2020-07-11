@@ -8,6 +8,7 @@ namespace UAlbion.Formats.MapEvents
         public static SpinnerEvent Serdes(SpinnerEvent e, ISerializer s)
         {
             e ??= new SpinnerEvent();
+            s.Begin();
             e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
@@ -21,6 +22,7 @@ namespace UAlbion.Formats.MapEvents
             ApiUtil.Assert(e.Unk5 == 0);
             ApiUtil.Assert(e.Unk6 == 0);
             ApiUtil.Assert(e.Unk8 == 0);
+            s.End();
             return e;
         }
 

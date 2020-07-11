@@ -31,6 +31,7 @@ namespace UAlbion.Formats.Assets
         public static InterlacedBitmap Serdes(InterlacedBitmap img, ISerializer s)
         {
             img ??= new InterlacedBitmap();
+            s.Begin();
 
             var formatChunk = IFFChunk.Serdes(0, new IFFChunk(IFFChunkType.Format, 0), s);
             if (formatChunk.TypeId != IFFChunkType.Format)
@@ -79,6 +80,7 @@ namespace UAlbion.Formats.Assets
             }
 
             formatChunk.WriteLength(s);
+            s.End();
             return img;
         }
 

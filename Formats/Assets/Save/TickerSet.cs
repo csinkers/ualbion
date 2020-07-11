@@ -10,6 +10,7 @@ namespace UAlbion.Formats.Assets.Save
 
         public void Serdes(ISerializer s)
         {
+            s.Begin();
             if (s.Mode == SerializerMode.Reading)
                 Clear();
 
@@ -19,6 +20,7 @@ namespace UAlbion.Formats.Assets.Save
                     ? s.UInt8(i.ToString(), existing) 
                     : s.UInt8(i.ToString(), 0);
             }
+            s.End();
         }
     }
 }

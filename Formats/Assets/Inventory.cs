@@ -53,6 +53,7 @@ namespace UAlbion.Formats.Assets
                     (_, x, s2) => ItemSlot.Serdes(new InventorySlotId(invId, slotId), x, s2));
 
             inv ??= new Inventory(invId);
+            s.Begin();
             if (type == InventoryType.Player)
             {
                 S(nameof(inv.Neck), inv.Neck, ItemSlotId.Neck);
@@ -82,6 +83,7 @@ namespace UAlbion.Formats.Assets
                 inv.Rations.Amount = s.UInt16(nameof(inv.Rations), inv.Rations.Amount);
             }
 
+            s.End();
             return inv;
         }
 

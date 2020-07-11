@@ -55,7 +55,8 @@ namespace UAlbion.Formats.Assets.Map
         public static MapNpc Serdes(int _, MapNpc existing, ISerializer s)
         {
             var npc = existing ?? new MapNpc();
-            npc.Id = (NpcCharacterId?)Tweak.Serdes(nameof(Id), (byte?)npc.Id, s.UInt8);
+            s.Begin();
+            npc.Id = s.TransformEnumU8(nameof(Id), npc.Id, Tweak<NpcCharacterId>.Instance);
             // npc.Sound = (SampleId?)Tweak.Serdes(nameof(Sound), (byte?)npc.Sound, s.UInt8);
             npc.Sound = s.UInt8(nameof(Sound), npc.Sound);
 
@@ -63,11 +64,12 @@ namespace UAlbion.Formats.Assets.Map
             if(eventNumber != null && npc.Node == null)
                 npc.Node = new DummyEventNode(eventNumber.Value);
 
-            npc.ObjectNumber = Tweak.Serdes(nameof(ObjectNumber), npc.ObjectNumber, s.UInt16) ?? 0;
+            npc.ObjectNumber = s.Transform<ushort, ushort?>(nameof(ObjectNumber), npc.ObjectNumber, s.UInt16, Tweak.Instance) ?? 0;
             npc.Flags = s.EnumU8(nameof(Flags), npc.Flags);
             npc.Movement = s.EnumU8(nameof(Movement), npc.Movement);
             npc.Unk8 = s.UInt8(nameof(Unk8), npc.Unk8);
             npc.Unk9 = s.UInt8(nameof(Unk9), npc.Unk9);
+            s.End();
             return npc;
         }
 

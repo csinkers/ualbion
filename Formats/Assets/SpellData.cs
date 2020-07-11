@@ -18,11 +18,13 @@ namespace UAlbion.Formats.Assets
         public static SpellData Serdes(int i, SpellData d, ISerializer s)
         {
             d ??= new SpellData();
+            s.Begin();
             d.Environment = s.EnumU8(nameof(Environment), d.Environment);
             d.Cost = s.UInt8(nameof(Cost), d.Cost);
             d.LevelRequirement = s.UInt8(nameof(LevelRequirement), d.LevelRequirement);
             d.Targets = s.EnumU8(nameof(Targets), d.Targets);
             d.Unused = s.UInt8(nameof(Unused), d.Unused);
+            s.End();
             return d;
         }
     }

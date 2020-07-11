@@ -1,5 +1,4 @@
-﻿using SerdesNet;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -77,7 +76,12 @@ namespace UAlbion
                 }
             }
 
-            for (int i = 0; i < 300; i++)
+            var labIds =
+                    Enumerable.Range(0, 9)
+                    .Concat(Enumerable.Range(101, 25))
+                    .Concat(Enumerable.Range(200, 11))
+                ;
+            foreach(var i in labIds)
             {
                 var l = assets.LoadLabyrinthData((LabyrinthDataId) i);
                 if (l == null)
@@ -259,21 +263,27 @@ namespace UAlbion
             }
 
             sw.WriteLine($"    WordSetId:{c.WordSetId}");
-            var eventSet = assets.LoadEventSet(c.EventSetId);
-            sw.WriteLine($"    Event Set {c.EventSetId}: {(eventSet == null ? "Not Found" : $"{eventSet.Chains.Count()} chains")}");
-            if (eventSet != null)
+            if(c.EventSetId == null)
+                sw.WriteLine("    No Event Set");
+            else
             {
-                sw.WriteLine("    Chain Offsets: " + string.Join(", ", eventSet.Chains.Select((x, i) => $"{i}:{x.Id}")));
-                foreach (var e in eventSet.Events)
+                var eventSet = assets.LoadEventSet(c.EventSetId.Value);
+                sw.WriteLine($"    Event Set {c.EventSetId}: {(eventSet == null ? "Not Found" : $"{eventSet.Chains.Count()} chains")}");
+                if (eventSet != null)
                 {
-                    if (e.Event is BaseTextEvent textEvent)
+                    sw.WriteLine("    Chain Offsets: " +
+                         string.Join(", ", eventSet.Chains.Select((x, i) => $"{i}:{x.Id}")));
+                    foreach (var e in eventSet.Events)
                     {
-                        var textSource = tf.Format(textEvent.ToId());
-                        var text = string.Join(", ", textSource.Get().Select(x => x.Text));
-                        sw.WriteLine($"        {e} = {text}");
+                        if (e.Event is BaseTextEvent textEvent)
+                        {
+                            var textSource = tf.Format(textEvent.ToId());
+                            var text = string.Join(", ", textSource.Get().Select(x => x.Text));
+                            sw.WriteLine($"        {e} = {text}");
+                        }
+                        else
+                            sw.WriteLine("        " + e);
                     }
-                    else
-                        sw.WriteLine("        " + e);
                 }
             }
 
@@ -307,17 +317,28 @@ namespace UAlbion
             if (c.Unknown60 != 0) sw.WriteLine($"    Unknown60:{c.Unknown60}");
             if (c.Unknown66 != 0) sw.WriteLine($"    Unknown66:{c.Unknown66}");
             if (c.Unknown68 != 0) sw.WriteLine($"    Unknown68:{c.Unknown68}");
-            if(c.UnknownBlock6C.Any(x => x != 0)) sw.WriteLine($"    Unknown6C:{AnnotatedFormatWriter.ConvertToHexString(c.UnknownBlock6C)}");
+            if (c.Unknown6C != 0) sw.WriteLine($"    Unknown6C:{c.Unknown6C}");
             if (c.Unknown7E != 0) sw.WriteLine($"    Unknown7E:{c.Unknown7E}");
             if (c.Unknown80 != 0) sw.WriteLine($"    Unknown80:{c.Unknown80}");
             if (c.Unknown86 != 0) sw.WriteLine($"    Unknown86:{c.Unknown86}");
             if (c.Unknown88 != 0) sw.WriteLine($"    Unknown88:{c.Unknown88}");
             if (c.Unknown8E != 0) sw.WriteLine($"    Unknown8E:{c.Unknown8E}");
             if (c.Unknown90 != 0) sw.WriteLine($"    Unknown90:{c.Unknown90}");
-            if(c.UnknownBlock96.Any(x => x != 0)) sw.WriteLine($"    Unknown96:{AnnotatedFormatWriter.ConvertToHexString(c.UnknownBlock96)}");
+            if (c.UnknownBlock96.Any(x => x != 0))
+            {
+                for (int i = 0; i < c.UnknownBlock96.Count; i++)
+                    sw.WriteLine($" Unknown96.{i}:{c.UnknownBlock96[i]}");
+            }
+
             if (c.UnknownCE != 0) sw.WriteLine($"    UnknownCE:{c.UnknownCE}");
             if (c.UnknownD6 != 0) sw.WriteLine($"    UnknownD6:{c.UnknownD6}");
-            if(c.UnknownBlockDA.Any(x => x != 0)) sw.WriteLine($"    UnknownDA:{AnnotatedFormatWriter.ConvertToHexString(c.UnknownBlockDA)}");
+            if (c.UnknownDA != 0) sw.WriteLine($"    UnknownDA:{c.UnknownDA}");
+            if (c.UnknownDC != 0) sw.WriteLine($"    UnknownDC:{c.UnknownDC}");
+            if (c.UnknownDE != 0) sw.WriteLine($"    UnknownDE:{c.UnknownDE}");
+            if (c.UnknownE2 != 0) sw.WriteLine($"    UnknownE2:{c.UnknownE2}");
+            if (c.UnknownE4 != 0) sw.WriteLine($"    UnknownE4:{c.UnknownE4}");
+            if (c.UnknownE6 != 0) sw.WriteLine($"    UnknownE6:{c.UnknownE6}");
+            if (c.UnknownEA != 0) sw.WriteLine($"    UnknownEA:{c.UnknownEA}");
             if (c.UnknownFA != 0) sw.WriteLine($"    UnknownFA:{c.UnknownFA}");
             if (c.UnknownFC != 0) sw.WriteLine($"    UnknownFC:{c.UnknownFC}");
         }
@@ -466,7 +487,7 @@ namespace UAlbion
             foreach (var eventSetId in Enum.GetValues(typeof(EventSetId)).Cast<EventSetId>())
             {
                 sw.WriteLine();
-                sw.WriteLine($"EventSet{(int)eventSetId}:");
+                sw.WriteLine($"{(int)eventSetId} {eventSetId}:");
                 var set = assets.LoadEventSet(eventSetId);
                 if (set == null)
                     continue;

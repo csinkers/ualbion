@@ -16,6 +16,7 @@ namespace UAlbion.Formats.MapEvents
         public static StartDialogueEvent Serdes(StartDialogueEvent e, ISerializer s)
         {
             e ??= new StartDialogueEvent();
+            s.Begin();
             s.UInt8("Pad1", 1);
             s.UInt8("Pad2", 0);
             s.UInt8("Pad3", 0);
@@ -24,6 +25,7 @@ namespace UAlbion.Formats.MapEvents
             e.NpcId = s.EnumU8(nameof(NpcId), e.NpcId);
             s.UInt8("Pad7", 0);
             s.UInt16("Pad8", 0);
+            s.End();
             return e;
         }
 

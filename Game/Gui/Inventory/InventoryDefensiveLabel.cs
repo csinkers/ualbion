@@ -33,8 +33,9 @@ namespace UAlbion.Game.Gui.Inventory
             AttachChild(
                 new ButtonFrame(
                         new HorizontalStack(
-                            new FixedSize(8, 8,
-                                new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiDefensiveValue) { Flags = SpriteFlags.Highlight }),
+                            new FixedSize(6, 8,
+                                new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiDefensiveValue)),
+                            new Spacing(1, 0),
                             new UiText(source)
                         )
                     )

@@ -35,6 +35,7 @@ namespace UAlbion.Game.Gui.Inventory
                         new HorizontalStack(
                             new FixedSize(6, 8,
                                 new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiDefensiveValue) { Flags = SpriteFlags.Highlight }),
+                            new Spacing(1, 0),
                             new UiText(source)
                         )
                     )

@@ -4,12 +4,12 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Controls
 {
-    class Header : UiElement
+    class BoldHeader : UiElement
     {
         readonly StringId _id;
 
-        public Header(StringId id) => _id = id;
-        public Header(IText source) => AttachChild(new UiText(source));
+        public BoldHeader(StringId id) => _id = id;
+        public BoldHeader(IText source) => AttachChild(new UiText(source));
 
         protected override void Subscribed()
         {
@@ -17,7 +17,7 @@ namespace UAlbion.Game.Gui.Controls
                 return;
 
             var tf = Resolve<ITextFormatter>();
-            var text = tf.NoWrap().Center().Format(_id);
+            var text = tf.NoWrap().Fat().Center().Format(_id);
             AttachChild(new UiText(text));
         }
     }

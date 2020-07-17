@@ -41,6 +41,7 @@ namespace UAlbion.Game.Gui.Inventory
             );
 
             var mainStack = new VerticalStack(
+                new Spacing(0, 1),
                 new Header(new DynamicText(() =>
                     {
                         var member = Resolve<IParty>()[activeCharacter];

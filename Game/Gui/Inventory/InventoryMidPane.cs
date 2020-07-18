@@ -32,6 +32,7 @@ namespace UAlbion.Game.Gui.Inventory
                     (int)position.X,
                     (int)position.Y);
             }
+            bodyStack.Add(new Spacing(0, 164), 0, 0);
 
             var frame = new GroupingFrame(bodyStack);
             var labelStack = new HorizontalStack(
@@ -56,6 +57,7 @@ namespace UAlbion.Game.Gui.Inventory
                     new Spacing(3, 0),
                     frame,
                     new Spacing(3, 0)),
+                new Spacing(0, 2),
                 labelStack
                 );
 

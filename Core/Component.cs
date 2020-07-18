@@ -50,7 +50,7 @@ namespace UAlbion.Core
         IComponent Parent { get; set; }
 
         /// <summary>
-        /// The list of this components child components.
+        /// The list of this component's child components.
         /// The primary purpose of children is ensuring that the children are also attached and
         /// detached when the parent component is.
         /// </summary>
@@ -58,7 +58,7 @@ namespace UAlbion.Core
 
         /// <summary>
         /// Resolve the currently active object that provides the given interface.
-        /// Service interfaces should only have a maximum of one active instance at any time.
+        /// Service interfaces should have a maximum of one active instance at any one time.
         /// </summary>
         /// <typeparam name="T">The interface type to resolve</typeparam>
         /// <returns></returns>
@@ -79,7 +79,7 @@ namespace UAlbion.Core
         /// </summary>
         /// <param name="event">The event to raise</param>
         /// <param name="continuation">The continuation to be called by async handlers upon completion</param>
-        /// <returns>The number of async handlers which have either already called continuation or intend to call it in the future.</returns>
+        /// <returns>The number of async handlers which have either already called the continuation or intend to call it in the future.</returns>
         protected int RaiseAsync(IAsyncEvent @event, Action continuation) => Exchange?.RaiseAsync(@event, this, continuation) ?? 0;
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace UAlbion.Core
         /// <typeparam name="T">The return value that async handlers should supply upon completion.</typeparam>
         /// <param name="event">The event to raise</param>
         /// <param name="continuation">The continuation to be called by async handlers upon completion</param>
-        /// <returns>The number of async handlers which have either already called continuation or intend to call it in the future.</returns>
+        /// <returns>The number of async handlers which have either already called the continuation or intend to call it in the future.</returns>
         protected int RaiseAsync<T>(IAsyncEvent<T> @event, Action<T> continuation) => Exchange?.RaiseAsync(@event, this, continuation) ?? 0;
 
         /// <summary>
@@ -175,49 +175,6 @@ namespace UAlbion.Core
         {
             if (_handlers.Remove(typeof(T)) && IsSubscribed)
                 Exchange.Unsubscribe<T>(this);
-        }
-
-        /// <summary>
-        /// Add a component to the collection of this component's children, will attach the
-        /// component to this component's exchange if this component is currently attached.
-        /// </summary>
-        /// <typeparam name="T">The type of the child component</typeparam>
-        /// <param name="child">The component to add</param>
-        /// <returns>The child is also returned to allow constructs like _localVar = AttachChild(new SomeType());</returns>
-        protected T AttachChild<T>(T child) where T : IComponent
-        {
-            if (_isActive)
-                Exchange?.Attach(child);
-
-            Children.Add(child);
-            if (child is Component component)
-                component.Parent = this;
-
-            return child;
-        }
-
-        /// <summary>
-        /// Remove all children of this component and detach them from the exchange.
-        /// </summary>
-        protected void RemoveAllChildren()
-        {
-            for (int i = Children.Count - 1; i >= 0; i--)
-                Children[i].Remove(); // O(n²)… refactor if it ever becomes a problem.
-        }
-
-        /// <summary>
-        /// If the given component is a child of this component, detach it from the exchange and remove it from this components child list.
-        /// </summary>
-        /// <param name="child">The child component to remove</param>
-        protected void RemoveChild(IComponent child)
-        {
-            int index = Children.IndexOf(child);
-            if (index == -1) return;
-            if (child is Component c)
-                c.Parent = null;
-
-            child.Remove();
-            Children.RemoveAt(index);
         }
 
         /// <summary>
@@ -307,6 +264,50 @@ namespace UAlbion.Core
                 Parent = null;
                 parent.RemoveChild(this);
             }
+        }
+
+        /// <summary>
+        /// Add a component to the collection of this component's children, will attach the
+        /// component to this component's exchange if this component is currently attached.
+        /// </summary>
+        /// <typeparam name="T">The type of the child component</typeparam>
+        /// <param name="child">The component to add</param>
+        /// <returns>The child is also returned to allow constructs like _localVar = AttachChild(new SomeType());</returns>
+        protected T AttachChild<T>(T child) where T : IComponent
+        {
+            if (_isActive)
+                Exchange?.Attach(child);
+
+            Children.Add(child);
+            if (child is Component component)
+                component.Parent = this;
+
+            return child;
+        }
+
+        /// <summary>
+        /// Remove all children of this component and detach them from the exchange.
+        /// </summary>
+        protected void RemoveAllChildren()
+        {
+            for (int i = Children.Count - 1; i >= 0; i--)
+                Children[i].Remove(); // O(n²)… refactor if it ever becomes a problem.
+        }
+
+        /// <summary>
+        /// If the given component is a child of this component, detach it from the
+        /// exchange and remove it from this component's child list.
+        /// </summary>
+        /// <param name="child">The child component to remove</param>
+        protected void RemoveChild(IComponent child)
+        {
+            int index = Children.IndexOf(child);
+            if (index == -1) return;
+            if (child is Component c)
+                c.Parent = null;
+
+            child.Remove();
+            Children.RemoveAt(index);
         }
 
         /// <summary>

@@ -16,8 +16,8 @@ namespace UAlbion.Game.State
         ICharacterSheet GetNpc(NpcCharacterId id);
         ICharacterSheet GetPartyMember(PartyCharacterId id);
         IInventory GetInventory(InventoryId id);
-        short GetTicker(int id);
-        bool GetSwitch(int id);
+        short GetTicker(TickerId id);
+        bool GetSwitch(SwitchId id);
         IList<MapChange> TemporaryMapChanges { get; }
         IList<MapChange> PermanentMapChanges { get; }
     }

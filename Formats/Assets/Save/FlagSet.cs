@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets.Save
 {
-    public class FlagSet : Dictionary<int, bool>
+    public class FlagSet : Dictionary<SwitchId, bool>
     {
-        const int _max = 600;
-        public const int PackedSize = _max / 8;
+        const SwitchId _max = (SwitchId)600;
+        public const int PackedSize = (int)_max / 8;
 
-        public bool Get(int flag) => TryGetValue(flag, out var value) && value;
-        public void Set(int flag, bool value)
+        public bool Get(SwitchId flag) => TryGetValue(flag, out var value) && value;
+        public void Set(SwitchId flag, bool value)
         {
             if (flag > _max)
-                throw new InvalidOperationException($"Tried to set out of range flag {flag} (greate than max: {_max})");
+                throw new InvalidOperationException($"Tried to set out of range flag {flag} (greater than max: {(int)_max})");
             this[flag] = value;
         }
 
@@ -20,9 +21,9 @@ namespace UAlbion.Formats.Assets.Save
         {
             get
             {
-                var packed = new byte[(_max + 7) / 8];
-                for (int i = 0; i < _max; i++)
-                    packed[i / 8] |= (byte)((TryGetValue(i, out var value) && value ? 1 : 0) << (i % 8));
+                var packed = new byte[((int)_max + 7) / 8];
+                for (int i = 0; i < (int)_max; i++)
+                    packed[i / 8] |= (byte)((TryGetValue((SwitchId)i, out var value) && value ? 1 : 0) << (i % 8));
                 return packed;
             }
 
@@ -35,7 +36,7 @@ namespace UAlbion.Formats.Assets.Save
                     {
                         bool flagValue = (value[i] & (1 << j)) != 0;
                         if (flagValue)
-                            this[i * 8 + j] = true;
+                            this[(SwitchId)(i * 8 + j)] = true;
                     }
                 }
             }

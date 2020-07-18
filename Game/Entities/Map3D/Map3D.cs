@@ -87,7 +87,7 @@ namespace UAlbion.Game.Entities.Map3D
 
             foreach (var npc in _mapData.Npcs.Values)
             {
-                var objectData = _labyrinthData.ObjectGroups[npc.ObjectNumber - 1];
+                var objectData = _labyrinthData.ObjectGroups[npc.ObjectNumber];
                 // TODO: Build proper NPC objects with AI, sound effects etc
                 foreach (var subObject in objectData.SubObjects) 
                     AttachChild(BuildMapObject(npc.Waypoints[0].X, npc.Waypoints[0].Y, subObject, objectYScaling));

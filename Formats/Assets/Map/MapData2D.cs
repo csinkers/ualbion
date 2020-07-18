@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Assets.Map
 {
     public class MapData2D : BaseMapData
     {
-        static readonly TilesetId[] OutdoorTilesets = new TilesetId[0];
+        static readonly TilesetId[] OutdoorTilesets = { TilesetId.Outdoors, TilesetId.Outdoors2, TilesetId.Desert };
 
         public override MapType MapType => OutdoorTilesets.Contains(TilesetId) ? MapType.TwoDOutdoors : MapType.TwoD;
         public MapFlags2D Flags { get; private set; } // Wait/Rest, Light-Environment, NPC converge range

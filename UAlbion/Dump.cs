@@ -165,17 +165,22 @@ namespace UAlbion
                     sw.Write($"S:{npc.Sound} ({(int?)npc.Sound}) ");
                     switch (map.MapType)
                     {
-                        case MapType.TwoD: sw.Write($"O:{(LargeNpcId)npc.ObjectNumber} ({npc.ObjectNumber}) "); break;
-                        case MapType.TwoDOutdoors: sw.Write($"O:{(SmallNpcId)npc.ObjectNumber} ({npc.ObjectNumber}) "); break;
+                        case MapType.TwoD: sw.Write($"GR:{(LargeNpcId)npc.ObjectNumber} ({npc.ObjectNumber}) "); break;
+                        case MapType.TwoDOutdoors: sw.Write($"KL:{(SmallNpcId)npc.ObjectNumber} ({npc.ObjectNumber}) "); break;
                         case MapType.ThreeD:
                             if (lab != null)
                             {
-                                var objectData = lab.ObjectGroups[npc.ObjectNumber - 1];
+                                var objectData = lab.ObjectGroups[npc.ObjectNumber];
+                                sw.Write($"3D:{npc.ObjectNumber}=(");
+                                bool first = true;
                                 foreach (var subObject in objectData.SubObjects)
                                 {
+                                    if(!first) sw.Write(", ");
+                                    first = false;
                                     var def = lab.Objects[subObject.ObjectInfoNumber];
-                                    sw.Write($"O:{def.TextureNumber} ");
+                                    sw.Write(def.TextureNumber);
                                 }
+                                sw.Write(")");
                             }
 
                             break;  
@@ -384,10 +389,12 @@ namespace UAlbion
                 else
                 {
                     items.Add(data);
-                    sw.Write($"Gfx:{(ushort)data.Icon:D3} {data.IconAnim} frames ");
+                    sw.Write($"Gfx:{(ushort)data.Icon:D3} ({data.IconAnim} frames) ");
                     sw.Write($"Type:{data.TypeId} Slot:{data.SlotType} ");
                     sw.Write($"F:{data.Flags} A:{data.Activate} ");
-                    sw.Write($"{data.Class}");
+                    sw.Write($"{data.Class} ");
+                    sw.Write($"${data.Value / 10}.{data.Value % 10:D2} ");
+                    sw.Write($"{data.Weight}g ($/kg ratio: {(float)data.Value*100/data.Weight:F2})");
                 }
 
                 sw.WriteLine();

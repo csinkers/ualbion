@@ -4593,7 +4593,7 @@
         "Width": 64
       },
       "81": {
-        "Name": "Krondiir",
+        "Name": "Krondir",
         "PaletteHints": [
           2,
           12,
@@ -4658,7 +4658,7 @@
         "Width": 116
       },
       "89": {
-        "Name": "Krondiir",
+        "Name": "Krondir",
         "PaletteHints": [
           2,
           12,
@@ -4715,7 +4715,7 @@
         "Height": 119
       },
       "94": {
-        "Name": "Krondiir",
+        "Name": "Krondir",
         "PaletteHints": [
           2,
           12,
@@ -4904,7 +4904,7 @@
         "Height": 152
       },
       "10": {
-        "Name": "Krondiir",
+        "Name": "Krondir",
         "PaletteHints": [
           17
         ],
@@ -10469,13 +10469,13 @@
       },
       "8": {},
       "9": {
-        "Name": "Krondiir",
+        "Name": "Krondir",
         "PaletteHints": [
           23
         ]
       },
       "10": {
-        "Name": "Krondiir",
+        "Name": "Krondir",
         "PaletteHints": [
           23
         ]
@@ -11800,10 +11800,10 @@
         "Name": "InsectSwarm"
       },
       "22": {
-        "Name": "Krondiir"
+        "Name": "Krondir"
       },
       "23": {
-        "Name": "Krondiir"
+        "Name": "Krondir"
       },
       "24": {
         "Name": "EvilKangaroo"
@@ -12376,7 +12376,7 @@
         "Name": "BreakingSticks"
       },
       "45": {
-        "Name": "VIneCoveredRocksFallingAway"
+        "Name": "VineCoveredRocksFallingAway"
       },
       "46": {
         "Name": "Switch"

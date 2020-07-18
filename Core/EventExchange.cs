@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using UAlbion.Api;
+#if DEBUG
 using UAlbion.Core.Events;
+#endif
 
 namespace UAlbion.Core
 {
@@ -66,15 +68,19 @@ namespace UAlbion.Core
             return this;
         }
 
-        public void Enqueue(IEvent e, object sender) => _queuedEvents.Enqueue((e, sender));
+        public void Enqueue(IEvent e, object sender) { lock (_syncRoot) _queuedEvents.Enqueue((e, sender)); }
 
         public void FlushQueuedEvents()
         {
-            while (_queuedEvents.Count > 0)
+            IList<(IEvent, object)> events;
+            lock (_syncRoot)
             {
-                var (e, sender) = _queuedEvents.Dequeue();
-                Raise(e, sender);
+                events = _queuedEvents.ToList();
+                _queuedEvents.Clear();
             }
+
+            foreach(var (e, sender) in events)
+                Raise(e, sender);
         }
 
         void Collect(List<Handler> subscribers, Type eventType) // Must be called from inside lock(_syncRoot)!
@@ -98,16 +104,16 @@ namespace UAlbion.Core
         public void Raise(IEvent e, object sender) => RaiseInternal(e, sender, DummyContinuation);
         public int RaiseAsync(IAsyncEvent e, object sender, Action continuation) => RaiseInternal(e, sender, _ => continuation?.Invoke());
         public int RaiseAsync<T>(IAsyncEvent e, object sender, Action<T> continuation) 
-            => RaiseInternal(e, sender, x =>
-            {
-                if (continuation == null)
-                    return;
-
-                if (x is T t)
-                    continuation(t);
-                else
-                    ApiUtil.Assert($"Tried to complete a continuation of type Action<{typeof(T).Name}> with null or a value of a different type.");
-            });
+            => RaiseInternal(e, sender, 
+                continuation == null 
+                ? DummyContinuation 
+                : x =>
+                {
+                    if (x is T t)
+                        continuation(t);
+                    else
+                        ApiUtil.Assert($"Tried to complete a continuation of type Action<{typeof(T).Name}> with null or a value of a different type.");
+                });
 
         int RaiseInternal(IEvent e, object sender, Action<object> continuation)
         {

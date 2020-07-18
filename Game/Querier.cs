@@ -42,15 +42,15 @@ namespace UAlbion.Game
             var game = Resolve<IGameState>();
             switch (query, query.QueryType)
             {
-                case (QueryEvent q, QueryType.TemporarySwitch):      continuation(Compare(q.Operation, game.GetSwitch(q.Argument) ? 1 : 0, q.Immediate)); return true;
-                case (QueryEvent q, QueryType.Ticker):               continuation(Compare(q.Operation, game.GetTicker(q.Argument), q.Immediate)); return true;
+                case (QueryEvent q, QueryType.TemporarySwitch):      continuation(Compare(q.Operation, game.GetSwitch((SwitchId)q.Argument) ? 1 : 0, q.Immediate)); return true;
+                case (QueryEvent q, QueryType.Ticker):               continuation(Compare(q.Operation, game.GetTicker((TickerId)q.Argument), q.Immediate)); return true;
                 case (QueryEvent q, QueryType.CurrentMapId):         continuation(Compare(q.Operation, (int)game.MapId, q.Immediate)); return true;
                 case (QueryEvent q, QueryType.HasEnoughGold):        continuation(Compare(q.Operation, game.Party.TotalGold, q.Argument)); return true;
-                case (QueryItemEvent q, QueryType.InventoryHasItem): continuation(Compare(q.Operation, game.Party.GetItemCount(q.ItemId), q.Immediate)); return true;;
+                case (QueryItemEvent q, QueryType.InventoryHasItem): continuation(Compare(q.Operation, game.Party.GetItemCount(q.ItemId), q.Immediate)); return true;
                 case (QueryEvent q, QueryType.HasPartyMember):       continuation(game.Party.StatusBarOrder.Any(x => (int)x.Id == q.Argument)); return true;
                 case (QueryEvent q, QueryType.IsPartyMemberLeader):  continuation((int)game.Party.Leader == q.Argument); return true;
                 case (QueryEvent q, QueryType.RandomChance):         continuation(_random.Next(100) < q.Argument); return true;
-                case (QueryEvent q, QueryType.TriggerType):          continuation((ushort)context.Source.Trigger == q.Argument); return true;;
+                case (QueryEvent q, QueryType.TriggerType):          continuation((ushort)context.Source.Trigger == q.Argument); return true;
                 case (QueryVerbEvent verb, QueryType.ChosenVerb):    continuation(context.Source.Trigger.HasFlag((TriggerType)(1 << (int)verb.Verb))); return true;
                 case (QueryItemEvent q, QueryType.UsedItemId):       continuation(context.Source is EventSource.Item item && item.ItemId == q.ItemId); return true;
                 case (_, QueryType.PreviousActionResult):            continuation(Resolve<IEventManager>().LastEventResult); return true;

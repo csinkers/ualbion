@@ -28,7 +28,7 @@ namespace UAlbion.Core.Veldrid.Textures
 
             Texture texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, usage, Type));
             texture.Name = Name;
-            using (CommandList cl = rf.CreateCommandList())
+            using (CommandList cl = rf.CreateCommandList()) // TODO: Update texture without a dedicated command list to improve perf.
             {
                 cl.Begin();
                 cl.CopyTexture(staging, texture);

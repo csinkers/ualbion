@@ -26,13 +26,12 @@ namespace UAlbion.Game.Gui.Controls
             ClickTimerPending = 1 << 8,
         }
 
-        const int DoubleClickIntervalMilliseconds = 250;
+        const int DoubleClickIntervalMilliseconds = 350;
         string TimerName => "DoubleClickButton." + _id;
 
         static int _nextId;
         readonly ButtonFrame _frame;
         readonly int _id;
-        int _margin = 2;
         float _typematicAccrual;
         ButtonFlags _flags = ButtonFlags.Hoverable;
 
@@ -150,7 +149,8 @@ namespace UAlbion.Game.Gui.Controls
 
         public ButtonFrame.ThemeFunction Theme { get => _frame.Theme; set => _frame.Theme = value; }
         public int Padding { get => _frame.Padding; set => _frame.Padding = value; }
-        public int Margin { get => _margin; set => _margin = value; }
+        public int Margin { get; set; } = 2;
+
         ButtonState State => (IsClicked, IsPressed, IsHovered) switch
         {
             (false, false, false) => ButtonState.Normal,
@@ -161,7 +161,7 @@ namespace UAlbion.Game.Gui.Controls
             (true, _, true) => ButtonState.Clicked,
         };
 
-        public override Vector2 GetSize() => GetMaxChildSize() + new Vector2(2 * _margin, 0);
+        public override Vector2 GetSize() => GetMaxChildSize() + new Vector2(2 * Margin, 0);
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {

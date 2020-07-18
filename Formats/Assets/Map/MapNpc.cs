@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using SerdesNet;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Map
@@ -40,7 +39,7 @@ namespace UAlbion.Formats.Assets.Map
             public override string ToString() => $"({X}, {Y})";
         }
 
-        public NpcCharacterId? Id { get; set; }
+        public byte? Id { get; set; }
         // public SampleId? Sound { get; set; }
         public byte Sound { get; set; }
         public ushort ObjectNumber { get; set; }
@@ -56,7 +55,7 @@ namespace UAlbion.Formats.Assets.Map
         {
             var npc = existing ?? new MapNpc();
             s.Begin();
-            npc.Id = s.TransformEnumU8(nameof(Id), npc.Id, Tweak<NpcCharacterId>.Instance);
+            npc.Id = s.Transform<byte, byte?>(nameof(Id), npc.Id, s.UInt8, Tweak.Instance);
             // npc.Sound = (SampleId?)Tweak.Serdes(nameof(Sound), (byte?)npc.Sound, s.UInt8);
             npc.Sound = s.UInt8(nameof(Sound), npc.Sound);
 

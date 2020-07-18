@@ -59,7 +59,13 @@ namespace UAlbion.Formats.MapEvents
 
         public ushort Argument { get; private set; }
 
-        public override string ToString() => $"query {QueryType} {Argument} ({Operation} {Immediate})";
+        public override string ToString() => QueryType switch
+        {
+            QueryType.Ticker => $"query {QueryType} {(TickerId)Argument} ({Operation} {Immediate})",
+            QueryType.TemporarySwitch => $"query {QueryType} {(SwitchId)Argument} ({Operation} {Immediate})",
+            _ => $"query {QueryType} {Argument} ({Operation} {Immediate})"
+        };
+
         public override MapEventType EventType => MapEventType.Query;
     }
 }

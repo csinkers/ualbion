@@ -49,13 +49,14 @@ namespace UAlbion.Game.Entities
             var normPosition = camera.ProjectWorldToNorm(_sprite.Position);
             var uiPosition = window.NormToUi(normPosition.X, normPosition.Y);
 
+            // TODO: NPC type check.
             IText S(StringId textId) => tf.NoWrap().Center().Format(textId);
             var heading = S(SystemTextId.MapPopup_Person);
             var options = new List<ContextMenuOption>
             {
                 new ContextMenuOption(
                     S(SystemTextId.MapPopup_TalkTo),
-                    new TriggerChainEvent(_npc.Chain, _npc.Chain.FirstEvent, _npc.Id.Value),
+                    new TriggerChainEvent(_npc.Chain, _npc.Chain.FirstEvent, (NpcCharacterId)_npc.Id.Value),
                     ContextMenuGroup.Actions),
 
                 new ContextMenuOption(

@@ -36,8 +36,8 @@ namespace UAlbion.Formats.Assets.Save
         TickerSet _tickers { get; } = new TickerSet();
         FlagSet _switches { get; } = new FlagSet();
 
-        public IDictionary<int, byte> Tickers => _tickers;
-        public IDictionary<int, bool> Switches => _switches;
+        public IDictionary<TickerId, byte> Tickers => _tickers;
+        public IDictionary<SwitchId, bool> Switches => _switches;
 
         public ushort Unk0 { get; set; }
         public uint Unk1 { get; set; }

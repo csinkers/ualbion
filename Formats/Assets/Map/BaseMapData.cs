@@ -179,7 +179,7 @@ namespace UAlbion.Formats.Assets.Map
                 if (npc.Chain == null)
                 {
                     var chain = new EventChain(-1);
-                    chain.Events.Add(new EventNode(0, new StartDialogueEvent(npc.Id.Value)));
+                    chain.Events.Add(new EventNode(0, new StartDialogueEvent((NpcCharacterId)npc.Id.Value)));
                     npc.Chain = chain;
                 }
             }

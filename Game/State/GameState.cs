@@ -23,8 +23,8 @@ namespace UAlbion.Game.State
         IParty IGameState.Party => _party;
         public ICharacterSheet GetNpc(NpcCharacterId id) => _game != null && _game.NpcStats.TryGetValue(id, out var sheet) ? sheet : null;
         public ICharacterSheet GetPartyMember(PartyCharacterId id) => _game != null && _game.PartyMembers.TryGetValue(id, out var member) ? member : null;
-        public short GetTicker(int id) => _game != null && _game.Tickers.TryGetValue(id, out var value) ? value : (short)0;
-        public bool GetSwitch(int id) => _game != null && _game.Switches.TryGetValue(id, out var value) && value;
+        public short GetTicker(TickerId id) => _game != null && _game.Tickers.TryGetValue(id, out var value) ? value : (short)0;
+        public bool GetSwitch(SwitchId id) => _game != null && _game.Switches.TryGetValue(id, out var value) && value;
 
         public IList<MapChange> TemporaryMapChanges => _game.TemporaryMapChanges;
         public IList<MapChange> PermanentMapChanges => _game.PermanentMapChanges;

@@ -40,7 +40,11 @@ namespace UAlbion.Game.Gui.Text
                 return;
 
             _sprite?.Dispose();
-            _sprite = Resolve<ITextManager>().BuildRenderable(Block, order, _scissorRegion, this);
+            _sprite = 
+                string.IsNullOrWhiteSpace(Block.Text)
+                ? null
+                : Resolve<ITextManager>().BuildRenderable(Block, order, _scissorRegion, this);
+
             _lastOrder = order;
             IsDirty = false;
         }

@@ -1,5 +1,6 @@
 ﻿using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -13,7 +14,7 @@ namespace UAlbion.Formats.MapEvents
             e.Amount = s.UInt8(nameof(Amount), e.Amount);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-            e.TickerId = s.UInt16(nameof(TickerId), e.TickerId);
+            e.TickerId = s.EnumU16(nameof(TickerId), e.TickerId);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             ApiUtil.Assert(e.Unk4 == 0 || e.Unk4 == 1);
             ApiUtil.Assert(e.Unk5 == 0);
@@ -24,7 +25,7 @@ namespace UAlbion.Formats.MapEvents
 
         public QuantityChangeOperation Operation { get; private set; }
         public byte Amount { get; private set; }
-        public ushort TickerId { get; private set; }
+        public TickerId TickerId { get; private set; }
 
         public byte Unk4 { get; private set; } // 0, 1
         byte Unk5 { get; set; }

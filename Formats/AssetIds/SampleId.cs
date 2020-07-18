@@ -54,7 +54,7 @@ namespace UAlbion.Formats.AssetIds
         LaserPyewPyew = 42,
         AnticipationOfCollapse = 43,
         BreakingSticks = 44,
-        VIneCoveredRocksFallingAway = 45,
+        VineCoveredRocksFallingAway = 45,
         Switch = 46,
         IllTemperedLlama = 47,
         HiTechHiss2 = 48,

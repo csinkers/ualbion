@@ -7,6 +7,7 @@ namespace UAlbion.Core.Veldrid.Textures
 {
     public class VeldridEightBitTexture : EightBitTexture, IVeldridTexture
     {
+        public override uint FormatSize => 1;
         public PixelFormat Format => PixelFormat.R8_UNorm;
         public TextureType Type => TextureType.Texture2D;
 
@@ -50,20 +51,6 @@ namespace UAlbion.Core.Veldrid.Textures
 
                 IsDirty = false;
                 return texture;
-            }
-        }
-
-        public override uint FormatSize
-        {
-            get
-            {
-                switch (Format)
-                {
-                    case PixelFormat.R8_G8_B8_A8_UNorm: return 4;
-                    case PixelFormat.R8_UNorm: return 1;
-                    case PixelFormat.R8_UInt: return 1;
-                    default: throw new NotImplementedException();
-                }
             }
         }
 

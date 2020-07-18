@@ -37,7 +37,9 @@ namespace UAlbion.Game.Gui.Inventory
             var frame = new GroupingFrame(bodyStack);
             var labelStack = new HorizontalStack(
                 new InventoryOffensiveLabel(activeCharacter),
+                new Spacing(4, 0),
                 new InventoryWeightLabel(activeCharacter),
+                new Spacing(4, 0),
                 new InventoryDefensiveLabel(activeCharacter)
             );
 

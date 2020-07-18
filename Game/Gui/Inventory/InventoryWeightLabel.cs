@@ -61,7 +61,7 @@ namespace UAlbion.Game.Gui.Inventory
                     .Get();
             }, x => _version);
 
-            AttachChild(new ButtonFrame(new UiText(source))
+            AttachChild(new ButtonFrame(new FixedSize(66, 8, new UiText(source)))
             {
                 State = ButtonState.Pressed,
                 Padding = 0

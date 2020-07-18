@@ -26,7 +26,7 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 var player = Resolve<IParty>()[_activeCharacter];
                 var damage = player?.Apparent.DisplayDamage ?? 0;
-                return new[] { new TextBlock($": {damage}") };
+                return new[] { new TextBlock($"{damage}") };
             }, x => _version);
 
             AttachChild(
@@ -36,6 +36,7 @@ namespace UAlbion.Game.Gui.Inventory
                             new FixedSize(8, 8,
                                 new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiOffensiveValue)),
                             new Spacing(1, 0),
+                            new UiText(new LiteralText(":")),
                             new UiText(source)
                         )
                     ))

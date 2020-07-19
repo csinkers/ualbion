@@ -22,7 +22,7 @@ namespace UAlbion.Game.Gui.Menus
             var elements = new List<IUiElement>
             {
                 new Spacing(0, 2),
-                new HorizontalStack(new Spacing(5, 0), new Header(SystemTextId.MainMenu_MainMenu), new Spacing(5, 0)),
+                new HorizontalStack(new Spacing(5, 0), new BoldHeader(SystemTextId.MainMenu_MainMenu), new Spacing(5, 0)),
                 new Divider(CommonColor.Yellow3),
                 new Spacing(0, 2),
             };

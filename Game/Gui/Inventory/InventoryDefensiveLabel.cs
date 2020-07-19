@@ -27,18 +27,20 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 var player = Resolve<IParty>()[_activeCharacter];
                 var protection = player?.Apparent.DisplayProtection ?? 0;
-                return new[] { new TextBlock($": {protection}") };
+                return new[] { new TextBlock($"{protection}") };
             }, x => _version);
 
             AttachChild(
                 new ButtonFrame(
+                    new FixedSize(27, 8,
                         new HorizontalStack(
                             new FixedSize(6, 8,
                                 new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiDefensiveValue)),
                             new Spacing(1, 0),
+                            new UiText(new LiteralText(":")),
                             new UiText(source)
                         )
-                    )
+                    ))
                 {
                     State = ButtonState.Pressed,
                     Padding = 0

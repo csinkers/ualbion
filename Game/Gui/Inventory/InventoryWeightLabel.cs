@@ -61,11 +61,19 @@ namespace UAlbion.Game.Gui.Inventory
                     .Get();
             }, x => _version);
 
-            AttachChild(new ButtonFrame(new UiText(source))
-            {
-                State = ButtonState.Pressed,
-                Padding = 0
-            });
+            AttachChild(
+                new ButtonFrame(
+                    new FixedSize(66, 8,
+                        new HorizontalStack(
+                            new Spacing(1, 0),
+                            new UiText(source)
+                        )
+                    )
+                )
+                {
+                    State = ButtonState.Pressed,
+                    Padding = 0
+                });
         }
 
         void Hover() => Raise(new HoverTextEvent(_hoverSource));

@@ -100,7 +100,7 @@ namespace UAlbion.Game.Gui.Controls
             var elements = new List<IUiElement>
             {
                 new Spacing(0, 2),
-                new HorizontalStack(new Spacing(5, 0), new Header(_event.Heading), new Spacing(5, 0)),
+                new HorizontalStack(new Spacing(5, 0), new BoldHeader(_event.Heading), new Spacing(5, 0)),
                 new Divider(CommonColor.Yellow3),
                 new Padding(new VerticalStack(optionElements), 0, 2)
             };

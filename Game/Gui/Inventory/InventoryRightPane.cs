@@ -68,7 +68,9 @@ namespace UAlbion.Game.Gui.Inventory
             }
 
             var stack = new VerticalStack(
+                new Spacing(0, 1),
                 header,
+                new Spacing(0, 1),
                 slotStack, // slotFrame,
                 new Spacing(0, 2),
                 moneyAndFoodStack,

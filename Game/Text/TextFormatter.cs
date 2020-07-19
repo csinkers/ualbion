@@ -303,17 +303,17 @@ namespace UAlbion.Game.Text
             => new DynamicText(() =>
             {
                 var assets = Resolve<IAssetManager>();
-                language ??= Resolve<ISettings>().Gameplay.Language;
-                string template = assets.LoadString(stringId, language.Value);
-                return InnerFormat(template, arguments, implicitTokens, assets, language.Value);
+                var curLanguage = language ?? Resolve<ISettings>().Gameplay.Language;
+                string template = assets.LoadString(stringId, curLanguage);
+                return InnerFormat(template, arguments, implicitTokens, assets, curLanguage);
             });
 
         public IText Format(string template, IList<(Token, object)> implicitTokens, GameLanguage? language, params object[] arguments)
             => new DynamicText(() =>
             {
                 var assets = Resolve<IAssetManager>();
-                language ??= Resolve<ISettings>().Gameplay.Language;
-                return InnerFormat(template, arguments, implicitTokens, assets, language.Value);
+                var curLanguage = language ?? Resolve<ISettings>().Gameplay.Language;
+                return InnerFormat(template, arguments, implicitTokens, assets, curLanguage);
             });
     }
 }

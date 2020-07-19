@@ -112,7 +112,7 @@ namespace UAlbion.Game.Gui.Controls
                 Alpha = 0.5f,
                 Corners = CommonColor.Black2,
                 TopLeft = CommonColor.Black2,
-                BottomRight = CommonColor.Black2,
+                BottomRight = null,
                 Background = CommonColor.Black2
             };
 
@@ -121,5 +121,15 @@ namespace UAlbion.Game.Gui.Controls
 
             return c;
         }
+
+        public static ButtonFrame.ColorScheme InventoryOuterFrame(ButtonState _) =>
+            new ButtonFrame.ColorScheme
+            {
+                Alpha = 0.5f,
+                Corners = CommonColor.Black2,
+                TopLeft = null,
+                BottomRight = CommonColor.Black2,
+                Background = null
+            };
     }
 }

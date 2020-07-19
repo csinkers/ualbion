@@ -35,7 +35,7 @@ namespace UAlbion.Game.Gui.Inventory
             }
 
             var slotStack = new VerticalStack(slotSpans);
-            //var slotFrame = new ButtonFrame(slotStack) { State = ButtonState.Pressed, Theme = new FrameTheme() };
+            var slotHalfFrame = new ButtonFrame(slotStack) {Theme = ButtonTheme.InventoryOuterFrame, Padding = -1 };
 
             HorizontalStack moneyAndFoodStack;
             if (showTotalPartyGold)
@@ -71,7 +71,7 @@ namespace UAlbion.Game.Gui.Inventory
                 new Spacing(0, 1),
                 header,
                 new Spacing(0, 1),
-                slotStack, // slotFrame,
+                slotHalfFrame,
                 new Spacing(0, 2),
                 moneyAndFoodStack,
                 new Spacing(0, 9),

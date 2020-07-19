@@ -25,7 +25,7 @@ namespace UAlbion.Game.Settings
             On<DebugFlagEvent>     (e =>
             {
                 DebugFlags = (DebugFlags) CoreUtil.UpdateFlag((uint) DebugFlags, e.Operation, (uint) e.Flag);
-                Component.TraceAttachment = (DebugFlags & DebugFlags.TraceAttachment) != 0;
+                TraceAttachment = (DebugFlags & DebugFlags.TraceAttachment) != 0;
             });
             On<SpecialEvent>       (e => Special1 = CoreUtil.UpdateValue(Special1, e.Operation, e.Argument));
             On<Special2Event>      (e => Special2 = CoreUtil.UpdateValue(Special2, e.Operation, e.Argument));

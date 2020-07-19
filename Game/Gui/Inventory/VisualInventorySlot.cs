@@ -51,10 +51,10 @@ namespace UAlbion.Game.Gui.Inventory
                         Padding = -1,
                         Margin = 0,
                         Theme = slotId.Slot.IsBodyPart()
-                            ? (ButtonFrame.ThemeFunction) ButtonTheme.Default
+                            ? (ButtonFrame.ThemeFunction)ButtonTheme.Default
                             : ButtonTheme.InventorySlot,
 
-                        IsPressed = !slotId.Slot.IsBodyPart()
+                    IsPressed = !slotId.Slot.IsBodyPart()
                     }
                     .OnHover(() => Hover?.Invoke())
                     .OnBlur(() => Blur?.Invoke())

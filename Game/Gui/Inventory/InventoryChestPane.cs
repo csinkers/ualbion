@@ -40,7 +40,7 @@ namespace UAlbion.Game.Gui.Inventory
             }
 
             var slotStack = new VerticalStack(slotSpans);
-            //var slotFrame = new ButtonFrame(slotStack) { State = ButtonState.Pressed, Theme = new FrameTheme() };
+            var slotHalfFrame = new ButtonFrame(slotStack) {Theme = ButtonTheme.InventoryOuterFrame, Padding = -1 };
 
             var goldButton = new LogicalInventorySlot(new InventorySlotId(
                 InventoryType.Chest,
@@ -62,7 +62,7 @@ namespace UAlbion.Game.Gui.Inventory
 
             var stack = new VerticalStack(
                 header,
-                slotStack,
+                slotHalfFrame,
                 new Spacing(0, 78),
                 moneyAndFoodStack
             ) { Greedy = false };

@@ -1,6 +1,7 @@
 ﻿using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game
@@ -8,7 +9,6 @@ namespace UAlbion.Game
     public class IdleClockEvent : GameEvent, IVerboseEvent { }
     public class IdleClock : Component
     {
-        const float TickDurationSeconds = 1 / 8.0f;
         readonly IdleClockEvent _event = new IdleClockEvent();
         float _elapsedTimeThisGameFrame;
 
@@ -20,14 +20,16 @@ namespace UAlbion.Game
         void OnEngineUpdate(EngineUpdateEvent e)
         {
             _elapsedTimeThisGameFrame += e.DeltaSeconds;
+            var config = Resolve<GameConfig>();
+            var tickDurationSeconds = 1.0f / config.Time.IdleTicksPerSecond;
 
             // If the game was paused for a while don't try and catch up
-            if (_elapsedTimeThisGameFrame > 4 * TickDurationSeconds)
-                _elapsedTimeThisGameFrame = 4 * TickDurationSeconds;
+            if (_elapsedTimeThisGameFrame > 4 * tickDurationSeconds)
+                _elapsedTimeThisGameFrame = 4 * tickDurationSeconds;
 
-            while (_elapsedTimeThisGameFrame >= TickDurationSeconds)
+            while (_elapsedTimeThisGameFrame >= tickDurationSeconds)
             {
-                _elapsedTimeThisGameFrame -= TickDurationSeconds;
+                _elapsedTimeThisGameFrame -= tickDurationSeconds;
                 Raise(_event);
             }
         }

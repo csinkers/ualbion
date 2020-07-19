@@ -7,6 +7,7 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
@@ -174,7 +175,8 @@ namespace UAlbion.Game.Gui.Status
             }
             else // For the first click, just start the double-click timer.
             {
-                Raise(new StartTimerEvent(TimerName, 300, this));
+                var config = Resolve<GameConfig>();
+                Raise(new StartTimerEvent(TimerName, config.UI.ButtonDoubleClickIntervalSeconds, this));
                 _isClickTimerPending = true;
             }
         }

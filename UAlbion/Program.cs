@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;

@@ -3,7 +3,6 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
@@ -184,8 +183,7 @@ namespace UAlbion.Game.Gui.Inventory
             bool isPlotItem = (item.Flags & ItemFlags.PlotItem) != 0;
             var options = new List<ContextMenuOption>();
 
-            var inventoryManager = Resolve<IInventoryManager>();
-            if (inventoryManager.ActiveMode == InventoryMode.Merchant)
+            if (_id.Type == InventoryType.Merchant)
             {
                 options.Add(new ContextMenuOption(
                     S(SystemTextId.InvPopup_Sell, isPlotItem),

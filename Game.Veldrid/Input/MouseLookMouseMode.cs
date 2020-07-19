@@ -6,6 +6,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 using Veldrid;
 
@@ -40,8 +41,6 @@ namespace UAlbion.Game.Veldrid.Input
 
     public class MouseLookMouseMode : Component
     {
-        const float Sensitivity = 2;
-
         public MouseLookMouseMode()
         {
             On<InputEvent>(OnInput);
@@ -64,7 +63,11 @@ namespace UAlbion.Game.Veldrid.Input
             var hits = Resolve<ISelectionManager>()?.CastRayFromScreenSpace(e.Snapshot.MousePosition, true);
 
             if (delta.LengthSquared() > float.Epsilon)
-                Raise(new CameraRotateEvent(delta.X * (Sensitivity / -1000), delta.Y * (Sensitivity / -1000)));
+            {
+                var config = Resolve<GameConfig>();
+                var sensitivity = config.UI.MouseLookSensitivity / -1000;
+                Raise(new CameraRotateEvent(delta.X * sensitivity, delta.Y * sensitivity));
+            }
 
             // Clicks are targeted, releases are broadcast. e.g. if you click and drag a slider and move outside
             // its hover area, then it should switch to "ClickedBlurred". If you then release the button while

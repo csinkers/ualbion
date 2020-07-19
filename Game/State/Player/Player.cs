@@ -4,6 +4,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
 
@@ -11,8 +12,6 @@ namespace UAlbion.Game.State.Player
 {
     public class Player : Component, IPlayer
     {
-        const int TransitionSpeedMilliseconds = 250;
-
         readonly CharacterSheet _base;
         IEffectiveCharacterSheet _lastEffective;
         DateTime _lastChangeTime;
@@ -33,9 +32,17 @@ namespace UAlbion.Game.State.Player
 
         void EngineUpdate(EngineUpdateEvent e)
         {
-            var elapsed = (DateTime.Now - _lastChangeTime).TotalMilliseconds;
+            if (_lerp >= 1.0f)
+                return;
+
+            var config = Resolve<GameConfig>();
+            var elapsed = (DateTime.Now - _lastChangeTime).TotalSeconds;
             var oldLerp = _lerp;
-            _lerp = elapsed > TransitionSpeedMilliseconds ? 1.0f : (float) (elapsed / TransitionSpeedMilliseconds);
+
+            _lerp = elapsed > config.UI.Transitions.InventoryChangLerpSeconds 
+                ? 1.0f 
+                : (float)(elapsed / config.UI.Transitions.InventoryChangLerpSeconds);
+
             if (Math.Abs(_lerp - oldLerp) > float.Epsilon)
                 Raise(new InventoryChangedEvent(InventoryType.Player, (ushort)Id));
         }
@@ -56,9 +63,8 @@ namespace UAlbion.Game.State.Player
 
         void UpdateInventory()
         {
-            var assets = Resolve<IAssetManager>();
             _lastEffective = Effective;
-            Effective = EffectiveSheetCalculator.GetEffectiveSheet(_base);
+            Effective = EffectiveSheetCalculator.GetEffectiveSheet(_base, Resolve<GameConfig>());
             _lastEffective ??= Effective;
             _lastChangeTime = DateTime.Now;
             _lerp = 0.0f;

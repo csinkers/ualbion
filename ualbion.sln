@@ -20,11 +20,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{E4F7A1D2-3
 		data\assets.json = data\assets.json
 		data\assets_min.json = data\assets_min.json
 		data\config.json = data\config.json
+		data\core.json = data\core.json
 		data\core_sprites.json = data\core_sprites.json
+		data\game.json = data\game.json
 		data\input.json = data\input.json
-		data\inventory.json = data\inventory.json
-		data\items.json = data\items.json
-		data\savefile.txt = data\savefile.txt
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateEnums", "Tools\GenerateEnums\GenerateEnums.csproj", "{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}"

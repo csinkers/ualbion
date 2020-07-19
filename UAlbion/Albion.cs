@@ -94,10 +94,11 @@ namespace UAlbion
         {
             PerfTracker.StartupEvent("Creating main components");
             var factory = global.Resolve<ICoreFactory>();
-            var inventoryConfig = InventoryConfig.Load(baseDir);
 
             global
                 .Register<ICommonColors>(new CommonColors(factory))
+                .Register(CoreConfig.Load(baseDir))
+                .Register(GameConfig.Load(baseDir))
                 ;
 
             if (commandLine.AudioMode == AudioMode.InProcess)
@@ -143,7 +144,7 @@ namespace UAlbion
                         .Add(new ConversationManager())
                         .Add(new PaletteManager())
                         .Add(new InventoryInspector())
-                        .Add(new InventoryScreen(inventoryConfig))))
+                        .Add(new InventoryScreen())))
 
                 .Add(new TextFormatter())
                 .Add(new TextManager())

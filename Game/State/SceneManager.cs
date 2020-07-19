@@ -12,14 +12,13 @@ namespace UAlbion.Game.State
     public class SceneManager : ServiceComponent<ISceneManager>, ISceneManager
     {
         readonly IDictionary<SceneId, GameScene> _scenes = new Dictionary<SceneId, GameScene>();
-        ISetInventoryModeEvent _lastModeEvent;
 
         public SceneManager()
         {
             On<SetSceneEvent>(Set);
             On<ChestEvent>(OpenChest);
             On<DoorEvent>(OpenDoor);
-            On<InventoryOpenEvent>(e => OpenInventory(e.Member));
+            On<ISetInventoryModeEvent>(e => OpenInventory(e.Member));
             On<InventoryOpenPositionEvent>(e =>
             {
                 var party = Resolve<IParty>();

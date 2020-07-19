@@ -8,6 +8,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Audio;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 
@@ -15,7 +16,6 @@ namespace UAlbion.Game.Veldrid.Audio
 {
     public class AudioManager : ServiceComponent<IAudioManager>, IAudioManager
     {
-        const int AudioPollIntervalMs = 100;
         readonly bool _standalone;
         readonly IDictionary<SampleId, AudioBuffer> _sampleCache = new Dictionary<SampleId, AudioBuffer>();
         readonly IDictionary<(SongId, int), AudioBuffer> _waveLibCache = new Dictionary<(SongId, int), AudioBuffer>();
@@ -234,8 +234,9 @@ namespace UAlbion.Game.Veldrid.Audio
         void AudioThread()
         {
             using var device = new AudioDevice { DistanceModel = DistanceModel.InverseDistance };
+            var config = Resolve<GameConfig>();
 
-            while (!_doneEvent.WaitOne(AudioPollIntervalMs))
+            while (!_doneEvent.WaitOne((int)(config.Audio.AudioPollIntervalSeconds * 1000)))
             {
                 if (_standalone)
                     Raise(new BeginFrameEvent());

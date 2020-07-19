@@ -2,6 +2,7 @@
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Events.Transitions;
 using UAlbion.Game.State;
 
@@ -10,7 +11,6 @@ namespace UAlbion.Game.Entities
     public class ItemTransitionManager : Component
     {
         static readonly Vector2 FirstPortraitPosition = new Vector2(23, 204);
-        const float DefaultTransitionTime = 0.35f;
 
         public ItemTransitionManager()
         {
@@ -45,9 +45,15 @@ namespace UAlbion.Game.Entities
             return LinearFromNormPosition(fromPosition, new Vector2(toX, toY), itemId, transitionTime, continuation);
         }
 
-        bool LinearFromNormPosition(Vector2 fromNormPosition, Vector2 toUiPosition, ItemId itemId, float? transitionTime, Action continuation)
+        bool LinearFromNormPosition(
+            Vector2 fromNormPosition,
+            Vector2 toUiPosition,
+            ItemId itemId,
+            float? transitionTimeSeconds,
+            Action continuation)
         {
             var assets = Resolve<IAssetManager>();
+            var config = Resolve<GameConfig>().UI.Transitions;
             var window = Resolve<IWindowManager>();
             var destPosition = window.UiToNorm(toUiPosition); // Tom's portrait, hardcoded for now.
 
@@ -63,7 +69,7 @@ namespace UAlbion.Game.Entities
                             CoreSpriteId.UiGold, 0,
                             fromNormPosition,
                             destPosition,
-                            transitionTime ?? DefaultTransitionTime,
+                            transitionTimeSeconds ?? config.DefaultTransitionTimeSeconds,
                             window.UiToNormRelative(subImageDetails.Size),
                             continuation));
                         break;
@@ -78,7 +84,7 @@ namespace UAlbion.Game.Entities
                             CoreSpriteId.UiFood, 0,
                             fromNormPosition,
                             destPosition,
-                            transitionTime ?? DefaultTransitionTime,
+                            transitionTimeSeconds ?? config.DefaultTransitionTimeSeconds,
                             window.UiToNormRelative(subImageDetails.Size),
                             continuation));
                         break;
@@ -93,7 +99,7 @@ namespace UAlbion.Game.Entities
                             item.Icon, (int)item.Icon,
                             fromNormPosition,
                             destPosition,
-                            transitionTime ?? DefaultTransitionTime,
+                            transitionTimeSeconds ?? config.DefaultTransitionTimeSeconds,
                             window.UiToNormRelative(subImageDetails.Size),
                             continuation));
                         break;

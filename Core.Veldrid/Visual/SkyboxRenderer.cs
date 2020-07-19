@@ -22,8 +22,6 @@ namespace UAlbion.Core.Veldrid.Visual
 
     public class SkyboxRenderer : Component, IRenderer
     {
-        const float VisibleProportion = 0.8f;
-
         // Vertex Layout
         static readonly VertexLayoutDescription VertexLayout = VertexLayoutHelper.Vertex2DTextured;
 
@@ -150,6 +148,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
             ITextureManager textureManager = Resolve<ITextureManager>();
             IDeviceObjectManager dom = Resolve<IDeviceObjectManager>();
+            var config = Resolve<CoreConfig>().Visual.Skybox;
             if (!(Resolve<ICamera>() is PerspectiveCamera camera))
                 return;
 
@@ -161,7 +160,7 @@ namespace UAlbion.Core.Veldrid.Visual
             {
                 uYaw = camera.Yaw,
                 uPitch = camera.Pitch,
-                uVisibleProportion = VisibleProportion
+                uVisibleProportion = config.VisibleProportion
             };
 
             cl.UpdateBuffer(_uniformBuffer, 0, uniformInfo);

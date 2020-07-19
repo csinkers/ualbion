@@ -10,24 +10,29 @@ namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryMidPane : UiElement
     {
-        public InventoryMidPane(PartyCharacterId activeCharacter,  InventoryConfig.PlayerInventory config)
+        readonly PartyCharacterId _activeCharacter;
+        public InventoryMidPane(PartyCharacterId activeCharacter) => _activeCharacter = activeCharacter;
+
+        protected override void Subscribed()
         {
+            var config = Resolve<GameConfig>();
+            var positions = config.Inventory.Positions[_activeCharacter];
             var backgroundStack = new FixedPositionStack();
-            var background = new UiSpriteElement<FullBodyPictureId>((FullBodyPictureId)activeCharacter);
+            var background = new UiSpriteElement<FullBodyPictureId>((FullBodyPictureId)_activeCharacter);
             var backgroundButton = new Button(background) { Theme = ButtonTheme.Invisible }
-                .OnClick(() => Raise(new InventorySwapEvent(InventoryType.Player, (ushort)activeCharacter, ItemSlotId.CharacterBody)));
+                .OnClick(() => Raise(new InventorySwapEvent(InventoryType.Player, (ushort)_activeCharacter, ItemSlotId.CharacterBody)));
             backgroundStack.Add(backgroundButton, 1, -3);
             AttachChild(backgroundStack);
 
             var bodyStack = new FixedPositionStack();
-            foreach (var bodyPart in config)
+            foreach (var bodyPart in positions)
             {
                 var itemSlotId = bodyPart.Key;
                 var position = bodyPart.Value;
                 bodyStack.Add(
                     new LogicalInventorySlot(new InventorySlotId(
                         InventoryType.Player,
-                        (ushort)activeCharacter,
+                        (ushort)_activeCharacter,
                         itemSlotId)),
                     (int)position.X,
                     (int)position.Y);
@@ -36,18 +41,18 @@ namespace UAlbion.Game.Gui.Inventory
 
             var frame = new GroupingFrame(bodyStack);
             var labelStack = new HorizontalStack(
-                new InventoryOffensiveLabel(activeCharacter),
+                new InventoryOffensiveLabel(_activeCharacter),
                 new Spacing(4, 0),
-                new InventoryWeightLabel(activeCharacter),
+                new InventoryWeightLabel(_activeCharacter),
                 new Spacing(4, 0),
-                new InventoryDefensiveLabel(activeCharacter)
+                new InventoryDefensiveLabel(_activeCharacter)
             );
 
             var mainStack = new VerticalStack(
                 new Spacing(0, 1),
                 new Header(new DynamicText(() =>
                     {
-                        var member = Resolve<IParty>()[activeCharacter];
+                        var member = Resolve<IParty>()[_activeCharacter];
                         var settings = Resolve<ISettings>();
                         if (member == null)
                             return new TextBlock[0];

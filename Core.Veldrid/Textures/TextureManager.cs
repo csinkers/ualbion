@@ -11,9 +11,6 @@ namespace UAlbion.Core.Veldrid.Textures
 {
     public class TextureManager : ServiceComponent<ITextureManager>, ITextureManager
     {
-        const float CacheLifetimeSeconds = 20.0f;
-        const float CacheCheckIntervalSeconds = 5.0f;
-
         readonly object _syncRoot = new object();
         readonly IDictionary<ITexture, CacheEntry> _cache = new Dictionary<ITexture, CacheEntry>();
         float _lastCleanup;
@@ -70,8 +67,9 @@ namespace UAlbion.Core.Veldrid.Textures
         void OnUpdate(EngineUpdateEvent e)
         {
             _totalTime += e.DeltaSeconds;
+            var config = Resolve<CoreConfig>().Visual.TextureManager;
 
-            if (_totalTime - _lastCleanup > CacheCheckIntervalSeconds)
+            if (_totalTime - _lastCleanup > config.CacheCheckIntervalSeconds)
             {
                 lock (_syncRoot)
                 {
@@ -79,7 +77,7 @@ namespace UAlbion.Core.Veldrid.Textures
                     foreach (var key in keys)
                     {
                         var entry = _cache[key];
-                        if ((DateTime.Now - entry.LastAccessDateTime).TotalSeconds > CacheLifetimeSeconds)
+                        if ((DateTime.Now - entry.LastAccessDateTime).TotalSeconds > config.CacheLifetimeSeconds)
                         {
                             _cache.Remove(key);
                             entry.Dispose();

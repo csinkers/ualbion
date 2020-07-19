@@ -1,13 +1,11 @@
 ﻿using UAlbion.Formats.Assets;
+using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.State.Player
 {
     public static class EffectiveSheetCalculator
     {
-        const int GramsPerGold = 2;
-        const int GramsPerRation = 250;
-        const int CarryWeightPerStrength = 1000;
-        public static IEffectiveCharacterSheet GetEffectiveSheet(CharacterSheet sheet)
+        public static IEffectiveCharacterSheet GetEffectiveSheet(CharacterSheet sheet, GameConfig config)
         {
             var effective = new EffectiveCharacterSheet(sheet.Key)
             {
@@ -38,12 +36,12 @@ namespace UAlbion.Game.State.Player
             };
 
             ApplyWieldedItems(effective);
-            CalculateTotalWeight(effective);
+            CalculateTotalWeight(effective, config);
 
             return effective;
         }
 
-        static void CalculateTotalWeight(EffectiveCharacterSheet sheet)
+        static void CalculateTotalWeight(EffectiveCharacterSheet sheet, GameConfig config)
         {
             sheet.TotalWeight = 0;
             foreach (var itemSlot in sheet.Inventory.EnumerateAll())
@@ -53,9 +51,9 @@ namespace UAlbion.Game.State.Player
                 sheet.TotalWeight += itemSlot.Amount * item.Weight;
             }
 
-            sheet.TotalWeight += sheet.Inventory.Gold.Amount * GramsPerGold;
-            sheet.TotalWeight += sheet.Inventory.Rations.Amount * GramsPerRation;
-            sheet.MaxWeight = sheet.Attributes.Strength * CarryWeightPerStrength;
+            sheet.TotalWeight += (sheet.Inventory.Gold.Amount * config.Inventory.GramsPerGold) / 10;
+            sheet.TotalWeight += sheet.Inventory.Rations.Amount * config.Inventory.GramsPerRation;
+            sheet.MaxWeight = sheet.Attributes.Strength * config.Inventory.CarryWeightPerStrength;
         }
 
         static void ApplyWieldedItems(EffectiveCharacterSheet sheet)

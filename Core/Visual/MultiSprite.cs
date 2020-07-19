@@ -61,10 +61,9 @@ namespace UAlbion.Core.Visual
         internal void Shrink(SpriteLease leaseToRemove)
         {
             // TODO: Use a more efficient algorithm, e.g. look for equal sized lease at end of list and swap, use linked list for lease list etc
-            VerifyConsistency();
-
             lock (_syncRoot)
             {
+                VerifyConsistency();
                 PerfTracker.IncrementFrameCounter("Sprite Returns");
                 bool shifting = false;
                 for (int n = 0; n < _leases.Count; n++)

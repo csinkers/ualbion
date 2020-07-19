@@ -5,7 +5,7 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.MapEvents;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Events.Transitions;
@@ -14,16 +14,17 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.State.Player
 {
+    public class InventoryEventManager : Component
+    {
+    }
+
     public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryManager
     {
         readonly Func<InventoryId, Inventory> _getInventory;
         readonly ItemSlot _hand = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, ItemSlotId.None));
-        const float RelocationTransitionDurationSeconds = 0.2f;
 
         ItemSlot GetSlot(InventorySlotId id) => _getInventory(id.Inventory)?.GetSlot(id.Slot);
         public ReadOnlyItemSlot ItemInHand { get; }
-        public InventoryMode ActiveMode { get; private set; }
-        public InventorySwapEvent ReturnItemInHandEvent { get; private set; }
         public InventoryManager(Func<InventoryId, Inventory> getInventory)
         {
             OnAsync<InventorySwapEvent>(OnSlotEvent);
@@ -79,10 +80,6 @@ namespace UAlbion.Game.State.Player
                 return; // TODO: Message
 
             _hand.TransferFrom(slot, quantity);
-            ReturnItemInHandEvent =
-                _hand.Item == null
-                ? null
-                : new InventorySwapEvent(slot.Id.Type, slot.Id.Id, slot.Id.Slot);
         }
 
         static bool DoesSlotAcceptItem(ICharacterSheet sheet, ItemSlotId slotId, ItemData item)
@@ -272,6 +269,7 @@ namespace UAlbion.Game.State.Player
             if (slot == null)
                 return false;
 
+            var config = Resolve<GameConfig>();
             var cursorManager = Resolve<ICursorManager>();
             var window = Resolve<IWindowManager>();
             var cursorUiPosition = window.PixelToUi(cursorManager.Position);
@@ -307,7 +305,7 @@ namespace UAlbion.Game.State.Player
                                 (int)cursorUiPosition.Y,
                                 (int)slot.LastUiPosition.X,
                                 (int)slot.LastUiPosition.Y,
-                                RelocationTransitionDurationSeconds);
+                                config.UI.Transitions.ItemMovementTransitionTimeSeconds);
 
                             ItemSlot temp = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
                             temp.TransferFrom(_hand, null);
@@ -337,7 +335,7 @@ namespace UAlbion.Game.State.Player
                                 (int)cursorUiPosition.Y,
                                 (int)slot.LastUiPosition.X,
                                 (int)slot.LastUiPosition.Y,
-                                RelocationTransitionDurationSeconds);
+                                config.UI.Transitions.ItemMovementTransitionTimeSeconds);
 
                             var transitionEvent2 = new LinearItemTransitionEvent(
                                 slot.ItemId ?? ItemId.Knife,
@@ -345,7 +343,7 @@ namespace UAlbion.Game.State.Player
                                 (int)slot.LastUiPosition.Y,
                                 (int)cursorUiPosition.X,
                                 (int)cursorUiPosition.Y,
-                                RelocationTransitionDurationSeconds);
+                                config.UI.Transitions.ItemMovementTransitionTimeSeconds);
 
                             ItemSlot temp1 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
                             ItemSlot temp2 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
@@ -393,7 +391,6 @@ namespace UAlbion.Game.State.Player
 
         bool OnDiscard(InventoryDiscardEvent e, Action continuation)
         {
-            const int maxDiscardTransitions = 24;
             var inventoryId = new InventoryId(e.InventoryType, e.InventoryId);
             var inventory = _getInventory(inventoryId);
             GetQuantity(true, inventory, e.SlotId, quantity =>
@@ -424,8 +421,11 @@ namespace UAlbion.Game.State.Player
                     }
 
                     if (slot.ItemId.HasValue)
-                        for (int i = 0; i < itemsToDrop && i < maxDiscardTransitions; i++)
+                    {
+                        var config = Resolve<GameConfig>();
+                        for (int i = 0; i < itemsToDrop && i < config.UI.Transitions.MaxDiscardTransitions; i++)
                             Raise(new GravityItemTransitionEvent(slot.ItemId.Value, e.NormX, e.NormY));
+                    }
 
                     slot.Amount -= itemsToDrop;
                     Update(inventoryId);

@@ -7,6 +7,7 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
@@ -15,7 +16,6 @@ namespace UAlbion.Game.Entities.Map2D
 {
     public class TileLayer : Component
     {
-        const int TicksPerFrame = 10;
         static readonly SpriteInstanceData BlankInstance = SpriteInstanceData.TopMid(
             Vector3.Zero, Vector2.Zero,
             new SubImage(Vector2.Zero, Vector2.Zero, Vector2.Zero, 0),
@@ -102,7 +102,8 @@ namespace UAlbion.Game.Entities.Map2D
 
         void Render()
         {
-            var frameCount =  (Resolve<IGameState>()?.TickCount ?? 0) / TicksPerFrame;
+            var config = Resolve<GameConfig>();
+            var frameCount =  (Resolve<IGameState>()?.TickCount ?? 0) / config.Time.FastTicksPerMapTileFrame;
 #if DEBUG
             var debug = Resolve<IDebugSettings>()?.DebugFlags ?? 0;
             if (_lastDebugFlags != debug)

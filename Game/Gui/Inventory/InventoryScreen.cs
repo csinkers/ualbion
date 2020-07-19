@@ -2,7 +2,6 @@
 using System.Linq;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
@@ -12,26 +11,30 @@ namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryScreen : Dialog
     {
-        readonly InventoryConfig _config;
-        InventoryMode _mode;
+        InventoryMode _mode = InventoryMode.Character;
         int _modeSpecificId;
         InventoryPage _page;
         PartyCharacterId _activeCharacter;
 
-        public InventoryScreen(InventoryConfig config) : base(DialogPositioning.TopLeft)
+        public InventoryScreen() : base(DialogPositioning.TopLeft)
         {
-            On<InventoryOpenEvent>(SetMode);
+            On<InventoryOpenEvent>(e => SetDisplayedPartyMember(e.Member));
             On<ChestEvent>(SetMode);
             On<DoorEvent>(SetMode);
             On<MerchantEvent>(SetMode);
-
-            _config = config;
         }
 
-        protected override void Subscribed()
+        void SetDisplayedPartyMember(PartyCharacterId? member)
         {
+            var party = Resolve<IParty>();
+            _activeCharacter = member ?? party.Leader;
+            if (party.WalkOrder.All(x => x.Id != _activeCharacter))
+                _activeCharacter = party.Leader;
+
             Rebuild();
         }
+
+        protected override void Subscribed() => Rebuild();
 
         void SetMode(ISetInventoryModeEvent e)
         {
@@ -44,12 +47,7 @@ namespace UAlbion.Game.Gui.Inventory
                 _ => 0
             };
 
-            var party = Resolve<IParty>();
-            _activeCharacter = e.Member ?? party.Leader;
-            if (party.WalkOrder.All(x => x.Id != _activeCharacter))
-                _activeCharacter = party.Leader;
-
-            Rebuild();
+            SetDisplayedPartyMember(e.Member);
         }
 
         void Rebuild()
@@ -71,10 +69,15 @@ namespace UAlbion.Game.Gui.Inventory
                     _ => throw new InvalidOperationException($"Unexpected inventory mode {_mode}")
                 };
 
-            var middlePane = new InventoryMidPane(_activeCharacter, _config.Positions[_activeCharacter]);
+            var middlePane = new InventoryMidPane(_activeCharacter);
             var rightPane = new InventoryRightPane(
                 _activeCharacter,
-                () => Raise(new PopSceneEvent()),
+                () =>
+                {
+                    _mode = InventoryMode.Character;
+                    _modeSpecificId = 0;
+                    Raise(new PopSceneEvent());
+                },
                 _mode == InventoryMode.Merchant);
 
             // var frameDivider = new FrameDivider(135, 0, 4, 192);

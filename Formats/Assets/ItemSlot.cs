@@ -174,7 +174,7 @@ namespace UAlbion.Formats.Assets
             if (ItemId != y.ItemId) return false; // Can't stack dissimilar items
             if (Item is Gold) return true;
             if (Item is Rations) return true;
-            if (!(Item is ItemData xi) || !(y.Item is ItemData yi)) return false; // If not gold/rations, then both must be items
+            if (!(Item is ItemData xi) || !(y.Item is ItemData _)) return false; // If not gold/rations, then both must be items
             if (Id.Slot.IsBodyPart() || y.Id.Slot.IsBodyPart()) return false; // Can't wield / wear stacks
             return xi.IsStackable;
         }

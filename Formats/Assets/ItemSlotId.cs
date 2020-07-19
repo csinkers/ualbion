@@ -21,7 +21,10 @@ namespace UAlbion.Formats.Assets
         RightHandOrTail,
         CharacterSlotCount,
 
-        CharacterBody = 0xfc,
+        // Dummy slot id used for the character's full body
+        // picture as a background on the middle inventory pane.
+        CharacterBody = 0xfc, 
+
         None = 0xff,
     }
 

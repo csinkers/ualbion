@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
@@ -27,14 +29,14 @@ namespace UAlbion.Game.Assets
             });
             On<AssetStatsEvent>(e =>
             {
-                Console.WriteLine("Asset Statistics:");
+                var sb = new StringBuilder();
+                sb.AppendLine("Asset Statistics:");
                 lock (_syncRoot)
                 {
                     foreach (var key in _assetCache.Keys.OrderBy(y => y.ToString()))
-                    {
-                        Console.WriteLine("    {0}: {1} items", key, _assetCache[key].Values.Count);
-                    }
+                        sb.AppendLine($"    {key}: {_assetCache[key].Values.Count} items");
                 }
+                Raise(new LogEvent(LogEvent.Level.Info, sb.ToString()));
             });
         }
 

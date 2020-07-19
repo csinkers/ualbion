@@ -7,6 +7,7 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Assets
 {
@@ -22,8 +23,15 @@ namespace UAlbion.Game.Assets
 
         public IEnumerable<AssetType> SupportedTypes => new[] { AssetType.UAlbionText };
 
-        protected override void Subscribed()
+        public NewStringLocator() => On<ReloadAssetsEvent>(_ => _strings = null);
+
+        protected override void Subscribed() => Load();
+
+        void Load()
         {
+            if (_strings != null)
+                return;
+
             var settings = Resolve<ISettings>();
             var filename = Path.Combine(settings.BasePath, "data", "strings.json");
             var rawJson = File.ReadAllText(filename);
@@ -41,6 +49,7 @@ namespace UAlbion.Game.Assets
 
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, object> loaderFunc)
         {
+            Load();
             if (!_strings.TryGetValue((UAlbionStringId)key.Id, out var languages))
             {
                 Raise(new LogEvent(LogEvent.Level.Error,

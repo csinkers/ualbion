@@ -91,5 +91,9 @@ namespace UAlbion.Formats.Config
             return JsonConvert.DeserializeObject<GameConfig>(configText,
                 new JsonSerializerSettings {ContractResolver = new PrivatePropertyJsonContractResolver()});
         }
+
+        public static GameConfig LoadLiteral(string json) =>
+            JsonConvert.DeserializeObject<GameConfig>(json,
+                new JsonSerializerSettings {ContractResolver = new PrivatePropertyJsonContractResolver()});
     }
 }

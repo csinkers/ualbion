@@ -1,10 +1,9 @@
 ﻿using System.Linq;
-using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
@@ -34,10 +33,12 @@ namespace UAlbion.Game.Tests
             _exchange = new EventExchange(new LogExchange());
             var factory = new MockFactory();
             var locator = new MockAssetLocatorRegistry()
-                .Add(new AssetKey(AssetType.MetaFont, (ushort)new MetaFontId()), MockUniformFont.Font)
+                    .Add(new AssetKey(AssetType.MetaFont, (ushort) new MetaFontId()), MockUniformFont.Font)
                 ;
 
+            var config = GameConfig.LoadLiteral(@"{ ""UI"": { ""ButtonDoubleClickIntervalSeconds"": 0.35 } }");
             _exchange
+                .Register(config)
                 .Attach(locator)
                 .Attach(new AssetManager())
                 .Attach(new SpriteManager())

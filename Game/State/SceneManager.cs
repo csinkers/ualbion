@@ -1,11 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Scenes;
-using UAlbion.Game.Text;
 
 namespace UAlbion.Game.State
 {
@@ -16,15 +13,6 @@ namespace UAlbion.Game.State
         public SceneManager()
         {
             On<SetSceneEvent>(Set);
-            On<ChestEvent>(OpenChest);
-            On<DoorEvent>(OpenDoor);
-            On<ISetInventoryModeEvent>(e => OpenInventory(e.Member));
-            On<InventoryOpenPositionEvent>(e =>
-            {
-                var party = Resolve<IParty>();
-                if (party?.StatusBarOrder.Count > e.Position)
-                    OpenInventory(party.StatusBarOrder[e.Position].Id);
-            });
         }
 
         public SceneId ActiveSceneId { get; private set; }
@@ -37,30 +25,6 @@ namespace UAlbion.Game.State
             AttachChild(scene);
             _scenes.Add(scene.Id, scene);
             return this;
-        }
-
-        void OpenChest(ChestEvent e)
-        {
-            if(ActiveSceneId != SceneId.Inventory)
-                Raise(new PushSceneEvent(SceneId.Inventory));
-
-            // TODO: Handle messages, locked chests, traps etc
-            var party = Resolve<IParty>();
-            Raise(e.Member.HasValue ? e : e.CloneForMember(party.Leader));
-        }
-
-        void OpenDoor(DoorEvent obj)
-        {
-        }
-
-        void OpenInventory(PartyCharacterId? memberId)
-        {
-            if(ActiveSceneId != SceneId.Inventory)
-                Raise(new PushSceneEvent(SceneId.Inventory));
-
-            var party = Resolve<IParty>();
-            memberId ??= party.Leader;
-            Raise(new SetContextEvent(ContextType.Inventory, AssetType.PartyMember, (int)memberId));
         }
 
         void Set(SetSceneEvent e)
@@ -83,11 +47,6 @@ namespace UAlbion.Game.State
             }
 
             ActiveSceneId = e.SceneId;
-            if(ActiveSceneId != SceneId.Inventory)
-            {
-                // _inventoryMode = InventoryMode.Character;
-                // _inventoryId = null;
-            }
         }
     }
 }

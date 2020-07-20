@@ -20,5 +20,6 @@ namespace UAlbion.Formats.Assets
         IEnumerable<IReadOnlyItemSlot> EnumerateAll();
         IEnumerable<IReadOnlyItemSlot> EnumerateBodyParts();
         IReadOnlyItemSlot GetSlot(ItemSlotId itemSlotId);
+        bool IsEmpty { get; }
     }
 }

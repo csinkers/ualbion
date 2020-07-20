@@ -34,5 +34,6 @@ namespace UAlbion.Game.State.Player
         public IEnumerable<IReadOnlyItemSlot> EnumerateAll() => _b().EnumerateAll();
         public IEnumerable<IReadOnlyItemSlot> EnumerateBodyParts() => _b().EnumerateBodyParts();
         public IReadOnlyItemSlot GetSlot(ItemSlotId itemSlotId) => _b().GetSlot(itemSlotId);
+        public bool IsEmpty => _b().IsEmpty;
     }
 }

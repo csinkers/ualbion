@@ -7,8 +7,8 @@ namespace UAlbion.Formats.MapEvents
     public class InventoryOpenEvent : Event, ISetInventoryModeEvent
     {
         public InventoryOpenEvent(PartyCharacterId? member) => Member = member;
-        public InventoryMode Mode => InventoryMode.Character;
         [EventPart("member", true)] public PartyCharacterId? Member { get; }
-        public ISetInventoryModeEvent CloneForMember(PartyCharacterId member) => new InventoryOpenEvent(member);
+        public InventoryMode Mode => InventoryMode.Character;
+        public ushort Submode => 0;
     }
 }

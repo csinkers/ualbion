@@ -20,6 +20,7 @@ namespace UAlbion.Core
     public abstract class Component : IComponent
     {
         public static bool TraceAttachment;
+        static readonly Action<object> DummyContinuation = _ => { };
         static int _nesting;
         static int _nextId;
         readonly IDictionary<Type, Handler> _handlers = new Dictionary<Type, Handler>();
@@ -323,7 +324,7 @@ namespace UAlbion.Core
                 return;
 
             if (_handlers.TryGetValue(@event.GetType(), out var handler))
-                handler.Invoke(@event, null);
+                handler.Invoke(@event, DummyContinuation);
         }
     }
 }

@@ -21,7 +21,6 @@ namespace UAlbion.Game
             // Need to enqueue without a sender if we want to handle it ourselves.
             On<BeginFrameEvent>(_ => Exchange?.Enqueue(new ResumeChainsEvent(), null)); 
             On<ResumeChainsEvent>(ResumeChains);
-
             OnAsync<TriggerChainEvent>(Trigger);
         }
 
@@ -38,7 +37,13 @@ namespace UAlbion.Game
                 Raise(new LogEvent(LogEvent.Level.Info, $"if ({context.Node.Event}) => {result}"));
 #endif
                 context.Node = result ? branch.Next : branch.NextIfFalse;
-                LastEventResult = result;
+
+                // If a non-query event needs to set this it will have to do it itself. This is to allow
+                // things like chest / door events where different combinations of their IAsyncEvent<bool> result 
+                // and the LastEventResult can mean successful opening, exiting the screen without success or a
+                // trap has been triggered.
+                if (boolEvent is IQueryEvent) 
+                    LastEventResult = result;
                 context.Status = EventContextStatus.Ready;
             });
 
@@ -64,7 +69,7 @@ namespace UAlbion.Game
             context.Status = EventContextStatus.Waiting;
             int waiting = RaiseAsync(asyncEvent, () =>
             {
-                context.Node = context.Node.Next;
+                context.Node = context.Node?.Next;
                 context.Status = EventContextStatus.Ready;
             });
 

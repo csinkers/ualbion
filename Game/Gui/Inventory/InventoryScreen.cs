@@ -1,84 +1,34 @@
 ﻿using System;
-using System.Linq;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
-using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
-using UAlbion.Game.State;
 
 namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryScreen : Dialog
     {
-        InventoryMode _mode = InventoryMode.Character;
-        int _modeSpecificId;
-        InventoryPage _page;
-        PartyCharacterId _activeCharacter;
-
-        public InventoryScreen() : base(DialogPositioning.TopLeft)
+        public InventoryScreen(
+            ISetInventoryModeEvent modeEvent,
+            PartyCharacterId activeCharacter,
+            Func<InventoryPage> getPage,
+            Action<InventoryPage> setPage) : base(DialogPositioning.TopLeft)
         {
-            On<InventoryOpenEvent>(e => SetDisplayedPartyMember(e.Member));
-            On<ChestEvent>(SetMode);
-            On<DoorEvent>(SetMode);
-            On<MerchantEvent>(SetMode);
-        }
-
-        void SetDisplayedPartyMember(PartyCharacterId? member)
-        {
-            var party = Resolve<IParty>();
-            _activeCharacter = member ?? party.Leader;
-            if (party.WalkOrder.All(x => x.Id != _activeCharacter))
-                _activeCharacter = party.Leader;
-
-            Rebuild();
-        }
-
-        protected override void Subscribed() => Rebuild();
-
-        void SetMode(ISetInventoryModeEvent e)
-        {
-            _mode = e.Mode;
-            _modeSpecificId = e switch
-            {
-                MerchantEvent merchant => (int)merchant.MerchantId,
-                ChestEvent chest => (int)chest.ChestId,
-                DoorEvent door => door.DoorId,
-                _ => 0
-            };
-
-            SetDisplayedPartyMember(e.Member);
-        }
-
-        void Rebuild()
-        {
-            RemoveAllChildren();
-
             var leftPane =
-                _mode switch
+                modeEvent.Mode switch
                 {
-                    InventoryMode.Character => (IUiElement)new InventoryCharacterPane(
-                        _activeCharacter,
-                        () => _page,
-                        x => _page = x),
-
-                    // InventoryMode.Merchant => new InventoryMerchantPane((MerchantId)_modeSpecificId),
-                    InventoryMode.Chest => new InventoryChestPane((ChestId)_modeSpecificId),
-                    InventoryMode.LockedChest => new InventoryLockPane(true),
-                    InventoryMode.LockedDoor => new InventoryLockPane(false),
-                    _ => throw new InvalidOperationException($"Unexpected inventory mode {_mode}")
+                    InventoryMode.Character => (IUiElement)new InventoryCharacterPane(activeCharacter, getPage, setPage),
+                    InventoryMode.Merchant => new InventoryMerchantPane((MerchantId)modeEvent.Submode),
+                    InventoryMode.Chest => new InventoryChestPane((ChestId)modeEvent.Submode),
+                    InventoryMode.LockedChest => new InventoryLockPane((ILockedInventoryEvent)modeEvent),
+                    InventoryMode.LockedDoor => new InventoryLockPane((ILockedInventoryEvent)modeEvent),
+                    _ => throw new InvalidOperationException($"Unexpected inventory mode {modeEvent.Mode}")
                 };
 
-            var middlePane = new InventoryMidPane(_activeCharacter);
+            var middlePane = new InventoryMidPane(activeCharacter);
             var rightPane = new InventoryRightPane(
-                _activeCharacter,
-                () =>
-                {
-                    _mode = InventoryMode.Character;
-                    _modeSpecificId = 0;
-                    Raise(new PopSceneEvent());
-                },
-                _mode == InventoryMode.Merchant);
+                activeCharacter,
+                modeEvent.Mode == InventoryMode.Merchant);
 
             // var frameDivider = new FrameDivider(135, 0, 4, 192);
 

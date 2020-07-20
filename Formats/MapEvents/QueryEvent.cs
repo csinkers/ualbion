@@ -1,6 +1,7 @@
 ﻿using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets.Map;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -67,5 +68,85 @@ namespace UAlbion.Formats.MapEvents
         };
 
         public override MapEventType EventType => MapEventType.Query;
+
+        public static QueryEvent TemporarySwitch(SwitchId id, QueryOperation operation, byte immediate) => new QueryEvent
+        {
+            QueryType = QueryType.TemporarySwitch,
+            Argument = (ushort)id,
+            Operation = operation,
+            Immediate = immediate
+        };
+
+        public static QueryEvent HasPartyMember(PartyCharacterId id) => new QueryEvent { QueryType = QueryType.HasPartyMember, Argument = (ushort)id };
+        public static QueryEvent InventoryHasItem(ItemId id, QueryOperation operation, byte immediate) => new QueryEvent
+        {
+            QueryType = QueryType.InventoryHasItem,
+            Argument = (ushort)id,
+            Operation = operation,
+            Immediate = immediate
+        };
+
+        public static QueryEvent UsedItemId(ItemId id, QueryOperation operation, byte immediate) => new QueryEvent
+        {
+            QueryType = QueryType.UsedItemId,
+            Argument = (ushort)id,
+            Operation = operation,
+            Immediate = immediate
+        };
+        public static QueryEvent PreviousActionResult(QueryOperation operation, byte immediate) => new QueryEvent
+        {
+            QueryType = QueryType.PreviousActionResult,
+            Operation = operation,
+            Immediate = immediate
+        };
+        public static QueryEvent IsScriptDebugModeActive() => new QueryEvent { QueryType = QueryType.IsScriptDebugModeActive, };
+        public static QueryEvent IsNpcActive(ushort id, QueryOperation operation, byte immediate) => new QueryEvent
+        {
+            QueryType = QueryType.IsNpcActive,
+            Argument = id,
+            Operation = operation,
+            Immediate = immediate
+        };
+        public static QueryEvent HasEnoughGold(ushort amount) => new QueryEvent { QueryType = QueryType.HasEnoughGold, Argument = amount };
+        public static QueryEvent RandomChance(ushort percentage) => new QueryEvent { QueryType = QueryType.RandomChance, Argument = percentage, };
+        public static QueryEvent IsPartyMemberConscious(PartyCharacterId id) => new QueryEvent { QueryType = QueryType.IsPartyMemberConscious, Argument = (ushort)id, };
+        public static QueryEvent IsPartyMemberLeader(PartyCharacterId id) => new QueryEvent { QueryType = QueryType.IsPartyMemberLeader, Argument = (ushort)id, };
+        public static QueryEvent Ticker(TickerId id, QueryOperation operation, byte immediate) => new QueryEvent
+        {
+            QueryType = QueryType.Ticker,
+            Argument = (ushort)id,
+            Operation = operation,
+            Immediate = immediate
+        };
+        public static QueryEvent CurrentMapId(MapDataId id, QueryOperation operation, byte immediate) => new QueryEvent
+        {
+            QueryType = QueryType.CurrentMapId,
+            Argument = (ushort)id,
+            Operation = operation,
+            Immediate = immediate
+        };
+        public static QueryEvent PromptPlayer(ushort textId, QueryOperation operation, byte immediate) => new QueryEvent
+        {
+            QueryType = QueryType.PromptPlayer,
+            Argument = textId,
+            Operation = operation,
+            Immediate = immediate
+        };
+        public static QueryEvent TriggerType(TriggerType id, QueryOperation operation, byte immediate) => new QueryEvent
+        {
+            QueryType = QueryType.TriggerType,
+            Argument = (ushort)id,
+            Operation = operation,
+            Immediate = immediate
+        };
+        public static QueryEvent EventAlreadyUsed(ushort id, QueryOperation operation, byte immediate) => new QueryEvent
+        {
+            QueryType = QueryType.EventAlreadyUsed,
+            Argument = id,
+            Operation = operation,
+            Immediate = immediate
+        };
+        public static QueryEvent IsDemoVersion() => new QueryEvent { QueryType = QueryType.IsDemoVersion, };
+        public static QueryEvent PromptPlayerNumeric(ushort value) => new QueryEvent { QueryType = QueryType.PromptPlayerNumeric, Argument = value, };
     }
 }

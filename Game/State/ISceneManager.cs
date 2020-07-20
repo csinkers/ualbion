@@ -7,6 +7,6 @@ namespace UAlbion.Game.State
     {
         IScene ActiveScene { get; }
         SceneId ActiveSceneId { get; }
-        IScene GetScene(SceneId inventory);
+        IScene GetScene(SceneId sceneId);
     }
 }

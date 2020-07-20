@@ -33,7 +33,7 @@ namespace UAlbion.Game.Gui.Dialogs
             else
                 content = padding;
 
-            var stack = new VerticalStack(content, new Spacing(320, 0));
+            var stack = new FixedWidth(320, content);
             AttachChild(new DialogFrame(stack) { Background = DialogFrameBackgroundStyle.DarkTint });
         }
 

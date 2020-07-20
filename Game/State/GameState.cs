@@ -11,6 +11,7 @@ using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.State.Player;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.State
 {
@@ -158,6 +159,7 @@ namespace UAlbion.Game.State
             _party = AttachChild(new Party(_game.PartyMembers, _game.ActiveMembers, GetInventory));
             Raise(new LoadMapEvent(_game.MapId));
             Raise(new StartClockEvent());
+            Raise(new SetContextEvent(ContextType.Leader, AssetType.PartyMember, (int)_party.Leader));
             Raise(new PartyChangedEvent());
             Raise(new PartyJumpEvent(_game.PartyX, _game.PartyY));
             Raise(new CameraJumpEvent(_game.PartyX, _game.PartyY));

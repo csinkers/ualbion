@@ -108,6 +108,8 @@ namespace UAlbion.Formats.Assets
             return Slots[slotNumber];
         }
 
+        public bool IsEmpty => !EnumerateAll().Any(x => x.Item != null && x.Amount > 0);
+
         public void SetSlotUiPosition(ItemSlotId itemSlotId, Vector2 position)
         {
             var slot = GetSlot(itemSlotId);

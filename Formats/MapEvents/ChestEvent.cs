@@ -11,9 +11,11 @@ namespace UAlbion.Formats.MapEvents
         {
             return new ChestEvent(AssetType.SystemText, 0)
             {
-                ChestId = (ChestId)int.Parse(args[0]),
-                PickDifficulty = byte.Parse(args[1]),
-                Member = args.Length > 2 ? (PartyCharacterId?)int.Parse(args[2]) : null,
+                ChestId = (ChestId)int.Parse(args[1]),
+                PickDifficulty = args.Length > 2 ? byte.Parse(args[2]) : (byte)0,
+                InitialTextId =  args.Length > 3 ? byte.Parse(args[3]) : (byte)255,
+                UnlockedTextId = args.Length > 4 ? byte.Parse(args[4]) : (byte)255,
+                KeyItemId = args.Length > 5 ? (ItemId?)int.Parse(args[5]) : null,
             };
         }
 
@@ -38,6 +40,7 @@ namespace UAlbion.Formats.MapEvents
 
         public override MapEventType EventType => MapEventType.Chest;
         public InventoryMode Mode => InventoryMode.Chest;
+        public ushort Submode => (ushort)ChestId;
         public ChestId ChestId { get; private set; }
         public byte PickDifficulty { get; private set; }
         public ItemId? KeyItemId { get; private set; }
@@ -45,18 +48,6 @@ namespace UAlbion.Formats.MapEvents
         public byte UnlockedTextId { get; private set; }
         public AssetType TextType { get; }
         public ushort TextSourceId { get; }
-        public PartyCharacterId? Member { get; private set; }
-        public override string ToString() => $"inv:chest {ChestId} {PickDifficulty}% Key:{KeyItemId} Initial:{InitialTextId} Unlocked:{UnlockedTextId}";
-
-        public ISetInventoryModeEvent CloneForMember(PartyCharacterId member)
-            => new ChestEvent(TextType, TextSourceId)
-            {
-                ChestId = ChestId,
-                KeyItemId = KeyItemId,
-                PickDifficulty = PickDifficulty,
-                UnlockedTextId = UnlockedTextId,
-                InitialTextId = InitialTextId,
-                Member = member
-            };
+        public override string ToString() => $"inv:chest {ChestId} {PickDifficulty}% Initial:{InitialTextId} Unlocked:{UnlockedTextId} Key:{KeyItemId}";
     }
 }

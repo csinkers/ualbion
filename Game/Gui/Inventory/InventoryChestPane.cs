@@ -3,6 +3,7 @@ using UAlbion.Formats.Assets;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
+using UAlbion.Game.State;
 
 namespace UAlbion.Game.Gui.Inventory
 {
@@ -12,17 +13,24 @@ namespace UAlbion.Game.Gui.Inventory
         const int InventoryHeight = 4;
 
         readonly ChestId _id;
-        int _version;
+        readonly UiSpriteElement<PictureId> _background;
 
         public InventoryChestPane(ChestId id)
         {
-            On<InventoryChangedEvent>(e => _version++);
+            On<InventoryChangedEvent>(e =>
+            {
+                if (e.Id != new InventoryId(_id))
+                    return;
+
+                UpdateBackground();
+            });
 
             _id = id;
+            _background = new UiSpriteElement<PictureId>(PictureId.OpenChestWithGold);
 
-            var background = new FixedPositionStack();
-            background.Add(new UiSpriteElement<PictureId>(PictureId.OpenChestWithGold), 0, 0);
-            AttachChild(background);
+            var backgroundStack = new FixedPositionStack();
+            backgroundStack.Add(_background, 0, 0);
+            AttachChild(backgroundStack);
 
             var slotSpans = new IUiElement[InventoryHeight];
             for (int j = 0; j < InventoryHeight; j++)
@@ -69,5 +77,13 @@ namespace UAlbion.Game.Gui.Inventory
 
             AttachChild(stack);
         }
+
+        void UpdateBackground()
+        {
+            var inv = Resolve<IGameState>().GetInventory(new InventoryId(_id));
+            _background.Id = inv.IsEmpty ? PictureId.OpenChest : PictureId.OpenChestWithGold;
+        }
+
+        protected override void Subscribed() => UpdateBackground();
     }
 }

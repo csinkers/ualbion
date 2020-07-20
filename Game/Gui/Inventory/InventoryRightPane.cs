@@ -1,8 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.State;
@@ -15,7 +15,7 @@ namespace UAlbion.Game.Gui.Inventory
         const int InventoryWidth = 4;
         const int InventoryHeight = 6;
 
-        public InventoryRightPane(PartyCharacterId activeCharacter, Action exitButtonCallback, bool showTotalPartyGold)
+        public InventoryRightPane(PartyCharacterId activeCharacter, bool showTotalPartyGold)
         {
             var header = new Header(new StringId(AssetType.SystemText, 0, (int)SystemTextId.Inv_Backpack));
 
@@ -75,7 +75,7 @@ namespace UAlbion.Game.Gui.Inventory
                 new Spacing(0, 2),
                 moneyAndFoodStack,
                 new Spacing(0, 9),
-                new InventoryExitButton().OnClick(exitButtonCallback)
+                new InventoryExitButton().OnClick(() => Raise(new InventoryCloseEvent()))
             ) { Greedy = false };
 
             AttachChild(stack);

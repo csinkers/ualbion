@@ -146,7 +146,7 @@ namespace UAlbion.Game.State
 
             var key = new AssetKey(AssetType.SavedGame, id);
             var generalConfig = Resolve<IAssetManager>().LoadGeneralConfig();
-            var filename = Path.Combine(generalConfig.BasePath, generalConfig.ExePath, "SAVES", $"SAVE.{key.Id:D3}");
+            var filename = Path.Combine(generalConfig.BasePath, generalConfig.SavePath, $"SAVE.{key.Id:D3}");
 
             using var stream = File.Open(filename, FileMode.Create);
             using var bw = new BinaryWriter(stream);

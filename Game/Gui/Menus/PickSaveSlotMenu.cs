@@ -39,11 +39,11 @@ namespace UAlbion.Game.Gui.Menus
             Remove();
         }
 
-        string BuildSaveFilename(int i)
+        string BuildSaveFilename(ushort i)
         {
+            var key = new AssetKey(AssetType.SavedGame, i);
             var generalConfig = Resolve<IAssetManager>().LoadGeneralConfig();
-            string saveDir = Path.Combine(generalConfig.BasePath, generalConfig.SavePath);
-            return Path.Combine(saveDir, $"SAVE.{i:D3}");
+            return Path.Combine(generalConfig.BasePath, generalConfig.SavePath, $"SAVE.{key.Id:D3}");
         }
 
         protected override void Subscribed()

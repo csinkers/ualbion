@@ -15,7 +15,7 @@ namespace UAlbion.Game.Assets
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, object> loaderFunc)
         {
             var generalConfig = (IGeneralConfig)loaderFunc(new AssetKey(AssetType.GeneralConfig));
-            var filename = Path.Combine(generalConfig.BasePath, generalConfig.ExePath, "SAVES", $"SAVE.{key.Id:D3}");
+            var filename = Path.Combine(generalConfig.BasePath, generalConfig.SavePath, $"SAVE.{key.Id:D3}");
 
             var loader = AssetLoaderRegistry.GetLoader<SavedGame>(FileFormat.SavedGame);
             using var stream = File.Open(filename, FileMode.Open);

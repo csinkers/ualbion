@@ -18,8 +18,11 @@ namespace UAlbion.Game.Veldrid.Input
 
         readonly BindingSet _bindings = new BindingSet();
         readonly HashSet<Key> _pressedKeys = new HashSet<Key>();
-        // InputMode _activeMode = InputMode.Global;
         MapDataId _mapId = (MapDataId)100;
+
+        public bool IsAltPressed => _pressedKeys.Contains(Key.AltLeft) || _pressedKeys.Contains(Key.AltRight);
+        public bool IsCtrlPressed  => _pressedKeys.Contains(Key.ControlLeft) || _pressedKeys.Contains(Key.ControlRight);
+        public bool IsShiftPressed  => _pressedKeys.Contains(Key.ShiftLeft) || _pressedKeys.Contains(Key.ShiftRight);
 
         public InputBinder(InputConfig config)
         {
@@ -70,15 +73,9 @@ namespace UAlbion.Game.Veldrid.Input
             get
             {
                 ModifierKeys m = ModifierKeys.None;
-                if (_pressedKeys.Overlaps(new[] { Key.ShiftLeft, Key.ShiftRight, Key.LShift, Key.RShift }))
-                    m |= ModifierKeys.Shift;
-
-                if (_pressedKeys.Overlaps(new[] { Key.ControlLeft, Key.ControlRight, Key.LControl, Key.RControl }))
-                    m |= ModifierKeys.Control;
-
-                if (_pressedKeys.Overlaps(new[] { Key.AltLeft, Key.AltRight, Key.LAlt, Key.RAlt }))
-                    m |= ModifierKeys.Alt;
-
+                if (IsShiftPressed) m |= ModifierKeys.Shift;
+                if (IsCtrlPressed)  m |= ModifierKeys.Control;
+                if (IsAltPressed)   m |= ModifierKeys.Alt;
                 return m;
             }
         }

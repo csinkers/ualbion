@@ -51,10 +51,10 @@ namespace UAlbion.Game.Gui.Inventory
                         Padding = -1,
                         Margin = 0,
                         Theme = slotId.Slot.IsBodyPart()
-                            ? (ButtonFrame.ThemeFunction)ButtonTheme.Default
-                            : ButtonTheme.InventorySlot,
+                                ? (ButtonFrame.ThemeFunction)ButtonTheme.Default
+                                : ButtonTheme.InventorySlot,
 
-                    IsPressed = !slotId.Slot.IsBodyPart()
+                        IsPressed = !slotId.Slot.IsBodyPart()
                     }
                     .OnHover(() => Hover?.Invoke())
                     .OnBlur(() => Blur?.Invoke())
@@ -101,6 +101,7 @@ namespace UAlbion.Game.Gui.Inventory
         event Action Blur;
 
         public bool Hoverable { get => _button.Hoverable; set => _button.Hoverable = value; }
+        public bool SuppressNextDoubleClick { get => _button.SuppressNextDoubleClick; set => _button.SuppressNextDoubleClick = value; }
 
         void Rebuild(in Rectangle extents)
         {

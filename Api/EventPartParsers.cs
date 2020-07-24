@@ -12,16 +12,17 @@ namespace UAlbion.Api
 
         public EventPartParsers()
         {
-            _parsers[typeof(bool)]   = typeof(bool).GetMethod("Parse", new[] { typeof(string) });
-            _parsers[typeof(byte)]   = typeof(byte).GetMethod("Parse", new[] { typeof(string) });
-            _parsers[typeof(ushort)] = typeof(ushort).GetMethod("Parse", new[] { typeof(string) });
-            _parsers[typeof(short)]  = typeof(short).GetMethod("Parse", new[] { typeof(string) });
-            _parsers[typeof(int)]    = typeof(int).GetMethod("Parse", new[] { typeof(string) });
-            _parsers[typeof(uint)]   = typeof(uint).GetMethod("Parse", new[] { typeof(string) });
-            _parsers[typeof(float)]  = typeof(float).GetMethod("Parse", new[] { typeof(string) });
-            _parsers[typeof(bool?)]  = GetType().GetMethod("ParseNullableBool", BindingFlags.NonPublic | BindingFlags.Static);
-            _parsers[typeof(int?)]   = GetType().GetMethod("ParseNullableInt", BindingFlags.NonPublic | BindingFlags.Static);
-            _parsers[typeof(float?)] = GetType().GetMethod("ParseNullableFloat", BindingFlags.NonPublic | BindingFlags.Static);
+            _parsers[typeof(bool)]    =   typeof(bool).GetMethod("Parse", new[] { typeof(string) });
+            _parsers[typeof(byte)]    =   typeof(byte).GetMethod("Parse", new[] { typeof(string) });
+            _parsers[typeof(ushort)]  = typeof(ushort).GetMethod("Parse", new[] { typeof(string) });
+            _parsers[typeof(short)]   =  typeof(short).GetMethod("Parse", new[] { typeof(string) });
+            _parsers[typeof(int)]     =    typeof(int).GetMethod("Parse", new[] { typeof(string) });
+            _parsers[typeof(uint)]    =   typeof(uint).GetMethod("Parse", new[] { typeof(string) });
+            _parsers[typeof(float)]   =  typeof(float).GetMethod("Parse", new[] { typeof(string) });
+            _parsers[typeof(bool?)]   = GetType().GetMethod("ParseNullableBool",   BindingFlags.NonPublic | BindingFlags.Static);
+            _parsers[typeof(int?)]    = GetType().GetMethod("ParseNullableInt",    BindingFlags.NonPublic | BindingFlags.Static);
+            _parsers[typeof(ushort?)] = GetType().GetMethod("ParseNullableUInt16", BindingFlags.NonPublic | BindingFlags.Static);
+            _parsers[typeof(float?)]  = GetType().GetMethod("ParseNullableFloat",  BindingFlags.NonPublic | BindingFlags.Static);
         }
 
         public MethodInfo GetParser(Type type)
@@ -66,6 +67,13 @@ namespace UAlbion.Api
             if (string.IsNullOrEmpty(s))
                 return null;
             return int.Parse(s);
+        }
+
+        static ushort? ParseNullableUInt16(string s)
+        {
+            if (string.IsNullOrEmpty(s))
+                return null;
+            return ushort.Parse(s);
         }
 
         static float? ParseNullableFloat(string s)

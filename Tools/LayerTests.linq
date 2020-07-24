@@ -340,17 +340,17 @@ public class Parameters : IEquatable<Parameters>
 		succeeded += TestTiles(TileLayer.Layer1, TileType.Overlay1, TileLayer.Normal, TileType.Normal, Greater, sb);
 		succeeded += TestTiles(TileLayer.Normal, TileType.Overlay3, TileLayer.Layer1, TileType.Normal, GE, sb);
 		succeeded += TestTiles(TileLayer.Normal, TileType.Overlay3, TileLayer.Layer2, TileType.Normal, GE, sb, "Container on console in Tom's room");
+		succeeded += TestTiles(TileLayer.Normal, TileType.Overlay3, TileLayer.Layer3, TileType.Normal, GE, sb, "Cups on Toronto");
 
-		succeeded += 10 * TestTiles(TileLayer.Layer1, TileType.Normal, TileLayer.Normal, TileType.Normal, GE, sb);
-		succeeded += 10 * TestTiles(TileLayer.Layer2, TileType.Normal, TileLayer.Layer1, TileType.Normal, GE, sb);
-		succeeded += 10 * TestTiles(TileLayer.Layer3, TileType.Normal, TileLayer.Layer2, TileType.Normal, GE, sb);
+		succeeded += TestTiles(TileLayer.Layer1, TileType.Normal, TileLayer.Normal, TileType.Normal, GE, sb);
+		succeeded += TestTiles(TileLayer.Layer2, TileType.Normal, TileLayer.Layer1, TileType.Normal, GE, sb);
+		succeeded += TestTiles(TileLayer.Layer3, TileType.Normal, TileLayer.Layer2, TileType.Normal, GE, sb);
 
-		succeeded += 10 * TestTiles(TileLayer.Normal, TileType.Overlay1, TileLayer.Normal, TileType.Normal, GE, sb);
-		succeeded += 10 * TestTiles(TileLayer.Normal, TileType.Overlay2, TileLayer.Normal, TileType.Overlay1, GE, sb);
-		succeeded += 10 * TestTiles(TileLayer.Normal, TileType.Overlay3, TileLayer.Normal, TileType.Overlay2, GE, sb);
+		succeeded += TestTiles(TileLayer.Normal, TileType.Overlay1, TileLayer.Normal, TileType.Normal, GE, sb);
+		succeeded += TestTiles(TileLayer.Normal, TileType.Overlay2, TileLayer.Normal, TileType.Overlay1, GE, sb);
+		succeeded += TestTiles(TileLayer.Normal, TileType.Overlay3, TileLayer.Normal, TileType.Overlay2, GE, sb);
 
 		succeeded += Test(0, TileLayer.Layer3, TileType.Overlay3, Less, sb); // TODO: Verify. Beaker in middle room's bathroom on second row of initial map
 		return succeeded;
 	}
 }
-

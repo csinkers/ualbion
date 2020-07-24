@@ -36,7 +36,7 @@ namespace UAlbion.Game.State.Player
                 ReturnItemInHand();
             });
             OnAsync<InventorySwapEvent>(OnSlotEvent);
-            OnAsync<InventoryPickupAllEvent>(OnSlotEvent);
+            OnAsync<InventoryPickupEvent>(OnSlotEvent);
             OnAsync<InventoryGiveItemEvent>(OnGiveItem);
             OnAsync<InventoryDiscardEvent>(OnDiscard);
             On<SetInventorySlotUiPositionEvent>(OnSetSlotUiPosition);
@@ -294,9 +294,14 @@ namespace UAlbion.Game.State.Player
             switch (GetInventoryAction(slotId))
             {
                 case InventoryAction.Pickup:
-                    if (e is InventoryPickupAllEvent || slot.Amount == 1)
+                    if (slot.Amount == 1)
                     {
                         PickupItem(slot, null);
+                        complete = true;
+                    }
+                    else if (e is InventoryPickupEvent pickup)
+                    {
+                        PickupItem(slot, pickup.Amount);
                         complete = true;
                     }
                     else

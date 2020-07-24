@@ -25,6 +25,7 @@ namespace UAlbion.Api
             Aliases = eventAttribute.Aliases ?? new string[0];
 
             var partsParameter = Expression.Parameter(typeof(string[]), "parts");
+            // TODO: Order passed in to EventPartMetadata needs to be based on constructor parameters.
             Parts = properties
                 .Where(x => x.GetCustomAttribute(typeof(EventPartAttribute)) != null)
                 .Select((x, i) => new EventPartMetadata(x, partsParameter, i))

@@ -25,6 +25,7 @@ namespace UAlbion.Game.Gui.Controls
             Clicked           = 1 << 6,
             RightClicked      = 1 << 7,
             ClickTimerPending = 1 << 8,
+            SuppressNextDoubleClick = 1 << 9,
         }
 
         string TimerName => "DoubleClickButton." + _id;
@@ -69,9 +70,10 @@ namespace UAlbion.Game.Gui.Controls
                 if (!IsHovered)
                     return;
 
-                if (DoubleClick == null || !AllowDoubleClick) // Simple single click only button
+                if (DoubleClick == null || !AllowDoubleClick || SuppressNextDoubleClick) // Simple single click only button
                 {
                     Click?.Invoke();
+                    SuppressNextDoubleClick = false;
                     return;
                 }
 
@@ -200,6 +202,12 @@ namespace UAlbion.Game.Gui.Controls
         {
             get => 0 != (_flags & ButtonFlags.Hoverable);
             set { SetFlag(ButtonFlags.Hoverable, value); _frame.State = State; }
+        }
+
+        public bool SuppressNextDoubleClick
+        {
+            get => 0 != (_flags & ButtonFlags.SuppressNextDoubleClick);
+            set { SetFlag(ButtonFlags.SuppressNextDoubleClick, value); _frame.State = State; }
         }
 
         public bool IsPressed

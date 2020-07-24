@@ -111,7 +111,7 @@ namespace UAlbion.Game.Tests
             _tom.Slots[0].Set(_torch, 5);
 
             Assert.Null(_im.ItemInHand.ItemId);
-            Raise(new InventoryPickupAllEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, 0));
+            Raise(new InventoryPickupEvent(null, InventoryType.Player, (ushort)PartyCharacterId.Tom, 0));
             Assert.Equal(ItemId.Torch, _im.ItemInHand.ItemId);
             Assert.Equal(5, _im.ItemInHand.Amount);
             Assert.Null(_tom.Slots[0].ItemId);

@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Formats.Assets.Map
+﻿using UAlbion.Api;
+
+namespace UAlbion.Formats.Assets.Map
 {
     public enum TileType : byte
     {
@@ -28,10 +30,10 @@
             int typeAdjust;
             switch ((int)type & 0x7)
             {
-                case (int)TileType.Normal: typeAdjust = 0; break;
-                case (int)TileType.Overlay1: typeAdjust = 1; break;
-                case (int)TileType.Overlay2: typeAdjust = 2; break;
-                case (int)TileType.Overlay3: typeAdjust = 3; break;
+                case (int)TileType.Normal: typeAdjust = DepthUtil.TypeNormalAdjustment; break;
+                case (int)TileType.Overlay1: typeAdjust = DepthUtil.TypeOverlay1Adjustment; break;
+                case (int)TileType.Overlay2: typeAdjust = DepthUtil.TypeOverlay2Adjustment; break;
+                case (int)TileType.Overlay3: typeAdjust = DepthUtil.TypeOverlay3Adjustment; break;
                 case (int)TileType.Unk7: typeAdjust = 0; break;
                 default: typeAdjust = 0; break;
             }

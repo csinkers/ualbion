@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Formats.Assets.Map
+﻿using UAlbion.Api;
+
+namespace UAlbion.Formats.Assets.Map
 {
     public enum TileLayer : byte // Upper nibble of first byte
     {
@@ -28,10 +30,10 @@
             int adjustment;
             switch ((int)layer & 0x7)
             {
-                case (int)TileLayer.Normal: adjustment = 0; break;
-                case (int)TileLayer.Layer1: adjustment = 1; break;
-                case (int)TileLayer.Layer2: adjustment = 2; break;
-                case (int)TileLayer.Layer3: adjustment = 8; break;
+                case (int)TileLayer.Normal: adjustment = DepthUtil.NormalAdjustment; break;
+                case (int)TileLayer.Layer1: adjustment = DepthUtil.Layer1Adjustment; break;
+                case (int)TileLayer.Layer2: adjustment = DepthUtil.Layer2Adjustment; break;
+                case (int)TileLayer.Layer3: adjustment = DepthUtil.Layer3Adjustment; break;
                 default: adjustment = 0; break;
             }
             return adjustment;

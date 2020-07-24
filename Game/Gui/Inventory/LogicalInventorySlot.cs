@@ -58,8 +58,31 @@ namespace UAlbion.Game.Gui.Inventory
             }
 
             _visual = AttachChild(new VisualInventorySlot(_id, amountSource, () => Slot))
-                .OnClick(() => Raise(new InventorySwapEvent(_id.Type, _id.Id, _id.Slot)))
-                .OnDoubleClick(() => Raise(new InventoryPickupAllEvent(_id.Type, _id.Id, _id.Slot)))
+                .OnButtonDown(() =>
+                {
+                    var im = Resolve<IInventoryManager>();
+                    var inputBinder = Resolve<IInputBinder>();
+                    if (im.ItemInHand.Item != null
+                        || inputBinder.IsCtrlPressed
+                        || inputBinder.IsShiftPressed
+                        || inputBinder.IsAltPressed)
+                    {
+                        _visual.SuppressNextDoubleClick = true;
+                    }
+                })
+                .OnClick(() =>
+                {
+                    var inputBinder = Resolve<IInputBinder>();
+                    if (inputBinder.IsCtrlPressed)
+                        Raise(new InventoryPickupEvent(null, _id.Type, _id.Id, _id.Slot));
+                    else if (inputBinder.IsShiftPressed)
+                        Raise(new InventoryPickupEvent(5, _id.Type, _id.Id, _id.Slot));
+                    else if (inputBinder.IsAltPressed)
+                        Raise(new InventoryPickupEvent(1, _id.Type, _id.Id, _id.Slot));
+                    else
+                        Raise(new InventorySwapEvent(_id.Type, _id.Id, _id.Slot));
+                })
+                .OnDoubleClick(() => Raise(new InventoryPickupEvent(null, _id.Type, _id.Id, _id.Slot)))
                 .OnRightClick(OnRightClick)
                 .OnHover(Hover)
                 .OnBlur(Blur);

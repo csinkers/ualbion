@@ -226,7 +226,7 @@ namespace UAlbion.Game.Veldrid.Audio
                 _activeSounds.Clear();
 
                 foreach (var sample in _sampleCache.Values)
-                    sample.Dispose();
+                    sample?.Dispose();
                 _sampleCache.Clear();
             }
         }

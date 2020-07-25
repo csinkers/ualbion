@@ -13,7 +13,7 @@ namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryScreenManager : Component
     {
-        ISetInventoryModeEvent _modeEvent;
+        ISetInventoryModeEvent _modeEvent = new InventoryOpenEvent(null); // Should never be null.
         InventoryPage _page;
         PartyCharacterId _activeCharacter;
         Action<bool> _continuation;

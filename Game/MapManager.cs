@@ -26,19 +26,17 @@ namespace UAlbion.Game
             {
                 _pendingMapChange = e.MapId;
                 LoadMap();
-                Raise(new PartyJumpEvent(15, 15));
-                Raise(new PartyTurnEvent(TeleportDirection.Right));
-                Raise(new CameraJumpEvent(15, 15));
             });
         }
 
         void LoadMap()
         {
-            if (_pendingMapChange == null) // TODO: Check for when new map == current map
+            if (_pendingMapChange == null)
                 return;
 
             var pendingMapChange = _pendingMapChange.Value;
             _pendingMapChange = null;
+
             Raise(new UnloadMapEvent());
             if (pendingMapChange == 0) // 0 = Build a blank scene for testing / debugging
             {
@@ -89,14 +87,13 @@ namespace UAlbion.Game
 
         void Teleport(TeleportEvent e)
         {
+            // Raise event rather than calling directly so that GameState.Map will get updated.
+            // Need to explicitly pass null sender as this class handles the event.
             if (e.MapId != Current?.MapId)
-            {
-                // Raise event rather than calling directly so that GameState.Map will get updated.
-                Exchange.Raise(new LoadMapEvent(e.MapId), null);
-            }
+                Exchange.Raise(new LoadMapEvent(e.MapId), null); 
 
             Raise(new PartyJumpEvent(e.X, e.Y));
-            if(e.Direction != TeleportDirection.Unchanged)
+            if (e.Direction != TeleportDirection.Unchanged)
                 Raise(new PartyTurnEvent(e.Direction));
             Raise(new CameraJumpEvent(e.X, e.Y));
         }

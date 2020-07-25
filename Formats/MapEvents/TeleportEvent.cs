@@ -4,6 +4,7 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
+    [Event("teleport", "teleports the party to a specific location")]
     public class TeleportEvent : MapEvent
     {
         public static TeleportEvent Serdes(TeleportEvent e, ISerializer s)
@@ -29,10 +30,18 @@ namespace UAlbion.Formats.MapEvents
             return e;
         }
 
-        public byte X { get; private set; }
-        public byte Y { get; private set; }
+        TeleportEvent() { }
+        public TeleportEvent(MapDataId mapId, byte x, byte y)
+        {
+            MapId = mapId;
+            X = x;
+            Y = y;
+        }
+
+        [EventPart("map")] public MapDataId MapId { get; private set; } // 0 = stay on current map
+        [EventPart("x")] public byte X { get; private set; }
+        [EventPart("y")] public byte Y { get; private set; }
         public TeleportDirection Direction { get; private set; }
-        public MapDataId MapId { get; private set; } // 0 = stay on current map
 
         public byte Unk4 { get; private set; } // 255 on 2D maps, (1,6) on 3D maps
         public byte Unk5 { get; private set; } // 2,3,4,5,6,8,9

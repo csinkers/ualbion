@@ -3,9 +3,9 @@
     public enum DrawLayer : ushort
     {
         Background = 1, // Skybox in 3D
-        Underlay   = 0x100,
+        Overlay    = 0x100,
         Character  = 0x101,
-        Overlay    = 0x102,
+        Underlay   = 0x102,
         // Effects,
         Diagnostic  = 0x600, // Missing textures etc
         Interface   = 0x700, // GUI

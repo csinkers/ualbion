@@ -48,7 +48,7 @@ namespace UAlbion
             var backgroundThreadInitTask = Task.Run(() => RegisterComponents(global, services, baseDir, commandLine));
             services
                 .Add(new ShaderCache(
-                    Path.Combine(baseDir, "Core", "Visual", "Shaders"),
+                    Path.Combine(baseDir, "src", "Core", "Visual", "Shaders"),
                     Path.Combine(baseDir, "data", "ShaderCache")))
                 .Add(engine);
 

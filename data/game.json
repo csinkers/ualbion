@@ -8,7 +8,7 @@
 
   "Time": {
     "FastTicksPerSecond": 60.0,
-    "GameSecondsPerSecond": 1.0,
+    "GameSecondsPerSecond": 60.0,
     "FastTicksPerAssetCacheCycle": 3600,
     "IdleTicksPerSecond": 8,
     "FastTicksPerSlowTick": 8,

@@ -4,15 +4,14 @@
 /data/Saves/
 /data/ShaderCache/
 /data/exported/
-/mods/
+/data/mods/
+/data/settings.json
 /re/
-/AdlMidi.NET/
-/SerdesNet/
-/veldrid-spirv/
-/veldrid/
+/deps/
 
 .vs/
 .vscode/
+/BenchmarkDotNet.Artifacts
 Debug/
 bin/
 obj/
@@ -24,9 +23,8 @@ packages/
 *.lock~
 *.user
 *.DotSettings
+launchSettings.json
 
-/data/settings.json
 SDL2.dll
 imgui.ini
 libveldrid-spirv.dll
-/BenchmarkDotNet.Artifacts

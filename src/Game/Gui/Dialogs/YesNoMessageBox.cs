@@ -20,6 +20,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
         public YesNoMessageBox(StringId stringId, int depth) : base(DialogPositioning.Center, depth)
         {
+            // TODO: Block0 = yes text, Block1 = no text.
             var elements = new VerticalStack(
                 new Spacing(0, 5),
                 new FixedSizePanel(231, 30, new UiTextBuilder(stringId)),

@@ -100,7 +100,10 @@ namespace UAlbion.Api
         public static void Assert(string message)
         {
             #if DEBUG
+            var oldColour = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Assertion failed! " + message);
+            Console.ForegroundColor = oldColour;
             #endif
             CoreTrace.Log.AssertFailed(message);
         }

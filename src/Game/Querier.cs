@@ -92,7 +92,7 @@ namespace UAlbion.Game
                 QueryOperation.NotEqual => (value != immediate),
                 QueryOperation.OpUnk2 => (value == immediate),
                 QueryOperation.Equals => (value == immediate),
-                QueryOperation.OpUnk3 => (value == immediate),
+                QueryOperation.GreaterThanOrEqual => (value >= immediate),
                 QueryOperation.GreaterThan => (value > immediate),
                 QueryOperation.OpUnk5 => (value == immediate),
                 _ => true

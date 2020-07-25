@@ -1,1 +1,1 @@
-@dotnet run --project ualbion -- %*
+@dotnet run --project src\ualbion -- %*

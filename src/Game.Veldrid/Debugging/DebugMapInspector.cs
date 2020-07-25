@@ -106,6 +106,8 @@ namespace UAlbion.Game.Veldrid.Debugging
                 ImGui.TreePop();
             }
 
+            anyHovered |= RenderNode(Reflector.Reflect("State", state, null), false, false);
+
             if (ImGui.TreeNode("Stats"))
             {
                 if (ImGui.Button("Clear"))
@@ -173,6 +175,17 @@ namespace UAlbion.Game.Veldrid.Debugging
                     ImGui.TreePop();
                 }
 
+                if (ImGui.TreeNode("Event Contexts"))
+                {
+                    if (Resolve<IEventManager>() is EventChainManager em)
+                    {
+                        foreach (var context in em.DebugActiveContexts)
+                            ImGui.Text(context.ToString());
+                    }
+
+                    ImGui.TreePop();
+                }
+
                 if (ImGui.TreeNode("Textures"))
                 {
                     ImGui.Text(Resolve<ITextureManager>()?.Stats());
@@ -231,17 +244,6 @@ namespace UAlbion.Game.Veldrid.Debugging
                 ImGui.TreePop();
             }
 
-            if (ImGui.TreeNode("Event Contexts"))
-            {
-                if (Resolve<IEventManager>() is EventChainManager em)
-                {
-                    foreach (var context in em.DebugActiveContexts)
-                        ImGui.Text(context.ToString());
-                }
-
-                ImGui.TreePop();
-            }
-
             if (ImGui.TreeNode("Positions"))
             {
                 var normPos = window.PixelToNorm(_mousePosition);
@@ -261,7 +263,7 @@ namespace UAlbion.Game.Veldrid.Debugging
             {
                 var reflected = Reflector.Reflect(null, _services, null);
                 if (reflected.SubObjects != null)
-                    foreach (var child in reflected.SubObjects)
+                    foreach (var child in reflected.SubObjects.OrderBy(x => x.Name))
                         anyHovered |= RenderNode(child, false);
                 ImGui.TreePop();
             }
@@ -330,7 +332,7 @@ namespace UAlbion.Game.Veldrid.Debugging
             return true;
         }
 
-        bool RenderNode(Reflector.ReflectedObject reflected, bool fixedObject)
+        bool RenderNode(Reflector.ReflectedObject reflected, bool fixedObject, bool showCheckbox = true)
         {
             var type = reflected.Object?.GetType();
             var typeName = type?.Name ?? "null";
@@ -360,11 +362,14 @@ namespace UAlbion.Game.Veldrid.Debugging
                         customStyle = true;
                     }
 
-                    bool active = component.IsActive;
-                    ImGui.Checkbox(component.ComponentId.ToString(), ref active);
-                    ImGui.SameLine();
-                    if (active != component.IsActive)
-                        component.IsActive = active;
+                    if (showCheckbox)
+                    {
+                        bool active = component.IsActive;
+                        ImGui.Checkbox(component.ComponentId.ToString(), ref active);
+                        ImGui.SameLine();
+                        if (active != component.IsActive)
+                            component.IsActive = active;
+                    }
                 }
 
                 bool treeOpen = ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowItemOverlap);

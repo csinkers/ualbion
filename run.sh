@@ -1,2 +1,2 @@
 #!/bin/sh
-dotnet run --project UAlbion -- $*
+dotnet run --project src/UAlbion -- $*

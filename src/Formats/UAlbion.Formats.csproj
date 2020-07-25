@@ -10,11 +10,11 @@
     <PackageReference Include="System.Memory" Version="4.5.3" />
   </ItemGroup>
 
-  <ItemGroup Condition="!Exists('..\..\SerdesNet')">
+  <ItemGroup Condition="!Exists('..\..\deps\SerdesNet')">
     <PackageReference Include="SerdesNet" Version="1.1.2" />
   </ItemGroup>
-  <ItemGroup Condition="Exists('..\..\SerdesNet')">
-    <ProjectReference Include="..\..\SerdesNet\SerdesNet.csproj" />
+  <ItemGroup Condition="Exists('..\..\deps\SerdesNet')">
+    <ProjectReference Include="..\..\deps\SerdesNet\SerdesNet.csproj" />
   </ItemGroup>
 
   <ItemGroup>

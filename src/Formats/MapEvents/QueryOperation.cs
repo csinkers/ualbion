@@ -6,7 +6,7 @@
         NotEqual,
         OpUnk2,
         Equals,
-        OpUnk3,
+        GreaterThanOrEqual,
         GreaterThan,
         OpUnk5
     }

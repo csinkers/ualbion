@@ -3,59 +3,29 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{149A8BC2-91D1-4249-9E1D-7B0054347832}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "src\Tools", "{149A8BC2-91D1-4249-9E1D-7B0054347832}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Game", "Game\UAlbion.Game.csproj", "{CE0E2DB4-828A-45F4-9C41-20A7C5522DA0}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "src\Tests", "{EC61DB68-353D-4825-B221-FADABA7ADFF3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Formats", "Formats\UAlbion.Formats.csproj", "{78B55A1C-1200-4C6E-A9D3-9C04D65F0AF9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Veldrid", "deps\Veldrid", "{DB6A1F1D-5617-4750-A609-506067B01336}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion", "UAlbion\UAlbion.csproj", "{215725EE-7C55-49B6-97C1-88CDC163A8B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Game", "src\Game\UAlbion.Game.csproj", "{CE0E2DB4-828A-45F4-9C41-20A7C5522DA0}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "UAlbion.Tools.Exporter", "Tools\Exporter\UAlbion.Tools.Exporter.fsproj", "{8611136B-B88E-498C-9F5B-5CF22EE48D32}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Formats", "src\Formats\UAlbion.Formats.csproj", "{78B55A1C-1200-4C6E-A9D3-9C04D65F0AF9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core", "Core\UAlbion.Core.csproj", "{4B3B467B-2E99-4836-B589-A69D272417F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion", "src\UAlbion\UAlbion.csproj", "{215725EE-7C55-49B6-97C1-88CDC163A8B0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}"
-	ProjectSection(SolutionItems) = preProject
-		data\assets.json = data\assets.json
-		data\assets_min.json = data\assets_min.json
-		data\config.json = data\config.json
-		data\core.json = data\core.json
-		data\core_sprites.json = data\core_sprites.json
-		data\game.json = data\game.json
-		data\input.json = data\input.json
-		Data\strings.json = Data\strings.json
-	EndProjectSection
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "UAlbion.Tools.Exporter", "src\Tools\Exporter\UAlbion.Tools.Exporter.fsproj", "{8611136B-B88E-498C-9F5B-5CF22EE48D32}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateEnums", "Tools\GenerateEnums\GenerateEnums.csproj", "{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core", "src\Core\UAlbion.Core.csproj", "{4B3B467B-2E99-4836-B589-A69D272417F0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid", "veldrid\src\Veldrid\Veldrid.csproj", "{229A9BFA-B737-40B3-87FA-BACE20587C46}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.ImageSharp", "veldrid\src\Veldrid.ImageSharp\Veldrid.ImageSharp.csproj", "{0E8DF225-AFF9-41E1-BE3F-CDDDCF0CE32E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.ImGui", "veldrid\src\Veldrid.ImGui\Veldrid.ImGui.csproj", "{433026E0-3C04-490D-85C6-BCBFF4ABA75A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.OpenGLBindings", "veldrid\src\Veldrid.OpenGLBindings\Veldrid.OpenGLBindings.csproj", "{E3615811-FD58-43C0-98F6-925C19595880}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.RenderDoc", "veldrid\src\Veldrid.RenderDoc\Veldrid.RenderDoc.csproj", "{C1AA221E-83B2-42DB-9BD3-D221DF7D85DB}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.SDL2", "veldrid\src\Veldrid.SDL2\Veldrid.SDL2.csproj", "{CBDF8BE3-7BBE-4931-96D7-74F192FA8B43}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.StartupUtilities", "veldrid\src\Veldrid.StartupUtilities\Veldrid.StartupUtilities.csproj", "{FDCD4C59-2D82-43EF-B148-064AAEBA02D9}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.Utilities", "veldrid\src\Veldrid.Utilities\Veldrid.Utilities.csproj", "{8F54D7C3-67CF-4058-BFB5-8FBCF327B355}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Veldrid", "Veldrid", "{DB6A1F1D-5617-4750-A609-506067B01336}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.SPIRV", "veldrid-spirv\src\Veldrid.SPIRV\Veldrid.SPIRV.csproj", "{8E4A3651-9264-4FD6-AA1C-E48AEF26EFCA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateEnums", "src\Tools\GenerateEnums\GenerateEnums.csproj", "{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Api", "Api\UAlbion.Api.csproj", "{20D41E69-C260-461F-A0B9-89920F133F60}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core.Veldrid", "Core.Veldrid\UAlbion.Core.Veldrid.csproj", "{EF1027DF-951A-4544-8780-5D190EE3725E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Game.Veldrid", "Game.Veldrid\UAlbion.Game.Veldrid.csproj", "{8CAAAFFC-3BE8-468B-830D-24610F4F75A2}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{EC61DB68-353D-4825-B221-FADABA7ADFF3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Api.Tests", "Tests\UAlbion.Api.Tests\UAlbion.Api.Tests.csproj", "{0AF795B6-F1AE-4251-8950-572E50FCB011}"
 EndProject
@@ -68,6 +38,36 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumpSave", "Tools\DumpSave\DumpSave.csproj", "{EE1EC7F8-2D85-49A4-9477-EED30D2B4FB8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.TestCommon", "Tests\UAlbion.TestCommon\UAlbion.TestCommon.csproj", "{DF30EA7F-00EB-4E3B-A93B-A75A89C83492}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid", "deps\veldrid\src\Veldrid\Veldrid.csproj", "{229A9BFA-B737-40B3-87FA-BACE20587C46}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.ImageSharp", "deps\veldrid\src\Veldrid.ImageSharp\Veldrid.ImageSharp.csproj", "{0E8DF225-AFF9-41E1-BE3F-CDDDCF0CE32E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.ImGui", "deps\veldrid\src\Veldrid.ImGui\Veldrid.ImGui.csproj", "{433026E0-3C04-490D-85C6-BCBFF4ABA75A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.OpenGLBindings", "deps\veldrid\src\Veldrid.OpenGLBindings\Veldrid.OpenGLBindings.csproj", "{E3615811-FD58-43C0-98F6-925C19595880}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.RenderDoc", "deps\veldrid\src\Veldrid.RenderDoc\Veldrid.RenderDoc.csproj", "{C1AA221E-83B2-42DB-9BD3-D221DF7D85DB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.SDL2", "deps\veldrid\src\Veldrid.SDL2\Veldrid.SDL2.csproj", "{CBDF8BE3-7BBE-4931-96D7-74F192FA8B43}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.StartupUtilities", "deps\veldrid\src\Veldrid.StartupUtilities\Veldrid.StartupUtilities.csproj", "{FDCD4C59-2D82-43EF-B148-064AAEBA02D9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.Utilities", "deps\veldrid\src\Veldrid.Utilities\Veldrid.Utilities.csproj", "{8F54D7C3-67CF-4058-BFB5-8FBCF327B355}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.SPIRV", "deps\veldrid-spirv\src\Veldrid.SPIRV\Veldrid.SPIRV.csproj", "{8E4A3651-9264-4FD6-AA1C-E48AEF26EFCA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}"
+	ProjectSection(SolutionItems) = preProject
+		data\assets.json = data\assets.json
+		data\assets_min.json = data\assets_min.json
+		data\config.json = data\config.json
+		data\core.json = data\core.json
+		data\core_sprites.json = data\core_sprites.json
+		data\game.json = data\game.json
+		data\input.json = data\input.json
+		Data\strings.json = Data\strings.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

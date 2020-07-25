@@ -91,8 +91,8 @@ namespace UAlbion.Game
         {
             if (e.MapId != Current?.MapId)
             {
-                _pendingMapChange = e.MapId;
-                LoadMap();
+                // Raise event rather than calling directly so that GameState.Map will get updated.
+                Exchange.Raise(new LoadMapEvent(e.MapId), null);
             }
 
             Raise(new PartyJumpEvent(e.X, e.Y));

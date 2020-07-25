@@ -294,6 +294,7 @@ namespace UAlbion.Game.State.Player
             switch (GetInventoryAction(slotId))
             {
                 case InventoryAction.Pickup:
+                {
                     if (slot.Amount == 1)
                     {
                         PickupItem(slot, null);
@@ -317,88 +318,97 @@ namespace UAlbion.Game.State.Player
                         });
                     }
                     break;
+                }
                 case InventoryAction.PutDown:
+                {
+                    if (redirected)
                     {
-                        if (redirected)
-                        {
-                            var transitionEvent = new LinearItemTransitionEvent(
-                                _hand.ItemId ?? ItemId.Knife,
-                                (int)cursorUiPosition.X,
-                                (int)cursorUiPosition.Y,
-                                (int)slot.LastUiPosition.X,
-                                (int)slot.LastUiPosition.Y,
-                                config.UI.Transitions.ItemMovementTransitionTimeSeconds);
+                        var transitionEvent = new LinearItemTransitionEvent(
+                            _hand.ItemId ?? ItemId.Knife,
+                            (int)cursorUiPosition.X,
+                            (int)cursorUiPosition.Y,
+                            (int)slot.LastUiPosition.X,
+                            (int)slot.LastUiPosition.Y,
+                            config.UI.Transitions.ItemMovementTransitionTimeSeconds);
 
-                            ItemSlot temp = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
-                            temp.TransferFrom(_hand, null);
-                            Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
-                            RaiseAsync(transitionEvent, () =>
-                            {
-                                slot.TransferFrom(temp, null);
-                                Update(slotId.Inventory);
-                                continuation();
-                            });
-                        }
-                        else
+                        ItemSlot temp = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
+                        temp.TransferFrom(_hand, null);
+                        Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
+                        RaiseAsync(transitionEvent, () =>
                         {
-                            slot.TransferFrom(_hand, null);
-                            complete = true;
-                        }
-                        break;
+                            slot.TransferFrom(temp, null);
+                            Update(slotId.Inventory);
+                            continuation();
+                        });
                     }
+                    else
+                    {
+                        slot.TransferFrom(_hand, null);
+                        complete = true;
+                    }
+                    break;
+                }
                 case InventoryAction.Swap:
+                {
+                    if (redirected)
                     {
-                        if (redirected)
+                        // Original game didn't handle this, but doesn't hurt.
+                        var transitionEvent1 = new LinearItemTransitionEvent(
+                            _hand.ItemId ?? ItemId.Knife,
+                            (int)cursorUiPosition.X,
+                            (int)cursorUiPosition.Y,
+                            (int)slot.LastUiPosition.X,
+                            (int)slot.LastUiPosition.Y,
+                            config.UI.Transitions.ItemMovementTransitionTimeSeconds);
+
+                        var transitionEvent2 = new LinearItemTransitionEvent(
+                            slot.ItemId ?? ItemId.Knife,
+                            (int)slot.LastUiPosition.X,
+                            (int)slot.LastUiPosition.Y,
+                            (int)cursorUiPosition.X,
+                            (int)cursorUiPosition.Y,
+                            config.UI.Transitions.ItemMovementTransitionTimeSeconds);
+
+                        ItemSlot temp1 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
+                        ItemSlot temp2 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
+                        temp1.TransferFrom(_hand, null);
+                        temp2.TransferFrom(slot, null);
+
+                        RaiseAsync(transitionEvent1, () =>
                         {
-                            // Original game didn't handle this, but doesn't hurt.
-                            var transitionEvent1 = new LinearItemTransitionEvent(
-                                _hand.ItemId ?? ItemId.Knife,
-                                (int)cursorUiPosition.X,
-                                (int)cursorUiPosition.Y,
-                                (int)slot.LastUiPosition.X,
-                                (int)slot.LastUiPosition.Y,
-                                config.UI.Transitions.ItemMovementTransitionTimeSeconds);
-
-                            var transitionEvent2 = new LinearItemTransitionEvent(
-                                slot.ItemId ?? ItemId.Knife,
-                                (int)slot.LastUiPosition.X,
-                                (int)slot.LastUiPosition.Y,
-                                (int)cursorUiPosition.X,
-                                (int)cursorUiPosition.Y,
-                                config.UI.Transitions.ItemMovementTransitionTimeSeconds);
-
-                            ItemSlot temp1 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
-                            ItemSlot temp2 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
-                            temp1.TransferFrom(_hand, null);
-                            temp2.TransferFrom(slot, null);
-
-                            RaiseAsync(transitionEvent1, () =>
-                            {
-                                slot.TransferFrom(temp1, null);
-                                Update(slotId.Inventory);
-                                Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
-                                continuation();
-                            });
-
-                            RaiseAsync(transitionEvent2, () =>
-                            {
-                                _hand.TransferFrom(temp2, null);
-                                _returnItemInHandEvent = new InventorySwapEvent(slot.Id.Type, slot.Id.Id, slot.Id.Slot);
-                                Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
-                            });
-
+                            slot.TransferFrom(temp1, null);
+                            Update(slotId.Inventory);
                             Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
-                        }
-                        else
+                            continuation();
+                        });
+
+                        RaiseAsync(transitionEvent2, () =>
                         {
-                            SwapItems(slot);
-                            complete = true;
-                        }
-                        break;
+                            _hand.TransferFrom(temp2, null);
+                            _returnItemInHandEvent = new InventorySwapEvent(slot.Id.Type, slot.Id.Id, slot.Id.Slot);
+                            Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
+                        });
+
+                        Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
                     }
+                    else
+                    {
+                        SwapItems(slot);
+                        complete = true;
+                    }
+                    break;
+                }
 
                 // Shouldn't be possible for this to be a redirect as redirects only happen between body parts and they don't allow stacks.
-                case InventoryAction.Coalesce: CoalesceItems(slot); complete = true; break;
+                case InventoryAction.Coalesce:
+                {
+                    if (e is InventoryPickupEvent pickup)
+                        PickupItem(slot, pickup.Amount);
+                    else
+                        CoalesceItems(slot);
+                    complete = true;
+                    break;
+                }
                 case InventoryAction.NoCoalesceFullStack: complete = true; break; // No-op
             }
 

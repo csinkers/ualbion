@@ -17,6 +17,6 @@ jobs:
       with:
         dotnet-version: 3.1.100
     - name: Build with dotnet
-      run: dotnet build --configuration Release UAlbion/UAlbion.csproj
+      run: dotnet build --configuration Release src/UAlbion/UAlbion.csproj
     - name: Test with dotnet
-      run: dotnet test ./ualbion.sln --configuration Release
+      run: dotnet test ./src/ualbion.sln --configuration Release

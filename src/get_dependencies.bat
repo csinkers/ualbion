@@ -1,5 +1,5 @@
 @echo off
-pushd deps
+pushd ..\deps
 git clone https://github.com/CSinkers/AdlMidi.NET
 :: Optional dependencies
 :: git clone https://github.com/CSinkers/SerdesNet

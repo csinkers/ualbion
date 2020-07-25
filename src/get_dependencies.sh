@@ -1,5 +1,5 @@
 #!/bin/sh
-cd deps
+cd ../deps
 git clone https://github.com/CSinkers/AdlMidi.NET
 # Optional dependencies
 #git clone https://github.com/CSinkers/SerdesNet

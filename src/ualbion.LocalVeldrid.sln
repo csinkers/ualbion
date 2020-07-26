@@ -59,14 +59,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.SPIRV", "..\deps\ve
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}"
 	ProjectSection(SolutionItems) = preProject
-		data\assets.json = data\assets.json
-		data\assets_min.json = data\assets_min.json
-		data\config.json = data\config.json
-		data\core.json = data\core.json
-		data\core_sprites.json = data\core_sprites.json
-		data\game.json = data\game.json
-		data\input.json = data\input.json
-		Data\strings.json = Data\strings.json
+		..\data\assets.json = ..\data\assets.json
+		..\data\assets_min.json = ..\data\assets_min.json
+		..\data\config.json = ..\data\config.json
+		..\data\core.json = ..\data\core.json
+		..\data\core_sprites.json = ..\data\core_sprites.json
+		..\data\game.json = ..\data\game.json
+		..\data\game.json = ..\data\game.json
+		..\data\input.json = ..\data\input.json
+		..\data\settings.json = ..\data\settings.json
+		..\data\strings.json = ..\data\strings.json
 	EndProjectSection
 EndProject
 Global

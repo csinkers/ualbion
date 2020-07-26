@@ -6,7 +6,9 @@ open System.Reflection
 open System.Text
 open FSharp.Json
 
-let baseDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) |> (fun x -> Directory.GetParent(x).Parent.Parent.Parent.Parent.FullName)
+let baseDir = 
+    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) 
+    |> (fun x -> Directory.GetParent(x).Parent.Parent.Parent.Parent.Parent.FullName)
 let xldDir = Path.Combine(baseDir, @"albion\CD\XLDLIBS")
 let mainOutputDir = Path.Combine(baseDir, @"data\exported")
 let xmiToMidiPath = Path.Combine(baseDir, @"Tools\XmiToMidi.exe")

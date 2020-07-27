@@ -19,10 +19,7 @@ namespace UAlbion.Game.Gui.Inventory
             var positions = config.Inventory.Positions[_activeCharacter];
             var backgroundStack = new FixedPositionStack();
             var background = new UiSpriteElement<FullBodyPictureId>((FullBodyPictureId)_activeCharacter);
-            var backgroundButton = new Button(background) { Theme = ButtonTheme.Invisible }
-                .OnClick(() => Raise(new InventorySwapEvent(InventoryType.Player, (ushort)_activeCharacter, ItemSlotId.CharacterBody)));
-            backgroundStack.Add(backgroundButton, 1, -3);
-            AttachChild(backgroundStack);
+            backgroundStack.Add(background, 3, 10 - 1); //subtract 1px because picture starts 1px above frame
 
             var bodyStack = new FixedPositionStack();
             foreach (var bodyPart in positions)
@@ -34,12 +31,14 @@ namespace UAlbion.Game.Gui.Inventory
                         InventoryType.Player,
                         (ushort)_activeCharacter,
                         itemSlotId)),
-                    (int)position.X,
-                    (int)position.Y);
+                    (int)position.X + 1, //take frame border into account
+                    (int)position.Y + 1); //take frame border into account
             }
-            bodyStack.Add(new Spacing(0, 164), 0, 0);
+            bodyStack.Add(new Button(new Spacing(128, 168)) { Theme = ButtonTheme.Invisible, Margin = 0, Padding = -1 }
+                .OnClick(() => Raise(new InventorySwapEvent(InventoryType.Player, (ushort)_activeCharacter, ItemSlotId.CharacterBody))), 0, 0);
 
-            var frame = new GroupingFrame(bodyStack);
+            var frame = new GroupingFrame(bodyStack) { Theme = GroupingFrame.FrameThemeBackgroundless, Padding = -1 };
+
             var labelStack = new HorizontalStack(
                 new InventoryOffensiveLabel(_activeCharacter),
                 new Spacing(4, 0),
@@ -68,7 +67,7 @@ namespace UAlbion.Game.Gui.Inventory
                 labelStack
                 );
 
-            AttachChild(mainStack);
+            AttachChild(new LayerStack(backgroundStack, mainStack));
         }
     }
 }

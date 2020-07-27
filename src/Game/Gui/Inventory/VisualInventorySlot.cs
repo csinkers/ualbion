@@ -34,7 +34,9 @@ namespace UAlbion.Game.Gui.Inventory
 
             if (!slotId.Slot.IsSpecial())
             {
-                _size = slotId.Slot.IsBodyPart() ? new Vector2(16, 16) : new Vector2(16, 20);
+                _size = slotId.Slot.IsBodyPart() ?
+                    new Vector2(18, 18) : //16x16 surrounded by 1px borders
+                    new Vector2(16, 20);
                 _sprite = new UiSpriteElement<AssetId>(ItemSpriteId.Nothing.ToAssetId())
                 {
                     SubId = (int)ItemSpriteId.Nothing
@@ -45,7 +47,7 @@ namespace UAlbion.Game.Gui.Inventory
                             new LayerStack(
                                 _sprite,
                                 _overlay),
-                            0, 0, 16, 16)
+                            1, 1, 16, 16) //16x16 surrounded by 1px borders
                         .Add(text, 0, 20 - 9, 16, 9))
                     {
                         Padding = -1,

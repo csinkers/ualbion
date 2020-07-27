@@ -32,8 +32,8 @@ namespace UAlbion.Game.Gui.Inventory
                         InventoryType.Player,
                         (ushort)_activeCharacter,
                         itemSlotId)),
-                    (int)position.X,
-                    (int)position.Y);
+                    (int)position.X + 1, //take frame border into account
+                    (int)position.Y + 1); //take frame border into account
             }
             bodyStack.Add(new Button(new Spacing(128, 168)) { Theme = ButtonTheme.Invisible, Margin = 0, Padding = -1 }
                 .OnClick(() => Raise(new InventorySwapEvent(InventoryType.Player, (ushort)_activeCharacter, ItemSlotId.CharacterBody))), 0, 0);

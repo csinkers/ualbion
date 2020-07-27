@@ -49,7 +49,7 @@ namespace GenerateEnums
         {
             var baseDir = FormatUtil.FindBasePath();
             var config = FullAssetConfig.Load(baseDir);
-            var outpathPath = Path.Combine(baseDir, @"Formats/AssetIds");
+            var outpathPath = Path.Combine(baseDir, @"src/Formats/AssetIds");
             var xldPattern = new Regex(@"([0-9]+).XLD$");
 
             var enums = new Dictionary<string, EnumData>();

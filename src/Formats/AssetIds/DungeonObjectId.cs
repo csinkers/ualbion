@@ -97,7 +97,7 @@ namespace UAlbion.Formats.AssetIds
         Skybox = 85,
         Skybox2 = 86,
         DiscoPlant = 87,
-        DiscPlant = 88,
+        DiscoPlant2 = 88,
         ScuttleBush = 89,
         ScuttleBush2 = 90,
         JellySpirit = 91,

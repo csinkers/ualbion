@@ -19,7 +19,7 @@ namespace UAlbion.Game.Gui.Inventory
             var positions = config.Inventory.Positions[_activeCharacter];
             var backgroundStack = new FixedPositionStack();
             var background = new UiSpriteElement<FullBodyPictureId>((FullBodyPictureId)_activeCharacter);
-            backgroundStack.Add(background, 3, 10 - 1);
+            backgroundStack.Add(background, 3, 10 - 1); //subtract 1px because picture starts 1px above frame
 
             var bodyStack = new FixedPositionStack();
             foreach (var bodyPart in positions)

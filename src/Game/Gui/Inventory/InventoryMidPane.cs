@@ -19,9 +19,7 @@ namespace UAlbion.Game.Gui.Inventory
             var positions = config.Inventory.Positions[_activeCharacter];
             var backgroundStack = new FixedPositionStack();
             var background = new UiSpriteElement<FullBodyPictureId>((FullBodyPictureId)_activeCharacter);
-            var backgroundButton = new Button(background) { Theme = ButtonTheme.Invisible }
-                .OnClick(() => Raise(new InventorySwapEvent(InventoryType.Player, (ushort)_activeCharacter, ItemSlotId.CharacterBody)));
-            backgroundStack.Add(backgroundButton, 1, -3);
+            backgroundStack.Add(background, 3, 10 - 1);
             AttachChild(backgroundStack);
 
             var bodyStack = new FixedPositionStack();
@@ -37,9 +35,11 @@ namespace UAlbion.Game.Gui.Inventory
                     (int)position.X,
                     (int)position.Y);
             }
-            bodyStack.Add(new Spacing(0, 164), 0, 0);
+            bodyStack.Add(new Button(new Spacing(128, 168)) { Theme = ButtonTheme.Invisible, Margin = 0, Padding = -1 }
+                .OnClick(() => Raise(new InventorySwapEvent(InventoryType.Player, (ushort)_activeCharacter, ItemSlotId.CharacterBody))), 0, 0);
 
-            var frame = new GroupingFrame(bodyStack);
+            var frame = new GroupingFrame(bodyStack) { Theme = GroupingFrame.FrameThemeBackgroundless, Padding = -1 };
+
             var labelStack = new HorizontalStack(
                 new InventoryOffensiveLabel(_activeCharacter),
                 new Spacing(4, 0),

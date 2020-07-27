@@ -41,7 +41,7 @@
     "Positions":
     {
       "Tom": {
-        "Head":        { "X": 33,  "Y": 5 },
+        "Head":        { "X": 31,  "Y": 5 },
         "Neck":        { "X": 74,  "Y": 14 },
         "RightHand":   { "X": 5,   "Y": 56 },
         "RightFinger": { "X": 5,   "Y": 75 },

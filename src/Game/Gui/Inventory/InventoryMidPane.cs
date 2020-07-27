@@ -20,7 +20,6 @@ namespace UAlbion.Game.Gui.Inventory
             var backgroundStack = new FixedPositionStack();
             var background = new UiSpriteElement<FullBodyPictureId>((FullBodyPictureId)_activeCharacter);
             backgroundStack.Add(background, 3, 10 - 1);
-            AttachChild(backgroundStack);
 
             var bodyStack = new FixedPositionStack();
             foreach (var bodyPart in positions)
@@ -68,7 +67,7 @@ namespace UAlbion.Game.Gui.Inventory
                 labelStack
                 );
 
-            AttachChild(mainStack);
+            AttachChild(new LayerStack(backgroundStack, mainStack));
         }
     }
 }

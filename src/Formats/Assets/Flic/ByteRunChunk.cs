@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using SerdesNet;
 
 namespace UAlbion.Formats.Assets.Flic
 {
@@ -40,12 +39,9 @@ namespace UAlbion.Formats.Assets.Flic
             }
         }
 
-        protected override uint SerdesBody(uint length, ISerializer s)
+        protected override uint LoadChunk(uint length, BinaryReader br)
         {
-            if (s.Mode != SerializerMode.Reading)
-                throw new NotImplementedException();
-
-            var compressed = s.ByteArray(nameof(PixelData), null, (int)length);
+            var compressed = br.ReadBytes((int)length);
             PixelData = Decompress(compressed).ToArray();
             return (uint)compressed.Length;
         }

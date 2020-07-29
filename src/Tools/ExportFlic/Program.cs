@@ -1,5 +1,4 @@
-﻿using SerdesNet;
-using System.IO;
+﻿using System.IO;
 using System;
 using System.Collections.Generic;
 using UAlbion.Formats.Assets.Flic;
@@ -23,21 +22,15 @@ namespace UAlbion.Tools.ExportFlic
             {
                 using var stream = File.OpenRead(file);
                 using var br = new BinaryReader(stream);
-                var flic = FlicFile.Serdes(null, new AlbionReader(br));
+                var flic = new FlicFile(br);
 
-                var jsonFile = Path.ChangeExtension(file, "json");
-                using var writeStream = File.OpenWrite(jsonFile);
-                using var textWriter = new StreamWriter(writeStream);
-                FlicFile.Serdes(flic, new JsonWriter(textWriter, true));
-                /*
                 AviFile.Write(
                     Path.ChangeExtension(file, "avi"),
-                    flic.Speed, // What units is Speed in?
+                    flic.Speed,
                     flic.Width,
                     flic.Height,
-                    ApplyPalette(flic.AllFrames()));
-                break;
-                */
+                    flic.AllFrames());
+                // break;
             }
         }
 
@@ -50,6 +43,5 @@ namespace UAlbion.Tools.ExportFlic
                 yield return frame;
             }
         }
-
     }
 }

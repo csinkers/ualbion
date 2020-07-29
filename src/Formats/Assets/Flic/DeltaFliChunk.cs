@@ -1,5 +1,5 @@
 ﻿using System;
-using SerdesNet;
+using System.IO;
 
 namespace UAlbion.Formats.Assets.Flic
 {
@@ -26,7 +26,7 @@ namespace UAlbion.Formats.Assets.Flic
 
         Line[] Lines;
 
-        protected override uint SerdesBody(uint length, ISerializer s)
+        protected override uint LoadChunk(uint length, BinaryReader br)
         {
             throw new NotImplementedException();
         }

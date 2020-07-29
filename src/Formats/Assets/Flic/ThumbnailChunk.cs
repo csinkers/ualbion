@@ -1,12 +1,12 @@
 ﻿using System;
-using SerdesNet;
+using System.IO;
 
 namespace UAlbion.Formats.Assets.Flic
 {
     public class ThumbnailChunk : FlicChunk
     {
         public override FlicChunkType Type => FlicChunkType.Thumbnail;
-        protected override uint SerdesBody(uint length, ISerializer s)
+        protected override uint LoadChunk(uint length, BinaryReader br)
         {
             throw new NotImplementedException();
         }

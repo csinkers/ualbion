@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using SerdesNet;
+using System.IO;
 using UAlbion.Api;
 
 namespace UAlbion.Formats.Assets.Flic
@@ -19,20 +19,19 @@ namespace UAlbion.Formats.Assets.Flic
         public override FlicChunkType Type => FlicChunkType.Frame;
         public IList<FlicChunk> SubChunks { get; } = new List<FlicChunk>();
         public ushort Delay { get; private set; }
-        protected override uint SerdesBody(uint length, ISerializer s)
+        protected override uint LoadChunk(uint length, BinaryReader br)
         {
-            var initialOffset = s.Offset;
-            ushort subChunkCount = s.UInt16("SubChunkCount", (ushort)SubChunks.Count);
-            Delay = s.UInt16(nameof(Delay), Delay);
-            s.UInt16("reserved", 0);
-            Width = s.UInt16(nameof(Width), Width);
-            Height = s.UInt16(nameof(Height), Height);
+            var initialOffset = br.BaseStream.Position;
+            ushort subChunkCount = br.ReadUInt16();
+            Delay = br.ReadUInt16();
+            br.ReadUInt16();
+            Width = br.ReadUInt16();
+            Height = br.ReadUInt16();
 
-            s.List(nameof(SubChunks), SubChunks, subChunkCount,
-                (i, c, s2) => Serdes(i, c, s2, _videoWidth, _videoHeight));
+            for(int i = 0; i < subChunkCount; i++)
+                SubChunks.Add(Load(br, _videoWidth, _videoHeight));
 
-            if (s.Mode == SerializerMode.Reading)
-                ApiUtil.Assert(s.Offset == initialOffset + length);
+            ApiUtil.Assert(br.BaseStream.Position == initialOffset + length);
             return length;
         }
 

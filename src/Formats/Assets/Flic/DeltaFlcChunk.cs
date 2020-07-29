@@ -1,5 +1,7 @@
 ﻿using System;
-using SerdesNet;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace UAlbion.Formats.Assets.Flic
 {
@@ -9,86 +11,146 @@ namespace UAlbion.Formats.Assets.Flic
 
         public enum RleOpcode : byte
         {
-            PacketCount = 0,
+            Packets = 0,
             Undefined = 1,
             StoreLowByteInLastPixel = 2,
             LineSkipCount = 3, // Take absolute value first
         }
 
+        public class LineToken
+        {
+            public override string ToString()
+                    => $"LineToken:Skip{ColumnSkipCount}:{(SignedCount > 0 ? $"Lit{SignedCount}" : $"Rle{-SignedCount}")}[ "
+                    + string.Join(", ", PixelData.Select(x => $"{x}"))
+                    + " ]";
+
+            public byte ColumnSkipCount { get; }
+            public sbyte SignedCount { get; }
+            public ushort[] PixelData { get; }
+
+            public LineToken(BinaryReader br)
+            {
+                StartedAt = br.BaseStream.Position;
+                ColumnSkipCount = br.ReadByte();
+                SignedCount = br.ReadSByte(); // +ve = verbatim, -ve = RLE
+
+                if (SignedCount > 0)
+                {
+                    PixelData ??= new ushort[SignedCount];
+                    for (int j = 0; j < SignedCount; j++)
+                        PixelData[j] = br.ReadUInt16();
+                }
+                else
+                {
+                    PixelData ??= new ushort[1];
+                    PixelData[0] = br.ReadUInt16();
+                }
+
+                BytesRead = (ushort)(br.BaseStream.Position - StartedAt);
+            }
+
+            public long StartedAt { get; }
+            public ushort BytesRead { get; }
+        }
+
         public class Line
         {
-            public ushort PacketCount { get; private set; }
+            public override string ToString() => 
+                $"Line [ {string.Join("; ", Tokens.Select(x => x.ToString()))} ]";
 
-            public class Packet
+            public ushort Skip { get; }
+            public byte? LastPixel { get; }
+            public IList<LineToken> Tokens { get; } = new List<LineToken>();
+
+            public Line(BinaryReader br)
             {
-                public byte ColumnSkipCount { get; private set; }
-                public sbyte RleCount { get; private set; }
-                public ushort[] PixelData { get; private set; }
+                StartedAt = br.BaseStream.Position;
 
-                public static Packet Serdes(int i, Packet p, ISerializer s)
+                int remaining = 1;
+                while (remaining > 0)
                 {
-                    p ??= new Packet();
-                    var startOffset = s.Offset;
-                    p.ColumnSkipCount = s.UInt8(nameof(ColumnSkipCount), p.ColumnSkipCount);
-                    p.RleCount = s.Int8(nameof(RleCount), p.RleCount); // +ve = verbatim, -ve = RLE
+                    var raw = br.ReadUInt16();
+                    var opcode = (RleOpcode)(byte)(raw >> 14);
+                    remaining--;
 
-                    if (p.RleCount > 0)
+                    switch (opcode)
                     {
-                        p.PixelData ??= new ushort[p.RleCount];
-                        for(int j = 0; j < p.RleCount; j++)
-                            p.PixelData[j] = s.UInt16(null, p.PixelData[j]);
+                        case RleOpcode.Packets:
+                            Tokens = new LineToken[raw];
+                            for (int i = 0; i < raw; i++)
+                                Tokens[i] = new LineToken(br);
+                            break;
+                        case RleOpcode.StoreLowByteInLastPixel:
+                            LastPixel = (byte)(0xff & raw);
+                            remaining++;
+                            break;
+                        case RleOpcode.LineSkipCount:
+                            Skip = (ushort)-raw;
+                            remaining++;
+                            break;
+                        default: throw new ArgumentOutOfRangeException();
                     }
-                    else
-                    {
-                        p.PixelData ??= new ushort[1];
-                        p.PixelData[0] = s.UInt16(nameof(PixelData), p.PixelData[0]);
-                    }
-
-                    p.BytesRead = (ushort)(s.Offset - startOffset);
-                    return p;
                 }
 
-                public ushort BytesRead { get; private set; }
+                BytesRead = (ushort)(br.BaseStream.Position - StartedAt);
             }
 
-            public Packet[] Packets;
-
-            public static Line Serdes(int i, Line l, ISerializer s)
-            {
-                l ??= new Line();
-                var startOffset = s.Offset;
-                l.PacketCount = s.UInt16(nameof(PacketCount), l.PacketCount);
-                RleOpcode opcode = (RleOpcode)(byte)(l.PacketCount >> 14);
-
-                switch(opcode)
-                {
-                    case RleOpcode.PacketCount:
-                        l.Packets ??= new Packet[l.PacketCount];
-                        s.List(nameof(Packets), l.Packets, l.PacketCount, Packet.Serdes);
-                        break;
-                    case RleOpcode.StoreLowByteInLastPixel: break;
-                    case RleOpcode.LineSkipCount: break;
-                    default: throw new ArgumentOutOfRangeException();
-                }
-
-                l.BytesRead = (ushort)(s.Offset - startOffset);
-                return l;
-            }
-
-            public ushort BytesRead { get; private set; }
+            public long StartedAt { get; }
+            public ushort BytesRead { get; }
         }
 
         public Line[] Lines { get; private set; }
+        public long StartedAt { get; private set; }
         public ushort BytesRead { get; private set; }
 
-        protected override uint SerdesBody(uint length, ISerializer s)
+        protected override uint LoadChunk(uint length, BinaryReader br)
         {
-            var startOffset = s.Offset;
-            ushort lineCount = s.UInt16("LineCount", (ushort)(Lines?.Length ?? 0));
+            StartedAt = br.BaseStream.Position;
+            ushort lineCount = br.ReadUInt16();
             Lines ??= new Line[lineCount];
-            s.List(nameof(Lines), Lines, lineCount, Line.Serdes);
-            BytesRead = (ushort)(s.Offset - startOffset);
-            return (uint)(s.Offset - startOffset);
+            for(int i = 0; i < lineCount; i++)
+                Lines[i] = new Line(br);
+            BytesRead = (ushort)(br.BaseStream.Position - StartedAt);
+            return BytesRead;
+        }
+
+        public void Apply(byte[] buffer8, int width)
+        {
+            int y = 0;
+            int x = 0;
+            void Write(byte b)
+            {
+                buffer8[y * width + x] = b;
+                x++;
+            }
+
+            foreach(var line in Lines)
+            {
+                y += line.Skip;
+                foreach (var token in line.Tokens)
+                {
+                    x += token.ColumnSkipCount;
+                    if(token.SignedCount > 0)
+                    {
+                        for (int i = 0; i < token.SignedCount; i++)
+                        {
+                            Write((byte)(token.PixelData[i] & 0xff));
+                            Write((byte)((token.PixelData[i] & 0xff00) >> 8));
+                        }
+                    }
+                    else // RLE
+                    {
+                        for (int i = 0; i < -token.SignedCount; i++)
+                        {
+                            Write((byte)(token.PixelData[0] & 0xff));
+                            Write((byte)((token.PixelData[0] & 0xff00) >> 8));
+                        }
+                    }
+                }
+
+                x = 0;
+                y++;
+            }
         }
     }
 }

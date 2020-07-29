@@ -1,4 +1,4 @@
-﻿using SerdesNet;
+﻿using System.IO;
 
 namespace UAlbion.Formats.Assets.Flic
 {
@@ -7,9 +7,9 @@ namespace UAlbion.Formats.Assets.Flic
         public byte[] PixelData { get; private set; }
 
         public override FlicChunkType Type => FlicChunkType.FullUncompressed;
-        protected override uint SerdesBody(uint length, ISerializer s)
+        protected override uint LoadChunk(uint length, BinaryReader br)
         {
-            PixelData = s.ByteArray(nameof(PixelData), PixelData, PixelData?.Length ?? (int)length);
+            PixelData = br.ReadBytes((int)length);
             return length;
         }
     }

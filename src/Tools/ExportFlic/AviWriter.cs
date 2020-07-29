@@ -6,13 +6,13 @@ namespace UAlbion.Tools.ExportFlic
 {
     public static class AviFile
     {
-        const int BytesPerPixel = 3;
+        const int BytesPerPixel = 4;
         public static unsafe void Write(
             string fileName,
             uint framesPerSecond,
             uint width,
             uint height,
-            IEnumerable<byte[]> frames)
+            IEnumerable<uint[]> frames)
         {
             AVIFileInit();
             AVIFileOpenW(out var fileHandle, fileName, OF_WRITE | OF_CREATE, 0);
@@ -23,7 +23,7 @@ namespace UAlbion.Tools.ExportFlic
                 fccType = StreamTypeVideo,
                 fccHandler = StreamCompressor,
                 dwFlags = 0, dwCaps = 0, wPriority = 0, wLanguage = 0,
-                dwScale = 1,
+                dwScale = 20,
                 dwRate = framesPerSecond,
                 dwStart = 0,
                 dwLength = 0,
@@ -61,7 +61,6 @@ namespace UAlbion.Tools.ExportFlic
             IntPtr* streamPtr = &stream;
             AVISaveOptions(0, 0, 1, streamPtr, pp);
             AVISaveOptionsFree(1, pp);
-
             AVIMakeCompressedStream(out var compressedStream, stream, ref opts, 0);
 
             BitmapInfoHeader bi = new BitmapInfoHeader
@@ -70,7 +69,7 @@ namespace UAlbion.Tools.ExportFlic
                 biWidth = (int)width,
                 biHeight = (int)height,
                 biPlanes = 1,
-                biBitCount = 24,
+                biBitCount = 32,
                 biCompression = 0,
                 biSizeImage = stride * height,
                 biXPelsPerMeter = 0,
@@ -84,10 +83,10 @@ namespace UAlbion.Tools.ExportFlic
             int count = 0;
             foreach (var frame in frames)
             {
-                fixed (byte* bytePtr = frame)
+                fixed (uint* framePtr = frame)
                 {
                     AVIStreamWrite(compressedStream, count, 1,
-                        new IntPtr(bytePtr),
+                        new IntPtr(framePtr),
                         (int)(stride * height),
                         0,
                         0,

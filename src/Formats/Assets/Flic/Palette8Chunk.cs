@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using SerdesNet;
+using System.IO;
 
 namespace UAlbion.Formats.Assets.Flic
 {
@@ -8,41 +8,39 @@ namespace UAlbion.Formats.Assets.Flic
     {
         public class PalettePacket
         {
-            public byte Skip { get; private set; }
-            public byte Copy { get; private set; }
-            public byte[] Triplets { get; private set; }
+            public byte Skip { get; }
+            public byte[] Triplets { get; }
 
-            public static PalettePacket Serdes(int _, PalettePacket p, ISerializer s)
+            public PalettePacket(BinaryReader br)
             {
-                p ??= new PalettePacket();
-                p.Skip = s.UInt8(nameof(Skip), p.Skip);
-                p.Copy = s.UInt8(nameof(Copy), p.Copy);
+                Skip = br.ReadByte();
+                var copy = br.ReadByte();
 
-                int count = p.Copy == 0 ? 256 : p.Copy;
-                p.Triplets ??= new byte[3 * count];
-                for (int i = 0; i < count; i++)
+                int count = copy == 0 ? 256 : copy;
+                count *= 3;
+                Triplets = new byte[count];
+                for (int i = 0; i < count;)
                 {
-                    p.Triplets[i * 3]     = s.UInt8("R", p.Triplets[i * 3]);
-                    p.Triplets[i * 3 + 1] = s.UInt8("G", p.Triplets[i * 3 + 1]);
-                    p.Triplets[i * 3 + 2] = s.UInt8("B", p.Triplets[i * 3 + 2]);
+                    Triplets[i++] = br.ReadByte();
+                    Triplets[i++] = br.ReadByte();
+                    Triplets[i++] = br.ReadByte();
                 }
-
-                return p;
             }
         }
 
         public override FlicChunkType Type => FlicChunkType.Palette8Bit;
-        public IList<PalettePacket> Packets { get; private set; }
-        protected override uint SerdesBody(uint length, ISerializer s)
+        public IList<PalettePacket> Packets { get; } = new List<PalettePacket>();
+        protected override uint LoadChunk(uint length, BinaryReader br)
         {
-            ushort packetCount = s.UInt16("PacketCount", (ushort)(Packets?.Count ?? 0));
-            Packets = s.List(nameof(Packets), Packets, packetCount, PalettePacket.Serdes);
+            ushort packetCount = br.ReadUInt16();
+            for(int i = 0; i < packetCount; i++)
+                Packets.Add(new PalettePacket(br));
             return length;
         }
 
-        public byte[] GetEffectivePalette(ReadOnlySpan<byte> existing)
+        public uint[] GetEffectivePalette(ReadOnlySpan<uint> existing)
         {
-            byte[] palette = new byte[3 * 256];
+            uint[] palette = new uint[256];
             if(existing.Length != palette.Length)
                 throw new InvalidOperationException($"Existing palette had invalid size {existing.Length}, expected {palette.Length}");
 
@@ -51,13 +49,16 @@ namespace UAlbion.Formats.Assets.Flic
 
             foreach (var packet in Packets)
             {
-                int i = packet.Skip;
-                int count = packet.Copy == 0 ? 256 : packet.Copy;
-                for (; i < packet.Skip + count; i++)
+                int final = (packet.Skip + packet.Triplets.Length / 3);
+                int j = packet.Skip * 3;
+                for (int i = packet.Skip; i < final; i++)
                 {
-                    palette[i * 3] = packet.Triplets[i * 3];
-                    palette[i * 3 + 1] = packet.Triplets[i * 3 + 1];
-                    palette[i * 3 + 2] = packet.Triplets[i * 3 + 2];
+                    palette[i] =
+                          (uint) 0xff << 24 // Alpha
+                        | (uint) packet.Triplets[j++] << 16 // Red
+                        | (uint) packet.Triplets[j++] << 8 // Green
+                        | (uint) packet.Triplets[j++] // Blue
+                        ;
                 }
             }
 

@@ -50,16 +50,13 @@ Planned improvements / changes from the original gameplay:
 
 ## Getting started
 
-1. Configure `data/config.json` to set the paths for the files from the original game (currently only version v1.38 where MAIN.EXE is 1,109,655 bytes is supported). If you're running the GOG version, you'll want to mount the `game.gog` file (it's just a .bin format CD image) and then copy the ALBION directory into your UAlbion folder.
-1. To compile and run the project, open `ualbion.sln` in the C# IDE of your choice or run `./run.sh` in Linux (ensure `dotnet-host`, `dotnet-runtime` and `dotnet-sdk` are installed) or `run.bat` in Windows. Any extra parameters to `run` will be passed through to UAlbion, `--help` will show the available options.
-    - To show available options: `run -h`
-    - To run with Vulkan: `run -vk`
-    - To run with OpenGL: `run -gl`
-    - To run with Direct3D: `run -d3d`
+### Game data
 
-To extract the required game files from the GOG version of the game:
+You need to have the original Albion game files. These days, Albion can be bought cheaply on [GOG](https://www.gog.com/game/albion).
 
-### Linux:
+If you have the GOG version of the game, extract the required game files as following:
+
+#### Linux:
 1. Ensure `wine` and `dosbox` are installed
 1. Download the [Albion installer for Windows from GOG](https://www.gog.com/game/albion)
 1. Run the installer using wine (`wine setup_albion_1.38_\(28043\).exe`). Note that the installer may show some errors, but if the game can be launched in the end, it's okay.
@@ -69,7 +66,7 @@ To extract the required game files from the GOG version of the game:
     1. `mount D "~/.wine/drive_c/GOG Games/Albion/"`
     1. `C:\src\Tools\GOG_EXTR.BAT`
 
-### Windows:
+#### Windows:
 1. Download the [Albion installer from GOG](https://www.gog.com/game/albion)
 1. Run installer
 1. Open the Albion install directory in file explorer (e.g. `C:\GOG Games\Albion`)
@@ -78,6 +75,16 @@ To extract the required game files from the GOG version of the game:
     1. `mount C "C:\Git\ualbion"`
     1. `mount D "C:\GOG Games\Albion"`
     1. `C:\src\Tools\GOG_EXTR.BAT`
+
+If you did not do the above steps and want to select your game files manually, configure `data/config.json` to set the paths for the files from the original game (currently only version v1.38 where `MAIN.EXE` is 1,109,655 bytes and has a SHA256 hash of `476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710` is supported). If you're running the GOG version, you'll want to mount the `game.gog` file (it's just a raw binary dump of the CD contents) using CDemu and then copy the ALBION directory into your UAlbion folder.
+
+### Compile and run
+
+To compile and run the project, open `ualbion.sln` in the C# IDE of your choice or run `./run.sh` in Linux (ensure `dotnet-host`, `dotnet-runtime` and `dotnet-sdk` are installed) or `run.bat` in Windows. Any extra parameters to `run` will be passed through to UAlbion, `--help` will show the available options.
+- To show available options: `run -h`
+- To run with Vulkan: `run -vk`
+- To run with OpenGL: `run -gl`
+- To run with Direct3D: `run -d3d`
 
 ## Attributions
 Many thanks to Florian Ziesche and the other contributers to the [freealbion wiki](https://github.com/freealbion/freealbion/wiki) for their efforts in discovering and documenting the Albion file formats.

@@ -16,7 +16,7 @@ goto d_dir_ok
 
 :d_dir_err
 echo Error: D drive must be mounted to point at the Albion GOG installation.
-echo E.g. mount D "C:\Program Files\Albion"
+echo E.g. mount D "C:\GOG Games\Albion"
 goto end
 
 :d_dir_ok

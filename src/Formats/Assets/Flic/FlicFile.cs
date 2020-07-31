@@ -2,16 +2,9 @@
 using System.IO;
 using System.Linq;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Assets.Flic
 {
-    public class FlicLoader : IAssetLoader
-    {
-        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config) 
-            => new FlicFile(br);
-    }
     public class FlicFile
     {
         public FlicFile(BinaryReader br)
@@ -24,7 +17,7 @@ namespace UAlbion.Formats.Assets.Flic
             Height      =  br.ReadUInt16(); // FLIC height in pixels
             Depth       =  br.ReadUInt16(); // Bits per pixel (usually 8)
             Flags       =  br.ReadUInt16(); // Set to zero or to three
-            Speed       =  br.ReadUInt32(); // Delay between frames in jiffied (1/70 s)
+            Speed       =  br.ReadUInt32(); // Delay between frames in jiffies (1/70 s)
             Reserved1   =  br.ReadUInt16(); // Set to zero
             Created     =  br.ReadUInt32(); // Date of FLIC creation (FLC only)
             Creator     =  br.ReadUInt32(); // Serial number or compiler id (FLC only)
@@ -75,11 +68,11 @@ namespace UAlbion.Formats.Assets.Flic
         public byte[] Reserved3 { get; } // Set to zero (40 bytes)
         public IList<FlicChunk> Chunks { get; } = new List<FlicChunk>();
 
-        public IEnumerable<uint[]> AllFrames()
+        public IEnumerable<(byte[], uint[], ushort)> AllFrames8() // pixels, palette, delay
         {
             uint[] palette = new uint[0x100];
             byte[] buffer8 = new byte[Width * Height];
-            uint[] buffer24 = new uint[Width * Height];
+
             foreach (var frame in Chunks.OfType<FlicFrame>())
             {
                 ApiUtil.Assert(frame.Width == 0, "Frame width overrides are not currently handled");
@@ -87,20 +80,39 @@ namespace UAlbion.Formats.Assets.Flic
 
                 foreach (var subChunk in frame.SubChunks)
                 {
-                    if (subChunk is Palette8Chunk paletteChunk)
-                        palette = paletteChunk.GetEffectivePalette(palette);
-                    else if (subChunk is CopyChunk copy)
-                        copy.PixelData.CopyTo(buffer8, 0);
-                    else if (subChunk is DeltaFlcChunk delta)
-                        delta.Apply(buffer8, Width);
+                    switch (subChunk)
+                    {
+                        case Palette8Chunk paletteChunk:
+                            palette = paletteChunk.GetEffectivePalette(palette);
+                            break;
+                        case CopyChunk copy:
+                            copy.PixelData.CopyTo(buffer8, 0);
+                            break;
+                        case DeltaFlcChunk delta:
+                            delta.Apply(buffer8, Width);
+                            break;
+                        case FullByteOrientedRleChunk rle:
+                            rle.PixelData.CopyTo(buffer8, 0);
+                            break;
+                    }
                 }
+
+                yield return (buffer8, palette, frame.Delay);
+            }
+        }
+
+        public IEnumerable<(uint[], ushort)> AllFrames32() // pixels, delay
+        {
+            uint[] buffer32 = new uint[Width * Height];
+            foreach (var (frame, palette, delay) in AllFrames8())
+            {
                 // Inefficient, could be optimised by rendering with an 8-bit shader or
-                // getting the deltas to apply directly to the 24-bit buffer.
+                // applying the deltas directly to the 32-bit buffer.
                 for (int y = 0; y < Height; y++)
                     for (int x = 0; x < Width; x++)
-                        buffer24[(Height-y-1) * Width + x] = palette[buffer8[y * Width + x]];
+                        buffer32[(Height - y - 1) * Width + x] = palette[frame[y * Width + x]];
 
-                yield return buffer24;
+                yield return (buffer32, delay);
             }
         }
     }

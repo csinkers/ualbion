@@ -3124,7 +3124,7 @@
     "Assets": {}
   },
   "$(LANG)/FLICS0.XLD": {
-    "Format": "Video",
+    "Format": "FlicVideo",
     "Assets": {}
   },
   "$(LANG)/MAPTEXT1.XLD": {

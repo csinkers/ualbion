@@ -14232,29 +14232,67 @@
     }
   },
   "$(LANG)/FLICS0.XLD": {
-    "Format": "Video",
+    "Format": "FlicVideo",
     "EnumName": "VideoId",
     "EnumType": "byte",
     "Assets": {
-      "0": {},
-      "1": {},
-      "2": {},
-      "3": {},
-      "4": {},
-      "5": {},
-      "6": {},
-      "7": {},
-      "8": {},
-      "9": {},
-      "10": {},
-      "11": {},
-      "12": {},
-      "13": {},
-      "14": {},
-      "15": {},
-      "16": {},
-      "17": {},
-      "18": {}
+      "0": {
+        "Name": "Magic Demonstration"
+      },
+      "1": {
+        "Name": "Kitty Titties"
+      },
+      "2": {
+        "Name": "Ship Malfunction"
+      },
+      "3": {
+        "Name": "Post Malfunction"
+      },
+      "4": {
+        "Name": "Ship Explosion"
+      },
+      "5": {
+        "Name": "Dream (Short)"
+      },
+      "6": {
+        "Name": "Assassination"
+      },
+      "7": {
+        "Name": "Flashbang"
+      },
+      "8": {
+        "Name": "Small Explosion"
+      },
+      "9": {
+        "Name": "Ned's Dead"
+      },
+      "10": {
+        "Name": "Game Over"
+      },
+      "11": {
+        "Name": "Approach to Albion"
+      },
+      "12": {
+        "Name": "Shuttle Flying to Toronto"
+      },
+      "13": {
+        "Name": "Throwing Seed"
+      },
+      "14": {
+        "Name": "Cpu Go Boom"
+      },
+      "15": {
+        "Name": "Endgame 1"
+      },
+      "16": {
+        "Name": "Endgame 2"
+      },
+      "17": {
+        "Name": "Endgame 3"
+      },
+      "18": {
+        "Name": "Endgame 4"
+      }
     }
   },
   "$(LANG)/MAPTEXT1.XLD": {

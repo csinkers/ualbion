@@ -8,7 +8,6 @@ namespace UAlbion.Formats.Assets.Flic
     {
         readonly int _videoWidth;
         readonly int _videoHeight;
-        const int HeaderSize = 16;
 
         public FlicFrame(int width, int height)
         {
@@ -19,6 +18,9 @@ namespace UAlbion.Formats.Assets.Flic
         public override FlicChunkType Type => FlicChunkType.Frame;
         public IList<FlicChunk> SubChunks { get; } = new List<FlicChunk>();
         public ushort Delay { get; private set; }
+        public ushort Width { get; private set; } // Overrides, usually 0.
+        public ushort Height { get; private set; }
+
         protected override uint LoadChunk(uint length, BinaryReader br)
         {
             var initialOffset = br.BaseStream.Position;
@@ -28,14 +30,11 @@ namespace UAlbion.Formats.Assets.Flic
             Width = br.ReadUInt16();
             Height = br.ReadUInt16();
 
-            for(int i = 0; i < subChunkCount; i++)
+            for (int i = 0; i < subChunkCount; i++)
                 SubChunks.Add(Load(br, _videoWidth, _videoHeight));
 
             ApiUtil.Assert(br.BaseStream.Position == initialOffset + length);
             return length;
         }
-
-        public ushort Width { get; private set; }
-        public ushort Height { get; private set; }
     }
 }

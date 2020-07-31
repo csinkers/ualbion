@@ -12,7 +12,7 @@
         Palette,
         PaletteCommon,
         SingleHeaderSprite,
-        Video,
+        FlicVideo,
         Font,
         Slab, // Just a FixedSizeSprite, but custom loader to add a subimage for the status bar
 

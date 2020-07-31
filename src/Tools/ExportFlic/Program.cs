@@ -29,7 +29,7 @@ namespace UAlbion.Tools.ExportFlic
                     flic.Speed,
                     flic.Width,
                     flic.Height,
-                    flic.AllFrames());
+                    flic.AllFrames32());
                 // break;
             }
         }

@@ -30,7 +30,6 @@ namespace UAlbion.Formats.Assets.Flic
 
             public LineToken(BinaryReader br)
             {
-                StartedAt = br.BaseStream.Position;
                 ColumnSkipCount = br.ReadByte();
                 SignedCount = br.ReadSByte(); // +ve = verbatim, -ve = RLE
 
@@ -45,12 +44,7 @@ namespace UAlbion.Formats.Assets.Flic
                     PixelData ??= new ushort[1];
                     PixelData[0] = br.ReadUInt16();
                 }
-
-                BytesRead = (ushort)(br.BaseStream.Position - StartedAt);
             }
-
-            public long StartedAt { get; }
-            public ushort BytesRead { get; }
         }
 
         public class Line
@@ -64,8 +58,6 @@ namespace UAlbion.Formats.Assets.Flic
 
             public Line(BinaryReader br)
             {
-                StartedAt = br.BaseStream.Position;
-
                 int remaining = 1;
                 while (remaining > 0)
                 {
@@ -91,27 +83,19 @@ namespace UAlbion.Formats.Assets.Flic
                         default: throw new ArgumentOutOfRangeException();
                     }
                 }
-
-                BytesRead = (ushort)(br.BaseStream.Position - StartedAt);
             }
-
-            public long StartedAt { get; }
-            public ushort BytesRead { get; }
         }
 
         public Line[] Lines { get; private set; }
-        public long StartedAt { get; private set; }
-        public ushort BytesRead { get; private set; }
 
         protected override uint LoadChunk(uint length, BinaryReader br)
         {
-            StartedAt = br.BaseStream.Position;
+            var start = br.BaseStream.Position;
             ushort lineCount = br.ReadUInt16();
             Lines ??= new Line[lineCount];
             for(int i = 0; i < lineCount; i++)
                 Lines[i] = new Line(br);
-            BytesRead = (ushort)(br.BaseStream.Position - StartedAt);
-            return BytesRead;
+            return (ushort)(br.BaseStream.Position - start);
         }
 
         public void Apply(byte[] buffer8, int width)

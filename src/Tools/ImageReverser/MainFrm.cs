@@ -205,7 +205,7 @@ namespace UAlbion.Tools.ImageReverser
                 case FileFormat.PaletteCommon:
                     break;
 
-                case FileFormat.Video:
+                case FileFormat.FlicVideo:
                     break;
 
                 case FileFormat.MapData:

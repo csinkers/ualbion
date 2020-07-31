@@ -5,6 +5,7 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.Assets.Save;
@@ -21,7 +22,7 @@ namespace UAlbion.Game
         ISample LoadSample(SampleId id);
         ISample LoadWaveLib(SongId songId, int instrument);
         byte[] LoadSoundBanks();
-        AlbionVideo LoadVideo(VideoId id, GameLanguage language);
+        FlicFile LoadVideo(VideoId id, GameLanguage language);
         AlbionPalette LoadPalette(PaletteId id);
         IMapData LoadMap(MapDataId id);
         ItemData LoadItem(ItemId id);

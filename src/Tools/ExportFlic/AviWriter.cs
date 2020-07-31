@@ -12,7 +12,7 @@ namespace UAlbion.Tools.ExportFlic
             uint framesPerSecond,
             uint width,
             uint height,
-            IEnumerable<uint[]> frames)
+            IEnumerable<(uint[], ushort)> frames)
         {
             AVIFileInit();
             AVIFileOpenW(out var fileHandle, fileName, OF_WRITE | OF_CREATE, 0);
@@ -23,7 +23,7 @@ namespace UAlbion.Tools.ExportFlic
                 fccType = StreamTypeVideo,
                 fccHandler = StreamCompressor,
                 dwFlags = 0, dwCaps = 0, wPriority = 0, wLanguage = 0,
-                dwScale = 20,
+                dwScale = 15,
                 dwRate = framesPerSecond,
                 dwStart = 0,
                 dwLength = 0,
@@ -81,7 +81,7 @@ namespace UAlbion.Tools.ExportFlic
             // 80044068
             AVIStreamSetFormat(compressedStream, 0, ref bi, 40);
             int count = 0;
-            foreach (var frame in frames)
+            foreach (var (frame, delay) in frames)
             {
                 fixed (uint* framePtr = frame)
                 {

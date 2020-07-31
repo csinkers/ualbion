@@ -9,7 +9,6 @@ namespace UAlbion.Formats.Assets.Flic
         public abstract FlicChunkType Type { get; }
         protected abstract uint LoadChunk(uint length, BinaryReader br);
 
-        // Need w & h to fixup issue in CopyChunk size
         public static FlicChunk Load(BinaryReader br, int width, int height) 
         {
             var chunkSizeOffset = br.BaseStream.Position;
@@ -23,13 +22,13 @@ namespace UAlbion.Formats.Assets.Flic
             {
                 FlicChunkType.Palette8Bit          => new Palette8Chunk(),
                 FlicChunkType.DeltaWordOrientedRle => new DeltaFlcChunk(),
+                FlicChunkType.FullByteOrientedRle  => new FullByteOrientedRleChunk(width, height),
+                FlicChunkType.FullUncompressed     => new CopyChunk(),
+                FlicChunkType.Frame                => new FlicFrame(width, height),
                 // FlicChunkType.Palette6Bit          => new Palette6Chunk(),
                 // FlicChunkType.DeltaByteOrientedRle => new DeltaFliChunk(),
                 // FlicChunkType.BlackFrameData       => new BlackFrameChunk(),
-                // FlicChunkType.FullByteOrientedRle  => new FullByteOrientedRleChunk(),
-                FlicChunkType.FullUncompressed     => new CopyChunk(),
                 // FlicChunkType.Thumbnail            => new ThumbnailChunk(),
-                FlicChunkType.Frame => new FlicFrame(width, height),
                 _ => new UnknownChunk(type)
             };
 
@@ -43,6 +42,15 @@ namespace UAlbion.Formats.Assets.Flic
             chunkSize = c.LoadChunk(chunkSize - ChunkHeaderSize, br) + ChunkHeaderSize;
 
             var actualChunkSize = br.BaseStream.Position - chunkSizeOffset;
+
+            if (actualChunkSize - chunkSize < 4) // pad
+            {
+                for (long i = chunkSize - actualChunkSize; i != 0; i--)
+                    br.ReadByte();
+
+                actualChunkSize = br.BaseStream.Position - chunkSizeOffset;
+            }
+
             ApiUtil.Assert(actualChunkSize == chunkSize);
             return c;
         }

@@ -8,6 +8,7 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Map;
 using UAlbion.Formats.Assets.Save;
@@ -111,7 +112,7 @@ namespace UAlbion.Game.Assets
                ))?.GetSample(instrument);
 
         public byte[] LoadSoundBanks() => (byte[]) _assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.SoundBank));
-        public AlbionVideo LoadVideo(VideoId id, GameLanguage language) => (AlbionVideo)_assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.Flic, (ushort)id, language));
+        public FlicFile LoadVideo(VideoId id, GameLanguage language) => (FlicFile)_assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.Flic, (ushort)id, language));
         public CharacterSheet LoadPartyMember(PartyCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(id.ToAssetId());
         public CharacterSheet LoadNpc(NpcCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(id.ToAssetId());
         public CharacterSheet LoadMonster(MonsterCharacterId id) => (CharacterSheet)_assetLocatorRegistry.LoadAssetCached(id.ToAssetId());

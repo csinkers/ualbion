@@ -112,6 +112,7 @@ namespace UAlbion
                 .Add(new DeviceObjectManager())
                 .Add(new SpriteManager())
                 .Add(new TextureManager())
+                .Add(new VideoManager())
                 .Add(new EventChainManager())
                 .Add(new Querier())
                 .Add(new MapManager())

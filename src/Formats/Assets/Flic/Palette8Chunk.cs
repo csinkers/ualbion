@@ -55,9 +55,9 @@ namespace UAlbion.Formats.Assets.Flic
                 {
                     palette[i] =
                           (uint) 0xff << 24 // Alpha
-                        | (uint) packet.Triplets[j++] << 16 // Red
+                        | (uint) packet.Triplets[j++] // Red
                         | (uint) packet.Triplets[j++] << 8 // Green
-                        | (uint) packet.Triplets[j++] // Blue
+                        | (uint) packet.Triplets[j++] << 16 // Blue
                         ;
                 }
             }

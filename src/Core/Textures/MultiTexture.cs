@@ -100,6 +100,7 @@ namespace UAlbion.Core.Textures
         }
 
         public int SizeInBytes => (int)(Width * Height * LayerSizes.Count * FormatSize);
+        public void Invalidate() => IsDirty = true; 
 
         public bool IsAnimated(int logicalId)
         {

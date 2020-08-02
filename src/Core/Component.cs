@@ -122,7 +122,7 @@ namespace UAlbion.Core
         /// </summary>
         /// <typeparam name="T">The event type to handle</typeparam>
         /// <param name="callback">The function to call when the event is raised</param>
-        protected void On<T>(Action<T> callback)
+        protected void On<T>(Action<T> callback) where T : IEvent
         {
             if (_handlers.ContainsKey(typeof(T)))
                 return;

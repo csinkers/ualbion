@@ -1,5 +1,6 @@
 ﻿using UAlbion.Api;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
@@ -17,25 +18,30 @@ namespace UAlbion.Game
         {
             On<SlowClockEvent>(e => OnTick(e.Delta));
             On<LoadPaletteEvent>(e => SetPalette(e.PaletteId));
+            On<LoadRawPaletteEvent>(e =>
+            {
+                Palette = null;
+                GeneratePalette(e.Name, e.Entries);
+            });
         }
 
         protected override void Subscribed()
         {
             base.Subscribed();
-            if (Palette == null)
+            if (PaletteTexture == null)
                 SetPalette(PaletteId.Toronto2D);
         }
 
         void OnTick(int frames)
         {
-            if (!Palette.IsAnimated)
+            if (Palette == null || !Palette.IsAnimated)
                 return;
 
             Frame += frames;
             while (Frame >= Palette.GetCompletePalette().Count)
                 Frame -= Palette.GetCompletePalette().Count;
 
-            GeneratePalette();
+            GeneratePalette(Palette.Name, Palette.GetPaletteAtTime(Frame));
         }
 
         void SetPalette(PaletteId paletteId)
@@ -51,13 +57,13 @@ namespace UAlbion.Game
             while (Frame >= Palette.GetCompletePalette().Count)
                 Frame -= Palette.GetCompletePalette().Count;
 
-            GeneratePalette();
+            GeneratePalette(Palette.Name, Palette.GetPaletteAtTime(Frame));
         }
 
-        void GeneratePalette()
+        void GeneratePalette(string name, uint[] rawPalette)
         {
             var factory = Resolve<ICoreFactory>();
-            PaletteTexture = factory.CreatePaletteTexture(Palette.Name, Palette.GetPaletteAtTime(Frame));
+            PaletteTexture = factory.CreatePaletteTexture(name, rawPalette);
             Version++;
         }
     }

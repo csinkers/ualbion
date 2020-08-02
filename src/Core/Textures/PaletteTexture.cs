@@ -32,5 +32,6 @@ namespace UAlbion.Core.Textures
         }
 
         public SubImage GetSubImageDetails(int subImageId) => SubImage;
+        public void Invalidate() => IsDirty = true;
     }
 }

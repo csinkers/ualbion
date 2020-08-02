@@ -43,6 +43,7 @@ namespace UAlbion.Core.Textures
         }
 
         public bool ContainsColors(IEnumerable<byte> colors) => TextureData.Distinct().Intersect(colors).Any();
+        public void Invalidate() => IsDirty = true;
 
         public void GetSubImageOffset(int id, out int width, out int height, out int offset, out int stride)
         {

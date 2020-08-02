@@ -16,7 +16,7 @@ namespace UAlbion.Core.Tests
         public new int RaiseAsync(IAsyncEvent e, Action continuation) => base.RaiseAsync(e, continuation);
         public new int RaiseAsync<T>(IAsyncEvent<T> e, Action<T> continuation) => base.RaiseAsync(e, continuation);
         public new void Enqueue(IEvent e) => base.Enqueue(e);
-        public void AddHandler<T>(Action<T> handler)
+        public void AddHandler<T>(Action<T> handler) where T : IEvent
         {
             On<T>(e =>
             {

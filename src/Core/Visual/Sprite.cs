@@ -2,11 +2,37 @@
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core.Events;
+using UAlbion.Core.Textures;
 
 namespace UAlbion.Core.Visual
 {
-    public class Sprite<T> : Component, IPositioned where T : Enum
+    public class Sprite<T> : Sprite where T : Enum
     {
+        public static Sprite<T> CharacterSprite(T id) =>
+            new Sprite<T>(id, Vector3.Zero, DrawLayer.Character, 0, SpriteFlags.BottomAligned);
+
+        public static Sprite<T> ScreenSpaceSprite(T id, Vector2 position, Vector2 size) =>
+            new Sprite<T>(id, new Vector3(position, 0), DrawLayer.Interface,
+                SpriteKeyFlags.NoTransform,
+                SpriteFlags.LeftAligned) { Size = size };
+
+        static ITexture TextureFunc(Sprite sprite)
+        {
+            var s = (Sprite<T>)sprite;
+            var assets = s.Resolve<ITextureLoader>();
+            return assets.LoadTexture(s.Id);
+        }
+
+        public Sprite(T id, Vector3 position, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags)
+            : base(TextureFunc, position, layer, keyFlags, flags) =>
+            Id = id;
+
+        public T Id { get; }
+    }
+
+    public class Sprite : Component, IPositioned
+    {
+        readonly Func<Sprite, ITexture> _textureFunc;
         readonly DrawLayer _layer;
         readonly SpriteKeyFlags _keyFlags;
         SpriteLease _sprite;
@@ -16,15 +42,15 @@ namespace UAlbion.Core.Visual
         SpriteFlags _flags;
         bool _dirty = true;
 
-        public static Sprite<T> CharacterSprite(T id) =>
-            new Sprite<T>(id, Vector3.Zero, DrawLayer.Character, 0, SpriteFlags.BottomAligned);
+        public static Sprite CharacterSprite(Func<Sprite, ITexture> textureFunc) =>
+            new Sprite(textureFunc, Vector3.Zero, DrawLayer.Character, 0, SpriteFlags.BottomAligned);
 
-        public static Sprite<T> ScreenSpaceSprite(T id, Vector2 position, Vector2 size) =>
-            new Sprite<T>(id, new Vector3(position, 0), DrawLayer.Interface,
+        public static Sprite ScreenSpaceSprite(Func<Sprite, ITexture> textureFunc, Vector2 position, Vector2 size) =>
+            new Sprite(textureFunc, new Vector3(position, 0), DrawLayer.Interface,
                 SpriteKeyFlags.NoTransform,
                 SpriteFlags.LeftAligned) { Size = size };
 
-        public Sprite(T id, Vector3 position, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags)
+        public Sprite(Func<Sprite, ITexture> textureFunc, Vector3 position, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags)
         {
             On<BackendChangedEvent>(_ => Dirty = true);
             On<RenderEvent>(e => UpdateSprite());
@@ -40,16 +66,15 @@ namespace UAlbion.Core.Visual
                     Flags &= ~SpriteFlags.Highlight;
             });
 
-            Id = id;
             Position = position;
             _layer = layer;
             _keyFlags = keyFlags;
             _flags = flags;
+            _textureFunc = textureFunc;
         }
 
         public event EventHandler<SpriteSelectedEventArgs> Selected;
         public Vector3 Normal => Vector3.UnitZ; // TODO
-        public T Id { get; }
 
         public Vector3 Position
         {
@@ -134,12 +159,11 @@ namespace UAlbion.Core.Visual
                 return;
             Dirty = false;
 
-            var assets = Resolve<ITextureLoader>();
             var sm = Resolve<ISpriteManager>();
 
             if (_sprite == null)
             {
-                var texture = assets.LoadTexture(Id);
+                var texture = _textureFunc(this);
                 if (texture == null)
                 {
                     _sprite?.Dispose();

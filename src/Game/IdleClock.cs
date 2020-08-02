@@ -6,7 +6,7 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
-    public class IdleClockEvent : GameEvent, IVerboseEvent { }
+    [Event("idle")] public class IdleClockEvent : GameEvent, IVerboseEvent { }
     public class IdleClock : Component
     {
         readonly IdleClockEvent _event = new IdleClockEvent();

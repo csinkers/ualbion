@@ -63,6 +63,7 @@ namespace UAlbion.Core.Veldrid.Textures
         }
 
         public SubImage GetSubImageDetails(int subImageId) => _subImage;
+        public void Invalidate() => IsDirty = true;
 
         public unsafe Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
         {

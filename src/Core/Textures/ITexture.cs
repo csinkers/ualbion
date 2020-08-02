@@ -10,8 +10,9 @@
         uint ArrayLayers { get; }
         bool IsDirty { get; }
         int SubImageCount { get; }
-        SubImage GetSubImageDetails(int subImage);
         int SizeInBytes { get; }
         uint FormatSize { get; }
+        SubImage GetSubImageDetails(int subImage);
+        void Invalidate();
     }
 }

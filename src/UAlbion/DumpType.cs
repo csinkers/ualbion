@@ -14,7 +14,8 @@ namespace UAlbion
         Maps        = 1 << 6,
         Spells      = 1 << 7,
         ThreeDMaps  = 1 << 8,
+        MonsterGroups = 1 << 9,
 
-        All = 0x7fffffff
+        All = 0x7fffffff,
     }
 }

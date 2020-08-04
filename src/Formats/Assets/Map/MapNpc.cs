@@ -12,10 +12,10 @@ namespace UAlbion.Formats.Assets.Map
         [Flags]
         public enum NpcFlags : byte
         {
-            Unk0 = 1,
-            Unk1 = 1 << 1,
+            NonPartySeeking = 1,
+            IsMonster = 1 << 1,
             Unk2 = 1 << 2,
-            Unk3 = 1 << 3,
+            Unk3 = 1 << 3, // Has contact event?
             Unk4 = 1 << 4,
             Unk5 = 1 << 5,
             Unk6 = 1 << 6,
@@ -28,7 +28,7 @@ namespace UAlbion.Formats.Assets.Map
             RandomMask = 3,
             Random1 = 1,
             Random2 = 2,
-            FollowParty = 4,
+            Unk4 = 4,
             Stationary = 8,
         }
 
@@ -39,10 +39,10 @@ namespace UAlbion.Formats.Assets.Map
             public override string ToString() => $"({X}, {Y})";
         }
 
-        public byte? Id { get; set; }
+        public byte? Id { get; set; } // MonsterGroup, NpcCharacterId etc
         // public SampleId? Sound { get; set; }
         public byte Sound { get; set; }
-        public ushort ObjectNumber { get; set; }
+        public ushort ObjectNumber { get; set; } // LargeNpcGfx, SmallNpcGfx etc
         public NpcFlags Flags { get; set; } // 1=Dialogue, 2=AutoAttack, 11=ReturnMsg
         public MovementType Movement { get; set; }
         public byte Unk8 { get; set; }

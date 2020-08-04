@@ -154,7 +154,12 @@ namespace UAlbion
                         continue;
 
                     var wp = npc.Waypoints.FirstOrDefault();
-                    var idText = npc.Id.ToString().PadLeft(15);
+                    object typedId = (npc.Flags & MapNpc.NpcFlags.IsMonster) == 0
+                        ? (object)(NpcCharacterId?)npc.Id
+                        : (MonsterGroupId?)npc.Id;
+
+                    typedId ??= "";
+                    var idText = typedId.ToString().PadLeft(15);
 
                     sw.Write($"    Npc{j:D3}: {idText} ({(int?)npc.Id:D3}) ");
                     sw.Write($"X:{wp.X:D3} Y:{wp.Y:D3} ");
@@ -526,6 +531,28 @@ namespace UAlbion
                 sw.Write($"Env:{spell.Environment} ");
                 sw.Write($"Target:{spell.Targets} ");
                 sw.WriteLine();
+            }
+        }
+
+        public static void MonsterGroups(AssetManager assets, string baseDir)
+        {
+            using var sw = File.CreateText($@"{baseDir}\re\MonsterGroups.txt");
+            foreach (var groupId in Enum.GetValues(typeof(MonsterGroupId)).Cast<MonsterGroupId>())
+            {
+                var group = assets.LoadMonsterGroup(groupId);
+                if (group == null)
+                    continue;
+
+                var counts =
+                    group.Grid
+                        .Where(x => x != null)
+                        .Select(x => x.Value)
+                        .GroupBy(x => x)
+                        .OrderBy(x => x.Key)
+                        .ToDictionary(x => x.Key, x => x.Count());
+                sw.Write($"{(int)groupId}: ");
+                var countString = string.Join(" ", counts.Select(x => $"{x.Value}x{x.Key}"));
+                sw.WriteLine(countString);
             }
         }
     }

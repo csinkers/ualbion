@@ -147,5 +147,8 @@ namespace UAlbion.Game.Assets
         }
         public SavedGame LoadSavedGame(ushort id) 
             => (SavedGame)_assetLocatorRegistry.LoadAsset(new AssetKey(AssetType.SavedGame, id));
+
+        public MonsterGroup LoadMonsterGroup(MonsterGroupId groupId)
+            => (MonsterGroup)_assetLocatorRegistry.LoadAssetCached(groupId.ToAssetId());
     }
 }

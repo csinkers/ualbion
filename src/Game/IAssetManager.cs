@@ -41,5 +41,6 @@ namespace UAlbion.Game
         IList<IEvent> LoadScript(ScriptId scriptId);
         SpellData LoadSpell(SpellId spellId);
         SavedGame LoadSavedGame(ushort id);
+        MonsterGroup LoadMonsterGroup(MonsterGroupId groupId);
     }
 }

@@ -64,7 +64,6 @@ namespace UAlbion.Game.Entities.Map2D
             TileSize = new Vector3(renderable.TileSize, 1.0f);
             _logicalMap.TileSize = renderable.TileSize;
 
-
             var movementSettings = _logicalMap.UseSmallSprites ? MovementSettings.Small() : MovementSettings.Large();
             _partyMovement = AttachChild(new PartyCaterpillar(Vector2.Zero, MovementDirection.Right, movementSettings));
 

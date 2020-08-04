@@ -99,6 +99,7 @@ namespace UAlbion
                     if ((dumpTypes & DumpType.Maps) != 0) Dump.MapData(assets, tf, baseDir);
                     if ((dumpTypes & DumpType.Spells) != 0) Dump.Spells(assets, tf, baseDir);
                     if ((dumpTypes & DumpType.ThreeDMaps) != 0) Dump.ThreeDMapAndLabInfo(assets, baseDir);
+                    if ((dumpTypes & DumpType.MonsterGroups) != 0) Dump.MonsterGroups(assets, baseDir);
                     break;
 
                 case ExecutionMode.Exit: break;

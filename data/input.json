@@ -19,7 +19,10 @@
     "Alt+1": "set_language English",
     "Alt+2": "set_language German",
     "Alt+3": "set_language French",
-    "Alt+F2":  "load_map_prompt" 
+    "Alt+F2":  "load_map_prompt",
+
+    "Space": "dismiss_message",
+    "Period": "dismiss_message" 
   },
   "World2D": {
     "Escape": "push_scene MainMenu",
@@ -102,9 +105,7 @@
     "Number4": "respond 4",
     "Number5": "respond 5",
     "Number6": "respond 6",
-    "Number7": "respond 7",
-    "Space": "dismiss_message",
-    "Period": "dismiss_message" 
+    "Number7": "respond 7"
   },
   "MainMenu": {
     "Control+N": "new_game 300 32 75",

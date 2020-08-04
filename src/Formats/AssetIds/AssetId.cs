@@ -58,7 +58,6 @@ namespace UAlbion.Formats.AssetIds
             AssetType.SpellData          => ((SpellId)Id).ToString(),
             AssetType.SystemText         => ((SystemTextId)Id).ToString(),
             AssetType.TacticalIcon       => ((TacticId)Id).ToString(),
-            AssetType.TransparencyTables => ((TranslationTableId)Id).ToString(),
             AssetType.Flic               => ((VideoId)Id).ToString(),
             AssetType.WaveLibrary        => ((WaveLibraryId)Id).ToString(),
             AssetType.Dictionary         => ((WordId)Id).ToString(),
@@ -113,7 +112,6 @@ namespace UAlbion.Formats.AssetIds
         public static implicit operator AssetId(SpellId id)              => new AssetId(AssetType.SpellData,          (ushort)id);
         public static implicit operator AssetId(SystemTextId id)         => new AssetId(AssetType.SystemText,         (ushort)id);
         public static implicit operator AssetId(TacticId id)             => new AssetId(AssetType.TacticalIcon,       (ushort)id);
-        public static implicit operator AssetId(TranslationTableId id)   => new AssetId(AssetType.TransparencyTables, (ushort)id);
         public static implicit operator AssetId(VideoId id)              => new AssetId(AssetType.Flic,               (ushort)id);
         public static implicit operator AssetId(WaveLibraryId id)        => new AssetId(AssetType.WaveLibrary,        (ushort)id);
         public static implicit operator AssetId(WordId id)               => new AssetId(AssetType.Dictionary,         (ushort)id);

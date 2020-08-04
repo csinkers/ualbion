@@ -49,8 +49,8 @@ namespace UAlbion.Formats.Assets.Save
         public NpcState[] Npcs { get; } = new NpcState[MaxNpcCount];
         public byte[] Unknown5B71 { get; set; } 
         public Unknown35Byte[] Unk35Byte { get; set; } // Len = 16
-        public IList<MapChange> PermanentMapChanges { get; private set; } = new List<MapChange>();
-        public IList<MapChange> TemporaryMapChanges { get; private set; } = new List<MapChange>();
+        public MapChangeList PermanentMapChanges { get; private set; } = new MapChangeList();
+        public MapChangeList TemporaryMapChanges { get; private set; } = new MapChangeList();
         public IList<VisitedEvent> VisitedEvents { get; private set; } = new List<VisitedEvent>();
         public IList<PartyCharacterId?> ActiveMembers { get; private set; } = new PartyCharacterId?[MaxPartySize];
 
@@ -121,12 +121,23 @@ namespace UAlbion.Formats.Assets.Save
             uint permChangesSize = s.UInt32("PermanentMapChanges_Size", (uint)(save.PermanentMapChanges.Count * MapChange.SizeOnDisk + 2));
             ushort permChangesCount = s.UInt16("PermanentMapChanges_Count", (ushort)save.PermanentMapChanges.Count);
             ApiUtil.Assert(permChangesSize == permChangesCount * MapChange.SizeOnDisk + 2);
-            save.PermanentMapChanges = s.List(nameof(PermanentMapChanges), save.PermanentMapChanges, permChangesCount, MapChange.Serdes);
+            save.PermanentMapChanges = (MapChangeList)s.List(
+                nameof(PermanentMapChanges),
+                save.PermanentMapChanges,
+                permChangesCount,
+                MapChange.Serdes,
+                _ => new MapChangeList());
 
             uint tempChangesSize = s.UInt32("TemporaryMapChanges_Size", (uint)(save.TemporaryMapChanges.Count * MapChange.SizeOnDisk + 2));
             ushort tempChangesCount = s.UInt16("TemporaryMapChanges_Count", (ushort)save.TemporaryMapChanges.Count);
             ApiUtil.Assert(tempChangesSize == tempChangesCount * MapChange.SizeOnDisk + 2);
-            save.TemporaryMapChanges = s.List(nameof(TemporaryMapChanges), save.TemporaryMapChanges, tempChangesCount, MapChange.Serdes);
+
+            save.TemporaryMapChanges = (MapChangeList)s.List(
+                nameof(TemporaryMapChanges),
+                save.TemporaryMapChanges,
+                tempChangesCount,
+                MapChange.Serdes,
+                _ => new MapChangeList());
 
             uint visitedEventsSize = s.UInt32("VisitedEvents_Size", (uint)(save.VisitedEvents.Count * VisitedEvent.SizeOnDisk + 2));
             ushort visitedEventsCount = s.UInt16("VisitedEvents_Count", (ushort)save.VisitedEvents.Count);

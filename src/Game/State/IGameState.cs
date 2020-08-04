@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
@@ -18,7 +17,7 @@ namespace UAlbion.Game.State
         IInventory GetInventory(InventoryId id);
         short GetTicker(TickerId id);
         bool GetSwitch(SwitchId id);
-        IList<MapChange> TemporaryMapChanges { get; }
-        IList<MapChange> PermanentMapChanges { get; }
+        MapChangeList TemporaryMapChanges { get; }
+        MapChangeList PermanentMapChanges { get; }
     }
 }

@@ -157,7 +157,7 @@ namespace UAlbion.Game.Entities.Map2D
 
             byte x = (byte)(e.X + mapSource.X);
             byte y = (byte)(e.Y + mapSource.Y);
-            _logicalMap.Modify(x,y, e.ChangeType, e.Value, (e.Scope & EventScope.Temp) != 0);
+            _logicalMap.Modify(x, y, e.ChangeType, e.Value, (e.Scope & EventScope.Temp) != 0);
         }
     }
 }

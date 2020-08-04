@@ -1,6 +1,6 @@
 ﻿namespace UAlbion.Formats.Assets
 {
-    public enum InventoryType
+    public enum InventoryType : byte
     {
         Player,
         Chest,

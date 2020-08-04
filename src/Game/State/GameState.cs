@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -27,8 +26,8 @@ namespace UAlbion.Game.State
         public short GetTicker(TickerId id) => _game != null && _game.Tickers.TryGetValue(id, out var value) ? value : (short)0;
         public bool GetSwitch(SwitchId id) => _game != null && _game.Switches.TryGetValue(id, out var value) && value;
 
-        public IList<MapChange> TemporaryMapChanges => _game.TemporaryMapChanges;
-        public IList<MapChange> PermanentMapChanges => _game.PermanentMapChanges;
+        public MapChangeList TemporaryMapChanges => _game.TemporaryMapChanges;
+        public MapChangeList PermanentMapChanges => _game.PermanentMapChanges;
         public MapDataId MapId => _game?.MapId ?? 0;
 
         public GameState()

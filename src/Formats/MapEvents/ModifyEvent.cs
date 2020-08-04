@@ -8,22 +8,22 @@ namespace UAlbion.Formats.MapEvents
         public static ModifyEvent Serdes(ModifyEvent genericEvent, ISerializer s)
         {
             var subType = s.EnumU8("SubType", genericEvent?.SubType ?? ModifyType.Unk2);
-            switch (subType)
+            return subType switch
             {
-                case ModifyType.SetTemporarySwitch:     return SetTemporarySwitchEvent.Serdes((SetTemporarySwitchEvent)genericEvent, s);
-                case ModifyType.DisableEventChain:      return DisableEventChainEvent.Serdes((DisableEventChainEvent)genericEvent, s);
-                case ModifyType.SetNpcActive:           return SetNpcActiveEvent.Serdes((SetNpcActiveEvent)genericEvent, s);
-                case ModifyType.AddPartyMember:         return AddPartyMemberEvent.Serdes((AddPartyMemberEvent)genericEvent, s);
-                case ModifyType.AddRemoveInventoryItem: return AddRemoveInventoryItemEvent.Serdes((AddRemoveInventoryItemEvent)genericEvent, s);
-                case ModifyType.SetMapLighting:         return SetMapLightingEvent.Serdes((SetMapLightingEvent)genericEvent, s);
-                case ModifyType.ChangePartyGold:        return ChangePartyGoldEvent.Serdes((ChangePartyGoldEvent)genericEvent, s);
-                case ModifyType.ChangePartyRations:     return ChangePartyRationsEvent.Serdes((ChangePartyRationsEvent)genericEvent, s);
-                case ModifyType.ChangeTime:             return ChangeTimeEvent.Serdes((ChangeTimeEvent)genericEvent, s);
-                case ModifyType.SetPartyLeader:         return SetPartyLeaderEvent.Serdes((SetPartyLeaderEvent)genericEvent, s);
-                case ModifyType.SetTicker:              return SetTickerEvent.Serdes((SetTickerEvent)genericEvent, s);
-                case ModifyType.Unk2:                   return DummyModifyEvent.Serdes((DummyModifyEvent)genericEvent, s);
-                default: throw new ArgumentOutOfRangeException();
-            }
+                ModifyType.SetTemporarySwitch => SetTemporarySwitchEvent.Serdes((SetTemporarySwitchEvent)genericEvent, s),
+                ModifyType.DisableEventChain => DisableEventChainEvent.Serdes((DisableEventChainEvent)genericEvent, s),
+                ModifyType.SetNpcActive => SetNpcActiveEvent.Serdes((SetNpcActiveEvent)genericEvent, s),
+                ModifyType.AddPartyMember => AddPartyMemberEvent.Serdes((AddPartyMemberEvent)genericEvent, s),
+                ModifyType.AddRemoveInventoryItem => AddRemoveInventoryItemEvent.Serdes((AddRemoveInventoryItemEvent)genericEvent, s),
+                ModifyType.SetMapLighting => SetMapLightingEvent.Serdes((SetMapLightingEvent)genericEvent, s),
+                ModifyType.ChangePartyGold => ChangePartyGoldEvent.Serdes((ChangePartyGoldEvent)genericEvent, s),
+                ModifyType.ChangePartyRations => ChangePartyRationsEvent.Serdes((ChangePartyRationsEvent)genericEvent, s),
+                ModifyType.ChangeTime => ChangeTimeEvent.Serdes((ChangeTimeEvent)genericEvent, s),
+                ModifyType.SetPartyLeader => SetPartyLeaderEvent.Serdes((SetPartyLeaderEvent)genericEvent, s),
+                ModifyType.SetTicker => SetTickerEvent.Serdes((SetTickerEvent)genericEvent, s),
+                ModifyType.Unk2 => DummyModifyEvent.Serdes((DummyModifyEvent)genericEvent, s),
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
         public enum ModifyType : byte

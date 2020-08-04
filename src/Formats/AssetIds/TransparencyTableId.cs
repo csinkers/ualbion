@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 namespace UAlbion.Formats.AssetIds
 {
-    public enum TranslationTableId : byte
+    public enum TransparencyTableId : byte
     {
         Unknown0 = 0,
         Unknown1 = 1,

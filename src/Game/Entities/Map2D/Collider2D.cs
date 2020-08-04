@@ -32,11 +32,7 @@ namespace UAlbion.Game.Entities.Map2D
             return underlayBlocked || overlayBlocked;
         }
 
-        public Passability GetPassability(Vector2 tilePosition)
-        {
-            var underlayTile = _logicalMap.GetUnderlay((int)tilePosition.X, (int)tilePosition.Y);
-            var overlayTile = _logicalMap.GetOverlay((int)tilePosition.X, (int)tilePosition.Y);
-            return underlayTile?.Collision ?? overlayTile?.Collision ?? Passability.Passable;
-        }
+        public Passability GetPassability(Vector2 tilePosition) =>
+            _logicalMap.GetPassability(_logicalMap.Index((int)tilePosition.X, (int)tilePosition.Y));
     }
 }

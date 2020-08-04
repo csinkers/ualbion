@@ -16,14 +16,16 @@ namespace UAlbion.Game.Entities.Map2D
         readonly MapData2D _mapData;
         readonly TilesetData _tileData;
         readonly IList<Block> _blockList;
-        readonly IList<MapChange> _tempChanges;
-        readonly IList<MapChange> _permChanges;
+        readonly MapChangeList _tempChanges;
+        readonly MapChangeList _permChanges;
 
         public MapDataId Id => _mapData.Id;
 
-        public LogicalMap2D(IAssetManager assetManager, MapData2D mapData,
-            IList<MapChange> tempChanges,
-            IList<MapChange> permChanges)
+        public LogicalMap2D(
+            IAssetManager assetManager,
+            MapData2D mapData,
+            MapChangeList tempChanges,
+            MapChangeList permChanges)
         {
             _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
             _tempChanges = tempChanges ?? throw new ArgumentNullException(nameof(tempChanges));
@@ -51,7 +53,8 @@ namespace UAlbion.Game.Entities.Map2D
         public void Modify(byte x, byte y, IconChangeType changeType, ushort value, bool isTemporary)
         {
             ApplyChange(x, y, changeType, value, MapChange.Enum2.Norm);
-            // Add / update temp/perm changes
+            var collection = isTemporary ? _tempChanges : _permChanges;
+            collection.Update(Id, x, y, changeType, value);
         }
 
         void ApplyChange(byte x, byte y, IconChangeType changeType, ushort value, MapChange.Enum2 unk3)
@@ -103,6 +106,11 @@ namespace UAlbion.Game.Entities.Map2D
             int tileIndex = _mapData.Overlay[index];
             return tileIndex > 1 ? _tileData.Tiles[tileIndex] : null;
         }
+        
+        public Passability GetPassability(int index) => 
+            GetUnderlay(index)?.Collision 
+            ?? GetOverlay(index)?.Collision 
+            ?? Passability.Passable;
 
         public MapEventZone GetZone(int x, int y) => GetZone(Index(x, y));
         public MapEventZone GetZone(int index) => _mapData.ZoneLookup.TryGetValue(index, out var zone) ? zone : null;
@@ -141,7 +149,7 @@ namespace UAlbion.Game.Entities.Map2D
             }
         }
 
-        public void PlaceBlock(byte x, byte y, ushort blockId, bool overwrite)
+        void PlaceBlock(byte x, byte y, ushort blockId, bool overwrite)
         {
             if (blockId >= _blockList.Count)
             {
@@ -212,6 +220,7 @@ namespace UAlbion.Game.Entities.Map2D
         {
             var chain = _mapData.Chains[chainNumber];
             chain.Enabled = false;
+            // TODO: Save in temp/perm changes
         }
     }
 

@@ -3095,10 +3095,6 @@
     "Width": 32,
     "Assets": {}
   },
-  "TRANSTB0.XLD": {
-    "Format": "TranslationTable",
-    "Assets": {}
-  },
   "WAVELIB0.XLD": {
     "Format": "SampleLibrary",
     "Assets": {}

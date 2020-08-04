@@ -40,7 +40,6 @@
         MerchantInventory,
         MonsterGroup,
         SpellData,
-        TranslationTable,
         LabyrinthData,
         ItemData,
         ItemNames,

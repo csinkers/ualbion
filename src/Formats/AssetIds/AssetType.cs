@@ -66,7 +66,6 @@ namespace UAlbion.Formats.AssetIds
         [EnumType(typeof(SpellId))]              SpellData,          // Misc
         [EnumType(typeof(SystemTextId))]         SystemText,         // Text
         [EnumType(typeof(TacticId))]             TacticalIcon,       // Graphics
-        [EnumType(typeof(TranslationTableId))]   TransparencyTables, // Misc
         [EnumType(typeof(VideoId))]              Flic,               // Graphics
         [EnumType(typeof(WaveLibraryId))]        WaveLibrary,        // Audio
         [EnumType(typeof(WordId))]               Dictionary,         // Text

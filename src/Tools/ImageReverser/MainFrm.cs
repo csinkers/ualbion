@@ -222,7 +222,6 @@ namespace UAlbion.Tools.ImageReverser
                 case FileFormat.ChestInventory:
                 case FileFormat.MerchantInventory:
                 case FileFormat.MonsterGroup:
-                case FileFormat.TranslationTable:
                     break;
             }
 

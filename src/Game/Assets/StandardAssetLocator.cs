@@ -25,7 +25,7 @@ namespace UAlbion.Game.Assets
             { AssetType.Dictionary,         (AssetLocation.Localised, "WORDLIS!.XLD") }, // The words that can be used as conversation topics
             { AssetType.Script,             (AssetLocation.Base,      "SCRIPT!.XLD" ) }, // Scripted sequences of events for narrative sequences etc
             { AssetType.Picture,            (AssetLocation.Base,      "PICTURE!.XLD") }, // Full screen graphics for various special events, menu backgrounds etc (in the obscure ILBM / interlaced bitmap format from IBM)
-            { AssetType.TransparencyTables, (AssetLocation.Base,      "TRANSTB!.XLD") }, // Used for transparency / blending of palettised textures. Not needed when we have shaders.
+            // { AssetType.TransparencyTables, (AssetLocation.Base,      "TRANSTB!.XLD") }, // Used for transparency / blending of palettised textures. Not needed when we have shaders.
             // { AssetType.CoreGraphics,       (AssetLocation.MainExe,   "MAIN.EXE") }, // Various UI graphics that get loaded directly from the original game executable
             // { AssetType.CoreGraphicsMetadata, (AssetLocation.MainExe, "MAIN.EXE") },
             // { AssetType.Unnamed2,        (AssetLocation.Base,      ""            ) },

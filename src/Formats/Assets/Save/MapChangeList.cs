@@ -1,18 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Save
 {
     public class MapChangeList : List<MapChange>
     {
-        public enum ChunkType
-        {
-            MysterySmall = 0x3,
-            Xld = 0x11,
-            Mystery6Byte = 0xc8,
-        }
-
         public static MapChangeList Serdes(int _, MapChangeList c, ISerializer s)
         {
             c ??= new MapChangeList();
@@ -30,6 +26,23 @@ namespace UAlbion.Formats.Assets.Save
 
             s.End();
             return c;
+        }
+
+        public void Update(MapDataId mapId, byte x, byte y, IconChangeType type, ushort value)
+        {
+            var change = this.FirstOrDefault(c =>
+                c.MapId == mapId &&
+                c.X == x &&
+                c.Y == y &&
+                c.ChangeType == type);
+
+            if (change == null)
+            {
+                change = new MapChange { MapId = mapId, X = x, Y = y, ChangeType = type };
+                Add(change);
+            }
+
+            change.Value = value;
         }
     }
 }

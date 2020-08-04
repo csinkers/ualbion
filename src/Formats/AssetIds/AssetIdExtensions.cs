@@ -61,7 +61,6 @@ namespace UAlbion.Formats.AssetIds
         public static AssetId ToAssetId(this SpellId id) => new AssetId(AssetType.SpellData, (ushort)id);
         public static AssetId ToAssetId(this SystemTextId id) => new AssetId(AssetType.SystemText, (ushort)id);
         public static AssetId ToAssetId(this TacticId id) => new AssetId(AssetType.TacticalIcon, (ushort)id);
-        public static AssetId ToAssetId(this TranslationTableId id) => new AssetId(AssetType.TransparencyTables, (ushort)id);
         public static AssetId ToAssetId(this VideoId id) => new AssetId(AssetType.Flic, (ushort)id);
         public static AssetId ToAssetId(this WaveLibraryId id) => new AssetId(AssetType.WaveLibrary, (ushort)id);
         public static AssetId ToAssetId(this WordId id) => new AssetId(AssetType.Dictionary, (ushort)id);

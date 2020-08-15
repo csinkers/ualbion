@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\deps\AdlMidi.NET')">
-    <PackageReference Include="AdlMidi.NET" Version="1.0.5" />
+    <PackageReference Include="AdlMidi.NET" Version="1.0.6" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\..\deps\AdlMidi.NET')">
     <ProjectReference Include="..\..\deps\AdlMidi.NET\src\ADLMidi.NET.csproj" />

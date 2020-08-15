@@ -1,5 +1,6 @@
 ﻿using System;
 using ADLMidi.NET;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 
@@ -18,7 +19,7 @@ namespace UAlbion.Game
                 return;
 
             try { _player = AdlMidi.Init(); }
-            catch (DllNotFoundException) { }
+            catch (DllNotFoundException e) { Raise(new LogEvent(LogEvent.Level.Error, $"DLL not found: {e.Message}")); }
 
             if (_player == null)
                 return;
@@ -28,7 +29,14 @@ namespace UAlbion.Game
             if ((xmiBytes?.Length ?? 0) == 0)
                 return;
 
-            _player.OpenBankData(assets.LoadSoundBanks());
+            var banks = assets.LoadSoundBanks();
+            if(banks == null)
+            {
+                Raise(new LogEvent(LogEvent.Level.Error, $"AlbionMusicGenerator: Could not load sound banks"));
+                return;
+            }
+
+            _player.OpenBankData(banks);
             _player.OpenData(xmiBytes);
             _player.SetLoopEnabled(true);
         }

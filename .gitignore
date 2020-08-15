@@ -23,6 +23,7 @@ packages/
 *.lock~
 *.user
 *.DotSettings
+*.code-workspace
 launchSettings.json
 
 SDL2.dll

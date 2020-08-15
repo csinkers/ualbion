@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Reflection;
 using ADLMidi.NET;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
@@ -16,10 +14,13 @@ namespace UAlbion.Game
 
         protected override void Subscribed()
         {
-            if (!File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "ADLMIDI.dll")))
+            if (_player != null)
                 return;
 
-            if (_player != null)
+            try { _player = AdlMidi.Init(); }
+            catch (DllNotFoundException) { }
+
+            if (_player == null)
                 return;
 
             var assets = Resolve<IAssetManager>();
@@ -27,7 +28,6 @@ namespace UAlbion.Game
             if ((xmiBytes?.Length ?? 0) == 0)
                 return;
 
-            _player = AdlMidi.Init();
             _player.OpenBankData(assets.LoadSoundBanks());
             _player.OpenData(xmiBytes);
             _player.SetLoopEnabled(true);

@@ -13,17 +13,10 @@ namespace UAlbion.Core
             Hash = hash;
         }
 
-        public bool Equals(ShaderSetCacheKey other)
-        {
-            return Name.Equals(other.Name)
-                   && Hash.Equals(other.Hash);
-        }
-
-        public override int GetHashCode()
-        {
-            int hash = Name.GetHashCode();
-            hash ^= Hash.GetHashCode();
-            return hash;
-        }
+        public bool Equals(ShaderSetCacheKey other) => Name.Equals(other.Name, StringComparison.Ordinal) && Hash.Equals(other.Hash, StringComparison.Ordinal);
+        public override int GetHashCode() => Name.GetHashCode(StringComparison.Ordinal) ^ Hash.GetHashCode(StringComparison.Ordinal);
+        public override bool Equals(object obj) => obj is ShaderSetCacheKey key && Equals(key);
+        public static bool operator ==(ShaderSetCacheKey left, ShaderSetCacheKey right) => left.Equals(right);
+        public static bool operator !=(ShaderSetCacheKey left, ShaderSetCacheKey right) => !(left == right);
     }
 }

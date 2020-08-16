@@ -6,23 +6,23 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Assets
 {
-    public class AssetLocatorRegistry : ServiceComponent<IAssetLocatorRegistry>, IAssetLocatorRegistry
+    public sealed class AssetLocatorRegistry : ServiceComponent<IAssetLocatorRegistry>, IAssetLocatorRegistry
     {
         readonly IDictionary<AssetType, IAssetLocator> _locators = new Dictionary<AssetType, IAssetLocator>();
         readonly IDictionary<Type, IAssetPostProcessor> _postProcessors = new Dictionary<Type, IAssetPostProcessor>();
+        readonly AssetCache _assetCache;
+        IAssetLocator _defaultLocator;
 
         public AssetLocatorRegistry()
         {
             PerfTracker.StartupEvent("Building AssetLocatorRegistry");
-            _standardAssetLocator = new StandardAssetLocator();
             _assetCache = AttachChild(new AssetCache());
-            //foreach(var locator in Locators.Values.OfType<IComponent>())
-            //    AttachChild(locator);
             PerfTracker.StartupEvent("Built AssetLocatorRegistry");
         }
 
-        public IAssetLocatorRegistry AddAssetLocator(IAssetLocator locator)
+        public IAssetLocatorRegistry AddAssetLocator(IAssetLocator locator, bool useAsDefault = false)
         {
+            if (locator == null) throw new ArgumentNullException(nameof(locator));
             if (locator is IComponent component)
                 AttachChild(component);
 
@@ -33,11 +33,19 @@ namespace UAlbion.Game.Assets
                 _locators[assetType] = locator;
             }
 
+            if (useAsDefault)
+            {
+                if(_defaultLocator != null)
+                    throw new InvalidOperationException($"Tried to set a second default asset locator \"{locator.GetType()}\", but one of type \"{_defaultLocator.GetType()}\" is already set.");
+                _defaultLocator = locator;
+            }
+
             return this;
         }
 
         public IAssetLocatorRegistry AddAssetPostProcessor(IAssetPostProcessor postProcessor)
         {
+            if (postProcessor == null) throw new ArgumentNullException(nameof(postProcessor));
             foreach (var type in postProcessor.SupportedTypes)
             {
                 if(_postProcessors.ContainsKey(type))
@@ -48,14 +56,11 @@ namespace UAlbion.Game.Assets
             return this;
         }
 
-        readonly AssetCache _assetCache;
-        readonly StandardAssetLocator _standardAssetLocator;
-
         IAssetLocator GetLocator(AssetType type)
         {
             if (_locators.TryGetValue(type, out var locator))
                 return locator;
-            return _standardAssetLocator;
+            return _defaultLocator;
         }
 
         public object LoadAssetCached(AssetKey key)
@@ -96,11 +101,6 @@ namespace UAlbion.Game.Assets
                 Raise(new LogEvent(LogEvent.Level.Error, $"Could not load asset {name}: {e}"));
                 return e;
             }
-        }
-
-        public void Dispose()
-        {
-            _standardAssetLocator?.Dispose();
         }
     }
 }

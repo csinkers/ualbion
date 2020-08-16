@@ -5,6 +5,7 @@
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
+#pragma warning disable CA1707 // Identifiers should not contain underscores
 namespace UAlbion.Formats.AssetIds
 {
     public enum MonsterCharacterId : byte
@@ -70,3 +71,4 @@ namespace UAlbion.Formats.AssetIds
         AIBody22 = 58,
     }
 }
+#pragma warning restore CA1707 // Identifiers should not contain underscores

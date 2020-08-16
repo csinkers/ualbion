@@ -6,7 +6,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Settings;
@@ -23,9 +23,7 @@ namespace UAlbion.Game.Entities.Map2D
 
         public TileLayer(LogicalMap2D logicalMap, ITexture tileset, Func<int, TileData> tileFunc, DrawLayer drawLayer, IconChangeType iconChangeType)
         {
-            On<RenderEvent>(e => Render());
-
-            _logicalMap = logicalMap;
+            _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
             _logicalMap.Dirty += (sender, args) =>
             {
                 if (args.Type == iconChangeType)
@@ -34,6 +32,8 @@ namespace UAlbion.Game.Entities.Map2D
             _tileset = tileset;
             _tileFunc = tileFunc;
             _drawLayer = drawLayer;
+
+            On<RenderEvent>(e => Render());
         }
 
         readonly LogicalMap2D _logicalMap;

@@ -1,4 +1,6 @@
-﻿using SerdesNet;
+﻿using System;
+using System.Globalization;
+using SerdesNet;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets
@@ -10,11 +12,12 @@ namespace UAlbion.Formats.Assets
 
         public static MonsterGroup Serdes(int _, MonsterGroup m, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             m ??= new MonsterGroup();
             for(int i = 0; i < m.Grid.Length; i++)
             {
                 m.Grid[i] = s.TransformEnumU8(
-                    i.ToString(),
+                    i.ToString(CultureInfo.InvariantCulture),
                     m.Grid[i],
                     StoreIncrementedNullZero<MonsterCharacterId>.Instance);
                 s.UInt8(null, 0);

@@ -55,7 +55,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.StartupUtilities", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.Utilities", "..\deps\veldrid\src\Veldrid.Utilities\Veldrid.Utilities.csproj", "{8F54D7C3-67CF-4058-BFB5-8FBCF327B355}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.SPIRV", "..\deps\veldrid\src-spirv\Veldrid.SPIRV\Veldrid.SPIRV.csproj", "{8E4A3651-9264-4FD6-AA1C-E48AEF26EFCA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.SPIRV", "..\deps\veldrid-spirv\src\Veldrid.SPIRV\Veldrid.SPIRV.csproj", "{8E4A3651-9264-4FD6-AA1C-E48AEF26EFCA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}"
 	ProjectSection(SolutionItems) = preProject
@@ -65,10 +65,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{E4F7A1D2-3
 		..\data\core.json = ..\data\core.json
 		..\data\core_sprites.json = ..\data\core_sprites.json
 		..\data\game.json = ..\data\game.json
-		..\data\game.json = ..\data\game.json
 		..\data\input.json = ..\data\input.json
 		..\data\settings.json = ..\data\settings.json
 		..\data\strings.json = ..\data\strings.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5B011D11-67A4-4DAC-BA1C-CD95C699A6B9}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		build.bat = build.bat
+		build.sh = build.sh
+		get_dependencies.bat = get_dependencies.bat
+		get_dependencies.sh = get_dependencies.sh
+		LICENSE = LICENSE
+		publish.bat = publish.bat
+		README.md = README.md
+		run.bat = run.bat
+		run.sh = run.sh
 	EndProjectSection
 EndProject
 Global

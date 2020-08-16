@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Assets
     {
         public ushort SpellPoints { get; set; }
         public ushort SpellPointsMax { get; set; }
-        public SpellClassMask SpellClasses { get; set; }
+        public SpellClasses SpellClasses { get; set; }
         public IDictionary<SpellId, (bool, ushort)> SpellStrengths { get; private set; } = new Dictionary<SpellId, (bool, ushort)>();
 
         public MagicSkills DeepClone()
@@ -23,7 +23,7 @@ namespace UAlbion.Formats.Assets
     {
         ushort SpellPoints { get; }
         ushort SpellPointsMax { get; }
-        SpellClassMask SpellClasses { get; }
+        SpellClasses SpellClasses { get; }
         IDictionary<SpellId, (bool, ushort)> SpellStrengths { get; }
     }
 }

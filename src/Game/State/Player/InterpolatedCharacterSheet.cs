@@ -28,15 +28,15 @@ namespace UAlbion.Game.State.Player
         public string GetName(GameLanguage language) => _b().GetName(language);
         public CharacterType Type => _b().Type;
         public Gender Gender => _b().Gender;
-        public PlayerRace Race => _b().Race;
-        public PlayerClass Class => _b().Class;
+        public PlayerRaces Races => _b().Races;
+        public PlayerClass PlayerClass => _b().PlayerClass;
         public ushort Age => _b().Age;
         public byte Level => _b().Level;
         public AssetId SpriteId => _b().SpriteId;
         public SmallPortraitId? PortraitId => _b().PortraitId;
         public EventSetId? EventSetId => _b().EventSetId;
         public EventSetId? WordSetId => _b().WordSetId;
-        public PlayerLanguage Languages => _b().Languages;
+        public PlayerLanguages Languages => _b().Languages;
         public IMagicSkills Magic { get; }
         public IInventory Inventory { get; }
         public ICharacterAttributes Attributes { get; }

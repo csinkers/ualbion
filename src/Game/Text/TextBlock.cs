@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Formats.AssetIds;
 
@@ -25,27 +26,28 @@ namespace UAlbion.Game.Text
         public FontColor Color { get; set; }
         public TextStyle Style { get; set; }
         public TextAlignment Alignment { get; set; }
-        public TextArrangement Arrangement { get; set; }
+        public TextArrangementFlags ArrangementFlags { get; set; }
         public IEnumerable<WordId> Words => _words ?? Enumerable.Empty<WordId>();
         public void AddWord(WordId word) { _words ??= new HashSet<WordId>(); _words.Add(word); }
         ISet<WordId> _words;
 
-        public override string ToString() => $"[\"{Text}\" {Color} {Style} {Alignment} {Arrangement}]";
+        public override string ToString() => $"[\"{Text}\" {Color} {Style} {Alignment} {ArrangementFlags}]";
 
         public bool IsMergeableWith(TextBlock other)
         {
+            if (other == null) throw new ArgumentNullException(nameof(other));
             return
                 other.BlockId == BlockId &&
-                (other.Text == "" ||
-                other.Text == " " ||
+                (string.IsNullOrWhiteSpace(other.Text) ||
                 other.Color == Color &&
                 other.Style == Style &&
                 other.Alignment == Alignment &&
-                other.Arrangement == Arrangement);
+                other.ArrangementFlags == ArrangementFlags);
         }
 
         public void Merge(TextBlock other)
         {
+            if (other == null) throw new ArgumentNullException(nameof(other));
             if (string.IsNullOrEmpty(other.Text))
                 Text += " ";
             else

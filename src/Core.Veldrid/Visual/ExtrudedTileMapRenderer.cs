@@ -8,9 +8,10 @@ using UAlbion.Core.Visual;
 using Veldrid;
 using Veldrid.Utilities;
 
+#pragma warning disable CA2213 // Analysis doesn't know about dispose collector
 namespace UAlbion.Core.Veldrid.Visual
 {
-    public class ExtrudedTileMapRenderer : Component, IRenderer
+    public sealed class ExtrudedTileMapRenderer : Component, IRenderer
     {
         // Vertex Layout
         static readonly VertexLayoutDescription VertexLayout = VertexLayoutHelper.Vertex3DTextured;
@@ -18,8 +19,8 @@ namespace UAlbion.Core.Veldrid.Visual
         // Instance Layout
         static readonly VertexLayoutDescription InstanceLayout = new VertexLayoutDescription(
             VertexLayoutHelper.Vector2D("TilePosition"), // 2
-            VertexLayoutHelper.Int("Textures"), // 3
-            VertexLayoutHelper.Int("Flags"), // 4
+            VertexLayoutHelper.IntElement("Textures"), // 3
+            VertexLayoutHelper.IntElement("Flags"), // 4
             VertexLayoutHelper.Vector2D("WallSize") // 5
         )
         { InstanceStepRate = 1 };
@@ -83,7 +84,7 @@ namespace UAlbion.Core.Veldrid.Visual
             20, 21, 22, 22, 21, 23, // Right
         };
 
-        public bool CanRender(Type renderable) => renderable == typeof(TileMap);
+        public bool CanRender(Type renderable) => renderable == typeof(DungeonTileMap);
         public RenderPasses RenderPasses => RenderPasses.Standard;
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
         readonly IList<DeviceBuffer> _instanceBuffers = new List<DeviceBuffer>();
@@ -96,7 +97,7 @@ namespace UAlbion.Core.Veldrid.Visual
         Sampler _textureSampler;
         Shader[] _shaders;
 
-        public struct MiscUniformData
+        struct MiscUniformData
         {
             public static readonly uint SizeInBytes = (uint)Unsafe.SizeOf<MiscUniformData>();
             public Vector3 TileSize { get; set; } // 12 bytes
@@ -105,6 +106,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public void CreateDeviceObjects(IRendererContext context)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
             var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
@@ -165,6 +167,8 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public IEnumerable<IRenderable> UpdatePerFrameResources(IRendererContext context, IEnumerable<IRenderable> renderables)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            if (renderables == null) throw new ArgumentNullException(nameof(renderables));
             var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
@@ -182,9 +186,19 @@ namespace UAlbion.Core.Veldrid.Visual
             {
                 var tilemap = window.TileMap;
                 window.InstanceBufferId = _instanceBuffers.Count;
-                var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)window.Length * TileMap.Tile.StructSize, BufferUsage.VertexBuffer));
+                var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)window.Length * DungeonTile.StructSize, BufferUsage.VertexBuffer));
                 buffer.Name = $"B_Tile3DInst{_instanceBuffers.Count}";
-                cl.UpdateBuffer(buffer, 0, ref tilemap.Tiles[window.Offset], TileMap.Tile.StructSize * (uint)window.Length);
+                unsafe
+                {
+                    fixed (DungeonTile* tile = &tilemap.Tiles[0])
+                    {
+                        cl.UpdateBuffer(
+                            buffer,
+                            0,
+                            (IntPtr)(&tile[window.Offset]),
+                            DungeonTile.StructSize * (uint)window.Length);
+                    }
+                }
                 _instanceBuffers.Add(buffer);
 
                 textureManager.PrepareTexture(tilemap.Floors, context);
@@ -193,7 +207,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
             foreach (var renderable in renderables)
             {
-                if (renderable is TileMap tilemap)
+                if (renderable is DungeonTileMap tilemap)
                 {
                     var dummyWindow = new TileMapWindow(tilemap, 0, tilemap.Tiles.Length);
                     UpdateTilemapWindow(dummyWindow);
@@ -209,6 +223,8 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public void Render(IRendererContext context, RenderPasses renderPass, IRenderable renderable)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            if (renderable == null) throw new ArgumentNullException(nameof(renderable));
             var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
@@ -265,6 +281,11 @@ namespace UAlbion.Core.Veldrid.Visual
             _disposeCollector.DisposeAll();
         }
 
-        public void Dispose() => DestroyDeviceObjects();
+        public void Dispose()
+        {
+            DestroyDeviceObjects();
+            GC.SuppressFinalize(this);
+        }
     }
 }
+#pragma warning restore CA2213 // Analysis doesn't know about dispose collector

@@ -13,9 +13,10 @@ using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 
+#pragma warning disable CA2213
 namespace UAlbion.Core.Veldrid
 {
-    public class VeldridEngine : Engine, IDisposable
+    public sealed class VeldridEngine : Engine, IDisposable
     {
         const int DefaultWidth = 720;
         const int DefaultHeight = 480;
@@ -39,12 +40,12 @@ namespace UAlbion.Core.Veldrid
         GraphicsBackend? _newBackend;
 
         internal GraphicsDevice GraphicsDevice { get; private set; }
-        internal RenderDoc RenderDoc => _renderDoc;
+        internal static RenderDoc RenderDoc => _renderDoc;
 
         public override ICoreFactory Factory { get; } = new VeldridCoreFactory();
 
-        public override string FrameTimeText => _frameTimeAverager.CurrentAverageFramesPerSecond.ToString("000.0 fps / ") +
-                                                _frameTimeAverager.CurrentAverageFrameTimeMilliseconds.ToString("#00.00 ms");
+        public override string FrameTimeText =>
+            $"{_frameTimeAverager.CurrentAverageFramesPerSecond:000.0 fps} / {_frameTimeAverager.CurrentAverageFrameTimeMilliseconds:#00.00 ms}";
 
         public VeldridEngine(GraphicsBackend backend, bool useRenderDoc)
         {
@@ -376,4 +377,4 @@ namespace UAlbion.Core.Veldrid
         }
     }
 }
-
+#pragma warning restore CA2213

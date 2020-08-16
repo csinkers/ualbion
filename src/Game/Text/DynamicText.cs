@@ -70,6 +70,6 @@ namespace UAlbion.Game.Text
 
         public int Version => _getVersion(_version);
         public void Invalidate() => _version++;
-        public IEnumerable<TextBlock> Get() => _generator();
+        public IEnumerable<TextBlock> GetBlocks() => _generator();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets
@@ -23,20 +24,26 @@ namespace UAlbion.Formats.Assets
             InventoryType.Chest => ((ChestId)Id).ToString(),
             InventoryType.Merchant => ((MerchantId)Id).ToString(),
             InventoryType.CombatLoot => "CombatLoot",
-            _ => Id.ToString()
+            _ => Id.ToString(CultureInfo.InvariantCulture)
         };
 
-        public static explicit operator int(InventoryId id) => (int)id.Type << 16 | id.Id;
-        public static explicit operator InventoryId(int id)
+        public static explicit operator int(InventoryId id) => ToInt(id);
+        public static int ToInt(InventoryId id) => (int)id.Type << 16 | id.Id;
+
+        public static explicit operator InventoryId(int id) => ToInventoryId(id);
+        public static explicit operator InventoryId(PartyCharacterId id) => ToInventoryId(id);
+        public static explicit operator InventoryId(ChestId id)          => ToInventoryId(id);
+        public static explicit operator InventoryId(MerchantId id) => ToInventoryId(id);
+        public static explicit operator InventoryId(AssetKey key) => ToInventoryId(key);
+        public static InventoryId ToInventoryId(int id)
             => new InventoryId(
                 (InventoryType)((id & 0x7fff0000) >> 16),
                 (ushort)(id & 0xffff));
 
-        public static explicit operator InventoryId(PartyCharacterId id) => new InventoryId(InventoryType.Player,   (ushort)id);
-        public static explicit operator InventoryId(ChestId id)          => new InventoryId(InventoryType.Chest,    (ushort)id);
-        public static explicit operator InventoryId(MerchantId id)       => new InventoryId(InventoryType.Merchant, (ushort)id);
-
-        public static explicit operator InventoryId(AssetKey key) => key.Type switch
+        public static InventoryId ToInventoryId(PartyCharacterId id) => new InventoryId(InventoryType.Player,   (ushort)id);
+        public static InventoryId ToInventoryId(ChestId id)          => new InventoryId(InventoryType.Chest,    (ushort)id);
+        public static InventoryId ToInventoryId(MerchantId id)       => new InventoryId(InventoryType.Merchant, (ushort)id);
+        public static InventoryId ToInventoryId(AssetKey key) => key.Type switch
         {
             AssetType.PartyMember => new InventoryId(InventoryType.Player, (ushort)key.Id),
             AssetType.ChestData => new InventoryId(InventoryType.Chest, (ushort)key.Id),

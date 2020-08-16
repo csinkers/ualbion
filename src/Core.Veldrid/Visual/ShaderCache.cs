@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -11,7 +12,7 @@ using Veldrid.SPIRV;
 
 namespace UAlbion.Core.Veldrid.Visual
 {
-    public class ShaderCache : ServiceComponent<IShaderCache>, IShaderCache, IDisposable
+    public sealed class ShaderCache : ServiceComponent<IShaderCache>, IShaderCache, IDisposable
     {
         readonly object _syncRoot = new object();
         readonly IDictionary<string, CacheEntry> _cache = new Dictionary<string, CacheEntry>();
@@ -93,9 +94,9 @@ namespace UAlbion.Core.Veldrid.Visual
 
         string GetShaderPath(string name, string content)
         {
-            using var md5 = MD5.Create();
-            var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(content));
-            var hashString = string.Join("", hash.Select(x => x.ToString("X2")));
+            using var sha256 = SHA256.Create();
+            var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(content));
+            var hashString = string.Join("", hash.Select(x => x.ToString("X2", CultureInfo.InvariantCulture)));
             return Path.Combine(_shaderCachePath, $"{name}.{hashString}.spv");
         }
 
@@ -107,7 +108,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
             using (PerfTracker.InfrequentEvent($"Compiling {name} to SPIR-V"))
             {
-                if (!content.StartsWith("#version"))
+                if (!content.StartsWith("#version", StringComparison.Ordinal))
                 {
                     content = @"#version 450
 " + content;
@@ -171,6 +172,7 @@ namespace UAlbion.Core.Veldrid.Visual
             string vertexName, string fragmentName,
             string vertexContent, string fragmentContent)
         {
+            if (factory == null) throw new ArgumentNullException(nameof(factory));
             var vertexPath = GetShaderPath(vertexName, vertexContent);
             var fragmentPath = GetShaderPath(fragmentName, fragmentContent);
 

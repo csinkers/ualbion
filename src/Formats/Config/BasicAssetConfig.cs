@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 
@@ -11,6 +12,7 @@ namespace UAlbion.Formats.Config
 
         public static BasicAssetConfig Extract(FullAssetConfig full)
         {
+            if (full == null) throw new ArgumentNullException(nameof(full));
             var min = new BasicAssetConfig();
 
             foreach (var kvp in full.Xlds)

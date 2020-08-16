@@ -1,4 +1,6 @@
-﻿using SerdesNet;
+﻿using System;
+using System.Globalization;
+using SerdesNet;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 
@@ -8,6 +10,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static DataChangeEvent Serdes(DataChangeEvent e, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new DataChangeEvent();
             s.Begin();
             e.Property = s.EnumU8(nameof(Property), e.Property);
@@ -63,9 +66,9 @@ namespace UAlbion.Formats.MapEvents
             Property switch
             {
                 ChangeProperty.Status => ((PlayerStatus)Value).ToString(),
-                ChangeProperty.AddLanguage => ((PlayerLanguage)Value).ToString(),
+                ChangeProperty.AddLanguage => ((PlayerLanguages)Value).ToString(),
                 ChangeProperty.ReceiveOrRemoveItem => ((ItemId)Value-1).ToString(),
-                _ => Value.ToString()
+                _ => Value.ToString(CultureInfo.InvariantCulture)
             };
         public override string ToString() => $"data_change {PartyMemberId?.ToString() ?? "ActivePlayer"} {Property} {Mode} {Amount}x{ItemString} ({Unk3} {Unk4})";
         public override MapEventType EventType => MapEventType.DataChange;

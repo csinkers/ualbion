@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -12,24 +13,23 @@ namespace UAlbion.Formats.Parsers
     {
         static string GetHash(string filename)
         {
-            using var md5 = MD5.Create();
+            using var sha256 = SHA256.Create();
             using var stream = File.OpenRead(filename);
-            var hashBytes = md5.ComputeHash(stream);
-            return string.Join("", hashBytes.Select(x => x.ToString("x2")));
+            var hashBytes = sha256.ComputeHash(stream);
+            return string.Join("", hashBytes.Select(x => x.ToString("x2", CultureInfo.InvariantCulture)));
         }
 
-        static byte[] LoadSection(string filename, CoreSpriteConfig.BinaryResource resource)
+        static byte[] LoadSection(string filename, CoreSpriteInfo resource)
         {
-            using (var stream = File.OpenRead(filename))
-            using (var br = new BinaryReader(stream))
-            {
-                stream.Position = resource.Offset;
-                return br.ReadBytes(resource.Width * resource.Height);
-            }
+            using var stream = File.OpenRead(filename);
+            using var br = new BinaryReader(stream);
+            stream.Position = resource.Offset;
+            return br.ReadBytes(resource.Width * resource.Height);
         }
 
-        public static CoreSpriteConfig.BinaryResource GetConfig(CoreSpriteId id, string exePath, CoreSpriteConfig config, out string filename)
+        public static CoreSpriteInfo GetConfig(CoreSpriteId id, string exePath, CoreSpriteConfig config, out string filename)
         {
+            if (config == null) throw new ArgumentNullException(nameof(config));
             if(!Directory.Exists(exePath))
                 throw new InvalidOperationException($"Search directory {exePath} does not exist");
 
@@ -53,15 +53,13 @@ namespace UAlbion.Formats.Parsers
         {
             var resource = GetConfig(id, exePath, config, out var file);
             var bytes = LoadSection(file, resource);
-            return new AlbionSprite
-            {
-                Name = $"Core.{id}",
-                Width = resource.Width,
-                Height = resource.Height,
-                UniformFrames = true,
-                Frames = new[] { new AlbionSprite.Frame(0, 0, resource.Width, resource.Height) },
-                PixelData = bytes
-            };
+            return new AlbionSprite(
+                $"Core.{id}",
+                resource.Width,
+                resource.Height,
+                true,
+                bytes,
+                new[] { new AlbionSpriteFrame(0, 0, resource.Width, resource.Height) });
         }
     }
 }

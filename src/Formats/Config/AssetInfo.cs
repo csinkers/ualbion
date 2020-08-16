@@ -1,20 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 
 namespace UAlbion.Formats.Config
 {
     public abstract class AssetInfo
     {
-        [JsonIgnore] public int Id;
+        [JsonIgnore] public int Id { get; set;  }
         [JsonIgnore] public abstract FileFormat Format { get; }
         [JsonIgnore] public abstract int EffectiveWidth { get; }
         [JsonIgnore] public abstract int EffectiveHeight { get; }
         [JsonIgnore] public abstract bool Transposed { get; }
 
-        public int? Width;
-        public int? Height;
-        public string SubSprites;
-        public bool? UseSmallGraphics;
+        public int? Width { get; set; }
+        public int? Height { get; set; }
+        public string SubSprites { get; set; }
+        public bool? UseSmallGraphics { get; set; }
     }
 
     public class BasicAssetInfo : AssetInfo
@@ -22,6 +24,7 @@ namespace UAlbion.Formats.Config
         public BasicAssetInfo() { }
         public BasicAssetInfo(FullAssetInfo asset)
         {
+            if (asset == null) throw new ArgumentNullException(nameof(asset));
             Id = asset.Id;
             Width = asset.Width;
             Height = asset.Height;
@@ -43,13 +46,15 @@ namespace UAlbion.Formats.Config
 
     public class FullAssetInfo : AssetInfo
     {
-        public string Name;
-        public IList<int> PaletteHints;
-        [JsonIgnore] public FullXldInfo Parent;
+        public string Name { get; set; }
+
+        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "Play nicely with JSON serialisation")]
+        public IList<int> PaletteHints { get; set; }
+        [JsonIgnore] public FullXldInfo Parent { get; set; }
         [JsonIgnore] public override FileFormat Format => Parent.Format;
         [JsonIgnore] public override int EffectiveWidth => Width ?? Parent.Width ?? 0;
         [JsonIgnore] public override int EffectiveHeight => Height ?? Parent.Height ?? 0;
         [JsonIgnore] public override bool Transposed => Parent.Transposed ?? false;
-        [JsonIgnore] public string Filename;
+        [JsonIgnore] public string Filename { get; set; }
     }
 }

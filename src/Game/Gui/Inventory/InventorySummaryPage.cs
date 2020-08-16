@@ -63,7 +63,7 @@ namespace UAlbion.Game.Gui.Inventory
             var formatBlocks = tf
                 .Format(
                     assets.LoadString(SystemTextId.Inv1_NYearsOldRaceClassLevelN, settings.Gameplay.Language),
-                    member.Apparent.Age, member.Apparent.Level).Get();
+                    member.Apparent.Age, member.Apparent.Level).GetBlocks();
 
             foreach (var block in formatBlocks)
                 yield return block;
@@ -80,34 +80,34 @@ namespace UAlbion.Game.Gui.Inventory
             if (member == null)
                 yield break;
 
-            foreach (var block in tf.Format(S(SystemTextId.Inv1_LifePoints)).Get())
+            foreach (var block in tf.Format(S(SystemTextId.Inv1_LifePoints)).GetBlocks())
             {
-                block.Arrangement = TextArrangement.NoWrap;
+                block.ArrangementFlags = TextArrangementFlags.NoWrap;
                 block.Alignment = TextAlignment.Right;
                 yield return block;
             }
 
             if (member.Apparent.Magic.SpellPointsMax > 0)
             {
-                foreach (var block in tf.Format(S(SystemTextId.Inv1_SpellPoints)).Get())
+                foreach (var block in tf.Format(S(SystemTextId.Inv1_SpellPoints)).GetBlocks())
                 {
-                    block.Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap;
+                    block.ArrangementFlags = TextArrangementFlags.ForceNewLine | TextArrangementFlags.NoWrap;
                     block.Alignment = TextAlignment.Right;
                     yield return block;
                 }
             }
-            else yield return new TextBlock("") { Arrangement = TextArrangement.ForceNewLine };
+            else yield return new TextBlock("") { ArrangementFlags = TextArrangementFlags.ForceNewLine };
 
-            foreach (var block in tf.Format(S(SystemTextId.Inv1_ExperiencePoints)).Get())
+            foreach (var block in tf.Format(S(SystemTextId.Inv1_ExperiencePoints)).GetBlocks())
             {
-                block.Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap;
+                block.ArrangementFlags = TextArrangementFlags.ForceNewLine | TextArrangementFlags.NoWrap;
                 block.Alignment = TextAlignment.Right;
                 yield return block;
             }
 
-            foreach (var block in tf.Format(S(SystemTextId.Inv1_TrainingPoints)).Get())
+            foreach (var block in tf.Format(S(SystemTextId.Inv1_TrainingPoints)).GetBlocks())
             {
-                block.Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap;
+                block.ArrangementFlags = TextArrangementFlags.ForceNewLine | TextArrangementFlags.NoWrap;
                 block.Alignment = TextAlignment.Right;
                 yield return block;
             }
@@ -119,18 +119,18 @@ namespace UAlbion.Game.Gui.Inventory
             if (member == null)
                 yield break;
 
-            yield return new TextBlock($"{member.Apparent.Combat.LifePoints}/{member.Apparent.Combat.LifePointsMax}") { Arrangement = TextArrangement.NoWrap };
+            yield return new TextBlock($"{member.Apparent.Combat.LifePoints}/{member.Apparent.Combat.LifePointsMax}") { ArrangementFlags = TextArrangementFlags.NoWrap };
 
             yield return new TextBlock(
                 member.Apparent.Magic.SpellPointsMax > 0
                     ? $"{member.Apparent.Magic.SpellPoints}/{member.Apparent.Magic.SpellPointsMax}"
                     : "")
             {
-                Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap
+                ArrangementFlags = TextArrangementFlags.ForceNewLine | TextArrangementFlags.NoWrap
             };
 
-            yield return new TextBlock($"{member.Apparent.Combat.ExperiencePoints}") { Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap };
-            yield return new TextBlock($"{member.Apparent.Combat.TrainingPoints}") { Arrangement = TextArrangement.ForceNewLine | TextArrangement.NoWrap };
+            yield return new TextBlock($"{member.Apparent.Combat.ExperiencePoints}") { ArrangementFlags = TextArrangementFlags.ForceNewLine | TextArrangementFlags.NoWrap };
+            yield return new TextBlock($"{member.Apparent.Combat.TrainingPoints}") { ArrangementFlags = TextArrangementFlags.ForceNewLine | TextArrangementFlags.NoWrap };
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using SerdesNet;
 
 namespace UAlbion.Formats.MapEvents
@@ -7,6 +8,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static ModifyEvent Serdes(ModifyEvent genericEvent, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             var subType = s.EnumU8("SubType", genericEvent?.SubType ?? ModifyType.Unk2);
             return subType switch
             {
@@ -22,7 +24,7 @@ namespace UAlbion.Formats.MapEvents
                 ModifyType.SetPartyLeader => SetPartyLeaderEvent.Serdes((SetPartyLeaderEvent)genericEvent, s),
                 ModifyType.SetTicker => SetTickerEvent.Serdes((SetTickerEvent)genericEvent, s),
                 ModifyType.Unk2 => DummyModifyEvent.Serdes((DummyModifyEvent)genericEvent, s),
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new InvalidEnumArgumentException(nameof(subType), (int)subType, typeof(ModifyType))
             };
         }
 

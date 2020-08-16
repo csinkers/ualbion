@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UAlbion.Api;
 
 namespace UAlbion.Formats.Assets.Flic
 {
-    public class FullByteOrientedRleChunk : FlicChunk
+    class FullByteOrientedRleChunk : FlicChunk
     {
         readonly int _width;
         readonly int _height;
@@ -21,6 +22,8 @@ namespace UAlbion.Formats.Assets.Flic
 
         public IEnumerable<byte> ReadLinePixels(BinaryReader br)
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
+
             var startOfLine = br.BaseStream.Position;
             int x = 0;
             while (x < _width)
@@ -53,6 +56,7 @@ namespace UAlbion.Formats.Assets.Flic
 
         protected override uint LoadChunk(uint length, BinaryReader br)
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
             var start = br.BaseStream.Position;
             int i = 0;
             for (int y = 0; y < _height; y++)

@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api;
 
 namespace UAlbion.Formats.Assets.Save
@@ -11,6 +12,7 @@ namespace UAlbion.Formats.Assets.Save
 
         public static VisitedEventList Serdes(int _, VisitedEventList c, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             c ??= new VisitedEventList();
             s.Begin();
             c.Size = s.UInt32(nameof(Size), c.Size);

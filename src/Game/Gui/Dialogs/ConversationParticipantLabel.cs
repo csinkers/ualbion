@@ -69,7 +69,7 @@ namespace UAlbion.Game.Gui.Dialogs
                 {
                     Alignment = isRight ? TextAlignment.Right : TextAlignment.Left,
                     Color = FontColor.White,
-                    Arrangement = TextArrangement.NoWrap,
+                    ArrangementFlags = TextArrangementFlags.NoWrap,
                 }
             };
         });

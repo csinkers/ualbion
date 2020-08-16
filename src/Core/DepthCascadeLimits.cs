@@ -2,6 +2,7 @@
 
 namespace UAlbion.Core
 {
+#pragma warning disable CA1051 // Do not declare visible instance fields
     [StructLayout(LayoutKind.Sequential)]
     public struct DepthCascadeLimits
     {
@@ -10,4 +11,5 @@ namespace UAlbion.Core
         public float FarLimit;
         readonly float _padding;
     }
+#pragma warning restore CA1051 // Do not declare visible instance fields
 }

@@ -1,31 +1,26 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace UAlbion.Formats.Assets
 {
     public class AlbionSprite
     {
-        public string Name { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public IList<Frame> Frames { get; set; }
-        public bool UniformFrames { get; set; }
-        public byte[] PixelData { get; set; }
-
-        public class Frame
+        public AlbionSprite(string name, int width, int height, bool uniformFrames, byte[] pixelData, IEnumerable<AlbionSpriteFrame> frames)
         {
-            public Frame(int x, int y, int width, int height)
-            {
-                X = x;
-                Y = y;
-                Width = width;
-                Height = height;
-            }
-
-            public int X { get; }
-            public int Y { get; }
-            public int Width { get; }
-            public int Height { get; }
+            Name = name;
+            Width = width;
+            Height = height;
+            UniformFrames = uniformFrames;
+            PixelData = pixelData;
+            Frames = frames.ToArray();
         }
+
+        public string Name { get; }
+        public int Width { get; }
+        public int Height { get; }
+        public bool UniformFrames { get; }
+        public IReadOnlyList<AlbionSpriteFrame> Frames { get; }
+        public byte[] PixelData { get; }
 
         public override string ToString() => $"AlbionSprite {Name} {Width}x{Height} ({Frames.Count} frames)";
     }

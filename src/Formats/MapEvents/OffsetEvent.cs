@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
@@ -7,6 +8,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static OffsetEvent Serdes(OffsetEvent e, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new OffsetEvent();
             s.Begin();
             e.X = s.Int8(nameof(X), e.X);

@@ -5,20 +5,6 @@ namespace UAlbion.Formats.AssetIds
 {
     public static class StringIdExtensions
     {
-        /*
-        public static StringId ToId(this SystemTextId systemTextId)
-            => new StringId(AssetType.SystemText, 0, (int)systemTextId);
-
-        public static StringId ToId(this UAlbionStringId id)
-            => new StringId(AssetType.UAlbionText, (ushort)id, 0);
-
-        public static StringId ToId(this WordId id)
-            => new StringId(AssetType.Dictionary, (ushort)((int)id / 500), (int)id);
-
-        public static StringId ToId(this ItemId id)
-            => new StringId(AssetType.ItemNames, (ushort)id, 0);
-            */
-
         public static StringId ToId(this ItemType type)
             => new StringId(AssetType.SystemText, 0, (int)(type switch
             {
@@ -42,11 +28,11 @@ namespace UAlbion.Formats.AssetIds
                 ItemType.HeadsUpDisplayItem => SystemTextId.ItemType_SpecialItem,
                 ItemType.Lockpick => SystemTextId.ItemType_Lockpick,
                 ItemType.LightSource => SystemTextId.ItemType_Torch,
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, $"Unhandled item type \"{type}\"")
             }));
 
-        public static StringId ToId(this PlayerClass x)
-            => new StringId(AssetType.SystemText, 0, (int)(x switch
+        public static StringId ToId(this PlayerClass playerClass)
+            => new StringId(AssetType.SystemText, 0, (int)(playerClass switch
             {
                 PlayerClass.Pilot => SystemTextId.Class_Pilot,
                 PlayerClass.Scientist => SystemTextId.Class_Scientist,
@@ -57,7 +43,7 @@ namespace UAlbion.Formats.AssetIds
                 PlayerClass.Technician => SystemTextId.Class_Technician,
                 PlayerClass.OquloKamulos => SystemTextId.Class_OquloKamulos,
                 PlayerClass.Warrior => SystemTextId.Class_Warrior,
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(nameof(playerClass), playerClass, $"Unhandled item type \"{playerClass}\"")
             }));
     }
 }

@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
@@ -18,6 +19,7 @@ namespace UAlbion.Formats.MapEvents
 
         public static SimpleChestEvent Serdes(SimpleChestEvent e, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new SimpleChestEvent();
             s.Begin();
             e.ChestType = s.EnumU8(nameof(ChestType), e.ChestType);

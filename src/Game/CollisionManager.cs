@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
-using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Game
 {

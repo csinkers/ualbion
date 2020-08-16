@@ -3,10 +3,11 @@ using OpenAL;
 
 namespace UAlbion.Core.Veldrid.Audio
 {
-    public class AudioDevice : IDisposable
+    public sealed class AudioDevice : IDisposable
     {
         readonly IntPtr _device;
         readonly IntPtr _context;
+        bool _disposed;
 
         void Check()
         {
@@ -25,9 +26,9 @@ namespace UAlbion.Core.Veldrid.Audio
         public AudioDevice()
         {
             _device = ALC10.alcOpenDevice(null); Check();
-            _context = ALC10.alcCreateContext(_device, new int[0]); Check();
+            _context = ALC10.alcCreateContext(_device, Array.Empty<int>()); Check();
             ALC10.alcMakeContextCurrent(_context); Check();
-            AL10.alGetError(); // Clear error code for subsequent callers
+            var _ = AL10.alGetError(); // Clear error code for subsequent callers
         }
 
         public AudioListener Listener { get; } = new AudioListener();
@@ -46,6 +47,17 @@ namespace UAlbion.Core.Veldrid.Audio
 
         public void Dispose()
         {
+            InnerDispose();
+            GC.SuppressFinalize(this);
+        }
+
+        ~AudioDevice() => InnerDispose();
+
+        void InnerDispose()
+        {
+            if (_disposed)
+                return;
+
             if (_context != IntPtr.Zero)
             {
                 ALC10.alcMakeContextCurrent(IntPtr.Zero); Check();
@@ -57,6 +69,8 @@ namespace UAlbion.Core.Veldrid.Audio
                 ALC10.alcCloseDevice(_device);
                 Check();
             }
+
+            _disposed = true;
         }
     }
 }

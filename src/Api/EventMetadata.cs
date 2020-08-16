@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -9,27 +10,28 @@ namespace UAlbion.Api
     public class EventMetadata
     {
         public string Name { get; }
-        public string[] Aliases { get; }
         public string HelpText { get; }
-        public EventPartMetadata[] Parts { get; }
+        public ReadOnlyCollection<string> Aliases { get; }
+        public ReadOnlyCollection<EventPartMetadata> Parts { get; }
         public Func<string[], Event> Parser { get; }
         public Type Type { get; }
 
         public EventMetadata(Type type)
         {
+            if (type == null) throw new ArgumentNullException(nameof(type));
             var eventAttribute = (EventAttribute)type.GetCustomAttribute(typeof(EventAttribute), false);
             var properties = type.GetProperties();
             Type = type;
             Name = eventAttribute.Name;
             HelpText = eventAttribute.HelpText;
-            Aliases = eventAttribute.Aliases ?? new string[0];
+            Aliases = new ReadOnlyCollection<string>(eventAttribute.Aliases ?? Array.Empty<string>());
 
             var partsParameter = Expression.Parameter(typeof(string[]), "parts");
             // TODO: Order passed in to EventPartMetadata needs to be based on constructor parameters.
-            Parts = properties
+            Parts = new ReadOnlyCollection<EventPartMetadata>(properties
                 .Where(x => x.GetCustomAttribute(typeof(EventPartAttribute)) != null)
                 .Select((x, i) => new EventPartMetadata(x, partsParameter, i))
-                .ToArray();
+                .ToArray());
 
             var parser = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public);
             if (parser != null && parser.ReturnParameter?.ParameterType == type)
@@ -81,8 +83,8 @@ namespace UAlbion.Api
         {
             var constructor = Type.GetConstructors().Single();
             var parameters = constructor.GetParameters();
-            ApiUtil.Assert(parameters.Length == Parts.Length,
-                $"When building parser for {Type}, the public constructor had {parameters.Length} parameters but {Parts.Length} were expected.");
+            ApiUtil.Assert(parameters.Length == Parts.Count,
+                $"When building parser for {Type}, the public constructor had {parameters.Length} parameters but {Parts.Count} were expected.");
 
             return (Func<string[], Event>)Expression.Lambda(
                 Expression.Convert(

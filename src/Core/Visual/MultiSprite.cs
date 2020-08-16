@@ -11,7 +11,7 @@ namespace UAlbion.Core.Visual
         const double ShrinkFactor = 0.3;
 
         public MultiSprite(SpriteKey key) { Key = key; }
-        public override string ToString() => $"Multi:{Name} {RenderOrder} Flags:{Key.Flags} ({ActiveInstances}/{Instances.Length} instances)";
+        public override string ToString() => $"Multi:{Name} {RenderOrder} Flags:{Key.Flags} ({ActiveInstances}/{_instances.Length} instances)";
 
         string _name;
         public string Name
@@ -25,9 +25,10 @@ namespace UAlbion.Core.Visual
         public SpriteKey Key { get; }
         public bool InstancesDirty { get; set; }
         public int ActiveInstances { get; private set; }
-        public SpriteInstanceData[] Instances { get; private set; } = new SpriteInstanceData[MinSize];
+        public ReadOnlySpan<SpriteInstanceData> Instances => _instances;
         readonly List<SpriteLease> _leases = new List<SpriteLease>();
         readonly object _syncRoot = new object();
+        SpriteInstanceData[] _instances = new SpriteInstanceData[MinSize];
 
         internal SpriteLease Grow(int length, object caller)
         {
@@ -36,16 +37,16 @@ namespace UAlbion.Core.Visual
                 PerfTracker.IncrementFrameCounter("Sprite Borrows");
                 int from = ActiveInstances;
                 ActiveInstances += length;
-                if (ActiveInstances >= Instances.Length)
+                if (ActiveInstances >= _instances.Length)
                 {
-                    int newSize = Instances.Length;
+                    int newSize = _instances.Length;
                     while (newSize <= ActiveInstances)
                         newSize = (int) (newSize * GrowthFactor);
 
                     var newArray = new SpriteInstanceData[newSize];
-                    for (int i = 0; i < Instances.Length; i++)
-                        newArray[i] = Instances[i];
-                    Instances = newArray;
+                    for (int i = 0; i < _instances.Length; i++)
+                        newArray[i] = _instances[i];
+                    _instances = newArray;
                 }
 
                 var lease = new SpriteLease(this, from, ActiveInstances);
@@ -79,27 +80,27 @@ namespace UAlbion.Core.Visual
                     {
                         var lease = _leases[n];
                         for (int i = lease.From; i < lease.To; i++)
-                            Instances[i - leaseToRemove.Length] = Instances[i];
+                            _instances[i - leaseToRemove.Length] = _instances[i];
                         lease.From -= leaseToRemove.Length;
                         lease.To -= leaseToRemove.Length;
                     }
                 }
                 VerifyConsistency();
 
-                if ((double)ActiveInstances / Instances.Length < ShrinkFactor)
+                if ((double)ActiveInstances / _instances.Length < ShrinkFactor)
                 {
-                    int newSize = Instances.Length;
+                    int newSize = _instances.Length;
                     while ((double)ActiveInstances / newSize > ShrinkFactor)
                         newSize = (int)(newSize * ShrinkFactor);
                     newSize = Math.Max(newSize, ActiveInstances);
                     newSize = Math.Max(newSize, MinSize);
 
-                    if (newSize != Instances.Length)
+                    if (newSize != _instances.Length)
                     {
                         var newArray = new SpriteInstanceData[newSize];
                         for (int i = 0; i < ActiveInstances; i++)
-                            newArray[i] = Instances[i];
-                        Instances = newArray;
+                            newArray[i] = _instances[i];
+                        _instances = newArray;
                     }
                 }
             }
@@ -126,7 +127,7 @@ namespace UAlbion.Core.Visual
         {
             PerfTracker.IncrementFrameCounter("Sprite Accesses");
             InstancesDirty = true;
-            return new Span<SpriteInstanceData>(Instances, lease.From, lease.Length);
+            return new Span<SpriteInstanceData>(_instances, lease.From, lease.Length);
         }
     }
 }

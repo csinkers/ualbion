@@ -10,7 +10,7 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {
-    public class EventChainManager : ServiceComponent<IEventManager>, IEventManager
+    public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventManager, IDisposable
     {
         readonly ThreadLocal<Stack<EventContext>> _threadContexts = new ThreadLocal<Stack<EventContext>>(() => new Stack<EventContext>());
         readonly HashSet<EventContext> _activeContexts = new HashSet<EventContext>();
@@ -156,5 +156,7 @@ namespace UAlbion.Game
             Resume(context);
             return true;
         }
+
+        public void Dispose() => _threadContexts?.Dispose();
     }
 }

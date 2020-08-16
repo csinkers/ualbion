@@ -65,13 +65,11 @@ namespace UAlbion.Tools.ImageReverser
                 if (string.IsNullOrEmpty(paletteName))
                     paletteName = file.Substring(BaseExportDirectory.Length + 1);
 
-                using(var stream = File.Open(file, FileMode.Open))
-                using (var br = new BinaryReader(stream))
-                {
-                    var palette = new AlbionPalette(br, (int)br.BaseStream.Length, new AssetKey(AssetType.Palette, paletteNumber), paletteNumber);
-                    palette.SetCommonPalette(commonPalette);
-                    Palettes.Add(palette);
-                }
+                using var stream = File.Open(file, FileMode.Open);
+                using var br = new BinaryReader(stream);
+                var palette = new AlbionPalette(br, (int)br.BaseStream.Length, new AssetKey(AssetType.Palette, paletteNumber), paletteNumber);
+                palette.SetCommonPalette(commonPalette);
+                Palettes.Add(palette);
             }
         }
 

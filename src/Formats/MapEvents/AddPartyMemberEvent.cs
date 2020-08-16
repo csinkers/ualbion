@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
@@ -9,6 +10,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static AddPartyMemberEvent Serdes(AddPartyMemberEvent e, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new AddPartyMemberEvent();
             s.Begin();
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);

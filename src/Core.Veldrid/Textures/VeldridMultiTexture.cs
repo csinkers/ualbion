@@ -21,13 +21,15 @@ namespace UAlbion.Core.Veldrid.Textures
                     case PixelFormat.R8_G8_B8_A8_UNorm: return 4;
                     case PixelFormat.R8_UNorm: return 1;
                     case PixelFormat.R8_UInt: return 1;
-                    default: throw new NotImplementedException();
+                    default: return 1;
                 }
             }
         }
 
         public Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
         {
+            if (gd == null) throw new ArgumentNullException(nameof(gd));
+            if (rf == null) throw new ArgumentNullException(nameof(rf));
             using var _ = PerfTracker.FrameEvent("6.1.2.1 Rebuild MultiTextures");
             if (IsMetadataDirty)
                 RebuildLayers();

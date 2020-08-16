@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using UAlbion.Api;
 
+#pragma warning disable CA1030 // Use events where appropriate
 namespace UAlbion.Core
 {
     /// <summary>
@@ -19,7 +20,7 @@ namespace UAlbion.Core
     /// </summary>
     public abstract class Component : IComponent
     {
-        public static bool TraceAttachment;
+        public static bool TraceAttachment { get; set; }
         static readonly Action<object> DummyContinuation = _ => { };
         static int _nesting;
         static int _nextId;
@@ -205,6 +206,7 @@ namespace UAlbion.Core
         /// <param name="exchange">The event exchange that this component should be attached to</param>
         public void Attach(EventExchange exchange)
         {
+            if (exchange == null) throw new ArgumentNullException(nameof(exchange));
             if (IsSubscribed)
                 return;
 
@@ -302,6 +304,7 @@ namespace UAlbion.Core
         /// <param name="child">The child component to remove</param>
         protected void RemoveChild(IComponent child)
         {
+            if (child == null) throw new ArgumentNullException(nameof(child));
             int index = Children.IndexOf(child);
             if (index == -1) return;
             if (child is Component c)
@@ -320,6 +323,7 @@ namespace UAlbion.Core
         /// <param name="sender">The component which generated the event</param>
         public void Receive(IEvent @event, object sender)
         {
+            if (@event == null) throw new ArgumentNullException(nameof(@event));
             if (sender == this || !IsSubscribed || Exchange == null)
                 return;
 
@@ -328,3 +332,4 @@ namespace UAlbion.Core
         }
     }
 }
+#pragma warning restore CA1030 // Use events where appropriate

@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
@@ -18,10 +19,8 @@ namespace UAlbion.Game.Entities.Map2D
 
         public MapRenderable2D(LogicalMap2D logicalMap, ITexture tileset)
         {
-            On<ToggleUnderlayEvent>(e => _underlay.IsActive = !_underlay.IsActive);
-            On<ToggleOverlayEvent>(e => _overlay.IsActive = !_overlay.IsActive);
-
-            _logicalMap = logicalMap;
+            if (tileset == null) throw new ArgumentNullException(nameof(tileset));
+            _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
             var subImage = tileset.GetSubImageDetails(0);
             TileSize = subImage.Size;
 
@@ -40,6 +39,9 @@ namespace UAlbion.Game.Entities.Map2D
 
             var tileSize = tileset.GetSubImageDetails(0).Size;
             _annotations = AttachChild(new MapAnnotationLayer(logicalMap, tileSize));
+
+            On<ToggleUnderlayEvent>(e => _underlay.IsActive = !_underlay.IsActive);
+            On<ToggleOverlayEvent>(e => _overlay.IsActive = !_overlay.IsActive);
         }
 
         public Vector2 TileSize { get; }
@@ -48,13 +50,10 @@ namespace UAlbion.Game.Entities.Map2D
         public WeakSpriteReference GetWeakUnderlayReference(int x, int y) => _underlay.GetWeakSpriteReference(x, y);
         public WeakSpriteReference GetWeakOverlayReference(int x, int y) => _overlay.GetWeakSpriteReference(x, y);
 
-        public int? HighlightIndex
+        public void SetHighlightIndex(int? index)
         {
-            set
-            {
-                _underlay.HighlightIndex = value;
-                _overlay.HighlightIndex = value;
-            }
+            _underlay.HighlightIndex = index;
+            _overlay.HighlightIndex = index;
         }
 
         protected override void Subscribed() => Raise(new LoadPaletteEvent(Palette));

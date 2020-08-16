@@ -112,6 +112,7 @@ $@"// Note: This file was automatically generated using Tools/GenerateEnums.
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
+#pragma warning disable CA1707 // Identifiers should not contain underscores
 namespace UAlbion.Formats.AssetIds
 {{
     public enum {e.Name} {(e.Type != null ? ":" : "")} {e.Type}
@@ -121,6 +122,7 @@ namespace UAlbion.Formats.AssetIds
                 + @"
     }
 }
+#pragma warning restore CA1707 // Identifiers should not contain underscores
 ");
             }
         }

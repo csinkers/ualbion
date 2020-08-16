@@ -1,4 +1,5 @@
-﻿using UAlbion.Api;
+﻿using System;
+using UAlbion.Api;
 
 namespace UAlbion.Core.Events
 {
@@ -10,7 +11,7 @@ namespace UAlbion.Core.Events
         public LoadRawPaletteEvent(string name, uint[] entries)
         {
             Name = name;
-            Entries = entries;
+            Entries = entries ?? throw new ArgumentNullException(nameof(entries));
         }
     }
 }

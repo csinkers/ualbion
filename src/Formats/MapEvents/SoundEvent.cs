@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
@@ -8,6 +9,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static SoundEvent Serdes(SoundEvent e, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new SoundEvent();
             s.Begin();
             e.Mode = s.EnumU8(nameof(Mode), e.Mode);

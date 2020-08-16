@@ -13,6 +13,7 @@ namespace UAlbion.Game.Assets
         public IEnumerable<AssetType> SupportedTypes => new[] { AssetType.CoreGraphics, AssetType.CoreGraphicsMetadata, AssetType.CoreSpriteConfig };
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, object> loaderFunc)
         {
+            if (loaderFunc == null) throw new ArgumentNullException(nameof(loaderFunc));
             if (key.Type == AssetType.CoreSpriteConfig)
             {
                 var settings = Resolve<ISettings>();

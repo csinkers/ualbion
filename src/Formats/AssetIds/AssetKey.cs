@@ -10,7 +10,8 @@ namespace UAlbion.Formats.AssetIds
             Language = language;
         }
 
-        public static implicit operator AssetKey(AssetId id) => new AssetKey(id.Type, id.Id);
+        public static implicit operator AssetKey(AssetId id) => ToAssetKey(id);
+        public static AssetKey ToAssetKey(AssetId id) => new AssetKey(id.Type, id.Id);
 
         public AssetId AssetId { get; }
         public AssetType Type => AssetId.Type;

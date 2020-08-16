@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Numerics;
@@ -47,6 +48,7 @@ namespace UAlbion.Formats.Assets
 
         static Inventory Serdes(int n, Inventory inv, ISerializer s, InventoryType type)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             var invId = new InventoryId(type, (ushort) n);
             void S(string name, ItemSlot existing, ItemSlotId slotId)
                 => s.Meta(name, existing,

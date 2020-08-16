@@ -6,7 +6,7 @@ using Veldrid;
 
 namespace UAlbion.Core.Veldrid
 {
-    class DebugMenus : Component
+    public class DebugMenus : Component
     {
         static readonly string[] MsaaOptions = { "Off", "2x", "4x", "8x", "16x", "32x" };
         readonly VeldridEngine _engine;
@@ -15,7 +15,6 @@ namespace UAlbion.Core.Veldrid
         public DebugMenus(VeldridEngine engine)
         {
             On<EngineUpdateEvent>(_ => RenderDebugMenu());
-
             _engine = engine;
         }
 
@@ -92,7 +91,7 @@ namespace UAlbion.Core.Veldrid
 
                 if (ImGui.BeginMenu("RenderDoc"))
                 {
-                    if (_engine.RenderDoc == null)
+                    if (VeldridEngine.RenderDoc == null)
                     {
                         if (ImGui.MenuItem("Load"))
                             Raise(new LoadRenderDocEvent());
@@ -100,50 +99,50 @@ namespace UAlbion.Core.Veldrid
                     else
                     {
                         if (ImGui.MenuItem("Trigger Capture"))
-                            _engine.RenderDoc.TriggerCapture();
+                            VeldridEngine.RenderDoc.TriggerCapture();
 
                         if (ImGui.BeginMenu("Options"))
                         {
-                            bool allowVsync = _engine.RenderDoc.AllowVSync;
+                            bool allowVsync = VeldridEngine.RenderDoc.AllowVSync;
                             if (ImGui.Checkbox("Allow VSync", ref allowVsync))
-                                _engine.RenderDoc.AllowVSync = allowVsync;
+                                VeldridEngine.RenderDoc.AllowVSync = allowVsync;
 
-                            bool validation = _engine.RenderDoc.APIValidation;
+                            bool validation = VeldridEngine.RenderDoc.APIValidation;
                             if (ImGui.Checkbox("API Validation", ref validation))
-                                _engine.RenderDoc.APIValidation = validation;
+                                VeldridEngine.RenderDoc.APIValidation = validation;
 
-                            int delayForDebugger = (int)_engine.RenderDoc.DelayForDebugger;
+                            int delayForDebugger = (int)VeldridEngine.RenderDoc.DelayForDebugger;
                             if (ImGui.InputInt("Debugger Delay", ref delayForDebugger))
                             {
                                 delayForDebugger = Math.Clamp(delayForDebugger, 0, int.MaxValue);
-                                _engine.RenderDoc.DelayForDebugger = (uint)delayForDebugger;
+                                VeldridEngine.RenderDoc.DelayForDebugger = (uint)delayForDebugger;
                             }
 
-                            bool verifyBufferAccess = _engine.RenderDoc.VerifyBufferAccess;
+                            bool verifyBufferAccess = VeldridEngine.RenderDoc.VerifyBufferAccess;
                             if (ImGui.Checkbox("Verify Buffer Access", ref verifyBufferAccess))
-                                _engine.RenderDoc.VerifyBufferAccess = verifyBufferAccess;
+                                VeldridEngine.RenderDoc.VerifyBufferAccess = verifyBufferAccess;
 
-                            bool overlayEnabled = _engine.RenderDoc.OverlayEnabled;
+                            bool overlayEnabled = VeldridEngine.RenderDoc.OverlayEnabled;
                             if (ImGui.Checkbox("Overlay Visible", ref overlayEnabled))
-                                _engine.RenderDoc.OverlayEnabled = overlayEnabled;
+                                VeldridEngine.RenderDoc.OverlayEnabled = overlayEnabled;
 
-                            bool overlayFrameRate = _engine.RenderDoc.OverlayFrameRate;
+                            bool overlayFrameRate = VeldridEngine.RenderDoc.OverlayFrameRate;
                             if (ImGui.Checkbox("Overlay Frame Rate", ref overlayFrameRate))
-                                _engine.RenderDoc.OverlayFrameRate = overlayFrameRate;
+                                VeldridEngine.RenderDoc.OverlayFrameRate = overlayFrameRate;
 
-                            bool overlayFrameNumber = _engine.RenderDoc.OverlayFrameNumber;
+                            bool overlayFrameNumber = VeldridEngine.RenderDoc.OverlayFrameNumber;
                             if (ImGui.Checkbox("Overlay Frame Number", ref overlayFrameNumber))
-                                _engine.RenderDoc.OverlayFrameNumber = overlayFrameNumber;
+                                VeldridEngine.RenderDoc.OverlayFrameNumber = overlayFrameNumber;
 
-                            bool overlayCaptureList = _engine.RenderDoc.OverlayCaptureList;
+                            bool overlayCaptureList = VeldridEngine.RenderDoc.OverlayCaptureList;
                             if (ImGui.Checkbox("Overlay Capture List", ref overlayCaptureList))
-                                _engine.RenderDoc.OverlayCaptureList = overlayCaptureList;
+                                VeldridEngine.RenderDoc.OverlayCaptureList = overlayCaptureList;
 
                             ImGui.EndMenu();
                         }
 
                         if (ImGui.MenuItem("Launch Replay UI"))
-                            _engine.RenderDoc.LaunchReplayUI();
+                            VeldridEngine.RenderDoc.LaunchReplayUI();
                     }
                     ImGui.EndMenu();
                 }

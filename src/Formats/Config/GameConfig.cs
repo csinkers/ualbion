@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
+#pragma warning disable CA1034 // Nested types should not be visible
 namespace UAlbion.Formats.Config
 {
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
@@ -73,8 +74,8 @@ namespace UAlbion.Formats.Config
         public InventoryT Inventory { get; } = new InventoryT();
         public class InventoryT
         {
-            public IDictionary<PartyCharacterId, PlayerInventoryPositions> Positions { get; }
-                = new Dictionary<PartyCharacterId, PlayerInventoryPositions>();
+            public IDictionary<PartyCharacterId, InventoryPositionDictionary> Positions { get; }
+                = new Dictionary<PartyCharacterId, InventoryPositionDictionary>();
 
             public int GramsPerGold { get; private set; }
             public int GramsPerRation { get; private set; }
@@ -97,3 +98,4 @@ namespace UAlbion.Formats.Config
                 new JsonSerializerSettings {ContractResolver = new PrivatePropertyJsonContractResolver()});
     }
 }
+#pragma warning restore CA1034 // Nested types should not be visible

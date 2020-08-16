@@ -2,7 +2,7 @@
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Game.Entities
 {

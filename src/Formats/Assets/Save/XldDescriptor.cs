@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 
 namespace UAlbion.Formats.Assets.Save
 {
@@ -11,6 +12,7 @@ namespace UAlbion.Formats.Assets.Save
 
         public static XldDescriptor Serdes(int _, XldDescriptor d, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             d ??= new XldDescriptor();
             s.Begin();
             d.Size = s.UInt32(nameof(Size), d.Size);

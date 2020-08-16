@@ -11,13 +11,13 @@ namespace UAlbion.Formats.Parsers
         public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
             var sprite = (AlbionSprite)new FixedSizeSpriteLoader().Load(br, streamLength, key, config);
-            sprite.Frames = new[]
+            var frames = new[] // Frame 0 = entire slab, Frame 1 = status bar only.
             {
                 sprite.Frames[0],
-                new AlbionSprite.Frame(0, sprite.Height - 48, sprite.Width, 48)
+                new AlbionSpriteFrame(0, sprite.Height - 48, sprite.Width, 48)
             };
 
-            return sprite;
+            return new AlbionSprite(sprite.Name, sprite.Width, sprite.Height, sprite.UniformFrames, sprite.PixelData, frames);
         }
     }
 }

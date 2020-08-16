@@ -150,7 +150,7 @@ namespace UAlbion.Game.Veldrid.Debugging
                 try
                 {
                     var command = Encoding.ASCII.GetString(_inputBuffer);
-                    command = command.Substring(0, command.IndexOf((char)0));
+                    command = command.Substring(0, command.IndexOf((char)0, StringComparison.Ordinal));
                     for (int i = 0; i < command.Length; i++)
                         _inputBuffer[i] = 0;
 
@@ -160,10 +160,8 @@ namespace UAlbion.Game.Veldrid.Debugging
                     else
                         PrintMessage($"Unknown event \"{command}\"", ConsoleColor.Red);
                 }
-                catch (Exception e)
-                {
-                    PrintMessage($"Parse error: {e}", ConsoleColor.Red);
-                }
+                catch (Exception e) { PrintMessage($"Parse error: {e}", ConsoleColor.Red); }
+
                 reclaimFocus = true;
             }
             ImGui.SetItemDefaultFocus();
@@ -289,7 +287,7 @@ namespace UAlbion.Game.Veldrid.Debugging
                 }
                 */
 
-        Vector4 ConsoleColorToRgba(ConsoleColor color) => color switch
+        static Vector4 ConsoleColorToRgba(ConsoleColor color) => color switch
         {
             ConsoleColor.White => new Vector4(1.0f, 1.0f, 1.0f, 1.0f),
             ConsoleColor.Cyan => new Vector4(0.3f, 1.0f, 1.0f, 1.0f),

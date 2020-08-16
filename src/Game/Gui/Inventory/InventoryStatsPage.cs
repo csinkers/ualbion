@@ -22,7 +22,7 @@ namespace UAlbion.Game.Gui.Inventory
             if (member == null)
                 yield break;
 
-            var block = tf.Format(id).Get().First();
+            var block = tf.Format(id).GetBlocks().First();
             block.Text += $" {getValue(member)} / {getMax(member)}";
             yield return block;
         }

@@ -9,18 +9,18 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Gui.Controls
 {
+    public class ButtonColorScheme
+    {
+        public CommonColor? TopLeft { get; set; }
+        public CommonColor? BottomRight { get; set; }
+        public CommonColor? Corners { get; set; }
+        public CommonColor? Background { get; set; }
+        public float Alpha { get; set; }
+    }
+
     public class ButtonFrame : UiElement
     {
-        public class ColorScheme
-        {
-            public CommonColor? TopLeft { get; set; }
-            public CommonColor? BottomRight { get; set; }
-            public CommonColor? Corners { get; set; }
-            public CommonColor? Background { get; set; }
-            public float Alpha { get; set; }
-        }
-
-        public delegate ColorScheme ThemeFunction(ButtonState state);
+        public delegate ButtonColorScheme ThemeFunction(ButtonState state);
 
         SpriteLease _sprite;
         Rectangle _lastExtents;

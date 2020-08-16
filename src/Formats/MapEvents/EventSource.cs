@@ -1,18 +1,19 @@
 ﻿using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Maps;
 
+#pragma warning disable CA1034 // Nested types should not be visible
 namespace UAlbion.Formats.MapEvents
 {
     public abstract class EventSource
     {
         public class None : EventSource
         {
-            public override TriggerType Trigger => TriggerType.Default;
+            public override TriggerTypes Trigger => TriggerTypes.Default;
             public override string ToString() => "Ø";
         }
         public class Map : EventSource
         {
-            public Map(MapDataId mapId, TriggerType trigger, int x, int y)
+            public Map(MapDataId mapId, TriggerTypes trigger, int x, int y)
             {
                 MapId = mapId;
                 Trigger = trigger;
@@ -21,7 +22,7 @@ namespace UAlbion.Formats.MapEvents
             }
 
             public MapDataId MapId { get; }
-            public override TriggerType Trigger { get; }
+            public override TriggerTypes Trigger { get; }
             public int X { get; }
             public int Y { get; }
             public override string ToString() => $"Map{(int)MapId}:{Trigger}:{X}:{Y}";
@@ -31,7 +32,7 @@ namespace UAlbion.Formats.MapEvents
         {
             public EventSetId EventSetId { get; }
             public EventSet(EventSetId id) => EventSetId = id;
-            public override TriggerType Trigger => TriggerType.Action;
+            public override TriggerTypes Trigger => TriggerTypes.Action;
             public override string ToString() => $"ES:{EventSetId}";
         }
 
@@ -40,7 +41,7 @@ namespace UAlbion.Formats.MapEvents
             public Npc(NpcCharacterId npcId) => NpcId = npcId;
             public NpcCharacterId NpcId { get; }
             public override string ToString() => $"Npc:{NpcId}";
-            public override TriggerType Trigger => TriggerType.TalkTo;
+            public override TriggerTypes Trigger => TriggerTypes.TalkTo;
         }
 
         public class Item : EventSource
@@ -48,9 +49,10 @@ namespace UAlbion.Formats.MapEvents
             public Item(ItemId usedItem) => ItemId = usedItem;
             public ItemId ItemId { get; }
             public override string ToString() => $"Item:{ItemId}";
-            public override TriggerType Trigger => TriggerType.UseItem;
+            public override TriggerTypes Trigger => TriggerTypes.UseItem;
         }
 
-        public abstract TriggerType Trigger { get; }
+        public abstract TriggerTypes Trigger { get; }
     }
 }
+#pragma warning restore CA1034 // Nested types should not be visible

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UAlbion.Api;
 
@@ -23,6 +24,7 @@ namespace UAlbion.Formats.Assets.Flic
 
         protected override uint LoadChunk(uint length, BinaryReader br)
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
             var initialOffset = br.BaseStream.Position;
             ushort subChunkCount = br.ReadUInt16();
             Delay = br.ReadUInt16();

@@ -1,4 +1,5 @@
-﻿using UAlbion.Core.Events;
+﻿using System;
+using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
@@ -36,21 +37,21 @@ namespace UAlbion.Game.Gui.Inventory
             _hoverSource = new DynamicText(() =>
             {
                 var player = Resolve<IParty>()[_activeCharacter];
-                if(player == null)
-                    return new TextBlock[0];
+                if (player == null)
+                    return Array.Empty<TextBlock>();
 
                 // Carried Weight : %ld of %ld g
                 return Resolve<ITextFormatter>().Format(
                     SystemTextId.Inv_CarriedWeightNdOfNdG,
                     player.Apparent.TotalWeight,
-                    player.Apparent.MaxWeight).Get();
+                    player.Apparent.MaxWeight).GetBlocks();
             }, x => _version);
 
             var source = new DynamicText(() =>
             {
                 var player = Resolve<IParty>()[_activeCharacter];
-                if(player == null)
-                    return new TextBlock[0];
+                if (player == null)
+                    return Array.Empty<TextBlock>();
 
                 // Weight : %d Kg
                 int weight = player.Apparent.TotalWeight / 1000;
@@ -58,7 +59,7 @@ namespace UAlbion.Game.Gui.Inventory
                     .NoWrap()
                     .Center()
                     .Format(SystemTextId.Inv_WeightNKg, weight)
-                    .Get();
+                    .GetBlocks();
             }, x => _version);
 
             AttachChild(

@@ -17,12 +17,9 @@ namespace UAlbion.Core.Visual
         public override string ToString() => $"LEASE [{From}-{To}) {_sprite}";
 #endif
 
-
         public void Dispose()
         {
-            if (Disposed)
-                throw new InvalidOperationException("SpriteLease already disposed");
-
+            if (Disposed) return;
             _sprite.Shrink(this);
             Disposed = true;
         }
@@ -50,5 +47,20 @@ namespace UAlbion.Core.Visual
             if (fromComparison != 0) return fromComparison;
             return To.CompareTo(other.To);
         }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(this, obj)) return true;
+            if (ReferenceEquals(obj, null)) return false;
+            return obj is SpriteLease lease && Key == lease.Key && To == lease.To;
+        }
+
+        public override int GetHashCode() => HashCode.Combine(Key, From, To);
+        public static bool operator ==(SpriteLease left, SpriteLease right) => left?.Equals(right) ?? ReferenceEquals(right, null);
+        public static bool operator !=(SpriteLease left, SpriteLease right) => !(left == right);
+        public static bool operator <(SpriteLease left, SpriteLease right) => ReferenceEquals(left, null) ? !ReferenceEquals(right, null) : left.CompareTo(right) < 0;
+        public static bool operator <=(SpriteLease left, SpriteLease right) => ReferenceEquals(left, null) || left.CompareTo(right) <= 0;
+        public static bool operator >(SpriteLease left, SpriteLease right) => !ReferenceEquals(left, null) && left.CompareTo(right) > 0;
+        public static bool operator >=(SpriteLease left, SpriteLease right) => ReferenceEquals(left, null) ? ReferenceEquals(right, null) : left.CompareTo(right) >= 0;
     }
 }

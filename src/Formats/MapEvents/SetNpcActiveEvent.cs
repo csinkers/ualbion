@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -6,6 +7,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static SetNpcActiveEvent Serdes(SetNpcActiveEvent e, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new SetNpcActiveEvent();
             s.Begin();
             e.IsActive = s.UInt8(nameof(IsActive), e.IsActive);

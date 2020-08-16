@@ -23,12 +23,12 @@ namespace UAlbion.Game.Text
         }
 
         public int Version => _baseVersion + (Source?.Version ?? 0);
-        public IEnumerable<TextBlock> Get()
+        public IEnumerable<TextBlock> GetBlocks()
         {
             if (Source == null)
                 yield break;
 
-            foreach (var block in Source.Get())
+            foreach (var block in Source.GetBlocks())
             {
                 _filter(block);
                 yield return block;

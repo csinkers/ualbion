@@ -7,6 +7,7 @@ namespace UAlbion.Core
 {
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
+#pragma warning disable CA1034 // Nested types should not be visible
     public class CoreConfig
     {
         public VisualT Visual { get; } = new VisualT();
@@ -37,4 +38,5 @@ namespace UAlbion.Core
                 new JsonSerializerSettings {ContractResolver = new PrivatePropertyJsonContractResolver()});
         }
     }
+#pragma warning restore CA1034 // Nested types should not be visible
 }

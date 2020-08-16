@@ -1,8 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
@@ -12,6 +13,8 @@ namespace UAlbion.Formats.Parsers
     {
         public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
+            if (config == null) throw new ArgumentNullException(nameof(config));
             var td = new TilesetData();
             td.UseSmallGraphics = config.UseSmallGraphics ?? false;
 

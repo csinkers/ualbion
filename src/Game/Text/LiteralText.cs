@@ -16,6 +16,6 @@ namespace UAlbion.Game.Text
         }
 
         public int Version => 1;
-        public IEnumerable<TextBlock> Get() => _blocks;
+        public IEnumerable<TextBlock> GetBlocks() => _blocks;
     }
 }

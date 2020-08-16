@@ -54,7 +54,17 @@ namespace UAlbion.Core.Tests
     {
         public void Attach(EventExchange exchange) { }
         public void Remove() { }
-        public void Receive(IEvent @event, object sender) { }
+
+        public void Receive(IEvent e, object sender)
+        {
+            Log?.Invoke(this, new LogEventArgs
+            {
+                Time = DateTime.Now,
+                Nesting = 0,
+                Message = e.ToString(),
+                Color = Console.ForegroundColor = ConsoleColor.Gray,
+            });
+        }
         public bool IsActive { get; set; }
         public void EnqueueEvent(IEvent e) { }
         public event EventHandler<LogEventArgs> Log;

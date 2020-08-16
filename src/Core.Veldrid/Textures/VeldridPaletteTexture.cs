@@ -12,6 +12,8 @@ namespace UAlbion.Core.Veldrid.Textures
 
         public unsafe Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
         {
+            if (gd == null) throw new ArgumentNullException(nameof(gd));
+            if (rf == null) throw new ArgumentNullException(nameof(rf));
             using Texture staging = rf.CreateTexture(new TextureDescription(
                 Width, Height, Depth, MipLevels,
                 ArrayLayers, Format, TextureUsage.Staging, Type));

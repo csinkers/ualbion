@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
@@ -15,6 +16,7 @@ namespace UAlbion.Formats.MapEvents
 
         public static StartDialogueEvent Serdes(StartDialogueEvent e, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new StartDialogueEvent();
             s.Begin();
             s.UInt8("Pad1", 1);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -21,7 +22,7 @@ namespace UAlbion.Core
 
         public void Attach(EventExchange exchange)
         {
-            _exchange = exchange;
+            _exchange = exchange ?? throw new ArgumentNullException(nameof(exchange));
             // Only need to subscribe to verbose events, as all non-verbose events will be delivered
             // here anyway as long as this was given to Engine as the logger component.
             exchange.Subscribe<BeginFrameEvent>(this);
@@ -39,6 +40,7 @@ namespace UAlbion.Core
 
         public void Receive(IEvent @event, object sender)
         {
+            if (@event == null) throw new ArgumentNullException(nameof(@event));
             bool highlight = @event is IHighlightEvent;
             switch(@event)
             {
@@ -167,33 +169,35 @@ namespace UAlbion.Core
                 if (matchingEvents.Any())
                     PrintHelpSummary(sb, matchingEvents);
                 else
-                    sb.AppendFormat("The command \"{0}\" is not recognised." + Environment.NewLine, pattern);
+                    sb.AppendFormat(CultureInfo.InvariantCulture, "The command \"{0}\" is not recognised." + Environment.NewLine, pattern);
             }
         }
 
-        void PrintHelpSummary(StringBuilder sb, IEnumerable<EventMetadata> events)
+        static void PrintHelpSummary(StringBuilder sb, IEnumerable<EventMetadata> events)
         {
             foreach (var e in events)
             {
-                var paramList = e.Parts.Length == 0
+                var paramList = e.Parts.Count == 0
                     ? ""
                     : " " + string.Join(" ",
                           e.Parts.Select(x => x.IsOptional ? $"[{x.Name}]" : x.Name));
 
-                sb.AppendFormat("    {0}{1}: {2}" + Environment.NewLine, e.Name, paramList, e.HelpText);
+                sb.AppendFormat(CultureInfo.InvariantCulture, "    {0}{1}: {2}" + Environment.NewLine, e.Name, paramList, e.HelpText);
             }
         }
 
-        void PrintDetailedHelp(StringBuilder sb, EventMetadata metadata)
+        public static void PrintDetailedHelp(StringBuilder sb, EventMetadata metadata)
         {
-            var paramList = metadata.Parts.Length == 0
+            if (sb == null) throw new ArgumentNullException(nameof(sb));
+            if (metadata == null) throw new ArgumentNullException(nameof(metadata));
+            var paramList = metadata.Parts.Count == 0
                 ? ""
                 : " " + string.Join(" ",
                       metadata.Parts.Select(x => x.IsOptional ? $"[{x.Name}]" : x.Name));
 
-            sb.AppendFormat("    {0}{1}: {2}" + Environment.NewLine, metadata.Name, paramList, metadata.HelpText);
+            sb.AppendFormat(CultureInfo.InvariantCulture, "    {0}{1}: {2}" + Environment.NewLine, metadata.Name, paramList, metadata.HelpText);
             foreach (var param in metadata.Parts)
-                sb.AppendFormat("        {0} ({1}): {2}" + Environment.NewLine, param.Name, param.PropertyType, param.HelpText);
+                sb.AppendFormat(CultureInfo.InvariantCulture, "        {0} ({1}): {2}" + Environment.NewLine, param.Name, param.PropertyType, param.HelpText);
         }
 
         void PrintEventConsumers(StringBuilder sb, string pattern)

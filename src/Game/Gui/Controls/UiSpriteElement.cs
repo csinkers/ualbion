@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
@@ -35,8 +36,8 @@ namespace UAlbion.Game.Gui.Controls
             get => _id ?? (T)(object)0;
             set
             {
-                int existing = _id == null ? -1 : Convert.ToInt32(_id.Value);
-                int newValue = Convert.ToInt32(value);
+                int existing = _id == null ? -1 : Convert.ToInt32(_id.Value, CultureInfo.InvariantCulture);
+                int newValue = Convert.ToInt32(value, CultureInfo.InvariantCulture);
 
                 if (existing == newValue) return;
                 _id = value;
@@ -51,6 +52,7 @@ namespace UAlbion.Game.Gui.Controls
         public override Vector2 GetSize() => _size;
         public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
+            if (registerHitFunc == null) throw new ArgumentNullException(nameof(registerHitFunc));
             if (extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
                 registerHitFunc(order, this);
             return order;

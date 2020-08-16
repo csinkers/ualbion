@@ -7,7 +7,7 @@ using Veldrid;
 
 namespace UAlbion.Core.Veldrid.Visual
 {
-    public class DebugGuiRenderer : Component, IRenderer, IRenderable
+    public sealed class DebugGuiRenderer : Component, IRenderer, IRenderable
     {
         ImGuiRenderer _imguiRenderer;
 
@@ -27,6 +27,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public void CreateDeviceObjects(IRendererContext context)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
             var c = (VeldridRendererContext)context;
             if (_imguiRenderer == null)
             {
@@ -48,12 +49,18 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public void Render(IRendererContext context, RenderPasses renderPass, IRenderable r)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            if (r == null) throw new ArgumentNullException(nameof(r));
             var c = (VeldridRendererContext)context;
             ApiUtil.Assert(renderPass == RenderPasses.Standard);
             _imguiRenderer.Render(c.GraphicsDevice, c.CommandList);
             c.CommandList.SetFullScissorRects();
         }
 
-        public void Dispose() { DestroyDeviceObjects(); }
+        public void Dispose()
+        {
+            DestroyDeviceObjects();
+            GC.SuppressFinalize(this);
+        }
     }
 }

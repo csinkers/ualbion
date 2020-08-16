@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Globalization;
 using SerdesNet;
 
 namespace UAlbion.Formats
 {
-    public class StoreIncrementedNullZero :
+    public sealed class StoreIncrementedNullZero :
         IConverter<  byte,   byte?>,
         IConverter< sbyte,  sbyte?>,
         IConverter<ushort, ushort?>,
@@ -42,17 +43,17 @@ namespace UAlbion.Formats
         public string ToSymbolic( ulong? x) => x == null ? null : x.ToString();
         public string ToSymbolic(  long? x) => x == null ? null : x.ToString();
 
-        byte?   IConverter<byte,     byte?>.FromSymbolic(string x) => x == null ?   (byte?)null :   byte.Parse(x);
-        sbyte?  IConverter<sbyte,   sbyte?>.FromSymbolic(string x) => x == null ?  (sbyte?)null :  sbyte.Parse(x);
-        ushort? IConverter<ushort, ushort?>.FromSymbolic(string x) => x == null ? (ushort?)null : ushort.Parse(x);
-        short?  IConverter<short,   short?>.FromSymbolic(string x) => x == null ?  (short?)null :  short.Parse(x);
-        uint?   IConverter<uint,     uint?>.FromSymbolic(string x) => x == null ?   (uint?)null :   uint.Parse(x);
-        int?    IConverter<int,       int?>.FromSymbolic(string x) => x == null ?    (int?)null :    int.Parse(x);
-        ulong?  IConverter<ulong,   ulong?>.FromSymbolic(string x) => x == null ?  (ulong?)null :  ulong.Parse(x);
-        long?   IConverter<long,     long?>.FromSymbolic(string x) => x == null ?   (long?)null :   long.Parse(x);
+        byte?   IConverter<byte,     byte?>.FromSymbolic(string x) => x == null ?   (byte?)null :   byte.Parse(x, CultureInfo.InvariantCulture);
+        sbyte?  IConverter<sbyte,   sbyte?>.FromSymbolic(string x) => x == null ?  (sbyte?)null :  sbyte.Parse(x, CultureInfo.InvariantCulture);
+        ushort? IConverter<ushort, ushort?>.FromSymbolic(string x) => x == null ? (ushort?)null : ushort.Parse(x, CultureInfo.InvariantCulture);
+        short?  IConverter<short,   short?>.FromSymbolic(string x) => x == null ?  (short?)null :  short.Parse(x, CultureInfo.InvariantCulture);
+        uint?   IConverter<uint,     uint?>.FromSymbolic(string x) => x == null ?   (uint?)null :   uint.Parse(x, CultureInfo.InvariantCulture);
+        int?    IConverter<int,       int?>.FromSymbolic(string x) => x == null ?    (int?)null :    int.Parse(x, CultureInfo.InvariantCulture);
+        ulong?  IConverter<ulong,   ulong?>.FromSymbolic(string x) => x == null ?  (ulong?)null :  ulong.Parse(x, CultureInfo.InvariantCulture);
+        long?   IConverter<long,     long?>.FromSymbolic(string x) => x == null ?   (long?)null :   long.Parse(x, CultureInfo.InvariantCulture);
     }
 
-    public class StoreIncrementedNullZero<T> :
+    public sealed class StoreIncrementedNullZero<T> :
         IConverter<byte, T?>,
         IConverter<sbyte, T?>,
         IConverter<ushort, T?>,

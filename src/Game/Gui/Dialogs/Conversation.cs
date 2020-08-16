@@ -142,6 +142,8 @@ namespace UAlbion.Game.Gui.Dialogs
 
         public bool? OnText(BaseTextEvent textEvent, Action continuation)
         {
+            if (textEvent == null) throw new ArgumentNullException(nameof(textEvent));
+            if (continuation == null) throw new ArgumentNullException(nameof(continuation));
             var tf = Resolve<ITextFormatter>();
             switch(textEvent.Location)
             {
@@ -155,7 +157,7 @@ namespace UAlbion.Game.Gui.Dialogs
                     }
 
                     var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
-                    DiscoverTopics(text.Get().SelectMany(x => x.Words));
+                    DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
                     _textWindow.Text = text;
                     _textWindow.Clicked += OnConversationClicked;
                     return true;
@@ -164,11 +166,11 @@ namespace UAlbion.Game.Gui.Dialogs
                 case TextLocation.ConversationOptions:
                 {
                     var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
-                    DiscoverTopics(text.Get().SelectMany(x => x.Words));
+                    DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
                     _textWindow.Text = text;
 
                     var options = new List<(IText, int?, Action)>();
-                    var blocks = text.Get().Select(x => x.BlockId).Distinct();
+                    var blocks = text.GetBlocks().Select(x => x.BlockId).Distinct();
                     foreach (var blockId in blocks.Where(x => x > 0))
                         options.Add((text, blockId, () => BlockClicked(blockId, textEvent.TextId)));
 
@@ -183,14 +185,14 @@ namespace UAlbion.Game.Gui.Dialogs
                 {
                     var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
 
-                    DiscoverTopics(text.Get().SelectMany(x => x.Words));
+                    DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
 
                     void OnQueryClicked()
                     {
                         _textWindow.Clicked -= OnQueryClicked;
 
                         var options = new List<(IText, int?, Action)>();
-                        var blocks = text.Get().Select(x => x.BlockId).Distinct();
+                        var blocks = text.GetBlocks().Select(x => x.BlockId).Distinct();
                         foreach (var blockId in blocks.Where(x => x > 0))
                             options.Add((text, blockId, () => BlockClicked(blockId, textEvent.TextId)));
                         _optionsWindow.SetOptions(options, null);

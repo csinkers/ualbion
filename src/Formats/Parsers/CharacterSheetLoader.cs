@@ -10,21 +10,22 @@ using UAlbion.Formats.Config;
 namespace UAlbion.Formats.Parsers
 {
     [AssetLoader(FileFormat.CharacterData)]
-    class CharacterSheetLoader : IAssetLoader<CharacterSheet>
+    public class CharacterSheetLoader : IAssetLoader<CharacterSheet>
     {
         const int SpellSchoolCount = 7;
         const int MaxSpellsPerSchool = 30;
 
         public CharacterSheet Serdes(CharacterSheet sheet, ISerializer s, AssetKey key, AssetInfo config)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             var initialOffset = s.Offset;
             sheet ??= new CharacterSheet(key);
             s.Begin();
             s.Check();
             sheet.Type = s.EnumU8(nameof(sheet.Type), sheet.Type);
             sheet.Gender = s.EnumU8(nameof(sheet.Gender), sheet.Gender);
-            sheet.Race = s.EnumU8(nameof(sheet.Race), sheet.Race);
-            sheet.Class = s.EnumU8(nameof(sheet.Class), sheet.Class);
+            sheet.Races = s.EnumU8(nameof(sheet.Races), sheet.Races);
+            sheet.PlayerClass = s.EnumU8(nameof(sheet.PlayerClass), sheet.PlayerClass);
             sheet.Magic.SpellClasses = s.EnumU8(nameof(sheet.Magic.SpellClasses), sheet.Magic.SpellClasses);
             sheet.Level = s.UInt8(nameof(sheet.Level), sheet.Level);
             sheet.Unknown6 = s.UInt8(nameof(sheet.Unknown6), sheet.Unknown6);

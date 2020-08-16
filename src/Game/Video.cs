@@ -16,7 +16,7 @@ namespace UAlbion.Game
         readonly VideoId _id;
         readonly bool _looping;
         Sprite _sprite;
-        FlicFile.Player _player;
+        FlicPlayer _player;
         ITexture _texture;
         PaletteId _previousPaletteId;
 

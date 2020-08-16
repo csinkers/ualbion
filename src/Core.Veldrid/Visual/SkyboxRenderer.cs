@@ -20,7 +20,7 @@ namespace UAlbion.Core.Veldrid.Visual
         readonly uint _pad1;   // 16
     }
 
-    public class SkyboxRenderer : Component, IRenderer
+    public sealed class SkyboxRenderer : Component, IRenderer
     {
         // Vertex Layout
         static readonly VertexLayoutDescription VertexLayout = VertexLayoutHelper.Vertex2DTextured;
@@ -43,11 +43,13 @@ namespace UAlbion.Core.Veldrid.Visual
         readonly List<Shader> _shaders = new List<Shader>();
         Pipeline _pipeline;
 
-        // Context objects
+#pragma warning disable CA2213 // Disposable fields should be disposed
+        // Context objects - disposed by the dispose collector.
         DeviceBuffer _vertexBuffer;
         DeviceBuffer _indexBuffer;
         DeviceBuffer _uniformBuffer;
         ResourceLayout _resourceLayout;
+#pragma warning restore CA2213 // Disposable fields should be disposed
 
         public bool CanRender(Type renderable) => renderable == typeof(SkyboxRenderable);
         public RenderPasses RenderPasses => RenderPasses.Standard;
@@ -93,6 +95,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public void CreateDeviceObjects(IRendererContext context)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
             var c = (VeldridRendererContext)context;
 
             ResourceFactory factory = c.GraphicsDevice.ResourceFactory;
@@ -113,6 +116,8 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public IEnumerable<IRenderable> UpdatePerFrameResources(IRendererContext context, IEnumerable<IRenderable> renderables)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            if (renderables == null) throw new ArgumentNullException(nameof(renderables));
             var c = (VeldridRendererContext)context;
             var gd = c.GraphicsDevice;
             if(!(renderables.FirstOrDefault() is SkyboxRenderable skybox))
@@ -124,7 +129,7 @@ namespace UAlbion.Core.Veldrid.Visual
             textureManager?.PrepareTexture(skybox.Texture, context);
             TextureView textureView = (TextureView)textureManager?.GetTexture(skybox.Texture);
 
-            var resourceSet = objectManager.Get<ResourceSet>((skybox, textureView));
+            var resourceSet = objectManager.GetDeviceObject<ResourceSet>((skybox, textureView));
             if (resourceSet == null)
             {
                 resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
@@ -134,7 +139,7 @@ namespace UAlbion.Core.Veldrid.Visual
                     _uniformBuffer));
                 resourceSet.Name = $"RS_Sky:{skybox.Texture.Name}";
                 PerfTracker.IncrementFrameCounter("Create ResourceSet");
-                objectManager.Set((skybox, textureView), resourceSet);
+                objectManager.SetDeviceObject((skybox, textureView), resourceSet);
             }
 
             yield return skybox;
@@ -142,6 +147,8 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public void Render(IRendererContext context, RenderPasses renderPass, IRenderable renderable)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            if (renderable == null) throw new ArgumentNullException(nameof(renderable));
             var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var sc = c.SceneContext;
@@ -169,7 +176,7 @@ namespace UAlbion.Core.Veldrid.Visual
                 return;
 
             TextureView textureView = (TextureView)textureManager?.GetTexture(skybox.Texture);
-            var resourceSet = dom.Get<ResourceSet>((skybox, textureView));
+            var resourceSet = dom.GetDeviceObject<ResourceSet>((skybox, textureView));
 
             cl.SetPipeline(_pipeline);
             cl.SetGraphicsResourceSet(0, resourceSet);

@@ -6,6 +6,7 @@ using System.Text;
 
 namespace UAlbion.Api
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1716:Identifiers should not match keywords", Justification = "Don't care about VB")]
     public abstract class Event : IEvent // Contains no fields, only helper methods for reflection-based parsing and serialization.
     {
         static IEnumerable<Assembly> EventAssemblies => 
@@ -146,11 +147,12 @@ namespace UAlbion.Api
             if (!Events.TryGetValue(parts[0], out var metadata))
                 return null;
 
-            if (parts.Length < metadata.Parts.Length + 1)
-                parts = parts.Concat(Enumerable.Repeat<string>(null, metadata.Parts.Length + 1 - parts.Length)).ToArray();
+            if (parts.Length < metadata.Parts.Count + 1)
+                parts = parts.Concat(Enumerable.Repeat("", metadata.Parts.Count + 1 - parts.Length)).ToArray();
 
             try { return metadata.Parser(parts); }
-            catch { return null; }
+            catch(FormatException) { return null; }
+            catch(NullReferenceException) { return null; }
         }
     }
 }

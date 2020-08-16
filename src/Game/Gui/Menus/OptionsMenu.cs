@@ -19,7 +19,7 @@ namespace UAlbion.Game.Gui.Menus
         bool HasLanguageFiles(GameLanguage language)
         {
             var config = Resolve<IAssetManager>().LoadGeneralConfig();
-            var path = Path.Combine(config.BasePath, config.XldPath, language.ToString().ToUpper());
+            var path = Path.Combine(config.BasePath, config.XldPath, language.ToString().ToUpperInvariant());
             return Directory.Exists(path);
         }
 

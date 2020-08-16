@@ -1,4 +1,5 @@
-﻿namespace UAlbion.Formats.MapEvents
+﻿using System;
+namespace UAlbion.Formats.MapEvents
 {
     public enum EventContextStatus
     {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
@@ -41,6 +42,7 @@ namespace UAlbion.Game.Gui.Text
 
         public Vector2 Measure(TextBlock block)
         {
+            if (block == null) throw new ArgumentNullException(nameof(block));
             int offset = 0;
             var assets = Resolve<IAssetManager>();
             var font = assets.LoadFont(block.Color, block.Style == TextStyle.Big);
@@ -65,6 +67,7 @@ namespace UAlbion.Game.Gui.Text
 
         public PositionedSpriteBatch BuildRenderable(TextBlock block, DrawLayer order, Rectangle? scissorRegion, object caller)
         {
+            if (block == null) throw new ArgumentNullException(nameof(block));
             var assets = Resolve<IAssetManager>();
             var sm = Resolve<ISpriteManager>();
             var window = Resolve<IWindowManager>();
@@ -130,9 +133,10 @@ namespace UAlbion.Game.Gui.Text
 
         public IEnumerable<TextBlock> SplitBlocksToSingleWords(IEnumerable<TextBlock> blocks)
         {
+            if (blocks == null) throw new ArgumentNullException(nameof(blocks));
             foreach (var block in blocks)
             {
-                if (block.Arrangement.HasFlag(TextArrangement.NoWrap))
+                if (block.ArrangementFlags.HasFlag(TextArrangementFlags.NoWrap))
                 {
                     yield return block;
                     continue;
@@ -149,7 +153,7 @@ namespace UAlbion.Game.Gui.Text
                             Alignment = block.Alignment,
                             Color = block.Color,
                             Style = block.Style,
-                            Arrangement = block.Arrangement & ~TextArrangement.ForceNewLine
+                            ArrangementFlags = block.ArrangementFlags & ~TextArrangementFlags.ForceNewLine
                         };
 
                         if (part.Length > 0)
@@ -159,7 +163,7 @@ namespace UAlbion.Game.Gui.Text
                                 Alignment = block.Alignment,
                                 Color = block.Color,
                                 Style = block.Style,
-                                Arrangement = block.Arrangement & ~TextArrangement.ForceNewLine
+                                ArrangementFlags = block.ArrangementFlags & ~TextArrangementFlags.ForceNewLine
                             };
                         }
                     }
@@ -170,7 +174,7 @@ namespace UAlbion.Game.Gui.Text
                             Alignment = block.Alignment,
                             Color = block.Color,
                             Style = block.Style,
-                            Arrangement = block.Arrangement
+                            ArrangementFlags = block.ArrangementFlags
                         };
                         first = false;
                     }

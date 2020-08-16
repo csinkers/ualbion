@@ -16,6 +16,8 @@ namespace UAlbion.Core.Veldrid
             ResourceFactory factory,
             string setName)
         {
+            if (gd == null) throw new ArgumentNullException(nameof(gd));
+            if (factory == null) throw new ArgumentNullException(nameof(factory));
             byte[] vsBytes = LoadBytecode(GraphicsBackend.Vulkan, setName, ShaderStages.Vertex);
             byte[] fsBytes = LoadBytecode(GraphicsBackend.Vulkan, setName, ShaderStages.Fragment);
 
@@ -43,6 +45,7 @@ namespace UAlbion.Core.Veldrid
 
         public static SpecializationConstant[] GetSpecializations(GraphicsDevice gd)
         {
+            if (gd == null) throw new ArgumentNullException(nameof(gd));
             bool glOrGles = gd.BackendType == GraphicsBackend.OpenGL || gd.BackendType == GraphicsBackend.OpenGLES;
 
             List<SpecializationConstant> specializations = new List<SpecializationConstant>();

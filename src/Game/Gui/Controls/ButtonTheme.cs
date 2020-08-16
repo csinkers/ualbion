@@ -1,13 +1,14 @@
 ﻿using System;
+using System.ComponentModel;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Gui.Controls
 {
     public static class ButtonTheme
     {
-        public static ButtonFrame.ColorScheme Default(ButtonState state)
+        public static ButtonColorScheme Default(ButtonState state)
         {
-            var c = new ButtonFrame.ColorScheme { Alpha = 0.4f, Corners = CommonColor.Grey8 };
+            var c = new ButtonColorScheme { Alpha = 0.4f, Corners = CommonColor.Grey8 };
             switch (state)
             {
                 case ButtonState.Normal:
@@ -32,15 +33,15 @@ namespace UAlbion.Game.Gui.Controls
                     c.BottomRight = CommonColor.White;
                     c.Background = CommonColor.White;
                     break;
-                default: throw new ArgumentOutOfRangeException();
+                default: throw new ArgumentOutOfRangeException(nameof(state), state, $"Unexpected button state \"{state}\"");
             }
 
             return c;
         }
 
-        public static ButtonFrame.ColorScheme SliderThumb(ButtonState state)
+        public static ButtonColorScheme SliderThumb(ButtonState state)
         {
-            var c = new ButtonFrame.ColorScheme { Alpha = 1.0f, Corners = CommonColor.BlueGrey4 };
+            var c = new ButtonColorScheme { Alpha = 1.0f, Corners = CommonColor.BlueGrey4 };
             switch (state)
             {
                 case ButtonState.Normal:
@@ -65,14 +66,14 @@ namespace UAlbion.Game.Gui.Controls
                     c.BottomRight = CommonColor.Teal1;
                     c.Background = CommonColor.Teal3;
                     break;
-                default: throw new ArgumentOutOfRangeException();
+                default: throw new InvalidEnumArgumentException(nameof(state), (int)state, typeof(ButtonState));
             }
             return c;
         }
 
-        public static ButtonFrame.ColorScheme Frameless(ButtonState state)
+        public static ButtonColorScheme Frameless(ButtonState state)
         {
-            var c = new ButtonFrame.ColorScheme { Alpha = 0.4f, Corners = CommonColor.Grey8 };
+            var c = new ButtonColorScheme { Alpha = 0.4f, Corners = CommonColor.Grey8 };
             switch (state)
             {
                 case ButtonState.Normal:
@@ -97,17 +98,17 @@ namespace UAlbion.Game.Gui.Controls
                     c.BottomRight = CommonColor.White;
                     c.Background = CommonColor.White;
                     break;
-                default: throw new ArgumentOutOfRangeException();
+                default: throw new InvalidEnumArgumentException(nameof(state), (int)state, typeof(ButtonState));
             }
 
             return c;
         }
 
-        public static ButtonFrame.ColorScheme Invisible(ButtonState state) => new ButtonFrame.ColorScheme { Alpha = 0 };
+        public static ButtonColorScheme Invisible(ButtonState state) => new ButtonColorScheme { Alpha = 0 };
 
-        public static ButtonFrame.ColorScheme InventorySlot(ButtonState state)
+        public static ButtonColorScheme InventorySlot(ButtonState state)
         {
-            var c = new ButtonFrame.ColorScheme
+            var c = new ButtonColorScheme
             {
                 Alpha = 0.5f,
                 Corners = CommonColor.Black2,
@@ -122,8 +123,8 @@ namespace UAlbion.Game.Gui.Controls
             return c;
         }
 
-        public static ButtonFrame.ColorScheme InventoryOuterFrame(ButtonState _) =>
-            new ButtonFrame.ColorScheme
+        public static ButtonColorScheme InventoryOuterFrame(ButtonState _) =>
+            new ButtonColorScheme
             {
                 Alpha = 0.5f,
                 Corners = CommonColor.Black2,

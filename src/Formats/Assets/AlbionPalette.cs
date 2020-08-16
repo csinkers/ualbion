@@ -37,6 +37,7 @@ namespace UAlbion.Formats.Assets
 
         public AlbionPalette(BinaryReader br, int streamLength, AssetKey key, int id)
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
             Id = id;
             Name = key.ToString();
             long startingOffset = br.BaseStream.Position;

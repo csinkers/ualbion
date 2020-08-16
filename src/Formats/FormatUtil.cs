@@ -14,9 +14,11 @@ namespace UAlbion.Formats
                 .Replace("×", "ß")
                 .TrimEnd((char) 0);
 
-        public static byte[] BytesFrom850String(string str) =>
-            AlbionEncoding
-                .GetBytes(str.Replace("ß", "×"));
+        public static byte[] BytesFrom850String(string str)
+        {
+            if (str == null) throw new ArgumentNullException(nameof(str));
+            return AlbionEncoding.GetBytes(str.Replace("ß", "×"));
+        }
 
         public static string FindBasePath()
         {
@@ -31,7 +33,7 @@ namespace UAlbion.Formats
 
         public static string WordWrap(string s, int maxLine)
         {
-            if (s.Length <= maxLine)
+            if (s == null || s.Length <= maxLine)
                 return s;
 
             int n = 0;

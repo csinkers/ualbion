@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.Config;
@@ -60,6 +61,7 @@ namespace UAlbion.Game.Input
 
         public InputManager RegisterMouseMode(MouseMode mouseMode, IComponent implementation)
         {
+            if (implementation == null) throw new ArgumentNullException(nameof(implementation));
             _mouseModes.Add(mouseMode, implementation);
             implementation.IsActive = false;
             AttachChild(implementation);
@@ -68,6 +70,7 @@ namespace UAlbion.Game.Input
 
         public InputManager RegisterInputMode(InputMode inputMode, IComponent implementation)
         {
+            if (implementation == null) throw new ArgumentNullException(nameof(implementation));
             _inputModes.Add(inputMode, implementation);
             implementation.IsActive = false;
             AttachChild(implementation);

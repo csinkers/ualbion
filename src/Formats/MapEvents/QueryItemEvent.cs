@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
@@ -13,6 +14,7 @@ namespace UAlbion.Formats.MapEvents
 
         public static QueryItemEvent Serdes(QueryItemEvent e, ISerializer s, QueryType subType)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new QueryItemEvent(subType);
             s.Begin();
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);

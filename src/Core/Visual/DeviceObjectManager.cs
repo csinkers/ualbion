@@ -46,7 +46,7 @@ namespace UAlbion.Core.Visual
             }
         }
 
-        public T Get<T>((object, object) owner) where T : IDisposable
+        public T GetDeviceObject<T>((object, object) owner) where T : IDisposable
         {
             lock(_syncRoot)
             {
@@ -60,7 +60,7 @@ namespace UAlbion.Core.Visual
             }
         }
 
-        public void Set<T>((object, object) owner, T newResource) where T : IDisposable
+        public void SetDeviceObject<T>((object, object) owner, T newResource) where T : IDisposable
         {
             lock (_syncRoot)
             {

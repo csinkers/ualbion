@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace UAlbion.Game.Text
@@ -14,6 +16,7 @@ namespace UAlbion.Game.Text
 
         public static IEnumerable<(Token, object)> Tokenise(string template)
         {
+            if (template == null) yield break;
             StringBuilder sb = new StringBuilder();
             TokeniserState state = TokeniserState.Neutral;
             foreach (var c in template)
@@ -88,17 +91,17 @@ namespace UAlbion.Game.Text
                                     case "TECF": yield return (Token.Tecf, null); break;
                                     case "UNKN": yield return (Token.Unknown, null); break;
                                     default:
-                                        if (inner.StartsWith("BLOK"))
+                                        if (inner.StartsWith("BLOK", StringComparison.Ordinal))
                                         {
-                                            var number = int.Parse(inner.Substring(4));
+                                            var number = int.Parse(inner.Substring(4), CultureInfo.InvariantCulture);
                                             yield return (Token.Block, number);
                                         }
-                                        else if (inner.StartsWith("INK "))
+                                        else if (inner.StartsWith("INK ", StringComparison.Ordinal))
                                         {
-                                            var number = int.Parse(inner.Substring(4));
+                                            var number = int.Parse(inner.Substring(4), CultureInfo.InvariantCulture);
                                             yield return (Token.Ink, number);
                                         }
-                                        else if (inner.StartsWith("WORD"))
+                                        else if (inner.StartsWith("WORD", StringComparison.Ordinal))
                                         {
                                             var word = inner.Substring(4);
                                             yield return (Token.Word, word);

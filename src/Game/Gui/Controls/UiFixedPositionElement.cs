@@ -55,6 +55,7 @@ namespace UAlbion.Game.Gui.Controls
 
         public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
+            if (registerHitFunc == null) throw new ArgumentNullException(nameof(registerHitFunc));
             if (extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
                 registerHitFunc(order, this);
             return order;

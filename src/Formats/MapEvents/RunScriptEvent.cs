@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -6,6 +7,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static RunScriptEvent Serdes(RunScriptEvent e, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new RunScriptEvent();
             s.Begin();
             e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);

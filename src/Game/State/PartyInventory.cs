@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
@@ -9,6 +10,7 @@ using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Events.Transitions;
 using UAlbion.Game.State.Player;
+using Component = UAlbion.Core.Component;
 
 namespace UAlbion.Game.State
 {
@@ -30,7 +32,7 @@ namespace UAlbion.Game.State
                     SimpleChestEvent.SimpleChestItemType.Item => e.ItemId,
                     SimpleChestEvent.SimpleChestItemType.Gold => ItemId.Gold,
                     SimpleChestEvent.SimpleChestItemType.Rations => ItemId.Rations,
-                    _ => throw new ArgumentOutOfRangeException()
+                    _ => throw new InvalidEnumArgumentException(nameof(e.ChestType), (int)e.ChestType, typeof(SimpleChestEvent.SimpleChestItemType))
                 };
 
                 var recipient = ChangePartyItemAmount(itemId, QuantityChangeOperation.AddAmount, e.Amount);

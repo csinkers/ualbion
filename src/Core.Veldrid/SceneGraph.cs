@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core.Events;
 using Veldrid.Utilities;
@@ -20,12 +21,20 @@ namespace UAlbion.Core.Veldrid
             });
         }
 
-        public void Add(IPositioned entity) 
-            => _octree.AddItem(new BoundingBox(entity.Position - entity.Dimensions, entity.Position + entity.Dimensions), entity);
+        public void Add(IPositioned entity)
+        {
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
+            _octree.AddItem(new BoundingBox(
+                    entity.Position - entity.Dimensions,
+                    entity.Position + entity.Dimensions),
+                entity);
+        }
+
         public void Remove(IPositioned entity) => _octree.RemoveItem(entity);
 
         public void RayIntersect(Vector3 origin, Vector3 direction, List<Selection> hits)
         {
+            if (hits == null) throw new ArgumentNullException(nameof(hits));
             var veldridHits = new List<RayCastHit<IPositioned>>();
             _octree.RayCast(new Ray(origin, direction), veldridHits, (ray, item, list) =>
             {

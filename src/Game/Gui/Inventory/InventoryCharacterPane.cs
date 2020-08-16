@@ -15,7 +15,8 @@ namespace UAlbion.Game.Gui.Inventory
 
         public InventoryCharacterPane(PartyCharacterId activeCharacter, Func<InventoryPage> getPage, Action<InventoryPage> setPage)
         {
-            _getPage = getPage;
+            if (setPage == null) throw new ArgumentNullException(nameof(setPage));
+            _getPage = getPage ?? throw new ArgumentNullException(nameof(getPage));
             var page = _getPage();
             _summaryButton = new Button("I")
             {

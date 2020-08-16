@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Gui.Text;
@@ -36,7 +37,7 @@ namespace UAlbion.Game.Gui.Controls
 
             _lastValue = currentValue;
             _text.Text = _format == null
-                ? currentValue.ToString() 
+                ? currentValue.ToString(CultureInfo.InvariantCulture) // i18n
                 : _format(currentValue);
         }
 

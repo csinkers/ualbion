@@ -51,9 +51,9 @@ namespace UAlbion.Game.Gui.Status
             _bar.DrawSize = new Vector2(_bar.MeasureSize.X * value / valueMax, _bar.MeasureSize.Y);
             _frame.State = highlighted ? ButtonState.Hover : ButtonState.Normal;
         }
-        static ButtonFrame.ColorScheme HealthIndicatorTheme(ButtonState state)
+        static ButtonColorScheme HealthIndicatorTheme(ButtonState state)
         {
-            var c = new ButtonFrame.ColorScheme { Alpha = 1.0f };
+            var c = new ButtonColorScheme { Alpha = 1.0f };
             switch (state)
             {
                 case ButtonState.Normal:
@@ -72,9 +72,9 @@ namespace UAlbion.Game.Gui.Status
             return c;
         }
 
-        static ButtonFrame.ColorScheme ManaIndicatorTheme(ButtonState state)
+        static ButtonColorScheme ManaIndicatorTheme(ButtonState state)
         {
-            var c = new ButtonFrame.ColorScheme { Alpha = 1.0f };
+            var c = new ButtonColorScheme { Alpha = 1.0f };
             switch (state)
             {
                 case ButtonState.Normal:

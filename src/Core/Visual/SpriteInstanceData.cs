@@ -1,10 +1,12 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using UAlbion.Core.Textures;
 using Matrix4x4 = System.Numerics.Matrix4x4;
 
 namespace UAlbion.Core.Visual
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Not comparable")]
     public struct SpriteInstanceData
     {
         public static readonly uint StructSize = (uint)Unsafe.SizeOf<SpriteInstanceData>();
@@ -16,9 +18,9 @@ namespace UAlbion.Core.Visual
         public Vector3 Transform2 { get; private set; }
         public Vector3 Transform3 { get; private set; }
         public Vector3 Transform4 { get; private set; }
-        public Vector2 TexPosition { get; private set; } // Normalised texture coordinates
-        public Vector2 TexSize { get; private set; } // Normalised texture coordinates
-        public uint TexLayer { get; private set; }
+        public Vector2 TexPosition { get; } // Normalised texture coordinates
+        public Vector2 TexSize { get; } // Normalised texture coordinates
+        public uint TexLayer { get; }
         public SpriteFlags Flags { get; set; }
 
         // Derived properties for use by C# code
@@ -36,6 +38,7 @@ namespace UAlbion.Core.Visual
         // Main constructor
         SpriteInstanceData(Vector3 position, Vector2 size, SubImage subImage, SpriteFlags flags)
         {
+            if (subImage == null) throw new ArgumentNullException(nameof(subImage));
             BuildTransform(position, size, flags, out Matrix4x4 transform);
 
             Transform1 = new Vector3(transform.M11, transform.M12, transform.M13);
@@ -99,37 +102,44 @@ namespace UAlbion.Core.Visual
 
         public static SpriteInstanceData CopyFlags(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags)
         {
+            if (lease == null) throw new ArgumentNullException(nameof(lease));
             var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
             return CopyFlags(position, size, subImage, flags);
         }
 
         public static SpriteInstanceData TopLeft(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags)
         {
+            if (lease == null) throw new ArgumentNullException(nameof(lease));
             var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
             return TopLeft(position, size, subImage, flags);
         }
         public static SpriteInstanceData MidLeft(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags)
         {
+            if (lease == null) throw new ArgumentNullException(nameof(lease));
             var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
             return MidLeft(position, size, subImage, flags);
         }
         public static SpriteInstanceData BottomLeft(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags)
         {
+            if (lease == null) throw new ArgumentNullException(nameof(lease));
             var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
             return BottomLeft(position, size, subImage, flags);
         }
         public static SpriteInstanceData TopMid(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags)
         {
+            if (lease == null) throw new ArgumentNullException(nameof(lease));
             var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
             return TopMid(position, size, subImage, flags);
         }
         public static SpriteInstanceData Centred(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags)
         {
+            if (lease == null) throw new ArgumentNullException(nameof(lease));
             var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
             return Centred(position, size, subImage, flags);
         }
         public static SpriteInstanceData BottomMid(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags)
         {
+            if (lease == null) throw new ArgumentNullException(nameof(lease));
             var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
             return BottomMid(position, size, subImage, flags);
         }

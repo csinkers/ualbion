@@ -37,6 +37,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
 
         public static Wall Serdes(int _, Wall w, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             w ??= new Wall();
             s.Begin();
             w.Properties = s.EnumU8(nameof(w.Properties), w.Properties);

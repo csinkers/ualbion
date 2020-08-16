@@ -1,8 +1,11 @@
-﻿namespace UAlbion.Formats.Assets
+﻿using System;
+
+namespace UAlbion.Formats.Assets
 {
     /// <summary>
     /// Range flags.
     /// </summary>
+    [Flags]
     public enum ColorRangeFlags : ushort
     {
         /// <summary>

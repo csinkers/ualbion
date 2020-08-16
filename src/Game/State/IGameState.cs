@@ -17,7 +17,7 @@ namespace UAlbion.Game.State
         IInventory GetInventory(InventoryId id);
         short GetTicker(TickerId id);
         bool GetSwitch(SwitchId id);
-        MapChangeList TemporaryMapChanges { get; }
-        MapChangeList PermanentMapChanges { get; }
+        MapChangeCollection TemporaryMapChanges { get; }
+        MapChangeCollection PermanentMapChanges { get; }
     }
 }

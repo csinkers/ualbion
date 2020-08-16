@@ -7,13 +7,12 @@ namespace UAlbion.Core.Visual
         public string Name => TileMap.Name;
         public DrawLayer RenderOrder => TileMap.RenderOrder;
         public int PipelineId => 1;
-        // public Type Renderer => TileMap.Renderer;
         public int Offset { get; }
         public int Length { get; }
-        public TileMap TileMap { get; }
+        public DungeonTileMap TileMap { get; }
         public int InstanceBufferId { get; set; }
 
-        public TileMapWindow(TileMap tileMap, int offset, int length)
+        public TileMapWindow(DungeonTileMap tileMap, int offset, int length)
         {
             TileMap = tileMap;
             Offset = offset;

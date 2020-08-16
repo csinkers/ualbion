@@ -1,7 +1,8 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -9,6 +10,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static IQueryEvent Serdes(IQueryEvent genericEvent, ISerializer s, AssetType textType, ushort textSourceId)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             var subType = s.EnumU8("SubType", genericEvent?.QueryType ?? QueryType.IsScriptDebugModeActive);
             switch (subType)
             {
@@ -132,7 +134,7 @@ namespace UAlbion.Formats.MapEvents
             Operation = operation,
             Immediate = immediate
         };
-        public static QueryEvent TriggerType(TriggerType id, QueryOperation operation, byte immediate) => new QueryEvent
+        public static QueryEvent TriggerType(TriggerTypes id, QueryOperation operation, byte immediate) => new QueryEvent
         {
             QueryType = QueryType.TriggerType,
             Argument = (ushort)id,

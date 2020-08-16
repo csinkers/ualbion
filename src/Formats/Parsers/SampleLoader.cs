@@ -13,6 +13,8 @@ namespace UAlbion.Formats.Parsers
     {
         public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
+            if (config == null) throw new ArgumentNullException(nameof(config));
             if (config.Format == FileFormat.AudioSample)
                 return new AlbionSample(br.ReadBytes((int) streamLength));
 

@@ -6,6 +6,7 @@ namespace UAlbion.Core.Textures
 {
     public abstract class EightBitTexture : ITexture
     {
+        readonly byte[] _textureData;
         public abstract uint FormatSize { get; }
         public uint Width { get; }
         public uint Height { get; }
@@ -13,7 +14,7 @@ namespace UAlbion.Core.Textures
         public uint MipLevels { get; }
         public uint ArrayLayers { get; }
         public string Name { get; }
-        public byte[] TextureData { get; }
+        public ReadOnlySpan<byte> TextureData => _textureData;
         public int SubImageCount => _subImages.Count;
         public bool IsDirty { get; protected set; }
         public IReadOnlyList<SubImage> SubImages => _subImages.AsReadOnly();
@@ -35,14 +36,14 @@ namespace UAlbion.Core.Textures
             Height = height;
             MipLevels = mipLevels;
             ArrayLayers = arrayLayers;
-            TextureData = textureData;
+            _textureData = textureData;
             if(subImages != null)
                 foreach(var subImage in subImages)
                     _subImages.Add(subImage);
             IsDirty = true;
         }
 
-        public bool ContainsColors(IEnumerable<byte> colors) => TextureData.Distinct().Intersect(colors).Any();
+        public bool ContainsColors(IEnumerable<byte> colors) => _textureData.Distinct().Intersect(colors).Any();
         public void Invalidate() => IsDirty = true;
 
         public void GetSubImageOffset(int id, out int width, out int height, out int offset, out int stride)

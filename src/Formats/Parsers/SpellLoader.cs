@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using SerdesNet;
 using UAlbion.Formats.AssetIds;
@@ -12,6 +13,7 @@ namespace UAlbion.Formats.Parsers
     {
         public IList<SpellData> Serdes(IList<SpellData> existing, ISerializer s, AssetKey key, AssetInfo config)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             existing ??= new SpellData[SpellData.SpellClasses * SpellData.MaxSpellsPerClass];
             s.List(nameof(SpellData), existing, existing.Count, SpellData.Serdes);
             return existing;

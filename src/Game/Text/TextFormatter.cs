@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using UAlbion.Api;
@@ -81,7 +82,7 @@ namespace UAlbion.Game.Text
                             break; // throw new FormatException($"Expected the active item to be a character, was actually {active ?? "null"}");
                         }
 
-                        switch (character.Class)
+                        switch (character.PlayerClass)
                         {
                             case PlayerClass.Pilot: yield return (Token.Text, assets.LoadString(SystemTextId.Class_Pilot, language)); break;
                             case PlayerClass.Scientist: yield return (Token.Text, assets.LoadString(SystemTextId.Class_Scientist, language)); break;
@@ -93,7 +94,7 @@ namespace UAlbion.Game.Text
                             case PlayerClass.OquloKamulos: yield return (Token.Text, assets.LoadString(SystemTextId.Class_OquloKamulos, language)); break;
                             case PlayerClass.Warrior: yield return (Token.Text, assets.LoadString(SystemTextId.Class_Warrior2, language)); break;
                             case PlayerClass.Monster: yield return (Token.Text, "Monster"); break;
-                            default: throw new ArgumentOutOfRangeException();
+                            default: throw new InvalidEnumArgumentException(nameof(character.PlayerClass), (int)character.PlayerClass, typeof(PlayerClass));
                         }
                         break;
                     }
@@ -157,15 +158,15 @@ namespace UAlbion.Game.Text
                             break; // throw new FormatException($"Expected the active item to be a character, was actually {active ?? "null"}");
                         }
 
-                        switch (character.Race)
+                        switch (character.Races)
                         {
-                            case PlayerRace.Terran: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Terran, language)); break;
-                            case PlayerRace.Iskai: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Iskai, language)); break;
-                            case PlayerRace.Celt: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Celt, language)); break;
-                            case PlayerRace.KengetKamulos: yield return (Token.Text, assets.LoadString(SystemTextId.Race_KengetKamulos, language)); break;
-                            case PlayerRace.DjiCantos: yield return (Token.Text, assets.LoadString(SystemTextId.Race_DjiCantos, language)); break;
-                            case PlayerRace.Mahino: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Mahino, language)); break;
-                            default: throw new ArgumentOutOfRangeException();
+                            case PlayerRaces.Terran: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Terran, language)); break;
+                            case PlayerRaces.Iskai: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Iskai, language)); break;
+                            case PlayerRaces.Celt: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Celt, language)); break;
+                            case PlayerRaces.KengetKamulos: yield return (Token.Text, assets.LoadString(SystemTextId.Race_KengetKamulos, language)); break;
+                            case PlayerRaces.DjiCantos: yield return (Token.Text, assets.LoadString(SystemTextId.Race_DjiCantos, language)); break;
+                            case PlayerRaces.Mahino: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Mahino, language)); break;
+                            default: throw new InvalidEnumArgumentException(nameof(character.Races), (int)character.Races, typeof(PlayerRaces));
                         }
                         break;
                     }
@@ -205,7 +206,7 @@ namespace UAlbion.Game.Text
             }
         }
 
-        IEnumerable<TextBlock> TokensToBlocks(IAssetManager assets, IEnumerable<(Token, object)> tokens, string raw)
+        static IEnumerable<TextBlock> TokensToBlocks(IAssetManager assets, IEnumerable<(Token, object)> tokens, string raw)
         {
             var sb = new StringBuilder();
             var block = new TextBlock();
@@ -247,8 +248,8 @@ namespace UAlbion.Game.Text
                     case Token.Right: block.Alignment = TextAlignment.Right; break;
                     case Token.Justify: block.Alignment = TextAlignment.Justified; break;
 
-                    case Token.NewLine: block.Arrangement |= TextArrangement.ForceNewLine; break;
-                    case Token.NoWrap: block.Arrangement |= TextArrangement.NoWrap; break;
+                    case Token.NewLine: block.ArrangementFlags |= TextArrangementFlags.ForceNewLine; break;
+                    case Token.NoWrap: block.ArrangementFlags |= TextArrangementFlags.NoWrap; break;
 
                     case Token.Text:
                         sb.Append((string) p);

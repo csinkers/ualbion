@@ -2,20 +2,14 @@
 using System.IO;
 using Newtonsoft.Json;
 
+// Collections are set by JSON.NET
+#pragma warning disable CA2227 // Collection properties should be read only
 namespace UAlbion.Formats.Config
 {
     public class CoreSpriteConfig
     {
-        public class BinaryResource
-        {
-            public long Offset { get; set; }
-            public int Width { get; set; }
-            public int Height { get; set; }
-            public Position2D Hotspot { get; set; }
-        }
-
-        public readonly IDictionary<int, string> CoreSpriteIds = new Dictionary<int, string>();
-        public readonly IDictionary<string, IDictionary<int, BinaryResource>> Hashes = new Dictionary<string, IDictionary<int, BinaryResource>>();
+        public IDictionary<int, string> CoreSpriteIds { get; set; } = new Dictionary<int, string>();
+        public IDictionary<string, IDictionary<int, CoreSpriteInfo>> Hashes { get; set; } = new Dictionary<string, IDictionary<int, CoreSpriteInfo>>();
 
         public static CoreSpriteConfig Load(string basePath)
         {
@@ -28,3 +22,4 @@ namespace UAlbion.Formats.Config
         }
     }
 }
+#pragma warning restore CA2227 // Collection properties should be read only

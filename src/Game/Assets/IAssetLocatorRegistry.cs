@@ -1,12 +1,11 @@
-﻿using System;
-using UAlbion.Core;
+﻿using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Assets
 {
-    public interface IAssetLocatorRegistry : IComponent, IDisposable
+    public interface IAssetLocatorRegistry : IComponent
     {
-        IAssetLocatorRegistry AddAssetLocator(IAssetLocator locator);
+        IAssetLocatorRegistry AddAssetLocator(IAssetLocator locator, bool useAsDefault = false);
         IAssetLocatorRegistry AddAssetPostProcessor(IAssetPostProcessor postProcessor);
         object LoadAsset(AssetKey key);
         object LoadAssetCached(AssetKey key);

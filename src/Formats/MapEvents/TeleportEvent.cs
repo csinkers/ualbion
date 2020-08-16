@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
@@ -9,6 +10,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static TeleportEvent Serdes(TeleportEvent e, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new TeleportEvent();
             s.Begin();
             e.X = s.UInt8(nameof(X), e.X);

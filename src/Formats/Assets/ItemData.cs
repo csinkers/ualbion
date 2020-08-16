@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
@@ -13,7 +14,7 @@ namespace UAlbion.Formats.Assets
         public ItemType TypeId { get; set; }   //  1 Item type
         public ItemSlotId SlotType { get; set; }   //  2 Slot that can hold the item
         public byte BreakRate { get; set; }   //  3 Chance to break the item
-        public GenderMask AllowedGender { get; set; }   //  4 Determines which gender can use this item. 2 = female, 3 = any
+        public Genders AllowedGender { get; set; }   //  4 Determines which gender can use this item. 2 = female, 3 = any
         public byte Hands { get; set; }   //  5 Determines how many free hands are required to equip the item.
         public byte LpMaxBonus { get; set; }   //  6 Bonus value to life points.
         public byte SpMaxBonus { get; set; }   //  7 Bonus value to spell points.
@@ -41,7 +42,7 @@ namespace UAlbion.Formats.Assets
         public ushort Weight { get; set; }   // 30 weight of the item in grams
         public ushort Value { get; set; }   // 32 Base resell value * 10.
         public ItemSpriteId Icon { get; set; }   // 34 Image for the item
-        public PlayerClassMask Class { get; set; }   // 36 A bitfield that controls which classes can use the item.
+        public PlayerClasses Class { get; set; }   // 36 A bitfield that controls which classes can use the item.
         public ushort Race { get; set; }   // 38 Likely meant to control which race can use the item – but does not seem to work ?
 
         public bool IsStackable => 
@@ -63,18 +64,10 @@ namespace UAlbion.Formats.Assets
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append(((int)Id).ToString().PadLeft(3)); sb.Append(' ');
-            sb.Append(Id.ToString().PadRight(19)); sb.Append(' ');
-            sb.Append(TypeId.ToString()); sb.Append(' ');
-            sb.Append(SlotType.ToString()); sb.Append(' ');
+            sb.Append($"{(int)Id,3} {Id,-19} {TypeId} {SlotType}"); 
 
             if (AttributeBonus != 0)
-            {
-                sb.Append(AttributeType.ToString());
-                sb.Append('+');
-                sb.Append(AttributeBonus);
-                sb.Append(' ');
-            }
+                sb.Append($"{AttributeType}+{AttributeBonus} ");
 
             if (SkillBonus != 0)
             {
@@ -121,32 +114,32 @@ namespace UAlbion.Formats.Assets
                 sb.Append(' ');
             }
 
-            if(AllowedGender != GenderMask.Any)
+            if(AllowedGender != Genders.Any)
             {
                 sb.Append(AllowedGender.ToString());
                 sb.Append("Only ");
             }
 
-            if (Damage != 0) sb.AppendFormat("D:{0} ", Damage);
-            if (Protection != 0) sb.AppendFormat("P:{0} ", Protection);
-            if (BreakRate != 0) sb.AppendFormat("BR:{0} ", BreakRate); 
-            if (Activate != 0) sb.AppendFormat("A:{0} ", Activate);
+            if (Damage != 0) sb.Append($"D:{Damage} ");
+            if (Protection != 0) sb.Append($"P:{Protection} ");
+            if (BreakRate != 0) sb.Append($"BR:{BreakRate} "); 
+            if (Activate != 0) sb.Append($"A:{Activate} ");
 
             if (SpellEffect.HasValue)
             {
                 var className = SpellClass.ToString().Replace(", ", "|");
                 SpellId spellId = SpellClass.ToSpellId(SpellEffect.Value);
-                sb.AppendFormat($"SC:{className} SE:{SpellEffect}={spellId} ");
+                sb.Append($"SC:{className} SE:{SpellEffect}={spellId} ");
             }
 
-            if (Charges != 0) sb.AppendFormat("C:{0} ", Charges);
-            if (MaxCharges != 0) sb.AppendFormat("MaxC:{0} ", MaxCharges);
+            if (Charges != 0) sb.Append($"C:{Charges} ");
+            if (MaxCharges != 0) sb.Append($"MaxC:{MaxCharges} ");
 
             if(EnchantmentCount != 0 || MaxEnchantmentCount != 0)
-                sb.AppendFormat("E:{0} MaxE:{1} ", EnchantmentCount, MaxEnchantmentCount);
+                sb.Append($"E:{EnchantmentCount} MaxE:{MaxEnchantmentCount} ");
 
             if(Flags != 0)
-                sb.AppendFormat("F:{0} ", Flags.ToString().Replace(", ", "|"));
+                sb.Append($"F:{Flags} ".Replace(", ", "|"));
 
             if (Value != 0)
                 sb.Append($"${(decimal)Value / 10:F}");
@@ -156,6 +149,7 @@ namespace UAlbion.Formats.Assets
 
         public static ItemData Serdes(int i, ItemData item, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             item ??= new ItemData((ItemId)i);
             s.Begin();
             ApiUtil.Assert(i == (int)item.Id);
@@ -199,14 +193,7 @@ namespace UAlbion.Formats.Assets
 
         bool Equals(ItemData other) => Id == other.Id;
         public bool Equals(IContents obj) => Equals((object) obj);
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((ItemData) obj);
-        }
-
+        public override bool Equals(object obj) => obj is ItemData other && Equals(other);
         public override int GetHashCode() => (int) Id;
     }
 }

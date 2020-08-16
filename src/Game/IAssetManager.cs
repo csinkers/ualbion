@@ -7,7 +7,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
-using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Config;
 
@@ -35,7 +35,7 @@ namespace UAlbion.Game
         IList<Block> LoadBlockList(BlockListId blockListId);
         IGeneralConfig LoadGeneralConfig();
         IAssetConfig LoadAssetConfig();
-        CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id);
+        CoreSpriteInfo LoadCoreSpriteInfo(CoreSpriteId id);
         EventSet LoadEventSet(EventSetId eventSetId);
         byte[] LoadSong(SongId songId);
         IList<IEvent> LoadScript(ScriptId scriptId);

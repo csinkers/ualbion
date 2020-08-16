@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-
+#if false
 namespace UAlbion.Game.Gui.Combat
 {
     class CombatPositionsDialog : UiElement
@@ -9,3 +9,4 @@ namespace UAlbion.Game.Gui.Combat
         public override Vector2 GetSize() => Vector2.Zero;
     }
 }
+#endif

@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
@@ -7,6 +8,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static PauseEvent Serdes(PauseEvent e, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new PauseEvent();
             s.Begin();
             e.Length = s.UInt8(nameof(Length), e.Length);

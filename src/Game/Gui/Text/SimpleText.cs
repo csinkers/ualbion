@@ -10,7 +10,7 @@ namespace UAlbion.Game.Gui.Text
         readonly TextBlock _block = new TextBlock();
         public SimpleText(string literal) => _block.Text = literal;
         public int Version { get; private set; }
-        public IEnumerable<TextBlock> Get() => new[] { _block };
+        public IEnumerable<TextBlock> GetBlocks() => new[] { _block };
         public string Text
         {
             get => _block.Text;
@@ -34,7 +34,7 @@ namespace UAlbion.Game.Gui.Text
         public SimpleText Center() { _block.Alignment = TextAlignment.Center; Version++; return this; }
         public SimpleText Right() { _block.Alignment = TextAlignment.Right; Version++; return this; }
         public SimpleText Justify() { _block.Alignment = TextAlignment.Justified; Version++; return this; }
-        public SimpleText NoWrap() { _block.Arrangement |= TextArrangement.NoWrap; Version++; return this; }
+        public SimpleText NoWrap() { _block.ArrangementFlags |= TextArrangementFlags.NoWrap; Version++; return this; }
         public SimpleText Ink(FontColor color) { _block.Color = color; Version++; return this; }
         public SimpleText Language(GameLanguage language) => this;
         public override string ToString() => $"SimpleText \"{_block.Text}\"";

@@ -26,6 +26,7 @@ namespace UAlbion.Game.Veldrid.Input
 
         public InputBinder(InputConfig config)
         {
+            if (config == null) throw new ArgumentNullException(nameof(config));
             On<InputEvent>(OnInput);
             On<LoadMapEvent>(e => _mapId = e.MapId);
 
@@ -37,7 +38,7 @@ namespace UAlbion.Game.Veldrid.Input
                 var mode = _bindings[rawMode.Key];
                 foreach (var rawBinding in rawMode.Value)
                 {
-                    var parts = rawBinding.Key.Split('+').Select(x => x.Trim().ToLower()).ToArray();
+                    var parts = rawBinding.Key.Split('+').Select(x => x.Trim().ToUpperInvariant()).ToArray();
                     Key key = Key.LastKey;
                     var modifiers = ModifierKeys.None;
                     for (int i = 0; i < parts.Length; i++)
@@ -156,12 +157,13 @@ namespace UAlbion.Game.Veldrid.Input
             }
         }
 
+/*
         void OnUpdate(FastClockEvent fastClockEvent)
         {
             // TODO: Re-emit any held events
         }
 
-        /*
+
         public bool GetKey(Key key) { return CurrentlyPressedKeys.Contains(key); }
         public bool GetKeyDown(Key key) { return NewKeysThisFrame.Contains(key); }
         public bool GetMouseButton(MouseButton button) { return CurrentlyPressedMouseButtons.Contains(button); }

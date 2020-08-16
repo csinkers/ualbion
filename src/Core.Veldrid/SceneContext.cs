@@ -1,11 +1,13 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using Veldrid;
 using Veldrid.Utilities;
 
+#pragma warning disable CA2213 // Analysis doesn't know about DisposeCollector
 namespace UAlbion.Core.Veldrid
 {
-    public sealed class SceneContext
+    public sealed class SceneContext : IDisposable
     {
         readonly DisposeCollector _disposer = new DisposeCollector();
         WindowSizedSceneContext _windowSized;
@@ -38,6 +40,8 @@ namespace UAlbion.Core.Veldrid
 
         public void CreateDeviceObjects(GraphicsDevice gd, CommandList cl)
         {
+            if (gd == null) throw new ArgumentNullException(nameof(gd));
+            if (cl == null) throw new ArgumentNullException(nameof(cl));
             var factory = new DisposingResourceFactoryFacade(gd.ResourceFactory, _disposer);
             DeviceBuffer MakeBuffer(uint size, string name)
             {
@@ -70,6 +74,8 @@ namespace UAlbion.Core.Veldrid
 
         public void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl)
         {
+            if (gd == null) throw new ArgumentNullException(nameof(gd));
+            if (cl == null) throw new ArgumentNullException(nameof(cl));
             CommonResourceSet?.Dispose();
             CommonResourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
                 CommonResourceLayout,
@@ -99,15 +105,20 @@ namespace UAlbion.Core.Veldrid
 
         public void SetCurrentScene(Scene scene)
         {
+            if (scene == null) throw new ArgumentNullException(nameof(scene));
             Camera = scene.Camera;
         }
 
         public void RecreateWindowSizedResources(GraphicsDevice graphicsDevice)
         {
+            if (graphicsDevice == null) throw new ArgumentNullException(nameof(graphicsDevice));
             _disposer.Remove(_windowSized);
             _windowSized.Dispose();
             _windowSized = new WindowSizedSceneContext(graphicsDevice, MainSceneSampleCount);
             _disposer.Add(_windowSized);
         }
+
+        public void Dispose() => DestroyDeviceObjects();
     }
 }
+#pragma warning restore CA2213 // Analysis doesn't know about DisposeCollector

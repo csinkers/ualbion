@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
@@ -15,16 +16,17 @@ namespace UAlbion.Game.State
         public const int MaxPartySize = 6;
 
         readonly IDictionary<PartyCharacterId, CharacterSheet> _characterSheets;
-        readonly List<Player.Player> _statusBarOrder = new List<Player.Player>();
-        readonly List<Player.Player> _walkOrder = new List<Player.Player>();
-        readonly IReadOnlyList<Player.Player> _readOnlyStatusBarOrder;
-        readonly IReadOnlyList<Player.Player> _readOnlyWalkOrder;
+        readonly List<Player.PartyMember> _statusBarOrder = new List<Player.PartyMember>();
+        readonly List<Player.PartyMember> _walkOrder = new List<Player.PartyMember>();
+        readonly IReadOnlyList<Player.PartyMember> _readOnlyStatusBarOrder;
+        readonly IReadOnlyList<Player.PartyMember> _readOnlyWalkOrder;
 
         public Party(
             IDictionary<PartyCharacterId, CharacterSheet> characterSheets,
             IList<PartyCharacterId?> statusBarOrder,
             Func<InventoryId, Inventory> getInventory)
         {
+            if (statusBarOrder == null) throw new ArgumentNullException(nameof(statusBarOrder));
             On<AddPartyMemberEvent>(e => SetLastResult(AddMember(e.PartyMemberId)));
             On<RemovePartyMemberEvent>(e => SetLastResult(RemoveMember(e.PartyMemberId)));
             On<SetPartyLeaderEvent>(e =>
@@ -44,6 +46,7 @@ namespace UAlbion.Game.State
                     AddMember(member.Value);
         }
 
+        [SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "<Pending>")]
         public IPlayer this[PartyCharacterId id] => _statusBarOrder.FirstOrDefault(x => x.Id == id);
         public IReadOnlyList<IPlayer> StatusBarOrder => _readOnlyStatusBarOrder;
         public IReadOnlyList<IPlayer> WalkOrder => _readOnlyWalkOrder;
@@ -73,7 +76,7 @@ namespace UAlbion.Game.State
 
         bool AddMember(PartyCharacterId id)
         {
-            bool InsertMember(Player.Player newPlayer)
+            bool InsertMember(Player.PartyMember newPlayer)
             {
                 for (int i = 0; i < MaxPartySize; i++)
                 {
@@ -89,7 +92,7 @@ namespace UAlbion.Game.State
             if (_statusBarOrder.Any(x => x.Id == id))
                 return false;
 
-            var player = new Player.Player(id, _characterSheets[id]);
+            var player = new Player.PartyMember(id, _characterSheets[id]);
             if (!InsertMember(player)) 
                 return false;
 

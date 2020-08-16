@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Formats.AssetIds;
@@ -17,8 +18,11 @@ namespace UAlbion.Game.Assets
 
         public static ITexture Load(ICoreFactory factory, MetaFontId id, ITexture regular, ITexture bold)
         {
+            if (factory == null) throw new ArgumentNullException(nameof(factory));
+            if (regular == null) throw new ArgumentNullException(nameof(regular));
+            if (bold == null) throw new ArgumentNullException(nameof(bold));
             var texture = (EightBitTexture)(id.IsBold ? bold : regular);
-            var bytes = (byte[])texture.TextureData.Clone();
+            var bytes = texture.TextureData.ToArray();
             if (!Mappings.TryGetValue(id.Color, out var mapping))
                 mapping = Mappings[FontColor.White];
 

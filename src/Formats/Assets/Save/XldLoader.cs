@@ -8,13 +8,14 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.Assets.Save
 {
-    public class XldLoader // TODO: Combine this with XldFile at some point.
+    public static class XldLoader // TODO: Combine this with XldFile at some point.
     {
         const string MagicString = "XLD0I";
         public static int HeaderSize(int itemCount) => MagicString.Length + 3 + 4 * itemCount;
 
         static int[] HeaderSerdes(int[] lengths, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             s.Check();
             string magic = s.NullTerminatedString("MagicString", MagicString);
             s.Check();
@@ -74,6 +75,7 @@ namespace UAlbion.Formats.Assets.Save
 
         public static void Serdes(XldCategory category, ushort xldNumber, ISerializer s, Action<int, int, ISerializer> func, IList<int> populatedIds)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             s.Begin($"Xld{category}.{xldNumber}");
             if (s.Mode == SerializerMode.Reading)
             {

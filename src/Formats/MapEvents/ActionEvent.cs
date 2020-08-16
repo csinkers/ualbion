@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
@@ -8,6 +9,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static ActionEvent Serdes(ActionEvent e, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             var actionType = s.EnumU8(nameof(ActionType), e?.ActionType ?? 0);
             e ??=
                 actionType switch

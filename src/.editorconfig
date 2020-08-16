@@ -1,0 +1,23 @@
+﻿[*.cs]
+
+# CA1303: Do not pass literals as localized parameters
+# Most string literals aren't shown to the users, any user-visible text 
+# will go through the whole TextFormatter flow and be localised appropriately.
+dotnet_diagnostic.CA1303.severity = none
+
+# IDE0040: Add accessibility modifiers
+dotnet_style_require_accessibility_modifiers = never:silent
+
+# CA1707: Identifiers should not contain underscores
+# Analysers aren't familiar with the new discard notation consisting of a single underscore.
+dotnet_diagnostic.CA1707.severity = none
+
+# CA1819: Properties should not return arrays
+# Arrays have the best performance and returning them directly avoids excessive copying.
+# It is the responsibility of calling code to not modify any arrays it doesn't own.
+dotnet_diagnostic.CA1819.severity = none
+
+# CA1028:Enum Storage should be Int32
+# Many of the enums need to exactly correspond to the existing on-disk formats, making them ints 
+# complicates type casting in the serialisation code.
+dotnet_diagnostic.CA1028.severity = none

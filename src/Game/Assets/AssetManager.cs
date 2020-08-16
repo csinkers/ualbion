@@ -10,7 +10,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
-using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Config;
 
@@ -90,8 +90,7 @@ namespace UAlbion.Game.Assets
         public LabyrinthData LoadLabyrinthData(LabyrinthDataId id) => (LabyrinthData)_assetLocatorRegistry.LoadAssetCached(id.ToAssetId());
         public IAssetConfig LoadAssetConfig() => (IAssetConfig) _assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.AssetConfig));
         public IGeneralConfig LoadGeneralConfig() => (IGeneralConfig) _assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.GeneralConfig));
-        public CoreSpriteConfig.BinaryResource LoadCoreSpriteInfo(CoreSpriteId id) =>
-            (CoreSpriteConfig.BinaryResource)_assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.CoreGraphicsMetadata, (ushort)id));
+        public CoreSpriteInfo LoadCoreSpriteInfo(CoreSpriteId id) => (CoreSpriteInfo)_assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.CoreGraphicsMetadata, (ushort)id));
 
         public string LoadString(StringId id, GameLanguage language)
         {

@@ -1,4 +1,5 @@
-﻿using UAlbion.Api;
+﻿using System;
+using UAlbion.Api;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Veldrid.Textures;
 using Veldrid;
@@ -27,6 +28,7 @@ namespace UAlbion.Core.Veldrid
         public void SetClearColor(float red, float green, float blue) => _clearColour = new RgbaFloat(red, green, blue, 1.0f);
         public void SetCurrentPalette(PaletteTexture newPalette, int newVersion)
         {
+            if (newPalette == null) throw new ArgumentNullException(nameof(newPalette));
             if (SceneContext.PaletteView != null && _paletteTexture == newPalette && _lastPaletteVersion == newVersion)
                 return;
 

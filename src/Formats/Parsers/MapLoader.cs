@@ -3,7 +3,7 @@ using System.IO;
 using SerdesNet;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
@@ -16,6 +16,7 @@ namespace UAlbion.Formats.Parsers
 
         public IMapData Serdes(IMapData existing, ISerializer s, AssetKey key, AssetInfo config)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             var startPosition = s.Offset;
             s.UInt16("DummyRead", 0); // Initial flags + npc count, will be re-read by the 2D/3D specific map loader
             MapType mapType = s.EnumU8(nameof(mapType), existing?.MapType ?? MapType.Unknown);

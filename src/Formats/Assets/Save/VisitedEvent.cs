@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 
@@ -22,8 +23,9 @@ namespace UAlbion.Formats.Assets.Save
             };
         public static VisitedEvent Serdes(int n, VisitedEvent u, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             if (s.Mode == SerializerMode.WritingAnnotated)
-                s.Comment(u.ToString());
+                s.Comment(u?.ToString());
 
             u ??= new VisitedEvent();
             s.Begin();

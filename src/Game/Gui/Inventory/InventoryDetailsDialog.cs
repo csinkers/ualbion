@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
@@ -50,9 +51,9 @@ namespace UAlbion.Game.Gui.Inventory
                 new Spacing(2,0),
                 new VerticalStack(
                     new UiTextBuilder(item.TypeId.ToId()).NoWrap(),
-                    new SimpleText($"{item.Weight} g").NoWrap(), // Literal String
-                    new SimpleText(item.Damage.ToString()).NoWrap(),
-                    new SimpleText(item.Protection.ToString()).NoWrap()
+                    new SimpleText($"{item.Weight} g").NoWrap(), // i18n Literal String
+                    new SimpleText(item.Damage.ToString(CultureInfo.InvariantCulture)).NoWrap(), // i18n
+                    new SimpleText(item.Protection.ToString(CultureInfo.InvariantCulture)).NoWrap() // i18n
                 )
             );
 

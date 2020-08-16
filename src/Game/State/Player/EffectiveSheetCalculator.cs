@@ -1,5 +1,7 @@
-﻿using UAlbion.Formats.Assets;
+﻿using System;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
+using Attribute = UAlbion.Formats.Assets.Attribute;
 
 namespace UAlbion.Game.State.Player
 {
@@ -7,6 +9,8 @@ namespace UAlbion.Game.State.Player
     {
         public static IEffectiveCharacterSheet GetEffectiveSheet(CharacterSheet sheet, GameConfig config)
         {
+            if (sheet == null) throw new ArgumentNullException(nameof(sheet));
+            if (config == null) throw new ArgumentNullException(nameof(config));
             var effective = new EffectiveCharacterSheet(sheet.Key)
             {
                 // Names
@@ -17,8 +21,8 @@ namespace UAlbion.Game.State.Player
                 // Basic stats
                 Type = sheet.Type,
                 Gender = sheet.Gender,
-                Race = sheet.Race,
-                Class = sheet.Class,
+                Races = sheet.Races,
+                PlayerClass = sheet.PlayerClass,
                 Age = sheet.Age,
                 Level = sheet.Level,
 

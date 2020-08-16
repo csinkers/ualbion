@@ -9,7 +9,10 @@ namespace UAlbion.Core.Veldrid
     {
         public MultiTexture CreateMultiTexture(string name, IPaletteManager paletteManager) => new VeldridMultiTexture(name, paletteManager);
         public IDisposable CreateRenderDebugGroup(IRendererContext context, string name)
-            => new RenderDebugGroup(((VeldridRendererContext)context).CommandList, name);
+        {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            return new RenderDebugGroup(((VeldridRendererContext)context).CommandList, name);
+        }
 
         public PaletteTexture CreatePaletteTexture(string name, uint[] colours) => new VeldridPaletteTexture(name, colours);
 

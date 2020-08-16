@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
@@ -7,6 +8,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static QueryPartyEvent Serdes(QueryPartyEvent e, ISerializer s, QueryType subType)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new QueryPartyEvent();
             s.Begin();
             e.QueryType = subType;

@@ -18,6 +18,7 @@ namespace UAlbion.Game.Gui.Controls
         public int Render(Rectangle extents, int order) => order;
         public int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
+            if (registerHitFunc == null) throw new ArgumentNullException(nameof(registerHitFunc));
             registerHitFunc(order, this);
             return order;
         }

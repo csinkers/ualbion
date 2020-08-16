@@ -36,9 +36,9 @@ namespace UAlbion.Formats.Assets
 
         public override string ToString() =>
             Type switch {
-            CharacterType.Party => $"{Key} {Race} {Class} {Age} EN:{EnglishName} DE:{GermanName} {Magic.SpellStrengths.Count} spells",
+            CharacterType.Party => $"{Key} {Races} {PlayerClass} {Age} EN:{EnglishName} DE:{GermanName} {Magic.SpellStrengths.Count} spells",
             CharacterType.Npc => $"{Key} {PortraitId} S:{SpriteId} E{EventSetId} W{WordSetId}",
-            CharacterType.Monster => $"{Key} {Class} {Gender} AP{Combat.ActionPoints} Lvl{Level} LP{Combat.LifePoints}/{Combat.LifePointsMax} {Magic.SpellStrengths.Count} spells",
+            CharacterType.Monster => $"{Key} {PlayerClass} {Gender} AP{Combat.ActionPoints} Lvl{Level} LP{Combat.LifePoints}/{Combat.LifePointsMax} {Magic.SpellStrengths.Count} spells",
             _ => $"{Key} UNKNOWN TYPE {Type}" };
 
         // Names
@@ -50,13 +50,13 @@ namespace UAlbion.Formats.Assets
         // Basic stats
         public CharacterType Type { get; set; }
         public Gender Gender { get; set; }
-        public PlayerRace Race { get; set; }
-        public PlayerClass Class { get; set; }
+        public PlayerRaces Races { get; set; }
+        public PlayerClass PlayerClass { get; set; }
         public ushort Age { get; set; }
         public byte Level { get; set; }
 
         // Display and behaviour
-        public PlayerLanguage Languages { get; set; }
+        public PlayerLanguages Languages { get; set; }
         public AssetId SpriteId { get; set; }
         public SmallPortraitId? PortraitId { get; set; }
         public EventSetId? EventSetId { get; set; }

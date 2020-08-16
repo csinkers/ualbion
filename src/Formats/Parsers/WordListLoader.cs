@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using SerdesNet;
 using UAlbion.Api;
@@ -13,6 +14,8 @@ namespace UAlbion.Formats.Parsers
         const int WordLength = 21;
         public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
+            if (config == null) throw new ArgumentNullException(nameof(config));
             int wordListId = config.Id;
             var wordCount = streamLength / WordLength;
             var s = new GenericBinaryReader(br, streamLength, FormatUtil.BytesTo850String, ApiUtil.Assert);

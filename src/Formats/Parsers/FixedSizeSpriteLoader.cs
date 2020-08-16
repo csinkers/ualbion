@@ -12,6 +12,9 @@ namespace UAlbion.Formats.Parsers
     {
         public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
+            if (config == null) throw new ArgumentNullException(nameof(config));
+
             if (streamLength == 0)
                 return null;
 
@@ -29,57 +32,38 @@ namespace UAlbion.Formats.Parsers
             int spriteCount = Math.Max(1, unchecked((int)(streamLength / (width * height))));
             height = (int) streamLength / (width * spriteCount);
 
-            var sprite = new AlbionSprite
-            {
-                Name = key.ToString(),
-                Width = width,
-                Height = height * spriteCount,
-                Frames = new AlbionSprite.Frame[spriteCount],
-                UniformFrames = true,
-                PixelData = new byte[spriteCount * width * height]
-            };
-
             int currentY = 0;
+            var pixelData = new byte[spriteCount * width * height];
+            var frames = new AlbionSpriteFrame[spriteCount];
+
             for (int n = 0; n < spriteCount; n++)
             {
-                sprite.Frames[n] = new AlbionSprite.Frame(0, currentY, width, height);
+                frames[n] = new AlbionSpriteFrame(0, currentY, width, height);
 
                 var bytes = br.ReadBytes(width * height);
                 for (int i = 0; i < width * height; i++)
-                    sprite.PixelData[n * width * height + i] = bytes[i];
+                    pixelData[n * width * height + i] = bytes[i];
 
                 currentY += height;
             }
 
-            if (config.Transposed)
+            var sprite = new AlbionSprite(key.ToString(), width, height * spriteCount, true, pixelData, frames);
+            if (!config.Transposed)
+                return sprite;
+
+            int rotatedFrameHeight = width;
+            pixelData = new byte[spriteCount * width * height];
+            frames = new AlbionSpriteFrame[spriteCount];
+            for (int n = 0; n < spriteCount; n++)
             {
-                var rotatedSprite = new AlbionSprite
-                {
-                    Name = key.ToString(),
-                    Width = height,
-                    Height = width * spriteCount,
-                    Frames = new AlbionSprite.Frame[spriteCount],
-                    UniformFrames = true,
-                    PixelData = new byte[spriteCount * width * height]
-                };
-                int rotatedFrameHeight = width;
+                frames[n] = new AlbionSpriteFrame(0, rotatedFrameHeight * n, height, rotatedFrameHeight);
 
-                for (int n = 0; n < spriteCount; n++)
-                {
-                    rotatedSprite.Frames[n] = new AlbionSprite.Frame(
-                        0, rotatedFrameHeight * n,
-                        rotatedSprite.Width, rotatedFrameHeight);
-
-                    ApiUtil.RotateImage(width, height,
-                        new Span<byte>(sprite.PixelData, n * width * height, width * height),
-                        new Span<byte>(rotatedSprite.PixelData, n * width * height, width * height));
-                }
-
-                return rotatedSprite;
+                ApiUtil.RotateImage(width, height,
+                    new ReadOnlySpan<byte>(sprite.PixelData, n * width * height, width * height),
+                    new Span<byte>(pixelData, n * width * height, width * height));
             }
 
-            // ApiUtil.Assert(br.BaseStream.Position == initialPosition + streamLength);
-            return sprite;
+            return new AlbionSprite(key.ToString(), height, width * spriteCount, true, pixelData, frames);
         }
     }
 }

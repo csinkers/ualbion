@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SerdesNet;
 using System.Linq;
 using UAlbion.Api;
@@ -31,12 +32,13 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public ushort Lighting { get; set; }
         public ushort Unk24 { get; set; }
         public IList<ObjectGroup> ObjectGroups { get; } = new List<ObjectGroup>();
-        public IList<Object> Objects { get; } = new List<Object>();
+        public IList<LabyrinthObject> Objects { get; } = new List<LabyrinthObject>();
         public IList<FloorAndCeiling> FloorAndCeilings { get; } = new List<FloorAndCeiling>();
         public IList<Wall> Walls { get; } = new List<Wall>();
 
         public static LabyrinthData Serdes(LabyrinthData d, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             d ??= new LabyrinthData();
             s.Begin();
             PerfTracker.StartupEvent("Start loading labyrinth data");
@@ -74,7 +76,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
             s.Check();
 
             ushort objectCount = s.UInt16("ObjectCount", (ushort)d.Objects.Count); // 2A + objectGroupCount * 42 + floorAndCeilingCount * A
-            s.List(nameof(d.Objects), d.Objects, objectCount, Object.Serdes);
+            s.List(nameof(d.Objects), d.Objects, objectCount, LabyrinthObject.Serdes);
             s.Check();
 
             // Populate objectIds on subobjects to improve debugging experience

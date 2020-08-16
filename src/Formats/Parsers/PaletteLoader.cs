@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
@@ -10,6 +11,8 @@ namespace UAlbion.Formats.Parsers
     {
         public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
+            if (config == null) throw new ArgumentNullException(nameof(config));
             if(config.Format == FileFormat.Palette)
                 return new AlbionPalette(br, (int)streamLength, key, config.Id);
 

@@ -6,7 +6,7 @@ namespace UAlbion.Core
     {
         void Attach(EventExchange exchange);
         void Remove();
-        void Receive(IEvent @event, object sender);
+        void Receive(IEvent e, object sender);
         bool IsActive { get; set; }
     }
 }

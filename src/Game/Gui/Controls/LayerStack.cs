@@ -15,6 +15,7 @@ namespace UAlbion.Game.Gui.Controls
         public LayerStack(params IUiElement[] children) : this((IList<IUiElement>)children) { }
         public LayerStack(IList<IUiElement> children)
         {
+            if (children == null) throw new ArgumentNullException(nameof(children));
             foreach(var child in children)
                 Children.Add(child);
         }

@@ -20,6 +20,7 @@ namespace UAlbion.Game.Gui
 
         public CommonColors(ICoreFactory factory)
         {
+            if (factory == null) throw new ArgumentNullException(nameof(factory));
             BorderTexture = factory.CreateEightBitTexture(
                 "CommonColors",
                 1, 1, 1, (uint) Palette.Count,

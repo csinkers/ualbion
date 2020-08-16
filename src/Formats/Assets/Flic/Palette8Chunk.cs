@@ -1,18 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace UAlbion.Formats.Assets.Flic
 {
     public class Palette8Chunk : FlicChunk
     {
-        public class PalettePacket
+        PalettePacket[] _packets;
+        class PalettePacket
         {
             public byte Skip { get; }
             public byte[] Triplets { get; }
 
             public PalettePacket(BinaryReader br)
             {
+                if (br == null) throw new ArgumentNullException(nameof(br));
                 Skip = br.ReadByte();
                 var copy = br.ReadByte();
 
@@ -29,12 +30,13 @@ namespace UAlbion.Formats.Assets.Flic
         }
 
         public override FlicChunkType Type => FlicChunkType.Palette8Bit;
-        public IList<PalettePacket> Packets { get; } = new List<PalettePacket>();
         protected override uint LoadChunk(uint length, BinaryReader br)
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
             ushort packetCount = br.ReadUInt16();
+            _packets = new PalettePacket[packetCount];
             for(int i = 0; i < packetCount; i++)
-                Packets.Add(new PalettePacket(br));
+                _packets[i] = new PalettePacket(br);
             return length;
         }
 
@@ -47,7 +49,7 @@ namespace UAlbion.Formats.Assets.Flic
             for (int i = 0; i < palette.Length; i++)
                 palette[i] = existing[i];
 
-            foreach (var packet in Packets)
+            foreach (var packet in _packets)
             {
                 int final = (packet.Skip + packet.Triplets.Length / 3);
                 int j = packet.Skip * 3;

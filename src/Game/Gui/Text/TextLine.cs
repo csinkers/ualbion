@@ -23,6 +23,7 @@ namespace UAlbion.Game.Gui.Text
         /// <param name="size"></param>
         public void Add(TextBlock block, Vector2 size)
         {
+            if (block == null) throw new ArgumentNullException(nameof(block));
             if (string.IsNullOrEmpty(block.Text))
                 return;
 

@@ -46,8 +46,8 @@ namespace UAlbion.Core.Veldrid.Textures
         {
             public CacheEntry(Texture texture, TextureView textureView)
             {
-                Texture = texture;
-                TextureView = textureView;
+                Texture = texture ?? throw new ArgumentNullException(nameof(texture));
+                TextureView = textureView ?? throw new ArgumentNullException(nameof(textureView));
                 LastAccessDateTime = DateTime.Now;
             }
 
@@ -102,6 +102,8 @@ namespace UAlbion.Core.Veldrid.Textures
 
         public void PrepareTexture(ITexture texture, IRendererContext context)
         {
+            if (texture == null) throw new ArgumentNullException(nameof(texture));
+            if (context == null) throw new ArgumentNullException(nameof(context));
             var veldridTexture = (IVeldridTexture)texture;
             var gd = ((VeldridRendererContext)context).GraphicsDevice;
 

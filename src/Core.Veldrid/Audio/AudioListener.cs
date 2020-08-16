@@ -5,6 +5,8 @@ namespace UAlbion.Core.Veldrid.Audio
 {
     public class AudioListener : AudioObject
     {
+        // ReSharper disable UnusedMember.Global
+        #pragma warning disable CA1822 // Can be static
         public float Gain
         {
             get { AL10.alGetListenerf(AL10.AL_GAIN, out var gain); Check(); return gain; }
@@ -46,5 +48,7 @@ namespace UAlbion.Core.Veldrid.Audio
                 Check();
             }
         }
+        // ReSharper restore UnusedMember.Global
+        #pragma warning restore CA1822 // Can be static
     }
 }

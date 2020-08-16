@@ -9,7 +9,7 @@ using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets.Labyrinth;
-using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
 
@@ -22,7 +22,7 @@ namespace UAlbion.Game.Entities.Map3D
         readonly LabyrinthData _labyrinthData;
         readonly Vector3 _tileSize;
         readonly IDictionary<int, IList<int>> _tilesByDistance = new Dictionary<int, IList<int>>();
-        TileMap _tilemap;
+        DungeonTileMap _tilemap;
         bool _isSorting;
         bool _fullUpdate = true;
 
@@ -47,7 +47,7 @@ namespace UAlbion.Game.Entities.Map3D
                 return;
 
             var assets = Resolve<IAssetManager>();
-            _tilemap = new TileMap(
+            _tilemap = new DungeonTileMap(
                 _mapId.ToString(),
                 DrawLayer.Background,
                 _tileSize,

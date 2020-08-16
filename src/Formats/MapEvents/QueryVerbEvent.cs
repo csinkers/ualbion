@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -26,6 +27,7 @@ namespace UAlbion.Formats.MapEvents
 
         public static QueryVerbEvent Serdes(QueryVerbEvent e, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new QueryVerbEvent();
             s.Begin();
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);

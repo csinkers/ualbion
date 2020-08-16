@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 
 namespace UAlbion.Formats.Assets
 {
@@ -34,6 +35,7 @@ namespace UAlbion.Formats.Assets
         /// </summary>
         public static ColorRange Serdes(int _, ColorRange c, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             c ??= new ColorRange();
             s.Begin();
             c._pad1 = s.UInt16BE(nameof(_pad1), c._pad1);

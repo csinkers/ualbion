@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -6,6 +7,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static DummyMapEvent Serdes(DummyMapEvent e, ISerializer s, MapEventType type)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new DummyMapEvent();
             s.Begin();
             e.Type = type;

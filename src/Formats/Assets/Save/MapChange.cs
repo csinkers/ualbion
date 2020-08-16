@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.MapEvents;
@@ -26,6 +27,7 @@ namespace UAlbion.Formats.Assets.Save
         public override string ToString() => $"MapΔ {X:X2} {Y:X2} {ChangeType} {Unk3} {Value:X4} {MapId}";
         public static MapChange Serdes(int i, MapChange u, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             u ??= new MapChange();
             s.Begin();
             u.X = s.UInt8(nameof(X), u.X);

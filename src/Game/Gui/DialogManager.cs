@@ -9,9 +9,7 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui
 {
-    public interface IDialogManager
-    {
-    }
+    public interface IDialogManager { }
 
     public class DialogManager  : ServiceComponent<IDialogManager>, IDialogManager
     {

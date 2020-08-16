@@ -23,6 +23,7 @@ namespace UAlbion.Game.Gui.Controls
 
         public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
+            if (registerHitFunc == null) throw new ArgumentNullException(nameof(registerHitFunc));
             // Just the default condition without the extents check, as the use of a fixed position stack means the extents passed in are ignored.
             var maxOrder = DoLayout(extents, order, (x,y,z) => x.Select(uiPosition, y, z, registerHitFunc));
             registerHitFunc(order, this);

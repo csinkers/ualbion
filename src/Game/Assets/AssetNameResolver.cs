@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UAlbion.Formats.AssetIds;
 
@@ -20,6 +21,6 @@ namespace UAlbion.Game.Assets
             }).Where(x => x.EnumType != null).ToDictionary(x => x.x, x => x.EnumType);
 
 
-        public static string GetName(AssetType type, int id) => IdTypes.TryGetValue(type, out var enumType) ? Enum.GetName(enumType, id) : id.ToString();
+        public static string GetName(AssetType type, int id) => IdTypes.TryGetValue(type, out var enumType) ? Enum.GetName(enumType, id) : id.ToString(CultureInfo.InvariantCulture);
     }
 }

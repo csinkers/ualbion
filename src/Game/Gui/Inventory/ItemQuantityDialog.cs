@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
@@ -53,8 +54,8 @@ namespace UAlbion.Game.Gui.Inventory
             });
         }
 
-        static string FormatTenths(int x) => $"{x / 10}.{x % 10}";
-        static string FormatUnits(int x) => x.ToString();
+        static string FormatTenths(int x) => $"{x / 10}.{x % 10}"; // i18n
+        static string FormatUnits(int x) => x.ToString(CultureInfo.InvariantCulture); // i18n
 
         void Close()
         {

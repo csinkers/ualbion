@@ -44,6 +44,7 @@ namespace UAlbion.Game.Gui
 
         public virtual int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
         {
+            if (registerHitFunc == null) throw new ArgumentNullException(nameof(registerHitFunc));
             if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
                 return order;
 

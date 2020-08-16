@@ -15,6 +15,7 @@ namespace UAlbion.Game.Gui.Controls
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
+            if (func == null) throw new ArgumentNullException(nameof(func));
             var childSize = _content.GetSize();
             var childExtents = new Rectangle(
                 extents.X + (int)(extents.Width - childSize.X) / 2,

@@ -24,7 +24,7 @@ namespace UAlbion.Game.State.Player
         public byte ActionPoints => (byte)ApiUtil.Lerp(_a().ActionPoints, _b().ActionPoints, _getLerp());
         public ushort Protection => (ushort)ApiUtil.Lerp(_a().Protection, _b().Protection, _getLerp());
         public ushort Damage => (ushort)ApiUtil.Lerp(_a().Damage, _b().Damage, _getLerp());
-        public PhysicalCondition PhysicalConditions => _b().PhysicalConditions;
-        public MentalCondition MentalConditions => _b().MentalConditions;
+        public PhysicalConditions PhysicalConditions => _b().PhysicalConditions;
+        public MentalConditions MentalConditions => _b().MentalConditions;
     }
 }

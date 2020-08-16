@@ -14,6 +14,10 @@ namespace UAlbion.Game.Gui.Inventory
             Func<InventoryPage> getPage,
             Action<InventoryPage> setPage) : base(DialogPositioning.TopLeft)
         {
+            if (modeEvent == null) throw new ArgumentNullException(nameof(modeEvent));
+            if (getPage == null) throw new ArgumentNullException(nameof(getPage));
+            if (setPage == null) throw new ArgumentNullException(nameof(setPage));
+
             var leftPane =
                 modeEvent.Mode switch
                 {

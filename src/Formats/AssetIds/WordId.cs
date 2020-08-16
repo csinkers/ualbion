@@ -5,6 +5,7 @@
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
+#pragma warning disable CA1707 // Identifiers should not contain underscores
 namespace UAlbion.Formats.AssetIds
 {
     public enum WordId : ushort
@@ -549,3 +550,4 @@ namespace UAlbion.Formats.AssetIds
         MagiciansGuild2 = 1217,
     }
 }
+#pragma warning restore CA1707 // Identifiers should not contain underscores

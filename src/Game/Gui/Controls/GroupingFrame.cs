@@ -11,9 +11,9 @@ namespace UAlbion.Game.Gui.Controls
             State = ButtonState.Pressed;
         }
 
-        public static ColorScheme FrameTheme(ButtonState state)
+        public static ButtonColorScheme FrameTheme(ButtonState state)
         {
-            var c = new ColorScheme { Alpha = 0.5f, Corners = CommonColor.Grey8 };
+            var c = new ButtonColorScheme { Alpha = 0.5f, Corners = CommonColor.Grey8 };
             switch (state)
             {
                 case ButtonState.Normal:
@@ -38,15 +38,15 @@ namespace UAlbion.Game.Gui.Controls
                     c.BottomRight = CommonColor.White;
                     c.Background = null;
                     break;
-                default: throw new ArgumentOutOfRangeException();
+                default: throw new ArgumentOutOfRangeException(nameof(state), state, $"Unexpected button state \"{state}\"");
             }
 
             return c;
         }
 
-        public static ColorScheme FrameThemeBackgroundless(ButtonState state)
+        public static ButtonColorScheme FrameThemeBackgroundless(ButtonState state)
         {
-            var c = new ColorScheme { Alpha = 0.5f, Corners = CommonColor.Grey8 };
+            var c = new ButtonColorScheme { Alpha = 0.5f, Corners = CommonColor.Grey8 };
             switch (state)
             {
                 case ButtonState.Normal:
@@ -71,7 +71,7 @@ namespace UAlbion.Game.Gui.Controls
                     c.BottomRight = CommonColor.White;
                     c.Background = null;
                     break;
-                default: throw new ArgumentOutOfRangeException();
+                default: throw new ArgumentOutOfRangeException(nameof(state), state, $"Unexpected button state \"{state}\"");
             }
 
             return c;

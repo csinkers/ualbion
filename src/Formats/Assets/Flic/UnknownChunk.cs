@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace UAlbion.Formats.Assets.Flic
 {
@@ -10,6 +11,7 @@ namespace UAlbion.Formats.Assets.Flic
         public override string ToString() => $"Unknown:{Type} ({Bytes.Length} bytes)";
         protected override uint LoadChunk(uint length, BinaryReader br)
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
             Bytes = br.ReadBytes((int)length);
             return (uint)Bytes.Length;
         }

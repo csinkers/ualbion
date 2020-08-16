@@ -116,6 +116,7 @@ namespace UAlbion.Game.Gui.Status
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
+            if (func == null) throw new ArgumentNullException(nameof(func));
             var party = Resolve<IParty>();
             var member = PartyMember;
             if (member == null)

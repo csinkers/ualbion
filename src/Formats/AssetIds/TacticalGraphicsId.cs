@@ -5,6 +5,7 @@
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
+#pragma warning disable CA1707 // Identifiers should not contain underscores
 namespace UAlbion.Formats.AssetIds
 {
     public enum TacticalGraphicsId : byte
@@ -83,3 +84,4 @@ namespace UAlbion.Formats.AssetIds
         Unknown71 = 71,
     }
 }
+#pragma warning restore CA1707 // Identifiers should not contain underscores

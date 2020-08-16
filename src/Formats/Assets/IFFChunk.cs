@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 
 namespace UAlbion.Formats.Assets
 {
@@ -17,6 +18,7 @@ namespace UAlbion.Formats.Assets
 
         public void WriteLength(ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             var offset = s.Offset;
             s.Seek(_lengthOffset);
             Length = s.Int32BE(nameof(Length), (int)(offset - _lengthOffset));
@@ -25,6 +27,7 @@ namespace UAlbion.Formats.Assets
 
 		public static IFFChunk Serdes(int _, IFFChunk c, ISerializer s)
 		{
+            if (s == null) throw new ArgumentNullException(nameof(s));
             c ??= new IFFChunk();
             s.Begin();
             c.TypeId = s.FixedLengthString(nameof(TypeId), c.TypeId, 4);

@@ -2,6 +2,7 @@ using System;
 
 namespace UAlbion.Formats.AssetIds
 {
+    [AttributeUsage(AttributeTargets.Field)]
     public class EnumTypeAttribute : Attribute
     {
         public Type EnumType { get; }

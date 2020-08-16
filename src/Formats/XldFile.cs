@@ -6,7 +6,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats
 {
-    public class XldFile : IDisposable
+    public sealed class XldFile : IDisposable
     {
         const string MagicString = "XLD0I";
         readonly Stream _stream;

@@ -4,7 +4,7 @@ using SerdesNet;
 
 namespace UAlbion.Formats
 {
-    public class StoreIncremented :
+    public sealed class StoreIncremented :
         IConverter<uint, uint>,
         IConverter<int, int>,
         IConverter<ushort, ushort>,
@@ -13,11 +13,35 @@ namespace UAlbion.Formats
     {
         public static readonly StoreIncremented Instance = new StoreIncremented();
         StoreIncremented() { }
-        public static byte Serdes(string name, byte existing, Func<string, byte, byte> serializer) => Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
-        public static ushort Serdes(string name, ushort existing, Func<string, ushort, ushort> serializer) => Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
-        public static uint Serdes(string name, uint existing, Func<string, uint, uint> serializer) => Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
-        public static short Serdes(string name, short existing, Func<string, short, short> serializer) => Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
-        public static int Serdes(string name, int existing, Func<string, int, int> serializer) => Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
+        public static byte Serdes(string name, byte existing, Func<string, byte, byte> serializer)
+        {
+            if (serializer == null) throw new ArgumentNullException(nameof(serializer));
+            return Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
+        }
+
+        public static ushort Serdes(string name, ushort existing, Func<string, ushort, ushort> serializer)
+        {
+            if (serializer == null) throw new ArgumentNullException(nameof(serializer));
+            return Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
+        }
+
+        public static uint Serdes(string name, uint existing, Func<string, uint, uint> serializer)
+        {
+            if (serializer == null) throw new ArgumentNullException(nameof(serializer));
+            return Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
+        }
+
+        public static short Serdes(string name, short existing, Func<string, short, short> serializer)
+        {
+            if (serializer == null) throw new ArgumentNullException(nameof(serializer));
+            return Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
+        }
+
+        public static int Serdes(string name, int existing, Func<string, int, int> serializer)
+        {
+            if (serializer == null) throw new ArgumentNullException(nameof(serializer));
+            return Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
+        }
 
         public uint   FromNumeric(uint   x) => x - 1;
         public int    FromNumeric(int    x) => x - 1;

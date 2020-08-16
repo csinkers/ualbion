@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
@@ -11,6 +12,7 @@ namespace UAlbion.Formats.Assets
     {
         public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
             IDictionary<int, string> strings = new Dictionary<int, string>();
             var startOffset = br.BaseStream.Position;
             var stringCount = br.ReadUInt16();
@@ -40,6 +42,7 @@ namespace UAlbion.Formats.Assets
 
         public static StringTable Serdes(StringTable existing, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             s.Begin();
             var strings = existing?._strings;
             var stringCount = s.UInt16("StringCount", (ushort)(strings?.Length ?? 0));

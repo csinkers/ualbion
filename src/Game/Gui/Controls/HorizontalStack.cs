@@ -16,6 +16,7 @@ namespace UAlbion.Game.Gui.Controls
         public HorizontalStack(params IUiElement[] args) : this((IList<IUiElement>)args) { }
         public HorizontalStack(IList<IUiElement> children)
         {
+            if (children == null) throw new ArgumentNullException(nameof(children));
             foreach(var child in children)
                 Children.Add(child);
         }

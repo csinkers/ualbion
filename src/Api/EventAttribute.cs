@@ -23,10 +23,8 @@ namespace UAlbion.Api
         public string HelpText { get; }
         public bool IsOptional { get; }
 
-        public EventPartAttribute(string name) : this(name, null, false) { }
-        public EventPartAttribute(string name, string helpText) : this(name, helpText, false) { }
         public EventPartAttribute(string name, bool isOptional) : this(name, null, isOptional) { }
-        public EventPartAttribute(string name, string helpText, bool isOptional)
+        public EventPartAttribute(string name, string helpText = null, bool isOptional = false)
         {
             Name = name;
             HelpText = helpText;

@@ -15,6 +15,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
 
         public static ObjectGroup Serdes(int _, ObjectGroup og, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             og ??= new ObjectGroup();
             s.Begin();
             og.AutoGraphicsId = s.UInt16(nameof(og.AutoGraphicsId), og.AutoGraphicsId);

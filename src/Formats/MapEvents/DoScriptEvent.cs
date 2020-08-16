@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
@@ -12,6 +13,7 @@ namespace UAlbion.Formats.MapEvents
 
         public static DoScriptEvent Serdes(DoScriptEvent e, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new DoScriptEvent();
             s.Begin();
             e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);

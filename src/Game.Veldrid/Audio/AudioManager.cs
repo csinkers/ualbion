@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading;
@@ -14,7 +15,7 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Veldrid.Audio
 {
-    public class AudioManager : ServiceComponent<IAudioManager>, IAudioManager
+    public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManager, IDisposable
     {
         readonly bool _standalone;
         readonly IDictionary<SampleId, AudioBuffer> _sampleCache = new Dictionary<SampleId, AudioBuffer>();
@@ -288,6 +289,12 @@ namespace UAlbion.Game.Veldrid.Audio
                         .ToList();
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            _doneEvent?.Dispose();
+            _music?.Dispose();
         }
     }
 }

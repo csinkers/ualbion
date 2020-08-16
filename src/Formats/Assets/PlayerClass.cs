@@ -17,7 +17,7 @@ namespace UAlbion.Formats.Assets
     }
 
     [Flags]
-    public enum PlayerClassMask : ushort
+    public enum PlayerClasses : ushort
     {
         Pilot = 0x1,
         Scientist = 0x2,
@@ -37,18 +37,18 @@ namespace UAlbion.Formats.Assets
 
     public static class PlayerClassExtensions
     {
-        public static bool IsAllowed(this PlayerClassMask mask, PlayerClass playerClass) =>
+        public static bool IsAllowed(this PlayerClasses mask, PlayerClass playerClass) =>
             playerClass switch
             {
-                PlayerClass.Pilot          => 0 != (mask & PlayerClassMask.Pilot),
-                PlayerClass.Scientist      => 0 != (mask & PlayerClassMask.Scientist),
-                PlayerClass.IskaiWarrior   => 0 != (mask & PlayerClassMask.IskaiWarrior),
-                PlayerClass.DjiKasMage     => 0 != (mask & PlayerClassMask.DjiKasMage),
-                PlayerClass.Druid          => 0 != (mask & PlayerClassMask.Druid),
-                PlayerClass.EnlightenedOne => 0 != (mask & PlayerClassMask.EnlightenedOne),
-                PlayerClass.Technician     => 0 != (mask & PlayerClassMask.Technician),
-                PlayerClass.OquloKamulos   => 0 != (mask & PlayerClassMask.OquloKamulos),
-                PlayerClass.Warrior        => 0 != (mask & PlayerClassMask.Warrior),
+                PlayerClass.Pilot          => 0 != (mask & PlayerClasses.Pilot),
+                PlayerClass.Scientist      => 0 != (mask & PlayerClasses.Scientist),
+                PlayerClass.IskaiWarrior   => 0 != (mask & PlayerClasses.IskaiWarrior),
+                PlayerClass.DjiKasMage     => 0 != (mask & PlayerClasses.DjiKasMage),
+                PlayerClass.Druid          => 0 != (mask & PlayerClasses.Druid),
+                PlayerClass.EnlightenedOne => 0 != (mask & PlayerClasses.EnlightenedOne),
+                PlayerClass.Technician     => 0 != (mask & PlayerClasses.Technician),
+                PlayerClass.OquloKamulos   => 0 != (mask & PlayerClasses.OquloKamulos),
+                PlayerClass.Warrior        => 0 != (mask & PlayerClasses.Warrior),
                 _ => false
             };
     }

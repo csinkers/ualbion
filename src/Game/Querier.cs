@@ -3,7 +3,7 @@ using System.Linq;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
@@ -31,6 +31,7 @@ namespace UAlbion.Game
 
         public bool? QueryDebug(IQueryEvent query)
         {
+            if (query == null) throw new ArgumentNullException(nameof(query));
             var context = Resolve<IEventManager>().Context;
             bool result = true;
             InnerQuery(context, query, true, x => result = x);
@@ -51,7 +52,7 @@ namespace UAlbion.Game
                 case (QueryEvent q, QueryType.IsPartyMemberLeader):  continuation((int)game.Party.Leader == q.Argument); return true;
                 case (QueryEvent q, QueryType.RandomChance):         continuation(_random.Next(100) < q.Argument); return true;
                 case (QueryEvent q, QueryType.TriggerType):          continuation((ushort)context.Source.Trigger == q.Argument); return true;
-                case (QueryVerbEvent verb, QueryType.ChosenVerb):    continuation(context.Source.Trigger.HasFlag((TriggerType)(1 << (int)verb.Verb))); return true;
+                case (QueryVerbEvent verb, QueryType.ChosenVerb):    continuation(context.Source.Trigger.HasFlag((TriggerTypes)(1 << (int)verb.Verb))); return true;
                 case (QueryItemEvent q, QueryType.UsedItemId):       continuation(context.Source is EventSource.Item item && item.ItemId == q.ItemId); return true;
                 case (_, QueryType.PreviousActionResult):            continuation(Resolve<IEventManager>().LastEventResult); return true;
 
@@ -85,7 +86,7 @@ namespace UAlbion.Game
             }
         }
 
-        bool Compare(QueryOperation operation, int value, int immediate) =>
+        static bool Compare(QueryOperation operation, int value, int immediate) =>
             operation switch
             {
                 QueryOperation.IsTrue => (value != 0),

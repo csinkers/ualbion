@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using UAlbion.Api;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
@@ -9,7 +10,7 @@ using Veldrid.Utilities;
 
 namespace UAlbion.Core.Veldrid.Visual
 {
-    public class SpriteRenderer : Component, IRenderer
+    public sealed class SpriteRenderer : Component, IRenderer
     {
         // Vertex Layout
         static readonly VertexLayoutDescription VertexLayout = VertexLayoutHelper.Vertex2DTextured;
@@ -22,8 +23,8 @@ namespace UAlbion.Core.Veldrid.Visual
                 VertexLayoutHelper.Vector3D("Transform4"),
                 //VertexLayoutHelper.Vector3D("Offset"), VertexLayoutHelper.Vector2D("Size"),
                 VertexLayoutHelper.Vector2D("TexPosition"), VertexLayoutHelper.Vector2D("TexSize"),
-                VertexLayoutHelper.Int("TexLayer"), VertexLayoutHelper.Int("Flags")
-            //VertexLayoutHelper.Float("Rotation")
+                VertexLayoutHelper.IntElement("TexLayer"), VertexLayoutHelper.IntElement("Flags")
+            //VertexLayoutHelper.FloatElement("Rotation")
             )
         { InstanceStepRate = 1 };
 
@@ -46,11 +47,13 @@ namespace UAlbion.Core.Veldrid.Visual
         readonly List<Shader> _shaders = new List<Shader>();
         readonly Dictionary<SpriteShaderKey, Pipeline> _pipelines = new Dictionary<SpriteShaderKey, Pipeline>();
 
+#pragma warning disable CA2213 // Analysis doesn't know about DisposeCollector
         // Context objects
         DeviceBuffer _vertexBuffer;
         DeviceBuffer _indexBuffer;
         DeviceBuffer _uniformBuffer;
         ResourceLayout _perSpriteResourceLayout;
+#pragma warning restore CA2213 // Analysis doesn't know about DisposeCollector
 
         public bool CanRender(Type renderable) => renderable == typeof(MultiSprite);
         public RenderPasses RenderPasses => RenderPasses.Standard;
@@ -120,6 +123,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public void CreateDeviceObjects(IRendererContext context)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
             var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
@@ -139,8 +143,23 @@ namespace UAlbion.Core.Veldrid.Visual
             _disposeCollector.Add(_vertexBuffer, _indexBuffer, _uniformBuffer, _perSpriteResourceLayout);
         }
 
+        static void UpdateBufferSpan(CommandList cl, DeviceBuffer buffer, ReadOnlySpan<SpriteInstanceData> instances)
+        {
+            unsafe
+            {
+                fixed (SpriteInstanceData* instancePtr = &instances[0])
+                    cl.UpdateBuffer(
+                        buffer,
+                        0,
+                        (IntPtr)instancePtr,
+                        (uint)(instances.Length * Marshal.SizeOf<SpriteInstanceData>()));
+            }
+        }
+
         public IEnumerable<IRenderable> UpdatePerFrameResources(IRendererContext context, IEnumerable<IRenderable> renderables)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            if (renderables == null) throw new ArgumentNullException(nameof(renderables));
             var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
@@ -161,25 +180,26 @@ namespace UAlbion.Core.Veldrid.Visual
                     _pipelines.Add(shaderKey, BuildPipeline(gd, sc, shaderKey));
 
                 uint bufferSize = (uint)sprite.Instances.Length * SpriteInstanceData.StructSize;
-                var buffer = objectManager.Get<DeviceBuffer>((sprite, sprite));
+                var buffer = objectManager.GetDeviceObject<DeviceBuffer>((sprite, sprite));
                 if (buffer?.SizeInBytes != bufferSize)
                 {
                     buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription(bufferSize, BufferUsage.VertexBuffer));
                     buffer.Name = $"B_SpriteInst:{sprite.Name}";
                     PerfTracker.IncrementFrameCounter("Create InstanceBuffer");
-                    objectManager.Set((sprite, sprite), buffer);
+                    objectManager.SetDeviceObject((sprite, sprite), buffer);
                 }
 
                 if (sprite.InstancesDirty)
                 {
-                    cl.UpdateBuffer(buffer, 0, sprite.Instances);
+                    var instances = sprite.Instances;
+                    UpdateBufferSpan(cl, buffer, instances);
                     PerfTracker.IncrementFrameCounter("Update InstanceBuffers");
                 }
 
                 textureManager?.PrepareTexture(sprite.Key.Texture, context);
                 TextureView textureView = (TextureView)textureManager?.GetTexture(sprite.Key.Texture);
 
-                var resourceSet = objectManager.Get<ResourceSet>((sprite, textureView));
+                var resourceSet = objectManager.GetDeviceObject<ResourceSet>((sprite, textureView));
                 if (resourceSet == null)
                 {
                     resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
@@ -189,7 +209,7 @@ namespace UAlbion.Core.Veldrid.Visual
                         _uniformBuffer));
                     resourceSet.Name = $"RS_Sprite:{sprite.Key.Texture.Name}";
                     PerfTracker.IncrementFrameCounter("Create ResourceSet");
-                    objectManager.Set((sprite, textureView), resourceSet);
+                    objectManager.SetDeviceObject((sprite, textureView), resourceSet);
                 }
 
                 sprite.InstancesDirty = false;
@@ -201,6 +221,8 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public void Render(IRendererContext context, RenderPasses renderPass, IRenderable renderable)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            if (renderable == null) throw new ArgumentNullException(nameof(renderable));
             var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var sc = c.SceneContext;
@@ -222,8 +244,8 @@ namespace UAlbion.Core.Veldrid.Visual
                 return;
 
             TextureView textureView = (TextureView)textureManager?.GetTexture(sprite.Key.Texture);
-            var resourceSet = dom.Get<ResourceSet>((sprite, textureView));
-            var instanceBuffer = dom.Get<DeviceBuffer>((sprite, sprite));
+            var resourceSet = dom.GetDeviceObject<ResourceSet>((sprite, textureView));
+            var instanceBuffer = dom.GetDeviceObject<DeviceBuffer>((sprite, sprite));
             var uniformInfo = new SpriteUniformInfo
             {
                 Flags = sprite.Key.Flags,

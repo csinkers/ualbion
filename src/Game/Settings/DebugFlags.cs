@@ -3,7 +3,7 @@
 namespace UAlbion.Game.Settings
 {
     [Flags]
-    public enum DebugFlags : uint
+    public enum DebugFlags
     {
         DrawPositions            = 0x1,
         HighlightTile            = 0x2,

@@ -9,7 +9,7 @@ namespace UAlbion.Formats
         public AlbionReader(BinaryReader br, long maxLength = 0)
             : base(
                 br,
-                maxLength == 0 ? br.BaseStream.Length : maxLength,
+                maxLength == 0 ? br?.BaseStream.Length ?? 0 : maxLength,
                 FormatUtil.BytesTo850String,
                 ApiUtil.Assert)
         {

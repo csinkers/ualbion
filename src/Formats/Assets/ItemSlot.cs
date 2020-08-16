@@ -67,6 +67,7 @@ namespace UAlbion.Formats.Assets
 
         public static ItemSlot Serdes(InventorySlotId id, ItemSlot slot, ISerializer s)  // 6 per slot
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             slot ??= new ItemSlot(id);
             s.Begin();
             slot.Amount = s.UInt8(nameof(slot.Amount), (byte)(slot.Amount == Unlimited ? 0xff : slot.Amount));
@@ -170,6 +171,7 @@ namespace UAlbion.Formats.Assets
 
         public bool CanCoalesce(ItemSlot y)
         {
+            if (y == null) throw new ArgumentNullException(nameof(y));
             if (Item == null || y.Item == null) return true; // Anything can coalesce with nothing
             if (ItemId != y.ItemId) return false; // Can't stack dissimilar items
             if (Item is Gold) return true;
@@ -181,6 +183,7 @@ namespace UAlbion.Formats.Assets
 
         public void Swap(ItemSlot other)
         {
+            if (other == null) throw new ArgumentNullException(nameof(other));
             var oldItem = Item; Item = other.Item; other.Item = oldItem;
             var oldAmount = Amount; Amount = other.Amount; other.Amount = oldAmount;
             var oldCharges = Charges; Charges = other.Charges; other.Charges = oldCharges;

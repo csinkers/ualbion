@@ -14,7 +14,7 @@ namespace UAlbion.Formats.Assets
     }
 
     [Flags]
-    public enum SpellClassMask : byte
+    public enum SpellClasses : byte
     {
         DjiKas       =  1,
         DjiKantos    =  2, // Enlightened ones

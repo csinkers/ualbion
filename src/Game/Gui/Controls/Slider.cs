@@ -66,6 +66,7 @@ namespace UAlbion.Game.Gui.Controls
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
+            if (func == null) throw new ArgumentNullException(nameof(func));
             int maxOrder = order;
             var decWidth = (int)_decrement.GetSize().X;
             var incWidth = (int)_increment.GetSize().X;

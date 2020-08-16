@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Core;
 using UAlbion.Game.Events;
@@ -21,6 +22,7 @@ namespace UAlbion.Game.State
 
         public SceneManager AddScene(GameScene scene)
         {
+            if (scene == null) throw new ArgumentNullException(nameof(scene));
             scene.IsActive = false;
             AttachChild(scene);
             _scenes.Add(scene.Id, scene);

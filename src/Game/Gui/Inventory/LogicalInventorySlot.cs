@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
@@ -35,7 +37,7 @@ namespace UAlbion.Game.Gui.Inventory
                 amountSource = new DynamicText(() =>
                 {
                     var gold = Inventory?.Gold.Amount ?? 0;
-                    return new[] { new TextBlock($"{gold / 10}.{gold % 10}") };
+                    return new[] { new TextBlock($"{gold / 10}.{gold % 10}") }; // i18n: May need to vary based on the current game language
                 }, x => _version);
             }
             else if (id.Slot == ItemSlotId.Rations)
@@ -43,7 +45,7 @@ namespace UAlbion.Game.Gui.Inventory
                 amountSource = new DynamicText(() =>
                 {
                     var food = Inventory?.Rations.Amount ?? 0;
-                    return new[] { new TextBlock(food.ToString()) };
+                    return new[] { new TextBlock(food.ToString(CultureInfo.InvariantCulture)) }; // i18n: Will need to be changed if we support a language that doesn't use Hindu-Arabic numerals.
                 }, x => _version);
             }
             else
@@ -52,8 +54,8 @@ namespace UAlbion.Game.Gui.Inventory
                 {
                     var slotInfo = Slot;
                     return slotInfo == null || slotInfo.Amount < 2
-                        ? new TextBlock[0]
-                        : new[] { new TextBlock(slotInfo.Amount.ToString()) { Alignment = TextAlignment.Right } };
+                        ? Array.Empty<TextBlock>()
+                        : new[] { new TextBlock(slotInfo.Amount.ToString(CultureInfo.InvariantCulture)) { Alignment = TextAlignment.Right } }; // i18n: Will need to be changed if we support a language that doesn't use Hindu-Arabic numerals.
                 }, x => _version);
             }
 

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
@@ -10,7 +12,7 @@ namespace UAlbion.Formats.MapEvents
     public class EventNode : IEventNode
     {
         bool DirectSequence => (Next?.Id ?? Id + 1) == Id + 1;
-        public override string ToString() => $"{(DirectSequence ? " " : "#")}{Id}=>{Next?.Id.ToString() ?? "!"}: {Event}";
+        public override string ToString() => $"{(DirectSequence ? " " : "#")}{Id}=>{Next?.Id.ToString(CultureInfo.InvariantCulture) ?? "!"}: {Event}";
         public ushort Id { get; set; }
         public IEvent Event { get; }
         public IEventNode Next { get; set; }
@@ -22,6 +24,7 @@ namespace UAlbion.Formats.MapEvents
 
         public virtual void Unswizzle(IList<EventNode> nodes)
         {
+            if (nodes == null) throw new ArgumentNullException(nameof(nodes));
             if (!(Next is DummyEventNode dummy)) 
                 return;
 
@@ -35,6 +38,7 @@ namespace UAlbion.Formats.MapEvents
 
         public static EventNode Serdes(ushort id, EventNode node, ISerializer s, bool useEventText, ushort textSourceId)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             s.Begin();
             var initialPosition = s.Offset;
             var mapEvent = node?.Event as MapEvent;

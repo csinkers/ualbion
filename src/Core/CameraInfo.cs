@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace UAlbion.Core
 {
+#pragma warning disable CA1051 // Do not declare visible instance fields
     [StructLayout(LayoutKind.Sequential)]
     public struct CameraInfo
     {
@@ -23,4 +24,5 @@ namespace UAlbion.Core
         readonly uint _padding3;
         readonly uint _padding4;
     }
+#pragma warning restore CA1051 // Do not declare visible instance fields
 }

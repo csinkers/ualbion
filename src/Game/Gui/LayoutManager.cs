@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -120,7 +120,7 @@ namespace UAlbion.Game.Gui
                     y = UiConstants.StatusBarExtents.Y;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new InvalidEnumArgumentException(nameof(dialog.Positioning), (int)dialog.Positioning, typeof(DialogPositioning));
             }
 
             return (x, y);
@@ -141,13 +141,7 @@ namespace UAlbion.Game.Gui
             void Aux(LayoutNode node, int level)
             {
                 var size = node.Element?.GetSize() ?? Vector2.Zero;
-                sb.Append($"{node.Order.ToString().PadLeft(4)} (");
-                sb.Append(node.Extents.X.ToString().PadLeft(3)); sb.Append(", ");
-                sb.Append(node.Extents.Y.ToString().PadLeft(3)); sb.Append(", ");
-                sb.Append(node.Extents.Width.ToString().PadLeft(3)); sb.Append(", ");
-                sb.Append(node.Extents.Height.ToString().PadLeft(3)); sb.Append(") <");
-                sb.Append(size.X.ToString(CultureInfo.InvariantCulture).PadLeft(3)); sb.Append(", ");
-                sb.Append(size.Y.ToString(CultureInfo.InvariantCulture).PadLeft(3)); sb.Append("> ");
+                sb.Append($"{node.Order,4} ({node.Extents.X,3}, {node.Extents.Y,3}, {node.Extents.Width,3}, {node.Extents.Height,3}) <{size.X,3}, {size.Y,3}> ");
                 sb.Append("".PadLeft(level * 2));
                 sb.AppendLine($"{node.Element}");
                 foreach (var child in node.Children)

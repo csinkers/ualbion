@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using UAlbion.Api;
 using UAlbion.Formats;
@@ -8,7 +9,7 @@ using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.Assets
 {
-    public class StandardAssetLocator : IAssetLocator, IDisposable
+    public sealed class StandardAssetLocator : IAssetLocator, IDisposable
     {
         // ReSharper disable StringLiteralTypo
         readonly IDictionary<AssetType, (AssetLocation, string)> _assetFiles = new Dictionary<AssetType, (AssetLocation, string)> {
@@ -88,6 +89,12 @@ namespace UAlbion.Game.Assets
         readonly string[] _overrideExtensions = { "bmp", "png", "wav", "json", "mp3" };
         readonly IDictionary<XldKey, XldFile> _xlds = new Dictionary<XldKey, XldFile>();
         readonly object _syncRoot = new object();
+        readonly IAssetLoaderRegistry _assetLoaderRegistry;
+
+        public StandardAssetLocator(IAssetLoaderRegistry assetLoaderRegistry)
+        {
+            _assetLoaderRegistry = assetLoaderRegistry ?? throw new ArgumentNullException(nameof(assetLoaderRegistry));
+        }
 
         AssetPaths GetAssetPaths(IGeneralConfig config, AssetLocation location, GameLanguage language, string baseName, int number, int objectNumber)
         {
@@ -106,13 +113,13 @@ namespace UAlbion.Game.Assets
             ApiUtil.Assert(number <= 9);
 
             var result = new AssetPaths();
-            baseName = baseName.Replace("!", number.ToString());
-            var lang = language.ToString().ToUpper();
+            baseName = baseName.Replace("!", number.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
+            var lang = language.ToString().ToUpperInvariant();
             switch (location)
             {
                 case AssetLocation.Base:
                     result.XldPath = Path.Combine(config.BasePath, config.XldPath, baseName);
-                    result.OverridePath = Try(Path.Combine(config.BaseDataPath, baseName, objectNumber.ToString()));
+                    result.OverridePath = Try(Path.Combine(config.BaseDataPath, baseName, objectNumber.ToString(CultureInfo.InvariantCulture)));
                     result.XldNameInConfig = baseName;
                     break;
 
@@ -124,7 +131,7 @@ namespace UAlbion.Game.Assets
 
                 case AssetLocation.Localised:
                     result.XldPath = Path.Combine(config.BasePath, config.XldPath, lang, baseName);
-                    result.OverridePath = Try(Path.Combine(config.BaseDataPath, lang, baseName, objectNumber.ToString()));
+                    result.OverridePath = Try(Path.Combine(config.BaseDataPath, lang, baseName, objectNumber.ToString(CultureInfo.InvariantCulture)));
                     result.XldNameInConfig = "$(LANG)/" + baseName;
                     break;
 
@@ -136,13 +143,13 @@ namespace UAlbion.Game.Assets
 
                 case AssetLocation.Initial:
                     result.XldPath = Path.Combine(config.BasePath, config.XldPath, "INITIAL", baseName);
-                    result.OverridePath = Try(Path.Combine(config.BaseDataPath, "INITIAL", baseName, objectNumber.ToString()));
+                    result.OverridePath = Try(Path.Combine(config.BaseDataPath, "INITIAL", baseName, objectNumber.ToString(CultureInfo.InvariantCulture)));
                     result.XldNameInConfig = "INITIAL/" + baseName;
                     break;
 
                 case AssetLocation.Current:
                     result.XldPath = Path.Combine(config.BasePath, config.XldPath, "CURRENT", baseName);
-                    result.OverridePath = Try(Path.Combine(config.BaseDataPath, "CURRENT", baseName, objectNumber.ToString()));
+                    result.OverridePath = Try(Path.Combine(config.BaseDataPath, "CURRENT", baseName, objectNumber.ToString(CultureInfo.InvariantCulture)));
                     result.XldNameInConfig = "INITIAL/" + baseName; // Note: Use the same metadata for CURRENT & INITIAL
                     break;
 
@@ -194,6 +201,7 @@ namespace UAlbion.Game.Assets
         public IEnumerable<AssetType> SupportedTypes => _assetFiles.Keys;
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, object> loaderFunc)
         {
+            if (loaderFunc == null) throw new ArgumentNullException(nameof(loaderFunc));
             var basicAssetConfig = (IAssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig));
             var generalConfig = (IGeneralConfig)loaderFunc(new AssetKey(AssetType.GeneralConfig));
 
@@ -208,7 +216,7 @@ namespace UAlbion.Game.Assets
 
             object Reader(string path, BinaryReader br, long length)
             {
-                var loader = AssetLoaderRegistry.GetLoader(assetConfig.Format);
+                var loader = _assetLoaderRegistry.GetLoader(assetConfig.Format);
                 var asset = loader.Load(br, (int)length, key, assetConfig);
                 if (asset == null) throw new AssetNotFoundException($"Object {key.Type}:{key.Id} could not be loaded from file {path}", key.Type, key.Id);
                 GameTrace.Log.AssetLoaded(key, name, path);

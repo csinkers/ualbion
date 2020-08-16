@@ -2,9 +2,10 @@
 using System.Globalization;
 using SerdesNet;
 
+#pragma warning disable CA1822 // Mark members as static
 namespace UAlbion.Formats
 {
-    public class Tweak :
+    public sealed class Tweak :
         IConverter<uint, uint?>,
         //IConverter<int, int?>,
         IConverter<ushort, ushort?>,
@@ -103,7 +104,7 @@ namespace UAlbion.Formats
         byte?   IConverter<byte,     byte?>.FromSymbolic(string symbolic) => symbolic == null ? null :   (byte?)byte.Parse(symbolic, CultureInfo.InvariantCulture);
     }
 
-    public class Tweak<T> :
+    public sealed class Tweak<T> :
         IConverter<byte, T?>,
         //IConverter<sbyte, T?>,
         IConverter<ushort, T?>,
@@ -163,3 +164,4 @@ namespace UAlbion.Formats
         public T? FromSymbolic(string x) => x == null ? null : (T?)(T)Enum.Parse(typeof(T), x);
     }
 }
+#pragma warning restore CA1822 // Mark members as static

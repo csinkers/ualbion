@@ -8,7 +8,12 @@ namespace UAlbion.Formats.Assets
     {
         public static readonly NpcCountTransform Instance = new NpcCountTransform();
         NpcCountTransform() { }
-        public static int Serdes(string name, int existing, Func<string, byte, byte> serializer) => Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
+        public static int Serdes(string name, int existing, Func<string, byte, byte> serializer)
+        {
+            if (serializer == null) throw new ArgumentNullException(nameof(serializer));
+            return Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
+        }
+
         public byte ToNumeric(int memory) => memory switch
         {
             0x20 => (byte)0,

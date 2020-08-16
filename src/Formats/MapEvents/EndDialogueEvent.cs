@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
@@ -8,6 +9,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static EndDialogueEvent Serdes(EndDialogueEvent e, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new EndDialogueEvent();
             s.Begin();
             s.UInt8("Pad1", 0);

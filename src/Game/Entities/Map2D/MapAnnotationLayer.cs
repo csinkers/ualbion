@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
-using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Settings;
@@ -23,23 +23,22 @@ namespace UAlbion.Game.Entities.Map2D
     {
         public MapAnnotationLayer(LogicalMap2D logicalMap, Vector2 tileSize)
         {
-            On<RenderEvent>(e => Render());
-
-            _logicalMap = logicalMap;
+            _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
             _tileSize = tileSize;
             _logicalMap.Dirty += (sender, args) => _dirty.Add((args.X, args.Y));
-            _drawLayer = DrawLayer.Diagnostic;
+            // _drawLayer = DrawLayer.Diagnostic;
+            On<RenderEvent>(e => Render());
         }
 
         readonly LogicalMap2D _logicalMap;
         readonly Vector2 _tileSize;
-        readonly DrawLayer _drawLayer;
+        // readonly DrawLayer _drawLayer;
         readonly ISet<(int, int)> _dirty = new HashSet<(int, int)>();
 
 #if DEBUG
         DebugFlags _lastDebugFlags;
 #endif
-        bool _allDirty = true;
+        // bool _allDirty = true;
         public int? HighlightIndex { get; set; }
         int? _highlightEvent;
 
@@ -69,8 +68,8 @@ namespace UAlbion.Game.Entities.Map2D
         {
 #if DEBUG
             var debug = Resolve<IDebugSettings>()?.DebugFlags ?? 0;
-            if (_lastDebugFlags != debug)
-                _allDirty = true;
+            //if (_lastDebugFlags != debug)
+            //    _allDirty = true;
             _lastDebugFlags = debug;
 #endif
 

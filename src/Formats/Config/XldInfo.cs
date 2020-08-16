@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -6,13 +7,13 @@ namespace UAlbion.Formats.Config
 {
     public abstract class XldInfo
     {
-        [JsonIgnore] public string Name;
+        [JsonIgnore] public string Name { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public FileFormat Format;
-        public int? Width;
-        public int? Height;
-        public bool? Transposed;
+        public FileFormat Format { get; set; }
+        public int? Width { get; set; }
+        public int? Height { get; set; }
+        public bool? Transposed { get; set; }
     }
 
     public class BasicXldInfo : XldInfo
@@ -22,6 +23,7 @@ namespace UAlbion.Formats.Config
 
         public BasicXldInfo(FullXldInfo full)
         {
+            if (full == null) throw new ArgumentNullException(nameof(full));
             Name = full.Name;
             Format = full.Format;
             Width = full.Width;

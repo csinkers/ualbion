@@ -8,7 +8,6 @@ namespace UAlbion.Game
         string BasePath { get; }
         IDebugSettings Debug { get; }
         IAudioSettings Audio { get; }
-        IGraphicsSettings Graphics { get; }
         IGameplaySettings Gameplay { get; }
         IEngineSettings Engine { get; }
         void Save();

@@ -3,7 +3,7 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 
@@ -31,7 +31,7 @@ namespace UAlbion.Game
             for (ushort i = 0; i < events.Count - 1; i++) nodes[i].Next = nodes[i + 1];
             for (ushort i = 0; i < events.Count;     i++) chain.Events.Add(nodes[i]);
 
-            var source = new EventSource.Map(mapManager.Current.MapId, TriggerType.Default, 0, 0); // TODO: Is there a better trigger type for this?
+            var source = new EventSource.Map(mapManager.Current.MapId, TriggerTypes.Default, 0, 0); // TODO: Is there a better trigger type for this?
             var trigger = new TriggerChainEvent(chain, chain.FirstEvent, source);
             return RaiseAsync(trigger, continuation) > 0;
         }

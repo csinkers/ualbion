@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 
 namespace UAlbion.Game.Debugging
 {
     public interface IDebugBehaviour
     {
-        Type[] HandledTypes { get; }
-        object Handle(DebugInspectorAction action, Reflector.ReflectedObject reflected);
+        ReadOnlyCollection<Type> HandledTypes { get; }
+        object Handle(DebugInspectorAction action, ReflectedObject reflected);
     }
 }

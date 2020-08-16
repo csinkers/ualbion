@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
 
@@ -6,20 +7,22 @@ namespace UAlbion.Formats.Assets
 {
     public class WaveLibSample : ISample
     {
-        public int IsValid;
-        public int Instrument;
-        public int Type2;
-        public uint Offset;
-        public uint Length;
-        public int Unk14;
-        public int Unk18;
+        byte[] _samples = Array.Empty<byte>();
+        public int IsValid { get; private set; }
+        public int Instrument { get; private set; }
+        public int Type2 { get; set; }
+        public uint Offset { get; set; }
+        public uint Length { get; private set; }
+        public int Unk14 { get; set; }
+        public int Unk18 { get; set; }
         public int SampleRate { get; private set; }
         public int Channels => 1;
         public int BytesPerSample => 1;
-        public byte[] Samples { get; internal set; }
+        public ReadOnlySpan<byte> Samples { get => _samples; set => _samples = value.ToArray(); }
 
         public static WaveLibSample Serdes(int i, WaveLibSample w, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             w ??= new WaveLibSample();
             s.Begin();
             w.IsValid = s.Int32(nameof(IsValid), w.IsValid);

@@ -21,9 +21,9 @@ namespace UAlbion.Game.Text
         }
 
         public int Version => _version + (_source?.Version ?? 0 - _baseSourceVersion);
-        public IEnumerable<TextBlock> Get() =>
+        public IEnumerable<TextBlock> GetBlocks() =>
             _source == null
                 ? Enumerable.Empty<TextBlock>()
-                : _source.Get();
+                : _source.GetBlocks();
     }
 }

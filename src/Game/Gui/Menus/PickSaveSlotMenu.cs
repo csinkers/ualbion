@@ -55,7 +55,7 @@ namespace UAlbion.Game.Gui.Menus
                     var block = textFormatter
                         .Ink(FontColor.Gray)
                         .Format(SystemTextId.MainMenu_EmptyPosition)
-                        .Get().Single();
+                        .GetBlocks().Single();
                     block.Text = $"{x,2}    {block.Text}";
                     return new[] { block };
                 });

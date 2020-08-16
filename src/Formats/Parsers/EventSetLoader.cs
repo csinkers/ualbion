@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using SerdesNet;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
@@ -10,12 +11,18 @@ namespace UAlbion.Formats.Parsers
     public class EventSetLoader : IAssetLoader<EventSet>
     {
         public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
-            => EventSet.Serdes(
-                (EventSetId)config.Id,
+        {
+            if (config == null) throw new ArgumentNullException(nameof(config));
+            return EventSet.Serdes(
+                (EventSetId) config.Id,
                 null,
                 new AlbionReader(br, streamLength));
+        }
 
         public EventSet Serdes(EventSet existing, ISerializer s, AssetKey key, AssetInfo config)
-            => EventSet.Serdes((EventSetId)config.Id, existing, s);
+        {
+            if (config == null) throw new ArgumentNullException(nameof(config));
+            return EventSet.Serdes((EventSetId) config.Id, existing, s);
+        }
     }
 }

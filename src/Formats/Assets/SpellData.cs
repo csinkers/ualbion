@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets
@@ -9,20 +10,21 @@ namespace UAlbion.Formats.Assets
         public const int MaxSpellsPerClass = 30;
         public const SystemTextId SystemTextOffset = SystemTextId.Spell0_0_ThornSnare;
 
-        public SpellEnvironment Environment { get; set; }
+        public SpellEnvironments Environments { get; set; }
         public byte Cost { get; set; }
         public byte LevelRequirement { get; set; }
-        public SpellTarget Targets { get; set; }
+        public SpellTargets Targetses { get; set; }
         byte Unused { get; set; } // Always 0 expect for unused spells in school 6
 
         public static SpellData Serdes(int i, SpellData d, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             d ??= new SpellData();
             s.Begin();
-            d.Environment = s.EnumU8(nameof(Environment), d.Environment);
+            d.Environments = s.EnumU8(nameof(Environments), d.Environments);
             d.Cost = s.UInt8(nameof(Cost), d.Cost);
             d.LevelRequirement = s.UInt8(nameof(LevelRequirement), d.LevelRequirement);
-            d.Targets = s.EnumU8(nameof(Targets), d.Targets);
+            d.Targetses = s.EnumU8(nameof(Targetses), d.Targetses);
             d.Unused = s.UInt8(nameof(Unused), d.Unused);
             s.End();
             return d;

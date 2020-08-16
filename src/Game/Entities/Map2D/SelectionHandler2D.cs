@@ -4,7 +4,7 @@ using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
@@ -102,35 +102,35 @@ namespace UAlbion.Game.Entities.Map2D
             var zone = _map.GetZone(x, y);
             if (zone?.Chain != null && zone.Node != null)
             {
-                if (zone.Trigger.HasFlag(TriggerType.Examine))
+                if (zone.Trigger.HasFlag(TriggerTypes.Examine))
                 {
                     options.Add(new ContextMenuOption(
                         S(SystemTextId.MapPopup_Examine),
-                        new TriggerChainEvent(zone.Chain, zone.Node, TriggerType.Examine, _map.Id, x, y),
+                        new TriggerChainEvent(zone.Chain, zone.Node, TriggerTypes.Examine, _map.Id, x, y),
                         ContextMenuGroup.Actions));
                 }
 
-                if (zone.Trigger.HasFlag(TriggerType.Manipulate))
+                if (zone.Trigger.HasFlag(TriggerTypes.Manipulate))
                 {
                     options.Add(new ContextMenuOption(
                         S(SystemTextId.MapPopup_Manipulate),
-                        new TriggerChainEvent(zone.Chain, zone.Node, TriggerType.Manipulate, _map.Id, x, y),
+                        new TriggerChainEvent(zone.Chain, zone.Node, TriggerTypes.Manipulate, _map.Id, x, y),
                         ContextMenuGroup.Actions));
                 }
 
-                if (zone.Trigger.HasFlag(TriggerType.Take))
+                if (zone.Trigger.HasFlag(TriggerTypes.Take))
                 {
                     options.Add(new ContextMenuOption(
                         S(SystemTextId.MapPopup_Take),
-                        new TriggerChainEvent(zone.Chain, zone.Node, TriggerType.Take, _map.Id, x, y),
+                        new TriggerChainEvent(zone.Chain, zone.Node, TriggerTypes.Take, _map.Id, x, y),
                         ContextMenuGroup.Actions));
                 }
 
-                if (zone.Trigger.HasFlag(TriggerType.TalkTo))
+                if (zone.Trigger.HasFlag(TriggerTypes.TalkTo))
                 {
                     options.Add(new ContextMenuOption(
                         S(SystemTextId.MapPopup_TalkTo),
-                        new TriggerChainEvent(zone.Chain, zone.Node, TriggerType.TalkTo, _map.Id, x, y),
+                        new TriggerChainEvent(zone.Chain, zone.Node, TriggerTypes.TalkTo, _map.Id, x, y),
                         ContextMenuGroup.Actions));
                 }
             }

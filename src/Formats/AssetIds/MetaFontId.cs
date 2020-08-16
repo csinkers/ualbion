@@ -2,7 +2,7 @@
 
 namespace UAlbion.Formats.AssetIds
 {
-    public class MetaFontId : IConvertible
+    public struct MetaFontId : IConvertible, IEquatable<MetaFontId>
     {
         public MetaFontId(bool isBold = false, FontColor color = FontColor.White)
         {
@@ -15,10 +15,12 @@ namespace UAlbion.Formats.AssetIds
         public FontId FontId => IsBold ? FontId.BoldFont : FontId.RegularFont;
 
         public static explicit operator int(MetaFontId id) => (byte)id.Color << 8 | (id.IsBold ? 1 : 0);
-        public static explicit operator MetaFontId(int id) => new MetaFontId((id & 1) != 0, (FontColor)((id & 0xff00) >> 8));
+        public static explicit operator MetaFontId(int id) => ToMetaFontId(id);
 
         public static explicit operator ushort(MetaFontId id) => (ushort)((byte)id.Color << 8 | (id.IsBold ? 1 : 0));
-        public static explicit operator MetaFontId(ushort id) => new MetaFontId((id & 1) != 0, (FontColor)((id & 0xff00) >> 8));
+        public static explicit operator MetaFontId(ushort id) => ToMetaFontId(id);
+        public static MetaFontId ToMetaFontId(int id) => new MetaFontId((id & 1) != 0, (FontColor)((id & 0xff00) >> 8));
+        public static MetaFontId ToMetaFontId(ushort id) => new MetaFontId((id & 1) != 0, (FontColor)((id & 0xff00) >> 8));
 
         public int ToInt32(IFormatProvider provider) => (int)this;
 
@@ -38,5 +40,11 @@ namespace UAlbion.Formats.AssetIds
         public uint ToUInt32(IFormatProvider provider) => throw new NotImplementedException();
         public ulong ToUInt64(IFormatProvider provider) => throw new NotImplementedException();
         public object ToType(Type conversionType, IFormatProvider provider) => throw new NotImplementedException();
+
+        public override bool Equals(object obj) => obj is MetaFontId other && Equals(other);
+        public override int GetHashCode() => (int)Color * 2 + (IsBold ? 1 : 0);
+        public static bool operator ==(MetaFontId left, MetaFontId right) => left.Equals(right);
+        public static bool operator !=(MetaFontId left, MetaFontId right) => !(left == right);
+        public bool Equals(MetaFontId other) => IsBold == other.IsBold && Color == other.Color;
     }
 }

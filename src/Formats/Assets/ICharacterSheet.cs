@@ -9,8 +9,8 @@ namespace UAlbion.Formats.Assets
 
         CharacterType Type { get; }
         Gender Gender { get; }
-        PlayerRace Race { get; }
-        PlayerClass Class { get; }
+        PlayerRaces Races { get; }
+        PlayerClass PlayerClass { get; }
         ushort Age { get; }
         byte Level { get; }
 
@@ -18,7 +18,7 @@ namespace UAlbion.Formats.Assets
         SmallPortraitId? PortraitId { get; }
         EventSetId? EventSetId { get; }
         EventSetId? WordSetId { get; }
-        PlayerLanguage Languages { get; }
+        PlayerLanguages Languages { get; }
 
         // Grouped
         IMagicSkills Magic { get; }

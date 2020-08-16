@@ -14,9 +14,10 @@ namespace UAlbion.Game.Assets
         public IEnumerable<Type> SupportedTypes => new[] { typeof(AlbionSprite) };
         public object Process(ICoreFactory factory, AssetKey key, object asset, Func<AssetKey, object> loaderFunc)
         {
+            if (factory == null) throw new ArgumentNullException(nameof(factory));
+            if (asset == null) throw new ArgumentNullException(nameof(asset));
             var sprite = (AlbionSprite)asset;
             SubImage[] subImages;
-            byte[] pixelData;
 
             if (key.Type == AssetType.Font || sprite.UniformFrames && sprite.Frames.Count >= 256)
             {
@@ -27,7 +28,7 @@ namespace UAlbion.Game.Assets
                 int destTileWidth = srcTileWidth + buffer * 2;
                 int destTileHeight = srcTileHeight + buffer * 2;
                 var (width, height) = GetAtlasSize(destTileWidth, destTileHeight, sprite.Frames.Count);
-                pixelData = new byte[width * height];
+                byte[] pixelData = new byte[width * height];
                 subImages = new SubImage[sprite.Frames.Count];
 
                 int curX = 0;
@@ -74,7 +75,6 @@ namespace UAlbion.Game.Assets
             {
                 int tileWidth = sprite.Width;
                 int tileHeight = sprite.Height / sprite.Frames.Count;
-                pixelData = sprite.PixelData;
                 subImages = sprite.Frames
                     .Select((x, i) => new EightBitTexture.SubImage(0, 0, x.Width, x.Height, i))
                     .ToArray();
@@ -85,11 +85,10 @@ namespace UAlbion.Game.Assets
                     (uint)tileHeight,
                     1,
                     (uint)subImages.Length,
-                    pixelData, subImages);
+                     sprite.PixelData, subImages);
             }*/
             else // For non-uniforms just use the on-disk packing
             {
-                pixelData = sprite.PixelData;
                 subImages = sprite.Frames
                     .Select(x => new SubImage(
                         new Vector2(x.X, x.Y),
@@ -104,7 +103,7 @@ namespace UAlbion.Game.Assets
                     (uint)sprite.Height,
                     1,
                     1,
-                    pixelData,
+                    sprite.PixelData,
                     subImages);
             }
         }

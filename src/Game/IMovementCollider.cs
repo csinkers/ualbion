@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Game
 {

@@ -57,10 +57,7 @@ namespace UAlbion.Core
                     else
                         Console.WriteLine("Unknown event \"{0}\"", command);
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Parse error: {0}", e);
-                }
+                catch (Exception e) { Console.WriteLine("Parse error: {0}", e); }
 
             } while (!_done);
         }

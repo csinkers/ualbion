@@ -1,11 +1,14 @@
-﻿namespace UAlbion.Formats.Assets
+﻿using System;
+
+namespace UAlbion.Formats.Assets
 {
     public class AlbionSample : ISample
     {
-        public AlbionSample(byte[] samples) => Samples = samples;
+        readonly byte[] _samples;
+        public AlbionSample(byte[] samples) => _samples = samples;
         public int SampleRate => 11025;
         public int Channels => 1;
         public int BytesPerSample => 1;
-        public byte[] Samples { get; }
+        public ReadOnlySpan<byte> Samples => _samples;
     }
 }

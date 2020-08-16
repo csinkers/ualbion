@@ -1,4 +1,6 @@
-﻿using SerdesNet;
+﻿using System;
+using System.Globalization;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
@@ -9,18 +11,20 @@ namespace UAlbion.Formats.MapEvents
     {
         public static DoorEvent Parse(string[] args)
         {
+            if (args == null) throw new ArgumentNullException(nameof(args));
             return new DoorEvent(AssetType.SystemText, 0)
             {
-                DoorId = ushort.Parse(args[1]),
-                PickDifficulty = args.Length > 2 ? byte.Parse(args[2]) : (byte)0,
-                InitialTextId =  args.Length > 3 ? byte.Parse(args[3]) : (byte)255,
-                UnlockedTextId = args.Length > 4 ? byte.Parse(args[4]) : (byte)255,
-                KeyItemId = args.Length > 5 ? (ItemId?)int.Parse(args[5]) : null,
+                DoorId = ushort.Parse(args[1], CultureInfo.InvariantCulture),
+                PickDifficulty = args.Length > 2 ? byte.Parse(args[2], CultureInfo.InvariantCulture) : (byte)0,
+                InitialTextId =  args.Length > 3 ? byte.Parse(args[3], CultureInfo.InvariantCulture) : (byte)255,
+                UnlockedTextId = args.Length > 4 ? byte.Parse(args[4], CultureInfo.InvariantCulture) : (byte)255,
+                KeyItemId = args.Length > 5 ? (ItemId?)int.Parse(args[5], CultureInfo.InvariantCulture) : null,
             };
         }
 
         public static DoorEvent Serdes(DoorEvent e, ISerializer s, AssetType textType, ushort textSourceId)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new DoorEvent(textType, textSourceId);
             s.Begin();
             e.PickDifficulty = s.UInt8(nameof(PickDifficulty), e.PickDifficulty);

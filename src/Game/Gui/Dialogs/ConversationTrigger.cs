@@ -1,6 +1,7 @@
 ﻿using System;
 using UAlbion.Formats.AssetIds;
 
+#pragma warning disable CA1034 // Nested types should not be visible
 namespace UAlbion.Game.Gui.Dialogs
 {
     public abstract class ConversationTrigger : IEquatable<ConversationTrigger>
@@ -33,3 +34,4 @@ namespace UAlbion.Game.Gui.Dialogs
             };
     }
 }
+#pragma warning restore CA1034 // Nested types should not be visible

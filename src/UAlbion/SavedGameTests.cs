@@ -13,9 +13,9 @@ namespace UAlbion
 {
     static class SavedGameTests
     {
-        public static void RoundTripTest(string baseDir)
+        public static void RoundTripTest(string baseDir, IAssetLoaderRegistry assetLoaderRegistry)
         {
-            var loader = AssetLoaderRegistry.GetLoader<SavedGame>(FileFormat.SavedGame);
+            var loader = assetLoaderRegistry.GetLoader<SavedGame>(FileFormat.SavedGame);
             ushort i = 0;
             foreach (var file in Directory.EnumerateFiles(Path.Combine(baseDir, "re", "TestSaves"), "*.001"))
             {

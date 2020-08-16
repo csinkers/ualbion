@@ -12,7 +12,7 @@ namespace UAlbion.Formats.Parsers
         public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
             var font = (AlbionSprite)new FixedSizeSpriteLoader().Load(br, streamLength, key, config);
-            var frames = new List<AlbionSprite.Frame>();
+            var frames = new List<AlbionSpriteFrame>();
 
             // Fix up sub-images for variable size
             foreach (var oldFrame in font.Frames)
@@ -27,12 +27,10 @@ namespace UAlbion.Formats.Parsers
                     }
                 }
 
-                frames.Add(new AlbionSprite.Frame(oldFrame.X, oldFrame.Y, width + 2, oldFrame.Height));
+                frames.Add(new AlbionSpriteFrame(oldFrame.X, oldFrame.Y, width + 2, oldFrame.Height));
             }
 
-            font.UniformFrames = false;
-            font.Frames = frames;
-            return font;
+            return new AlbionSprite(font.Name, font.Width, font.Height, false, font.PixelData, frames);
         }
     }
 }

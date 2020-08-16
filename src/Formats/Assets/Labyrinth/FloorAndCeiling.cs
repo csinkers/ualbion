@@ -31,6 +31,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
 
         public static FloorAndCeiling Serdes(int _, FloorAndCeiling existing, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             var fc = existing ?? new FloorAndCeiling();
             s.Begin();
             fc.Properties = s.EnumU8(nameof(fc.Properties), fc.Properties);

@@ -1,4 +1,5 @@
-﻿using UAlbion.Api;
+﻿using System;
+using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents

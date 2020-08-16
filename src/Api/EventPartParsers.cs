@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Reflection;
 
 namespace UAlbion.Api
@@ -27,6 +28,7 @@ namespace UAlbion.Api
 
         public MethodInfo GetParser(Type type)
         {
+            if (type == null) throw new ArgumentNullException(nameof(type));
             if (_parsers.TryGetValue(type, out var parser))
                 return parser;
 
@@ -66,21 +68,21 @@ namespace UAlbion.Api
         {
             if (string.IsNullOrEmpty(s))
                 return null;
-            return int.Parse(s);
+            return int.Parse(s, CultureInfo.InvariantCulture);
         }
 
         static ushort? ParseNullableUInt16(string s)
         {
             if (string.IsNullOrEmpty(s))
                 return null;
-            return ushort.Parse(s);
+            return ushort.Parse(s, CultureInfo.InvariantCulture);
         }
 
         static float? ParseNullableFloat(string s)
         {
             if (string.IsNullOrEmpty(s))
                 return null;
-            return float.Parse(s);
+            return float.Parse(s, CultureInfo.InvariantCulture);
         }
 
         static T ParseEnum<T>(string s) => (T)Enum.Parse(typeof(T), s, true);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using UAlbion.Formats.AssetIds;
@@ -13,6 +14,7 @@ namespace UAlbion.Formats.Parsers
         static readonly Regex Regex = new Regex(@"\[(\d+):(.*)\]");
         public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
             var results = new Dictionary<int, string>();
             var bytes = br.ReadBytes((int)streamLength);
             var data = FormatUtil.BytesTo850String(bytes);
@@ -23,7 +25,7 @@ namespace UAlbion.Formats.Parsers
                 if (!m.Success)
                     continue;
 
-                var id = int.Parse(m.Groups[1].Value);
+                var id = int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture);
                 var text = m.Groups[2].Value;
                 results[id] = text;
             }

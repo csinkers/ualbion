@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Core
+﻿using System;
+
+namespace UAlbion.Core
 {
     public class Container : Component, IContainer
     {
@@ -19,6 +21,7 @@
 
         public void Remove(IComponent child)
         {
+            if (child == null) throw new ArgumentNullException(nameof(child));
             child.Remove();
         }
 

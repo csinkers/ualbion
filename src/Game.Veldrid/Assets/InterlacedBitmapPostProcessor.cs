@@ -13,6 +13,7 @@ namespace UAlbion.Game.Veldrid.Assets
         public IEnumerable<Type> SupportedTypes => new[] { typeof(InterlacedBitmap) };
         public object Process(ICoreFactory factory, AssetKey key, object asset, Func<AssetKey, object> loaderFunc)
         {
+            if (asset == null) throw new ArgumentNullException(nameof(asset));
             var bitmap = (InterlacedBitmap)asset;
             return new TrueColorTexture(
                 key.ToString(), (uint)bitmap.Width, (uint)bitmap.Height,

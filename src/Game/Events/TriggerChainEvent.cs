@@ -2,7 +2,7 @@
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Events
@@ -16,7 +16,7 @@ namespace UAlbion.Game.Events
             Source = source ?? throw new ArgumentNullException(nameof(source));
         }
 
-        public TriggerChainEvent(EventChain chain, IEventNode node, TriggerType trigger, MapDataId mapId, int x, int y) 
+        public TriggerChainEvent(EventChain chain, IEventNode node, TriggerTypes trigger, MapDataId mapId, int x, int y) 
             : this(chain, node, new EventSource.Map(mapId, trigger, x, y)) { }
 
         public TriggerChainEvent(EventChain chain, IEventNode node, NpcCharacterId npcId)

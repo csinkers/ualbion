@@ -1,4 +1,5 @@
-﻿using UAlbion.Formats.AssetIds;
+﻿using System;
+using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events.Inventory;
@@ -54,7 +55,7 @@ namespace UAlbion.Game.Gui.Inventory
                         var member = Resolve<IParty>()[_activeCharacter];
                         var settings = Resolve<ISettings>();
                         if (member == null)
-                            return new TextBlock[0];
+                            return Array.Empty<TextBlock>();
 
                         var name = member.Apparent.GetName(settings.Gameplay.Language);
                         return new[] { new TextBlock(name) { Alignment = TextAlignment.Center } };

@@ -20,14 +20,14 @@ namespace UAlbion.Game.State
         Party _party;
 
         public DateTime Time => SavedGame.Epoch + _game.ElapsedTime;
-        IParty IGameState.Party => _party;
+        public IParty Party => _party;
         public ICharacterSheet GetNpc(NpcCharacterId id) => _game != null && _game.NpcStats.TryGetValue(id, out var sheet) ? sheet : null;
         public ICharacterSheet GetPartyMember(PartyCharacterId id) => _game != null && _game.PartyMembers.TryGetValue(id, out var member) ? member : null;
         public short GetTicker(TickerId id) => _game != null && _game.Tickers.TryGetValue(id, out var value) ? value : (short)0;
         public bool GetSwitch(SwitchId id) => _game != null && _game.Switches.TryGetValue(id, out var value) && value;
 
-        public MapChangeList TemporaryMapChanges => _game.TemporaryMapChanges;
-        public MapChangeList PermanentMapChanges => _game.PermanentMapChanges;
+        public MapChangeCollection TemporaryMapChanges => _game.TemporaryMapChanges;
+        public MapChangeCollection PermanentMapChanges => _game.PermanentMapChanges;
         public MapDataId MapId => _game?.MapId ?? 0;
 
         public GameState()
@@ -60,10 +60,10 @@ namespace UAlbion.Game.State
             });
             On<ChangeTimeEvent>(e => { });
 
-            AttachChild(new InventoryManager(GetInventory));
+            AttachChild(new InventoryManager(GetWriteableInventory));
         }
 
-        IInventory IGameState.GetInventory(InventoryId id)
+        public IInventory GetInventory(InventoryId id)
         {
             if (id.Type == InventoryType.Player)
             {
@@ -72,10 +72,10 @@ namespace UAlbion.Game.State
                     return player.Apparent.Inventory;
             }
 
-            return GetInventory(id);
+            return GetWriteableInventory(id);
         }
 
-        Inventory GetInventory(InventoryId id)
+        Inventory GetWriteableInventory(InventoryId id)
         {
             if (_game == null)
                 return null;
@@ -135,7 +135,6 @@ namespace UAlbion.Game.State
             if (_game == null)
                 return;
 
-            var loader = AssetLoaderRegistry.GetLoader<SavedGame>(FileFormat.SavedGame);
             _game.Name = name;
 
             for (int i = 0; i < SavedGame.MaxPartySize; i++)
@@ -149,13 +148,14 @@ namespace UAlbion.Game.State
 
             using var stream = File.Open(filename, FileMode.Create);
             using var bw = new BinaryWriter(stream);
+            var loader = Resolve<IAssetLoaderRegistry>().GetLoader<SavedGame>(FileFormat.SavedGame);
             loader.Serdes(_game, new AlbionWriter(bw), key, null);
         }
 
         void InitialiseGame()
         {
             _party?.Remove();
-            _party = AttachChild(new Party(_game.PartyMembers, _game.ActiveMembers, GetInventory));
+            _party = AttachChild(new Party(_game.PartyMembers, _game.ActiveMembers, GetWriteableInventory));
             Raise(new LoadMapEvent(_game.MapId));
             Raise(new StartClockEvent());
             Raise(new SetContextEvent(ContextType.Leader, AssetType.PartyMember, (int)_party.Leader));

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using SerdesNet;
 using UAlbion.Formats.AssetIds;
@@ -15,6 +16,7 @@ namespace UAlbion.Formats.Parsers
 
         public IList<ItemData> Serdes(IList<ItemData> items, ISerializer s, AssetKey key, AssetInfo config)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             items ??= new List<ItemData>();
             s.Begin();
             if (s.Mode == SerializerMode.Reading)

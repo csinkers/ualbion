@@ -8,14 +8,6 @@ namespace UAlbion.Core.Visual
 {
     public class Sprite<T> : Sprite where T : Enum
     {
-        public static Sprite<T> CharacterSprite(T id) =>
-            new Sprite<T>(id, Vector3.Zero, DrawLayer.Character, 0, SpriteFlags.BottomAligned);
-
-        public static Sprite<T> ScreenSpaceSprite(T id, Vector2 position, Vector2 size) =>
-            new Sprite<T>(id, new Vector3(position, 0), DrawLayer.Interface,
-                SpriteKeyFlags.NoTransform,
-                SpriteFlags.LeftAligned) { Size = size };
-
         static ITexture TextureFunc(Sprite sprite)
         {
             var s = (Sprite<T>)sprite;
@@ -74,7 +66,7 @@ namespace UAlbion.Core.Visual
         }
 
         public event EventHandler<SpriteSelectedEventArgs> Selected;
-        public Vector3 Normal => Vector3.UnitZ; // TODO
+        static Vector3 Normal => Vector3.UnitZ; // TODO
 
         public Vector3 Position
         {

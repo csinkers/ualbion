@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
@@ -21,6 +22,7 @@ namespace UAlbion.Formats.MapEvents
         PlayAnimationEvent() { }
         public static PlayAnimationEvent Serdes(PlayAnimationEvent e, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new PlayAnimationEvent();
             s.Begin();
             e.VideoId = s.EnumU8(nameof(VideoId), e.VideoId);

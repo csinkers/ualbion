@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using ImGuiNET;
@@ -26,14 +27,14 @@ namespace UAlbion.Game.Veldrid.Debugging
     public class DebugMapInspector : Component
     {
         // TODO: Initial size
-        readonly IDictionary<Type, Func<DebugInspectorAction, Reflector.ReflectedObject, object>> _behaviours =
-            new Dictionary<Type, Func<DebugInspectorAction, Reflector.ReflectedObject, object>>();
+        readonly IDictionary<Type, Func<DebugInspectorAction, ReflectedObject, object>> _behaviours =
+            new Dictionary<Type, Func<DebugInspectorAction, ReflectedObject, object>>();
 
         readonly IContainer _services;
         readonly IList<object> _fixedObjects = new List<object>();
         IList<Selection> _hits;
         Vector2 _mousePosition;
-        Reflector.ReflectedObject _lastHoveredItem;
+        ReflectedObject _lastHoveredItem;
 
         public DebugMapInspector(IContainer services)
         {
@@ -49,6 +50,7 @@ namespace UAlbion.Game.Veldrid.Debugging
 
         public DebugMapInspector AddBehaviour(IDebugBehaviour behaviour)
         {
+            if (behaviour == null) throw new ArgumentNullException(nameof(behaviour));
             foreach(var type in behaviour.HandledTypes)
                 _behaviours[type] = behaviour.Handle;
             return this;
@@ -100,7 +102,7 @@ namespace UAlbion.Game.Veldrid.Debugging
                 for (int i = 0; i < _fixedObjects.Count; i++)
                 {
                     var thing = _fixedObjects[i];
-                    Reflector.ReflectedObject reflected = Reflector.Reflect($"Fixed{i}", thing, null);
+                    ReflectedObject reflected = Reflector.Reflect($"Fixed{i}", thing, null);
                     anyHovered |= RenderNode(reflected, true);
                 }
                 ImGui.TreePop();
@@ -251,7 +253,8 @@ namespace UAlbion.Game.Veldrid.Debugging
                 uiPos.X = (int)uiPos.X;
                 uiPos.Y = (int)uiPos.Y;
 
-                Vector3? playerTilePos = Resolve<IParty>()?.WalkOrder.FirstOrDefault()?.GetPosition();
+                var walkOrder = Resolve<IParty>()?.WalkOrder;
+                Vector3? playerTilePos = walkOrder?[0].GetPosition();
 
                 ImGui.Text($"Cursor Pix: {_mousePosition} UI: {uiPos} Scale: {window.GuiScale} PixSize: {window.Size} Norm: {normPos}");
                 ImGui.Text($"Camera World: {cameraPosition} Tile: {cameraTilePosition} Dir: {cameraDirection} Mag: {cameraMagnification}");
@@ -295,8 +298,8 @@ namespace UAlbion.Game.Veldrid.Debugging
             ImGui.EndChild();
             ImGui.End();
 
-            if (!anyHovered && _lastHoveredItem?.Object != null &&
-                _behaviours.TryGetValue(_lastHoveredItem.Object.GetType(), out var callback))
+            if (!anyHovered && _lastHoveredItem?.Target != null &&
+                _behaviours.TryGetValue(_lastHoveredItem.Target.GetType(), out var callback))
                 callback(DebugInspectorAction.Blur, _lastHoveredItem);
 
             /*
@@ -311,19 +314,19 @@ namespace UAlbion.Game.Veldrid.Debugging
             */
         }
 
-        bool CheckHover(Reflector.ReflectedObject reflected)
+        bool CheckHover(ReflectedObject reflected)
         {
             if (!ImGui.IsItemHovered())
                 return false;
 
             if (_lastHoveredItem != reflected)
             {
-                if (_lastHoveredItem?.Object != null &&
-                    _behaviours.TryGetValue(_lastHoveredItem.Object.GetType(), out var blurredCallback))
+                if (_lastHoveredItem?.Target != null &&
+                    _behaviours.TryGetValue(_lastHoveredItem.Target.GetType(), out var blurredCallback))
                     blurredCallback(DebugInspectorAction.Blur, _lastHoveredItem);
 
-                if (reflected.Object != null &&
-                    _behaviours.TryGetValue(reflected.Object.GetType(), out var hoverCallback))
+                if (reflected.Target != null &&
+                    _behaviours.TryGetValue(reflected.Target.GetType(), out var hoverCallback))
                     hoverCallback(DebugInspectorAction.Hover, reflected);
 
                 _lastHoveredItem = reflected;
@@ -332,9 +335,9 @@ namespace UAlbion.Game.Veldrid.Debugging
             return true;
         }
 
-        bool RenderNode(Reflector.ReflectedObject reflected, bool fixedObject, bool showCheckbox = true)
+        bool RenderNode(ReflectedObject reflected, bool fixedObject, bool showCheckbox = true)
         {
-            var type = reflected.Object?.GetType();
+            var type = reflected.Target?.GetType();
             var typeName = type?.Name ?? "null";
             var description =
                 reflected.Name == null
@@ -354,7 +357,7 @@ namespace UAlbion.Game.Veldrid.Debugging
             if (reflected.SubObjects != null)
             {
                 bool customStyle = false;
-                if (reflected.Object is Component component)
+                if (reflected.Target is Component component)
                 {
                     if (!component.IsSubscribed)
                     {
@@ -365,7 +368,7 @@ namespace UAlbion.Game.Veldrid.Debugging
                     if (showCheckbox)
                     {
                         bool active = component.IsActive;
-                        ImGui.Checkbox(component.ComponentId.ToString(), ref active);
+                        ImGui.Checkbox(component.ComponentId.ToString(CultureInfo.InvariantCulture), ref active);
                         ImGui.SameLine();
                         if (active != component.IsActive)
                             component.IsActive = active;
@@ -379,10 +382,10 @@ namespace UAlbion.Game.Veldrid.Debugging
                 if (treeOpen)
                 {
                     if (!fixedObject && ImGui.Button("Track"))
-                        _fixedObjects.Add(reflected.Object);
+                        _fixedObjects.Add(reflected.Target);
 
                     if (fixedObject && ImGui.Button("Stop tracking"))
-                        _fixedObjects.Remove(reflected.Object);
+                        _fixedObjects.Remove(reflected.Target);
 
                     anyHovered |= CheckHover(reflected);
                     foreach (var child in reflected.SubObjects)

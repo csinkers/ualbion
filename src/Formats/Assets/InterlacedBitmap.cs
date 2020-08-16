@@ -22,7 +22,7 @@ namespace UAlbion.Formats.Assets
         public uint[] Palette { get; set; }
         public short HotspotX { get; set; }
         public short HotspotY { get; set; }
-        public IList<ColorRange> ColorRanges { get; set; }
+        public IList<ColorRange> ColorRanges { get; private set; }
         public ushort ThumbnailWidth { get; set; }
         public ushort ThumbnailHeight { get; set; }
         public byte[] Thumbnail { get; set; }
@@ -30,6 +30,7 @@ namespace UAlbion.Formats.Assets
 
         public static InterlacedBitmap Serdes(InterlacedBitmap img, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             img ??= new InterlacedBitmap();
             s.Begin();
 

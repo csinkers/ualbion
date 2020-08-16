@@ -32,7 +32,7 @@ namespace UAlbion.Core
 
             FrameCount++;
             var correlationId = new Guid(_a, _b, _c, BitConverter.GetBytes(FrameCount).Reverse().ToArray());
-            CoreTrace.Log.SetCorrelationId(correlationId);
+            CoreTrace.SetCorrelationId(correlationId);
             CoreTrace.Log.StartFrame(FrameCount, deltaSeconds * 1.0e6);
             return deltaSeconds;
         }

@@ -8,7 +8,7 @@ namespace UAlbion.Core.Textures
 {
     public abstract class MultiTexture : ITexture
     {
-        protected readonly IPaletteManager PaletteManager;
+        protected IPaletteManager PaletteManager { get; }
 
         protected class SubImageComponent
         {
@@ -39,25 +39,21 @@ namespace UAlbion.Core.Textures
 
         protected struct LayerKey : IEquatable<LayerKey>
         {
-            public LayerKey(int id, int frame)
-            {
-                Id = id;
-                Frame = frame;
-            }
-
-            public int Id { get; }
-            public int Frame { get; }
-
-            public bool Equals(LayerKey other) => Id == other.Id && Frame == other.Frame;
+            readonly int _id;
+            readonly int _frame;
+            public LayerKey(int id, int frame) { _id = id; _frame = frame; }
+            public bool Equals(LayerKey other) => _id == other._id && _frame == other._frame;
             public override bool Equals(object obj) => obj is LayerKey other && Equals(other);
-            public override int GetHashCode() { unchecked { return (Id * 397) ^ Frame; } }
-            public override string ToString() => $"LK{Id}.{Frame}";
+            public static bool operator ==(LayerKey left, LayerKey right) => left.Equals(right);
+            public static bool operator !=(LayerKey left, LayerKey right) => !(left == right);
+            public override int GetHashCode() { unchecked { return (_id * 397) ^ _frame; } }
+            public override string ToString() => $"LK{_id}.{_frame}";
         }
 
-        protected readonly IList<LogicalSubImage> LogicalSubImages = new List<LogicalSubImage>();
-        protected readonly IDictionary<LayerKey, int> LayerLookup = new Dictionary<LayerKey, int>();
-        protected readonly IList<Vector2> LayerSizes = new List<Vector2>();
-        protected bool IsMetadataDirty = true;
+        protected IList<LogicalSubImage> LogicalSubImages { get; }= new List<LogicalSubImage>();
+        protected IDictionary<LayerKey, int> LayerLookup { get; }= new Dictionary<LayerKey, int>();
+        protected IList<Vector2> LayerSizes { get; }= new List<Vector2>();
+        protected bool IsMetadataDirty { get; private set; } = true;
         bool _isAnySubImagePaletteAnimated;
         int _lastPaletteVersion;
         int _lastPaletteId;
@@ -239,6 +235,8 @@ namespace UAlbion.Core.Textures
 
         protected void Rebuild(LogicalSubImage lsi, int frameNumber, Span<uint> toBuffer, IList<uint[]> palette)
         {
+            if (lsi == null) throw new ArgumentNullException(nameof(lsi));
+            if (palette == null) throw new ArgumentNullException(nameof(palette));
             foreach (var component in lsi.Components)
             {
                 if (component.Source == null)

@@ -1,7 +1,7 @@
-﻿using System;
+﻿#if false
+using System;
 using System.Runtime.InteropServices;
 using UAlbion.Core.Events;
-
 namespace UAlbion.Core.Veldrid
 {
     public class ClipboardManager : Component
@@ -48,3 +48,4 @@ namespace UAlbion.Core.Veldrid
 #endif
     }
 }
+#endif

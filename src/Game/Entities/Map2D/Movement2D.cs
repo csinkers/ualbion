@@ -22,7 +22,7 @@ namespace UAlbion.Game.Entities.Map2D
         public bool Clipping { get; set; } = true;
         public Vector2 Position { get; set; }
         public void AddDirection(Vector2 direction) => _direction += direction;
-        public EventHandler<(int, int)> EnteredTile;
+        public event EventHandler<(int, int)> EnteredTile;
 
         public int SpriteFrame
         {

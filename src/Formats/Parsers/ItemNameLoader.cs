@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
@@ -12,6 +13,7 @@ namespace UAlbion.Formats.Parsers
         const int StringSize = 20;
         public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
             ApiUtil.Assert(streamLength % StringSize == 0);
             var results = new Dictionary<(int, GameLanguage), string>();
             long end = br.BaseStream.Position + streamLength;

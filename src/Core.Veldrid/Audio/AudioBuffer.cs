@@ -21,7 +21,12 @@ namespace UAlbion.Core.Veldrid.Audio
             LastUpdatedDateTime = DateTime.Now;
         }
 
-        public void Dispose() => Dispose(true);
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         ~AudioBuffer() => Dispose(false);
 
         protected virtual void Dispose(bool disposing)

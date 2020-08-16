@@ -25,7 +25,5 @@ packages/
 *.DotSettings
 *.code-workspace
 launchSettings.json
-
-SDL2.dll
 imgui.ini
-libveldrid-spirv.dll
+global.json

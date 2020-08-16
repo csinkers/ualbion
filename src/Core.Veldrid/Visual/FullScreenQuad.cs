@@ -5,9 +5,10 @@ using UAlbion.Core.Events;
 using Veldrid;
 using Veldrid.Utilities;
 
+#pragma warning disable CA2213 // Analysis doesn't know about dispose collector
 namespace UAlbion.Core.Veldrid.Visual
 {
-    public class FullScreenQuad : Component, IRenderer, IRenderable
+    public sealed class FullScreenQuad : Component, IRenderer, IRenderable
     {
         const string VertexShaderName = "FullScreenQuadSV.vert";
         const string FragmentShaderName = "FullScreenQuadSF.frag";
@@ -34,6 +35,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public void CreateDeviceObjects(IRendererContext context)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
             var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
@@ -79,6 +81,8 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public void Render(IRendererContext context, RenderPasses renderPass, IRenderable r)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            if (r == null) throw new ArgumentNullException(nameof(r));
             var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var sc = c.SceneContext;
@@ -99,6 +103,12 @@ namespace UAlbion.Core.Veldrid.Visual
 
             _disposeCollector?.DisposeAll();
         }
-        public void Dispose() => DestroyDeviceObjects();
+
+        public void Dispose()
+        {
+            DestroyDeviceObjects();
+            GC.SuppressFinalize(this);
+        }
     }
 }
+#pragma warning restore CA2213 // Analysis doesn't know about dispose collector

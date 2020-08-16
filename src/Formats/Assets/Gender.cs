@@ -10,7 +10,7 @@ namespace UAlbion.Formats.Assets
     }
 
     [Flags]
-    public enum GenderMask : byte
+    public enum Genders : byte
     {
         Male = 1,
         Female = 2,

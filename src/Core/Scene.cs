@@ -26,6 +26,7 @@ namespace UAlbion.Core
 
         public void RenderAllStages(IRendererContext context, IList<IRenderer> renderers)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
             context.SetCurrentScene(this);
             context.SetClearColor(_clearColour.Red, _clearColour.Green, _clearColour.Blue);
 
@@ -117,7 +118,7 @@ namespace UAlbion.Core
             }
         }
 
-        void Render(IRendererContext context,
+        static void Render(IRendererContext context,
             RenderPasses pass,
             IDictionary<Type, IRenderer> renderers,
             IEnumerable<IRenderable> renderableList)

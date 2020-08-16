@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Globalization;
+using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -214,7 +215,7 @@ namespace UAlbion.Game.Veldrid.Input
             return
                 hand.Item is Gold
                 ? $"{amount / 10}.{amount % 10}"
-                : amount.ToString();
+                : amount.ToString(CultureInfo.InvariantCulture); // i18n: Will need updating if we want separators or non-Hindu-Arabic numerals.
         }
     }
 }

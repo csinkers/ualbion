@@ -103,15 +103,15 @@ namespace UAlbion.Game.State.Player
         {
             switch (sheet.Gender)
             {
-                case Gender.Male: if (!item.AllowedGender.HasFlag(GenderMask.Male)) return false; break;
-                case Gender.Female: if (!item.AllowedGender.HasFlag(GenderMask.Female)) return false; break;
-                case Gender.Neuter: if (!item.AllowedGender.HasFlag(GenderMask.Neutral)) return false; break;
+                case Gender.Male: if (!item.AllowedGender.HasFlag(Genders.Male)) return false; break;
+                case Gender.Female: if (!item.AllowedGender.HasFlag(Genders.Female)) return false; break;
+                case Gender.Neuter: if (!item.AllowedGender.HasFlag(Genders.Neutral)) return false; break;
             }
 
-            if (!item.Class.IsAllowed(sheet.Class))
+            if (!item.Class.IsAllowed(sheet.PlayerClass))
                 return false;
 
-            // if (!item.Race.IsAllowed(sheet.Race)) // Apparently never implemented in original game?
+            // if (!item.Races.IsAllowed(sheet.Races)) // Apparently never implemented in original game?
             //     return false;
 
             if (item.SlotType != slotId)

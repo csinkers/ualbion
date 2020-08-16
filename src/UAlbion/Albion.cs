@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -36,6 +37,7 @@ namespace UAlbion
         public static void RunGame(EventExchange global, IContainer services, string baseDir, CommandLineOptions commandLine)
         {
             PerfTracker.StartupEvent("Creating engine");
+#pragma warning disable CA2000 // Dispose objects before losing scopes
             using var engine = new VeldridEngine(commandLine.Backend, commandLine.UseRenderDoc)
                 .AddRenderer(new SkyboxRenderer())
                 .AddRenderer(new SpriteRenderer())
@@ -51,10 +53,14 @@ namespace UAlbion
                     Path.Combine(baseDir, "src", "Core", "Visual", "Shaders"),
                     Path.Combine(baseDir, "data", "ShaderCache")))
                 .Add(engine);
+#pragma warning restore CA2000 // Dispose objects before losing scopes
+
+            if (commandLine.DebugMenus)
+                services.Add(new DebugMenus(engine));
 
             backgroundThreadInitTask.Wait();
 
-            if(commandLine.StartupOnly)
+            if (commandLine.StartupOnly)
                 global.Raise(new QuitEvent(), null);
 
             PerfTracker.StartupEvent("Running game");
@@ -68,16 +74,16 @@ namespace UAlbion
                     global.Raise(new NewGameEvent(MapDataId.Toronto2DGesamtkarteSpielbeginn, 30, 75), null);
                     break;
                 case GameMode.LoadGame:
-                    global.Raise(new LoadGameEvent(ushort.Parse(commandLine.GameModeArgument)), null);
+                    global.Raise(new LoadGameEvent(ushort.Parse(commandLine.GameModeArgument, CultureInfo.InvariantCulture)), null);
                     break;
                 case GameMode.LoadMap:
-                    global.Raise(new NewGameEvent((MapDataId)int.Parse(commandLine.GameModeArgument), 40, 40), null); 
+                    global.Raise(new NewGameEvent((MapDataId)int.Parse(commandLine.GameModeArgument, CultureInfo.InvariantCulture), 40, 40), null); 
                     break;
                 case GameMode.Inventory:
                     global.Raise(new SetSceneEvent(SceneId.Inventory), null);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException($"Unexpected game mode \"{commandLine.GameMode}\"");
             }
 
             if (commandLine.Commands != null)
@@ -136,10 +142,12 @@ namespace UAlbion
                     .AddScene((GameScene)new MenuScene()
                         .Add(new PaletteManager())
                         .Add(new MainMenu())
-                        .Add(Sprite<PictureId>.ScreenSpaceSprite(
+                        .Add(new Sprite<PictureId>(
                             PictureId.MenuBackground8,
-                            new Vector2(-1.0f, 1.0f),
-                            new Vector2(2.0f, -2.0f))))
+                            new Vector3(-1.0f, 1.0f, 0),
+                            DrawLayer.Interface,
+                            SpriteKeyFlags.NoTransform,
+                            SpriteFlags.LeftAligned) { Size = new Vector2(2.0f, -2.0f) }))
 
                     .AddScene((GameScene)new InventoryScene()
                         .Add(new ConversationManager())

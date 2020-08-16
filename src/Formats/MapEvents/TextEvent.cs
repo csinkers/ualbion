@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
@@ -8,6 +9,8 @@ namespace UAlbion.Formats.MapEvents
     {
         protected static BaseTextEvent Serdes(BaseTextEvent e, ISerializer s)
         {
+            if (e == null) throw new ArgumentNullException(nameof(e));
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e.Location = s.EnumU8(nameof(Location), e.Location ?? TextLocation.TextInWindow);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
@@ -59,6 +62,7 @@ namespace UAlbion.Formats.MapEvents
         public override AssetType TextType => AssetType.EventText;
         public static BaseTextEvent Serdes(BaseTextEvent e, ISerializer s, EventSetId eventSetId)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new EventTextEvent(eventSetId);
             return Serdes(e, s);
         }
@@ -80,6 +84,7 @@ namespace UAlbion.Formats.MapEvents
         public override AssetType TextType => AssetType.MapText;
         public static BaseTextEvent Serdes(BaseTextEvent e, ISerializer s, MapDataId mapId)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new MapTextEvent(mapId);
             return Serdes(e, s);
         }

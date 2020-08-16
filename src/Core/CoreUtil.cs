@@ -108,9 +108,11 @@ namespace UAlbion.Core
 
         public static ITexture BuildRotatedTexture(ICoreFactory factory, EightBitTexture texture)
         {
+            if (factory == null) throw new ArgumentNullException(nameof(factory));
+            if (texture == null) throw new ArgumentNullException(nameof(texture));
             var rotatedPixels = new byte[texture.Width * texture.Height];
             ApiUtil.RotateImage((int)texture.Width, (int)texture.Height,
-               new Span<byte>(texture.TextureData),
+               texture.TextureData,
                new Span<byte>(rotatedPixels));
 
             return factory.CreateEightBitTexture(

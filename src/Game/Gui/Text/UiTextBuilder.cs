@@ -13,10 +13,10 @@ namespace UAlbion.Game.Gui.Text
 
         public UiTextBuilder(StringId stringId) => _stringId = stringId;
         public int Version => _implicitTokens.Count + 1;
-        public IEnumerable<TextBlock> Get()
+        public IEnumerable<TextBlock> GetBlocks()
         {
             var tf = Resolve<ITextFormatter>();
-            return tf.Format(_stringId, _implicitTokens, _language).Get();
+            return tf.Format(_stringId, _implicitTokens, _language).GetBlocks();
         }
 
         public UiTextBuilder NoWrap() { _implicitTokens.Add((Token.NoWrap, null)); return this; }

@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets.Labyrinth
@@ -18,6 +19,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
 
         public static Overlay Serdes(int _, Overlay o, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             o ??= new Overlay();
             s.Begin();
             o.TextureNumber = s.TransformEnumU16(nameof(o.TextureNumber), o.TextureNumber, Tweak<DungeonOverlayId>.Instance);

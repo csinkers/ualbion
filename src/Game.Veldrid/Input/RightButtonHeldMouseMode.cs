@@ -45,6 +45,7 @@ namespace UAlbion.Game.Veldrid.Input
         void OnInput(InputEvent e)
         {
             var hits = Resolve<ISelectionManager>()?.CastRayFromScreenSpace(e.Snapshot.MousePosition);
+            if (hits == null) return;
             if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && !x.Down))
                 ShowContextMenu(hits);
             else

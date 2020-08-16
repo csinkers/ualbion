@@ -9,6 +9,7 @@ namespace UAlbion
         public GraphicsBackend Backend { get; }
         public bool StartupOnly { get; }
         public bool UseRenderDoc { get; }
+        public bool DebugMenus { get; }
         public ExecutionMode Mode { get; }
         public AudioMode AudioMode { get; }
         public GameMode GameMode { get; }
@@ -21,6 +22,7 @@ namespace UAlbion
             Backend = GraphicsBackend.Vulkan;
             StartupOnly = args.Contains("--startuponly");
             UseRenderDoc = args.Contains("--renderdoc") || args.Contains("-rd");
+            DebugMenus = args.Contains("--menus");
             if (args.Contains("-gl") || args.Contains("--opengl")) Backend = GraphicsBackend.OpenGL;
             if (args.Contains("-gles") || args.Contains("--opengles")) Backend = GraphicsBackend.OpenGLES;
             if (args.Contains("-vk") || args.Contains("--vulkan")) Backend = GraphicsBackend.Vulkan;
@@ -99,8 +101,8 @@ namespace UAlbion
         void DisplayUsage()
         {
             var dumpTypes = string.Join(" ",
-                Enum.GetValues(typeof(DumpType))
-                    .Cast<DumpType>()
+                Enum.GetValues(typeof(DumpTypes))
+                    .Cast<DumpTypes>()
                     .Select(x => x.ToString()));
 
             Console.WriteLine($@"UAlbion

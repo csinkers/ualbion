@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
@@ -12,11 +13,11 @@ namespace UAlbion.Formats.Parsers
     {
         public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
+            if (config == null) throw new ArgumentNullException(nameof(config));
+
             ApiUtil.Assert(config.Transposed != true);
-            var sprite = new AlbionSprite();
             long initialPosition = br.BaseStream.Position;
-            sprite.Name = key.ToString();
-            sprite.UniformFrames = config.Format == FileFormat.SingleHeaderSprite;
 
             int width = br.ReadUInt16();
             int height = br.ReadUInt16();
@@ -24,14 +25,15 @@ namespace UAlbion.Formats.Parsers
             ApiUtil.Assert(something == 0);
             int spriteCount = br.ReadByte();
 
-            sprite.Frames = new AlbionSprite.Frame[spriteCount];
+            bool uniform = config.Format == FileFormat.SingleHeaderSprite;
+            var frames = new AlbionSpriteFrame[spriteCount];
             var frameBytes = new List<byte[]>();
             int currentY = 0;
 
-            sprite.Width = 0;
+            int spriteWidth = 0;
             for (int i = 0; i < spriteCount; i++)
             {
-                if (!sprite.UniformFrames && i > 0)
+                if (!uniform && i > 0)
                 {
                     width = br.ReadUInt16();
                     height = br.ReadUInt16();
@@ -42,28 +44,26 @@ namespace UAlbion.Formats.Parsers
                 }
 
                 var bytes = br.ReadBytes(width * height);
-                sprite.Frames[i] = new AlbionSprite.Frame(0, currentY, width, height);
+                frames[i] = new AlbionSpriteFrame(0, currentY, width, height);
                 frameBytes.Add(bytes);
 
                 currentY += height;
-                if (width > sprite.Width)
-                    sprite.Width = width;
+                if (width > spriteWidth)
+                    spriteWidth = width;
             }
 
-            sprite.Height = currentY;
-            sprite.PixelData = new byte[spriteCount * sprite.Width * currentY];
-
+            byte[] pixelData = new byte[spriteCount * spriteWidth * currentY];
             for (int n = 0; n < spriteCount; n++)
             {
-                var frame = sprite.Frames[n];
+                var frame = frames[n];
 
                 for (int j = 0; j < frame.Height; j++)
                 for (int i = 0; i < frame.Width; i++)
-                    sprite.PixelData[(frame.Y + j) * sprite.Width + frame.X + i] = frameBytes[n][j * frame.Width + i];
+                    pixelData[(frame.Y + j) * spriteWidth + frame.X + i] = frameBytes[n][j * frame.Width + i];
             }
 
             ApiUtil.Assert(br.BaseStream.Position == initialPosition + streamLength);
-            return sprite;
+            return new AlbionSprite(key.ToString(), spriteWidth, currentY, uniform, pixelData, frames);
         }
     }
 }

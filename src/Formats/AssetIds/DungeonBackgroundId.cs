@@ -5,6 +5,7 @@
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
+#pragma warning disable CA1707 // Identifiers should not contain underscores
 namespace UAlbion.Formats.AssetIds
 {
     public enum DungeonBackgroundId : ushort
@@ -14,3 +15,4 @@ namespace UAlbion.Formats.AssetIds
         LateGame = 2,
     }
 }
+#pragma warning restore CA1707 // Identifiers should not contain underscores

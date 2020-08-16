@@ -13,7 +13,7 @@
     <PackageReference Include="SerdesNet" Version="1.1.3" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\..\..\deps\SerdesNet')">
-    <ProjectReference Include="..\..\..\deps\SerdesNet\SerdesNet.csproj">
+    <ProjectReference Include="..\..\..\deps\SerdesNet\src\SerdesNet.csproj">
       <Project>{88B45D1E-E323-4B3C-B6AF-7EFFB7AEA496}</Project>
       <Name>SerdesNet</Name>
     </ProjectReference>

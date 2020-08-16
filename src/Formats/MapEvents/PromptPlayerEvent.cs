@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
@@ -7,6 +8,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static PromptPlayerEvent Serdes(PromptPlayerEvent e, ISerializer s, AssetType textType, ushort textSourceId)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new PromptPlayerEvent(textType, textSourceId);
             s.Begin();
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);

@@ -61,7 +61,7 @@ namespace UAlbion.Api
         /// <param name="height"></param>
         /// <param name="from"></param>
         /// <param name="to"></param>
-        public static void RotateImage(int width, int height, Span<byte> from, Span<byte> to)
+        public static void RotateImage(int width, int height, ReadOnlySpan<byte> from, Span<byte> to)
         {
             if (to.Length < width * height)
                 throw new ArgumentOutOfRangeException(
@@ -88,8 +88,11 @@ namespace UAlbion.Api
             }
         }
 
-        public static uint SizeInBytes<T>(this T[] array) where T : struct 
-            => (uint)(array.Length * Unsafe.SizeOf<T>());
+        public static uint SizeInBytes<T>(this T[] array) where T : struct
+        {
+            if (array == null) throw new ArgumentNullException(nameof(array));
+            return (uint)(array.Length * Unsafe.SizeOf<T>());
+        }
 
         public static Matrix4x4 Inverse(this Matrix4x4 src)
         {

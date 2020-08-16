@@ -7,6 +7,7 @@ using UAlbion.Api;
 using UAlbion.Core.Events;
 #endif
 
+#pragma warning disable CA1030 // Use events where appropriate
 namespace UAlbion.Core
 {
     /// <summary>
@@ -14,7 +15,7 @@ namespace UAlbion.Core
     /// components that have registered handlers for the event. Also acts as a 
     /// service locator, via the Register / Resolve methods.
     /// </summary>
-    public class EventExchange : IDisposable
+    public sealed class EventExchange : IDisposable
     {
         static readonly Action<object> DummyContinuation = _ => { };
         readonly object _syncRoot = new object();
@@ -62,6 +63,7 @@ namespace UAlbion.Core
 
         public EventExchange Attach(IComponent component)
         {
+            if (component == null) throw new ArgumentNullException(nameof(component));
             PerfTracker.StartupEvent($"Attaching {component.GetType().Name}");
             component.Attach(this);
             PerfTracker.StartupEvent($"Attached {component.GetType().Name}");
@@ -117,6 +119,7 @@ namespace UAlbion.Core
 
         int RaiseInternal(IEvent e, object sender, Action<object> continuation)
         {
+            if (e == null) throw new ArgumentNullException(nameof(e));
             bool verbose = e is IVerboseEvent;
             if (!verbose)
             {
@@ -178,6 +181,7 @@ namespace UAlbion.Core
 
         public void Subscribe(Handler handler)
         {
+            if (handler == null) throw new ArgumentNullException(nameof(handler));
             lock (_syncRoot)
             {
                 if (_subscribers.TryGetValue(handler.Component, out var subscribedTypes))
@@ -263,6 +267,7 @@ namespace UAlbion.Core
 
         public void Unregister(object system)
         {
+            if (system == null) throw new ArgumentNullException(nameof(system));
             Unregister(system.GetType(), system);
             foreach (var i in system.GetType().GetInterfaces())
                 Unregister(i, system);
@@ -285,6 +290,7 @@ namespace UAlbion.Core
 
         public IEnumerable<IComponent> EnumerateRecipients(Type eventType)
         {
+            if (eventType == null) throw new ArgumentNullException(nameof(eventType));
             lock (_syncRoot)
             {
                 var subscribers = new List<Handler>();
@@ -294,3 +300,4 @@ namespace UAlbion.Core
         }
     }
 }
+#pragma warning restore CA1030 // Use events where appropriate

@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
@@ -9,6 +10,7 @@ namespace UAlbion.Formats.Assets.Save
         // Total size = 128 bytes
         public static NpcState Serdes(int i, NpcState npc, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             npc ??= new NpcState();
             s.Begin();
             var startOffset = s.Offset;

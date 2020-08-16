@@ -14,6 +14,7 @@ namespace UAlbion.Game.Assets
     {
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, object> loaderFunc)
         {
+            if (loaderFunc == null) throw new ArgumentNullException(nameof(loaderFunc));
             if(key.Type != AssetType.SoundBank)
                 throw new InvalidOperationException($"Called SoundBankLocator with unexpected asset type {key.Type}");
 

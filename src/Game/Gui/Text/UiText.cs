@@ -71,7 +71,7 @@ namespace UAlbion.Game.Gui.Text
             foreach (var block in textManager.SplitBlocksToSingleWords(blocks))
             {
                 var size = textManager.Measure(block);
-                bool forceNewLine = (block.Arrangement & TextArrangement.ForceNewLine) != 0;
+                bool forceNewLine = (block.ArrangementFlags & TextArrangementFlags.ForceNewLine) != 0;
                 if (forceNewLine || line.Width > 0 && line.Width + size.X > extents.Width)
                 {
                     if (!forceNewLine && string.IsNullOrWhiteSpace(block.Text))
@@ -95,7 +95,7 @@ namespace UAlbion.Game.Gui.Text
 
             RemoveAllChildren();
 
-            var filtered = _source.Get().Where(x => _blockFilter == null || x.BlockId == _blockFilter);
+            var filtered = _source.GetBlocks().Where(x => _blockFilter == null || x.BlockId == _blockFilter);
             _totalHeight = 0;
             foreach (var line in BuildLines(extents, filtered))
             {

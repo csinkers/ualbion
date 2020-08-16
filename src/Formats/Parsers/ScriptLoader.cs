@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UAlbion.Api;
@@ -52,6 +53,7 @@ namespace UAlbion.Formats.Parsers
 
         public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
             var events = new List<IEvent>();
             foreach (var line in ReadLines(br, streamLength))
             {

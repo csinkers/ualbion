@@ -33,9 +33,9 @@ namespace UAlbion.Formats.Assets.Save
         public IDictionary<AutoMapId, byte[]> Automaps { get; } = new Dictionary<AutoMapId, byte[]>();
         public IDictionary<ChestId, Inventory> Chests { get; } = new Dictionary<ChestId, Inventory>();
         public IDictionary<MerchantId, Inventory> Merchants { get; } = new Dictionary<MerchantId, Inventory>();
-        TickerSet _tickers { get; } = new TickerSet();
-        FlagSet _switches { get; } = new FlagSet();
 
+        readonly TickerDictionary _tickers  = new TickerDictionary();
+        readonly FlagDictionary _switches  = new FlagDictionary();
         public IDictionary<TickerId, byte> Tickers => _tickers;
         public IDictionary<SwitchId, bool> Switches => _switches;
 
@@ -49,13 +49,14 @@ namespace UAlbion.Formats.Assets.Save
         public NpcState[] Npcs { get; } = new NpcState[MaxNpcCount];
         public byte[] Unknown5B71 { get; set; } 
         public Unknown35Byte[] Unk35Byte { get; set; } // Len = 16
-        public MapChangeList PermanentMapChanges { get; private set; } = new MapChangeList();
-        public MapChangeList TemporaryMapChanges { get; private set; } = new MapChangeList();
+        public MapChangeCollection PermanentMapChanges { get; private set; } = new MapChangeCollection();
+        public MapChangeCollection TemporaryMapChanges { get; private set; } = new MapChangeCollection();
         public IList<VisitedEvent> VisitedEvents { get; private set; } = new List<VisitedEvent>();
         public IList<PartyCharacterId?> ActiveMembers { get; private set; } = new PartyCharacterId?[MaxPartySize];
 
         public static string GetName(BinaryReader br)
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
             var s = new AlbionReader(br, br.BaseStream.Length);
             ushort nameLength = s.UInt16("NameLength", 0);
             if (nameLength > 1024)
@@ -67,6 +68,7 @@ namespace UAlbion.Formats.Assets.Save
 
         public static SavedGame Serdes(SavedGame save, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             save ??= new SavedGame();
             s.Begin();
 
@@ -106,7 +108,7 @@ namespace UAlbion.Formats.Assets.Save
                 });
 
             save.Unknown1A6 = s.ByteArrayHex(nameof(Unknown1A6), save.Unknown1A6, 0xD0); // 1A6
-            save._switches.Packed = s.ByteArrayHex(nameof(Switches), save._switches.Packed, FlagSet.PackedSize); // 276
+            save._switches.SetPacked(s.ByteArrayHex(nameof(Switches), save._switches.GetPacked(), FlagDictionary.PackedSize)); // 276
             save.Unknown2C1 = s.ByteArrayHex(nameof(Unknown2C1), save.Unknown2C1, 0x5833); // 0x2C1
             s.Meta(nameof(Tickers), save._tickers.Serdes, save._tickers.Serdes); // 5AF4
 
@@ -121,23 +123,23 @@ namespace UAlbion.Formats.Assets.Save
             uint permChangesSize = s.UInt32("PermanentMapChanges_Size", (uint)(save.PermanentMapChanges.Count * MapChange.SizeOnDisk + 2));
             ushort permChangesCount = s.UInt16("PermanentMapChanges_Count", (ushort)save.PermanentMapChanges.Count);
             ApiUtil.Assert(permChangesSize == permChangesCount * MapChange.SizeOnDisk + 2);
-            save.PermanentMapChanges = (MapChangeList)s.List(
+            save.PermanentMapChanges = (MapChangeCollection)s.List(
                 nameof(PermanentMapChanges),
                 save.PermanentMapChanges,
                 permChangesCount,
                 MapChange.Serdes,
-                _ => new MapChangeList());
+                _ => new MapChangeCollection());
 
             uint tempChangesSize = s.UInt32("TemporaryMapChanges_Size", (uint)(save.TemporaryMapChanges.Count * MapChange.SizeOnDisk + 2));
             ushort tempChangesCount = s.UInt16("TemporaryMapChanges_Count", (ushort)save.TemporaryMapChanges.Count);
             ApiUtil.Assert(tempChangesSize == tempChangesCount * MapChange.SizeOnDisk + 2);
 
-            save.TemporaryMapChanges = (MapChangeList)s.List(
+            save.TemporaryMapChanges = (MapChangeCollection)s.List(
                 nameof(TemporaryMapChanges),
                 save.TemporaryMapChanges,
                 tempChangesCount,
                 MapChange.Serdes,
-                _ => new MapChangeList());
+                _ => new MapChangeCollection());
 
             uint visitedEventsSize = s.UInt32("VisitedEvents_Size", (uint)(save.VisitedEvents.Count * VisitedEvent.SizeOnDisk + 2));
             ushort visitedEventsCount = s.UInt16("VisitedEvents_Count", (ushort)save.VisitedEvents.Count);
@@ -162,7 +164,7 @@ namespace UAlbion.Formats.Assets.Save
                 }
             }
 
-        void SerdesNpcCharacter(int i, int size, ISerializer serializer)
+            void SerdesNpcCharacter(int i, int size, ISerializer serializer)
             {
                 if (i > 0xff)
                     return;

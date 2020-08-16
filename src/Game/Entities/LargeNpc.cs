@@ -5,7 +5,7 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Assets.Map;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Scenes;

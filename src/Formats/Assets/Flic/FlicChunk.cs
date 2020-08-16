@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using UAlbion.Api;
 
 namespace UAlbion.Formats.Assets.Flic
@@ -11,6 +12,8 @@ namespace UAlbion.Formats.Assets.Flic
 
         public static FlicChunk Load(BinaryReader br, int width, int height) 
         {
+            if (br == null) throw new ArgumentNullException(nameof(br));
+
             var chunkSizeOffset = br.BaseStream.Position;
             uint chunkSize = br.ReadUInt32();
             if ((chunkSize & 0x1) != 0)

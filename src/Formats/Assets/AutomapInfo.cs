@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 
 namespace UAlbion.Formats.Assets
 {
@@ -12,6 +13,7 @@ namespace UAlbion.Formats.Assets
 
         public static AutomapInfo Serdes(int _, AutomapInfo existing, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             var info = existing ?? new AutomapInfo();
             s.Begin();
             info.X = s.UInt8(nameof(X), info.X); // 0

@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
@@ -9,6 +10,7 @@ namespace UAlbion.Formats.MapEvents
     {
         public static RemovePartyMemberEvent Serdes(RemovePartyMemberEvent e, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new RemovePartyMemberEvent();
             s.Begin();
             e.PartyMemberId = (PartyCharacterId)StoreIncremented.Serdes(nameof(PartyMemberId), (byte)e.PartyMemberId, s.UInt8);

@@ -6,10 +6,10 @@ namespace UAlbion.Game.Text
 {
     public interface ITextFormatter
     {
-        IText Format(StringId template, params object[] arguments);
-        IText Format(string template, params object[] arguments);
+        IText Format(StringId stringId, params object[] arguments);
+        IText Format(string templateText, params object[] arguments);
         IText Format(StringId stringId, IList<(Token, object)> implicitTokens, GameLanguage? language, params object[] arguments);
-        IText Format(string template, IList<(Token, object)> implicitTokens, GameLanguage? language, params object[] arguments);
+        IText Format(string templateText, IList<(Token, object)> implicitTokens, GameLanguage? language, params object[] arguments);
 
         ITextFormatter NoWrap();
         ITextFormatter Left();

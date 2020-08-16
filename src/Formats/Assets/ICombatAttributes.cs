@@ -9,7 +9,7 @@
         byte ActionPoints { get; }
         ushort Protection { get; }
         ushort Damage { get; }
-        PhysicalCondition PhysicalConditions { get; }
-        MentalCondition MentalConditions { get; }
+        PhysicalConditions PhysicalConditions { get; }
+        MentalConditions MentalConditions { get; }
     }
 }

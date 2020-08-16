@@ -33,7 +33,7 @@ namespace UAlbion.Game.Tests
             var lm = new LayoutManager();
             var alr = new MockAssetLocatorRegistry()
                 .Add(new AssetKey(AssetType.SystemText), systemText)
-                .Add(new AssetKey(AssetType.MetaFont, (ushort)new MetaFontId()), MockUniformFont.Font)
+                .Add(new AssetKey(AssetType.MetaFont, (ushort)new MetaFontId(false, FontColor.White)), MockUniformFont.Font)
                 ;
 
             ex

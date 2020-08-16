@@ -33,7 +33,7 @@ namespace UAlbion.Game.Tests
             _exchange = new EventExchange(new LogExchange());
             var factory = new MockFactory();
             var locator = new MockAssetLocatorRegistry()
-                    .Add(new AssetKey(AssetType.MetaFont, (ushort) new MetaFontId()), MockUniformFont.Font)
+                    .Add(new AssetKey(AssetType.MetaFont, (ushort)new MetaFontId(false, FontColor.White)), MockUniformFont.Font)
                 ;
 
             var config = GameConfig.LoadLiteral(@"{ ""UI"": { ""ButtonDoubleClickIntervalSeconds"": 0.35 } }");

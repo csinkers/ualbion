@@ -4,7 +4,7 @@ namespace UAlbion.Formats.AssetIds
 {
     public struct MetaFontId : IConvertible, IEquatable<MetaFontId>
     {
-        public MetaFontId(bool isBold = false, FontColor color = FontColor.White)
+        public MetaFontId(bool isBold, FontColor color)
         {
             IsBold = isBold;
             Color = color;
@@ -42,7 +42,7 @@ namespace UAlbion.Formats.AssetIds
         public object ToType(Type conversionType, IFormatProvider provider) => throw new NotImplementedException();
 
         public override bool Equals(object obj) => obj is MetaFontId other && Equals(other);
-        public override int GetHashCode() => (int)Color * 2 + (IsBold ? 1 : 0);
+        public override int GetHashCode() => (int)this;
         public static bool operator ==(MetaFontId left, MetaFontId right) => left.Equals(right);
         public static bool operator !=(MetaFontId left, MetaFontId right) => !(left == right);
         public bool Equals(MetaFontId other) => IsBold == other.IsBold && Color == other.Color;

@@ -29,6 +29,7 @@ Things that are at least somewhat implemented:
 - Conversations
 - Sound effects and music (music currently requires some manual steps to setup ADLMIDI.NET / libADLMIDI)
 - Loading/saving saved games
+- Video playback
 
 Currently unimplemented:
 - Lighting model for 3D levels
@@ -38,7 +39,6 @@ Currently unimplemented:
 - Combat system
 - Magic system
 - NPC movement
-- Video playback
 
 Planned improvements / changes from the original gameplay:
 - Add hotkeys to streamline the interface, reduce the amount of right clicking required etc

@@ -54,13 +54,14 @@ namespace UAlbion.Game
                 case (QueryEvent q, QueryType.TriggerType):          continuation((ushort)context.Source.Trigger == q.Argument); return true;
                 case (QueryVerbEvent verb, QueryType.ChosenVerb):    continuation(context.Source.Trigger.HasFlag((TriggerTypes)(1 << (int)verb.Verb))); return true;
                 case (QueryItemEvent q, QueryType.UsedItemId):       continuation(context.Source is EventSource.Item item && item.ItemId == q.ItemId); return true;
-                case (_, QueryType.PreviousActionResult):            continuation(Resolve<IEventManager>().LastEventResult); return true;
+                // Need to use QueryEvent _ instead of _ here due to a compiler issue (https://github.com/dotnet/roslyn/issues/47075)
+                case (QueryEvent _, QueryType.PreviousActionResult): continuation(Resolve<IEventManager>().LastEventResult); return true;
 
-                case (_, QueryType.IsScriptDebugModeActive): { continuation(false); return true; }
-                case (_, QueryType.IsNpcActive):             { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query NpcActive")); continuation(true); return true; }
-                case (_, QueryType.IsPartyMemberConscious):  { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query Party member conscious")); continuation(true); return true; }
-                case (_, QueryType.EventAlreadyUsed):        { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query event already used")); continuation(false); return true; }
-                case (_, QueryType.IsDemoVersion):           { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query is demo")); continuation(false); return true; }
+                case (QueryEvent _, QueryType.IsScriptDebugModeActive): { continuation(false); return true; }
+                case (QueryEvent _, QueryType.IsNpcActive):             { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query NpcActive")); continuation(true); return true; }
+                case (QueryEvent _, QueryType.IsPartyMemberConscious):  { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query Party member conscious")); continuation(true); return true; }
+                case (QueryEvent _, QueryType.EventAlreadyUsed):        { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query event already used")); continuation(false); return true; }
+                case (QueryEvent _, QueryType.IsDemoVersion):           { Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query is demo")); continuation(false); return true; }
 
                 case (PromptPlayerEvent prompt, QueryType.PromptPlayer):
                 {

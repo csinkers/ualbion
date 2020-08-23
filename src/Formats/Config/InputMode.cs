@@ -12,6 +12,7 @@
         World3D,
         ContextMenu,
         MainMenu,
-        TextEntry
+        TextEntry,
+        Editor
     }
 }

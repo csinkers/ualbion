@@ -209,10 +209,8 @@ namespace UAlbion.Game.Text
         static IEnumerable<TextBlock> TokensToBlocks(IAssetManager assets, IEnumerable<(Token, object)> tokens, string raw)
         {
             var sb = new StringBuilder();
-            var block = new TextBlock();
-#if DEBUG
-            block.Raw = raw;
-#endif
+            var block = new TextBlock { Raw = raw };
+
             foreach (var (token, p) in tokens)
             {
                 if (sb.Length > 0 && token != Token.Text || token == Token.Block)
@@ -228,9 +226,7 @@ namespace UAlbion.Game.Text
                         Style = block.Style,
                         Color = block.Color,
                     };
-#if DEBUG
-            block.Raw = raw;
-#endif
+                    block.Raw = raw;
                 }
 
                 switch (token)

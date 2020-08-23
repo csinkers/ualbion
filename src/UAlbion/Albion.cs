@@ -28,6 +28,7 @@ using UAlbion.Game.State;
 using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid.Audio;
 using UAlbion.Game.Veldrid.Debugging;
+using UAlbion.Game.Veldrid.Editor;
 using UAlbion.Game.Veldrid.Input;
 
 namespace UAlbion
@@ -126,20 +127,25 @@ namespace UAlbion
                 .Add(new SceneStack())
                 .Add(new SceneManager()
                     .AddScene((GameScene)new EmptyScene()
+                        .Add(new StatusBar())
                         .Add(new PaletteManager()))
 
                     .AddScene((GameScene)new AutomapScene()
+                        .Add(new StatusBar())
                         .Add(new PaletteManager()))
 
                     .AddScene((GameScene)new FlatScene()
+                        .Add(new StatusBar())
                         .Add(new ConversationManager())
                         .Add(new PaletteManager()))
 
                     .AddScene((GameScene)new DungeonScene()
+                        .Add(new StatusBar())
                         .Add(new ConversationManager())
                         .Add(new PaletteManager()))
 
                     .AddScene((GameScene)new MenuScene()
+                        .Add(new StatusBar())
                         .Add(new PaletteManager())
                         .Add(new MainMenu())
                         .Add(new Sprite<PictureId>(
@@ -150,9 +156,15 @@ namespace UAlbion
                             SpriteFlags.LeftAligned) { Size = new Vector2(2.0f, -2.0f) }))
 
                     .AddScene((GameScene)new InventoryScene()
+                        .Add(new StatusBar())
                         .Add(new ConversationManager())
                         .Add(new PaletteManager())
-                        .Add(new InventoryInspector())))
+                        .Add(new InventoryInspector()))
+
+                    .AddScene((GameScene)new EditorScene()
+                        .Add(new PaletteManager())
+                        .Add(new EditorUi()))
+                )
 
                 .Add(new TextFormatter())
                 .Add(new TextManager())
@@ -163,7 +175,6 @@ namespace UAlbion
                     .AddBehaviour(new SpriteInstanceDataDebugBehaviour())
                     .AddBehaviour(new FormatTextEventBehaviour())
                     .AddBehaviour(new QueryEventDebugBehaviour()))
-                .Add(new StatusBar())
                 .Add(new ContextMenu())
                 .Add(new CursorManager())
                 .Add(new InputManager()

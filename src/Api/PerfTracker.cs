@@ -34,7 +34,9 @@ namespace UAlbion.Api
 
         class InfrequentTracker : IDisposable
         {
+#if DEBUG
             readonly Stopwatch _stopwatch = Stopwatch.StartNew();
+#endif
             readonly string _name;
 
             public InfrequentTracker(string name)

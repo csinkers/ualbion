@@ -126,25 +126,25 @@ namespace UAlbion
                 .Add(new CollisionManager())
                 .Add(new SceneStack())
                 .Add(new SceneManager()
-                    .AddScene((GameScene)new EmptyScene()
+                    .AddScene((Scene)new EmptyScene()
                         .Add(new StatusBar())
                         .Add(new PaletteManager()))
 
-                    .AddScene((GameScene)new AutomapScene()
+                    .AddScene((Scene)new AutomapScene()
                         .Add(new StatusBar())
                         .Add(new PaletteManager()))
 
-                    .AddScene((GameScene)new FlatScene()
-                        .Add(new StatusBar())
-                        .Add(new ConversationManager())
-                        .Add(new PaletteManager()))
-
-                    .AddScene((GameScene)new DungeonScene()
+                    .AddScene((Scene)new FlatScene()
                         .Add(new StatusBar())
                         .Add(new ConversationManager())
                         .Add(new PaletteManager()))
 
-                    .AddScene((GameScene)new MenuScene()
+                    .AddScene((Scene)new DungeonScene()
+                        .Add(new StatusBar())
+                        .Add(new ConversationManager())
+                        .Add(new PaletteManager()))
+
+                    .AddScene((Scene)new MenuScene()
                         .Add(new StatusBar())
                         .Add(new PaletteManager())
                         .Add(new MainMenu())
@@ -155,13 +155,13 @@ namespace UAlbion
                             SpriteKeyFlags.NoTransform,
                             SpriteFlags.LeftAligned) { Size = new Vector2(2.0f, -2.0f) }))
 
-                    .AddScene((GameScene)new InventoryScene()
+                    .AddScene((Scene)new InventoryScene()
                         .Add(new StatusBar())
                         .Add(new ConversationManager())
                         .Add(new PaletteManager())
                         .Add(new InventoryInspector()))
 
-                    .AddScene((GameScene)new EditorScene()
+                    .AddScene((Scene)new EditorScene()
                         .Add(new PaletteManager())
                         .Add(new EditorUi()))
                 )

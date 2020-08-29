@@ -12,6 +12,7 @@
     "Control+A": "!loadnextmap",
     "Control+X": "!loadprevmap",
     "Control+D": "engine_flag toggle RenderDepth",
+    "Control+E":  "push_scene Editor",
     "Control+B": "engine_flag toggle ShowBoundingBoxes",
     "Control+R": "e:run_renderdoc",
     "Pause": "e:run_renderdoc",
@@ -112,5 +113,8 @@
     "Control+3": "new_game 110 20 20",
     "Control+Shift+N": "new_game 300 32 75",
     "Escape": "close_dialog"
-  } 
+  },
+  "Editor": {
+    "Control+E":  "pop_scene Editor"
+  }
 }

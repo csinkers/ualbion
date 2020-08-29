@@ -3,8 +3,10 @@
 namespace UAlbion.Game.Scenes
 {
     public interface IEmptyScene : IScene { }
-    public class EmptyScene : GameScene, IEmptyScene
+
+    [Scene(SceneId.Empty)]
+    public class EmptyScene : Scene, IEmptyScene
     {
-        public EmptyScene() : base(SceneId.Empty, new OrthographicCamera()) { }
+        public EmptyScene() : base("Empty", new OrthographicCamera()) { }
     }
 }

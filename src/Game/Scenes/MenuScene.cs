@@ -5,10 +5,11 @@ using UAlbion.Game.Events;
 namespace UAlbion.Game.Scenes
 {
     public interface IMenuScene : IScene { }
-    public class MenuScene : GameScene, IMenuScene
+    [Scene(SceneId.MainMenu)]
+    public class MenuScene : Scene, IMenuScene
     {
         bool _clockWasRunning;
-        public MenuScene() : base(SceneId.MainMenu, new OrthographicCamera())
+        public MenuScene() : base(nameof(SceneId.MainMenu), new OrthographicCamera())
         { }
 
         protected override void Subscribed()

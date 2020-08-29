@@ -1,9 +1,72 @@
-﻿using ImGuiNET;
+﻿using System;
+using System.Linq;
+using System.Numerics;
+using ImGuiNET;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Game.Veldrid.Editor
 {
+    public abstract class AssetEditor : Component
+    {
+        public abstract void Render();
+    }
+
+    public class MapEditor : AssetEditor
+    {
+        readonly string _name;
+
+        public MapEditor(string name)
+        {
+            _name = name;
+        }
+
+        public override void Render()
+        {
+            if (!ImGui.Begin(_name)) return;
+            if (ImGui.BeginMenuBar())
+            {
+                if (ImGui.BeginMenu("View"))
+                {
+                    if (ImGui.MenuItem("Show Overlay", true)) { }
+                    if (ImGui.MenuItem("Show Underlay", true)) { }
+                    if (ImGui.MenuItem("Show NPCs", true)) { }
+                    if (ImGui.MenuItem("Show NPC paths", true)) { }
+                    if (ImGui.MenuItem("Show trigger zones", true)) { }
+                        
+
+                }
+
+                ImGui.EndMenuBar();
+            }
+            ImGui.End();
+        }
+    }
+
+    public class CharacterEditor : AssetEditor
+    {
+        readonly string _name;
+        readonly AssetKey _key;
+
+        public CharacterEditor(string name, AssetKey key)
+        {
+            _name = name;
+            _key = key;
+        }
+
+        public override void Render()
+        {
+            if (!ImGui.Begin(_name)) return;
+            if (ImGui.BeginMenuBar())
+            {
+
+                ImGui.EndMenuBar();
+            }
+            ImGui.End();
+        }
+    }
+
     public class EditorUi : Component
     {
         bool _showInspector;
@@ -11,10 +74,40 @@ namespace UAlbion.Game.Veldrid.Editor
 
         public EditorUi()
         {
-            On<EngineUpdateEvent>(e => Render());
+            On<EngineUpdateEvent>(e =>
+            {
+                RenderMenus();
+                RenderAssetPicker();
+                RenderChildren();
+            });
+            AttachChild(new MapEditor("Map Editor"));
+            AttachChild(new CharacterEditor("Tom"));
         }
 
-        void Render()
+        void RenderChildren()
+        {
+            foreach (var child in Children.OfType<AssetEditor>())
+                child.Render();
+        }
+
+        void RenderAssetPicker()
+        {
+            ImGui.SetWindowSize(new Vector2(300, 200), ImGuiCond.FirstUseEver);
+            if (ImGui.Begin("Assets"))
+            {
+                foreach (var assetType in Enum.GetValues(typeof(AssetType)).OfType<AssetType>())
+                {
+                    if (ImGui.TreeNode(assetType.ToString()))
+                    {
+                        ImGui.TreePop();
+                    }
+                }
+
+                ImGui.End();
+            }
+        }
+
+        void RenderMenus()
         {
             if (ImGui.BeginMainMenuBar())
             {

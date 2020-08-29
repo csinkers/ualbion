@@ -6,9 +6,10 @@ using UAlbion.Game.Events;
 namespace UAlbion.Game.Scenes
 {
     public interface IEditorScene : IScene { }
-    public class EditorScene : GameScene, IEditorScene
+    [Scene(SceneId.Editor)]
+    public class EditorScene : Scene, IEditorScene
     {
-        public EditorScene() : base(SceneId.Editor, new OrthographicCamera()) 
+        public EditorScene() : base(nameof(SceneId.Editor), new OrthographicCamera()) 
             => AttachChild(new CameraMotion2D((OrthographicCamera)Camera));
 
         protected override void Subscribed() => Raise(new PushInputModeEvent(InputMode.Editor));

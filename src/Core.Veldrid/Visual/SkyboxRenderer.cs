@@ -86,7 +86,7 @@ namespace UAlbion.Core.Veldrid.Visual
                     shaderSet.Shaders,
                     ShaderHelper.GetSpecializations(gd)),
                 new[] { _resourceLayout, sc.CommonResourceLayout },
-                sc.MainSceneFramebuffer.OutputDescription);
+                gd.SwapchainFramebuffer.OutputDescription);
 
             var pipeline = gd.ResourceFactory.CreateGraphicsPipeline(ref pipelineDescription);
             pipeline.Name = "P_Skybox";

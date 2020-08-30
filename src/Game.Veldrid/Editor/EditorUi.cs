@@ -81,7 +81,7 @@ namespace UAlbion.Game.Veldrid.Editor
                 RenderChildren();
             });
             AttachChild(new MapEditor("Map Editor"));
-            AttachChild(new CharacterEditor("Tom"));
+            AttachChild(new CharacterEditor("Tom", PartyCharacterId.Tom.ToAssetId()));
         }
 
         void RenderChildren()

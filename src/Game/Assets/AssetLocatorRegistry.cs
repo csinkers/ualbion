@@ -102,5 +102,7 @@ namespace UAlbion.Game.Assets
                 return e;
             }
         }
+
+        public IEnumerable<AssetKey> GetCacheInfo() => _assetCache.GetCachedAssetInfo();
     }
 }

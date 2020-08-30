@@ -15,7 +15,7 @@ namespace UAlbion.Formats.AssetIds
 
         public AssetId AssetId { get; }
         public AssetType Type => AssetId.Type;
-        public int Id => AssetId.Id;
+        public ushort Id => AssetId.Id;
         public GameLanguage Language { get; }
 
         public override string ToString() => $"{AssetId}:{Language}";

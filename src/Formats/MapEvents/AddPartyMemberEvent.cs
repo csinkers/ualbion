@@ -5,7 +5,7 @@ using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.MapEvents
 {
-    [Event("add_party_member")]
+    [Event("add_party_member", "Add someone to the party", new[] { "apm" })]
     public class AddPartyMemberEvent : ModifyEvent
     {
         public static AddPartyMemberEvent Serdes(AddPartyMemberEvent e, ISerializer s)

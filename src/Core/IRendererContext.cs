@@ -9,9 +9,6 @@ namespace UAlbion.Core
         void SetCurrentScene(Scene scene);
         void SetClearColor(float red, float green, float blue);
         void SetCurrentPalette(PaletteTexture newPalette, int version);
-        void StartMainPass();
-        void StartOverlayPass();
-        void StartDuplicatorPass();
         void StartSwapchainPass();
     }
 }

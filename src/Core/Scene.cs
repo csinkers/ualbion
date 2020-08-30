@@ -89,32 +89,11 @@ namespace UAlbion.Core
 
             // Main scene
             using (PerfTracker.FrameEvent("6.1.3 Main scene pass"))
-            using (context.Factory.CreateRenderDebugGroup(context, "Main Scene Pass"))
-            {
-                context.StartMainPass();
-                foreach (var key in orderedKeys)
-                    Render(context, RenderPasses.Standard, rendererLookup, _processedRenderables[key]);
-            }
-
-            using (context.Factory.CreateRenderDebugGroup(context, "Overlay"))
-            {
-                context.StartOverlayPass();
-                foreach (var key in orderedKeys)
-                    Render(context, RenderPasses.Overlay, rendererLookup, _processedRenderables[key]);
-            }
-
-            using (context.Factory.CreateRenderDebugGroup(context, "Duplicator"))
-            {
-                context.StartDuplicatorPass();
-                foreach (var key in orderedKeys)
-                    Render(context, RenderPasses.Duplicator, rendererLookup, _processedRenderables[key]);
-            }
-
-            using (context.Factory.CreateRenderDebugGroup(context, "Swapchain Pass"))
+            using (context.Factory.CreateRenderDebugGroup(context, "Main Pass"))
             {
                 context.StartSwapchainPass();
                 foreach (var key in orderedKeys)
-                    Render(context, RenderPasses.SwapchainOutput, rendererLookup, _processedRenderables[key]);
+                    Render(context, RenderPasses.Standard, rendererLookup, _processedRenderables[key]);
             }
         }
 

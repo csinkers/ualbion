@@ -32,11 +32,10 @@ namespace UAlbion.Game.Settings
             On<EngineFlagEvent>(e => Flags = (EngineFlags) CoreUtil.UpdateFlag((uint) Flags, e.Operation, (uint) e.Flag));
         }
         [JsonIgnore] public string BasePath { get; set; }
-
-        public IDebugSettings Debug => this;
-        public IAudioSettings Audio => this;
-        public IGameplaySettings Gameplay => this;
-        public IEngineSettings Engine => this;
+        [JsonIgnore] public IDebugSettings Debug => this;
+        [JsonIgnore] public IAudioSettings Audio => this;
+        [JsonIgnore] public IGameplaySettings Gameplay => this;
+        [JsonIgnore] public IEngineSettings Engine => this;
 
         // Debug
         public DebugFlags DebugFlags { get; private set; }

@@ -308,6 +308,9 @@ namespace UAlbion.Core.Veldrid
                     true, false)
                 {
                     SyncToVerticalBlank = _vsync,
+#if DEBUG
+                    Debug = true
+#endif
                 };
 
                 // Currently this field only exists in my local build of veldrid, so set it via reflection.

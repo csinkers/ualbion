@@ -43,9 +43,7 @@ namespace UAlbion
                 .AddRenderer(new SkyboxRenderer())
                 .AddRenderer(new SpriteRenderer())
                 .AddRenderer(new ExtrudedTileMapRenderer())
-                .AddRenderer(new FullScreenQuad())
                 .AddRenderer(new DebugGuiRenderer())
-                .AddRenderer(new ScreenDuplicator())
                 ;
 
             var backgroundThreadInitTask = Task.Run(() => RegisterComponents(global, services, baseDir, commandLine));

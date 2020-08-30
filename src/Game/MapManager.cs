@@ -63,6 +63,7 @@ namespace UAlbion.Game
                 if (map.MapData.SongId.HasValue)
                     Enqueue(new SongEvent(map.MapData.SongId.Value));
             }
+            Raise(new CycleCacheEvent());
         }
 
         IMap BuildMap(MapDataId mapId)

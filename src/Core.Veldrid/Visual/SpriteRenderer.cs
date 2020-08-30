@@ -23,7 +23,7 @@ namespace UAlbion.Core.Veldrid.Visual
                 VertexLayoutHelper.Vector3D("Transform4"),
                 //VertexLayoutHelper.Vector3D("Offset"), VertexLayoutHelper.Vector2D("Size"),
                 VertexLayoutHelper.Vector2D("TexPosition"), VertexLayoutHelper.Vector2D("TexSize"),
-                VertexLayoutHelper.IntElement("TexLayer"), VertexLayoutHelper.IntElement("Flags")
+                VertexLayoutHelper.IntElement("TexLayer"), VertexLayoutHelper.UIntElement("Flags")
             //VertexLayoutHelper.FloatElement("Rotation")
             )
         { InstanceStepRate = 1 };
@@ -114,7 +114,7 @@ namespace UAlbion.Core.Veldrid.Visual
                     shaderSet.Shaders,
                     ShaderHelper.GetSpecializations(gd)),
                 new[] { _perSpriteResourceLayout, sc.CommonResourceLayout },
-                sc.MainSceneFramebuffer.OutputDescription);
+                gd.SwapchainFramebuffer.OutputDescription);
 
             var pipeline = gd.ResourceFactory.CreateGraphicsPipeline(ref pipelineDescription);
             pipeline.Name = $"P_Sprite_{key}";

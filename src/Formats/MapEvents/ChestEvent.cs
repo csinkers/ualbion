@@ -32,13 +32,11 @@ namespace UAlbion.Formats.MapEvents
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new ChestEvent(textType, textSourceId);
-            s.Begin();
             e.PickDifficulty = s.UInt8(nameof(PickDifficulty), e.PickDifficulty);
-            e.KeyItemId = s.TransformEnumU16(nameof(KeyItemId), e.KeyItemId, StoreIncrementedNullZero<ItemId>.Instance);
+            e.KeyItemId = s.TransformEnumU16(nameof(KeyItemId), e.KeyItemId, ZeroToNullConverter<ItemId>.Instance);
             e.UnlockedTextId = s.UInt8(nameof(UnlockedTextId), e.UnlockedTextId);
             e.InitialTextId = s.UInt8(nameof(InitialTextId), e.InitialTextId);
             e.ChestId = s.EnumU16(nameof(ChestId), e.ChestId);
-            s.End();
             return e;
         }
 

@@ -9,14 +9,12 @@ namespace UAlbion.Formats.MapEvents
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new SetNpcActiveEvent();
-            s.Begin();
             e.IsActive = s.UInt8(nameof(IsActive), e.IsActive);
             e.NpcId = s.UInt8(nameof(NpcId), e.NpcId);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
-            s.End();
             return e;
         }
 

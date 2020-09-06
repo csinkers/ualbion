@@ -19,7 +19,7 @@ namespace UAlbion.Formats.Assets
                 m.Grid[i] = s.TransformEnumU8(
                     i.ToString(CultureInfo.InvariantCulture),
                     m.Grid[i],
-                    StoreIncrementedNullZero<MonsterCharacterId>.Instance);
+                    ZeroToNullConverter<MonsterCharacterId>.Instance);
                 s.UInt8(null, 0);
             }
             return m;

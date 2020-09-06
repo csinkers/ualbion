@@ -20,13 +20,11 @@ namespace UAlbion.Formats.Assets
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             d ??= new SpellData();
-            s.Begin();
             d.Environments = s.EnumU8(nameof(Environments), d.Environments);
             d.Cost = s.UInt8(nameof(Cost), d.Cost);
             d.LevelRequirement = s.UInt8(nameof(LevelRequirement), d.LevelRequirement);
             d.Targetses = s.EnumU8(nameof(Targetses), d.Targetses);
             d.Unused = s.UInt8(nameof(Unused), d.Unused);
-            s.End();
             return d;
         }
     }

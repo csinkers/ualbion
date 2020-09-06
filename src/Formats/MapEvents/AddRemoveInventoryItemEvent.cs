@@ -12,14 +12,12 @@ namespace UAlbion.Formats.MapEvents
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new AddRemoveInventoryItemEvent();
-            s.Begin();
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);
             e.Amount = s.UInt8(nameof(Amount), e.Amount);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-            e.ItemId = (ItemId)StoreIncremented.Serdes(nameof(e.ItemId), (ushort)e.ItemId, s.UInt16);
+            e.ItemId = (ItemId)StoreIncrementedConverter.Serdes(nameof(e.ItemId), (ushort)e.ItemId, s.UInt16);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
-            s.End();
             return e;
         }
 

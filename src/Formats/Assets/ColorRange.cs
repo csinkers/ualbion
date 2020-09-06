@@ -37,13 +37,11 @@ namespace UAlbion.Formats.Assets
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             c ??= new ColorRange();
-            s.Begin();
             c._pad1 = s.UInt16BE(nameof(_pad1), c._pad1);
             c.Rate = s.UInt16BE(nameof(Rate), c.Rate);
             c.Flags = s.EnumU16BE(nameof(Flags), c.Flags);
             c.Low = s.UInt8(nameof(Low), c.Low);
             c.High = s.UInt8(nameof(High), c.High);
-            s.End();
             return c;
         }
     }

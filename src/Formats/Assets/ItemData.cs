@@ -151,7 +151,6 @@ namespace UAlbion.Formats.Assets
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             item ??= new ItemData((ItemId)i);
-            s.Begin();
             ApiUtil.Assert(i == (int)item.Id);
             item.Unknown = s.UInt8(nameof(item.Unknown), item.Unknown);
             item.TypeId = s.EnumU8(nameof(item.TypeId), item.TypeId);
@@ -175,7 +174,7 @@ namespace UAlbion.Formats.Assets
             item.Activate = s.UInt8(nameof(item.Activate), item.Activate);
             item.AmmoAnim = s.UInt8(nameof(item.AmmoAnim), item.AmmoAnim);
             item.SpellClass = s.EnumU8(nameof(item.SpellClass), item.SpellClass);
-            item.SpellEffect = s.Transform<byte, byte?>(nameof(item.SpellEffect), item.SpellEffect, s.UInt8, StoreIncrementedNullZero.Instance);
+            item.SpellEffect = s.Transform<byte, byte?>(nameof(item.SpellEffect), item.SpellEffect, S.UInt8, ZeroToNullConverter.Instance);
             item.Charges = s.UInt8(nameof(item.Charges), item.Charges);
             item.EnchantmentCount = s.UInt8(nameof(item.EnchantmentCount), item.EnchantmentCount);
             item.MaxEnchantmentCount = s.UInt8(nameof(item.MaxEnchantmentCount), item.MaxEnchantmentCount);
@@ -187,7 +186,6 @@ namespace UAlbion.Formats.Assets
             item.Icon = s.EnumU16(nameof(item.Icon), item.Icon);
             item.Class = s.EnumU16(nameof(item.Class), item.Class);
             item.Race = s.UInt16(nameof(item.Race), item.Race);
-            s.End();
             return item;
         }
 

@@ -21,14 +21,14 @@ namespace UAlbion.Game.State
 
         public DateTime Time => SavedGame.Epoch + _game.ElapsedTime;
         public IParty Party => _party;
-        public ICharacterSheet GetNpc(NpcCharacterId id) => _game != null && _game.NpcStats.TryGetValue(id, out var sheet) ? sheet : null;
-        public ICharacterSheet GetPartyMember(PartyCharacterId id) => _game != null && _game.PartyMembers.TryGetValue(id, out var member) ? member : null;
-        public short GetTicker(TickerId id) => _game != null && _game.Tickers.TryGetValue(id, out var value) ? value : (short)0;
-        public bool GetSwitch(SwitchId id) => _game != null && _game.Switches.TryGetValue(id, out var value) && value;
+        public ICharacterSheet GetNpc(NpcCharacterId id) => _game.NpcStats.TryGetValue(id, out var sheet) ? sheet : null;
+        public ICharacterSheet GetPartyMember(PartyCharacterId id) => _game.PartyMembers.TryGetValue(id, out var member) ? member : null;
+        public short GetTicker(TickerId id) => _game.Tickers.TryGetValue(id, out var value) ? value : (short)0;
+        public bool GetSwitch(SwitchId id) => _game.Switches.TryGetValue(id, out var value) && value;
 
         public MapChangeCollection TemporaryMapChanges => _game.TemporaryMapChanges;
         public MapChangeCollection PermanentMapChanges => _game.PermanentMapChanges;
-        public MapDataId MapId => _game?.MapId ?? 0;
+        public MapDataId MapId => _game.MapId;
 
         public GameState()
         {
@@ -38,20 +38,24 @@ namespace UAlbion.Game.State
             On<FastClockEvent>(e => TickCount += e.Frames);
             On<SetTimeEvent>(e =>
             {
-                if (_game != null)
-                    _game.ElapsedTime = e.Time - SavedGame.Epoch;
+                _game.ElapsedTime = e.Time - SavedGame.Epoch;
             });
             On<LoadMapEvent>(e =>
             {
                 if (_game != null)
                     _game.MapId = e.MapId;
             });
-            On<SetTemporarySwitchEvent>(e => _game.Switches[e.SwitchId] = e.Operation switch
+            On<SetTemporarySwitchEvent>(e =>
             {
-                SetTemporarySwitchEvent.SwitchOperation.Reset => false,
-                SetTemporarySwitchEvent.SwitchOperation.Set => true,
-                SetTemporarySwitchEvent.SwitchOperation.Toggle => _game.Switches.ContainsKey(e.SwitchId) ? !_game.Switches[e.SwitchId] : true,
-                _ => false
+                _game.Switches[e.SwitchId] = e.Operation switch
+                {
+                    SetTemporarySwitchEvent.SwitchOperation.Reset => false,
+                    SetTemporarySwitchEvent.SwitchOperation.Set => true,
+                    SetTemporarySwitchEvent.SwitchOperation.Toggle => 
+                        !_game.Switches.ContainsKey(e.SwitchId) 
+                        || !_game.Switches[e.SwitchId],
+                    _ => false
+                };
             });
             On<SetTickerEvent>(e =>
             {
@@ -77,9 +81,6 @@ namespace UAlbion.Game.State
 
         Inventory GetWriteableInventory(InventoryId id)
         {
-            if (_game == null)
-                return null;
-
             Inventory inventory;
             switch(id.Type)
             {

@@ -12,12 +12,11 @@ namespace UAlbion.Formats.Assets.Save
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             npc ??= new NpcState();
-            s.Begin();
             var startOffset = s.Offset;
 
-            npc.Id = s.TransformEnumU8(nameof(Id), npc.Id, Tweak<NpcCharacterId>.Instance); // 0
+            npc.Id = s.TransformEnumU8(nameof(Id), npc.Id, TweakedConverter<NpcCharacterId>.Instance); // 0
             s.UInt8("dummy", 0);
-            npc.ObjectNumber = s.Transform<ushort, ushort?>(nameof(ObjectNumber), npc.ObjectNumber, s.UInt16, Tweak.Instance); // 2
+            npc.ObjectNumber = s.Transform<ushort, ushort?>(nameof(ObjectNumber), npc.ObjectNumber, S.UInt16, TweakedConverter.Instance); // 2
             npc.Unk4 = s.UInt16(nameof(Unk4), npc.Unk4);
             npc.Unk6 = s.UInt16(nameof(Unk6), npc.Unk6);
             npc.Unk8 = s.UInt8(nameof(Unk8), npc.Unk8);
@@ -86,7 +85,6 @@ namespace UAlbion.Formats.Assets.Save
             npc.Unk7E = s.UInt16(nameof(Unk7E), npc.Unk7E);
 
             ApiUtil.Assert(s.Offset == startOffset + 0x80);
-            s.End();
             return npc;
         }
 

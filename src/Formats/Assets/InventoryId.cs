@@ -35,6 +35,7 @@ namespace UAlbion.Formats.Assets
         public static explicit operator InventoryId(ChestId id)          => ToInventoryId(id);
         public static explicit operator InventoryId(MerchantId id) => ToInventoryId(id);
         public static explicit operator InventoryId(AssetKey key) => ToInventoryId(key);
+        public static explicit operator InventoryId(AssetId id) => ToInventoryId(id);
         public static InventoryId ToInventoryId(int id)
             => new InventoryId(
                 (InventoryType)((id & 0x7fff0000) >> 16),

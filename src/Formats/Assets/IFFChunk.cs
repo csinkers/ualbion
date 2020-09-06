@@ -29,11 +29,9 @@ namespace UAlbion.Formats.Assets
 		{
             if (s == null) throw new ArgumentNullException(nameof(s));
             c ??= new IFFChunk();
-            s.Begin();
             c.TypeId = s.FixedLengthString(nameof(TypeId), c.TypeId, 4);
             c._lengthOffset = s.Offset;
             c.Length = s.Int32BE(nameof(Length), c.Length);
-            s.End();
             return c;
 		}
 	}

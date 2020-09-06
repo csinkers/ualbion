@@ -28,12 +28,10 @@ namespace UAlbion.Formats.Assets.Save
                 s.Comment(u?.ToString());
 
             u ??= new VisitedEvent();
-            s.Begin();
             u.Unk0 = s.UInt8(nameof(Unk0), u.Unk0);
             u.EventSetId = s.EnumU16(nameof(EventSetId), u.EventSetId);
             u.Type = s.EnumU8(nameof(Type), u.Type);
             u.Word = s.UInt16(nameof(Word), u.Word);
-            s.End();
             return u;
         }
 

@@ -122,6 +122,7 @@ namespace UAlbion
                             dumpTypes |= Enum.Parse<DumpTypes>(t);
                     }
 
+                    if ((dumpTypes & DumpTypes.Json) != 0) DumpJson.DumpAll(baseDir, assets);
                     if ((dumpTypes & DumpTypes.Characters) != 0) Dump.CharacterSheets(assets, tf, baseDir);
                     if ((dumpTypes & DumpTypes.Chests) != 0) Dump.Chests(assets, baseDir);
                     if ((dumpTypes & DumpTypes.CoreSprites) != 0) Dump.CoreSprites(assets, baseDir);

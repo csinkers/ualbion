@@ -4,7 +4,7 @@ namespace UAlbion.Formats.Assets
 {
     public interface ICharacterSheet
     {
-        AssetKey Key { get; }
+        AssetId Id { get; }
         string GetName(GameLanguage language);
 
         CharacterType Type { get; }

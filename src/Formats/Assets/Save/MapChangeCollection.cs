@@ -14,7 +14,6 @@ namespace UAlbion.Formats.Assets.Save
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             c ??= new MapChangeCollection();
-            s.Begin();
             uint size = s.UInt32("Size", (uint)(c.Count * MapChange.SizeOnDisk + 2));
             ushort count = s.UInt16(nameof(Count), (ushort)c.Count);
             ApiUtil.Assert(count * MapChange.SizeOnDisk == size - 2);
@@ -26,7 +25,6 @@ namespace UAlbion.Formats.Assets.Save
                     c.Add(MapChange.Serdes(i, null, s));
             }
 
-            s.End();
             return c;
         }
 

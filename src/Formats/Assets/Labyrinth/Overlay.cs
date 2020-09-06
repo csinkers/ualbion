@@ -21,15 +21,13 @@ namespace UAlbion.Formats.Assets.Labyrinth
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             o ??= new Overlay();
-            s.Begin();
-            o.TextureNumber = s.TransformEnumU16(nameof(o.TextureNumber), o.TextureNumber, Tweak<DungeonOverlayId>.Instance);
+            o.TextureNumber = s.TransformEnumU16(nameof(o.TextureNumber), o.TextureNumber, TweakedConverter<DungeonOverlayId>.Instance);
             o.AnimationFrames = s.UInt8(nameof(o.AnimationFrames), o.AnimationFrames);
             o.WriteZero = s.UInt8(nameof(o.WriteZero), o.WriteZero);
             o.XOffset = s.UInt16(nameof(o.XOffset), o.XOffset);
             o.YOffset = s.UInt16(nameof(o.YOffset), o.YOffset);
             o.Width = s.UInt16(nameof(o.Width), o.Width);
             o.Height = s.UInt16(nameof(o.Height), o.Height);
-            s.End();
             return o;
         }
     }

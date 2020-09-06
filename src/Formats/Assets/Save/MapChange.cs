@@ -29,14 +29,12 @@ namespace UAlbion.Formats.Assets.Save
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             u ??= new MapChange();
-            s.Begin();
             u.X = s.UInt8(nameof(X), u.X);
             u.Y = s.UInt8(nameof(Y), u.Y);
             u.ChangeType = s.EnumU8(nameof(ChangeType), u.ChangeType);
             u.Unk3 = s.EnumU8(nameof(Unk3), u.Unk3);
             u.Value = s.UInt16(nameof(Value), u.Value);
             u.MapId = s.EnumU16(nameof(Overlay), u.MapId);
-            s.End();
             return u;
         }
     }

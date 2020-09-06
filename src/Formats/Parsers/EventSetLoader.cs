@@ -14,7 +14,7 @@ namespace UAlbion.Formats.Parsers
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
             return EventSet.Serdes(
-                (EventSetId) config.Id,
+                config.Id,
                 null,
                 new AlbionReader(br, streamLength));
         }
@@ -22,7 +22,7 @@ namespace UAlbion.Formats.Parsers
         public EventSet Serdes(EventSet existing, ISerializer s, AssetKey key, AssetInfo config)
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
-            return EventSet.Serdes((EventSetId) config.Id, existing, s);
+            return EventSet.Serdes(config.Id, existing, s);
         }
     }
 }

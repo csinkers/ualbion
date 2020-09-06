@@ -11,7 +11,7 @@ namespace UAlbion.Game.State.Player
         {
             if (sheet == null) throw new ArgumentNullException(nameof(sheet));
             if (config == null) throw new ArgumentNullException(nameof(config));
-            var effective = new EffectiveCharacterSheet(sheet.Key)
+            var effective = new EffectiveCharacterSheet(sheet.Id)
             {
                 // Names
                 EnglishName = sheet.EnglishName,

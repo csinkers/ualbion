@@ -61,8 +61,8 @@ namespace UAlbion.Formats.Assets.Save
                 case SerializerMode.WritingJson:
                 {
                     using var tw = new StreamWriter(stream, Encoding.GetEncoding(850), 1024, true);
-                    var s = new JsonWriter(tw, true, (JsonWriter)parentSerializer);
-                    s.Seek(fakeOffset);
+                        var s = new JsonWriter(tw, (JsonWriter)parentSerializer);
+                        s.Seek(fakeOffset);
                     func(s);
                     int length = (int)s.Offset - fakeOffset;
                     fakeOffset = (int)s.Offset;
@@ -76,10 +76,9 @@ namespace UAlbion.Formats.Assets.Save
         public static void Serdes(XldCategory category, ushort xldNumber, ISerializer s, Action<int, int, ISerializer> func, IList<int> populatedIds)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            s.Begin($"Xld{category}.{xldNumber}");
             if (s.Mode == SerializerMode.Reading)
             {
-                var descriptor = s.Meta("XldDescriptor", (XldDescriptor)null, XldDescriptor.Serdes);
+                var descriptor = s.Object("XldDescriptor", (XldDescriptor)null, XldDescriptor.Serdes);
                 ApiUtil.Assert(descriptor.Category == category);
                 ApiUtil.Assert(xldNumber == descriptor.Number);
 
@@ -157,8 +156,7 @@ namespace UAlbion.Formats.Assets.Save
                         Number = xldNumber,
                         Size = (uint)(lengths.Sum() + lengths.Length * 4 + 8)
                     };
-                    s.Meta("Descriptor", descriptor, XldDescriptor.Serdes);
-
+                    s.Object("Descriptor", descriptor, XldDescriptor.Serdes);
                     s.Seek(endOffset);
                 }
                 finally
@@ -167,7 +165,6 @@ namespace UAlbion.Formats.Assets.Save
                         buffer.Dispose();
                 }
             }
-            s.End();
         }
     }
 }

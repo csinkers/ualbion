@@ -12,14 +12,12 @@ namespace UAlbion.Formats.Assets
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             w ??= new WaveLib();
-            s.Begin();
             w._headers ??= new WaveLibSample[512];
             s.List(nameof(w._headers), w._headers, 512, WaveLibSample.Serdes);
 
             foreach (var header in w._headers.Where(x => x.IsValid != -1))
                 header.Samples = s.ByteArray(nameof(header.Samples), header.Samples.ToArray(), (int)header.Length);
 
-            s.End();
             return w;
         }
 

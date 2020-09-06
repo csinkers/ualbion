@@ -16,17 +16,15 @@ namespace UAlbion.Formats.MapEvents
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new QueryItemEvent(subType);
-            s.Begin();
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);
             e.Immediate = s.UInt8(nameof(Immediate), e.Immediate);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-            e.ItemId = (ItemId)StoreIncremented.Serdes(nameof(ItemId), (ushort)e.ItemId, s.UInt16);
+            e.ItemId = (ItemId)StoreIncrementedConverter.Serdes(nameof(ItemId), (ushort)e.ItemId, s.UInt16);
 
             ApiUtil.Assert(e.Unk4 == 0);
             ApiUtil.Assert(e.Unk5 == 0);
 
-            s.End();
             return e;
         }
 

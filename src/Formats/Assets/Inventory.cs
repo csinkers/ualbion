@@ -51,11 +51,10 @@ namespace UAlbion.Formats.Assets
             if (s == null) throw new ArgumentNullException(nameof(s));
             var invId = new InventoryId(type, (ushort) n);
             void S(string name, ItemSlot existing, ItemSlotId slotId)
-                => s.Meta(name, existing,
+                => s.Object(name, existing,
                     (_, x, s2) => ItemSlot.Serdes(new InventorySlotId(invId, slotId), x, s2));
 
             inv ??= new Inventory(invId);
-            s.Begin();
             if (type == InventoryType.Player)
             {
                 S(nameof(inv.Neck), inv.Neck, ItemSlotId.Neck);
@@ -85,7 +84,6 @@ namespace UAlbion.Formats.Assets
                 inv.Rations.Amount = s.UInt16(nameof(inv.Rations), inv.Rations.Amount);
             }
 
-            s.End();
             return inv;
         }
 

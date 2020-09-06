@@ -25,7 +25,6 @@ namespace UAlbion.Formats.MapEvents
                     _ => new ActionEvent()
                 };
 
-            s.Begin();
             e.ActionType = actionType;
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.SmallArg = s.UInt8(nameof(SmallArg), e.SmallArg);
@@ -38,7 +37,6 @@ namespace UAlbion.Formats.MapEvents
             ApiUtil.Assert(e.Unk4 == 0);
             ApiUtil.Assert(e.Unk5 == 0);
             ApiUtil.Assert(e.Unk8 == 0);
-            s.End();
             return e;
         }
 

@@ -3,7 +3,6 @@ using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Assets.Maps
 {
@@ -21,24 +20,32 @@ namespace UAlbion.Formats.Assets.Maps
         public int[] Overlay { get; private set; }
 
         MapData2D(MapDataId id) : base(id) { }
-        public static MapData2D Serdes(MapData2D existing, ISerializer s, AssetInfo config)
+        public static MapData2D Serdes(int id, MapData2D existing, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            if (config == null) throw new ArgumentNullException(nameof(config));
 
             var startOffset = s.Offset;
-            var map = existing ?? new MapData2D((MapDataId)config.Id);
-            s.Begin();
+            var map = existing ?? new MapData2D((MapDataId)id);
             map.Flags = s.EnumU8(nameof(Flags), map.Flags); // 0
-            int npcCount = s.Transform("NpcCount", map.Npcs.Count, s.UInt8, NpcCountTransform.Instance); // 1
+            int npcCount = s.Transform("NpcCount", map.Npcs.Count, S.UInt8, NpcCountTransform.Instance); // 1
             var _ = s.UInt8("MapType", (byte)map.MapType); // 2
 
-            map.SongId = s.TransformEnumU8(nameof(SongId), map.SongId, Tweak<SongId>.Instance); // 3
+            map.SongId = s.TransformEnumU8(nameof(SongId), map.SongId, TweakedConverter<SongId>.Instance); // 3
             map.Width = s.UInt8(nameof(Width), map.Width); // 4
             map.Height = s.UInt8(nameof(Height), map.Height); // 5
-            map.TilesetId = (TilesetId)StoreIncremented.Serdes(nameof(TilesetId), (byte)map.TilesetId, s.UInt8);  //6
+
+            map.TilesetId = s.TransformEnumU8(
+                nameof(TilesetId),
+                map.TilesetId,
+                StoreIncrementedConverter<TilesetId>.Instance); //6
+
             map.CombatBackgroundId = s.EnumU8(nameof(CombatBackgroundId), map.CombatBackgroundId); // 7
-            map.PaletteId = (PaletteId)StoreIncremented.Serdes(nameof(PaletteId), (byte)map.PaletteId, s.UInt8);
+
+            map.PaletteId = s.TransformEnumU8(
+                nameof(PaletteId),
+                map.PaletteId,
+                StoreIncrementedConverter<PaletteId>.Instance);
+
             map.FrameRate = s.UInt8(nameof(FrameRate), map.FrameRate); //9
 
             for (int i = 0; i < npcCount; i++)
@@ -80,7 +87,6 @@ namespace UAlbion.Formats.Assets.Maps
             if (s.Mode == SerializerMode.Reading)
                 map.Unswizzle();
 
-            s.End();
             return map;
         }
     }

@@ -24,7 +24,6 @@ namespace UAlbion.Formats.MapEvents
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new PlayAnimationEvent();
-            s.Begin();
             e.VideoId = s.EnumU8(nameof(VideoId), e.VideoId);
             e.X = s.UInt8(nameof(X), e.X);
             e.Y = s.UInt8(nameof(Y), e.Y);
@@ -32,7 +31,6 @@ namespace UAlbion.Formats.MapEvents
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
-            s.End();
             return e;
         }
 

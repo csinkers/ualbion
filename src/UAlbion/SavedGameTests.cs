@@ -45,7 +45,7 @@ namespace UAlbion
                 ApiUtil.Assert(originalBytes.SequenceEqual(roundTripBytes));
 
                 var sw = new StringWriter();
-                loader.Serdes(save, new JsonWriter(sw, true), key, null);
+                loader.Serdes(save, new JsonWriter(sw), key, null);
                 File.WriteAllText(file + ".json", sw.ToString());
                 break;
             }

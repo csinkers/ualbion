@@ -18,7 +18,6 @@ namespace UAlbion.Formats.Parsers
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             items ??= new List<ItemData>();
-            s.Begin();
             if (s.Mode == SerializerMode.Reading)
             {
                 int i = 0;
@@ -35,7 +34,6 @@ namespace UAlbion.Formats.Parsers
                     ItemData.Serdes((int) item.Id, item, s);
             }
 
-            s.End();
             return items;
         }
     }

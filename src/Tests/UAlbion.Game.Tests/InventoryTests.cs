@@ -25,7 +25,8 @@ namespace UAlbion.Game.Tests
             _sword = new ItemData(ItemId.Sword) { TypeId = ItemType.CloseRangeWeapon };
             _torch = new ItemData(ItemId.Torch)
             {
-                TypeId = ItemType.Misc
+                TypeId = ItemType.Misc,
+                Flags = ItemFlags.Stackable
             };
 
             _tom = new Inventory(new InventoryId(PartyCharacterId.Tom));

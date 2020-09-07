@@ -14,6 +14,12 @@ namespace UAlbion.Formats.Assets
         public int GetOverlay(int index) => _overlay[index];
         public override string ToString() => $"BLK {Width}x{Height}";
 
+        public byte[] RawLayout
+        {
+            get => FormatUtil.ToPacked(Width, Height, _underlay, _overlay);
+            set => (_underlay, _overlay) = FormatUtil.FromPacked(Width, Height, value);
+        }
+
         public static IList<Block> Serdes(int _, IList<Block> blockList, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
@@ -39,11 +45,16 @@ namespace UAlbion.Formats.Assets
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             b ??= new Block();
-            byte width = s.UInt8(nameof(Width), b.Width);
-            byte height = s.UInt8(nameof(Height), b.Height);
-            b._underlay ??= new int[width * height];
-            b._overlay ??= new int[width * height];
+            b.Width = s.UInt8(nameof(Width), b.Width);
+            b.Height = s.UInt8(nameof(Height), b.Height);
+            b._underlay ??= new int[b.Width * b.Height];
+            b._overlay ??= new int[b.Width * b.Height];
 
+            if (s.Mode == SerializerMode.Reading)
+                b.RawLayout = s.ByteArray("Layout", null, 3 * b.Width * b.Height);
+            else
+                s.ByteArray("Layout", b.RawLayout, 3 * b.Width * b.Height);
+            /*
             for (int i = 0; i < b._underlay.Length; i++)
             {
                 var underlay = b._underlay[i];
@@ -59,9 +70,9 @@ namespace UAlbion.Formats.Assets
 
                 b._underlay[i] = ((b2 & 0x0F) << 8) + b3;
                 b._overlay[i] = (b1 << 4) + (b2 >> 4);
-            }
+            } */
 
             return b;
         }
     }
-}
+} 

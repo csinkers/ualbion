@@ -1,5 +1,9 @@
-﻿namespace UAlbion.Formats.Assets
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace UAlbion.Formats.Assets
 {
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ItemType : byte
     {
         Armor              = 1,

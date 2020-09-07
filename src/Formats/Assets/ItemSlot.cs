@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
@@ -29,13 +30,14 @@ namespace UAlbion.Formats.Assets
 
         IContents _item;
         public ItemSlot(InventorySlotId id) => Id = id;
-        public InventorySlotId Id { get; }
+        [JsonIgnore] public InventorySlotId Id { get; }
         public byte Charges { get; set; }
         public byte Enchantment { get; set; }
         public Vector2 LastUiPosition { get; set; }
         public ItemSlotFlags Flags { get; set; }
         public ushort Amount { get; set; }
 
+        [JsonIgnore]
         public IContents Item
         {
             get => Amount == 0 ? null : _item;

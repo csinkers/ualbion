@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using SerdesNet;
 using UAlbion.Formats.MapEvents;
 
@@ -9,6 +11,7 @@ namespace UAlbion.Formats.Assets.Maps
         public const int SizeOnDisk = 10;
 
         [Flags]
+        [JsonConverter(typeof(StringEnumConverter))]
         public enum NpcFlags : byte
         {
             NonPartySeeking = 1,
@@ -22,6 +25,7 @@ namespace UAlbion.Formats.Assets.Maps
         }
 
         [Flags]
+        [JsonConverter(typeof(StringEnumConverter))]
         public enum MovementTypes : byte
         {
             RandomMask = 3,

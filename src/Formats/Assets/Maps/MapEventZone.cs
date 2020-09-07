@@ -1,9 +1,11 @@
 ﻿using System;
+using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Maps
 {
+    [JsonConverter(typeof(ToStringJsonConverter))]
     public class MapEventZone
     {
         public bool Global { get; set; }
@@ -43,6 +45,6 @@ namespace UAlbion.Formats.Assets.Maps
                 (Chain, Node) = getEvent(dummy.Id);
         }
 
-        public override string ToString() => $"Zone ({X}, {Y}) T:{Trigger} Mode:{Unk1} C:{Chain?.Id} E:{Node?.Id}";
+        public override string ToString() => $"Z({X}, {Y}) T:{Trigger} Mode:{Unk1} C:{Chain?.Id} E:{Node?.Id}";
     }
 }

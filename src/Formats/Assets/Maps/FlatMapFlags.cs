@@ -1,8 +1,11 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace UAlbion.Formats.Assets.Maps
 {
     [Flags]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum FlatMapFlags : byte
     {
         Unk0 = 1,

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Maps
@@ -21,13 +21,13 @@ namespace UAlbion.Formats.Assets.Maps
         public IDictionary<int, MapNpc> Npcs { get; } = new Dictionary<int, MapNpc>();
 
         public IList<MapEventZone> Zones { get; } = new List<MapEventZone>();
-        public IDictionary<int, MapEventZone> ZoneLookup { get; } = new Dictionary<int, MapEventZone>();
-        public IDictionary<TriggerTypes, MapEventZone[]> ZoneTypeLookup { get; } = new Dictionary<TriggerTypes, MapEventZone[]>();
+        [JsonIgnore] public IDictionary<int, MapEventZone> ZoneLookup { get; } = new Dictionary<int, MapEventZone>();
+        [JsonIgnore] public IDictionary<TriggerTypes, MapEventZone[]> ZoneTypeLookup { get; } = new Dictionary<TriggerTypes, MapEventZone[]>();
         public IList<EventNode> Events { get; } = new List<EventNode>();
         public IList<EventChain> Chains { get; } = new List<EventChain>();
-        public (EventChain, IEventNode)[] ChainsByEventId { get; private set; }
+        [JsonIgnore] public (EventChain, IEventNode)[] ChainsByEventId { get; private set; }
 #if DEBUG
-        public IList<object>[] EventReferences { get; private set; }
+        [JsonIgnore] public IList<object>[] EventReferences { get; private set; }
 #endif
 
         protected BaseMapData(MapDataId id) { Id = id; }

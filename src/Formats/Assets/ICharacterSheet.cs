@@ -9,12 +9,12 @@ namespace UAlbion.Formats.Assets
 
         CharacterType Type { get; }
         Gender Gender { get; }
-        PlayerRaces Races { get; }
+        PlayerRace Race { get; }
         PlayerClass PlayerClass { get; }
         ushort Age { get; }
         byte Level { get; }
 
-        AssetId SpriteId { get; }
+        AssetId? SpriteId { get; }
         SmallPortraitId? PortraitId { get; }
         EventSetId? EventSetId { get; }
         EventSetId? WordSetId { get; }

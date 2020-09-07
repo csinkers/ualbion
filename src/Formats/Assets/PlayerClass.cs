@@ -1,7 +1,10 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace UAlbion.Formats.Assets
 {
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum PlayerClass : byte
     {
         Pilot = 0,
@@ -17,6 +20,7 @@ namespace UAlbion.Formats.Assets
     }
 
     [Flags]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum PlayerClasses : ushort
     {
         Pilot = 0x1,
@@ -29,10 +33,10 @@ namespace UAlbion.Formats.Assets
         OquloKamulos = 0x100,
         Warrior = 0x200, // 100%
 
-        IskaiMask = 0xc,
-        MagicianMask = 0x138,
-        HumanMask = 0xfff3,
-        EveryoneMask = 0xffff,
+        Iskai = 0xc,
+        Magicians = 0x138,
+        Humans = 0xfff3,
+        Anyone = 0xffff,
     }
 
     public static class PlayerClassExtensions

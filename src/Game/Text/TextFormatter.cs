@@ -158,15 +158,18 @@ namespace UAlbion.Game.Text
                             break; // throw new FormatException($"Expected the active item to be a character, was actually {active ?? "null"}");
                         }
 
-                        switch (character.Races)
+                        switch (character.Race)
                         {
-                            case PlayerRaces.Terran: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Terran, language)); break;
-                            case PlayerRaces.Iskai: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Iskai, language)); break;
-                            case PlayerRaces.Celt: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Celt, language)); break;
-                            case PlayerRaces.KengetKamulos: yield return (Token.Text, assets.LoadString(SystemTextId.Race_KengetKamulos, language)); break;
-                            case PlayerRaces.DjiCantos: yield return (Token.Text, assets.LoadString(SystemTextId.Race_DjiCantos, language)); break;
-                            case PlayerRaces.Mahino: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Mahino, language)); break;
-                            default: throw new InvalidEnumArgumentException(nameof(character.Races), (int)character.Races, typeof(PlayerRaces));
+                            case PlayerRace.Terran: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Terran, language)); break;
+                            case PlayerRace.Iskai: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Iskai, language)); break;
+                            case PlayerRace.Celt: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Celt, language)); break;
+                            case PlayerRace.KengetKamulos: yield return (Token.Text, assets.LoadString(SystemTextId.Race_KengetKamulos, language)); break;
+                            case PlayerRace.DjiCantos: yield return (Token.Text, assets.LoadString(SystemTextId.Race_DjiCantos, language)); break;
+                            case PlayerRace.Mahino: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Mahino, language)); break;
+                            case PlayerRace.Decadent: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Decadent, language)); break;
+                            case PlayerRace.Umajo: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Umajo, language)); break;
+                            case PlayerRace.Monster: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Monster, language)); break;
+                            default: throw new InvalidEnumArgumentException(nameof(character.Race), (int)character.Race, typeof(PlayerRace));
                         }
                         break;
                     }

@@ -243,7 +243,7 @@ namespace UAlbion
                 return;
 
             sw.WriteLine($"{Convert.ToInt32(id, CultureInfo.InvariantCulture):D3} {id} ({c.EnglishName}, {c.GermanName}, {c.FrenchName})");
-            sw.WriteLine($"    Type:{c.Type} Gender:{c.Gender} Races:{c.Races} Class:{c.PlayerClass} Age:{c.Age} Level:{c.Level}");
+            sw.WriteLine($"    Type:{c.Type} Gender:{c.Gender} Races:{c.Race} Class:{c.PlayerClass} Age:{c.Age} Level:{c.Level}");
             sw.WriteLine($"    Languages:{c.Languages} Sprite:{c.SpriteId} Portrait:{(int?)c.PortraitId}");
             if (c.Inventory?.Slots != null)
             {
@@ -334,10 +334,10 @@ namespace UAlbion
             if (c.Unknown88 != 0) sw.WriteLine($"    Unknown88:{c.Unknown88}");
             if (c.Unknown8E != 0) sw.WriteLine($"    Unknown8E:{c.Unknown8E}");
             if (c.Unknown90 != 0) sw.WriteLine($"    Unknown90:{c.Unknown90}");
-            if (c.UnknownBlock96.Any(x => x != 0))
+            if (c.UnusedBlock.Any(x => x != 0))
             {
-                for (int i = 0; i < c.UnknownBlock96.Count; i++)
-                    sw.WriteLine($" Unknown96.{i}:{c.UnknownBlock96[i]}");
+                for (int i = 0; i < c.UnusedBlock.Length; i++)
+                    sw.WriteLine($" UnusedBlock.{i}:{c.UnusedBlock[i]}");
             }
 
             if (c.UnknownCE != 0) sw.WriteLine($"    UnknownCE:{c.UnknownCE}");
@@ -529,7 +529,7 @@ namespace UAlbion
                 sw.Write($"{spell.Cost} ".PadLeft(4));
                 sw.Write($"Lvl:{spell.LevelRequirement} ");
                 sw.Write($"Env:{spell.Environments} ");
-                sw.Write($"Target:{spell.Targetses} ");
+                sw.Write($"Target:{spell.Targets} ");
                 sw.WriteLine();
             }
         }

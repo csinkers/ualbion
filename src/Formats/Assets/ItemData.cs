@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
@@ -43,23 +44,8 @@ namespace UAlbion.Formats.Assets
         public ushort Value { get; set; }   // 32 Base resell value * 10.
         public ItemSpriteId Icon { get; set; }   // 34 Image for the item
         public PlayerClasses Class { get; set; }   // 36 A bitfield that controls which classes can use the item.
-        public ushort Race { get; set; }   // 38 Likely meant to control which race can use the item – but does not seem to work ?
-
-        public bool IsStackable => 
-            TypeId == ItemType.Ammo
-            //|| TypeId == ItemType.Document // ?
-            //|| TypeId == ItemType.SpellScroll // ?
-            || TypeId == ItemType.Drink
-            //|| TypeId == ItemType.Amulet
-            //|| TypeId == ItemType.MagicRing
-            || TypeId == ItemType.Valuable // ?
-            || TypeId == ItemType.Tool // ?
-            // || TypeId == ItemType.Key // ?
-            || TypeId == ItemType.Misc
-            //|| TypeId == ItemType.MagicItem
-            //|| TypeId == ItemType.HeadsUpDisplayItem
-            || TypeId == ItemType.Lockpick
-            || TypeId == ItemType.LightSource;
+        [JsonIgnore] public ushort Race { get; set; }   // 38 Likely meant to control which race can use the item – but does not seem to work ?
+        [JsonIgnore] public bool IsStackable => (Flags & ItemFlags.Stackable) != 0;
 
         public override string ToString()
         {

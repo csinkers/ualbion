@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
@@ -42,7 +41,7 @@ namespace UAlbion.Formats.Assets
 
         public override string ToString() =>
             Type switch {
-            CharacterType.Party => $"{Id} {Races} {PlayerClass} {Age} EN:{EnglishName} DE:{GermanName} {Magic.SpellStrengths.Count} spells",
+            CharacterType.Party => $"{Id} {Race} {PlayerClass} {Age} EN:{EnglishName} DE:{GermanName} {Magic.SpellStrengths.Count} spells",
             CharacterType.Npc => $"{Id} {PortraitId} S:{SpriteId} E{EventSetId} W{WordSetId}",
             CharacterType.Monster => $"{Id} {PlayerClass} {Gender} AP{Combat.ActionPoints} Lvl{Level} LP{Combat.LifePoints}/{Combat.LifePointsMax} {Magic.SpellStrengths.Count} spells",
             _ => $"{Id} UNKNOWN TYPE {Type}" };
@@ -56,14 +55,14 @@ namespace UAlbion.Formats.Assets
         // Basic stats
         public CharacterType Type { get; set; }
         public Gender Gender { get; set; }
-        public PlayerRaces Races { get; set; }
+        public PlayerRace Race { get; set; }
         public PlayerClass PlayerClass { get; set; }
         public ushort Age { get; set; }
         public byte Level { get; set; }
 
         // Display and behaviour
         public PlayerLanguages Languages { get; set; }
-        public AssetId SpriteId { get; set; }
+        public AssetId? SpriteId { get; set; }
         public SmallPortraitId? PortraitId { get; set; }
         public EventSetId? EventSetId { get; set; }
         public EventSetId? WordSetId { get; set; }
@@ -115,7 +114,7 @@ namespace UAlbion.Formats.Assets
         public ushort Unknown88 { get; set; }
         public ushort Unknown8E { get; set; }
         public ushort Unknown90 { get; set; }
-        public IList<uint> UnknownBlock96 { get; set; } = new uint[13];
+        public byte[] UnusedBlock { get; set; } // Only non-zero for the NPC "Konny"
         // ReSharper disable InconsistentNaming
         public ushort UnknownCE { get; set; }
         public ushort UnknownD6 { get; set; }
@@ -139,7 +138,7 @@ namespace UAlbion.Formats.Assets
             s.Check();
             sheet.Type = s.EnumU8(nameof(sheet.Type), sheet.Type);
             sheet.Gender = s.EnumU8(nameof(sheet.Gender), sheet.Gender);
-            sheet.Races = s.EnumU8(nameof(sheet.Races), sheet.Races);
+            sheet.Race = s.EnumU8(nameof(sheet.Race), sheet.Race);
             sheet.PlayerClass = s.EnumU8(nameof(sheet.PlayerClass), sheet.PlayerClass);
             sheet.Magic.SpellClasses = s.EnumU8(nameof(sheet.Magic.SpellClasses), sheet.Magic.SpellClasses);
             sheet.Level = s.UInt8(nameof(sheet.Level), sheet.Level);
@@ -157,8 +156,13 @@ namespace UAlbion.Formats.Assets
                     _ => throw new InvalidOperationException($"Unhandled character type {sheet.Type}")
                 };
 
-            byte spriteId = s.UInt8(nameof(sheet.SpriteId), (byte)sheet.SpriteId.Id);
-            sheet.SpriteId = new AssetId(spriteType, spriteId);
+            byte? spriteId = s.Transform<byte,byte?>(
+                nameof(sheet.SpriteId),
+                (byte?)sheet.SpriteId?.Id,
+                S.UInt8,
+                ZeroToNullConverter.Instance);
+
+            sheet.SpriteId = spriteId == null ? (AssetId?)null : new AssetId(spriteType, spriteId.Value);
             sheet.PortraitId = s.TransformEnumU8(nameof(sheet.PortraitId), sheet.PortraitId, TweakedConverter<SmallPortraitId>.Instance); 
             sheet.Unknown11 = s.UInt8(nameof(sheet.Unknown11 ), sheet.Unknown11);
             sheet.Unknown12 = s.UInt8(nameof(sheet.Unknown12), sheet.Unknown12);
@@ -244,11 +248,7 @@ namespace UAlbion.Formats.Assets
             sheet.Unknown90 = s.UInt16(nameof(sheet.Unknown90), sheet.Unknown90);
             sheet.Skills.LockPicking = s.UInt16(nameof(sheet.Skills.LockPicking), sheet.Skills.LockPicking);
             sheet.Skills.LockPickingMax = s.UInt16(nameof(sheet.Skills.LockPickingMax), sheet.Skills.LockPickingMax);
-            sheet.UnknownBlock96 = s.List(
-                nameof(sheet.UnknownBlock96),
-                sheet.UnknownBlock96,
-                sheet.UnknownBlock96.Count,
-                (_, x, s2) => s2.UInt32(null, x));
+            sheet.UnusedBlock = s.ByteArray(nameof(sheet.UnusedBlock), sheet.UnusedBlock, 52);
             sheet.Combat.LifePoints = s.UInt16(nameof(sheet.Combat.LifePoints), sheet.Combat.LifePoints);
             sheet.Combat.LifePointsMax = s.UInt16(nameof(sheet.Combat.LifePointsMax), sheet.Combat.LifePointsMax);
             sheet.UnknownCE = s.UInt16(nameof(sheet.UnknownCE), sheet.UnknownCE);
@@ -344,6 +344,5 @@ namespace UAlbion.Formats.Assets
             ApiUtil.Assert(s.Offset - initialOffset == 940, "Expected player character sheet to be 940 bytes");
             return sheet;
         }
-
     }
 }

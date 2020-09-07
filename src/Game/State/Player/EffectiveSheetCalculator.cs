@@ -21,7 +21,7 @@ namespace UAlbion.Game.State.Player
                 // Basic stats
                 Type = sheet.Type,
                 Gender = sheet.Gender,
-                Races = sheet.Races,
+                Race = sheet.Race,
                 PlayerClass = sheet.PlayerClass,
                 Age = sheet.Age,
                 Level = sheet.Level,

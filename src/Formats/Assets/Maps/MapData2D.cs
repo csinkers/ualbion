@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
@@ -16,8 +17,14 @@ namespace UAlbion.Formats.Assets.Maps
         public TilesetId TilesetId { get; private set; }
         public byte FrameRate { get; private set; }
 
-        public int[] Underlay { get; private set; }
-        public int[] Overlay { get; private set; }
+        [JsonIgnore] public int[] Underlay { get; private set; }
+        [JsonIgnore] public int[] Overlay { get; private set; }
+
+        public byte[] RawLayout
+        {
+            get => FormatUtil.ToPacked(Width, Height, Underlay, Overlay);
+            set => (Underlay, Overlay) = FormatUtil.FromPacked(Width, Height, value);
+        }
 
         MapData2D(MapDataId id) : base(id) { }
         public static MapData2D Serdes(int id, MapData2D existing, ISerializer s)
@@ -57,24 +64,11 @@ namespace UAlbion.Formats.Assets.Maps
             }
             s.Check();
 
-            map.Underlay ??= new int[map.Width * map.Height];
-            map.Overlay ??= new int[map.Width * map.Height];
-            for (int i = 0; i < map.Width * map.Height; i++)
-            {
-                ushort underlay = (ushort)(map.Underlay[i] + 1);
-                ushort overlay = (ushort)(map.Overlay[i] + 1);
+            if (s.Mode == SerializerMode.Reading)
+                map.RawLayout = s.ByteArray("Layout", null, 3 * map.Width * map.Height);
+            else
+                s.ByteArray("Layout", map.RawLayout, 3 * map.Width * map.Height);
 
-                byte b1 = (byte)(overlay >> 4);
-                byte b2 = (byte)(((overlay & 0xf) << 4) | ((underlay & 0xf00) >> 8));
-                byte b3 = (byte)(underlay & 0xff);
-
-                b1 = s.UInt8(null, b1);
-                b2 = s.UInt8(null, b2);
-                b3 = s.UInt8(null, b3);
-
-                map.Overlay[i] = (b1 << 4) + (b2 >> 4);
-                map.Underlay[i] = ((b2 & 0x0F) << 8) + b3;
-            }
             s.Check();
             ApiUtil.Assert(s.Offset == startOffset + 10 + npcCount * MapNpc.SizeOnDisk + 3 * map.Width * map.Height);
 

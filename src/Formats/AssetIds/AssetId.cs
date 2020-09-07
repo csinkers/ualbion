@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Globalization;
+using Newtonsoft.Json;
 
 namespace UAlbion.Formats.AssetIds
 {
+    [JsonConverter(typeof(ToStringJsonConverter))]
     public struct AssetId : IConvertible, IEquatable<AssetId>
     {
         public AssetId(AssetType type, ushort id)
@@ -14,7 +16,7 @@ namespace UAlbion.Formats.AssetIds
         public AssetType Type { get; }
         public ushort Id { get; }
 
-        public override string ToString() => Type + ":" + (Type switch
+        public override string ToString() => Type.ToShortName() + ":" + (Type switch
         {
             AssetType.Automap            => ((AutoMapId)Id).ToString(),
             AssetType.AutomapGraphics    => ((AutoMapId)Id).ToString(),
@@ -65,6 +67,19 @@ namespace UAlbion.Formats.AssetIds
             AssetType.UAlbionText        => ((UAlbionStringId)Id).ToString(),
             _ => Id.ToString(CultureInfo.InvariantCulture)
         });
+
+        // public string Serialise() => Type.ToShortName() + ":" + Id;
+
+        public static AssetId Parse(string s)
+        {
+            if (s == null || !s.Contains(":"))
+                throw new FormatException($"Tried to parse an InventoryId without a : (\"{s}\")");
+            var parts = s.Split(':');
+            //var type = (AssetType)Enum.Parse(typeof(AssetType), parts[0]);
+            var type = AssetTypeExtensions.FromShort(parts[0]);
+            var id = ushort.Parse(parts[1], CultureInfo.InvariantCulture);
+            return new AssetId(type, id);
+        }
 
         public static explicit operator int(AssetId id) => (int)id.Type << 16 | id.Id;
         public static explicit operator AssetId(int id)

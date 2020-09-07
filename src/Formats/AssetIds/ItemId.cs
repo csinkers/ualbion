@@ -1,7 +1,12 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace UAlbion.Formats.AssetIds
 {
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ItemId : ushort
     {
         Knife = 0,

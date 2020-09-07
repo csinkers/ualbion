@@ -13,7 +13,7 @@ namespace UAlbion.Formats.Assets
         public SpellEnvironments Environments { get; set; }
         public byte Cost { get; set; }
         public byte LevelRequirement { get; set; }
-        public SpellTargets Targetses { get; set; }
+        public SpellTargets Targets { get; set; }
         byte Unused { get; set; } // Always 0 expect for unused spells in school 6
 
         public static SpellData Serdes(int i, SpellData d, ISerializer s)
@@ -23,7 +23,7 @@ namespace UAlbion.Formats.Assets
             d.Environments = s.EnumU8(nameof(Environments), d.Environments);
             d.Cost = s.UInt8(nameof(Cost), d.Cost);
             d.LevelRequirement = s.UInt8(nameof(LevelRequirement), d.LevelRequirement);
-            d.Targetses = s.EnumU8(nameof(Targetses), d.Targetses);
+            d.Targets = s.EnumU8(nameof(Targets), d.Targets);
             d.Unused = s.UInt8(nameof(Unused), d.Unused);
             return d;
         }

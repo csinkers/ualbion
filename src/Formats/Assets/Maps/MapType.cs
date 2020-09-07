@@ -1,5 +1,9 @@
-﻿namespace UAlbion.Formats.Assets.Maps
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace UAlbion.Formats.Assets.Maps
 {
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum MapType : byte
     {
         Unknown = 0,

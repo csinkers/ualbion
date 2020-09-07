@@ -2,19 +2,143 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using SerdesNet;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Game;
+using Newtonsoft.Json;
 
 namespace UAlbion
 {
     static class DumpJson
     {
         static IEnumerable<T> All<T>() where T : struct, Enum => Enum.GetValues(typeof(T)).OfType<T>();
+        static IDictionary<TKey, TValue> AllAssets<TKey, TValue>(Func<TKey, TValue> fetcher) where TKey : struct, Enum
+            => All<TKey>()
+               .Select(x => (x, fetcher(x)))
+               .Where(x => x.Item2 != null)
+               .ToDictionary(x => x.x, x => x.Item2);
 
+        public static void DumpAll(string baseDir, IAssetManager assets)
+        {
+            var disposeList = new List<IDisposable>();
+
+            TextWriter Writer(string name)
+            {
+                var directory = Path.Combine(baseDir, "data", "exported");
+                if (!Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+
+                var stream = File.Open(Path.Combine(directory, name), FileMode.Create);
+                var writer = new StreamWriter(stream);
+                disposeList.Add(writer);
+                disposeList.Add(stream);
+                return writer;
+            }
+
+            void Flush()
+            {
+                foreach (var d in disposeList)
+                    d.Dispose();
+                disposeList.Clear();
+            }
+
+            var settings = new JsonSerializerSettings
+            {
+                // ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                // PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                Formatting = Formatting.Indented,
+                DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate,
+            };
+
+            var s = JsonSerializer.Create(settings);
+            TextWriter tw;
+
+            foreach (var id in All<TilesetId>())
+            {
+                TilesetData asset = assets.LoadTileData(id);
+                if (asset == null) continue;
+                tw = Writer($"tileset{(int)id}.json");
+                s.Serialize(tw, asset);
+            }
+            Flush();
+
+            foreach (var id in All<LabyrinthDataId>())
+            {
+                LabyrinthData asset = assets.LoadLabyrinthData(id);
+                if (asset == null) continue;
+                tw = Writer($"labyrinth{(int)id}.json");
+                s.Serialize(tw, asset);
+            }
+            Flush();
+
+            // string str = assets.LoadString(StringId id, GameLanguage language);
+
+            foreach (var id in All<MapDataId>())
+            {
+                IMapData asset = assets.LoadMap(id);
+                if (asset == null) continue;
+                tw = Writer($"map{(int)id}_{id}.json");
+                s.Serialize(tw, asset);
+            }
+            Flush();
+
+            tw = Writer("items.json");
+            s.Serialize(tw, AllAssets<ItemId, ItemData>(assets.LoadItem));
+            Flush();
+
+            tw = Writer("partymembers.json");
+            s.Serialize(tw, AllAssets<PartyCharacterId, CharacterSheet>(assets.LoadPartyMember));
+            Flush();
+
+            tw = Writer("npcs.json");
+            s.Serialize(tw, AllAssets<NpcCharacterId, CharacterSheet>(assets.LoadNpc));
+            Flush();
+
+            tw = Writer("monsters.json");
+            s.Serialize(tw, AllAssets<MonsterCharacterId, CharacterSheet>(assets.LoadMonster));
+            Flush();
+
+            tw = Writer("chests.json");
+            s.Serialize(tw, AllAssets<ChestId, Inventory>(assets.LoadChest));
+            Flush();
+
+            tw = Writer("merchants.json");
+            s.Serialize(tw, AllAssets<MerchantId, Inventory>(assets.LoadMerchant));
+            Flush();
+
+            foreach (var id in All<BlockListId>())
+            {
+                IList<Block> asset = assets.LoadBlockList(id);
+                if (asset == null) continue;
+                tw = Writer($"blocklist{(int)id}.json");
+                s.Serialize(tw, asset);
+            }
+            Flush();
+
+            tw = Writer("eventsets.json");
+            s.Serialize(tw, AllAssets<EventSetId, EventSet>(assets.LoadEventSet));
+            Flush();
+
+            /*
+                        foreach (var id in All<ScriptId>())
+                        {
+                            s = Writer($"script{(int)id}.json");
+                            IList<IEvent> asset = assets.LoadScript(id);
+                        }
+            */
+
+            tw = Writer("spells.json");
+            s.Serialize(tw, AllAssets<SpellId, SpellData>(assets.LoadSpell));
+            Flush();
+
+            tw = Writer("monstergroups.json");
+            s.Serialize(tw, AllAssets<MonsterGroupId, MonsterGroup>(assets.LoadMonsterGroup));
+            Flush();
+        }
+
+#if false
         public static void DumpAll(string baseDir, IAssetManager assets)
         {
             ISerializer s;
@@ -146,5 +270,6 @@ namespace UAlbion
             foreach (var d in disposeList)
                 d.Dispose();
         }
+#endif
     }
 }

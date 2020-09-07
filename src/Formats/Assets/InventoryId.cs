@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Globalization;
+using Newtonsoft.Json;
 using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets
 {
+    [JsonConverter(typeof(ToStringJsonConverter))]
     public struct InventoryId : IConvertible, IEquatable<InventoryId>
     {
         public InventoryId(PartyCharacterId id) : this(InventoryType.Player, (ushort)id) { }
@@ -20,12 +22,37 @@ namespace UAlbion.Formats.Assets
 
         public override string ToString() => Type switch
         {
-            InventoryType.Player => ((PartyCharacterId)Id).ToString(),
-            InventoryType.Chest => ((ChestId)Id).ToString(),
-            InventoryType.Merchant => ((MerchantId)Id).ToString(),
+            InventoryType.Player => "P:" + (PartyCharacterId)Id,
+            InventoryType.Chest => "C:" + (ChestId)Id,
+            InventoryType.Merchant => "M:" + (MerchantId)Id,
             InventoryType.CombatLoot => "CombatLoot",
-            _ => Id.ToString(CultureInfo.InvariantCulture)
+            _ => Type + ":" + Id.ToString(CultureInfo.InvariantCulture)
         };
+
+        public string Serialise() => Type switch
+        {
+            InventoryType.Player => "P:" + Id,
+            InventoryType.Chest => "C:" + Id,
+            InventoryType.Merchant => "M:" + Id,
+            InventoryType.CombatLoot => "CombatLoot",
+            _ => Type + ":" + Id.ToString(CultureInfo.InvariantCulture)
+        };
+
+        public static InventoryId Parse(string s)
+        {
+            if (s == null || !s.Contains(":"))
+                throw new FormatException($"Tried to parse an InventoryId without a : (\"{s}\")");
+            var parts = s.Split(':');
+            var id = ushort.Parse(parts[1], CultureInfo.InvariantCulture);
+            switch (parts[0])
+            {
+                case "P": return new InventoryId((PartyCharacterId)id);
+                case "C": return new InventoryId((ChestId)id);
+                case "M": return new InventoryId((MerchantId)id);
+                case "CombatLoot": return new InventoryId(InventoryType.CombatLoot, id);
+                default: return new InventoryId((InventoryType)Enum.Parse(typeof(InventoryType), parts[0]), id);
+            }
+        }
 
         public static explicit operator int(InventoryId id) => ToInt(id);
         public static int ToInt(InventoryId id) => (int)id.Type << 16 | id.Id;

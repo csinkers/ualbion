@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Numerics;
+using Newtonsoft.Json;
 using SerdesNet;
 
 namespace UAlbion.Formats.Assets
@@ -27,20 +28,20 @@ namespace UAlbion.Formats.Assets
             _readOnlyList = new ReadOnlyCollection<IReadOnlyItemSlot>(Slots);
         }
 
-        public InventoryId Id { get; }
+        [JsonIgnore] public InventoryId Id { get; }
         public ItemSlot[] Slots { get; }
-        public IEnumerable<ItemSlot> BackpackSlots { get { for (int i = 0; i < (int)ItemSlotId.NormalSlotCount; i++) yield return Slots[i]; } }
-        public ItemSlot Gold => Slots[(int)ItemSlotId.Gold];
-        public ItemSlot Rations => Slots[(int)ItemSlotId.Rations];
-        public ItemSlot Neck => Slots[(int)ItemSlotId.Neck];
-        public ItemSlot Head => Slots[(int)ItemSlotId.Head];
-        public ItemSlot Tail => Slots[(int)ItemSlotId.Tail];
-        public ItemSlot LeftHand => Slots[(int)ItemSlotId.LeftHand];
-        public ItemSlot Chest => Slots[(int)ItemSlotId.Chest];
-        public ItemSlot RightHand => Slots[(int)ItemSlotId.RightHand];
-        public ItemSlot LeftFinger => Slots[(int)ItemSlotId.LeftFinger];
-        public ItemSlot Feet => Slots[(int)ItemSlotId.Feet];
-        public ItemSlot RightFinger => Slots[(int)ItemSlotId.RightFinger];
+        [JsonIgnore] public IEnumerable<ItemSlot> BackpackSlots { get { for (int i = 0; i < (int)ItemSlotId.NormalSlotCount; i++) yield return Slots[i]; } }
+        [JsonIgnore] public ItemSlot Gold => Slots[(int)ItemSlotId.Gold];
+        [JsonIgnore] public ItemSlot Rations => Slots[(int)ItemSlotId.Rations];
+        [JsonIgnore] public ItemSlot Neck => Slots[(int)ItemSlotId.Neck];
+        [JsonIgnore] public ItemSlot Head => Slots[(int)ItemSlotId.Head];
+        [JsonIgnore] public ItemSlot Tail => Slots[(int)ItemSlotId.Tail];
+        [JsonIgnore] public ItemSlot LeftHand => Slots[(int)ItemSlotId.LeftHand];
+        [JsonIgnore] public ItemSlot Chest => Slots[(int)ItemSlotId.Chest];
+        [JsonIgnore] public ItemSlot RightHand => Slots[(int)ItemSlotId.RightHand];
+        [JsonIgnore] public ItemSlot LeftFinger => Slots[(int)ItemSlotId.LeftFinger];
+        [JsonIgnore] public ItemSlot Feet => Slots[(int)ItemSlotId.Feet];
+        [JsonIgnore] public ItemSlot RightFinger => Slots[(int)ItemSlotId.RightFinger];
         public static Inventory SerdesChest(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, InventoryType.Chest);
         public static Inventory SerdesMerchant(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, InventoryType.Merchant);
         public static Inventory SerdesCharacter(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, InventoryType.Player);
@@ -108,7 +109,7 @@ namespace UAlbion.Formats.Assets
             return Slots[slotNumber];
         }
 
-        public bool IsEmpty => !EnumerateAll().Any(x => x.Item != null && x.Amount > 0);
+        [JsonIgnore] public bool IsEmpty => !EnumerateAll().Any(x => x.Item != null && x.Amount > 0);
 
         public void SetSlotUiPosition(ItemSlotId itemSlotId, Vector2 position)
         {

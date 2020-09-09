@@ -9,7 +9,8 @@ namespace UAlbion.Core
     public class Scene : Container, IScene
     {
         readonly IDictionary<Type, IList<IRenderable>> _renderables = new Dictionary<Type, IList<IRenderable>>();
-        readonly IDictionary<(DrawLayer, int), IList<IRenderable>> _processedRenderables = new Dictionary<(DrawLayer, int), IList<IRenderable>>();
+        readonly IDictionary<(DrawLayer, int), List<IRenderable>> _processedRenderables = new Dictionary<(DrawLayer, int), List<IRenderable>>();
+        readonly Dictionary<Type, IRenderer> _rendererLookup = new Dictionary<Type, IRenderer>();
         (float Red, float Green, float Blue) _clearColour;
 
         public ICamera Camera { get; }
@@ -24,17 +25,16 @@ namespace UAlbion.Core
 
         public override string ToString() => $"Scene:{Name}";
 
-        public void RenderAllStages(IRendererContext context, IList<IRenderer> renderers)
+        public void UpdatePerFrameResources(IRendererContext context, IList<IRenderer> renderers)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             context.SetCurrentScene(this);
-            context.SetClearColor(_clearColour.Red, _clearColour.Green, _clearColour.Blue);
 
             // Collect all renderables from components
             foreach (var renderer in _renderables.Values)
                 renderer.Clear();
 
-            using (PerfTracker.FrameEvent("6.1.1 Collect renderables"))
+            using (PerfTracker.FrameEvent("6.2.1 Collect renderables"))
             {
                 Raise(new RenderEvent(x =>
                 {
@@ -53,18 +53,16 @@ namespace UAlbion.Core
 
             CoreTrace.Log.Info("Scene", "Created palette device texture");
 
-            var rendererLookup = new Dictionary<Type, IRenderer>();
-
-            using (PerfTracker.FrameEvent("6.1.2 Prepare per-frame resources"))
+            using (PerfTracker.FrameEvent("6.2.2 Prepare per-frame resources"))
             using (context.Factory.CreateRenderDebugGroup(context, "Prepare per-frame resources"))
             {
                 _processedRenderables.Clear();
                 foreach (var renderableGroup in _renderables)
                 {
-                    var renderer = renderers.FirstOrDefault(x => x.CanRender(renderableGroup.Key));
+                    var renderer = renderers.FirstOrDefault(x => x.CanRender(renderableGroup.Key)); // TODO: Use a better pattern and remove closure alloc
                     if (renderer == null) continue;
 
-                    foreach (var renderable in renderer.UpdatePerFrameResources(context, renderableGroup.Value))
+                    foreach (var renderable in renderer.UpdatePerFrameResources(context, renderableGroup.Value)) // TODO: Avoid coroutine / enumerator alloc. Pass in empty list for it to fill etc.
                     {
                         var key = (renderable.RenderOrder, renderable.PipelineId);
                         if (!_processedRenderables.ContainsKey(key))
@@ -72,8 +70,8 @@ namespace UAlbion.Core
                         _processedRenderables[key].Add(renderable);
 
                         var processedType = renderable.GetType();
-                        if (!rendererLookup.ContainsKey(processedType))
-                            rendererLookup[processedType] = renderers.FirstOrDefault(x => x.CanRender(renderableGroup.Key));
+                        if (!_rendererLookup.ContainsKey(processedType))
+                            _rendererLookup[processedType] = renderers.FirstOrDefault(x => x.CanRender(renderableGroup.Key));
                     }
                 }
 
@@ -83,28 +81,31 @@ namespace UAlbion.Core
 
                 context.UpdatePerFrameResources();
             }
+        }
 
-            var orderedKeys = _processedRenderables.Keys.OrderBy(x => x).ToList();
+        public void RenderAllStages(IRendererContext context)
+        {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            context.SetClearColor(_clearColour.Red, _clearColour.Green, _clearColour.Blue);
+
+            var orderedKeys = _processedRenderables.Keys.OrderBy(x => x).ToArray();
             CoreTrace.Log.Info("Scene", "Sorted processed renderables");
 
             // Main scene
-            using (PerfTracker.FrameEvent("6.1.3 Main scene pass"))
+            using (PerfTracker.FrameEvent("6.2.3 Main scene pass"))
             using (context.Factory.CreateRenderDebugGroup(context, "Main Pass"))
             {
                 context.StartSwapchainPass();
                 foreach (var key in orderedKeys)
-                    Render(context, RenderPasses.Standard, rendererLookup, _processedRenderables[key]);
+                    Render(context, RenderPasses.Standard, _processedRenderables[key]);
             }
         }
 
-        static void Render(IRendererContext context,
-            RenderPasses pass,
-            IDictionary<Type, IRenderer> renderers,
-            IEnumerable<IRenderable> renderableList)
+        void Render(IRendererContext context, RenderPasses pass, List<IRenderable> renderableList)
         {
             foreach (IRenderable renderable in renderableList)
             {
-                var renderer = renderers[renderable.GetType()];
+                var renderer = _rendererLookup[renderable.GetType()];
                 if ((renderer.RenderPasses & pass) != 0)
                     renderer.Render(context, pass, renderable);
             }

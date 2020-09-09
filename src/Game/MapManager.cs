@@ -32,6 +32,7 @@ namespace UAlbion.Game
 
                 _pendingMapChange = e.MapId;
                 LoadMap();
+                Raise(new CameraJumpEvent(0, 0));
             });
         }
 

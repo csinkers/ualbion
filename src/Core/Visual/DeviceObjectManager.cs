@@ -8,9 +8,9 @@ namespace UAlbion.Core.Visual
 {
     public class DeviceObjectManager : ServiceComponent<IDeviceObjectManager>, IDeviceObjectManager
     {
-        readonly IDictionary<(object, object), CacheEntry> _cache = new Dictionary<(object, object), CacheEntry>();
+        readonly IDictionary<(object, object, object), CacheEntry> _cache = new Dictionary<(object, object, object), CacheEntry>();
         readonly object _syncRoot = new object();
-        readonly HashSet<(object, object)> _staleOwners = new HashSet<(object, object)>();
+        readonly HashSet<(object, object, object)> _staleOwners = new HashSet<(object, object, object)>();
         long _frame;
 
         public DeviceObjectManager()
@@ -46,7 +46,7 @@ namespace UAlbion.Core.Visual
             }
         }
 
-        public T GetDeviceObject<T>((object, object) owner) where T : IDisposable
+        public T GetDeviceObject<T>((object, object, object) owner) where T : IDisposable
         {
             lock(_syncRoot)
             {
@@ -60,7 +60,7 @@ namespace UAlbion.Core.Visual
             }
         }
 
-        public void SetDeviceObject<T>((object, object) owner, T newResource) where T : IDisposable
+        public void SetDeviceObject<T>((object, object, object) owner, T newResource) where T : IDisposable
         {
             lock (_syncRoot)
             {

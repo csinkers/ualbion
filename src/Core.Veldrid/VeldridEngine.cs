@@ -26,10 +26,10 @@ namespace UAlbion.Core.Veldrid
 
         readonly IList<IRenderer> _renderers = new List<IRenderer>();
         readonly FrameTimeAverager _frameTimeAverager = new FrameTimeAverager(0.5);
-        readonly SceneContext _sceneContext = new SceneContext();
         readonly WindowManager _windowManager;
         readonly VeldridCoreFactory _coreFactory;
 
+        SceneContext _sceneContext;
         CommandList _frameCommands;
         TextureSampleCount? _newSampleCount;
         bool _windowResized;
@@ -228,7 +228,6 @@ namespace UAlbion.Core.Veldrid
 
                 GraphicsDevice.ResizeMainWindow((uint)width, (uint)height);
                 Raise(new WindowResizedEvent(width, height));
-                _sceneContext.RecreateWindowSizedResources(GraphicsDevice);
                 CoreTrace.Log.Info("Engine", "Resize finished");
             }
 
@@ -240,21 +239,28 @@ namespace UAlbion.Core.Veldrid
                 CreateAllObjects();
             }
 
-            using (PerfTracker.FrameEvent("6.1 Render scenes"))
+            var scenes = new List<Scene>();
+            var context = new VeldridRendererContext(GraphicsDevice, _frameCommands, _sceneContext, _coreFactory); // TODO: Reuse
+            Raise(new CollectScenesEvent(scenes.Add));
+
+            using (PerfTracker.FrameEvent("6.1 Prepare scenes"))
             {
                 _frameCommands.Begin();
-
-                var scenes = new List<Scene>();
-                Raise(new CollectScenesEvent(scenes.Add));
-
-                var context = new VeldridRendererContext(GraphicsDevice, _frameCommands, _sceneContext, _coreFactory);
                 foreach (var scene in scenes)
-                    scene.RenderAllStages(context, _renderers);
+                    scene.UpdatePerFrameResources(context, _renderers);
+                _frameCommands.End();
+                GraphicsDevice.SubmitCommands(_frameCommands);
+            }
 
+            using (PerfTracker.FrameEvent("6.2 Render scenes"))
+            {
+                _frameCommands.Begin();
+                foreach (var scene in scenes)
+                    scene.RenderAllStages(context);
                 _frameCommands.End();
             }
 
-            using (PerfTracker.FrameEvent("6.2 Submit commandlist"))
+            using (PerfTracker.FrameEvent("6.3 Submit commandlist"))
             {
                 CoreTrace.Log.Info("Scene", "Submitting Commands");
                 GraphicsDevice.SubmitCommands(_frameCommands);
@@ -340,6 +346,7 @@ namespace UAlbion.Core.Veldrid
                 CommandList initList = GraphicsDevice.ResourceFactory.CreateCommandList();
                 initList.Name = "Recreation Initialization Command List";
                 initList.Begin();
+                _sceneContext = new SceneContext();
                 _sceneContext.CreateDeviceObjects(GraphicsDevice, initList);
 
                 var context = new VeldridRendererContext(GraphicsDevice, initList, _sceneContext, _coreFactory);
@@ -360,8 +367,10 @@ namespace UAlbion.Core.Veldrid
             using (PerfTracker.InfrequentEvent("Destroying objects"))
             {
                 GraphicsDevice.WaitForIdle();
-                _frameCommands.Dispose();
-                _sceneContext.DestroyDeviceObjects();
+                _frameCommands?.Dispose();
+                _sceneContext?.Dispose();
+                _frameCommands = null;
+                _sceneContext = null;
                 foreach (var r in _renderers)
                     r.DestroyDeviceObjects();
 
@@ -373,10 +382,11 @@ namespace UAlbion.Core.Veldrid
 
         public void Dispose()
         {
-            _frameCommands?.Dispose();
+            DestroyAllObjects();
             foreach(var renderer in _renderers)
                 if (renderer is IDisposable disposable)
                     disposable.Dispose();
+            _renderers.Clear();
         }
     }
 }

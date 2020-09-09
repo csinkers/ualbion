@@ -74,7 +74,13 @@ namespace UAlbion.Core.Veldrid
             cl.UpdateBuffer(CameraInfoBuffer, 0, Camera.GetCameraInfo());
         }
 
-        public void DestroyDeviceObjects()
+        public void SetCurrentScene(Scene scene)
+        {
+            if (scene == null) throw new ArgumentNullException(nameof(scene));
+            Camera = scene.Camera;
+        }
+
+        public void Dispose()
         {
             _disposer.DisposeAll();
             PaletteView?.Dispose();
@@ -85,19 +91,6 @@ namespace UAlbion.Core.Veldrid
             PaletteTexture = null;
             CommonResourceSet = null;
         }
-
-        public void SetCurrentScene(Scene scene)
-        {
-            if (scene == null) throw new ArgumentNullException(nameof(scene));
-            Camera = scene.Camera;
-        }
-
-        public void RecreateWindowSizedResources(GraphicsDevice graphicsDevice)
-        {
-            if (graphicsDevice == null) throw new ArgumentNullException(nameof(graphicsDevice));
-        }
-
-        public void Dispose() => DestroyDeviceObjects();
     }
 }
 #pragma warning restore CA2213 // Analysis doesn't know about DisposeCollector

@@ -60,9 +60,6 @@ namespace UAlbion.Game.Veldrid.Debugging
             var debugFlags = Resolve<ISettings>().Debug.DebugFlags;
             if ((debugFlags & DebugFlags.ShowConsole) == 0)
             {
-                if(_wasShown)
-                    Raise(new PopInputModeEvent());
-
                 _wasShown = false;
                 return;
             }
@@ -70,8 +67,7 @@ namespace UAlbion.Game.Veldrid.Debugging
             if(!_wasShown)
             {
                 _scrollToBottom = true;
-                Raise(new PushInputModeEvent(InputMode.TextEntry));
-            }
+}
 
             ImGui.Begin("Console");
 

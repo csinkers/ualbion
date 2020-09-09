@@ -114,7 +114,7 @@ namespace UAlbion.Game.Veldrid.Input
                 var binding = new KeyBinding(keyEvent.Key, keyEvent.Modifiers);
                 var mode = _bindings.ContainsKey(inputManager.InputMode) ? inputManager.InputMode : InputMode.Global;
                 if (!_bindings[mode].TryGetValue(binding, out var action))
-                    if (!_bindings[InputMode.Global].TryGetValue(binding, out action))
+                    if (mode == InputMode.TextEntry || !_bindings[InputMode.Global].TryGetValue(binding, out action))
                         continue;
 
                 action = action.Trim();

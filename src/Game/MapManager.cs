@@ -24,8 +24,15 @@ namespace UAlbion.Game
             On<TeleportEvent>(Teleport);
             On<LoadMapEvent>(e =>
             {
+                if (!Resolve<IGameState>().Loaded)
+                {
+                    Raise(new NewGameEvent(e.MapId, 32, 32));
+                    return;
+                }
+
                 _pendingMapChange = e.MapId;
                 LoadMap();
+                Raise(new CameraJumpEvent(0, 0));
             });
         }
 
@@ -63,6 +70,7 @@ namespace UAlbion.Game
                 if (map.MapData.SongId.HasValue)
                     Enqueue(new SongEvent(map.MapData.SongId.Value));
             }
+            // Raise(new CycleCacheEvent());
         }
 
         IMap BuildMap(MapDataId mapId)

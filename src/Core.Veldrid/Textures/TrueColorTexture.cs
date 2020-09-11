@@ -1,5 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Numerics;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api;
 using UAlbion.Core.Textures;
 using Veldrid;
@@ -119,6 +122,26 @@ namespace UAlbion.Core.Veldrid.Textures
                 ret /= 2;
 
             return Math.Max(1, ret);
+        }
+
+        public void SavePng(string path)
+        {
+            Rgba32[] pixels = new Rgba32[Width * Height];
+
+            unsafe
+            {
+                fixed (Rgba32* pixelPtr = pixels)
+                {
+                    Span<uint> toBuffer = new Span<uint>((uint*)pixelPtr, pixels.Length);
+                    _pixelData.CopyTo(toBuffer);
+                }
+            }
+
+            Image<Rgba32> image = new Image<Rgba32>((int)Width, (int)Height);
+            image.Frames.AddFrame(pixels);
+            image.Frames.RemoveFrame(0);
+            using var stream = File.OpenWrite(path);
+            image.SaveAsPng(stream);
         }
     }
 }

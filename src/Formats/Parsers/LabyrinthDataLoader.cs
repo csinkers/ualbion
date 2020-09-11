@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Config;
@@ -9,8 +10,9 @@ namespace UAlbion.Formats.Parsers
     public class LabyrinthDataLoader : IAssetLoader
     {
         public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
-            => LabyrinthData.Serdes(
-                null,
-                new AlbionReader(br, streamLength));
+        {
+            if (config == null) throw new ArgumentNullException(nameof(config));
+            return LabyrinthData.Serdes(config.Id, null, new AlbionReader(br, streamLength));
+        }
     }
 }

@@ -43,5 +43,7 @@ namespace UAlbion.Game.Assets
             WoplFile.Serdes(wopl, new GenericBinaryWriter(bw, Encoding.ASCII.GetBytes, ApiUtil.Assert));
             return ms.ToArray();
         }
+
+        public AssetInfo GetAssetInfo(AssetKey key, Func<AssetKey, object> loaderFunc) => null;
     }
 }

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using System.Linq;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Parsers
 {
@@ -13,42 +14,9 @@ namespace UAlbion.Formats.Parsers
     {
         IEnumerable<string> ReadLines(BinaryReader br, long streamLength)
         {
-            var remaining = streamLength;
-            var sb = new StringBuilder();
-            bool inComment = false;
-            while (remaining > 0)
-            {
-                char c = br.ReadChar();
-                remaining--;
-
-                if(c == '\n' || c == '\r')
-                {
-                    if (sb.Length > 0)
-                    {
-                        var s = sb.ToString().Trim();
-                        if (s.Length > 0)
-                            yield return s;
-                        sb.Clear();
-                    }
-                    inComment = false;
-                }
-                else if (c == ';')
-                {
-                    inComment = true;
-                }
-                else if (!inComment)
-                {
-                    sb.Append(c);
-                }
-            }
-
-            if (sb.Length > 0) // Handle final line
-            {
-                var s = sb.ToString().Trim();
-                if (s.Length > 0)
-                    yield return s;
-                sb.Clear();
-            }
+            var bytes = br.ReadBytes((int)streamLength);
+            var text = FormatUtil.BytesTo850String(bytes);
+            return text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None).Select(x => x.Trim());
         }
 
         public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
@@ -57,11 +25,21 @@ namespace UAlbion.Formats.Parsers
             var events = new List<IEvent>();
             foreach (var line in ReadLines(br, streamLength))
             {
-                var e = Event.Parse(line);
-                if (e == null)
-                    ApiUtil.Assert($"Script line \"{line}\" could not be parsed parsed to an event");
+                IEvent e;
+                if (string.IsNullOrEmpty(line))
+                    e = new CommentEvent(null);
+                else if (line.StartsWith(";", StringComparison.Ordinal))
+                    e = new CommentEvent(line.Substring(1));
                 else
-                    events.Add(e);
+                    e = Event.Parse(line);
+
+                if (e == null)
+                {
+                    ApiUtil.Assert($"Script line \"{line}\" could not be parsed parsed to an event");
+                    e = new UnparsableEvent(line);
+                }
+
+                events.Add(e);
             }
 
             return events;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UAlbion.Api;
 
 namespace UAlbion.Core.Visual
@@ -49,10 +50,7 @@ namespace UAlbion.Core.Visual
                     _instances = newArray;
                 }
 
-                var lease = new SpriteLease(this, from, ActiveInstances);
-#if DEBUG
-                lease.Owner = caller;
-#endif
+                var lease = new SpriteLease(this, from, ActiveInstances) { Owner = caller };
                 _leases.Add(lease);
                 VerifyConsistency();
                 return lease;
@@ -106,9 +104,9 @@ namespace UAlbion.Core.Visual
             }
         }
 
+        [Conditional("DEBUG")]
         void VerifyConsistency()
         {
-#if DEBUG
             if (_leases.Count > 0)
             {
                 // Assert that all leases are in order
@@ -120,7 +118,6 @@ namespace UAlbion.Core.Visual
                 ApiUtil.Assert(_leases[^1].To == ActiveInstances);
             }
             else ApiUtil.Assert(ActiveInstances == 0);
-#endif
         }
 
         internal Span<SpriteInstanceData> GetSpan(SpriteLease lease)

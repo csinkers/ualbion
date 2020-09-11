@@ -19,8 +19,8 @@ namespace UAlbion.Core.Veldrid.Visual
         // Instance Layout
         static readonly VertexLayoutDescription InstanceLayout = new VertexLayoutDescription(
             VertexLayoutHelper.Vector2D("TilePosition"), // 2
-            VertexLayoutHelper.IntElement("Textures"), // 3
-            VertexLayoutHelper.IntElement("Flags"), // 4
+            VertexLayoutHelper.UIntElement("Textures"), // 3
+            VertexLayoutHelper.UIntElement("Flags"), // 4
             VertexLayoutHelper.Vector2D("WallSize") // 5
         )
         { InstanceStepRate = 1 };
@@ -158,7 +158,7 @@ namespace UAlbion.Core.Veldrid.Visual
                     shaderSet.Shaders,
                     ShaderHelper.GetSpecializations(gd)),
                 new[] { _layout, sc.CommonResourceLayout },
-                sc.MainSceneFramebuffer.OutputDescription);
+                gd.SwapchainFramebuffer.OutputDescription);
 
             _pipeline = factory.CreateGraphicsPipeline(ref pd);
             _pipeline.Name = "P_TileMapRenderer";

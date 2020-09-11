@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using SerdesNet;
 using UAlbion.Formats.MapEvents;
 
@@ -9,6 +11,7 @@ namespace UAlbion.Formats.Assets.Maps
         public const int SizeOnDisk = 10;
 
         [Flags]
+        [JsonConverter(typeof(StringEnumConverter))]
         public enum NpcFlags : byte
         {
             NonPartySeeking = 1,
@@ -22,6 +25,7 @@ namespace UAlbion.Formats.Assets.Maps
         }
 
         [Flags]
+        [JsonConverter(typeof(StringEnumConverter))]
         public enum MovementTypes : byte
         {
             RandomMask = 3,
@@ -47,21 +51,19 @@ namespace UAlbion.Formats.Assets.Maps
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             var npc = existing ?? new MapNpc();
-            s.Begin();
-            npc.Id = s.Transform<byte, byte?>(nameof(Id), npc.Id, s.UInt8, Tweak.Instance);
+            npc.Id = s.Transform<byte, byte?>(nameof(Id), npc.Id, S.UInt8, TweakedConverter.Instance);
             // npc.Sound = (SampleId?)Tweak.Serdes(nameof(Sound), (byte?)npc.Sound, s.UInt8);
             npc.Sound = s.UInt8(nameof(Sound), npc.Sound);
 
-            ushort? eventNumber = ConvertMaxToNull.Serdes(nameof(npc.Node), npc.Node?.Id, s.UInt16);
-            if(eventNumber != null && npc.Node == null)
+            ushort? eventNumber = MaxToNullConverter.Serdes(nameof(npc.Node), npc.Node?.Id, s.UInt16);
+            if (eventNumber != null && npc.Node == null)
                 npc.Node = new DummyEventNode(eventNumber.Value);
 
-            npc.ObjectNumber = s.Transform<ushort, ushort?>(nameof(ObjectNumber), npc.ObjectNumber, s.UInt16, Tweak.Instance) ?? 0;
+            npc.ObjectNumber = s.Transform<ushort, ushort?>(nameof(ObjectNumber), npc.ObjectNumber, S.UInt16, TweakedConverter.Instance) ?? 0;
             npc.Flags = s.EnumU8(nameof(Flags), npc.Flags);
             npc.Movement = s.EnumU8(nameof(Movement), npc.Movement);
             npc.Unk8 = s.UInt8(nameof(Unk8), npc.Unk8);
             npc.Unk9 = s.UInt8(nameof(Unk9), npc.Unk9);
-            s.End();
             return npc;
         }
 

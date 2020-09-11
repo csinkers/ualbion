@@ -5,9 +5,6 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>UAlbion.Tools.ExportFlic</AssemblyName>
     <RootNamespace>UAlbion.Tools.ExportFlic</RootNamespace>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 

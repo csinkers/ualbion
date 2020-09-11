@@ -1,5 +1,4 @@
-﻿using System;
-using UAlbion.Api;
+﻿using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {

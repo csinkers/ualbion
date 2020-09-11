@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
@@ -43,23 +44,8 @@ namespace UAlbion.Formats.Assets
         public ushort Value { get; set; }   // 32 Base resell value * 10.
         public ItemSpriteId Icon { get; set; }   // 34 Image for the item
         public PlayerClasses Class { get; set; }   // 36 A bitfield that controls which classes can use the item.
-        public ushort Race { get; set; }   // 38 Likely meant to control which race can use the item – but does not seem to work ?
-
-        public bool IsStackable => 
-            TypeId == ItemType.Ammo
-            //|| TypeId == ItemType.Document // ?
-            //|| TypeId == ItemType.SpellScroll // ?
-            || TypeId == ItemType.Drink
-            //|| TypeId == ItemType.Amulet
-            //|| TypeId == ItemType.MagicRing
-            || TypeId == ItemType.Valuable // ?
-            || TypeId == ItemType.Tool // ?
-            // || TypeId == ItemType.Key // ?
-            || TypeId == ItemType.Misc
-            //|| TypeId == ItemType.MagicItem
-            //|| TypeId == ItemType.HeadsUpDisplayItem
-            || TypeId == ItemType.Lockpick
-            || TypeId == ItemType.LightSource;
+        [JsonIgnore] public ushort Race { get; set; }   // 38 Likely meant to control which race can use the item – but does not seem to work ?
+        [JsonIgnore] public bool IsStackable => (Flags & ItemFlags.Stackable) != 0;
 
         public override string ToString()
         {
@@ -151,7 +137,6 @@ namespace UAlbion.Formats.Assets
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             item ??= new ItemData((ItemId)i);
-            s.Begin();
             ApiUtil.Assert(i == (int)item.Id);
             item.Unknown = s.UInt8(nameof(item.Unknown), item.Unknown);
             item.TypeId = s.EnumU8(nameof(item.TypeId), item.TypeId);
@@ -175,7 +160,7 @@ namespace UAlbion.Formats.Assets
             item.Activate = s.UInt8(nameof(item.Activate), item.Activate);
             item.AmmoAnim = s.UInt8(nameof(item.AmmoAnim), item.AmmoAnim);
             item.SpellClass = s.EnumU8(nameof(item.SpellClass), item.SpellClass);
-            item.SpellEffect = s.Transform<byte, byte?>(nameof(item.SpellEffect), item.SpellEffect, s.UInt8, StoreIncrementedNullZero.Instance);
+            item.SpellEffect = s.Transform<byte, byte?>(nameof(item.SpellEffect), item.SpellEffect, S.UInt8, ZeroToNullConverter.Instance);
             item.Charges = s.UInt8(nameof(item.Charges), item.Charges);
             item.EnchantmentCount = s.UInt8(nameof(item.EnchantmentCount), item.EnchantmentCount);
             item.MaxEnchantmentCount = s.UInt8(nameof(item.MaxEnchantmentCount), item.MaxEnchantmentCount);
@@ -187,7 +172,6 @@ namespace UAlbion.Formats.Assets
             item.Icon = s.EnumU16(nameof(item.Icon), item.Icon);
             item.Class = s.EnumU16(nameof(item.Class), item.Class);
             item.Race = s.UInt16(nameof(item.Race), item.Race);
-            s.End();
             return item;
         }
 

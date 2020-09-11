@@ -23,17 +23,15 @@ namespace UAlbion.Formats.Assets.Labyrinth
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             o ??= new LabyrinthObject();
-            s.Begin();
             o.Properties = s.EnumU8(nameof(o.Properties), o.Properties);
             o.CollisionData = s.ByteArray(nameof(o.CollisionData), o.CollisionData, 3);
-            o.TextureNumber = (DungeonObjectId?)s.Transform<ushort, ushort?>(nameof(TextureNumber), (ushort?)o.TextureNumber, s.UInt16, Tweak.Instance);
+            o.TextureNumber = (DungeonObjectId?)s.Transform<ushort, ushort?>(nameof(TextureNumber), (ushort?)o.TextureNumber, S.UInt16, TweakedConverter.Instance);
             o.AnimationFrames = s.UInt8(nameof(o.AnimationFrames), o.AnimationFrames);
             o.Unk7 = s.UInt8(nameof(o.Unk7), o.Unk7);
             o.Width = s.UInt16(nameof(o.Width), o.Width);
             o.Height = s.UInt16(nameof(o.Height), o.Height);
             o.MapWidth = s.UInt16(nameof(o.MapWidth), o.MapWidth);
             o.MapHeight = s.UInt16(nameof(o.MapHeight), o.MapHeight);
-            s.End();
             return o;
         }
     }

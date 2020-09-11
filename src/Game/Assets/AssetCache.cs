@@ -13,8 +13,8 @@ namespace UAlbion.Game.Assets
     public class AssetCache : Component
     {
         readonly object _syncRoot = new object();
-        IDictionary<AssetType, IDictionary<Tuple<int, GameLanguage>, object>> _assetCache = new Dictionary<AssetType, IDictionary<Tuple<int, GameLanguage>, object>>();
-        IDictionary<AssetType, IDictionary<Tuple<int, GameLanguage>, object>> _oldAssetCache = new Dictionary<AssetType, IDictionary<Tuple<int, GameLanguage>, object>>();
+        IDictionary<AssetType, IDictionary<Tuple<ushort, GameLanguage>, object>> _assetCache = new Dictionary<AssetType, IDictionary<Tuple<ushort, GameLanguage>, object>>();
+        IDictionary<AssetType, IDictionary<Tuple<ushort, GameLanguage>, object>> _oldAssetCache = new Dictionary<AssetType, IDictionary<Tuple<ushort, GameLanguage>, object>>();
 
         public AssetCache()
         {
@@ -45,7 +45,7 @@ namespace UAlbion.Game.Assets
             lock (_syncRoot)
             {
                 _oldAssetCache = _assetCache;
-                _assetCache = new Dictionary<AssetType, IDictionary<Tuple<int, GameLanguage>, object>>();
+                _assetCache = new Dictionary<AssetType, IDictionary<Tuple<ushort, GameLanguage>, object>>();
             }
         }
 
@@ -59,7 +59,7 @@ namespace UAlbion.Game.Assets
                     if (typeCache.TryGetValue(subKey, out var cachedAsset))
                         return cachedAsset;
                 }
-                else _assetCache[key.Type] = new Dictionary<Tuple<int, GameLanguage>, object>();
+                else _assetCache[key.Type] = new Dictionary<Tuple<ushort, GameLanguage>, object>();
 
                 // Check old cache
                 if (_oldAssetCache.TryGetValue(key.Type, out var oldTypeCache) && oldTypeCache.TryGetValue(subKey, out var oldCachedAsset))
@@ -81,6 +81,17 @@ namespace UAlbion.Game.Assets
             lock (_syncRoot)
             {
                 _assetCache[key.Type][subKey] = asset;
+            }
+        }
+
+        public IEnumerable<AssetKey> GetCachedAssetInfo()
+        {
+            foreach(var assetType in _assetCache)
+            {
+                foreach (var asset in assetType.Value)
+                {
+                    yield return new AssetKey(assetType.Key, asset.Key.Item1, asset.Key.Item2);
+                }
             }
         }
     }

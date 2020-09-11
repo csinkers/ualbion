@@ -11,20 +11,20 @@ namespace UAlbion.Formats.Assets.Save
         const int Min = 100;
         const int Max = 255;
 
-        public void Serdes(ISerializer s)
+        public static TickerDictionary Serdes(int _, TickerDictionary d, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            s.Begin();
+            d ??= new TickerDictionary();
             if (s.Mode == SerializerMode.Reading)
-                Clear();
+                d.Clear();
 
             for (int i = Min; i <= Max; i++)
             {
-                this[(TickerId)i] = TryGetValue((TickerId)i, out var existing) 
+                d[(TickerId)i] = d.TryGetValue((TickerId)i, out var existing) 
                     ? s.UInt8(i.ToString(CultureInfo.InvariantCulture), existing) 
                     : s.UInt8(i.ToString(CultureInfo.InvariantCulture), 0);
             }
-            s.End();
+            return d;
         }
     }
 }

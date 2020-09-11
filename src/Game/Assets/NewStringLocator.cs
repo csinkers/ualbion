@@ -7,6 +7,7 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Assets
@@ -64,5 +65,7 @@ namespace UAlbion.Game.Assets
                 $"Missing translation for {(UAlbionStringId)key.Id} in {key.Language}"));
             return languages[GameLanguage.English]; // Default
         }
+
+        public AssetInfo GetAssetInfo(AssetKey key, Func<AssetKey, object> loaderFunc) => null;
     }
 }

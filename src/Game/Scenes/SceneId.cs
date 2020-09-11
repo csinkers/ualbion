@@ -9,5 +9,6 @@
         Automap,
         Inventory,
         Combat,
+        Editor
     }
 }

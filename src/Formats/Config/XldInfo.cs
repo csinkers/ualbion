@@ -36,6 +36,7 @@ namespace UAlbion.Formats.Config
     {
         public string EnumName { get; set; }
         public string EnumType { get; set; }
+        public int IdOffset { get; set; }
         public IDictionary<int, FullAssetInfo> Assets { get; } = new Dictionary<int, FullAssetInfo>();
     }
 }

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
@@ -15,6 +13,8 @@ namespace UAlbion.Formats.Parsers
         {
             if (br == null) throw new ArgumentNullException(nameof(br));
             if (config == null) throw new ArgumentNullException(nameof(config));
+            return TilesetData.Serdes(null, new AlbionReader(br, streamLength), config);
+            /*
             var td = new TilesetData();
             td.UseSmallGraphics = config.UseSmallGraphics ?? false;
 
@@ -69,6 +69,7 @@ namespace UAlbion.Formats.Parsers
             }
 
             return td;
+            */
         }
     }
 }

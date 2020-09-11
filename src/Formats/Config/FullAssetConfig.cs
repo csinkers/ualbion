@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace UAlbion.Formats.Config
 {
-    public class FullAssetConfig
+    public class FullAssetConfig : IAssetConfig
     {
         public const string Filename = "assets.json";
 
@@ -26,7 +26,7 @@ namespace UAlbion.Formats.Config
                     foreach(var o in xld.Value.Assets)
                     {
                         o.Value.Parent = xld.Value;
-                        o.Value.Id = o.Key;
+                        o.Value.Id = o.Key + xld.Value.IdOffset;
                         o.Value.PaletteHints ??= new List<int>();
                     }
 
@@ -70,15 +70,15 @@ namespace UAlbion.Formats.Config
             }
         }
 
-        public FullAssetInfo GetAsset(string xldName, int id)
+        public AssetInfo GetAsset(string xldName, int xldSubObject, int id)
         {
             if (!Xlds.TryGetValue(xldName, out var xld))
                 return null;
 
-            if (!xld.Assets.TryGetValue(id, out var asset))
+            if (!xld.Assets.TryGetValue(xldSubObject, out var asset))
             {
-                asset = new FullAssetInfo {Parent = xld, Id = id };
-                xld.Assets[id] = asset;
+                asset = new FullAssetInfo { Parent = xld, Id = id };
+                xld.Assets[xldSubObject] = asset;
             }
 
             return asset;

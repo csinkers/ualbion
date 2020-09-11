@@ -32,5 +32,7 @@ namespace UAlbion.Game.Assets
 
             throw new InvalidOperationException("CoreSpriteLocator called with an invalid type");
         }
+
+        public AssetInfo GetAssetInfo(AssetKey key, Func<AssetKey, object> loaderFunc) => null;
     }
 }

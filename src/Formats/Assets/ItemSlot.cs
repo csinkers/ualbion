@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
@@ -29,13 +30,14 @@ namespace UAlbion.Formats.Assets
 
         IContents _item;
         public ItemSlot(InventorySlotId id) => Id = id;
-        public InventorySlotId Id { get; }
+        [JsonIgnore] public InventorySlotId Id { get; }
         public byte Charges { get; set; }
         public byte Enchantment { get; set; }
         public Vector2 LastUiPosition { get; set; }
         public ItemSlotFlags Flags { get; set; }
         public ushort Amount { get; set; }
 
+        [JsonIgnore]
         public IContents Item
         {
             get => Amount == 0 ? null : _item;
@@ -69,7 +71,6 @@ namespace UAlbion.Formats.Assets
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             slot ??= new ItemSlot(id);
-            s.Begin();
             slot.Amount = s.UInt8(nameof(slot.Amount), (byte)(slot.Amount == Unlimited ? 0xff : slot.Amount));
             if (slot.Amount == 0xff)
                 slot.Amount = Unlimited;
@@ -79,10 +80,9 @@ namespace UAlbion.Formats.Assets
             slot.Flags = s.EnumU8(nameof(slot.Flags), slot.Flags);
 
             ItemId? itemId = (slot.Item as IItem)?.Id;
-            itemId = s.TransformEnumU16(nameof(ItemId), itemId, StoreIncrementedNullZero<ItemId>.Instance);
+            itemId = s.TransformEnumU16(nameof(ItemId), itemId, ZeroToNullConverter<ItemId>.Instance);
             if(slot.Item == null && itemId != null)
                 slot.Item = new ItemProxy(itemId.Value);
-            s.End();
             return slot;
         }
 

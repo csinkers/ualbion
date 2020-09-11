@@ -36,18 +36,17 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public IList<FloorAndCeiling> FloorAndCeilings { get; } = new List<FloorAndCeiling>();
         public IList<Wall> Walls { get; } = new List<Wall>();
 
-        public static LabyrinthData Serdes(LabyrinthData d, ISerializer s)
+        public static LabyrinthData Serdes(int _, LabyrinthData d, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             d ??= new LabyrinthData();
-            s.Begin();
             PerfTracker.StartupEvent("Start loading labyrinth data");
             // s.ByteArray("UnknownBlock6C", () => sheet.UnknownBlock6C, x => sheet.UnknownBlock6C = x, 14);
 
             d.WallHeight   = s.UInt16(nameof(d.WallHeight), d.WallHeight);       // 0
             d.CameraHeight = s.UInt16(nameof(d.CameraHeight), d.CameraHeight); // 2
             d.Unk4         = s.UInt16(nameof(d.Unk4), d.Unk4);                         // 4
-            d.BackgroundId = s.TransformEnumU16(nameof(BackgroundId), d.BackgroundId, Tweak<DungeonBackgroundId>.Instance); // 6
+            d.BackgroundId = s.TransformEnumU16(nameof(BackgroundId), d.BackgroundId, TweakedConverter<DungeonBackgroundId>.Instance); // 6
             d.BackgroundYPosition  = s.UInt16(nameof(d.BackgroundYPosition), d.BackgroundYPosition);   // 8
             d.FogDistance          = s.UInt16(nameof(d.FogDistance), d.FogDistance);                   // A
             d.FogRed               = s.UInt16(nameof(d.FogRed), d.FogRed);                             // C
@@ -91,7 +90,6 @@ namespace UAlbion.Formats.Assets.Labyrinth
             s.List(nameof(d.Walls), d.Walls, wallCount, Wall.Serdes);
             s.Check();
             PerfTracker.StartupEvent("Finish loading labyrinth data");
-            s.End();
             return d;
         }
     }

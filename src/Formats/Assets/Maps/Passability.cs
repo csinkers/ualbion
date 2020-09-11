@@ -1,6 +1,6 @@
 ﻿namespace UAlbion.Formats.Assets.Maps
 {
-    public enum Passability
+    public enum Passability : byte
     {
         Passable = 0,
         Unk1 = 1,

@@ -10,7 +10,6 @@ namespace UAlbion.Core.Veldrid
     public sealed class SceneContext : IDisposable
     {
         readonly DisposeCollector _disposer = new DisposeCollector();
-        WindowSizedSceneContext _windowSized;
 
         public DeviceBuffer IdentityMatrixBuffer { get; private set; }
         public DeviceBuffer ProjectionMatrixBuffer { get; private set; }
@@ -25,24 +24,11 @@ namespace UAlbion.Core.Veldrid
         public ICamera Camera { get; set; }
         public TextureSampleCount MainSceneSampleCount { get; internal set; }
 
-        public ResourceLayout TextureSamplerResourceLayout => _windowSized.TextureSamplerResourceLayout;
-        public Texture MainSceneColorTexture => _windowSized.MainSceneColorTexture;
-        public Texture MainSceneDepthTexture => _windowSized.MainSceneDepthTexture;
-        public Framebuffer MainSceneFramebuffer => _windowSized.MainSceneFramebuffer;
-        public Texture MainSceneResolvedColorTexture => _windowSized.MainSceneResolvedColorTexture;
-        public TextureView MainSceneResolvedColorView => _windowSized.MainSceneResolvedColorView;
-        public ResourceSet MainSceneViewResourceSet => _windowSized.MainSceneViewResourceSet;
-
-        public Texture DuplicatorTarget0 => _windowSized.DuplicatorTarget0;
-        public TextureView DuplicatorTargetView0 => _windowSized.DuplicatorTargetView0;
-        public ResourceSet DuplicatorTargetSet0 => _windowSized.DuplicatorTargetSet0;
-        public Framebuffer DuplicatorFramebuffer => _windowSized.DuplicatorFramebuffer;
-
         public void CreateDeviceObjects(GraphicsDevice gd, CommandList cl)
         {
             if (gd == null) throw new ArgumentNullException(nameof(gd));
             if (cl == null) throw new ArgumentNullException(nameof(cl));
-            var factory = new DisposingResourceFactoryFacade(gd.ResourceFactory, _disposer);
+            var factory = new DisposeCollectorResourceFactory(gd.ResourceFactory, _disposer);
             DeviceBuffer MakeBuffer(uint size, string name)
             {
                 var buffer = factory.CreateBuffer(
@@ -67,9 +53,6 @@ namespace UAlbion.Core.Veldrid
 
             CommonResourceLayout = factory.CreateResourceLayout(commonLayoutDescription);
             CommonResourceLayout.Name = "RL_Common";
-
-            _windowSized = new WindowSizedSceneContext(gd, MainSceneSampleCount);
-            _disposer.Add(_windowSized, CommonResourceLayout);
         }
 
         public void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl)
@@ -91,7 +74,13 @@ namespace UAlbion.Core.Veldrid
             cl.UpdateBuffer(CameraInfoBuffer, 0, Camera.GetCameraInfo());
         }
 
-        public void DestroyDeviceObjects()
+        public void SetCurrentScene(Scene scene)
+        {
+            if (scene == null) throw new ArgumentNullException(nameof(scene));
+            Camera = scene.Camera;
+        }
+
+        public void Dispose()
         {
             _disposer.DisposeAll();
             PaletteView?.Dispose();
@@ -102,23 +91,6 @@ namespace UAlbion.Core.Veldrid
             PaletteTexture = null;
             CommonResourceSet = null;
         }
-
-        public void SetCurrentScene(Scene scene)
-        {
-            if (scene == null) throw new ArgumentNullException(nameof(scene));
-            Camera = scene.Camera;
-        }
-
-        public void RecreateWindowSizedResources(GraphicsDevice graphicsDevice)
-        {
-            if (graphicsDevice == null) throw new ArgumentNullException(nameof(graphicsDevice));
-            _disposer.Remove(_windowSized);
-            _windowSized.Dispose();
-            _windowSized = new WindowSizedSceneContext(graphicsDevice, MainSceneSampleCount);
-            _disposer.Add(_windowSized);
-        }
-
-        public void Dispose() => DestroyDeviceObjects();
     }
 }
 #pragma warning restore CA2213 // Analysis doesn't know about DisposeCollector

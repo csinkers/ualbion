@@ -21,6 +21,7 @@ namespace UAlbion.Formats.AssetIds
             };
 
         public static AssetId ToAssetId(this AutoMapId id) => new AssetId(AssetType.Automap, (ushort)id);
+        public static AssetId ToAssetId(this AutoGraphicsId id) => new AssetId(AssetType.AutomapGraphics, (ushort)id);
         public static AssetId ToAssetId(this BlockListId id) => new AssetId(AssetType.BlockList, (ushort)id);
         public static AssetId ToAssetId(this ChestId id) => new AssetId(AssetType.ChestData, (ushort)id);
         public static AssetId ToAssetId(this CombatBackgroundId id) => new AssetId(AssetType.CombatBackground, (ushort)id);

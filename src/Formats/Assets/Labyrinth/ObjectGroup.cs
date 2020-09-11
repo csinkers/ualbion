@@ -7,8 +7,10 @@ namespace UAlbion.Formats.Assets.Labyrinth
 {
     public class ObjectGroup
     {
+        public const int MaxSubObjectCount = 8;
         public ushort AutoGraphicsId { get; set; }
-        public IList<SubObject> SubObjects { get; } = new List<SubObject>();
+        SubObject[] _subObjects { get; } = new SubObject[MaxSubObjectCount];
+        public IEnumerable<SubObject> SubObjects => _subObjects.Where(x => x != null);
 
         public override string ToString() =>
             $"Obj: AG{AutoGraphicsId} [ {string.Join("; ", SubObjects.Select(x => x.ToString()))} ]";
@@ -17,35 +19,30 @@ namespace UAlbion.Formats.Assets.Labyrinth
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             og ??= new ObjectGroup();
-            s.Begin();
             og.AutoGraphicsId = s.UInt16(nameof(og.AutoGraphicsId), og.AutoGraphicsId);
 
-            for (int n = 0; n < 8; n++)
-            {
-                var so = og.SubObjects.Count <= n
-                    ? new SubObject()
-                    : og.SubObjects[n];
 
-                if (og.SubObjects.Count > n)
-                    so.ObjectInfoNumber++;
+            for (int n = 0; n < MaxSubObjectCount; n++)
+            {
+                og._subObjects[n] ??= new SubObject();
+                var so = og._subObjects[n];
 
                 so.X = s.Int16(nameof(so.X), so.X);
                 so.Z = s.Int16(nameof(so.Z), so.Z);
                 so.Y = s.Int16(nameof(so.Y), so.Y);
 
-                so.ObjectInfoNumber = s.UInt16(nameof(so.ObjectInfoNumber), so.ObjectInfoNumber);
-                if(s.Mode != SerializerMode.Reading)
-                    throw new NotImplementedException();
+                // so.ObjectInfoNumber = s.UInt16(nameof(so.ObjectInfoNumber), so.ObjectInfoNumber);
 
-                if (so.ObjectInfoNumber != 0)
-                {
-                    so.ObjectInfoNumber--;
-                    if (og.SubObjects.Count <= n)
-                        og.SubObjects.Add(so);
-                }
+                so.ObjectInfoNumber = s.Transform<ushort, ushort>(
+                   nameof(so.ObjectInfoNumber),
+                    so.ObjectInfoNumber,
+                    S.UInt16,
+                    StoreIncrementedConverter.Instance);
+
+                if (so.ObjectInfoNumber == 0xffff)
+                    og._subObjects[n] = null;
             } // +64
 
-            s.End();
             return og;
         }
     }

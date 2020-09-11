@@ -32,11 +32,11 @@ namespace UAlbion.Core.Veldrid.Visual
             if (_imguiRenderer == null)
             {
                 var window = Resolve<IWindowManager>();
-                _imguiRenderer = new ImGuiRenderer(c.GraphicsDevice, c.SceneContext.MainSceneFramebuffer.OutputDescription, window.PixelWidth, window.PixelHeight, ColorSpaceHandling.Linear);
+                _imguiRenderer = new ImGuiRenderer(c.GraphicsDevice, c.GraphicsDevice.SwapchainFramebuffer.OutputDescription, window.PixelWidth, window.PixelHeight, ColorSpaceHandling.Linear);
             }
             else
             {
-                _imguiRenderer.CreateDeviceResources(c.GraphicsDevice, c.SceneContext.MainSceneFramebuffer.OutputDescription, ColorSpaceHandling.Linear);
+                _imguiRenderer.CreateDeviceResources(c.GraphicsDevice, c.GraphicsDevice.SwapchainFramebuffer.OutputDescription, ColorSpaceHandling.Linear);
             }
         }
 

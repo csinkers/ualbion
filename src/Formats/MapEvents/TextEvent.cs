@@ -14,7 +14,7 @@ namespace UAlbion.Formats.MapEvents
             e.Location = s.EnumU8(nameof(Location), e.Location ?? TextLocation.TextInWindow);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-            e.PortraitId = s.TransformEnumU8(nameof(PortraitId), e.PortraitId, Tweak<SmallPortraitId>.Instance);
+            e.PortraitId = s.TransformEnumU8(nameof(PortraitId), e.PortraitId, TweakedConverter<SmallPortraitId>.Instance);
             e.TextId = s.UInt8(nameof(TextId), e.TextId);
             e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);

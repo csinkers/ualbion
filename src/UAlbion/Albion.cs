@@ -28,6 +28,7 @@ using UAlbion.Game.State;
 using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid.Audio;
 using UAlbion.Game.Veldrid.Debugging;
+using UAlbion.Game.Veldrid.Editor;
 using UAlbion.Game.Veldrid.Input;
 
 namespace UAlbion
@@ -42,9 +43,7 @@ namespace UAlbion
                 .AddRenderer(new SkyboxRenderer())
                 .AddRenderer(new SpriteRenderer())
                 .AddRenderer(new ExtrudedTileMapRenderer())
-                .AddRenderer(new FullScreenQuad())
                 .AddRenderer(new DebugGuiRenderer())
-                .AddRenderer(new ScreenDuplicator())
                 ;
 
             var backgroundThreadInitTask = Task.Run(() => RegisterComponents(global, services, baseDir, commandLine));
@@ -125,21 +124,26 @@ namespace UAlbion
                 .Add(new CollisionManager())
                 .Add(new SceneStack())
                 .Add(new SceneManager()
-                    .AddScene((GameScene)new EmptyScene()
+                    .AddScene((Scene)new EmptyScene()
+                        .Add(new StatusBar())
                         .Add(new PaletteManager()))
 
-                    .AddScene((GameScene)new AutomapScene()
+                    .AddScene((Scene)new AutomapScene()
+                        .Add(new StatusBar())
                         .Add(new PaletteManager()))
 
-                    .AddScene((GameScene)new FlatScene()
+                    .AddScene((Scene)new FlatScene()
+                        .Add(new StatusBar())
                         .Add(new ConversationManager())
                         .Add(new PaletteManager()))
 
-                    .AddScene((GameScene)new DungeonScene()
+                    .AddScene((Scene)new DungeonScene()
+                        .Add(new StatusBar())
                         .Add(new ConversationManager())
                         .Add(new PaletteManager()))
 
-                    .AddScene((GameScene)new MenuScene()
+                    .AddScene((Scene)new MenuScene()
+                        .Add(new StatusBar())
                         .Add(new PaletteManager())
                         .Add(new MainMenu())
                         .Add(new Sprite<PictureId>(
@@ -149,10 +153,16 @@ namespace UAlbion
                             SpriteKeyFlags.NoTransform,
                             SpriteFlags.LeftAligned) { Size = new Vector2(2.0f, -2.0f) }))
 
-                    .AddScene((GameScene)new InventoryScene()
+                    .AddScene((Scene)new InventoryScene()
+                        .Add(new StatusBar())
                         .Add(new ConversationManager())
                         .Add(new PaletteManager())
-                        .Add(new InventoryInspector())))
+                        .Add(new InventoryInspector()))
+
+                    .AddScene((Scene)new EditorScene()
+                        .Add(new PaletteManager())
+                        .Add(new EditorUi()))
+                )
 
                 .Add(new TextFormatter())
                 .Add(new TextManager())
@@ -163,7 +173,6 @@ namespace UAlbion
                     .AddBehaviour(new SpriteInstanceDataDebugBehaviour())
                     .AddBehaviour(new FormatTextEventBehaviour())
                     .AddBehaviour(new QueryEventDebugBehaviour()))
-                .Add(new StatusBar())
                 .Add(new ContextMenu())
                 .Add(new CursorManager())
                 .Add(new InputManager()

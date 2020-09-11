@@ -46,32 +46,16 @@ namespace UAlbion.Core.Veldrid
             SceneContext.UpdatePerFrameResources(GraphicsDevice, CommandList);
         }
 
-        public void StartMainPass()
+        public void StartSwapchainPass()
         {
-            CommandList.SetFramebuffer(SceneContext.MainSceneFramebuffer);
-            var fbWidth = SceneContext.MainSceneFramebuffer.Width;
-            var fbHeight = SceneContext.MainSceneFramebuffer.Height;
+            CommandList.SetFramebuffer(GraphicsDevice.SwapchainFramebuffer);
+            var fbWidth = GraphicsDevice.SwapchainFramebuffer.Width;
+            var fbHeight = GraphicsDevice.SwapchainFramebuffer.Height;
             CommandList.SetViewport(0, new Viewport(0, 0, fbWidth, fbHeight, 0, 1));
             CommandList.SetFullViewports();
             CommandList.SetFullScissorRects();
             CommandList.ClearColorTarget(0, _clearColour);
             CommandList.ClearDepthStencil(GraphicsDevice.IsDepthRangeZeroToOne ? 1f : 0f);
-        }
-        public void StartOverlayPass() { }
-
-        public void StartDuplicatorPass()
-        {
-            if (SceneContext.MainSceneColorTexture.SampleCount != TextureSampleCount.Count1)
-                CommandList.ResolveTexture(SceneContext.MainSceneColorTexture, SceneContext.MainSceneResolvedColorTexture);
-
-            CommandList.SetFramebuffer(SceneContext.DuplicatorFramebuffer);
-            CommandList.SetFullViewports();
-        }
-
-        public void StartSwapchainPass()
-        {
-            CommandList.SetFramebuffer(GraphicsDevice.SwapchainFramebuffer);
-            CommandList.SetFullViewports();
         }
     }
 }

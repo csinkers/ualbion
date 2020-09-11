@@ -1,7 +1,10 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace UAlbion.Formats.Assets
 {
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum Gender : byte
     {
         Male = 0,
@@ -10,6 +13,7 @@ namespace UAlbion.Formats.Assets
     }
 
     [Flags]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum Genders : byte
     {
         Male = 1,

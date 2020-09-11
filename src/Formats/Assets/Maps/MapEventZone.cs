@@ -1,9 +1,11 @@
 ﻿using System;
+using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Maps
 {
+    [JsonConverter(typeof(ToStringJsonConverter))]
     public class MapEventZone
     {
         public bool Global { get; set; }
@@ -14,7 +16,7 @@ namespace UAlbion.Formats.Assets.Maps
         public EventChain Chain { get; set; }
         public IEventNode Node { get; set; }
 
-        public static MapEventZone Serdes(MapEventZone existing, ISerializer s, byte y)
+        public static MapEventZone Serdes(MapEventZone existing, ISerializer s, in byte y)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -25,16 +27,14 @@ namespace UAlbion.Formats.Assets.Maps
                 Y = global ? (byte)0 : y
             };
 
-            s.Begin();
-            zone.X = s.Transform<byte, byte>(nameof(X), zone.X, s.UInt8, StoreIncremented.Instance);
+            zone.X = s.Transform<byte, byte>(nameof(X), zone.X, S.UInt8, StoreIncrementedConverter.Instance);
             // ApiUtil.Assert(global && zone.X == 0xff || !global && zone.X != 0xff);
             zone.Unk1 = s.UInt8(nameof(Unk1), zone.Unk1);
             zone.Trigger = s.EnumU16(nameof(Trigger), zone.Trigger);
-            ushort? nodeId = ConvertMaxToNull.Serdes(nameof(Node), zone.Node?.Id, s.UInt16);
+            ushort? nodeId = s.Transform<ushort, ushort?>(nameof(Node), zone.Node?.Id, S.UInt16, MaxToNullConverter.Instance);
             if (nodeId != null && zone.Node == null)
                 zone.Node = new DummyEventNode(nodeId.Value);
 
-            s.End();
             return zone;
         }
 
@@ -45,6 +45,6 @@ namespace UAlbion.Formats.Assets.Maps
                 (Chain, Node) = getEvent(dummy.Id);
         }
 
-        public override string ToString() => $"Zone ({X}, {Y}) T:{Trigger} Mode:{Unk1} C:{Chain?.Id} E:{Node?.Id}";
+        public override string ToString() => $"Z({X}, {Y}) T:{Trigger} Mode:{Unk1} C:{Chain?.Id} E:{Node?.Id}";
     }
 }

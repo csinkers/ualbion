@@ -1,5 +1,4 @@
-﻿using System;
-namespace UAlbion.Formats.MapEvents
+﻿namespace UAlbion.Formats.MapEvents
 {
     public enum InventoryMode
     {

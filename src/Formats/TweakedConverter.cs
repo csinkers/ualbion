@@ -5,14 +5,14 @@ using SerdesNet;
 #pragma warning disable CA1822 // Mark members as static
 namespace UAlbion.Formats
 {
-    public sealed class Tweak :
+    public sealed class TweakedConverter :
         IConverter<uint, uint?>,
         //IConverter<int, int?>,
         IConverter<ushort, ushort?>,
         //IConverter<short, short?>,
         IConverter<byte, byte?>
     {
-        public static readonly Tweak Instance = new Tweak();
+        public static readonly TweakedConverter Instance = new TweakedConverter();
 /*
         public static byte? Serdes(string name, byte? existing, Func<string, byte, byte> serializer) => Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
         public static ushort? Serdes(string name, ushort? existing, Func<string, ushort, ushort> serializer) => Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
@@ -21,7 +21,7 @@ namespace UAlbion.Formats
         public static int? Serdes(string name, int? existing, Func<string, int, int> serializer) => Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing)));
     */
 
-        Tweak() { }
+        TweakedConverter() { }
         public uint? FromNumeric(uint x)
         {
             if (x == 0) return null;
@@ -104,7 +104,7 @@ namespace UAlbion.Formats
         byte?   IConverter<byte,     byte?>.FromSymbolic(string symbolic) => symbolic == null ? null :   (byte?)byte.Parse(symbolic, CultureInfo.InvariantCulture);
     }
 
-    public sealed class Tweak<T> :
+    public sealed class TweakedConverter<T> :
         IConverter<byte, T?>,
         //IConverter<sbyte, T?>,
         IConverter<ushort, T?>,
@@ -115,8 +115,8 @@ namespace UAlbion.Formats
         //IConverter<long, T?>
         where T : struct, Enum
     {
-        public static readonly Tweak<T> Instance = new Tweak<T>();
-        Tweak() { }
+        public static readonly TweakedConverter<T> Instance = new TweakedConverter<T>();
+        TweakedConverter() { }
         T? IConverter<  byte, T?>.FromNumeric(  byte x) => x == 0 ? null : x < 100 ? (T?)(T)(object)(  byte)(x - 1) : (T)(object)x;
         //T? IConverter< sbyte, T?>.FromNumeric( sbyte x) => x == 0 ? null : x < 100 ? (T?)(T)(object)( sbyte)(x - 1) : (T)(object)x;
         T? IConverter<ushort, T?>.FromNumeric(ushort x) => x == 0 ? null : x < 100 ? (T?)(T)(object)(ushort)(x - 1) : (T)(object)x;

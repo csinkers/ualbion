@@ -6,9 +6,10 @@ using UAlbion.Game.Events;
 namespace UAlbion.Game.Scenes
 {
     public interface IFlatScene : IScene { }
-    public class FlatScene : GameScene, IFlatScene
+    [Scene(SceneId.World2D)]
+    public class FlatScene : Scene, IFlatScene
     {
-        public FlatScene() : base(SceneId.World2D, new OrthographicCamera()) 
+        public FlatScene() : base(nameof(SceneId.World2D), new OrthographicCamera()) 
             => AttachChild(new CameraMotion2D((OrthographicCamera)Camera));
 
         protected override void Subscribed() => Raise(new PushInputModeEvent(InputMode.World2D));

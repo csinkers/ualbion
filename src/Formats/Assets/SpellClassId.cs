@@ -1,7 +1,10 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace UAlbion.Formats.Assets
 {
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum SpellClass : byte
     {
         DjiKas       = 0, // Sira etc
@@ -14,6 +17,7 @@ namespace UAlbion.Formats.Assets
     }
 
     [Flags]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum SpellClasses : byte
     {
         DjiKas       =  1,

@@ -6,9 +6,10 @@ using UAlbion.Game.Events;
 namespace UAlbion.Game.Scenes
 {
     public interface IDungeonScene : IScene { }
-    public class DungeonScene : GameScene, IDungeonScene
+    [Scene(SceneId.World3D)]
+    public class DungeonScene : Scene, IDungeonScene
     {
-        public DungeonScene() : base(SceneId.World3D, new PerspectiveCamera(true))
+        public DungeonScene() : base(nameof(SceneId.World3D), new PerspectiveCamera(true))
         {
             AttachChild(new CameraMotion3D((PerspectiveCamera)Camera));
         }

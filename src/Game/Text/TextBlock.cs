@@ -18,9 +18,8 @@ namespace UAlbion.Game.Text
         }
 
         string _text;
-#if DEBUG
+
         public string Raw { get; set; }
-#endif
         public int BlockId { get; }
         public string Text { get => _text; set => _text = value ?? ""; }
         public FontColor Color { get; set; }

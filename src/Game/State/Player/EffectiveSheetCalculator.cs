@@ -11,7 +11,7 @@ namespace UAlbion.Game.State.Player
         {
             if (sheet == null) throw new ArgumentNullException(nameof(sheet));
             if (config == null) throw new ArgumentNullException(nameof(config));
-            var effective = new EffectiveCharacterSheet(sheet.Key)
+            var effective = new EffectiveCharacterSheet(sheet.Id)
             {
                 // Names
                 EnglishName = sheet.EnglishName,
@@ -21,7 +21,7 @@ namespace UAlbion.Game.State.Player
                 // Basic stats
                 Type = sheet.Type,
                 Gender = sheet.Gender,
-                Races = sheet.Races,
+                Race = sheet.Race,
                 PlayerClass = sheet.PlayerClass,
                 Age = sheet.Age,
                 Level = sheet.Level,

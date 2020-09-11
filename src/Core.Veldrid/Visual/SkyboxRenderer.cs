@@ -86,7 +86,7 @@ namespace UAlbion.Core.Veldrid.Visual
                     shaderSet.Shaders,
                     ShaderHelper.GetSpecializations(gd)),
                 new[] { _resourceLayout, sc.CommonResourceLayout },
-                sc.MainSceneFramebuffer.OutputDescription);
+                gd.SwapchainFramebuffer.OutputDescription);
 
             var pipeline = gd.ResourceFactory.CreateGraphicsPipeline(ref pipelineDescription);
             pipeline.Name = "P_Skybox";
@@ -129,7 +129,7 @@ namespace UAlbion.Core.Veldrid.Visual
             textureManager?.PrepareTexture(skybox.Texture, context);
             TextureView textureView = (TextureView)textureManager?.GetTexture(skybox.Texture);
 
-            var resourceSet = objectManager.GetDeviceObject<ResourceSet>((skybox, textureView));
+            var resourceSet = objectManager.GetDeviceObject<ResourceSet>((skybox, textureView, null));
             if (resourceSet == null)
             {
                 resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
@@ -139,7 +139,7 @@ namespace UAlbion.Core.Veldrid.Visual
                     _uniformBuffer));
                 resourceSet.Name = $"RS_Sky:{skybox.Texture.Name}";
                 PerfTracker.IncrementFrameCounter("Create ResourceSet");
-                objectManager.SetDeviceObject((skybox, textureView), resourceSet);
+                objectManager.SetDeviceObject((skybox, textureView, null), resourceSet);
             }
 
             yield return skybox;
@@ -176,7 +176,7 @@ namespace UAlbion.Core.Veldrid.Visual
                 return;
 
             TextureView textureView = (TextureView)textureManager?.GetTexture(skybox.Texture);
-            var resourceSet = dom.GetDeviceObject<ResourceSet>((skybox, textureView));
+            var resourceSet = dom.GetDeviceObject<ResourceSet>((skybox, textureView, null));
 
             cl.SetPipeline(_pipeline);
             cl.SetGraphicsResourceSet(0, resourceSet);

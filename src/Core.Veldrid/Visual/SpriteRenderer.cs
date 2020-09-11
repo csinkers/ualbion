@@ -23,7 +23,7 @@ namespace UAlbion.Core.Veldrid.Visual
                 VertexLayoutHelper.Vector3D("Transform4"),
                 //VertexLayoutHelper.Vector3D("Offset"), VertexLayoutHelper.Vector2D("Size"),
                 VertexLayoutHelper.Vector2D("TexPosition"), VertexLayoutHelper.Vector2D("TexSize"),
-                VertexLayoutHelper.IntElement("TexLayer"), VertexLayoutHelper.IntElement("Flags")
+                VertexLayoutHelper.IntElement("TexLayer"), VertexLayoutHelper.UIntElement("Flags")
             //VertexLayoutHelper.FloatElement("Rotation")
             )
         { InstanceStepRate = 1 };
@@ -51,7 +51,6 @@ namespace UAlbion.Core.Veldrid.Visual
         // Context objects
         DeviceBuffer _vertexBuffer;
         DeviceBuffer _indexBuffer;
-        DeviceBuffer _uniformBuffer;
         ResourceLayout _perSpriteResourceLayout;
 #pragma warning restore CA2213 // Analysis doesn't know about DisposeCollector
 
@@ -114,7 +113,7 @@ namespace UAlbion.Core.Veldrid.Visual
                     shaderSet.Shaders,
                     ShaderHelper.GetSpecializations(gd)),
                 new[] { _perSpriteResourceLayout, sc.CommonResourceLayout },
-                sc.MainSceneFramebuffer.OutputDescription);
+                gd.SwapchainFramebuffer.OutputDescription);
 
             var pipeline = gd.ResourceFactory.CreateGraphicsPipeline(ref pipelineDescription);
             pipeline.Name = $"P_Sprite_{key}";
@@ -132,15 +131,13 @@ namespace UAlbion.Core.Veldrid.Visual
 
             _vertexBuffer = factory.CreateBuffer(new BufferDescription(Vertices.SizeInBytes(), BufferUsage.VertexBuffer));
             _indexBuffer = factory.CreateBuffer(new BufferDescription(Indices.SizeInBytes(), BufferUsage.IndexBuffer));
-            _uniformBuffer = factory.CreateBuffer(new BufferDescription((uint)Unsafe.SizeOf<SpriteUniformInfo>(), BufferUsage.UniformBuffer));
             _vertexBuffer.Name = "SpriteVertexBuffer";
             _indexBuffer.Name = "SpriteIndexBuffer";
-            _uniformBuffer.Name = "SpriteUniformBuffer";
             cl.UpdateBuffer(_vertexBuffer, 0, Vertices);
             cl.UpdateBuffer(_indexBuffer, 0, Indices);
 
             _perSpriteResourceLayout = factory.CreateResourceLayout(PerSpriteLayoutDescription);
-            _disposeCollector.Add(_vertexBuffer, _indexBuffer, _uniformBuffer, _perSpriteResourceLayout);
+            _disposeCollector.Add(_vertexBuffer, _indexBuffer, _perSpriteResourceLayout);
         }
 
         static void UpdateBufferSpan(CommandList cl, DeviceBuffer buffer, ReadOnlySpan<SpriteInstanceData> instances)
@@ -180,13 +177,13 @@ namespace UAlbion.Core.Veldrid.Visual
                     _pipelines.Add(shaderKey, BuildPipeline(gd, sc, shaderKey));
 
                 uint bufferSize = (uint)sprite.Instances.Length * SpriteInstanceData.StructSize;
-                var buffer = objectManager.GetDeviceObject<DeviceBuffer>((sprite, sprite));
+                var buffer = objectManager.GetDeviceObject<DeviceBuffer>((sprite, sprite, "InstanceBuffer"));
                 if (buffer?.SizeInBytes != bufferSize)
                 {
                     buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription(bufferSize, BufferUsage.VertexBuffer));
                     buffer.Name = $"B_SpriteInst:{sprite.Name}";
                     PerfTracker.IncrementFrameCounter("Create InstanceBuffer");
-                    objectManager.SetDeviceObject((sprite, sprite), buffer);
+                    objectManager.SetDeviceObject((sprite, sprite, "InstanceBuffer"), buffer);
                 }
 
                 if (sprite.InstancesDirty)
@@ -199,17 +196,34 @@ namespace UAlbion.Core.Veldrid.Visual
                 textureManager?.PrepareTexture(sprite.Key.Texture, context);
                 TextureView textureView = (TextureView)textureManager?.GetTexture(sprite.Key.Texture);
 
-                var resourceSet = objectManager.GetDeviceObject<ResourceSet>((sprite, textureView));
+                var uniformBuffer = objectManager.GetDeviceObject<DeviceBuffer>((sprite, textureView, "UniformBuffer"));
+                if (uniformBuffer == null)
+                {
+                    uniformBuffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)Unsafe.SizeOf<SpriteUniformInfo>(), BufferUsage.UniformBuffer));
+                    uniformBuffer.Name = "SpriteUniformBuffer";
+                    PerfTracker.IncrementFrameCounter("Create sprite uniform buffer");
+                    objectManager.SetDeviceObject((sprite, textureView, "UniformBuffer"), uniformBuffer);
+                }
+
+                var uniformInfo = new SpriteUniformInfo
+                {
+                    Flags = sprite.Key.Flags,
+                    TextureWidth = textureView?.Target.Width ?? 1,
+                    TextureHeight = textureView?.Target.Height ?? 1
+                };
+                cl.UpdateBuffer(uniformBuffer, 0, uniformInfo);
+
+                var resourceSet = objectManager.GetDeviceObject<ResourceSet>((sprite, textureView, "ResourceSet"));
                 if (resourceSet == null)
                 {
                     resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
                         _perSpriteResourceLayout,
                         gd.PointSampler,
                         textureView,
-                        _uniformBuffer));
+                        uniformBuffer));
                     resourceSet.Name = $"RS_Sprite:{sprite.Key.Texture.Name}";
                     PerfTracker.IncrementFrameCounter("Create ResourceSet");
-                    objectManager.SetDeviceObject((sprite, textureView), resourceSet);
+                    objectManager.SetDeviceObject((sprite, textureView, "ResourceSet"), resourceSet);
                 }
 
                 sprite.InstancesDirty = false;
@@ -244,14 +258,8 @@ namespace UAlbion.Core.Veldrid.Visual
                 return;
 
             TextureView textureView = (TextureView)textureManager?.GetTexture(sprite.Key.Texture);
-            var resourceSet = dom.GetDeviceObject<ResourceSet>((sprite, textureView));
-            var instanceBuffer = dom.GetDeviceObject<DeviceBuffer>((sprite, sprite));
-            var uniformInfo = new SpriteUniformInfo
-            {
-                Flags = sprite.Key.Flags,
-                TextureWidth = textureView?.Target.Width ?? 1,
-                TextureHeight = textureView?.Target.Height ?? 1
-            };
+            var resourceSet = dom.GetDeviceObject<ResourceSet>((sprite, textureView, "ResourceSet"));
+            var instanceBuffer = dom.GetDeviceObject<DeviceBuffer>((sprite, sprite, "InstanceBuffer"));
 
             if (sprite.Key.ScissorRegion.HasValue)
             {
@@ -260,7 +268,6 @@ namespace UAlbion.Core.Veldrid.Visual
                 cl.SetScissorRect(0, (uint)screenCoordinates.X, (uint)screenCoordinates.Y, (uint)screenCoordinates.Width, (uint)screenCoordinates.Height);
             }
 
-            cl.UpdateBuffer(_uniformBuffer, 0, uniformInfo);
             cl.SetPipeline(_pipelines[shaderKey]);
             cl.SetGraphicsResourceSet(0, resourceSet);
             cl.SetGraphicsResourceSet(1, sc.CommonResourceSet);

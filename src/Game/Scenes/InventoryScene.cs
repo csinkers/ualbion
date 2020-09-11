@@ -6,11 +6,12 @@ using UAlbion.Game.Events;
 namespace UAlbion.Game.Scenes
 {
     public interface IInventoryScene : IScene { }
-    public class InventoryScene : GameScene, IInventoryScene
+
+    [Scene(SceneId.Inventory)]
+    public class InventoryScene : Scene, IInventoryScene
     {
         bool _clockWasRunning;
-        public InventoryScene() : base(SceneId.Inventory, new OrthographicCamera())
-        { }
+        public InventoryScene() : base("Inventory", new OrthographicCamera()) { }
 
         protected override void Subscribed()
         {

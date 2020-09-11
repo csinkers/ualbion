@@ -4,6 +4,7 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
+using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Input
 {
@@ -13,20 +14,21 @@ namespace UAlbion.Game.Input
         readonly IDictionary<MouseMode, IComponent> _mouseModes = new Dictionary<MouseMode, IComponent>();
         readonly Stack<MouseMode> _mouseModeStack = new Stack<MouseMode>();
         readonly Stack<InputMode> _inputModeStack = new Stack<InputMode>();
+        InputMode _inputMode = InputMode.Global;
+        MouseMode _mouseMode = MouseMode.Normal;
 
-        public InputMode InputMode { get; private set; } = InputMode.Global;
-        public MouseMode MouseMode { get; private set; } = MouseMode.Normal; // (MouseMode)(int)-1;
+        public InputMode InputMode => (Resolve<ISettings>().Debug.DebugFlags & DebugFlags.ShowConsole) != 0 ? InputMode.TextEntry : _inputMode;
+        public MouseMode MouseMode => (Resolve<ISettings>().Debug.DebugFlags & DebugFlags.ShowConsole) != 0 ? MouseMode.Normal :_mouseMode;
         public IEnumerable<InputMode> InputModeStack => _inputModeStack;
         public IEnumerable<MouseMode> MouseModeStack => _mouseModeStack;
 
         public InputManager()
         {
-            On<SetInputModeEvent>(SetInputMode);
+            On<InputModeEvent>(SetInputMode);
             On<MouseModeEvent>(SetMouseMode);
             On<PushMouseModeEvent>(e =>
             {
-                var inputManager = Resolve<IInputManager>();
-                _mouseModeStack.Push(inputManager.MouseMode);
+                _mouseModeStack.Push(_mouseMode);
                 var setEvent = new MouseModeEvent(e.Mode);
                 SetMouseMode(setEvent);
                 Raise(setEvent);
@@ -42,9 +44,8 @@ namespace UAlbion.Game.Input
             });
             On<PushInputModeEvent>(e =>
             {
-                var inputManager = Resolve<IInputManager>();
-                _inputModeStack.Push(inputManager.InputMode);
-                var setEvent = new SetInputModeEvent(e.Mode);
+                _inputModeStack.Push(_inputMode);
+                var setEvent = new InputModeEvent(e.Mode);
                 SetInputMode(setEvent);
                 Raise(setEvent);
             });
@@ -53,7 +54,7 @@ namespace UAlbion.Game.Input
                 if (_inputModeStack.Count == 0) 
                     return;
 
-                var setEvent = new SetInputModeEvent(_inputModeStack.Pop());
+                var setEvent = new InputModeEvent(_inputModeStack.Pop());
                 SetInputMode(setEvent);
                 Raise(setEvent);
             });
@@ -87,7 +88,7 @@ namespace UAlbion.Game.Input
             }
 
             _mouseModes.TryGetValue(e.Mode.Value, out var activeMode);
-            if (MouseMode == e.Mode && activeMode?.IsActive == true)
+            if (_mouseMode == e.Mode && activeMode?.IsActive == true)
                 return;
 
             foreach (var mode in _mouseModes.Values)
@@ -96,10 +97,10 @@ namespace UAlbion.Game.Input
             if (activeMode != null)
                 activeMode.IsActive = true;
 
-            MouseMode = e.Mode.Value;
+            _mouseMode = e.Mode.Value;
         }
 
-        void SetInputMode(SetInputModeEvent e)
+        void SetInputMode(InputModeEvent e)
         {
             if (e.Mode == null)
             {
@@ -109,7 +110,7 @@ namespace UAlbion.Game.Input
             }
 
             _inputModes.TryGetValue(e.Mode.Value, out var activeMode);
-            if (InputMode == e.Mode && activeMode?.IsActive == true)
+            if (_inputMode == e.Mode && activeMode?.IsActive == true)
                 return;
 
             foreach (var mode in _inputModes.Values)
@@ -118,7 +119,7 @@ namespace UAlbion.Game.Input
             if (activeMode != null)
                 activeMode.IsActive = true;
 
-            InputMode = e.Mode.Value;
+            _inputMode = e.Mode.Value;
         }
     }
 }

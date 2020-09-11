@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
@@ -20,13 +21,13 @@ namespace UAlbion.Formats.Assets.Maps
         public IDictionary<int, MapNpc> Npcs { get; } = new Dictionary<int, MapNpc>();
 
         public IList<MapEventZone> Zones { get; } = new List<MapEventZone>();
-        public IDictionary<int, MapEventZone> ZoneLookup { get; } = new Dictionary<int, MapEventZone>();
-        public IDictionary<TriggerTypes, MapEventZone[]> ZoneTypeLookup { get; } = new Dictionary<TriggerTypes, MapEventZone[]>();
+        [JsonIgnore] public IDictionary<int, MapEventZone> ZoneLookup { get; } = new Dictionary<int, MapEventZone>();
+        [JsonIgnore] public IDictionary<TriggerTypes, MapEventZone[]> ZoneTypeLookup { get; } = new Dictionary<TriggerTypes, MapEventZone[]>();
         public IList<EventNode> Events { get; } = new List<EventNode>();
         public IList<EventChain> Chains { get; } = new List<EventChain>();
-        public (EventChain, IEventNode)[] ChainsByEventId { get; private set; }
+        [JsonIgnore] public (EventChain, IEventNode)[] ChainsByEventId { get; private set; }
 #if DEBUG
-        public IList<object>[] EventReferences { get; private set; }
+        [JsonIgnore] public IList<object>[] EventReferences { get; private set; }
 #endif
 
         protected BaseMapData(MapDataId id) { Id = id; }
@@ -35,15 +36,16 @@ namespace UAlbion.Formats.Assets.Maps
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             int zoneCount = s.UInt16("ZoneCount", (ushort)Zones.Count(x => x.Global));
-            s.List(nameof(Zones), Zones, zoneCount, (i, x, serializer) => MapEventZone.Serdes(x, serializer, 0xff));
+            byte y = 0xff;
+            s.List(nameof(Zones), Zones, zoneCount, (i, x, serializer) => MapEventZone.Serdes(x, serializer, in y));
             s.Check();
 
             int zoneOffset = zoneCount;
-            for (byte y = 0; y < Height; y++)
+            for (y = 0; y < Height; y++)
             {
                 zoneCount = s.UInt16("RowZones", (ushort)Zones.Count(x => x.Y == y && !x.Global));
-                var y1 = y;
-                s.List(nameof(Zones), Zones, zoneCount, zoneOffset, (i, x, s2) => MapEventZone.Serdes(x, s2, y1));
+                s.List(nameof(Zones), Zones, zoneCount, zoneOffset,
+                    (i, x, s2) => MapEventZone.Serdes(x, s2, in y));
                 zoneOffset += zoneCount;
             }
         }
@@ -186,6 +188,23 @@ namespace UAlbion.Formats.Assets.Maps
                     npc.Chain = chain;
                 }
             }
+        }
+
+        public static IMapData Serdes(int id, IMapData existing, ISerializer s)
+        {
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            var startPosition = s.Offset;
+            s.UInt16("DummyRead", 0); // Initial flags + npc count, will be re-read by the 2D/3D specific map loader
+            MapType mapType = s.EnumU8(nameof(mapType), existing?.MapType ?? MapType.Unknown);
+            s.Seek(startPosition);
+
+            return mapType switch
+            {
+                MapType.TwoD => MapData2D.Serdes(id, (MapData2D)existing, s),
+                MapType.TwoDOutdoors => MapData2D.Serdes(id, (MapData2D)existing, s),
+                MapType.ThreeD => MapData3D.Serdes(id, (MapData3D)existing, s),
+                _ => throw new NotImplementedException($"Unrecognised map type {mapType} found.")
+            };
         }
     }
 }

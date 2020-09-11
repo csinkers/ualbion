@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
@@ -9,6 +10,7 @@ using UAlbion.Formats.AssetIds;
 namespace UAlbion.Formats.MapEvents
 {
     [DebuggerDisplay("{ToString()}")]
+    [JsonConverter(typeof(ToStringJsonConverter))]
     public class EventNode : IEventNode
     {
         bool DirectSequence => (Next?.Id ?? Id + 1) == Id + 1;
@@ -39,7 +41,6 @@ namespace UAlbion.Formats.MapEvents
         public static EventNode Serdes(ushort id, EventNode node, ISerializer s, bool useEventText, ushort textSourceId)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            s.Begin();
             var initialPosition = s.Offset;
             var mapEvent = node?.Event as MapEvent;
             MapEventType type = (MapEventType)s.UInt8("Type", (byte)(mapEvent?.EventType ?? MapEventType.UnkFf));
@@ -49,14 +50,19 @@ namespace UAlbion.Formats.MapEvents
             {
                 node ??= new BranchNode(id, @event);
                 var branch = (BranchNode)node;
-                ushort? falseEventId = s.Transform(nameof(branch.NextIfFalse), branch.NextIfFalse?.Id, s.UInt16, ConvertMaxToNull.Instance);
+                ushort? falseEventId = s.Transform<ushort, ushort?>(
+                    nameof(branch.NextIfFalse),
+                    branch.NextIfFalse?.Id,
+                    S.UInt16,
+                    MaxToNullConverter.Instance);
+
                 if(falseEventId != null && branch.NextIfFalse == null)
                     branch.NextIfFalse = new DummyEventNode(falseEventId.Value);
             }
             else
                 node ??= new EventNode(id, @event);
 
-            ushort? nextEventId = s.Transform(nameof(node.Next), node.Next?.Id, s.UInt16, ConvertMaxToNull.Instance);
+            ushort? nextEventId = s.Transform<ushort, ushort?>(nameof(node.Next), node.Next?.Id, S.UInt16, MaxToNullConverter.Instance);
             if (nextEventId != null && node.Next == null)
                 node.Next = new DummyEventNode(nextEventId.Value);
 
@@ -65,7 +71,6 @@ namespace UAlbion.Formats.MapEvents
             ApiUtil.Assert(expectedPosition == actualPosition,
                 $"Expected to have read {expectedPosition - initialPosition} bytes, but {actualPosition - initialPosition} have been read.");
 
-            s.End();
             return node;
         }
 

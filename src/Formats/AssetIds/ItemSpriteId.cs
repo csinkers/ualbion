@@ -1,7 +1,11 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace UAlbion.Formats.AssetIds
 {
     // ReSharper disable InconsistentNaming
     // ReSharper disable UnusedMember.Global
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ItemSpriteId : ushort // Actually sub-image ids
     {
         Knife = 0,

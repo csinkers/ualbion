@@ -65,7 +65,7 @@ namespace UAlbion
 
             var locatorRegistry = new AssetLocatorRegistry()
                 .AddAssetLocator(new StandardAssetLocator(loaderRegistry), true)
-                .AddAssetLocator(new AssetConfigLocator())
+                .AddAssetLocator(new AssetConfigLocator(commandLine.Mode == ExecutionMode.DumpData))
                 .AddAssetLocator(new CoreSpriteLocator())
                 .AddAssetLocator(new MetaFontLocator(factory))
                 .AddAssetLocator(new NewStringLocator())
@@ -114,24 +114,11 @@ namespace UAlbion
                     PerfTracker.BeginFrame(); // Don't need to show verbose startup logging while dumping
                     var tf = new TextFormatter();
                     exchange.Attach(tf);
-                    DumpTypes dumpTypes = DumpTypes.All;
-                    if (commandLine.GameModeArgument != null)
-                    {
-                        dumpTypes = 0;
-                        foreach(var t in commandLine.GameModeArgument.Split(' ', StringSplitOptions.RemoveEmptyEntries))
-                            dumpTypes |= Enum.Parse<DumpTypes>(t);
-                    }
 
-                    if ((dumpTypes & DumpTypes.Characters) != 0) Dump.CharacterSheets(assets, tf, baseDir);
-                    if ((dumpTypes & DumpTypes.Chests) != 0) Dump.Chests(assets, baseDir);
-                    if ((dumpTypes & DumpTypes.CoreSprites) != 0) Dump.CoreSprites(assets, baseDir);
-                    if ((dumpTypes & DumpTypes.EventSets) != 0) Dump.EventSets(assets, baseDir);
-                    if ((dumpTypes & DumpTypes.Items) != 0) Dump.ItemData(assets, baseDir);
-                    if ((dumpTypes & DumpTypes.MapEvents) != 0) Dump.MapEvents(assets, baseDir);
-                    if ((dumpTypes & DumpTypes.Maps) != 0) Dump.MapData(assets, tf, baseDir);
-                    if ((dumpTypes & DumpTypes.Spells) != 0) Dump.Spells(assets, baseDir);
-                    if ((dumpTypes & DumpTypes.ThreeDMaps) != 0) Dump.ThreeDMapAndLabInfo(assets, baseDir);
-                    if ((dumpTypes & DumpTypes.MonsterGroups) != 0) Dump.MonsterGroups(assets, baseDir);
+                    if ((commandLine.DumpFormats & DumpFormats.Json) != 0) DumpJson.Dump(baseDir, assets, commandLine.DumpAssetTypes);
+                    if ((commandLine.DumpFormats & DumpFormats.Text) != 0) DumpText.Dump(assets, baseDir, tf, commandLine.DumpAssetTypes);
+                    if ((commandLine.DumpFormats & DumpFormats.GraphicsMask) != 0)
+                        DumpGraphics.Dump(assets, baseDir, commandLine.DumpAssetTypes, commandLine.DumpFormats & DumpFormats.GraphicsMask);
                     break;
 
                 case ExecutionMode.Exit: break;

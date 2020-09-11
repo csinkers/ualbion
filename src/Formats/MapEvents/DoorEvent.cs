@@ -26,13 +26,11 @@ namespace UAlbion.Formats.MapEvents
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new DoorEvent(textType, textSourceId);
-            s.Begin();
             e.PickDifficulty = s.UInt8(nameof(PickDifficulty), e.PickDifficulty);
-            e.KeyItemId = s.TransformEnumU16(nameof(KeyItemId), e.KeyItemId, StoreIncrementedNullZero<ItemId>.Instance);
+            e.KeyItemId = s.TransformEnumU16(nameof(KeyItemId), e.KeyItemId, ZeroToNullConverter<ItemId>.Instance);
             e.InitialTextId = s.UInt8(nameof(InitialTextId), e.InitialTextId);
             e.UnlockedTextId = s.UInt8(nameof(UnlockedTextId), e.UnlockedTextId);
             e.DoorId = s.UInt16(nameof(DoorId), e.DoorId); // Usually 100+
-            s.End();
             return e;
         }
 

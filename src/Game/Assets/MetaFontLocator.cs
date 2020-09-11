@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.Assets
 {
@@ -24,5 +25,7 @@ namespace UAlbion.Game.Assets
             var bold = (ITexture)loaderFunc(new AssetKey(AssetType.Font, (int)FontId.BoldFont));
             return FontLoader.Load(_factory, (MetaFontId) key.Id, regular, bold);
         }
+
+        public AssetInfo GetAssetInfo(AssetKey key, Func<AssetKey, object> loaderFunc) => null;
     }
 }

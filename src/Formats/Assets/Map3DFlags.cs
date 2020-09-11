@@ -1,8 +1,11 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace UAlbion.Formats.Assets
 {
     [Flags]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum Map3DFlags : byte
     {
         Unk0 = 1,

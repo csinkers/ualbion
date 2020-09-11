@@ -6,9 +6,10 @@ using UAlbion.Game.Events;
 namespace UAlbion.Game.Scenes
 {
     public interface IAutoMapScene : IScene { }
-    public class AutomapScene : GameScene, IAutoMapScene
+    [Scene(SceneId.Automap)]
+    public class AutomapScene : Scene, IAutoMapScene
     {
-        public AutomapScene() : base(SceneId.Automap, new OrthographicCamera())
+        public AutomapScene() : base(nameof(SceneId.Automap), new OrthographicCamera())
         {
             AttachChild(new CameraMotion2D((OrthographicCamera)Camera));
         }

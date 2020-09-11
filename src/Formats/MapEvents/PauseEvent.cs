@@ -10,7 +10,6 @@ namespace UAlbion.Formats.MapEvents
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new PauseEvent();
-            s.Begin();
             e.Length = s.UInt8(nameof(Length), e.Length);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
@@ -24,7 +23,6 @@ namespace UAlbion.Formats.MapEvents
             ApiUtil.Assert(e.Unk5 == 0);
             ApiUtil.Assert(e.Unk6 == 0);
             ApiUtil.Assert(e.Unk8 == 0);
-            s.End();
             return e;
         }
 

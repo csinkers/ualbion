@@ -70,7 +70,6 @@ namespace UAlbion.Formats.Assets.Save
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             save ??= new SavedGame();
-            s.Begin();
 
             ushort nameLength = s.UInt16("NameLength", (ushort)(save.Name?.Length ?? 0));
             save.Unk0 = s.UInt16(nameof(Unk0), save.Unk0);
@@ -102,7 +101,7 @@ namespace UAlbion.Formats.Assets.Save
                     var value = s2.TransformEnumU8(
                         null,
                         save.ActiveMembers[i],
-                        StoreIncrementedNullZero<PartyCharacterId>.Instance);
+                        ZeroToNullConverter<PartyCharacterId>.Instance);
                     s2.UInt8("dummy", 0);
                     return value;
                 });
@@ -110,7 +109,7 @@ namespace UAlbion.Formats.Assets.Save
             save.Unknown1A6 = s.ByteArrayHex(nameof(Unknown1A6), save.Unknown1A6, 0xD0); // 1A6
             save._switches.SetPacked(s.ByteArrayHex(nameof(Switches), save._switches.GetPacked(), FlagDictionary.PackedSize)); // 276
             save.Unknown2C1 = s.ByteArrayHex(nameof(Unknown2C1), save.Unknown2C1, 0x5833); // 0x2C1
-            s.Meta(nameof(Tickers), save._tickers.Serdes, save._tickers.Serdes); // 5AF4
+            s.Object(nameof(Tickers), save._tickers, TickerDictionary.Serdes); // 5AF4
 
             save.Unknown5B9F = s.ByteArrayHex(nameof(Unknown5B9F), save.Unknown5B9F, 0x2C);
             s.List(nameof(save.Npcs), save.Npcs, MaxNpcCount, NpcState.Serdes);
@@ -214,6 +213,9 @@ namespace UAlbion.Formats.Assets.Save
             var partyIds = save.PartyMembers.Keys.Select(x => (int)x).ToList();
             partyIds.Add(199); // Force extra XLD length fields to be written for empty objects to preserve compat with original game.
             partyIds.Add(299);
+
+            // s.Object($"XldPartyCharacter.0");
+
             XldLoader.Serdes(XldCategory.PartyCharacter, 0, s, SerdesPartyCharacter, partyIds);
             XldLoader.Serdes(XldCategory.PartyCharacter,1, s, SerdesPartyCharacter, partyIds);
             XldLoader.Serdes(XldCategory.PartyCharacter,2, s, SerdesPartyCharacter, partyIds);
@@ -247,7 +249,6 @@ namespace UAlbion.Formats.Assets.Save
             XldLoader.Serdes(XldCategory.NpcCharacter,2, s, SerdesNpcCharacter, npcIds);
 
             s.RepeatU8("Padding", 0, 4);
-            s.End();
 
             return save;
         }

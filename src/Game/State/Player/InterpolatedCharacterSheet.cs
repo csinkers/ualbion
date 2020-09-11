@@ -24,15 +24,15 @@ namespace UAlbion.Game.State.Player
             Combat = new InterpolatedCombat(() => _a().Combat, () => _b().Combat, _getLerp);
         }
 
-        public AssetKey Key => _b().Key;
+        public AssetId Id => _b().Id;
         public string GetName(GameLanguage language) => _b().GetName(language);
         public CharacterType Type => _b().Type;
         public Gender Gender => _b().Gender;
-        public PlayerRaces Races => _b().Races;
+        public PlayerRace Race => _b().Race;
         public PlayerClass PlayerClass => _b().PlayerClass;
         public ushort Age => _b().Age;
         public byte Level => _b().Level;
-        public AssetId SpriteId => _b().SpriteId;
+        public AssetId? SpriteId => _b().SpriteId;
         public SmallPortraitId? PortraitId => _b().PortraitId;
         public EventSetId? EventSetId => _b().EventSetId;
         public EventSetId? WordSetId => _b().WordSetId;

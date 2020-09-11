@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.Assets
 {
@@ -83,6 +84,8 @@ namespace UAlbion.Game.Assets
             return asset is Exception ? null : asset;
         }
 
+        public AssetInfo GetAssetInfo(AssetKey key) => GetLocator(key.Type).GetAssetInfo(key, LoadAssetCached);
+
         object LoadAssetInternal(AssetKey key)
         {
             var name = $"{key.Type}.{key.Id}";
@@ -102,5 +105,7 @@ namespace UAlbion.Game.Assets
                 return e;
             }
         }
+
+        public IEnumerable<AssetKey> GetCacheInfo() => _assetCache.GetCachedAssetInfo();
     }
 }

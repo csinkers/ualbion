@@ -202,7 +202,7 @@ namespace UAlbion.Game.Assets
         public object LoadAsset(AssetKey key, string name, Func<AssetKey, object> loaderFunc)
         {
             if (loaderFunc == null) throw new ArgumentNullException(nameof(loaderFunc));
-            var basicAssetConfig = (IAssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig));
+            var allAssetsConfig = (IAssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig));
             var generalConfig = (IGeneralConfig)loaderFunc(new AssetKey(AssetType.GeneralConfig));
 
             int xldIndex = key.Id / 100;
@@ -212,7 +212,7 @@ namespace UAlbion.Game.Assets
 
             var (location, baseName) = _assetFiles[key.Type];
             var paths = GetAssetPaths(generalConfig, location, key.Language, baseName, xldIndex, objectIndex);
-            var assetConfig = basicAssetConfig.GetAsset(paths.XldNameInConfig, objectIndex, key.Id);
+            var assetConfig = allAssetsConfig.GetAsset(paths.XldNameInConfig, objectIndex, key.Id);
 
             object Reader(string path, BinaryReader br, long length)
             {
@@ -226,6 +226,22 @@ namespace UAlbion.Game.Assets
             return paths.OverridePath != null || IsLocationRaw(location)
                 ? ReadFromFile(paths.OverridePath ?? paths.XldPath, Reader)
                 : ReadFromXld(paths, key, Reader);
+        }
+
+        public AssetInfo GetAssetInfo(AssetKey key, Func<AssetKey, object> loaderFunc)
+        {
+            if (loaderFunc == null) throw new ArgumentNullException(nameof(loaderFunc));
+            var allAssetsConfig = (IAssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig));
+            var generalConfig = (IGeneralConfig)loaderFunc(new AssetKey(AssetType.GeneralConfig));
+
+            int xldIndex = key.Id / 100;
+            ApiUtil.Assert(xldIndex >= 0);
+            ApiUtil.Assert(xldIndex <= 9);
+            int objectIndex = key.Id % 100;
+
+            var (location, baseName) = _assetFiles[key.Type];
+            var paths = GetAssetPaths(generalConfig, location, key.Language, baseName, xldIndex, objectIndex);
+            return allAssetsConfig.GetAsset(paths.XldNameInConfig, objectIndex, key.Id);
         }
 
         public void Dispose()

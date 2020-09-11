@@ -655,6 +655,7 @@
   },
   "3DFLOOR1.XLD": {
     "Format": "FixedSizeSprite",
+    "IdOffset":  100,
     "Width": 64,
     "Height": 64,
     "EnumName": "DungeonFloorId",
@@ -1803,6 +1804,7 @@
   },
   "3DFLOOR2.XLD": {
     "Format": "FixedSizeSprite",
+    "IdOffset":  200,
     "Width": 64,
     "Height": 64,
     "EnumName": "DungeonFloorId",
@@ -3157,6 +3159,7 @@
   },
   "3DOBJEC1.XLD": {
     "Format": "FixedSizeSprite",
+    "IdOffset":  100,
     "EnumName": "DungeonObjectId",
     "EnumType": "ushort",
     "Assets": {
@@ -3981,6 +3984,7 @@
   },
   "3DOBJEC2.XLD": {
     "Format": "FixedSizeSprite",
+    "IdOffset":  200,
     "EnumName": "DungeonObjectId",
     "EnumType": "ushort",
     "Assets": {
@@ -4809,6 +4813,7 @@
   },
   "3DOBJEC3.XLD": {
     "Format": "FixedSizeSprite",
+    "IdOffset":  300,
     "EnumName": "DungeonObjectId",
     "EnumType": "ushort",
     "Assets": {
@@ -5856,6 +5861,7 @@
   },
   "3DOVERL1.XLD": {
     "Format": "FixedSizeSprite",
+    "IdOffset":  100,
     "Transposed": true,
     "EnumName": "DungeonOverlayId",
     "EnumType": "ushort",
@@ -6532,6 +6538,7 @@
   },
   "3DOVERL2.XLD": {
     "Format": "FixedSizeSprite",
+    "IdOffset":  200,
     "Transposed": true,
     "EnumName": "DungeonOverlayId",
     "EnumType": "ushort",
@@ -7650,6 +7657,7 @@
   },
   "3DWALLS1.XLD": {
     "Format": "FixedSizeSprite",
+    "IdOffset":  100,
     "Transposed": true,
     "EnumName": "DungeonWallId",
     "EnumType": "ushort",
@@ -8365,6 +8373,7 @@
   },
   "EVNTSET1.XLD": {
     "Format": "EventSet",
+    "IdOffset":  100,
     "EnumName": "EventSetId",
     "EnumType": "ushort",
     "Assets": {
@@ -8654,6 +8663,7 @@
   },
   "EVNTSET2.XLD": {
     "Format": "EventSet",
+    "IdOffset":  200,
     "EnumName": "EventSetId",
     "EnumType": "ushort",
     "Assets": {
@@ -8851,6 +8861,7 @@
   },
   "EVNTSET3.XLD": {
     "Format": "EventSet",
+    "IdOffset":  300,
     "EnumName": "EventSetId",
     "EnumType": "ushort",
     "Assets": {
@@ -9000,6 +9011,7 @@
   },
   "EVNTSET9.XLD": {
     "Format": "EventSet",
+    "IdOffset":  900,
     "EnumName": "EventSetId",
     "EnumType": "ushort",
     "Assets": {
@@ -9362,6 +9374,7 @@
   },
   "LABDATA1.XLD": {
     "Format": "LabyrinthData",
+    "IdOffset":  100,
     "EnumName": "LabyrinthDataId",
     "EnumType": "byte",
     "Assets": {
@@ -9469,6 +9482,7 @@
   },
   "LABDATA2.XLD": {
     "Format": "LabyrinthData",
+    "IdOffset":  200,
     "EnumName": "LabyrinthDataId",
     "EnumType": "byte",
     "Assets": {
@@ -9576,6 +9590,7 @@
   },
   "MAPDATA1.XLD": {
     "Format": "MapData",
+    "IdOffset":  100,
     "EnumName": "MapDataId",
     "EnumType": "ushort",
     "Assets": {
@@ -9845,6 +9860,7 @@
   },
   "MAPDATA2.XLD": {
     "Format": "MapData",
+    "IdOffset":  200,
     "EnumName": "MapDataId",
     "EnumType": "ushort",
     "Assets": {
@@ -10110,6 +10126,7 @@
   },
   "MAPDATA3.XLD": {
     "Format": "MapData",
+    "IdOffset":  300,
     "EnumName": "MapDataId",
     "EnumType": "ushort",
     "Assets": {
@@ -10856,6 +10873,7 @@
   },
   "MONGRP1.XLD": {
     "Format": "MonsterGroup",
+    "IdOffset":  100,
     "EnumName": "MonsterGroupId",
     "EnumType": "byte",
     "Assets": {
@@ -10963,6 +10981,7 @@
   },
   "MONGRP2.XLD": {
     "Format": "MonsterGroup",
+    "IdOffset":  200,
     "EnumName": "MonsterGroupId",
     "EnumType": "byte",
     "Assets": {
@@ -11461,6 +11480,7 @@
   },
   "NPCGR1.XLD": {
     "Format": "SingleHeaderSprite",
+    "IdOffset":  100,
     "EnumName": "LargeNpcId",
     "EnumType": "byte",
     "Assets": {
@@ -12474,6 +12494,7 @@
   },
   "SAMPLES1.XLD": {
     "Format": "AudioSample",
+    "IdOffset":  100,
     "EnumName": "SampleId",
     "EnumType": "byte",
     "Assets": {
@@ -12615,6 +12636,7 @@
   },
   "SAMPLES2.XLD": {
     "Format": "AudioSample",
+    "IdOffset":  200,
     "EnumName": "SampleId",
     "EnumType": "byte",
     "Assets": {
@@ -12835,6 +12857,7 @@
   },
   "SCRIPT2.XLD": {
     "Format": "Script",
+    "IdOffset":  200,
     "EnumName": "ScriptId",
     "EnumType": "ushort",
     "Assets": {
@@ -13226,6 +13249,7 @@
   },
   "SMLPORT1.XLD": {
     "Format": "FixedSizeSprite",
+    "IdOffset":  100,
     "Width": 34,
     "EnumName": "SmallPortraitId",
     "EnumType": "byte",
@@ -13744,6 +13768,7 @@
   },
   "$(LANG)/EVNTTXT1.XLD": {
     "Format": "StringTable",
+    "IdOffset":  100,
     "EnumName": "EventTextId",
     "EnumType": "ushort",
     "Assets": {
@@ -13851,6 +13876,7 @@
   },
   "$(LANG)/EVNTTXT2.XLD": {
     "Format": "StringTable",
+    "IdOffset":  200,
     "EnumName": "EventTextId",
     "EnumType": "ushort",
     "Assets": {
@@ -13958,6 +13984,7 @@
   },
   "$(LANG)/EVNTTXT3.XLD": {
     "Format": "StringTable",
+    "IdOffset":  300,
     "EnumName": "EventTextId",
     "EnumType": "ushort",
     "Assets": {
@@ -14065,6 +14092,7 @@
   },
   "$(LANG)/EVNTTXT9.XLD": {
     "Format": "StringTable",
+    "IdOffset":  900,
     "EnumName": "EventTextId",
     "EnumType": "ushort",
     "Assets": {
@@ -14236,6 +14264,7 @@
   },
   "$(LANG)/MAPTEXT1.XLD": {
     "Format": "StringTable",
+    "IdOffset":  100,
     "EnumName": "MapTextId",
     "EnumType": "ushort",
     "Assets": {
@@ -14343,6 +14372,7 @@
   },
   "$(LANG)/MAPTEXT2.XLD": {
     "Format": "StringTable",
+    "IdOffset":  200,
     "EnumName": "MapTextId",
     "EnumType": "ushort",
     "Assets": {
@@ -14450,6 +14480,7 @@
   },
   "$(LANG)/MAPTEXT3.XLD": {
     "Format": "StringTable",
+    "IdOffset":  300,
     "EnumName": "MapTextId",
     "EnumType": "ushort",
     "Assets": {
@@ -17820,6 +17851,7 @@
   },
   "INITIAL/AUTOMAP1.XLD": {
     "Format": "Unknown",
+    "IdOffset":  100,
     "EnumName": "AutoMapId",
     "EnumType": "ushort",
     "Assets": {
@@ -17927,6 +17959,7 @@
   },
   "INITIAL/AUTOMAP2.XLD": {
     "Format": "Unknown",
+    "IdOffset":  200,
     "EnumName": "AutoMapId",
     "EnumType": "ushort",
     "Assets": {
@@ -18034,6 +18067,7 @@
   },
   "INITIAL/AUTOMAP3.XLD": {
     "Format": "Unknown",
+    "IdOffset":  300,
     "EnumName": "AutoMapId",
     "EnumType": "ushort",
     "Assets": {
@@ -18150,6 +18184,7 @@
   },
   "INITIAL/CHESTDT1.XLD": {
     "Format": "ChestInventory",
+    "IdOffset":  100,
     "EnumName": "ChestId",
     "EnumType": "ushort",
     "Assets": {
@@ -18257,6 +18292,7 @@
   },
   "INITIAL/CHESTDT2.XLD": {
     "Format": "ChestInventory",
+    "IdOffset":  200,
     "EnumName": "ChestId",
     "EnumType": "ushort",
     "Assets": {
@@ -18364,6 +18400,7 @@
   },
   "INITIAL/CHESTDT5.XLD": {
     "Format": "ChestInventory",
+    "IdOffset":  500,
     "EnumName": "ChestId",
     "EnumType": "ushort",
     "Assets": {
@@ -18479,6 +18516,7 @@
   },
   "INITIAL/MERCHDT1.XLD": {
     "Format": "MerchantInventory",
+    "IdOffset":  100,
     "EnumName": "MerchantId",
     "EnumType": "byte",
     "Assets": {
@@ -18586,6 +18624,7 @@
   },
   "INITIAL/MERCHDT2.XLD": {
     "Format": "MerchantInventory",
+    "IdOffset":  200,
     "EnumName": "MerchantId",
     "EnumType": "byte",
     "Assets": {
@@ -18847,6 +18886,7 @@
   },
   "INITIAL/NPCCHAR1.XLD": {
     "Format": "CharacterData",
+    "IdOffset":  100,
     "EnumName": "NpcCharacterId",
     "EnumType": "byte",
     "Assets": {
@@ -19126,6 +19166,7 @@
   },
   "INITIAL/NPCCHAR2.XLD": {
     "Format": "CharacterData",
+    "IdOffset":  200,
     "EnumName": "NpcCharacterId",
     "EnumType": "byte",
     "Assets": {
@@ -19358,6 +19399,7 @@
   },
   "INITIAL/PRTCHAR1.XLD": {
     "Format": "CharacterData",
+    "IdOffset":  100,
     "EnumName": "PartyCharacterId",
     "EnumType": "byte",
     "Assets": {
@@ -19465,6 +19507,7 @@
   },
   "INITIAL/PRTCHAR2.XLD": {
     "Format": "CharacterData",
+    "IdOffset":  200,
     "EnumName": "PartyCharacterId",
     "EnumType": "byte",
     "Assets": {
@@ -19584,6 +19627,7 @@
   },
   "ENGLISH/EVNTTXT1.XLD": {
     "Format": "Unknown",
+    "IdOffset":  100,
     "Assets": {
       "0": {},
       "2": {},
@@ -19682,6 +19726,7 @@
   },
   "ENGLISH/EVNTTXT2.XLD": {
     "Format": "Unknown",
+    "IdOffset":  200,
     "Assets": {
       "0": {},
       "1": {},
@@ -19778,6 +19823,7 @@
   },
   "ENGLISH/EVNTTXT3.XLD": {
     "Format": "Unknown",
+    "IdOffset":  300,
     "Assets": {
       "1": {},
       "2": {},
@@ -19804,6 +19850,7 @@
   },
   "ENGLISH/EVNTTXT9.XLD": {
     "Format": "Unknown",
+    "IdOffset":  900,
     "Assets": {
       "81": {},
       "82": {},
@@ -19842,6 +19889,7 @@
   },
   "ENGLISH/MAPTEXT1.XLD": {
     "Format": "Unknown",
+    "IdOffset":  100,
     "Assets": {
       "0": {},
       "1": {},
@@ -19928,6 +19976,7 @@
   },
   "ENGLISH/MAPTEXT2.XLD": {
     "Format": "Unknown",
+    "IdOffset":  200,
     "Assets": {
       "0": {},
       "1": {},
@@ -20005,6 +20054,7 @@
   },
   "ENGLISH/MAPTEXT3.XLD": {
     "Format": "Unknown",
+    "IdOffset":  300,
     "Assets": {
       "0": {},
       "1": {},
@@ -20039,6 +20089,7 @@
   },
   "GERMAN/EVNTTXT1.XLD": {
     "Format": "Unknown",
+    "IdOffset":  100,
     "Assets": {
       "0": {},
       "2": {},
@@ -20137,6 +20188,7 @@
   },
   "GERMAN/EVNTTXT2.XLD": {
     "Format": "Unknown",
+    "IdOffset":  200,
     "Assets": {
       "0": {},
       "1": {},
@@ -20233,6 +20285,7 @@
   },
   "GERMAN/EVNTTXT3.XLD": {
     "Format": "Unknown",
+    "IdOffset":  300,
     "Assets": {
       "1": {},
       "2": {},
@@ -20259,6 +20312,7 @@
   },
   "GERMAN/EVNTTXT9.XLD": {
     "Format": "Unknown",
+    "IdOffset":  900,
     "Assets": {
       "81": {},
       "82": {},
@@ -20298,6 +20352,7 @@
   },
   "GERMAN/MAPTEXT1.XLD": {
     "Format": "Unknown",
+    "IdOffset":  100,
     "Assets": {
       "0": {},
       "1": {},
@@ -20384,6 +20439,7 @@
   },
   "GERMAN/MAPTEXT2.XLD": {
     "Format": "Unknown",
+    "IdOffset":  200,
     "Assets": {
       "0": {},
       "1": {},
@@ -20461,6 +20517,7 @@
   },
   "GERMAN/MAPTEXT3.XLD": {
     "Format": "Unknown",
+    "IdOffset":  300,
     "Assets": {
       "0": {},
       "1": {},

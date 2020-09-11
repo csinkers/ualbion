@@ -26,6 +26,7 @@ namespace UAlbion.Core.Veldrid.Textures
             }
         }
 
+        // TODO: Cleanup
         public Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
         {
             if (gd == null) throw new ArgumentNullException(nameof(gd));
@@ -113,7 +114,7 @@ namespace UAlbion.Core.Veldrid.Textures
             image.Frames.AddFrame(pixels);
             image.Frames.RemoveFrame(0);
             using var stream = File.OpenWrite(path);
-            image.SaveAsBmp(stream);
+            image.SaveAsPng(stream);
         }
 
         public VeldridMultiTexture(string name, IPaletteManager paletteManager) : base(name, paletteManager)

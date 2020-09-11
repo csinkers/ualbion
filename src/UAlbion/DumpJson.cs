@@ -8,6 +8,7 @@ using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Game;
 using Newtonsoft.Json;
+using UAlbion.Api;
 
 namespace UAlbion
 {
@@ -20,17 +21,19 @@ namespace UAlbion
                .Where(x => x.Item2 != null)
                .ToDictionary(x => x.x, x => x.Item2);
 
-        public static void DumpAll(string baseDir, IAssetManager assets)
+        public static void Dump(string baseDir, IAssetManager assets, ISet<AssetType> types)
         {
             var disposeList = new List<IDisposable>();
 
             TextWriter Writer(string name)
             {
-                var directory = Path.Combine(baseDir, "data", "exported");
+                var filename = Path.Combine(baseDir, "data", "exported", "json", name);
+                var directory = Path.GetDirectoryName(filename);
+
                 if (!Directory.Exists(directory))
                     Directory.CreateDirectory(directory);
 
-                var stream = File.Open(Path.Combine(directory, name), FileMode.Create);
+                var stream = File.Open(filename, FileMode.Create);
                 var writer = new StreamWriter(stream);
                 disposeList.Add(writer);
                 disposeList.Add(stream);
@@ -46,230 +49,154 @@ namespace UAlbion
 
             var settings = new JsonSerializerSettings
             {
-                // ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                // PreserveReferencesHandling = PreserveReferencesHandling.Objects,
                 Formatting = Formatting.Indented,
                 DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate,
             };
 
             var s = JsonSerializer.Create(settings);
             TextWriter tw;
-
-            foreach (var id in All<TilesetId>())
+            if (types.Contains(AssetType.Tileset))
             {
-                TilesetData asset = assets.LoadTileData(id);
-                if (asset == null) continue;
-                tw = Writer($"tileset{(int)id}.json");
-                s.Serialize(tw, asset);
-            }
-            Flush();
+                foreach (var id in All<TilesetId>())
+                {
+                    TilesetData asset = assets.LoadTileData(id);
+                    if (asset == null) continue;
+                    tw = Writer($"tilesets/tileset{(int)id}.json");
+                    s.Serialize(tw, asset);
+                }
 
-            foreach (var id in All<LabyrinthDataId>())
-            {
-                LabyrinthData asset = assets.LoadLabyrinthData(id);
-                if (asset == null) continue;
-                tw = Writer($"labyrinth{(int)id}.json");
-                s.Serialize(tw, asset);
-            }
-            Flush();
-
-            // string str = assets.LoadString(StringId id, GameLanguage language);
-
-            foreach (var id in All<MapDataId>())
-            {
-                IMapData asset = assets.LoadMap(id);
-                if (asset == null) continue;
-                tw = Writer($"map{(int)id}_{id}.json");
-                s.Serialize(tw, asset);
-            }
-            Flush();
-
-            tw = Writer("items.json");
-            s.Serialize(tw, AllAssets<ItemId, ItemData>(assets.LoadItem));
-            Flush();
-
-            tw = Writer("partymembers.json");
-            s.Serialize(tw, AllAssets<PartyCharacterId, CharacterSheet>(assets.LoadPartyMember));
-            Flush();
-
-            tw = Writer("npcs.json");
-            s.Serialize(tw, AllAssets<NpcCharacterId, CharacterSheet>(assets.LoadNpc));
-            Flush();
-
-            tw = Writer("monsters.json");
-            s.Serialize(tw, AllAssets<MonsterCharacterId, CharacterSheet>(assets.LoadMonster));
-            Flush();
-
-            tw = Writer("chests.json");
-            s.Serialize(tw, AllAssets<ChestId, Inventory>(assets.LoadChest));
-            Flush();
-
-            tw = Writer("merchants.json");
-            s.Serialize(tw, AllAssets<MerchantId, Inventory>(assets.LoadMerchant));
-            Flush();
-
-            foreach (var id in All<BlockListId>())
-            {
-                IList<Block> asset = assets.LoadBlockList(id);
-                if (asset == null) continue;
-                tw = Writer($"blocklist{(int)id}.json");
-                s.Serialize(tw, asset);
-            }
-            Flush();
-
-            tw = Writer("eventsets.json");
-            s.Serialize(tw, AllAssets<EventSetId, EventSet>(assets.LoadEventSet));
-            Flush();
-
-            /*
-                        foreach (var id in All<ScriptId>())
-                        {
-                            s = Writer($"script{(int)id}.json");
-                            IList<IEvent> asset = assets.LoadScript(id);
-                        }
-            */
-
-            tw = Writer("spells.json");
-            s.Serialize(tw, AllAssets<SpellId, SpellData>(assets.LoadSpell));
-            Flush();
-
-            tw = Writer("monstergroups.json");
-            s.Serialize(tw, AllAssets<MonsterGroupId, MonsterGroup>(assets.LoadMonsterGroup));
-            Flush();
-        }
-
-#if false
-        public static void DumpAll(string baseDir, IAssetManager assets)
-        {
-            ISerializer s;
-            var disposeList = new List<IDisposable>();
-            JsonWriter Writer(string name)
-            {
-                var directory = Path.Combine(baseDir, "data", "exported");
-                if (!Directory.Exists(directory))
-                    Directory.CreateDirectory(directory);
-
-                var stream = File.OpenWrite(Path.Combine(directory, name));
-                var tw = new StreamWriter(stream);
-                disposeList.Add(tw);
-                disposeList.Add(stream);
-                return new JsonWriter(tw);
+                Flush();
             }
 
-            foreach (var id in All<TilesetId>())
+            if (types.Contains(AssetType.LabData))
             {
-                TilesetData asset = assets.LoadTileData(id);
-                if (asset == null) continue;
-                s = Writer($"tileset{(int)id}.json");
-                s.Object(null, asset, (i, x, s2) => TilesetData.Serdes(x, s2, null));
-            }
+                foreach (var id in All<LabyrinthDataId>())
+                {
+                    LabyrinthData asset = assets.LoadLabyrinthData(id);
+                    if (asset == null) continue;
+                    tw = Writer($"labdata/labyrinth{(int)id}.json");
+                    s.Serialize(tw, asset);
+                }
 
-            foreach (var id in All<LabyrinthDataId>())
-            {
-                LabyrinthData asset = assets.LoadLabyrinthData(id);
-                if (asset == null) continue;
-                s = Writer($"labyrinth{(int)id}.json");
-                s.Comment(id.ToString());
-                s.Object($"{(int)id}", asset, LabyrinthData.Serdes);
+                Flush();
             }
 
             // string str = assets.LoadString(StringId id, GameLanguage language);
 
-            foreach (var id in All<MapDataId>())
+            if (types.Contains(AssetType.MapData))
             {
-                IMapData asset = assets.LoadMap(id);
-                if (asset == null) continue;
-                s = Writer($"map{(int)id}.json");
-                s.Object($"{(int)id}", asset, BaseMapData.Serdes);
+                foreach (var id in All<MapDataId>())
+                {
+                    IMapData asset = assets.LoadMap(id);
+                    if (asset == null) continue;
+                    tw = Writer($"maps/map{(int)id}_{id}.json");
+                    s.Serialize(tw, asset);
+                }
+
+                Flush();
             }
 
-            s = Writer("items.json");
-            foreach (var id in All<ItemId>())
+            if (types.Contains(AssetType.ItemList) || types.Contains(AssetType.ItemNames))
             {
-                ItemData asset = assets.LoadItem(id);
-                s.Object($"{(int)id}", asset, ItemData.Serdes);
+                tw = Writer("items.json");
+                s.Serialize(tw, AllAssets<ItemId, ItemData>(assets.LoadItem));
+                Flush();
             }
 
-            foreach (var id in All<PartyCharacterId>())
+            if (types.Contains(AssetType.PartyMember))
             {
-                CharacterSheet asset = assets.LoadPartyMember(id);
-                if (asset == null) continue;
-                s = Writer($"partymember{(int)id}.json");
-                s.Object($"{(int) id}", asset,
-                    (i, x, s2) => CharacterSheet.Serdes(id.ToAssetId(), x, s2));
+                tw = Writer("party_members.json");
+                s.Serialize(tw, AllAssets<PartyCharacterId, CharacterSheet>(assets.LoadPartyMember));
+                Flush();
+
             }
 
-            foreach (var id in All<NpcCharacterId>())
+            if (types.Contains(AssetType.Npc))
             {
-                CharacterSheet asset = assets.LoadNpc(id);
-                if (asset == null) continue;
-                s = Writer($"npc{(int)id}.json");
-                s.Object($"{(int) id}", asset,
-                    (i, x, s2) => CharacterSheet.Serdes(id.ToAssetId(), x, s2));
+                tw = Writer("npcs.json");
+                s.Serialize(tw, AllAssets<NpcCharacterId, CharacterSheet>(assets.LoadNpc));
+                Flush();
             }
 
-            foreach (var id in All<MonsterCharacterId>())
+            if (types.Contains(AssetType.Monster))
             {
-                CharacterSheet asset = assets.LoadMonster(id);
-                if (asset == null) continue;
-                s = Writer($"monster{(int)id}.json");
-                s.Object($"{(int)id}", asset,
-                    (i, x, s2) => CharacterSheet.Serdes(id.ToAssetId(), x, s2));
+
+                tw = Writer("monsters.json");
+                s.Serialize(tw, AllAssets<MonsterCharacterId, CharacterSheet>(assets.LoadMonster));
+                Flush();
             }
 
-            s = Writer("chests.json");
-            foreach (var id in All<ChestId>())
+            if (types.Contains(AssetType.ChestData))
             {
-                Inventory asset = assets.LoadChest(id);
-                s.Object($"{(int) id}", asset, Inventory.SerdesChest);
+
+                tw = Writer("chests.json");
+                s.Serialize(tw, AllAssets<ChestId, Inventory>(assets.LoadChest));
+                Flush();
             }
 
-            s = Writer("merchants.json");
-            foreach (var id in All<MerchantId>())
+            if (types.Contains(AssetType.MerchantData))
             {
-                var asset = assets.LoadMerchant(id);
-                s.Object($"{(int) id}", asset, Inventory.SerdesMerchant);
+
+                tw = Writer("merchants.json");
+                s.Serialize(tw, AllAssets<MerchantId, Inventory>(assets.LoadMerchant));
+                Flush();
             }
 
-            foreach (var id in All<BlockListId>())
+            if (types.Contains(AssetType.BlockList))
             {
-                IList<Block> asset = assets.LoadBlockList(id);
-                if (asset == null) continue;
-                s = Writer($"blocklist{(int)id}.json");
-                s.Object($"{(int)id}", asset, Block.Serdes);
+                foreach (var id in All<BlockListId>())
+                {
+                    IList<Block> asset = assets.LoadBlockList(id);
+                    if (asset == null) continue;
+                    tw = Writer($"blocks/blocklist{(int)id}.json");
+                    s.Serialize(tw, asset);
+                }
+                Flush();
             }
 
-            s = Writer("eventsets.json");
-            foreach (var id in All<EventSetId>())
+            if (types.Contains(AssetType.EventSet))
             {
-                EventSet asset = assets.LoadEventSet(id);
-                s.Object($"{(int)id}", asset, EventSet.Serdes);
-            }
-/*
-            foreach (var id in All<ScriptId>())
-            {
-                s = Writer($"script{(int)id}.json");
-                IList<IEvent> asset = assets.LoadScript(id);
-            }
-*/
-
-            s = Writer("spells.json");
-            foreach (var id in All<SpellId>())
-            {
-                SpellData asset = assets.LoadSpell(id);
-                s.Object($"{(int)id}", asset, SpellData.Serdes);
+                tw = Writer("event_sets.json");
+                s.Serialize(tw, AllAssets<EventSetId, EventSet>(assets.LoadEventSet));
+                Flush();
             }
 
-            s = Writer("monstergroups.json");
-            foreach (var id in All<MonsterGroupId>())
+            if (types.Contains(AssetType.Script))
             {
-                MonsterGroup asset = assets.LoadMonsterGroup(id);
-                s.Object($"{(int)id}", asset, MonsterGroup.Serdes);
+                foreach (var id in All<ScriptId>())
+                {
+                    IList<IEvent> asset = assets.LoadScript(id);
+                    if (asset == null) continue;
+                    tw = Writer($"scripts/script{(int)id}.json");
+                    s.Serialize(tw, asset.Select(x => x.ToString()).ToArray());
+                }
+                Flush();
             }
 
-            foreach (var d in disposeList)
-                d.Dispose();
+            if (types.Contains(AssetType.SpellData))
+            {
+                tw = Writer("spells.json");
+                s.Serialize(tw, AllAssets<SpellId, SpellData>(assets.LoadSpell));
+                Flush();
+            }
+
+            if (types.Contains(AssetType.MonsterGroup))
+            {
+                tw = Writer("monster_groups.json");
+                s.Serialize(tw, AllAssets<MonsterGroupId, MonsterGroup>(assets.LoadMonsterGroup));
+                Flush();
+            }
+
+            if (types.Contains(AssetType.Palette))
+            {
+                foreach (var id in All<PaletteId>())
+                {
+                    tw = Writer($"palettes/palette{(int)id}_{id}.json");
+                    var palette = assets.LoadPalette(id);
+                    s.Serialize(tw, palette);
+                }
+                Flush();
+            }
         }
-#endif
     }
 }

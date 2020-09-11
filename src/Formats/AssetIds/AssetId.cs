@@ -19,7 +19,7 @@ namespace UAlbion.Formats.AssetIds
         public override string ToString() => Type.ToShortName() + ":" + (Type switch
         {
             AssetType.Automap            => ((AutoMapId)Id).ToString(),
-            AssetType.AutomapGraphics    => ((AutoMapId)Id).ToString(),
+            AssetType.AutomapGraphics    => ((AutoGraphicsId)Id).ToString(),
             AssetType.BlockList          => ((BlockListId)Id).ToString(),
             AssetType.ChestData          => ((ChestId)Id).ToString(),
             AssetType.CombatBackground   => ((CombatBackgroundId)Id).ToString(),
@@ -54,6 +54,7 @@ namespace UAlbion.Formats.AssetIds
             AssetType.Picture            => ((PictureId)Id).ToString(),
             AssetType.Sample             => ((SampleId)Id).ToString(),
             AssetType.Script             => ((ScriptId)Id).ToString(),
+            AssetType.Slab               => ((SlabId)Id).ToString(),
             AssetType.SmallNpcGraphics   => ((SmallNpcId)Id).ToString(),
             AssetType.SmallPartyGraphics => ((SmallPartyGraphicsId)Id).ToString(),
             AssetType.SmallPortrait      => ((SmallPortraitId)Id).ToString(),
@@ -88,6 +89,7 @@ namespace UAlbion.Formats.AssetIds
                 (ushort)(id & 0xffff));
 
         public static implicit operator AssetId(AutoMapId id)            => ToAssetId(id);
+        public static implicit operator AssetId(AutoGraphicsId id)       => ToAssetId(id);
         public static implicit operator AssetId(BlockListId id)          => ToAssetId(id);
         public static implicit operator AssetId(ChestId id)              => ToAssetId(id);
         public static implicit operator AssetId(CombatBackgroundId id)   => ToAssetId(id);
@@ -121,6 +123,7 @@ namespace UAlbion.Formats.AssetIds
         public static implicit operator AssetId(PictureId id)            => ToAssetId(id);
         public static implicit operator AssetId(SampleId id)             => ToAssetId(id);
         public static implicit operator AssetId(ScriptId id)             => ToAssetId(id);
+        public static implicit operator AssetId(SlabId id)               => ToAssetId(id);
         public static implicit operator AssetId(SmallNpcId id)           => ToAssetId(id);
         public static implicit operator AssetId(SmallPartyGraphicsId id) => ToAssetId(id);
         public static implicit operator AssetId(SmallPortraitId id)      => ToAssetId(id);
@@ -158,6 +161,7 @@ namespace UAlbion.Formats.AssetIds
         public override int GetHashCode() => (int)this;
 
         public static AssetId ToAssetId(AutoMapId id)            => new AssetId(AssetType.Automap,            (ushort)id);
+        public static AssetId ToAssetId(AutoGraphicsId id)       => new AssetId(AssetType.AutomapGraphics,    (ushort)id);
         public static AssetId ToAssetId(BlockListId id)          => new AssetId(AssetType.BlockList,          (ushort)id);
         public static AssetId ToAssetId(ChestId id)              => new AssetId(AssetType.ChestData,          (ushort)id);
         public static AssetId ToAssetId(CombatBackgroundId id)   => new AssetId(AssetType.CombatBackground,   (ushort)id);
@@ -191,6 +195,7 @@ namespace UAlbion.Formats.AssetIds
         public static AssetId ToAssetId(PictureId id)            => new AssetId(AssetType.Picture,            (ushort)id);
         public static AssetId ToAssetId(SampleId id)             => new AssetId(AssetType.Sample,             (ushort)id);
         public static AssetId ToAssetId(ScriptId id)             => new AssetId(AssetType.Script,             (ushort)id);
+        public static AssetId ToAssetId(SlabId id)               => new AssetId(AssetType.Slab,               (ushort)id);
         public static AssetId ToAssetId(SmallNpcId id)           => new AssetId(AssetType.SmallNpcGraphics,   (ushort)id);
         public static AssetId ToAssetId(SmallPartyGraphicsId id) => new AssetId(AssetType.SmallPartyGraphics, (ushort)id);
         public static AssetId ToAssetId(SmallPortraitId id)      => new AssetId(AssetType.SmallPortrait,      (ushort)id);

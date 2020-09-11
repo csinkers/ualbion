@@ -32,5 +32,7 @@ namespace UAlbion.Game.Assets
                 null,
                 new AlbionReader(br, stream.Length), key, null);
         }
+
+        public AssetInfo GetAssetInfo(AssetKey key, Func<AssetKey, object> loaderFunc) => null;
     }
 }

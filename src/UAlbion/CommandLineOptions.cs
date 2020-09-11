@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using UAlbion.Formats.AssetIds;
 using Veldrid;
 
 namespace UAlbion
@@ -15,6 +17,8 @@ namespace UAlbion
         public GameMode GameMode { get; }
         public string GameModeArgument { get; }
         public string[] Commands { get; }
+        public DumpFormats DumpFormats { get; } = DumpFormats.Json;
+        public ISet<AssetType> DumpAssetTypes { get; } = new HashSet<AssetType>();
 
         public CommandLineOptions(string[] args)
         {
@@ -55,14 +59,54 @@ namespace UAlbion
             if (args.Contains("--save-tests"))
                 Mode = ExecutionMode.SavedGameTests;
 
-            if (args.Contains("--dump-all"))
-                Mode = ExecutionMode.DumpData;
-
-            var index = FindArgIndex("--dump", args);
-            if (index != -1)
+            if (args.Contains("--dump-all-gfx"))
             {
                 Mode = ExecutionMode.DumpData;
-                GameModeArgument = args[index + 1];
+                DumpFormats = DumpFormats.Png;
+                DumpAssetTypes.UnionWith(new[] {
+                    AssetType.AutomapGraphics,
+                    AssetType.CombatBackground,
+                    AssetType.CombatGraphics,
+                    AssetType.CoreGraphics,
+                    AssetType.BackgroundGraphics,
+                    AssetType.Floor3D,
+                    AssetType.Object3D,
+                    AssetType.Overlay3D,
+                    AssetType.Wall3D,
+                    AssetType.Font,
+                    AssetType.FullBodyPicture,
+                    AssetType.IconGraphics,
+                    AssetType.ItemGraphics,
+                    AssetType.BigNpcGraphics,
+                    AssetType.BigPartyGraphics,
+                    AssetType.MonsterGraphics,
+                    AssetType.Picture,
+                    AssetType.SmallNpcGraphics,
+                    AssetType.SmallPartyGraphics,
+                    AssetType.SmallPortrait,
+                    AssetType.TacticalIcon });
+            }
+
+            if (args.Contains("--dump-all"))
+            {
+                Mode = ExecutionMode.DumpData;
+                DumpAssetTypes.UnionWith(Enum.GetValues(typeof(AssetType)).OfType<AssetType>());
+            }
+
+            var index = FindArgIndex("--dump", args);
+            if (index != -1 && args.Length > index + 1)
+            {
+                Mode = ExecutionMode.DumpData;
+                foreach (var type in args[index + 1].Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                    DumpAssetTypes.Add(Enum.Parse<AssetType>(type, true));
+            }
+
+            index = FindArgIndex("--formats", args);
+            if (index != -1 && args.Length > index + 1)
+            {
+                DumpFormats = 0;
+                foreach (var type in args[index + 1].Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                    DumpFormats |= Enum.Parse<DumpFormats>(type, true);
             }
 
             if (Mode == ExecutionMode.Game)
@@ -74,14 +118,14 @@ namespace UAlbion
                     GameMode = GameMode.Inventory;
 
                 index = FindArgIndex("--load-game", args);
-                if (index > -1)
+                if (index > -1 && args.Length > index + 1)
                 {
                     GameMode = GameMode.LoadGame;
                     GameModeArgument = args[index + 1];
                 }
 
                 index = FindArgIndex("--load-map", args);
-                if (index > -1)
+                if (index > -1 && args.Length > index + 1)
                 {
                     GameMode = GameMode.LoadMap;
                     GameModeArgument = args[index + 1];
@@ -100,9 +144,14 @@ namespace UAlbion
 
         void DisplayUsage()
         {
+            var formats = string.Join(" ", 
+                Enum.GetValues(typeof(DumpFormats))
+                    .Cast<DumpFormats>()
+                    .Select(x => x.ToString()));
+
             var dumpTypes = string.Join(" ",
-                Enum.GetValues(typeof(DumpTypes))
-                    .Cast<DumpTypes>()
+                Enum.GetValues(typeof(AssetType))
+                    .Cast<AssetType>()
                     .Select(x => x.ToString()));
 
             Console.WriteLine($@"UAlbion
@@ -125,10 +174,11 @@ Execution Mode:
     --no-audio: Runs the game without audio
     --external-audio: Runs the game with audio delegated to a worker process
     --audio : Runs as an audio worker process
-    --editor : Runs the editor (TODO)
     --save-tests : Runs the saved game tests
-    --dump-all : Dumps a variety of game data to text files
-    --dump ""[dumpTypes]"": Dump specific types of game data (space separated list, valid types: {dumpTypes})
+    --dump-all : Dumps all asset types supported by the selected formats
+    --dump-all-gfx : Dumps all graphical asset types
+    --dump ""[asset types]"": Dump specific types of game data (space separated list, valid types: {dumpTypes})
+    --formats ""[formats]"": Specifies the formats for the dumped data (defaults to JSON, valid formats: {formats})
 
 Game Mode: (if running as game)
         --main-menu (default)

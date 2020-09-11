@@ -29,6 +29,7 @@ namespace UAlbion.Game.Assets
 
         protected override void Unsubscribed() => Exchange.Unregister(this);
 
+        public AssetInfo GetAssetInfo(AssetKey key) => _assetLocatorRegistry.GetAssetInfo(key);
         public IMapData LoadMap(MapDataId id) => (IMapData)_assetLocatorRegistry.LoadAsset(id.ToAssetId()); // No caching for map data
         public ItemData LoadItem(ItemId id)
         {
@@ -57,6 +58,7 @@ namespace UAlbion.Game.Assets
         {
             AssetId x                    => _assetLocatorRegistry.LoadAssetCached(x),
             AutoMapId x                  => _assetLocatorRegistry.LoadAssetCached(x.ToAssetId()),
+            AutoGraphicsId x             => _assetLocatorRegistry.LoadAssetCached(x.ToAssetId()),
             CombatBackgroundId x         => _assetLocatorRegistry.LoadAssetCached(x.ToAssetId()),
             CombatGraphicsId x           => _assetLocatorRegistry.LoadAssetCached(x.ToAssetId()),
             CoreSpriteId x               => _assetLocatorRegistry.LoadAssetCached(x.ToAssetId()),

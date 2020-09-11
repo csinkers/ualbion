@@ -3,20 +3,15 @@
 namespace UAlbion
 {
     [Flags]
-    public enum DumpTypes
+    public enum DumpFormats
     {
-        Characters  = 1 << 0,
-        Chests      = 1 << 1,
-        CoreSprites = 1 << 2,
-        EventSets   = 1 << 3,
-        Items       = 1 << 4,
-        MapEvents   = 1 << 5,
-        Maps        = 1 << 6,
-        Spells      = 1 << 7,
-        ThreeDMaps  = 1 << 8,
-        MonsterGroups = 1 << 9,
-        Json        = 1 << 10,
+        Json      = 1 << 0, // Machine & human-readable, good for inter-operation and modding
+        Text      = 1 << 1, // Dense ad-hoc text format, good for an overview.
+        Png       = 1 << 2, // True-colour PNG with colours resolved at palette tick 0
+        PngCycled = 1 << 3, // True-colour PNGs capturing all significant palette steps
+        Bmp       = 1 << 4, // 8-bit Device-Independent Bitmap with palette copied at tick 0
+        BmpCycled = 1 << 5, // 8-bit Device-Independent Bitmaps capturing all significant palette steps
 
-        All = 0x7fffffff,
+        GraphicsMask = Bmp | Png | BmpCycled | PngCycled
     }
 }

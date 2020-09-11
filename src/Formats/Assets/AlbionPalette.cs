@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using UAlbion.Api;
 using UAlbion.Formats.AssetIds;
 
@@ -11,8 +12,9 @@ namespace UAlbion.Formats.Assets
     {
         public int Id { get; }
         public string Name { get; }
-        public bool IsAnimated => AnimatedRanges.ContainsKey(Id);
+        [JsonIgnore] public bool IsAnimated => AnimatedRanges.ContainsKey(Id);
         public int Period { get; }
+
         readonly uint[] _entries = new uint[0x100];
         readonly IList<uint[]> _cache = new List<uint[]>();
 
@@ -34,6 +36,11 @@ namespace UAlbion.Formats.Assets
         }.ToDictionary(
             x => x.Key,
             x => (IList<(byte, byte)>)x.Value.Select(y => ((byte)y.Item1, (byte)y.Item2)).ToArray());
+
+        public IList<(byte, byte)> AnimatedRange =>
+            AnimatedRanges.TryGetValue((int) Id, out var range)
+            ? range
+            : Array.Empty<(byte, byte)>();
 
         public AlbionPalette(BinaryReader br, int streamLength, AssetKey key, int id)
         {

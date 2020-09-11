@@ -1,5 +1,6 @@
 ﻿using UAlbion.Core;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.Assets
 {
@@ -9,5 +10,6 @@ namespace UAlbion.Game.Assets
         IAssetLocatorRegistry AddAssetPostProcessor(IAssetPostProcessor postProcessor);
         object LoadAsset(AssetKey key);
         object LoadAssetCached(AssetKey key);
+        AssetInfo GetAssetInfo(AssetKey key);
     }
 }

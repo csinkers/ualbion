@@ -8,12 +8,11 @@ namespace UAlbion.Formats.Config
     public abstract class XldInfo
     {
         [JsonIgnore] public string Name { get; set; }
-
         [JsonConverter(typeof(StringEnumConverter))]
-        public FileFormat Format { get; set; }
-        public int? Width { get; set; }
-        public int? Height { get; set; }
-        public bool? Transposed { get; set; }
+        [JsonProperty(Order=-2)] public FileFormat Format { get; set; }
+        [JsonProperty(Order=-2)] public int? Width { get; set; }
+        [JsonProperty(Order=-2)] public int? Height { get; set; }
+        [JsonProperty(Order=-2)] public bool? Transposed { get; set; }
     }
 
     public class BasicXldInfo : XldInfo

@@ -3,6 +3,7 @@
     "Format": "SingleHeaderSprite",
     "EnumName": "DungeonBackgroundId",
     "EnumType": "ushort",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "EarlyGameS",
@@ -34,6 +35,7 @@
     "Height": 64,
     "EnumName": "DungeonFloorId",
     "EnumType": "ushort",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Brick",
@@ -655,11 +657,11 @@
   },
   "3DFLOOR1.XLD": {
     "Format": "FixedSizeSprite",
-    "IdOffset":  100,
     "Width": 64,
     "Height": 64,
     "EnumName": "DungeonFloorId",
     "EnumType": "ushort",
+    "IdOffset": 100,
     "Assets": {
       "0": {
         "Name": "DirtToStoneTR",
@@ -1804,11 +1806,11 @@
   },
   "3DFLOOR2.XLD": {
     "Format": "FixedSizeSprite",
-    "IdOffset":  200,
     "Width": 64,
     "Height": 64,
     "EnumName": "DungeonFloorId",
     "EnumType": "ushort",
+    "IdOffset": 200,
     "Assets": {
       "0": {
         "Name": "OrganicToStoneTR",
@@ -2381,6 +2383,7 @@
     "Format": "FixedSizeSprite",
     "EnumName": "DungeonObjectId",
     "EnumType": "ushort",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "LightCover",
@@ -3159,9 +3162,9 @@
   },
   "3DOBJEC1.XLD": {
     "Format": "FixedSizeSprite",
-    "IdOffset":  100,
     "EnumName": "DungeonObjectId",
     "EnumType": "ushort",
+    "IdOffset": 100,
     "Assets": {
       "0": {
         "Name": "TorchPedestal",
@@ -3984,9 +3987,9 @@
   },
   "3DOBJEC2.XLD": {
     "Format": "FixedSizeSprite",
-    "IdOffset":  200,
     "EnumName": "DungeonObjectId",
     "EnumType": "ushort",
+    "IdOffset": 200,
     "Assets": {
       "0": {
         "Name": "Stalagmite",
@@ -4321,14 +4324,23 @@
       },
       "45": {
         "Name": "Orb",
+        "PaletteHints": [
+          8
+        ],
         "Width": 64
       },
       "46": {
         "Name": "Orb",
+        "PaletteHints": [
+          8
+        ],
         "Width": 64
       },
       "47": {
         "Name": "VerticalLight",
+        "PaletteHints": [
+          6
+        ],
         "Width": 10
       },
       "48": {
@@ -4632,10 +4644,16 @@
       },
       "84": {
         "Name": "AnimatedOrb",
+        "PaletteHints": [
+          8
+        ],
         "Width": 64
       },
       "85": {
         "Name": "AnimatedOrb",
+        "PaletteHints": [
+          8
+        ],
         "Width": 64
       },
       "86": {
@@ -4734,7 +4752,7 @@
         "Name": "PeskyWasp",
         "PaletteHints": [
           54,
-          2
+          14
         ],
         "Width": 165,
         "Height": 147
@@ -4813,9 +4831,9 @@
   },
   "3DOBJEC3.XLD": {
     "Format": "FixedSizeSprite",
-    "IdOffset":  300,
     "EnumName": "DungeonObjectId",
     "EnumType": "ushort",
+    "IdOffset": 300,
     "Assets": {
       "0": {
         "Name": "Celt",
@@ -4836,12 +4854,7 @@
       "2": {
         "Name": "Demon",
         "PaletteHints": [
-          29,
-          2,
-          12,
-          13,
-          28,
-          54
+          12
         ],
         "Width": 129,
         "Height": 164
@@ -4849,8 +4862,7 @@
       "3": {
         "Name": "PeskyWasp",
         "PaletteHints": [
-          2,
-          14
+          12
         ],
         "Width": 165,
         "Height": 147
@@ -4858,8 +4870,7 @@
       "4": {
         "Name": "PeskyWasp",
         "PaletteHints": [
-          2,
-          14
+          12
         ],
         "Width": 165,
         "Height": 147
@@ -4867,8 +4878,7 @@
       "5": {
         "Name": "PeskyWasp",
         "PaletteHints": [
-          2,
-          14
+          55
         ],
         "Width": 165,
         "Height": 147
@@ -4970,46 +4980,80 @@
       },
       "17": {
         "Name": "AngryCloud",
+        "PaletteHints": [
+          55
+        ],
         "Width": 183,
         "Height": 152
       },
       "18": {
         "Name": "Spidermajigger",
+        "PaletteHints": [
+          21
+        ],
         "Width": 83,
         "Height": 84
       },
       "19": {
         "Name": "Security",
+        "PaletteHints": [
+          21,
+          55
+        ],
         "Width": 54,
         "Height": 116
       },
       "20": {
         "Name": "Security",
+        "PaletteHints": [
+          21,
+          55
+        ],
         "Width": 54,
         "Height": 116
       },
       "21": {
         "Name": "Celt",
+        "PaletteHints": [
+          10
+        ],
         "Width": 50,
         "Height": 120
       },
       "22": {
         "Name": "MutedPuppyDog",
+        "PaletteHints": [
+          12,
+          4,
+          8,
+          9,
+          21
+        ],
         "Width": 75,
         "Height": 71
       },
       "23": {
         "Name": "IllTemperedMoleRat",
+        "PaletteHints": [
+          12,
+          13
+        ],
         "Width": 85,
         "Height": 122
       },
       "24": {
         "Name": "Raptor",
+        "PaletteHints": [
+          12
+        ],
         "Width": 106,
         "Height": 112
       },
       "25": {
         "Name": "Spidermajigger",
+        "PaletteHints": [
+          12
+        ],
         "Width": 83,
         "Height": 84
       },
@@ -5242,6 +5286,7 @@
     "Transposed": true,
     "EnumName": "DungeonOverlayId",
     "EnumType": "ushort",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "JiriDoor",
@@ -5861,10 +5906,10 @@
   },
   "3DOVERL1.XLD": {
     "Format": "FixedSizeSprite",
-    "IdOffset":  100,
     "Transposed": true,
     "EnumName": "DungeonOverlayId",
     "EnumType": "ushort",
+    "IdOffset": 100,
     "Assets": {
       "0": {
         "PaletteHints": [
@@ -6538,10 +6583,10 @@
   },
   "3DOVERL2.XLD": {
     "Format": "FixedSizeSprite",
-    "IdOffset":  200,
     "Transposed": true,
     "EnumName": "DungeonOverlayId",
     "EnumType": "ushort",
+    "IdOffset": 200,
     "Assets": {
       "0": {
         "PaletteHints": [
@@ -6983,6 +7028,7 @@
     "Transposed": true,
     "EnumName": "DungeonWallId",
     "EnumType": "ushort",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "JiriTileAndStone",
@@ -7657,10 +7703,10 @@
   },
   "3DWALLS1.XLD": {
     "Format": "FixedSizeSprite",
-    "IdOffset":  100,
     "Transposed": true,
     "EnumName": "DungeonWallId",
     "EnumType": "ushort",
+    "IdOffset": 100,
     "Assets": {
       "0": {
         "PaletteHints": [
@@ -8085,13 +8131,20 @@
     "Format": "AmorphousSprite",
     "EnumName": "AutoGraphicsId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Set1",
+        "PaletteHints": [
+          10
+        ],
         "SubSprites": "(8,8,576) (16,16)"
       },
       "1": {
         "Name": "Set2",
+        "PaletteHints": [
+          29
+        ],
         "SubSprites": "(8,8,576) (16,16)"
       }
     }
@@ -8100,6 +8153,7 @@
     "Format": "BlockList",
     "EnumName": "BlockListId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {},
       "1": {},
@@ -8119,6 +8173,7 @@
     "Width": 360,
     "EnumName": "CombatBackgroundId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Plains",
@@ -8240,98 +8295,1460 @@
     "Format": "HeaderPerSubImageSprite",
     "EnumName": "CombatGraphicsId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
-      "0": {},
-      "1": {},
-      "2": {},
-      "3": {},
-      "4": {},
-      "5": {},
-      "6": {},
-      "7": {},
-      "8": {},
-      "9": {},
-      "10": {},
-      "11": {},
-      "12": {},
-      "13": {},
-      "14": {},
-      "15": {},
-      "16": {},
-      "17": {},
-      "18": {},
-      "19": {},
-      "20": {},
-      "21": {},
-      "22": {},
-      "23": {},
-      "24": {},
-      "25": {},
-      "26": {},
-      "27": {},
-      "28": {},
-      "29": {},
-      "30": {},
-      "31": {},
-      "32": {},
-      "33": {},
-      "34": {},
-      "35": {},
-      "36": {},
-      "37": {},
-      "38": {},
-      "39": {},
-      "40": {},
-      "41": {},
-      "42": {},
-      "43": {},
-      "44": {},
-      "45": {},
-      "46": {},
-      "47": {},
-      "48": {},
-      "49": {},
-      "50": {},
-      "51": {},
-      "52": {},
-      "53": {},
-      "54": {},
-      "55": {},
-      "56": {},
-      "57": {},
-      "58": {},
-      "59": {},
-      "60": {},
-      "61": {},
-      "62": {},
-      "63": {},
-      "64": {},
-      "65": {},
-      "66": {},
-      "67": {},
-      "68": {},
-      "69": {},
-      "70": {},
-      "71": {},
-      "72": {},
-      "73": {},
-      "74": {},
-      "75": {},
-      "76": {},
-      "77": {},
-      "78": {},
-      "79": {},
-      "80": {},
-      "81": {},
-      "82": {},
-      "83": {},
-      "84": {}
+      "0": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "1": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "2": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "3": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "4": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "5": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "6": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "7": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "8": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "9": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "10": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "11": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "12": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "13": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "14": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "15": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "16": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "17": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "18": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "19": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "20": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "21": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "22": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "23": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "24": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "25": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "26": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "27": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "28": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "29": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "30": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "31": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "32": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "33": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "34": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "35": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "36": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "37": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "38": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "39": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "40": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "41": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "42": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "43": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "44": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "45": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "46": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "47": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "48": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "49": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "50": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "51": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "52": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "53": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "54": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "55": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "56": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "57": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "58": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "59": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "60": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "61": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "62": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "63": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "64": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "65": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "66": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "67": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "68": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "69": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "70": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "71": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "72": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "73": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "74": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "75": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "76": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "77": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "78": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "79": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "80": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "81": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "82": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "83": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      },
+      "84": {
+        "PaletteHints": [
+          22,
+          23,
+          26,
+          35,
+          36,
+          37,
+          39,
+          41,
+          42,
+          43,
+          51,
+          52,
+          53
+        ]
+      }
     }
   },
   "EVNTSET0.XLD": {
     "Format": "EventSet",
     "EnumName": "EventSetId",
     "EnumType": "ushort",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "FestivalTime"
@@ -8373,9 +9790,9 @@
   },
   "EVNTSET1.XLD": {
     "Format": "EventSet",
-    "IdOffset":  100,
     "EnumName": "EventSetId",
     "EnumType": "ushort",
+    "IdOffset": 100,
     "Assets": {
       "0": {
         "Name": "Iskai WordSet"
@@ -8663,9 +10080,9 @@
   },
   "EVNTSET2.XLD": {
     "Format": "EventSet",
-    "IdOffset":  200,
     "EnumName": "EventSetId",
     "EnumType": "ushort",
+    "IdOffset": 200,
     "Assets": {
       "0": {
         "Name": "Maini Beloveno WordSet"
@@ -8861,9 +10278,9 @@
   },
   "EVNTSET3.XLD": {
     "Format": "EventSet",
-    "IdOffset":  300,
     "EnumName": "EventSetId",
     "EnumType": "ushort",
+    "IdOffset": 300,
     "Assets": {
       "0": {},
       "1": {
@@ -9011,9 +10428,9 @@
   },
   "EVNTSET9.XLD": {
     "Format": "EventSet",
-    "IdOffset":  900,
     "EnumName": "EventSetId",
     "EnumType": "ushort",
+    "IdOffset": 900,
     "Assets": {
       "0": {},
       "1": {},
@@ -9139,6 +10556,7 @@
     "Format": "SingleHeaderSprite",
     "EnumName": "FullBodyPictureId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Tom",
@@ -9203,6 +10621,7 @@
     "Height": 8,
     "EnumName": "FontId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "RegularFont"
@@ -9218,6 +10637,7 @@
     "Height": 8,
     "EnumName": "TilesetId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Outdoors",
@@ -9261,6 +10681,7 @@
     "Height": 16,
     "EnumName": "IconGraphicsId",
     "EnumType": "ushort",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Outdoors",
@@ -9334,6 +10755,7 @@
     "Format": "FixedSizeSprite",
     "Width": 16,
     "Height": 16,
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Item Sprites"
@@ -9342,6 +10764,7 @@
   },
   "ITEMLIST.DAT": {
     "Format": "ItemData",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Item Data"
@@ -9350,6 +10773,7 @@
   },
   "ITEMNAME.DAT": {
     "Format": "ItemNames",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Item Names"
@@ -9360,6 +10784,7 @@
     "Format": "LabyrinthData",
     "EnumName": "LabyrinthDataId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {},
       "1": {},
@@ -9374,9 +10799,9 @@
   },
   "LABDATA1.XLD": {
     "Format": "LabyrinthData",
-    "IdOffset":  100,
     "EnumName": "LabyrinthDataId",
     "EnumType": "byte",
+    "IdOffset": 100,
     "Assets": {
       "0": {},
       "1": {},
@@ -9482,9 +10907,9 @@
   },
   "LABDATA2.XLD": {
     "Format": "LabyrinthData",
-    "IdOffset":  200,
     "EnumName": "LabyrinthDataId",
     "EnumType": "byte",
+    "IdOffset": 200,
     "Assets": {
       "0": {},
       "1": {},
@@ -9590,9 +11015,9 @@
   },
   "MAPDATA1.XLD": {
     "Format": "MapData",
-    "IdOffset":  100,
     "EnumName": "MapDataId",
     "EnumType": "ushort",
+    "IdOffset": 100,
     "Assets": {
       "0": {
         "Name": "Test-Map Iskai"
@@ -9860,9 +11285,9 @@
   },
   "MAPDATA2.XLD": {
     "Format": "MapData",
-    "IdOffset":  200,
     "EnumName": "MapDataId",
     "EnumType": "ushort",
+    "IdOffset": 200,
     "Assets": {
       "0": {
         "Name": "Nakiridaani Kontinentkarte"
@@ -10126,9 +11551,9 @@
   },
   "MAPDATA3.XLD": {
     "Format": "MapData",
-    "IdOffset":  300,
     "EnumName": "MapDataId",
     "EnumType": "ushort",
+    "IdOffset": 300,
     "Assets": {
       "0": {
         "Name": "Toronto 2D Gesamtkarte Spielbeginn"
@@ -10270,6 +11695,7 @@
     "Format": "CharacterData",
     "EnumName": "MonsterCharacterId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Fear1"
@@ -10448,6 +11874,7 @@
     "Format": "HeaderPerSubImageSprite",
     "EnumName": "MonsterGraphicsId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "FloatingHand",
@@ -10769,18 +12196,39 @@
     "Format": "MonsterGroup",
     "EnumName": "MonsterGroupId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {},
-      "1": { "Name": "DebugMix" },
-      "2": { "Name": "OneKrondir1" },
-      "3": { "Name": "TwoKrondir1" },
-      "4": { "Name": "TwoSkrinn1" },
-      "5": { "Name": "FourSkrinn1" },
-      "6": { "Name": "SixSkrinn1" },
-      "7": { "Name": "OneBrogg1" },
-      "8": { "Name": "TwoBrogg1" },
-      "9": { "Name": "TwoSkrinn1OneKrondir1" },
-      "10": { "Name": "OneArgim" },
+      "1": {
+        "Name": "DebugMix"
+      },
+      "2": {
+        "Name": "OneKrondir1"
+      },
+      "3": {
+        "Name": "TwoKrondir1"
+      },
+      "4": {
+        "Name": "TwoSkrinn1"
+      },
+      "5": {
+        "Name": "FourSkrinn1"
+      },
+      "6": {
+        "Name": "SixSkrinn1"
+      },
+      "7": {
+        "Name": "OneBrogg1"
+      },
+      "8": {
+        "Name": "TwoBrogg1"
+      },
+      "9": {
+        "Name": "TwoSkrinn1OneKrondir1"
+      },
+      "10": {
+        "Name": "OneArgim"
+      },
       "11": {},
       "12": {},
       "13": {},
@@ -10819,156 +12267,440 @@
       "46": {},
       "47": {},
       "48": {},
-      "49": { "Name": "OneBrogg1" },
-      "50": { "Name": "OneRinrii1" },
-      "51": { "Name": "OneRinrii1" },
-      "52": { "Name": "ThreeRinrii1" },
-      "53": { "Name": "SixRinrii1" },
-      "54": { "Name": "NineRinrii1" },
-      "55": { "Name": "OneKizz1" },
-      "56": { "Name": "ThreeKizz1" },
-      "57": { "Name": "SixKizz1" },
-      "58": { "Name": "ElevenKizz1" },
-      "59": { "Name": "EightBrogg1" },
-      "60": { "Name": "FourBrogg1FourKizz1" },
-      "61": { "Name": "ThreeBrogg1FiveKizz1" },
-      "62": { "Name": "SixBrogg1ThreeKizz1" },
-      "63": { "Name": "SevenKizz1FourRinrii1" },
-      "64": { "Name": "FourBrogg1SixRinrii1" },
-      "65": { "Name": "FiveKizz1FiveRinrii1" },
-      "66": { "Name": "FiveBrogg1ThreeRinrii1" },
-      "67": { "Name": "TwoKritah1TwoKritah2" },
-      "68": { "Name": "ThreeKritah1TwoKritah2OneKritah3" },
-      "69": { "Name": "ThreeKritah1FourKritah2OneKritah3" },
-      "70": { "Name": "ThreeKritah1OneKritah2ThreeKritah3" },
-      "71": { "Name": "OneKritah1FiveKritah2OneKritah3" },
-      "72": { "Name": "SixKritah2ThreeKritah3" },
-      "73": { "Name": "FourKritah1ThreeKritah2TwoKritah3" },
-      "74": { "Name": "TwelveSkrinn2" },
-      "75": { "Name": "ThreeBrogg2FiveBrogg3" },
-      "76": { "Name": "FiveBrogg3TwoKrondir2TwoWarniak3" },
-      "77": { "Name": "TwoBrogg2SevenBrogg3TwoSkrinn2" },
-      "78": { "Name": "FourBrogg3FourSkrinn2ThreeKizz3" },
-      "79": { "Name": "FourSkrinn2OneKrondir2" },
-      "80": { "Name": "OneSkrinn2FourKrondir2" },
-      "81": { "Name": "FiveSkrinn2" },
-      "82": { "Name": "FourSkrinn1TwoSkrinn2" },
-      "83": { "Name": "ThreeKrondir1TwoKrondir2" },
-      "84": { "Name": "FourSkrinn2OneKrondir2" },
-      "85": { "Name": "FourSkrinn2OneWarniak3" },
-      "86": { "Name": "FourWarniak1TwoWarniak2TwoWarniak3" },
-      "87": { "Name": "ThreeSkrinn2OneKrondir2OneWarniak2OneWarniak3" },
-      "88": { "Name": "ThreeSkrinn1FiveSkrinn2" },
-      "89": { "Name": "ThreeWarniak1TwoSkrinn2TwoKrondir2" },
-      "90": { "Name": "FiveKrondir1ThreeKrondir2" },
-      "91": { "Name": "ThreeKrondir1ThreeSkrinn2ThreeWarniak2" },
-      "92": { "Name": "NineSkrinn2OneWarniak3" },
-      "93": { "Name": "FourSkrinn2ThreeWarniak2" },
-      "94": { "Name": "FourSkrinn2TwoKrondir2" },
-      "95": { "Name": "OneKrondir2TwoWarniak2OneWarniak3" },
-      "96": { "Name": "EightSkrinn2OneWarniak3" },
-      "97": { "Name": "FiveSkrinn2ThreeKrondir2" },
-      "98": { "Name": "FourKrondir2OneWarniak2TwoWarniak3" }
+      "49": {
+        "Name": "OneBrogg1"
+      },
+      "50": {
+        "Name": "OneRinrii1"
+      },
+      "51": {
+        "Name": "OneRinrii1"
+      },
+      "52": {
+        "Name": "ThreeRinrii1"
+      },
+      "53": {
+        "Name": "SixRinrii1"
+      },
+      "54": {
+        "Name": "NineRinrii1"
+      },
+      "55": {
+        "Name": "OneKizz1"
+      },
+      "56": {
+        "Name": "ThreeKizz1"
+      },
+      "57": {
+        "Name": "SixKizz1"
+      },
+      "58": {
+        "Name": "ElevenKizz1"
+      },
+      "59": {
+        "Name": "EightBrogg1"
+      },
+      "60": {
+        "Name": "FourBrogg1FourKizz1"
+      },
+      "61": {
+        "Name": "ThreeBrogg1FiveKizz1"
+      },
+      "62": {
+        "Name": "SixBrogg1ThreeKizz1"
+      },
+      "63": {
+        "Name": "SevenKizz1FourRinrii1"
+      },
+      "64": {
+        "Name": "FourBrogg1SixRinrii1"
+      },
+      "65": {
+        "Name": "FiveKizz1FiveRinrii1"
+      },
+      "66": {
+        "Name": "FiveBrogg1ThreeRinrii1"
+      },
+      "67": {
+        "Name": "TwoKritah1TwoKritah2"
+      },
+      "68": {
+        "Name": "ThreeKritah1TwoKritah2OneKritah3"
+      },
+      "69": {
+        "Name": "ThreeKritah1FourKritah2OneKritah3"
+      },
+      "70": {
+        "Name": "ThreeKritah1OneKritah2ThreeKritah3"
+      },
+      "71": {
+        "Name": "OneKritah1FiveKritah2OneKritah3"
+      },
+      "72": {
+        "Name": "SixKritah2ThreeKritah3"
+      },
+      "73": {
+        "Name": "FourKritah1ThreeKritah2TwoKritah3"
+      },
+      "74": {
+        "Name": "TwelveSkrinn2"
+      },
+      "75": {
+        "Name": "ThreeBrogg2FiveBrogg3"
+      },
+      "76": {
+        "Name": "FiveBrogg3TwoKrondir2TwoWarniak3"
+      },
+      "77": {
+        "Name": "TwoBrogg2SevenBrogg3TwoSkrinn2"
+      },
+      "78": {
+        "Name": "FourBrogg3FourSkrinn2ThreeKizz3"
+      },
+      "79": {
+        "Name": "FourSkrinn2OneKrondir2"
+      },
+      "80": {
+        "Name": "OneSkrinn2FourKrondir2"
+      },
+      "81": {
+        "Name": "FiveSkrinn2"
+      },
+      "82": {
+        "Name": "FourSkrinn1TwoSkrinn2"
+      },
+      "83": {
+        "Name": "ThreeKrondir1TwoKrondir2"
+      },
+      "84": {
+        "Name": "FourSkrinn2OneKrondir2"
+      },
+      "85": {
+        "Name": "FourSkrinn2OneWarniak3"
+      },
+      "86": {
+        "Name": "FourWarniak1TwoWarniak2TwoWarniak3"
+      },
+      "87": {
+        "Name": "ThreeSkrinn2OneKrondir2OneWarniak2OneWarniak3"
+      },
+      "88": {
+        "Name": "ThreeSkrinn1FiveSkrinn2"
+      },
+      "89": {
+        "Name": "ThreeWarniak1TwoSkrinn2TwoKrondir2"
+      },
+      "90": {
+        "Name": "FiveKrondir1ThreeKrondir2"
+      },
+      "91": {
+        "Name": "ThreeKrondir1ThreeSkrinn2ThreeWarniak2"
+      },
+      "92": {
+        "Name": "NineSkrinn2OneWarniak3"
+      },
+      "93": {
+        "Name": "FourSkrinn2ThreeWarniak2"
+      },
+      "94": {
+        "Name": "FourSkrinn2TwoKrondir2"
+      },
+      "95": {
+        "Name": "OneKrondir2TwoWarniak2OneWarniak3"
+      },
+      "96": {
+        "Name": "EightSkrinn2OneWarniak3"
+      },
+      "97": {
+        "Name": "FiveSkrinn2ThreeKrondir2"
+      },
+      "98": {
+        "Name": "FourKrondir2OneWarniak2TwoWarniak3"
+      }
     }
   },
   "MONGRP1.XLD": {
     "Format": "MonsterGroup",
-    "IdOffset":  100,
     "EnumName": "MonsterGroupId",
     "EnumType": "byte",
+    "IdOffset": 100,
     "Assets": {
-      "00": { "Name": "TwoSkrinn1" },
-      "01": { "Name": "ThreeSkrinn1" },
-      "02": { "Name": "OneKrondir1" },
-      "03": { "Name": "TwoKrondir1" },
-      "04": { "Name": "FourSkrinn1OneSkrinn2" },
-      "05": { "Name": "TwoSkrinn1TwoSkrinn2" },
-      "06": { "Name": "TwoSkrinn1OneKrondir1OneSkrinn2" },
-      "07": { "Name": "OneAnimal1" },
-      "08": { "Name": "ThreeWarniak1" },
-      "09": { "Name": "FourWarniak1OneWarniak3" },
-      "10": { "Name": "FiveWarniak1OneWarniak2" },
-      "11": { "Name": "FiveWarniak1TwoWarniak2OneWarniak3" },
-      "12": { "Name": "OneFear1" },
-      "13": { "Name": "TwoFear1" },
-      "14": { "Name": "TwoBrogg2OneBrogg3" },
-      "15": { "Name": "FiveBrogg3" },
-      "16": { "Name": "FourBrogg3OneAnimal2" },
-      "17": { "Name": "TwoKizz2OneKizz3" },
-      "18": { "Name": "FourKizz3" },
-      "19": { "Name": "SixKizz3OneAnimal2" },
-      "20": { "Name": "FourKrondir2" },
-      "21": { "Name": "FourKrondir2OneAnimal3" },
-      "22": { "Name": "ThreeKrondir2TwoAnimal3" },
-      "23": { "Name": "OneMagician1" },
-      "24": { "Name": "TwoMagician1" },
-      "25": { "Name": "TwoMagician1OneMagician2" },
-      "26": { "Name": "ThreeMagician2" },
-      "27": { "Name": "OneMagician2" },
-      "28": { "Name": "OneMagician3" },
-      "29": { "Name": "TwoMagician2OneMagician3" },
-      "30": { "Name": "ThreeMagician3" },
-      "31": { "Name": "OneMagician1TwoMagician2ThreeMagician3" },
-      "32": { "Name": "TwoFear2" },
-      "33": { "Name": "TwoFear2OneFear3" },
-      "34": { "Name": "OneFear2ThreeFear3" },
-      "35": { "Name": "TwoAnimal2" },
-      "36": { "Name": "OneAnimal2OneAnimal3" },
-      "37": { "Name": "OneAnimal2TwoAnimal3" },
-      "38": { "Name": "OneStorm1OneStorm2" },
-      "39": { "Name": "OneStorm2OneStorm3" },
-      "40": { "Name": "TwoStorm3" },
-      "41": { "Name": "OnePlague1TwoPlague2" },
-      "42": { "Name": "TwoPlague2OnePlague3" },
-      "43": { "Name": "ThreePlague3" },
-      "44": { "Name": "TwoMagician3OneBeastmaster" },
-      "45": { "Name": "OneKledoKamulos3" },
-      "46": { "Name": "OneSecu1" },
-      "47": { "Name": "OneSecu1" },
-      "48": { "Name": "OneSecu2" },
-      "49": { "Name": "TwoSecu1OneSecu2" },
-      "50": { "Name": "OneSecu1TwoSecu2" },
-      "51": { "Name": "FourSecu1FourSecu2" },
-      "52": { "Name": "ThreeSecu1ThreeSecu2" },
-      "53": { "Name": "OneServiceRobot" },
-      "54": { "Name": "TwoServiceRobot" },
-      "55": { "Name": "FiveServiceRobot" },
-      "56": { "Name": "SevenServiceRobot" },
-      "57": { "Name": "TenServiceRobot" },
-      "58": { "Name": "FifteenSecu2" },
-      "59": { "Name": "OneWarniak1" },
-      "60": { "Name": "TwoWarniak1" },
-      "61": { "Name": "TwoWarniak1OneWarniak2" },
-      "62": { "Name": "OneKledoKamulos1" },
-      "63": { "Name": "OneKledoKamulos2" },
-      "64": { "Name": "OneKledoKamulos3" },
-      "65": { "Name": "TwoKledoKamulos1OneKledoKamulos2" },
-      "66": { "Name": "ThreeKledoKamulos2" },
-      "67": { "Name": "OneKledoKamulos2TwoKledoKamulos3" },
-      "68": { "Name": "TwoKledoKamulos2TwoKledoKamulos3" },
-      "69": { "Name": "FiveKledoKamulos3" },
-      "70": { "Name": "OneMagician1OneMagician2OneMagician3OneKledoKamulos1OneKledoKamulos2OneKledoKamulos3" },
-      "71": { "Name": "OneKamulos" },
-      "72": { "Name": "OneAIBody1" },
-      "73": { "Name": "OneAIBody2" },
-      "74": { "Name": "TwoAIBody1OneAIBody2" },
-      "75": { "Name": "TwoAIBody1TwoAIBody2" },
-      "76": { "Name": "OneBandit1OneBandit2" },
-      "77": { "Name": "TwoBandit1OneBandit2" },
-      "78": { "Name": "TwoBandit1TwoBandit2" },
-      "79": { "Name": "OneBandit1OneBandit2OneBandit3" },
-      "80": { "Name": "TwoBandit2TwoBandit3" },
-      "81": { "Name": "OneArgim" },
-      "82": { "Name": "OneAI" },
-      "83": { "Name": "OneBradir" },
-      "84": { "Name": "ThreeWarniak2" },
-      "85": { "Name": "OneWarniak2OneWarniak3" },
-      "86": { "Name": "TwoWarniak1TwoWarniak2OneWarniak3" },
-      "87": { "Name": "TwoWarniak1TwoWarniak2OneWarniak3" },
-      "88": { "Name": "ThreeAnimal3" },
-      "89": { "Name": "OneAnimal3" },
-      "90": { "Name": "TwoWarniak2TwoWarniak3" },
-      "91": { "Name": "TwoAIBody1ThreeAIBody2OneAIBody22" },
+      "0": {
+        "Name": "TwoSkrinn1"
+      },
+      "1": {
+        "Name": "ThreeSkrinn1"
+      },
+      "2": {
+        "Name": "OneKrondir1"
+      },
+      "3": {
+        "Name": "TwoKrondir1"
+      },
+      "4": {
+        "Name": "FourSkrinn1OneSkrinn2"
+      },
+      "5": {
+        "Name": "TwoSkrinn1TwoSkrinn2"
+      },
+      "6": {
+        "Name": "TwoSkrinn1OneKrondir1OneSkrinn2"
+      },
+      "7": {
+        "Name": "OneAnimal1"
+      },
+      "8": {
+        "Name": "ThreeWarniak1"
+      },
+      "9": {
+        "Name": "FourWarniak1OneWarniak3"
+      },
+      "10": {
+        "Name": "FiveWarniak1OneWarniak2"
+      },
+      "11": {
+        "Name": "FiveWarniak1TwoWarniak2OneWarniak3"
+      },
+      "12": {
+        "Name": "OneFear1"
+      },
+      "13": {
+        "Name": "TwoFear1"
+      },
+      "14": {
+        "Name": "TwoBrogg2OneBrogg3"
+      },
+      "15": {
+        "Name": "FiveBrogg3"
+      },
+      "16": {
+        "Name": "FourBrogg3OneAnimal2"
+      },
+      "17": {
+        "Name": "TwoKizz2OneKizz3"
+      },
+      "18": {
+        "Name": "FourKizz3"
+      },
+      "19": {
+        "Name": "SixKizz3OneAnimal2"
+      },
+      "20": {
+        "Name": "FourKrondir2"
+      },
+      "21": {
+        "Name": "FourKrondir2OneAnimal3"
+      },
+      "22": {
+        "Name": "ThreeKrondir2TwoAnimal3"
+      },
+      "23": {
+        "Name": "OneMagician1"
+      },
+      "24": {
+        "Name": "TwoMagician1"
+      },
+      "25": {
+        "Name": "TwoMagician1OneMagician2"
+      },
+      "26": {
+        "Name": "ThreeMagician2"
+      },
+      "27": {
+        "Name": "OneMagician2"
+      },
+      "28": {
+        "Name": "OneMagician3"
+      },
+      "29": {
+        "Name": "TwoMagician2OneMagician3"
+      },
+      "30": {
+        "Name": "ThreeMagician3"
+      },
+      "31": {
+        "Name": "OneMagician1TwoMagician2ThreeMagician3"
+      },
+      "32": {
+        "Name": "TwoFear2"
+      },
+      "33": {
+        "Name": "TwoFear2OneFear3"
+      },
+      "34": {
+        "Name": "OneFear2ThreeFear3"
+      },
+      "35": {
+        "Name": "TwoAnimal2"
+      },
+      "36": {
+        "Name": "OneAnimal2OneAnimal3"
+      },
+      "37": {
+        "Name": "OneAnimal2TwoAnimal3"
+      },
+      "38": {
+        "Name": "OneStorm1OneStorm2"
+      },
+      "39": {
+        "Name": "OneStorm2OneStorm3"
+      },
+      "40": {
+        "Name": "TwoStorm3"
+      },
+      "41": {
+        "Name": "OnePlague1TwoPlague2"
+      },
+      "42": {
+        "Name": "TwoPlague2OnePlague3"
+      },
+      "43": {
+        "Name": "ThreePlague3"
+      },
+      "44": {
+        "Name": "TwoMagician3OneBeastmaster"
+      },
+      "45": {
+        "Name": "OneKledoKamulos3"
+      },
+      "46": {
+        "Name": "OneSecu1"
+      },
+      "47": {
+        "Name": "OneSecu1"
+      },
+      "48": {
+        "Name": "OneSecu2"
+      },
+      "49": {
+        "Name": "TwoSecu1OneSecu2"
+      },
+      "50": {
+        "Name": "OneSecu1TwoSecu2"
+      },
+      "51": {
+        "Name": "FourSecu1FourSecu2"
+      },
+      "52": {
+        "Name": "ThreeSecu1ThreeSecu2"
+      },
+      "53": {
+        "Name": "OneServiceRobot"
+      },
+      "54": {
+        "Name": "TwoServiceRobot"
+      },
+      "55": {
+        "Name": "FiveServiceRobot"
+      },
+      "56": {
+        "Name": "SevenServiceRobot"
+      },
+      "57": {
+        "Name": "TenServiceRobot"
+      },
+      "58": {
+        "Name": "FifteenSecu2"
+      },
+      "59": {
+        "Name": "OneWarniak1"
+      },
+      "60": {
+        "Name": "TwoWarniak1"
+      },
+      "61": {
+        "Name": "TwoWarniak1OneWarniak2"
+      },
+      "62": {
+        "Name": "OneKledoKamulos1"
+      },
+      "63": {
+        "Name": "OneKledoKamulos2"
+      },
+      "64": {
+        "Name": "OneKledoKamulos3"
+      },
+      "65": {
+        "Name": "TwoKledoKamulos1OneKledoKamulos2"
+      },
+      "66": {
+        "Name": "ThreeKledoKamulos2"
+      },
+      "67": {
+        "Name": "OneKledoKamulos2TwoKledoKamulos3"
+      },
+      "68": {
+        "Name": "TwoKledoKamulos2TwoKledoKamulos3"
+      },
+      "69": {
+        "Name": "FiveKledoKamulos3"
+      },
+      "70": {
+        "Name": "OneMagician1OneMagician2OneMagician3OneKledoKamulos1OneKledoKamulos2OneKledoKamulos3"
+      },
+      "71": {
+        "Name": "OneKamulos"
+      },
+      "72": {
+        "Name": "OneAIBody1"
+      },
+      "73": {
+        "Name": "OneAIBody2"
+      },
+      "74": {
+        "Name": "TwoAIBody1OneAIBody2"
+      },
+      "75": {
+        "Name": "TwoAIBody1TwoAIBody2"
+      },
+      "76": {
+        "Name": "OneBandit1OneBandit2"
+      },
+      "77": {
+        "Name": "TwoBandit1OneBandit2"
+      },
+      "78": {
+        "Name": "TwoBandit1TwoBandit2"
+      },
+      "79": {
+        "Name": "OneBandit1OneBandit2OneBandit3"
+      },
+      "80": {
+        "Name": "TwoBandit2TwoBandit3"
+      },
+      "81": {
+        "Name": "OneArgim"
+      },
+      "82": {
+        "Name": "OneAI"
+      },
+      "83": {
+        "Name": "OneBradir"
+      },
+      "84": {
+        "Name": "ThreeWarniak2"
+      },
+      "85": {
+        "Name": "OneWarniak2OneWarniak3"
+      },
+      "86": {
+        "Name": "TwoWarniak1TwoWarniak2OneWarniak3"
+      },
+      "87": {
+        "Name": "TwoWarniak1TwoWarniak2OneWarniak3"
+      },
+      "88": {
+        "Name": "ThreeAnimal3"
+      },
+      "89": {
+        "Name": "OneAnimal3"
+      },
+      "90": {
+        "Name": "TwoWarniak2TwoWarniak3"
+      },
+      "91": {
+        "Name": "TwoAIBody1ThreeAIBody2OneAIBody22"
+      },
       "92": {},
       "93": {},
       "94": {},
@@ -10981,62 +12713,166 @@
   },
   "MONGRP2.XLD": {
     "Format": "MonsterGroup",
-    "IdOffset":  200,
     "EnumName": "MonsterGroupId",
     "EnumType": "byte",
+    "IdOffset": 200,
     "Assets": {
-      "00": { "Name": "TwoBrogg2" },
-      "01": { "Name": "TwoBrogg2TwoBrogg3" },
-      "02": { "Name": "FourBrogg2FourBrogg3" },
-      "03": { "Name": "SixSkrinn2" },
-      "04": { "Name": "EightSkrinn2" },
-      "05": { "Name": "TenSkrinn2" },
-      "06": { "Name": "FourBrogg3FourSkrinn2" },
-      "07": { "Name": "NineBrogg1NineSkrinn2" },
-      "08": { "Name": "OneWarniak2FiveWarniak3" },
-      "09": { "Name": "FiveWarniak2FiveWarniak3" },
-      "10": { "Name": "OneWarniak2FourWarniak3" },
-      "11": { "Name": "SevenWarniak3" },
-      "12": { "Name": "TwoSkrinn1ThreeBrogg3OneSkrinn2TwoWarniak2OneWarniak3" },
-      "13": { "Name": "OneBrogg2FiveBrogg3" },
-      "14": { "Name": "EightSkrinn2" },
-      "15": { "Name": "OneSkrinn2OneWarniak3" },
-      "16": { "Name": "OneWarniak3" },
-      "17": { "Name": "ThreeRinrii3" },
-      "18": { "Name": "SixRinrii1SixRinrii2SixRinrii3" },
-      "19": { "Name": "OneFear3" },
-      "20": { "Name": "FiveFear3" },
-      "21": { "Name": "ElevenFear3" },
-      "22": { "Name": "OneAnimal3" },
-      "23": { "Name": "SixAnimal3" },
-      "24": { "Name": "SixteenAnimal3" },
-      "25": { "Name": "OneStorm3" },
-      "26": { "Name": "SixStorm3" },
-      "27": { "Name": "TwelveStorm3" },
-      "28": { "Name": "OnePlague3" },
-      "29": { "Name": "SixPlague3" },
-      "30": { "Name": "FourteenPlague3" },
-      "31": { "Name": "FiveFear3OneBrogg3TwoAnimal3FourStorm3TwoPlague2TwoPlague3" },
-      "32": { "Name": "FourStorm3SixPlague3" },
-      "33": { "Name": "SixAnimal3SixStorm3" },
-      "34": { "Name": "FourFear3TwoAnimal3TwoStorm3" },
-      "35": { "Name": "TwoSanddiver1" },
-      "36": { "Name": "ThreeSanddiver2" },
-      "37": { "Name": "FiveSanddiver3" },
-      "38": { "Name": "TenSanddiver3" },
-      "39": { "Name": "OneRinrii3" },
-      "40": { "Name": "FiveRinrii2TwoRinrii3" },
-      "41": { "Name": "OneKrondir2" },
-      "42": { "Name": "OneKrondir2" },
-      "43": { "Name": "ThreeKrondir2" },
-      "44": { "Name": "OneKrondir2" },
-      "45": { "Name": "TwoKrondir2" },
-      "46": { "Name": "FiveKrondir2" },
-      "47": { "Name": "OneFear2" },
-      "48": { "Name": "ThreeFear1" },
-      "49": { "Name": "ThreeFear1TwoKizz1OneRinrii1" },
-      "50": { "Name": "OneNodd" },
-      "51": { "Name": "OneKontos" },
+      "0": {
+        "Name": "TwoBrogg2"
+      },
+      "1": {
+        "Name": "TwoBrogg2TwoBrogg3"
+      },
+      "2": {
+        "Name": "FourBrogg2FourBrogg3"
+      },
+      "3": {
+        "Name": "SixSkrinn2"
+      },
+      "4": {
+        "Name": "EightSkrinn2"
+      },
+      "5": {
+        "Name": "TenSkrinn2"
+      },
+      "6": {
+        "Name": "FourBrogg3FourSkrinn2"
+      },
+      "7": {
+        "Name": "NineBrogg1NineSkrinn2"
+      },
+      "8": {
+        "Name": "OneWarniak2FiveWarniak3"
+      },
+      "9": {
+        "Name": "FiveWarniak2FiveWarniak3"
+      },
+      "10": {
+        "Name": "OneWarniak2FourWarniak3"
+      },
+      "11": {
+        "Name": "SevenWarniak3"
+      },
+      "12": {
+        "Name": "TwoSkrinn1ThreeBrogg3OneSkrinn2TwoWarniak2OneWarniak3"
+      },
+      "13": {
+        "Name": "OneBrogg2FiveBrogg3"
+      },
+      "14": {
+        "Name": "EightSkrinn2"
+      },
+      "15": {
+        "Name": "OneSkrinn2OneWarniak3"
+      },
+      "16": {
+        "Name": "OneWarniak3"
+      },
+      "17": {
+        "Name": "ThreeRinrii3"
+      },
+      "18": {
+        "Name": "SixRinrii1SixRinrii2SixRinrii3"
+      },
+      "19": {
+        "Name": "OneFear3"
+      },
+      "20": {
+        "Name": "FiveFear3"
+      },
+      "21": {
+        "Name": "ElevenFear3"
+      },
+      "22": {
+        "Name": "OneAnimal3"
+      },
+      "23": {
+        "Name": "SixAnimal3"
+      },
+      "24": {
+        "Name": "SixteenAnimal3"
+      },
+      "25": {
+        "Name": "OneStorm3"
+      },
+      "26": {
+        "Name": "SixStorm3"
+      },
+      "27": {
+        "Name": "TwelveStorm3"
+      },
+      "28": {
+        "Name": "OnePlague3"
+      },
+      "29": {
+        "Name": "SixPlague3"
+      },
+      "30": {
+        "Name": "FourteenPlague3"
+      },
+      "31": {
+        "Name": "FiveFear3OneBrogg3TwoAnimal3FourStorm3TwoPlague2TwoPlague3"
+      },
+      "32": {
+        "Name": "FourStorm3SixPlague3"
+      },
+      "33": {
+        "Name": "SixAnimal3SixStorm3"
+      },
+      "34": {
+        "Name": "FourFear3TwoAnimal3TwoStorm3"
+      },
+      "35": {
+        "Name": "TwoSanddiver1"
+      },
+      "36": {
+        "Name": "ThreeSanddiver2"
+      },
+      "37": {
+        "Name": "FiveSanddiver3"
+      },
+      "38": {
+        "Name": "TenSanddiver3"
+      },
+      "39": {
+        "Name": "OneRinrii3"
+      },
+      "40": {
+        "Name": "FiveRinrii2TwoRinrii3"
+      },
+      "41": {
+        "Name": "OneKrondir2"
+      },
+      "42": {
+        "Name": "OneKrondir2"
+      },
+      "43": {
+        "Name": "ThreeKrondir2"
+      },
+      "44": {
+        "Name": "OneKrondir2"
+      },
+      "45": {
+        "Name": "TwoKrondir2"
+      },
+      "46": {
+        "Name": "FiveKrondir2"
+      },
+      "47": {
+        "Name": "OneFear2"
+      },
+      "48": {
+        "Name": "ThreeFear1"
+      },
+      "49": {
+        "Name": "ThreeFear1TwoKizz1OneRinrii1"
+      },
+      "50": {
+        "Name": "OneNodd"
+      },
+      "51": {
+        "Name": "OneKontos"
+      },
       "52": {},
       "53": {},
       "54": {},
@@ -11091,6 +12927,7 @@
     "Format": "SingleHeaderSprite",
     "EnumName": "LargeNpcId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Iskai",
@@ -11480,9 +13317,9 @@
   },
   "NPCGR1.XLD": {
     "Format": "SingleHeaderSprite",
-    "IdOffset":  100,
     "EnumName": "LargeNpcId",
     "EnumType": "byte",
+    "IdOffset": 100,
     "Assets": {
       "0": {
         "Name": "Crew"
@@ -11752,6 +13589,7 @@
     "Format": "SingleHeaderSprite",
     "EnumName": "SmallNpcId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Iskai"
@@ -11844,6 +13682,7 @@
   },
   "PALETTE.000": {
     "Format": "PaletteCommon",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Common Palette"
@@ -11854,6 +13693,7 @@
     "Format": "Palette",
     "EnumName": "PaletteId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "FirstIslandDay"
@@ -12005,6 +13845,7 @@
     "Format": "SingleHeaderSprite",
     "EnumName": "LargePartyGraphicsId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Tom",
@@ -12071,6 +13912,7 @@
     "Format": "SingleHeaderSprite",
     "EnumName": "SmallPartyGraphicsId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Tom",
@@ -12137,6 +13979,7 @@
     "Format": "InterlacedBitmap",
     "EnumName": "PictureId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "SmallWizard"
@@ -12285,6 +14128,7 @@
     "Format": "AudioSample",
     "EnumName": "SampleId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "CreakyWoodenDoor"
@@ -12494,9 +14338,9 @@
   },
   "SAMPLES1.XLD": {
     "Format": "AudioSample",
-    "IdOffset":  100,
     "EnumName": "SampleId",
     "EnumType": "byte",
+    "IdOffset": 100,
     "Assets": {
       "0": {
         "Name": "Tick"
@@ -12636,9 +14480,9 @@
   },
   "SAMPLES2.XLD": {
     "Format": "AudioSample",
-    "IdOffset":  200,
     "EnumName": "SampleId",
     "EnumType": "byte",
+    "IdOffset": 200,
     "Assets": {
       "0": {},
       "1": {
@@ -12790,6 +14634,7 @@
     "Format": "Script",
     "EnumName": "ScriptId",
     "EnumType": "ushort",
+    "IdOffset": 0,
     "Assets": {
       "0": {},
       "1": {},
@@ -12857,9 +14702,9 @@
   },
   "SCRIPT2.XLD": {
     "Format": "Script",
-    "IdOffset":  200,
     "EnumName": "ScriptId",
     "EnumType": "ushort",
+    "IdOffset": 200,
     "Assets": {
       "0": {},
       "1": {},
@@ -12968,6 +14813,7 @@
     "Width": 360,
     "EnumName": "SlabId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "SLAB"
@@ -12979,6 +14825,7 @@
     "Width": 34,
     "EnumName": "SmallPortraitId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Tom"
@@ -13249,10 +15096,10 @@
   },
   "SMLPORT1.XLD": {
     "Format": "FixedSizeSprite",
-    "IdOffset":  100,
     "Width": 34,
     "EnumName": "SmallPortraitId",
     "EnumType": "byte",
+    "IdOffset": 100,
     "Assets": {
       "0": {
         "Name": "Alice Takashi"
@@ -13504,6 +15351,7 @@
     "Format": "Song",
     "EnumName": "SongId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "SomewhatMenacing"
@@ -13631,6 +15479,7 @@
   },
   "SPELLDAT.DAT": {
     "Format": "SpellData",
+    "IdOffset": 0,
     "Assets": {}
   },
   "TACTICO0.XLD": {
@@ -13638,6 +15487,7 @@
     "Width": 32,
     "EnumName": "TacticalGraphicsId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {},
       "1": {},
@@ -13717,6 +15567,7 @@
     "Format": "SampleLibrary",
     "EnumName": "WaveLibraryId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {},
       "1": {},
@@ -13760,6 +15611,7 @@
     "Format": "StringTable",
     "EnumName": "EventTextId",
     "EnumType": "ushort",
+    "IdOffset": 0,
     "Assets": {
       "0": {},
       "1": {},
@@ -13768,9 +15620,9 @@
   },
   "$(LANG)/EVNTTXT1.XLD": {
     "Format": "StringTable",
-    "IdOffset":  100,
     "EnumName": "EventTextId",
     "EnumType": "ushort",
+    "IdOffset": 100,
     "Assets": {
       "0": {},
       "1": {},
@@ -13876,9 +15728,9 @@
   },
   "$(LANG)/EVNTTXT2.XLD": {
     "Format": "StringTable",
-    "IdOffset":  200,
     "EnumName": "EventTextId",
     "EnumType": "ushort",
+    "IdOffset": 200,
     "Assets": {
       "0": {},
       "1": {},
@@ -13984,9 +15836,9 @@
   },
   "$(LANG)/EVNTTXT3.XLD": {
     "Format": "StringTable",
-    "IdOffset":  300,
     "EnumName": "EventTextId",
     "EnumType": "ushort",
+    "IdOffset": 300,
     "Assets": {
       "0": {},
       "1": {},
@@ -14092,9 +15944,9 @@
   },
   "$(LANG)/EVNTTXT9.XLD": {
     "Format": "StringTable",
-    "IdOffset":  900,
     "EnumName": "EventTextId",
     "EnumType": "ushort",
+    "IdOffset": 900,
     "Assets": {
       "0": {},
       "1": {},
@@ -14202,6 +16054,7 @@
     "Format": "FlicVideo",
     "EnumName": "VideoId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Magic Demonstration"
@@ -14264,9 +16117,9 @@
   },
   "$(LANG)/MAPTEXT1.XLD": {
     "Format": "StringTable",
-    "IdOffset":  100,
     "EnumName": "MapTextId",
     "EnumType": "ushort",
+    "IdOffset": 100,
     "Assets": {
       "0": {},
       "1": {},
@@ -14372,9 +16225,9 @@
   },
   "$(LANG)/MAPTEXT2.XLD": {
     "Format": "StringTable",
-    "IdOffset":  200,
     "EnumName": "MapTextId",
     "EnumType": "ushort",
+    "IdOffset": 200,
     "Assets": {
       "0": {},
       "1": {},
@@ -14480,9 +16333,9 @@
   },
   "$(LANG)/MAPTEXT3.XLD": {
     "Format": "StringTable",
-    "IdOffset":  300,
     "EnumName": "MapTextId",
     "EnumType": "ushort",
+    "IdOffset": 300,
     "Assets": {
       "0": {},
       "1": {},
@@ -14590,6 +16443,7 @@
     "Format": "SystemText",
     "EnumName": "SystemTextId",
     "EnumType": "ushort",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "PartyPortrait_XLifeMana"
@@ -16238,6 +18092,7 @@
     "Format": "WordList",
     "EnumName": "WordId",
     "EnumType": "ushort",
+    "IdOffset": 0,
     "Assets": {
       "1": {
         "Name": "Zero"
@@ -17851,9 +19706,9 @@
   },
   "INITIAL/AUTOMAP1.XLD": {
     "Format": "Unknown",
-    "IdOffset":  100,
     "EnumName": "AutoMapId",
     "EnumType": "ushort",
+    "IdOffset": 100,
     "Assets": {
       "0": {},
       "1": {},
@@ -17959,9 +19814,9 @@
   },
   "INITIAL/AUTOMAP2.XLD": {
     "Format": "Unknown",
-    "IdOffset":  200,
     "EnumName": "AutoMapId",
     "EnumType": "ushort",
+    "IdOffset": 200,
     "Assets": {
       "0": {},
       "1": {},
@@ -18067,9 +19922,9 @@
   },
   "INITIAL/AUTOMAP3.XLD": {
     "Format": "Unknown",
-    "IdOffset":  300,
     "EnumName": "AutoMapId",
     "EnumType": "ushort",
+    "IdOffset": 300,
     "Assets": {
       "0": {},
       "1": {},
@@ -18177,6 +20032,7 @@
     "Format": "ChestInventory",
     "EnumName": "ChestId",
     "EnumType": "ushort",
+    "IdOffset": 0,
     "Assets": {
       "0": {},
       "1": {}
@@ -18184,9 +20040,9 @@
   },
   "INITIAL/CHESTDT1.XLD": {
     "Format": "ChestInventory",
-    "IdOffset":  100,
     "EnumName": "ChestId",
     "EnumType": "ushort",
+    "IdOffset": 100,
     "Assets": {
       "0": {},
       "1": {},
@@ -18292,9 +20148,9 @@
   },
   "INITIAL/CHESTDT2.XLD": {
     "Format": "ChestInventory",
-    "IdOffset":  200,
     "EnumName": "ChestId",
     "EnumType": "ushort",
+    "IdOffset": 200,
     "Assets": {
       "0": {},
       "1": {},
@@ -18400,9 +20256,9 @@
   },
   "INITIAL/CHESTDT5.XLD": {
     "Format": "ChestInventory",
-    "IdOffset":  500,
     "EnumName": "ChestId",
     "EnumType": "ushort",
+    "IdOffset": 500,
     "Assets": {
       "0": {},
       "1": {},
@@ -18510,15 +20366,16 @@
     "Format": "MerchantInventory",
     "EnumName": "MerchantId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {}
     }
   },
   "INITIAL/MERCHDT1.XLD": {
     "Format": "MerchantInventory",
-    "IdOffset":  100,
     "EnumName": "MerchantId",
     "EnumType": "byte",
+    "IdOffset": 100,
     "Assets": {
       "0": {},
       "1": {},
@@ -18624,9 +20481,9 @@
   },
   "INITIAL/MERCHDT2.XLD": {
     "Format": "MerchantInventory",
-    "IdOffset":  200,
     "EnumName": "MerchantId",
     "EnumType": "byte",
+    "IdOffset": 200,
     "Assets": {
       "0": {},
       "1": {},
@@ -18734,6 +20591,7 @@
     "Format": "CharacterData",
     "EnumName": "NpcCharacterId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Khunagh"
@@ -18886,9 +20744,9 @@
   },
   "INITIAL/NPCCHAR1.XLD": {
     "Format": "CharacterData",
-    "IdOffset":  100,
     "EnumName": "NpcCharacterId",
     "EnumType": "byte",
+    "IdOffset": 100,
     "Assets": {
       "0": {},
       "1": {},
@@ -19166,9 +21024,9 @@
   },
   "INITIAL/NPCCHAR2.XLD": {
     "Format": "CharacterData",
-    "IdOffset":  200,
     "EnumName": "NpcCharacterId",
     "EnumType": "byte",
+    "IdOffset": 200,
     "Assets": {
       "0": {
         "Name": "Gerwad"
@@ -19318,6 +21176,7 @@
     "Format": "CharacterData",
     "EnumName": "PartyCharacterId",
     "EnumType": "byte",
+    "IdOffset": 0,
     "Assets": {
       "0": {
         "Name": "Tom"
@@ -19399,9 +21258,9 @@
   },
   "INITIAL/PRTCHAR1.XLD": {
     "Format": "CharacterData",
-    "IdOffset":  100,
     "EnumName": "PartyCharacterId",
     "EnumType": "byte",
+    "IdOffset": 100,
     "Assets": {
       "0": {},
       "1": {},
@@ -19507,9 +21366,9 @@
   },
   "INITIAL/PRTCHAR2.XLD": {
     "Format": "CharacterData",
-    "IdOffset":  200,
     "EnumName": "PartyCharacterId",
     "EnumType": "byte",
+    "IdOffset": 200,
     "Assets": {
       "0": {},
       "1": {},
@@ -19615,10 +21474,12 @@
   },
   "MAIN.EXE": {
     "Format": "Unknown",
+    "IdOffset": 0,
     "Assets": {}
   },
   "ENGLISH/EVNTTXT0.XLD": {
     "Format": "Unknown",
+    "IdOffset": 0,
     "Assets": {
       "0": {},
       "1": {},
@@ -19627,7 +21488,7 @@
   },
   "ENGLISH/EVNTTXT1.XLD": {
     "Format": "Unknown",
-    "IdOffset":  100,
+    "IdOffset": 100,
     "Assets": {
       "0": {},
       "2": {},
@@ -19726,7 +21587,7 @@
   },
   "ENGLISH/EVNTTXT2.XLD": {
     "Format": "Unknown",
-    "IdOffset":  200,
+    "IdOffset": 200,
     "Assets": {
       "0": {},
       "1": {},
@@ -19823,7 +21684,7 @@
   },
   "ENGLISH/EVNTTXT3.XLD": {
     "Format": "Unknown",
-    "IdOffset":  300,
+    "IdOffset": 300,
     "Assets": {
       "1": {},
       "2": {},
@@ -19850,7 +21711,7 @@
   },
   "ENGLISH/EVNTTXT9.XLD": {
     "Format": "Unknown",
-    "IdOffset":  900,
+    "IdOffset": 900,
     "Assets": {
       "81": {},
       "82": {},
@@ -19865,6 +21726,7 @@
   },
   "ENGLISH/FLICS0.XLD": {
     "Format": "Unknown",
+    "IdOffset": 0,
     "Assets": {
       "0": {},
       "1": {},
@@ -19889,7 +21751,7 @@
   },
   "ENGLISH/MAPTEXT1.XLD": {
     "Format": "Unknown",
-    "IdOffset":  100,
+    "IdOffset": 100,
     "Assets": {
       "0": {},
       "1": {},
@@ -19976,7 +21838,7 @@
   },
   "ENGLISH/MAPTEXT2.XLD": {
     "Format": "Unknown",
-    "IdOffset":  200,
+    "IdOffset": 200,
     "Assets": {
       "0": {},
       "1": {},
@@ -20054,7 +21916,7 @@
   },
   "ENGLISH/MAPTEXT3.XLD": {
     "Format": "Unknown",
-    "IdOffset":  300,
+    "IdOffset": 300,
     "Assets": {
       "0": {},
       "1": {},
@@ -20073,6 +21935,7 @@
   },
   "ENGLISH/WORDLIS0.XLD": {
     "Format": "WordList",
+    "IdOffset": 0,
     "Assets": {
       "0": {},
       "1": {},
@@ -20081,6 +21944,7 @@
   },
   "GERMAN/EVNTTXT0.XLD": {
     "Format": "Unknown",
+    "IdOffset": 0,
     "Assets": {
       "0": {},
       "1": {},
@@ -20089,7 +21953,7 @@
   },
   "GERMAN/EVNTTXT1.XLD": {
     "Format": "Unknown",
-    "IdOffset":  100,
+    "IdOffset": 100,
     "Assets": {
       "0": {},
       "2": {},
@@ -20188,7 +22052,7 @@
   },
   "GERMAN/EVNTTXT2.XLD": {
     "Format": "Unknown",
-    "IdOffset":  200,
+    "IdOffset": 200,
     "Assets": {
       "0": {},
       "1": {},
@@ -20285,7 +22149,7 @@
   },
   "GERMAN/EVNTTXT3.XLD": {
     "Format": "Unknown",
-    "IdOffset":  300,
+    "IdOffset": 300,
     "Assets": {
       "1": {},
       "2": {},
@@ -20312,7 +22176,7 @@
   },
   "GERMAN/EVNTTXT9.XLD": {
     "Format": "Unknown",
-    "IdOffset":  900,
+    "IdOffset": 900,
     "Assets": {
       "81": {},
       "82": {},
@@ -20328,6 +22192,7 @@
   },
   "GERMAN/FLICS0.XLD": {
     "Format": "Unknown",
+    "IdOffset": 0,
     "Assets": {
       "0": {},
       "1": {},
@@ -20352,7 +22217,7 @@
   },
   "GERMAN/MAPTEXT1.XLD": {
     "Format": "Unknown",
-    "IdOffset":  100,
+    "IdOffset": 100,
     "Assets": {
       "0": {},
       "1": {},
@@ -20439,7 +22304,7 @@
   },
   "GERMAN/MAPTEXT2.XLD": {
     "Format": "Unknown",
-    "IdOffset":  200,
+    "IdOffset": 200,
     "Assets": {
       "0": {},
       "1": {},
@@ -20517,7 +22382,7 @@
   },
   "GERMAN/MAPTEXT3.XLD": {
     "Format": "Unknown",
-    "IdOffset":  300,
+    "IdOffset": 300,
     "Assets": {
       "0": {},
       "1": {},
@@ -20536,6 +22401,7 @@
   },
   "GERMAN/WORDLIS0.XLD": {
     "Format": "WordList",
+    "IdOffset": 0,
     "Assets": {
       "0": {},
       "1": {},
@@ -20544,6 +22410,32 @@
   },
   "ENGLISH": {
     "Format": "Unknown",
+    "IdOffset": 0,
     "Assets": {}
+  },
+  "TRANSTB0.XLD": {
+    "Format": "Unknown",
+    "IdOffset": 0,
+    "Assets": {
+      "22": {},
+      "23": {},
+      "26": {},
+      "31": {},
+      "32": {},
+      "33": {},
+      "34": {},
+      "35": {},
+      "36": {},
+      "37": {},
+      "38": {},
+      "39": {},
+      "40": {},
+      "41": {},
+      "42": {},
+      "43": {},
+      "51": {},
+      "52": {},
+      "53": {}
+    }
   }
 }

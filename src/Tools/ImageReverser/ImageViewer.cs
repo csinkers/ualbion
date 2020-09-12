@@ -15,6 +15,7 @@ namespace UAlbion.Tools.ImageReverser
 {
     public partial class ImageViewer : UserControl, IAssetViewer
     {
+        const int Magnify = 3;
         readonly ReverserCore _core;
         readonly Timer _timer;
         readonly DateTime _startTime;
@@ -109,7 +110,6 @@ namespace UAlbion.Tools.ImageReverser
 
         void Render()
         {
-            const int magnify = 3;
             var asset = _core.SelectedObject;
             if (asset == null)
                 return;
@@ -144,7 +144,7 @@ namespace UAlbion.Tools.ImageReverser
 
                 var width = _visualSprite.Width;
                 var frame = Math.Max(0, trackFrame.Value);
-                bmp = GenerateBitmap(_visualSprite, frame, width, magnify, curPalette);
+                bmp = GenerateBitmap(_visualSprite, frame, width, Magnify, curPalette);
             }
             //else if (asset.Layer == FileFormat.Map2D)
             //{

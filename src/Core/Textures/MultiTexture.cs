@@ -196,13 +196,13 @@ namespace UAlbion.Core.Textures
 
         public void AddTexture(int logicalId, ITexture texture, uint x, uint y, byte? transparentColor, bool isAlphaTested, uint? w = null, uint? h = null, byte alpha = 255)
         {
-            if(logicalId == 0)
+            if (logicalId == 0)
                 throw new InvalidOperationException("Logical Subimage Index 0 is reserved for a blank / transparent state");
 
             if (texture == null) // Will just end up using layer 0
                 return;
 
-            while(LogicalSubImages.Count <= logicalId)
+            while (LogicalSubImages.Count <= logicalId)
                 LogicalSubImages.Add(new LogicalSubImage(logicalId));
 
             var lsi = LogicalSubImages[logicalId];
@@ -256,7 +256,7 @@ namespace UAlbion.Core.Textures
                     continue;
                 }
 
-                ReadOnlySpan<byte> fromSlice = ((ReadOnlySpan<byte>)eightBitTexture.TextureData).Slice(
+                ReadOnlySpan<byte> fromSlice = eightBitTexture.TextureData.Slice(
                     sourceOffset,
                     sourceWidth + (sourceHeight - 1) * sourceStride);
 

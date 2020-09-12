@@ -44,20 +44,35 @@ namespace UAlbion.Core.Textures
         }
 
         public bool ContainsColors(IEnumerable<byte> colors) => _textureData.Distinct().Intersect(colors).Any();
+        public IList<byte> DistinctColors(int? subImageId)
+        {
+            if (subImageId == null)
+            {
+                var buffer = new ReadOnlyByteImageBuffer(Width, Height, Width, TextureData);
+                return CoreUtil.DistinctColors(buffer);
+            }
+            else
+            {
+                GetSubImageOffset(subImageId.Value, out var width, out var height, out var offset, out var stride);
+                ReadOnlySpan<byte> slice = TextureData.Slice(
+                    offset,
+                    width + (height - 1) * stride);
+                var buffer = new ReadOnlyByteImageBuffer((uint)width, (uint)height, (uint)stride, slice);
+                return CoreUtil.DistinctColors(buffer);
+            }
+        }
+
         public void Invalidate() => IsDirty = true;
 
         public void GetSubImageOffset(int id, out int width, out int height, out int offset, out int stride)
         {
-            if (_subImages.Count == 0)
+            var subImage = GetSubImageDetails(id);
+            if (subImage == null)
             {
                 width = 0; height = 0; offset = 0; stride = 0;
                 return;
             }
 
-            if (id >= _subImages.Count)
-                id %= _subImages.Count;
-
-            var subImage = _subImages[id];
             uint subresourceSize = Width * Height * Depth * FormatSize;
             width = (int)subImage.Size.X;
             height = (int)subImage.Size.Y;

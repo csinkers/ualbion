@@ -7,7 +7,7 @@
   "ExePath": "ALBION",
 
   // Where the exporter tool should export its results to. Relative to the base repo dir.
-  "ExportedXldPath": "data/Exported",
+  "ExportedXldPath": "data/Exported/raw",
 
   // Where to save & load saved game files
   "SavePath":  "ALBION/SAVES" 

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core.Textures;
@@ -195,8 +197,9 @@ namespace UAlbion.Core
             }
         }
 
-        internal static void Blit8To32(ReadOnlyByteImageBuffer from, UIntImageBuffer to, uint[] palette, byte componentAlpha, byte? transparentColor)
+        public static void Blit8To32(ReadOnlyByteImageBuffer from, UIntImageBuffer to, uint[] palette, byte componentAlpha, byte? transparentColor)
         {
+            if (palette == null) throw new ArgumentNullException(nameof(palette));
             uint remainingWidth = to.Width;
             uint remainingHeight = to.Height;
             Span<uint> dest = to.Buffer;
@@ -227,6 +230,29 @@ namespace UAlbion.Core
                 if (remainingHeight > 0)
                     dest = rowStart.Slice((int)(chunkHeight * to.Stride));
             } while (remainingHeight > 0);
+        }
+
+        public static IList<byte> DistinctColors(ReadOnlyByteImageBuffer buffer)
+        {
+            int c = 0;
+            bool[] active = new bool[256];
+            while (c < buffer.Buffer.Length)
+            {
+                int end = (int)(c + buffer.Width);
+                while(c < end)
+                {
+                    active[buffer.Buffer[c]] = true;
+                    c++;
+                }
+
+                c += (int)(buffer.Stride - buffer.Width);
+            }
+
+            var results = new List<byte>();
+            for(int i = 0; i < 256; i++)
+                if(active[i])
+                    results.Add((byte)i);
+            return results;
         }
 
         public static void LogInfo(string msg) => Engine.GlobalExchange?.Raise(new LogEvent(LogEvent.Level.Info, msg), null);

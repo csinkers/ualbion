@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Core.Textures;
 using Veldrid;
 
@@ -58,6 +61,37 @@ namespace UAlbion.Core.Veldrid.Textures
             byte[] textureData, IEnumerable<SubImage> subImages)
             : base(name, width, height, mipLevels, arrayLayers, textureData, subImages)
         {
+        }
+
+        public void SavePng(string path, int? subImage, uint[] palette)
+        {
+            int width = (int)Width;
+            int height = (int)Height;
+            int offset = 0;
+            int stride = (int)Width;
+
+            if (subImage.HasValue)
+                GetSubImageOffset(subImage.Value, out width, out height, out offset, out stride);
+
+            Rgba32[] rgbaPixels = new Rgba32[width * height];
+            unsafe
+            {
+                fixed (Rgba32* pixelPtr = rgbaPixels)
+                {
+                    ReadOnlySpan<byte> fromSlice = TextureData.Slice(offset, width + (height - 1) * stride);
+                    var from = new ReadOnlyByteImageBuffer((uint)width, (uint)height, (uint)stride, fromSlice);
+
+                    Span<uint> toBuffer = new Span<uint>((uint*)pixelPtr, rgbaPixels.Length);
+                    var to = new UIntImageBuffer((uint)width, (uint)height, width, toBuffer);
+                    CoreUtil.Blit8To32(from, to, palette, 255, 0);
+                }
+            }
+
+            Image<Rgba32> image = new Image<Rgba32>(width, height);
+            image.Frames.AddFrame(rgbaPixels);
+            image.Frames.RemoveFrame(0);
+            using var stream = File.OpenWrite(path);
+            image.SaveAsPng(stream);
         }
     }
 }

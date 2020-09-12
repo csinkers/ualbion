@@ -19,7 +19,8 @@ namespace UAlbion.Game.Assets
             var sprite = (AlbionSprite)asset;
             SubImage[] subImages;
 
-            if (key.Type == AssetType.Font || sprite.UniformFrames && sprite.Frames.Count >= 256)
+            /// TODO: Put exemptions into assets(min).json
+            if (key.Type == AssetType.Font || key.Type == AssetType.AutomapGraphics || sprite.UniformFrames && sprite.Frames.Count >= 256)
             {
                 const int buffer = 1;
                 // For things like tilemaps etc we repack into a texture atlas with buffer pixels.

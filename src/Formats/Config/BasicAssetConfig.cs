@@ -24,7 +24,7 @@ namespace UAlbion.Formats.Config
                 {
                     var newAsset = new BasicAssetInfo(asset) { Parent = newXld };
                     if (newAsset.ContainsData)
-                        newXld.Assets[asset.Id] = newAsset;
+                        newXld.Assets[asset.Id - asset.Parent.IdOffset] = newAsset;
                 }
 
                 min.Xlds[kvp.Key] = newXld;

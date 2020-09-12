@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using UAlbion.Core.Textures;
-using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
@@ -17,7 +16,6 @@ namespace UAlbion
         // For now, ignore formats and just dump out PNG.
         public static void Dump(IAssetManager assets, string baseDir, ISet<AssetType> types, DumpFormats _)
         {
-            var factory = new VeldridCoreFactory();
             void Export<TEnum>(string name, Func<TEnum, AssetKey> keyFunc, Func<TEnum, ITexture> loadFunc)
             {
                 var directory = Path.Combine(baseDir, "data", "exported", "png", name);
@@ -35,23 +33,47 @@ namespace UAlbion
                     if (texture == null)
                         continue;
 
-                    var path = Path.Combine(directory, $"{intId}_{id}.png");
-
-                    if (texture.ArrayLayers > 1 || texture.SubImageCount > 255)
-                    {
-                        File.WriteAllText(path + ".todo", "");
-                        continue; // TODO: Handle layered images + subimages
-                    }
-
                     if (texture is TrueColorTexture trueColor)
                     {
+                        var path = Path.Combine(directory, $"{intId}_{id}.png");
                         trueColor.SavePng(path);
+                    }
+                    else if (texture is VeldridEightBitTexture tilemap && (
+                        typeof(TEnum) == typeof(FontId) ||
+                        typeof(TEnum) == typeof(IconGraphicsId) ||
+                        typeof(TEnum) == typeof(AutoGraphicsId)))
+                    {
+                        var colors = tilemap.DistinctColors(null);
+                        int palettePeriod = palette.CalculatePeriod(colors);
+                        for (int palFrame = 0; palFrame < palettePeriod; palFrame++)
+                        {
+                            var path = Path.Combine(directory, $"{intId}_{palFrame}_{id}.png");
+                            tilemap.SavePng(path, null, palette.GetPaletteAtTime(palFrame));
+                        }
+                    }
+                    else if (texture is VeldridEightBitTexture ebt)
+                    {
+                        for (int subId = 0; subId < ebt.SubImageCount; subId++)
+                        {
+                            if (id is ItemSpriteId)
+                                subId = Convert.ToInt32(id, CultureInfo.InvariantCulture);
+
+                            var colors = ebt.DistinctColors(subId);
+                            int palettePeriod = palette.CalculatePeriod(colors);
+                            for (int palFrame = 0; palFrame < palettePeriod; palFrame++)
+                            {
+                                var path = Path.Combine(directory, $"{intId}_{subId}_{palFrame}_{id}.png");
+                                ebt.SavePng(path, subId, palette.GetPaletteAtTime(palFrame));
+                            }
+
+                            if (id is ItemSpriteId)
+                                break;
+                        }
                     }
                     else
                     {
-                        var multiTexture = factory.CreateMultiTexture(name, new DummyPaletteManager(palette));
-                        multiTexture.AddTexture(1, texture, 0, 0, null, false);
-                        multiTexture.SavePng(1, 0, path);
+                        var path = Path.Combine(directory, $"{intId}_{id}.png.todo");
+                        File.WriteAllText(path, "");
                     }
                 }
             }

@@ -123,6 +123,8 @@ namespace UAlbion
 
                 case ExecutionMode.Exit: break;
             }
+
+            Console.WriteLine("Exiting");
         }
     }
 }

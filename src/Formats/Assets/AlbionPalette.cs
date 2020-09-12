@@ -14,6 +14,7 @@ namespace UAlbion.Formats.Assets
         public string Name { get; }
         [JsonIgnore] public bool IsAnimated => AnimatedRanges.ContainsKey(Id);
         public int Period { get; }
+        readonly int[] _periods = new int[256];
 
         readonly uint[] _entries = new uint[0x100];
         readonly IList<uint[]> _cache = new List<uint[]>();
@@ -83,7 +84,16 @@ namespace UAlbion.Formats.Assets
                 }
                 _cache.Add(result);
             }
+
+            for (int i = 0; i < _periods.Length; i++)
+                _periods[i] = 1;
+
+            foreach(var range in ranges)
+                for (int i = range.Item1; i <= range.Item2; i++)
+                    _periods[i] = range.Item2 - range.Item1 + 1;
         }
+
+        public int CalculatePeriod(IList<byte> distinctColors) => (int)ApiUtil.Lcm(distinctColors.Select(x => (long)_periods[x]).Append(1));
 
         public void SetCommonPalette(byte[] commonPalette)
         {

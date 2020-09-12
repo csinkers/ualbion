@@ -2,15 +2,18 @@
 
 open System
 open System.IO
-open System.Reflection
 open System.Text
 open FSharp.Json
 
-let baseDir = 
-    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) 
-    |> (fun x -> Directory.GetParent(x).Parent.Parent.Parent.Parent.Parent.FullName)
-let xldDir = Path.Combine(baseDir, @"albion\CD\XLDLIBS")
-let mainOutputDir = Path.Combine(baseDir, @"data\exported")
+let baseDir = Util.findBasePath()
+let xldDir =
+    let path1 = Path.Combine(baseDir, @"albion/CD/XLDLIBS")
+    if(Directory.Exists(path1)) then path1 else
+    let path2 = Path.Combine(baseDir, @"albion/CD/ALBION/XLDLIBS")
+    if(Directory.Exists(path2)) then path2 else
+    failwithf "Could not find XLD directory, tried %s and %s" path1 path2
+
+let mainOutputDir = Path.Combine(baseDir, @"data\exported\raw")
 let xmiToMidiPath = Path.Combine(baseDir, @"Tools\XmiToMidi.exe")
 let bytesTo850String (bytes:byte array) = Encoding.GetEncoding(850).GetString(bytes).Replace("×", "ß").TrimEnd((char)0)
 
@@ -87,21 +90,21 @@ type XldFile =
     {
         path : string
     }
-    
-    static member raw extension (br:BinaryReader) outputDir i length = 
+
+    static member raw extension (br:BinaryReader) outputDir i length =
         if(length = 0) then () else
         let bytes = br.ReadBytes(length)
         File.WriteAllBytes(Path.Combine(outputDir, sprintf "%02d.%s" i extension), bytes)
 
     static member graphics = XldFile.raw "bin"
-    static member strings (br:BinaryReader) outputDir i length = 
+    static member strings (br:BinaryReader) outputDir i length =
         if(length = 0) then () else
         let startOffset = br.BaseStream.Position
         let stringCount = int <| br.ReadUInt16()
         let stringLengths = Array.ofSeq <| seq { for _ in [1..stringCount] do yield int <| br.ReadUInt16() }
-        let stringTable = 
-            stringLengths 
-            |> Seq.mapi (fun i l -> 
+        let stringTable =
+            stringLengths
+            |> Seq.mapi (fun i l ->
                 let bytes = br.ReadBytes(l)
                 (sprintf "%2d" i), bytesTo850String bytes
             ) |> Map.ofSeq
@@ -109,12 +112,12 @@ type XldFile =
         File.WriteAllText(Path.Combine(outputDir, sprintf "%02d.json" i), json)
         assert (br.BaseStream.Position = startOffset + (int64 length))
 
-    static member chunkedStrings chunkSize (br:BinaryReader) outputDir i length = 
+    static member chunkedStrings chunkSize (br:BinaryReader) outputDir i length =
         if (length = 0) then () else
         assert (length % chunkSize = 0)
-        let stringTable = 
-            seq { 
-                for stringid in [1..(length/chunkSize)] do 
+        let stringTable =
+            seq {
+                for stringid in [1..(length/chunkSize)] do
                     let bytes = br.ReadBytes(chunkSize)
                     let str = bytesTo850String bytes
                     if (Util.stringNotEmpty str) then yield (string stringid), str
@@ -122,18 +125,18 @@ type XldFile =
         let json = Json.serialize stringTable
         File.WriteAllText(Path.Combine(outputDir, sprintf "%02d.json" i), json)
 
-    static member samples (br:BinaryReader) outputDir i length = 
-        if (length = 0) then () else 
+    static member samples (br:BinaryReader) outputDir i length =
+        if (length = 0) then () else
         let bytes = br.ReadBytes(length)
         let filename = sprintf "%s\\%02d.wav" outputDir i
         Util.writeWavFile filename bytes 11025u 1us 1us
 
-    static member wavelib (br:BinaryReader) outputDir i length = 
+    static member wavelib (br:BinaryReader) outputDir i length =
         if (length = 0) then () else // Ignore empty files
         let startPos = br.BaseStream.Position
 
-        let headers = Array.ofSeq <| seq { 
-            for _ in [1u..512u] do 
+        let headers = Array.ofSeq <| seq {
+            for _ in [1u..512u] do
                 let isValid    = br.ReadInt32()
                 let type1      = br.ReadInt32()
                 let type2      = br.ReadInt32()
@@ -192,27 +195,27 @@ Total size: 0x1ae3b (110,139 bytes)
 
 0x40: int ??         = 0
 0x44: int Type1      = 7b (123)
-0x48: int Type2      = 
-0x4c: int Offset     = 
-0x50: int Length     = 
-0x54: int ??         = 
-0x58: int ??         = 
-0x5c: int SampleRate = 
+0x48: int Type2      =
+0x4c: int Offset     =
+0x50: int Length     =
+0x54: int ??         =
+0x58: int ??         =
+0x5c: int SampleRate =
 0000040: 0000 0000 7b00 0000 3c00 0000 d9e0 0000  ....{...<.......
 0000050: e62e 0000 0000 0000 0000 0000 112b 0000  .............+..
 
-0x60: int ??         = 
+0x60: int ??         =
 0x64: int Type1      = 7c (124)
-0x68: int Type2      = 
-0x6c: int Offset     = 
-0x70: int Length     = 
-0x74: int ??         = 
-0x78: int ??         = 
-0x7c: int SampleRate = 
+0x68: int Type2      =
+0x6c: int Offset     =
+0x70: int Length     =
+0x74: int ??         =
+0x78: int ??         =
+0x7c: int SampleRate =
 0000060: 0000 0000 7c00 0000 3c00 0000 bf0f 0100  ....|...<.......
 0000070: 9e0c 0000 0000 0000 0000 0000 112b 0000  .............+..
 
-0x80: int ??         = 
+0x80: int ??         =
 0x84: int Type1      = 7d (125)
 0x88: int Type2      = 0x3c
 0x8c: int Offset     = 0x11c5d
@@ -402,7 +405,7 @@ let main argv =
     Encoding.RegisterProvider(CodePagesEncodingProvider.Instance) // Required for code page 850 support in .NET Core
 
     files
-    |> Seq.iter (fun (path, exportFunc) -> 
+    |> Seq.iter (fun (path, exportFunc) ->
         exportFunc (Path.Combine(xldDir, path)) (Path.Combine(mainOutputDir, path))
     )
     0

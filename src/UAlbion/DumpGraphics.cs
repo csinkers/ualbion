@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Formats.AssetIds;
@@ -14,11 +16,28 @@ namespace UAlbion
     static class DumpGraphics
     {
         // For now, ignore formats and just dump out PNG.
-        public static void Dump(IAssetManager assets, string baseDir, ISet<AssetType> types, DumpFormats _)
+        public static void Dump(IAssetManager assets, string baseDir, ISet<AssetType> types, DumpFormats formats)
         {
+            void Save(Image<Rgba32> image, string pathWithoutExtension)
+            {
+                if ((formats & DumpFormats.Png) != 0)
+                {
+                    var path = Path.ChangeExtension(pathWithoutExtension, "png");
+                    using var stream = File.OpenWrite(path);
+                    image.SaveAsPng(stream);
+                }
+
+                if ((formats & DumpFormats.Tga) != 0)
+                {
+                    var path = Path.ChangeExtension(pathWithoutExtension, "tga");
+                    using var stream = File.OpenWrite(path);
+                    image.SaveAsTga(stream);
+                }
+            }
+
             void Export<TEnum>(string name, Func<TEnum, AssetKey> keyFunc, Func<TEnum, ITexture> loadFunc)
             {
-                var directory = Path.Combine(baseDir, "data", "exported", "png", name);
+                var directory = Path.Combine(baseDir, "data", "exported", "gfx", name);
                 if (!Directory.Exists(directory))
                     Directory.CreateDirectory(directory);
 
@@ -35,8 +54,9 @@ namespace UAlbion
 
                     if (texture is TrueColorTexture trueColor)
                     {
-                        var path = Path.Combine(directory, $"{intId}_{id}.png");
-                        trueColor.SavePng(path);
+                        var path = Path.Combine(directory, $"{intId}_{id}");
+                        var image = trueColor.ToImage();
+                        Save(image, path);
                     }
                     else if (texture is VeldridEightBitTexture tilemap && (
                         typeof(TEnum) == typeof(FontId) ||
@@ -47,8 +67,9 @@ namespace UAlbion
                         int palettePeriod = palette.CalculatePeriod(colors);
                         for (int palFrame = 0; palFrame < palettePeriod; palFrame++)
                         {
-                            var path = Path.Combine(directory, $"{intId}_{palFrame}_{id}.png");
-                            tilemap.SavePng(path, null, palette.GetPaletteAtTime(palFrame));
+                            var path = Path.Combine(directory, $"{intId}_{palFrame}_{id}");
+                            var image = tilemap.ToImage(null, palette.GetPaletteAtTime(palFrame));
+                            Save(image, path);
                         }
                     }
                     else if (texture is VeldridEightBitTexture ebt)
@@ -62,8 +83,9 @@ namespace UAlbion
                             int palettePeriod = palette.CalculatePeriod(colors);
                             for (int palFrame = 0; palFrame < palettePeriod; palFrame++)
                             {
-                                var path = Path.Combine(directory, $"{intId}_{subId}_{palFrame}_{id}.png");
-                                ebt.SavePng(path, subId, palette.GetPaletteAtTime(palFrame));
+                                var path = Path.Combine(directory, $"{intId}_{subId}_{palFrame}_{id}");
+                                var image = ebt.ToImage(subId, palette.GetPaletteAtTime(palFrame));
+                                Save(image, path);
                             }
 
                             if (id is ItemSpriteId)

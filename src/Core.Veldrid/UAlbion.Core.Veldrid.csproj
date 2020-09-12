@@ -34,13 +34,13 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\deps\veldrid\')">
-    <PackageReference Include="Veldrid" Version="4.7.0" />
-    <PackageReference Include="Veldrid.ImageSharp" Version="4.7.0" />
+    <PackageReference Include="Veldrid" Version="4.8.0" />
+    <PackageReference Include="Veldrid.ImageSharp" Version="4.8.0" />
     <PackageReference Include="Veldrid.ImGui" Version="5.72.0" />
     <PackageReference Include="Veldrid.RenderDoc" Version="1.0.0" />
-    <PackageReference Include="Veldrid.Sdl2" Version="4.7.0" />
-    <PackageReference Include="Veldrid.StartupUtilities" Version="4.7.0" />
-    <PackageReference Include="Veldrid.Utilities" Version="4.7.0" />
+    <PackageReference Include="Veldrid.Sdl2" Version="4.8.0" />
+    <PackageReference Include="Veldrid.StartupUtilities" Version="4.8.0" />
+    <PackageReference Include="Veldrid.Utilities" Version="4.8.0" />
   </ItemGroup>
 
   <ItemGroup Condition="Exists('..\..\deps\veldrid\')">

@@ -15,7 +15,6 @@ namespace UAlbion
 {
     static class DumpGraphics
     {
-        // For now, ignore formats and just dump out PNG.
         public static void Dump(IAssetManager assets, string baseDir, ISet<AssetType> types, DumpFormats formats)
         {
             void Save(Image<Rgba32> image, string pathWithoutExtension)

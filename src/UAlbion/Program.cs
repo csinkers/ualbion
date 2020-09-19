@@ -36,7 +36,7 @@ namespace UAlbion
             PerfTracker.StartupEvent("Registering asset manager");
             var factory = new VeldridCoreFactory();
             var loaderRegistry = new AssetLoaderRegistry()
-                .AddLoader(new AlbionStringTableLoader())
+                .AddLoader(new AlbionStringTableLoader()) // Register loaders for the various file formats
                 .AddLoader(new AmorphousSpriteLoader())
                 .AddLoader(new BlockListLoader())
                 .AddLoader(new ChestLoader())
@@ -64,6 +64,7 @@ namespace UAlbion
                 .AddLoader(new WordListLoader());
 
             var locatorRegistry = new AssetLocatorRegistry()
+                // Register locators for handling the various container formats and paths
                 .AddAssetLocator(new StandardAssetLocator(loaderRegistry), true)
                 .AddAssetLocator(new AssetConfigLocator(commandLine.Mode == ExecutionMode.DumpData))
                 .AddAssetLocator(new CoreSpriteLocator())
@@ -71,6 +72,7 @@ namespace UAlbion
                 .AddAssetLocator(new NewStringLocator())
                 .AddAssetLocator(new SoundBankLocator())
                 .AddAssetLocator(new SavedGameLocator(loaderRegistry))
+                // Register post-processors for handling transformations of asset data that can't be done by UAlbion.Formats alone.
                 .AddAssetPostProcessor(new AlbionSpritePostProcessor())
                 .AddAssetPostProcessor(new ImageSharpPostProcessor())
                 .AddAssetPostProcessor(new InterlacedBitmapPostProcessor())

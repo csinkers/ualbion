@@ -118,6 +118,11 @@ namespace UAlbion.Core.Veldrid
             PerfTracker.StartupEvent("Set up backend");
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
             ImGui.StyleColorsClassic();
+
+            // Turn on ImGui docking if it's supported
+            if (Enum.TryParse(typeof(ImGuiConfigFlags), "DockingEnable", out var dockingFlag))
+                ImGui.GetIO().ConfigFlags |= (ImGuiConfigFlags)dockingFlag;
+
             Raise(new WindowResizedEvent(_window.Width, _window.Height));
             Raise(new BeginFrameEvent());
 
@@ -188,6 +193,8 @@ namespace UAlbion.Core.Veldrid
             DestroyAllObjects();
             GraphicsDevice.Dispose();
             _window.Close();
+            GraphicsDevice = null;
+            _window = null;
         }
 
         void Update(float deltaSeconds)
@@ -382,7 +389,6 @@ namespace UAlbion.Core.Veldrid
 
         public void Dispose()
         {
-            DestroyAllObjects();
             foreach(var renderer in _renderers)
                 if (renderer is IDisposable disposable)
                     disposable.Dispose();

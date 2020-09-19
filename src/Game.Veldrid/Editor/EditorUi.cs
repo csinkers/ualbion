@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using ImGuiNET;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Game.Assets;
 
 namespace UAlbion.Game.Veldrid.Editor
 {
@@ -72,6 +74,8 @@ namespace UAlbion.Game.Veldrid.Editor
         bool _showInspector;
         bool _showAssets;
 
+        readonly Dictionary<AssetType, AssetKey[]> _allKeys = new Dictionary<AssetType, AssetKey[]>();
+
         public EditorUi()
         {
             On<EngineUpdateEvent>(e =>
@@ -84,6 +88,14 @@ namespace UAlbion.Game.Veldrid.Editor
             AttachChild(new CharacterEditor("Tom", PartyCharacterId.Tom.ToAssetId()));
         }
 
+        void ReloadAssetKeys()
+        {
+            var raw = Resolve<IRawAssetManager>();
+            _allKeys.Clear();
+            foreach (var assetType in Enum.GetValues(typeof(AssetType)).OfType<AssetType>())
+                _allKeys[assetType] = raw.EnumerateAssets(assetType).ToArray();
+        }
+
         void RenderChildren()
         {
             foreach (var child in Children.OfType<AssetEditor>())
@@ -92,13 +104,21 @@ namespace UAlbion.Game.Veldrid.Editor
 
         void RenderAssetPicker()
         {
+            if(_allKeys.Count == 0)
+                ReloadAssetKeys();
+
+            // TODO: Filter textbox w/ keyboard shortcuts
             ImGui.SetWindowSize(new Vector2(300, 200), ImGuiCond.FirstUseEver);
             if (ImGui.Begin("Assets"))
             {
                 foreach (var assetType in Enum.GetValues(typeof(AssetType)).OfType<AssetType>())
                 {
+                    // TODO: Coloured / grouped by asset type?
                     if (ImGui.TreeNode(assetType.ToString()))
                     {
+                        // TODO: Mark modified/overridden assets, assets with unsaved changes, zero-length assets, missing assets etc
+                        foreach(var key in _allKeys[assetType])
+                            ImGui.Text(key.ToString());
                         ImGui.TreePop();
                     }
                 }

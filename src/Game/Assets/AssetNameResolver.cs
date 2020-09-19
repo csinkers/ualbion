@@ -20,7 +20,11 @@ namespace UAlbion.Game.Assets
                 return (x, null);
             }).Where(x => x.EnumType != null).ToDictionary(x => x.x, x => x.EnumType);
 
+        public static Type GetEnumType(AssetType type) => IdTypes.TryGetValue(type, out var result) ? result : null;
 
-        public static string GetName(AssetType type, int id) => IdTypes.TryGetValue(type, out var enumType) ? Enum.GetName(enumType, id) : id.ToString(CultureInfo.InvariantCulture);
+        public static string GetName(AssetType type, int id) => 
+            IdTypes.TryGetValue(type, out var enumType) 
+                ? Enum.GetName(enumType, id) 
+                : id.ToString(CultureInfo.InvariantCulture);
     }
 }

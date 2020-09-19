@@ -13,6 +13,7 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game;
+using UAlbion.Game.Assets;
 using UAlbion.Game.Debugging;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
@@ -160,6 +161,7 @@ namespace UAlbion
                         .Add(new InventoryInspector()))
 
                     .AddScene((Scene)new EditorScene()
+                        .Add(new RawAssetManager())
                         .Add(new PaletteManager())
                         .Add(new EditorUi()))
                 )

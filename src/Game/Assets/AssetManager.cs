@@ -123,7 +123,7 @@ namespace UAlbion.Game.Assets
         {
             var words = // Inefficient code, if it ends up being a problem then we can build a reverse dictionary and cache it.
                 new[]
-                {   // Load the english files as all languages use english {WORDxxx} tags
+                {   // Load the English files as all languages use English {WORDxxx} tags
                     (IDictionary<int, string>) _assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.Dictionary)),
                     (IDictionary<int, string>) _assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.Dictionary, 1)),
                     (IDictionary<int, string>) _assetLocatorRegistry.LoadAssetCached(new AssetKey(AssetType.Dictionary, 2))

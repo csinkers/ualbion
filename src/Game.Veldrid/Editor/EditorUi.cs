@@ -84,7 +84,7 @@ namespace UAlbion.Game.Veldrid.Editor
         {
             if (ImGui.BeginMainMenuBar())
             {
-                ImGui.DockSpace(0, Resolve<IWindowManager>().Size);
+                // ImGui.DockSpace(0, Resolve<IWindowManager>().Size);
                 if (ImGui.BeginMenu("File"))
                     ImGui.EndMenu();
                 if (ImGui.BeginMenu("Edit"))

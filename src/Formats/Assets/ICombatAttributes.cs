@@ -2,7 +2,7 @@
 {
     public interface ICombatAttributes
     {
-        uint ExperiencePoints { get; }
+        int ExperiencePoints { get; }
         ushort TrainingPoints { get; }
         ushort LifePoints { get; }
         ushort LifePointsMax { get; }

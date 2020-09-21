@@ -163,6 +163,7 @@ namespace UAlbion
                     .AddScene((Scene)new EditorScene()
                         .Add(new RawAssetManager())
                         .Add(new PaletteManager())
+                        .Add(new EditorAssetManager())
                         .Add(new EditorUi()))
                 )
 

@@ -15,59 +15,7 @@ namespace UAlbion.Formats.AssetIds
 
         public AssetType Type { get; }
         public ushort Id { get; }
-
-        public override string ToString() => Type.ToShortName() + ":" + (Type switch
-        {
-            AssetType.Automap            => ((AutoMapId)Id).ToString(),
-            AssetType.AutomapGraphics    => ((AutoGraphicsId)Id).ToString(),
-            AssetType.BlockList          => ((BlockListId)Id).ToString(),
-            AssetType.ChestData          => ((ChestId)Id).ToString(),
-            AssetType.CombatBackground   => ((CombatBackgroundId)Id).ToString(),
-            AssetType.CombatGraphics     => ((CombatGraphicsId)Id).ToString(),
-            AssetType.CoreGraphics       => ((CoreSpriteId)Id).ToString(),
-            AssetType.BackgroundGraphics => ((DungeonBackgroundId)Id).ToString(),
-            AssetType.Floor3D            => ((DungeonFloorId)Id).ToString(),
-            AssetType.Object3D           => ((DungeonObjectId)Id).ToString(),
-            AssetType.Overlay3D          => ((DungeonOverlayId)Id).ToString(),
-            AssetType.Wall3D             => ((DungeonWallId)Id).ToString(),
-            AssetType.EventSet           => ((EventSetId)Id).ToString(),
-            AssetType.EventText          => ((EventTextId)Id).ToString(),
-            AssetType.Font               => ((FontId)Id).ToString(),
-            AssetType.FullBodyPicture    => ((FullBodyPictureId)Id).ToString(),
-            AssetType.Tileset            => ((TilesetId)Id).ToString(),
-            AssetType.IconGraphics       => ((IconGraphicsId)Id).ToString(),
-            AssetType.ItemGraphics       => ((ItemSpriteId)Id).ToString(),
-            AssetType.ItemList           => ((ItemId)Id).ToString(),
-            AssetType.ItemNames          => ((ItemId)Id).ToString(),
-            AssetType.LabData            => ((LabyrinthDataId)Id).ToString(),
-            AssetType.BigNpcGraphics     => ((LargeNpcId)Id).ToString(),
-            AssetType.BigPartyGraphics   => ((LargePartyGraphicsId)Id).ToString(),
-            AssetType.MapData            => ((MapDataId)Id).ToString(),
-            AssetType.MapText            => ((MapTextId)Id).ToString(),
-            AssetType.MerchantData       => ((MerchantId)Id).ToString(),
-            AssetType.Monster            => ((MonsterCharacterId)Id).ToString(),
-            AssetType.MonsterGraphics    => ((MonsterGraphicsId)Id).ToString(),
-            AssetType.MonsterGroup       => ((MonsterGroupId)Id).ToString(),
-            AssetType.Npc                => ((NpcCharacterId)Id).ToString(),
-            AssetType.Palette            => ((PaletteId)Id).ToString(),
-            AssetType.PartyMember        => ((PartyCharacterId)Id).ToString(),
-            AssetType.Picture            => ((PictureId)Id).ToString(),
-            AssetType.Sample             => ((SampleId)Id).ToString(),
-            AssetType.Script             => ((ScriptId)Id).ToString(),
-            AssetType.Slab               => ((SlabId)Id).ToString(),
-            AssetType.SmallNpcGraphics   => ((SmallNpcId)Id).ToString(),
-            AssetType.SmallPartyGraphics => ((SmallPartyGraphicsId)Id).ToString(),
-            AssetType.SmallPortrait      => ((SmallPortraitId)Id).ToString(),
-            AssetType.Song               => ((SongId)Id).ToString(),
-            AssetType.SpellData          => ((SpellId)Id).ToString(),
-            AssetType.SystemText         => ((SystemTextId)Id).ToString(),
-            AssetType.TacticalIcon       => ((TacticId)Id).ToString(),
-            AssetType.Flic               => ((VideoId)Id).ToString(),
-            AssetType.WaveLibrary        => ((WaveLibraryId)Id).ToString(),
-            AssetType.Dictionary         => ((WordId)Id).ToString(),
-            AssetType.UAlbionText        => ((UAlbionStringId)Id).ToString(),
-            _ => Id.ToString(CultureInfo.InvariantCulture)
-        });
+        public override string ToString() => ToString(CultureInfo.InvariantCulture);
 
         // public string Serialise() => Type.ToShortName() + ":" + Id;
 
@@ -136,6 +84,59 @@ namespace UAlbion.Formats.AssetIds
         public static implicit operator AssetId(WordId id)               => ToAssetId(id);
         public static implicit operator AssetId(UAlbionStringId id)      => ToAssetId(id);
 
+        public string ToString(IFormatProvider provider) => Type.ToShortName() + ":" + (Type switch
+        {
+            AssetType.Automap            => ((AutoMapId)Id).ToString(),
+            AssetType.AutomapGraphics    => ((AutoGraphicsId)Id).ToString(),
+            AssetType.BlockList          => ((BlockListId)Id).ToString(),
+            AssetType.ChestData          => ((ChestId)Id).ToString(),
+            AssetType.CombatBackground   => ((CombatBackgroundId)Id).ToString(),
+            AssetType.CombatGraphics     => ((CombatGraphicsId)Id).ToString(),
+            AssetType.CoreGraphics       => ((CoreSpriteId)Id).ToString(),
+            AssetType.BackgroundGraphics => ((DungeonBackgroundId)Id).ToString(),
+            AssetType.Floor3D            => ((DungeonFloorId)Id).ToString(),
+            AssetType.Object3D           => ((DungeonObjectId)Id).ToString(),
+            AssetType.Overlay3D          => ((DungeonOverlayId)Id).ToString(),
+            AssetType.Wall3D             => ((DungeonWallId)Id).ToString(),
+            AssetType.EventSet           => ((EventSetId)Id).ToString(),
+            AssetType.EventText          => ((EventTextId)Id).ToString(),
+            AssetType.Font               => ((FontId)Id).ToString(),
+            AssetType.FullBodyPicture    => ((FullBodyPictureId)Id).ToString(),
+            AssetType.Tileset            => ((TilesetId)Id).ToString(),
+            AssetType.IconGraphics       => ((IconGraphicsId)Id).ToString(),
+            AssetType.ItemGraphics       => ((ItemSpriteId)Id).ToString(),
+            AssetType.ItemList           => ((ItemId)Id).ToString(),
+            AssetType.ItemNames          => ((ItemId)Id).ToString(),
+            AssetType.LabData            => ((LabyrinthDataId)Id).ToString(),
+            AssetType.BigNpcGraphics     => ((LargeNpcId)Id).ToString(),
+            AssetType.BigPartyGraphics   => ((LargePartyGraphicsId)Id).ToString(),
+            AssetType.MapData            => ((MapDataId)Id).ToString(),
+            AssetType.MapText            => ((MapTextId)Id).ToString(),
+            AssetType.MerchantData       => ((MerchantId)Id).ToString(),
+            AssetType.Monster            => ((MonsterCharacterId)Id).ToString(),
+            AssetType.MonsterGraphics    => ((MonsterGraphicsId)Id).ToString(),
+            AssetType.MonsterGroup       => ((MonsterGroupId)Id).ToString(),
+            AssetType.Npc                => ((NpcCharacterId)Id).ToString(),
+            AssetType.Palette            => ((PaletteId)Id).ToString(),
+            AssetType.PartyMember        => ((PartyCharacterId)Id).ToString(),
+            AssetType.Picture            => ((PictureId)Id).ToString(),
+            AssetType.Sample             => ((SampleId)Id).ToString(),
+            AssetType.Script             => ((ScriptId)Id).ToString(),
+            AssetType.Slab               => ((SlabId)Id).ToString(),
+            AssetType.SmallNpcGraphics   => ((SmallNpcId)Id).ToString(),
+            AssetType.SmallPartyGraphics => ((SmallPartyGraphicsId)Id).ToString(),
+            AssetType.SmallPortrait      => ((SmallPortraitId)Id).ToString(),
+            AssetType.Song               => ((SongId)Id).ToString(),
+            AssetType.SpellData          => ((SpellId)Id).ToString(),
+            AssetType.SystemText         => ((SystemTextId)Id).ToString(),
+            AssetType.TacticalIcon       => ((TacticId)Id).ToString(),
+            AssetType.Flic               => ((VideoId)Id).ToString(),
+            AssetType.WaveLibrary        => ((WaveLibraryId)Id).ToString(),
+            AssetType.Dictionary         => ((WordId)Id).ToString(),
+            AssetType.UAlbionText        => ((UAlbionStringId)Id).ToString(),
+            _ => Id.ToString(CultureInfo.InvariantCulture)
+        });
+
         public int ToInt32(IFormatProvider provider) => (int)this;
         public TypeCode GetTypeCode() => throw new NotImplementedException();
         public bool ToBoolean(IFormatProvider provider) => throw new NotImplementedException();
@@ -148,7 +149,6 @@ namespace UAlbion.Formats.AssetIds
         public long ToInt64(IFormatProvider provider) => throw new NotImplementedException();
         public sbyte ToSByte(IFormatProvider provider) => throw new NotImplementedException();
         public float ToSingle(IFormatProvider provider) => throw new NotImplementedException();
-        public string ToString(IFormatProvider provider) => throw new NotImplementedException();
         public ushort ToUInt16(IFormatProvider provider) => throw new NotImplementedException();
         public uint ToUInt32(IFormatProvider provider) => throw new NotImplementedException();
         public ulong ToUInt64(IFormatProvider provider) => throw new NotImplementedException();

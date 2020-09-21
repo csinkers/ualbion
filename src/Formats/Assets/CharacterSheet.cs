@@ -17,8 +17,9 @@ namespace UAlbion.Formats.Assets
 
     public class CharacterSheet : ICharacterSheet
     {
-        const int SpellSchoolCount = 7;
-        const int MaxSpellsPerSchool = 30;
+        public const int SpellSchoolCount = 7;
+        public const int MaxSpellsPerSchool = 30;
+        public const int MaxNameLength = 16;
 
         public CharacterSheet(AssetId id)
         {
@@ -266,7 +267,7 @@ namespace UAlbion.Formats.Assets
             sheet.UnknownE6 = s.UInt32(nameof(sheet.UnknownE6), sheet.UnknownE6);
             sheet.UnknownEA = s.UInt32(nameof(sheet.UnknownEA), sheet.UnknownEA);
 
-            sheet.Combat.ExperiencePoints = s.UInt32(nameof(sheet.Combat.ExperiencePoints), sheet.Combat.ExperiencePoints);
+            sheet.Combat.ExperiencePoints = s.Int32(nameof(sheet.Combat.ExperiencePoints), sheet.Combat.ExperiencePoints);
             // e.g. 98406 = 0x18066 => 6680 0100 in file
             s.Check();
 
@@ -297,9 +298,9 @@ namespace UAlbion.Formats.Assets
             sheet.UnknownFC = s.UInt16(nameof(sheet.UnknownFC), sheet.UnknownFC);
             s.Check();
 
-            sheet.GermanName = s.FixedLengthString(nameof(sheet.GermanName), sheet.GermanName, 16); // 112
-            sheet.EnglishName = s.FixedLengthString(nameof(sheet.EnglishName), sheet.EnglishName, 16);
-            sheet.FrenchName = s.FixedLengthString(nameof(sheet.FrenchName), sheet.FrenchName, 16);
+            sheet.GermanName = s.FixedLengthString(nameof(sheet.GermanName), sheet.GermanName, MaxNameLength); // 112
+            sheet.EnglishName = s.FixedLengthString(nameof(sheet.EnglishName), sheet.EnglishName, MaxNameLength);
+            sheet.FrenchName = s.FixedLengthString(nameof(sheet.FrenchName), sheet.FrenchName, MaxNameLength);
 
             s.Check();
 

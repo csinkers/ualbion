@@ -2,7 +2,7 @@
 {
     public class CombatAttributes : ICombatAttributes
     {
-        public uint ExperiencePoints { get; set; }
+        public int ExperiencePoints { get; set; }
         public ushort TrainingPoints { get; set; }
         public ushort LifePoints { get; set; }
         public ushort LifePointsMax { get; set; }

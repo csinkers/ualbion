@@ -6,69 +6,11 @@ using ImGuiNET;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Game.Assets;
 
 namespace UAlbion.Game.Veldrid.Editor
 {
-    public abstract class AssetEditor : Component
-    {
-        public abstract void Render();
-    }
-
-    public class MapEditor : AssetEditor
-    {
-        readonly string _name;
-
-        public MapEditor(string name)
-        {
-            _name = name;
-        }
-
-        public override void Render()
-        {
-            if (!ImGui.Begin(_name)) return;
-            if (ImGui.BeginMenuBar())
-            {
-                if (ImGui.BeginMenu("View"))
-                {
-                    if (ImGui.MenuItem("Show Overlay", true)) { }
-                    if (ImGui.MenuItem("Show Underlay", true)) { }
-                    if (ImGui.MenuItem("Show NPCs", true)) { }
-                    if (ImGui.MenuItem("Show NPC paths", true)) { }
-                    if (ImGui.MenuItem("Show trigger zones", true)) { }
-                        
-
-                }
-
-                ImGui.EndMenuBar();
-            }
-            ImGui.End();
-        }
-    }
-
-    public class CharacterEditor : AssetEditor
-    {
-        readonly string _name;
-        readonly AssetKey _key;
-
-        public CharacterEditor(string name, AssetKey key)
-        {
-            _name = name;
-            _key = key;
-        }
-
-        public override void Render()
-        {
-            if (!ImGui.Begin(_name)) return;
-            if (ImGui.BeginMenuBar())
-            {
-
-                ImGui.EndMenuBar();
-            }
-            ImGui.End();
-        }
-    }
-
     public class EditorUi : Component
     {
         bool _showInspector;
@@ -84,8 +26,19 @@ namespace UAlbion.Game.Veldrid.Editor
                 RenderAssetPicker();
                 RenderChildren();
             });
-            AttachChild(new MapEditor("Map Editor"));
-            AttachChild(new CharacterEditor("Tom", PartyCharacterId.Tom.ToAssetId()));
+        }
+
+        protected override void Subscribed()
+        {
+            if (Children.Count == 0)
+            {
+                var toronto = (MapData2D)Resolve<IRawAssetManager>().LoadMap(MapDataId.Toronto2DGesamtkarteSpielbeginn);
+                var tom = Resolve<IRawAssetManager>().LoadPartyMember(PartyCharacterId.Tom);
+                AttachChild(new FlatMapEditor("Map Editor", toronto));
+                AttachChild(new CharacterEditor("Tom", tom));
+            }
+
+            base.Subscribed();
         }
 
         void ReloadAssetKeys()
@@ -131,6 +84,7 @@ namespace UAlbion.Game.Veldrid.Editor
         {
             if (ImGui.BeginMainMenuBar())
             {
+                ImGui.DockSpace(0, Resolve<IWindowManager>().Size);
                 if (ImGui.BeginMenu("File"))
                     ImGui.EndMenu();
                 if (ImGui.BeginMenu("Edit"))

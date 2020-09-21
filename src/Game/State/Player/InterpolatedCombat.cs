@@ -17,7 +17,7 @@ namespace UAlbion.Game.State.Player
             _getLerp = getLerp;
         }
 
-        public uint ExperiencePoints => (ushort)ApiUtil.Lerp(_a().ExperiencePoints, _b().ExperiencePoints, _getLerp());
+        public int ExperiencePoints => (int)ApiUtil.Lerp(_a().ExperiencePoints, _b().ExperiencePoints, _getLerp());
         public ushort TrainingPoints => (ushort)ApiUtil.Lerp(_a().TrainingPoints, _b().TrainingPoints, _getLerp());
         public ushort LifePoints => (ushort)ApiUtil.Lerp(_a().LifePoints, _b().LifePoints, _getLerp());
         public ushort LifePointsMax => (ushort)ApiUtil.Lerp(_a().LifePointsMax, _b().LifePointsMax, _getLerp());

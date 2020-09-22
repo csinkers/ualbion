@@ -5,7 +5,7 @@ using System.Linq;
 using UAlbion.Api;
 using UAlbion.Core;
 
-namespace UAlbion.Game.Veldrid.Editor
+namespace UAlbion.Editor
 {
     public class EditorAsset : Component
     {

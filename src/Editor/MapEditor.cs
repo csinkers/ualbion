@@ -2,7 +2,7 @@
 using ImGuiNET;
 using UAlbion.Formats.Assets.Maps;
 
-namespace UAlbion.Game.Veldrid.Editor
+namespace UAlbion.Editor
 {
     public class FlatMapEditor : AssetEditor
     {

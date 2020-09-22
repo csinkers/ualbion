@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Api\UAlbion.Api.csproj" />
+    <ProjectReference Include="..\Core\UAlbion.Core.csproj" />
+    <ProjectReference Include="..\Game\UAlbion.Game.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ImGui.NET" Version="1.72.0" />
+  </ItemGroup>
+
+</Project>

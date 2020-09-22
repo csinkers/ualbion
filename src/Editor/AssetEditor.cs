@@ -5,7 +5,7 @@ using System.Text;
 using ImGuiNET;
 using UAlbion.Core;
 
-namespace UAlbion.Game.Veldrid.Editor
+namespace UAlbion.Editor
 {
     public abstract class AssetEditor : Component
     {
@@ -17,15 +17,49 @@ namespace UAlbion.Game.Veldrid.Editor
         public abstract void Render();
         protected object Asset { get; }
 
-        protected void IntSlider(string propertyName, int value, int min, int max)
+        protected void Int8Slider(string propertyName, sbyte value, sbyte min, sbyte max)
         {
             int newValue = value;
             ImGui.SliderInt(propertyName, ref newValue, min, max);
-            if (newValue != value)
-            {
-                var id = Resolve<IEditorAssetManager>().GetIdForAsset(Asset);
-                Raise(new EditorSetPropertyEvent(id, propertyName, value, newValue));
-            }
+            if (newValue == value) return;
+            var id = Resolve<IEditorAssetManager>().GetIdForAsset(Asset);
+            Raise(new EditorSetPropertyEvent(id, propertyName, value, (sbyte)newValue));
+        }
+
+        protected void UInt8Slider(string propertyName, byte value, byte min, byte max)
+        {
+            int newValue = value;
+            ImGui.SliderInt(propertyName, ref newValue, min, max);
+            if (newValue == value) return;
+            var id = Resolve<IEditorAssetManager>().GetIdForAsset(Asset);
+            Raise(new EditorSetPropertyEvent(id, propertyName, value, (byte)newValue));
+        }
+
+        protected void Int16Slider(string propertyName, short value, short min, short max)
+        {
+            int newValue = value;
+            ImGui.SliderInt(propertyName, ref newValue, min, max);
+            if (newValue == value) return;
+            var id = Resolve<IEditorAssetManager>().GetIdForAsset(Asset);
+            Raise(new EditorSetPropertyEvent(id, propertyName, value, (short)newValue));
+        }
+
+        protected void UInt16Slider(string propertyName, ushort value, ushort min, ushort max)
+        {
+            int newValue = value;
+            ImGui.SliderInt(propertyName, ref newValue, min, max);
+            if (newValue == value) return;
+            var id = Resolve<IEditorAssetManager>().GetIdForAsset(Asset);
+            Raise(new EditorSetPropertyEvent(id, propertyName, value, (ushort)newValue));
+        }
+
+        protected void Int32Slider(string propertyName, int value, int min, int max)
+        {
+            int newValue = value;
+            ImGui.SliderInt(propertyName, ref newValue, min, max);
+            if (newValue == value) return;
+            var id = Resolve<IEditorAssetManager>().GetIdForAsset(Asset);
+            Raise(new EditorSetPropertyEvent(id, propertyName, value, newValue));
         }
 
         protected void EnumCheckboxes<T>(string propertyName, T value) where T : struct, Enum

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UAlbion.Api;
 using UAlbion.Core;
 
-namespace UAlbion.Game.Veldrid.Editor
+namespace UAlbion.Editor
 {
     public class EditorAssetManager : ServiceComponent<IEditorAssetManager>, IEditorAssetManager
     {

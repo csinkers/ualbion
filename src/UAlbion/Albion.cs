@@ -29,7 +29,7 @@ using UAlbion.Game.State;
 using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid.Audio;
 using UAlbion.Game.Veldrid.Debugging;
-using UAlbion.Game.Veldrid.Editor;
+using UAlbion.Editor;
 using UAlbion.Game.Veldrid.Input;
 
 namespace UAlbion

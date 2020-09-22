@@ -9,7 +9,7 @@ using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Game.Assets;
 
-namespace UAlbion.Game.Veldrid.Editor
+namespace UAlbion.Editor
 {
     public class EditorUi : Component
     {

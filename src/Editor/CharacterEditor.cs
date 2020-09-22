@@ -3,7 +3,7 @@ using System.Globalization;
 using ImGuiNET;
 using UAlbion.Formats.Assets;
 
-namespace UAlbion.Game.Veldrid.Editor
+namespace UAlbion.Editor
 {
     public class CharacterEditor : AssetEditor
     {
@@ -46,8 +46,8 @@ namespace UAlbion.Game.Veldrid.Editor
             EnumRadioButtons(nameof(_sheet.Gender), _sheet.Gender);
             EnumRadioButtons(nameof(_sheet.Race), _sheet.Race);
             EnumRadioButtons(nameof(_sheet.PlayerClass), _sheet.PlayerClass);
-            IntSlider(nameof(_sheet.Age), _sheet.Age, 0, ushort.MaxValue);
-            IntSlider(nameof(_sheet.Level), _sheet.Level, 0, byte.MaxValue);
+            UInt16Slider(nameof(_sheet.Age), _sheet.Age, 0, ushort.MaxValue);
+            UInt16Slider(nameof(_sheet.Level), _sheet.Level, 0, byte.MaxValue);
 
             EnumCheckboxes(nameof(_sheet.Languages), _sheet.Languages);
             ImGui.Text($"SpriteId: {_sheet.SpriteId}"); // TODO: Combo-box? Resource picker?

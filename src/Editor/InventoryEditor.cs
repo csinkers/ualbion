@@ -1,7 +1,7 @@
 ﻿using System;
 using UAlbion.Formats.Assets;
 
-namespace UAlbion.Game.Veldrid.Editor
+namespace UAlbion.Editor
 {
     public class InventoryEditor : AssetEditor
     {

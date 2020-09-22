@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core.Veldrid\UAlbion.Core.Veldrid.csproj" />
+    <!-- <ProjectReference Include="..\Core.Veldrid\UAlbion.Core.Veldrid.csproj" /> -->
     <ProjectReference Include="..\Core\UAlbion.Core.csproj" />
     <ProjectReference Include="..\Formats\UAlbion.Formats.csproj" />
   </ItemGroup>

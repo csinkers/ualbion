@@ -1,6 +1,6 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion.Game.Veldrid.Editor
+namespace UAlbion.Editor
 {
     public interface IEditorEvent : IEvent
     {

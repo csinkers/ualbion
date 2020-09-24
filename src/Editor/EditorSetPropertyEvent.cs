@@ -14,5 +14,6 @@
         public string PropertyName { get; }
         public object CurrentValue { get; }
         public object NewValue { get; }
+        public override string ToString() => $"change {Id}.{PropertyName} from {CurrentValue} to {NewValue}";
     }
 }

@@ -37,24 +37,28 @@ namespace UAlbion.Editor
             if (ImGui.TreeNode("Skills")) { _skills.Render(); ImGui.TreePop(); } 
             if (ImGui.TreeNode("Combat")) { _combat.Render(); ImGui.TreePop(); }
 
-            ImGui.Text("Note: If the English / French names are left blank, they will default to the German one.");
-            Text(nameof(_sheet.EnglishName), _sheet.EnglishName, CharacterSheet.MaxNameLength);
-            Text(nameof(_sheet.GermanName), _sheet.GermanName, CharacterSheet.MaxNameLength);
-            Text(nameof(_sheet.FrenchName), _sheet.FrenchName, CharacterSheet.MaxNameLength);
+            if (ImGui.TreeNode("Misc"))
+            {
+                ImGui.Text("Note: If the English / French names are left blank, they will default to the German one.");
+                Text(nameof(_sheet.EnglishName), _sheet.EnglishName, CharacterSheet.MaxNameLength);
+                Text(nameof(_sheet.GermanName), _sheet.GermanName, CharacterSheet.MaxNameLength);
+                Text(nameof(_sheet.FrenchName), _sheet.FrenchName, CharacterSheet.MaxNameLength);
 
-            // CharacterType Type // Consequence of the AssetType so not configurable. Worth displaying, or will it be obvious?
-            EnumRadioButtons(nameof(_sheet.Gender), _sheet.Gender);
-            EnumRadioButtons(nameof(_sheet.Race), _sheet.Race);
-            EnumRadioButtons(nameof(_sheet.PlayerClass), _sheet.PlayerClass);
-            UInt16Slider(nameof(_sheet.Age), _sheet.Age, 0, ushort.MaxValue);
-            UInt16Slider(nameof(_sheet.Level), _sheet.Level, 0, byte.MaxValue);
+                // CharacterType Type // Consequence of the AssetType so not configurable. Worth displaying, or will it be obvious?
+                EnumRadioButtons(nameof(_sheet.Gender), _sheet.Gender);
+                EnumRadioButtons(nameof(_sheet.Race), _sheet.Race); // TODO: Dropdown
+                EnumRadioButtons(nameof(_sheet.PlayerClass), _sheet.PlayerClass); // TODO: Dropdown
+                UInt16Slider(nameof(_sheet.Age), _sheet.Age, 0, ushort.MaxValue);
+                UInt8Slider(nameof(_sheet.Level), _sheet.Level, 0, byte.MaxValue);
 
-            EnumCheckboxes(nameof(_sheet.Languages), _sheet.Languages);
-            ImGui.Text($"SpriteId: {_sheet.SpriteId}"); // TODO: Combo-box? Resource picker?
+                EnumCheckboxes(nameof(_sheet.Languages), _sheet.Languages);
+                ImGui.Text($"SpriteId: {_sheet.SpriteId}"); // TODO: Combo-box? Resource picker?
 
-            ImGui.Text($"PortraitId: {_sheet.PortraitId} ({(int?)_sheet.PortraitId})"); // TODO: Combo-box? Resource picker?
-            ImGui.Text($"EventSet: {_sheet.EventSetId} ({(int?)_sheet.EventSetId})"); // TODO: Combo-box? Resource picker?
-            ImGui.Text($"WordSet: {_sheet.WordSetId} ({(int?)_sheet.WordSetId})"); // TODO: Combo-box? Resource picker?
+                ImGui.Text($"PortraitId: {_sheet.PortraitId} ({(int?)_sheet.PortraitId})"); // TODO: Combo-box? Resource picker?
+                ImGui.Text($"EventSet: {_sheet.EventSetId} ({(int?)_sheet.EventSetId})"); // TODO: Combo-box? Resource picker?
+                ImGui.Text($"WordSet: {_sheet.WordSetId} ({(int?)_sheet.WordSetId})"); // TODO: Combo-box? Resource picker?
+                ImGui.TreePop();
+            }
 
             ImGui.End();
         }

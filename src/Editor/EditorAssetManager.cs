@@ -12,6 +12,7 @@ namespace UAlbion.Editor
         readonly Dictionary<int, EditorAsset> _assetsById = new Dictionary<int, EditorAsset>();
         readonly Dictionary<object, int> _idsByAsset = new Dictionary<object, int>();
         readonly LinkedList<IEditorEvent> _undoStack = new LinkedList<IEditorEvent>();
+        // Cross references: IDictionary<AssetKey, IList<(object, string)>> - requires loading total state.
 
         public EditorAssetManager()
         {
@@ -20,23 +21,45 @@ namespace UAlbion.Editor
 
         void Apply(IEditorEvent e)
         {
-            var asset = GetAssetForId(e.Id);
-            if (asset == null)
+            if (e is EditorAggregateChangeEvent aggregate)
             {
-                Raise(new LogEvent(LogEvent.Level.Error, $"No asset could be found with id {e.Id}"));
-                return;
+                var applied = new List<IEditorEvent>();
+                bool success = true;
+                foreach (var subEvent in aggregate.Events)
+                {
+                    success &= InnerApply(subEvent);
+                    if (success)
+                        applied.Add(subEvent);
+                    else break;
+                }
+
+                if (!success)
+                {
+                    applied.Reverse();
+                    foreach (var subEvent in applied)
+                        Undo(subEvent);
+                    return;
+                }
             }
-
-            if (!asset.Apply(e))
-                return;
-
-            // TODO: Verify id is valid
-            // TODO: Verify current value in event matches actual current value
-            // TODO: Perform change
+            else
+            {
+                if (!InnerApply(e))
+                    return;
+            }
 
             _undoStack.AddLast(e);
             if (_undoStack.Count > MaxUndo)
                 _undoStack.RemoveFirst();
+        }
+
+        bool InnerApply(IEditorEvent e)
+        {
+            var asset = GetAssetForId(e.Id);
+            if (asset != null)
+                return asset.Apply(e);
+
+            Raise(new LogEvent(LogEvent.Level.Error, $"No asset could be found with id {e.Id}"));
+            return false;
         }
 
         void Undo(IEditorEvent e)

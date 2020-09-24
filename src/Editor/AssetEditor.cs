@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using ImGuiNET;
 using UAlbion.Core;
 
@@ -9,8 +10,11 @@ namespace UAlbion.Editor
 {
     public abstract class AssetEditor : Component
     {
+        static int _nextId;
+        readonly int _id;
         protected AssetEditor(object asset)
         {
+            _id = Interlocked.Increment(ref _nextId);
             Asset = asset ?? throw new ArgumentNullException(nameof(asset));
         }
 
@@ -20,7 +24,7 @@ namespace UAlbion.Editor
         protected void Int8Slider(string propertyName, sbyte value, sbyte min, sbyte max)
         {
             int newValue = value;
-            ImGui.SliderInt(propertyName, ref newValue, min, max);
+            ImGui.SliderInt(propertyName + _id, ref newValue, min, max);
             if (newValue == value) return;
             var id = Resolve<IEditorAssetManager>().GetIdForAsset(Asset);
             Raise(new EditorSetPropertyEvent(id, propertyName, value, (sbyte)newValue));
@@ -29,7 +33,7 @@ namespace UAlbion.Editor
         protected void UInt8Slider(string propertyName, byte value, byte min, byte max)
         {
             int newValue = value;
-            ImGui.SliderInt(propertyName, ref newValue, min, max);
+            ImGui.SliderInt(propertyName + _id, ref newValue, min, max);
             if (newValue == value) return;
             var id = Resolve<IEditorAssetManager>().GetIdForAsset(Asset);
             Raise(new EditorSetPropertyEvent(id, propertyName, value, (byte)newValue));
@@ -38,7 +42,7 @@ namespace UAlbion.Editor
         protected void Int16Slider(string propertyName, short value, short min, short max)
         {
             int newValue = value;
-            ImGui.SliderInt(propertyName, ref newValue, min, max);
+            ImGui.SliderInt(propertyName + _id, ref newValue, min, max);
             if (newValue == value) return;
             var id = Resolve<IEditorAssetManager>().GetIdForAsset(Asset);
             Raise(new EditorSetPropertyEvent(id, propertyName, value, (short)newValue));
@@ -47,7 +51,7 @@ namespace UAlbion.Editor
         protected void UInt16Slider(string propertyName, ushort value, ushort min, ushort max)
         {
             int newValue = value;
-            ImGui.SliderInt(propertyName, ref newValue, min, max);
+            ImGui.SliderInt(propertyName + _id, ref newValue, min, max);
             if (newValue == value) return;
             var id = Resolve<IEditorAssetManager>().GetIdForAsset(Asset);
             Raise(new EditorSetPropertyEvent(id, propertyName, value, (ushort)newValue));
@@ -56,7 +60,7 @@ namespace UAlbion.Editor
         protected void Int32Slider(string propertyName, int value, int min, int max)
         {
             int newValue = value;
-            ImGui.SliderInt(propertyName, ref newValue, min, max);
+            ImGui.SliderInt(propertyName + _id, ref newValue, min, max);
             if (newValue == value) return;
             var id = Resolve<IEditorAssetManager>().GetIdForAsset(Asset);
             Raise(new EditorSetPropertyEvent(id, propertyName, value, newValue));
@@ -77,7 +81,7 @@ namespace UAlbion.Editor
             foreach (var (i, flag) in powerOfTwoValues)
             {
                 bool isChecked = (intValue & i) != 0;
-                ImGui.Checkbox(flag.ToString(), ref isChecked);
+                ImGui.Checkbox($"{propertyName}_{flag}_{_id}", ref isChecked);
 
                 if (isChecked != ((intValue & i) != 0))
                 {
@@ -99,7 +103,7 @@ namespace UAlbion.Editor
             foreach (var enumValue in enumValues)
             {
                 bool isSelected = Equals(value, enumValue);
-                if (ImGui.RadioButton(enumValue.ToString(), isSelected))
+                if (ImGui.RadioButton($"{propertyName}_{enumValue}_{_id}", isSelected))
                 {
                     if (isSelected)
                         continue;
@@ -110,6 +114,29 @@ namespace UAlbion.Editor
             }
             ImGui.EndGroup();
         }
+
+        // TODO: Single checkbox taking curValue, trueValue and falseValue.
+/*
+        protected void EnumDropdown<T>(string propertyName, T value) where T : struct, Enum
+        {
+            // TODO: Will need index->enum/name lookup. Compare w/ code in ItemSlotEditor
+            var enumValues = Enum.GetValues(typeof(T)).OfType<T>();
+
+            foreach (var enumValue in enumValues)
+            {
+                bool isSelected = Equals(value, enumValue);
+            }
+
+            int index = Convert.ToInt32(value);
+            if (ImGui.Combo(propertyName, enumValue.ToString(), isSelected))
+            {
+                if (isSelected)
+                    continue;
+
+                var id = Resolve<IEditorAssetManager>().GetIdForAsset(Asset);
+                Raise(new EditorSetPropertyEvent(id, propertyName, value, enumValue));
+            }
+        }*/
 
         protected void Text(string propertyName, string value, int maxLength)
         {

@@ -51,6 +51,8 @@ namespace UAlbion.Formats.Assets
                     Enchantment = 0;
                     Flags = 0;
                 }
+                else if (Amount == 0)
+                    Amount = 1;
             }
         }
 

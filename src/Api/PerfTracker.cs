@@ -85,6 +85,9 @@ namespace UAlbion.Api
 
         public static void BeginFrame()
         {
+            if(_frameCount == 1)
+                StartupEvent("First frame finished"); // Last startup event to be emitted
+
             _frameCount++;
             foreach (var key in FrameCounters.Keys.ToList())
             {
@@ -101,13 +104,11 @@ namespace UAlbion.Api
 
         public static void StartupEvent(string name)
         {
-            if (_frameCount == 0)
-            {
+            if (_frameCount > 1) return;
 //#if DEBUG
-                Console.WriteLine($"at {StartupStopwatch.ElapsedMilliseconds}: {name}");
+            Console.WriteLine($"at {StartupStopwatch.ElapsedMilliseconds}: {name}");
 //#endif
-                CoreTrace.Log.StartupEvent(name);
-            }
+            CoreTrace.Log.StartupEvent(name);
         }
 
         public static IDisposable InfrequentEvent(string name) => new InfrequentTracker(name);

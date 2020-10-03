@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Config
     {
         public const string Filename = "assets.json";
 
-        public IDictionary<string, FullXldInfo> Xlds { get; } = new Dictionary<string, FullXldInfo>();
+        public IDictionary<string, FullAssetFileInfo> Files { get; } = new Dictionary<string, FullAssetFileInfo>();
 
         public static FullAssetConfig Load(string basePath)
         {
@@ -18,19 +18,19 @@ namespace UAlbion.Formats.Config
             if (File.Exists(configPath))
             {
                 var configText = File.ReadAllText(configPath);
-                var xlds = JsonConvert.DeserializeObject<IDictionary<string, FullXldInfo>>(configText);
+                var files = JsonConvert.DeserializeObject<IDictionary<string, FullAssetFileInfo>>(configText);
 
-                foreach (var xld in xlds)
+                foreach (var file in files)
                 {
-                    xld.Value.Name = xld.Key;
-                    foreach(var o in xld.Value.Assets)
+                    file.Value.Name = file.Key;
+                    foreach(var o in file.Value.Assets)
                     {
-                        o.Value.Parent = xld.Value;
-                        o.Value.Id = o.Key + xld.Value.IdOffset;
+                        o.Value.Parent = file.Value;
+                        o.Value.Id = o.Key + file.Value.IdOffset;
                         o.Value.PaletteHints ??= new List<int>();
                     }
 
-                    config.Xlds[xld.Key] = xld.Value;
+                    config.Files[file.Key] = file.Value;
                 }
             }
             return config;
@@ -38,7 +38,7 @@ namespace UAlbion.Formats.Config
 
         public void Save(string basePath)
         {
-            foreach (var xld in Xlds)
+            foreach (var xld in Files)
             {
                 if (xld.Value.Transposed == false)
                     xld.Value.Transposed = null;
@@ -54,31 +54,26 @@ namespace UAlbion.Formats.Config
 
             var configPath = Path.Combine(basePath, "data", Filename);
             var serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, NullValueHandling = NullValueHandling.Ignore };
-            var json = JsonConvert.SerializeObject(Xlds, serializerSettings);
+            var json = JsonConvert.SerializeObject(Files, serializerSettings);
             File.WriteAllText(configPath, json);
 
             var basicConfig = BasicAssetConfig.Extract(this);
             basicConfig.Save(basePath);
 
-            foreach (var xld in Xlds)
-            {
-                foreach (var asset in xld.Value.Assets)
-                {
-                    if (asset.Value.PaletteHints == null)
-                        asset.Value.PaletteHints = new List<int>();
-                }
-            }
+            foreach (var file in Files)
+                foreach (var asset in file.Value.Assets)
+                    asset.Value.PaletteHints ??= new List<int>();
         }
 
-        public AssetInfo GetAsset(string xldName, int xldSubObject, int id)
+        public AssetInfo GetAsset(string filename, int subObject, int id)
         {
-            if (!Xlds.TryGetValue(xldName, out var xld))
+            if (!Files.TryGetValue(filename, out var xld))
                 return null;
 
-            if (!xld.Assets.TryGetValue(xldSubObject, out var asset))
+            if (!xld.Assets.TryGetValue(subObject, out var asset))
             {
                 asset = new FullAssetInfo { Parent = xld, Id = id };
-                xld.Assets[xldSubObject] = asset;
+                xld.Assets[subObject] = asset;
             }
 
             return asset;

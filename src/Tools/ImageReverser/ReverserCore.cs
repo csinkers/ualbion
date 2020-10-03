@@ -14,7 +14,7 @@ namespace UAlbion.Tools.ImageReverser
         public string BaseExportDirectory { get; }
         public FullAssetConfig Config { get; }
         public GeneralConfig GeneralConfig { get; }
-        public IDictionary<string, FullXldInfo> Xlds { get; } = new Dictionary<string, FullXldInfo>();
+        public IDictionary<string, FullAssetFileInfo> Xlds { get; } = new Dictionary<string, FullAssetFileInfo>();
         public IList<AlbionPalette> Palettes { get; } = new List<AlbionPalette>();
 
         public ReverserCore(GeneralConfig generalConfig, FullAssetConfig config)
@@ -31,10 +31,10 @@ namespace UAlbion.Tools.ImageReverser
                 if (relativeDir.Length == 0)
                     continue;
 
-                if (!Config.Xlds.ContainsKey(relativeDir))
-                    Config.Xlds.Add(relativeDir, new FullXldInfo());
+                if (!Config.Files.ContainsKey(relativeDir))
+                    Config.Files.Add(relativeDir, new FullAssetFileInfo());
 
-                var xld = Config.Xlds[relativeDir];
+                var xld = Config.Files[relativeDir];
                 if(!Xlds.ContainsKey(relativeDir))
                     Xlds.Add(relativeDir, xld);
 
@@ -60,7 +60,7 @@ namespace UAlbion.Tools.ImageReverser
             {
                 var a = file.Substring(palettesPath.Length + 1, 2);
                 ushort paletteNumber = ushort.Parse(a);
-                var assetConfig = Config.Xlds["PALETTE0.XLD"].Assets[paletteNumber];
+                var assetConfig = Config.Files["PALETTE0.XLD"].Assets[paletteNumber];
                 var paletteName = assetConfig.Name;
                 if (string.IsNullOrEmpty(paletteName))
                     paletteName = file.Substring(BaseExportDirectory.Length + 1);
@@ -79,14 +79,14 @@ namespace UAlbion.Tools.ImageReverser
         {
             _selectedXldPath = xld;
             _selectedItemNumber = item;
-            SelectionChanged?.Invoke(this, new SelectedAssetChangedArgs(SelectedXld, SelectedObject));
+            SelectionChanged?.Invoke(this, new SelectedAssetChangedArgs(SelectedAssetFile, SelectedObject));
         }
         public void TriggerAssetChanged(FullAssetInfo asset) => AssetChanged?.Invoke(this, new AssetChangedArgs(asset));
         public event EventHandler<SelectedAssetChangedArgs> SelectionChanged;
         public event EventHandler<AssetChangedArgs> AssetChanged;
 
 
-        public FullXldInfo SelectedXld =>
+        public FullAssetFileInfo SelectedAssetFile =>
             _selectedXldPath != null
             ? Xlds.TryGetValue(_selectedXldPath, out var xld)
                 ? xld
@@ -94,8 +94,8 @@ namespace UAlbion.Tools.ImageReverser
             : null;
 
         public FullAssetInfo SelectedObject =>
-            SelectedXld != null && _selectedItemNumber.HasValue
-                ? SelectedXld.Assets.TryGetValue(_selectedItemNumber.Value, out var asset)
+            SelectedAssetFile != null && _selectedItemNumber.HasValue
+                ? SelectedAssetFile.Assets.TryGetValue(_selectedItemNumber.Value, out var asset)
                     ? asset
                     : null
                 : null;
@@ -113,13 +113,13 @@ namespace UAlbion.Tools.ImageReverser
 
     public class SelectedAssetChangedArgs
     {
-        public SelectedAssetChangedArgs(FullXldInfo selectedXld, FullAssetInfo selectedObject)
+        public SelectedAssetChangedArgs(FullAssetFileInfo selectedAssetFile, FullAssetInfo selectedObject)
         {
-            SelectedXld = selectedXld;
+            SelectedAssetFile = selectedAssetFile;
             SelectedObject = selectedObject;
         }
 
-        public FullXldInfo SelectedXld { get; }
+        public FullAssetFileInfo SelectedAssetFile { get; }
         public FullAssetInfo SelectedObject { get; }
     }
 }

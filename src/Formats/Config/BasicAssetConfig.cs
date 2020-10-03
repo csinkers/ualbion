@@ -8,26 +8,26 @@ namespace UAlbion.Formats.Config
     public class BasicAssetConfig : IAssetConfig
     {
         public const string Filename = "assets_min.json";
-        public IDictionary<string, BasicXldInfo> Xlds { get; } = new Dictionary<string, BasicXldInfo>();
+        public IDictionary<string, BasicAssetFileInfo> Files { get; } = new Dictionary<string, BasicAssetFileInfo>();
 
         public static BasicAssetConfig Extract(FullAssetConfig full)
         {
             if (full == null) throw new ArgumentNullException(nameof(full));
             var min = new BasicAssetConfig();
 
-            foreach (var kvp in full.Xlds)
+            foreach (var kvp in full.Files)
             {
                 var old = kvp.Value;
-                var newXld = new BasicXldInfo(old);
+                var newFile = new BasicAssetFileInfo(old);
 
                 foreach(var asset in old.Assets.Values)
                 {
-                    var newAsset = new BasicAssetInfo(asset) { Parent = newXld };
+                    var newAsset = new BasicAssetInfo(asset) { Parent = newFile };
                     if (newAsset.ContainsData)
-                        newXld.Assets[asset.Id - asset.Parent.IdOffset] = newAsset;
+                        newFile.Assets[asset.Id - asset.Parent.IdOffset] = newAsset;
                 }
 
-                min.Xlds[kvp.Key] = newXld;
+                min.Files[kvp.Key] = newFile;
             }
 
             return min;
@@ -40,18 +40,18 @@ namespace UAlbion.Formats.Config
             if (File.Exists(configPath))
             {
                 var configText = File.ReadAllText(configPath);
-                var xlds = JsonConvert.DeserializeObject<Dictionary<string, BasicXldInfo>>(configText);
+                var files = JsonConvert.DeserializeObject<Dictionary<string, BasicAssetFileInfo>>(configText);
 
-                foreach (var xld in xlds)
+                foreach (var file in files)
                 {
-                    xld.Value.Name = xld.Key;
-                    foreach(var o in xld.Value.Assets)
+                    file.Value.Name = file.Key;
+                    foreach(var o in file.Value.Assets)
                     {
-                        o.Value.Parent = xld.Value;
+                        o.Value.Parent = file.Value;
                         o.Value.Id = o.Key;
                     }
 
-                    config.Xlds[xld.Key] = xld.Value;
+                    config.Files[file.Key] = file.Value;
                 }
             }
 
@@ -62,19 +62,19 @@ namespace UAlbion.Formats.Config
         {
             var configPath = Path.Combine(basePath, "data", Filename);
             var serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, NullValueHandling = NullValueHandling.Ignore };
-            var json = JsonConvert.SerializeObject(Xlds, serializerSettings);
+            var json = JsonConvert.SerializeObject(Files, serializerSettings);
             File.WriteAllText(configPath, json);
         }
 
-        public AssetInfo GetAsset(string xldName, int xldSubObject, int id)
+        public AssetInfo GetAsset(string filename, int subObject, int id)
         {
-            if (!Xlds.TryGetValue(xldName, out var xld))
+            if (!Files.TryGetValue(filename, out var file))
                 return null;
 
-            if (!xld.Assets.TryGetValue(xldSubObject, out var asset))
+            if (!file.Assets.TryGetValue(subObject, out var asset))
             {
-                asset = new BasicAssetInfo { Parent = xld, Id = id };
-                xld.Assets[xldSubObject] = asset;
+                asset = new BasicAssetInfo { Parent = file, Id = id };
+                file.Assets[subObject] = asset;
             }
 
             return asset;

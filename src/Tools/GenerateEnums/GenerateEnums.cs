@@ -53,7 +53,7 @@ namespace GenerateEnums
             var xldPattern = new Regex(@"([0-9]+).XLD$");
 
             var enums = new Dictionary<string, EnumData>();
-            foreach (var xld in config.Xlds.Values)
+            foreach (var xld in config.Files.Values)
             {
                 if (string.IsNullOrEmpty(xld.EnumName))
                     continue;

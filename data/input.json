@@ -34,10 +34,10 @@
     "Shift+BracketRight": "toggle_overlay",
     "C": "noclip",
 
-    "W": "+camera_move  0 -8",
-    "A": "+camera_move -8  0",
-    "S": "+camera_move  0  8",
-    "D": "+camera_move  8  0",
+    "W": "+party_move  0 -1",
+    "S": "+party_move  0  1",
+    "A": "+party_move -1  0",
+    "D": "+party_move  1  0",
 
     "Shift+W": "+camera_move  0 -16",
     "Shift+A": "+camera_move -16  0",

@@ -32,7 +32,7 @@ namespace UAlbion.Formats.Config
             UseSmallGraphics = asset.UseSmallGraphics;
         }
 
-        [JsonIgnore] public XldInfo Parent { get; internal set; }
+        [JsonIgnore] public AssetFileInfo Parent { get; internal set; }
         [JsonIgnore] public override FileFormat Format => Parent.Format;
         [JsonIgnore] public override int EffectiveWidth => Width ?? Parent.Width ?? 0;
         [JsonIgnore] public override int EffectiveHeight => Height ?? Parent.Height ?? 0;
@@ -50,7 +50,7 @@ namespace UAlbion.Formats.Config
 
         [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "Play nicely with JSON serialisation")]
         public IList<int> PaletteHints { get; set; }
-        [JsonIgnore] public FullXldInfo Parent { get; set; }
+        [JsonIgnore] public FullAssetFileInfo Parent { get; set; }
         [JsonIgnore] public override FileFormat Format => Parent.Format;
         [JsonIgnore] public override int EffectiveWidth => Width ?? Parent.Width ?? 0;
         [JsonIgnore] public override int EffectiveHeight => Height ?? Parent.Height ?? 0;

@@ -1,6 +1,5 @@
 ﻿using System;
 using UAlbion.Core.Events;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
@@ -13,17 +12,17 @@ namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryWeightLabel : UiElement
     {
-        readonly PartyCharacterId _activeCharacter;
+        readonly PartyMemberId _activeCharacter;
         readonly IText _hoverSource;
         int _version;
 
-        public InventoryWeightLabel(PartyCharacterId activeCharacter)
+        public InventoryWeightLabel(PartyMemberId activeCharacter)
         {
             On<SetLanguageEvent>(e => _version++);
             On<BlurEvent>(e => Raise(new HoverTextEvent(null)));
             On<InventoryChangedEvent>(e =>
             {
-                if (e.InventoryType == InventoryType.Player && _activeCharacter == (PartyCharacterId)e.InventoryId)
+                if (_activeCharacter == e.Id.ToAssetId())
                     _version++;
             });
             On<HoverEvent>(e =>
@@ -42,7 +41,7 @@ namespace UAlbion.Game.Gui.Inventory
 
                 // Carried Weight : %ld of %ld g
                 return Resolve<ITextFormatter>().Format(
-                    SystemTextId.Inv_CarriedWeightNdOfNdG,
+                    Base.SystemText.Inv_CarriedWeightNdOfNdG,
                     player.Apparent.TotalWeight,
                     player.Apparent.MaxWeight).GetBlocks();
             }, x => _version);
@@ -58,7 +57,7 @@ namespace UAlbion.Game.Gui.Inventory
                 return Resolve<ITextFormatter>()
                     .NoWrap()
                     .Center()
-                    .Format(SystemTextId.Inv_WeightNKg, weight)
+                    .Format(Base.SystemText.Inv_WeightNKg, weight)
                     .GetBlocks();
             }, x => _version);
 

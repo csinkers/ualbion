@@ -1,6 +1,4 @@
-﻿using UAlbion.Formats.AssetIds;
-
-namespace UAlbion.Formats.Assets
+﻿namespace UAlbion.Formats.Assets
 {
     public class ItemProxy : IItem
     {

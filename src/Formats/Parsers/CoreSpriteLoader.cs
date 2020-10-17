@@ -3,9 +3,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {
@@ -27,7 +26,7 @@ namespace UAlbion.Formats.Parsers
             return br.ReadBytes(resource.Width * resource.Height);
         }
 
-        public static CoreSpriteInfo GetConfig(CoreSpriteId id, string exePath, CoreSpriteConfig config, out string filename)
+        public static CoreSpriteInfo GetConfig(SpriteId id, string exePath, CoreSpriteConfig config, out string filename)
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
             if(!Directory.Exists(exePath))
@@ -49,7 +48,7 @@ namespace UAlbion.Formats.Parsers
             throw new FileNotFoundException("No suitable main.exe file could be found.");
         }
 
-        public static AlbionSprite Load(CoreSpriteId id, string exePath, CoreSpriteConfig config)
+        public static AlbionSprite Load(SpriteId id, string exePath, CoreSpriteConfig config)
         {
             var resource = GetConfig(id, exePath, config, out var file);
             var bytes = LoadSection(file, resource);

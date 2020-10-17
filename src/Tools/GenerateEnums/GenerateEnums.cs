@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using UAlbion.Formats;
-using UAlbion.Formats.Config;
+using UAlbion.Config;
 
-namespace GenerateEnums
+namespace UAlbion.CodeGenerator
 {
     public class EnumEntry
     {
@@ -17,94 +15,28 @@ namespace GenerateEnums
 
     public class EnumData
     {
-        public string Name { get; set; }
-        public string Type { get; set; }
+        public string FullName { get; set; }
+        public string EnumType { get; set; }
+        public AssetType AssetType { get; set; }
         public IList<EnumEntry> Entries { get; } = new List<EnumEntry>();
+        public string Namespace => FullName.Substring(0, FullName.LastIndexOf('.'));
+        public string TypeName => FullName.Substring(FullName.LastIndexOf('.') + 1);
+        public string CopiedFrom { get; set; }
     }
 
     static class GenerateEnums
     {
-        static readonly char[] ForbiddenCharacters = { ' ', '\t', '-', '(', ')', ',', '?', '.', '"' };
-        static string Sanitise(string x)
+        public static void Generate(Assets assets)
         {
-            var chars = new List<char>();
-            bool capitaliseNext = true;
-            foreach (var c in x)
+            const string RelativeOutputPath = @"src/Base"; // TODO: Pull from asset config
+            var outputPath = Path.Combine(assets.BaseDir, RelativeOutputPath);
+            if (!Directory.Exists(outputPath))
+                Directory.CreateDirectory(outputPath);
+
+            // TODO: Extension methods from Base enums to AssetId, .ToId() or just .Id()?
+            foreach (var e in assets.Enums.Values)
             {
-                if (c == '\'')
-                    continue;
-
-                if (!ForbiddenCharacters.Contains(c))
-                {
-                    chars.Add(capitaliseNext ? char.ToUpper(c) : c);
-                    capitaliseNext = false;
-                }
-                else capitaliseNext = true;
-            }
-
-            return new string(chars.ToArray());
-        }
-
-        static void Main()
-        {
-            var baseDir = FormatUtil.FindBasePath();
-            var config = FullAssetConfig.Load(baseDir);
-            var outpathPath = Path.Combine(baseDir, @"src/Formats/AssetIds");
-            var xldPattern = new Regex(@"([0-9]+).XLD$");
-
-            var enums = new Dictionary<string, EnumData>();
-            foreach (var xld in config.Files.Values)
-            {
-                if (string.IsNullOrEmpty(xld.EnumName))
-                    continue;
-
-                int offset = 0;
-                var match = xldPattern.Match(xld.Name);
-                if (match.Success)
-                    offset = 100 * int.Parse(match.Groups[1].Value);
-
-                if (!enums.ContainsKey(xld.EnumName))
-                    enums[xld.EnumName] = new EnumData { Name = xld.EnumName, Type = xld.EnumType};
-                var e = enums[xld.EnumName];
-
-                foreach (var o in xld.Assets.Values.OrderBy(x => x.Id))
-                {
-                    var id = offset + o.Id;
-
-                    if (e.Type == "byte" && id > 0xff)
-                        continue;
-
-                    e.Entries.Add(string.IsNullOrEmpty(o.Name)
-                        ? new EnumEntry { Name = $"Unknown{id}", Value = id }
-                        : new EnumEntry { Name = Sanitise(o.Name), Value = id });
-                }
-            }
-
-            CoreSpriteConfig coreSpriteConfig = CoreSpriteConfig.Load(baseDir);
-            enums["CoreSpriteId"] = new EnumData { Name = "CoreSpriteId", Type = "byte" };
-            foreach (var item in coreSpriteConfig.CoreSpriteIds)
-                enums["CoreSpriteId"].Entries.Add(new EnumEntry { Name = Sanitise(item.Value), Value = item.Key });
-
-            foreach (var e in enums.Values)
-            {
-                var duplicateNames = e.Entries.GroupBy(x => x.Name).Where(x => x.Count() > 1).ToList();
-                var counters = duplicateNames.ToDictionary(x => x.Key, x => 1);
-
-                foreach (var o in e.Entries)
-                {
-                    if (!counters.ContainsKey(o.Name))
-                        continue;
-                    var name = o.Name;
-
-                    int count = counters[name];
-                    o.Name = count == 1 ? name : name + count;
-                    counters[name]++;
-                }
-            }
-
-            foreach (var e in enums.Values)
-            {
-                File.WriteAllText(Path.Combine(outpathPath, e.Name + ".cs"),
+                File.WriteAllText(Path.Combine(outputPath, e.TypeName + ".g.cs"),
 $@"// Note: This file was automatically generated using Tools/GenerateEnums.
 // No changes should be made to this file by hand. Instead, the relevant json
 // files should be modified and then GenerateEnums should be used to regenerate
@@ -115,16 +47,16 @@ using Newtonsoft.Json.Converters;
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 #pragma warning disable CA1707 // Identifiers should not contain underscores
-namespace UAlbion.Formats.AssetIds
+namespace {e.Namespace}
 {{
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum {e.Name} {(e.Type != null ? ":" : "")} {e.Type}
+    public enum {e.TypeName} {(e.EnumType != null ? ":" : "")} {e.EnumType}
     {{
 " +
-                string.Join(Environment.NewLine, e.Entries.Select(x => $"        {x.Name} = {x.Value},"))
-                + @"
-    }
-}
+                string.Join(Environment.NewLine, e.Entries.OrderBy(x => x.Value).Select(x => $"        {x.Name} = {x.Value},"))
+                + $@"
+    }}
+}}
 #pragma warning restore CA1707 // Identifiers should not contain underscores
 ");
             }

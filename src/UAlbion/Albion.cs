@@ -10,7 +10,6 @@ using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Veldrid.Visual;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
@@ -30,6 +29,7 @@ using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid.Audio;
 using UAlbion.Game.Veldrid.Debugging;
 using UAlbion.Editor;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Veldrid.Input;
 
 namespace UAlbion
@@ -71,13 +71,13 @@ namespace UAlbion
                     global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
                     break;
                 case GameMode.NewGame:
-                    global.Raise(new NewGameEvent(MapDataId.Toronto2DGesamtkarteSpielbeginn, 30, 75), null);
+                    global.Raise(new NewGameEvent(Base.Map.Toronto2DGesamtkarteSpielbeginn, 30, 75), null);
                     break;
                 case GameMode.LoadGame:
                     global.Raise(new LoadGameEvent(ushort.Parse(commandLine.GameModeArgument, CultureInfo.InvariantCulture)), null);
                     break;
                 case GameMode.LoadMap:
-                    global.Raise(new NewGameEvent((MapDataId)int.Parse(commandLine.GameModeArgument, CultureInfo.InvariantCulture), 40, 40), null); 
+                    global.Raise(new NewGameEvent((Base.Map)int.Parse(commandLine.GameModeArgument, CultureInfo.InvariantCulture), 40, 40), null); 
                     break;
                 case GameMode.Inventory:
                     global.Raise(new SetSceneEvent(SceneId.Inventory), null);
@@ -147,8 +147,8 @@ namespace UAlbion
                         .Add(new StatusBar())
                         .Add(new PaletteManager())
                         .Add(new MainMenu())
-                        .Add(new Sprite<PictureId>(
-                            PictureId.MenuBackground8,
+                        .Add(new Sprite(
+                            (SpriteId)Base.Picture.MenuBackground8,
                             new Vector3(-1.0f, 1.0f, 0),
                             DrawLayer.Interface,
                             SpriteKeyFlags.NoTransform,

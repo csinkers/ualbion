@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Save
 {
     public class MapChangeCollection : List<MapChange>
     {
-        public static MapChangeCollection Serdes(int _, MapChangeCollection c, ISerializer s)
+        public static MapChangeCollection Serdes(int _, MapChangeCollection c, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             c ??= new MapChangeCollection();
@@ -20,15 +20,15 @@ namespace UAlbion.Formats.Assets.Save
             for (int i = 0; i < count; i++)
             {
                 if(i < c.Count)
-                    c[i] = MapChange.Serdes(i, c[i], s);
+                    c[i] = MapChange.Serdes(i, c[i], mapping, s);
                 else
-                    c.Add(MapChange.Serdes(i, null, s));
+                    c.Add(MapChange.Serdes(i, null, mapping, s));
             }
 
             return c;
         }
 
-        public void Update(MapDataId mapId, byte x, byte y, IconChangeType type, ushort value)
+        public void Update(MapId mapId, byte x, byte y, IconChangeType type, ushort value)
         {
             var change = this.FirstOrDefault(c =>
                 c.MapId == mapId &&

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 

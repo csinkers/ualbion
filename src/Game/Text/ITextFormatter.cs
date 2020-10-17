@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
-using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Text
 {
     public interface ITextFormatter
     {
+        IText Format(TextId textId, params object[] arguments);
         IText Format(StringId stringId, params object[] arguments);
         IText Format(string templateText, params object[] arguments);
-        IText Format(StringId stringId, IList<(Token, object)> implicitTokens, GameLanguage? language, params object[] arguments);
-        IText Format(string templateText, IList<(Token, object)> implicitTokens, GameLanguage? language, params object[] arguments);
+        IText Format(TextId textId, IList<(Token, object)> implicitTokens, params object[] arguments);
+        IText Format(StringId stringId, IList<(Token, object)> implicitTokens, params object[] arguments);
+        IText Format(string templateText, IList<(Token, object)> implicitTokens, params object[] arguments);
 
         ITextFormatter NoWrap();
         ITextFormatter Left();
@@ -17,7 +18,6 @@ namespace UAlbion.Game.Text
         ITextFormatter Right();
         ITextFormatter Justify();
         ITextFormatter Fat();
-        ITextFormatter Language(GameLanguage language);
         ITextFormatter Ink(FontColor color);
     }
 }

@@ -9,8 +9,8 @@ namespace UAlbion.Game.Events.Inventory
         [EventPart("norm_x")] public float NormX { get; }
         [EventPart("norm_y")] public float NormY { get; }
 
-        public InventoryDiscardEvent(float normX, float normY, InventoryType inventoryType, ushort id, ItemSlotId slotId)
-            : base(inventoryType, id, slotId)
+        public InventoryDiscardEvent(float normX, float normY, InventoryId inventoryId, ItemSlotId slotId)
+            : base(inventoryId, slotId)
         {
             NormX = normX;
             NormY = normY;

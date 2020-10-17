@@ -4,16 +4,17 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Gui.Controls
 {
-    public class UiFixedPositionElement<T> : UiElement where T : Enum
+    public class UiFixedPositionElement : UiElement
     {
-        readonly T _id;
+        readonly SpriteId _id;
         readonly Rectangle _extents;
         SpriteLease _sprite;
 
-        public UiFixedPositionElement(T id, Rectangle extents)
+        public UiFixedPositionElement(SpriteId id, Rectangle extents)
         {
             On<BackendChangedEvent>(_ => Rebuild());
             On<WindowResizedEvent>(_ => Rebuild());

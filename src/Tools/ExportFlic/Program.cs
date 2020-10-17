@@ -1,6 +1,7 @@
-﻿using System.IO;
-using System;
+﻿using System;
+using System.IO;
 using System.Collections.Generic;
+using UAlbion.Config;
 using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats;
 
@@ -11,7 +12,7 @@ namespace UAlbion.Tools.ExportFlic
         const string RelativePath = @"data\Exported\ENGLISH\FLICS0.XLD";
         static void Main()
         {
-            var baseDir = FormatUtil.FindBasePath();
+            var baseDir = ConfigUtil.FindBasePath();
             if (baseDir == null)
                 throw new InvalidOperationException("No base directory could be found.");
 

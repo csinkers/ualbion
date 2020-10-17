@@ -2,7 +2,6 @@
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
@@ -17,7 +16,7 @@ namespace UAlbion.Game.State.Player
         DateTime _lastChangeTime;
         float _lerp;
 
-        public PartyMember(PartyCharacterId id, CharacterSheet sheet)
+        public PartyMember(PartyMemberId id, CharacterSheet sheet)
         {
             On<InventoryChangedEvent>(InventoryChanged);
             On<EngineUpdateEvent>(EngineUpdate);
@@ -44,10 +43,10 @@ namespace UAlbion.Game.State.Player
                 : (float)(elapsed / config.UI.Transitions.InventoryChangLerpSeconds);
 
             if (Math.Abs(_lerp - oldLerp) > float.Epsilon)
-                Raise(new InventoryChangedEvent(InventoryType.Player, (ushort)Id));
+                Raise(new InventoryChangedEvent(new InventoryId(Id)));
         }
 
-        public PartyCharacterId Id { get; }
+        public PartyMemberId Id { get; }
         public int CombatPosition { get; set; }
         public IEffectiveCharacterSheet Effective { get; private set; }
         public IEffectiveCharacterSheet Apparent { get; }

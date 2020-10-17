@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
@@ -36,7 +36,7 @@ namespace UAlbion.Game.Gui.Dialogs
                         _ => FontColor.Gray,
                     };
 
-                    var textElement = (IUiElement)new UiTextBuilder(x.Key).Ink(color);
+                    var textElement = (IUiElement)new UiTextBuilder((TextId)x.Key).Ink(color);
                     return (IUiElement)new Button(textElement)
                     {
                         Theme = ButtonTheme.Frameless
@@ -50,7 +50,7 @@ namespace UAlbion.Game.Gui.Dialogs
                 elements.Add(new Spacing(0, 3));
             }
 
-            elements.Add(new Button(SystemTextId.MsgBox_EnterWord).OnClick(() =>
+            elements.Add(new Button(Base.SystemText.MsgBox_EnterWord).OnClick(() =>
             {
                 // TODO
                 OnWordSelected(null);

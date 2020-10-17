@@ -1,5 +1,4 @@
 ﻿using System;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events.Inventory;
@@ -11,15 +10,15 @@ namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryMidPane : UiElement
     {
-        readonly PartyCharacterId _activeCharacter;
-        public InventoryMidPane(PartyCharacterId activeCharacter) => _activeCharacter = activeCharacter;
+        readonly PartyMemberId _activeCharacter;
+        public InventoryMidPane(PartyMemberId activeCharacter) => _activeCharacter = activeCharacter;
 
         protected override void Subscribed()
         {
             var config = Resolve<GameConfig>();
             var positions = config.Inventory.Positions[_activeCharacter];
             var backgroundStack = new FixedPositionStack();
-            var background = new UiSpriteElement<FullBodyPictureId>((FullBodyPictureId)_activeCharacter);
+            var background = new UiSpriteElement(_activeCharacter.ToFullBodyPicture());
             backgroundStack.Add(background, 3, 10 - 1); //subtract 1px because picture starts 1px above frame
 
             var bodyStack = new FixedPositionStack();
@@ -29,14 +28,13 @@ namespace UAlbion.Game.Gui.Inventory
                 var position = bodyPart.Value;
                 bodyStack.Add(
                     new LogicalInventorySlot(new InventorySlotId(
-                        InventoryType.Player,
-                        (ushort)_activeCharacter,
+                        _activeCharacter,
                         itemSlotId)),
                     (int)position.X + 1, //take frame border into account
                     (int)position.Y + 1); //take frame border into account
             }
             bodyStack.Add(new Button(new Spacing(128, 168)) { Theme = ButtonTheme.Invisible, Margin = 0, Padding = -1 }
-                .OnClick(() => Raise(new InventorySwapEvent(InventoryType.Player, (ushort)_activeCharacter, ItemSlotId.CharacterBody))), 0, 0);
+                .OnClick(() => Raise(new InventorySwapEvent(new InventoryId(_activeCharacter), ItemSlotId.CharacterBody))), 0, 0);
 
             var frame = new GroupingFrame(bodyStack) { Theme = GroupingFrame.FrameThemeBackgroundless, Padding = -1 };
 

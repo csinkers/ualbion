@@ -1,4 +1,4 @@
-﻿using UAlbion.Formats.AssetIds;
+﻿using UAlbion.Formats.Assets;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Text;
 

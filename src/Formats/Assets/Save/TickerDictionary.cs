@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using SerdesNet;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets.Save
 {
@@ -18,9 +18,11 @@ namespace UAlbion.Formats.Assets.Save
             if (s.Mode == SerializerMode.Reading)
                 d.Clear();
 
+            // TODO: Proper extensible modding support
             for (int i = Min; i <= Max; i++)
             {
-                d[(TickerId)i] = d.TryGetValue((TickerId)i, out var existing) 
+                var assetId = new TickerId(AssetType.Ticker, i);
+                d[assetId] = d.TryGetValue(assetId, out var existing)
                     ? s.UInt8(i.ToString(CultureInfo.InvariantCulture), existing) 
                     : s.UInt8(i.ToString(CultureInfo.InvariantCulture), 0);
             }

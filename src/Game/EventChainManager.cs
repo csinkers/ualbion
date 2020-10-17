@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.MapEvents;
@@ -14,7 +15,7 @@ namespace UAlbion.Game
     {
         readonly ThreadLocal<Stack<EventContext>> _threadContexts = new ThreadLocal<Stack<EventContext>>(() => new Stack<EventContext>());
         readonly HashSet<EventContext> _activeContexts = new HashSet<EventContext>();
-        static readonly EventContext BaseContext = new EventContext(new EventSource.None());
+        static readonly EventContext BaseContext = new EventContext(new EventSource(AssetId.None, 0));
 
         public EventChainManager()
         {
@@ -42,7 +43,7 @@ namespace UAlbion.Game
                 // things like chest / door events where different combinations of their IAsyncEvent<bool> result 
                 // and the LastEventResult can mean successful opening, exiting the screen without success or a
                 // trap has been triggered.
-                if (boolEvent is IQueryEvent) 
+                if (boolEvent is QueryEvent) 
                     LastEventResult = result;
                 context.Status = EventContextStatus.Ready;
             });

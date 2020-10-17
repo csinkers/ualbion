@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Text
@@ -11,6 +11,7 @@ namespace UAlbion.Game.Gui.Text
         readonly StringId _stringId;
         GameLanguage? _language;
 
+        public UiTextBuilder(TextId textId) => _stringId = textId;
         public UiTextBuilder(StringId stringId) => _stringId = stringId;
         public int Version => _implicitTokens.Count + 1;
         public IEnumerable<TextBlock> GetBlocks()

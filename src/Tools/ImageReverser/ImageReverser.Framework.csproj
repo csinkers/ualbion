@@ -109,6 +109,10 @@
       <Project>{20d41e69-c260-461f-a0b9-89920f133f60}</Project>
       <Name>UAlbion.Api</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Config\UAlbion.Config.csproj">
+      <Project>{9ad96f20-81ba-465f-925a-89544c64adf8}</Project>
+      <Name>UAlbion.Config</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Formats\UAlbion.Formats.csproj">
       <Project>{78b55a1c-1200-4c6e-a9d3-9c04d65f0af9}</Project>
       <Name>UAlbion.Formats</Name>

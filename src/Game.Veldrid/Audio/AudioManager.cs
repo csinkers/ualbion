@@ -5,10 +5,11 @@ using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Audio;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
@@ -97,7 +98,7 @@ namespace UAlbion.Game.Veldrid.Audio
                 if (_waveLibCache.TryGetValue(key, out var buffer))
                     return buffer;
                 var assets = Resolve<IAssetManager>();
-                var sample = assets.LoadWaveLib(songId, instrument);
+                var sample = assets.LoadWaveLib(songId.ToWaveLibrary(), instrument);
                 if (sample == null)
                 {
                     Raise(new LogEvent(LogEvent.Level.Error, $"Could not load audio sample {key}"));
@@ -141,13 +142,12 @@ namespace UAlbion.Game.Veldrid.Audio
             var context = Resolve<IEventManager>().Context;
             var map = Resolve<IMapManager>()?.Current;
             var tileSize = map?.TileSize ?? Vector3.One;
-            var mapSource = context.Source as EventSource.Map;
             var source = new SimpleAudioSource(buffer)
             {
                 Volume = e.Volume == 0 ? 1.0f : e.Volume / 255.0f,
                 Looping = e.Mode == SoundEvent.SoundMode.LocalLoop,
-                Position = tileSize * new Vector3(mapSource?.X ?? 0, mapSource?.Y ?? 0, 0.0f),
-                SourceRelative = mapSource == null, // If we couldn't localise the sound then play it at (0,0) relative to the player.
+                Position = tileSize * new Vector3(context.Source.X, context.Source.Y, 0.0f),
+                SourceRelative = context.Source.Id.Type != AssetType.Map, // If we couldn't localise the sound then play it at (0,0) relative to the player.
                 ReferenceDistance = 1.0f * tileSize.X,
                 RolloffFactor = 4.0f
             };

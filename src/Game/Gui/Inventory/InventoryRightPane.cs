@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
@@ -15,9 +14,9 @@ namespace UAlbion.Game.Gui.Inventory
         const int InventoryWidth = 4;
         const int InventoryHeight = 6;
 
-        public InventoryRightPane(PartyCharacterId activeCharacter, bool showTotalPartyGold)
+        public InventoryRightPane(PartyMemberId activeCharacter, bool showTotalPartyGold)
         {
-            var header = new Header(new StringId(AssetType.SystemText, 0, (int)SystemTextId.Inv_Backpack));
+            var header = new Header(Base.SystemText.Inv_Backpack);
 
             var slotSpans = new IUiElement[InventoryHeight];
             for (int j = 0; j < InventoryHeight; j++)
@@ -26,9 +25,7 @@ namespace UAlbion.Game.Gui.Inventory
                 for (int i = 0; i < InventoryWidth; i++)
                 {
                     int index = j * InventoryWidth + i;
-                    slotsInRow[i] = new LogicalInventorySlot(new InventorySlotId(
-                        InventoryType.Player,
-                        (ushort)activeCharacter,
+                    slotsInRow[i] = new LogicalInventorySlot(new InventorySlotId(activeCharacter,
                         (ItemSlotId)((int)ItemSlotId.Slot0 + index)));
                 }
                 slotSpans[j] = new HorizontalStack(slotsInRow);
@@ -45,8 +42,8 @@ namespace UAlbion.Game.Gui.Inventory
                 var money = new Button(
                     new VerticalStack(
                         new Spacing(64, 0),
-                        new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiGold) { Flags = SpriteFlags.Highlight },
-                        new UiText(tf.Format(SystemTextId.Shop_GoldAll)),
+                        new UiSpriteElement(Base.CoreSprite.UiGold) { Flags = SpriteFlags.Highlight },
+                        new UiText(tf.Format(Base.SystemText.Shop_GoldAll)),
                         new SimpleText($"{total / 10}.{total % 10}")
                     ) { Greedy = false})
                 { IsPressed = true };
@@ -54,16 +51,8 @@ namespace UAlbion.Game.Gui.Inventory
             }
             else
             {
-                var goldButton = new LogicalInventorySlot(new InventorySlotId(
-                    InventoryType.Player,
-                    (ushort)activeCharacter,
-                    ItemSlotId.Gold));
-
-                var foodButton = new LogicalInventorySlot(new InventorySlotId(
-                    InventoryType.Player,
-                    (ushort)activeCharacter,
-                    ItemSlotId.Rations));
-
+                var goldButton = new LogicalInventorySlot(new InventorySlotId(activeCharacter, ItemSlotId.Gold));
+                var foodButton = new LogicalInventorySlot(new InventorySlotId(activeCharacter, ItemSlotId.Rations));
                 moneyAndFoodStack = new HorizontalStack(goldButton, foodButton);
             }
 

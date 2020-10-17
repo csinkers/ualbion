@@ -1,7 +1,8 @@
 ﻿using System;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Dialogs;
@@ -16,42 +17,29 @@ namespace UAlbion.Game.Gui.Text
 
         public ConversationManager()
         {
-            OnAsync<TextEvent>(OnTextEvent);
-            OnAsync<MapTextEvent>(OnBaseTextEvent);
-            OnAsync<EventTextEvent>(OnBaseTextEvent);
+            OnAsync<ContextTextEvent>(OnTextEvent);
+            OnAsync<TextEvent>(OnBaseTextEvent);
             OnAsync<NpcTextEvent>(OnNpcTextEvent);
             OnAsync<PartyMemberTextEvent>(OnPartyMemberTextEvent);
             OnAsync<StartDialogueEvent>(StartDialogue);
             OnAsync<StartPartyDialogueEvent>(StartPartyDialogue);
         }
 
+        AssetId ContextTextSource
+        {
+            get
+            {
+                var mapManager = Resolve<IMapManager>();
+                var eventManager = Resolve<IEventManager>();
+                return eventManager.Context?.Source.Id ?? mapManager.Current.MapId;
+            }
+        }
+
         bool OnNpcTextEvent(NpcTextEvent e, Action continuation)
         {
             var state = Resolve<IGameState>();
-            var sheet = state.GetNpc(e.NpcId);
-            var eventManager = Resolve<IEventManager>();
-            var mapManager = Resolve<IMapManager>();
-
-            var (useEventText, textSourceId) = eventManager.Context?.Source switch
-            {
-                EventSource.Map map => (false, (int) map.MapId),
-                EventSource.EventSet eventSet => (true, (int) eventSet.EventSetId),
-                _ => (false, (int)mapManager.Current.MapId)
-            };
-
-            var textEvent = 
-                useEventText
-                    ? (BaseTextEvent)new EventTextEvent(
-                        (EventSetId)textSourceId,
-                        e.TextId,
-                        TextLocation.TextInWindowWithPortrait,
-                        sheet.PortraitId)
-                    : new MapTextEvent(
-                        (MapDataId) textSourceId,
-                        e.TextId,
-                        TextLocation.TextInWindowWithPortrait,
-                        sheet.PortraitId);
-
+            var sheet = state.GetSheet(e.NpcId);
+            var textEvent = new TextEvent(ContextTextSource, e.TextId, TextLocation.TextInWindowWithPortrait, sheet.PortraitId);
             return OnBaseTextEvent(textEvent, continuation);
         }
 
@@ -59,62 +47,19 @@ namespace UAlbion.Game.Gui.Text
         {
             var state = Resolve<IGameState>();
             var party = Resolve<IParty>();
-            var sheet = state.GetPartyMember(e.MemberId ?? party.Leader);
-            var eventManager = Resolve<IEventManager>();
-            var mapManager = Resolve<IMapManager>();
+            var sheet = state.GetSheet(e.MemberId ?? party.Leader);
 
-            var (useEventText, textSourceId) = eventManager.Context?.Source switch
-            {
-                EventSource.Map map => (false, (int) map.MapId),
-                EventSource.EventSet eventSet => (true, (int) eventSet.EventSetId),
-                _ => (false, (int)mapManager.Current.MapId)
-            };
-
-            var textEvent = 
-                useEventText
-                    ?  (BaseTextEvent)new EventTextEvent(
-                        (EventSetId)textSourceId,
-                        e.TextId,
-                        TextLocation.TextInWindowWithPortrait,
-                        sheet.PortraitId)
-                    : new MapTextEvent(
-                        (MapDataId) textSourceId,
-                        e.TextId,
-                        TextLocation.TextInWindowWithPortrait,
-                        sheet.PortraitId);
-
+            var textEvent = new TextEvent(ContextTextSource, e.TextId, TextLocation.TextInWindowWithPortrait, sheet.PortraitId);
             return OnBaseTextEvent(textEvent, continuation);
         }
 
-        bool OnTextEvent(TextEvent e, Action continuation)
+        bool OnTextEvent(ContextTextEvent e, Action continuation)
         {
-            var eventManager = Resolve<IEventManager>();
-            var mapManager = Resolve<IMapManager>();
-
-            var (useEventText, textSourceId) = eventManager.Context?.Source switch
-            {
-                EventSource.Map map => (false, (int) map.MapId),
-                EventSource.EventSet eventSet => (true, (int) eventSet.EventSetId),
-                _ => (false, (int)mapManager.Current.MapId)
-            };
-
-            var textEvent = 
-                useEventText
-                    ?  (BaseTextEvent)new EventTextEvent(
-                        (EventSetId)textSourceId,
-                        e.TextId,
-                        e.Location,
-                        e.PortraitId)
-                    : new MapTextEvent(
-                        (MapDataId) textSourceId,
-                        e.TextId,
-                        e.Location,
-                        e.PortraitId);
-
+            var textEvent = new TextEvent(ContextTextSource, e.TextId, e.Location, e.PortraitId);
             return OnBaseTextEvent(textEvent, continuation);
         }
 
-        bool OnBaseTextEvent(BaseTextEvent textEvent, Action continuation)
+        bool OnBaseTextEvent(TextEvent textEvent, Action continuation)
         {
             var conversationResult = _conversation?.OnText(textEvent, continuation);
             if (conversationResult.HasValue)
@@ -135,10 +80,19 @@ namespace UAlbion.Game.Gui.Text
                 case TextLocation.TextInWindowWithPortrait2:
                 case TextLocation.TextInWindowWithPortrait3:
                 {
-                    SmallPortraitId portraitId = textEvent.PortraitId ?? Resolve<IParty>().Leader.ToPortraitId();
+                    var portraitId = textEvent.PortraitId;
+                    if (textEvent.PortraitId.IsNone)
+                    {
+                        var leaderId = Resolve<IParty>().Leader;
+                        var assets = Resolve<IAssetManager>();
+                        var leader = assets.LoadSheet(leaderId);
+                        portraitId = leader.PortraitId;
+                    }
+                    if (textEvent.PortraitId.IsNone)
+                        portraitId = Base.Portrait.GibtEsNicht;
 
                     if (textEvent.Location == TextLocation.TextInWindowWithPortrait2) // TODO: ??? work out how this is meant to work.
-                        portraitId = SmallPortraitId.Rainer;
+                        portraitId = Base.Portrait.Rainer;
 
                     var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
                     var dialog = AttachChild(new TextDialog(text, portraitId));
@@ -170,14 +124,14 @@ namespace UAlbion.Game.Gui.Text
         {
             var party = Resolve<IParty>();
             var assets = Resolve<IAssetManager>();
-            var npc = assets.LoadNpc(e.NpcId);
+            var npc = assets.LoadSheet(e.NpcId);
             if(npc == null)
             {
                 ApiUtil.Assert($"Could not load NPC {e.NpcId}");
                 return false;
             }
 
-            _conversation = AttachChild(new Conversation(party?.Leader ?? PartyCharacterId.Tom, npc));
+            _conversation = AttachChild(new Conversation(party?.Leader ?? Base.PartyMember.Tom, npc));
             _conversation.Complete += (sender, args) => { _conversation = null; continuation(); };
             _conversation.StartDialogue();
             return true;
@@ -186,7 +140,7 @@ namespace UAlbion.Game.Gui.Text
         bool StartPartyDialogue(StartPartyDialogueEvent e, Action continuation)
         {
             var assets = Resolve<IAssetManager>();
-            var npc = assets.LoadPartyMember(e.MemberId);
+            var npc = assets.LoadSheet(e.MemberId);
             if (npc == null)
             {
                 Raise(new LogEvent(LogEvent.Level.Error, $"Could not load NPC info for \"{e.MemberId}\""));
@@ -194,7 +148,7 @@ namespace UAlbion.Game.Gui.Text
                 return true;
             }
 
-            _conversation = AttachChild(new Conversation(PartyCharacterId.Tom, npc));
+            _conversation = AttachChild(new Conversation(Base.PartyMember.Tom, npc));
             _conversation.Complete += (sender, args) => { _conversation = null; continuation(); };
             _conversation.StartDialogue();
             return true;

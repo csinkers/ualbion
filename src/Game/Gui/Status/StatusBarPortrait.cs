@@ -5,7 +5,6 @@ using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
@@ -23,7 +22,7 @@ namespace UAlbion.Game.Gui.Status
     {
         const string TimerName = "StatusBarPortrait.ClickTimer";
 
-        readonly UiSpriteElement<SmallPortraitId> _portrait;
+        readonly UiSpriteElement _portrait;
         readonly StatusBarHealthBar _health;
         readonly StatusBarHealthBar _mana;
         readonly int _order;
@@ -47,7 +46,7 @@ namespace UAlbion.Game.Gui.Status
             });
 
             _order = order;
-            _portrait = AttachChild(new UiSpriteElement<SmallPortraitId>(SmallPortraitId.Tom));
+            _portrait = AttachChild(new UiSpriteElement(Base.Portrait.Tom));
             _health = AttachChild(new StatusBarHealthBar(order, true));
             _mana = AttachChild(new StatusBarHealthBar(order, false));
         }
@@ -72,13 +71,13 @@ namespace UAlbion.Game.Gui.Status
                     Alignment = TextAlignment.Center
                 });
 
-            IText S(SystemTextId textId) => tf.Center().NoWrap().Format(textId);
+            IText S(TextId textId) => tf.Center().NoWrap().Format(textId);
 
             var uiPosition = window.PixelToUi(cursorManager.Position);
             var options = new List<ContextMenuOption>
             {
                 new ContextMenuOption(
-                    S(SystemTextId.PartyPopup_CharacterScreen),
+                    S(Base.SystemText.PartyPopup_CharacterScreen),
                     new InventoryOpenEvent(member.Id),
                     ContextMenuGroup.Actions)
             };
@@ -86,7 +85,7 @@ namespace UAlbion.Game.Gui.Status
             if (member.Apparent.Magic.SpellStrengths.Any())
             {
                 options.Add(new ContextMenuOption(
-                    S(SystemTextId.PartyPopup_UseMagic),
+                    S(Base.SystemText.PartyPopup_UseMagic),
                     null,
                     ContextMenuGroup.Actions));
             }
@@ -94,15 +93,15 @@ namespace UAlbion.Game.Gui.Status
             if (member.Id != party.Leader)
             {
                 options.Add(new ContextMenuOption(
-                    S(SystemTextId.PartyPopup_MakeLeader),
+                    S(Base.SystemText.PartyPopup_MakeLeader),
                     new SetPartyLeaderEvent(member.Id),
                     ContextMenuGroup.Actions));
             }
 
-            if (member.Id != PartyCharacterId.Tom)
+            if (member.Id != Base.PartyMember.Tom)
             {
                 options.Add(new ContextMenuOption(
-                    S(SystemTextId.PartyPopup_TalkTo),
+                    S(Base.SystemText.PartyPopup_TalkTo),
                     new StartPartyDialogueEvent(member.Id), 
                     ContextMenuGroup.Actions));
             }
@@ -220,26 +219,26 @@ namespace UAlbion.Game.Gui.Status
                 case ItemData item:
                     // Give %s to %s
                     text = tf.Format(
-                        SystemTextId.PartyPortrait_GiveXToX,
-                        assets.LoadString(item.Id, settings.Gameplay.Language),
+                        Base.SystemText.PartyPortrait_GiveXToX,
+                        assets.LoadString(item.Id.ToItemName()),
                         member.Apparent.GetName(settings.Gameplay.Language));
                     break;
                 case Gold _:
                     // Give gold to %s
                     text = tf.Format(
-                        SystemTextId.PartyPortrait_GiveGoldToX,
+                        Base.SystemText.PartyPortrait_GiveGoldToX,
                         member.Apparent.GetName(settings.Gameplay.Language));
                     break;
                 case Rations _:
                     // Give food to %s
                     text = tf.Format(
-                        SystemTextId.PartyPortrait_GiveFoodToX,
+                        Base.SystemText.PartyPortrait_GiveFoodToX,
                         member.Apparent.GetName(settings.Gameplay.Language));
                     break;
                 default:
                     // %s (LP:%d, SP:%d)
                     text = tf.Format(
-                        SystemTextId.PartyPortrait_XLifeMana,
+                        Base.SystemText.PartyPortrait_XLifeMana,
                         member.Apparent.GetName(settings.Gameplay.Language),
                         member.Apparent.Combat.LifePoints,
                         member.Apparent.Magic.SpellPoints);

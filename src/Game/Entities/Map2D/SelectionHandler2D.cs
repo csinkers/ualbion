@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Scenes;
@@ -92,11 +93,11 @@ namespace UAlbion.Game.Entities.Map2D
             var camera = Resolve<ICamera>();
             var tf = Resolve<ITextFormatter>();
 
-            IText S(StringId textId) => tf.Center().Format(textId);
+            IText S(TextId textId) => tf.Center().Format(textId);
             var worldPosition = new Vector2(x, y) * _map.TileSize;
             var normPosition = camera.ProjectWorldToNorm(new Vector3(worldPosition, 0.0f));
             var uiPosition = window.NormToUi(normPosition.X, normPosition.Y);
-            var heading = S(SystemTextId.MapPopup_Environment);
+            var heading = S(Base.SystemText.MapPopup_Environment);
             var options = new List<ContextMenuOption>();
 
             var zone = _map.GetZone(x, y);
@@ -105,32 +106,32 @@ namespace UAlbion.Game.Entities.Map2D
                 if (zone.Trigger.HasFlag(TriggerTypes.Examine))
                 {
                     options.Add(new ContextMenuOption(
-                        S(SystemTextId.MapPopup_Examine),
-                        new TriggerChainEvent(zone.Chain, zone.Node, TriggerTypes.Examine, _map.Id, x, y),
+                        S(Base.SystemText.MapPopup_Examine),
+                        new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_map.Id, TriggerTypes.Examine, x, y)),
                         ContextMenuGroup.Actions));
                 }
 
                 if (zone.Trigger.HasFlag(TriggerTypes.Manipulate))
                 {
                     options.Add(new ContextMenuOption(
-                        S(SystemTextId.MapPopup_Manipulate),
-                        new TriggerChainEvent(zone.Chain, zone.Node, TriggerTypes.Manipulate, _map.Id, x, y),
+                        S(Base.SystemText.MapPopup_Manipulate),
+                        new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_map.Id, TriggerTypes.Manipulate, x, y)),
                         ContextMenuGroup.Actions));
                 }
 
                 if (zone.Trigger.HasFlag(TriggerTypes.Take))
                 {
                     options.Add(new ContextMenuOption(
-                        S(SystemTextId.MapPopup_Take),
-                        new TriggerChainEvent(zone.Chain, zone.Node, TriggerTypes.Take, _map.Id, x, y),
+                        S(Base.SystemText.MapPopup_Take),
+                        new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_map.Id, TriggerTypes.Take, x, y)),
                         ContextMenuGroup.Actions));
                 }
 
                 if (zone.Trigger.HasFlag(TriggerTypes.TalkTo))
                 {
                     options.Add(new ContextMenuOption(
-                        S(SystemTextId.MapPopup_TalkTo),
-                        new TriggerChainEvent(zone.Chain, zone.Node, TriggerTypes.TalkTo, _map.Id, x, y),
+                        S(Base.SystemText.MapPopup_TalkTo),
+                        new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_map.Id, TriggerTypes.TalkTo, x, y)),
                         ContextMenuGroup.Actions));
                 }
             }
@@ -138,7 +139,7 @@ namespace UAlbion.Game.Entities.Map2D
             // Check if map allows Rest
 
             options.Add(new ContextMenuOption(
-                    S(SystemTextId.MapPopup_MainMenu),
+                    S(Base.SystemText.MapPopup_MainMenu),
                     new PushSceneEvent(SceneId.MainMenu),
                     ContextMenuGroup.System
                 ));

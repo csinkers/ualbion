@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Parsers;
 using UAlbion.Game.Assets;
@@ -28,7 +28,7 @@ namespace UAlbion
             if (commandLine.Mode == ExecutionMode.Exit)
                 return;
 
-            var baseDir = FormatUtil.FindBasePath();
+            var baseDir = ConfigUtil.FindBasePath();
             if (baseDir == null)
                 throw new InvalidOperationException("No base directory could be found.");
 
@@ -71,7 +71,7 @@ namespace UAlbion
                 .AddAssetLocator(new MetaFontLocator(factory))
                 .AddAssetLocator(new NewStringLocator())
                 .AddAssetLocator(new SoundBankLocator())
-                .AddAssetLocator(new SavedGameLocator(loaderRegistry))
+                // .AddAssetLocator(new SavedGameLocator(loaderRegistry))
                 // Register post-processors for handling transformations of asset data that can't be done by UAlbion.Formats alone.
                 .AddAssetPostProcessor(new AlbionSpritePostProcessor())
                 .AddAssetPostProcessor(new ImageSharpPostProcessor())

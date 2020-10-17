@@ -1,0 +1,37 @@
+// Note: This file was automatically generated using Tools/GenerateEnums.
+// No changes should be made to this file by hand. Instead, the relevant json
+// files should be modified and then GenerateEnums should be used to regenerate
+// the various ID enums.
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+#pragma warning disable CA1707 // Identifiers should not contain underscores
+namespace UAlbion.Base
+{
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CombatBackground : byte
+    {
+        Plains = 1,
+        Dungeon = 2,
+        Desert = 3,
+        WoodDungeon = 4,
+        BarrelDungeon = 5,
+        TableDungeon = 6,
+        FireDungeon = 7,
+        PlantDungeon = 8,
+        Cave = 9,
+        Toronto = 10,
+        LivingWalls = 11,
+        Forest = 12,
+        TownNight = 13,
+        Town = 14,
+        Plains2 = 15,
+        Plains3 = 16,
+        DesertNight = 17,
+        ForestNight = 18,
+        ForestNight2 = 19,
+    }
+}
+#pragma warning restore CA1707 // Identifiers should not contain underscores

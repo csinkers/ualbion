@@ -1,6 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 using SerdesNet;
+using UAlbion.Config;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Maps

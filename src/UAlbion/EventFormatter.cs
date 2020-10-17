@@ -1,5 +1,5 @@
-﻿using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
+﻿using UAlbion.Config;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game;
 
@@ -8,24 +8,20 @@ namespace UAlbion
     class EventFormatter
     {
         readonly IAssetManager _assets;
-        readonly AssetType _textType;
-        readonly ushort _context;
+        readonly AssetId _textSourceId;
 
-        public EventFormatter(IAssetManager assets, AssetType textType, ushort context)
+        public EventFormatter(IAssetManager assets, AssetId textSourceId)
         {
             _assets = assets;
-            _textType = textType;
-            _context = context;
+            _textSourceId = textSourceId;
         }
 
         public string GetText(IEventNode e)
         {
             var nodeText = e.ToString();
-            if (e.Event is BaseTextEvent textEvent)
+            if (e.Event is TextEvent textEvent)
             {
-                var text = _assets.LoadString(
-                    new StringId(_textType, _context, textEvent.TextId),
-                    GameLanguage.English);
+                var text = _assets.LoadString(new StringId(_textSourceId, textEvent.TextId));
 
                 return $"{nodeText} \"{text}\"";
             }

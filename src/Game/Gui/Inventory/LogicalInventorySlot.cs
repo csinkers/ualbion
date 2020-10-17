@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using UAlbion.Api;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
@@ -25,7 +24,7 @@ namespace UAlbion.Game.Gui.Inventory
         {
             On<InventoryChangedEvent>(e =>
             {
-                if (e.InventoryType == _id.Type && e.InventoryId == _id.Id)
+                if (e.Id == _id.Id)
                     _version++;
             });
 
@@ -76,29 +75,29 @@ namespace UAlbion.Game.Gui.Inventory
                 {
                     var inputBinder = Resolve<IInputBinder>();
                     if (inputBinder.IsCtrlPressed)
-                        Raise(new InventoryPickupEvent(null, _id.Type, _id.Id, _id.Slot));
+                        Raise(new InventoryPickupEvent(null, _id.Id, _id.Slot));
                     else if (inputBinder.IsShiftPressed)
-                        Raise(new InventoryPickupEvent(5, _id.Type, _id.Id, _id.Slot));
+                        Raise(new InventoryPickupEvent(5, _id.Id, _id.Slot));
                     else if (inputBinder.IsAltPressed)
-                        Raise(new InventoryPickupEvent(1, _id.Type, _id.Id, _id.Slot));
+                        Raise(new InventoryPickupEvent(1, _id.Id, _id.Slot));
                     else
-                        Raise(new InventorySwapEvent(_id.Type, _id.Id, _id.Slot));
+                        Raise(new InventorySwapEvent(_id.Id, _id.Slot));
                 })
-                .OnDoubleClick(() => Raise(new InventoryPickupEvent(null, _id.Type, _id.Id, _id.Slot)))
+                .OnDoubleClick(() => Raise(new InventoryPickupEvent(null, _id.Id, _id.Slot)))
                 .OnRightClick(OnRightClick)
                 .OnHover(Hover)
                 .OnBlur(Blur);
         }
 
         public override string ToString() => $"InventorySlot:{_id}";
-        IInventory Inventory => Resolve<IGameState>().GetInventory(_id.Inventory);
+        IInventory Inventory => Resolve<IGameState>().GetInventory(_id.Id);
         IReadOnlyItemSlot Slot => Inventory?.GetSlot(_id.Slot);
 
         void Blur()
         {
             var inventoryManager = Resolve<IInventoryManager>();
             var hand = inventoryManager.ItemInHand;
-            Raise(new SetCursorEvent(hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
+            Raise(new SetCursorEvent(hand.Item == null ? Base.CoreSprite.Cursor : Base.CoreSprite.CursorSmall));
             Raise(new HoverTextEvent(null));
         }
 
@@ -107,18 +106,18 @@ namespace UAlbion.Game.Gui.Inventory
             var assets = Resolve<IAssetManager>();
             var settings = Resolve<ISettings>();
             var inventoryManager = Resolve<IInventoryManager>();
-            var inventory = Resolve<IGameState>().GetInventory(_id.Inventory);
+            var inventory = Resolve<IGameState>().GetInventory(_id.Id);
             var tf = Resolve<ITextFormatter>();
 
             var slotInfo = Slot;
             string itemName = null;
             if (slotInfo?.Item is ItemData item)
-                itemName = assets.LoadString(item.Id, settings.Gameplay.Language);
+                itemName = assets.LoadString(item.Id.ToItemName());
 
             var hand = inventoryManager.ItemInHand;
             string itemInHandName = null;
             if (hand.Item is ItemData itemInHand)
-                itemInHandName = assets.LoadString(itemInHand.Id, settings.Gameplay.Language);
+                itemInHandName = assets.LoadString(itemInHand.Id.ToItemName());
 
             var action = inventoryManager.GetInventoryAction(_id);
             _visual.Hoverable = true;
@@ -132,17 +131,17 @@ namespace UAlbion.Game.Gui.Inventory
                     if (itemName != null)
                     {
                         Raise(new HoverTextEvent(new LiteralText(itemName)));
-                        Raise(new SetCursorEvent(CoreSpriteId.CursorSelected));
+                        Raise(new SetCursorEvent(Base.CoreSprite.CursorSelected));
                     }
                     else if(_id.Slot == ItemSlotId.Gold || _id.Slot == ItemSlotId.Rations)
                     {
                         bool isGold = _id.Slot == ItemSlotId.Gold;
                         int amount = isGold ? inventory.Gold.Amount : inventory.Rations.Amount;
                         var text = isGold
-                            ? tf.Format(SystemTextId.Gold_NNGold, amount / 10, amount % 10)
-                            : tf.Format(SystemTextId.Gold_NRations, amount);
+                            ? tf.Format(Base.SystemText.Gold_NNGold, amount / 10, amount % 10)
+                            : tf.Format(Base.SystemText.Gold_NRations, amount);
                         Raise(new HoverTextEvent(text));
-                        Raise(new SetCursorEvent(CoreSpriteId.CursorSelected));
+                        Raise(new SetCursorEvent(Base.CoreSprite.CursorSelected));
                     }
                     break;
                 }
@@ -150,7 +149,7 @@ namespace UAlbion.Game.Gui.Inventory
                 {
                     if (itemInHandName != null)
                     {
-                        var text = tf.Format(SystemTextId.Item_PutDownX, itemInHandName);
+                        var text = tf.Format(Base.SystemText.Item_PutDownX, itemInHandName);
                         Raise(new HoverTextEvent(text));
                     }
                     break;
@@ -159,19 +158,19 @@ namespace UAlbion.Game.Gui.Inventory
                 {
                     if (itemInHandName != null && itemName != null)
                     {
-                        var text = tf.Format(SystemTextId.Item_SwapXWithX, itemInHandName, itemName);
+                        var text = tf.Format(Base.SystemText.Item_SwapXWithX, itemInHandName, itemName);
                         Raise(new HoverTextEvent(text));
                     }
                     break;
                 }
                 case InventoryAction.Coalesce: // Add
                 {
-                    Raise(new HoverTextEvent(tf.Format(SystemTextId.Item_Add)));
+                    Raise(new HoverTextEvent(tf.Format(Base.SystemText.Item_Add)));
                     break;
                 }
                 case InventoryAction.NoCoalesceFullStack: // {YELLOW}This space is occupied!
                 {
-                    Raise(new HoverTextEvent(tf.Format(SystemTextId.Item_ThisSpaceIsOccupied)));
+                    Raise(new HoverTextEvent(tf.Format(Base.SystemText.Item_ThisSpaceIsOccupied)));
                     break;
                 }
             }
@@ -181,16 +180,16 @@ namespace UAlbion.Game.Gui.Inventory
         {
             var window = Resolve<IWindowManager>();
             var cursorManager = Resolve<ICursorManager>();
-            var inventory = Resolve<IGameState>().GetInventory(_id.Inventory);
+            var inventory = Resolve<IGameState>().GetInventory(_id.Id);
             var tf = Resolve<ITextFormatter>();
             var slotInfo = inventory.GetSlot(_id.Slot);
             if (!(slotInfo?.Item is ItemData item))
                 return;
 
             var itemPosition = window.UiToNorm(slotInfo.LastUiPosition);
-            var heading = tf.Center().NoWrap().Fat().Format(item.Id);
+            var heading = tf.Center().NoWrap().Fat().Format(item.Id.ToItemName());
 
-            IText S(StringId textId, bool disabled = false)
+            IText S(TextId textId, bool disabled = false)
                 => tf
                 .Center()
                 .NoWrap()
@@ -208,15 +207,15 @@ namespace UAlbion.Game.Gui.Inventory
             bool isPlotItem = (item.Flags & ItemFlags.PlotItem) != 0;
             var options = new List<ContextMenuOption>();
 
-            if (_id.Type == InventoryType.Merchant)
+            if (_id.Id.Type == InventoryType.Merchant)
             {
                 options.Add(new ContextMenuOption(
-                    S(SystemTextId.InvPopup_Sell, isPlotItem),
+                    S(Base.SystemText.InvPopup_Sell, isPlotItem),
                     isPlotItem 
                         ? (IEvent)new HoverTextEvent(
                             tf.Format(
-                                SystemTextId.InvMsg_ThisIsAVitalItem))
-                        : new InventorySellEvent(_id.Type, _id.Id, _id.Slot),
+                                Base.SystemText.InvMsg_ThisIsAVitalItem))
+                        : new InventorySellEvent(_id.Id, _id.Slot),
                     ContextMenuGroup.Actions,
                     isPlotItem));
             }
@@ -224,35 +223,35 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 options.Add(
                     new ContextMenuOption(
-                        S(SystemTextId.InvPopup_Drop, isPlotItem),
+                        S(Base.SystemText.InvPopup_Drop, isPlotItem),
                         isPlotItem
                             ? (IEvent)new HoverTextEvent(
                                 tf.Format(
-                                    SystemTextId.InvMsg_ThisIsAVitalItem))
-                            : new InventoryDiscardEvent(itemPosition.X, itemPosition.Y, _id.Type, _id.Id, _id.Slot),
+                                    Base.SystemText.InvMsg_ThisIsAVitalItem))
+                            : new InventoryDiscardEvent(itemPosition.X, itemPosition.Y, _id.Id, _id.Slot),
                         ContextMenuGroup.Actions,
                         isPlotItem));
             }
 
             options.Add(new ContextMenuOption(
-                S(SystemTextId.InvPopup_Examine),
+                S(Base.SystemText.InvPopup_Examine),
                 new InventoryExamineEvent(item.Id),
                 ContextMenuGroup.Actions));
 
-            if (item.TypeId == ItemType.Document && _id.Type == InventoryType.Player)
-                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_Read), null, ContextMenuGroup.Actions));
+            if (item.TypeId == ItemType.Document && _id.Id.Type == InventoryType.Player)
+                options.Add(new ContextMenuOption(S(Base.SystemText.InvPopup_Read), null, ContextMenuGroup.Actions));
 
-            if (item.TypeId == ItemType.SpellScroll && _id.Type == InventoryType.Player)
-                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_LearnSpell), null, ContextMenuGroup.Actions));
+            if (item.TypeId == ItemType.SpellScroll && _id.Id.Type == InventoryType.Player)
+                options.Add(new ContextMenuOption(S(Base.SystemText.InvPopup_LearnSpell), null, ContextMenuGroup.Actions));
 
-            if (item.TypeId == ItemType.Drink && _id.Type == InventoryType.Player)
-                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_Drink), null, ContextMenuGroup.Actions));
+            if (item.TypeId == ItemType.Drink && _id.Id.Type == InventoryType.Player)
+                options.Add(new ContextMenuOption(S(Base.SystemText.InvPopup_Drink), null, ContextMenuGroup.Actions));
 
-            if (item.TypeId == ItemType.HeadsUpDisplayItem && _id.Type == InventoryType.Player)
-                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_Activate), null, ContextMenuGroup.Actions));
+            if (item.TypeId == ItemType.HeadsUpDisplayItem && _id.Id.Type == InventoryType.Player)
+                options.Add(new ContextMenuOption(S(Base.SystemText.InvPopup_Activate), null, ContextMenuGroup.Actions));
 
-            if (item.Charges > 0 && _id.Type == InventoryType.Player) // TODO: Disable based on spell context
-                options.Add(new ContextMenuOption(S(SystemTextId.InvPopup_ActivateSpell), null, ContextMenuGroup.Actions));
+            if (item.Charges > 0 && _id.Id.Type == InventoryType.Player) // TODO: Disable based on spell context
+                options.Add(new ContextMenuOption(S(Base.SystemText.InvPopup_ActivateSpell), null, ContextMenuGroup.Actions));
 
 
             var uiPosition = window.PixelToUi(cursorManager.Position);

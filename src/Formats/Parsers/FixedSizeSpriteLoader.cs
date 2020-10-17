@@ -1,16 +1,15 @@
 ﻿using System;
 using System.IO;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {
     [AssetLoader(FileFormat.FixedSizeSprite)]
     public class FixedSizeSpriteLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
         {
             if (br == null) throw new ArgumentNullException(nameof(br));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -47,7 +46,7 @@ namespace UAlbion.Formats.Parsers
                 currentY += height;
             }
 
-            var sprite = new AlbionSprite(key.ToString(), width, height * spriteCount, true, pixelData, frames);
+            var sprite = new AlbionSprite(id.ToString(), width, height * spriteCount, true, pixelData, frames);
             if (!config.Transposed)
                 return sprite;
 
@@ -63,7 +62,7 @@ namespace UAlbion.Formats.Parsers
                     new Span<byte>(pixelData, n * width * height, width * height));
             }
 
-            return new AlbionSprite(key.ToString(), height, width * spriteCount, true, pixelData, frames);
+            return new AlbionSprite(id.ToString(), height, width * spriteCount, true, pixelData, frames);
         }
     }
 }

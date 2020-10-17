@@ -2,21 +2,21 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UAlbion.Formats.AssetIds;
+using Newtonsoft.Json;
+using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Game;
-using Newtonsoft.Json;
-using UAlbion.Api;
 
 namespace UAlbion
 {
     static class DumpJson
     {
-        static IEnumerable<T> All<T>() where T : struct, Enum => Enum.GetValues(typeof(T)).OfType<T>();
-        static IDictionary<TKey, TValue> AllAssets<TKey, TValue>(Func<TKey, TValue> fetcher) where TKey : struct, Enum
-            => All<TKey>()
+        static IEnumerable<AssetId> All(AssetType type) => AssetId.EnumerateAll(type);
+        static IDictionary<AssetId, TValue> AllAssets<TValue>(AssetType type, Func<AssetId, TValue> fetcher)
+            => All(type)
                .Select(x => (x, fetcher(x)))
                .Where(x => x.Item2 != null)
                .ToDictionary(x => x.x, x => x.Item2);
@@ -55,9 +55,9 @@ namespace UAlbion
 
             var s = JsonSerializer.Create(settings);
             TextWriter tw;
-            if (types.Contains(AssetType.Tileset))
+            if (types.Contains(AssetType.TilesetData))
             {
-                foreach (var id in All<TilesetId>())
+                foreach (var id in All(AssetType.TilesetData))
                 {
                     TilesetData asset = assets.LoadTileData(id);
                     if (asset == null) continue;
@@ -68,9 +68,9 @@ namespace UAlbion
                 Flush();
             }
 
-            if (types.Contains(AssetType.LabData))
+            if (types.Contains(AssetType.Labyrinth))
             {
-                foreach (var id in All<LabyrinthDataId>())
+                foreach (var id in All(AssetType.Labyrinth))
                 {
                     LabyrinthData asset = assets.LoadLabyrinthData(id);
                     if (asset == null) continue;
@@ -83,9 +83,9 @@ namespace UAlbion
 
             // string str = assets.LoadString(StringId id, GameLanguage language);
 
-            if (types.Contains(AssetType.MapData))
+            if (types.Contains(AssetType.Map))
             {
-                foreach (var id in All<MapDataId>())
+                foreach (var id in All(AssetType.Map))
                 {
                     IMapData asset = assets.LoadMap(id);
                     if (asset == null) continue;
@@ -96,17 +96,17 @@ namespace UAlbion
                 Flush();
             }
 
-            if (types.Contains(AssetType.ItemList) || types.Contains(AssetType.ItemNames))
+            if (types.Contains(AssetType.Item) || types.Contains(AssetType.ItemName))
             {
                 tw = Writer("items.json");
-                s.Serialize(tw, AllAssets<ItemId, ItemData>(assets.LoadItem));
+                s.Serialize(tw, AllAssets(AssetType.Item, x => assets.LoadItem(x)));
                 Flush();
             }
 
             if (types.Contains(AssetType.PartyMember))
             {
                 tw = Writer("party_members.json");
-                s.Serialize(tw, AllAssets<PartyCharacterId, CharacterSheet>(assets.LoadPartyMember));
+                s.Serialize(tw, AllAssets(AssetType.PartyMember, x => assets.LoadSheet(x)));
                 Flush();
 
             }
@@ -114,7 +114,7 @@ namespace UAlbion
             if (types.Contains(AssetType.Npc))
             {
                 tw = Writer("npcs.json");
-                s.Serialize(tw, AllAssets<NpcCharacterId, CharacterSheet>(assets.LoadNpc));
+                s.Serialize(tw, AllAssets(AssetType.Npc, x => assets.LoadSheet(x)));
                 Flush();
             }
 
@@ -122,29 +122,29 @@ namespace UAlbion
             {
 
                 tw = Writer("monsters.json");
-                s.Serialize(tw, AllAssets<MonsterCharacterId, CharacterSheet>(assets.LoadMonster));
+                s.Serialize(tw, AllAssets(AssetType.Monster, x => assets.LoadSheet(x)));
                 Flush();
             }
 
-            if (types.Contains(AssetType.ChestData))
+            if (types.Contains(AssetType.Chest))
             {
 
                 tw = Writer("chests.json");
-                s.Serialize(tw, AllAssets<ChestId, Inventory>(assets.LoadChest));
+                s.Serialize(tw, AllAssets(AssetType.Chest, assets.LoadInventory));
                 Flush();
             }
 
-            if (types.Contains(AssetType.MerchantData))
+            if (types.Contains(AssetType.Merchant))
             {
 
                 tw = Writer("merchants.json");
-                s.Serialize(tw, AllAssets<MerchantId, Inventory>(assets.LoadMerchant));
+                s.Serialize(tw, AllAssets(AssetType.Merchant, assets.LoadInventory));
                 Flush();
             }
 
             if (types.Contains(AssetType.BlockList))
             {
-                foreach (var id in All<BlockListId>())
+                foreach (var id in All(AssetType.BlockList))
                 {
                     IList<Block> asset = assets.LoadBlockList(id);
                     if (asset == null) continue;
@@ -157,13 +157,13 @@ namespace UAlbion
             if (types.Contains(AssetType.EventSet))
             {
                 tw = Writer("event_sets.json");
-                s.Serialize(tw, AllAssets<EventSetId, EventSet>(assets.LoadEventSet));
+                s.Serialize(tw, AllAssets(AssetType.EventSet, x => assets.LoadEventSet(x)));
                 Flush();
             }
 
             if (types.Contains(AssetType.Script))
             {
-                foreach (var id in All<ScriptId>())
+                foreach (var id in All(AssetType.Script))
                 {
                     IList<IEvent> asset = assets.LoadScript(id);
                     if (asset == null) continue;
@@ -173,23 +173,23 @@ namespace UAlbion
                 Flush();
             }
 
-            if (types.Contains(AssetType.SpellData))
+            if (types.Contains(AssetType.Spell))
             {
                 tw = Writer("spells.json");
-                s.Serialize(tw, AllAssets<SpellId, SpellData>(assets.LoadSpell));
+                s.Serialize(tw, AllAssets(AssetType.Spell, x => assets.LoadSpell(x)));
                 Flush();
             }
 
             if (types.Contains(AssetType.MonsterGroup))
             {
                 tw = Writer("monster_groups.json");
-                s.Serialize(tw, AllAssets<MonsterGroupId, MonsterGroup>(assets.LoadMonsterGroup));
+                s.Serialize(tw, AllAssets(AssetType.MonsterGroup, x => assets.LoadMonsterGroup(x)));
                 Flush();
             }
 
             if (types.Contains(AssetType.Palette))
             {
-                foreach (var id in All<PaletteId>())
+                foreach (var id in All(AssetType.Palette))
                 {
                     tw = Writer($"palettes/palette{(int)id}_{id}.json");
                     var palette = assets.LoadPalette(id);

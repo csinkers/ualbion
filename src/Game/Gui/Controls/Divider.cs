@@ -2,7 +2,7 @@
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Gui.Controls
 {

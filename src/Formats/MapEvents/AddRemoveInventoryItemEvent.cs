@@ -1,14 +1,15 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
     [Event("add_remove_inv")]
     public class AddRemoveInventoryItemEvent : ModifyEvent
     {
-        public static AddRemoveInventoryItemEvent Serdes(AddRemoveInventoryItemEvent e, ISerializer s)
+        public static AddRemoveInventoryItemEvent Serdes(AddRemoveInventoryItemEvent e, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new AddRemoveInventoryItemEvent();
@@ -16,7 +17,7 @@ namespace UAlbion.Formats.MapEvents
             e.Amount = s.UInt8(nameof(Amount), e.Amount);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-            e.ItemId = (ItemId)StoreIncrementedConverter.Serdes(nameof(e.ItemId), (ushort)e.ItemId, s.UInt16);
+            e.ItemId = ItemId.SerdesU16(nameof(e.ItemId), e.ItemId, AssetType.Item, mapping, s);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             return e;
         }

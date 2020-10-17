@@ -1,14 +1,14 @@
 ﻿using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
     [Event("inv:open", "Opens the given character's inventory")]
     public class InventoryOpenEvent : Event, ISetInventoryModeEvent
     {
-        public InventoryOpenEvent(PartyCharacterId? member) => Member = member;
-        [EventPart("member", true)] public PartyCharacterId? Member { get; }
+        public InventoryOpenEvent(CharacterId member) => Submode = member;
         public InventoryMode Mode => InventoryMode.Character;
-        public ushort Submode => 0;
+        public AssetId Submode { get; }
     }
 }

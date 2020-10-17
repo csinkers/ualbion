@@ -3,29 +3,26 @@ using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities
 {
     public class LargePlayer : Component
     {
-        readonly PartyCharacterId _id;
+        readonly CharacterId _id;
         readonly Func<(Vector3, int)> _positionFunc;
-        readonly MapSprite<LargePartyGraphicsId> _sprite;
+        readonly MapSprite _sprite;
         public override string ToString() => $"LPlayer {_id}";
 
-        public LargePlayer(PartyCharacterId charId, LargePartyGraphicsId graphicsId, Func<(Vector3, int)> positionFunc)
+        public LargePlayer(CharacterId charId, SpriteId graphicsId, Func<(Vector3, int)> positionFunc)
         {
             On<FastClockEvent>(e => Update());
             On<MapInitEvent>(e => Update());
 
             _id = charId;
             _positionFunc = positionFunc;
-            _sprite = AttachChild(new MapSprite<LargePartyGraphicsId>(
-                graphicsId,
-                DrawLayer.Character,
-                0, SpriteFlags.BottomAligned));
+            _sprite = AttachChild(new MapSprite(graphicsId, DrawLayer.Character, 0, SpriteFlags.BottomAligned));
         }
 
         protected override void Subscribed()

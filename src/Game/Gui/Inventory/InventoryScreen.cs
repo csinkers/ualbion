@@ -1,6 +1,6 @@
 ﻿using System;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Gui.Controls;
 
@@ -10,7 +10,7 @@ namespace UAlbion.Game.Gui.Inventory
     {
         public InventoryScreen(
             ISetInventoryModeEvent modeEvent,
-            PartyCharacterId activeCharacter,
+            PartyMemberId activeCharacter,
             Func<InventoryPage> getPage,
             Action<InventoryPage> setPage) : base(DialogPositioning.TopLeft)
         {
@@ -22,8 +22,8 @@ namespace UAlbion.Game.Gui.Inventory
                 modeEvent.Mode switch
                 {
                     InventoryMode.Character => (IUiElement)new InventoryCharacterPane(activeCharacter, getPage, setPage),
-                    InventoryMode.Merchant => new InventoryMerchantPane((MerchantId)modeEvent.Submode),
-                    InventoryMode.Chest => new InventoryChestPane((ChestId)modeEvent.Submode),
+                    InventoryMode.Merchant => new InventoryMerchantPane(modeEvent.Submode),
+                    InventoryMode.Chest => new InventoryChestPane(modeEvent.Submode),
                     InventoryMode.LockedChest => new InventoryLockPane((ILockedInventoryEvent)modeEvent),
                     InventoryMode.LockedDoor => new InventoryLockPane((ILockedInventoryEvent)modeEvent),
                     _ => throw new InvalidOperationException($"Unexpected inventory mode {modeEvent.Mode}")
@@ -36,7 +36,7 @@ namespace UAlbion.Game.Gui.Inventory
 
             // var frameDivider = new FrameDivider(135, 0, 4, 192);
 
-            AttachChild(new UiFixedPositionElement<SlabId>(SlabId.SLAB, UiConstants.UiExtents));
+            AttachChild(new UiFixedPositionElement(Base.UiBackground.SLAB, UiConstants.UiExtents));
             AttachChild(new FixedPosition(new Rectangle(0, 0, 135, UiConstants.ActiveAreaExtents.Height), leftPane));
             AttachChild(new FixedPosition(new Rectangle(142, 0, 134, UiConstants.ActiveAreaExtents.Height), middlePane));
             AttachChild(new FixedPosition(new Rectangle(280, 0, 71, UiConstants.ActiveAreaExtents.Height), rightPane));

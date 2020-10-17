@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Text
 {

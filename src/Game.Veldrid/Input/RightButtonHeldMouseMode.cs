@@ -6,7 +6,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using Veldrid;
@@ -15,14 +15,14 @@ namespace UAlbion.Game.Veldrid.Input
 {
     public class RightButtonHeldMouseMode : Component
     {
-        readonly MapSprite<CoreSpriteId> _cursor;
+        readonly MapSprite _cursor;
         Vector2 _lastTilePosition;
         bool _wasClockRunning;
 
         public RightButtonHeldMouseMode()
         {
             On<InputEvent>(OnInput);
-            _cursor = AttachChild(new MapSprite<CoreSpriteId>(CoreSpriteId.Select, DrawLayer.MaxLayer, 0, SpriteFlags.LeftAligned));
+            _cursor = AttachChild(new MapSprite((SpriteId)Base.CoreSprite.Select, DrawLayer.MaxLayer, 0, SpriteFlags.LeftAligned));
         }
 
         protected override void Subscribed()

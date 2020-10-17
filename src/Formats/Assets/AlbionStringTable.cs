@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Config;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets
 {
     [AssetLoader(FileFormat.StringTable)]
     public class AlbionStringTableLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
         {
             if (br == null) throw new ArgumentNullException(nameof(br));
             IDictionary<int, string> strings = new Dictionary<int, string>();
@@ -31,7 +30,7 @@ namespace UAlbion.Formats.Assets
             return strings;
         }
 
-        // public StringTable Serdes(StringTable existing, ISerializer s, AssetKey key, AssetInfo config) => StringTable.Serdes(existing, s);
+        // public StringTable Serdes(StringTable existing, ISerializer s, AssetId key, AssetInfo config) => StringTable.Serdes(existing, s);
     }
     /*
     public class StringTable

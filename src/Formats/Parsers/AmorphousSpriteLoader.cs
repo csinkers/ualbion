@@ -4,9 +4,8 @@ using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {
@@ -41,7 +40,7 @@ namespace UAlbion.Formats.Parsers
             }
         }
 
-        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
         {
             if (br == null) throw new ArgumentNullException(nameof(br));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -81,7 +80,7 @@ namespace UAlbion.Formats.Parsers
             }
 
             ApiUtil.Assert(br.BaseStream.Position == initialPosition + streamLength);
-            return new AlbionSprite(key.ToString(), spriteWidth, spriteHeight, false, pixelData, frames);
+            return new AlbionSprite(id.ToString(), spriteWidth, spriteHeight, false, pixelData, frames);
         }
     }
 }

@@ -3,15 +3,15 @@ using System.Linq;
 using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets.Maps
 {
     public class MapData2D : BaseMapData
     {
-        static readonly TilesetId[] OutdoorTilesets = { TilesetId.Outdoors, TilesetId.Outdoors2, TilesetId.Desert };
+        static readonly Base.TilesetData[] OutdoorTilesets = { Base.TilesetData.Outdoors, Base.TilesetData.Outdoors2, Base.TilesetData.Desert }; // TODO: Pull from config or infer from other data
 
-        public override MapType MapType => OutdoorTilesets.Contains(TilesetId) ? MapType.TwoDOutdoors : MapType.TwoD;
+        public override MapType MapType => OutdoorTilesets.Any(x => x == TilesetId) ? MapType.TwoDOutdoors : MapType.TwoD;
         public FlatMapFlags Flags { get; private set; } // Wait/Rest, Light-Environment, NPC converge range
         public byte Sound { get; private set; }
         public TilesetId TilesetId { get; private set; }
@@ -26,40 +26,31 @@ namespace UAlbion.Formats.Assets.Maps
             set => (Underlay, Overlay) = FormatUtil.FromPacked(Width, Height, value);
         }
 
-        MapData2D(MapDataId id) : base(id) { }
-        public static MapData2D Serdes(int id, MapData2D existing, ISerializer s)
+        MapData2D(MapId id) : base(id) { }
+        public static MapData2D Serdes(int id, MapData2D existing, MapType mapType, AssetMapping mapping, ISerializer s)
         {
+            if (mapping == null) throw new ArgumentNullException(nameof(mapping));
             if (s == null) throw new ArgumentNullException(nameof(s));
 
             var startOffset = s.Offset;
-            var map = existing ?? new MapData2D((MapDataId)id);
+            var map = existing ?? new MapData2D((MapId)id);
             map.Flags = s.EnumU8(nameof(Flags), map.Flags); // 0
             int npcCount = s.Transform("NpcCount", map.Npcs.Count, S.UInt8, NpcCountTransform.Instance); // 1
             var _ = s.UInt8("MapType", (byte)map.MapType); // 2
 
-            map.SongId = s.TransformEnumU8(nameof(SongId), map.SongId, TweakedConverter<SongId>.Instance); // 3
+            map.SongId = SongId.SerdesU8(nameof(SongId), map.SongId, mapping, s); // 3
             map.Width = s.UInt8(nameof(Width), map.Width); // 4
             map.Height = s.UInt8(nameof(Height), map.Height); // 5
-
-            map.TilesetId = s.TransformEnumU8(
-                nameof(TilesetId),
-                map.TilesetId,
-                StoreIncrementedConverter<TilesetId>.Instance); //6
-
-            map.CombatBackgroundId = s.EnumU8(nameof(CombatBackgroundId), map.CombatBackgroundId); // 7
-
-            map.PaletteId = s.TransformEnumU8(
-                nameof(PaletteId),
-                map.PaletteId,
-                StoreIncrementedConverter<PaletteId>.Instance);
-
+            map.TilesetId = TilesetId.SerdesU8(nameof(TilesetId), map.TilesetId, mapping, s); //6
+            map.CombatBackgroundId = SpriteId.SerdesU8(nameof(CombatBackgroundId), map.CombatBackgroundId, AssetType.CombatBackground, mapping, s); // 7
+            map.PaletteId = PaletteId.SerdesU8(nameof(PaletteId), map.PaletteId, mapping, s);
             map.FrameRate = s.UInt8(nameof(FrameRate), map.FrameRate); //9
 
             for (int i = 0; i < npcCount; i++)
             {
                 map.Npcs.TryGetValue(i, out var npc);
-                npc = MapNpc.Serdes(i, npc, s);
-                if (npc.ObjectNumber != 0 || npc.Id != null)
+                npc = MapNpc.Serdes(i, npc, mapType, mapping, s);
+                if (!npc.SpriteOrGroup.IsNone || !npc.Id.IsNone)
                     map.Npcs[i] = npc;
             }
             s.Check();
@@ -73,7 +64,7 @@ namespace UAlbion.Formats.Assets.Maps
             ApiUtil.Assert(s.Offset == startOffset + 10 + npcCount * MapNpc.SizeOnDisk + 3 * map.Width * map.Height);
 
             map.SerdesZones(s);
-            map.SerdesEvents(s);
+            map.SerdesEvents(mapping, s);
             map.SerdesNpcWaypoints(s);
             if (map.Events.Any())
                 map.SerdesChains(s, 250);

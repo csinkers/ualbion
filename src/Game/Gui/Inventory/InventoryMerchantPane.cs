@@ -1,5 +1,4 @@
-﻿using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Assets;
+﻿using UAlbion.Formats.Assets;
 using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui.Inventory
@@ -18,17 +17,14 @@ namespace UAlbion.Game.Gui.Inventory
                 for (int i = 0; i < InventoryWidth; i++)
                 {
                     int index = j * InventoryWidth + i;
-                    slotsInRow[i] = new LogicalInventorySlot(new InventorySlotId(
-                        InventoryType.Merchant,
-                        (ushort)id,
-                        (ItemSlotId)((int)ItemSlotId.Slot0 + index)));
+                    slotsInRow[i] = new LogicalInventorySlot(new InventorySlotId(id, (ItemSlotId)((int)ItemSlotId.Slot0 + index)));
                 }
                 slotSpans[j] = new HorizontalStack(slotsInRow);
             }
 
             var slotStack = new VerticalStack(slotSpans);
             var slotHalfFrame = new ButtonFrame(slotStack) {Theme = ButtonTheme.InventoryOuterFrame, Padding = -1 };
-            var header = new Header(new StringId(AssetType.SystemText, 0, (int)SystemTextId.Shop_Merchant));
+            var header = new Header(Base.SystemText.Shop_Merchant);
             var stack = new VerticalStack(header, slotHalfFrame) { Greedy = false };
             AttachChild(stack);
         }

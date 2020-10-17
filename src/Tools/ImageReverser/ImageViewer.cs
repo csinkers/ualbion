@@ -5,10 +5,9 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using UAlbion.Config;
 using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Config;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Tools.ImageReverser
@@ -373,14 +372,14 @@ namespace UAlbion.Tools.ImageReverser
             }
         }
 
-        AlbionSprite LoadSprite(string filename, FullAssetInfo conf)
+        AlbionSprite LoadSprite(string filename, AssetInfo conf)
         {
             using var stream = File.OpenRead(Path.Combine(_core.BaseExportDirectory, filename));
             using var br = new BinaryReader(stream);
-            return (AlbionSprite)GetLoader(conf).Load(br, stream.Length, new AssetKey(AssetType.Picture), conf);
+            return (AlbionSprite)GetLoader(conf).Load(br, stream.Length, AssetMapping.Global, new AssetId(AssetType.Picture), conf);
         }
 
-        static IAssetLoader GetLoader(FullAssetInfo conf) =>
+        static IAssetLoader GetLoader(AssetInfo conf) =>
             (conf.Parent.Format) switch
             {
             FileFormat.AmorphousSprite => new AmorphousSpriteLoader(),

@@ -1,8 +1,11 @@
 ﻿using System.Linq;
+using Xunit;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
@@ -11,10 +14,10 @@ using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Text;
 using UAlbion.TestCommon;
-using Xunit;
 
 namespace UAlbion.Game.Tests
 {
+
     public class ButtonTests : Component
     {
         readonly EventExchange _exchange;
@@ -31,15 +34,21 @@ namespace UAlbion.Game.Tests
         public ButtonTests()
         {
             _exchange = new EventExchange(new LogExchange());
+            var mapping = new AssetMapping()
+                .RegisterAssetType(typeof(Base.Font), AssetType.Font)
+                ;
+
             var factory = new MockFactory();
+            var modApplier = new MockModApplier(mapping, GameLanguage.English);
             var locator = new MockAssetLocatorRegistry()
-                    .Add(new AssetKey(AssetType.MetaFont, (ushort)new MetaFontId(false, FontColor.White)), MockUniformFont.Font)
+                    .Add(new AssetId(AssetType.MetaFont, (ushort)new MetaFontId(false, FontColor.White)), MockUniformFont.Font)
                 ;
 
             var config = GameConfig.LoadLiteral(@"{ ""UI"": { ""ButtonDoubleClickIntervalSeconds"": 0.35 } }");
             _exchange
                 .Register(config)
                 .Attach(locator)
+                .Attach(modApplier)
                 .Attach(new AssetManager())
                 .Attach(new SpriteManager())
                 .Attach(new WindowManager { Window = new MockWindow(1920, 1080) })

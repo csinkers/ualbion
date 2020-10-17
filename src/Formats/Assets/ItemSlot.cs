@@ -3,7 +3,7 @@ using System.Numerics;
 using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets
 {
@@ -56,20 +56,20 @@ namespace UAlbion.Formats.Assets
             }
         }
 
-        public ItemId? ItemId =>
+        public ItemId ItemId =>
             Item switch
             {
-                Gold _ => AssetIds.ItemId.Gold,
-                Rations _ => AssetIds.ItemId.Rations,
+                Gold _ => AssetId.Gold,
+                Rations _ => AssetId.Rations,
                 ItemData item => item.Id,
                 ItemProxy item => item.Id,
-                _ => null
+                _ => AssetId.None
             };
 
         public ItemSlot DeepClone() => (ItemSlot)MemberwiseClone();
         public override string ToString() => Amount == 0 ? "Empty" : $"{Amount}x{ItemId} {Flags}";
 
-        public static ItemSlot Serdes(InventorySlotId id, ItemSlot slot, ISerializer s)  // 6 per slot
+        public static ItemSlot Serdes(InventorySlotId id, ItemSlot slot, AssetMapping mapping, ISerializer s)  // 6 per slot
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             slot ??= new ItemSlot(id);
@@ -81,10 +81,10 @@ namespace UAlbion.Formats.Assets
             slot.Enchantment = s.UInt8(nameof(slot.Enchantment), slot.Enchantment);
             slot.Flags = s.EnumU8(nameof(slot.Flags), slot.Flags);
 
-            ItemId? itemId = (slot.Item as IItem)?.Id;
-            itemId = s.TransformEnumU16(nameof(ItemId), itemId, ZeroToNullConverter<ItemId>.Instance);
-            if(slot.Item == null && itemId != null)
-                slot.Item = new ItemProxy(itemId.Value);
+            ItemId itemId = slot.ItemId;
+            itemId = ItemId.SerdesU16(nameof(ItemId), itemId, AssetType.Item, mapping, s);
+            if(slot.Item == null && !itemId.IsNone)
+                slot.Item = new ItemProxy(itemId);
             return slot;
         }
 
@@ -130,7 +130,7 @@ namespace UAlbion.Formats.Assets
                     Charges = other.Charges;
                     Enchantment = other.Enchantment;
                     Flags = other.Flags;
-                    ushort max = other.ItemId == AssetIds.ItemId.Gold || other.ItemId == AssetIds.ItemId.Rations 
+                    ushort max = other.ItemId == AssetId.Gold || other.ItemId == AssetId.Rations 
                         ? (ushort)short.MaxValue 
                         : MaxItemCount;
 

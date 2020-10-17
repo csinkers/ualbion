@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using SerdesNet;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {
     [AssetLoader(FileFormat.SpellData)]
     public class SpellLoader : IAssetLoader<IList<SpellData>>
     {
-        public IList<SpellData> Serdes(IList<SpellData> existing, ISerializer s, AssetKey key, AssetInfo config)
+        public IList<SpellData> Serdes(IList<SpellData> existing, AssetMapping mapping, ISerializer s, AssetId id, AssetInfo config)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             existing ??= new SpellData[SpellData.SpellClasses * SpellData.MaxSpellsPerClass];
@@ -19,7 +18,7 @@ namespace UAlbion.Formats.Parsers
             return existing;
         }
 
-        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config) 
-            => Serdes(null, new AlbionReader(br, streamLength), key, config);
+        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
+            => Serdes(null, mapping, new AlbionReader(br, streamLength), id, config);
     }
 }

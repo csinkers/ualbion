@@ -1,14 +1,11 @@
 ﻿using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Events
 {
     [Event("prompt:numeric")]
     public class NumericPromptEvent : IAsyncEvent<int>
     {
-        public NumericPromptEvent(AssetType stringType, ushort stringId, int stringSubId, int min, int max)
-            : this(new StringId(stringType, stringId, stringSubId), min, max) { }
-
         public NumericPromptEvent(StringId text, int min, int max)
         {
             Text = text;
@@ -16,11 +13,7 @@ namespace UAlbion.Game.Events
             Max = max;
         }
 
-        public StringId Text { get; }
-
-        [EventPart("type")] public AssetType StringType => Text.Type;
-        [EventPart("id")] public ushort StringId => Text.Id;
-        [EventPart("sub_id")] public int StringSubId => Text.SubId;
+        [EventPart("id")] public StringId Text { get; }
         [EventPart("min")] public int Min { get; }
         [EventPart("max")] public int Max { get; }
     }

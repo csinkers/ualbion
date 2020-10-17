@@ -1,7 +1,8 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -10,10 +11,10 @@ namespace UAlbion.Formats.MapEvents
     {
         public SimpleChestEvent(ItemId item, ushort amount)
         {
-            ChestType = item switch 
+            ChestType = item.Type switch 
                 {
-                    ItemId.Gold => SimpleChestItemType.Gold,
-                    ItemId.Rations => SimpleChestItemType.Rations,
+                    AssetType.Gold => SimpleChestItemType.Gold,
+                    AssetType.Rations => SimpleChestItemType.Rations,
                     _ => SimpleChestItemType.Item
                 };
             ItemId = item;
@@ -22,14 +23,14 @@ namespace UAlbion.Formats.MapEvents
 
         SimpleChestEvent() { }
 
-        public static SimpleChestEvent Serdes(SimpleChestEvent e, ISerializer s)
+        public static SimpleChestEvent Serdes(SimpleChestEvent e, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new SimpleChestEvent();
             e.ChestType = s.EnumU8(nameof(ChestType), e.ChestType);
             uint padding = s.UInt32(nameof(padding), 0);
             ApiUtil.Assert(padding == 0);
-            e.ItemId = (ItemId)StoreIncrementedConverter.Serdes(nameof(e.ItemId), (ushort)e.ItemId, s.UInt16);
+            e.ItemId = ItemId.SerdesU16(nameof(e.ItemId), e.ItemId, AssetType.Item, mapping, s);
             e.Amount = s.UInt16(nameof(Amount), e.Amount);
             return e;
         }

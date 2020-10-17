@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using UAlbion.Config;
 using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 
 namespace DumpSave
@@ -59,9 +60,9 @@ namespace DumpSave
             Console.WriteLine("NPCs:");
             foreach (var e in save.Npcs)
             {
-                if (!e.Id.HasValue)
+                if (e.Id.IsNone)
                     continue;
-                Console.WriteLine($"{e.Id} O:{e.ObjectNumber}:{(LargeNpcId)e.ObjectNumber} ({e.X1}, {e.Y1}) ({e.X2}, {e.Y2}) ({e.X3}, {e.Y3}) ({e.X4}, {e.Y4})");
+                Console.WriteLine($"{e.Id} O:{e.SpriteOrGroup} ({e.X1}, {e.Y1}) ({e.X2}, {e.Y2}) ({e.X3}, {e.Y3}) ({e.X4}, {e.Y4})");
                 ColorPrint(0x4, e.Unk4);
                 ColorPrint(0x6, e.Unk6);
                 ColorPrint(0x8, e.Unk8);
@@ -139,11 +140,11 @@ namespace DumpSave
             }
         }
 
-        static bool VerifyRoundTrip(Stream fileStream, SavedGame save)
+        static bool VerifyRoundTrip(Stream fileStream, SavedGame save, AssetMapping mapping)
         {
             using var ms = new MemoryStream((int)fileStream.Length);
             using var bw = new BinaryWriter(ms, Encoding.GetEncoding(850));
-            SavedGame.Serdes(save, new AlbionWriter(bw));
+            SavedGame.Serdes(save, mapping, new AlbionWriter(bw));
 
             if (ms.Position != fileStream.Length)
             {
@@ -182,9 +183,10 @@ namespace DumpSave
             var filename = args[0];
             var stream = File.OpenRead(filename);
             using var br = new BinaryReader(stream, Encoding.GetEncoding(850));
-            var save = SavedGame.Serdes(null, new AlbionReader(br, stream.Length));
+            var mapping = new AssetMapping(); // TODO
+            var save = SavedGame.Serdes(null, mapping, new AlbionReader(br, stream.Length));
 
-            if (!VerifyRoundTrip(stream, save))
+            if (!VerifyRoundTrip(stream, save, mapping))
                 return;
 
             foreach (var command in commands)

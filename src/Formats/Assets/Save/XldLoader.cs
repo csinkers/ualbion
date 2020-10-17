@@ -73,7 +73,7 @@ namespace UAlbion.Formats.Assets.Save
             }
         }
 
-        public static void Serdes(XldCategory category, ushort xldNumber, ISerializer s, Action<int, int, ISerializer> func, IList<int> populatedIds)
+        public static void Serdes<TContext>(XldCategory category, ushort xldNumber, TContext context, ISerializer s, Action<int, int, TContext, ISerializer> func, IList<int> populatedIds)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (s.Mode == SerializerMode.Reading)
@@ -90,7 +90,7 @@ namespace UAlbion.Formats.Assets.Save
                 {
                     if (lengths[i] == 0)
                         continue;
-                    func(i + xldNumber * 100, lengths[i], s);
+                    func(i + xldNumber * 100, lengths[i], context, s);
                     offset += lengths[i];
                     ApiUtil.Assert(offset == s.Offset);
                 }
@@ -112,7 +112,7 @@ namespace UAlbion.Formats.Assets.Save
                         lengths[i] = WithSerializer(
                             s.Mode,
                             buffers[i],
-                            memorySerializer => func(i + xldNumber * 100, 0, memorySerializer), s, ref fakeOffset);
+                            memorySerializer => func(i + xldNumber * 100, 0, context, memorySerializer), s, ref fakeOffset);
 
                     HeaderSerdes(lengths, s);
                     ApiUtil.Assert(initialFakeOffset == s.Offset);

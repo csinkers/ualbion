@@ -2,7 +2,7 @@
 using ADLMidi.NET;
 using UAlbion.Api;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game
 {

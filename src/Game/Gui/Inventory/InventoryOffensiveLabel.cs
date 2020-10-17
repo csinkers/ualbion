@@ -1,5 +1,5 @@
 ﻿using UAlbion.Core.Events;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
@@ -11,10 +11,10 @@ namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryOffensiveLabel : UiElement
     {
-        readonly PartyCharacterId _activeCharacter;
+        readonly PartyMemberId _activeCharacter;
         int _version;
 
-        public InventoryOffensiveLabel(PartyCharacterId activeCharacter)
+        public InventoryOffensiveLabel(PartyMemberId activeCharacter)
         {
             On<InventoryChangedEvent>(e => _version++);
             On<BlurEvent>(e => Raise(new HoverTextEvent(null)));
@@ -33,7 +33,7 @@ namespace UAlbion.Game.Gui.Inventory
                     new FixedSize(27, 8,
                         new HorizontalStack(
                             new FixedSize(8, 8,
-                                new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiOffensiveValue)),
+                                new UiSpriteElement(Base.CoreSprite.UiOffensiveValue)),
                             new Spacing(1, 0),
                             new UiText(new LiteralText(":")),
                             new UiText(source)
@@ -51,7 +51,7 @@ namespace UAlbion.Game.Gui.Inventory
             var player = Resolve<IParty>()[_activeCharacter];
             var tf = Resolve<ITextFormatter>();
             var damage = player?.Apparent.DisplayDamage ?? 0;
-            var text = tf.Format(SystemTextId.Inv_DamageN, damage); // Damage : %d
+            var text = tf.Format(Base.SystemText.Inv_DamageN, damage); // Damage : %d
             Raise(new HoverTextEvent(text));
             e.Propagating = false;
         }

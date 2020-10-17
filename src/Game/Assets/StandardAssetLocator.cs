@@ -1,14 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using UAlbion.Api;
-using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Config;
+using UAlbion.Config;
 
 namespace UAlbion.Game.Assets
 {
+    public sealed class StandardAssetLocator : IAssetLocator, IDisposable
+    {
+        readonly IAssetLoaderRegistry _assetLoaderRegistry;
+
+        public StandardAssetLocator(IAssetLoaderRegistry assetLoaderRegistry)
+        {
+            _assetLoaderRegistry = assetLoaderRegistry ?? throw new ArgumentNullException(nameof(assetLoaderRegistry));
+        }
+        public object LoadAsset(AssetId key, SerializationContext context, Func<AssetId, SerializationContext, object> loaderFunc)
+        {
+            throw new NotImplementedException();
+        }
+
+        public AssetInfo GetAssetInfo(AssetId key, Func<AssetId, SerializationContext, object> loaderFunc)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<AssetType> SupportedTypes { get; }
+        public void Dispose()
+        {
+        }
+    }
+
+#if false
     public sealed class StandardAssetLocator : IAssetLocator, IDisposable
     {
         // ReSharper disable StringLiteralTypo
@@ -78,7 +98,6 @@ namespace UAlbion.Game.Assets
             { AssetType.SpellData,          (AssetLocation.BaseRaw,   "SPELLDAT.DAT") }, // Spell definitions & statistics
         };
         // ReSharper restore StringLiteralTypo
-
         class AssetPaths
         {
             public string OverridePath { get; set; }
@@ -170,20 +189,18 @@ namespace UAlbion.Game.Assets
             }
         }
 
-        object ReadFromFile(string path, Func<string, BinaryReader, long, object> readFunc)
+        object ReadFromFile(string path, AssetInfo assetInfo, Func<string, BinaryReader, long, AssetInfo, object> readFunc)
         {
             using var stream = File.OpenRead(path);
             using var br = new BinaryReader(stream);
-            return readFunc(path, br, stream.Length);
+            return readFunc(path, br, stream.Length, assetInfo);
         }
 
-        object ReadFromXld(AssetPaths paths, AssetKey key, Func<string, BinaryReader, long, object> readFunc)
+        object ReadFromXld(AssetPaths paths, AssetId key, AssetInfo assetInfo, Func<string, BinaryReader, long, AssetInfo, object> readFunc)
         {
             lock (_syncRoot)
             {
-                int objectIndex = key.Id % 100;
-
-                var xldKey = new XldKey(key);
+                var xldKey = new XldKey(key, language);
                 if (!_xlds.TryGetValue(xldKey, out var xld) && File.Exists(paths.XldPath))
                 {
                     xld = new XldFile(paths.XldPath);
@@ -193,17 +210,17 @@ namespace UAlbion.Game.Assets
                 if (xld == null)
                     throw new AssetNotFoundException($"XLD not found for object: {key.Type}:{key.Id} in {paths.XldPath}", key.Type, key.Id);
 
-                using var br = xld.GetReaderForObject(objectIndex, out var length);
-                return length > 0 ? readFunc(paths.XldPath, br, length) : null;
+                using var br = xld.GetReaderForObject(assetInfo.ContainerIndex, out var length);
+                return length > 0 ? readFunc(paths.XldPath, br, length, assetInfo) : null;
             }
         }
 
         public IEnumerable<AssetType> SupportedTypes => _assetFiles.Keys;
-        public object LoadAsset(AssetKey key, string name, Func<AssetKey, object> loaderFunc)
+        public object LoadAsset(AssetId key, SerializationContext context, Func<AssetId, SerializationContext, object> loaderFunc)
         {
             if (loaderFunc == null) throw new ArgumentNullException(nameof(loaderFunc));
-            var allAssetsConfig = (IAssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig));
-            var generalConfig = (IGeneralConfig)loaderFunc(new AssetKey(AssetType.GeneralConfig));
+            var allAssetsConfig = (IAssetConfig)loaderFunc(new AssetId(AssetType.AssetConfig), context);
+            var generalConfig = (IGeneralConfig)loaderFunc(new AssetId(AssetType.GeneralConfig), context);
 
             int xldIndex = key.Id / 100;
             ApiUtil.Assert(xldIndex >= 0);
@@ -211,28 +228,28 @@ namespace UAlbion.Game.Assets
             int objectIndex = key.Id % 100;
 
             var (location, baseName) = _assetFiles[key.Type];
-            var paths = GetAssetPaths(generalConfig, location, key.Language, baseName, xldIndex, objectIndex);
-            var assetConfig = allAssetsConfig.GetAsset(paths.XldNameInConfig, objectIndex, key.Id);
+            var paths = GetAssetPaths(generalConfig, location, language, baseName, xldIndex, objectIndex);
+            AssetInfo assetConfig = allAssetsConfig.GetAsset(paths.XldNameInConfig, objectIndex, key.Id);
 
-            object Reader(string path, BinaryReader br, long length)
+            object Reader(string path, BinaryReader br, long length, AssetInfo assetInfo)
             {
-                var loader = _assetLoaderRegistry.GetLoader(assetConfig.Format);
-                var asset = loader.Load(br, (int)length, key, assetConfig);
+                var loader = _assetLoaderRegistry.GetLoader(assetInfo.Format);
+                var asset = loader.Load(br, (int)length, key, assetInfo);
                 if (asset == null) throw new AssetNotFoundException($"Object {key.Type}:{key.Id} could not be loaded from file {path}", key.Type, key.Id);
-                GameTrace.Log.AssetLoaded(key, name, path);
+                GameTrace.Log.AssetLoaded(key, language, path);
                 return asset;
             }
 
             return paths.OverridePath != null || IsLocationRaw(location)
-                ? ReadFromFile(paths.OverridePath ?? paths.XldPath, Reader)
-                : ReadFromXld(paths, key, Reader);
+                ? ReadFromFile(paths.OverridePath ?? paths.XldPath, assetConfig, Reader)
+                : ReadFromXld(paths, key, assetConfig, Reader);
         }
 
-        public AssetInfo GetAssetInfo(AssetKey key, Func<AssetKey, object> loaderFunc)
+        public AssetInfo GetAssetInfo(AssetId key, Func<AssetId, SerializationContext, object> loaderFunc)
         {
             if (loaderFunc == null) throw new ArgumentNullException(nameof(loaderFunc));
-            var allAssetsConfig = (IAssetConfig)loaderFunc(new AssetKey(AssetType.AssetConfig));
-            var generalConfig = (IGeneralConfig)loaderFunc(new AssetKey(AssetType.GeneralConfig));
+            var allAssetsConfig = (IAssetConfig)loaderFunc(new AssetId(AssetType.AssetConfig));
+            var generalConfig = (IGeneralConfig)loaderFunc(new AssetId(AssetType.GeneralConfig));
 
             int xldIndex = key.Id / 100;
             ApiUtil.Assert(xldIndex >= 0);
@@ -250,4 +267,5 @@ namespace UAlbion.Game.Assets
                 xld?.Dispose();
         }
     }
+#endif
 }

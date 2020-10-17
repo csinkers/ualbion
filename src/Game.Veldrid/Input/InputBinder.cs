@@ -4,7 +4,7 @@ using System.Linq;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid.Events;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 using UAlbion.Game.Input;
@@ -18,7 +18,7 @@ namespace UAlbion.Game.Veldrid.Input
 
         readonly BindingSet _bindings = new BindingSet();
         readonly HashSet<Key> _pressedKeys = new HashSet<Key>();
-        MapDataId _mapId = (MapDataId)100;
+        MapId _mapId = Base.Map.TestMapIskai;
 
         public bool IsAltPressed => _pressedKeys.Contains(Key.AltLeft) || _pressedKeys.Contains(Key.AltRight);
         public bool IsCtrlPressed  => _pressedKeys.Contains(Key.ControlLeft) || _pressedKeys.Contains(Key.ControlRight);
@@ -123,13 +123,13 @@ namespace UAlbion.Game.Veldrid.Input
 
                 if (action == "!loadprevmap")
                 {
-                    _mapId--;
+                    _mapId = new MapId((uint)_mapId - 1);
                     Raise(new LoadMapEvent(_mapId));
                     continue;
                 }
                 if (action == "!loadnextmap")
                 {
-                    _mapId++;
+                    _mapId = new MapId((uint)_mapId + 1);
                     Raise(new LoadMapEvent(_mapId));
                     continue;
                 }

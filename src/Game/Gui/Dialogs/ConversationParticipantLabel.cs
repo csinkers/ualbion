@@ -1,5 +1,4 @@
 ﻿using System;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
@@ -14,14 +13,13 @@ namespace UAlbion.Game.Gui.Dialogs
             : base(isRight ? DialogPositioning.TopRight : DialogPositioning.TopLeft)
         {
             if (sheet == null) throw new ArgumentNullException(nameof(sheet));
-            var portraitId = sheet.PortraitId ?? SmallPortraitId.GibtEsNicht;
             var name = GetName(sheet, false);
 
             var fixedPos = new FixedPositionStack();
             fixedPos.Add(
                 new RepeatedBackground(
                     new ButtonFrame(
-                        new UiSpriteElement<SmallPortraitId>(portraitId))),
+                        new UiSpriteElement(sheet.PortraitId))),
                 isRight ? 315 : 9, 4);
 
             fixedPos.Add(

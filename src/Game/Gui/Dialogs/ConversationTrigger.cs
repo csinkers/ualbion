@@ -1,5 +1,5 @@
 ﻿using System;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 #pragma warning disable CA1034 // Nested types should not be visible
 namespace UAlbion.Game.Gui.Dialogs

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
@@ -19,7 +18,7 @@ namespace UAlbion.Game.Entities.Map2D
         readonly MapChangeCollection _tempChanges;
         readonly MapChangeCollection _permChanges;
 
-        public MapDataId Id => _mapData.Id;
+        public MapId Id => _mapData.Id;
 
         public LogicalMap2D(
             IAssetManager assetManager,
@@ -32,7 +31,7 @@ namespace UAlbion.Game.Entities.Map2D
             _tempChanges = tempChanges ?? throw new ArgumentNullException(nameof(tempChanges));
             _permChanges = permChanges ?? throw new ArgumentNullException(nameof(permChanges));
             _tileData = assetManager.LoadTileData(_mapData.TilesetId);
-            _blockList = assetManager.LoadBlockList((BlockListId)_mapData.TilesetId); // Note: Assuming a 1:1 correspondence between blocklist and tileset ids.
+            _blockList = assetManager.LoadBlockList(_mapData.TilesetId.ToBlockList());
             UseSmallSprites = _tileData.UseSmallGraphics;
 
             // Clear out temp changes for other maps
@@ -82,7 +81,7 @@ namespace UAlbion.Game.Entities.Map2D
         public int Height => _mapData.Height;
         public bool UseSmallSprites { get; }
         public PaletteId PaletteId => _mapData.PaletteId;
-        public IconGraphicsId TilesetId => (IconGraphicsId)_mapData.TilesetId;
+        public TilesetGraphicsId TilesetId => _mapData.TilesetId.ToTilesetGraphics();
         public IEnumerable<MapNpc> Npcs => _mapData.Npcs.OrderBy(x => x.Key).Select(x => x.Value);
         public Vector2 TileSize { get; set; } // TODO: Tidy up how this gets initialised
 

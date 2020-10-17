@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Config;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Parsers
 {
@@ -11,7 +10,7 @@ namespace UAlbion.Formats.Parsers
     public class ItemNameLoader : IAssetLoader
     {
         const int StringSize = 20;
-        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
         {
             if (br == null) throw new ArgumentNullException(nameof(br));
             ApiUtil.Assert(streamLength % StringSize == 0);

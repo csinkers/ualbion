@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Linq;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
@@ -29,10 +28,10 @@ namespace UAlbion.Game.Gui.Inventory
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
 
-            var heading = new Header(item.Id);
-            var itemPic = new UiSpriteElement<ItemSpriteId>(0)
+            var heading = new Header(item.Id.ToItemName());
+            var itemPic = new UiSpriteElement(item.Icon)
             {
-                SubId = (int)item.Icon,
+                SubId = item.IconSubId,
                 Flags = SpriteFlags.GradientPixels
             };
 
@@ -43,14 +42,14 @@ namespace UAlbion.Game.Gui.Inventory
 
             var attribStack = new HorizontalStack(
                 new VerticalStack(
-                    new UiTextBuilder(SystemTextId.Examine1_Type).NoWrap(),
-                    new UiTextBuilder(SystemTextId.Examine1_Weight).NoWrap(),
-                    new UiTextBuilder(SystemTextId.Examine1_Damage).NoWrap(),
-                    new UiTextBuilder(SystemTextId.Examine1_Protection).NoWrap()
+                    new UiTextBuilder(Base.SystemText.Examine1_Type).NoWrap(),
+                    new UiTextBuilder(Base.SystemText.Examine1_Weight).NoWrap(),
+                    new UiTextBuilder(Base.SystemText.Examine1_Damage).NoWrap(),
+                    new UiTextBuilder(Base.SystemText.Examine1_Protection).NoWrap()
                 ),
                 new Spacing(2,0),
                 new VerticalStack(
-                    new UiTextBuilder(item.TypeId.ToId()).NoWrap(),
+                    new UiTextBuilder(Describe.DescribeItemType(item.TypeId)).NoWrap(),
                     new SimpleText($"{item.Weight} g").NoWrap(), // i18n Literal String
                     new SimpleText(item.Damage.ToString(CultureInfo.InvariantCulture)).NoWrap(), // i18n
                     new SimpleText(item.Protection.ToString(CultureInfo.InvariantCulture)).NoWrap() // i18n
@@ -61,7 +60,7 @@ namespace UAlbion.Game.Gui.Inventory
                 Enum.GetValues(typeof(PlayerClass))
                     .Cast<PlayerClass>()
                     .Where(x => item.Class.IsAllowed(x))
-                    .Select(x => (IUiElement)new UiTextBuilder(x.ToId()).NoWrap());
+                    .Select(x => (IUiElement)new UiTextBuilder(Describe.DescribePlayerClass(x)).NoWrap());
 
             var classStack = new HorizontalStack(
                 new VerticalStack(classElements.Take(5).ToArray()),
@@ -80,13 +79,13 @@ namespace UAlbion.Game.Gui.Inventory
                         new Spacing(0, 2),
                         new Divider(CommonColor.Yellow4),
                         new Spacing(0, 2),
-                        new UiTextBuilder(SystemTextId.Misc_CanBeUsedBy),
+                        new UiTextBuilder((TextId)Base.SystemText.Misc_CanBeUsedBy),
                         classStack
                     )
                 ),
                 new Spacing(0, 2),
                 new FixedSize(52, 13,
-                    new Button(SystemTextId.MsgBox_OK) { DoubleFrame = true }.OnClick(Close))
+                    new Button(Base.SystemText.MsgBox_OK) { DoubleFrame = true }.OnClick(Close))
             );
 
             AttachChild(new DialogFrame(new Padding(stack, 6)) { Background = DialogFrameBackgroundStyle.MainMenuPattern });

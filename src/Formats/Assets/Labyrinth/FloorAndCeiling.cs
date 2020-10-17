@@ -1,6 +1,6 @@
 ﻿using System;
 using SerdesNet;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets.Labyrinth
 {
@@ -25,11 +25,11 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public byte Unk3 { get; set; }
         public byte AnimationCount { get; set; }
         public byte Unk5 { get; set; }
-        public DungeonFloorId? TextureNumber { get; set; } // ushort
+        public SpriteId SpriteId { get; set; } // ushort
         public ushort Unk8 { get; set; }
-        public override string ToString() => $"FC.{TextureNumber}:{AnimationCount} {Properties}";
+        public override string ToString() => $"FC.{SpriteId}:{AnimationCount} {Properties}";
 
-        public static FloorAndCeiling Serdes(int _, FloorAndCeiling existing, ISerializer s)
+        public static FloorAndCeiling Serdes(int _, FloorAndCeiling existing, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             var fc = existing ?? new FloorAndCeiling();
@@ -39,7 +39,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
             fc.Unk3 = s.UInt8(nameof(fc.Unk3), fc.Unk3);
             fc.AnimationCount = s.UInt8(nameof(fc.AnimationCount), fc.AnimationCount);
             fc.Unk5 = s.UInt8(nameof(fc.Unk5), fc.Unk5);
-            fc.TextureNumber = s.TransformEnumU16(nameof(TextureNumber), fc.TextureNumber, TweakedConverter<DungeonFloorId>.Instance);
+            fc.SpriteId = SpriteId.SerdesU16(nameof(SpriteId), fc.SpriteId, AssetType.Floor, mapping, s);
             fc.Unk8 = s.UInt16(nameof(fc.Unk8), fc.Unk8);
             return fc;
         }

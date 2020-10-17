@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Numerics;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.State
 {
     public interface IPlayer
     {
-        PartyCharacterId Id { get; }
+        PartyMemberId Id { get; }
         int CombatPosition { get; }
         IEffectiveCharacterSheet Effective { get; }
         IEffectiveCharacterSheet Apparent { get; }

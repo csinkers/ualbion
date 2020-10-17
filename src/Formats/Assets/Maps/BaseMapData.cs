@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using SerdesNet;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Maps
 {
     public abstract class BaseMapData : IMapData
     {
-        public MapDataId Id { get; }
+        public MapId Id { get; }
         public abstract MapType MapType { get; }
         public byte Width { get; protected set; }
         public byte Height { get; protected set; }
-        public SongId? SongId { get; protected set; }
+        public SongId SongId { get; protected set; }
         public PaletteId PaletteId { get; protected set; }
-        public CombatBackgroundId CombatBackgroundId { get; protected set; }
+        public SpriteId CombatBackgroundId { get; protected set; }
 
         public IDictionary<int, MapNpc> Npcs { get; } = new Dictionary<int, MapNpc>();
 
@@ -30,27 +30,27 @@ namespace UAlbion.Formats.Assets.Maps
         [JsonIgnore] public IList<object>[] EventReferences { get; private set; }
 #endif
 
-        protected BaseMapData(MapDataId id) { Id = id; }
+        protected BaseMapData(MapId id) { Id = id; }
 
         protected void SerdesZones(ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             int zoneCount = s.UInt16("ZoneCount", (ushort)Zones.Count(x => x.Global));
             byte y = 0xff;
-            s.List(nameof(Zones), Zones, zoneCount, (i, x, serializer) => MapEventZone.Serdes(x, serializer, in y));
+            s.List(nameof(Zones), Zones, y, zoneCount, (i, x, y2, serializer) => MapEventZone.Serdes(x, serializer, y2));
             s.Check();
 
             int zoneOffset = zoneCount;
             for (y = 0; y < Height; y++)
             {
                 zoneCount = s.UInt16("RowZones", (ushort)Zones.Count(x => x.Y == y && !x.Global));
-                s.List(nameof(Zones), Zones, zoneCount, zoneOffset,
-                    (i, x, s2) => MapEventZone.Serdes(x, s2, in y));
+                s.List(nameof(Zones), Zones, y, zoneCount, zoneOffset,
+                    (i, x, y2, s2) => MapEventZone.Serdes(x, s2, y2));
                 zoneOffset += zoneCount;
             }
         }
 
-        protected void SerdesEvents(ISerializer s)
+        protected void SerdesEvents(AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             ushort eventCount = s.UInt16("EventCount", (ushort)Events.Count);
@@ -60,7 +60,7 @@ namespace UAlbion.Formats.Assets.Maps
                     Events[i].Id = i;
 
             s.List(nameof(Events), Events, eventCount, (i, x, serializer) 
-                => EventNode.Serdes((ushort)i, x, serializer, false, (ushort)Id));
+                => EventNode.Serdes((ushort)i, x, serializer, Id.ToMapText(), mapping));
 
             foreach (var node in Events)
                 node.Unswizzle(Events);
@@ -166,25 +166,25 @@ namespace UAlbion.Formats.Assets.Maps
         {
             foreach (var npc in Npcs.OrderBy(x => x.Key).Select(x => x.Value))
             {
-                if (npc.Id.HasValue)
+                if (npc.Id.Type != AssetType.None)
                     npc.LoadWaypoints(s);
                 else 
                     npc.Waypoints = new NpcWaypoint[1];
             }
         }
 
-        public void AttachEventSets(Func<NpcCharacterId, ICharacterSheet> characterSheetLoader, Func<EventSetId, EventSet> eventSetLoader)
+        public void AttachEventSets(Func<NpcId, ICharacterSheet> characterSheetLoader, Func<EventSetId, EventSet> eventSetLoader)
         {
             // Wire up event sets for NPCs that don't have map-specific events.
             foreach (var npc in Npcs.Values)
             {
-                if (npc.Id == null)
+                if (npc.Id.Type == AssetType.None)
                     continue;
 
                 if (npc.Chain == null)
                 {
                     var chain = new EventChain(-1);
-                    chain.Events.Add(new EventNode(0, new StartDialogueEvent((NpcCharacterId)npc.Id.Value)));
+                    chain.Events.Add(new EventNode(0, new StartDialogueEvent(npc.Id)));
                     npc.Chain = chain;
                 }
             }

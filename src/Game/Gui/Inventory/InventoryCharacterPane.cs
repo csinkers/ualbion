@@ -1,6 +1,6 @@
 ﻿using System;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui.Inventory
@@ -13,7 +13,7 @@ namespace UAlbion.Game.Gui.Inventory
         readonly Button _statsButton;
         readonly Button _miscButton;
 
-        public InventoryCharacterPane(PartyCharacterId activeCharacter, Func<InventoryPage> getPage, Action<InventoryPage> setPage)
+        public InventoryCharacterPane(PartyMemberId activeCharacter, Func<InventoryPage> getPage, Action<InventoryPage> setPage)
         {
             if (setPage == null) throw new ArgumentNullException(nameof(setPage));
             _getPage = getPage ?? throw new ArgumentNullException(nameof(getPage));

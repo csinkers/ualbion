@@ -1,7 +1,6 @@
 ﻿using System;
 using UAlbion.Api;
 using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.State.Player
@@ -24,7 +23,7 @@ namespace UAlbion.Game.State.Player
             Combat = new InterpolatedCombat(() => _a().Combat, () => _b().Combat, _getLerp);
         }
 
-        public AssetId Id => _b().Id;
+        public CharacterId Id => _b().Id;
         public string GetName(GameLanguage language) => _b().GetName(language);
         public CharacterType Type => _b().Type;
         public Gender Gender => _b().Gender;
@@ -32,10 +31,10 @@ namespace UAlbion.Game.State.Player
         public PlayerClass PlayerClass => _b().PlayerClass;
         public ushort Age => _b().Age;
         public byte Level => _b().Level;
-        public AssetId? SpriteId => _b().SpriteId;
-        public SmallPortraitId? PortraitId => _b().PortraitId;
-        public EventSetId? EventSetId => _b().EventSetId;
-        public EventSetId? WordSetId => _b().WordSetId;
+        public SpriteId SpriteId => _b().SpriteId;
+        public SpriteId PortraitId => _b().PortraitId;
+        public EventSetId EventSetId => _b().EventSetId;
+        public EventSetId WordSetId => _b().WordSetId;
         public PlayerLanguages Languages => _b().Languages;
         public IMagicSkills Magic { get; }
         public IInventory Inventory { get; }

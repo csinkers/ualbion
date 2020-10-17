@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
@@ -23,7 +22,7 @@ namespace UAlbion.Game.Gui.Inventory
             On<PickLockEvent>(_ => PickLock());
             _lockEvent = lockEvent;
             bool isChest = lockEvent is ChestEvent;
-            var background = new UiSpriteElement<PictureId>(isChest ? PictureId.ClosedChest : PictureId.WoodenDoor);
+            var background = new UiSpriteElement(isChest ? Base.Picture.ClosedChest : Base.Picture.WoodenDoor);
             var backgroundStack = new FixedPositionStack();
             backgroundStack.Add(background, 0, 0);
             AttachChild(backgroundStack);
@@ -31,14 +30,14 @@ namespace UAlbion.Game.Gui.Inventory
             var lockButton = 
                 new Button(
                     new Padding(
-                        new UiSpriteElement<CoreSpriteId>(CoreSpriteId.Lock),
+                        new UiSpriteElement(Base.CoreSprite.Lock),
                         4))
                 .OnHover(LockHovered)
                 .OnBlur(() =>
                 {
                     Raise(new HoverTextEvent(null));
                     if (Resolve<IInventoryManager>().ItemInHand.Item == null)
-                        Raise(new SetCursorEvent(CoreSpriteId.Cursor));
+                        Raise(new SetCursorEvent(Base.CoreSprite.Cursor));
                 })
                 .OnClick(LockClicked) // If holding key etc
                 .OnRightClick(LockRightClicked)
@@ -49,9 +48,9 @@ namespace UAlbion.Game.Gui.Inventory
         void LockHovered()
         {
             var tf = Resolve<ITextFormatter>();
-            Raise(new HoverTextEvent(tf.Format(SystemTextId.Lock_OpenTheLock)));
+            Raise(new HoverTextEvent(tf.Format(Base.SystemText.Lock_OpenTheLock)));
             if (Resolve<IInventoryManager>().ItemInHand.Item == null)
-                Raise(new SetCursorEvent(CoreSpriteId.CursorSelected));
+                Raise(new SetCursorEvent(Base.CoreSprite.CursorSelected));
         }
 
         void LockClicked()
@@ -63,21 +62,21 @@ namespace UAlbion.Game.Gui.Inventory
             var tf = Resolve<ITextFormatter>();
             if (hand.ItemId == _lockEvent.KeyItemId)
             {
-                Raise(new HoverTextEvent(tf.Format(SystemTextId.Lock_LeaderOpenedTheLock)));
+                Raise(new HoverTextEvent(tf.Format(Base.SystemText.Lock_LeaderOpenedTheLock)));
                 Raise(new InventoryReturnItemInHandEvent());
                 Raise(new LockOpenedEvent());
             }
-            else if (hand.ItemId == ItemId.Lockpick)
+            else if (hand.ItemId == Base.Item.Lockpick)
             {
                 if (_lockEvent.PickDifficulty == 100)
                 {
-                    Raise(new DescriptionTextEvent(tf.Format(SystemTextId.Lock_ThisLockCannotBePicked)));
+                    Raise(new DescriptionTextEvent(tf.Format(Base.SystemText.Lock_ThisLockCannotBePicked)));
                     Raise(new InventoryDestroyItemInHandEvent());
                 }
                 else
                 {
                     Raise(new InventoryDestroyItemInHandEvent());
-                    Raise(new DescriptionTextEvent(tf.Format(SystemTextId.Lock_LeaderPickedTheLockWithALockpick)));
+                    Raise(new DescriptionTextEvent(tf.Format(Base.SystemText.Lock_LeaderPickedTheLockWithALockpick)));
                     Raise(new LockOpenedEvent());
                 }
             }
@@ -85,8 +84,8 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 Raise(new DescriptionTextEvent(tf.Format(
                     item.TypeId == ItemType.Key 
-                    ? SystemTextId.Lock_ThisIsNotTheRightKey 
-                    : SystemTextId.Lock_YouCannotOpenTheLockWithThisItem)));
+                    ? Base.SystemText.Lock_ThisIsNotTheRightKey 
+                    : Base.SystemText.Lock_YouCannotOpenTheLockWithThisItem)));
             }
         }
 
@@ -110,7 +109,7 @@ namespace UAlbion.Game.Gui.Inventory
             var tf = Resolve<ITextFormatter>();
             if (_lockEvent.PickDifficulty >= 100)
             {
-                Raise(new DescriptionTextEvent(tf.Format(SystemTextId.Lock_ThisLockCannotBePicked)));
+                Raise(new DescriptionTextEvent(tf.Format(Base.SystemText.Lock_ThisLockCannotBePicked)));
                 return;
             }
 
@@ -120,12 +119,12 @@ namespace UAlbion.Game.Gui.Inventory
             {
                 if (x)
                 {
-                    Raise(new DescriptionTextEvent(tf.Format(SystemTextId.Lock_LeaderPickedTheLock)));
+                    Raise(new DescriptionTextEvent(tf.Format(Base.SystemText.Lock_LeaderPickedTheLock)));
                     Raise(new LockOpenedEvent());
                 }
                 else
                 {
-                    Raise(new DescriptionTextEvent(tf.Format(SystemTextId.Lock_LeaderCannotPickThisLock)));
+                    Raise(new DescriptionTextEvent(tf.Format(Base.SystemText.Lock_LeaderCannotPickThisLock)));
                 }
             });
         }
@@ -139,11 +138,11 @@ namespace UAlbion.Game.Gui.Inventory
             var cursorManager = Resolve<ICursorManager>();
 
             options.Add(new ContextMenuOption(
-                tf.Center().NoWrap().Format(SystemTextId.Lock_PickTheLock),
+                tf.Center().NoWrap().Format(Base.SystemText.Lock_PickTheLock),
                 new PickLockEvent(),
                 ContextMenuGroup.Actions));
 
-            var heading = tf.Center().NoWrap().Fat().Format(SystemTextId.Lock_Lock);
+            var heading = tf.Center().NoWrap().Fat().Format(Base.SystemText.Lock_Lock);
             var uiPosition = window.PixelToUi(cursorManager.Position);
             Raise(new ContextMenuEvent(uiPosition, heading, options));
         }

@@ -1,13 +1,14 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
     public class SetTickerEvent : ModifyEvent
     {
-        public static SetTickerEvent Serdes(SetTickerEvent e, ISerializer s)
+        public static SetTickerEvent Serdes(SetTickerEvent e, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -16,7 +17,7 @@ namespace UAlbion.Formats.MapEvents
             e.Amount = s.UInt8(nameof(Amount), e.Amount);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-            e.TickerId = s.EnumU16(nameof(TickerId), e.TickerId);
+            e.TickerId = TickerId.SerdesU16(nameof(TickerId), e.TickerId, mapping, s);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             ApiUtil.Assert(e.Unk4 == 0 || e.Unk4 == 1);
             ApiUtil.Assert(e.Unk5 == 0);

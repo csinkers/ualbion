@@ -1,13 +1,11 @@
 ﻿using System;
 using System.IO;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
-using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
-using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.State.Player;
 using UAlbion.Game.Text;
@@ -21,14 +19,13 @@ namespace UAlbion.Game.State
 
         public DateTime Time => SavedGame.Epoch + _game.ElapsedTime;
         public IParty Party => _party;
-        public ICharacterSheet GetNpc(NpcCharacterId id) => _game.NpcStats.TryGetValue(id, out var sheet) ? sheet : null;
-        public ICharacterSheet GetPartyMember(PartyCharacterId id) => _game.PartyMembers.TryGetValue(id, out var member) ? member : null;
+        public ICharacterSheet GetSheet(CharacterId id) => _game.Sheets.TryGetValue(id, out var sheet) ? sheet : null;
         public short GetTicker(TickerId id) => _game.Tickers.TryGetValue(id, out var value) ? value : (short)0;
         public bool GetSwitch(SwitchId id) => _game.Switches.TryGetValue(id, out var value) && value;
 
         public MapChangeCollection TemporaryMapChanges => _game.TemporaryMapChanges;
         public MapChangeCollection PermanentMapChanges => _game.PermanentMapChanges;
-        public MapDataId MapId => _game.MapId;
+        public MapId MapId => _game.MapId;
 
         public GameState()
         {
@@ -71,7 +68,7 @@ namespace UAlbion.Game.State
         {
             if (id.Type == InventoryType.Player)
             {
-                var player = _party[(PartyCharacterId)id.Id];
+                var player = _party[id.ToAssetId()];
                 if (player != null)
                     return player.Apparent.Inventory;
             }
@@ -85,10 +82,10 @@ namespace UAlbion.Game.State
             switch(id.Type)
             {
                 case InventoryType.Player:
-                    inventory = _game.PartyMembers.TryGetValue((PartyCharacterId)id.Id, out var member) ? member.Inventory : null;
+                    inventory = _game.Sheets.TryGetValue(id.ToAssetId(), out var member) ? member.Inventory : null;
                     break;
-                case InventoryType.Chest: _game.Chests.TryGetValue((ChestId)id.Id, out inventory); break;
-                case InventoryType.Merchant: _game.Merchants.TryGetValue((MerchantId)id.Id, out inventory); break;
+                case InventoryType.Chest: _game.Inventories.TryGetValue(id.ToAssetId(), out inventory); break;
+                case InventoryType.Merchant: _game.Inventories.TryGetValue(id.ToAssetId(), out inventory); break;
                 default:
                     throw new InvalidOperationException($"Unexpected inventory type requested: \"{id.Type}\"");
             }
@@ -99,7 +96,7 @@ namespace UAlbion.Game.State
         public int TickCount { get; private set; }
         public bool Loaded => _game != null;
 
-        void NewGame(MapDataId mapId, ushort x, ushort y)
+        void NewGame(MapId mapId, ushort x, ushort y)
         {
             var assets = Resolve<IAssetManager>();
             _game = new SavedGame
@@ -107,27 +104,29 @@ namespace UAlbion.Game.State
                 MapId = mapId,
                 PartyX = x,
                 PartyY = y,
-                ActiveMembers = { [0] = PartyCharacterId.Tom }
+                ActiveMembers = { [0] = Base.PartyMember.Tom }
             };
 
-            foreach (PartyCharacterId charId in Enum.GetValues(typeof(PartyCharacterId)))
-                _game.PartyMembers.Add(charId, assets.LoadPartyMember(charId));
+            foreach (var id in AssetMapping.Global.EnumeratAssetsOfType(AssetType.PartyMember))
+                _game.Sheets.Add(id, assets.LoadSheet(id));
 
-            foreach (NpcCharacterId charId in Enum.GetValues(typeof(NpcCharacterId)))
-                _game.NpcStats.Add(charId, assets.LoadNpc(charId));
+            foreach (var id in AssetMapping.Global.EnumeratAssetsOfType(AssetType.Npc))
+                _game.Sheets.Add(id, assets.LoadSheet(id));
 
-            foreach(ChestId id in Enum.GetValues(typeof(ChestId)))
-                _game.Chests.Add(id, assets.LoadChest(id));
+            foreach (var id in AssetMapping.Global.EnumeratAssetsOfType(AssetType.Chest))
+                _game.Inventories.Add(id, assets.LoadInventory(id));
 
-            foreach(MerchantId id in Enum.GetValues(typeof(MerchantId)))
-                _game.Merchants.Add(id, assets.LoadMerchant(id));
+            foreach (var id in AssetMapping.Global.EnumeratAssetsOfType(AssetType.Merchant))
+                _game.Inventories.Add(id, assets.LoadInventory(id));
 
             InitialiseGame();
         }
 
         void LoadGame(ushort id)
         {
-            _game = Resolve<IAssetManager>().LoadSavedGame(id);
+            var generalConfig = Resolve<IAssetManager>().LoadGeneralConfig();
+            var filename = Path.Combine(generalConfig.BasePath, generalConfig.SavePath, $"SAVE.{id:D3}");
+            _game = Resolve<IAssetManager>().LoadSavedGame(filename);
             InitialiseGame();
         }
 
@@ -141,25 +140,25 @@ namespace UAlbion.Game.State
             for (int i = 0; i < SavedGame.MaxPartySize; i++)
                 _game.ActiveMembers[i] = _party.StatusBarOrder.Count > i
                     ? _party.StatusBarOrder[i].Id
-                    : (PartyCharacterId?)null;
+                    : PartyMemberId.None;
 
-            var key = new AssetKey(AssetType.SavedGame, id);
+            // var key = new AssetId(AssetType.SavedGame, id);
             var generalConfig = Resolve<IAssetManager>().LoadGeneralConfig();
-            var filename = Path.Combine(generalConfig.BasePath, generalConfig.SavePath, $"SAVE.{key.Id:D3}");
+            var filename = Path.Combine(generalConfig.BasePath, generalConfig.SavePath, $"SAVE.{id:D3}");
 
             using var stream = File.Open(filename, FileMode.Create);
             using var bw = new BinaryWriter(stream);
-            var loader = Resolve<IAssetLoaderRegistry>().GetLoader<SavedGame>(FileFormat.SavedGame);
-            loader.Serdes(_game, new AlbionWriter(bw), key, null);
+            var mapping = new AssetMapping(); // TODO
+            SavedGame.Serdes(_game, mapping, new AlbionWriter(bw));
         }
 
         void InitialiseGame()
         {
             _party?.Remove();
-            _party = AttachChild(new Party(_game.PartyMembers, _game.ActiveMembers, GetWriteableInventory));
+            _party = AttachChild(new Party(_game.Sheets, _game.ActiveMembers, GetWriteableInventory));
             Raise(new LoadMapEvent(_game.MapId));
             Raise(new StartClockEvent());
-            Raise(new SetContextEvent(ContextType.Leader, AssetType.PartyMember, (int)_party.Leader));
+            Raise(new SetContextEvent(ContextType.Leader, _party.Leader));
             Raise(new PartyChangedEvent());
             Raise(new PartyJumpEvent(_game.PartyX, _game.PartyY));
             Raise(new CameraJumpEvent(_game.PartyX, _game.PartyY));

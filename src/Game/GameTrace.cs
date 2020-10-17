@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.Tracing;
+using UAlbion.Config;
 using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities.Map2D;
 
 namespace UAlbion.Game
@@ -11,9 +11,9 @@ namespace UAlbion.Game
         public static GameTrace Log { get; } = new GameTrace();
 
         [NonEvent]
-        public void AssetLoaded(AssetKey key, string name, string path)
+        public void AssetLoaded(AssetId key, GameLanguage language, string path)
         {
-            AssetLoaded(key.Type, key.Id, name, key.Language, path);
+            AssetLoaded(key.Type, key.Id, key.ToString(), language, path);
         }
 
         [Event(1)]

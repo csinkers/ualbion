@@ -1,14 +1,15 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
     [Event("teleport", "teleports the party to a specific location")]
     public class TeleportEvent : MapEvent
     {
-        public static TeleportEvent Serdes(TeleportEvent e, ISerializer s)
+        public static TeleportEvent Serdes(TeleportEvent e, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new TeleportEvent();
@@ -17,7 +18,7 @@ namespace UAlbion.Formats.MapEvents
             e.Direction = s.EnumU8(nameof(Direction), e.Direction);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-            e.MapId = s.EnumU16(nameof(MapId), e.MapId);
+            e.MapId = MapId.SerdesU8(nameof(MapId), e.MapId, mapping, s);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             ApiUtil.Assert(e.Unk4 == 0
                          || e.Unk4 == 1
@@ -31,14 +32,14 @@ namespace UAlbion.Formats.MapEvents
         }
 
         TeleportEvent() { }
-        public TeleportEvent(MapDataId mapId, byte x, byte y)
+        public TeleportEvent(MapId mapId, byte x, byte y)
         {
             MapId = mapId;
             X = x;
             Y = y;
         }
 
-        [EventPart("map")] public MapDataId MapId { get; private set; } // 0 = stay on current map
+        [EventPart("map")] public MapId MapId { get; private set; } // 0 = stay on current map
         [EventPart("x")] public byte X { get; private set; }
         [EventPart("y")] public byte Y { get; private set; }
         public TeleportDirection Direction { get; private set; }

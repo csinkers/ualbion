@@ -4,28 +4,26 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.Entities
 {
     public class GravityItemTransition : Component
     {
-        protected static readonly Random Random = new Random();
-        protected static readonly object SyncRoot = new object();
-    }
+        static readonly Random Random = new Random();
+        static readonly object SyncRoot = new object();
 
-    class GravityItemTransition<T> : GravityItemTransition where T : Enum
-    {
         readonly Action _continuation;
-        readonly Sprite<T> _sprite;
+        readonly Sprite _sprite;
         Vector2 _velocity;
 
-        public GravityItemTransition(T spriteId, int subImage, Vector2 fromPosition, Vector2 size, Action continuation)
+        public GravityItemTransition(SpriteId spriteId, int subImage, Vector2 fromPosition, Vector2 size, Action continuation)
         {
             _continuation = continuation;
             On<EngineUpdateEvent>(e => Update(e.DeltaSeconds));
 
-            _sprite = AttachChild(new Sprite<T>(
+            _sprite = AttachChild(new Sprite(
                 spriteId,
                 new Vector3(fromPosition, 0),
                 DrawLayer.InterfaceOverlay,

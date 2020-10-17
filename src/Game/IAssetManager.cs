@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
@@ -15,33 +14,32 @@ namespace UAlbion.Game
 {
     public interface IAssetManager : ITextureLoader
     {
-        AssetInfo GetAssetInfo(AssetKey key);
+        AssetInfo GetAssetInfo(AssetId id);
+        ITexture LoadTexture(SpriteId id);
         ITexture LoadFont(FontColor color, bool isBold);
         TilesetData LoadTileData(TilesetId id);
-        LabyrinthData LoadLabyrinthData(LabyrinthDataId id);
-        string LoadString(StringId id, GameLanguage language);
+        LabyrinthData LoadLabyrinthData(LabyrinthId id);
+        string LoadString(TextId id);
+        string LoadString(StringId id);
         ISample LoadSample(SampleId id);
-        ISample LoadWaveLib(SongId songId, int instrument);
+        ISample LoadWaveLib(WaveLibraryId waveLibraryId, int instrument);
         byte[] LoadSoundBanks();
-        FlicFile LoadVideo(VideoId id, GameLanguage language);
+        FlicFile LoadVideo(VideoId id);
         AlbionPalette LoadPalette(PaletteId id);
-        IMapData LoadMap(MapDataId id);
+        IMapData LoadMap(MapId id);
         ItemData LoadItem(ItemId id);
-        CharacterSheet LoadPartyMember(PartyCharacterId id);
-        CharacterSheet LoadNpc(NpcCharacterId id);
-        CharacterSheet LoadMonster(MonsterCharacterId id);
-        Inventory LoadChest(ChestId chestId);
-        Inventory LoadMerchant(MerchantId merchantId);
+        CharacterSheet LoadSheet(CharacterId id);
+        Inventory LoadInventory(AssetId id); // TODO: Use InventoryId?
         WordId? ParseWord(string word);
-        IList<Block> LoadBlockList(BlockListId blockListId);
+        IList<Block> LoadBlockList(BlockListId id);
         IGeneralConfig LoadGeneralConfig();
         IAssetConfig LoadAssetConfig();
-        CoreSpriteInfo LoadCoreSpriteInfo(CoreSpriteId id);
-        EventSet LoadEventSet(EventSetId eventSetId);
-        byte[] LoadSong(SongId songId);
-        IList<IEvent> LoadScript(ScriptId scriptId);
-        SpellData LoadSpell(SpellId spellId);
-        SavedGame LoadSavedGame(ushort id);
-        MonsterGroup LoadMonsterGroup(MonsterGroupId groupId);
+        CoreSpriteInfo LoadCoreSpriteInfo(SpriteId id);
+        EventSet LoadEventSet(EventSetId id);
+        byte[] LoadSong(SongId id);
+        IList<IEvent> LoadScript(ScriptId id);
+        SpellData LoadSpell(SpellId id);
+        SavedGame LoadSavedGame(string path);
+        MonsterGroup LoadMonsterGroup(MonsterGroupId id);
     }
 }

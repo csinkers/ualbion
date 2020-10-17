@@ -1,7 +1,8 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -11,7 +12,7 @@ namespace UAlbion.Formats.MapEvents
         DoScriptEvent() { }
         public DoScriptEvent(ScriptId scriptId) => ScriptId = scriptId;
 
-        public static DoScriptEvent Serdes(DoScriptEvent e, ISerializer s)
+        public static DoScriptEvent Serdes(DoScriptEvent e, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new DoScriptEvent();
@@ -20,7 +21,7 @@ namespace UAlbion.Formats.MapEvents
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-            e.ScriptId = (ScriptId)StoreIncrementedConverter.Serdes(nameof(ScriptId), (ushort)e.ScriptId, s.UInt16);
+            e.ScriptId = ScriptId.SerdesU16(nameof(ScriptId), e.ScriptId, mapping, s);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             ApiUtil.Assert(e.Unk1 == 0);
             ApiUtil.Assert(e.Unk2 == 0);

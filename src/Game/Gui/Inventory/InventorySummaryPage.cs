@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.State;
@@ -11,9 +11,10 @@ namespace UAlbion.Game.Gui.Inventory
 {
     public class InventorySummaryPage : UiElement // Summary
     {
-        readonly PartyCharacterId _activeMember;
+        readonly PartyMemberId _activeMember;
+        readonly UiSpriteElement _portrait;
 
-        public InventorySummaryPage(PartyCharacterId activeMember)
+        public InventorySummaryPage(PartyMemberId activeMember)
         {
             _activeMember = activeMember;
 
@@ -40,20 +41,26 @@ namespace UAlbion.Game.Gui.Inventory
                     new Spacing(4,0)
                 );
 
+            _portrait = new UiSpriteElement(SpriteId.None)
+            {
+                Flags = SpriteFlags.GradientPixels
+            };
+
             AttachChild(new LayerStack(
-                 new FixedPosition(
-                    new Rectangle(0, 25, 135, 145),
-                    new UiSpriteElement<SmallPortraitId>((SmallPortraitId)(int)activeMember)
-                    {
-                        Flags = SpriteFlags.GradientPixels
-                    }),
+                 new FixedPosition( new Rectangle(0, 25, 135, 145), _portrait),
                 stack));
+        }
+
+        protected override void Subscribed()
+        {
+            var sheet = Resolve<IAssetManager>().LoadSheet(_activeMember);
+            _portrait.Id = sheet.PortraitId;
+            base.Subscribed();
         }
 
         IEnumerable<TextBlock> BuildSummary()
         {
             var assets = Resolve<IAssetManager>();
-            var settings = Resolve<ISettings>();
             var tf = Resolve<ITextFormatter>();
             var member = Resolve<IParty>()?[_activeMember];
             if (member == null)
@@ -62,7 +69,7 @@ namespace UAlbion.Game.Gui.Inventory
             // {INVE}{NAME} ({SEXC}), %u years old, {RACE}, {CLAS}, level %d.
             var formatBlocks = tf
                 .Format(
-                    assets.LoadString(SystemTextId.Inv1_NYearsOldRaceClassLevelN, settings.Gameplay.Language),
+                    assets.LoadString(Base.SystemText.Inv1_NYearsOldRaceClassLevelN),
                     member.Apparent.Age, member.Apparent.Level).GetBlocks();
 
             foreach (var block in formatBlocks)
@@ -71,16 +78,13 @@ namespace UAlbion.Game.Gui.Inventory
 
         IEnumerable<TextBlock> BuildPointsHeadings()
         {
-            var assets = Resolve<IAssetManager>();
-            var settings = Resolve<ISettings>();
             var tf = Resolve<ITextFormatter>();
             var member = Resolve<IParty>()?[_activeMember];
-            string S(SystemTextId id) => assets.LoadString(id, settings.Gameplay.Language);
 
             if (member == null)
                 yield break;
 
-            foreach (var block in tf.Format(S(SystemTextId.Inv1_LifePoints)).GetBlocks())
+            foreach (var block in tf.Format(Base.SystemText.Inv1_LifePoints).GetBlocks())
             {
                 block.ArrangementFlags = TextArrangementFlags.NoWrap;
                 block.Alignment = TextAlignment.Right;
@@ -89,7 +93,7 @@ namespace UAlbion.Game.Gui.Inventory
 
             if (member.Apparent.Magic.SpellPointsMax > 0)
             {
-                foreach (var block in tf.Format(S(SystemTextId.Inv1_SpellPoints)).GetBlocks())
+                foreach (var block in tf.Format(Base.SystemText.Inv1_SpellPoints).GetBlocks())
                 {
                     block.ArrangementFlags = TextArrangementFlags.ForceNewLine | TextArrangementFlags.NoWrap;
                     block.Alignment = TextAlignment.Right;
@@ -98,14 +102,14 @@ namespace UAlbion.Game.Gui.Inventory
             }
             else yield return new TextBlock("") { ArrangementFlags = TextArrangementFlags.ForceNewLine };
 
-            foreach (var block in tf.Format(S(SystemTextId.Inv1_ExperiencePoints)).GetBlocks())
+            foreach (var block in tf.Format(Base.SystemText.Inv1_ExperiencePoints).GetBlocks())
             {
                 block.ArrangementFlags = TextArrangementFlags.ForceNewLine | TextArrangementFlags.NoWrap;
                 block.Alignment = TextAlignment.Right;
                 yield return block;
             }
 
-            foreach (var block in tf.Format(S(SystemTextId.Inv1_TrainingPoints)).GetBlocks())
+            foreach (var block in tf.Format(Base.SystemText.Inv1_TrainingPoints).GetBlocks())
             {
                 block.ArrangementFlags = TextArrangementFlags.ForceNewLine | TextArrangementFlags.NoWrap;
                 block.Alignment = TextAlignment.Right;

@@ -1,6 +1,5 @@
 ﻿using System;
 using SerdesNet;
-using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets
 {
@@ -8,7 +7,7 @@ namespace UAlbion.Formats.Assets
     {
         public const int SpellClasses = 7;
         public const int MaxSpellsPerClass = 30;
-        public const SystemTextId SystemTextOffset = SystemTextId.Spell0_0_ThornSnare;
+        public const Base.SystemText SystemTextOffset = Base.SystemText.Spell0_0_ThornSnare; // TODO: Config?
 
         public SpellEnvironments Environments { get; set; }
         public byte Cost { get; set; }

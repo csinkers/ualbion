@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.Assets
 {
@@ -64,7 +63,8 @@ namespace UAlbion.Game.Assets
             return _defaultLocator;
         }
 
-        public object LoadAssetCached(AssetKey key)
+        public object LoadAssetCached<T>(T key, SerializationContext context) where T : unmanaged, Enum => LoadAssetCached(AssetId.From(key), context);
+        public object LoadAssetCached(AssetId key, SerializationContext context)
         {
             object asset = _assetCache.Get(key);
             if (asset is Exception) // If it failed to load once then stop trying (at least until an asset:reload / cycle)
@@ -73,39 +73,37 @@ namespace UAlbion.Game.Assets
             if (asset != null)
                 return asset;
 
-            asset = LoadAssetInternal(key);
+            asset = LoadAssetInternal(key, context);
             _assetCache.Add(asset, key);
             return asset is Exception ? null : asset;
         }
 
-        public object LoadAsset(AssetKey key)
+        public object LoadAsset<T>(T key, SerializationContext context) where T : unmanaged, Enum => LoadAsset(AssetId.From(key), context);
+        public object LoadAsset(AssetId key, SerializationContext context)
         {
-            var asset = LoadAssetInternal(key);
+            var asset = LoadAssetInternal(key, context);
             return asset is Exception ? null : asset;
         }
 
-        public AssetInfo GetAssetInfo(AssetKey key) => GetLocator(key.Type).GetAssetInfo(key, LoadAssetCached);
+        public AssetInfo GetAssetInfo(AssetId key) => GetLocator(key.Type).GetAssetInfo(key, LoadAssetCached);
 
-        object LoadAssetInternal(AssetKey key)
+        object LoadAssetInternal(AssetId key, SerializationContext context)
         {
-            var name = $"{key.Type}.{key.Id}";
             try
             {
                 ICoreFactory factory = Resolve<ICoreFactory>();
                 IAssetLocator locator = GetLocator(key.Type);
-                var asset = locator.LoadAsset(key, name, LoadAssetCached);
+                var asset = locator.LoadAsset(key, context, LoadAssetCached);
 
                 if (asset != null && _postProcessors.TryGetValue(asset.GetType(), out var processor))
-                    asset = processor.Process(factory, key, asset, LoadAssetCached);
+                    asset = processor.Process(factory, key, asset, context, LoadAssetCached);
                 return asset;
             }
             catch (Exception e)
             {
-                Raise(new LogEvent(LogEvent.Level.Error, $"Could not load asset {name}: {e}"));
+                Raise(new LogEvent(LogEvent.Level.Error, $"Could not load asset {key}: {e}"));
                 return e;
             }
         }
-
-        public IEnumerable<AssetKey> GetCacheInfo() => _assetCache.GetCachedAssetInfo();
     }
 }

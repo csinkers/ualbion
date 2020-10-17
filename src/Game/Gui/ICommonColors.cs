@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Core.Textures;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Gui
 {

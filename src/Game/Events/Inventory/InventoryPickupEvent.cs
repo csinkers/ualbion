@@ -7,7 +7,7 @@ namespace UAlbion.Game.Events.Inventory
     public class InventoryPickupEvent : InventorySlotEvent
     {
         [EventPart("amount", true)] public ushort? Amount { get; }
-        public InventoryPickupEvent(ushort? amount, InventoryType sourceType, ushort sourceId, ItemSlotId slotId)
-            : base(sourceType, sourceId, slotId) => Amount = amount;
+        public InventoryPickupEvent(ushort? amount, InventoryId sourceId, ItemSlotId slotId)
+            : base(sourceId, slotId) => Amount = amount;
     }
 }

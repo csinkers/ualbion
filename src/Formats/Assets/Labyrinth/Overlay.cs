@@ -1,12 +1,12 @@
 ﻿using System;
 using SerdesNet;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets.Labyrinth
 {
     public class Overlay
     {
-        public DungeonOverlayId? TextureNumber { get; set; } // 0, ushort
+        public SpriteId SpriteId { get; set; } // 0, ushort
         public byte AnimationFrames { get; set; } // 2
         public byte WriteZero { get; set; } // 3
         public ushort YOffset { get; set; } // 4
@@ -15,13 +15,13 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public ushort Height { get; set; }  // A
 
         public override string ToString() =>
-            $"O.{TextureNumber}:{AnimationFrames} ({XOffset}, {YOffset}) {Width}x{Height}";
+            $"O.{SpriteId}:{AnimationFrames} ({XOffset}, {YOffset}) {Width}x{Height}";
 
-        public static Overlay Serdes(int _, Overlay o, ISerializer s)
+        public static Overlay Serdes(int _, Overlay o, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             o ??= new Overlay();
-            o.TextureNumber = s.TransformEnumU16(nameof(o.TextureNumber), o.TextureNumber, TweakedConverter<DungeonOverlayId>.Instance);
+            o.SpriteId = SpriteId.SerdesU16(nameof(o.SpriteId), o.SpriteId, AssetType.WallOverlay, mapping, s);
             o.AnimationFrames = s.UInt8(nameof(o.AnimationFrames), o.AnimationFrames);
             o.WriteZero = s.UInt8(nameof(o.WriteZero), o.WriteZero);
             o.XOffset = s.UInt16(nameof(o.XOffset), o.XOffset);

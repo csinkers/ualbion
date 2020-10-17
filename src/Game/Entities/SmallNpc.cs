@@ -4,8 +4,9 @@ using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Scenes;
@@ -16,7 +17,7 @@ namespace UAlbion.Game.Entities
     public class SmallNpc : Component
     {
         readonly MapNpc _npc;
-        readonly MapSprite<SmallNpcId> _sprite;
+        readonly MapSprite _sprite;
         public override string ToString() => $"SNpc {_npc.Id} {_sprite.Id}";
 
         public SmallNpc(MapNpc npc)
@@ -25,7 +26,7 @@ namespace UAlbion.Game.Entities
             On<ShowMapMenuEvent>(OnRightClick);
 
             _npc = npc ?? throw new ArgumentNullException(nameof(npc));
-            _sprite = AttachChild(new MapSprite<SmallNpcId>((SmallNpcId)npc.ObjectNumber, DrawLayer.Underlay - 1, 0, SpriteFlags.BottomAligned));
+            _sprite = AttachChild(new MapSprite(npc.SpriteOrGroup, DrawLayer.Underlay - 1, 0, SpriteFlags.BottomAligned));
             _sprite.Selected += (sender, e) => e.RegisterHit(this);
         }
 
@@ -39,7 +40,7 @@ namespace UAlbion.Game.Entities
 
         void OnRightClick(ShowMapMenuEvent e)
         {
-            if (_npc.Chain == null || _npc.Id == null)
+            if (_npc.Chain == null || _npc.Id.IsNone)
                 return;
 
             var window = Resolve<IWindowManager>();
@@ -50,17 +51,17 @@ namespace UAlbion.Game.Entities
             var uiPosition = window.NormToUi(normPosition.X, normPosition.Y);
 
             // TODO: NPC type check.
-            IText S(StringId textId) => tf.NoWrap().Center().Format(textId);
-            var heading = S(SystemTextId.MapPopup_Person);
+            IText S(TextId textId) => tf.NoWrap().Center().Format(textId);
+            var heading = S(Base.SystemText.MapPopup_Person);
             var options = new List<ContextMenuOption>
             {
                 new ContextMenuOption(
-                    S(SystemTextId.MapPopup_TalkTo),
-                    new TriggerChainEvent(_npc.Chain, _npc.Chain.FirstEvent, (NpcCharacterId)_npc.Id.Value),
+                    S(Base.SystemText.MapPopup_TalkTo),
+                    new TriggerChainEvent(_npc.Chain, _npc.Chain.FirstEvent, new EventSource(_npc.Id, TriggerTypes.TalkTo)),
                     ContextMenuGroup.Actions),
 
                 new ContextMenuOption(
-                    S(SystemTextId.MapPopup_MainMenu),
+                    S(Base.SystemText.MapPopup_MainMenu),
                     new PushSceneEvent(SceneId.MainMenu),
                     ContextMenuGroup.System
                 )

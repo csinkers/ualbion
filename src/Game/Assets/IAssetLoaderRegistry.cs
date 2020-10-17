@@ -1,7 +1,6 @@
 ﻿using System.IO;
+using UAlbion.Config;
 using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.Assets
 {
@@ -9,6 +8,6 @@ namespace UAlbion.Game.Assets
     {
         IAssetLoader GetLoader(FileFormat type);
         IAssetLoader<T> GetLoader<T>(FileFormat type) where T : class;
-        object Load(BinaryReader br, AssetKey key, int streamLength, AssetInfo config);
+        object Load(BinaryReader br, AssetId key, int streamLength, AssetMapping mapping, AssetInfo config);
     }
 }

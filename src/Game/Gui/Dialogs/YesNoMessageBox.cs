@@ -1,5 +1,5 @@
 ﻿using System;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 
@@ -27,10 +27,10 @@ namespace UAlbion.Game.Gui.Dialogs
                 new Spacing(0, 5),
                 new HorizontalStack(
                     new Spacing(11, 0),
-                    new Button(SystemTextId.MsgBox_Yes) { DoubleFrame = true }
+                    new Button(Base.SystemText.MsgBox_Yes) { DoubleFrame = true }
                         .OnClick(() => OnButton(true)),
                     new Spacing(8, 0),
-                    new Button(SystemTextId.MsgBox_No) { DoubleFrame = true }
+                    new Button(Base.SystemText.MsgBox_No) { DoubleFrame = true }
                         .OnClick(() => OnButton(false)),
                     new Spacing(10, 0)
                 ),

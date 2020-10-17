@@ -5,10 +5,10 @@ using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities.Map3D
@@ -22,7 +22,7 @@ namespace UAlbion.Game.Entities.Map3D
         float _backgroundGreen;
         float _backgroundBlue;
 
-        public DungeonMap(MapDataId mapId, MapData3D mapData)
+        public DungeonMap(MapId mapId, MapData3D mapData)
         {
             On<WorldCoordinateSelectEvent>(Select);
             On<MapInitEvent>(e => FireEventChains(TriggerTypes.MapInit, true));
@@ -36,7 +36,7 @@ namespace UAlbion.Game.Entities.Map3D
         }
 
         public override string ToString() => $"DungeonMap:{MapId} {LogicalSize.X}x{LogicalSize.Y} TileSize: {TileSize}";
-        public MapDataId MapId { get; }
+        public MapId MapId { get; }
         public MapType MapType => MapType.ThreeD;
         public IMapData MapData => _mapData;
         public Vector2 LogicalSize { get; private set; }
@@ -62,8 +62,8 @@ namespace UAlbion.Game.Entities.Map3D
             AttachChild(new MapRenderable3D(MapId, _mapData, _labyrinthData, TileSize));
             AttachChild(new ScriptManager());
 
-            if (_labyrinthData.BackgroundId.HasValue)
-                AttachChild(new Skybox(_labyrinthData.BackgroundId.Value));
+            if (!_labyrinthData.BackgroundId.IsNone)
+                AttachChild(new Skybox(_labyrinthData.BackgroundId));
 
             var palette = assets.LoadPalette(_mapData.PaletteId);
             uint backgroundColour = palette.GetPaletteAtTime(0)[_labyrinthData.BackgroundColour];
@@ -86,7 +86,7 @@ namespace UAlbion.Game.Entities.Map3D
 
             foreach (var npc in _mapData.Npcs.Values)
             {
-                var objectData = _labyrinthData.ObjectGroups[npc.ObjectNumber];
+                var objectData = _labyrinthData.ObjectGroups[npc.SpriteOrGroup.Id]; // TODO: Verify SpriteOrGroup is an ObjectGroup
                 // TODO: Build proper NPC objects with AI, sound effects etc
                 foreach (var subObject in objectData.SubObjects) 
                     AttachChild(BuildMapObject(npc.Waypoints[0].X, npc.Waypoints[0].Y, subObject, objectYScaling));
@@ -127,7 +127,7 @@ namespace UAlbion.Game.Entities.Map3D
                 Raise(new SetLogLevelEvent(LogEvent.Level.Warning));
 
             foreach (var zone in zones)
-                Raise(new TriggerChainEvent(zone.Chain, zone.Node, type, _mapData.Id, zone.X, zone.Y));
+                Raise(new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_mapData.Id, type, zone.X, zone.Y)));
 
             if (!log)
                 Raise(new SetLogLevelEvent(LogEvent.Level.Info));
@@ -136,7 +136,7 @@ namespace UAlbion.Game.Entities.Map3D
         MapObject BuildMapObject(int tileX, int tileY, SubObject subObject, float objectYScaling)
         {
             var definition = _labyrinthData.Objects[subObject.ObjectInfoNumber];
-            if (definition.TextureNumber == null)
+            if (definition.SpriteId.IsNone)
                 return null;
 
             bool onFloor = (definition.Properties & LabyrinthObjectFlags.FloorObject) != 0;
@@ -146,7 +146,7 @@ namespace UAlbion.Game.Entities.Map3D
             // collision detection, path-finding etc.
             var objectBias = new Vector3(-1.0f, 0, -1.0f) / 2;
                 /*
-                (MapId == MapDataId.Jirinaar3D || MapId == MapDataId.AltesFormergebäude || MapId == MapDataId.FormergebäudeNachKampfGegenArgim)
+                (MapId == MapId.Jirinaar3D || MapId == MapId.AltesFormergebäude || MapId == MapId.FormergebäudeNachKampfGegenArgim)
                     ? new Vector3(-1.0f, 0, -1.0f) / 2
                     : new Vector3(-1.0f, 0, -1.0f); // / 2;
                 */
@@ -164,7 +164,7 @@ namespace UAlbion.Game.Entities.Map3D
             Vector3 position = tilePosition * TileSize + offset + smidgeon;
 
             return new MapObject(
-                definition.TextureNumber.Value,
+                definition.SpriteId,
                 position,
                 new Vector2(definition.MapWidth, definition.MapHeight),
                 (definition.Properties & LabyrinthObjectFlags.FloorObject) != 0

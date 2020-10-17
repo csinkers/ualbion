@@ -4,9 +4,8 @@ using System.IO;
 using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Config;
-using UAlbion.Formats.Parsers;
+using UAlbion.Config;
+using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Formats.Assets.Save
 {
@@ -23,16 +22,14 @@ namespace UAlbion.Formats.Assets.Save
         public string Name { get; set; }
         public ushort Version { get; set; }
         public TimeSpan ElapsedTime { get; set; }
-        public MapDataId MapId { get; set; }
+        public MapId MapId { get; set; }
         public ushort PartyX { get; set; }
         public ushort PartyY { get; set; }
         public Direction PartyDirection { get; set; }
 
-        public IDictionary<PartyCharacterId, CharacterSheet> PartyMembers { get; } = new Dictionary<PartyCharacterId, CharacterSheet>();
-        public IDictionary<NpcCharacterId, CharacterSheet> NpcStats { get; } = new Dictionary<NpcCharacterId, CharacterSheet>();
-        public IDictionary<AutoMapId, byte[]> Automaps { get; } = new Dictionary<AutoMapId, byte[]>();
-        public IDictionary<ChestId, Inventory> Chests { get; } = new Dictionary<ChestId, Inventory>();
-        public IDictionary<MerchantId, Inventory> Merchants { get; } = new Dictionary<MerchantId, Inventory>();
+        public IDictionary<CharacterId, CharacterSheet> Sheets { get; } = new Dictionary<CharacterId, CharacterSheet>();
+        public IDictionary<AssetId, Inventory> Inventories { get; } = new Dictionary<AssetId, Inventory>(); // TODO: Change to InventoryId?
+        public IDictionary<AutomapId, byte[]> Automaps { get; } = new Dictionary<AutomapId, byte[]>();
 
         readonly TickerDictionary _tickers  = new TickerDictionary();
         readonly FlagDictionary _switches  = new FlagDictionary();
@@ -52,7 +49,7 @@ namespace UAlbion.Formats.Assets.Save
         public MapChangeCollection PermanentMapChanges { get; private set; } = new MapChangeCollection();
         public MapChangeCollection TemporaryMapChanges { get; private set; } = new MapChangeCollection();
         public IList<VisitedEvent> VisitedEvents { get; private set; } = new List<VisitedEvent>();
-        public IList<PartyCharacterId?> ActiveMembers { get; private set; } = new PartyCharacterId?[MaxPartySize];
+        public IList<PartyMemberId> ActiveMembers { get; private set; } = new PartyMemberId[MaxPartySize];
 
         public static string GetName(BinaryReader br)
         {
@@ -66,7 +63,7 @@ namespace UAlbion.Formats.Assets.Save
             return s.FixedLengthString(nameof(Name), null, nameLength);
         }
 
-        public static SavedGame Serdes(SavedGame save, ISerializer s)
+        public static SavedGame Serdes(SavedGame save, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             save ??= new SavedGame();
@@ -85,7 +82,7 @@ namespace UAlbion.Formats.Assets.Save
             ushort hours   = s.UInt16("Hours", (ushort)save.ElapsedTime.Hours);     // A
             ushort minutes = s.UInt16("Minutes", (ushort)save.ElapsedTime.Minutes); // C
             save.ElapsedTime = new TimeSpan(days, hours, minutes, save.ElapsedTime.Seconds, save.ElapsedTime.Milliseconds);
-            save.MapId   = s.EnumU16(nameof(MapId), save.MapId);    // E
+            save.MapId   = MapId.SerdesU16(nameof(MapId), save.MapId, mapping, s);      // E
             save.PartyX  = s.UInt16(nameof(PartyX), save.PartyX);   // 10
             save.PartyY  = s.UInt16(nameof(PartyY), save.PartyY);   // 12
             save.PartyDirection = s.EnumU16(nameof(PartyDirection), save.PartyDirection); // 14
@@ -98,10 +95,7 @@ namespace UAlbion.Formats.Assets.Save
                 MaxPartySize,
                 (i, x, s2) =>
                 {
-                    var value = s2.TransformEnumU8(
-                        null,
-                        save.ActiveMembers[i],
-                        ZeroToNullConverter<PartyCharacterId>.Instance);
+                    var value = PartyMemberId.SerdesU8(null, save.ActiveMembers[i], mapping, s);
                     s2.UInt8("dummy", 0);
                     return value;
                 });
@@ -112,7 +106,8 @@ namespace UAlbion.Formats.Assets.Save
             s.Object(nameof(Tickers), save._tickers, TickerDictionary.Serdes); // 5AF4
 
             save.Unknown5B9F = s.ByteArrayHex(nameof(Unknown5B9F), save.Unknown5B9F, 0x2C);
-            s.List(nameof(save.Npcs), save.Npcs, MaxNpcCount, NpcState.Serdes);
+            var mapType = MapType.TwoD;
+            s.List(nameof(save.Npcs), save.Npcs, (mapType, mapping), MaxNpcCount, NpcState.Serdes);
 
             save.Unknown5B71 = s.ByteArrayHex(
                 nameof(Unknown5B71),
@@ -125,6 +120,7 @@ namespace UAlbion.Formats.Assets.Save
             save.PermanentMapChanges = (MapChangeCollection)s.List(
                 nameof(PermanentMapChanges),
                 save.PermanentMapChanges,
+                mapping,
                 permChangesCount,
                 MapChange.Serdes,
                 _ => new MapChangeCollection());
@@ -136,6 +132,7 @@ namespace UAlbion.Formats.Assets.Save
             save.TemporaryMapChanges = (MapChangeCollection)s.List(
                 nameof(TemporaryMapChanges),
                 save.TemporaryMapChanges,
+                mapping,
                 tempChangesCount,
                 MapChange.Serdes,
                 _ => new MapChangeCollection());
@@ -143,114 +140,113 @@ namespace UAlbion.Formats.Assets.Save
             uint visitedEventsSize = s.UInt32("VisitedEvents_Size", (uint)(save.VisitedEvents.Count * VisitedEvent.SizeOnDisk + 2));
             ushort visitedEventsCount = s.UInt16("VisitedEvents_Count", (ushort)save.VisitedEvents.Count);
             ApiUtil.Assert(visitedEventsSize == visitedEventsCount * VisitedEvent.SizeOnDisk + 2);
-            save.VisitedEvents = s.List(nameof(VisitedEvents), save.VisitedEvents, visitedEventsCount, VisitedEvent.Serdes);
+            save.VisitedEvents = s.List(nameof(VisitedEvents), save.VisitedEvents, mapping, visitedEventsCount, VisitedEvent.Serdes);
 
-            var charLoader = new CharacterSheetLoader();
-            void SerdesPartyCharacter(int i, int size, ISerializer serializer)
-            {
-                if (i > 0xff)
-                    return;
-
-                var key = (PartyCharacterId)i;
-                CharacterSheet existing = null;
-                if (size > 0 || save.PartyMembers.TryGetValue(key, out existing))
-                {
-                    save.PartyMembers[key] = charLoader.Serdes(
-                        existing,
-                        serializer,
-                        key.ToAssetId(),
-                        new BasicAssetInfo { Id = i });
-                }
-            }
-
-            void SerdesNpcCharacter(int i, int size, ISerializer serializer)
-            {
-                if (i > 0xff)
-                    return;
-
-                var key = (NpcCharacterId)i;
-                CharacterSheet existing = null;
-                if (serializer.Mode == SerializerMode.Reading || save.NpcStats.TryGetValue(key, out existing))
-                {
-                    save.NpcStats[key] = charLoader.Serdes(
-                        existing,
-                        serializer,
-                        key.ToAssetId(),
-                        new BasicAssetInfo { Id = i });
-                }
-            }
-
-            void SerdesAutomap(int i, int size, ISerializer serializer)
-            {
-                var key = (AutoMapId)i;
-                if (save.Automaps.TryGetValue(key, out _))
-                    serializer.ByteArray(null, save.Automaps[key], save.Automaps[key].Length);
-                else if (serializer.Mode == SerializerMode.Reading)
-                    save.Automaps[key] = serializer.ByteArray(null, null, size);
-            }
-
-            void SerdesChest(int i, int size, ISerializer serializer)
-            {
-                var key = (ChestId)i;
-                Inventory existing = null;
-
-                if (serializer.Mode == SerializerMode.Reading || save.Chests.TryGetValue(key, out existing))
-                    save.Chests[key] = Inventory.SerdesChest(i, existing, serializer);
-            }
-
-            void SerdesMerchant(int i, int size, ISerializer serializer)
-            {
-                if (i > 0xff)
-                    return;
-
-                var key = (MerchantId)i;
-                Inventory existing = null;
-
-                if (serializer.Mode == SerializerMode.Reading || save.Merchants.TryGetValue(key, out existing))
-                    save.Merchants[key] = Inventory.SerdesMerchant(i, existing, serializer);
-            }
-
-            var partyIds = save.PartyMembers.Keys.Select(x => (int)x).ToList();
+            var partyIds = save.Sheets.Keys.Select(x => (int)x).ToList();
             partyIds.Add(199); // Force extra XLD length fields to be written for empty objects to preserve compat with original game.
             partyIds.Add(299);
 
             // s.Object($"XldPartyCharacter.0");
 
-            XldLoader.Serdes(XldCategory.PartyCharacter, 0, s, SerdesPartyCharacter, partyIds);
-            XldLoader.Serdes(XldCategory.PartyCharacter,1, s, SerdesPartyCharacter, partyIds);
-            XldLoader.Serdes(XldCategory.PartyCharacter,2, s, SerdesPartyCharacter, partyIds);
+            XldLoader.Serdes(XldCategory.PartyCharacter, 0,  (save, mapping), s, SerdesPartyCharacter, partyIds);
+            XldLoader.Serdes(XldCategory.PartyCharacter,1, (save, mapping), s, SerdesPartyCharacter, partyIds);
+            XldLoader.Serdes(XldCategory.PartyCharacter,2, (save, mapping), s, SerdesPartyCharacter, partyIds);
 
             var automapIds = save.Automaps.Keys.Select(x => (int)x).ToList();
             automapIds.Add(199);
             automapIds.Add(399);
-            XldLoader.Serdes(XldCategory.Automap,1, s, SerdesAutomap, automapIds);
-            XldLoader.Serdes(XldCategory.Automap,2, s, SerdesAutomap, automapIds);
-            XldLoader.Serdes(XldCategory.Automap,3, s, SerdesAutomap, automapIds);
+            XldLoader.Serdes(XldCategory.Automap,1, (save, mapping), s, SerdesAutomap, automapIds);
+            XldLoader.Serdes(XldCategory.Automap,2, (save, mapping), s, SerdesAutomap, automapIds);
+            XldLoader.Serdes(XldCategory.Automap,3, (save, mapping), s, SerdesAutomap, automapIds);
 
-            var chestIds = save.Chests.Keys.Select(x => (int) x).ToList();
+            var chestIds = save.Inventories.Keys.Select(x => (int) x).ToList();
             chestIds.Add(199);
             chestIds.Add(599);
-            XldLoader.Serdes(XldCategory.Chest,0, s, SerdesChest, chestIds);
-            XldLoader.Serdes(XldCategory.Chest,1, s, SerdesChest, chestIds);
-            XldLoader.Serdes(XldCategory.Chest,2, s, SerdesChest, chestIds);
-            XldLoader.Serdes(XldCategory.Chest,5, s, SerdesChest, chestIds);
+            XldLoader.Serdes(XldCategory.Chest,0, (save, mapping), s, SerdesChest, chestIds);
+            XldLoader.Serdes(XldCategory.Chest,1, (save, mapping), s, SerdesChest, chestIds);
+            XldLoader.Serdes(XldCategory.Chest,2, (save, mapping), s, SerdesChest, chestIds);
+            XldLoader.Serdes(XldCategory.Chest,5, (save, mapping), s, SerdesChest, chestIds);
 
-            var merchantIds = save.Merchants.Keys.Select(x => (int) x).ToList();
+            var merchantIds = save.Inventories.Keys.Select(x => (int) x).ToList();
             merchantIds.Add(199);
             merchantIds.Add(299);
-            XldLoader.Serdes(XldCategory.Merchant,0, s, SerdesMerchant, merchantIds);
-            XldLoader.Serdes(XldCategory.Merchant,1, s, SerdesMerchant, merchantIds);
-            XldLoader.Serdes(XldCategory.Merchant,2, s, SerdesMerchant, merchantIds);
+            XldLoader.Serdes(XldCategory.Merchant,0, (save, mapping), s, SerdesMerchant, merchantIds);
+            XldLoader.Serdes(XldCategory.Merchant,1, (save, mapping), s, SerdesMerchant, merchantIds);
+            XldLoader.Serdes(XldCategory.Merchant,2, (save, mapping), s, SerdesMerchant, merchantIds);
 
-            var npcIds = save.NpcStats.Keys.Select(x => (int) x).ToList();
+            var npcIds = save.Sheets.Keys.Select(x => (int) x).ToList();
             npcIds.Add(299);
-            XldLoader.Serdes(XldCategory.NpcCharacter,0, s, SerdesNpcCharacter, npcIds);
-            XldLoader.Serdes(XldCategory.NpcCharacter,1, s, SerdesNpcCharacter, npcIds);
-            XldLoader.Serdes(XldCategory.NpcCharacter,2, s, SerdesNpcCharacter, npcIds);
+            XldLoader.Serdes(XldCategory.NpcCharacter,0, (save, mapping), s, SerdesNpcCharacter, npcIds);
+            XldLoader.Serdes(XldCategory.NpcCharacter,1, (save, mapping), s, SerdesNpcCharacter, npcIds);
+            XldLoader.Serdes(XldCategory.NpcCharacter,2, (save, mapping), s, SerdesNpcCharacter, npcIds);
 
             s.RepeatU8("Padding", 0, 4);
 
+            // TODO: Save additional sheets & inventories from mods.
+
             return save;
+        }
+
+        static void SerdesPartyCharacter(int i, int size, (SavedGame, AssetMapping) context, ISerializer serializer)
+        {
+            if (i > 0xff)
+                return;
+
+            var save = context.Item1;
+            var mapping = context.Item2;
+            var id = CharacterId.FromDisk(AssetType.PartyMember, i, mapping);
+            CharacterSheet existing = null;
+            if (size > 0 || save.Sheets.TryGetValue(id, out existing))
+                save.Sheets[id] = CharacterSheet.Serdes(id, existing, mapping, serializer);
+        }
+
+        static void SerdesNpcCharacter(int i, int size, (SavedGame, AssetMapping) context, ISerializer serializer)
+        {
+            if (i > 0xff)
+                return;
+
+            var save = context.Item1;
+            var mapping = context.Item2;
+            var id = CharacterId.FromDisk(AssetType.Npc, i, mapping);
+            CharacterSheet existing = null;
+            if (serializer.Mode == SerializerMode.Reading || save.Sheets.TryGetValue(id, out existing))
+                save.Sheets[id] = CharacterSheet.Serdes(id, existing, mapping, serializer);
+        }
+
+        static void SerdesAutomap(int i, int size, (SavedGame, AssetMapping) context, ISerializer serializer)
+        {
+            var save = context.Item1;
+            var mapping = context.Item2;
+            var key = AutomapId.FromDisk(i, mapping);
+            if (save.Automaps.TryGetValue(key, out _))
+                serializer.ByteArray(null, save.Automaps[key], save.Automaps[key].Length);
+            else if (serializer.Mode == SerializerMode.Reading)
+                save.Automaps[key] = serializer.ByteArray(null, null, size);
+        }
+
+        static void SerdesChest(int i, int size, (SavedGame, AssetMapping) context, ISerializer serializer)
+        {
+            var save = context.Item1;
+            var mapping = context.Item2;
+            var key = ChestId.FromDisk(i, mapping);
+            Inventory existing = null;
+
+            if (serializer.Mode == SerializerMode.Reading || save.Inventories.TryGetValue(key, out existing))
+                save.Inventories[key] = Inventory.SerdesChest(i, existing, mapping, serializer);
+        }
+
+        static void SerdesMerchant(int i, int size, (SavedGame, AssetMapping) context, ISerializer serializer)
+        {
+            if (i > 0xff)
+                return;
+
+            var save = context.Item1;
+            var mapping = context.Item2;
+            var key = MerchantId.FromDisk(i, mapping);
+            Inventory existing = null;
+
+            if (serializer.Mode == SerializerMode.Reading || save.Inventories.TryGetValue(key, out existing))
+                save.Inventories[key] = Inventory.SerdesMerchant(i, existing, mapping, serializer);
         }
     }
 }

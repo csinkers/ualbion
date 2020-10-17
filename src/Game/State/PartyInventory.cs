@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
+using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events.Inventory;
@@ -22,16 +22,16 @@ namespace UAlbion.Game.State
         {
             _getInventory = getInventory;
             On<InventoryTakeAllEvent>(TakeAll);
-            On<ChangePartyGoldEvent>(e => ChangePartyItemAmount(ItemId.Gold, e.Operation, e.Amount));
-            On<ChangePartyRationsEvent>(e => ChangePartyItemAmount(ItemId.Rations, e.Operation, e.Amount));
+            On<ChangePartyGoldEvent>(e => ChangePartyItemAmount(AssetId.Gold, e.Operation, e.Amount));
+            On<ChangePartyRationsEvent>(e => ChangePartyItemAmount(AssetId.Rations, e.Operation, e.Amount));
             On<AddRemoveInventoryItemEvent>(e => GiveToParty(e.ItemId, e.Amount));
             On<SimpleChestEvent>(e =>
             {
                 var itemId = e.ChestType switch
                 {
-                    SimpleChestEvent.SimpleChestItemType.Item => e.ItemId,
-                    SimpleChestEvent.SimpleChestItemType.Gold => ItemId.Gold,
-                    SimpleChestEvent.SimpleChestItemType.Rations => ItemId.Rations,
+                    SimpleChestEvent.SimpleChestItemType.Item => (AssetId)e.ItemId,
+                    SimpleChestEvent.SimpleChestItemType.Gold => AssetId.Gold,
+                    SimpleChestEvent.SimpleChestItemType.Rations => AssetId.Rations,
                     _ => throw new InvalidEnumArgumentException(nameof(e.ChestType), (int)e.ChestType, typeof(SimpleChestEvent.SimpleChestItemType))
                 };
 
@@ -49,10 +49,10 @@ namespace UAlbion.Game.State
             if (chest == null)
                 return;
 
-            var changedMembers = new HashSet<PartyCharacterId>();
+            var changedMembers = new HashSet<PartyMemberId>();
             foreach (var slot in chest.EnumerateAll())
             {
-                if (slot.ItemId == null) 
+                if (slot.ItemId.IsNone) 
                     continue;
 
                 foreach (var member in party.WalkOrder)
@@ -61,14 +61,14 @@ namespace UAlbion.Game.State
                     if (itemsGiven > 0)
                         changedMembers.Add(member.Id);
 
-                    if (slot.ItemId == null)
+                    if (slot.ItemId.IsNone)
                         break;
                 }
             }
 
             foreach(var memberId in changedMembers)
-                Raise(new InventoryChangedEvent(InventoryType.Player, (ushort)memberId));
-            Raise(new InventoryChangedEvent(InventoryType.Chest, (ushort)e.ChestId));
+                Raise(new InventoryChangedEvent(new InventoryId(memberId)));
+            Raise(new InventoryChangedEvent(new InventoryId(e.ChestId)));
         }
 
         void SetLastResult(bool result) => Resolve<IEventManager>().LastEventResult = result;
@@ -81,14 +81,14 @@ namespace UAlbion.Game.State
         }
 
         IContents ContentsFromItemId(ItemId itemId) =>
-            itemId switch
+            itemId.Type switch
             {
-                ItemId.Gold => new Gold(),
-                ItemId.Rations => new Rations(),
+                AssetType.Gold => new Gold(),
+                AssetType.Rations => new Rations(),
                 _ => Resolve<IAssetManager>().LoadItem(itemId),
             };
 
-        PartyCharacterId? ChangePartyItemAmount(ItemId itemId, QuantityChangeOperation operation, ushort amount)
+        PartyMemberId? ChangePartyItemAmount(ItemId itemId, QuantityChangeOperation operation, ushort amount)
         {
             int currentTotal = GetTotalItemCount(itemId);
             int newTotal = operation.Apply(currentTotal, amount, 0, int.MaxValue);
@@ -101,12 +101,12 @@ namespace UAlbion.Game.State
             return null;
         }
 
-        PartyCharacterId? GiveToParty(ItemId itemId, ushort amount)
+        PartyMemberId? GiveToParty(ItemId itemId, ushort amount)
         {
-            PartyCharacterId? recipient = null;
+            PartyMemberId? recipient = null;
             var party = Resolve<IParty>();
             var inventoryManager = Resolve<IInventoryManager>();
-            var slot = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
+            var slot = new ItemSlot(new InventorySlotId(new InventoryId(InventoryType.Temporary, 0), 0));
             var contents = ContentsFromItemId(itemId);
             slot.Set(contents, amount);
 
@@ -116,7 +116,7 @@ namespace UAlbion.Game.State
 
                 if (amountGiven > 0)
                 {
-                    Raise(new InventoryChangedEvent(InventoryType.Player, (ushort) member.Id));
+                    Raise(new InventoryChangedEvent((InventoryId)member.Id));
                     recipient = member.Id;
                 }
 
@@ -127,12 +127,12 @@ namespace UAlbion.Game.State
             return recipient;
         }
 
-        PartyCharacterId? TakeFromParty(ItemId itemId, ushort amount)
+        PartyMemberId? TakeFromParty(ItemId itemId, ushort amount)
         {
             var party = Resolve<IParty>();
             var inventoryManager = Resolve<IInventoryManager>();
-            var slot = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
-            PartyCharacterId? donor = null;
+            var slot = new ItemSlot(new InventorySlotId(new InventoryId(InventoryType.Temporary, 0), 0));
+            PartyMemberId? donor = null;
 
             foreach (var member in party.WalkOrder)
             {
@@ -141,7 +141,7 @@ namespace UAlbion.Game.State
 
                 if (amountTaken > 0)
                 {
-                    Raise(new InventoryChangedEvent(InventoryType.Player, (ushort) member.Id));
+                    Raise(new InventoryChangedEvent((InventoryId)member.Id));
                     donor = member.Id;
                 }
 
@@ -152,10 +152,10 @@ namespace UAlbion.Game.State
             return donor;
         }
 
-        void MapItemTransition(ItemId itemId, PartyCharacterId recipientId)
+        void MapItemTransition(ItemId itemId, PartyMemberId recipientId)
         {
             var context = Resolve<IEventManager>().Context;
-            if (!(context?.Source is EventSource.Map mapEventSource))
+            if (context?.Source.Id.Type != AssetType.Map)
                 return;
 
             var scene = Resolve<ISceneManager>()?.ActiveScene;
@@ -167,7 +167,7 @@ namespace UAlbion.Game.State
                 return;
 
             var player = party[recipientId];
-            var worldPosition = new Vector3(mapEventSource.X, mapEventSource.Y, 0) * map.TileSize;
+            var worldPosition = new Vector3(context.Source.X, context.Source.Y, 0) * map.TileSize;
             var normPosition = scene.Camera.ProjectWorldToNorm(worldPosition);
             var uiPosition = window.NormToUi(new Vector2(normPosition.X, normPosition.Y));
 

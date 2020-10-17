@@ -1,11 +1,10 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core.Visual;
 
 namespace UAlbion.Game.Entities
 {
-    public class MapSprite<T> : Sprite<T> where T : Enum
+    public class MapSprite : Sprite
     {
         public Vector3 TilePosition
         {
@@ -21,7 +20,7 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        public MapSprite(T id, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags)
+        public MapSprite(ITextureId id, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags)
             : base(id, Vector3.Zero, layer, keyFlags, flags) { }
     }
 }

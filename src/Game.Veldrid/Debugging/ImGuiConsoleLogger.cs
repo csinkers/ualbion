@@ -6,8 +6,6 @@ using ImGuiNET;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Formats.Config;
-using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Veldrid.Debugging

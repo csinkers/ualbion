@@ -1,12 +1,12 @@
 ﻿using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Events
 {
     [Event("load_map")]
     public class LoadMapEvent : GameEvent
     {
-        public LoadMapEvent(MapDataId mapId) { MapId = mapId; }
-        [EventPart("id")] public MapDataId MapId { get; }
+        public LoadMapEvent(MapId mapId) { MapId = mapId; }
+        [EventPart("id")] public MapId MapId { get; }
     }
 }

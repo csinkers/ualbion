@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 
@@ -22,11 +23,11 @@ namespace UAlbion.Game.Gui.Inventory
         |    [<] [=======[  3  ]==============] [>]    |
         |                   [    OK    ]   ^4          |
         \---------------------------------------------*/ //^5
-        public ItemQuantityDialog(int depth, StringId stringId, AssetId id, int max, bool useTenths, Action<int> continuation)
+        public ItemQuantityDialog(int depth, StringId stringId, SpriteId id, int max, bool useTenths, Action<int> continuation)
             : base(DialogPositioning.Center, depth)
         {
             _continuation = continuation;
-            IUiElement itemPic = new UiSpriteElement<AssetId>(id)
+            IUiElement itemPic = new UiSpriteElement(id)
             {
                 SubId = id.Type == AssetType.ItemGraphics ? id.Id : 0
             };
@@ -45,7 +46,7 @@ namespace UAlbion.Game.Gui.Inventory
                 new FixedSize(106, 14, new Slider(() => _quantity, x => _quantity = x, 0, max, formatFunc)),
                 new Spacing(0, 4),
                 new FixedSize(52, 13,
-                    new Button(SystemTextId.MsgBox_OK) { DoubleFrame = true }.OnClick(Close))
+                    new Button(Base.SystemText.MsgBox_OK) { DoubleFrame = true }.OnClick(Close))
             );
 
             AttachChild(new DialogFrame(new Padding(stack, 6))

@@ -14,7 +14,7 @@ namespace UAlbion.Game.Gui.Text
     {
         const int SpaceSize = 3;
 
-
+        // TODO: Move to config
         static readonly IDictionary<char, int> FontMapping = new Dictionary<char, int>
         {
             { 'a',  0 }, { 'b',  1 }, { 'c',  2 }, { 'd',  3 }, { 'e',  4 },

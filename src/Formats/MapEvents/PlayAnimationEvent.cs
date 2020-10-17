@@ -1,7 +1,8 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -20,11 +21,11 @@ namespace UAlbion.Formats.MapEvents
         }
 
         PlayAnimationEvent() { }
-        public static PlayAnimationEvent Serdes(PlayAnimationEvent e, ISerializer s)
+        public static PlayAnimationEvent Serdes(PlayAnimationEvent e, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new PlayAnimationEvent();
-            e.VideoId = s.EnumU8(nameof(VideoId), e.VideoId);
+            e.VideoId = VideoId.SerdesU8(nameof(VideoId), e.VideoId, mapping, s);
             e.X = s.UInt8(nameof(X), e.X);
             e.Y = s.UInt8(nameof(Y), e.Y);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);

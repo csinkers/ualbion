@@ -1,13 +1,14 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
     public class SetTemporarySwitchEvent : ModifyEvent
     {
-        public static SetTemporarySwitchEvent Serdes(SetTemporarySwitchEvent e, ISerializer s)
+        public static SetTemporarySwitchEvent Serdes(SetTemporarySwitchEvent e, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new SetTemporarySwitchEvent();
@@ -15,7 +16,7 @@ namespace UAlbion.Formats.MapEvents
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-            e.SwitchId = s.EnumU16(nameof(SwitchId), e.SwitchId);
+            e.SwitchId = SwitchId.SerdesU16(nameof(SwitchId), e.SwitchId, mapping, s);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             ApiUtil.Assert(e.Unk4 == 0);
             ApiUtil.Assert(e.Unk5 == 0);

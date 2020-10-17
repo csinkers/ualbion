@@ -3,7 +3,7 @@ using System.Numerics;
 using System.Threading;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Text;
@@ -135,6 +135,7 @@ namespace UAlbion.Game.Gui.Controls
         }
 
         public Button(IText textSource) : this(new UiText(textSource)) { }
+        public Button(TextId textId) : this((StringId)textId) { }
         public Button(StringId textId) : this((IUiElement)new UiTextBuilder(textId).Center().NoWrap()) { }
         public Button(string literalText) : this((IUiElement)new SimpleText(literalText).Center().NoWrap()) { }
         public Button OnClick(Action callback) { Click += callback; return this; }

@@ -2,17 +2,17 @@
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Entities
 {
     public class MapObject : Component
     {
-        readonly MapSprite<DungeonObjectId> _sprite;
+        readonly MapSprite _sprite;
 
-        public MapObject(DungeonObjectId id, Vector3 initialPosition, Vector2 size, bool onFloor)
+        public MapObject(SpriteId id, Vector3 initialPosition, Vector2 size, bool onFloor)
         {
-            _sprite = AttachChild(new MapSprite<DungeonObjectId>(
+            _sprite = AttachChild(new MapSprite(
                 id,
                 DrawLayer.Underlay,
                 SpriteKeyFlags.UseCylindrical,

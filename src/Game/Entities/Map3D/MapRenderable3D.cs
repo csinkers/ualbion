@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Game.Events;
@@ -17,7 +18,7 @@ namespace UAlbion.Game.Entities.Map3D
 {
     public class MapRenderable3D : Component
     {
-        readonly MapDataId _mapId;
+        readonly MapId _mapId;
         readonly MapData3D _mapData;
         readonly LabyrinthData _labyrinthData;
         readonly Vector3 _tileSize;
@@ -26,7 +27,7 @@ namespace UAlbion.Game.Entities.Map3D
         bool _isSorting;
         bool _fullUpdate = true;
 
-        public MapRenderable3D(MapDataId mapId, MapData3D mapData, LabyrinthData labyrinthData, Vector3 tileSize)
+        public MapRenderable3D(MapId mapId, MapData3D mapData, LabyrinthData labyrinthData, Vector3 tileSize)
         {
             On<RenderEvent>(Render);
             On<SlowClockEvent>(OnSlowClock);
@@ -58,26 +59,29 @@ namespace UAlbion.Game.Entities.Map3D
             for(int i = 0; i < _labyrinthData.FloorAndCeilings.Count; i++)
             {
                 var floorInfo = _labyrinthData.FloorAndCeilings[i];
-                ITexture floor = floorInfo?.TextureNumber == null ? null : assets.LoadTexture(floorInfo.TextureNumber.Value);
+                ITexture floor = assets.LoadTexture(floorInfo?.SpriteId ?? AssetId.None);
                 _tilemap.DefineFloor(i + 1, floor);
             }
 
             for (int i = 0; i < _labyrinthData.Walls.Count; i++)
             {
                 var wallInfo = _labyrinthData.Walls[i];
-                if (wallInfo?.TextureNumber == null)
+                if (wallInfo == null)
                     continue;
 
-                ITexture wall = assets.LoadTexture(wallInfo.TextureNumber.Value);
+                ITexture wall = assets.LoadTexture(wallInfo.SpriteId);
+                if (wall == null)
+                    continue;
+
                 bool isAlphaTested = (wallInfo.Properties & Wall.WallFlags.AlphaTested) != 0;
                 _tilemap.DefineWall(i + 1, wall, 0, 0, wallInfo.TransparentColour, isAlphaTested);
 
                 foreach(var overlayInfo in wallInfo.Overlays)
                 {
-                    if (!overlayInfo.TextureNumber.HasValue)
+                    if (overlayInfo.SpriteId.IsNone)
                         continue;
 
-                    var overlay = assets.LoadTexture(overlayInfo.TextureNumber.Value);
+                    var overlay = assets.LoadTexture(overlayInfo.SpriteId);
                     _tilemap.DefineWall(i + 1, overlay, overlayInfo.XOffset, overlayInfo.YOffset, wallInfo.TransparentColour, isAlphaTested);
                 }
             }

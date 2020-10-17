@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using Newtonsoft.Json;
 using SerdesNet;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets
 {
@@ -42,18 +43,18 @@ namespace UAlbion.Formats.Assets
         [JsonIgnore] public ItemSlot LeftFinger => Slots[(int)ItemSlotId.LeftFinger];
         [JsonIgnore] public ItemSlot Feet => Slots[(int)ItemSlotId.Feet];
         [JsonIgnore] public ItemSlot RightFinger => Slots[(int)ItemSlotId.RightFinger];
-        public static Inventory SerdesChest(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, InventoryType.Chest);
-        public static Inventory SerdesMerchant(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, InventoryType.Merchant);
-        public static Inventory SerdesCharacter(int n, Inventory inv, ISerializer s) => Serdes(n, inv, s, InventoryType.Player);
+        public static Inventory SerdesChest(int n, Inventory inv, AssetMapping mapping, ISerializer s) => Serdes(n, inv, mapping, s, InventoryType.Chest);
+        public static Inventory SerdesMerchant(int n, Inventory inv, AssetMapping mapping, ISerializer s) => Serdes(n, inv, mapping, s, InventoryType.Merchant);
+        public static Inventory SerdesCharacter(int n, Inventory inv, AssetMapping mapping, ISerializer s) => Serdes(n, inv, mapping, s, InventoryType.Player);
         public IEnumerable<ItemSlot> EnumerateAll() => Slots.Where(x => x != null);
 
-        static Inventory Serdes(int n, Inventory inv, ISerializer s, InventoryType type)
+        static Inventory Serdes(int n, Inventory inv, AssetMapping mapping, ISerializer s, InventoryType type)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             var invId = new InventoryId(type, (ushort) n);
             void S(string name, ItemSlot existing, ItemSlotId slotId)
                 => s.Object(name, existing,
-                    (_, x, s2) => ItemSlot.Serdes(new InventorySlotId(invId, slotId), x, s2));
+                    (_, x, s2) => ItemSlot.Serdes(new InventorySlotId(invId, slotId), x, mapping, s2));
 
             inv ??= new Inventory(invId);
             if (type == InventoryType.Player)

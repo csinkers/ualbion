@@ -1,16 +1,15 @@
 ﻿using System.IO;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {
     [AssetLoader(FileFormat.Slab)]
     public class SlabLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
         {
-            var sprite = (AlbionSprite)new FixedSizeSpriteLoader().Load(br, streamLength, key, config);
+            var sprite = (AlbionSprite)new FixedSizeSpriteLoader().Load(br, streamLength, mapping, id, config);
             var frames = new[] // Frame 0 = entire slab, Frame 1 = status bar only.
             {
                 sprite.Frames[0],

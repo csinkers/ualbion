@@ -1,13 +1,12 @@
 ﻿using System.IO;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 using UAlbion.Formats.Assets.Flic;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {
     [AssetLoader(FileFormat.FlicVideo)]
     public class FlicLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config) => new FlicFile(br);
+        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config) => new FlicFile(br);
     }
 }

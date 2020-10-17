@@ -4,7 +4,6 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
 
 namespace UAlbion.Game.Gui.Controls
@@ -39,10 +38,10 @@ namespace UAlbion.Game.Gui.Controls
 
             var assets = Resolve<IAssetManager>();
             var multi = factory.CreateMultiTexture($"Background {width}x{height}",
-                new DummyPaletteManager(assets.LoadPalette(PaletteId.Inventory)));
+                new DummyPaletteManager(assets.LoadPalette(Base.Palette.Inventory)));
 
             // Background
-            var background = assets.LoadTexture(CoreSpriteId.UiBackground);
+            var background = assets.LoadTexture(Base.CoreSprite.UiBackground);
             multi.AddTexture(1, background, 0, 0,
                 0, true, (uint)width, (uint)height);
 

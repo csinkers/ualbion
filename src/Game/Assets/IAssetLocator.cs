@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Config;
+using UAlbion.Config;
 
 namespace UAlbion.Game.Assets
 {
     public interface IAssetLocator
     {
-        object LoadAsset(AssetKey key, string name, Func<AssetKey, object> loaderFunc);
-        AssetInfo GetAssetInfo(AssetKey key, Func<AssetKey, object> loaderFunc);
+        object LoadAsset(AssetId key, SerializationContext context, Func<AssetId, SerializationContext, object> loaderFunc);
+        AssetInfo GetAssetInfo(AssetId key, Func<AssetId, SerializationContext, object> loaderFunc);
         IEnumerable<AssetType> SupportedTypes { get; }
     }
 }

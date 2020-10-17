@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Gui.Controls
 {

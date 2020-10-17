@@ -1,10 +1,8 @@
-﻿using UAlbion.Formats.AssetIds;
-
-namespace UAlbion.Formats.Assets
+﻿namespace UAlbion.Formats.Assets
 {
     public interface ICharacterSheet
     {
-        AssetId Id { get; }
+        CharacterId Id { get; }
         string GetName(GameLanguage language);
 
         CharacterType Type { get; }
@@ -14,10 +12,10 @@ namespace UAlbion.Formats.Assets
         ushort Age { get; }
         byte Level { get; }
 
-        AssetId? SpriteId { get; }
-        SmallPortraitId? PortraitId { get; }
-        EventSetId? EventSetId { get; }
-        EventSetId? WordSetId { get; }
+        SpriteId SpriteId { get; }
+        SpriteId PortraitId { get; }
+        EventSetId EventSetId { get; }
+        EventSetId WordSetId { get; }
         PlayerLanguages Languages { get; }
 
         // Grouped

@@ -1,5 +1,4 @@
 ﻿using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 
@@ -22,7 +21,7 @@ namespace UAlbion.Game.Scenes
             Raise(new ShowMapEvent(false));
             Raise(new PushInputModeEvent(InputMode.Inventory));
             Raise(new PushMouseModeEvent(MouseMode.Normal));
-            Raise(new LoadPaletteEvent(PaletteId.Inventory));
+            Raise(new LoadPaletteEvent(Base.Palette.Inventory));
         }
 
         protected override void Unsubscribed()

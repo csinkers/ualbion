@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SerdesNet;
-using UAlbion.Formats.Config;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets.Maps
 {

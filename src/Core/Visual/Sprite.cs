@@ -6,27 +6,12 @@ using UAlbion.Core.Textures;
 
 namespace UAlbion.Core.Visual
 {
-    public class Sprite<T> : Sprite where T : Enum
-    {
-        static ITexture TextureFunc(Sprite sprite)
-        {
-            var s = (Sprite<T>)sprite;
-            var assets = s.Resolve<ITextureLoader>();
-            return assets.LoadTexture(s.Id);
-        }
-
-        public Sprite(T id, Vector3 position, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags)
-            : base(TextureFunc, position, layer, keyFlags, flags) =>
-            Id = id;
-
-        public T Id { get; }
-    }
-
     public class Sprite : Component, IPositioned
     {
-        readonly Func<Sprite, ITexture> _textureFunc;
         readonly DrawLayer _layer;
         readonly SpriteKeyFlags _keyFlags;
+        readonly Func<ITextureId, ITexture> _loaderFunc;
+
         SpriteLease _sprite;
         Vector3 _position;
         Vector2? _size;
@@ -34,15 +19,15 @@ namespace UAlbion.Core.Visual
         SpriteFlags _flags;
         bool _dirty = true;
 
-        public static Sprite CharacterSprite(Func<Sprite, ITexture> textureFunc) =>
-            new Sprite(textureFunc, Vector3.Zero, DrawLayer.Character, 0, SpriteFlags.BottomAligned);
+        public static Sprite CharacterSprite(ITextureId id) =>
+            new Sprite(id, Vector3.Zero, DrawLayer.Character, 0, SpriteFlags.BottomAligned);
 
-        public static Sprite ScreenSpaceSprite(Func<Sprite, ITexture> textureFunc, Vector2 position, Vector2 size) =>
-            new Sprite(textureFunc, new Vector3(position, 0), DrawLayer.Interface,
+        public static Sprite ScreenSpaceSprite(ITextureId id, Vector2 position, Vector2 size) =>
+            new Sprite(id, new Vector3(position, 0), DrawLayer.Interface,
                 SpriteKeyFlags.NoTransform,
                 SpriteFlags.LeftAligned) { Size = size };
 
-        public Sprite(Func<Sprite, ITexture> textureFunc, Vector3 position, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags)
+        public Sprite(ITextureId id, Vector3 position, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags, Func<ITextureId, ITexture> loaderFunc = null)
         {
             On<BackendChangedEvent>(_ => Dirty = true);
             On<RenderEvent>(e => UpdateSprite());
@@ -62,8 +47,11 @@ namespace UAlbion.Core.Visual
             _layer = layer;
             _keyFlags = keyFlags;
             _flags = flags;
-            _textureFunc = textureFunc;
+            Id = id;
+            _loaderFunc = loaderFunc ?? DefaultLoader;
         }
+
+        public ITextureId Id { get; }
 
         public event EventHandler<SpriteSelectedEventArgs> Selected;
         static Vector3 Normal => Vector3.UnitZ; // TODO
@@ -145,6 +133,8 @@ namespace UAlbion.Core.Visual
             _sprite = null;
         }
 
+        ITexture DefaultLoader(ITextureId id) => Resolve<ITextureLoader>().LoadTexture(id);
+
         void UpdateSprite()
         {
             if (!_dirty)
@@ -155,7 +145,7 @@ namespace UAlbion.Core.Visual
 
             if (_sprite == null)
             {
-                var texture = _textureFunc(this);
+                var texture = _loaderFunc(Id);
                 if (texture == null)
                 {
                     _sprite?.Dispose();

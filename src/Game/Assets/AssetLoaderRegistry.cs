@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.Assets
 {
@@ -15,10 +14,10 @@ namespace UAlbion.Game.Assets
 
         public IAssetLoader GetLoader(FileFormat type) => _loaders[type];
         public IAssetLoader<T> GetLoader<T>(FileFormat type) where T : class => (IAssetLoader<T>)_loaders[type];
-        public object Load(BinaryReader br, AssetKey key, int streamLength, AssetInfo config)
+        public object Load(BinaryReader br, AssetId key, int streamLength, AssetMapping mapping, AssetInfo config)
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
-            return GetLoader(config.Format).Load(br, streamLength, key, config);
+            return GetLoader(config.Format).Load(br, streamLength, mapping, key, config);
         }
 
         public AssetLoaderRegistry AddLoader(IAssetLoader loader)

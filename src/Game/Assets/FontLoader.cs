@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Assets
 {
     public static class FontLoader
     {
+        // TODO: Move to config
         static readonly IDictionary<FontColor, IList<byte>> Mappings = new Dictionary<FontColor, IList<byte>>
         {
             { FontColor.White, new byte[] { 0, 194, 194, 195, 196, 197 } }, // DataLiteral

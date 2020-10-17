@@ -20,17 +20,6 @@ namespace UAlbion.Formats
             return AlbionEncoding.GetBytes(str.Replace("ß", "×"));
         }
 
-        public static string FindBasePath()
-        {
-            var exeLocation = Assembly.GetExecutingAssembly().Location;
-            var curDir = new DirectoryInfo(Path.GetDirectoryName(exeLocation) ?? throw new InvalidOperationException());
-            while (curDir != null && !File.Exists(Path.Combine(curDir.FullName, "data", "assets.json")))
-                curDir = curDir.Parent;
-
-            var baseDir = curDir?.FullName;
-            return baseDir;
-        }
-
         public static string WordWrap(string s, int maxLine)
         {
             if (s == null || s.Length <= maxLine)

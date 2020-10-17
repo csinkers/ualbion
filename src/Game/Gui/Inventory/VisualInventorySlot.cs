@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
+using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
@@ -12,8 +12,8 @@ namespace UAlbion.Game.Gui.Inventory
 {
     public sealed class VisualInventorySlot : UiElement
     {
-        readonly UiSpriteElement<AssetId> _sprite;
-        readonly UiSpriteElement<AssetId> _overlay;
+        readonly UiSpriteElement _sprite;
+        readonly UiSpriteElement _overlay;
         readonly Func<IReadOnlyItemSlot> _getSlot;
         readonly InventorySlotId _slotId;
         readonly Button _button;
@@ -29,7 +29,7 @@ namespace UAlbion.Game.Gui.Inventory
 
             _slotId = slotId;
             _getSlot = getSlot;
-            _overlay = new UiSpriteElement<AssetId>(CoreSpriteId.UiBroken.ToAssetId()) { IsActive = false };
+            _overlay = new UiSpriteElement(Base.CoreSprite.UiBroken) { IsActive = false };
             var text = new UiText(amountSource);
 
             if (!slotId.Slot.IsSpecial())
@@ -37,11 +37,7 @@ namespace UAlbion.Game.Gui.Inventory
                 _size = slotId.Slot.IsBodyPart() ?
                     new Vector2(18, 18) : //16x16 surrounded by 1px borders
                     new Vector2(16, 20);
-                _sprite = new UiSpriteElement<AssetId>(ItemSpriteId.Nothing.ToAssetId())
-                {
-                    SubId = (int)ItemSpriteId.Nothing
-                };
-
+                _sprite = new UiSpriteElement(SpriteId.None);
                 _button = AttachChild(new Button(new FixedPositionStack()
                         .Add(
                             new LayerStack(
@@ -67,10 +63,10 @@ namespace UAlbion.Game.Gui.Inventory
             }
             else
             {
-                _sprite = new UiSpriteElement<AssetId>(
+                _sprite = new UiSpriteElement(
                     slotId.Slot == ItemSlotId.Gold
-                        ? CoreSpriteId.UiGold.ToAssetId()
-                        : CoreSpriteId.UiFood.ToAssetId());
+                        ? Base.CoreSprite.UiGold
+                        : Base.CoreSprite.UiFood);
 
                 _button = AttachChild(new Button(
                     new VerticalStack(
@@ -115,7 +111,7 @@ namespace UAlbion.Game.Gui.Inventory
             _button.AllowDoubleClick = slot.Amount > 1;
 
             if ((int)slot.LastUiPosition.X != extents.X || (int)slot.LastUiPosition.Y != extents.Y)
-                Raise(new SetInventorySlotUiPositionEvent(_slotId.Type, _slotId.Id, _slotId.Slot, extents.X, extents.Y));
+                Raise(new SetInventorySlotUiPositionEvent(_slotId, extents.X, extents.Y));
 
             if (contents is ItemData item)
             {
@@ -129,7 +125,7 @@ namespace UAlbion.Game.Gui.Inventory
             }
             else // Nothing, or gold/rations (subId should still be 0)
             {
-                _sprite.SubId = (int)ItemSpriteId.Nothing;
+                _sprite.SubId = 0;
                 _overlay.IsActive = false;
             }
         }

@@ -1,5 +1,4 @@
 ﻿using System;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
@@ -15,7 +14,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
             var textSection = new UiText(text);
             var slider = new Slider(() => Value, x => Value = x, min, max);
-            var button = new Button(SystemTextId.MsgBox_OK).OnClick(Close);
+            var button = new Button(Base.SystemText.MsgBox_OK).OnClick(Close);
             Value = min;
 
             // 30

@@ -1,5 +1,5 @@
 ﻿using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Text
 {

@@ -10,7 +10,6 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
-using UAlbion.Game.Assets;
 using UAlbion.Game.Debugging;
 using UAlbion.Game.Input;
 using UAlbion.Game.State;
@@ -133,15 +132,6 @@ namespace UAlbion.Game.Veldrid.Debugging
 
                     ImGui.Columns(1);
                     ImGui.EndGroup();
-                    ImGui.TreePop();
-                }
-
-                if (Resolve<IAssetLocatorRegistry>() is AssetLocatorRegistry assetLocatorRegistry && 
-                    ImGui.TreeNode("Asset Cache"))
-                {
-                    var assets = assetLocatorRegistry.GetCacheInfo();
-                    foreach(var asset in assets)
-                        ImGui.Text(asset.ToString());
                     ImGui.TreePop();
                 }
 

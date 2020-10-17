@@ -5,7 +5,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Flic;
 using UAlbion.Game.Events;
 
@@ -52,8 +52,7 @@ namespace UAlbion.Game
             if (_player != null)
                 return;
 
-            var language = Resolve<ISettings>().Gameplay.Language;
-            var flic = Resolve<IAssetManager>().LoadVideo(_id, language);
+            var flic = Resolve<IAssetManager>().LoadVideo(_id);
             if (flic == null)
             {
                 Complete?.Invoke();
@@ -72,11 +71,12 @@ namespace UAlbion.Game
                 buffer,
                 new[] {new SubImage(Vector2.Zero, size, size, 0),});
 
-            _sprite = AttachChild(new Sprite(_ => _texture,
+            _sprite = AttachChild(new Sprite(SpriteId.None,
                 new Vector3(-1, -1, 0), 
                 DrawLayer.Interface,
                 SpriteKeyFlags.NoTransform,
-                SpriteFlags.LeftAligned | SpriteFlags.FlipVertical));
+                SpriteFlags.LeftAligned | SpriteFlags.FlipVertical,
+                _ => _texture));
             _sprite.Size = 2 * Vector2.One;
 
             var oldId = Resolve<IPaletteManager>().Palette?.Id;

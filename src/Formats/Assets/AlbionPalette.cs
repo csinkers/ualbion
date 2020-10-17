@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets
 {
@@ -43,11 +42,11 @@ namespace UAlbion.Formats.Assets
             ? range
             : Array.Empty<(byte, byte)>();
 
-        public AlbionPalette(BinaryReader br, int streamLength, AssetKey key, int id)
+        public AlbionPalette(BinaryReader br, int streamLength, PaletteId id)
         {
             if (br == null) throw new ArgumentNullException(nameof(br));
-            Id = id;
-            Name = key.ToString();
+            Id = (int)id;
+            Name = id.ToString();
             long startingOffset = br.BaseStream.Position;
             for (int i = 0; i < 192; i++)
             {

@@ -1,0 +1,95 @@
+{
+  "Mappings": {
+    "SpriteId": [
+      "AutomapGraphics",
+      "BackgroundGraphics",
+      "BigNpcGraphics",
+      "BigPartyGraphics",
+      "CombatBackground",
+      "CombatGraphics",
+      "CoreGraphics",
+      "Floor",
+      "Font",
+      "FullBodyPicture",
+      "ItemGraphics",
+      "MonsterGraphics",
+      "Object3D",
+      "Picture",
+      "Slab",
+      "SmallNpcGraphics",
+      "SmallPartyGraphics",
+      "Portrait",
+      "TacticalIcon",
+      "TilesetGraphics",
+      "Wall",
+      "WallOverlay"
+    ],
+
+    "FullBodyPictureId": [ "FullBodyPicture" ],
+    "TilesetGraphicsId": [ "TilesetGraphics" ],
+
+    "CharacterId": [
+      "Monster",
+      "Npc",
+      "PartyMember"
+    ],
+    "MonsterId": [ "Monster" ],
+    "NpcId": [ "Npc" ],
+    "PartyMemberId": [ "PartyMember" ],
+
+    "ItemId": [
+      "Item",
+      "Gold",
+      "Rations"
+    ],
+
+    "AutomapId": [ "Automap" ],
+    "BlockListId": [ "BlockList" ],
+    "ChestId": [ "Chest" ],
+    "DoorId": [ "Door" ],
+    "EventSetId": [ "EventSet" ],
+    "LabyrinthId": [ "Labyrinth" ],
+    "MapId": [ "Map" ],
+    "MerchantId": [ "Merchant" ],
+    "MonsterGroupId": [ "MonsterGroup" ],
+    "PaletteId": [ "Palette" ],
+    "SampleId": [ "Sample" ],
+    "ScriptId": [ "Script" ],
+    "SongId": [ "Song" ],
+    "SpellId": [ "Spell" ],
+    "SwitchId": [ "Switch" ],
+    "TickerId": [ "Ticker" ],
+    "TilesetId": [ "TilesetData" ],
+    "VideoId": [ "Video" ],
+    "WaveLibraryId": [ "WaveLibrary" ],
+
+    "EventTextId": [ "EventText" ],
+    "ItemNameId": [ "ItemName" ],
+    "MapTextId": [ "MapText" ],
+    "WordId": [ "Word" ],
+
+    "TextId": [
+      "EventText",
+      "ItemName",
+      "MapText",
+      "Text",
+      "Word"
+    ]
+  },
+  "Extras": {
+    "EventSetId": [ "        public readonly TextId ToEventText() => new TextId(AssetType.EventText, Id);" ],
+    "MapId": [ "        public readonly TextId ToMapText() => new TextId(AssetType.MapText, Id);" ],
+    "TilesetId": [
+      "        public readonly BlockListId ToBlockList() => new BlockListId(AssetType.BlockList, Id);",
+      "        public readonly TilesetGraphicsId ToTilesetGraphics() => new TilesetGraphicsId(AssetType.TilesetGraphics, Id);"
+    ],
+    "PartyMemberId": [
+      "        public readonly SpriteId ToSmallPartyGraphics() => new SpriteId(AssetType.SmallPartyGraphics, Id);",
+      "        public readonly SpriteId ToBigPartyGraphics() => new SpriteId(AssetType.BigPartyGraphics, Id);",
+      "        public readonly SpriteId ToFullBodyPicture() => new SpriteId(AssetType.FullBodyPicture, Id);"
+    ],
+    "SongId": [ "        public readonly WaveLibraryId ToWaveLibrary() => new WaveLibraryId(AssetType.WaveLibrary, Id);" ],
+    "ItemId": [ "        public readonly ItemNameId ToItemName() => new ItemNameId(AssetType.ItemName, Id);" ],
+    "SpriteId": [ "        public static implicit operator SpriteId(UAlbion.Base.CoreSprite id) => SpriteId.From(id);" ]
+  }
+}

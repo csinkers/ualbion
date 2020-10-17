@@ -6,7 +6,6 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
@@ -20,7 +19,7 @@ namespace UAlbion.Game.Veldrid.Input
 {
     public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
     {
-        CoreSpriteId _cursorId = CoreSpriteId.Cursor;
+        SpriteId _cursorId = Base.CoreSprite.Cursor;
 
         public Vector2 Position { get; private set; }
         Vector2 _hotspot;
@@ -52,7 +51,7 @@ namespace UAlbion.Game.Veldrid.Input
             });
         }
 
-        void SetCursor(CoreSpriteId cursorId)
+        void SetCursor(SpriteId cursorId)
         {
             var assets = Resolve<IAssetManager>();
             var window = Resolve<IWindowManager>();
@@ -152,7 +151,7 @@ namespace UAlbion.Game.Veldrid.Input
                     : tm.BuildRenderable(new TextBlock(itemAmountText), DrawLayer.MaxLayer, null, this);
             }
 
-            if (_cursorId != CoreSpriteId.CursorSmall) // Inventory screen, check what's being held.
+            if (_cursorId != Base.CoreSprite.CursorSmall) // Inventory screen, check what's being held.
             {
                 _itemSprite?.Dispose(); _itemSprite = null;
                 _itemAmountSprite?.Dispose(); _itemAmountSprite = null;
@@ -164,13 +163,12 @@ namespace UAlbion.Game.Veldrid.Input
 
             switch (held.Item)
             {
-                case Gold _: texture = assets.LoadTexture(CoreSpriteId.UiGold); break;
-                case Rations _: texture = assets.LoadTexture(CoreSpriteId.UiFood); break;
+                case Gold _: texture = assets.LoadTexture(Base.CoreSprite.UiGold); break;
+                case Rations _: texture = assets.LoadTexture(Base.CoreSprite.UiFood); break;
                 case ItemData item:
                 {
-                    ItemSpriteId spriteId = (ItemSpriteId)((int)item.Icon + _frame % item.IconAnim);
-                    texture = assets.LoadTexture(spriteId);
-                    subItem = (int)spriteId;
+                    texture = assets.LoadTexture(item.Icon);
+                    subItem = item.IconSubId + _frame % item.IconAnim;
                     break;
                 }
             }

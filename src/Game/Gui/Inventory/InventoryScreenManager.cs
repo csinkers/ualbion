@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
@@ -13,9 +13,9 @@ namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryScreenManager : Component
     {
-        ISetInventoryModeEvent _modeEvent = new InventoryOpenEvent(null); // Should never be null.
+        ISetInventoryModeEvent _modeEvent = new InventoryOpenEvent(PartyMemberId.None); // Should never be null.
         InventoryPage _page;
-        PartyCharacterId _activeCharacter;
+        PartyMemberId _activeCharacter;
         Action<bool> _continuation;
         InventoryScreen _screen;
 
@@ -24,7 +24,7 @@ namespace UAlbion.Game.Gui.Inventory
             OnAsync<ChestEvent, bool>(OpenChest);
             OnAsync<DoorEvent, bool>(OpenDoor);
             OnAsync<MerchantEvent>(TalkToMerchant);
-            On<InventoryOpenEvent>(e => SetDisplayedPartyMember(e.Member));
+            On<InventoryOpenEvent>(e => SetDisplayedPartyMember(e.Submode));
             On<InventoryOpenPositionEvent>(e =>
             {
                 var party = Resolve<IParty>();
@@ -69,11 +69,11 @@ namespace UAlbion.Game.Gui.Inventory
             if (e is ILockedInventoryEvent locked && locked.InitialTextId != 255)
             {
                 var state = Resolve<IGameState>();
-                Raise(new MapTextEvent(state.MapId, locked.InitialTextId, TextLocation.TextInWindow, null));
+                Raise(new TextEvent(state.MapId.ToMapText(), locked.InitialTextId, TextLocation.TextInWindow, SpriteId.None));
             }
         }
 
-        void SetDisplayedPartyMember(PartyCharacterId? member)
+        void SetDisplayedPartyMember(PartyMemberId? member)
         {
             if (Resolve<ISceneManager>().ActiveSceneId != SceneId.Inventory)
                 Raise(new PushSceneEvent(SceneId.Inventory));
@@ -85,7 +85,7 @@ namespace UAlbion.Game.Gui.Inventory
 
             _activeCharacter = member.Value;
 
-            Raise(new SetContextEvent(ContextType.Inventory, AssetType.PartyMember, (int)member.Value));
+            Raise(new SetContextEvent(ContextType.Inventory, member.Value));
             Rebuild();
         }
 
@@ -110,7 +110,7 @@ namespace UAlbion.Game.Gui.Inventory
 
         void InventoryClosed()
         {
-            _modeEvent = new InventoryOpenEvent(null);
+            _modeEvent = new InventoryOpenEvent(PartyMemberId.None);
             _screen?.Remove();
             _screen = null;
             Raise(new PopSceneEvent());

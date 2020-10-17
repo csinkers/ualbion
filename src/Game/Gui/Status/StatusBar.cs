@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
@@ -14,7 +13,7 @@ namespace UAlbion.Game.Gui.Status
     public class StatusBar : Dialog
     {
         const int MaxPortraits = SavedGame.MaxPartySize;
-        readonly UiSpriteElement<SlabId> _sprite;
+        readonly UiSpriteElement _sprite;
         readonly StatusBarPortrait[] _portraits;
         readonly TextFilter _hoverSource = new TextFilter(x => x.Alignment = TextAlignment.Center);
         readonly TextFilter _descriptionSource = new TextFilter(x => x.Alignment = TextAlignment.Center);
@@ -26,7 +25,7 @@ namespace UAlbion.Game.Gui.Status
             On<HoverTextEvent>(e => _hoverSource.Source = e.Source);
             On<DescriptionTextEvent>(e => _descriptionSource.Source = e.Source);
 
-            _sprite = AttachChild(new UiSpriteElement<SlabId>(SlabId.SLAB));
+            _sprite = AttachChild(new UiSpriteElement(Base.UiBackground.SLAB));
             _sprite.SubId = 1;
             _portraits = new StatusBarPortrait[MaxPortraits];
             for (int i = 0; i < _portraits.Length; i++)

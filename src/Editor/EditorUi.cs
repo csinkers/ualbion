@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using ImGuiNET;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Game.Assets;
 
@@ -16,7 +16,7 @@ namespace UAlbion.Editor
         bool _showInspector;
         bool _showAssets;
 
-        readonly Dictionary<AssetType, AssetKey[]> _allKeys = new Dictionary<AssetType, AssetKey[]>();
+        readonly Dictionary<AssetType, AssetId[]> _allKeys = new Dictionary<AssetType, AssetId[]>();
 
         public EditorUi()
         {
@@ -32,8 +32,8 @@ namespace UAlbion.Editor
         {
             if (Children.Count == 0)
             {
-                var toronto = (MapData2D)Resolve<IRawAssetManager>().LoadMap(MapDataId.Toronto2DGesamtkarteSpielbeginn);
-                var tom = Resolve<IRawAssetManager>().LoadPartyMember(PartyCharacterId.Tom);
+                var toronto = (MapData2D)Resolve<IRawAssetManager>().LoadMap(Base.Map.Toronto2DGesamtkarteSpielbeginn);
+                var tom = Resolve<IRawAssetManager>().LoadSheet(Base.PartyMember.Tom);
                 AttachChild(new FlatMapEditor("Map Editor", toronto));
                 AttachChild(new CharacterEditor("Tom", tom));
             }
@@ -41,7 +41,7 @@ namespace UAlbion.Editor
             base.Subscribed();
         }
 
-        void ReloadAssetKeys()
+        void ReloadAssetIds()
         {
             var raw = Resolve<IRawAssetManager>();
             _allKeys.Clear();
@@ -58,7 +58,7 @@ namespace UAlbion.Editor
         void RenderAssetPicker()
         {
             if(_allKeys.Count == 0)
-                ReloadAssetKeys();
+                ReloadAssetIds();
 
             // TODO: Filter textbox w/ keyboard shortcuts
             ImGui.SetWindowSize(new Vector2(300, 200), ImGuiCond.FirstUseEver);
@@ -84,6 +84,12 @@ namespace UAlbion.Editor
         {
             if (ImGui.BeginMainMenuBar())
             {
+                // Build
+                //   assets -> min_assets
+                //   verify asset mappings & formats etc
+                //   create effective XLDs
+                // Create new mod, open mod, save mod
+
                 // ImGui.DockSpace(0, Resolve<IWindowManager>().Size);
                 if (ImGui.BeginMenu("File"))
                     ImGui.EndMenu();

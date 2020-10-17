@@ -1,5 +1,4 @@
 ﻿using System;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 
@@ -11,9 +10,8 @@ namespace UAlbion.Game.State
         int TickCount { get; }
         DateTime Time { get; }
         IParty Party { get; }
-        MapDataId MapId { get; }
-        ICharacterSheet GetNpc(NpcCharacterId id);
-        ICharacterSheet GetPartyMember(PartyCharacterId id);
+        MapId MapId { get; }
+        ICharacterSheet GetSheet(CharacterId id);
         IInventory GetInventory(InventoryId id);
         short GetTicker(TickerId id);
         bool GetSwitch(SwitchId id);

@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
+using Xunit;
+using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.State.Player;
 using UAlbion.TestCommon;
-using Xunit;
 
 namespace UAlbion.Game.Tests
 {
@@ -19,18 +19,27 @@ namespace UAlbion.Game.Tests
         readonly Dictionary<InventoryId, Inventory> _inventories;
         readonly EventExchange _exchange;
         readonly InventoryManager _im;
+        readonly InventoryId _tomInv;
 
         public InventoryTests()
         {
-            _sword = new ItemData(ItemId.Sword) { TypeId = ItemType.CloseRangeWeapon };
-            _torch = new ItemData(ItemId.Torch)
+            AssetMapping.GlobalIsThreadLocal = true;
+            AssetMapping.Global.Clear()
+                .RegisterAssetType(typeof(Base.PartyMember), AssetType.PartyMember)
+                .RegisterAssetType(typeof(Base.CoreSprite), AssetType.CoreGraphics)
+                .RegisterAssetType(typeof(Base.Item), AssetType.Item)
+                ;
+
+            _tomInv = new InventoryId((CharacterId)Base.PartyMember.Tom);
+            _sword = new ItemData(Base.Item.Sword) { TypeId = ItemType.CloseRangeWeapon };
+            _torch = new ItemData(Base.Item.Torch)
             {
                 TypeId = ItemType.Misc,
                 Flags = ItemFlags.Stackable
             };
 
-            _tom = new Inventory(new InventoryId(PartyCharacterId.Tom));
-            _rainer = new Inventory(new InventoryId(PartyCharacterId.Rainer));
+            _tom = new Inventory(_tomInv);
+            _rainer = new Inventory(new InventoryId((CharacterId)Base.PartyMember.Rainer));
             _inventories = new Dictionary<InventoryId, Inventory>
             {
                 [_tom.Id] = _tom,
@@ -53,10 +62,10 @@ namespace UAlbion.Game.Tests
         public void PickupItemTest()
         {
             _tom.Slots[0].Set(_torch, 1);
-            Assert.Null(_im.ItemInHand.ItemId);
-            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, 0));
-            Assert.NotNull(_im.ItemInHand.ItemId);
-            Assert.Equal(ItemId.Torch, _im.ItemInHand.ItemId);
+            Assert.True(_im.ItemInHand.ItemId.IsNone);
+            Raise(new InventorySwapEvent(_tomInv, 0));
+            Assert.False(_im.ItemInHand.ItemId.IsNone);
+            Assert.Equal(Base.Item.Torch, _im.ItemInHand.ItemId);
             Assert.Equal(1, _im.ItemInHand.Amount);
         }
 
@@ -65,12 +74,12 @@ namespace UAlbion.Game.Tests
         {
             _tom.Slots[0].Set(_torch, 1);
 
-            Assert.Null(_im.ItemInHand.ItemId);
-            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, 0));
-            Assert.NotNull(_im.ItemInHand.ItemId);
-            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, (ItemSlotId)1));
-            Assert.Null(_im.ItemInHand.ItemId);
-            Assert.Equal(ItemId.Torch, _tom.Slots[1].ItemId);
+            Assert.True(_im.ItemInHand.ItemId.IsNone);
+            Raise(new InventorySwapEvent(_tomInv, 0));
+            Assert.False(_im.ItemInHand.ItemId.IsNone);
+            Raise(new InventorySwapEvent(_tomInv, (ItemSlotId)1));
+            Assert.True(_im.ItemInHand.ItemId.IsNone);
+            Assert.Equal(Base.Item.Torch, _tom.Slots[1].ItemId);
             Assert.Equal(1, _tom.Slots[1].Amount);
         }
 
@@ -80,12 +89,12 @@ namespace UAlbion.Game.Tests
             _tom.Slots[0].Set(_torch, 1);
             _tom.Slots[1].Set(_torch, 1);
 
-            Assert.Null(_im.ItemInHand.ItemId);
-            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, 0));
-            Assert.NotNull(_im.ItemInHand.ItemId);
-            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, (ItemSlotId)1));
-            Assert.Null(_im.ItemInHand.ItemId);
-            Assert.Equal(ItemId.Torch, _tom.Slots[1].ItemId);
+            Assert.True(_im.ItemInHand.ItemId.IsNone);
+            Raise(new InventorySwapEvent(_tomInv, 0));
+            Assert.False(_im.ItemInHand.ItemId.IsNone);
+            Raise(new InventorySwapEvent(_tomInv, (ItemSlotId)1));
+            Assert.True(_im.ItemInHand.ItemId.IsNone);
+            Assert.Equal(Base.Item.Torch, _tom.Slots[1].ItemId);
             Assert.Equal(2, _tom.Slots[1].Amount);
         }
 
@@ -95,14 +104,14 @@ namespace UAlbion.Game.Tests
             _tom.Slots[0].Set(_torch, 1);
             _tom.Slots[1].Set(_sword, 1);
 
-            Assert.Null(_im.ItemInHand.ItemId);
-            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, 0));
-            Assert.NotNull(_im.ItemInHand.ItemId);
-            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, (ItemSlotId)1));
-            Assert.NotNull(_im.ItemInHand.ItemId);
-            Assert.Equal(ItemId.Sword, _im.ItemInHand.ItemId);
+            Assert.True(_im.ItemInHand.ItemId.IsNone);
+            Raise(new InventorySwapEvent(_tomInv, 0));
+            Assert.False(_im.ItemInHand.ItemId.IsNone);
+            Raise(new InventorySwapEvent(_tomInv, (ItemSlotId)1));
+            Assert.False(_im.ItemInHand.ItemId.IsNone);
+            Assert.Equal(Base.Item.Sword, _im.ItemInHand.ItemId);
             Assert.Equal(1, _im.ItemInHand.Amount);
-            Assert.Equal(ItemId.Torch, _tom.Slots[1].ItemId);
+            Assert.Equal(Base.Item.Torch, _tom.Slots[1].ItemId);
             Assert.Equal(1, _tom.Slots[1].Amount);
         }
 
@@ -111,11 +120,11 @@ namespace UAlbion.Game.Tests
         {
             _tom.Slots[0].Set(_torch, 5);
 
-            Assert.Null(_im.ItemInHand.ItemId);
-            Raise(new InventoryPickupEvent(null, InventoryType.Player, (ushort)PartyCharacterId.Tom, 0));
-            Assert.Equal(ItemId.Torch, _im.ItemInHand.ItemId);
+            Assert.True(_im.ItemInHand.ItemId.IsNone);
+            Raise(new InventoryPickupEvent(null, _tomInv, 0));
+            Assert.Equal(Base.Item.Torch, _im.ItemInHand.ItemId);
             Assert.Equal(5, _im.ItemInHand.Amount);
-            Assert.Null(_tom.Slots[0].ItemId);
+            Assert.True(_tom.Slots[0].ItemId.IsNone);
         }
 
         [Fact]
@@ -126,44 +135,44 @@ namespace UAlbion.Game.Tests
             _tom.Slots[2].Set(_sword, 1);
             _tom.Slots[3].Set(_sword, 1);
 
-            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, 0));
-            Assert.Equal(ItemId.Torch, _im.ItemInHand.ItemId);
+            Raise(new InventorySwapEvent(_tomInv, 0));
+            Assert.Equal(Base.Item.Torch, _im.ItemInHand.ItemId);
             Assert.Equal(1, _im.ItemInHand.Amount);
 
-            Raise(new InventoryGiveItemEvent(PartyCharacterId.Rainer));
-            Assert.Null(_im.ItemInHand.ItemId);
-            Assert.Equal(ItemId.Torch, _rainer.Slots[0].ItemId);
+            Raise(new InventoryGiveItemEvent(Base.PartyMember.Rainer));
+            Assert.True(_im.ItemInHand.ItemId.IsNone);
+            Assert.Equal(Base.Item.Torch, _rainer.Slots[0].ItemId);
             Assert.Equal(1, _rainer.Slots[0].Amount);
-            Assert.Null(_tom.Slots[0].ItemId);
+            Assert.True(_tom.Slots[0].ItemId.IsNone);
             Assert.Equal(0, _tom.Slots[0].Amount);
 
-            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, (ItemSlotId)1));
-            Assert.Equal(ItemId.Torch, _im.ItemInHand.ItemId);
+            Raise(new InventorySwapEvent(_tomInv, (ItemSlotId)1));
+            Assert.Equal(Base.Item.Torch, _im.ItemInHand.ItemId);
             Assert.Equal(1, _im.ItemInHand.Amount);
 
-            Raise(new InventoryGiveItemEvent(PartyCharacterId.Rainer));
-            Assert.Null(_im.ItemInHand.ItemId);
-            Assert.Equal(ItemId.Torch, _rainer.Slots[0].ItemId);
+            Raise(new InventoryGiveItemEvent(Base.PartyMember.Rainer));
+            Assert.True(_im.ItemInHand.ItemId.IsNone);
+            Assert.Equal(Base.Item.Torch, _rainer.Slots[0].ItemId);
             Assert.Equal(2, _rainer.Slots[0].Amount);
 
-            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, (ItemSlotId)2));
-            Assert.Equal(ItemId.Sword, _im.ItemInHand.ItemId);
+            Raise(new InventorySwapEvent(_tomInv, (ItemSlotId)2));
+            Assert.Equal(Base.Item.Sword, _im.ItemInHand.ItemId);
             Assert.Equal(1, _im.ItemInHand.Amount);
 
-            Raise(new InventoryGiveItemEvent(PartyCharacterId.Rainer));
-            Assert.Null(_im.ItemInHand.ItemId);
-            Assert.Equal(ItemId.Sword, _rainer.Slots[1].ItemId);
+            Raise(new InventoryGiveItemEvent(Base.PartyMember.Rainer));
+            Assert.True(_im.ItemInHand.ItemId.IsNone);
+            Assert.Equal(Base.Item.Sword, _rainer.Slots[1].ItemId);
             Assert.Equal(1, _rainer.Slots[1].Amount);
 
-            Raise(new InventorySwapEvent(InventoryType.Player, (ushort)PartyCharacterId.Tom, (ItemSlotId)3));
-            Assert.Equal(ItemId.Sword, _im.ItemInHand.ItemId);
+            Raise(new InventorySwapEvent(_tomInv, (ItemSlotId)3));
+            Assert.Equal(Base.Item.Sword, _im.ItemInHand.ItemId);
             Assert.Equal(1, _im.ItemInHand.Amount);
 
-            Raise(new InventoryGiveItemEvent(PartyCharacterId.Rainer));
-            Assert.Null(_im.ItemInHand.ItemId);
-            Assert.Equal(ItemId.Sword, _rainer.Slots[1].ItemId);
+            Raise(new InventoryGiveItemEvent(Base.PartyMember.Rainer));
+            Assert.True(_im.ItemInHand.ItemId.IsNone);
+            Assert.Equal(Base.Item.Sword, _rainer.Slots[1].ItemId);
             Assert.Equal(1, _rainer.Slots[1].Amount);
-            Assert.Equal(ItemId.Sword, _rainer.Slots[2].ItemId);
+            Assert.Equal(Base.Item.Sword, _rainer.Slots[2].ItemId);
             Assert.Equal(1, _rainer.Slots[2].Amount);
         }
 

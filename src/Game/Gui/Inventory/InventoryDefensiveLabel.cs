@@ -1,5 +1,5 @@
 ﻿using UAlbion.Core.Events;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
@@ -11,10 +11,10 @@ namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryDefensiveLabel : UiElement
     {
-        readonly PartyCharacterId _activeCharacter;
+        readonly PartyMemberId _activeCharacter;
         int _version;
 
-        public InventoryDefensiveLabel(PartyCharacterId activeCharacter)
+        public InventoryDefensiveLabel(PartyMemberId activeCharacter)
         {
             On<InventoryChangedEvent>(e => _version++);
             On<BlurEvent>(e => Raise(new HoverTextEvent(null)));
@@ -34,7 +34,7 @@ namespace UAlbion.Game.Gui.Inventory
                     new FixedSize(27, 8,
                         new HorizontalStack(
                             new FixedSize(6, 8,
-                                new UiSpriteElement<CoreSpriteId>(CoreSpriteId.UiDefensiveValue)),
+                                new UiSpriteElement(Base.CoreSprite.UiDefensiveValue)),
                             new Spacing(1, 0),
                             new UiText(new LiteralText(":")),
                             new UiText(source)
@@ -54,7 +54,7 @@ namespace UAlbion.Game.Gui.Inventory
 
             // Protection : %d
             var protection = player?.Apparent.DisplayProtection ?? 0;
-            var text = tf.Format(SystemTextId.Inv_ProtectionN, protection);
+            var text = tf.Format(Base.SystemText.Inv_ProtectionN, protection);
             Raise(new HoverTextEvent(text));
             e.Propagating = false;
         }

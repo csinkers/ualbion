@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Text
 {
@@ -8,21 +7,26 @@ namespace UAlbion.Game.Text
     {
         readonly TextFormatter _formatter;
         readonly IList<(Token, object)> _implicitTokens = new List<(Token, object)>();
-        GameLanguage? _language;
 
         public CustomisedTextFormatter(TextFormatter formatter) => _formatter = formatter;
 
+        public IText Format(TextId textId, params object[] arguments)
+            => _formatter.Format(textId, _implicitTokens, arguments);
+
         public IText Format(StringId stringId, params object[] arguments) 
-            => _formatter.Format(stringId, _implicitTokens, _language, arguments);
+            => _formatter.Format(stringId, _implicitTokens, arguments);
 
         public IText Format(string template, params object[] arguments)
-            => _formatter.Format(template, _implicitTokens, _language, arguments);
+            => _formatter.Format(template, _implicitTokens, arguments);
 
-        public IText Format(StringId stringId, IList<(Token, object)> implicitTokens, GameLanguage? language, params object[] arguments)
-            => _formatter.Format(stringId, implicitTokens, language, arguments);
+        public IText Format(TextId textId, IList<(Token, object)> implicitTokens, params object[] arguments)
+            => _formatter.Format(textId, implicitTokens, arguments);
 
-        public IText Format(string template, IList<(Token, object)> implicitTokens, GameLanguage? language, params object[] arguments)
-            => _formatter.Format(template, implicitTokens, language, arguments);
+        public IText Format(StringId stringId, IList<(Token, object)> implicitTokens, params object[] arguments)
+            => _formatter.Format(stringId, implicitTokens, arguments);
+
+        public IText Format(string template, IList<(Token, object)> implicitTokens, params object[] arguments)
+            => _formatter.Format(template, implicitTokens, arguments);
 
         public ITextFormatter NoWrap() { _implicitTokens.Add((Token.NoWrap, null)); return this; }
         public ITextFormatter Left(){ _implicitTokens.Add((Token.Left, null)); return this; }
@@ -31,6 +35,5 @@ namespace UAlbion.Game.Text
         public ITextFormatter Justify(){ _implicitTokens.Add((Token.Justify, null)); return this; }
         public ITextFormatter Fat() { _implicitTokens.Add((Token.Fat, null)); return this; }
         public ITextFormatter Ink(FontColor color) { _implicitTokens.Add((Token.Ink, (int)color)); return this; }
-        public ITextFormatter Language(GameLanguage language) { _language = language; return this; }
     }
 }

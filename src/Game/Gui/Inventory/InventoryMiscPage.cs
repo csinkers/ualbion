@@ -1,5 +1,4 @@
-﻿using UAlbion.Formats.AssetIds;
-using UAlbion.Game.Gui.Controls;
+﻿using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui.Inventory
 {
@@ -8,13 +7,13 @@ namespace UAlbion.Game.Gui.Inventory
         public InventoryMiscPage()
         {
             var stack = new VerticalStack(
-                new Header(SystemTextId.Inv3_Conditions),
+                new Header(Base.SystemText.Inv3_Conditions),
                 new Spacing(0, 64),
-                new Header(SystemTextId.Inv3_Languages),
+                new Header(Base.SystemText.Inv3_Languages),
                 new Spacing(0, 23),
-                new Header(SystemTextId.Inv3_TemporarySpells),
+                new Header(Base.SystemText.Inv3_TemporarySpells),
                 new Spacing(0, 45),
-                new Button(SystemTextId.Inv3_CombatPositions) // TODO: Make functional
+                new Button(Base.SystemText.Inv3_CombatPositions) // TODO: Make functional
             );
             AttachChild(stack);
         }

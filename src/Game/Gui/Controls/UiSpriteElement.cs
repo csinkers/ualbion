@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Globalization;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Gui.Controls
 {
-    public class UiSpriteElement<T> : UiElement where T : struct
+    public class UiSpriteElement : UiElement
     {
-        T? _id;
+        SpriteId _id;
         Vector2 _size;
         SpriteLease _sprite;
         Vector3 _lastPosition;
@@ -19,7 +19,7 @@ namespace UAlbion.Game.Gui.Controls
         SpriteFlags _flags;
         bool _dirty = true;
 
-        public UiSpriteElement(T id)
+        public UiSpriteElement(SpriteId id)
         {
             On<BackendChangedEvent>(_ => _dirty = true);
             Id = id;
@@ -31,15 +31,12 @@ namespace UAlbion.Game.Gui.Controls
             _sprite = null;
         }
 
-        public T Id
+        public SpriteId Id
         {
-            get => _id ?? (T)(object)0;
+            get => _id;
             set
             {
-                int existing = _id == null ? -1 : Convert.ToInt32(_id.Value, CultureInfo.InvariantCulture);
-                int newValue = Convert.ToInt32(value, CultureInfo.InvariantCulture);
-
-                if (existing == newValue) return;
+                if (_id == value) return;
                 _id = value;
                 _dirty = true;
             }
@@ -99,13 +96,13 @@ namespace UAlbion.Game.Gui.Controls
             _sprite?.Dispose();
             _sprite = null;
 
-            if (_id == null)
+            if (_id.IsNone)
             {
                 _size = Vector2.One;
             }
             else
             {
-                var texture = assets.LoadTexture(_id.Value);
+                var texture = assets.LoadTexture(_id);
                 if (texture == null)
                     return;
                 var key = new SpriteKey(texture, order, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);

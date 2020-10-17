@@ -1,20 +1,19 @@
 ﻿using System.IO;
 using SerdesNet;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Formats.Parsers
 {
     [AssetLoader(FileFormat.CharacterData)]
     public class CharacterSheetLoader : IAssetLoader<CharacterSheet>
     {
-        public CharacterSheet Serdes(CharacterSheet existing, ISerializer s, AssetKey key, AssetInfo config)
-            => CharacterSheet.Serdes(key.AssetId, existing, s);
+        public CharacterSheet Serdes(CharacterSheet existing, AssetMapping mapping, ISerializer s, AssetId id, AssetInfo config)
+            => CharacterSheet.Serdes(id, existing, mapping, s);
 
-        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
         {
-            var sheet = Serdes(null, new AlbionReader(br, streamLength), key, config);
+            var sheet = Serdes(null, mapping, new AlbionReader(br, streamLength), id, config);
             return sheet;
         }
     }

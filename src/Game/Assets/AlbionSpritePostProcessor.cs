@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Assets
@@ -12,7 +12,7 @@ namespace UAlbion.Game.Assets
     public class AlbionSpritePostProcessor : IAssetPostProcessor
     {
         public IEnumerable<Type> SupportedTypes => new[] { typeof(AlbionSprite) };
-        public object Process(ICoreFactory factory, AssetKey key, object asset, Func<AssetKey, object> loaderFunc)
+        public object Process(ICoreFactory factory, AssetId key, object asset, SerializationContext context, Func<AssetId, SerializationContext, object> loaderFunc)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
             if (asset == null) throw new ArgumentNullException(nameof(asset));

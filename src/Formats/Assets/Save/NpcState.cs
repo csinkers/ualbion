@@ -1,22 +1,32 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
+using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Formats.Assets.Save
 {
     public class NpcState
     {
         // Total size = 128 bytes
-        public static NpcState Serdes(int i, NpcState npc, ISerializer s)
+        public static NpcState Serdes(int i, NpcState npc, (MapType mapType, AssetMapping mapping) c, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             npc ??= new NpcState();
             var startOffset = s.Offset;
 
-            npc.Id = s.TransformEnumU8(nameof(Id), npc.Id, TweakedConverter<NpcCharacterId>.Instance); // 0
+            byte id = (byte)npc.Id.ToDisk(c.mapping);
+            id = s.UInt8(nameof(Id), id); // 0
             s.UInt8("dummy", 0);
-            npc.ObjectNumber = s.Transform<ushort, ushort?>(nameof(ObjectNumber), npc.ObjectNumber, S.UInt16, TweakedConverter.Instance); // 2
+
+            switch (c.mapType)
+            {
+                case MapType.ThreeD: npc.SpriteOrGroup = AssetId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.ObjectGroup, c.mapping, s); break;
+                case MapType.TwoD: npc.SpriteOrGroup = SpriteId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.BigNpcGraphics, c.mapping, s); break;
+                case MapType.TwoDOutdoors: npc.SpriteOrGroup = SpriteId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.SmallNpcGraphics, c.mapping, s); break;
+                default: throw new ArgumentOutOfRangeException(nameof(c), c.mapType, null);
+            }
+
             npc.Unk4 = s.UInt16(nameof(Unk4), npc.Unk4);
             npc.Unk6 = s.UInt16(nameof(Unk6), npc.Unk6);
             npc.Unk8 = s.UInt8(nameof(Unk8), npc.Unk8);
@@ -84,12 +94,15 @@ namespace UAlbion.Formats.Assets.Save
             npc.Unk7C = s.UInt16(nameof(Unk7C), npc.Unk7C);
             npc.Unk7E = s.UInt16(nameof(Unk7E), npc.Unk7E);
 
+            var assetType = (npc.Flags & NpcFlags.IsMonster) != 0 ? AssetType.MonsterGroup : AssetType.Npc;
+            npc.Id = AssetId.FromDisk(assetType, id, c.mapping);
+
             ApiUtil.Assert(s.Offset == startOffset + 0x80);
             return npc;
         }
 
-        public NpcCharacterId? Id { get; set; } // 0
-        public ushort? ObjectNumber { get; set; } // 2
+        public NpcId Id { get; set; } // 0
+        public AssetId SpriteOrGroup { get; set; } // 2
         public ushort Unk4 { get; set; } // 4
         public ushort Unk6 { get; set; } // 6. Always 0?
         public byte Unk8 { get; set; } // 8. Always 0?
@@ -158,8 +171,11 @@ namespace UAlbion.Formats.Assets.Save
         public ushort Unk7E { get; set; }
 
 
+        public NpcFlags Flags { get; } = 0; // TODO: Find which Unk this is
+        public NpcMovementTypes Movement { get; } = 0; // TODO: Find which Unk this is
+
         public override string ToString() =>
-            $@"{Id} O:{ObjectNumber}:{(LargeNpcId)ObjectNumber}
+            $@"{Id} O:{SpriteOrGroup}
     4:{Unk4} 6:{Unk6} 8:{Unk8} 9:{Unk9} 11:{Unk11} 13:{Unk13} 15:{Unk15} 17:{Unk17} 19:{Unk19} 
     1B:{Unk1B} 1D:{Unk1D} 1F:{Unk1F} 20:{Unk20} 21:{Unk21} 23:{Unk23} 25:{Unk25} 27:{Unk27} 
     29:{Unk29} {X1} {Y1} {X2} {Y2} 32:{Unk32} 33:{Unk33} 34:{Unk34} 36:{Unk36} 38:{Unk38} 

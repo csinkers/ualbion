@@ -1,7 +1,6 @@
 ﻿using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
@@ -118,18 +117,10 @@ namespace UAlbion.Game.Entities.Map2D
             }
         }
 
-        public (Vector3, int) GetPositionHistory(PartyCharacterId partyMember)
-        {
-            var players = Resolve<IParty>().WalkOrder;
-            int index = 0;
-            for (; index < players.Count && players[index].Id != partyMember; index++) { }
-
-            if (index == players.Count)
-                return (Vector3.Zero, 0);
-
-            var (pos, frame) = _trail[_playerOffsets[index].Item1];
-            return (pos, frame);
-        }
+        public (Vector3, int) GetPositionHistory(int followerIndex) 
+            => followerIndex >= _playerOffsets.Length 
+                ? (Vector3.Zero, 0) 
+                : _trail[_playerOffsets[followerIndex].Item1];
 
         Vector3 To3D(Vector2 position) => new Vector3(position, _settings.GetDepth(position.Y));
     }

@@ -1,21 +1,22 @@
 ﻿using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
     [Event("inv:merchant", "Opens the inventory screen for the given merchant")]
     public class MerchantEvent : Event, ISetInventoryModeEvent, IAsyncEvent
     {
-        public MerchantEvent(MerchantId merchantId, PartyCharacterId? member)
+        public MerchantEvent(MerchantId merchantId, PartyMemberId member) // If member is None, then open with the current team leader
         {
             MerchantId = merchantId;
             Member = member;
         }
 
         public InventoryMode Mode => InventoryMode.Merchant;
-        public ushort Submode => (ushort)MerchantId;
+        public AssetId Submode => MerchantId;
         [EventPart("id")] public MerchantId MerchantId { get; }
-        [EventPart("id", true)] public PartyCharacterId? Member { get; }
-        public ISetInventoryModeEvent CloneForMember(PartyCharacterId member) => new MerchantEvent(MerchantId, member);
+        [EventPart("partyMember")] public PartyMemberId Member { get; }
+        public ISetInventoryModeEvent CloneForMember(PartyMemberId member) => new MerchantEvent(MerchantId, member);
     }
 }

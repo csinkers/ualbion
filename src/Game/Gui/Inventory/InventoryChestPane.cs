@@ -1,5 +1,4 @@
-﻿using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Assets;
+﻿using UAlbion.Formats.Assets;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
@@ -13,7 +12,7 @@ namespace UAlbion.Game.Gui.Inventory
         const int InventoryHeight = 4;
 
         readonly ChestId _id;
-        readonly UiSpriteElement<PictureId> _background;
+        readonly UiSpriteElement _background;
 
         public InventoryChestPane(ChestId id)
         {
@@ -26,7 +25,7 @@ namespace UAlbion.Game.Gui.Inventory
             });
 
             _id = id;
-            _background = new UiSpriteElement<PictureId>(PictureId.OpenChestWithGold);
+            _background = new UiSpriteElement(Base.Picture.OpenChestWithGold);
 
             var backgroundStack = new FixedPositionStack();
             backgroundStack.Add(_background, 0, 0);
@@ -39,33 +38,22 @@ namespace UAlbion.Game.Gui.Inventory
                 for (int i = 0; i < InventoryWidth; i++)
                 {
                     int index = j * InventoryWidth + i;
-                    slotsInRow[i] = new LogicalInventorySlot(new InventorySlotId(
-                        InventoryType.Chest,
-                        (ushort)_id,
-                        (ItemSlotId)((int)ItemSlotId.Slot0 + index)));
+                    slotsInRow[i] = new LogicalInventorySlot(new InventorySlotId(_id, (ItemSlotId)((int)ItemSlotId.Slot0 + index)));
                 }
                 slotSpans[j] = new HorizontalStack(slotsInRow);
             }
 
             var slotStack = new VerticalStack(slotSpans);
             var slotHalfFrame = new ButtonFrame(slotStack) {Theme = ButtonTheme.InventoryOuterFrame, Padding = -1 };
-
-            var goldButton = new LogicalInventorySlot(new InventorySlotId(
-                InventoryType.Chest,
-                (ushort)_id,
-                ItemSlotId.Gold));
-
-            var foodButton = new LogicalInventorySlot(new InventorySlotId(
-                InventoryType.Chest,
-                (ushort)_id,
-                ItemSlotId.Rations));
+            var goldButton = new LogicalInventorySlot(new InventorySlotId(_id, ItemSlotId.Gold));
+            var foodButton = new LogicalInventorySlot(new InventorySlotId(_id, ItemSlotId.Rations));
 
             var takeAllButton =
                 new Button(
-                (UiElement)new UiTextBuilder(UAlbionStringId.TakeAll).Center()
+                (UiElement)new UiTextBuilder(TextId.From(Base.UAlbionStringId.TakeAll)).Center()
                 ).OnClick(() => Raise(new InventoryTakeAllEvent(_id)));
 
-            var header = new Header(new StringId(AssetType.SystemText, 0, (int)SystemTextId.Chest_Chest));
+            var header = new Header(Base.SystemText.Chest_Chest);
             var moneyAndFoodStack = new HorizontalStack(goldButton, takeAllButton, foodButton);
 
             var stack = new VerticalStack(
@@ -81,7 +69,7 @@ namespace UAlbion.Game.Gui.Inventory
         void UpdateBackground()
         {
             var inv = Resolve<IGameState>().GetInventory(new InventoryId(_id));
-            _background.Id = inv.IsEmpty ? PictureId.OpenChest : PictureId.OpenChestWithGold;
+            _background.Id = inv.IsEmpty ? Base.Picture.OpenChest : Base.Picture.OpenChestWithGold;
         }
 
         protected override void Subscribed() => UpdateBackground();

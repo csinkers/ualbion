@@ -12,7 +12,7 @@ namespace UAlbion.Editor
         readonly Dictionary<int, EditorAsset> _assetsById = new Dictionary<int, EditorAsset>();
         readonly Dictionary<object, int> _idsByAsset = new Dictionary<object, int>();
         readonly LinkedList<IEditorEvent> _undoStack = new LinkedList<IEditorEvent>();
-        // Cross references: IDictionary<AssetKey, IList<(object, string)>> - requires loading total state.
+        // Cross references: IDictionary<AssetId, IList<(object, string)>> - requires loading total state.
 
         public EditorAssetManager()
         {

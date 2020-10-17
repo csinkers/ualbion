@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-#if false
+﻿#if false
 namespace UAlbion.Game.Gui.Combat
 {
     internal class BattleScreen : UiElement

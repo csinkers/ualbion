@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
@@ -41,9 +41,8 @@ namespace UAlbion.Game.Gui.Menus
 
         string BuildSaveFilename(ushort i)
         {
-            var key = new AssetKey(AssetType.SavedGame, i);
             var generalConfig = Resolve<IAssetManager>().LoadGeneralConfig();
-            return Path.Combine(generalConfig.BasePath, generalConfig.SavePath, $"SAVE.{key.Id:D3}");
+            return Path.Combine(generalConfig.BasePath, generalConfig.SavePath, $"SAVE.{i:D3}");
         }
 
         protected override void Subscribed()
@@ -54,7 +53,7 @@ namespace UAlbion.Game.Gui.Menus
                     var textFormatter = Resolve<ITextFormatter>();
                     var block = textFormatter
                         .Ink(FontColor.Gray)
-                        .Format(SystemTextId.MainMenu_EmptyPosition)
+                        .Format(Base.SystemText.MainMenu_EmptyPosition)
                         .GetBlocks().Single();
                     block.Text = $"{x,2}    {block.Text}";
                     return new[] { block };

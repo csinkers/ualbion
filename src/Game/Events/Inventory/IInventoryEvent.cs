@@ -4,7 +4,6 @@ namespace UAlbion.Game.Events.Inventory
 {
     public interface IInventoryEvent
     {
-        InventoryType InventoryType { get; }
-        ushort InventoryId { get; }
+        InventoryId Id { get; }
     }
 }

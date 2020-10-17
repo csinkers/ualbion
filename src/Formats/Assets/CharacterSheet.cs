@@ -2,13 +2,13 @@
 using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets
 {
     public class EffectiveCharacterSheet : CharacterSheet, IEffectiveCharacterSheet
     {
-        public EffectiveCharacterSheet(AssetId id) : base(id) { }
+        public EffectiveCharacterSheet(CharacterId id) : base(id) { }
         public int TotalWeight { get; set; }
         public int MaxWeight { get; set; }
         public int DisplayDamage { get; set; }
@@ -21,11 +21,11 @@ namespace UAlbion.Formats.Assets
         public const int MaxSpellsPerSchool = 30;
         public const int MaxNameLength = 16;
 
-        public CharacterSheet(AssetId id)
+        public CharacterSheet(CharacterId id)
         {
             Id = id;
             if (id.Type == AssetType.PartyMember)
-                Inventory = new Inventory((InventoryId)id);
+                Inventory = new Inventory(new InventoryId(id));
         }
 
         // Grouped
@@ -48,7 +48,7 @@ namespace UAlbion.Formats.Assets
             _ => $"{Id} UNKNOWN TYPE {Type}" };
 
         // Names
-        public AssetId Id { get; } // Debug name, not displayed to the player
+        public CharacterId Id { get; }
         public string EnglishName { get; set; }
         public string GermanName { get; set; }
         public string FrenchName { get; set; }
@@ -63,10 +63,10 @@ namespace UAlbion.Formats.Assets
 
         // Display and behaviour
         public PlayerLanguages Languages { get; set; }
-        public AssetId? SpriteId { get; set; }
-        public SmallPortraitId? PortraitId { get; set; }
-        public EventSetId? EventSetId { get; set; }
-        public EventSetId? WordSetId { get; set; }
+        public SpriteId SpriteId { get; set; }
+        public SpriteId PortraitId { get; set; }
+        public EventSetId EventSetId { get; set; }
+        public EventSetId WordSetId { get; set; }
 
         public string GetName(GameLanguage language) => language switch
         {
@@ -131,7 +131,7 @@ namespace UAlbion.Formats.Assets
         public ushort UnknownFC { get; set; }
         // ReSharper restore InconsistentNaming
 
-        public static CharacterSheet Serdes(AssetId id, CharacterSheet sheet, ISerializer s)
+        public static CharacterSheet Serdes(CharacterId id, CharacterSheet sheet, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             var initialOffset = s.Offset;
@@ -148,23 +148,15 @@ namespace UAlbion.Formats.Assets
             sheet.Languages = s.EnumU8(nameof(sheet.Languages), sheet.Languages);
             s.Check();
 
-            var spriteType =
-                sheet.Type switch
+            sheet.SpriteId = sheet.Type switch
                 {
-                    CharacterType.Party => AssetType.BigPartyGraphics,
-                    CharacterType.Npc => AssetType.BigNpcGraphics,
-                    CharacterType.Monster => AssetType.MonsterGraphics,
+                    CharacterType.Party   => SpriteId.SerdesU8(nameof(SpriteId), sheet.SpriteId, AssetType.BigPartyGraphics, mapping, s),
+                    CharacterType.Npc     => SpriteId.SerdesU8(nameof(SpriteId), sheet.SpriteId, AssetType.BigNpcGraphics, mapping, s),
+                    CharacterType.Monster => SpriteId.SerdesU8(nameof(SpriteId), sheet.SpriteId, AssetType.MonsterGraphics, mapping, s),
                     _ => throw new InvalidOperationException($"Unhandled character type {sheet.Type}")
                 };
 
-            byte? spriteId = s.Transform<byte,byte?>(
-                nameof(sheet.SpriteId),
-                (byte?)sheet.SpriteId?.Id,
-                S.UInt8,
-                ZeroToNullConverter.Instance);
-
-            sheet.SpriteId = spriteId == null ? (AssetId?)null : new AssetId(spriteType, spriteId.Value);
-            sheet.PortraitId = s.TransformEnumU8(nameof(sheet.PortraitId), sheet.PortraitId, TweakedConverter<SmallPortraitId>.Instance); 
+            sheet.PortraitId = SpriteId.SerdesU8(nameof(sheet.PortraitId), sheet.PortraitId, AssetType.Portrait, mapping, s); 
             sheet.Unknown11 = s.UInt8(nameof(sheet.Unknown11 ), sheet.Unknown11);
             sheet.Unknown12 = s.UInt8(nameof(sheet.Unknown12), sheet.Unknown12);
             sheet.Unknown13 = s.UInt8(nameof(sheet.Unknown13), sheet.Unknown13);
@@ -172,8 +164,8 @@ namespace UAlbion.Formats.Assets
             sheet.Unknown15 = s.UInt8(nameof(sheet.Unknown15), sheet.Unknown15);
             sheet.Unknown16 = s.UInt8(nameof(sheet.Unknown16), sheet.Unknown16);
             sheet.Combat.ActionPoints = s.UInt8(nameof(sheet.Combat.ActionPoints), sheet.Combat.ActionPoints);
-            sheet.EventSetId = s.TransformEnumU16(nameof(sheet.EventSetId), sheet.EventSetId, TweakedConverter<EventSetId>.Instance);
-            sheet.WordSetId = s.TransformEnumU16(nameof(sheet.WordSetId), sheet.WordSetId, TweakedConverter<EventSetId>.Instance);
+            sheet.EventSetId = EventSetId.SerdesU16(nameof(sheet.EventSetId), sheet.EventSetId, mapping, s);
+            sheet.WordSetId = EventSetId.SerdesU16(nameof(sheet.WordSetId), sheet.WordSetId, mapping, s);
             sheet.Combat.TrainingPoints = s.UInt16(nameof(sheet.Combat.TrainingPoints), sheet.Combat.TrainingPoints);
 
             ushort gold = s.UInt16("Gold", sheet.Inventory?.Gold.Amount ?? 0);
@@ -318,14 +310,14 @@ namespace UAlbion.Formats.Assets
                         int i = school * MaxSpellsPerSchool + offset;
                         bool isKnown = (knownSpells & (1 << (offset % 8))) != 0;
                         ushort spellStrength = BitConverter.ToUInt16(spellStrengthBytes, i * sizeof(ushort));
-                        var spellId = (SpellId)(school * 100 + offset);
+                        var spellId = new SpellId(AssetType.Spell, i); // TODO: Check this.
 
                         if (spellStrength > 0)
                             sheet.Magic.SpellStrengths[spellId] = (false, spellStrength);
 
                         if (isKnown)
                         {
-                            SpellId correctedSpellId = spellId - 1;
+                            SpellId correctedSpellId = spellId; // TODO: is this still needed?
                             if (!sheet.Magic.SpellStrengths.TryGetValue(correctedSpellId, out var current))
                                 current = (false, 0);
                             sheet.Magic.SpellStrengths[correctedSpellId] = (true, current.Item2);
@@ -340,7 +332,7 @@ namespace UAlbion.Formats.Assets
                 return sheet;
             }
 
-            s.Object(nameof(sheet.Inventory), sheet.Inventory, Inventory.SerdesCharacter);
+            s.Object(nameof(sheet.Inventory), sheet.Inventory, mapping, Inventory.SerdesCharacter);
 
             ApiUtil.Assert(s.Offset - initialOffset == 940, "Expected player character sheet to be 940 bytes");
             return sheet;

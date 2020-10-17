@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Globalization;
 using SerdesNet;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
     public class DataChangeEvent : MapEvent
     {
-        public static DataChangeEvent Serdes(DataChangeEvent e, ISerializer s)
+        public static DataChangeEvent Serdes(DataChangeEvent e, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new DataChangeEvent();
@@ -16,8 +16,17 @@ namespace UAlbion.Formats.MapEvents
             e.Mode = s.EnumU8(nameof(Mode), e.Mode);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
-            e.PartyMemberId = s.TransformEnumU8(nameof(PartyMemberId), e.PartyMemberId, ZeroToNullConverter<PartyCharacterId>.Instance);
-            e.Value = s.UInt16(nameof(Value), e.Value);
+            e.PartyMemberId = PartyMemberId.SerdesU8(nameof(PartyMemberId), e.PartyMemberId, mapping, s);
+
+            switch (e.Property)
+            {
+                case ChangeProperty.ReceiveOrRemoveItem:
+                    e._value = (uint)ItemId.SerdesU16(nameof(ItemId), new ItemId(e._value), AssetType.Item, mapping, s);
+                    break;
+                default:
+                    e._value = s.UInt16(nameof(Value), (ushort)e._value);
+                    break;
+            }
             e.Amount = s.UInt16(nameof(Amount), e.Amount);
             return e;
         }
@@ -34,41 +43,47 @@ namespace UAlbion.Formats.MapEvents
             Food                = 0x15
         }
 
-        public enum PlayerStatus
-        {
-            Unconscious = 0,
-            Poisoned    = 1,
-            Ill         = 2,
-            Exhausted   = 3,
-            Paralysed   = 4,
-            Fleeing     = 5,
-            Intoxicated = 6,
-            Blind       = 7,
-            Panicking   = 8,
-            Asleep      = 9,
-            Insane      = 10,
-            Irritated   = 11
-        }
+        uint _value;
 
         public ChangeProperty Property { get; private set; }
         public QuantityChangeOperation Mode { get; private set;  } // No mode for adding XP
-        public PartyCharacterId? PartyMemberId { get; private set;  }
+        public PartyMemberId PartyMemberId { get; private set;  }
         public ushort Amount { get; private set;  } // Or language id
 
         public byte Unk3 { get; private set; }
         public byte Unk4 { get; private set; }
-        public ushort Value { get; private set; }
-        public ItemId ItemId => (ItemId)Value - 1;
+
+        public ushort Value => Property switch
+            {
+                ChangeProperty.Health => (ushort)_value,
+                ChangeProperty.MagicPoints => (ushort)_value,
+                ChangeProperty.AddExperience => (ushort)_value,
+                ChangeProperty.Gold => (ushort)_value,
+                ChangeProperty.Food => (ushort)_value,
+                _ => throw new InvalidOperationException("Tried to retrieve the Value of a non-numeric DataChangeEvent")
+            };
+
+        public ItemId ItemId => Property == ChangeProperty.ReceiveOrRemoveItem
+            ? new ItemId(_value)
+            : throw new InvalidOperationException("Tried to retrieve the ItemId of a non-item DataChangeEvent");
+
+        public PlayerCondition Status => Property == ChangeProperty.Status 
+            ? (PlayerCondition)_value 
+            : throw new InvalidOperationException("Tried to retrieve the Status of a non-status DataChangeEvent");
+
+        public PlayerLanguages Language => Property == ChangeProperty.AddLanguage 
+            ? (PlayerLanguages)_value 
+            : throw new InvalidOperationException("Tried to retrieve the Language of a non-language DataChangeEvent");
 
         string ItemString =>
             Property switch
             {
-                ChangeProperty.Status => ((PlayerStatus)Value).ToString(),
-                ChangeProperty.AddLanguage => ((PlayerLanguages)Value).ToString(),
-                ChangeProperty.ReceiveOrRemoveItem => ((ItemId)Value-1).ToString(),
+                ChangeProperty.Status => Status.ToString(),
+                ChangeProperty.AddLanguage => Language.ToString(),
+                ChangeProperty.ReceiveOrRemoveItem => ItemId.ToString(),
                 _ => Value.ToString(CultureInfo.InvariantCulture)
             };
-        public override string ToString() => $"data_change {PartyMemberId?.ToString() ?? "ActivePlayer"} {Property} {Mode} {Amount}x{ItemString} ({Unk3} {Unk4})";
+        public override string ToString() => $"data_change {PartyMemberId.ToString() ?? "ActivePlayer"} {Property} {Mode} {Amount}x{ItemString} ({Unk3} {Unk4})";
         public override MapEventType EventType => MapEventType.DataChange;
     }
 }

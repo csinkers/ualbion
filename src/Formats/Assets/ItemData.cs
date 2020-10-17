@@ -3,7 +3,7 @@ using System.Text;
 using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets
 {
@@ -33,7 +33,7 @@ namespace UAlbion.Formats.Assets
         public byte Activate { get; set; }   // 19 Activate enables compass (0), monster eye (1) or clock (3) (if type=0×13) / Torch intensity (if type=0×16)
         public byte AmmoAnim { get; set; }   // 20 Ammo combat animation (long-range weapons only)
         public SpellClass SpellClass { get; set; }   // 21 Spell Class
-        public byte? SpellEffect { get; set; }   // 22 Spell Id
+        public SpellId SpellEffect { get; set; }   // 22 Spell Id
         public byte Charges { get; set; }   // 23 Charges left in item / Torch lifetime (if type=0×16)
         public byte EnchantmentCount { get; set; }   // 24 Number of times item was enchanted/recharged
         public byte MaxEnchantmentCount { get; set; }   // 25 Maximum possible enchantments
@@ -42,7 +42,8 @@ namespace UAlbion.Formats.Assets
         public byte IconAnim { get; set; }   // 29 Number of animated images
         public ushort Weight { get; set; }   // 30 weight of the item in grams
         public ushort Value { get; set; }   // 32 Base resell value * 10.
-        public ItemSpriteId Icon { get; set; }   // 34 Image for the item
+        public SpriteId Icon { get; set; }
+        public int IconSubId { get; set; }   // 34 Image for the item
         public PlayerClasses Class { get; set; }   // 36 A bitfield that controls which classes can use the item.
         [JsonIgnore] public ushort Race { get; set; }   // 38 Likely meant to control which race can use the item – but does not seem to work ?
         [JsonIgnore] public bool IsStackable => (Flags & ItemFlags.Stackable) != 0;
@@ -111,11 +112,10 @@ namespace UAlbion.Formats.Assets
             if (BreakRate != 0) sb.Append($"BR:{BreakRate} "); 
             if (Activate != 0) sb.Append($"A:{Activate} ");
 
-            if (SpellEffect.HasValue)
+            if (!SpellEffect.IsNone)
             {
                 var className = SpellClass.ToString().Replace(", ", "|");
-                SpellId spellId = SpellClass.ToSpellId(SpellEffect.Value);
-                sb.Append($"SC:{className} SE:{SpellEffect}={spellId} ");
+                sb.Append($"SC:{className} SE:{SpellEffect} ");
             }
 
             if (Charges != 0) sb.Append($"C:{Charges} ");
@@ -133,7 +133,7 @@ namespace UAlbion.Formats.Assets
             return sb.ToString();
         }
 
-        public static ItemData Serdes(int i, ItemData item, ISerializer s)
+        public static ItemData Serdes(int i, ItemData item, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             item ??= new ItemData((ItemId)i);
@@ -160,7 +160,7 @@ namespace UAlbion.Formats.Assets
             item.Activate = s.UInt8(nameof(item.Activate), item.Activate);
             item.AmmoAnim = s.UInt8(nameof(item.AmmoAnim), item.AmmoAnim);
             item.SpellClass = s.EnumU8(nameof(item.SpellClass), item.SpellClass);
-            item.SpellEffect = s.Transform<byte, byte?>(nameof(item.SpellEffect), item.SpellEffect, S.UInt8, ZeroToNullConverter.Instance);
+            item.SpellEffect = SpellId.SerdesU8(nameof(item.SpellEffect), item.SpellEffect, mapping, s);
             item.Charges = s.UInt8(nameof(item.Charges), item.Charges);
             item.EnchantmentCount = s.UInt8(nameof(item.EnchantmentCount), item.EnchantmentCount);
             item.MaxEnchantmentCount = s.UInt8(nameof(item.MaxEnchantmentCount), item.MaxEnchantmentCount);
@@ -169,7 +169,7 @@ namespace UAlbion.Formats.Assets
             item.IconAnim = s.UInt8(nameof(item.IconAnim), item.IconAnim);
             item.Weight = s.UInt16(nameof(item.Weight), item.Weight);
             item.Value = s.UInt16(nameof(item.Value), item.Value);
-            item.Icon = s.EnumU16(nameof(item.Icon), item.Icon);
+            item.Icon = SpriteId.SerdesU16(nameof(item.Icon), item.Icon, AssetType.TilesetGraphics, mapping, s);
             item.Class = s.EnumU16(nameof(item.Class), item.Class);
             item.Race = s.UInt16(nameof(item.Race), item.Race);
             return item;

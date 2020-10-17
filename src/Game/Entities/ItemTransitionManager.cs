@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Numerics;
+using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events.Transitions;
 using UAlbion.Game.State;
@@ -58,15 +59,15 @@ namespace UAlbion.Game.Entities
             var destPosition = window.UiToNorm(toUiPosition); // Tom's portrait, hardcoded for now.
 
             // Note: no need to attach as child as transitions clean themselves up.
-            switch (itemId)
+            switch (itemId.Type)
             {
-                case ItemId.Gold:
+                case AssetType.Gold:
                     {
-                        var texture = assets.LoadTexture(CoreSpriteId.UiGold);
+                        var texture = assets.LoadTexture(Base.CoreSprite.UiGold);
                         var subImageDetails = texture.GetSubImageDetails(0);
 
-                        AttachChild(new LinearItemTransition<CoreSpriteId>(
-                            CoreSpriteId.UiGold, 0,
+                        AttachChild(new LinearItemTransition(
+                            Base.CoreSprite.UiGold, 0,
                             fromNormPosition,
                             destPosition,
                             transitionTimeSeconds ?? config.DefaultTransitionTimeSeconds,
@@ -75,13 +76,13 @@ namespace UAlbion.Game.Entities
                         break;
                     }
 
-                case ItemId.Rations:
+                case AssetType.Rations:
                     {
-                        var texture = assets.LoadTexture(CoreSpriteId.UiFood);
+                        var texture = assets.LoadTexture(Base.CoreSprite.UiFood);
                         var subImageDetails = texture.GetSubImageDetails(0);
 
-                        AttachChild(new LinearItemTransition<CoreSpriteId>(
-                            CoreSpriteId.UiFood, 0,
+                        AttachChild(new LinearItemTransition(
+                            Base.CoreSprite.UiFood, 0,
                             fromNormPosition,
                             destPosition,
                             transitionTimeSeconds ?? config.DefaultTransitionTimeSeconds,
@@ -95,7 +96,7 @@ namespace UAlbion.Game.Entities
                         var texture = assets.LoadTexture(item.Icon);
                         var subImageDetails = texture.GetSubImageDetails((int)item.Icon);
 
-                        AttachChild(new LinearItemTransition<ItemSpriteId>(
+                        AttachChild(new LinearItemTransition(
                             item.Icon, (int)item.Icon,
                             fromNormPosition,
                             destPosition,
@@ -115,27 +116,27 @@ namespace UAlbion.Game.Entities
             var window = Resolve<IWindowManager>();
 
             // Note: no need to attach as child as transitions clean themselves up.
-            switch (itemId)
+            switch (itemId.Type)
             {
-                case ItemId.Gold:
+                case AssetType.Gold:
                     {
-                        var texture = assets.LoadTexture(CoreSpriteId.UiGold);
+                        var texture = assets.LoadTexture(Base.CoreSprite.UiGold);
                         var subImageDetails = texture.GetSubImageDetails(0);
 
-                        AttachChild(new GravityItemTransition<CoreSpriteId>(
-                            CoreSpriteId.UiGold, 0,
+                        AttachChild(new GravityItemTransition(
+                            Base.CoreSprite.UiGold, 0,
                             fromNormPosition,
                             window.UiToNormRelative(subImageDetails.Size),
                             continuation));
                         break;
                     }
-                case ItemId.Rations:
+                case AssetType.Rations:
                     {
-                        var texture = assets.LoadTexture(CoreSpriteId.UiFood);
+                        var texture = assets.LoadTexture(Base.CoreSprite.UiFood);
                         var subImageDetails = texture.GetSubImageDetails(0);
 
-                        AttachChild(new GravityItemTransition<CoreSpriteId>(
-                            CoreSpriteId.UiFood, 0,
+                        AttachChild(new GravityItemTransition(
+                            Base.CoreSprite.UiFood, 0,
                             fromNormPosition,
                             window.UiToNormRelative(subImageDetails.Size),
                             continuation));
@@ -147,7 +148,7 @@ namespace UAlbion.Game.Entities
                         var texture = assets.LoadTexture(item.Icon);
                         var subImageDetails = texture.GetSubImageDetails((int)item.Icon);
 
-                        AttachChild(new GravityItemTransition<ItemSpriteId>(
+                        AttachChild(new GravityItemTransition(
                             item.Icon, (int)item.Icon,
                             fromNormPosition,
                             window.UiToNormRelative(subImageDetails.Size),

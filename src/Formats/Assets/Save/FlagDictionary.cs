@@ -1,27 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Formats.AssetIds;
 
 namespace UAlbion.Formats.Assets.Save
 {
     public class FlagDictionary : Dictionary<SwitchId, bool>
     {
-        const SwitchId _max = (SwitchId)600;
-        public const int PackedSize = (int)_max / 8;
+        // TODO: Proper AssetId support + a way of storing extra flags in save files.
+        const int _max = 600;
+        public const int PackedSize = _max / 8;
 
         public bool GetFlag(SwitchId flag) => TryGetValue(flag, out var value) && value;
         public void SetFlag(SwitchId flag, bool value)
         {
-            if (flag > _max)
-                throw new InvalidOperationException($"Tried to set out of range flag {flag} (greater than max: {(int)_max})");
+            if (flag.Id > _max)
+                throw new InvalidOperationException($"Tried to set out of range flag {flag} (greater than max: {_max})");
             this[flag] = value;
         }
 
         public byte[] GetPacked()
         {
 
-            var packed = new byte[((int)_max + 7) / 8];
-            for (int i = 0; i < (int)_max; i++)
+            var packed = new byte[(_max + 7) / 8];
+            for (int i = 0; i < _max; i++)
                 packed[i / 8] |= (byte)((TryGetValue((SwitchId)i, out var value) && value ? 1 : 0) << (i % 8));
             return packed;
         }

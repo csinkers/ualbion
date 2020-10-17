@@ -1,15 +1,15 @@
 ﻿using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Events
 {
     public class SetPlayerStatusUiPositionEvent : GameEvent, IVerboseEvent
     {
-        public PartyCharacterId Id { get; }
+        public PartyMemberId Id { get; }
         public int CentreX { get; }
         public int CentreY { get; }
 
-        public SetPlayerStatusUiPositionEvent(PartyCharacterId id, int centreX, int centreY)
+        public SetPlayerStatusUiPositionEvent(PartyMemberId id, int centreX, int centreY)
         {
             Id = id;
             CentreX = centreX;

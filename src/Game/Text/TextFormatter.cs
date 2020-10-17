@@ -4,9 +4,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
@@ -29,12 +28,12 @@ namespace UAlbion.Game.Text
                 var assets = Resolve<IAssetManager>();
                 var state = Resolve<IGameState>();
 
-                var asset = e.AssetType switch
+                var asset = e.AssetId.Type switch
                 {
-                    AssetType.PartyMember => (object)state.GetPartyMember((PartyCharacterId)e.AssetId),
-                    AssetType.Npc => state.GetNpc((NpcCharacterId)e.AssetId),
-                    AssetType.Monster => assets.LoadMonster((MonsterCharacterId)e.AssetId),
-                    AssetType.ItemList => assets.LoadItem((ItemId)e.AssetId),
+                    AssetType.PartyMember => (object)state.GetSheet(e.AssetId), // TODO: Load game state assets via AssetManager?
+                    AssetType.Npc => state.GetSheet(e.AssetId),
+                    AssetType.Monster => assets.LoadSheet(e.AssetId),
+                    AssetType.Item => assets.LoadItem(e.AssetId),
                     _ => null
                 };
 
@@ -57,11 +56,9 @@ namespace UAlbion.Game.Text
         public ITextFormatter Justify() => new CustomisedTextFormatter(this).Justify();
         public ITextFormatter Fat() => new CustomisedTextFormatter(this).Fat();
         public ITextFormatter Ink(FontColor color) => new CustomisedTextFormatter(this).Ink(color);
-        public ITextFormatter Language(GameLanguage language) => new CustomisedTextFormatter(this).Language(language);
 
         IEnumerable<(Token, object)> Substitute(
             IAssetManager assets,
-            GameLanguage language,
             IEnumerable<(Token, object)> tokens,
             object[] args)
         {
@@ -84,15 +81,15 @@ namespace UAlbion.Game.Text
 
                         switch (character.PlayerClass)
                         {
-                            case PlayerClass.Pilot: yield return (Token.Text, assets.LoadString(SystemTextId.Class_Pilot, language)); break;
-                            case PlayerClass.Scientist: yield return (Token.Text, assets.LoadString(SystemTextId.Class_Scientist, language)); break;
-                            case PlayerClass.IskaiWarrior: yield return (Token.Text, assets.LoadString(SystemTextId.Class_Warrior, language)); break;
-                            case PlayerClass.DjiKasMage: yield return (Token.Text, assets.LoadString(SystemTextId.Class_DjiKasMage, language)); break;
-                            case PlayerClass.Druid: yield return (Token.Text, assets.LoadString(SystemTextId.Class_Druid, language)); break;
-                            case PlayerClass.EnlightenedOne: yield return (Token.Text, assets.LoadString(SystemTextId.Class_EnlightenedOne, language)); break;
-                            case PlayerClass.Technician: yield return (Token.Text, assets.LoadString(SystemTextId.Class_Technician, language)); break;
-                            case PlayerClass.OquloKamulos: yield return (Token.Text, assets.LoadString(SystemTextId.Class_OquloKamulos, language)); break;
-                            case PlayerClass.Warrior: yield return (Token.Text, assets.LoadString(SystemTextId.Class_Warrior2, language)); break;
+                            case PlayerClass.Pilot: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Pilot)); break;
+                            case PlayerClass.Scientist: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Scientist)); break;
+                            case PlayerClass.IskaiWarrior: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Warrior)); break;
+                            case PlayerClass.DjiKasMage: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_DjiKasMage)); break;
+                            case PlayerClass.Druid: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Druid)); break;
+                            case PlayerClass.EnlightenedOne: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_EnlightenedOne)); break;
+                            case PlayerClass.Technician: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Technician)); break;
+                            case PlayerClass.OquloKamulos: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_OquloKamulos)); break;
+                            case PlayerClass.Warrior: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Warrior2)); break;
                             case PlayerClass.Monster: yield return (Token.Text, "Monster"); break;
                             default: throw new InvalidEnumArgumentException(nameof(character.PlayerClass), (int)character.PlayerClass, typeof(PlayerClass));
                         }
@@ -111,28 +108,31 @@ namespace UAlbion.Game.Text
 
                         var word = (token, character.Gender) switch
                             {
-                                (Token.He, Gender.Male) => SystemTextId.Meta_He,
-                                (Token.He, Gender.Female) => SystemTextId.Meta_She,
-                                (Token.He, Gender.Neuter) => SystemTextId.Meta_ItNominative,
-                                (Token.Him, Gender.Male) => SystemTextId.Meta_HimAccusative,
-                                (Token.Him, Gender.Female) => SystemTextId.Meta_HerAccusative,
-                                (Token.Him, Gender.Neuter) => SystemTextId.Meta_ItAccusative,
-                                (Token.His, Gender.Male) => SystemTextId.Meta_His,
-                                (Token.His, Gender.Female) => SystemTextId.Meta_Her,
-                                (Token.His, Gender.Neuter) => SystemTextId.Meta_Its,
+                                (Token.He, Gender.Male) => Base.SystemText.Meta_He,
+                                (Token.He, Gender.Female) => Base.SystemText.Meta_She,
+                                (Token.He, Gender.Neuter) => Base.SystemText.Meta_ItNominative,
+                                (Token.Him, Gender.Male) => Base.SystemText.Meta_HimAccusative,
+                                (Token.Him, Gender.Female) => Base.SystemText.Meta_HerAccusative,
+                                (Token.Him, Gender.Neuter) => Base.SystemText.Meta_ItAccusative,
+                                (Token.His, Gender.Male) => Base.SystemText.Meta_His,
+                                (Token.His, Gender.Female) => Base.SystemText.Meta_Her,
+                                (Token.His, Gender.Neuter) => Base.SystemText.Meta_Its,
                                 _ => throw new NotImplementedException()
                             };
 
-                        yield return (Token.Text, assets.LoadString(word, language));
+                        yield return (Token.Text, assets.LoadString(word));
                         break;
                     }
 
                     case Token.Name:
                     {
                         if (active is ICharacterSheet character)
+                        {
+                            var language = Resolve<ISettings>().Gameplay.Language;
                             yield return (Token.Text, character.GetName(language));
+                        }
                         else if (active is ItemData item)
-                            yield return (Token.Text, assets.LoadString(item.Id, language));
+                            yield return (Token.Text, assets.LoadString(item.Id.ToItemName()));
                         else 
                             yield return (Token.Text, "{NAME}");
                         break;
@@ -160,15 +160,15 @@ namespace UAlbion.Game.Text
 
                         switch (character.Race)
                         {
-                            case PlayerRace.Terran: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Terran, language)); break;
-                            case PlayerRace.Iskai: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Iskai, language)); break;
-                            case PlayerRace.Celt: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Celt, language)); break;
-                            case PlayerRace.KengetKamulos: yield return (Token.Text, assets.LoadString(SystemTextId.Race_KengetKamulos, language)); break;
-                            case PlayerRace.DjiCantos: yield return (Token.Text, assets.LoadString(SystemTextId.Race_DjiCantos, language)); break;
-                            case PlayerRace.Mahino: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Mahino, language)); break;
-                            case PlayerRace.Decadent: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Decadent, language)); break;
-                            case PlayerRace.Umajo: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Umajo, language)); break;
-                            case PlayerRace.Monster: yield return (Token.Text, assets.LoadString(SystemTextId.Race_Monster, language)); break;
+                            case PlayerRace.Terran: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Terran)); break;
+                            case PlayerRace.Iskai: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Iskai)); break;
+                            case PlayerRace.Celt: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Celt)); break;
+                            case PlayerRace.KengetKamulos: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_KengetKamulos)); break;
+                            case PlayerRace.DjiCantos: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_DjiCantos)); break;
+                            case PlayerRace.Mahino: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Mahino)); break;
+                            case PlayerRace.Decadent: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Decadent)); break;
+                            case PlayerRace.Umajo: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Umajo)); break;
+                            case PlayerRace.Monster: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Monster)); break;
                             default: throw new InvalidEnumArgumentException(nameof(character.Race), (int)character.Race, typeof(PlayerRace));
                         }
                         break;
@@ -266,7 +266,7 @@ namespace UAlbion.Game.Text
                         }
                         else
                         {
-                            // sb.Append(assets.LoadString(word.Value, language));
+                            // sb.Append(assets.LoadString(word.Value));
                             block.AddWord(word.Value);
                         }
                         break;
@@ -281,7 +281,7 @@ namespace UAlbion.Game.Text
             }
         }
 
-        IEnumerable<TextBlock> InnerFormat(string template, object[] arguments, IList<(Token, object)> implicitTokens, IAssetManager assets, GameLanguage language)
+        IEnumerable<TextBlock> InnerFormat(string template, object[] arguments, IList<(Token, object)> implicitTokens, IAssetManager assets)
         {
             PerfTracker.IncrementFrameCounter("Format text");
 
@@ -289,9 +289,12 @@ namespace UAlbion.Game.Text
             if (implicitTokens != null)
                 tokens = implicitTokens.Concat(tokens);
 
-            IEnumerable<(Token, object)> substituted = Substitute(assets, language, tokens, arguments);
+            IEnumerable<(Token, object)> substituted = Substitute(assets, tokens, arguments);
             return TokensToBlocks(assets, substituted, template);
         }
+
+        public IText Format(TextId textId, params object[] arguments)
+            => Format(textId, null, null, arguments);
 
         public IText Format(StringId stringId, params object[] arguments)
             => Format(stringId, null, null, arguments);
@@ -299,21 +302,22 @@ namespace UAlbion.Game.Text
         public IText Format(string template, params object[] arguments)
             => Format(template, null, null, arguments);
 
-        public IText Format(StringId stringId, IList<(Token, object)> implicitTokens, GameLanguage? language, params object[] arguments)
+        public IText Format(TextId textId, IList<(Token, object)> implicitTokens, params object[] arguments)
+            => Format(textId, implicitTokens, null, arguments);
+
+        public IText Format(StringId stringId, IList<(Token, object)> implicitTokens, params object[] arguments)
             => new DynamicText(() =>
             {
                 var assets = Resolve<IAssetManager>();
-                var curLanguage = language ?? Resolve<ISettings>().Gameplay.Language;
-                string template = assets.LoadString(stringId, curLanguage);
-                return InnerFormat(template, arguments, implicitTokens, assets, curLanguage);
+                string template = assets.LoadString(stringId);
+                return InnerFormat(template, arguments, implicitTokens, assets);
             });
 
-        public IText Format(string template, IList<(Token, object)> implicitTokens, GameLanguage? language, params object[] arguments)
+        public IText Format(string template, IList<(Token, object)> implicitTokens, params object[] arguments)
             => new DynamicText(() =>
             {
                 var assets = Resolve<IAssetManager>();
-                var curLanguage = language ?? Resolve<ISettings>().Gameplay.Language;
-                return InnerFormat(template, arguments, implicitTokens, assets, curLanguage);
+                return InnerFormat(template, arguments, implicitTokens, assets);
             });
     }
 }

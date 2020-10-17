@@ -3,10 +3,9 @@ using System.IO;
 using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets.Save;
-using UAlbion.Formats.Config;
 using UAlbion.Game.Assets;
 
 namespace UAlbion
@@ -15,18 +14,16 @@ namespace UAlbion
     {
         public static void RoundTripTest(string baseDir, IAssetLoaderRegistry assetLoaderRegistry)
         {
-            var loader = assetLoaderRegistry.GetLoader<SavedGame>(FileFormat.SavedGame);
-            ushort i = 0;
+            var mapping = AssetMapping.Global; // TODO: Base game mapping.
             foreach (var file in Directory.EnumerateFiles(Path.Combine(baseDir, "re", "TestSaves"), "*.001"))
             {
-                var key = new AssetKey(AssetType.SavedGame, i++);
                 using var stream = File.Open(file, FileMode.Open);
                 using var br = new BinaryReader(stream);
-                var save = loader.Serdes(null, new AlbionReader(br, stream.Length), key, null);
+                var save = SavedGame.Serdes(null, mapping, new AlbionReader(br, stream.Length));
 
                 using var ms = new MemoryStream();
                 using var bw = new BinaryWriter(ms);
-                loader.Serdes(save, new AlbionWriter(bw), key, null);
+                SavedGame.Serdes(save, mapping, new AlbionWriter(bw));
 
                 br.BaseStream.Position = 0;
                 var originalBytes = br.ReadBytes((int)stream.Length);
@@ -36,7 +33,7 @@ namespace UAlbion
                 File.WriteAllBytes(file + ".bin", roundTripBytes);
                 using var ts = new MemoryStream();
                 using var tw = new StreamWriter(ts);
-                loader.Serdes(save, new AnnotatedFormatWriter(tw), key, null);
+                SavedGame.Serdes(save, mapping, new AnnotatedFormatWriter(tw));
                 ts.Position = 0;
                 File.WriteAllBytes(file + ".txt", ts.ToArray());
                 //*/
@@ -45,7 +42,7 @@ namespace UAlbion
                 ApiUtil.Assert(originalBytes.SequenceEqual(roundTripBytes));
 
                 var sw = new StringWriter();
-                loader.Serdes(save, new JsonWriter(sw), key, null);
+                SavedGame.Serdes(save, mapping, new JsonWriter(sw));
                 File.WriteAllText(file + ".json", sw.ToString());
                 break;
             }

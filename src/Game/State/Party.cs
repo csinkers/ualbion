@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
@@ -15,15 +14,15 @@ namespace UAlbion.Game.State
     {
         public const int MaxPartySize = 6;
 
-        readonly IDictionary<PartyCharacterId, CharacterSheet> _characterSheets;
+        readonly IDictionary<CharacterId, CharacterSheet> _characterSheets;
         readonly List<Player.PartyMember> _statusBarOrder = new List<Player.PartyMember>();
         readonly List<Player.PartyMember> _walkOrder = new List<Player.PartyMember>();
         readonly IReadOnlyList<Player.PartyMember> _readOnlyStatusBarOrder;
         readonly IReadOnlyList<Player.PartyMember> _readOnlyWalkOrder;
 
         public Party(
-            IDictionary<PartyCharacterId, CharacterSheet> characterSheets,
-            IList<PartyCharacterId?> statusBarOrder,
+            IDictionary<CharacterId, CharacterSheet> characterSheets,
+            IList<PartyMemberId> statusBarOrder,
             Func<InventoryId, Inventory> getInventory)
         {
             if (statusBarOrder == null) throw new ArgumentNullException(nameof(statusBarOrder));
@@ -32,7 +31,7 @@ namespace UAlbion.Game.State
             On<SetPartyLeaderEvent>(e =>
             {
                 Leader = e.PartyMemberId;
-                Raise(new SetContextEvent(ContextType.Leader, AssetType.PartyMember, (int)e.PartyMemberId));
+                Raise(new SetContextEvent(ContextType.Leader, e.PartyMemberId));
                 Raise(e);
             });
 
@@ -42,12 +41,11 @@ namespace UAlbion.Game.State
             AttachChild(new PartyInventory(getInventory));
 
             foreach (var member in statusBarOrder)
-                if (member.HasValue)
-                    AddMember(member.Value);
+                AddMember(member);
         }
 
         [SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "<Pending>")]
-        public IPlayer this[PartyCharacterId id] => _statusBarOrder.FirstOrDefault(x => x.Id == id);
+        public IPlayer this[PartyMemberId id] => _statusBarOrder.FirstOrDefault(x => x.Id == id);
         public IReadOnlyList<IPlayer> StatusBarOrder => _readOnlyStatusBarOrder;
         public IReadOnlyList<IPlayer> WalkOrder => _readOnlyWalkOrder;
         public int TotalGold => _statusBarOrder.Sum(x => x.Effective.Inventory.Gold.Amount);
@@ -59,7 +57,7 @@ namespace UAlbion.Game.State
 
         // The current party leader (shown with a white outline on
         // health bar and slightly raised in the status bar)
-        public PartyCharacterId Leader
+        public PartyMemberId Leader
         {
             get => _walkOrder[0].Id;
             private set
@@ -74,13 +72,13 @@ namespace UAlbion.Game.State
             }
         }
 
-        bool AddMember(PartyCharacterId id)
+        bool AddMember(PartyMemberId id)
         {
             bool InsertMember(Player.PartyMember newPlayer)
             {
                 for (int i = 0; i < MaxPartySize; i++)
                 {
-                    if (_statusBarOrder.Count == i || _statusBarOrder[i].Id > id)
+                    if (_statusBarOrder.Count == i || _statusBarOrder[i].Id.Id > id.Id)
                     {
                         _statusBarOrder.Insert(i, newPlayer);
                         return true;
@@ -102,7 +100,7 @@ namespace UAlbion.Game.State
             return true;
         }
 
-        bool RemoveMember(PartyCharacterId id)
+        bool RemoveMember(PartyMemberId id)
         {
             var player = _statusBarOrder.FirstOrDefault(x => x.Id == id);
             if (player == null)

@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.MapEvents;
@@ -19,7 +19,7 @@ namespace UAlbion.Game.Entities.Map2D
         LogicalMap2D _logicalMap;
         IMovement _partyMovement;
 
-        public MapDataId MapId { get; }
+        public MapId MapId { get; }
         public MapType MapType => _logicalMap.UseSmallSprites ? MapType.TwoDOutdoors : MapType.TwoD;
         public Vector2 LogicalSize => new Vector2(_logicalMap.Width, _logicalMap.Height);
         public Vector3 TileSize { get; private set; }
@@ -29,7 +29,7 @@ namespace UAlbion.Game.Entities.Map2D
 
         public override string ToString() { return $"FlatMap: {MapId} ({(int)MapId})"; }
 
-        public FlatMap(MapDataId mapId, MapData2D mapData)
+        public FlatMap(MapId mapId, MapData2D mapData)
         {
             On<PlayerEnteredTileEvent>(OnPlayerEnteredTile);
             On<NpcEnteredTileEvent>(OnNpcEnteredTile);
@@ -86,12 +86,16 @@ namespace UAlbion.Game.Entities.Map2D
             var state = Resolve<IGameState>();
             if (state.Party != null)
             {
+                int i = 0;
                 foreach(var player in state.Party.StatusBarOrder)
                 {
-                    player.GetPosition = () => _partyMovement.GetPositionHistory(player.Id).Item1;
+                    player.GetPosition = () => _partyMovement.GetPositionHistory(i).Item1;
+                    (Vector3, int) PositionFunc() => _partyMovement.GetPositionHistory(i);
+
                     AttachChild(_logicalMap.UseSmallSprites
-                        ? (IComponent)new SmallPlayer(player.Id, (SmallPartyGraphicsId)player.Id, () => _partyMovement.GetPositionHistory(player.Id)) // TODO: Use a function to translate logical to sprite id
-                        : new LargePlayer(player.Id, (LargePartyGraphicsId)player.Id, () => _partyMovement.GetPositionHistory(player.Id))); // TODO: Use a function to translate logical to sprite id
+                        ? (IComponent)new SmallPlayer(player.Id, player.Id.ToSmallPartyGraphics(), PositionFunc)
+                        : new LargePlayer(player.Id, player.Id.ToBigPartyGraphics(), PositionFunc));
+                    i++;
                 }
             }
         }
@@ -104,7 +108,7 @@ namespace UAlbion.Game.Entities.Map2D
 
             foreach (var zone in zones)
                 if (zone.Chain.Enabled)
-                    Raise(new TriggerChainEvent(zone.Chain, zone.Node, type, _mapData.Id, zone.X, zone.Y));
+                    Raise(new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_mapData.Id, type, zone.X, zone.Y)));
 
             if (!log)
                 Raise(new SetLogLevelEvent(LogEvent.Level.Info));
@@ -125,7 +129,7 @@ namespace UAlbion.Game.Entities.Map2D
             }
 
             if (zone.Chain.Enabled)
-                Raise(new TriggerChainEvent(zone.Chain, zone.Node, TriggerTypes.Npc, _mapData.Id, e.X, e.Y));
+                Raise(new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_mapData.Id, TriggerTypes.Npc, e.X, e.Y)));
         }
 
         void OnPlayerEnteredTile(PlayerEnteredTileEvent e)
@@ -143,20 +147,20 @@ namespace UAlbion.Game.Entities.Map2D
             }
 
             if (zone.Chain.Enabled)
-                Raise(new TriggerChainEvent(zone.Chain, zone.Node, TriggerTypes.Normal, _mapData.Id, e.X, e.Y));
+                Raise(new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_mapData.Id, TriggerTypes.Normal, e.X, e.Y)));
         }
 
         void ChangeIcon(ChangeIconEvent e)
         {
             var context = Resolve<IEventManager>().Context;
-            if (!(context.Source is EventSource.Map mapSource))
+            if (context.Source.Id.Type != AssetType.Map)
             {
                 ApiUtil.Assert($"Expected event {e} to be triggered from a map event");
                 return;
             }
 
-            byte x = (byte)(e.X + mapSource.X);
-            byte y = (byte)(e.Y + mapSource.Y);
+            byte x = (byte)(e.X + context.Source.X);
+            byte y = (byte)(e.Y + context.Source.Y);
             _logicalMap.Modify(x, y, e.ChangeType, e.Value, (e.Scopes & EventScopes.Temp) != 0);
         }
     }

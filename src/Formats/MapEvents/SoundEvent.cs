@@ -1,18 +1,19 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
     public class SoundEvent : MapEvent
     {
-        public static SoundEvent Serdes(SoundEvent e, ISerializer s)
+        public static SoundEvent Serdes(SoundEvent e, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new SoundEvent();
             e.Mode = s.EnumU8(nameof(Mode), e.Mode);
-            e.SoundId = (SampleId)StoreIncrementedConverter.Serdes(nameof(SoundId), (byte)e.SoundId, s.UInt8);
+            e.SoundId = SampleId.SerdesU8(nameof(SoundId), e.SoundId, mapping, s);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
             e.Volume = s.UInt8(nameof(Volume), e.Volume);
             e.RestartProbability = s.UInt8(nameof(RestartProbability), e.RestartProbability);

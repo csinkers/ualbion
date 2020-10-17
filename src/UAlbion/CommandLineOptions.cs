@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 using Veldrid;
 
 namespace UAlbion
@@ -69,13 +69,13 @@ namespace UAlbion
                     AssetType.CombatGraphics,
                     AssetType.CoreGraphics,
                     AssetType.BackgroundGraphics,
-                    AssetType.Floor3D,
+                    AssetType.Floor,
                     AssetType.Object3D,
-                    AssetType.Overlay3D,
-                    AssetType.Wall3D,
+                    AssetType.WallOverlay,
+                    AssetType.Wall,
                     AssetType.Font,
                     AssetType.FullBodyPicture,
-                    AssetType.IconGraphics,
+                    AssetType.TilesetGraphics,
                     AssetType.ItemGraphics,
                     AssetType.BigNpcGraphics,
                     AssetType.BigPartyGraphics,
@@ -83,7 +83,7 @@ namespace UAlbion
                     AssetType.Picture,
                     AssetType.SmallNpcGraphics,
                     AssetType.SmallPartyGraphics,
-                    AssetType.SmallPortrait,
+                    AssetType.Portrait,
                     AssetType.TacticalIcon });
             }
 

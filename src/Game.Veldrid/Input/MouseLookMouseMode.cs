@@ -5,7 +5,6 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 using Veldrid;
@@ -53,7 +52,7 @@ namespace UAlbion.Game.Veldrid.Input
 
         protected override void Subscribed()
         {
-            Raise(new SetCursorEvent(CoreSpriteId.CursorCrossUnselected));
+            Raise(new SetCursorEvent(Base.CoreSprite.CursorCrossUnselected));
         }
 
         void OnInput(InputEvent e)

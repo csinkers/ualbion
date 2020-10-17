@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryActivePageSelector : UiElement
     {
-        readonly PartyCharacterId _activeCharacter;
+        readonly PartyMemberId _activeCharacter;
         readonly Func<InventoryPage> _getPage;
         InventoryPage _lastPage = (InventoryPage)(object)-1;
 
-        public InventoryActivePageSelector(PartyCharacterId activeCharacter, Func<InventoryPage> getPage)
+        public InventoryActivePageSelector(PartyMemberId activeCharacter, Func<InventoryPage> getPage)
         {
             _activeCharacter = activeCharacter;
             _getPage = getPage;

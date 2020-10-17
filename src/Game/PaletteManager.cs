@@ -2,7 +2,7 @@
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game
@@ -29,7 +29,7 @@ namespace UAlbion.Game
         {
             base.Subscribed();
             if (PaletteTexture == null)
-                SetPalette(PaletteId.Toronto2D);
+                SetPalette(Base.Palette.Toronto2D);
         }
 
         void OnTick(int frames)

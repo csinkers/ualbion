@@ -1,7 +1,8 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -9,12 +10,12 @@ namespace UAlbion.Formats.MapEvents
     public class StartDialogueEvent : MapEvent, IAsyncEvent
     {
         StartDialogueEvent() { }
-        public StartDialogueEvent(NpcCharacterId npcId) => NpcId = npcId;
+        public StartDialogueEvent(NpcId npcId) => NpcId = npcId;
 
         [EventPart("npc_id")]
-        public NpcCharacterId NpcId { get; private set; }
+        public NpcId NpcId { get; private set; }
 
-        public static StartDialogueEvent Serdes(StartDialogueEvent e, ISerializer s)
+        public static StartDialogueEvent Serdes(StartDialogueEvent e, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new StartDialogueEvent();
@@ -23,7 +24,7 @@ namespace UAlbion.Formats.MapEvents
             s.UInt8("Pad3", 0);
             s.UInt8("Pad4", 0);
             s.UInt8("Pad5", 0);
-            e.NpcId = s.EnumU8(nameof(NpcId), e.NpcId);
+            e.NpcId = NpcId.SerdesU8(nameof(NpcId), e.NpcId, mapping, s);
             s.UInt8("Pad7", 0);
             s.UInt16("Pad8", 0);
             return e;

@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid.Events;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using Veldrid;
 
@@ -16,7 +15,7 @@ namespace UAlbion.Game.Veldrid.Input
 
         protected override void Subscribed()
         {
-            Raise(new SetCursorEvent(CoreSpriteId.Cursor));
+            Raise(new SetCursorEvent(Base.CoreSprite.Cursor));
         }
 
         void OnInput(InputEvent e)

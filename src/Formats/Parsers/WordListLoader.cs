@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
-using UAlbion.Formats.Config;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Parsers
 {
@@ -12,7 +11,7 @@ namespace UAlbion.Formats.Parsers
     public class WordListLoader : IAssetLoader
     {
         const int WordLength = 21;
-        public object Load(BinaryReader br, long streamLength, AssetKey key, AssetInfo config)
+        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
         {
             if (br == null) throw new ArgumentNullException(nameof(br));
             if (config == null) throw new ArgumentNullException(nameof(config));

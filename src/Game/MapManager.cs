@@ -1,7 +1,7 @@
 ﻿using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Entities;
@@ -13,7 +13,7 @@ namespace UAlbion.Game
 {
     public class MapManager : ServiceComponent<IMapManager>, IMapManager
     {
-        MapDataId? _pendingMapChange;
+        MapId? _pendingMapChange;
 
         public IMap Current { get; private set; }
 
@@ -45,7 +45,7 @@ namespace UAlbion.Game
             _pendingMapChange = null;
 
             Raise(new UnloadMapEvent());
-            if (pendingMapChange == 0) // 0 = Build a blank scene for testing / debugging
+            if (pendingMapChange == MapId.None) // 0 = Build a blank scene for testing / debugging
             {
                 Raise(new SetSceneEvent(SceneId.World2D));
                 return;
@@ -67,13 +67,13 @@ namespace UAlbion.Game
                 Raise(new LogEvent(LogEvent.Level.Info, $"Loaded map {(int)pendingMapChange}: {pendingMapChange}"));
                 Enqueue(new MapInitEvent());
 
-                if (map.MapData.SongId.HasValue)
-                    Enqueue(new SongEvent(map.MapData.SongId.Value));
+                if (!map.MapData.SongId.IsNone)
+                    Enqueue(new SongEvent(map.MapData.SongId));
             }
             // Raise(new CycleCacheEvent());
         }
 
-        IMap BuildMap(MapDataId mapId)
+        IMap BuildMap(MapId mapId)
         {
             var assets = Resolve<IAssetManager>();
             var game = Resolve<IGameState>();
@@ -82,7 +82,7 @@ namespace UAlbion.Game
                 return null;
 
             mapData.AttachEventSets(
-                x => game.GetNpc(x),
+                x => game.GetSheet(x),
                 x => assets.LoadEventSet(x));
 
             return mapData switch

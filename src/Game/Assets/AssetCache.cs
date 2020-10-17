@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Assets
@@ -13,8 +12,8 @@ namespace UAlbion.Game.Assets
     public class AssetCache : Component
     {
         readonly object _syncRoot = new object();
-        IDictionary<AssetType, IDictionary<Tuple<ushort, GameLanguage>, object>> _assetCache = new Dictionary<AssetType, IDictionary<Tuple<ushort, GameLanguage>, object>>();
-        IDictionary<AssetType, IDictionary<Tuple<ushort, GameLanguage>, object>> _oldAssetCache = new Dictionary<AssetType, IDictionary<Tuple<ushort, GameLanguage>, object>>();
+        IDictionary<AssetId, object> _assetCache = new Dictionary<AssetId, object>();
+        IDictionary<AssetId, object> _oldAssetCache = new Dictionary<AssetId, object>();
 
         public AssetCache()
         {
@@ -33,8 +32,13 @@ namespace UAlbion.Game.Assets
                 sb.AppendLine("Asset Statistics:");
                 lock (_syncRoot)
                 {
-                    foreach (var key in _assetCache.Keys.OrderBy(y => y.ToString()))
-                        sb.AppendLine($"    {key}: {_assetCache[key].Values.Count} items");
+                    var countByType = _assetCache.Keys
+                        .GroupBy(x => x.Type)
+                        .Select(x => (x.Key, x.Count()))
+                        .OrderBy(x => x.Key.ToString());
+
+                    foreach(var (type, count) in countByType)
+                        sb.AppendLine($"    {type}: {count} items");
                 }
                 Raise(new LogEvent(LogEvent.Level.Info, sb.ToString()));
             });
@@ -45,53 +49,33 @@ namespace UAlbion.Game.Assets
             lock (_syncRoot)
             {
                 _oldAssetCache = _assetCache;
-                _assetCache = new Dictionary<AssetType, IDictionary<Tuple<ushort, GameLanguage>, object>>();
+                _assetCache = new Dictionary<AssetId, object>();
             }
         }
 
-        public object Get(AssetKey key)
+        public object Get(AssetId key)
         {
-            var subKey = Tuple.Create(key.Id, key.Language);
             lock (_syncRoot)
             {
-                if (_assetCache.TryGetValue(key.Type, out var typeCache))
-                {
-                    if (typeCache.TryGetValue(subKey, out var cachedAsset))
-                        return cachedAsset;
-                }
-                else _assetCache[key.Type] = new Dictionary<Tuple<ushort, GameLanguage>, object>();
+                if (_assetCache.TryGetValue(key, out var cachedAsset))
+                    return cachedAsset;
 
                 // Check old cache
-                if (_oldAssetCache.TryGetValue(key.Type, out var oldTypeCache) && oldTypeCache.TryGetValue(subKey, out var oldCachedAsset))
+                if (_oldAssetCache.TryGetValue(key, out var oldCachedAsset) && !(oldCachedAsset is Exception))
                 {
-                    if (!(oldCachedAsset is Exception))
-                    {
-                        _assetCache[key.Type][subKey] = oldCachedAsset;
-                        return oldCachedAsset;
-                    }
+                    _assetCache[key] = oldCachedAsset;
+                    return oldCachedAsset;
                 }
             }
 
             return null;
         }
 
-        public void Add(object asset, AssetKey key)
+        public void Add(object asset, AssetId key)
         {
-            var subKey = Tuple.Create(key.Id, key.Language);
             lock (_syncRoot)
             {
-                _assetCache[key.Type][subKey] = asset;
-            }
-        }
-
-        public IEnumerable<AssetKey> GetCachedAssetInfo()
-        {
-            foreach(var assetType in _assetCache)
-            {
-                foreach (var asset in assetType.Value)
-                {
-                    yield return new AssetKey(assetType.Key, asset.Key.Item1, asset.Key.Item2);
-                }
+                _assetCache[key] = asset;
             }
         }
     }

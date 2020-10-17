@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace UAlbion.Formats.Tests
+﻿namespace UAlbion.Formats.Tests
 {
     class TextureTests
     {

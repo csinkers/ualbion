@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ImGuiNET;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Assets;
 
@@ -31,7 +31,7 @@ namespace UAlbion.Editor
         }
 
         static int IndexForItemId(ItemId? x) => x == null ? 0 : _itemNameIndexLookup[x.Value];
-        static ItemId? ItemIdForIndex(int x) => x == 0 ? (ItemId?)null : Enum.Parse<ItemId>(_itemNames[x]);
+        static ItemId ItemIdForIndex(int x) => x == 0 ? ItemId.None : Enum.Parse<Base.Item>(_itemNames[x]); // TODO: Proper item id support
 
         public ItemSlotEditor(ItemSlot slot) : base(slot)
         {
@@ -47,12 +47,12 @@ namespace UAlbion.Editor
             {
                 var assetId = Resolve<IEditorAssetManager>().GetIdForAsset(Asset);
                 var itemId = ItemIdForIndex(index);
-                var newItem = itemId switch
+                var newItem = itemId.Type switch
                 {
-                    null => (IContents)null,
-                    ItemId.Gold => new Gold(),
-                    ItemId.Rations => new Rations(),
-                    _ => Resolve<IRawAssetManager>().LoadItem(itemId.Value)
+                    AssetType.None => (IContents)null,
+                    AssetType.Gold => new Gold(),
+                    AssetType.Rations => new Rations(),
+                    _ => Resolve<IRawAssetManager>().LoadItem(itemId)
                 };
                 Raise(new EditorSetPropertyEvent(assetId, nameof(_slot.Item), _slot.Item, newItem));
             }

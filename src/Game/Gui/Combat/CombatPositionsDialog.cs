@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-#if false
+﻿#if false
 namespace UAlbion.Game.Gui.Combat
 {
     class CombatPositionsDialog : UiElement

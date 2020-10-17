@@ -7,13 +7,13 @@ namespace UAlbion.Game.Debugging
 {
     public class QueryEventDebugBehaviour : IDebugBehaviour
     {
-        public ReadOnlyCollection<Type> HandledTypes { get; } = new ReadOnlyCollection<Type>(new[] { typeof(QueryEvent), typeof(QueryItemEvent), typeof(QueryVerbEvent) });
+        public ReadOnlyCollection<Type> HandledTypes { get; } = new ReadOnlyCollection<Type>(new[] { typeof(QueryEvent) });
         public object Handle(DebugInspectorAction action, ReflectedObject reflected)
         {
             if (reflected == null || action != DebugInspectorAction.Format)
                 return null;
 
-            if (!(reflected.Target is IQueryEvent query))
+            if (!(reflected.Target is QueryEvent query))
                 return null;
 
             var querier = Engine.GlobalExchange?.Resolve<IQuerier>();

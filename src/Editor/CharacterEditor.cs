@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using ImGuiNET;
 using UAlbion.Formats.Assets;
 
@@ -30,7 +29,7 @@ namespace UAlbion.Editor
         {
             if (!ImGui.Begin(_name)) return;
 
-            ImGui.Text(_sheet.Id.ToString(CultureInfo.InvariantCulture));
+            ImGui.Text(_sheet.Id.ToString());
             if (ImGui.TreeNode("Magic")) { _magic.Render(); ImGui.TreePop(); }
             if (ImGui.TreeNode("Inventory")) { _inventory.Render(); ImGui.TreePop(); } 
             if (ImGui.TreeNode("Attributes")) { _attributes.Render(); ImGui.TreePop(); } 

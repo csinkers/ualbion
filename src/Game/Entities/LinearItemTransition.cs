@@ -4,19 +4,20 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Entities
 {
-    public class LinearItemTransition<T> : Component where T : Enum
+    public class LinearItemTransition : Component
     {
-        readonly Sprite<T> _sprite;
+        readonly Sprite _sprite;
         readonly Vector2 _fromPosition;
         readonly Vector2 _toPosition;
         readonly float _transitionTimeSeconds;
         readonly Action _continuation;
         float _elapsedTime;
 
-        public LinearItemTransition(T spriteId, int subImage, Vector2 fromPosition, Vector2 toPosition, float transitionTimeSeconds, Vector2 size, Action continuation)
+        public LinearItemTransition(SpriteId spriteId, int subImage, Vector2 fromPosition, Vector2 toPosition, float transitionTimeSeconds, Vector2 size, Action continuation)
         {
             On<EngineUpdateEvent>(e => Update(e.DeltaSeconds));
 
@@ -25,7 +26,7 @@ namespace UAlbion.Game.Entities
             _transitionTimeSeconds = transitionTimeSeconds;
             _continuation = continuation;
 
-            _sprite = AttachChild(new Sprite<T>(
+            _sprite = AttachChild(new Sprite(
                 spriteId,
                 new Vector3(fromPosition, 0),
                 DrawLayer.InterfaceOverlay,

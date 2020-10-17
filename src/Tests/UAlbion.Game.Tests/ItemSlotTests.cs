@@ -1,17 +1,25 @@
-﻿using UAlbion.Formats.AssetIds;
+﻿using Xunit;
+using UAlbion.Config;
 using UAlbion.Formats.Assets;
-using Xunit;
 
 namespace UAlbion.Game.Tests
 {
     public class ItemSlotTests
     {
+        public ItemSlotTests()
+        {
+            AssetMapping.GlobalIsThreadLocal = true;
+            AssetMapping.Global.Clear()
+                .RegisterAssetType(typeof(Base.Item), AssetType.Item)
+                ;
+        }
+
         [Fact]
         void ItemSlotTransferTest()
         {
             var s1 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, ItemSlotId.Slot0));
             var s2 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, ItemSlotId.Slot0 + 1));
-            var dagger = new ItemData(ItemId.Dagger);
+            var dagger = new ItemData(Base.Item.Dagger);
 
             s1.Set(dagger, 1);
             Assert.Equal(dagger, s1.Item);
@@ -33,7 +41,7 @@ namespace UAlbion.Game.Tests
         {
             var s1 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, ItemSlotId.Slot0));
             var s2 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, ItemSlotId.Slot0 + 1));
-            var dagger = new ItemData(ItemId.Dagger);
+            var dagger = new ItemData(Base.Item.Dagger);
 
             s1.Set(dagger, 1);
             Assert.Equal(dagger, s1.Item);
@@ -70,7 +78,7 @@ namespace UAlbion.Game.Tests
         {
             var s1 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, ItemSlotId.Slot0));
             var s2 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, ItemSlotId.Slot0 + 1));
-            var torch = new ItemData(ItemId.Torch) { TypeId = ItemType.LightSource, Flags = ItemFlags.Stackable };
+            var torch = new ItemData(Base.Item.Torch) { TypeId = ItemType.LightSource, Flags = ItemFlags.Stackable };
 
             s1.Set(torch, 1);
             Assert.Equal(torch, s1.Item);

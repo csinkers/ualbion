@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
@@ -24,7 +24,7 @@ namespace UAlbion.Game.State.Player
         readonly ItemSlot _hand = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, ItemSlotId.None));
         IEvent _returnItemInHandEvent;
 
-        ItemSlot GetSlot(InventorySlotId id) => _getInventory(id.Inventory)?.GetSlot(id.Slot);
+        ItemSlot GetSlot(InventorySlotId id) => _getInventory(id.Id)?.GetSlot(id.Slot);
         public ReadOnlyItemSlot ItemInHand { get; }
         public InventoryManager(Func<InventoryId, Inventory> getInventory)
         {
@@ -54,8 +54,8 @@ namespace UAlbion.Game.State.Player
 
         void OnSetSlotUiPosition(SetInventorySlotUiPositionEvent e)
         {
-            var inventory = _getInventory(e.InventorySlotId.Inventory);
-            inventory.SetSlotUiPosition(e.Slot, new Vector2(e.X, e.Y));
+            var inventory = _getInventory(e.InventorySlotId.Id);
+            inventory.SetSlotUiPosition(e.InventorySlotId.Slot, new Vector2(e.X, e.Y));
         }
 
         public InventoryAction GetInventoryAction(InventorySlotId slotId)
@@ -88,7 +88,7 @@ namespace UAlbion.Game.State.Player
             }
         }
 
-        void Update(InventoryId id) => Raise(new InventoryChangedEvent(id.Type, id.Id));
+        void Update(InventoryId id) => Raise(new InventoryChangedEvent(id));
 
         void PickupItem(ItemSlot slot, ushort? quantity)
         {
@@ -96,7 +96,7 @@ namespace UAlbion.Game.State.Player
                 return; // TODO: Message
 
             _hand.TransferFrom(slot, quantity);
-            _returnItemInHandEvent = new InventorySwapEvent(slot.Id.Type, slot.Id.Id, slot.Id.Slot);
+            _returnItemInHandEvent = new InventorySwapEvent(slot.Id.Id, slot.Id.Slot);
         }
 
         static bool DoesSlotAcceptItem(ICharacterSheet sheet, ItemSlotId slotId, ItemData item)
@@ -132,7 +132,7 @@ namespace UAlbion.Game.State.Player
             }
         }
 
-        bool DoesSlotAcceptItemInHand(InventoryType type, int id, ItemSlotId slotId)
+        bool DoesSlotAcceptItemInHand(InventoryId id, ItemSlotId slotId)
         {
             switch (_hand?.Item)
             {
@@ -140,11 +140,11 @@ namespace UAlbion.Game.State.Player
                 case Gold _: return slotId == ItemSlotId.Gold;
                 case Rations _: return slotId == ItemSlotId.Rations;
                 case ItemData _ when slotId < ItemSlotId.NormalSlotCount: return true;
-                case ItemData _ when type != InventoryType.Player: return false;
+                case ItemData _ when id.Type != InventoryType.Player: return false;
                 case ItemData item:
                     {
                         var state = Resolve<IGameState>();
-                        var sheet = state.GetPartyMember((PartyCharacterId)id);
+                        var sheet = state.GetSheet(id.ToAssetId());
                         return DoesSlotAcceptItem(sheet, slotId, item);
                     }
 
@@ -159,11 +159,11 @@ namespace UAlbion.Game.State.Player
             if (_hand.Item is Rations) return ItemSlotId.Rations;
             if (!(_hand.Item is ItemData item)) return id.Slot; // Shouldn't be possible
 
-            if (id.Type != InventoryType.Player || !id.Slot.IsBodyPart())
+            if (id.Id.Type != InventoryType.Player || !id.Slot.IsBodyPart())
                 return ItemSlotId.None;
 
             var state = Resolve<IGameState>();
-            var sheet = state.GetPartyMember((PartyCharacterId)id.Id);
+            var sheet = state.GetSheet(id.Id.ToAssetId());
             if (DoesSlotAcceptItem(sheet, id.Slot, item)) return id.Slot;
             if (DoesSlotAcceptItem(sheet, ItemSlotId.Head, item)) return ItemSlotId.Head;
             if (DoesSlotAcceptItem(sheet, ItemSlotId.Neck, item)) return ItemSlotId.Neck;
@@ -219,7 +219,7 @@ namespace UAlbion.Game.State.Player
             }
 
             Update(inventory.Id);
-            Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
+            SetCursor();
             continuation();
             return true;
         }
@@ -238,28 +238,28 @@ namespace UAlbion.Game.State.Player
                 Gold _ => (
                     slot.Amount,
                     discard
-                        ? SystemTextId.Gold_ThrowHowMuchGoldAway
-                        : SystemTextId.Gold_TakeHowMuchGold,
-                    CoreSpriteId.UiGold.ToAssetId()),
+                        ? Base.SystemText.Gold_ThrowHowMuchGoldAway
+                        : Base.SystemText.Gold_TakeHowMuchGold,
+                    Base.CoreSprite.UiGold),
 
                 Rations _ => (
                     slot.Amount,
                     discard
-                        ? SystemTextId.Gold_ThrowHowManyRationsAway
-                        : SystemTextId.Gold_TakeHowManyRations,
-                    CoreSpriteId.UiFood.ToAssetId()),
+                        ? Base.SystemText.Gold_ThrowHowManyRationsAway
+                        : Base.SystemText.Gold_TakeHowManyRations,
+                    Base.CoreSprite.UiFood),
 
                 ItemData item => (
                     slot.Amount,
                     discard
-                        ? SystemTextId.InvMsg_ThrowHowManyItemsAway
-                        : SystemTextId.InvMsg_TakeHowManyItems,
-                    item.Icon.ToAssetId()
+                        ? Base.SystemText.InvMsg_ThrowHowManyItemsAway
+                        : Base.SystemText.InvMsg_TakeHowManyItems,
+                    item.Icon
                 ),
                 { } x => throw new InvalidOperationException($"Unexpected item contents {x}")
             };
 
-            if (RaiseAsync(new ItemQuantityPromptEvent(text, icon, maxQuantity, slotId == ItemSlotId.Gold), continuation) == 0)
+            if (RaiseAsync(new ItemQuantityPromptEvent((TextId)text, icon, maxQuantity, slotId == ItemSlotId.Gold), continuation) == 0)
             {
                 ApiUtil.Assert("ItemManager.GetQuantity tried to open a quantity dialog, but no-one was listening for the event.");
                 continuation(0);
@@ -268,20 +268,20 @@ namespace UAlbion.Game.State.Player
 
         bool OnSlotEvent(InventorySlotEvent e, Action continuation)
         {
-            var slotId = new InventorySlotId(e.InventoryType, e.InventoryId, e.SlotId);
+            var slotId = new InventorySlotId(e.Id, e.SlotId);
             bool redirected = false;
             bool complete = false;
 
-            if (!DoesSlotAcceptItemInHand(e.InventoryType, e.InventoryId, e.SlotId))
+            if (!DoesSlotAcceptItemInHand(e.Id, e.SlotId))
             {
-                slotId = new InventorySlotId(slotId.Type, slotId.Id, GetBestSlot(slotId));
+                slotId = new InventorySlotId(slotId.Id, GetBestSlot(slotId));
                 redirected = true;
             }
 
             if (slotId.Slot == ItemSlotId.None || slotId.Slot == ItemSlotId.CharacterBody)
                 return false;
 
-            Inventory inventory = _getInventory(slotId.Inventory);
+            Inventory inventory = _getInventory(slotId.Id);
             ItemSlot slot = inventory?.GetSlot(slotId.Slot);
             if (slot == null)
                 return false;
@@ -312,8 +312,8 @@ namespace UAlbion.Game.State.Player
                             if (quantity > 0)
                                 PickupItem(slot, (ushort)quantity);
 
-                            Update(slotId.Inventory);
-                            Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
+                            Update(slotId.Id);
+                            SetCursor();
                             continuation();
                         });
                     }
@@ -324,7 +324,7 @@ namespace UAlbion.Game.State.Player
                     if (redirected)
                     {
                         var transitionEvent = new LinearItemTransitionEvent(
-                            _hand.ItemId ?? ItemId.Knife,
+                            _hand.ItemId,
                             (int)cursorUiPosition.X,
                             (int)cursorUiPosition.Y,
                             (int)slot.LastUiPosition.X,
@@ -333,11 +333,11 @@ namespace UAlbion.Game.State.Player
 
                         ItemSlot temp = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
                         temp.TransferFrom(_hand, null);
-                        Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
+                        SetCursor();
                         RaiseAsync(transitionEvent, () =>
                         {
                             slot.TransferFrom(temp, null);
-                            Update(slotId.Inventory);
+                            Update(slotId.Id);
                             continuation();
                         });
                     }
@@ -354,7 +354,7 @@ namespace UAlbion.Game.State.Player
                     {
                         // Original game didn't handle this, but doesn't hurt.
                         var transitionEvent1 = new LinearItemTransitionEvent(
-                            _hand.ItemId ?? ItemId.Knife,
+                            _hand.ItemId,
                             (int)cursorUiPosition.X,
                             (int)cursorUiPosition.Y,
                             (int)slot.LastUiPosition.X,
@@ -362,7 +362,7 @@ namespace UAlbion.Game.State.Player
                             config.UI.Transitions.ItemMovementTransitionTimeSeconds);
 
                         var transitionEvent2 = new LinearItemTransitionEvent(
-                            slot.ItemId ?? ItemId.Knife,
+                            slot.ItemId,
                             (int)slot.LastUiPosition.X,
                             (int)slot.LastUiPosition.Y,
                             (int)cursorUiPosition.X,
@@ -377,19 +377,19 @@ namespace UAlbion.Game.State.Player
                         RaiseAsync(transitionEvent1, () =>
                         {
                             slot.TransferFrom(temp1, null);
-                            Update(slotId.Inventory);
-                            Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
+                            Update(slotId.Id);
+                            SetCursor();
                             continuation();
                         });
 
                         RaiseAsync(transitionEvent2, () =>
                         {
                             _hand.TransferFrom(temp2, null);
-                            _returnItemInHandEvent = new InventorySwapEvent(slot.Id.Type, slot.Id.Id, slot.Id.Slot);
-                            Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
+                            _returnItemInHandEvent = new InventorySwapEvent(slot.Id.Id, slot.Id.Slot);
+                            SetCursor();
                         });
 
-                        Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
+                        SetCursor();
                     }
                     else
                     {
@@ -415,8 +415,8 @@ namespace UAlbion.Game.State.Player
             if (complete)
             {
                 continuation();
-                Update(slotId.Inventory);
-                Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
+                Update(slotId.Id);
+                SetCursor();
             }
 
             return true;
@@ -424,8 +424,7 @@ namespace UAlbion.Game.State.Player
 
         bool OnDiscard(InventoryDiscardEvent e, Action continuation)
         {
-            var inventoryId = new InventoryId(e.InventoryType, e.InventoryId);
-            var inventory = _getInventory(inventoryId);
+            var inventory = _getInventory(e.Id);
             GetQuantity(true, inventory, e.SlotId, quantity =>
             {
                 if (quantity <= 0)
@@ -439,13 +438,13 @@ namespace UAlbion.Game.State.Player
 
                 var prompt = slot.Item switch
                 {
-                    Gold _ => SystemTextId.Gold_ReallyThrowTheGoldAway,
-                    Rations _ => SystemTextId.Gold_ReallyThrowTheRationsAway,
-                    ItemData _ when itemsToDrop == 1 => SystemTextId.InvMsg_ReallyThrowThisItemAway,
-                    _ => SystemTextId.InvMsg_ReallyThrowTheseItemsAway,
+                    Gold _ => Base.SystemText.Gold_ReallyThrowTheGoldAway,
+                    Rations _ => Base.SystemText.Gold_ReallyThrowTheRationsAway,
+                    ItemData _ when itemsToDrop == 1 => Base.SystemText.InvMsg_ReallyThrowThisItemAway,
+                    _ => Base.SystemText.InvMsg_ReallyThrowTheseItemsAway,
                 };
 
-                RaiseAsync(new YesNoPromptEvent(prompt), response =>
+                RaiseAsync(new YesNoPromptEvent((TextId)prompt), response =>
                 {
                     if (!response)
                     {
@@ -453,20 +452,25 @@ namespace UAlbion.Game.State.Player
                         return;
                     }
 
-                    if (slot.ItemId.HasValue)
+                    if (!slot.ItemId.IsNone)
                     {
                         var config = Resolve<GameConfig>();
                         for (int i = 0; i < itemsToDrop && i < config.UI.Transitions.MaxDiscardTransitions; i++)
-                            Raise(new GravityItemTransitionEvent(slot.ItemId.Value, e.NormX, e.NormY));
+                            Raise(new GravityItemTransitionEvent(slot.ItemId, e.NormX, e.NormY));
                     }
 
                     slot.Amount -= itemsToDrop;
-                    Update(inventoryId);
-                    Raise(new SetCursorEvent(_hand.Item == null ? CoreSpriteId.Cursor : CoreSpriteId.CursorSmall));
+                    Update(e.Id);
+                    SetCursor();
                     continuation();
                 });
             });
             return true;
+        }
+
+        void SetCursor()
+        {
+            Raise(new SetCursorEvent(_hand.Item == null ? Base.CoreSprite.Cursor : Base.CoreSprite.CursorSmall));
         }
 
         void CoalesceItems(ItemSlot slot)
@@ -483,10 +487,10 @@ namespace UAlbion.Game.State.Player
                 return; // TODO: Message
 
             _hand.Swap(slot);
-            _returnItemInHandEvent = new InventorySwapEvent(slot.Id.Type, slot.Id.Id, slot.Id.Slot);
+            _returnItemInHandEvent = new InventorySwapEvent(slot.Id.Id, slot.Id.Slot);
         }
 
-        void RaiseStatusMessage(SystemTextId textId)
+        void RaiseStatusMessage(TextId textId)
             => Raise(new DescriptionTextEvent(Resolve<ITextFormatter>().Format(textId)));
 
         public int GetItemCount(InventoryId id, ItemId item) => _getInventory(id).EnumerateAll().Where(x => x.ItemId == item).Sum(x => (int?)x.Amount) ?? 0;
@@ -497,10 +501,10 @@ namespace UAlbion.Game.State.Player
             ushort remaining = amount ?? ushort.MaxValue;
             var inventory = _getInventory(id);
 
-            if (donor.ItemId == ItemId.Gold)
+            if (donor.ItemId == AssetId.Gold)
                 return inventory.Gold.TransferFrom(donor, remaining);
 
-            if (donor.ItemId == ItemId.Rations)
+            if (donor.ItemId == AssetId.Rations)
                 return inventory.Rations.TransferFrom(donor, remaining);
 
             for (int i = 0; i < (int)ItemSlotId.NormalSlotCount && amount != 0; i++)
@@ -524,10 +528,10 @@ namespace UAlbion.Game.State.Player
             ushort remaining = amount ?? ushort.MaxValue;
             var inventory = _getInventory(id);
 
-            if (item == ItemId.Gold)
+            if (item == AssetId.Gold)
                 return acceptor.TransferFrom(inventory.Gold, remaining);
 
-            if (item == ItemId.Rations)
+            if (item == AssetId.Rations)
                 return acceptor.TransferFrom(inventory.Rations, remaining);
 
             for (int i = 0; i < (int)ItemSlotId.NormalSlotCount && amount != 0; i++)

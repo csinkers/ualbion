@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Entities;
 
 namespace UAlbion.Game.Gui.Controls
@@ -40,6 +40,7 @@ namespace UAlbion.Game.Gui.Controls
         public DialogFrameBackgroundStyle Background { get; set; }
         void Rebuild(int width, int height, DrawLayer order)
         {
+            static AssetId Id<T>(T enumValue) where T : unmanaged, Enum => AssetId.From(enumValue);
             var window = Resolve<IWindowManager>();
             var sm = Resolve<ISpriteManager>();
             var factory = Resolve<ICoreFactory>();
@@ -54,7 +55,7 @@ namespace UAlbion.Game.Gui.Controls
             }
 
             var assets = Resolve<IAssetManager>();
-            var multi = factory.CreateMultiTexture($"DialogFrame {width}x{height}", new DummyPaletteManager(assets.LoadPalette(PaletteId.Inventory)));
+            var multi = factory.CreateMultiTexture($"DialogFrame {width}x{height}", new DummyPaletteManager(assets.LoadPalette(Id(Base.Palette.Inventory))));
 
             void DrawLine(uint y)
             {
@@ -62,7 +63,8 @@ namespace UAlbion.Game.Gui.Controls
                 uint n = 0;
                 while(x < width - TileSize)
                 {
-                    var texture = assets.LoadTexture((CoreSpriteId)((int)CoreSpriteId.UiBackgroundLines1 + n % 4));
+                    var sprite = (Base.CoreSprite)((int)Base.CoreSprite.UiBackgroundLines1 + n % 4); // TODO: Better solution
+                    var texture = assets.LoadTexture(Id(sprite));
                     uint? w = x + 2*TileSize > width ? (uint)(width - TileSize - x) : (uint?)null;
                     multi.AddTexture(1, texture, x, y, 0, true, w);
                     n++;
@@ -74,7 +76,8 @@ namespace UAlbion.Game.Gui.Controls
             {
                 uint y = TileSize;
                 uint n = 0;
-                var texture = assets.LoadTexture((CoreSpriteId)((int)CoreSpriteId.UiBackgroundLines1 + n % 4));
+                var sprite = (Base.CoreSprite)((int)Base.CoreSprite.UiBackgroundLines1 + n % 4); // TODO: Better solution
+                var texture = assets.LoadTexture(Id(sprite));
                 texture = CoreUtil.BuildRotatedTexture(factory, (EightBitTexture)texture);
                 while (y < height - TileSize)
                 {
@@ -90,7 +93,7 @@ namespace UAlbion.Game.Gui.Controls
             {
                 case DialogFrameBackgroundStyle.MainMenuPattern:
                 {
-                    var background = assets.LoadTexture(CoreSpriteId.UiBackground);
+                    var background = assets.LoadTexture(Id(Base.CoreSprite.UiBackground));
                     multi.AddTexture(1, background,
                         FrameOffsetX, FrameOffsetY, 0, true,
                         (uint)width - FrameOffsetX * 2, (uint)height - FrameOffsetY * 2);
@@ -108,10 +111,10 @@ namespace UAlbion.Game.Gui.Controls
             }
 
             // Corners
-            multi.AddTexture(1, assets.LoadTexture(CoreSpriteId.UiWindowTopLeft), 0, 0, 0, true);
-            multi.AddTexture(1, assets.LoadTexture(CoreSpriteId.UiWindowTopRight), (uint)width - TileSize, 0, 0, true);
-            multi.AddTexture(1, assets.LoadTexture(CoreSpriteId.UiWindowBottomLeft), 0, (uint)height - TileSize, 0, true);
-            multi.AddTexture(1, assets.LoadTexture(CoreSpriteId.UiWindowBottomRight), (uint)width - TileSize, (uint)height - TileSize, 0, true);
+            multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreSprite.UiWindowTopLeft)), 0, 0, 0, true);
+            multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreSprite.UiWindowTopRight)), (uint)width - TileSize, 0, 0, true);
+            multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreSprite.UiWindowBottomLeft)), 0, (uint)height - TileSize, 0, true);
+            multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreSprite.UiWindowBottomRight)), (uint)width - TileSize, (uint)height - TileSize, 0, true);
 
             DrawLine(4); // Left
             DrawLine((uint)height - FrameOffsetY); // Right

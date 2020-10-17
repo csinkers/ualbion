@@ -1,16 +1,16 @@
 ﻿using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Entities
 {
     public class Skybox : Component
     {
-        readonly DungeonBackgroundId _id;
+        readonly SpriteId _id;
         SkyboxRenderable _renderable;
 
-        public Skybox(DungeonBackgroundId id)
+        public Skybox(SpriteId id)
         {
             On<RenderEvent>(e =>
             {

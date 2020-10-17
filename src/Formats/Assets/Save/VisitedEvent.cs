@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Globalization;
 using SerdesNet;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Save
@@ -11,17 +12,8 @@ namespace UAlbion.Formats.Assets.Save
         public byte Unk0 { get; set; }
         public EventSetId EventSetId { get; set; }
         public ActionType Type { get; set; }
-        public ushort Word { get; set; }
 
-        public override string ToString() =>
-            Type switch
-            {
-                ActionType.Word => $"{Unk0} {(int) EventSetId} {Type} {Word}={WordId}",
-                ActionType.AskAboutItem => $"{Unk0} {(int) EventSetId} {Type} {ItemId}",
-                ActionType.DialogueLine => $"{Unk0} {(int) EventSetId} {Type} Text:{Word / 256} Block:{Word % 256}",
-                _ => $"{Unk0} {(int) EventSetId} {Type} {Word / 256} {Word % 256}"
-            };
-        public static VisitedEvent Serdes(int n, VisitedEvent u, ISerializer s)
+        public static VisitedEvent Serdes(int n, VisitedEvent u, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (s.Mode == SerializerMode.WritingAnnotated)
@@ -29,19 +21,66 @@ namespace UAlbion.Formats.Assets.Save
 
             u ??= new VisitedEvent();
             u.Unk0 = s.UInt8(nameof(Unk0), u.Unk0);
-            u.EventSetId = s.EnumU16(nameof(EventSetId), u.EventSetId);
+            u.EventSetId = EventSetId.SerdesU16(nameof(EventSetId), u.EventSetId, mapping, s);
             u.Type = s.EnumU8(nameof(Type), u.Type);
-            u.Word = s.UInt16(nameof(Word), u.Word);
+
+            switch (u.Type)
+            {
+                case ActionType.AskAboutItem:
+                case ActionType.UseItem:
+                case ActionType.EquipItem:
+                case ActionType.UnequipItem:
+                case ActionType.PickupItem:
+                    u._value = (uint)ItemId.SerdesU16("Value", new ItemId(u._value), AssetType.Item, mapping, s);
+                    break;
+                case ActionType.Word:
+                    u._value = (uint)WordId.SerdesU16("Value", new WordId(u._value), mapping, s);
+                    break;
+                default:
+                    u._value = s.UInt16("Value", (ushort)u._value);
+                    break;
+            }
+
             return u;
         }
 
+        uint _value;
+
+        public WordId WordId =>
+            Type == ActionType.Word
+                ? new WordId(_value)
+                : throw new InvalidOperationException($"Tried to retrieve WordId of a non-word VisitedEvent");
+        /*
         public WordId WordId => Word switch
         {
-            { } x when x <= 193 => (WordId)(Word + 502),
+            // TODO: Ugh... finish reversing this and then fix up via asset mappings?
+            { } x when x <= 193 => (WordId)(Word + 502), 
             _ => (WordId) (Word + 503)
-        };
+        }; */
 
-        public ItemId ItemId => (ItemId)Word - 1;
+        public ItemId ItemId => 
+            Type == ActionType.AskAboutItem
+            || Type == ActionType.UseItem
+            || Type == ActionType.EquipItem
+            || Type == ActionType.UnequipItem
+            || Type == ActionType.PickupItem
+                ? new ItemId(_value)
+                : throw new InvalidOperationException($"Tried to retrieve WordId of a non-word VisitedEvent");
+
+        string ItemString =>
+            Type switch
+            {
+                ActionType.AskAboutItem => ItemId.ToString(),
+                ActionType.UseItem => ItemId.ToString(),
+                ActionType.EquipItem => ItemId.ToString(),
+                ActionType.UnequipItem => ItemId.ToString(),
+                ActionType.PickupItem => ItemId.ToString(),
+                ActionType.Word => WordId.ToString(),
+                ActionType.DialogueLine => $"Text:{_value >> 8} Block:{_value & 0xff}",
+                _ => _value.ToString(CultureInfo.InvariantCulture)
+            };
+
+        public override string ToString() => $"{Unk0} {(int) EventSetId} {Type} {ItemString}";
 
         /*
          Logical to textual word id mapping clues:

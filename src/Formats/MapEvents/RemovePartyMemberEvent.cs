@@ -1,18 +1,19 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
     [Event("remove_party_member", "Remove someone from the party", new[] { "rpm" })]
     public class RemovePartyMemberEvent : MapEvent
     {
-        public static RemovePartyMemberEvent Serdes(RemovePartyMemberEvent e, ISerializer s)
+        public static RemovePartyMemberEvent Serdes(RemovePartyMemberEvent e, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new RemovePartyMemberEvent();
-            e.PartyMemberId = (PartyCharacterId)StoreIncrementedConverter.Serdes(nameof(PartyMemberId), (byte)e.PartyMemberId, s.UInt8);
+            e.PartyMemberId = PartyMemberId.SerdesU8(nameof(PartyMemberId), e.PartyMemberId, mapping, s);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
@@ -25,11 +26,11 @@ namespace UAlbion.Formats.MapEvents
             return e;
         }
 
-        public RemovePartyMemberEvent(PartyCharacterId partyMemberId) { PartyMemberId = partyMemberId;}
+        public RemovePartyMemberEvent(PartyMemberId partyMemberId) { PartyMemberId = partyMemberId;}
         RemovePartyMemberEvent() { }
 
         [EventPart("member_id")]
-        public PartyCharacterId PartyMemberId { get; private set; }
+        public PartyMemberId PartyMemberId { get; private set; }
         public byte Unk2 { get; private set; }
         public byte Unk3 { get; private set; }
         byte Unk4 { get; set; }

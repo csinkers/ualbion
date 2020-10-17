@@ -1,18 +1,12 @@
 ﻿using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Events
 {
     [Event("prompt:item_quantity")]
     public class ItemQuantityPromptEvent : IAsyncEvent<int>
     {
-        public ItemQuantityPromptEvent(
-            AssetType stringType, ushort stringId, int stringSubId,
-            AssetType iconType, ushort iconId,
-            int max, 
-            bool useTenths) : this(new StringId(stringType, stringId, stringSubId), new AssetId(iconType, iconId), max, useTenths) { }
-
-        public ItemQuantityPromptEvent(StringId text, AssetId icon, int max, bool useTenths)
+        public ItemQuantityPromptEvent(StringId text, SpriteId icon, int max, bool useTenths)
         {
             Text = text;
             Icon = icon;
@@ -20,15 +14,9 @@ namespace UAlbion.Game.Events
             UseTenths = useTenths;
         }
 
-        public StringId Text { get; }
-        public AssetId Icon { get; }
-        public int Max { get; }
-        public bool UseTenths { get; }
-
-        [EventPart("string_type")] public AssetType StringType => Text.Type;
-        [EventPart("string_id")] public ushort StringId => Text.Id;
-        [EventPart("string_sub_id")] public int StringSubId => Text.SubId;
-        [EventPart("icon_type")] public AssetType IconType => Icon.Type;
-        [EventPart("icon_id")] public ushort IconId => Icon.Id;
+        [EventPart("text")] public StringId Text { get; }
+        [EventPart("icon")] public SpriteId Icon { get; }
+        [EventPart("max")] public int Max { get; }
+        [EventPart("useTenths")] public bool UseTenths { get; }
     }
 }

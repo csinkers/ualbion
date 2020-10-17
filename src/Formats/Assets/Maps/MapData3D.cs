@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Formats.AssetIds;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets.Maps
 {
@@ -10,41 +10,37 @@ namespace UAlbion.Formats.Assets.Maps
     {
         public override MapType MapType => MapType.ThreeD;
         public Map3DFlags Flags { get; private set; }
-        public LabyrinthDataId LabDataId { get; private set; }
-        public byte Sound { get; private set; }
+        public LabyrinthId LabDataId { get; private set; }
+        public SongId AmbientSongId { get; private set; }
         public byte[] Contents { get; private set; }
         public byte[] Floors { get; private set; }
         public byte[] Ceilings { get; private set; }
         public IList<AutomapInfo> Automap { get; } = new List<AutomapInfo>();
         public byte[] AutomapGraphics { get; private set; }
 
-        MapData3D(MapDataId id) : base(id) { }
-        public static MapData3D Serdes(int id, MapData3D existing, ISerializer s)
+        MapData3D(MapId id) : base(id) { }
+        public static MapData3D Serdes(int id, MapData3D existing, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
 
-            var map = existing ?? new MapData3D((MapDataId)id);
+            var map = existing ?? new MapData3D((MapId)id);
             map.Flags = s.EnumU8(nameof(Flags), map.Flags); // 0
             int npcCount = s.Transform("NpcCount", map.Npcs.Count, S.UInt8, NpcCountTransform.Instance); // 1
             var _ = s.UInt8("MapType", (byte)map.MapType); // 2
 
-            map.SongId = s.TransformEnumU8(nameof(SongId), map.SongId, TweakedConverter<SongId>.Instance); // 3
+            map.SongId = SongId.SerdesU8(nameof(SongId), map.SongId, mapping, s); // 3
             map.Width = s.UInt8(nameof(Width), map.Width); // 4
             map.Height = s.UInt8(nameof(Height), map.Height); // 5
-            map.LabDataId = s.EnumU8(nameof(LabDataId), map.LabDataId); // 6
-            map.CombatBackgroundId = s.EnumU8(nameof(CombatBackgroundId), map.CombatBackgroundId); // 7 TODO: Verify this is combat background
-            map.PaletteId = s.TransformEnumU8(
-                nameof(PaletteId),
-                map.PaletteId,
-                StoreIncrementedConverter<PaletteId>.Instance);
-
-            map.Sound = s.Transform<byte, byte>(nameof(Sound), map.Sound, S.UInt8, StoreIncrementedConverter.Instance);
+            map.LabDataId = LabyrinthId.SerdesU8(nameof(LabDataId), map.LabDataId, mapping, s); // 6
+            map.CombatBackgroundId = SpriteId.SerdesU8(nameof(CombatBackgroundId), map.CombatBackgroundId, AssetType.CombatBackground, mapping, s); // 7 TODO: Verify this is combat background
+            map.PaletteId = PaletteId.SerdesU8(nameof(PaletteId), map.PaletteId, mapping, s);
+            map.AmbientSongId = SongId.SerdesU8(nameof(AmbientSongId), map.AmbientSongId, mapping, s);
 
             for (int i = 0; i < npcCount; i++)
             {
                 map.Npcs.TryGetValue(i, out var npc);
-                npc = MapNpc.Serdes(i, npc, s);
-                if (npc.Id != null)
+                npc = MapNpc.Serdes(i, npc, MapType.ThreeD, mapping, s);
+                if (!npc.Id.IsNone)
                     map.Npcs[i] = npc;
             }
             s.Check();
@@ -69,7 +65,7 @@ namespace UAlbion.Formats.Assets.Maps
                 return map;
             }
 
-            map.SerdesEvents(s);
+            map.SerdesEvents(mapping, s);
             map.SerdesNpcWaypoints(s);
             map.SerdesAutomap(s);
             map.SerdesChains(s, 64);

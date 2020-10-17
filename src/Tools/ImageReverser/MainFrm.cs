@@ -5,13 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using UAlbion.Formats.Config;
+using UAlbion.Config;
 
 namespace UAlbion.Tools.ImageReverser
 {
     public partial class MainFrm : Form
     {
-        readonly IDictionary<FullAssetInfo, TreeNode> _nodes = new Dictionary<FullAssetInfo, TreeNode>();
+        readonly IDictionary<AssetInfo, TreeNode> _nodes = new Dictionary<AssetInfo, TreeNode>();
         readonly ReverserCore _core;
         readonly Font _boldFont = new Font(DefaultFont, FontStyle.Bold);
         readonly Font _defaultFont = new Font(DefaultFont, 0);
@@ -47,7 +47,7 @@ namespace UAlbion.Tools.ImageReverser
         void MainFrm_Load(object sender, EventArgs e)
         {
             _rootNode = fileTree.Nodes.Add("Files");
-            foreach(var xld in _core.Xlds)
+            foreach(var xld in _core.ContainerFiles)
                 foreach (var asset in xld.Value.Assets.Values)
                     AddToTree(asset);
             _rootNode.Expand();
@@ -83,7 +83,7 @@ namespace UAlbion.Tools.ImageReverser
             txtInfo.Text = sb.ToString();
         }
 
-        void AddToTree(FullAssetInfo asset)
+        void AddToTree(AssetInfo asset)
         {
             if (asset.Filename == null)
                 return;
@@ -171,7 +171,7 @@ namespace UAlbion.Tools.ImageReverser
             UpdateAssetDescription();
         }
 
-        IAssetViewer GetViewerForAsset(FullAssetInfo asset)
+        IAssetViewer GetViewerForAsset(AssetInfo asset)
         {
             if (asset == null)
                 return null;

@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Dialogs;
@@ -40,7 +39,7 @@ namespace UAlbion.Game.Gui
             On<LoadMapPromptEvent>(e =>
             {
                 var dialog = AttachChild(new LoadMapPromptDialog(new LiteralText("Select map"), 100, 399));
-                dialog.Closed += (sender, _) => Raise(new LoadMapEvent((MapDataId)dialog.Value));
+                dialog.Closed += (sender, _) => Raise(new LoadMapEvent((Base.Map)dialog.Value)); // TODO: Include mod maps
             });
         }
     }

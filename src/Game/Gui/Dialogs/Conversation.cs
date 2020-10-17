@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
-using UAlbion.Formats.AssetIds;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
@@ -19,14 +19,14 @@ namespace UAlbion.Game.Gui.Dialogs
         static readonly Vector2 ConversationPositionLeft = new Vector2(20, 20); // For give item transitions
         static readonly Vector2 ConversationPositionRight = new Vector2(335, 20);
 
-        readonly PartyCharacterId _partyMemberId;
+        readonly PartyMemberId _partyMemberId;
         readonly ICharacterSheet _npc;
         readonly IDictionary<WordId, WordStatus> _topics = new Dictionary<WordId, WordStatus>();
         ConversationTextWindow _textWindow;
         ConversationTopicWindow _topicsWindow;
         ConversationOptionsWindow _optionsWindow;
 
-        public Conversation(PartyCharacterId partyMemberId, ICharacterSheet npc)
+        public Conversation(PartyMemberId partyMemberId, ICharacterSheet npc)
         {
             On<EndDialogueEvent>(_ => Close());
             On<UnloadMapEvent>(_ => Close());
@@ -56,7 +56,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
             var game = Resolve<IGameState>();
             var assets = Resolve<IAssetManager>();
-            var partyMember = game?.GetPartyMember(_partyMemberId) ?? assets.LoadPartyMember(_partyMemberId);
+            var partyMember = game?.GetSheet(_partyMemberId) ?? assets.LoadSheet(_partyMemberId);
 
             AttachChild(new ConversationParticipantLabel(partyMember, false));
             AttachChild(new ConversationParticipantLabel(_npc, true));
@@ -108,7 +108,7 @@ namespace UAlbion.Game.Gui.Dialogs
                         DefaultIdleHandler();
                     }
 
-                    var text = tf.Ink(FontColor.Yellow).Format(new StringId(AssetType.EventText, (ushort)_npc.EventSetId, 0));
+                    var text = tf.Ink(FontColor.Yellow).Format(_npc.EventSetId.ToEventText());
                     _textWindow.Text = text;
                     _textWindow.Clicked += OnClicked;
                     return;
@@ -140,7 +140,7 @@ namespace UAlbion.Game.Gui.Dialogs
             TriggerLineAction(blockId, textId);
         }
 
-        public bool? OnText(BaseTextEvent textEvent, Action continuation)
+        public bool? OnText(TextEvent textEvent, Action continuation)
         {
             if (textEvent == null) throw new ArgumentNullException(nameof(textEvent));
             if (continuation == null) throw new ArgumentNullException(nameof(continuation));
@@ -230,16 +230,16 @@ namespace UAlbion.Game.Gui.Dialogs
 
         IEnumerable<(IText, int?, Action)> GetStandardOptions(ITextFormatter tf)
         {
-            (IText, int?, Action) Build(SystemTextId id, int block)
+            (IText, int?, Action) Build(TextId id, int block)
             {
                 var text = tf.Format(id);
                 return (text, null, () => BlockClicked(block, 0));
             }
 
-            yield return Build(SystemTextId.Dialog_WhatsYourProfession, 0);
-            yield return Build(SystemTextId.Dialog_WhatDoYouKnowAbout, 1);
-            yield return Build(SystemTextId.Dialog_WhatDoYouKnowAboutThisItem, 2);
-            yield return Build(SystemTextId.Dialog_ItsBeenNiceTalkingToYou, 3);
+            yield return Build(Base.SystemText.Dialog_WhatsYourProfession, 0);
+            yield return Build(Base.SystemText.Dialog_WhatDoYouKnowAbout, 1);
+            yield return Build(Base.SystemText.Dialog_WhatDoYouKnowAboutThisItem, 2);
+            yield return Build(Base.SystemText.Dialog_ItsBeenNiceTalkingToYou, 3);
         }
 
         void OnDataChange(DataChangeEvent e)
@@ -262,27 +262,31 @@ namespace UAlbion.Game.Gui.Dialogs
         bool TriggerAction(ActionType type, byte small, ushort large, Action continuation = null)
         {
             var assets = Resolve<IAssetManager>();
-            var eventSet = _npc.EventSetId == null ? null : assets.LoadEventSet(_npc.EventSetId.Value);
-            var wordSet = _npc.WordSetId == null ? null : assets.LoadEventSet(_npc.WordSetId.Value);
+            var eventSet = _npc.EventSetId.IsNone ? null : assets.LoadEventSet(_npc.EventSetId);
+            var wordSet = _npc.WordSetId.IsNone ? null : assets.LoadEventSet(_npc.WordSetId);
 
             bool fromWordSet = false;
             var chain = eventSet?.Chains.FirstOrDefault(x =>
                 x.FirstEvent?.Event is ActionEvent action && 
                 action.ActionType == type && 
                 action.SmallArg == small &&
-                action.LargeArg == large);
+                action.Argument.Id == large);
 
             if (chain == null)
             {
                 chain = wordSet?.Chains.FirstOrDefault(x =>
                     x.FirstEvent?.Event is ActionEvent action && action.ActionType == type &&
-                    action.SmallArg == small && action.LargeArg == large);
+                    action.SmallArg == small && action.Argument.Id == large);
                 fromWordSet = true;
             }
 
             if (chain != null)
             {
-                var triggerEvent = new TriggerChainEvent(chain, chain.FirstEvent, fromWordSet ? wordSet.Id : eventSet.Id);
+                var triggerEvent = new TriggerChainEvent(
+                    chain,
+                    chain.FirstEvent,
+                    new EventSource(fromWordSet ? wordSet.Id : eventSet.Id, TriggerTypes.Action));
+
                 RaiseAsync(triggerEvent, () => continuation?.Invoke());
                 return true;
             }

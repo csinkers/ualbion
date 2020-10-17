@@ -17,9 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion", "UAlbion\UAlbion.
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "UAlbion.Tools.Exporter", "Tools\Exporter\UAlbion.Tools.Exporter.fsproj", "{8611136B-B88E-498C-9F5B-5CF22EE48D32}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core", "Core\UAlbion.Core.csproj", "{4B3B467B-2E99-4836-B589-A69D272417F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.CodeGenerator", "Tools\GenerateEnums\UAlbion.CodeGenerator.csproj", "{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateEnums", "Tools\GenerateEnums\GenerateEnums.csproj", "{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core", "Core\UAlbion.Core.csproj", "{4B3B467B-2E99-4836-B589-A69D272417F0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Api", "Api\UAlbion.Api.csproj", "{20D41E69-C260-461F-A0B9-89920F133F60}"
 EndProject

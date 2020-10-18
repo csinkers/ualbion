@@ -3,22 +3,41 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Newtonsoft.Json;
 using UAlbion.Api;
 
 namespace UAlbion.Config
 {
     public class AssetMapping
     {
+        static readonly ThreadLocal<AssetMapping> ThreadLocalGlobal = new ThreadLocal<AssetMapping>(() => new AssetMapping());
+        static readonly AssetMapping TrueGlobal = new AssetMapping();
+
+        // The global mapping, should always be used apart from when loading/saving assets.
+        // Always built dynamically based on the current set of active mods
+        public static AssetMapping Global => GlobalIsThreadLocal ? ThreadLocalGlobal.Value : TrueGlobal;
+        public static bool GlobalIsThreadLocal { get; set; } // Set to true for unit tests.
+
+        readonly struct Range
+        {
+            public Range(int from, int to) { From = from; To = to; }
+            public int From { get; }
+            public int To { get; }
+        }
+
         class EnumInfo
         {
-            public Type EnumType { get; }
-            public AssetType AssetType { get; }
-            public int EnumMin { get; }
-            public int EnumMax { get; }
-            public int Offset { get; }
-            public int MappedMin => EnumMin + Offset;
-            public int MappedMax => EnumMax + Offset;
-            public (int, int)[] Ranges { get; }
+            [JsonIgnore] public Type EnumType { get; set; }
+            [JsonConverter(typeof(ToStringJsonConverter))]
+            public AssetType AssetType { get; set; }
+            public int EnumMin { get; set; }
+            public int EnumMax { get; set; }
+            public int Offset { get; set; }
+            [JsonIgnore] public int MappedMin => EnumMin + Offset;
+            [JsonIgnore] public int MappedMax => EnumMax + Offset;
+            public Range[] Ranges { get; set; }
+
+            public EnumInfo() { } // For deserialisation
 
             public EnumInfo(Type type, AssetType assetType, int mappedMin)
             {
@@ -35,13 +54,15 @@ namespace UAlbion.Config
                 EnumMin = values.Min();
                 EnumMax = values.Max();
                 Offset = mappedMin - EnumMin;
-                Ranges = values.Aggregate(new List<(int, int)>(), (acc, x) =>
-                {
-                    if (acc.Count == 0) acc.Add((x, x));
-                    else if (acc[acc.Count - 1].Item2 == x - 1) acc[acc.Count - 1] = (acc[acc.Count - 1].Item1, x);
-                    else acc.Add((x, x));
-                    return acc;
-                }).ToArray();
+                Ranges = values.Aggregate(new List<Range>(), (acc, x) =>
+                    {
+                        if (acc.Count == 0) acc.Add(new Range(x, x));
+                        else if (acc[acc.Count - 1].To == x - 1) acc[acc.Count - 1] = new Range(acc[acc.Count - 1].From, x);
+                        else acc.Add(new Range(x, x));
+                        return acc;
+                    })
+                    .Select(x => new Range(x.From + Offset, x.To + Offset))
+                    .ToArray();
             }
         }
 
@@ -58,13 +79,18 @@ namespace UAlbion.Config
 
         readonly Dictionary<Type, EnumInfo> _byEnumType = new Dictionary<Type, EnumInfo>();
 
-        static readonly ThreadLocal<AssetMapping> _threadLocalGlobal = new ThreadLocal<AssetMapping>(() => new AssetMapping());
-        static readonly AssetMapping _trueGlobal = new AssetMapping();
 
-        // The global mapping, should always be used apart from when loading/saving assets.
-        // Always built dynamically based on the current set of active mods
-        public static AssetMapping Global => GlobalIsThreadLocal ? _threadLocalGlobal.Value : _trueGlobal;
-        public static bool GlobalIsThreadLocal { get; set; } // Set to true for unit tests.
+        public AssetMapping() {}
+        AssetMapping(Dictionary<Type, EnumInfo> byEnumType)
+        {
+            _byEnumType = byEnumType;
+            foreach (var grouping in byEnumType.GroupBy(x => x.Value.AssetType))
+            {
+                var typeMapping = _byAssetType[(byte)grouping.Key];
+                var ordered = grouping.OrderBy(x => x.Value.MappedMin);
+                typeMapping.AddRange(ordered.Select(kvp => kvp.Value));
+            }
+        }
 
         /// <summary>
         /// Convert a run-time AssetId to its unambiguous enum representation.
@@ -75,11 +101,11 @@ namespace UAlbion.Config
         {
             foreach (var info in _byAssetType[(byte)id.Type])
             {
-                if (info.MappedMin > id.Id)
+                if (info.MappedMax < id.Id)
                     continue;
 
                 ApiUtil.Assert(id.Id <= info.MappedMax, $"AssetId ({id.Type}, {id.Id}) is outside the mapped range.");
-                return (info.EnumType, id.Id + info.Offset);
+                return (info.EnumType, id.Id - info.Offset);
             }
 
             ApiUtil.Assert($"AssetId ({id.Type}, {id.Id}) is outside the mapped range.");
@@ -125,7 +151,8 @@ namespace UAlbion.Config
 
         public AssetId EnumToId(Type enumType, int enumValue)
         {
-            var info = _byEnumType[enumType];
+            if (!_byEnumType.TryGetValue(enumType, out var info))
+                throw new ArgumentOutOfRangeException($"Type {enumType} is not currently mapped.");
             return new AssetId(info.AssetType, enumValue + info.Offset);
         }
 
@@ -161,9 +188,18 @@ namespace UAlbion.Config
         public IEnumerable<AssetId> EnumeratAssetsOfType(AssetType type)
         {
             foreach (var info in  _byAssetType[(byte)type]) // Nested for loops go brrr
-                foreach (var (from, to) in info.Ranges)
-                    for (int i = from; i < to; i++)
+                foreach (var range in info.Ranges)
+                    for (int i = range.From; i <= range.To; i++)
                         yield return new AssetId(type, i);
+        }
+
+        public string Serialize(JsonSerializerSettings settings) => JsonConvert.SerializeObject(_byEnumType, settings);
+        public static AssetMapping Deserialize(string json)
+        {
+            var m = new AssetMapping(JsonConvert.DeserializeObject<Dictionary<Type, EnumInfo>>(json));
+            foreach (var kvp in m._byEnumType)
+                kvp.Value.EnumType = kvp.Key;
+            return m;
         }
     }
 }

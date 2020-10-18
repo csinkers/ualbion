@@ -62,12 +62,13 @@ namespace UAlbion.Game.Veldrid.Debugging
                 return;
             }
 
-            if(!_wasShown)
-            {
+            if (!_wasShown)
                 _scrollToBottom = true;
-}
 
+            var window = Resolve<IWindowManager>();
             ImGui.Begin("Console");
+            ImGui.SetWindowPos(Vector2.Zero, ImGuiCond.Always);
+            ImGui.SetWindowSize(new Vector2(window.PixelWidth / 3.0f, window.PixelHeight), ImGuiCond.Always);
 
             // Reserve enough left-over height for 1 separator + 1 input text
             float footerHeightToReserve = ImGui.GetStyle().ItemSpacing.Y + ImGui.GetFrameHeightWithSpacing();
@@ -163,7 +164,7 @@ namespace UAlbion.Game.Veldrid.Debugging
                 ImGui.SetKeyboardFocusHere(-1); // Auto focus previous widget
 
             ImGui.SameLine();
-            ImGui.Checkbox("Autoscroll", ref _autoScroll);
+            ImGui.Checkbox("Scroll", ref _autoScroll);
 
             ImGui.End();
             _wasShown = true;

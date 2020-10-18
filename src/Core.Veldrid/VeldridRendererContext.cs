@@ -49,9 +49,6 @@ namespace UAlbion.Core.Veldrid
         public void StartSwapchainPass()
         {
             CommandList.SetFramebuffer(GraphicsDevice.SwapchainFramebuffer);
-            var fbWidth = GraphicsDevice.SwapchainFramebuffer.Width;
-            var fbHeight = GraphicsDevice.SwapchainFramebuffer.Height;
-            CommandList.SetViewport(0, new Viewport(0, 0, fbWidth, fbHeight, 0, 1));
             CommandList.SetFullViewports();
             CommandList.SetFullScissorRects();
             CommandList.ClearColorTarget(0, _clearColour);

@@ -79,6 +79,9 @@ namespace UAlbion.Game.Veldrid.Debugging
             float cameraMagnification = scene.Camera.Magnification;
 
             ImGui.Begin("Inspector");
+            ImGui.SetWindowPos(new Vector2(2 * window.PixelWidth / 3.0f, 0), ImGuiCond.Always);
+            ImGui.SetWindowSize(new Vector2(window.PixelWidth / 3.0f, window.PixelHeight), ImGuiCond.Always);
+
             ImGui.BeginChild("Inspector");
             if (ImGui.Button("Close"))
             {

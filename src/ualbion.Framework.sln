@@ -110,6 +110,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Base", "Base\UAlbio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Config", "Config\UAlbion.Config.csproj", "{9AD96F20-81BA-465F-925A-89544C64ADF8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{B63749EE-C4FD-4450-9B63-4A0797E172F9}"
+	ProjectSection(SolutionItems) = preProject
+		..\Data\Test\assets.json = ..\Data\Test\assets.json
+		..\Data\Test\core_sprites.json = ..\Data\Test\core_sprites.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -559,6 +565,7 @@ Global
 		{FDCD4C59-2D82-43EF-B148-064AAEBA02D9} = {DB6A1F1D-5617-4750-A609-506067B01336}
 		{8F54D7C3-67CF-4058-BFB5-8FBCF327B355} = {DB6A1F1D-5617-4750-A609-506067B01336}
 		{2344D75E-30ED-4717-8291-2C62738A764F} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
+		{B63749EE-C4FD-4450-9B63-4A0797E172F9} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2759A62D-227A-4D68-B6B5-966B9141AA74}

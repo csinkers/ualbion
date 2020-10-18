@@ -28,6 +28,9 @@ namespace UAlbion.Config
             if (parse != null && parse.IsStatic && parse.ReturnType == objectType)
                 return parse.Invoke(null, new object[] { (string)reader.Value });
 
+            if (objectType.IsEnum)
+                return Enum.Parse(objectType, (string)reader.Value);
+
             throw new JsonException($"The {objectType.Name} type does not have a public " +
                                     $"static Parse(string) method that returns a {objectType.Name}.");
         }

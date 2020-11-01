@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using Newtonsoft.Json;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -15,9 +16,9 @@ namespace UAlbion.Game.Settings
         {
             On<SetLanguageEvent>(e =>
             {
-                if (Language == e.Language) return;
+                if (Language == e.Language)
+                    return;
                 Language = e.Language;
-                Raise(e); // Re-raise to ensure any consumers who received it before Settings will get it again.
             });
             On<SetMusicVolumeEvent>(e => MusicVolume = e.Value);
             On<SetFxVolumeEvent>   (e => FxVolume    = e.Value);
@@ -49,6 +50,7 @@ namespace UAlbion.Game.Settings
         // Gameplay
         public GameLanguage Language { get; private set; } = GameLanguage.English;
         public int CombatDelay { get; private set; } = 3;
+        public IList<string> Mods { get; } = new List<string>();
 
         // Engine
         public float Special1 { get; private set; }
@@ -66,6 +68,8 @@ namespace UAlbion.Game.Settings
             var configText = File.ReadAllText(configPath);
             var settings = JsonConvert.DeserializeObject<GeneralSettings>(configText);
             settings.BasePath = basePath;
+            if(settings.Mods.Count == 0)
+                settings.Mods.Add("../Base");
             return settings;
         }
 

@@ -6,19 +6,19 @@ using ADLMidi.NET;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
-using UAlbion.Formats.Config;
+using UAlbion.Core;
 
 namespace UAlbion.Game.Assets
 {
-    public class SoundBankLocator : IAssetLocator
+    public class SoundBankLocator : Component, IAssetLocator
     {
-        public object LoadAsset(AssetId key, SerializationContext context, Func<AssetId, SerializationContext, object> loaderFunc)
+        public object LoadAsset(AssetId key, SerializationContext context, AssetInfo info)
         {
-            if (loaderFunc == null) throw new ArgumentNullException(nameof(loaderFunc));
             if (key != AssetId.SoundBank)
                 throw new InvalidOperationException($"Called SoundBankLocator with unexpected asset type {key.Type}");
 
-            var config = (IGeneralConfig)loaderFunc(AssetId.GeneralConfig, context);
+            var assets = Resolve<IAssetManager>();
+            var config = assets.LoadGeneralConfig(); // (IGeneralConfig)loaderFunc(AssetId.GeneralConfig, context);
             var oplPath = Path.Combine(config.BasePath, config.ExePath, "DRIVERS", "ALBISND.OPL");
             GlobalTimbreLibrary oplFile = ReadOpl(oplPath);
             WoplFile wopl = new WoplFile(oplFile);
@@ -43,7 +43,5 @@ namespace UAlbion.Game.Assets
             WoplFile.Serdes(wopl, new GenericBinaryWriter(bw, Encoding.ASCII.GetBytes, ApiUtil.Assert));
             return ms.ToArray();
         }
-
-        public AssetInfo GetAssetInfo(AssetId key, Func<AssetId, SerializationContext, object> loaderFunc) => null;
     }
 }

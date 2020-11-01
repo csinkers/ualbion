@@ -12,7 +12,7 @@ namespace UAlbion.Game.Assets
     public class AlbionSpritePostProcessor : IAssetPostProcessor
     {
         public IEnumerable<Type> SupportedTypes => new[] { typeof(AlbionSprite) };
-        public object Process(ICoreFactory factory, AssetId key, object asset, SerializationContext context, Func<AssetId, SerializationContext, object> loaderFunc)
+        public object Process(ICoreFactory factory, AssetId key, object asset, SerializationContext context)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
             if (asset == null) throw new ArgumentNullException(nameof(asset));

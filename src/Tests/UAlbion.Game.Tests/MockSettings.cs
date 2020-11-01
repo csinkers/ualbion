@@ -1,4 +1,5 @@
-﻿using UAlbion.Core;
+﻿using System.Collections.Generic;
+using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Game.Settings;
 
@@ -17,6 +18,7 @@ namespace UAlbion.Game.Tests
         public int FxVolume { get; set; }
         public GameLanguage Language { get; set; }
         public int CombatDelay { get; set; }
+        public IList<string> Mods { get; set; }
         public float Special1 { get; set; }
         public float Special2 { get; set; }
         public EngineFlags Flags { get; set; }

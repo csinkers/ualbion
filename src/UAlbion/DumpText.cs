@@ -388,7 +388,7 @@ namespace UAlbion
             using var sw = Open(baseDir, ChestPath);
             var chests = 
                 Ids<Base.Chest>()
-                    .ToDictionary(x => x, x => assets.LoadInventory(x));
+                    .ToDictionary(x => x, assets.LoadInventory);
             foreach (var chest in chests.Where(x => x.Value != null))
             {
                 sw.WriteLine($"Chest {(int)chest.Key} {chest.Key}: ({chest.Value.Gold.Amount / 10.0} gold, {chest.Value.Rations} rations)");
@@ -402,7 +402,7 @@ namespace UAlbion
             using var sw = Open(baseDir, MerchantPath);
             var merchants = 
                 Ids<Base.Merchant>()
-                    .ToDictionary(x => x, x => assets.LoadInventory(x));
+                    .ToDictionary(x => x, assets.LoadInventory);
             foreach (var merchant in merchants.Where(x => x.Value != null))
             {
                 sw.WriteLine($"Merchant {(int)merchant.Key} {merchant.Key}");

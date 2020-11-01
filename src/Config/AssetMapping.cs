@@ -201,5 +201,15 @@ namespace UAlbion.Config
                 kvp.Value.EnumType = kvp.Key;
             return m;
         }
+
+        public void MergeFrom(AssetMapping other)
+        {
+            if (other == null) throw new ArgumentNullException(nameof(other));
+            foreach (var info in other._byAssetType.SelectMany(x => x))
+            {
+                if (!_byEnumType.ContainsKey(info.EnumType))
+                    RegisterAssetType(info.EnumType, info.AssetType);
+            }
+        }
     }
 }

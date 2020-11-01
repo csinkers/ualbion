@@ -37,16 +37,15 @@ namespace UAlbion.Game.Tests
             var ex = new EventExchange(new LogExchange());
             var dm = new DialogManager();
             var lm = new LayoutManager();
-            var alr = new MockAssetLocatorRegistry()
+            var mma = new MockModApplier(GameLanguage.English)
                 .Add(new AssetId(AssetType.MetaFont, (ushort)new MetaFontId(false, FontColor.White)), MockUniformFont.Font)
                 ;
 
             foreach (var kvp in systemText)
-                alr.Add(kvp.Key, kvp.Value);
+                mma.Add(kvp.Key, kvp.Value);
 
             ex
-                .Attach(alr)
-                .Attach(new MockModApplier(AssetMapping.Global, GameLanguage.English))
+                .Attach(mma)
                 .Attach(new AssetManager())
                 .Attach(new TextFormatter())
                 .Attach(new TextManager())

@@ -6,10 +6,12 @@ using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Flic;
-using UAlbion.Formats.Assets.Labyrinth;
-using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Config;
+using EventSet = UAlbion.Formats.Assets.EventSet;
+using LabyrinthData = UAlbion.Formats.Assets.Labyrinth.LabyrinthData;
+using MonsterGroup = UAlbion.Formats.Assets.MonsterGroup;
+using TilesetData = UAlbion.Formats.Assets.Maps.TilesetData;
 
 namespace UAlbion.Game.Assets
 {
@@ -57,8 +59,8 @@ namespace UAlbion.Game.Assets
 
         public TilesetData LoadTileData(TilesetId id) => (TilesetData)_modApplier.LoadAsset(id);
         public LabyrinthData LoadLabyrinthData(LabyrinthId id) => (LabyrinthData)_modApplier.LoadAsset(id);
-        public IAssetConfig LoadAssetConfig() => (IAssetConfig) _modApplier.LoadAsset(AssetId.AssetConfig);
         public IGeneralConfig LoadGeneralConfig() => (IGeneralConfig) _modApplier.LoadAsset(AssetId.GeneralConfig);
+        public CoreSpriteConfig LoadCoreSpriteConfig() => (CoreSpriteConfig) _modApplier.LoadAsset(AssetId.CoreSpriteConfig);
         public CoreSpriteInfo LoadCoreSpriteInfo(SpriteId id) => ((CoreSpriteConfig)_modApplier.LoadAsset(AssetId.CoreGraphicsMetadata)).Hashes.First().Value[id.Id];
 
         public string LoadString(TextId id) => LoadString((StringId)id);

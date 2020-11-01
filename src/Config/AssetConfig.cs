@@ -7,13 +7,11 @@ namespace UAlbion.Config
 {
     public class AssetConfig : IAssetConfig
     {
-        public const string Filename = "assets.json";
         public IDictionary<string, AssetTypeInfo> Types { get; } = new Dictionary<string, AssetTypeInfo>();
         Dictionary<(string, int), AssetInfo> _assetLookup;
 
-        public static AssetConfig Load(string basePath)
+        public static AssetConfig Load(string configPath)
         {
-            var configPath = Path.Combine(basePath, "data", "Base", Filename);
             AssetConfig config = new AssetConfig();
             if (!File.Exists(configPath))
                 return config;
@@ -37,12 +35,11 @@ namespace UAlbion.Config
             return config;
         }
 
-        public void Save(string basePath)
+        public void Save(string configPath)
         {
             foreach (var assetType in Types)
                 assetType.Value.PreSave();
 
-            var configPath = Path.Combine(basePath, "data", Filename);
             var serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, NullValueHandling = NullValueHandling.Ignore };
             var json = JsonConvert.SerializeObject(Types, serializerSettings);
             File.WriteAllText(configPath, json);

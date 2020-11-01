@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -9,28 +10,31 @@ namespace UAlbion.Game.Tests
 {
     public class MockModApplier : ServiceComponent<IModApplier>, IModApplier
     {
-        IAssetLocatorRegistry _registry;
-        readonly AssetMapping _mapping;
+        readonly Dictionary<AssetId, object> _assets = new Dictionary<AssetId, object>();
+        readonly Dictionary<AssetId, AssetInfo> _infos = new Dictionary<AssetId, AssetInfo>();
 
-        public MockModApplier(AssetMapping mapping, GameLanguage language)
+        public MockModApplier(GameLanguage language)
         {
-            _mapping = mapping;
             Language = language;
         }
 
         public GameLanguage Language { get; set; }
 
-        protected override void Subscribed()
+        public AssetInfo GetAssetInfo(AssetId id) => _infos[id];
+        public object LoadAsset(AssetId id) => _assets[id];
+        public object LoadAssetCached(AssetId id) => _assets[id];
+        public SavedGame LoadSavedGame(string path) => throw new NotImplementedException();
+
+        public MockModApplier Add(AssetId id, object asset)
         {
-            _registry ??= Resolve<IAssetLocatorRegistry>()
-                          ??  throw new InvalidOperationException(
-                              $"{nameof(MockModApplier)} is missing requirement of type {nameof(IAssetLocatorRegistry)}");
-            base.Subscribed();
+            _assets[id] = asset;
+            return this;
         }
 
-        public AssetInfo GetAssetInfo(AssetId key) => _registry.GetAssetInfo(key);
-        public object LoadAsset(AssetId id) => _registry.LoadAsset(id, new SerializationContext(_mapping, Language));
-        public object LoadAssetCached(AssetId assetId) => _registry.LoadAssetCached(assetId, new SerializationContext(_mapping, Language));
-        public SavedGame LoadSavedGame(string path) => throw new NotImplementedException();
+        public MockModApplier AddInfo(AssetId id, AssetInfo asset)
+        {
+            _infos[id] = asset;
+            return this;
+        }
     }
 }

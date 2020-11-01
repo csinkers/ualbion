@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -8,17 +9,9 @@ namespace UAlbion.Game.Assets
 {
     public sealed class AssetLocatorRegistry : ServiceComponent<IAssetLocatorRegistry>, IAssetLocatorRegistry
     {
-        readonly IDictionary<AssetType, IAssetLocator> _locators = new Dictionary<AssetType, IAssetLocator>();
+        readonly IDictionary<AssetType, List<IAssetLocator>> _locators = new Dictionary<AssetType, List<IAssetLocator>>();
         readonly IDictionary<Type, IAssetPostProcessor> _postProcessors = new Dictionary<Type, IAssetPostProcessor>();
-        readonly AssetCache _assetCache;
         IAssetLocator _defaultLocator;
-
-        public AssetLocatorRegistry()
-        {
-            PerfTracker.StartupEvent("Building AssetLocatorRegistry");
-            _assetCache = AttachChild(new AssetCache());
-            PerfTracker.StartupEvent("Built AssetLocatorRegistry");
-        }
 
         public IAssetLocatorRegistry AddAssetLocator(IAssetLocator locator, bool useAsDefault = false)
         {
@@ -26,14 +19,20 @@ namespace UAlbion.Game.Assets
             if (locator is IComponent component)
                 AttachChild(component);
 
-            foreach (var assetType in locator.SupportedTypes)
+            if (!useAsDefault)
             {
-                if (_locators.ContainsKey(assetType))
-                    throw new InvalidOperationException($"A locator is already defined for {assetType}");
-                _locators[assetType] = locator;
-            }
+                foreach (var assetType in locator.SupportedTypes)
+                {
+                    if (!_locators.TryGetValue(assetType, out var locatorsForType))
+                    {
+                        locatorsForType = new List<IAssetLocator>();
+                        _locators[assetType] = locatorsForType;
+                    }
 
-            if (useAsDefault)
+                    locatorsForType.Add(locator);
+                }
+            }
+            else
             {
                 if(_defaultLocator != null)
                     throw new InvalidOperationException($"Tried to set a second default asset locator \"{locator.GetType()}\", but one of type \"{_defaultLocator.GetType()}\" is already set.");
@@ -58,50 +57,26 @@ namespace UAlbion.Game.Assets
 
         IAssetLocator GetLocator(AssetType type)
         {
-            if (_locators.TryGetValue(type, out var locator))
-                return locator;
-            return _defaultLocator;
+            return _locators.TryGetValue(type, out var locatorsForType) 
+                ? locatorsForType.FirstOrDefault(x => x != null) 
+                : _defaultLocator;
         }
 
-        public object LoadAssetCached<T>(T key, SerializationContext context) where T : unmanaged, Enum => LoadAssetCached(AssetId.From(key), context);
-        public object LoadAssetCached(AssetId key, SerializationContext context)
-        {
-            object asset = _assetCache.Get(key);
-            if (asset is Exception) // If it failed to load once then stop trying (at least until an asset:reload / cycle)
-                return null;
-
-            if (asset != null)
-                return asset;
-
-            asset = LoadAssetInternal(key, context);
-            _assetCache.Add(asset, key);
-            return asset is Exception ? null : asset;
-        }
-
-        public object LoadAsset<T>(T key, SerializationContext context) where T : unmanaged, Enum => LoadAsset(AssetId.From(key), context);
-        public object LoadAsset(AssetId key, SerializationContext context)
-        {
-            var asset = LoadAssetInternal(key, context);
-            return asset is Exception ? null : asset;
-        }
-
-        public AssetInfo GetAssetInfo(AssetId key) => GetLocator(key.Type).GetAssetInfo(key, LoadAssetCached);
-
-        object LoadAssetInternal(AssetId key, SerializationContext context)
+        public object LoadAsset(AssetId id, SerializationContext context, AssetInfo info)
         {
             try
             {
                 ICoreFactory factory = Resolve<ICoreFactory>();
-                IAssetLocator locator = GetLocator(key.Type);
-                var asset = locator.LoadAsset(key, context, LoadAssetCached);
+                IAssetLocator locator = GetLocator(id.Type);
+                var asset = locator.LoadAsset(id, context, info);
 
                 if (asset != null && _postProcessors.TryGetValue(asset.GetType(), out var processor))
-                    asset = processor.Process(factory, key, asset, context, LoadAssetCached);
+                    asset = processor.Process(factory, id, asset, context);
                 return asset;
             }
             catch (Exception e)
             {
-                Raise(new LogEvent(LogEvent.Level.Error, $"Could not load asset {key}: {e}"));
+                Raise(new LogEvent(LogEvent.Level.Error, $"Could not load asset {id}: {e}"));
                 return e;
             }
         }

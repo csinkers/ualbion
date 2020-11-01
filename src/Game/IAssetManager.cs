@@ -33,7 +33,7 @@ namespace UAlbion.Game
         WordId? ParseWord(string word);
         IList<Block> LoadBlockList(BlockListId id);
         IGeneralConfig LoadGeneralConfig();
-        IAssetConfig LoadAssetConfig();
+        CoreSpriteConfig LoadCoreSpriteConfig();
         CoreSpriteInfo LoadCoreSpriteInfo(SpriteId id);
         EventSet LoadEventSet(EventSetId id);
         byte[] LoadSong(SongId id);

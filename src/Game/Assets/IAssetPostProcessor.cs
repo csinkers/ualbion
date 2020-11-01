@@ -7,7 +7,7 @@ namespace UAlbion.Game.Assets
 {
     public interface IAssetPostProcessor
     {
-        object Process(ICoreFactory factory, AssetId key, object asset, SerializationContext context, Func<AssetId, SerializationContext, object> loaderFunc);
+        object Process(ICoreFactory factory, AssetId key, object asset, SerializationContext context);
         IEnumerable<Type> SupportedTypes { get; }
     }
 }

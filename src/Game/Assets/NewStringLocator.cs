@@ -15,7 +15,7 @@ namespace UAlbion.Game.Assets
     public class NewStringLocator : Component, IAssetLocator
     {
         Dictionary<TextId, Dictionary<GameLanguage, string>> _strings;
-        static readonly IDictionary<string, GameLanguage> _shortLanguageNames = new Dictionary<string, GameLanguage>
+        static readonly IDictionary<string, GameLanguage> ShortLanguageNames = new Dictionary<string, GameLanguage>
         {
             { "en", GameLanguage.English },
             { "de", GameLanguage.German },
@@ -37,18 +37,22 @@ namespace UAlbion.Game.Assets
             var filename = Path.Combine(settings.BasePath, "data", "strings.json");
             var rawJson = File.ReadAllText(filename);
             var json = JsonConvert.DeserializeObject<
-                Dictionary<TextId, Dictionary<string, string>>>
+                Dictionary<string, Dictionary<string, string>>>
                 (rawJson);
 
             _strings = json.ToDictionary(
-                x => x.Key,
+                x =>
+                    Enum.TryParse(x.Key, true, out Base.UAlbionStringId id)
+                        ? TextId.From(id)
+                        : throw new InvalidOperationException(
+                            $"When loading UAlbion strings, the key {x.Key} did not match any Base.UAlbionStringId entry."),
                 x => x.Value.ToDictionary(
-                    y => _shortLanguageNames[y.Key],
+                    y => ShortLanguageNames[y.Key],
                     y => y.Value
                 ));
         }
 
-        public object LoadAsset(AssetId key, SerializationContext context, Func<AssetId, SerializationContext, object> loaderFunc)
+        public object LoadAsset(AssetId key, SerializationContext context, AssetInfo info)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             Load();
@@ -66,7 +70,5 @@ namespace UAlbion.Game.Assets
                 $"Missing translation for {(TextId)key.Id} in {context.Language}"));
             return languages[GameLanguage.English]; // Default
         }
-
-        public AssetInfo GetAssetInfo(AssetId key, Func<AssetId, SerializationContext, object> loaderFunc) => null;
     }
 }

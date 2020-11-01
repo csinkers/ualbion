@@ -60,8 +60,8 @@ namespace UAlbion.Game.Assets
 
         public TilesetData LoadTileData(TilesetId id) => (TilesetData)_modApplier.LoadAssetCached(id);
         public LabyrinthData LoadLabyrinthData(LabyrinthId id) => (LabyrinthData)_modApplier.LoadAssetCached(id);
-        public IAssetConfig LoadAssetConfig() => (IAssetConfig) _modApplier.LoadAssetCached(AssetId.AssetConfig);
         public IGeneralConfig LoadGeneralConfig() => (IGeneralConfig) _modApplier.LoadAssetCached(AssetId.GeneralConfig);
+        public CoreSpriteConfig LoadCoreSpriteConfig() => (CoreSpriteConfig) _modApplier.LoadAssetCached(AssetId.CoreSpriteConfig);
         public CoreSpriteInfo LoadCoreSpriteInfo(SpriteId id) => ((CoreSpriteConfig)_modApplier.LoadAssetCached(AssetId.CoreGraphicsMetadata)).Hashes.First().Value[id.Id];
 
         public string LoadString(TextId id) => LoadString((StringId)id);

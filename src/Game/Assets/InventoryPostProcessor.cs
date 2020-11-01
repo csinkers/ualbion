@@ -7,10 +7,10 @@ using UAlbion.Formats.Assets.Save;
 
 namespace UAlbion.Game.Assets
 {
-    public class InventoryPostProcessor : IAssetPostProcessor
+    public class InventoryPostProcessor : Component, IAssetPostProcessor
     {
         public IEnumerable<Type> SupportedTypes => new[] { typeof(CharacterSheet), typeof(Inventory), typeof(SavedGame) };
-        void ResolveItemProxies(Inventory inventory, SerializationContext context, Func<AssetId, SerializationContext, object> loaderFunc)
+        void ResolveItemProxies(Inventory inventory, IAssetManager assets)
         {
             if (inventory == null)
                 return;
@@ -25,19 +25,20 @@ namespace UAlbion.Game.Assets
 
             foreach (var slot in inventory.EnumerateAll())
                 if (slot.Item is ItemProxy proxy)
-                    slot.Item = (ItemData)loaderFunc(proxy.Id, context);
+                    slot.Item = assets.LoadItem(proxy.Id);
         }
-        public object Process(ICoreFactory factory, AssetId key, object asset, SerializationContext context, Func<AssetId, SerializationContext, object> loaderFunc)
+        public object Process(ICoreFactory factory, AssetId key, object asset, SerializationContext context)
         {
+            var assets = Resolve<IAssetManager>();
             switch (asset)
             {
-                case CharacterSheet sheet: ResolveItemProxies(sheet.Inventory, context, loaderFunc); break;
-                case Inventory x: ResolveItemProxies(x, context, loaderFunc); break;
+                case CharacterSheet sheet: ResolveItemProxies(sheet.Inventory, assets); break;
+                case Inventory x: ResolveItemProxies(x, assets); break;
                 case SavedGame save:
                     foreach(var sheet in save.Sheets.Values)
-                        ResolveItemProxies(sheet.Inventory, context, loaderFunc);
+                        ResolveItemProxies(sheet.Inventory, assets);
                     foreach (var inv in save.Inventories.Values)
-                        ResolveItemProxies(inv, context, loaderFunc);
+                        ResolveItemProxies(inv, assets);
 
                     break;
                 default: throw new InvalidOperationException($"Unexpected asset type in inventory post processor: {asset}");

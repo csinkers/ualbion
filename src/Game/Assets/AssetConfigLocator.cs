@@ -12,7 +12,7 @@ namespace UAlbion.Game.Assets
         public AssetConfigLocator(bool useFullConfig) => _useFullConfig = useFullConfig;
         public IEnumerable<AssetType> SupportedTypes => new[] { AssetType.Special, };
 
-        public object LoadAsset(AssetId key, SerializationContext context, Func<AssetId, SerializationContext, object> loaderFunc)
+        public object LoadAsset(AssetId key, SerializationContext context, AssetInfo info)
         {
             var settings = Resolve<ISettings>();
             if(key == AssetId.AssetConfig)
@@ -22,6 +22,6 @@ namespace UAlbion.Game.Assets
             throw new ArgumentOutOfRangeException(nameof(key));
         }
 
-        public AssetInfo GetAssetInfo(AssetId key, Func<AssetId, SerializationContext, object> loaderFunc) => null;
+        public AssetInfo GetAssetInfo(AssetId key) => null;
     }
 }

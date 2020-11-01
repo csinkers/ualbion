@@ -87,7 +87,8 @@ namespace UAlbion
                 GeneralSettings.Load(baseDir), // Need to register settings first, as the AssetConfigLocator relies on it.
                 loaderRegistry,
                 locatorRegistry,
-                assets);
+                assets,
+                new ModApplier());
 
             using var exchange = new EventExchange(new LogExchange())
                 .Register<ICoreFactory>(factory)

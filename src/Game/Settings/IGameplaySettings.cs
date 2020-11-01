@@ -1,4 +1,5 @@
-﻿using UAlbion.Formats;
+﻿using System.Collections.Generic;
+using UAlbion.Formats;
 
 namespace UAlbion.Game.Settings
 {
@@ -6,5 +7,6 @@ namespace UAlbion.Game.Settings
     {
         GameLanguage Language { get; }
         int CombatDelay { get; }
+        IList<string> Mods { get; }
     }
 }

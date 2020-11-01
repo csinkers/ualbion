@@ -18,7 +18,7 @@ namespace UAlbion.Game.Gui.Inventory
 
         public InventoryWeightLabel(PartyMemberId activeCharacter)
         {
-            On<SetLanguageEvent>(e => _version++);
+            On<LanguageChangedEvent>(e => _version++);
             On<BlurEvent>(e => Raise(new HoverTextEvent(null)));
             On<InventoryChangedEvent>(e =>
             {

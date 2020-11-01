@@ -12,12 +12,12 @@ namespace UAlbion.Game.Assets
         {
             _assetLoaderRegistry = assetLoaderRegistry ?? throw new ArgumentNullException(nameof(assetLoaderRegistry));
         }
-        public object LoadAsset(AssetId key, SerializationContext context, Func<AssetId, SerializationContext, object> loaderFunc)
+        public object LoadAsset(AssetId key, SerializationContext context, AssetInfo info)
         {
             throw new NotImplementedException();
         }
 
-        public AssetInfo GetAssetInfo(AssetId key, Func<AssetId, SerializationContext, object> loaderFunc)
+        public AssetInfo GetAssetInfo(AssetId key)
         {
             throw new NotImplementedException();
         }

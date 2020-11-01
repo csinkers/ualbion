@@ -9,4 +9,6 @@ namespace UAlbion.Game.Events
         public SetLanguageEvent(GameLanguage language) { Language = language; }
         [EventPart("language")] public GameLanguage Language { get; }
     }
+
+    // Raised after the language has changed to prompt text fields etc to reload their contents
 }

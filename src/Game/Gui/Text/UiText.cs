@@ -33,7 +33,7 @@ namespace UAlbion.Game.Gui.Text
         void RegisterEvents()
         {
             On<BackendChangedEvent>(_ => _lastVersion = 0);
-            On<SetLanguageEvent>(e => _lastVersion = 0); // Force a rebuild on next render
+            On<LanguageChangedEvent>(e => _lastVersion = 0); // Force a rebuild on next render
             On<UiScrollEvent>(OnScroll);
         }
 

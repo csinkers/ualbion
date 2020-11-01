@@ -39,15 +39,13 @@ namespace UAlbion.Game.Tests
                 ;
 
             var factory = new MockFactory();
-            var modApplier = new MockModApplier(mapping, GameLanguage.English);
-            var locator = new MockAssetLocatorRegistry()
+            var modApplier = new MockModApplier(GameLanguage.English)
                     .Add(new AssetId(AssetType.MetaFont, (ushort)new MetaFontId(false, FontColor.White)), MockUniformFont.Font)
                 ;
 
             var config = GameConfig.LoadLiteral(@"{ ""UI"": { ""ButtonDoubleClickIntervalSeconds"": 0.35 } }");
             _exchange
                 .Register(config)
-                .Attach(locator)
                 .Attach(modApplier)
                 .Attach(new AssetManager())
                 .Attach(new SpriteManager())

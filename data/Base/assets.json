@@ -1,5 +1,10 @@
 {
-  "UAlbion.Base.DungeonBackground": {
+  "UAlbion.Base.UAlbionString, UAlbion.Base": {
+    "AssetType": "Text",
+    "EnumType": "non-generated",
+    "Files": { "$(LANG)/strings.json": { "Format": "StringTable" } }
+  },
+  "UAlbion.Base.DungeonBackground, UAlbion.Base": {
     "AssetType": "BackgroundGraphics",
     "EnumType": "ushort",
     "Files": {
@@ -14,7 +19,7 @@
       }
     }
   },
-  "UAlbion.Base.Floor": {
+  "UAlbion.Base.Floor, UAlbion.Base": {
     "AssetType": "Floor",
     "EnumType": "ushort",
     "Files": {
@@ -326,7 +331,7 @@
       }
     }
   },
-  "UAlbion.Base.DungeonObject": {
+  "UAlbion.Base.DungeonObject, UAlbion.Base": {
     "AssetType": "Object3D",
     "EnumType": "ushort",
     "Files": {
@@ -755,7 +760,7 @@
       }
     }
   },
-  "UAlbion.Base.WallOverlay": {
+  "UAlbion.Base.WallOverlay, UAlbion.Base": {
     "AssetType": "WallOverlay",
     "EnumType": "ushort",
     "Files": {
@@ -1081,7 +1086,7 @@
       }
     }
   },
-  "UAlbion.Base.Wall": {
+  "UAlbion.Base.Wall, UAlbion.Base": {
     "AssetType": "Wall",
     "EnumType": "ushort",
     "Files": {
@@ -1300,7 +1305,7 @@
       }
     }
   },
-  "UAlbion.Base.AutomapTiles": {
+  "UAlbion.Base.AutomapTiles, UAlbion.Base": {
     "AssetType": "AutomapGraphics",
     "EnumType": "byte",
     "Files": {
@@ -1314,7 +1319,7 @@
       }
     }
   },
-  "UAlbion.Base.BlockList": {
+  "UAlbion.Base.BlockList, UAlbion.Base": {
     "AssetType": "BlockList",
     "EnumType": "byte",
     "Files": {
@@ -1337,7 +1342,7 @@
       }
     }
   },
-  "UAlbion.Base.CombatBackground": {
+  "UAlbion.Base.CombatBackground, UAlbion.Base": {
     "AssetType": "CombatBackground",
     "EnumType": "byte",
     "Files": {
@@ -1369,7 +1374,7 @@
       }
     }
   },
-  "UAlbion.Base.CombatGraphics": {
+  "UAlbion.Base.CombatGraphics, UAlbion.Base": {
     "AssetType": "CombatGraphics",
     "EnumType": "byte",
     "Files": {
@@ -1466,7 +1471,7 @@
       }
     }
   },
-  "UAlbion.Base.EventSet": {
+  "UAlbion.Base.EventSet, UAlbion.Base": {
     "AssetType": "EventSet",
     "EnumType": "ushort",
     "Files": {
@@ -1934,7 +1939,7 @@
       }
     }
   },
-  "UAlbion.Base.FullBodyPicture": {
+  "UAlbion.Base.FullBodyPicture, UAlbion.Base": {
     "AssetType": "FullBodyPicture",
     "EnumType": "byte",
     "Files": {
@@ -1956,7 +1961,7 @@
       }
     }
   },
-  "UAlbion.Base.Font": {
+  "UAlbion.Base.Font, UAlbion.Base": {
     "AssetType": "Font",
     "EnumType": "byte",
     "Files": {
@@ -1972,7 +1977,7 @@
       }
     }
   },
-  "UAlbion.Base.TilesetData": {
+  "UAlbion.Base.TilesetData, UAlbion.Base": {
     "AssetType": "TilesetData",
     "EnumType": "byte",
     "Files": {
@@ -1997,7 +2002,7 @@
       }
     }
   },
-  "UAlbion.Base.TilesetGraphics": {
+  "UAlbion.Base.TilesetGraphics, UAlbion.Base": {
     "AssetType": "TilesetGraphics",
     "EnumType": "ushort",
     "Files": {
@@ -2022,7 +2027,7 @@
       }
     }
   },
-  "UAlbion.Base.ItemGraphics": {
+  "UAlbion.Base.ItemGraphics, UAlbion.Base": {
     "AssetType": "ItemGraphics",
     "EnumType": "byte",
     "Files": {
@@ -2036,7 +2041,7 @@
       }
     }
   },
-  "UAlbion.Base.Item": {
+  "UAlbion.Base.Item, UAlbion.Base": {
     "AssetType": "Item",
     "EnumType": "ushort",
     "Files": {
@@ -2510,7 +2515,7 @@
       }
     }
   },
-  "UAlbion.Base.ItemName": {
+  "UAlbion.Base.ItemName, UAlbion.Base": {
     "AssetType": "ItemName", 
     "EnumType": "byte",
     "Files": {
@@ -2519,7 +2524,7 @@
       }
     }
   },
-  "UAlbion.Base.LabyrinthData": {
+  "UAlbion.Base.LabyrinthData, UAlbion.Base": {
     "AssetType": "Labyrinth",
     "EnumType": "byte",
     "Files": {
@@ -2708,7 +2713,7 @@
       }
     }
   },
-  "UAlbion.Base.Map": {
+  "UAlbion.Base.Map, UAlbion.Base": {
     "AssetType": "Map",
     "EnumType": "ushort",
     "Files": {
@@ -3032,7 +3037,7 @@
       }
     }
   },
-  "UAlbion.Base.Monster": {
+  "UAlbion.Base.Monster, UAlbion.Base": {
     "AssetType": "Monster",
     "EnumType": "byte",
     "Files": {
@@ -3103,7 +3108,7 @@
       }
     }
   },
-  "UAlbion.Base.MonsterGraphics": {
+  "UAlbion.Base.MonsterGraphics, UAlbion.Base": {
     "AssetType": "MonsterGraphics",
     "EnumType": "byte",
     "Files": {
@@ -3175,7 +3180,7 @@
       }
     }
   },
-  "UAlbion.Base.MonsterGroup": {
+  "UAlbion.Base.MonsterGroup, UAlbion.Base": {
     "AssetType": "MonsterGroup",
     "EnumType": "byte",
     "Files": {
@@ -3454,7 +3459,7 @@
       }
     }
   },
-  "UAlbion.Base.LargeNpc": {
+  "UAlbion.Base.LargeNpc, UAlbion.Base": {
     "AssetType": "BigNpcGraphics",
     "EnumType": "byte",
     "Files": {
@@ -3671,7 +3676,7 @@
       }
     }
   },
-  "UAlbion.Base.SmallNpc": {
+  "UAlbion.Base.SmallNpc, UAlbion.Base": {
     "AssetType": "SmallNpcGraphics",
     "EnumType": "byte",
     "Files": {
@@ -3712,7 +3717,7 @@
       }
     }
   },
-  "UAlbion.Base.PaletteNull": {
+  "UAlbion.Base.PaletteNull, UAlbion.Base": {
     "AssetType": "Special",
     "EnumType": "byte",
     "Files": {
@@ -3724,7 +3729,7 @@
       }
     }
   },
-  "UAlbion.Base.Palette": {
+  "UAlbion.Base.Palette, UAlbion.Base": {
     "AssetType": "Palette",
     "EnumType": "byte",
     "Files": {
@@ -3792,7 +3797,7 @@
       }
     }
   },
-  "UAlbion.Base.LargePartyMember": {
+  "UAlbion.Base.LargePartyMember, UAlbion.Base": {
     "AssetType": "BigPartyGraphics",
     "EnumType": "byte",
     "Files": {
@@ -3814,7 +3819,7 @@
       }
     }
   },
-  "UAlbion.Base.SmallPartyMember": {
+  "UAlbion.Base.SmallPartyMember, UAlbion.Base": {
     "AssetType": "SmallPartyGraphics",
     "EnumType": "byte",
     "Files": {
@@ -3836,7 +3841,7 @@
       }
     }
   },
-  "UAlbion.Base.Picture": {
+  "UAlbion.Base.Picture, UAlbion.Base": {
     "AssetType": "Picture",
     "EnumType": "byte",
     "Files": {
@@ -3895,7 +3900,7 @@
       }
     }
   },
-  "UAlbion.Base.Sample": {
+  "UAlbion.Base.Sample, UAlbion.Base": {
     "AssetType": "Sample",
     "EnumType": "byte",
     "Files": {
@@ -4153,7 +4158,7 @@
       }
     }
   },
-  "UAlbion.Base.Script": {
+  "UAlbion.Base.Script, UAlbion.Base": {
     "AssetType": "Script",
     "EnumType": "ushort",
     "Files": {
@@ -4333,7 +4338,7 @@
       }
     }
   },
-  "UAlbion.Base.UiBackground": {
+  "UAlbion.Base.UiBackground, UAlbion.Base": {
     "AssetType": "Slab",
     "EnumType": "byte",
     "Files": {
@@ -4346,7 +4351,7 @@
       }
     }
   },
-  "UAlbion.Base.Portrait": {
+  "UAlbion.Base.Portrait, UAlbion.Base": {
     "AssetType": "Portrait",
     "EnumType": "byte",
     "Files": {
@@ -4565,7 +4570,7 @@
       }
     }
   },
-  "UAlbion.Base.Song": {
+  "UAlbion.Base.Song, UAlbion.Base": {
     "AssetType": "Song",
     "EnumType": "byte",
     "Files": {
@@ -4623,7 +4628,7 @@
       }
     }
   },
-  "UAlbion.Base.Spell": {
+  "UAlbion.Base.Spell, UAlbion.Base": {
     "AssetType": "Spell",
     "EnumType": "byte",
     "Files": {
@@ -4857,7 +4862,7 @@
       }
     }
   },
-  "UAlbion.Base.TacticalGraphics": {
+  "UAlbion.Base.TacticalGraphics, UAlbion.Base": {
     "AssetType": "TacticalIcon",
     "EnumType": "byte",
     "Files": {
@@ -4942,7 +4947,7 @@
       }
     }
   },
-  "UAlbion.Base.WaveLibrary": {
+  "UAlbion.Base.WaveLibrary, UAlbion.Base": {
     "AssetType": "WaveLibrary",
     "EnumType": "byte",
     "Files": {
@@ -4990,7 +4995,7 @@
       }
     }
   },
-  "UAlbion.Base.EventText": {
+  "UAlbion.Base.EventText, UAlbion.Base": {
     "AssetType": "EventText",
     "EnumType": "ushort",
     "Files": {
@@ -5429,7 +5434,7 @@
       }
     }
   },
-  "UAlbion.Base.Video": {
+  "UAlbion.Base.Video, UAlbion.Base": {
     "AssetType": "Video",
     "EnumType": "byte",
     "Files": {
@@ -5460,7 +5465,7 @@
       }
     }
   },
-  "UAlbion.Base.MapText": {
+  "UAlbion.Base.MapText, UAlbion.Base": {
     "AssetType": "MapText",
     "EnumType": "ushort",
     "Files": {
@@ -5784,7 +5789,7 @@
       }
     }
   },
-  "UAlbion.Base.SystemText": {
+  "UAlbion.Base.SystemText, UAlbion.Base": {
     "AssetType": "Text",
     "EnumType": "ushort",
     "Files": {
@@ -6343,7 +6348,7 @@
       }
     }
   },
-  "UAlbion.Base.Word": {
+  "UAlbion.Base.Word, UAlbion.Base": {
     "AssetType": "Word",
     "EnumType": "ushort",
     "Files": {
@@ -6908,7 +6913,7 @@
       }
     }
   },
-  "UAlbion.Base.AutoMap": {
+  "UAlbion.Base.AutoMap, UAlbion.Base": {
     "AssetType": "Automap",
     "EnumType": "ushort",
     "Files": {
@@ -7232,7 +7237,7 @@
       }
     }
   },
-  "UAlbion.Base.Chest": {
+  "UAlbion.Base.Chest, UAlbion.Base": {
     "AssetType": "Chest",
     "EnumType": "ushort",
     "Files": {
@@ -7564,7 +7569,7 @@
       }
     }
   },
-  "UAlbion.Base.Merchant": {
+  "UAlbion.Base.Merchant, UAlbion.Base": {
     "AssetType": "Merchant",
     "EnumType": "byte",
     "Files": {
@@ -7789,7 +7794,7 @@
       }
     }
   },
-  "UAlbion.Base.Npc": {
+  "UAlbion.Base.Npc, UAlbion.Base": {
     "AssetType": "Npc",
     "EnumType": "byte",
     "Files": {
@@ -8064,7 +8069,7 @@
       }
     }
   },
-  "UAlbion.Base.PartyMember": {
+  "UAlbion.Base.PartyMember, UAlbion.Base": {
     "AssetType": "PartyMember",
     "EnumType": "byte",
     "Files": {

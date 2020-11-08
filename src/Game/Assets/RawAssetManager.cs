@@ -45,7 +45,7 @@ namespace UAlbion.Game.Assets
             if (palette == null)
                 return null;
 
-            var commonPalette = (byte[])_modApplier.LoadAsset(AssetId.CommonPalette);
+            var commonPalette = (byte[])_modApplier.LoadAsset(AssetId.From(Base.Special.CommonPalette));
             palette.SetCommonPalette(commonPalette);
 
             return palette;
@@ -59,9 +59,11 @@ namespace UAlbion.Game.Assets
 
         public TilesetData LoadTileData(TilesetId id) => (TilesetData)_modApplier.LoadAsset(id);
         public LabyrinthData LoadLabyrinthData(LabyrinthId id) => (LabyrinthData)_modApplier.LoadAsset(id);
-        public IGeneralConfig LoadGeneralConfig() => (IGeneralConfig) _modApplier.LoadAsset(AssetId.GeneralConfig);
-        public CoreSpriteConfig LoadCoreSpriteConfig() => (CoreSpriteConfig) _modApplier.LoadAsset(AssetId.CoreSpriteConfig);
-        public CoreSpriteInfo LoadCoreSpriteInfo(SpriteId id) => ((CoreSpriteConfig)_modApplier.LoadAsset(AssetId.CoreGraphicsMetadata)).Hashes.First().Value[id.Id];
+        public IGeneralConfig LoadGeneralConfig() => (IGeneralConfig) _modApplier.LoadAsset(AssetId.From(Base.Special.GeneralConfig));
+        public CoreSpriteConfig LoadCoreSpriteConfig() => (CoreSpriteConfig) _modApplier.LoadAsset(AssetId.From(Base.Special.CoreSpriteConfig));
+        public CoreSpriteInfo LoadCoreSpriteInfo(SpriteId id) => 
+            ((CoreSpriteConfig)_modApplier.LoadAsset(AssetId.From(Base.Special.CoreGraphicsMetadata)))
+            .Hashes.First().Value[id.Id];
 
         public string LoadString(TextId id) => LoadString((StringId)id);
         public string LoadString(StringId id)
@@ -78,7 +80,7 @@ namespace UAlbion.Game.Assets
 
         public ISample LoadSample(SampleId id) => (AlbionSample)_modApplier.LoadAsset(id);
         public ISample LoadWaveLib(WaveLibraryId waveLibraryId, int instrument) => ((WaveLib)_modApplier.LoadAsset(waveLibraryId))?.GetSample(instrument);
-        public byte[] LoadSoundBanks() => (byte[]) _modApplier.LoadAsset(AssetId.SoundBank);
+        public byte[] LoadSoundBanks() => (byte[]) _modApplier.LoadAsset(AssetId.From(Base.Special.SoundBank));
         public FlicFile LoadVideo(VideoId id) => (FlicFile)_modApplier.LoadAsset(id);
         public CharacterSheet LoadSheet(CharacterId id) => (CharacterSheet)_modApplier.LoadAsset(id);
         public Inventory LoadInventory(AssetId id) => (Inventory)_modApplier.LoadAsset(id);

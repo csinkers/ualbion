@@ -50,7 +50,7 @@ namespace UAlbion.Game.Gui.Inventory
 
             var takeAllButton =
                 new Button(
-                (UiElement)new UiTextBuilder(TextId.From(Base.UAlbionStringId.TakeAll)).Center()
+                (UiElement)new UiTextBuilder(TextId.From(Base.UAlbionString.TakeAll)).Center()
                 ).OnClick(() => Raise(new InventoryTakeAllEvent(_id)));
 
             var header = new Header(Base.SystemText.Chest_Chest);

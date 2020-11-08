@@ -62,12 +62,6 @@ namespace UAlbion.Config
         public static AssetId None { get; } = new AssetId(AssetType.None);
         public static AssetId Gold { get; } = new AssetId(AssetType.Gold);
         public static AssetId Rations { get; } = new AssetId(AssetType.Rations);
-        public static AssetId AssetConfig { get; } = new AssetId(AssetType.Special, (int)SpecialAsset.AssetConfig);
-        public static AssetId CommonPalette { get; } = new AssetId(AssetType.Special, (int)SpecialAsset.CommonPalette);
-        public static AssetId CoreGraphicsMetadata { get; } = new AssetId(AssetType.Special, (int)SpecialAsset.CoreGraphicsMetadata);
-        public static AssetId CoreSpriteConfig { get; } = new AssetId(AssetType.Special, (int)SpecialAsset.CoreSpriteConfig);
-        public static AssetId GeneralConfig { get; } = new AssetId(AssetType.Special, (int)SpecialAsset.GeneralConfig);
-        public static AssetId SoundBank { get; } = new AssetId(AssetType.Special, (int) SpecialAsset.SoundBank);
         public bool IsNone => _value == 0;
         public AssetId(uint id) => _value = id;
         public AssetId(int id) => _value = unchecked((uint)id);

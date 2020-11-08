@@ -82,7 +82,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{E4F7A1D2-3
 		..\data\game.json = ..\data\game.json
 		..\data\input.json = ..\data\input.json
 		..\data\settings.json = ..\data\settings.json
-		..\data\strings.json = ..\data\strings.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5B011D11-67A4-4DAC-BA1C-CD95C699A6B9}"
@@ -100,20 +99,30 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		run.sh = run.sh
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Base", "Base", "{2344D75E-30ED-4717-8291-2C62738A764F}"
-	ProjectSection(SolutionItems) = preProject
-		..\data\Base\assets.json = ..\data\Base\assets.json
-		..\data\Base\core_sprites.json = ..\data\Base\core_sprites.json
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Base", "Base\UAlbion.Base.csproj", "{86A29314-DA10-4D0D-B727-D715CD205862}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Config", "Config\UAlbion.Config.csproj", "{9AD96F20-81BA-465F-925A-89544C64ADF8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{B63749EE-C4FD-4450-9B63-4A0797E172F9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Base", "Base", "{DAC01E7B-9B98-4DB3-AC5B-9D093785B17E}"
 	ProjectSection(SolutionItems) = preProject
-		..\Data\Test\assets.json = ..\Data\Test\assets.json
-		..\Data\Test\core_sprites.json = ..\Data\Test\core_sprites.json
+		..\data\Base\assets.json = ..\data\Base\assets.json
+		..\data\Base\core_sprites.json = ..\data\Base\core_sprites.json
+		..\data\Base\modinfo.json = ..\data\Base\modinfo.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "English", "English", "{913D6C98-B30D-4DBA-B5FB-F35A52725C43}"
+	ProjectSection(SolutionItems) = preProject
+		..\data\Base\English\strings.json = ..\data\Base\English\strings.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "French", "French", "{14B52D81-C751-45B6-AD71-873FB26C80F7}"
+	ProjectSection(SolutionItems) = preProject
+		..\data\Base\French\strings.json = ..\data\Base\French\strings.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "German", "German", "{2735FEDB-7AFC-442A-ADDE-2B88B0A6E078}"
+	ProjectSection(SolutionItems) = preProject
+		..\data\Base\German\strings.json = ..\data\Base\German\strings.json
 	EndProjectSection
 EndProject
 Global
@@ -564,8 +573,10 @@ Global
 		{8E4A3651-9264-4FD6-AA1C-E48AEF26EFCA} = {DB6A1F1D-5617-4750-A609-506067B01336}
 		{FDCD4C59-2D82-43EF-B148-064AAEBA02D9} = {DB6A1F1D-5617-4750-A609-506067B01336}
 		{8F54D7C3-67CF-4058-BFB5-8FBCF327B355} = {DB6A1F1D-5617-4750-A609-506067B01336}
-		{2344D75E-30ED-4717-8291-2C62738A764F} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
-		{B63749EE-C4FD-4450-9B63-4A0797E172F9} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
+		{DAC01E7B-9B98-4DB3-AC5B-9D093785B17E} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
+		{913D6C98-B30D-4DBA-B5FB-F35A52725C43} = {DAC01E7B-9B98-4DB3-AC5B-9D093785B17E}
+		{14B52D81-C751-45B6-AD71-873FB26C80F7} = {DAC01E7B-9B98-4DB3-AC5B-9D093785B17E}
+		{2735FEDB-7AFC-442A-ADDE-2B88B0A6E078} = {DAC01E7B-9B98-4DB3-AC5B-9D093785B17E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2759A62D-227A-4D68-B6B5-966B9141AA74}

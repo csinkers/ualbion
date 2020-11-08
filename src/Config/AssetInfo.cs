@@ -7,7 +7,6 @@ namespace UAlbion.Config
     public class AssetInfo
     {
         [JsonIgnore] public AssetFileInfo Parent { get; internal set; }
-        [JsonIgnore] public int ContainerIndex { get; set;  }
         [JsonIgnore] public FileFormat Format => Parent.Format;
         [JsonIgnore] public int EffectiveWidth => Width ?? Parent.Width ?? 0;
         [JsonIgnore] public int EffectiveHeight => Height ?? Parent.Height ?? 0;
@@ -23,6 +22,5 @@ namespace UAlbion.Config
 
         [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "Play nicely with JSON serialisation")]
         public IList<int> PaletteHints { get; set; }
-
     }
 }

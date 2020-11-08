@@ -12,22 +12,23 @@ namespace UAlbion.Game.Assets
         public IEnumerable<AssetType> SupportedTypes => new[] { AssetType.CoreGraphics, AssetType.Special };
         public object LoadAsset(AssetId key, SerializationContext context, AssetInfo info)
         {
-            if (key == AssetId.CoreSpriteConfig)
-            {
-                var settings = Resolve<ISettings>();
-                return CoreSpriteConfig.Load(settings.BasePath);
-            }
+            if (info == null)
+                throw new ArgumentNullException(nameof(info));
 
             var assets = Resolve<IAssetManager>();
-            var generalConfig = assets.LoadGeneralConfig(); // (GeneralConfig)loaderFunc(AssetId.GeneralConfig, context);
-            var coreSpriteConfig = assets.LoadCoreSpriteConfig(); // (CoreSpriteConfig)loaderFunc(AssetId.CoreSpriteConfig, context);
+            var generalConfig = assets.LoadGeneralConfig();
 
+            if (key == AssetId.From(Base.Special.CoreSpriteConfig))
+                return CoreSpriteConfig.Load(info.Filename);
+
+            var coreSpriteConfig = assets.LoadCoreSpriteConfig();
             var exePath = Path.Combine(generalConfig.BasePath, generalConfig.ExePath);
+
+            if (key == AssetId.From(Base.Special.CoreGraphicsMetadata))
+                return CoreSpriteLoader.GetConfig(key, exePath, coreSpriteConfig, out _);
+
             if (key.Type == AssetType.CoreGraphics)
                 return CoreSpriteLoader.Load(key, exePath, coreSpriteConfig);
-
-            if (key == AssetId.CoreGraphicsMetadata)
-                return CoreSpriteLoader.GetConfig(key, exePath, coreSpriteConfig, out _);
 
             throw new InvalidOperationException("CoreSpriteLocator called with an invalid type");
         }

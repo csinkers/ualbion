@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 using UAlbion.Config;
 using UAlbion.Formats.Config;
@@ -14,7 +15,7 @@ namespace UAlbion.Tools.ImageReverser
         static void Main()
         {
             var baseDir = ConfigUtil.FindBasePath();
-            var generalConfig = GeneralConfig.Load(baseDir);
+            var generalConfig = GeneralConfig.Load(Path.Combine(baseDir, "data/config.json"), baseDir);
             var config = AssetConfig.Load(baseDir);
 
             Application.EnableVisualStyles();

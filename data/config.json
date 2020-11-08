@@ -3,13 +3,14 @@
   // This path is relative to the top-level ualbion / repository directory.
   "XldPath": "ALBION/CD/XLDLIBS",
 
-  // Where to look for MAIN.EXE from the original game.
-  "ExePath": "ALBION",
+  "ExePath": "ALBION", // Where to look for MAIN.EXE from the original game.
+  "SavePath":  "ALBION/SAVES", // Where to save & load saved game files
+  "BaseAssetsPath": "data/Base",
+  "ModPath": "data/Mods",
 
-  // Where the exporter tool should export its results to. Relative to the base repo dir.
-  "ExportedXldPath": "data/Exported/raw",
-
-  // Where to save & load saved game files
-  "SavePath":  "ALBION/SAVES" 
+  "SettingsPath": "data/settings.json",
+  "CoreConfigPath": "data/core.json",
+  "GameConfigPath": "data/game.json",
+  "ExportedXldPath": "data/Exported/raw" // Where the exporter tool should export its results to. Relative to the base repo dir.
 }
 

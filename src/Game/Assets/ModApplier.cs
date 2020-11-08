@@ -38,11 +38,17 @@ namespace UAlbion.Game.Assets
         protected override void Subscribed()
         {
             _assetLocatorRegistry = Resolve<IAssetLocatorRegistry>();
-            var dataDir = Resolve<IGeneralConfig>().BaseDataPath;
+            var config = Resolve<IGeneralConfig>();
             Exchange.Register<IModApplier>(this);
 
+            string baseAssetRelativeDir = Path.GetDirectoryName(config.BaseAssetsPath);
+            if(baseAssetRelativeDir == null)
+                throw new InvalidOperationException();
+
+            LoadMod(Path.Combine(config.BasePath, baseAssetRelativeDir), Path.GetFileName(config.BaseAssetsPath));
+
             foreach (var mod in Resolve<IGameplaySettings>().Mods)
-                LoadMod(dataDir, mod);
+                LoadMod(Path.Combine(config.BasePath, config.ModPath), mod);
         }
 
         void LoadMod(string dataDir, string modName)
@@ -50,22 +56,22 @@ namespace UAlbion.Game.Assets
             if (string.IsNullOrEmpty(modName))
                 return;
 
-            var path = Path.Combine(dataDir, "Mods", modName);
-
-            if (modName != "../Base" && modName.Any(c => c == '\\' || c == '/' || c == Path.DirectorySeparatorChar))
+            if (modName.Any(c => c == '\\' || c == '/' || c == Path.DirectorySeparatorChar))
             {
                 Raise(new LogEvent(LogEvent.Level.Error, $"Mod {modName} is not a simple directory name"));
                 return;
             }
 
+            string path = Path.Combine(dataDir, modName);
+
             var assetConfigPath = Path.Combine(path, "assets.json");
-            var modConfigPath = Path.Combine(path, "modinfo.json");
             if (!File.Exists(assetConfigPath))
             {
                 Raise(new LogEvent(LogEvent.Level.Error, $"Mod {modName} does not contain an asset.config file"));
                 return;
             }
 
+            var modConfigPath = Path.Combine(path, "modinfo.json");
             if (!File.Exists(modConfigPath))
             {
                 Raise(new LogEvent(LogEvent.Level.Error, $"Mod {modName} does not contain an modinfo.config file"));

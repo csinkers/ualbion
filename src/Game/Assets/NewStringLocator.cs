@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if false
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -42,10 +43,10 @@ namespace UAlbion.Game.Assets
 
             _strings = json.ToDictionary(
                 x =>
-                    Enum.TryParse(x.Key, true, out Base.UAlbionStringId id)
+                    Enum.TryParse(x.Key, true, out Base.UAlbionString id)
                         ? TextId.From(id)
                         : throw new InvalidOperationException(
-                            $"When loading UAlbion strings, the key {x.Key} did not match any Base.UAlbionStringId entry."),
+                            $"When loading UAlbion strings, the key {x.Key} did not match any Base.UAlbionString entry."),
                 x => x.Value.ToDictionary(
                     y => ShortLanguageNames[y.Key],
                     y => y.Value
@@ -72,3 +73,4 @@ namespace UAlbion.Game.Assets
         }
     }
 }
+#endif

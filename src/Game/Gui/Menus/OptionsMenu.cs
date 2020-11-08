@@ -43,7 +43,7 @@ namespace UAlbion.Game.Gui.Menus
             var elements = new List<IUiElement>
             {
                 new Spacing(156,2),
-                new Label(TextId.From(Base.UAlbionStringId.LanguageLabel)),
+                new Label(TextId.From(Base.UAlbionString.LanguageLabel)),
                 new HorizontalStack(languageButtons),
                 new Spacing(0,2),
                 new Label((TextId)Base.SystemText.Options_MusicVolume),

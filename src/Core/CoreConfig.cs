@@ -27,9 +27,8 @@ namespace UAlbion.Core
             }
         }
 
-        public static CoreConfig Load(string basePath)
+        public static CoreConfig Load(string configPath)
         {
-            var configPath = Path.Combine(basePath, "data", "core.json");
             if (!File.Exists(configPath))
                 return new CoreConfig();
 

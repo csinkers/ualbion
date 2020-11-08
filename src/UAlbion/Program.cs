@@ -1,10 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Config;
 using UAlbion.Formats.Parsers;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Settings;
@@ -31,6 +33,8 @@ namespace UAlbion
             var baseDir = ConfigUtil.FindBasePath();
             if (baseDir == null)
                 throw new InvalidOperationException("No base directory could be found.");
+
+            var generalConfig = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir);
 
             PerfTracker.StartupEvent($"Found base directory {baseDir}");
             PerfTracker.StartupEvent("Registering asset manager");
@@ -66,11 +70,10 @@ namespace UAlbion
             var locatorRegistry = new AssetLocatorRegistry()
                 // Register locators for handling the various container formats and paths
                 .AddAssetLocator(new StandardAssetLocator(loaderRegistry), true)
-                .AddAssetLocator(new AssetConfigLocator(commandLine.Mode == ExecutionMode.DumpData))
-                .AddAssetLocator(new CoreSpriteLocator())
-                .AddAssetLocator(new MetaFontLocator(factory))
-                .AddAssetLocator(new NewStringLocator())
-                .AddAssetLocator(new SoundBankLocator())
+                // .AddAssetLocator(new AssetConfigLocator())
+                // .AddAssetLocator(new CoreSpriteLocator())
+                // .AddAssetLocator(new MetaFontLocator(factory))
+                // .AddAssetLocator(new SoundBankLocator())
                 // .AddAssetLocator(new SavedGameLocator(loaderRegistry))
                 // Register post-processors for handling transformations of asset data that can't be done by UAlbion.Formats alone.
                 .AddAssetPostProcessor(new AlbionSpritePostProcessor())
@@ -87,10 +90,11 @@ namespace UAlbion
                 GeneralSettings.Load(baseDir), // Need to register settings first, as the AssetConfigLocator relies on it.
                 loaderRegistry,
                 locatorRegistry,
-                assets,
-                new ModApplier());
+                new ModApplier(),
+                assets);
 
             using var exchange = new EventExchange(new LogExchange())
+                .Register<IGeneralConfig>(generalConfig)
                 .Register<ICoreFactory>(factory)
                 .Attach(services);
 

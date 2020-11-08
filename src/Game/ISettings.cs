@@ -5,7 +5,6 @@ namespace UAlbion.Game
 {
     public interface ISettings
     {
-        string BasePath { get; }
         IDebugSettings Debug { get; }
         IAudioSettings Audio { get; }
         IGameplaySettings Gameplay { get; }

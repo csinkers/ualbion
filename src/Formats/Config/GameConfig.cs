@@ -82,9 +82,8 @@ namespace UAlbion.Formats.Config
             public int CarryWeightPerStrength { get; private set; }
         }
 
-        public static GameConfig Load(string basePath)
+        public static GameConfig Load(string configPath)
         {
-            var configPath = Path.Combine(basePath, "data", "game.json");
             if (!File.Exists(configPath))
                 return new GameConfig();
 

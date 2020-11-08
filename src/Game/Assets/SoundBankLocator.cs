@@ -14,7 +14,7 @@ namespace UAlbion.Game.Assets
     {
         public object LoadAsset(AssetId key, SerializationContext context, AssetInfo info)
         {
-            if (key != AssetId.SoundBank)
+            if (key != AssetId.From(Base.Special.SoundBank))
                 throw new InvalidOperationException($"Called SoundBankLocator with unexpected asset type {key.Type}");
 
             var assets = Resolve<IAssetManager>();

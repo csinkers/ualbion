@@ -34,6 +34,7 @@ namespace UAlbion.CodeGenerator
             ParentsByAssetId = FindAssetIdParents(AssetIdConfig, AssetIdsByType);
             AssetIdsByEnum = FindAssetIdsForEnums(Enums, AssetIdsByType);
             EnumsByAssetId = FindEnumsByAssetId(Enums, AssetIdsByType);
+            HandleIsomorphism(Enums);
 
             // TODO: Build family based on IsomorphicToAttribute.
             // * AssetTypes in a family need to have a single-type AssetId
@@ -137,6 +138,13 @@ namespace UAlbion.CodeGenerator
                     o.Name = count == 1 ? name : name + count;
                     counters[name]++;
                 }
+            }
+        }
+
+        static void HandleIsomorphism(Dictionary<string, EnumData> enums)
+        {
+            foreach (var e in enums.Values)
+            {
             }
         }
 

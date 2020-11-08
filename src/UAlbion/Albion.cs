@@ -100,11 +100,12 @@ namespace UAlbion
         {
             PerfTracker.StartupEvent("Creating main components");
             var factory = global.Resolve<ICoreFactory>();
+            var config = global.Resolve<IGeneralConfig>();
 
             global
                 .Register<ICommonColors>(new CommonColors(factory))
-                .Register(CoreConfig.Load(baseDir))
-                .Register(GameConfig.Load(baseDir))
+                .Register(CoreConfig.Load(Path.Combine(config.BasePath, config.CoreConfigPath)))
+                .Register(GameConfig.Load(Path.Combine(config.BasePath, config.GameConfigPath)))
                 ;
 
             if (commandLine.AudioMode == AudioMode.InProcess)

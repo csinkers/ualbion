@@ -1,6 +1,6 @@
 ﻿namespace UAlbion.Base
 {
-    public enum UAlbionStringId
+    public enum UAlbionString
     {
         LanguageLabel,
         TakeAll

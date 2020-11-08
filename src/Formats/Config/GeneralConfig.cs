@@ -5,33 +5,33 @@ namespace UAlbion.Formats.Config
 {
     public class GeneralConfig : IGeneralConfig
     {
-        public const string Filename = "config.json";
         [JsonIgnore] public string BasePath { get; set; }
-        [JsonIgnore] public string BaseDataPath => Path.Combine(BasePath, "data");
         public string XldPath { get; set; }
         public string ExePath { get; set; }
         public string SavePath { get; set; }
+        public string SettingsPath { get; set; }
+        public string CoreConfigPath { get; set; }
+        public string GameConfigPath { get; set; }
+        public string BaseAssetsPath { get; set; }
+        public string ModPath { get; set; }
         public string ExportedXldPath { get; set; }
 
-        public static GeneralConfig Load(string basePath)
+        public static GeneralConfig Load(string configPath, string baseDir)
         {
-            var configPath = Path.Combine(basePath, "data", Filename);
-            GeneralConfig config;
-            if (File.Exists(configPath))
-            {
-                var configText = File.ReadAllText(configPath);
-                config = JsonConvert.DeserializeObject<GeneralConfig>(configText);
-            }
-            else
-            {
-                config = new GeneralConfig
-                {
-                    XldPath = @"albion/CD/XLDLIBS",
-                    ExportedXldPath = @"exported"
-                };
-            }
+            var config = File.Exists(configPath) 
+                ? JsonConvert.DeserializeObject<GeneralConfig>(File.ReadAllText(configPath)) 
+                : new GeneralConfig();
 
-            config.BasePath = basePath;
+            config.BasePath = baseDir;
+            config.XldPath ??= @"albion/CD/XLDLIBS";
+            config.ExePath ??= "ALBION";
+            config.SavePath ??= "ALBION/SAVES";
+            config.BaseAssetsPath ??= "data/Base";
+            config.ModPath ??= "data/Mods";
+            config.SettingsPath ??= "data/settings.json";
+            config.CoreConfigPath ??= "data/core.json";
+            config.GameConfigPath ??= "data/game.json";
+            config.ExportedXldPath ??= "data/Exported/raw";
             return config;
         }
     }

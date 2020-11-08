@@ -10,7 +10,7 @@ namespace UAlbion.Game.Settings
 {
     public class GeneralSettings : Component, ISettings, IDebugSettings, IAudioSettings, IGameplaySettings, IEngineSettings
     {
-        const string Filename = "settings.json";
+        string _configPath;
 
         protected GeneralSettings()
         {
@@ -32,7 +32,7 @@ namespace UAlbion.Game.Settings
             On<Special2Event>      (e => Special2 = CoreUtil.UpdateValue(Special2, e.Operation, e.Argument));
             On<EngineFlagEvent>(e => Flags = (EngineFlags) CoreUtil.UpdateFlag((uint) Flags, e.Operation, (uint) e.Flag));
         }
-        [JsonIgnore] public string BasePath { get; set; }
+
         [JsonIgnore] public IDebugSettings Debug => this;
         [JsonIgnore] public IAudioSettings Audio => this;
         [JsonIgnore] public IGameplaySettings Gameplay => this;
@@ -59,23 +59,18 @@ namespace UAlbion.Game.Settings
             EngineFlags.VSync | 
             EngineFlags.UseCylindricalBillboards;
 
-        public static GeneralSettings Load(string basePath)
+        public static GeneralSettings Load(string configPath)
         {
-            var configPath = Path.Combine(basePath, "data", Filename);
-            if (!File.Exists(configPath))
-                return new GeneralSettings { BasePath = basePath };
+            var settings = File.Exists(configPath) 
+                ? JsonConvert.DeserializeObject<GeneralSettings>(File.ReadAllText(configPath)) 
+                : new GeneralSettings();
 
-            var configText = File.ReadAllText(configPath);
-            var settings = JsonConvert.DeserializeObject<GeneralSettings>(configText);
-            settings.BasePath = basePath;
-            if(settings.Mods.Count == 0)
-                settings.Mods.Add("../Base");
+            settings._configPath = configPath;
             return settings;
         }
 
         public void Save()
         {
-            var configPath = Path.Combine(BasePath, "data", Filename);
             var serializerSettings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented,
@@ -83,7 +78,7 @@ namespace UAlbion.Game.Settings
             };
 
             var json = JsonConvert.SerializeObject(this, serializerSettings);
-            File.WriteAllText(configPath, json);
+            File.WriteAllText(_configPath, json);
         }
 
         protected override void Subscribed()

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Newtonsoft.Json;
 
-namespace UAlbion.Formats.Config
+namespace UAlbion.Config
 {
     public class GeneralConfig : IGeneralConfig
     {

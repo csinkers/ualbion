@@ -8,5 +8,6 @@
         ItemList,
         SpellList,
         SystemTextList,
+        BinaryOffsets,
     }
 }

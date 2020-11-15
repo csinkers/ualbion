@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace UAlbion.Api
@@ -10,6 +10,7 @@ namespace UAlbion.Api
     public class EventPartParsers
     {
         readonly IDictionary<Type, MethodInfo> _parsers = new Dictionary<Type, MethodInfo>();
+        readonly MethodInfo _isNullOrEmpty = typeof(string).GetMethod("IsNullOrEmpty", BindingFlags.Static | BindingFlags.Public);
 
         public EventPartParsers()
         {
@@ -20,15 +21,31 @@ namespace UAlbion.Api
             _parsers[typeof(int)]     =    typeof(int).GetMethod("Parse", new[] { typeof(string) });
             _parsers[typeof(uint)]    =   typeof(uint).GetMethod("Parse", new[] { typeof(string) });
             _parsers[typeof(float)]   =  typeof(float).GetMethod("Parse", new[] { typeof(string) });
-            _parsers[typeof(bool?)]   = GetType().GetMethod("ParseNullableBool",   BindingFlags.NonPublic | BindingFlags.Static);
-            _parsers[typeof(int?)]    = GetType().GetMethod("ParseNullableInt",    BindingFlags.NonPublic | BindingFlags.Static);
-            _parsers[typeof(ushort?)] = GetType().GetMethod("ParseNullableUInt16", BindingFlags.NonPublic | BindingFlags.Static);
-            _parsers[typeof(float?)]  = GetType().GetMethod("ParseNullableFloat",  BindingFlags.NonPublic | BindingFlags.Static);
         }
 
-        public MethodInfo GetParser(Type type)
+        public Expression GetParser(Type type, Expression argument)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
+            if (type == typeof(string))
+                return argument;
+
+            if (Nullable.GetUnderlyingType(type) is { } underlying)
+            {
+                var underlyingParse = GetParseMethod(underlying);
+                var expression =
+                    Expression.Condition(
+                        Expression.Call(null, _isNullOrEmpty, argument),
+                        Expression.Constant(null, type),
+                        Expression.Convert(Expression.Call(null, underlyingParse, argument), type));
+                return expression;
+            }
+
+            var method = GetParseMethod(type);
+            return method == null ? null : Expression.Call(method, argument);
+        }
+
+        MethodInfo GetParseMethod(Type type)
+        {
             if (_parsers.TryGetValue(type, out var parser))
                 return parser;
 
@@ -39,53 +56,22 @@ namespace UAlbion.Api
                     throw new InvalidOperationException("Method ParseEnum could not be found");
 
                 parser = method.MakeGenericMethod(type);
-                _parsers[type] = parser;
-                return parser;
             }
-
-            if (Nullable.GetUnderlyingType(type) is { } underlying && underlying.IsEnum)
+            else
             {
-                var method = GetType().GetMethod("ParseNullableEnum", BindingFlags.NonPublic | BindingFlags.Static);
-                if(method == null)
-                    throw new InvalidOperationException("Method ParseNullableEnum could not be found");
-
-                parser = method.MakeGenericMethod(underlying);
-                _parsers[type] = parser;
-                return parser;
+                parser = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public);
             }
 
-            return null;
+            if (parser != null)
+                _parsers[type] = parser;
+
+            return parser;
         }
 
-        static bool? ParseNullableBool(string s)
-        {
-            if (string.IsNullOrEmpty(s))
-                return null;
-            return bool.Parse(s);
-        }
-
-        static int? ParseNullableInt(string s)
-        {
-            if (string.IsNullOrEmpty(s))
-                return null;
-            return int.Parse(s, CultureInfo.InvariantCulture);
-        }
-
-        static ushort? ParseNullableUInt16(string s)
-        {
-            if (string.IsNullOrEmpty(s))
-                return null;
-            return ushort.Parse(s, CultureInfo.InvariantCulture);
-        }
-
-        static float? ParseNullableFloat(string s)
-        {
-            if (string.IsNullOrEmpty(s))
-                return null;
-            return float.Parse(s, CultureInfo.InvariantCulture);
-        }
-
+        // Methods called via reflection
+#pragma warning disable IDE0051 // Remove unused private members
         static T ParseEnum<T>(string s) => (T)Enum.Parse(typeof(T), s, true);
         static T? ParseNullableEnum<T>(string s) where T : struct, Enum => string.IsNullOrEmpty(s) ? null : (T?)Enum.Parse(typeof(T), s, true);
+#pragma warning restore IDE0051 // Remove unused private members
     }
 }

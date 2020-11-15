@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Formats.Config
+﻿namespace UAlbion.Config
 {
     public interface IGeneralConfig
     {

@@ -4,8 +4,6 @@ namespace UAlbion.Base
     {
         AssetConfig,
         CommonPalette,
-        CoreGraphicsMetadata,
-        CoreSpriteConfig,
         GeneralConfig,
         SoundBank,
     }

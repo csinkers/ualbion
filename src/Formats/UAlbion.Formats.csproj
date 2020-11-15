@@ -10,7 +10,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="System.Memory" Version="4.5.4" />
   </ItemGroup>
 
@@ -19,6 +18,12 @@
   </ItemGroup>
   <ItemGroup Condition="Exists('..\..\deps\SerdesNet')">
     <ProjectReference Include="..\..\deps\SerdesNet\src\SerdesNet.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('..\..\deps\Newtonsoft.Json\')">
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+  <ItemGroup Condition="Exists('..\..\deps\Newtonsoft.Json\')">
+    <ProjectReference Include="..\..\deps\Newtonsoft.Json\Src\Newtonsoft.Json\Newtonsoft.Json.csproj" />
   </ItemGroup>
 
   <ItemGroup>

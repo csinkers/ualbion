@@ -19,6 +19,8 @@ namespace UAlbion.Config
         public int? Height { get; set; }
         public string SubSprites { get; set; }
         public bool? UseSmallGraphics { get; set; }
+        public long? Offset { get; set; }
+        public Position2D Hotspot { get; set; }
 
         [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "Play nicely with JSON serialisation")]
         public IList<int> PaletteHints { get; set; }

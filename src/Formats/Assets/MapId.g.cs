@@ -3,6 +3,8 @@
 // files should be modified and then GenerateEnums should be used to regenerate
 // the various types.
 using System;
+using System.ComponentModel;
+using System.Globalization;
 using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Api;
@@ -11,6 +13,7 @@ using UAlbion.Config;
 namespace UAlbion.Formats.Assets
 {
     [JsonConverter(typeof(ToStringJsonConverter))]
+    [TypeConverter(typeof(MapIdConverter))]
     public struct MapId : IEquatable<MapId>, IEquatable<AssetId>, ITextureId
     {
         readonly uint _value;
@@ -80,17 +83,8 @@ namespace UAlbion.Formats.Assets
         public bool IsNone => Type == AssetType.None;
 
         public override string ToString() => AssetMapping.Global.IdToName(this);
-        public static MapId Parse(string s)
-        {
-            throw new NotImplementedException(); // TODO: Add proper parsing of arbitrary asset enums
-            // if (s == null || !s.Contains(":"))
-            //     throw new FormatException($"Tried to parse an InventoryId without a : (\"{s}\")");
-            // var parts = s.Split(':');
-            // //var type = (AssetType)Enum.Parse(typeof(AssetType), parts[0]);
-            // var type = AssetTypeExtensions.FromShort(parts[0]);
-            // var id = ushort.Parse(parts[1], CultureInfo.InvariantCulture);
-            // return new MapId(type, id);
-        }
+        static AssetType[] _validTypes = { AssetType.Map };
+        public static MapId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
         public static implicit operator AssetId(MapId id) => new AssetId(id._value);
         public static implicit operator MapId(AssetId id) => new MapId((uint)id);
@@ -111,5 +105,17 @@ namespace UAlbion.Formats.Assets
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
         public override int GetHashCode() => (int)this;
         public readonly TextId ToMapText() => new TextId(AssetType.MapText, Id);
+    }
+
+    public class MapIdConverter : TypeConverter
+    {
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) 
+            => sourceType == typeof(string) ? true : base.CanConvertFrom(context, sourceType);
+
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value) 
+            => value is string s ? MapId.Parse(s) : base.ConvertFrom(context, culture, value);
+
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType) =>
+            destinationType == typeof(string) ? value.ToString() : base.ConvertTo(context, culture, value, destinationType);
     }
 }

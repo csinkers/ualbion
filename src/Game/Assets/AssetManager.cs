@@ -2,19 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Api;
-using UAlbion.Base;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Flic;
+using UAlbion.Formats.Assets.Labyrinth;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
-using UAlbion.Formats.Config;
-using EventSet = UAlbion.Formats.Assets.EventSet;
-using LabyrinthData = UAlbion.Formats.Assets.Labyrinth.LabyrinthData;
-using MonsterGroup = UAlbion.Formats.Assets.MonsterGroup;
-using TilesetData = UAlbion.Formats.Assets.Maps.TilesetData;
 
 namespace UAlbion.Game.Assets
 {
@@ -48,7 +44,7 @@ namespace UAlbion.Game.Assets
             if (palette == null)
                 return null;
 
-            var commonPalette = (byte[])_modApplier.LoadAssetCached(AssetId.From(Special.CommonPalette));
+            var commonPalette = (byte[])_modApplier.LoadAssetCached(AssetId.From(Base.Special.CommonPalette));
             palette.SetCommonPalette(commonPalette);
 
             return palette;
@@ -62,9 +58,7 @@ namespace UAlbion.Game.Assets
 
         public TilesetData LoadTileData(TilesetId id) => (TilesetData)_modApplier.LoadAssetCached(id);
         public LabyrinthData LoadLabyrinthData(LabyrinthId id) => (LabyrinthData)_modApplier.LoadAssetCached(id);
-        public IGeneralConfig LoadGeneralConfig() => (IGeneralConfig) _modApplier.LoadAssetCached(AssetId.From(Special.GeneralConfig));
-        public CoreSpriteConfig LoadCoreSpriteConfig() => (CoreSpriteConfig) _modApplier.LoadAssetCached(AssetId.From(Special.CoreSpriteConfig));
-        public CoreSpriteInfo LoadCoreSpriteInfo(SpriteId id) => ((CoreSpriteConfig)_modApplier.LoadAssetCached(AssetId.From(Special.CoreGraphicsMetadata))).Hashes.First().Value[id.Id];
+        public IGeneralConfig LoadGeneralConfig() => (IGeneralConfig) _modApplier.LoadAssetCached(AssetId.From(Base.Special.GeneralConfig));
 
         public string LoadString(TextId id) => LoadString((StringId)id);
         public string LoadString(StringId id)
@@ -81,7 +75,7 @@ namespace UAlbion.Game.Assets
 
         public ISample LoadSample(SampleId id) => (AlbionSample)_modApplier.LoadAssetCached(id);
         public ISample LoadWaveLib(WaveLibraryId waveLibraryId, int instrument) => ((WaveLib)_modApplier.LoadAssetCached(waveLibraryId))?.GetSample(instrument);
-        public byte[] LoadSoundBanks() => (byte[]) _modApplier.LoadAssetCached(AssetId.From(Special.SoundBank));
+        public byte[] LoadSoundBanks() => (byte[]) _modApplier.LoadAssetCached(AssetId.From(Base.Special.SoundBank));
         public FlicFile LoadVideo(VideoId id) => (FlicFile)_modApplier.LoadAssetCached(id);
         public CharacterSheet LoadSheet(CharacterId id) => (CharacterSheet)_modApplier.LoadAssetCached(id);
         public Inventory LoadInventory(AssetId id) => (Inventory)_modApplier.LoadAssetCached(id);

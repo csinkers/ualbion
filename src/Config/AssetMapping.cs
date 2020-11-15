@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -78,7 +79,7 @@ namespace UAlbion.Config
                 .ToArray(); // Keyed by AssetType, a byte enum
 
         readonly Dictionary<Type, EnumInfo> _byEnumType = new Dictionary<Type, EnumInfo>();
-
+        readonly Dictionary<string, List<(EnumInfo, int)>> _byName = new Dictionary<string, List<(EnumInfo, int)>>();
 
         public AssetMapping() {}
         AssetMapping(Dictionary<Type, EnumInfo> byEnumType)
@@ -182,6 +183,20 @@ namespace UAlbion.Config
             var info = new EnumInfo(enumType, assetType, (mapping.LastOrDefault()?.MappedMax ?? -1) + 1);
             mapping.Add(info);
             _byEnumType[enumType] = info;
+
+            foreach(var value in
+                Enum.GetValues(enumType)
+                .Cast<object>()
+                .Select(x => (x.ToString(), Convert.ToInt32(x, CultureInfo.InvariantCulture))))
+            {
+                if (!_byName.TryGetValue(value.Item1, out var entries))
+                {
+                    entries = new List<(EnumInfo, int)>();
+                    _byName[value.Item1] = entries;
+                }
+                entries.Add((info, value.Item2 + info.Offset));
+            }
+
             return this;
         }
 
@@ -210,6 +225,42 @@ namespace UAlbion.Config
                 if (!_byEnumType.ContainsKey(info.EnumType))
                     RegisterAssetType(info.EnumType, info.AssetType);
             }
+        }
+
+        public AssetId Parse(string s, AssetType[] validTypes) // pass null for validTypes to allow any type
+        {
+            if (string.IsNullOrEmpty(s)) throw new ArgumentNullException(nameof(s));
+            int index = s.LastIndexOf('.');
+            var valueName = index == -1 ? s : s.Substring(index + 1);
+            var typeName = index == -1 ? null : s.Substring(0, index);
+
+            if (!_byName.TryGetValue(valueName, out var matches))
+                throw new KeyNotFoundException($"Could not parse \"{s}\" as an asset id enum");
+
+            AssetId result = AssetId.None;
+            foreach (var match in matches)
+            {
+                if (validTypes != null && !validTypes.Contains(match.Item1.AssetType))
+                    continue;
+
+                if (result != AssetId.None)
+                {
+                    var candidates = string.Join(", ",
+                        matches
+                            .Where(x => validTypes == null || validTypes.Contains(x.Item1.AssetType))
+                            .Select(x => x.Item1.EnumType.Name)
+                    );
+
+                    throw new InvalidOperationException($"Could not unambiguously parse \"{s}\" as an asset id. Candidate types: {candidates}");
+                }
+
+                result = new AssetId(match.Item1.AssetType, match.Item2);
+            }
+
+            if (result == AssetId.None)
+                throw new KeyNotFoundException($"Could not parse \"{s}\" as an asset id enum");
+
+            return result;
         }
     }
 }

@@ -15,7 +15,7 @@ namespace UAlbion.Base
     {
         Outdoors = 1,
         Outdoors2 = 2,
-        IskaiIndoors = 3,
+        Indoors = 3,
         Desert = 4,
         Stoney = 5,
         Stoney2 = 6,

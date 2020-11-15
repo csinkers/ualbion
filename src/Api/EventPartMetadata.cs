@@ -38,19 +38,9 @@ namespace UAlbion.Api
                     instance).Compile();
 
             var part = Expression.ArrayIndex(partsParameter, Expression.Constant(index + 1));
-            if (PropertyType == typeof(string))
-            {
-                Parser = part;
-            }
-            else
-            {
-                var parser = Parsers.GetParser(PropertyType);
-                if (parser != null)
-                {
-                    Parser = Expression.Call(parser, part);
-                }
-                else throw new NotImplementedException($"The property {declaringType.Name}.{Name} of type {PropertyType.Name} is not handled.");
-            }
+            Parser = Parsers.GetParser(PropertyType, part);
+            if (Parser == null)
+                throw new NotImplementedException($"The property {declaringType.Name}.{Name} of type {PropertyType.Name} is not handled.");
         }
     }
 }

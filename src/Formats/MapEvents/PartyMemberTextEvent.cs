@@ -7,8 +7,8 @@ namespace UAlbion.Formats.MapEvents
     [Event("party_member_text")]
     public class PartyMemberTextEvent : Event, IAsyncEvent
     {
-        [EventPart("member_id")] public PartyMemberId? MemberId { get; }
         [EventPart("text_id")] public byte TextId { get; }
+        [EventPart("member_id")] public PartyMemberId? MemberId { get; }
 
         public static PartyMemberTextEvent Parse(string[] parts)
         {

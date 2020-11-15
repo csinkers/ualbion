@@ -3,6 +3,8 @@
 // files should be modified and then GenerateEnums should be used to regenerate
 // the various types.
 using System;
+using System.ComponentModel;
+using System.Globalization;
 using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Api;
@@ -11,6 +13,7 @@ using UAlbion.Config;
 namespace UAlbion.Formats.Assets
 {
     [JsonConverter(typeof(ToStringJsonConverter))]
+    [TypeConverter(typeof(PartyMemberIdConverter))]
     public struct PartyMemberId : IEquatable<PartyMemberId>, IEquatable<AssetId>, ITextureId
     {
         readonly uint _value;
@@ -80,17 +83,8 @@ namespace UAlbion.Formats.Assets
         public bool IsNone => Type == AssetType.None;
 
         public override string ToString() => AssetMapping.Global.IdToName(this);
-        public static PartyMemberId Parse(string s)
-        {
-            throw new NotImplementedException(); // TODO: Add proper parsing of arbitrary asset enums
-            // if (s == null || !s.Contains(":"))
-            //     throw new FormatException($"Tried to parse an InventoryId without a : (\"{s}\")");
-            // var parts = s.Split(':');
-            // //var type = (AssetType)Enum.Parse(typeof(AssetType), parts[0]);
-            // var type = AssetTypeExtensions.FromShort(parts[0]);
-            // var id = ushort.Parse(parts[1], CultureInfo.InvariantCulture);
-            // return new PartyMemberId(type, id);
-        }
+        static AssetType[] _validTypes = { AssetType.PartyMember };
+        public static PartyMemberId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
         public static implicit operator AssetId(PartyMemberId id) => new AssetId(id._value);
         public static implicit operator PartyMemberId(AssetId id) => new PartyMemberId((uint)id);
@@ -115,5 +109,17 @@ namespace UAlbion.Formats.Assets
         public readonly SpriteId ToSmallPartyGraphics() => new SpriteId(AssetType.SmallPartyGraphics, Id);
         public readonly SpriteId ToBigPartyGraphics() => new SpriteId(AssetType.BigPartyGraphics, Id);
         public readonly SpriteId ToFullBodyPicture() => new SpriteId(AssetType.FullBodyPicture, Id);
+    }
+
+    public class PartyMemberIdConverter : TypeConverter
+    {
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) 
+            => sourceType == typeof(string) ? true : base.CanConvertFrom(context, sourceType);
+
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value) 
+            => value is string s ? PartyMemberId.Parse(s) : base.ConvertFrom(context, culture, value);
+
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType) =>
+            destinationType == typeof(string) ? value.ToString() : base.ConvertTo(context, culture, value, destinationType);
     }
 }

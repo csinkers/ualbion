@@ -6,7 +6,6 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Config;
 using UAlbion.Formats.Parsers;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Settings;

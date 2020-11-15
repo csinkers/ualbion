@@ -89,12 +89,12 @@ namespace UAlbion.Formats.Config
 
             var configText = File.ReadAllText(configPath);
             return JsonConvert.DeserializeObject<GameConfig>(configText,
-                new JsonSerializerSettings {ContractResolver = new PrivatePropertyJsonContractResolver()});
+                new JsonSerializerSettings { ContractResolver = new PrivatePropertyJsonContractResolver() });
         }
 
         public static GameConfig LoadLiteral(string json) =>
             JsonConvert.DeserializeObject<GameConfig>(json,
-                new JsonSerializerSettings {ContractResolver = new PrivatePropertyJsonContractResolver()});
+                new JsonSerializerSettings { ContractResolver = new PrivatePropertyJsonContractResolver() });
     }
 }
 #pragma warning restore CA1034 // Nested types should not be visible

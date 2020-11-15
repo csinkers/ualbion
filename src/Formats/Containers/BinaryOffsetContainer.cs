@@ -3,13 +3,17 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
-using UAlbion.Config;
-using UAlbion.Formats.Assets;
+using SerdesNet;
 
-namespace UAlbion.Formats.Parsers
+namespace UAlbion.Formats.Containers
 {
-    public static class CoreSpriteLoader
+    public class BinaryOffsetContainer : IFileContainer
     {
+        public ISerializer Open(string file, string subItem)
+        {
+            throw new NotImplementedException();
+        }
+
         static string GetHash(string filename)
         {
             using var sha256 = SHA256.Create();
@@ -17,7 +21,7 @@ namespace UAlbion.Formats.Parsers
             var hashBytes = sha256.ComputeHash(stream);
             return string.Join("", hashBytes.Select(x => x.ToString("x2", CultureInfo.InvariantCulture)));
         }
-
+/*
         static byte[] LoadSection(string filename, CoreSpriteInfo resource)
         {
             using var stream = File.OpenRead(filename);
@@ -29,7 +33,7 @@ namespace UAlbion.Formats.Parsers
         public static CoreSpriteInfo GetConfig(SpriteId id, string exePath, CoreSpriteConfig config, out string filename)
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
-            if(!Directory.Exists(exePath))
+            if (!Directory.Exists(exePath))
                 throw new InvalidOperationException($"Search directory {exePath} does not exist");
 
             foreach (var file in Directory.EnumerateFiles(exePath, "*.*", SearchOption.AllDirectories))
@@ -60,5 +64,6 @@ namespace UAlbion.Formats.Parsers
                 bytes,
                 new[] { new AlbionSpriteFrame(0, 0, resource.Width, resource.Height) });
         }
+*/
     }
 }

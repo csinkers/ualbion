@@ -69,18 +69,7 @@ namespace UAlbion.Config
         public readonly int Id => (int)(_value & 0xffffff);
 
         public override string ToString() => AssetMapping.Global.IdToName(this);
-        public static AssetId Parse(string s)
-        {
-            throw new NotImplementedException(); // TODO: Add proper parsing of arbitrary asset enums
-            /*
-            if (s == null || !s.Contains(":"))
-                throw new FormatException($"Tried to parse an InventoryId without a : (\"{s}\")");
-            var parts = s.Split(':');
-            //var type = (AssetType)Enum.Parse(typeof(AssetType), parts[0]);
-            var type = AssetTypeExtensions.FromShort(parts[0]);
-            var id = ushort.Parse(parts[1], CultureInfo.InvariantCulture);
-            return new AssetId(type, id); */
-        }
+        public static AssetId Parse(string s) => AssetMapping.Global.Parse(s, null);
 
         public static explicit operator uint(AssetId id) => id._value;
         public static explicit operator int(AssetId id) => unchecked((int)id._value);

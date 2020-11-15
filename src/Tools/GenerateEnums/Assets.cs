@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UAlbion.Config;
@@ -10,25 +11,22 @@ namespace UAlbion.CodeGenerator
         public string BaseDir { get; }
         public AssetConfig AssetConfig { get; }
         public AssetIdConfig AssetIdConfig { get; }
-        public CoreSpriteConfig CoreSpriteConfig { get; }
         public Dictionary<string, EnumData> Enums { get; }
         public Dictionary<string, string[]> ParentsByAssetId { get; }
         public Dictionary<string, string[]> AssetIdsByEnum { get; }
-        public Dictionary<string, string[]> EnumsByAssetId { get; set; }
+        public Dictionary<string, string[]> EnumsByAssetId { get; }
         public ILookup<AssetType, string> AssetIdsByType { get; }
-        public Dictionary<AssetType, string[]> FamilyMembersByAssetId { get; }
 
         public Assets() // Everything in this class should be treated as read-only once the constructor finishes.
         {
             BaseDir = ConfigUtil.FindBasePath();
             var assetIdConfigPath = Path.Combine(BaseDir, @"src/Formats/AssetIdTypes.json");
+            var config = GeneralConfig.Load(Path.Combine(BaseDir, "data/config.json"), BaseDir);
 
-            AssetConfig = AssetConfig.Load(BaseDir);
+            AssetConfig = AssetConfig.Load(Path.Combine(BaseDir, config.BaseAssetsPath, "assets.json"));
             AssetIdConfig = AssetIdConfig.Load(assetIdConfigPath);
-            CoreSpriteConfig = CoreSpriteConfig.Load(BaseDir);
 
             Enums = LoadEnums(AssetConfig);
-            AddCoreSprites(Enums, CoreSpriteConfig);
             DeduplicateEnums(Enums);
             AssetIdsByType = FindAssetIdsByType(AssetIdConfig);
             ParentsByAssetId = FindAssetIdParents(AssetIdConfig, AssetIdsByType);
@@ -98,7 +96,11 @@ namespace UAlbion.CodeGenerator
                         var id = o.Id;
 
                         if (e.EnumType == "byte" && id > 0xff)
-                            continue;
+                        {
+                            throw new InvalidOperationException(
+                                $"Enum {e.FullName} has an underlying type of byte, but it " +
+                                $"defines a value {id} which is greater than the maximum value that a byte can represent (256).");
+                        }
 
                         e.Entries.Add(string.IsNullOrEmpty(o.Name)
                             ? new EnumEntry {Name = $"Unknown{id}", Value = id}
@@ -108,14 +110,6 @@ namespace UAlbion.CodeGenerator
             }
 
             return enums;
-        }
-
-        static void AddCoreSprites(Dictionary<string, EnumData> enums, CoreSpriteConfig config)
-        {
-            const string coreSprite = "UAlbion.Base.CoreSprite";
-            enums[coreSprite] = new EnumData { FullName = coreSprite, EnumType = "byte" };
-            foreach (var item in config.CoreSpriteIds)
-                enums[coreSprite].Entries.Add(new EnumEntry { Name = Sanitise(item.Value), Value = item.Key });
         }
 
         static void DeduplicateEnums(Dictionary<string, EnumData> enums)
@@ -145,6 +139,48 @@ namespace UAlbion.CodeGenerator
         {
             foreach (var e in enums.Values)
             {
+                var type = typeof(AssetType);
+                var memberInfo = type.GetMember(e.AssetType.ToString()).SingleOrDefault();
+                if (memberInfo == null)
+                    continue;
+
+                if (!(memberInfo.GetCustomAttributes(typeof(IsomorphicToAttribute), false).FirstOrDefault() is IsomorphicToAttribute iso))
+                    continue;
+
+                if (e.Entries.Any(x => !x.Name.StartsWith("Unknown")))
+                {
+                    throw new InvalidOperationException(
+                        $"Enum {e.FullName} identifies assets of type {e.AssetType}, which " +
+                        $"is defined as being isomorphic to {iso.Type} causing its entries to be defined by the " +
+                        $"enums associated with {iso.Type}, however it declares {e.Entries.Count} entries of its own.");
+                }
+                e.Entries.Clear();
+
+                if (string.IsNullOrEmpty(e.CopiedFrom))
+                {
+                    throw new InvalidOperationException(
+                        $"Enum {e.FullName} identifies assets of type {e.AssetType}, which " +
+                        $"is defined as being isomorphic to {iso.Type} causing its entries to be defined by the " +
+                        $"enums associated with {iso.Type}, however it does not have a CopiesFrom property identifying the" +
+                        "enum type to copy entries from.");
+                }
+
+                if(!enums.TryGetValue(e.CopiedFrom, out var parentData))
+                {
+                    throw new InvalidOperationException(
+                        $"Enum {e.FullName} specifies the type {e.CopiedFrom} as its CopiedFrom property, but this type is" +
+                        " not defined by the current mod's configuration, or that of any dependency.");
+                }
+
+                if (parentData.AssetType != iso.Type)
+                {
+                    throw new InvalidOperationException(
+                        $"Enum {e.FullName} specifies the type {e.CopiedFrom} as its CopiedFrom property, but its type" +
+                        $" is {parentData.AssetType} which does not match the expected asset type declared by the IsomorphicTo attribute ({iso.Type})");
+                }
+
+                foreach (var entry in parentData.Entries)
+                    e.Entries.Add(entry);
             }
         }
 

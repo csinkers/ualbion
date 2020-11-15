@@ -21,7 +21,7 @@ namespace UAlbion.Game.Assets
             var assets = Resolve<IAssetManager>();
             var regular = assets.LoadTexture(Base.Font.RegularFont);
             var bold = assets.LoadTexture(Base.Font.BoldFont); // (ITexture)loaderFunc((SpriteId)Base.Font.BoldFont, context);
-            return FontLoader.Load(_factory, (MetaFontId) key.Id, regular, bold);
+            return FontLoader.Load(_factory, (MetaFontId)key.Id, regular, bold);
         }
     }
 }

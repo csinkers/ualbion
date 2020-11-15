@@ -55,7 +55,7 @@ namespace UAlbion.Game.Veldrid.Input
         {
             var assets = Resolve<IAssetManager>();
             var window = Resolve<IWindowManager>();
-            var config = assets.LoadCoreSpriteInfo(cursorId);
+            var config = assets.GetAssetInfo(cursorId);
 
             _cursorId = cursorId;
             _hotspot = config?.Hotspot == null

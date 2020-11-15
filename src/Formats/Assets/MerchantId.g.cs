@@ -3,6 +3,8 @@
 // files should be modified and then GenerateEnums should be used to regenerate
 // the various types.
 using System;
+using System.ComponentModel;
+using System.Globalization;
 using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Api;
@@ -11,6 +13,7 @@ using UAlbion.Config;
 namespace UAlbion.Formats.Assets
 {
     [JsonConverter(typeof(ToStringJsonConverter))]
+    [TypeConverter(typeof(MerchantIdConverter))]
     public struct MerchantId : IEquatable<MerchantId>, IEquatable<AssetId>, ITextureId
     {
         readonly uint _value;
@@ -80,17 +83,8 @@ namespace UAlbion.Formats.Assets
         public bool IsNone => Type == AssetType.None;
 
         public override string ToString() => AssetMapping.Global.IdToName(this);
-        public static MerchantId Parse(string s)
-        {
-            throw new NotImplementedException(); // TODO: Add proper parsing of arbitrary asset enums
-            // if (s == null || !s.Contains(":"))
-            //     throw new FormatException($"Tried to parse an InventoryId without a : (\"{s}\")");
-            // var parts = s.Split(':');
-            // //var type = (AssetType)Enum.Parse(typeof(AssetType), parts[0]);
-            // var type = AssetTypeExtensions.FromShort(parts[0]);
-            // var id = ushort.Parse(parts[1], CultureInfo.InvariantCulture);
-            // return new MerchantId(type, id);
-        }
+        static AssetType[] _validTypes = { AssetType.Merchant };
+        public static MerchantId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
         public static implicit operator AssetId(MerchantId id) => new AssetId(id._value);
         public static implicit operator MerchantId(AssetId id) => new MerchantId((uint)id);
@@ -110,5 +104,17 @@ namespace UAlbion.Formats.Assets
         public bool Equals(AssetId other) => _value == (uint)other;
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
         public override int GetHashCode() => (int)this;
+    }
+
+    public class MerchantIdConverter : TypeConverter
+    {
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) 
+            => sourceType == typeof(string) ? true : base.CanConvertFrom(context, sourceType);
+
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value) 
+            => value is string s ? MerchantId.Parse(s) : base.ConvertFrom(context, culture, value);
+
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType) =>
+            destinationType == typeof(string) ? value.ToString() : base.ConvertTo(context, culture, value, destinationType);
     }
 }

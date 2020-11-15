@@ -8,7 +8,6 @@ using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Game
 {
@@ -33,8 +32,6 @@ namespace UAlbion.Game
         WordId? ParseWord(string word);
         IList<Block> LoadBlockList(BlockListId id);
         IGeneralConfig LoadGeneralConfig();
-        CoreSpriteConfig LoadCoreSpriteConfig();
-        CoreSpriteInfo LoadCoreSpriteInfo(SpriteId id);
         EventSet LoadEventSet(EventSetId id);
         byte[] LoadSong(SongId id);
         IList<IEvent> LoadScript(ScriptId id);

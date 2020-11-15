@@ -46,7 +46,7 @@ namespace UAlbion.Game.Gui.Text
             int offset = 0;
             var assets = Resolve<IAssetManager>();
             var font = assets.LoadFont(block.Color, block.Style == TextStyle.Big);
-            if(block.Text == null)
+            if (block.Text == null)
                 return Vector2.Zero;
 
             foreach (var c in block.Text)

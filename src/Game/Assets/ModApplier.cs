@@ -136,9 +136,6 @@ namespace UAlbion.Game.Assets
             foreach (var mod in _modsInDependencyOrder)
             {
                 var info = mod.AssetConfig.GetAsset(enumType.FullName, enumId);
-                if (info == null)
-                    continue;
-
                 var context = new SerializationContext(mod.Mapping, _language);
                 var modAsset = _assetLocatorRegistry.LoadAsset(id, context, info);
                 if(modAsset != null)

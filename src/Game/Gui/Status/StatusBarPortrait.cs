@@ -220,7 +220,7 @@ namespace UAlbion.Game.Gui.Status
                     // Give %s to %s
                     text = tf.Format(
                         Base.SystemText.PartyPortrait_GiveXToX,
-                        assets.LoadString(item.Id.ToItemName()),
+                        item.Name,
                         member.Apparent.GetName(settings.Gameplay.Language));
                     break;
                 case Gold _:

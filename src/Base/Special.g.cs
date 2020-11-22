@@ -17,6 +17,7 @@ namespace UAlbion.Base
         CoreConfig = 1,
         GameConfig = 2,
         SoundBank = 3,
+        ItemNames = 4,
     }
 }
 #pragma warning restore CA1707 // Identifiers should not contain underscores

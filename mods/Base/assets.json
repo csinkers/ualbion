@@ -6,7 +6,8 @@
         "assets.json":         { "Format": "AssetConfig",   "Assets": { "0": { "Id": 0, "Name": "AssetConfig" } } },
         "core.json":           { "Format": "CoreConfig",    "Assets": { "0": { "Id": 1, "Name": "CoreConfig" } } },
         "game.json":           { "Format": "GameConfig",    "Assets": { "0": { "Id": 2, "Name": "GameConfig" } } },
-        "DRIVERS/ALBISND.OPL": { "Format": "SoundBank",     "Assets": { "0": { "Id": 3, "Name": "SoundBank" } } }
+        "DRIVERS/ALBISND.OPL": { "Format": "SoundBank",     "Assets": { "0": { "Id": 3, "Name": "SoundBank" } } },
+        "ITEMNAME":            { "Format": "ItemNames",     "Assets": { "0": { "Id": 4, "Name": "ItemNames" } } }
     }
   },
   "UAlbion.Base.UAlbionString, UAlbion.Base": {
@@ -2499,16 +2500,6 @@
           "460": { "Name": "Mellthas's Pencil" },
           "461": { "Name": "Laser" }
         }
-      }
-    }
-  },
-  "UAlbion.Base.ItemName, UAlbion.Base": {
-    "AssetType": "ItemName",
-    "EnumType": "ushort",
-    "CopiedFrom": "UAlbion.Base.Item, UAlbion.Base",
-    "Files": {
-      "ITEMNAME": {
-        "Format": "ItemNames"
       }
     }
   },

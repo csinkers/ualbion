@@ -18,7 +18,7 @@ namespace UAlbion.Formats.Parsers
             var results = new Dictionary<(int, GameLanguage), string>();
             long end = s.Offset + streamLength;
 
-            int i = 0;
+            int i = 3;
             while (s.Offset < end)
             {
                 var bytes = s.ByteArray(null, null, StringSize);

@@ -44,5 +44,6 @@ namespace UAlbion.Game
         GameConfig LoadGameConfig();
         CoreConfig LoadCoreConfig();
         byte[] LoadSoundBanks();
+        IDictionary<ItemId, string> LoadItemNames();
     }
 }

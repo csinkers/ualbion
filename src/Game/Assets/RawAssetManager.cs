@@ -106,5 +106,6 @@ namespace UAlbion.Game.Assets
         public GameConfig LoadGameConfig() => (GameConfig)_modApplier.LoadAsset(AssetId.From(Base.Special.GameConfig));
         public CoreConfig LoadCoreConfig()=> (CoreConfig)_modApplier.LoadAsset(AssetId.From(Base.Special.CoreConfig));
         public byte[] LoadSoundBanks() => (byte[]) _modApplier.LoadAsset(AssetId.From(Base.Special.SoundBank));
+        public IDictionary<ItemId, string> LoadItemNames() => (IDictionary<ItemId, string>) _modApplier.LoadAsset(AssetId.From(Base.Special.ItemNames));
     }
 }

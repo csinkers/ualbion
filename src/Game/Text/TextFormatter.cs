@@ -132,7 +132,7 @@ namespace UAlbion.Game.Text
                             yield return (Token.Text, character.GetName(language));
                         }
                         else if (active is ItemData item)
-                            yield return (Token.Text, assets.LoadString(item.Id.ToItemName()));
+                            yield return (Token.Text, item.Name);
                         else 
                             yield return (Token.Text, "{NAME}");
                         break;

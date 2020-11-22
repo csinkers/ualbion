@@ -10,6 +10,7 @@ namespace UAlbion.Formats.Assets
     {
         public const int SizeOnDisk = 40;
         public ItemData(ItemId id) => Id = id;
+        public string Name { get; set; }
         public ItemId Id { get; }
         public byte Unknown { get; set; }   //  0 Always 0
         public ItemType TypeId { get; set; }   //  1 Item type

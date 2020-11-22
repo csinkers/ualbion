@@ -98,7 +98,6 @@ namespace UAlbion.Formats.Assets
         public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
         public override int GetHashCode() => unchecked((int)_value);
-        public readonly ItemNameId ToItemName() => new ItemNameId(AssetType.ItemName, Id);
     }
 
     public class ItemIdConverter : TypeConverter

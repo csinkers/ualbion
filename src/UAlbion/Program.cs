@@ -86,6 +86,8 @@ namespace UAlbion
                 .AddAssetPostProcessor(new ImageSharpPostProcessor())
                 .AddAssetPostProcessor(new InterlacedBitmapPostProcessor())
                 .AddAssetPostProcessor(new InventoryPostProcessor())
+                .AddAssetPostProcessor(new ItemPostProcessor())
+                .AddAssetPostProcessor(new ItemNamePostProcessor())
                 ;
 
             var assets = new AssetManager();
@@ -156,7 +158,6 @@ namespace UAlbion
             var fullBodyPicture = assets.LoadTexture(Base.FullBodyPicture.Tom);
             var itemGraphics = assets.LoadTexture(Base.ItemGraphics.ItemSprites);
             var labyrinthData = assets.LoadLabyrinthData(Base.LabyrinthData.Unknown125);
-            var itemName = assets.LoadString(Base.ItemName.LughsShield);
             var largeNpc = assets.LoadTexture(Base.LargeNpc.Christine);
             var largePartyMember = assets.LoadTexture(Base.LargePartyMember.Tom);
             var mapText = assets.LoadString(Base.MapText.Toronto2DGesamtkarteSpielbeginn);

@@ -46,7 +46,7 @@
 
         Labyrinth,
 
-        [Uncached] Map,
+        Map,
         [IsomorphicTo(Map)] Automap,
 
         Monster,
@@ -68,7 +68,6 @@
         [Localised] Video,
 
         [Localised] [IsomorphicTo(EventSet)] EventText,
-        [Localised] [IsomorphicTo(Item)] ItemName,
         [Localised] [IsomorphicTo(Map)] MapText,
         [Localised] Text,
         [Localised] Word,

@@ -96,7 +96,7 @@ namespace UAlbion
                 Flush();
             }
 
-            if (types.Contains(AssetType.Item) || types.Contains(AssetType.ItemName))
+            if (types.Contains(AssetType.Item))
             {
                 tw = Writer("items.json");
                 s.Serialize(tw, AllAssets(AssetType.Item, x => assets.LoadItem(x)));

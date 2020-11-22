@@ -5,6 +5,7 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Inventory
 {
@@ -28,7 +29,7 @@ namespace UAlbion.Game.Gui.Inventory
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
 
-            var heading = new Header(item.Id.ToItemName());
+            var heading = new Header(new LiteralText(item.Name));
             var itemPic = new UiSpriteElement(item.Icon)
             {
                 SubId = item.IconSubId,

@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public PaletteId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.Palette))
-                throw new ArgumentOutOfRangeException($"Tried to construct a PaletteId with a type of {Type}");
-        }
-        public PaletteId(int id)
+        PaletteId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.Palette))
                 throw new ArgumentOutOfRangeException($"Tried to construct a PaletteId with a type of {Type}");
         }
@@ -86,24 +80,22 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.Palette };
         public static PaletteId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(PaletteId id) => new AssetId(id._value);
-        public static implicit operator PaletteId(AssetId id) => new PaletteId((uint)id);
-        public static explicit operator uint(PaletteId id) => id._value;
-        public static explicit operator int(PaletteId id) => unchecked((int)id._value);
-        public static explicit operator PaletteId(int id) => new PaletteId(id);
+        public static implicit operator AssetId(PaletteId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator PaletteId(AssetId id) => new PaletteId(id.ToUInt32());
         public static implicit operator PaletteId(UAlbion.Base.Palette id) => PaletteId.From(id);
 
-        public static PaletteId ToPaletteId(int id) => new PaletteId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static PaletteId FromInt32(int id) => new PaletteId(unchecked((uint)id));
+        public static PaletteId FromUInt32(uint id) => new PaletteId(id);
         public static bool operator ==(PaletteId x, PaletteId y) => x.Equals(y);
         public static bool operator !=(PaletteId x, PaletteId y) => !(x == y);
         public static bool operator ==(PaletteId x, AssetId y) => x.Equals(y);
         public static bool operator !=(PaletteId x, AssetId y) => !(x == y);
         public bool Equals(PaletteId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
     }
 
     public class PaletteIdConverter : TypeConverter

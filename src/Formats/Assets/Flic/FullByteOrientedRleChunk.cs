@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using SerdesNet;
 using UAlbion.Api;
 
 namespace UAlbion.Formats.Assets.Flic
@@ -20,18 +20,18 @@ namespace UAlbion.Formats.Assets.Flic
 
         public override FlicChunkType Type => FlicChunkType.FullByteOrientedRle;
 
-        public IEnumerable<byte> ReadLinePixels(BinaryReader br)
+        public IEnumerable<byte> ReadLinePixels(ISerializer s)
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
+            if (s == null) throw new ArgumentNullException(nameof(s));
 
-            var startOfLine = br.BaseStream.Position;
+            var startOfLine = s.Offset;
             int x = 0;
             while (x < _width)
             {
-                sbyte type = br.ReadSByte();
+                sbyte type = s.Int8(null, 0);
                 if (type >= 0)
                 {
-                    byte value = br.ReadByte();
+                    byte value = s.UInt8(null, 0);
                     while (type != 0)
                     {
                         yield return value;
@@ -43,7 +43,7 @@ namespace UAlbion.Formats.Assets.Flic
                 {
                     while(type != 0)
                     {
-                        yield return br.ReadByte();
+                        yield return s.UInt8(null, 0);
                         x++;
                         type++;
                     }
@@ -54,15 +54,15 @@ namespace UAlbion.Formats.Assets.Flic
             }
         }
 
-        protected override uint LoadChunk(uint length, BinaryReader br)
+        protected override uint LoadChunk(uint length, ISerializer s)
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
-            var start = br.BaseStream.Position;
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            var start = s.Offset;
             int i = 0;
             for (int y = 0; y < _height; y++)
             {
-                byte _ = br.ReadByte(); // old packet count, no longer used
-                foreach (var pixel in ReadLinePixels(br))
+                byte _ = s.UInt8(null, 0); // old packet count, no longer used
+                foreach (var pixel in ReadLinePixels(s))
                     PixelData[i++] = pixel;
             }
 

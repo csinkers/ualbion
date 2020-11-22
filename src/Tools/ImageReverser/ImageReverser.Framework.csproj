@@ -105,6 +105,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\deps\SerdesNet\src\SerdesNet.csproj">
+      <Project>{88B45D1E-E323-4B3C-B6AF-7EFFB7AEA496}</Project>
+      <Name>SerdesNet</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Api\UAlbion.Api.csproj">
       <Project>{20d41e69-c260-461f-a0b9-89920f133f60}</Project>
       <Name>UAlbion.Api</Name>

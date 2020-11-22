@@ -24,8 +24,10 @@
         AudioSample,
         SampleLibrary,
         Song,
+        SoundBank,
 
         // Text
+        ItemNames,
         StringTable,
         SystemText,
         Script,
@@ -42,7 +44,12 @@
         SpellData,
         LabyrinthData,
         ItemData,
-        ItemNames,
-        SavedGame
+        SavedGame,
+
+        // Config
+        GeneralConfig,
+        AssetConfig,
+        CoreConfig,
+        GameConfig
     }
 }

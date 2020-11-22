@@ -272,8 +272,8 @@ namespace UAlbion.Formats.Assets
                 var spellStrengths = new ushort[MaxSpellsPerSchool * SpellSchoolCount];
                 foreach (var spellId in activeSpellIds)
                 {
-                    uint schoolId = (uint)spellId / 100;
-                    int offset = (int)spellId % 100;
+                    uint schoolId = (uint)spellId.Id / 100; // TODO: Confirm
+                    int offset = spellId.Id % 100;
                     if (sheet.Magic.SpellStrengths[spellId].Item1)
                         knownSpells[schoolId] |= 1U << offset + 1;
                     spellStrengths[schoolId * MaxSpellsPerSchool + offset] = sheet.Magic.SpellStrengths[spellId].Item2;

@@ -8,12 +8,11 @@ namespace UAlbion.Formats.Tests
 {
     public class AssetMappingTests : Component
     {
-        public enum ZeroBasedByte : byte { Zero = 0, One, Two }
-        public enum OneBasedByte : byte { One = 1, Two, Three }
-        public enum ZeroBasedShort : ushort { Zero = 0, One, Two }
-        public enum OneBasedShort : ushort { One = 1, Two, Three }
-        public enum GapByteZero : byte { Zero = 0, One, Foo255 = 255 }
-        public enum GapByteOne : byte { One = 1, Two, Foo255 = 255 }
+        enum ZeroBasedByte : byte { Zero = 0, One, Two }
+        enum OneBasedByte : byte { One = 1, Two, Three }
+        enum ZeroBasedShort : ushort { Zero = 0, One, Two }
+        enum GapByteZero : byte { Zero = 0, One, Foo255 = 255 }
+        enum GapByteOne : byte { One = 1, Two, Foo255 = 255 }
 
         public AssetMappingTests()
         {
@@ -34,7 +33,21 @@ namespace UAlbion.Formats.Tests
             Assert.Equal(new AssetId(AssetType.Portrait, 5), m.EnumToId(OneBasedByte.Three));
 
             Assert.Throws<InvalidOperationException>(() => m.RegisterAssetType(typeof(int), AssetType.Automap));
-            Assert.Throws<ArgumentNullException>(() => m.RegisterAssetType(null, AssetType.Monster));
+            Assert.Throws<ArgumentNullException>(() => m.RegisterAssetType((Type)null, AssetType.Monster));
+        }
+
+        [Fact]
+        public void TestFirstRegistrationOffsetPreserved()
+        {
+            var m = AssetMapping.Global.Clear();
+            m.RegisterAssetType(typeof(OneBasedByte), AssetType.Map);
+            m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Map);
+            Assert.Equal(new AssetId(AssetType.Map, 1), AssetId.From(OneBasedByte.One));
+            Assert.Equal(new AssetId(AssetType.Map, 2), AssetId.From(OneBasedByte.Two));
+            Assert.Equal(new AssetId(AssetType.Map, 3), AssetId.From(OneBasedByte.Three));
+            Assert.Equal(new AssetId(AssetType.Map, 4), AssetId.From(ZeroBasedByte.Zero));
+            Assert.Equal(new AssetId(AssetType.Map, 5), AssetId.From(ZeroBasedByte.One));
+            Assert.Equal(new AssetId(AssetType.Map, 6), AssetId.From(ZeroBasedByte.Two));
         }
 
         [Fact]
@@ -49,16 +62,16 @@ namespace UAlbion.Formats.Tests
         public void TestEnumToId()
         {
             var m = AssetMapping.Global.Clear().RegisterAssetType(typeof(GapByteOne), AssetType.Item);
-            Assert.Equal(new AssetId(AssetType.Item, 0), m.EnumToId(GapByteOne.One));
-            Assert.Equal(new AssetId(AssetType.Item, 1), m.EnumToId(GapByteOne.Two));
-            Assert.Equal(new AssetId(AssetType.Item, 254), m.EnumToId(GapByteOne.Foo255));
-            Assert.Equal(new AssetId(AssetType.Item, 199), m.EnumToId((GapByteOne)200));
+            Assert.Equal(new AssetId(AssetType.Item, 1), m.EnumToId(GapByteOne.One));
+            Assert.Equal(new AssetId(AssetType.Item, 2), m.EnumToId(GapByteOne.Two));
+            Assert.Equal(new AssetId(AssetType.Item, 255), m.EnumToId(GapByteOne.Foo255));
+            Assert.Equal(new AssetId(AssetType.Item, 200), m.EnumToId((GapByteOne)200));
             Assert.Throws<ArgumentOutOfRangeException>(() => m.EnumToId(ZeroBasedByte.Zero));
 
-            Assert.Equal(new AssetId(AssetType.Item, 0), m.EnumToId(typeof(GapByteOne), 1));
-            Assert.Equal(new AssetId(AssetType.Item, 1), m.EnumToId(typeof(GapByteOne), 2));
-            Assert.Equal(new AssetId(AssetType.Item, 254), m.EnumToId(typeof(GapByteOne), 255));
-            Assert.Equal(new AssetId(AssetType.Item, 199), m.EnumToId(typeof(GapByteOne), 200));
+            Assert.Equal(new AssetId(AssetType.Item, 1), m.EnumToId(typeof(GapByteOne), 1));
+            Assert.Equal(new AssetId(AssetType.Item, 2), m.EnumToId(typeof(GapByteOne), 2));
+            Assert.Equal(new AssetId(AssetType.Item, 255), m.EnumToId(typeof(GapByteOne), 255));
+            Assert.Equal(new AssetId(AssetType.Item, 200), m.EnumToId(typeof(GapByteOne), 200));
             Assert.Throws<ArgumentOutOfRangeException>(() => m.EnumToId(typeof(ZeroBasedByte), 0));
         }
 
@@ -66,10 +79,10 @@ namespace UAlbion.Formats.Tests
         public void TestIdToEnum()
         {
             var m = AssetMapping.Global.Clear().RegisterAssetType(typeof(GapByteOne), AssetType.Item);
-            Assert.Equal((typeof(GapByteOne), (int)GapByteOne.One), m.IdToEnum(new AssetId(AssetType.Item, 0)));
-            Assert.Equal((typeof(GapByteOne), (int)GapByteOne.Two), m.IdToEnum(new AssetId(AssetType.Item, 1)));
-            Assert.Equal((typeof(GapByteOne), (int)GapByteOne.Foo255), m.IdToEnum(new AssetId(AssetType.Item, 254)));
-            Assert.Equal((typeof(GapByteOne), 200), m.IdToEnum(new AssetId(AssetType.Item, 199)));
+            Assert.Equal((typeof(GapByteOne), (int)GapByteOne.One), m.IdToEnum(new AssetId(AssetType.Item, 1)));
+            Assert.Equal((typeof(GapByteOne), (int)GapByteOne.Two), m.IdToEnum(new AssetId(AssetType.Item, 2)));
+            Assert.Equal((typeof(GapByteOne), (int)GapByteOne.Foo255), m.IdToEnum(new AssetId(AssetType.Item, 255)));
+            Assert.Equal((typeof(GapByteOne), 200), m.IdToEnum(new AssetId(AssetType.Item, 200)));
             Assert.Equal((typeof(int), 300), m.IdToEnum(new AssetId(AssetType.Item, 300)));
         }
 

@@ -12,14 +12,14 @@ namespace UAlbion.Game.Assets
     public class AlbionSpritePostProcessor : IAssetPostProcessor
     {
         public IEnumerable<Type> SupportedTypes => new[] { typeof(AlbionSprite) };
-        public object Process(ICoreFactory factory, AssetId key, object asset, SerializationContext context)
+        public object Process(ICoreFactory factory, AssetId key, object asset)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
             if (asset == null) throw new ArgumentNullException(nameof(asset));
             var sprite = (AlbionSprite)asset;
             SubImage[] subImages;
 
-            /// TODO: Put exemptions into assets(min).json
+            /// TODO: Put exemptions into assets.json
             if (key.Type == AssetType.Font || key.Type == AssetType.AutomapGraphics || sprite.UniformFrames && sprite.Frames.Count >= 256)
             {
                 const int buffer = 1;

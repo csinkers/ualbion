@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using SerdesNet;
 using UAlbion.Api;
 
 namespace UAlbion.Formats.Assets.Flic
@@ -22,20 +22,20 @@ namespace UAlbion.Formats.Assets.Flic
         public ushort Width { get; private set; } // Overrides, usually 0.
         public ushort Height { get; private set; }
 
-        protected override uint LoadChunk(uint length, BinaryReader br)
+        protected override uint LoadChunk(uint length, ISerializer s)
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
-            var initialOffset = br.BaseStream.Position;
-            ushort subChunkCount = br.ReadUInt16();
-            Delay = br.ReadUInt16();
-            br.ReadUInt16();
-            Width = br.ReadUInt16();
-            Height = br.ReadUInt16();
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            var initialOffset = s.Offset;
+            ushort subChunkCount = s.UInt16(null, 0);
+            Delay = s.UInt16(null, 0);
+            s.UInt16(null, 0);
+            Width = s.UInt16(null, 0);
+            Height = s.UInt16(null, 0);
 
             for (int i = 0; i < subChunkCount; i++)
-                SubChunks.Add(Load(br, _videoWidth, _videoHeight));
+                SubChunks.Add(Load(s, _videoWidth, _videoHeight));
 
-            ApiUtil.Assert(br.BaseStream.Position == initialOffset + length);
+            ApiUtil.Assert(s.Offset == initialOffset + length);
             return length;
         }
     }

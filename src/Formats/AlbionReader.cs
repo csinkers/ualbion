@@ -6,6 +6,8 @@ namespace UAlbion.Formats
 {
     public class AlbionReader : GenericBinaryReader
     {
+        readonly BinaryReader _br;
+
         public AlbionReader(BinaryReader br, long maxLength = 0)
             : base(
                 br,
@@ -13,6 +15,13 @@ namespace UAlbion.Formats
                 FormatUtil.BytesTo850String,
                 ApiUtil.Assert)
         {
+            _br = br;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            _br.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

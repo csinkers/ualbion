@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
@@ -18,9 +19,15 @@ namespace UAlbion.Game.Gui.Menus
 
         bool HasLanguageFiles(GameLanguage language)
         {
-            var config = Resolve<IAssetManager>().LoadGeneralConfig();
-            var path = Path.Combine(config.BasePath, config.XldPath, language.ToString().ToUpperInvariant());
-            return Directory.Exists(path);
+            var config = Resolve<IGeneralConfig>();
+            foreach (var searchPath in config.SearchPaths)
+            {
+                var path = config.ResolvePath($"{searchPath}/{language.ToString().ToUpperInvariant()}");
+                if (Directory.Exists(path))
+                    return true;
+            }
+
+            return false;
         }
 
         public OptionsMenu() : base(DialogPositioning.Center) { }

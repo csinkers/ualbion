@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 
@@ -8,14 +8,11 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.Palette, FileFormat.PaletteCommon)]
     public class PaletteLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
+        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
+            if (s == null) throw new ArgumentNullException(nameof(s));
             if (config == null) throw new ArgumentNullException(nameof(config));
-            if (config.Format == FileFormat.Palette)
-                return new AlbionPalette(br, (int)streamLength, id);
-
-            return br.ReadBytes(192); // Common palette
-        }
+            return new AlbionPalette(s, config);
+        }    
     }
 }

@@ -11,7 +11,7 @@ namespace UAlbion.Game.Veldrid.Assets
     public class InterlacedBitmapPostProcessor : IAssetPostProcessor
     {
         public IEnumerable<Type> SupportedTypes => new[] { typeof(InterlacedBitmap) };
-        public object Process(ICoreFactory factory, AssetId key, object asset, SerializationContext context)
+        public object Process(ICoreFactory factory, AssetId key, object asset)
         {
             if (asset == null) throw new ArgumentNullException(nameof(asset));
             var bitmap = (InterlacedBitmap)asset;

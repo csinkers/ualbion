@@ -24,7 +24,7 @@ namespace UAlbion.Formats.MapEvents
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
 
             e._value = e.AssetType != AssetType.None
-                ? (uint)AssetId.SerdesU16("Argument", new AssetId(e._value), e.AssetType, mapping, s)
+                ? AssetId.SerdesU16("Argument", AssetId.FromUInt32(e._value), e.AssetType, mapping, s).ToUInt32()
                 : s.UInt16("Argument", (ushort)e._value);
 
             ApiUtil.Assert(e.Unk4 == 0);
@@ -67,23 +67,23 @@ namespace UAlbion.Formats.MapEvents
             : throw new InvalidOperationException($"Tried to retrieve the Argument of a {QueryType} query event");
 
         public ItemId ItemId => AssetType == AssetType.Item
-            ? new ItemId(_value)
+            ? ItemId.FromUInt32(_value)
             : throw new InvalidOperationException($"Tried to retrieve the ItemId of a {QueryType} query event");
 
         public PartyMemberId PartyMemberId => AssetType == AssetType.PartyMember
-            ? new PartyMemberId(_value)
+            ? PartyMemberId.FromUInt32(_value)
             : throw new InvalidOperationException($"Tried to retrieve the PartyMemberId of a {QueryType} query event");
 
         public TickerId TickerId => AssetType == AssetType.Ticker
-            ? new TickerId(_value)
+            ? TickerId.FromUInt32(_value)
             : throw new InvalidOperationException($"Tried to retrieve the TickerId of a {QueryType} query event");
 
         public SwitchId SwitchId => AssetType == AssetType.Switch
-            ? new SwitchId(_value)
+            ? SwitchId.FromUInt32(_value)
             : throw new InvalidOperationException($"Tried to retrieve the SwitchId of a {QueryType} query event");
 
         public MapId MapId => AssetType == AssetType.Map
-            ? new MapId(_value)
+            ? MapId.FromUInt32(_value)
             : throw new InvalidOperationException($"Tried to retrieve the MapId of a {QueryType} query event");
 
         public string StringValue => (AssetType, QueryType) switch
@@ -103,16 +103,16 @@ namespace UAlbion.Formats.MapEvents
         public static QueryEvent TemporarySwitch(SwitchId id, QueryOperation operation, byte immediate) => new QueryEvent
         {
             QueryType = QueryType.TemporarySwitch,
-            _value = (uint)id,
+            _value = id.ToUInt32(),
             Operation = operation,
             Immediate = immediate
         };
 
-        public static QueryEvent HasPartyMember(PartyMemberId id) => new QueryEvent { QueryType = QueryType.HasPartyMember, _value = (uint)id };
+        public static QueryEvent HasPartyMember(PartyMemberId id) => new QueryEvent { QueryType = QueryType.HasPartyMember, _value = id.ToUInt32() };
         public static QueryEvent InventoryHasItem(ItemId id, QueryOperation operation, byte immediate) => new QueryEvent
         {
             QueryType = QueryType.InventoryHasItem,
-            _value = (uint)id,
+            _value = id.ToUInt32(),
             Operation = operation,
             Immediate = immediate
         };
@@ -120,7 +120,7 @@ namespace UAlbion.Formats.MapEvents
         public static QueryEvent UsedItemId(ItemId id, QueryOperation operation, byte immediate) => new QueryEvent
         {
             QueryType = QueryType.UsedItemId,
-            _value = (uint)id,
+            _value = id.ToUInt32(),
             Operation = operation,
             Immediate = immediate
         };
@@ -134,25 +134,25 @@ namespace UAlbion.Formats.MapEvents
         public static QueryEvent IsNpcActive(NpcId id, QueryOperation operation, byte immediate) => new QueryEvent
         {
             QueryType = QueryType.IsNpcActive,
-            _value = (uint)id,
+            _value = id.ToUInt32(),
             Operation = operation,
             Immediate = immediate
         };
         public static QueryEvent HasEnoughGold(ushort amount) => new QueryEvent { QueryType = QueryType.HasEnoughGold, _value = amount };
         public static QueryEvent RandomChance(ushort percentage) => new QueryEvent { QueryType = QueryType.RandomChance, _value = percentage, };
-        public static QueryEvent IsPartyMemberConscious(PartyMemberId id) => new QueryEvent { QueryType = QueryType.IsPartyMemberConscious, _value = (uint)id, };
-        public static QueryEvent IsPartyMemberLeader(PartyMemberId id) => new QueryEvent { QueryType = QueryType.IsPartyMemberLeader, _value = (uint)id, };
+        public static QueryEvent IsPartyMemberConscious(PartyMemberId id) => new QueryEvent { QueryType = QueryType.IsPartyMemberConscious, _value = id.ToUInt32(), };
+        public static QueryEvent IsPartyMemberLeader(PartyMemberId id) => new QueryEvent { QueryType = QueryType.IsPartyMemberLeader, _value = id.ToUInt32(), };
         public static QueryEvent Ticker(TickerId id, QueryOperation operation, byte immediate) => new QueryEvent
         {
             QueryType = QueryType.Ticker,
-            _value = (uint)id,
+            _value = id.ToUInt32(),
             Operation = operation,
             Immediate = immediate
         };
         public static QueryEvent CurrentMapId(MapId id, QueryOperation operation, byte immediate) => new QueryEvent
         {
             QueryType = QueryType.CurrentMapId,
-            _value = (uint)id,
+            _value = id.ToUInt32(),
             Operation = operation,
             Immediate = immediate
         };

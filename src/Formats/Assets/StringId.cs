@@ -16,6 +16,6 @@ namespace UAlbion.Formats.Assets
         public bool Equals(StringId other) => Id == other.Id && SubId == other.SubId;
         public static bool operator ==(StringId left, StringId right) => left.Equals(right);
         public static bool operator !=(StringId left, StringId right) => !(left == right);
-        public override int GetHashCode() => 17 * (int)Id ^ SubId;
+        public override int GetHashCode() => 17 * Id.ToInt32() ^ SubId;
     }
 }

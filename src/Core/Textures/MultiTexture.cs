@@ -56,7 +56,7 @@ namespace UAlbion.Core.Textures
         protected bool IsMetadataDirty { get; private set; } = true;
         bool _isAnySubImagePaletteAnimated;
         int _lastPaletteVersion;
-        int _lastPaletteId;
+        uint _lastPaletteId;
         bool _isDirty;
 
         public MultiTexture(string name, IPaletteManager paletteManager)

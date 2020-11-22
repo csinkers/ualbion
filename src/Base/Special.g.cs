@@ -11,18 +11,12 @@ using Newtonsoft.Json.Converters;
 namespace UAlbion.Base
 {
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum SmallPlayer : byte
+    public enum Special : ushort
     {
-        Tom = 1,
-        Rainer = 2,
-        Drirr = 3,
-        Sira = 4,
-        Mellthas = 5,
-        Harriet = 6,
-        Joe = 7,
-        Unknown8 = 8,
-        Khunag = 9,
-        Siobhan = 10,
+        AssetConfig = 0,
+        CoreConfig = 1,
+        GameConfig = 2,
+        SoundBank = 3,
     }
 }
 #pragma warning restore CA1707 // Identifiers should not contain underscores

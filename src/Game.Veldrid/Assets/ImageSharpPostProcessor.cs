@@ -12,7 +12,7 @@ namespace UAlbion.Game.Veldrid.Assets
     public class ImageSharpPostProcessor : IAssetPostProcessor
     {
         public IEnumerable<Type> SupportedTypes => new[] { typeof(Image<Rgba32>) };
-        public object Process(ICoreFactory factory, AssetId key, object asset, SerializationContext context)
+        public object Process(ICoreFactory factory, AssetId key, object asset)
             => new ImageSharpTrueColorTexture(key.ToString(), (Image<Rgba32>)asset);
     }
 }

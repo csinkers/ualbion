@@ -23,7 +23,8 @@ namespace UAlbion.Tools.ExportFlic
             {
                 using var stream = File.OpenRead(file);
                 using var br = new BinaryReader(stream);
-                var flic = new FlicFile(br);
+                using var s = new AlbionReader(br);
+                var flic = new FlicFile(s);
 
                 AviFile.Write(
                     Path.ChangeExtension(file, "avi"),

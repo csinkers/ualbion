@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public SpriteId(uint id) 
-        { 
-            _value = id;
-            if (!(Type >= AssetType.None && Type <= AssetType.WallOverlay))
-                throw new ArgumentOutOfRangeException($"Tried to construct a SpriteId with a type of {Type}");
-        }
-        public SpriteId(int id)
+        SpriteId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type >= AssetType.None && Type <= AssetType.WallOverlay))
                 throw new ArgumentOutOfRangeException($"Tried to construct a SpriteId with a type of {Type}");
         }
@@ -88,11 +82,8 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.AutomapGraphics, AssetType.BackgroundGraphics, AssetType.BigNpcGraphics, AssetType.BigPartyGraphics, AssetType.CombatBackground, AssetType.CombatGraphics, AssetType.CoreGraphics, AssetType.Floor, AssetType.Font, AssetType.FullBodyPicture, AssetType.ItemGraphics, AssetType.MonsterGraphics, AssetType.Object3D, AssetType.Picture, AssetType.Slab, AssetType.SmallNpcGraphics, AssetType.SmallPartyGraphics, AssetType.Portrait, AssetType.TacticalIcon, AssetType.TilesetGraphics, AssetType.Wall, AssetType.WallOverlay };
         public static SpriteId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(SpriteId id) => new AssetId(id._value);
-        public static implicit operator SpriteId(AssetId id) => new SpriteId((uint)id);
-        public static explicit operator uint(SpriteId id) => id._value;
-        public static explicit operator int(SpriteId id) => unchecked((int)id._value);
-        public static explicit operator SpriteId(int id) => new SpriteId(id);
+        public static implicit operator AssetId(SpriteId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator SpriteId(AssetId id) => new SpriteId(id.ToUInt32());
         public static implicit operator SpriteId(UAlbion.Base.DungeonBackground id) => SpriteId.From(id);
         public static implicit operator SpriteId(UAlbion.Base.Floor id) => SpriteId.From(id);
         public static implicit operator SpriteId(UAlbion.Base.DungeonObject id) => SpriteId.From(id);
@@ -114,19 +105,20 @@ namespace UAlbion.Formats.Assets
         public static implicit operator SpriteId(UAlbion.Base.UiBackground id) => SpriteId.From(id);
         public static implicit operator SpriteId(UAlbion.Base.Portrait id) => SpriteId.From(id);
         public static implicit operator SpriteId(UAlbion.Base.TacticalGraphics id) => SpriteId.From(id);
+        public static implicit operator SpriteId(UAlbion.Base.CoreSprite id) => SpriteId.From(id);
 
-        public static SpriteId ToSpriteId(int id) => new SpriteId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static SpriteId FromInt32(int id) => new SpriteId(unchecked((uint)id));
+        public static SpriteId FromUInt32(uint id) => new SpriteId(id);
         public static bool operator ==(SpriteId x, SpriteId y) => x.Equals(y);
         public static bool operator !=(SpriteId x, SpriteId y) => !(x == y);
         public static bool operator ==(SpriteId x, AssetId y) => x.Equals(y);
         public static bool operator !=(SpriteId x, AssetId y) => !(x == y);
         public bool Equals(SpriteId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
-        public static implicit operator SpriteId(UAlbion.Base.CoreSprite id) => SpriteId.From(id);
+        public override int GetHashCode() => unchecked((int)_value);
     }
 
     public class SpriteIdConverter : TypeConverter

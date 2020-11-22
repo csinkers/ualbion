@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public NpcId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.Npc))
-                throw new ArgumentOutOfRangeException($"Tried to construct a NpcId with a type of {Type}");
-        }
-        public NpcId(int id)
+        NpcId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.Npc))
                 throw new ArgumentOutOfRangeException($"Tried to construct a NpcId with a type of {Type}");
         }
@@ -86,26 +80,24 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.Npc };
         public static NpcId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(NpcId id) => new AssetId(id._value);
-        public static implicit operator NpcId(AssetId id) => new NpcId((uint)id);
-        public static explicit operator uint(NpcId id) => id._value;
-        public static explicit operator int(NpcId id) => unchecked((int)id._value);
-        public static explicit operator NpcId(int id) => new NpcId(id);
-        public static implicit operator CharacterId(NpcId id) => new CharacterId(id._value);
-        public static explicit operator NpcId(CharacterId id) => new NpcId((uint)id);
+        public static implicit operator AssetId(NpcId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator NpcId(AssetId id) => new NpcId(id.ToUInt32());
+        public static implicit operator CharacterId(NpcId id) => CharacterId.FromUInt32(id._value);
+        public static explicit operator NpcId(CharacterId id) => new NpcId(id.ToUInt32());
         public static implicit operator NpcId(UAlbion.Base.Npc id) => NpcId.From(id);
 
-        public static NpcId ToNpcId(int id) => new NpcId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static NpcId FromInt32(int id) => new NpcId(unchecked((uint)id));
+        public static NpcId FromUInt32(uint id) => new NpcId(id);
         public static bool operator ==(NpcId x, NpcId y) => x.Equals(y);
         public static bool operator !=(NpcId x, NpcId y) => !(x == y);
         public static bool operator ==(NpcId x, AssetId y) => x.Equals(y);
         public static bool operator !=(NpcId x, AssetId y) => !(x == y);
         public bool Equals(NpcId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
     }
 
     public class NpcIdConverter : TypeConverter

@@ -20,6 +20,7 @@ namespace UAlbion.Game.Tests
 
         public GameLanguage Language { get; set; }
 
+        public IModApplier AddAssetPostProcessor(IAssetPostProcessor postProcessor) => throw new NotImplementedException();
         public AssetInfo GetAssetInfo(AssetId id) => _infos[id];
         public object LoadAsset(AssetId id) => _assets[id];
         public object LoadAssetCached(AssetId id) => _assets[id];

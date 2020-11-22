@@ -278,7 +278,12 @@ namespace UAlbion.Core
         /// <returns>The child is also returned to allow constructs like _localVar = AttachChild(new SomeType());</returns>
         protected T AttachChild<T>(T child) where T : IComponent
         {
-            if (_isActive)
+            // For situations like AttachChild(someParameterPassedAsInterface as IComponent)
+            // we don't need to do anything if the implementation of the interface isn't actually a component. 
+            if (child == null) 
+                return default;
+
+            if (_isActive) // Children will be attached when this component is made active.
                 Exchange?.Attach(child);
 
             Children.Add(child);

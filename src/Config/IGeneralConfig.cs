@@ -1,16 +1,12 @@
-﻿namespace UAlbion.Config
+﻿using System.Collections.Generic;
+
+namespace UAlbion.Config
 {
     public interface IGeneralConfig
     {
         string BasePath { get; }
-        string XldPath { get; }
-        string ExePath { get; }
-        string SavePath { get; }
-        string ExportedXldPath { get; }
-        string SettingsPath { get; }
-        string CoreConfigPath { get; }
-        string GameConfigPath { get; }
-        string BaseAssetsPath { get; }
-        string ModPath { get; }
+        IDictionary<string, string> Paths { get; }
+        IList<string> SearchPaths { get; }
+        string ResolvePath(string relative);
     }
 }

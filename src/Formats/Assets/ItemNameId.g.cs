@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public ItemNameId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.ItemName))
-                throw new ArgumentOutOfRangeException($"Tried to construct a ItemNameId with a type of {Type}");
-        }
-        public ItemNameId(int id)
+        ItemNameId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.ItemName))
                 throw new ArgumentOutOfRangeException($"Tried to construct a ItemNameId with a type of {Type}");
         }
@@ -86,26 +80,24 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.ItemName };
         public static ItemNameId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(ItemNameId id) => new AssetId(id._value);
-        public static implicit operator ItemNameId(AssetId id) => new ItemNameId((uint)id);
-        public static explicit operator uint(ItemNameId id) => id._value;
-        public static explicit operator int(ItemNameId id) => unchecked((int)id._value);
-        public static explicit operator ItemNameId(int id) => new ItemNameId(id);
-        public static implicit operator TextId(ItemNameId id) => new TextId(id._value);
-        public static explicit operator ItemNameId(TextId id) => new ItemNameId((uint)id);
+        public static implicit operator AssetId(ItemNameId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator ItemNameId(AssetId id) => new ItemNameId(id.ToUInt32());
+        public static implicit operator TextId(ItemNameId id) => TextId.FromUInt32(id._value);
+        public static explicit operator ItemNameId(TextId id) => new ItemNameId(id.ToUInt32());
         public static implicit operator ItemNameId(UAlbion.Base.ItemName id) => ItemNameId.From(id);
 
-        public static ItemNameId ToItemNameId(int id) => new ItemNameId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static ItemNameId FromInt32(int id) => new ItemNameId(unchecked((uint)id));
+        public static ItemNameId FromUInt32(uint id) => new ItemNameId(id);
         public static bool operator ==(ItemNameId x, ItemNameId y) => x.Equals(y);
         public static bool operator !=(ItemNameId x, ItemNameId y) => !(x == y);
         public static bool operator ==(ItemNameId x, AssetId y) => x.Equals(y);
         public static bool operator !=(ItemNameId x, AssetId y) => !(x == y);
         public bool Equals(ItemNameId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
     }
 
     public class ItemNameIdConverter : TypeConverter

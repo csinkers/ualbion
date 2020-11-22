@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public MonsterGroupId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.MonsterGroup))
-                throw new ArgumentOutOfRangeException($"Tried to construct a MonsterGroupId with a type of {Type}");
-        }
-        public MonsterGroupId(int id)
+        MonsterGroupId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.MonsterGroup))
                 throw new ArgumentOutOfRangeException($"Tried to construct a MonsterGroupId with a type of {Type}");
         }
@@ -86,24 +80,22 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.MonsterGroup };
         public static MonsterGroupId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(MonsterGroupId id) => new AssetId(id._value);
-        public static implicit operator MonsterGroupId(AssetId id) => new MonsterGroupId((uint)id);
-        public static explicit operator uint(MonsterGroupId id) => id._value;
-        public static explicit operator int(MonsterGroupId id) => unchecked((int)id._value);
-        public static explicit operator MonsterGroupId(int id) => new MonsterGroupId(id);
+        public static implicit operator AssetId(MonsterGroupId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator MonsterGroupId(AssetId id) => new MonsterGroupId(id.ToUInt32());
         public static implicit operator MonsterGroupId(UAlbion.Base.MonsterGroup id) => MonsterGroupId.From(id);
 
-        public static MonsterGroupId ToMonsterGroupId(int id) => new MonsterGroupId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static MonsterGroupId FromInt32(int id) => new MonsterGroupId(unchecked((uint)id));
+        public static MonsterGroupId FromUInt32(uint id) => new MonsterGroupId(id);
         public static bool operator ==(MonsterGroupId x, MonsterGroupId y) => x.Equals(y);
         public static bool operator !=(MonsterGroupId x, MonsterGroupId y) => !(x == y);
         public static bool operator ==(MonsterGroupId x, AssetId y) => x.Equals(y);
         public static bool operator !=(MonsterGroupId x, AssetId y) => !(x == y);
         public bool Equals(MonsterGroupId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
     }
 
     public class MonsterGroupIdConverter : TypeConverter

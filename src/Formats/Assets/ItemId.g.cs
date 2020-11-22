@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public ItemId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type >= AssetType.Gold && Type <= AssetType.Item))
-                throw new ArgumentOutOfRangeException($"Tried to construct a ItemId with a type of {Type}");
-        }
-        public ItemId(int id)
+        ItemId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type >= AssetType.Gold && Type <= AssetType.Item))
                 throw new ArgumentOutOfRangeException($"Tried to construct a ItemId with a type of {Type}");
         }
@@ -88,24 +82,22 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.Item, AssetType.Gold, AssetType.Rations };
         public static ItemId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(ItemId id) => new AssetId(id._value);
-        public static implicit operator ItemId(AssetId id) => new ItemId((uint)id);
-        public static explicit operator uint(ItemId id) => id._value;
-        public static explicit operator int(ItemId id) => unchecked((int)id._value);
-        public static explicit operator ItemId(int id) => new ItemId(id);
+        public static implicit operator AssetId(ItemId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator ItemId(AssetId id) => new ItemId(id.ToUInt32());
         public static implicit operator ItemId(UAlbion.Base.Item id) => ItemId.From(id);
 
-        public static ItemId ToItemId(int id) => new ItemId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static ItemId FromInt32(int id) => new ItemId(unchecked((uint)id));
+        public static ItemId FromUInt32(uint id) => new ItemId(id);
         public static bool operator ==(ItemId x, ItemId y) => x.Equals(y);
         public static bool operator !=(ItemId x, ItemId y) => !(x == y);
         public static bool operator ==(ItemId x, AssetId y) => x.Equals(y);
         public static bool operator !=(ItemId x, AssetId y) => !(x == y);
         public bool Equals(ItemId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
         public readonly ItemNameId ToItemName() => new ItemNameId(AssetType.ItemName, Id);
     }
 

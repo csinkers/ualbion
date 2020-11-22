@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
@@ -9,27 +9,30 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.FixedSizeSprite)]
     public class FixedSizeSpriteLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
+        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
+            if (s == null) throw new ArgumentNullException(nameof(s));
             if (config == null) throw new ArgumentNullException(nameof(config));
+            if (s.Mode != SerializerMode.Reading)
+                throw new NotImplementedException("Fixed size sprite saving not currently supported");
 
+            var streamLength = s.BytesRemaining;
             if (streamLength == 0)
                 return null;
 
             int width = config.EffectiveWidth;
             int height = config.EffectiveHeight;
             if (width == 0)
-                width = (int) Math.Sqrt(streamLength);
+                width = (int)Math.Sqrt(streamLength);
             if (height == 0)
                 height = (int)streamLength / width;
 
             // ApiUtil.Assert(streamLength % width == 0);
             // ApiUtil.Assert(streamLength % (width * height) == 0);
 
-            // long initialPosition = br.BaseStream.Position;
+            // long initialPosition = s.BaseStream.Position;
             int spriteCount = Math.Max(1, unchecked((int)(streamLength / (width * height))));
-            height = (int) streamLength / (width * spriteCount);
+            height = (int)streamLength / (width * spriteCount);
 
             int currentY = 0;
             var pixelData = new byte[spriteCount * width * height];
@@ -39,14 +42,14 @@ namespace UAlbion.Formats.Parsers
             {
                 frames[n] = new AlbionSpriteFrame(0, currentY, width, height);
 
-                var bytes = br.ReadBytes(width * height);
+                var bytes = s.ByteArray(null, null, width * height);
                 for (int i = 0; i < width * height; i++)
                     pixelData[n * width * height + i] = bytes[i];
 
                 currentY += height;
             }
 
-            var sprite = new AlbionSprite(id.ToString(), width, height * spriteCount, true, pixelData, frames);
+            var sprite = new AlbionSprite(config.AssetId.ToString(), width, height * spriteCount, true, pixelData, frames);
             if (!config.Transposed)
                 return sprite;
 
@@ -62,7 +65,7 @@ namespace UAlbion.Formats.Parsers
                     new Span<byte>(pixelData, n * width * height, width * height));
             }
 
-            return new AlbionSprite(id.ToString(), height, width * spriteCount, true, pixelData, frames);
+            return new AlbionSprite(config.AssetId.ToString(), height, width * spriteCount, true, pixelData, frames);
         }
     }
 }

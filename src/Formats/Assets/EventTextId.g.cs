@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public EventTextId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.EventText))
-                throw new ArgumentOutOfRangeException($"Tried to construct a EventTextId with a type of {Type}");
-        }
-        public EventTextId(int id)
+        EventTextId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.EventText))
                 throw new ArgumentOutOfRangeException($"Tried to construct a EventTextId with a type of {Type}");
         }
@@ -86,26 +80,24 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.EventText };
         public static EventTextId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(EventTextId id) => new AssetId(id._value);
-        public static implicit operator EventTextId(AssetId id) => new EventTextId((uint)id);
-        public static explicit operator uint(EventTextId id) => id._value;
-        public static explicit operator int(EventTextId id) => unchecked((int)id._value);
-        public static explicit operator EventTextId(int id) => new EventTextId(id);
-        public static implicit operator TextId(EventTextId id) => new TextId(id._value);
-        public static explicit operator EventTextId(TextId id) => new EventTextId((uint)id);
+        public static implicit operator AssetId(EventTextId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator EventTextId(AssetId id) => new EventTextId(id.ToUInt32());
+        public static implicit operator TextId(EventTextId id) => TextId.FromUInt32(id._value);
+        public static explicit operator EventTextId(TextId id) => new EventTextId(id.ToUInt32());
         public static implicit operator EventTextId(UAlbion.Base.EventText id) => EventTextId.From(id);
 
-        public static EventTextId ToEventTextId(int id) => new EventTextId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static EventTextId FromInt32(int id) => new EventTextId(unchecked((uint)id));
+        public static EventTextId FromUInt32(uint id) => new EventTextId(id);
         public static bool operator ==(EventTextId x, EventTextId y) => x.Equals(y);
         public static bool operator !=(EventTextId x, EventTextId y) => !(x == y);
         public static bool operator ==(EventTextId x, AssetId y) => x.Equals(y);
         public static bool operator !=(EventTextId x, AssetId y) => !(x == y);
         public bool Equals(EventTextId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
     }
 
     public class EventTextIdConverter : TypeConverter

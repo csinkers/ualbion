@@ -21,7 +21,7 @@ namespace UAlbion.Formats.MapEvents
             switch (e.Property)
             {
                 case ChangeProperty.ReceiveOrRemoveItem:
-                    e._value = (uint)ItemId.SerdesU16(nameof(ItemId), new ItemId(e._value), AssetType.Item, mapping, s);
+                    e._value = ItemId.SerdesU16(nameof(ItemId), ItemId.FromUInt32(e._value), AssetType.Item, mapping, s).ToUInt32();
                     break;
                 default:
                     e._value = s.UInt16(nameof(Value), (ushort)e._value);
@@ -64,7 +64,7 @@ namespace UAlbion.Formats.MapEvents
             };
 
         public ItemId ItemId => Property == ChangeProperty.ReceiveOrRemoveItem
-            ? new ItemId(_value)
+            ? ItemId.FromUInt32(_value)
             : throw new InvalidOperationException("Tried to retrieve the ItemId of a non-item DataChangeEvent");
 
         public PlayerCondition Status => Property == ChangeProperty.Status 

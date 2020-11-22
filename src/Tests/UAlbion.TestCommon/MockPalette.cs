@@ -13,7 +13,7 @@ namespace UAlbion.TestCommon
             (uint)(x == 0 ? 0 : 0xff) << 24
         ).ToArray();
 
-        public int Id => 0;
+        public uint Id => 0;
         public string Name => "Mock";
         public IList<uint[]> GetCompletePalette() => new[] { _entries };
         public bool IsAnimated => false;

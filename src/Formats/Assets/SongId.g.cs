@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public SongId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.Song))
-                throw new ArgumentOutOfRangeException($"Tried to construct a SongId with a type of {Type}");
-        }
-        public SongId(int id)
+        SongId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.Song))
                 throw new ArgumentOutOfRangeException($"Tried to construct a SongId with a type of {Type}");
         }
@@ -86,24 +80,22 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.Song };
         public static SongId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(SongId id) => new AssetId(id._value);
-        public static implicit operator SongId(AssetId id) => new SongId((uint)id);
-        public static explicit operator uint(SongId id) => id._value;
-        public static explicit operator int(SongId id) => unchecked((int)id._value);
-        public static explicit operator SongId(int id) => new SongId(id);
+        public static implicit operator AssetId(SongId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator SongId(AssetId id) => new SongId(id.ToUInt32());
         public static implicit operator SongId(UAlbion.Base.Song id) => SongId.From(id);
 
-        public static SongId ToSongId(int id) => new SongId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static SongId FromInt32(int id) => new SongId(unchecked((uint)id));
+        public static SongId FromUInt32(uint id) => new SongId(id);
         public static bool operator ==(SongId x, SongId y) => x.Equals(y);
         public static bool operator !=(SongId x, SongId y) => !(x == y);
         public static bool operator ==(SongId x, AssetId y) => x.Equals(y);
         public static bool operator !=(SongId x, AssetId y) => !(x == y);
         public bool Equals(SongId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
         public readonly WaveLibraryId ToWaveLibrary() => new WaveLibraryId(AssetType.WaveLibrary, Id);
     }
 

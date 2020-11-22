@@ -94,10 +94,10 @@ namespace UAlbion.Game.Entities
                     {
                         var item = assets.LoadItem(itemId);
                         var texture = assets.LoadTexture(item.Icon);
-                        var subImageDetails = texture.GetSubImageDetails((int)item.Icon);
+                        var subImageDetails = texture.GetSubImageDetails(item.IconSubId);
 
                         AttachChild(new LinearItemTransition(
-                            item.Icon, (int)item.Icon,
+                            item.Icon, item.IconSubId,
                             fromNormPosition,
                             destPosition,
                             transitionTimeSeconds ?? config.DefaultTransitionTimeSeconds,
@@ -146,10 +146,10 @@ namespace UAlbion.Game.Entities
                     {
                         var item = assets.LoadItem(itemId);
                         var texture = assets.LoadTexture(item.Icon);
-                        var subImageDetails = texture.GetSubImageDetails((int)item.Icon);
+                        var subImageDetails = texture.GetSubImageDetails(item.IconSubId);
 
                         AttachChild(new GravityItemTransition(
-                            item.Icon, (int)item.Icon,
+                            item.Icon, item.IconSubId,
                             fromNormPosition,
                             window.UiToNormRelative(subImageDetails.Size),
                             continuation));

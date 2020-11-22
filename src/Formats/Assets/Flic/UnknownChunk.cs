@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using SerdesNet;
 
 namespace UAlbion.Formats.Assets.Flic
 {
@@ -9,10 +9,10 @@ namespace UAlbion.Formats.Assets.Flic
         public override FlicChunkType Type { get; }
         public UnknownChunk(FlicChunkType type) => Type = type;
         public override string ToString() => $"Unknown:{Type} ({Bytes.Length} bytes)";
-        protected override uint LoadChunk(uint length, BinaryReader br)
+        protected override uint LoadChunk(uint length, ISerializer s)
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
-            Bytes = br.ReadBytes((int)length);
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            Bytes = s.ByteArray(null, null, (int)length);
             return (uint)Bytes.Length;
         }
     }

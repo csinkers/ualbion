@@ -64,7 +64,7 @@ namespace UAlbion.Game
                 Current = map;
                 AttachChild(map);
 
-                Raise(new LogEvent(LogEvent.Level.Info, $"Loaded map {(int)pendingMapChange}: {pendingMapChange}"));
+                Raise(new LogEvent(LogEvent.Level.Info, $"Loaded map {pendingMapChange.Id}: {pendingMapChange}"));
                 Enqueue(new MapInitEvent());
 
                 if (!map.MapData.SongId.IsNone)

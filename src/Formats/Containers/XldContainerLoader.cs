@@ -1,17 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-using SerdesNet;
 using System.IO;
 using System.Linq;
 using System.Text;
+using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Config;
+using UAlbion.Formats.Assets.Save;
 
-namespace UAlbion.Formats.Assets.Save
+namespace UAlbion.Formats.Containers
 {
-    public static class XldLoader // TODO: Combine this with XldFile at some point.
+    [ContainerLoader(ContainerFormat.Xld)]
+    public class XldContainerLoader : IContainerLoader
     {
         const string MagicString = "XLD0I";
         public static int HeaderSize(int itemCount) => MagicString.Length + 3 + 4 * itemCount;
+
+        public ISerializer Open(string file, AssetInfo info)
+        {
+            if (info == null) throw new ArgumentNullException(nameof(info));
+            using var s = new AlbionReader(new BinaryReader(File.OpenRead(file)));
+            var bytes = LoadAsset(info.SubAssetId, s);
+            var ms = new MemoryStream(bytes);
+            return new AlbionReader(new BinaryReader(ms));
+        }
+
+        public static byte[] LoadAsset(int subItem, ISerializer s)
+        {
+            var lengths = HeaderSerdes(null, s);
+            if (subItem >= lengths.Length)
+                throw new ArgumentOutOfRangeException($"Tried to load subItem {subItem} from XLD, but it only contains {lengths.Length} items.");
+
+            long offset = s.Offset;
+            offset += lengths.Where((x, i) => i < subItem).Sum();
+            s.Seek(offset);
+            return s.ByteArray(null, null, lengths[subItem]);
+        }
 
         static int[] HeaderSerdes(int[] lengths, ISerializer s)
         {
@@ -50,7 +74,7 @@ namespace UAlbion.Formats.Assets.Save
                 case SerializerMode.WritingAnnotated:
                 {
                     using var tw = new StreamWriter(stream, Encoding.GetEncoding(850), 1024, true);
-                    var s = new AnnotatedFormatWriter(tw, (AnnotatedFormatWriter)parentSerializer);
+                    using var s = new AnnotatedFormatWriter(tw, (AnnotatedFormatWriter)parentSerializer);
                     s.Seek(fakeOffset);
                     func(s);
                     int length = (int)s.Offset - fakeOffset;
@@ -61,8 +85,8 @@ namespace UAlbion.Formats.Assets.Save
                 case SerializerMode.WritingJson:
                 {
                     using var tw = new StreamWriter(stream, Encoding.GetEncoding(850), 1024, true);
-                        var s = new JsonWriter(tw, (JsonWriter)parentSerializer);
-                        s.Seek(fakeOffset);
+                    using var s = new JsonWriter(tw, (JsonWriter)parentSerializer);
+                    s.Seek(fakeOffset);
                     func(s);
                     int length = (int)s.Offset - fakeOffset;
                     fakeOffset = (int)s.Offset;
@@ -73,7 +97,12 @@ namespace UAlbion.Formats.Assets.Save
             }
         }
 
-        public static void Serdes<TContext>(XldCategory category, ushort xldNumber, TContext context, ISerializer s, Action<int, int, TContext, ISerializer> func, IList<int> populatedIds)
+        public static void Serdes<TContext>(
+            XldCategory category,
+            ushort xldNumber,
+            TContext context,
+            ISerializer s,
+            Action<int, int, TContext, ISerializer> func, IList<int> populatedIds)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (s.Mode == SerializerMode.Reading)

@@ -65,13 +65,13 @@ namespace UAlbion.Tools.ImageReverser
             }
 
             var sb = new StringBuilder();
-            sb.AppendLine($"{asset.Filename}");
+            sb.AppendLine($"{asset.Parent.Filename}");
 
-            if (File.Exists(asset.Filename))
+            if (File.Exists(asset.Parent.Filename))
             {
-                var fileInfo = new FileInfo(asset.Filename);
+                var fileInfo = new FileInfo(asset.Parent.Filename);
                 sb.AppendLine($"File Size: {fileInfo.Length}");
-                sb.AppendLine($"XLD: {asset.Parent.Name}");
+                sb.AppendLine($"XLD: {asset.Parent.Filename}");
                 sb.AppendLine($"Layer: {asset.Parent.Format}");
                 sb.AppendLine($"Conf Width: {asset.EffectiveWidth}");
                 sb.AppendLine($"Conf Height: {asset.EffectiveHeight}");
@@ -85,9 +85,9 @@ namespace UAlbion.Tools.ImageReverser
 
         void AddToTree(AssetInfo asset)
         {
-            if (asset.Filename == null)
+            if (asset.Parent.Filename == null)
                 return;
-            var parts = asset.Filename.Split('\\');
+            var parts = asset.Parent.Filename.Split('\\');
             TreeNode node = _rootNode;
             foreach (var dir in parts.Take(parts.Length - 1)) // Ensure parent nodes exist
             {

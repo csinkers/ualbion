@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public SampleId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.Sample))
-                throw new ArgumentOutOfRangeException($"Tried to construct a SampleId with a type of {Type}");
-        }
-        public SampleId(int id)
+        SampleId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.Sample))
                 throw new ArgumentOutOfRangeException($"Tried to construct a SampleId with a type of {Type}");
         }
@@ -86,24 +80,22 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.Sample };
         public static SampleId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(SampleId id) => new AssetId(id._value);
-        public static implicit operator SampleId(AssetId id) => new SampleId((uint)id);
-        public static explicit operator uint(SampleId id) => id._value;
-        public static explicit operator int(SampleId id) => unchecked((int)id._value);
-        public static explicit operator SampleId(int id) => new SampleId(id);
+        public static implicit operator AssetId(SampleId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator SampleId(AssetId id) => new SampleId(id.ToUInt32());
         public static implicit operator SampleId(UAlbion.Base.Sample id) => SampleId.From(id);
 
-        public static SampleId ToSampleId(int id) => new SampleId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static SampleId FromInt32(int id) => new SampleId(unchecked((uint)id));
+        public static SampleId FromUInt32(uint id) => new SampleId(id);
         public static bool operator ==(SampleId x, SampleId y) => x.Equals(y);
         public static bool operator !=(SampleId x, SampleId y) => !(x == y);
         public static bool operator ==(SampleId x, AssetId y) => x.Equals(y);
         public static bool operator !=(SampleId x, AssetId y) => !(x == y);
         public bool Equals(SampleId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
     }
 
     public class SampleIdConverter : TypeConverter

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using SerdesNet;
 
 namespace UAlbion.Formats.Assets.Flic
 {
@@ -7,10 +7,10 @@ namespace UAlbion.Formats.Assets.Flic
     {
         public byte[] PixelData { get; private set; }
         public override FlicChunkType Type => FlicChunkType.FullUncompressed;
-        protected override uint LoadChunk(uint length, BinaryReader br)
+        protected override uint LoadChunk(uint length, ISerializer br)
         {
             if (br == null) throw new ArgumentNullException(nameof(br));
-            PixelData = br.ReadBytes((int)length);
+            PixelData = br.ByteArray(null, null, (int)length);
             return length;
         }
     }

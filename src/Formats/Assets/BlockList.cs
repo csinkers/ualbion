@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using SerdesNet;
 
+#pragma warning disable CA1710 // Identifiers should have correct suffix
 namespace UAlbion.Formats.Assets
 {
+    public class BlockList : List<Block> { }
     public class Block
     {
         int[] _underlay;
@@ -20,10 +22,10 @@ namespace UAlbion.Formats.Assets
             set => (_underlay, _overlay) = FormatUtil.FromPacked(Width, Height, value);
         }
 
-        public static IList<Block> Serdes(int _, IList<Block> blockList, ISerializer s)
+        public static BlockList Serdes(int _, BlockList blockList, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            blockList ??= new List<Block>();
+            blockList ??= new BlockList();
             if (s.Mode == SerializerMode.Reading)
             {
                 int j = 0;
@@ -76,3 +78,4 @@ namespace UAlbion.Formats.Assets
         }
     }
 } 
+#pragma warning restore CA1710 // Identifiers should have correct suffix

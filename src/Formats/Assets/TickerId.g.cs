@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public TickerId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.Ticker))
-                throw new ArgumentOutOfRangeException($"Tried to construct a TickerId with a type of {Type}");
-        }
-        public TickerId(int id)
+        TickerId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.Ticker))
                 throw new ArgumentOutOfRangeException($"Tried to construct a TickerId with a type of {Type}");
         }
@@ -86,23 +80,21 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.Ticker };
         public static TickerId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(TickerId id) => new AssetId(id._value);
-        public static implicit operator TickerId(AssetId id) => new TickerId((uint)id);
-        public static explicit operator uint(TickerId id) => id._value;
-        public static explicit operator int(TickerId id) => unchecked((int)id._value);
-        public static explicit operator TickerId(int id) => new TickerId(id);
+        public static implicit operator AssetId(TickerId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator TickerId(AssetId id) => new TickerId(id.ToUInt32());
 
-        public static TickerId ToTickerId(int id) => new TickerId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static TickerId FromInt32(int id) => new TickerId(unchecked((uint)id));
+        public static TickerId FromUInt32(uint id) => new TickerId(id);
         public static bool operator ==(TickerId x, TickerId y) => x.Equals(y);
         public static bool operator !=(TickerId x, TickerId y) => !(x == y);
         public static bool operator ==(TickerId x, AssetId y) => x.Equals(y);
         public static bool operator !=(TickerId x, AssetId y) => !(x == y);
         public bool Equals(TickerId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
     }
 
     public class TickerIdConverter : TypeConverter

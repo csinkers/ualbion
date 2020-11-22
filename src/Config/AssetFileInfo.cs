@@ -6,13 +6,14 @@ namespace UAlbion.Config
 {
     public class AssetFileInfo
     {
-        [JsonIgnore] public string Name { get; set; } // Just mirrors the dictionary key
+        [JsonIgnore] public string Filename { get; set; } // Just mirrors the dictionary key
         [JsonConverter(typeof(StringEnumConverter))]
         public ContainerFormat ContainerFormat { get; set; }
         public FileFormat Format { get; set; }
         public int? Width { get; set; }
         public int? Height { get; set; }
         public bool? Transposed { get; set; }
+        public string Sha256Hash { get; set; } // Currently only used for MAIN.EXE
         public IDictionary<int, AssetInfo> Assets { get; } = new Dictionary<int, AssetInfo>();
         // TODO: Text encoding
         public void PostLoad()
@@ -22,6 +23,7 @@ namespace UAlbion.Config
             foreach (var o in Assets)
             {
                 o.Value.Parent = this;
+                o.Value.SubAssetId = o.Key;
                 if (o.Value.Id == 0)
                     o.Value.Id = o.Key - lastKey + lastId;
 

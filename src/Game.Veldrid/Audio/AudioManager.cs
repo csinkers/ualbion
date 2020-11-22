@@ -79,7 +79,7 @@ namespace UAlbion.Game.Veldrid.Audio
                 var sample = assets.LoadSample(id);
                 if (sample == null)
                 {
-                    Raise(new LogEvent(LogEvent.Level.Error, $"Could not load audio sample {(int)id}: {id}"));
+                    Raise(new LogEvent(LogEvent.Level.Error, $"Could not load audio sample {id.Id}: {id}"));
                     _sampleCache[id] = null;
                     return null;
                 }
@@ -98,7 +98,7 @@ namespace UAlbion.Game.Veldrid.Audio
                 if (_waveLibCache.TryGetValue(key, out var buffer))
                     return buffer;
                 var assets = Resolve<IAssetManager>();
-                var sample = assets.LoadWaveLib(songId.ToWaveLibrary(), instrument);
+                var sample = assets.LoadWaveLib(songId.ToWaveLibrary())?.GetSample(instrument);
                 if (sample == null)
                 {
                     Raise(new LogEvent(LogEvent.Level.Error, $"Could not load audio sample {key}"));

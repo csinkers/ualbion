@@ -18,6 +18,7 @@ namespace UAlbion.Config
         // Always built dynamically based on the current set of active mods
         public static AssetMapping Global => GlobalIsThreadLocal ? ThreadLocalGlobal.Value : TrueGlobal;
         public static bool GlobalIsThreadLocal { get; set; } // Set to true for unit tests.
+        public const string UnknownType = "Unknown";
 
         readonly struct Range
         {
@@ -29,8 +30,8 @@ namespace UAlbion.Config
         class EnumInfo
         {
             [JsonIgnore] public Type EnumType { get; set; }
-            [JsonConverter(typeof(ToStringJsonConverter))]
-            public AssetType AssetType { get; set; }
+            [JsonIgnore] public string EnumTypeString { get; set; }
+            [JsonConverter(typeof(ToStringJsonConverter))] public AssetType AssetType { get; set; }
             public int EnumMin { get; set; }
             public int EnumMax { get; set; }
             public int Offset { get; set; }
@@ -40,13 +41,17 @@ namespace UAlbion.Config
 
             public EnumInfo() { } // For deserialisation
 
-            public EnumInfo(Type type, AssetType assetType, int mappedMin)
+            public EnumInfo(string typeString, AssetType assetType, int? lastMax)
             {
-                EnumType = type;
+                EnumTypeString = typeString;
+                EnumType = Type.GetType(typeString) ?? throw new InvalidOperationException();
+                if (!EnumType.IsEnum)
+                    throw new InvalidOperationException($"Tried to register type {EnumType} as an asset identifier for assets of type {assetType}, but it is not an enum.");
+
                 AssetType = assetType;
 
                 var values =
-                    Enum.GetValues(type)
+                    Enum.GetValues(EnumType)
                     .Cast<object>()
                     .Select(Convert.ToInt32)
                     .OrderBy(x => x)
@@ -54,7 +59,7 @@ namespace UAlbion.Config
 
                 EnumMin = values.Min();
                 EnumMax = values.Max();
-                Offset = mappedMin - EnumMin;
+                Offset = (lastMax ?? (EnumMin-1)) + 1 - EnumMin;
                 Ranges = values.Aggregate(new List<Range>(), (acc, x) =>
                     {
                         if (acc.Count == 0) acc.Add(new Range(x, x));
@@ -98,6 +103,26 @@ namespace UAlbion.Config
         /// </summary>
         /// <param name="id">The asset id to convert</param>
         /// <returns>The type of the enumeration and numerical value of the enum member corresponding to the asset id</returns>
+        public (string, int) IdToEnumString(AssetId id)
+        {
+            foreach (var info in _byAssetType[(byte)id.Type])
+            {
+                if (info.MappedMax < id.Id)
+                    continue;
+
+                ApiUtil.Assert(id.Id <= info.MappedMax, $"AssetId ({id.Type}, {id.Id}) is outside the mapped range.");
+                return (info.EnumTypeString, id.Id - info.Offset);
+            }
+
+            ApiUtil.Assert($"AssetId ({id.Type}, {id.Id}) is outside the mapped range.");
+            return (UnknownType, id.Id);
+        }
+
+        /// <summary>
+        /// Convert a run-time AssetId to its unambiguous enum representation.
+        /// </summary>
+        /// <param name="id">The asset id to convert</param>
+        /// <returns>The type of the enumeration and numerical value of the enum member corresponding to the asset id</returns>
         public (Type, int) IdToEnum(AssetId id)
         {
             foreach (var info in _byAssetType[(byte)id.Type])
@@ -121,9 +146,9 @@ namespace UAlbion.Config
         public string IdToName(AssetId id)
         {
             var (enumType, enumValue) = IdToEnum(id);
-            return enumType == typeof(int) 
-                ? $"{id.Type}.??{enumValue}??" 
-                : enumType.Name + "." + Enum.GetName(enumType, enumValue);
+            return enumType.IsEnum
+                ? enumType.Name + "." + Enum.GetName(enumType, enumValue)
+                : enumValue == 0 ? "None" : $"{id.Type}.??{enumValue}??";
         }
 
         /// <summary>
@@ -150,10 +175,25 @@ namespace UAlbion.Config
             }
         }
 
+        public AssetId EnumToId((Type, int) value) => EnumToId(value.Item1, value.Item2);
         public AssetId EnumToId(Type enumType, int enumValue)
         {
+            if (enumType == typeof(int) && enumValue == 0)
+                return AssetId.None;
+
             if (!_byEnumType.TryGetValue(enumType, out var info))
                 throw new ArgumentOutOfRangeException($"Type {enumType} is not currently mapped.");
+
+            if (enumValue < info.EnumMin)
+            {
+                if (enumValue == 0)
+                    return AssetId.None;
+                throw new ArgumentOutOfRangeException($"Value {enumValue} of type {enumType} is out of range (below minimum value {info.EnumMin})");
+            }
+
+            if (enumValue > info.EnumMax)
+                throw new ArgumentOutOfRangeException($"Value {enumValue} of type {enumType} is out of range (above maximum value {info.EnumMin})");
+
             return new AssetId(info.AssetType, enumValue + info.Offset);
         }
 
@@ -170,22 +210,27 @@ namespace UAlbion.Config
         /// </summary>
         /// <param name="enumType">The enum type to map</param>
         /// <param name="assetType">The type of asset that the enum identifies</param>
-        public AssetMapping RegisterAssetType(Type enumType, AssetType assetType)
-        {
-            if (enumType == null) throw new ArgumentNullException(nameof(enumType));
-            if (!enumType.IsEnum)
-                throw new InvalidOperationException($"Tried to register type {enumType} as an asset identifier for assets of type {assetType}, but it is not an enum.");
+        public AssetMapping RegisterAssetType(Type enumType, AssetType assetType) => RegisterAssetType(enumType?.AssemblyQualifiedName, assetType);
 
-            if (_byEnumType.ContainsKey(enumType))
-                throw new InvalidOperationException($"Tried to register type {enumType} as an asset identifier for assets of type {assetType}, but it is already registered.");
+        /// <summary>
+        /// Register an enum type whose values should be mapped into the global asset namespaces.
+        /// </summary>
+        /// <param name="enumName">The enum type to map</param>
+        /// <param name="assetType">The type of asset that the enum identifies</param>
+        public AssetMapping RegisterAssetType(string enumName, AssetType assetType)
+        {
+            if (enumName == null) throw new ArgumentNullException(nameof(enumName));
 
             var mapping = _byAssetType[(byte)assetType];
-            var info = new EnumInfo(enumType, assetType, (mapping.LastOrDefault()?.MappedMax ?? -1) + 1);
+            var info = new EnumInfo(enumName, assetType, mapping.LastOrDefault()?.MappedMax);
+            if (_byEnumType.ContainsKey(info.EnumType))
+                throw new InvalidOperationException($"Tried to register type {enumName} as an asset identifier for assets of type {assetType}, but it is already registered.");
+
             mapping.Add(info);
-            _byEnumType[enumType] = info;
+            _byEnumType[info.EnumType] = info;
 
             foreach(var value in
-                Enum.GetValues(enumType)
+                Enum.GetValues(info.EnumType)
                 .Cast<object>()
                 .Select(x => (x.ToString(), Convert.ToInt32(x, CultureInfo.InvariantCulture))))
             {
@@ -202,7 +247,7 @@ namespace UAlbion.Config
 
         public IEnumerable<AssetId> EnumeratAssetsOfType(AssetType type)
         {
-            foreach (var info in  _byAssetType[(byte)type]) // Nested for loops go brrr
+            foreach (var info in  _byAssetType[(byte)type]) // Nested for-loops go brrr
                 foreach (var range in info.Ranges)
                     for (int i = range.From; i <= range.To; i++)
                         yield return new AssetId(type, i);
@@ -223,7 +268,7 @@ namespace UAlbion.Config
             foreach (var info in other._byAssetType.SelectMany(x => x))
             {
                 if (!_byEnumType.ContainsKey(info.EnumType))
-                    RegisterAssetType(info.EnumType, info.AssetType);
+                    RegisterAssetType(info.EnumTypeString, info.AssetType);
             }
         }
 
@@ -233,6 +278,7 @@ namespace UAlbion.Config
             int index = s.LastIndexOf('.');
             var valueName = index == -1 ? s : s.Substring(index + 1);
             var typeName = index == -1 ? null : s.Substring(0, index);
+            // TODO: Use typeName to resolve ambiguous matches
 
             if (!_byName.TryGetValue(valueName, out var matches))
                 throw new KeyNotFoundException($"Could not parse \"{s}\" as an asset id enum");

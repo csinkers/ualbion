@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public AutomapId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.Automap))
-                throw new ArgumentOutOfRangeException($"Tried to construct a AutomapId with a type of {Type}");
-        }
-        public AutomapId(int id)
+        AutomapId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.Automap))
                 throw new ArgumentOutOfRangeException($"Tried to construct a AutomapId with a type of {Type}");
         }
@@ -86,24 +80,22 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.Automap };
         public static AutomapId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(AutomapId id) => new AssetId(id._value);
-        public static implicit operator AutomapId(AssetId id) => new AutomapId((uint)id);
-        public static explicit operator uint(AutomapId id) => id._value;
-        public static explicit operator int(AutomapId id) => unchecked((int)id._value);
-        public static explicit operator AutomapId(int id) => new AutomapId(id);
-        public static implicit operator AutomapId(UAlbion.Base.AutoMap id) => AutomapId.From(id);
+        public static implicit operator AssetId(AutomapId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator AutomapId(AssetId id) => new AutomapId(id.ToUInt32());
+        public static implicit operator AutomapId(UAlbion.Base.Automap id) => AutomapId.From(id);
 
-        public static AutomapId ToAutomapId(int id) => new AutomapId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static AutomapId FromInt32(int id) => new AutomapId(unchecked((uint)id));
+        public static AutomapId FromUInt32(uint id) => new AutomapId(id);
         public static bool operator ==(AutomapId x, AutomapId y) => x.Equals(y);
         public static bool operator !=(AutomapId x, AutomapId y) => !(x == y);
         public static bool operator ==(AutomapId x, AssetId y) => x.Equals(y);
         public static bool operator !=(AutomapId x, AssetId y) => !(x == y);
         public bool Equals(AutomapId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
     }
 
     public class AutomapIdConverter : TypeConverter

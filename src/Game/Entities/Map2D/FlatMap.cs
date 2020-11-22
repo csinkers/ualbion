@@ -24,10 +24,8 @@ namespace UAlbion.Game.Entities.Map2D
         public Vector2 LogicalSize => new Vector2(_logicalMap.Width, _logicalMap.Height);
         public Vector3 TileSize { get; private set; }
         public IMapData MapData => _mapData;
-
         public float BaseCameraHeight => 1.0f;
-
-        public override string ToString() { return $"FlatMap: {MapId} ({(int)MapId})"; }
+        public override string ToString() { return $"FlatMap: {MapId} ({MapId.Id})"; }
 
         public FlatMap(MapId mapId, MapData2D mapData)
         {

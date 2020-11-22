@@ -1,17 +1,20 @@
 ﻿using System;
-using System.IO;
+using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Labyrinth;
 
 namespace UAlbion.Formats.Parsers
 {
     [AssetLoader(FileFormat.LabyrinthData)]
-    public class LabyrinthDataLoader : IAssetLoader
+    public class LabyrinthDataLoader : IAssetLoader<LabyrinthData>
     {
-        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
+        public LabyrinthData Serdes(LabyrinthData existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
-            return LabyrinthData.Serdes(config.Id, null, mapping, new AlbionReader(br, streamLength));
+            return LabyrinthData.Serdes(config.Id, null, mapping, s);
         }
+
+        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+            => Serdes(existing as LabyrinthData, config, mapping, s);
     }
 }

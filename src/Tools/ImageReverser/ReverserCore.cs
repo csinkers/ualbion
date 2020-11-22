@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UAlbion.Config;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Tools.ImageReverser
 {
@@ -17,19 +17,27 @@ namespace UAlbion.Tools.ImageReverser
         public IDictionary<string, AssetFileInfo> ContainerFiles { get; } = new Dictionary<string, AssetFileInfo>();
         public IList<AlbionPalette> Palettes { get; } = new List<AlbionPalette>();
 
+        AlbionPalette LoadPalette(string file, AssetInfo assetInfo)
+        {
+            using var stream = File.Open(file, FileMode.Open);
+            using var br = new BinaryReader(stream);
+            using var s = new AlbionReader(br, stream.Length);
+            return new AlbionPalette(s, assetInfo);
+        }
+
         public ReverserCore(GeneralConfig generalConfig, AssetConfig config)
         {
             GeneralConfig = generalConfig;
             Config = config;
 
-            BaseExportDirectory = Path.GetFullPath(Path.Combine(GeneralConfig.BasePath, GeneralConfig.ExportedXldPath));
+            BaseExportDirectory = Path.GetFullPath(GeneralConfig.ResolvePath("$(EXPORT)/raw"));
             var files = Directory.EnumerateFiles(BaseExportDirectory, "*.*", SearchOption.AllDirectories);
 
             var fileLookup =
                 (from t in config.Types
                 from f in t.Value.Files
-                select (f.Value.Name, f.Value))
-                .ToDictionary(x => x.Name, x => x.Value);
+                select (f.Value.Filename, f.Value))
+                .ToDictionary(x => x.Filename, x => x.Value);
 
             foreach (var file in files)
             {
@@ -59,10 +67,10 @@ namespace UAlbion.Tools.ImageReverser
                     fileInfo.Assets[number] = new AssetInfo();
 
                 AssetInfo asset = fileInfo.Assets[number];
-                asset.Filename = relative;
+                asset.Parent.Filename = relative;
             }
 
-            var commonPalette = File.ReadAllBytes(Path.Combine(GeneralConfig.BasePath, GeneralConfig.XldPath, "PALETTE.000"));
+            var commonPalette = LoadPalette(GeneralConfig.ResolvePath("$(ALBION)/CD/XLDLIBS/PALETTE.000"), new AssetInfo());
 
             var palettesPath = Path.Combine(BaseExportDirectory, "PALETTE0.XLD");
             files = Directory.EnumerateFiles(palettesPath, "*.*", SearchOption.AllDirectories);
@@ -70,14 +78,8 @@ namespace UAlbion.Tools.ImageReverser
             {
                 var a = file.Substring(palettesPath.Length + 1, 2);
                 ushort paletteNumber = ushort.Parse(a);
-                var assetConfig = fileLookup["PALETTE0"].Assets[paletteNumber];
-                var paletteName = assetConfig.Name;
-                if (string.IsNullOrEmpty(paletteName))
-                    paletteName = file.Substring(BaseExportDirectory.Length + 1);
-
-                using var stream = File.Open(file, FileMode.Open);
-                using var br = new BinaryReader(stream);
-                var palette = new AlbionPalette(br, (int)br.BaseStream.Length, new PaletteId(AssetType.Palette, paletteNumber));
+                var assetInfo = fileLookup["PALETTE0"].Assets[paletteNumber];
+                var palette = LoadPalette(file, assetInfo);
                 palette.SetCommonPalette(commonPalette);
                 Palettes.Add(palette);
             }

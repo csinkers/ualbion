@@ -89,7 +89,6 @@
       "        public readonly SpriteId ToFullBodyPicture() => new SpriteId(AssetType.FullBodyPicture, Id);"
     ],
     "SongId": [ "        public readonly WaveLibraryId ToWaveLibrary() => new WaveLibraryId(AssetType.WaveLibrary, Id);" ],
-    "ItemId": [ "        public readonly ItemNameId ToItemName() => new ItemNameId(AssetType.ItemName, Id);" ],
-    "SpriteId": [ "        public static implicit operator SpriteId(UAlbion.Base.CoreSprite id) => SpriteId.From(id);" ]
+    "ItemId": [ "        public readonly ItemNameId ToItemName() => new ItemNameId(AssetType.ItemName, Id);" ]
   }
 }

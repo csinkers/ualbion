@@ -71,8 +71,8 @@ namespace UAlbion.CodeGenerator
             var sb = new StringBuilder();
             foreach (var parent in assets.ParentsByAssetId[name])
             {
-                sb.AppendLine($"        public static implicit operator {parent}({name} id) => new {parent}(id._value);");
-                sb.AppendLine($"        public static explicit operator {name}({parent} id) => new {name}((uint)id);");
+                sb.AppendLine($"        public static implicit operator {parent}({name} id) => {parent}.FromUInt32(id._value);");
+                sb.AppendLine($"        public static explicit operator {name}({parent} id) => new {name}(id.ToUInt32());");
             }
             return sb.ToString();
         }
@@ -141,15 +141,9 @@ namespace {destNamespace}
             _value = (uint)type << 24 | (uint)id;
         }}
 
-        public {name}(uint id) 
-        {{ 
-            _value = id;
-            if (!({condition2}))
-                throw new ArgumentOutOfRangeException($""Tried to construct a {name} with a type of {{Type}}"");
-        }}
-        public {name}(int id)
+        {name}(uint id) 
         {{
-            _value = unchecked((uint)id);
+            _value = id;
             if (!({condition2}))
                 throw new ArgumentOutOfRangeException($""Tried to construct a {name} with a type of {{Type}}"");
         }}
@@ -201,23 +195,21 @@ namespace {destNamespace}
         static AssetType[] _validTypes = {{ {string.Join(", ", types.Select(x => "AssetType." + x))} }};
         public static {name} Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId({name} id) => new AssetId(id._value);
-        public static implicit operator {name}(AssetId id) => new {name}((uint)id);
-        public static explicit operator uint({name} id) => id._value;
-        public static explicit operator int({name} id) => unchecked((int)id._value);
-        public static explicit operator {name}(int id) => new {name}(id);
+        public static implicit operator AssetId({name} id) => AssetId.FromUInt32(id._value);
+        public static implicit operator {name}(AssetId id) => new {name}(id.ToUInt32());
 {familyCasts}{compoundCasts}{enumCasts}
-        public static {name} To{name}(int id) => new {name}(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static {name} FromInt32(int id) => new {name}(unchecked((uint)id));
+        public static {name} FromUInt32(uint id) => new {name}(id);
         public static bool operator ==({name} x, {name} y) => x.Equals(y);
         public static bool operator !=({name} x, {name} y) => !(x == y);
         public static bool operator ==({name} x, AssetId y) => x.Equals(y);
         public static bool operator !=({name} x, AssetId y) => !(x == y);
         public bool Equals({name} other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
 {extras}    }}
 
     public class {name}Converter : TypeConverter

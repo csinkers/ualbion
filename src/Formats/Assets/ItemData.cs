@@ -2,13 +2,13 @@
 using System.Text;
 using Newtonsoft.Json;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets
 {
     public sealed class ItemData : IItem
     {
+        public const int SizeOnDisk = 40;
         public ItemData(ItemId id) => Id = id;
         public ItemId Id { get; }
         public byte Unknown { get; set; }   //  0 Always 0
@@ -51,7 +51,7 @@ namespace UAlbion.Formats.Assets
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append($"{(int)Id,3} {Id,-19} {TypeId} {SlotType}"); 
+            sb.Append($"{Id,-19} {TypeId} {SlotType}"); 
 
             if (AttributeBonus != 0)
                 sb.Append($"{AttributeType}+{AttributeBonus} ");
@@ -133,11 +133,11 @@ namespace UAlbion.Formats.Assets
             return sb.ToString();
         }
 
-        public static ItemData Serdes(int i, ItemData item, AssetMapping mapping, ISerializer s)
+        public static ItemData Serdes(AssetInfo info, ItemData item, AssetMapping mapping, ISerializer s)
         {
+            if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));
-            item ??= new ItemData((ItemId)i);
-            ApiUtil.Assert(i == (int)item.Id);
+            item ??= new ItemData(info.AssetId);
             item.Unknown = s.UInt8(nameof(item.Unknown), item.Unknown);
             item.TypeId = s.EnumU8(nameof(item.TypeId), item.TypeId);
             item.SlotType = ((PersistedItemSlotId)s.UInt8(nameof(item.SlotType), (byte)item.SlotType.ToPersisted())).ToMemory();
@@ -169,7 +169,8 @@ namespace UAlbion.Formats.Assets
             item.IconAnim = s.UInt8(nameof(item.IconAnim), item.IconAnim);
             item.Weight = s.UInt16(nameof(item.Weight), item.Weight);
             item.Value = s.UInt16(nameof(item.Value), item.Value);
-            item.Icon = SpriteId.SerdesU16(nameof(item.Icon), item.Icon, AssetType.TilesetGraphics, mapping, s);
+            item.Icon = SpriteId.From(Base.ItemGraphics.ItemSprites); // TODO: Allow mods to add extra sprite sheets via specifying their ID in the AssetInfo.
+            item.IconSubId = s.UInt16(nameof(item.IconSubId), (ushort)item.IconSubId);
             item.Class = s.EnumU16(nameof(item.Class), item.Class);
             item.Race = s.UInt16(nameof(item.Race), item.Race);
             return item;
@@ -178,6 +179,6 @@ namespace UAlbion.Formats.Assets
         bool Equals(ItemData other) => Id == other.Id;
         public bool Equals(IContents obj) => Equals((object) obj);
         public override bool Equals(object obj) => obj is ItemData other && Equals(other);
-        public override int GetHashCode() => (int) Id;
+        public override int GetHashCode() => Id.GetHashCode();
     }
 }

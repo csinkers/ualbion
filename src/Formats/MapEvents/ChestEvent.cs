@@ -15,11 +15,11 @@ namespace UAlbion.Formats.MapEvents
             if (args == null) throw new ArgumentNullException(nameof(args));
             return new ChestEvent(TextId.None)
             {
-                ChestId = (ChestId)int.Parse(args[1], CultureInfo.InvariantCulture),
+                ChestId = ChestId.Parse(args[1]),
                 PickDifficulty = args.Length > 2 ? byte.Parse(args[2], CultureInfo.InvariantCulture) : (byte)0,
                 InitialTextId =  args.Length > 3 ? byte.Parse(args[3], CultureInfo.InvariantCulture) : (byte)255,
                 UnlockedTextId = args.Length > 4 ? byte.Parse(args[4], CultureInfo.InvariantCulture) : (byte)255,
-                KeyItemId = args.Length > 5 ? new ItemId(int.Parse(args[5], CultureInfo.InvariantCulture)) : ItemId.None,
+                KeyItemId = args.Length > 5 ? ItemId.Parse(args[5]) : ItemId.None,
             };
         }
 

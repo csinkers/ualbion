@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.IO;
+using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 
@@ -8,9 +8,9 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.Font)]
     public class FontSpriteLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
+        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
-            var font = (AlbionSprite)new FixedSizeSpriteLoader().Load(br, streamLength, mapping, id, config);
+            var font = (AlbionSprite)new FixedSizeSpriteLoader().Serdes(existing, config, mapping, s);
             var frames = new List<AlbionSpriteFrame>();
 
             // Fix up sub-images for variable size

@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public VideoId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.Video))
-                throw new ArgumentOutOfRangeException($"Tried to construct a VideoId with a type of {Type}");
-        }
-        public VideoId(int id)
+        VideoId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.Video))
                 throw new ArgumentOutOfRangeException($"Tried to construct a VideoId with a type of {Type}");
         }
@@ -86,24 +80,22 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.Video };
         public static VideoId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(VideoId id) => new AssetId(id._value);
-        public static implicit operator VideoId(AssetId id) => new VideoId((uint)id);
-        public static explicit operator uint(VideoId id) => id._value;
-        public static explicit operator int(VideoId id) => unchecked((int)id._value);
-        public static explicit operator VideoId(int id) => new VideoId(id);
+        public static implicit operator AssetId(VideoId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator VideoId(AssetId id) => new VideoId(id.ToUInt32());
         public static implicit operator VideoId(UAlbion.Base.Video id) => VideoId.From(id);
 
-        public static VideoId ToVideoId(int id) => new VideoId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static VideoId FromInt32(int id) => new VideoId(unchecked((uint)id));
+        public static VideoId FromUInt32(uint id) => new VideoId(id);
         public static bool operator ==(VideoId x, VideoId y) => x.Equals(y);
         public static bool operator !=(VideoId x, VideoId y) => !(x == y);
         public static bool operator ==(VideoId x, AssetId y) => x.Equals(y);
         public static bool operator !=(VideoId x, AssetId y) => !(x == y);
         public bool Equals(VideoId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
     }
 
     public class VideoIdConverter : TypeConverter

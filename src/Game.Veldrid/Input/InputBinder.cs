@@ -123,13 +123,13 @@ namespace UAlbion.Game.Veldrid.Input
 
                 if (action == "!loadprevmap")
                 {
-                    _mapId = new MapId((uint)_mapId - 1);
+                    _mapId = MapId.FromUInt32(_mapId.ToUInt32() - 1);
                     Raise(new LoadMapEvent(_mapId));
                     continue;
                 }
                 if (action == "!loadnextmap")
                 {
-                    _mapId = new MapId((uint)_mapId + 1);
+                    _mapId = MapId.FromUInt32(_mapId.ToUInt32() + 1);
                     Raise(new LoadMapEvent(_mapId));
                     continue;
                 }

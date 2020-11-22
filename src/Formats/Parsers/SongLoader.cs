@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using SerdesNet;
 using UAlbion.Config;
 
 namespace UAlbion.Formats.Parsers
@@ -7,10 +7,10 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.Song)]
     public class SongLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
+        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
-            return br.ReadBytes((int) streamLength);
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            return s.ByteArray(null, null, (int)s.BytesRemaining);
         }
     }
 }

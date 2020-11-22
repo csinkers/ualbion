@@ -9,6 +9,10 @@ namespace UAlbion.Formats.Assets
         public const int MaxSpellsPerClass = 30;
         public const Base.SystemText SystemTextOffset = Base.SystemText.Spell0_0_ThornSnare; // TODO: Config?
 
+        // TODO!
+        public SpellClass Class { get; } // spellId / SpellData.MaxSpellsPerClass;
+        public int OffsetInClass { get; } // spellId % SpellData.MaxSpellsPerClass;
+        public StringId Name { get; } // (Base.SystemText)((int)spellId + (int)SpellData.SystemTextOffset);
         public SpellEnvironments Environments { get; set; }
         public byte Cost { get; set; }
         public byte LevelRequirement { get; set; }

@@ -1,18 +1,16 @@
-﻿using System;
-using System.IO;
+﻿using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Formats.Parsers
 {
     [AssetLoader(FileFormat.Tileset)]
-    public class TilesetDataLoader : IAssetLoader
+    public class TilesetDataLoader : IAssetLoader<TilesetData>
     {
-        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
-        {
-            if (br == null) throw new ArgumentNullException(nameof(br));
-            if (config == null) throw new ArgumentNullException(nameof(config));
-            return TilesetData.Serdes(null, new AlbionReader(br, streamLength), config);
-        }
+        public TilesetData Serdes(TilesetData existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+            => TilesetData.Serdes(null, s, config);
+
+        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+            => Serdes(existing as TilesetData, config, mapping, s);
     }
 }

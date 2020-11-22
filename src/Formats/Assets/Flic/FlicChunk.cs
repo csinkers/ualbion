@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using SerdesNet;
 using UAlbion.Api;
 
 namespace UAlbion.Formats.Assets.Flic
@@ -8,17 +8,17 @@ namespace UAlbion.Formats.Assets.Flic
     {
         const uint ChunkHeaderSize = 6;
         public abstract FlicChunkType Type { get; }
-        protected abstract uint LoadChunk(uint length, BinaryReader br);
+        protected abstract uint LoadChunk(uint length, ISerializer br);
 
-        public static FlicChunk Load(BinaryReader br, int width, int height) 
+        public static FlicChunk Load(ISerializer s, int width, int height) 
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
+            if (s == null) throw new ArgumentNullException(nameof(s));
 
-            var chunkSizeOffset = br.BaseStream.Position;
-            uint chunkSize = br.ReadUInt32();
+            var chunkSizeOffset = s.Offset;
+            uint chunkSize = s.UInt32(null, 0);
             if ((chunkSize & 0x1) != 0)
                 chunkSize++;
-            FlicChunkType type = (FlicChunkType)br.ReadUInt16();
+            FlicChunkType type = (FlicChunkType)s.UInt16(null, 0);
 
             // Chunk
             FlicChunk c = type switch
@@ -42,16 +42,16 @@ namespace UAlbion.Formats.Assets.Flic
                 chunkSize += 2;
             }
 
-            chunkSize = c.LoadChunk(chunkSize - ChunkHeaderSize, br) + ChunkHeaderSize;
+            chunkSize = c.LoadChunk(chunkSize - ChunkHeaderSize, s) + ChunkHeaderSize;
 
-            var actualChunkSize = br.BaseStream.Position - chunkSizeOffset;
+            var actualChunkSize = s.Offset - chunkSizeOffset;
 
             if (actualChunkSize - chunkSize < 4) // pad
             {
                 for (long i = chunkSize - actualChunkSize; i != 0; i--)
-                    br.ReadByte();
+                    s.UInt8(null, 0);
 
-                actualChunkSize = br.BaseStream.Position - chunkSizeOffset;
+                actualChunkSize = s.Offset - chunkSizeOffset;
             }
 
             ApiUtil.Assert(actualChunkSize == chunkSize);

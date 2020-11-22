@@ -81,7 +81,7 @@ namespace UAlbion.Game
 
             var oldId = Resolve<IPaletteManager>().Palette?.Id;
             if (oldId.HasValue)
-                _previousPaletteId = (PaletteId)oldId.Value;
+                _previousPaletteId = PaletteId.FromUInt32(oldId.Value);
             Raise(new LoadRawPaletteEvent($"P:V:{_id}", _player.Palette));
         }
 

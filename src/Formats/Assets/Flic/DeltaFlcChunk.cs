@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using SerdesNet;
 
 namespace UAlbion.Formats.Assets.Flic
 {
@@ -8,15 +8,15 @@ namespace UAlbion.Formats.Assets.Flic
         DeltaFlcLine[] _lines;
         public override FlicChunkType Type => FlicChunkType.DeltaWordOrientedRle;
 
-        protected override uint LoadChunk(uint length, BinaryReader br)
+        protected override uint LoadChunk(uint length, ISerializer s)
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
-            var start = br.BaseStream.Position;
-            ushort lineCount = br.ReadUInt16();
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            var start = s.Offset;
+            ushort lineCount = s.UInt16(null, 0);
             _lines ??= new DeltaFlcLine[lineCount];
             for (int i = 0; i < lineCount; i++)
-                _lines[i] = new DeltaFlcLine(br);
-            return (ushort)(br.BaseStream.Position - start);
+                _lines[i] = new DeltaFlcLine(s);
+            return (ushort)(s.Offset - start);
         }
 
         public void Apply(byte[] buffer8, int width)

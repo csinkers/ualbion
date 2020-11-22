@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Formats;
 
@@ -8,6 +8,6 @@ namespace UAlbion.Game.Assets
     {
         IAssetLoader GetLoader(FileFormat type);
         IAssetLoader<T> GetLoader<T>(FileFormat type) where T : class;
-        object Load(BinaryReader br, AssetId key, int streamLength, AssetMapping mapping, AssetInfo config);
+        object Load(AssetInfo config, AssetMapping mapping, ISerializer s);
     }
 }

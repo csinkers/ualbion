@@ -1,6 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
+using SerdesNet;
 
 namespace UAlbion.Formats.Assets.Flic
 {
@@ -15,22 +15,22 @@ namespace UAlbion.Formats.Assets.Flic
         public sbyte SignedCount { get; }
         public ushort[] PixelData { get; }
 
-        public DeltaFlcLineToken(BinaryReader br)
+        public DeltaFlcLineToken(ISerializer s)
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
-            ColumnSkipCount = br.ReadByte();
-            SignedCount = br.ReadSByte(); // +ve = verbatim, -ve = RLE
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            ColumnSkipCount = s.UInt8(null, 0);
+            SignedCount = s.Int8(null, 0); // +ve = verbatim, -ve = RLE
 
             if (SignedCount > 0)
             {
                 PixelData ??= new ushort[SignedCount];
                 for (int j = 0; j < SignedCount; j++)
-                    PixelData[j] = br.ReadUInt16();
+                    PixelData[j] = s.UInt16(null, 0);
             }
             else
             {
                 PixelData ??= new ushort[1];
-                PixelData[0] = br.ReadUInt16();
+                PixelData[0] = s.UInt16(null, 0);
             }
         }
     }

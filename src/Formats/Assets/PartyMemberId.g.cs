@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public PartyMemberId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.PartyMember))
-                throw new ArgumentOutOfRangeException($"Tried to construct a PartyMemberId with a type of {Type}");
-        }
-        public PartyMemberId(int id)
+        PartyMemberId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.PartyMember))
                 throw new ArgumentOutOfRangeException($"Tried to construct a PartyMemberId with a type of {Type}");
         }
@@ -86,26 +80,24 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.PartyMember };
         public static PartyMemberId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(PartyMemberId id) => new AssetId(id._value);
-        public static implicit operator PartyMemberId(AssetId id) => new PartyMemberId((uint)id);
-        public static explicit operator uint(PartyMemberId id) => id._value;
-        public static explicit operator int(PartyMemberId id) => unchecked((int)id._value);
-        public static explicit operator PartyMemberId(int id) => new PartyMemberId(id);
-        public static implicit operator CharacterId(PartyMemberId id) => new CharacterId(id._value);
-        public static explicit operator PartyMemberId(CharacterId id) => new PartyMemberId((uint)id);
+        public static implicit operator AssetId(PartyMemberId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator PartyMemberId(AssetId id) => new PartyMemberId(id.ToUInt32());
+        public static implicit operator CharacterId(PartyMemberId id) => CharacterId.FromUInt32(id._value);
+        public static explicit operator PartyMemberId(CharacterId id) => new PartyMemberId(id.ToUInt32());
         public static implicit operator PartyMemberId(UAlbion.Base.PartyMember id) => PartyMemberId.From(id);
 
-        public static PartyMemberId ToPartyMemberId(int id) => new PartyMemberId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static PartyMemberId FromInt32(int id) => new PartyMemberId(unchecked((uint)id));
+        public static PartyMemberId FromUInt32(uint id) => new PartyMemberId(id);
         public static bool operator ==(PartyMemberId x, PartyMemberId y) => x.Equals(y);
         public static bool operator !=(PartyMemberId x, PartyMemberId y) => !(x == y);
         public static bool operator ==(PartyMemberId x, AssetId y) => x.Equals(y);
         public static bool operator !=(PartyMemberId x, AssetId y) => !(x == y);
         public bool Equals(PartyMemberId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
         public readonly SpriteId ToSmallPartyGraphics() => new SpriteId(AssetType.SmallPartyGraphics, Id);
         public readonly SpriteId ToBigPartyGraphics() => new SpriteId(AssetType.BigPartyGraphics, Id);
         public readonly SpriteId ToFullBodyPicture() => new SpriteId(AssetType.FullBodyPicture, Id);

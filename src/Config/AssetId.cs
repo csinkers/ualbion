@@ -63,25 +63,20 @@ namespace UAlbion.Config
         public static AssetId Gold { get; } = new AssetId(AssetType.Gold);
         public static AssetId Rations { get; } = new AssetId(AssetType.Rations);
         public bool IsNone => _value == 0;
-        public AssetId(uint id) => _value = id;
-        public AssetId(int id) => _value = unchecked((uint)id);
+        AssetId(uint id) => _value = id;
         public readonly AssetType Type => (AssetType)((_value & 0xff00_0000) >> 24);
         public readonly int Id => (int)(_value & 0xffffff);
-
         public override string ToString() => AssetMapping.Global.IdToName(this);
         public static AssetId Parse(string s) => AssetMapping.Global.Parse(s, null);
-
-        public static explicit operator uint(AssetId id) => id._value;
-        public static explicit operator int(AssetId id) => unchecked((int)id._value);
-        public static explicit operator AssetId(int id) => new AssetId(id);
-        public static AssetId ToAssetId(int id) => new AssetId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static AssetId FromInt32(int id) => new AssetId(unchecked((uint)id));
+        public static AssetId FromUInt32(uint id) => new AssetId(id);
         public static bool operator ==(AssetId x, AssetId y) => x.Equals(y);
         public static bool operator !=(AssetId x, AssetId y) => !(x == y);
         public bool Equals(AssetId other) => _value == other._value;
         public override bool Equals(object obj) => obj is AssetId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
 
         public static IEnumerable<AssetId> EnumerateAll(AssetType type) => AssetMapping.Global.EnumeratAssetsOfType(type);
     }

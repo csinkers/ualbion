@@ -1,10 +1,8 @@
 /albion_sr/
 /ALBION/
 /data/*.XLD/
-/data/Saves/
 /data/ShaderCache/
 /data/exported/
-/data/mods/
 /data/settings.json
 /re/
 /deps/
@@ -27,3 +25,7 @@ packages/
 launchSettings.json
 imgui.ini
 global.json
+
+mods/*
+!mods/Base/
+!mods/Test/

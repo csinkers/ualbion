@@ -85,6 +85,6 @@ namespace UAlbion.Formats.Assets.Maps
                 (Chain, Node) = getEvent(dummy.Id);
         }
 
-        public override string ToString() => $"Npc{(int)Id} {Id} Obj{SpriteOrGroup} F:{Flags:x} M{Movement} Amount:{Unk8} Unk9:{Unk9} S{Sound} E{Node?.Id}";
+        public override string ToString() => $"Npc{Id.Id} {Id} Obj{SpriteOrGroup} F:{Flags:x} M{Movement} Amount:{Unk8} Unk9:{Unk9} S{Sound} E{Node?.Id}";
     }
 }

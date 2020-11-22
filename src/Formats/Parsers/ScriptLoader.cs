@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.MapEvents;
@@ -11,18 +11,18 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.Script)]
     public class ScriptLoader : IAssetLoader
     {
-        IEnumerable<string> ReadLines(BinaryReader br, long streamLength)
+        IEnumerable<string> ReadLines(ISerializer s)
         {
-            var bytes = br.ReadBytes((int)streamLength);
+            var bytes = s.ByteArray(null, null, (int)s.BytesRemaining);
             var text = FormatUtil.BytesTo850String(bytes);
             return text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None).Select(x => x.Trim());
         }
 
-        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
+        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
+            if (s == null) throw new ArgumentNullException(nameof(s));
             var events = new List<IEvent>();
-            foreach (var line in ReadLines(br, streamLength))
+            foreach (var line in ReadLines(s))
             {
                 IEvent e;
                 if (string.IsNullOrEmpty(line))

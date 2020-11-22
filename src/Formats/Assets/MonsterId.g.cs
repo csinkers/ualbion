@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public MonsterId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.Monster))
-                throw new ArgumentOutOfRangeException($"Tried to construct a MonsterId with a type of {Type}");
-        }
-        public MonsterId(int id)
+        MonsterId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.Monster))
                 throw new ArgumentOutOfRangeException($"Tried to construct a MonsterId with a type of {Type}");
         }
@@ -86,26 +80,24 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.Monster };
         public static MonsterId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(MonsterId id) => new AssetId(id._value);
-        public static implicit operator MonsterId(AssetId id) => new MonsterId((uint)id);
-        public static explicit operator uint(MonsterId id) => id._value;
-        public static explicit operator int(MonsterId id) => unchecked((int)id._value);
-        public static explicit operator MonsterId(int id) => new MonsterId(id);
-        public static implicit operator CharacterId(MonsterId id) => new CharacterId(id._value);
-        public static explicit operator MonsterId(CharacterId id) => new MonsterId((uint)id);
+        public static implicit operator AssetId(MonsterId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator MonsterId(AssetId id) => new MonsterId(id.ToUInt32());
+        public static implicit operator CharacterId(MonsterId id) => CharacterId.FromUInt32(id._value);
+        public static explicit operator MonsterId(CharacterId id) => new MonsterId(id.ToUInt32());
         public static implicit operator MonsterId(UAlbion.Base.Monster id) => MonsterId.From(id);
 
-        public static MonsterId ToMonsterId(int id) => new MonsterId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static MonsterId FromInt32(int id) => new MonsterId(unchecked((uint)id));
+        public static MonsterId FromUInt32(uint id) => new MonsterId(id);
         public static bool operator ==(MonsterId x, MonsterId y) => x.Equals(y);
         public static bool operator !=(MonsterId x, MonsterId y) => !(x == y);
         public static bool operator ==(MonsterId x, AssetId y) => x.Equals(y);
         public static bool operator !=(MonsterId x, AssetId y) => !(x == y);
         public bool Equals(MonsterId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
     }
 
     public class MonsterIdConverter : TypeConverter

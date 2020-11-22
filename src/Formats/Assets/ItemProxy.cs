@@ -15,6 +15,6 @@
         }
 
         public override string ToString() => $"Proxy for {Id}";
-        public override int GetHashCode() => (int) Id;
+        public override int GetHashCode() => Id.GetHashCode();
     }
 }

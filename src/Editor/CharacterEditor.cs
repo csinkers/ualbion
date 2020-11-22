@@ -53,9 +53,9 @@ namespace UAlbion.Editor
                 EnumCheckboxes(nameof(_sheet.Languages), _sheet.Languages);
                 ImGui.Text($"SpriteId: {_sheet.SpriteId}"); // TODO: Combo-box? Resource picker?
 
-                ImGui.Text($"PortraitId: {_sheet.PortraitId} ({(int?)_sheet.PortraitId})"); // TODO: Combo-box? Resource picker?
-                ImGui.Text($"EventSet: {_sheet.EventSetId} ({(int?)_sheet.EventSetId})"); // TODO: Combo-box? Resource picker?
-                ImGui.Text($"WordSet: {_sheet.WordSetId} ({(int?)_sheet.WordSetId})"); // TODO: Combo-box? Resource picker?
+                ImGui.Text($"PortraitId: {_sheet.PortraitId} ({_sheet.PortraitId.Id})"); // TODO: Combo-box? Resource picker?
+                ImGui.Text($"EventSet: {_sheet.EventSetId} ({_sheet.EventSetId.Id})"); // TODO: Combo-box? Resource picker?
+                ImGui.Text($"WordSet: {_sheet.WordSetId} ({_sheet.WordSetId.Id})"); // TODO: Combo-box? Resource picker?
                 ImGui.TreePop();
             }
 

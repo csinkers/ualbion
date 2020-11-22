@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Game.Events;
@@ -41,8 +42,9 @@ namespace UAlbion.Game.Gui.Menus
 
         string BuildSaveFilename(ushort i)
         {
-            var generalConfig = Resolve<IAssetManager>().LoadGeneralConfig();
-            return Path.Combine(generalConfig.BasePath, generalConfig.SavePath, $"SAVE.{i:D3}");
+            var generalConfig = Resolve<IGeneralConfig>();
+            // TODO: This path currently exists in two places: here and Game\State\GameState.cs
+            return generalConfig.ResolvePath($"$(SAVE)/SAVE.{i:D3}");
         }
 
         protected override void Subscribed()

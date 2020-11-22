@@ -4,7 +4,6 @@ using System.IO;
 using System.Numerics;
 using System.Threading.Tasks;
 using UAlbion.Api;
-using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
@@ -101,12 +100,9 @@ namespace UAlbion
         {
             PerfTracker.StartupEvent("Creating main components");
             var factory = global.Resolve<ICoreFactory>();
-            var config = global.Resolve<IGeneralConfig>();
 
             global
                 .Register<ICommonColors>(new CommonColors(factory))
-                .Register(CoreConfig.Load(Path.Combine(config.BasePath, config.CoreConfigPath)))
-                .Register(GameConfig.Load(Path.Combine(config.BasePath, config.GameConfigPath)))
                 ;
 
             if (commandLine.AudioMode == AudioMode.InProcess)

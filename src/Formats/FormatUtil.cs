@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 
 namespace UAlbion.Formats
@@ -94,5 +95,10 @@ namespace UAlbion.Formats
 
             return (underlay, overlay);
         }
+
+        public static int ParseHex(string s) =>
+            s != null && s.StartsWith("0x", StringComparison.InvariantCulture)
+                ? int.Parse(s.Substring(2), NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture)
+                : int.Parse(s, CultureInfo.InvariantCulture);
     }
 }

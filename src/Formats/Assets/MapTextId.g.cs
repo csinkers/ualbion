@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public MapTextId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.MapText))
-                throw new ArgumentOutOfRangeException($"Tried to construct a MapTextId with a type of {Type}");
-        }
-        public MapTextId(int id)
+        MapTextId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.MapText))
                 throw new ArgumentOutOfRangeException($"Tried to construct a MapTextId with a type of {Type}");
         }
@@ -86,26 +80,24 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.MapText };
         public static MapTextId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(MapTextId id) => new AssetId(id._value);
-        public static implicit operator MapTextId(AssetId id) => new MapTextId((uint)id);
-        public static explicit operator uint(MapTextId id) => id._value;
-        public static explicit operator int(MapTextId id) => unchecked((int)id._value);
-        public static explicit operator MapTextId(int id) => new MapTextId(id);
-        public static implicit operator TextId(MapTextId id) => new TextId(id._value);
-        public static explicit operator MapTextId(TextId id) => new MapTextId((uint)id);
+        public static implicit operator AssetId(MapTextId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator MapTextId(AssetId id) => new MapTextId(id.ToUInt32());
+        public static implicit operator TextId(MapTextId id) => TextId.FromUInt32(id._value);
+        public static explicit operator MapTextId(TextId id) => new MapTextId(id.ToUInt32());
         public static implicit operator MapTextId(UAlbion.Base.MapText id) => MapTextId.From(id);
 
-        public static MapTextId ToMapTextId(int id) => new MapTextId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static MapTextId FromInt32(int id) => new MapTextId(unchecked((uint)id));
+        public static MapTextId FromUInt32(uint id) => new MapTextId(id);
         public static bool operator ==(MapTextId x, MapTextId y) => x.Equals(y);
         public static bool operator !=(MapTextId x, MapTextId y) => !(x == y);
         public static bool operator ==(MapTextId x, AssetId y) => x.Equals(y);
         public static bool operator !=(MapTextId x, AssetId y) => !(x == y);
         public bool Equals(MapTextId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
     }
 
     public class MapTextIdConverter : TypeConverter

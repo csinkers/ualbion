@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Text.RegularExpressions;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
@@ -40,12 +40,13 @@ namespace UAlbion.Formats.Parsers
             }
         }
 
-        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
+        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
+            if (s == null) throw new ArgumentNullException(nameof(s));
             if (config == null) throw new ArgumentNullException(nameof(config));
+            if (s.Mode != SerializerMode.Reading) throw new NotImplementedException($"Writing of amorphous sprites is not currently supported");
             ApiUtil.Assert(config.Transposed != true);
-            long initialPosition = br.BaseStream.Position;
+
             var sizes = ParseSpriteSizes(config.SubSprites);
 
             int spriteWidth = 0;
@@ -55,10 +56,9 @@ namespace UAlbion.Formats.Parsers
 
             foreach(var (width, height) in sizes)
             {
-                if (br.BaseStream.Position >= initialPosition + streamLength)
-                    break;
+                s.Check();
 
-                var bytes = br.ReadBytes(width * height);
+                var bytes = s.ByteArray("PixelData", null, width * height);
                 frames.Add(new AlbionSpriteFrame(0, currentY, width, height));
                 frameBytes.Add(bytes);
 
@@ -79,8 +79,8 @@ namespace UAlbion.Formats.Parsers
                         pixelData[(frame.Y + j) * spriteWidth + frame.X + i] = frameBytes[n][j * frame.Width + i];
             }
 
-            ApiUtil.Assert(br.BaseStream.Position == initialPosition + streamLength);
-            return new AlbionSprite(id.ToString(), spriteWidth, spriteHeight, false, pixelData, frames);
+            s.Check();
+            return new AlbionSprite(config.AssetId.ToString(), spriteWidth, spriteHeight, false, pixelData, frames);
         }
     }
 }

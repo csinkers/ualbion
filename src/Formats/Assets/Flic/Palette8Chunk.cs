@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using SerdesNet;
 
 namespace UAlbion.Formats.Assets.Flic
 {
@@ -11,32 +11,32 @@ namespace UAlbion.Formats.Assets.Flic
             public byte Skip { get; }
             public byte[] Triplets { get; }
 
-            public PalettePacket(BinaryReader br)
+            public PalettePacket(ISerializer s)
             {
-                if (br == null) throw new ArgumentNullException(nameof(br));
-                Skip = br.ReadByte();
-                var copy = br.ReadByte();
+                if (s == null) throw new ArgumentNullException(nameof(s));
+                Skip = s.UInt8(null, 0);
+                var copy = s.UInt8(null, 0);
 
                 int count = copy == 0 ? 256 : copy;
                 count *= 3;
                 Triplets = new byte[count];
                 for (int i = 0; i < count;)
                 {
-                    Triplets[i++] = br.ReadByte();
-                    Triplets[i++] = br.ReadByte();
-                    Triplets[i++] = br.ReadByte();
+                    Triplets[i++] = s.UInt8(null, 0);
+                    Triplets[i++] = s.UInt8(null, 0);
+                    Triplets[i++] = s.UInt8(null, 0);
                 }
             }
         }
 
         public override FlicChunkType Type => FlicChunkType.Palette8Bit;
-        protected override uint LoadChunk(uint length, BinaryReader br)
+        protected override uint LoadChunk(uint length, ISerializer s)
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
-            ushort packetCount = br.ReadUInt16();
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            ushort packetCount = s.UInt16(null, 0);
             _packets = new PalettePacket[packetCount];
             for(int i = 0; i < packetCount; i++)
-                _packets[i] = new PalettePacket(br);
+                _packets[i] = new PalettePacket(s);
             return length;
         }
 

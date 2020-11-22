@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
@@ -8,6 +9,7 @@ using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Config;
 
 namespace UAlbion.Game
 {
@@ -21,8 +23,7 @@ namespace UAlbion.Game
         string LoadString(TextId id);
         string LoadString(StringId id);
         ISample LoadSample(SampleId id);
-        ISample LoadWaveLib(WaveLibraryId waveLibraryId, int instrument);
-        byte[] LoadSoundBanks();
+        WaveLib LoadWaveLib(WaveLibraryId waveLibraryId);
         FlicFile LoadVideo(VideoId id);
         AlbionPalette LoadPalette(PaletteId id);
         IMapData LoadMap(MapId id);
@@ -31,12 +32,17 @@ namespace UAlbion.Game
         Inventory LoadInventory(AssetId id); // TODO: Use InventoryId?
         WordId? ParseWord(string word);
         IList<Block> LoadBlockList(BlockListId id);
-        IGeneralConfig LoadGeneralConfig();
         EventSet LoadEventSet(EventSetId id);
         byte[] LoadSong(SongId id);
         IList<IEvent> LoadScript(ScriptId id);
         SpellData LoadSpell(SpellId id);
         SavedGame LoadSavedGame(string path);
         MonsterGroup LoadMonsterGroup(MonsterGroupId id);
+        Automap LoadAutomap(AutomapId id);
+
+        // Special assets
+        GameConfig LoadGameConfig();
+        CoreConfig LoadCoreConfig();
+        byte[] LoadSoundBanks();
     }
 }

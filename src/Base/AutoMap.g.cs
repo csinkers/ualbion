@@ -11,7 +11,7 @@ using Newtonsoft.Json.Converters;
 namespace UAlbion.Base
 {
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum AutoMap : ushort
+    public enum Automap : ushort
     {
         TestMapIskai = 100,
         TestMapToronto = 101,

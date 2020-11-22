@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Text.RegularExpressions;
+using SerdesNet;
 using UAlbion.Config;
 
 namespace UAlbion.Formats.Parsers
@@ -11,11 +11,12 @@ namespace UAlbion.Formats.Parsers
     public class SystemTextLoader : IAssetLoader
     {
         static readonly Regex Regex = new Regex(@"\[(\d+):(.*)\]");
-        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
-        {
-            if (br == null) throw new ArgumentNullException(nameof(br));
+
+        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+{
+            if (s == null) throw new ArgumentNullException(nameof(s));
             var results = new Dictionary<int, string>();
-            var bytes = br.ReadBytes((int)streamLength);
+            var bytes = s.ByteArray(null, null, (int)s.BytesRemaining);
             var data = FormatUtil.BytesTo850String(bytes);
             var lines = data.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var line in lines)
@@ -31,7 +32,7 @@ namespace UAlbion.Formats.Parsers
 
             return results;
 /*
-            var fullText = FormatUtil.BytesTo850String(br.ReadBytes((int)streamLength));
+            var fullText = FormatUtil.BytesTo850String(s.ByteArray(null, null, (int)s.BytesRemaining));
             var lines = fullText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var line in lines)
             {

@@ -84,7 +84,7 @@ namespace UAlbion
                 if (!(assets.LoadMap((Base.Map)i) is MapData3D map))
                     continue;
 
-                sw.WriteLine($"{i} {(Base.Map)i} {map.Width}x{map.Height} L{(int?)map.LabDataId} P{(int)map.PaletteId}:{map.PaletteId}");
+                sw.WriteLine($"{i} {(Base.Map)i} {map.Width}x{map.Height} L{map.LabDataId.Id} P{map.PaletteId.Id}:{map.PaletteId}");
                 var floors = map.Floors.GroupBy(x => x).Select(x => (x.Key, x.Count())).OrderBy(x => x.Key);
                 sw.WriteLine("    Floors: " + string.Join(" ", floors.Select(x => $"{x.Key}:{x.Item2}")));
                 var ceilings = map.Ceilings.GroupBy(x => x).Select(x => (x.Key, x.Count())).OrderBy(x => x.Key);
@@ -166,7 +166,7 @@ namespace UAlbion
 
                 sw.Write($"{i} {(Base.Map)i} {map.MapType} ");
                 sw.Write($"{map.Width}x{map.Height} ");
-                sw.Write($"Palette:{map.PaletteId} ({(int)map.PaletteId}) ");
+                sw.Write($"Palette:{map.PaletteId} ({map.PaletteId.Id}) ");
                 if (map is MapData2D map2d)
                 {
                     sw.Write($"FrameRate:{map2d.FrameRate} ");
@@ -184,8 +184,8 @@ namespace UAlbion
                     lab = assets.LoadLabyrinthData(map3d.LabDataId);
                 }
 
-                sw.Write($"Song:{map.SongId} ({(int?)map.SongId}) ");
-                sw.WriteLine($"CombatBackground:{map.CombatBackgroundId} ({(int)map.CombatBackgroundId})");
+                sw.Write($"Song:{map.SongId} ({map.SongId.Id}) ");
+                sw.WriteLine($"CombatBackground:{map.CombatBackgroundId} ({map.CombatBackgroundId.Id})");
 
                 for(int j = 0; j < map.Npcs.Count; j++)
                 {
@@ -195,7 +195,7 @@ namespace UAlbion
                     var wp = npc.Waypoints.FirstOrDefault();
                     var idText = npc.Id.ToString().PadLeft(15);
 
-                    sw.Write($"    Npc{j:D3}: {idText} ({(int?)npc.Id:D3}) ");
+                    sw.Write($"    Npc{j:D3}: {idText} ({npc.Id.Id:D3}) ");
                     sw.Write($"X:{wp.X:D3} Y:{wp.Y:D3} ");
                     sw.Write($"U8:{npc.Unk8} ");
                     sw.Write($"U9:{npc.Unk9} ");
@@ -278,7 +278,7 @@ namespace UAlbion
 
             sw.WriteLine($"{Convert.ToInt32(id, CultureInfo.InvariantCulture):D3} {id} ({c.EnglishName}, {c.GermanName}, {c.FrenchName})");
             sw.WriteLine($"    Type:{c.Type} Gender:{c.Gender} Races:{c.Race} Class:{c.PlayerClass} Age:{c.Age} Level:{c.Level}");
-            sw.WriteLine($"    Languages:{c.Languages} Sprite:{c.SpriteId} Portrait:{(int?)c.PortraitId}");
+            sw.WriteLine($"    Languages:{c.Languages} Sprite:{c.SpriteId} Portrait:{c.PortraitId}");
             if (c.Inventory?.Slots != null)
             {
                 sw.WriteLine($"    Inventory: (Gold:{c.Inventory.Gold.Amount / 10.0}, Rations:{c.Inventory.Rations.Amount})");
@@ -391,7 +391,7 @@ namespace UAlbion
                     .ToDictionary(x => x, assets.LoadInventory);
             foreach (var chest in chests.Where(x => x.Value != null))
             {
-                sw.WriteLine($"Chest {(int)chest.Key} {chest.Key}: ({chest.Value.Gold.Amount / 10.0} gold, {chest.Value.Rations} rations)");
+                sw.WriteLine($"Chest {chest.Key.Id} {chest.Key}: ({chest.Value.Gold.Amount / 10.0} gold, {chest.Value.Rations} rations)");
                 foreach (var x in chest.Value.Slots.Where(x => x.Item != null))
                     sw.WriteLine($"    {x.Amount}x{x.Item} Charges:{x.Charges} Enchantment:{x.Enchantment} Flags:{x.Flags}");
             }
@@ -405,7 +405,7 @@ namespace UAlbion
                     .ToDictionary(x => x, assets.LoadInventory);
             foreach (var merchant in merchants.Where(x => x.Value != null))
             {
-                sw.WriteLine($"Merchant {(int)merchant.Key} {merchant.Key}");
+                sw.WriteLine($"Merchant {merchant.Key.Id} {merchant.Key}");
                 foreach(var x in merchant.Value.Slots.Where(x => x.Item != null))
                     sw.WriteLine($"    {x.Amount}x{x.Item} Charges:{x.Charges} Enchantment:{x.Enchantment} Flags:{x.Flags}");
             }
@@ -417,7 +417,7 @@ namespace UAlbion
             var items = new List<ItemData>();
             foreach (ItemId itemId in Ids<Base.Item>())
             {
-                sw.Write(((int)itemId).ToString(CultureInfo.InvariantCulture).PadLeft(3)); 
+                sw.Write(itemId.Id.ToString(CultureInfo.InvariantCulture).PadLeft(3)); 
                 sw.Write(' ');
                 sw.Write(itemId.ToString().PadRight(20));
 
@@ -488,7 +488,7 @@ namespace UAlbion
         {
             var formatter = new EventFormatter(assets, mapId.ToMapText());
             sw.WriteLine();
-            sw.WriteLine($"Map {(int)mapId} {mapId}:");
+            sw.WriteLine($"Map {mapId.Id} {mapId}:");
             foreach (var e in map.Events)
             {
                 var chainId = map.Chains.Select((x, i) => x.FirstEvent == e ? i : (int?) null).FirstOrDefault(x => x != null);
@@ -532,7 +532,7 @@ namespace UAlbion
             foreach (var eventSetId in Ids<Base.EventSet>())
             {
                 sw.WriteLine();
-                sw.WriteLine($"{(int)eventSetId} {eventSetId}:");
+                sw.WriteLine($"{eventSetId.Id} {eventSetId}:");
                 var set = assets.LoadEventSet(eventSetId);
                 if (set == null)
                     continue;
@@ -552,13 +552,12 @@ namespace UAlbion
             foreach (var spellId in Ids<Base.Spell>())
             {
                 var spell = assets.LoadSpell(spellId);
-                var systemTextId = (Base.SystemText)((int)spellId + (int)SpellData.SystemTextOffset);
-                var systemText = assets.LoadString(systemTextId);
-                int classNumber = (int)spellId / SpellData.MaxSpellsPerClass;
-                int offsetInClass = (int)spellId % SpellData.MaxSpellsPerClass;
-                sw.Write($"Spell{(int)spellId:D3} {classNumber}_{offsetInClass}");
+                var name = assets.LoadString(spell.Name);
+                //int classNumber = (int)spellId / SpellData.MaxSpellsPerClass;
+                //int offsetInClass = (int)spellId % SpellData.MaxSpellsPerClass;
+                sw.Write($"Spell{spellId.Id:D3} {spell.Class}_{spell.OffsetInClass} ");
                 sw.Write($"({spellId}) ".PadRight(24));
-                sw.Write($"\"{systemText}\" ".PadRight(24));
+                sw.Write($"\"{name}\" ".PadRight(24));
                 sw.Write($"{spell.Cost} ".PadLeft(4));
                 sw.Write($"Lvl:{spell.LevelRequirement} ");
                 sw.Write($"Env:{spell.Environments} ");
@@ -566,7 +565,6 @@ namespace UAlbion
                 sw.WriteLine();
             }
         }
-
 
         static void MonsterGroups(IAssetManager assets, string baseDir)
         {
@@ -583,7 +581,7 @@ namespace UAlbion
                         .GroupBy(x => x)
                         .OrderBy(x => x.Key)
                         .ToDictionary(x => x.Key, x => x.Count());
-                sw.Write($"{(int)groupId}: ");
+                sw.Write($"{groupId.Id}: ");
                 var countString = string.Join(" ", counts.Select(x => $"{x.Value}x{x.Key}"));
                 sw.WriteLine(countString);
             }

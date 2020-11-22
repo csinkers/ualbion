@@ -10,7 +10,7 @@ namespace UAlbion.Config
         {
             var exeLocation = Assembly.GetExecutingAssembly().Location;
             var curDir = new DirectoryInfo(Path.GetDirectoryName(exeLocation) ?? throw new InvalidOperationException());
-            while (curDir != null && !File.Exists(Path.Combine(curDir.FullName, "data", "Base", "assets.json")))
+            while (curDir != null && !File.Exists(Path.Combine(curDir.FullName, "data", "config.json")))
                 curDir = curDir.Parent;
 
             var baseDir = curDir?.FullName;

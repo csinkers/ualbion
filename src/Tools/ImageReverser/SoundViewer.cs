@@ -26,7 +26,7 @@ namespace UAlbion.Tools.ImageReverser
             //if (asset.Format == FileFormat.SampleLibrary)
             if (asset?.Format == FileFormat.AudioSample)
             {
-                var stream = File.OpenRead(Path.Combine(_core.BaseExportDirectory, asset.Filename));
+                var stream = File.OpenRead(Path.Combine(_core.BaseExportDirectory, asset.Parent.Filename));
                 _player.Stream = stream;
                 _player.Play();
             }

@@ -27,7 +27,7 @@ namespace UAlbion.Game.Assets
                 if (slot.Item is ItemProxy proxy)
                     slot.Item = assets.LoadItem(proxy.Id);
         }
-        public object Process(ICoreFactory factory, AssetId key, object asset, SerializationContext context)
+        public object Process(ICoreFactory factory, AssetId key, object asset)
         {
             var assets = Resolve<IAssetManager>();
             switch (asset)

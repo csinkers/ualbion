@@ -31,10 +31,10 @@ namespace UAlbion.Formats.Assets.Save
                 case ActionType.EquipItem:
                 case ActionType.UnequipItem:
                 case ActionType.PickupItem:
-                    u._value = (uint)ItemId.SerdesU16("Value", new ItemId(u._value), AssetType.Item, mapping, s);
+                    u._value = ItemId.SerdesU16("Value", ItemId.FromUInt32(u._value), AssetType.Item, mapping, s).ToUInt32();
                     break;
                 case ActionType.Word:
-                    u._value = (uint)WordId.SerdesU16("Value", new WordId(u._value), mapping, s);
+                    u._value = WordId.SerdesU16("Value", WordId.FromUInt32(u._value), mapping, s).ToUInt32();
                     break;
                 default:
                     u._value = s.UInt16("Value", (ushort)u._value);
@@ -48,7 +48,7 @@ namespace UAlbion.Formats.Assets.Save
 
         public WordId WordId =>
             Type == ActionType.Word
-                ? new WordId(_value)
+                ? WordId.FromUInt32(_value)
                 : throw new InvalidOperationException($"Tried to retrieve WordId of a non-word VisitedEvent");
         /*
         public WordId WordId => Word switch
@@ -64,7 +64,7 @@ namespace UAlbion.Formats.Assets.Save
             || Type == ActionType.EquipItem
             || Type == ActionType.UnequipItem
             || Type == ActionType.PickupItem
-                ? new ItemId(_value)
+                ? ItemId.FromUInt32(_value)
                 : throw new InvalidOperationException($"Tried to retrieve WordId of a non-word VisitedEvent");
 
         string ItemString =>
@@ -80,7 +80,7 @@ namespace UAlbion.Formats.Assets.Save
                 _ => _value.ToString(CultureInfo.InvariantCulture)
             };
 
-        public override string ToString() => $"{Unk0} {(int) EventSetId} {Type} {ItemString}";
+        public override string ToString() => $"{Unk0} {EventSetId} {Type} {ItemString}";
 
         /*
          Logical to textual word id mapping clues:

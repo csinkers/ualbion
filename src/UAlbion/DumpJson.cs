@@ -61,7 +61,7 @@ namespace UAlbion
                 {
                     TilesetData asset = assets.LoadTileData(id);
                     if (asset == null) continue;
-                    tw = Writer($"tilesets/tileset{(int)id}.json");
+                    tw = Writer($"tilesets/tileset{id.Id}.json");
                     s.Serialize(tw, asset);
                 }
 
@@ -74,7 +74,7 @@ namespace UAlbion
                 {
                     LabyrinthData asset = assets.LoadLabyrinthData(id);
                     if (asset == null) continue;
-                    tw = Writer($"labdata/labyrinth{(int)id}.json");
+                    tw = Writer($"labdata/labyrinth{id.Id}.json");
                     s.Serialize(tw, asset);
                 }
 
@@ -89,7 +89,7 @@ namespace UAlbion
                 {
                     IMapData asset = assets.LoadMap(id);
                     if (asset == null) continue;
-                    tw = Writer($"maps/map{(int)id}_{id}.json");
+                    tw = Writer($"maps/map{id.Id}_{id}.json");
                     s.Serialize(tw, asset);
                 }
 
@@ -148,7 +148,7 @@ namespace UAlbion
                 {
                     IList<Block> asset = assets.LoadBlockList(id);
                     if (asset == null) continue;
-                    tw = Writer($"blocks/blocklist{(int)id}.json");
+                    tw = Writer($"blocks/blocklist{id.Id}.json");
                     s.Serialize(tw, asset);
                 }
                 Flush();
@@ -167,7 +167,7 @@ namespace UAlbion
                 {
                     IList<IEvent> asset = assets.LoadScript(id);
                     if (asset == null) continue;
-                    tw = Writer($"scripts/script{(int)id}.json");
+                    tw = Writer($"scripts/script{id.Id}.json");
                     s.Serialize(tw, asset.Select(x => x.ToString()).ToArray());
                 }
                 Flush();
@@ -191,7 +191,7 @@ namespace UAlbion
             {
                 foreach (var id in All(AssetType.Palette))
                 {
-                    tw = Writer($"palettes/palette{(int)id}_{id}.json");
+                    tw = Writer($"palettes/palette{id.Id}_{id}.json");
                     var palette = assets.LoadPalette(id);
                     s.Serialize(tw, palette);
                 }

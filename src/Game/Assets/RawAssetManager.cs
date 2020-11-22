@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -9,6 +9,7 @@ using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.Assets
 {
@@ -42,21 +43,20 @@ namespace UAlbion.Game.Assets
             if (palette == null)
                 return null;
 
-            var commonPalette = (byte[])_modApplier.LoadAsset(AssetId.From(Base.Special.CommonPalette));
+            var commonPalette = (AlbionPalette)_modApplier.LoadAssetCached(AssetId.From(Base.Palette.CommonPalette));
             palette.SetCommonPalette(commonPalette);
 
             return palette;
         }
 
         public ITexture LoadTexture(SpriteId id) => (ITexture)_modApplier.LoadAsset(id);
-        public ITexture LoadTexture(ITextureId id) => (ITexture)_modApplier.LoadAsset(new SpriteId(id?.ToUInt32() ?? 0));
+        public ITexture LoadTexture(ITextureId id) => (ITexture)_modApplier.LoadAsset(SpriteId.FromUInt32(id?.ToUInt32() ?? 0));
         public ITexture LoadFont(FontColor color, bool isBold) 
             => (ITexture)_modApplier.LoadAsset(new AssetId(
                 AssetType.MetaFont, (ushort)new MetaFontId(isBold, color)));
 
         public TilesetData LoadTileData(TilesetId id) => (TilesetData)_modApplier.LoadAsset(id);
         public LabyrinthData LoadLabyrinthData(LabyrinthId id) => (LabyrinthData)_modApplier.LoadAsset(id);
-        public IGeneralConfig LoadGeneralConfig() => (IGeneralConfig) _modApplier.LoadAsset(AssetId.From(Base.Special.GeneralConfig));
         public string LoadString(TextId id) => LoadString((StringId)id);
         public string LoadString(StringId id)
         {
@@ -71,13 +71,14 @@ namespace UAlbion.Game.Assets
         }
 
         public ISample LoadSample(SampleId id) => (AlbionSample)_modApplier.LoadAsset(id);
-        public ISample LoadWaveLib(WaveLibraryId waveLibraryId, int instrument) => ((WaveLib)_modApplier.LoadAsset(waveLibraryId))?.GetSample(instrument);
-        public byte[] LoadSoundBanks() => (byte[]) _modApplier.LoadAsset(AssetId.From(Base.Special.SoundBank));
+        public WaveLib LoadWaveLib(WaveLibraryId waveLibraryId) => (WaveLib)_modApplier.LoadAsset(waveLibraryId);
         public FlicFile LoadVideo(VideoId id) => (FlicFile)_modApplier.LoadAsset(id);
         public CharacterSheet LoadSheet(CharacterId id) => (CharacterSheet)_modApplier.LoadAsset(id);
         public Inventory LoadInventory(AssetId id) => (Inventory)_modApplier.LoadAsset(id);
         public WordId? ParseWord(string word)
         {
+            throw new NotImplementedException();
+            /*
             var words = // Inefficient code, if it ends up being a problem then we can build a reverse dictionary and cache it.
                 new[]
                 {   // Load the english files as all languages use english {WORDxxx} tags
@@ -90,7 +91,7 @@ namespace UAlbion.Game.Assets
                 .SelectMany(x => x)
                 .Where(x => x.Value == word)
                 .Select(x => (WordId?)x.Key)
-                .FirstOrDefault();
+                .FirstOrDefault(); */
         }
 
         public IList<Block> LoadBlockList(BlockListId blockListId) => (IList<Block>)_modApplier.LoadAsset(blockListId);
@@ -100,5 +101,10 @@ namespace UAlbion.Game.Assets
         public SpellData LoadSpell(SpellId id) => (SpellData)_modApplier.LoadAsset(id);
         public SavedGame LoadSavedGame(string path) => _modApplier.LoadSavedGame(path);
         public MonsterGroup LoadMonsterGroup(MonsterGroupId id) => (MonsterGroup)_modApplier.LoadAsset(id);
+        public Automap LoadAutomap(AutomapId id) => (Automap) _modApplier.LoadAsset(id);
+
+        public GameConfig LoadGameConfig() => (GameConfig)_modApplier.LoadAsset(AssetId.From(Base.Special.GameConfig));
+        public CoreConfig LoadCoreConfig()=> (CoreConfig)_modApplier.LoadAsset(AssetId.From(Base.Special.CoreConfig));
+        public byte[] LoadSoundBanks() => (byte[]) _modApplier.LoadAsset(AssetId.From(Base.Special.SoundBank));
     }
 }

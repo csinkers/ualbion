@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public DoorId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.Door))
-                throw new ArgumentOutOfRangeException($"Tried to construct a DoorId with a type of {Type}");
-        }
-        public DoorId(int id)
+        DoorId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.Door))
                 throw new ArgumentOutOfRangeException($"Tried to construct a DoorId with a type of {Type}");
         }
@@ -86,23 +80,21 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.Door };
         public static DoorId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(DoorId id) => new AssetId(id._value);
-        public static implicit operator DoorId(AssetId id) => new DoorId((uint)id);
-        public static explicit operator uint(DoorId id) => id._value;
-        public static explicit operator int(DoorId id) => unchecked((int)id._value);
-        public static explicit operator DoorId(int id) => new DoorId(id);
+        public static implicit operator AssetId(DoorId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator DoorId(AssetId id) => new DoorId(id.ToUInt32());
 
-        public static DoorId ToDoorId(int id) => new DoorId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static DoorId FromInt32(int id) => new DoorId(unchecked((uint)id));
+        public static DoorId FromUInt32(uint id) => new DoorId(id);
         public static bool operator ==(DoorId x, DoorId y) => x.Equals(y);
         public static bool operator !=(DoorId x, DoorId y) => !(x == y);
         public static bool operator ==(DoorId x, AssetId y) => x.Equals(y);
         public static bool operator !=(DoorId x, AssetId y) => !(x == y);
         public bool Equals(DoorId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
     }
 
     public class DoorIdConverter : TypeConverter

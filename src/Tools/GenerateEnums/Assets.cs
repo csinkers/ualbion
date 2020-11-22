@@ -23,7 +23,7 @@ namespace UAlbion.CodeGenerator
             var assetIdConfigPath = Path.Combine(BaseDir, @"src/Formats/AssetIdTypes.json");
             var config = GeneralConfig.Load(Path.Combine(BaseDir, "data/config.json"), BaseDir);
 
-            AssetConfig = AssetConfig.Load(Path.Combine(BaseDir, config.BaseAssetsPath, "assets.json"));
+            AssetConfig = AssetConfig.Load(config.ResolvePath("$(MODS)/Base/assets.json"));
             AssetIdConfig = AssetIdConfig.Load(assetIdConfigPath);
 
             Enums = LoadEnums(AssetConfig);

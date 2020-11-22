@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public LabyrinthId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.Labyrinth))
-                throw new ArgumentOutOfRangeException($"Tried to construct a LabyrinthId with a type of {Type}");
-        }
-        public LabyrinthId(int id)
+        LabyrinthId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.Labyrinth))
                 throw new ArgumentOutOfRangeException($"Tried to construct a LabyrinthId with a type of {Type}");
         }
@@ -86,24 +80,22 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.Labyrinth };
         public static LabyrinthId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(LabyrinthId id) => new AssetId(id._value);
-        public static implicit operator LabyrinthId(AssetId id) => new LabyrinthId((uint)id);
-        public static explicit operator uint(LabyrinthId id) => id._value;
-        public static explicit operator int(LabyrinthId id) => unchecked((int)id._value);
-        public static explicit operator LabyrinthId(int id) => new LabyrinthId(id);
+        public static implicit operator AssetId(LabyrinthId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator LabyrinthId(AssetId id) => new LabyrinthId(id.ToUInt32());
         public static implicit operator LabyrinthId(UAlbion.Base.LabyrinthData id) => LabyrinthId.From(id);
 
-        public static LabyrinthId ToLabyrinthId(int id) => new LabyrinthId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static LabyrinthId FromInt32(int id) => new LabyrinthId(unchecked((uint)id));
+        public static LabyrinthId FromUInt32(uint id) => new LabyrinthId(id);
         public static bool operator ==(LabyrinthId x, LabyrinthId y) => x.Equals(y);
         public static bool operator !=(LabyrinthId x, LabyrinthId y) => !(x == y);
         public static bool operator ==(LabyrinthId x, AssetId y) => x.Equals(y);
         public static bool operator !=(LabyrinthId x, AssetId y) => !(x == y);
         public bool Equals(LabyrinthId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
     }
 
     public class LabyrinthIdConverter : TypeConverter

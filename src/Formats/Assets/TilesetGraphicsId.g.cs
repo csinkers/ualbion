@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public TilesetGraphicsId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.TilesetGraphics))
-                throw new ArgumentOutOfRangeException($"Tried to construct a TilesetGraphicsId with a type of {Type}");
-        }
-        public TilesetGraphicsId(int id)
+        TilesetGraphicsId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.TilesetGraphics))
                 throw new ArgumentOutOfRangeException($"Tried to construct a TilesetGraphicsId with a type of {Type}");
         }
@@ -86,26 +80,24 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.TilesetGraphics };
         public static TilesetGraphicsId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(TilesetGraphicsId id) => new AssetId(id._value);
-        public static implicit operator TilesetGraphicsId(AssetId id) => new TilesetGraphicsId((uint)id);
-        public static explicit operator uint(TilesetGraphicsId id) => id._value;
-        public static explicit operator int(TilesetGraphicsId id) => unchecked((int)id._value);
-        public static explicit operator TilesetGraphicsId(int id) => new TilesetGraphicsId(id);
-        public static implicit operator SpriteId(TilesetGraphicsId id) => new SpriteId(id._value);
-        public static explicit operator TilesetGraphicsId(SpriteId id) => new TilesetGraphicsId((uint)id);
+        public static implicit operator AssetId(TilesetGraphicsId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator TilesetGraphicsId(AssetId id) => new TilesetGraphicsId(id.ToUInt32());
+        public static implicit operator SpriteId(TilesetGraphicsId id) => SpriteId.FromUInt32(id._value);
+        public static explicit operator TilesetGraphicsId(SpriteId id) => new TilesetGraphicsId(id.ToUInt32());
         public static implicit operator TilesetGraphicsId(UAlbion.Base.TilesetGraphics id) => TilesetGraphicsId.From(id);
 
-        public static TilesetGraphicsId ToTilesetGraphicsId(int id) => new TilesetGraphicsId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static TilesetGraphicsId FromInt32(int id) => new TilesetGraphicsId(unchecked((uint)id));
+        public static TilesetGraphicsId FromUInt32(uint id) => new TilesetGraphicsId(id);
         public static bool operator ==(TilesetGraphicsId x, TilesetGraphicsId y) => x.Equals(y);
         public static bool operator !=(TilesetGraphicsId x, TilesetGraphicsId y) => !(x == y);
         public static bool operator ==(TilesetGraphicsId x, AssetId y) => x.Equals(y);
         public static bool operator !=(TilesetGraphicsId x, AssetId y) => !(x == y);
         public bool Equals(TilesetGraphicsId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
     }
 
     public class TilesetGraphicsIdConverter : TypeConverter

@@ -190,7 +190,7 @@ namespace UAlbion.Formats.Assets.Maps
             }
         }
 
-        public static IMapData Serdes(int id, IMapData existing, ISerializer s)
+        public static IMapData Serdes(AssetInfo info, IMapData existing, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             var startPosition = s.Offset;
@@ -200,9 +200,9 @@ namespace UAlbion.Formats.Assets.Maps
 
             return mapType switch
             {
-                MapType.TwoD => MapData2D.Serdes(id, (MapData2D)existing, s),
-                MapType.TwoDOutdoors => MapData2D.Serdes(id, (MapData2D)existing, s),
-                MapType.ThreeD => MapData3D.Serdes(id, (MapData3D)existing, s),
+                MapType.TwoD => Serdes(info, (MapData2D)existing, s),
+                MapType.TwoDOutdoors => Serdes(info, (MapData2D)existing, s),
+                MapType.ThreeD => Serdes(info, (MapData3D)existing, s),
                 _ => throw new NotImplementedException($"Unrecognised map type {mapType} found.")
             };
         }

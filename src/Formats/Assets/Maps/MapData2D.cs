@@ -27,13 +27,14 @@ namespace UAlbion.Formats.Assets.Maps
         }
 
         MapData2D(MapId id) : base(id) { }
-        public static MapData2D Serdes(int id, MapData2D existing, MapType mapType, AssetMapping mapping, ISerializer s)
+        public static MapData2D Serdes(AssetInfo info, MapData2D existing, MapType mapType, AssetMapping mapping, ISerializer s)
         {
+            if (info == null) throw new ArgumentNullException(nameof(info));
             if (mapping == null) throw new ArgumentNullException(nameof(mapping));
             if (s == null) throw new ArgumentNullException(nameof(s));
 
             var startOffset = s.Offset;
-            var map = existing ?? new MapData2D((MapId)id);
+            var map = existing ?? new MapData2D(info.AssetId);
             map.Flags = s.EnumU8(nameof(Flags), map.Flags); // 0
             int npcCount = s.Transform("NpcCount", map.Npcs.Count, S.UInt8, NpcCountTransform.Instance); // 1
             var _ = s.UInt8("MapType", (byte)map.MapType); // 2

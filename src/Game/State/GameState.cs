@@ -21,7 +21,7 @@ namespace UAlbion.Game.State
         public IParty Party => _party;
         public ICharacterSheet GetSheet(CharacterId id) => _game.Sheets.TryGetValue(id, out var sheet) ? sheet : null;
         public short GetTicker(TickerId id) => _game.Tickers.TryGetValue(id, out var value) ? value : (short)0;
-        public bool GetSwitch(SwitchId id) => _game.Switches.TryGetValue(id, out var value) && value;
+        public bool GetSwitch(SwitchId id) => _game.GetFlag(id);
 
         public MapChangeCollection TemporaryMapChanges => _game.TemporaryMapChanges;
         public MapChangeCollection PermanentMapChanges => _game.PermanentMapChanges;
@@ -44,15 +44,13 @@ namespace UAlbion.Game.State
             });
             On<SetTemporarySwitchEvent>(e =>
             {
-                _game.Switches[e.SwitchId] = e.Operation switch
+                _game.SetFlag(e.SwitchId, e.Operation switch
                 {
                     SetTemporarySwitchEvent.SwitchOperation.Reset => false,
                     SetTemporarySwitchEvent.SwitchOperation.Set => true,
-                    SetTemporarySwitchEvent.SwitchOperation.Toggle => 
-                        !_game.Switches.ContainsKey(e.SwitchId) 
-                        || !_game.Switches[e.SwitchId],
+                    SetTemporarySwitchEvent.SwitchOperation.Toggle => !_game.GetFlag(e.SwitchId),
                     _ => false
-                };
+                });
             });
             On<SetTickerEvent>(e =>
             {
@@ -122,11 +120,16 @@ namespace UAlbion.Game.State
             InitialiseGame();
         }
 
+        string IdToPath(ushort id)
+        {
+            var generalConfig = Resolve<IGeneralConfig>();
+            // TODO: This path currently exists in two places: here and Game\Gui\Menus\PickSaveSlot.cs
+            return generalConfig.ResolvePath($"$(SAVE)/SAVE.{id:D3}");
+        }
+
         void LoadGame(ushort id)
         {
-            var generalConfig = Resolve<IAssetManager>().LoadGeneralConfig();
-            var filename = Path.Combine(generalConfig.BasePath, generalConfig.SavePath, $"SAVE.{id:D3}");
-            _game = Resolve<IAssetManager>().LoadSavedGame(filename);
+            _game = Resolve<IAssetManager>().LoadSavedGame(IdToPath(id));
             InitialiseGame();
         }
 
@@ -143,13 +146,11 @@ namespace UAlbion.Game.State
                     : PartyMemberId.None;
 
             // var key = new AssetId(AssetType.SavedGame, id);
-            var generalConfig = Resolve<IAssetManager>().LoadGeneralConfig();
-            var filename = Path.Combine(generalConfig.BasePath, generalConfig.SavePath, $"SAVE.{id:D3}");
-
-            using var stream = File.Open(filename, FileMode.Create);
+            using var stream = File.Open(IdToPath(id), FileMode.Create);
             using var bw = new BinaryWriter(stream);
             var mapping = new AssetMapping(); // TODO
-            SavedGame.Serdes(_game, mapping, new AlbionWriter(bw));
+            using var aw = new AlbionWriter(bw);
+            SavedGame.Serdes(_game, mapping, aw);
         }
 
         void InitialiseGame()

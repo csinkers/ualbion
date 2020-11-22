@@ -1,45 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using SerdesNet;
 
 namespace UAlbion.Formats.Assets.Flic
 {
     public class FlicFile
     {
-        public FlicFile(BinaryReader br)
+        public FlicFile(ISerializer s)
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            if (s.Mode != SerializerMode.Reading)
+                throw new NotImplementedException("FLIC file writing not currently supported");
 
-            long startOffset = br.BaseStream.Position;
-            Size        =  br.ReadUInt32(); // Size of FLIC including this header
-            Type        =  (FlicHeaderType)br.ReadUInt16(); // File type 0xAF11, 0xAF12, 0xAF30, 0xAF44, ...
-            Frames      =  br.ReadUInt16(); // Number of frames in first segment
-            Width       =  br.ReadUInt16(); // FLIC width in pixels
-            Height      =  br.ReadUInt16(); // FLIC height in pixels
-            Depth       =  br.ReadUInt16(); // Bits per pixel (usually 8)
-            Flags       =  br.ReadUInt16(); // Set to zero or to three
-            Speed       =  br.ReadUInt32(); // Delay between frames in jiffies (1/70 s)
-            Reserved1   =  br.ReadUInt16(); // Set to zero
-            Created     =  br.ReadUInt32(); // Date of FLIC creation (FLC only)
-            Creator     =  br.ReadUInt32(); // Serial number or compiler id (FLC only)
-            Updated     =  br.ReadUInt32(); // Date of FLIC update (FLC only)
-            Updater     =  br.ReadUInt32(); // Serial number (FLC only), see creator
-            AspectDx    =  br.ReadUInt16(); // Width of square rectangle (FLC only)
-            AspectDy    =  br.ReadUInt16(); // Height of square rectangle (FLC only)
-            ExtFlags    =  br.ReadUInt16(); // EGI: flags for specific EGI extensions
-            KeyFrames   =  br.ReadUInt16(); // EGI: key-image frequency
-            TotalFrames =  br.ReadUInt16(); // EGI: total number of frames (segments)
-            ReqMemory   =  br.ReadUInt32(); // EGI: maximum chunk size (uncompressed)
-            MaxRegions  =  br.ReadUInt16(); // EGI: max. number of regions in a CHK_REGION chunk
-            TranspNum   =  br.ReadUInt16(); // EGI: number of transparent levels
-            Reserved2   =  br.ReadBytes(24); // Set to zero
-            OFrame1     =  br.ReadUInt32(); // Offset to frame 1 (FLC only)
-            OFrame2     =  br.ReadUInt32(); // Offset to frame 2 (FLC only)
-            Reserved3   =  br.ReadBytes(40); // Set to zero
+            long startOffset = s.Offset;
+            Size        =  s.UInt32(null, 0); // Size of FLIC including this header
+            Type        =  (FlicHeaderType)s.UInt16(null, 0); // File type 0xAF11, 0xAF12, 0xAF30, 0xAF44, ...
+            Frames      =  s.UInt16(null, 0); // Number of frames in first segment
+            Width       =  s.UInt16(null, 0); // FLIC width in pixels
+            Height      =  s.UInt16(null, 0); // FLIC height in pixels
+            Depth       =  s.UInt16(null, 0); // Bits per pixel (usually 8)
+            Flags       =  s.UInt16(null, 0); // Set to zero or to three
+            Speed       =  s.UInt32(null, 0); // Delay between frames in jiffies (1/70 s)
+            Reserved1   =  s.UInt16(null, 0); // Set to zero
+            Created     =  s.UInt32(null, 0); // Date of FLIC creation (FLC only)
+            Creator     =  s.UInt32(null, 0); // Serial number or compiler id (FLC only)
+            Updated     =  s.UInt32(null, 0); // Date of FLIC update (FLC only)
+            Updater     =  s.UInt32(null, 0); // Serial number (FLC only), see creator
+            AspectDx    =  s.UInt16(null, 0); // Width of square rectangle (FLC only)
+            AspectDy    =  s.UInt16(null, 0); // Height of square rectangle (FLC only)
+            ExtFlags    =  s.UInt16(null, 0); // EGI: flags for specific EGI extensions
+            KeyFrames   =  s.UInt16(null, 0); // EGI: key-image frequency
+            TotalFrames =  s.UInt16(null, 0); // EGI: total number of frames (segments)
+            ReqMemory   =  s.UInt32(null, 0); // EGI: maximum chunk size (uncompressed)
+            MaxRegions  =  s.UInt16(null, 0); // EGI: max. number of regions in a CHK_REGION chunk
+            TranspNum   =  s.UInt16(null, 0); // EGI: number of transparent levels
+            Reserved2   =  s.ByteArray(null, null, 24); // Set to zero
+            OFrame1     =  s.UInt32(null, 0); // Offset to frame 1 (FLC only)
+            OFrame2     =  s.UInt32(null, 0); // Offset to frame 2 (FLC only)
+            Reserved3   =  s.ByteArray(null, null, 40); // Set to zero
 
             var finalOffset = startOffset + Size;
-            while (br.BaseStream.Position < finalOffset)
-                Chunks.Add(FlicChunk.Load(br, Width, Height));
+            while (s.Offset < finalOffset)
+                Chunks.Add(FlicChunk.Load(s, Width, Height));
         }
 
         public uint Size { get; } // Size of FLIC including this header

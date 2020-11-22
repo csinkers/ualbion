@@ -1,65 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets
 {
     public class AlbionPalette : IPalette
     {
-        public int Id { get; }
+        const int EntryCount = 256;
+        const int CommonEntries = 64;
+        const int VariableEntries = EntryCount - CommonEntries;
+        public uint Id { get; }
         public string Name { get; }
-        [JsonIgnore] public bool IsAnimated => AnimatedRanges.ContainsKey(Id);
+        [JsonIgnore] public bool IsAnimated { get; }
         public int Period { get; }
-        readonly int[] _periods = new int[256];
-
-        readonly uint[] _entries = new uint[0x100];
+        readonly int[] _periods = new int[EntryCount];
+        readonly uint[] _entries = new uint[EntryCount];
         readonly IList<uint[]> _cache = new List<uint[]>();
 
-        // TODO: Move to a json file
-        static readonly IDictionary<int, IList<(byte, byte)>> AnimatedRanges = new Dictionary<int, IList<(int, int)>> {
-            { 0,  new[] { (0x99, 0x9f), (0xb0, 0xbf) } }, // 7, 16 => 112 // Outdoors Green (first island)
-            { 1,  new[] { (0x99, 0x9f), (0xb0, 0xb4), (0xb5, 0xbf) } }, // 7, 5, 11 => 385 // Outdoors Green (slightly brighter, used for second island)
-            { 2,  new[] { (0x40, 0x43), (0x44, 0x4f) } }, // 4, 12 => 12
-            { 5,  new[] { (0xb0, 0xb4), (0xb5, 0xbf) } }, // 5, 11 => 55
-            { 13, new[] { (0xb0, 0xb3), (0xb4, 0xbf) } }, // 4, 12 => 12
-            { 14, new[] { (0x58, 0x5f) } }, // 14 => 14
-            { 24, new[] { (0xb0, 0xb3), (0xb4, 0xbf) } }, // 4, 12 => 12
-            { 25, new[] { (0xb4, 0xb7), (0xb8, 0xbb), (0xbc, 0xbf) } }, // 4, 11, 4 => 44
-            { 30, new[] { (0x10, 0x4f) } }, // 80 => 80
-            { 46, new[] { (0x99, 0x9f), (0xb0, 0xb4), (0xb5, 0xbf) } }, // 7, 5, 11 => 385 // Outdoors Green - Night
-            { 48, new[] { (0xb0, 0xb3), (0xb4, 0xbf) } }, // 4, 12 => 12 // Night-palette for 24
-            { 50, new[] { (0xb0, 0xb3), (0xb4, 0xbf) } }, // 4, 12 => 12 // Dusk-palette for 24
-            { 54, new[] { (0x40, 0x43), (0x44, 0x4f) } }, // 4, 12 => 12 // Night-palette for 2
-        }.ToDictionary(
-            x => x.Key,
-            x => (IList<(byte, byte)>)x.Value.Select(y => ((byte)y.Item1, (byte)y.Item2)).ToArray());
-
-        public IList<(byte, byte)> AnimatedRange =>
-            AnimatedRanges.TryGetValue((int) Id, out var range)
-            ? range
-            : Array.Empty<(byte, byte)>();
-
-        public AlbionPalette(BinaryReader br, int streamLength, PaletteId id)
+        public AlbionPalette(ISerializer s, AssetInfo info)
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
-            Id = (int)id;
-            Name = id.ToString();
-            long startingOffset = br.BaseStream.Position;
-            for (int i = 0; i < 192; i++)
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            if (info == null) throw new ArgumentNullException(nameof(info));
+            var streamLength = s.BytesRemaining;
+            bool isCommon = streamLength == EntryCount * 3;
+
+            Id = info.AssetId.ToUInt32();
+            Name = info.AssetId.ToString();
+            long startingOffset = s.Offset;
+            for (int i = isCommon ? VariableEntries : 0; i < (isCommon ? EntryCount : VariableEntries); i++)
             {
-                _entries[i]  =       br.ReadByte();       // Red
-                _entries[i] |= (uint)br.ReadByte() << 8;  // Green
-                _entries[i] |= (uint)br.ReadByte() << 16; // Blue
+                _entries[i]  =       s.UInt8(null, 0);       // Red
+                _entries[i] |= (uint)s.UInt8(null, 0) << 8;  // Green
+                _entries[i] |= (uint)s.UInt8(null, 0) << 16; // Blue
                 _entries[i] |= (uint)(i == 0 ? 0 : 0xff) << 24; // Alpha
             }
 
-            ApiUtil.Assert(br.BaseStream.Position == startingOffset + streamLength);
+            ApiUtil.Assert(s.Offset == startingOffset + streamLength);
 
-            AnimatedRanges.TryGetValue(Id, out var ranges);
-            ranges ??= new List<(byte, byte)>();
+            var ranges = info.AnimatedRanges?.Select(x =>
+            {
+                var parts = x.Split('-');
+                if (parts.Length != 2)
+                {
+                    throw new InvalidOperationException(
+                        "Palette animated ranges must be of the form \"FROM-TO\" " +
+                        "where FROM and TO are either decimal or hex values between 0 and 255. e.g. \"0x23-0x4b\" or \"10-23\"). " +
+                        $"The incorrect value was {x}");
+                }
+
+                return ((byte) FormatUtil.ParseHex(parts[0]), (byte) FormatUtil.ParseHex(parts[1]));
+            }).ToList() ?? new List<(byte, byte)>();
+
+            IsAnimated = ranges.Any();
             Period = (int)ApiUtil.Lcm(ranges.Select(x => (long)(x.Item2 - x.Item1 + 1)).Append(1));
 
             for (int cacheIndex = 0; cacheIndex < Period; cacheIndex++)
@@ -94,18 +90,14 @@ namespace UAlbion.Formats.Assets
 
         public int CalculatePeriod(IList<byte> distinctColors) => (int)ApiUtil.Lcm(distinctColors.Select(x => (long)_periods[x]).Append(1));
 
-        public void SetCommonPalette(byte[] commonPalette)
+        public void SetCommonPalette(AlbionPalette commonPalette)
         {
-            if (commonPalette == null) throw new ArgumentNullException(nameof(commonPalette));
-            ApiUtil.Assert(commonPalette.Length == 192);
+            if (commonPalette == null)
+                throw new ArgumentNullException(nameof(commonPalette));
 
-            for (int i = 192; i < 256; i++)
+            for (int i = VariableEntries; i < EntryCount; i++)
             {
-                _entries[i]  =       commonPalette[(i - 192) * 3 + 0];       // Red
-                _entries[i] |= (uint)commonPalette[(i - 192) * 3 + 1] << 8;  // Green
-                _entries[i] |= (uint)commonPalette[(i - 192) * 3 + 2] << 16; // Blue
-                _entries[i] |= (uint)0xff << 24; // Alpha
-
+                _entries[i] = commonPalette._entries[i - VariableEntries];
                 foreach (var frame in _cache)
                     frame[i] = _entries[i];
             }

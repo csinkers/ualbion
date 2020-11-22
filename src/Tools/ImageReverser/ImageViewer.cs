@@ -96,7 +96,7 @@ namespace UAlbion.Tools.ImageReverser
                 var frame = trackFrame.Value;
                 frame++;
 
-                var filename = _core.SelectedObject?.Filename;
+                var filename = _core.SelectedObject?.Parent?.Filename;
                 if ((filename ?? "").Contains("MONGFX")) // Skip odd frames for monster graphics
                     frame++;
 
@@ -116,15 +116,15 @@ namespace UAlbion.Tools.ImageReverser
             Bitmap bmp;
             if (IsSprite(asset.Parent.Format))
             {
-                if (asset.Filename != _logicalSprite?.Name)
+                if (asset.Parent.Filename != _logicalSprite?.Name)
                 {
                     // Ugh
                     bool isRotated = asset.Parent.Transposed ?? false;
                     asset.Parent.Transposed = false;
-                    _logicalSprite = LoadSprite(asset.Filename, asset);
+                    _logicalSprite = LoadSprite(asset.Parent.Filename, asset);
                     asset.Parent.Transposed = isRotated;
 
-                    _visualSprite = isRotated ? LoadSprite(asset.Filename, asset) : _logicalSprite;
+                    _visualSprite = isRotated ? LoadSprite(asset.Parent.Filename, asset) : _logicalSprite;
                 }
 
                 if (_logicalSprite == null)
@@ -322,14 +322,15 @@ namespace UAlbion.Tools.ImageReverser
                 return;
 
             var palette = (AlbionPalette)chkListPalettes.Items[e.Index];
+            var paletteId = PaletteId.FromUInt32(palette.Id);
             if (e.NewValue == CheckState.Checked)
             {
-                if (!asset.PaletteHints.Contains(palette.Id))
-                    asset.PaletteHints.Add(palette.Id);
+                if (!asset.PaletteHints.Contains(paletteId.Id))
+                    asset.PaletteHints.Add(paletteId.Id);
             }
             else
             {
-                asset.PaletteHints.Remove(palette.Id);
+                asset.PaletteHints.Remove(paletteId.Id);
             }
 
             _core.TriggerAssetChanged(asset);
@@ -347,7 +348,8 @@ namespace UAlbion.Tools.ImageReverser
             for (int index = 0; index < chkListPalettes.Items.Count; index++)
             {
                 var item = (AlbionPalette)chkListPalettes.Items[index];
-                chkListPalettes.SetItemChecked(index, asset.PaletteHints.Contains(item.Id));
+                var paletteId = PaletteId.FromUInt32(item.Id);
+                chkListPalettes.SetItemChecked(index, asset.PaletteHints.Contains(paletteId.Id));
             }
 
             if (chkListPalettes.SelectedIndex != -1)
@@ -376,7 +378,8 @@ namespace UAlbion.Tools.ImageReverser
         {
             using var stream = File.OpenRead(Path.Combine(_core.BaseExportDirectory, filename));
             using var br = new BinaryReader(stream);
-            return (AlbionSprite)GetLoader(conf).Load(br, stream.Length, AssetMapping.Global, new AssetId(AssetType.Picture), conf);
+            using var ar = new AlbionReader(br, stream.Length);
+            return (AlbionSprite)GetLoader(conf).Serdes(null, conf, AssetMapping.Global, ar);
         }
 
         static IAssetLoader GetLoader(AssetInfo conf) =>

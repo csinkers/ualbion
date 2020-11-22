@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Config;
 
 namespace UAlbion.Formats.Parsers
@@ -11,13 +9,12 @@ namespace UAlbion.Formats.Parsers
     public class WordListLoader : IAssetLoader
     {
         const int WordLength = 21;
-        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
+        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
+            if (s == null) throw new ArgumentNullException(nameof(s));
             if (config == null) throw new ArgumentNullException(nameof(config));
             int wordListId = config.Id;
-            var wordCount = streamLength / WordLength;
-            var s = new GenericBinaryReader(br, streamLength, FormatUtil.BytesTo850String, ApiUtil.Assert);
+            var wordCount = s.BytesRemaining / WordLength;
             var words = new Dictionary<int, string>();
             for (int i = 0; i < wordCount; i++)
                 words[wordListId * 100 + i] = s.FixedLengthString("Word", null, WordLength);

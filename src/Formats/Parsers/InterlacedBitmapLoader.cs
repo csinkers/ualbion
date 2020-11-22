@@ -1,6 +1,4 @@
-﻿using System.IO;
-using SerdesNet;
-using UAlbion.Api;
+﻿using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 
@@ -9,11 +7,10 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.InterlacedBitmap)]
     public class InterlacedBitmapLoader : IAssetLoader<InterlacedBitmap>
     {
-        public InterlacedBitmap Serdes(InterlacedBitmap existing, AssetMapping mapping, ISerializer s, AssetId id, AssetInfo config) 
+        public InterlacedBitmap Serdes(InterlacedBitmap existing, AssetInfo config, AssetMapping mapping, ISerializer s)
             => InterlacedBitmap.Serdes(existing, s);
 
-        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config) 
-            => InterlacedBitmap.Serdes(null,
-                new GenericBinaryReader(br, streamLength, FormatUtil.BytesTo850String, ApiUtil.Assert));
+        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+            => Serdes(existing as InterlacedBitmap, config, mapping, s);
     }
 }

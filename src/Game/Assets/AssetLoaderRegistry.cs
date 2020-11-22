@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
+using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -14,10 +14,10 @@ namespace UAlbion.Game.Assets
 
         public IAssetLoader GetLoader(FileFormat type) => _loaders[type];
         public IAssetLoader<T> GetLoader<T>(FileFormat type) where T : class => (IAssetLoader<T>)_loaders[type];
-        public object Load(BinaryReader br, AssetId key, int streamLength, AssetMapping mapping, AssetInfo config)
+        public object Load(AssetInfo config, AssetMapping mapping, ISerializer s)
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
-            return GetLoader(config.Format).Load(br, streamLength, mapping, key, config);
+            return GetLoader(config.Format).Serdes(null, config, mapping, s);
         }
 
         public AssetLoaderRegistry AddLoader(IAssetLoader loader)
@@ -27,6 +27,10 @@ namespace UAlbion.Game.Assets
             if (attribute != null)
                 foreach (var format in attribute.SupportedFormats)
                     _loaders.Add(format, loader);
+
+            if (loader is IComponent component)
+                AttachChild(component);
+
             return this;
         }
     }

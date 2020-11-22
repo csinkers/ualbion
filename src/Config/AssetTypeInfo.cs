@@ -15,7 +15,7 @@ namespace UAlbion.Config
         {
             foreach (var file in Files)
             {
-                file.Value.Name = file.Key;
+                file.Value.Filename = file.Key;
                 file.Value.PostLoad();
             }
         }

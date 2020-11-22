@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public EventSetId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.EventSet))
-                throw new ArgumentOutOfRangeException($"Tried to construct a EventSetId with a type of {Type}");
-        }
-        public EventSetId(int id)
+        EventSetId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.EventSet))
                 throw new ArgumentOutOfRangeException($"Tried to construct a EventSetId with a type of {Type}");
         }
@@ -86,24 +80,22 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.EventSet };
         public static EventSetId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(EventSetId id) => new AssetId(id._value);
-        public static implicit operator EventSetId(AssetId id) => new EventSetId((uint)id);
-        public static explicit operator uint(EventSetId id) => id._value;
-        public static explicit operator int(EventSetId id) => unchecked((int)id._value);
-        public static explicit operator EventSetId(int id) => new EventSetId(id);
+        public static implicit operator AssetId(EventSetId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator EventSetId(AssetId id) => new EventSetId(id.ToUInt32());
         public static implicit operator EventSetId(UAlbion.Base.EventSet id) => EventSetId.From(id);
 
-        public static EventSetId ToEventSetId(int id) => new EventSetId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static EventSetId FromInt32(int id) => new EventSetId(unchecked((uint)id));
+        public static EventSetId FromUInt32(uint id) => new EventSetId(id);
         public static bool operator ==(EventSetId x, EventSetId y) => x.Equals(y);
         public static bool operator !=(EventSetId x, EventSetId y) => !(x == y);
         public static bool operator ==(EventSetId x, AssetId y) => x.Equals(y);
         public static bool operator !=(EventSetId x, AssetId y) => !(x == y);
         public bool Equals(EventSetId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
         public readonly TextId ToEventText() => new TextId(AssetType.EventText, Id);
     }
 

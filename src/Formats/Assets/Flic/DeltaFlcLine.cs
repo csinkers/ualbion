@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
+using SerdesNet;
 
 namespace UAlbion.Formats.Assets.Flic
 {
@@ -15,13 +15,13 @@ namespace UAlbion.Formats.Assets.Flic
         public byte? LastPixel { get; }
         public IList<DeltaFlcLineToken> Tokens { get; } = new List<DeltaFlcLineToken>();
 
-        public DeltaFlcLine(BinaryReader br)
+        public DeltaFlcLine(ISerializer s)
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
+            if (s == null) throw new ArgumentNullException(nameof(s));
             int remaining = 1;
             while (remaining > 0)
             {
-                var raw = br.ReadUInt16();
+                var raw = s.UInt16(null, 0);
                 var opcode = (RleOpcode)(raw >> 14);
                 remaining--;
 
@@ -30,7 +30,7 @@ namespace UAlbion.Formats.Assets.Flic
                     case RleOpcode.Packets:
                         Tokens = new DeltaFlcLineToken[raw];
                         for (int i = 0; i < raw; i++)
-                            Tokens[i] = new DeltaFlcLineToken(br);
+                            Tokens[i] = new DeltaFlcLineToken(s);
                         break;
                     case RleOpcode.StoreLowByteInLastPixel:
                         LastPixel = (byte)(0xff & raw);

@@ -28,15 +28,9 @@ namespace UAlbion.Formats.Assets
             _value = (uint)type << 24 | (uint)id;
         }
 
-        public MerchantId(uint id) 
-        { 
-            _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.Merchant))
-                throw new ArgumentOutOfRangeException($"Tried to construct a MerchantId with a type of {Type}");
-        }
-        public MerchantId(int id)
+        MerchantId(uint id) 
         {
-            _value = unchecked((uint)id);
+            _value = id;
             if (!(Type == AssetType.None || Type == AssetType.Merchant))
                 throw new ArgumentOutOfRangeException($"Tried to construct a MerchantId with a type of {Type}");
         }
@@ -86,24 +80,22 @@ namespace UAlbion.Formats.Assets
         static AssetType[] _validTypes = { AssetType.Merchant };
         public static MerchantId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
-        public static implicit operator AssetId(MerchantId id) => new AssetId(id._value);
-        public static implicit operator MerchantId(AssetId id) => new MerchantId((uint)id);
-        public static explicit operator uint(MerchantId id) => id._value;
-        public static explicit operator int(MerchantId id) => unchecked((int)id._value);
-        public static explicit operator MerchantId(int id) => new MerchantId(id);
+        public static implicit operator AssetId(MerchantId id) => AssetId.FromUInt32(id._value);
+        public static implicit operator MerchantId(AssetId id) => new MerchantId(id.ToUInt32());
         public static implicit operator MerchantId(UAlbion.Base.Merchant id) => MerchantId.From(id);
 
-        public static MerchantId ToMerchantId(int id) => new MerchantId(id);
-        public readonly int ToInt32() => (int)this;
-        public readonly uint ToUInt32() => (uint)this;
+        public readonly int ToInt32() => unchecked((int)_value);
+        public readonly uint ToUInt32() => _value;
+        public static MerchantId FromInt32(int id) => new MerchantId(unchecked((uint)id));
+        public static MerchantId FromUInt32(uint id) => new MerchantId(id);
         public static bool operator ==(MerchantId x, MerchantId y) => x.Equals(y);
         public static bool operator !=(MerchantId x, MerchantId y) => !(x == y);
         public static bool operator ==(MerchantId x, AssetId y) => x.Equals(y);
         public static bool operator !=(MerchantId x, AssetId y) => !(x == y);
         public bool Equals(MerchantId other) => _value == other._value;
-        public bool Equals(AssetId other) => _value == (uint)other;
+        public bool Equals(AssetId other) => _value == other.ToUInt32();
         public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
-        public override int GetHashCode() => (int)this;
+        public override int GetHashCode() => unchecked((int)_value);
     }
 
     public class MerchantIdConverter : TypeConverter

@@ -19,11 +19,12 @@ namespace UAlbion.Formats.Assets.Maps
         public byte[] AutomapGraphics { get; private set; }
 
         MapData3D(MapId id) : base(id) { }
-        public static MapData3D Serdes(int id, MapData3D existing, AssetMapping mapping, ISerializer s)
+        public static MapData3D Serdes(AssetInfo info, MapData3D existing, AssetMapping mapping, ISerializer s)
         {
+            if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));
 
-            var map = existing ?? new MapData3D((MapId)id);
+            var map = existing ?? new MapData3D(info.AssetId);
             map.Flags = s.EnumU8(nameof(Flags), map.Flags); // 0
             int npcCount = s.Transform("NpcCount", map.Npcs.Count, S.UInt8, NpcCountTransform.Instance); // 1
             var _ = s.UInt8("MapType", (byte)map.MapType); // 2

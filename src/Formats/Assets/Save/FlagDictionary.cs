@@ -1,42 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets.Save
 {
-    public class FlagDictionary : Dictionary<SwitchId, bool>
+    public class FlagDictionary
     {
         // TODO: Proper AssetId support + a way of storing extra flags in save files.
-        const int _max = 600;
-        public const int PackedSize = _max / 8;
+        public const int OriginalSaveGameMax = 600;
+        public static int PackedSize(int min, int max) => (max-min + 7) / 8;
 
-        public bool GetFlag(SwitchId flag) => TryGetValue(flag, out var value) && value;
+        readonly HashSet<SwitchId> _set = new HashSet<SwitchId>();
+
+        public bool GetFlag(SwitchId flag) => _set.Contains(flag);
         public void SetFlag(SwitchId flag, bool value)
         {
-            if (flag.Id > _max)
-                throw new InvalidOperationException($"Tried to set out of range flag {flag} (greater than max: {_max})");
-            this[flag] = value;
+            if (value) _set.Add(flag);
+            else _set.Remove(flag);
         }
 
-        public byte[] GetPacked()
+        public byte[] GetPacked(int from, int to, AssetMapping mapping)
         {
+            if (mapping == null) throw new ArgumentNullException(nameof(mapping));
+            var packed = new byte[PackedSize(from, to)];
+            for (int i = 0; i < to-from; i++)
+            {
+                var diskId = new SwitchId(AssetType.Switch, i + from);
+                var globalId = AssetMapping.Global.EnumToId(mapping.IdToEnum(diskId));
+                packed[i / 8] |= (byte)((_set.Contains(globalId) ? 1 : 0) << (i % 8));
+            }
 
-            var packed = new byte[(_max + 7) / 8];
-            for (int i = 0; i < _max; i++)
-                packed[i / 8] |= (byte)((TryGetValue((SwitchId)i, out var value) && value ? 1 : 0) << (i % 8));
             return packed;
         }
 
-        public void SetPacked(byte[] packed)
+        public void SetPacked(int offset, byte[] packed, AssetMapping mapping)
         {
-            Clear();
-            if (packed == null) return;
+            if (mapping == null)
+                throw new ArgumentNullException(nameof(mapping));
+
+            _set.Clear();
+            if (packed == null)
+                return;
+
             for (int i = 0; i < packed.Length; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
                     bool flagValue = (packed[i] & (1 << j)) != 0;
+                    int diskId = i * 8 + j + offset;
+                    SwitchId id = AssetMapping.Global.EnumToId(mapping.IdToEnum(new SwitchId(AssetType.Switch, diskId)));
                     if (flagValue)
-                        this[(SwitchId)(i * 8 + j)] = true;
+                        _set.Add(id);
                 }
             }
         }

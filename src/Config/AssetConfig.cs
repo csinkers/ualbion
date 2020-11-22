@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
@@ -12,10 +13,10 @@ namespace UAlbion.Config
 
         public static AssetConfig Load(string configPath)
         {
-            AssetConfig config = new AssetConfig();
             if (!File.Exists(configPath))
-                return config;
+                throw new FileNotFoundException($"Could not open asset config from {configPath}");
 
+            AssetConfig config = new AssetConfig();
             var configText = File.ReadAllText(configPath);
             var assetTypes = JsonConvert.DeserializeObject<IDictionary<string, AssetTypeInfo>>(configText);
 
@@ -52,5 +53,16 @@ namespace UAlbion.Config
         }
 
         public AssetInfo GetAsset(string typeName, int id) => _assetLookup.TryGetValue((typeName, id), out var info) ? info : null;
+
+        public void PopulateAssetIds(AssetMapping mapping)
+        {
+            if (mapping == null) throw new ArgumentNullException(nameof(mapping));
+            foreach (var typeKvp in Types)
+            {
+                var type = Type.GetType(typeKvp.Key);
+                foreach(var asset in typeKvp.Value.Files.SelectMany(x => x.Value.Assets))
+                    asset.Value.AssetId = mapping.EnumToId(type, asset.Value.Id);
+            }
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
@@ -10,19 +10,18 @@ namespace UAlbion.Formats.Parsers
     [AssetLoader(FileFormat.SingleHeaderSprite, FileFormat.HeaderPerSubImageSprite)]
     public class HeaderBasedSpriteLoader : IAssetLoader
     {
-        public object Load(BinaryReader br, long streamLength, AssetMapping mapping, AssetId id, AssetInfo config)
+        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
-            if (br == null) throw new ArgumentNullException(nameof(br));
+            if (s == null) throw new ArgumentNullException(nameof(s));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
             ApiUtil.Assert(config.Transposed != true);
-            long initialPosition = br.BaseStream.Position;
 
-            int width = br.ReadUInt16();
-            int height = br.ReadUInt16();
-            int something = br.ReadByte();
+            int width = s.UInt16(null, 0);
+            int height = s.UInt16(null, 0);
+            int something = s.UInt8(null, 0);
             ApiUtil.Assert(something == 0);
-            int spriteCount = br.ReadByte();
+            int spriteCount = s.UInt8(null, 0);
 
             bool uniform = config.Format == FileFormat.SingleHeaderSprite;
             var frames = new AlbionSpriteFrame[spriteCount];
@@ -34,15 +33,15 @@ namespace UAlbion.Formats.Parsers
             {
                 if (!uniform && i > 0)
                 {
-                    width = br.ReadUInt16();
-                    height = br.ReadUInt16();
-                    something = br.ReadByte();
+                    width = s.UInt16(null, 0);
+                    height = s.UInt16(null, 0);
+                    something = s.UInt8(null, 0);
                     ApiUtil.Assert(something == 0);
-                    int spriteCount2 = br.ReadByte();
+                    int spriteCount2 = s.UInt8(null, 0);
                     ApiUtil.Assert(spriteCount2 == spriteCount);
                 }
 
-                var bytes = br.ReadBytes(width * height);
+                var bytes = s.ByteArray(null, null, width * height);
                 frames[i] = new AlbionSpriteFrame(0, currentY, width, height);
                 frameBytes.Add(bytes);
 
@@ -61,8 +60,8 @@ namespace UAlbion.Formats.Parsers
                     pixelData[(frame.Y + j) * spriteWidth + frame.X + i] = frameBytes[n][j * frame.Width + i];
             }
 
-            ApiUtil.Assert(br.BaseStream.Position == initialPosition + streamLength);
-            return new AlbionSprite(id.ToString(), spriteWidth, currentY, uniform, pixelData, frames);
+            s.Check();
+            return new AlbionSprite(config.AssetId.ToString(), spriteWidth, currentY, uniform, pixelData, frames);
         }
     }
 }

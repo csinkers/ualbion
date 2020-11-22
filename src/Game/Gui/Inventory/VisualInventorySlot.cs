@@ -119,7 +119,7 @@ namespace UAlbion.Game.Gui.Inventory
                 while (_frameNumber >= frames)
                     _frameNumber -= frames;
 
-                int itemSpriteId = (int) item.Icon + _frameNumber;
+                int itemSpriteId = item.IconSubId + _frameNumber;
                 _sprite.SubId = itemSpriteId;
                 _overlay.IsActive = (slot.Flags & ItemSlotFlags.Broken) != 0;
             }

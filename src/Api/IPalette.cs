@@ -4,7 +4,7 @@ namespace UAlbion.Api
 {
     public interface IPalette
     {
-        int Id { get; }
+        uint Id { get; }
         string Name { get; }
         IList<uint[]> GetCompletePalette();
         bool IsAnimated { get; }

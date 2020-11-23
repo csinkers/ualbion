@@ -51,7 +51,7 @@ namespace UAlbion.Tools.ImageReverser
             if (_logicalSprite != null)
             {
                 trackFrameCount.Value = _logicalSprite.Frames.Count;
-                if (asset.Parent.Format == FileFormat.FixedSizeSprite &&
+                if (asset.File.Loader == FixedSizeSpriteLoader.TypeString &&
                     asset.Height != null &&
                     _logicalSprite.Frames[0].Height != asset.Height)
                 {
@@ -96,7 +96,7 @@ namespace UAlbion.Tools.ImageReverser
                 var frame = trackFrame.Value;
                 frame++;
 
-                var filename = _core.SelectedObject?.Parent?.Filename;
+                var filename = _core.SelectedObject?.File?.Filename;
                 if ((filename ?? "").Contains("MONGFX")) // Skip odd frames for monster graphics
                     frame++;
 
@@ -114,17 +114,17 @@ namespace UAlbion.Tools.ImageReverser
                 return;
 
             Bitmap bmp;
-            if (IsSprite(asset.Parent.Format))
+            if (IsSprite(asset.File))
             {
-                if (asset.Parent.Filename != _logicalSprite?.Name)
+                if (asset.File.Filename != _logicalSprite?.Name)
                 {
                     // Ugh
-                    bool isRotated = asset.Parent.Transposed ?? false;
-                    asset.Parent.Transposed = false;
-                    _logicalSprite = LoadSprite(asset.Parent.Filename, asset);
-                    asset.Parent.Transposed = isRotated;
+                    bool isRotated = asset.File.Transposed ?? false;
+                    asset.File.Transposed = false;
+                    _logicalSprite = LoadSprite(asset.File.Filename, asset);
+                    asset.File.Transposed = isRotated;
 
-                    _visualSprite = isRotated ? LoadSprite(asset.Parent.Filename, asset) : _logicalSprite;
+                    _visualSprite = isRotated ? LoadSprite(asset.File.Filename, asset) : _logicalSprite;
                 }
 
                 if (_logicalSprite == null)
@@ -217,8 +217,8 @@ namespace UAlbion.Tools.ImageReverser
             if (asset == null)
                 return;
 
-            if (!asset.Parent.Width.HasValue &&
-                asset.Parent.Format == FileFormat.FixedSizeSprite &&
+            if (!asset.File.Width.HasValue &&
+                asset.File.Format == FixedSizeSpriteLoader.TypeString &&
                 asset.Width != trackWidth.Value)
             {
                 asset.Width = trackWidth.Value;
@@ -270,8 +270,8 @@ namespace UAlbion.Tools.ImageReverser
                         ? (int?)null
                         : _logicalSprite.Height / trackFrameCount.Value;
 
-                if (!asset.Parent.Height.HasValue &&
-                    asset.Parent.Format == FileFormat.FixedSizeSprite &&
+                if (!asset.File.Height.HasValue &&
+                    asset.File.Format == FixedSizeSpriteLoader.TypeString &&
                     asset.Height != newHeight)
                 {
                     asset.Height = newHeight;
@@ -357,18 +357,16 @@ namespace UAlbion.Tools.ImageReverser
                     chkListPalettes.SelectedIndex = chkListPalettes.CheckedIndices[0];
         }
 
-        static bool IsSprite(FileFormat type)
+        static bool IsSprite(AssetFileInfo info)
         {
-            switch (type)
+            switch (info.Loader)
             {
-                // case FileFormat.InterlacedBitmap:
-                case FileFormat.AmorphousSprite:
-                case FileFormat.FixedSizeSprite:
-                case FileFormat.Font:
-                case FileFormat.HeaderPerSubImageSprite:
-                case FileFormat.MapData:
-                case FileFormat.SingleHeaderSprite:
-                case FileFormat.Slab:
+                case "UAlbion.Formats.Parsers.AmorphousSpriteLoader, UAlbion.Formats":
+                case "UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats":
+                case "UAlbion.Formats.Parsers.FontSpriteLoader, UAlbion.Formats":
+                case "UAlbion.Formats.Parsers.HeaderBasedSpriteLoader, UAlbion.Formats":
+                case "UAlbion.Formats.Parsers.InterlacedBitmapLoader, UAlbion.Formats":
+                case "UAlbion.Formats.Parsers.SlabLoader, UAlbion.Formats":
                     return true;
                 default: return false;
             }
@@ -382,17 +380,17 @@ namespace UAlbion.Tools.ImageReverser
             return (AlbionSprite)GetLoader(conf).Serdes(null, conf, AssetMapping.Global, ar);
         }
 
-        static IAssetLoader GetLoader(AssetInfo conf) =>
-            (conf.Parent.Format) switch
-            {
-            FileFormat.AmorphousSprite => new AmorphousSpriteLoader(),
-            FileFormat.FixedSizeSprite => new FixedSizeSpriteLoader(),
-            FileFormat.Font => new FixedSizeSpriteLoader(),
-            FileFormat.HeaderPerSubImageSprite => new HeaderBasedSpriteLoader(),
-            FileFormat.MapData =>new FixedSizeSpriteLoader(),
-            FileFormat.SingleHeaderSprite =>new HeaderBasedSpriteLoader(),
-            FileFormat.Slab => new FixedSizeSpriteLoader(),
-            _ => null
-            };
+        static IAssetLoader GetLoader(AssetInfo conf)
+        {
+            var type = Type.GetType(conf.File.Loader);
+            if(type == null)
+                throw new InvalidOperationException($"Could not find loader type \"{conf.File.Loader}\"");
+
+            var constructor = type.GetConstructor(new Type[0]);
+            if(constructor == null)
+                throw new InvalidOperationException($"Could not find parameterless constructor for loader type \"{type}\"");
+
+            return (IAssetLoader)constructor.Invoke(new object[0]);
+        }
     }
 }

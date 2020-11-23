@@ -6,7 +6,6 @@ using UAlbion.Config;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.ItemNames)]
     public class ItemNameLoader : IAssetLoader
     {
         const int StringSize = 20;

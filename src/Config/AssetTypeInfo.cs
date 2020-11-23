@@ -8,14 +8,16 @@ namespace UAlbion.Config
         public string CopiedFrom { get; set; }
         public string EnumType { get; set; }
         public AssetType AssetType { get; set; }
-        public bool Localised { get; set; }
         public IDictionary<string, AssetFileInfo> Files { get; } = new Dictionary<string, AssetFileInfo>();
+        public string Loader { get; set; }
+        public string Locator { get; set; }
 
         public void PostLoad()
         {
             foreach (var file in Files)
             {
                 file.Value.Filename = file.Key;
+                file.Value.EnumType = this;
                 file.Value.PostLoad();
             }
         }

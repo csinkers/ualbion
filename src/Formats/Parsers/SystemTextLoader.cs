@@ -7,7 +7,6 @@ using UAlbion.Config;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.SystemText)]
     public class SystemTextLoader : IAssetLoader
     {
         static readonly Regex Regex = new Regex(@"\[(\d+):(.*)\]");
@@ -31,18 +30,6 @@ namespace UAlbion.Formats.Parsers
             }
 
             return results;
-/*
-            var fullText = FormatUtil.BytesTo850String(s.ByteArray(null, null, (int)s.BytesRemaining));
-            var lines = fullText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var line in lines)
-            {
-                if (line[0] != '[')
-                    continue;
-                var untilColon = line.Substring(1, line.IndexOf(':') - 1);
-                int id = int.Parse(untilColon);
-                strings[id] = line.Substring(line.IndexOf(':') + 1).TrimEnd(']');
-            }
-*/
         }
     }
 }

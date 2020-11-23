@@ -29,7 +29,7 @@ namespace UAlbion.Game.Gui.Inventory
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
 
-            var heading = new Header(new LiteralText(item.Name));
+            var heading = new Header(item.Name);
             var itemPic = new UiSpriteElement(item.Icon)
             {
                 SubId = item.IconSubId,

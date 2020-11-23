@@ -13,9 +13,9 @@ namespace UAlbion.Base
     [JsonConverter(typeof(StringEnumConverter))]
     public enum DungeonBackground : ushort
     {
-        EarlyGameS = 1,
-        EarlyGameL = 2,
-        LateGame = 3,
+        EarlyGameS = 0,
+        EarlyGameL = 1,
+        LateGame = 2,
     }
 }
 #pragma warning restore CA1707 // Identifiers should not contain underscores

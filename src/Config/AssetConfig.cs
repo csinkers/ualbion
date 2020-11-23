@@ -52,7 +52,7 @@ namespace UAlbion.Config
                 assetType.Value.PostSave();
         }
 
-        public AssetInfo GetAsset(string typeName, int id) => _assetLookup.TryGetValue((typeName, id), out var info) ? info : null;
+        public AssetInfo GetAssetInfo(string typeName, int id) => _assetLookup.TryGetValue((typeName, id), out var info) ? info : null;
 
         public void PopulateAssetIds(AssetMapping mapping)
         {
@@ -64,5 +64,7 @@ namespace UAlbion.Config
                     asset.Value.AssetId = mapping.EnumToId(type, asset.Value.Id);
             }
         }
+
+        public AssetTypeInfo GetTypeInfo(string name) => Types.TryGetValue(name, out var info) ? info : null;
     }
 }

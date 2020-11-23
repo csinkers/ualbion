@@ -4,7 +4,6 @@ using UAlbion.Formats.Assets.Save;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.SavedGame)]
     public class SavedGameLoader : IAssetLoader<SavedGame>
     {
         public SavedGame Serdes(SavedGame existing, AssetInfo config, AssetMapping mapping, ISerializer s)

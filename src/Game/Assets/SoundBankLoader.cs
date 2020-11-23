@@ -9,7 +9,6 @@ using UAlbion.Formats;
 
 namespace UAlbion.Game.Assets
 {
-    [AssetLoader(FileFormat.SoundBank)]
     public class SoundBankLoader : Component, IAssetLoader
     {
         static byte[] GetRawWoplBytes(WoplFile wopl)
@@ -22,7 +21,7 @@ namespace UAlbion.Game.Assets
         }
 
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-{
+        {
             var oplFile = GlobalTimbreLibrary.Serdes(null, s);
             WoplFile wopl = new WoplFile(oplFile);
             return GetRawWoplBytes(wopl);

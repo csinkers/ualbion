@@ -5,7 +5,6 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.Font)]
     public class FontSpriteLoader : IAssetLoader
     {
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)

@@ -19,7 +19,7 @@ namespace UAlbion.Formats.Assets
         readonly uint _value;
         public TextId(AssetType type, int id = 0)
         {
-            if (!(type == AssetType.None || type >= AssetType.EventText && type <= AssetType.Word))
+            if (!(type == AssetType.None || type >= AssetType.EventText && type <= AssetType.Word || type == AssetType.Special))
                 throw new ArgumentOutOfRangeException($"Tried to construct a TextId with a type of {type}");
 #if DEBUG
             if (id < 0 || id > 0xffffff)
@@ -31,7 +31,7 @@ namespace UAlbion.Formats.Assets
         TextId(uint id) 
         {
             _value = id;
-            if (!(Type == AssetType.None || Type >= AssetType.EventText && Type <= AssetType.Word))
+            if (!(Type == AssetType.None || Type >= AssetType.EventText && Type <= AssetType.Word || Type == AssetType.Special))
                 throw new ArgumentOutOfRangeException($"Tried to construct a TextId with a type of {Type}");
         }
 
@@ -48,7 +48,7 @@ namespace UAlbion.Formats.Assets
         {
             if (mapping == null) throw new ArgumentNullException(nameof(mapping));
             
-            if (!(type == AssetType.None || type >= AssetType.EventText && type <= AssetType.Word))
+            if (!(type == AssetType.None || type >= AssetType.EventText && type <= AssetType.Word || type == AssetType.Special))
                 throw new ArgumentOutOfRangeException($"Tried to construct a TextId with a type of {type}");
 
             var (enumType, enumValue) = mapping.IdToEnum(new TextId(type, disk));
@@ -79,15 +79,16 @@ namespace UAlbion.Formats.Assets
         public bool IsNone => Type == AssetType.None;
 
         public override string ToString() => AssetMapping.Global.IdToName(this);
-        static AssetType[] _validTypes = { AssetType.EventText, AssetType.MapText, AssetType.Text, AssetType.Word };
+        static AssetType[] _validTypes = { AssetType.EventText, AssetType.MapText, AssetType.Special, AssetType.Text, AssetType.Word };
         public static TextId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
         public static implicit operator AssetId(TextId id) => AssetId.FromUInt32(id._value);
         public static implicit operator TextId(AssetId id) => new TextId(id.ToUInt32());
+        public static implicit operator TextId(UAlbion.Base.Special id) => TextId.From(id);
+        public static implicit operator TextId(UAlbion.Base.SystemText id) => TextId.From(id);
         public static implicit operator TextId(UAlbion.Base.UAlbionString id) => TextId.From(id);
         public static implicit operator TextId(UAlbion.Base.EventText id) => TextId.From(id);
         public static implicit operator TextId(UAlbion.Base.MapText id) => TextId.From(id);
-        public static implicit operator TextId(UAlbion.Base.SystemText id) => TextId.From(id);
         public static implicit operator TextId(UAlbion.Base.Word id) => TextId.From(id);
 
         public readonly int ToInt32() => unchecked((int)_value);

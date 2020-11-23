@@ -83,7 +83,8 @@ namespace UAlbion.Formats.Tests
             Assert.Equal((typeof(GapByteOne), (int)GapByteOne.Two), m.IdToEnum(new AssetId(AssetType.Item, 2)));
             Assert.Equal((typeof(GapByteOne), (int)GapByteOne.Foo255), m.IdToEnum(new AssetId(AssetType.Item, 255)));
             Assert.Equal((typeof(GapByteOne), 200), m.IdToEnum(new AssetId(AssetType.Item, 200)));
-            Assert.Equal((typeof(int), 300), m.IdToEnum(new AssetId(AssetType.Item, 300)));
+            var invalidId = new AssetId(AssetType.Item, 300);
+            Assert.Equal((null, invalidId.ToInt32()), m.IdToEnum(invalidId));
         }
 
         // Test To/FromDisk on AssetId

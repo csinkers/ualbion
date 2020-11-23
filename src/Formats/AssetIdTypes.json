@@ -70,6 +70,7 @@
     "TextId": [
       "EventText",
       "MapText",
+      "Special",
       "Text",
       "Word"
     ]
@@ -86,6 +87,6 @@
       "        public readonly SpriteId ToBigPartyGraphics() => new SpriteId(AssetType.BigPartyGraphics, Id);",
       "        public readonly SpriteId ToFullBodyPicture() => new SpriteId(AssetType.FullBodyPicture, Id);"
     ],
-    "SongId": [ "        public readonly WaveLibraryId ToWaveLibrary() => new WaveLibraryId(AssetType.WaveLibrary, Id);" ],
+    "SongId": [ "        public readonly WaveLibraryId ToWaveLibrary() => new WaveLibraryId(AssetType.WaveLibrary, Id);" ]
   }
 }

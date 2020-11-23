@@ -67,7 +67,7 @@ namespace UAlbion.Tools.ImageReverser
                     fileInfo.Assets[number] = new AssetInfo();
 
                 AssetInfo asset = fileInfo.Assets[number];
-                asset.Parent.Filename = relative;
+                asset.File.Filename = relative;
             }
 
             var commonPalette = LoadPalette(GeneralConfig.ResolvePath("$(ALBION)/CD/XLDLIBS/PALETTE.000"), new AssetInfo());

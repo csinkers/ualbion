@@ -4,8 +4,7 @@ using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.Tileset)]
-    public class TilesetDataLoader : IAssetLoader<TilesetData>
+    public class TilesetLoader : IAssetLoader<TilesetData>
     {
         public TilesetData Serdes(TilesetData existing, AssetInfo config, AssetMapping mapping, ISerializer s)
             => TilesetData.Serdes(null, s, config);

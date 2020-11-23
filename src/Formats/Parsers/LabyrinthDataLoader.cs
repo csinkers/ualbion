@@ -5,7 +5,6 @@ using UAlbion.Formats.Assets.Labyrinth;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.LabyrinthData)]
     public class LabyrinthDataLoader : IAssetLoader<LabyrinthData>
     {
         public LabyrinthData Serdes(LabyrinthData existing, AssetInfo config, AssetMapping mapping, ISerializer s)

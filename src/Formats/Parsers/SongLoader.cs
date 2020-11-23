@@ -4,7 +4,6 @@ using UAlbion.Config;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.Song)]
     public class SongLoader : IAssetLoader
     {
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)

@@ -5,7 +5,6 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.Palette, FileFormat.PaletteCommon)]
     public class PaletteLoader : IAssetLoader
     {
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)

@@ -4,7 +4,6 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.Slab)]
     public class SlabLoader : IAssetLoader
     {
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)

@@ -7,7 +7,6 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.SingleHeaderSprite, FileFormat.HeaderPerSubImageSprite)]
     public class HeaderBasedSpriteLoader : IAssetLoader
     {
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
@@ -23,7 +22,7 @@ namespace UAlbion.Formats.Parsers
             ApiUtil.Assert(something == 0);
             int spriteCount = s.UInt8(null, 0);
 
-            bool uniform = config.Format == FileFormat.SingleHeaderSprite;
+            bool uniform = config.File.Format != "NonUniform";
             var frames = new AlbionSpriteFrame[spriteCount];
             var frameBytes = new List<byte[]>();
             int currentY = 0;

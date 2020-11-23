@@ -23,6 +23,8 @@ namespace UAlbion.Config
             return config;
         }
 
+        public void SetPath(string pathName, string path) => Paths[pathName] = path;
+
         public string ResolvePath(string relative)
         {
             if (string.IsNullOrEmpty(relative))

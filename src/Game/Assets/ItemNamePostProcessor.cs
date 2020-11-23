@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
 using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Assets
@@ -14,11 +13,11 @@ namespace UAlbion.Game.Assets
         {
             if (asset == null) throw new ArgumentNullException(nameof(asset));
             var dict = (IDictionary<(int, GameLanguage), string>)asset;
-            var result = new Dictionary<ItemId, string>();
+            var result = new Dictionary<int, string>();
             var settings = Resolve<IGameplaySettings>();
             foreach (var kvp in dict)
                 if (kvp.Key.Item2 == settings.Language)
-                    result[new ItemId(AssetType.Item, kvp.Key.Item1)] = kvp.Value;
+                    result[kvp.Key.Item1] = kvp.Value;
             return result;
         }
 

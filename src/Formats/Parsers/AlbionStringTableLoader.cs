@@ -2,10 +2,10 @@
 using System.Linq;
 using SerdesNet;
 using UAlbion.Config;
+using UAlbion.Formats.Assets;
 
-namespace UAlbion.Formats.Assets
+namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.StringTable)]
     public class AlbionStringTableLoader : IAssetLoader<AlbionStringCollection>
     {
         public AlbionStringCollection Serdes(AlbionStringCollection existing, AssetInfo config, AssetMapping mapping, ISerializer s)

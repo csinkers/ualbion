@@ -13,12 +13,21 @@ namespace UAlbion.Config
     {
         static readonly ThreadLocal<AssetMapping> ThreadLocalGlobal = new ThreadLocal<AssetMapping>(() => new AssetMapping());
         static readonly AssetMapping TrueGlobal = new AssetMapping();
+        static readonly AssetType[] _unmappedTypes = 
+            typeof(AssetType)
+            .GetEnumValues()
+            .OfType<AssetType>()
+            .Where(x => 
+                typeof(AssetType)
+                .GetMember(x.ToString())[0]
+                .GetCustomAttributes(typeof(UnmappedAttribute), false)
+                .FirstOrDefault() != null
+            ).ToArray();
 
         // The global mapping, should always be used apart from when loading/saving assets.
         // Always built dynamically based on the current set of active mods
         public static AssetMapping Global => GlobalIsThreadLocal ? ThreadLocalGlobal.Value : TrueGlobal;
         public static bool GlobalIsThreadLocal { get; set; } // Set to true for unit tests.
-        public const string UnknownType = "Unknown";
 
         readonly struct Range
         {
@@ -114,8 +123,11 @@ namespace UAlbion.Config
                 return (info.EnumTypeString, id.Id - info.Offset);
             }
 
-            ApiUtil.Assert($"AssetId ({id.Type}, {id.Id}) is outside the mapped range.");
-            return (UnknownType, id.Id);
+            #if DEBUG
+            if (!_unmappedTypes.Contains(id.Type))
+                ApiUtil.Assert($"AssetId ({id.Type}, {id.Id}) is outside the mapped range.");
+            #endif
+            return (null, id.ToInt32());
         }
 
         /// <summary>
@@ -134,8 +146,11 @@ namespace UAlbion.Config
                 return (info.EnumType, id.Id - info.Offset);
             }
 
-            ApiUtil.Assert($"AssetId ({id.Type}, {id.Id}) is outside the mapped range.");
-            return (typeof(int), id.Id);
+            #if DEBUG
+            if (!_unmappedTypes.Contains(id.Type))
+                ApiUtil.Assert($"AssetId ({id.Type}, {id.Id}) is outside the mapped range.");
+            #endif
+            return (null, id.ToInt32());
         }
 
         /// <summary>
@@ -146,9 +161,9 @@ namespace UAlbion.Config
         public string IdToName(AssetId id)
         {
             var (enumType, enumValue) = IdToEnum(id);
-            return enumType.IsEnum
-                ? enumType.Name + "." + Enum.GetName(enumType, enumValue)
-                : enumValue == 0 ? "None" : $"{id.Type}.??{enumValue}??";
+            return enumType == null
+                ? enumValue == 0 ? "None" : $"{id.Type}.{enumValue}"
+                : enumType.Name + "." + Enum.GetName(enumType, enumValue);
         }
 
         /// <summary>
@@ -178,8 +193,8 @@ namespace UAlbion.Config
         public AssetId EnumToId((Type, int) value) => EnumToId(value.Item1, value.Item2);
         public AssetId EnumToId(Type enumType, int enumValue)
         {
-            if (enumType == typeof(int) && enumValue == 0)
-                return AssetId.None;
+            if (enumType == null)
+                return AssetId.FromInt32(enumValue);
 
             if (!_byEnumType.TryGetValue(enumType, out var info))
                 throw new ArgumentOutOfRangeException($"Type {enumType} is not currently mapped.");

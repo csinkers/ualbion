@@ -71,7 +71,7 @@ namespace UAlbion
                     global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
                     break;
                 case GameMode.NewGame:
-                    global.Raise(new NewGameEvent(Base.Map.Toronto2DGesamtkarteSpielbeginn, 30, 75), null);
+                    global.Raise(new NewGameEvent(Base.Map.TorontoBegin, 30, 75), null);
                     break;
                 case GameMode.LoadGame:
                     global.Raise(new LoadGameEvent(ushort.Parse(commandLine.GameModeArgument, CultureInfo.InvariantCulture)), null);

@@ -5,7 +5,6 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.CharacterData)]
     public class CharacterSheetLoader : IAssetLoader<CharacterSheet>
     {
         public CharacterSheet Serdes(CharacterSheet existing, AssetInfo config, AssetMapping mapping, ISerializer s)

@@ -209,7 +209,7 @@ namespace UAlbion.Game.Text
             }
         }
 
-        static IEnumerable<TextBlock> TokensToBlocks(IAssetManager assets, IEnumerable<(Token, object)> tokens, string raw)
+        static IEnumerable<TextBlock> TokensToBlocks(IWordLookup wordLookup, IEnumerable<(Token, object)> tokens, string raw)
         {
             var sb = new StringBuilder();
             var block = new TextBlock { Raw = raw };
@@ -259,16 +259,11 @@ namespace UAlbion.Game.Text
 
                     case Token.Word:
                     {
-                        WordId? word = assets.ParseWord((string)p);
-                        if (word == null)
-                        {
-                            sb.Append((string)p);
-                        }
+                        WordId word = wordLookup.Parse((string)p);
+                        if (word.IsNone)
+                            sb.Append((string) p);
                         else
-                        {
-                            // sb.Append(assets.LoadString(word.Value));
-                            block.AddWord(word.Value);
-                        }
+                            block.AddWord(word);
                         break;
                     }
                 }
@@ -290,7 +285,7 @@ namespace UAlbion.Game.Text
                 tokens = implicitTokens.Concat(tokens);
 
             IEnumerable<(Token, object)> substituted = Substitute(assets, tokens, arguments);
-            return TokensToBlocks(assets, substituted, template);
+            return TokensToBlocks(Resolve<IWordLookup>(), substituted, template);
         }
 
         public IText Format(TextId textId, params object[] arguments)
@@ -303,7 +298,7 @@ namespace UAlbion.Game.Text
             => Format(template, null, null, arguments);
 
         public IText Format(TextId textId, IList<(Token, object)> implicitTokens, params object[] arguments)
-            => Format(textId, implicitTokens, null, arguments);
+            => Format(new StringId(textId), implicitTokens, null, arguments);
 
         public IText Format(StringId stringId, IList<(Token, object)> implicitTokens, params object[] arguments)
             => new DynamicText(() =>

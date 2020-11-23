@@ -6,6 +6,7 @@ namespace UAlbion.Game.Assets
 {
     public interface IModApplier : IComponent
     {
+        void LoadMods(IGeneralConfig config);
         IModApplier AddAssetPostProcessor(IAssetPostProcessor postProcessor);
         AssetInfo GetAssetInfo(AssetId key);
         object LoadAsset(AssetId id);

@@ -26,7 +26,7 @@ namespace UAlbion.Formats.Assets
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (info == null) throw new ArgumentNullException(nameof(info));
             var streamLength = s.BytesRemaining;
-            bool isCommon = streamLength == EntryCount * 3;
+            bool isCommon = streamLength == CommonEntries * 3;
 
             Id = info.AssetId.ToUInt32();
             Name = info.AssetId.ToString();

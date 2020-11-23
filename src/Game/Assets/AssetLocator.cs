@@ -11,27 +11,19 @@ namespace UAlbion.Game.Assets
 {
     public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocator
     {
-        readonly IAssetLoaderRegistry _assetLoaderRegistry;
-        readonly IContainerLoaderRegistry _containerLoaderRegistry;
-        readonly MetaFontLoader _metafontLoader;
+        IAssetLoaderRegistry _assetLoaderRegistry;
+        IContainerLoaderRegistry _containerLoaderRegistry;
 
-        public AssetLocator(IAssetLoaderRegistry assetLoaderRegistry, IContainerLoaderRegistry containerLoaderRegistry, MetaFontLoader metafontLoader)
+        protected override void Subscribed()
         {
-            _assetLoaderRegistry = assetLoaderRegistry ?? throw new ArgumentNullException(nameof(assetLoaderRegistry));
-            _containerLoaderRegistry = containerLoaderRegistry ?? throw new ArgumentNullException(nameof(containerLoaderRegistry));
-            _metafontLoader = metafontLoader ?? throw new ArgumentNullException(nameof(metafontLoader));
-            AttachChild(_assetLoaderRegistry as IComponent);
-            AttachChild(_containerLoaderRegistry as IComponent);
-            AttachChild(_metafontLoader);
+            _assetLoaderRegistry = Resolve<IAssetLoaderRegistry>();
+            _containerLoaderRegistry = Resolve<IContainerLoaderRegistry>();
+            base.Subscribed();
         }
 
         public object LoadAsset(AssetId id, SerializationContext context, AssetInfo info)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-
-            if (id.Type == AssetType.MetaFont)
-                return _metafontLoader.Load(id);
-
             if (info == null) throw new ArgumentNullException(nameof(info));
             var generalConfig = Resolve<IGeneralConfig>();
             object asset = TryLoad(context.ModDirectory, generalConfig, info, context);
@@ -43,7 +35,7 @@ namespace UAlbion.Game.Assets
             }
 
             if (asset == null)
-                throw new FileNotFoundException($"Could not find file matching \"{info.Parent.Filename}\" in the configured mods and search paths (for asset {info.AssetId}).");
+                throw new FileNotFoundException($"Could not find file matching \"{info.File.Filename}\" in the configured mods and search paths (for asset {info.AssetId}).");
 
             return asset;
         }
@@ -54,16 +46,16 @@ namespace UAlbion.Game.Assets
             if (s == null)
                 return null;
 
-            var loader = _assetLoaderRegistry.GetLoader(info.Format);
+            var loader = _assetLoaderRegistry.GetLoader(info.File.Loader);
             if (loader == null)
-                throw new InvalidOperationException($"No loader for file type \"{info.Format}\" required by asset {info.Name}");
+                throw new InvalidOperationException($"No loader for file type \"{info.File.Loader}\" required by asset {info.Name}");
 
             return loader.Serdes(null, info, context.Mapping, s);
         }
 
         ISerializer Search(string dir, IGeneralConfig generalConfig, AssetInfo info)
         {
-            var combined = Path.Combine(dir, info.Parent.Filename);
+            var combined = Path.Combine(dir, info.File.Filename);
             var filename = Path.GetFileName(combined).ToUpperInvariant();
             dir = Path.GetDirectoryName(combined);
             var resolved = generalConfig.ResolvePath(dir);
@@ -81,12 +73,12 @@ namespace UAlbion.Game.Assets
             var files = Directory.GetFiles(resolved);
             foreach (var path in files.Where(x => Path.GetFileNameWithoutExtension(x).ToUpperInvariant() == filename))
             {
-                if (!string.IsNullOrEmpty(info.Parent.Sha256Hash))
+                if (!string.IsNullOrEmpty(info.File.Sha256Hash))
                 {
                     var hash = GetHash(path);
-                    if (!hash.Equals(info.Parent.Sha256Hash, StringComparison.OrdinalIgnoreCase))
+                    if (!hash.Equals(info.File.Sha256Hash, StringComparison.OrdinalIgnoreCase))
                     {
-                        CoreUtil.LogWarn($"Found file {path} for asset {info.AssetId}, but its hash ({hash}) did not match the expected one ({info.Parent.Sha256Hash})");
+                        CoreUtil.LogWarn($"Found file {path} for asset {info.AssetId}, but its hash ({hash}) did not match the expected one ({info.File.Sha256Hash})");
                         return null;
                     }
                 }
@@ -97,7 +89,7 @@ namespace UAlbion.Game.Assets
                 {
                     case ".XLD": s = _containerLoaderRegistry.Load(path, info, ContainerFormat.Xld); break;
                     case ".ZIP": s = _containerLoaderRegistry.Load(path, info, ContainerFormat.Zip); break;
-                    default: s = _containerLoaderRegistry.Load(path, info, info.Parent.ContainerFormat); break;
+                    default: s = _containerLoaderRegistry.Load(path, info, info.File.ContainerFormat); break;
                 }
 
                 if (s != null)

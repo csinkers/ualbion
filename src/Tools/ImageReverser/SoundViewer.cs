@@ -3,7 +3,6 @@ using System.IO;
 using System.Media;
 using System.Text;
 using System.Windows.Forms;
-using UAlbion.Config;
 
 namespace UAlbion.Tools.ImageReverser
 {
@@ -23,10 +22,12 @@ namespace UAlbion.Tools.ImageReverser
         void CoreOnSelectionChanged(object sender, SelectedAssetChangedArgs e)
         {
             var asset = e.SelectedObject;
+            if (asset == null)
+                return;
             //if (asset.Format == FileFormat.SampleLibrary)
-            if (asset?.Format == FileFormat.AudioSample)
+            if (asset.File.Loader == "UAlbion.Formats.Parsers.SampleLoader, UAlbion.Formats")
             {
-                var stream = File.OpenRead(Path.Combine(_core.BaseExportDirectory, asset.Parent.Filename));
+                var stream = File.OpenRead(Path.Combine(_core.BaseExportDirectory, asset.File.Filename));
                 _player.Stream = stream;
                 _player.Play();
             }

@@ -9,7 +9,6 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.AmorphousSprite)]
     public class AmorphousSpriteLoader : IAssetLoader
     {
         static readonly Regex SizesRegex = new Regex(@"

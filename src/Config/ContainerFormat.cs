@@ -10,6 +10,5 @@
         ItemList, // 0x3A bytes per item, no header.
         ItemNameList, // 20 bytes per name, each item has 3 names (German, English, French)
         SpellList, // 5 bytes per spell, 30 spells per class, 7 classes. No header.
-        SystemTextList, // Text file with lines like "[123:Some string %s etc]" (lines not starting with '[' are comments)
     }
 }

@@ -6,6 +6,7 @@ using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
@@ -19,6 +20,7 @@ namespace UAlbion.Game.Assets
         readonly List<ModInfo> _modsInReverseDependencyOrder = new List<ModInfo>();
         readonly AssetCache _assetCache = new AssetCache();
         IAssetLocator _assetLocator;
+        IAssetLocatorRegistry _assetLocatorRegistry;
         GameLanguage _language = GameLanguage.English;
 
         public ModApplier()
@@ -30,6 +32,8 @@ namespace UAlbion.Game.Assets
                     return;
 
                 _language = e.Language;
+                var config = Resolve<IGeneralConfig>();
+                config.SetPath("LANG", _language.ToString().ToUpperInvariant());
                 Raise(new ReloadAssetsEvent());
                 Raise(new LanguageChangedEvent());
             });
@@ -53,9 +57,18 @@ namespace UAlbion.Game.Assets
 
         protected override void Subscribed()
         {
-            _assetLocator = Resolve<IAssetLocator>();
-            var config = Resolve<IGeneralConfig>();
+            _assetLocator ??= Resolve<IAssetLocator>();
+            _assetLocatorRegistry ??= Resolve<IAssetLocatorRegistry>();
             Exchange.Register<IModApplier>(this);
+        }
+
+        public void LoadMods(IGeneralConfig config)
+        {
+            if (config == null) throw new ArgumentNullException(nameof(config));
+
+            _mods.Clear();
+            _modsInReverseDependencyOrder.Clear();
+            AssetMapping.Global.Clear();
 
             LoadMod(config.ResolvePath("$(MODS)"), "Base");
 
@@ -132,7 +145,7 @@ namespace UAlbion.Game.Assets
         {
             var (typeName, enumId) = AssetMapping.Global.IdToEnumString(id);
             return _modsInReverseDependencyOrder
-                .Select(x => x.AssetConfig.GetAsset(typeName, enumId))
+                .Select(x => x.AssetConfig.GetAssetInfo(typeName, enumId))
                 .FirstOrDefault(x => x != null);
         }
 
@@ -171,17 +184,28 @@ namespace UAlbion.Game.Assets
 
         object LoadAssetInternal(AssetId id)
         {
+            if (id.Type == AssetType.MetaFont)
+                return Resolve<IMetafontBuilder>().Build((MetaFontId)id.Id);
+
             var (typeName, enumId) = AssetMapping.Global.IdToEnumString(id);
+            if (typeName == null)
+                return null;
+
             object asset = null;
             Stack<IPatch> patches = null; // Create the stack lazily, as most assets won't have any patches.
             foreach (var mod in _modsInReverseDependencyOrder)
             {
-                var info = mod.AssetConfig.GetAsset(typeName, enumId);
-                if (info == null && typeName != AssetMapping.UnknownType)
+                var info = mod.AssetConfig.GetAssetInfo(typeName, enumId);
+                var typeInfo = info?.File.EnumType ?? mod.AssetConfig.GetTypeInfo(typeName);
+                if (typeInfo == null)
                     continue;
 
-                var context = new SerializationContext(mod.Mapping, _language, mod.Path);
-                var modAsset = _assetLocator.LoadAsset(id, context, info);
+                var assetLocator = typeInfo.Locator != null
+                    ? _assetLocatorRegistry.GetLocator(typeInfo.Locator)
+                    : _assetLocator;
+
+                var context = new SerializationContext(mod.Mapping, mod.Path);
+                var modAsset = assetLocator.LoadAsset(id, context, info);
                 if (modAsset is IPatch patch)
                 {
                     patches ??= new Stack<IPatch>();

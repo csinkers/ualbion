@@ -6,8 +6,8 @@ namespace UAlbion.Game.Assets
 {
     public interface IAssetLoaderRegistry
     {
-        IAssetLoader GetLoader(FileFormat type);
-        IAssetLoader<T> GetLoader<T>(FileFormat type) where T : class;
+        IAssetLoader GetLoader(string loaderName);
+        IAssetLoader<T> GetLoader<T>(string loaderName) where T : class;
         object Load(AssetInfo config, AssetMapping mapping, ISerializer s);
     }
 }

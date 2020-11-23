@@ -4,7 +4,6 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.BlockList)]
     public class BlockListLoader : IAssetLoader<BlockList>
     {
         public BlockList Serdes(BlockList existing, AssetInfo config, AssetMapping mapping, ISerializer s)

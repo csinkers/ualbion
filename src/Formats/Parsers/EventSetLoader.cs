@@ -5,7 +5,6 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.EventSet)]
     public class EventSetLoader : IAssetLoader<EventSet>
     {
         public EventSet Serdes(EventSet existing, AssetInfo config, AssetMapping mapping, ISerializer s)

@@ -82,6 +82,7 @@ namespace UAlbion.Formats.Assets
 
         public static implicit operator AssetId(TickerId id) => AssetId.FromUInt32(id._value);
         public static implicit operator TickerId(AssetId id) => new TickerId(id.ToUInt32());
+        public static implicit operator TickerId(UAlbion.Base.Ticker id) => TickerId.From(id);
 
         public readonly int ToInt32() => unchecked((int)_value);
         public readonly uint ToUInt32() => _value;

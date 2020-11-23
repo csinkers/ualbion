@@ -6,8 +6,8 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Config;
 using UAlbion.Formats.Containers;
-using UAlbion.Formats.Parsers;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Settings;
 using UAlbion.Game.Text;
@@ -40,45 +40,15 @@ namespace UAlbion
             PerfTracker.StartupEvent("Registering asset manager");
             var factory = new VeldridCoreFactory();
 
+            var loaderRegistry = new AssetLoaderRegistry();
+            var locatorRegistry = new AssetLocatorRegistry();
             var containerLoaderRegistry = new ContainerLoaderRegistry()
                 .AddLoader(new RawContainerLoader())
                 .AddLoader(new XldContainerLoader())
                 .AddLoader(new BinaryOffsetContainerLoader())
                 .AddLoader(new ItemListContainerLoader())
                 .AddLoader(new SpellListContainerLoader())
-                .AddLoader(new SystemTextContainerLoader())
                 ;
-
-            var loaderRegistry = new AssetLoaderRegistry()
-                .AddLoader(new AlbionStringTableLoader()) // Register loaders for the various file formats
-                .AddLoader(new AmorphousSpriteLoader())
-                .AddLoader(new BlockListLoader())
-                .AddLoader(new ChestLoader())
-                .AddLoader(new CharacterSheetLoader())
-                .AddLoader(new EventSetLoader())
-                .AddLoader(new FixedSizeSpriteLoader())
-                .AddLoader(new FlicLoader())
-                .AddLoader(new FontSpriteLoader())
-                .AddLoader(new HeaderBasedSpriteLoader())
-                .AddLoader(new InterlacedBitmapLoader())
-                .AddLoader(new ItemDataLoader())
-                .AddLoader(new ItemNameLoader())
-                .AddLoader(new LabyrinthDataLoader())
-                .AddLoader(new MapLoader())
-                .AddLoader(new MonsterGroupLoader())
-                .AddLoader(new PaletteLoader())
-                .AddLoader(new SampleLoader())
-                .AddLoader(new SavedGameLoader())
-                .AddLoader(new ScriptLoader())
-                .AddLoader(new SlabLoader())
-                .AddLoader(new SongLoader())
-                .AddLoader(new SpellLoader())
-                .AddLoader(new SystemTextLoader())
-                .AddLoader(new TilesetDataLoader())
-                .AddLoader(new WordListLoader());
-
-            var metaFontLoader = new MetaFontLoader(factory);
-            var assetLocator = new AssetLocator(loaderRegistry, containerLoaderRegistry, metaFontLoader);
 
             var modApplier = new ModApplier()
                 // Register post-processors for handling transformations of asset data that can't be done by UAlbion.Formats alone.
@@ -86,17 +56,22 @@ namespace UAlbion
                 .AddAssetPostProcessor(new ImageSharpPostProcessor())
                 .AddAssetPostProcessor(new InterlacedBitmapPostProcessor())
                 .AddAssetPostProcessor(new InventoryPostProcessor())
-                .AddAssetPostProcessor(new ItemPostProcessor())
                 .AddAssetPostProcessor(new ItemNamePostProcessor())
                 ;
 
             var assets = new AssetManager();
-            var services = new Container("Services", 
+            var settings = GeneralSettings.Load(baseDir);
+            var services = new Container("Services",
+                settings, // Need to register settings first, as the AssetLocator relies on it.
+                loaderRegistry,
+                locatorRegistry,
+                containerLoaderRegistry,
+                new MetafontBuilder(factory),
                 new StdioConsoleLogger(),
                 // new ClipboardManager(),
                 new ImGuiConsoleLogger(),
-                GeneralSettings.Load(baseDir), // Need to register settings first, as the AssetConfigLocator relies on it.
-                assetLocator,
+                new WordLookup(),
+                new AssetLocator(),
                 modApplier,
                 assets);
 
@@ -106,7 +81,16 @@ namespace UAlbion
                 .Attach(services);
 
             Engine.GlobalExchange = exchange;
-            AssetTest(assets);
+            generalConfig.SetPath("LANG", settings.Language.ToString().ToUpperInvariant()); // Ensure that the LANG path is set before resolving any assets
+            modApplier.LoadMods(generalConfig);
+
+            exchange // Need to load game config after mods so asset ids can be parsed.
+                .Register(CoreConfig.Load(Path.Combine(baseDir, "data", "core.json")))
+                .Register(GameConfig.Load(Path.Combine(baseDir, "data", "game.json")));
+
+            // PerfTracker.StartupEvent("Running asset tests...");
+            // AssetTest(assets);
+            // PerfTracker.StartupEvent("Asset tests done");
 
             PerfTracker.StartupEvent("Registered asset manager");
             PerfTracker.StartupEvent($"Running as {commandLine.Mode}");
@@ -145,6 +129,7 @@ namespace UAlbion
         static void AssetTest(AssetManager assets)
         {
             var item = assets.LoadItem(Base.Item.LughsShield);
+            var itemName = assets.LoadString(item.Name);
             var fontTex = assets.LoadTexture(Base.Font.RegularFont);
             var font = assets.LoadFont(FontColor.White, false);
             var blocklist = assets.LoadBlockList(Base.BlockList.Toronto);
@@ -160,7 +145,7 @@ namespace UAlbion
             var labyrinthData = assets.LoadLabyrinthData(Base.LabyrinthData.Unknown125);
             var largeNpc = assets.LoadTexture(Base.LargeNpc.Christine);
             var largePartyMember = assets.LoadTexture(Base.LargePartyMember.Tom);
-            var mapText = assets.LoadString(Base.MapText.Toronto2DGesamtkarteSpielbeginn);
+            var mapText = assets.LoadString(Base.MapText.TorontoBegin);
             var merchant = assets.LoadInventory(AssetId.From(Base.Merchant.Unknown109));
             var monster = assets.LoadSheet(Base.Monster.Krondir1);
             var monsterGraphics = assets.LoadTexture(Base.MonsterGraphics.Krondir);
@@ -186,11 +171,11 @@ namespace UAlbion
             var video = assets.LoadVideo(Base.Video.MagicDemonstration);
             var wall = assets.LoadTexture(Base.Wall.TorontoPanelling);
             var wallOverlay = assets.LoadTexture(Base.WallOverlay.JiriWindow);
-            var waveLibrary = assets.LoadWaveLib(Base.WaveLibrary.Toronto);
             var word = assets.LoadString(Base.Word.Unknown0);
-            var map = assets.LoadMap(Base.Map.Toronto2DGesamtkarteSpielbeginn);
+            var map = assets.LoadMap(Base.Map.TorontoBegin);
             var eventSet = assets.LoadEventSet(Base.EventSet.Frill);
             var eventText = assets.LoadString(Base.EventText.Frill);
+            var waveLibrary = assets.LoadWaveLib(Base.WaveLibrary.Toronto);
             var automapTiles = assets.LoadTexture(Base.AutomapTiles.Set1);
             var automap = assets.LoadAutomap(Base.Automap.Jirinaar3D);
         }

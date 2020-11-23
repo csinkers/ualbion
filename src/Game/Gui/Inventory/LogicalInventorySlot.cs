@@ -112,12 +112,12 @@ namespace UAlbion.Game.Gui.Inventory
             var slotInfo = Slot;
             string itemName = null;
             if (slotInfo?.Item is ItemData item)
-                itemName = item.Name;
+                itemName = assets.LoadString(item.Name);
 
             var hand = inventoryManager.ItemInHand;
             string itemInHandName = null;
             if (hand.Item is ItemData itemInHand)
-                itemInHandName = itemInHand.Name;
+                itemInHandName = assets.LoadString(itemInHand.Name);
 
             var action = inventoryManager.GetInventoryAction(_id);
             _visual.Hoverable = true;
@@ -187,13 +187,7 @@ namespace UAlbion.Game.Gui.Inventory
                 return;
 
             var itemPosition = window.UiToNorm(slotInfo.LastUiPosition);
-            var heading = new LiteralText(
-                new TextBlock(item.Name)
-                {
-                    Alignment = TextAlignment.Center,
-                    ArrangementFlags = TextArrangementFlags.NoWrap,
-                    Style = TextStyle.Fat
-                });
+            var heading = tf.Center().NoWrap().Fat().Format(item.Name);
 
             IText S(TextId textId, bool disabled = false)
                 => tf

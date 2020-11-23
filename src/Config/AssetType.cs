@@ -8,7 +8,7 @@
     /// </summary>
     public enum AssetType : byte
     {
-        None = 0, // Must be 0 so default(AssetId) will equate to AssetId.None
+        [Unmapped] None = 0, // Must be 0 so default(AssetId) will equate to AssetId.None
 
         AutomapGraphics,
         BackgroundGraphics,
@@ -53,7 +53,7 @@
         Npc,
         PartyMember,
 
-        MetaFont,
+        [Unmapped] MetaFont,
         MonsterGroup,
         ObjectGroup,
         Palette,
@@ -71,7 +71,6 @@
         [Localised] [IsomorphicTo(Map)] MapText,
         [Localised] Text,
         [Localised] Word,
-        [Localised] Dictionary,
 
         Special = 254, // For various types that only have a single value
         Unknown = 255

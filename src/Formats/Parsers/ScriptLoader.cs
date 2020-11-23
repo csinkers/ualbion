@@ -8,7 +8,6 @@ using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.Script)]
     public class ScriptLoader : IAssetLoader
     {
         IEnumerable<string> ReadLines(ISerializer s)

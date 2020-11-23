@@ -10,7 +10,6 @@ using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.Assets
 {
@@ -87,39 +86,15 @@ namespace UAlbion.Game.Assets
         public FlicFile LoadVideo(VideoId id) => (FlicFile)_modApplier.LoadAssetCached(id);
         public CharacterSheet LoadSheet(CharacterId id) => (CharacterSheet)_modApplier.LoadAssetCached(id);
         public Inventory LoadInventory(AssetId id) => (Inventory)_modApplier.LoadAssetCached(id);
-        public WordId? ParseWord(string word)
-        {
-            throw new NotImplementedException();
-            /*
-            var words = // Inefficient code, if it ends up being a problem then we can build a reverse dictionary and cache it.
-                new[]
-                {   // Load the English files as all languages use English {WORDxxx} tags
-                    (IDictionary<int, string>) _modApplier.LoadAssetCached(new AssetId(AssetType.Dictionary)),
-                    (IDictionary<int, string>) _modApplier.LoadAssetCached(new AssetId(AssetType.Dictionary, 1)),
-                    (IDictionary<int, string>) _modApplier.LoadAssetCached(new AssetId(AssetType.Dictionary, 2))
-                };
-
-            return words
-                .SelectMany(x => x)
-                .Where(x => x.Value == word)
-                .Select(x => (WordId?)x.Key)
-                .FirstOrDefault();
-            */
-        }
-
         public IList<Block> LoadBlockList(BlockListId id) => (IList<Block>)_modApplier.LoadAssetCached(id);
         public EventSet LoadEventSet(EventSetId id) => (EventSet)_modApplier.LoadAssetCached(id);
-        public byte[] LoadSong(SongId id) => (byte[]) _modApplier.LoadAssetCached(id);
-        public IList<IEvent> LoadScript(ScriptId id) => (IList<IEvent>) _modApplier.LoadAsset(id);
+        public byte[] LoadSong(SongId id) => (byte[])_modApplier.LoadAssetCached(id);
+        public IList<IEvent> LoadScript(ScriptId id) => (IList<IEvent>)_modApplier.LoadAsset(id);
 
         public SpellData LoadSpell(SpellId id) => (SpellData)_modApplier.LoadAssetCached(id);
         public SavedGame LoadSavedGame(string path) => _modApplier.LoadSavedGame(path);
         public MonsterGroup LoadMonsterGroup(MonsterGroupId id) => (MonsterGroup)_modApplier.LoadAssetCached(id);
         public Automap LoadAutomap(AutomapId id) => (Automap)_modApplier.LoadAssetCached(id);
-
-        public GameConfig LoadGameConfig() => (GameConfig)_modApplier.LoadAssetCached(AssetId.From(Base.Special.GameConfig));
-        public CoreConfig LoadCoreConfig()=> (CoreConfig)_modApplier.LoadAssetCached(AssetId.From(Base.Special.CoreConfig));
-        public byte[] LoadSoundBanks() => (byte[]) _modApplier.LoadAssetCached(AssetId.From(Base.Special.SoundBank));
-        public IDictionary<ItemId, string> LoadItemNames() => (IDictionary<ItemId, string>) _modApplier.LoadAssetCached(AssetId.From(Base.Special.ItemNames));
+        public byte[] LoadSoundBanks() => (byte[])_modApplier.LoadAssetCached(AssetId.From(Base.Special.SoundBank));
     }
 }

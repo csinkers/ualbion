@@ -73,7 +73,7 @@ namespace UAlbion.Game.Gui.Menus
             {
                 Attach(exchange);
                 if (response)
-                    Raise(new NewGameEvent(Base.Map.Toronto2DGesamtkarteSpielbeginn, 30, 75)); // TODO: Move this to config?
+                    Raise(new NewGameEvent(Base.Map.TorontoBegin, 30, 75)); // TODO: Move this to config?
             });
             Detach();
         }

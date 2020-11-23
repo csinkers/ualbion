@@ -37,6 +37,7 @@ namespace UAlbion.Formats.MapEvents
             QueryType switch
             {
                 QueryType.ChosenVerb             => AssetType.None,
+                QueryType.IsDemoVersion          => AssetType.None,
                 QueryType.PreviousActionResult   => AssetType.None,
                 QueryType.TriggerType            => AssetType.None,
                 QueryType.PromptPlayerNumeric    => AssetType.None,

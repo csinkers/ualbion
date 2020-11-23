@@ -4,7 +4,6 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.MonsterGroup)]
     public class MonsterGroupLoader : IAssetLoader<MonsterGroup>
     {
         public MonsterGroup Serdes(MonsterGroup existing, AssetInfo config, AssetMapping mapping, ISerializer s)

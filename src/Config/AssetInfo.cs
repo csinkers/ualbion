@@ -7,11 +7,10 @@ namespace UAlbion.Config
     public class AssetInfo
     {
         [JsonIgnore] public int SubAssetId { get; internal set; } // Sub-asset offset in the container file (or 0 if not inside a container)
-        [JsonIgnore] public AssetFileInfo Parent { get; internal set; }
-        [JsonIgnore] public FileFormat Format => Parent.Format;
-        [JsonIgnore] public int EffectiveWidth => Width ?? Parent.Width ?? 0; // For sprites only
-        [JsonIgnore] public int EffectiveHeight => Height ?? Parent.Height ?? 0; // For sprites only
-        [JsonIgnore] public bool Transposed => Parent.Transposed ?? false; // For sprites only
+        [JsonIgnore] public AssetFileInfo File { get; internal set; }
+        [JsonIgnore] public int EffectiveWidth => Width ?? File.Width ?? 0; // For sprites only
+        [JsonIgnore] public int EffectiveHeight => Height ?? File.Height ?? 0; // For sprites only
+        [JsonIgnore] public bool Transposed => File.Transposed ?? false; // For sprites only
         [JsonIgnore] public AssetId AssetId { get; internal set; }
 
         public int Id { get; set; } // Id of this asset in the mapped enum type.

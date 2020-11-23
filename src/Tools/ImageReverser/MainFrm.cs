@@ -65,14 +65,14 @@ namespace UAlbion.Tools.ImageReverser
             }
 
             var sb = new StringBuilder();
-            sb.AppendLine($"{asset.Parent.Filename}");
+            sb.AppendLine($"{asset.File.Filename}");
 
-            if (File.Exists(asset.Parent.Filename))
+            if (File.Exists(asset.File.Filename))
             {
-                var fileInfo = new FileInfo(asset.Parent.Filename);
+                var fileInfo = new FileInfo(asset.File.Filename);
                 sb.AppendLine($"File Size: {fileInfo.Length}");
-                sb.AppendLine($"XLD: {asset.Parent.Filename}");
-                sb.AppendLine($"Layer: {asset.Parent.Format}");
+                sb.AppendLine($"XLD: {asset.File.Filename}");
+                sb.AppendLine($"Layer: {asset.File.Format}");
                 sb.AppendLine($"Conf Width: {asset.EffectiveWidth}");
                 sb.AppendLine($"Conf Height: {asset.EffectiveHeight}");
             }
@@ -85,9 +85,9 @@ namespace UAlbion.Tools.ImageReverser
 
         void AddToTree(AssetInfo asset)
         {
-            if (asset.Parent.Filename == null)
+            if (asset.File.Filename == null)
                 return;
-            var parts = asset.Parent.Filename.Split('\\');
+            var parts = asset.File.Filename.Split('\\');
             TreeNode node = _rootNode;
             foreach (var dir in parts.Take(parts.Length - 1)) // Ensure parent nodes exist
             {
@@ -176,53 +176,26 @@ namespace UAlbion.Tools.ImageReverser
             if (asset == null)
                 return null;
 
-            switch (asset.Format)
+            switch (asset.File.Loader)
             {
-                case FileFormat.Unknown:
-                    break;
-
-                case FileFormat.AmorphousSprite:
-                case FileFormat.FixedSizeSprite:
-                case FileFormat.HeaderPerSubImageSprite:
-                case FileFormat.SingleHeaderSprite:
-                case FileFormat.Font:
-                case FileFormat.InterlacedBitmap:
-                case FileFormat.Slab:
+                case "UAlbion.Formats.Parsers.AmorphousSpriteLoader, UAlbion.Formats":
+                case "UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats":
+                case "UAlbion.Formats.Parsers.FontSpriteLoader, UAlbion.Formats":
+                case "UAlbion.Formats.Parsers.HeaderBasedSpriteLoader, UAlbion.Formats":
+                case "UAlbion.Formats.Parsers.InterlacedBitmapLoader, UAlbion.Formats":
+                case "UAlbion.Formats.Parsers.SlabLoader, UAlbion.Formats":
                     return _imageViewer;
 
-                case FileFormat.StringTable:
-                case FileFormat.SystemText:
-                case FileFormat.Script:
-                case FileFormat.ItemNames:
+                case "UAlbion.Formats.Parsers.AlbionStringTableLoader, UAlbion.Formats":
+                case "UAlbion.Formats.Parsers.SystemTextLoader, UAlbion.Formats":
+                case "UAlbion.Formats.Parsers.ItemNameLoader, UAlbion.Formats":
+                case "UAlbion.Formats.Parsers.ScriptLoader, UAlbion.Formats":
                     return _textViewer;
 
-                case FileFormat.AudioSample:
-                case FileFormat.SampleLibrary:
-                case FileFormat.Song:
+                case "UAlbion.Formats.Parsers.SampleLoader, UAlbion.Formats":
+                case "UAlbion.Formats.Parsers.SongLoader, UAlbion.Formats":
+                case "UAlbion.Formats.Parsers.WaveLibLoader, UAlbion.Formats":
                     return _soundPlayer;
-
-                case FileFormat.Palette:
-                case FileFormat.PaletteCommon:
-                    break;
-
-                case FileFormat.FlicVideo:
-                    break;
-
-                case FileFormat.MapData:
-                case FileFormat.Tileset:
-                case FileFormat.CharacterData:
-                case FileFormat.SpellData:
-                case FileFormat.LabyrinthData:
-                case FileFormat.ItemData:
-                    break;
-
-                case FileFormat.BlockList:
-                case FileFormat.EventSet:
-                case FileFormat.PlayerInventory:
-                case FileFormat.ChestInventory:
-                case FileFormat.MerchantInventory:
-                case FileFormat.MonsterGroup:
-                    break;
             }
 
             return null;

@@ -4,7 +4,6 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    [AssetLoader(FileFormat.InterlacedBitmap)]
     public class InterlacedBitmapLoader : IAssetLoader<InterlacedBitmap>
     {
         public InterlacedBitmap Serdes(InterlacedBitmap existing, AssetInfo config, AssetMapping mapping, ISerializer s)

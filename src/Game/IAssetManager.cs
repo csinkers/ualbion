@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Api;
 using UAlbion.Config;
-using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
@@ -9,7 +8,6 @@ using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Game
 {
@@ -30,7 +28,6 @@ namespace UAlbion.Game
         ItemData LoadItem(ItemId id);
         CharacterSheet LoadSheet(CharacterId id);
         Inventory LoadInventory(AssetId id); // TODO: Use InventoryId?
-        WordId? ParseWord(string word);
         IList<Block> LoadBlockList(BlockListId id);
         EventSet LoadEventSet(EventSetId id);
         byte[] LoadSong(SongId id);
@@ -39,11 +36,6 @@ namespace UAlbion.Game
         SavedGame LoadSavedGame(string path);
         MonsterGroup LoadMonsterGroup(MonsterGroupId id);
         Automap LoadAutomap(AutomapId id);
-
-        // Special assets
-        GameConfig LoadGameConfig();
-        CoreConfig LoadCoreConfig();
-        byte[] LoadSoundBanks();
-        IDictionary<ItemId, string> LoadItemNames();
+        byte[] LoadSoundBanks(); // Special assets
     }
 }

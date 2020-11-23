@@ -21,16 +21,16 @@ namespace UAlbion.Game.Settings
                 Language = e.Language;
             });
             On<SetMusicVolumeEvent>(e => MusicVolume = e.Value);
-            On<SetFxVolumeEvent>   (e => FxVolume    = e.Value);
+            On<SetFxVolumeEvent>(e => FxVolume = e.Value);
             On<SetCombatDelayEvent>(e => CombatDelay = e.Value);
-            On<DebugFlagEvent>     (e =>
+            On<DebugFlagEvent>(e =>
             {
-                DebugFlags = (DebugFlags) CoreUtil.UpdateFlag((uint) DebugFlags, e.Operation, (uint) e.Flag);
+                DebugFlags = (DebugFlags)CoreUtil.UpdateFlag((uint)DebugFlags, e.Operation, (uint)e.Flag);
                 TraceAttachment = (DebugFlags & DebugFlags.TraceAttachment) != 0;
             });
-            On<SpecialEvent>       (e => Special1 = CoreUtil.UpdateValue(Special1, e.Operation, e.Argument));
-            On<Special2Event>      (e => Special2 = CoreUtil.UpdateValue(Special2, e.Operation, e.Argument));
-            On<EngineFlagEvent>(e => Flags = (EngineFlags) CoreUtil.UpdateFlag((uint) Flags, e.Operation, (uint) e.Flag));
+            On<SpecialEvent>(e => Special1 = CoreUtil.UpdateValue(Special1, e.Operation, e.Argument));
+            On<Special2Event>(e => Special2 = CoreUtil.UpdateValue(Special2, e.Operation, e.Argument));
+            On<EngineFlagEvent>(e => Flags = (EngineFlags)CoreUtil.UpdateFlag((uint)Flags, e.Operation, (uint)e.Flag));
         }
 
         [JsonIgnore] public IDebugSettings Debug => this;

@@ -13,11 +13,10 @@ namespace UAlbion.Base
     [JsonConverter(typeof(StringEnumConverter))]
     public enum Special : ushort
     {
-        AssetConfig = 0,
-        CoreConfig = 1,
-        GameConfig = 2,
-        SoundBank = 3,
-        ItemNames = 4,
+        SoundBank = 0,
+        ItemNames = 1,
+        SystemStrings = 2,
+        UAlbionStrings = 3,
     }
 }
 #pragma warning restore CA1707 // Identifiers should not contain underscores

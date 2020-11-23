@@ -233,33 +233,18 @@ namespace UAlbion.Game.State.Player
                 return;
             }
 
-            var (maxQuantity, text, icon) = slot.Item switch
+            var text = (slot.Item, discard) switch
             {
-                Gold _ => (
-                    slot.Amount,
-                    discard
-                        ? Base.SystemText.Gold_ThrowHowMuchGoldAway
-                        : Base.SystemText.Gold_TakeHowMuchGold,
-                    Base.CoreSprite.UiGold),
-
-                Rations _ => (
-                    slot.Amount,
-                    discard
-                        ? Base.SystemText.Gold_ThrowHowManyRationsAway
-                        : Base.SystemText.Gold_TakeHowManyRations,
-                    Base.CoreSprite.UiFood),
-
-                ItemData item => (
-                    slot.Amount,
-                    discard
-                        ? Base.SystemText.InvMsg_ThrowHowManyItemsAway
-                        : Base.SystemText.InvMsg_TakeHowManyItems,
-                    item.Icon
-                ),
+                (Gold _, true) => Base.SystemText.Gold_ThrowHowMuchGoldAway,
+                (Gold _, false) => Base.SystemText.Gold_TakeHowMuchGold,
+                (Rations _, true) => Base.SystemText.Gold_ThrowHowManyRationsAway,
+                (Rations _, false) => Base.SystemText.Gold_TakeHowManyRations,
+                (ItemData item, true) => Base.SystemText.InvMsg_ThrowHowManyItemsAway,
+                (ItemData item, false) => Base.SystemText.InvMsg_TakeHowManyItems,
                 { } x => throw new InvalidOperationException($"Unexpected item contents {x}")
             };
 
-            if (RaiseAsync(new ItemQuantityPromptEvent((TextId)text, icon, maxQuantity, slotId == ItemSlotId.Gold), continuation) == 0)
+            if (RaiseAsync(new ItemQuantityPromptEvent((TextId)text, slot.Item.Icon, slot.Item.IconSubId, slot.Amount, slotId == ItemSlotId.Gold), continuation) == 0)
             {
                 ApiUtil.Assert("ItemManager.GetQuantity tried to open a quantity dialog, but no-one was listening for the event.");
                 continuation(0);

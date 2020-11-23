@@ -184,7 +184,8 @@ namespace UAlbion.Formats.Assets.Maps
                 if (npc.Chain == null)
                 {
                     var chain = new EventChain(-1);
-                    chain.Events.Add(new EventNode(0, new StartDialogueEvent(npc.Id)));
+                    if (npc.Id.Type == AssetType.Npc)
+                        chain.Events.Add(new EventNode(0, new StartDialogueEvent(npc.Id)));
                     npc.Chain = chain;
                 }
             }
@@ -193,6 +194,9 @@ namespace UAlbion.Formats.Assets.Maps
         public static IMapData Serdes(AssetInfo info, IMapData existing, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
+            if (s.BytesRemaining == 0)
+                return null;
+
             var startPosition = s.Offset;
             s.UInt16("DummyRead", 0); // Initial flags + npc count, will be re-read by the 2D/3D specific map loader
             MapType mapType = s.EnumU8(nameof(mapType), existing?.MapType ?? MapType.Unknown);

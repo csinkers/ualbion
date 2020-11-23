@@ -43,8 +43,12 @@ namespace UAlbion.Game.Assets
             if (palette == null)
                 return null;
 
-            var commonPalette = (AlbionPalette)_modApplier.LoadAssetCached(AssetId.From(Base.Palette.CommonPalette));
-            palette.SetCommonPalette(commonPalette);
+            var commonId = AssetId.From(Base.Palette.CommonPalette);
+            if (palette.Id != commonId.ToUInt32())
+            {
+                var commonPalette = (AlbionPalette)_modApplier.LoadAssetCached(commonId);
+                palette.SetCommonPalette(commonPalette);
+            }
 
             return palette;
         }
@@ -75,6 +79,7 @@ namespace UAlbion.Game.Assets
             return (asset switch
             {
                 string s => s,
+                AlbionStringCollection c => c.Count > id.SubId ? c[id.SubId] : null,
                 IDictionary<int, string> d => d.GetValueOrDefault(id.SubId),
                 IDictionary<AssetId, string> d => d.GetValueOrDefault(id.Id),
                 _ => $"!MISSING STRING-TABLE {id.Id}:{id.SubId}!"

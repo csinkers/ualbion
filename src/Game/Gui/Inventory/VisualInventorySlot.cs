@@ -113,18 +113,20 @@ namespace UAlbion.Game.Gui.Inventory
             if ((int)slot.LastUiPosition.X != extents.X || (int)slot.LastUiPosition.Y != extents.Y)
                 Raise(new SetInventorySlotUiPositionEvent(_slotId, extents.X, extents.Y));
 
-            if (contents is ItemData item)
+            if (contents != null)
             {
-                int frames = item.IconAnim == 0 ? 1 : item.IconAnim;
+                int frames = contents.IconAnim == 0 ? 1 : contents.IconAnim;
                 while (_frameNumber >= frames)
                     _frameNumber -= frames;
 
-                int itemSpriteId = item.IconSubId + _frameNumber;
+                int itemSpriteId = contents.IconSubId + _frameNumber;
+                _sprite.Id = contents.Icon;
                 _sprite.SubId = itemSpriteId;
                 _overlay.IsActive = (slot.Flags & ItemSlotFlags.Broken) != 0;
             }
-            else // Nothing, or gold/rations (subId should still be 0)
+            else // Nothing
             {
+                _sprite.Id = AssetId.None;
                 _sprite.SubId = 0;
                 _overlay.IsActive = false;
             }

@@ -18,7 +18,7 @@ namespace UAlbion.Formats.MapEvents
             e.Direction = s.EnumU8(nameof(Direction), e.Direction);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-            e.MapId = MapId.SerdesU8(nameof(MapId), e.MapId, mapping, s);
+            e.MapId = MapId.SerdesU16(nameof(MapId), e.MapId, mapping, s);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             ApiUtil.Assert(e.Unk4 == 0
                          || e.Unk4 == 1

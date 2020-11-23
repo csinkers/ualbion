@@ -41,7 +41,8 @@ namespace UAlbion.Game.State
             AttachChild(new PartyInventory(getInventory));
 
             foreach (var member in statusBarOrder)
-                AddMember(member);
+                if (!member.IsNone)
+                    AddMember(member);
         }
 
         [SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "<Pending>")]

@@ -86,6 +86,12 @@ namespace UAlbion.Game.Entities.Map3D
 
             foreach (var npc in _mapData.Npcs.Values)
             {
+                if (npc.SpriteOrGroup.Id >= _labyrinthData.ObjectGroups.Count)
+                {
+                    CoreUtil.LogWarn($"[3DMap] Tried to load object group {npc.SpriteOrGroup.Id}, but the max group id is {_labyrinthData.ObjectGroups.Count-1}.");
+                    continue;
+                }
+
                 var objectData = _labyrinthData.ObjectGroups[npc.SpriteOrGroup.Id]; // TODO: Verify SpriteOrGroup is an ObjectGroup
                 // TODO: Build proper NPC objects with AI, sound effects etc
                 foreach (var subObject in objectData.SubObjects) 

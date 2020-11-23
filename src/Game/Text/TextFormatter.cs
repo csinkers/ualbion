@@ -285,20 +285,31 @@ namespace UAlbion.Game.Text
                 tokens = implicitTokens.Concat(tokens);
 
             IEnumerable<(Token, object)> substituted = Substitute(assets, tokens, arguments);
-            return TokensToBlocks(Resolve<IWordLookup>(), substituted, template);
+
+            #if DEBUG
+            substituted = substituted.ToList();
+            #endif
+
+            var blocks = TokensToBlocks(Resolve<IWordLookup>(), substituted, template);
+
+            #if DEBUG
+            blocks = blocks.ToList();
+            #endif
+
+            return blocks;
         }
 
         public IText Format(TextId textId, params object[] arguments)
-            => Format(textId, null, null, arguments);
+            => Format(textId, null, arguments);
 
         public IText Format(StringId stringId, params object[] arguments)
-            => Format(stringId, null, null, arguments);
+            => Format(stringId, null, arguments);
 
         public IText Format(string template, params object[] arguments)
-            => Format(template, null, null, arguments);
+            => Format(template, null, arguments);
 
         public IText Format(TextId textId, IList<(Token, object)> implicitTokens, params object[] arguments)
-            => Format(new StringId(textId), implicitTokens, null, arguments);
+            => Format(new StringId(textId), implicitTokens, arguments);
 
         public IText Format(StringId stringId, IList<(Token, object)> implicitTokens, params object[] arguments)
             => new DynamicText(() =>

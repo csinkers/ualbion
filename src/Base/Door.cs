@@ -2,7 +2,7 @@
 {
     public enum Door : ushort
     {
-        HunterClanCellarDoor = 100, // TODO: Are these two around the right way?
+        HunterClanCellarDoor = 100,
         HunterClanFrontDoor = 101,
         Unknown102 = 102,
         Unknown103 = 103,

@@ -135,7 +135,11 @@ namespace UAlbion.Formats.Assets
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             var initialOffset = s.Offset;
+
             sheet ??= new CharacterSheet(id);
+            if (s.Mode == SerializerMode.Reading && s.BytesRemaining == 0)
+                return sheet;
+
             s.Check();
             sheet.Type = s.EnumU8(nameof(sheet.Type), sheet.Type);
             sheet.Gender = s.EnumU8(nameof(sheet.Gender), sheet.Gender);

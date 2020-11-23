@@ -55,7 +55,8 @@ namespace UAlbion.Formats.Parsers
 
             foreach(var (width, height) in sizes)
             {
-                s.Check();
+                if (s.BytesRemaining <= 0)
+                    break;
 
                 var bytes = s.ByteArray("PixelData", null, width * height);
                 frames.Add(new AlbionSpriteFrame(0, currentY, width, height));

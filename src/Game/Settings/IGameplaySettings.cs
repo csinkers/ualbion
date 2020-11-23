@@ -7,6 +7,6 @@ namespace UAlbion.Game.Settings
     {
         GameLanguage Language { get; }
         int CombatDelay { get; }
-        IList<string> Mods { get; }
+        IList<string> ActiveMods { get; }
     }
 }

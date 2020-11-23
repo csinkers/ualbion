@@ -54,8 +54,9 @@ namespace UAlbion.Formats.Tests
         public void TestDoubleRegistration()
         {
             var m = new AssetMapping().RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait);
-            Assert.Throws<InvalidOperationException>(() => m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait));
-            Assert.Throws<InvalidOperationException>(() => m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Automap));
+            // Used to throw, but now we forgive it to prevent issues when a mod overrides some assets using a dependency's ids.
+            m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait); 
+            m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Automap);
         }
 
         [Fact]

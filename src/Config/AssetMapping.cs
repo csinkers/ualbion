@@ -13,16 +13,18 @@ namespace UAlbion.Config
     {
         static readonly ThreadLocal<AssetMapping> ThreadLocalGlobal = new ThreadLocal<AssetMapping>(() => new AssetMapping());
         static readonly AssetMapping TrueGlobal = new AssetMapping();
-        static readonly AssetType[] _unmappedTypes = 
+#if DEBUG
+        static readonly AssetType[] UnmappedTypes =
             typeof(AssetType)
             .GetEnumValues()
             .OfType<AssetType>()
-            .Where(x => 
+            .Where(x =>
                 typeof(AssetType)
                 .GetMember(x.ToString())[0]
                 .GetCustomAttributes(typeof(UnmappedAttribute), false)
                 .FirstOrDefault() != null
             ).ToArray();
+#endif
 
         // The global mapping, should always be used apart from when loading/saving assets.
         // Always built dynamically based on the current set of active mods
@@ -123,10 +125,10 @@ namespace UAlbion.Config
                 return (info.EnumTypeString, id.Id - info.Offset);
             }
 
-            #if DEBUG
-            if (!_unmappedTypes.Contains(id.Type))
+#if DEBUG
+            if (!UnmappedTypes.Contains(id.Type))
                 ApiUtil.Assert($"AssetId ({id.Type}, {id.Id}) is outside the mapped range.");
-            #endif
+#endif
             return (null, id.ToInt32());
         }
 
@@ -146,10 +148,10 @@ namespace UAlbion.Config
                 return (info.EnumType, id.Id - info.Offset);
             }
 
-            #if DEBUG
-            if (!_unmappedTypes.Contains(id.Type))
+#if DEBUG
+            if (!UnmappedTypes.Contains(id.Type))
                 ApiUtil.Assert($"AssetId ({id.Type}, {id.Id}) is outside the mapped range.");
-            #endif
+#endif
             return (null, id.ToInt32());
         }
 
@@ -239,7 +241,7 @@ namespace UAlbion.Config
             var mapping = _byAssetType[(byte)assetType];
             var info = new EnumInfo(enumName, assetType, mapping.LastOrDefault()?.MappedMax);
             if (_byEnumType.ContainsKey(info.EnumType))
-                throw new InvalidOperationException($"Tried to register type {enumName} as an asset identifier for assets of type {assetType}, but it is already registered.");
+                return this;
 
             mapping.Add(info);
             _byEnumType[info.EnumType] = info;

@@ -12,5 +12,8 @@
         }
 
         public override int GetHashCode() => 72;
+        public SpriteId Icon => Base.CoreSprite.UiFood;
+        public int IconSubId => 0;
+        public byte IconAnim => 0;
     }
 }

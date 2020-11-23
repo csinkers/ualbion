@@ -14,5 +14,7 @@
         public int Y { get; }
         public int Width { get; }
         public int Height { get; }
+
+        public override string ToString() => $"({X},{Y}) {Width}x{Height}";
     }
 }

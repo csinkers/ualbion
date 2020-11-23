@@ -50,7 +50,7 @@ namespace UAlbion.Game.Settings
         // Gameplay
         public GameLanguage Language { get; private set; } = GameLanguage.English;
         public int CombatDelay { get; private set; } = 3;
-        public IList<string> Mods { get; } = new List<string>();
+        public IList<string> ActiveMods { get; } = new List<string>();
 
         // Engine
         public float Special1 { get; private set; }

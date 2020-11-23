@@ -72,7 +72,7 @@ namespace UAlbion.Game.Assets
 
             LoadMod(config.ResolvePath("$(MODS)"), "Base");
 
-            foreach (var mod in Resolve<IGameplaySettings>().Mods)
+            foreach (var mod in Resolve<IGameplaySettings>().ActiveMods)
                 LoadMod(config.ResolvePath("$(MODS)"), mod);
 
             _modsInReverseDependencyOrder.Reverse();
@@ -81,6 +81,9 @@ namespace UAlbion.Game.Assets
         void LoadMod(string dataDir, string modName)
         {
             if (string.IsNullOrEmpty(modName))
+                return;
+
+            if (_mods.ContainsKey(modName))
                 return;
 
             if (modName.Any(c => c == '\\' || c == '/' || c == Path.DirectorySeparatorChar))
@@ -200,6 +203,9 @@ namespace UAlbion.Game.Assets
                 if (typeInfo == null)
                     continue;
 
+                if (info == null && typeInfo.Locator == null)
+                    continue;
+
                 var assetLocator = typeInfo.Locator != null
                     ? _assetLocatorRegistry.GetLocator(typeInfo.Locator)
                     : _assetLocator;
@@ -224,9 +230,8 @@ namespace UAlbion.Game.Assets
             while (patches != null && patches.Count > 0)
                 asset = patches.Pop().Apply(asset);
 
-            ICoreFactory factory = Resolve<ICoreFactory>();
             if (_postProcessors.TryGetValue(asset.GetType(), out var processor))
-                asset = processor.Process(factory, id, asset);
+                asset = processor.Process(Resolve<ICoreFactory>(), id, asset);
 
             return asset;
         }

@@ -25,7 +25,7 @@ namespace UAlbion.Game.Gui
             OnAsync<ItemQuantityPromptEvent, int>((e, c) =>
             {
                 var maxLayer = Children.OfType<ModalDialog>().Select(x => (int?)x.Depth).Max() ?? 0;
-                AttachChild(new ItemQuantityDialog(maxLayer + 1, e.Text, e.Icon, e.Max, e.UseTenths, c));
+                AttachChild(new ItemQuantityDialog(maxLayer + 1, e.Text, e.Icon, e.IconSubId, e.Max, e.UseTenths, c));
                 return true; 
             });
 

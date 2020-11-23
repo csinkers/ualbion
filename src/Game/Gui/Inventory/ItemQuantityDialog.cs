@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
@@ -23,15 +22,11 @@ namespace UAlbion.Game.Gui.Inventory
         |    [<] [=======[  3  ]==============] [>]    |
         |                   [    OK    ]   ^4          |
         \---------------------------------------------*/ //^5
-        public ItemQuantityDialog(int depth, StringId stringId, SpriteId id, int max, bool useTenths, Action<int> continuation)
+        public ItemQuantityDialog(int depth, StringId stringId, SpriteId id, int subId, int max, bool useTenths, Action<int> continuation)
             : base(DialogPositioning.Center, depth)
         {
             _continuation = continuation;
-            IUiElement itemPic = new UiSpriteElement(id)
-            {
-                SubId = id.Type == AssetType.ItemGraphics ? id.Id : 0
-            };
-
+            IUiElement itemPic = new UiSpriteElement(id) { SubId = subId }; 
             var topStack = new HorizontalStack(
                 new NonGreedy(new GroupingFrame(itemPic)),
                 new Spacing(2,0),

@@ -10,7 +10,7 @@ namespace UAlbion.Game.Assets
         {
             var modApplier = Resolve<IModApplier>();
             var all = (IDictionary<int, string>)modApplier.LoadAssetCached(AssetId.From(Base.Special.SystemStrings));
-            return all[key.Id];
+            return all?[key.Id];
         }
     }
 }

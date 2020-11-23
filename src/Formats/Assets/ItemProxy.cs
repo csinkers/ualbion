@@ -16,5 +16,8 @@
 
         public override string ToString() => $"Proxy for {Id}";
         public override int GetHashCode() => Id.GetHashCode();
+        public SpriteId Icon => Base.ItemGraphics.ItemSprites;
+        public int IconSubId => 0;
+        public byte IconAnim => 0;
     }
 }

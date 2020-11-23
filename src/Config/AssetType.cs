@@ -40,8 +40,8 @@
         EventSet,
         Script,
 
-        Gold,
-        Rations,
+        [Unmapped] Gold,
+        [Unmapped] Rations,
         Item,
 
         Labyrinth,
@@ -55,7 +55,7 @@
 
         [Unmapped] MetaFont,
         MonsterGroup,
-        ObjectGroup,
+        [Unmapped] ObjectGroup,
         Palette,
         Sample,
         Song,

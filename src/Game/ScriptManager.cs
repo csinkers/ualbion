@@ -22,6 +22,12 @@ namespace UAlbion.Game
             var mapManager = Resolve<IMapManager>();
 
             var events = assets.LoadScript(doScriptEvent.ScriptId);
+            if (events == null)
+            {
+                CoreUtil.LogError($"Could not load script {doScriptEvent.ScriptId}");
+                return false;
+            }
+
             var nodes = new EventNode[events.Count];
             var chain = new EventChain(0);
 

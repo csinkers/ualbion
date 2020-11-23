@@ -57,6 +57,9 @@ namespace UAlbion.Formats.Assets
                     (_, x, s2) => ItemSlot.Serdes(new InventorySlotId(invId, slotId), x, mapping, s2));
 
             inv ??= new Inventory(invId);
+            if (s.BytesRemaining <= 0)
+                return inv;
+
             if (type == InventoryType.Player)
             {
                 S(nameof(inv.Neck), inv.Neck, ItemSlotId.Neck);

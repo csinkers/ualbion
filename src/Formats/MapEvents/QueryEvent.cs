@@ -8,7 +8,7 @@ using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Formats.MapEvents
 {
-    public class QueryEvent : MapEvent, IAsyncEvent<bool>
+    public class QueryEvent : MapEvent, IBranchingEvent
     {
         QueryEvent() { }
         QueryEvent(TextId textSourceId) { TextSourceId = textSourceId; }
@@ -41,7 +41,6 @@ namespace UAlbion.Formats.MapEvents
                 QueryType.PreviousActionResult   => AssetType.None,
                 QueryType.TriggerType            => AssetType.None,
                 QueryType.PromptPlayerNumeric    => AssetType.None,
-                QueryType.PromptPlayer           => AssetType.MapText,
                 QueryType.InventoryHasItem       => AssetType.Item,
                 QueryType.UsedItemId             => AssetType.Item,
                 QueryType.IsPartyMemberConscious => AssetType.PartyMember,

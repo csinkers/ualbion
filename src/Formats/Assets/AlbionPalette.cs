@@ -97,7 +97,7 @@ namespace UAlbion.Formats.Assets
 
             for (int i = VariableEntries; i < EntryCount; i++)
             {
-                _entries[i] = commonPalette._entries[i - VariableEntries];
+                _entries[i] = commonPalette._entries[i];
                 foreach (var frame in _cache)
                     frame[i] = _entries[i];
             }

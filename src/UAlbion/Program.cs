@@ -60,7 +60,7 @@ namespace UAlbion
                 ;
 
             var assets = new AssetManager();
-            var settings = GeneralSettings.Load(baseDir);
+            var settings = GeneralSettings.Load(generalConfig.ResolvePath("$(DATA)/settings.json"));
             var services = new Container("Services",
                 settings, // Need to register settings first, as the AssetLocator relies on it.
                 loaderRegistry,
@@ -85,12 +85,12 @@ namespace UAlbion
             modApplier.LoadMods(generalConfig);
 
             exchange // Need to load game config after mods so asset ids can be parsed.
-                .Register(CoreConfig.Load(Path.Combine(baseDir, "data", "core.json")))
-                .Register(GameConfig.Load(Path.Combine(baseDir, "data", "game.json")));
+                .Register(CoreConfig.Load(generalConfig.ResolvePath("$(DATA)/core.json")))
+                .Register(GameConfig.Load(generalConfig.ResolvePath("$(DATA)/game.json")));
 
-            // PerfTracker.StartupEvent("Running asset tests...");
-            // AssetTest(assets);
-            // PerfTracker.StartupEvent("Asset tests done");
+            PerfTracker.StartupEvent("Running asset tests...");
+            AssetTest(assets);
+            PerfTracker.StartupEvent("Asset tests done");
 
             PerfTracker.StartupEvent("Registered asset manager");
             PerfTracker.StartupEvent($"Running as {commandLine.Mode}");
@@ -175,9 +175,9 @@ namespace UAlbion
             var map = assets.LoadMap(Base.Map.TorontoBegin);
             var eventSet = assets.LoadEventSet(Base.EventSet.Frill);
             var eventText = assets.LoadString(Base.EventText.Frill);
-            var waveLibrary = assets.LoadWaveLib(Base.WaveLibrary.Toronto);
+            var waveLibrary = assets.LoadWaveLib(Base.WaveLibrary.TorontoAmbient);
             var automapTiles = assets.LoadTexture(Base.AutomapTiles.Set1);
-            var automap = assets.LoadAutomap(Base.Automap.Jirinaar3D);
+            var automap = assets.LoadAutomap(Base.Automap.Jirinaar);
         }
     }
 }

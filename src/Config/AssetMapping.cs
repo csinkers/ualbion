@@ -295,16 +295,21 @@ namespace UAlbion.Config
 
         public AssetId Parse(string s, AssetType[] validTypes) // pass null for validTypes to allow any type
         {
-            if (string.IsNullOrEmpty(s)) throw new ArgumentNullException(nameof(s));
+            if (string.IsNullOrEmpty(s))
+                throw new ArgumentNullException(nameof(s));
+
             s = s.Trim();
             int index = s.LastIndexOf('.');
             var valueName = index == -1 ? s : s.Substring(index + 1);
             var typeName = index == -1 ? null : s.Substring(0, index);
-            // TODO: Use typeName to resolve ambiguous matches
 
-            if (!_byName.TryGetValue(valueName, out var matches))
-                return ParseNumeric(s, typeName, valueName, validTypes);
+            return _byName.TryGetValue(valueName, out var matches) 
+                ? ParseTextual(s, typeName, valueName, validTypes, matches) 
+                : ParseNumeric(s, typeName, valueName, validTypes);
+        }
 
+        static AssetId ParseTextual(string s, string typeName, string valueName, AssetType[] validTypes, IList<(EnumInfo, int)> matches)
+        {
             AssetId result = new AssetId(AssetType.Unknown);
             foreach (var match in matches)
             {
@@ -337,7 +342,7 @@ namespace UAlbion.Config
             return result;
         }
 
-        AssetId ParseNumeric(string s, string typeName, string valueName, AssetType[] validTypes) // pass null for validTypes to allow any type
+        static AssetId ParseNumeric(string s, string typeName, string valueName, AssetType[] validTypes) // pass null for validTypes to allow any type
         {
             AssetId result = new AssetId(AssetType.Unknown);
             if (int.TryParse(valueName, out var intValue))

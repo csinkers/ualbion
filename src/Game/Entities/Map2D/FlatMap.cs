@@ -87,8 +87,9 @@ namespace UAlbion.Game.Entities.Map2D
                 int i = 0;
                 foreach(var player in state.Party.StatusBarOrder)
                 {
-                    player.GetPosition = () => _partyMovement.GetPositionHistory(i).Item1;
-                    (Vector3, int) PositionFunc() => _partyMovement.GetPositionHistory(i);
+                    var iCopy = i; // Make a copy to ensure each closure captures its own number.
+                    player.GetPosition = () => _partyMovement.GetPositionHistory(iCopy).Item1;
+                    (Vector3, int) PositionFunc() => _partyMovement.GetPositionHistory(iCopy);
 
                     AttachChild(_logicalMap.UseSmallSprites
                         ? (IComponent)new SmallPlayer(player.Id, player.Id.ToSmallPartyGraphics(), PositionFunc)

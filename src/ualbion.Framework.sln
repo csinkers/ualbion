@@ -106,7 +106,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Base", "Base", "{DAC01E7B-9B98-4DB3-AC5B-9D093785B17E}"
 	ProjectSection(SolutionItems) = preProject
 		..\mods\Base\assets.json = ..\mods\Base\assets.json
-		..\mods\Base\core_sprites.json = ..\mods\Base\core_sprites.json
 		..\mods\Base\modinfo.json = ..\mods\Base\modinfo.json
 	EndProjectSection
 EndProject

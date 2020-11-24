@@ -13,11 +13,14 @@ namespace UAlbion.Config
     {
         static readonly ThreadLocal<AssetMapping> ThreadLocalGlobal = new ThreadLocal<AssetMapping>(() => new AssetMapping());
         static readonly AssetMapping TrueGlobal = new AssetMapping();
+        static readonly AssetType[] AllAssetTypes =
+            typeof(AssetType)
+                .GetEnumValues()
+                .OfType<AssetType>()
+                .ToArray();
 #if DEBUG
         static readonly AssetType[] UnmappedTypes =
-            typeof(AssetType)
-            .GetEnumValues()
-            .OfType<AssetType>()
+            AllAssetTypes
             .Where(x =>
                 typeof(AssetType)
                 .GetMember(x.ToString())[0]
@@ -40,8 +43,9 @@ namespace UAlbion.Config
 
         class EnumInfo
         {
+            [JsonIgnore] readonly string _enumTypeString;
             [JsonIgnore] public Type EnumType { get; set; }
-            [JsonIgnore] public string EnumTypeString { get; set; }
+            [JsonIgnore] public string EnumTypeString => _enumTypeString ?? EnumType.AssemblyQualifiedName;
             [JsonConverter(typeof(ToStringJsonConverter))] public AssetType AssetType { get; set; }
             public int EnumMin { get; set; }
             public int EnumMax { get; set; }
@@ -54,7 +58,7 @@ namespace UAlbion.Config
 
             public EnumInfo(string typeString, AssetType assetType, int? lastMax)
             {
-                EnumTypeString = typeString;
+                _enumTypeString = typeString;
                 EnumType = Type.GetType(typeString) ?? throw new InvalidOperationException();
                 if (!EnumType.IsEnum)
                     throw new InvalidOperationException($"Tried to register type {EnumType} as an asset identifier for assets of type {assetType}, but it is not an enum.");
@@ -292,27 +296,34 @@ namespace UAlbion.Config
         public AssetId Parse(string s, AssetType[] validTypes) // pass null for validTypes to allow any type
         {
             if (string.IsNullOrEmpty(s)) throw new ArgumentNullException(nameof(s));
+            s = s.Trim();
             int index = s.LastIndexOf('.');
             var valueName = index == -1 ? s : s.Substring(index + 1);
             var typeName = index == -1 ? null : s.Substring(0, index);
             // TODO: Use typeName to resolve ambiguous matches
 
             if (!_byName.TryGetValue(valueName, out var matches))
-                throw new KeyNotFoundException($"Could not parse \"{s}\" as an asset id enum");
+                return ParseNumeric(s, typeName, valueName, validTypes);
 
-            AssetId result = AssetId.None;
+            AssetId result = new AssetId(AssetType.Unknown);
             foreach (var match in matches)
             {
                 if (validTypes != null && !validTypes.Contains(match.Item1.AssetType))
                     continue;
 
-                if (result != AssetId.None)
+                if (!string.IsNullOrEmpty(typeName)
+                    && !match.Item1.EnumType.Name.Equals(typeName, StringComparison.InvariantCultureIgnoreCase)
+                    && !match.Item1.AssetType.ToString().Equals(typeName, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    continue;
+                }
+
+                if (result.Type != AssetType.Unknown)
                 {
                     var candidates = string.Join(", ",
                         matches
                             .Where(x => validTypes == null || validTypes.Contains(x.Item1.AssetType))
-                            .Select(x => x.Item1.EnumType.Name)
-                    );
+                            .Select(x => x.Item1.EnumType.Name));
 
                     throw new InvalidOperationException($"Could not unambiguously parse \"{s}\" as an asset id. Candidate types: {candidates}");
                 }
@@ -320,7 +331,37 @@ namespace UAlbion.Config
                 result = new AssetId(match.Item1.AssetType, match.Item2);
             }
 
-            if (result == AssetId.None)
+            if (result.Type == AssetType.Unknown)
+                throw new KeyNotFoundException($"Could not parse \"{s}\" as an asset id enum");
+
+            return result;
+        }
+
+        AssetId ParseNumeric(string s, string typeName, string valueName, AssetType[] validTypes) // pass null for validTypes to allow any type
+        {
+            AssetId result = new AssetId(AssetType.Unknown);
+            if (int.TryParse(valueName, out var intValue))
+            {
+                validTypes ??= AllAssetTypes;
+                foreach (var assetType in validTypes)
+                {
+                    if (!string.IsNullOrEmpty(typeName)
+                        && !assetType.ToString().Equals(typeName, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    if (result.Type != AssetType.Unknown)
+                    {
+                        var candidates = string.Join(", ", validTypes.Select(x => x.ToString()));
+                        throw new InvalidOperationException($"Could not unambiguously parse \"{s}\" as an asset id. Candidate types: {candidates}");
+                    }
+
+                    result = new AssetId(assetType, intValue);
+                }
+            }
+
+            if (result.Type == AssetType.Unknown)
                 throw new KeyNotFoundException($"Could not parse \"{s}\" as an asset id enum");
 
             return result;

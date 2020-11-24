@@ -157,6 +157,9 @@ namespace UAlbion.Game.Assets
             try { return LoadAssetInternal(id); }
             catch (Exception e)
             {
+                if (CoreUtil.IsCriticalException(e))
+                    throw;
+
                 Raise(new LogEvent(LogEvent.Level.Error, $"Could not load asset {id}: {e}"));
                 return null;
             }
@@ -177,6 +180,9 @@ namespace UAlbion.Game.Assets
             }
             catch (Exception e)
             {
+                if (CoreUtil.IsCriticalException(e))
+                    throw;
+
                 Raise(new LogEvent(LogEvent.Level.Error, $"Could not load asset {id}: {e}"));
                 asset = e;
             }

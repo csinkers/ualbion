@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace UAlbion.Config
 {
@@ -33,18 +32,8 @@ namespace UAlbion.Config
                 {
                     if (string.IsNullOrWhiteSpace(asset.Value.Name))
                         asset.Value.Name = null;
-
-                    if (asset.Value.PaletteHints != null && !asset.Value.PaletteHints.Any())
-                        asset.Value.PaletteHints = null;
                 }
             }
-        }
-
-        public void PostSave()
-        {
-            foreach (var file in Files)
-            foreach (var asset in file.Value.Assets)
-                asset.Value.PaletteHints ??= new List<int>();
         }
     }
 }

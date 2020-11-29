@@ -53,16 +53,7 @@ namespace UAlbion.Formats.MapEvents
         public byte Unk3 { get; private set; }
         public byte Unk4 { get; private set; }
 
-        public ushort Value => Property switch
-            {
-                ChangeProperty.Health => (ushort)_value,
-                ChangeProperty.MagicPoints => (ushort)_value,
-                ChangeProperty.AddExperience => (ushort)_value,
-                ChangeProperty.Gold => (ushort)_value,
-                ChangeProperty.Food => (ushort)_value,
-                _ => throw new InvalidOperationException("Tried to retrieve the Value of a non-numeric DataChangeEvent")
-            };
-
+        public ushort Value => (ushort)_value;
         public ItemId ItemId => Property == ChangeProperty.ReceiveOrRemoveItem
             ? ItemId.FromUInt32(_value)
             : throw new InvalidOperationException("Tried to retrieve the ItemId of a non-item DataChangeEvent");

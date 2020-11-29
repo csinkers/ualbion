@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -325,12 +324,13 @@ namespace UAlbion.Tools.ImageReverser
             var paletteId = PaletteId.FromUInt32(palette.Id);
             if (e.NewValue == CheckState.Checked)
             {
-                if (!asset.PaletteHints.Contains(paletteId.Id))
-                    asset.PaletteHints.Add(paletteId.Id);
+                asset.PaletteHint = paletteId.Id;
+                // TODO: Uncheck all others
             }
             else
             {
-                asset.PaletteHints.Remove(paletteId.Id);
+                if (asset.PaletteHint == paletteId.Id)
+                    asset.PaletteHint = null;
             }
 
             _core.TriggerAssetChanged(asset);
@@ -342,14 +342,11 @@ namespace UAlbion.Tools.ImageReverser
             if (asset == null)
                 return;
 
-            if (asset.PaletteHints == null)
-                asset.PaletteHints = new List<int>();
-
             for (int index = 0; index < chkListPalettes.Items.Count; index++)
             {
                 var item = (AlbionPalette)chkListPalettes.Items[index];
                 var paletteId = PaletteId.FromUInt32(item.Id);
-                chkListPalettes.SetItemChecked(index, asset.PaletteHints.Contains(paletteId.Id));
+                chkListPalettes.SetItemChecked(index, asset.PaletteHint == paletteId.Id);
             }
 
             if (chkListPalettes.SelectedIndex != -1)

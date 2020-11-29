@@ -23,7 +23,7 @@ namespace UAlbion.Config
         public Position2D Hotspot { get; set; } // For core sprites only
 
         [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "Play nicely with JSON serialisation")]
-        public IList<int> PaletteHints { get; set; } // Just for displaying things in ImageReverser - the game doesn't use these.
+        public int? PaletteHint { get; set; } // Just for displaying things in ImageReverser - the game doesn't use these.
 
         [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "Play nicely with JSON serialisation")]
         public IList<string> AnimatedRanges { get; set; } // For palettes only.

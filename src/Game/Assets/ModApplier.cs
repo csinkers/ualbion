@@ -154,7 +154,11 @@ namespace UAlbion.Game.Assets
 
         public object LoadAsset(AssetId id)
         {
-            try { return LoadAssetInternal(id); }
+            try
+            {
+                var asset = LoadAssetInternal(id);
+                return asset is Exception ? null : asset;
+            }
             catch (Exception e)
             {
                 if (CoreUtil.IsCriticalException(e))

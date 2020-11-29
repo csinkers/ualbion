@@ -35,7 +35,7 @@ namespace UAlbion.Game.Assets
             }
 
             if (asset == null)
-                throw new FileNotFoundException($"Could not find file matching \"{info.File.Filename}\" in the configured mods and search paths (for asset {info.AssetId}).");
+                throw new AssetNotFoundException($"Could not find file matching \"{info.File.Filename}\" in the configured mods and search paths (for asset {info.AssetId}).", info.AssetId);
 
             return asset;
         }
@@ -45,6 +45,9 @@ namespace UAlbion.Game.Assets
             using var s = Search(dir, generalConfig, info);
             if (s == null)
                 return null;
+
+            if (s.BytesRemaining == 0) // Happens all the time when dumping, just return rather than throw to preserve perf.
+                return new AssetNotFoundException($"Asset for {info.AssetId} found but size was 0 bytes.", info.AssetId);
 
             var loader = _assetLoaderRegistry.GetLoader(info.File.Loader);
             if (loader == null)

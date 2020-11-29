@@ -209,17 +209,25 @@ namespace UAlbion
                         case MapType.ThreeD:
                             if (lab != null)
                             {
-                                var objectData = lab.ObjectGroups[npc.SpriteOrGroup.Id];
-                                sw.Write($"3D:{npc.SpriteOrGroup.Id}=(");
-                                bool first = true;
-                                foreach (var subObject in objectData.SubObjects)
+                                if (npc.SpriteOrGroup.Id >= lab.ObjectGroups.Count)
                                 {
-                                    if(!first) sw.Write(", ");
-                                    first = false;
-                                    var def = lab.Objects[subObject.ObjectInfoNumber];
-                                    sw.Write(def.SpriteId);
+                                    sw.Write($"InvalidObjGroup:{npc.SpriteOrGroup.Id}");
                                 }
-                                sw.Write(")");
+                                else
+                                {
+                                    var objectData = lab.ObjectGroups[npc.SpriteOrGroup.Id];
+                                    sw.Write($"3D:{npc.SpriteOrGroup.Id}=(");
+                                    bool first = true;
+                                    foreach (var subObject in objectData.SubObjects)
+                                    {
+                                        if (!first) sw.Write(", ");
+                                        first = false;
+                                        var def = lab.Objects[subObject.ObjectInfoNumber];
+                                        sw.Write(def.SpriteId);
+                                    }
+
+                                    sw.Write(")");
+                                }
                             }
 
                             break;  
@@ -276,7 +284,7 @@ namespace UAlbion
             if (c == null || string.IsNullOrEmpty(c.GermanName) && c.PortraitId.IsNone)
                 return;
 
-            sw.WriteLine($"{Convert.ToInt32(id, CultureInfo.InvariantCulture):D3} {id} ({c.EnglishName}, {c.GermanName}, {c.FrenchName})");
+            sw.WriteLine($"{id.Id:D3} {id} ({c.EnglishName}, {c.GermanName}, {c.FrenchName})");
             sw.WriteLine($"    Type:{c.Type} Gender:{c.Gender} Races:{c.Race} Class:{c.PlayerClass} Age:{c.Age} Level:{c.Level}");
             sw.WriteLine($"    Languages:{c.Languages} Sprite:{c.SpriteId} Portrait:{c.PortraitId}");
             if (c.Inventory?.Slots != null)

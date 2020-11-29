@@ -164,10 +164,10 @@ namespace UAlbion
             Console.WriteLine($@"UAlbion
 Command Line Options:
 
-    -h --help /? help  : Display this help
-    --startuponly      : Exit immediately after the first frame (for profiling startup time etc)
-    -rd    --renderdoc : Load the RenderDoc plugin on startup
-    -c ""commands""    : Raise the given events (semicolon separated list) on startup.
+    -h --help /? help : Display this help
+    --startuponly     : Exit immediately after the first frame (for profiling startup time etc)
+    -rd   --renderdoc : Load the RenderDoc plugin on startup
+    -c ""commands""     : Raise the given events (semicolon separated list) on startup.
 
 Set Rendering Backend:
     -gl    --opengl     Use OpenGL

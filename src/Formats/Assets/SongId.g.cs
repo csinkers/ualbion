@@ -14,7 +14,7 @@ namespace UAlbion.Formats.Assets
 {
     [JsonConverter(typeof(ToStringJsonConverter))]
     [TypeConverter(typeof(SongIdConverter))]
-    public struct SongId : IEquatable<SongId>, IEquatable<AssetId>, ITextureId
+    public readonly struct SongId : IEquatable<SongId>, IEquatable<AssetId>, IComparable, ITextureId
     {
         readonly uint _value;
         public SongId(AssetType type, int id = 0)
@@ -92,9 +92,14 @@ namespace UAlbion.Formats.Assets
         public static bool operator !=(SongId x, SongId y) => !(x == y);
         public static bool operator ==(SongId x, AssetId y) => x.Equals(y);
         public static bool operator !=(SongId x, AssetId y) => !(x == y);
+        public static bool operator <(SongId x, SongId y) => x.CompareTo(y) == -1;
+        public static bool operator >(SongId x, SongId y) => x.CompareTo(y) == 1;
+        public static bool operator <=(SongId x, SongId y) => x.CompareTo(y) != 1;
+        public static bool operator >=(SongId x, SongId y) => x.CompareTo(y) != -1;
         public bool Equals(SongId other) => _value == other._value;
         public bool Equals(AssetId other) => _value == other.ToUInt32();
-        public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
+        public override bool Equals(object obj) => obj is ITextureId other && other.ToUInt32() == _value;
+        public int CompareTo(object obj) => (obj is ITextureId other) ? _value.CompareTo(other.ToUInt32()) : -1;
         public override int GetHashCode() => unchecked((int)_value);
         public readonly WaveLibraryId ToWaveLibrary() => new WaveLibraryId(AssetType.WaveLibrary, Id);
     }

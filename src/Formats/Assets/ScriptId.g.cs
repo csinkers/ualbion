@@ -14,7 +14,7 @@ namespace UAlbion.Formats.Assets
 {
     [JsonConverter(typeof(ToStringJsonConverter))]
     [TypeConverter(typeof(ScriptIdConverter))]
-    public struct ScriptId : IEquatable<ScriptId>, IEquatable<AssetId>, ITextureId
+    public readonly struct ScriptId : IEquatable<ScriptId>, IEquatable<AssetId>, IComparable, ITextureId
     {
         readonly uint _value;
         public ScriptId(AssetType type, int id = 0)
@@ -92,9 +92,14 @@ namespace UAlbion.Formats.Assets
         public static bool operator !=(ScriptId x, ScriptId y) => !(x == y);
         public static bool operator ==(ScriptId x, AssetId y) => x.Equals(y);
         public static bool operator !=(ScriptId x, AssetId y) => !(x == y);
+        public static bool operator <(ScriptId x, ScriptId y) => x.CompareTo(y) == -1;
+        public static bool operator >(ScriptId x, ScriptId y) => x.CompareTo(y) == 1;
+        public static bool operator <=(ScriptId x, ScriptId y) => x.CompareTo(y) != 1;
+        public static bool operator >=(ScriptId x, ScriptId y) => x.CompareTo(y) != -1;
         public bool Equals(ScriptId other) => _value == other._value;
         public bool Equals(AssetId other) => _value == other.ToUInt32();
-        public override bool Equals(object obj) => obj is ITextureId other && Equals(other);
+        public override bool Equals(object obj) => obj is ITextureId other && other.ToUInt32() == _value;
+        public int CompareTo(object obj) => (obj is ITextureId other) ? _value.CompareTo(other.ToUInt32()) : -1;
         public override int GetHashCode() => unchecked((int)_value);
     }
 

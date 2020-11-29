@@ -6,6 +6,7 @@ using System.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Config;
+using UAlbion.Core;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Game;
 
@@ -44,7 +45,7 @@ namespace UAlbion
                 {
                     var assetId = AssetId.From(id);
                     var config = assets.GetAssetInfo(assetId);
-                    var palette = assets.LoadPalette((Base.Palette)(config?.PaletteHints?.FirstOrDefault() ?? (int)Base.Palette.Inventory));
+                    var palette = assets.LoadPalette((Base.Palette)(config?.PaletteHint ?? (int)Base.Palette.Inventory));
                     var texture = assets.LoadTexture(assetId);
                     if (texture == null)
                         continue;
@@ -60,8 +61,17 @@ namespace UAlbion
                         typeof(TEnum) == typeof(Base.TilesetGraphics) ||
                         typeof(TEnum) == typeof(Base.AutomapTiles)))
                     {
+                        if (palette == null)
+                        {
+                            CoreUtil.LogError($"Could not load palette for {assetId}");
+                            continue;
+                        }
+
                         var colors = tilemap.DistinctColors(null);
                         int palettePeriod = palette.CalculatePeriod(colors);
+                        if (palettePeriod > 10) // Limit to 10, some of the tile sets can get a bit silly.
+                            palettePeriod = 10;
+
                         for (int palFrame = 0; palFrame < palettePeriod; palFrame++)
                         {
                             var path = Path.Combine(directory, $"{assetId.Id}_{palFrame}_{id}");
@@ -73,11 +83,20 @@ namespace UAlbion
                     {
                         for (int subId = 0; subId < ebt.SubImageCount; subId++)
                         {
+                            if (palette == null)
+                            {
+                                CoreUtil.LogError($"Could not load palette for {assetId}");
+                                break;
+                            }
+
                             if (id is Base.ItemGraphics)
                                 subId = Convert.ToInt32(id, CultureInfo.InvariantCulture);
 
                             var colors = ebt.DistinctColors(subId);
                             int palettePeriod = palette.CalculatePeriod(colors);
+                            if (palettePeriod > 10) // Limit to 10, some of the tile sets can get a bit silly.
+                                palettePeriod = 10;
+
                             for (int palFrame = 0; palFrame < palettePeriod; palFrame++)
                             {
                                 var path = Path.Combine(directory, $"{assetId.Id}_{subId}_{palFrame}_{id}");

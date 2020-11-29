@@ -27,6 +27,7 @@
 
     "FullBodyPictureId": [ "FullBodyPicture" ],
     "TilesetGraphicsId": [ "TilesetGraphics" ],
+    "PictureId": [ "Picture" ],
 
     "CharacterId": [
       "Monster",

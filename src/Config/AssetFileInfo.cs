@@ -33,7 +33,6 @@ namespace UAlbion.Config
 
                 lastKey = o.Key;
                 lastId = o.Value.Id;
-                o.Value.PaletteHints ??= new List<int>();
             }
         }
     }

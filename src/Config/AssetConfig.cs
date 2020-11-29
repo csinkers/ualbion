@@ -47,9 +47,6 @@ namespace UAlbion.Config
 
             // var basicConfig = BasicAssetConfig.Extract(this);
             // basicConfig.Save(basePath);
-
-            foreach (var assetType in Types)
-                assetType.Value.PostSave();
         }
 
         public AssetInfo GetAssetInfo(string typeName, int id) => _assetLookup.TryGetValue((typeName, id), out var info) ? info : null;

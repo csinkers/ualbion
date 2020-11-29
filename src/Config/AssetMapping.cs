@@ -297,7 +297,7 @@ namespace UAlbion.Config
         public AssetId Parse(string s, AssetType[] validTypes) // pass null for validTypes to allow any type
         {
             if (string.IsNullOrEmpty(s))
-                throw new ArgumentNullException(nameof(s));
+                return AssetId.None;
 
             s = s.Trim();
             int index = s.LastIndexOf('.');

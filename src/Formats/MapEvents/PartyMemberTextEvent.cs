@@ -1,5 +1,4 @@
-﻿using System;
-using UAlbion.Api;
+﻿using UAlbion.Api;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
@@ -9,18 +8,6 @@ namespace UAlbion.Formats.MapEvents
     {
         [EventPart("text_id")] public byte TextId { get; }
         [EventPart("member_id")] public PartyMemberId? MemberId { get; }
-
-        public static PartyMemberTextEvent Parse(string[] parts)
-        {
-            throw new NotImplementedException();
-            /*
-            if (parts == null) throw new ArgumentNullException(nameof(parts));
-            int memberId = int.Parse(parts[1], CultureInfo.InvariantCulture);
-            byte textId = byte.Parse(parts[2], CultureInfo.InvariantCulture);
-            return new PartyMemberTextEvent(textId, memberId == 0 ? null : (PartyMemberId?)(memberId-1));
-            */
-        }
-
         public PartyMemberTextEvent(byte textId, PartyMemberId? portraitId)
         {
             TextId = textId;

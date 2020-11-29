@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace UAlbion.Api
 {
@@ -34,16 +35,18 @@ namespace UAlbion.Api
 
         class InfrequentTracker : IDisposable
         {
-#if DEBUG
-            readonly Stopwatch _stopwatch = Stopwatch.StartNew();
-#endif
+            readonly Stopwatch _stopwatch;
             readonly string _name;
+            readonly long _initialTicks;
 
-            public InfrequentTracker(string name)
+            public InfrequentTracker(string name, Stopwatch stopwatch)
             {
                 _name = name;
+                _stopwatch = stopwatch ?? throw new ArgumentNullException(nameof(stopwatch));
+                _initialTicks = _stopwatch.ElapsedTicks;
 #if DEBUG
-                Console.WriteLine($"Starting {name}");
+                var tid = Thread.CurrentThread.ManagedThreadId;
+                Console.WriteLine($"[{tid}] at {_stopwatch.ElapsedMilliseconds}: Starting {_name}");
 #endif
                 CoreTrace.Log.StartupEvent(name);
             }
@@ -51,7 +54,9 @@ namespace UAlbion.Api
             public void Dispose()
             {
 #if DEBUG
-                Console.WriteLine($"Finished {_name} in {_stopwatch.ElapsedMilliseconds} ms");
+                var tid = Thread.CurrentThread.ManagedThreadId;
+                var elapsedMs = (_stopwatch.ElapsedTicks - _initialTicks) * 1000 / Stopwatch.Frequency;
+                Console.WriteLine($"[{tid}] at {_stopwatch.ElapsedMilliseconds}: Finished {_name} in {elapsedMs}");
 #endif
                 CoreTrace.Log.StartupEvent(_name);
             }
@@ -106,12 +111,13 @@ namespace UAlbion.Api
         {
             if (_frameCount > 1) return;
 //#if DEBUG
-            Console.WriteLine($"at {StartupStopwatch.ElapsedMilliseconds}: {name}");
+            var tid = Thread.CurrentThread.ManagedThreadId;
+            Console.WriteLine($"[{tid}] at {StartupStopwatch.ElapsedMilliseconds}: {name}");
 //#endif
             CoreTrace.Log.StartupEvent(name);
         }
 
-        public static IDisposable InfrequentEvent(string name) => new InfrequentTracker(name);
+        public static IDisposable InfrequentEvent(string name) => new InfrequentTracker(name, StartupStopwatch);
 
         public static IDisposable FrameEvent(string name) => new FrameTimeTracker(name);
 

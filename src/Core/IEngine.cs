@@ -1,7 +1,9 @@
 ﻿namespace UAlbion.Core
 {
-    public interface IEngine
+    public interface IEngine : IComponent
     {
+        void Run();
+        void ChangeBackend();
         ICoreFactory Factory { get; }
         string FrameTimeText { get; }
     }

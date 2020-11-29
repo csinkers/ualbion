@@ -36,18 +36,11 @@ namespace UAlbion
 {
     static class Albion
     {
-        public static void RunGame(EventExchange global, IContainer services, string baseDir, CommandLineOptions commandLine)
+        public static void RunGame(IEngine engine, EventExchange global, IContainer services, string baseDir, CommandLineOptions commandLine)
         {
-            PerfTracker.StartupEvent("Creating engine");
-#pragma warning disable CA2000 // Dispose objects before losing scopes
-            using var engine = new VeldridEngine(commandLine.Backend, commandLine.UseRenderDoc)
-                .AddRenderer(new SkyboxRenderer())
-                .AddRenderer(new SpriteRenderer())
-                .AddRenderer(new ExtrudedTileMapRenderer())
-                .AddRenderer(new DebugGuiRenderer())
-                ;
+            var registrationTask = Task.Run(() => RegisterComponents(global, services, baseDir, commandLine));
 
-            var backgroundThreadInitTask = Task.Run(() => RegisterComponents(global, services, baseDir, commandLine));
+#pragma warning disable CA2000 // Dispose objects before losing scopes
             services
                 .Add(new ShaderCache(
                     Path.Combine(baseDir, "src", "Core", "Visual", "Shaders"),
@@ -55,10 +48,10 @@ namespace UAlbion
                 .Add(engine);
 #pragma warning restore CA2000 // Dispose objects before losing scopes
 
-            if (commandLine.DebugMenus)
-                services.Add(new DebugMenus(engine));
+            if (commandLine.DebugMenus && engine is VeldridEngine ve)
+                services.Add(new DebugMenus(ve));
 
-            backgroundThreadInitTask.Wait();
+            registrationTask.Wait();
 
             if (commandLine.StartupOnly)
                 global.Raise(new QuitEvent(), null);

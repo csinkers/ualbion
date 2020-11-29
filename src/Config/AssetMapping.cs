@@ -92,7 +92,8 @@ namespace UAlbion.Config
         // concurrent readers. When a mod needs to change its mapping, all assets should
         // be loaded from disk using the old mapping into the global mapping, then saved
         // to disk using the new mapping.
-
+        // Adding a new mapping won't invalidate existing ids, but removing one would
+        // likely require flushing and reloading all assets to avoid misinterpretations.
         readonly List<EnumInfo>[] _byAssetType = 
             Enumerable.Repeat(0, 256)
                 .Select(_ => new List<EnumInfo>())
@@ -304,11 +305,11 @@ namespace UAlbion.Config
             var typeName = index == -1 ? null : s.Substring(0, index);
 
             return _byName.TryGetValue(valueName, out var matches) 
-                ? ParseTextual(s, typeName, valueName, validTypes, matches) 
+                ? ParseTextual(s, typeName, matches, validTypes) 
                 : ParseNumeric(s, typeName, valueName, validTypes);
         }
 
-        static AssetId ParseTextual(string s, string typeName, string valueName, AssetType[] validTypes, IList<(EnumInfo, int)> matches)
+        static AssetId ParseTextual(string s, string typeName, IList<(EnumInfo, int)> matches, AssetType[] validTypes)
         {
             AssetId result = new AssetId(AssetType.Unknown);
             foreach (var match in matches)

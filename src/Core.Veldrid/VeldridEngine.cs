@@ -35,6 +35,7 @@ namespace UAlbion.Core.Veldrid
         bool _windowResized;
         bool _done;
         bool _recreateWindow;
+        bool _objectsCreated;
         bool _vsync = true;
         Vector2? _pendingCursorUpdate;
         GraphicsBackend? _newBackend;
@@ -112,9 +113,10 @@ namespace UAlbion.Core.Veldrid
             return this;
         }
 
-        public void Run()
+        public override void Run()
         {
             ChangeBackend();
+            CreateAllObjects();
             PerfTracker.StartupEvent("Set up backend");
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
             ImGui.StyleColorsClassic();
@@ -131,6 +133,7 @@ namespace UAlbion.Core.Veldrid
             while (!_done)
             {
                 ChangeBackend();
+                CreateAllObjects();
 
                 PerfTracker.BeginFrame();
                 double deltaSeconds = frameCounter.StartFrame();
@@ -190,6 +193,7 @@ namespace UAlbion.Core.Veldrid
                 }
             }
 
+            Resolve<IShaderCache>()?.CleanupOldFiles();
             DestroyAllObjects();
             GraphicsDevice.Dispose();
             _window.Close();
@@ -276,7 +280,7 @@ namespace UAlbion.Core.Veldrid
             }
         }
 
-        void ChangeBackend()
+        public override void ChangeBackend()
         {
             if (_newBackend == null) return;
             var backend = _newBackend.Value;
@@ -336,8 +340,6 @@ namespace UAlbion.Core.Veldrid
                 _window.Title = GraphicsDevice.BackendType.ToString();
 
                 Raise(new BackendChangedEvent(GraphicsDevice.IsDepthRangeZeroToOne, GraphicsDevice.IsClipSpaceYInverted));
-                CreateAllObjects();
-
                 if (!firstCreate)
                     Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.FlipDepthRange));
             }
@@ -345,6 +347,9 @@ namespace UAlbion.Core.Veldrid
 
         void CreateAllObjects()
         {
+            if (_objectsCreated)
+                return;
+
             using(PerfTracker.InfrequentEvent("Create objects"))
             {
                 _frameCommands = GraphicsDevice.ResourceFactory.CreateCommandList();
@@ -365,12 +370,15 @@ namespace UAlbion.Core.Veldrid
                 GraphicsDevice.WaitForIdle();
                 initList.Dispose();
                 GraphicsDevice.WaitForIdle();
-                Resolve<IShaderCache>().CleanupOldFiles();
+                _objectsCreated = true;
             }
         }
 
         void DestroyAllObjects()
         {
+            if (!_objectsCreated)
+                return;
+
             using (PerfTracker.InfrequentEvent("Destroying objects"))
             {
                 GraphicsDevice.WaitForIdle();
@@ -384,6 +392,7 @@ namespace UAlbion.Core.Veldrid
                 Resolve<ITextureManager>()?.DestroyDeviceObjects();
                 Resolve<IDeviceObjectManager>()?.DestroyDeviceObjects();
                 GraphicsDevice.WaitForIdle();
+                _objectsCreated = false;
             }
         }
 

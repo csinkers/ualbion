@@ -19,6 +19,13 @@ namespace UAlbion
         public string[] Commands { get; }
         public DumpFormats DumpFormats { get; } = DumpFormats.Json;
         public ISet<AssetType> DumpAssetTypes { get; } = new HashSet<AssetType>();
+        public bool NeedsEngine => Mode switch
+        {
+            ExecutionMode.Game => true,
+            ExecutionMode.GameWithSlavedAudio => true,
+            ExecutionMode.Editor => true,
+            _ => false
+        };
 
         public CommandLineOptions(string[] args)
         {

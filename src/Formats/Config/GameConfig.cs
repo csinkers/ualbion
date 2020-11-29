@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Newtonsoft.Json;
 using UAlbion.Api;
-using UAlbion.Formats.Assets;
 
 #pragma warning disable CA1034 // Nested types should not be visible
 namespace UAlbion.Formats.Config
@@ -74,8 +73,8 @@ namespace UAlbion.Formats.Config
         public InventoryT Inventory { get; } = new InventoryT();
         public class InventoryT
         {
-            public IDictionary<PartyMemberId, InventoryPositionDictionary> Positions { get; }
-                = new Dictionary<PartyMemberId, InventoryPositionDictionary>();
+            public IDictionary<string, InventoryPositionDictionary> Positions { get; }
+                = new Dictionary<string, InventoryPositionDictionary>();
 
             public int GramsPerGold { get; private set; }
             public int GramsPerRation { get; private set; }

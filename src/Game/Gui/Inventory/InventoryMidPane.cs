@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events.Inventory;
@@ -16,7 +17,11 @@ namespace UAlbion.Game.Gui.Inventory
         protected override void Subscribed()
         {
             var config = Resolve<GameConfig>();
-            var positions = config.Inventory.Positions[_activeCharacter];
+            var allPositions = config.Inventory.Positions.ToDictionary(
+                x => PartyMemberId.Parse(x.Key),
+               x => x.Value);
+
+            var positions = allPositions[_activeCharacter];
             var backgroundStack = new FixedPositionStack();
             var background = new UiSpriteElement(_activeCharacter.ToFullBodyPicture());
             backgroundStack.Add(background, 3, 10 - 1); //subtract 1px because picture starts 1px above frame

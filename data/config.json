@@ -2,17 +2,16 @@
   "Paths": {
       // Directory to look for the main .XLD data files from the original game.
       // This path is relative to the top-level ualbion / repository directory.
-      "ALBION": "ALBION", // Directory to look for MAIN.EXE, should also contain DRIVERS/ALBISND.OPL
+      "ALBION": "ALBION", // Directory to look for MAIN.EXE, should also contain CD directory and DRIVERS/ALBISND.OPL
       "SAVE": "ALBION/SAVES", // Where to save & load saved game files
-      "SETTINGS": "data/settings.json", // Where to save user preferences
       "EXPORT": "data/Exported", // Where the exporter tool should export its results to. Relative to the base repo dir.
       "DATA": "data",
       "MODS": "mods"
   },
   "SearchPaths": [
-    "$(ALBION)/CD/XLDLIBS",
-    "$(ALBION)",
-    "$(DATA)"
+    "$(ALBION)/CD/XLDLIBS", // For base game XLD files
+    "$(ALBION)", // For base game EXE and the OPL sound banks
+    "$(DATA)" // For new assets and mod assets.
   ]
 }
 

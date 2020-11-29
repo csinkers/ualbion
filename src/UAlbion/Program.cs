@@ -1,13 +1,16 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.Containers;
+using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Settings;
 using UAlbion.Game.Text;
@@ -25,6 +28,7 @@ namespace UAlbion
             PerfTracker.StartupEvent("Entered main");
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
             PerfTracker.StartupEvent("Registered encodings");
+            Task.Run(() => new LogEvent(LogEvent.Level.Verbose, "Preheat Event Metadata").ToString());
 
             var commandLine = new CommandLineOptions(args);
             if (commandLine.Mode == ExecutionMode.Exit)
@@ -33,73 +37,30 @@ namespace UAlbion
             var baseDir = ConfigUtil.FindBasePath();
             if (baseDir == null)
                 throw new InvalidOperationException("No base directory could be found.");
-
-            var generalConfig = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir);
-
             PerfTracker.StartupEvent($"Found base directory {baseDir}");
-            PerfTracker.StartupEvent("Registering asset manager");
-            var factory = new VeldridCoreFactory();
 
-            var loaderRegistry = new AssetLoaderRegistry();
-            var locatorRegistry = new AssetLocatorRegistry();
-            var containerLoaderRegistry = new ContainerLoaderRegistry()
-                .AddLoader(new RawContainerLoader())
-                .AddLoader(new XldContainerLoader())
-                .AddLoader(new BinaryOffsetContainerLoader())
-                .AddLoader(new ItemListContainerLoader())
-                .AddLoader(new SpellListContainerLoader())
-                ;
+            var setupAssetSystem = Task.Run(() => SetupAssetSystem(baseDir));
+            PerfTracker.StartupEvent("Creating engine");
+            using var engine = commandLine.NeedsEngine
+                ? new VeldridEngine(commandLine.Backend, commandLine.UseRenderDoc)
+                    .AddRenderer(new SkyboxRenderer())
+                    .AddRenderer(new SpriteRenderer())
+                    .AddRenderer(new ExtrudedTileMapRenderer())
+                    .AddRenderer(new DebugGuiRenderer())
+                : null;
+            engine?.ChangeBackend();
 
-            var modApplier = new ModApplier()
-                // Register post-processors for handling transformations of asset data that can't be done by UAlbion.Formats alone.
-                .AddAssetPostProcessor(new AlbionSpritePostProcessor())
-                .AddAssetPostProcessor(new ImageSharpPostProcessor())
-                .AddAssetPostProcessor(new InterlacedBitmapPostProcessor())
-                .AddAssetPostProcessor(new InventoryPostProcessor())
-                .AddAssetPostProcessor(new ItemNamePostProcessor())
-                ;
+            // PerfTracker.StartupEvent("Running asset tests...");
+            // AssetTest(assets);
+            // PerfTracker.StartupEvent("Asset tests done");
 
-            var assets = new AssetManager();
-            var settings = GeneralSettings.Load(generalConfig.ResolvePath("$(DATA)/settings.json"));
-            var services = new Container("Services",
-                settings, // Need to register settings first, as the AssetLocator relies on it.
-                loaderRegistry,
-                locatorRegistry,
-                containerLoaderRegistry,
-                new MetafontBuilder(factory),
-                new StdioConsoleLogger(),
-                // new ClipboardManager(),
-                new ImGuiConsoleLogger(),
-                new WordLookup(),
-                new AssetLocator(),
-                modApplier,
-                assets);
-
-            using var exchange = new EventExchange(new LogExchange())
-                .Register<IGeneralConfig>(generalConfig)
-                .Register<ICoreFactory>(factory)
-                .Attach(services);
-
-            Engine.GlobalExchange = exchange;
-            generalConfig.SetPath("LANG", settings.Language.ToString().ToUpperInvariant()); // Ensure that the LANG path is set before resolving any assets
-            modApplier.LoadMods(generalConfig);
-
-            exchange // Need to load game config after mods so asset ids can be parsed.
-                .Register(CoreConfig.Load(generalConfig.ResolvePath("$(DATA)/core.json")))
-                .Register(GameConfig.Load(generalConfig.ResolvePath("$(DATA)/game.json")));
-
-            PerfTracker.StartupEvent("Running asset tests...");
-            AssetTest(assets);
-            PerfTracker.StartupEvent("Asset tests done");
-
-            PerfTracker.StartupEvent("Registered asset manager");
             PerfTracker.StartupEvent($"Running as {commandLine.Mode}");
-
+            var (exchange, services) = setupAssetSystem.Result;
             switch (commandLine.Mode)
             {
                 case ExecutionMode.Game:
                 case ExecutionMode.GameWithSlavedAudio:
-                    Albion.RunGame(exchange, services, baseDir, commandLine);
+                    Albion.RunGame(engine, exchange, services, baseDir, commandLine);
                     break;
 
                 case ExecutionMode.AudioSlave: 
@@ -110,6 +71,7 @@ namespace UAlbion
                 case ExecutionMode.SavedGameTests: SavedGameTests.RoundTripTest(baseDir); break;
 
                 case ExecutionMode.DumpData:
+                    var assets = exchange.Resolve<IAssetManager>();
                     PerfTracker.BeginFrame(); // Don't need to show verbose startup logging while dumping
                     var tf = new TextFormatter();
                     exchange.Attach(tf);
@@ -124,6 +86,78 @@ namespace UAlbion
             }
 
             Console.WriteLine("Exiting");
+        }
+
+        static async Task<(EventExchange, IContainer)> SetupAssetSystem(string baseDir)
+        {
+            var generalConfigTask =  Task.Run(() =>
+            {
+                var result = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir);
+                PerfTracker.StartupEvent("Loaded general config");
+                return result;
+            });
+            var settingsTask = Task.Run(() =>
+            {
+                var result = GeneralSettings.Load(Path.Combine(baseDir, "data", "settings.json"));
+                PerfTracker.StartupEvent("Loaded settings");
+                return result;
+            });
+            var coreConfigTask = Task.Run(() =>
+            {
+                var result = CoreConfig.Load(Path.Combine(baseDir, "data", "core.json"));
+                PerfTracker.StartupEvent("Loaded core config");
+                return result;
+            });
+            var gameConfigTask = Task.Run(() =>
+            {
+                var result = GameConfig.Load(Path.Combine("data", "game.json"));
+                PerfTracker.StartupEvent("Loaded game config");
+                return result;
+            });
+
+            var assets = new AssetManager();
+            var factory = new VeldridCoreFactory();
+            var loaderRegistry = new AssetLoaderRegistry();
+            var locatorRegistry = new AssetLocatorRegistry();
+            var containerLoaderRegistry = new ContainerLoaderRegistry().AddLoader(new RawContainerLoader())
+                .AddLoader(new XldContainerLoader())
+                .AddLoader(new BinaryOffsetContainerLoader())
+                .AddLoader(new ItemListContainerLoader())
+                .AddLoader(new SpellListContainerLoader());
+
+            var modApplier = new ModApplier()
+                // Register post-processors for handling transformations of asset data that can't be done by UAlbion.Formats alone.
+                .AddAssetPostProcessor(new AlbionSpritePostProcessor())
+                .AddAssetPostProcessor(new ImageSharpPostProcessor())
+                .AddAssetPostProcessor(new InterlacedBitmapPostProcessor())
+                .AddAssetPostProcessor(new InventoryPostProcessor())
+                .AddAssetPostProcessor(new ItemNamePostProcessor());
+
+            var settings = await settingsTask.ConfigureAwait(false);
+            var services = new Container("Services", settings, // Need to register settings first, as the AssetLocator relies on it.
+                loaderRegistry, locatorRegistry, containerLoaderRegistry, new MetafontBuilder(factory), new StdioConsoleLogger(),
+                // new ClipboardManager(),
+                new ImGuiConsoleLogger(), new WordLookup(), new AssetLocator(), modApplier, assets);
+
+            var generalConfig = await generalConfigTask.ConfigureAwait(false);
+            using var exchange = new EventExchange(new LogExchange()).Register<IGeneralConfig>(generalConfig)
+                .Register<ICoreFactory>(factory)
+                .Attach(services);
+            PerfTracker.StartupEvent("Registered asset services");
+
+            Engine.GlobalExchange = exchange;
+            generalConfig.SetPath("LANG", settings.Language.ToString()
+                .ToUpperInvariant()); // Ensure that the LANG path is set before resolving any assets
+            modApplier.LoadMods(generalConfig);
+            PerfTracker.StartupEvent("Loaded mods");
+
+            var coreConfig = await coreConfigTask.ConfigureAwait(false);
+            var gameConfig = await gameConfigTask.ConfigureAwait(false);
+            exchange // Need to load game config after mods so asset ids can be parsed.
+                .Register(coreConfig)
+                .Register(gameConfig);
+            PerfTracker.StartupEvent("Loaded core and game config");
+            return (exchange, services);
         }
 
         static void AssetTest(AssetManager assets)

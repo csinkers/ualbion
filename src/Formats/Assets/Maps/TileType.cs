@@ -5,8 +5,8 @@ namespace UAlbion.Formats.Assets.Maps
     public enum TileType : byte
     {
         Normal = 0,   // Standard issue
-        UnderlayIat = 1, // Underlay
-        UnderlayCeltFloor = 2, // Underlay, celtic floors, toilet seats, random square next to pumps, top shelves of desks
+        Underlay1 = 1, // Underlay
+        Underlay2 = 2, // Underlay, celtic floors, toilet seats, random square next to pumps, top shelves of desks
         Overlay1 = 4, // Overlay
         Overlay2 = 5, // Overlay, only on continent maps?
         Overlay3 = 6, // Overlay

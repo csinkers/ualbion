@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using SixLabors.ImageSharp;
@@ -16,23 +15,6 @@ namespace UAlbion
     {
         public static void Dump(IAssetManager assets, string baseDir, ISet<AssetType> types, DumpFormats formats)
         {
-            void Save(Image<Rgba32> image, string pathWithoutExtension)
-            {
-                if ((formats & DumpFormats.Png) != 0)
-                {
-                    var path = Path.ChangeExtension(pathWithoutExtension, "png");
-                    using var stream = File.OpenWrite(path);
-                    image.SaveAsPng(stream);
-                }
-
-                if ((formats & DumpFormats.Tga) != 0)
-                {
-                    var path = Path.ChangeExtension(pathWithoutExtension, "tga");
-                    using var stream = File.OpenWrite(path);
-                    image.SaveAsTga(stream);
-                }
-            }
-
             void Export<TEnum>(string name) where TEnum : unmanaged, Enum
             {
                 var directory = Path.Combine(baseDir, "data", "exported", "gfx", name);
@@ -44,75 +26,7 @@ namespace UAlbion
                 foreach (var id in ids)
                 {
                     var assetId = AssetId.From(id);
-                    var config = assets.GetAssetInfo(assetId);
-                    var palette = assets.LoadPalette((Base.Palette)(config?.PaletteHint ?? (int)Base.Palette.Inventory));
-                    var texture = assets.LoadTexture(assetId);
-                    if (texture == null)
-                        continue;
-
-                    if (texture is TrueColorTexture trueColor)
-                    {
-                        var path = Path.Combine(directory, $"{assetId.Id}_{id}");
-                        var image = trueColor.ToImage();
-                        Save(image, path);
-                    }
-                    else if (texture is VeldridEightBitTexture tilemap && (
-                        typeof(TEnum) == typeof(Base.Font) ||
-                        typeof(TEnum) == typeof(Base.TilesetGraphics) ||
-                        typeof(TEnum) == typeof(Base.AutomapTiles)))
-                    {
-                        if (palette == null)
-                        {
-                            CoreUtil.LogError($"Could not load palette for {assetId}");
-                            continue;
-                        }
-
-                        var colors = tilemap.DistinctColors(null);
-                        int palettePeriod = palette.CalculatePeriod(colors);
-                        if (palettePeriod > 10) // Limit to 10, some of the tile sets can get a bit silly.
-                            palettePeriod = 10;
-
-                        for (int palFrame = 0; palFrame < palettePeriod; palFrame++)
-                        {
-                            var path = Path.Combine(directory, $"{assetId.Id}_{palFrame}_{id}");
-                            var image = tilemap.ToImage(null, palette.GetPaletteAtTime(palFrame));
-                            Save(image, path);
-                        }
-                    }
-                    else if (texture is VeldridEightBitTexture ebt)
-                    {
-                        for (int subId = 0; subId < ebt.SubImageCount; subId++)
-                        {
-                            if (palette == null)
-                            {
-                                CoreUtil.LogError($"Could not load palette for {assetId}");
-                                break;
-                            }
-
-                            if (id is Base.ItemGraphics)
-                                subId = Convert.ToInt32(id, CultureInfo.InvariantCulture);
-
-                            var colors = ebt.DistinctColors(subId);
-                            int palettePeriod = palette.CalculatePeriod(colors);
-                            if (palettePeriod > 10) // Limit to 10, some of the tile sets can get a bit silly.
-                                palettePeriod = 10;
-
-                            for (int palFrame = 0; palFrame < palettePeriod; palFrame++)
-                            {
-                                var path = Path.Combine(directory, $"{assetId.Id}_{subId}_{palFrame}_{id}");
-                                var image = ebt.ToImage(subId, palette.GetPaletteAtTime(palFrame));
-                                Save(image, path);
-                            }
-
-                            if (id is Base.ItemGraphics)
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        var path = Path.Combine(directory, $"{assetId.Id}_{id}.png.todo");
-                        File.WriteAllText(path, "");
-                    }
+                    ExportImage(assetId, assets, directory, formats, 10); // Limit to 10, some of the tile sets can get a bit silly.
                 }
             }
 
@@ -143,6 +57,96 @@ namespace UAlbion
                     case AssetType.Portrait:            Export<Base.Portrait>         ("Portrait");             break;
                     case AssetType.TacticalIcon:        Export<Base.TacticalGraphics> ("TacticalIcon");         break;
                 }
+            }
+        }
+
+        public static IList<string> ExportImage(AssetId assetId, IAssetManager assets, string directory, DumpFormats formats, int? paletteFrameLimit)
+        {
+            var filenames = new List<string>();
+            var config = assets.GetAssetInfo(assetId);
+            var palette = assets.LoadPalette((Base.Palette)(config?.PaletteHint ?? (int)Base.Palette.Inventory));
+            var texture = assets.LoadTexture(assetId);
+            if (texture == null)
+                return null;
+
+            if (texture is TrueColorTexture trueColor)
+            {
+                var path = Path.Combine(directory, $"{assetId.Id}_{assetId}");
+                var image = trueColor.ToImage();
+                Save(image, path, formats, filenames);
+            }
+            else if (texture is VeldridEightBitTexture tilemap && (
+                assetId.Type == AssetType.Font ||
+                assetId.Type == AssetType.TilesetGraphics ||
+                assetId.Type == AssetType.AutomapGraphics))
+            {
+                if (palette == null)
+                {
+                    CoreUtil.LogError($"Could not load palette for {assetId}");
+                    return null;
+                }
+
+                var colors = tilemap.DistinctColors(null);
+                int palettePeriod = palette.CalculatePeriod(colors);
+                if (paletteFrameLimit.HasValue && palettePeriod > paletteFrameLimit)
+                    palettePeriod = paletteFrameLimit.Value;
+
+                for (int palFrame = 0; palFrame < palettePeriod; palFrame++)
+                {
+                    var path = Path.Combine(directory, $"{assetId.Id}_{palFrame}_{assetId}");
+                    var image = tilemap.ToImage(null, palette.GetPaletteAtTime(palFrame));
+                    Save(image, path, formats, filenames);
+                }
+            }
+            else if (texture is VeldridEightBitTexture ebt)
+            {
+                for (int subId = 0; subId < ebt.SubImageCount; subId++)
+                {
+                    if (palette == null)
+                    {
+                        CoreUtil.LogError($"Could not load palette for {assetId}");
+                        break;
+                    }
+
+                    var colors = ebt.DistinctColors(subId);
+                    int palettePeriod = palette.CalculatePeriod(colors);
+                    if (paletteFrameLimit.HasValue && palettePeriod > paletteFrameLimit)
+                        palettePeriod = paletteFrameLimit.Value;
+
+                    for (int palFrame = 0; palFrame < palettePeriod; palFrame++)
+                    {
+                        var path = Path.Combine(directory, $"{assetId.Id}_{subId}_{palFrame}_{assetId}");
+                        var image = ebt.ToImage(subId, palette.GetPaletteAtTime(palFrame));
+                        Save(image, path, formats, filenames);
+                    }
+                }
+            }
+            else
+            {
+                var path = Path.Combine(directory, $"{assetId.Id}_{assetId}.png.todo");
+                File.WriteAllText(path, "");
+                return null;
+            }
+
+            return filenames;
+        }
+
+        static void Save(Image<Rgba32> image, string pathWithoutExtension, DumpFormats formats, IList<string> filenames)
+        {
+            if ((formats & DumpFormats.Png) != 0)
+            {
+                var path = Path.ChangeExtension(pathWithoutExtension, "png");
+                using var stream = File.OpenWrite(path);
+                image.SaveAsPng(stream);
+                filenames.Add(path);
+            }
+
+            if ((formats & DumpFormats.Tga) != 0)
+            {
+                var path = Path.ChangeExtension(pathWithoutExtension, "tga");
+                using var stream = File.OpenWrite(path);
+                image.SaveAsTga(stream);
+                filenames.Add(path);
             }
         }
     }

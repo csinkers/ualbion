@@ -1960,8 +1960,6 @@
     "Loader": "UAlbion.Formats.Parsers.TilesetLoader, UAlbion.Formats",
     "Files": {
       "ICONDAT0": {
-        "Width": 8,
-        "Height": 8,
         "Assets": {
           "0": { "Id": 1, "Name": "Outdoors", "UseSmallGraphics": true },
           "1": { "Name": "Outdoors", "UseSmallGraphics": true },

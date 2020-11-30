@@ -80,6 +80,7 @@ namespace UAlbion
                     if ((commandLine.DumpFormats & DumpFormats.Text) != 0) DumpText.Dump(assets, baseDir, tf, commandLine.DumpAssetTypes);
                     if ((commandLine.DumpFormats & DumpFormats.GraphicsMask) != 0)
                         DumpGraphics.Dump(assets, baseDir, commandLine.DumpAssetTypes, commandLine.DumpFormats & DumpFormats.GraphicsMask);
+                    if ((commandLine.DumpFormats & DumpFormats.Tiled) != 0) DumpTiled.Dump(baseDir, assets, commandLine.DumpAssetTypes);
                     break;
 
                 case ExecutionMode.Exit: break;

@@ -14,6 +14,7 @@ namespace UAlbion.Formats.Assets.Maps
         public ushort ImageNumber { get; set; }
         public byte FrameCount { get; set; }
         public byte Unk7 { get; set; }
+
         public int GetSubImageForTile(int tickCount)
         {
             int frames = FrameCount;

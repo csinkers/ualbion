@@ -19,7 +19,7 @@ namespace UAlbion.Game.Assets
             var sprite = (AlbionSprite)asset;
             SubImage[] subImages;
 
-            /// TODO: Put exemptions into assets.json
+            // TODO: Put exemptions into assets.json
             if (key.Type == AssetType.Font || key.Type == AssetType.AutomapGraphics || sprite.UniformFrames && sprite.Frames.Count >= 256)
             {
                 const int buffer = 1;
@@ -108,7 +108,6 @@ namespace UAlbion.Game.Assets
                     subImages);
             }
         }
-
 
         static (int, int) GetAtlasSize(int tileWidth, int tileHeight, int count)
         {

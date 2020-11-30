@@ -21,7 +21,12 @@ namespace UAlbion.Game.Entities.Map2D
             new SubImage(Vector2.Zero, Vector2.Zero, Vector2.Zero, 0),
             0);
 
-        public TileLayer(LogicalMap2D logicalMap, ITexture tileset, Func<int, TileData> tileFunc, DrawLayer drawLayer, IconChangeType iconChangeType)
+        public TileLayer(
+            LogicalMap2D logicalMap,
+            ITexture tileset,
+            Func<int, TileData> tileFunc,
+            DrawLayer drawLayer,
+            IconChangeType iconChangeType)
         {
             _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
             _logicalMap.Dirty += (sender, args) =>
@@ -72,7 +77,6 @@ namespace UAlbion.Game.Entities.Map2D
 
             int index = _logicalMap.Index(i, j);
             int subImageId = tile.GetSubImageForTile(tickCount);
-
             var subImage = _tileset.GetSubImageDetails(subImageId);
 
             var position = new Vector3(

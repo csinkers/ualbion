@@ -111,7 +111,7 @@ namespace UAlbion
             });
             var gameConfigTask = Task.Run(() =>
             {
-                var result = GameConfig.Load(Path.Combine("data", "game.json"));
+                var result = GameConfig.Load(Path.Combine(baseDir, "data", "game.json"));
                 PerfTracker.StartupEvent("Loaded game config");
                 return result;
             });

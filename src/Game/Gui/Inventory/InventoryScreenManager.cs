@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
@@ -13,7 +14,7 @@ namespace UAlbion.Game.Gui.Inventory
 {
     public class InventoryScreenManager : Component
     {
-        ISetInventoryModeEvent _modeEvent = new InventoryOpenEvent(PartyMemberId.None); // Should never be null.
+        IEvent _modeEvent = new InventoryOpenEvent(PartyMemberId.None); // Should never be null.
         InventoryPage _page;
         PartyMemberId _activeCharacter;
         Action<bool> _continuation;
@@ -24,7 +25,7 @@ namespace UAlbion.Game.Gui.Inventory
             OnAsync<ChestEvent, bool>(OpenChest);
             OnAsync<DoorEvent, bool>(OpenDoor);
             OnAsync<MerchantEvent>(TalkToMerchant);
-            On<InventoryOpenEvent>(e => SetDisplayedPartyMember(e.Submode));
+            On<InventoryOpenEvent>(e => SetDisplayedPartyMember(e.PartyMemberId));
             On<InventoryOpenPositionEvent>(e =>
             {
                 var party = Resolve<IParty>();
@@ -61,7 +62,7 @@ namespace UAlbion.Game.Gui.Inventory
             return true;
         }
 
-        void SetMode(ISetInventoryModeEvent e)
+        void SetMode(IEvent e)
         {
             _modeEvent = e;
             SetDisplayedPartyMember(null);

@@ -45,10 +45,8 @@ namespace UAlbion.Formats.MapEvents
         public byte InitialTextId { get; private set; }
         public byte UnlockedTextId { get; private set; }
         public DoorId DoorId { get; private set; }
-        public AssetId Submode => DoorId;
         public override string ToString() => $"inv:door {DoorId} {PickDifficulty}% Initial:{InitialTextId} Unlocked:{UnlockedTextId} Key:{KeyItemId}";
         public override MapEventType EventType => MapEventType.Door;
         public TextId TextSourceId { get; }
-        public InventoryMode Mode => InventoryMode.LockedDoor;
     }
 }

@@ -84,7 +84,7 @@ namespace UAlbion.Formats.Config
         public static GameConfig Load(string configPath)
         {
             if (!File.Exists(configPath))
-                return new GameConfig();
+                throw new FileNotFoundException($"Could not find game config file at expected path {configPath}");
 
             var configText = File.ReadAllText(configPath);
             return JsonConvert.DeserializeObject<GameConfig>(configText,

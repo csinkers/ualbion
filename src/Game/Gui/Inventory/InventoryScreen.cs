@@ -1,4 +1,5 @@
 ﻿using System;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
@@ -9,7 +10,7 @@ namespace UAlbion.Game.Gui.Inventory
     public class InventoryScreen : Dialog
     {
         public InventoryScreen(
-            ISetInventoryModeEvent modeEvent,
+            IEvent modeEvent,
             PartyMemberId activeCharacter,
             Func<InventoryPage> getPage,
             Action<InventoryPage> setPage) : base(DialogPositioning.TopLeft)
@@ -19,20 +20,17 @@ namespace UAlbion.Game.Gui.Inventory
             if (setPage == null) throw new ArgumentNullException(nameof(setPage));
 
             var leftPane =
-                modeEvent.Mode switch
+                modeEvent switch
                 {
-                    InventoryMode.Character => (IUiElement)new InventoryCharacterPane(activeCharacter, getPage, setPage),
-                    InventoryMode.Merchant => new InventoryMerchantPane(modeEvent.Submode),
-                    InventoryMode.Chest => new InventoryChestPane(modeEvent.Submode),
-                    InventoryMode.LockedChest => new InventoryLockPane((ILockedInventoryEvent)modeEvent),
-                    InventoryMode.LockedDoor => new InventoryLockPane((ILockedInventoryEvent)modeEvent),
-                    _ => throw new InvalidOperationException($"Unexpected inventory mode {modeEvent.Mode}")
+                    InventoryOpenEvent ioe => new InventoryCharacterPane(activeCharacter, getPage, setPage),
+                    MerchantEvent me => new InventoryMerchantPane(me.MerchantId),
+                    ChestEvent ce => ce.PickDifficulty == 0 ? (IUiElement)new InventoryChestPane(ce.ChestId) : new InventoryLockPane(ce),
+                    DoorEvent de => new InventoryLockPane(de),
+                    _ => throw new InvalidOperationException($"Unexpected inventory mode event {modeEvent}")
                 };
 
             var middlePane = new InventoryMidPane(activeCharacter);
-            var rightPane = new InventoryRightPane(
-                activeCharacter,
-                modeEvent.Mode == InventoryMode.Merchant);
+            var rightPane = new InventoryRightPane(activeCharacter, modeEvent is MerchantEvent);
 
             // var frameDivider = new FrameDivider(135, 0, 4, 192);
 

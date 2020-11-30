@@ -331,14 +331,14 @@ namespace UAlbion.Config
                             .Where(x => validTypes == null || validTypes.Contains(x.Item1.AssetType))
                             .Select(x => x.Item1.EnumType.Name));
 
-                    throw new InvalidOperationException($"Could not unambiguously parse \"{s}\" as an asset id. Candidate types: {candidates}");
+                    throw new FormatException($"Could not unambiguously parse \"{s}\" as an asset id. Candidate types: {candidates}");
                 }
 
                 result = new AssetId(match.Item1.AssetType, match.Item2);
             }
 
             if (result.Type == AssetType.Unknown)
-                throw new KeyNotFoundException($"Could not parse \"{s}\" as an asset id enum");
+                throw new FormatException($"Could not parse \"{s}\" as an asset id enum");
 
             return result;
         }
@@ -368,7 +368,7 @@ namespace UAlbion.Config
             }
 
             if (result.Type == AssetType.Unknown)
-                throw new KeyNotFoundException($"Could not parse \"{s}\" as an asset id enum");
+                throw new FormatException($"Could not parse \"{s}\" as an asset id enum");
 
             return result;
         }

@@ -41,8 +41,6 @@ namespace UAlbion.Formats.MapEvents
         }
 
         public override MapEventType EventType => MapEventType.Chest;
-        public InventoryMode Mode => InventoryMode.Chest;
-        public AssetId Submode => ChestId;
         public ChestId ChestId { get; private set; }
         public byte PickDifficulty { get; private set; }
         public ItemId KeyItemId { get; private set; }

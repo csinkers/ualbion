@@ -150,9 +150,20 @@ namespace UAlbion.Api
             if (parts.Length < metadata.Parts.Count + 1)
                 parts = parts.Concat(Enumerable.Repeat("", metadata.Parts.Count + 1 - parts.Length)).ToArray();
 
-            try { return metadata.Parser(parts); }
-            catch(FormatException) { return null; }
-            catch(NullReferenceException) { return null; }
+            try
+            {
+                return metadata.Parser(parts);
+            }
+            catch (FormatException ex)
+            {
+                ApiUtil.Assert($"Failed to parse \"{s}\" as a {metadata.Name} ({metadata.Type}): {ex.Message}");
+                return null;
+            }
+            catch (NullReferenceException ex)
+            {
+                ApiUtil.Assert($"Failed to parse \"{s}\" as a {metadata.Name} ({metadata.Type}): {ex.Message}");
+                return null;
+            }
         }
     }
 }

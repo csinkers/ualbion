@@ -70,7 +70,7 @@ namespace UAlbion.Game.Gui.Inventory
             if (e is ILockedInventoryEvent locked && locked.InitialTextId != 255)
             {
                 var state = Resolve<IGameState>();
-                Raise(new TextEvent(state.MapId.ToMapText(), locked.InitialTextId, TextLocation.TextInWindow, SpriteId.None));
+                Raise(new TextEvent(state.MapId.ToMapText(), locked.InitialTextId, TextLocation.NoPortrait, SpriteId.None));
             }
         }
 
@@ -80,9 +80,9 @@ namespace UAlbion.Game.Gui.Inventory
                 Raise(new PushSceneEvent(SceneId.Inventory));
 
             var party = Resolve<IParty>();
-            member ??= party.Leader;
+            member ??= party.Leader.Id;
             if (party.WalkOrder.All(x => x.Id != member.Value))
-                member = party.Leader;
+                member = party.Leader.Id;
 
             _activeCharacter = member.Value;
 

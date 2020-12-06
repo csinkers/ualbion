@@ -11,7 +11,7 @@ namespace UAlbion.Game.State
         int GetItemCount(ItemId item);
         IReadOnlyList<IPlayer> StatusBarOrder { get; } // Max of 6
         IReadOnlyList<IPlayer> WalkOrder { get; } // Max of 6
-        PartyMemberId Leader { get; }
+        IPlayer Leader { get; }
 
         [SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "<Pending>")]
         IPlayer this[PartyMemberId id] { get; }

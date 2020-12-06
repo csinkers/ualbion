@@ -30,7 +30,7 @@ namespace UAlbion.Game.State
             On<RemovePartyMemberEvent>(e => SetLastResult(RemoveMember(e.PartyMemberId)));
             On<SetPartyLeaderEvent>(e =>
             {
-                Leader = e.PartyMemberId;
+                SetLeader(e.PartyMemberId);
                 Raise(new SetContextEvent(ContextType.Leader, e.PartyMemberId));
                 Raise(e);
             });
@@ -47,6 +47,7 @@ namespace UAlbion.Game.State
 
         [SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "<Pending>")]
         public IPlayer this[PartyMemberId id] => _statusBarOrder.FirstOrDefault(x => x.Id == id);
+        public IPlayer Leader => _walkOrder[0];
         public IReadOnlyList<IPlayer> StatusBarOrder => _readOnlyStatusBarOrder;
         public IReadOnlyList<IPlayer> WalkOrder => _readOnlyWalkOrder;
         public int TotalGold => _statusBarOrder.Sum(x => x.Effective.Inventory.Gold.Amount);
@@ -58,19 +59,15 @@ namespace UAlbion.Game.State
 
         // The current party leader (shown with a white outline on
         // health bar and slightly raised in the status bar)
-        public PartyMemberId Leader
+        void SetLeader(PartyMemberId value)
         {
-            get => _walkOrder[0].Id;
-            private set
-            {
-                int index = _walkOrder.FindIndex(x => x.Id == value);
-                if (index == -1)
-                    return;
+            int index = _walkOrder.FindIndex(x => x.Id == value);
+            if (index == -1)
+                return;
 
-                var player = _walkOrder[index];
-                _walkOrder.RemoveAt(index);
-                _walkOrder.Insert(0, player);
-            }
+            var player = _walkOrder[index];
+            _walkOrder.RemoveAt(index);
+            _walkOrder.Insert(0, player);
         }
 
         bool AddMember(PartyMemberId id)

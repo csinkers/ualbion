@@ -45,11 +45,11 @@ namespace UAlbion.Game
                 case QueryType.HasEnoughGold:        continuation(Compare(query.Operation, game.Party.TotalGold, query.Argument)); return true;
                 case QueryType.InventoryHasItem:     continuation(Compare(query.Operation, game.Party.GetItemCount(query.ItemId), query.Immediate)); return true;
                 case QueryType.HasPartyMember:       continuation(game.Party.StatusBarOrder.Any(x => x.Id == query.PartyMemberId)); return true;
-                case QueryType.IsPartyMemberLeader:  continuation(game.Party.Leader == query.PartyMemberId); return true;
+                case QueryType.IsPartyMemberLeader:  continuation(game.Party.Leader.Id == query.PartyMemberId); return true;
                 case QueryType.RandomChance:         continuation(_random.Next(100) < query.Argument); return true;
                 case QueryType.TriggerType:          continuation(context.Source.Trigger == (TriggerTypes)query.Argument); return true;
                 case QueryType.ChosenVerb:           continuation(context.Source.Trigger.HasFlag((TriggerTypes)(1 << (int)query.Argument))); return true;
-                case QueryType.UsedItemId:           continuation(query.ItemId == context.Source.Id); return true;
+                case QueryType.UsedItemId:           continuation(query.ItemId == context.Source.AssetId); return true;
                 // Need to use QueryEvent _ instead of _ here due to a compiler issue (https://github.com/dotnet/roslyn/issues/47075)
                 case QueryType.PreviousActionResult: continuation(Resolve<IEventManager>().LastEventResult); return true;
 

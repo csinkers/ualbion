@@ -107,7 +107,7 @@ namespace UAlbion.Game.Entities.Map2D
 
             foreach (var zone in zones)
                 if (zone.Chain.Enabled)
-                    Raise(new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_mapData.Id, type, zone.X, zone.Y)));
+                    Raise(new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), type, zone.X, zone.Y)));
 
             if (!log)
                 Raise(new SetLogLevelEvent(LogEvent.Level.Info));
@@ -128,7 +128,7 @@ namespace UAlbion.Game.Entities.Map2D
             }
 
             if (zone.Chain.Enabled)
-                Raise(new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_mapData.Id, TriggerTypes.Npc, e.X, e.Y)));
+                Raise(new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Npc, e.X, e.Y)));
         }
 
         void OnPlayerEnteredTile(PlayerEnteredTileEvent e)
@@ -146,13 +146,13 @@ namespace UAlbion.Game.Entities.Map2D
             }
 
             if (zone.Chain.Enabled)
-                Raise(new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_mapData.Id, TriggerTypes.Normal, e.X, e.Y)));
+                Raise(new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Normal, e.X, e.Y)));
         }
 
         void ChangeIcon(ChangeIconEvent e)
         {
             var context = Resolve<IEventManager>().Context;
-            if (context.Source.Id.Type != AssetType.Map)
+            if (context.Source.AssetId.Type != AssetType.Map)
             {
                 ApiUtil.Assert($"Expected event {e} to be triggered from a map event");
                 return;

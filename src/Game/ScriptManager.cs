@@ -36,7 +36,7 @@ namespace UAlbion.Game
             for (ushort i = 0; i < events.Count - 1; i++) nodes[i].Next = nodes[i + 1];
             for (ushort i = 0; i < events.Count;     i++) chain.Events.Add(nodes[i]);
 
-            var source = new EventSource(mapManager.Current.MapId, TriggerTypes.Default); // TODO: Is there a better trigger type for this?
+            var source = new EventSource(mapManager.Current.MapId, mapManager.Current.MapId.ToMapText(), TriggerTypes.Default); // TODO: Is there a better trigger type for this?
             var trigger = new TriggerChainEvent(chain, chain.FirstEvent, source);
             return RaiseAsync(trigger, continuation) > 0;
         }

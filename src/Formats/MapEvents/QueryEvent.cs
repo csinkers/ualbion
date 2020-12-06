@@ -23,7 +23,7 @@ namespace UAlbion.Formats.MapEvents
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
 
-            e._value = e.AssetType != AssetType.None
+            e._value = e.AssetType != AssetType.None && e.AssetType != AssetType.Unknown
                 ? AssetId.SerdesU16("Argument", AssetId.FromUInt32(e._value), e.AssetType, mapping, s).ToUInt32()
                 : s.UInt16("Argument", (ushort)e._value);
 

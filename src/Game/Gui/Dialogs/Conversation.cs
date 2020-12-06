@@ -148,7 +148,7 @@ namespace UAlbion.Game.Gui.Dialogs
             switch(textEvent.Location)
             {
                 case TextLocation.Conversation:
-                case TextLocation.TextInWindow:
+                case TextLocation.NoPortrait:
                 {
                     void OnConversationClicked()
                     {
@@ -282,10 +282,11 @@ namespace UAlbion.Game.Gui.Dialogs
 
             if (chain != null)
             {
+                var set = fromWordSet ? wordSet.Id : eventSet.Id;
                 var triggerEvent = new TriggerChainEvent(
                     chain,
                     chain.FirstEvent,
-                    new EventSource(fromWordSet ? wordSet.Id : eventSet.Id, TriggerTypes.Action));
+                    new EventSource(set, set.ToEventText(), TriggerTypes.Action));
 
                 RaiseAsync(triggerEvent, () => continuation?.Invoke());
                 return true;

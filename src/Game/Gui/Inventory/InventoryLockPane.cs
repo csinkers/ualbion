@@ -56,7 +56,7 @@ namespace UAlbion.Game.Gui.Inventory
         void LockClicked()
         {
             var hand = Resolve<IInventoryManager>().ItemInHand;
-            if (hand.ItemId == null)
+            if (hand.ItemId.IsNone)
                 return;
 
             var tf = Resolve<ITextFormatter>();
@@ -113,8 +113,7 @@ namespace UAlbion.Game.Gui.Inventory
                 return;
             }
 
-            var party = Resolve<IParty>();
-            var leader = party[party.Leader];
+            var leader = Resolve<IParty>().Leader;
             CanPick(leader, x =>
             {
                 if (x)

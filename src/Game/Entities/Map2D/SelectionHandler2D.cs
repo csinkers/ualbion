@@ -107,7 +107,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(Base.SystemText.MapPopup_Examine),
-                        new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_map.Id, TriggerTypes.Examine, x, y)),
+                        new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.Examine, x, y)),
                         ContextMenuGroup.Actions));
                 }
 
@@ -115,7 +115,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(Base.SystemText.MapPopup_Manipulate),
-                        new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_map.Id, TriggerTypes.Manipulate, x, y)),
+                        new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.Manipulate, x, y)),
                         ContextMenuGroup.Actions));
                 }
 
@@ -123,7 +123,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(Base.SystemText.MapPopup_Take),
-                        new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_map.Id, TriggerTypes.Take, x, y)),
+                        new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.Take, x, y)),
                         ContextMenuGroup.Actions));
                 }
 
@@ -131,7 +131,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(Base.SystemText.MapPopup_TalkTo),
-                        new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_map.Id, TriggerTypes.TalkTo, x, y)),
+                        new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.TalkTo, x, y)),
                         ContextMenuGroup.Actions));
                 }
             }

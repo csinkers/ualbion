@@ -43,7 +43,7 @@ namespace UAlbion.Game.Gui.Status
                 return;
 
             var playerId = party.StatusBarOrder[_order].Id;
-            var highlighted = playerId == party.Leader;
+            var highlighted = playerId == party.Leader.Id;
             var sheet = party[playerId];
             var value = _isHealth ? sheet.Apparent.Combat.LifePoints : sheet.Apparent.Magic.SpellPoints;
             var valueMax = _isHealth ? sheet.Apparent.Combat.LifePointsMax : sheet.Apparent.Magic.SpellPointsMax;

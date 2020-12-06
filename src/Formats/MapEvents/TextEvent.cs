@@ -16,7 +16,7 @@ namespace UAlbion.Formats.MapEvents
 
             if (s == null) throw new ArgumentNullException(nameof(s));
             e.TextSourceId = textSourceId;
-            e.Location = s.EnumU8(nameof(Location), e.Location ?? TextLocation.TextInWindow);
+            e.Location = s.EnumU8(nameof(Location), e.Location ?? TextLocation.NoPortrait);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
             e.PortraitId = SpriteId.SerdesU8(nameof(PortraitId), e.PortraitId, AssetType.Portrait, mapping, s);

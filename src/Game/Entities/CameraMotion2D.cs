@@ -51,7 +51,7 @@ namespace UAlbion.Game.Entities
                 var party = Resolve<IParty>();
                 var config = Resolve<GameConfig>().Visual.Camera2D;
                 if (map == null || party == null || !party.StatusBarOrder.Any()) return;
-                var leader = party[party.Leader];
+                var leader = party.Leader;
                 if (leader == null)
                     return;
 

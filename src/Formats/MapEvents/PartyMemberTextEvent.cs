@@ -1,17 +1,16 @@
 ﻿using UAlbion.Api;
-using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
     [Event("party_member_text")]
     public class PartyMemberTextEvent : Event, IAsyncEvent
     {
+        [EventPart("member_id")] public TextLocation Location { get; }
         [EventPart("text_id")] public byte TextId { get; }
-        [EventPart("member_id")] public PartyMemberId? MemberId { get; }
-        public PartyMemberTextEvent(byte textId, PartyMemberId? portraitId)
+        public PartyMemberTextEvent(TextLocation location, byte textId)
         {
+            Location = location;
             TextId = textId;
-            MemberId = portraitId;
         }
     }
 }

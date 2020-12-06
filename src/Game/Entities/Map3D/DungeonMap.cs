@@ -133,7 +133,7 @@ namespace UAlbion.Game.Entities.Map3D
                 Raise(new SetLogLevelEvent(LogEvent.Level.Warning));
 
             foreach (var zone in zones)
-                Raise(new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_mapData.Id, type, zone.X, zone.Y)));
+                Raise(new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), type, zone.X, zone.Y)));
 
             if (!log)
                 Raise(new SetLogLevelEvent(LogEvent.Level.Info));

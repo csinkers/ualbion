@@ -1,20 +1,23 @@
 ﻿using UAlbion.Config;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Formats.MapEvents
 {
     public class EventSource
     {
-        public EventSource(AssetId id, TriggerTypes trigger, int x = 0, int y = 0)
+        public EventSource(AssetId assetId, TextId textSource, TriggerTypes trigger, int x = 0, int y = 0)
         {
             // Trigger = TalkTo for NPC, UseItem for item, Action for event set, Default for none
-            Id = id;
+            AssetId = assetId;
+            TextSource = textSource;
             Trigger = trigger;
             X = x;
             Y = y;
         }
 
-        public AssetId Id { get; }
+        public AssetId AssetId { get; }
+        public TextId TextSource { get; }
         public TriggerTypes Trigger { get; }
         public int X { get; }
         public int Y { get; }

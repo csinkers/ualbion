@@ -147,7 +147,7 @@ namespace UAlbion.Game.Veldrid.Audio
                 Volume = e.Volume == 0 ? 1.0f : e.Volume / 255.0f,
                 Looping = e.Mode == SoundEvent.SoundMode.LocalLoop,
                 Position = tileSize * new Vector3(context.Source.X, context.Source.Y, 0.0f),
-                SourceRelative = context.Source.Id.Type != AssetType.Map, // If we couldn't localise the sound then play it at (0,0) relative to the player.
+                SourceRelative = context.Source.AssetId.Type != AssetType.Map, // If we couldn't localise the sound then play it at (0,0) relative to the player.
                 ReferenceDistance = 1.0f * tileSize.X,
                 RolloffFactor = 4.0f
             };

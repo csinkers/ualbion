@@ -155,7 +155,7 @@ namespace UAlbion.Game.State
         void MapItemTransition(ItemId itemId, PartyMemberId recipientId)
         {
             var context = Resolve<IEventManager>().Context;
-            if (context?.Source.Id.Type != AssetType.Map)
+            if (context?.Source.AssetId.Type != AssetType.Map)
                 return;
 
             var scene = Resolve<ISceneManager>()?.ActiveScene;

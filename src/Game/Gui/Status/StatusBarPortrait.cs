@@ -90,7 +90,7 @@ namespace UAlbion.Game.Gui.Status
                     ContextMenuGroup.Actions));
             }
 
-            if (member.Id != party.Leader)
+            if (member.Id != party.Leader.Id)
             {
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.PartyPopup_MakeLeader),
@@ -121,7 +121,7 @@ namespace UAlbion.Game.Gui.Status
             if (member == null)
                 return order;
 
-            bool highlighted = member.Id == party.Leader;
+            bool highlighted = member.Id == party.Leader.Id;
             int maxOrder = order;
             var portraitExtents = new Rectangle(extents.X, extents.Y + (highlighted ? 0 : 3), extents.Width, extents.Height - 6);
 

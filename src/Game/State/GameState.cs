@@ -159,7 +159,7 @@ namespace UAlbion.Game.State
             _party = AttachChild(new Party(_game.Sheets, _game.ActiveMembers, GetWriteableInventory));
             Raise(new LoadMapEvent(_game.MapId));
             Raise(new StartClockEvent());
-            Raise(new SetContextEvent(ContextType.Leader, _party.Leader));
+            Raise(new SetContextEvent(ContextType.Leader, _party.Leader.Id));
             Raise(new PartyChangedEvent());
             Raise(new PartyJumpEvent(_game.PartyX, _game.PartyY));
             Raise(new CameraJumpEvent(_game.PartyX, _game.PartyY));

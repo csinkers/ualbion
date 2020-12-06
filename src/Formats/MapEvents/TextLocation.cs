@@ -2,13 +2,16 @@
 {
     public enum TextLocation : byte
     {
-        TextInWindow = 0,
-        TextInWindowWithPortrait = 2,
-        TextInWindowWithPortrait2 = 3,
+        NoPortrait = 0,
+        LeaderPortraitLeft = 1,
+        PortraitLeft = 2,
+        PortraitLeft2 = 3,
         Conversation = 4,
+        Unk5 = 5,
         QuickInfo = 6,
+        Unk7 = 7,
         ConversationQuery = 9, // Show text in main conv window, then show options dlg without standard options.
-        TextInWindowWithPortrait3 = 10, // Not sure how this one differs
+        PortraitLeft3 = 10, // Not sure how this one differs
         // TextInWindowWithNpcPortrait,
         ConversationOptions = 11, // Show standard and BLOK conversation options.
         StandardOptions = 13,

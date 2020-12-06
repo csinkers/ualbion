@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
@@ -16,7 +19,7 @@ namespace UAlbion.Formats
             _textSourceId = textSourceId;
         }
 
-        public string GetText(IEventNode e)
+        public string Format(IEventNode e)
         {
             if (e == null) throw new ArgumentNullException(nameof(e));
             var nodeText = e.ToString();
@@ -27,6 +30,36 @@ namespace UAlbion.Formats
             }
 
             return nodeText;
+        }
+
+        public string FormatChain(EventChain chain)
+        {
+            if (chain == null) 
+                return null;
+            var sb = new StringBuilder();
+
+            var uniqueEvents = new HashSet<IEventNode>();
+            void Visit(IEventNode e)
+            {
+                while (true)
+                {
+                    if (e == null)
+                        return;
+
+                    if (!uniqueEvents.Add(e)) 
+                        break;
+
+                    if (e is IBranchNode branch && uniqueEvents.Add(branch))
+                        Visit(branch.NextIfFalse);
+                    e = e.Next;
+                }
+            }
+
+            Visit(chain.FirstEvent);
+            foreach (var e in uniqueEvents.OrderBy(x => x.Id))
+                sb.AppendLine(Format(e));
+
+            return sb.ToString();
         }
     }
 }

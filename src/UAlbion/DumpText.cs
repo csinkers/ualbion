@@ -469,13 +469,13 @@ namespace UAlbion
                 sw.Write("".PadRight(indent * 4));
                 if(e is IBranchNode branch)
                 {
-                    sw.WriteLine($"if (!{formatter.GetText(e)}) {{");
+                    sw.WriteLine($"if (!{formatter.Format(e)}) {{");
                     if (branch.NextIfFalse != null)
                         PrintChain(sw, formatter, branch.NextIfFalse, indent + 1);
                     sw.WriteLine("}".PadLeft(4 + indent * 4));
                     sw.WriteLine("else...".PadLeft(10 + indent * 4));
                 }
-                else sw.WriteLine(formatter.GetText(e));
+                else sw.WriteLine(formatter.Format(e));
                 e = e.Next;
             } while (e != null);
         }
@@ -490,7 +490,7 @@ namespace UAlbion
             else
                 sw.Write("    ");
 
-            sw.WriteLine(formatter.GetText(e));
+            sw.WriteLine(formatter.Format(e));
         }
 
         static void DumpMapEvents(StreamWriter sw, IAssetManager assets, MapId mapId, IMapData map)

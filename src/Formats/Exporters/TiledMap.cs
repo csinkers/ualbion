@@ -58,12 +58,12 @@ namespace UAlbion.Formats.Exporters
         {
             public Polygon() {}
 
-            public Polygon(IList<(int, int)> points)
+            public Polygon(IList<(int, int)> points, int multX = 1, int multY = 1)
             {
                 if (points == null) throw new ArgumentNullException(nameof(points));
                 var sb = new StringBuilder();
                 foreach (var (x, y) in points)
-                    sb.Append($"{x},{y} ");
+                    sb.Append($"{x * multX},{y * multY} ");
                 Points = sb.ToString(0, sb.Length - 1);
             }
             [XmlAttribute("points")] public string Points { get; set; }
@@ -194,41 +194,95 @@ namespace UAlbion.Formats.Exporters
             };
         }
 
-        static ObjectGroup BuildTriggers(int objectGroupId, MapData2D map, TilemapProperties properties, EventFormatter eventFormatter, ref int nextObjectId)
+        static ObjectGroup BuildTriggers(
+            int objectGroupId,
+            MapData2D map,
+            TilemapProperties properties,
+            EventFormatter eventFormatter,
+            ref int nextObjectId)
         {
             // TODO: Layer/group triggers by trigger type
             // TODO: Coalesce trigger regions
+            var zoneMap = new List<MapEventZone>[map.Width * map.Height];
+            foreach (var zone in map.Zones)
+            {
+                int index = zone.Y * map.Width + zone.X;
+                zoneMap[index] ??= new List<MapEventZone>();
+                zoneMap[index].Add(zone);
+            }
+
+            var regions = new List<(ZoneKey, List<(int, int)>)>();
+            Queue<int> pending = new Queue<int>();
+            for (int index = 0; index < zoneMap.Length; index++)
+            {
+                var current = zoneMap[index];
+                if (current == null)
+                    continue;
+
+                foreach (var zone in current)
+                {
+                    pending.Enqueue(index);
+                    var region = new List<(int, int)>();
+                    regions.Add((zone.Key, region));
+
+                    while (pending.Count > 0)
+                    {
+                        var n = pending.Dequeue();
+                        var targetZones = zoneMap[n];
+                        if (targetZones == null)
+                            continue;
+
+                        for(int k = 0; k < targetZones.Count;)
+                        {
+                            var other = targetZones[k];
+                            if (other.Key != zone.Key)
+                            {
+                                k++;
+                                continue;
+                            }
+
+                            region.Add((other.X, other.Y));
+                            targetZones.RemoveAt(k);
+
+                            int i = n % map.Width;
+                            if (i > 0) pending.Enqueue(index - 1);
+                            if (i < map.Width) pending.Enqueue(index + 1);
+                            if (n - map.Width >= 0) pending.Enqueue(index + map.Width);
+                            if (n + map.Width < zoneMap.Length) pending.Enqueue(index + map.Width);
+                        }
+                    }
+                }
+            }
+
             int nextId = nextObjectId;
-            var group = new ObjectGroup
+            var zonePolygons =
+                from r in regions
+                where r.Item1.Chain != null
+                from poly in GeometryHelper.RegionToPolygons(r.Item2)
+                select new TiledObject
+                {
+                    Id = nextId++,
+                    Name = $"C{r.Item1.Chain.Id} {r.Item1.Trigger}",
+                    Type = "Trigger",
+                    X = poly.OffsetX * properties.TileWidth,
+                    Y = poly.OffsetY * properties.TileHeight,
+                    Polygon = new Polygon(poly.Points, properties.TileWidth, properties.TileHeight),
+                    Properties = new List<ObjectProperty>
+                    {
+                        new ObjectProperty("Script", eventFormatter.FormatChain(r.Item1.Chain)),
+                        new ObjectProperty("Trigger", r.Item1.Trigger.ToString()),
+                        new ObjectProperty("Unk1", r.Item1.Unk1.ToString(CultureInfo.InvariantCulture)),
+                    }
+                };
+
+            var objectGroup = new ObjectGroup
             {
                 Id = objectGroupId,
                 Name = "Triggers",
-                Objects = map.Zones
-                    .Where(x => x.Chain != null)
-                    .Select((x, i) => new TiledObject
-                {
-                    Id = nextId++,
-                    Name = $"C{x.Chain.Id} {x.Trigger}",
-                    Type = "Trigger",
-                    X = x.X * properties.TileWidth,
-                    Y = x.Y * properties.TileHeight,
-                    Polygon = new Polygon(new[]
-                    {
-                        (0, 0),
-                        (properties.TileWidth, 0),
-                        (properties.TileWidth, properties.TileHeight),
-                        (0, properties.TileHeight),
-                    }),
-                    Properties = new List<ObjectProperty>
-                        {
-                            new ObjectProperty("Script", eventFormatter.GetText(x.Chain.FirstEvent)),
-                            new ObjectProperty("Trigger", x.Trigger.ToString()),
-                            new ObjectProperty("Unk1", x.Unk1.ToString(CultureInfo.InvariantCulture)),
-                        }
-                }).ToList(),
+                Objects = zonePolygons.ToList(),
             };
             nextObjectId = nextId;
-            return group;
+            return objectGroup;
         }
 
         static ObjectGroup BuildNpcs(int objectGroupId, MapData2D map, TilemapProperties properties, EventFormatter eventFormatter, Func<AssetId, int> getGid, ref int nextObjectId)
@@ -250,7 +304,7 @@ namespace UAlbion.Formats.Exporters
                     objProps.Add(new ObjectProperty("Unk9", x.Value.Unk9.ToString(CultureInfo.InvariantCulture)));
 
                     if (!x.Value.Id.IsNone) objProps.Add(new ObjectProperty("Id", x.Value.Id.ToString()));
-                    if (x.Value.Chain != null) objProps.Add(new ObjectProperty("Script", eventFormatter.GetText(x.Value.Chain.FirstEvent)));
+                    if (x.Value.Chain != null) objProps.Add(new ObjectProperty("Script", eventFormatter.FormatChain(x.Value.Chain)));
                     if (x.Value.Sound > 0) objProps.Add(new ObjectProperty("Sound", x.Value.Sound.ToString(CultureInfo.InvariantCulture)));
                     // TODO: Path
 

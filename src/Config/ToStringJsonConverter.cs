@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Reflection;
 using Newtonsoft.Json;
 
@@ -28,8 +29,12 @@ namespace UAlbion.Config
             if (parse != null && parse.IsStatic && parse.ReturnType == objectType)
                 return parse.Invoke(null, new object[] { (string)reader.Value });
 
-            if (objectType.IsEnum)
-                return Enum.Parse(objectType, (string)reader.Value);
+            if (objectType.IsEnum && reader.Value is string strValue)
+                return Enum.Parse(objectType, strValue);
+            if (objectType.IsEnum && reader.Value is int intValue)
+                return Enum.Parse(objectType, intValue.ToString(CultureInfo.InvariantCulture));
+            if (objectType.IsEnum && reader.Value is long longValue)
+                return Enum.Parse(objectType, longValue.ToString(CultureInfo.InvariantCulture));
 
             throw new JsonException($"The {objectType.Name} type does not have a public " +
                                     $"static Parse(string) method that returns a {objectType.Name}.");

@@ -41,7 +41,12 @@ namespace UAlbion.Config
             foreach (var assetType in Types)
                 assetType.Value.PreSave();
 
-            var serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, NullValueHandling = NullValueHandling.Ignore };
+            var serializerSettings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                NullValueHandling = NullValueHandling.Ignore,
+                DefaultValueHandling = DefaultValueHandling.Ignore
+            };
             var json = JsonConvert.SerializeObject(Types, serializerSettings);
             File.WriteAllText(configPath, json);
 

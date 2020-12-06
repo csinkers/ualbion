@@ -5,6 +5,7 @@ using System.Linq;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Exporters;
@@ -14,16 +15,32 @@ namespace UAlbion
 {
     public static class DumpTiled
     {
+        class DumpProperties
+        {
+            public DumpProperties(IAssetManager assets, string tilesetDir, string exportDir, Func<string, TextWriter> getWriter)
+            {
+                Assets = assets;
+                TilesetDir = tilesetDir;
+                ExportDir = exportDir;
+                GetWriter = getWriter;
+            }
+
+            public IAssetManager Assets { get; }
+            public string TilesetDir { get; }
+            public string ExportDir { get; }
+            public Func<string, TextWriter> GetWriter { get; }
+        }
+
         public static void Dump(string baseDir, IAssetManager assets, ISet<AssetType> types)
         {
             if (assets == null) throw new ArgumentNullException(nameof(assets));
             if (types == null) throw new ArgumentNullException(nameof(types));
             var disposeList = new List<IDisposable>();
-            string exportDir = Path.Combine(baseDir, "data", "exported", "tiled");
+            var exportDir = Path.Combine(baseDir, "data", "exported", "tiled");
             if (!Directory.Exists(exportDir))
                 Directory.CreateDirectory(exportDir);
 
-            string tilesetDir = Path.Combine(exportDir, "tilesets");
+            var tilesetDir = Path.Combine(exportDir, "tilesets");
             if (!Directory.Exists(tilesetDir))
                 Directory.CreateDirectory(tilesetDir);
 
@@ -36,6 +53,8 @@ namespace UAlbion
                 return writer;
             }
 
+            var props = new DumpProperties(assets, tilesetDir, exportDir, Writer);
+
             void Flush()
             {
                 foreach (var d in disposeList)
@@ -43,27 +62,38 @@ namespace UAlbion
                 disposeList.Clear();
             }
 
+            if (types.Contains(AssetType.SmallNpcGraphics))
+                DumpNpcTileset(props, "smallnpc", "SmallNPCs", AssetId.EnumerateAll(AssetType.SmallNpcGraphics));
+            Flush();
+
+            if (types.Contains(AssetType.BigNpcGraphics))
+                DumpNpcTileset(props, "largenpc", "LargeNPCs", AssetId.EnumerateAll(AssetType.BigNpcGraphics));
+            Flush();
+
+            if (types.Contains(AssetType.Object3D))
+            {
+            }
+
+            if (types.Contains(AssetType.Floor))
+            {
+            }
+
+            if (types.Contains(AssetType.Wall))
+            {
+            }
+
+            if (types.Contains(AssetType.WallOverlay))
+            {
+            }
+
+            if (types.Contains(AssetType.AutomapGraphics))
+            {
+            }
+
             if (types.Contains(AssetType.TilesetData))
             {
                 foreach (TilesetId id in DumpUtil.All(AssetType.TilesetData))
-                {
-                    TilesetData tileset = assets.LoadTileData(id);
-                    ITexture sheet = assets.LoadTexture(id.ToTilesetGraphics());
-                    if (tileset == null) continue;
-                    if (sheet == null) continue;
-
-                    var sheetPath = DumpGraphics.ExportImage(id.ToTilesetGraphics(), assets, tilesetDir, DumpFormats.Png, 1).FirstOrDefault();
-                    if(sheetPath == null)
-                    {
-                        CoreUtil.LogError($"Could not save sprite sheet for tilemap {id}");
-                        continue;
-                    }
-
-                    var tw = Writer(Path.Combine(tilesetDir, $"{id.Id}_{id}.tsx"));
-                    var properties = ExtractProperties(sheet, sheetPath);
-                    var tilemap = TiledTileMap.FromTileset(tileset, properties);
-                    tilemap.Serialize(tw);
-                }
+                    Dump2DTilemap(assets, id, props);
 
                 Flush();
             }
@@ -72,20 +102,10 @@ namespace UAlbion
             {
                 foreach (var id in DumpUtil.All(AssetType.Map))
                 {
-                    MapData2D map = assets.LoadMap(id) as MapData2D;
-                    if (map == null) continue;
-
-                    TilesetData tileset = assets.LoadTileData(map.TilesetId);
-                    if (tileset == null) continue;
-
-                    ITexture sheet = assets.LoadTexture(map.TilesetId.ToTilesetGraphics());
-                    if (sheet == null) continue;
-
-                    var tilesetPath = Path.Combine(tilesetDir, $"{map.TilesetId.Id}_{map.TilesetId}.tsx");
-                    var tw = Writer(Path.Combine(exportDir, $"{id.Id}_{id}.tmx"));
-                    var properties = ExtractProperties(sheet, null);
-                    var tiledMap = TiledMap.FromAlbionMap(map, tileset, properties, tilesetPath);
-                    tiledMap.Serialize(tw);
+                    if (assets.LoadMap(id) is MapData2D map2d)
+                        Dump2DMap(map2d, assets, props);
+                    if (assets.LoadMap(id) is MapData3D map3d)
+                        Dump3DMap(map3d, assets, props);
                 }
 
                 Flush();
@@ -106,16 +126,98 @@ namespace UAlbion
             //*/
         }
 
-        static TilemapProperties ExtractProperties(ITexture sheet, string sheetPath) => new TilemapProperties
+        static void DumpNpcTileset(DumpProperties props, string gfxDirName, string tilesetName, IEnumerable<AssetId> assetIds)
+        {
+            var spriteDir = Path.Combine(props.TilesetDir, gfxDirName);
+            if (!Directory.Exists(spriteDir))
+                Directory.CreateDirectory(spriteDir);
+
+            var tiles = new List<TileProperties>();
+            foreach (var id in assetIds)
             {
-                FrameDurationMs = 180, // TODO: Pull from first matching map's anim rate?
-                Margin = 1, // See AlbionSpritePostProcessor
-                Spacing = 2, // See AlbionSpritePostProcessor
-                SheetPath = sheetPath,
-                SheetWidth = (int)sheet.Width,
-                SheetHeight = (int)sheet.Height,
-                TileWidth = (int)sheet.GetSubImageDetails(0).Size.X,
-                TileHeight = (int)sheet.GetSubImageDetails(0).Size.Y,
-            };
+                var info = DumpGraphics.ExportImage(id, props.Assets, spriteDir, DumpFormats.Png, (frame, palFrame) => frame == 9 && palFrame == 0).SingleOrDefault();
+                if (info == null)
+                    continue;
+                tiles.Add(new TileProperties
+                {
+                    Name = id.ToString(),
+                    Frames = 1,
+                    Width = info.Width,
+                    Height = info.Height,
+                    Source = info.Path,
+                });
+            }
+
+            var tilemap = TiledTileMap.FromSprites(tilesetName, "NPC", tiles);
+            tilemap.Save(Path.Combine(props.TilesetDir,  tilesetName + ".tsx"));
+        }
+
+        static void Dump2DTilemap(IAssetManager assets, in TilesetId id, DumpProperties props)
+        {
+            var tileGfxDir = Path.Combine(props.TilesetDir, "tiles");
+            if (!Directory.Exists(tileGfxDir))
+                Directory.CreateDirectory(tileGfxDir);
+
+            TilesetData tileset = assets.LoadTileData(id);
+            ITexture sheet = assets.LoadTexture(id.ToTilesetGraphics());
+            if (tileset == null) return;
+            if (sheet == null) return;
+
+            var sheetInfo = DumpGraphics.ExportImage(
+                    id.ToTilesetGraphics(),
+                    assets,
+                    tileGfxDir,
+                    DumpFormats.Png,
+                    (frame, palFrame) => frame == 0 && palFrame == 0
+                ).FirstOrDefault();
+
+            if (sheetInfo == null)
+            {
+                CoreUtil.LogError($"Could not save sprite sheet for tilemap {id}");
+                return;
+            }
+
+            var tw = props.GetWriter(Path.Combine(props.TilesetDir, $"{id.Id}_{id}.tsx"));
+            var properties = ExtractProperties(sheet, sheetInfo.Path);
+            var tilemap = TiledTileMap.FromTileset(tileset, properties);
+            tilemap.Serialize(tw);
+        }
+
+        static void Dump2DMap(MapData2D map, IAssetManager assets, DumpProperties props)
+        {
+            TilesetData tileset = assets.LoadTileData(map.TilesetId);
+            if (tileset == null)
+                return;
+
+            ITexture sheet = assets.LoadTexture(map.TilesetId.ToTilesetGraphics());
+            if (sheet == null)
+                return;
+
+            var tilesetPath = Path.Combine(props.TilesetDir, $"{map.TilesetId.Id}_{map.TilesetId}.tsx");
+            var npcTilesetPath = Path.Combine(props.TilesetDir, map.MapType == MapType.TwoD ? "LargeNPCs.tsx" : "SmallNPCs.tsx");
+            int GetNpcTileId(AssetId assetId) => assetId.Id - 1;
+
+            var tw = props.GetWriter(Path.Combine(props.ExportDir, $"{map.Id.Id}_{map.Id}.tmx"));
+            var properties = ExtractProperties(sheet, null);
+            var formatter = new EventFormatter(assets.LoadString, map.Id.ToMapText());
+            var tiledMap = TiledMap.FromAlbionMap(map, tileset, properties, tilesetPath, npcTilesetPath, GetNpcTileId, formatter);
+            tiledMap.Serialize(tw);
+        }
+
+        static void Dump3DMap(MapData3D map3d, IAssetManager assets, DumpProperties props)
+        {
+        }
+
+        static TilemapProperties ExtractProperties(ITexture sheet, string sheetPath) => new TilemapProperties
+        {
+            FrameDurationMs = 180, // TODO: Pull from first matching map's anim rate?
+            Margin = 1, // See AlbionSpritePostProcessor
+            Spacing = 2, // See AlbionSpritePostProcessor
+            SheetPath = sheetPath,
+            SheetWidth = (int)sheet.Width,
+            SheetHeight = (int)sheet.Height,
+            TileWidth = (int)sheet.GetSubImageDetails(0).Size.X,
+            TileHeight = (int)sheet.GetSubImageDetails(0).Size.Y,
+        };
     }
 }

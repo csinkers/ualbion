@@ -2,7 +2,6 @@
 using System.IO;
 using System.Windows.Forms;
 using UAlbion.Config;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Tools.ImageReverser
 {
@@ -16,12 +15,12 @@ namespace UAlbion.Tools.ImageReverser
         {
             var baseDir = ConfigUtil.FindBasePath();
             var generalConfig = GeneralConfig.Load(Path.Combine(baseDir, "data/config.json"), baseDir);
-            var config = AssetConfig.Load(baseDir);
+            var config = AssetConfig.Load(Path.Combine(baseDir, "mods/Base/assets.json"));
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            void SaveChanges(object sender, EventArgs e) => config.Save(baseDir);
+            void SaveChanges(object sender, EventArgs e) => config.Save(Path.Combine(baseDir, "mods/Base/assets.json"));
 
             var core = new ReverserCore(generalConfig, config);
             var form = new MainFrm(core);

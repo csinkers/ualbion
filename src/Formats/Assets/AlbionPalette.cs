@@ -28,8 +28,9 @@ namespace UAlbion.Formats.Assets
             var streamLength = s.BytesRemaining;
             bool isCommon = streamLength == CommonEntries * 3;
 
-            Id = info.AssetId.ToUInt32();
-            Name = info.AssetId.ToString();
+            // AssetId is None when loading palettes from raw data in ImageReverser
+            Id = info.AssetId.IsNone ? (uint)info.Id : info.AssetId.ToUInt32();
+            Name = info.AssetId.IsNone ? info.Name : info.AssetId.ToString();
             long startingOffset = s.Offset;
             for (int i = isCommon ? VariableEntries : 0; i < (isCommon ? EntryCount : VariableEntries); i++)
             {

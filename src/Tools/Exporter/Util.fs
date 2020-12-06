@@ -7,7 +7,7 @@ open System.Text
 let findBasePath () =
     let exeLocation = Assembly.GetExecutingAssembly().Location
     let mutable curDir = new DirectoryInfo(Path.GetDirectoryName(exeLocation))
-    while (curDir <> null && not <| File.Exists(Path.Combine(curDir.FullName, "data", "assets.json"))) do
+    while (curDir <> null && not <| File.Exists(Path.Combine(curDir.FullName, "data", "config.json"))) do
         curDir <- curDir.Parent
 
     if curDir = null then failwith "Could not find base directory"

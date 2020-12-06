@@ -16,6 +16,7 @@ namespace UAlbion.Tools.ImageReverser
         public GeneralConfig GeneralConfig { get; }
         public IDictionary<string, AssetFileInfo> ContainerFiles { get; } = new Dictionary<string, AssetFileInfo>();
         public IList<AlbionPalette> Palettes { get; } = new List<AlbionPalette>();
+        readonly IDictionary<AssetInfo, string> _rawFilePaths = new Dictionary<AssetInfo, string>();
 
         AlbionPalette LoadPalette(string file, AssetInfo assetInfo)
         {
@@ -53,7 +54,7 @@ namespace UAlbion.Tools.ImageReverser
                 //if (!Config.Files.ContainsKey(relativeDir))
                 //    Config.Files.Add(relativeDir, new AssetFileInfo());
                 // var xld = Config.Files[relativeDir];
-                if(!ContainerFiles.ContainsKey(relativeDir))
+                if (!ContainerFiles.ContainsKey(relativeDir))
                     ContainerFiles.Add(relativeDir, fileInfo);
 
                 var relative = file.Substring(BaseExportDirectory.Length + 1);
@@ -64,13 +65,19 @@ namespace UAlbion.Tools.ImageReverser
                     continue;
 
                 if (!fileInfo.Assets.ContainsKey(number))
-                    fileInfo.Assets[number] = new AssetInfo();
+                {
+                    fileInfo.Assets[number] = new AssetInfo
+                    {
+                        File = fileInfo,
+                        Offset = number
+                    };
+                }
 
                 AssetInfo asset = fileInfo.Assets[number];
-                asset.File.Filename = relative;
+                _rawFilePaths[asset] = file;
             }
 
-            var commonPalette = LoadPalette(GeneralConfig.ResolvePath("$(ALBION)/CD/XLDLIBS/PALETTE.000"), new AssetInfo());
+            var commonPalette = LoadPalette(GeneralConfig.ResolvePath("$(ALBION)/CD/XLDLIBS/PALETTE.000"), new AssetInfo { Name = "Common" });
 
             var palettesPath = Path.Combine(BaseExportDirectory, "PALETTE0.XLD");
             files = Directory.EnumerateFiles(palettesPath, "*.*", SearchOption.AllDirectories);
@@ -110,6 +117,8 @@ namespace UAlbion.Tools.ImageReverser
                     ? asset
                     : null
                 : null;
+
+        public string GetRawPath(AssetInfo asset) => _rawFilePaths.TryGetValue(asset, out var filename) ? filename : null;
     }
 
     public class AssetChangedArgs

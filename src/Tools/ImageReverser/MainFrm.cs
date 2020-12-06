@@ -27,7 +27,7 @@ namespace UAlbion.Tools.ImageReverser
             _core = core;
             _core.AssetChanged += CoreOnAssetChanged;
             _imageViewer = new ImageViewer(_core) { Visible = false };
-            _textViewer = new TextViewer() { Visible = false };
+            _textViewer = new TextViewer { Visible = false };
             _soundPlayer = new SoundViewer(_core) { Visible = false };
             InitializeComponent();
             mainPanel.Controls.Add(_imageViewer);
@@ -49,7 +49,7 @@ namespace UAlbion.Tools.ImageReverser
             _rootNode = fileTree.Nodes.Add("Files");
             foreach(var xld in _core.ContainerFiles)
                 foreach (var asset in xld.Value.Assets.Values)
-                    AddToTree(asset);
+                    AddToTree(asset, _core.GetRawPath(asset));
             _rootNode.Expand();
 
             // this.fileTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.FileTree_AfterSelect);
@@ -64,14 +64,16 @@ namespace UAlbion.Tools.ImageReverser
                 return;
             }
 
-            var sb = new StringBuilder();
-            sb.AppendLine($"{asset.File.Filename}");
+            var filename = _core.GetRawPath(asset);
 
-            if (File.Exists(asset.File.Filename))
+            var sb = new StringBuilder();
+            sb.AppendLine($"{filename}");
+
+            if (File.Exists(filename))
             {
-                var fileInfo = new FileInfo(asset.File.Filename);
+                var fileInfo = new FileInfo(filename);
                 sb.AppendLine($"File Size: {fileInfo.Length}");
-                sb.AppendLine($"XLD: {asset.File.Filename}");
+                sb.AppendLine($"Path: {asset.File.Filename}");
                 sb.AppendLine($"Layer: {asset.File.Format}");
                 sb.AppendLine($"Conf Width: {asset.EffectiveWidth}");
                 sb.AppendLine($"Conf Height: {asset.EffectiveHeight}");
@@ -83,17 +85,21 @@ namespace UAlbion.Tools.ImageReverser
             txtInfo.Text = sb.ToString();
         }
 
-        void AddToTree(AssetInfo asset)
+        void AddToTree(AssetInfo asset, string filename)
         {
-            if (asset.File.Filename == null)
+            if (filename == null || !filename.StartsWith(_core.BaseExportDirectory))
                 return;
-            var parts = asset.File.Filename.Split('\\');
+
+            filename = filename.Substring(_core.BaseExportDirectory.Length + 1);
+
+            var parts = filename.Split('\\');
             TreeNode node = _rootNode;
             foreach (var dir in parts.Take(parts.Length - 1)) // Ensure parent nodes exist
             {
-                if (!node.Nodes.ContainsKey(dir))
-                    node.Nodes.Add(dir, dir);
-                node = node.Nodes[dir];
+                var noExtension = Path.GetFileNameWithoutExtension(dir);
+                if (!node.Nodes.ContainsKey(noExtension))
+                    node.Nodes.Add(noExtension, noExtension);
+                node = node.Nodes[noExtension];
             }
 
             string key = Path.GetFileNameWithoutExtension(parts.Last());

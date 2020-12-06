@@ -26,6 +26,15 @@ namespace UAlbion.Formats.Exporters
         public int FrameDurationMs { get; set; }
     }
 
+    public class TileProperties
+    {
+        public string Name { get; set; }
+        public string Source { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public int Frames { get; set; }
+    }
+
     [XmlRoot("tileset")]
     public class TiledTileMap
     {
@@ -45,11 +54,13 @@ namespace UAlbion.Formats.Exporters
         public class TiledTile
         {
             [XmlAttribute("id")] public int Id { get; set; }
+            [XmlAttribute("type")] public string Type { get; set; }
             [XmlAttribute("terrain")] public string Terrain { get; set; } // e.g. 0,1,0,3
             [XmlArray("animation")] [XmlArrayItem("frame")] public List<TileFrame> Frames { get; set; }
             [XmlIgnore] public bool FramesSpecified => Frames != null && Frames.Count > 0;
             [XmlArray("properties")] [XmlArrayItem("property")] public List<TileProperty> Properties { get; set; }
             [XmlIgnore] public bool PropertiesSpecified => Properties != null && Properties.Count > 0;
+            [XmlElement("image")] public TilesetImage Image { get; set; }
         }
 
         public class TerrainType
@@ -96,14 +107,17 @@ namespace UAlbion.Formats.Exporters
         [XmlIgnore] public bool WangSetsSpecified => WangSets != null && WangSets.Count > 0;
 
         [XmlAttribute("margin")] public int Margin { get; set; }
+        [XmlIgnore] public bool MarginSpecified => Margin != 0;
         [XmlAttribute("name")] public string Name { get; set; }
         [XmlAttribute("spacing")] public int Spacing { get; set; }
+        [XmlIgnore] public bool SpacingSpecified => Spacing != 0;
         [XmlAttribute("tilewidth")] public int TileWidth { get; set; }
         [XmlAttribute("tileheight")] public int TileHeight { get; set; }
         [XmlAttribute("columns")] public int Columns { get; set; }
         [XmlAttribute("tilecount")] public int TileCount { get; set; }
         [XmlAttribute("version")] public string Version { get; set; }
         [XmlAttribute("tiledversion")] public string TiledVersion { get; set; }
+        [XmlAttribute("backgroundcolor")] public string BackgroundColor { get; set; }
 
         static TileFrame F(int id, int duration) => new TileFrame { Id = id, DurationMs = duration };
         static WangTile W(int id, string wang) => new WangTile { TileId = id, WangId = wang };
@@ -119,6 +133,7 @@ namespace UAlbion.Formats.Exporters
                 Version = "1.4",
                 TiledVersion = "1.4.2",
                 TileCount = 3136,
+                BackgroundColor = "#000000",
                 Image = new TilesetImage { Source = "0_0_Outdoors.png", Width = 1024, Height = 1024 }
             };
 
@@ -174,6 +189,7 @@ namespace UAlbion.Formats.Exporters
             serializer.Serialize(tw, this, ns);
         }
 
+        static TileProperty Prop(string name, string value, string type = null) => new TileProperty { Name = name, Type = type, Value = value };
         public static TiledTileMap FromTileset(TilesetData tileset, TilemapProperties properties)
         {
             if (tileset == null) throw new ArgumentNullException(nameof(tileset));
@@ -183,7 +199,6 @@ namespace UAlbion.Formats.Exporters
             int count = tileset.Tiles.Where(x => x.ImageNumber != 0xffff).Max(x => x.ImageNumber + x.FrameCount - 1) + 2;
             int columns = (properties.SheetWidth - 2 * properties.Margin) / (properties.TileWidth + properties.Spacing);
 
-            static TileProperty Prop(string name, string value, string type = null) => new TileProperty { Name = name, Type = type, Value = value };
             static List<TileProperty> Props(TileData x)
             {
                 var properties = new List<TileProperty>();
@@ -208,6 +223,7 @@ namespace UAlbion.Formats.Exporters
                 Margin = properties.Margin,
                 Spacing = properties.Spacing,
                 Columns = columns,
+                BackgroundColor = "#000000",
                 Image = new TilesetImage
                 {
                     Source = properties.SheetPath,
@@ -228,6 +244,37 @@ namespace UAlbion.Formats.Exporters
                     }).ToList(),
                 // terrain
                 // wang sets
+            };
+        }
+
+        public static TiledTileMap FromSprites(string name, string type, IList<TileProperties> tiles) // (name, source, w, h)
+        {
+            if (tiles == null) throw new ArgumentNullException(nameof(tiles));
+            return new TiledTileMap
+            {
+                Name = name,
+                Version = "1.4",
+                TiledVersion = "1.4.2",
+                TileCount = tiles.Count,
+                TileWidth = tiles.Max(x => x.Width),
+                TileHeight = tiles.Max(x => x.Height),
+                Columns = 1,
+                BackgroundColor = "#000000",
+                Tiles = tiles.Select((x, i) => new TiledTile
+                    {
+                        Id = i,
+                        Type = type,
+                        Image = new TilesetImage
+                        {
+                            Source = x.Source,
+                            Width = x.Width,
+                            Height = x.Height
+                        },
+                        Properties = new List<TileProperty>
+                        {
+                            Prop("Visual", x.Name)
+                        }
+                    }).ToList(),
             };
         }
     }

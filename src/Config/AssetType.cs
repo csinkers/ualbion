@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Config
+﻿using Newtonsoft.Json;
+
+namespace UAlbion.Config
 {
     /// <summary>
     /// An asset type corresponds to a particular type of asset object intended for a particular purpose.
@@ -6,6 +8,7 @@
     /// If this enum is modified, then CodeGeneration must be re-run.
     /// Any AssetTypes in a family should have their own AssetId type, in additional to any more general id types they may be a part of.
     /// </summary>
+    [JsonConverter(typeof(ToStringJsonConverter))]
     public enum AssetType : byte
     {
         [Unmapped] None = 0, // Must be 0 so default(AssetId) will equate to AssetId.None

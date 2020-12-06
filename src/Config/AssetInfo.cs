@@ -7,7 +7,7 @@ namespace UAlbion.Config
     public class AssetInfo
     {
         [JsonIgnore] public int SubAssetId { get; internal set; } // Sub-asset offset in the container file (or 0 if not inside a container)
-        [JsonIgnore] public AssetFileInfo File { get; internal set; }
+        [JsonIgnore] public AssetFileInfo File { get; set; }
         [JsonIgnore] public int EffectiveWidth => Width ?? File.Width ?? 0; // For sprites only
         [JsonIgnore] public int EffectiveHeight => Height ?? File.Height ?? 0; // For sprites only
         [JsonIgnore] public bool Transposed => File.Transposed ?? false; // For sprites only

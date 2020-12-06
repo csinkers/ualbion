@@ -26,7 +26,7 @@ namespace UAlbion
                 foreach (var id in ids)
                 {
                     var assetId = AssetId.From(id);
-                    ExportImage(assetId, assets, directory, formats, 10); // Limit to 10, some of the tile sets can get a bit silly.
+                    ExportImage(assetId, assets, directory, formats, (frame, palFrame) => palFrame < 10); // Limit to 10, some of the tile sets can get a bit silly.
                 }
             }
 
@@ -60,14 +60,22 @@ namespace UAlbion
             }
         }
 
-        public static IList<string> ExportImage(AssetId assetId, IAssetManager assets, string directory, DumpFormats formats, int? paletteFrameLimit)
+        public class ExportedImageInfo
         {
-            var filenames = new List<string>();
+            public string Path { get; set; }
+            public int Width { get; set; }
+            public int Height { get; set; }
+            public DumpFormats Format { get; set; }
+        }
+
+        public static IList<ExportedImageInfo> ExportImage(AssetId assetId, IAssetManager assets, string directory, DumpFormats formats, Func<int, int, bool> frameFilter = null)
+        {
+            var filenames = new List<ExportedImageInfo>();
             var config = assets.GetAssetInfo(assetId);
             var palette = assets.LoadPalette((Base.Palette)(config?.PaletteHint ?? (int)Base.Palette.Inventory));
             var texture = assets.LoadTexture(assetId);
             if (texture == null)
-                return null;
+                return filenames;
 
             if (texture is TrueColorTexture trueColor)
             {
@@ -83,16 +91,16 @@ namespace UAlbion
                 if (palette == null)
                 {
                     CoreUtil.LogError($"Could not load palette for {assetId}");
-                    return null;
+                    return filenames;
                 }
 
                 var colors = tilemap.DistinctColors(null);
                 int palettePeriod = palette.CalculatePeriod(colors);
-                if (paletteFrameLimit.HasValue && palettePeriod > paletteFrameLimit)
-                    palettePeriod = paletteFrameLimit.Value;
 
                 for (int palFrame = 0; palFrame < palettePeriod; palFrame++)
                 {
+                    if (frameFilter != null && !frameFilter(0, palFrame))
+                        continue;
                     var path = Path.Combine(directory, $"{assetId.Id}_{palFrame}_{assetId}");
                     var image = tilemap.ToImage(null, palette.GetPaletteAtTime(palFrame));
                     Save(image, path, formats, filenames);
@@ -110,11 +118,11 @@ namespace UAlbion
 
                     var colors = ebt.DistinctColors(subId);
                     int palettePeriod = palette.CalculatePeriod(colors);
-                    if (paletteFrameLimit.HasValue && palettePeriod > paletteFrameLimit)
-                        palettePeriod = paletteFrameLimit.Value;
 
                     for (int palFrame = 0; palFrame < palettePeriod; palFrame++)
                     {
+                        if (frameFilter != null && !frameFilter(subId, palFrame))
+                            continue;
                         var path = Path.Combine(directory, $"{assetId.Id}_{subId}_{palFrame}_{assetId}");
                         var image = ebt.ToImage(subId, palette.GetPaletteAtTime(palFrame));
                         Save(image, path, formats, filenames);
@@ -131,14 +139,14 @@ namespace UAlbion
             return filenames;
         }
 
-        static void Save(Image<Rgba32> image, string pathWithoutExtension, DumpFormats formats, IList<string> filenames)
+        static void Save(Image<Rgba32> image, string pathWithoutExtension, DumpFormats formats, IList<ExportedImageInfo> filenames)
         {
             if ((formats & DumpFormats.Png) != 0)
             {
                 var path = Path.ChangeExtension(pathWithoutExtension, "png");
                 using var stream = File.OpenWrite(path);
                 image.SaveAsPng(stream);
-                filenames.Add(path);
+                filenames.Add(new ExportedImageInfo { Path = path, Format = DumpFormats.Png, Width = image.Width, Height = image.Height });
             }
 
             if ((formats & DumpFormats.Tga) != 0)
@@ -146,7 +154,7 @@ namespace UAlbion
                 var path = Path.ChangeExtension(pathWithoutExtension, "tga");
                 using var stream = File.OpenWrite(path);
                 image.SaveAsTga(stream);
-                filenames.Add(path);
+                filenames.Add(new ExportedImageInfo { Path = path, Format = DumpFormats.Png, Width = image.Width, Height = image.Height });
             }
         }
     }

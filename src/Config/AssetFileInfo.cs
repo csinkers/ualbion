@@ -12,6 +12,7 @@ namespace UAlbion.Config
         [JsonConverter(typeof(StringEnumConverter))]
         public ContainerFormat ContainerFormat { get; set; }
         public string Loader { get => _loader ?? EnumType.Loader; set => _loader = value; }
+        public bool ShouldSerializeLoader() => _loader != null && _loader != EnumType.Loader;
         public string Format { get; set; }
         public int? Width { get; set; }
         public int? Height { get; set; }

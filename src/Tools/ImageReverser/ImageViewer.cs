@@ -120,7 +120,7 @@ namespace UAlbion.Tools.ImageReverser
                     // Ugh
                     bool isRotated = asset.File.Transposed ?? false;
                     asset.File.Transposed = false;
-                    _logicalSprite = LoadSprite(asset.File.Filename, asset);
+                    _logicalSprite = LoadSprite(_core.GetRawPath(asset), asset);
                     asset.File.Transposed = isRotated;
 
                     _visualSprite = isRotated ? LoadSprite(asset.File.Filename, asset) : _logicalSprite;

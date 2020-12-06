@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using UAlbion.Config;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
@@ -494,7 +495,7 @@ namespace UAlbion
 
         static void DumpMapEvents(StreamWriter sw, IAssetManager assets, MapId mapId, IMapData map)
         {
-            var formatter = new EventFormatter(assets, mapId.ToMapText());
+            var formatter = new EventFormatter(assets.LoadString, mapId.ToMapText());
             sw.WriteLine();
             sw.WriteLine($"Map {mapId.Id} {mapId}:");
             foreach (var e in map.Events)
@@ -545,7 +546,7 @@ namespace UAlbion
                 if (set == null)
                     continue;
 
-                var formatter = new EventFormatter(assets, ((EventSetId)eventSetId).ToEventText());
+                var formatter = new EventFormatter(assets.LoadString, ((EventSetId)eventSetId).ToEventText());
                 foreach (var e in set.Events)
                 {
                     var chainId = set.Chains.Select((x, i) => x.FirstEvent == e ? i : (int?) null).FirstOrDefault(x => x != null);

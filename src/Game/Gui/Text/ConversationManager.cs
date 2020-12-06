@@ -40,7 +40,7 @@ namespace UAlbion.Game.Gui.Text
         bool OnPartyMemberTextEvent(PartyMemberTextEvent e, Action continuation)
         {
             var party = Resolve<IParty>();
-            var textEvent = new TextEvent(ContextTextSource, e.TextId, e.Location, party.Leader.Effective.PortraitId);
+            var textEvent = new TextEvent(ContextTextSource, e.TextId, TextLocation.PortraitLeft, e.PortraitId);
             return OnBaseTextEvent(textEvent, continuation);
         }
 
@@ -63,17 +63,6 @@ namespace UAlbion.Game.Gui.Text
                 case TextLocation.NoPortrait:
                 {
                     var dialog = AttachChild(new TextDialog(tf.Format(textEvent.ToId())));
-                    dialog.Closed += (sender, _) => continuation();
-                    return true;
-                }
-
-                case TextLocation.LeaderPortraitLeft:
-                case TextLocation.Unk5:
-                case TextLocation.Unk7:
-                {
-                    var portraitId = Resolve<IParty>().Leader.Effective.PortraitId;
-                    var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
-                    var dialog = AttachChild(new TextDialog(text, portraitId));
                     dialog.Closed += (sender, _) => continuation();
                     return true;
                 }

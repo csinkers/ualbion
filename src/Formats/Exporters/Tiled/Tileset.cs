@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
+using UAlbion.Config;
 using UAlbion.Formats.Assets.Maps;
 
 // ReSharper disable StringLiteralTypo
@@ -12,96 +13,17 @@ using UAlbion.Formats.Assets.Maps;
 #pragma warning disable CA1034 // Nested types should not be visible
 #pragma warning disable CA2227 // Collection properties should be read only
 
-namespace UAlbion.Formats.Exporters
+namespace UAlbion.Formats.Exporters.Tiled
 {
-    public class TilemapProperties
-    {
-        public int TileWidth { get; set; }
-        public int TileHeight { get; set; }
-        public int Margin { get; set; }
-        public int Spacing { get; set; }
-        public string SheetPath { get; set; }
-        public int SheetWidth { get; set; }
-        public int SheetHeight { get; set; }
-        public int FrameDurationMs { get; set; }
-    }
-
-    public class TileProperties
-    {
-        public string Name { get; set; }
-        public string Source { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public int Frames { get; set; }
-    }
-
     [XmlRoot("tileset")]
-    public class TiledTileMap
+    public class Tileset
     {
-        public class TileFrame
-        {
-            [XmlAttribute("tileid")] public int Id { get; set; }
-            [XmlAttribute("duration")] public int DurationMs { get; set; }
-        }
-
-        public class TileProperty
-        {
-            [XmlAttribute("name")] public string Name { get; set; }
-            [XmlAttribute("type")] public string Type { get; set; }
-            [XmlAttribute("value")] public string Value { get; set; }
-        }
-
-        public class TiledTile
-        {
-            [XmlAttribute("id")] public int Id { get; set; }
-            [XmlAttribute("type")] public string Type { get; set; }
-            [XmlAttribute("terrain")] public string Terrain { get; set; } // e.g. 0,1,0,3
-            [XmlArray("animation")] [XmlArrayItem("frame")] public List<TileFrame> Frames { get; set; }
-            [XmlIgnore] public bool FramesSpecified => Frames != null && Frames.Count > 0;
-            [XmlArray("properties")] [XmlArrayItem("property")] public List<TileProperty> Properties { get; set; }
-            [XmlIgnore] public bool PropertiesSpecified => Properties != null && Properties.Count > 0;
-            [XmlElement("image")] public TilesetImage Image { get; set; }
-        }
-
-        public class TerrainType
-        {
-            [XmlAttribute("name")] public string Name { get; set; }
-            [XmlAttribute("tile")] public int IndexTile { get; set; }
-        }
-
-        public class WangCorner
-        {
-            [XmlAttribute("name")] public string Name { get; set; }
-            [XmlAttribute("color")] public string Color { get; set; }
-            [XmlAttribute("tile")] public int Tile { get; set; }
-            [XmlAttribute("probability")] public int Probability { get; set; }
-        }
-
-        public class WangTile
-        {
-            [XmlAttribute("tileid")] public int TileId { get; set; }
-            [XmlAttribute("wangid")] public string WangId { get; set; }
-        }
-
-        public class WangSet
-        {
-            [XmlAttribute("name")] public string Name { get; set; }
-            [XmlAttribute("tile")] public int Tile { get; set; }
-            [XmlElement("wangcornercolor")] public List<WangCorner> Corners { get; set; }
-            [XmlElement("wangtile")] public List<WangTile> Tiles { get; set; }
-        }
-
-        public class TilesetImage
-        {
-            [XmlAttribute("source")] public string Source { get; set; }
-            [XmlAttribute("width")] public int Width { get; set; }
-            [XmlAttribute("height")] public int Height { get; set; }
-        }
-
+        [XmlIgnore] public string Filename { get; set; }
+        [XmlIgnore] public int GidOffset { get; set; }
         [XmlElement("image", Order = 1)] public TilesetImage Image { get; set; }
         [XmlArray("terraintypes", Order = 2)] [XmlArrayItem("terrain")] public List<TerrainType> TerrainTypes { get; } = new List<TerrainType>();
         [XmlIgnore] public bool TerrainTypesSpecified => TerrainTypes != null && TerrainTypes.Count > 0;
-        [XmlElement("tile", Order = 3)] public List<TiledTile> Tiles { get; set; }
+        [XmlElement("tile", Order = 3)] public List<Tile> Tiles { get; set; }
         [XmlIgnore] public bool TilesSpecified => Tiles != null && Tiles.Count > 0;
         [XmlArray("wangsets", Order = 4)] [XmlArrayItem("wangset")] public List<WangSet> WangSets { get; } = new List<WangSet>();
         [XmlIgnore] public bool WangSetsSpecified => WangSets != null && WangSets.Count > 0;
@@ -122,9 +44,9 @@ namespace UAlbion.Formats.Exporters
         static TileFrame F(int id, int duration) => new TileFrame { Id = id, DurationMs = duration };
         static WangTile W(int id, string wang) => new WangTile { TileId = id, WangId = wang };
 
-        public static TiledTileMap BuildExample()
+        public static Tileset BuildExample()
         {
-            var test = new TiledTileMap
+            var test = new Tileset
             {
                 Name = "Test",
                 TileWidth = 18,
@@ -143,8 +65,8 @@ namespace UAlbion.Formats.Exporters
             test.TerrainTypes.Add(new TerrainType { Name = "Dirt", IndexTile = 205 });
             test.TerrainTypes.Add(new TerrainType { Name = "Road", IndexTile = 301 });
 
-            test.Tiles.Add(new TiledTile { Id = 8, Terrain = "0,0,0,0" });
-            test.Tiles.Add(new TiledTile { Id = 216, Frames = new List<TileFrame> { F(216, 180), F(217, 180), F(218, 180) } });
+            test.Tiles.Add(new Tile { Id = 8, Terrain = "0,0,0,0" });
+            test.Tiles.Add(new Tile { Id = 216, Frames = new List<TileFrame> { F(216, 180), F(217, 180), F(218, 180) } });
 
             test.WangSets.Add(new WangSet
             {
@@ -166,17 +88,27 @@ namespace UAlbion.Formats.Exporters
             return test;
         }
 
-        public static TiledTileMap Load(string path)
+        public static Tileset Load(string path)
         {
             using var stream = File.OpenRead(path);
             using var xr = new XmlTextReader(stream);
-            var serializer = new XmlSerializer(typeof(TiledTileMap));
-            return (TiledTileMap)serializer.Deserialize(xr);
+            var serializer = new XmlSerializer(typeof(Tileset));
+            var tilemap = (Tileset)serializer.Deserialize(xr);
+            tilemap.Filename = path;
+            return tilemap;
         }
 
         public void Save(string path)
         {
-            using var stream = File.OpenWrite(path);
+            var dir = Path.GetDirectoryName(path);
+            foreach (var tile in Tiles)
+                if (!string.IsNullOrEmpty(tile.Image?.Source))
+                    tile.Image.Source = ConfigUtil.GetRelativePath(tile.Image.Source, dir, false);
+
+            if (!string.IsNullOrEmpty(Image?.Source))
+                Image.Source = ConfigUtil.GetRelativePath(Image.Source, dir, false);
+
+            using var stream = File.Open(path, FileMode.Create);
             using var sw = new StreamWriter(stream);
             Serialize(sw);
         }
@@ -185,12 +117,12 @@ namespace UAlbion.Formats.Exporters
         {
             var ns = new XmlSerializerNamespaces();
             ns.Add("", "");
-            var serializer = new XmlSerializer(typeof(TiledTileMap));
+            var serializer = new XmlSerializer(typeof(Tileset));
             serializer.Serialize(tw, this, ns);
         }
 
         static TileProperty Prop(string name, string value, string type = null) => new TileProperty { Name = name, Type = type, Value = value };
-        public static TiledTileMap FromTileset(TilesetData tileset, TilemapProperties properties)
+        public static Tileset FromTileset(TilesetData tileset, TilemapProperties properties)
         {
             if (tileset == null) throw new ArgumentNullException(nameof(tileset));
             if (properties == null) throw new ArgumentNullException(nameof(properties));
@@ -212,7 +144,7 @@ namespace UAlbion.Formats.Exporters
 
             var grouped = tileset.Tiles.GroupBy(x => x.ImageNumber).Where(x => x.Count() > 1);
 
-            return new TiledTileMap
+            return new Tileset
             {
                 Name = tileset.Id.ToString(),
                 Version = "1.4",
@@ -232,25 +164,25 @@ namespace UAlbion.Formats.Exporters
                 },
                 Tiles = tileset.Tiles
                     .Where(x => x.ImageNumber != 0xffff && x.ImageNumber != 0)
-                    .Select(x => new TiledTile
+                    .Select(x => new Tile
                     {
                         Id = x.ImageNumber,
-                        Frames = x.FrameCount == 1 
-                            ? null 
+                        Frames = x.FrameCount == 1
+                            ? null
                             : Enumerable.Range(x.ImageNumber, x.FrameCount)
                               .Select(f => new TileFrame { Id = f, DurationMs = properties.FrameDurationMs })
                               .ToList(),
                         Properties = Props(x)
                     }).ToList(),
-                // terrain
+                // TODO: Terrain
                 // wang sets
             };
         }
 
-        public static TiledTileMap FromSprites(string name, string type, IList<TileProperties> tiles) // (name, source, w, h)
+        public static Tileset FromSprites(string name, string type, IList<TileProperties> tiles) // (name, source, w, h)
         {
             if (tiles == null) throw new ArgumentNullException(nameof(tiles));
-            return new TiledTileMap
+            return new Tileset
             {
                 Name = name,
                 Version = "1.4",
@@ -260,21 +192,21 @@ namespace UAlbion.Formats.Exporters
                 TileHeight = tiles.Max(x => x.Height),
                 Columns = 1,
                 BackgroundColor = "#000000",
-                Tiles = tiles.Select((x, i) => new TiledTile
+                Tiles = tiles.Select((x, i) => new Tile
+                {
+                    Id = i,
+                    Type = type,
+                    Image = new TilesetImage
                     {
-                        Id = i,
-                        Type = type,
-                        Image = new TilesetImage
-                        {
-                            Source = x.Source,
-                            Width = x.Width,
-                            Height = x.Height
-                        },
-                        Properties = new List<TileProperty>
+                        Source = x.Source,
+                        Width = x.Width,
+                        Height = x.Height
+                    },
+                    Properties = new List<TileProperty>
                         {
                             Prop("Visual", x.Name)
                         }
-                    }).ToList(),
+                }).ToList(),
             };
         }
     }

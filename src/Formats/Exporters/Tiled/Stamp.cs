@@ -1,6 +1,6 @@
-﻿namespace UAlbion.Formats.Exporters
+﻿namespace UAlbion.Formats.Exporters.Tiled
 {
-    public class TiledStamp
+    public class Stamp
     {
         // TODO
 /*

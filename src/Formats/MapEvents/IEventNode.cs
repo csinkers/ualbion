@@ -7,5 +7,6 @@ namespace UAlbion.Formats.MapEvents
         ushort Id { get; }
         IEvent Event { get; }
         IEventNode Next { get; }
+        string ToString(int idOffset);
     }
 }

@@ -13,7 +13,7 @@ namespace UAlbion
 {
     static class DumpGraphics
     {
-        public static void Dump(IAssetManager assets, string baseDir, ISet<AssetType> types, DumpFormats formats)
+        public static void Dump(IAssetManager assets, string baseDir, ISet<AssetType> types, DumpFormats formats, AssetId[] dumpIds)
         {
             void Export<TEnum>(string name) where TEnum : unmanaged, Enum
             {
@@ -26,6 +26,9 @@ namespace UAlbion
                 foreach (var id in ids)
                 {
                     var assetId = AssetId.From(id);
+                    if (dumpIds != null && !dumpIds.Contains(assetId))
+                        continue;
+
                     ExportImage(assetId, assets, directory, formats, (frame, palFrame) => palFrame < 10); // Limit to 10, some of the tile sets can get a bit silly.
                 }
             }

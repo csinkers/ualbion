@@ -8,8 +8,8 @@ using UAlbion.Core.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
-using UAlbion.Formats.Exporters;
 using UAlbion.Game;
+using Tiled = UAlbion.Formats.Exporters.Tiled;
 
 namespace UAlbion
 {
@@ -31,7 +31,7 @@ namespace UAlbion
             public Func<string, TextWriter> GetWriter { get; }
         }
 
-        public static void Dump(string baseDir, IAssetManager assets, ISet<AssetType> types)
+        public static void Dump(string baseDir, IAssetManager assets, ISet<AssetType> types, AssetId[] dumpIds)
         {
             if (assets == null) throw new ArgumentNullException(nameof(assets));
             if (types == null) throw new ArgumentNullException(nameof(types));
@@ -92,7 +92,7 @@ namespace UAlbion
 
             if (types.Contains(AssetType.TilesetData))
             {
-                foreach (TilesetId id in DumpUtil.All(AssetType.TilesetData))
+                foreach (TilesetId id in DumpUtil.All(AssetType.TilesetData, dumpIds))
                     Dump2DTilemap(assets, id, props);
 
                 Flush();
@@ -100,12 +100,12 @@ namespace UAlbion
 
             if (types.Contains(AssetType.Map))
             {
-                foreach (var id in DumpUtil.All(AssetType.Map))
+                foreach (var id in DumpUtil.All(AssetType.Map, dumpIds))
                 {
                     if (assets.LoadMap(id) is MapData2D map2d)
                         Dump2DMap(map2d, assets, props);
-                    if (assets.LoadMap(id) is MapData3D map3d)
-                        Dump3DMap(map3d, assets, props);
+                    //if (assets.LoadMap(id) is MapData3D map3d)
+                    //    Dump3DMap(map3d, assets, props);
                 }
 
                 Flush();
@@ -132,13 +132,13 @@ namespace UAlbion
             if (!Directory.Exists(spriteDir))
                 Directory.CreateDirectory(spriteDir);
 
-            var tiles = new List<TileProperties>();
+            var tiles = new List<Tiled.TileProperties>();
             foreach (var id in assetIds)
             {
                 var info = DumpGraphics.ExportImage(id, props.Assets, spriteDir, DumpFormats.Png, (frame, palFrame) => frame == 9 && palFrame == 0).SingleOrDefault();
                 if (info == null)
                     continue;
-                tiles.Add(new TileProperties
+                tiles.Add(new Tiled.TileProperties
                 {
                     Name = id.ToString(),
                     Frames = 1,
@@ -148,7 +148,7 @@ namespace UAlbion
                 });
             }
 
-            var tilemap = TiledTileMap.FromSprites(tilesetName, "NPC", tiles);
+            var tilemap = Tiled.Tileset.FromSprites(tilesetName, "NPC", tiles);
             tilemap.Save(Path.Combine(props.TilesetDir,  tilesetName + ".tsx"));
         }
 
@@ -179,7 +179,7 @@ namespace UAlbion
 
             var tw = props.GetWriter(Path.Combine(props.TilesetDir, $"{id.Id}_{id}.tsx"));
             var properties = ExtractProperties(sheet, sheetInfo.Path);
-            var tilemap = TiledTileMap.FromTileset(tileset, properties);
+            var tilemap = Tiled.Tileset.FromTileset(tileset, properties);
             tilemap.Serialize(tw);
         }
 
@@ -195,20 +195,20 @@ namespace UAlbion
 
             var tilesetPath = Path.Combine(props.TilesetDir, $"{map.TilesetId.Id}_{map.TilesetId}.tsx");
             var npcTilesetPath = Path.Combine(props.TilesetDir, map.MapType == MapType.TwoD ? "LargeNPCs.tsx" : "SmallNPCs.tsx");
-            int GetNpcTileId(AssetId assetId) => assetId.Id - 1;
+            var npcTileset = Tiled.Tileset.Load(npcTilesetPath);
 
             var tw = props.GetWriter(Path.Combine(props.ExportDir, $"{map.Id.Id}_{map.Id}.tmx"));
             var properties = ExtractProperties(sheet, null);
             var formatter = new EventFormatter(assets.LoadString, map.Id.ToMapText());
-            var tiledMap = TiledMap.FromAlbionMap(map, tileset, properties, tilesetPath, npcTilesetPath, GetNpcTileId, formatter);
+            var tiledMap = Tiled.Map.FromAlbionMap(map, tileset, properties, tilesetPath, npcTileset, formatter);
             tiledMap.Serialize(tw);
         }
 
-        static void Dump3DMap(MapData3D map3d, IAssetManager assets, DumpProperties props)
-        {
-        }
+        // static void Dump3DMap(MapData3D map3d, IAssetManager assets, DumpProperties props)
+        // {
+        // }
 
-        static TilemapProperties ExtractProperties(ITexture sheet, string sheetPath) => new TilemapProperties
+        static Tiled.TilemapProperties ExtractProperties(ITexture sheet, string sheetPath) => new Tiled.TilemapProperties
         {
             FrameDurationMs = 180, // TODO: Pull from first matching map's anim rate?
             Margin = 1, // See AlbionSpritePostProcessor

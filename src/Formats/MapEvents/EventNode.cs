@@ -15,7 +15,14 @@ namespace UAlbion.Formats.MapEvents
     public class EventNode : IEventNode
     {
         bool DirectSequence => (Next?.Id ?? Id + 1) == Id + 1;
-        public override string ToString() => $"{(DirectSequence ? " " : "#")}{Id}=>{Next?.Id.ToString(CultureInfo.InvariantCulture) ?? "!"}: {Event}";
+        public override string ToString() => ToString(0);
+        public virtual string ToString(int idOffset)
+        {
+            int id = Id - idOffset;
+            int? next = Next?.Id - idOffset;
+            return $"{(DirectSequence ? " " : "#")}{id}=>{next?.ToString(CultureInfo.InvariantCulture) ?? "!"}: {Event}";
+        }
+
         public ushort Id { get; set; }
         public IEvent Event { get; }
         public IEventNode Next { get; set; }

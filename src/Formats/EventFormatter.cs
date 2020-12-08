@@ -19,10 +19,10 @@ namespace UAlbion.Formats
             _textSourceId = textSourceId;
         }
 
-        public string Format(IEventNode e)
+        public string Format(IEventNode e, int idOffset = 0)
         {
             if (e == null) throw new ArgumentNullException(nameof(e));
-            var nodeText = e.ToString();
+            var nodeText = e.ToString(idOffset);
             if (e.Event is TextEvent textEvent)
             {
                 var text = _stringLoadFunc(new StringId(_textSourceId, textEvent.TextId));
@@ -49,15 +49,16 @@ namespace UAlbion.Formats
                     if (!uniqueEvents.Add(e)) 
                         break;
 
-                    if (e is IBranchNode branch && uniqueEvents.Add(branch))
+                    if (e is IBranchNode branch)
                         Visit(branch.NextIfFalse);
                     e = e.Next;
                 }
             }
 
             Visit(chain.FirstEvent);
-            foreach (var e in uniqueEvents.OrderBy(x => x.Id))
-                sb.AppendLine(Format(e));
+            var sorted = uniqueEvents.OrderBy(x => x.Id).ToList();
+            foreach (var e in sorted)
+                sb.AppendLine(Format(e, sorted[0].Id));
 
             return sb.ToString();
         }

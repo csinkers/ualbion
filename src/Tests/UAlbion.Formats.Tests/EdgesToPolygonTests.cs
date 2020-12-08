@@ -1,46 +1,28 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using UAlbion.Config;
-using UAlbion.Formats.Assets;
-using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Exporters;
-using UAlbion.Formats.MapEvents;
 using Xunit;
 
 namespace UAlbion.Formats.Tests
 {
-    public class RegionToPolygonTests
+    public class EdgesToPolygonTests
     {
-        static IList<Geometry.Polygon> Convert(List<(byte, byte)> region)
-        {
-            byte w = (byte)(region.Max(x => x.Item1) + 1);
-            byte h = (byte)(region.Max(x => x.Item2) + 1);
-
-            var map = new MapData2D(MapId.None, w, h);
-            var chain = new EventChain(0);
-            chain.Events.Add(new EventNode(0, new DoScriptEvent(new ScriptId(AssetType.Script))));
-            foreach (var (x, y) in region)
-            {
-                map.Zones.Add(new MapEventZone
-                {
-                    X = x,
-                    Y = y,
-                    Chain = chain,
-                    Node = chain.FirstEvent,
-                    Trigger = TriggerTypes.Default
-                });
-            }
-
-            var zones = TriggerZoneBuilder.BuildZones(map);
-            return zones.Select(x => x.Item2).ToList();
-        }
-
+        static Edge E(byte x1, byte y1, byte x2, byte y2) => new Edge(x1, y1, x2, y2);
+        static IList<Geometry.Polygon> Convert(IEnumerable<Edge> edges) => 
+            TriggerZoneBuilder.BuildPolygonsFromSortedEdges(
+                edges.OrderBy(x => x).ToList());
 
         [Fact]
         public void SingleTileTest()
         {
-            var region = new List<(byte, byte)> { (0, 0) };
-            var polygons = Convert(region);
+            var edges = new[]
+            {
+                E(0,0,1,0),
+                E(1,0,1,1),
+                E(1,1,0,1),
+                E(0,1,0,0),
+            };
+            var polygons = Convert(edges);
             Assert.Collection(polygons,
                 poly =>
                 {
@@ -57,8 +39,14 @@ namespace UAlbion.Formats.Tests
         [Fact]
         public void TwoTileTest()
         {
-            var region = new List<(byte, byte)> { (0, 0), (1, 0) };
-            var polygons = Convert(region);
+            var edges = new[]
+            {
+                E(0,0,2,0),
+                E(2,0,2,1),
+                E(2,1,0,1),
+                E(0,1,0,0),
+            };
+            var polygons = Convert(edges);
             Assert.Collection(polygons,
                 poly =>
                 {
@@ -75,8 +63,14 @@ namespace UAlbion.Formats.Tests
         [Fact]
         public void TwoByTwoTest()
         {
-            var region = new List<(byte, byte)> { (0, 0), (1, 0), (0, 1), (1, 1) };
-            var polygons = Convert(region);
+            var edges = new[]
+            {
+                E(0,0,2,0),
+                E(2,0,2,2),
+                E(2,2,0,2),
+                E(0,2,0,0),
+            };
+            var polygons = Convert(edges);
             Assert.Collection(polygons,
                 poly =>
                 {
@@ -93,13 +87,16 @@ namespace UAlbion.Formats.Tests
         [Fact]
         public void LShapeTest()
         {
-            var region = new List<(byte, byte)>
+            var edges = new List<Edge>
             {
-                (0, 0), (1, 0), 
-                (0, 1), 
-                (0, 2)
+                E(0,0,2,0),
+                E(2,0,2,1),
+                E(2,1,1,1),
+                E(1,1,1,3),
+                E(1,3,0,3),
+                E(0,3,0,0),
             };
-            var polygons = Convert(region);
+            var polygons = Convert(edges);
             Assert.Collection(polygons,
                 poly =>
                 {
@@ -118,13 +115,19 @@ namespace UAlbion.Formats.Tests
         [Fact]
         public void DoughnutTest()
         {
-            var region = new List<(byte, byte)>
+            var edges = new List<Edge>
             {
-                (0,0), (1,0), (2,0),
-                (0,1),        (2,1),
-                (0,2), (1,2), (2,2),
+                E(0,0,3,0), // Outer edge
+                E(3,0,3,3),
+                E(3,3,0,3),
+                E(0,3,0,0),
+
+                E(1,1,2,1), // Inner edge
+                E(2,1,2,2),
+                E(2,2,1,2),
+                E(1,2,1,1)
             };
-            var polygons = Convert(region);
+            var polygons = Convert(edges);
             Assert.Collection(polygons,
                 poly =>
                 {
@@ -156,12 +159,19 @@ namespace UAlbion.Formats.Tests
         [Fact]
         public void DiagonallyTouchingTest()
         {
-            var region = new List<(byte, byte)>
+            var edges = new List<Edge>
             {
-                (0,0), (1,0),
-                              (2,1), (3,1),
+                E(0,0,2,0), // ----
+                E(2,0,2,1), //     |
+                E(0,1,0,0), // |
+                E(2,1,0,1), // ----
+
+                E(2,1,4,1), //      ----
+                E(4,1,4,2), //          |
+                E(2,2,2,1), //      |
+                E(4,2,2,2), //      ----
             };
-            var polygons = Convert(region);
+            var polygons = Convert(edges);
             Assert.Collection(polygons,
                 poly =>
                 {

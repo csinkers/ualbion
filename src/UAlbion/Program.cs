@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UAlbion.Api;
@@ -76,11 +77,21 @@ namespace UAlbion
                     var tf = new TextFormatter();
                     exchange.Attach(tf);
 
-                    if ((commandLine.DumpFormats & DumpFormats.Json) != 0) DumpJson.Dump(baseDir, assets, commandLine.DumpAssetTypes);
-                    if ((commandLine.DumpFormats & DumpFormats.Text) != 0) DumpText.Dump(assets, baseDir, tf, commandLine.DumpAssetTypes);
+                    AssetId[] dumpIds = null;
+                    if (commandLine.DumpIds != null)
+                        dumpIds = commandLine.DumpIds.Select(AssetId.Parse).ToArray();
+
+                    if ((commandLine.DumpFormats & DumpFormats.Json) != 0)
+                        DumpJson.Dump(baseDir, assets, commandLine.DumpAssetTypes, dumpIds);
+
+                    if ((commandLine.DumpFormats & DumpFormats.Text) != 0)
+                        DumpText.Dump(assets, baseDir, tf, commandLine.DumpAssetTypes, dumpIds);
+
                     if ((commandLine.DumpFormats & DumpFormats.GraphicsMask) != 0)
-                        DumpGraphics.Dump(assets, baseDir, commandLine.DumpAssetTypes, commandLine.DumpFormats & DumpFormats.GraphicsMask);
-                    if ((commandLine.DumpFormats & DumpFormats.Tiled) != 0) DumpTiled.Dump(baseDir, assets, commandLine.DumpAssetTypes);
+                        DumpGraphics.Dump(assets, baseDir, commandLine.DumpAssetTypes, commandLine.DumpFormats & DumpFormats.GraphicsMask, dumpIds);
+
+                    if ((commandLine.DumpFormats & DumpFormats.Tiled) != 0)
+                        DumpTiled.Dump(baseDir, assets, commandLine.DumpAssetTypes, dumpIds);
                     break;
 
                 case ExecutionMode.Exit: break;

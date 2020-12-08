@@ -108,7 +108,19 @@ namespace UAlbion
                     DumpAssetTypes.Add(Enum.Parse<AssetType>(type, true));
             }
 
+            index = FindArgIndex("--id", args);
+            if(index == -1) index = FindArgIndex("-id", args);
+            if(index == -1) index = FindArgIndex("--ids", args);
+            if(index == -1) index = FindArgIndex("-ids", args);
+            if (index != -1 && args.Length > index + 1)
+                DumpIds = args[index + 1].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
             index = FindArgIndex("--formats", args);
+            if(index == -1) index = FindArgIndex("--format", args);
+            if(index == -1) index = FindArgIndex("--dump-format", args);
+            if(index == -1) index = FindArgIndex("--dump-formats", args);
+            if(index == -1) index = FindArgIndex("-formats", args);
+            if(index == -1) index = FindArgIndex("-format", args);
             if (index != -1 && args.Length > index + 1)
             {
                 DumpFormats = 0;
@@ -139,6 +151,8 @@ namespace UAlbion
                 }
             }
         }
+
+        public string[] DumpIds { get; }
 
         int FindArgIndex(string argument, string[] arguments)
         {

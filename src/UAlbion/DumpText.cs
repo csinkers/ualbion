@@ -30,25 +30,30 @@ namespace UAlbion
         const string SpellInfoPath        = "Spells.txt";
         const string ScriptPath           = "Scripts/{0}.txt";
 
-        static IEnumerable<AssetId> Ids<T>() where T : unmanaged, Enum => Enum.GetValues(typeof(T)).Cast<T>().Select(AssetId.From);
-        public static void Dump(IAssetManager assets, string baseDir, ITextFormatter tf, ISet<AssetType> types)
+        static IEnumerable<AssetId> Ids<T>(AssetId[] dumpIds) where T : unmanaged, Enum 
+            => Enum.GetValues(typeof(T))
+                .Cast<T>()
+                .Select(AssetId.From)
+                .Where(x => dumpIds == null || dumpIds.Contains(x));
+
+        public static void Dump(IAssetManager assets, string baseDir, ITextFormatter tf, ISet<AssetType> types, AssetId[] dumpIds)
         {
             foreach (var type in types)
             {
                 switch (type)
                 {
-                    case AssetType.Chest: Chests(assets, baseDir); break;
-                    case AssetType.EventSet: EventSets(assets, baseDir); break;
-                    case AssetType.Item: ItemData(assets, baseDir); break;
+                    case AssetType.Chest: Chests(assets, baseDir, dumpIds); break;
+                    case AssetType.EventSet: EventSets(assets, baseDir, dumpIds); break;
+                    case AssetType.Item: ItemData(assets, baseDir, dumpIds); break;
                     case AssetType.Labyrinth: Labyrinths(assets, baseDir); break;
-                    case AssetType.Map: MapData(assets, tf, baseDir); MapEvents(assets, baseDir); break;
-                    case AssetType.Merchant: Merchants(assets, baseDir); break;
-                    case AssetType.Monster: MonsterCharacterSheets(assets, tf, baseDir); break;
-                    case AssetType.MonsterGroup: MonsterGroups(assets, baseDir); break;
-                    case AssetType.Npc: NpcCharacterSheets(assets, tf, baseDir); break;
-                    case AssetType.PartyMember: PartyCharacterSheets(assets, tf, baseDir); break;
-                    case AssetType.Script: Scripts(assets, baseDir); break;
-                    case AssetType.Spell: Spells(assets, baseDir); break;
+                    case AssetType.Map: MapData(assets, tf, baseDir, dumpIds); MapEvents(assets, baseDir, dumpIds); break;
+                    case AssetType.Merchant: Merchants(assets, baseDir, dumpIds); break;
+                    case AssetType.Monster: MonsterCharacterSheets(assets, tf, baseDir, dumpIds); break;
+                    case AssetType.MonsterGroup: MonsterGroups(assets, baseDir, dumpIds); break;
+                    case AssetType.Npc: NpcCharacterSheets(assets, tf, baseDir, dumpIds); break;
+                    case AssetType.PartyMember: PartyCharacterSheets(assets, tf, baseDir, dumpIds); break;
+                    case AssetType.Script: Scripts(assets, baseDir, dumpIds); break;
+                    case AssetType.Spell: Spells(assets, baseDir, dumpIds); break;
                 }
             }
         }
@@ -64,9 +69,9 @@ namespace UAlbion
             return File.CreateText(filename);
         }
 
-        static void Scripts(IAssetManager assets, string baseDir)
+        static void Scripts(IAssetManager assets, string baseDir, AssetId[] dumpIds)
         {
-            foreach (var id in Ids<Base.Script>())
+            foreach (var id in Ids<Base.Script>(dumpIds))
             {
                 var events = assets.LoadScript(id);
                 if (events == null) continue;
@@ -156,12 +161,16 @@ namespace UAlbion
             }
         }
 
-        static void MapData(IAssetManager assets, ITextFormatter tf, string baseDir)
+        static void MapData(IAssetManager assets, ITextFormatter tf, string baseDir, AssetId[] dumpIds)
         {
             using var sw = Open(baseDir, MapInfoPath);
             for (int i = 100; i < 400; i++)
             {
-                IMapData map = assets.LoadMap((Base.Map)i);
+                AssetId id = AssetId.From((Base.Map)i);
+                if (dumpIds != null && !dumpIds.Contains(id))
+                    continue;
+
+                IMapData map = assets.LoadMap(id);
                 if (map == null)
                     continue;
 
@@ -259,24 +268,24 @@ namespace UAlbion
             }
         }
 
-        static void PartyCharacterSheets(IAssetManager assets, ITextFormatter tf, string baseDir)
+        static void PartyCharacterSheets(IAssetManager assets, ITextFormatter tf, string baseDir, AssetId[] dumpIds)
         {
             using var sw = Open(baseDir, PartyCharacterPath);
-            foreach (var charId in Ids<Base.PartyMember>())
+            foreach (var charId in Ids<Base.PartyMember>(dumpIds))
                 DumpCharacterSheet(charId, assets.LoadSheet(charId), sw, assets, tf);
         }
 
-        static void NpcCharacterSheets(IAssetManager assets, ITextFormatter tf, string baseDir)
+        static void NpcCharacterSheets(IAssetManager assets, ITextFormatter tf, string baseDir, AssetId[] dumpIds)
         {
             using var sw = Open(baseDir, NpcCharacterPath);
-            foreach (var charId in Ids<Base.Npc>())
+            foreach (var charId in Ids<Base.Npc>(dumpIds))
                 DumpCharacterSheet(charId, assets.LoadSheet(charId), sw, assets, tf);
         }
 
-        static void MonsterCharacterSheets(IAssetManager assets, ITextFormatter tf, string baseDir)
+        static void MonsterCharacterSheets(IAssetManager assets, ITextFormatter tf, string baseDir, AssetId[] dumpIds)
         {
             using var sw = Open(baseDir, MonsterCharacterPath);
-            foreach (var charId in Ids<Base.Monster>())
+            foreach (var charId in Ids<Base.Monster>(dumpIds))
                 DumpCharacterSheet(charId, assets.LoadSheet(charId), sw, assets, tf);
         }
 
@@ -392,11 +401,11 @@ namespace UAlbion
             if (c.UnknownFC != 0) sw.WriteLine($"    UnknownFC:{c.UnknownFC}");
         }
 
-        static void Chests(IAssetManager assets, string baseDir)
+        static void Chests(IAssetManager assets, string baseDir, AssetId[] dumpIds)
         {
             using var sw = Open(baseDir, ChestPath);
             var chests = 
-                Ids<Base.Chest>()
+                Ids<Base.Chest>(dumpIds)
                     .ToDictionary(x => x, assets.LoadInventory);
             foreach (var chest in chests.Where(x => x.Value != null))
             {
@@ -406,11 +415,11 @@ namespace UAlbion
             }
         }
 
-        static void Merchants(IAssetManager assets, string baseDir)
+        static void Merchants(IAssetManager assets, string baseDir, AssetId[] dumpIds)
         {
             using var sw = Open(baseDir, MerchantPath);
             var merchants = 
-                Ids<Base.Merchant>()
+                Ids<Base.Merchant>(dumpIds)
                     .ToDictionary(x => x, assets.LoadInventory);
             foreach (var merchant in merchants.Where(x => x.Value != null))
             {
@@ -420,11 +429,11 @@ namespace UAlbion
             }
         }
 
-        static void ItemData(IAssetManager assets, string baseDir)
+        static void ItemData(IAssetManager assets, string baseDir, AssetId[] dumpIds)
         {
             using var sw = Open(baseDir, ItemDataPath);
             var items = new List<ItemData>();
-            foreach (ItemId itemId in Ids<Base.Item>())
+            foreach (ItemId itemId in Ids<Base.Item>(dumpIds))
             {
                 sw.Write(itemId.Id.ToString(CultureInfo.InvariantCulture).PadLeft(3)); 
                 sw.Write(' ');
@@ -524,10 +533,10 @@ namespace UAlbion
             }*/
         }
 
-        static void MapEvents(IAssetManager assets, string baseDir)
+        static void MapEvents(IAssetManager assets, string baseDir, AssetId[] dumpIds)
         {
             using var sw = Open(baseDir, MapEventPath);
-            foreach (var mapId in Ids<Base.Map>())
+            foreach (var mapId in Ids<Base.Map>(dumpIds))
             {
                 IMapData map = assets.LoadMap(mapId);
                 if (map != null)
@@ -535,10 +544,10 @@ namespace UAlbion
             }
         }
 
-        static void EventSets(IAssetManager assets, string baseDir)
+        static void EventSets(IAssetManager assets, string baseDir, AssetId[] dumpIds)
         {
             using var sw = Open(baseDir, EventSetPath);
-            foreach (var eventSetId in Ids<Base.EventSet>())
+            foreach (var eventSetId in Ids<Base.EventSet>(dumpIds))
             {
                 sw.WriteLine();
                 sw.WriteLine($"{eventSetId.Id} {eventSetId}:");
@@ -555,10 +564,10 @@ namespace UAlbion
             }
         }
 
-        static void Spells(IAssetManager assets, string baseDir)
+        static void Spells(IAssetManager assets, string baseDir, AssetId[] dumpIds)
         {
             using var sw = Open(baseDir, SpellInfoPath);
-            foreach (var spellId in Ids<Base.Spell>())
+            foreach (var spellId in Ids<Base.Spell>(dumpIds))
             {
                 var spell = assets.LoadSpell(spellId);
                 var name = assets.LoadString(spell.Name);
@@ -575,10 +584,10 @@ namespace UAlbion
             }
         }
 
-        static void MonsterGroups(IAssetManager assets, string baseDir)
+        static void MonsterGroups(IAssetManager assets, string baseDir, AssetId[] dumpIds)
         {
             using var sw = Open(baseDir, MonsterGroupPath);
-            foreach (var groupId in Ids<Base.MonsterGroup>())
+            foreach (var groupId in Ids<Base.MonsterGroup>(dumpIds))
             {
                 var group = assets.LoadMonsterGroup(groupId);
                 if (group == null)

@@ -204,8 +204,8 @@ namespace UAlbion.Formats.Assets.Maps
 
             return mapType switch
             {
-                MapType.TwoD => MapData2D.Serdes(info, (MapData2D)existing, mapType, mapping, s),
-                MapType.TwoDOutdoors => MapData2D.Serdes(info, (MapData2D)existing, mapType, mapping, s),
+                // Indoor/outdoor maps aren't distinguished on disk - it has to be inferred from the tileset
+                MapType.TwoD => MapData2D.Serdes(info, (MapData2D)existing, mapping, s), 
                 MapType.ThreeD => MapData3D.Serdes(info, (MapData3D)existing, mapping, s),
                 _ => throw new NotImplementedException($"Unrecognised map type {mapType} found.")
             };

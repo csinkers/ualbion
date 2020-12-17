@@ -96,6 +96,7 @@ namespace UAlbion.Game.State
 
         void NewGame(MapId mapId, ushort x, ushort y)
         {
+            Raise(new ReloadAssetsEvent()); // Make sure we don't end up with cached assets from the last game.
             var assets = Resolve<IAssetManager>();
             _game = new SavedGame
             {

@@ -169,7 +169,7 @@ namespace UAlbion.Config
         {
             var (enumType, enumValue) = IdToEnum(id);
             return enumType == null
-                ? enumValue == 0 ? "None" : $"{id.Type}.{enumValue}"
+                ? enumValue == 0 ? "None" : $"{id.Type}.{id.Id}"
                 : enumType.Name + "." + Enum.GetName(enumType, enumValue);
         }
 

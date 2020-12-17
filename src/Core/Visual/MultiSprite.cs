@@ -71,6 +71,7 @@ namespace UAlbion.Core.Visual
                     {
                         _leases.RemoveAt(n);
                         ActiveInstances -= leaseToRemove.Length;
+                        InstancesDirty = true;
                         shifting = true;
                     }
 

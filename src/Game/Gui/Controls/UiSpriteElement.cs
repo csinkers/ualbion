@@ -60,13 +60,17 @@ namespace UAlbion.Game.Gui.Controls
             if (!IsSubscribed)
                 return order;
 
-            if (_sprite?.Key.RenderOrder != (DrawLayer)order)
+            var newOrder = _sprite?.Key.RenderOrder;
+            if (newOrder.HasValue && newOrder.Value != (DrawLayer)order)
                 _dirty = true;
 
             UpdateSprite((DrawLayer)order);
 
-            if(_sprite == null)
+            if (_sprite == null)
+            {
+                _dirty = false;
                 return order;
+            }
 
             var window = Resolve<IWindowManager>();
             var position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);

@@ -445,7 +445,7 @@ namespace UAlbion
                 else
                 {
                     items.Add(data);
-                    sw.Write($"Gfx:{data.Icon} ({data.IconAnim} frames) ");
+                    sw.Write($"Gfx:{data.IconSubId} ({data.IconAnim} frames) ");
                     sw.Write($"Type:{data.TypeId} Slot:{data.SlotType} ");
                     sw.Write($"F:{data.Flags} A:{data.Activate} ");
                     sw.Write($"{data.Class} ");

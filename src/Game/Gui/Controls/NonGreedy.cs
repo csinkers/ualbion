@@ -5,7 +5,7 @@ namespace UAlbion.Game.Gui.Controls
 {
     public class NonGreedy : UiElement, IFixedSizeUiElement
     {
-        public NonGreedy(IUiElement child) => Children.Add(child);
+        public NonGreedy(IUiElement child) => AttachChild(child);
         public DialogPositioning Position { get; set; } = DialogPositioning.Center;
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)

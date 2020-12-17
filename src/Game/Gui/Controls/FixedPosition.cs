@@ -11,7 +11,7 @@ namespace UAlbion.Game.Gui.Controls
         public FixedPosition(Rectangle extents, IUiElement child)
         {
             _extents = extents;
-            Children.Add(child);
+            AttachChild(child);
         }
 
         public override Vector2 GetSize() => new Vector2(_extents.Width, _extents.Height);

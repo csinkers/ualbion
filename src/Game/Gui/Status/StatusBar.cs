@@ -31,7 +31,7 @@ namespace UAlbion.Game.Gui.Status
             for (int i = 0; i < _portraits.Length; i++)
             {
                 _portraits[i] = new StatusBarPortrait(i);
-                Children.Add(_portraits[i]);
+                AttachChild(_portraits[i]);
             }
 
             var hoverText = new UiText(_hoverSource);

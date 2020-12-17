@@ -32,14 +32,14 @@ namespace UAlbion.Game.Gui.Controls
         public FixedPositionStack Add(IUiElement child, int x, int y)
         {
             _positions.Add(new Child(child, x, y, null, null));
-            Children.Add(child);
+            AttachChild(child);
             return this;
         }
 
         public FixedPositionStack Add(IUiElement child, int x, int y, int w, int h)
         {
             _positions.Add(new Child(child, x, y, w, h));
-            Children.Add(child);
+            AttachChild(child);
             return this;
         }
 

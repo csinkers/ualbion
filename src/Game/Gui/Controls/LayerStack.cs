@@ -17,7 +17,7 @@ namespace UAlbion.Game.Gui.Controls
         {
             if (children == null) throw new ArgumentNullException(nameof(children));
             foreach(var child in children)
-                Children.Add(child);
+                AttachChild(child);
         }
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)

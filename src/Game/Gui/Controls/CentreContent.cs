@@ -9,7 +9,7 @@ namespace UAlbion.Game.Gui.Controls
 
         public CentreContent(UiElement content)
         {
-            Children.Add(content);
+            AttachChild(content);
             _content = content;
         }
 

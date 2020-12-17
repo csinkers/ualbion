@@ -25,8 +25,8 @@ namespace UAlbion.Core
         static int _nesting;
         static int _nextId;
         readonly IDictionary<Type, Handler> _handlers = new Dictionary<Type, Handler>();
+        readonly List<IComponent> _children = new List<IComponent>();
         bool _isActive = true; // If false, then this component will not be attached to the exchange even if its parent is.
-
         protected Component() => ComponentId = Interlocked.Increment(ref _nextId);
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace UAlbion.Core
         /// The primary purpose of children is ensuring that the children are also attached and
         /// detached when the parent component is.
         /// </summary>
-        protected IList<IComponent> Children { get; } = new List<IComponent>(); 
+        protected IReadOnlyList<IComponent> Children => _children;
 
         /// <summary>
         /// Resolve the currently active object that provides the given interface.
@@ -286,7 +286,7 @@ namespace UAlbion.Core
             if (_isActive) // Children will be attached when this component is made active.
                 Exchange?.Attach(child);
 
-            Children.Add(child);
+            _children.Add(child);
             if (child is Component component)
                 component.Parent = this;
 
@@ -310,13 +310,13 @@ namespace UAlbion.Core
         protected void RemoveChild(IComponent child)
         {
             if (child == null) throw new ArgumentNullException(nameof(child));
-            int index = Children.IndexOf(child);
+            int index = _children.IndexOf(child);
             if (index == -1) return;
             if (child is Component c)
                 c.Parent = null;
 
             child.Remove();
-            Children.RemoveAt(index);
+            _children.RemoveAt(index);
         }
 
         /// <summary>

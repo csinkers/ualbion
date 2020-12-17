@@ -112,7 +112,7 @@ namespace UAlbion.Game.Gui.Inventory
                 )
             );
 
-            Children.Add(new HorizontalStack(new Spacing(4,0), stack, new Spacing(4,0)));
+            AttachChild(new HorizontalStack(new Spacing(4,0), stack, new Spacing(4,0)));
         }
     }
 }

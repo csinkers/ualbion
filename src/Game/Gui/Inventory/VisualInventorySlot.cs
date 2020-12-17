@@ -124,9 +124,9 @@ namespace UAlbion.Game.Gui.Inventory
                 _sprite.SubId = itemSpriteId;
                 _overlay.IsActive = (slot.Flags & ItemSlotFlags.Broken) != 0;
             }
-            else // Nothing
+            else if (!_slotId.Slot.IsSpecial()) // Special slots (i.e. rations + gold) keep their sprite when empty.
             {
-                _sprite.Id = AssetId.None;
+                _sprite.Id = AssetId.None; // Nothing
                 _sprite.SubId = 0;
                 _overlay.IsActive = false;
             }

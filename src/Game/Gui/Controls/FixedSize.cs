@@ -13,7 +13,7 @@ namespace UAlbion.Game.Gui.Controls
         {
             _width = width;
             _height = height;
-            Children.Add(child);
+            AttachChild(child);
         }
 
         public DialogPositioning Position { get; set; } = DialogPositioning.Center;

@@ -18,7 +18,7 @@ namespace UAlbion.Game.Gui.Controls
         {
             if (children == null) throw new ArgumentNullException(nameof(children));
             foreach(var child in children)
-                Children.Add(child);
+                AttachChild(child);
         }
 
         public bool Greedy { get; set; } = true;

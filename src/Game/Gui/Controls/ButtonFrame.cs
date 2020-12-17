@@ -52,7 +52,7 @@ namespace UAlbion.Game.Gui.Controls
             On<WindowResizedEvent>(e => _lastExtents = new Rectangle());
 
             if (child != null)
-                Children.Add(child);
+                AttachChild(child);
         }
 
         protected override void Unsubscribed()

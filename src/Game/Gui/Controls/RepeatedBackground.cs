@@ -13,7 +13,7 @@ namespace UAlbion.Game.Gui.Controls
         PositionedSpriteBatch _sprite;
         Vector2 _lastPixelSize; // For dirty state detection
 
-        public RepeatedBackground(IUiElement child) => Children.Add(child);
+        public RepeatedBackground(IUiElement child) => AttachChild(child);
         protected override void Unsubscribed()
         {
             _sprite?.Dispose();

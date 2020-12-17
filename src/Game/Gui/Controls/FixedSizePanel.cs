@@ -5,8 +5,8 @@
         public FixedSizePanel(int width, int height, IUiElement content)
         {
             var frame = new ButtonFrame(content) { State = ButtonState.Pressed };
-            Children.Add(new Spacing(width, height));
-            Children.Add(frame);
+            AttachChild(new Spacing(width, height));
+            AttachChild(frame);
         }
     }
 }

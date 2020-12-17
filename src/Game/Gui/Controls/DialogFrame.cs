@@ -28,7 +28,7 @@ namespace UAlbion.Game.Gui.Controls
                 _sprite?.Dispose();
                 _sprite = null;
             });
-            Children.Add(child);
+            AttachChild(child);
         }
 
         protected override void Unsubscribed()

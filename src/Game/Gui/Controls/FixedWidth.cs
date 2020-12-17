@@ -11,7 +11,7 @@ namespace UAlbion.Game.Gui.Controls
         public FixedWidth(int width, IUiElement child)
         {
             _width = width;
-            Children.Add(child);
+            AttachChild(child);
         }
 
         public DialogPositioning Position { get; set; } = DialogPositioning.Center;

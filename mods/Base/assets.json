@@ -4542,13 +4542,13 @@
   },
   "UAlbion.Base.Spell, UAlbion.Base": {
     "AssetType": "Spell",
-    "EnumType": "byte",
+    "EnumType": "ushort",
     "Loader": "UAlbion.Formats.Parsers.SpellLoader, UAlbion.Formats",
     "Files": {
       "SPELLDAT": {
         "ContainerFormat": "SpellList",
-        "Assets": {
-          "0": { "Name": "ThornSnare" },
+        "Assets": { // Ids = 1 + OffsetInSchool + School * 256
+          "0": { "Id": 1, "Name": "ThornSnare" },
           "1": { "Name": "Unused1" },
           "2": { "Name": "Unused2" },
           "3": { "Name": "Hurry" },
@@ -4580,7 +4580,7 @@
           "29": { "Name": "Unused29" },
 
           // EnlightenedOneOffset" },
-          "30": { "Name": "Regeneration" },
+          "30": { "Id": 257, "Name": "Regeneration" },
           "31": { "Name": "MapView" },
           "32": { "Name": "Lifebringer" },
           "33": { "Name": "Teleporter" },
@@ -4612,7 +4612,7 @@
           "59": { "Name": "Unused59" },
 
           // DruidOffset = 60,
-          "60": { "Name": "Berserk" },
+          "60": { "Id": 513, "Name": "Berserk" },
           "61": { "Name": "BanishDemon" },
           "62": { "Name": "BanishDemons" },
           "63": { "Name": "DemonExodus" },
@@ -4644,7 +4644,7 @@
           "89": { "Name": "Unused89" },
 
           // KengetKamulosOffset = 90,
-          "90": { "Name": "Fireball" },
+          "90": { "Id": 769, "Name": "Fireball" },
           "91": { "Name": "LightningStrike" },
           "92": { "Name": "FireRain" },
           "93": { "Name": "Thunderbolt" },
@@ -4676,7 +4676,7 @@
           "119": { "Name": "Unused119" },
 
           // UNUSED
-          "120": { "Name": "Unused120" },
+          "120": { "Id": 1025, "Name": "Unused120" },
           "121": { "Name": "Unused121" },
           "122": { "Name": "Unused122" },
           "123": { "Name": "Unused123" },
@@ -4708,7 +4708,7 @@
           "149": { "Name": "Unused149" },
 
           // ZombieOffset = 150
-          "150": { "Name": "ZombiePanic" },
+          "150": { "Id": 1281, "Name": "ZombiePanic" },
           "151": { "Name": "ZombiePoisonBreeze" },
           "152": { "Name": "ZombieIrritation" },
           "153": { "Name": "ZombiePlagueBreeze" },
@@ -4740,7 +4740,7 @@
           "179": { "Name": "Unused179" },
 
           // UNUSED
-          "180": { "Name": "Unused180" },
+          "180": { "Id": 1537, "Name": "Unused180" },
           "181": { "Name": "Unused181" },
           "182": { "Name": "Unused182" },
           "183": { "Name": "Unused183" },

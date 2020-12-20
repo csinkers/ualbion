@@ -42,7 +42,7 @@ namespace UAlbion.Formats.Assets
 
             ApiUtil.Assert(s.Offset == startingOffset + streamLength);
 
-            var ranges = info.AnimatedRanges?.Select(x =>
+            var ranges = info.GetArray<string>("AnimatedRanges")?.Select(x =>
             {
                 var parts = x.Split('-');
                 if (parts.Length != 2)

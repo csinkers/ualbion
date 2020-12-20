@@ -135,7 +135,9 @@ namespace UAlbion
                 .AddLoader(new XldContainerLoader())
                 .AddLoader(new BinaryOffsetContainerLoader())
                 .AddLoader(new ItemListContainerLoader())
-                .AddLoader(new SpellListContainerLoader());
+                .AddLoader(new SpellListContainerLoader())
+                .AddLoader(new DirectoryContainerLoader())
+                ;
 
             var modApplier = new ModApplier()
                 // Register post-processors for handling transformations of asset data that can't be done by UAlbion.Formats alone.

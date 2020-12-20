@@ -4,7 +4,7 @@ using UAlbion.Config;
 namespace UAlbion.Formats.Containers
 {
     [ContainerLoader(ContainerFormat.Directory)]
-    public class DirectoryContainer : IContainerLoader
+    public class DirectoryContainerLoader : IContainerLoader
     {
         public ISerializer Open(string file, AssetInfo info)
         {

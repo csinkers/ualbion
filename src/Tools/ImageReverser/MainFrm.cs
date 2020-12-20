@@ -39,7 +39,7 @@ namespace UAlbion.Tools.ImageReverser
 
         void CoreOnAssetChanged(object sender, AssetChangedArgs e)
         {
-            _nodes[e.Asset].NodeFont = e.Asset.PaletteHint == null ? _boldFont : _defaultFont;
+            _nodes[e.Asset].NodeFont = e.Asset.Get("PaletteHint", 0) == 0 ? _boldFont : _defaultFont;
         }
 
         public event EventHandler SaveClicked;
@@ -111,7 +111,7 @@ namespace UAlbion.Tools.ImageReverser
             {
                 var newNode = node.Nodes.Add(key, name);
                 newNode.Tag = asset;
-                newNode.NodeFont = asset.PaletteHint == null ? _boldFont : _defaultFont;
+                newNode.NodeFont = asset.Get("PaletteHint", 0) == 0 ? _boldFont : _defaultFont;
                 _nodes[asset] = newNode;
             }
         }
@@ -131,10 +131,10 @@ namespace UAlbion.Tools.ImageReverser
 
             var asset = _core.SelectedObject;
             if (e.Control && e.KeyCode == Keys.C && asset != null)
-                _savedPalette = asset.PaletteHint;
+                _savedPalette = asset.Get("PaletteHint", 0);
 
             if (e.Control && e.KeyCode == Keys.V && asset != null && _savedPalette != null)
-                asset.PaletteHint = _savedPalette;
+                asset.Set("PaletteHint", _savedPalette);
         }
 
         void FileTree_AfterSelect(object sender, TreeViewEventArgs e)

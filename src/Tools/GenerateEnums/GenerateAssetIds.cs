@@ -186,6 +186,15 @@ namespace {destNamespace}
             return FromDisk({(single ? "" : "type, ")}diskValue, mapping);
         }}
 
+        public static {name} SerdesU16BE(string name, {name} id, {(single ? "" : "AssetType type, ")}AssetMapping mapping, ISerializer s)
+        {{
+            if (s == null) throw new ArgumentNullException(nameof(s));
+
+            ushort diskValue = (ushort)id.ToDisk(mapping);
+            diskValue = s.UInt16BE(name, diskValue);
+            return FromDisk({(single ? "" : "type, ")}diskValue, mapping);
+        }}
+
         public readonly AssetType Type => (AssetType)((_value & 0xff00_0000) >> 24);
         public readonly int Id => (int)(_value & 0xffffff);
         public static {name} None => new {name}(AssetType.None);

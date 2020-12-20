@@ -75,7 +75,7 @@ namespace UAlbion
         {
             var filenames = new List<ExportedImageInfo>();
             var config = assets.GetAssetInfo(assetId);
-            var palette = assets.LoadPalette((Base.Palette)(config?.PaletteHint ?? (int)Base.Palette.Inventory));
+            var palette = assets.LoadPalette((Base.Palette)(config?.Get<int?>("PaletteHint", null) ?? (int)Base.Palette.Inventory));
             var texture = assets.LoadTexture(assetId);
             if (texture == null)
                 return filenames;

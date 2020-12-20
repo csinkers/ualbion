@@ -66,11 +66,9 @@ namespace UAlbion.Tools.ImageReverser
 
                 if (!fileInfo.Assets.ContainsKey(number))
                 {
-                    fileInfo.Assets[number] = new AssetInfo
-                    {
-                        File = fileInfo,
-                        Offset = number
-                    };
+                    var info = new AssetInfo { File = fileInfo, };
+                    info.Set("Offset", number);
+                    fileInfo.Assets[number] = info;
                 }
 
                 AssetInfo asset = fileInfo.Assets[number];

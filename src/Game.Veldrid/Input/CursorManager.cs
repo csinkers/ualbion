@@ -58,9 +58,10 @@ namespace UAlbion.Game.Veldrid.Input
             var config = assets.GetAssetInfo(cursorId);
 
             _cursorId = cursorId;
-            _hotspot = config?.Hotspot == null
+            var hotspot = config?.GetRaw("Hotspot");
+            _hotspot = hotspot == null
                 ? Vector2.Zero
-                : window.GuiScale * new Vector2(config.Hotspot.X, config.Hotspot.Y);
+                : window.GuiScale * new Vector2(hotspot.Value<int>("X"), hotspot.Value<int>("Y"));
             _dirty = true;
         }
 

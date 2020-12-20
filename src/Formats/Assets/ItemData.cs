@@ -33,8 +33,7 @@ namespace UAlbion.Formats.Assets
         public byte SkillTax2 { get; set; } // 18 Skill Tax 2 value. Ranged Values
         public byte Activate { get; set; } // 19 Activate enables compass (0), monster eye (1) or clock (3) (if type=0×13) / Torch intensity (if type=0×16)
         public byte AmmoAnim { get; set; } // 20 Ammo combat animation (long-range weapons only)
-        public SpellClass SpellClass { get; set; } // 21 Spell Class
-        public SpellId SpellEffect { get; set; } // 22 Spell Id
+        public SpellId Spell { get; set; } // 21 Spell Id (2 bytes)
         public byte Charges { get; set; } // 23 Charges left in item / Torch lifetime (if type=0×16)
         public byte EnchantmentCount { get; set; } // 24 Number of times item was enchanted/recharged
         public byte MaxEnchantmentCount { get; set; } // 25 Maximum possible enchantments
@@ -113,11 +112,8 @@ namespace UAlbion.Formats.Assets
             if (BreakRate != 0) sb.Append($"BR:{BreakRate} "); 
             if (Activate != 0) sb.Append($"A:{Activate} ");
 
-            if (!SpellEffect.IsNone)
-            {
-                var className = SpellClass.ToString().Replace(", ", "|");
-                sb.Append($"SC:{className} SE:{SpellEffect} ");
-            }
+            if (!Spell.IsNone)
+                sb.Append($"S:{Spell} ");
 
             if (Charges != 0) sb.Append($"C:{Charges} ");
             if (MaxCharges != 0) sb.Append($"MaxC:{MaxCharges} ");
@@ -160,8 +156,10 @@ namespace UAlbion.Formats.Assets
             item.SkillTax2 = s.UInt8(nameof(item.SkillTax2), item.SkillTax2);
             item.Activate = s.UInt8(nameof(item.Activate), item.Activate);
             item.AmmoAnim = s.UInt8(nameof(item.AmmoAnim), item.AmmoAnim);
-            item.SpellClass = s.EnumU8(nameof(item.SpellClass), item.SpellClass);
-            item.SpellEffect = SpellId.SerdesU8(nameof(item.SpellEffect), item.SpellEffect, mapping, s);
+
+            // Original game spells have school then offset, so need to treat it as big endian so each school's spells are consecutive
+            item.Spell = SpellId.SerdesU16BE(nameof(item.Spell), item.Spell, mapping, s); 
+
             item.Charges = s.UInt8(nameof(item.Charges), item.Charges);
             item.EnchantmentCount = s.UInt8(nameof(item.EnchantmentCount), item.EnchantmentCount);
             item.MaxEnchantmentCount = s.UInt8(nameof(item.MaxEnchantmentCount), item.MaxEnchantmentCount);

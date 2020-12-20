@@ -168,9 +168,14 @@ namespace UAlbion.Config
         public string IdToName(AssetId id)
         {
             var (enumType, enumValue) = IdToEnum(id);
-            return enumType == null
-                ? enumValue == 0 ? "None" : $"{id.Type}.{id.Id}"
-                : enumType.Name + "." + Enum.GetName(enumType, enumValue);
+            if(enumType == null)
+                return enumValue == 0 ? "None" : $"{id.Type}.{id.Id}";
+
+            var enumName = Enum.GetName(enumType, enumValue);
+            if (!string.IsNullOrEmpty(enumName))
+                return enumType.Name + "." + enumName;
+
+            return $"{enumType.Name}.{enumValue}";
         }
 
         /// <summary>

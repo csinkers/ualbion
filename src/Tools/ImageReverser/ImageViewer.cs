@@ -324,13 +324,13 @@ namespace UAlbion.Tools.ImageReverser
             var paletteId = PaletteId.FromUInt32(palette.Id);
             if (e.NewValue == CheckState.Checked)
             {
-                asset.PaletteHint = paletteId.Id;
+                asset.Set("PaletteHint", paletteId.Id);
                 // TODO: Uncheck all others
             }
             else
             {
-                if (asset.PaletteHint == paletteId.Id)
-                    asset.PaletteHint = null;
+                if (asset.Get("PaletteHint", 0) == paletteId.Id)
+                    asset.Set<object>("PaletteHint", null);
             }
 
             _core.TriggerAssetChanged(asset);
@@ -346,7 +346,7 @@ namespace UAlbion.Tools.ImageReverser
             {
                 var item = (AlbionPalette)chkListPalettes.Items[index];
                 var paletteId = PaletteId.FromUInt32(item.Id);
-                chkListPalettes.SetItemChecked(index, asset.PaletteHint == paletteId.Id);
+                chkListPalettes.SetItemChecked(index, asset.Get("PaletteHint", 0) == paletteId.Id);
             }
 
             if (chkListPalettes.SelectedIndex != -1)

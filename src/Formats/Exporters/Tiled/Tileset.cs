@@ -137,7 +137,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                 if (x.Flags != 0) properties.Add(Prop("Flags", x.Flags.ToString()));
                 properties.Add(Prop("Layer", x.Layer.ToString()));
                 if (x.Collision != 0) properties.Add(Prop("Passability", ((int)x.Collision).ToString(CultureInfo.InvariantCulture), "int"));
-                properties.Add(Prop("Type", x.Layer.ToString()));
+                properties.Add(Prop("Type", x.Type.ToString()));
                 properties.Add(Prop("Unk7", x.Unk7.ToString(CultureInfo.InvariantCulture), "int"));
                 return properties;
             }

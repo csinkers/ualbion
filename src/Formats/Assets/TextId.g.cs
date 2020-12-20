@@ -73,6 +73,15 @@ namespace UAlbion.Formats.Assets
             return FromDisk(type, diskValue, mapping);
         }
 
+        public static TextId SerdesU16BE(string name, TextId id, AssetType type, AssetMapping mapping, ISerializer s)
+        {
+            if (s == null) throw new ArgumentNullException(nameof(s));
+
+            ushort diskValue = (ushort)id.ToDisk(mapping);
+            diskValue = s.UInt16BE(name, diskValue);
+            return FromDisk(type, diskValue, mapping);
+        }
+
         public readonly AssetType Type => (AssetType)((_value & 0xff00_0000) >> 24);
         public readonly int Id => (int)(_value & 0xffffff);
         public static TextId None => new TextId(AssetType.None);

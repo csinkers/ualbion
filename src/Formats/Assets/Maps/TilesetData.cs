@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Assets.Maps
     {
         public TilesetData(AssetId id) => Id = id;
         public AssetId Id { get; }
-        public bool UseSmallGraphics { get; set; }
+        public bool UseSmallGraphics { get; set; } // Careful if renaming: needs to match up to asset property in assets.json
         public IList<TileData> Tiles { get; } = new List<TileData>();
 
         public static TilesetData Serdes(TilesetData td, ISerializer s, AssetInfo config)
@@ -19,7 +19,7 @@ namespace UAlbion.Formats.Assets.Maps
 
             int tileCount = td?.Tiles.Count ?? (int)(s.BytesRemaining / 8) + 2;
             td ??= new TilesetData(config.AssetId);
-            td.UseSmallGraphics = config.UseSmallGraphics ?? td.UseSmallGraphics;
+            td.UseSmallGraphics = config.Get(nameof(UseSmallGraphics), td.UseSmallGraphics);
 
             td.Tiles.Add(new TileData
             {

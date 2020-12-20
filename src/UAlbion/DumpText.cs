@@ -121,18 +121,14 @@ namespace UAlbion
                 }
             }
 
-            var labIds =
-                    Enumerable.Range(0, 9)
-                        .Concat(Enumerable.Range(101, 25))
-                        .Concat(Enumerable.Range(200, 11))
-                ;
-            foreach(var i in labIds)
+            var labIds = AssetId.EnumerateAll(AssetType.Labyrinth);
+            foreach(var id in labIds)
             {
-                var l = assets.LoadLabyrinthData((Base.LabyrinthData)i);
+                var l = assets.LoadLabyrinthData(id);
                 if (l == null)
                     continue;
 
-                sw.WriteLine($"L{i}");
+                sw.WriteLine($"{id}");
                 for (int j = 0; j < l.FloorAndCeilings.Count; j++)
                 {
                     var fc = l.FloorAndCeilings[j];

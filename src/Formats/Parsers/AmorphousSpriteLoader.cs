@@ -19,6 +19,9 @@ namespace UAlbion.Formats.Parsers
             \)", RegexOptions.IgnorePatternWhitespace);
         static IEnumerable<(int, int)> ParseSpriteSizes(string s)
         {
+            if(s == null)
+                yield break;
+
             var matches = SizesRegex.Matches(s);
             foreach (Match match in matches)
             {
@@ -46,7 +49,7 @@ namespace UAlbion.Formats.Parsers
             if (s.Mode != SerializerMode.Reading) throw new NotImplementedException($"Writing of amorphous sprites is not currently supported");
             ApiUtil.Assert(config.Transposed != true);
 
-            var sizes = ParseSpriteSizes(config.SubSprites);
+            var sizes = ParseSpriteSizes(config.Get<string>("SubSprites", null));
 
             int spriteWidth = 0;
             int currentY = 0;

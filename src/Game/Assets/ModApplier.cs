@@ -70,8 +70,6 @@ namespace UAlbion.Game.Assets
             _modsInReverseDependencyOrder.Clear();
             AssetMapping.Global.Clear();
 
-            LoadMod(config.ResolvePath("$(MODS)"), "Base");
-
             foreach (var mod in Resolve<IGameplaySettings>().ActiveMods)
                 LoadMod(config.ResolvePath("$(MODS)"), mod);
 

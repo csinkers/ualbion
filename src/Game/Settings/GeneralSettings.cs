@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -66,6 +67,8 @@ namespace UAlbion.Game.Settings
                 : new GeneralSettings();
 
             settings._configPath = configPath;
+            if (!settings.ActiveMods.Any())
+                settings.ActiveMods.Add("Base");
             return settings;
         }
 

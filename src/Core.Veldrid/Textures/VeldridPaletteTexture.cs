@@ -6,7 +6,6 @@ namespace UAlbion.Core.Veldrid.Textures
 {
     public class VeldridPaletteTexture : PaletteTexture, IVeldridTexture
     {
-        public PixelFormat Format => PixelFormat.R8_G8_B8_A8_UNorm;
         public TextureType Type => TextureType.Texture2D;
         public override uint FormatSize => 1;
 
@@ -16,7 +15,7 @@ namespace UAlbion.Core.Veldrid.Textures
             if (rf == null) throw new ArgumentNullException(nameof(rf));
             using Texture staging = rf.CreateTexture(new TextureDescription(
                 Width, Height, Depth, MipLevels,
-                ArrayLayers, Format, TextureUsage.Staging, Type));
+                ArrayLayers, Format.ToVeldrid(), TextureUsage.Staging, Type));
 
             staging.Name = Name + "_Staging";
 
@@ -28,7 +27,7 @@ namespace UAlbion.Core.Veldrid.Textures
                     0, 0, 0, Width, Height, 1, 0, 0);
             }
 
-            Texture texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, usage, Type));
+            Texture texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format.ToVeldrid(), usage, Type));
             texture.Name = Name;
             using (CommandList cl = rf.CreateCommandList()) // TODO: Update texture without a dedicated command list to improve perf.
             {

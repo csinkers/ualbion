@@ -7,7 +7,6 @@ namespace UAlbion.Core.Textures
     public abstract class EightBitTexture : ITexture
     {
         readonly byte[] _textureData;
-        public abstract uint FormatSize { get; }
         public uint Width { get; }
         public uint Height { get; }
         public uint Depth => 1;
@@ -19,6 +18,8 @@ namespace UAlbion.Core.Textures
         public bool IsDirty { get; protected set; }
         public IReadOnlyList<SubImage> SubImages => _subImages.AsReadOnly();
         public int SizeInBytes => TextureData.Length;
+        public PixelFormat Format => PixelFormat.EightBit;
+        public uint FormatSize => Format.Size();
         readonly List<SubImage> _subImages = new List<SubImage>();
         public override string ToString() => $"8Bit {Name} ({Width}x{Height}, {_subImages.Count} subimages)";
 

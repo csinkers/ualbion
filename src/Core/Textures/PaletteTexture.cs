@@ -25,6 +25,7 @@ namespace UAlbion.Core.Textures
         public bool IsDirty { get; protected set; }
         protected ReadOnlySpan<uint> TextureData => _textureData;
         public int SizeInBytes => TextureData.Length * sizeof(uint);
+        public PixelFormat Format => PixelFormat.Rgba32;
         public abstract uint FormatSize { get; }
 
         public PaletteTexture(string name, uint[] paletteData)

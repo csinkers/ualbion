@@ -10,21 +10,8 @@ namespace UAlbion.Core.Veldrid.Textures
 {
     public class VeldridMultiTexture : MultiTexture, IVeldridTexture
     {
-        public PixelFormat Format => PixelFormat.R8_G8_B8_A8_UNorm;
         public TextureType Type => TextureType.Texture2D;
-        public override uint FormatSize
-        {
-            get
-            {
-                switch (Format)
-                {
-                    case PixelFormat.R8_G8_B8_A8_UNorm: return 4;
-                    case PixelFormat.R8_UNorm: return 1;
-                    case PixelFormat.R8_UInt: return 1;
-                    default: return 1;
-                }
-            }
-        }
+        public override uint FormatSize => Format.Size();
 
         // TODO: Cleanup
         public Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
@@ -36,7 +23,7 @@ namespace UAlbion.Core.Veldrid.Textures
                 RebuildLayers();
 
             var palette = PaletteManager.Palette.GetCompletePalette();
-            using var staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, TextureUsage.Staging, Type));
+            using var staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format.ToVeldrid(), TextureUsage.Staging, Type));
             staging.Name = "T_" + Name + "_Staging";
 
             Span<uint> toBuffer = stackalloc uint[(int)(Width * Height)];
@@ -71,7 +58,7 @@ namespace UAlbion.Core.Veldrid.Textures
                 {
                 } //*/
 
-            var texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, usage, Type));
+            var texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format.ToVeldrid(), usage, Type));
             texture.Name = "T_" + Name;
 
             using (CommandList cl = rf.CreateCommandList())

@@ -12,6 +12,7 @@ using UAlbion.Core.Visual;
 using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
+using PixelFormat = Veldrid.PixelFormat;
 
 #pragma warning disable CA2213
 namespace UAlbion.Core.Veldrid

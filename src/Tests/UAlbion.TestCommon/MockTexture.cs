@@ -21,7 +21,5 @@ namespace UAlbion.TestCommon
             : base(name, width, height, mipLevels, arrayLayers, pixels, subImages)
         {
         }
-
-        public override uint FormatSize => 1;
     }
 }

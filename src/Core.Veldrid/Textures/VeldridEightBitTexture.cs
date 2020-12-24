@@ -9,15 +9,13 @@ namespace UAlbion.Core.Veldrid.Textures
 {
     public class VeldridEightBitTexture : EightBitTexture, IVeldridTexture
     {
-        public override uint FormatSize => 1;
-        public PixelFormat Format => PixelFormat.R8_UNorm;
         public TextureType Type => TextureType.Texture2D;
 
         public unsafe Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
         {
             if (gd == null) throw new ArgumentNullException(nameof(gd));
             if (rf == null) throw new ArgumentNullException(nameof(rf));
-            using Texture staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, TextureUsage.Staging, Type));
+            using Texture staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format.ToVeldrid(), TextureUsage.Staging, Type));
             staging.Name = "T_" + Name + "_Staging";
 
             ulong offset = 0;
@@ -41,7 +39,7 @@ namespace UAlbion.Core.Veldrid.Textures
                 }
             }
 
-            Texture texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, usage, Type));
+            Texture texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format.ToVeldrid(), usage, Type));
             texture.Name = "T_" + Name;
 
             using (CommandList cl = rf.CreateCommandList())

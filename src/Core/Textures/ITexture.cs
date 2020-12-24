@@ -11,7 +11,7 @@
         bool IsDirty { get; }
         int SubImageCount { get; }
         int SizeInBytes { get; }
-        uint FormatSize { get; }
+        PixelFormat Format { get; }
         SubImage GetSubImageDetails(int subImage);
         void Invalidate();
     }

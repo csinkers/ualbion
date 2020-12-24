@@ -5,13 +5,14 @@ using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api;
 using UAlbion.Core.Textures;
 using Veldrid;
+using PixelFormat = UAlbion.Core.Textures.PixelFormat;
 
 namespace UAlbion.Core.Veldrid.Textures
 {
     public class TrueColorTexture : IVeldridTexture
     {
         public string Name { get; }
-        public PixelFormat Format => PixelFormat.R8_G8_B8_A8_UNorm;
+        public PixelFormat Format => PixelFormat.Rgba32;
         public TextureType Type => TextureType.Texture2D;
         public uint Width { get; }
         public uint Height { get; }
@@ -21,7 +22,7 @@ namespace UAlbion.Core.Veldrid.Textures
         public int SubImageCount => 1;
         public bool IsDirty { get; private set; }
         public int SizeInBytes => (int)(Width * Height * FormatSize);
-        public uint FormatSize => sizeof(uint);
+        public uint FormatSize => Format.Size();
         readonly uint[] _pixelData;
         readonly SubImage _subImage;
 
@@ -75,7 +76,7 @@ namespace UAlbion.Core.Veldrid.Textures
             if (gd == null) throw new ArgumentNullException(nameof(gd));
             if (rf == null) throw new ArgumentNullException(nameof(rf));
 
-            using Texture staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, TextureUsage.Staging, Type));
+            using Texture staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format.ToVeldrid(), TextureUsage.Staging, Type));
             staging.Name = "T_" + Name + "_Staging";
 
             ulong offset = 0;
@@ -99,7 +100,7 @@ namespace UAlbion.Core.Veldrid.Textures
                 }
             }
 
-            Texture texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format, usage, Type));
+            Texture texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format.ToVeldrid(), usage, Type));
             texture.Name = "T_" + Name;
 
             using (CommandList cl = rf.CreateCommandList())

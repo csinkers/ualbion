@@ -4,13 +4,14 @@ using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Core.Textures;
 using Veldrid;
 using Veldrid.ImageSharp;
+using PixelFormat = UAlbion.Core.Textures.PixelFormat;
 
 namespace UAlbion.Core.Veldrid.Textures
 {
     public class ImageSharpTrueColorTexture : IVeldridTexture
     {
         public string Name { get; }
-        public PixelFormat Format => PixelFormat.R8_G8_B8_A8_UNorm;
+        public PixelFormat Format => PixelFormat.Rgba32;
         public TextureType Type => TextureType.Texture2D;
         public uint Width => _texture.Width;
         public uint Height => _texture.Height;

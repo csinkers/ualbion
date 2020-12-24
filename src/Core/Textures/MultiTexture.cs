@@ -69,6 +69,7 @@ namespace UAlbion.Core.Textures
             LogicalSubImages.Add(new LogicalSubImage(0) { W = 1, H = 1, Frames = 1, IsPaletteAnimated = false });
         }
 
+        public PixelFormat Format => PixelFormat.Rgba32;
         public abstract uint FormatSize { get; }
         public string Name { get; }
         public uint Width { get; private set; }

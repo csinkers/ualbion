@@ -14,17 +14,9 @@ namespace UAlbion.PaletteBuilder
     {
         static void Main(string[] args)
         {
-            using var stream = File.OpenRead(@"C:\Depot\bb\ualbion\mods\UATestDev\Assets\3DBCKGR0\1.bmp");
-            using var sr = new BinaryReader(stream);
-            using var s = new GenericBinaryReader(sr, stream.Length, Encoding.ASCII.GetString);
-            var bitmap = Bitmap8Bit.Serdes(null, s);
-
             if (!(args?.Length > 0))
             {
-                Console.WriteLine("Usage: <PaletteSize> [--transparent #] [Directories]");
-                Console.WriteLine("Reads all PNG files from the given directories, then outputs");
-                Console.WriteLine("the unsigned hex RGBA32 values corresponding to the best matching palette found.");
-                Console.WriteLine("Options: transparent - will reserve the given palette index for transparency (i.e. black with opacity 0)");
+                CommandLine.PrintUsage();
                 return;
             }
 
@@ -37,14 +29,19 @@ namespace UAlbion.PaletteBuilder
                 return;
             }
 
-            foreach (var colour in palette.Colours)
-                Console.WriteLine($"{colour:x8}");
+            if (!string.IsNullOrEmpty(options.OutPath))
+                SavePalette(options, palette);
 
-            ConvertAll(options.Directories, palette);
+            if (options.ExportImages)
+                ConvertAll(options.Directories, palette);
         }
 
         static Palette BuildPalette(CommandLine options)
         {
+            Palette basePalette = null;
+            if (!string.IsNullOrEmpty(options.BasePath))
+                basePalette = LoadPalette(options.BasePath);
+
             var context = new MLContext();
             var builder = new PaletteBuilder(context);
             Console.Write("Loading");
@@ -67,15 +64,23 @@ namespace UAlbion.PaletteBuilder
             Console.WriteLine();
             Console.WriteLine();
 
+            if (basePalette != null)
+                builder.RemoveBaseColours(basePalette.Colours, 5.0f / 255);
+
             Console.Write("Building");
-            var palette = builder.Build(options.PaletteSize, options.TransparentIndex);
+            var palette = builder.Build(options.PaletteSize, options.Offset);
             Console.WriteLine();
+
+            if (basePalette != null)
+                for (int i = 0, j = options.BaseOffset; i < basePalette.Size; i++, j++)
+                    palette.Colours[j] = basePalette.Colours[i];
 
             return palette;
         }
 
         static void ConvertAll(IEnumerable<string> directories, Palette palette)
         {
+            Console.Write("Exporting");
             // Convert and re-emit for testing
             foreach (var directory in directories)
             {
@@ -88,8 +93,10 @@ namespace UAlbion.PaletteBuilder
 
                     var pixels = palette.Convert(pixelSpan);
                     WriteBitmap(Path.ChangeExtension(file, "bmp"), palette.Colours, pixels, image.Width);
+                    Console.Write('.');
                 }
             }
+            Console.WriteLine();
         }
 
         static void WriteBitmap(string path, uint[] palette, byte[] pixels, int width)
@@ -98,6 +105,38 @@ namespace UAlbion.PaletteBuilder
             using var bw = new BinaryWriter(stream);
             using var s = new GenericBinaryWriter(bw, Encoding.ASCII.GetBytes);
             Bitmap8Bit.Serdes(new Bitmap8Bit((ushort)width, palette, pixels), s);
+        }
+
+        static Palette LoadPalette(string path)
+        {
+            var bytes = File.ReadAllBytes(path);
+            int count = bytes.Length / 3;
+            var colours = new uint[count];
+            for (int i = 0, j = 0; i < count; i++)
+            {
+                var r = bytes[j++];
+                var g = bytes[j++];
+                var b = bytes[j++];
+                colours[i] = Colour.Pack(r, g, b);
+            }
+
+            return new Palette(colours);
+        }
+
+        static void SavePalette(CommandLine options, Palette palette)
+        {
+            var paletteBytes = new byte[options.Trim ? options.PaletteSize * 3 : palette.Size * 3];
+            int start = options.Trim ? options.Offset : 0;
+            for (int i = start, index = 0; i < palette.Size; i++)
+            {
+                var colour = palette.Colours[i];
+                var (r, g, b) = Colour.Unpack(colour);
+                paletteBytes[index++] = r;
+                paletteBytes[index++] = g;
+                paletteBytes[index++] = b;
+            }
+
+            File.WriteAllBytes(options.OutPath, paletteBytes);
         }
     }
 }

@@ -35,19 +35,19 @@ namespace UAlbion.Formats.Assets
             //-------------\\
             // File Header \\
             //-------------\\
-            var magic = Encoding.ASCII.GetString(s.ByteArray("Magic", Magic, 2));
+            var magic = Encoding.ASCII.GetString(s.ByteArray("Magic", Magic, 2)); // 0
             if (magic != MagicString)
                 throw new FormatException($"Tried to read as bitmap, but incorrect signature \"{magic}\" found (expected BM)");
 
             var sizeOffset = s.Offset;
-            uint size = s.UInt32("Size", 0); // Will patch this at the end when writing
+            uint size = s.UInt32("Size", 0); // 2 Will patch this at the end when writing
             if (s.Mode == SerializerMode.Reading && size > s.BytesRemaining + (s.Offset - initialOffset))
                 throw new FormatException($"Bitmap specified a size of {size}, but the stream only contains {s.BytesRemaining + (s.Offset - initialOffset)} bytes");
 
-            s.UInt16("Reserved1", 0);
-            s.UInt16("Reserved2", 0);
+            s.UInt16("Reserved1", 0); // 6
+            s.UInt16("Reserved2", 0); // 8
             var pixelOffsetOffset = s.Offset;
-            uint pixelOffset = s.UInt32("PixelOffset", 0); // Will patch later when writing
+            uint pixelOffset = s.UInt32("PixelOffset", 0); // A Will patch later when writing
             if (s.Mode == SerializerMode.Reading && pixelOffset > s.BytesRemaining + (s.Offset - initialOffset))
                 throw new FormatException($"Bitmap specified a pixel offset of {pixelOffset}, but the stream only contains {s.BytesRemaining + (s.Offset - initialOffset)} bytes");
 
@@ -55,35 +55,35 @@ namespace UAlbion.Formats.Assets
             // DIB Header \\
             //------------\\
             const uint bitmapInfoHeaderSize = 40;
-            uint headerSize = s.UInt32("HeaderSize", bitmapInfoHeaderSize);
+            uint headerSize = s.UInt32("HeaderSize", bitmapInfoHeaderSize); // E
             if (headerSize != bitmapInfoHeaderSize)
                 throw new FormatException($"Unsupported bitmap header size {headerSize}, expecting {bitmapInfoHeaderSize}.");
 
-            b.Width = s.UInt32("Width", b.Width);
-            b.Height = s.UInt32("Width", b.Height);
-            ushort planes = s.UInt16("Planes", 1);
+            b.Width = s.UInt32("Width", b.Width); // 12
+            b.Height = s.UInt32("Width", b.Height); // 16
+            ushort planes = s.UInt16("Planes", 1); // 1A
             if (planes != 1)
                 throw new FormatException($"Unsupported number of colour planes in bitmap: {planes}, expected 1");
 
-            ushort bpp = s.UInt16("BPP", 8);
+            ushort bpp = s.UInt16("BPP", 8); // 1C
             if (bpp != 8)
                 throw new FormatException($"Unsupported colour depth: {bpp} bits per pixel, expected 8");
 
-            Compression compression = s.EnumU32("Compression", Compression.Rgb);
+            Compression compression = s.EnumU32("Compression", Compression.Rgb); // 1E
             if (compression != Compression.Rgb)
                 throw new FormatException($"Unsupported compression method {compression}, expected RGB (0)");
 
-            s.UInt32("ImageSize", 0); // Dummy value for RGB bitmaps
-            int widthPixelsPerMetre = s.Int32("HorizontalResolution", 3779);
-            int heightPixelsPerMetre = s.Int32("VerticalResolution", 3779);
-            uint paletteSize = s.UInt32("PaletteSize", 256);
+            s.UInt32("ImageSize", 0); // 22 Dummy value for RGB bitmaps
+            int widthPixelsPerMetre = s.Int32("HorizontalResolution", 3779); // 26
+            int heightPixelsPerMetre = s.Int32("VerticalResolution", 3779); // 2A
+            uint paletteSize = s.UInt32("PaletteSize", (uint)b.Palette.Count); // 2E
             if (paletteSize != 256)
                 throw new FormatException($"Unsupported palette size {paletteSize}, expected 256");
 
-            s.UInt32("ImportantColours", 0); // Ignored
+            s.UInt32("ImportantColours", 0); // 32 Ignored
 
             //---------\\
-            // Palette \\
+            // Palette \\ // 36
             //---------\\
             b.Palette = s.List("Palette", b.Palette, (int)paletteSize, (n, x, s2) =>
             {

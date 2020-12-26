@@ -25,7 +25,6 @@ namespace UAlbion.Game.Veldrid.Audio
         readonly ManualResetEvent _doneEvent = new ManualResetEvent(false);
         readonly object _syncRoot = new object();
 
-        SongId? _activeSongId;
         StreamingAudioSource _music;
         AlbionMusicGenerator _musicGenerator;
         AmbientSoundPlayer _ambientPlayer;
@@ -167,7 +166,7 @@ namespace UAlbion.Game.Veldrid.Audio
 
         void PlayMusic(SongId songId)
         {
-            if (songId == _activeSongId)
+            if (_musicGenerator?.SongId == songId)
                 return;
 
             lock (_syncRoot)
@@ -185,7 +184,6 @@ namespace UAlbion.Game.Veldrid.Audio
                 };
 
                 _music.Play();
-                _activeSongId = songId;
             }
         }
 
@@ -198,19 +196,23 @@ namespace UAlbion.Game.Veldrid.Audio
             }
         }
 
-        void StopAmbient() => _ambientPlayer?.Remove();
+        void StopAmbient()
+        {
+            CoreUtil.LogInfo($"Stopping ambient playback ({_ambientPlayer?.SongId})");
+            _ambientPlayer?.Remove();
+        }
 
         void StopMusic()
         {
             if (_music == null)
                 return;
 
+            CoreUtil.LogInfo($"Stopping music playback of {_musicGenerator.SongId}");
             _music.Stop();
             _music.Dispose();
             _musicGenerator.Remove();
             _music = null;
             _musicGenerator = null;
-            _activeSongId = null;
         }
 
         void StopAll()

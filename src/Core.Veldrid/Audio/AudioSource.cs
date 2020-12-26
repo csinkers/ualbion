@@ -16,9 +16,9 @@ namespace UAlbion.Core.Veldrid.Audio
             Check();
         }
 
-        public void Play() { AL10.alSourcePlay(Source); Check(); }
-        public void Pause() { AL10.alSourcePause(Source); Check(); }
-        public void Stop() { AL10.alSourceStop(Source); Check(); }
+        public virtual void Play() { AL10.alSourcePlay(Source); Check(); }
+        public virtual void Pause() { AL10.alSourcePause(Source); Check(); }
+        public virtual void Stop() { AL10.alSourceStop(Source); Check(); }
         // public void Rewind() {}
 
         public bool Looping { get => GetInt(AL10.AL_LOOPING) != AL10.AL_FALSE; set => SetInt(AL10.AL_LOOPING, value ? AL10.AL_TRUE : AL10.AL_FALSE); } 

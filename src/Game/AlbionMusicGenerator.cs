@@ -8,10 +8,10 @@ namespace UAlbion.Game
 {
     public class AlbionMusicGenerator : Component, IAudioGenerator
     {
-        readonly SongId _songId;
         MidiPlayer _player;
 
-        public AlbionMusicGenerator(SongId songId) => _songId = songId;
+        public SongId SongId { get; }
+        public AlbionMusicGenerator(SongId songId) => SongId = songId;
 
         protected override void Subscribed()
         {
@@ -25,7 +25,7 @@ namespace UAlbion.Game
                 return;
 
             var assets = Resolve<IAssetManager>();
-            var xmiBytes = assets.LoadSong(_songId);
+            var xmiBytes = assets.LoadSong(SongId);
             if ((xmiBytes?.Length ?? 0) == 0)
                 return;
 

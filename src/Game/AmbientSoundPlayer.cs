@@ -9,15 +9,16 @@ namespace UAlbion.Game
 {
     public class AmbientSoundPlayer : Component
     {
-        readonly SongId _songId;
         readonly NoteHook _hook;
         MidiPlayer _player;
+
+        public SongId SongId { get; }
 
         public AmbientSoundPlayer(SongId songId)
         {
             On<EngineUpdateEvent>(e => Tick(e.DeltaSeconds));
 
-            _songId = songId;
+            SongId = songId;
             _hook = NoteHook;
         }
 
@@ -27,7 +28,7 @@ namespace UAlbion.Game
                 return;
 
             var assets = Resolve<IAssetManager>();
-            var xmiBytes = assets.LoadSong(_songId);
+            var xmiBytes = assets.LoadSong(SongId);
             if ((xmiBytes?.Length ?? 0) == 0)
                 return;
 
@@ -45,7 +46,7 @@ namespace UAlbion.Game
         }
 
         void NoteHook(IntPtr userData, int adlChannel, int note, int instrument, int pressure, double bend) 
-            => Raise(new WaveLibEvent(_songId, instrument, pressure, note));
+            => Raise(new WaveLibEvent(SongId, instrument, pressure, note));
 
         void Tick(float deltaSeconds)
         {

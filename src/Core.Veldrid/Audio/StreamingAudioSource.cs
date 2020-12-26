@@ -12,6 +12,7 @@ namespace UAlbion.Core.Veldrid.Audio
 
         readonly IAudioGenerator _generator;
         readonly AudioBufferInt16Stereo[] _buffers;
+        bool _playing;
 
         public StreamingAudioSource(IAudioGenerator generator)
         {
@@ -29,8 +30,18 @@ namespace UAlbion.Core.Veldrid.Audio
             Check();
         }
 
+        public override void Play() { _playing = true; base.Play(); }
+        public override void Pause() { _playing = false; base.Pause(); }
+        public override void Stop() { _playing = false; base.Stop(); }
+
         public void CycleBuffers() // Must be called periodically if streaming
         {
+            if (State == SourceState.Playing != _playing)
+            {
+                if (_playing) Play();
+                else Pause();
+            }
+
             while (BuffersProcessed > BufferCount / 2)
             {
                 uint[] bufferIds = new uint[1];

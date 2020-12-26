@@ -40,6 +40,7 @@ namespace UAlbion.Core.Veldrid
         bool _vsync = true;
         Vector2? _pendingCursorUpdate;
         GraphicsBackend? _newBackend;
+        DateTime _lastTitleUpdateTime;
 
         internal GraphicsDevice GraphicsDevice { get; private set; }
         internal static RenderDoc RenderDoc => _renderDoc;
@@ -151,6 +152,7 @@ namespace UAlbion.Core.Veldrid
                 if (!_window.Exists)
                     break;
 
+                SetTitle();
                 if (_pendingCursorUpdate.HasValue)
                 {
                     using (PerfTracker.FrameEvent("3 Warping mouse"))
@@ -338,12 +340,21 @@ namespace UAlbion.Core.Veldrid
 
                 GraphicsDevice = VeldridStartup.CreateGraphicsDevice(_window, gdOptions, backend);
                 GraphicsDevice.WaitForIdle();
-                _window.Title = GraphicsDevice.BackendType.ToString();
+                SetTitle();
 
                 Raise(new BackendChangedEvent(GraphicsDevice.IsDepthRangeZeroToOne, GraphicsDevice.IsClipSpaceYInverted));
                 if (!firstCreate)
                     Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.FlipDepthRange));
             }
+        }
+
+        void SetTitle()
+        {
+            if (DateTime.UtcNow - _lastTitleUpdateTime <= TimeSpan.FromSeconds(1)) 
+                return;
+
+            _window.Title = $"{GraphicsDevice.BackendType} ({FrameTimeText})";
+            _lastTitleUpdateTime = DateTime.UtcNow;
         }
 
         void CreateAllObjects()

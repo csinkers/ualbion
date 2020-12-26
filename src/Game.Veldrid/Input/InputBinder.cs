@@ -16,6 +16,7 @@ namespace UAlbion.Game.Veldrid.Input
     {
         class BindingSet : Dictionary<InputMode, IDictionary<KeyBinding, string>> { }
 
+        readonly Func<InputConfig> _configLoader;
         readonly BindingSet _bindings = new BindingSet();
         readonly HashSet<Key> _pressedKeys = new HashSet<Key>();
         MapId _mapId = Base.Map.TestMapIskai;
@@ -24,11 +25,19 @@ namespace UAlbion.Game.Veldrid.Input
         public bool IsCtrlPressed  => _pressedKeys.Contains(Key.ControlLeft) || _pressedKeys.Contains(Key.ControlRight);
         public bool IsShiftPressed  => _pressedKeys.Contains(Key.ShiftLeft) || _pressedKeys.Contains(Key.ShiftRight);
 
-        public InputBinder(InputConfig config)
+        public InputBinder(Func<InputConfig> configLoader)
         {
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            _configLoader = configLoader ?? throw new ArgumentNullException(nameof(configLoader));
             On<InputEvent>(OnInput);
+            On<RebindInputEvent>(_ => Rebind());
             On<LoadMapEvent>(e => _mapId = e.MapId);
+            Rebind();
+        }
+
+        void Rebind()
+        {
+            var config = _configLoader();
+            _bindings.Clear();
 
             foreach (var rawMode in config.Bindings)
             {

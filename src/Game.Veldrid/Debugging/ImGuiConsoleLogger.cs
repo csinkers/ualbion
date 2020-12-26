@@ -67,8 +67,8 @@ namespace UAlbion.Game.Veldrid.Debugging
 
             var window = Resolve<IWindowManager>();
             ImGui.Begin("Console");
-            ImGui.SetWindowPos(Vector2.Zero, ImGuiCond.Always);
-            ImGui.SetWindowSize(new Vector2(window.PixelWidth / 3.0f, window.PixelHeight), ImGuiCond.Always);
+            ImGui.SetWindowPos(Vector2.Zero, ImGuiCond.FirstUseEver);
+            ImGui.SetWindowSize(new Vector2(window.PixelWidth / 3.0f, window.PixelHeight), ImGuiCond.FirstUseEver);
 
             // Reserve enough left-over height for 1 separator + 1 input text
             float footerHeightToReserve = ImGui.GetStyle().ItemSpacing.Y + ImGui.GetFrameHeightWithSpacing();

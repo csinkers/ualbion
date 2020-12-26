@@ -25,6 +25,8 @@ namespace UAlbion.Game.Gui.Controls
             Id = id;
         }
 
+        protected override void Subscribed() => _dirty = true;
+
         protected override void Unsubscribed()
         {
             _sprite?.Dispose();

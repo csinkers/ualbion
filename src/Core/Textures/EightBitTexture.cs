@@ -16,12 +16,13 @@ namespace UAlbion.Core.Textures
         public ReadOnlySpan<byte> TextureData => _textureData;
         public int SubImageCount => _subImages.Count;
         public bool IsDirty { get; protected set; }
-        public IReadOnlyList<SubImage> SubImages => _subImages.AsReadOnly();
+        public IReadOnlyList<SubImage> SubImages { get; }
         public int SizeInBytes => TextureData.Length;
         public PixelFormat Format => PixelFormat.EightBit;
         public uint FormatSize => Format.Size();
-        readonly List<SubImage> _subImages = new List<SubImage>();
         public override string ToString() => $"8Bit {Name} ({Width}x{Height}, {_subImages.Count} subimages)";
+
+        readonly List<SubImage> _subImages = new List<SubImage>();
 
         public EightBitTexture(
             string name,
@@ -38,10 +39,11 @@ namespace UAlbion.Core.Textures
             MipLevels = mipLevels;
             ArrayLayers = arrayLayers;
             _textureData = textureData;
-            if(subImages != null)
-                foreach(var subImage in subImages)
+            if (subImages != null)
+                foreach (var subImage in subImages)
                     _subImages.Add(subImage);
             IsDirty = true;
+            SubImages = _subImages.AsReadOnly();
         }
 
         public bool ContainsColors(IEnumerable<byte> colors) => _textureData.Distinct().Intersect(colors).Any();

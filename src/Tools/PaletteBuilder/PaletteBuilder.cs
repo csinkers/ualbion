@@ -34,6 +34,9 @@ namespace UAlbion.PaletteBuilder
 
         public Palette Build(int size, int offset)
         {
+            Console.WriteLine($"{_counts.Count} distinct colours");
+            Console.Write("Building");
+
             // k-means clustering on unique colours
             var data = _context.Data.LoadFromEnumerable(_counts.Select(x => new PixelData(x.Key, x.Value)),
                 SchemaDefinition.Create(typeof(PixelData)));
@@ -63,10 +66,12 @@ namespace UAlbion.PaletteBuilder
                     values[3] / 255.0f));
             }
 
+            var sorted = temp.OrderBy(x => Colour.ToHsv(x.PackedValue)).ToArray();
+
             var colours = new uint[256];
-            colours[0] = 0;
+            colours[0] = 0xff00ff;
             for (int i = offset, j = 0; i < colours.Length && j < temp.Length; i++, j++)
-                colours[i] = temp[j].PackedValue;
+                colours[i] = sorted[j].PackedValue;
 
             return new Palette(colours);
         }
@@ -87,6 +92,7 @@ namespace UAlbion.PaletteBuilder
                 }
             }
 
+            Console.WriteLine($"Removing {redundantColours.Count} colours matching common palette");
             foreach (var c in redundantColours)
                 _counts.Remove(c);
 

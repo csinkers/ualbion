@@ -105,7 +105,7 @@ namespace UAlbion
                     if (frameFilter != null && !frameFilter(0, palFrame))
                         continue;
                     var path = Path.Combine(directory, $"{assetId.Id}_{palFrame}_{assetId}");
-                    var image = tilemap.ToImage(null, palette.GetPaletteAtTime(palFrame));
+                    var image = tilemap.ToImage(palette.GetPaletteAtTime(palFrame));
                     Save(image, path, formats, filenames);
                 }
             }

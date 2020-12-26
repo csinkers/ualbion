@@ -55,6 +55,11 @@ namespace UAlbion.Api
         public static long Gcd(long a, long b) => b == 0 ? a : Gcd(b, a % b);
 
         /// <summary>
+        /// Find the nearest power of two that is greater than or equal to the given value.
+        /// </summary>
+        public static int NextPowerOfTwo(int x) => (int)Math.Pow(2.0, Math.Ceiling(Math.Log(x, 2.0)));
+
+        /// <summary>
         /// Rotate the given 8-bit image 90 degrees clockwise.
         /// </summary>
         /// <param name="width"></param>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
@@ -111,12 +112,10 @@ namespace UAlbion.Game.Assets
 
         static (int, int) GetAtlasSize(int tileWidth, int tileHeight, int count)
         {
-            int NextPowerOfTwo(int x) => (int)Math.Pow(2.0, Math.Ceiling(Math.Log(x, 2.0)));
-
             int tilesPerRow = (int)Math.Ceiling(Math.Sqrt(count));
-            int width = NextPowerOfTwo(tileWidth * tilesPerRow);
+            int width = ApiUtil.NextPowerOfTwo(tileWidth * tilesPerRow);
             int requiredHeight = tileHeight * ((count + tilesPerRow - 1) / tilesPerRow);
-            int height = NextPowerOfTwo(requiredHeight);
+            int height = ApiUtil.NextPowerOfTwo(requiredHeight);
             return (width, height);
         }
     }

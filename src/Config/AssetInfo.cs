@@ -3,6 +3,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+#pragma warning disable CA2227 // Collection properties should be read only
 namespace UAlbion.Config
 {
     public class AssetInfo
@@ -53,3 +54,4 @@ namespace UAlbion.Config
         public JToken GetRaw(string propertyName) => Properties != null && Properties.TryGetValue(propertyName, out var token) ? token : null;
     }
 }
+#pragma warning restore CA2227 // Collection properties should be read only

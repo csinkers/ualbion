@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Microsoft.ML;
 using SerdesNet;
@@ -21,6 +22,12 @@ namespace UAlbion.PaletteBuilder
             }
 
             var options = new CommandLine(args);
+            if(options.Directories?.Any() != true)
+            {
+                Console.WriteLine("No directories supplied.");
+                return;
+            }
+
             var palette = BuildPalette(options);
 
             if (palette == null)
@@ -29,8 +36,7 @@ namespace UAlbion.PaletteBuilder
                 return;
             }
 
-            if (!string.IsNullOrEmpty(options.OutPath))
-                SavePalette(options, palette);
+            SavePalette(options, palette);
 
             if (options.ExportImages)
                 ConvertAll(options.Directories, palette);
@@ -65,9 +71,8 @@ namespace UAlbion.PaletteBuilder
             Console.WriteLine();
 
             if (basePalette != null)
-                builder.RemoveBaseColours(basePalette.Colours, 5.0f / 255);
+                builder.RemoveBaseColours(basePalette.Colours, 10.0f / 255);
 
-            Console.Write("Building");
             var palette = builder.Build(options.PaletteSize, options.Offset);
             Console.WriteLine();
 
@@ -125,18 +130,27 @@ namespace UAlbion.PaletteBuilder
 
         static void SavePalette(CommandLine options, Palette palette)
         {
-            var paletteBytes = new byte[options.Trim ? options.PaletteSize * 3 : palette.Size * 3];
             int start = options.Trim ? options.Offset : 0;
-            for (int i = start, index = 0; i < palette.Size; i++)
+            if (!string.IsNullOrEmpty(options.OutPath))
             {
-                var colour = palette.Colours[i];
-                var (r, g, b) = Colour.Unpack(colour);
-                paletteBytes[index++] = r;
-                paletteBytes[index++] = g;
-                paletteBytes[index++] = b;
+                var paletteBytes = new byte[options.Trim ? options.PaletteSize * 3 : palette.Size * 3];
+                for (int i = start, index = 0; i < palette.Size; i++)
+                {
+                    var colour = palette.Colours[i];
+                    var (r, g, b) = Colour.Unpack(colour);
+                    paletteBytes[index++] = r;
+                    paletteBytes[index++] = g;
+                    paletteBytes[index++] = b;
+                }
+
+                File.WriteAllBytes(options.OutPath, paletteBytes);
             }
 
-            File.WriteAllBytes(options.OutPath, paletteBytes);
+            if (!string.IsNullOrEmpty(options.BitmapPath))
+            {
+                var pixels = Enumerable.Range(start, palette.Colours.Length - start).Select(x => (byte) x).ToArray();
+                WriteBitmap(options.BitmapPath, palette.Colours, pixels, 16);
+            }
         }
     }
 }

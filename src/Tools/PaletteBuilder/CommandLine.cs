@@ -10,6 +10,7 @@ namespace UAlbion.PaletteBuilder
         public int Offset { get; }
         public string[] Directories { get; }
         public string OutPath { get; }
+        public string BitmapPath { get; }
         public string BasePath { get; }
         public int BaseOffset { get; }
         public bool ExportImages { get; }
@@ -43,6 +44,12 @@ namespace UAlbion.PaletteBuilder
                     if (args.Length == i) { Console.WriteLine("Missing output path parameter"); return; } 
                     i++;
                     OutPath = args[i];
+                }
+                else if (path.Equals("--outbmp", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (args.Length == i) { Console.WriteLine("Missing output bitmap path parameter"); return; } 
+                    i++;
+                    BitmapPath = args[i];
                 }
                 else if (path.Equals("--base", StringComparison.OrdinalIgnoreCase))
                 {
@@ -91,6 +98,7 @@ namespace UAlbion.PaletteBuilder
             Console.WriteLine();
             Console.WriteLine("Options:"); 
             Console.WriteLine(" --out        Set the output file for the raw palette colours");
+            Console.WriteLine(" --outbmp     Set the output file for a bitmap of the palette colours");
             Console.WriteLine(" --size       Set the palette size (defaults to 256)");
             Console.WriteLine(" --offset     Start the palette at the given index, padding all prior entries with zeroes");
             Console.WriteLine(" --base       Use the given palette file as a starting point, only the zeroed out entries will be calculated for the new palette");

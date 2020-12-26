@@ -2,6 +2,8 @@
 using System.Numerics;
 using OpenAL;
 
+// "Stop" is a keyword in Visual Basic, but VB compatibility is not a concern.
+#pragma warning disable CA1716 // Identifiers should not match keywords
 namespace UAlbion.Core.Veldrid.Audio
 {
     public abstract class AudioSource : AudioObject, IDisposable
@@ -84,3 +86,4 @@ namespace UAlbion.Core.Veldrid.Audio
         #endregion
     }
 }
+#pragma warning restore CA1716 // Identifiers should not match keywords

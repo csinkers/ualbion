@@ -7,20 +7,20 @@ namespace UAlbion.Core.Textures
         /// <summary>
         /// Single-channel, 8-bit unsigned normalized integer.
         /// </summary>
-        [PixelFormatBits(8)]
+        [PixelFormatBytes(1)]
         EightBit,
         /// <summary>
         /// RGBA component order. Each component is an 8-bit unsigned normalized integer.
         /// </summary>
-        [PixelFormatBits(32)]
+        [PixelFormatBytes(4)]
         Rgba32,
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class PixelFormatBitsAttribute : Attribute
+    public class PixelFormatBytesAttribute : Attribute
     {
-        public uint Bits { get; }
-        public PixelFormatBitsAttribute(uint bits) => Bits = bits;
+        public uint Bytes { get; }
+        public PixelFormatBytesAttribute(uint bytes) => Bytes = bytes;
     }
 
     public static class PixelFormatExtensions
@@ -32,9 +32,9 @@ namespace UAlbion.Core.Textures
             foreach(var info in memberInfos)
             {
                 if (info.DeclaringType != enumType) continue;
-                var attribs = info.GetCustomAttributes(typeof(PixelFormatBitsAttribute), false);
+                var attribs = info.GetCustomAttributes(typeof(PixelFormatBytesAttribute), false);
                 if(attribs.Length > 0)
-                    return ((PixelFormatBitsAttribute)attribs[0]).Bits;
+                    return ((PixelFormatBytesAttribute)attribs[0]).Bytes;
             }
             throw new InvalidOperationException($"Could not obtain size of pixel format {format} ({(int)format}), it either does not exist or is missing a PixelFormatBits attribute.");
         }

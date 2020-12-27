@@ -118,6 +118,7 @@ namespace UAlbion.Core
                new Span<byte>(rotatedPixels));
 
             return factory.CreateEightBitTexture(
+                texture.Id,
                 texture.Name + "Rotated",
                 texture.Height, texture.Width,
                 texture.MipLevels, texture.ArrayLayers,

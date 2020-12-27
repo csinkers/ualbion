@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using UAlbion.Api;
 using UAlbion.Core.Textures;
 
 namespace UAlbion.Core
 {
     public interface ICoreFactory
     {
-        MultiTexture CreateMultiTexture(string name, IPaletteManager paletteManager);
+        MultiTexture CreateMultiTexture(ITextureId id, string name, IPaletteManager paletteManager);
         IDisposable CreateRenderDebugGroup(IRendererContext context, string name);
         ITexture CreateEightBitTexture(
+            ITextureId id,
             string name,
             uint width,
             uint height,
@@ -17,7 +19,7 @@ namespace UAlbion.Core
             byte[] pixels,
             IEnumerable<SubImage> subImages);
 
-        PaletteTexture CreatePaletteTexture(string name, uint[] colours);
+        PaletteTexture CreatePaletteTexture(ITextureId id, string name, uint[] colours);
         ISceneGraph CreateSceneGraph();
     }
 }

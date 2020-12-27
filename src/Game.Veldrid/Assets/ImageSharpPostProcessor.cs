@@ -13,6 +13,6 @@ namespace UAlbion.Game.Veldrid.Assets
     {
         public IEnumerable<Type> SupportedTypes => new[] { typeof(Image<Rgba32>) };
         public object Process(ICoreFactory factory, AssetId key, object asset)
-            => new ImageSharpTrueColorTexture(key.ToString(), (Image<Rgba32>)asset);
+            => new ImageSharpTrueColorTexture(key, key.ToString(), (Image<Rgba32>)asset);
     }
 }

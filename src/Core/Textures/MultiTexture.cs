@@ -59,10 +59,11 @@ namespace UAlbion.Core.Textures
         uint _lastPaletteId;
         bool _isDirty;
 
-        public MultiTexture(string name, IPaletteManager paletteManager)
+        public MultiTexture(ITextureId id, string name, IPaletteManager paletteManager)
         {
-            PaletteManager = paletteManager;
+            Id = id;
             Name = name;
+            PaletteManager = paletteManager;
             MipLevels = 1; //(uint)Math.Min(Math.Log(Width, 2.0), Math.Log(Height, 2.0));
 
             // Add empty texture for disabled walls/ceilings etc
@@ -71,6 +72,7 @@ namespace UAlbion.Core.Textures
 
         public PixelFormat Format => PixelFormat.Rgba32;
         public abstract uint FormatSize { get; }
+        public ITextureId Id { get; }
         public string Name { get; }
         public uint Width { get; private set; }
         public uint Height { get; private set; }

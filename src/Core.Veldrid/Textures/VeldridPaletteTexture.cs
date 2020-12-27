@@ -1,4 +1,5 @@
 ﻿using System;
+using UAlbion.Api;
 using UAlbion.Core.Textures;
 using Veldrid;
 
@@ -41,6 +42,6 @@ namespace UAlbion.Core.Veldrid.Textures
             return texture;
         }
 
-        public VeldridPaletteTexture(string name, uint[] paletteData) : base(name, paletteData) { }
+        public VeldridPaletteTexture(ITextureId id, string name, uint[] paletteData) : base(id, name, paletteData) { }
     }
 }

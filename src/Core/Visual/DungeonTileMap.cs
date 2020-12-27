@@ -8,7 +8,7 @@ namespace UAlbion.Core.Visual
 {
     public class DungeonTileMap : IRenderable
     {
-        public DungeonTileMap(string name, DrawLayer renderOrder, Vector3 tileSize, uint width, uint height, ICoreFactory factory, IPaletteManager paletteManager)
+        public DungeonTileMap(ITextureId id, string name, DrawLayer renderOrder, Vector3 tileSize, uint width, uint height, ICoreFactory factory, IPaletteManager paletteManager)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
             if (paletteManager == null) throw new ArgumentNullException(nameof(paletteManager));
@@ -17,8 +17,8 @@ namespace UAlbion.Core.Visual
             Width = width;
             Height = height;
             _tiles = new DungeonTile[width * height];
-            Floors = factory.CreateMultiTexture("FloorTiles:" + name, paletteManager);
-            Walls = factory.CreateMultiTexture("WallTiles:" + name, paletteManager);
+            Floors = factory.CreateMultiTexture(id, "FloorTiles:" + name, paletteManager);
+            Walls = factory.CreateMultiTexture(id, "WallTiles:" + name, paletteManager);
         }
 
         readonly DungeonTile[] _tiles;

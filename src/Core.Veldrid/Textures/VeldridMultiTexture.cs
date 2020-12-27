@@ -104,7 +104,7 @@ namespace UAlbion.Core.Veldrid.Textures
             image.SaveAsPng(stream);
         }
 
-        public VeldridMultiTexture(string name, IPaletteManager paletteManager) : base(name, paletteManager)
+        public VeldridMultiTexture(ITextureId id, string name, IPaletteManager paletteManager) : base(id, name, paletteManager)
         {
         }
     }

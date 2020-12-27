@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using UAlbion.Api;
 using UAlbion.Core.Textures;
 using Veldrid;
 using Veldrid.ImageSharp;
@@ -10,6 +11,7 @@ namespace UAlbion.Core.Veldrid.Textures
 {
     public class ImageSharpTrueColorTexture : IVeldridTexture
     {
+        public ITextureId Id { get; }
         public string Name { get; }
         public PixelFormat Format => PixelFormat.Rgba32;
         public TextureType Type => TextureType.Texture2D;
@@ -25,8 +27,9 @@ namespace UAlbion.Core.Veldrid.Textures
         readonly ImageSharpTexture _texture;
         readonly SubImage _subImage;
 
-        public ImageSharpTrueColorTexture(string name, Image<Rgba32> image)
+        public ImageSharpTrueColorTexture(ITextureId id, string name, Image<Rgba32> image)
         {
+            Id = id;
             Name = name;
             ImageSharpTexture imageSharpTexture = new ImageSharpTexture(image, false);
             _texture = imageSharpTexture;

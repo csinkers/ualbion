@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Numerics;
 using BenchmarkDotNet.Attributes;
+using UAlbion.Config;
 using UAlbion.Core.Textures;
 using UAlbion.TestCommon;
 
@@ -12,33 +13,33 @@ namespace UAlbion.Benchmarks
         const int N = 1000;
         const int Dimensions = 256;
         static readonly MockPaletteManager _paletteManager = new MockPaletteManager();
-        static readonly MockTexture _black = new MockTexture(
+        static readonly MockTexture _black = new MockTexture(AssetId.None, 
                 "Black",
                 Dimensions,
                 Dimensions,
                 Enumerable.Repeat((byte)0, Dimensions * Dimensions).ToArray(),
                 new[] { new SubImage(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
 
-        static readonly MockTexture _white = new MockTexture(
+        static readonly MockTexture _white = new MockTexture(AssetId.None, 
                 "Black",
                 Dimensions,
                 Dimensions,
                 Enumerable.Repeat((byte)255, Dimensions * Dimensions).ToArray(),
                 new[] { new SubImage(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
 
-        readonly MockMultiTexture _opaqueUniform = new MockMultiTexture("OpaqueUniform", _paletteManager);
-        readonly MockMultiTexture _opaqueRandom = new MockMultiTexture("OpaqueRandom", _paletteManager);
-        readonly MockMultiTexture _transparentUniform = new MockMultiTexture("TransparentUniform", _paletteManager);
-        readonly MockMultiTexture _transparentRandom = new MockMultiTexture("TransparentRandom", _paletteManager);
+        readonly MockMultiTexture _opaqueUniform = new MockMultiTexture(AssetId.None, "OpaqueUniform", _paletteManager);
+        readonly MockMultiTexture _opaqueRandom = new MockMultiTexture(AssetId.None, "OpaqueRandom", _paletteManager);
+        readonly MockMultiTexture _transparentUniform = new MockMultiTexture(AssetId.None, "TransparentUniform", _paletteManager);
+        readonly MockMultiTexture _transparentRandom = new MockMultiTexture(AssetId.None, "TransparentRandom", _paletteManager);
         public Blitting()
         {
             _paletteManager.Palette = new MockPalette();
-            _paletteManager.PaletteTexture = new MockPaletteTexture("Mock", _paletteManager.Palette.GetPaletteAtTime(0));
+            _paletteManager.PaletteTexture = new MockPaletteTexture(AssetId.None, "Mock", _paletteManager.Palette.GetPaletteAtTime(0));
 
             var r = new Random();
             var randomBuffer = new byte[Dimensions * Dimensions];
             r.NextBytes(randomBuffer);
-            var random = new MockTexture(
+            var random = new MockTexture(AssetId.None, 
                 "Random",
                 Dimensions,
                 Dimensions,

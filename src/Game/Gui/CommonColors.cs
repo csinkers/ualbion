@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Formats.Assets;
@@ -22,8 +23,9 @@ namespace UAlbion.Game.Gui
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
             BorderTexture = factory.CreateEightBitTexture(
+                AssetId.None,
                 "CommonColors",
-                1, 1, 1, (uint) Palette.Count,
+                1, 1, 1, (uint)Palette.Count,
                 Palette.OrderBy(x => x.Value).Select(x => (byte)x.Key).ToArray(),
                 Palette.OrderBy(x => x.Value)
                     .Select(x => new SubImage(Vector2.Zero, Vector2.One, Vector2.One, x.Value))

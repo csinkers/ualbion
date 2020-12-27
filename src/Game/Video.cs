@@ -65,6 +65,7 @@ namespace UAlbion.Game
             _player = flic.Play(buffer);
 
             _texture = Resolve<ICoreFactory>().CreateEightBitTexture(
+                _id,
                 $"V:{_id}",
                 flic.Width, flic.Height,
                 1, 1,

@@ -15,7 +15,7 @@ namespace UAlbion.Game.Veldrid.Assets
         {
             if (asset == null) throw new ArgumentNullException(nameof(asset));
             var bitmap = (InterlacedBitmap)asset;
-            return new TrueColorTexture(
+            return new TrueColorTexture(key,
                 key.ToString(), (uint)bitmap.Width, (uint)bitmap.Height,
                 bitmap.Palette, bitmap.ImageData);
         }

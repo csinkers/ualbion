@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UAlbion.Api;
 
 namespace UAlbion.Core.Textures
 {
     public abstract class EightBitTexture : ITexture
     {
         readonly byte[] _textureData;
+
+        public ITextureId Id { get; }
+        public string Name { get; }
         public uint Width { get; }
         public uint Height { get; }
         public uint Depth => 1;
         public uint MipLevels { get; }
         public uint ArrayLayers { get; }
-        public string Name { get; }
         public ReadOnlySpan<byte> TextureData => _textureData;
         public int SubImageCount => _subImages.Count;
         public bool IsDirty { get; protected set; }
@@ -25,6 +28,7 @@ namespace UAlbion.Core.Textures
         readonly List<SubImage> _subImages = new List<SubImage>();
 
         public EightBitTexture(
+            ITextureId id,
             string name,
             uint width,
             uint height,
@@ -33,6 +37,7 @@ namespace UAlbion.Core.Textures
             byte[] textureData,
             IEnumerable<SubImage> subImages)
         {
+            Id = id;
             Name = name;
             Width = width;
             Height = height;

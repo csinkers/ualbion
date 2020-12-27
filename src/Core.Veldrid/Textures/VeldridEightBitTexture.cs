@@ -56,9 +56,10 @@ namespace UAlbion.Core.Veldrid.Textures
             return texture;
         }
 
-        public VeldridEightBitTexture(string name, uint width, uint height, uint mipLevels, uint arrayLayers,
+        public VeldridEightBitTexture(ITextureId id, string name,
+            uint width, uint height, uint mipLevels, uint arrayLayers,
             byte[] textureData, IEnumerable<SubImage> subImages)
-            : base(name, width, height, mipLevels, arrayLayers, textureData, subImages)
+            : base(id, name, width, height, mipLevels, arrayLayers, textureData, subImages)
         {
         }
 

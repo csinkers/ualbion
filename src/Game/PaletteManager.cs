@@ -21,7 +21,7 @@ namespace UAlbion.Game
             On<LoadRawPaletteEvent>(e =>
             {
                 Palette = null;
-                GeneratePalette(e.Name, e.Entries);
+                GeneratePalette(PaletteId.None, e.Name, e.Entries);
             });
         }
 
@@ -41,7 +41,7 @@ namespace UAlbion.Game
             while (Frame >= Palette.GetCompletePalette().Count)
                 Frame -= Palette.GetCompletePalette().Count;
 
-            GeneratePalette(Palette.Name, Palette.GetPaletteAtTime(Frame));
+            GeneratePalette(PaletteId.FromUInt32(Palette.Id), Palette.Name, Palette.GetPaletteAtTime(Frame));
         }
 
         void SetPalette(PaletteId paletteId)
@@ -57,13 +57,13 @@ namespace UAlbion.Game
             while (Frame >= Palette.GetCompletePalette().Count)
                 Frame -= Palette.GetCompletePalette().Count;
 
-            GeneratePalette(Palette.Name, Palette.GetPaletteAtTime(Frame));
+            GeneratePalette(paletteId, Palette.Name, Palette.GetPaletteAtTime(Frame));
         }
 
-        void GeneratePalette(string name, uint[] rawPalette)
+        void GeneratePalette(PaletteId id, string name, uint[] rawPalette)
         {
             var factory = Resolve<ICoreFactory>();
-            PaletteTexture = factory.CreatePaletteTexture(name, rawPalette);
+            PaletteTexture = factory.CreatePaletteTexture(id, name, rawPalette);
             Version++;
         }
     }

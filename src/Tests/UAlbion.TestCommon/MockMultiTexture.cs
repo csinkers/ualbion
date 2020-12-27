@@ -1,4 +1,5 @@
 ﻿using System;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
 
@@ -6,7 +7,7 @@ namespace UAlbion.TestCommon
 {
     public class MockMultiTexture : MultiTexture
     {
-        public MockMultiTexture(string name, IPaletteManager paletteManager) : base(name, paletteManager)
+        public MockMultiTexture(ITextureId id, string name, IPaletteManager paletteManager) : base(id, name, paletteManager)
         {
         }
 

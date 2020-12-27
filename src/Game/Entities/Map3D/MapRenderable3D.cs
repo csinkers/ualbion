@@ -48,7 +48,7 @@ namespace UAlbion.Game.Entities.Map3D
                 return;
 
             var assets = Resolve<IAssetManager>();
-            _tilemap = new DungeonTileMap(
+            _tilemap = new DungeonTileMap(_mapId, 
                 _mapId.ToString(),
                 DrawLayer.Background,
                 _tileSize,

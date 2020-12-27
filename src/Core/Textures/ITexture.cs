@@ -1,7 +1,10 @@
-﻿namespace UAlbion.Core.Textures
+﻿using UAlbion.Api;
+
+namespace UAlbion.Core.Textures
 {
     public interface ITexture
     {
+        ITextureId Id { get; }
         string Name { get; }
         uint Width { get; }
         uint Height { get; }

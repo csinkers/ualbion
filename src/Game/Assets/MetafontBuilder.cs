@@ -22,9 +22,10 @@ namespace UAlbion.Game.Assets
         public ITexture Build(MetaFontId id)
         {
             var assets = Resolve<IAssetManager>();
-            var texture = (EightBitTexture)(id.IsBold
-                ? assets.LoadTexture(Base.Font.BoldFont) ?? throw new InvalidOperationException("MetafontBuilder: Could not load bold font.")
-                : assets.LoadTexture(Base.Font.RegularFont) ?? throw new InvalidOperationException("MetafontBuilder: Could not load regular font."));
+            var textureId = (SpriteId)(id.IsBold ? Base.Font.BoldFont : Base.Font.RegularFont);
+            var texture = (EightBitTexture)assets.LoadTexture(textureId);
+            if (texture == null)
+                throw new InvalidOperationException($"MetafontBuilder: Could not load font {textureId}");
 
             var bytes = texture.TextureData.ToArray();
             if (!Mappings.TryGetValue(id.Color, out var mapping))
@@ -39,6 +40,7 @@ namespace UAlbion.Game.Assets
             }
 
             return _factory.CreateEightBitTexture(
+                textureId,
                 $"Font{id.Color}{(id.IsBold ? "Bold" : "")}",
                 texture.Width, texture.Height,
                 texture.MipLevels, texture.ArrayLayers,

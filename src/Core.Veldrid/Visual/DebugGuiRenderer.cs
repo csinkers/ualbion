@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UAlbion.Api;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
+using UAlbion.Core.Visual;
 using Veldrid;
 
 namespace UAlbion.Core.Veldrid.Visual

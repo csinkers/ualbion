@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Core.Textures
+﻿using UAlbion.Core.Visual;
+
+namespace UAlbion.Core.Textures
 {
     public interface ITextureManager : IComponent
     {

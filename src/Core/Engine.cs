@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Core
+﻿using UAlbion.Core.Visual;
+
+namespace UAlbion.Core
 {
     public abstract class Engine : ServiceComponent<IEngine>, IEngine
     {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UAlbion.Api;
 using UAlbion.Core.Textures;
+using UAlbion.Core.Visual;
 
 namespace UAlbion.Core
 {

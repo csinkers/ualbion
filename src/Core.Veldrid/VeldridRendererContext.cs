@@ -2,6 +2,7 @@
 using UAlbion.Api;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Veldrid.Textures;
+using UAlbion.Core.Visual;
 using Veldrid;
 
 namespace UAlbion.Core.Veldrid

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
 
-namespace UAlbion.Core
+namespace UAlbion.Core.Visual
 {
 #pragma warning disable CA1051 // Do not declare visible instance fields
     // ReSharper disable CompareOfFloatsByEqualityOperator

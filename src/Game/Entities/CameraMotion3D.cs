@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Core.Visual;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities

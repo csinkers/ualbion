@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
 
-namespace UAlbion.Core
+namespace UAlbion.Core.Visual
 {
 #pragma warning disable CA1051 // Do not declare visible instance fields
     [StructLayout(LayoutKind.Sequential)]

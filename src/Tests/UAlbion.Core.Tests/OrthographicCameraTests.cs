@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using UAlbion.Core.Visual;
 using UAlbion.TestCommon;
 using Xunit;
 

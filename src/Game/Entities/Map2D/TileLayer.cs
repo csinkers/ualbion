@@ -86,7 +86,6 @@ namespace UAlbion.Game.Entities.Map2D
             var instance = SpriteInstanceData.TopLeft(position, subImage.Size, subImage, 0);
 
             var zone = _logicalMap.GetZone(index);
-            var triggers = zone?.Trigger ?? 0;
             int eventNum = zone?.Node?.Id ?? -1;
 
             instance.Flags = 0

@@ -1,6 +1,6 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion.Core
+namespace UAlbion.Core.Visual
 {
     public interface IRenderable
     {

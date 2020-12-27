@@ -3,7 +3,7 @@ using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core.Events;
 
-namespace UAlbion.Core
+namespace UAlbion.Core.Visual
 {
     public class PerspectiveCamera : ServiceComponent<ICamera>, ICamera
     {

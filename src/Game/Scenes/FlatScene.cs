@@ -1,4 +1,5 @@
 ﻿using UAlbion.Core;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;

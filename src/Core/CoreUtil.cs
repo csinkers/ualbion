@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Threading;
 using UAlbion.Api;
 using UAlbion.Core.Textures;
+using UAlbion.Core.Visual;
 
 namespace UAlbion.Core
 {

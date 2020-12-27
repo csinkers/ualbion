@@ -1,7 +1,7 @@
 ﻿using System;
 using UAlbion.Api;
-using UAlbion.Core;
 using UAlbion.Core.Textures;
+using UAlbion.Core.Visual;
 
 namespace UAlbion.TestCommon
 {

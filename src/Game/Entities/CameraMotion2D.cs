@@ -3,6 +3,7 @@ using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;

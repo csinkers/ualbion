@@ -5,6 +5,7 @@ using System.Text;
 using UAlbion.Api;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
+using UAlbion.Core.Visual;
 using Veldrid;
 
 namespace UAlbion.Core.Veldrid.Textures

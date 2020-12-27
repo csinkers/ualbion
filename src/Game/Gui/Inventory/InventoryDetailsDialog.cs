@@ -5,7 +5,6 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
-using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Inventory
 {

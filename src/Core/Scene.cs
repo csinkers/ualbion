@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Core.Events;
+using UAlbion.Core.Visual;
 
 namespace UAlbion.Core
 {

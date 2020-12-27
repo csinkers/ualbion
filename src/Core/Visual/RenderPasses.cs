@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UAlbion.Core
+namespace UAlbion.Core.Visual
 {
     [Flags]
     public enum RenderPasses

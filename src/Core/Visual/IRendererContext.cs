@@ -1,6 +1,6 @@
 ﻿using UAlbion.Core.Textures;
 
-namespace UAlbion.Core
+namespace UAlbion.Core.Visual
 {
     public interface IRendererContext
     {

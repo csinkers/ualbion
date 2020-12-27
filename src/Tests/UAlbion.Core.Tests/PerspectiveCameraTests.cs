@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using UAlbion.Core.Events;
+using UAlbion.Core.Visual;
 using UAlbion.TestCommon;
 using Xunit;
 

@@ -88,20 +88,14 @@ namespace UAlbion.Core
 
         void Collect(List<Handler> subscribers, Type eventType) // Must be called from inside lock(_syncRoot)!
         {
-            var interfaces = eventType.GetInterfaces();
-            if (_subscriptions.TryGetValue(eventType, out var tempSubscribers))
-            {
-                if (subscribers.Capacity < tempSubscribers.Count)
-                    subscribers.Capacity = tempSubscribers.Count;
+            if (!_subscriptions.TryGetValue(eventType, out var tempSubscribers)) 
+                return;
 
-                foreach (var subscriber in tempSubscribers)
-                    subscribers.Add(subscriber);
-            }
+            if (subscribers.Capacity < tempSubscribers.Count)
+                subscribers.Capacity = tempSubscribers.Count;
 
-            foreach (var @interface in interfaces)
-                if (_subscriptions.TryGetValue(@interface, out var interfaceSubscribers))
-                    foreach (var subscriber in interfaceSubscribers)
-                        subscribers.Add(subscriber);
+            foreach (var subscriber in tempSubscribers)
+                subscribers.Add(subscriber);
         }
 
         public void Raise(IEvent e, object sender) => RaiseInternal(e, sender, DummyContinuation);
@@ -118,17 +112,17 @@ namespace UAlbion.Core
                         ApiUtil.Assert($"Tried to complete a continuation of type Action<{typeof(T).Name}> with null or a value of a different type.");
                 });
 
-        int RaiseInternal(IEvent e, object sender, Action<object> continuation)
+        int RaiseInternal(IEvent e, object sender, Action<object> continuation) // This method is performance critical, memory allocations should be avoided etc.
         {
             if (e == null) throw new ArgumentNullException(nameof(e));
             bool verbose = e is IVerboseEvent;
             if (!verbose)
-            {
+            { // Nesting level helps identify which events were caused by other events when reading the console window
                 Interlocked.Increment(ref _nesting);
                 _logExchange.Receive(e, sender);
             }
 
-#if DEBUG
+#if DEBUG // Keep track of which events have been fired this frame for debugging
             if (e is BeginFrameEvent) _frameEvents.Clear();
             else _frameEvents.Add(e);
 #endif
@@ -146,7 +140,7 @@ namespace UAlbion.Core
             List<Handler> handlers;
             lock (_syncRoot)
             {
-                if (!_dispatchLists.TryPop(out handlers))
+                if (!_dispatchLists.TryPop(out handlers)) // reuse the event handler lists to avoid GC churn
                     handlers = new List<Handler>();
 #if DEBUG
                 if (e is BeginFrameEvent) _frameEvents.Clear();
@@ -244,9 +238,8 @@ namespace UAlbion.Core
         }
 
         public EventExchange Register<T>(T system) => Register(typeof(T), system);
-        public EventExchange Register(Type type, object system)
+        public EventExchange Register(Type type, object system, bool attach = true)
         {
-            bool doAttach;
             lock (_syncRoot)
             {
                 if (_registrations.ContainsKey(type))
@@ -254,13 +247,16 @@ namespace UAlbion.Core
                     if (_registrations[type] != system)
                         throw new InvalidOperationException(
                             "Only one instance can be registered per type / interface in a given exchange.");
+                    attach = false;
                 }
-                else _registrations.Add(type, system);
-
-                doAttach = system is IComponent component && !_subscribers.ContainsKey(component);
+                else
+                {
+                    _registrations.Add(type, system);
+                    attach &= system is IComponent component && !_subscribers.ContainsKey(component);
+                }
             }
 
-            if (doAttach)
+            if (attach)
                 Attach((IComponent)system);
 
             return this;

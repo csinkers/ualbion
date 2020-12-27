@@ -5,10 +5,13 @@ namespace UAlbion.Core
 {
     public interface IRenderer : IDisposable
     {
-        bool CanRender(Type renderable);
+        Type[] RenderableTypes { get; }
         RenderPasses RenderPasses { get; }
         void CreateDeviceObjects(IRendererContext context);
-        IEnumerable<IRenderable> UpdatePerFrameResources(IRendererContext context, IEnumerable<IRenderable> renderables);
+        void UpdatePerFrameResources(
+            IRendererContext context,
+            IEnumerable<IRenderable> renderables,
+            IList<IRenderable> results);
         void Render(IRendererContext context, RenderPasses renderPass, IRenderable renderable);
         void DestroyDeviceObjects();
     }

@@ -1,5 +1,4 @@
 ﻿using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 
@@ -12,12 +11,6 @@ namespace UAlbion.Game.Entities
 
         public Skybox(SpriteId id)
         {
-            On<RenderEvent>(e =>
-            {
-                if (_renderable != null)
-                    e.Add(_renderable);
-            });
-
             _id = id;
         }
 
@@ -26,6 +19,12 @@ namespace UAlbion.Game.Entities
             var assets = Resolve<IAssetManager>();
             var texture = assets.LoadTexture(_id);
             _renderable = new SkyboxRenderable(texture);
+            Resolve<IEngine>()?.RegisterRenderable(_renderable);
+        }
+
+        protected override void Unsubscribed()
+        {
+            Resolve<IEngine>()?.UnregisterRenderable(_renderable);
         }
     }
 }

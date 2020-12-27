@@ -44,12 +44,12 @@ namespace UAlbion.Game.State
                 if (!scene.IsActive)
                     continue;
 
+                Exchange.Attach(scene);
+
                 var interfaces = scene.GetType().GetInterfaces();
                 var sceneInterface = interfaces.FirstOrDefault(x => typeof(IScene).IsAssignableFrom(x) && x != typeof(IScene));
                 if (sceneInterface != null)
                     Exchange.Register(sceneInterface, scene);
-                else
-                    Exchange.Attach(scene);
             }
 
             ActiveSceneId = e.SceneId;

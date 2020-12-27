@@ -103,6 +103,8 @@ namespace UAlbion.Core
         /// <param name="event"></param>
         protected void Enqueue(IEvent @event) => Exchange?.Enqueue(@event, this);
 
+        protected virtual void Subscribing() { }
+
         /// <summary>
         /// Called when the component is attached / subscribed to an event exchange.
         /// Does nothing by default, but is provided for individual component implementations
@@ -215,6 +217,7 @@ namespace UAlbion.Core
             if (!_isActive)
                 return;
 
+            Subscribing();
             _nesting++;
             if (TraceAttachment)
                 Console.WriteLine("+".PadLeft(_nesting) + ToString());
@@ -246,7 +249,7 @@ namespace UAlbion.Core
             Unsubscribed();
 
             foreach (var child in Children)
-                if(child is Component c)
+                if (child is Component c)
                     c.Detach();
 
             _nesting--;

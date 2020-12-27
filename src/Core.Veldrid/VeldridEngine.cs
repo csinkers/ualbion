@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Numerics;
 using ImGuiNET;
 using UAlbion.Api;
@@ -25,10 +26,11 @@ namespace UAlbion.Core.Veldrid
         static RenderDoc _renderDoc;
         Sdl2Window _window;
 
-        readonly IList<IRenderer> _renderers = new List<IRenderer>();
         readonly FrameTimeAverager _frameTimeAverager = new FrameTimeAverager(0.5);
         readonly WindowManager _windowManager;
         readonly VeldridCoreFactory _coreFactory;
+        readonly IDictionary<Type, IRenderer> _renderers = new Dictionary<Type, IRenderer>();
+        readonly IDictionary<Type, List<IRenderable>> _renderables = new Dictionary<Type, List<IRenderable>>();
 
         SceneContext _sceneContext;
         CommandList _frameCommands;
@@ -102,17 +104,42 @@ namespace UAlbion.Core.Veldrid
             if(shaderCache == null)
                 throw new InvalidOperationException("An instance of IShaderCache must be registered.");
             shaderCache.ShadersUpdated += (sender, args) => _newBackend = GraphicsDevice?.BackendType;
-            ChangeBackend();
             base.Subscribed();
         }
 
         public VeldridEngine AddRenderer(IRenderer renderer)
         {
-            _renderers.Add(renderer);
+            if (renderer == null) throw new ArgumentNullException(nameof(renderer));
+            foreach(var type in renderer.RenderableTypes)
+                _renderers[type] = renderer;
+
             if (renderer is IComponent component)
                 AttachChild(component);
 
             return this;
+        }
+
+        public override void RegisterRenderable(IRenderable renderable)
+        {
+            if (renderable == null) return;
+            var type = renderable.GetType();
+            if (!_renderables.TryGetValue(type, out var list))
+            {
+                list = new List<IRenderable>();
+                _renderables[type] = list;
+            }
+
+            list.Add(renderable);
+        }
+
+        public override void UnregisterRenderable(IRenderable renderable)
+        {
+            if (renderable == null) return;
+            var type = renderable.GetType();
+            if (!_renderables.TryGetValue(type, out var list))
+                return;
+
+            list.Remove(renderable);
         }
 
         public override void Run()
@@ -128,7 +155,7 @@ namespace UAlbion.Core.Veldrid
                 ImGui.GetIO().ConfigFlags |= (ImGuiConfigFlags)dockingFlag;
 
             Raise(new WindowResizedEvent(_window.Width, _window.Height));
-            Raise(new BeginFrameEvent());
+            Raise(BeginFrameEvent.Instance);
 
             var frameCounter = new FrameCounter();
             PerfTracker.StartupEvent("Startup done, rendering first frame");
@@ -140,7 +167,7 @@ namespace UAlbion.Core.Veldrid
                 PerfTracker.BeginFrame();
                 double deltaSeconds = frameCounter.StartFrame();
                 using(PerfTracker.FrameEvent("1 Raising begin frame"))
-                    Raise(new BeginFrameEvent());
+                    Raise(BeginFrameEvent.Instance);
 
                 InputSnapshot snapshot;
                 using (PerfTracker.FrameEvent("2 Processing SDL events"))
@@ -260,8 +287,9 @@ namespace UAlbion.Core.Veldrid
             using (PerfTracker.FrameEvent("6.1 Prepare scenes"))
             {
                 _frameCommands.Begin();
+                Raise(RenderEvent.Instance);
                 foreach (var scene in scenes)
-                    scene.UpdatePerFrameResources(context, _renderers);
+                    scene.UpdatePerFrameResources(context, _renderables, _renderers);
                 _frameCommands.End();
                 GraphicsDevice.SubmitCommands(_frameCommands);
             }
@@ -270,7 +298,7 @@ namespace UAlbion.Core.Veldrid
             {
                 _frameCommands.Begin();
                 foreach (var scene in scenes)
-                    scene.RenderAllStages(context);
+                    scene.RenderAllStages(context, _renderers);
                 _frameCommands.End();
             }
 
@@ -374,7 +402,7 @@ namespace UAlbion.Core.Veldrid
                 _sceneContext.CreateDeviceObjects(GraphicsDevice, initList);
 
                 var context = new VeldridRendererContext(GraphicsDevice, initList, _sceneContext, _coreFactory);
-                foreach (var r in _renderers)
+                foreach (var r in _renderers.Values.Distinct())
                     r.CreateDeviceObjects(context);
 
                 initList.End();
@@ -398,7 +426,7 @@ namespace UAlbion.Core.Veldrid
                 _sceneContext?.Dispose();
                 _frameCommands = null;
                 _sceneContext = null;
-                foreach (var r in _renderers)
+                foreach (var r in _renderers.Values.Distinct())
                     r.DestroyDeviceObjects();
 
                 Resolve<ITextureManager>()?.DestroyDeviceObjects();
@@ -410,7 +438,7 @@ namespace UAlbion.Core.Veldrid
 
         public void Dispose()
         {
-            foreach(var renderer in _renderers)
+            foreach(var renderer in _renderers.Values.Distinct())
                 if (renderer is IDisposable disposable)
                     disposable.Dispose();
             _renderers.Clear();

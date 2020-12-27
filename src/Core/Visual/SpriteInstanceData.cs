@@ -11,7 +11,7 @@ namespace UAlbion.Core.Visual
     {
         public static readonly uint StructSize = (uint)Unsafe.SizeOf<SpriteInstanceData>();
 
-        public override string ToString() => $"SID {Position}:{TexLayer} ({Flags & ~SpriteFlags.DebugFlags}) Z:{DebugZ}";
+        public override string ToString() => $"SID {Position}:{TexLayer} ({Flags & ~SpriteFlags.DebugMask}) Z:{DebugZ}";
 
         // State
         public Vector3 Transform1 { get; private set; }

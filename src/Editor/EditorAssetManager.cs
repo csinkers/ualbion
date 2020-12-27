@@ -16,7 +16,11 @@ namespace UAlbion.Editor
 
         public EditorAssetManager()
         {
-            On<IEditorEvent>(Apply);
+            On<EditorAddInstanceEvent>(Apply);
+            On<EditorAggregateChangeEvent>(Apply);
+            On<EditorMoveInstanceEvent>(Apply);
+            On<EditorRemoveInstanceEvent>(Apply);
+            On<EditorSetPropertyEvent>(Apply);
         }
 
         void Apply(IEditorEvent e)

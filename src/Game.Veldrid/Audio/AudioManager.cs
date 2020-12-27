@@ -242,7 +242,7 @@ namespace UAlbion.Game.Veldrid.Audio
             while (!_doneEvent.WaitOne((int)(config.Audio.AudioPollIntervalSeconds * 1000)))
             {
                 if (_standalone)
-                    Raise(new BeginFrameEvent());
+                    Raise(BeginFrameEvent.Instance);
 
                 lock (_syncRoot) // Reap any dead sounds and update any streaming sources
                 {

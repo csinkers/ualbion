@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.IO;
 using System.Numerics;
-using System.Threading.Tasks;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -38,8 +37,6 @@ namespace UAlbion
     {
         public static void RunGame(IEngine engine, EventExchange global, IContainer services, string baseDir, CommandLineOptions commandLine)
         {
-            var registrationTask = Task.Run(() => RegisterComponents(global, services, baseDir, commandLine));
-
 #pragma warning disable CA2000 // Dispose objects before losing scopes
             services
                 .Add(new ShaderCache(
@@ -48,10 +45,10 @@ namespace UAlbion
                 .Add(engine);
 #pragma warning restore CA2000 // Dispose objects before losing scopes
 
+            RegisterComponents(global, services, baseDir, commandLine);
+
             if (commandLine.DebugMenus && engine is VeldridEngine ve)
                 services.Add(new DebugMenus(ve));
-
-            registrationTask.Wait();
 
             if (commandLine.StartupOnly)
                 global.Raise(new QuitEvent(), null);

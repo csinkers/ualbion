@@ -84,7 +84,7 @@ namespace UAlbion.Core.Veldrid.Visual
             20, 21, 22, 22, 21, 23, // Right
         };
 
-        public bool CanRender(Type renderable) => renderable == typeof(DungeonTileMap);
+        public Type[] RenderableTypes => new[] { typeof(DungeonTileMap), typeof(TileMapWindow) };
         public RenderPasses RenderPasses => RenderPasses.Standard;
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
         readonly IList<DeviceBuffer> _instanceBuffers = new List<DeviceBuffer>();
@@ -165,10 +165,11 @@ namespace UAlbion.Core.Veldrid.Visual
             _disposeCollector.Add(_vb, _ib, _layout, _textureSampler, _pipeline);
         }
 
-        public IEnumerable<IRenderable> UpdatePerFrameResources(IRendererContext context, IEnumerable<IRenderable> renderables)
+        public void UpdatePerFrameResources(IRendererContext context, IEnumerable<IRenderable> renderables, IList<IRenderable> results)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (renderables == null) throw new ArgumentNullException(nameof(renderables));
+            if (results == null) throw new ArgumentNullException(nameof(results));
             var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
@@ -211,12 +212,12 @@ namespace UAlbion.Core.Veldrid.Visual
                 {
                     var dummyWindow = new TileMapWindow(tilemap, 0, tilemap.Tiles.Length);
                     UpdateTilemapWindow(dummyWindow);
-                    yield return dummyWindow;
+                    results.Add(dummyWindow);
                 }
                 else if (renderable is TileMapWindow window)
                 {
                     UpdateTilemapWindow(window);
-                    yield return window;
+                    results.Add(window);
                 }
             }
         }
@@ -231,8 +232,7 @@ namespace UAlbion.Core.Veldrid.Visual
             var sc = c.SceneContext;
 
             ITextureManager textureManager = Resolve<ITextureManager>();
-            var window = renderable as TileMapWindow;
-            if (window == null)
+            if (!(renderable is TileMapWindow window))
                 return;
 
             var tilemap = window.TileMap;

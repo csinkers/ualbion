@@ -54,7 +54,7 @@ namespace UAlbion.Core.Veldrid.Visual
         ResourceLayout _perSpriteResourceLayout;
 #pragma warning restore CA2213 // Analysis doesn't know about DisposeCollector
 
-        public bool CanRender(Type renderable) => renderable == typeof(MultiSprite);
+        public Type[] RenderableTypes => new [] { typeof(MultiSprite) };
         public RenderPasses RenderPasses => RenderPasses.Standard;
 
         Pipeline BuildPipeline(GraphicsDevice gd, SceneContext sc, SpriteShaderKey key)
@@ -153,10 +153,12 @@ namespace UAlbion.Core.Veldrid.Visual
             }
         }
 
-        public IEnumerable<IRenderable> UpdatePerFrameResources(IRendererContext context, IEnumerable<IRenderable> renderables)
+        public void UpdatePerFrameResources(IRendererContext context, IEnumerable<IRenderable> renderables, IList<IRenderable> results)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (renderables == null) throw new ArgumentNullException(nameof(renderables));
+            if (results == null) throw new ArgumentNullException(nameof(results));
+
             var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
@@ -227,7 +229,7 @@ namespace UAlbion.Core.Veldrid.Visual
                 }
 
                 sprite.InstancesDirty = false;
-                yield return sprite;
+                results.Add(sprite);
             }
 
             Resolve<ISpriteManager>().Cleanup();

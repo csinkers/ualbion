@@ -51,7 +51,7 @@ namespace UAlbion.Core.Veldrid.Visual
         ResourceLayout _resourceLayout;
 #pragma warning restore CA2213 // Disposable fields should be disposed
 
-        public bool CanRender(Type renderable) => renderable == typeof(SkyboxRenderable);
+        public Type[] RenderableTypes => new[] { typeof(SkyboxRenderable) };
         public RenderPasses RenderPasses => RenderPasses.Standard;
 
         Pipeline BuildPipeline(GraphicsDevice gd, SceneContext sc)
@@ -114,14 +114,15 @@ namespace UAlbion.Core.Veldrid.Visual
             _pipeline = BuildPipeline(c.GraphicsDevice, c.SceneContext);
         }
 
-        public IEnumerable<IRenderable> UpdatePerFrameResources(IRendererContext context, IEnumerable<IRenderable> renderables)
+        public void UpdatePerFrameResources(IRendererContext context, IEnumerable<IRenderable> renderables, IList<IRenderable> results)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (renderables == null) throw new ArgumentNullException(nameof(renderables));
+            if (results == null) throw new ArgumentNullException(nameof(results));
             var c = (VeldridRendererContext)context;
             var gd = c.GraphicsDevice;
             if(!(renderables.FirstOrDefault() is SkyboxRenderable skybox))
-                yield break;
+                return;
 
             ITextureManager textureManager = Resolve<ITextureManager>();
             IDeviceObjectManager objectManager = Resolve<IDeviceObjectManager>();
@@ -142,7 +143,7 @@ namespace UAlbion.Core.Veldrid.Visual
                 objectManager.SetDeviceObject((skybox, textureView, null), resourceSet);
             }
 
-            yield return skybox;
+            results.Add(skybox);
         }
 
         public void Render(IRendererContext context, RenderPasses renderPass, IRenderable renderable)

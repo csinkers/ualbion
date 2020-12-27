@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Core.Events;
 
 namespace UAlbion.Core.Visual
 {
@@ -9,27 +8,18 @@ namespace UAlbion.Core.Visual
         readonly object _syncRoot = new object();
         readonly IDictionary<SpriteKey, MultiSprite> _sprites = new Dictionary<SpriteKey, MultiSprite>();
 
-        public SpriteManager()
-        {
-            On<RenderEvent>(Render);
-        }
-
-        void Render(RenderEvent renderEvent)
-        {
-            lock (_syncRoot)
-                foreach (var sprite in _sprites)
-                    renderEvent.Add(sprite.Value);
-        }
-
         public SpriteLease Borrow(SpriteKey key, int length, object caller)
         {
             if (length <= 0) throw new ArgumentOutOfRangeException(nameof(length));
             lock (_syncRoot)
             {
-                if (!_sprites.ContainsKey(key))
-                    _sprites[key] = new MultiSprite(key);
+                if (!_sprites.TryGetValue(key, out var entry))
+                {
+                    entry = new MultiSprite(key);
+                    Resolve<IEngine>()?.RegisterRenderable(entry);
+                    _sprites[key] = entry;
+                }
 
-                var entry = _sprites[key];
                 return entry.Grow(length, caller);
             }
         }
@@ -38,13 +28,16 @@ namespace UAlbion.Core.Visual
         {
             lock (_syncRoot)
             {
-                var keysToRemove = new List<SpriteKey>();
-                foreach (var sprite in _sprites.Values)
-                    if (sprite.ActiveInstances == 0)
-                        keysToRemove.Add(sprite.Key);
+                var spritesToRemove = new List<KeyValuePair<SpriteKey, MultiSprite>>();
+                foreach (var kvp in _sprites)
+                    if (kvp.Value.ActiveInstances == 0)
+                        spritesToRemove.Add(kvp);
 
-                foreach (var key in keysToRemove)
-                    _sprites.Remove(key);
+                foreach (var kvp in spritesToRemove)
+                {
+                    Resolve<IEngine>()?.UnregisterRenderable(kvp.Value);
+                    _sprites.Remove(kvp.Key);
+                }
             }
         }
 
@@ -57,6 +50,21 @@ namespace UAlbion.Core.Visual
                 _sprites.TryGetValue(lease.Key, out var entry);
                 return new WeakSpriteReference(entry, lease, index);
             }
+        }
+
+        protected override void Subscribed()
+        {
+            lock (_syncRoot)
+                foreach (var sprite in _sprites)
+                    Resolve<IEngine>()?.RegisterRenderable(sprite.Value);
+            base.Subscribed();
+        }
+        protected override void Unsubscribed()
+        {
+            lock (_syncRoot)
+                foreach (var sprite in _sprites)
+                    Resolve<IEngine>()?.UnregisterRenderable(sprite.Value);
+            base.Unsubscribed();
         }
     }
 }

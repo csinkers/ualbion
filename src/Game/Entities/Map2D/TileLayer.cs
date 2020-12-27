@@ -21,6 +21,23 @@ namespace UAlbion.Game.Entities.Map2D
             new SubImage(Vector2.Zero, Vector2.Zero, Vector2.Zero, 0),
             0);
 
+        readonly LogicalMap2D _logicalMap;
+        readonly ITexture _tileset;
+        readonly Func<int, TileData> _tileFunc;
+        readonly DrawLayer _drawLayer;
+        readonly ISet<(int, int)> _dirty = new HashSet<(int, int)>();
+
+#if DEBUG
+        DebugFlags _lastDebugFlags;
+#endif
+        SpriteLease _lease;
+        (int, int)[] _animatedTiles;
+        int _lastFrameCount;
+        bool _allDirty = true;
+
+        public int? HighlightIndex { get; set; }
+        int? _highlightEvent;
+
         public TileLayer(
             LogicalMap2D logicalMap,
             ITexture tileset,
@@ -40,23 +57,6 @@ namespace UAlbion.Game.Entities.Map2D
 
             On<RenderEvent>(e => Render());
         }
-
-        readonly LogicalMap2D _logicalMap;
-        readonly ITexture _tileset;
-        readonly Func<int, TileData> _tileFunc;
-        readonly DrawLayer _drawLayer;
-        readonly ISet<(int, int)> _dirty = new HashSet<(int, int)>();
-
-#if DEBUG
-        DebugFlags _lastDebugFlags;
-#endif
-        SpriteLease _lease;
-        (int, int)[] _animatedTiles;
-        int _lastFrameCount;
-        bool _allDirty = true;
-
-        public int? HighlightIndex { get; set; }
-        int? _highlightEvent;
 
         public WeakSpriteReference GetWeakSpriteReference(int x, int y)
         {
@@ -86,6 +86,7 @@ namespace UAlbion.Game.Entities.Map2D
             var instance = SpriteInstanceData.TopLeft(position, subImage.Size, subImage, 0);
 
             var zone = _logicalMap.GetZone(index);
+            var triggers = zone?.Trigger ?? 0;
             int eventNum = zone?.Node?.Id ?? -1;
 
             instance.Flags = 0

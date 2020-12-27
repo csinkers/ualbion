@@ -13,13 +13,24 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public DebugGuiRenderer()
         {
-            On<RenderEvent>(e => e.Add(this));
             On<InputEvent>(e => _imguiRenderer.Update((float)e.DeltaSeconds, e.Snapshot));
             On<WindowResizedEvent>(e => _imguiRenderer.WindowResized(e.Width, e.Height));
         }
 
         public string Name => "DebugGuiRenderer";
-        public bool CanRender(Type renderable) => renderable == typeof(DebugGuiRenderer);
+        public Type[] RenderableTypes => new[] { typeof(DebugGuiRenderer) };
+
+        protected override void Subscribed()
+        {
+            Resolve<IEngine>()?.RegisterRenderable(this);
+            base.Subscribed();
+        }
+
+        protected override void Unsubscribed()
+        {
+            Resolve<IEngine>()?.RegisterRenderable(this);
+            base.Unsubscribed();
+        }
 
         public RenderPasses RenderPasses => RenderPasses.Standard;
         public DrawLayer RenderOrder => DrawLayer.Debug;
@@ -40,7 +51,13 @@ namespace UAlbion.Core.Veldrid.Visual
             }
         }
 
-        public IEnumerable<IRenderable> UpdatePerFrameResources(IRendererContext context, IEnumerable<IRenderable> renderables) => renderables;
+        public void UpdatePerFrameResources(IRendererContext context, IEnumerable<IRenderable> renderables, IList<IRenderable> results)
+        {
+            if (renderables == null) throw new ArgumentNullException(nameof(renderables));
+            if (results == null) throw new ArgumentNullException(nameof(results));
+            foreach (var r in renderables)
+                results.Add(r);
+        }
 
         public void DestroyDeviceObjects()
         {

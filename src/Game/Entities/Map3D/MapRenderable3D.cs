@@ -5,7 +5,6 @@ using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
@@ -29,7 +28,6 @@ namespace UAlbion.Game.Entities.Map3D
 
         public MapRenderable3D(MapId mapId, MapData3D mapData, LabyrinthData labyrinthData, Vector3 tileSize)
         {
-            On<RenderEvent>(Render);
             On<SlowClockEvent>(OnSlowClock);
             On<SortMapTilesEvent>(e => _isSorting = e.IsSorting);
             On<LoadPaletteEvent>(e => { });
@@ -86,11 +84,13 @@ namespace UAlbion.Game.Entities.Map3D
                 }
             }
 
+            Resolve<IEngine>()?.RegisterRenderable(_tilemap);
             _fullUpdate = true;
         }
 
         protected override void Unsubscribed()
         {
+            Resolve<IEngine>()?.UnregisterRenderable(_tilemap);
             _tilemap = null;
         }
 
@@ -184,19 +184,6 @@ namespace UAlbion.Game.Entities.Map3D
                     order++;
                 }
             }
-        }
-
-        void Render(RenderEvent e)
-        {
-            e.Add(_tilemap); /*
-            // Split map rendering into one render call per distance group for debugging
-            int offset = 0;
-            foreach (var distance in _tilesByDistance.OrderByDescending(x => x.Key))
-            {
-                e.Add(new TileMapWindow(_tilemap, offset, distance.Value.Count));
-                offset += distance.Value.Count;
-            }
-            //*/
         }
     }
 }

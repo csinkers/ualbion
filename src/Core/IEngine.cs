@@ -6,5 +6,7 @@
         void ChangeBackend();
         ICoreFactory Factory { get; }
         string FrameTimeText { get; }
+        void RegisterRenderable(IRenderable renderable);
+        void UnregisterRenderable(IRenderable renderable);
     }
 }

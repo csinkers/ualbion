@@ -6,7 +6,7 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
-    [Event("remove_party_member", "Remove someone from the party", new[] { "rpm" })]
+    [Event("remove_party_member", "Remove someone from the party", "rpm")]
     public class RemovePartyMemberEvent : MapEvent
     {
         public static RemovePartyMemberEvent Serdes(RemovePartyMemberEvent e, AssetMapping mapping, ISerializer s)

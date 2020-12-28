@@ -4,7 +4,9 @@
     {
         Normal,
         Examine,
-        Interact,
+        Manipulate,
+        Talk,
+        Take,
         PathFinding
     }
 }

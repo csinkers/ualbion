@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using UAlbion.Api;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
@@ -88,7 +87,6 @@ namespace UAlbion.Core.Veldrid.Visual
                 vertexShaderContent, fragmentShaderContent);
 
             _shaders.AddRange(shaders);
-            var shaderSet = new ShaderSetDescription(new[] { VertexLayout, InstanceLayout }, shaders);
 
             var depthStencilMode =
                 key.PerformDepthTest
@@ -110,7 +108,7 @@ namespace UAlbion.Core.Veldrid.Visual
                 rasterizerMode,
                 PrimitiveTopology.TriangleList,
                 new ShaderSetDescription(new[] { VertexLayout, InstanceLayout },
-                    shaderSet.Shaders,
+                    shaders,
                     ShaderHelper.GetSpecializations(gd)),
                 new[] { _perSpriteResourceLayout, sc.CommonResourceLayout },
                 gd.SwapchainFramebuffer.OutputDescription);
@@ -126,8 +124,7 @@ namespace UAlbion.Core.Veldrid.Visual
             var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
-
-            ResourceFactory factory = gd.ResourceFactory;
+            var factory = gd.ResourceFactory;
 
             _vertexBuffer = factory.CreateBuffer(new BufferDescription(Vertices.SizeInBytes(), BufferUsage.VertexBuffer));
             _indexBuffer = factory.CreateBuffer(new BufferDescription(Indices.SizeInBytes(), BufferUsage.IndexBuffer));
@@ -140,19 +137,6 @@ namespace UAlbion.Core.Veldrid.Visual
             _disposeCollector.Add(_vertexBuffer, _indexBuffer, _perSpriteResourceLayout);
         }
 
-        static void UpdateBufferSpan(CommandList cl, DeviceBuffer buffer, ReadOnlySpan<SpriteInstanceData> instances)
-        {
-            unsafe
-            {
-                fixed (SpriteInstanceData* instancePtr = &instances[0])
-                    cl.UpdateBuffer(
-                        buffer,
-                        0,
-                        (IntPtr)instancePtr,
-                        (uint)(instances.Length * Marshal.SizeOf<SpriteInstanceData>()));
-            }
-        }
-
         public void UpdatePerFrameResources(IRendererContext context, IEnumerable<IRenderable> renderables, IList<IRenderable> results)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
@@ -162,11 +146,9 @@ namespace UAlbion.Core.Veldrid.Visual
             var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
             var gd = c.GraphicsDevice;
-            var sc = c.SceneContext;
-
-            ITextureManager textureManager = Resolve<ITextureManager>();
-            IDeviceObjectManager objectManager = Resolve<IDeviceObjectManager>();
-            EngineFlags engineFlags = Resolve<IEngineSettings>().Flags;
+            var textureManager = Resolve<ITextureManager>();
+            var objectManager = Resolve<IDeviceObjectManager>();
+            var engineFlags = Resolve<IEngineSettings>().Flags;
 
             foreach (var renderable in renderables)
             {
@@ -174,9 +156,10 @@ namespace UAlbion.Core.Veldrid.Visual
                 if (sprite.ActiveInstances == 0)
                     continue;
 
+                cl.PushDebugGroup(sprite.Name);
                 var shaderKey = new SpriteShaderKey(sprite, engineFlags);
                 if (!_pipelines.ContainsKey(shaderKey))
-                    _pipelines.Add(shaderKey, BuildPipeline(gd, sc, shaderKey));
+                    _pipelines.Add(shaderKey, BuildPipeline(gd, c.SceneContext, shaderKey));
 
                 uint bufferSize = (uint)sprite.Instances.Length * SpriteInstanceData.StructSize;
                 var buffer = objectManager.GetDeviceObject<DeviceBuffer>((sprite, sprite, "InstanceBuffer"));
@@ -191,7 +174,7 @@ namespace UAlbion.Core.Veldrid.Visual
                 if (sprite.InstancesDirty)
                 {
                     var instances = sprite.Instances;
-                    UpdateBufferSpan(cl, buffer, instances);
+                    VeldridUtil.UpdateBufferSpan(cl, buffer, instances);
                     PerfTracker.IncrementFrameCounter("Update InstanceBuffers");
                 }
 
@@ -230,6 +213,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
                 sprite.InstancesDirty = false;
                 results.Add(sprite);
+                cl.PopDebugGroup();
             }
 
             Resolve<ISpriteManager>().Cleanup();
@@ -239,14 +223,13 @@ namespace UAlbion.Core.Veldrid.Visual
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (renderable == null) throw new ArgumentNullException(nameof(renderable));
+
             var c = (VeldridRendererContext)context;
             var cl = c.CommandList;
-            var sc = c.SceneContext;
+            var dom = Resolve<IDeviceObjectManager>();
+            var engineFlags = Resolve<IEngineSettings>().Flags;
+            var textureManager = Resolve<ITextureManager>();
 
-            ITextureManager textureManager = Resolve<ITextureManager>();
-            IDeviceObjectManager dom = Resolve<IDeviceObjectManager>();
-            EngineFlags engineFlags = Resolve<IEngineSettings>().Flags;
-            // float depth = gd.IsDepthRangeZeroToOne ? 0 : 1;
             var sprite = (MultiSprite)renderable;
             var shaderKey = new SpriteShaderKey(sprite, engineFlags);
             sprite.PipelineId = shaderKey.GetHashCode();
@@ -256,7 +239,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
             cl.PushDebugGroup(sprite.Name);
 
-            if (sc.PaletteView == null)
+            if (c.SceneContext.PaletteView == null)
                 return;
 
             TextureView textureView = (TextureView)textureManager?.GetTexture(sprite.Key.Texture);
@@ -272,7 +255,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
             cl.SetPipeline(_pipelines[shaderKey]);
             cl.SetGraphicsResourceSet(0, resourceSet);
-            cl.SetGraphicsResourceSet(1, sc.CommonResourceSet);
+            cl.SetGraphicsResourceSet(1, c.SceneContext.CommonResourceSet);
             cl.SetVertexBuffer(0, _vertexBuffer);
             cl.SetIndexBuffer(_indexBuffer, IndexFormat.UInt16);
             cl.SetVertexBuffer(1, instanceBuffer);

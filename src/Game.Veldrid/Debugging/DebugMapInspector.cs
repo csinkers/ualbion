@@ -21,7 +21,7 @@ using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Veldrid.Debugging
 {
-    [Event("hide_debug_window", "Hide the debug window", new[] { "hdw" })]
+    [Event("hide_debug_window", "Hide the debug window", "hdw")]
     public class HideDebugWindowEvent : Event { }
 
     public class DebugMapInspector : Component

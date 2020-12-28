@@ -18,6 +18,7 @@ using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid.Assets;
 using UAlbion.Game.Veldrid.Audio;
 using UAlbion.Game.Veldrid.Debugging;
+using UAlbion.Game.Veldrid.Visual;
 
 #pragma warning disable CA2000 // Dispose objects before losing scopes
 namespace UAlbion
@@ -47,6 +48,7 @@ namespace UAlbion
                     .AddRenderer(new SkyboxRenderer())
                     .AddRenderer(new SpriteRenderer())
                     .AddRenderer(new ExtrudedTileMapRenderer())
+                    .AddRenderer(new InfoOverlayRenderer())
                     .AddRenderer(new DebugGuiRenderer())
                 : null;
             engine?.ChangeBackend();

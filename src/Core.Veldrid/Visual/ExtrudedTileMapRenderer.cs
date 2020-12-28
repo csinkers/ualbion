@@ -97,12 +97,14 @@ namespace UAlbion.Core.Veldrid.Visual
         Sampler _textureSampler;
         Shader[] _shaders;
 
+        // ReSharper disable NotAccessedField.Local
         struct MiscUniformData
         {
             public static readonly uint SizeInBytes = (uint)Unsafe.SizeOf<MiscUniformData>();
-            public Vector3 TileSize { get; set; } // 12 bytes
-            public int Unused1 { get; set; } // Need another 4 bytes to reach a multiple of 16.
+            public Vector3 TileSize; // 12 bytes
+            public int Unused1; // Need another 4 bytes to reach a multiple of 16.
         }
+        // ReSharper restore NotAccessedField.Local
 
         public void CreateDeviceObjects(IRendererContext context)
         {
@@ -186,6 +188,7 @@ namespace UAlbion.Core.Veldrid.Visual
             void UpdateTilemapWindow(TileMapWindow window)
             {
                 var tilemap = window.TileMap;
+                cl.PushDebugGroup($"Tiles3D:{tilemap.Name}:{tilemap.RenderOrder}");
                 window.InstanceBufferId = _instanceBuffers.Count;
                 var buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)window.Length * DungeonTile.StructSize, BufferUsage.VertexBuffer));
                 buffer.Name = $"B_Tile3DInst{_instanceBuffers.Count}";
@@ -204,6 +207,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
                 textureManager.PrepareTexture(tilemap.Floors, context);
                 textureManager.PrepareTexture(tilemap.Walls, context);
+                cl.PopDebugGroup();
             }
 
             foreach (var renderable in renderables)
@@ -281,11 +285,7 @@ namespace UAlbion.Core.Veldrid.Visual
             _disposeCollector.DisposeAll();
         }
 
-        public void Dispose()
-        {
-            DestroyDeviceObjects();
-            GC.SuppressFinalize(this);
-        }
+        public void Dispose() => DestroyDeviceObjects();
     }
 }
 #pragma warning restore CA2213 // Analysis doesn't know about dispose collector

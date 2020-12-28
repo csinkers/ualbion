@@ -2,6 +2,6 @@
 
 namespace UAlbion.Core.Events
 {
-    [Event("quit", "Exit the game.", new[] { "exit" })]
+    [Event("quit", "Exit the game.", "exit")]
     public class QuitEvent : EngineEvent { }
 }

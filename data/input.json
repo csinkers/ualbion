@@ -3,7 +3,7 @@
   "Global": {
     "Tilde": "debug_flag toggle ShowConsole",
     "Alt+F4": "quit",
-    "Alt+Enter":  "e:toggle_fullscreen",
+    "Alt+Enter": "e:toggle_fullscreen",
     "V": "push_mouse_mode DebugPick",
     "Shift+V": "hide_debug_window",
     "F10": "update 1",
@@ -21,7 +21,7 @@
     "Alt+1": "set_language English",
     "Alt+2": "set_language German",
     "Alt+3": "set_language French",
-    "Alt+F2":  "load_map_prompt",
+    "Alt+F2": "load_map_prompt",
 
     "Space": "dismiss_message",
     "Period": "dismiss_message" 
@@ -64,10 +64,10 @@
     "Control+Number5": "set_active_member 4",
     "Control+Number6": "set_active_member 5",
 
-    "Q": "cursor_mode look",
-    "E": "cursor_mode manipulate",
-    "R": "cursor_mode talk",
-    "Z": "cursor_mode take"
+    "Q": "+cursor_mode examine",
+    "E": "+cursor_mode manipulate",
+    "R": "+cursor_mode talk",
+    "Z": "+cursor_mode take"
   },
   "World3D": {
     "Escape": "push_scene MainMenu",
@@ -94,11 +94,18 @@
     "Shift+W": "+camera_move  0 -8",
     "Shift+A": "+camera_move -8  0",
     "Shift+S": "+camera_move  0  8",
-    "Shift+D": "+camera_move  8  0"
+    "Shift+D": "+camera_move  8  0",
+
+    "Q": "+cursor_mode examine",
+    "E": "+cursor_mode manipulate",
+    "R": "+cursor_mode talk",
+    "Z": "+cursor_mode take"
   },
   "Inventory": {
     "Control+A": "inv_take_all",
-    "Escape": "button_press Inventory.Exit"
+    "E": "inv:equip",
+    "Escape": "inv:close",
+    "Tab": "inv:close"
   },
   "Conversation": {
     "Number1": "respond 1",
@@ -116,6 +123,6 @@
     "Escape": "close_dialog"
   },
   "Editor": {
-    "Control+E":  "pop_scene Editor"
+    "Control+E": "pop_scene Editor"
   }
 }

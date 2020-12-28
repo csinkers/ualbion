@@ -8,7 +8,7 @@ namespace UAlbion.Api
         public string Name { get; }
         public string HelpText { get; }
         public string[] Aliases { get; }
-        public EventAttribute(string name, string helpText = null, string[] aliases = null)
+        public EventAttribute(string name, string helpText = null, params string[] aliases)
         {
             Name = name;
             HelpText = helpText;

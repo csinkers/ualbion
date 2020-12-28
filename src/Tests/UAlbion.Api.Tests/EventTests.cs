@@ -23,7 +23,7 @@ namespace UAlbion.Api.Tests
             Assert.Null(Event.Parse(" "));
         }
 
-        [Event("event1", "A simple event", new[] { "event_1" })]
+        [Event("event1", "A simple event", "event_1")]
         public class Event1 : Event
         {
             public Event1(int id) => Id = id;

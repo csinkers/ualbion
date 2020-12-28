@@ -15,6 +15,7 @@ namespace UAlbion.Game.Entities.Map2D
         readonly LogicalMap2D _logicalMap;
         readonly TileLayer _underlay;
         readonly TileLayer _overlay;
+        readonly InfoOverlay _info;
         readonly MapAnnotationLayer _annotations;
 
         public MapRenderable2D(LogicalMap2D logicalMap, ITexture tileset)
@@ -36,6 +37,8 @@ namespace UAlbion.Game.Entities.Map2D
                 logicalMap.GetOverlay,
                 DrawLayer.Overlay,
                 IconChangeType.Overlay));
+
+            _info = AttachChild(new InfoOverlay(logicalMap));
 
             var tileSize = tileset.GetSubImageDetails(0).Size;
             _annotations = AttachChild(new MapAnnotationLayer(logicalMap, tileSize));

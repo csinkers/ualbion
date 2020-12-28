@@ -16,13 +16,14 @@ namespace UAlbion.Core.Veldrid.Visual
     {
         readonly object _syncRoot = new object();
         readonly IDictionary<string, CacheEntry> _cache = new Dictionary<string, CacheEntry>();
-        readonly string _debugShaderPath;
+        readonly List<string> _shaderPaths = new List<string>();
+        readonly List<FileSystemWatcher> _watchers = new List<FileSystemWatcher>();
         readonly string _shaderCachePath;
-        readonly FileSystemWatcher _watcher;
 
         class CacheEntry
         {
-            public CacheEntry(string vertexPath, string fragmentPath, ShaderDescription vertexShader, ShaderDescription fragmentShader)
+            public CacheEntry(string vertexPath, string fragmentPath, ShaderDescription vertexShader,
+                ShaderDescription fragmentShader)
             {
                 VertexPath = vertexPath;
                 FragmentPath = fragmentPath;
@@ -36,38 +37,47 @@ namespace UAlbion.Core.Veldrid.Visual
             public ShaderDescription FragmentShader { get; }
         }
 
-        public ShaderCache(string debugShaderPath, string shaderCachePath)
+        public ShaderCache(string shaderCachePath)
         {
-            _debugShaderPath = debugShaderPath;
             _shaderCachePath = shaderCachePath;
             if (!Directory.Exists(shaderCachePath))
                 Directory.CreateDirectory(shaderCachePath);
+        }
 
-            _watcher = new FileSystemWatcher(debugShaderPath);
+        public IShaderCache AddShaderPath(string path)
+        {
+            _shaderPaths.Add(path);
+            var watcher = new FileSystemWatcher(path);
             //_watcher.Filters.Add("*.frag");
             //_watcher.Filters.Add("*.vert");
-            _watcher.Changed += (sender, e) => ShadersUpdated?.Invoke(sender, new EventArgs());
-            _watcher.EnableRaisingEvents = true;
+            watcher.Changed += (sender, e) => ShadersUpdated?.Invoke(sender, new EventArgs());
+            watcher.EnableRaisingEvents = true;
+            _watchers.Add(watcher);
+            return this;
         }
 
         public event EventHandler<EventArgs> ShadersUpdated;
 
         IEnumerable<string> ReadGlsl(string shaderName)
         {
-            var debugPath = Path.Combine(_debugShaderPath, shaderName);
-            if (File.Exists(debugPath))
+            foreach (var dirPath in _shaderPaths)
             {
-                foreach (var line in File.ReadAllLines(debugPath))
-                    yield return line;
+                var filePath = Path.Combine(dirPath, shaderName);
+                if (File.Exists(filePath))
+                {
+                    foreach (var line in File.ReadAllLines(filePath))
+                        yield return line;
+                    yield break;
+                }
             }
-            else
-            {
-                var fullName = $"{GetType().Namespace}.{shaderName}";
-                using var resource = GetType().Assembly.GetManifestResourceStream(fullName);
-                using var streamReader = new StreamReader(resource ?? throw new InvalidOperationException($"The shader {fullName} could not be found (checked debug path {debugPath})"));
-                while (!streamReader.EndOfStream)
-                    yield return streamReader.ReadLine();
-            }
+
+            var fullName = $"{GetType().Namespace}.{shaderName}";
+            using var resource = GetType().Assembly.GetManifestResourceStream(fullName);
+            using var streamReader = new StreamReader(resource ?? throw new InvalidOperationException(
+                $"The shader {fullName} could not be found (checked paths {string.Join(", ", _shaderPaths)})"));
+
+            while (!streamReader.EndOfStream)
+                yield return streamReader.ReadLine();
         }
 
         static readonly Regex IncludeRegex = new Regex("^#include\\s+\"([^\"]+)\"");
@@ -232,7 +242,9 @@ namespace UAlbion.Core.Veldrid.Visual
 
         public void Dispose()
         {
-            _watcher.Dispose();
+            foreach(var watcher in _watchers)
+                watcher.Dispose();
+            _watchers.Clear();
             DestroyAllDeviceObjects();
         }
     }

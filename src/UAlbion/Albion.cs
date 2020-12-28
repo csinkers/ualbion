@@ -39,9 +39,9 @@ namespace UAlbion
         {
 #pragma warning disable CA2000 // Dispose objects before losing scopes
             services
-                .Add(new ShaderCache(
-                    Path.Combine(baseDir, "src", "Core", "Visual", "Shaders"),
-                    Path.Combine(baseDir, "data", "ShaderCache")))
+                .Add(new ShaderCache(Path.Combine(baseDir, "data", "ShaderCache"))
+                    .AddShaderPath(Path.Combine(baseDir, "src", "Core", "Visual", "Shaders")) // TODO: Pull from mod config
+                    .AddShaderPath(Path.Combine(baseDir, "src", "Game", "Visual", "Shaders")))
                 .Add(engine);
 #pragma warning restore CA2000 // Dispose objects before losing scopes
 

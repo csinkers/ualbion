@@ -6,7 +6,7 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
-    [Event("simple_chest", "Pickup some items from the map", new[] { "sc" })]
+    [Event("simple_chest", "Pickup some items from the map", "sc")]
     public class SimpleChestEvent : MapEvent
     {
         public SimpleChestEvent(ItemId item, ushort amount)

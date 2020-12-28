@@ -16,22 +16,22 @@ namespace UAlbion.Core.Veldrid.Visual
 
         // Instance Layout
         static readonly VertexLayoutDescription InstanceLayout = new VertexLayoutDescription(
-                VertexLayoutHelper.Vector3D("Transform1"),
-                VertexLayoutHelper.Vector3D("Transform2"),
-                VertexLayoutHelper.Vector3D("Transform3"),
-                VertexLayoutHelper.Vector3D("Transform4"),
-                //VertexLayoutHelper.Vector3D("Offset"), VertexLayoutHelper.Vector2D("Size"),
-                VertexLayoutHelper.Vector2D("TexPosition"), VertexLayoutHelper.Vector2D("TexSize"),
-                VertexLayoutHelper.IntElement("TexLayer"), VertexLayoutHelper.UIntElement("Flags")
-            //VertexLayoutHelper.FloatElement("Rotation")
+                VertexLayoutHelper.Vector3D("iTransform1"),
+                VertexLayoutHelper.Vector3D("iTransform2"),
+                VertexLayoutHelper.Vector3D("iTransform3"),
+                VertexLayoutHelper.Vector3D("iTransform4"),
+                VertexLayoutHelper.Vector2D("iTexOffset"),
+                VertexLayoutHelper.Vector2D("iTexSize"),
+                VertexLayoutHelper.UIntElement("iTexLayer"),
+                VertexLayoutHelper.UIntElement("iFlags")
             )
         { InstanceStepRate = 1 };
 
         // Resource Sets
         static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
-            ResourceLayoutHelper.Sampler("vdspv_0_0"), // SpriteSampler
-            ResourceLayoutHelper.Texture("vdspv_0_1"), // SpriteTexture
-            ResourceLayoutHelper.Uniform("vdspv_0_2") // Per-draw call uniform buffer
+            ResourceLayoutHelper.Sampler("uSpriteSampler"),
+            ResourceLayoutHelper.Texture("uSprite"),
+            ResourceLayoutHelper.Uniform("_Uniform")
         );
 
         static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
@@ -185,7 +185,7 @@ namespace UAlbion.Core.Veldrid.Visual
                 if (uniformBuffer == null)
                 {
                     uniformBuffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)Unsafe.SizeOf<SpriteUniformInfo>(), BufferUsage.UniformBuffer));
-                    uniformBuffer.Name = "SpriteUniformBuffer";
+                    uniformBuffer.Name = $"B_SpriteUniform:{sprite.Name}";
                     PerfTracker.IncrementFrameCounter("Create sprite uniform buffer");
                     objectManager.SetDeviceObject((sprite, textureView, "UniformBuffer"), uniformBuffer);
                 }
@@ -260,9 +260,7 @@ namespace UAlbion.Core.Veldrid.Visual
             cl.SetIndexBuffer(_indexBuffer, IndexFormat.UInt16);
             cl.SetVertexBuffer(1, instanceBuffer);
 
-            //cl.SetViewport(0, new Viewport(0, 0, sc.MainSceneColorTexture.Width, sc.MainSceneColorTexture.Height, depth, depth));
             cl.DrawIndexed((uint)Indices.Length, (uint)sprite.ActiveInstances, 0, 0, 0);
-            //cl.SetViewport(0, new Viewport(0, 0, sc.MainSceneColorTexture.Width, sc.MainSceneColorTexture.Height, 0, 1));
             if (sprite.Key.ScissorRegion.HasValue)
                 cl.SetFullScissorRect(0);
             cl.PopDebugGroup();

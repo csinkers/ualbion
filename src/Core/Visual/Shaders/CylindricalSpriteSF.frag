@@ -26,7 +26,7 @@ layout(location = 0) out vec4 OutputColor;
 
 void main()
 {
-	vec2 screenCoords = gl_FragCoord.xy / u_resolution;
+	vec2 screenCoords = gl_FragCoord.xy / uResolution;
 	vec2 uv = ((iFlags & SF_FLIP_VERTICAL) != 0) 
 		? vec2(iTexPosition.x, 1 - iTexPosition.y) 
 		: iTexPosition;
@@ -48,13 +48,13 @@ void main()
 #endif
 
 	// Outline
-	if ((u_engine_flags & EF_SHOW_BOUNDING_BOXES) != 0 && (iFlags & SF_NO_BOUNDING_BOX) == 0)
+	if ((uEngineFlags & EF_SHOW_BOUNDING_BOXES) != 0 && (iFlags & SF_NO_BOUNDING_BOX) == 0)
 	{
 		vec2 factor = step(vec2(0.02), min(iNormCoords, 1.0f - iNormCoords));
 		color = mix(color, vec4(1.0f), vec4(1.0f - min(factor.x, factor.y)));
 	}
 
-	if ((u_engine_flags & EF_SHOW_CENTRE) != 0)
+	if ((uEngineFlags & EF_SHOW_CENTRE) != 0)
 	{
 		float dist = length(vec3(screenCoords, 0) - vec3(0.5, 0.5, 0));
 		if (dist < 0.01)
@@ -87,9 +87,9 @@ void main()
 		depth += (iFrontDepth - depth) * coef;
 	}
 	
-	if ((u_engine_flags & EF_RENDER_DEPTH) != 0)
+	if ((uEngineFlags & EF_RENDER_DEPTH) != 0)
 		color = vec4(depth, 10 * (max(depth, 0.9) - 0.9), 10 * min(depth, 0.1), 1.0f);
 	OutputColor = color;
 
-	gl_FragDepth = ((u_engine_flags & EF_FLIP_DEPTH_RANGE) != 0) ? 1.0f - depth : depth;
+	gl_FragDepth = ((uEngineFlags & EF_FLIP_DEPTH_RANGE) != 0) ? 1.0f - depth : depth;
 }

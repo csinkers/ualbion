@@ -72,11 +72,11 @@ void main()
 	if ((iFlags & TF_TEXTURE_TYPE_MASK) == TF_TEXTURE_TYPE_FLOOR)
 		depth = 1.0f;
  
-	if ((u_engine_flags & EF_RENDER_DEPTH) != 0)
+	if ((uEngineFlags & EF_RENDER_DEPTH) != 0)
 		color = DEPTH_COLOR(depth);
 
 	OutputColor = color;
 
-	gl_FragDepth = ((u_engine_flags & EF_FLIP_DEPTH_RANGE) != 0) ? 1.0f - depth : depth;
+	gl_FragDepth = ((uEngineFlags & EF_FLIP_DEPTH_RANGE) != 0) ? 1.0f - depth : depth;
 }
 

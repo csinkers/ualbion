@@ -18,19 +18,19 @@ namespace UAlbion.Core.Veldrid.Visual
 
         // Instance Layout
         static readonly VertexLayoutDescription InstanceLayout = new VertexLayoutDescription(
-            VertexLayoutHelper.Vector2D("TilePosition"), // 2
-            VertexLayoutHelper.UIntElement("Textures"), // 3
-            VertexLayoutHelper.UIntElement("Flags"), // 4
-            VertexLayoutHelper.Vector2D("WallSize") // 5
+            VertexLayoutHelper.Vector2D("iTilePosition"),
+            VertexLayoutHelper.UIntElement("iTextures"),
+            VertexLayoutHelper.UIntElement("iFlags"),
+            VertexLayoutHelper.Vector2D("iWallSize")
         )
         { InstanceStepRate = 1 };
 
         static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
-            ResourceLayoutHelper.UniformV("vdspv_0_0"),  // Misc Uniform Data
-            ResourceLayoutHelper.Sampler("vdspv_0_1"),  // Point Sampler
-            ResourceLayoutHelper.Sampler("vdspv_0_2"),  // Texture Sampler
-            ResourceLayoutHelper.Texture("vdspv_0_3"),  // Floors
-            ResourceLayoutHelper.Texture("vdspv_0_4")); // Walls
+            ResourceLayoutHelper.UniformV("_Misc"), // Misc Uniform Data
+            ResourceLayoutHelper.Sampler("PaletteSampler"),
+            ResourceLayoutHelper.Sampler("TextureSampler"),
+            ResourceLayoutHelper.Texture("Floors"),
+            ResourceLayoutHelper.Texture("Walls"));
 
         const string VertexShaderName = "ExtrudedTileMapSV.vert";
         const string FragmentShaderName = "ExtrudedTileMapSF.frag";

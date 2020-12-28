@@ -47,10 +47,10 @@ namespace UAlbion.Core.Veldrid
             cl.UpdateBuffer(IdentityMatrixBuffer, 0, Matrix4x4.Identity);
 
             var commonLayoutDescription = new ResourceLayoutDescription(
-                ResourceLayoutHelper.Uniform("vdspv_1_0"), // CameraInfo / common data buffer
-                ResourceLayoutHelper.UniformV("vdspv_1_1"), // Perspective Matrix
-                ResourceLayoutHelper.UniformV("vdspv_1_2"), // View Matrix
-                ResourceLayoutHelper.Texture("vdspv_1_3")); // PaletteTexture
+                ResourceLayoutHelper.Uniform("_Shared"), // CameraInfo / common data buffer
+                ResourceLayoutHelper.UniformV("_Projection"), // Perspective Matrix
+                ResourceLayoutHelper.UniformV("_View"), // View Matrix
+                ResourceLayoutHelper.Texture("uPalette")); // PaletteTexture
 
             CommonResourceLayout = factory.CreateResourceLayout(commonLayoutDescription);
             CommonResourceLayout.Name = "RL_Common";

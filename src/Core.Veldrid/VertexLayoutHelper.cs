@@ -12,11 +12,11 @@ namespace UAlbion.Core.Veldrid
         public static VertexElementDescription Vector4D(string name) => new VertexElementDescription(name, VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4);
 
         public static VertexLayoutDescription Vertex2DTextured => new VertexLayoutDescription(
-            Vector2D("Position"),
-            Vector2D("TexCoords"));
+            Vector2D("vPosition"),
+            Vector2D("vTexCoords"));
 
         public static VertexLayoutDescription Vertex3DTextured => new VertexLayoutDescription(
-            Vector3D("Position"),
-            Vector2D("TexCoords"));
+            Vector3D("vPosition"),
+            Vector2D("vTexCoords"));
     }
 }

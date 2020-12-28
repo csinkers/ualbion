@@ -17,7 +17,7 @@ namespace UAlbion.Game.State
         SavedGame _game;
         Party _party;
 
-        public DateTime Time => SavedGame.Epoch + _game.ElapsedTime;
+        public DateTime Time => SavedGame.Epoch + (_game?.ElapsedTime ?? TimeSpan.Zero);
         public IParty Party => _party;
         public ICharacterSheet GetSheet(CharacterId id) => _game.Sheets.TryGetValue(id, out var sheet) ? sheet : null;
         public short GetTicker(TickerId id) => _game.Tickers.TryGetValue(id, out var value) ? value : (short)0;

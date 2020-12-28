@@ -26,9 +26,9 @@ namespace UAlbion.Core.Veldrid.Visual
             UsePalette = usePalette;
             UseCylindricalShader = useCylindrical;
         }
-        public override string ToString() => 
-            $"{(UseArrayTexture ? "Array" : "Flat")}_{(PerformDepthTest ? "Depth" : "NoDepth")}"+
-            $"{(UsePalette ? "_Pal" : "")}{(UseCylindricalShader ? "_Cyl": "")}";
+        public override string ToString() =>
+            $"{(UseArrayTexture ? "Array" : "Flat")}_{(PerformDepthTest ? "Depth" : "NoDepth")}" +
+            $"{(UsePalette ? "_Pal" : "")}{(UseCylindricalShader ? "_Cyl" : "")}";
 
         public bool Equals(SpriteShaderKey other) =>
             UseArrayTexture == other.UseArrayTexture &&

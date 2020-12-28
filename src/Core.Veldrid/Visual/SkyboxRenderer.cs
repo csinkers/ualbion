@@ -27,9 +27,9 @@ namespace UAlbion.Core.Veldrid.Visual
 
         // Resource Sets
         static readonly ResourceLayoutDescription ResourceLayoutDescription = new ResourceLayoutDescription(
-            ResourceLayoutHelper.Sampler("vdspv_0_0"), // Sampler
-            ResourceLayoutHelper.Texture("vdspv_0_1"), // Texture
-            ResourceLayoutHelper.Uniform("vdspv_0_2") // Per-draw call uniform buffer
+            ResourceLayoutHelper.Sampler("uSampler"),
+            ResourceLayoutHelper.Texture("uTexture"),
+            ResourceLayoutHelper.Uniform("_Uniform")
         );
 
         static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };

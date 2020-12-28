@@ -16,30 +16,34 @@ layout(location = 0) in vec2 vPosition;
 layout(location = 1) in vec2 vTexCoords;
 
 // Instance Data
-layout(location = 2) in vec3 iT1;
-layout(location = 3) in vec3 iT2;
-layout(location = 4) in vec3 iT3;
-layout(location = 5) in vec3 iT4;
+layout(location = 2) in vec3 iTransform1;
+layout(location = 3) in vec3 iTransform2;
+layout(location = 4) in vec3 iTransform3;
+layout(location = 5) in vec3 iTransform4;
 layout(location = 6) in vec2 iTexOffset;
 layout(location = 7) in vec2 iTexSize;
-layout(location = 8) in int  iTexLayer;
+layout(location = 8) in uint iTexLayer;
 layout(location = 9) in uint iFlags;
 
 // Outputs to fragment shader
-layout(location = 0) out vec2 oTexPosition;      // Texture Coordinates
-layout(location = 1) out flat float oLayer;      // Texture Layer
-layout(location = 2) out flat uint oFlags;       // Flags
-layout(location = 3) out vec2 oNormCoords;       // Normalised sprite coordinates
-layout(location = 4) out vec3 oWorldPosition;    // World position
+layout(location = 0) out vec2 oTexPosition;   // Texture Coordinates
+layout(location = 1) out flat float oLayer;   // Texture Layer
+layout(location = 2) out flat uint oFlags;    // Flags
+layout(location = 3) out vec2 oNormCoords;    // Normalised sprite coordinates
+layout(location = 4) out vec3 oWorldPosition; // World position
 
 void main()
 {
-	mat4 transform = mat4(vec4(iT1, 0), vec4(iT2, 0), vec4(iT3, 0), vec4(iT4, 1));
+	mat4 transform = mat4(
+		vec4(iTransform1, 0),
+		vec4(iTransform2, 0),
+		vec4(iTransform3, 0),
+		vec4(iTransform4, 1));
 
 	if ((iFlags & SF_BILLBOARD) != 0)
 	{
-		float cx = cos(-u_camera_look_direction.x);
-		float sx = sin(-u_camera_look_direction.x);
+		float cx = cos(-uCameraLookDirection.x);
+		float sx = sin(-uCameraLookDirection.x);
 
 		transform = transform * mat4(
 			cx, 0, sx, 0,

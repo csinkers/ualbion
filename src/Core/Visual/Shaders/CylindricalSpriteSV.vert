@@ -3,8 +3,8 @@
 // Resource Sets
 layout(binding = 2) uniform _Uniform {
 	uint uFlags;
-	uint _u_padding_1;
-	uint _u_padding_2;
+	float uTexSizeW;
+	float uTexSizeH;
 	uint _u_padding_3;
 };
 
@@ -16,13 +16,13 @@ layout(location = 0) in vec2 vPosition;
 layout(location = 1) in vec2 vTexCoords;
 
 // Instance Data
-layout(location = 2) in vec3 iT1;
-layout(location = 3) in vec3 iT2;
-layout(location = 4) in vec3 iT3;
-layout(location = 5) in vec3 iT4;
+layout(location = 2) in vec3 iTransform1;
+layout(location = 3) in vec3 iTransform2;
+layout(location = 4) in vec3 iTransform3;
+layout(location = 5) in vec3 iTransform4;
 layout(location = 6) in vec2 iTexOffset;
 layout(location = 7) in vec2 iTexSize;
-layout(location = 8) in int  iTexLayer;
+layout(location = 8) in uint iTexLayer;
 layout(location = 9) in uint iFlags;
 
 // Outputs to fragment shader
@@ -35,7 +35,7 @@ layout(location = 5) out flat float oFrontDepth; // Sprite front depth
 
 void main()
 {
-	mat4 transform = mat4(vec4(iT1, 0), vec4(iT2, 0), vec4(iT3, 0), vec4(iT4, 1));
+	mat4 transform = mat4(vec4(iTransform1, 0), vec4(iTransform2, 0), vec4(iTransform3, 0), vec4(iTransform4, 1));
 	vec4 worldSpace = transform * vec4(vPosition, 0, 1);
 	mat4 viewTransform = uView * transform;
 	viewTransform[0] = transform[0];
@@ -44,7 +44,7 @@ void main()
 	vec4 viewPosition = viewTransform * vec4(vPosition, 0, 1);
 	vec4 normPosition = uProjection * viewPosition;
 	vec4 centerView = uView * transform * vec4(0, 0, 0, 1);
-	float angle = atan(centerView.z, centerView.x) - u_camera_look_direction.x; // rotate to form a line
+	float angle = atan(centerView.z, centerView.x) - uCameraLookDirection.x; // rotate to form a line
 	
 	float cx = cos(angle);
 	float sx = sin(angle);

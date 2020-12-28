@@ -1,14 +1,14 @@
 ﻿// UAlbion.Core.CameraInfo
 layout(set = 1, binding = 0) uniform _Shared {
-	vec3 u_world_space_position; // 12
+	vec3 uWorldSpacePosition; // 12
 	uint _s_padding_1;
-	vec3 u_camera_look_direction; // 24
+	vec3 uCameraLookDirection; // 24
 	uint _s_padding_2;
-	vec2 u_resolution;   // 32
-	float u_time;        // 36
-	float u_special1;    // 40
-	float u_special2;    // 44
-	uint u_engine_flags; // 48
+	vec2 uResolution;   // 32
+	float uTime;        // 36
+	float uSpecial1;    // 40
+	float uSpecial2;    // 44
+	uint uEngineFlags; // 48
 	uint _s_padding_3;
 	uint _s_padding_4;
 };

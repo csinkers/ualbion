@@ -67,7 +67,7 @@ namespace UAlbion.Game.Gui.Text
         {
             var textManager = Resolve<ITextManager>();
 
-            var line = new TextLine(extents);
+            var line = new TextLine(_isScrollable ? extents : (Rectangle?)null);
             foreach (var block in textManager.SplitBlocksToSingleWords(blocks))
             {
                 var size = textManager.Measure(block);
@@ -77,7 +77,7 @@ namespace UAlbion.Game.Gui.Text
                     if (!forceNewLine && string.IsNullOrWhiteSpace(block.Text))
                         continue;
                     yield return line;
-                    line = new TextLine(extents);
+                    line = new TextLine(_isScrollable ? extents : (Rectangle?)null);
                 }
 
                 line.Add(block, size);

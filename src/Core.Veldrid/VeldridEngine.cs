@@ -30,7 +30,7 @@ namespace UAlbion.Core.Veldrid
         readonly WindowManager _windowManager;
         readonly VeldridCoreFactory _coreFactory;
         readonly IDictionary<Type, IRenderer> _renderers = new Dictionary<Type, IRenderer>();
-        readonly IDictionary<Type, List<IRenderable>> _renderables = new Dictionary<Type, List<IRenderable>>();
+        readonly IDictionary<IRenderer, List<IRenderable>> _renderables = new Dictionary<IRenderer, List<IRenderable>>();
 
         SceneContext _sceneContext;
         CommandList _frameCommands;
@@ -123,10 +123,13 @@ namespace UAlbion.Core.Veldrid
         {
             if (renderable == null) return;
             var type = renderable.GetType();
-            if (!_renderables.TryGetValue(type, out var list))
+            if (!_renderers.TryGetValue(type, out var renderer))
+                throw new InvalidOperationException($"Renderable of type {type.Name} is not handled by any registered renderer");
+
+            if (!_renderables.TryGetValue(renderer, out var list))
             {
                 list = new List<IRenderable>();
-                _renderables[type] = list;
+                _renderables[renderer] = list;
             }
 
             list.Add(renderable);
@@ -136,7 +139,10 @@ namespace UAlbion.Core.Veldrid
         {
             if (renderable == null) return;
             var type = renderable.GetType();
-            if (!_renderables.TryGetValue(type, out var list))
+            if (!_renderers.TryGetValue(type, out var renderer))
+                throw new InvalidOperationException($"Renderable of type {type.Name} is not handled by any registered renderer");
+
+            if (!_renderables.TryGetValue(renderer, out var list))
                 return;
 
             list.Remove(renderable);
@@ -289,7 +295,7 @@ namespace UAlbion.Core.Veldrid
                 _frameCommands.Begin();
                 Raise(RenderEvent.Instance);
                 foreach (var scene in scenes)
-                    scene.UpdatePerFrameResources(context, _renderables, _renderers);
+                    scene.UpdatePerFrameResources(context, _renderables);
                 _frameCommands.End();
                 GraphicsDevice.SubmitCommands(_frameCommands);
             }

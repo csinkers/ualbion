@@ -24,16 +24,15 @@ namespace UAlbion.Core
 
         public override string ToString() => $"Scene:{Name}";
 
-        public void UpdatePerFrameResources(IRendererContext context, IDictionary<Type, List<IRenderable>> renderables, IDictionary<Type, IRenderer> renderers)
+        public void UpdatePerFrameResources(IRendererContext context, IDictionary<IRenderer, List<IRenderable>> renderables)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (renderables == null) throw new ArgumentNullException(nameof(renderables));
-            if (renderers == null) throw new ArgumentNullException(nameof(renderers));
 
             context.SetCurrentScene(this);
 
             foreach (var renderer in renderables)
-                CoreTrace.Log.CollectedRenderables(renderer.Key.Name, 0, renderer.Value.Count);
+                CoreTrace.Log.CollectedRenderables(renderer.Key.GetType().Name, 0, renderer.Value.Count);
 
             var paletteManager = Resolve<IPaletteManager>();
             context.SetCurrentPalette(paletteManager.PaletteTexture, paletteManager.Version);
@@ -47,7 +46,7 @@ namespace UAlbion.Core
                 List<IRenderable> processed = new List<IRenderable>();
                 foreach (var renderableGroup in renderables)
                 {
-                    IRenderer renderer = renderers[renderableGroup.Key];
+                    IRenderer renderer = renderableGroup.Key;
                     processed.Clear();
                     renderer.UpdatePerFrameResources(context, renderableGroup.Value, processed);
                     foreach (var renderable in processed)

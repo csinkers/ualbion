@@ -18,8 +18,8 @@ namespace UAlbion.Game.Veldrid.Visual
 
         // Resource Sets
         static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
-            ResourceLayoutHelper.BufferReadOnlyFrag("vdspv_0_0"), // Tile data
-            ResourceLayoutHelper.Uniform("vdspv_0_1") // Per-draw call uniform buffer
+            ResourceLayoutHelper.BufferReadOnlyFrag("_Buffer"), // Tile data
+            ResourceLayoutHelper.Uniform("_Uniform") // Per-draw call uniform buffer
         );
 
         static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };

@@ -183,6 +183,16 @@ namespace UAlbion.Core.Veldrid.Visual
             string vertexContent, string fragmentContent)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
+
+#if DEBUG
+                vertexContent =
+                    @"#define DEBUG
+" + vertexContent;
+                fragmentContent =
+                    @"#define DEBUG
+" + fragmentContent;
+#endif
+
             var vertexPath = GetShaderPath(vertexName, vertexContent);
             var fragmentPath = GetShaderPath(fragmentName, fragmentContent);
 
@@ -205,11 +215,11 @@ namespace UAlbion.Core.Veldrid.Visual
                 if (entry == null)
                     throw new InvalidOperationException($"No shader could be built for ({vertexName}, {fragmentName})");
 
-                return new[]
-                {
-                    factory.CreateShader(entry.VertexShader),
-                    factory.CreateShader(entry.FragmentShader)
-                };
+                var vertexShader = factory.CreateShader(entry.VertexShader);
+                var fragmentShader = factory.CreateShader(entry.FragmentShader);
+                vertexShader.Name = "S_" + vertexName;
+                fragmentShader.Name = "S_" + fragmentName;
+                return new[] { vertexShader, fragmentShader };
             }
         }
 

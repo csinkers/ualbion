@@ -29,8 +29,8 @@ namespace UAlbion.Core.Veldrid.Visual
 
         // Resource Sets
         static readonly ResourceLayoutDescription PerSpriteLayoutDescription = new ResourceLayoutDescription(
-            ResourceLayoutHelper.Sampler("uSpriteSampler"),
             ResourceLayoutHelper.Texture("uSprite"),
+            ResourceLayoutHelper.Sampler("uSpriteSampler"),
             ResourceLayoutHelper.Uniform("_Uniform")
         );
 
@@ -166,9 +166,10 @@ namespace UAlbion.Core.Veldrid.Visual
                 if (buffer?.SizeInBytes != bufferSize)
                 {
                     buffer = gd.ResourceFactory.CreateBuffer(new BufferDescription(bufferSize, BufferUsage.VertexBuffer));
-                    buffer.Name = $"B_SpriteInst:{sprite.Name}";
+                    buffer.Name = $"B_Inst:{sprite.Name}";
                     PerfTracker.IncrementFrameCounter("Create InstanceBuffer");
                     objectManager.SetDeviceObject((sprite, sprite, "InstanceBuffer"), buffer);
+                    sprite.InstancesDirty = true;
                 }
 
                 if (sprite.InstancesDirty)
@@ -188,23 +189,23 @@ namespace UAlbion.Core.Veldrid.Visual
                     uniformBuffer.Name = $"B_SpriteUniform:{sprite.Name}";
                     PerfTracker.IncrementFrameCounter("Create sprite uniform buffer");
                     objectManager.SetDeviceObject((sprite, textureView, "UniformBuffer"), uniformBuffer);
-                }
 
-                var uniformInfo = new SpriteUniformInfo
-                {
-                    Flags = sprite.Key.Flags,
-                    TextureWidth = textureView?.Target.Width ?? 1,
-                    TextureHeight = textureView?.Target.Height ?? 1
-                };
-                cl.UpdateBuffer(uniformBuffer, 0, uniformInfo);
+                    var uniformInfo = new SpriteUniformInfo
+                    {
+                        Flags = sprite.Key.Flags,
+                        TextureWidth = textureView?.Target.Width ?? 1,
+                        TextureHeight = textureView?.Target.Height ?? 1
+                    };
+                    cl.UpdateBuffer(uniformBuffer, 0, uniformInfo);
+                }
 
                 var resourceSet = objectManager.GetDeviceObject<ResourceSet>((sprite, textureView, "ResourceSet"));
                 if (resourceSet == null)
                 {
                     resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
                         _perSpriteResourceLayout,
-                        gd.PointSampler,
                         textureView,
+                        gd.PointSampler,
                         uniformBuffer));
                     resourceSet.Name = $"RS_Sprite:{sprite.Key.Texture.Name}";
                     PerfTracker.IncrementFrameCounter("Create ResourceSet");

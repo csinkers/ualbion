@@ -3,11 +3,11 @@
 
 // Resource Sets
 #ifdef USE_ARRAY_TEXTURE
-layout(binding = 0) uniform sampler uSpriteSampler; // vdspv_0_0
-layout(binding = 1) uniform texture2DArray uSprite; // vdspv_0_1
+layout(binding = 0) uniform texture2DArray uSprite;
+layout(binding = 1) uniform sampler uSpriteSampler;
 #else
-layout(binding = 0) uniform sampler uSpriteSampler; //! // vdspv_0_0
-layout(binding = 1) uniform texture2D uSprite;  //! // vdspv_0_1
+layout(binding = 0) uniform texture2D uSprite;  //!
+layout(binding = 1) uniform sampler uSpriteSampler; //!
 #endif
 
 // Shared set
@@ -38,15 +38,13 @@ void main()
 #endif
 
 #ifdef USE_PALETTE
-	float redChannel = color[0];
-	color = texture(
-		sampler2D(uPalette, uSpriteSampler),
-		vec2((redChannel * 255.0f/256.f) + (0.5f/256.0f), 0)); //!
-
-	if (redChannel == 0)
-		color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	color = color[0] == 0
+		? vec4(0)
+		: texture(sampler2D(uPalette, uSpriteSampler),
+			vec2((color[0] * 255.0f/256.f) + (0.5f/256.0f), 0));
 #endif
 
+#ifdef DEBUG
 	// Outline
 	if ((uEngineFlags & EF_SHOW_BOUNDING_BOXES) != 0 && (iFlags & SF_NO_BOUNDING_BOX) == 0)
 	{
@@ -61,17 +59,18 @@ void main()
 			color = mix(color, vec4(1.0f, 0.0f, 0.0f, 1.0f), vec4(0.4));
 	}
 
+	if ((iFlags & SF_HIGHLIGHT)  != 0) color = color * 1.2;
+	if ((iFlags & SF_RED_TINT)   != 0) color = vec4(color.x * 1.5f + 0.3f, color.yz * 0.7f,                       color.w);
+	if ((iFlags & SF_GREEN_TINT) != 0) color = vec4(color.x * 0.7f,        color.y * 1.5f + 0.3f, color.z * 0.7f, color.w);
+	if ((iFlags & SF_BLUE_TINT)  != 0) color = vec4(color.xy * 0.7f,       color.z * 1.5f + 0.3f,                 color.w);
+#endif
+
 	if (color.w == 0.0f)
 		discard;
 
 	if ((iFlags & SF_DROP_SHADOW) != 0)
 		color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
-	if ((iFlags & SF_HIGHLIGHT)  != 0) color = color * 1.2;
-	if ((iFlags & SF_RED_TINT)   != 0) color = vec4(color.x * 1.5f + 0.3f, color.yz * 0.7f,                       color.w);
-	if ((iFlags & SF_GREEN_TINT) != 0) color = vec4(color.x * 0.7f,        color.y * 1.5f + 0.3f, color.z * 0.7f, color.w);
-	if ((iFlags & SF_BLUE_TINT)  != 0) color = vec4(color.xy * 0.7f,       color.z * 1.5f + 0.3f,                 color.w);
-	// if ((iFlags & SF_TRANSPARENT) != 0) color = vec4(color.xyz, color.w * 0.5f); // Transparent
 	if ((iFlags & 0xff000000) != 0) // High order byte = opacity
 	{
 		float opacity = (((iFlags & 0xff000000) >> 24) / 255.0f);
@@ -87,9 +86,11 @@ void main()
 		depth += (iFrontDepth - depth) * coef;
 	}
 	
+#ifdef DEBUG
 	if ((uEngineFlags & EF_RENDER_DEPTH) != 0)
 		color = vec4(depth, 10 * (max(depth, 0.9) - 0.9), 10 * min(depth, 0.1), 1.0f);
-	OutputColor = color;
+#endif
 
+	OutputColor = color;
 	gl_FragDepth = ((uEngineFlags & EF_FLIP_DEPTH_RANGE) != 0) ? 1.0f - depth : depth;
 }

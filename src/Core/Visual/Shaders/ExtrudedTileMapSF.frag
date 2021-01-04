@@ -2,10 +2,10 @@
 //!#extension GL_KHR_vulkan_glsl: enable
 
 // Resource Sets / Uniforms 
-layout(binding = 1) uniform sampler PaletteSampler;  //! // vdspv_0_3
-layout(binding = 2) uniform sampler TextureSampler;  //! // vdspv_0_5
-layout(binding = 3) uniform texture2DArray Floors;   //! // vdspv_0_6
-layout(binding = 4) uniform texture2DArray Walls;    //! // vdspv_0_7
+layout(binding = 1) uniform sampler PaletteSampler;  //!
+layout(binding = 2) uniform sampler TextureSampler;  //!
+layout(binding = 3) uniform texture2DArray Floors;   //!
+layout(binding = 4) uniform texture2DArray Walls;    //!
 
 #include "CommonResources.glsl"
 

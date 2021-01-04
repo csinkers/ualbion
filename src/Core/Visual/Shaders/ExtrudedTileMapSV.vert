@@ -2,7 +2,7 @@
 //!#define gl_VertexIndex gl_VertexID
 
 // Resource Sets / Uniforms
-layout(binding = 0) uniform _Misc { vec3 uTileSize; int Unused1; }; // vdspv_0_0
+layout(binding = 0) uniform _Misc { vec3 uTileSize; int Unused1; };
 
 #include "CommonResources.glsl"
 

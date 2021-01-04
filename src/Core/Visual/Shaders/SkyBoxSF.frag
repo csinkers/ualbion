@@ -2,8 +2,8 @@
 //!#extension GL_KHR_vulkan_glsl: enable
 
 // Resource Sets
-layout(binding = 0) uniform sampler uSampler; //! // vdspv_0_0
-layout(binding = 1) uniform texture2D uTexture;  //! // vdspv_0_1
+layout(binding = 0) uniform sampler uSampler; //!
+layout(binding = 1) uniform texture2D uTexture;  //!
 
 // Shared set
 #define USE_PALETTE

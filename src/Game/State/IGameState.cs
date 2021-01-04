@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 
@@ -17,5 +18,7 @@ namespace UAlbion.Game.State
         bool GetSwitch(SwitchId id);
         MapChangeCollection TemporaryMapChanges { get; }
         MapChangeCollection PermanentMapChanges { get; }
+        ActiveItems ActiveItems { get; }
+        IList<NpcState> Npcs { get; }
     }
 }

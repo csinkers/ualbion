@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using UAlbion.Config;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 
 namespace DumpSave

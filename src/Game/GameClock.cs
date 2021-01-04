@@ -76,11 +76,14 @@ namespace UAlbion.Game
                     var newGameTime = lastGameTime.AddSeconds(e.DeltaSeconds * config.GameSecondsPerSecond);
                     ((IComponent) state).Receive(new SetTimeEvent(newGameTime), this);
 
+                    if (newGameTime.Minute != lastGameTime.Minute)
+                        Raise(MinuteElapsedEvent.Instance);
+
                     if (newGameTime.Hour != lastGameTime.Hour)
-                        Raise(new HourElapsedEvent());
+                        Raise(HourElapsedEvent.Instance);
 
                     if (newGameTime.Date != lastGameTime.Date)
-                        Raise(new DayElapsedEvent());
+                        Raise(DayElapsedEvent.Instance);
                 }
 
                 _elapsedTimeThisGameFrame += e.DeltaSeconds;

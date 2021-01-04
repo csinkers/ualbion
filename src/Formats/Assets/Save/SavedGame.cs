@@ -42,7 +42,7 @@ namespace UAlbion.Formats.Assets.Save
         public uint Unk1 { get; set; }
         public byte[] Unk9 { get; set; }
         public byte[] Unknown16 { get; set; }
-        public byte[] Unknown1A6 { get; set; }
+        public MiscState Misc { get; private set; } = new MiscState();
         public byte[] Unknown2C1 { get; set; }
         public byte[] Unknown5B9F { get; set; }
         public NpcState[] Npcs { get; } = new NpcState[MaxNpcCount];
@@ -102,7 +102,7 @@ namespace UAlbion.Formats.Assets.Save
                     return value;
                 });
 
-            save.Unknown1A6 = s.ByteArrayHex(nameof(Unknown1A6), save.Unknown1A6, 0xD0); // 1A6
+            save.Misc = s.Object(nameof(Misc), save.Misc, MiscState.Serdes); // 1A6
             save._switches.SetPacked(0,
                 s.ByteArrayHex("Switches",
                     save._switches.GetPacked(0, FlagDictionary.OriginalSaveGameMax, mapping),

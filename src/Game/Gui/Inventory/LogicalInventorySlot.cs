@@ -241,18 +241,25 @@ namespace UAlbion.Game.Gui.Inventory
             if (item.TypeId == ItemType.Document && _id.Id.Type == InventoryType.Player)
                 options.Add(new ContextMenuOption(S(Base.SystemText.InvPopup_Read), null, ContextMenuGroup.Actions));
 
+            // TODO: Remove scroll if event successful
             if (item.TypeId == ItemType.SpellScroll && _id.Id.Type == InventoryType.Player)
                 options.Add(new ContextMenuOption(S(Base.SystemText.InvPopup_LearnSpell), null, ContextMenuGroup.Actions));
 
+            // TODO: Remove drink if event successful
             if (item.TypeId == ItemType.Drink && _id.Id.Type == InventoryType.Player)
                 options.Add(new ContextMenuOption(S(Base.SystemText.InvPopup_Drink), null, ContextMenuGroup.Actions));
 
+            // TODO: Remove item if event successful
             if (item.TypeId == ItemType.HeadsUpDisplayItem && _id.Id.Type == InventoryType.Player)
-                options.Add(new ContextMenuOption(S(Base.SystemText.InvPopup_Activate), null, ContextMenuGroup.Actions));
+            {
+                options.Add(new ContextMenuOption(
+                    S(Base.SystemText.InvPopup_Activate),
+                    new ActivateItemEvent(item.Id),
+                    ContextMenuGroup.Actions));
+            }
 
             if (item.Charges > 0 && _id.Id.Type == InventoryType.Player) // TODO: Disable based on spell context
                 options.Add(new ContextMenuOption(S(Base.SystemText.InvPopup_ActivateSpell), null, ContextMenuGroup.Actions));
-
 
             var uiPosition = window.PixelToUi(cursorManager.Position);
             Raise(new ContextMenuEvent(uiPosition, heading, options));

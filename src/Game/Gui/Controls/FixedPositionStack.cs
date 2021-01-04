@@ -22,10 +22,10 @@ namespace UAlbion.Game.Gui.Controls
             }
 
             public IUiElement Element { get; }
-            public int X { get; }
-            public int Y { get; }
-            public int? Width { get; }
-            public int? Height { get; }
+            public int X { get; set; }
+            public int Y { get; set; }
+            public int? Width { get; set; }
+            public int? Height { get; set; }
             public override string ToString() => $"{Element} @ <{X}, {Y}>";
         }
 
@@ -41,6 +41,21 @@ namespace UAlbion.Game.Gui.Controls
             _positions.Add(new Child(child, x, y, w, h));
             AttachChild(child);
             return this;
+        }
+
+        public void Move(IUiElement element, int x, int y, int? w = null, int? h = null)
+        {
+            foreach (var child in _positions)
+            {
+                if (child.Element != element) 
+                    continue;
+
+                child.X = x;
+                child.Y = y;
+                child.Width = w ?? child.Width;
+                child.Height = h ?? child.Height;
+                break;
+            }
         }
 
         public override Vector2 GetSize()

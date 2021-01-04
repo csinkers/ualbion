@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -25,6 +26,8 @@ namespace UAlbion.Game.State
 
         public MapChangeCollection TemporaryMapChanges => _game.TemporaryMapChanges;
         public MapChangeCollection PermanentMapChanges => _game.PermanentMapChanges;
+        public ActiveItems ActiveItems => _game.Misc.ActiveItems;
+        public IList<NpcState> Npcs => _game.Npcs;
         public MapId MapId => _game.MapId;
 
         public GameState()
@@ -58,6 +61,7 @@ namespace UAlbion.Game.State
                 _game.Tickers[e.TickerId] = (byte)e.Operation.Apply(curValue, e.Amount, 0, 255);
             });
             On<ChangeTimeEvent>(e => { });
+            On<ActivateItemEvent>(ActivateItem);
 
             AttachChild(new InventoryManager(GetWriteableInventory));
         }
@@ -165,6 +169,13 @@ namespace UAlbion.Game.State
             Raise(new PartyJumpEvent(_game.PartyX, _game.PartyY));
             Raise(new CameraJumpEvent(_game.PartyX, _game.PartyY));
             Raise(new PlayerEnteredTileEvent(_game.PartyX, _game.PartyY));
+        }
+
+        void ActivateItem(ActivateItemEvent e)
+        {
+            if (e.Item == Base.Item.Clock) _game.Misc.ActiveItems |= ActiveItems.Clock;
+            else if (e.Item == Base.Item.Compass) _game.Misc.ActiveItems |= ActiveItems.Compass;
+            else if (e.Item == Base.Item.MonsterEye) _game.Misc.ActiveItems |= ActiveItems.MonsterEye;
         }
     }
 }

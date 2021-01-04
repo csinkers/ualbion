@@ -261,10 +261,11 @@ namespace UAlbion.Config
                 .Cast<object>()
                 .Select(x => (x.ToString(), Convert.ToInt32(x, CultureInfo.InvariantCulture))))
             {
-                if (!_byName.TryGetValue(value.Item1, out var entries))
+                var key = value.Item1.ToUpperInvariant();
+                if (!_byName.TryGetValue(key, out var entries))
                 {
                     entries = new List<(EnumInfo, int)>();
-                    _byName[value.Item1] = entries;
+                    _byName[key] = entries;
                 }
                 entries.Add((info, value.Item2 + info.Offset));
             }
@@ -304,7 +305,7 @@ namespace UAlbion.Config
             if (string.IsNullOrEmpty(s))
                 return AssetId.None;
 
-            s = s.Trim();
+            s = s.Trim().ToUpperInvariant();
             int index = s.LastIndexOf('.');
             var valueName = index == -1 ? s : s.Substring(index + 1);
             var typeName = index == -1 ? null : s.Substring(0, index);

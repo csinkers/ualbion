@@ -72,18 +72,28 @@ namespace UAlbion.Game.Assets
         public TilesetData LoadTileData(TilesetId id) => (TilesetData)_modApplier.LoadAssetCached(id);
         public LabyrinthData LoadLabyrinthData(LabyrinthId id) => (LabyrinthData)_modApplier.LoadAssetCached(id);
 
+        public bool IsStringDefined(StringId id) =>
+            _modApplier.LoadAssetCached(id.Id) switch
+            {
+                string _ => true,
+                AlbionStringCollection c => c.Count > id.SubId,
+                IDictionary<int, string> d => d.ContainsKey(id.SubId),
+                IDictionary<AssetId, string> d => d.ContainsKey(id.Id),
+                _ => false
+            };
+
         public string LoadString(TextId id) => LoadString((StringId)id);
         public string LoadString(StringId id)
         {
             var asset = _modApplier.LoadAssetCached(id.Id);
-            return (asset switch
+            return asset switch
             {
                 string s => s,
                 AlbionStringCollection c => c.Count > id.SubId ? c[id.SubId] : null,
                 IDictionary<int, string> d => d.GetValueOrDefault(id.SubId),
                 IDictionary<AssetId, string> d => d.GetValueOrDefault(id.Id),
                 _ => $"!MISSING STRING-TABLE {id.Id}:{id.SubId}!"
-            }) ?? $"!MISSING STRING {id.Id}:{id.SubId}!";
+            } ?? $"!MISSING STRING {id.Id}:{id.SubId}!";
         }
 
         public ISample LoadSample(SampleId id) => (AlbionSample)_modApplier.LoadAssetCached(id);

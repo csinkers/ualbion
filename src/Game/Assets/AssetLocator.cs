@@ -76,12 +76,15 @@ namespace UAlbion.Game.Assets
             var files = Directory.GetFiles(resolved);
             foreach (var path in files.Where(x => Path.GetFileNameWithoutExtension(x).ToUpperInvariant() == filename))
             {
-                if (!string.IsNullOrEmpty(info.File.Sha256Hash))
+                if (info.File.Sha256Hashes != null)
                 {
                     var hash = GetHash(path);
-                    if (!hash.Equals(info.File.Sha256Hash, StringComparison.OrdinalIgnoreCase))
+                    if (info.File.Sha256Hashes.All(x => !hash.Equals(x, StringComparison.OrdinalIgnoreCase)))
                     {
-                        CoreUtil.LogWarn($"Found file {path} for asset {info.AssetId}, but its hash ({hash}) did not match the expected one ({info.File.Sha256Hash})");
+                        var expected = string.Join(", ", info.File.Sha256Hashes);
+                        CoreUtil.LogWarn(
+                            $"Found file {path} for asset {info.AssetId}, but its " + 
+                            $"hash ({hash}) did not match any of the expected ones ({expected})");
                         return null;
                     }
                 }

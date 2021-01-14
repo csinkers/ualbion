@@ -55,6 +55,17 @@ namespace UAlbion.Game.Assets
 
         public TilesetData LoadTileData(TilesetId id) => (TilesetData)_modApplier.LoadAsset(id);
         public LabyrinthData LoadLabyrinthData(LabyrinthId id) => (LabyrinthData)_modApplier.LoadAsset(id);
+
+        public bool IsStringDefined(StringId id) =>
+            _modApplier.LoadAsset(id.Id) switch
+            {
+                string _ => true,
+                AlbionStringCollection c => c.Count > id.SubId,
+                IDictionary<int, string> d => d.ContainsKey(id.SubId),
+                IDictionary<AssetId, string> d => d.ContainsKey(id.Id),
+                _ => false
+            };
+
         public string LoadString(TextId id) => LoadString((StringId)id);
         public string LoadString(StringId id)
         {

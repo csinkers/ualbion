@@ -7408,7 +7408,10 @@
     "Files": {
       "MAIN": {
         "ContainerFormat": "BinaryOffsets",
-        "Sha256Hash": "476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710",
+        "Sha256Hashes": [ 
+          "476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710", // EN + DE
+          "487da3348c367363f3efcbb22ae45c186f1fbecada73f0bf0ce2ca8377a8de14"  // FR
+        ],
         "Assets": {
            "0": { "Name": "Cursor",               "Offset": 0x0FBE58, "Width": 14, "Height": 14, "Hotspot": { "X": -6,   "Y":  0 } },
            "1": { "Name": "Cursor3dUp",           "Offset": 0x0FBF1C, "Width": 16, "Height": 16, "Hotspot": { "X":  0,   "Y":  4 } },

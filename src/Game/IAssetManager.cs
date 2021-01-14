@@ -18,6 +18,7 @@ namespace UAlbion.Game
         ITexture LoadFont(FontColor color, bool isBold);
         TilesetData LoadTileData(TilesetId id);
         LabyrinthData LoadLabyrinthData(LabyrinthId id);
+        bool IsStringDefined(StringId id);
         string LoadString(TextId id);
         string LoadString(StringId id);
         ISample LoadSample(SampleId id);

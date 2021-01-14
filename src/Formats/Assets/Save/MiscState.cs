@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 
 namespace UAlbion.Formats.Assets.Save
 {
@@ -35,6 +36,7 @@ namespace UAlbion.Formats.Assets.Save
 
         public static MiscState Serdes(int _, MiscState m, ISerializer s)
         {
+            if (s == null) throw new ArgumentNullException(nameof(s));
             m ??= new MiscState();
             m.Unk0 = s.Int32(nameof(Unk0), m.Unk0); // 0
             m.ActiveItems = s.EnumU32(nameof(ActiveItems), m.ActiveItems); // 4

@@ -54,7 +54,8 @@ namespace UAlbion.Config
             // basicConfig.Save(basePath);
         }
 
-        public AssetInfo GetAssetInfo(string typeName, int id) => _assetLookup.TryGetValue((typeName, id), out var info) ? info : null;
+        public AssetInfo GetAssetInfo(string typeName, int id)
+            => _assetLookup.TryGetValue((typeName, id), out var info) ? info : null;
 
         public void PopulateAssetIds(AssetMapping mapping)
         {

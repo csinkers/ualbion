@@ -17,7 +17,7 @@ namespace UAlbion.Config
         public int? Width { get; set; }
         public int? Height { get; set; }
         public bool? Transposed { get; set; }
-        public string Sha256Hash { get; set; } // Currently only used for MAIN.EXE
+        public string[] Sha256Hashes { get; set; } // Currently only used for MAIN.EXE
         public IDictionary<int, AssetInfo> Assets { get; } = new Dictionary<int, AssetInfo>();
 
         // TODO: Text encoding

@@ -8,11 +8,13 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Visual;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.Containers;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
+using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
 using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid.Assets;
@@ -59,6 +61,19 @@ namespace UAlbion
 
             PerfTracker.StartupEvent($"Running as {commandLine.Mode}");
             var (exchange, services) = setupAssetSystem.Result;
+
+            // Auto-detect language
+            var assets = exchange.Resolve<IAssetManager>();
+            if (!assets.IsStringDefined((TextId)Base.SystemText.MainMenu_MainMenu))
+            {
+                foreach (var language in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
+                {
+                    exchange.Raise(new SetLanguageEvent(language), null);
+                    if (assets.IsStringDefined((TextId)Base.SystemText.MainMenu_MainMenu))
+                        break;
+                }
+            }
+
             switch (commandLine.Mode)
             {
                 case ExecutionMode.Game:
@@ -74,7 +89,6 @@ namespace UAlbion
                 case ExecutionMode.SavedGameTests: SavedGameTests.RoundTripTest(baseDir); break;
 
                 case ExecutionMode.DumpData:
-                    var assets = exchange.Resolve<IAssetManager>();
                     PerfTracker.BeginFrame(); // Don't need to show verbose startup logging while dumping
                     var tf = new TextFormatter();
                     exchange.Attach(tf);

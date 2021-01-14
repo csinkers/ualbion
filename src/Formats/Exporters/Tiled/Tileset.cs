@@ -49,8 +49,8 @@ namespace UAlbion.Formats.Exporters.Tiled
             var test = new Tileset
             {
                 Name = "Test",
-                TileWidth = 18,
-                TileHeight = 18,
+                TileWidth = 16,
+                TileHeight = 16,
                 Columns = 56,
                 Version = "1.4",
                 TiledVersion = "1.4.2",
@@ -128,7 +128,10 @@ namespace UAlbion.Formats.Exporters.Tiled
             if (properties == null) throw new ArgumentNullException(nameof(properties));
             // +1 to go from max index to count, then + another so we have a blank tile at the end.
 
-            int count = tileset.Tiles.Where(x => x.ImageNumber != 0xffff).Max(x => x.ImageNumber + x.FrameCount - 1) + 2;
+            int count = tileset.Tiles
+                .Where(x => x.ImageNumber != 0xffff)
+                .Max(x => x.ImageNumber + x.FrameCount - 1)
+                + 2;
             int columns = (properties.SheetWidth - 2 * properties.Margin) / (properties.TileWidth + properties.Spacing);
 
             static List<TileProperty> Props(TileData x)

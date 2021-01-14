@@ -211,8 +211,9 @@ namespace UAlbion
         static Tiled.TilemapProperties ExtractProperties(ITexture sheet, string sheetPath) => new Tiled.TilemapProperties
         {
             FrameDurationMs = 180, // TODO: Pull from first matching map's anim rate?
-            Margin = 1, // See AlbionSpritePostProcessor
-            Spacing = 2, // See AlbionSpritePostProcessor
+            // Commented out since we export closely packed now instead of dumping the raw in-memory pixels.
+            // Margin = 1, // See AlbionSpritePostProcessor
+            // Spacing = 2, // See AlbionSpritePostProcessor
             SheetPath = sheetPath,
             SheetWidth = (int)sheet.Width,
             SheetHeight = (int)sheet.Height,

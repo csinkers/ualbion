@@ -3,7 +3,7 @@ if x%1 == xextract goto extract
 if x%1 == xbuild goto build
 if x%1 == xpublish goto publish
 if x%1 == xsr goto sr
-if x%1 == xsr goto ds
+if x%1 == xds goto ds
 dotnet run --project src\ualbion -- %*
 goto end
 

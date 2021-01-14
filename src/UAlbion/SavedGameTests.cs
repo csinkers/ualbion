@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -14,8 +15,13 @@ namespace UAlbion
         public static void RoundTripTest(string baseDir)
         {
             var mapping = AssetMapping.Global; // TODO: Base game mapping.
-            foreach (var file in Directory.EnumerateFiles(Path.Combine(baseDir, "re", "TestSaves"), "*.001"))
+            var saveDir = Path.Combine(baseDir, "re", "TestSaves");
+            var regex = new Regex(@"\.[0-9][0-9][0-9]$");
+            foreach (var file in Directory.EnumerateFiles(saveDir))
             {
+                if (!regex.IsMatch(file))
+                    continue;
+                Console.WriteLine("Round-trip testing " + file);
                 using var stream = File.Open(file, FileMode.Open);
                 using var br = new BinaryReader(stream);
                 using var ar = new AlbionReader(br, stream.Length);
@@ -50,6 +56,7 @@ namespace UAlbion
                 break;
             }
 
+            Console.WriteLine("Done");
             Console.ReadLine();
         }
     }

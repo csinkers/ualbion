@@ -101,7 +101,7 @@ namespace UAlbion.Formats.Tests
                 .RegisterAssetType(typeof(ZeroBasedShort), AssetType.Map)
                 ;
 
-            Assert.Collection(m.EnumeratAssetsOfType(AssetType.Portrait),
+            Assert.Collection(m.EnumerateAssetsOfType(AssetType.Portrait),
                 x => Assert.Equal("ZeroBasedByte.Zero", x.ToString()),
                 x => Assert.Equal("ZeroBasedByte.One", x.ToString()),
                 x => Assert.Equal("ZeroBasedByte.Two", x.ToString()),
@@ -110,7 +110,7 @@ namespace UAlbion.Formats.Tests
                 x => Assert.Equal("OneBasedByte.Three", x.ToString())
                 );
 
-            Assert.Collection(m.EnumeratAssetsOfType(AssetType.Map),
+            Assert.Collection(m.EnumerateAssetsOfType(AssetType.Map),
                 x => Assert.Equal("GapByteZero.Zero", x.ToString()),
                 x => Assert.Equal("GapByteZero.One", x.ToString()),
                 x => Assert.Equal("GapByteZero.Foo255", x.ToString()),
@@ -129,7 +129,7 @@ namespace UAlbion.Formats.Tests
             Assert.Equal(expectedJson, json);
 
             var roundTripped = AssetMapping.Deserialize(json);
-            Assert.Collection(roundTripped.EnumeratAssetsOfType(AssetType.Portrait),
+            Assert.Collection(roundTripped.EnumerateAssetsOfType(AssetType.Portrait),
                 x => Assert.Equal("ZeroBasedByte.Zero", x.ToString()),
                 x => Assert.Equal("ZeroBasedByte.One", x.ToString()),
                 x => Assert.Equal("ZeroBasedByte.Two", x.ToString()),
@@ -138,7 +138,7 @@ namespace UAlbion.Formats.Tests
                 x => Assert.Equal("OneBasedByte.Three", x.ToString())
                 );
 
-            Assert.Collection(roundTripped.EnumeratAssetsOfType(AssetType.Map),
+            Assert.Collection(roundTripped.EnumerateAssetsOfType(AssetType.Map),
                 x => Assert.Equal("GapByteZero.Zero", x.ToString()),
                 x => Assert.Equal("GapByteZero.One", x.ToString()),
                 x => Assert.Equal("GapByteZero.Foo255", x.ToString()),

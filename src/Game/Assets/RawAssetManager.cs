@@ -30,7 +30,7 @@ namespace UAlbion.Game.Assets
         {
         }
 
-        public IEnumerable<AssetId> EnumerateAssets(AssetType type) => AssetMapping.Global.EnumeratAssetsOfType(type);
+        public IEnumerable<AssetId> EnumerateAssets(AssetType type) => AssetMapping.Global.EnumerateAssetsOfType(type);
         public AssetInfo GetAssetInfo(AssetId id) => _modApplier.GetAssetInfo(id);
         public IMapData LoadMap(MapId id) => (IMapData)_modApplier.LoadAsset(id); // No caching for map data
         public ItemData LoadItem(ItemId id) => (ItemData)_modApplier.LoadAsset(id);

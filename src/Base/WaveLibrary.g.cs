@@ -59,6 +59,8 @@ namespace UAlbion.Base
         Unknown44 = 44,
         Unknown45 = 45,
         ShortOptimisticGlissando = 46,
+        Invalid = 51,
+        Invalid2 = 53,
     }
 }
 #pragma warning restore CA1707 // Identifiers should not contain underscores

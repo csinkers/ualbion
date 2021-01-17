@@ -235,7 +235,7 @@ namespace UAlbion
             var video = assets.LoadVideo(Base.Video.MagicDemonstration);
             var wall = assets.LoadTexture(Base.Wall.TorontoPanelling);
             var wallOverlay = assets.LoadTexture(Base.WallOverlay.JiriWindow);
-            var word = assets.LoadString(Base.Word.Unknown0);
+            var word = assets.LoadString(Base.Word.Key);
             var map = assets.LoadMap(Base.Map.TorontoBegin);
             var eventSet = assets.LoadEventSet(Base.EventSet.Frill);
             var eventText = assets.LoadString(Base.EventText.Frill);

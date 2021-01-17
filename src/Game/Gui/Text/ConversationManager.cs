@@ -31,22 +31,20 @@ namespace UAlbion.Game.Gui.Text
 
         bool OnNpcTextEvent(NpcTextEvent e, Action continuation)
         {
-            var state = Resolve<IGameState>();
-            var sheet = state.GetSheet(e.NpcId);
-            var textEvent = new TextEvent(ContextTextSource, e.TextId, TextLocation.PortraitLeft, sheet.PortraitId);
+            var textEvent = new TextEvent(ContextTextSource, e.TextId, TextLocation.PortraitLeft, e.NpcId);
             return OnBaseTextEvent(textEvent, continuation);
         }
 
         bool OnPartyMemberTextEvent(PartyMemberTextEvent e, Action continuation)
         {
             var party = Resolve<IParty>();
-            var textEvent = new TextEvent(ContextTextSource, e.TextId, TextLocation.PortraitLeft, e.PortraitId);
+            var textEvent = new TextEvent(ContextTextSource, e.TextId, TextLocation.PortraitLeft, e.MemberId);
             return OnBaseTextEvent(textEvent, continuation);
         }
 
         bool OnTextEvent(ContextTextEvent e, Action continuation)
         {
-            var textEvent = new TextEvent(ContextTextSource, e.TextId, e.Location, e.PortraitId);
+            var textEvent = new TextEvent(ContextTextSource, e.TextId, e.Location, e.NpcId);
             return OnBaseTextEvent(textEvent, continuation);
         }
 
@@ -71,19 +69,9 @@ namespace UAlbion.Game.Gui.Text
                 case TextLocation.PortraitLeft2:
                 case TextLocation.PortraitLeft3:
                 {
-                    var portraitId = textEvent.PortraitId;
-                    if (textEvent.PortraitId.IsNone)
-                    {
-                        var leader = Resolve<IParty>().Leader.Effective;
-                        portraitId = leader.PortraitId;
-                    }
-
-                    if (textEvent.PortraitId.IsNone)
-                        portraitId = Base.Portrait.GibtEsNicht;
-
+                    var portraitId = GetPortrait(textEvent.CharacterId);
                     if (textEvent.Location == TextLocation.PortraitLeft2) // TODO: ??? work out how this is meant to work.
                         portraitId = Base.Portrait.Rainer;
-
                     var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
                     var dialog = AttachChild(new TextDialog(text, portraitId));
                     dialog.Closed += (sender, _) => continuation();
@@ -108,6 +96,18 @@ namespace UAlbion.Game.Gui.Text
             }
 
             return false;
+        }
+
+        SpriteId GetPortrait(CharacterId id)
+        {
+            if (id.IsNone)
+                return Base.Portrait.GibtEsNicht;
+
+            var sheet = Resolve<IGameState>().GetSheet(id);
+            if (sheet != null && !sheet.PortraitId.IsNone)
+                return sheet.PortraitId;
+            var leader = Resolve<IParty>().Leader.Effective;
+            return leader.PortraitId;
         }
 
         bool StartDialogue(StartDialogueEvent e, Action continuation)

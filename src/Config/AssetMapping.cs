@@ -11,7 +11,8 @@ namespace UAlbion.Config
 {
     public class AssetMapping
     {
-        static readonly ThreadLocal<AssetMapping> ThreadLocalGlobal = new ThreadLocal<AssetMapping>(() => new AssetMapping());
+        static readonly ThreadLocal<AssetMapping> ThreadLocalGlobal = 
+            new ThreadLocal<AssetMapping>(() => new AssetMapping());
         static readonly AssetMapping TrueGlobal = new AssetMapping();
         static readonly AssetType[] AllAssetTypes =
             typeof(AssetType)
@@ -74,7 +75,7 @@ namespace UAlbion.Config
 
                 EnumMin = values.Min();
                 EnumMax = values.Max();
-                Offset = (lastMax ?? (EnumMin-1)) + 1 - EnumMin;
+                Offset = (lastMax ?? (EnumMin - 1)) + 1 - EnumMin;
                 Ranges = values.Aggregate(new List<Range>(), (acc, x) =>
                     {
                         if (acc.Count == 0) acc.Add(new Range(x, x));
@@ -94,7 +95,7 @@ namespace UAlbion.Config
         // to disk using the new mapping.
         // Adding a new mapping won't invalidate existing ids, but removing one would
         // likely require flushing and reloading all assets to avoid misinterpretations.
-        readonly List<EnumInfo>[] _byAssetType = 
+        readonly List<EnumInfo>[] _byAssetType =
             Enumerable.Repeat(0, 256)
                 .Select(_ => new List<EnumInfo>())
                 .ToArray(); // Keyed by AssetType, a byte enum
@@ -102,7 +103,7 @@ namespace UAlbion.Config
         readonly Dictionary<Type, EnumInfo> _byEnumType = new Dictionary<Type, EnumInfo>();
         readonly Dictionary<string, List<(EnumInfo, int)>> _byName = new Dictionary<string, List<(EnumInfo, int)>>();
 
-        public AssetMapping() {}
+        public AssetMapping() { }
         AssetMapping(Dictionary<Type, EnumInfo> byEnumType)
         {
             _byEnumType = byEnumType;
@@ -168,8 +169,8 @@ namespace UAlbion.Config
         public string IdToName(AssetId id)
         {
             var (enumType, enumValue) = IdToEnum(id);
-            if(enumType == null)
-                return enumValue == 0 ? "None" : $"{id.Type}.{id.Id}";
+            if (enumType == null)
+                return id.Id == 0 ? id.Type.ToString() : $"{id.Type}.{id.Id}";
 
             var enumName = Enum.GetName(enumType, enumValue);
             if (!string.IsNullOrEmpty(enumName))
@@ -227,7 +228,7 @@ namespace UAlbion.Config
         public AssetMapping Clear()
         {
             _byEnumType.Clear();
-            foreach(var mapping in _byAssetType)
+            foreach (var mapping in _byAssetType)
                 mapping.Clear();
             return this;
         }
@@ -237,7 +238,8 @@ namespace UAlbion.Config
         /// </summary>
         /// <param name="enumType">The enum type to map</param>
         /// <param name="assetType">The type of asset that the enum identifies</param>
-        public AssetMapping RegisterAssetType(Type enumType, AssetType assetType) => RegisterAssetType(enumType?.AssemblyQualifiedName, assetType);
+        public AssetMapping RegisterAssetType(Type enumType, AssetType assetType)
+            => RegisterAssetType(enumType?.AssemblyQualifiedName, assetType);
 
         /// <summary>
         /// Register an enum type whose values should be mapped into the global asset namespaces.
@@ -256,7 +258,7 @@ namespace UAlbion.Config
             mapping.Add(info);
             _byEnumType[info.EnumType] = info;
 
-            foreach(var value in
+            foreach (var value in
                 Enum.GetValues(info.EnumType)
                 .Cast<object>()
                 .Select(x => (x.ToString(), Convert.ToInt32(x, CultureInfo.InvariantCulture))))
@@ -273,9 +275,9 @@ namespace UAlbion.Config
             return this;
         }
 
-        public IEnumerable<AssetId> EnumeratAssetsOfType(AssetType type)
+        public IEnumerable<AssetId> EnumerateAssetsOfType(AssetType type)
         {
-            foreach (var info in  _byAssetType[(byte)type]) // Nested for-loops go brrr
+            foreach (var info in _byAssetType[(byte)type]) // Nested for-loops go brrr
                 foreach (var range in info.Ranges)
                     for (int i = range.From; i <= range.To; i++)
                         yield return new AssetId(type, i);
@@ -310,8 +312,8 @@ namespace UAlbion.Config
             var valueName = index == -1 ? s : s.Substring(index + 1);
             var typeName = index == -1 ? null : s.Substring(0, index);
 
-            return _byName.TryGetValue(valueName, out var matches) 
-                ? ParseTextual(s, typeName, matches, validTypes) 
+            return _byName.TryGetValue(valueName, out var matches)
+                ? ParseTextual(s, typeName, matches, validTypes)
                 : ParseNumeric(s, typeName, valueName, validTypes);
         }
 

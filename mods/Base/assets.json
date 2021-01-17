@@ -4535,7 +4535,9 @@
           "42": { "Name": "HalfBrokenMidi" },
           "43": {},
           "44": {},
-          "45": { "Name": "ShortOptimisticGlissando" }
+          "45": { "Name": "ShortOptimisticGlissando" },
+          "50": { "Name": "Invalid" }, // Referenced in map 112
+          "52": { "Name": "Invalid" } // Referenced in map 121
         }
       }
     }
@@ -5658,7 +5660,7 @@
   },
   "UAlbion.Base.Word, UAlbion.Base": {
     "AssetType": "Word",
-    "EnumType": "ushort",
+    "EnumType": "non-generated",
     "Loader": "UAlbion.Formats.Parsers.WordListLoader, UAlbion.Formats",
     "Files": {
       "$(LANG)/WORDLIS0": {

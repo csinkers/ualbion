@@ -110,16 +110,16 @@ namespace UAlbion.Game.State
                 ActiveMembers = { [0] = Base.PartyMember.Tom }
             };
 
-            foreach (var id in AssetMapping.Global.EnumeratAssetsOfType(AssetType.PartyMember))
+            foreach (var id in AssetMapping.Global.EnumerateAssetsOfType(AssetType.PartyMember))
                 _game.Sheets.Add(id, assets.LoadSheet(id));
 
-            foreach (var id in AssetMapping.Global.EnumeratAssetsOfType(AssetType.Npc))
+            foreach (var id in AssetMapping.Global.EnumerateAssetsOfType(AssetType.Npc))
                 _game.Sheets.Add(id, assets.LoadSheet(id));
 
-            foreach (var id in AssetMapping.Global.EnumeratAssetsOfType(AssetType.Chest))
+            foreach (var id in AssetMapping.Global.EnumerateAssetsOfType(AssetType.Chest))
                 _game.Inventories.Add(id, assets.LoadInventory(id));
 
-            foreach (var id in AssetMapping.Global.EnumeratAssetsOfType(AssetType.Merchant))
+            foreach (var id in AssetMapping.Global.EnumerateAssetsOfType(AssetType.Merchant))
                 _game.Inventories.Add(id, assets.LoadInventory(id));
 
             InitialiseGame();

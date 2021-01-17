@@ -4,8 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using UAlbion.Config;
+using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Containers;
+using UAlbion.Game.Assets;
+using UAlbion.Game.Settings;
 
 namespace DumpSave
 {
@@ -171,6 +175,10 @@ namespace DumpSave
 
         static void Main(string[] args)
         {
+            var baseDir = ConfigUtil.FindBasePath();
+            if (baseDir == null)
+                throw new InvalidOperationException("No base directory could be found.");
+
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
             var commands = ParseCommands(args.Skip(1)).ToList();
             if (!commands.Any())
@@ -182,10 +190,39 @@ namespace DumpSave
             var filename = args[0];
             var stream = File.OpenRead(filename);
             using var br = new BinaryReader(stream, Encoding.GetEncoding(850));
-            var mapping = new AssetMapping(); // TODO
-            var save = SavedGame.Serdes(null, mapping, new AlbionReader(br, stream.Length));
+            var generalConfig = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir);
+            var settings = GeneralSettings.Load(generalConfig.ResolvePath("$(DATA)/settings.json"));
+            var assets = new AssetManager();
+            var loaderRegistry = new AssetLoaderRegistry();
+            var locatorRegistry = new AssetLocatorRegistry();
+            var containerLoaderRegistry = new ContainerLoaderRegistry().AddLoader(new RawContainerLoader())
+                .AddLoader(new XldContainerLoader())
+                .AddLoader(new BinaryOffsetContainerLoader())
+                .AddLoader(new ItemListContainerLoader())
+                .AddLoader(new SpellListContainerLoader())
+                .AddLoader(new DirectoryContainerLoader())
+                ;
+            var modApplier = new ModApplier()
+                // Register post-processors for handling transformations of asset data that can't be done by UAlbion.Formats alone.
+                .AddAssetPostProcessor(new AlbionSpritePostProcessor())
+                .AddAssetPostProcessor(new InventoryPostProcessor())
+                .AddAssetPostProcessor(new ItemNamePostProcessor());
 
-            if (!VerifyRoundTrip(stream, save, mapping))
+            var exchange = new EventExchange(new LogExchange());
+            exchange
+                .Attach(settings)
+                .Register<IGeneralConfig>(generalConfig)
+                .Attach(loaderRegistry)
+                .Attach(locatorRegistry)
+                .Attach(containerLoaderRegistry)
+                .Attach(modApplier)
+                .Attach(assets)
+                ;
+
+            modApplier.LoadMods(generalConfig);
+            var save = SavedGame.Serdes(null, AssetMapping.Global, new AlbionReader(br, stream.Length));
+
+            if (!VerifyRoundTrip(stream, save, AssetMapping.Global))
                 return;
 
             foreach (var command in commands)

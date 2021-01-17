@@ -76,6 +76,6 @@ namespace UAlbion.Config
         [Localised] Word,
 
         Special = 254, // For various types that only have a single value
-        Unknown = 255
+        [Unmapped] Unknown = 255
     }
 }

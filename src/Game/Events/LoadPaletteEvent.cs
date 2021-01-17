@@ -3,7 +3,7 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Events
 {
-    [Event("palette")]
+    [Event("palette", "Set the current palette", "load_pal")]
     public class LoadPaletteEvent : GameEvent
     {
         public LoadPaletteEvent(PaletteId paletteId) { PaletteId = paletteId; }

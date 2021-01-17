@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Formats\UAlbion.Formats.csproj" />
+    <ProjectReference Include="..\..\Game\UAlbion.Game.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\..\deps\SerdesNet')">

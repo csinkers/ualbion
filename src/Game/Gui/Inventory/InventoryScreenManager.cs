@@ -70,7 +70,7 @@ namespace UAlbion.Game.Gui.Inventory
             if (e is ILockedInventoryEvent locked && locked.InitialTextId != 255)
             {
                 var state = Resolve<IGameState>();
-                Raise(new TextEvent(state.MapId.ToMapText(), locked.InitialTextId, TextLocation.NoPortrait, SpriteId.None));
+                Raise(new TextEvent(state.MapId.ToMapText(), locked.InitialTextId, TextLocation.NoPortrait, NpcId.None));
             }
         }
 

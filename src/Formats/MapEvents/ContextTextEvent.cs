@@ -6,15 +6,15 @@ namespace UAlbion.Formats.MapEvents
     [Event("text")]
     public class ContextTextEvent : Event, IAsyncEvent // Relies on event chain context to resolve TextId to an enum type / AssetId
     {
-        public ContextTextEvent(byte textId, TextLocation? location, SpriteId portrait)
+        public ContextTextEvent(byte textId, TextLocation? location, NpcId npcId)
         {
             TextId = textId;
             Location = location;
-            PortraitId = portrait;
+            NpcId = npcId;
         }
 
         [EventPart("text_id")] public byte TextId { get; }
         [EventPart("location", true)] public TextLocation? Location { get; }
-        [EventPart("portrait_id", true)] public SpriteId PortraitId { get; }
+        [EventPart("npc_id", true)] public NpcId NpcId { get; }
     }
 }

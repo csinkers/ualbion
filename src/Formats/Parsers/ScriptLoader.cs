@@ -33,7 +33,7 @@ namespace UAlbion.Formats.Parsers
 
                 if (e == null)
                 {
-                    ApiUtil.Assert($"Script line \"{line}\" could not be parsed parsed to an event");
+                    ApiUtil.Assert($"Script line \"{line}\" could not be parsed to an event");
                     e = new UnparsableEvent(line);
                 }
 

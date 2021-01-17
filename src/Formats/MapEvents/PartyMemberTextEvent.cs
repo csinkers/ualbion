@@ -6,11 +6,11 @@ namespace UAlbion.Formats.MapEvents
     [Event("party_member_text")]
     public class PartyMemberTextEvent : Event, IAsyncEvent
     {
-        [EventPart("portrait_id")] public PortraitId PortraitId { get; }
+        [EventPart("member_id")] public PartyMemberId MemberId { get; }
         [EventPart("text_id")] public byte TextId { get; }
-        public PartyMemberTextEvent(PortraitId portraitId, byte textId)
+        public PartyMemberTextEvent(PartyMemberId memberId, byte textId)
         {
-            PortraitId = portraitId;
+            MemberId = memberId;
             TextId = textId;
         }
     }

@@ -47,10 +47,6 @@ namespace UAlbion.Formats.Assets
         public static ItemId FromDisk(AssetType type, int disk, AssetMapping mapping)
         {
             if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-            
-            if (!(type == AssetType.None || type >= AssetType.Gold && type <= AssetType.Item))
-                throw new ArgumentOutOfRangeException($"Tried to construct a ItemId with a type of {type}");
-
             var (enumType, enumValue) = mapping.IdToEnum(new ItemId(type, disk));
             return (ItemId)AssetMapping.Global.EnumToId(enumType, enumValue);
         }

@@ -16,10 +16,9 @@ namespace UAlbion.Formats.Assets.Save
         public static VisitedEvent Serdes(int n, VisitedEvent u, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            if (s.Mode == SerializerMode.WritingAnnotated)
-                s.Comment(u?.ToString());
 
             u ??= new VisitedEvent();
+            s.Begin();
             u.Unk0 = s.UInt8(nameof(Unk0), u.Unk0);
             u.EventSetId = EventSetId.SerdesU16(nameof(EventSetId), u.EventSetId, mapping, s);
             u.Type = s.EnumU8(nameof(Type), u.Type);
@@ -41,6 +40,9 @@ namespace UAlbion.Formats.Assets.Save
                     break;
             }
 
+            if (s.IsCommenting())
+                s.Comment(u.ToString());
+            s.End();
             return u;
         }
 

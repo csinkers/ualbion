@@ -46,7 +46,7 @@ namespace UAlbion.Formats.Parsers
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (config == null) throw new ArgumentNullException(nameof(config));
-            if (s.Mode != SerializerMode.Reading) throw new NotImplementedException($"Writing of amorphous sprites is not currently supported");
+            if (s.IsWriting()) throw new NotImplementedException($"Writing of amorphous sprites is not currently supported");
             ApiUtil.Assert(config.Transposed != true);
 
             var sizes = ParseSpriteSizes(config.Get<string>("SubSprites", null));

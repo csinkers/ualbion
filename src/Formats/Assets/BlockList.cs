@@ -26,7 +26,7 @@ namespace UAlbion.Formats.Assets
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             blockList ??= new BlockList();
-            if (s.Mode == SerializerMode.Reading)
+            if (s.IsReading())
             {
                 int j = 0;
                 while (!s.IsComplete())
@@ -52,7 +52,7 @@ namespace UAlbion.Formats.Assets
             b._underlay ??= new int[b.Width * b.Height];
             b._overlay ??= new int[b.Width * b.Height];
 
-            if (s.Mode == SerializerMode.Reading)
+            if (s.IsReading())
                 b.RawLayout = s.ByteArray("Layout", null, 3 * b.Width * b.Height);
             else
                 s.ByteArray("Layout", b.RawLayout, 3 * b.Width * b.Height);

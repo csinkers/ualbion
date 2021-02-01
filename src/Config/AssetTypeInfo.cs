@@ -10,7 +10,8 @@ namespace UAlbion.Config
         [JsonProperty(Order = 3)] public string CopiedFrom { get; set; }
         [JsonProperty(Order = 4)] public string Loader { get; set; }
         [JsonProperty(Order = 5)] public string Locator { get; set; }
-        [JsonProperty(Order = 6)] public IDictionary<string, AssetFileInfo> Files { get; } = new Dictionary<string, AssetFileInfo>();
+        [JsonProperty(Order = 5)] public string LocatorArg { get; set; }
+        [JsonProperty(Order = 7)] public IDictionary<string, AssetFileInfo> Files { get; } = new Dictionary<string, AssetFileInfo>();
 
         public void PostLoad()
         {

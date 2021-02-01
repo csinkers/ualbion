@@ -81,7 +81,7 @@ namespace UAlbion.Formats.Assets.Save
             save.Unk9 = s.ByteArray(nameof(Unk9), save.Unk9, 6); // 2
 
             ushort days = s.UInt16("Days", (ushort)save.ElapsedTime.TotalDays);  // 8
-            ushort hours = s.UInt16("Hours", (ushort)save.ElapsedTime.Hours);     // A
+            ushort hours = s.UInt16("Hours", (ushort)save.ElapsedTime.Hours);    // A
             ushort minutes = s.UInt16("Minutes", (ushort)save.ElapsedTime.Minutes); // C
             save.ElapsedTime = new TimeSpan(days, hours, minutes, save.ElapsedTime.Seconds, save.ElapsedTime.Milliseconds);
             save.MapId = MapId.SerdesU16(nameof(MapId), save.MapId, mapping, s);      // E
@@ -89,7 +89,7 @@ namespace UAlbion.Formats.Assets.Save
             save.PartyY = s.UInt16(nameof(PartyY), save.PartyY);   // 12
             save.PartyDirection = s.EnumU16(nameof(PartyDirection), save.PartyDirection); // 14
 
-            save.Unknown16 = s.ByteArrayHex(nameof(Unknown16), save.Unknown16, 0x184); // 16
+            save.Unknown16 = s.ByteArray(nameof(Unknown16), save.Unknown16, 0x184); // 16
 
             save.ActiveMembers = s.List(
                 nameof(ActiveMembers),
@@ -98,27 +98,27 @@ namespace UAlbion.Formats.Assets.Save
                 (i, x, s2) =>
                 {
                     var value = PartyMemberId.SerdesU8(null, save.ActiveMembers[i], mapping, s);
-                    s2.UInt8("dummy", 0);
+                    s2.Pad(1);
                     return value;
                 });
 
             save.Misc = s.Object(nameof(Misc), save.Misc, MiscState.Serdes); // 1A6
             save._switches.SetPacked(0,
-                s.ByteArrayHex("Switches",
+                s.ByteArray("Switches",
                     save._switches.GetPacked(0, FlagDictionary.OriginalSaveGameMax, mapping),
                     FlagDictionary.PackedSize(0, FlagDictionary.OriginalSaveGameMax)), mapping); // 276
 
-            save.Unknown2C1 = s.ByteArrayHex(nameof(Unknown2C1), save.Unknown2C1, 0x5833); // 0x2C1
+            save.Unknown2C1 = s.ByteArray(nameof(Unknown2C1), save.Unknown2C1, 0x5833); // 0x2C1
             s.Object(nameof(Tickers), save._tickers, TickerDictionary.Serdes); // 5AF4
 
-            save.Unknown5B9F = s.ByteArrayHex(nameof(Unknown5B9F), save.Unknown5B9F, 0x2C);
+            save.Unknown5B9F = s.ByteArray(nameof(Unknown5B9F), save.Unknown5B9F, 0x2C);
             var mapType = MapType.TwoD;
             s.List(nameof(save.Npcs), save.Npcs, (mapType, mapping), MaxNpcCount, NpcState.Serdes);
 
-            save.Unknown5B71 = s.ByteArrayHex(
+            save.Unknown5B71 = s.ByteArray(
                 nameof(Unknown5B71),
                 save.Unknown5B71,
-                (int)(0x947C + versionOffset - s.Offset)); // 5B9F
+                0x8c0); // (int)(0x947C + versionOffset - s.Offset)); // 5B9F
 
             uint permChangesSize = s.UInt32("PermanentMapChanges_Size", (uint)(save.PermanentMapChanges.Count * MapChange.SizeOnDisk + 2));
             ushort permChangesCount = s.UInt16("PermanentMapChanges_Count", (ushort)save.PermanentMapChanges.Count);
@@ -148,43 +148,43 @@ namespace UAlbion.Formats.Assets.Save
             ApiUtil.Assert(visitedEventsSize == visitedEventsCount * VisitedEvent.SizeOnDisk + 2);
             save.VisitedEvents = s.List(nameof(VisitedEvents), save.VisitedEvents, mapping, visitedEventsCount, VisitedEvent.Serdes);
 
-            var partyIds = save.Sheets.Keys.Select(x => x.Id).ToList();
+            var partyIds = save.Sheets.Keys.Where(x => x.Type == AssetType.PartyMember).Select(x => x.Id).ToList();
             partyIds.Add(199); // Force extra XLD length fields to be written for empty objects to preserve compat with original game.
             partyIds.Add(299);
 
             // s.Object($"XldPartyCharacter.0");
 
-            XldContainerLoader.Serdes(XldCategory.PartyCharacter, 0, (save, mapping), s, SerdesPartyCharacter, partyIds);
-            XldContainerLoader.Serdes(XldCategory.PartyCharacter, 1, (save, mapping), s, SerdesPartyCharacter, partyIds);
-            XldContainerLoader.Serdes(XldCategory.PartyCharacter, 2, (save, mapping), s, SerdesPartyCharacter, partyIds);
+            XldContainerLoader.Serdes(XldCategory.PartyCharacter, 1, 99, (save, mapping), s, SerdesPartyCharacter, partyIds);
+            XldContainerLoader.Serdes(XldCategory.PartyCharacter, 100, 199, (save, mapping), s, SerdesPartyCharacter, partyIds);
+            XldContainerLoader.Serdes(XldCategory.PartyCharacter, 200, 299, (save, mapping), s, SerdesPartyCharacter, partyIds);
 
             var automapIds = save.Automaps.Keys.Select(x => x.Id).ToList(); // TODO: Allow extension somehow
             automapIds.Add(199);
             automapIds.Add(399);
-            XldContainerLoader.Serdes(XldCategory.Automap, 1, (save, mapping), s, SerdesAutomap, automapIds);
-            XldContainerLoader.Serdes(XldCategory.Automap, 2, (save, mapping), s, SerdesAutomap, automapIds);
-            XldContainerLoader.Serdes(XldCategory.Automap, 3, (save, mapping), s, SerdesAutomap, automapIds);
+            XldContainerLoader.Serdes(XldCategory.Automap, 100, 199, (save, mapping), s, SerdesAutomap, automapIds);
+            XldContainerLoader.Serdes(XldCategory.Automap, 200, 299, (save, mapping), s, SerdesAutomap, automapIds);
+            XldContainerLoader.Serdes(XldCategory.Automap, 300, 399, (save, mapping), s, SerdesAutomap, automapIds);
 
-            var chestIds = save.Inventories.Keys.Select(x => x.Id).ToList(); // TODO: Allow extension somehow
+            var chestIds = save.Inventories.Keys.Where(x => x.Type == AssetType.Chest).Select(x => x.Id).ToList(); // TODO: Allow extension somehow
             chestIds.Add(199);
             chestIds.Add(599);
-            XldContainerLoader.Serdes(XldCategory.Chest, 0, (save, mapping), s, SerdesChest, chestIds);
-            XldContainerLoader.Serdes(XldCategory.Chest, 1, (save, mapping), s, SerdesChest, chestIds);
-            XldContainerLoader.Serdes(XldCategory.Chest, 2, (save, mapping), s, SerdesChest, chestIds);
-            XldContainerLoader.Serdes(XldCategory.Chest, 5, (save, mapping), s, SerdesChest, chestIds);
+            XldContainerLoader.Serdes(XldCategory.Chest, 1, 99, (save, mapping), s, SerdesChest, chestIds);
+            XldContainerLoader.Serdes(XldCategory.Chest, 100, 199, (save, mapping), s, SerdesChest, chestIds);
+            XldContainerLoader.Serdes(XldCategory.Chest, 200, 299, (save, mapping), s, SerdesChest, chestIds);
+            XldContainerLoader.Serdes(XldCategory.Chest, 500, 599, (save, mapping), s, SerdesChest, chestIds);
 
-            var merchantIds = save.Inventories.Keys.Select(x => x.Id).ToList(); // TODO: Allow extension somehow
+            var merchantIds = save.Inventories.Keys.Where(x => x.Type == AssetType.Merchant).Select(x => x.Id).ToList(); // TODO: Allow extension somehow
             merchantIds.Add(199);
             merchantIds.Add(299);
-            XldContainerLoader.Serdes(XldCategory.Merchant, 0, (save, mapping), s, SerdesMerchant, merchantIds);
-            XldContainerLoader.Serdes(XldCategory.Merchant, 1, (save, mapping), s, SerdesMerchant, merchantIds);
-            XldContainerLoader.Serdes(XldCategory.Merchant, 2, (save, mapping), s, SerdesMerchant, merchantIds);
+            XldContainerLoader.Serdes(XldCategory.Merchant, 1, 99, (save, mapping), s, SerdesMerchant, merchantIds);
+            XldContainerLoader.Serdes(XldCategory.Merchant, 100, 199, (save, mapping), s, SerdesMerchant, merchantIds);
+            XldContainerLoader.Serdes(XldCategory.Merchant, 200, 299, (save, mapping), s, SerdesMerchant, merchantIds);
 
             var npcIds = save.Sheets.Keys.Select(x => x.Id).ToList(); // TODO: Allow extension somehow
             npcIds.Add(299);
-            XldContainerLoader.Serdes(XldCategory.NpcCharacter, 0, (save, mapping), s, SerdesNpcCharacter, npcIds);
-            XldContainerLoader.Serdes(XldCategory.NpcCharacter, 1, (save, mapping), s, SerdesNpcCharacter, npcIds);
-            XldContainerLoader.Serdes(XldCategory.NpcCharacter, 2, (save, mapping), s, SerdesNpcCharacter, npcIds);
+            XldContainerLoader.Serdes(XldCategory.NpcCharacter, 1, 99, (save, mapping), s, SerdesNpcCharacter, npcIds);
+            XldContainerLoader.Serdes(XldCategory.NpcCharacter, 100, 199, (save, mapping), s, SerdesNpcCharacter, npcIds);
+            XldContainerLoader.Serdes(XldCategory.NpcCharacter, 200, 299, (save, mapping), s, SerdesNpcCharacter, npcIds);
 
             s.RepeatU8("Padding", 0, 4);
 
@@ -215,7 +215,7 @@ namespace UAlbion.Formats.Assets.Save
             var mapping = context.Item2;
             var id = CharacterId.FromDisk(AssetType.Npc, i, mapping);
             CharacterSheet existing = null;
-            if (serializer.Mode == SerializerMode.Reading || save.Sheets.TryGetValue(id, out existing))
+            if (serializer.IsReading() || save.Sheets.TryGetValue(id, out existing))
                 save.Sheets[id] = CharacterSheet.Serdes(id, existing, mapping, serializer);
         }
 
@@ -226,7 +226,7 @@ namespace UAlbion.Formats.Assets.Save
             var key = AutomapId.FromDisk(i, mapping);
             if (save.Automaps.TryGetValue(key, out _))
                 serializer.ByteArray(null, save.Automaps[key], save.Automaps[key].Length);
-            else if (serializer.Mode == SerializerMode.Reading)
+            else if (serializer.IsReading())
                 save.Automaps[key] = serializer.ByteArray(null, null, size);
         }
 
@@ -237,7 +237,7 @@ namespace UAlbion.Formats.Assets.Save
             var key = ChestId.FromDisk(i, mapping);
             Inventory existing = null;
 
-            if (serializer.Mode == SerializerMode.Reading || save.Inventories.TryGetValue(key, out existing))
+            if (serializer.IsReading() || save.Inventories.TryGetValue(key, out existing))
                 save.Inventories[key] = Inventory.SerdesChest(i, existing, mapping, serializer);
         }
 
@@ -251,7 +251,7 @@ namespace UAlbion.Formats.Assets.Save
             var key = MerchantId.FromDisk(i, mapping);
             Inventory existing = null;
 
-            if (serializer.Mode == SerializerMode.Reading || save.Inventories.TryGetValue(key, out existing))
+            if (serializer.IsReading() || save.Inventories.TryGetValue(key, out existing))
                 save.Inventories[key] = Inventory.SerdesMerchant(i, existing, mapping, serializer);
         }
     }

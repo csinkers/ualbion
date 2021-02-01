@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Assets.Flic
         public FlicFile(ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            if (s.Mode != SerializerMode.Reading)
+            if (s.IsWriting())
                 throw new NotImplementedException("FLIC file writing not currently supported");
 
             long startOffset = s.Offset;

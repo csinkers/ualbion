@@ -207,7 +207,10 @@ namespace UAlbion.Config
         public AssetId EnumToId(Type enumType, int enumValue)
         {
             if (enumType == null)
-                return AssetId.FromInt32(enumValue);
+            {
+                var id = AssetId.FromInt32(enumValue);
+                return id.Id == 0 ? AssetId.None : id;
+            }
 
             if (!_byEnumType.TryGetValue(enumType, out var info))
                 throw new ArgumentOutOfRangeException($"Type {enumType} is not currently mapped.");

@@ -60,7 +60,7 @@ namespace UAlbion.Formats.Assets.Maps
 
             map.SerdesZones(s);
 
-            if (s.Mode == SerializerMode.Reading && s.IsComplete() || s.Mode != SerializerMode.Reading && map.AutomapGraphics == null)
+            if (s.IsReading() && s.IsComplete() || s.IsWriting() && map.AutomapGraphics == null)
             {
                 ApiUtil.Assert(map.Zones.Count == 0);
                 return map;
@@ -71,7 +71,7 @@ namespace UAlbion.Formats.Assets.Maps
             map.SerdesAutomap(s);
             map.SerdesChains(s, 64);
 
-            if (s.Mode == SerializerMode.Reading)
+            if (s.IsReading())
                 map.Unswizzle();
 
             return map;

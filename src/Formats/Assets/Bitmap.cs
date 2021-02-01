@@ -41,14 +41,14 @@ namespace UAlbion.Formats.Assets
 
             var sizeOffset = s.Offset;
             uint size = s.UInt32("Size", 0); // 2 Will patch this at the end when writing
-            if (s.Mode == SerializerMode.Reading && size > s.BytesRemaining + (s.Offset - initialOffset))
+            if (s.IsReading() && size > s.BytesRemaining + (s.Offset - initialOffset))
                 throw new FormatException($"Bitmap specified a size of {size}, but the stream only contains {s.BytesRemaining + (s.Offset - initialOffset)} bytes");
 
             s.UInt16("Reserved1", 0); // 6
             s.UInt16("Reserved2", 0); // 8
             var pixelOffsetOffset = s.Offset;
             uint pixelOffset = s.UInt32("PixelOffset", 0); // A Will patch later when writing
-            if (s.Mode == SerializerMode.Reading && pixelOffset > s.BytesRemaining + (s.Offset - initialOffset))
+            if (s.IsReading() && pixelOffset > s.BytesRemaining + (s.Offset - initialOffset))
                 throw new FormatException($"Bitmap specified a pixel offset of {pixelOffset}, but the stream only contains {s.BytesRemaining + (s.Offset - initialOffset)} bytes");
 
             //------------\\
@@ -97,7 +97,7 @@ namespace UAlbion.Formats.Assets
             //------------\\
             // Pixel Data \\
             //------------\\
-            if (s.Mode != SerializerMode.Reading)
+            if (s.IsReading())
             {
                 var tempOffset = s.Offset;
                 s.Seek(pixelOffsetOffset);
@@ -120,7 +120,7 @@ namespace UAlbion.Formats.Assets
                     s.RepeatU8(null, 0, (int)(stride - b.Width));
             }
 
-            if (s.Mode != SerializerMode.Reading)
+            if (s.IsReading())
             {
                 var tempOffset = s.Offset;
                 s.Seek(sizeOffset);

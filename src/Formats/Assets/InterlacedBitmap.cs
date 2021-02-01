@@ -41,7 +41,7 @@ namespace UAlbion.Formats.Assets
             if (formatId != IFFChunkType.PackedBitmap)
                 throw new NotSupportedException($"Invalid IFF header, expected \"PBM \", found \"{formatId}\"");
 
-            if (s.Mode == SerializerMode.Reading)
+            if (s.IsReading())
             {
                 int i = 0;
                 while(s.BytesRemaining > 0)
@@ -133,14 +133,14 @@ namespace UAlbion.Formats.Assets
             ThumbnailHeight = s.UInt16BE(nameof(ThumbnailHeight), ThumbnailHeight);
 
             Thumbnail = Compression == 1 
-                ? s.Mode == SerializerMode.Reading ? Unpack(s, length - 4) : Pack(Thumbnail, s)
+                ? s.IsReading() ? Unpack(s, length - 4) : Pack(Thumbnail, s)
                 : s.ByteArray("Pixels", null, length - 4);
         }
 
         void SerdesPixels(ISerializer s, int length)
         {
             ImageData = Compression == 1
-                ? s.Mode == SerializerMode.Reading ? Unpack(s, length) : Pack(ImageData, s)
+                ? s.IsReading() ? Unpack(s, length) : Pack(ImageData, s)
                 : s.ByteArray("Pixels", ImageData, length);
         }
 

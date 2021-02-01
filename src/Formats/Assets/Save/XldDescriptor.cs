@@ -5,7 +5,7 @@ namespace UAlbion.Formats.Assets.Save
 {
     public class XldDescriptor
     {
-
+        public const int SizeInBytes = 8;
         public uint Size { get; set; }
         public XldCategory Category { get; set; }
         public ushort Number { get; set; }

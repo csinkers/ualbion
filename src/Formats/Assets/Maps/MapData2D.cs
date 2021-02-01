@@ -67,7 +67,7 @@ namespace UAlbion.Formats.Assets.Maps
             }
             s.Check();
 
-            if (s.Mode == SerializerMode.Reading)
+            if (s.IsReading())
                 map.RawLayout = s.ByteArray("Layout", null, 3 * map.Width * map.Height);
             else
                 s.ByteArray("Layout", map.RawLayout, 3 * map.Width * map.Height);
@@ -81,7 +81,7 @@ namespace UAlbion.Formats.Assets.Maps
             if (map.Events.Any())
                 map.SerdesChains(s, 250);
 
-            if (s.Mode == SerializerMode.Reading)
+            if (s.IsReading())
                 map.Unswizzle();
 
             return map;

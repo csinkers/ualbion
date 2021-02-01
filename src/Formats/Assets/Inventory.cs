@@ -51,7 +51,7 @@ namespace UAlbion.Formats.Assets
         static Inventory Serdes(int n, Inventory inv, AssetMapping mapping, ISerializer s, InventoryType type)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            var invId = new InventoryId(type, (ushort) n);
+            var invId = new InventoryId(type, (ushort)n);
             void S(string name, ItemSlot existing, ItemSlotId slotId)
                 => s.Object(name, existing,
                     (_, x, s2) => ItemSlot.Serdes(new InventorySlotId(invId, slotId), x, mapping, s2));
@@ -59,6 +59,9 @@ namespace UAlbion.Formats.Assets
             inv ??= new Inventory(invId);
             if (s.BytesRemaining <= 0)
                 return inv;
+
+            if (s.IsCommenting())
+                s.Begin(invId.ToString());
 
             if (type == InventoryType.Player)
             {
@@ -76,18 +79,15 @@ namespace UAlbion.Formats.Assets
             for (int i = 0; i < (int)ItemSlotId.NormalSlotCount; i++)
                 S($"Slot{i}", inv.Slots[i], (ItemSlotId)((int)ItemSlotId.Slot0 + i));
 
-            if (type != InventoryType.Merchant)
-            {
-                inv.Gold.Item ??= new Gold();
-                inv.Rations.Item ??= new Rations();
-            }
-
             // Note: Gold + Rations for players are added in the sheet loader. Merchants have no gold/rations.
-            if (type == InventoryType.Chest) 
+            if (type == InventoryType.Chest)
             {
                 inv.Gold.Amount = s.UInt16(nameof(inv.Gold), inv.Gold.Amount);
                 inv.Rations.Amount = s.UInt16(nameof(inv.Rations), inv.Rations.Amount);
             }
+
+            if (s.IsCommenting())
+                s.End();
 
             return inv;
         }

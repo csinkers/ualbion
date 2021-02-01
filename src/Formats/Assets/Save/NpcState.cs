@@ -15,9 +15,10 @@ namespace UAlbion.Formats.Assets.Save
             npc ??= new NpcState();
             var startOffset = s.Offset;
 
+            s.Begin("Npc" + i);
             byte id = (byte)npc.Id.ToDisk(c.mapping);
             id = s.UInt8(nameof(Id), id); // 0
-            s.UInt8("dummy", 0);
+            s.Pad(1);
 
             switch (c.mapType)
             {
@@ -98,6 +99,7 @@ namespace UAlbion.Formats.Assets.Save
             npc.Id = AssetId.FromDisk(assetType, id, c.mapping);
 
             ApiUtil.Assert(s.Offset == startOffset + 0x80);
+            s.End();
             return npc;
         }
 

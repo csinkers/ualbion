@@ -11,6 +11,8 @@
   },
   "UAlbion.Base.SystemText, UAlbion.Base":    { "AssetType": "Text",   "EnumType": "non-generated", "Locator": "UAlbion.Game.Assets.SystemTextLocator, UAlbion.Game" },
   "UAlbion.Base.UAlbionString, UAlbion.Base": { "AssetType": "Text",   "EnumType": "non-generated", "Locator": "UAlbion.Game.Assets.UAlbionStringLocator, UAlbion.Game" },
+  // "UAlbion.Base.SystemText, UAlbion.Base":    { "AssetType": "Text",   "EnumType": "non-generated", "Locator": "UAlbion.Game.Assets.IntToStringLocator, UAlbion.Game", "LocatorArg": "UAlbion.Base.Special:SystemStrings" },
+  // "UAlbion.Base.UAlbionString, UAlbion.Base": { "AssetType": "Text",   "EnumType": "non-generated", "Locator": "UAlbion.Game.Assets.StringToStringLocator, UAlbion.Game", "LocatorArg":  "UAlbion.Base.Special.UAlbionStrings" },
   "UAlbion.Base.Door, UAlbion.Base":          { "AssetType": "Door",   "EnumType": "non-generated" },
   "UAlbion.Base.Switch, UAlbion.Base":        { "AssetType": "Switch", "EnumType": "non-generated" },
   "UAlbion.Base.Ticker, UAlbion.Base":        { "AssetType": "Ticker", "EnumType": "non-generated" },
@@ -1948,8 +1950,8 @@
         "Width": 8,
         "Height": 8,
         "Assets": {
-          "0": { "Id": 1, "Name": "RegularFont" },
-          "1": { "Name": "BoldFont" }
+          "0": { "Id": 1, "Name": "RegularFont", "Mapping": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\"?!/()#%*&+-=><☺♀♂éâàçêëèïîìôòûùáíóú" },
+          "1": { "Name": "BoldFont", "Mapping": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\"?!/()#%*&+-=><☺♀♂éâàçêëèïîìôòûùáíóú" }
         }
       }
     }

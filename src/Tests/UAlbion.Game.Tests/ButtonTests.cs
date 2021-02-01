@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json.Linq;
 using Xunit;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -17,7 +19,6 @@ using UAlbion.TestCommon;
 
 namespace UAlbion.Game.Tests
 {
-
     public class ButtonTests : Component
     {
         readonly EventExchange _exchange;
@@ -34,13 +35,16 @@ namespace UAlbion.Game.Tests
         public ButtonTests()
         {
             _exchange = new EventExchange(new LogExchange());
-            var mapping = new AssetMapping()
+            AssetMapping.GlobalIsThreadLocal = true;
+            AssetMapping.Global.Clear()
                 .RegisterAssetType(typeof(Base.Font), AssetType.Font)
                 ;
 
+            var font = MockUniformFont.Font(AssetId.From(Base.Font.RegularFont));
             var factory = new MockFactory();
             var modApplier = new MockModApplier(GameLanguage.English)
-                    .Add(new AssetId(AssetType.MetaFont, (ushort)new MetaFontId(false, FontColor.White)), MockUniformFont.Font)
+                    .Add(new AssetId(AssetType.MetaFont, (ushort)new MetaFontId(false, FontColor.White)), font)
+                    .AddInfo(AssetId.From(Base.Font.RegularFont), MockUniformFont.Info)
                 ;
 
             var config = GameConfig.LoadLiteral(@"{ ""UI"": { ""ButtonDoubleClickIntervalSeconds"": 0.35 } }");

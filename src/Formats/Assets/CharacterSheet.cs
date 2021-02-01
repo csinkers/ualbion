@@ -137,10 +137,11 @@ namespace UAlbion.Formats.Assets
             var initialOffset = s.Offset;
 
             sheet ??= new CharacterSheet(id);
-            if (s.Mode == SerializerMode.Reading && s.BytesRemaining == 0)
+            if (s.IsReading() && s.BytesRemaining == 0)
                 return sheet;
 
             s.Check();
+            s.Begin(id.ToString());
             sheet.Type = s.EnumU8(nameof(sheet.Type), sheet.Type);
             sheet.Gender = s.EnumU8(nameof(sheet.Gender), sheet.Gender);
             sheet.Race = s.EnumU8(nameof(sheet.Race), sheet.Race);
@@ -269,17 +270,17 @@ namespace UAlbion.Formats.Assets
 
             byte[] knownSpellBytes = null;
             byte[] spellStrengthBytes = null;
-            if (s.Mode != SerializerMode.Reading)
+            if (s.IsWriting())
             {
                 var activeSpellIds = sheet.Magic.SpellStrengths.Keys;
                 var knownSpells = new uint[SpellSchoolCount];
                 var spellStrengths = new ushort[MaxSpellsPerSchool * SpellSchoolCount];
                 foreach (var spellId in activeSpellIds)
                 {
-                    uint schoolId = (uint)spellId.Id / 100; // TODO: Confirm
-                    int offset = spellId.Id % 100;
+                    uint schoolId = (uint)spellId.Id / 256;
+                    int offset = spellId.Id % 256;
                     if (sheet.Magic.SpellStrengths[spellId].Item1)
-                        knownSpells[schoolId] |= 1U << offset + 1;
+                        knownSpells[schoolId] |= 1U << offset;
                     spellStrengths[schoolId * MaxSpellsPerSchool + offset] = sheet.Magic.SpellStrengths[spellId].Item2;
                 }
 
@@ -302,7 +303,7 @@ namespace UAlbion.Formats.Assets
 
             spellStrengthBytes = s.ByteArray("SpellStrength", spellStrengthBytes, MaxSpellsPerSchool * SpellSchoolCount * sizeof(ushort));
 
-            if (s.Mode == SerializerMode.Reading)
+            if (s.IsReading())
             {
                 for (int school = 0; school < SpellSchoolCount; school++)
                 {
@@ -314,7 +315,7 @@ namespace UAlbion.Formats.Assets
                         int i = school * MaxSpellsPerSchool + offset;
                         bool isKnown = (knownSpells & (1 << (offset % 8))) != 0;
                         ushort spellStrength = BitConverter.ToUInt16(spellStrengthBytes, i * sizeof(ushort));
-                        var spellId = new SpellId(AssetType.Spell, i); // TODO: Check this.
+                        var spellId = new SpellId(AssetType.Spell, school * 256 + offset);
 
                         if (spellStrength > 0)
                             sheet.Magic.SpellStrengths[spellId] = (false, spellStrength);
@@ -330,15 +331,26 @@ namespace UAlbion.Formats.Assets
                 }
             }
 
+            if ((s.Flags & SerializerFlags.Comments) != 0 && sheet.Magic.SpellStrengths.Count > 0)
+            {
+                s.Comment("Spells:");
+                foreach (var spell in sheet.Magic.SpellStrengths.OrderBy(x => x.Key))
+                {
+                    s.Comment($"{spell.Key}: {spell.Value.Item2}{(spell.Value.Item1 ? " (Learnt)" : "")}");
+                }
+            }
+
             if (sheet.Type != CharacterType.Party)
             {
                 ApiUtil.Assert(s.Offset - initialOffset == 742, "Expected non-player character sheet to be 742 bytes");
+                s.End();
                 return sheet;
             }
 
-            s.Object(nameof(sheet.Inventory), sheet.Inventory, mapping, Inventory.SerdesCharacter);
+            Inventory.SerdesCharacter(id.Id, sheet.Inventory, mapping, s);
 
             ApiUtil.Assert(s.Offset - initialOffset == 940, "Expected player character sheet to be 940 bytes");
+            s.End();
             return sheet;
         }
     }

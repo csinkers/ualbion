@@ -15,7 +15,7 @@ namespace UAlbion.Formats.Assets.Save
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             d ??= new TickerDictionary();
-            if (s.Mode == SerializerMode.Reading)
+            if (s.IsReading())
                 d.Clear();
 
             // TODO: Proper extensible modding support

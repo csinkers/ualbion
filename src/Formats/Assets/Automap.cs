@@ -12,7 +12,7 @@ namespace UAlbion.Formats.Assets
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             map ??= new Automap();
-            var length = (int)(s.Mode == SerializerMode.Reading ? s.BytesRemaining : map._bytes.Length);
+            var length = (int)(s.IsReading() ? s.BytesRemaining : map._bytes.Length);
             map._bytes = s.ByteArray(null, map._bytes, length);
             return map;
         }

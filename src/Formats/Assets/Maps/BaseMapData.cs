@@ -74,7 +74,7 @@ namespace UAlbion.Formats.Assets.Maps
             var chainOffsets = Chains.Select(x => x.Events[0].Id).ToList();
             for(int i = 0; i < chainCount; i++)
             {
-                if(s.Mode == SerializerMode.Reading)
+                if(s.IsReading())
                 {
                     var eventId = s.UInt16(null, 0);
                     if(eventId != 0xffff)
@@ -87,7 +87,7 @@ namespace UAlbion.Formats.Assets.Maps
                 }
             }
 
-            if(s.Mode == SerializerMode.Reading)
+            if(s.IsReading())
             {
                 ChainsByEventId = new (EventChain, IEventNode)[Events.Count];
                 for (int i = 0; i < chainOffsets.Count; i++)

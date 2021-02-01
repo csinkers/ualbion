@@ -13,7 +13,7 @@ namespace UAlbion.Formats.Parsers
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (config == null) throw new ArgumentNullException(nameof(config));
-            if (s.Mode != SerializerMode.Reading)
+            if (s.IsWriting())
                 throw new NotImplementedException("Fixed size sprite saving not currently supported");
 
             var streamLength = s.BytesRemaining;

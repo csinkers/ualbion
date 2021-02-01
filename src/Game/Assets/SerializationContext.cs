@@ -5,13 +5,13 @@ namespace UAlbion.Game.Assets
 {
     public class SerializationContext
     {
-        public SerializationContext(AssetMapping mapping, string modDirectory)
+        public SerializationContext(AssetMapping mapping, string modAssetDirectory)
         {
             Mapping = mapping ?? throw new ArgumentNullException(nameof(mapping));
-            ModDirectory = modDirectory;
+            ModAssetDirectory = modAssetDirectory;
         }
 
         public AssetMapping Mapping { get; }
-        public string ModDirectory { get; }
+        public string ModAssetDirectory { get; }
     }
 }

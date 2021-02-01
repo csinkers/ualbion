@@ -218,7 +218,15 @@ namespace UAlbion.Game.Assets
                     ? _assetLocatorRegistry.GetLocator(typeInfo.Locator)
                     : _assetLocator;
 
-                var context = new SerializationContext(mod.Mapping, mod.Path);
+                var modAssetPath = mod.Path;
+                if (!string.IsNullOrEmpty(mod.ModConfig.AssetPath))
+                {
+                    if (Path.IsPathRooted(mod.ModConfig.AssetPath) || mod.ModConfig.AssetPath.Contains("..", StringComparison.Ordinal))
+                        throw new FormatException($"The asset path ({mod.ModConfig.AssetPath}) for mod {mod.Name} is invalid - asset paths must be a relative path to a location inside the mod directory");
+                    modAssetPath = Path.Combine(mod.Path, mod.ModConfig.AssetPath);
+                }
+
+                var context = new SerializationContext(mod.Mapping, modAssetPath);
                 var modAsset = assetLocator.LoadAsset(id, context, info);
                 if (modAsset is IPatch patch)
                 {

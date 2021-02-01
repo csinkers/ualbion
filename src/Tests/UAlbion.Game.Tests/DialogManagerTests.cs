@@ -25,6 +25,7 @@ namespace UAlbion.Game.Tests
             AssetMapping.GlobalIsThreadLocal = true;
             AssetMapping.Global.Clear()
                 .RegisterAssetType(typeof(Base.SystemText), AssetType.Text)
+                .RegisterAssetType(typeof(Base.Font), AssetType.Font)
                 ;
 
             var systemText = new Dictionary<TextId, string>
@@ -38,7 +39,8 @@ namespace UAlbion.Game.Tests
             var dm = new DialogManager();
             var lm = new LayoutManager();
             var mma = new MockModApplier(GameLanguage.English)
-                .Add(new AssetId(AssetType.MetaFont, (ushort)new MetaFontId(false, FontColor.White)), MockUniformFont.Font)
+                .Add(new AssetId(AssetType.MetaFont, (ushort)new MetaFontId(false, FontColor.White)), MockUniformFont.Font(AssetId.From(Base.Font.RegularFont)))
+                .AddInfo(AssetId.From(Base.Font.RegularFont), MockUniformFont.Info)
                 ;
 
             foreach (var kvp in systemText)

@@ -11,7 +11,7 @@ namespace UAlbion.Formats.Parsers
         public AlbionStringCollection Serdes(AlbionStringCollection existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            if (s.Mode == SerializerMode.Reading)
+            if (s.IsReading())
             {
                 var stringCount = s.UInt16("StringCount", 0);
                 var stringLengths = new int[stringCount];

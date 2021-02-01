@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Text;
 
@@ -13,32 +15,8 @@ namespace UAlbion.Game.Gui.Text
     public class TextManager : ServiceComponent<ITextManager>, ITextManager
     {
         const int SpaceSize = 3;
-
-        // TODO: Move to config
-        static readonly IDictionary<char, int> FontMapping = new Dictionary<char, int>
-        {
-            { 'a',  0 }, { 'b',  1 }, { 'c',  2 }, { 'd',  3 }, { 'e',  4 },
-            { 'f',  5 }, { 'g',  6 }, { 'h',  7 }, { 'i',  8 }, { 'j',  9 },
-            { 'k', 10 }, { 'l', 11 }, { 'm', 12 }, { 'n', 13 }, { 'o', 14 },
-            { 'p', 15 }, { 'q', 16 }, { 'r', 17 }, { 's', 18 }, { 't', 19 },
-            { 'u', 20 }, { 'v', 21 }, { 'w', 22 }, { 'x', 23 }, { 'y', 24 }, { 'z', 25 },
-            { 'A', 26 }, { 'B', 27 }, { 'C', 28 }, { 'D', 29 }, { 'E', 30 },
-            { 'F', 31 }, { 'G', 32 }, { 'H', 33 }, { 'I', 34 }, { 'J', 35 },
-            { 'K', 36 }, { 'L', 37 }, { 'M', 38 }, { 'N', 39 }, { 'O', 40 },
-            { 'P', 41 }, { 'Q', 42 }, { 'R', 43 }, { 'S', 44 }, { 'T', 45 },
-            { 'U', 46 }, { 'V', 47 }, { 'W', 48 }, { 'X', 49 }, { 'Y', 50 }, { 'Z', 51 },
-            { '1', 52 }, { '2', 53 }, { '3', 54 }, { '4', 55 }, { '5', 56 },
-            { '6', 57 }, { '7', 58 }, { '8', 59 }, { '9', 60 }, { '0', 61 },
-            { 'ä', 62 }, { 'Ä', 63 }, { 'ö', 64 }, { 'Ö', 65 }, { 'ü', 66 }, { 'Ü', 67 }, { 'ß', 68 },
-            { '.', 69 }, { ':', 70 }, { ',', 71 }, { ';', 72 }, { '\'', 73 }, { '$', 74 }, // Weird H thingy?
-            { '"', 75 }, { '?', 76 }, { '!', 77 }, { '/', 78 }, { '(', 79 }, { ')', 80 },
-            { '#', 81 }, { '%', 82 }, { '*', 83 }, { '&', 84 }, { '+', 85 }, { '-', 86 },
-            { '=', 87 }, { '>', 88 }, { '<', 89 }, { '^', 90 }, // Little skull / face glyph?
-            { '♂', 91 }, { '♀', 92 }, // Male & female
-            { 'é', 93 }, { 'â', 94 }, { 'à', 95 }, { 'ç', 96 }, { 'ê', 97 }, { 'ë', 98 }, { 'è', 99 },
-            { 'ï', 100 }, { 'î', 101 }, { 'ì', 102 }, { 'ô', 103 }, { 'ò', 104 },
-            { 'û', 105 }, { 'ù', 106 }, { 'á', 107 }, { 'í', 108 }, { 'ó', 109 }, { 'ú', 110 },
-        };
+        readonly Dictionary<SpriteId, Dictionary<char, int>> _fontMappings = new Dictionary<SpriteId, Dictionary<char, int>>();
+        readonly object _syncRoot = new object();
 
         public Vector2 Measure(TextBlock block)
         {
@@ -49,9 +27,10 @@ namespace UAlbion.Game.Gui.Text
             if (block.Text == null)
                 return Vector2.Zero;
 
+            var mapping = GetFontMapping(font.Id, assets);
             foreach (var c in block.Text)
             {
-                if (FontMapping.TryGetValue(c, out var index))
+                if (mapping.TryGetValue(c, out var index))
                 {
                     var size = font.GetSubImageDetails(index).Size;
                     offset += (int)size.X;
@@ -73,13 +52,14 @@ namespace UAlbion.Game.Gui.Text
             var window = Resolve<IWindowManager>();
 
             var font = assets.LoadFont(block.Color, block.Style == TextStyle.Big);
+            var mapping = GetFontMapping(font.Id, assets);
             var text = block.Text ?? "";
             var isFat = block.Style == TextStyle.Fat || block.Style == TextStyle.FatAndHigh;
 
             int offset = 0;
             var flags = SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest;
             var key = new SpriteKey(font, order, flags, scissorRegion);
-            int displayableCharacterCount = text.Count(x => FontMapping.ContainsKey(x));
+            int displayableCharacterCount = text.Count(x => mapping.ContainsKey(x));
             int instanceCount = displayableCharacterCount * (isFat ? 4 : 2);
             var lease = sm.Borrow(key, instanceCount, caller);
             var instances = lease.Access();
@@ -87,7 +67,7 @@ namespace UAlbion.Game.Gui.Text
             int n = 0;
             foreach (var c in text)
             {
-                if (!FontMapping.TryGetValue(c, out var index)) { offset += SpaceSize; continue; } // Spaces etc
+                if (!mapping.TryGetValue(c, out var index)) { offset += SpaceSize; continue; } // Spaces etc
 
                 var subImage = font.GetSubImageDetails(index);
 
@@ -179,6 +159,28 @@ namespace UAlbion.Game.Gui.Text
                         first = false;
                     }
                 }
+            }
+
+        }
+        Dictionary<char, int> GetFontMapping(ITextureId fontId, IAssetManager assets)
+        {
+            var id = AssetId.FromUInt32(fontId.ToUInt32());
+            lock (_syncRoot)
+            {
+                if (_fontMappings.TryGetValue(id, out var cachedMapping))
+                    return cachedMapping;
+
+                var info = assets.GetAssetInfo(id);
+                var mappingString = info.Get<string>("Mapping", null);
+                if (mappingString == null)
+                    throw new InvalidOperationException($"The asset configuration for font {id} did not contain a Mapping property");
+
+                var mapping = new Dictionary<char, int>();
+                for (int i = 0; i < mappingString.Length; i++)
+                    mapping[mappingString[i]] = i;
+
+                _fontMappings[id] = mapping;
+                return mapping;
             }
         }
     }

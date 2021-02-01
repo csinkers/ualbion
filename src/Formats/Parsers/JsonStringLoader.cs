@@ -17,8 +17,8 @@ namespace UAlbion.Formats.Parsers
             var bytes = s.ByteArray(null, null, (int)s.BytesRemaining);
             var text = Encoding.UTF8.GetString(bytes);
             return 
-                JsonConvert.DeserializeObject<IDictionary<Base.UAlbionString, string>>(text)
-                    .ToDictionary(x => TextId.From(x.Key), x => x.Value);
+                JsonConvert.DeserializeObject<IDictionary<string, string>>(text)
+                    .ToDictionary(x => TextId.Parse(x.Key), x => x.Value);
         }
     }
 }

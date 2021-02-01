@@ -12,6 +12,7 @@ namespace UAlbion.Config
         public string Description { get; }
         public string Author { get; }
         public Version Version { get; }
+        [JsonProperty("asset_path")] public string AssetPath { get; }
         public List<string> Dependencies { get; } = new List<string>();
 
         public static ModConfig Load(string configPath)

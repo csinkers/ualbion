@@ -26,7 +26,7 @@ namespace UAlbion.Game.Assets
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (info == null) throw new ArgumentNullException(nameof(info));
             var generalConfig = Resolve<IGeneralConfig>();
-            object asset = TryLoad(context.ModDirectory, generalConfig, info, context);
+            object asset = TryLoad(context.ModAssetDirectory, generalConfig, info, context);
             foreach (var dir in generalConfig.SearchPaths)
             {
                 if (asset != null)

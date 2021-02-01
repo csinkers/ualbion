@@ -14,23 +14,25 @@ namespace UAlbion.Formats.Tests
         static void RoundTrip(string file)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            AssetMapping.GlobalIsThreadLocal = true;
+            AssetMapping.Global.Clear()
+                .RegisterAssetType(typeof(Base.Automap), AssetType.Automap)
+                .RegisterAssetType(typeof(Base.Chest), AssetType.Chest)
+                .RegisterAssetType(typeof(Base.EventSet), AssetType.EventSet)
+                .RegisterAssetType(typeof(Base.Item), AssetType.Item)
+                .RegisterAssetType(typeof(Base.LargeNpc), AssetType.BigNpcGraphics)
+                .RegisterAssetType(typeof(Base.LargePartyMember), AssetType.BigPartyGraphics)
+                .RegisterAssetType(typeof(Base.Map), AssetType.Map)
+                .RegisterAssetType(typeof(Base.Merchant), AssetType.Merchant)
+                .RegisterAssetType(typeof(Base.Npc), AssetType.Npc)
+                .RegisterAssetType(typeof(Base.PartyMember), AssetType.PartyMember)
+                .RegisterAssetType(typeof(Base.Portrait), AssetType.Portrait)
+                .RegisterAssetType(typeof(Base.SmallNpc), AssetType.SmallNpcGraphics)
+                .RegisterAssetType(typeof(Base.SmallPartyMember), AssetType.SmallPartyGraphics)
+                .RegisterAssetType(typeof(Base.Spell), AssetType.Spell)
+                .RegisterAssetType(typeof(Base.Switch), AssetType.Switch)
+                .RegisterAssetType(typeof(Base.Ticker), AssetType.Ticker);
             var mapping = AssetMapping.Global;
-            mapping.RegisterAssetType(typeof(Base.Automap), AssetType.Automap);
-            mapping.RegisterAssetType(typeof(Base.Chest), AssetType.Chest);
-            mapping.RegisterAssetType(typeof(Base.EventSet), AssetType.EventSet);
-            mapping.RegisterAssetType(typeof(Base.Item), AssetType.Item);
-            mapping.RegisterAssetType(typeof(Base.LargeNpc), AssetType.BigNpcGraphics);
-            mapping.RegisterAssetType(typeof(Base.LargePartyMember), AssetType.BigPartyGraphics);
-            mapping.RegisterAssetType(typeof(Base.Map), AssetType.Map);
-            mapping.RegisterAssetType(typeof(Base.Merchant), AssetType.Merchant);
-            mapping.RegisterAssetType(typeof(Base.Npc), AssetType.Npc);
-            mapping.RegisterAssetType(typeof(Base.PartyMember), AssetType.PartyMember);
-            mapping.RegisterAssetType(typeof(Base.Portrait), AssetType.Portrait);
-            mapping.RegisterAssetType(typeof(Base.SmallNpc), AssetType.SmallNpcGraphics);
-            mapping.RegisterAssetType(typeof(Base.SmallPartyMember), AssetType.SmallPartyGraphics);
-            mapping.RegisterAssetType(typeof(Base.Spell), AssetType.Spell);
-            mapping.RegisterAssetType(typeof(Base.Switch), AssetType.Switch);
-            mapping.RegisterAssetType(typeof(Base.Ticker), AssetType.Ticker);
 
             // === Load ===
             using var stream = File.Open(file, FileMode.Open, FileAccess.Read);

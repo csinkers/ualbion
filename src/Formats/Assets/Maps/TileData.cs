@@ -6,7 +6,6 @@ namespace UAlbion.Formats.Assets.Maps
 {
     public class TileData
     {
-        public int TileNumber { get; set; }
         public TileLayer Layer { get; set; } // Upper nibble of first byte
         public TileType Type { get; set; } // Lower nibble of first byte
         public Passability Collision { get; set; }
@@ -26,13 +25,13 @@ namespace UAlbion.Formats.Assets.Maps
             return ImageNumber + tickCount % frames;
         }
 
-        public override string ToString() => $"Tile{TileNumber} {Layer} {Type} {Collision} {Flags} ->{ImageNumber}:{FrameCount} Unk7: {Unk7}";
+        public override string ToString() => $"Tile {Layer} {Type} {Collision} {Flags} ->{ImageNumber}:{FrameCount} Unk7: {Unk7}";
         public int Depth => Type.ToDepthOffset() + Layer.ToDepthOffset();
 
-        public static TileData Serdes(int i, TileData t, ISerializer s)
+        public static TileData Serdes(int _, TileData t, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            t ??= new TileData { TileNumber = i };
+            t ??= new TileData();
 
             byte firstByte = (byte)((int) t.Layer << 4 | (int) t.Type); 
             firstByte = s.UInt8("LayerAndType", firstByte); // 0

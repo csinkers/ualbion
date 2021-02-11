@@ -7,6 +7,7 @@ namespace UAlbion.Formats.Assets.Maps
         Normal = 0,   // Standard issue
         Underlay1 = 1, // Underlay
         Underlay2 = 2, // Underlay, celtic floors, toilet seats, random square next to pumps, top shelves of desks
+        Underlay3 = 3, // Unused
         Overlay1 = 4, // Overlay
         Overlay2 = 5, // Overlay, only on continent maps?
         Overlay3 = 6, // Overlay
@@ -15,7 +16,6 @@ namespace UAlbion.Formats.Assets.Maps
         Unk12 = 12,   // Overlay used on OkuloKamulos maps for covered fire / grilles
         Unk14 = 14,   // Overlay used on OkuloKamulos maps for open fire
 
-        Unused3 = 3,
         Unused9 = 9,
         Unused10 = 10,
         Unused11 = 11,

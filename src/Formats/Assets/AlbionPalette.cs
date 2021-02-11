@@ -15,11 +15,25 @@ namespace UAlbion.Formats.Assets
         const int VariableEntries = EntryCount - CommonEntries;
         public uint Id { get; }
         public string Name { get; }
-        [JsonIgnore] public bool IsAnimated { get; }
+        [JsonIgnore] public bool IsAnimated => Period > 1;
         public int Period { get; }
         readonly int[] _periods = new int[EntryCount];
         readonly uint[] _entries = new uint[EntryCount];
         readonly IList<uint[]> _cache = new List<uint[]>();
+
+        public AlbionPalette(
+            uint id,
+            string name,
+            uint[] entries,
+            IList<(byte, byte)> ranges = null)
+        {
+            if (entries == null) throw new ArgumentNullException(nameof(entries));
+
+            Id = id;
+            Name = name;
+            _entries = entries.ToArray();
+            Period = InitRanges(ranges);
+        }
 
         public AlbionPalette(ISerializer s, AssetInfo info)
         {
@@ -28,13 +42,10 @@ namespace UAlbion.Formats.Assets
             var streamLength = s.BytesRemaining;
             bool isCommon = streamLength == CommonEntries * 3;
 
-            // AssetId is None when loading palettes from raw data in ImageReverser
-            Id = info.AssetId.IsNone ? (uint)info.Id : info.AssetId.ToUInt32();
-            Name = info.AssetId.IsNone ? info.Name : info.AssetId.ToString();
             long startingOffset = s.Offset;
             for (int i = isCommon ? VariableEntries : 0; i < (isCommon ? EntryCount : VariableEntries); i++)
             {
-                _entries[i]  =       s.UInt8(null, 0);       // Red
+                _entries[i] =        s.UInt8(null, 0);       // Red
                 _entries[i] |= (uint)s.UInt8(null, 0) << 8;  // Green
                 _entries[i] |= (uint)s.UInt8(null, 0) << 16; // Blue
                 _entries[i] |= (uint)(i == 0 ? 0 : 0xff) << 24; // Alpha
@@ -53,13 +64,23 @@ namespace UAlbion.Formats.Assets
                         $"The incorrect value was {x}");
                 }
 
-                return ((byte) FormatUtil.ParseHex(parts[0]), (byte) FormatUtil.ParseHex(parts[1]));
+                return ((byte)FormatUtil.ParseHex(parts[0]), (byte)FormatUtil.ParseHex(parts[1]));
             }).ToList() ?? new List<(byte, byte)>();
 
-            IsAnimated = ranges.Any();
-            Period = (int)ApiUtil.Lcm(ranges.Select(x => (long)(x.Item2 - x.Item1 + 1)).Append(1));
+            // AssetId is None when loading palettes from raw data in ImageReverser
+            Id = info.AssetId.IsNone ? (uint)info.Id : info.AssetId.ToUInt32();
+            Name = info.AssetId.IsNone ? info.Name : info.AssetId.ToString();
+            Period = InitRanges(ranges);
+        }
 
-            for (int cacheIndex = 0; cacheIndex < Period; cacheIndex++)
+        int InitRanges(IList<(byte, byte)> ranges)
+        {
+            ranges ??= Array.Empty<(byte, byte)>();
+            var totalPeriod = (int)ApiUtil.Lcm(ranges
+                .Select(x => (long)(x.Item2 - x.Item1 + 1))
+                .Append(1));
+
+            for (int cacheIndex = 0; cacheIndex < totalPeriod; cacheIndex++)
             {
                 var result = new uint[256];
                 for (int i = 0; i < _entries.Length; i++)
@@ -69,7 +90,7 @@ namespace UAlbion.Formats.Assets
                     {
                         if (i >= range.Item1 && i <= range.Item2)
                         {
-                            int period = (range.Item2 - range.Item1 + 1);
+                            int period = range.Item2 - range.Item1 + 1;
                             int tickModulo = cacheIndex % period;
                             index = (i - range.Item1 + tickModulo) % period + range.Item1;
                             break;
@@ -84,12 +105,15 @@ namespace UAlbion.Formats.Assets
             for (int i = 0; i < _periods.Length; i++)
                 _periods[i] = 1;
 
-            foreach(var range in ranges)
+            foreach (var range in ranges)
                 for (int i = range.Item1; i <= range.Item2; i++)
                     _periods[i] = range.Item2 - range.Item1 + 1;
+
+            return totalPeriod;
         }
 
-        public int CalculatePeriod(IList<byte> distinctColors) => (int)ApiUtil.Lcm(distinctColors.Select(x => (long)_periods[x]).Append(1));
+        public int CalculatePeriod(IEnumerable<byte> distinctColors)
+            => (int)ApiUtil.Lcm(distinctColors.Select(x => (long)_periods[x]).Append(1));
 
         public void SetCommonPalette(AlbionPalette commonPalette)
         {

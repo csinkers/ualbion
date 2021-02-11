@@ -156,8 +156,7 @@ namespace UAlbion.Formats.Assets.Maps
 #if DEBUG
         void AddEventReference(int id, object referrer)
         {
-            if (EventReferences[id] == null)
-                EventReferences[id] = new List<object>();
+            EventReferences[id] ??= new List<object>();
             EventReferences[id].Add(referrer);
         }
 #endif

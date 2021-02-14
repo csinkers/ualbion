@@ -68,7 +68,7 @@ namespace UAlbion.Formats.Assets
             }).ToList() ?? new List<(byte, byte)>();
 
             // AssetId is None when loading palettes from raw data in ImageReverser
-            Id = info.AssetId.IsNone ? (uint)info.Id : info.AssetId.ToUInt32();
+            Id = info.AssetId.IsNone ? (uint)info.SubAssetId : info.AssetId.ToUInt32();
             Name = info.AssetId.IsNone ? info.Name : info.AssetId.ToString();
             Period = InitRanges(ranges);
         }

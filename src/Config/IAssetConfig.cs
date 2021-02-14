@@ -2,6 +2,6 @@
 {
     public interface IAssetConfig
     {
-        AssetInfo GetAssetInfo(string typeName, int id);
+        AssetInfo[] GetAssetInfo(AssetId id);
     }
 }

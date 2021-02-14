@@ -6,6 +6,7 @@ using System.Text;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
@@ -309,7 +310,7 @@ namespace UAlbion.Game.Text
             => Format(template, null, arguments);
 
         public IText Format(TextId textId, IList<(Token, object)> implicitTokens, params object[] arguments)
-            => Format(new StringId(textId), implicitTokens, arguments);
+            => Format((StringId)textId, implicitTokens, arguments);
 
         public IText Format(StringId stringId, IList<(Token, object)> implicitTokens, params object[] arguments)
             => new DynamicText(() =>

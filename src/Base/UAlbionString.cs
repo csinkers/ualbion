@@ -2,7 +2,7 @@
 {
     public enum UAlbionString
     {
-        LanguageLabel,
-        TakeAll
+        LanguageLabel = 0,
+        TakeAll = 1,
     }
 }

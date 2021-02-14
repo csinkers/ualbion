@@ -20,8 +20,8 @@ namespace UAlbion.Formats.Parsers
             if (streamLength == 0)
                 return null;
 
-            int width = config.EffectiveWidth;
-            int height = config.EffectiveHeight;
+            int width = config.Width;
+            int height = config.Height;
             if (width == 0)
                 width = (int)Math.Sqrt(streamLength);
             if (height == 0)

@@ -5,6 +5,7 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
@@ -72,13 +73,15 @@ namespace UAlbion.Game.Assets
         public TilesetData LoadTileData(TilesetId id) => (TilesetData)_modApplier.LoadAssetCached(id);
         public LabyrinthData LoadLabyrinthData(LabyrinthId id) => (LabyrinthData)_modApplier.LoadAssetCached(id);
 
-        public bool IsStringDefined(StringId id) =>
-            _modApplier.LoadAssetCached(id.Id) switch
+        public bool IsStringDefined(TextId id, GameLanguage? language) => IsStringDefined((StringId)id, language);
+        public bool IsStringDefined(StringId id, GameLanguage? language) =>
+            (language.HasValue ? _modApplier.LoadAsset(id.Id, language.Value) : _modApplier.LoadAssetCached(id.Id)) switch
             {
                 string _ => true,
-                AlbionStringCollection c => c.Count > id.SubId,
+                StringCollection c => c.Count > id.SubId,
                 IDictionary<int, string> d => d.ContainsKey(id.SubId),
                 IDictionary<AssetId, string> d => d.ContainsKey(id.Id),
+                IDictionary<TextId, string> d => d.ContainsKey(id.Id),
                 _ => false
             };
 
@@ -89,9 +92,10 @@ namespace UAlbion.Game.Assets
             return asset switch
             {
                 string s => s,
-                AlbionStringCollection c => c.Count > id.SubId ? c[id.SubId] : null,
+                StringCollection c => c.Count > id.SubId ? c[id.SubId] : null,
                 IDictionary<int, string> d => d.GetValueOrDefault(id.SubId),
                 IDictionary<AssetId, string> d => d.GetValueOrDefault(id.Id),
+                IDictionary<TextId, string> d => d.GetValueOrDefault(id.Id),
                 _ => $"!MISSING STRING-TABLE {id.Id}:{id.SubId}!"
             } ?? $"!MISSING STRING {id.Id}:{id.SubId}!";
         }

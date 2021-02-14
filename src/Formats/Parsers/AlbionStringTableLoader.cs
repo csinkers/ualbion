@@ -6,9 +6,9 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class AlbionStringTableLoader : IAssetLoader<AlbionStringCollection>
+    public class AlbionStringTableLoader : IAssetLoader<StringCollection>
     {
-        public AlbionStringCollection Serdes(AlbionStringCollection existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public StringCollection Serdes(StringCollection existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (s.IsReading())
@@ -21,7 +21,7 @@ namespace UAlbion.Formats.Parsers
                 var strings = new string[stringCount];
                 for (int i = 0; i < stringCount; i++)
                     strings[i] = s.FixedLengthString(null, null, stringLengths[i]);
-                return new AlbionStringCollection(strings);
+                return new StringCollection(strings);
             }
             else
             {
@@ -37,6 +37,6 @@ namespace UAlbion.Formats.Parsers
         }
 
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes(existing as AlbionStringCollection, config, mapping, s);
+            => Serdes(existing as StringCollection, config, mapping, s);
     }
 }

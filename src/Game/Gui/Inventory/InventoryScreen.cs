@@ -34,7 +34,7 @@ namespace UAlbion.Game.Gui.Inventory
 
             // var frameDivider = new FrameDivider(135, 0, 4, 192);
 
-            AttachChild(new UiFixedPositionElement(Base.UiBackground.SLAB, UiConstants.UiExtents));
+            AttachChild(new UiFixedPositionElement(Base.UiBackground.Slab, UiConstants.UiExtents));
             AttachChild(new FixedPosition(new Rectangle(0, 0, 135, UiConstants.ActiveAreaExtents.Height), leftPane));
             AttachChild(new FixedPosition(new Rectangle(142, 0, 134, UiConstants.ActiveAreaExtents.Height), middlePane));
             AttachChild(new FixedPosition(new Rectangle(280, 0, 71, UiConstants.ActiveAreaExtents.Height), rightPane));

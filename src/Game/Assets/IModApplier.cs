@@ -1,5 +1,6 @@
 ﻿using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets.Save;
 
 namespace UAlbion.Game.Assets
@@ -10,6 +11,7 @@ namespace UAlbion.Game.Assets
         IModApplier AddAssetPostProcessor(IAssetPostProcessor postProcessor);
         AssetInfo GetAssetInfo(AssetId key);
         object LoadAsset(AssetId id);
+        object LoadAsset(AssetId id, GameLanguage language);
         object LoadAssetCached(AssetId assetId);
         SavedGame LoadSavedGame(string path);
     }

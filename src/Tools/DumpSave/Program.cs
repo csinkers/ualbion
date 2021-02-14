@@ -191,10 +191,10 @@ namespace DumpSave
             var stream = File.OpenRead(filename);
             using var br = new BinaryReader(stream, Encoding.GetEncoding(850));
             var generalConfig = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir);
-            var settings = GeneralSettings.Load(generalConfig.ResolvePath("$(DATA)/settings.json"));
+            var settings = GeneralSettings.Load(generalConfig.ResolvePath("$(DATA)/settings.json", null));
+            var settingsManager = new SettingsManager(settings);
             var assets = new AssetManager();
             var loaderRegistry = new AssetLoaderRegistry();
-            var locatorRegistry = new AssetLocatorRegistry();
             var containerLoaderRegistry = new ContainerLoaderRegistry().AddLoader(new RawContainerLoader())
                 .AddLoader(new XldContainerLoader())
                 .AddLoader(new BinaryOffsetContainerLoader())
@@ -210,10 +210,9 @@ namespace DumpSave
 
             var exchange = new EventExchange(new LogExchange());
             exchange
-                .Attach(settings)
+                .Attach(settingsManager)
                 .Register<IGeneralConfig>(generalConfig)
                 .Attach(loaderRegistry)
-                .Attach(locatorRegistry)
                 .Attach(containerLoaderRegistry)
                 .Attach(modApplier)
                 .Attach(assets)

@@ -5,9 +5,8 @@ using UAlbion.Api;
 
 namespace UAlbion.Core
 {
-    [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
 #pragma warning disable CA1034 // Nested types should not be visible
+    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
     public class CoreConfig
     {
         public VisualT Visual { get; } = new VisualT();
@@ -34,7 +33,7 @@ namespace UAlbion.Core
 
             var configText = File.ReadAllText(configPath);
             return JsonConvert.DeserializeObject<CoreConfig>(configText,
-                new JsonSerializerSettings {ContractResolver = new PrivatePropertyJsonContractResolver()});
+                new JsonSerializerSettings { ContractResolver = new PrivatePropertyJsonContractResolver() });
         }
     }
 #pragma warning restore CA1034 // Nested types should not be visible

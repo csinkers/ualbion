@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -14,7 +13,6 @@ namespace UAlbion.Game.Assets
         readonly IDictionary<ContainerFormat, IContainerLoader> _loaders = new Dictionary<ContainerFormat, IContainerLoader>();
 
         public IContainerLoader GetLoader(ContainerFormat type) => _loaders[type];
-        public ISerializer Load(string filename, AssetInfo info, ContainerFormat format) => GetLoader(format).Open(filename, info);
 
         public ContainerLoaderRegistry AddLoader(IContainerLoader loader)
         {

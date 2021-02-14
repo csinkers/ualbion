@@ -23,16 +23,16 @@ namespace UAlbion.CodeGenerator
             var assetIdConfigPath = Path.Combine(BaseDir, @"src/Formats/AssetIdTypes.json");
             var config = GeneralConfig.Load(Path.Combine(BaseDir, "data/config.json"), BaseDir);
 
-            AssetConfig = AssetConfig.Load(config.ResolvePath("$(MODS)/Base/assets.json"));
+            AssetConfig = AssetConfig.Load(config.ResolvePath("$(MODS)/Base/assets.json", null));
             AssetIdConfig = AssetIdConfig.Load(assetIdConfigPath);
 
-            Enums = LoadEnums(AssetConfig);
-            DeduplicateEnums(Enums);
+            //Enums = LoadEnums(AssetConfig);
+            //DeduplicateEnums(Enums);
             AssetIdsByType = FindAssetIdsByType(AssetIdConfig);
             ParentsByAssetId = FindAssetIdParents(AssetIdConfig, AssetIdsByType);
-            AssetIdsByEnum = FindAssetIdsForEnums(Enums, AssetIdsByType);
-            EnumsByAssetId = FindEnumsByAssetId(Enums, AssetIdsByType);
-            HandleIsomorphism(Enums);
+            // AssetIdsByEnum = FindAssetIdsForEnums(Enums, AssetIdsByType);
+            // EnumsByAssetId = FindEnumsByAssetId(Enums, AssetIdsByType);
+            //HandleIsomorphism(Enums);
 
             // TODO: Build family based on IsomorphicToAttribute.
             // * AssetTypes in a family need to have a single-type AssetId
@@ -71,11 +71,11 @@ namespace UAlbion.CodeGenerator
                     .ToArray());
 
         static bool IsSuperSet(IEnumerable<AssetType> a, IEnumerable<AssetType> b) => new HashSet<AssetType>(a).IsProperSupersetOf(b);
-
+/*
         static Dictionary<string, EnumData> LoadEnums(AssetConfig config)
         {
             var enums = new Dictionary<string, EnumData>();
-            foreach (var typeInfo in config.Types)
+            foreach (var file in config.Files)
             {
                 if (!enums.TryGetValue(typeInfo.Key, out var e))
                 {
@@ -89,28 +89,25 @@ namespace UAlbion.CodeGenerator
                     enums[typeInfo.Key] = e;
                 }
 
-                foreach (var file in typeInfo.Value.Files.Values)
+                foreach (var o in file.Assets.Values.OrderBy(x => x.Id))
                 {
-                    foreach (var o in file.Assets.Values.OrderBy(x => x.Id))
+                    var id = o.Id;
+
+                    if (e.EnumType == "byte" && id > 0xff)
                     {
-                        var id = o.Id;
-
-                        if (e.EnumType == "byte" && id > 0xff)
-                        {
-                            throw new InvalidOperationException(
-                                $"Enum {e.FullName} has an underlying type of byte, but it " +
-                                $"defines a value {id} which is greater than the maximum value that a byte can represent (256).");
-                        }
-
-                        e.Entries.Add(string.IsNullOrEmpty(o.Name)
-                            ? new EnumEntry {Name = $"Unknown{id}", Value = id}
-                            : new EnumEntry {Name = Sanitise(o.Name), Value = id});
+                        throw new InvalidOperationException(
+                            $"Enum {e.FullName} has an underlying type of byte, but it " +
+                            $"defines a value {id} which is greater than the maximum value that a byte can represent (256).");
                     }
+
+                    e.Entries.Add(string.IsNullOrEmpty(o.Name)
+                        ? new EnumEntry {Name = $"Unknown{id}", Value = id}
+                        : new EnumEntry {Name = Sanitise(o.Name), Value = id});
                 }
             }
 
             return enums;
-        }
+        }*/
 
         static void DeduplicateEnums(Dictionary<string, EnumData> enums)
         {

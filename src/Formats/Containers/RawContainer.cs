@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using SerdesNet;
 using UAlbion.Api;
@@ -17,5 +18,7 @@ namespace UAlbion.Formats.Containers
             var br = new BinaryReader(stream);
             return new AlbionReader(br);
         }
+
+        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info) => new List<(int, int)> { (0, 1) };
     }
 }

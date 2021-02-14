@@ -56,6 +56,7 @@ namespace UAlbion.Config
             public Range[] Ranges { get; set; }
 
             public EnumInfo() { } // For deserialisation
+            public override string ToString() => $"{EnumType.Name}@{Offset} = {AssetType}";
 
             public EnumInfo(string typeString, AssetType assetType, int? lastMax)
             {
@@ -102,6 +103,7 @@ namespace UAlbion.Config
 
         readonly Dictionary<Type, EnumInfo> _byEnumType = new Dictionary<Type, EnumInfo>();
         readonly Dictionary<string, List<(EnumInfo, int)>> _byName = new Dictionary<string, List<(EnumInfo, int)>>();
+        readonly Dictionary<AssetId, (AssetId, ushort)> _stringLookup = new Dictionary<AssetId, (AssetId, ushort)>();
 
         public AssetMapping() { }
         AssetMapping(Dictionary<Type, EnumInfo> byEnumType)
@@ -114,6 +116,8 @@ namespace UAlbion.Config
                 typeMapping.AddRange(ordered.Select(kvp => kvp.Value));
             }
         }
+
+        public bool IsGlobal => Global == this;
 
         /// <summary>
         /// Convert a run-time AssetId to its unambiguous enum representation.
@@ -228,9 +232,32 @@ namespace UAlbion.Config
             return new AssetId(info.AssetType, enumValue + info.Offset);
         }
 
+        public AssetId EnumToId(Type enumType, string value)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (!_byEnumType.TryGetValue(enumType, out var enumInfo))
+                throw new FormatException($"Could not parse a value of type \"{enumType}\", as it has not been registered in the asset mapping");
+
+            if (int.TryParse(value, out int intValue))
+                return new AssetId(enumInfo.AssetType, intValue);
+
+            if (!_byName.TryGetValue(value.ToUpperInvariant(), out var matches))
+                throw new FormatException($"Could not parse id \"{value}\" as \"{enumType}\": no such value");
+
+            var match = matches.FirstOrDefault(x => x.Item1 == enumInfo);
+            if (match == (null, 0))
+                throw new FormatException($"Could not parse id \"{value}\" as \"{enumType}\": no such value");
+
+            return new AssetId(match.Item1.AssetType, match.Item2);
+        }
+
         public AssetMapping Clear()
         {
             _byEnumType.Clear();
+            _byName.Clear();
+
             foreach (var mapping in _byAssetType)
                 mapping.Clear();
             return this;
@@ -278,6 +305,21 @@ namespace UAlbion.Config
             return this;
         }
 
+        public AssetMapping RegisterStringRedirect(Type enumType, AssetId target, int min, int max)
+        {
+            foreach (var id in EnumerateAssetsOfType(enumType))
+            {
+                var (_, numeric) = IdToEnum(id);
+                if (numeric < min || numeric > max)
+                    continue;
+
+                _stringLookup[id] = (target, (ushort)(numeric - min));
+            }
+            return this;
+        }
+
+        public (AssetId, ushort)? TextIdToStringId(AssetId id) => _stringLookup.ContainsKey(id) ? _stringLookup[id] : ((AssetId, ushort)?)null;
+
         public IEnumerable<AssetId> EnumerateAssetsOfType(AssetType type)
         {
             foreach (var info in _byAssetType[(byte)type]) // Nested for-loops go brrr
@@ -286,7 +328,19 @@ namespace UAlbion.Config
                         yield return new AssetId(type, i);
         }
 
-        public string Serialize(JsonSerializerSettings settings) => JsonConvert.SerializeObject(_byEnumType, settings);
+        public IEnumerable<AssetId> EnumerateAssetsOfType(Type type)
+        {
+            if (!_byEnumType.TryGetValue(type, out var info))
+                yield break;
+
+            foreach (var range in info.Ranges)
+                for (int i = range.From; i <= range.To; i++)
+                    yield return new AssetId(info.AssetType, i);
+        }
+
+        public string Serialize(JsonSerializerSettings settings = null) => settings == null 
+            ? JsonConvert.SerializeObject(_byEnumType) 
+            : JsonConvert.SerializeObject(_byEnumType, settings);
         public static AssetMapping Deserialize(string json)
         {
             var m = new AssetMapping(JsonConvert.DeserializeObject<Dictionary<Type, EnumInfo>>(json));
@@ -303,6 +357,9 @@ namespace UAlbion.Config
                 if (!_byEnumType.ContainsKey(info.EnumType))
                     RegisterAssetType(info.EnumTypeString, info.AssetType);
             }
+
+            foreach (var redirect in other._stringLookup)
+                _stringLookup[redirect.Key] = redirect.Value;
         }
 
         public AssetId Parse(string s, AssetType[] validTypes) // pass null for validTypes to allow any type
@@ -371,7 +428,7 @@ namespace UAlbion.Config
                     if (result.Type != AssetType.Unknown)
                     {
                         var candidates = string.Join(", ", validTypes.Select(x => x.ToString()));
-                        throw new InvalidOperationException($"Could not unambiguously parse \"{s}\" as an asset id. Candidate types: {candidates}");
+                        throw new FormatException($"Could not unambiguously parse \"{s}\" as an asset id. Candidate types: {candidates}");
                     }
 
                     result = new AssetId(assetType, intValue);

@@ -48,7 +48,7 @@ namespace UAlbion.Tools.ImageReverser
         {
             _rootNode = fileTree.Nodes.Add("Files");
             foreach(var xld in _core.ContainerFiles)
-                foreach (var asset in xld.Value.Assets.Values)
+                foreach (var asset in xld.Value.Map.Values)
                     AddToTree(asset, _core.GetRawPath(asset));
             _rootNode.Expand();
 
@@ -75,8 +75,8 @@ namespace UAlbion.Tools.ImageReverser
                 sb.AppendLine($"File Size: {fileInfo.Length}");
                 sb.AppendLine($"Path: {asset.File.Filename}");
                 sb.AppendLine($"Layer: {asset.File.Format}");
-                sb.AppendLine($"Conf Width: {asset.EffectiveWidth}");
-                sb.AppendLine($"Conf Height: {asset.EffectiveHeight}");
+                sb.AppendLine($"Conf Width: {asset.Width}");
+                sb.AppendLine($"Conf Height: {asset.Height}");
             }
 
             sb.AppendLine();

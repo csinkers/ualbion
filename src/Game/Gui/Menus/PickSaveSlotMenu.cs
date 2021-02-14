@@ -44,7 +44,7 @@ namespace UAlbion.Game.Gui.Menus
         {
             var generalConfig = Resolve<IGeneralConfig>();
             // TODO: This path currently exists in two places: here and Game\State\GameState.cs
-            return generalConfig.ResolvePath($"$(SAVE)/SAVE.{i:D3}");
+            return generalConfig.ResolvePath($"$(SAVE)/SAVE.{i:D3}", null);
         }
 
         protected override void Subscribed()

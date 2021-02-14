@@ -3,6 +3,7 @@ using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
@@ -56,13 +57,15 @@ namespace UAlbion.Game.Assets
         public TilesetData LoadTileData(TilesetId id) => (TilesetData)_modApplier.LoadAsset(id);
         public LabyrinthData LoadLabyrinthData(LabyrinthId id) => (LabyrinthData)_modApplier.LoadAsset(id);
 
-        public bool IsStringDefined(StringId id) =>
-            _modApplier.LoadAsset(id.Id) switch
+        public bool IsStringDefined(TextId id, GameLanguage? language) => IsStringDefined((StringId)id, language);
+        public bool IsStringDefined(StringId id, GameLanguage? language) =>
+            (language.HasValue ? _modApplier.LoadAsset(id.Id, language.Value) : _modApplier.LoadAsset(id.Id)) switch
             {
                 string _ => true,
-                AlbionStringCollection c => c.Count > id.SubId,
+                StringCollection c => c.Count > id.SubId,
                 IDictionary<int, string> d => d.ContainsKey(id.SubId),
                 IDictionary<AssetId, string> d => d.ContainsKey(id.Id),
+                IDictionary<TextId, string> d => d.ContainsKey(id.Id),
                 _ => false
             };
 
@@ -75,6 +78,7 @@ namespace UAlbion.Game.Assets
                 string s => s,
                 IDictionary<int, string> d => d.GetValueOrDefault(id.SubId),
                 IDictionary<AssetId, string> d => d.GetValueOrDefault(id.Id),
+                IDictionary<TextId, string> d => d.GetValueOrDefault(id.Id),
                 _ => $"!MISSING STRING-TABLE {id.Id}:{id.SubId}!"
             }) ?? $"!MISSING STRING {id.Id}:{id.SubId}!";
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using SerdesNet;
 using UAlbion.Config;
@@ -16,6 +17,12 @@ namespace UAlbion.Formats.Containers
             var br = new BinaryReader(stream);
             stream.Position = info.SubAssetId * ItemData.SizeOnDisk;
             return new AlbionReader(br, ItemData.SizeOnDisk);
+        }
+
+        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info)
+        {
+            using var f = File.OpenRead(path);
+            return new List<(int, int)> { (0, (int)f.Length / ItemData.SizeOnDisk) };
         }
     }
 }

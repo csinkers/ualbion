@@ -19,7 +19,7 @@ namespace UAlbion.Formats.MapEvents
             e.Location = s.EnumU8(nameof(Location), e.Location ?? TextLocation.NoPortrait);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-            e.CharacterId = CharacterId.SerdesU8(nameof(CharacterId), e.CharacterId, AssetType.Npc, mapping, s);
+            e.CharacterId = CharacterId.SerdesU8(nameof(CharacterId), e.CharacterId, e.CharacterType, mapping, s);
             e.TextId = s.UInt8(nameof(TextId), e.TextId);
             e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
@@ -39,6 +39,13 @@ namespace UAlbion.Formats.MapEvents
         [EventPart("text_id")] public byte TextId { get; private set; }
         [EventPart("location")] public TextLocation? Location { get; private set; }
         [EventPart("npc")] public CharacterId CharacterId { get; private set; }
+
+        AssetType CharacterType => Location switch
+        {
+            // TODO: Handle the other cases
+            TextLocation.PortraitLeft => AssetType.PartyMember,
+            _ => AssetType.Npc
+        };
 
         public byte Unk2 { get; private set; }
         public byte Unk3 { get; private set; }

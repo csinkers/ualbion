@@ -24,6 +24,13 @@ namespace UAlbion.Formats.Containers
             return new AlbionReader(new BinaryReader(ms));
         }
 
+        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info)
+        {
+            using var s = new AlbionReader(new BinaryReader(File.OpenRead(path)));
+            var lengths = HeaderSerdes(null, s);
+            return new List<(int, int)> { (0, lengths.Length) };
+        }
+
         static byte[] LoadAsset(int subItem, ISerializer s)
         {
             var lengths = HeaderSerdes(null, s);

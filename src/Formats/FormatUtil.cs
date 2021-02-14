@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using UAlbion.Config;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats
 {
@@ -100,5 +103,48 @@ namespace UAlbion.Formats
             s != null && s.StartsWith("0x", StringComparison.InvariantCulture)
                 ? int.Parse(s.Substring(2), NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture)
                 : int.Parse(s, CultureInfo.InvariantCulture);
+
+        public static List<(int, int)> SortedIntsToRanges(IEnumerable<int> values) // pairs = (subItemId, count)
+        {
+            var ranges = new List<(int, int)>();
+            if (values == null)
+                return ranges;
+
+            int last = int.MinValue;
+            int start = int.MinValue;
+            foreach (var value in values)
+            {
+                if (value < last)
+                    throw new ArgumentOutOfRangeException(nameof(values), $"A non-sorted list was passed to {nameof(SortedIntsToRanges)}");
+
+                if (value == last) // Ignore duplicates
+                    continue;
+
+                if (start == int.MinValue)
+                {
+                    start = value;
+                }
+                else if (last != value - 1)
+                {
+                    ranges.Add((start, last - start + 1));
+                    start = value;
+                }
+
+                last = value;
+            }
+
+            if (start != int.MinValue)
+                ranges.Add((start, last - start + 1));
+
+            return ranges;
+        }
+
+        public static StringId ResolveTextId(TextId id)
+        {
+            var result = AssetMapping.Global.TextIdToStringId(id);
+            return result.HasValue 
+                ? new StringId(result.Value.Item1, result.Value.Item2) 
+                : new StringId(id, 0);
+        }
     }
 }

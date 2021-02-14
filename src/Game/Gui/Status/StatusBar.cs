@@ -25,7 +25,7 @@ namespace UAlbion.Game.Gui.Status
             On<HoverTextEvent>(e => _hoverSource.Source = e.Source);
             On<DescriptionTextEvent>(e => _descriptionSource.Source = e.Source);
 
-            _sprite = AttachChild(new UiSpriteElement(Base.UiBackground.SLAB));
+            _sprite = AttachChild(new UiSpriteElement(Base.UiBackground.Slab));
             _sprite.SubId = 1;
             _portraits = new StatusBarPortrait[MaxPortraits];
             for (int i = 0; i < _portraits.Length; i++)

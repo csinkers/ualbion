@@ -10,7 +10,7 @@ namespace UAlbion.Formats.Parsers
         public Inventory Serdes(Inventory existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
-            return Inventory.SerdesChest(config.Id, existing, mapping, s);
+            return Inventory.SerdesChest(config.AssetId.ToInt32(), existing, mapping, s);
         }
 
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)

@@ -129,7 +129,7 @@ namespace UAlbion.Game.State
         {
             var generalConfig = Resolve<IGeneralConfig>();
             // TODO: This path currently exists in two places: here and Game\Gui\Menus\PickSaveSlot.cs
-            return generalConfig.ResolvePath($"$(SAVE)/SAVE.{id:D3}");
+            return generalConfig.ResolvePath($"$(SAVE)/SAVE.{id:D3}", null);
         }
 
         void LoadGame(ushort id)

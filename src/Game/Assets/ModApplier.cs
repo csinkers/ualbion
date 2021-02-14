@@ -19,21 +19,21 @@ namespace UAlbion.Game.Assets
         readonly Dictionary<string, ModInfo> _mods = new Dictionary<string, ModInfo>();
         readonly List<ModInfo> _modsInReverseDependencyOrder = new List<ModInfo>();
         readonly AssetCache _assetCache = new AssetCache();
+        readonly Dictionary<string, string> _extraPaths = new Dictionary<string, string>
+        {
+            { "LANG", GameLanguage.English.ToString().ToUpperInvariant() }
+        };
+
         IAssetLocator _assetLocator;
-        IAssetLocatorRegistry _assetLocatorRegistry;
-        GameLanguage _language = GameLanguage.English;
 
         public ModApplier()
         {
             AttachChild(_assetCache);
             On<SetLanguageEvent>(e =>
             {
-                if (_language == e.Language)
-                    return;
-
-                _language = e.Language;
-                var config = Resolve<IGeneralConfig>();
-                config.SetPath("LANG", _language.ToString().ToUpperInvariant());
+                _extraPaths["LANG"] = e.Language.ToString().ToUpperInvariant();
+                // TODO: Different languages could have different sub-id ranges in their
+                // container files, so we should really be invalidating / rebuilding the whole asset config too.
                 Raise(new ReloadAssetsEvent());
                 Raise(new LanguageChangedEvent());
             });
@@ -58,7 +58,6 @@ namespace UAlbion.Game.Assets
         protected override void Subscribed()
         {
             _assetLocator ??= Resolve<IAssetLocator>();
-            _assetLocatorRegistry ??= Resolve<IAssetLocatorRegistry>();
             Exchange.Register<IModApplier>(this);
         }
 
@@ -71,7 +70,7 @@ namespace UAlbion.Game.Assets
             AssetMapping.Global.Clear();
 
             foreach (var mod in Resolve<IGameplaySettings>().ActiveMods)
-                LoadMod(config.ResolvePath("$(MODS)"), mod);
+                LoadMod(config.ResolvePath("$(MODS)", _extraPaths), mod);
 
             _modsInReverseDependencyOrder.Reverse();
         }
@@ -125,36 +124,57 @@ namespace UAlbion.Game.Assets
 
             MergeTypesToMapping(modInfo.Mapping, assetConfig, assetConfigPath);
             AssetMapping.Global.MergeFrom(modInfo.Mapping);
-            assetConfig.PopulateAssetIds(AssetMapping.Global);
+            _extraPaths["MOD"] = modConfig.AssetPath;
+            assetConfig.PopulateAssetIds(AssetMapping.Global, x => _assetLocator.GetSubItemRangesForFile(x, _extraPaths));
             _mods.Add(modName, modInfo);
             _modsInReverseDependencyOrder.Add(modInfo);
         }
 
         static void MergeTypesToMapping(AssetMapping mapping, AssetConfig config, string assetConfigPath)
         {
-            foreach (var assetType in config.Types)
+            foreach (var assetType in config.IdTypes.Values)
             {
-                var enumType = Type.GetType(assetType.Key);
+                var enumType = Type.GetType(assetType.EnumType);
                 if (enumType == null)
-                    throw new InvalidOperationException($"Could not load enum type \"{assetType.Key}\" defined in \"{assetConfigPath}\"");
+                    throw new InvalidOperationException(
+                        $"Could not load enum type \"{assetType.EnumType}\" defined in \"{assetConfigPath}\"");
 
-                mapping.RegisterAssetType(assetType.Key, assetType.Value.AssetType);
+                mapping.RegisterAssetType(assetType.EnumType, assetType.AssetType);
             }
+
+            config.RegisterStringRedirects(mapping);
         }
 
         public AssetInfo GetAssetInfo(AssetId id)
         {
-            var (typeName, enumId) = AssetMapping.Global.IdToEnumString(id);
             return _modsInReverseDependencyOrder
-                .Select(x => x.AssetConfig.GetAssetInfo(typeName, enumId))
-                .FirstOrDefault(x => x != null);
+                .SelectMany(x => x.AssetConfig.GetAssetInfo(id))
+                .FirstOrDefault();
         }
 
         public object LoadAsset(AssetId id)
         {
             try
             {
-                var asset = LoadAssetInternal(id);
+                var asset = LoadAssetInternal(id, _extraPaths);
+                return asset is Exception ? null : asset;
+            }
+            catch (Exception e)
+            {
+                if (CoreUtil.IsCriticalException(e))
+                    throw;
+
+                Raise(new LogEvent(LogEvent.Level.Error, $"Could not load asset {id}: {e}"));
+                return null;
+            }
+        }
+
+        public object LoadAsset(AssetId id, GameLanguage language)
+        {
+            try
+            {
+                var extraPaths = new Dictionary<string, string> { { "LANG", language.ToString().ToUpperInvariant() } };
+                var asset = LoadAssetInternal(id, extraPaths);
                 return asset is Exception ? null : asset;
             }
             catch (Exception e)
@@ -178,7 +198,7 @@ namespace UAlbion.Game.Assets
 
             try
             {
-                asset = LoadAssetInternal(id);
+                asset = LoadAssetInternal(id, _extraPaths);
             }
             catch (Exception e)
             {
@@ -193,50 +213,29 @@ namespace UAlbion.Game.Assets
             return asset is Exception ? null : asset;
         }
 
-        object LoadAssetInternal(AssetId id)
+        object LoadAssetInternal(AssetId id, Dictionary<string, string> extraPaths)
         {
             if (id.Type == AssetType.MetaFont)
                 return Resolve<IMetafontBuilder>().Build((MetaFontId)id.Id);
-
-            var (typeName, enumId) = AssetMapping.Global.IdToEnumString(id);
-            if (typeName == null)
-                return null;
 
             object asset = null;
             Stack<IPatch> patches = null; // Create the stack lazily, as most assets won't have any patches.
             foreach (var mod in _modsInReverseDependencyOrder)
             {
-                var info = mod.AssetConfig.GetAssetInfo(typeName, enumId);
-                var typeInfo = info?.File.EnumType ?? mod.AssetConfig.GetTypeInfo(typeName);
-                if (typeInfo == null)
-                    continue;
-
-                if (info == null && typeInfo.Locator == null)
-                    continue;
-
-                var assetLocator = typeInfo.Locator != null
-                    ? _assetLocatorRegistry.GetLocator(typeInfo.Locator)
-                    : _assetLocator;
-
-                var modAssetPath = mod.Path;
-                if (!string.IsNullOrEmpty(mod.ModConfig.AssetPath))
+                foreach (var info in mod.AssetConfig.GetAssetInfo(id))
                 {
-                    if (Path.IsPathRooted(mod.ModConfig.AssetPath) || mod.ModConfig.AssetPath.Contains("..", StringComparison.Ordinal))
-                        throw new FormatException($"The asset path ({mod.ModConfig.AssetPath}) for mod {mod.Name} is invalid - asset paths must be a relative path to a location inside the mod directory");
-                    modAssetPath = Path.Combine(mod.Path, mod.ModConfig.AssetPath);
-                }
-
-                var context = new SerializationContext(mod.Mapping, modAssetPath);
-                var modAsset = assetLocator.LoadAsset(id, context, info);
-                if (modAsset is IPatch patch)
-                {
-                    patches ??= new Stack<IPatch>();
-                    patches.Push(patch);
-                }
-                else if (modAsset != null)
-                {
-                    asset = modAsset;
-                    break;
+                    extraPaths["MOD"] = mod.AssetPath;
+                    var modAsset = _assetLocator.LoadAsset(id, mod.Mapping, info, extraPaths);
+                    if (modAsset is IPatch patch)
+                    {
+                        patches ??= new Stack<IPatch>();
+                        patches.Push(patch);
+                    }
+                    else if (modAsset != null)
+                    {
+                        asset = modAsset;
+                        break;
+                    }
                 }
             }
 

@@ -43,19 +43,17 @@ namespace UAlbion.Tools.ImageReverser
                 return;
             SyncSelectedPalettes();
 
-            trackWidth.Value = asset.EffectiveWidth == 0 ? 1 : asset.EffectiveWidth;
+            trackWidth.Value = asset.Width == 0 ? 1 : asset.Width;
             trackFrame.Value = 0;
             Render();
 
-            if (_logicalSprite != null)
+            if (_logicalSprite == null) 
+                return;
+
+            trackFrameCount.Value = _logicalSprite.Frames.Count;
+            if (asset.File.Loader == FixedSizeSpriteLoader.TypeString && _logicalSprite.Frames[0].Height != asset.Height)
             {
-                trackFrameCount.Value = _logicalSprite.Frames.Count;
-                if (asset.File.Loader == FixedSizeSpriteLoader.TypeString &&
-                    asset.Height != null &&
-                    _logicalSprite.Frames[0].Height != asset.Height)
-                {
-                    asset.Height = _logicalSprite.Frames[0].Height;
-                }
+                asset.Height = _logicalSprite.Frames[0].Height;
             }
         }
 
@@ -273,7 +271,7 @@ namespace UAlbion.Tools.ImageReverser
                     asset.File.Format == FixedSizeSpriteLoader.TypeString &&
                     asset.Height != newHeight)
                 {
-                    asset.Height = newHeight;
+                    asset.Set("Height", newHeight);
                     _logicalSprite = null; // Force sprite reload
                     _visualSprite = null;
                     Render();

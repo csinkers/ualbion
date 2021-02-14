@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using SerdesNet;
 using UAlbion.Config;
 
@@ -14,9 +16,12 @@ namespace UAlbion.Formats.Containers
             using var stream = File.OpenRead(file);
             using var br = new BinaryReader(stream);
             stream.Position = info.Get("Offset", 0);
-            var bytes = br.ReadBytes((info.Width ?? 0) * (info.Height ?? 0));
+            var bytes = br.ReadBytes(info.Width * info.Height);
             var ms = new MemoryStream(bytes);
             return new AlbionReader(new BinaryReader(ms));
         }
+
+        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info) // All sub-items must be given explicitly for binary offset containers
+            => FormatUtil.SortedIntsToRanges(info?.Map.Keys.OrderBy(x => x));
     }
 }

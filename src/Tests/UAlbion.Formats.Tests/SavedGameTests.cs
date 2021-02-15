@@ -56,21 +56,26 @@ namespace UAlbion.Formats.Tests
             var roundTripBytes = ms.ToArray();
 
             /* Save round-tripped and annotated text output for debugging
+
+            static string ReadToEnd(Stream stream)
+            {
+                stream.Position = 0;
+                using var reader = new StreamReader(stream, null, true, -1, true);
+                return reader.ReadToEnd();
+            }
+
+            ms.Position = 0;
+            using var reloadBr = new BinaryReader(ms);
+            using var reloadAnnotationStream = new MemoryStream();
+            using var reloadAnnotationReader = new StreamWriter(reloadAnnotationStream);
+            using var reloadFacade = new AnnotationFacadeSerializer(new AlbionReader(reloadBr, stream.Length), reloadAnnotationReader, FormatUtil.BytesFrom850String);
+            SavedGame.Serdes(null, mapping, reloadFacade);
+
             File.WriteAllBytes(file + ".bin", roundTripBytes);
-
-            annotationReadStream.Position = 0;
-            annotationWriteStream.Position = 0;
-            using var trPre = new StreamReader(annotationReadStream, null, true, -1, true);
-            using var trPost = new StreamReader(annotationWriteStream, null, true, -1, true);
-            var annotatedPre = trPre.ReadToEnd();
-            var annotatedPost = trPost.ReadToEnd();
-
-            File.WriteAllText(file + ".pre.txt", annotatedPre);
-            File.WriteAllText(file + ".post.txt", annotatedPost);
+            File.WriteAllText(file + ".pre.txt", ReadToEnd(annotationReadStream));
+            File.WriteAllText(file + ".post.txt", ReadToEnd(annotationWriteStream));
+            File.WriteAllText(file + ".reload.txt", ReadToEnd(reloadAnnotationStream));
             //*/
-
-            ApiUtil.Assert(originalBytes.Length == roundTripBytes.Length, $"Save game size changed after round trip (delta {roundTripBytes.Length - originalBytes.Length})");
-            ApiUtil.Assert(originalBytes.SequenceEqual(roundTripBytes));
 
             /* Save JSON for debugging
             {
@@ -83,6 +88,9 @@ namespace UAlbion.Formats.Tests
                 File.WriteAllText(file + ".json", JsonConvert.SerializeObject(save, settings));
             }
             //*/
+
+            ApiUtil.Assert(originalBytes.Length == roundTripBytes.Length, $"Save game size changed after round trip (delta {roundTripBytes.Length - originalBytes.Length})");
+            ApiUtil.Assert(originalBytes.SequenceEqual(roundTripBytes));
 
             var diffs = XDelta.Compare(originalBytes, roundTripBytes).ToArray();
             Assert.Collection(diffs,

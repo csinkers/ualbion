@@ -82,6 +82,12 @@ namespace UAlbion.Formats.Assets
             // Note: Gold + Rations for players are added in the sheet loader. Merchants have no gold/rations.
             if (type == InventoryType.Chest)
             {
+                if (s.IsReading())
+                {
+                    inv.Gold.Item = new Gold();
+                    inv.Rations.Item = new Rations();
+                }
+
                 inv.Gold.Amount = s.UInt16(nameof(inv.Gold), inv.Gold.Amount);
                 inv.Rations.Amount = s.UInt16(nameof(inv.Rations), inv.Rations.Amount);
             }

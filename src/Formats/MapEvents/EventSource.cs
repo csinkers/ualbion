@@ -21,5 +21,6 @@ namespace UAlbion.Formats.MapEvents
         public TriggerTypes Trigger { get; }
         public int X { get; }
         public int Y { get; }
+        public override string ToString() => $"ESrc {Trigger} {AssetId} @ ({X},{Y}) T:{TextSource}";
     }
 }

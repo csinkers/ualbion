@@ -22,7 +22,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
         }
 
         public WallFlags Properties { get; set; } // 0
-        public byte[] CollisionData { get; set; } // 1, len = 3 bytes
+        public uint Collision { get; set; } // 1, len = 3 bytes
         public SpriteId SpriteId { get; set; } // 4, ushort
         public byte AnimationFrames { get; set; } // 6
         public byte AutoGfxType { get; set; }     // 7
@@ -40,7 +40,12 @@ namespace UAlbion.Formats.Assets.Labyrinth
             if (s == null) throw new ArgumentNullException(nameof(s));
             w ??= new Wall();
             w.Properties = s.EnumU8(nameof(w.Properties), w.Properties);
-            w.CollisionData = s.ByteArray(nameof(w.CollisionData), w.CollisionData, 3);
+
+            // Either a 24 bit int or a 3 byte array, annoying to serialize either way.
+            w.Collision = (w.Collision & 0xffff00) | s.UInt8(nameof(w.Collision), (byte)(w.Collision & 0xff));
+            w.Collision = (w.Collision & 0xff00ff) | (uint)s.UInt8(nameof(w.Collision), (byte)((w.Collision >> 8) & 0xff)) << 8;
+            w.Collision = (w.Collision & 0x00ffff) | (uint)s.UInt8(nameof(w.Collision), (byte)((w.Collision >> 16) & 0xff)) << 16;
+
             w.SpriteId = SpriteId.SerdesU16(nameof(w.SpriteId), w.SpriteId, AssetType.Wall, mapping, s);
             w.AnimationFrames = s.UInt8(nameof(w.AnimationFrames), w.AnimationFrames);
             w.AutoGfxType = s.UInt8(nameof(w.AutoGfxType), w.AutoGfxType);

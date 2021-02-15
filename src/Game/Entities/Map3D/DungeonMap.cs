@@ -77,7 +77,7 @@ namespace UAlbion.Game.Entities.Map3D
             //if(_labyrinthData.Unk12 != 0) // 7=1|2|4 (Jirinaar), 54=32|16|4|2, 156=128|16|8|2 (Tall town)
             //    Debugger.Break();
 
-            var maxObjectHeightRaw = _labyrinthData.ObjectGroups.Max(x => x.SubObjects.Max(y => (int?)y.Y));
+            var maxObjectHeightRaw = _labyrinthData.ObjectGroups.Max(x => x.SubObjects.Max(y => (int?)y?.Y));
             float objectYScaling = TileSize.Y / _labyrinthData.WallHeight;
             if (maxObjectHeightRaw > _labyrinthData.WallHeight * 1.5f)
                 objectYScaling /= 2; // TODO: Figure out the proper way to handle this.
@@ -94,8 +94,9 @@ namespace UAlbion.Game.Entities.Map3D
 
                 var objectData = _labyrinthData.ObjectGroups[npc.SpriteOrGroup.Id]; // TODO: Verify SpriteOrGroup is an ObjectGroup
                 // TODO: Build proper NPC objects with AI, sound effects etc
-                foreach (var subObject in objectData.SubObjects) 
-                    AttachChild(BuildMapObject(npc.Waypoints[0].X, npc.Waypoints[0].Y, subObject, objectYScaling));
+                foreach (var subObject in objectData.SubObjects)
+                    if (subObject != null)
+                        AttachChild(BuildMapObject(npc.Waypoints[0].X, npc.Waypoints[0].Y, subObject, objectYScaling));
             }
 
             for (int y = 0; y < _mapData.Height; y++)
@@ -108,7 +109,8 @@ namespace UAlbion.Game.Entities.Map3D
 
                     var objectInfo = _labyrinthData.ObjectGroups[contents - 1];
                     foreach (var subObject in objectInfo.SubObjects)
-                        AttachChild(BuildMapObject(x, y, subObject, objectYScaling));
+                        if (subObject != null)
+                            AttachChild(BuildMapObject(x, y, subObject, objectYScaling));
                 }
             }
 

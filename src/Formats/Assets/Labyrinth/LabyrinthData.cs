@@ -81,8 +81,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
             // Populate objectIds on subobjects to improve debugging experience
             foreach (var so in d.ObjectGroups.SelectMany(x => x.SubObjects))
             {
-                if (so.ObjectInfoNumber >= d.Objects.Count)
-                    continue;
+                if (so == null || so.ObjectInfoNumber >= d.Objects.Count) continue;
                 so.SpriteId = d.Objects[so.ObjectInfoNumber].SpriteId;
             }
 

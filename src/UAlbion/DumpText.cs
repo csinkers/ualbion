@@ -112,6 +112,7 @@ namespace UAlbion
                     sw.Write($"        {content}: ");
                     foreach (var subObject in objectInfo.SubObjects)
                     {
+                        if (subObject == null) continue;
                         var definition = l.Objects[subObject.ObjectInfoNumber];
                         sw.Write(definition.SpriteId);
                         sw.Write(" ");
@@ -144,8 +145,11 @@ namespace UAlbion
                 for (int j = 0; j < l.ObjectGroups.Count; j++)
                 {
                     var o = l.ObjectGroups[j];
-                    sw.WriteLine(
-                        $"    Obj {j}: {o.AutoGraphicsId} [{string.Join(", ", o.SubObjects.Select(x => x.ObjectInfoNumber.ToString(CultureInfo.InvariantCulture)))}]");
+                    sw.Write($"    Obj {j}: {o.AutoGraphicsId} [");
+                    sw.WriteLine(string.Join(", ",
+                        o.SubObjects
+                            .Where(x => x != null)
+                            .Select(x => x.ObjectInfoNumber.ToString(CultureInfo.InvariantCulture))));
                 }
 
                 for (int j = 0; j < l.Objects.Count; j++)
@@ -226,6 +230,7 @@ namespace UAlbion
                                     bool first = true;
                                     foreach (var subObject in objectData.SubObjects)
                                     {
+                                        if (subObject == null) continue;
                                         if (!first) sw.Write(", ");
                                         first = false;
                                         var def = lab.Objects[subObject.ObjectInfoNumber];

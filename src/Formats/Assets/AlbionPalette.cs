@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using SerdesNet;
@@ -13,13 +14,18 @@ namespace UAlbion.Formats.Assets
         const int EntryCount = 256;
         const int CommonEntries = 64;
         const int VariableEntries = EntryCount - CommonEntries;
-        public uint Id { get; }
-        public string Name { get; }
-        [JsonIgnore] public bool IsAnimated => Period > 1;
-        public int Period { get; }
+
         readonly int[] _periods = new int[EntryCount];
-        readonly uint[] _entries = new uint[EntryCount];
         readonly IList<uint[]> _cache = new List<uint[]>();
+        readonly IList<(byte, byte)> _ranges = new List<(byte, byte)>();
+
+        public uint Id { get; private set; }
+        public string Name { get; private set; }
+        public uint[] Entries { get; private set; } = new uint[EntryCount];
+        [JsonIgnore] public bool IsAnimated => Period > 1;
+        [JsonIgnore] public int Period { get; private set; }
+
+        public AlbionPalette() { }
 
         public AlbionPalette(
             uint id,
@@ -28,88 +34,64 @@ namespace UAlbion.Formats.Assets
             IList<(byte, byte)> ranges = null)
         {
             if (entries == null) throw new ArgumentNullException(nameof(entries));
+            if (entries.Length != EntryCount)
+                throw new ArgumentOutOfRangeException(nameof(entries), $"Expected entries to be an array of {EntryCount} elements");
 
             Id = id;
             Name = name;
-            _entries = entries.ToArray();
-            Period = InitRanges(ranges);
+            Array.Copy(entries, Entries, EntryCount);
+            Ranges = ranges;
         }
 
-        public AlbionPalette(ISerializer s, AssetInfo info)
+        public IEnumerable<(byte, byte)> Ranges
         {
-            if (s == null) throw new ArgumentNullException(nameof(s));
-            if (info == null) throw new ArgumentNullException(nameof(info));
-            var streamLength = s.BytesRemaining;
-            bool isCommon = streamLength == CommonEntries * 3;
-
-            long startingOffset = s.Offset;
-            for (int i = isCommon ? VariableEntries : 0; i < (isCommon ? EntryCount : VariableEntries); i++)
+            get => _ranges;
+            set
             {
-                _entries[i] =        s.UInt8(null, 0);       // Red
-                _entries[i] |= (uint)s.UInt8(null, 0) << 8;  // Green
-                _entries[i] |= (uint)s.UInt8(null, 0) << 16; // Blue
-                _entries[i] |= (uint)(i == 0 ? 0 : 0xff) << 24; // Alpha
-            }
+                if (ReferenceEquals(value, _ranges))
+                    return;
 
-            ApiUtil.Assert(s.Offset == startingOffset + streamLength);
+                _ranges.Clear();
+                if (value != null)
+                    foreach (var range in value)
+                        _ranges.Add(range);
 
-            var ranges = info.GetArray<string>("AnimatedRanges")?.Select(x =>
-            {
-                var parts = x.Split('-');
-                if (parts.Length != 2)
+                var totalPeriod = (int)ApiUtil.Lcm(_ranges
+                    .Select(x => (long)(x.Item2 - x.Item1 + 1))
+                    .Append(1));
+
+                _cache.Clear();
+                for (int cacheIndex = 0; cacheIndex < totalPeriod; cacheIndex++)
                 {
-                    throw new InvalidOperationException(
-                        "Palette animated ranges must be of the form \"FROM-TO\" " +
-                        "where FROM and TO are either decimal or hex values between 0 and 255. e.g. \"0x23-0x4b\" or \"10-23\"). " +
-                        $"The incorrect value was {x}");
-                }
-
-                return ((byte)FormatUtil.ParseHex(parts[0]), (byte)FormatUtil.ParseHex(parts[1]));
-            }).ToList() ?? new List<(byte, byte)>();
-
-            // AssetId is None when loading palettes from raw data in ImageReverser
-            Id = info.AssetId.IsNone ? (uint)info.SubAssetId : info.AssetId.ToUInt32();
-            Name = info.AssetId.IsNone ? info.Name : info.AssetId.ToString();
-            Period = InitRanges(ranges);
-        }
-
-        int InitRanges(IList<(byte, byte)> ranges)
-        {
-            ranges ??= Array.Empty<(byte, byte)>();
-            var totalPeriod = (int)ApiUtil.Lcm(ranges
-                .Select(x => (long)(x.Item2 - x.Item1 + 1))
-                .Append(1));
-
-            for (int cacheIndex = 0; cacheIndex < totalPeriod; cacheIndex++)
-            {
-                var result = new uint[256];
-                for (int i = 0; i < _entries.Length; i++)
-                {
-                    int index = i;
-                    foreach (var range in ranges)
+                    var result = new uint[256];
+                    for (int i = 0; i < EntryCount; i++)
                     {
-                        if (i >= range.Item1 && i <= range.Item2)
+                        int index = i;
+                        foreach (var range in _ranges)
                         {
-                            int period = range.Item2 - range.Item1 + 1;
-                            int tickModulo = cacheIndex % period;
-                            index = (i - range.Item1 + tickModulo) % period + range.Item1;
-                            break;
+                            if (i >= range.Item1 && i <= range.Item2)
+                            {
+                                int period = range.Item2 - range.Item1 + 1;
+                                int tickModulo = cacheIndex % period;
+                                index = (i - range.Item1 + tickModulo) % period + range.Item1;
+                                break;
+                            }
                         }
+
+                        result[i] = Entries[index];
                     }
-
-                    result[i] = _entries[index];
+                    _cache.Add(result);
                 }
-                _cache.Add(result);
+
+                for (int i = 0; i < _periods.Length; i++)
+                    _periods[i] = 1;
+
+                foreach (var range in _ranges)
+                    for (int i = range.Item1; i <= range.Item2; i++)
+                        _periods[i] = range.Item2 - range.Item1 + 1;
+
+                Period = totalPeriod;
             }
-
-            for (int i = 0; i < _periods.Length; i++)
-                _periods[i] = 1;
-
-            foreach (var range in ranges)
-                for (int i = range.Item1; i <= range.Item2; i++)
-                    _periods[i] = range.Item2 - range.Item1 + 1;
-
-            return totalPeriod;
         }
 
         public int CalculatePeriod(IEnumerable<byte> distinctColors)
@@ -122,9 +104,9 @@ namespace UAlbion.Formats.Assets
 
             for (int i = VariableEntries; i < EntryCount; i++)
             {
-                _entries[i] = commonPalette._entries[i];
+                Entries[i] = commonPalette.Entries[i];
                 foreach (var frame in _cache)
-                    frame[i] = _entries[i];
+                    frame[i] = Entries[i];
             }
         }
 
@@ -137,5 +119,61 @@ namespace UAlbion.Formats.Assets
         }
 
         public override string ToString() { return string.IsNullOrEmpty(Name) ? $"Palette {Id}" : $"{Name} ({Id})"; }
+
+        public static AlbionPalette Serdes(AlbionPalette p, AssetInfo info, ISerializer s)
+        {
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            if (info == null) throw new ArgumentNullException(nameof(info));
+
+            bool isCommon = info.Get("IsCommon", false);
+            long entryCount = isCommon ? CommonEntries : VariableEntries;
+
+            if (p == null)
+            {
+                if (s.IsWriting()) throw new ArgumentNullException(nameof(p));
+
+                // AssetId is None when loading palettes from raw data in ImageReverser
+                p = new AlbionPalette
+                {
+                    Id = info.AssetId.IsNone ? (uint) info.SubAssetId : info.AssetId.ToUInt32(),
+                    Name = info.AssetId.IsNone ? info.Name : info.AssetId.ToString()
+                };
+            }
+
+            if (s.IsReading() && s.BytesRemaining != entryCount * 3)
+                throw new InvalidDataException($"Palette had invalid size {s.BytesRemaining}, expected {entryCount * 3}");
+
+            for (int i = isCommon ? VariableEntries : 0; i < (isCommon ? EntryCount : VariableEntries); i++)
+            {
+                var (r, g, b, _) = FormatUtil.UnpackColor(p.Entries[i]);
+
+                r = s.UInt8(null, r); // Red
+                g = s.UInt8(null, g); // Green
+                b = s.UInt8(null, b); // Blue
+                var a = (byte)(i == 0 ? 0 : 0xff); // Alpha
+
+                p.Entries[i] = FormatUtil.PackColor(r, g, b, a);
+            }
+
+            if (s.IsReading())
+                p.Ranges = ParseRanges(info);
+
+            return p;
+        }
+
+        static IEnumerable<(byte, byte)> ParseRanges(AssetInfo info) =>
+            info.GetArray<string>("AnimatedRanges")?.Select(x =>
+            {
+                var parts = x.Split('-');
+                if (parts.Length != 2)
+                {
+                    throw new InvalidOperationException(
+                        "Palette animated ranges must be of the form \"FROM-TO\" " +
+                        "where FROM and TO are either decimal or hex values between 0 and 255. e.g. \"0x23-0x4b\" or \"10-23\"). " +
+                        $"The incorrect value was {x}");
+                }
+
+                return ((byte)FormatUtil.ParseHex(parts[0]), (byte)FormatUtil.ParseHex(parts[1]));
+            });
     }
 }

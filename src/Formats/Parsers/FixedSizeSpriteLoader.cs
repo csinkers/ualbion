@@ -6,10 +6,14 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class FixedSizeSpriteLoader : IAssetLoader
+    public class FixedSizeSpriteLoader : IAssetLoader<AlbionSprite>
     {
         public const string TypeString = "UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats";
+
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+            => Serdes((AlbionSprite) existing, config, mapping, s);
+
+        public AlbionSprite Serdes(AlbionSprite existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (config == null) throw new ArgumentNullException(nameof(config));

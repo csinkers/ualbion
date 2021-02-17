@@ -7,8 +7,8 @@ namespace UAlbion.Formats.Assets.Maps
 {
     public class TilesetData
     {
-        public TilesetData(AssetId id) => Id = id;
-        public AssetId Id { get; }
+        public TilesetData(TilesetId id) => Id = id;
+        public TilesetId Id { get; }
         public bool UseSmallGraphics { get; set; } // Careful if renaming: needs to match up to asset property in assets.json
         public IList<TileData> Tiles { get; } = new List<TileData>();
 

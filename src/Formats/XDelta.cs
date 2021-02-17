@@ -83,7 +83,8 @@ namespace UAlbion.Formats
             for (int i = 0; i + FingerprintWidth <= source.Length; i += FingerprintWidth) // Loop over source blocks
             {
                 var hash = Adler32(source, i, i + FingerprintWidth); // Compute fingerprint
-                hashes[hash] = i; // Enter in table
+                if (!hashes.ContainsKey(hash)) // Keep first match rather than last
+                    hashes[hash] = i; // Enter in table
             }
             return hashes;
         }

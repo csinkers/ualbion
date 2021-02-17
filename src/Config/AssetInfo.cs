@@ -8,24 +8,23 @@ namespace UAlbion.Config
 {
     public class AssetInfo
     {
-        [JsonIgnore] public AssetId AssetId { get; internal set; }
-        [JsonIgnore] public int SubAssetId { get; internal set; } // Sub-asset offset in the container file (or 0 if not inside a container)
-        [JsonIgnore] public AssetFileInfo File { get; set; }
         public string Id { get; set; } // Id of this asset in the mapped enum type.
         [JsonExtensionData] public IDictionary<string, JToken> Properties { get; set; }
 
-        public override string ToString() => $"I:{AssetId} ({File.Filename}.{SubAssetId})";
+        [JsonIgnore] public AssetId AssetId { get; set; }
+        [JsonIgnore] public int SubAssetId { get; set; } // Sub-asset offset in the container file (or 0 if not inside a container)
+        [JsonIgnore] public AssetFileInfo File { get; set; }
 
-        [JsonIgnore] public bool Transposed => File.Transposed ?? false; // For sprites only
+        [JsonIgnore] public bool Transposed => File?.Transposed ?? false; // For sprites only
         [JsonIgnore] public int Width // For sprites only
         {
-            get => Get(nameof(Width), File.Width ?? 0);
+            get => Get(nameof(Width), File?.Width ?? 0);
             set => Set(nameof(Width), value == 0 ? (object)null : value);
         }
 
         [JsonIgnore] public int Height // For sprites only
         {
-            get => Get(nameof(Height), File.Height ?? 0);
+            get => Get(nameof(Height), File?.Height ?? 0);
             set => Set(nameof(Height), value == 0 ? (object)null : value);
         }
 
@@ -34,6 +33,8 @@ namespace UAlbion.Config
             get => Get<string>(nameof(Name), null);
             set => Set(nameof(Name), value);
         }
+
+        public override string ToString() => $"I:{AssetId} ({File.Filename}.{SubAssetId})";
 
         public T Get<T>(string propertyName, T defaultValue)
         {

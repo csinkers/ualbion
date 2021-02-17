@@ -8,6 +8,6 @@ namespace UAlbion.Formats.Parsers
     {
         public Automap Serdes(Automap existing, AssetInfo config, AssetMapping mapping, ISerializer s) => Automap.Serdes(existing, s);
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((Automap) existing, config, mapping, s);
+            => Serdes((Automap)existing, config, mapping, s);
     }
 }

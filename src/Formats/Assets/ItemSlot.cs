@@ -56,8 +56,9 @@ namespace UAlbion.Formats.Assets
             }
         }
 
-        public ItemId ItemId =>
-            Item switch
+        public ItemId ItemId
+        {
+            get => Item switch
             {
                 Gold _ => AssetId.Gold,
                 Rations _ => AssetId.Rations,
@@ -65,6 +66,17 @@ namespace UAlbion.Formats.Assets
                 ItemProxy item => item.Id,
                 _ => AssetId.None
             };
+            set
+            {
+                _item = value.Type switch
+                {
+                    AssetType.Gold => new Gold(),
+                    AssetType.Rations => new Rations(),
+                    AssetType.Item => new ItemProxy(value),
+                    _ => null
+                };
+            }
+        }
 
         public ItemSlot DeepClone() => (ItemSlot)MemberwiseClone();
         public override string ToString() => Amount == 0 ? "Empty" : $"{Amount}x{ItemId} {Flags}";
@@ -83,7 +95,7 @@ namespace UAlbion.Formats.Assets
 
             ItemId itemId = slot.ItemId;
             itemId = ItemId.SerdesU16(nameof(ItemId), itemId, AssetType.Item, mapping, s);
-            if(slot.Item == null && !itemId.IsNone)
+            if (slot.Item == null && !itemId.IsNone)
                 slot.Item = new ItemProxy(itemId);
             return slot;
         }

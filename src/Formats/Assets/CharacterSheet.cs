@@ -129,6 +129,7 @@ namespace UAlbion.Formats.Assets
 
         public ushort UnknownFA { get; set; }
         public ushort UnknownFC { get; set; }
+        public byte[] UnkMonster { get; set; } // 472 bytes more than an NPC
         // ReSharper restore InconsistentNaming
 
         public static CharacterSheet Serdes(CharacterId id, CharacterSheet sheet, AssetMapping mapping, ISerializer s)
@@ -340,16 +341,25 @@ namespace UAlbion.Formats.Assets
                 }
             }
 
-            if (sheet.Type != CharacterType.Party)
+            if (sheet.Type == CharacterType.Npc)
             {
                 ApiUtil.Assert(s.Offset - initialOffset == 742, "Expected non-player character sheet to be 742 bytes");
                 s.End();
                 return sheet;
             }
 
-            Inventory.SerdesCharacter(id.Id, sheet.Inventory, mapping, s);
 
-            ApiUtil.Assert(s.Offset - initialOffset == 940, "Expected player character sheet to be 940 bytes");
+            if (sheet.Type == CharacterType.Party)
+            {
+                Inventory.SerdesCharacter(id.Id, sheet.Inventory, mapping, s);
+                ApiUtil.Assert(s.Offset - initialOffset == 940, "Expected player character sheet to be 940 bytes");
+                s.End();
+                return sheet;
+            }
+
+            Inventory.SerdesMonster(id.Id, sheet.Inventory, mapping, s);
+            sheet.UnkMonster = s.ByteArray(nameof(UnkMonster), sheet.UnkMonster, 328);
+            ApiUtil.Assert(s.Offset - initialOffset == 1214, "Expected player character sheet to be 1214 bytes");
             s.End();
             return sheet;
         }

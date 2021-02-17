@@ -4,7 +4,7 @@ namespace UAlbion.Config
 {
     public interface IGeneralConfig
     {
-        string ResolvePath(string relative, IDictionary<string, string> extraPaths);
+        string ResolvePath(string relative, IDictionary<string, string> extraPaths = null);
         void SetPath(string pathName, string path);
     }
 }

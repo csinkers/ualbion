@@ -5,6 +5,7 @@ namespace UAlbion.Formats.Assets.Maps
     [Flags]
     public enum TileFlags : ushort
     {
+        None = 0,
         Unused0 = 1, // Not used?
         Unused1 = 1 << 1, // Not used?
         // Set on stairs on 117

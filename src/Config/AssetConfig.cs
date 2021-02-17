@@ -103,11 +103,15 @@ namespace UAlbion.Config
             if (mapping == null) throw new ArgumentNullException(nameof(mapping));
             foreach (var kvp in StringMappings)
             {
-                var (type, range) = SplitId(kvp.Key);
+                var (type, range) = SplitId(kvp.Key, '.');
                 var enumType = ResolveIdType(type);
-                var target = ResolveId(mapping, kvp.Value);
+                var (targetStr, offsetStr) = SplitId(kvp.Value, ':');
+                if (!int.TryParse(offsetStr, out var offset))
+                    offset = 0;
+
+                var target = ResolveId(mapping, targetStr);
                 var (min, max) = ParseRange(range);
-                mapping.RegisterStringRedirect(enumType, target, min, max);
+                mapping.RegisterStringRedirect(enumType, target, min, max, offset);
             }
         }
 
@@ -136,11 +140,11 @@ namespace UAlbion.Config
             return (min, max);
         }
 
-        static (string, string) SplitId(string id)
+        static (string, string) SplitId(string id, char separator)
         {
-            int index = id.IndexOf('.');
+            int index = id.IndexOf(separator);
             if (index == -1)
-                throw new FormatException("Asset IDs should consist of an alias type and value, separated by a '.' character");
+                return (id, null);
 
             var type = id.Substring(0, index);
             var val = id.Substring(index + 1);
@@ -161,7 +165,9 @@ namespace UAlbion.Config
 
         AssetId ResolveId(AssetMapping mapping, string id)
         {
-            var (type, val) = SplitId(id);
+            var (type, val) = SplitId(id, '.');
+            if (val == null)
+                throw new FormatException("Asset IDs should consist of an alias type and value, separated by a '.' character");
             var enumType = ResolveIdType(type);
             return mapping.EnumToId(enumType, val);
         }

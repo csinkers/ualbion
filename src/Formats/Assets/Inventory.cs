@@ -20,7 +20,7 @@ namespace UAlbion.Formats.Assets
             {
                 InventoryType.Player => ItemSlotId.CharacterSlotCount,
                 InventoryType.Chest => ItemSlotId.ChestSlotCount,
-                _ => ItemSlotId.NormalSlotCount // e.g. merchants
+                _ => ItemSlotId.NormalSlotCount // just the backpack/normal slots, e.g. merchants
             })];
 
             for (int i = 0; i < Slots.Length; i++)
@@ -29,8 +29,8 @@ namespace UAlbion.Formats.Assets
             _readOnlyList = new ReadOnlyCollection<IReadOnlyItemSlot>(Slots);
         }
 
-        [JsonIgnore] public InventoryId Id { get; }
-        public ItemSlot[] Slots { get; }
+        [JsonIgnore] public InventoryId Id { get; private set; }
+        public ItemSlot[] Slots { get; private set; }
         [JsonIgnore] public IEnumerable<ItemSlot> BackpackSlots { get { for (int i = 0; i < (int)ItemSlotId.NormalSlotCount; i++) yield return Slots[i]; } }
         [JsonIgnore] public ItemSlot Gold => Slots[(int)ItemSlotId.Gold];
         [JsonIgnore] public ItemSlot Rations => Slots[(int)ItemSlotId.Rations];
@@ -46,6 +46,7 @@ namespace UAlbion.Formats.Assets
         public static Inventory SerdesChest(int n, Inventory inv, AssetMapping mapping, ISerializer s) => Serdes(n, inv, mapping, s, InventoryType.Chest);
         public static Inventory SerdesMerchant(int n, Inventory inv, AssetMapping mapping, ISerializer s) => Serdes(n, inv, mapping, s, InventoryType.Merchant);
         public static Inventory SerdesCharacter(int n, Inventory inv, AssetMapping mapping, ISerializer s) => Serdes(n, inv, mapping, s, InventoryType.Player);
+        public static Inventory SerdesMonster(int n, Inventory inv, AssetMapping mapping, ISerializer s) => Serdes(n, inv, mapping, s, InventoryType.Monster);
         public IEnumerable<ItemSlot> EnumerateAll() => Slots.Where(x => x != null);
 
         static Inventory Serdes(int n, Inventory inv, AssetMapping mapping, ISerializer s, InventoryType type)

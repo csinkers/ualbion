@@ -8,9 +8,9 @@ using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class ScriptLoader : IAssetLoader
+    public class ScriptLoader : IAssetLoader<IList<IEvent>>
     {
-        IEnumerable<string> ReadLines(ISerializer s)
+        static IEnumerable<string> ReadLines(ISerializer s)
         {
             var bytes = s.ByteArray(null, null, (int)s.BytesRemaining);
             var text = FormatUtil.BytesTo850String(bytes);
@@ -18,6 +18,9 @@ namespace UAlbion.Formats.Parsers
         }
 
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+            => Serdes((IList<IEvent>)existing, config, mapping, s);
+
+        public IList<IEvent> Serdes(IList<IEvent> existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             var events = new List<IEvent>();

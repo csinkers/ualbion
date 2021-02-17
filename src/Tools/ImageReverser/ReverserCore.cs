@@ -19,12 +19,12 @@ namespace UAlbion.Tools.ImageReverser
         readonly IDictionary<AssetInfo, string> _rawFilePaths = new Dictionary<AssetInfo, string>();
         readonly IDictionary<string, string> _extraPaths = new Dictionary<string, string> { { "LANG", "ENGLISH" } };
 
-        AlbionPalette LoadPalette(string file, AssetInfo assetInfo)
+        static AlbionPalette LoadPalette(string file, AssetInfo assetInfo)
         {
             using var stream = File.Open(file, FileMode.Open);
             using var br = new BinaryReader(stream);
             using var s = new AlbionReader(br, stream.Length);
-            return new AlbionPalette(s, assetInfo);
+            return AlbionPalette.Serdes(null, assetInfo, s);
         }
 
         public ReverserCore(GeneralConfig generalConfig, AssetConfig config)

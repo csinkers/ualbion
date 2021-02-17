@@ -9,6 +9,31 @@ namespace UAlbion.Formats.Assets
         BitArray _discovered;
         public int Width { get; set; }
         public int Height => Width == 0 ? 0 : _discovered.Length / Width;
+
+        public byte[] AsBytes
+        {
+            get
+            {
+                var length = (_discovered.Length + 7) / 8;
+                var bytes = new byte[length];
+                    for (int i = 0; i < _discovered.Length; i++)
+                        bytes[i >> 3] |= (byte)(_discovered[i] ? 1 << (i & 7) : 0);
+                return bytes;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    _discovered = null;
+                    return;
+                }
+
+                _discovered = new BitArray(value.Length * 8);
+                for (int i = 0; i < _discovered.Length; i++)
+                    _discovered[i] = (value[i >> 3] & (1 << (i & 7))) != 0;
+            }
+        }
+
         public bool this[int index] => _discovered[index];
         public bool this[int x, int y] => _discovered[y * Width + x];
 
@@ -22,19 +47,24 @@ namespace UAlbion.Formats.Assets
         public static Automap Serdes(Automap map, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            map ??= new Automap();
-            var length = (int)(s.IsReading() ? s.BytesRemaining : (map._discovered.Length + 7) / 8);
-            var bytes = new byte[length];
-
-            if (map._discovered != null)
-                for (int i = 0; i < map._discovered.Length; i++)
-                    bytes[i >> 3] |= (byte)(map._discovered[i] ? 0 : 1 << (i & 7));
+            int length;
+            byte[] bytes = null;
+            if (s.IsReading())
+            {
+                map ??= new Automap();
+                length = (int)s.BytesRemaining;
+            }
+            else
+            {
+                if (map == null) throw new ArgumentNullException(nameof(map));
+                bytes = map.AsBytes;
+                length = bytes.Length;
+            }
 
             bytes = s.ByteArray(null, bytes, length);
 
-            map._discovered ??= new BitArray(length * 8);
-            for (int i = 0; i < map._discovered.Length; i++)
-                map._discovered[i] = (bytes[i >> 3] & (1 << (i & 7))) != 0;
+            if (s.IsReading())
+                map.AsBytes = bytes;
 
             return map;
         }

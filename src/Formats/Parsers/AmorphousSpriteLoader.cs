@@ -9,7 +9,7 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class AmorphousSpriteLoader : IAssetLoader
+    public class AmorphousSpriteLoader : IAssetLoader<AlbionSprite>
     {
         static readonly Regex SizesRegex = new Regex(@"
             \(\s*
@@ -43,11 +43,14 @@ namespace UAlbion.Formats.Parsers
         }
 
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+            => Serdes((AlbionSprite)existing, config, mapping, s);
+
+        public AlbionSprite Serdes(AlbionSprite existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (config == null) throw new ArgumentNullException(nameof(config));
-            if (s.IsWriting()) throw new NotImplementedException($"Writing of amorphous sprites is not currently supported");
-            ApiUtil.Assert(config.Transposed != true);
+            if (s.IsWriting()) throw new NotImplementedException("Writing of amorphous sprites is not currently supported");
+            ApiUtil.Assert(!config.Transposed);
 
             var sizes = ParseSpriteSizes(config.Get<string>("SubSprites", null));
 

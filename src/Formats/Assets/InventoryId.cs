@@ -86,6 +86,7 @@ namespace UAlbion.Formats.Assets
             InventoryType.Chest => AssetType.Chest,
             InventoryType.Merchant => AssetType.Merchant,
             InventoryType.Player => AssetType.PartyMember,
+            InventoryType.Monster => AssetType.Monster,
             _ => throw new ArgumentOutOfRangeException($"Cannot convert inventory id of type {id.Type} to an AssetId")
         }, id.Id);
 

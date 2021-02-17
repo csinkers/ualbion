@@ -24,7 +24,7 @@ namespace UAlbion.Config
 
         public void SetPath(string pathName, string path) => Paths[pathName] = path;
 
-        public string ResolvePath(string relative, IDictionary<string, string> extraPaths)
+        public string ResolvePath(string relative, IDictionary<string, string> extraPaths = null)
         {
             if (string.IsNullOrEmpty(relative))
                 throw new ArgumentNullException(nameof(relative));

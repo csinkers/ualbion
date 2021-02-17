@@ -8,6 +8,7 @@ namespace UAlbion.Formats.Assets.Maps
     [JsonConverter(typeof(StringEnumConverter))]
     public enum NpcMovementTypes : byte
     {
+        None = 0,
         RandomMask = 3,
         Random1 = 1,
         Random2 = 2,

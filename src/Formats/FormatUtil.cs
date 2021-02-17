@@ -43,6 +43,21 @@ namespace UAlbion.Formats
             return sb.ToString();
         }
 
+        public static (byte, byte, byte, byte) UnpackColor(uint c)
+        {
+            var r = (byte)(c & 0xff);
+            var g = (byte)((c >> 8) & 0xff);
+            var b = (byte)((c >> 16) & 0xff);
+            var a = (byte)((c >> 24) & 0xff);
+            return (r, g, b, a);
+        }
+
+        public static uint PackColor(byte r, byte g, byte b, byte a) =>
+            r
+            | (uint)(g << 8)
+            | (uint)(b << 16)
+            | (uint)(a << 24);
+
         public static (ushort, ushort) FromPacked(byte b1, byte b2, byte b3)
         {
             ushort overlay = (ushort)((b1 << 4) + (b2 >> 4));
@@ -71,13 +86,13 @@ namespace UAlbion.Formats
                     buf[i * 3],
                     buf[i * 3 + 1],
                     buf[i * 3 + 2]
-                ) = ToPacked((ushort)(underlay[i] + 1), (ushort)(overlay[i] + 1));
+                ) = ToPacked((ushort)underlay[i], (ushort)overlay[i]);
             return buf;
         }
 
         public static (int[], int[]) FromPacked(int width, int height, byte[] buf)
         {
-            if (buf == null) throw new ArgumentNullException(nameof(buf));
+            if (buf == null) return (null, null);
             if (buf.Length != 3 * width * height)
             {
                 throw new InvalidOperationException(
@@ -102,7 +117,7 @@ namespace UAlbion.Formats
         public static int ParseHex(string s) =>
             s != null && s.StartsWith("0x", StringComparison.InvariantCulture)
                 ? int.Parse(s.Substring(2), NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture)
-                : int.Parse(s, CultureInfo.InvariantCulture);
+                : s == null ? 0 : int.Parse(s, CultureInfo.InvariantCulture);
 
         public static List<(int, int)> SortedIntsToRanges(IEnumerable<int> values) // pairs = (subItemId, count)
         {

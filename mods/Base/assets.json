@@ -88,9 +88,9 @@
   "StringMappings": {
     "stext.*":        "special.SystemStrings",
     "utext.*":        "special.UAlbionStrings",
-    "word.1-500":     "special.Words1",
-    "word.501-1000":  "special.Words2",
-    "word.1001-1500": "special.Words3"
+    "word.1-500":     "special.Words1:0",
+    "word.501-1000":  "special.Words2:500",
+    "word.1001-1500": "special.Words3:1000"
   },
 
   "Loaders": {
@@ -177,7 +177,11 @@
     "$(XLD)/MONGRP2.XLD":  { "Loader": "mongrp", "Map": { "0": { "Id": "mongrp.200" } } },
 
     // Palettes
-    "$(XLD)/PALETTE.000":  { "Loader": "pal", "ContainerFormat": "None", "Map": { "0": { "Id": "pal.0" } } },
+    "$(XLD)/PALETTE.000":  {
+      "Loader": "pal",
+      "ContainerFormat": "None",
+      "Map": { "0": { "Id": "pal.0", "IsCommon": true } }
+    },
     "$(XLD)/PALETTE0.XLD": {
       "Loader": "pal",
       "Map": {

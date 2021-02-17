@@ -174,7 +174,7 @@ namespace UAlbion.Config
         {
             var (enumType, enumValue) = IdToEnum(id);
             if (enumType == null)
-                return id.Id == 0 ? id.Type.ToString() : $"{id.Type}.{id.Id}";
+                return $"{id.Type}.{id.Id}";
 
             var enumName = Enum.GetName(enumType, enumValue);
             if (!string.IsNullOrEmpty(enumName))
@@ -305,7 +305,7 @@ namespace UAlbion.Config
             return this;
         }
 
-        public AssetMapping RegisterStringRedirect(Type enumType, AssetId target, int min, int max)
+        public AssetMapping RegisterStringRedirect(Type enumType, AssetId target, int min, int max, int offset)
         {
             foreach (var id in EnumerateAssetsOfType(enumType))
             {
@@ -313,7 +313,7 @@ namespace UAlbion.Config
                 if (numeric < min || numeric > max)
                     continue;
 
-                _stringLookup[id] = (target, (ushort)(numeric - min));
+                _stringLookup[id] = (target, (ushort)(offset + numeric - min));
             }
             return this;
         }

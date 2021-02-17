@@ -7,9 +7,12 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class HeaderBasedSpriteLoader : IAssetLoader
+    public class HeaderBasedSpriteLoader : IAssetLoader<AlbionSprite>
     {
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+            => Serdes((AlbionSprite)existing, config, mapping, s);
+
+        public AlbionSprite Serdes(AlbionSprite existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -22,7 +25,7 @@ namespace UAlbion.Formats.Parsers
             ApiUtil.Assert(something == 0);
             int spriteCount = s.UInt8(null, 0);
 
-            bool uniform = config.File.Format != "NonUniform";
+            bool uniform = config.File?.Format != "NonUniform";
             var frames = new AlbionSpriteFrame[spriteCount];
             var frameBytes = new List<byte[]>();
             int currentY = 0;
@@ -55,8 +58,8 @@ namespace UAlbion.Formats.Parsers
                 var frame = frames[n];
 
                 for (int j = 0; j < frame.Height; j++)
-                for (int i = 0; i < frame.Width; i++)
-                    pixelData[(frame.Y + j) * spriteWidth + frame.X + i] = frameBytes[n][j * frame.Width + i];
+                    for (int i = 0; i < frame.Width; i++)
+                        pixelData[(frame.Y + j) * spriteWidth + frame.X + i] = frameBytes[n][j * frame.Width + i];
             }
 
             s.Check();

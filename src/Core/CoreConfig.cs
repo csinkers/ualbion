@@ -32,7 +32,7 @@ namespace UAlbion.Core
                 return new CoreConfig();
 
             var configText = File.ReadAllText(configPath);
-            return JsonConvert.DeserializeObject<CoreConfig>(configText,
+            return (CoreConfig)JsonConvert.DeserializeObject<CoreConfig>(configText,
                 new JsonSerializerSettings { ContractResolver = new PrivatePropertyJsonContractResolver() });
         }
     }

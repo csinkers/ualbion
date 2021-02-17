@@ -20,6 +20,7 @@ namespace UAlbion.Formats.Assets
     [JsonConverter(typeof(StringEnumConverter))]
     public enum SpellClasses : byte
     {
+        None         =  0,
         DjiKas       =  1,
         DjiKantos    =  2, // Enlightened ones
         Druid        =  4,

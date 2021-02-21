@@ -1,32 +1,33 @@
 ﻿using System;
 using SerdesNet;
+using UAlbion.Api;
+using UAlbion.Config;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
+    [Event("change_used_item")]
     public class ChangeUsedItemEvent : MapEvent
     {
-        public static ChangeUsedItemEvent Serdes(ChangeUsedItemEvent e, ISerializer s)
+        public static ChangeUsedItemEvent Serdes(ChangeUsedItemEvent e, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new ChangeUsedItemEvent();
-            e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);
-            e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
-            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
-            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-            e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
-            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+            int zeroes = s.UInt8(null, 0);
+            zeroes += s.UInt8(null, 0);
+            zeroes += s.UInt8(null, 0);
+            zeroes += s.UInt8(null, 0);
+            zeroes += s.UInt8(null, 0);
+            e.ItemId = ItemId.SerdesU16(nameof(ItemId), e.ItemId, AssetType.Item, mapping, s);
+            zeroes += s.UInt16(null, 0);
+            s.Assert(zeroes == 0, "ChangeUsedItem: Expected all fields other than 6 to be 0");
             return e;
         }
 
-        public byte Unk1 { get; private set; }
-        public byte Unk2 { get; private set; }
-        public byte Unk3 { get; private set; }
-        public byte Unk4 { get; private set; }
-        public byte Unk5 { get; private set; }
-        public ushort Unk6 { get; private set; }
-        public ushort Unk8 { get; private set; }
-        public override string ToString() => $"change_used_item ({Unk1} {Unk2} {Unk3} {Unk4} {Unk5} {Unk6} {Unk8})";
+        ChangeUsedItemEvent() { }
+        public ChangeUsedItemEvent(ItemId itemId) => ItemId = itemId;
+        [EventPart("id")] public ItemId ItemId { get; private set; }
+        public override string ToString() => $"change_used_item {ItemId}";
         public override MapEventType EventType => MapEventType.ChangeUsedItem;
     }
 }

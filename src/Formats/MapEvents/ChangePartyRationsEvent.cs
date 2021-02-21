@@ -18,7 +18,7 @@ namespace UAlbion.Formats.MapEvents
             return e;
         }
 
-        public QuantityChangeOperation Operation { get; private set; }
+        public NumericOperation Operation { get; private set; }
         public byte Unk3 { get; private set; }
         public byte Unk4 { get; private set; }
         public byte Unk5 { get; private set; }

@@ -1,8 +1,10 @@
 ﻿using System;
 using SerdesNet;
+using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
+    [Event("change_time")]
     public class ChangeTimeEvent : ModifyEvent
     {
         public static ChangeTimeEvent Serdes(ChangeTimeEvent e, ISerializer s)
@@ -10,21 +12,25 @@ namespace UAlbion.Formats.MapEvents
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new ChangeTimeEvent();
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);
-            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
-            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            int zeroes = s.UInt8(null, 0);
+            zeroes += s.UInt8(null, 0);
+            zeroes += s.UInt8(null, 0);
             e.Amount = s.UInt16(nameof(Amount), e.Amount);
-            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+            zeroes += s.UInt16(null, 0);
+            s.Assert(zeroes == 0, "ChangeTime: Expected fields 3,4,5,8 to be 0");
             return e;
         }
 
-        public QuantityChangeOperation Operation { get; private set; }
-        public byte Unk3 { get; private set; }
-        public byte Unk4 { get; private set; }
-        public byte Unk5 { get; private set; }
-        public ushort Amount { get; private set; }
-        public ushort Unk8 { get; private set; }
-        public override string ToString() => $"change_time {Operation} {Amount} ({Unk3} {Unk4} {Unk5} {Unk8})";
+        ChangeTimeEvent(){}
+
+        public ChangeTimeEvent(NumericOperation operation, ushort amount)
+        {
+            Operation = operation;
+            Amount = amount;
+        }
+
+        [EventPart("op")] public NumericOperation Operation { get; private set; }
+        [EventPart("amount")] public ushort Amount { get; private set; }
         public override ModifyType SubType => ModifyType.ChangeTime;
     }
 }

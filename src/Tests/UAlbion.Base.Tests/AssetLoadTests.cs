@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UAlbion.Api;
@@ -45,7 +44,6 @@ namespace UAlbion.Base.Tests
 
         public AssetLoadTests()
         {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
             AssetMapping.GlobalIsThreadLocal = true;
             AssetMapping.Global.Clear();
             _testNum = Interlocked.Increment(ref s_testNum);

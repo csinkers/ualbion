@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 
@@ -9,7 +11,18 @@ namespace UAlbion.Formats
 {
     public static class FormatUtil
     {
-        public static readonly Encoding AlbionEncoding = Encoding.GetEncoding(850);
+        public static readonly Encoding AlbionEncoding;
+
+        [SuppressMessage("Performance",
+            "CA1810:Initialize reference type static fields inline",
+            Justification = "Encoding.GetEncoding must happen after Encoding.RegisterProvider")]
+        static FormatUtil()
+        {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
+            PerfTracker.StartupEvent("Registered encodings");
+            AlbionEncoding = Encoding.GetEncoding(850);
+        }
+
         public static string BytesTo850String(byte[] bytes) =>
             AlbionEncoding
                 .GetString(bytes)
@@ -119,6 +132,44 @@ namespace UAlbion.Formats
                 ? int.Parse(s.Substring(2), NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture)
                 : s == null ? 0 : int.Parse(s, CultureInfo.InvariantCulture);
 
+
+        const string HexChars = "0123456789ABCDEF";
+        public static string BytesToHexString(byte[] bytes)
+        {
+            if (bytes == null) return "";
+            var result = new StringBuilder(bytes.Length * 2);
+            foreach (var b in bytes)
+            {
+                result.Append(HexChars[b >> 4]);
+                result.Append(HexChars[b & 0xf]);
+            }
+
+            return result.ToString();
+        }
+
+        static byte HexCharToByte(char c)
+        {
+            if (c >= 0 && c <= 9) return (byte)(c - '0');
+            if (c >= 'A' && c <= 'F') return (byte)(c - 'A');
+            throw new FormatException($"Invalid character '{c}' in hex string");
+        }
+
+        public static byte[] HexStringToBytes(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return Array.Empty<byte>();
+            if ((s.Length & 1) == 1) throw new FormatException("Hex string did not consist of an even number of characters");
+
+            var result = new byte[s.Length / 2];
+            for (int i = 0, j = 0; i < result.Length; i++)
+            {
+                char c1 = char.ToUpperInvariant(s[j++]);
+                char c2 = char.ToUpperInvariant(s[j++]);
+                result[i] = (byte)((HexCharToByte(c1) << 4) | HexCharToByte(c2));
+            }
+
+            return result;
+        }
+
         public static List<(int, int)> SortedIntsToRanges(IEnumerable<int> values) // pairs = (subItemId, count)
         {
             var ranges = new List<(int, int)>();
@@ -161,5 +212,10 @@ namespace UAlbion.Formats
                 ? new StringId(result.Value.Item1, result.Value.Item2) 
                 : new StringId(id, 0);
         }
+
+        static readonly char[] NewLineChars = { '\n', '\r' };
+        public static string[] SplitLines(string s)
+             => s?.Split(NewLineChars, StringSplitOptions.RemoveEmptyEntries)
+            ?? Array.Empty<string>();
     }
 }

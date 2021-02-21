@@ -21,8 +21,7 @@ namespace UAlbion.Formats.Parsers
             var results = new Dictionary<int, string>();
             var bytes = s.ByteArray(null, null, (int)s.BytesRemaining);
             var data = FormatUtil.BytesTo850String(bytes);
-            var lines = data.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var line in lines)
+            foreach (var line in FormatUtil.SplitLines(data))
             {
                 var m = Regex.Match(line);
                 if (!m.Success)

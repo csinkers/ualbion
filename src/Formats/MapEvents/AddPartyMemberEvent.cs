@@ -15,26 +15,29 @@ namespace UAlbion.Formats.MapEvents
             e ??= new AddPartyMemberEvent();
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
-            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            int check = s.UInt8(null, 0);
+            check += s.UInt8(null, 0);
             e.PartyMemberId = PartyMemberId.SerdesU8(nameof(PartyMemberId), e.PartyMemberId, mapping, s);
             s.UInt8("pad", 0);
-            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+            check += s.UInt16(null,0);
+
+            s.Assert(check == 0, "Expected fields 4, 5 and 8 of AddPartyMemberEvent to be 0");
             return e;
         }
 
-        public AddPartyMemberEvent(PartyMemberId partyMemberId) { PartyMemberId = partyMemberId; }
+        public AddPartyMemberEvent(PartyMemberId partyMemberId, byte unk2, byte unk3)
+        {
+            PartyMemberId = partyMemberId;
+            Unk2 = unk2;
+            Unk3 = unk3;
+        }
+
         AddPartyMemberEvent() { }
 
-        [EventPart("member_id")]
-        public PartyMemberId PartyMemberId { get; private set; }
-
-        public byte Unk2 { get; private set; }
-        public byte Unk3 { get; private set; }
-        public byte Unk4 { get; private set; }
-        public byte Unk5 { get; private set; }
-        public ushort Unk8 { get; private set; }
-        public override string ToString() => $"add_party_member {PartyMemberId} ({Unk2} {Unk3} {Unk4} {Unk5} {Unk8})";
+        [EventPart("member_id")] public PartyMemberId PartyMemberId { get; private set; }
+        [EventPart("unk2", true, 0)] public byte Unk2 { get; private set; }
+        [EventPart("unk3", true, 0)] public byte Unk3 { get; private set; }
+        public override string ToString() => $"add_party_member {PartyMemberId} {Unk2} {Unk3}";
         public override ModifyType SubType => ModifyType.AddPartyMember;
     }
 }

@@ -234,6 +234,15 @@ namespace UAlbion.Config.Tests
         }
 
         [Fact]
+        public void ParseUnknownTest()
+        {
+            var m = AssetMapping.Global.Clear();
+            Assert.Equal(new AssetId(AssetType.Unknown, 1), m.Parse("Unknown.1", null));
+            Assert.Equal(new AssetId(AssetType.Unknown, 2), m.Parse("Unknown.2", null));
+            Assert.Equal(new AssetId(AssetType.Unknown, 0), m.Parse("Unknown.0", null));
+        }
+
+        [Fact]
         public void IdToEnumStringTest()
         {
             var m = AssetMapping.Global.Clear();

@@ -35,7 +35,7 @@ namespace UAlbion.Game.State
                     _ => throw new InvalidEnumArgumentException(nameof(e.ChestType), (int)e.ChestType, typeof(SimpleChestEvent.SimpleChestItemType))
                 };
 
-                var recipient = ChangePartyItemAmount(itemId, QuantityChangeOperation.AddAmount, e.Amount);
+                var recipient = ChangePartyItemAmount(itemId, NumericOperation.AddAmount, e.Amount);
                 if (recipient.HasValue)
                     MapItemTransition(itemId, recipient.Value);
             });
@@ -88,7 +88,7 @@ namespace UAlbion.Game.State
                 _ => Resolve<IAssetManager>().LoadItem(itemId),
             };
 
-        PartyMemberId? ChangePartyItemAmount(ItemId itemId, QuantityChangeOperation operation, ushort amount)
+        PartyMemberId? ChangePartyItemAmount(ItemId itemId, NumericOperation operation, ushort amount)
         {
             int currentTotal = GetTotalItemCount(itemId);
             int newTotal = operation.Apply(currentTotal, amount, 0, int.MaxValue);

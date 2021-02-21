@@ -21,8 +21,6 @@ namespace UAlbion
         static void Main(string[] args)
         {
             PerfTracker.StartupEvent("Entered main");
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
-            PerfTracker.StartupEvent("Registered encodings");
             Task.Run(() => new LogEvent(LogEvent.Level.Verbose, "Preheat Event Metadata").ToString());
 
             var commandLine = new CommandLineOptions(args);

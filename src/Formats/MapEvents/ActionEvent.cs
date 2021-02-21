@@ -5,8 +5,19 @@ using UAlbion.Config;
 
 namespace UAlbion.Formats.MapEvents
 {
+    [Event("action")]
     public class ActionEvent : MapEvent
     {
+        ActionEvent() { }
+
+        public ActionEvent(ActionType actionType, byte block, AssetId arg, byte unk2)
+        {
+            ActionType = actionType;
+            Unk2 = unk2;
+            Block = block;
+            Argument = arg;
+        }
+
         public static ActionEvent Serdes(ActionEvent e, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
@@ -27,7 +38,7 @@ namespace UAlbion.Formats.MapEvents
 
             e.ActionType = actionType;
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
-            e.SmallArg = s.UInt8(nameof(SmallArg), e.SmallArg);
+            e.Block = s.UInt8(nameof(Block), e.Block);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.Argument = AssetId.SerdesU16(nameof(Argument), e.Argument, assetType, mapping, s);
@@ -40,15 +51,16 @@ namespace UAlbion.Formats.MapEvents
             return e;
         }
 
-        public ActionType ActionType { get; private set; }
-        public byte Unk2 { get; private set; } // Always 1, unless ActionType == 14 (in which cas it is 2)
-        public byte SmallArg { get; private set; } // Item Class, 255 for 'any'
+        [EventPart("type")] public ActionType ActionType { get; private set; }
+        [EventPart("block")] public byte Block { get; private set; } // Item Class, 255 for 'any'
+        [EventPart("arg")] public AssetId Argument { get; private set; }
+        [EventPart("unk2")] public byte Unk2 { get; private set; } // Always 1, unless ActionType == 14 (in which cas it is 2)
+
         byte Unk4 { get; set; }
         byte Unk5 { get; set; }
-        public AssetId Argument { get; private set; }
         ushort Unk8 { get; set; }
 
-        public override string ToString() => $"action {ActionType} Block:{SmallArg} From:{Argument} ({Unk2})"; // Unk2 is almost always 1
+        // public override string ToString() => $"action {ActionType} {Block} {Argument} {Unk2}"; // Unk2 is almost always 1
         public override MapEventType EventType => MapEventType.Action;
     }
 }

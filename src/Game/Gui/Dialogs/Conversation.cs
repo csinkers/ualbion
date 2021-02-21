@@ -244,10 +244,9 @@ namespace UAlbion.Game.Gui.Dialogs
 
         void OnDataChange(DataChangeEvent e)
         {
-            if (e.Property == DataChangeEvent.ChangeProperty.ReceiveOrRemoveItem &&
-                e.Mode == QuantityChangeOperation.AddAmount)
+            if (e is ChangeItemEvent cie && cie.Operation == NumericOperation.AddAmount)
             {
-                var transitionEvent = new LinearItemTransitionEvent(e.ItemId,
+                var transitionEvent = new LinearItemTransitionEvent(cie.ItemId,
                     (int)ConversationPositionRight.X,
                     (int)ConversationPositionRight.Y,
                     (int)ConversationPositionLeft.X,
@@ -269,14 +268,14 @@ namespace UAlbion.Game.Gui.Dialogs
             var chain = eventSet?.Chains.FirstOrDefault(x =>
                 x.FirstEvent?.Event is ActionEvent action && 
                 action.ActionType == type && 
-                action.SmallArg == small &&
+                action.Block == small &&
                 action.Argument.Id == large);
 
             if (chain == null)
             {
                 chain = wordSet?.Chains.FirstOrDefault(x =>
                     x.FirstEvent?.Event is ActionEvent action && action.ActionType == type &&
-                    action.SmallArg == small && action.Argument.Id == large);
+                    action.Block == small && action.Argument.Id == large);
                 fromWordSet = true;
             }
 

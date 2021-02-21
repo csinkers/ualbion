@@ -1,6 +1,6 @@
 ﻿namespace UAlbion.Formats.Assets
 {
-    public enum PlayerCondition
+    public enum PlayerCondition : ushort
     {
         Unconscious = 0,
         Poisoned = 1,

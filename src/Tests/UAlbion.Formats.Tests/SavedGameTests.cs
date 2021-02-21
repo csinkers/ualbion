@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Linq;
-using System.Text;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -13,7 +12,6 @@ namespace UAlbion.Formats.Tests
     {
         static void RoundTrip(string file)
         {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             AssetMapping.GlobalIsThreadLocal = true;
             AssetMapping.Global.Clear()
                 .RegisterAssetType(typeof(Base.Automap), AssetType.Automap)

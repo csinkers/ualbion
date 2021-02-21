@@ -179,7 +179,6 @@ namespace DumpSave
             if (baseDir == null)
                 throw new InvalidOperationException("No base directory could be found.");
 
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
             var commands = ParseCommands(args.Skip(1)).ToList();
             if (!commands.Any())
             {

@@ -15,29 +15,26 @@ namespace UAlbion.Formats.MapEvents
             e ??= new AddRemoveInventoryItemEvent();
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);
             e.Amount = s.UInt8(nameof(Amount), e.Amount);
-            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
-            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            int zeroes = s.UInt8(null, 0);
+            zeroes += s.UInt8(null, 0);
             e.ItemId = ItemId.SerdesU16(nameof(e.ItemId), e.ItemId, AssetType.Item, mapping, s);
-            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+            zeroes += s.UInt16(null, 0);
+            s.Assert(zeroes == 0, "AddRemoveInventoryItem: Expected fields 4,5 & 8 to be 0");
             return e;
         }
 
         AddRemoveInventoryItemEvent() { }
-        public AddRemoveInventoryItemEvent(QuantityChangeOperation operation, byte amount, ItemId itemId)
+        public AddRemoveInventoryItemEvent(NumericOperation operation, byte amount, ItemId itemId)
         {
             Operation = operation;
             Amount = amount;
             ItemId = itemId;
         }
 
-        [EventPart("operation")] public QuantityChangeOperation Operation { get; private set; }
+        [EventPart("operation")] public NumericOperation Operation { get; private set; }
         [EventPart("amount")] public byte Amount { get; private set; }
         [EventPart("item_id")] public ItemId ItemId { get; private set; }
 
-        public byte Unk4 { get; private set; }
-        public byte Unk5 { get; private set; }
-        public ushort Unk8 { get; private set; }
-        public override string ToString() => $"add_remove_inv_item {Operation} {Amount}x{ItemId} ({Unk4} {Unk5} {Unk8})";
         public override ModifyType SubType => ModifyType.AddRemoveInventoryItem;
     }
 }

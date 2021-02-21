@@ -435,9 +435,6 @@ namespace UAlbion.Config
                 }
             }
 
-            if (result.Type == AssetType.Unknown)
-                throw new FormatException($"Could not parse \"{s}\" as an asset id enum");
-
             return result;
         }
     }

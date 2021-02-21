@@ -20,7 +20,6 @@ namespace UAlbion.Base.Tests
     {
         public RoundtripTests()
         {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
             AssetMapping.GlobalIsThreadLocal = true;
             var mapping = AssetMapping.Global;
             var assetConfigPath = Path.Combine(BaseDir, "mods", "Base", "assets.json");

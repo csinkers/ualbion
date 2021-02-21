@@ -185,8 +185,8 @@ namespace UAlbion.Config.Tests
             m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait);
             m.RegisterAssetType(typeof(OneBasedByte), AssetType.Npc);
 
-            Assert.Throws<FormatException>(() => m.Parse("somethinginvalid", null));
-            Assert.Throws<FormatException>(() => m.Parse("Portrait.nonsense", null));
+            Assert.Equal(new AssetId(AssetType.Unknown, 0), m.Parse("somethinginvalid", null));
+            Assert.Equal(new AssetId(AssetType.Unknown, 0), m.Parse("Portrait.nonsense", null));
             Assert.Throws<FormatException>(() => m.Parse("0", null));
             Assert.Equal(AssetId.From(ZeroBasedByte.Zero), m.Parse("0", new[] { AssetType.Portrait }));
             Assert.Equal(AssetId.From(ZeroBasedByte.One), m.Parse("1", new[] { AssetType.Portrait }));

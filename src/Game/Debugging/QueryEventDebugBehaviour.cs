@@ -1,4 +1,5 @@
-﻿using System;
+﻿/*
+using System;
 using System.Collections.ObjectModel;
 using UAlbion.Core;
 using UAlbion.Formats.MapEvents;
@@ -25,3 +26,4 @@ namespace UAlbion.Game.Debugging
         }
     }
 }
+*/

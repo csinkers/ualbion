@@ -56,24 +56,24 @@ namespace UAlbion.Api
             foreach (var part in Parts)
             {
                 sb.Append(' ');
-                if (part.PropertyType == typeof(string))
+                var value = part.Getter(instance);
+                if (part.PropertyType == typeof(string) && value is string s)
                 {
-                    var value = (string)part.Getter(instance);
-                    if (value != null)
+                    sb.Append('"');
+                    for (int i = 0; i < s.Length; i++)
                     {
-                        sb.Append('"');
-                        sb.Append(value
-                            .Replace("\\", "\\\\")
-                            .Replace("\"", "\\\"")
-                            .Replace("\t", "\\t")
-                        );
-                        sb.Append('"');
+                        char c = s[i];
+                        switch (c)
+                        {
+                            case '\\': sb.Append("\\\\"); break;
+                            case '"': sb.Append("\\\""); break;
+                            case '\t': sb.Append("\\t"); break;
+                            default: sb.Append(c); break;
+                        }
                     }
+                    sb.Append('"');
                 }
-                else
-                {
-                    sb.Append(part.Getter(instance));
-                }
+                else sb.Append(value);
             }
 
             return sb.ToString().TrimEnd();

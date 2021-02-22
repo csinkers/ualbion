@@ -2,7 +2,7 @@
 
 namespace UAlbion.Game.Events
 {
-    [Event("npc_jump", "Teleport the given NPC to the given position.")]
+    [Event("npc_jump", "Teleport the given NPC to the given position.")] // USED IN SCRIPT
     public class NpcJumpEvent : Event
     {
         public NpcJumpEvent(int npcId, int? x, int? y) { NpcId = npcId; X = x; Y = y; }

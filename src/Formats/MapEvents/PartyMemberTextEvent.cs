@@ -3,7 +3,7 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
-    [Event("party_member_text")]
+    [Event("party_member_text")] // USED IN SCRIPT
     public class PartyMemberTextEvent : Event, IAsyncEvent
     {
         [EventPart("member_id")] public PartyMemberId MemberId { get; }

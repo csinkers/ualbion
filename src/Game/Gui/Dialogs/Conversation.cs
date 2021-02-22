@@ -172,7 +172,7 @@ namespace UAlbion.Game.Gui.Dialogs
                     var options = new List<(IText, int?, Action)>();
                     var blocks = text.GetBlocks().Select(x => x.BlockId).Distinct();
                     foreach (var blockId in blocks.Where(x => x > 0))
-                        options.Add((text, blockId, () => BlockClicked(blockId, textEvent.TextId)));
+                        options.Add((text, blockId, () => BlockClicked(blockId, textEvent.SubId)));
 
                     var standardOptions = GetStandardOptions(tf);
                     _optionsWindow.SetOptions(options, standardOptions);
@@ -194,7 +194,7 @@ namespace UAlbion.Game.Gui.Dialogs
                         var options = new List<(IText, int?, Action)>();
                         var blocks = text.GetBlocks().Select(x => x.BlockId).Distinct();
                         foreach (var blockId in blocks.Where(x => x > 0))
-                            options.Add((text, blockId, () => BlockClicked(blockId, textEvent.TextId)));
+                            options.Add((text, blockId, () => BlockClicked(blockId, textEvent.SubId)));
                         _optionsWindow.SetOptions(options, null);
                         _optionsWindow.IsActive = true;
 

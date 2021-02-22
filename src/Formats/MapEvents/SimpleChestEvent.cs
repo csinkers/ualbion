@@ -9,14 +9,14 @@ namespace UAlbion.Formats.MapEvents
     [Event("simple_chest", "Pickup some items from the map", "sc")]
     public class SimpleChestEvent : MapEvent
     {
-        public SimpleChestEvent(ItemId item, ushort amount)
+        public SimpleChestEvent(ushort amount, ItemId item)
         {
-            ChestType = item.Type switch 
-                {
-                    AssetType.Gold => SimpleChestItemType.Gold,
-                    AssetType.Rations => SimpleChestItemType.Rations,
-                    _ => SimpleChestItemType.Item
-                };
+            ChestType = item.Type switch
+            {
+                AssetType.Gold => SimpleChestItemType.Gold,
+                AssetType.Rations => SimpleChestItemType.Rations,
+                _ => SimpleChestItemType.Item
+            };
             ItemId = item;
             Amount = amount;
         }
@@ -35,18 +35,10 @@ namespace UAlbion.Formats.MapEvents
             return e;
         }
 
-        public enum SimpleChestItemType : byte
-        {
-            Item = 0,
-            Gold = 1, // ??
-            Rations = 2 // ??
-        }
-
         public SimpleChestItemType ChestType { get; private set; }
-        [EventPart("item")] public ItemId ItemId { get; private set; }
         [EventPart("amount")] public ushort Amount { get; private set; }
+        [EventPart("item")] public ItemId ItemId { get; private set; }
 
-        public override string ToString() => $"simple_chest {ChestType} {Amount}x{ItemId}";
         public override MapEventType EventType => MapEventType.SimpleChest;
     }
 }

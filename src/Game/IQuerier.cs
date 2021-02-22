@@ -1,4 +1,5 @@
-﻿using UAlbion.Formats.MapEvents;
+﻿/*
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game
 {
@@ -7,3 +8,4 @@ namespace UAlbion.Game
         bool? QueryDebug(QueryEvent query);
     }
 }
+*/

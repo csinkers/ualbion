@@ -2,7 +2,7 @@
 
 namespace UAlbion.Game.Events
 {
-    [Event("show_map")]
+    [Event("show_map")] // USED IN SCRIPT
     public class ShowMapEvent : GameEvent
     {
         public ShowMapEvent(bool? show = null) => Show = show;

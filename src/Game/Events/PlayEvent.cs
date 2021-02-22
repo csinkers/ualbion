@@ -2,7 +2,7 @@
 
 namespace UAlbion.Game.Events
 {
-    [Event("play")]
+    [Event("play")] // USED IN SCRIPT
     public class PlayEvent : GameEvent
     {
         public PlayEvent(int unknown) { Unknown = unknown; }

@@ -234,6 +234,36 @@ namespace UAlbion.Config.Tests
         }
 
         [Fact]
+        public void ParseTypeOnlyTest()
+        {
+            var m = AssetMapping.Global.Clear();
+            m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait);
+            _output.WriteLine(m.Serialize());
+            Assert.Equal(AssetId.None, m.Parse("None", null)); // Succeeds due to special case
+            Assert.Equal(AssetId.None, m.Parse("None.0", null));
+
+            Assert.Equal(new AssetId(AssetType.Unknown, 0), m.Parse("Gold", null));
+            Assert.Equal(new AssetId(AssetType.Unknown, 0), m.Parse("Rations", null));
+            Assert.Equal(AssetId.Gold, m.Parse("Gold.0", null));
+            Assert.Equal(AssetId.Rations, m.Parse("Rations.0", null));
+
+            Assert.Equal(new AssetId(AssetType.Unknown, 0), m.Parse("Unknown", null));
+            Assert.Equal(new AssetId(AssetType.Unknown, 0), m.Parse("Unknown.0", null));
+        }
+
+        [Fact]
+        public void SerialiseTypeOnlyTest()
+        {
+            var m = AssetMapping.Global.Clear();
+            m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait);
+            _output.WriteLine(m.Serialize());
+            Assert.Equal("None", AssetId.None.ToString());
+            Assert.Equal("Gold.0", AssetId.Gold.ToString());
+            Assert.Equal("Rations.0", AssetId.Rations.ToString());
+            Assert.Equal("Unknown.0", new AssetId(AssetType.Unknown).ToString());
+        }
+
+        [Fact]
         public void ParseUnknownTest()
         {
             var m = AssetMapping.Global.Clear();

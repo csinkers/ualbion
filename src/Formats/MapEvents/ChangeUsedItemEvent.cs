@@ -27,7 +27,6 @@ namespace UAlbion.Formats.MapEvents
         ChangeUsedItemEvent() { }
         public ChangeUsedItemEvent(ItemId itemId) => ItemId = itemId;
         [EventPart("id")] public ItemId ItemId { get; private set; }
-        public override string ToString() => $"change_used_item {ItemId}";
         public override MapEventType EventType => MapEventType.ChangeUsedItem;
     }
 }

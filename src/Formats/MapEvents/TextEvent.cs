@@ -6,39 +6,41 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
+    [Event("map_text")]
     public class TextEvent : MapEvent, ITextEvent, IAsyncEvent
     {
-        public static TextEvent Serdes(TextEvent e, AssetMapping mapping, ISerializer s, TextId textSourceId)
+        TextEvent(TextId textSourceId) => TextSource = textSourceId;
+        public TextEvent(TextId textSourceId, byte subId, TextLocation? location, CharacterId characterId)
         {
-            e ??= new TextEvent(textSourceId);
-            if (e.TextSourceId != textSourceId)
-                throw new InvalidOperationException($"Called Serdes on a TextEvent with source id {e.TextSourceId} but passed in source id {textSourceId}");
-
-            if (s == null) throw new ArgumentNullException(nameof(s));
-            e.TextSourceId = textSourceId;
-            e.Location = s.EnumU8(nameof(Location), e.Location ?? TextLocation.NoPortrait);
-            e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
-            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-            e.CharacterId = CharacterId.SerdesU8(nameof(CharacterId), e.CharacterId, e.CharacterType, mapping, s);
-            e.TextId = s.UInt8(nameof(TextId), e.TextId);
-            e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
-            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
-            return e;
-        }
-
-        public TextEvent(TextId textSourceId) => TextSourceId = textSourceId;
-
-        public TextEvent(TextId id, byte subId, TextLocation? location, CharacterId characterId)
-        {
-            TextSourceId = id;
-            TextId = subId;
+            TextSource = textSourceId;
+            SubId = subId;
             Location = location;
             CharacterId = characterId;
         }
 
-        [EventPart("text_id")] public byte TextId { get; private set; }
+        public static TextEvent Serdes(TextEvent e, AssetMapping mapping, ISerializer s, TextId textSourceId)
+        {
+            e ??= new TextEvent(textSourceId);
+            if (e.TextSource != textSourceId)
+                throw new InvalidOperationException($"Called Serdes on a TextEvent with source id {e.TextSource} but passed in source id {textSourceId}");
+
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            e.TextSource = textSourceId;
+            e.Location = s.EnumU8(nameof(Location), e.Location ?? TextLocation.NoPortrait);
+            int zeroed = s.UInt8(null, 0);
+            zeroed += s.UInt8(null, 0);
+            e.CharacterId = CharacterId.SerdesU8(nameof(CharacterId), e.CharacterId, e.CharacterType, mapping, s);
+            e.SubId = s.UInt8(nameof(SubId), e.SubId);
+            zeroed += s.UInt16(null, 0);
+            zeroed += s.UInt16(null, 0);
+            s.Assert(zeroed == 0, "TextEvent: Expected fields 2,3,6,8 to be 0");
+            return e;
+        }
+
+        [EventPart("text")] public TextId TextSource { get; private set; }
+        [EventPart("sub_id")] public byte SubId { get; private set; }
         [EventPart("location")] public TextLocation? Location { get; private set; }
-        [EventPart("npc")] public CharacterId CharacterId { get; private set; }
+        [EventPart("char")] public CharacterId CharacterId { get; private set; }
 
         AssetType CharacterType => Location switch
         {
@@ -47,14 +49,7 @@ namespace UAlbion.Formats.MapEvents
             _ => AssetType.Npc
         };
 
-        public byte Unk2 { get; private set; }
-        public byte Unk3 { get; private set; }
-        public ushort Unk6 { get; private set; }
-        public ushort Unk8 { get; private set; }
-
-        public override string ToString() => $"text {TextSourceId}:{TextId} {Location} {CharacterId} ({Unk2} {Unk3} {Unk6} {Unk8})";
         public override MapEventType EventType => MapEventType.Text;
-        public TextId TextSourceId { get; protected set; }
-        public StringId ToId() => new StringId(TextSourceId, TextId);
+        public StringId ToId() => new StringId(TextSource, SubId);
     }
 }

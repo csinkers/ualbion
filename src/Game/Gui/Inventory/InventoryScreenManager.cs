@@ -67,10 +67,10 @@ namespace UAlbion.Game.Gui.Inventory
             _modeEvent = e;
             SetDisplayedPartyMember(null);
 
-            if (e is ILockedInventoryEvent locked && locked.InitialTextId != 255)
+            if (e is ILockedInventoryEvent locked && locked.OpenedText != 255)
             {
                 var state = Resolve<IGameState>();
-                Raise(new TextEvent(state.MapId.ToMapText(), locked.InitialTextId, TextLocation.NoPortrait, NpcId.None));
+                Raise(new TextEvent(state.MapId.ToMapText(), locked.OpenedText, TextLocation.NoPortrait, NpcId.None));
             }
         }
 

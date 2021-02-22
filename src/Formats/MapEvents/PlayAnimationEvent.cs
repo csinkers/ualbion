@@ -6,21 +6,19 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
-    [Event("play_anim")]
+    [Event("play_anim")] // USED IN SCRIPT
     public class PlayAnimationEvent : MapEvent, IAsyncEvent
     {
-        public PlayAnimationEvent(VideoId videoId/*, byte unk4, byte unk5, byte unk2, byte unk3*/)
+        PlayAnimationEvent() { }
+        public PlayAnimationEvent(VideoId videoId, byte x, byte y, byte unk4, byte unk5)
         {
             VideoId = videoId;
-            /*
-            X = unk2;
-            Y = unk3;
+            X = x;
+            Y = y;
             Unk4 = unk4;
             Unk5 = unk5;
-            */
         }
 
-        PlayAnimationEvent() { }
         public static PlayAnimationEvent Serdes(PlayAnimationEvent e, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
@@ -30,19 +28,17 @@ namespace UAlbion.Formats.MapEvents
             e.Y = s.UInt8(nameof(Y), e.Y);
             e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-            e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
-            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+            int zeroes = s.UInt16(null, 0);
+            zeroes += s.UInt16(null, 0);
+            s.Assert(zeroes == 0, "PlayAnimation: Expected fields 6, 8 to be 0");
             return e;
         }
 
         [EventPart("id")] public VideoId VideoId { get; private set; }
-        /*[EventPart("unk2")]*/ public byte X { get; private set; }
-        /*[EventPart("unk3")]*/ public byte Y { get; private set; }
-        /*[EventPart("unk4")]*/ public byte Unk4 { get; private set; }
-        /*[EventPart("unk5")]*/ public byte Unk5 { get; private set; }
-        public ushort Unk6 { get; private set; }
-        public ushort Unk8 { get; private set; }
-        public override string ToString() => $"play_anim {VideoId} ({X}, {Y}) {Unk4} {Unk5} {Unk6} {Unk8})";
+        [EventPart("x")] public byte X { get; private set; }
+        [EventPart("y")] public byte Y { get; private set; }
+        [EventPart("unk4")] public byte Unk4 { get; private set; }
+        [EventPart("unk5")] public byte Unk5 { get; private set; }
         public override MapEventType EventType => MapEventType.PlayAnimation;
     }
 }

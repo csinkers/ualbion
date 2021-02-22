@@ -2,7 +2,7 @@
 
 namespace UAlbion.Game.Events
 {
-    [Event("npc_unlock")]
+    [Event("npc_unlock")] // USED IN SCRIPT
     public class NpcUnlockEvent : Event
     {
         public NpcUnlockEvent(int npcId) { NpcId = npcId; }

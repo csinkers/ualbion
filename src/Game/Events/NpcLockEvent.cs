@@ -2,7 +2,7 @@
 
 namespace UAlbion.Game.Events
 {
-    [Event("npc_lock")]
+    [Event("npc_lock")] // USED IN SCRIPT
     public class NpcLockEvent : Event
     {
         public NpcLockEvent(int npcId) { NpcId = npcId; }

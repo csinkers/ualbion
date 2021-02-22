@@ -3,7 +3,7 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Events
 {
-    [Event("ambient")]
+    [Event("ambient")] // USED IN SCRIPT
     public class AmbientEvent : GameEvent
     {
         public AmbientEvent(SongId songId) { SongId = songId; }

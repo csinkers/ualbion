@@ -5,6 +5,6 @@ namespace UAlbion.Formats.MapEvents
 {
     public interface ITextEvent : IEvent
     {
-        TextId TextSourceId { get; }
+        TextId TextSource { get; }
     }
 }

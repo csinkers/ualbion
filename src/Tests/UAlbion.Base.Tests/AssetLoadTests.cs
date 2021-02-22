@@ -191,8 +191,8 @@ namespace UAlbion.Base.Tests
                     Assert.Equal(2, x.Next.Id);
                     var bn = (IBranchNode)x;
                     Assert.Equal(3, bn.NextIfFalse.Id);
-                    var e = (QueryEvent)x.Event;
-                    Assert.Equal(QueryType.EventAlreadyUsed, e.QueryType);
+                    var e = (QueryEventUsedEvent)x.Event;
+                    Assert.Equal(QueryType.EventUsed, e.QueryType);
                     Assert.Equal(QueryOperation.IsTrue, e.Operation);
                 }, // !1?2:3: query EventAlreadyUsed 0 (IsTrue 0)
                 x =>
@@ -200,8 +200,8 @@ namespace UAlbion.Base.Tests
                     Assert.Equal(2, x.Id);
                     Assert.Null(x.Next);
                     var e = (TextEvent)x.Event;
-                    Assert.Equal(EventText.Frill, e.TextSourceId);
-                    Assert.Equal(7, e.TextId);
+                    Assert.Equal(EventText.Frill, e.TextSource);
+                    Assert.Equal(7, e.SubId);
                     Assert.Equal(TextLocation.NoPortrait, e.Location);
                     Assert.Equal(CharacterId.None, e.CharacterId);
                 }, // 2=>!: text EventText.Frill:7 NoPortrait None (0 0 0 0)
@@ -448,7 +448,7 @@ namespace UAlbion.Base.Tests
             Assert.IsType<SoundEvent>(en.Event);
             var e = (SoundEvent)en.Event;
             Assert.Equal(0, e.FrequencyOverride);
-            Assert.Equal(SoundEvent.SoundMode.LocalLoop, e.Mode);
+            Assert.Equal(SoundMode.LocalLoop, e.Mode);
             Assert.Equal(0, e.RestartProbability);
             Assert.Equal(0, e.Unk3);
             Assert.Equal(0, e.Unk3);

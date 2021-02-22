@@ -3,7 +3,7 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
-    [Event("npc_text")]
+    [Event("npc_text")] // USED IN SCRIPT
     public class NpcTextEvent : Event, IAsyncEvent
     {
         public NpcTextEvent(NpcId npcId, byte textId)

@@ -44,7 +44,6 @@ namespace UAlbion.Formats.MapEvents
         [EventPart("value")] public ushort Value { get; private set; }
         public byte Unk5 { get; private set; }
         ushort Unk8 { get; set; }
-        // public override string ToString() => $"change_icon <{X}, {Y}> ({Scopes}) {ChangeType} {Value} ({Unk5} {Unk8})";
         public override MapEventType EventType => MapEventType.ChangeIcon;
     }
 }

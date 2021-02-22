@@ -2,7 +2,7 @@
 
 namespace UAlbion.Game.Events
 {
-    [Event("party_move")]
+    [Event("party_move")] // USED IN SCRIPT
     public class PartyMoveEvent : GameEvent, IVerboseEvent
     {
         public PartyMoveEvent(int x, int y) { X = x; Y = y; }

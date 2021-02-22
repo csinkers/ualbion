@@ -2,7 +2,7 @@
 
 namespace UAlbion.Game.Events
 {
-    [Event("fade_to_white", "Fade away to a white screen.")]
+    [Event("fade_to_white", "Fade away to a white screen.")] // USED IN SCRIPT
     public class FadeToWhiteEvent : GameEvent
     {
     }

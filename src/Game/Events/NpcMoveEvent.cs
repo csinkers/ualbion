@@ -2,7 +2,7 @@
 
 namespace UAlbion.Game.Events
 {
-    [Event("npc_move")]
+    [Event("npc_move")] // USED IN SCRIPT
     public class NpcMoveEvent : Event
     {
         public NpcMoveEvent(int npcId, int x, int y) { NpcId = npcId; X = x; Y = y; }

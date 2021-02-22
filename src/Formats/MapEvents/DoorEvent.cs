@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -10,43 +9,35 @@ namespace UAlbion.Formats.MapEvents
     [Event("inv:door", "Opens the inventory screen for the given door")]
     public class DoorEvent : MapEvent, ILockedInventoryEvent
     {
-        public static DoorEvent Parse(string[] args)
-        {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            return new DoorEvent(TextId.None)
-            {
-                DoorId = new DoorId(AssetType.Door, ushort.Parse(args[1], CultureInfo.InvariantCulture)),
-                PickDifficulty = args.Length > 2 ? byte.Parse(args[2], CultureInfo.InvariantCulture) : (byte)0,
-                InitialTextId =  args.Length > 3 ? byte.Parse(args[3], CultureInfo.InvariantCulture) : (byte)255,
-                UnlockedTextId = args.Length > 4 ? byte.Parse(args[4], CultureInfo.InvariantCulture) : (byte)255,
-                KeyItemId = args.Length > 5 ? new ItemId(AssetType.Item, int.Parse(args[5], CultureInfo.InvariantCulture)) : ItemId.None, // TODO Better parsing
-            };
-        }
-
         public static DoorEvent Serdes(DoorEvent e, AssetMapping mapping, ISerializer s, TextId textSourceId)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new DoorEvent(textSourceId);
             e.PickDifficulty = s.UInt8(nameof(PickDifficulty), e.PickDifficulty);
-            e.KeyItemId = ItemId.SerdesU16(nameof(KeyItemId), e.KeyItemId, AssetType.Item, mapping, s);
-            e.InitialTextId = s.UInt8(nameof(InitialTextId), e.InitialTextId);
-            e.UnlockedTextId = s.UInt8(nameof(UnlockedTextId), e.UnlockedTextId);
+            e.Key = ItemId.SerdesU16(nameof(Key), e.Key, AssetType.Item, mapping, s);
+            e.OpenedText = s.UInt8(nameof(OpenedText), e.OpenedText);
+            e.UnlockedText = s.UInt8(nameof(UnlockedText), e.UnlockedText);
             e.DoorId = DoorId.SerdesU16(nameof(DoorId), e.DoorId, mapping, s); // Usually 100+
             return e;
         }
 
-        DoorEvent(TextId textSourceId)
+        DoorEvent(TextId textSourceId) => TextSource = textSourceId;
+        public DoorEvent(DoorId doorId, TextId textSource, ItemId key, byte difficulty, byte openedText, byte unlockedText)
         {
-            TextSourceId = textSourceId;
+            DoorId = doorId;
+            TextSource = textSource;
+            Key = key;
+            PickDifficulty = difficulty;
+            OpenedText = openedText;
+            UnlockedText = unlockedText;
         }
 
-        public byte PickDifficulty { get; private set; }
-        public ItemId KeyItemId { get; private set; }
-        public byte InitialTextId { get; private set; }
-        public byte UnlockedTextId { get; private set; }
-        public DoorId DoorId { get; private set; }
-        public override string ToString() => $"inv:door {DoorId} {PickDifficulty}% Initial:{InitialTextId} Unlocked:{UnlockedTextId} Key:{KeyItemId}";
+        [EventPart("id")] public DoorId DoorId { get; private set; }
+        [EventPart("text_src")] public TextId TextSource { get; }
+        [EventPart("key_id")] public ItemId Key { get; private set; }
+        [EventPart("difficulty", true, "0")] public byte PickDifficulty { get; private set; }
+        [EventPart("open_text", true, "255")] public byte OpenedText { get; private set; }
+        [EventPart("unlock_text", true, "255")] public byte UnlockedText { get; private set; }
         public override MapEventType EventType => MapEventType.Door;
-        public TextId TextSourceId { get; }
     }
 }

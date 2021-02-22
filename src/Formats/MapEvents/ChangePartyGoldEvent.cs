@@ -13,7 +13,6 @@ namespace UAlbion.Formats.MapEvents
             e ??= new ChangePartyGoldEvent();
             e.Operation = s.EnumU8(nameof(Operation), e.Operation);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-
             int zeroes = s.UInt8(null, 0);
             zeroes += s.UInt8(null, 0);
             e.Amount = s.UInt16(nameof(Amount), e.Amount);
@@ -32,7 +31,7 @@ namespace UAlbion.Formats.MapEvents
 
         [EventPart("op")] public NumericOperation Operation { get; private set; }
         [EventPart("amount")] public ushort Amount { get; private set; }
-        [EventPart("unk3", true, 0)] public byte Unk3 { get; private set; }
-        public override ModifyType SubType => ModifyType.ChangePartyGold;
+        [EventPart("unk3", true, "0")] public byte Unk3 { get; private set; }
+        public override ModifyType SubType => ModifyType.PartyGold;
     }
 }

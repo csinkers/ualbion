@@ -3,7 +3,7 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Events
 {
-    [Event("show_pic")]
+    [Event("show_pic")] // USED IN SCRIPT (TODO: unify with show_picture)
     public class ShowPicEvent : GameEvent
     {
         public ShowPicEvent(PictureId picId, int? x, int? y) { PicId = picId; X = x; Y = y; }

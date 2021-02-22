@@ -39,6 +39,6 @@ namespace UAlbion.Formats.MapEvents
         byte Unk4 { get; set; }
         byte Unk5 { get; set; }
         ushort Unk8 { get; set; }
-        public override MapEventType EventType => MapEventType.DoScript;
+        public override MapEventType EventType => MapEventType.Script;
     }
 }

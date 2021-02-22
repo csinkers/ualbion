@@ -172,6 +172,9 @@ namespace UAlbion.Config
         /// <returns></returns>
         public string IdToName(AssetId id)
         {
+            if (id == AssetId.None) // Special case to keep things tidy
+                return "None";
+
             var (enumType, enumValue) = IdToEnum(id);
             if (enumType == null)
                 return $"{id.Type}.{id.Id}";
@@ -200,7 +203,7 @@ namespace UAlbion.Config
                       sizeof(T) == 1 ? Unsafe.As<T, byte>(ref id)
                     : sizeof(T) == 2 ? Unsafe.As<T, ushort>(ref id)
                     : sizeof(T) == 4 ? Unsafe.As<T, int>(ref id)
-                    : throw new InvalidOperationException("Type {typeof(T)} is of non-enum type, or has an unsupported underlying type");
+                    : throw new InvalidOperationException($"Type {typeof(T)} is of non-enum type, or has an unsupported underlying type");
 
                 ApiUtil.Assert(enumValue >= info.EnumMin && enumValue <= info.EnumMax, $"Enum value {id} of type {typeof(T)} with a value of {enumValue} falls outside the mapped range");
                 return new AssetId(info.AssetType, enumValue + info.Offset);
@@ -371,6 +374,9 @@ namespace UAlbion.Config
             int index = s.LastIndexOf('.');
             var valueName = index == -1 ? s : s.Substring(index + 1);
             var typeName = index == -1 ? null : s.Substring(0, index);
+
+            // Special case so we don't have ugly "None.0"s everywhere.
+            if (typeName == null && string.Equals(s, "NONE", StringComparison.Ordinal)) return AssetId.None;
 
             return _byName.TryGetValue(valueName, out var matches)
                 ? ParseTextual(s, typeName, matches, validTypes)

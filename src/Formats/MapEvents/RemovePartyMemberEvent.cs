@@ -15,29 +15,26 @@ namespace UAlbion.Formats.MapEvents
             e ??= new RemovePartyMemberEvent();
             e.PartyMemberId = PartyMemberId.SerdesU8(nameof(PartyMemberId), e.PartyMemberId, mapping, s);
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
-            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
-            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            int zeroes = s.UInt8(null, 0);
+            zeroes += s.UInt8(null, 0);
+            zeroes += s.UInt8(null, 0);
             e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
-            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
-            ApiUtil.Assert(e.Unk4 == 0);
-            ApiUtil.Assert(e.Unk5 == 0);
-            ApiUtil.Assert(e.Unk8 == 0);
+            zeroes += s.UInt16(null, 0);
+            s.Assert(zeroes == 0, "RemovePartyMemberEvent: Expected fields 3,4,5,8 to be 0");
             return e;
         }
 
-        public RemovePartyMemberEvent(PartyMemberId partyMemberId) { PartyMemberId = partyMemberId;}
         RemovePartyMemberEvent() { }
+        public RemovePartyMemberEvent(PartyMemberId partyMemberId, byte unk2, ushort unk6)
+        {
+            PartyMemberId = partyMemberId;
+            Unk2 = unk2;
+            Unk6 = unk6;
+        }
 
-        [EventPart("member_id")]
-        public PartyMemberId PartyMemberId { get; private set; }
-        public byte Unk2 { get; private set; }
-        public byte Unk3 { get; private set; }
-        byte Unk4 { get; set; }
-        byte Unk5 { get; set; }
-        public ushort Unk6 { get; private set; }
-        ushort Unk8 { get; set; }
-        public override string ToString() => $"remove_party_member ({PartyMemberId} {Unk2} {Unk3} {Unk6})";
+        [EventPart("member_id")] public PartyMemberId PartyMemberId { get; private set; }
+        [EventPart("unk2", true, "0")] public byte Unk2 { get; private set; }
+        [EventPart("unk6", true, "0")] public ushort Unk6 { get; private set; }
         public override MapEventType EventType => MapEventType.RemovePartyMember;
     }
 }

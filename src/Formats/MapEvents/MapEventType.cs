@@ -2,7 +2,6 @@
 {
     public enum MapEventType : byte
     {
-        Script = 0,
         MapExit = 1,
         Door = 2,
         Chest = 3,
@@ -31,7 +30,7 @@
         Pause = 0x1A,
         SimpleChest = 0x1B,
         AskSurrender = 0x1C,
-        DoScript = 0x1D,
+        Script = 0x1D,
         UnkFf = 0xFF // 3D only?
     }
 }

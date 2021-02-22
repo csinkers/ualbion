@@ -31,6 +31,6 @@ namespace UAlbion.Formats.MapEvents
 
         [EventPart("op")] public NumericOperation Operation { get; private set; }
         [EventPart("amount")] public ushort Amount { get; private set; }
-        public override ModifyType SubType => ModifyType.ChangeTime;
+        public override ModifyType SubType => ModifyType.Time;
     }
 }

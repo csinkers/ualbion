@@ -3,11 +3,11 @@ using UAlbion.Formats;
 
 namespace UAlbion.Game.Events
 {
-    [Event("npc_turn")]
+    [Event("npc_turn")] // USED IN SCRIPT
     public class NpcTurnEvent : Event
     {
-        public NpcTurnEvent(int npcId, Direction? direction) { NpcId = npcId; Direction = direction; }
+        public NpcTurnEvent(int npcId, Direction direction) { NpcId = npcId; Direction = direction; }
         [EventPart("npcId ")] public int NpcId { get; }
-        [EventPart("direction", true)] public Direction? Direction { get; }
+        [EventPart("direction", true, "Unchanged")] public Direction Direction { get; }
     }
 }

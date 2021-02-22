@@ -32,7 +32,7 @@ namespace UAlbion.Base.Tests
             }
         }
 
-        static void Test(string data)
+        static void Test(string data, bool useNumeric = false)
         {
             var results = new List<(string, string)>();
 
@@ -81,28 +81,47 @@ namespace UAlbion.Base.Tests
             return MapEvent.Serdes(null, s, TextId.None, AssetMapping.Global);
         }
 
+        static string Test(string scriptFormat, string expectedToStringResult, IMapEvent e)
+        {
+            if (!string.Equals(e.ToString(), expectedToStringResult, StringComparison.OrdinalIgnoreCase))
+                return $"Event \"{e}\" did not serialise to the expected string \"{expectedToStringResult}\"";
+
+            IMapEvent parsed;
+            try { parsed = (IMapEvent)Event.Parse(scriptFormat); }
+            catch (Exception ex) { return $"Could not parse \"{scriptFormat}\": {ex}"; }
+
+
+            var bytes1 = EventToBytes(e);
+            var bytes2 = EventToBytes(parsed);
+            var hex1 = FormatUtil.BytesToHexString(bytes1);
+            var hex2 = FormatUtil.BytesToHexString(bytes2);
+            if (!string.Equals(hex1, hex2, StringComparison.Ordinal))
+                return $"The literal event ({e}) serialised to {hex1}, but the parsed event ({scriptFormat}) serialised to {hex2}";
+
+            if (scriptFormat != expectedToStringResult)
+            {
+                IMapEvent roundTripped;
+                try { roundTripped = (IMapEvent) Event.Parse(expectedToStringResult); }
+                catch (Exception ex) { return $"Could not parse \"{expectedToStringResult}\": {ex}"; }
+
+                var bytes3 = EventToBytes(roundTripped);
+                var hex3 = FormatUtil.BytesToHexString(bytes3);
+                if (!string.Equals(hex1, hex2, StringComparison.Ordinal))
+                    return $"The literal event ({e}) serialised to {hex1}, but after round-tripping through text ({expectedToStringResult}) it serialised to {hex3}";
+            }
+
+            return null;
+        }
+
         static void Test(params (string, IMapEvent)[] events)
         {
             var results = new List<string>();
 
             foreach (var (line, e) in events)
             {
-                if (!string.Equals(e.ToString(), line, StringComparison.OrdinalIgnoreCase))
-                    results.Add($"Event \"{e}\" did not serialise to the expected string \"{line}\"");
-
-                IMapEvent parsed = null;
-                try { parsed = (IMapEvent)Event.Parse(line); }
-                catch (Exception ex) { results.Add($"Could not parse \"{line}\": {ex}"); }
-
-                if (parsed == null)
-                    continue;
-
-                var bytes1 = EventToBytes(e);
-                var bytes2 = EventToBytes(parsed);
-                var hex1 = FormatUtil.BytesToHexString(bytes1);
-                var hex2 = FormatUtil.BytesToHexString(bytes2);
-                if (!string.Equals(hex1, hex2, StringComparison.Ordinal))
-                    results.Add($"The literal event (\"{e}\") serialised to {hex1}, but the parsed event (\"{line}\") serialised to {hex2}");
+                var error = Test(line, line, e);
+                if (error != null)
+                    results.Add(error);
             }
 
             if (results.Count > 0)
@@ -117,7 +136,7 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void DummyModify()
         {
-            Test(("DummyModifyEvent", new DummyModifyEvent()));
+            Test(("modify_unk2 1 2 3 4 5 6", new ModifyUnk2Event(1, 2, 3, 4, 5, 6)));
         }
 
         [Fact]
@@ -132,9 +151,9 @@ namespace UAlbion.Base.Tests
                 ("action StartDialogue 1 Unknown.1 1",  new ActionEvent(ActionType.StartDialogue,  1, new AssetId(AssetType.Unknown, 1), 1)),
                 ("action UnequipItem 1 Item.Pistol 1",  new ActionEvent(ActionType.UnequipItem,    1, (ItemId)Item.Pistol, 1)),
                 ("action Unk14 1 Unknown.0 1",          new ActionEvent(ActionType.Unk14,          1, new AssetId(AssetType.Unknown), 1)),
-                ("action Unk23 1 Unknown.1 1",          new ActionEvent(ActionType.Unk14,          1, new AssetId(AssetType.Unknown, 1), 1)),
+                ("action Unk23 1 Unknown.1 1",          new ActionEvent(ActionType.Unk23,          1, new AssetId(AssetType.Unknown, 1), 1)),
                 ("action UseItem 1 Item.Pistol 1",      new ActionEvent(ActionType.UseItem,        1, (ItemId)Item.Pistol, 1)),
-                ("action Word 1 Unknown.0 1",           new ActionEvent(ActionType.Word,           1, AssetId.None, 1)),
+                ("action Word 1 None 1",              new ActionEvent(ActionType.Word,           1, AssetId.None, 1)),
                 ("action Word 1 Word.Argim 1",          new ActionEvent(ActionType.Word,           1, (WordId)Word.Argim, 1)));
         }
 
@@ -148,10 +167,10 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void AddRemoveInvItem()
         {
-            Test(("add_remove_inv_item AddAmount 1 Item.Pistol", new AddRemoveInventoryItemEvent(NumericOperation.AddAmount, 1, Item.Pistol)),
-                ("add_remove_inv_item SetToMinimum 0 Item.Pistol", new AddRemoveInventoryItemEvent(NumericOperation.SetToMinimum, 0, Item.Pistol)),
-                ("add_remove_inv_item SetToMinimum 1 Item.Pistol", new AddRemoveInventoryItemEvent(NumericOperation.SetToMinimum, 1, Item.Pistol)),
-                ("add_remove_inv_item SubtractAmount 1 Item.Pistol", new AddRemoveInventoryItemEvent(NumericOperation.SubtractAmount, 1, Item.Pistol)));
+            Test(("add_remove_inv AddAmount 1 Item.Pistol", new AddRemoveInventoryItemEvent(NumericOperation.AddAmount, 1, Item.Pistol)),
+                ("add_remove_inv SetToMinimum 0 Item.Pistol", new AddRemoveInventoryItemEvent(NumericOperation.SetToMinimum, 0, Item.Pistol)),
+                ("add_remove_inv SetToMinimum 1 Item.Pistol", new AddRemoveInventoryItemEvent(NumericOperation.SetToMinimum, 1, Item.Pistol)),
+                ("add_remove_inv SubtractAmount 1 Item.Pistol", new AddRemoveInventoryItemEvent(NumericOperation.SubtractAmount, 1, Item.Pistol)));
         }
 
         [Fact]
@@ -160,7 +179,7 @@ namespace UAlbion.Base.Tests
             Test(("change_icon 1 1 0 BlockHard 0", new ChangeIconEvent(1, 1, 0, IconChangeType.BlockHard, 0)),
                 ("change_icon 1 1 0 BlockHard 1", new ChangeIconEvent(1, 1, 0, IconChangeType.BlockHard, 1)),
                 ("change_icon 1 1 Rel BlockHard 1", new ChangeIconEvent(1, 1, EventScopes.Rel, IconChangeType.BlockHard, 1)),
-                ("change_icon 1 1 Rel, Temp BlockHard 1", new ChangeIconEvent(1, 1, EventScopes.Rel | EventScopes.Temp, IconChangeType.BlockHard, 1)),
+                ("change_icon 1 1 Rel|Temp BlockHard 1", new ChangeIconEvent(1, 1, EventScopes.Rel | EventScopes.Temp, IconChangeType.BlockHard, 1)),
                 ("change_icon 1 1 Temp BlockHard 1", new ChangeIconEvent(1, 1, EventScopes.Temp, IconChangeType.BlockHard, 1)));
         }
 
@@ -168,12 +187,22 @@ namespace UAlbion.Base.Tests
         public void ChangePartyGold()
         {
             Test(("change_party_gold AddAmount 1 0", new ChangePartyGoldEvent(NumericOperation.AddAmount, 1, 0)),
-                ("change_party_gold AddAmount 1 1", new ChangePartyGoldEvent(NumericOperation.AddAmount, 1, 0)),
+                ("change_party_gold AddAmount 1 1", new ChangePartyGoldEvent(NumericOperation.AddAmount, 1, 1)),
                 ("change_party_gold SetToMinimum 0 0", new ChangePartyGoldEvent(NumericOperation.SetToMinimum, 0, 0)),
                 ("change_party_gold SubtractAmount 0 1", new ChangePartyGoldEvent(NumericOperation.SubtractAmount, 0, 1)),
                 ("change_party_gold SubtractAmount 1 0", new ChangePartyGoldEvent(NumericOperation.SubtractAmount, 1, 0)),
-                ("change_party_gold SubtractAmount 1 1", new ChangePartyGoldEvent(NumericOperation.SubtractAmount, 1, 1)),
-                ("change_party_rations AddAmount 1 1", new ChangePartyGoldEvent(NumericOperation.AddAmount, 1, 1)));
+                ("change_party_gold SubtractAmount 1 1", new ChangePartyGoldEvent(NumericOperation.SubtractAmount, 1, 1)));
+        }
+
+        [Fact]
+        public void ChangePartyRations()
+        {
+            Test(("change_party_rations AddAmount 1 0", new ChangePartyRationsEvent(NumericOperation.AddAmount, 1, 0)),
+                ("change_party_rations AddAmount 1 1", new ChangePartyRationsEvent(NumericOperation.AddAmount, 1, 1)),
+                ("change_party_rations SetToMinimum 0 0", new ChangePartyRationsEvent(NumericOperation.SetToMinimum, 0, 0)),
+                ("change_party_rations SubtractAmount 0 1", new ChangePartyRationsEvent(NumericOperation.SubtractAmount, 0, 1)),
+                ("change_party_rations SubtractAmount 1 0", new ChangePartyRationsEvent(NumericOperation.SubtractAmount, 1, 0)),
+                ("change_party_rations SubtractAmount 1 1", new ChangePartyRationsEvent(NumericOperation.SubtractAmount, 1, 1)));
         }
 
         [Fact]
@@ -192,7 +221,9 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void CloneAutomap()
         {
-            Test(("clone_automap 122 164", new CloneAutomapEvent(Map.OldFormerBuilding, Map.OldFormerBuildingPostFight)));
+            Test("clone_automap 122 164",
+                "clone_automap Map.OldFormerBuilding Map.OldFormerBuildingPostFight",
+                new CloneAutomapEvent(Map.OldFormerBuilding, Map.OldFormerBuildingPostFight));
         }
 
         [Fact]
@@ -220,21 +251,21 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void ChangeGold()
         {
-            Test(("change_gold None AddAmount 340 0 0", new ChangeGoldEvent(PartyMemberId.None, NumericOperation.AddAmount, 340, 0)));
+            Test(("change_gold None AddAmount 340 0", new ChangeGoldEvent(PartyMemberId.None, NumericOperation.AddAmount, 340, 0)));
         }
 
         [Fact]
         public void ChangeHealth()
         {
-            Test(("change_health None AddAmount 2 0 1", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.AddAmount, 2, 1)),
-                ("change_health None AddPercentage 25 0 7", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.AddPercentage, 25, 7)),
-                ("change_health None SetToMaximum 0 0 0", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.SetToMaximum, 0, 0)),
-                ("change_health None SubtractAmount 17 0 1", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.SubtractAmount, 17, 1)),
-                ("change_health None SubtractPercentage 15 0 1", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.SubtractPercentage, 15, 1)),
-                ("change_health PartyMember.Harriet AddAmount 1 0 2", new ChangeHealthEvent(PartyMember.Harriet, NumericOperation.AddAmount, 1, 2)),
-                ("change_health PartyMember.Unknown8 SetToMaximum 0 0 2", new ChangeHealthEvent(PartyMember.Unknown8, NumericOperation.SetToMaximum, 0, 2)),
-                ("change_health PartyMember.Unknown11 SetToMaximum 0 0 2", new ChangeHealthEvent(PartyMember.Unknown11, NumericOperation.SetToMaximum, 0, 2)),
-                ("change_health PartyMember.Unknown12 SetToMaximum 0 0 2", new ChangeHealthEvent(PartyMember.Unknown12, NumericOperation.SetToMaximum, 0, 2)));
+            Test(("change_health None AddAmount 2 1", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.AddAmount, 2, 1)),
+                ("change_health None AddPercentage 25 7", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.AddPercentage, 25, 7)),
+                ("change_health None SetToMaximum 0 0", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.SetToMaximum, 0, 0)),
+                ("change_health None SubtractAmount 17 1", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.SubtractAmount, 17, 1)),
+                ("change_health None SubtractPercentage 15 1", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.SubtractPercentage, 15, 1)),
+                ("change_health PartyMember.Harriet AddAmount 1 2", new ChangeHealthEvent(PartyMember.Harriet, NumericOperation.AddAmount, 1, 2)),
+                ("change_health PartyMember.Unknown8 SetToMaximum 0 2", new ChangeHealthEvent(PartyMember.Unknown8, NumericOperation.SetToMaximum, 0, 2)),
+                ("change_health PartyMember.Unknown11 SetToMaximum 0 2", new ChangeHealthEvent(PartyMember.Unknown11, NumericOperation.SetToMaximum, 0, 2)),
+                ("change_health PartyMember.Unknown12 SetToMaximum 0 2", new ChangeHealthEvent(PartyMember.Unknown12, NumericOperation.SetToMaximum, 0, 2)));
         }
 
         [Fact]
@@ -251,18 +282,18 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void ChangeLanguage()
         {
-            Test(("change_language None SetToMaximum 0 Iskai 1", new ChangeLanguageEvent(PartyMemberId.None, NumericOperation.SetToMaximum, PlayerLanguages.Iskai, 1)),
-                ("change_language PartyMember.Rainer SetToMaximum 0 Iskai 2", new ChangeLanguageEvent(PartyMember.Rainer, NumericOperation.SetToMaximum, PlayerLanguages.Iskai, 2)),
-                ("change_language PartyMember.Tom SetToMaximum 0 Iskai 2", new ChangeLanguageEvent(PartyMember.Tom, NumericOperation.SetToMaximum, PlayerLanguages.Iskai, 2)));
+            Test(("change_language None SetToMaximum Iskai 1", new ChangeLanguageEvent(PartyMemberId.None, NumericOperation.SetToMaximum, PlayerLanguages.Iskai, 1)),
+                ("change_language PartyMember.Rainer SetToMaximum Iskai 2", new ChangeLanguageEvent(PartyMember.Rainer, NumericOperation.SetToMaximum, PlayerLanguages.Iskai, 2)),
+                ("change_language PartyMember.Tom SetToMaximum Iskai 2", new ChangeLanguageEvent(PartyMember.Tom, NumericOperation.SetToMaximum, PlayerLanguages.Iskai, 2)));
         }
 
         [Fact]
         public void ChangeMana()
         {
-            Test(("change_mana None AddPercentage 20 0 7", new ChangeManaEvent(PartyMemberId.None, NumericOperation.AddPercentage, 20, 7)),
-                ("change_mana None AddPercentage 50 0 1", new ChangeManaEvent(PartyMemberId.None, NumericOperation.AddPercentage, 50, 1)),
-                ("change_mana None SetToMaximum 0 0 0", new ChangeManaEvent(PartyMemberId.None, NumericOperation.SetToMaximum, 0, 0)),
-                ("change_mana None SetToMaximum 0 0 1", new ChangeManaEvent(PartyMemberId.None, NumericOperation.SetToMaximum, 0, 1)));
+            Test(("change_mana None AddPercentage 20 7", new ChangeManaEvent(PartyMemberId.None, NumericOperation.AddPercentage, 20, 7)),
+                ("change_mana None AddPercentage 50 1", new ChangeManaEvent(PartyMemberId.None, NumericOperation.AddPercentage, 50, 1)),
+                ("change_mana None SetToMaximum 0 0", new ChangeManaEvent(PartyMemberId.None, NumericOperation.SetToMaximum, 0, 0)),
+                ("change_mana None SetToMaximum 0 1", new ChangeManaEvent(PartyMemberId.None, NumericOperation.SetToMaximum, 0, 1)));
         }
 
         [Fact]
@@ -287,12 +318,12 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void DisableEventChain()
         {
-            Test(@"disable_event_chain 0 (1 0 0 0 0)
-disable_event_chain 0 (1 0 0 1 0)
-disable_event_chain 1 (0 0 0 0 0)
-disable_event_chain 1 (0 0 0 1 0)
-disable_event_chain 1 (1 0 0 0 0)
-disable_event_chain 1 (1 0 0 1 0)");
+            Test(@"disable_event_chain 0 1 0
+disable_event_chain 0 1 1
+disable_event_chain 1 0 0
+disable_event_chain 1 0 1
+disable_event_chain 1 1 0
+disable_event_chain 1 1 1");
         }
 
         [Fact]
@@ -304,7 +335,7 @@ disable_event_chain 1 (1 0 0 1 0)");
         [Fact]
         public void EncounterEvent()
         {
-            Test(@"encounter_event (0 0 0 0 0 1 1)");
+            Test(@"encounter 1 2");
         }
 
         [Fact]
@@ -316,17 +347,17 @@ disable_event_chain 1 (1 0 0 1 0)");
         [Fact]
         public void Execute()
         {
-            Test(@"execute (0 0 0 0 0 0 1)
-execute (1 0 0 0 0 0 1)");
+            Test(@"execute 0 1
+execute 1 1");
         }
 
         [Fact]
         public void Inv()
         {
-            Test(@"inv:chest Chest.Unknown1 1% Initial:1 Unlocked:1 Key:Item.Pistol
-inv:chest Chest.Unknown1 1% Initial:1 Unlocked:1 Key:None
-inv:door Door.HerrasDoor 1% Initial:1 Unlocked:1 Key:Item.Pistol
-inv:door Door.HerrasDoor 1% Initial:1 Unlocked:1 Key:None");
+            Test(@"inv:chest Chest.Unknown1 MapText.Jirinaar Item.Pistol 1 2 3
+inv:chest Chest.Unknown1 MapText.Jirinaar None 0 255 255
+inv:door Door.HerrasDoor MapText.Jirinaar Item.Pistol 1 2 3
+inv:door Door.HerrasDoor MapText.Jirinaar None 0 255 255");
         }
 
         [Fact]
@@ -338,145 +369,145 @@ inv:door Door.HerrasDoor 1% Initial:1 Unlocked:1 Key:None");
         [Fact]
         public void PlaceAction()
         {
-            Test(@"place_action AskOpinion (0 0 0 0 1 1)
-place_action AskOpinion (1 1 1 1 1 1)
-place_action Cure (1 1 1 1 1 1)
-place_action Heal (1 1 1 1 1 1)
-place_action LearnCloseCombat (1 1 1 0 1 0)
-place_action LearnCloseCombat (1 1 1 1 1 0)
-place_action LearnSpells (1 1 1 1 1 1)
-place_action Merchant (1 1 1 0 1 1)
-place_action Merchant (1 1 1 1 1 1)
-place_action OrderFood (1 1 1 0 1 0)
-place_action OrderFood (1 1 1 0 1 1)
-place_action OrderFood (1 1 1 1 1 0)
-place_action OrderFood (1 1 1 1 1 1)
-place_action RemoveCurse (1 1 1 0 0 0)
-place_action RemoveCurse (1 1 1 0 0 1)
-place_action RemoveCurse (1 1 1 0 1 0)
-place_action RemoveCurse (1 1 1 1 1 1)
-place_action RepairItem (1 1 1 0 1 0)
-place_action RepairItem (1 1 1 0 1 1)
-place_action RepairItem (1 1 1 1 1 0)
-place_action RestoreItemEnergy (1 1 1 0 1 0)
-place_action ScrollMerchant (1 1 1 0 1 1)
-place_action SleepInRoom (1 1 1 1 1 0)
-place_action SleepInRoom (1 1 1 1 1 1)");
+            Test(@"place_action AskOpinion 0 0 0 0 1 1
+place_action AskOpinion 1 1 1 1 1 1
+place_action Cure 1 1 1 1 1 1
+place_action Heal 1 1 1 1 1 1
+place_action LearnCloseCombat 1 1 1 0 1 0
+place_action LearnCloseCombat 1 1 1 1 1 0
+place_action LearnSpells 1 1 1 1 1 1
+place_action Merchant 1 1 1 0 1 1
+place_action Merchant 1 1 1 1 1 1
+place_action OrderFood 1 1 1 0 1 0
+place_action OrderFood 1 1 1 0 1 1
+place_action OrderFood 1 1 1 1 1 0
+place_action OrderFood 1 1 1 1 1 1
+place_action RemoveCurse 1 1 1 0 0 0
+place_action RemoveCurse 1 1 1 0 0 1
+place_action RemoveCurse 1 1 1 0 1 0
+place_action RemoveCurse 1 1 1 1 1 1
+place_action RepairItem 1 1 1 0 1 0
+place_action RepairItem 1 1 1 0 1 1
+place_action RepairItem 1 1 1 1 1 0
+place_action RestoreItemEnergy 1 1 1 0 1 0
+place_action ScrollMerchant 1 1 1 0 1 1
+place_action SleepInRoom 1 1 1 1 1 0
+place_action SleepInRoom 1 1 1 1 1 1");
         }
 
         [Fact]
         public void PlayAnim()
         {
-            Test(@"play_anim Video.MagicDemonstration (1, 1) 0 0 1 1)");
+            Test((@"play_anim Video.MagicDemonstration 1 2 3 4", new PlayAnimationEvent(Video.MagicDemonstration, 1, 2, 3, 4)));
         }
 
         [Fact]
         public void Query()
         {
-            Test(@"query 1 1 (Equals 1)
-query 1 1 (GreaterThan 1)
-query 1 1 (GreaterThanOrEqual 1)
-query 1 1 (NotEqual 1)
-query 1 1 (OpUnk1 1)
-query ChosenVerb MapInit (IsTrue 0)
-query CurrentMapId 1 (Equals 0)
-query EventAlreadyUsed 0 (IsTrue 0)
-query HasEnoughGold 0 (GreaterThan 0)
-query HasEnoughGold 0 (GreaterThanOrEqual 1)
-query HasEnoughGold 1 (GreaterThanOrEqual 0)
-query HasEnoughGold 1 (NotEqual 0)
-query HasPartyMember PartyMember.Tom (IsTrue 0)
-query InventoryHasItem Item.Pistol (Equals 1)
-query InventoryHasItem Item.Pistol (GreaterThan 0)
-query InventoryHasItem Item.Pistol (GreaterThanOrEqual 1)
-query IsDemoVersion 1 (IsTrue 0)
-query IsNpcActive 0 (Equals 0)
-query IsNpcActive 0 (IsTrue 0)
-query IsNpcActive 0 (IsTrue 1)
-query IsNpcActive 1 (Equals 1)
-query IsNpcActive 1 (IsTrue 0)
-query IsPartyMemberConscious PartyMember.Tom (IsTrue 0)
-query IsPartyMemberConscious PartyMember.Tom (IsTrue 1)
-query IsPartyMemberLeader PartyMember.Tom (Equals 0)
-query IsPartyMemberLeader PartyMember.Tom (IsTrue 0)
-query IsScriptDebugModeActive 0 (IsTrue 0)
-query PreviousActionResult 0 (IsTrue 0)
-query PromptPlayer 1 (IsTrue 0)
-query PromptPlayer 1 (IsTrue 1)
-query PromptPlayerNumeric 1 (Equals 0)
-query RandomChance 1 (IsTrue 1)
-query RandomChance 1 (NotEqual 0)
-query RandomChance 1 (NotEqual 1)
-query RandomChance 1 (OpUnk1 0)
-query RandomChance 1 (OpUnk1 1)
-query TemporarySwitch Switch.ExpelledFromSouthWind (IsTrue 0)
-query Ticker Ticker.Ticker1 (Equals 1)
-query Ticker Ticker.Ticker1 (GreaterThan 1)
-query Ticker Ticker.Ticker1 (GreaterThanOrEqual 1)
-query Ticker Ticker.Ticker1 (NotEqual 1)
-query Ticker Ticker.Ticker1 (OpUnk1 1)
-query Unk1 0 (IsTrue 0)
-query Unk1 0 (IsTrue 1)
-query Unk1 1 (Equals 1)
-query Unk1 1 (GreaterThan 1)
-query Unk1 1 (GreaterThanOrEqual 1)
-query Unk1 1 (NotEqual 1)
-query Unk1 1 (OpUnk1 1)
-query Unk1E 1 (GreaterThan 0)
-query Unk1E 1 (GreaterThanOrEqual 0)
-query Unk1E 1 (NotEqual 0)
-query Unk1E 1 (OpUnk1 0)
-query UnkC 0 (Equals 0)
-query UnkC 1 (Equals 0)
-query UsedItemId Item.Pistol (Equals 0)
-query UsedItemId Item.Pistol (IsTrue 0)");
+            Test(@"prompt_player MapText.TestMapIskai IsTrue 0 1
+prompt_player EventText.FestivalTime IsTrue 1 1
+prompt_player_numeric MapText.Jirinaar Equals 0 1
+query_conscious IsTrue 0 PartyMember.Tom
+query_conscious IsTrue 1 PartyMember.Tom
+query_demo_version IsTrue 0 1
+query_event_used IsTrue 0 0
+query_gold GreaterThan 0 0
+query_gold GreaterThanOrEqual 0 1
+query_gold GreaterThanOrEqual 1 0
+query_gold NotEqual 0 1
+query_has_item Equals 1 Item.Pistol
+query_has_item GreaterThan 0 Item.Pistol
+query_has_item GreaterThanOrEqual 1 Item.Pistol
+query_has_party_member IsTrue 0 PartyMember.Tom
+query_leader Equals 0 PartyMember.Tom
+query_leader IsTrue 0 PartyMember.Tom
+query_map Equals 0 Map.1
+query_npc_active Equals 0 0
+query_npc_active Equals 1 1
+query_npc_active IsTrue 0 0
+query_npc_active IsTrue 0 1
+query_npc_active IsTrue 1 0
+query_previous_action_result IsTrue 0 0
+query_random_chance IsTrue 1 1
+query_random_chance NotEqual 0 1
+query_random_chance NotEqual 1 1
+query_random_chance OpUnk2 1 1
+query_random_chance OpUnk6 0 1
+query_script_debug_mode IsTrue 0 0
+query_switch IsTrue 0 Switch.ExpelledFromSouthWind
+query_ticker Equals 1 Ticker.Ticker100
+query_ticker GreaterThan 1 Ticker.Ticker100
+query_ticker GreaterThanOrEqual 1 Ticker.Ticker100
+query_ticker NotEqual 1 Ticker.Ticker100
+query_ticker OpUnk2 1 Ticker.Ticker100
+query_unk1 Equals 1 1
+query_unk1 Equals 1 1
+query_unk1 GreaterThan 1 1
+query_unk1 GreaterThan 1 1
+query_unk1 GreaterThanOrEqual 1 1
+query_unk1 GreaterThanOrEqual 1 1
+query_unk1 IsTrue 0 0
+query_unk1 IsTrue 1 0
+query_unk1 NotEqual 1 1
+query_unk1 NotEqual 1 1
+query_unk1 OpUnk2 1 1
+query_unk1 OpUnk6 1 1
+query_unk1e GreaterThan 0 1
+query_unk1e GreaterThanOrEqual 0 1
+query_unk1e NotEqual 0 1
+query_unk1e OpUnk6 0 1
+query_unkc Equals 0 0
+query_unkc Equals 0 1
+query_used_item Equals 0 Item.Pistol
+query_verb IsTrue 0 MapInit
+query_used_item IsTrue 0 Item.Pistol");
         }
 
         [Fact]
         public void RemovePartyMember()
         {
-            Test(@"remove_party_member (None 1 0 1)
-remove_party_member (PartyMember.Tom 1 0 1)");
+            Test(@"remove_party_member None 1 1
+remove_party_member PartyMember.Tom 1 1");
         }
 
         [Fact]
         public void SetMapLighting()
         {
-            Test(@"set_map_lighting NeedTorch (1 1 0 0 0)");
+            Test(@"set_map_lighting NeedTorch 1 2");
         }
 
         [Fact]
-        public void SetNpcActive()
+        public void NpcActive()
         {
-            Test(@"set_npc_active 1 0 (0 0 0)
-set_npc_active 1 1 (0 0 0)
-set_npc_active 1 1 (0 1 0)");
+            Test(@"npc_active 1 0 0 0
+npc_active 1 1 0 0
+npc_active 1 1 0 1");
         }
 
         [Fact]
         public void SetPartyLeader()
         {
-            Test(@"set_party_leader PartyMember.Tom (1 0 0 0 0)
-set_party_leader PartyMember.Tom (1 1 0 0 0)");
+            Test(@"set_party_leader PartyMember.Tom 3 0
+set_party_leader PartyMember.Tom 1 1");
         }
 
         [Fact]
         public void SetTemporarySwitch()
         {
-            Test(@"set_temporary_switch Switch.ExpelledFromSouthWind Reset (0)
-set_temporary_switch Switch.ExpelledFromSouthWind Reset (1)
-set_temporary_switch Switch.ExpelledFromSouthWind Set (0)
-set_temporary_switch Switch.ExpelledFromSouthWind Set (1)
-set_temporary_switch Switch.ExpelledFromSouthWind Toggle (0)");
+            Test(@"switch Reset Switch.ExpelledFromSouthWind 0
+switch Reset Switch.ExpelledFromSouthWind 1
+switch Set Switch.ExpelledFromSouthWind 0
+switch Set Switch.ExpelledFromSouthWind 1
+switch Toggle Switch.ExpelledFromSouthWind 0");
         }
 
         [Fact]
-        public void SetTicker()
+        public void Ticker()
         {
-            Test(@"set_ticker Ticker.Ticker1 AddAmount 1 (0)
-set_ticker Ticker.Ticker1 SetAmount 1 (0)
-set_ticker Ticker.Ticker1 SetToMinimum 1 (0)
-set_ticker Ticker.Ticker1 SubtractAmount 1 (0)");
+            Test(@"ticker Ticker.Ticker100 AddAmount 1 0
+ticker Ticker.Ticker100 SetAmount 1 0
+ticker Ticker.Ticker100 SetToMinimum 1 0
+ticker Ticker.Ticker100 SubtractAmount 1 0");
         }
 
         [Fact]
@@ -488,24 +519,24 @@ set_ticker Ticker.Ticker1 SubtractAmount 1 (0)");
         [Fact]
         public void SimpleChest()
         {
-            Test(@"simple_chest Gold 1xNone
-simple_chest Item 1xItem.Pistol
-simple_chest Item 1xNone
-simple_chest Rations 1xNone");
+            Test(@"simple_chest 1 Gold.0
+simple_chest 1 Item.Pistol
+simple_chest 1 None
+simple_chest 1 Rations.0");
         }
 
         [Fact]
         public void Sound()
         {
-            Test(@"sound None GlobalOneShot Vol:0 Prob:0% Freq:0 (0)
-sound None GlobalOneShot Vol:1 Prob:1% Freq:1 (1)
-sound Sample.AmbientThrum Silent Vol:0 Prob:0% Freq:0 (0)
-sound Sample.IllTemperedLlama GlobalOneShot Vol:0 Prob:1% Freq:0 (0)
-sound Sample.IllTemperedLlama GlobalOneShot Vol:0 Prob:1% Freq:0 (1)
-sound Sample.IllTemperedLlama GlobalOneShot Vol:0 Prob:1% Freq:1 (1)
-sound Sample.IllTemperedLlama GlobalOneShot Vol:1 Prob:1% Freq:0 (1)
-sound Sample.IllTemperedLlama GlobalOneShot Vol:1 Prob:1% Freq:1 (0)
-sound Sample.IllTemperedLlama GlobalOneShot Vol:1 Prob:1% Freq:1 (1)");
+            Test(@"sound None 0 0 0 0 GlobalOneShot
+sound None 1 1 1 11000 GlobalOneShot
+sound Sample.AmbientThrum 0 0 0 0 Silent
+sound Sample.IllTemperedLlama 0 1 0 0 GlobalOneShot
+sound Sample.IllTemperedLlama 0 1 1 0 GlobalOneShot
+sound Sample.IllTemperedLlama 0 1 1 11000 GlobalOneShot
+sound Sample.IllTemperedLlama 1 1 1 0 GlobalOneShot
+sound Sample.IllTemperedLlama 1 1 0 11000 GlobalOneShot
+sound Sample.IllTemperedLlama 1 1 1 11000 GlobalOneShot");
         }
 
         [Fact]
@@ -523,40 +554,40 @@ sound Sample.IllTemperedLlama GlobalOneShot Vol:1 Prob:1% Freq:1 (1)");
         [Fact]
         public void Teleport()
         {
-            Test(@"teleport Map.Jirinaar <1, 1> Dir:Up (1 0)
-teleport Map.Jirinaar <1, 1> Dir:Up (1 1)
-teleport None <1, 1> Dir:Up (1 1)");
+            Test(@"teleport Map.Jirinaar 1 1 North 1 0
+teleport Map.Jirinaar 1 1 North 1 1
+teleport None 1 1 North 1 1");
         }
 
         [Fact]
         public void Text()
         {
-            Test(@"text EventText.Frill:1 1 None (0 0 0 0)
-text EventText.Frill:1 Conversation None (0 0 0 0)
-text EventText.Frill:1 ConversationOptions None (0 0 0 0)
-text EventText.Frill:1 ConversationQuery None (0 0 0 0)
-text EventText.Frill:1 NoPortrait None (0 0 0 0)
-text EventText.Frill:1 NoPortrait Npc.Christine (0 0 0 0)
-text EventText.Frill:1 PortraitLeft Npc.Christine (0 0 0 0)
-text EventText.Frill:1 PortraitLeft1 None (0 0 0 0)
-text EventText.Frill:1 StandardOptions None (0 0 0 0)
-text MapText.Jirinaar:1 1 None (0 0 0 0)
-text MapText.Jirinaar:1 NoPortrait None (0 0 0 0)
-text MapText.Jirinaar:1 PortraitLeft None (0 0 0 0)
-text MapText.Jirinaar:1 PortraitLeft Npc.Christine (0 0 0 0)
-text MapText.Jirinaar:1 PortraitLeft1 None (0 0 0 0)
-text MapText.Jirinaar:1 PortraitLeft1 Npc.Christine (0 0 0 0)
-text MapText.Jirinaar:1 QuickInfo None (0 0 0 0)");
+            Test(@"map_text EventText.Frill 1 1 None
+map_text EventText.Frill 1 Conversation None
+map_text EventText.Frill 1 ConversationOptions None
+map_text EventText.Frill 1 ConversationQuery None
+map_text EventText.Frill 1 NoPortrait None
+map_text EventText.Frill 1 NoPortrait Npc.Christine
+map_text EventText.Frill 1 PortraitLeft Npc.Christine
+map_text EventText.Frill 1 PortraitLeft2 None
+map_text EventText.Frill 1 StandardOptions None
+map_text MapText.Jirinaar 1 1 None
+map_text MapText.Jirinaar 1 NoPortrait None
+map_text MapText.Jirinaar 1 PortraitLeft None
+map_text MapText.Jirinaar 1 PortraitLeft Npc.Christine
+map_text MapText.Jirinaar 1 PortraitLeft2 None
+map_text MapText.Jirinaar 1 PortraitLeft3 Npc.Christine
+map_text MapText.Jirinaar 1 QuickInfo None");
         }
 
         [Fact]
         public void Trap()
         {
-            Test(@"trap (1 1 0 0 0)
-trap (1 1 0 0 1)
-trap (1 1 1 0 1)
-trap (1 1 1 1 0)
-trap (1 1 1 1 1)");
+            Test(@"trap 1 1 0 0 0
+trap 1 1 0 0 1
+trap 1 1 1 0 1
+trap 1 1 1 1 0
+trap 1 1 1 1 1");
         }
 
         [Fact]
@@ -569,7 +600,60 @@ wipe 1");
         [Fact]
         public void TestScriptEvents()
         {
-            Test(@"active_member_text 100
+            Test(
+                @"active_member_text 100
+ambient Song.JungleTownAmbient2
+camera_jump 300 300
+camera_lock
+camera_move -4 4
+camera_unlock
+clear_quest_bit Switch.Switch236
+do_event_chain 1
+fade_from_black
+fade_from_white
+fade_to_black
+fade_to_white
+Fill_screen 0
+fill_screen 194
+fill_screen_0
+load_pal Palette.FirstIslandDay
+npc_jump 1 123 213
+npc_lock 12
+npc_move 16 -1 1
+npc_off 11
+npc_on 33
+npc_text Npc.Khunagh 158
+npc_turn 11 West
+npc_unlock 1
+party_jump 170 63
+party_member_text PartyMember.Tom 112
+party_move -1 1
+party_off
+party_on
+party_turn West
+pause 120
+play 12
+play_anim Video.ThrowingSeed 140 20 1 1
+show_map
+show_pic Picture.CelticIskaiStandoff
+show_pic Picture.TorontoWithVines 0 0
+show_picture Picture.HarbourTown 0 0
+song Song.TechCombatMusic
+sound Sample.DistantCollapse 80 0 0 0 GlobalOneShot
+sound Sample.DistantCollapse 80 0 0 7000 GlobalOneShot
+sound Sample.DistantCollapse 80 150 0 0 GlobalOneShot
+sound Sample.XylophoneTones 90 100 0 22000 GlobalOneShot
+sound Sample.Healing 80 0 0 0 GlobalOneShot
+sound_fx_off
+start_anim 10 0 0 1
+start_anim 3 25 24 2
+stop_anim
+text 101
+update 1
+update 200", true);
+
+/* Original text w/ numeric ids
+active_member_text 100
 ambient 32
 camera_jump 300 300
 camera_lock
@@ -618,7 +702,8 @@ start_anim 3 25 24 2
 stop_anim
 text 101
 update 1
-update 200");
+update 200
+ */
         }
     }
 }

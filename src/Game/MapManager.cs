@@ -1,6 +1,7 @@
 ﻿using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.MapEvents;
@@ -101,7 +102,7 @@ namespace UAlbion.Game
                 Exchange.Raise(new LoadMapEvent(e.MapId), null); 
 
             Raise(new PartyJumpEvent(e.X, e.Y));
-            if (e.Direction != TeleportDirection.Unchanged)
+            if (e.Direction != Direction.Unchanged)
                 Raise(new PartyTurnEvent(e.Direction));
             Raise(new CameraJumpEvent(e.X, e.Y));
         }

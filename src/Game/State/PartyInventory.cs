@@ -29,10 +29,10 @@ namespace UAlbion.Game.State
             {
                 var itemId = e.ChestType switch
                 {
-                    SimpleChestEvent.SimpleChestItemType.Item => (AssetId)e.ItemId,
-                    SimpleChestEvent.SimpleChestItemType.Gold => AssetId.Gold,
-                    SimpleChestEvent.SimpleChestItemType.Rations => AssetId.Rations,
-                    _ => throw new InvalidEnumArgumentException(nameof(e.ChestType), (int)e.ChestType, typeof(SimpleChestEvent.SimpleChestItemType))
+                    SimpleChestItemType.Item => (AssetId)e.ItemId,
+                    SimpleChestItemType.Gold => AssetId.Gold,
+                    SimpleChestItemType.Rations => AssetId.Rations,
+                    _ => throw new InvalidEnumArgumentException(nameof(e.ChestType), (int)e.ChestType, typeof(SimpleChestItemType))
                 };
 
                 var recipient = ChangePartyItemAmount(itemId, NumericOperation.AddAmount, e.Amount);

@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
@@ -35,10 +36,10 @@ namespace UAlbion.Game.Entities.Map2D
                 var position = new Vector2(position3d.X, position3d.Y);
                 _movement.FacingDirection = e.Direction switch
                 {
-                    TeleportDirection.Up => MovementDirection.Up,
-                    TeleportDirection.Right => MovementDirection.Right,
-                    TeleportDirection.Down => MovementDirection.Down,
-                    TeleportDirection.Left => MovementDirection.Left,
+                    Direction.North => MovementDirection.Up,
+                    Direction.East => MovementDirection.Right,
+                    Direction.South => MovementDirection.Down,
+                    Direction.West => MovementDirection.Left,
                     _ => _movement.FacingDirection
                 };
                 MoveLeader(position);

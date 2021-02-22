@@ -1,32 +1,36 @@
 ﻿using System;
 using SerdesNet;
+using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
+    [Event("execute")]
     public class ExecuteEvent : MapEvent
     {
+        ExecuteEvent() { }
+        public ExecuteEvent(byte unk1, ushort unk8)
+        {
+            Unk1 = unk1;
+            Unk8 = unk8;
+        }
+
         public static ExecuteEvent Serdes(ExecuteEvent e, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new ExecuteEvent();
             e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);
-            e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
-            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
-            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-            e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
+            int zeroes = s.UInt8(null, 0);
+            zeroes += s.UInt8(null, 0);
+            zeroes += s.UInt8(null, 0);
+            zeroes += s.UInt8(null, 0);
+            zeroes += s.UInt16(null, 0);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+            s.Assert(zeroes == 0, "ExecuteEvent: Expected fields 2-6 to be 0");
             return e;
         }
 
-        public byte Unk1 { get; private set; }
-        public byte Unk2 { get; private set; }
-        public byte Unk3 { get; private set; }
-        public byte Unk4 { get; private set; }
-        public byte Unk5 { get; private set; }
-        public ushort Unk6 { get; private set; }
-        public ushort Unk8 { get; private set; }
-        public override string ToString() => $"execute ({Unk1} {Unk2} {Unk3} {Unk4} {Unk5} {Unk6} {Unk8})";
+        [EventPart("unk1")]public byte Unk1 { get; private set; }
+        [EventPart("unk8")]public ushort Unk8 { get; private set; }
         public override MapEventType EventType => MapEventType.Execute;
     }
 }

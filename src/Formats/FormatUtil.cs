@@ -6,6 +6,7 @@ using System.Text;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats
 {
@@ -217,5 +218,18 @@ namespace UAlbion.Formats
         public static string[] SplitLines(string s)
              => s?.Split(NewLineChars, StringSplitOptions.RemoveEmptyEntries)
             ?? Array.Empty<string>();
+
+        public static bool Compare(QueryOperation operation, int value, int immediate) =>
+            operation switch
+            {
+                QueryOperation.IsTrue => value != 0,
+                QueryOperation.NotEqual => value != immediate,
+                QueryOperation.OpUnk2 => value == immediate,
+                QueryOperation.Equals => value == immediate,
+                QueryOperation.GreaterThanOrEqual => value >= immediate,
+                QueryOperation.GreaterThan => value > immediate,
+                QueryOperation.OpUnk6 => value == immediate,
+                _ => true
+            };
     }
 }

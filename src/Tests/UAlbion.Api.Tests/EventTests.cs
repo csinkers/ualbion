@@ -15,9 +15,10 @@ namespace UAlbion.Api.Tests
             var e = Event.Parse("event0");
             Assert.IsType<Event0>(e);
             Assert.Equal("event0", e.ToString());
+            Assert.IsType<Event0>(Event.Parse("EvEnT0")); // Case insensitive
+            Assert.Equal("event0", Event.Parse("EvEnT0").ToString()); // Case insensitive
 
             Assert.Null(Event.Parse("some_nonsense_that_matches_nothing"));
-            Assert.Null(Event.Parse("EvEnT0")); // Currently case sensitive.
             Assert.Null(Event.Parse(null));
             Assert.Null(Event.Parse(""));
             Assert.Null(Event.Parse(" "));

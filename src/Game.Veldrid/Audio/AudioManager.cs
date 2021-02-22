@@ -131,7 +131,7 @@ namespace UAlbion.Game.Veldrid.Audio
 
         void Play(SoundEvent e)
         {
-            if (e.Mode == SoundEvent.SoundMode.Silent)
+            if (e.Mode == SoundMode.Silent)
                 return;
 
             var buffer = GetBuffer(e.SoundId);
@@ -144,7 +144,7 @@ namespace UAlbion.Game.Veldrid.Audio
             var source = new SimpleAudioSource(buffer)
             {
                 Volume = e.Volume == 0 ? 1.0f : e.Volume / 255.0f,
-                Looping = e.Mode == SoundEvent.SoundMode.LocalLoop,
+                Looping = e.Mode == SoundMode.LocalLoop,
                 Position = tileSize * new Vector3(context.Source.X, context.Source.Y, 0.0f),
                 SourceRelative = context.Source.AssetId.Type != AssetType.Map, // If we couldn't localise the sound then play it at (0,0) relative to the player.
                 ReferenceDistance = 1.0f * tileSize.X,

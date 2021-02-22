@@ -2,7 +2,7 @@
 
 namespace UAlbion.Game.Events
 {
-    [Event("camera_jump", "Teleports the camera to the given position.")]
+    [Event("camera_jump", "Teleports the camera to the given position.")] // USED IN SCRIPT
     public class CameraJumpEvent : GameEvent
     {
         public CameraJumpEvent(int x, int y) { X = x; Y = y; }

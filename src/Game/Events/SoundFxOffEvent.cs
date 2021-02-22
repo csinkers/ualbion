@@ -2,6 +2,6 @@
 
 namespace UAlbion.Game.Events
 {
-    [Event("sound_fx_off")]
+    [Event("sound_fx_off")] // USED IN SCRIPT
     public class SoundFxOffEvent : GameEvent { }
 }

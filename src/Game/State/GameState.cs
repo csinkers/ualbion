@@ -45,17 +45,17 @@ namespace UAlbion.Game.State
                 if (_game != null)
                     _game.MapId = e.MapId;
             });
-            On<SetTemporarySwitchEvent>(e =>
+            On<SwitchEvent>(e =>
             {
                 _game.SetFlag(e.SwitchId, e.Operation switch
                 {
-                    SetTemporarySwitchEvent.SwitchOperation.Reset => false,
-                    SetTemporarySwitchEvent.SwitchOperation.Set => true,
-                    SetTemporarySwitchEvent.SwitchOperation.Toggle => !_game.GetFlag(e.SwitchId),
+                    SwitchOperation.Reset => false,
+                    SwitchOperation.Set => true,
+                    SwitchOperation.Toggle => !_game.GetFlag(e.SwitchId),
                     _ => false
                 });
             });
-            On<SetTickerEvent>(e =>
+            On<TickerEvent>(e =>
             {
                 _game.Tickers.TryGetValue(e.TickerId, out var curValue);
                 _game.Tickers[e.TickerId] = (byte)e.Operation.Apply(curValue, e.Amount, 0, 255);

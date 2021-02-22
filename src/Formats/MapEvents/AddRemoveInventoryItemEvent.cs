@@ -35,6 +35,6 @@ namespace UAlbion.Formats.MapEvents
         [EventPart("amount")] public byte Amount { get; private set; }
         [EventPart("item_id")] public ItemId ItemId { get; private set; }
 
-        public override ModifyType SubType => ModifyType.AddRemoveInventoryItem;
+        public override ModifyType SubType => ModifyType.InventoryItem;
     }
 }

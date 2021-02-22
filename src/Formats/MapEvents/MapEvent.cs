@@ -25,7 +25,6 @@ namespace UAlbion.Formats.MapEvents
                 MapEventType.CloneAutomap => CloneAutomapEvent.Serdes((CloneAutomapEvent)e, mapping, s),
                 MapEventType.CreateTransport => CreateTransportEvent.Serdes((CreateTransportEvent)e, s),
                 MapEventType.DataChange => DataChangeEvent.Serdes((DataChangeEvent)e, mapping, s),
-                MapEventType.DoScript => DoScriptEvent.Serdes((DoScriptEvent)e, mapping, s),
                 MapEventType.Door => DoorEvent.Serdes((DoorEvent)e, mapping, s, textSourceId),
                 MapEventType.Encounter => EncounterEvent.Serdes((EncounterEvent)e, s),
                 MapEventType.EndDialogue => EndDialogueEvent.Serdes((EndDialogueEvent)e, s),
@@ -38,7 +37,7 @@ namespace UAlbion.Formats.MapEvents
                 MapEventType.PlayAnimation => PlayAnimationEvent.Serdes((PlayAnimationEvent)e, mapping, s),
                 MapEventType.Query => QueryEvent.Serdes((QueryEvent)e, mapping, s, textSourceId),
                 MapEventType.RemovePartyMember => RemovePartyMemberEvent.Serdes((RemovePartyMemberEvent)e, mapping, s),
-                MapEventType.Script => RunScriptEvent.Serdes((RunScriptEvent)e, s),
+                MapEventType.Script => DoScriptEvent.Serdes((DoScriptEvent)e, mapping, s),
                 MapEventType.Signal => SignalEvent.Serdes((SignalEvent)e, s),
                 MapEventType.SimpleChest => SimpleChestEvent.Serdes((SimpleChestEvent)e, mapping, s),
                 MapEventType.Sound => SoundEvent.Serdes((SoundEvent)e, mapping, s),
@@ -50,7 +49,7 @@ namespace UAlbion.Formats.MapEvents
                 _ => DummyMapEvent.Serdes((DummyMapEvent)e, s, type)
             };
             s.End();
-            if(type == MapEventType.Query)
+            if (e is IBranchingEvent)
                 s.Assert(s.Offset - initialPosition == 8, "Query events should always be 8 bytes");
             else
                 s.Assert(s.Offset - initialPosition == 10, "Non-query map events should always be 10 bytes");

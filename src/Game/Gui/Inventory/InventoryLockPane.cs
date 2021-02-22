@@ -60,7 +60,7 @@ namespace UAlbion.Game.Gui.Inventory
                 return;
 
             var tf = Resolve<ITextFormatter>();
-            if (hand.ItemId == _lockEvent.KeyItemId)
+            if (hand.ItemId == _lockEvent.Key)
             {
                 Raise(new HoverTextEvent(tf.Format(Base.SystemText.Lock_LeaderOpenedTheLock)));
                 Raise(new InventoryReturnItemInHandEvent());
@@ -101,7 +101,7 @@ namespace UAlbion.Game.Gui.Inventory
             // TODO: Determine the actual probabilities the game uses.
             var baseChance = (100.0f - _lockEvent.PickDifficulty) / 100.0f;
             var adjusted = baseChance * skill;
-            RaiseAsync(QueryEvent.RandomChance((ushort)adjusted), continuation);
+            RaiseAsync(new QueryRandomChanceEvent(QueryOperation.GreaterThan, 0, (ushort)adjusted), continuation);
         }
 
         void PickLock()

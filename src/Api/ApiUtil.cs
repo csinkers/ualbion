@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace UAlbion.Api
@@ -127,5 +128,7 @@ namespace UAlbion.Api
             if (!condition)
                 Assert($"Assertion failed! {message}");
         }
+
+        public static bool IsFlagsEnum(Type type) => type != null && type.IsEnum && type.GetCustomAttribute(typeof(FlagsAttribute)) != null;
     }
 }

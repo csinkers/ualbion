@@ -2,7 +2,7 @@
 
 namespace UAlbion.Game.Events
 {
-    [Event("start_anim")]
+    [Event("start_anim")] // USED IN SCRIPT
     public class StartAnimEvent : GameEvent
     {
         public StartAnimEvent(int unk1, int unk2, int unk3, int unk4, int? unk5) { Unk1 = unk1; Unk2 = unk2; Unk3 = unk3; Unk4 = unk4; Unk5 = unk5; }

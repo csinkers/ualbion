@@ -94,7 +94,7 @@ namespace UAlbion.Game.Gui.Status
             {
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.PartyPopup_MakeLeader),
-                    new SetPartyLeaderEvent(member.Id),
+                    new SetPartyLeaderEvent(member.Id, 3, 0), // TODO: what do unk2/3 do?
                     ContextMenuGroup.Actions));
             }
 
@@ -197,7 +197,7 @@ namespace UAlbion.Game.Gui.Status
 
             var memberId = PartyMember?.Id;
             if (memberId.HasValue)
-                Raise(new SetPartyLeaderEvent(memberId.Value));
+                Raise(new SetPartyLeaderEvent(memberId.Value, 3, 0)); // TODO: Proper values for unk2/3
         }
 
         void Hover(HoverEvent e)

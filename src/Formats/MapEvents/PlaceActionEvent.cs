@@ -1,8 +1,10 @@
 ﻿using System;
 using SerdesNet;
+using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
+    [Event("place_action")]
     public class PlaceActionEvent : MapEvent
     {
         public static PlaceActionEvent Serdes(PlaceActionEvent e, ISerializer s)
@@ -18,15 +20,25 @@ namespace UAlbion.Formats.MapEvents
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
             return e;
         }
+        PlaceActionEvent() { }
+        public PlaceActionEvent(PlaceActionType type, byte unk2, byte unk3, byte unk4, byte unk5, ushort unk6, ushort unk8)
+        {
+            Type = type;
+            Unk2 = unk2;
+            Unk3 = unk3;
+            Unk4 = unk4;
+            Unk5 = unk5;
+            Unk6 = unk6;
+            Unk8 = unk8;
+        }
 
-        public PlaceActionType Type { get; private set; }
-        public byte Unk2 { get; private set; }
-        public byte Unk3 { get; private set; }
-        public byte Unk4 { get; private set; }
-        public byte Unk5 { get; private set; } // Spell class for learn magic
-        public ushort Unk6 { get; private set; }
-        public ushort Unk8 { get; private set; }
-        public override string ToString() => $"place_action {Type} ({Unk2} {Unk3} {Unk4} {Unk5} {Unk6} {Unk8})";
+        [EventPart("type")] public PlaceActionType Type { get; private set; }
+        [EventPart("unk2")] public byte Unk2 { get; private set; }
+        [EventPart("unk3")] public byte Unk3 { get; private set; }
+        [EventPart("unk4")] public byte Unk4 { get; private set; }
+        [EventPart("unk5")] public byte Unk5 { get; private set; } // Spell class for learn magic
+        [EventPart("unk6")] public ushort Unk6 { get; private set; }
+        [EventPart("unk8")] public ushort Unk8 { get; private set; }
         public override MapEventType EventType => MapEventType.PlaceAction;
     }
 }

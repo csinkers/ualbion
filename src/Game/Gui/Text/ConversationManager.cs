@@ -44,7 +44,7 @@ namespace UAlbion.Game.Gui.Text
 
         bool OnTextEvent(ContextTextEvent e, Action continuation)
         {
-            var textEvent = new TextEvent(ContextTextSource, e.TextId, e.Location, e.NpcId);
+            var textEvent = new TextEvent(ContextTextSource, e.TextId, e.Location, e.NpcId ?? NpcId.None);
             return OnBaseTextEvent(textEvent, continuation);
         }
 

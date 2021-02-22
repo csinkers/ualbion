@@ -1,32 +1,36 @@
 ﻿using System;
 using SerdesNet;
+using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
+    [Event("encounter")]
     public class EncounterEvent : MapEvent
     {
+        EncounterEvent() { }
+        public EncounterEvent(ushort unk6, ushort unk8)
+        {
+            Unk6 = unk6;
+            Unk8 = unk8;
+        }
+
         public static EncounterEvent Serdes(EncounterEvent e, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new EncounterEvent();
-            e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);
-            e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
-            e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
-            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            int zeroes = s.UInt8(null, 0);
+            zeroes += s.UInt8(null, 0);
+            zeroes += s.UInt8(null, 0);
+            zeroes += s.UInt8(null, 0);
+            zeroes += s.UInt8(null, 0);
             e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
             e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+            s.Assert(zeroes ==0, "EncounterEvent: Expected fields 1-5 to be 0");
             return e;
         }
 
-        public byte Unk1 { get; private set; }
-        public byte Unk2 { get; private set; }
-        public byte Unk3 { get; private set; }
-        public byte Unk4 { get; private set; }
-        public byte Unk5 { get; private set; }
-        public ushort Unk6 { get; private set; }
-        public ushort Unk8 { get; private set; }
-        public override string ToString() => $"encounter_event ({Unk1} {Unk2} {Unk3} {Unk4} {Unk5} {Unk6} {Unk8})";
+        [EventPart("unk6")] public ushort Unk6 { get; private set; }
+        [EventPart("unk8")] public ushort Unk8 { get; private set; }
         public override MapEventType EventType => MapEventType.Encounter;
     }
 }

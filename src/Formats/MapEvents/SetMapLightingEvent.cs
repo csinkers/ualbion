@@ -1,15 +1,19 @@
 ﻿using System;
 using SerdesNet;
+using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
+    [Event("set_map_lighting")]
     public class SetMapLightingEvent : ModifyEvent
     {
-        public enum LightingLevel : ushort
+        SetMapLightingEvent() { }
+        public SetMapLightingEvent(LightingLevel level, byte unk2, byte unk3)
         {
-            Normal = 0,
-            NeedTorch = 1,
-            FadeFromBlack = 2
+
+            LightLevel = level;
+            Unk2 = unk2;
+            Unk3 = unk3;
         }
 
         public static SetMapLightingEvent Serdes(SetMapLightingEvent e, ISerializer s)
@@ -18,20 +22,17 @@ namespace UAlbion.Formats.MapEvents
             e ??= new SetMapLightingEvent();
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
             e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-            e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
-            e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
+            int zeroed = s.UInt8(null, 0);
+            zeroed += s.UInt8(null, 0);
             e.LightLevel = s.EnumU16(nameof(LightLevel), e.LightLevel);
-            e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+            zeroed += s.UInt16(null, 0);
+            s.Assert(zeroed == 0, "SetMapLightingEvent: Expected fields 4,5,8 to be 0");
             return e;
         }
 
-        public byte Unk2 { get; private set; }
-        public byte Unk3 { get; private set; }
-        public byte Unk4 { get; private set; }
-        public byte Unk5 { get; private set; }
-        public LightingLevel LightLevel { get; private set; }
-        public ushort Unk8 { get; private set; }
-        public override string ToString() => $"set_map_lighting {LightLevel} ({Unk2} {Unk3} {Unk4} {Unk5} {Unk8})";
-        public override ModifyType SubType => ModifyType.SetMapLighting;
+        [EventPart("level")] public LightingLevel LightLevel { get; private set; }
+        [EventPart("unk2", true, "3")] public byte Unk2 { get; private set; }
+        [EventPart("unk3", true, "0")] public byte Unk3 { get; private set; }
+        public override ModifyType SubType => ModifyType.MapLighting;
     }
 }

@@ -60,7 +60,6 @@ namespace UAlbion.Formats.MapEvents
         byte Unk5 { get; set; }
         ushort Unk8 { get; set; }
 
-        // public override string ToString() => $"action {ActionType} {Block} {Argument} {Unk2}"; // Unk2 is almost always 1
         public override MapEventType EventType => MapEventType.Action;
     }
 }

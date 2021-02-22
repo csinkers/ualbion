@@ -60,7 +60,7 @@ namespace UAlbion.Api
             .SelectMany(x =>
                 new[] { x.Value.Name }.Concat(x.Value.Aliases)
                 .Select(y => new { Name = y, Meta = x.Value }))
-            .ToDictionary(x => x.Name, x => x.Meta);
+            .ToDictionary(x => x.Name.ToUpperInvariant(), x => x.Meta);
 
         public override string ToString()
         {
@@ -144,11 +144,21 @@ namespace UAlbion.Api
             if (parts.Length == 0)
                 return null;
 
-            if (!Events.TryGetValue(parts[0], out var metadata))
+            if (!Events.TryGetValue(parts[0].ToUpperInvariant(), out var metadata))
                 return null;
 
             if (parts.Length < metadata.Parts.Count + 1)
-                parts = parts.Concat(Enumerable.Repeat("", metadata.Parts.Count + 1 - parts.Length)).ToArray();
+            {
+                var newParts = new string[metadata.Parts.Count + 1];
+                for (int i = 0; i < newParts.Length; i++)
+                {
+                    if (i < parts.Length)
+                        newParts[i] = parts[i];
+                    else
+                        newParts[i] = metadata.Parts[i - 1].Default;
+                }
+                parts = newParts;
+            }
 
             try
             {

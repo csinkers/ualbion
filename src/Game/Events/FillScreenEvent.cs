@@ -2,7 +2,7 @@
 
 namespace UAlbion.Game.Events
 {
-    [Event("fill_screen")]
+    [Event("fill_screen")] // USED IN SCRIPT
     public class FillScreenEvent : GameEvent
     {
         public FillScreenEvent(int color) { Color = color; }

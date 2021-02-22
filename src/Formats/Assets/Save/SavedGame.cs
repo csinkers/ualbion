@@ -41,7 +41,7 @@ namespace UAlbion.Formats.Assets.Save
         public ushort Unk0 { get; set; }
         public uint Unk1 { get; set; }
         public byte[] Unk9 { get; set; }
-        public byte[] Unknown16 { get; set; }
+        public byte[] Unknown15 { get; set; }
         public MiscState Misc { get; private set; } = new MiscState();
         public byte[] Unknown2C1 { get; set; }
         public byte[] Unknown5B9F { get; set; }
@@ -87,9 +87,8 @@ namespace UAlbion.Formats.Assets.Save
             save.MapId = MapId.SerdesU16(nameof(MapId), save.MapId, mapping, s);      // E
             save.PartyX = s.UInt16(nameof(PartyX), save.PartyX);   // 10
             save.PartyY = s.UInt16(nameof(PartyY), save.PartyY);   // 12
-            save.PartyDirection = s.EnumU16(nameof(PartyDirection), save.PartyDirection); // 14
-
-            save.Unknown16 = s.ByteArray(nameof(Unknown16), save.Unknown16, 0x184); // 16
+            save.PartyDirection = s.EnumU8(nameof(PartyDirection), save.PartyDirection); // 14
+            save.Unknown15 = s.ByteArray(nameof(Unknown15), save.Unknown15, 0x185); // 15
 
             save.ActiveMembers = s.List(
                 nameof(ActiveMembers),

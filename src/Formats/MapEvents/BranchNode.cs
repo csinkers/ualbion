@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using UAlbion.Api;
+using static System.FormattableString;
 
 namespace UAlbion.Formats.MapEvents
 {
     [DebuggerDisplay("{ToString()}")]
     public class BranchNode : EventNode, IBranchNode
     {
-        public BranchNode(ushort id, IMapEvent @event) : base(id, @event) { }
+        public BranchNode(ushort id, IBranchingEvent @event) : base(id, @event) { }
         public override string ToString() => ToString(0);
 
         public override string ToString(int idOffset)
@@ -17,7 +18,7 @@ namespace UAlbion.Formats.MapEvents
             var id = Id - idOffset;
             var ifTrue = (Next?.Id - idOffset)?.ToString(CultureInfo.InvariantCulture) ?? "!";
             var ifFalse = (NextIfFalse?.Id - idOffset)?.ToString(CultureInfo.InvariantCulture) ?? "!";
-            return $"!{id}?{ifTrue}:{ifFalse}: {Event}";
+            return Invariant($"!{id}?{ifTrue}:{ifFalse}: {Event}");
         }
 
         public IEventNode NextIfFalse { get; set; }

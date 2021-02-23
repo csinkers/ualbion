@@ -41,7 +41,7 @@ namespace UAlbion.Game.Entities
 
         void OnRightClick(ShowMapMenuEvent e)
         {
-            if (_npc.Chain == null || _npc.Id.IsNone)
+            if (_npc.Node == null)
                 return;
 
             var window = Resolve<IWindowManager>();
@@ -58,7 +58,7 @@ namespace UAlbion.Game.Entities
             {
                 new ContextMenuOption(
                     S(Base.SystemText.MapPopup_TalkTo),
-                    new TriggerChainEvent(_npc.Chain, _npc.Chain.FirstEvent, new EventSource(_npc.Id, TextId.None, TriggerTypes.TalkTo)),
+                    new TriggerChainEvent(_npc.ChainSource, _npc.Chain, _npc.Node, new EventSource(_npc.Id, TextId.None, TriggerTypes.TalkTo)),
                     ContextMenuGroup.Actions),
 
                 new ContextMenuOption(
@@ -72,5 +72,5 @@ namespace UAlbion.Game.Entities
             e.Propagating = false;
         }
     }
- }
+}
 

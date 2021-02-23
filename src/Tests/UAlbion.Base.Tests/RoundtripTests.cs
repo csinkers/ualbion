@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Api;
@@ -107,7 +106,7 @@ namespace UAlbion.Base.Tests
 
         static void Compare(string testName, byte[] originalBytes, byte[] roundTripBytes, string preText, string postText, string reloadText)
         {
-            ApiUtil.Assert(originalBytes.Length == roundTripBytes.Length, $"Save game size changed after round trip (delta {roundTripBytes.Length - originalBytes.Length})");
+            ApiUtil.Assert(originalBytes.Length == roundTripBytes.Length, $"Asset size changed after round trip (delta {roundTripBytes.Length - originalBytes.Length})");
             ApiUtil.Assert(originalBytes.SequenceEqual(roundTripBytes));
 
             var diffs = XDelta.Compare(originalBytes, roundTripBytes).ToArray();
@@ -198,14 +197,6 @@ namespace UAlbion.Base.Tests
         }
 
         [Fact]
-        public void AutomapGfxTest()
-        {
-            var info = new AssetInfo { AssetId = AssetId.From(AutomapTiles.Set1) };
-            RoundTripXld<AlbionSprite>(nameof(AutomapGfxTest), "$(XLD)/AUTOGFX0.XLD", 0,
-                (x, s) => AmorphousSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
-        }
-
-        [Fact]
         public void AutomapTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Automap.Jirinaar) };
@@ -230,37 +221,12 @@ namespace UAlbion.Base.Tests
         }
 
         [Fact]
-        public void CombatBgTest()
-        {
-            var info = new AssetInfo
-            {
-                AssetId = AssetId.From(CombatBackground.Toronto),
-                Width = 360
-            };
-            RoundTripXld<AlbionSprite>(nameof(CombatBgTest), "$(XLD)/COMBACK0.XLD", 0,
-                (x, s) => FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
-        }
-
-        [Fact]
         public void CommonPaletteTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Palette.CommonPalette) };
             info.Set<bool>("IsCommon", true);
             RoundTripRaw<AlbionPalette>(nameof(CommonPaletteTest), "$(XLD)/PALETTE.000",
                 (x, s) => PaletteLoader.Serdes(x, info, AssetMapping.Global, s));
-        }
-
-        [Fact]
-        public void DungeonObjectTest()
-        {
-            var info = new AssetInfo
-            {
-                AssetId = AssetId.From(DungeonObject.Krondir),
-                Width = 145,
-                Height = 165
-            };
-            RoundTripXld<AlbionSprite>(nameof(DungeonObjectTest), "$(XLD)/3DOBJEC2.XLD", 81,
-                (x, s) => FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
         [Fact]
@@ -277,27 +243,6 @@ namespace UAlbion.Base.Tests
             var info = new AssetInfo { AssetId = AssetId.From(EventText.Frill) };
             RoundTripXld<StringCollection>(nameof(EventTextTest), "$(XLD)/ENGLISH/EVNTTXT1.XLD", 11,
                 (x, s) => AlbionStringTableLoader.Serdes(x, info, AssetMapping.Global, s));
-        }
-
-        [Fact]
-        public void FontTest()
-        {
-            var info = new AssetInfo { AssetId = AssetId.From(Font.RegularFont) };
-            RoundTripXld<AlbionSprite>(nameof(FontTest), "$(XLD)/FONTS0.XLD", 0,
-                (x, s) => FontSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
-        }
-
-        [Fact]
-        public void ItemSpriteTest()
-        {
-            var info = new AssetInfo
-            {
-                AssetId = AssetId.From(ItemGraphics.ItemSprites),
-                Width = 16,
-                Height = 16
-            };
-            RoundTripRaw<AlbionSprite>(nameof(ItemSpriteTest), "$(XLD)/ITEMGFX",
-                (x, s) => FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
         [Fact]
@@ -398,14 +343,6 @@ namespace UAlbion.Base.Tests
         }
 
         [Fact]
-        public void SlabTest()
-        {
-            var info = new AssetInfo { AssetId = AssetId.From(UiBackground.Slab) };
-            RoundTripRaw<AlbionSprite>(nameof(SlabTest), "$(XLD)/SLAB",
-                (x, s) => SlabLoader.Serdes(x, info, AssetMapping.Global, s));
-        }
-
-        [Fact]
         public void SongTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Song.Toronto) };
@@ -419,19 +356,6 @@ namespace UAlbion.Base.Tests
             var info = new AssetInfo { AssetId = AssetId.From(Spell.FrostAvalanche) };
             RoundTripSpell<SpellData>(nameof(SpellTest), "$(XLD)/SPELLDAT.DAT", 7,
                 (x, s) => SpellLoader.Serdes(x, info, AssetMapping.Global, s));
-        }
-
-        [Fact]
-        public void TileGfxTest()
-        {
-            var info = new AssetInfo
-            {
-                AssetId = AssetId.From(TilesetGraphics.Toronto),
-                Width = 16,
-                Height = 16
-            };
-            RoundTripXld<AlbionSprite>(nameof(TileGfxTest), "$(XLD)/ICONGFX0.XLD", 7,
-                (x, s) => FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
         [Fact]
@@ -456,6 +380,81 @@ namespace UAlbion.Base.Tests
             var info = new AssetInfo { AssetId = AssetId.From(Special.Words1) };
             RoundTripXld<StringCollection>(nameof(WordTest), "$(XLD)/ENGLISH/WORDLIS0.XLD", 0,
                 (x, s) => WordListLoader.Serdes(x, info, AssetMapping.Global, s));
+        }
+//*
+        [Fact]
+        public void AutomapGfxTest()
+        {
+            var info = new AssetInfo { AssetId = AssetId.From(AutomapTiles.Set1) };
+            RoundTripXld<AlbionSprite>(nameof(AutomapGfxTest), "$(XLD)/AUTOGFX0.XLD", 0,
+                (x, s) => AmorphousSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
+        }
+
+        [Fact]
+        public void CombatBgTest()
+        {
+            var info = new AssetInfo
+            {
+                AssetId = AssetId.From(CombatBackground.Toronto),
+                Width = 360
+            };
+            RoundTripXld<AlbionSprite>(nameof(CombatBgTest), "$(XLD)/COMBACK0.XLD", 0,
+                (x, s) => FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
+        }
+
+        [Fact]
+        public void DungeonObjectTest()
+        {
+            var info = new AssetInfo
+            {
+                AssetId = AssetId.From(DungeonObject.Krondir),
+                Width = 145,
+                Height = 165
+            };
+            RoundTripXld<AlbionSprite>(nameof(DungeonObjectTest), "$(XLD)/3DOBJEC2.XLD", 81,
+                (x, s) => FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
+        }
+
+        [Fact]
+        public void FontTest()
+        {
+            var info = new AssetInfo { AssetId = AssetId.From(Font.RegularFont) };
+            RoundTripXld<AlbionSprite>(nameof(FontTest), "$(XLD)/FONTS0.XLD", 0,
+                (x, s) => FontSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
+        }
+
+        [Fact]
+        public void ItemSpriteTest()
+        {
+            var info = new AssetInfo
+            {
+                AssetId = AssetId.From(ItemGraphics.ItemSprites),
+                Width = 16,
+                Height = 16
+            };
+            RoundTripRaw<AlbionSprite>(nameof(ItemSpriteTest), "$(XLD)/ITEMGFX",
+                (x, s) => FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
+        }
+
+        [Fact]
+        public void SlabTest()
+        {
+            var info = new AssetInfo { AssetId = AssetId.From(UiBackground.Slab) };
+            RoundTripRaw<AlbionSprite>(nameof(SlabTest), "$(XLD)/SLAB",
+                (x, s) => SlabLoader.Serdes(x, info, AssetMapping.Global, s));
+        }
+
+        [Fact]
+        public void TileGfxTest()
+        {
+            var info = new AssetInfo
+            {
+                AssetId = AssetId.From(TilesetGraphics.Toronto),
+                Width = 16,
+                Height = 16
+            };
+            RoundTripXld<AlbionSprite>(nameof(TileGfxTest), "$(XLD)/ICONGFX0.XLD", 7,
+                (x, s) => FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
         [Fact]
@@ -599,7 +598,7 @@ namespace UAlbion.Base.Tests
             RoundTripXld<AlbionSprite>(nameof(WallTest), "$(XLD)/3DWALLS0.XLD", 11,
                 (x, s) => FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
-
+// */
         static readonly AlbionStringTableLoader AlbionStringTableLoader = new AlbionStringTableLoader();
         static readonly AmorphousSpriteLoader AmorphousSpriteLoader = new AmorphousSpriteLoader();
         static readonly AutomapLoader AutomapLoader = new AutomapLoader();

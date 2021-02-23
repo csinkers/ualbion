@@ -18,12 +18,14 @@ namespace UAlbion.Formats.Assets.Maps
         public byte Unk8 { get; set; }
         public byte Unk9 { get; set; }
         public NpcWaypoint[] Waypoints { get; set; }
-        public EventChain Chain { get; set; }
+        public MapId ChainSource { get; set; }
+        public ushort Chain { get; set; }
         public IEventNode Node { get; set; }
 
         public static MapNpc Serdes(int _, MapNpc existing, MapType mapType, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
+            s.Begin("Npc");
             var npc = existing ?? new MapNpc();
 
             byte id = (byte)npc.Id.ToDisk(mapping);
@@ -51,6 +53,7 @@ namespace UAlbion.Formats.Assets.Maps
             var assetType = (npc.Flags & NpcFlags.IsMonster) != 0 ? AssetType.MonsterGroup : AssetType.Npc;
             npc.Id = AssetId.FromDisk(assetType, id, mapping);
 
+            s.End();
             return npc;
         }
 
@@ -71,20 +74,20 @@ namespace UAlbion.Formats.Assets.Maps
                 Waypoints ??= new NpcWaypoint[0x480];
                 for (int i = 0; i < Waypoints.Length; i++)
                 {
-                    byte x = s.UInt8(null, Waypoints[i].X);
-                    byte y = s.UInt8(null, Waypoints[i].Y);
+                    byte x = s.UInt8("x", Waypoints[i].X);
+                    byte y = s.UInt8("y", Waypoints[i].Y);
                     Waypoints[i] = new NpcWaypoint(x, y);
                 }
             }
         }
 
-        public void Unswizzle(Func<ushort, (EventChain, IEventNode)> getEvent)
+        public void Unswizzle(Func<ushort, IEventNode> getEvent)
         {
             if (getEvent == null) throw new ArgumentNullException(nameof(getEvent));
             if (Node is DummyEventNode dummy)
-                (Chain, Node) = getEvent(dummy.Id);
+                Node = getEvent(dummy.Id);
         }
 
-        public override string ToString() => $"Npc{Id.Id} {Id} Obj{SpriteOrGroup} F:{Flags:x} M{Movement} Amount:{Unk8} Unk9:{Unk9} S{Sound} E{Node?.Id}";
+        public override string ToString() => $"Npc{Id.Id} {Id} O:{SpriteOrGroup} F:{Flags:x} M{Movement} Amount:{Unk8} Unk9:{Unk9} S{Sound} E{Node?.Id}";
     }
 }

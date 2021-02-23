@@ -1,5 +1,6 @@
 ﻿using System;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
@@ -29,15 +30,13 @@ namespace UAlbion.Game
             }
 
             var nodes = new EventNode[events.Count];
-            var chain = new EventChain(0);
 
             // Create, link and add all the nodes.
             for (ushort i = 0; i < events.Count;     i++) nodes[i] = new EventNode(i, events[i]);
             for (ushort i = 0; i < events.Count - 1; i++) nodes[i].Next = nodes[i + 1];
-            for (ushort i = 0; i < events.Count;     i++) chain.Events.Add(nodes[i]);
 
             var source = new EventSource(mapManager.Current.MapId, mapManager.Current.MapId.ToMapText(), TriggerTypes.Default); // TODO: Is there a better trigger type for this?
-            var trigger = new TriggerChainEvent(chain, chain.FirstEvent, source);
+            var trigger = new TriggerChainEvent(AssetId.None, 0, nodes[0], source);
             return RaiseAsync(trigger, continuation) > 0;
         }
 

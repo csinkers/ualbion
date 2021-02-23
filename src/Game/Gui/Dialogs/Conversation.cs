@@ -264,28 +264,20 @@ namespace UAlbion.Game.Gui.Dialogs
             var eventSet = _npc.EventSetId.IsNone ? null : assets.LoadEventSet(_npc.EventSetId);
             var wordSet = _npc.WordSetId.IsNone ? null : assets.LoadEventSet(_npc.WordSetId);
 
-            bool fromWordSet = false;
+            var chainSource = eventSet ?? wordSet;
             var chain = eventSet?.Chains.FirstOrDefault(x =>
-                x.FirstEvent?.Event is ActionEvent action && 
+                eventSet.Events[x].Event is ActionEvent action && 
                 action.ActionType == type && 
                 action.Block == small &&
                 action.Argument.Id == large);
 
-            if (chain == null)
-            {
-                chain = wordSet?.Chains.FirstOrDefault(x =>
-                    x.FirstEvent?.Event is ActionEvent action && action.ActionType == type &&
-                    action.Block == small && action.Argument.Id == large);
-                fromWordSet = true;
-            }
-
             if (chain != null)
             {
-                var set = fromWordSet ? wordSet.Id : eventSet.Id;
                 var triggerEvent = new TriggerChainEvent(
-                    chain,
-                    chain.FirstEvent,
-                    new EventSource(set, set.ToEventText(), TriggerTypes.Action));
+                    chainSource.Id,
+                    chain.Value,
+                    chainSource.Events[chain.Value],
+                    new EventSource(chainSource.Id, chainSource.Id.ToEventText(), TriggerTypes.Action));
 
                 RaiseAsync(triggerEvent, () => continuation?.Invoke());
                 return true;

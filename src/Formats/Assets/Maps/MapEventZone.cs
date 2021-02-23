@@ -15,7 +15,8 @@ namespace UAlbion.Formats.Assets.Maps
         public byte X { get; set; }
         public byte Y { get; set; }
         public TriggerTypes Trigger { get; set; }
-        public EventChain Chain { get; set; }
+        public AssetId ChainSource { get; set; }
+        public ushort Chain { get; set; }
         public IEventNode Node { get; set; }
 
         public MapEventZone() => Key = new ZoneKey(this);
@@ -41,14 +42,14 @@ namespace UAlbion.Formats.Assets.Maps
             return zone;
         }
 
-        public void Unswizzle(Func<ushort, (EventChain, IEventNode)> getEvent)
+        public void Unswizzle(Func<ushort, IEventNode> getEvent)
         {
             if (getEvent == null) throw new ArgumentNullException(nameof(getEvent));
             if (Node is DummyEventNode dummy)
-                (Chain, Node) = getEvent(dummy.Id);
+                Node = getEvent(dummy.Id);
         }
 
-        public override string ToString() => $"Z({X}, {Y}) T:{Trigger} Mode:{Unk1} C:{Chain?.Id} E:{Node?.Id}";
+        public override string ToString() => $"Z({X}, {Y}) T:{Trigger} Mode:{Unk1} C:{Chain} E:{Node?.Id}";
     }
 
     public readonly struct ZoneKey : IEquatable<ZoneKey>
@@ -63,7 +64,7 @@ namespace UAlbion.Formats.Assets.Maps
         public bool Global => _zone.Global;
         public byte Unk1 => _zone.Unk1;
         public TriggerTypes Trigger => _zone.Trigger;
-        public EventChain Chain => _zone.Chain;
+        public ushort Chain => _zone.Chain;
         public IEventNode Node => _zone.Node;
         public override int GetHashCode()
         {

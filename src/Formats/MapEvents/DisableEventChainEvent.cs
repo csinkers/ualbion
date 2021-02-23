@@ -1,6 +1,7 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -9,13 +10,14 @@ namespace UAlbion.Formats.MapEvents
     {
         DisableEventChainEvent() { }
 
-        public DisableEventChainEvent(byte chainNumber, byte unk2, ushort unk6)
+        public DisableEventChainEvent(AssetId chainSource, byte chainNumber, byte unk2, ushort unk6)
         {
+            ChainSource = chainSource;
             ChainNumber = chainNumber;
             Unk2 = unk2;
             Unk6 = unk6;
         }
-        public static DisableEventChainEvent Serdes(DisableEventChainEvent e, ISerializer s)
+        public static DisableEventChainEvent Serdes(DisableEventChainEvent e, AssetId chainSource, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new DisableEventChainEvent();
@@ -31,6 +33,7 @@ namespace UAlbion.Formats.MapEvents
             return e;
         }
 
+        [EventPart("chain_src")] public AssetId ChainSource { get; private set; }
         [EventPart("chain_num")] public byte ChainNumber { get; private set; }
         [EventPart("unk2")] public byte Unk2 { get; private set; } // Temp / permanent?
         [EventPart("unk6")] public ushort Unk6 { get; private set; } // varies

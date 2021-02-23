@@ -17,16 +17,15 @@ namespace UAlbion.Formats.Tests
             byte h = (byte)(region.Max(x => x.Item2) + 1);
 
             var map = new MapData2D(MapId.None, w, h);
-            var chain = new EventChain(0);
-            chain.Events.Add(new EventNode(0, new DoScriptEvent(new ScriptId(AssetType.Script))));
+            var events = new List<IEventNode> { new EventNode(0, new DoScriptEvent(new ScriptId(AssetType.Script))) };
             foreach (var (x, y) in region)
             {
                 map.Zones.Add(new MapEventZone
                 {
                     X = x,
                     Y = y,
-                    Chain = chain,
-                    Node = chain.FirstEvent,
+                    Chain = 0,
+                    Node = events[0],
                     Trigger = TriggerTypes.Default
                 });
             }

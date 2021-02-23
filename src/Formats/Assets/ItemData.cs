@@ -45,7 +45,7 @@ namespace UAlbion.Formats.Assets
         public SpriteId Icon { get; set; }
         public int IconSubId { get; set; } // 34 Image for the item
         public PlayerClasses Class { get; set; } // 36 A bitfield that controls which classes can use the item.
-        [JsonIgnore] public ushort Race { get; set; } // 38 Likely meant to control which race can use the item – but does not seem to work ?
+        public ushort Race { get; set; } // 38 Likely meant to control which race can use the item – but does not seem to work ?
         [JsonIgnore] public bool IsStackable => (Flags & ItemFlags.Stackable) != 0;
 
         public override string ToString()

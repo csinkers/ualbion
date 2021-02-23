@@ -9,6 +9,7 @@ using UAlbion.Core.Events;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
+using UAlbion.Game.State;
 
 namespace UAlbion.Game
 {
@@ -142,6 +143,10 @@ namespace UAlbion.Game
 
         bool Trigger(TriggerChainEvent e, Action continuation)
         {
+            var game = Resolve<IGameState>();
+            if (game.IsChainDisabled(e.ChainSource, e.Chain))
+                return true;
+
             var context = new EventContext(e.Source)
             {
                 Chain = e.Chain,

@@ -32,9 +32,9 @@ namespace UAlbion.Formats
             return nodeText;
         }
 
-        public string FormatChain(EventChain chain)
+        public string FormatChain(IEventNode firstEvent, string indent = null)
         {
-            if (chain == null) 
+            if (firstEvent == null) 
                 return null;
             var sb = new StringBuilder();
 
@@ -55,10 +55,14 @@ namespace UAlbion.Formats
                 }
             }
 
-            Visit(chain.FirstEvent);
+            Visit(firstEvent);
             var sorted = uniqueEvents.OrderBy(x => x.Id).ToList();
             foreach (var e in sorted)
+            {
+                if (indent != null)
+                    sb.Append(indent);
                 sb.AppendLine(Format(e, sorted[0].Id));
+            }
 
             return sb.ToString();
         }

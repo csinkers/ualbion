@@ -166,8 +166,8 @@ namespace UAlbion
             using var sw = Open(baseDir, MapInfoPath);
             for (int i = 100; i < 400; i++)
             {
-                AssetId id = AssetId.From((Base.Map)i);
-                if (dumpIds != null && !dumpIds.Contains(id))
+                MapId id = MapId.From((Base.Map)i);
+                if (dumpIds != null && !dumpIds.Contains((AssetId)id))
                     continue;
 
                 IMapData map = assets.LoadMap(id);
@@ -245,26 +245,9 @@ namespace UAlbion
                     }
 
                     sw.WriteLine();
-
-                    if (npc.Chain != null)
-                    {
-                        // var context = new EventContext(new EventSource.Map((MapDataId)i, TriggerType.Default, 0, 0));
-                        sw.WriteLine($"        EventChain: {npc.Chain?.Id}");
-                        foreach (var e in npc.Chain.Events)
-                        {
-                            if (e.Event is TextEvent textEvent)
-                            {
-                                var textSource = tf.Format(textEvent.ToId());
-                                var text = string.Join(", ", textSource.GetBlocks().Select(x => x.Text));
-                                sw.WriteLine($"        {e} = {text}");
-                            }
-                            else
-                            {
-                                sw.Write("        ");
-                                sw.WriteLine(e.ToString());
-                            }
-                        }
-                    }
+                    sw.WriteLine($"        EventChain: {npc.Chain}");
+                    var formatter = new EventFormatter(assets.LoadString, id.ToMapText());
+                    sw.WriteLine(formatter.FormatChain(npc.Node, "          "));
                 }
             }
         }
@@ -328,11 +311,10 @@ namespace UAlbion
             sw.WriteLine($"    WordSetId:{c.WordSetId}");
 
             var eventSet = assets.LoadEventSet(c.EventSetId);
-            sw.WriteLine($"    Event Set {c.EventSetId}: {(eventSet == null ? "Not Found" : $"{eventSet.Chains.Count} chains")}");
+            sw.WriteLine($"    Event Set {c.EventSetId}: {(eventSet == null ? "Not Found" : $"{eventSet.Chains.Length} chains")}");
             if (eventSet != null)
             {
-                sw.WriteLine("    Chain Offsets: " +
-                             string.Join(", ", eventSet.Chains.Select((x, i) => $"{i}:{x.Id}")));
+                sw.WriteLine("    Chain Offsets: " + string.Join(", ", eventSet.Chains.Select((x, i) => $"{i}:{x}")));
                 foreach (var e in eventSet.Events)
                 {
                     if (e.Event is TextEvent textEvent)
@@ -510,7 +492,7 @@ namespace UAlbion
             sw.WriteLine($"Map {mapId.Id} {mapId}:");
             foreach (var e in map.Events)
             {
-                var chainId = map.Chains.Select((x, i) => x.FirstEvent == e ? i : (int?) null).FirstOrDefault(x => x != null);
+                var chainId = map.Chains.Select((x, i) => x == e.Id ? i : (int?)null).FirstOrDefault(x => x != null);
                 PrintEvent(sw, formatter, e, chainId);
             }
 
@@ -559,7 +541,7 @@ namespace UAlbion
                 var formatter = new EventFormatter(assets.LoadString, ((EventSetId)eventSetId).ToEventText());
                 foreach (var e in set.Events)
                 {
-                    var chainId = set.Chains.Select((x, i) => x.FirstEvent == e ? i : (int?) null).FirstOrDefault(x => x != null);
+                    var chainId = set.Chains.Select((x, i) => x == e.Id ? i : (int?)null).FirstOrDefault(x => x != null);
                     PrintEvent(sw, formatter, e, chainId);
                 }
             }

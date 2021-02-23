@@ -36,7 +36,6 @@ namespace UAlbion.Game.Entities.Map2D
             On<SlowClockEvent>(e => FireEventChains(TriggerTypes.EveryStep, false));
             On<HourElapsedEvent>(e => FireEventChains(TriggerTypes.EveryHour, true));
             On<DayElapsedEvent>(e => FireEventChains(TriggerTypes.EveryDay, true));
-            On<DisableEventChainEvent>(e => _logicalMap.DisableChain(e.ChainNumber));
             On<PartyChangedEvent>(e => RebuildPartyMembers());
             // On<UnloadMapEvent>(e => Unload());
 
@@ -67,6 +66,9 @@ namespace UAlbion.Game.Entities.Map2D
 
             foreach (var npc in _logicalMap.Npcs)
             {
+                if (npc.SpriteOrGroup.IsNone)
+                    continue;
+
                 AttachChild(_logicalMap.UseSmallSprites
                     ? new SmallNpc(npc) as IComponent
                     : new LargeNpc(npc));
@@ -106,8 +108,7 @@ namespace UAlbion.Game.Entities.Map2D
                 Raise(new SetLogLevelEvent(LogEvent.Level.Warning));
 
             foreach (var zone in zones)
-                if (zone.Chain.Enabled)
-                    Raise(new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), type, zone.X, zone.Y)));
+                Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), type, zone.X, zone.Y)));
 
             if (!log)
                 Raise(new SetLogLevelEvent(LogEvent.Level.Info));
@@ -122,13 +123,12 @@ namespace UAlbion.Game.Entities.Map2D
                 if (zone == null || !zone.Trigger.HasFlag(TriggerTypes.Npc))
                     return;
 
-                if (!(zone.Chain.FirstEvent.Event is OffsetEvent offset))
+                if (!(zone.Node.Event is OffsetEvent offset))
                     break;
                 e = new NpcEnteredTileEvent(e.Id, e.X + offset.X, e.Y + offset.Y);
             }
 
-            if (zone.Chain.Enabled)
-                Raise(new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Npc, e.X, e.Y)));
+            Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Npc, e.X, e.Y)));
         }
 
         void OnPlayerEnteredTile(PlayerEnteredTileEvent e)
@@ -137,16 +137,15 @@ namespace UAlbion.Game.Entities.Map2D
             while (true)
             {
                 zone = _logicalMap.GetZone(e.X, e.Y);
-                if (zone?.Chain?.FirstEvent == null || !zone.Trigger.HasFlag(TriggerTypes.Normal))
+                if (zone?.Node == null || !zone.Trigger.HasFlag(TriggerTypes.Normal))
                     return;
 
-                if (!(zone.Chain.FirstEvent.Event is OffsetEvent offset))
+                if (!(zone.Node.Event is OffsetEvent offset))
                     break;
                 e = new PlayerEnteredTileEvent(e.X + offset.X, e.Y + offset.Y);
             }
 
-            if (zone.Chain.Enabled)
-                Raise(new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Normal, e.X, e.Y)));
+            Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Normal, e.X, e.Y)));
         }
 
         void ChangeIcon(ChangeIconEvent e)

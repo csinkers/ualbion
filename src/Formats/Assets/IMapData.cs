@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.MapEvents;
 
@@ -16,10 +15,9 @@ namespace UAlbion.Formats.Assets
 
         IDictionary<int, MapNpc> Npcs { get; }
         IList<EventNode> Events { get; }
-        IList<EventChain> Chains { get; }
+        IList<ushort> Chains { get; }
         IList<MapEventZone> Zones { get; }
         IDictionary<int, MapEventZone> ZoneLookup { get; }
         IDictionary<TriggerTypes, MapEventZone[]> ZoneTypeLookup { get; }
-        void AttachEventSets(Func<NpcId, ICharacterSheet> characterSheetLoader, Func<EventSetId, EventSet> eventSetLoader);
     }
 }

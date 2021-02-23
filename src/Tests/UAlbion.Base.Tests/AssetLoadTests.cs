@@ -174,9 +174,8 @@ namespace UAlbion.Base.Tests
         public void EventSetTest()
         {
             var set = Test(assets => assets.LoadEventSet(EventSet.Frill));
-            Assert.Equal(10, set.Chains.Count);
-            var c = set.Chains[0];
-            Assert.Collection(c.Events,
+            Assert.Equal(10, set.Chains.Length);
+            Assert.Collection(set.Events.Take(7),
                 x =>
                 {
                     Assert.Equal(0, x.Id);
@@ -395,14 +394,14 @@ namespace UAlbion.Base.Tests
             Assert.Equal(-3, e.Y);
             Assert.Equal(302, e.Value);
 
-            Assert.Equal(148, map.Chains.Count);
+            Assert.Equal(250, map.Chains.Count);
 
-            Assert.Equal(24, map.Npcs.Count);
+            Assert.Equal(96, map.Npcs.Count);
             var n = map.Npcs[2];
             Assert.Equal(AssetId.From(Npc.Christine), n.Id);
             Assert.Equal(AssetId.From(LargeNpc.Christine), n.SpriteOrGroup);
             Assert.Equal(NpcFlags.Wander | NpcFlags.Unk3, n.Flags);
-            Assert.Null(n.Chain);
+            Assert.Equal(0xffff, n.Chain);
             Assert.Equal(NpcMovementTypes.None, n.Movement);
             Assert.Equal(1, n.Unk8);
             Assert.Equal(0, n.Unk9);
@@ -410,7 +409,7 @@ namespace UAlbion.Base.Tests
 
             Assert.Equal(3768, map.Zones.Count);
             var z = map.Zones[0];
-            Assert.Equal(24, z.Chain.Id);
+            Assert.Equal(24, z.Chain);
             Assert.True(z.Global);
             Assert.Equal(TriggerTypes.MapInit, z.Trigger);
             Assert.Equal(0, z.Unk1);
@@ -454,9 +453,9 @@ namespace UAlbion.Base.Tests
             Assert.Equal(0, e.Unk3);
             Assert.Equal(SampleId.None, e.SoundId);
 
-            Assert.Equal(62, map.Chains.Count);
+            Assert.Equal(64, map.Chains.Count);
 
-            Assert.Equal(30, map.Npcs.Count);
+            Assert.Equal(96, map.Npcs.Count);
             var n = map.Npcs[2];
             Assert.Equal(AssetId.From(MonsterGroup.Unknown1), n.Id);
             Assert.Equal(new AssetId(AssetType.ObjectGroup, 68), n.SpriteOrGroup);
@@ -464,7 +463,7 @@ namespace UAlbion.Base.Tests
                          | NpcFlags.IsMonster
                          | NpcFlags.Unk4
                          | NpcFlags.Unk5, n.Flags);
-            Assert.Equal(23, n.Chain.Id);
+            Assert.Equal(23, n.Chain);
             Assert.Equal(NpcMovementTypes.Random1, n.Movement);
             Assert.Equal(3, n.Unk8);
             Assert.Equal(0, n.Unk9);
@@ -477,7 +476,7 @@ namespace UAlbion.Base.Tests
 
             Assert.Equal(355, map.Zones.Count);
             var z = map.Zones[6];
-            Assert.Equal(15, z.Chain.Id);
+            Assert.Equal(15, z.Chain);
             Assert.False(z.Global);
             Assert.Equal(TriggerTypes.Normal | TriggerTypes.Examine | TriggerTypes.UseItem, z.Trigger);
             Assert.Equal(0, z.Unk1);

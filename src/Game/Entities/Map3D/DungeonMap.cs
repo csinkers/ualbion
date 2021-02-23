@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.Assets;
@@ -86,6 +87,15 @@ namespace UAlbion.Game.Entities.Map3D
 
             foreach (var npc in _mapData.Npcs.Values)
             {
+                if (npc.SpriteOrGroup.IsNone)
+                    continue;
+
+                if(npc.SpriteOrGroup.Type != AssetType.ObjectGroup)
+                {
+                    CoreUtil.LogWarn($"[3DMap] Tried to load npc with object group of incorrect type: {npc.SpriteOrGroup}");
+                    continue;
+                }
+
                 if (npc.SpriteOrGroup.Id >= _labyrinthData.ObjectGroups.Count)
                 {
                     CoreUtil.LogWarn($"[3DMap] Tried to load object group {npc.SpriteOrGroup.Id}, but the max group id is {_labyrinthData.ObjectGroups.Count-1}.");
@@ -135,7 +145,7 @@ namespace UAlbion.Game.Entities.Map3D
                 Raise(new SetLogLevelEvent(LogEvent.Level.Warning));
 
             foreach (var zone in zones)
-                Raise(new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), type, zone.X, zone.Y)));
+                Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), type, zone.X, zone.Y)));
 
             if (!log)
                 Raise(new SetLogLevelEvent(LogEvent.Level.Info));

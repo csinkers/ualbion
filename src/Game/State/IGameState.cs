@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 
@@ -20,5 +21,6 @@ namespace UAlbion.Game.State
         MapChangeCollection PermanentMapChanges { get; }
         ActiveItems ActiveItems { get; }
         IList<NpcState> Npcs { get; }
+        bool IsChainDisabled(AssetId chainSource, ushort chain);
     }
 }

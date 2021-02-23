@@ -18,14 +18,14 @@ namespace UAlbion.Formats.Assets.Maps
         public PaletteId PaletteId { get; protected set; }
         public SpriteId CombatBackgroundId { get; protected set; }
 
+        public byte OriginalNpcCount { get; protected set; }
         public IDictionary<int, MapNpc> Npcs { get; } = new Dictionary<int, MapNpc>();
 
         public IList<MapEventZone> Zones { get; } = new List<MapEventZone>();
         [JsonIgnore] public IDictionary<int, MapEventZone> ZoneLookup { get; } = new Dictionary<int, MapEventZone>();
         [JsonIgnore] public IDictionary<TriggerTypes, MapEventZone[]> ZoneTypeLookup { get; } = new Dictionary<TriggerTypes, MapEventZone[]>();
         public IList<EventNode> Events { get; } = new List<EventNode>();
-        public IList<EventChain> Chains { get; } = new List<EventChain>();
-        [JsonIgnore] public (EventChain, IEventNode)[] ChainsByEventId { get; private set; }
+        public IList<ushort> Chains { get; } = new List<ushort>();
 #if DEBUG
         [JsonIgnore] public IList<object>[] EventReferences { get; private set; }
 #endif
@@ -60,7 +60,7 @@ namespace UAlbion.Formats.Assets.Maps
                     Events[i].Id = i;
 
             s.List(nameof(Events), Events, eventCount, (i, x, serializer) 
-                => EventNode.Serdes((ushort)i, x, serializer, Id.ToMapText(), mapping));
+                => EventNode.Serdes((ushort)i, x, serializer, Id, Id.ToMapText(), mapping));
 
             foreach (var node in Events)
                 node.Unswizzle(Events);
@@ -71,14 +71,15 @@ namespace UAlbion.Formats.Assets.Maps
         protected void SerdesChains(ISerializer s, int chainCount)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
+            s.List(nameof(Chains), Chains, chainCount, (_, x, s2) => s2.UInt16(null, x));
+            /*
             var chainOffsets = Chains.Select(x => x.Events[0].Id).ToList();
             for(int i = 0; i < chainCount; i++)
             {
                 if(s.IsReading())
                 {
                     var eventId = s.UInt16(null, 0);
-                    if(eventId != 0xffff)
-                        chainOffsets.Add(eventId);
+                    chainOffsets.Add(eventId);
                 }
                 else
                 {
@@ -106,9 +107,10 @@ namespace UAlbion.Formats.Assets.Maps
 
                     Chains.Add(chain);
                 }
-            }
+            } */
 
             s.Check();
+            s.End();
         }
 
         protected void Unswizzle() // Resolve event indices to pointers
@@ -117,10 +119,10 @@ namespace UAlbion.Formats.Assets.Maps
             // Note: Event set loading requires IAssetManager, so can't be done directly by UAlbion.Formats code.
             // Instead, the MapManager will call AttachEventSets with a callback to load the event sets.
             foreach (var npc in Npcs.Values)
-                npc.Unswizzle(x => ChainsByEventId[x]);
+                npc.Unswizzle(x => Events[x]);
 
             foreach (var zone in Zones)
-                zone.Unswizzle(x => ChainsByEventId[x]);
+                zone.Unswizzle(x => Events[x]);
 
             foreach (var position in Zones.Where(x => !x.Global).GroupBy(x => x.Y * Width + x.X))
             {
@@ -163,30 +165,15 @@ namespace UAlbion.Formats.Assets.Maps
 
         protected void SerdesNpcWaypoints(ISerializer s)
         {
-            foreach (var npc in Npcs.OrderBy(x => x.Key).Select(x => x.Value))
+            foreach (var kvp in Npcs.OrderBy(x => x.Key))
             {
+                var npc = kvp.Value;
+                s.Begin("NpcWaypoints" + kvp.Key);
                 if (npc.Id.Type != AssetType.None)
                     npc.LoadWaypoints(s);
                 else 
                     npc.Waypoints = new NpcWaypoint[1];
-            }
-        }
-
-        public void AttachEventSets(Func<NpcId, ICharacterSheet> characterSheetLoader, Func<EventSetId, EventSet> eventSetLoader)
-        {
-            // Wire up event sets for NPCs that don't have map-specific events.
-            foreach (var npc in Npcs.Values)
-            {
-                if (npc.Id.Type == AssetType.None)
-                    continue;
-
-                if (npc.Chain == null)
-                {
-                    var chain = new EventChain(-1);
-                    if (npc.Id.Type == AssetType.Npc)
-                        chain.Events.Add(new EventNode(0, new StartDialogueEvent(npc.Id)));
-                    npc.Chain = chain;
-                }
+                s.End();
             }
         }
 

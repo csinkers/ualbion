@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
     {
         public const int MaxSubObjectCount = 8;
         public ushort AutoGraphicsId { get; set; }
-        public SubObject[] SubObjects { get; } = new SubObject[MaxSubObjectCount];
+        public SubObject[] SubObjects { get; private set; } = new SubObject[MaxSubObjectCount]; // Need private setter for JSON deserialisation
 
         public override string ToString() =>
             $"Obj: AG{AutoGraphicsId} [ {string.Join("; ", SubObjects.Select(x => x.ToString()))} ]";

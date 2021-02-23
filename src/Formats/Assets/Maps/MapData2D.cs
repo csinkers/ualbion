@@ -47,7 +47,8 @@ namespace UAlbion.Formats.Assets.Maps
             var startOffset = s.Offset;
             var map = existing ?? new MapData2D(info.AssetId);
             map.Flags = s.EnumU8(nameof(Flags), map.Flags); // 0
-            int npcCount = s.Transform("NpcCount", map.Npcs.Count, S.UInt8, NpcCountTransform.Instance); // 1
+            map.OriginalNpcCount = s.UInt8(nameof(OriginalNpcCount), map.OriginalNpcCount); // 1
+            int npcCount = NpcCountTransform.Instance.FromNumeric(map.OriginalNpcCount);
             var _ = s.UInt8("MapType", (byte)map.MapType); // 2 (always Map2D to start with, may shift to outdoors once we assign the tileset)
 
             map.SongId = SongId.SerdesU8(nameof(SongId), map.SongId, mapping, s); // 3
@@ -58,14 +59,14 @@ namespace UAlbion.Formats.Assets.Maps
             map.PaletteId = PaletteId.SerdesU8(nameof(PaletteId), map.PaletteId, mapping, s);
             map.FrameRate = s.UInt8(nameof(FrameRate), map.FrameRate); //9
 
+            s.Begin("NPCs");
             for (int i = 0; i < npcCount; i++)
             {
                 map.Npcs.TryGetValue(i, out var npc);
-                npc = MapNpc.Serdes(i, npc, map.MapType, mapping, s);
-                if (!npc.SpriteOrGroup.IsNone || !npc.Id.IsNone)
-                    map.Npcs[i] = npc;
+                map.Npcs[i] = MapNpc.Serdes(i, npc, map.MapType, mapping, s);
             }
             s.Check();
+            s.End();
 
             if (s.IsReading())
                 map.RawLayout = s.ByteArray("Layout", null, 3 * map.Width * map.Height);

@@ -26,7 +26,8 @@ namespace UAlbion.Formats.Assets.Maps
 
             var map = existing ?? new MapData3D(info.AssetId);
             map.Flags = s.EnumU8(nameof(Flags), map.Flags); // 0
-            int npcCount = s.Transform("NpcCount", map.Npcs.Count, S.UInt8, NpcCountTransform.Instance); // 1
+            map.OriginalNpcCount = s.UInt8(nameof(OriginalNpcCount), map.OriginalNpcCount); // 1
+            int npcCount = NpcCountTransform.Instance.FromNumeric(map.OriginalNpcCount);
             var _ = s.UInt8("MapType", (byte)map.MapType); // 2
 
             map.SongId = SongId.SerdesU8(nameof(SongId), map.SongId, mapping, s); // 3
@@ -37,14 +38,14 @@ namespace UAlbion.Formats.Assets.Maps
             map.PaletteId = PaletteId.SerdesU8(nameof(PaletteId), map.PaletteId, mapping, s);
             map.AmbientSongId = SongId.SerdesU8(nameof(AmbientSongId), map.AmbientSongId, mapping, s);
 
+            s.Begin("NPCs");
             for (int i = 0; i < npcCount; i++)
             {
                 map.Npcs.TryGetValue(i, out var npc);
-                npc = MapNpc.Serdes(i, npc, MapType.ThreeD, mapping, s);
-                if (!npc.Id.IsNone)
-                    map.Npcs[i] = npc;
+                map.Npcs[i] = MapNpc.Serdes(i, npc, MapType.ThreeD, mapping, s);
             }
             s.Check();
+            s.End();
 
             map.Contents ??= new byte[map.Width * map.Height];
             map.Floors   ??= new byte[map.Width * map.Height];

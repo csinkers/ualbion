@@ -26,7 +26,7 @@ namespace UAlbion.Formats.Parsers
                 var strings = new List<string>();
                 while (!s.IsComplete())
                     strings.Add(s.FixedLengthString(null, null, WordLength));
-                return new StringCollection(strings.ToArray());
+                return new StringCollection(strings);
             }
             else
             {

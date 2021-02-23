@@ -52,6 +52,7 @@ namespace UAlbion.Formats.Assets.Save
         public MapChangeCollection TemporaryMapChanges { get; private set; } = new MapChangeCollection();
         public IList<VisitedEvent> VisitedEvents { get; private set; } = new List<VisitedEvent>();
         public IList<PartyMemberId> ActiveMembers { get; private set; } = new PartyMemberId[MaxPartySize];
+        public ISet<(AssetId, ushort)> DisabledChains { get; } = new HashSet<(AssetId, ushort)>();
 
         public static string GetName(BinaryReader br)
         {

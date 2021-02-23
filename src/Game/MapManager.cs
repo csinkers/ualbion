@@ -82,10 +82,6 @@ namespace UAlbion.Game
             if (mapData == null)
                 return null;
 
-            mapData.AttachEventSets(
-                x => game.GetSheet(x),
-                x => assets.LoadEventSet(x));
-
             return mapData switch
             {
                 MapData2D map2d => new Entities.Map2D.FlatMap(mapId, map2d),

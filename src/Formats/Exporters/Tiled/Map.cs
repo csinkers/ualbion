@@ -164,14 +164,14 @@ namespace UAlbion.Formats.Exporters.Tiled
                 select new MapObject
                 {
                     Id = nextId++,
-                    Name = $"C{r.Item1.Chain.Id} {r.Item1.Trigger}",
+                    Name = $"C{r.Item1.Chain} {r.Item1.Trigger}",
                     Type = "Trigger",
                     X = r.Item2.OffsetX * properties.TileWidth,
                     Y = r.Item2.OffsetY * properties.TileHeight,
                     Polygon = new Polygon(r.Item2.Points, properties.TileWidth, properties.TileHeight),
                     Properties = new List<ObjectProperty>
                     {
-                        new ObjectProperty("Script", eventFormatter.FormatChain(r.Item1.Chain)),
+                        new ObjectProperty("Script", eventFormatter.FormatChain(r.Item1.Node)),
                         new ObjectProperty("Trigger", r.Item1.Trigger.ToString()),
                         new ObjectProperty("Unk1", r.Item1.Unk1.ToString(CultureInfo.InvariantCulture)),
                     }
@@ -238,7 +238,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             };
 
             if (!npc.Id.IsNone) objProps.Add(new ObjectProperty("Id", npc.Id.ToString()));
-            if (npc.Chain != null) objProps.Add(new ObjectProperty("Script", eventFormatter.FormatChain(npc.Chain)));
+            if (npc.Node != null) objProps.Add(new ObjectProperty("Script", eventFormatter.FormatChain(npc.Node)));
             if (npc.Sound > 0)
                 objProps.Add(new ObjectProperty("Sound", npc.Sound.ToString(CultureInfo.InvariantCulture)));
             // TODO: Path

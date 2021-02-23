@@ -204,8 +204,9 @@ namespace UAlbion.Game.Entities.Map2D
             }
             else
             {
-                zone.Chain = _mapData.Chains[value];
-                zone.Node = zone.Chain.Events.First();
+                zone.ChainSource = _mapData.Id;
+                zone.Chain = value;
+                zone.Node = _mapData.Events[_mapData.Chains[value]];
             }
         }
 
@@ -216,12 +217,6 @@ namespace UAlbion.Game.Entities.Map2D
                 zone.Trigger = (TriggerTypes)value;
         }
 
-        public void DisableChain(byte chainNumber)
-        {
-            var chain = _mapData.Chains[chainNumber];
-            chain.Enabled = false;
-            // TODO: Save in temp/perm changes
-        }
     }
 
     public class DirtyTileEventArgs : EventArgs

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
@@ -72,8 +73,9 @@ namespace UAlbion.Game.Entities.Map2D
             var chain = zone?.Chain;
             if (chain != null)
             {
-                foreach (var zoneEvent in chain.Events)
-                    continuation(new Selection(e.Origin, e.Direction, t, zoneEvent));
+                var assets = Resolve<IAssetManager>();
+                var ef = new EventFormatter(assets.LoadString, _map.Id.ToMapText());
+                continuation(new Selection(e.Origin, e.Direction, t, ef.FormatChain(zone.Node)));
             }
 
             if (_lastHighlightIndex != highlightIndex)
@@ -107,7 +109,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(Base.SystemText.MapPopup_Examine),
-                        new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.Examine, x, y)),
+                        new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.Examine, x, y)),
                         ContextMenuGroup.Actions));
                 }
 
@@ -115,7 +117,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(Base.SystemText.MapPopup_Manipulate),
-                        new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.Manipulate, x, y)),
+                        new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.Manipulate, x, y)),
                         ContextMenuGroup.Actions));
                 }
 
@@ -123,7 +125,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(Base.SystemText.MapPopup_Take),
-                        new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.Take, x, y)),
+                        new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.Take, x, y)),
                         ContextMenuGroup.Actions));
                 }
 
@@ -131,7 +133,7 @@ namespace UAlbion.Game.Entities.Map2D
                 {
                     options.Add(new ContextMenuOption(
                         S(Base.SystemText.MapPopup_TalkTo),
-                        new TriggerChainEvent(zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.TalkTo, x, y)),
+                        new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.TalkTo, x, y)),
                         ContextMenuGroup.Actions));
                 }
             }

@@ -1,5 +1,5 @@
 ﻿using System;
-using UAlbion.Formats.Assets;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.MapEvents
 {
@@ -7,7 +7,8 @@ namespace UAlbion.Formats.MapEvents
     {
         IEventNode _node;
         public EventContext(EventSource source) => Source = source;
-        public EventChain Chain { get; set; }
+        public AssetId ChainSource { get; set; }
+        public ushort Chain { get; set; }
         public IEventNode Node { get => _node; set { LastNode = _node; _node = value; } }
         public IEventNode LastNode { get; set; }
         public EventSource Source { get; }

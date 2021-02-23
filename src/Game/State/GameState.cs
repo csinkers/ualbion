@@ -28,6 +28,8 @@ namespace UAlbion.Game.State
         public MapChangeCollection PermanentMapChanges => _game.PermanentMapChanges;
         public ActiveItems ActiveItems => _game.Misc.ActiveItems;
         public IList<NpcState> Npcs => _game.Npcs;
+        public bool IsChainDisabled(AssetId chainSource, ushort chain) => _game.DisabledChains.Contains((chainSource, chain));
+
         public MapId MapId => _game.MapId;
 
         public GameState()
@@ -62,6 +64,10 @@ namespace UAlbion.Game.State
             });
             On<ChangeTimeEvent>(e => { });
             On<ActivateItemEvent>(ActivateItem);
+            On<DisableEventChainEvent>(e =>
+            {
+                _game.DisabledChains.Add((e.ChainSource, (ushort) e.ChainNumber));
+            });
 
             AttachChild(new InventoryManager(GetWriteableInventory));
         }

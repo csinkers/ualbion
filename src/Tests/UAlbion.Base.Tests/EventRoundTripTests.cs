@@ -67,7 +67,7 @@ namespace UAlbion.Base.Tests
             using var ms = new MemoryStream();
             using var bw = new BinaryWriter(ms);
             using var s = new AlbionWriter(bw);
-            MapEvent.Serdes(e, s, TextId.None, AssetMapping.Global);
+            MapEvent.Serdes(e, s, EventSetId.None, TextId.None, AssetMapping.Global);
             bw.Flush();
             ms.Position = 0;
             return ms.ToArray();
@@ -78,7 +78,7 @@ namespace UAlbion.Base.Tests
             using var ms = new MemoryStream(bytes);
             using var br = new BinaryReader(ms);
             using var s = new AlbionReader(br);
-            return MapEvent.Serdes(null, s, TextId.None, AssetMapping.Global);
+            return MapEvent.Serdes(null, s, EventSetId.None, TextId.None, AssetMapping.Global);
         }
 
         static string Test(string scriptFormat, string expectedToStringResult, IMapEvent e)
@@ -318,12 +318,12 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void DisableEventChain()
         {
-            Test(@"disable_event_chain 0 1 0
-disable_event_chain 0 1 1
-disable_event_chain 1 0 0
-disable_event_chain 1 0 1
-disable_event_chain 1 1 0
-disable_event_chain 1 1 1");
+            Test(@"disable_event_chain None 0 1 0
+disable_event_chain None 0 1 1
+disable_event_chain None 1 0 0
+disable_event_chain None 1 0 1
+disable_event_chain None 1 1 0
+disable_event_chain None 1 1 1");
         }
 
         [Fact]

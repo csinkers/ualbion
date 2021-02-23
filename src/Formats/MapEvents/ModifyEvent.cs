@@ -7,14 +7,14 @@ namespace UAlbion.Formats.MapEvents
 {
     public abstract class ModifyEvent : MapEvent
     {
-        public static ModifyEvent BaseSerdes(ModifyEvent genericEvent, AssetMapping mapping, ISerializer s)
+        public static ModifyEvent BaseSerdes(ModifyEvent genericEvent, AssetMapping mapping, AssetId eventSource, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             var subType = s.EnumU8("SubType", genericEvent?.SubType ?? ModifyType.Unk2);
             return subType switch
             {
                 ModifyType.Switch => SwitchEvent.Serdes((SwitchEvent)genericEvent, mapping, s),
-                ModifyType.DisableEventChain => DisableEventChainEvent.Serdes((DisableEventChainEvent)genericEvent, s),
+                ModifyType.DisableEventChain => DisableEventChainEvent.Serdes((DisableEventChainEvent)genericEvent, eventSource, s),
                 ModifyType.NpcActive => NpcActiveEvent.Serdes((NpcActiveEvent)genericEvent, s),
                 ModifyType.AddPartyMember => AddPartyMemberEvent.Serdes((AddPartyMemberEvent)genericEvent, mapping, s),
                 ModifyType.InventoryItem => AddRemoveInventoryItemEvent.Serdes((AddRemoveInventoryItemEvent)genericEvent, mapping, s),

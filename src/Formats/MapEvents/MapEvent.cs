@@ -9,7 +9,7 @@ namespace UAlbion.Formats.MapEvents
     public abstract class MapEvent : Event, IMapEvent
     {
         public abstract MapEventType EventType { get; }
-        public static IMapEvent Serdes(IMapEvent e, ISerializer s, TextId textSourceId, AssetMapping mapping)
+        public static IMapEvent Serdes(IMapEvent e, ISerializer s, AssetId chainSource, TextId textSourceId, AssetMapping mapping)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             var initialPosition = s.Offset;
@@ -30,7 +30,7 @@ namespace UAlbion.Formats.MapEvents
                 MapEventType.EndDialogue => EndDialogueEvent.Serdes((EndDialogueEvent)e, s),
                 MapEventType.Execute => ExecuteEvent.Serdes((ExecuteEvent)e, s),
                 MapEventType.MapExit => TeleportEvent.Serdes((TeleportEvent)e, mapping, s),
-                MapEventType.Modify => ModifyEvent.BaseSerdes((ModifyEvent)e, mapping, s),
+                MapEventType.Modify => ModifyEvent.BaseSerdes((ModifyEvent)e, mapping, chainSource, s),
                 MapEventType.Offset => OffsetEvent.Serdes((OffsetEvent)e, s),
                 MapEventType.Pause => PauseEvent.Serdes((PauseEvent)e, s),
                 MapEventType.PlaceAction => PlaceActionEvent.Serdes((PlaceActionEvent)e, s),

@@ -25,13 +25,18 @@ namespace UAlbion.Formats.Parsers
             }
             else
             {
-                var stringCount = s.UInt16("StringCount", 0);
+                if (existing == null) throw new ArgumentNullException(nameof(existing));
+                var stringCount = s.UInt16("StringCount", (ushort)existing.Count);
                 var byteArrays = existing.Select(FormatUtil.BytesFrom850String).ToArray();
                 for (int i = 0; i < stringCount; i++)
-                    s.UInt16(null, (ushort)byteArrays[i].Length);
+                    s.UInt16(null, (ushort)(byteArrays[i].Length + 1));
 
                 for (int i = 0; i < stringCount; i++)
+                {
                     s.ByteArray(null, byteArrays[i], byteArrays[i].Length);
+                    s.UInt8(null, 0);
+                }
+
                 return existing;
             }
         }

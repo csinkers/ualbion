@@ -9,21 +9,18 @@ namespace UAlbion.Formats.Assets
 {
     public class EventSet
     {
-        EventNode[] _events;
-
         public EventSetId Id { get; private set; }
         public ushort[] Chains { get; private set; }
-
-        [JsonIgnore] public EventNode[] Events => _events;
+        [JsonIgnore] public EventNode[] Events { get; private set; }
 
         public string[] EventStrings // Used for JSON
         {
-            get => _events?.Select(x => x.ToString()).ToArray();
+            get => Events?.Select(x => x.ToString()).ToArray();
             set
             {
-                _events = value?.Select(EventNode.Parse).ToArray() ?? Array.Empty<EventNode>();
-                foreach (var e in _events)
-                    e.Unswizzle(_events);
+                Events = value?.Select(EventNode.Parse).ToArray() ?? Array.Empty<EventNode>();
+                foreach (var e in Events)
+                    e.Unswizzle(Events);
             }
         }
 
@@ -33,21 +30,21 @@ namespace UAlbion.Formats.Assets
             set ??= new EventSet { Id = id };
             var chains = set.Chains;
             ushort chainCount = s.UInt16("ChainCount", (ushort)(chains?.Length ?? 0));
-            ushort eventCount = s.UInt16("TotalEventCount", (ushort)(set._events?.Length ?? 0));
+            ushort eventCount = s.UInt16("TotalEventCount", (ushort)(set.Events?.Length ?? 0));
 
             chains ??= new ushort[chainCount];
-            set._events ??= new EventNode[eventCount];
+            set.Events ??= new EventNode[eventCount];
 
             for (int i = 0; i < chainCount; i++)
                 chains[i] = s.UInt16(null, chains[i]);
 
             set.Chains = chains;
 
-            for (ushort i = 0; i < set._events.Length; i++)
-                set._events[i] = EventNode.Serdes(i, set._events[i], s, id, id.ToEventText(), mapping);
+            for (ushort i = 0; i < set.Events.Length; i++)
+                set.Events[i] = EventNode.Serdes(i, set.Events[i], s, id, id.ToEventText(), mapping);
 
-            foreach (var e in set._events)
-                e.Unswizzle(set._events);
+            foreach (var e in set.Events)
+                e.Unswizzle(set.Events);
 
             return set;
         }

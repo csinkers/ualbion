@@ -10,27 +10,34 @@ namespace UAlbion.Formats.Assets.Maps
 {
     public abstract class BaseMapData : IMapData
     {
-        public MapId Id { get; }
+        public MapId Id { get; protected set; }
         public abstract MapType MapType { get; }
         public byte Width { get; protected set; }
         public byte Height { get; protected set; }
         public SongId SongId { get; protected set; }
         public PaletteId PaletteId { get; protected set; }
         public SpriteId CombatBackgroundId { get; protected set; }
-
         public byte OriginalNpcCount { get; protected set; }
-        public IDictionary<int, MapNpc> Npcs { get; } = new Dictionary<int, MapNpc>();
+        public MapNpc[] Npcs { get; protected set; }
 
-        public IList<MapEventZone> Zones { get; } = new List<MapEventZone>();
+        public IList<MapEventZone> Zones { get; private set; } = new List<MapEventZone>();
         [JsonIgnore] public IDictionary<int, MapEventZone> ZoneLookup { get; } = new Dictionary<int, MapEventZone>();
         [JsonIgnore] public IDictionary<TriggerTypes, MapEventZone[]> ZoneTypeLookup { get; } = new Dictionary<TriggerTypes, MapEventZone[]>();
-        public IList<EventNode> Events { get; } = new List<EventNode>();
+        [JsonIgnore] public IList<EventNode> Events { get; private set; } = new List<EventNode>();
         public IList<ushort> Chains { get; } = new List<ushort>();
+        public string[] EventStrings // Used for JSON
+        {
+            get => Events?.Select(x => x.ToString()).ToArray();
+            set
+            {
+                Events = value?.Select(EventNode.Parse).ToArray() ?? Array.Empty<EventNode>();
+                foreach (var e in Events)
+                    e.Unswizzle(Events);
+            }
+        }
 #if DEBUG
         [JsonIgnore] public IList<object>[] EventReferences { get; private set; }
 #endif
-
-        protected BaseMapData(MapId id) { Id = id; }
 
         protected void SerdesZones(ISerializer s)
         {
@@ -72,57 +79,31 @@ namespace UAlbion.Formats.Assets.Maps
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             s.List(nameof(Chains), Chains, chainCount, (_, x, s2) => s2.UInt16(null, x));
-            /*
-            var chainOffsets = Chains.Select(x => x.Events[0].Id).ToList();
-            for(int i = 0; i < chainCount; i++)
-            {
-                if(s.IsReading())
-                {
-                    var eventId = s.UInt16(null, 0);
-                    chainOffsets.Add(eventId);
-                }
-                else
-                {
-                    var eventId = chainOffsets.Count <= i ? (ushort)0xffff : chainOffsets[i];
-                    s.UInt16(null, eventId);
-                }
-            }
-
-            if(s.IsReading())
-            {
-                ChainsByEventId = new (EventChain, IEventNode)[Events.Count];
-                for (int i = 0; i < chainOffsets.Count; i++)
-                {
-                    var offset = chainOffsets[i];
-                    var chain = new EventChain(i);
-                    var nextOffset = chainOffsets.Count == i + 1
-                        ? Events.Count
-                        : chainOffsets[i + 1];
-
-                    for (int j = offset; j < nextOffset; j++)
-                    {
-                        chain.Events.Add(Events[j]);
-                        ChainsByEventId[j] = (chain, Events[j]);
-                    }
-
-                    Chains.Add(chain);
-                }
-            } */
-
             s.Check();
-            s.End();
         }
 
         protected void Unswizzle() // Resolve event indices to pointers
         {
+            var chainMapping = new ushort[Events.Count];
+            var sortedChains = Chains
+                .Select((eventId, chainId) => (eventId, chainId))
+                .OrderBy(x => x)
+                .ToArray();
+
+            for (int i = 0, j = 0; i < Events.Count; i++)
+            {
+                while (sortedChains[j].eventId < i) j++;
+                chainMapping[i] = (ushort)sortedChains[j].chainId;
+            }
+
             // Use map events if the event number is set, otherwise use the event set from the NPC's character sheet.
             // Note: Event set loading requires IAssetManager, so can't be done directly by UAlbion.Formats code.
             // Instead, the MapManager will call AttachEventSets with a callback to load the event sets.
-            foreach (var npc in Npcs.Values)
-                npc.Unswizzle(x => Events[x]);
+            foreach (var npc in Npcs)
+                npc.Unswizzle(Id, x => Events[x], x => chainMapping[x]);
 
             foreach (var zone in Zones)
-                zone.Unswizzle(x => Events[x]);
+                zone.Unswizzle(Id, x => Events[x], x => chainMapping[x]);
 
             foreach (var position in Zones.Where(x => !x.Global).GroupBy(x => x.Y * Width + x.X))
             {
@@ -140,7 +121,7 @@ namespace UAlbion.Formats.Assets.Maps
                 if (zone.Node != null)
                     AddEventReference(zone.Node.Id, zone);
 
-            foreach (var npc in Npcs.Values)
+            foreach (var npc in Npcs)
                 if (npc.Node != null)
                     AddEventReference(npc.Node.Id, npc);
 
@@ -165,10 +146,10 @@ namespace UAlbion.Formats.Assets.Maps
 
         protected void SerdesNpcWaypoints(ISerializer s)
         {
-            foreach (var kvp in Npcs.OrderBy(x => x.Key))
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            foreach (var npc in Npcs)
             {
-                var npc = kvp.Value;
-                s.Begin("NpcWaypoints" + kvp.Key);
+                s.Begin("NpcWaypoints" + npc.Index);
                 if (npc.Id.Type != AssetType.None)
                     npc.LoadWaypoints(s);
                 else 

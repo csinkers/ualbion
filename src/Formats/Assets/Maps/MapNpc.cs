@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Formats.MapEvents;
@@ -9,6 +10,7 @@ namespace UAlbion.Formats.Assets.Maps
     {
         public const int SizeOnDisk = 10;
 
+        public int Index { get; private set; }
         public AssetId Id { get; set; } // MonsterGroup, Npc etc
         // public SampleId? Sound { get; set; }
         public byte Sound { get; set; }
@@ -20,13 +22,18 @@ namespace UAlbion.Formats.Assets.Maps
         public NpcWaypoint[] Waypoints { get; set; }
         public MapId ChainSource { get; set; }
         public ushort Chain { get; set; }
-        public IEventNode Node { get; set; }
+        [JsonIgnore] public IEventNode Node { get; set; }
+        public ushort EventIndex
+        {
+            get => Node?.Id ?? 0xffff;
+            set => Node = new DummyEventNode(value);
+        }
 
-        public static MapNpc Serdes(int _, MapNpc existing, MapType mapType, AssetMapping mapping, ISerializer s)
+        public static MapNpc Serdes(int index, MapNpc existing, MapType mapType, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             s.Begin("Npc");
-            var npc = existing ?? new MapNpc();
+            var npc = existing ?? new MapNpc { Index = index };
 
             byte id = (byte)npc.Id.ToDisk(mapping);
             id = s.UInt8(nameof(Id), id);
@@ -81,11 +88,17 @@ namespace UAlbion.Formats.Assets.Maps
             }
         }
 
-        public void Unswizzle(Func<ushort, IEventNode> getEvent)
+        public void Unswizzle(MapId mapId, Func<ushort, IEventNode> getEvent, Func<ushort, ushort> getChain)
         {
             if (getEvent == null) throw new ArgumentNullException(nameof(getEvent));
+            if (getChain == null) throw new ArgumentNullException(nameof(getChain));
+            ChainSource = mapId;
             if (Node is DummyEventNode dummy)
+            {
                 Node = getEvent(dummy.Id);
+                Chain = getChain(dummy.Id);
+            }
+            else Chain = 0xffff;
         }
 
         public override string ToString() => $"Npc{Id.Id} {Id} O:{SpriteOrGroup} F:{Flags:x} M{Movement} Amount:{Unk8} Unk9:{Unk9} S{Sound} E{Node?.Id}";

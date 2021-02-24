@@ -30,10 +30,10 @@ namespace UAlbion.Formats.Assets.Maps
             set => (Underlay, Overlay) = FormatUtil.FromPacked(Width, Height, value);
         }
 
-        MapData2D(MapId id) : base(id) { }
-
-        public MapData2D(MapId id, byte width, byte height) : base(id)
+        public MapData2D() { } // For JSON
+        public MapData2D(MapId id, byte width, byte height)
         {
+            Id = id;
             Width = width;
             Height = height;
         }
@@ -45,7 +45,7 @@ namespace UAlbion.Formats.Assets.Maps
             if (s == null) throw new ArgumentNullException(nameof(s));
 
             var startOffset = s.Offset;
-            var map = existing ?? new MapData2D(info.AssetId);
+            var map = existing ?? new MapData2D { Id = info.AssetId };
             map.Flags = s.EnumU8(nameof(Flags), map.Flags); // 0
             map.OriginalNpcCount = s.UInt8(nameof(OriginalNpcCount), map.OriginalNpcCount); // 1
             int npcCount = NpcCountTransform.Instance.FromNumeric(map.OriginalNpcCount);
@@ -58,15 +58,11 @@ namespace UAlbion.Formats.Assets.Maps
             map.CombatBackgroundId = SpriteId.SerdesU8(nameof(CombatBackgroundId), map.CombatBackgroundId, AssetType.CombatBackground, mapping, s); // 7
             map.PaletteId = PaletteId.SerdesU8(nameof(PaletteId), map.PaletteId, mapping, s);
             map.FrameRate = s.UInt8(nameof(FrameRate), map.FrameRate); //9
-
-            s.Begin("NPCs");
-            for (int i = 0; i < npcCount; i++)
-            {
-                map.Npcs.TryGetValue(i, out var npc);
-                map.Npcs[i] = MapNpc.Serdes(i, npc, map.MapType, mapping, s);
-            }
-            s.Check();
-            s.End();
+            map.Npcs = s.List(
+                nameof(Npcs),
+                map.Npcs,
+                npcCount,
+                (n, x, s2) => MapNpc.Serdes(n, x, map.MapType, mapping, s2)).ToArray();
 
             if (s.IsReading())
                 map.RawLayout = s.ByteArray("Layout", null, 3 * map.Width * map.Height);

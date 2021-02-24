@@ -53,8 +53,7 @@ namespace UAlbion
                 .AddAssetPostProcessor(new AlbionSpritePostProcessor())
                 .AddAssetPostProcessor(new ImageSharpPostProcessor())
                 .AddAssetPostProcessor(new InterlacedBitmapPostProcessor())
-                .AddAssetPostProcessor(new InventoryPostProcessor())
-                .AddAssetPostProcessor(new ItemNamePostProcessor());
+                .AddAssetPostProcessor(new InventoryPostProcessor());
 
             var settings = await settingsTask.ConfigureAwait(false);
             var settingsManager = new SettingsManager(settings);

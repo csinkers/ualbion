@@ -13,5 +13,7 @@ namespace UAlbion.Formats.Assets
                 foreach (var s in existing)
                     Add(s);
         }
+
+        public string Get(int index) => index >= Count ? null : this[index];
     }
 }

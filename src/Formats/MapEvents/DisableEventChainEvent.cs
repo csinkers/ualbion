@@ -22,6 +22,7 @@ namespace UAlbion.Formats.MapEvents
             if (s == null) throw new ArgumentNullException(nameof(s));
             e ??= new DisableEventChainEvent();
             e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
+            e.ChainSource = chainSource;
             e.ChainNumber = s.UInt8(nameof(ChainNumber), e.ChainNumber);
             int zeroes = s.UInt8(null, 0);
             zeroes += s.UInt8(null, 0);

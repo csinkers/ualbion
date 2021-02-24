@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -18,13 +19,12 @@ namespace UAlbion.Formats.Assets.Maps
         public IList<AutomapInfo> Automap { get; } = new List<AutomapInfo>();
         public byte[] AutomapGraphics { get; private set; }
 
-        MapData3D(MapId id) : base(id) { }
         public static MapData3D Serdes(AssetInfo info, MapData3D existing, AssetMapping mapping, ISerializer s)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));
 
-            var map = existing ?? new MapData3D(info.AssetId);
+            var map = existing ?? new MapData3D { Id = info.AssetId };
             map.Flags = s.EnumU8(nameof(Flags), map.Flags); // 0
             map.OriginalNpcCount = s.UInt8(nameof(OriginalNpcCount), map.OriginalNpcCount); // 1
             int npcCount = NpcCountTransform.Instance.FromNumeric(map.OriginalNpcCount);
@@ -37,15 +37,11 @@ namespace UAlbion.Formats.Assets.Maps
             map.CombatBackgroundId = SpriteId.SerdesU8(nameof(CombatBackgroundId), map.CombatBackgroundId, AssetType.CombatBackground, mapping, s); // 7 TODO: Verify this is combat background
             map.PaletteId = PaletteId.SerdesU8(nameof(PaletteId), map.PaletteId, mapping, s);
             map.AmbientSongId = SongId.SerdesU8(nameof(AmbientSongId), map.AmbientSongId, mapping, s);
-
-            s.Begin("NPCs");
-            for (int i = 0; i < npcCount; i++)
-            {
-                map.Npcs.TryGetValue(i, out var npc);
-                map.Npcs[i] = MapNpc.Serdes(i, npc, MapType.ThreeD, mapping, s);
-            }
-            s.Check();
-            s.End();
+            map.Npcs = s.List(
+                nameof(Npcs),
+                map.Npcs,
+                npcCount,
+                (n, x, s2) => MapNpc.Serdes(n, x, map.MapType, mapping, s2)).ToArray();
 
             map.Contents ??= new byte[map.Width * map.Height];
             map.Floors   ??= new byte[map.Width * map.Height];

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Config;
@@ -42,14 +44,43 @@ namespace UAlbion.Formats.Assets.Maps
             return zone;
         }
 
-        public void Unswizzle(Func<ushort, IEventNode> getEvent)
+        public void Unswizzle(MapId mapId, Func<ushort, IEventNode> getEvent, Func<ushort, ushort> getChain)
         {
             if (getEvent == null) throw new ArgumentNullException(nameof(getEvent));
+            if (getChain == null) throw new ArgumentNullException(nameof(getChain));
+            ChainSource = mapId;
             if (Node is DummyEventNode dummy)
+            {
                 Node = getEvent(dummy.Id);
+                Chain = getChain(dummy.Id);
+            }
+            else Chain = 0xffff;
         }
 
-        public override string ToString() => $"Z({X}, {Y}) T:{Trigger} Mode:{Unk1} C:{Chain} E:{Node?.Id}";
+        public override string ToString() => $"Z({X}, {Y}) T({Trigger}) M({Unk1}) C({Chain}) E({Node?.Id})";
+        static readonly Regex ZoneRegex = new Regex(
+            @"
+\s*Z\((?<X>\d+),\s*(?<Y>\d+)\)\s*
+T\((?<Trigger>[^)]+)\)\s*
+M\((?<Mode>[^)]+)\)\s*
+C\((?<Chain>[^)]+)\)\s*
+E\((?<Event>[^)]+)\)\s*", RegexOptions.IgnorePatternWhitespace);
+        public static MapEventZone Parse(string s)
+        {
+            var m = ZoneRegex.Match(s);
+            if (!m.Success)
+                throw new FormatException($"Could not parse \"{s}\" as a MapEventZone");
+
+            return new MapEventZone
+            {
+                X = byte.Parse(m.Groups["X"].Value, CultureInfo.InvariantCulture),
+                Y = byte.Parse(m.Groups["Y"].Value, CultureInfo.InvariantCulture),
+                Trigger = (TriggerTypes)Enum.Parse(typeof(TriggerTypes), m.Groups["Trigger"].Value),
+                Unk1 = byte.Parse(m.Groups["Mode"].Value, CultureInfo.InvariantCulture),
+                Chain = ushort.Parse(m.Groups["Chain"].Value, CultureInfo.InvariantCulture),
+                Node = new DummyEventNode(ushort.Parse(m.Groups["Event"].Value, CultureInfo.InvariantCulture))
+            };
+        }
     }
 
     public readonly struct ZoneKey : IEquatable<ZoneKey>
@@ -74,7 +105,7 @@ namespace UAlbion.Formats.Assets.Maps
                 hashCode = (hashCode * 397) ^ Unk1.GetHashCode();
                 hashCode = (hashCode * 397) ^ (int)Trigger;
                 hashCode = (hashCode * 397) ^ (Node != null ? Node.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (Chain != null ? Chain.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ Chain.GetHashCode();
                 return hashCode;
             }
         }

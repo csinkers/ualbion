@@ -396,7 +396,7 @@ namespace UAlbion.Base.Tests
 
             Assert.Equal(250, map.Chains.Count);
 
-            Assert.Equal(96, map.Npcs.Count);
+            Assert.Equal(96, map.Npcs.Length);
             var n = map.Npcs[2];
             Assert.Equal(AssetId.From(Npc.Christine), n.Id);
             Assert.Equal(AssetId.From(LargeNpc.Christine), n.SpriteOrGroup);
@@ -455,7 +455,7 @@ namespace UAlbion.Base.Tests
 
             Assert.Equal(64, map.Chains.Count);
 
-            Assert.Equal(96, map.Npcs.Count);
+            Assert.Equal(96, map.Npcs.Length);
             var n = map.Npcs[2];
             Assert.Equal(AssetId.From(MonsterGroup.Unknown1), n.Id);
             Assert.Equal(new AssetId(AssetType.ObjectGroup, 68), n.SpriteOrGroup);

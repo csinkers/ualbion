@@ -132,7 +132,7 @@ namespace UAlbion.Formats.Exporters.Tiled
 
             var regions = TriggerZoneBuilder.BuildZones(map);
             var groupedByTriggerType = regions
-                .Where(x => x.Item1.Chain != null)
+                .Where(x => x.Item1.Chain != 0xffff)
                 .GroupBy(x => x.Item1.Trigger)
                 .OrderBy(x => x.Key);
 
@@ -209,8 +209,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                         properties,
                         eventFormatter,
                         npcTileset,
-                        x.Key,
-                        x.Value,
+                        x,
                         ref nextId))
                     .ToList(),
             };
@@ -224,7 +223,6 @@ namespace UAlbion.Formats.Exporters.Tiled
             TilemapProperties properties,
             EventFormatter eventFormatter,
             Tileset npcTileset,
-            int npcNumber,
             MapNpc npc,
             ref int nextId)
         {
@@ -250,7 +248,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             {
                 Id = nextId++,
                 Gid = tile == null ? 0 : (tile.Id + npcTileset.GidOffset),
-                Name = $"NPC{npcNumber} {npc.Id}",
+                Name = $"NPC{npc.Index} {npc.Id}",
                 Type = "NPC",
                 X = npc.Waypoints[0].X * properties.TileWidth,
                 Y = npc.Waypoints[0].Y * properties.TileHeight,

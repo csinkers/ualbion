@@ -46,7 +46,7 @@ namespace UAlbion
                     case AssetType.EventSet: EventSets(assets, baseDir, dumpIds); break;
                     case AssetType.Item: ItemData(assets, baseDir, dumpIds); break;
                     case AssetType.Labyrinth: Labyrinths(assets, baseDir); break;
-                    case AssetType.Map: MapData(assets, tf, baseDir, dumpIds); MapEvents(assets, baseDir, dumpIds); break;
+                    case AssetType.Map: MapData(assets, baseDir, dumpIds); MapEvents(assets, baseDir, dumpIds); break;
                     case AssetType.Merchant: Merchants(assets, baseDir, dumpIds); break;
                     case AssetType.Monster: MonsterCharacterSheets(assets, tf, baseDir, dumpIds); break;
                     case AssetType.MonsterGroup: MonsterGroups(assets, baseDir, dumpIds); break;
@@ -161,7 +161,7 @@ namespace UAlbion
             }
         }
 
-        static void MapData(IAssetManager assets, ITextFormatter tf, string baseDir, AssetId[] dumpIds)
+        static void MapData(IAssetManager assets, string baseDir, AssetId[] dumpIds)
         {
             using var sw = Open(baseDir, MapInfoPath);
             for (int i = 100; i < 400; i++)
@@ -197,9 +197,10 @@ namespace UAlbion
                 sw.Write($"Song:{map.SongId} ({map.SongId.Id}) ");
                 sw.WriteLine($"CombatBackground:{map.CombatBackgroundId} ({map.CombatBackgroundId.Id})");
 
-                for(int j = 0; j < map.Npcs.Count; j++)
+                for(int j = 0; j < map.Npcs.Length; j++)
                 {
-                    if (!map.Npcs.TryGetValue(j, out var npc))
+                    var npc = map.Npcs[j];
+                    if (npc == null)
                         continue;
 
                     var wp = npc.Waypoints.FirstOrDefault();

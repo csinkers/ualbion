@@ -1,58 +1,59 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class ItemNameLoader : IAssetLoader<IDictionary<(int, GameLanguage), string>>
+    public class ItemNameLoader : IAssetLoader<IDictionary<GameLanguage, StringCollection>>
     {
         const int StringSize = 20;
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s) 
-            => Serdes((IDictionary<(int, GameLanguage), string>) existing, config, mapping, s);
+        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+            => Serdes((IDictionary<GameLanguage, StringCollection>)existing, config, mapping, s);
 
-        public IDictionary<(int, GameLanguage), string> Serdes(IDictionary<(int, GameLanguage), string> existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public IDictionary<GameLanguage, StringCollection> Serdes(IDictionary<GameLanguage, StringCollection> names, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
+            var streamLength = s.BytesRemaining;
+            ApiUtil.Assert(streamLength % StringSize == 0);
+            names ??= new Dictionary<GameLanguage, StringCollection>();
+            if (!names.ContainsKey(GameLanguage.German)) names[GameLanguage.German] = new StringCollection();
+            if (!names.ContainsKey(GameLanguage.English)) names[GameLanguage.English] = new StringCollection();
+            if (!names.ContainsKey(GameLanguage.French)) names[GameLanguage.French] = new StringCollection();
+
+            static void Inner(StringCollection collection, int i, ISerializer s2)
+            {
+                while (collection.Count <= i)
+                    collection.Add(null);
+                collection[i] = s2.FixedLengthString(null, collection[i], StringSize);
+            }
+
             if (s.IsReading())
             {
-                var streamLength = s.BytesRemaining;
-                ApiUtil.Assert(streamLength % StringSize == 0);
-                var results = new Dictionary<(int, GameLanguage), string>();
+                int i = 1;
                 long end = s.Offset + streamLength;
-
-                int i = 3;
                 while (s.Offset < end)
                 {
-                    var bytes = s.ByteArray(null, null, StringSize);
-                    var language = (i % 3) switch
-                    {
-                        0 => GameLanguage.German,
-                        1 => GameLanguage.English,
-                        _ => GameLanguage.French,
-                    };
-
-                    results[(i / 3, language)] = FormatUtil.BytesTo850String(bytes);
+                    Inner(names[GameLanguage.German], i, s);
+                    Inner(names[GameLanguage.English], i, s);
+                    Inner(names[GameLanguage.French], i, s);
                     i++;
                 }
-                return results;
             }
-
-            if (existing == null) throw new ArgumentNullException(nameof(existing));
-            int maxId = existing.Keys.Select(x => x.Item1).Max();
-            for (int i = 1; i <= maxId; i++)
+            else
             {
-                if (!existing.TryGetValue((i, GameLanguage.German), out var value)) { } 
-                s.FixedLengthString(null, value, StringSize);
-                if (!existing.TryGetValue((i, GameLanguage.English), out value)) { } 
-                s.FixedLengthString(null, value, StringSize);
-                if (!existing.TryGetValue((i, GameLanguage.French), out value)) { } 
-                s.FixedLengthString(null, value, StringSize);
+                var stringCount = names[GameLanguage.German].Count;
+                for (int i = 1; i < stringCount; i++)
+                {
+                    Inner(names[GameLanguage.German], i, s);
+                    Inner(names[GameLanguage.English], i, s);
+                    Inner(names[GameLanguage.French], i, s);
+                }
             }
 
-            return existing;
+            return names;
         }
     }
 }

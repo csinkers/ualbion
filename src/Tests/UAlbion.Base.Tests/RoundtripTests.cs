@@ -192,7 +192,7 @@ namespace UAlbion.Base.Tests
         public void ItemNameTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Special.ItemNames) };
-            RoundTripRaw<IDictionary<(int, GameLanguage), string>>(nameof(ItemNameTest), "$(XLD)/ITEMNAME.DAT",
+            RoundTripRaw<IDictionary<GameLanguage, StringCollection>>(nameof(ItemNameTest), "$(XLD)/ITEMNAME.DAT",
                 (x, s) => ItemNameLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -254,10 +254,10 @@ namespace UAlbion.Base.Tests
         }
 
         [Fact]
-        public void Map2DRoundtrip()
+        public void Map2DTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Map.TorontoBegin) };
-            RoundTripXld<MapData2D>(nameof(Map2DRoundtrip), "$(XLD)/MAPDATA3.XLD", 0,
+            RoundTripXld<MapData2D>(nameof(Map2DTest), "$(XLD)/MAPDATA3.XLD", 0,
                 (x, s) => MapData2D.Serdes(info, x, AssetMapping.Global, s));
         }
 

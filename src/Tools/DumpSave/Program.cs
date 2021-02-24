@@ -204,8 +204,7 @@ namespace DumpSave
             var modApplier = new ModApplier()
                 // Register post-processors for handling transformations of asset data that can't be done by UAlbion.Formats alone.
                 .AddAssetPostProcessor(new AlbionSpritePostProcessor())
-                .AddAssetPostProcessor(new InventoryPostProcessor())
-                .AddAssetPostProcessor(new ItemNamePostProcessor());
+                .AddAssetPostProcessor(new InventoryPostProcessor());
 
             var exchange = new EventExchange(new LogExchange());
             exchange

@@ -43,12 +43,13 @@ namespace UAlbion.Formats.Assets.Maps
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             int zoneCount = s.UInt16("ZoneCount", (ushort)Zones.Count(x => x.Global));
-            byte y = 0xff;
-            s.List(nameof(Zones), Zones, y, zoneCount, (i, x, y2, serializer) => MapEventZone.Serdes(x, serializer, y2));
+            // TODO: This is assuming that global events will always come first in the in-memory list, may need
+            // to add some code to preserve this invariant later on when handling editing / patching functionality.
+            s.List(nameof(Zones), Zones, (byte)255, zoneCount, (i, x, y2, serializer) => MapEventZone.Serdes(x, serializer, y2));
             s.Check();
 
             int zoneOffset = zoneCount;
-            for (y = 0; y < Height; y++)
+            for (byte y = 0; y < Height; y++)
             {
                 zoneCount = s.UInt16("RowZones", (ushort)Zones.Count(x => x.Y == y && !x.Global));
                 s.List(nameof(Zones), Zones, y, zoneCount, zoneOffset,

@@ -26,8 +26,8 @@ namespace UAlbion.Formats.Assets.Maps
 
         public byte[] RawLayout
         {
-            get => FormatUtil.ToPacked(Width, Height, Underlay, Overlay);
-            set => (Underlay, Overlay) = FormatUtil.FromPacked(Width, Height, value);
+            get => FormatUtil.ToPacked(Underlay, Overlay);
+            set => (Underlay, Overlay) = FormatUtil.FromPacked(value);
         }
 
         public MapData2D() { } // For JSON

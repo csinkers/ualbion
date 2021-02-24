@@ -28,13 +28,14 @@ namespace UAlbion.Formats.MapEvents
         }
 
         ChangeIconEvent() { }
-        public ChangeIconEvent(short x, short y, EventScopes scopes, IconChangeType changeType, ushort value)
+        public ChangeIconEvent(short x, short y, EventScopes scopes, IconChangeType changeType, ushort value, byte unk5)
         {
             X = x;
             Y = y;
             Scopes = scopes;
             ChangeType = changeType;
             Value = value;
+            Unk5 = unk5;
         }
 
         [EventPart("x")] public short X { get; private set; }
@@ -42,7 +43,7 @@ namespace UAlbion.Formats.MapEvents
         [EventPart("scopes")] public EventScopes Scopes { get; private set; }
         [EventPart("type")] public IconChangeType ChangeType { get; private set; }
         [EventPart("value")] public ushort Value { get; private set; }
-        public byte Unk5 { get; private set; }
+        [EventPart("unk5")] public byte Unk5 { get; private set; }
         ushort Unk8 { get; set; }
         public override MapEventType EventType => MapEventType.ChangeIcon;
     }

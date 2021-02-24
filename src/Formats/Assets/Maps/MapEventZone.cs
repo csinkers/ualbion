@@ -22,7 +22,7 @@ namespace UAlbion.Formats.Assets.Maps
         public IEventNode Node { get; set; }
 
         public MapEventZone() => Key = new ZoneKey(this);
-        public static MapEventZone Serdes(MapEventZone existing, ISerializer s, in byte y)
+        public static MapEventZone Serdes(MapEventZone existing, ISerializer s, byte y)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -57,10 +57,10 @@ namespace UAlbion.Formats.Assets.Maps
             else Chain = 0xffff;
         }
 
-        public override string ToString() => $"Z({X}, {Y}) T({Trigger}) M({Unk1}) C({Chain}) E({Node?.Id})";
+        public override string ToString() => $"{(Global ? "GZ" : "Z")}({X}, {Y}) T({Trigger}) M({Unk1}) C({Chain}) E({Node?.Id})";
         static readonly Regex ZoneRegex = new Regex(
             @"
-\s*Z\((?<X>\d+),\s*(?<Y>\d+)\)\s*
+\s*(?<Type>Z|GZ)\((?<X>\d+),\s*(?<Y>\d+)\)\s*
 T\((?<Trigger>[^)]+)\)\s*
 M\((?<Mode>[^)]+)\)\s*
 C\((?<Chain>[^)]+)\)\s*
@@ -73,6 +73,7 @@ E\((?<Event>[^)]+)\)\s*", RegexOptions.IgnorePatternWhitespace);
 
             return new MapEventZone
             {
+                Global = m.Groups["Type"].Value == "GZ",
                 X = byte.Parse(m.Groups["X"].Value, CultureInfo.InvariantCulture),
                 Y = byte.Parse(m.Groups["Y"].Value, CultureInfo.InvariantCulture),
                 Trigger = (TriggerTypes)Enum.Parse(typeof(TriggerTypes), m.Groups["Trigger"].Value),

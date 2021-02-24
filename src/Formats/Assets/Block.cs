@@ -15,8 +15,8 @@ namespace UAlbion.Formats.Assets
 
         public byte[] RawLayout
         {
-            get => FormatUtil.ToPacked(Width, Height, _underlay, _overlay);
-            set => (_underlay, _overlay) = FormatUtil.FromPacked(Width, Height, value);
+            get => FormatUtil.ToPacked(_underlay, _overlay);
+            set => (_underlay, _overlay) = FormatUtil.FromPacked(value);
         }
 
         public static Block Serdes(int _, Block b, ISerializer s)

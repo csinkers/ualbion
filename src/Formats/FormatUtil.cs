@@ -87,15 +87,20 @@ namespace UAlbion.Formats
             return (b1, b2, b3);
         }
 
-        public static byte[] ToPacked(int width, int height, int[] underlay, int[] overlay)
+        public static byte[] ToPacked(int[] underlay, int[] overlay)
         {
-            if (width == 0 || height == 0)
-                return null;
             if (underlay == null) throw new ArgumentNullException(nameof(underlay));
             if (overlay == null) throw new ArgumentNullException(nameof(overlay));
 
-            var buf = new byte[3 * width * height];
-            for (int i = 0; i < width * height; i++)
+            if (underlay.Length != overlay.Length)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "Tried to pack tiledata, but the underlay count " +
+                    $"({underlay.Length}) differed from the overlay count ({overlay.Length})");
+            }
+
+            var buf = new byte[3 * underlay.Length];
+            for (int i = 0; i < underlay.Length; i++)
                 (
                     buf[i * 3],
                     buf[i * 3 + 1],
@@ -104,20 +109,21 @@ namespace UAlbion.Formats
             return buf;
         }
 
-        public static (int[], int[]) FromPacked(int width, int height, byte[] buf)
+        public static (int[], int[]) FromPacked(byte[] buf)
         {
             if (buf == null) return (null, null);
-            if (buf.Length != 3 * width * height)
+            if (buf.Length % 3 != 0)
             {
                 throw new InvalidOperationException(
                     "Tried to set raw map data with incorrect " +
-                    $"size (expected {3 * width * height} bytes for a {width}x{height} " +
-                    $"map but was given {buf.Length})");
+                    "size (expected a multiple of 3, " +
+                    $"but was given {buf.Length})");
             }
 
-            var underlay = new int[width * height];
-            var overlay = new int[width * height];
-            for (int i = 0; i < width * height; i++)
+            int tileCount = buf.Length / 3;
+            var underlay = new int[tileCount];
+            var overlay = new int[tileCount];
+            for (int i = 0; i < tileCount; i++)
             {
                 (underlay[i], overlay[i]) = FromPacked(
                     buf[i * 3],

@@ -78,7 +78,7 @@ namespace UAlbion.Game.Gui.Controls
                 uint n = 0;
                 var sprite = (Base.CoreSprite)((int)Base.CoreSprite.UiBackgroundLines1 + n % 4); // TODO: Better solution
                 var texture = assets.LoadTexture(Id(sprite));
-                texture = CoreUtil.BuildRotatedTexture(factory, (EightBitTexture)texture);
+                texture = CoreUtil.BuildTransposedTexture(factory, (EightBitTexture)texture);
                 while (y < height - TileSize)
                 {
                     uint? h = y + 2*TileSize > height ? (uint)(height - TileSize - y) : (uint?)null;

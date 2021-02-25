@@ -51,7 +51,7 @@ namespace UAlbion.Api.Tests
         }
 
         [Fact]
-        public void RotateImageTest()
+        public void TransposeImageTest()
         {
             byte[] image = {
                 1,2,3,
@@ -66,7 +66,7 @@ namespace UAlbion.Api.Tests
             };
 
             var result = new byte[9];
-            ApiUtil.RotateImage(3, 3, image, result);
+            ApiUtil.TransposeImage(3, 3, image, result);
             Assert.Equal(rotated, result);
 
             image = new byte[] {
@@ -83,7 +83,7 @@ namespace UAlbion.Api.Tests
             };
 
             result = new byte[12];
-            ApiUtil.RotateImage(4, 3, image, result);
+            ApiUtil.TransposeImage(4, 3, image, result);
             Assert.Equal(rotated, result);
         }
     }

@@ -386,6 +386,7 @@ namespace UAlbion.Base.Tests
         public void AutomapGfxTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(AutomapTiles.Set1) };
+            info.Set("SubSprites", "(8,8,576) (16,16)");
             RoundTripXld<AlbionSprite>(nameof(AutomapGfxTest), "$(XLD)/AUTOGFX0.XLD", 0,
                 (x, s) => AmorphousSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
@@ -418,7 +419,7 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void FontTest()
         {
-            var info = new AssetInfo { AssetId = AssetId.From(Font.RegularFont) };
+            var info = new AssetInfo { AssetId = AssetId.From(Font.RegularFont), Width = 8, Height = 8 };
             RoundTripXld<AlbionSprite>(nameof(FontTest), "$(XLD)/FONTS0.XLD", 0,
                 (x, s) => FontSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }

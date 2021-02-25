@@ -61,22 +61,22 @@ namespace UAlbion.Api
         public static int NextPowerOfTwo(int x) => (int)Math.Pow(2.0, Math.Ceiling(Math.Log(x, 2.0)));
 
         /// <summary>
-        /// Rotate the given 8-bit image 90 degrees clockwise.
+        /// Transposes the given 8-bit image, swapping X and Y
         /// </summary>
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="from"></param>
         /// <param name="to"></param>
-        public static void RotateImage(int width, int height, ReadOnlySpan<byte> from, Span<byte> to)
+        public static void TransposeImage(int width, int height, ReadOnlySpan<byte> from, Span<byte> to)
         {
             if (to.Length < width * height)
                 throw new ArgumentOutOfRangeException(
-                    $"Tried to rotate a {width}x{height} image, but the source buffer does not contain enough bytes ({from.Length} < {width * height})");
+                    $"Tried to transpose a {width}x{height} image, but the source buffer does not contain enough bytes ({from.Length} < {width * height})");
             if (to.Length < width * height)
                 throw new ArgumentOutOfRangeException(
-                    $"Tried to rotate a {width}x{height} image, but the destination buffer does not contain enough bytes ({to.Length} < {width * height})");
+                    $"Tried to transpose a {width}x{height} image, but the destination buffer does not contain enough bytes ({to.Length} < {width * height})");
 
-            int rotatedFrameHeight = width;
+            int transposedFrameHeight = width;
 
             int x = 0;
             int y = 0;
@@ -86,7 +86,7 @@ namespace UAlbion.Api
                 to[destIndex] = from[i];
 
                 y++;
-                if (y == rotatedFrameHeight)
+                if (y == transposedFrameHeight)
                 {
                     y = 0;
                     x++;

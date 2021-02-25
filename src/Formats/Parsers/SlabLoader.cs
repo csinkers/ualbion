@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 
@@ -11,7 +12,25 @@ namespace UAlbion.Formats.Parsers
 
         public AlbionSprite Serdes(AlbionSprite existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
-            var sprite = new FixedSizeSpriteLoader().Serdes(existing, config, mapping, s);
+            AlbionSprite singleFrame = null;
+            if (s.IsWriting())
+            {
+                if (existing == null) throw new ArgumentNullException(nameof(existing));
+                singleFrame = new AlbionSprite(
+                    existing.Name, existing.Width, existing.Height, true, existing.PixelData,
+                    new[] { new AlbionSpriteFrame(
+                        existing.Frames[0].X,
+                        existing.Frames[0].Y,
+                        existing.Frames[0].Width,
+                        existing.Frames[0].Height)
+                    }
+                );
+            }
+
+            var sprite = new FixedSizeSpriteLoader().Serdes(singleFrame, config, mapping, s);
+            if (sprite == null)
+                return null;
+
             var frames = new[] // Frame 0 = entire slab, Frame 1 = status bar only.
             {
                 sprite.Frames[0],

@@ -24,7 +24,7 @@ namespace UAlbion.Formats.Assets
         public CharacterSheet(CharacterId id)
         {
             Id = id;
-            if (id.Type == AssetType.PartyMember)
+            if (id.Type == AssetType.PartyMember || id.Type == AssetType.Monster)
                 Inventory = new Inventory(new InventoryId(id));
         }
 
@@ -357,9 +357,10 @@ namespace UAlbion.Formats.Assets
                 return sheet;
             }
 
+            // Must be a monster
             Inventory.SerdesMonster(id.Id, sheet.Inventory, mapping, s);
             sheet.UnkMonster = s.ByteArray(nameof(UnkMonster), sheet.UnkMonster, 328);
-            ApiUtil.Assert(s.Offset - initialOffset == 1214, "Expected player character sheet to be 1214 bytes");
+            ApiUtil.Assert(s.Offset - initialOffset == 1214, "Expected monster character sheet to be 1214 bytes");
             s.End();
             return sheet;
         }

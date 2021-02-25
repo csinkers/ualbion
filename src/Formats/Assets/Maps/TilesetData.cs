@@ -7,10 +7,11 @@ namespace UAlbion.Formats.Assets.Maps
 {
     public class TilesetData
     {
+        public TilesetData() { }
         public TilesetData(TilesetId id) => Id = id;
-        public TilesetId Id { get; }
+        public TilesetId Id { get; private set; }
         public bool UseSmallGraphics { get; set; } // Careful if renaming: needs to match up to asset property in assets.json
-        public IList<TileData> Tiles { get; } = new List<TileData>();
+        public IList<TileData> Tiles { get; private set; } = new List<TileData>();
 
         public static TilesetData Serdes(TilesetData td, ISerializer s, AssetInfo config)
         {
@@ -21,29 +22,32 @@ namespace UAlbion.Formats.Assets.Maps
             td ??= new TilesetData(config.AssetId);
             td.UseSmallGraphics = config.Get(nameof(UseSmallGraphics), td.UseSmallGraphics);
 
-            td.Tiles.Add(new TileData
+            if (td.Tiles.Count == 0)
             {
-                Layer = TileLayer.Normal,
-                Type = TileType.Normal,
-                Collision = Passability.Passable,
-                Flags = 0,
-                ImageNumber = 0xffff,
-                FrameCount = 1,
-                Unk7 = 0
-            });
+                td.Tiles.Add(new TileData
+                {
+                    Layer = TileLayer.Normal,
+                    Type = TileType.Normal,
+                    Collision = Passability.Passable,
+                    Flags = 0,
+                    ImageNumber = 0xffff,
+                    FrameCount = 1,
+                    Unk7 = 0
+                });
 
-            td.Tiles.Add(new TileData
-            {
-                Layer = TileLayer.Normal,
-                Type = TileType.Normal,
-                Collision = Passability.Passable,
-                Flags = 0,
-                ImageNumber = 0xffff,
-                FrameCount = 1,
-                Unk7 = 0
-            });
+                td.Tiles.Add(new TileData
+                {
+                    Layer = TileLayer.Normal,
+                    Type = TileType.Normal,
+                    Collision = Passability.Passable,
+                    Flags = 0,
+                    ImageNumber = 0xffff,
+                    FrameCount = 1,
+                    Unk7 = 0
+                });
+            }
 
-            s.List(nameof(Tiles), td.Tiles, (tileCount - 2), 2, S.Object<TileData>(TileData.Serdes));
+            s.List(nameof(Tiles), td.Tiles, tileCount - 2, 2, S.Object<TileData>(TileData.Serdes));
             return td;
         }
     }

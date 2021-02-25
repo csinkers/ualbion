@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using SerdesNet;
@@ -50,7 +49,6 @@ namespace UAlbion.Formats.Parsers
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (config == null) throw new ArgumentNullException(nameof(config));
-            if (s.IsWriting() && existing == null) throw new ArgumentNullException(nameof(existing));
             ApiUtil.Assert(!config.Transposed);
 
             var sizes = ParseSpriteSizes(config.Get<string>("SubSprites", null));
@@ -68,8 +66,8 @@ namespace UAlbion.Formats.Parsers
                 byte[] frameBytes = null;
                 if (s.IsWriting())
                 {
+                    if (existing == null) throw new ArgumentNullException(nameof(existing));
                     frameBytes = new byte[width * height];
-                    Debug.Assert(existing != null, nameof(existing) + " != null");
 
                     FormatUtil.Blit(
                         existing.PixelData.AsSpan(currentY * existing.Width),

@@ -6,7 +6,7 @@ using Newtonsoft.Json.Converters;
 namespace UAlbion.Base
 {
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum TilesetData : byte
+    public enum Tileset : byte
     {
         Outdoors = 1,
         Outdoors2 = 2,

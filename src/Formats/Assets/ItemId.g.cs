@@ -66,7 +66,9 @@ namespace UAlbion.Formats.Assets
 
             ushort diskValue = (ushort)id.ToDisk(mapping);
             diskValue = s.UInt16(name, diskValue);
-            return FromDisk(type, diskValue, mapping);
+            id = FromDisk(type, diskValue, mapping);
+            if(s.IsCommenting()) s.Comment(id.ToString());
+            return id;
         }
 
         public static ItemId SerdesU16BE(string name, ItemId id, AssetType type, AssetMapping mapping, ISerializer s)

@@ -9,11 +9,11 @@ namespace UAlbion.Formats.Assets.Maps
 {
     public class MapData2D : BaseMapData
     {
-        static readonly Base.TilesetData[] OutdoorTilesets =
+        static readonly Base.Tileset[] OutdoorTilesets =
         { // TODO: Pull from config or infer from other data
-            Base.TilesetData.Outdoors,
-            Base.TilesetData.Outdoors2,
-            Base.TilesetData.Desert
+            Base.Tileset.Outdoors,
+            Base.Tileset.Outdoors2,
+            Base.Tileset.Desert
         };
         public override MapType MapType => OutdoorTilesets.Any(x => x == TilesetId) ? MapType.TwoDOutdoors : MapType.TwoD;
         public FlatMapFlags Flags { get; private set; } // Wait/Rest, Light-Environment, NPC converge range

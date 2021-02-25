@@ -18,6 +18,7 @@ namespace UAlbion.Game.Veldrid.Audio
 {
     public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManager, IDisposable
     {
+        const int DefaultSampleRate = 11025;
         readonly bool _standalone;
         readonly IDictionary<SampleId, AudioBuffer> _sampleCache = new Dictionary<SampleId, AudioBuffer>();
         readonly IDictionary<(SongId, int), AudioBuffer> _waveLibCache = new Dictionary<(SongId, int), AudioBuffer>();
@@ -83,7 +84,8 @@ namespace UAlbion.Game.Veldrid.Audio
                     return null;
                 }
 
-                buffer = new AudioBufferUInt8(sample.Samples, sample.SampleRate);
+                var sampleRate = sample.SampleRate == -1 ? DefaultSampleRate : sample.SampleRate;
+                buffer = new AudioBufferUInt8(sample.Samples, sampleRate);
                 _sampleCache[id] = buffer;
                 return buffer;
             }
@@ -105,7 +107,8 @@ namespace UAlbion.Game.Veldrid.Audio
                     return null;
                 }
 
-                buffer = new AudioBufferUInt8(sample.Samples, sample.SampleRate);
+                var sampleRate = sample.SampleRate == -1 ? DefaultSampleRate : sample.SampleRate;
+                buffer = new AudioBufferUInt8(sample.Samples, sampleRate);
                 _waveLibCache[key] = buffer;
                 return buffer;
             }

@@ -12,7 +12,7 @@ namespace UAlbion.Formats.Parsers
         public byte[] Serdes(byte[] existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            return s.ByteArray(null, null, (int)s.BytesRemaining);
+            return s.ByteArray(null, existing, (int)s.BytesRemaining);
         }
     }
 }

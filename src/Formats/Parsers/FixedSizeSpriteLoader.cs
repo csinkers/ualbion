@@ -20,7 +20,10 @@ namespace UAlbion.Formats.Parsers
             if (s.IsWriting() && existing == null) throw new ArgumentNullException(nameof(existing));
             // TODO: Assert uniform frames when writing
 
-            var streamLength = s.IsWriting() ? existing.Width * existing.Height * existing.Frames.Count : s.BytesRemaining;
+            var streamLength = s.IsWriting() && existing != null 
+                ? existing.Width * existing.Height * existing.Frames.Count 
+                : s.BytesRemaining;
+
             if (streamLength == 0)
                 return null;
 

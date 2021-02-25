@@ -18,7 +18,9 @@ namespace UAlbion.Formats.Assets
             Id = id;
             Slots = new ItemSlot[(int)(id.Type switch
             {
-                InventoryType.Player => ItemSlotId.CharacterSlotCount,
+                InventoryType.Player => ItemSlotId.FullSlotCount,
+                InventoryType.Monster => ItemSlotId.FullSlotCount,
+                InventoryType.CombatLoot => ItemSlotId.FullSlotCount,
                 InventoryType.Chest => ItemSlotId.ChestSlotCount,
                 _ => ItemSlotId.NormalSlotCount // just the backpack/normal slots, e.g. merchants
             })];

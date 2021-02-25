@@ -11,7 +11,7 @@
     "block": {
       "AssetType": "BlockList",
       "EnumType": "UAlbion.Base.BlockList, UAlbion.Base",
-      "CopiedFrom": "UAlbion.Base.TilesetData, UAlbion.Base"
+      "CopiedFrom": "UAlbion.Base.Tileset, UAlbion.Base"
     },
     "chest":      { "AssetType": "Chest",            "EnumType": "UAlbion.Base.Chest, UAlbion.Base" },
     "combg":      { "AssetType": "CombatBackground", "EnumType": "UAlbion.Base.CombatBackground, UAlbion.Base" },
@@ -63,11 +63,11 @@
     "switch":   { "AssetType": "Switch",             "EnumType": "UAlbion.Base.Switch, UAlbion.Base" },
     "tacgfx":   { "AssetType": "TacticalIcon",       "EnumType": "UAlbion.Base.TacticalGraphics, UAlbion.Base" },
     "ticker":   { "AssetType": "Ticker",             "EnumType": "UAlbion.Base.Ticker, UAlbion.Base" },
-    "tiledata": { "AssetType": "TilesetData",        "EnumType": "UAlbion.Base.TilesetData, UAlbion.Base" },
+    "tiledata": { "AssetType": "TilesetData",        "EnumType": "UAlbion.Base.Tileset, UAlbion.Base" },
     "tilegfx":  {
       "AssetType": "TilesetGraphics",
       "EnumType": "UAlbion.Base.TilesetGraphics, UAlbion.Base",
-      "CopiedFrom": "UAlbion.Base.TilesetData, UAlbion.Base"
+      "CopiedFrom": "UAlbion.Base.Tileset, UAlbion.Base"
     },
     "uibg": {  "AssetType": "Slab",  "EnumType": "UAlbion.Base.UiBackground, UAlbion.Base" },
     "utext": { "AssetType": "Text",  "EnumType": "UAlbion.Base.UAlbionString, UAlbion.Base" },

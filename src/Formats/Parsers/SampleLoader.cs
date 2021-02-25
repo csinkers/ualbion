@@ -14,7 +14,7 @@ namespace UAlbion.Formats.Parsers
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (config == null) throw new ArgumentNullException(nameof(config));
-            return new AlbionSample(s.ByteArray(null, null, (int)s.BytesRemaining));
+            return new AlbionSample(s.ByteArray("Samples", existing?.Samples, (int)s.BytesRemaining));
         }
     }
 }

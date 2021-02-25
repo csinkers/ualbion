@@ -7,17 +7,16 @@ namespace UAlbion.Formats.Assets
 {
     public class WaveLib
     {
-        WaveLibSample[] _samples;
         Dictionary<int, WaveLibSample> _instrumentIndex;
         WaveLib() {}
         public static WaveLib Serdes(WaveLib w, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             w ??= new WaveLib();
-            w._samples ??= new WaveLibSample[512];
-            s.List(nameof(w._samples), w._samples, 512, WaveLibSample.Serdes);
+            w.Samples ??= new WaveLibSample[512];
+            s.List(nameof(w.Samples), w.Samples, 512, WaveLibSample.Serdes);
 
-            foreach (var header in w._samples.Where(x => x.IsValid != -1))
+            foreach (var header in w.Samples.Where(x => x.IsValid != -1))
                 header.Samples = s.ByteArray(nameof(header.Samples), header.Samples.ToArray(), (int)header.Length);
 
             return w;
@@ -27,7 +26,7 @@ namespace UAlbion.Formats.Assets
         {
             get
             {
-                _instrumentIndex ??= _samples
+                _instrumentIndex ??= Samples
                     .ToLookup(x => x.Instrument)
                     .ToDictionary(x => x.Key, x => x.First());
 
@@ -35,6 +34,6 @@ namespace UAlbion.Formats.Assets
             }
         }
 
-        public int SampleCount => _samples.Length;
+        public WaveLibSample[] Samples { get; private set; }
     }
 }

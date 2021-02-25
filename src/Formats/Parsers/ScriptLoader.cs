@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -20,27 +21,39 @@ namespace UAlbion.Formats.Parsers
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
             => Serdes((IList<IEvent>)existing, config, mapping, s);
 
-        public IList<IEvent> Serdes(IList<IEvent> existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public IList<IEvent> Serdes(IList<IEvent> events, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            var events = new List<IEvent>();
-            foreach (var line in ReadLines(s))
+
+            if (s.IsReading())
             {
-                IEvent e;
-                if (string.IsNullOrEmpty(line))
-                    e = new CommentEvent(null);
-                else if (line.StartsWith(";", StringComparison.Ordinal))
-                    e = new CommentEvent(line.Substring(1));
-                else
-                    e = Event.Parse(line);
-
-                if (e == null)
+                events = new List<IEvent>();
+                foreach (var line in ReadLines(s))
                 {
-                    ApiUtil.Assert($"Script line \"{line}\" could not be parsed to an event");
-                    e = new UnparsableEvent(line);
-                }
+                    IEvent e;
+                    if (string.IsNullOrEmpty(line))
+                        e = new CommentEvent(null);
+                    else if (line.StartsWith(";", StringComparison.Ordinal))
+                        e = new CommentEvent(line.Substring(1));
+                    else
+                        e = Event.Parse(line);
 
-                events.Add(e);
+                    if (e == null)
+                    {
+                        ApiUtil.Assert($"Script line \"{line}\" could not be parsed to an event");
+                        e = new UnparsableEvent(line);
+                    }
+
+                    events.Add(e);
+                }
+            }
+            else
+            {
+                if (events == null) throw new ArgumentNullException(nameof(events));
+                var sb = new StringBuilder();
+                foreach (var e in events)
+                    sb.AppendLine(e.ToString());
+                s.NullTerminatedString(null, sb.ToString());
             }
 
             return events;

@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Assets
     public class MonsterGroup
     {
         // 36 bytes = 2 bytes/slot, 6x3 combat grid.
-        public MonsterId[] Grid { get; } = new MonsterId[6 * 3];
+        public MonsterId[] Grid { get; private set; } = new MonsterId[6 * 3]; // setter required for JSON
 
         public static MonsterGroup Serdes(int _, MonsterGroup m, AssetMapping mapping, ISerializer s)
         {

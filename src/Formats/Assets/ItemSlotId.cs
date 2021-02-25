@@ -26,7 +26,7 @@ namespace UAlbion.Formats.Assets
         Feet,
         LeftFinger,
         RightHandOrTail,
-        CharacterSlotCount,
+        FullSlotCount,
 
         // Dummy slot id used for the character's full body picture as a
         // background on the middle inventory pane.  It can't hold anything,

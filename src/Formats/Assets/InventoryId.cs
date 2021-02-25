@@ -15,6 +15,7 @@ namespace UAlbion.Formats.Assets
                 AssetType.Chest => InventoryType.Chest,
                 AssetType.Merchant => InventoryType.Merchant,
                 AssetType.PartyMember => InventoryType.Player,
+                AssetType.Monster => InventoryType.Monster,
                 _ => throw new ArgumentOutOfRangeException($"Tried to convert an asset of type {id.Type} (value {id.Id}) to an inventory id")
             };
             Id = (ushort)id.Id;
@@ -35,6 +36,7 @@ namespace UAlbion.Formats.Assets
             InventoryType.Player => "P:" + Id,
             InventoryType.Chest => "C:" + Id,
             InventoryType.Merchant => "M:" + Id,
+            InventoryType.Monster => "E:" + Id,
             InventoryType.CombatLoot => "CombatLoot",
             _ => Type + ":" + Id.ToString(CultureInfo.InvariantCulture)
         };

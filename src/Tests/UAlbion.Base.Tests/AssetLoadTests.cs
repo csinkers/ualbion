@@ -372,7 +372,7 @@ namespace UAlbion.Base.Tests
             Assert.Equal(81, map.Height);
             Assert.Equal(SpriteId.None, map.CombatBackgroundId);
             Assert.Equal(Song.Toronto, map.SongId);
-            Assert.Equal(TilesetData.Toronto, map.TilesetId);
+            Assert.Equal(Tileset.Toronto, map.TilesetId);
             Assert.Equal(Palette.Toronto2D, map.PaletteId);
             Assert.Equal(FlatMapFlags.Unk2 | FlatMapFlags.Unk3 | FlatMapFlags.Unk4, map.Flags);
             Assert.Equal(map.Width * map.Height, map.Underlay.Length);
@@ -763,8 +763,8 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void TilesetTest()
         {
-            var ts = Test(assets => assets.LoadTileData(TilesetData.Toronto));
-            Assert.Equal(TilesetData.Toronto, ts.Id);
+            var ts = Test(assets => assets.LoadTileData(Tileset.Toronto));
+            Assert.Equal(Tileset.Toronto, ts.Id);
             Assert.False(ts.UseSmallGraphics);
             Assert.Equal(4098, ts.Tiles.Count);
 
@@ -803,7 +803,7 @@ namespace UAlbion.Base.Tests
         public void WaveLibTest()
         {
             var w = Test(assets => assets.LoadWaveLib(WaveLibrary.TorontoAmbient));
-            Assert.Equal(512, w.SampleCount);
+            Assert.Equal(512, w.Samples.Length);
             var s = w[121];
             Assert.Equal(1, s.BytesPerSample);
             Assert.Equal(1, s.Channels);

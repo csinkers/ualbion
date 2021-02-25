@@ -7,7 +7,6 @@ namespace UAlbion.Formats.Assets
 {
     public class WaveLibSample : ISample
     {
-        byte[] _samples = Array.Empty<byte>();
         public int IsValid { get; private set; }
         public int Instrument { get; private set; }
         public int Type2 { get; set; }
@@ -15,10 +14,10 @@ namespace UAlbion.Formats.Assets
         public uint Length { get; private set; }
         public int Unk14 { get; set; }
         public int Unk18 { get; set; }
-        public int SampleRate { get; private set; }
+        public int SampleRate { get; private set; } // -1 = Use default sample rate (11025)
         public int Channels => 1;
         public int BytesPerSample => 1;
-        public ReadOnlySpan<byte> Samples { get => _samples; set => _samples = value.ToArray(); }
+        public byte[] Samples { get; set; } = Array.Empty<byte>();
 
         public static WaveLibSample Serdes(int i, WaveLibSample w, ISerializer s)
         {
@@ -41,8 +40,6 @@ namespace UAlbion.Formats.Assets
             ApiUtil.Assert(w.Unk18 == 0);
             ApiUtil.Assert(w.SampleRate == 11025 || w.SampleRate == -1);
 
-            if (w.SampleRate == -1)
-                w.SampleRate = 11025;
             return w;
         }
     }

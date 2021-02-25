@@ -60,6 +60,12 @@ namespace UAlbion.Formats
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (target == null) throw new ArgumentNullException(nameof(target));
 
+            if (ShortArrayEqualityCheck(source, target))
+            {
+                yield return DiffOperation.Copy(0, source.Length);
+                yield break;
+            }
+
             var sindex = InitMatch(source); // Initialise string matching
             for (int i = 0; i < target.Length;) // Loop over target offsets
             {
@@ -127,6 +133,19 @@ namespace UAlbion.Formats
             }
 
             return (uint)(s2 * 65536 + (long)s1);
+        }
+
+        static bool ShortArrayEqualityCheck(byte[] a, byte[] b)
+        {
+            if (a.Length > 16 || (a.Length != b.Length))
+                return false;
+
+            for (int i = 0; i < a.Length; i++)
+            {
+                if (a[i] == b[i]) continue;
+                return false;
+            }
+            return true;
         }
     }
 }

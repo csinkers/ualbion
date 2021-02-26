@@ -31,5 +31,6 @@ namespace UAlbion.Game.Assets
         public AssetMapping Mapping { get; } = new AssetMapping();
         public string Path { get; }
         public string AssetPath { get; }
+        public override string ToString() => $"Mod:{Name}";
     }
 }

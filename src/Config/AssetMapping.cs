@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
 using UAlbion.Api;
@@ -19,15 +20,15 @@ namespace UAlbion.Config
                 .GetEnumValues()
                 .OfType<AssetType>()
                 .ToArray();
-#if DEBUG
-        static readonly AssetType[] UnmappedTypes =
-            AllAssetTypes
-            .Where(x =>
-                typeof(AssetType)
+
+        static T GetAttribute<T>(object x) where T : Attribute =>
+            (T)x.GetType()
                 .GetMember(x.ToString())[0]
-                .GetCustomAttributes(typeof(UnmappedAttribute), false)
-                .FirstOrDefault() != null
-            ).ToArray();
+                .GetCustomAttributes(typeof(T), false)
+                .FirstOrDefault();
+
+#if DEBUG
+        static readonly AssetType[] UnmappedTypes = AllAssetTypes.Where(x => GetAttribute<UnmappedAttribute>(x) != null).ToArray();
 #endif
 
         // The global mapping, should always be used apart from when loading/saving assets.
@@ -40,6 +41,7 @@ namespace UAlbion.Config
             public Range(int from, int to) { From = from; To = to; }
             public int From { get; }
             public int To { get; }
+            public override string ToString() => $"{From}:{To}";
         }
 
         class EnumInfo
@@ -319,6 +321,49 @@ namespace UAlbion.Config
                 _stringLookup[id] = (target, (ushort)(offset + numeric - min));
             }
             return this;
+        }
+
+        public void ConsistencyCheck()
+        {
+            (string, string ) Describe(AssetType assetType)
+            {
+                var sbBasic = new StringBuilder();
+                var sbFull = new StringBuilder();
+                foreach (var info in _byAssetType[(byte)assetType])
+                {
+                    var basic = $"O:{info.Offset} {string.Join(" ", info.Ranges.Select(x => x.ToString()))}";
+                    sbBasic.AppendLine(basic);
+                    sbFull.AppendLine($"      {basic} ({info.EnumTypeString})");
+                }
+
+                return (sbBasic.ToString(), sbFull.ToString());
+            }
+
+
+            var issues = new List<string>();
+            foreach (var assetType in AllAssetTypes)
+            {
+                var iso = GetAttribute<IsomorphicToAttribute>(assetType);
+                if (iso != null)
+                {
+                    var (basicA, fullA) = Describe(assetType);
+                    var (basicB, fullB) = Describe(iso.Type);
+                    if (string.Equals(basicA, basicB, StringComparison.Ordinal)) continue;
+                    issues.Add($"  The mapping of {assetType} should be isomorphic to {iso.Type}, but it is not:");
+                    issues.Add($"    {assetType} mapping:");
+                    issues.Add(fullA);
+                    issues.Add($"    {iso.Type} mapping:");
+                    issues.Add(fullB);
+                }
+            }
+
+            if (issues.Count > 0)
+            {
+                throw new InvalidOperationException(
+                    "AssetMapping constraints violated: " 
+                    + Environment.NewLine 
+                    + string.Join(Environment.NewLine, issues));
+            }
         }
 
         public (AssetId, ushort)? TextIdToStringId(AssetId id) => _stringLookup.ContainsKey(id) ? _stringLookup[id] : ((AssetId, ushort)?)null;

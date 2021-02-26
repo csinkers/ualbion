@@ -77,6 +77,7 @@ namespace UAlbion
             generalConfig.SetPath("LANG", settings.Language.ToString()
                 .ToUpperInvariant()); // Ensure that the LANG path is set before resolving any assets
             modApplier.LoadMods(generalConfig);
+            AssetMapping.Global.ConsistencyCheck();
             PerfTracker.StartupEvent("Loaded mods");
 
             var coreConfig = await coreConfigTask.ConfigureAwait(false);

@@ -80,7 +80,7 @@ namespace UAlbion.CodeGenerator
         static string BuildEnumCasts(string name, string[] enumNames)
         {
             var sb = new StringBuilder();
-            foreach (var fullEnumName in enumNames)
+            foreach (var fullEnumName in enumNames.OrderBy(x => x))
             {
                 int index = fullEnumName.IndexOf(',');
                 string enumName = index == -1 ? fullEnumName : fullEnumName.Substring(0, index);

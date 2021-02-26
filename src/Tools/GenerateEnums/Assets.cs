@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UAlbion.Config;
@@ -11,7 +10,6 @@ namespace UAlbion.CodeGenerator
         public string BaseDir { get; }
         public AssetConfig AssetConfig { get; }
         public AssetIdConfig AssetIdConfig { get; }
-        public Dictionary<string, EnumData> Enums { get; }
         public Dictionary<string, string[]> ParentsByAssetId { get; }
         public Dictionary<string, string[]> AssetIdsByEnum { get; }
         public Dictionary<string, string[]> EnumsByAssetId { get; }
@@ -26,13 +24,11 @@ namespace UAlbion.CodeGenerator
             AssetConfig = AssetConfig.Load(config.ResolvePath("$(MODS)/Base/assets.json", null));
             AssetIdConfig = AssetIdConfig.Load(assetIdConfigPath);
 
-            //Enums = LoadEnums(AssetConfig);
-            //DeduplicateEnums(Enums);
             AssetIdsByType = FindAssetIdsByType(AssetIdConfig);
             ParentsByAssetId = FindAssetIdParents(AssetIdConfig, AssetIdsByType);
-            // AssetIdsByEnum = FindAssetIdsForEnums(Enums, AssetIdsByType);
-            // EnumsByAssetId = FindEnumsByAssetId(Enums, AssetIdsByType);
-            //HandleIsomorphism(Enums);
+            AssetIdsByEnum = FindAssetIdsForEnums(AssetConfig.IdTypes, AssetIdsByType);
+            EnumsByAssetId = FindEnumsByAssetId(AssetConfig.IdTypes, AssetIdsByType);
+            // HandleIsomorphism(AssetConfig.IdTypes);
 
             // TODO: Build family based on IsomorphicToAttribute.
             // * AssetTypes in a family need to have a single-type AssetId
@@ -42,10 +38,10 @@ namespace UAlbion.CodeGenerator
             // ....getting complicated.
         }
 
-        Dictionary<string, string[]> FindEnumsByAssetId(Dictionary<string, EnumData> enums, ILookup<AssetType, string> assetIdsByType) =>
+        static Dictionary<string, string[]> FindEnumsByAssetId(IDictionary<string, AssetTypeInfo> enums, ILookup<AssetType, string> assetIdsByType) =>
             (from e in enums
              from assetId in assetIdsByType[e.Value.AssetType]
-             group e.Key by assetId into g
+             group e.Value.EnumType by assetId into g
              select (g.Key, g.ToArray()))
             .ToDictionary(x => x.Key, x => x.Item2);
 
@@ -56,7 +52,7 @@ namespace UAlbion.CodeGenerator
                 select (assetType, assetId))
             .ToLookup(x => x.assetType, x => x.assetId);
 
-        static Dictionary<string, string[]> FindAssetIdsForEnums(Dictionary<string, EnumData> enums, ILookup<AssetType, string> assetIdsByType) =>
+        static Dictionary<string, string[]> FindAssetIdsForEnums(IDictionary<string, AssetTypeInfo> enums, ILookup<AssetType, string> assetIdsByType) =>
             enums.ToDictionary(
                     e => e.Key,
                     e => assetIdsByType[e.Value.AssetType].ToArray());
@@ -71,7 +67,8 @@ namespace UAlbion.CodeGenerator
                     .ToArray());
 
         static bool IsSuperSet(IEnumerable<AssetType> a, IEnumerable<AssetType> b) => new HashSet<AssetType>(a).IsProperSupersetOf(b);
-/*
+
+        /*
         static Dictionary<string, EnumData> LoadEnums(AssetConfig config)
         {
             var enums = new Dictionary<string, EnumData>();
@@ -107,7 +104,7 @@ namespace UAlbion.CodeGenerator
             }
 
             return enums;
-        }*/
+        }
 
         static void DeduplicateEnums(Dictionary<string, EnumData> enums)
         {
@@ -180,6 +177,7 @@ namespace UAlbion.CodeGenerator
                     e.Entries.Add(entry);
             }
         }
+        */
 
         static readonly char[] ForbiddenCharacters = { ' ', '\t', '-', '(', ')', ',', '?', '.', '"' };
         static string Sanitise(string x)

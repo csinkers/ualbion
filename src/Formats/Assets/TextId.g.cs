@@ -93,11 +93,11 @@ namespace UAlbion.Formats.Assets
 
         public static implicit operator AssetId(TextId id) => AssetId.FromUInt32(id._value);
         public static implicit operator TextId(AssetId id) => new TextId(id.ToUInt32());
+        public static implicit operator TextId(UAlbion.Base.EventText id) => TextId.From(id);
+        public static implicit operator TextId(UAlbion.Base.MapText id) => TextId.From(id);
         public static implicit operator TextId(UAlbion.Base.Special id) => TextId.From(id);
         public static implicit operator TextId(UAlbion.Base.SystemText id) => TextId.From(id);
         public static implicit operator TextId(UAlbion.Base.UAlbionString id) => TextId.From(id);
-        public static implicit operator TextId(UAlbion.Base.EventText id) => TextId.From(id);
-        public static implicit operator TextId(UAlbion.Base.MapText id) => TextId.From(id);
         public static implicit operator TextId(UAlbion.Base.Word id) => TextId.From(id);
 
         public readonly int ToInt32() => unchecked((int)_value);

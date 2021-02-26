@@ -7,7 +7,6 @@
             // TODO: Add verify mode
             var assets = new Assets();
             GenerateAssetIds.Generate(assets);
-            GenerateEnums.Generate(assets);
         }
     }
 }

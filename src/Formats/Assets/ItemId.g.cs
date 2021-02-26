@@ -47,6 +47,10 @@ namespace UAlbion.Formats.Assets
         public static ItemId FromDisk(AssetType type, int disk, AssetMapping mapping)
         {
             if (mapping == null) throw new ArgumentNullException(nameof(mapping));
+            
+            if (!(type == AssetType.None || type >= AssetType.Gold && type <= AssetType.Item))
+                throw new ArgumentOutOfRangeException($"Tried to construct a ItemId with a type of {type}");
+
             var (enumType, enumValue) = mapping.IdToEnum(new ItemId(type, disk));
             return (ItemId)AssetMapping.Global.EnumToId(enumType, enumValue);
         }
@@ -66,9 +70,7 @@ namespace UAlbion.Formats.Assets
 
             ushort diskValue = (ushort)id.ToDisk(mapping);
             diskValue = s.UInt16(name, diskValue);
-            id = FromDisk(type, diskValue, mapping);
-            if(s.IsCommenting()) s.Comment(id.ToString());
-            return id;
+            return FromDisk(type, diskValue, mapping);
         }
 
         public static ItemId SerdesU16BE(string name, ItemId id, AssetType type, AssetMapping mapping, ISerializer s)

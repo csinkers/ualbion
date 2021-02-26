@@ -61,7 +61,9 @@ namespace UAlbion.Formats.Assets
 
             byte diskValue = (byte)id.ToDisk(mapping);
             diskValue = s.UInt8(name, diskValue);
-            return FromDisk(type, diskValue, mapping);
+            id = FromDisk(type, diskValue, mapping);
+            if (s.IsCommenting()) s.Comment(id.ToString());
+            return id;
         }
 
         public static CharacterId SerdesU16(string name, CharacterId id, AssetType type, AssetMapping mapping, ISerializer s)
@@ -70,7 +72,9 @@ namespace UAlbion.Formats.Assets
 
             ushort diskValue = (ushort)id.ToDisk(mapping);
             diskValue = s.UInt16(name, diskValue);
-            return FromDisk(type, diskValue, mapping);
+            id = FromDisk(type, diskValue, mapping);
+            if (s.IsCommenting()) s.Comment(id.ToString());
+            return id;
         }
 
         public static CharacterId SerdesU16BE(string name, CharacterId id, AssetType type, AssetMapping mapping, ISerializer s)
@@ -79,7 +83,9 @@ namespace UAlbion.Formats.Assets
 
             ushort diskValue = (ushort)id.ToDisk(mapping);
             diskValue = s.UInt16BE(name, diskValue);
-            return FromDisk(type, diskValue, mapping);
+            id = FromDisk(type, diskValue, mapping);
+            if (s.IsCommenting()) s.Comment(id.ToString());
+            return id;
         }
 
         public readonly AssetType Type => (AssetType)((_value & 0xff00_0000) >> 24);

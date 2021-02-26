@@ -5,6 +5,7 @@ using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.MapEvents;
@@ -62,7 +63,7 @@ namespace UAlbion.Game.Entities.Map2D
             _logicalMap.TileSize = renderable.TileSize;
 
             var movementSettings = _logicalMap.UseSmallSprites ? MovementSettings.Small() : MovementSettings.Large();
-            _partyMovement = AttachChild(new PartyCaterpillar(Vector2.Zero, MovementDirection.Right, movementSettings));
+            _partyMovement = AttachChild(new PartyCaterpillar(Vector2.Zero, Direction.East, movementSettings));
 
             foreach (var npc in _logicalMap.Npcs)
             {

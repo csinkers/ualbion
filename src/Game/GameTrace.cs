@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.Tracing;
 using UAlbion.Config;
 using UAlbion.Formats;
-using UAlbion.Game.Entities.Map2D;
 
 namespace UAlbion.Game
 {
@@ -22,7 +21,7 @@ namespace UAlbion.Game
             WriteEvent(1, type, id, name, language, path);
         }
 
-        public void Move(MovementDirection oldDir, MovementDirection desiredDir, MovementDirection facingDir, float fromX, float fromY, float toX, float toY, int frame)
+        public void Move(Direction oldDir, Direction desiredDir, Direction facingDir, float fromX, float fromY, float toX, float toY, int frame)
         {
             WriteEvent(2, oldDir, desiredDir, facingDir, fromX, fromY, toX, toY, frame);
         }

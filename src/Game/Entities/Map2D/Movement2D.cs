@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using UAlbion.Formats;
 
 namespace UAlbion.Game.Entities.Map2D
 {
@@ -13,15 +14,13 @@ namespace UAlbion.Game.Entities.Map2D
         }
 
         readonly MovementSettings _settings;
-        Vector2 _direction;
         MoveTarget? _target;
         int _movementTick;
         public Movement2D(MovementSettings settings) => _settings = settings ?? throw new ArgumentNullException(nameof(settings));
 
-        public MovementDirection FacingDirection { get; set; }
+        public Direction FacingDirection { get; set; }
         public bool Clipping { get; set; } = true;
         public Vector2 Position { get; set; }
-        public void AddDirection(Vector2 direction) => _direction += direction;
         public event EventHandler<(int, int)> EnteredTile;
 
         public int SpriteFrame
@@ -30,10 +29,10 @@ namespace UAlbion.Game.Entities.Map2D
             {
                 var anim = FacingDirection switch
                 {
-                    MovementDirection.Left => SpriteAnimation.WalkW,
-                    MovementDirection.Right => SpriteAnimation.WalkE,
-                    MovementDirection.Up => SpriteAnimation.WalkN,
-                    MovementDirection.Down => SpriteAnimation.WalkS,
+                    Direction.West => SpriteAnimation.WalkW,
+                    Direction.East => SpriteAnimation.WalkE,
+                    Direction.North => SpriteAnimation.WalkN,
+                    Direction.South => SpriteAnimation.WalkS,
                     _ => SpriteAnimation.Sleeping
                 };
 
@@ -42,44 +41,30 @@ namespace UAlbion.Game.Entities.Map2D
             }
         }
 
-        public bool Update(ICollisionManager detector, Vector2 position)
+        public bool Update(ICollisionManager detector, Vector2 direction)
         {
             bool moved = false;
-            if (_target == null && _direction.LengthSquared() > float.Epsilon)
-                _direction = CheckForCollisions(detector, position, _direction);
+            if (_target == null && direction.LengthSquared() > float.Epsilon)
+                direction = CheckForCollisions(detector, Position, direction);
 
-            if (_target == null && _direction.LengthSquared() > float.Epsilon)
+            if (_target == null && direction.LengthSquared() > float.Epsilon)
             {
-                MovementDirection desiredDirection = FacingDirection;
-                if (_direction.X > 0) desiredDirection = MovementDirection.Right;
-                else if (_direction.X < 0) desiredDirection = MovementDirection.Left;
-                else if (_direction.Y > 0) desiredDirection = MovementDirection.Down;
-                else if (_direction.Y < 0) desiredDirection = MovementDirection.Up;
+                Direction desiredDirection = FacingDirection;
+                if (direction.X > 0) desiredDirection = Direction.East;
+                else if (direction.X < 0) desiredDirection = Direction.West;
+                else if (direction.Y > 0) desiredDirection = Direction.South;
+                else if (direction.Y < 0) desiredDirection = Direction.North;
 
-                var target = new MoveTarget { From = position, To = position + _direction, StartTick = _movementTick };
+                var target = new MoveTarget { From = Position, To = Position + direction, StartTick = _movementTick };
                 var oldDirection = FacingDirection;
                 (FacingDirection, _target) = (FacingDirection, desiredDirection) switch
                 {
-                    (MovementDirection.Left, MovementDirection.Left) => (MovementDirection.Left, target),
-                    (MovementDirection.Left, MovementDirection.Right) => (MovementDirection.Down, (MoveTarget?)null),
-                    (MovementDirection.Left, MovementDirection.Up) => (MovementDirection.Up, null),
-                    (MovementDirection.Left, MovementDirection.Down) => (MovementDirection.Down, null),
-
-                    (MovementDirection.Right, MovementDirection.Left) => (MovementDirection.Down, null),
-                    (MovementDirection.Right, MovementDirection.Right) => (MovementDirection.Right, target),
-                    (MovementDirection.Right, MovementDirection.Up) => (MovementDirection.Up, null),
-                    (MovementDirection.Right, MovementDirection.Down) => (MovementDirection.Down, null),
-
-                    (MovementDirection.Up, MovementDirection.Left) => (MovementDirection.Left, null),
-                    (MovementDirection.Up, MovementDirection.Right) => (MovementDirection.Right, null),
-                    (MovementDirection.Up, MovementDirection.Up) => (MovementDirection.Up, target),
-                    (MovementDirection.Up, MovementDirection.Down) => (MovementDirection.Right, null),
-
-                    (MovementDirection.Down, MovementDirection.Left) => (MovementDirection.Left, null),
-                    (MovementDirection.Down, MovementDirection.Right) => (MovementDirection.Right, null),
-                    (MovementDirection.Down, MovementDirection.Up) => (MovementDirection.Right, null),
-                    (MovementDirection.Down, MovementDirection.Down) => (MovementDirection.Down, target),
-                    _ => (FacingDirection, null)
+                    ({ } a, { } b) when a == b => (a, target),
+                    (Direction.West, Direction.East) => (Direction.South, (MoveTarget?)null),
+                    (Direction.East, Direction.West) => (Direction.South, null),
+                    (Direction.North, Direction.South) => (Direction.East, null),
+                    (Direction.South, Direction.North) => (Direction.East, null),
+                    _ => (desiredDirection, null)
                 };
 
                 if (_target == null) // If it's just a direction change, we should still update the active frame
@@ -111,7 +96,6 @@ namespace UAlbion.Game.Entities.Map2D
                     _target = null;
             }
 
-            _direction = Vector2.Zero;
             return moved;
         }
 
@@ -160,7 +144,7 @@ namespace UAlbion.Game.Entities.Map2D
             if (Probe(direction))
                 return direction;
 
-            if((int)direction.X != 0 && (int)direction.Y != 0) // First try and reduce diagonal movement to an axis-aligned movement
+            if ((int)direction.X != 0 && (int)direction.Y != 0) // First try and reduce diagonal movement to an axis-aligned movement
             {
                 var result = CheckForCollisions(detector, position, new Vector2(direction.X, 0));
                 if ((int)result.X != 0 || (int)result.Y != 0)
@@ -171,21 +155,21 @@ namespace UAlbion.Game.Entities.Map2D
 
             return ((int)direction.X, (int)direction.Y) switch // First probe
             {
-                // Left
-                (-1, 0)  when Probe(new Vector2(-1.0f,  1.0f)) && Probe(new Vector2(0.0f, 1.0f)) => new Vector2(0.0f,  1.0f),  // Down
-                (-1, 0)  when Probe(new Vector2(-1.0f, -1.0f)) && Probe(new Vector2(0.0f, -1.0f)) => new Vector2(0.0f, -1.0f), // Up
+                // West
+                (-1, 0)  when Probe(new Vector2(-1.0f,  1.0f)) && Probe(new Vector2(0.0f, 1.0f)) => new Vector2(0.0f,  1.0f),  // South
+                (-1, 0)  when Probe(new Vector2(-1.0f, -1.0f)) && Probe(new Vector2(0.0f, -1.0f)) => new Vector2(0.0f, -1.0f), // North
 
-                // Right
-                ( 1, 0)  when Probe(new Vector2( 1.0f, -1.0f)) && Probe(new Vector2(0.0f, -1.0f)) => new Vector2(0.0f, -1.0f), // Up
-                ( 1, 0)  when Probe(new Vector2( 1.0f,  1.0f)) && Probe(new Vector2(0.0f,  1.0f)) => new Vector2(0.0f,  1.0f), // Down
+                // East
+                ( 1, 0)  when Probe(new Vector2( 1.0f, -1.0f)) && Probe(new Vector2(0.0f, -1.0f)) => new Vector2(0.0f, -1.0f), // North
+                ( 1, 0)  when Probe(new Vector2( 1.0f,  1.0f)) && Probe(new Vector2(0.0f,  1.0f)) => new Vector2(0.0f,  1.0f), // South
 
-                // Up
-                ( 0, -1) when Probe(new Vector2(-1.0f, -1.0f)) && Probe(new Vector2(-1.0f, 0.0f)) => new Vector2(-1.0f, 0.0f), // Left
-                ( 0, -1) when Probe(new Vector2( 1.0f, -1.0f)) && Probe(new Vector2( 1.0f, 0.0f)) => new Vector2( 1.0f, 0.0f), // Right
+                // North
+                ( 0, -1) when Probe(new Vector2(-1.0f, -1.0f)) && Probe(new Vector2(-1.0f, 0.0f)) => new Vector2(-1.0f, 0.0f), // West
+                ( 0, -1) when Probe(new Vector2( 1.0f, -1.0f)) && Probe(new Vector2( 1.0f, 0.0f)) => new Vector2( 1.0f, 0.0f), // East
 
-                // Down
-                ( 0, 1)  when Probe(new Vector2( 1.0f,  1.0f)) && Probe(new Vector2( 1.0f, 0.0f)) => new Vector2( 1.0f, 0.0f), // Right
-                ( 0, 1)  when Probe(new Vector2(-1.0f,  1.0f)) && Probe(new Vector2(-1.0f, 0.0f)) => new Vector2(-1.0f, 0.0f), // Left
+                // South
+                ( 0, 1)  when Probe(new Vector2( 1.0f,  1.0f)) && Probe(new Vector2( 1.0f, 0.0f)) => new Vector2( 1.0f, 0.0f), // East
+                ( 0, 1)  when Probe(new Vector2(-1.0f,  1.0f)) && Probe(new Vector2(-1.0f, 0.0f)) => new Vector2(-1.0f, 0.0f), // West
 
                 _ => Vector2.Zero
             };

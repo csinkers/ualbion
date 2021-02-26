@@ -24,6 +24,11 @@ namespace UAlbion.Game.Entities.Map2D
 
         bool IsOccupiedCore(Vector2 tilePosition)
         {
+            if ((int)tilePosition.X < 0) return true;
+            if ((int)tilePosition.Y < 0) return true;
+            if ((int)tilePosition.X >= _logicalMap.Width) return true;
+            if ((int)tilePosition.Y >= _logicalMap.Height) return true;
+
             var underlayTile = _logicalMap.GetUnderlay((int)tilePosition.X, (int)tilePosition.Y);
             var overlayTile = _logicalMap.GetOverlay((int)tilePosition.X, (int)tilePosition.Y);
 

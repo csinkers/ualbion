@@ -2,7 +2,6 @@
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats;
-using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
 
@@ -15,13 +14,14 @@ namespace UAlbion.Game.Entities.Map2D
 
         readonly (Vector3, int)[] _trail; // Positions (tile coordinates) and frame numbers.
         readonly (int, bool)[] _playerOffsets = new (int, bool)[Party.MaxPartySize]; // int = trail offset, bool = isMoving
+        Vector2 _direction;
         int _trailOffset;
         int TrailLength => Party.MaxPartySize * _settings.MaxTrailDistance; // Number of past positions to store
 
-        public PartyCaterpillar(Vector2 initialPosition, MovementDirection initialDirection, MovementSettings settings)
+        public PartyCaterpillar(Vector2 initialPosition, Direction initialDirection, MovementSettings settings)
         {
             On<FastClockEvent>(e => Update());
-            On<PartyMoveEvent>(e => _movement.AddDirection(new Vector2(e.X, e.Y)));
+            On<PartyMoveEvent>(e => _direction += new Vector2(e.X, e.Y));
             On<PartyJumpEvent>(e =>
             {
                 var position = new Vector2(e.X, e.Y);
@@ -34,14 +34,7 @@ namespace UAlbion.Game.Entities.Map2D
             {
                 var (position3d, _) = _trail[_trailOffset];
                 var position = new Vector2(position3d.X, position3d.Y);
-                _movement.FacingDirection = e.Direction switch
-                {
-                    Direction.North => MovementDirection.Up,
-                    Direction.East => MovementDirection.Right,
-                    Direction.South => MovementDirection.Down,
-                    Direction.West => MovementDirection.Left,
-                    _ => _movement.FacingDirection
-                };
+                _movement.FacingDirection = e.Direction;
                 MoveLeader(position);
             });
             On<NoClipEvent>(e =>
@@ -61,10 +54,10 @@ namespace UAlbion.Game.Entities.Map2D
 
             var offset = (initialDirection switch
             {
-                MovementDirection.Left  => new Vector2(1.0f, 0.0f),
-                MovementDirection.Right => new Vector2(-1.0f, 0.0f),
-                MovementDirection.Up    => new Vector2(0.0f, -1.0f),
-                MovementDirection.Down  => new Vector2(0.0f, 1.0f),
+                Direction.West  => new Vector2(1.0f, 0.0f),
+                Direction.East => new Vector2(-1.0f, 0.0f),
+                Direction.North    => new Vector2(0.0f, -1.0f),
+                Direction.South  => new Vector2(0.0f, 1.0f),
                 _ => Vector2.Zero
             }) / _settings.TicksPerTile;
 
@@ -79,13 +72,11 @@ namespace UAlbion.Game.Entities.Map2D
 
         void Update()
         {
-            var (position3d, _) = _trail[_trailOffset];
-            var position = new Vector2(position3d.X, position3d.Y);
-
             var detector = Resolve<ICollisionManager>();
-            if (_movement.Update(detector, position))
+            if (_movement.Update(detector, _direction))
                 MoveLeader(_movement.Position);
 
+            _direction = Vector2.Zero;
             MoveFollowers();
         }
 

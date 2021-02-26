@@ -93,7 +93,7 @@ namespace UAlbion.Formats.Assets.Maps
 
             for (int i = 0, j = 0; i < Events.Count; i++)
             {
-                while (sortedChains[j].eventId < i) j++;
+                while (sortedChains.Length > j + 1 && sortedChains[j].eventId < i) j++;
                 chainMapping[i] = (ushort)sortedChains[j].chainId;
             }
 

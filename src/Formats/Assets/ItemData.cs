@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Text;
 using Newtonsoft.Json;
 using SerdesNet;
@@ -16,7 +17,9 @@ namespace UAlbion.Formats.Assets
         public ItemType TypeId { get; set; } //  1 Item type
         public ItemSlotId SlotType { get; set; } //  2 Slot that can hold the item
         public byte BreakRate { get; set; } //  3 Chance to break the item
+        [DefaultValue(Genders.Any)]
         public Genders AllowedGender { get; set; } //  4 Determines which gender can use this item. 2 = female, 3 = any
+        [DefaultValue(1)]
         public byte Hands { get; set; } //  5 Determines how many free hands are required to equip the item.
         public byte LpMaxBonus { get; set; } //  6 Bonus value to life points.
         public byte SpMaxBonus { get; set; } //  7 Bonus value to spell points.
@@ -39,12 +42,15 @@ namespace UAlbion.Formats.Assets
         public byte MaxEnchantmentCount { get; set; } // 25 Maximum possible enchantments
         public byte MaxCharges { get; set; } // 26 Maximum number of charges
         public ItemFlags Flags { get; set; } // 27 Switch for vital, stackable and single-use items
+        [DefaultValue(1)]
         public byte IconAnim { get; set; } // 29 Number of animated images
         public ushort Weight { get; set; } // 30 weight of the item in grams
         public ushort Value { get; set; } // 32 Base resell value * 10.
         public SpriteId Icon { get; set; }
         public int IconSubId { get; set; } // 34 Image for the item
+        [DefaultValue(PlayerClasses.Anyone)]
         public PlayerClasses Class { get; set; } // 36 A bitfield that controls which classes can use the item.
+        [DefaultValue(0xffff)]
         public ushort Race { get; set; } // 38 Likely meant to control which race can use the item – but does not seem to work ?
         [JsonIgnore] public bool IsStackable => (Flags & ItemFlags.Stackable) != 0;
 

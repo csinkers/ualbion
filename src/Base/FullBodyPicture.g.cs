@@ -23,7 +23,7 @@ namespace UAlbion.Base
         Unknown8 = 8,
         Khunag = 9,
         Siobhan = 10,
-        Unknown11 = 11,
+/*        Unknown11 = 11,
         Unknown12 = 12,
         Unknown13 = 13,
         Unknown14 = 14,
@@ -226,7 +226,7 @@ namespace UAlbion.Base
         Unknown252 = 252,
         Unknown253 = 253,
         Unknown254 = 254,
-        Unknown255 = 255,
+        Unknown255 = 255, */
     }
 }
 #pragma warning restore CA1707 // Identifiers should not contain underscores

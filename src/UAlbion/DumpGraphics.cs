@@ -7,6 +7,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid.Textures;
+using UAlbion.Formats.Assets;
 using UAlbion.Game;
 
 namespace UAlbion
@@ -15,6 +16,7 @@ namespace UAlbion
     {
         public static void Dump(IAssetManager assets, string baseDir, ISet<AssetType> types, DumpFormats formats, AssetId[] dumpIds)
         {
+            var hints = PaletteHints.Load(Path.Combine(baseDir, "mods", "Base", "palette_hints.json"));
             void Export<TEnum>(string name) where TEnum : unmanaged, Enum
             {
                 var directory = Path.Combine(baseDir, "data", "exported", "gfx", name);
@@ -29,7 +31,7 @@ namespace UAlbion
                     if (dumpIds != null && !dumpIds.Contains(assetId))
                         continue;
 
-                    ExportImage(assetId, assets, directory, formats, (frame, palFrame) => palFrame < 10); // Limit to 10, some of the tile sets can get a bit silly.
+                    ExportImage(assetId, assets, hints, directory, formats, (frame, palFrame) => palFrame < 10); // Limit to 10, some of the tile sets can get a bit silly.
                 }
             }
 
@@ -71,11 +73,25 @@ namespace UAlbion
             public DumpFormats Format { get; set; }
         }
 
-        public static IList<ExportedImageInfo> ExportImage(AssetId assetId, IAssetManager assets, string directory, DumpFormats formats, Func<int, int, bool> frameFilter = null)
+        public static IList<ExportedImageInfo> ExportImage(
+            AssetId assetId,
+            IAssetManager assets,
+            PaletteHints hints,
+            string directory,
+            DumpFormats formats,
+            Func<int, int, bool> frameFilter = null)
         {
             var filenames = new List<ExportedImageInfo>();
             var config = assets.GetAssetInfo(assetId);
-            var palette = assets.LoadPalette((Base.Palette)(config?.Get<int?>("PaletteHint", null) ?? (int)Base.Palette.Inventory));
+            AlbionPalette palette;
+            if (config != null)
+            {
+                var rawPaletteId = hints.Get(config.File.Filename, config.SubAssetId);
+                var paletteId = new PaletteId(AssetType.Palette, rawPaletteId);
+                palette = assets.LoadPalette(paletteId);
+            }
+            else palette = assets.LoadPalette(Base.Palette.Inventory);
+
             var texture = assets.LoadTexture(assetId);
             if (texture == null)
                 return filenames;

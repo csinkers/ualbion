@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using SerdesNet;
 using UAlbion.Api;
 
@@ -11,6 +12,7 @@ namespace UAlbion.Formats.Assets.Maps
         public Passability Collision { get; set; }
         public TileFlags Flags { get; set; }
         public ushort ImageNumber { get; set; }
+        [DefaultValue(1)]
         public byte FrameCount { get; set; }
         public byte Unk7 { get; set; }
 

@@ -215,6 +215,9 @@ namespace UAlbion.Game.Assets
 
         object LoadAssetInternal(AssetId id, Dictionary<string, string> extraPaths)
         {
+            if (id.IsNone)
+                return null;
+
             if (id.Type == AssetType.MetaFont)
                 return Resolve<IMetafontBuilder>().Build((MetaFontId)id.Id);
 
@@ -240,7 +243,7 @@ namespace UAlbion.Game.Assets
             }
 
             if (asset == null)
-                throw new InvalidOperationException($"Could not load asset for {id}");
+                throw new AssetNotFoundException($"Could not load asset for {id}");
 
             while (patches != null && patches.Count > 0)
                 asset = patches.Pop().Apply(asset);

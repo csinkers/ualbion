@@ -17,15 +17,17 @@ namespace UAlbion
     {
         class DumpProperties
         {
-            public DumpProperties(IAssetManager assets, string tilesetDir, string exportDir, Func<string, TextWriter> getWriter)
+            public DumpProperties(IAssetManager assets, PaletteHints hints, string tilesetDir, string exportDir, Func<string, TextWriter> getWriter)
             {
                 Assets = assets;
+                Hints = hints;
                 TilesetDir = tilesetDir;
                 ExportDir = exportDir;
                 GetWriter = getWriter;
             }
 
             public IAssetManager Assets { get; }
+            public PaletteHints Hints { get; }
             public string TilesetDir { get; }
             public string ExportDir { get; }
             public Func<string, TextWriter> GetWriter { get; }
@@ -53,7 +55,8 @@ namespace UAlbion
                 return writer;
             }
 
-            var props = new DumpProperties(assets, tilesetDir, exportDir, Writer);
+            var hints = PaletteHints.Load(Path.Combine(baseDir, "mods", "Base", "palette_hints.json"));
+            var props = new DumpProperties(assets, hints, tilesetDir, exportDir, Writer);
 
             void Flush()
             {
@@ -93,7 +96,7 @@ namespace UAlbion
             if (types.Contains(AssetType.TilesetData))
             {
                 foreach (TilesetId id in DumpUtil.All(AssetType.TilesetData, dumpIds))
-                    Dump2DTilemap(assets, id, props);
+                    Dump2DTilemap(props, id);
 
                 Flush();
             }
@@ -135,7 +138,7 @@ namespace UAlbion
             var tiles = new List<Tiled.TileProperties>();
             foreach (var id in assetIds)
             {
-                var info = DumpGraphics.ExportImage(id, props.Assets, spriteDir, DumpFormats.Png, (frame, palFrame) => frame == 9 && palFrame == 0).SingleOrDefault();
+                var info = DumpGraphics.ExportImage(id, props.Assets, props.Hints, spriteDir, DumpFormats.Png, (frame, palFrame) => frame == 9 && palFrame == 0).SingleOrDefault();
                 if (info == null)
                     continue;
                 tiles.Add(new Tiled.TileProperties
@@ -152,20 +155,21 @@ namespace UAlbion
             tilemap.Save(Path.Combine(props.TilesetDir,  tilesetName + ".tsx"));
         }
 
-        static void Dump2DTilemap(IAssetManager assets, in TilesetId id, DumpProperties props)
+        static void Dump2DTilemap(DumpProperties props, in TilesetId id)
         {
             var tileGfxDir = Path.Combine(props.TilesetDir, "tiles");
             if (!Directory.Exists(tileGfxDir))
                 Directory.CreateDirectory(tileGfxDir);
 
-            TilesetData tileset = assets.LoadTileData(id);
-            ITexture sheet = assets.LoadTexture(id.ToTilesetGraphics());
+            TilesetData tileset = props.Assets.LoadTileData(id);
+            ITexture sheet = props.Assets.LoadTexture(id.ToTilesetGraphics());
             if (tileset == null) return;
             if (sheet == null) return;
 
             var sheetInfo = DumpGraphics.ExportImage(
                     id.ToTilesetGraphics(),
-                    assets,
+                    props.Assets,
+                    props.Hints,
                     tileGfxDir,
                     DumpFormats.Png,
                     (frame, palFrame) => frame == 0 && palFrame == 0

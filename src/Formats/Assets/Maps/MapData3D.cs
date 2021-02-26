@@ -60,6 +60,8 @@ namespace UAlbion.Formats.Assets.Maps
             if (s.IsReading() && s.IsComplete() || s.IsWriting() && map.AutomapGraphics == null)
             {
                 ApiUtil.Assert(map.Zones.Count == 0);
+                foreach (var npc in map.Npcs)
+                    npc.Waypoints = new NpcWaypoint[1];
                 return map;
             }
 

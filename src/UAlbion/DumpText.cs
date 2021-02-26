@@ -99,7 +99,7 @@ namespace UAlbion
                 sw.WriteLine("    Contents: " + string.Join(" ", contents.Select(x => $"{x.Key}:{x.Item2}")));
 
                 var l = assets.LoadLabyrinthData(map.LabDataId);
-                if (l == null) 
+                if (l == null) // Map 190 is completely broken and doesn't even specify a labyrinth
                     continue;
 
                 foreach (var (content, _) in contents)
@@ -246,10 +246,14 @@ namespace UAlbion
                     }
 
                     sw.WriteLine();
-                    sw.WriteLine($"        EventChain: {npc.Chain}");
-                    var formatter = new EventFormatter(assets.LoadString, id.ToMapText());
-                    sw.WriteLine(formatter.FormatChain(npc.Node, "          "));
+                    if (npc.Chain != 0xffff)
+                    {
+                        sw.WriteLine($"        EventChain: {npc.Chain}");
+                        var formatter = new EventFormatter(assets.LoadString, id.ToMapText());
+                        sw.WriteLine(formatter.FormatChain(npc.Node, "          "));
+                    }
                 }
+                sw.WriteLine();
             }
         }
 

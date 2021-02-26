@@ -42,6 +42,8 @@ namespace UAlbion.Formats.MapEvents
                 QueryType.Unk21 => QueryUnk21Event.Serdes((QueryUnk21Event)e, s),
                 QueryType.EventUsed => QueryEventUsedEvent.Serdes((QueryEventUsedEvent)e, s),
                 QueryType.DemoVersion => QueryDemoVersionEvent.Serdes((QueryDemoVersionEvent)e, s),
+                QueryType.Unk29 => QueryUnk29Event.Serdes((QueryUnk29Event)e, s),
+                QueryType.Unk2A => QueryUnk2AEvent.Serdes((QueryUnk2AEvent)e, s),
                 QueryType.PromptPlayerNumeric => PromptPlayerNumericEvent.Serdes((PromptPlayerNumericEvent)e, textSourceId, s),
                 _ => throw new FormatException($"Unexpected query type \"queryType\"")
             };

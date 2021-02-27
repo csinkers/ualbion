@@ -11,6 +11,7 @@ namespace UAlbion.Config
         public IDictionary<string, AssetTypeInfo> IdTypes { get; } = new Dictionary<string, AssetTypeInfo>();
         public IDictionary<string, string> StringMappings { get; } = new Dictionary<string, string>();
         public IDictionary<string, string> Loaders { get; } = new Dictionary<string, string>();
+        public IDictionary<string, string> Containers { get; } = new Dictionary<string, string>();
         public IDictionary<string, LanguageConfig> Languages { get; } = new Dictionary<string, LanguageConfig>();
         public IDictionary<string, AssetFileInfo> Files { get; } = new Dictionary<string, AssetFileInfo>();
         Dictionary<AssetId, AssetInfo[]> _assetLookup;
@@ -18,8 +19,11 @@ namespace UAlbion.Config
         public static AssetConfig Parse(string configText)
         {
             var config = JsonConvert.DeserializeObject<AssetConfig>(configText);
-            config.PostLoad();
-            return config;
+            if (config == null)
+                return null;
+
+            config?.PostLoad();
+            return (AssetConfig)config;
         }
 
         public static AssetConfig Load(string configPath)
@@ -28,7 +32,10 @@ namespace UAlbion.Config
                 throw new FileNotFoundException($"Could not open asset config from {configPath}");
 
             var configText = File.ReadAllText(configPath);
-            return Parse(configText);
+            var config = Parse(configText);
+            if(config == null)
+                throw new FileLoadException($"Could not load asset config from \"{configPath}\"");
+            return config;
         }
 
         public void Save(string configPath)
@@ -63,8 +70,11 @@ namespace UAlbion.Config
                 if (index != -1)
                     kvp.Value.Sha256Hash = kvp.Key.Substring(index + 1);
 
-                if (Loaders.TryGetValue(kvp.Value.Loader, out var typeName))
+                if (kvp.Value.Loader != null && Loaders.TryGetValue(kvp.Value.Loader, out var typeName))
                     kvp.Value.Loader = typeName;
+
+                if (kvp.Value.Container != null && Containers.TryGetValue(kvp.Value.Container, out typeName))
+                    kvp.Value.Container = typeName;
 
                 foreach (var asset in kvp.Value.Map)
                 {

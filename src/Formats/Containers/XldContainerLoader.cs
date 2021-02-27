@@ -9,7 +9,9 @@ using UAlbion.Formats.Assets.Save;
 
 namespace UAlbion.Formats.Containers
 {
-    [ContainerLoader(ContainerFormat.Xld)]
+    /// <summary>
+    /// Simple container, header contains file sizes, then followed by uncompressed raw file data.
+    /// </summary>
     public class XldContainerLoader : IContainerLoader
     {
         const string MagicString = "XLD0I";

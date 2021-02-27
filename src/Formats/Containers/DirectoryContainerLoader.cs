@@ -6,7 +6,9 @@ using UAlbion.Config;
 
 namespace UAlbion.Formats.Containers
 {
-    [ContainerLoader(ContainerFormat.Directory)]
+    /// <summary>
+    /// Sub-assets are just files in a directory, named 0_Foo, 1, 2_Bar etc (anything after an underscore is ignored when loading)
+    /// </summary>
     public class DirectoryContainerLoader : IContainerLoader
     {
         public ISerializer Open(string path, AssetInfo info)

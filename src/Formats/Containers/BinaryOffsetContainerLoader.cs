@@ -7,7 +7,9 @@ using UAlbion.Config;
 
 namespace UAlbion.Formats.Containers
 {
-    [ContainerLoader(ContainerFormat.BinaryOffsets)]
+    /// <summary>
+    /// Read chunks from a binary file using offsets & lengths specified in the assets.json file.
+    /// </summary>
     public class BinaryOffsetContainerLoader : IContainerLoader
     {
         public ISerializer Open(string file, AssetInfo info)

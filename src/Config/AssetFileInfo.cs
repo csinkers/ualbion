@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 // ReSharper disable UnassignedGetOnlyAutoProperty
 
 namespace UAlbion.Config
@@ -11,11 +10,9 @@ namespace UAlbion.Config
         [JsonIgnore] public string Filename { get; set; } // Just mirrors the dictionary key
         [JsonIgnore] public string Sha256Hash { get; set; } // Currently only used for MAIN.EXE
 
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ContainerFormat ContainerFormat { get; set; }
+        public string Container { get; set; }
         public string Loader { get; set; }
         public bool ShouldSerializeLoader() => Loader != null;
-        public string Format { get; set; }
         public int? Width { get; set; }
         public int? Height { get; set; }
         public bool? Transposed { get; set; }

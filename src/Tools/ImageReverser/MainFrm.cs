@@ -74,7 +74,7 @@ namespace UAlbion.Tools.ImageReverser
                 var fileInfo = new FileInfo(filename);
                 sb.AppendLine($"File Size: {fileInfo.Length}");
                 sb.AppendLine($"Path: {asset.File.Filename}");
-                sb.AppendLine($"Layer: {asset.File.Format}");
+                sb.AppendLine($"Loader: {asset.File.Loader}");
                 sb.AppendLine($"Conf Width: {asset.Width}");
                 sb.AppendLine($"Conf Height: {asset.Height}");
             }

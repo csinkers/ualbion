@@ -215,7 +215,7 @@ namespace UAlbion.Tools.ImageReverser
                 return;
 
             if (!asset.File.Width.HasValue &&
-                asset.File.Format == FixedSizeSpriteLoader.TypeString &&
+                asset.File.Loader == FixedSizeSpriteLoader.TypeString &&
                 asset.Width != trackWidth.Value)
             {
                 asset.Width = trackWidth.Value;
@@ -268,7 +268,7 @@ namespace UAlbion.Tools.ImageReverser
                         : _logicalSprite.Height / trackFrameCount.Value;
 
                 if (!asset.File.Height.HasValue &&
-                    asset.File.Format == FixedSizeSpriteLoader.TypeString &&
+                    asset.File.Loader == FixedSizeSpriteLoader.TypeString &&
                     asset.Height != newHeight)
                 {
                     asset.Set("Height", newHeight);

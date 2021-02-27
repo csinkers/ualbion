@@ -7,7 +7,6 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets.Save;
-using UAlbion.Formats.Containers;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Settings;
 
@@ -194,13 +193,7 @@ namespace DumpSave
             var settingsManager = new SettingsManager(settings);
             var assets = new AssetManager();
             var loaderRegistry = new AssetLoaderRegistry();
-            var containerLoaderRegistry = new ContainerLoaderRegistry().AddLoader(new RawContainerLoader())
-                .AddLoader(new XldContainerLoader())
-                .AddLoader(new BinaryOffsetContainerLoader())
-                .AddLoader(new ItemListContainerLoader())
-                .AddLoader(new SpellListContainerLoader())
-                .AddLoader(new DirectoryContainerLoader())
-                ;
+            var containerLoaderRegistry = new ContainerLoaderRegistry();
             var modApplier = new ModApplier()
                 // Register post-processors for handling transformations of asset data that can't be done by UAlbion.Formats alone.
                 .AddAssetPostProcessor(new AlbionSpritePostProcessor())

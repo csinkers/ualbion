@@ -9,7 +9,7 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class HeaderBasedSpriteLoader : IAssetLoader<AlbionSprite>
+    public class MultiHeaderSpriteLoader : IAssetLoader<AlbionSprite>
     {
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
             => Serdes((AlbionSprite)existing, config, mapping, s);
@@ -28,7 +28,7 @@ namespace UAlbion.Formats.Parsers
             ApiUtil.Assert(something == 0);
             byte frameCount = s.UInt8("Frames", (byte?)existing?.Frames.Count ?? 1);
 
-            // TODO: When writing, assert that the frame sizes are all the same
+            // TODO: When writing, assert that uniform and the frame sizes match up
             var frames = existing?.Frames.ToArray() ?? new AlbionSpriteFrame[frameCount];
             var allFrames = new List<byte[]>(frameCount * width * height);
             int currentY = 0;
@@ -37,6 +37,16 @@ namespace UAlbion.Formats.Parsers
             for (int i = 0; i < frameCount; i++)
             {
                 var frame = frames[i];
+                if (i > 0)
+                {
+                    width = s.UInt16("FrameWidth", (ushort?)frame?.Width ?? 0);
+                    height = s.UInt16("FrameHeight", (ushort?)frame?.Height ?? 0);
+                    something = s.UInt8(null, 0);
+                    ApiUtil.Assert(something == 0);
+                    byte spriteCount2 = s.UInt8(null, frameCount);
+                    ApiUtil.Assert(spriteCount2 == frameCount);
+                }
+
                 byte[] frameBytes = null;
                 if (s.IsWriting())
                 {
@@ -62,7 +72,7 @@ namespace UAlbion.Formats.Parsers
             if (existing != null)
             {
                 ApiUtil.Assert(spriteWidth == existing.Width,
-                    "HeaderSprite: Expected calculated and existing sprite width to be equal");
+                    "MultiHeaderSprite: Expected calculated and existing sprite width to be equal");
                 return existing;
             }
 
@@ -78,7 +88,7 @@ namespace UAlbion.Formats.Parsers
             }
 
             s.Check();
-            return new AlbionSprite(config.AssetId.ToString(), spriteWidth, currentY, true, pixelData, frames);
+            return new AlbionSprite(config.AssetId.ToString(), spriteWidth, currentY, false, pixelData, frames);
         }
     }
 }

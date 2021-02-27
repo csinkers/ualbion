@@ -170,7 +170,7 @@ namespace UAlbion.Base.Tests
             RoundTrip(testName, bytes, serdes);
         }
 
-        void RoundTripSpell<T>(string testName, string file, int subId, Func<T, ISerializer, T> serdes) where T : class
+        static void RoundTripSpell<T>(string testName, string file, int subId, Func<T, ISerializer, T> serdes) where T : class
         {
             var conf = AssetSystem.LoadGeneralConfig(BaseDir);
             var info = new AssetInfo { SubAssetId = subId };
@@ -224,7 +224,7 @@ namespace UAlbion.Base.Tests
         public void CommonPaletteTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Palette.CommonPalette) };
-            info.Set<bool>("IsCommon", true);
+            info.Set("IsCommon", true);
             RoundTripRaw<AlbionPalette>(nameof(CommonPaletteTest), "$(XLD)/PALETTE.000",
                 (x, s) => PaletteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
@@ -364,7 +364,7 @@ namespace UAlbion.Base.Tests
         public void TilesetTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Tileset.Toronto) };
-            RoundTripXld<Formats.Assets.Maps.TilesetData>(nameof(TilesetTest), "$(XLD)/ICONDAT0.XLD", 7,
+            RoundTripXld<TilesetData>(nameof(TilesetTest), "$(XLD)/ICONDAT0.XLD", 7,
                 (x, s) => TilesetLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -463,13 +463,9 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void CombatGfxTest()
         {
-            var info = new AssetInfo
-            {
-                AssetId = AssetId.From(CombatGraphics.Unknown27),
-                File = new AssetFileInfo { Format = "NonUninform" }
-            };
+            var info = new AssetInfo { AssetId = AssetId.From(CombatGraphics.Unknown27) };
             RoundTripXld<AlbionSprite>(nameof(CombatGfxTest), "$(XLD)/COMGFX0.XLD", 26,
-                (x, s) => HeaderBasedSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
+                (x, s) => MultiHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
         [Fact]
@@ -520,13 +516,9 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void MonsterGfxTest()
         {
-            var info = new AssetInfo
-            {
-                AssetId = AssetId.From(MonsterGraphics.Krondir),
-                File = new AssetFileInfo { Format = "NonUniform" }
-            };
+            var info = new AssetInfo { AssetId = AssetId.From(MonsterGraphics.Krondir) };
             RoundTripXld<AlbionSprite>(nameof(MonsterGfxTest), "$(XLD)/MONGFX0.XLD", 9,
-                (x, s) => HeaderBasedSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
+                (x, s) => MultiHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
         [Fact]
@@ -613,7 +605,8 @@ namespace UAlbion.Base.Tests
         static readonly FixedSizeSpriteLoader FixedSizeSpriteLoader = new FixedSizeSpriteLoader();
         static readonly FontSpriteLoader FontSpriteLoader = new FontSpriteLoader();
         static readonly HeaderBasedSpriteLoader HeaderBasedSpriteLoader = new HeaderBasedSpriteLoader();
-        static readonly InterlacedBitmapLoader InterlacedBitmapLoader = new InterlacedBitmapLoader();
+        static readonly MultiHeaderSpriteLoader MultiHeaderSpriteLoader = new MultiHeaderSpriteLoader();
+        // static readonly InterlacedBitmapLoader InterlacedBitmapLoader = new InterlacedBitmapLoader();
         static readonly ItemDataLoader ItemDataLoader = new ItemDataLoader();
         static readonly ItemNameLoader ItemNameLoader = new ItemNameLoader();
         static readonly LabyrinthDataLoader LabyrinthDataLoader = new LabyrinthDataLoader();
@@ -621,7 +614,7 @@ namespace UAlbion.Base.Tests
         static readonly MonsterGroupLoader MonsterGroupLoader = new MonsterGroupLoader();
         static readonly PaletteLoader PaletteLoader = new PaletteLoader();
         static readonly SampleLoader SampleLoader = new SampleLoader();
-        static readonly ScriptLoader ScriptLoader = new ScriptLoader();
+        // static readonly ScriptLoader ScriptLoader = new ScriptLoader();
         static readonly SlabLoader SlabLoader = new SlabLoader();
         static readonly SongLoader SongLoader = new SongLoader();
         static readonly SpellLoader SpellLoader = new SpellLoader();

@@ -7,7 +7,9 @@ using UAlbion.Config;
 
 namespace UAlbion.Formats.Containers
 {
-    [ContainerLoader(ContainerFormat.None)]
+    /// <summary>
+    /// Simple file containing a single asset.
+    /// </summary>
     public class RawContainerLoader : IContainerLoader
     {
         public ISerializer Open(string file, AssetInfo info)

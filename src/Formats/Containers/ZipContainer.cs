@@ -4,7 +4,9 @@ using UAlbion.Config;
 
 namespace UAlbion.Formats.Containers
 {
-    [ContainerLoader(ContainerFormat.Zip)]
+    /// <summary>
+    /// Zip compressed archive, sub-assets named 0_Foo, 1, 2_Bar etc (anything after an underscore is ignored when loading)
+    /// </summary>
     public class ZipContainer : IContainerLoader
     {
         public ISerializer Open(string file, AssetInfo info)

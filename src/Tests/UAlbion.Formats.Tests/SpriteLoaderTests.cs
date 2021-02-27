@@ -11,6 +11,7 @@ namespace UAlbion.Formats.Tests
     public class SpriteLoaderTests
     {
         static readonly HeaderBasedSpriteLoader _headerLoader = new HeaderBasedSpriteLoader();
+        static readonly MultiHeaderSpriteLoader _multiHeaderLoader = new MultiHeaderSpriteLoader();
         static readonly AmorphousSpriteLoader _amorphousLoader = new AmorphousSpriteLoader();
 
         static AlbionSprite Load(byte[] bytes, Func<AlbionSprite, ISerializer, AlbionSprite> serdes)
@@ -135,9 +136,9 @@ namespace UAlbion.Formats.Tests
                 01, 02, 03, 04, 05
             };
 
-            var info = new AssetInfo { File = new AssetFileInfo { Format = "NonUniform" } };
+            var info = new AssetInfo();
             RoundTrip(nonUniform,
-                (x, s) => _headerLoader.Serdes(x, info, null, s),
+                (x, s) => _multiHeaderLoader.Serdes(x, info, null, s),
                 sprite =>
                 {
                     Assert.Equal(5, sprite.Width);

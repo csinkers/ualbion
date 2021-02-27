@@ -7,7 +7,9 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Containers
 {
-    [ContainerLoader(ContainerFormat.SpellList)]
+    /// <summary>
+    /// 5 bytes per spell, 30 spells per class, 7 classes. No header.
+    /// </summary>
     public class SpellListContainerLoader : IContainerLoader
     {
         public ISerializer Open(string file, AssetInfo info)

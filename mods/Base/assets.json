@@ -80,7 +80,6 @@
     },
     "word": {
       "AssetType": "Word",
-      "ContainerFormat": "WordListXld",
       "EnumType": "UAlbion.Base.Word, UAlbion.Base"
     }
   },
@@ -103,6 +102,7 @@
     "flic":        "UAlbion.Formats.Parsers.FlicLoader, UAlbion.Formats",
     "font":        "UAlbion.Formats.Parsers.FontSpriteLoader, UAlbion.Formats",
     "header":      "UAlbion.Formats.Parsers.HeaderBasedSpriteLoader, UAlbion.Formats",
+    "multiheader": "UAlbion.Formats.Parsers.MultiHeaderSpriteLoader, UAlbion.Formats",
     "interlaced":  "UAlbion.Formats.Parsers.InterlacedBitmapLoader, UAlbion.Formats",
     "itemdata":    "UAlbion.Formats.Parsers.ItemDataLoader, UAlbion.Formats",
     "itemname":    "UAlbion.Formats.Parsers.ItemNameLoader, UAlbion.Formats",
@@ -126,6 +126,13 @@
     "wordlist":    "UAlbion.Formats.Parsers.WordListLoader, UAlbion.Formats"
   },
 
+  "Containers": {
+    "raw": "UAlbion.Formats.Containers.RawContainerLoader, UAlbion.Formats",
+    "binaryoffsets": "UAlbion.Formats.Containers.BinaryOffsetContainerLoader, UAlbion.Formats",
+    "items": "UAlbion.Formats.Containers.ItemListContainerLoader, UAlbion.Formats",
+    "spells": "UAlbion.Formats.Containers.SpellListContainerLoader, UAlbion.Formats"
+  },
+
   "Languages": {
     "ENGLISH": { "Name": "English",  "ShortName": "EN" },
     "GERMAN":  { "Name": "Deutsch",  "ShortName": "DE" },
@@ -135,14 +142,14 @@
   "Files": {
     // Misc
     "$(ALBION)/DRIVERS/ALBISND.OPL": {
-      "ContainerFormat": "None",
+      "Container": "raw",
       "Loader": "soundbank",
       "Map": { "0": { "Id": "special.SoundBank" } }
     },
 
     // Items
-    "$(XLD)/ITEMLIST.DAT": { "Loader": "itemdata", "ContainerFormat": "ItemList", "Map": { "0": { "Id": "item.1" } } },
-    "$(XLD)/ITEMNAME.DAT": { "Loader": "itemname", "ContainerFormat": "None", "Map": { "0": { "Id": "special.ItemNames" } } },
+    "$(XLD)/ITEMLIST.DAT": { "Loader": "itemdata", "Container": "items", "Map": { "0": { "Id": "item.1" } } },
+    "$(XLD)/ITEMNAME.DAT": { "Loader": "itemname", "Container": "raw", "Map": { "0": { "Id": "special.ItemNames" } } },
 
     // Events
     "$(XLD)/EVNTSET0.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.1" } } },
@@ -179,7 +186,7 @@
     // Palettes
     "$(XLD)/PALETTE.000":  {
       "Loader": "pal",
-      "ContainerFormat": "None",
+      "Container": "raw",
       "Map": { "0": { "Id": "pal.0", "IsCommon": true } }
     },
     "$(XLD)/PALETTE0.XLD": {
@@ -238,12 +245,12 @@
     "$(XLD)/$(LANG)/MAPTEXT3.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "mtext.300" } } },
     "$(MOD)/$(LANG)/strings.json": {
       "Loader": "json",
-      "ContainerFormat": "None",
+      "Container": "raw",
       "Map": { "0": { "Id": "special.UAlbionStrings" } }
     },
     "$(XLD)/$(LANG)/SYSTEXTS":     {
       "Loader": "stext",
-      "ContainerFormat": "None",
+      "Container": "raw",
       "Map": { "0": { "Id": "special.SystemStrings" } }
     },
     "$(XLD)/$(LANG)/WORDLIS0.XLD": {
@@ -258,7 +265,7 @@
     // Spells
     "$(XLD)/SPELLDAT.DAT": {
       "Loader": "spell",
-      "ContainerFormat": "SpellList",
+      "Container": "spells",
       "Map": { // Ids = 1 + OffsetInSchool + School * 256
         "0":   { "Id": "spell.1" },
         "30":  { "Id": "spell.257" },
@@ -297,8 +304,8 @@
     "$(XLD)/SMLPORT0.XLD": { "Loader": "fixedsize", "Width": 34, "Map": { "0": { "Id": "portrait.1" } } },
     "$(XLD)/SMLPORT1.XLD": { "Loader": "fixedsize", "Width": 34, "Map": { "0": { "Id": "portrait.100" } } },
     "$(XLD)/TACTICO0.XLD": { "Loader": "fixedsize", "Width": 32, "Map": { "0": { "Id": "tacgfx.1" } } },
-    "$(XLD)/COMGFX0.XLD":  { "Loader": "header", "Format": "NonUniform", "Map": { "0": { "Id": "comgfx.1"} } },
-    "$(XLD)/MONGFX0.XLD":  { "Loader": "header", "Format": "NonUniform", "Map": { "0": { "Id": "mongfx.1" } } },
+    "$(XLD)/COMGFX0.XLD":  { "Loader": "multiheader", "Map": { "0": { "Id": "comgfx.1"} } },
+    "$(XLD)/MONGFX0.XLD":  { "Loader": "multiheader", "Map": { "0": { "Id": "mongfx.1" } } },
     "$(XLD)/3DBCKGR0.XLD": { "Loader": "header", "Map": { "0": { "Id": "3dbg.1" } } },
     "$(XLD)/FBODPIX0.XLD": { "Loader": "header", "Map": { "0": { "Id": "fullbody.1" } } },
     "$(XLD)/NPCGR0.XLD":   { "Loader": "header", "Map": { "0": { "Id": "lnpc.1" } } },
@@ -309,7 +316,7 @@
     "$(XLD)/PICTURE0.XLD": { "Loader": "interlaced", "Map": { "0": { "Id": "pic.1" } } },
     "$(XLD)/ITEMGFX":      {
       "Loader": "fixedsize",
-      "ContainerFormat": "None",
+      "Container": "raw",
       "Width": 16,
       "Height": 16,
       "Map": { "0": { "Id": "itemgfx.1" } }
@@ -323,7 +330,7 @@
     },
     "$(XLD)/SLAB": {
       "Loader": "slab",
-      "ContainerFormat": "None",
+      "Container": "raw",
       "Width": 360,
       "Map": { "0": { "Id": "uibg.1" } }
     },
@@ -1087,7 +1094,7 @@
 
     "$(ALBION)/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710": { // EN+DE
       "Loader": "fixedsize",
-      "ContainerFormat": "BinaryOffsets",
+      "Container": "binaryoffsets",
       "Map": {
         "0":  { "Id": "coresprite.0", "Offset": 0x0FBE58, "Width": 14, "Height": 14, "Hotspot": { "X": -6, "Y": 0 } },
         "1":  { "Offset": 0x0FBF1C, "Width": 16, "Height": 16, "Hotspot": { "X":  0,   "Y":  4 } },
@@ -1183,7 +1190,7 @@
 
     "$(ALBION)/MAIN.EXE#487da3348c367363f3efcbb22ae45c186f1fbecada73f0bf0ce2ca8377a8de14": { // FR
       "Loader": "fixedsize",
-      "ContainerFormat": "BinaryOffsets",
+      "Container": "binaryoffsets",
       "Map": {
         "0":  { "Id": "coresprite.0", "Offset": 0x0FBE58, "Width": 14, "Height": 14, "Hotspot": { "X": -6, "Y": 0 } },
         "1":  { "Offset": 0x0FBF1C, "Width": 16, "Height": 16, "Hotspot": { "X":  0,   "Y":  4 } },

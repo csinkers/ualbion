@@ -40,6 +40,7 @@ namespace UAlbion.Config.Tests
     ""fixedsize"":  ""UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats"",
     ""font"":       ""UAlbion.Formats.Parsers.FontSpriteLoader, UAlbion.Formats"",
     ""header"":     ""UAlbion.Formats.Parsers.HeaderBasedSpriteLoader, UAlbion.Formats"",
+    ""multiheader"": ""UAlbion.Formats.Parsers.MultiHeaderSpriteLoader, UAlbion.Formats"",
     ""itemdata"":   ""UAlbion.Formats.Parsers.ItemDataLoader, UAlbion.Formats"",
     ""json"":       ""UAlbion.Formats.Parsers.JsonStringLoader, UAlbion.Formats"",
     ""pal"":        ""UAlbion.Formats.Parsers.PaletteLoader, UAlbion.Formats"",
@@ -50,23 +51,30 @@ namespace UAlbion.Config.Tests
     ""wordlist"":   ""UAlbion.Formats.Parsers.WordListLoader, UAlbion.Formats""
   },
 
+  ""Containers"": {
+    ""raw"": ""UAlbion.Formats.Containers.RawContainerLoader, UAlbion.Formats"",
+    ""binaryoffsets"": ""UAlbion.Formats.Containers.BinaryOffsetContainerLoader, UAlbion.Formats"",
+    ""items"": ""UAlbion.Formats.Containers.ItemListContainerLoader, UAlbion.Formats"",
+    ""spells"": ""UAlbion.Formats.Containers.SpellListContainerLoader, UAlbion.Formats""
+  },
+
   ""Files"": {
     ""$(ALBION)/DRIVERS/ALBISND.OPL"": { ""Loader"": ""soundbank"", ""Map"": { ""0"": { ""Id"": ""special.SoundBank"" } } },
-    ""$(XLD)/ITEMLIST.DAT"": { ""Loader"": ""itemdata"", ""ContainerFormat"": ""ItemList"", ""Map"": { ""0"": { ""Id"": ""item.1"" } } },
+    ""$(XLD)/ITEMLIST.DAT"": { ""Loader"": ""itemdata"", ""Container"": ""items"", ""Map"": { ""0"": { ""Id"": ""item.1"" } } },
     ""$(XLD)/BLKLIST0.XLD"": { ""Loader"": ""block"", ""Map"": { ""0"": {""Id"": ""block.1"" } } },
     ""$(XLD)/3DFLOOR2.XLD"": { ""Loader"": ""fixedsize"", ""Width"": 64, ""Height"": 64, ""Map"": { ""0"": { ""Id"": ""floor.200"" } } },
     ""$(XLD)/COMBACK0.XLD"": { ""Loader"": ""fixedsize"", ""Width"": 360, ""Map"": { ""0"": { ""Id"": ""combg.1"" } } },
     ""$(XLD)/ICONGFX0.XLD"": { ""Loader"": ""fixedsize"", ""Width"": 16, ""Height"": 16, ""Map"": { ""0"": { ""Id"": ""tilegfx.1"" } } },
-    ""$(XLD)/COMGFX0.XLD"":  { ""Loader"": ""header"", ""Format"": ""NonUniform"", ""Map"": { ""0"": { ""Id"": ""comgfx.1""} } },
+    ""$(XLD)/COMGFX0.XLD"":  { ""Loader"": ""multiheader"", ""Map"": { ""0"": { ""Id"": ""comgfx.1""} } },
 
     ""$(MOD)/$(LANG)/strings.json"": {
       ""Loader"": ""json"",
-      ""ContainerFormat"": ""None"",
+      ""Container"": ""raw"",
       ""Map"": { ""0"": { ""Id"": ""special.UAlbionStrings"" } }
     },
     ""$(XLD)/$(LANG)/SYSTEXTS"":     {
       ""Loader"": ""stext"",
-      ""ContainerFormat"": ""None"",
+      ""Container"": ""raw"",
       ""Map"": { ""0"": { ""Id"": ""special.SystemStrings"" } }
     },
     ""$(XLD)/$(LANG)/WORDLIS0.XLD"": {
@@ -134,7 +142,7 @@ namespace UAlbion.Config.Tests
 
     ""$(XLD)/SPELLDAT.XLD"": {
       ""Loader"": ""spell"",
-      ""ContainerFormat"": ""SpellList"",
+      ""Container"": ""spells"",
       ""Map"": { // Ids = 1 + OffsetInSchool + School * 256
         ""0"": { ""Id"": ""spell.1"" },
         ""30"": { ""Id"": ""spell.257"" },
@@ -144,7 +152,7 @@ namespace UAlbion.Config.Tests
 
     ""$(ALBION)/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710"": { // EN+DE
       ""Loader"": ""fixedsize"",
-      ""ContainerFormat"": ""BinaryOffsets"",
+      ""Container"": ""binaryoffsets"",
       ""Map"": {
         ""0"": { ""Id"": ""coresprite.0"", ""Offset"": 0x0FBE58, ""Width"": 14, ""Height"": 14, ""Hotspot"": { ""X"": -6,   ""Y"":  0 } },
         ""1"": { ""Offset"": 0x0FBF1C, ""Width"": 16, ""Height"": 16, ""Hotspot"": { ""X"":  0,   ""Y"":  4 } },
@@ -177,7 +185,6 @@ namespace UAlbion.Config.Tests
                     Assert.Equal(AssetType.BlockList, t.AssetType);
                     Assert.Equal("UAlbion.Base.BlockList, UAlbion.Base", t.EnumType);
                     Assert.Equal("UAlbion.Base.TilesetData, UAlbion.Base", t.CopiedFrom);
-
                 },
                 t =>
                 {
@@ -251,7 +258,6 @@ namespace UAlbion.Config.Tests
                     Assert.Equal(AssetType.TilesetGraphics, t.AssetType);
                     Assert.Equal("UAlbion.Base.TilesetGraphics, UAlbion.Base", t.EnumType);
                     Assert.Equal("UAlbion.Base.TilesetData, UAlbion.Base", t.CopiedFrom);
-
                 },
                 t =>
                 {
@@ -301,6 +307,11 @@ namespace UAlbion.Config.Tests
                         Assert.Equal("json", l.Key);
                         Assert.Equal("UAlbion.Formats.Parsers.JsonStringLoader, UAlbion.Formats", l.Value);
                     },
+                l =>
+                {
+                    Assert.Equal("multiheader", l.Key);
+                    Assert.Equal("UAlbion.Formats.Parsers.MultiHeaderSpriteLoader, UAlbion.Formats", l.Value);
+                },
                 l =>
                 {
                     Assert.Equal("pal", l.Key);
@@ -365,14 +376,13 @@ namespace UAlbion.Config.Tests
             var c = AssetConfig.Parse(TestConfig1);
             var f = c.Files["$(ALBION)/DRIVERS/ALBISND.OPL"];
             Assert.Equal("UAlbion.Game.Assets.SoundBankLoader, UAlbion.Game", f.Loader);
-            Assert.Equal(ContainerFormat.Auto, f.ContainerFormat);
+            Assert.Null(f.Container);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
                 m =>
                 {
                     Assert.Equal(0, m.Key);
                     Assert.Equal("special.SoundBank", m.Value.Id);
                 });
-
         }
 
         [Fact]
@@ -381,14 +391,13 @@ namespace UAlbion.Config.Tests
             var c = AssetConfig.Parse(TestConfig1);
             var f = c.Files["$(XLD)/ITEMLIST.DAT"];
             Assert.Equal("UAlbion.Formats.Parsers.ItemDataLoader, UAlbion.Formats", f.Loader);
-            Assert.Equal(ContainerFormat.ItemList, f.ContainerFormat);
+            Assert.Equal("UAlbion.Formats.Containers.ItemListContainerLoader, UAlbion.Formats", f.Container);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
                 m =>
                 {
                     Assert.Equal(0, m.Key);
                     Assert.Equal("item.1", m.Value.Id);
                 });
-
         }
 
         [Fact]
@@ -397,14 +406,13 @@ namespace UAlbion.Config.Tests
             var c = AssetConfig.Parse(TestConfig1);
             var f = c.Files["$(XLD)/BLKLIST0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.BlockListLoader, UAlbion.Formats", f.Loader);
-            Assert.Equal(ContainerFormat.Auto, f.ContainerFormat);
+            Assert.Null(f.Container);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
                 m =>
                 {
                     Assert.Equal(0, m.Key);
                     Assert.Equal("block.1", m.Value.Id);
                 });
-
         }
         [Fact]
         public void VerifyFloors()
@@ -419,7 +427,6 @@ namespace UAlbion.Config.Tests
                 Assert.Equal(0, m.Key);
                 Assert.Equal("floor.200", m.Value.Id);
             });
-
         }
 
         [Fact]
@@ -434,7 +441,6 @@ namespace UAlbion.Config.Tests
                 Assert.Equal(0, m.Key);
                 Assert.Equal("combg.1", m.Value.Id);
             });
-
         }
 
         [Fact]
@@ -450,7 +456,6 @@ namespace UAlbion.Config.Tests
                 Assert.Equal(0, m.Key);
                 Assert.Equal("tilegfx.1", m.Value.Id);
             });
-
         }
 
         [Fact]
@@ -458,14 +463,12 @@ namespace UAlbion.Config.Tests
         {
             var c = AssetConfig.Parse(TestConfig1);
             var f = c.Files["$(XLD)/COMGFX0.XLD"];
-            Assert.Equal("UAlbion.Formats.Parsers.HeaderBasedSpriteLoader, UAlbion.Formats", f.Loader);
-            Assert.Equal("NonUniform", f.Format);
+            Assert.Equal("UAlbion.Formats.Parsers.MultiHeaderSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Collection(f.Map.OrderBy(x => x.Key), m =>
             {
                 Assert.Equal(0, m.Key);
                 Assert.Equal("comgfx.1", m.Value.Id);
             });
-
         }
 
         [Fact]
@@ -486,7 +489,6 @@ namespace UAlbion.Config.Tests
                     Assert.Equal(1, m.Key);
                     Assert.Equal("(8,8,576) (16,16)", m.Value.Get<string>("SubSprites", null));
                 });
-
         }
 
         [Fact]
@@ -513,7 +515,6 @@ namespace UAlbion.Config.Tests
                     Assert.Equal(50, m.Value.Width);
                     Assert.Equal(128, m.Value.Height);
                 });
-
         }
 
         [Fact]
@@ -567,7 +568,6 @@ namespace UAlbion.Config.Tests
                         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\"?!/()#%*&+-=><☺♂♀éâàçêëèïîìôòûùáíóú",
                         m.Value.Get<string>("Mapping", null));
                 });
-
         }
 
         [Fact]
@@ -593,7 +593,6 @@ namespace UAlbion.Config.Tests
                     Assert.Equal(3, m.Key);
                     Assert.True(m.Value.Get("UseSmallGraphics", false));
                 });
-
         }
 
         [Fact]
@@ -619,7 +618,6 @@ namespace UAlbion.Config.Tests
                         x => Assert.Equal("0xb0-0xb4", x),
                         x => Assert.Equal("0xb5-0xbf", x));
                 });
-
         }
 
         [Fact]
@@ -628,7 +626,7 @@ namespace UAlbion.Config.Tests
             var c = AssetConfig.Parse(TestConfig1);
             var f = c.Files["$(XLD)/SPELLDAT.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.SpellLoader, UAlbion.Formats", f.Loader);
-            Assert.Equal(ContainerFormat.SpellList, f.ContainerFormat);
+            Assert.Equal("UAlbion.Formats.Containers.SpellListContainerLoader, UAlbion.Formats", f.Container);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
                 m => { Assert.Equal(0, m.Key); Assert.Equal("spell.1", m.Value.Id); },
                 m => { Assert.Equal(30, m.Key); Assert.Equal("spell.257", m.Value.Id); },
@@ -657,7 +655,7 @@ namespace UAlbion.Config.Tests
             var c = AssetConfig.Parse(TestConfig1);
             var f = c.Files["$(ALBION)/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710"];
             Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
-            Assert.Equal(ContainerFormat.BinaryOffsets, f.ContainerFormat);
+            Assert.Equal("UAlbion.Formats.Containers.BinaryOffsetContainerLoader, UAlbion.Formats", f.Container);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
                 m =>
                 {

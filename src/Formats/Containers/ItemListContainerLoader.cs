@@ -7,7 +7,9 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Containers
 {
-    [ContainerLoader(ContainerFormat.ItemList)]
+    /// <summary>
+    /// 0x3A bytes per item, no header.
+    /// </summary>
     public class ItemListContainerLoader : IContainerLoader
     {
         public ISerializer Open(string file, AssetInfo info)

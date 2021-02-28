@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Config
 {
@@ -30,8 +31,7 @@ namespace UAlbion.Formats.Config
         public void Save()
         {
             var configPath = Path.Combine(_basePath, "data", "input.json");
-            var serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented, NullValueHandling = NullValueHandling.Ignore };
-            var json = JsonConvert.SerializeObject(this, serializerSettings);
+            var json = JsonConvert.SerializeObject(this, ConfigUtil.JsonSerializerSettings);
             File.WriteAllText(configPath, json);
         }
     }

@@ -12,18 +12,39 @@ namespace UAlbion.Formats.Containers
     /// <summary>
     /// Simple container, header contains file sizes, then followed by uncompressed raw file data.
     /// </summary>
-    public class XldContainerLoader : IContainerLoader
+    public class XldContainer : IAssetContainer
     {
         const string MagicString = "XLD0I";
         static int HeaderSize(int itemCount) => MagicString.Length + 3 + 4 * itemCount;
 
-        public ISerializer Open(string file, AssetInfo info)
+        public ISerializer Read(string file, AssetInfo info)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             using var s = new AlbionReader(new BinaryReader(File.OpenRead(file)));
             var bytes = LoadAsset(info.SubAssetId, s);
             var ms = new MemoryStream(bytes);
             return new AlbionReader(new BinaryReader(ms));
+        }
+
+        public void Write(string path, IList<(AssetInfo, byte[])> assets)
+        {
+            if (assets == null) throw new ArgumentNullException(nameof(assets));
+            int count = assets.Max(x => x.Item1.SubAssetId);
+            var ordered = new (AssetInfo, byte[])[count];
+            var lengths = new int[count];
+            foreach (var (info, bytes) in assets)
+            {
+                ordered[info.SubAssetId] = (info, bytes);
+                lengths[info.SubAssetId] = bytes.Length;
+            }
+
+            using var fs = File.OpenWrite(path);
+            using var bw = new BinaryWriter(fs);
+            using var s = new AlbionWriter(bw);
+            HeaderSerdes(lengths, s);
+
+            for (int i = 0; i < count; i++)
+                s.ByteArray(null, ordered[i].Item2, lengths[i]);
         }
 
         public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info)
@@ -69,7 +90,7 @@ namespace UAlbion.Formats.Containers
             return lengths;
         }
 
-        static void Read<TContext>(
+        static void ReadEmbedded<TContext>(
             XldCategory category,
             int firstId,
             TContext context,
@@ -98,7 +119,7 @@ namespace UAlbion.Formats.Containers
             }
         }
 
-        static void Write<TContext>(
+        static void WriteEmbedded<TContext>(
             XldCategory category,
             int firstId,
             int lastId,
@@ -149,9 +170,9 @@ namespace UAlbion.Formats.Containers
             s.Object($"{category}.{firstId}-{lastId}", s2 =>
             {
                 if (s2.IsReading())
-                    Read(category, firstId, context, s2, func);
+                    ReadEmbedded(category, firstId, context, s2, func);
                 else
-                    Write(category, firstId, lastId, context, s2, func, populatedIds);
+                    WriteEmbedded(category, firstId, lastId, context, s2, func, populatedIds);
             });
         }
     }

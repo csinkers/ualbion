@@ -18,6 +18,7 @@ namespace UAlbion.Formats.Assets
         readonly int[] _periods = new int[EntryCount];
         readonly IList<uint[]> _cache = new List<uint[]>();
         readonly IList<(byte, byte)> _ranges = new List<(byte, byte)>();
+        uint[] _unambiguous;
 
         public uint Id { get; private set; }
         public string Name { get; private set; }
@@ -116,6 +117,48 @@ namespace UAlbion.Formats.Assets
             tick = int.MaxValue - tick;
             int index = tick % Period;
             return _cache[index];
+        }
+
+        static uint Search(uint root, ISet<uint> visited)
+        {
+            var queue = new Queue<uint>();
+            queue.Enqueue(root);
+            do
+            {
+                var entry = queue.Dequeue();
+                if (!visited.Contains(entry))
+                    return entry;
+
+                var (r, g, b, a) = FormatUtil.UnpackColor(entry);
+                if (r < 255) queue.Enqueue(FormatUtil.PackColor((byte)(r + 1), g, b, a));
+                if (g < 255) queue.Enqueue(FormatUtil.PackColor(r, (byte)(g + 1), b, a));
+                if (b < 255) queue.Enqueue(FormatUtil.PackColor(r, g, (byte)(b + 1), a));
+                if (r > 0) queue.Enqueue(FormatUtil.PackColor((byte)(r - 1), g, b, a));
+                if (g > 0) queue.Enqueue(FormatUtil.PackColor(r, (byte)(g - 1), b, a));
+                if (b > 0) queue.Enqueue(FormatUtil.PackColor(r, g, (byte)(b - 1), a));
+            } while (queue.Count > 0);
+
+            throw new InvalidOperationException($"Could not find an empty palette slot for {root:x}");
+        }
+
+        public uint[] GetUnambiguousPalette()
+        {
+            if (_unambiguous == null)
+            {
+                _unambiguous = new uint[256];
+                var used = new HashSet<uint>();
+                for (int i = 0; i < 256; i++)
+                {
+                    uint entry = Entries[i];
+                    if (used.Contains(entry))
+                        entry = Search(entry, used);
+
+                    _unambiguous[i] = entry;
+                    used.Add(entry);
+                }
+            }
+
+            return _unambiguous;
         }
 
         public override string ToString() { return string.IsNullOrEmpty(Name) ? $"Palette {Id}" : $"{Name} ({Id})"; }

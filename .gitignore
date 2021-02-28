@@ -29,3 +29,7 @@ global.json
 mods/*
 !mods/Base/
 !mods/Test/
+!mods/Repacked/
+mods/Repacked/Albion/*
+!mods/Unpacked/
+mods/Unpacked/Assets/*

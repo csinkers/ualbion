@@ -8,8 +8,8 @@ using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Containers;
 using UAlbion.Game.Events;
-using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Assets
 {
@@ -57,19 +57,20 @@ namespace UAlbion.Game.Assets
 
         protected override void Subscribed()
         {
-            _assetLocator ??= Resolve<IAssetLocator>();
+            _assetLocator ??= Resolve<IAssetLocator>() ?? throw new ComponentNotFoundException(nameof(IAssetLocator));
             Exchange.Register<IModApplier>(this);
         }
 
-        public void LoadMods(IGeneralConfig config)
+        public void LoadMods(IGeneralConfig config, IList<string> mods)
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
+            if (mods == null) throw new ArgumentNullException(nameof(mods));
 
             _mods.Clear();
             _modsInReverseDependencyOrder.Clear();
             AssetMapping.Global.Clear();
 
-            foreach (var mod in Resolve<IGameplaySettings>().ActiveMods)
+            foreach (var mod in mods)
                 LoadMod(config.ResolvePath("$(MODS)", _extraPaths), mod);
 
             _modsInReverseDependencyOrder.Reverse();
@@ -124,6 +125,7 @@ namespace UAlbion.Game.Assets
 
             MergeTypesToMapping(modInfo.Mapping, assetConfig, assetConfigPath);
             AssetMapping.Global.MergeFrom(modInfo.Mapping);
+            modConfig.AssetPath ??= path;
             _extraPaths["MOD"] = modConfig.AssetPath;
             assetConfig.PopulateAssetIds(AssetMapping.Global, x => _assetLocator.GetSubItemRangesForFile(x, _extraPaths));
             _mods.Add(modName, modInfo);
@@ -257,6 +259,66 @@ namespace UAlbion.Game.Assets
         public SavedGame LoadSavedGame(string path)
         {
             throw new NotImplementedException();
+        }
+
+        public void SaveAssets(Func<AssetId, (object, AssetInfo)> loaderFunc, PaletteHints paletteHints)
+        {
+            if (loaderFunc == null) throw new ArgumentNullException(nameof(loaderFunc));
+            var config = Resolve<IGeneralConfig>();
+            if (config == null)
+                throw new ComponentNotFoundException(nameof(IGeneralConfig));
+
+            var loaderRegistry = Resolve<IAssetLoaderRegistry>();
+            var containerRegistry = Resolve<IContainerRegistry>();
+            var target = _modsInReverseDependencyOrder.Last();
+
+            // Add any missing ids
+            target.AssetConfig.PopulateAssetIds(AssetMapping.Global, file =>
+            {
+                var container = containerRegistry.GetContainer(file.Container);
+                var firstAsset = file.Map[file.Map.Keys.Min()];
+                var assets = target.Mapping.EnumerateAssetsOfType(firstAsset.AssetId.Type).ToList();
+                var idsInRange = 
+                    assets
+                    .Where(x => x.Id >= firstAsset.AssetId.Id)
+                    .OrderBy(x => x.Id)
+                    .Select(x => x.Id - firstAsset.AssetId.Id + firstAsset.SubAssetId);
+
+                if (container is XldContainer)
+                    idsInRange = idsInRange.Where(x => x < 100);
+
+                return FormatUtil.SortedIntsToRanges(idsInRange);
+            });
+
+            _extraPaths["MOD"] = target.AssetPath;
+            foreach (var file in target.AssetConfig.Files.Values)
+            {
+
+                var path = config.ResolvePath(file.Filename, _extraPaths);
+                var loader = loaderRegistry.GetLoader(file.Loader);
+                var container = containerRegistry.GetContainer(file.Container);
+                var assets = new List<(AssetInfo, byte[])>();
+                foreach (var assetInfo in file.Map.Values)
+                {
+                    var (asset, sourceInfo) = loaderFunc(assetInfo.AssetId);
+                    if (asset == null)
+                        continue;
+
+                    var paletteId = paletteHints.Get(sourceInfo.File.Filename, sourceInfo.SubAssetId);
+                    if (paletteId != 0)
+                        assetInfo.Set("PaletteId", paletteId);
+
+                    using var ms = new MemoryStream();
+                    using var bw = new BinaryWriter(ms);
+                    using var s = new AlbionWriter(bw);
+                    loader.Serdes(asset, assetInfo, target.Mapping, s);
+
+                    ms.Position = 0;
+                    assets.Add((assetInfo, ms.ToArray()));
+                }
+
+                container.Write(path, assets);
+            }
         }
     }
 }

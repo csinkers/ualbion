@@ -14,12 +14,12 @@ namespace UAlbion.Game.Assets
     {
         readonly IDictionary<string, string> _hashCache = new Dictionary<string, string>();
         IAssetLoaderRegistry _assetLoaderRegistry;
-        IContainerLoaderRegistry _containerLoaderRegistry;
+        IContainerRegistry _containerRegistry;
 
         protected override void Subscribed()
         {
             _assetLoaderRegistry = Resolve<IAssetLoaderRegistry>();
-            _containerLoaderRegistry = Resolve<IContainerLoaderRegistry>();
+            _containerRegistry = Resolve<IContainerRegistry>();
             base.Subscribed();
         }
 
@@ -53,24 +53,20 @@ namespace UAlbion.Game.Assets
             return containerLoader?.GetSubItemRanges(resolved, info) ?? new List<(int, int)> { (0, 1) };
         }
 
-        IContainerLoader GetContainerLoader(string path, string container)
+        IAssetContainer GetContainerLoader(string path, string container)
         {
             if (!string.IsNullOrEmpty(container))
-                return _containerLoaderRegistry.GetLoader(container);
+                return _containerRegistry.GetContainer(container);
 
-            if (File.Exists(path))
+            switch (Path.GetExtension(path).ToUpperInvariant())
             {
-                return Path.GetExtension(path).ToUpperInvariant() switch
-                {
-                    ".XLD" => _containerLoaderRegistry.GetLoader(typeof(XldContainerLoader)),
-                    ".ZIP" => _containerLoaderRegistry.GetLoader(typeof(ZipContainer)),
-                    _ => throw new InvalidOperationException($"Could not autodetect container type for file \"{path}\"")
-                };
-            }
-
-            return Directory.Exists(path) 
-                ? _containerLoaderRegistry.GetLoader(typeof(DirectoryContainerLoader)) 
-                : null;
+                case ".XLD" : return _containerRegistry.GetContainer(typeof(XldContainer));
+                case ".ZIP" : return _containerRegistry.GetContainer(typeof(ZipContainer));
+                default:
+                    return Directory.Exists(path) 
+                        ? _containerRegistry.GetContainer(typeof(DirectoryContainer)) 
+                        : null;
+            };
         }
 
         ISerializer Search(IGeneralConfig generalConfig, AssetInfo info, IDictionary<string, string> extraPaths)
@@ -80,7 +76,7 @@ namespace UAlbion.Game.Assets
                 return null;
 
             var containerLoader = GetContainerLoader(path, info.File.Container);
-            return containerLoader?.Open(path, info);
+            return containerLoader?.Read(path, info);
         }
 
         string GetHash(string filename)

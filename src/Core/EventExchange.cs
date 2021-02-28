@@ -49,10 +49,11 @@ namespace UAlbion.Core
         }
 #endif
 
-        public EventExchange(ILogExchange logExchange)
+        public EventExchange(ILogExchange logExchange = null)
         {
-            _logExchange = logExchange ?? throw new ArgumentNullException(nameof(logExchange));
-            Attach(_logExchange);
+            _logExchange = logExchange;
+            if (_logExchange != null)
+                Attach(_logExchange);
         }
 
         public void Dispose()
@@ -119,7 +120,7 @@ namespace UAlbion.Core
             if (!verbose)
             { // Nesting level helps identify which events were caused by other events when reading the console window
                 Interlocked.Increment(ref _nesting);
-                _logExchange.Receive(e, sender);
+                _logExchange?.Receive(e, sender);
             }
 
 #if DEBUG // Keep track of which events have been fired this frame for debugging

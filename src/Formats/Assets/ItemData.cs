@@ -12,7 +12,7 @@ namespace UAlbion.Formats.Assets
         public const int SizeOnDisk = 40;
         public ItemData(ItemId id) => Id = id;
         [JsonIgnore] public StringId Name => new StringId(TextId.From(Base.Special.ItemNames), (ushort)Id.Id);
-        public ItemId Id { get; }
+        [JsonIgnore] public ItemId Id { get; }
         public byte Unknown { get; set; } //  0 Always 0
         public ItemType TypeId { get; set; } //  1 Item type
         public ItemSlotId SlotType { get; set; } //  2 Slot that can hold the item

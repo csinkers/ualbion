@@ -40,13 +40,7 @@ namespace UAlbion.Config
 
         public void Save(string configPath)
         {
-            var serializerSettings = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented,
-                NullValueHandling = NullValueHandling.Ignore,
-                DefaultValueHandling = DefaultValueHandling.Ignore
-            };
-            var json = JsonConvert.SerializeObject(this, serializerSettings);
+            var json = JsonConvert.SerializeObject(this, ConfigUtil.JsonSerializerSettings);
             File.WriteAllText(configPath, json);
         }
 
@@ -84,7 +78,7 @@ namespace UAlbion.Config
             }
         }
 
-        public void PopulateAssetIds(AssetMapping mapping, Func<AssetFileInfo, List<(int, int)>> getSubItemCountForFile)
+        public void PopulateAssetIds(AssetMapping mapping, Func<AssetFileInfo, IList<(int, int)>> getSubItemCountForFile)
         {
             if (mapping == null) throw new ArgumentNullException(nameof(mapping));
 

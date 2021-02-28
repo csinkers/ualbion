@@ -16,6 +16,8 @@ namespace UAlbion
         public AudioMode AudioMode { get; }
         public GameMode GameMode { get; }
         public string GameModeArgument { get; }
+        public string ConvertFrom { get; }
+        public string ConvertTo { get; }
         public string[] Commands { get; }
         public DumpFormats DumpFormats { get; } = DumpFormats.Json;
         public ISet<AssetType> DumpAssetTypes { get; } = new HashSet<AssetType>();
@@ -29,8 +31,12 @@ namespace UAlbion
 
         public CommandLineOptions(string[] args)
         {
+            // Defaults
             Mode = ExecutionMode.Game;
+            GameMode = GameMode.MainMenu;
+            AudioMode = AudioMode.InProcess;
             Backend = GraphicsBackend.Vulkan;
+
             StartupOnly = args.Contains("--startuponly");
             UseRenderDoc = args.Contains("--renderdoc") || args.Contains("-rd");
             DebugMenus = args.Contains("--menus");
@@ -51,20 +57,12 @@ namespace UAlbion
                 return;
             }
 
-            Mode = ExecutionMode.Game;
-            GameMode = GameMode.MainMenu;
-            AudioMode = AudioMode.InProcess;
+            if (args.Contains("--no-audio")) AudioMode = AudioMode.None;
+            if (args.Contains("--external-audio")) AudioMode = AudioMode.ExternalProcess;
 
-            if (args.Contains("--no-audio"))
-                AudioMode = AudioMode.None;
-            if (args.Contains("--external-audio"))
-                AudioMode = AudioMode.ExternalProcess;
-            if (args.Contains("--audio"))
-                Mode = ExecutionMode.AudioSlave;
-            if (args.Contains("--editor"))
-                Mode = ExecutionMode.Editor;
-            if (args.Contains("--save-tests"))
-                Mode = ExecutionMode.SavedGameTests;
+            if (args.Contains("--audio")) Mode = ExecutionMode.AudioSlave;
+            if (args.Contains("--editor")) Mode = ExecutionMode.Editor;
+            if (args.Contains("--save-tests")) Mode = ExecutionMode.SavedGameTests;
 
             if (args.Contains("--dump-all-gfx"))
             {
@@ -128,6 +126,16 @@ namespace UAlbion
                     DumpFormats |= Enum.Parse<DumpFormats>(type, true);
             }
 
+            index = FindArgIndex("--convert", args);
+            if (index != -1)
+            {
+                if (args.Length <= index + 2)
+                    throw new FormatException("--convert requires two parameters: the mod to convert from and the mod to convert to");
+                ConvertFrom = args[index + 1];
+                ConvertTo = args[index + 2];
+                Mode = ExecutionMode.ConvertAssets;
+            }
+
             if (Mode == ExecutionMode.Game)
             {
                 if (args.Contains("--new-game"))
@@ -163,7 +171,7 @@ namespace UAlbion
             return -1;
         }
 
-        void DisplayUsage()
+        static void DisplayUsage()
         {
             var formats = string.Join(" ", 
                 Enum.GetValues(typeof(DumpFormats))
@@ -199,6 +207,9 @@ Execution Mode:
     --dump-all : Dumps all asset types supported by the selected formats
     --dump-all-gfx : Dumps all graphical asset types
     --dump ""[asset types]"": Dump specific types of game data (space separated list, valid types: {dumpTypes})
+    --convert <FromMod> <ToMod> : Convert all assets from one mod's asset formats to another (e.g. Base->Unpacked, Unpacked->Repacked etc)
+
+Dump options: (if running as dump, dump-all or dump-all-gfx)
     --formats ""[formats]"": Specifies the formats for the dumped data (defaults to JSON, valid formats: {formats})
 
 Game Mode: (if running as game)

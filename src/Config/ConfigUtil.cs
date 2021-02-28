@@ -2,11 +2,21 @@
 using System.IO;
 using System.Reflection;
 using System.Text;
+using Newtonsoft.Json;
+using UAlbion.Api;
 
 namespace UAlbion.Config
 {
     public static class ConfigUtil
     {
+        public static JsonSerializerSettings JsonSerializerSettings { get; } = new JsonSerializerSettings
+        {
+            Formatting = Formatting.Indented,
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate,
+            ContractResolver = new PrivatePropertyJsonContractResolver()
+        };
+
         public static string FindBasePath()
         {
             var exeLocation = Assembly.GetExecutingAssembly().Location;
@@ -18,7 +28,7 @@ namespace UAlbion.Config
             return baseDir;
         }
 
-        static readonly char[] OneSlash = { '/'};
+        static readonly char[] OneSlash = { '/' };
         public static string GetRelativePath(string path, string curDir, bool useForwardSlash)
         {
             if (path == null) throw new ArgumentNullException(nameof(path));

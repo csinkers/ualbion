@@ -8,6 +8,7 @@
         AudioSlave,
         Editor,
         SavedGameTests,
-        DumpData
+        DumpData,
+        ConvertAssets
     }
 }

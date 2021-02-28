@@ -154,37 +154,37 @@ namespace UAlbion.Formats.Assets.Save
 
             // s.Object($"XldPartyCharacter.0");
 
-            XldContainerLoader.Serdes(XldCategory.PartyCharacter, 1, 99, (save, mapping), s, SerdesPartyCharacter, partyIds);
-            XldContainerLoader.Serdes(XldCategory.PartyCharacter, 100, 199, (save, mapping), s, SerdesPartyCharacter, partyIds);
-            XldContainerLoader.Serdes(XldCategory.PartyCharacter, 200, 299, (save, mapping), s, SerdesPartyCharacter, partyIds);
+            XldContainer.Serdes(XldCategory.PartyCharacter, 1, 99, (save, mapping), s, SerdesPartyCharacter, partyIds);
+            XldContainer.Serdes(XldCategory.PartyCharacter, 100, 199, (save, mapping), s, SerdesPartyCharacter, partyIds);
+            XldContainer.Serdes(XldCategory.PartyCharacter, 200, 299, (save, mapping), s, SerdesPartyCharacter, partyIds);
 
             var automapIds = save.Automaps.Keys.Select(x => x.Id).ToList(); // TODO: Allow extension somehow
             automapIds.Add(199);
             automapIds.Add(399);
-            XldContainerLoader.Serdes(XldCategory.Automap, 100, 199, (save, mapping), s, SerdesAutomap, automapIds);
-            XldContainerLoader.Serdes(XldCategory.Automap, 200, 299, (save, mapping), s, SerdesAutomap, automapIds);
-            XldContainerLoader.Serdes(XldCategory.Automap, 300, 399, (save, mapping), s, SerdesAutomap, automapIds);
+            XldContainer.Serdes(XldCategory.Automap, 100, 199, (save, mapping), s, SerdesAutomap, automapIds);
+            XldContainer.Serdes(XldCategory.Automap, 200, 299, (save, mapping), s, SerdesAutomap, automapIds);
+            XldContainer.Serdes(XldCategory.Automap, 300, 399, (save, mapping), s, SerdesAutomap, automapIds);
 
             var chestIds = save.Inventories.Keys.Where(x => x.Type == AssetType.Chest).Select(x => x.Id).ToList(); // TODO: Allow extension somehow
             chestIds.Add(199);
             chestIds.Add(599);
-            XldContainerLoader.Serdes(XldCategory.Chest, 1, 99, (save, mapping), s, SerdesChest, chestIds);
-            XldContainerLoader.Serdes(XldCategory.Chest, 100, 199, (save, mapping), s, SerdesChest, chestIds);
-            XldContainerLoader.Serdes(XldCategory.Chest, 200, 299, (save, mapping), s, SerdesChest, chestIds);
-            XldContainerLoader.Serdes(XldCategory.Chest, 500, 599, (save, mapping), s, SerdesChest, chestIds);
+            XldContainer.Serdes(XldCategory.Chest, 1, 99, (save, mapping), s, SerdesChest, chestIds);
+            XldContainer.Serdes(XldCategory.Chest, 100, 199, (save, mapping), s, SerdesChest, chestIds);
+            XldContainer.Serdes(XldCategory.Chest, 200, 299, (save, mapping), s, SerdesChest, chestIds);
+            XldContainer.Serdes(XldCategory.Chest, 500, 599, (save, mapping), s, SerdesChest, chestIds);
 
             var merchantIds = save.Inventories.Keys.Where(x => x.Type == AssetType.Merchant).Select(x => x.Id).ToList(); // TODO: Allow extension somehow
             merchantIds.Add(199);
             merchantIds.Add(299);
-            XldContainerLoader.Serdes(XldCategory.Merchant, 1, 99, (save, mapping), s, SerdesMerchant, merchantIds);
-            XldContainerLoader.Serdes(XldCategory.Merchant, 100, 199, (save, mapping), s, SerdesMerchant, merchantIds);
-            XldContainerLoader.Serdes(XldCategory.Merchant, 200, 299, (save, mapping), s, SerdesMerchant, merchantIds);
+            XldContainer.Serdes(XldCategory.Merchant, 1, 99, (save, mapping), s, SerdesMerchant, merchantIds);
+            XldContainer.Serdes(XldCategory.Merchant, 100, 199, (save, mapping), s, SerdesMerchant, merchantIds);
+            XldContainer.Serdes(XldCategory.Merchant, 200, 299, (save, mapping), s, SerdesMerchant, merchantIds);
 
             var npcIds = save.Sheets.Keys.Select(x => x.Id).ToList(); // TODO: Allow extension somehow
             npcIds.Add(299);
-            XldContainerLoader.Serdes(XldCategory.NpcCharacter, 1, 99, (save, mapping), s, SerdesNpcCharacter, npcIds);
-            XldContainerLoader.Serdes(XldCategory.NpcCharacter, 100, 199, (save, mapping), s, SerdesNpcCharacter, npcIds);
-            XldContainerLoader.Serdes(XldCategory.NpcCharacter, 200, 299, (save, mapping), s, SerdesNpcCharacter, npcIds);
+            XldContainer.Serdes(XldCategory.NpcCharacter, 1, 99, (save, mapping), s, SerdesNpcCharacter, npcIds);
+            XldContainer.Serdes(XldCategory.NpcCharacter, 100, 199, (save, mapping), s, SerdesNpcCharacter, npcIds);
+            XldContainer.Serdes(XldCategory.NpcCharacter, 200, 299, (save, mapping), s, SerdesNpcCharacter, npcIds);
 
             s.RepeatU8("Padding", 0, 4);
 

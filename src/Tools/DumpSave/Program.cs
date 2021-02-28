@@ -193,7 +193,7 @@ namespace DumpSave
             var settingsManager = new SettingsManager(settings);
             var assets = new AssetManager();
             var loaderRegistry = new AssetLoaderRegistry();
-            var containerLoaderRegistry = new ContainerLoaderRegistry();
+            var containerLoaderRegistry = new ContainerRegistry();
             var modApplier = new ModApplier()
                 // Register post-processors for handling transformations of asset data that can't be done by UAlbion.Formats alone.
                 .AddAssetPostProcessor(new AlbionSpritePostProcessor())
@@ -209,7 +209,7 @@ namespace DumpSave
                 .Attach(assets)
                 ;
 
-            modApplier.LoadMods(generalConfig);
+            modApplier.LoadMods(generalConfig, settings.ActiveMods);
             var save = SavedGame.Serdes(null, AssetMapping.Global, new AlbionReader(br, stream.Length));
 
             if (!VerifyRoundTrip(stream, save, AssetMapping.Global))

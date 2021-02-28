@@ -127,10 +127,10 @@
   },
 
   "Containers": {
-    "raw": "UAlbion.Formats.Containers.RawContainer, UAlbion.Formats",
-    "items": "UAlbion.Formats.Containers.ItemListContainer, UAlbion.Formats",
-    "spells": "UAlbion.Formats.Containers.SpellListContainer, UAlbion.Formats",
-    "binaryoffsets": "UAlbion.Formats.Containers.BinaryOffsetContainer, UAlbion.Formats"
+    "raw": "UAlbion.Formats.Containers.RawContainerLoader, UAlbion.Formats",
+    "binaryoffsets": "UAlbion.Formats.Containers.BinaryOffsetContainerLoader, UAlbion.Formats",
+    "items": "UAlbion.Formats.Containers.ItemListContainerLoader, UAlbion.Formats",
+    "spells": "UAlbion.Formats.Containers.SpellListContainerLoader, UAlbion.Formats"
   },
 
   "Languages": {
@@ -148,27 +148,27 @@
     },
 
     // Items
-    "$(XLD)/ITEMLIST.DAT": { "Loader": "itemdata", "Container": "items", "Map": { "0": { "Id": "item.1" } } },
-    "$(XLD)/ITEMNAME.DAT": { "Loader": "itemname", "Container": "raw", "Map": { "0": { "Id": "special.ItemNames" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/ITEMLIST.DAT": { "Loader": "itemdata", "Container": "items", "Map": { "0": { "Id": "item.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/ITEMNAME.DAT": { "Loader": "itemname", "Container": "raw", "Map": { "0": { "Id": "special.ItemNames" } } },
 
     // Events
-    "$(XLD)/EVNTSET0.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.1" } } },
-    "$(XLD)/EVNTSET1.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.100" } } },
-    "$(XLD)/EVNTSET2.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.200" } } },
-    "$(XLD)/EVNTSET3.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.300" } } },
-    "$(XLD)/EVNTSET9.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.900" } } },
-    "$(XLD)/SCRIPT0.XLD":  { "Loader": "script", "Map": { "0": { "Id": "script.1" } } },
-    "$(XLD)/SCRIPT2.XLD":  { "Loader": "script", "Map": { "0": { "Id": "script.200" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/EVNTSET0.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/EVNTSET1.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.100" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/EVNTSET2.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.200" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/EVNTSET3.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.300" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/EVNTSET9.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.900" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/SCRIPT0.XLD":  { "Loader": "script", "Map": { "0": { "Id": "script.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/SCRIPT2.XLD":  { "Loader": "script", "Map": { "0": { "Id": "script.200" } } },
 
     // Maps
-    "$(XLD)/BLKLIST0.XLD": { "Loader": "block", "Map": { "0": {"Id": "block.1" } } },
-    "$(XLD)/LABDATA0.XLD": { "Loader": "lab", "Map": { "0": { "Id": "lab.1" } } },
-    "$(XLD)/LABDATA1.XLD": { "Loader": "lab", "Map": { "0": { "Id": "lab.100" } } },
-    "$(XLD)/LABDATA2.XLD": { "Loader": "lab", "Map": { "0": { "Id": "lab.200" } } },
-    "$(XLD)/MAPDATA1.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.100" } } },
-    "$(XLD)/MAPDATA2.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.200" } } },
-    "$(XLD)/MAPDATA3.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.300" } } },
-    "$(XLD)/ICONDAT0.XLD": {
+    "$(MOD)/Albion/CD/XLDLIBS/BLKLIST0.XLD": { "Loader": "block", "Map": { "0": {"Id": "block.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/LABDATA0.XLD": { "Loader": "lab", "Map": { "0": { "Id": "lab.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/LABDATA1.XLD": { "Loader": "lab", "Map": { "0": { "Id": "lab.100" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/LABDATA2.XLD": { "Loader": "lab", "Map": { "0": { "Id": "lab.200" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/MAPDATA1.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.100" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/MAPDATA2.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.200" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/MAPDATA3.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.300" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/ICONDAT0.XLD": {
       "Loader": "tileset",
       "Map": {
         "0": { "Id": "tiledata.1", "UseSmallGraphics": true },
@@ -178,18 +178,18 @@
     },
 
     // Monster info
-    "$(XLD)/MONCHAR0.XLD": { "Loader": "sheet",  "Map": { "0": { "Id": "monster.1" } } },
-    "$(XLD)/MONGRP0.XLD":  { "Loader": "mongrp", "Map": { "0": { "Id": "mongrp.1" } } },
-    "$(XLD)/MONGRP1.XLD":  { "Loader": "mongrp", "Map": { "0": { "Id": "mongrp.100" } } },
-    "$(XLD)/MONGRP2.XLD":  { "Loader": "mongrp", "Map": { "0": { "Id": "mongrp.200" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/MONCHAR0.XLD": { "Loader": "sheet",  "Map": { "0": { "Id": "monster.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/MONGRP0.XLD":  { "Loader": "mongrp", "Map": { "0": { "Id": "mongrp.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/MONGRP1.XLD":  { "Loader": "mongrp", "Map": { "0": { "Id": "mongrp.100" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/MONGRP2.XLD":  { "Loader": "mongrp", "Map": { "0": { "Id": "mongrp.200" } } },
 
     // Palettes
-    "$(XLD)/PALETTE.000":  {
+    "$(MOD)/Albion/CD/XLDLIBS/PALETTE.000":  {
       "Loader": "pal",
       "Container": "raw",
       "Map": { "0": { "Id": "pal.0", "IsCommon": true } }
     },
-    "$(XLD)/PALETTE0.XLD": {
+    "$(MOD)/Albion/CD/XLDLIBS/PALETTE0.XLD": {
       "Loader": "pal",
       "Map": {
         "0":  { "Id": "pal.1", "AnimatedRanges": [ "0x99-0x9f", "0xb0-0xbf" ] },
@@ -209,7 +209,7 @@
     },
 
     // Fonts
-    "$(XLD)/FONTS0.XLD": {
+    "$(MOD)/Albion/CD/XLDLIBS/FONTS0.XLD": {
       "Loader": "font",
       "Width": 8,
       "Height": 8,
@@ -225,35 +225,35 @@
     },
 
     // Audio
-    "$(XLD)/SAMPLES0.XLD": { "Loader": "sample", "Map": { "0": { "Id": "sample.1" } } },
-    "$(XLD)/SAMPLES1.XLD": { "Loader": "sample", "Map": { "0": { "Id": "sample.100" } } },
-    "$(XLD)/SAMPLES2.XLD": { "Loader": "sample", "Map": { "0": { "Id": "sample.200" } } },
-    "$(XLD)/SONGS0.XLD":   { "Loader": "song",   "Map": { "0": { "Id": "song.1" } } },
-    "$(XLD)/WAVELIB0.XLD": { "Loader": "wavlib", "Map": { "0": { "Id": "wavlib.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/SAMPLES0.XLD": { "Loader": "sample", "Map": { "0": { "Id": "sample.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/SAMPLES1.XLD": { "Loader": "sample", "Map": { "0": { "Id": "sample.100" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/SAMPLES2.XLD": { "Loader": "sample", "Map": { "0": { "Id": "sample.200" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/SONGS0.XLD":   { "Loader": "song",   "Map": { "0": { "Id": "song.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/WAVELIB0.XLD": { "Loader": "wavlib", "Map": { "0": { "Id": "wavlib.1" } } },
 
     // Videos
-    "$(XLD)/$(LANG)/FLICS0.XLD":   { "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/$(LANG)/FLICS0.XLD":   { "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
 
     // Text
-    "$(XLD)/$(LANG)/EVNTTXT0.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "etext.1" } } },
-    "$(XLD)/$(LANG)/EVNTTXT1.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "etext.100" } } },
-    "$(XLD)/$(LANG)/EVNTTXT2.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "etext.200" } } },
-    "$(XLD)/$(LANG)/EVNTTXT3.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "etext.300" } } },
-    "$(XLD)/$(LANG)/EVNTTXT9.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "etext.900" } } },
-    "$(XLD)/$(LANG)/MAPTEXT1.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "mtext.100" } } },
-    "$(XLD)/$(LANG)/MAPTEXT2.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "mtext.200" } } },
-    "$(XLD)/$(LANG)/MAPTEXT3.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "mtext.300" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/$(LANG)/EVNTTXT0.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "etext.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/$(LANG)/EVNTTXT1.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "etext.100" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/$(LANG)/EVNTTXT2.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "etext.200" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/$(LANG)/EVNTTXT3.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "etext.300" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/$(LANG)/EVNTTXT9.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "etext.900" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/$(LANG)/MAPTEXT1.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "mtext.100" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/$(LANG)/MAPTEXT2.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "mtext.200" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/$(LANG)/MAPTEXT3.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "mtext.300" } } },
     "$(MOD)/$(LANG)/strings.json": {
       "Loader": "json",
       "Container": "raw",
       "Map": { "0": { "Id": "special.UAlbionStrings" } }
     },
-    "$(XLD)/$(LANG)/SYSTEXTS":     {
+    "$(MOD)/Albion/CD/XLDLIBS/$(LANG)/SYSTEXTS":     {
       "Loader": "stext",
       "Container": "raw",
       "Map": { "0": { "Id": "special.SystemStrings" } }
     },
-    "$(XLD)/$(LANG)/WORDLIS0.XLD": {
+    "$(MOD)/Albion/CD/XLDLIBS/$(LANG)/WORDLIS0.XLD": {
       "Loader": "wordlist",
       "Map": {
         "0": { "Id": "special.Words1" },
@@ -263,7 +263,7 @@
     },
 
     // Spells
-    "$(XLD)/SPELLDAT.DAT": {
+    "$(MOD)/Albion/CD/XLDLIBS/SPELLDAT.DAT": {
       "Loader": "spell",
       "Container": "spells",
       "Map": { // Ids = 1 + OffsetInSchool + School * 256
@@ -278,57 +278,57 @@
     },
 
     // Initial game state data
-    "$(XLD)/INITIAL/AUTOMAP1.XLD": { "Loader": "automap",  "Map": { "0": { "Id": "automap.100" } } },
-    "$(XLD)/INITIAL/AUTOMAP2.XLD": { "Loader": "automap",  "Map": { "0": { "Id": "automap.200" } } },
-    "$(XLD)/INITIAL/AUTOMAP3.XLD": { "Loader": "automap",  "Map": { "0": { "Id": "automap.300" } } },
-    "$(XLD)/INITIAL/CHESTDT0.XLD": { "Loader": "chest",    "Map": { "0": { "Id": "chest.1" } } },
-    "$(XLD)/INITIAL/CHESTDT1.XLD": { "Loader": "chest",    "Map": { "0": { "Id": "chest.100" } } },
-    "$(XLD)/INITIAL/CHESTDT2.XLD": { "Loader": "chest",    "Map": { "0": { "Id": "chest.200" } } },
-    "$(XLD)/INITIAL/CHESTDT5.XLD": { "Loader": "chest",    "Map": { "0": { "Id": "chest.500" } } },
-    "$(XLD)/INITIAL/MERCHDT0.XLD": { "Loader": "merchant", "Map": { "0": { "Id": "merchant.1" } } },
-    "$(XLD)/INITIAL/MERCHDT1.XLD": { "Loader": "merchant", "Map": { "0": { "Id": "merchant.100" } } },
-    "$(XLD)/INITIAL/MERCHDT2.XLD": { "Loader": "merchant", "Map": { "0": { "Id": "merchant.200" } } },
-    "$(XLD)/INITIAL/NPCCHAR0.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "npc.1" } } },
-    "$(XLD)/INITIAL/NPCCHAR1.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "npc.100" } } },
-    "$(XLD)/INITIAL/NPCCHAR2.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "npc.200" } } },
-    "$(XLD)/INITIAL/PRTCHAR0.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "party.1" } } },
-    "$(XLD)/INITIAL/PRTCHAR1.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "party.100" } } },
-    "$(XLD)/INITIAL/PRTCHAR2.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "party.200" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/AUTOMAP1.XLD": { "Loader": "automap",  "Map": { "0": { "Id": "automap.100" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/AUTOMAP2.XLD": { "Loader": "automap",  "Map": { "0": { "Id": "automap.200" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/AUTOMAP3.XLD": { "Loader": "automap",  "Map": { "0": { "Id": "automap.300" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/CHESTDT0.XLD": { "Loader": "chest",    "Map": { "0": { "Id": "chest.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/CHESTDT1.XLD": { "Loader": "chest",    "Map": { "0": { "Id": "chest.100" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/CHESTDT2.XLD": { "Loader": "chest",    "Map": { "0": { "Id": "chest.200" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/CHESTDT5.XLD": { "Loader": "chest",    "Map": { "0": { "Id": "chest.500" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/MERCHDT0.XLD": { "Loader": "merchant", "Map": { "0": { "Id": "merchant.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/MERCHDT1.XLD": { "Loader": "merchant", "Map": { "0": { "Id": "merchant.100" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/MERCHDT2.XLD": { "Loader": "merchant", "Map": { "0": { "Id": "merchant.200" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/NPCCHAR0.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "npc.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/NPCCHAR1.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "npc.100" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/NPCCHAR2.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "npc.200" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/PRTCHAR0.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "party.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/PRTCHAR1.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "party.100" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/PRTCHAR2.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "party.200" } } },
 
     // Graphics
-    "$(XLD)/3DFLOOR0.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "Map": { "0": { "Id": "floor.1" } } },
-    "$(XLD)/3DFLOOR1.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "Map": { "0": { "Id": "floor.100" } } },
-    "$(XLD)/3DFLOOR2.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "Map": { "0": { "Id": "floor.200" } } },
-    "$(XLD)/COMBACK0.XLD": { "Loader": "fixedsize", "Width": 360,              "Map": { "0": { "Id": "combg.1" } } },
-    "$(XLD)/ICONGFX0.XLD": { "Loader": "fixedsize", "Width": 16, "Height": 16, "Map": { "0": { "Id": "tilegfx.1" } } },
-    "$(XLD)/SMLPORT0.XLD": { "Loader": "fixedsize", "Width": 34, "Map": { "0": { "Id": "portrait.1" } } },
-    "$(XLD)/SMLPORT1.XLD": { "Loader": "fixedsize", "Width": 34, "Map": { "0": { "Id": "portrait.100" } } },
-    "$(XLD)/TACTICO0.XLD": { "Loader": "fixedsize", "Width": 32, "Map": { "0": { "Id": "tacgfx.1" } } },
-    "$(XLD)/COMGFX0.XLD":  { "Loader": "multiheader", "Map": { "0": { "Id": "comgfx.1"} } },
-    "$(XLD)/MONGFX0.XLD":  { "Loader": "multiheader", "Map": { "0": { "Id": "mongfx.1" } } },
-    "$(XLD)/3DBCKGR0.XLD": { "Loader": "header", "Map": { "0": { "Id": "3dbg.1" } } },
-    "$(XLD)/FBODPIX0.XLD": { "Loader": "header", "Map": { "0": { "Id": "fullbody.1" } } },
-    "$(XLD)/NPCGR0.XLD":   { "Loader": "header", "Map": { "0": { "Id": "lnpc.1" } } },
-    "$(XLD)/NPCGR1.XLD":   { "Loader": "header", "Map": { "0": { "Id": "lnpc.100" } } },
-    "$(XLD)/NPCKL0.XLD":   { "Loader": "header", "Map": { "0": { "Id": "snpc.1" } } },
-    "$(XLD)/PARTGR0.XLD":  { "Loader": "header", "Map": { "0": { "Id": "lparty.1" } } },
-    "$(XLD)/PARTKL0.XLD":  { "Loader": "header", "Map": { "0": { "Id": "sparty.1" } } },
-    "$(XLD)/PICTURE0.XLD": { "Loader": "interlaced", "Map": { "0": { "Id": "pic.1" } } },
-    "$(XLD)/ITEMGFX":      {
+    "$(MOD)/Albion/CD/XLDLIBS/3DFLOOR0.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "Map": { "0": { "Id": "floor.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/3DFLOOR1.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "Map": { "0": { "Id": "floor.100" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/3DFLOOR2.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "Map": { "0": { "Id": "floor.200" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/COMBACK0.XLD": { "Loader": "fixedsize", "Width": 360,              "Map": { "0": { "Id": "combg.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/ICONGFX0.XLD": { "Loader": "fixedsize", "Width": 16, "Height": 16, "Map": { "0": { "Id": "tilegfx.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/SMLPORT0.XLD": { "Loader": "fixedsize", "Width": 34, "Map": { "0": { "Id": "portrait.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/SMLPORT1.XLD": { "Loader": "fixedsize", "Width": 34, "Map": { "0": { "Id": "portrait.100" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/TACTICO0.XLD": { "Loader": "fixedsize", "Width": 32, "Map": { "0": { "Id": "tacgfx.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/COMGFX0.XLD":  { "Loader": "multiheader", "Map": { "0": { "Id": "comgfx.1"} } },
+    "$(MOD)/Albion/CD/XLDLIBS/MONGFX0.XLD":  { "Loader": "multiheader", "Map": { "0": { "Id": "mongfx.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/3DBCKGR0.XLD": { "Loader": "header", "Map": { "0": { "Id": "3dbg.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/FBODPIX0.XLD": { "Loader": "header", "Map": { "0": { "Id": "fullbody.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/NPCGR0.XLD":   { "Loader": "header", "Map": { "0": { "Id": "lnpc.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/NPCGR1.XLD":   { "Loader": "header", "Map": { "0": { "Id": "lnpc.100" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/NPCKL0.XLD":   { "Loader": "header", "Map": { "0": { "Id": "snpc.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/PARTGR0.XLD":  { "Loader": "header", "Map": { "0": { "Id": "lparty.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/PARTKL0.XLD":  { "Loader": "header", "Map": { "0": { "Id": "sparty.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/PICTURE0.XLD": { "Loader": "interlaced", "Map": { "0": { "Id": "pic.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/ITEMGFX":      {
       "Loader": "fixedsize",
       "Container": "raw",
       "Width": 16,
       "Height": 16,
       "Map": { "0": { "Id": "itemgfx.1" } }
     },
-    "$(XLD)/AUTOGFX0.XLD": {
+    "$(MOD)/Albion/CD/XLDLIBS/AUTOGFX0.XLD": {
       "Loader": "amorphous",
       "Map": {
         "0": { "Id": "autotile.1", "SubSprites": "(8,8,576) (16,16)" },
         "1": { "SubSprites": "(8,8,576) (16,16)" }
       }
     },
-    "$(XLD)/SLAB": {
+    "$(MOD)/Albion/CD/XLDLIBS/SLAB": {
       "Loader": "slab",
       "Container": "raw",
       "Width": 360,
@@ -336,7 +336,7 @@
     },
 
     // Graphics with explicit dimensions
-    "$(XLD)/3DOBJEC0.XLD": {
+    "$(MOD)/Albion/CD/XLDLIBS/3DOBJEC0.XLD": {
       "Loader": "fixedsize",
       "Map": {
         "0": { "Id": "3dobj.1", "Width": 32 },
@@ -440,7 +440,7 @@
         "98": { "Width": 24, "Height": 78 }
       }
     },
-    "$(XLD)/3DOBJEC1.XLD": {
+    "$(MOD)/Albion/CD/XLDLIBS/3DOBJEC1.XLD": {
       "Loader": "fixedsize",
       "Map": {
         "0": { "Id": "3dobj.100", "Width": 24, "Height": 70 },
@@ -545,7 +545,7 @@
         "99": { "Width": 42 }
       }
     },
-    "$(XLD)/3DOBJEC2.XLD": {
+    "$(MOD)/Albion/CD/XLDLIBS/3DOBJEC2.XLD": {
       "Loader": "fixedsize",
       "Map": {
         "0": { "Id": "3dobj.200", "Width": 57 },
@@ -650,7 +650,7 @@
         "99": { "Width": 56, "Height": 129 }
       }
     },
-    "$(XLD)/3DOBJEC3.XLD": {
+    "$(MOD)/Albion/CD/XLDLIBS/3DOBJEC3.XLD": {
       "Loader": "fixedsize",
       "Map": {
         "0": { "Id": "3dobj.300", "Width": 56, "Height": 125 },
@@ -683,7 +683,7 @@
       }
     },
 
-    "$(XLD)/3DOVERL0.XLD": {
+    "$(MOD)/Albion/CD/XLDLIBS/3DOVERL0.XLD": {
       "Transposed": true,
       "Loader": "fixedsize",
       "Map": {
@@ -788,7 +788,7 @@
         "98": { "Width": 134 }
       }
     },
-    "$(XLD)/3DOVERL1.XLD": {
+    "$(MOD)/Albion/CD/XLDLIBS/3DOVERL1.XLD": {
       "Transposed": true,
       "Loader": "fixedsize",
       "Map": {
@@ -894,7 +894,7 @@
         "99": { "Width": 26 }
       }
     },
-    "$(XLD)/3DOVERL2.XLD": {
+    "$(MOD)/Albion/CD/XLDLIBS/3DOVERL2.XLD": {
       "Transposed": true,
       "Loader": "fixedsize",
       "Map": {
@@ -942,7 +942,7 @@
       }
     },
 
-    "$(XLD)/3DWALLS0.XLD": {
+    "$(MOD)/Albion/CD/XLDLIBS/3DWALLS0.XLD": {
       "Transposed": true,
       "Loader": "fixedsize",
       "Map": {
@@ -1047,7 +1047,7 @@
         "98": { "Width": 98 }
       }
     },
-    "$(XLD)/3DWALLS1.XLD": {
+    "$(MOD)/Albion/CD/XLDLIBS/3DWALLS1.XLD": {
       "Transposed": true,
       "Loader": "fixedsize",
       "Map": {

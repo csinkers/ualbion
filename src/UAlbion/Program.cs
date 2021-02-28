@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -31,6 +30,9 @@ namespace UAlbion
             if (baseDir == null)
                 throw new InvalidOperationException("No base directory could be found.");
             PerfTracker.StartupEvent($"Found base directory {baseDir}");
+
+            if (commandLine.Mode == ExecutionMode.ConvertAssets)
+                ConvertAssets.Convert(baseDir, commandLine.ConvertFrom, commandLine.ConvertTo);
 
             var setupAssetSystem = Task.Run(() => AssetSystem.SetupAsync(baseDir));
             PerfTracker.StartupEvent("Creating engine");

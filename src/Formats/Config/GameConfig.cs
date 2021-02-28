@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Newtonsoft.Json;
-using UAlbion.Api;
+using UAlbion.Config;
 
 #pragma warning disable CA1034 // Nested types should not be visible
 namespace UAlbion.Formats.Config
@@ -87,13 +87,11 @@ namespace UAlbion.Formats.Config
                 throw new FileNotFoundException($"Could not find game config file at expected path {configPath}");
 
             var configText = File.ReadAllText(configPath);
-            return JsonConvert.DeserializeObject<GameConfig>(configText,
-                new JsonSerializerSettings { ContractResolver = new PrivatePropertyJsonContractResolver() });
+            return JsonConvert.DeserializeObject<GameConfig>(configText, ConfigUtil.JsonSerializerSettings);
         }
 
         public static GameConfig LoadLiteral(string json) =>
-            JsonConvert.DeserializeObject<GameConfig>(json,
-                new JsonSerializerSettings { ContractResolver = new PrivatePropertyJsonContractResolver() });
+            JsonConvert.DeserializeObject<GameConfig>(json, ConfigUtil.JsonSerializerSettings);
     }
 }
 #pragma warning restore CA1034 // Nested types should not be visible

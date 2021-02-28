@@ -7,12 +7,12 @@ namespace UAlbion.Config
 {
     public class ModConfig
     {
-        public string Repo { get; }
-        public string Name { get; }
-        public string Description { get; }
-        public string Author { get; }
-        public Version Version { get; }
-        [JsonProperty("asset_path")] public string AssetPath { get; }
+        public string Repo { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Author { get; set; }
+        public Version Version { get; set; }
+        [JsonProperty("asset_path")] public string AssetPath { get; set; }
         public List<string> Dependencies { get; } = new List<string>();
 
         public static ModConfig Load(string configPath)

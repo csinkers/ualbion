@@ -35,14 +35,9 @@ namespace UAlbion.Base.Tests
             }
         }
 
-        static readonly XldContainerLoader XldLoader = new XldContainerLoader();
+        static readonly XldContainer XldLoader = new XldContainer();
         static readonly string BaseDir = ConfigUtil.FindBasePath();
-        static readonly JsonSerializer JsonSerializer = JsonSerializer.Create(new JsonSerializerSettings
-        {
-            Formatting = Formatting.Indented,
-            DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate,
-            ContractResolver = new PrivatePropertyJsonContractResolver()
-        });
+        static readonly JsonSerializer JsonSerializer = JsonSerializer.Create(ConfigUtil.JsonSerializerSettings);
 
         static string ReadToEnd(Stream stream)
         {
@@ -100,7 +95,7 @@ namespace UAlbion.Base.Tests
 
         static byte[] BytesFromXld(IGeneralConfig conf, string path, AssetInfo info)
         {
-            using var s = XldLoader.Open(conf.ResolvePath(path), info);
+            using var s = XldLoader.Read(conf.ResolvePath(path), info);
             return s.ByteArray(null, null, (int)s.BytesRemaining);
         }
 
@@ -164,8 +159,8 @@ namespace UAlbion.Base.Tests
         {
             var conf = AssetSystem.LoadGeneralConfig(BaseDir);
             var info = new AssetInfo { SubAssetId = subId };
-            var loader = new ItemListContainerLoader();
-            using var s = loader.Open(conf.ResolvePath(file), info);
+            var loader = new ItemListContainer();
+            using var s = loader.Read(conf.ResolvePath(file), info);
             var bytes = s.ByteArray(null, null, (int)s.BytesRemaining);
             RoundTrip(testName, bytes, serdes);
         }
@@ -174,8 +169,8 @@ namespace UAlbion.Base.Tests
         {
             var conf = AssetSystem.LoadGeneralConfig(BaseDir);
             var info = new AssetInfo { SubAssetId = subId };
-            var loader = new SpellListContainerLoader();
-            using var s = loader.Open(conf.ResolvePath(file), info);
+            var loader = new SpellListContainer();
+            using var s = loader.Read(conf.ResolvePath(file), info);
             var bytes = s.ByteArray(null, null, (int)s.BytesRemaining);
             RoundTrip(testName, bytes, serdes);
         }

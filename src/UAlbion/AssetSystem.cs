@@ -39,7 +39,7 @@ namespace UAlbion
             var assets = new AssetManager();
             var factory = new VeldridCoreFactory();
             var loaderRegistry = new AssetLoaderRegistry();
-            var containerLoaderRegistry = new ContainerLoaderRegistry();
+            var containerLoaderRegistry = new ContainerRegistry();
             var modApplier = new ModApplier()
                 // Register post-processors for handling transformations of asset data that can't be done by UAlbion.Formats alone.
                 .AddAssetPostProcessor(new AlbionSpritePostProcessor())
@@ -66,9 +66,11 @@ namespace UAlbion
             PerfTracker.StartupEvent("Registered asset services");
 
             Engine.GlobalExchange = exchange;
-            generalConfig.SetPath("LANG", settings.Language.ToString()
-                .ToUpperInvariant()); // Ensure that the LANG path is set before resolving any assets
-            modApplier.LoadMods(generalConfig);
+
+            // Ensure that the LANG path is set before resolving any assets
+            generalConfig.SetPath("LANG", settings.Language.ToString().ToUpperInvariant());
+
+            modApplier.LoadMods(generalConfig, settings.ActiveMods);
             AssetMapping.Global.ConsistencyCheck();
             PerfTracker.StartupEvent("Loaded mods");
 

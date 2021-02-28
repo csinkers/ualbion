@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using SerdesNet;
 using UAlbion.Api;
 
@@ -8,12 +9,12 @@ namespace UAlbion.Formats
     {
         readonly BinaryReader _br;
 
-        public AlbionReader(BinaryReader br, long maxLength = 0)
-            : base(
-                br,
+        public AlbionReader(BinaryReader br, long maxLength = 0, Action disposeAction = null)
+            : base(br,
                 maxLength == 0 ? br?.BaseStream.Length ?? 0 : maxLength,
                 FormatUtil.BytesTo850String,
-                ApiUtil.Assert)
+                ApiUtil.Assert,
+                disposeAction)
         {
             _br = br;
         }

@@ -39,9 +39,9 @@ namespace UAlbion.Config
         public T Get<T>(string propertyName, T defaultValue)
         {
             if (Properties == null || !Properties.TryGetValue(propertyName, out var token))
-                return defaultValue;
+                return File != null ? File.Get(propertyName, defaultValue) : defaultValue;
 
-            return token.Value<T>();
+            return (T)token.Value<T>();
         }
 
         public void Set<T>(string propertyName, T value)

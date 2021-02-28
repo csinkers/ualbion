@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 using SerdesNet;
 
 namespace UAlbion.Formats.Assets
@@ -12,7 +13,7 @@ namespace UAlbion.Formats.Assets
 
         public SpellData() { }
         SpellData(SpellId id) => Id = id;
-        public SpellId Id { get; private set; } // Setters needed for JSON
+        [JsonIgnore] public SpellId Id { get; } // Setters needed for JSON
         public StringId Name { get; private set; }
         public SpellClass Class { get; private set; }
         public int OffsetInClass { get; private set; }

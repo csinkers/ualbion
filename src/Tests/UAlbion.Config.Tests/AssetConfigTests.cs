@@ -52,10 +52,10 @@ namespace UAlbion.Config.Tests
   },
 
   ""Containers"": {
-    ""raw"": ""UAlbion.Formats.Containers.RawContainerLoader, UAlbion.Formats"",
-    ""binaryoffsets"": ""UAlbion.Formats.Containers.BinaryOffsetContainerLoader, UAlbion.Formats"",
-    ""items"": ""UAlbion.Formats.Containers.ItemListContainerLoader, UAlbion.Formats"",
-    ""spells"": ""UAlbion.Formats.Containers.SpellListContainerLoader, UAlbion.Formats""
+    ""raw"": ""UAlbion.Formats.Containers.RawContainer, UAlbion.Formats"",
+    ""items"": ""UAlbion.Formats.Containers.ItemListContainer, UAlbion.Formats"",
+    ""spells"": ""UAlbion.Formats.Containers.SpellListContainer, UAlbion.Formats"",
+    ""binaryoffsets"": ""UAlbion.Formats.Containers.BinaryOffsetContainer, UAlbion.Formats""
   },
 
   ""Files"": {
@@ -391,7 +391,7 @@ namespace UAlbion.Config.Tests
             var c = AssetConfig.Parse(TestConfig1);
             var f = c.Files["$(XLD)/ITEMLIST.DAT"];
             Assert.Equal("UAlbion.Formats.Parsers.ItemDataLoader, UAlbion.Formats", f.Loader);
-            Assert.Equal("UAlbion.Formats.Containers.ItemListContainerLoader, UAlbion.Formats", f.Container);
+            Assert.Equal("UAlbion.Formats.Containers.ItemListContainer, UAlbion.Formats", f.Container);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
                 m =>
                 {
@@ -626,7 +626,7 @@ namespace UAlbion.Config.Tests
             var c = AssetConfig.Parse(TestConfig1);
             var f = c.Files["$(XLD)/SPELLDAT.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.SpellLoader, UAlbion.Formats", f.Loader);
-            Assert.Equal("UAlbion.Formats.Containers.SpellListContainerLoader, UAlbion.Formats", f.Container);
+            Assert.Equal("UAlbion.Formats.Containers.SpellListContainer, UAlbion.Formats", f.Container);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
                 m => { Assert.Equal(0, m.Key); Assert.Equal("spell.1", m.Value.Id); },
                 m => { Assert.Equal(30, m.Key); Assert.Equal("spell.257", m.Value.Id); },
@@ -655,7 +655,7 @@ namespace UAlbion.Config.Tests
             var c = AssetConfig.Parse(TestConfig1);
             var f = c.Files["$(ALBION)/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710"];
             Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
-            Assert.Equal("UAlbion.Formats.Containers.BinaryOffsetContainerLoader, UAlbion.Formats", f.Container);
+            Assert.Equal("UAlbion.Formats.Containers.BinaryOffsetContainer, UAlbion.Formats", f.Container);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
                 m =>
                 {

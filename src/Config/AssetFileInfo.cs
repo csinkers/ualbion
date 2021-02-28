@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-// ReSharper disable UnassignedGetOnlyAutoProperty
+using Newtonsoft.Json.Linq;
 
+#pragma warning disable CA2227 // Collection properties should be read only
 namespace UAlbion.Config
 {
     public class AssetFileInfo
@@ -17,11 +18,20 @@ namespace UAlbion.Config
         public int? Height { get; set; }
         public bool? Transposed { get; set; }
         public IDictionary<int, AssetInfo> Map { get; } = new Dictionary<int, AssetInfo>();
+        [JsonExtensionData] public IDictionary<string, JToken> Properties { get; set; }
+
+        public T Get<T>(string propertyName, T defaultValue)
+        {
+            if (Properties == null || !Properties.TryGetValue(propertyName, out var token))
+                return defaultValue;
+
+            return (T)token.Value<T>();
+        }
 
         // TODO: Text encoding
         public void PopulateAssetIds(
             Func<string, AssetId> resolveId,
-            Func<AssetFileInfo, List<(int, int)>> getSubItemCountForFile)
+            Func<AssetFileInfo, IList<(int, int)>> getSubItemCountForFile)
         {
             if (getSubItemCountForFile == null) throw new ArgumentNullException(nameof(getSubItemCountForFile));
 
@@ -29,6 +39,12 @@ namespace UAlbion.Config
             var ranges = getSubItemCountForFile(this);
             if (ranges == null)
                 return;
+
+            foreach(var asset in Map.Values)
+            {
+                if (asset.Id == null || !asset.AssetId.IsNone) continue;
+                asset.AssetId = resolveId(asset.Id);
+            }
 
             foreach(var range in ranges)
             {
@@ -52,10 +68,8 @@ namespace UAlbion.Config
 
                     asset.File = this;
                     asset.SubAssetId = i;
-                    asset.AssetId = asset.Id != null
-                        ? resolveId(asset.Id)
-                        : new AssetId(last.AssetId.Type, i - last.SubAssetId + last.AssetId.Id);
-
+                    if (asset.Id == null && last != null)
+                        asset.AssetId = new AssetId(last.AssetId.Type, i - last.SubAssetId + last.AssetId.Id);
                     last = asset;
                 }
             }

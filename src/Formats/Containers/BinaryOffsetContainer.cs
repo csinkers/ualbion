@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Config;
 
 namespace UAlbion.Formats.Containers
 {
     /// <summary>
-    /// Read chunks from a binary file using offsets & lengths specified in the assets.json file.
+    /// Read chunks from a binary file using offsets &amp; lengths specified in the assets.json file.
     /// </summary>
-    public class BinaryOffsetContainerLoader : IContainerLoader
+    public class BinaryOffsetContainer : IAssetContainer
     {
-        public ISerializer Open(string file, AssetInfo info)
+        public ISerializer Read(string file, AssetInfo info)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             using var stream = File.OpenRead(file);
@@ -22,6 +23,9 @@ namespace UAlbion.Formats.Containers
             var ms = new MemoryStream(bytes);
             return new AlbionReader(new BinaryReader(ms));
         }
+
+        public void Write(string path, IList<(AssetInfo, byte[])> assets) 
+            => ApiUtil.Assert("Binary offset containers do not currently support saving");
 
         public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info) // All sub-items must be given explicitly for binary offset containers
             => FormatUtil.SortedIntsToRanges(info?.Map.Keys.OrderBy(x => x));

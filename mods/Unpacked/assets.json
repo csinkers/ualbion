@@ -31,16 +31,16 @@
       "EnumType": "UAlbion.Base.FullBodyPicture, UAlbion.Base",
       "CopiedFrom": "UAlbion.Base.PartyMember, UAlbion.Base"
     },
-    "item":     { "AssetType": "Item",             "EnumType": "UAlbion.Base.Item, UAlbion.Base" },
-    "itemgfx":  { "AssetType": "ItemGraphics",     "EnumType": "UAlbion.Base.ItemGraphics, UAlbion.Base" },
-    "lab":      { "AssetType": "Labyrinth",        "EnumType": "UAlbion.Base.LabyrinthData, UAlbion.Base" },
-    "lnpc":     { "AssetType": "BigNpcGraphics",   "EnumType": "UAlbion.Base.LargeNpc, UAlbion.Base" },
-    "lparty":   { "AssetType": "BigPartyGraphics", "EnumType": "UAlbion.Base.LargePartyMember, UAlbion.Base" },
-    "map":      { "AssetType": "Map",              "EnumType": "UAlbion.Base.Map, UAlbion.Base" },
-    "merchant": { "AssetType": "Merchant",         "EnumType": "UAlbion.Base.Merchant, UAlbion.Base" },
-    "mongfx":   { "AssetType": "MonsterGraphics",  "EnumType": "UAlbion.Base.MonsterGraphics, UAlbion.Base" },
-    "mongrp":   { "AssetType": "MonsterGroup",     "EnumType": "UAlbion.Base.MonsterGroup, UAlbion.Base" },
-    "monster":  { "AssetType": "Monster",          "EnumType": "UAlbion.Base.Monster, UAlbion.Base" },
+    "item":     { "AssetType": "Item",               "EnumType": "UAlbion.Base.Item, UAlbion.Base" },
+    "itemgfx":  { "AssetType": "ItemGraphics",       "EnumType": "UAlbion.Base.ItemGraphics, UAlbion.Base" },
+    "lab":      { "AssetType": "Labyrinth",          "EnumType": "UAlbion.Base.LabyrinthData, UAlbion.Base" },
+    "lnpc":     { "AssetType": "LargeNpcGraphics",   "EnumType": "UAlbion.Base.LargeNpc, UAlbion.Base" },
+    "lparty":   { "AssetType": "LargePartyGraphics", "EnumType": "UAlbion.Base.LargePartyMember, UAlbion.Base" },
+    "map":      { "AssetType": "Map",                "EnumType": "UAlbion.Base.Map, UAlbion.Base" },
+    "merchant": { "AssetType": "Merchant",           "EnumType": "UAlbion.Base.Merchant, UAlbion.Base" },
+    "mongfx":   { "AssetType": "MonsterGraphics",    "EnumType": "UAlbion.Base.MonsterGraphics, UAlbion.Base" },
+    "mongrp":   { "AssetType": "MonsterGroup",       "EnumType": "UAlbion.Base.MonsterGroup, UAlbion.Base" },
+    "monster":  { "AssetType": "Monster",            "EnumType": "UAlbion.Base.Monster, UAlbion.Base" },
     "mtext": {
       "AssetType": "MapText",
       "EnumType": "UAlbion.Base.MapText, UAlbion.Base",
@@ -98,16 +98,19 @@
     "jsonInv":          "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.Inventory, UAlbion.Formats]], UAlbion.Formats",
     "jsonItems":        "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.ItemData, UAlbion.Formats]], UAlbion.Formats",
     "jsonMonsterGroup": "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.MonsterGroup, UAlbion.Formats]], UAlbion.Formats",
+    "jsonPal":          "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.AlbionPalette, UAlbion.Formats]], UAlbion.Formats",
     "jsonSheet":        "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.CharacterSheet, UAlbion.Formats]], UAlbion.Formats",
     "jsonSpell":        "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.SpellData, UAlbion.Formats]], UAlbion.Formats",
     "jsonText":         "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.StringCollection, UAlbion.Formats]], UAlbion.Formats",
-    "png8":             "UAlbion.Game.Veldrid.Assets.Png8Loader, UAlbion.Game.Veldrid",
+    "png":             "UAlbion.Game.Veldrid.Assets.PngLoader, UAlbion.Game.Veldrid",
+    "pngsheet":        "UAlbion.Game.Veldrid.Assets.PngSheetLoader, UAlbion.Game.Veldrid",
     "utf8":             "UAlbion.Formats.Parsers.Utf8Loader, UAlbion.Formats",
     "tiledLabyrinth":   "UAlbion.Formats.Exporters.Tiled.LabyrinthLoader, UAlbion.Formats",
-    "tiledMap":         "UAlbion.Formats.Exporters.Tiled.MapLoader, UAlbion.Formats",
+    "tiledMap":         "UAlbion.Game.Assets.TiledMapLoader, UAlbion.Game",
     "tiledStamp":       "UAlbion.Formats.Exporters.Tiled.StampLoader, UAlbion.Formats",
     "tiledTileGfx":     "UAlbion.Formats.Exporters.Tiled.TileGraphicsLoader, UAlbion.Formats",
-    "tiledTileset":     "UAlbion.Formats.Exporters.Tiled.TilesetLoader, UAlbion.Formats"
+    "tiledTileset":     "UAlbion.Formats.Exporters.Tiled.TilesetLoader, UAlbion.Formats",
+    "tiledNpcTileset":  "UAlbion.Formats.Exporters.Tiled.NpcTilesetLoader, UAlbion.Formats"
   },
 
   "Languages": {
@@ -117,52 +120,125 @@
   },
 
   "Containers": {
+    "raw": "UAlbion.Formats.Containers.RawContainer, UAlbion.Formats",
     "dir": "UAlbion.Formats.Containers.DirectoryContainer, UAlbion.Formats",
     "json": "UAlbion.Formats.Containers.JsonContainer, UAlbion.Formats"
   },
 
   "Files": {
-    "$(MOD)/Assets/3dBackgrounds":      { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "3dbg.1"     } } },
-    "$(MOD)/Assets/3dFloors":           { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "floor.1"    } } },
-    "$(MOD)/Assets/3dObjects":          { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "3dobj.1"    } } },
-    "$(MOD)/Assets/3dOverlays":         { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "overlay.1"  } } },
-    "$(MOD)/Assets/3dWalls":            { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "wall.1"     } } },
-    "$(MOD)/Assets/Automap":            { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "autotile.1" } } },
-    "$(MOD)/Assets/CombatBackground":   { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "combg.1"    } } },
-    "$(MOD)/Assets/CombatGraphics":     { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "comgfx.1"   } } },
-    "$(MOD)/Assets/Fonts":              { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "font.1"     } } },
-    "$(MOD)/Assets/InvBackgrounds":     { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "fullbody.1" } } },
-    "$(MOD)/Assets/Items":              { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "itemgfx.1"  } } },
-    "$(MOD)/Assets/MonsterGraphics":    { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "mongfx.1"   } } },
-    "$(MOD)/Assets/NpcGraphicsLarge":   { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "snpc.1"     } } },
-    "$(MOD)/Assets/NpcGraphicsSmall":   { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "lnpc.1"     } } },
-    // "$(MOD)/Assets/Palettes":           { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "pal.1"      } } },
-    "$(MOD)/Assets/PartyGraphicsLarge": { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "lparty.1"   } } },
-    "$(MOD)/Assets/PartyGraphicsSmall": { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "sparty.1"   } } },
-    "$(MOD)/Assets/Portraits":          { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "portrait.1" } } },
-    "$(MOD)/Assets/Slab":               { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "uibg.1"     } } },
-    "$(MOD)/Assets/TacticalIcons":      { "Loader": "png8",             "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "tacgfx.1"   } } },
+//    "$(MOD)/Assets/3dBackgrounds":      { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "3dbg.1"     } } },
+//    "$(MOD)/Assets/3dFloors":           { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "floor.1"    } } },
+//    "$(MOD)/Assets/3dObjects":          { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "3dobj.1"    } } },
+//    "$(MOD)/Assets/3dOverlays":         { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "overlay.1"  } } },
+//    "$(MOD)/Assets/3dWalls":            { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "wall.1"     } } },
+//    "$(MOD)/Assets/CombatBackground":   { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "combg.1"    } } },
+//    "$(MOD)/Assets/CombatGraphics":     { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "comgfx.1"   } } },
+//    "$(MOD)/Assets/InvBackgrounds":     { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "fullbody.1" } } },
+//    "$(MOD)/Assets/MonsterGraphics":    { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "mongfx.1"   } } },
+//    "$(MOD)/Assets/NpcGraphicsLarge":   { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "lnpc.1"     } } },
+//    "$(MOD)/Assets/NpcGraphicsSmall":   { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "snpc.1"     } } },
+//    "$(MOD)/Assets/PartyGraphicsLarge": { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "lparty.1"   } } },
+//    "$(MOD)/Assets/PartyGraphicsSmall": { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "sparty.1"   } } },
+//    "$(MOD)/Assets/Portraits":          { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "portrait.1" } } },
+//    "$(MOD)/Assets/Slab":               { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "uibg.1"     } } },
+//    "$(MOD)/Assets/TacticalIcons":      { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "tacgfx.1"   } } },
+//
+//    "$(MOD)/Assets/Chests":             { "Loader": "jsonInv",          "Container": "dir", "Pattern": "{0}_{2}.json",  "Map": { "1": { "Id": "chest.1"    } } },
+//    "$(MOD)/Assets/EventText":          { "Loader": "jsonText",         "Container": "dir", "Pattern": "{0}_{2}.json",  "Map": { "1": { "Id": "etext.1"    } } },
+//    "$(MOD)/Assets/Events":             { "Loader": "jsonEventSet",     "Container": "dir", "Pattern": "{0}_{2}.json",  "Map": { "1": { "Id": "eset.1"     } } },
+//    "$(MOD)/Assets/MapText":            { "Loader": "jsonText",         "Container": "dir", "Pattern": "{0}_{2}.json",  "Map": { "100": { "Id": "mtext.100" } } },
+//    "$(MOD)/Assets/Merchants":          { "Loader": "jsonInv",          "Container": "dir", "Pattern": "{0}_{2}.json",  "Map": { "1": { "Id": "merchant.1" } } },
+//    "$(MOD)/Assets/MonsterGroups":      { "Loader": "jsonMonsterGroup", "Container": "dir", "Pattern": "{0}_{2}.json",  "Map": { "1": { "Id": "mongrp.1"   } } },
+//    "$(MOD)/Assets/Monsters":           { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{0}_{2}.json",  "Map": { "1": { "Id": "monster.1"  } } },
+//    "$(MOD)/Assets/Npcs":               { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{0}_{2}.json",  "Map": { "1": { "Id": "npc.1"      } } },
+//    "$(MOD)/Assets/Palettes":           { "Loader": "jsonPal",          "Container": "dir", "Pattern": "{0}_{2}.json",  "Map": { "0": { "Id": "pal.0"      } } },
+//    "$(MOD)/Assets/PartyMembers":       { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{0}_{2}.json",  "Map": { "1": { "Id": "party.1"    } } },
+//    "$(MOD)/Assets/Items.json":         { "Loader": "jsonItems",        "Container": "json",                    "Map": { "1": { "Id": "item.1"     } } },
+//    "$(MOD)/Assets/Spells.json":        { "Loader": "jsonSpell",        "Container": "json",                    "Map": { "1": { "Id": "spell.1"    } } },
+//    /*
+//    "$(MOD)/Assets/Words": {
+//      "Loader": "utf8",
+//      "Container": "json",
+//      "Map": { "1": { "Id": "word.1"    } }
+//    },
+//    "$(MOD)/Assets/3dTilesets": {
+//      "Loader": "tiledLabyrinth",
+//      "Container": "dir",
+//      "Pattern": "{0}_{2}.tsx",
+//      "Map": { "1": { "Id": "lab.1" } }
+//    },
+//    "$(MOD)/Assets/Blocks": {
+//      "Loader": "tiledStamp",
+//      "Container": "dir",
+//      "Pattern": "{0}_{2}.stamp",
+//      "Map": { "1": { "Id": "block.1" } }
+//    },
+//    */
+//
+//    "$(MOD)/Assets/Automap/1": { "Loader": "png", "Container": "dir", "Pattern": "{0}_{1}_{2}.png", "Max": 1, "Map": { "1": { "Id": "autotile.1" } } },
+//    "$(MOD)/Assets/Automap/2": { "Loader": "png", "Container": "dir", "Pattern": "{0}_{1}_{2}.png", "Max": 2, "Map": { "2": { "Id": "autotile.2" } } },
+//    "$(MOD)/Assets/Fonts": {
+//      "Loader": "pngsheet",
+//      "Container": "dir",
+//      "Pattern": "{0}_{2}.png",
+//      "Width": 8,
+//      "Height": 8,
+//      "Map": { "1": { "Id": "font.1" } } 
+//    },
+//    "$(MOD)/Assets/Items.png": {
+//      "Loader": "pngsheet",
+//      "Container": "raw",
+//      "Pattern": "{0}_{2}.png",
+//      "Width": 16,
+//      "Height": 16,
+//      "Map": { "1": { "Id": "itemgfx.1"  } } 
+//    },
+//
+//    "$(MOD)/Assets/Tilesets/1":  { "Loader": "png", "Container": "dir", "Pattern": "{0}_{1}.png", "Max":  1, "Map": {  "1": { "Id": "tilegfx.1"  } } },
+//    "$(MOD)/Assets/Tilesets/2":  { "Loader": "png", "Container": "dir", "Pattern": "{0}_{1}.png", "Max":  2, "Map": {  "2": { "Id": "tilegfx.2"  } } },
+//    "$(MOD)/Assets/Tilesets/3":  { "Loader": "png", "Container": "dir", "Pattern": "{0}_{1}.png", "Max":  3, "Map": {  "3": { "Id": "tilegfx.3"  } } },
+//    "$(MOD)/Assets/Tilesets/4":  { "Loader": "png", "Container": "dir", "Pattern": "{0}_{1}.png", "Max":  4, "Map": {  "4": { "Id": "tilegfx.4"  } } },
+//    "$(MOD)/Assets/Tilesets/5":  { "Loader": "png", "Container": "dir", "Pattern": "{0}_{1}.png", "Max":  5, "Map": {  "5": { "Id": "tilegfx.5"  } } },
+//    "$(MOD)/Assets/Tilesets/6":  { "Loader": "png", "Container": "dir", "Pattern": "{0}_{1}.png", "Max":  6, "Map": {  "6": { "Id": "tilegfx.6"  } } },
+//    "$(MOD)/Assets/Tilesets/7":  { "Loader": "png", "Container": "dir", "Pattern": "{0}_{1}.png", "Max":  7, "Map": {  "7": { "Id": "tilegfx.7"  } } },
+//    "$(MOD)/Assets/Tilesets/8":  { "Loader": "png", "Container": "dir", "Pattern": "{0}_{1}.png", "Max":  8, "Map": {  "8": { "Id": "tilegfx.8"  } } },
+//    "$(MOD)/Assets/Tilesets/9":  { "Loader": "png", "Container": "dir", "Pattern": "{0}_{1}.png", "Max":  9, "Map": {  "9": { "Id": "tilegfx.9"  } } },
+//    "$(MOD)/Assets/Tilesets/10": { "Loader": "png", "Container": "dir", "Pattern": "{0}_{1}.png", "Max": 10, "Map": { "10": { "Id": "tilegfx.10" } } },
+//    "$(MOD)/Assets/Tilesets/11": { "Loader": "png", "Container": "dir", "Pattern": "{0}_{1}.png", "Max": 11, "Map": { "11": { "Id": "tilegfx.11" } } },
 
-    "$(MOD)/Assets/Chests":             { "Loader": "jsonInv",          "Container": "dir", "Suffix": ".json",  "Map": { "1": { "Id": "chest.1"    } } },
-    "$(MOD)/Assets/EventText":          { "Loader": "jsonText",         "Container": "dir", "Suffix": ".json",  "Map": { "1": { "Id": "etext.1"    } } },
-    "$(MOD)/Assets/Events":             { "Loader": "jsonEventSet",     "Container": "dir", "Suffix": ".json",  "Map": { "1": { "Id": "eset.1"     } } },
-    "$(MOD)/Assets/MapText":            { "Loader": "jsonText",         "Container": "dir", "Suffix": ".json",  "Map": { "1": { "Id": "mtext.1"    } } },
-    "$(MOD)/Assets/Merchants":          { "Loader": "jsonInv",          "Container": "dir", "Suffix": ".json",  "Map": { "1": { "Id": "merchant.1" } } },
-    "$(MOD)/Assets/MonsterGroups":      { "Loader": "jsonMonsterGroup", "Container": "dir", "Suffix": ".json",  "Map": { "1": { "Id": "mongrp.1"   } } },
-    "$(MOD)/Assets/Monsters":           { "Loader": "jsonSheet",        "Container": "dir", "Suffix": ".json",  "Map": { "1": { "Id": "monster.1"  } } },
-    "$(MOD)/Assets/Npcs":               { "Loader": "jsonSheet",        "Container": "dir", "Suffix": ".json",  "Map": { "1": { "Id": "npc.1"      } } },
-    "$(MOD)/Assets/PartyMembers":       { "Loader": "jsonSheet",        "Container": "dir", "Suffix": ".json",  "Map": { "1": { "Id": "party.1"    } } },
-    "$(MOD)/Assets/Items.json":         { "Loader": "jsonItems",        "Container": "json",                    "Map": { "1": { "Id": "item.1"     } } },
-    "$(MOD)/Assets/Spells.json":        { "Loader": "jsonSpell",        "Container": "json",                    "Map": { "1": { "Id": "spell.1"    } } }//,
-/*
-    "$(MOD)/Assets/Words":              { "Loader": "utf8",             "Container": "json",                    "Map": { "1": { "Id": "word.1"    } } },
+    "$(MOD)/Assets/Tilesets": {
+      "Loader": "tiledTileset",
+      "Container": "dir",
+      "Pattern": "{0}_{2}.tsx",
+      "GraphicsPattern": "{0}/{0}_{1}.png",
+      "BlankTilePath": "../../Blank.png",
+      "Map": { "1": { "Id": "tiledata.1" } }
+    },
+    "$(MOD)/Assets/Tilesets/LargeNPCs.tsx": {
+      "Loader": "tiledNpcTileset",
+      "Container": "raw",
+      "IsSmall": false,
+      "GraphicsPattern": "../NpcGraphicsLarge/{0}_{1}_{2}.png",
+      "Map": { "0": { "Id": "special.DummyObject" } }
+    },
+    "$(MOD)/Assets/Tilesets/SmallNPCs.tsx": {
+      "Loader": "tiledNpcTileset",
+      "Container": "raw",
+      "IsSmall": true,
+      "GraphicsPattern": "../NpcGraphicsSmall/{0}_{1}_{2}.png",
+      "Map": { "0": { "Id": "special.DummyObject" } }
+    },
 
-    "$(MOD)/Assets/3dTilesets":         { "Loader": "tiledLabyrinth",   "Container": "dir", "Suffix": ".tsx",   "Map": { "1": { "Id": "lab.1"      } } },
-    "$(MOD)/Assets/Blocks":             { "Loader": "tiledStamp",       "Container": "dir", "Suffix": ".stamp", "Map": { "1": { "Id": "block.1"    } } },
-    "$(MOD)/Assets/Maps":               { "Loader": "tiledMap",         "Container": "dir", "Suffix": ".tmx",   "Map": { "1": { "Id": "map.1"      } } },
-    "$(MOD)/Assets/Tilesets":           { "Loader": "tiledTileset",     "Container": "dir", "Suffix": ".tsx",   "Map": { "1": { "Id": "tiledata.1" } } },
-    "$(MOD)/Assets/TileGraphics":       { "Loader": "tiledTileGfx",     "Container": "dir", "Suffix": ".png",   "Map": { "1": { "Id": "tilegfx.1"  } } }
-    */
+    "$(MOD)/Assets/Maps": {
+      "Loader": "tiledMap",
+      "Container": "dir",
+      "Pattern": "{0}_{2}.tmx",
+      "IsSmall": true,
+      "TilesetPattern": "../Tilesets/{0}_{2}.tsx",
+      "SmallNpcs": "../Tilesets/SmallNPCs.tsx",
+      "LargeNpcs": "../Tilesets/LargeNPCs.tsx",
+      "Map": { "100": { "Id": "map.100" } }
+    }
   }
 }
-
+// vim: tabstop=2 shiftwidth=2 expandtab

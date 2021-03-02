@@ -156,8 +156,8 @@ namespace UAlbion.Formats.Assets
 
             sheet.SpriteId = sheet.Type switch
                 {
-                    CharacterType.Party   => SpriteId.SerdesU8(nameof(SpriteId), sheet.SpriteId, AssetType.BigPartyGraphics, mapping, s),
-                    CharacterType.Npc     => SpriteId.SerdesU8(nameof(SpriteId), sheet.SpriteId, AssetType.BigNpcGraphics, mapping, s),
+                    CharacterType.Party   => SpriteId.SerdesU8(nameof(SpriteId), sheet.SpriteId, AssetType.LargePartyGraphics, mapping, s),
+                    CharacterType.Npc     => SpriteId.SerdesU8(nameof(SpriteId), sheet.SpriteId, AssetType.LargeNpcGraphics, mapping, s),
                     CharacterType.Monster => SpriteId.SerdesU8(nameof(SpriteId), sheet.SpriteId, AssetType.MonsterGraphics, mapping, s),
                     _ => throw new InvalidOperationException($"Unhandled character type {sheet.Type}")
                 };

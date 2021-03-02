@@ -20,7 +20,7 @@ namespace UAlbion.Formats.Assets.Maps
 
             int tileCount = td?.Tiles.Count ?? (int)(s.BytesRemaining / 8) + 2;
             td ??= new TilesetData(config.AssetId);
-            td.UseSmallGraphics = config.Get(nameof(UseSmallGraphics), td.UseSmallGraphics);
+            td.UseSmallGraphics = config.Get(AssetProperty.UseSmallGraphics, td.UseSmallGraphics);
 
             if (td.Tiles.Count == 0)
             {
@@ -48,6 +48,11 @@ namespace UAlbion.Formats.Assets.Maps
             }
 
             s.List(nameof(Tiles), td.Tiles, tileCount - 2, 2, S.Object<TileData>(TileData.Serdes));
+
+            if (s.IsReading())
+                for (ushort i = 0; i < td.Tiles.Count; i++)
+                    td.Tiles[i].Index = i;
+
             return td;
         }
     }

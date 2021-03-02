@@ -174,7 +174,7 @@ namespace UAlbion.Formats.Tests
             };
 
             var info = new AssetInfo();
-            info.Set("SubSprites", "(3,2,2) (2,1)");
+            info.Set(AssetProperty.SubSprites, "(3,2,2) (2,1)");
             RoundTrip(oneFrame,
                 (x, s) => _amorphousLoader.Serdes(x, info, null, s),
                 sprite =>

@@ -72,7 +72,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             if (properties == null) throw new ArgumentNullException(nameof(properties));
             if (npcTileset == null) throw new ArgumentNullException(nameof(npcTileset));
 
-            ushort blankTileIndex = (ushort)(tileset.Tiles.Max(x => x.ImageNumber + x.FrameCount - 1) + 1);
+            ushort blankTileIndex = 0;
             int nextObjectId = 1;
             int nextObjectGroupId = 3; // 1 & 2 are always underlay & overlay.
             npcTileset.GidOffset = tileset.Tiles.Count + 1;
@@ -267,13 +267,8 @@ namespace UAlbion.Formats.Exporters.Tiled
                 {
                     int index = j * map.Width + i;
                     var tileIndex = useOverlay ? map.Overlay[index] : map.Underlay[index];
-                    var gfxIndex = tileset.Tiles[tileIndex].ImageNumber;
-                    if (gfxIndex == 0xffff)
-                        gfxIndex = blankTileIndex;
-                    else
-                        gfxIndex++;
-
-                    sb.Append(gfxIndex);
+                    var tile = tileset.Tiles[tileIndex];
+                    sb.Append(tile.IsBlank ? blankTileIndex : tileIndex + 1);
                     sb.Append(',');
                 }
 

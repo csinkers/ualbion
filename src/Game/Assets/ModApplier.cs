@@ -273,6 +273,7 @@ namespace UAlbion.Game.Assets
             var target = _modsInReverseDependencyOrder.Last();
 
             // Add any missing ids
+            Raise(new LogEvent(LogEvent.Level.Info, "Populating destination asset info..."));
             target.AssetConfig.PopulateAssetIds(AssetMapping.Global, file =>
             {
                 var container = containerRegistry.GetContainer(file.Container);
@@ -287,13 +288,17 @@ namespace UAlbion.Game.Assets
                 if (container is XldContainer)
                     idsInRange = idsInRange.Where(x => x < 100);
 
+                int maxSubId = file.Get(AssetProperty.Max, -1);
+                if (maxSubId != -1)
+                    idsInRange = idsInRange.Where(x => x <= maxSubId);
+
                 return FormatUtil.SortedIntsToRanges(idsInRange);
             });
 
-            _extraPaths["MOD"] = target.AssetPath;
+            Resolve<IGeneralConfig>().SetPath("MOD", target.AssetPath);
             foreach (var file in target.AssetConfig.Files.Values)
             {
-
+                Raise(new LogEvent(LogEvent.Level.Info, $"Saving {file.Filename}..."));
                 var path = config.ResolvePath(file.Filename, _extraPaths);
                 var loader = loaderRegistry.GetLoader(file.Loader);
                 var container = containerRegistry.GetContainer(file.Container);
@@ -306,7 +311,7 @@ namespace UAlbion.Game.Assets
 
                     var paletteId = paletteHints.Get(sourceInfo.File.Filename, sourceInfo.SubAssetId);
                     if (paletteId != 0)
-                        assetInfo.Set("PaletteId", paletteId);
+                        assetInfo.Set(AssetProperty.PaletteId, paletteId);
 
                     using var ms = new MemoryStream();
                     using var bw = new BinaryWriter(ms);

@@ -18,7 +18,7 @@ namespace UAlbion.Formats.Containers
             if (info == null) throw new ArgumentNullException(nameof(info));
             using var stream = File.OpenRead(file);
             using var br = new BinaryReader(stream);
-            stream.Position = info.Get("Offset", 0);
+            stream.Position = info.Get(AssetProperty.Offset, 0);
             var bytes = br.ReadBytes(info.Width * info.Height);
             var ms = new MemoryStream(bytes);
             return new AlbionReader(new BinaryReader(ms));

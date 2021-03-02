@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if false
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -69,8 +70,8 @@ namespace UAlbion
                 DumpNpcTileset(props, "smallnpc", "SmallNPCs", AssetId.EnumerateAll(AssetType.SmallNpcGraphics));
             Flush();
 
-            if (types.Contains(AssetType.BigNpcGraphics))
-                DumpNpcTileset(props, "largenpc", "LargeNPCs", AssetId.EnumerateAll(AssetType.BigNpcGraphics));
+            if (types.Contains(AssetType.LargeNpcGraphics))
+                DumpNpcTileset(props, "largenpc", "LargeNPCs", AssetId.EnumerateAll(AssetType.LargeNpcGraphics));
             Flush();
 
             if (types.Contains(AssetType.Object3D))
@@ -162,9 +163,9 @@ namespace UAlbion
                 Directory.CreateDirectory(tileGfxDir);
 
             TilesetData tileset = props.Assets.LoadTileData(id);
-            ITexture sheet = props.Assets.LoadTexture(id.ToTilesetGraphics());
+            ITexture spriteSheet = props.Assets.LoadTexture(id.ToTilesetGraphics());
             if (tileset == null) return;
-            if (sheet == null) return;
+            if (spriteSheet == null) return;
 
             var sheetInfo = DumpGraphics.ExportImage(
                     id.ToTilesetGraphics(),
@@ -182,7 +183,7 @@ namespace UAlbion
             }
 
             var tw = props.GetWriter(Path.Combine(props.TilesetDir, $"{id.Id}_{id}.tsx"));
-            var properties = ExtractProperties(sheet, sheetInfo.Path);
+            var properties = ExtractProperties(spriteSheet, sheetInfo.Path);
             var tilemap = Tiled.Tileset.FromTileset(tileset, properties);
             tilemap.Serialize(tw);
         }
@@ -219,10 +220,9 @@ namespace UAlbion
             // Margin = 1, // See AlbionSpritePostProcessor
             // Spacing = 2, // See AlbionSpritePostProcessor
             SheetPath = sheetPath,
-            SheetWidth = (int)sheet.Width,
-            SheetHeight = (int)sheet.Height,
             TileWidth = (int)sheet.GetSubImageDetails(0).Size.X,
             TileHeight = (int)sheet.GetSubImageDetails(0).Size.Y,
         };
     }
 }
+#endif

@@ -31,16 +31,16 @@
       "EnumType": "UAlbion.Base.FullBodyPicture, UAlbion.Base",
       "CopiedFrom": "UAlbion.Base.PartyMember, UAlbion.Base"
     },
-    "item":     { "AssetType": "Item",             "EnumType": "UAlbion.Base.Item, UAlbion.Base" },
-    "itemgfx":  { "AssetType": "ItemGraphics",     "EnumType": "UAlbion.Base.ItemGraphics, UAlbion.Base" },
-    "lab":      { "AssetType": "Labyrinth",        "EnumType": "UAlbion.Base.LabyrinthData, UAlbion.Base" },
-    "lnpc":     { "AssetType": "BigNpcGraphics",   "EnumType": "UAlbion.Base.LargeNpc, UAlbion.Base" },
-    "lparty":   { "AssetType": "BigPartyGraphics", "EnumType": "UAlbion.Base.LargePartyMember, UAlbion.Base" },
-    "map":      { "AssetType": "Map",              "EnumType": "UAlbion.Base.Map, UAlbion.Base" },
-    "merchant": { "AssetType": "Merchant",         "EnumType": "UAlbion.Base.Merchant, UAlbion.Base" },
-    "mongfx":   { "AssetType": "MonsterGraphics",  "EnumType": "UAlbion.Base.MonsterGraphics, UAlbion.Base" },
-    "mongrp":   { "AssetType": "MonsterGroup",     "EnumType": "UAlbion.Base.MonsterGroup, UAlbion.Base" },
-    "monster":  { "AssetType": "Monster",          "EnumType": "UAlbion.Base.Monster, UAlbion.Base" },
+    "item":     { "AssetType": "Item",               "EnumType": "UAlbion.Base.Item, UAlbion.Base" },
+    "itemgfx":  { "AssetType": "ItemGraphics",       "EnumType": "UAlbion.Base.ItemGraphics, UAlbion.Base" },
+    "lab":      { "AssetType": "Labyrinth",          "EnumType": "UAlbion.Base.LabyrinthData, UAlbion.Base" },
+    "lnpc":     { "AssetType": "LargeNpcGraphics",   "EnumType": "UAlbion.Base.LargeNpc, UAlbion.Base" },
+    "lparty":   { "AssetType": "LargePartyGraphics", "EnumType": "UAlbion.Base.LargePartyMember, UAlbion.Base" },
+    "map":      { "AssetType": "Map",                "EnumType": "UAlbion.Base.Map, UAlbion.Base" },
+    "merchant": { "AssetType": "Merchant",           "EnumType": "UAlbion.Base.Merchant, UAlbion.Base" },
+    "mongfx":   { "AssetType": "MonsterGraphics",    "EnumType": "UAlbion.Base.MonsterGraphics, UAlbion.Base" },
+    "mongrp":   { "AssetType": "MonsterGroup",       "EnumType": "UAlbion.Base.MonsterGroup, UAlbion.Base" },
+    "monster":  { "AssetType": "Monster",            "EnumType": "UAlbion.Base.Monster, UAlbion.Base" },
     "mtext": {
       "AssetType": "MapText",
       "EnumType": "UAlbion.Base.MapText, UAlbion.Base",
@@ -97,6 +97,7 @@
     "automap":     "UAlbion.Formats.Parsers.AutomapLoader, UAlbion.Formats",
     "block":       "UAlbion.Formats.Parsers.BlockListLoader, UAlbion.Formats",
     "chest":       "UAlbion.Formats.Parsers.ChestLoader, UAlbion.Formats",
+    "dummy":       "UAlbion.Formats.Parsers.DummyLoader, UAlbion.Formats",
     "eset":        "UAlbion.Formats.Parsers.EventSetLoader, UAlbion.Formats",
     "fixedsize":   "UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats",
     "flic":        "UAlbion.Formats.Parsers.FlicLoader, UAlbion.Formats",
@@ -128,6 +129,7 @@
 
   "Containers": {
     "raw": "UAlbion.Formats.Containers.RawContainer, UAlbion.Formats",
+    "dummy": "UAlbion.Formats.Containers.DummyContainer, UAlbion.Formats",
     "items": "UAlbion.Formats.Containers.ItemListContainer, UAlbion.Formats",
     "spells": "UAlbion.Formats.Containers.SpellListContainer, UAlbion.Formats",
     "binaryoffsets": "UAlbion.Formats.Containers.BinaryOffsetContainer, UAlbion.Formats"
@@ -146,6 +148,9 @@
       "Loader": "soundbank",
       "Map": { "0": { "Id": "special.SoundBank" } }
     },
+
+    // Dummy item for some dodgy edge cases
+    "dummy": { "Loader": "dummy", "Container": "dummy", "Map": { "0": {"Id": "special.DummyObject" } } },
 
     // Items
     "$(XLD)/ITEMLIST.DAT": { "Loader": "itemdata", "Container": "items", "Map": { "0": { "Id": "item.1" } } },

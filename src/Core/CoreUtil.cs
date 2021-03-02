@@ -165,7 +165,7 @@ namespace UAlbion.Core
             {
                 for (int i = 0; i < fromBuffer.Width; i++)
                 {
-                    uint pixel = from[fromOffset];
+                    byte pixel = from[fromOffset];
                     if (pixel != transparentColor)
                         to[toOffset] = palette[pixel] & 0x00ffffff | ((uint)componentAlpha << 24);
 
@@ -232,6 +232,61 @@ namespace UAlbion.Core
                 if (remainingHeight > 0)
                     dest = rowStart.Slice((int)(chunkHeight * to.Stride));
             } while (remainingHeight > 0);
+        }
+
+        static byte Quantize(uint value, uint[] palette)
+        {
+            if (palette == null) throw new ArgumentNullException(nameof(palette));
+            if (palette.Length > 256) throw new ArgumentOutOfRangeException(nameof(palette), "Only 8-bit palettes are supported");
+
+            var (r, g, b, a) = ApiUtil.UnpackColor(value);
+            byte result = 0;
+            int best = int.MaxValue;
+            for (byte i = 0; i < palette.Length; i++)
+            {
+                var (r2,g2,b2, a2) = ApiUtil.UnpackColor(palette[i]);
+                int dr = r-r2;
+                int dg = g-g2;
+                int db = b-b2;
+                int da = a-a2;
+                int dist2 = dr * dr + dg * dg + db * db + da * da;
+                if(dist2 < best)
+                {
+                    best = dist2;
+                    result = i;
+                }
+            }
+            return result;
+        }
+
+        public static void Blit32To8(ReadOnlyUIntImageBuffer fromBuffer, ByteImageBuffer toBuffer, uint[] palette)
+        {
+            var from = fromBuffer.Buffer;
+            var to = toBuffer.Buffer;
+            int fromOffset = 0;
+            int toOffset = 0;
+
+            var quantized = new Dictionary<uint, byte>();
+            for (int j = 0; j < fromBuffer.Height; j++)
+            {
+                for (int i = 0; i < fromBuffer.Width; i++)
+                {
+                    uint pixel = from[fromOffset];
+                    if (!quantized.TryGetValue(pixel, out var index))
+                    {
+                        index = Quantize(pixel, palette);
+                        quantized[pixel] = index;
+                    }
+
+                    to[toOffset] = index;
+
+                    fromOffset++;
+                    toOffset++;
+                }
+
+                fromOffset += (int)(fromBuffer.Stride - fromBuffer.Width);
+                toOffset += (int)(toBuffer.Stride - toBuffer.Width);
+            }
         }
 
         public static IList<byte> DistinctColors(ReadOnlyByteImageBuffer buffer)

@@ -32,7 +32,10 @@ namespace UAlbion
             PerfTracker.StartupEvent($"Found base directory {baseDir}");
 
             if (commandLine.Mode == ExecutionMode.ConvertAssets)
+            {
                 ConvertAssets.Convert(baseDir, commandLine.ConvertFrom, commandLine.ConvertTo);
+                return;
+            }
 
             var setupAssetSystem = Task.Run(() => AssetSystem.SetupAsync(baseDir));
             PerfTracker.StartupEvent("Creating engine");
@@ -99,8 +102,8 @@ namespace UAlbion
                     if ((commandLine.DumpFormats & DumpFormats.GraphicsMask) != 0)
                         DumpGraphics.Dump(assets, baseDir, commandLine.DumpAssetTypes, commandLine.DumpFormats & DumpFormats.GraphicsMask, dumpIds);
 
-                    if ((commandLine.DumpFormats & DumpFormats.Tiled) != 0)
-                        DumpTiled.Dump(baseDir, assets, commandLine.DumpAssetTypes, dumpIds);
+                    //if ((commandLine.DumpFormats & DumpFormats.Tiled) != 0)
+                    //    DumpTiled.Dump(baseDir, assets, commandLine.DumpAssetTypes, dumpIds);
                     break;
 
                 case ExecutionMode.Exit: break;

@@ -482,12 +482,12 @@ namespace UAlbion.Config.Tests
                 {
                     Assert.Equal(0, m.Key);
                     Assert.Equal("autotile.1", m.Value.Id);
-                    Assert.Equal("(8,8,576) (16,16)", m.Value.Get<string>("SubSprites", null));
+                    Assert.Equal("(8,8,576) (16,16)", m.Value.Get<string>(AssetProperty.SubSprites, null));
                 },
                 m =>
                 {
                     Assert.Equal(1, m.Key);
-                    Assert.Equal("(8,8,576) (16,16)", m.Value.Get<string>("SubSprites", null));
+                    Assert.Equal("(8,8,576) (16,16)", m.Value.Get<string>(AssetProperty.SubSprites, null));
                 });
         }
 
@@ -559,14 +559,14 @@ namespace UAlbion.Config.Tests
                     Assert.Equal("font.1", m.Value.Id);
                     Assert.Equal(
                         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\"?!/()#%*&+-=><☺♂♀éâàçêëèïîìôòûùáíóú",
-                        m.Value.Get<string>("Mapping", null));
+                        m.Value.Get<string>(AssetProperty.Mapping, null));
                 },
                 m =>
                 {
                     Assert.Equal(1, m.Key);
                     Assert.Equal(
                         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\"?!/()#%*&+-=><☺♂♀éâàçêëèïîìôòûùáíóú",
-                        m.Value.Get<string>("Mapping", null));
+                        m.Value.Get<string>(AssetProperty.Mapping, null));
                 });
         }
 
@@ -581,17 +581,17 @@ namespace UAlbion.Config.Tests
                 {
                     Assert.Equal(0, m.Key);
                     Assert.Equal("tiledata.1", m.Value.Id);
-                    Assert.True(m.Value.Get("UseSmallGraphics", false));
+                    Assert.True(m.Value.Get(AssetProperty.UseSmallGraphics, false));
                 },
                 m =>
                 {
                     Assert.Equal(1, m.Key);
-                    Assert.True(m.Value.Get("UseSmallGraphics", false));
+                    Assert.True(m.Value.Get(AssetProperty.UseSmallGraphics, false));
                 },
                 m =>
                 {
                     Assert.Equal(3, m.Key);
-                    Assert.True(m.Value.Get("UseSmallGraphics", false));
+                    Assert.True(m.Value.Get(AssetProperty.UseSmallGraphics, false));
                 });
         }
 
@@ -606,14 +606,14 @@ namespace UAlbion.Config.Tests
                 {
                     Assert.Equal(0, m.Key);
                     Assert.Equal("pal.1", m.Value.Id);
-                    Assert.Collection(m.Value.GetArray<string>("AnimatedRanges"),
+                    Assert.Collection(m.Value.GetArray<string>(AssetProperty.AnimatedRanges),
                         x => Assert.Equal("0x99-0x9f", x),
                         x => Assert.Equal("0xb0-0xbf", x));
                 },
                 m =>
                 {
                     Assert.Equal(1, m.Key);
-                    Assert.Collection(m.Value.GetArray<string>("AnimatedRanges"),
+                    Assert.Collection(m.Value.GetArray<string>(AssetProperty.AnimatedRanges),
                         x => Assert.Equal("0x99-0x9f", x),
                         x => Assert.Equal("0xb0-0xb4", x),
                         x => Assert.Equal("0xb5-0xbf", x));
@@ -661,7 +661,7 @@ namespace UAlbion.Config.Tests
                 {
                     Assert.Equal(0, m.Key);
                     Assert.Equal("coresprite.0", m.Value.Id);
-                    Assert.Equal(0x0FBE58, m.Value.Get("Offset", 0));
+                    Assert.Equal(0x0FBE58, m.Value.Get(AssetProperty.Offset, 0));
                     Assert.Equal(14, m.Value.Width);
                     Assert.Equal(14, m.Value.Height);
                     var hotspot = m.Value.GetRaw("Hotspot");
@@ -671,7 +671,7 @@ namespace UAlbion.Config.Tests
                 m =>
                 {
                     Assert.Equal(1, m.Key);
-                    Assert.Equal(0x0FBF1C, m.Value.Get("Offset", 0));
+                    Assert.Equal(0x0FBF1C, m.Value.Get(AssetProperty.Offset, 0));
                     Assert.Equal(16, m.Value.Width);
                     Assert.Equal(16, m.Value.Height);
                     var hotspot = m.Value.GetRaw("Hotspot");
@@ -681,7 +681,7 @@ namespace UAlbion.Config.Tests
                 m =>
                 {
                     Assert.Equal(27, m.Key);
-                    Assert.Equal(0x0FDD10, m.Value.Get("Offset", 0));
+                    Assert.Equal(0x0FDD10, m.Value.Get(AssetProperty.Offset, 0));
                     Assert.Equal(32, m.Value.Width);
                     Assert.Equal(64, m.Value.Height);
                     Assert.Null(m.Value.GetRaw("Hotspot"));

@@ -130,5 +130,20 @@ namespace UAlbion.Api
         }
 
         public static bool IsFlagsEnum(Type type) => type != null && type.IsEnum && type.GetCustomAttribute(typeof(FlagsAttribute)) != null;
+
+        public static (byte, byte, byte, byte) UnpackColor(uint c)
+        {
+            var r = (byte)(c & 0xff);
+            var g = (byte)((c >> 8) & 0xff);
+            var b = (byte)((c >> 16) & 0xff);
+            var a = (byte)((c >> 24) & 0xff);
+            return (r, g, b, a);
+        }
+
+        public static uint PackColor(byte r, byte g, byte b, byte a) =>
+            r
+            | (uint)(g << 8)
+            | (uint)(b << 16)
+            | (uint)(a << 24);
     }
 }

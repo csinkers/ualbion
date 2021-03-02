@@ -9,7 +9,7 @@ namespace UAlbion
         Text = 1 << 1, // Dense ad-hoc text format, good for an overview.
         Png  = 1 << 2, // True-colour PNG with colours resolved at palette tick 0
         Tga  = 1 << 3, // True-colour TGA
-        Tiled = 1 << 4, // Dump maps and tilemaps in Tiled tsx and tmx format
+        // Tiled = 1 << 4, // Dump maps and tilemaps in Tiled tsx and tmx format
 
         GraphicsMask = Png | Tga
     }

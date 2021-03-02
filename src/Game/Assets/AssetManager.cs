@@ -19,9 +19,12 @@ namespace UAlbion.Game.Assets
     {
         IModApplier _modApplier;
 
+        public AssetManager() { }
+        public AssetManager(IModApplier modApplier) => _modApplier = modApplier ?? throw new ArgumentNullException(nameof(modApplier));
+
         protected override void Subscribed()
         {
-            _modApplier = Resolve<IModApplier>() ?? throw new InvalidOperationException("AssetManager is missing requirement of type IModApplier");
+            _modApplier ??= Resolve<IModApplier>() ?? throw new InvalidOperationException("AssetManager is missing requirement of type IModApplier");
             Exchange.Register<IAssetManager>(this);
             Exchange.Register<ITextureLoader>(this);
         }

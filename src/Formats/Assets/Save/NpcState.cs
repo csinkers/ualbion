@@ -23,7 +23,7 @@ namespace UAlbion.Formats.Assets.Save
             switch (c.mapType)
             {
                 case MapType.ThreeD: npc.SpriteOrGroup = AssetId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.ObjectGroup, c.mapping, s); break;
-                case MapType.TwoD: npc.SpriteOrGroup = SpriteId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.BigNpcGraphics, c.mapping, s); break;
+                case MapType.TwoD: npc.SpriteOrGroup = SpriteId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.LargeNpcGraphics, c.mapping, s); break;
                 case MapType.TwoDOutdoors: npc.SpriteOrGroup = SpriteId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.SmallNpcGraphics, c.mapping, s); break;
                 default: throw new ArgumentOutOfRangeException(nameof(c), c.mapType, null);
             }

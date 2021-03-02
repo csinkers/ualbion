@@ -271,7 +271,7 @@ namespace UAlbion.Tools.ImageReverser
                     asset.File.Loader == FixedSizeSpriteLoader.TypeString &&
                     asset.Height != newHeight)
                 {
-                    asset.Set("Height", newHeight);
+                    asset.Set(AssetProperty.Height, newHeight);
                     _logicalSprite = null; // Force sprite reload
                     _visualSprite = null;
                     Render();
@@ -322,13 +322,13 @@ namespace UAlbion.Tools.ImageReverser
             var paletteId = PaletteId.FromUInt32(palette.Id);
             if (e.NewValue == CheckState.Checked)
             {
-                asset.Set("PaletteHint", paletteId.Id);
+                asset.Set(AssetProperty.PaletteId, paletteId.Id);
                 // TODO: Uncheck all others
             }
             else
             {
-                if (asset.Get("PaletteHint", 0) == paletteId.Id)
-                    asset.Set<object>("PaletteHint", null);
+                if (asset.Get(AssetProperty.PaletteId, 0) == paletteId.Id)
+                    asset.Set<object>(AssetProperty.PaletteId, null);
             }
 
             _core.TriggerAssetChanged(asset);
@@ -344,7 +344,7 @@ namespace UAlbion.Tools.ImageReverser
             {
                 var item = (AlbionPalette)chkListPalettes.Items[index];
                 var paletteId = PaletteId.FromUInt32(item.Id);
-                chkListPalettes.SetItemChecked(index, asset.Get("PaletteHint", 0) == paletteId.Id);
+                chkListPalettes.SetItemChecked(index, asset.Get(AssetProperty.PaletteId, 0) == paletteId.Id);
             }
 
             if (chkListPalettes.SelectedIndex != -1)

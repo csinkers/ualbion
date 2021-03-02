@@ -2,7 +2,6 @@
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
 using UAlbion.Game.Assets;
 
 namespace UAlbion
@@ -14,9 +13,10 @@ namespace UAlbion
             var config = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir);
             config.SetPath("LANG", GameLanguage.English.ToString().ToUpperInvariant()); // TODO: Allow language selection
             var applier = new ModApplier();
-            var exchange = new EventExchange();
+            var exchange = new EventExchange(new LogExchange());
             exchange
                 .Register<IGeneralConfig>(config)
+                .Attach(new StdioConsoleLogger())
                 .Attach(new AssetLoaderRegistry())
                 .Attach(new ContainerRegistry())
                 .Attach(new AssetLocator())
@@ -30,7 +30,7 @@ namespace UAlbion
         {
             var (from, fromExchange) = BuildModApplier(baseDir, fromMod);
             var (to, toExchange) = BuildModApplier(baseDir, toMod);
-            toExchange.Attach(new PaletteHackAssetManager(x => (AlbionPalette)from.LoadAssetCached(x)));
+            toExchange.Attach(new AssetManager(from));
 
             using (fromExchange)
             using (toExchange)

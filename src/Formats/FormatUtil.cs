@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -56,21 +57,6 @@ namespace UAlbion.Formats
             }
             return sb.ToString();
         }
-
-        public static (byte, byte, byte, byte) UnpackColor(uint c)
-        {
-            var r = (byte)(c & 0xff);
-            var g = (byte)((c >> 8) & 0xff);
-            var b = (byte)((c >> 16) & 0xff);
-            var a = (byte)((c >> 24) & 0xff);
-            return (r, g, b, a);
-        }
-
-        public static uint PackColor(byte r, byte g, byte b, byte a) =>
-            r
-            | (uint)(g << 8)
-            | (uint)(b << 16)
-            | (uint)(a << 24);
 
         public static (ushort, ushort) FromPacked(byte b1, byte b2, byte b3)
         {
@@ -249,6 +235,25 @@ namespace UAlbion.Formats
                 srcIndex += fromStride;
                 destIndex += toStride;
             }
+        }
+
+        public static byte[] BytesFromTextWriter(Action<TextWriter> func)
+        {
+            if (func == null) throw new ArgumentNullException(nameof(func));
+            using var ms = new MemoryStream();
+            using var tw = new StreamWriter(ms);
+            func(tw);
+            ms.Position = 0;
+            return ms.ToArray();
+        }
+
+        public static byte[] BytesFromStream(Action<Stream> func)
+        {
+            if (func == null) throw new ArgumentNullException(nameof(func));
+            using var stream = new MemoryStream();
+            func(stream);
+            stream.Position = 0;
+            return stream.ToArray();
         }
     }
 }

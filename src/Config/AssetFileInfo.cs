@@ -20,9 +20,9 @@ namespace UAlbion.Config
         public IDictionary<int, AssetInfo> Map { get; } = new Dictionary<int, AssetInfo>();
         [JsonExtensionData] public IDictionary<string, JToken> Properties { get; set; }
 
-        public T Get<T>(string propertyName, T defaultValue)
+        public T Get<T>(string property, T defaultValue)
         {
-            if (Properties == null || !Properties.TryGetValue(propertyName, out var token))
+            if (Properties == null || !Properties.TryGetValue(property, out var token))
                 return defaultValue;
 
             return (T)token.Value<T>();

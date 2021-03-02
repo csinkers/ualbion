@@ -35,7 +35,7 @@ namespace UAlbion.Config
             if (relative.Contains(":") && !relative.StartsWith(BasePath, StringComparison.InvariantCulture))
                 throw new ArgumentOutOfRangeException($"Paths containing : are not allowed ({relative})");
 
-            relative = Pattern.Replace(relative, x =>
+            var resolved = Pattern.Replace(relative, x =>
             {
                 var name = x.Groups[0].Value.Substring(2).TrimEnd(')').ToUpperInvariant();
                 if (extraPaths != null && extraPaths.TryGetValue(name, out var value))
@@ -47,7 +47,7 @@ namespace UAlbion.Config
                 throw new InvalidOperationException($"Could not find path substitution for {name} in path {relative}");
             });
 
-            return Path.Combine(BasePath, relative);
+            return Path.Combine(BasePath, resolved);
         }
     }
 }

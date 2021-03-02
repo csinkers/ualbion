@@ -94,7 +94,7 @@ namespace UAlbion.Formats.Assets
         public bool IsNone => Type == AssetType.None;
 
         public override string ToString() => AssetMapping.Global.IdToName(this);
-        static AssetType[] _validTypes = { AssetType.AutomapGraphics, AssetType.BackgroundGraphics, AssetType.BigNpcGraphics, AssetType.BigPartyGraphics, AssetType.CombatBackground, AssetType.CombatGraphics, AssetType.CoreGraphics, AssetType.Floor, AssetType.Font, AssetType.FullBodyPicture, AssetType.ItemGraphics, AssetType.MonsterGraphics, AssetType.Object3D, AssetType.Picture, AssetType.Slab, AssetType.SmallNpcGraphics, AssetType.SmallPartyGraphics, AssetType.Portrait, AssetType.TacticalIcon, AssetType.TilesetGraphics, AssetType.Wall, AssetType.WallOverlay };
+        static AssetType[] _validTypes = { AssetType.AutomapGraphics, AssetType.BackgroundGraphics, AssetType.LargeNpcGraphics, AssetType.LargePartyGraphics, AssetType.CombatBackground, AssetType.CombatGraphics, AssetType.CoreGraphics, AssetType.Floor, AssetType.Font, AssetType.FullBodyPicture, AssetType.ItemGraphics, AssetType.MonsterGraphics, AssetType.Object3D, AssetType.Picture, AssetType.Slab, AssetType.SmallNpcGraphics, AssetType.SmallPartyGraphics, AssetType.Portrait, AssetType.TacticalIcon, AssetType.TilesetGraphics, AssetType.Wall, AssetType.WallOverlay };
         public static SpriteId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
 
         public static implicit operator AssetId(SpriteId id) => AssetId.FromUInt32(id._value);

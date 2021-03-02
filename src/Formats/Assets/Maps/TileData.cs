@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Api;
 
@@ -7,14 +8,28 @@ namespace UAlbion.Formats.Assets.Maps
 {
     public class TileData
     {
+        [JsonIgnore] public ushort Index { get; set; }
         public TileLayer Layer { get; set; } // Upper nibble of first byte
         public TileType Type { get; set; } // Lower nibble of first byte
         public Passability Collision { get; set; }
         public TileFlags Flags { get; set; }
         public ushort ImageNumber { get; set; }
-        [DefaultValue(1)]
-        public byte FrameCount { get; set; }
+        [DefaultValue(1)] public byte FrameCount { get; set; }
         public byte Unk7 { get; set; }
+
+        public TileData() { }
+        public TileData(TileData other) // Make a copy
+        {
+            if (other == null) throw new ArgumentNullException(nameof(other));
+            Index       = other.Index;
+            Layer       = other.Layer;
+            Type        = other.Type;
+            Collision   = other.Collision;
+            Flags       = other.Flags;
+            ImageNumber = other.ImageNumber;
+            FrameCount  = other.FrameCount;
+            Unk7        = other.Unk7;
+        }
 
         public int GetSubImageForTile(int tickCount)
         {
@@ -28,7 +43,7 @@ namespace UAlbion.Formats.Assets.Maps
         }
 
         public override string ToString() => $"Tile {Layer} {Type} {Collision} {Flags} ->{ImageNumber}:{FrameCount} Unk7: {Unk7}";
-        public int Depth => Type.ToDepthOffset() + Layer.ToDepthOffset();
+        [JsonIgnore] public int Depth => Type.ToDepthOffset() + Layer.ToDepthOffset();
 
         public static TileData Serdes(int _, TileData t, ISerializer s)
         {
@@ -48,5 +63,14 @@ namespace UAlbion.Formats.Assets.Maps
             t.Unk7 = s.UInt8(nameof(Unk7), t.Unk7); // 7
             return t;
         }
+
+        public bool IsBlank =>
+            Collision == 0 &&
+            Flags == TileFlags.None &&
+            FrameCount == 0 &&
+            ImageNumber == 0 &&
+            Layer == TileLayer.Normal &&
+            Type == TileType.Normal &&
+            Unk7 == 0;
     }
 }

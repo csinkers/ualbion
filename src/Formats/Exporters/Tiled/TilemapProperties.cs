@@ -2,13 +2,11 @@
 {
     public class TilemapProperties
     {
-        public int TileWidth { get; set; }
-        public int TileHeight { get; set; }
-        public int Margin { get; set; }
-        public int Spacing { get; set; }
-        public string SheetPath { get; set; }
-        public int SheetWidth { get; set; }
-        public int SheetHeight { get; set; }
-        public int FrameDurationMs { get; set; }
+        public string GraphicsTemplate { get; set; }
+        public int TileWidth { get; set; } = 16;
+        public int TileHeight { get; set; } = 16;
+        public int FrameDurationMs { get; set; } = 180;
+        public int TilesetId { get; set; }
+        public string BlankTilePath { get; set; }
     }
 }

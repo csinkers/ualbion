@@ -128,12 +128,6 @@ namespace UAlbion.Formats.Exporters.Tiled
             if (properties == null) throw new ArgumentNullException(nameof(properties));
             // +1 to go from max index to count, then + another so we have a blank tile at the end.
 
-            int count = tileset.Tiles
-                .Where(x => x.ImageNumber != 0xffff)
-                .Max(x => x.ImageNumber + x.FrameCount - 1)
-                + 2;
-            int columns = (properties.SheetWidth - 2 * properties.Margin) / (properties.TileWidth + properties.Spacing);
-
             static List<TileProperty> Props(TileData x)
             {
                 var properties = new List<TileProperty>();
@@ -145,38 +139,71 @@ namespace UAlbion.Formats.Exporters.Tiled
                 return properties;
             }
 
-            var grouped = tileset.Tiles.GroupBy(x => x.ImageNumber).Where(x => x.Count() > 1);
+            List<Tile> tiles = 
+                tileset.Tiles
+                .Where(x => !x.IsBlank)
+                .Select(x => new Tile
+                {
+                    Id = x.Index,
+                    Properties = Props(x),
+                    Image = new TilesetImage
+                    {
+                        Width = properties.TileWidth,
+                        Height = properties.TileHeight,
+                        Source = x.ImageNumber == 0xffff  
+                            ? properties.BlankTilePath 
+                            : string.Format(CultureInfo.InvariantCulture,
+                                properties.GraphicsTemplate,
+                                properties.TilesetId, 
+                                x.ImageNumber)
+                    },
+                }).ToList();
+
+            // Add tiles for the extra frames of animated tiles
+            int nextId = tileset.Tiles[tileset.Tiles.Count - 1].Index + 1;
+            int maxTile = tiles.Count;
+            for (int i = 0; i < maxTile; i++)
+            {
+                var tile = tiles[i];
+                var sourceTile = tileset.Tiles[tile.Id];
+                if (sourceTile.FrameCount <= 1)
+                    continue;
+
+                tile.Frames = new List<TileFrame> { new TileFrame(tile.Id, properties.FrameDurationMs) };
+                for (int f = 1; f < sourceTile.FrameCount; f++)
+                {
+                    tiles.Add(new Tile
+                    {
+                        Id = nextId,
+                        Properties = new List<TileProperty> { Prop("Frame", "true", "boolean") },
+                        Image = new TilesetImage
+                        {
+                            Width = properties.TileWidth,
+                            Height = properties.TileHeight,
+                            Source = string.Format(CultureInfo.InvariantCulture,
+                                properties.GraphicsTemplate,
+                                properties.TilesetId,
+                                sourceTile.ImageNumber + f)
+                        }
+                    });
+                    tile.Frames.Add(new TileFrame(nextId, properties.FrameDurationMs));
+                    nextId++;
+                }
+            }
 
             return new Tileset
             {
                 Name = tileset.Id.ToString(),
                 Version = "1.4",
                 TiledVersion = "1.4.2",
-                TileCount = count,
+                TileCount = tiles.Count,
                 TileWidth = properties.TileWidth,
                 TileHeight = properties.TileHeight,
-                Margin = properties.Margin,
-                Spacing = properties.Spacing,
-                Columns = columns,
+                // Margin = properties.Margin,
+                // Spacing = properties.Spacing,
+                // Columns = columns,
                 BackgroundColor = "#000000",
-                Image = new TilesetImage
-                {
-                    Source = properties.SheetPath,
-                    Width = properties.SheetWidth,
-                    Height = properties.SheetHeight
-                },
-                Tiles = tileset.Tiles
-                    .Where(x => x.ImageNumber != 0xffff && x.ImageNumber != 0)
-                    .Select(x => new Tile
-                    {
-                        Id = x.ImageNumber,
-                        Frames = x.FrameCount == 1
-                            ? null
-                            : Enumerable.Range(x.ImageNumber, x.FrameCount)
-                              .Select(f => new TileFrame { Id = f, DurationMs = properties.FrameDurationMs })
-                              .ToList(),
-                        Properties = Props(x)
-                    }).ToList(),
+                Tiles = tiles,
                 // TODO: Terrain
                 // wang sets
             };

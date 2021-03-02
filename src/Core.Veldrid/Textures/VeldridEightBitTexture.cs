@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api;
@@ -66,88 +65,20 @@ namespace UAlbion.Core.Veldrid.Textures
 
         public Image<Rgba32> ToImage(uint[] palette)
         {
-            var totalPixels = SubImages.Sum(x => (long) x.Size.X * (long) x.Size.Y);
-            var width = Math.Max((int)Math.Sqrt(totalPixels), SubImages.Max(x => (int)x.Size.X));
-            width = ApiUtil.NextPowerOfTwo(width);
-
-            // First arrange to determine required size and positions, then create the image.
-            var positions = new Dictionary<int, (int,int)>();
-            int rowHeight = 0;
-            int curX = 0, curY = 0;
-            for (var index = 0; index < SubImages.Count; index++)
+            return ImageUtil.PackSpriteSheet(palette, SubImages.Count, frame =>
             {
-                var si = SubImages[index];
-                int w = (int) si.Size.X;
-                int h = (int) si.Size.Y;
-
-                if (width - (curX + w) >= 0) // Still room left on this row
-                {
-                    positions[index] = (curX, curY);
-                    curX += w;
-                    if (h > rowHeight)
-                        rowHeight = h;
-                }
-                else // Start a new row
-                {
-                    curY += rowHeight;
-                    rowHeight = h;
-                    positions[index] = (0, curY);
-                    curX = w;
-                }
-            }
-
-            if (curX > 0)
-                curY += rowHeight;
-
-            var height = curY;
-
-            Rgba32[] rgbaPixels = new Rgba32[width * height];
-            unsafe
-            {
-                fixed (Rgba32* pixelPtr = rgbaPixels)
-                {
-                    for (var index = 0; index < SubImages.Count; index++)
-                    {
-                        GetSubImageOffset(index, out var siw, out var sih, out var offset, out var stride);
-                        ReadOnlySpan<byte> fromSlice = TextureData.Slice(offset, siw + (sih - 1) * stride);
-                        var from = new ReadOnlyByteImageBuffer((uint)siw, (uint)sih, (uint)stride, fromSlice);
-                        var (toX, toY) = positions[index];
-                        Span<uint> toBuffer = new Span<uint>((uint*)pixelPtr, rgbaPixels.Length);
-                        toBuffer = toBuffer.Slice(toX + toY * width);
-                        var to = new UIntImageBuffer((uint)siw, (uint)sih, width, toBuffer);
-                        CoreUtil.Blit8To32(from, to, palette, 255, 0);
-                    }
-                }
-            }
-
-            Image<Rgba32> image = new Image<Rgba32>(width, height);
-            image.Frames.AddFrame(rgbaPixels);
-            image.Frames.RemoveFrame(0);
-            return image;
+                GetSubImageOffset(frame, out var siw, out var sih, out var offset, out var stride);
+                ReadOnlySpan<byte> fromSlice = TextureData.Slice(offset, siw + (sih - 1) * stride);
+                return new ReadOnlyByteImageBuffer((uint)siw, (uint)sih, (uint)stride, fromSlice);
+            });
         }
 
         public Image<Rgba32> ToImage(int subImage, uint[] palette)
         {
             GetSubImageOffset(subImage, out var width, out var height, out var offset, out var stride);
-
-            Rgba32[] rgbaPixels = new Rgba32[width * height];
-            unsafe
-            {
-                fixed (Rgba32* pixelPtr = rgbaPixels)
-                {
-                    ReadOnlySpan<byte> fromSlice = TextureData.Slice(offset, width + (height - 1) * stride);
-                    var from = new ReadOnlyByteImageBuffer((uint)width, (uint)height, (uint)stride, fromSlice);
-
-                    Span<uint> toBuffer = new Span<uint>((uint*)pixelPtr, rgbaPixels.Length);
-                    var to = new UIntImageBuffer((uint)width, (uint)height, width, toBuffer);
-                    CoreUtil.Blit8To32(from, to, palette, 255, 0);
-                }
-            }
-
-            Image<Rgba32> image = new Image<Rgba32>(width, height);
-            image.Frames.AddFrame(rgbaPixels);
-            image.Frames.RemoveFrame(0);
-            return image;
+            var fromSlice = TextureData.Slice(offset, width + (height - 1) * stride);
+            var from = new ReadOnlyByteImageBuffer((uint)width, (uint)height, (uint)stride, fromSlice);
+            return ImageUtil.BuildImageForFrame(from, palette);
         }
     }
 }

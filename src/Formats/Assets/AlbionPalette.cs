@@ -129,13 +129,13 @@ namespace UAlbion.Formats.Assets
                 if (!visited.Contains(entry))
                     return entry;
 
-                var (r, g, b, a) = FormatUtil.UnpackColor(entry);
-                if (r < 255) queue.Enqueue(FormatUtil.PackColor((byte)(r + 1), g, b, a));
-                if (g < 255) queue.Enqueue(FormatUtil.PackColor(r, (byte)(g + 1), b, a));
-                if (b < 255) queue.Enqueue(FormatUtil.PackColor(r, g, (byte)(b + 1), a));
-                if (r > 0) queue.Enqueue(FormatUtil.PackColor((byte)(r - 1), g, b, a));
-                if (g > 0) queue.Enqueue(FormatUtil.PackColor(r, (byte)(g - 1), b, a));
-                if (b > 0) queue.Enqueue(FormatUtil.PackColor(r, g, (byte)(b - 1), a));
+                var (r, g, b, a) = ApiUtil.UnpackColor(entry);
+                if (r < 255) queue.Enqueue(ApiUtil.PackColor((byte)(r + 1), g, b, a));
+                if (g < 255) queue.Enqueue(ApiUtil.PackColor(r, (byte)(g + 1), b, a));
+                if (b < 255) queue.Enqueue(ApiUtil.PackColor(r, g, (byte)(b + 1), a));
+                if (r > 0) queue.Enqueue(ApiUtil.PackColor((byte)(r - 1), g, b, a));
+                if (g > 0) queue.Enqueue(ApiUtil.PackColor(r, (byte)(g - 1), b, a));
+                if (b > 0) queue.Enqueue(ApiUtil.PackColor(r, g, (byte)(b - 1), a));
             } while (queue.Count > 0);
 
             throw new InvalidOperationException($"Could not find an empty palette slot for {root:x}");
@@ -168,7 +168,7 @@ namespace UAlbion.Formats.Assets
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (info == null) throw new ArgumentNullException(nameof(info));
 
-            bool isCommon = info.Get("IsCommon", false);
+            bool isCommon = info.Get(AssetProperty.IsCommon, false);
             long entryCount = isCommon ? CommonEntries : VariableEntries;
 
             if (p == null)
@@ -188,14 +188,14 @@ namespace UAlbion.Formats.Assets
 
             for (int i = isCommon ? VariableEntries : 0; i < (isCommon ? EntryCount : VariableEntries); i++)
             {
-                var (r, g, b, _) = FormatUtil.UnpackColor(p.Entries[i]);
+                var (r, g, b, _) = ApiUtil.UnpackColor(p.Entries[i]);
 
                 r = s.UInt8(null, r); // Red
                 g = s.UInt8(null, g); // Green
                 b = s.UInt8(null, b); // Blue
                 var a = (byte)(i == 0 ? 0 : 0xff); // Alpha
 
-                p.Entries[i] = FormatUtil.PackColor(r, g, b, a);
+                p.Entries[i] = ApiUtil.PackColor(r, g, b, a);
             }
 
             if (s.IsReading())
@@ -205,7 +205,7 @@ namespace UAlbion.Formats.Assets
         }
 
         static IEnumerable<(byte, byte)> ParseRanges(AssetInfo info) =>
-            info.GetArray<string>("AnimatedRanges")?.Select(x =>
+            info.GetArray<string>(AssetProperty.AnimatedRanges)?.Select(x =>
             {
                 var parts = x.Split('-');
                 if (parts.Length != 2)

@@ -51,5 +51,12 @@ namespace UAlbion.Config
                 result = ".";
             return useForwardSlash ? result : result.Replace('/', '\\');
         }
+
+        public static string AssetName(AssetId id)
+        {
+            var full = id.ToString();
+            int index = full.IndexOf('.');
+            return index == -1 ? full : full.Substring(index + 1);
+        }
     }
 }

@@ -264,8 +264,8 @@ namespace UAlbion.Base.Tests
                 ("change_health None SubtractPercentage 15 1", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.SubtractPercentage, 15, 1)),
                 ("change_health PartyMember.Harriet AddAmount 1 2", new ChangeHealthEvent(PartyMember.Harriet, NumericOperation.AddAmount, 1, 2)),
                 ("change_health PartyMember.Unknown8 SetToMaximum 0 2", new ChangeHealthEvent(PartyMember.Unknown8, NumericOperation.SetToMaximum, 0, 2)),
-                ("change_health PartyMember.Unknown11 SetToMaximum 0 2", new ChangeHealthEvent(PartyMember.Unknown11, NumericOperation.SetToMaximum, 0, 2)),
-                ("change_health PartyMember.Unknown12 SetToMaximum 0 2", new ChangeHealthEvent(PartyMember.Unknown12, NumericOperation.SetToMaximum, 0, 2)));
+                ("change_health PartyMember.Siobhan SetToMaximum 0 2", new ChangeHealthEvent(PartyMember.Siobhan, NumericOperation.SetToMaximum, 0, 2)),
+                ("change_health PartyMember.Drirr SetToMaximum 0 2", new ChangeHealthEvent(PartyMember.Drirr, NumericOperation.SetToMaximum, 0, 2)));
         }
 
         [Fact]

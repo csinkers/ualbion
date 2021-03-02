@@ -18,53 +18,53 @@ namespace UAlbion.Config
         [JsonIgnore] public bool Transposed => File?.Transposed ?? false; // For sprites only
         [JsonIgnore] public int Width // For sprites only
         {
-            get => Get(nameof(Width), File?.Width ?? 0);
-            set => Set(nameof(Width), value == 0 ? (object)null : value);
+            get => Get(AssetProperty.Width, File?.Width ?? 0);
+            set => Set(AssetProperty.Width, value == 0 ? (object)null : value);
         }
 
         [JsonIgnore] public int Height // For sprites only
         {
-            get => Get(nameof(Height), File?.Height ?? 0);
-            set => Set(nameof(Height), value == 0 ? (object)null : value);
+            get => Get(AssetProperty.Height, File?.Height ?? 0);
+            set => Set(AssetProperty.Height, value == 0 ? (object)null : value);
         }
 
         [JsonIgnore] public string Name
         {
-            get => Get<string>(nameof(Name), null);
-            set => Set(nameof(Name), value);
+            get => Get<string>(AssetProperty.Name, null);
+            set => Set(AssetProperty.Name, value);
         }
 
         public override string ToString() => $"I:{AssetId} ({File.Filename}.{SubAssetId})";
 
-        public T Get<T>(string propertyName, T defaultValue)
+        public T Get<T>(string property, T defaultValue)
         {
-            if (Properties == null || !Properties.TryGetValue(propertyName, out var token))
-                return File != null ? File.Get(propertyName, defaultValue) : defaultValue;
+            if (Properties == null || !Properties.TryGetValue(property, out var token))
+                return File != null ? File.Get(property, defaultValue) : defaultValue;
 
             return (T)token.Value<T>();
         }
 
-        public void Set<T>(string propertyName, T value)
+        public void Set<T>(string property, T value)
         {
             if (value == null)
             {
                 if (Properties == null)
                     return;
 
-                Properties.Remove(propertyName);
+                Properties.Remove(property);
                 if (Properties.Count == 0)
                     Properties = null;
             }
             else
             {
                 Properties ??= new Dictionary<string, JToken>();
-                Properties[propertyName] = new JValue(value);
+                Properties[property] = new JValue(value);
             }
         }
 
-        public T[] GetArray<T>(string propertyName)
+        public T[] GetArray<T>(string property)
         {
-            if (Properties == null || !Properties.TryGetValue(propertyName, out var token))
+            if (Properties == null || !Properties.TryGetValue(property, out var token))
                 return null;
 
             if (token is JArray array)
@@ -73,7 +73,7 @@ namespace UAlbion.Config
             return null;
         }
 
-        public JToken GetRaw(string propertyName) => Properties != null && Properties.TryGetValue(propertyName, out var token) ? token : null;
+        public JToken GetRaw(string property) => Properties != null && Properties.TryGetValue(property, out var token) ? token : null;
     }
 }
 #pragma warning restore CA2227 // Collection properties should be read only

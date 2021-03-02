@@ -66,7 +66,7 @@ namespace UAlbion.Tools.ImageReverser
                 if (!fileInfo.Map.ContainsKey(number))
                 {
                     var info = new AssetInfo { File = fileInfo, };
-                    info.Set("Offset", number);
+                    info.Set(AssetProperty.Offset, number);
                     fileInfo.Map[number] = info;
                 }
 

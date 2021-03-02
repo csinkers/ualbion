@@ -15,5 +15,6 @@ namespace UAlbion.Base
         Words1 = 4,
         Words2 = 5,
         Words3 = 6,
+        DummyObject = 7,
     }
 }

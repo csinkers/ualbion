@@ -171,7 +171,7 @@ namespace UAlbion.Game.Gui.Text
                     return cachedMapping;
 
                 var info = assets.GetAssetInfo(id);
-                var mappingString = info.Get<string>("Mapping", null);
+                var mappingString = info.Get<string>(AssetProperty.Mapping, null);
                 if (mappingString == null)
                     throw new InvalidOperationException($"The asset configuration for font {id} did not contain a Mapping property");
 

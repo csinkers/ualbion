@@ -25,8 +25,14 @@ namespace UAlbion.Formats.Containers
         public void Write(string path, IList<(AssetInfo, byte[])> assets)
         {
             if (assets == null) throw new ArgumentNullException(nameof(assets));
-            if(assets.Count != 1)
-                throw new ArgumentOutOfRangeException(nameof(assets), "A RawContainer can only hold a single asset");
+            if (assets.Count == 0)
+            {
+                if (File.Exists(path))
+                    File.Delete(path);
+                return;
+            }
+
+            if (assets.Count > 1) throw new ArgumentOutOfRangeException(nameof(assets), "A RawContainer can only hold a single asset");
 
             var (_, bytes) = assets.Single();
             File.WriteAllBytes(path, bytes);

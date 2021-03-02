@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using SerdesNet;
@@ -51,18 +52,20 @@ namespace UAlbion.Formats.Containers
                 using var s = new AlbionReader(br);
                 var frames = PackedChunks.Unpack(s).ToList();
 
-                var suffix = info.Get("Suffix", ".dat");
-                var name = info.AssetId.ToString();
-                int index = name.IndexOf('.');
-                name = index == -1 ? name : name.Substring(index + 1);
+                var pattern = info.Get(AssetProperty.Pattern, "{0}_{1}_{2}.dat");
+                var name = ConfigUtil.AssetName(info.AssetId);
                 if (frames.Count == 1)
                 {
-                    File.WriteAllBytes(Path.Combine(path, $"{info.SubAssetId}_{name}{suffix}"), frames[0]);
+                    var filename = string.Format(CultureInfo.InvariantCulture, pattern, info.SubAssetId, 0, name);
+                    File.WriteAllBytes(Path.Combine(path, filename), frames[0]);
                 }
                 else
                 {
                     for (int i = 0; i < frames.Count; i++)
-                        File.WriteAllBytes(Path.Combine(path, $"{info.SubAssetId}_{i}_{name}{suffix}"), frames[i]);
+                    {
+                        var filename = string.Format(CultureInfo.InvariantCulture, pattern, info.SubAssetId, i, name);
+                        File.WriteAllBytes(Path.Combine(path, filename), frames[i]);
+                    }
                 }
             }
         }

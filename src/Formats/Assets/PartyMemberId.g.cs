@@ -119,7 +119,7 @@ namespace UAlbion.Formats.Assets
         public int CompareTo(object obj) => (obj is ITextureId other) ? _value.CompareTo(other.ToUInt32()) : -1;
         public override int GetHashCode() => unchecked((int)_value);
         public readonly SpriteId ToSmallPartyGraphics() => new SpriteId(AssetType.SmallPartyGraphics, Id);
-        public readonly SpriteId ToBigPartyGraphics() => new SpriteId(AssetType.BigPartyGraphics, Id);
+        public readonly SpriteId ToBigPartyGraphics() => new SpriteId(AssetType.LargePartyGraphics, Id);
         public readonly SpriteId ToFullBodyPicture() => new SpriteId(AssetType.FullBodyPicture, Id);
     }
 

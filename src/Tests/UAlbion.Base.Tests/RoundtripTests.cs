@@ -219,7 +219,7 @@ namespace UAlbion.Base.Tests
         public void CommonPaletteTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Palette.CommonPalette) };
-            info.Set("IsCommon", true);
+            info.Set(AssetProperty.IsCommon, true);
             RoundTripRaw<AlbionPalette>(nameof(CommonPaletteTest), "$(XLD)/PALETTE.000",
                 (x, s) => PaletteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
@@ -383,7 +383,7 @@ namespace UAlbion.Base.Tests
         public void AutomapGfxTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(AutomapTiles.Set1) };
-            info.Set("SubSprites", "(8,8,576) (16,16)");
+            info.Set(AssetProperty.SubSprites, "(8,8,576) (16,16)");
             RoundTripXld<AlbionSprite>(nameof(AutomapGfxTest), "$(XLD)/AUTOGFX0.XLD", 0,
                 (x, s) => AmorphousSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }

@@ -51,7 +51,7 @@ namespace UAlbion.Formats.Parsers
             if (config == null) throw new ArgumentNullException(nameof(config));
             ApiUtil.Assert(!config.Transposed);
 
-            var sizes = ParseSpriteSizes(config.Get<string>("SubSprites", null));
+            var sizes = ParseSpriteSizes(config.Get<string>(AssetProperty.SubSprites, null));
 
             int spriteWidth = 0;
             int currentY = 0;

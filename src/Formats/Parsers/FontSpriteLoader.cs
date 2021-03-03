@@ -19,7 +19,7 @@ namespace UAlbion.Formats.Parsers
             {
                 if (existing == null) throw new ArgumentNullException(nameof(existing));
                 uniformFrames = new AlbionSprite(
-                    existing.Name,
+                    existing.Id,
                     existing.Width,
                     existing.Height,
                     true,
@@ -52,7 +52,7 @@ namespace UAlbion.Formats.Parsers
                 frames.Add(new AlbionSpriteFrame(oldFrame.X, oldFrame.Y, width + 2, oldFrame.Height));
             }
 
-            return new AlbionSprite(font.Name, font.Width, font.Height, false, font.PixelData, frames);
+            return new AlbionSprite(font.Id, font.Width, font.Height, false, font.PixelData, frames);
         }
     }
 }

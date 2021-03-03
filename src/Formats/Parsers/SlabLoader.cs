@@ -17,7 +17,7 @@ namespace UAlbion.Formats.Parsers
             {
                 if (existing == null) throw new ArgumentNullException(nameof(existing));
                 singleFrame = new AlbionSprite(
-                    existing.Name, existing.Width, existing.Height, true, existing.PixelData,
+                    existing.Id, existing.Width, existing.Height, true, existing.PixelData,
                     new[] { new AlbionSpriteFrame(
                         existing.Frames[0].X,
                         existing.Frames[0].Y,
@@ -37,7 +37,7 @@ namespace UAlbion.Formats.Parsers
                 new AlbionSpriteFrame(0, sprite.Height - 48, sprite.Width, 48)
             };
 
-            return new AlbionSprite(sprite.Name, sprite.Width, sprite.Height, sprite.UniformFrames, sprite.PixelData, frames);
+            return new AlbionSprite(sprite.Id, sprite.Width, sprite.Height, sprite.UniformFrames, sprite.PixelData, frames);
         }
     }
 }

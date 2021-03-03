@@ -74,7 +74,9 @@ namespace UAlbion.Tools.ImageReverser
                 _rawFilePaths[asset] = file;
             }
 
-            var commonPalette = LoadPalette(GeneralConfig.ResolvePath("$(ALBION)/CD/XLDLIBS/PALETTE.000", _extraPaths), new AssetInfo { Name = "Common" });
+            var palInfo = new AssetInfo();
+            palInfo.Set(AssetProperty.IsCommon, true);
+            var commonPalette = LoadPalette(GeneralConfig.ResolvePath("$(ALBION)/CD/XLDLIBS/PALETTE.000", _extraPaths), palInfo);
 
             var palettesPath = Path.Combine(BaseExportDirectory, "PALETTE0.XLD");
             files = Directory.EnumerateFiles(palettesPath, "*.*", SearchOption.AllDirectories);

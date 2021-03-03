@@ -113,16 +113,17 @@ namespace UAlbion.Tools.ImageReverser
             Bitmap bmp;
             if (IsSprite(asset.File))
             {
-                if (asset.File.Filename != _logicalSprite?.Name)
-                {
-                    // Ugh
-                    bool isRotated = asset.File.Transposed ?? false;
-                    asset.File.Transposed = false;
-                    _logicalSprite = LoadSprite(_core.GetRawPath(asset), asset);
-                    asset.File.Transposed = isRotated;
+                // if (asset.File.Filename != _logicalSprite?.Name) // ??
+                // {
 
-                    _visualSprite = isRotated ? LoadSprite(asset.File.Filename, asset) : _logicalSprite;
-                }
+                // Ugh
+                bool isRotated = asset.File.Get(AssetProperty.Transposed , false);
+                asset.File.Set<bool?>(AssetProperty.Transposed, null);
+                _logicalSprite = LoadSprite(_core.GetRawPath(asset), asset);
+                asset.File.Set<bool?>(AssetProperty.Transposed, isRotated);
+
+                _visualSprite = isRotated ? LoadSprite(asset.File.Filename, asset) : _logicalSprite;
+                // }
 
                 if (_logicalSprite == null)
                     return;

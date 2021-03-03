@@ -10,12 +10,10 @@ namespace UAlbion.Config
     {
         public string Id { get; set; } // Id of this asset in the mapped enum type.
         [JsonExtensionData] public IDictionary<string, JToken> Properties { get; set; }
-
         [JsonIgnore] public AssetId AssetId { get; set; }
         [JsonIgnore] public int SubAssetId { get; set; } // Sub-asset offset in the container file (or 0 if not inside a container)
         [JsonIgnore] public AssetFileInfo File { get; set; }
 
-        [JsonIgnore] public bool Transposed => File?.Transposed ?? false; // For sprites only
         [JsonIgnore] public int Width // For sprites only
         {
             get => Get(AssetProperty.Width, File?.Width ?? 0);
@@ -26,12 +24,6 @@ namespace UAlbion.Config
         {
             get => Get(AssetProperty.Height, File?.Height ?? 0);
             set => Set(AssetProperty.Height, value == 0 ? (object)null : value);
-        }
-
-        [JsonIgnore] public string Name
-        {
-            get => Get<string>(AssetProperty.Name, null);
-            set => Set(AssetProperty.Name, value);
         }
 
         public override string ToString() => $"I:{AssetId} ({File.Filename}.{SubAssetId})";

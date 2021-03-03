@@ -522,7 +522,7 @@ namespace UAlbion.Config.Tests
         {
             var c = AssetConfig.Parse(TestConfig1);
             var f = c.Files["$(XLD)/3DOVERL0.XLD"];
-            Assert.Equal(true, f.Transposed);
+            Assert.True(f.Get(AssetProperty.Transposed, false));
             Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
                 m =>

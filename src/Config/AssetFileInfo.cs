@@ -13,12 +13,21 @@ namespace UAlbion.Config
 
         public string Container { get; set; }
         public string Loader { get; set; }
-        public bool ShouldSerializeLoader() => Loader != null;
-        public int? Width { get; set; }
-        public int? Height { get; set; }
-        public bool? Transposed { get; set; }
         public IDictionary<int, AssetInfo> Map { get; } = new Dictionary<int, AssetInfo>();
         [JsonExtensionData] public IDictionary<string, JToken> Properties { get; set; }
+
+        [JsonIgnore] public int? Width // For sprites only
+        {
+            get => Get(AssetProperty.Width, (int?)null);
+            set => Set(AssetProperty.Width, value);
+        }
+
+        [JsonIgnore]
+        public int? Height // For sprites only
+        {
+            get => Get(AssetProperty.Height, (int?)null);
+            set => Set(AssetProperty.Height, value);
+        }
 
         public T Get<T>(string property, T defaultValue)
         {
@@ -26,6 +35,24 @@ namespace UAlbion.Config
                 return defaultValue;
 
             return (T)token.Value<T>();
+        }
+
+        public void Set<T>(string property, T value)
+        {
+            if (value == null)
+            {
+                if (Properties == null)
+                    return;
+
+                Properties.Remove(property);
+                if (Properties.Count == 0)
+                    Properties = null;
+            }
+            else
+            {
+                Properties ??= new Dictionary<string, JToken>();
+                Properties[property] = new JValue(value);
+            }
         }
 
         // TODO: Text encoding

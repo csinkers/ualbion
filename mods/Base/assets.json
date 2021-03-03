@@ -136,9 +136,9 @@
   },
 
   "Languages": {
-    "ENGLISH": { "Name": "English",  "ShortName": "EN" },
-    "GERMAN":  { "Name": "Deutsch",  "ShortName": "DE" },
-    "FRENCH":  { "Name": "François", "ShortName": "FR" }
+    "ENGLISH": { "DisplayName": "English",  "ShortName": "EN" },
+    "GERMAN":  { "DisplayName": "Deutsch",  "ShortName": "DE" },
+    "FRENCH":  { "DisplayName": "François", "ShortName": "FR" }
   },
 
   "Files": {

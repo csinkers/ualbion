@@ -103,9 +103,7 @@ namespace UAlbion.Tools.ImageReverser
             }
 
             string key = Path.GetFileNameWithoutExtension(parts.Last());
-            string name = string.IsNullOrEmpty(asset.Name)
-                ? key
-                : $"{asset.Name} ({asset.Id})";
+            string name = asset.AssetId.ToString();
 
             if (!node.Nodes.ContainsKey(key))
             {
@@ -161,7 +159,7 @@ namespace UAlbion.Tools.ImageReverser
             filename = filename.TrimEnd('\\');
             _core.SetSelectedItem(filename, number);
             var asset = _core.SelectedObject;
-            textName.Text = asset?.Name;
+            textName.Text = asset?.Id;
 
             _activeViewer = GetViewerForAsset(asset);
             _imageViewer.Visible = _activeViewer == _imageViewer;
@@ -203,9 +201,8 @@ namespace UAlbion.Tools.ImageReverser
 
         void TextName_TextChanged(object sender, EventArgs e)
         {
-            var asset = _core.SelectedObject;
-            if(asset != null)
-                asset.Name = textName.Text;
+            // var asset = _core.SelectedObject;
+            // if(asset != null) asset.Name = textName.Text;
         }
     }
 }

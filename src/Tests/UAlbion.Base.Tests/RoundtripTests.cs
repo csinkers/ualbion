@@ -523,8 +523,9 @@ namespace UAlbion.Base.Tests
             {
                 AssetId = AssetId.From(WallOverlay.JiriWindow),
                 Width = 44,
-                File = new AssetFileInfo { Transposed = true }
+                File = new AssetFileInfo()
             };
+            info.File.Set(AssetProperty.Transposed, true);
             RoundTripXld<AlbionSprite>(nameof(OverlayTest), "$(XLD)/3DOVERL0.XLD", 1,
                 (x, s) => FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }

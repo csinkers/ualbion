@@ -36,7 +36,7 @@ namespace UAlbion.Game.Veldrid.Assets
             return FormatUtil.BytesFromStream(stream => encoder.Encode(image, stream));
         }
 
-        static AlbionSprite Read(uint[] palette, IList<Image<Rgba32>> images, string name)
+        static AlbionSprite Read(AssetId id, uint[] palette, IList<Image<Rgba32>> images)
         {
             int totalWidth = images.Max(x => x.Width);
             int totalHeight = images.Sum(x => x.Height);
@@ -60,7 +60,7 @@ namespace UAlbion.Game.Veldrid.Assets
             }
 
             bool uniform = frames.All(x => x.Width == frames[0].Width && x.Height == frames[0].Height);
-            return new AlbionSprite(name, totalWidth, totalHeight, uniform, pixels, frames);
+            return new AlbionSprite(id, totalWidth, totalHeight, uniform, pixels, frames);
         }
 
         public AlbionSprite Serdes(AlbionSprite existing, AssetInfo config, AssetMapping mapping, ISerializer s)
@@ -94,7 +94,7 @@ namespace UAlbion.Game.Veldrid.Assets
                     images.Add(decoder.Decode<Rgba32>(configuration, stream));
                 }
 
-                return Read(palette, images, config.Name);
+                return Read(config.AssetId, palette, images);
             }
             finally { foreach (var image in images) image.Dispose(); }
         }

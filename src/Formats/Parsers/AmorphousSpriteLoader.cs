@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 
@@ -49,7 +48,6 @@ namespace UAlbion.Formats.Parsers
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (config == null) throw new ArgumentNullException(nameof(config));
-            ApiUtil.Assert(!config.Transposed);
 
             var sizes = ParseSpriteSizes(config.Get<string>(AssetProperty.SubSprites, null));
 
@@ -102,7 +100,7 @@ namespace UAlbion.Formats.Parsers
             }
 
             s.Check();
-            return new AlbionSprite(config.AssetId.ToString(), spriteWidth, spriteHeight, false, pixelData, frames);
+            return new AlbionSprite(config.AssetId, spriteWidth, spriteHeight, false, pixelData, frames);
         }
     }
 }

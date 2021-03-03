@@ -20,8 +20,6 @@ namespace UAlbion.Formats.Parsers
             if (config == null) throw new ArgumentNullException(nameof(config));
             if (s.IsWriting() && existing == null) throw new ArgumentNullException(nameof(existing));
 
-            ApiUtil.Assert(config.Transposed != true);
-
             int width = s.UInt16("Width", (ushort?)existing?.Frames[0].Width ?? 0);
             int height = s.UInt16("Height", (ushort?)existing?.Frames[0].Height ?? 0);
             int something = s.UInt8(null, 0);
@@ -88,7 +86,7 @@ namespace UAlbion.Formats.Parsers
             }
 
             s.Check();
-            return new AlbionSprite(config.AssetId.ToString(), spriteWidth, currentY, false, pixelData, frames);
+            return new AlbionSprite(config.AssetId, spriteWidth, currentY, false, pixelData, frames);
         }
     }
 }

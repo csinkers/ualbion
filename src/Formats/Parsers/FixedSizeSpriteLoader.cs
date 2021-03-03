@@ -40,7 +40,7 @@ namespace UAlbion.Formats.Parsers
             height = (int)streamLength / (width * spriteCount);
 
             byte[] pixelData = existing?.PixelData;
-            if (existing != null && config.Transposed)
+            if (existing != null && config.Get(AssetProperty.Transposed, false))
             {
                 pixelData = new byte[existing.PixelData.Length];
                 for (int n = 0; n < spriteCount; n++)
@@ -59,8 +59,8 @@ namespace UAlbion.Formats.Parsers
             for (int n = 0; n < spriteCount; n++)
                 frames[n] ??= new AlbionSpriteFrame(0, height * n, width, height);
 
-            var sprite = new AlbionSprite(config.AssetId.ToString(), width, height * spriteCount, true, pixelData, frames);
-            if (!config.Transposed)
+            var sprite = new AlbionSprite(config.AssetId, width, height * spriteCount, true, pixelData, frames);
+            if (!config.Get(AssetProperty.Transposed, false))
                 return sprite;
 
             int rotatedFrameHeight = width;
@@ -75,7 +75,7 @@ namespace UAlbion.Formats.Parsers
                     new Span<byte>(pixelData, n * width * height, width * height));
             }
 
-            return new AlbionSprite(config.AssetId.ToString(), height, width * spriteCount, true, pixelData, frames);
+            return new AlbionSprite(config.AssetId, height, width * spriteCount, true, pixelData, frames);
         }
     }
 }

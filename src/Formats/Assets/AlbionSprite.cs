@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets
 {
     public class AlbionSprite
     {
-        public AlbionSprite(string name, int width, int height, bool uniformFrames, byte[] pixelData, IEnumerable<AlbionSpriteFrame> frames)
+        public AlbionSprite(AssetId id, int width, int height, bool uniformFrames, byte[] pixelData, IEnumerable<AlbionSpriteFrame> frames)
         {
-            Name = name;
+            Id = id;
             Width = width;
             Height = height;
             UniformFrames = uniformFrames;
@@ -16,14 +17,14 @@ namespace UAlbion.Formats.Assets
             Frames = frames.ToArray();
         }
 
-        public string Name { get; }
+        public AssetId Id { get; }
         public int Width { get; }
         public int Height { get; }
         public bool UniformFrames { get; }
         public IReadOnlyList<AlbionSpriteFrame> Frames { get; }
         public byte[] PixelData { get; }
 
-        public override string ToString() => $"AlbionSprite {Name} {Width}x{Height} ({Frames.Count} frames)";
+        public override string ToString() => $"AlbionSprite {Id} {Width}x{Height} ({Frames.Count} frames)";
 
         public ReadOnlySpan<byte> GetRowSpan(int frameNumber, int row)
         {

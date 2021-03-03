@@ -65,7 +65,7 @@ namespace UAlbion.Game.Assets
 
                 return factory.CreateEightBitTexture(
                     key,
-                    sprite.Name,
+                    sprite.Id.ToString(),
                     (uint)width,
                     (uint)height,
                     1,
@@ -102,7 +102,7 @@ namespace UAlbion.Game.Assets
 
                 return factory.CreateEightBitTexture(
                     key,
-                    sprite.Name,
+                    sprite.Id.ToString(),
                     (uint)sprite.Width,
                     (uint)sprite.Height,
                     1,

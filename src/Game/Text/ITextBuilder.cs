@@ -1,5 +1,4 @@
-﻿using UAlbion.Formats;
-using UAlbion.Formats.Assets;
+﻿using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Text
 {
@@ -11,7 +10,7 @@ namespace UAlbion.Game.Text
         T Right();
         T Justify();
         T Fat();
-        T Language(GameLanguage language);
+        T Language(string language);
         T Ink(FontColor color);
     }
 }

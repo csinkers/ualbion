@@ -8,6 +8,7 @@
         public const string Height           = "Height";
         public const string IsCommon         = "IsCommon";
         public const string IsSmall          = "IsSmall";
+        public const string Language         = "Language";
         public const string LargeNpcs        = "LargeNpcs";
         public const string Mapping          = "Mapping";
         public const string Max              = "Max";

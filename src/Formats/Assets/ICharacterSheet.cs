@@ -3,7 +3,7 @@
     public interface ICharacterSheet
     {
         CharacterId Id { get; }
-        string GetName(GameLanguage language);
+        string GetName(string language);
 
         CharacterType Type { get; }
         Gender Gender { get; }

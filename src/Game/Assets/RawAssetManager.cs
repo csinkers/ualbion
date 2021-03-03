@@ -4,7 +4,6 @@ using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
@@ -34,7 +33,7 @@ namespace UAlbion.Game.Assets
         }
 
         public IEnumerable<AssetId> EnumerateAssets(AssetType type) => AssetMapping.Global.EnumerateAssetsOfType(type);
-        public AssetInfo GetAssetInfo(AssetId id) => _modApplier.GetAssetInfo(id);
+        public AssetInfo GetAssetInfo(AssetId id, string language = null) => _modApplier.GetAssetInfo(id, language);
         public IMapData LoadMap(MapId id) => (IMapData)_modApplier.LoadAsset(id); // No caching for map data
         public ItemData LoadItem(ItemId id) => (ItemData)_modApplier.LoadAsset(id);
 
@@ -59,7 +58,7 @@ namespace UAlbion.Game.Assets
         public TilesetData LoadTileData(TilesetId id) => (TilesetData)_modApplier.LoadAsset(id);
         public LabyrinthData LoadLabyrinthData(LabyrinthId id) => (LabyrinthData)_modApplier.LoadAsset(id);
 
-        string LoadStringCore(StringId id, GameLanguage? language, bool cached)
+        string LoadStringCore(StringId id, string language, bool cached)
         {
             var asset = (language, cached) switch
                 {
@@ -76,13 +75,13 @@ namespace UAlbion.Game.Assets
                 IDictionary<int, string> d => d.GetValueOrDefault(id.SubId),
                 IDictionary<AssetId, string> d => d.GetValueOrDefault(id.Id),
                 IDictionary<TextId, string> d => d.GetValueOrDefault(id.Id),
-                IDictionary<GameLanguage, StringCollection> d
+                IDictionary<string, StringCollection> d
                     => d[language ?? Resolve<IGameplaySettings>().Language].Get(id.SubId),
                 _ => null
             };
         }
-        public bool IsStringDefined(TextId id, GameLanguage? language) => LoadStringCore(id, language, false) != null;
-        public bool IsStringDefined(StringId id, GameLanguage? language) => LoadStringCore(id, language, false) != null;
+        public bool IsStringDefined(TextId id, string language) => LoadStringCore(id, language, false) != null;
+        public bool IsStringDefined(StringId id, string language) => LoadStringCore(id, language, false) != null;
         public string LoadString(TextId id) => LoadString((StringId)id);
         public string LoadString(StringId id) => LoadStringCore(id, null, false) // Raw manager - not cached
                                                  ?? $"!MISSING STRING {id.Id}:{id.SubId}!";

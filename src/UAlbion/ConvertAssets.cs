@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats;
 using UAlbion.Game.Assets;
 
 namespace UAlbion
@@ -13,7 +12,6 @@ namespace UAlbion
         static (ModApplier, EventExchange) BuildModApplier(string baseDir, string mod)
         {
             var config = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir);
-            config.SetPath("LANG", GameLanguage.English.ToString().ToUpperInvariant()); // TODO: Allow language selection
             var applier = new ModApplier();
             var exchange = new EventExchange(new LogExchange());
             exchange
@@ -44,7 +42,10 @@ namespace UAlbion
                 toExchange.Attach(new AssetManager(from));
                 var parsedIds = ids?.Select(AssetId.Parse).ToHashSet();
                 var paletteHints = PaletteHints.Load(Path.Combine(baseDir, "mods", "Base", "palette_hints.json"));
-                to.SaveAssets(x => (from.LoadAsset(x), from.GetAssetInfo(x)), paletteHints, parsedIds, assetTypes);
+
+                (object, AssetInfo) LoaderFunc(AssetId x, string lang) => (from.LoadAsset(x, lang), from.GetAssetInfo(x, lang));
+
+                to.SaveAssets(LoaderFunc, paletteHints, parsedIds, assetTypes);
             }
         }
     }

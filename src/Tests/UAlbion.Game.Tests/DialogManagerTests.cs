@@ -5,7 +5,6 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
@@ -38,7 +37,7 @@ namespace UAlbion.Game.Tests
             var ex = new EventExchange(new LogExchange());
             var dm = new DialogManager();
             var lm = new LayoutManager();
-            var mma = new MockModApplier(GameLanguage.English)
+            var mma = new MockModApplier()
                 .Add(new AssetId(AssetType.MetaFont, (ushort)new MetaFontId(false, FontColor.White)), MockUniformFont.Font(AssetId.From(Base.Font.RegularFont)))
                 .AddInfo(AssetId.From(Base.Font.RegularFont), MockUniformFont.Info)
                 ;
@@ -53,7 +52,7 @@ namespace UAlbion.Game.Tests
                 .Attach(new TextManager())
                 .Attach(new SpriteManager())
                 .Attach(new WindowManager { Window = new MockWindow(1920, 1080) })
-                .Attach(new MockSettings { Language = GameLanguage.English })
+                .Attach(new MockSettings { Language = Base.Language.English })
                 .Attach(dm)
                 .Attach(lm)
                 ;

@@ -1,6 +1,5 @@
 ﻿using System;
 using UAlbion.Api;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.State.Player
@@ -24,7 +23,7 @@ namespace UAlbion.Game.State.Player
         }
 
         public CharacterId Id => _b().Id;
-        public string GetName(GameLanguage language) => _b().GetName(language);
+        public string GetName(string language) => _b().GetName(language);
         public CharacterType Type => _b().Type;
         public Gender Gender => _b().Gender;
         public PlayerRace Race => _b().Race;

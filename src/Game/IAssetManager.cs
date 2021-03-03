@@ -3,7 +3,6 @@ using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
@@ -14,13 +13,13 @@ namespace UAlbion.Game
 {
     public interface IAssetManager : ITextureLoader
     {
-        AssetInfo GetAssetInfo(AssetId id);
+        AssetInfo GetAssetInfo(AssetId id, string language = null);
         ITexture LoadTexture(SpriteId id);
         ITexture LoadFont(FontColor color, bool isBold);
         TilesetData LoadTileData(TilesetId id);
         LabyrinthData LoadLabyrinthData(LabyrinthId id);
-        bool IsStringDefined(TextId id, GameLanguage? language);
-        bool IsStringDefined(StringId id, GameLanguage? language);
+        bool IsStringDefined(TextId id, string language);
+        bool IsStringDefined(StringId id, string language);
         string LoadString(TextId id);
         string LoadString(StringId id);
         ISample LoadSample(SampleId id);

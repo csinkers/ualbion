@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using UAlbion.Api;
@@ -10,6 +11,7 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Containers;
 using UAlbion.Game.Events;
+using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Assets
 {
@@ -19,25 +21,25 @@ namespace UAlbion.Game.Assets
         readonly Dictionary<string, ModInfo> _mods = new Dictionary<string, ModInfo>();
         readonly List<ModInfo> _modsInReverseDependencyOrder = new List<ModInfo>();
         readonly AssetCache _assetCache = new AssetCache();
-        readonly Dictionary<string, string> _extraPaths = new Dictionary<string, string>
-        {
-            { "LANG", GameLanguage.English.ToString().ToUpperInvariant() }
-        };
+        readonly Dictionary<string, LanguageConfig> _languages = new Dictionary<string, LanguageConfig>();
+        readonly Dictionary<string, string> _extraPaths = new Dictionary<string, string>(); // Just used for $(MOD)
 
         IAssetLocator _assetLocator;
 
         public ModApplier()
         {
+            Languages = new ReadOnlyDictionary<string, LanguageConfig>(_languages);
             AttachChild(_assetCache);
             On<SetLanguageEvent>(e =>
             {
-                _extraPaths["LANG"] = e.Language.ToString().ToUpperInvariant();
                 // TODO: Different languages could have different sub-id ranges in their
                 // container files, so we should really be invalidating / rebuilding the whole asset config too.
                 Raise(new ReloadAssetsEvent());
                 Raise(new LanguageChangedEvent());
             });
         }
+
+        public IReadOnlyDictionary<string, LanguageConfig> Languages { get; }
 
         public IModApplier AddAssetPostProcessor(IAssetPostProcessor postProcessor)
         {
@@ -71,7 +73,7 @@ namespace UAlbion.Game.Assets
             AssetMapping.Global.Clear();
 
             foreach (var mod in mods)
-                LoadMod(config.ResolvePath("$(MODS)", _extraPaths), mod);
+                LoadMod(config.ResolvePath("$(MODS)"), mod);
 
             _modsInReverseDependencyOrder.Reverse();
         }
@@ -123,11 +125,14 @@ namespace UAlbion.Game.Assets
                 modInfo.Mapping.MergeFrom(dependencyInfo.Mapping);
             }
 
+            foreach (var kvp in assetConfig.Languages)
+                _languages[kvp.Key] = kvp.Value;
+
             MergeTypesToMapping(modInfo.Mapping, assetConfig, assetConfigPath);
             AssetMapping.Global.MergeFrom(modInfo.Mapping);
             modConfig.AssetPath ??= path;
-            _extraPaths["MOD"] = modConfig.AssetPath;
-            assetConfig.PopulateAssetIds(AssetMapping.Global, x => _assetLocator.GetSubItemRangesForFile(x, _extraPaths));
+            var extraPaths = new Dictionary<string, string> { ["MOD"] = modConfig.AssetPath };
+            assetConfig.PopulateAssetIds(AssetMapping.Global, x => _assetLocator.GetSubItemRangesForFile(x, extraPaths));
             _mods.Add(modName, modInfo);
             _modsInReverseDependencyOrder.Add(modInfo);
         }
@@ -147,11 +152,16 @@ namespace UAlbion.Game.Assets
             config.RegisterStringRedirects(mapping);
         }
 
-        public AssetInfo GetAssetInfo(AssetId id)
+        public AssetInfo GetAssetInfo(AssetId id, string language = null)
         {
+            language ??= Resolve<IGameplaySettings>().Language;
             return _modsInReverseDependencyOrder
                 .SelectMany(x => x.AssetConfig.GetAssetInfo(id))
-                .FirstOrDefault();
+                .FirstOrDefault(x =>
+                {
+                    var assetLanguage = x.Get<string>(AssetProperty.Language, null);
+                    return assetLanguage == null || string.Equals(assetLanguage, language, StringComparison.OrdinalIgnoreCase);
+                });
         }
 
         public object LoadAsset(AssetId id)
@@ -171,12 +181,11 @@ namespace UAlbion.Game.Assets
             }
         }
 
-        public object LoadAsset(AssetId id, GameLanguage language)
+        public object LoadAsset(AssetId id, string language)
         {
             try
             {
-                var extraPaths = new Dictionary<string, string> { { "LANG", language.ToString().ToUpperInvariant() } };
-                var asset = LoadAssetInternal(id, extraPaths);
+                var asset = LoadAssetInternal(id, _extraPaths, language);
                 return asset is Exception ? null : asset;
             }
             catch (Exception e)
@@ -215,7 +224,7 @@ namespace UAlbion.Game.Assets
             return asset is Exception ? null : asset;
         }
 
-        object LoadAssetInternal(AssetId id, Dictionary<string, string> extraPaths)
+        object LoadAssetInternal(AssetId id, Dictionary<string, string> extraPaths, string language = null)
         {
             if (id.IsNone)
                 return null;
@@ -229,6 +238,15 @@ namespace UAlbion.Game.Assets
             {
                 foreach (var info in mod.AssetConfig.GetAssetInfo(id))
                 {
+                    var assetLang = info.Get<string>(AssetProperty.Language, null);
+                    if (assetLang != null)
+                    {
+                        language ??= Resolve<IGameplaySettings>().Language;
+                        if (!string.Equals(assetLang, language, StringComparison.OrdinalIgnoreCase))
+                            continue;
+                    }
+
+                    extraPaths ??= new Dictionary<string, string>();
                     extraPaths["MOD"] = mod.AssetPath;
                     var modAsset = _assetLocator.LoadAsset(id, mod.Mapping, info, extraPaths);
                     if (modAsset is IPatch patch)
@@ -262,7 +280,7 @@ namespace UAlbion.Game.Assets
         }
 
         public void SaveAssets(
-            Func<AssetId, (object, AssetInfo)> loaderFunc,
+            Func<AssetId, string, (object, AssetInfo)> loaderFunc,
             PaletteHints paletteHints,
             ISet<AssetId> ids,
             ISet<AssetType> assetTypes)
@@ -303,7 +321,7 @@ namespace UAlbion.Game.Assets
             foreach (var file in target.AssetConfig.Files.Values)
             {
                 Raise(new LogEvent(LogEvent.Level.Info, $"Saving {file.Filename}..."));
-                var path = config.ResolvePath(file.Filename, _extraPaths);
+                var path = config.ResolvePath(file.Filename);
                 var loader = loaderRegistry.GetLoader(file.Loader);
                 var container = containerRegistry.GetContainer(file.Container);
                 var assets = new List<(AssetInfo, byte[])>();
@@ -312,7 +330,8 @@ namespace UAlbion.Game.Assets
                     if (ids != null && !ids.Contains(assetInfo.AssetId)) continue;
                     if (assetTypes != null && !assetTypes.Contains(assetInfo.AssetId.Type)) continue;
 
-                    var (asset, sourceInfo) = loaderFunc(assetInfo.AssetId);
+                    var language = assetInfo.Get<string>(AssetProperty.Language, null);
+                    var (asset, sourceInfo) = loaderFunc(assetInfo.AssetId, language);
                     if (asset == null) continue;
 
                     var paletteId = paletteHints.Get(sourceInfo.File.Filename, sourceInfo.SubAssetId);

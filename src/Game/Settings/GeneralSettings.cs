@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using UAlbion.Core;
-using UAlbion.Formats;
 
 namespace UAlbion.Game.Settings
 {
@@ -21,7 +20,7 @@ namespace UAlbion.Game.Settings
         // Graphics
 
         // Gameplay
-        public GameLanguage Language { get; set; } = GameLanguage.English;
+        public string Language { get; set; } = Base.Language.English;
         public int CombatDelay { get; set; } = 3;
         public IList<string> ActiveMods { get; } = new List<string>();
 

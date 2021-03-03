@@ -5,7 +5,6 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
@@ -30,7 +29,7 @@ namespace UAlbion.Game.Assets
         }
 
         protected override void Unsubscribed() => Exchange.Unregister(this);
-        public AssetInfo GetAssetInfo(AssetId id) => _modApplier.GetAssetInfo(id);
+        public AssetInfo GetAssetInfo(AssetId id, string language = null) => _modApplier.GetAssetInfo(id, language);
         public IMapData LoadMap(MapId id) => (IMapData)_modApplier.LoadAsset(id); // No caching for map data
         public ItemData LoadItem(ItemId id)
         {
@@ -77,15 +76,15 @@ namespace UAlbion.Game.Assets
         public TilesetData LoadTileData(TilesetId id) => (TilesetData)_modApplier.LoadAssetCached(id);
         public LabyrinthData LoadLabyrinthData(LabyrinthId id) => (LabyrinthData)_modApplier.LoadAssetCached(id);
 
-        string LoadStringCore(StringId id, GameLanguage? language, bool cached)
+        string LoadStringCore(StringId id, string language, bool cached)
         {
             var asset = (language, cached) switch
-                {
-                    (null, false) => _modApplier.LoadAsset(id.Id),
-                    (null, true) => _modApplier.LoadAssetCached(id.Id),
-                    ({ } x, false) => _modApplier.LoadAsset(id.Id, x),
-                    _ => throw new NotImplementedException()
-                };
+            {
+                (null, false) => _modApplier.LoadAsset(id.Id),
+                (null, true) => _modApplier.LoadAssetCached(id.Id),
+                ({ } x, false) => _modApplier.LoadAsset(id.Id, x),
+                _ => throw new NotImplementedException()
+            };
 
             return asset switch
             {
@@ -94,13 +93,13 @@ namespace UAlbion.Game.Assets
                 IDictionary<int, string> d => d.GetValueOrDefault(id.SubId),
                 IDictionary<AssetId, string> d => d.GetValueOrDefault(id.Id),
                 IDictionary<TextId, string> d => d.GetValueOrDefault(id.Id),
-                IDictionary<GameLanguage, StringCollection> d
+                IDictionary<string, StringCollection> d
                     => d[language ?? Resolve<IGameplaySettings>().Language].Get(id.SubId),
                 _ => null
             };
         }
-        public bool IsStringDefined(TextId id, GameLanguage? language) => LoadStringCore(id, language, false) != null;
-        public bool IsStringDefined(StringId id, GameLanguage? language) => LoadStringCore(id, language, false) != null;
+        public bool IsStringDefined(TextId id, string language) => LoadStringCore(id, language, false) != null;
+        public bool IsStringDefined(StringId id, string language) => LoadStringCore(id, language, false) != null;
         public string LoadString(TextId id) => LoadString((StringId)id);
         public string LoadString(StringId id) => LoadStringCore(id, null, true)
                                                  ?? $"!MISSING STRING {id.Id}:{id.SubId}!";

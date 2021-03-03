@@ -96,7 +96,7 @@ namespace UAlbion.Game.Entities.Map2D
 
                     AttachChild(_logicalMap.UseSmallSprites
                         ? (IComponent)new SmallPlayer(player.Id, player.Id.ToSmallPartyGraphics(), PositionFunc)
-                        : new LargePlayer(player.Id, player.Id.ToBigPartyGraphics(), PositionFunc));
+                        : new LargePlayer(player.Id, player.Id.ToLargePartyGraphics(), PositionFunc));
                     i++;
                 }
             }

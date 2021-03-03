@@ -6,8 +6,8 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Visual;
-using UAlbion.Formats;
 using UAlbion.Game;
+using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid.Visual;
@@ -89,7 +89,8 @@ namespace UAlbion
                 return;
 
             // Otherwise just use the first one we can find
-            foreach (var language in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
+            var modApplier = exchange.Resolve<IModApplier>();
+            foreach (var language in modApplier.Languages.Keys)
             {
                 if (assets.IsStringDefined(Base.SystemText.MainMenu_MainMenu, language))
                 {

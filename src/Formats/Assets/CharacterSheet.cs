@@ -68,13 +68,13 @@ namespace UAlbion.Formats.Assets
         public EventSetId EventSetId { get; set; }
         public EventSetId WordSetId { get; set; }
 
-        public string GetName(GameLanguage language) => language switch
+        public string GetName(string language)
         {
-            GameLanguage.English => string.IsNullOrWhiteSpace(EnglishName) ? GermanName : EnglishName,
-            GameLanguage.German => GermanName,
-            GameLanguage.French => string.IsNullOrWhiteSpace(FrenchName) ? GermanName : FrenchName,
-            _ => throw new InvalidOperationException($"Unexpected language {language}")
-        };
+            if (language == Base.Language.English) return string.IsNullOrWhiteSpace(EnglishName) ? GermanName : EnglishName;
+            if (language == Base.Language.German) return GermanName;
+            if (language == Base.Language.French) return string.IsNullOrWhiteSpace(FrenchName) ? GermanName : FrenchName;
+            throw new InvalidOperationException($"Unexpected language {language}");
+        }
 
         // Pending further reversing
         public byte Unknown6 { get; set; }

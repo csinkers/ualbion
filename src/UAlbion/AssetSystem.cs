@@ -67,9 +67,6 @@ namespace UAlbion
 
             Engine.GlobalExchange = exchange;
 
-            // Ensure that the LANG path is set before resolving any assets
-            generalConfig.SetPath("LANG", settings.Language.ToString().ToUpperInvariant());
-
             modApplier.LoadMods(generalConfig, settings.ActiveMods);
             AssetMapping.Global.ConsistencyCheck();
             PerfTracker.StartupEvent("Loaded mods");

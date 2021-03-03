@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Core;
-using UAlbion.Formats;
 using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Tests
@@ -16,7 +15,7 @@ namespace UAlbion.Game.Tests
         public DebugFlags DebugFlags { get; set; }
         public int MusicVolume { get; set; }
         public int FxVolume { get; set; }
-        public GameLanguage Language { get; set; }
+        public string Language { get; set; }
         public int CombatDelay { get; set; }
         public IList<string> ActiveMods { get; set; }
         public float Special1 { get; set; }

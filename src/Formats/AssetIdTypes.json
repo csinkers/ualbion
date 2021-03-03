@@ -3,8 +3,6 @@
     "SpriteId": [
       "AutomapGraphics",
       "BackgroundGraphics",
-      "BigNpcGraphics",
-      "BigPartyGraphics",
       "CombatBackground",
       "CombatGraphics",
       "CoreGraphics",
@@ -12,6 +10,8 @@
       "Font",
       "FullBodyPicture",
       "ItemGraphics",
+      "LargeNpcGraphics",
+      "LargePartyGraphics",
       "MonsterGraphics",
       "Object3D",
       "Picture",
@@ -87,7 +87,7 @@
     ],
     "PartyMemberId": [
       "        public readonly SpriteId ToSmallPartyGraphics() => new SpriteId(AssetType.SmallPartyGraphics, Id);",
-      "        public readonly SpriteId ToBigPartyGraphics() => new SpriteId(AssetType.BigPartyGraphics, Id);",
+      "        public readonly SpriteId ToLargePartyGraphics() => new SpriteId(AssetType.LargePartyGraphics, Id);",
       "        public readonly SpriteId ToFullBodyPicture() => new SpriteId(AssetType.FullBodyPicture, Id);"
     ],
     "SongId": [ "        public readonly WaveLibraryId ToWaveLibrary() => new WaveLibraryId(AssetType.WaveLibrary, Id);" ]

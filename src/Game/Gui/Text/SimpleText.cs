@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Text;
 
@@ -36,7 +35,7 @@ namespace UAlbion.Game.Gui.Text
         public SimpleText Justify() { _block.Alignment = TextAlignment.Justified; Version++; return this; }
         public SimpleText NoWrap() { _block.ArrangementFlags |= TextArrangementFlags.NoWrap; Version++; return this; }
         public SimpleText Ink(FontColor color) { _block.Color = color; Version++; return this; }
-        public SimpleText Language(GameLanguage language) => this;
+        public SimpleText Language(string language) => this;
         public override string ToString() => $"SimpleText \"{_block.Text}\"";
     }
 }

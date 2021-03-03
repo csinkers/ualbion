@@ -135,7 +135,7 @@
     "binaryoffsets": "UAlbion.Formats.Containers.BinaryOffsetContainer, UAlbion.Formats"
   },
 
-  "Languages": {
+  "Languages": { // Just used for the options screen
     "ENGLISH": { "DisplayName": "English",  "ShortName": "EN" },
     "GERMAN":  { "DisplayName": "Deutsch",  "ShortName": "DE" },
     "FRENCH":  { "DisplayName": "François", "ShortName": "FR" }
@@ -237,28 +237,96 @@
     "$(XLD)/WAVELIB0.XLD": { "Loader": "wavlib", "Map": { "0": { "Id": "wavlib.1" } } },
 
     // Videos
-    "$(XLD)/$(LANG)/FLICS0.XLD":   { "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
+    "$(XLD)/GERMAN/FLICS0.XLD":  { "Language": "GERMAN",  "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
+    "$(XLD)/ENGLISH/FLICS0.XLD": { "Language": "ENGLISH", "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
+    "$(XLD)/FRENCH/FLICS0.XLD":  { "Language": "FRENCH",  "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
 
     // Text
-    "$(XLD)/$(LANG)/EVNTTXT0.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "etext.1" } } },
-    "$(XLD)/$(LANG)/EVNTTXT1.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "etext.100" } } },
-    "$(XLD)/$(LANG)/EVNTTXT2.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "etext.200" } } },
-    "$(XLD)/$(LANG)/EVNTTXT3.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "etext.300" } } },
-    "$(XLD)/$(LANG)/EVNTTXT9.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "etext.900" } } },
-    "$(XLD)/$(LANG)/MAPTEXT1.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "mtext.100" } } },
-    "$(XLD)/$(LANG)/MAPTEXT2.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "mtext.200" } } },
-    "$(XLD)/$(LANG)/MAPTEXT3.XLD": { "Loader": "stringtable", "Map": { "0": { "Id": "mtext.300" } } },
-    "$(MOD)/$(LANG)/strings.json": {
+    "$(XLD)/GERMAN/EVNTTXT0.XLD": { "Language": "GERMAN", "Loader": "stringtable", "Map": { "0": { "Id": "etext.1" } } },
+    "$(XLD)/GERMAN/EVNTTXT1.XLD": { "Language": "GERMAN", "Loader": "stringtable", "Map": { "0": { "Id": "etext.100" } } },
+    "$(XLD)/GERMAN/EVNTTXT2.XLD": { "Language": "GERMAN", "Loader": "stringtable", "Map": { "0": { "Id": "etext.200" } } },
+    "$(XLD)/GERMAN/EVNTTXT3.XLD": { "Language": "GERMAN", "Loader": "stringtable", "Map": { "0": { "Id": "etext.300" } } },
+    "$(XLD)/GERMAN/EVNTTXT9.XLD": { "Language": "GERMAN", "Loader": "stringtable", "Map": { "0": { "Id": "etext.900" } } },
+    "$(XLD)/GERMAN/MAPTEXT1.XLD": { "Language": "GERMAN", "Loader": "stringtable", "Map": { "0": { "Id": "mtext.100" } } },
+    "$(XLD)/GERMAN/MAPTEXT2.XLD": { "Language": "GERMAN", "Loader": "stringtable", "Map": { "0": { "Id": "mtext.200" } } },
+    "$(XLD)/GERMAN/MAPTEXT3.XLD": { "Language": "GERMAN", "Loader": "stringtable", "Map": { "0": { "Id": "mtext.300" } } },
+
+    "$(XLD)/ENGLISH/EVNTTXT0.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "Map": { "0": { "Id": "etext.1" } } },
+    "$(XLD)/ENGLISH/EVNTTXT1.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "Map": { "0": { "Id": "etext.100" } } },
+    "$(XLD)/ENGLISH/EVNTTXT2.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "Map": { "0": { "Id": "etext.200" } } },
+    "$(XLD)/ENGLISH/EVNTTXT3.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "Map": { "0": { "Id": "etext.300" } } },
+    "$(XLD)/ENGLISH/EVNTTXT9.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "Map": { "0": { "Id": "etext.900" } } },
+    "$(XLD)/ENGLISH/MAPTEXT1.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "Map": { "0": { "Id": "mtext.100" } } },
+    "$(XLD)/ENGLISH/MAPTEXT2.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "Map": { "0": { "Id": "mtext.200" } } },
+    "$(XLD)/ENGLISH/MAPTEXT3.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "Map": { "0": { "Id": "mtext.300" } } },
+
+    "$(XLD)/FRENCH/EVNTTXT0.XLD": { "Language": "FRENCH", "Loader": "stringtable", "Map": { "0": { "Id": "etext.1" } } },
+    "$(XLD)/FRENCH/EVNTTXT1.XLD": { "Language": "FRENCH", "Loader": "stringtable", "Map": { "0": { "Id": "etext.100" } } },
+    "$(XLD)/FRENCH/EVNTTXT2.XLD": { "Language": "FRENCH", "Loader": "stringtable", "Map": { "0": { "Id": "etext.200" } } },
+    "$(XLD)/FRENCH/EVNTTXT3.XLD": { "Language": "FRENCH", "Loader": "stringtable", "Map": { "0": { "Id": "etext.300" } } },
+    "$(XLD)/FRENCH/EVNTTXT9.XLD": { "Language": "FRENCH", "Loader": "stringtable", "Map": { "0": { "Id": "etext.900" } } },
+    "$(XLD)/FRENCH/MAPTEXT1.XLD": { "Language": "FRENCH", "Loader": "stringtable", "Map": { "0": { "Id": "mtext.100" } } },
+    "$(XLD)/FRENCH/MAPTEXT2.XLD": { "Language": "FRENCH", "Loader": "stringtable", "Map": { "0": { "Id": "mtext.200" } } },
+    "$(XLD)/FRENCH/MAPTEXT3.XLD": { "Language": "FRENCH", "Loader": "stringtable", "Map": { "0": { "Id": "mtext.300" } } },
+
+    "$(MOD)/GERMAN/strings.json": {
+      "Language": "GERMAN",
       "Loader": "json",
       "Container": "raw",
       "Map": { "0": { "Id": "special.UAlbionStrings" } }
     },
-    "$(XLD)/$(LANG)/SYSTEXTS":     {
+    "$(MOD)/ENGLISH/strings.json": {
+      "Language": "ENGLISH",
+      "Loader": "json",
+      "Container": "raw",
+      "Map": { "0": { "Id": "special.UAlbionStrings" } }
+    },
+    "$(MOD)/FRENCH/strings.json": {
+      "Language": "FRENCH",
+      "Loader": "json",
+      "Container": "raw",
+      "Map": { "0": { "Id": "special.UAlbionStrings" } }
+    },
+
+    "$(XLD)/GERMAN/SYSTEXTS":     {
+      "Language": "GERMAN",
       "Loader": "stext",
       "Container": "raw",
       "Map": { "0": { "Id": "special.SystemStrings" } }
     },
-    "$(XLD)/$(LANG)/WORDLIS0.XLD": {
+    "$(XLD)/ENGLISH/SYSTEXTS":     {
+      "Language": "ENGLISH",
+      "Loader": "stext",
+      "Container": "raw",
+      "Map": { "0": { "Id": "special.SystemStrings" } }
+    },
+    "$(XLD)/FRENCH/SYSTEXTS":     {
+      "Language": "FRENCH",
+      "Loader": "stext",
+      "Container": "raw",
+      "Map": { "0": { "Id": "special.SystemStrings" } }
+    },
+
+    "$(XLD)/GERMAN/WORDLIS0.XLD": {
+      "Language": "GERMAN",
+      "Loader": "wordlist",
+      "Map": {
+        "0": { "Id": "special.Words1" },
+        "1": { "Id": "special.Words2" },
+        "2": { "Id": "special.Words3" }
+      }
+    },
+    "$(XLD)/ENGLISH/WORDLIS0.XLD": {
+      "Language": "ENGLISH",
+      "Loader": "wordlist",
+      "Map": {
+        "0": { "Id": "special.Words1" },
+        "1": { "Id": "special.Words2" },
+        "2": { "Id": "special.Words3" }
+      }
+    },
+    "$(XLD)/FRENCH/WORDLIS0.XLD": {
+      "Language": "FRENCH",
       "Loader": "wordlist",
       "Map": {
         "0": { "Id": "special.Words1" },

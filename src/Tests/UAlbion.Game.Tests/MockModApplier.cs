@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Game.Assets;
 
@@ -13,19 +13,19 @@ namespace UAlbion.Game.Tests
         readonly Dictionary<AssetId, object> _assets = new Dictionary<AssetId, object>();
         readonly Dictionary<AssetId, AssetInfo> _infos = new Dictionary<AssetId, AssetInfo>();
 
-        public MockModApplier(GameLanguage language)
-        {
-            Language = language;
-        }
-
-        public GameLanguage Language { get; set; }
         public void LoadMods(IGeneralConfig config, IList<string> mods) { }
         public IModApplier AddAssetPostProcessor(IAssetPostProcessor postProcessor) => throw new NotImplementedException();
-        public AssetInfo GetAssetInfo(AssetId id) => _infos[id];
+        public AssetInfo GetAssetInfo(AssetId id, string language) => _infos[id];
         public object LoadAsset(AssetId id) => _assets[id];
-        public object LoadAsset(AssetId id, GameLanguage language) => _assets[id];
+        public object LoadAsset(AssetId id, string language) => _assets[id];
         public object LoadAssetCached(AssetId id) => _assets[id];
         public SavedGame LoadSavedGame(string path) => throw new NotImplementedException();
+        public IReadOnlyDictionary<string, LanguageConfig> Languages { get; } 
+            = new ReadOnlyDictionary<string, LanguageConfig>(
+                new Dictionary<string, LanguageConfig>());
+
+        public void SaveAssets(Func<AssetId, string, (object, AssetInfo)> loaderFunc, PaletteHints paletteHints, ISet<AssetId> ids, ISet<AssetType> assetTypes) 
+            => throw new NotImplementedException();
 
         public MockModApplier Add(AssetId id, object asset)
         {

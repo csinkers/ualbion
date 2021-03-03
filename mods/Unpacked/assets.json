@@ -113,11 +113,6 @@
     "tiledNpcTileset":  "UAlbion.Formats.Exporters.Tiled.NpcTilesetLoader, UAlbion.Formats"
   },
 
-  "Languages": {
-    "ENGLISH": { "Name": "English",  "ShortName": "EN" },
-    "GERMAN":  { "Name": "Deutsch",  "ShortName": "DE" },
-    "FRENCH":  { "Name": "François", "ShortName": "FR" }
-  },
 
   "Containers": {
     "raw": "UAlbion.Formats.Containers.RawContainer, UAlbion.Formats",
@@ -125,6 +120,11 @@
     "json": "UAlbion.Formats.Containers.JsonContainer, UAlbion.Formats"
   },
 
+  "Languages": { // Just used for the options screen
+    "ENGLISH": { "DisplayName": "English",  "ShortName": "EN" },
+    "GERMAN":  { "DisplayName": "Deutsch",  "ShortName": "DE" },
+    "FRENCH":  { "DisplayName": "François", "ShortName": "FR" }
+  },
   "Files": {
 //    "$(MOD)/Assets/3dBackgrounds":      { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "3dbg.1"     } } },
 //    "$(MOD)/Assets/3dFloors":           { "Loader": "png",             "Container": "dir", "Pattern": "{0}_{1}_{2}.png",   "Map": { "1": { "Id": "floor.1"    } } },

@@ -10,13 +10,13 @@ namespace UAlbion.Game
         public static GameTrace Log { get; } = new GameTrace();
 
         [NonEvent]
-        public void AssetLoaded(AssetId key, GameLanguage language, string path)
+        public void AssetLoaded(AssetId key, string language, string path)
         {
             AssetLoaded(key.Type, key.Id, key.ToString(), language, path);
         }
 
         [Event(1)]
-        void AssetLoaded(AssetType type, int id, string name, GameLanguage language, string path)
+        void AssetLoaded(AssetType type, int id, string name, string language, string path)
         {
             WriteEvent(1, type, id, name, language, path);
         }

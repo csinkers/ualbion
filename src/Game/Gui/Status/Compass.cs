@@ -3,7 +3,6 @@ using System.Numerics;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
@@ -54,11 +53,11 @@ namespace UAlbion.Game.Gui.Status
                         _frame = 0;
                 }
 
-                var language = Resolve<ISettings>()?.Gameplay.Language ?? GameLanguage.English;
+                var language = Resolve<ISettings>()?.Gameplay.Language;
                 _face.Id = language switch
                     {
-                        GameLanguage.German => Base.CoreSprite.CompassDe,
-                        GameLanguage.French => Base.CoreSprite.CompassFr,
+                        { } x when x == Base.Language.German => Base.CoreSprite.CompassDe,
+                        { } x when x == Base.Language.French => Base.CoreSprite.CompassFr,
                         _ => Base.CoreSprite.CompassEn
                     };
 

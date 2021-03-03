@@ -4,7 +4,6 @@ using System.IO;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Veldrid.Visual;

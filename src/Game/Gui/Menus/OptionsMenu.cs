@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
+using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 
@@ -15,7 +16,7 @@ namespace UAlbion.Game.Gui.Menus
         int _fxVolume;
         int _combatDelay;
 
-        bool HasLanguageFiles(GameLanguage language)
+        bool HasLanguageFiles(string language)
             => Resolve<IAssetManager>().IsStringDefined(Base.SystemText.MainMenu_MainMenu, language);
 
         public OptionsMenu() : base(DialogPositioning.Center) { }
@@ -23,17 +24,16 @@ namespace UAlbion.Game.Gui.Menus
         protected override void Subscribed()
         {
             var languageButtons = new List<IUiElement>();
-            void SetLanguage(GameLanguage language) => Raise(new SetLanguageEvent(language));
+            void SetLanguage(string language) => Raise(new SetLanguageEvent(language));
 
-            void AddLang(string label, GameLanguage language)
-            {
-                if (HasLanguageFiles(language))
-                    languageButtons.Add(new Button(label).OnClick(() => SetLanguage(language)));
-            }
+            var languages = new List<(string, string)>();
+            var modApplier = Resolve<IModApplier>();
+            foreach (var kvp in modApplier.Languages.OrderBy(x => x.Value.ShortName))
+                if (HasLanguageFiles(kvp.Key))
+                    languages.Add((kvp.Key, kvp.Value.ShortName));
 
-            AddLang("EN", GameLanguage.English);
-            AddLang("DE", GameLanguage.German);
-            AddLang("FR", GameLanguage.French);
+            foreach (var (language, shortName) in languages)
+                languageButtons.Add(new Button(shortName).OnClick(() => SetLanguage(language)));
 
             var elements = new List<IUiElement>
             {

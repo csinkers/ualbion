@@ -187,7 +187,7 @@ namespace UAlbion.Base.Tests
         public void ItemNameTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Special.ItemNames) };
-            RoundTripRaw<IDictionary<GameLanguage, StringCollection>>(nameof(ItemNameTest), "$(XLD)/ITEMNAME.DAT",
+            RoundTripRaw<IDictionary<string, StringCollection>>(nameof(ItemNameTest), "$(XLD)/ITEMNAME.DAT",
                 (x, s) => ItemNameLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 

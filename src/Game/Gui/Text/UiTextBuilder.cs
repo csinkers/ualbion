@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Text;
 
@@ -9,7 +8,7 @@ namespace UAlbion.Game.Gui.Text
     {
         readonly IList<(Token, object)> _implicitTokens = new List<(Token, object)>();
         readonly StringId _stringId;
-        GameLanguage? _language;
+        string _language;
 
         public UiTextBuilder(TextId textId) => _stringId = textId;
         public UiTextBuilder(StringId stringId) => _stringId = stringId;
@@ -27,7 +26,7 @@ namespace UAlbion.Game.Gui.Text
         public UiTextBuilder Justify() { _implicitTokens.Add((Token.Justify, null)); return this; }
         public UiTextBuilder Fat() { _implicitTokens.Add((Token.Fat, null)); return this; }
         public UiTextBuilder Ink(FontColor color) { _implicitTokens.Add((Token.Ink, (int)color)); return this; }
-        public UiTextBuilder Language(GameLanguage language) { _language = language; return this; }
+        public UiTextBuilder Language(string language) { _language = language; return this; }
 
         protected override void Subscribed()
         {

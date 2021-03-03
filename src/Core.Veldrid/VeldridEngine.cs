@@ -31,6 +31,7 @@ namespace UAlbion.Core.Veldrid
         readonly VeldridCoreFactory _coreFactory;
         readonly IDictionary<Type, IRenderer> _renderers = new Dictionary<Type, IRenderer>();
         readonly IDictionary<IRenderer, List<IRenderable>> _renderables = new Dictionary<IRenderer, List<IRenderable>>();
+        readonly bool _startupOnly;
 
         SceneContext _sceneContext;
         CommandList _frameCommands;
@@ -52,7 +53,7 @@ namespace UAlbion.Core.Veldrid
         public override string FrameTimeText =>
             $"{_frameTimeAverager.CurrentAverageFramesPerSecond:000.0 fps} / {_frameTimeAverager.CurrentAverageFrameTimeMilliseconds:#00.00 ms}";
 
-        public VeldridEngine(GraphicsBackend backend, bool useRenderDoc)
+        public VeldridEngine(GraphicsBackend backend, bool useRenderDoc, bool startupOnly)
         {
             On<LoadRenderDocEvent>(e =>
             {
@@ -93,6 +94,7 @@ namespace UAlbion.Core.Veldrid
             _coreFactory = new VeldridCoreFactory();
             _windowManager = AttachChild(new WindowManager());
             _newBackend = backend;
+            _startupOnly = startupOnly;
             if (useRenderDoc)
                 using(PerfTracker.InfrequentEvent("Loading renderdoc"))
                     RenderDoc.Load(out _renderDoc);
@@ -227,6 +229,9 @@ namespace UAlbion.Core.Veldrid
                     GraphicsDevice.SwapBuffers();
                     CoreTrace.Log.Info("Engine", "Draw complete");
                 }
+
+                if (_startupOnly)
+                    _done = true;
             }
 
             Resolve<IShaderCache>()?.CleanupOldFiles();

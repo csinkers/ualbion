@@ -167,14 +167,6 @@ namespace UAlbion
                 image.SaveAsPng(stream);
                 filenames.Add(new ExportedImageInfo { Path = path, Format = DumpFormats.Png, Width = image.Width, Height = image.Height });
             }
-
-            if ((formats & DumpFormats.Tga) != 0)
-            {
-                var path = Path.ChangeExtension(pathWithoutExtension, "tga");
-                using var stream = File.OpenWrite(path);
-                image.SaveAsTga(stream);
-                filenames.Add(new ExportedImageInfo { Path = path, Format = DumpFormats.Png, Width = image.Width, Height = image.Height });
-            }
         }
     }
 }

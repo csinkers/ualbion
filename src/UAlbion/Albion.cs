@@ -50,9 +50,6 @@ namespace UAlbion
             if (commandLine.DebugMenus && engine is VeldridEngine ve)
                 services.Add(new DebugMenus(ve));
 
-            if (commandLine.StartupOnly)
-                global.Raise(new QuitEvent(), null);
-
             PerfTracker.StartupEvent("Running game");
             global.Raise(new SetSceneEvent(SceneId.Empty), null);
             switch(commandLine.GameMode)
@@ -95,7 +92,7 @@ namespace UAlbion
                 .Register<ICommonColors>(new CommonColors(factory))
                 ;
 
-            if (commandLine.AudioMode == AudioMode.InProcess)
+            if (!commandLine.Mute)
                 services.Add(new AudioManager(false));
 
             services

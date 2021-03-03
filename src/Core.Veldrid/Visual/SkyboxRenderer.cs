@@ -192,7 +192,7 @@ namespace UAlbion.Core.Veldrid.Visual
         public void DestroyDeviceObjects()
         {
             _disposeCollector.DisposeAll();
-            _pipeline.Dispose();
+            _pipeline?.Dispose();
 
             foreach (var shader in _shaders)
                 shader.Dispose();

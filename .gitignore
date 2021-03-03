@@ -25,6 +25,7 @@ packages/
 launchSettings.json
 imgui.ini
 global.json
+r.bat
 
 mods/*
 !mods/Base/

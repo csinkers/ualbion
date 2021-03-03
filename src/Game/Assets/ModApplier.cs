@@ -261,7 +261,11 @@ namespace UAlbion.Game.Assets
             throw new NotImplementedException();
         }
 
-        public void SaveAssets(Func<AssetId, (object, AssetInfo)> loaderFunc, PaletteHints paletteHints)
+        public void SaveAssets(
+            Func<AssetId, (object, AssetInfo)> loaderFunc,
+            PaletteHints paletteHints,
+            ISet<AssetId> ids,
+            ISet<AssetType> assetTypes)
         {
             if (loaderFunc == null) throw new ArgumentNullException(nameof(loaderFunc));
             var config = Resolve<IGeneralConfig>();
@@ -279,7 +283,7 @@ namespace UAlbion.Game.Assets
                 var container = containerRegistry.GetContainer(file.Container);
                 var firstAsset = file.Map[file.Map.Keys.Min()];
                 var assets = target.Mapping.EnumerateAssetsOfType(firstAsset.AssetId.Type).ToList();
-                var idsInRange = 
+                var idsInRange =
                     assets
                     .Where(x => x.Id >= firstAsset.AssetId.Id)
                     .OrderBy(x => x.Id)
@@ -305,9 +309,11 @@ namespace UAlbion.Game.Assets
                 var assets = new List<(AssetInfo, byte[])>();
                 foreach (var assetInfo in file.Map.Values)
                 {
+                    if (ids != null && !ids.Contains(assetInfo.AssetId)) continue;
+                    if (assetTypes != null && !assetTypes.Contains(assetInfo.AssetId.Type)) continue;
+
                     var (asset, sourceInfo) = loaderFunc(assetInfo.AssetId);
-                    if (asset == null)
-                        continue;
+                    if (asset == null) continue;
 
                     var paletteId = paletteHints.Get(sourceInfo.File.Filename, sourceInfo.SubAssetId);
                     if (paletteId != 0)

@@ -8,167 +8,156 @@ namespace UAlbion
 {
     class CommandLineOptions
     {
-        public GraphicsBackend Backend { get; }
-        public bool StartupOnly { get; }
-        public bool UseRenderDoc { get; }
-        public bool DebugMenus { get; }
         public ExecutionMode Mode { get; }
-        public AudioMode AudioMode { get; }
         public GameMode GameMode { get; }
         public string GameModeArgument { get; }
+
+        public GraphicsBackend Backend { get; }
+        public bool DebugMenus { get; }
+        public bool Mute { get; }
+        public bool NeedsEngine => Mode == ExecutionMode.Game;
+        public bool StartupOnly { get; }
+        public bool UseRenderDoc { get; }
         public string ConvertFrom { get; }
         public string ConvertTo { get; }
+
         public string[] Commands { get; }
+        public string[] DumpIds { get; }
         public DumpFormats DumpFormats { get; } = DumpFormats.Json;
         public ISet<AssetType> DumpAssetTypes { get; } = new HashSet<AssetType>();
-        public bool NeedsEngine => Mode switch
-        {
-            ExecutionMode.Game => true,
-            ExecutionMode.GameWithSlavedAudio => true,
-            ExecutionMode.Editor => true,
-            _ => false
-        };
 
         public CommandLineOptions(string[] args)
         {
             // Defaults
             Mode = ExecutionMode.Game;
             GameMode = GameMode.MainMenu;
-            AudioMode = AudioMode.InProcess;
             Backend = GraphicsBackend.Vulkan;
 
-            StartupOnly = args.Contains("--startuponly");
-            UseRenderDoc = args.Contains("--renderdoc") || args.Contains("-rd");
-            DebugMenus = args.Contains("--menus");
-            if (args.Contains("-gl") || args.Contains("--opengl")) Backend = GraphicsBackend.OpenGL;
-            if (args.Contains("-gles") || args.Contains("--opengles")) Backend = GraphicsBackend.OpenGLES;
-            if (args.Contains("-vk") || args.Contains("--vulkan")) Backend = GraphicsBackend.Vulkan;
-            if (args.Contains("-metal") || args.Contains("--metal")) Backend = GraphicsBackend.Metal;
-            if (args.Contains("-d3d") || args.Contains("--direct3d")) Backend = GraphicsBackend.Direct3D11;
-
-            var commandString = args.SkipWhile(x => x != "-c").Skip(1).FirstOrDefault();
-            if (commandString != null)
-                Commands = commandString.Split(';').Select(x => x.Trim()).ToArray();
-
-            if (args.Contains("-h") || args.Contains("--help") || args.Contains("/?") || args.Contains("help"))
+            for (int i = 0; i < args.Length; i++)
             {
-                DisplayUsage();
-                Mode = ExecutionMode.Exit;
-                return;
-            }
+                var arg = args[i].ToUpperInvariant();
 
-            if (args.Contains("--no-audio")) AudioMode = AudioMode.None;
-            if (args.Contains("--external-audio")) AudioMode = AudioMode.ExternalProcess;
-
-            if (args.Contains("--audio")) Mode = ExecutionMode.AudioSlave;
-            if (args.Contains("--editor")) Mode = ExecutionMode.Editor;
-            if (args.Contains("--save-tests")) Mode = ExecutionMode.SavedGameTests;
-
-            if (args.Contains("--dump-all-gfx"))
-            {
-                Mode = ExecutionMode.DumpData;
-                DumpFormats = DumpFormats.Png;
-                DumpAssetTypes.UnionWith(new[] {
-                    AssetType.AutomapGraphics,
-                    AssetType.CombatBackground,
-                    AssetType.CombatGraphics,
-                    AssetType.CoreGraphics,
-                    AssetType.BackgroundGraphics,
-                    AssetType.Floor,
-                    AssetType.Object3D,
-                    AssetType.WallOverlay,
-                    AssetType.Wall,
-                    AssetType.Font,
-                    AssetType.FullBodyPicture,
-                    AssetType.TilesetGraphics,
-                    AssetType.ItemGraphics,
-                    AssetType.LargeNpcGraphics,
-                    AssetType.LargePartyGraphics,
-                    AssetType.MonsterGraphics,
-                    AssetType.Picture,
-                    AssetType.SmallNpcGraphics,
-                    AssetType.SmallPartyGraphics,
-                    AssetType.Portrait,
-                    AssetType.TacticalIcon });
-            }
-
-            if (args.Contains("--dump-all"))
-            {
-                Mode = ExecutionMode.DumpData;
-                DumpAssetTypes.UnionWith(Enum.GetValues(typeof(AssetType)).OfType<AssetType>());
-            }
-
-            var index = FindArgIndex("--dump", args);
-            if (index != -1 && args.Length > index + 1)
-            {
-                Mode = ExecutionMode.DumpData;
-                foreach (var type in args[index + 1].Split(' ', StringSplitOptions.RemoveEmptyEntries))
-                    DumpAssetTypes.Add(Enum.Parse<AssetType>(type, true));
-            }
-
-            index = FindArgIndex("--id", args);
-            if(index == -1) index = FindArgIndex("-id", args);
-            if(index == -1) index = FindArgIndex("--ids", args);
-            if(index == -1) index = FindArgIndex("-ids", args);
-            if (index != -1 && args.Length > index + 1)
-                DumpIds = args[index + 1].Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-            index = FindArgIndex("--formats", args);
-            if(index == -1) index = FindArgIndex("--format", args);
-            if(index == -1) index = FindArgIndex("--dump-format", args);
-            if(index == -1) index = FindArgIndex("--dump-formats", args);
-            if(index == -1) index = FindArgIndex("-formats", args);
-            if(index == -1) index = FindArgIndex("-format", args);
-            if (index != -1 && args.Length > index + 1)
-            {
-                DumpFormats = 0;
-                foreach (var type in args[index + 1].Split(' ', StringSplitOptions.RemoveEmptyEntries))
-                    DumpFormats |= Enum.Parse<DumpFormats>(type, true);
-            }
-
-            index = FindArgIndex("--convert", args);
-            if (index != -1)
-            {
-                if (args.Length <= index + 2)
-                    throw new FormatException("--convert requires two parameters: the mod to convert from and the mod to convert to");
-                ConvertFrom = args[index + 1];
-                ConvertTo = args[index + 2];
-                Mode = ExecutionMode.ConvertAssets;
-            }
-
-            if (Mode == ExecutionMode.Game)
-            {
-                if (args.Contains("--new-game"))
-                    GameMode = GameMode.NewGame;
-
-                if (args.Contains("--inventory"))
-                    GameMode = GameMode.Inventory;
-
-                index = FindArgIndex("--load-game", args);
-                if (index > -1 && args.Length > index + 1)
+                // Mode
+                if (arg == "--GAME") Mode = ExecutionMode.Game;
+                if (arg == "--CONVERT" || arg == "--BUILD" || arg == "-B")
                 {
+                    if (i +2 >= args.Length)
+                        throw new FormatException("\"--convert\" requires two parameters: the mod to convert from and the mod to convert to");
+                    ConvertFrom = args[++i];
+                    ConvertTo = args[++i];
+                    Mode = ExecutionMode.ConvertAssets;
+                }
+
+                if (arg == "--DUMP" || arg == "-D")
+                {
+                    Mode = ExecutionMode.DumpData;
+                    if (DumpAssetTypes.Count == 0)
+                        DumpAssetTypes.UnionWith(Enum.GetValues(typeof(AssetType)).OfType<AssetType>());
+                }
+
+                if (arg == "-H" || arg == "--HELP" || arg == "/?" || arg == "HELP")
+                {
+                    DisplayUsage();
+                    Mode = ExecutionMode.Exit;
+                    return;
+                }
+
+                // Options
+                if (arg == "-GL" || arg == "--OPENGL") Backend = GraphicsBackend.OpenGL;
+                if (arg == "-GLES" || arg == "--OPENGLES") Backend = GraphicsBackend.OpenGLES;
+                if (arg == "-VK" || arg == "--VULKAN") Backend = GraphicsBackend.Vulkan;
+                if (arg == "-METAL" || arg == "--METAL") Backend = GraphicsBackend.Metal;
+                if (arg == "-D3D" || arg == "--DIRECT3D") Backend = GraphicsBackend.Direct3D11;
+
+                if (arg == "--MENUS") DebugMenus = true;
+                if (arg == "--NO-AUDIO") Mute = true;
+                if (arg == "--STARTUPONlY" || arg == "-S") StartupOnly = true;
+                if (arg == "--RENDERDOC" || arg == "-RD") UseRenderDoc = true;
+
+                if (arg == "--COMMANDS" || arg == "-C")
+                {
+                    i++;
+                    if (i == args.Length)
+                    {
+                        Console.WriteLine("\"-c\" requires an argument specifying the commands to run");
+                        Mode = ExecutionMode.Exit;
+                        return;
+                    }
+
+                    Commands = args[i].Split(';').Select(x => x.Trim()).ToArray();
+                }
+
+                if (arg == "--TYPE" || arg == "-T")
+                {
+                    i++;
+                    if (i == args.Length)
+                    {
+                        Console.WriteLine("\"-type\" requires an argument specifying the asset types to process");
+                        Mode = ExecutionMode.Exit;
+                        return;
+                    }
+
+                    foreach (var type in args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                        DumpAssetTypes.Add(Enum.Parse<AssetType>(type, true));
+                }
+
+                if (arg == "--ID" || arg == "-ID" || arg == "-IDS" || arg == "--IDS")
+                {
+                    i++;
+                    if (i == args.Length)
+                    {
+                        Console.WriteLine("\"-id\" requires an argument specifying the ids to process");
+                        Mode = ExecutionMode.Exit;
+                        return;
+                    }
+                    DumpIds = args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                }
+
+                if (arg == "--FORMATS" || arg == "--FORMAT" || arg == "-F")
+                {
+                    i++;
+                    if (i == args.Length)
+                    {
+                        Console.WriteLine("\"--formats\" requires an argument specifying the formats to process");
+                        Mode = ExecutionMode.Exit;
+                        return;
+                    }
+                    DumpFormats = 0;
+                    foreach (var type in args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                        DumpFormats |= Enum.Parse<DumpFormats>(type, true);
+                }
+
+                // SubModes
+                if (arg == "--MAIN-MENU") GameMode = GameMode.MainMenu;
+                if (arg == "--NEW-GAME") GameMode = GameMode.NewGame;
+                if (arg == "--INVENTORY") GameMode = GameMode.Inventory;
+
+                if (arg == "--LOAD" || arg == "-L")
+                {
+                    i++;
+                    if (i == args.Length)
+                    {
+                        Console.WriteLine("\"--load-game\" requires an argument specifying the saved game to load");
+                        Mode = ExecutionMode.Exit;
+                        return;
+                    }
                     GameMode = GameMode.LoadGame;
-                    GameModeArgument = args[index + 1];
+                    GameModeArgument = args[i];
                 }
 
-                index = FindArgIndex("--load-map", args);
-                if (index > -1 && args.Length > index + 1)
+                if (arg == "--LOAD-MAP" || arg == "-MAP" || arg == "--MAP" || arg == "-M")
                 {
+                    i++;
+                    if (i == args.Length)
+                    {
+                        Console.WriteLine("\"--load-map\" requires an argument specifying the map to load");
+                        Mode = ExecutionMode.Exit;
+                        return;
+                    }
                     GameMode = GameMode.LoadMap;
-                    GameModeArgument = args[index + 1];
+                    GameModeArgument = args[i];
                 }
             }
-        }
-
-        public string[] DumpIds { get; }
-
-        int FindArgIndex(string argument, string[] arguments)
-        {
-            for (int i = 0; i < arguments.Length; i++)
-                if (arguments[i] == argument)
-                    return i;
-
-            return -1;
         }
 
         static void DisplayUsage()
@@ -185,39 +174,39 @@ namespace UAlbion
 
             Console.WriteLine($@"UAlbion
 Command Line Options:
-
-    -h --help /? help : Display this help
-    --startuponly     : Exit immediately after the first frame (for profiling startup time etc)
-    -rd   --renderdoc : Load the RenderDoc plugin on startup
-    -c ""commands""     : Raise the given events (semicolon separated list) on startup.
-
-Set Rendering Backend:
-    -gl    --opengl     Use OpenGL
-    -gles  --opengles   Use OpenGLES
-    -vk    --vulkan     Use Vulkan
-    -metal --metal      Use Metal
-    -d3d   --direct3d   Use Direct3D11
+(Note: To specify multiple values for any argument use double quotes and separate values with spaces)
 
 Execution Mode:
-    --game : Runs the game (default)
-    --no-audio: Runs the game without audio
-    --external-audio: Runs the game with audio delegated to a worker process
-    --audio : Runs as an audio worker process
-    --save-tests : Runs the saved game tests
-    --dump-all : Dumps all asset types supported by the selected formats
-    --dump-all-gfx : Dumps all graphical asset types
-    --dump ""[asset types]"": Dump specific types of game data (space separated list, valid types: {dumpTypes})
-    --convert <FromMod> <ToMod> : Convert all assets from one mod's asset formats to another (e.g. Base->Unpacked, Unpacked->Repacked etc)
+    --game            : Runs the game (default)
+    --help -h /? help : Display this help
+    --dump -d         : Dump assets to the data/exported directory
+    --convert --build -b <FromMod> <ToMod> : Convert all assets from one mod's asset formats to another (e.g. Base->Unpacked, Unpacked->Repacked etc)
 
-Dump options: (if running as dump, dump-all or dump-all-gfx)
-    --formats ""[formats]"": Specifies the formats for the dumped data (defaults to JSON, valid formats: {formats})
+Rendering Backend:
+    --opengl    -gl    : Use OpenGL
+    --opengles  -gles  : Use OpenGLES
+    --vulkan    -vk    : Use Vulkan
+    --metal     -metal : Use Metal
+    --direct3d  -d3d   : Use Direct3D11
+
+Options:
+    --commands -c <Commands> : Raise the given events (semicolon separated list) on startup.
+    --menus          : Show debug menus
+    --no-audio       : Runs the game without audio
+    --startuponly -s : Exit immediately after the first frame (for profiling startup time etc)
+    --renderdoc -rd  : Load the RenderDoc plugin on startup
+
+Dump / Convert options:
+    --formats -f <Formats>    : Specifies the formats for the dumped data (defaults to JSON, valid formats: {formats})
+    --id --ids -id -ids <Ids> : Dump specific asset ids (space separated list)
+    --type -t <Types>         : Dump specific types of game data (space separated list, valid types: {dumpTypes})
 
 Game Mode: (if running as game)
-        --main-menu (default)
-        --new-game
-        --load-game <slotNumber>
-        --load-map <mapId>
-        --inventory
+    --main-menu (default)              : Show the main menu on startup
+    --new-game                         : Begin a new game immediately
+    --load -l <slotNumber> : Load the specified saved game
+    --load-map --map -map <mapId>      : Start a new game on the specified map
+    --inventory                        : Start a new game and load the inventory screen
 ");
         }
     }

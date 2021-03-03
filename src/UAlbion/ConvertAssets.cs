@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -26,17 +28,23 @@ namespace UAlbion
             return (applier, exchange);
         }
 
-        public static void Convert(string baseDir, string fromMod, string toMod)
+        public static void Convert(
+            string baseDir,
+            string fromMod,
+            string toMod,
+            string[] ids,
+            ISet<AssetType> assetTypes)
         {
             var (from, fromExchange) = BuildModApplier(baseDir, fromMod);
             var (to, toExchange) = BuildModApplier(baseDir, toMod);
-            toExchange.Attach(new AssetManager(from));
 
             using (fromExchange)
             using (toExchange)
             {
+                toExchange.Attach(new AssetManager(from));
+                var parsedIds = ids?.Select(AssetId.Parse).ToHashSet();
                 var paletteHints = PaletteHints.Load(Path.Combine(baseDir, "mods", "Base", "palette_hints.json"));
-                to.SaveAssets(x => (from.LoadAsset(x), from.GetAssetInfo(x)), paletteHints);
+                to.SaveAssets(x => (from.LoadAsset(x), from.GetAssetInfo(x)), paletteHints, parsedIds, assetTypes);
             }
         }
     }

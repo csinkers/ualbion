@@ -92,8 +92,8 @@ namespace UAlbion.Formats.Assets
         public bool IsNone => Type == AssetType.None;
 
         public override string ToString() => AssetMapping.Global.IdToName(this);
-        static AssetType[] _validTypes = { AssetType.Labyrinth };
-        public static LabyrinthId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
+        public static AssetType[] ValidTypes = { AssetType.Labyrinth };
+        public static LabyrinthId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 
         public static implicit operator AssetId(LabyrinthId id) => AssetId.FromUInt32(id._value);
         public static implicit operator LabyrinthId(AssetId id) => new LabyrinthId(id.ToUInt32());

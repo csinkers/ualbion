@@ -24,9 +24,6 @@ namespace UAlbion.Game.Tests
             = new ReadOnlyDictionary<string, LanguageConfig>(
                 new Dictionary<string, LanguageConfig>());
 
-        public void SaveAssets(Func<AssetId, string, (object, AssetInfo)> loaderFunc, PaletteHints paletteHints, ISet<AssetId> ids, ISet<AssetType> assetTypes) 
-            => throw new NotImplementedException();
-
         public MockModApplier Add(AssetId id, object asset)
         {
             _assets[id] = asset;

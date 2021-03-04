@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -7,27 +6,28 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class ItemNameLoader : IAssetLoader<IDictionary<string, StringCollection>>
+    public class ItemNameLoader : IAssetLoader<MultiLanguageStringDictionary>
     {
         const int StringSize = 20;
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((IDictionary<string, StringCollection>)existing, config, mapping, s);
+            => Serdes((MultiLanguageStringDictionary)existing, config, mapping, s);
 
-        public IDictionary<string, StringCollection> Serdes(IDictionary<string, StringCollection> names, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public MultiLanguageStringDictionary Serdes(MultiLanguageStringDictionary names, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             var streamLength = s.BytesRemaining;
             ApiUtil.Assert(streamLength % StringSize == 0);
-            names ??= new Dictionary<string, StringCollection>();
-            if (!names.ContainsKey(Base.Language.German)) names[Base.Language.German] = new StringCollection();
-            if (!names.ContainsKey(Base.Language.English)) names[Base.Language.English] = new StringCollection();
-            if (!names.ContainsKey(Base.Language.French)) names[Base.Language.French] = new StringCollection();
+            names ??= new MultiLanguageStringDictionary();
+            if (!names.ContainsKey(Base.Language.German)) names[Base.Language.German] = new ListStringCollection();
+            if (!names.ContainsKey(Base.Language.English)) names[Base.Language.English] = new ListStringCollection();
+            if (!names.ContainsKey(Base.Language.French)) names[Base.Language.French] = new ListStringCollection();
 
-            static void Inner(StringCollection collection, int i, ISerializer s2)
+            static void Inner(IStringCollection collection, int i, ISerializer s2)
             {
+                var concrete = (ListStringCollection)collection;
                 while (collection.Count <= i)
-                    collection.Add(null);
-                collection[i] = s2.FixedLengthString(null, collection[i], StringSize);
+                    concrete.Add(null);
+                concrete[i] = s2.FixedLengthString(null, concrete[i], StringSize);
             }
 
             if (s.IsReading())

@@ -7,14 +7,14 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class WordListLoader : IAssetLoader<StringCollection>
+    public class WordListLoader : IAssetLoader<ListStringCollection>
     {
         const int WordLength = 21;
 
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((StringCollection)existing, config, mapping, s);
+            => Serdes((ListStringCollection)existing, config, mapping, s);
 
-        public StringCollection Serdes(StringCollection existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public ListStringCollection Serdes(ListStringCollection existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -26,7 +26,7 @@ namespace UAlbion.Formats.Parsers
                 var strings = new List<string>();
                 while (!s.IsComplete())
                     strings.Add(s.FixedLengthString(null, null, WordLength));
-                return new StringCollection(strings);
+                return new ListStringCollection(strings);
             }
             else
             {

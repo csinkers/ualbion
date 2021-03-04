@@ -92,8 +92,8 @@ namespace UAlbion.Formats.Assets
         public bool IsNone => Type == AssetType.None;
 
         public override string ToString() => AssetMapping.Global.IdToName(this);
-        static AssetType[] _validTypes = { AssetType.Sample };
-        public static SampleId Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
+        public static AssetType[] ValidTypes = { AssetType.Sample };
+        public static SampleId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 
         public static implicit operator AssetId(SampleId id) => AssetId.FromUInt32(id._value);
         public static implicit operator SampleId(AssetId id) => new SampleId(id.ToUInt32());

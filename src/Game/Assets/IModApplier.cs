@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats.Assets.Save;
@@ -16,10 +15,5 @@ namespace UAlbion.Game.Assets
         object LoadAssetCached(AssetId assetId);
         SavedGame LoadSavedGame(string path);
         IReadOnlyDictionary<string, LanguageConfig> Languages { get; }
-        void SaveAssets(
-            Func<AssetId, string, (object, AssetInfo)> loaderFunc,
-            PaletteHints paletteHints,
-            ISet<AssetId> ids,
-            ISet<AssetType> assetTypes);
     }
 }

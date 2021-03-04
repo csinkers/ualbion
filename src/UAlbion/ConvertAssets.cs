@@ -3,7 +3,9 @@ using System.IO;
 using System.Linq;
 using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Formats.Assets;
 using UAlbion.Game.Assets;
+using UAlbion.Game.Settings;
 
 namespace UAlbion
 {
@@ -20,6 +22,7 @@ namespace UAlbion
                 .Attach(new AssetLoaderRegistry())
                 .Attach(new ContainerRegistry())
                 .Attach(new AssetLocator())
+                .Attach(new SettingsManager(new GeneralSettings())) // Used for event comments
                 .Attach(applier)
                 ;
             applier.LoadMods(config, new[] { mod });
@@ -42,10 +45,34 @@ namespace UAlbion
                 toExchange.Attach(new AssetManager(from));
                 var parsedIds = ids?.Select(AssetId.Parse).ToHashSet();
                 var paletteHints = PaletteHints.Load(Path.Combine(baseDir, "mods", "Base", "palette_hints.json"));
+                var cache = new Dictionary<(AssetId, string), object>();
 
-                (object, AssetInfo) LoaderFunc(AssetId x, string lang) => (from.LoadAsset(x, lang), from.GetAssetInfo(x, lang));
+                (object, AssetInfo) LoaderFunc(AssetId id, string language)
+                {
+                    StringId? stringId = TextId.ValidTypes.Contains(id.Type)
+                        ? (TextId)id
+                        : (StringId?)null;
 
-                to.SaveAssets(LoaderFunc, paletteHints, parsedIds, assetTypes);
+                    if (stringId != null)
+                    {
+                        if (stringId.Value.Id == id)
+                            stringId = null;
+                        else
+                            id = stringId.Value.Id;
+                    }
+
+                    var info = from.GetAssetInfo(id, language);
+                    var asset = cache.TryGetValue((id, language), out var cached)
+                        ? cached
+                        : cache[(id,language)] = from.LoadAsset(id, language);
+
+                    if (stringId.HasValue && asset is IStringCollection collection)
+                        asset = collection.GetString(stringId.Value, language);
+
+                    return (asset, info);
+                }
+
+                to.SaveAssets(LoaderFunc, () => cache.Clear(), paletteHints, parsedIds, assetTypes);
             }
         }
     }

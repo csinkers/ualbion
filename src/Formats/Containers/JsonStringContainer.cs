@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -13,9 +12,9 @@ using UAlbion.Config;
 namespace UAlbion.Formats.Containers
 {
     /// <summary>
-    /// Container encoding a list of assets to a JSON object/dictionary
+    /// Container encoding a list of strings to a JSON object/dictionary
     /// </summary>
-    public class JsonObjectContainer : IAssetContainer
+    public class JsonStringContainer : IAssetContainer
     {
         [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The serializer will handle it")]
         public ISerializer Read(string path, AssetInfo info)
@@ -38,16 +37,12 @@ namespace UAlbion.Formats.Containers
         public void Write(string path, IList<(AssetInfo, byte[])> assets)
         {
             if (assets == null) throw new ArgumentNullException(nameof(assets));
-            var dict = new Dictionary<string, JObject>();
+            var dict = new Dictionary<string, string>();
             foreach(var (info, bytes) in assets)
-            {
-                var json = Encoding.UTF8.GetString(bytes);
-                var jObject = JObject.Parse(json);
-                dict[info.AssetId.ToString()] = jObject;
-            }
+                dict[info.AssetId.ToString()] = Encoding.UTF8.GetString(bytes);
 
             var fullText = JsonConvert.SerializeObject(dict, ConfigUtil.JsonSerializerSettings);
-             File.WriteAllText(path, fullText);
+            File.WriteAllText(path, fullText);
         }
 
         public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info)
@@ -58,10 +53,10 @@ namespace UAlbion.Formats.Containers
             return FormatUtil.SortedIntsToRanges(dict.Keys.Select(x => x.Id).OrderBy(x => x));
         }
 
-        static IDictionary<AssetId, JObject> Load(string path)
+        static IDictionary<AssetId, string> Load(string path)
         {
             var text = File.ReadAllText(path);
-            var dict = (IDictionary<string, JObject>)JsonConvert.DeserializeObject<IDictionary<string, JObject>>(text);
+            var dict = (IDictionary<string, string>)JsonConvert.DeserializeObject<IDictionary<string, string>>(text);
             if (dict == null)
                 throw new FileLoadException($"Could not deserialize \"{path}\"");
 

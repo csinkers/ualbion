@@ -207,8 +207,8 @@ namespace {destNamespace}
         public bool IsNone => Type == AssetType.None;
 
         public override string ToString() => AssetMapping.Global.IdToName(this);
-        static AssetType[] _validTypes = {{ {string.Join(", ", types.Select(x => "AssetType." + x))} }};
-        public static {name} Parse(string s) => AssetMapping.Global.Parse(s, _validTypes);
+        public static AssetType[] ValidTypes = {{ {string.Join(", ", types.Select(x => "AssetType." + x))} }};
+        public static {name} Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 
         public static implicit operator AssetId({name} id) => AssetId.FromUInt32(id._value);
         public static implicit operator {name}(AssetId id) => new {name}(id.ToUInt32());

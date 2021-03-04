@@ -24,7 +24,7 @@ namespace UAlbion
         public string[] Commands { get; }
         public string[] DumpIds { get; }
         public DumpFormats DumpFormats { get; } = DumpFormats.Json;
-        public ISet<AssetType> DumpAssetTypes { get; } = new HashSet<AssetType>();
+        public ISet<AssetType> DumpAssetTypes { get; }
 
         public CommandLineOptions(string[] args)
         {
@@ -39,6 +39,7 @@ namespace UAlbion
 
                 // Mode
                 if (arg == "--GAME") Mode = ExecutionMode.Game;
+                if (arg == "--DUMP" || arg == "-D") Mode = ExecutionMode.DumpData;
                 if (arg == "--CONVERT" || arg == "--BUILD" || arg == "-B")
                 {
                     if (i +2 >= args.Length)
@@ -46,13 +47,6 @@ namespace UAlbion
                     ConvertFrom = args[++i];
                     ConvertTo = args[++i];
                     Mode = ExecutionMode.ConvertAssets;
-                }
-
-                if (arg == "--DUMP" || arg == "-D")
-                {
-                    Mode = ExecutionMode.DumpData;
-                    if (DumpAssetTypes.Count == 0)
-                        DumpAssetTypes.UnionWith(Enum.GetValues(typeof(AssetType)).OfType<AssetType>());
                 }
 
                 if (arg == "-H" || arg == "--HELP" || arg == "/?" || arg == "HELP")
@@ -97,6 +91,7 @@ namespace UAlbion
                         return;
                     }
 
+                    DumpAssetTypes = new HashSet<AssetType>();
                     foreach (var type in args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries))
                         DumpAssetTypes.Add(Enum.Parse<AssetType>(type, true));
                 }

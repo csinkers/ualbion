@@ -78,23 +78,15 @@ namespace UAlbion.Game.Assets
 
         string LoadStringCore(StringId id, string language, bool cached)
         {
-            var asset = (language, cached) switch
-            {
-                (null, false) => _modApplier.LoadAsset(id.Id),
-                (null, true) => _modApplier.LoadAssetCached(id.Id),
-                ({ } x, false) => _modApplier.LoadAsset(id.Id, x),
-                _ => throw new NotImplementedException()
-            };
+            language ??= Resolve<IGameplaySettings>().Language;
+            var asset = cached 
+                ?  _modApplier.LoadAssetCached(id.Id)
+                : _modApplier.LoadAsset(id.Id, language);
 
             return asset switch
             {
+                IStringCollection collection => collection.GetString(id, language),
                 string s => s,
-                StringCollection c => c.Count > id.SubId ? c[id.SubId] : null,
-                IDictionary<int, string> d => d.GetValueOrDefault(id.SubId),
-                IDictionary<AssetId, string> d => d.GetValueOrDefault(id.Id),
-                IDictionary<TextId, string> d => d.GetValueOrDefault(id.Id),
-                IDictionary<string, StringCollection> d
-                    => d[language ?? Resolve<IGameplaySettings>().Language].Get(id.SubId),
                 _ => null
             };
         }

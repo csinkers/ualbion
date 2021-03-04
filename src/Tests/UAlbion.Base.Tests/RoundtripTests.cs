@@ -187,7 +187,7 @@ namespace UAlbion.Base.Tests
         public void ItemNameTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Special.ItemNames) };
-            RoundTripRaw<IDictionary<string, StringCollection>>(nameof(ItemNameTest), "$(XLD)/ITEMNAME.DAT",
+            RoundTripRaw<MultiLanguageStringDictionary>(nameof(ItemNameTest), "$(XLD)/ITEMNAME.DAT",
                 (x, s) => ItemNameLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -236,7 +236,7 @@ namespace UAlbion.Base.Tests
         public void EventTextTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(EventText.Frill) };
-            RoundTripXld<StringCollection>(nameof(EventTextTest), "$(XLD)/ENGLISH/EVNTTXT1.XLD", 11,
+            RoundTripXld<ListStringCollection>(nameof(EventTextTest), "$(XLD)/ENGLISH/EVNTTXT1.XLD", 11,
                 (x, s) => AlbionStringTableLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -269,7 +269,7 @@ namespace UAlbion.Base.Tests
         public void MapTextTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(MapText.TorontoBegin) };
-            RoundTripXld<StringCollection>(nameof(MapTextTest), "$(XLD)/ENGLISH/MAPTEXT3.XLD", 0,
+            RoundTripXld<ListStringCollection>(nameof(MapTextTest), "$(XLD)/ENGLISH/MAPTEXT3.XLD", 0,
                 (x, s) => AlbionStringTableLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -375,7 +375,7 @@ namespace UAlbion.Base.Tests
         public void WordTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Special.Words1) };
-            RoundTripXld<StringCollection>(nameof(WordTest), "$(XLD)/ENGLISH/WORDLIS0.XLD", 0,
+            RoundTripXld<ListStringCollection>(nameof(WordTest), "$(XLD)/ENGLISH/WORDLIS0.XLD", 0,
                 (x, s) => WordListLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 //*

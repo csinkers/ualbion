@@ -1,24 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using SerdesNet;
 using UAlbion.Config;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class SystemTextLoader : IAssetLoader<IDictionary<int, string>>
+    public class SystemTextLoader : IAssetLoader<IntStringDictionary>
     {
         static readonly Regex Regex = new Regex(@"\[(\d+):(.*)\]");
 
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((IDictionary<int, string>) existing, config, mapping, s);
+            => Serdes((IntStringDictionary) existing, config, mapping, s);
 
-        public IDictionary<int, string> Serdes(IDictionary<int, string> existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public IntStringDictionary Serdes(IntStringDictionary existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (s.IsWriting()) throw new NotImplementedException("Saving of system text not currently supported");
-            var results = new Dictionary<int, string>();
+            var results = new IntStringDictionary();
             var bytes = s.ByteArray(null, null, (int)s.BytesRemaining);
             var data = FormatUtil.BytesTo850String(bytes);
             foreach (var line in FormatUtil.SplitLines(data))

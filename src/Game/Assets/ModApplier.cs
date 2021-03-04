@@ -152,17 +152,16 @@ namespace UAlbion.Game.Assets
             config.RegisterStringRedirects(mapping);
         }
 
-        public AssetInfo GetAssetInfo(AssetId id, string language = null)
-        {
-            language ??= Resolve<IGameplaySettings>().Language;
-            return _modsInReverseDependencyOrder
+        public AssetInfo GetAssetInfo(AssetId id, string language = null) =>
+            _modsInReverseDependencyOrder
                 .SelectMany(x => x.AssetConfig.GetAssetInfo(id))
                 .FirstOrDefault(x =>
                 {
                     var assetLanguage = x.Get<string>(AssetProperty.Language, null);
-                    return assetLanguage == null || string.Equals(assetLanguage, language, StringComparison.OrdinalIgnoreCase);
+                    return language == null || 
+                           assetLanguage == null || 
+                           string.Equals(assetLanguage, language, StringComparison.OrdinalIgnoreCase);
                 });
-        }
 
         public object LoadAsset(AssetId id)
         {
@@ -281,11 +280,14 @@ namespace UAlbion.Game.Assets
 
         public void SaveAssets(
             Func<AssetId, string, (object, AssetInfo)> loaderFunc,
+            Action flushCacheFunc,
             PaletteHints paletteHints,
             ISet<AssetId> ids,
             ISet<AssetType> assetTypes)
         {
             if (loaderFunc == null) throw new ArgumentNullException(nameof(loaderFunc));
+            if (flushCacheFunc == null) throw new ArgumentNullException(nameof(flushCacheFunc));
+
             var config = Resolve<IGeneralConfig>();
             if (config == null)
                 throw new ComponentNotFoundException(nameof(IGeneralConfig));
@@ -300,6 +302,9 @@ namespace UAlbion.Game.Assets
             {
                 var container = containerRegistry.GetContainer(file.Container);
                 var firstAsset = file.Map[file.Map.Keys.Min()];
+                if (assetTypes != null && !assetTypes.Contains(firstAsset.AssetId.Type))
+                    return new List<(int, int)> { (firstAsset.SubAssetId, 1) };
+
                 var assets = target.Mapping.EnumerateAssetsOfType(firstAsset.AssetId.Type).ToList();
                 var idsInRange =
                     assets
@@ -321,6 +326,7 @@ namespace UAlbion.Game.Assets
             foreach (var file in target.AssetConfig.Files.Values)
             {
                 Raise(new LogEvent(LogEvent.Level.Info, $"Saving {file.Filename}..."));
+                flushCacheFunc();
                 var path = config.ResolvePath(file.Filename);
                 var loader = loaderRegistry.GetLoader(file.Loader);
                 var container = containerRegistry.GetContainer(file.Container);

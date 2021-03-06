@@ -52,6 +52,9 @@ namespace UAlbion.Formats.Containers
         public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (!disk.FileExists(path))
+                return new List<(int, int)>();
+
             using var s = new AlbionReader(new BinaryReader(disk.OpenRead(path)));
             var lengths = HeaderSerdes(null, s);
             return new List<(int, int)> { (0, lengths.Length) };

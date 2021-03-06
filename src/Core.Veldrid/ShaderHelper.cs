@@ -20,6 +20,8 @@ namespace UAlbion.Core.Veldrid
         {
             if (gd == null) throw new ArgumentNullException(nameof(gd));
             if (factory == null) throw new ArgumentNullException(nameof(factory));
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+
             byte[] vsBytes = LoadBytecode(GraphicsBackend.Vulkan, setName, ShaderStages.Vertex, disk);
             byte[] fsBytes = LoadBytecode(GraphicsBackend.Vulkan, setName, ShaderStages.Fragment, disk);
 
@@ -64,6 +66,7 @@ namespace UAlbion.Core.Veldrid
 
         public static byte[] LoadBytecode(GraphicsBackend backend, string setName, ShaderStages stage, IFileSystem disk)
         {
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
             string stageExt = stage == ShaderStages.Vertex ? "vert" : "frag";
             string name = setName + "." + stageExt;
 

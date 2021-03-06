@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using UAlbion.Api;
 
-namespace UAlbion.Formats.Containers
+namespace UAlbion.TestCommon
 {
     public class MockFileSystem : IFileSystem
     {
         static readonly char[] SeparatorChars = { '\\', '/' };
-        readonly DirNode _root = new DirNode("");
+        readonly DirNode _root = new DirNode(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "" : "/");
         readonly bool _fallbackToFileSystem;
 
         public MockFileSystem(bool fallbackToFileSystem) => _fallbackToFileSystem = fallbackToFileSystem;
@@ -49,7 +50,7 @@ namespace UAlbion.Formats.Containers
             if (path.Length > 260) throw new PathTooLongException();
 
             INode node = _root;
-            foreach (var part in path.Split(SeparatorChars))
+            foreach (var part in path.Split(SeparatorChars, StringSplitOptions.RemoveEmptyEntries))
             {
                 if (!(node is DirNode dir)) return null;
                 if (dir.TryGetValue(part, out node)) continue;
@@ -75,7 +76,7 @@ namespace UAlbion.Formats.Containers
 
             if (node == null && _fallbackToFileSystem && File.Exists(path))
             {
-                var newFile = new FileNode($"{dir.Path}\\{filename}");
+                var newFile = new FileNode(Path.Combine(dir.Path, filename));
                 using var s = File.OpenRead(path);
                 s.CopyTo(newFile.Stream);
                 dir[filename] = newFile;
@@ -91,7 +92,7 @@ namespace UAlbion.Formats.Containers
             if (path.Length > 260) throw new PathTooLongException();
 
             INode node = _root;
-            foreach (var part in path.Split(SeparatorChars))
+            foreach (var part in path.Split(SeparatorChars, StringSplitOptions.RemoveEmptyEntries))
             {
                 switch (node)
                 {
@@ -100,7 +101,7 @@ namespace UAlbion.Formats.Containers
                     case DirNode dir:
                     {
                         if (!dir.TryGetValue(part, out node))
-                            dir[part] = new DirNode(FormattableString.Invariant($"dir.Path\\part"));
+                            dir[part] = new DirNode(Path.Combine(dir.Path, part));
                         break;
                     }
                 }

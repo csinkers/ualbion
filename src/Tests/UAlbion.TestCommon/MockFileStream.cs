@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace UAlbion.Formats.Containers
+namespace UAlbion.TestCommon
 {
     public class MockFileStream : Stream
     {

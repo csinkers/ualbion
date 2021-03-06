@@ -5,6 +5,7 @@ using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Containers;
+using UAlbion.TestCommon;
 using Xunit;
 
 namespace UAlbion.Formats.Tests

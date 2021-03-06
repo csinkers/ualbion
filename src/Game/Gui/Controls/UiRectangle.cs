@@ -76,7 +76,7 @@ namespace UAlbion.Game.Gui.Controls
                 Vector2.Zero,
                 Vector2.One,
                 Vector2.One,
-                commonColors.Palette[_color]);
+                (int)commonColors.Palette[_color]);
 
             instances[0] = SpriteInstanceData.TopLeft(
                 position,

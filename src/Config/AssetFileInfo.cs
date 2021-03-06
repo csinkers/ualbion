@@ -13,6 +13,7 @@ namespace UAlbion.Config
 
         public string Container { get; set; }
         public string Loader { get; set; }
+        public string Post { get; set; }
         public IDictionary<int, AssetInfo> Map { get; } = new Dictionary<int, AssetInfo>();
         [JsonExtensionData] public IDictionary<string, JToken> Properties { get; set; }
 

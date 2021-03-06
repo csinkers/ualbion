@@ -19,13 +19,13 @@ namespace UAlbion.Core.Textures
     [AttributeUsage(AttributeTargets.Field)]
     public class PixelFormatBytesAttribute : Attribute
     {
-        public uint Bytes { get; }
-        public PixelFormatBytesAttribute(uint bytes) => Bytes = bytes;
+        public int Bytes { get; }
+        public PixelFormatBytesAttribute(int bytes) => Bytes = bytes;
     }
 
     public static class PixelFormatExtensions
     {
-        public static uint Size(this PixelFormat format)
+        public static int Size(this PixelFormat format)
         {
             var enumType = typeof(PixelFormat);
             var memberInfos = enumType.GetMember(format.ToString());

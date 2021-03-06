@@ -17,8 +17,8 @@ namespace UAlbion.TestCommon
         public ITexture CreateEightBitTexture(
             ITextureId id,
             string name, 
-            uint width, uint height,
-            uint mipLevels, uint arrayLayers,
+            int width, int height,
+            int mipLevels, int arrayLayers,
             byte[] pixels, IEnumerable<SubImage> subImages) =>
             new MockTexture(id, name, width, height, mipLevels, arrayLayers, pixels, subImages);
 

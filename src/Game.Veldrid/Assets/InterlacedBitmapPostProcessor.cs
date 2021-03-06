@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid.Textures;
@@ -10,13 +9,15 @@ namespace UAlbion.Game.Veldrid.Assets
 {
     public class InterlacedBitmapPostProcessor : IAssetPostProcessor
     {
-        public IEnumerable<Type> SupportedTypes => new[] { typeof(InterlacedBitmap) };
-        public object Process(ICoreFactory factory, AssetId key, object asset)
+        public object Process(object asset, AssetInfo info, ICoreFactory factory)
         {
             if (asset == null) throw new ArgumentNullException(nameof(asset));
+            if (info == null) throw new ArgumentNullException(nameof(info));
+
             var bitmap = (InterlacedBitmap)asset;
-            return new TrueColorTexture(key,
-                key.ToString(), (uint)bitmap.Width, (uint)bitmap.Height,
+            return new TrueColorTexture(
+                info.AssetId, info.AssetId.ToString(),
+                bitmap.Width, bitmap.Height,
                 bitmap.Palette, bitmap.ImageData);
         }
     }

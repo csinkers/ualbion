@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using SerdesNet;
-using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
 
@@ -16,14 +14,6 @@ namespace UAlbion.Game.Assets
         {
             lock (_syncRoot)
                 return _loaders.TryGetValue(loaderName, out var loader) ? loader : Instantiate(loaderName);
-        }
-
-        public IAssetLoader<T> GetLoader<T>(string loaderName) where T : class => (IAssetLoader<T>)GetLoader(loaderName);
-
-        public object Load(AssetInfo config, AssetMapping mapping, ISerializer s)
-        {
-            if (config == null) throw new ArgumentNullException(nameof(config));
-            return GetLoader(config.File.Loader).Serdes(null, config, mapping, s);
         }
 
         IAssetLoader Instantiate(string loaderName)

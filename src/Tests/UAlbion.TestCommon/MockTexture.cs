@@ -9,7 +9,7 @@ namespace UAlbion.TestCommon
         public MockTexture(
             ITextureId id,
             string name, 
-            uint width, uint height,
+            int width, int height,
             byte[] pixels, IEnumerable<SubImage> subImages) 
             : base(id, name, width, height, 0, 1, pixels, subImages)
         {
@@ -18,8 +18,8 @@ namespace UAlbion.TestCommon
         public MockTexture(
             ITextureId id,
             string name, 
-            uint width, uint height,
-            uint mipLevels, uint arrayLayers,
+            int width, int height,
+            int mipLevels, int arrayLayers,
             byte[] pixels, IEnumerable<SubImage> subImages)
             : base(id, name, width, height, mipLevels, arrayLayers, pixels, subImages)
         {

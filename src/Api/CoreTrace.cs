@@ -99,7 +99,7 @@ namespace UAlbion.Api
                 WriteEventCore(11, 5, data);
             }
         } // => WriteEvent(11, eventId, nesting, type ?? "", details ?? "", exchangeName ?? "", subscriberCount);
-        public void CreatedDeviceTexture(string name, uint width, uint height, uint layers) => WriteEvent(12, name ?? "", width, height, layers);
+        public void CreatedDeviceTexture(string name, int width, int height, int layers) => WriteEvent(12, name ?? "", width, height, layers);
         public void StartupEvent(string name) => WriteEvent(13, name ?? "");
         public void AssertFailed(string message) => WriteEvent(14, message ?? "");
     }

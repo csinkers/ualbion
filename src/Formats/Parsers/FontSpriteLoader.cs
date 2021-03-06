@@ -1,30 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class FontSpriteLoader : IAssetLoader<AlbionSprite>
+    public class FontSpriteLoader : IAssetLoader<IEightBitImage>
     {
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((AlbionSprite)existing, config, mapping, s);
+            => Serdes((IEightBitImage)existing, config, mapping, s);
 
-        public AlbionSprite Serdes(AlbionSprite existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
-            AlbionSprite uniformFrames = null;
+            if (config == null) throw new ArgumentNullException(nameof(config));
+            if (s == null) throw new ArgumentNullException(nameof(s));
+
+            AlbionSprite2 uniformFrames = null;
             if (s.IsWriting())
             {
                 if (existing == null) throw new ArgumentNullException(nameof(existing));
-                uniformFrames = new AlbionSprite(
-                    existing.Id,
-                    existing.Width,
-                    existing.Height,
+                var frames = new AlbionSpriteFrame[existing.SubImageCount];
+                for (int i = 0; i < frames.Length; i++)
+                {
+                    var frame = existing.GetSubImage(i);
+                    frames[i] = new AlbionSpriteFrame(frame.X, frame.Y, config.Width, config.Height, existing.Width);
+                }
+
+                uniformFrames = new AlbionSprite2(
+                    AssetId.FromUInt32(existing.Id.ToUInt32()),
+                    existing.Width, existing.Height,
                     true,
-                    existing.PixelData,
-                    existing.Frames.Select(x => new AlbionSpriteFrame(x.X, x.Y, config.Width, config.Height)).ToList());
+                    existing.PixelData.ToArray(), frames);
             }
 
             var font = new FixedSizeSpriteLoader().Serdes(uniformFrames, config, mapping, s);
@@ -32,27 +40,33 @@ namespace UAlbion.Formats.Parsers
                 return null;
 
             if (s.IsWriting())
-                return existing;
-
-            var frames = new List<AlbionSpriteFrame>();
-
-            // Fix up sub-images for variable size
-            foreach (var oldFrame in font.Frames)
             {
-                int width = 0;
-                for (int j = oldFrame.Y; j < oldFrame.Y + oldFrame.Height; j++)
+                return existing;
+            }
+            else
+            {
+                var frames = new List<AlbionSpriteFrame>();
+
+                // Fix up sub-images for variable size
+                for (int n = 0; n < font.SubImageCount; n++)
                 {
-                    for (int i = oldFrame.X; i < oldFrame.X + oldFrame.Width; i++)
+                    var frame = font.GetSubImage(n);
+                    int width = 0;
+                    for (int j = frame.Y; j < frame.Y + frame.Height; j++)
                     {
-                        if (i - oldFrame.X > width && font.PixelData[j * font.Width + i] != 0)
-                            width = i - oldFrame.X;
+                        for (int i = frame.X; i < frame.X + frame.Width; i++)
+                        {
+                            if (i - frame.X > width && font.PixelData[j * font.Width + i] != 0)
+                                width = i - frame.X;
+                        }
                     }
+
+                    frames.Add(new AlbionSpriteFrame(frame.X, frame.Y, width + 2, frame.Height, font.Width));
                 }
 
-                frames.Add(new AlbionSpriteFrame(oldFrame.X, oldFrame.Y, width + 2, oldFrame.Height));
+                var assetId = AssetId.FromUInt32(font.Id.ToUInt32());
+                return new AlbionSprite2(assetId, font.Width, font.Height, false, font.PixelData.ToArray(), frames);
             }
-
-            return new AlbionSprite(font.Id, font.Width, font.Height, false, font.PixelData, frames);
         }
     }
 }

@@ -12,6 +12,7 @@ namespace UAlbion.Config
         public IDictionary<string, string> StringMappings { get; } = new Dictionary<string, string>();
         public IDictionary<string, string> Loaders { get; } = new Dictionary<string, string>();
         public IDictionary<string, string> Containers { get; } = new Dictionary<string, string>();
+        public IDictionary<string, string> PostProcessors { get; } = new Dictionary<string, string>();
         public IDictionary<string, LanguageConfig> Languages { get; } = new Dictionary<string, LanguageConfig>();
         public IDictionary<string, AssetFileInfo> Files { get; } = new Dictionary<string, AssetFileInfo>();
         Dictionary<AssetId, AssetInfo[]> _assetLookup;
@@ -64,11 +65,10 @@ namespace UAlbion.Config
                 if (index != -1)
                     kvp.Value.Sha256Hash = kvp.Key.Substring(index + 1);
 
-                if (kvp.Value.Loader != null && Loaders.TryGetValue(kvp.Value.Loader, out var typeName))
-                    kvp.Value.Loader = typeName;
-
-                if (kvp.Value.Container != null && Containers.TryGetValue(kvp.Value.Container, out typeName))
-                    kvp.Value.Container = typeName;
+                // Resolve type aliases
+                if (kvp.Value.Loader != null && Loaders.TryGetValue(kvp.Value.Loader, out var typeName)) kvp.Value.Loader = typeName;
+                if (kvp.Value.Container != null && Containers.TryGetValue(kvp.Value.Container, out typeName)) kvp.Value.Container = typeName;
+                if (kvp.Value.Post != null && PostProcessors.TryGetValue(kvp.Value.Post, out typeName)) kvp.Value.Post = typeName;
 
                 foreach (var asset in kvp.Value.Map)
                 {

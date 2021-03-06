@@ -100,7 +100,7 @@ namespace UAlbion.Game.Gui.Controls
             var flags = SpriteFlags.None.SetOpacity(colors.Alpha);
 
             SubImage BuildSubImage(uint layer) =>
-                new SubImage(Vector2.Zero, Vector2.One, Vector2.One, layer);
+                new SubImage(Vector2.Zero, Vector2.One, Vector2.One, (int)layer);
 
             int curInstance = 0;
             if (topLeft.HasValue)
@@ -110,11 +110,13 @@ namespace UAlbion.Game.Gui.Controls
                     window.UiToNormRelative(extents.Width - 1, 1),
                     BuildSubImage(topLeft.Value),
                     flags);
+
                 instances[curInstance + 1] = SpriteInstanceData.TopLeft( // Left
                     position + new Vector3(window.UiToNormRelative(0, 1), 0),
                     window.UiToNormRelative(1, extents.Height - 2),
                     BuildSubImage(topLeft.Value),
                     flags);
+
                 curInstance += 2;
             }
 

@@ -17,18 +17,27 @@ namespace UAlbion.Core.Veldrid.Textures
         {
             if (gd == null) throw new ArgumentNullException(nameof(gd));
             if (rf == null) throw new ArgumentNullException(nameof(rf));
-            using Texture staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format.ToVeldrid(), TextureUsage.Staging, Type));
+            using Texture staging = rf.CreateTexture(new TextureDescription(
+                (uint)Width,
+                (uint)Height,
+                (uint)Depth,
+                (uint)MipLevels,
+                (uint)ArrayLayers,
+                Format.ToVeldrid(),
+                TextureUsage.Staging,
+                Type));
+
             staging.Name = "T_" + Name + "_Staging";
 
             ulong offset = 0;
-            fixed (byte* texDataPtr = &TextureData[0])
+            fixed (byte* texDataPtr = &PixelData[0])
             {
                 for (uint level = 0; level < MipLevels; level++)
                 {
-                    uint mipWidth = GetDimension(Width, level);
-                    uint mipHeight = GetDimension(Height, level);
-                    uint mipDepth = GetDimension(Depth, level);
-                    uint subresourceSize = mipWidth * mipHeight * mipDepth * FormatSize;
+                    uint mipWidth = GetDimension((uint)Width, level);
+                    uint mipHeight = GetDimension((uint)Height, level);
+                    uint mipDepth = GetDimension((uint)Depth, level);
+                    uint subresourceSize = (uint)(mipWidth * mipHeight * mipDepth * FormatSize);
 
                     for (uint layer = 0; layer < ArrayLayers; layer++)
                     {
@@ -41,7 +50,16 @@ namespace UAlbion.Core.Veldrid.Textures
                 }
             }
 
-            Texture texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format.ToVeldrid(), usage, Type));
+            Texture texture = rf.CreateTexture(new TextureDescription(
+                (uint)Width,
+                (uint)Height,
+                (uint)Depth,
+                (uint)MipLevels,
+                (uint)ArrayLayers,
+                Format.ToVeldrid(),
+                usage,
+                Type));
+
             texture.Name = "T_" + Name;
 
             using (CommandList cl = rf.CreateCommandList())
@@ -57,7 +75,7 @@ namespace UAlbion.Core.Veldrid.Textures
         }
 
         public VeldridEightBitTexture(ITextureId id, string name,
-            uint width, uint height, uint mipLevels, uint arrayLayers,
+            int width, int height, int mipLevels, int arrayLayers,
             byte[] textureData, IEnumerable<SubImage> subImages)
             : base(id, name, width, height, mipLevels, arrayLayers, textureData, subImages)
         {
@@ -68,16 +86,16 @@ namespace UAlbion.Core.Veldrid.Textures
             return ImageUtil.PackSpriteSheet(palette, SubImages.Count, frame =>
             {
                 GetSubImageOffset(frame, out var siw, out var sih, out var offset, out var stride);
-                ReadOnlySpan<byte> fromSlice = TextureData.Slice(offset, siw + (sih - 1) * stride);
-                return new ReadOnlyByteImageBuffer((uint)siw, (uint)sih, (uint)stride, fromSlice);
+                ReadOnlySpan<byte> fromSlice = PixelData.Slice(offset, siw + (sih - 1) * stride);
+                return new ReadOnlyByteImageBuffer(siw, sih, stride, fromSlice);
             });
         }
 
         public Image<Rgba32> ToImage(int subImage, uint[] palette)
         {
             GetSubImageOffset(subImage, out var width, out var height, out var offset, out var stride);
-            var fromSlice = TextureData.Slice(offset, width + (height - 1) * stride);
-            var from = new ReadOnlyByteImageBuffer((uint)width, (uint)height, (uint)stride, fromSlice);
+            var fromSlice = PixelData.Slice(offset, width + (height - 1) * stride);
+            var from = new ReadOnlyByteImageBuffer(width, height, stride, fromSlice);
             return ImageUtil.BuildImageForFrame(from, palette);
         }
     }

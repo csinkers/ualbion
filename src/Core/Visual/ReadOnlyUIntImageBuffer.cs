@@ -5,7 +5,7 @@ namespace UAlbion.Core.Visual
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Won't be compared")]
     public readonly ref struct ReadOnlyUIntImageBuffer
     {
-        public ReadOnlyUIntImageBuffer(uint width, uint height, int stride, ReadOnlySpan<uint> buffer)
+        public ReadOnlyUIntImageBuffer(int width, int height, int stride, ReadOnlySpan<uint> buffer)
         {
             Width = width;
             Height = height;
@@ -21,8 +21,8 @@ namespace UAlbion.Core.Visual
             Buffer = buffer;
         }
 
-        public uint Width { get; }
-        public uint Height { get; }
+        public int Width { get; }
+        public int Height { get; }
         public int Stride { get; }
         public ReadOnlySpan<uint> Buffer { get; }
     }

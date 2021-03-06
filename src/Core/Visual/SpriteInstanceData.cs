@@ -49,7 +49,7 @@ namespace UAlbion.Core.Visual
 
             TexPosition = subImage.TexOffset;
             TexSize = subImage.TexSize;
-            TexLayer = subImage.Layer;
+            TexLayer = (uint)subImage.Layer;
             Flags = flags;
         }
 
@@ -103,44 +103,44 @@ namespace UAlbion.Core.Visual
         public static SpriteInstanceData CopyFlags(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags)
         {
             if (lease == null) throw new ArgumentNullException(nameof(lease));
-            var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
+            var subImage = (SubImage)lease.Key.Texture.GetSubImage(subImageId);
             return CopyFlags(position, size, subImage, flags);
         }
 
         public static SpriteInstanceData TopLeft(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags)
         {
             if (lease == null) throw new ArgumentNullException(nameof(lease));
-            var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
+            var subImage = (SubImage)lease.Key.Texture.GetSubImage(subImageId);
             return TopLeft(position, size, subImage, flags);
         }
         public static SpriteInstanceData MidLeft(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags)
         {
             if (lease == null) throw new ArgumentNullException(nameof(lease));
-            var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
+            var subImage = (SubImage)lease.Key.Texture.GetSubImage(subImageId);
             return MidLeft(position, size, subImage, flags);
         }
         public static SpriteInstanceData BottomLeft(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags)
         {
             if (lease == null) throw new ArgumentNullException(nameof(lease));
-            var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
+            var subImage = (SubImage)lease.Key.Texture.GetSubImage(subImageId);
             return BottomLeft(position, size, subImage, flags);
         }
         public static SpriteInstanceData TopMid(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags)
         {
             if (lease == null) throw new ArgumentNullException(nameof(lease));
-            var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
+            var subImage = (SubImage)lease.Key.Texture.GetSubImage(subImageId);
             return TopMid(position, size, subImage, flags);
         }
         public static SpriteInstanceData Centred(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags)
         {
             if (lease == null) throw new ArgumentNullException(nameof(lease));
-            var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
+            var subImage = (SubImage)lease.Key.Texture.GetSubImage(subImageId);
             return Centred(position, size, subImage, flags);
         }
         public static SpriteInstanceData BottomMid(Vector3 position, Vector2 size, SpriteLease lease, int subImageId, SpriteFlags flags)
         {
             if (lease == null) throw new ArgumentNullException(nameof(lease));
-            var subImage = lease.Key.Texture.GetSubImageDetails(subImageId);
+            var subImage = (SubImage)lease.Key.Texture.GetSubImage(subImageId);
             return BottomMid(position, size, subImage, flags);
         }
     }

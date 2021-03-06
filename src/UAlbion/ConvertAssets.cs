@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Core.Veldrid;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Settings;
@@ -21,9 +22,11 @@ namespace UAlbion
                 .Attach(new StdioConsoleLogger())
                 .Attach(new AssetLoaderRegistry())
                 .Attach(new ContainerRegistry())
+                .Attach(new PostProcessorRegistry())
                 .Attach(new AssetLocator())
                 .Attach(new SettingsManager(new GeneralSettings())) // Used for event comments
                 .Attach(applier)
+                .Register<ICoreFactory>(new VeldridCoreFactory())
                 ;
             applier.LoadMods(config, new[] { mod });
             return (applier, exchange);
@@ -42,7 +45,10 @@ namespace UAlbion
             using (fromExchange)
             using (toExchange)
             {
-                toExchange.Attach(new AssetManager(from));
+                // Give the "from" universe's asset manager "to" the to exchange so we can import the assets.
+                toExchange.Attach(new AssetManager(from)); 
+                fromExchange.Attach(new AssetManager(from)); // From also needs an asset manager for the inventory post-processor etc
+
                 var parsedIds = ids?.Select(AssetId.Parse).ToHashSet();
                 var paletteHints = PaletteHints.Load(Path.Combine(baseDir, "mods", "Base", "palette_hints.json"));
                 var cache = new Dictionary<(AssetId, string), object>();

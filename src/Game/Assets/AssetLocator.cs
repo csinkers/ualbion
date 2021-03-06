@@ -66,7 +66,7 @@ namespace UAlbion.Game.Assets
                     return Directory.Exists(path) 
                         ? _containerRegistry.GetContainer(typeof(DirectoryContainer)) 
                         : null;
-            };
+            }
         }
 
         ISerializer Search(IGeneralConfig generalConfig, AssetInfo info, IDictionary<string, string> extraPaths)

@@ -77,7 +77,7 @@ namespace UAlbion.Game.Entities.Map2D
 
             int index = _logicalMap.Index(i, j);
             int subImageId = tile.GetSubImageForTile(tickCount);
-            var subImage = _tileset.GetSubImageDetails(subImageId);
+            var subImage = (SubImage)_tileset.GetSubImage(subImageId);
 
             var position = new Vector3(
                 new Vector2(i, j) * subImage.Size,

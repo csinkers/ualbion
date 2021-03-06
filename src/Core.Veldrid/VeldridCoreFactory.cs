@@ -21,8 +21,8 @@ namespace UAlbion.Core.Veldrid
         public ISceneGraph CreateSceneGraph()
             => new SceneGraph();
 
-        public ITexture CreateEightBitTexture(ITextureId id, string name, uint width, uint height, uint mipLevels,
-            uint arrayLayers, byte[] pixels, IEnumerable<SubImage> subImages)
+        public ITexture CreateEightBitTexture(ITextureId id, string name, int width, int height, int mipLevels,
+            int arrayLayers, byte[] pixels, IEnumerable<SubImage> subImages)
             => new VeldridEightBitTexture(id, name, width, height, mipLevels,
                 arrayLayers, pixels, subImages);
     }

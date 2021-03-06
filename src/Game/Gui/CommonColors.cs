@@ -25,10 +25,10 @@ namespace UAlbion.Game.Gui
             BorderTexture = factory.CreateEightBitTexture(
                 AssetId.None,
                 "CommonColors",
-                1, 1, 1, (uint)Palette.Count,
+                1, 1, 1, Palette.Count,
                 Palette.OrderBy(x => x.Value).Select(x => (byte)x.Key).ToArray(),
                 Palette.OrderBy(x => x.Value)
-                    .Select(x => new SubImage(Vector2.Zero, Vector2.One, Vector2.One, x.Value))
+                    .Select(x => new SubImage(Vector2.Zero, Vector2.One, Vector2.One, (int)x.Value))
                     .ToArray());
         }
     }

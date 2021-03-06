@@ -135,6 +135,13 @@
     "binaryoffsets": "UAlbion.Formats.Containers.BinaryOffsetContainer, UAlbion.Formats"
   },
 
+  "PostProcessors": {
+    "gfx": "UAlbion.Game.Assets.AlbionSpritePostProcessor, UAlbion.Game",
+    "tile": "UAlbion.Game.Assets.TilePostProcessor, UAlbion.Game",
+    "inv": "UAlbion.Game.Assets.InventoryPostProcessor, UAlbion.Game",
+    "ilbm": "UAlbion.Game.Veldrid.Assets.InterlacedBitmapPostProcessor, UAlbion.Game.Veldrid"
+  },
+
   "Languages": { // Just used for the options screen
     "ENGLISH": { "DisplayName": "English",  "ShortName": "EN" },
     "GERMAN":  { "DisplayName": "Deutsch",  "ShortName": "DE" },
@@ -183,7 +190,7 @@
     },
 
     // Monster info
-    "$(XLD)/MONCHAR0.XLD": { "Loader": "sheet",  "Map": { "0": { "Id": "monster.1" } } },
+    "$(XLD)/MONCHAR0.XLD": { "Post": "inv", "Loader": "sheet",  "Map": { "0": { "Id": "monster.1" } } },
     "$(XLD)/MONGRP0.XLD":  { "Loader": "mongrp", "Map": { "0": { "Id": "mongrp.1" } } },
     "$(XLD)/MONGRP1.XLD":  { "Loader": "mongrp", "Map": { "0": { "Id": "mongrp.100" } } },
     "$(XLD)/MONGRP2.XLD":  { "Loader": "mongrp", "Map": { "0": { "Id": "mongrp.200" } } },
@@ -215,6 +222,7 @@
 
     // Fonts
     "$(XLD)/FONTS0.XLD": {
+      "Post": "tile",
       "Loader": "font",
       "Width": 8,
       "Height": 8,
@@ -354,40 +362,41 @@
     "$(XLD)/INITIAL/AUTOMAP1.XLD": { "Loader": "automap",  "Map": { "0": { "Id": "automap.100" } } },
     "$(XLD)/INITIAL/AUTOMAP2.XLD": { "Loader": "automap",  "Map": { "0": { "Id": "automap.200" } } },
     "$(XLD)/INITIAL/AUTOMAP3.XLD": { "Loader": "automap",  "Map": { "0": { "Id": "automap.300" } } },
-    "$(XLD)/INITIAL/CHESTDT0.XLD": { "Loader": "chest",    "Map": { "0": { "Id": "chest.1" } } },
-    "$(XLD)/INITIAL/CHESTDT1.XLD": { "Loader": "chest",    "Map": { "0": { "Id": "chest.100" } } },
-    "$(XLD)/INITIAL/CHESTDT2.XLD": { "Loader": "chest",    "Map": { "0": { "Id": "chest.200" } } },
-    "$(XLD)/INITIAL/CHESTDT5.XLD": { "Loader": "chest",    "Map": { "0": { "Id": "chest.500" } } },
-    "$(XLD)/INITIAL/MERCHDT0.XLD": { "Loader": "merchant", "Map": { "0": { "Id": "merchant.1" } } },
-    "$(XLD)/INITIAL/MERCHDT1.XLD": { "Loader": "merchant", "Map": { "0": { "Id": "merchant.100" } } },
-    "$(XLD)/INITIAL/MERCHDT2.XLD": { "Loader": "merchant", "Map": { "0": { "Id": "merchant.200" } } },
+    "$(XLD)/INITIAL/CHESTDT0.XLD": { "Post": "inv", "Loader": "chest",    "Map": { "0": { "Id": "chest.1" } } },
+    "$(XLD)/INITIAL/CHESTDT1.XLD": { "Post": "inv", "Loader": "chest",    "Map": { "0": { "Id": "chest.100" } } },
+    "$(XLD)/INITIAL/CHESTDT2.XLD": { "Post": "inv", "Loader": "chest",    "Map": { "0": { "Id": "chest.200" } } },
+    "$(XLD)/INITIAL/CHESTDT5.XLD": { "Post": "inv", "Loader": "chest",    "Map": { "0": { "Id": "chest.500" } } },
+    "$(XLD)/INITIAL/MERCHDT0.XLD": { "Post": "inv", "Loader": "merchant", "Map": { "0": { "Id": "merchant.1" } } },
+    "$(XLD)/INITIAL/MERCHDT1.XLD": { "Post": "inv", "Loader": "merchant", "Map": { "0": { "Id": "merchant.100" } } },
+    "$(XLD)/INITIAL/MERCHDT2.XLD": { "Post": "inv", "Loader": "merchant", "Map": { "0": { "Id": "merchant.200" } } },
     "$(XLD)/INITIAL/NPCCHAR0.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "npc.1" } } },
     "$(XLD)/INITIAL/NPCCHAR1.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "npc.100" } } },
     "$(XLD)/INITIAL/NPCCHAR2.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "npc.200" } } },
-    "$(XLD)/INITIAL/PRTCHAR0.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "party.1" } } },
-    "$(XLD)/INITIAL/PRTCHAR1.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "party.100" } } },
-    "$(XLD)/INITIAL/PRTCHAR2.XLD": { "Loader": "sheet",    "Map": { "0": { "Id": "party.200" } } },
+    "$(XLD)/INITIAL/PRTCHAR0.XLD": { "Post": "inv", "Loader": "sheet",    "Map": { "0": { "Id": "party.1" } } },
+    "$(XLD)/INITIAL/PRTCHAR1.XLD": { "Post": "inv", "Loader": "sheet",    "Map": { "0": { "Id": "party.100" } } },
+    "$(XLD)/INITIAL/PRTCHAR2.XLD": { "Post": "inv", "Loader": "sheet",    "Map": { "0": { "Id": "party.200" } } },
 
     // Graphics
-    "$(XLD)/3DFLOOR0.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "Map": { "0": { "Id": "floor.1" } } },
-    "$(XLD)/3DFLOOR1.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "Map": { "0": { "Id": "floor.100" } } },
-    "$(XLD)/3DFLOOR2.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "Map": { "0": { "Id": "floor.200" } } },
-    "$(XLD)/COMBACK0.XLD": { "Loader": "fixedsize", "Width": 360,              "Map": { "0": { "Id": "combg.1" } } },
-    "$(XLD)/ICONGFX0.XLD": { "Loader": "fixedsize", "Width": 16, "Height": 16, "Map": { "0": { "Id": "tilegfx.1" } } },
-    "$(XLD)/SMLPORT0.XLD": { "Loader": "fixedsize", "Width": 34, "Map": { "0": { "Id": "portrait.1" } } },
-    "$(XLD)/SMLPORT1.XLD": { "Loader": "fixedsize", "Width": 34, "Map": { "0": { "Id": "portrait.100" } } },
-    "$(XLD)/TACTICO0.XLD": { "Loader": "fixedsize", "Width": 32, "Map": { "0": { "Id": "tacgfx.1" } } },
-    "$(XLD)/COMGFX0.XLD":  { "Loader": "multiheader", "Map": { "0": { "Id": "comgfx.1"} } },
-    "$(XLD)/MONGFX0.XLD":  { "Loader": "multiheader", "Map": { "0": { "Id": "mongfx.1" } } },
-    "$(XLD)/3DBCKGR0.XLD": { "Loader": "header", "Map": { "0": { "Id": "3dbg.1" } } },
-    "$(XLD)/FBODPIX0.XLD": { "Loader": "header", "Map": { "0": { "Id": "fullbody.1" } } },
-    "$(XLD)/NPCGR0.XLD":   { "Loader": "header", "Map": { "0": { "Id": "lnpc.1" } } },
-    "$(XLD)/NPCGR1.XLD":   { "Loader": "header", "Map": { "0": { "Id": "lnpc.100" } } },
-    "$(XLD)/NPCKL0.XLD":   { "Loader": "header", "Map": { "0": { "Id": "snpc.1" } } },
-    "$(XLD)/PARTGR0.XLD":  { "Loader": "header", "Map": { "0": { "Id": "lparty.1" } } },
-    "$(XLD)/PARTKL0.XLD":  { "Loader": "header", "Map": { "0": { "Id": "sparty.1" } } },
-    "$(XLD)/PICTURE0.XLD": { "Loader": "interlaced", "Map": { "0": { "Id": "pic.1" } } },
+    "$(XLD)/3DFLOOR0.XLD": { "Post": "gfx", "Loader": "fixedsize", "Width": 64, "Height": 64, "Map": { "0": { "Id": "floor.1" } } },
+    "$(XLD)/3DFLOOR1.XLD": { "Post": "gfx", "Loader": "fixedsize", "Width": 64, "Height": 64, "Map": { "0": { "Id": "floor.100" } } },
+    "$(XLD)/3DFLOOR2.XLD": { "Post": "gfx", "Loader": "fixedsize", "Width": 64, "Height": 64, "Map": { "0": { "Id": "floor.200" } } },
+    "$(XLD)/COMBACK0.XLD": { "Post": "gfx", "Loader": "fixedsize", "Width": 360,              "Map": { "0": { "Id": "combg.1" } } },
+    "$(XLD)/ICONGFX0.XLD": { "Post": "tile", "Loader": "fixedsize", "Width": 16, "Height": 16, "Map": { "0": { "Id": "tilegfx.1" } } },
+    "$(XLD)/SMLPORT0.XLD": { "Post": "gfx", "Loader": "fixedsize", "Width": 34, "Map": { "0": { "Id": "portrait.1" } } },
+    "$(XLD)/SMLPORT1.XLD": { "Post": "gfx", "Loader": "fixedsize", "Width": 34, "Map": { "0": { "Id": "portrait.100" } } },
+    "$(XLD)/TACTICO0.XLD": { "Post": "gfx", "Loader": "fixedsize", "Width": 32, "Map": { "0": { "Id": "tacgfx.1" } } },
+    "$(XLD)/COMGFX0.XLD":  { "Post": "gfx", "Loader": "multiheader", "Map": { "0": { "Id": "comgfx.1"} } },
+    "$(XLD)/MONGFX0.XLD":  { "Post": "gfx", "Loader": "multiheader", "Map": { "0": { "Id": "mongfx.1" } } },
+    "$(XLD)/3DBCKGR0.XLD": { "Post": "gfx", "Loader": "header", "Map": { "0": { "Id": "3dbg.1" } } },
+    "$(XLD)/FBODPIX0.XLD": { "Post": "gfx", "Loader": "header", "Map": { "0": { "Id": "fullbody.1" } } },
+    "$(XLD)/NPCGR0.XLD":   { "Post": "gfx", "Loader": "header", "Map": { "0": { "Id": "lnpc.1" } } },
+    "$(XLD)/NPCGR1.XLD":   { "Post": "gfx", "Loader": "header", "Map": { "0": { "Id": "lnpc.100" } } },
+    "$(XLD)/NPCKL0.XLD":   { "Post": "gfx", "Loader": "header", "Map": { "0": { "Id": "snpc.1" } } },
+    "$(XLD)/PARTGR0.XLD":  { "Post": "gfx", "Loader": "header", "Map": { "0": { "Id": "lparty.1" } } },
+    "$(XLD)/PARTKL0.XLD":  { "Post": "gfx", "Loader": "header", "Map": { "0": { "Id": "sparty.1" } } },
+    "$(XLD)/PICTURE0.XLD": { "Post": "ilbm", "Loader": "interlaced", "Map": { "0": { "Id": "pic.1" } } },
     "$(XLD)/ITEMGFX":      {
+      "Post": "gfx",
       "Loader": "fixedsize",
       "Container": "raw",
       "Width": 16,
@@ -395,6 +404,7 @@
       "Map": { "0": { "Id": "itemgfx.1" } }
     },
     "$(XLD)/AUTOGFX0.XLD": {
+      "Post": "tile",
       "Loader": "amorphous",
       "Map": {
         "0": { "Id": "autotile.1", "SubSprites": "(8,8,576) (16,16)" },
@@ -402,6 +412,7 @@
       }
     },
     "$(XLD)/SLAB": {
+      "Post": "gfx",
       "Loader": "slab",
       "Container": "raw",
       "Width": 360,
@@ -410,6 +421,7 @@
 
     // Graphics with explicit dimensions
     "$(XLD)/3DOBJEC0.XLD": {
+      "Post": "gfx",
       "Loader": "fixedsize",
       "Map": {
         "0": { "Id": "3dobj.1", "Width": 32 },
@@ -514,6 +526,7 @@
       }
     },
     "$(XLD)/3DOBJEC1.XLD": {
+      "Post": "gfx",
       "Loader": "fixedsize",
       "Map": {
         "0": { "Id": "3dobj.100", "Width": 24, "Height": 70 },
@@ -619,6 +632,7 @@
       }
     },
     "$(XLD)/3DOBJEC2.XLD": {
+      "Post": "gfx",
       "Loader": "fixedsize",
       "Map": {
         "0": { "Id": "3dobj.200", "Width": 57 },
@@ -724,6 +738,7 @@
       }
     },
     "$(XLD)/3DOBJEC3.XLD": {
+      "Post": "gfx",
       "Loader": "fixedsize",
       "Map": {
         "0": { "Id": "3dobj.300", "Width": 56, "Height": 125 },
@@ -757,6 +772,7 @@
     },
 
     "$(XLD)/3DOVERL0.XLD": {
+      "Post": "gfx",
       "Transposed": true,
       "Loader": "fixedsize",
       "Map": {
@@ -862,6 +878,7 @@
       }
     },
     "$(XLD)/3DOVERL1.XLD": {
+      "Post": "gfx",
       "Transposed": true,
       "Loader": "fixedsize",
       "Map": {
@@ -968,6 +985,7 @@
       }
     },
     "$(XLD)/3DOVERL2.XLD": {
+      "Post": "gfx",
       "Transposed": true,
       "Loader": "fixedsize",
       "Map": {
@@ -1016,6 +1034,7 @@
     },
 
     "$(XLD)/3DWALLS0.XLD": {
+      "Post": "gfx",
       "Transposed": true,
       "Loader": "fixedsize",
       "Map": {
@@ -1121,6 +1140,7 @@
       }
     },
     "$(XLD)/3DWALLS1.XLD": {
+      "Post": "gfx",
       "Transposed": true,
       "Loader": "fixedsize",
       "Map": {
@@ -1166,6 +1186,7 @@
     },
 
     "$(ALBION)/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710": { // EN+DE
+      "Post": "gfx",
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
       "Map": {
@@ -1262,6 +1283,7 @@
     },
 
     "$(ALBION)/MAIN.EXE#487da3348c367363f3efcbb22ae45c186f1fbecada73f0bf0ce2ca8377a8de14": { // FR
+      "Post": "gfx",
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
       "Map": {

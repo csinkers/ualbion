@@ -6,14 +6,14 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class FixedSizeSpriteLoader : IAssetLoader<AlbionSprite>
+    public class FixedSizeSpriteLoader : IAssetLoader<IEightBitImage>
     {
         public const string TypeString = "UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats";
 
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((AlbionSprite) existing, config, mapping, s);
+            => Serdes((IEightBitImage) existing, config, mapping, s);
 
-        public AlbionSprite Serdes(AlbionSprite existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -21,7 +21,7 @@ namespace UAlbion.Formats.Parsers
             // TODO: Assert uniform frames when writing
 
             var streamLength = s.IsWriting() && existing != null 
-                ? existing.Width * existing.Height * existing.Frames.Count 
+                ? existing.Width * existing.Height * existing.SubImageCount
                 : s.BytesRemaining;
 
             if (streamLength == 0)
@@ -39,14 +39,14 @@ namespace UAlbion.Formats.Parsers
             int spriteCount = Math.Max(1, unchecked((int)(streamLength / (width * height))));
             height = (int)streamLength / (width * spriteCount);
 
-            byte[] pixelData = existing?.PixelData;
+            byte[] pixelData = existing?.PixelData.ToArray();
             if (existing != null && config.Get(AssetProperty.Transposed, false))
             {
                 pixelData = new byte[existing.PixelData.Length];
                 for (int n = 0; n < spriteCount; n++)
                 {
                     ApiUtil.TransposeImage(width, height,
-                        new ReadOnlySpan<byte>(existing.PixelData, n * width * height, width * height),
+                        existing.PixelData.Slice(n * width * height, width * height),
                         new Span<byte>(pixelData, n * width * height, width * height));
                 }
             }
@@ -57,9 +57,9 @@ namespace UAlbion.Formats.Parsers
 
             var frames = new AlbionSpriteFrame[spriteCount];
             for (int n = 0; n < spriteCount; n++)
-                frames[n] ??= new AlbionSpriteFrame(0, height * n, width, height);
+                frames[n] ??= new AlbionSpriteFrame(0, height * n, width, height, width);
 
-            var sprite = new AlbionSprite(config.AssetId, width, height * spriteCount, true, pixelData, frames);
+            var sprite = new AlbionSprite2(config.AssetId, width, height * spriteCount, true, pixelData, frames);
             if (!config.Get(AssetProperty.Transposed, false))
                 return sprite;
 
@@ -68,14 +68,14 @@ namespace UAlbion.Formats.Parsers
             frames = new AlbionSpriteFrame[spriteCount];
             for (int n = 0; n < spriteCount; n++)
             {
-                frames[n] = new AlbionSpriteFrame(0, rotatedFrameHeight * n, height, rotatedFrameHeight);
+                frames[n] = new AlbionSpriteFrame(0, rotatedFrameHeight * n, height, rotatedFrameHeight, height);
 
                 ApiUtil.TransposeImage(width, height,
                     new ReadOnlySpan<byte>(sprite.PixelData, n * width * height, width * height),
                     new Span<byte>(pixelData, n * width * height, width * height));
             }
 
-            return new AlbionSprite(config.AssetId, height, width * spriteCount, true, pixelData, frames);
+            return new AlbionSprite2(config.AssetId, height, width * spriteCount, true, pixelData, frames);
         }
     }
 }

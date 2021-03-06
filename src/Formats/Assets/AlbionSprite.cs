@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UAlbion.Api;
 using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets
 {
-    public class AlbionSprite
+    public class AlbionSprite2 : IEightBitImage
     {
-        public AlbionSprite(AssetId id, int width, int height, bool uniformFrames, byte[] pixelData, IEnumerable<AlbionSpriteFrame> frames)
+        public AlbionSprite2(AssetId id, int width, int height, bool uniformFrames, byte[] pixelData, IEnumerable<AlbionSpriteFrame> frames)
         {
-            Id = id;
+            AssetId = id;
             Width = width;
             Height = height;
             UniformFrames = uniformFrames;
@@ -17,12 +18,19 @@ namespace UAlbion.Formats.Assets
             Frames = frames.ToArray();
         }
 
-        public AssetId Id { get; }
+        public ITextureId Id => AssetId;
+        public string Name => AssetId.ToString();
+        public AssetId AssetId { get; }
         public int Width { get; }
         public int Height { get; }
+        public int SubImageCount => Frames.Count;
+        public int SizeInBytes => PixelData.Length;
+        public ISubImage GetSubImage(int subImage) => subImage < Frames.Count ? Frames[subImage] : null;
+
         public bool UniformFrames { get; }
         public IReadOnlyList<AlbionSpriteFrame> Frames { get; }
         public byte[] PixelData { get; }
+        ReadOnlySpan<byte> IEightBitImage.PixelData => PixelData;
 
         public override string ToString() => $"AlbionSprite {Id} {Width}x{Height} ({Frames.Count} frames)";
 

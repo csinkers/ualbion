@@ -15,15 +15,15 @@ namespace UAlbion.Core.Veldrid.Textures
         public string Name { get; }
         public PixelFormat Format => PixelFormat.Rgba32;
         public TextureType Type => TextureType.Texture2D;
-        public uint Width => _texture.Width;
-        public uint Height => _texture.Height;
-        public uint Depth => 1;
-        public uint MipLevels => 1;
-        public uint ArrayLayers => 1;
+        public int Width => (int)_texture.Width;
+        public int Height => (int)_texture.Height;
+        public int Depth => 1;
+        public int MipLevels => 1;
+        public int ArrayLayers => 1;
         public int SubImageCount => 1;
         public bool IsDirty { get; private set; }
         public int SizeInBytes => (int)(_texture.Width * _texture.Height * _texture.PixelSizeInBytes);
-        public uint FormatSize => _texture.PixelSizeInBytes;
+        public int FormatSize => (int)_texture.PixelSizeInBytes;
         readonly ImageSharpTexture _texture;
         readonly SubImage _subImage;
 
@@ -42,7 +42,7 @@ namespace UAlbion.Core.Veldrid.Textures
                 0);
         }
 
-        public SubImage GetSubImageDetails(int subImageId) => _subImage;
+        public ISubImage GetSubImage(int subImageId) => _subImage;
         public void Invalidate() => IsDirty = true;
 
         public Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)

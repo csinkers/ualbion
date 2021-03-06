@@ -14,10 +14,10 @@ namespace UAlbion.Core.Textures
         protected class SubImageComponent
         {
             public ITexture Source { get; set; }
-            public uint X { get; set; }
-            public uint Y { get; set; }
-            public uint? W { get; set; }
-            public uint? H { get; set; }
+            public int X { get; set; }
+            public int Y { get; set; }
+            public int? W { get; set; }
+            public int? H { get; set; }
             public byte Alpha { get; set; } = 0xff;
             public override string ToString() => $"({X}, {Y}) {Source}";
         }
@@ -27,8 +27,8 @@ namespace UAlbion.Core.Textures
             public LogicalSubImage(int id) { Id = id; }
 
             public int Id { get; }
-            public uint W { get; set; }
-            public uint H { get; set; }
+            public int W { get; set; }
+            public int H { get; set; }
             public int Frames { get; set; }
             public bool IsPaletteAnimated { get; set; }
             public bool IsAlphaTested { get; set; }
@@ -65,21 +65,21 @@ namespace UAlbion.Core.Textures
             Id = id;
             Name = name;
             PaletteManager = paletteManager;
-            MipLevels = 1; //(uint)Math.Min(Math.Log(Width, 2.0), Math.Log(Height, 2.0));
+            MipLevels = 1; //(int)Math.Min(Math.Log(Width, 2.0), Math.Log(Height, 2.0));
 
             // Add empty texture for disabled walls/ceilings etc
             LogicalSubImages.Add(new LogicalSubImage(0) { W = 1, H = 1, Frames = 1, IsPaletteAnimated = false });
         }
 
         public PixelFormat Format => PixelFormat.Rgba32;
-        public abstract uint FormatSize { get; }
+        public abstract int FormatSize { get; }
         public ITextureId Id { get; }
         public string Name { get; }
-        public uint Width { get; private set; }
-        public uint Height { get; private set; }
-        public uint Depth => 1;
-        public uint MipLevels { get; }
-        public uint ArrayLayers { get { if (IsMetadataDirty) RebuildLayers(); return (uint)LayerSizes.Count; } }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+        public int Depth => 1;
+        public int MipLevels { get; }
+        public int ArrayLayers { get { if (IsMetadataDirty) RebuildLayers(); return LayerSizes.Count; } }
         public int SubImageCount => LayerSizes.Count;
 
         public bool IsDirty
@@ -87,7 +87,7 @@ namespace UAlbion.Core.Textures
             get
             {
                 var version = PaletteManager.Version;
-                if ((_isAnySubImagePaletteAnimated && version != _lastPaletteVersion) || PaletteManager.Palette.Id != _lastPaletteId)
+                if (_isAnySubImagePaletteAnimated && version != _lastPaletteVersion || PaletteManager.Palette.Id != _lastPaletteId)
                 {
                     _lastPaletteVersion = version;
                     _lastPaletteId = PaletteManager.Palette.Id;
@@ -99,7 +99,8 @@ namespace UAlbion.Core.Textures
             protected set => _isDirty = value;
         }
 
-        public int SizeInBytes => (int)(Width * Height * LayerSizes.Count * FormatSize);
+        public int SizeInBytes => Width * Height * LayerSizes.Count * FormatSize;
+
         public void Invalidate() => IsDirty = true; 
 
         public bool IsAnimated(int logicalId)
@@ -127,17 +128,17 @@ namespace UAlbion.Core.Textures
             return 0;
         }
 
-        public SubImage GetSubImageDetails(int subImageId)
+        public ISubImage GetSubImage(int subImage)
         {
-            if(IsMetadataDirty)
+            if (IsMetadataDirty)
                 RebuildLayers();
 
-            var size = LayerSizes[subImageId];
+            var size = LayerSizes[subImage];
             return new SubImage(
                 Vector2.Zero,
                 size,
                 new Vector2(Width, Height),
-                (uint)subImageId);
+                subImage);
         }
 
         protected void RebuildLayers()
@@ -165,14 +166,14 @@ namespace UAlbion.Core.Textures
                 {
                     if (component.Source == null)
                         continue;
-                    var size = component.Source.GetSubImageDetails(0).Size;
+                    var size = ((SubImage)component.Source.GetSubImage(0)).Size;
                     if (component.W.HasValue) size.X = component.W.Value;
                     if (component.H.HasValue) size.Y = component.H.Value;
 
                     if (lsi.W < component.X + size.X)
-                        lsi.W = component.X + (uint)size.X;
+                        lsi.W = component.X + (int)size.X;
                     if (lsi.H < component.Y + size.Y)
-                        lsi.H = component.Y + (uint)size.Y;
+                        lsi.H = component.Y + (int)size.Y;
 
                     if (!lsi.IsPaletteAnimated && component.Source is EightBitTexture t)
                         lsi.IsPaletteAnimated = t.ContainsColors(animatedRange);
@@ -198,7 +199,7 @@ namespace UAlbion.Core.Textures
                 throw new InvalidOperationException("Too many textures added to multi-texture");
         }
 
-        public void AddTexture(int logicalId, ITexture texture, uint x, uint y, byte? transparentColor, bool isAlphaTested, uint? w = null, uint? h = null, byte alpha = 255)
+        public void AddTexture(int logicalId, ITexture texture, int x, int y, byte? transparentColor, bool isAlphaTested, int? w = null, int? h = null, byte alpha = 255)
         {
             if (logicalId == 0)
                 throw new InvalidOperationException("Logical Subimage Index 0 is reserved for a blank / transparent state");
@@ -227,10 +228,10 @@ namespace UAlbion.Core.Textures
         }
 
         /* TODO: Add mip-mapping
-        static uint GetDimension(uint largestLevelDimension, uint mipLevel)
+        static int GetDimension(int largestLevelDimension, int mipLevel)
         {
-            uint ret = largestLevelDimension;
-            for (uint i = 0; i < mipLevel; i++)
+            int ret = largestLevelDimension;
+            for (int i = 0; i < mipLevel; i++)
                 ret /= 2;
 
             return Math.Max(1, ret);
@@ -249,8 +250,8 @@ namespace UAlbion.Core.Textures
                 var eightBitTexture = (EightBitTexture)component.Source;
                 int frame = frameNumber % eightBitTexture.SubImageCount;
                 eightBitTexture.GetSubImageOffset(frame, out var sourceWidth, out var sourceHeight, out var sourceOffset, out var sourceStride);
-                uint destWidth = component.W ?? (uint)sourceWidth;
-                uint destHeight = component.H ?? (uint)sourceHeight;
+                int destWidth = component.W ?? sourceWidth;
+                int destHeight = component.H ?? sourceHeight;
 
                 if (component.X + destWidth > Width || component.Y + destHeight > Height)
                 {
@@ -260,16 +261,16 @@ namespace UAlbion.Core.Textures
                     continue;
                 }
 
-                ReadOnlySpan<byte> fromSlice = eightBitTexture.TextureData.Slice(
+                ReadOnlySpan<byte> fromSlice = eightBitTexture.PixelData.Slice(
                     sourceOffset,
                     sourceWidth + (sourceHeight - 1) * sourceStride);
 
                 Span<uint> toSlice = toBuffer.Slice(
-                    (int)(component.Y * Width + component.X),
-                    (int)(destWidth + (destHeight - 1) * Width));
+                    component.Y * Width + component.X,
+                    destWidth + (destHeight - 1) * Width);
 
-                var from = new ReadOnlyByteImageBuffer((uint)sourceWidth, (uint)sourceHeight, (uint)sourceStride, fromSlice);
-                var to = new UIntImageBuffer(destWidth, destHeight, (int)Width, toSlice);
+                var from = new ReadOnlyByteImageBuffer(sourceWidth, sourceHeight, sourceStride, fromSlice);
+                var to = new UIntImageBuffer(destWidth, destHeight, Width, toSlice);
                 CoreUtil.Blit8To32(from, to, palette[PaletteManager.Frame], component.Alpha, lsi.TransparentColor);
             }
         }

@@ -73,7 +73,7 @@ namespace UAlbion.Formats
             return (b1, b2, b3);
         }
 
-        public static byte[] ToPacked(int[] underlay, int[] overlay)
+        public static byte[] ToPacked(int[] underlay, int[] overlay, int adjust = 0)
         {
             if (underlay == null) throw new ArgumentNullException(nameof(underlay));
             if (overlay == null) throw new ArgumentNullException(nameof(overlay));
@@ -91,11 +91,11 @@ namespace UAlbion.Formats
                     buf[i * 3],
                     buf[i * 3 + 1],
                     buf[i * 3 + 2]
-                ) = ToPacked((ushort)underlay[i], (ushort)overlay[i]);
+                ) = ToPacked((ushort)(underlay[i] + adjust), (ushort)(overlay[i] + adjust));
             return buf;
         }
 
-        public static (int[], int[]) FromPacked(byte[] buf)
+        public static (int[], int[]) FromPacked(byte[] buf, int adjust = 0)
         {
             if (buf == null) return (null, null);
             if (buf.Length % 3 != 0)
@@ -115,6 +115,9 @@ namespace UAlbion.Formats
                     buf[i * 3],
                     buf[i * 3 + 1],
                     buf[i * 3 + 2]);
+
+                underlay[i] += adjust;
+                overlay[i] += adjust;
             }
 
             return (underlay, overlay);
@@ -127,7 +130,7 @@ namespace UAlbion.Formats
 
 
         const string HexChars = "0123456789ABCDEF";
-        public static string BytesToHexString(byte[] bytes)
+        public static string BytesToHexString(ReadOnlySpan<byte> bytes)
         {
             if (bytes == null) return "";
             var result = new StringBuilder(bytes.Length * 2);
@@ -243,6 +246,7 @@ namespace UAlbion.Formats
             using var ms = new MemoryStream();
             using var tw = new StreamWriter(ms);
             func(tw);
+            tw.Flush();
             ms.Position = 0;
             return ms.ToArray();
         }

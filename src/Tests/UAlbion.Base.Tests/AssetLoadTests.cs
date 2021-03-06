@@ -93,10 +93,10 @@ namespace UAlbion.Base.Tests
         {
             var tileset = Test(assets => assets.LoadTexture(AutomapTiles.Set1));
             Assert.Equal(632, tileset.SubImageCount);
-            Assert.Equal(8, (int)tileset.GetSubImageDetails(0).Size.X);
-            Assert.Equal(8, (int)tileset.GetSubImageDetails(0).Size.Y);
-            Assert.Equal(16, (int)tileset.GetSubImageDetails(576).Size.X);
-            Assert.Equal(16, (int)tileset.GetSubImageDetails(576).Size.Y);
+            Assert.Equal(8, tileset.GetSubImage(0).Width);
+            Assert.Equal(8, tileset.GetSubImage(0).Height);
+            Assert.Equal(16, tileset.GetSubImage(576).Width);
+            Assert.Equal(16, tileset.GetSubImage(576).Height);
         }
 
         [Fact]
@@ -135,8 +135,8 @@ namespace UAlbion.Base.Tests
         {
             var bg = Test(assets => assets.LoadTexture(CombatBackground.Toronto));
             Assert.Equal(1, bg.SubImageCount);
-            Assert.Equal((uint)360, bg.Width);
-            Assert.Equal((uint)192, bg.Height);
+            Assert.Equal(360, bg.Width);
+            Assert.Equal(192, bg.Height);
         }
 
 
@@ -158,8 +158,8 @@ namespace UAlbion.Base.Tests
         {
             var cursor = Test(assets => assets.LoadTexture(CoreSprite.Cursor));
             Assert.Equal(1, cursor.SubImageCount);
-            Assert.Equal(14u, cursor.Width);
-            Assert.Equal(14u, cursor.Height);
+            Assert.Equal(14, cursor.Width);
+            Assert.Equal(14, cursor.Height);
         }
 
         [Fact]
@@ -375,11 +375,11 @@ namespace UAlbion.Base.Tests
             Assert.Equal(Palette.Toronto2D, map.PaletteId);
             Assert.Equal(FlatMapFlags.Unk2 | FlatMapFlags.Unk3 | FlatMapFlags.Unk4, map.Flags);
             Assert.Equal(map.Width * map.Height, map.Underlay.Length);
-            Assert.Equal(872, map.Underlay[0]);
-            Assert.Equal(350, map.Underlay[75]);
+            Assert.Equal(871, map.Underlay[0]);
+            Assert.Equal(349, map.Underlay[75]);
             Assert.Equal(map.Width * map.Height, map.Overlay.Length);
-            Assert.Equal(1, map.Overlay[0]);
-            Assert.Equal(2496, map.Overlay[719]);
+            Assert.Equal(0, map.Overlay[0]);
+            Assert.Equal(2495, map.Overlay[719]);
 
             Assert.Equal(657, map.Events.Count);
             var en = map.Events[0];
@@ -765,7 +765,7 @@ namespace UAlbion.Base.Tests
             var ts = Test(assets => assets.LoadTileData(Tileset.Toronto));
             Assert.Equal(Tileset.Toronto, ts.Id);
             Assert.False(ts.UseSmallGraphics);
-            Assert.Equal(4098, ts.Tiles.Count);
+            Assert.Equal(4097, ts.Tiles.Count);
 
             var t = ts.Tiles[0];
             Assert.Equal(TileLayer.Normal, t.Layer);
@@ -776,7 +776,7 @@ namespace UAlbion.Base.Tests
             Assert.Equal(1, t.FrameCount);
             Assert.Equal(0, t.Unk7);
 
-            t = ts.Tiles[453];
+            t = ts.Tiles[452];
             Assert.Equal(TileLayer.Layer1, t.Layer);
             Assert.Equal(TileType.Underlay2, t.Type);
             Assert.Equal(Passability.Blocked, t.Collision);

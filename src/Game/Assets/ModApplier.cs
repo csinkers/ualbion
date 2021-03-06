@@ -17,7 +17,6 @@ namespace UAlbion.Game.Assets
 {
     public class ModApplier : Component, IModApplier
     {
-        readonly IDictionary<Type, IAssetPostProcessor> _postProcessors = new Dictionary<Type, IAssetPostProcessor>();
         readonly Dictionary<string, ModInfo> _mods = new Dictionary<string, ModInfo>();
         readonly List<ModInfo> _modsInReverseDependencyOrder = new List<ModInfo>();
         readonly AssetCache _assetCache = new AssetCache();
@@ -40,22 +39,6 @@ namespace UAlbion.Game.Assets
         }
 
         public IReadOnlyDictionary<string, LanguageConfig> Languages { get; }
-
-        public IModApplier AddAssetPostProcessor(IAssetPostProcessor postProcessor)
-        {
-            if (postProcessor == null) throw new ArgumentNullException(nameof(postProcessor));
-            foreach (var type in postProcessor.SupportedTypes)
-            {
-                if(_postProcessors.ContainsKey(type))
-                    throw new InvalidOperationException($"A post-processor is already defined for {type}");
-                _postProcessors[type] = postProcessor;
-            }
-
-            if (postProcessor is IComponent component)
-                AttachChild(component);
-
-            return this;
-        }
 
         protected override void Subscribed()
         {
@@ -248,13 +231,26 @@ namespace UAlbion.Game.Assets
                     extraPaths ??= new Dictionary<string, string>();
                     extraPaths["MOD"] = mod.AssetPath;
                     var modAsset = _assetLocator.LoadAsset(id, mod.Mapping, info, extraPaths);
+
                     if (modAsset is IPatch patch)
                     {
                         patches ??= new Stack<IPatch>();
                         patches.Push(patch);
                     }
+                    else if (modAsset is Exception)
+                    {
+                        asset ??= modAsset;
+                    }
                     else if (modAsset != null)
                     {
+                        if (!string.IsNullOrEmpty(info.File.Post))
+                        {
+                            var registry = Resolve<IAssetPostProcessorRegistry>();
+                            var postProcessor = registry.GetPostProcessor(info.File.Post);
+                            if (postProcessor != null)
+                                modAsset = postProcessor.Process(modAsset, info, Resolve<ICoreFactory>());
+                        }
+
                         asset = modAsset;
                         break;
                     }
@@ -266,9 +262,6 @@ namespace UAlbion.Game.Assets
 
             while (patches != null && patches.Count > 0)
                 asset = patches.Pop().Apply(asset);
-
-            if (_postProcessors.TryGetValue(asset.GetType(), out var processor))
-                asset = processor.Process(Resolve<ICoreFactory>(), id, asset);
 
             return asset;
         }
@@ -325,7 +318,7 @@ namespace UAlbion.Game.Assets
             Resolve<IGeneralConfig>().SetPath("MOD", target.AssetPath);
             foreach (var file in target.AssetConfig.Files.Values)
             {
-                Raise(new LogEvent(LogEvent.Level.Info, $"Saving {file.Filename}..."));
+                bool notify = true;
                 flushCacheFunc();
                 var path = config.ResolvePath(file.Filename);
                 var loader = loaderRegistry.GetLoader(file.Loader);
@@ -340,6 +333,12 @@ namespace UAlbion.Game.Assets
                     var (asset, sourceInfo) = loaderFunc(assetInfo.AssetId, language);
                     if (asset == null) continue;
 
+                    if (notify)
+                    {
+                        Raise(new LogEvent(LogEvent.Level.Info, $"Saving {file.Filename}..."));
+                        notify = false;
+                    }
+
                     var paletteId = paletteHints.Get(sourceInfo.File.Filename, sourceInfo.SubAssetId);
                     if (paletteId != 0)
                         assetInfo.Set(AssetProperty.PaletteId, paletteId);
@@ -353,7 +352,8 @@ namespace UAlbion.Game.Assets
                     assets.Add((assetInfo, ms.ToArray()));
                 }
 
-                container.Write(path, assets);
+                if (assets.Count > 0)
+                    container.Write(path, assets);
             }
         }
     }

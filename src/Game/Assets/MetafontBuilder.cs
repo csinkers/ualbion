@@ -27,7 +27,7 @@ namespace UAlbion.Game.Assets
             if (texture == null)
                 throw new InvalidOperationException($"MetafontBuilder: Could not load font {textureId}");
 
-            var bytes = texture.TextureData.ToArray();
+            var bytes = texture.PixelData.ToArray();
             if (!Mappings.TryGetValue(id.Color, out var mapping))
                 mapping = Mappings[FontColor.White];
 

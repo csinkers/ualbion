@@ -34,7 +34,8 @@ namespace UAlbion.Core.Visual
         public MultiTexture Walls { get; }
 
         public void DefineFloor(int id, ITexture texture) => Floors.AddTexture(id, texture, 0, 0, null, false);
-        public void DefineWall(int id, ITexture texture, uint x, uint y, byte transparentColour, bool isAlphaTested) => Walls.AddTexture(id, texture, x, y, transparentColour, isAlphaTested);
+        public void DefineWall(int id, ITexture texture, int x, int y, byte transparentColour, bool isAlphaTested) 
+            => Walls.AddTexture(id, texture, x, y, transparentColour, isAlphaTested);
 
         public void Set(int index, int x, int y, byte floorSubImage, byte ceilingSubImage, byte wallSubImage, int frame)
         {
@@ -51,7 +52,7 @@ namespace UAlbion.Core.Visual
                     tile->Ceiling = (byte)Floors.GetSubImageAtTime(ceilingSubImage, frame);
                     tile->Wall = (byte)Walls.GetSubImageAtTime(wallSubImage, frame);
                     tile->Flags = 0; // DungeonTileFlags.UsePalette;
-                    var subImage = Walls.GetSubImageDetails(tile->Wall);
+                    var subImage = (SubImage)Walls.GetSubImage(tile->Wall);
                     tile->WallSize = subImage.TexSize;
                 }
             }

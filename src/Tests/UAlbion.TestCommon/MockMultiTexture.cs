@@ -11,7 +11,7 @@ namespace UAlbion.TestCommon
         {
         }
 
-        public override uint FormatSize => 1;
+        public override int FormatSize => 1;
 
         public override void SavePng(int logicalId, int tick, string path)
         {

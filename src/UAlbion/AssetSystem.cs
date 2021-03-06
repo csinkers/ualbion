@@ -9,7 +9,6 @@ using UAlbion.Formats.Config;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Settings;
 using UAlbion.Game.Text;
-using UAlbion.Game.Veldrid.Assets;
 using UAlbion.Game.Veldrid.Debugging;
 
 namespace UAlbion
@@ -39,18 +38,14 @@ namespace UAlbion
             var assets = new AssetManager();
             var factory = new VeldridCoreFactory();
             var loaderRegistry = new AssetLoaderRegistry();
-            var containerLoaderRegistry = new ContainerRegistry();
-            var modApplier = new ModApplier()
-                // Register post-processors for handling transformations of asset data that can't be done by UAlbion.Formats alone.
-                .AddAssetPostProcessor(new AlbionSpritePostProcessor())
-                .AddAssetPostProcessor(new ImageSharpPostProcessor())
-                .AddAssetPostProcessor(new InterlacedBitmapPostProcessor())
-                .AddAssetPostProcessor(new InventoryPostProcessor());
+            var containerRegistry = new ContainerRegistry();
+            var postProcessorRegistry = new PostProcessorRegistry();
+            var modApplier = new ModApplier();
 
             var settings = await settingsTask.ConfigureAwait(false);
             var settingsManager = new SettingsManager(settings);
             var services = new Container("Services", settingsManager, // Need to register settings first, as the AssetLocator relies on it.
-                loaderRegistry, containerLoaderRegistry, new MetafontBuilder(factory), new StdioConsoleLogger(),
+                loaderRegistry, containerRegistry, postProcessorRegistry, new MetafontBuilder(factory), new StdioConsoleLogger(),
                 // new ClipboardManager(),
                 new ImGuiConsoleLogger(), new WordLookup(), new AssetLocator(), modApplier, assets);
 

@@ -39,7 +39,7 @@ namespace UAlbion.Core
 
             return persp;
         }
-        
+
         public static Matrix4x4 CreateLegacyPerspective(
             bool isClipSpaceYInverted,
             bool useReverseDepth,
@@ -114,8 +114,8 @@ namespace UAlbion.Core
             if (factory == null) throw new ArgumentNullException(nameof(factory));
             if (texture == null) throw new ArgumentNullException(nameof(texture));
             var rotatedPixels = new byte[texture.Width * texture.Height];
-            ApiUtil.TransposeImage((int)texture.Width, (int)texture.Height,
-               texture.TextureData,
+            ApiUtil.TransposeImage(texture.Width, texture.Height,
+               texture.PixelData,
                new Span<byte>(rotatedPixels));
 
             return factory.CreateEightBitTexture(
@@ -134,7 +134,7 @@ namespace UAlbion.Core
 
         public static uint UpdateFlag(uint flags, FlagOperation operation, uint flag)
         {
-            switch(operation)
+            switch (operation)
             {
                 case FlagOperation.Set: return flags | flag;
                 case FlagOperation.Clear: return flags & ~flag;
@@ -145,7 +145,7 @@ namespace UAlbion.Core
 
         public static float UpdateValue(float value, ValueOperation operation, float argument)
         {
-            switch(operation)
+            switch (operation)
             {
                 case ValueOperation.Set: return argument;
                 case ValueOperation.Add: return value + argument;
@@ -173,8 +173,8 @@ namespace UAlbion.Core
                     toOffset++;
                 }
 
-                fromOffset += (int)(fromBuffer.Stride - fromBuffer.Width);
-                toOffset += (int)(toBuffer.Stride - toBuffer.Width);
+                fromOffset += fromBuffer.Stride - fromBuffer.Width;
+                toOffset += toBuffer.Stride - toBuffer.Width;
             }
         }
 
@@ -189,29 +189,29 @@ namespace UAlbion.Core
             {
                 for (int i = 0; i < fromBuffer.Width; i++)
                 {
-                    to[toOffset] = palette[from[fromOffset]] & 0x00ffffff | ((uint) componentAlpha << 24);
+                    to[toOffset] = palette[from[fromOffset]] & 0x00ffffff | ((uint)componentAlpha << 24);
                     fromOffset++;
                     toOffset++;
                 }
 
-                fromOffset += (int)(fromBuffer.Stride - fromBuffer.Width);
-                toOffset += (int)(toBuffer.Stride - toBuffer.Width);
+                fromOffset += fromBuffer.Stride - fromBuffer.Width;
+                toOffset += toBuffer.Stride - toBuffer.Width;
             }
         }
 
         public static void Blit8To32(ReadOnlyByteImageBuffer from, UIntImageBuffer to, uint[] palette, byte componentAlpha, byte? transparentColor)
         {
             if (palette == null) throw new ArgumentNullException(nameof(palette));
-            uint remainingWidth = to.Width;
-            uint remainingHeight = to.Height;
+            int remainingWidth = to.Width;
+            int remainingHeight = to.Height;
             Span<uint> dest = to.Buffer;
 
-            uint chunkHeight = Math.Min(from.Height, to.Height);
+            int chunkHeight = Math.Min(from.Height, to.Height);
             do
             {
                 Span<uint> rowStart = dest;
                 chunkHeight = Math.Min(chunkHeight, remainingHeight);
-                uint chunkWidth = Math.Min(from.Width, to.Width);
+                int chunkWidth = Math.Min(from.Width, to.Width);
                 do
                 {
                     chunkWidth = Math.Min(chunkWidth, remainingWidth);
@@ -223,14 +223,14 @@ namespace UAlbion.Core
                     else
                         Blit8To32Opaque(newFrom, newTo, palette, componentAlpha);
 
-                    dest = dest.Slice((int)chunkWidth);
+                    dest = dest.Slice(chunkWidth);
                     remainingWidth -= chunkWidth;
                 } while (remainingWidth > 0);
 
                 remainingHeight -= chunkHeight;
                 remainingWidth = to.Width;
                 if (remainingHeight > 0)
-                    dest = rowStart.Slice((int)(chunkHeight * to.Stride));
+                    dest = rowStart.Slice(chunkHeight * to.Stride);
             } while (remainingHeight > 0);
         }
 
@@ -244,13 +244,13 @@ namespace UAlbion.Core
             int best = int.MaxValue;
             for (byte i = 0; i < palette.Length; i++)
             {
-                var (r2,g2,b2, a2) = ApiUtil.UnpackColor(palette[i]);
-                int dr = r-r2;
-                int dg = g-g2;
-                int db = b-b2;
-                int da = a-a2;
+                var (r2, g2, b2, a2) = ApiUtil.UnpackColor(palette[i]);
+                int dr = r - r2;
+                int dg = g - g2;
+                int db = b - b2;
+                int da = a - a2;
                 int dist2 = dr * dr + dg * dg + db * db + da * da;
-                if(dist2 < best)
+                if (dist2 < best)
                 {
                     best = dist2;
                     result = i;
@@ -284,8 +284,8 @@ namespace UAlbion.Core
                     toOffset++;
                 }
 
-                fromOffset += (int)(fromBuffer.Stride - fromBuffer.Width);
-                toOffset += (int)(toBuffer.Stride - toBuffer.Width);
+                fromOffset += fromBuffer.Stride - fromBuffer.Width;
+                toOffset += toBuffer.Stride - toBuffer.Width;
             }
         }
 
@@ -295,19 +295,19 @@ namespace UAlbion.Core
             bool[] active = new bool[256];
             while (c < buffer.Buffer.Length)
             {
-                int end = (int)(c + buffer.Width);
-                while(c < end)
+                int end = c + buffer.Width;
+                while (c < end)
                 {
                     active[buffer.Buffer[c]] = true;
                     c++;
                 }
 
-                c += (int)(buffer.Stride - buffer.Width);
+                c += buffer.Stride - buffer.Width;
             }
 
             var results = new List<byte>();
-            for(int i = 0; i < 256; i++)
-                if(active[i])
+            for (int i = 0; i < 256; i++)
+                if (active[i])
                     results.Add((byte)i);
             return results;
         }
@@ -317,13 +317,13 @@ namespace UAlbion.Core
         public static void LogError(string msg) => Engine.GlobalExchange?.Raise(new LogEvent(LogEvent.Level.Error, msg), null);
         public static void LogCritical(string msg) => Engine.GlobalExchange?.Raise(new LogEvent(LogEvent.Level.Critical, msg), null);
         public static bool IsCriticalException(Exception e) => e switch
-            {
-                OutOfMemoryException _ => true,
-                ThreadAbortException _ => true,
-                IndexOutOfRangeException _ => true,
-                AccessViolationException _ => true,
-                NullReferenceException _ => true,
-                _ => false
-            };
+        {
+            OutOfMemoryException _ => true,
+            ThreadAbortException _ => true,
+            IndexOutOfRangeException _ => true,
+            AccessViolationException _ => true,
+            NullReferenceException _ => true,
+            _ => false
+        };
     }
 }

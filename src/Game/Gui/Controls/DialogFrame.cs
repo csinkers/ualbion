@@ -57,31 +57,31 @@ namespace UAlbion.Game.Gui.Controls
             var assets = Resolve<IAssetManager>();
             var multi = factory.CreateMultiTexture(AssetId.None, $"DialogFrame {width}x{height}", new DummyPaletteManager(assets.LoadPalette(Id(Base.Palette.Inventory))));
 
-            void DrawLine(uint y)
+            void DrawLine(int y)
             {
-                uint x = TileSize;
-                uint n = 0;
+                int x = TileSize;
+                int n = 0;
                 while(x < width - TileSize)
                 {
                     var sprite = (Base.CoreSprite)((int)Base.CoreSprite.UiBackgroundLines1 + n % 4); // TODO: Better solution
                     var texture = assets.LoadTexture(Id(sprite));
-                    uint? w = x + 2*TileSize > width ? (uint)(width - TileSize - x) : (uint?)null;
+                    int? w = x + 2*TileSize > width ? width - TileSize - x : (int?)null;
                     multi.AddTexture(1, texture, x, y, 0, true, w);
                     n++;
                     x += TileSize;
                 }
             }
 
-            void DrawVerticalLine(uint x)
+            void DrawVerticalLine(int x)
             {
-                uint y = TileSize;
-                uint n = 0;
-                var sprite = (Base.CoreSprite)((int)Base.CoreSprite.UiBackgroundLines1 + n % 4); // TODO: Better solution
+                int y = TileSize;
+                int n = 0;
+                var sprite = (Base.CoreSprite)(int)Base.CoreSprite.UiBackgroundLines1; // TODO: Better solution
                 var texture = assets.LoadTexture(Id(sprite));
                 texture = CoreUtil.BuildTransposedTexture(factory, (EightBitTexture)texture);
                 while (y < height - TileSize)
                 {
-                    uint? h = y + 2*TileSize > height ? (uint)(height - TileSize - y) : (uint?)null;
+                    int? h = y + 2*TileSize > height ? height - TileSize - y : (int?)null;
                     multi.AddTexture(1, texture, x, y, 0, true, null, h);
                     n++;
                     y += TileSize;
@@ -96,7 +96,7 @@ namespace UAlbion.Game.Gui.Controls
                     var background = assets.LoadTexture(Id(Base.CoreSprite.UiBackground));
                     multi.AddTexture(1, background,
                         FrameOffsetX, FrameOffsetY, 0, true,
-                        (uint)width - FrameOffsetX * 2, (uint)height - FrameOffsetY * 2);
+                        width - FrameOffsetX * 2, height - FrameOffsetY * 2);
                     break;
                 }
 
@@ -105,23 +105,23 @@ namespace UAlbion.Game.Gui.Controls
                     var colors = Resolve<ICommonColors>();
                     multi.AddTexture(1, colors.BorderTexture,
                         FrameOffsetX, FrameOffsetY, 0, false,
-                        (uint)width - FrameOffsetX * 2, (uint)height - FrameOffsetY * 2, 128);
+                        width - FrameOffsetX * 2, height - FrameOffsetY * 2, 128);
                     break;
                 }
             }
 
             // Corners
             multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreSprite.UiWindowTopLeft)), 0, 0, 0, true);
-            multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreSprite.UiWindowTopRight)), (uint)width - TileSize, 0, 0, true);
-            multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreSprite.UiWindowBottomLeft)), 0, (uint)height - TileSize, 0, true);
-            multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreSprite.UiWindowBottomRight)), (uint)width - TileSize, (uint)height - TileSize, 0, true);
+            multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreSprite.UiWindowTopRight)), width - TileSize, 0, 0, true);
+            multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreSprite.UiWindowBottomLeft)), 0, height - TileSize, 0, true);
+            multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreSprite.UiWindowBottomRight)), width - TileSize, height - TileSize, 0, true);
 
             DrawLine(4); // Left
-            DrawLine((uint)height - FrameOffsetY); // Right
+            DrawLine(height - FrameOffsetY); // Right
             DrawVerticalLine(4); // Top
-            DrawVerticalLine((uint)width - FrameOffsetX); // Bottom
+            DrawVerticalLine(width - FrameOffsetX); // Bottom
 
-            var subImage = multi.GetSubImageDetails(multi.GetSubImageAtTime(1, 0));
+            var subImage = (SubImage)multi.GetSubImage(multi.GetSubImageAtTime(1, 0));
             var normalisedSize = window.UiToNormRelative(subImage.Size);
 
             var key = new SpriteKey(multi, order, SpriteKeyFlags.NoTransform);

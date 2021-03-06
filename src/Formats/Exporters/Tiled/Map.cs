@@ -75,7 +75,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             ushort blankTileIndex = 0;
             int nextObjectId = 1;
             int nextObjectGroupId = 3; // 1 & 2 are always underlay & overlay.
-            npcTileset.GidOffset = tileset.Tiles.Count + 1;
+            npcTileset.GidOffset = tileset.Tiles.Count;
 
             return new Map
             {
@@ -93,7 +93,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                 BackgroundColor = "#000000",
                 Tilesets = new List<MapTileset>
                 {
-                    new MapTileset { FirstGid = 1, Source = tilesetPath, },
+                    new MapTileset { FirstGid = 0, Source = tilesetPath, },
                     new MapTileset { FirstGid = npcTileset.GidOffset, Source = npcTileset.Filename }
                 },
                 Layers = new List<MapLayer> {
@@ -268,7 +268,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                     int index = j * map.Width + i;
                     var tileIndex = useOverlay ? map.Overlay[index] : map.Underlay[index];
                     var tile = tileset.Tiles[tileIndex];
-                    sb.Append(tile.IsBlank ? blankTileIndex : tileIndex + 1);
+                    sb.Append(tile.IsBlank ? blankTileIndex : tileIndex);
                     sb.Append(',');
                 }
 

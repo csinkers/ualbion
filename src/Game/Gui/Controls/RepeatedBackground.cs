@@ -43,10 +43,9 @@ namespace UAlbion.Game.Gui.Controls
 
             // Background
             var background = assets.LoadTexture(Base.CoreSprite.UiBackground);
-            multi.AddTexture(1, background, 0, 0,
-                0, true, (uint)width, (uint)height);
+            multi.AddTexture(1, background, 0, 0, 0, true, width, height);
 
-            var subImage = multi.GetSubImageDetails(multi.GetSubImageAtTime(1, 0));
+            var subImage = (SubImage)multi.GetSubImage(multi.GetSubImageAtTime(1, 0));
             var normalisedSize = window.UiToNormRelative(subImage.Size);
 
             var key = new SpriteKey(multi, order, SpriteKeyFlags.NoTransform);

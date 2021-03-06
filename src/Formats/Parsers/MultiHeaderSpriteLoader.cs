@@ -9,36 +9,46 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class MultiHeaderSpriteLoader : IAssetLoader<AlbionSprite>
+    public class MultiHeaderSpriteLoader : IAssetLoader<IEightBitImage>
     {
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((AlbionSprite)existing, config, mapping, s);
+            => Serdes((IEightBitImage)existing, config, mapping, s);
 
-        public AlbionSprite Serdes(AlbionSprite existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (config == null) throw new ArgumentNullException(nameof(config));
             if (s.IsWriting() && existing == null) throw new ArgumentNullException(nameof(existing));
 
-            int width = s.UInt16("Width", (ushort?)existing?.Frames[0].Width ?? 0);
-            int height = s.UInt16("Height", (ushort?)existing?.Frames[0].Height ?? 0);
+            int width = s.UInt16("Width", (ushort?)existing?.GetSubImage(0).Width ?? 0);
+            int height = s.UInt16("Height", (ushort?)existing?.GetSubImage(0).Height ?? 0);
             int something = s.UInt8(null, 0);
             ApiUtil.Assert(something == 0);
-            byte frameCount = s.UInt8("Frames", (byte?)existing?.Frames.Count ?? 1);
+            byte frameCount = s.UInt8("Frames", (byte?)existing?.SubImageCount ?? 1);
 
             // TODO: When writing, assert that uniform and the frame sizes match up
-            var frames = existing?.Frames.ToArray() ?? new AlbionSpriteFrame[frameCount];
+            var frames = new (int, int, int)[frameCount];
+
+            if (existing != null)
+            {
+                for (int i = 0; i < existing.SubImageCount; i++)
+                {
+                    var x = existing.GetSubImage(i);
+                    frames[i] = (x.Y, x.Width, x.Height);
+                }
+            }
+
             var allFrames = new List<byte[]>(frameCount * width * height);
             int currentY = 0;
 
-            int spriteWidth = 0;
+            int totalWidth = 0;
             for (int i = 0; i < frameCount; i++)
             {
-                var frame = frames[i];
+                var (fy, fw, fh) = frames[i];
                 if (i > 0)
                 {
-                    width = s.UInt16("FrameWidth", (ushort?)frame?.Width ?? 0);
-                    height = s.UInt16("FrameHeight", (ushort?)frame?.Height ?? 0);
+                    width = s.UInt16("FrameWidth", (ushort)fw);
+                    height = s.UInt16("FrameHeight", (ushort)fh);
                     something = s.UInt8(null, 0);
                     ApiUtil.Assert(something == 0);
                     byte spriteCount2 = s.UInt8(null, frameCount);
@@ -50,43 +60,52 @@ namespace UAlbion.Formats.Parsers
                 {
                     frameBytes = new byte[width * height];
                     Debug.Assert(existing != null, nameof(existing) + " != null");
-                    Debug.Assert(frame != null, nameof(frame) + " != null");
 
                     FormatUtil.Blit(
-                        existing.PixelData.AsSpan(frame.Y * existing.Width + frame.X),
+                        existing.PixelData.Slice(fy * existing.Width),
                         frameBytes.AsSpan(),
-                        frame.Width, frame.Height,
-                        existing.Width, frame.Width);
+                        fw, fh,
+                        existing.Width, fw);
                 }
-                frameBytes = s.ByteArray("Frame" + i, frameBytes, width * height);;
-                frames[i] ??= new AlbionSpriteFrame(0, currentY, width, height);
+                frameBytes = s.ByteArray("Frame" + i, frameBytes, width * height);
+                frames[i] = (currentY, width, height);
                 allFrames.Add(frameBytes);
 
                 currentY += height;
-                if (width > spriteWidth)
-                    spriteWidth = width;
+                if (width > totalWidth)
+                    totalWidth = width;
             }
 
             if (existing != null)
             {
-                ApiUtil.Assert(spriteWidth == existing.Width,
+                ApiUtil.Assert(totalWidth == existing.Width,
                     "MultiHeaderSprite: Expected calculated and existing sprite width to be equal");
                 return existing;
             }
 
-            byte[] pixelData = new byte[spriteWidth * currentY];
+            byte[] pixelData = new byte[totalWidth * currentY];
             for (int n = 0; n < frameCount; n++)
             {
-                var frame = frames[n];
+                var (fy, fw, fh) = frames[n];
                 FormatUtil.Blit(
                     allFrames[n],
-                    pixelData.AsSpan(frame.Y*spriteWidth + frame.X),
-                    frame.Width, frame.Height,
-                    frame.Width, spriteWidth);
+                    pixelData.AsSpan(fy * totalWidth),
+                    fw, fh,
+                    fw, totalWidth);
             }
 
             s.Check();
-            return new AlbionSprite(config.AssetId, spriteWidth, currentY, false, pixelData, frames);
+            return new AlbionSprite2(
+                config.AssetId,
+                totalWidth,
+                currentY,
+                false,
+                pixelData,
+                frames.Select(frame =>
+                {
+                    var (y, w, h) = frame;
+                    return new AlbionSpriteFrame(0, y, w, h, totalWidth);
+                }));
         }
     }
 }

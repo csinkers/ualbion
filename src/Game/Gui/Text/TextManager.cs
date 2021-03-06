@@ -5,6 +5,7 @@ using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Entities;
@@ -32,7 +33,7 @@ namespace UAlbion.Game.Gui.Text
             {
                 if (mapping.TryGetValue(c, out var index))
                 {
-                    var size = font.GetSubImageDetails(index).Size;
+                    var size = ((SubImage)font.GetSubImage(index)).Size;
                     offset += (int)size.X;
                     if (block.Style == TextStyle.Fat || block.Style == TextStyle.FatAndHigh)
                         offset++;
@@ -40,7 +41,7 @@ namespace UAlbion.Game.Gui.Text
                 else offset += SpaceSize;
             }
 
-            var fontSize = font.GetSubImageDetails(0).Size;
+            var fontSize = ((SubImage)font.GetSubImage(0)).Size;
             return new Vector2(offset + 1, fontSize.Y + 1); // +1 for the drop shadow
         }
 
@@ -69,7 +70,7 @@ namespace UAlbion.Game.Gui.Text
             {
                 if (!mapping.TryGetValue(c, out var index)) { offset += SpaceSize; continue; } // Spaces etc
 
-                var subImage = font.GetSubImageDetails(index);
+                var subImage = (SubImage)font.GetSubImage(index);
 
                 // Adjust texture coordinates slightly to avoid bleeding
                 // var texOffset = subImage.TexOffset.Y + 0.1f / font.Height;
@@ -106,7 +107,7 @@ namespace UAlbion.Game.Gui.Text
                 n += isFat ? 4 : 2;
             }
 
-            var fontSize = font.GetSubImageDetails(0).Size;
+            var fontSize = ((SubImage)font.GetSubImage(0)).Size;
             var size = new Vector2(offset + 1, fontSize.Y + 1); // +1 for the drop shadow
             return new PositionedSpriteBatch(lease, size);
         }

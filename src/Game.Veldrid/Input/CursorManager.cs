@@ -191,7 +191,7 @@ namespace UAlbion.Game.Veldrid.Input
                 _itemSprite = sm.Borrow(key, 1, this);
             }
 
-            var subImage = texture.GetSubImageDetails(subItem);
+            var subImage = (SubImage)texture.GetSubImage(subItem);
 
             // TODO: Quantity text
             var instances = _itemSprite.Access();

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
@@ -12,113 +10,50 @@ namespace UAlbion.Game.Assets
 {
     public class AlbionSpritePostProcessor : IAssetPostProcessor
     {
-        public IEnumerable<Type> SupportedTypes => new[] { typeof(AlbionSprite) };
-        public object Process(ICoreFactory factory, AssetId key, object asset)
+        public object Process(object asset, AssetInfo info, ICoreFactory factory)
         {
-            if (factory == null) throw new ArgumentNullException(nameof(factory));
             if (asset == null) throw new ArgumentNullException(nameof(asset));
-            var sprite = (AlbionSprite)asset;
-            SubImage[] subImages;
+            if (info == null) throw new ArgumentNullException(nameof(info));
+            if (factory == null) throw new ArgumentNullException(nameof(factory));
 
-            // TODO: Put exemptions into assets.json
-            if (key.Type == AssetType.Font || key.Type == AssetType.AutomapGraphics || sprite.UniformFrames && sprite.Frames.Count >= 256)
-            {
-                const int buffer = 1;
-                // For things like tilemaps etc we repack into a texture atlas with buffer pixels.
-                int srcTileWidth = sprite.Width;
-                int srcTileHeight = sprite.Height / sprite.Frames.Count;
-                int destTileWidth = srcTileWidth + buffer * 2;
-                int destTileHeight = srcTileHeight + buffer * 2;
-                var (width, height) = GetAtlasSize(destTileWidth, destTileHeight, sprite.Frames.Count);
-                byte[] pixelData = new byte[width * height];
-                subImages = new SubImage[sprite.Frames.Count];
+            var sprite = (AlbionSprite2)asset;
 
-                int curX = 0;
-                int curY = 0;
-                for (int n = 0; n < sprite.Frames.Count; n++)
-                {
-                    for (int j = 0; j < destTileHeight; j++)
-                    {
-                        for (int i = 0; i < destTileWidth; i++)
-                        {
-                            var sourceX = Math.Clamp(i - buffer, 0, srcTileWidth - buffer);
-                            var sourceY = Math.Clamp(j - buffer, 0, srcTileHeight - buffer) + n * srcTileHeight;
-                            var destX = curX + i;
-                            var destY = curY + j;
-                            pixelData[destY * width + destX] = sprite.PixelData[sourceX + sourceY * srcTileWidth];
-                        }
-                    }
+            // For non-uniforms just use the on-disk packing
+            var subImages = sprite.Frames
+                .Select(x => new SubImage(
+                    new Vector2(x.X, x.Y),
+                    new Vector2(x.Width, x.Height),
+                    new Vector2(sprite.Width, sprite.Height),
+                    0))
+                .ToArray();
 
-                    subImages[n] = new SubImage(
-                        new Vector2(curX + buffer, curY + buffer),
-                        new Vector2(sprite.Frames[n].Width, sprite.Frames[n].Height),
-                        new Vector2(width, height),
-                        0);
-
-                    curX += destTileWidth;
-                    if (curX + destTileWidth > width)
-                    {
-                        curX = 0;
-                        curY += destTileHeight;
-                    }
-                }
-
-                return factory.CreateEightBitTexture(
-                    key,
-                    sprite.Id.ToString(),
-                    (uint)width,
-                    (uint)height,
-                    1,
-                    1,
-                    pixelData,
-                    subImages);
-            }
-            /*
-            else if (sprite.UniformFrames) // For reasonably sized uniform sprites use layers to simplify mip mapping / tiling etc
-            {
-                int tileWidth = sprite.Width;
-                int tileHeight = sprite.Height / sprite.Frames.Count;
-                subImages = sprite.Frames
-                    .Select((x, i) => new EightBitTexture.SubImage(0, 0, x.Width, x.Height, i))
-                    .ToArray();
-
-                return new EightBitTexture(
-                    sprite.Name,
-                    (uint)tileWidth,
-                    (uint)tileHeight,
-                    1,
-                    (uint)subImages.Length,
-                     sprite.PixelData, subImages);
-            }*/
-            else // For non-uniforms just use the on-disk packing
-            {
-                subImages = sprite.Frames
-                    .Select(x => new SubImage(
-                        new Vector2(x.X, x.Y),
-                        new Vector2(x.Width, x.Height),
-                        new Vector2(sprite.Width, sprite.Height),
-                        0))
-                    .ToArray();
-
-                return factory.CreateEightBitTexture(
-                    key,
-                    sprite.Id.ToString(),
-                    (uint)sprite.Width,
-                    (uint)sprite.Height,
-                    1,
-                    1,
-                    sprite.PixelData,
-                    subImages);
-            }
+            return factory.CreateEightBitTexture(
+                info.AssetId,
+                sprite.Id.ToString(),
+                sprite.Width,
+                sprite.Height,
+                1,
+                1,
+                sprite.PixelData,
+                subImages);
         }
 
-        static (int, int) GetAtlasSize(int tileWidth, int tileHeight, int count)
+        /*
+        else if (sprite.UniformFrames) // For reasonably sized uniform sprites use layers to simplify mip mapping / tiling etc
         {
-            int tilesPerRow = (int)Math.Ceiling(Math.Sqrt(count));
-            int width = ApiUtil.NextPowerOfTwo(tileWidth * tilesPerRow);
-            int requiredHeight = tileHeight * ((count + tilesPerRow - 1) / tilesPerRow);
-            int height = ApiUtil.NextPowerOfTwo(requiredHeight);
-            return (width, height);
-        }
+            int tileWidth = sprite.Width;
+            int tileHeight = sprite.Height / sprite.Frames.Count;
+            subImages = sprite.Frames
+                .Select((x, i) => new EightBitTexture.SubImage(0, 0, x.Width, x.Height, i))
+                .ToArray();
+
+            return new EightBitTexture(
+                sprite.Name,
+                (uint)tileWidth,
+                (uint)tileHeight,
+                1,
+                (uint)subImages.Length,
+                 sprite.PixelData, subImages);
+        }*/
     }
 }

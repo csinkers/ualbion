@@ -194,10 +194,8 @@ namespace DumpSave
             var assets = new AssetManager();
             var loaderRegistry = new AssetLoaderRegistry();
             var containerLoaderRegistry = new ContainerRegistry();
-            var modApplier = new ModApplier()
-                // Register post-processors for handling transformations of asset data that can't be done by UAlbion.Formats alone.
-                .AddAssetPostProcessor(new AlbionSpritePostProcessor())
-                .AddAssetPostProcessor(new InventoryPostProcessor());
+            var postProcessorRegistry = new PostProcessorRegistry();
+            var modApplier = new ModApplier();
 
             var exchange = new EventExchange(new LogExchange());
             exchange
@@ -205,6 +203,7 @@ namespace DumpSave
                 .Register<IGeneralConfig>(generalConfig)
                 .Attach(loaderRegistry)
                 .Attach(containerLoaderRegistry)
+                .Attach(postProcessorRegistry)
                 .Attach(modApplier)
                 .Attach(assets)
                 ;

@@ -47,6 +47,9 @@ namespace UAlbion.Formats.Containers
 
             foreach (var (info, bytes) in assets)
             {
+                if (bytes.Length == 0)
+                    continue;
+
                 using var ms = new MemoryStream(bytes);
                 using var br = new BinaryReader(ms);
                 using var s = new AlbionReader(br);
@@ -63,6 +66,9 @@ namespace UAlbion.Formats.Containers
                 {
                     for (int i = 0; i < frames.Count; i++)
                     {
+                        if (frames[i].Length == 0)
+                            continue;
+
                         var filename = string.Format(CultureInfo.InvariantCulture, pattern, info.SubAssetId, i, name);
                         File.WriteAllBytes(Path.Combine(path, filename), frames[i]);
                     }
@@ -74,7 +80,7 @@ namespace UAlbion.Formats.Containers
         {
             var subIds = new List<int>();
             if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+                return new List<(int, int)> { (0, 1) };
 
             foreach (var filePath in Directory.EnumerateFiles(path))
             {

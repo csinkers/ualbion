@@ -25,7 +25,7 @@ namespace UAlbion.Game.Assets
                 byte[] bytes = existing switch
                 {
                     MapData2D map2d => Write2D(map2d, info),
-                    MapData3D map3d => Write3D(map3d),
+                    // MapData3D map3d => Write3D(map3d),
                     _ => null
                 };
 
@@ -66,10 +66,11 @@ namespace UAlbion.Game.Assets
 
             return FormatUtil.BytesFromTextWriter(tiledMap.Serialize);
         }
-
+/*
         byte[] Write3D(MapData3D map3d)
         {
             return null;
         }
+*/
     }
 }

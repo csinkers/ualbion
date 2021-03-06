@@ -9,25 +9,26 @@ using PixelFormat = UAlbion.Core.Textures.PixelFormat;
 
 namespace UAlbion.Core.Veldrid.Textures
 {
-    public class TrueColorTexture : IVeldridTexture
+    public class TrueColorTexture : IVeldridTexture, IRgbaImage
     {
         public ITextureId Id { get; }
         public string Name { get; }
         public PixelFormat Format => PixelFormat.Rgba32;
         public TextureType Type => TextureType.Texture2D;
-        public uint Width { get; }
-        public uint Height { get; }
-        public uint Depth => 1;
-        public uint MipLevels => 1;
-        public uint ArrayLayers => 1;
+        public int Width { get; }
+        public int Height { get; }
+        public int Depth => 1;
+        public int MipLevels => 1;
+        public int ArrayLayers => 1;
         public int SubImageCount => 1;
         public bool IsDirty { get; private set; }
-        public int SizeInBytes => (int)(Width * Height * FormatSize);
-        public uint FormatSize => Format.Size();
+        public int SizeInBytes => Width * Height * FormatSize;
+        public int FormatSize => Format.Size();
+        public ReadOnlySpan<uint> PixelData => _pixelData;
         readonly uint[] _pixelData;
         readonly SubImage _subImage;
 
-        public TrueColorTexture(ITextureId id, string name, uint width, uint height, uint[] palette, byte[] pixels)
+        public TrueColorTexture(ITextureId id, string name, int width, int height, uint[] palette, byte[] pixels)
         {
             if (palette == null) throw new ArgumentNullException(nameof(palette));
             if (pixels == null) throw new ArgumentNullException(nameof(pixels));
@@ -37,11 +38,11 @@ namespace UAlbion.Core.Veldrid.Textures
             Width = width;
             Height = height;
             _pixelData = new uint[Width * Height];
-            for(uint j = 0; j < Height; j++)
+            for(int j = 0; j < Height; j++)
             {
-                for(uint i = 0; i < Width; i++)
+                for(int i = 0; i < Width; i++)
                 {
-                    uint index = j * Width + i;
+                    int index = j * Width + i;
                     byte palettePixel = pixels[index];
                     _pixelData[index] = palette[palettePixel];
                 }
@@ -54,7 +55,7 @@ namespace UAlbion.Core.Veldrid.Textures
                  0);
         }
 
-        public TrueColorTexture(string name, uint width, uint height, uint[] pixels)
+        public TrueColorTexture(string name, int width, int height, uint[] pixels)
         {
             if (pixels == null) throw new ArgumentNullException(nameof(pixels));
             Name = name;
@@ -70,7 +71,7 @@ namespace UAlbion.Core.Veldrid.Textures
                  0);
         }
 
-        public SubImage GetSubImageDetails(int subImageId) => _subImage;
+        public ISubImage GetSubImage(int subImage) => _subImage;
         public void Invalidate() => IsDirty = true;
 
         public unsafe Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
@@ -78,7 +79,16 @@ namespace UAlbion.Core.Veldrid.Textures
             if (gd == null) throw new ArgumentNullException(nameof(gd));
             if (rf == null) throw new ArgumentNullException(nameof(rf));
 
-            using Texture staging = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format.ToVeldrid(), TextureUsage.Staging, Type));
+            using Texture staging = rf.CreateTexture(new TextureDescription(
+                (uint)Width,
+                (uint)Height,
+                (uint)Depth,
+                (uint)MipLevels,
+                (uint)ArrayLayers,
+                Format.ToVeldrid(),
+                TextureUsage.Staging,
+                Type));
+
             staging.Name = "T_" + Name + "_Staging";
 
             ulong offset = 0;
@@ -89,7 +99,7 @@ namespace UAlbion.Core.Veldrid.Textures
                     uint mipWidth = GetDimension(Width, level);
                     uint mipHeight = GetDimension(Height, level);
                     uint mipDepth = GetDimension(Depth, level);
-                    uint subresourceSize = mipWidth * mipHeight * mipDepth * FormatSize;
+                    uint subresourceSize = (uint)(mipWidth * mipHeight * mipDepth * FormatSize);
 
                     for (uint layer = 0; layer < ArrayLayers; layer++)
                     {
@@ -102,7 +112,16 @@ namespace UAlbion.Core.Veldrid.Textures
                 }
             }
 
-            Texture texture = rf.CreateTexture(new TextureDescription(Width, Height, Depth, MipLevels, ArrayLayers, Format.ToVeldrid(), usage, Type));
+            Texture texture = rf.CreateTexture(new TextureDescription(
+                (uint)Width,
+                (uint)Height,
+                (uint)Depth,
+                (uint)MipLevels,
+                (uint)ArrayLayers,
+                Format.ToVeldrid(),
+                usage,
+                Type));
+
             texture.Name = "T_" + Name;
 
             using (CommandList cl = rf.CreateCommandList())
@@ -117,13 +136,13 @@ namespace UAlbion.Core.Veldrid.Textures
             return texture;
         }
 
-        public static uint GetDimension(uint largestLevelDimension, uint mipLevel)
+        public static uint GetDimension(int largestLevelDimension, uint mipLevel)
         {
-            uint ret = largestLevelDimension;
-            for (uint i = 0; i < mipLevel; i++)
+            int ret = largestLevelDimension;
+            for (int i = 0; i < mipLevel; i++)
                 ret /= 2;
 
-            return Math.Max(1, ret);
+            return (uint)Math.Max(1, ret);
         }
 
         public Image<Rgba32> ToImage()

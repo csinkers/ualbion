@@ -164,7 +164,7 @@ namespace UAlbion.Core.Visual
             }
 
             var instances = _sprite.Access();
-            var subImage = _sprite.Key.Texture.GetSubImageDetails(Frame);
+            var subImage = (SubImage)_sprite.Key.Texture.GetSubImage(Frame);
 
             if (_size == null)
                 Size = subImage.Size;

@@ -3,6 +3,7 @@ using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 
@@ -113,7 +114,7 @@ namespace UAlbion.Game.Gui.Controls
                     return;
                 var key = new SpriteKey(texture, order, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
                 _sprite = sm.Borrow(key, 1, this);
-                _size = texture.GetSubImageDetails(0).Size;
+                _size = ((SubImage)texture.GetSubImage(0)).Size;
             }
         }
     }

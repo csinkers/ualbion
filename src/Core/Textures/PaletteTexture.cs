@@ -4,11 +4,11 @@ using UAlbion.Api;
 
 namespace UAlbion.Core.Textures
 {
-    public abstract class PaletteTexture : ITexture
+    public abstract class PaletteTexture : ITexture, IRgbaImage
     {
-        const uint PaletteWidth = 256;
-        const uint PaletteHeight = 1;
-        readonly uint[] _textureData;
+        const int PaletteWidth = 256;
+        const int PaletteHeight = 1;
+        readonly uint[] _pixelData;
 
         static readonly SubImage SubImage = new SubImage(
             Vector2.Zero,
@@ -18,27 +18,27 @@ namespace UAlbion.Core.Textures
 
         public ITextureId Id { get; }
         public string Name { get; }
-        public uint Width => PaletteWidth;
-        public uint Height => PaletteHeight;
-        public uint Depth => 1;
-        public uint MipLevels => 1;
-        public uint ArrayLayers => 1;
+        public int Width => PaletteWidth;
+        public int Height => PaletteHeight;
+        public int Depth => 1;
+        public int MipLevels => 1;
+        public int ArrayLayers => 1;
         public int SubImageCount => 1;
         public bool IsDirty { get; protected set; }
-        protected ReadOnlySpan<uint> TextureData => _textureData;
-        public int SizeInBytes => TextureData.Length * sizeof(uint);
+        public ReadOnlySpan<uint> PixelData => _pixelData;
+        public int SizeInBytes => PixelData.Length * sizeof(uint);
         public PixelFormat Format => PixelFormat.Rgba32;
-        public abstract uint FormatSize { get; }
+        public abstract int FormatSize { get; }
 
         public PaletteTexture(ITextureId id, string name, uint[] paletteData)
         {
             Id = id;
             Name = name;
-            _textureData = paletteData ?? throw new ArgumentNullException(nameof(paletteData));
+            _pixelData = paletteData ?? throw new ArgumentNullException(nameof(paletteData));
             IsDirty = true;
         }
 
-        public SubImage GetSubImageDetails(int subImageId) => SubImage;
+        public ISubImage GetSubImage(int subImage) => SubImage;
         public void Invalidate() => IsDirty = true;
     }
 }

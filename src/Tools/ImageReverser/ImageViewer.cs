@@ -17,8 +17,8 @@ namespace UAlbion.Tools.ImageReverser
         readonly ReverserCore _core;
         readonly Timer _timer;
         readonly DateTime _startTime;
-        AlbionSprite _logicalSprite;
-        AlbionSprite _visualSprite;
+        AlbionSprite2 _logicalSprite;
+        AlbionSprite2 _visualSprite;
 
         public ImageViewer(ReverserCore core)
         {
@@ -159,7 +159,7 @@ namespace UAlbion.Tools.ImageReverser
             canvas.Image = bmp;
         }
 
-        Bitmap GenerateBitmap(AlbionSprite sprite, int frameNumber, int width, int magnify, uint[] palette)
+        Bitmap GenerateBitmap(AlbionSprite2 sprite, int frameNumber, int width, int magnify, uint[] palette)
         {
             var frame = sprite.Frames[frameNumber];
             var offset = frame.Y * sprite.Width;
@@ -368,12 +368,12 @@ namespace UAlbion.Tools.ImageReverser
             }
         }
 
-        AlbionSprite LoadSprite(string filename, AssetInfo conf)
+        AlbionSprite2 LoadSprite(string filename, AssetInfo conf)
         {
             using var stream = File.OpenRead(Path.Combine(_core.BaseExportDirectory, filename));
             using var br = new BinaryReader(stream);
             using var ar = new AlbionReader(br, stream.Length);
-            return (AlbionSprite)GetLoader(conf).Serdes(null, conf, AssetMapping.Global, ar);
+            return (AlbionSprite2)GetLoader(conf).Serdes(null, conf, AssetMapping.Global, ar);
         }
 
         static IAssetLoader GetLoader(AssetInfo conf)

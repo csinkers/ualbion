@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -39,6 +40,8 @@ namespace UAlbion.Game.Assets
         byte[] Write2D(MapData2D map, AssetInfo info)
         {
             var assets = Resolve<IAssetManager>();
+            var disk = Resolve<IFileSystem>();
+
             TilesetData tileset = assets.LoadTileData(map.TilesetId);
             if (tileset == null)
                 return null;
@@ -59,7 +62,7 @@ namespace UAlbion.Game.Assets
             var destPath = config.ResolvePath(info.File.Filename);
             npcTilesetPath = Path.Combine(destPath, npcTilesetPath);
 
-            var npcTileset = Tileset.Load(npcTilesetPath);
+            var npcTileset = Tileset.Load(npcTilesetPath, disk);
             var properties = new TilemapProperties { TileWidth = 16, TileHeight = 16 };
             var formatter = new EventFormatter(assets.LoadString, map.Id.ToMapText());
             var tiledMap = Map.FromAlbionMap(map, tileset, properties, tilesetPath, npcTileset, formatter);

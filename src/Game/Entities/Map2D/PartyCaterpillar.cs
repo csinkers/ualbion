@@ -2,6 +2,7 @@
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats;
+using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
 

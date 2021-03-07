@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using UAlbion.Api;
 
 namespace UAlbion.Config
 {
@@ -12,10 +13,11 @@ namespace UAlbion.Config
         [JsonIgnore] public string BasePath { get; set; }
         public IDictionary<string, string> Paths { get; } = new Dictionary<string, string>();
 
-        public static GeneralConfig Load(string configPath, string baseDir)
+        public static GeneralConfig Load(string configPath, string baseDir, IFileSystem disk)
         {
-            var config = File.Exists(configPath) 
-                ? JsonConvert.DeserializeObject<GeneralConfig>(File.ReadAllText(configPath)) 
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            var config = disk.FileExists(configPath) 
+                ? JsonConvert.DeserializeObject<GeneralConfig>(disk.ReadAllText(configPath)) 
                 : new GeneralConfig();
 
             config.BasePath = baseDir;

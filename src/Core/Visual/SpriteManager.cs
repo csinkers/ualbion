@@ -16,7 +16,7 @@ namespace UAlbion.Core.Visual
                 if (!_sprites.TryGetValue(key, out var entry))
                 {
                     entry = new MultiSprite(key);
-                    Resolve<IEngine>()?.RegisterRenderable(entry);
+                    TryResolve<IEngine>()?.RegisterRenderable(entry);
                     _sprites[key] = entry;
                 }
 
@@ -35,7 +35,7 @@ namespace UAlbion.Core.Visual
 
                 foreach (var kvp in spritesToRemove)
                 {
-                    Resolve<IEngine>()?.UnregisterRenderable(kvp.Value);
+                    TryResolve<IEngine>()?.UnregisterRenderable(kvp.Value);
                     _sprites.Remove(kvp.Key);
                 }
             }
@@ -54,16 +54,22 @@ namespace UAlbion.Core.Visual
 
         protected override void Subscribed()
         {
-            lock (_syncRoot)
-                foreach (var sprite in _sprites)
-                    Resolve<IEngine>()?.RegisterRenderable(sprite.Value);
+            var engine = TryResolve<IEngine>();
+            if (engine != null)
+                lock (_syncRoot)
+                    foreach (var sprite in _sprites)
+                        engine.RegisterRenderable(sprite.Value);
+
             base.Subscribed();
         }
         protected override void Unsubscribed()
         {
-            lock (_syncRoot)
-                foreach (var sprite in _sprites)
-                    Resolve<IEngine>()?.UnregisterRenderable(sprite.Value);
+            var engine = TryResolve<IEngine>();
+            if (engine != null)
+                lock (_syncRoot)
+                    foreach (var sprite in _sprites)
+                        engine.UnregisterRenderable(sprite.Value);
+
             base.Unsubscribed();
         }
     }

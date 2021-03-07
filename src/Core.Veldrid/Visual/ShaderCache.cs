@@ -19,6 +19,7 @@ namespace UAlbion.Core.Veldrid.Visual
         readonly List<string> _shaderPaths = new List<string>();
         readonly List<FileSystemWatcher> _watchers = new List<FileSystemWatcher>();
         readonly string _shaderCachePath;
+        IFileSystem _disk;
 
         class CacheEntry
         {
@@ -40,8 +41,12 @@ namespace UAlbion.Core.Veldrid.Visual
         public ShaderCache(string shaderCachePath)
         {
             _shaderCachePath = shaderCachePath;
-            if (!Directory.Exists(shaderCachePath))
-                Directory.CreateDirectory(shaderCachePath);
+        }
+        protected override void Subscribed()
+        {
+            _disk = Resolve<IFileSystem>();
+            if (!_disk.DirectoryExists(_shaderCachePath))
+                _disk.CreateDirectory(_shaderCachePath);
         }
 
         public IShaderCache AddShaderPath(string path)
@@ -63,9 +68,9 @@ namespace UAlbion.Core.Veldrid.Visual
             foreach (var dirPath in _shaderPaths)
             {
                 var filePath = Path.Combine(dirPath, shaderName);
-                if (File.Exists(filePath))
+                if (_disk.FileExists(filePath))
                 {
-                    foreach (var line in File.ReadAllLines(filePath))
+                    foreach (var line in _disk.ReadAllLines(filePath))
                         yield return line;
                     yield break;
                 }
@@ -113,8 +118,8 @@ namespace UAlbion.Core.Veldrid.Visual
         (string, byte[]) LoadSpirvByteCode(string name, string content, ShaderStages stage)
         {
             var cachePath = GetShaderPath(name, content);
-            if (File.Exists(cachePath))
-                return (cachePath, File.ReadAllBytes(cachePath));
+            if (_disk.FileExists(cachePath))
+                return (cachePath, _disk.ReadAllBytes(cachePath));
 
             using (PerfTracker.InfrequentEvent($"Compiling {name} to SPIR-V"))
             {
@@ -129,7 +134,7 @@ namespace UAlbion.Core.Veldrid.Visual
                 options.Debug = true;
 #endif
                 var glslCompileResult = SpirvCompilation.CompileGlslToSpirv(content, name, stage, options);
-                File.WriteAllBytes(cachePath, glslCompileResult.SpirvBytes);
+                _disk.WriteAllBytes(cachePath, glslCompileResult.SpirvBytes);
                 return (cachePath, glslCompileResult.SpirvBytes);
             }
         }
@@ -227,7 +232,7 @@ namespace UAlbion.Core.Veldrid.Visual
         {
             lock (_syncRoot)
             {
-                var files = Directory.EnumerateFiles(_shaderCachePath, "*.spv").ToHashSet();
+                var files = _disk.EnumerateDirectory(_shaderCachePath, "*.spv").ToHashSet();
                 foreach (var entry in _cache)
                 {
                     files.Remove(entry.Value.VertexPath);
@@ -236,8 +241,8 @@ namespace UAlbion.Core.Veldrid.Visual
 
                 foreach (var file in files)
                 {
-                    //if(DateTime.Now - File.GetLastAccessTime(file) > TimeSpan.FromDays(7))
-                    File.Delete(file);
+                    //if (DateTime.Now - _disk.GetLastAccessTime(file) > TimeSpan.FromDays(7))
+                    _disk.DeleteFile(file);
                 }
             }
         }

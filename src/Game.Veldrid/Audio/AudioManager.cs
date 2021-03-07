@@ -12,6 +12,7 @@ using UAlbion.Core.Veldrid.Audio;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Veldrid.Audio

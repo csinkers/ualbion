@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Config;
 
 namespace UAlbion.Formats.Containers
@@ -9,17 +10,17 @@ namespace UAlbion.Formats.Containers
     /// </summary>
     public class ZipContainer : IAssetContainer
     {
-        public ISerializer Read(string file, AssetInfo info)
+        public ISerializer Read(string file, AssetInfo info, IFileSystem disk)
         {
             throw new System.NotImplementedException();
         }
 
-        public void Write(string path, IList<(AssetInfo, byte[])> assets)
+        public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk)
         {
             throw new System.NotImplementedException();
         }
 
-        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info)
+        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk)
         {
             throw new System.NotImplementedException();
         }

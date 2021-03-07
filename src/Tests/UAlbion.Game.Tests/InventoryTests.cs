@@ -4,6 +4,7 @@ using Xunit;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.State.Player;
 using UAlbion.TestCommon;
@@ -16,8 +17,6 @@ namespace UAlbion.Game.Tests
         readonly ItemData _torch; // A stackable item
         readonly Inventory _tom;
         readonly Inventory _rainer;
-        readonly Dictionary<InventoryId, Inventory> _inventories;
-        readonly EventExchange _exchange;
         readonly InventoryManager _im;
         readonly InventoryId _tomInv;
 
@@ -40,18 +39,19 @@ namespace UAlbion.Game.Tests
 
             _tom = new Inventory(_tomInv);
             _rainer = new Inventory(new InventoryId((CharacterId)Base.PartyMember.Rainer));
-            _inventories = new Dictionary<InventoryId, Inventory>
+            var inventories = new Dictionary<InventoryId, Inventory>
             {
                 [_tom.Id] = _tom,
                 [_rainer.Id] = _rainer
             };
 
-            _exchange = new EventExchange(new LogExchange());
-            _im = new InventoryManager(x => _inventories[x]);
+            var exchange = new EventExchange(new LogExchange());
+            _im = new InventoryManager(x => inventories[x]);
             var wm = new WindowManager { Window = new MockWindow(1920, 1080) };
             var cm = new MockCursorManager { Position = new Vector2(1, 1) };
 
-            _exchange
+            exchange
+                .Register(new GameConfig())
                 .Register<IInventoryManager>(_im)
                 .Attach(wm)
                 .Attach(cm)

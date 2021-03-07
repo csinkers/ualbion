@@ -10,7 +10,9 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
+using UAlbion.Formats.Containers;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game;
 using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
@@ -30,10 +32,11 @@ namespace UAlbion.Base.Tests
 
         static AssetLoadTests()
         {
-            var baseDir = ConfigUtil.FindBasePath();
-            GeneralConfig = AssetSystem.LoadGeneralConfig(baseDir);
+            var disk = new MockFileSystem(true);
+            var baseDir = ConfigUtil.FindBasePath(disk);
+            GeneralConfig = AssetSystem.LoadGeneralConfig(baseDir, disk);
             CoreConfig = new CoreConfig();
-            GameConfig = AssetSystem.LoadGameConfig(baseDir);
+            GameConfig = AssetSystem.LoadGameConfig(baseDir, disk);
             Settings = new GeneralSettings
             {
                 ActiveMods = { "Base" },

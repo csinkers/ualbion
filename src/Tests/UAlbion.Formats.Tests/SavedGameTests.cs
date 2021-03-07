@@ -4,6 +4,7 @@ using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Containers;
 using Xunit;
 
 namespace UAlbion.Formats.Tests
@@ -103,14 +104,16 @@ namespace UAlbion.Formats.Tests
         [Fact]
         public void NewGameRoundTrip()
         {
-            var baseDir = ConfigUtil.FindBasePath();
+            var disk = new MockFileSystem(true);
+            var baseDir = ConfigUtil.FindBasePath(disk);
             RoundTrip(Path.Combine(baseDir, "mods", "UATest", "Saves", "NewGame.001"));
         }
 
         [Fact]
         public void LateGameRoundTrip()
         {
-            var baseDir = ConfigUtil.FindBasePath();
+            var disk = new MockFileSystem(true);
+            var baseDir = ConfigUtil.FindBasePath(disk);
             RoundTrip(Path.Combine(baseDir, "mods", "UATest", "Saves", "LateGame.001"));
         }
     }

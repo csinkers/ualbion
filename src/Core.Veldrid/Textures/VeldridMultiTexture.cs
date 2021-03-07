@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api;
@@ -92,9 +91,10 @@ namespace UAlbion.Core.Veldrid.Textures
             return texture;
         }
 
-        public override void SavePng(int logicalId, int tick, string path)
+        public override void SavePng(int logicalId, int tick, string path, IFileSystem disk)
         {
-            if(IsMetadataDirty)
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (IsMetadataDirty)
                 RebuildLayers();
 
             var palette = PaletteManager.Palette.GetCompletePalette();
@@ -119,7 +119,7 @@ namespace UAlbion.Core.Veldrid.Textures
             Image<Rgba32> image = new Image<Rgba32>(width, height);
             image.Frames.AddFrame(pixels);
             image.Frames.RemoveFrame(0);
-            using var stream = File.OpenWrite(path);
+            using var stream = disk.OpenWriteTruncate(path);
             image.SaveAsPng(stream);
         }
 

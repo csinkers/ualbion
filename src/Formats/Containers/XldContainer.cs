@@ -17,18 +17,20 @@ namespace UAlbion.Formats.Containers
         const string MagicString = "XLD0I";
         static int HeaderSize(int itemCount) => MagicString.Length + 3 + 4 * itemCount;
 
-        public ISerializer Read(string file, AssetInfo info)
+        public ISerializer Read(string file, AssetInfo info, IFileSystem disk)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
-            using var s = new AlbionReader(new BinaryReader(File.OpenRead(file)));
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            using var s = new AlbionReader(new BinaryReader(disk.OpenRead(file)));
             var bytes = LoadAsset(info.SubAssetId, s);
             var ms = new MemoryStream(bytes);
             return new AlbionReader(new BinaryReader(ms));
         }
 
-        public void Write(string path, IList<(AssetInfo, byte[])> assets)
+        public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk)
         {
             if (assets == null) throw new ArgumentNullException(nameof(assets));
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
             int count = assets.Max(x => x.Item1.SubAssetId);
             var ordered = new (AssetInfo, byte[])[count];
             var lengths = new int[count];
@@ -38,7 +40,7 @@ namespace UAlbion.Formats.Containers
                 lengths[info.SubAssetId] = bytes.Length;
             }
 
-            using var fs = File.OpenWrite(path);
+            using var fs = disk.OpenWriteTruncate(path);
             using var bw = new BinaryWriter(fs);
             using var s = new AlbionWriter(bw);
             HeaderSerdes(lengths, s);
@@ -47,9 +49,10 @@ namespace UAlbion.Formats.Containers
                 s.ByteArray(null, ordered[i].Item2, lengths[i]);
         }
 
-        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info)
+        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk)
         {
-            using var s = new AlbionReader(new BinaryReader(File.OpenRead(path)));
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            using var s = new AlbionReader(new BinaryReader(disk.OpenRead(path)));
             var lengths = HeaderSerdes(null, s);
             return new List<(int, int)> { (0, lengths.Length) };
         }

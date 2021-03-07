@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Config;
 
 namespace UAlbion.Formats.Containers
@@ -16,22 +17,25 @@ namespace UAlbion.Formats.Containers
         /// </summary>
         /// <param name="path">The path to the container file/directory</param>
         /// <param name="info">The config metadata for the asset</param>
+        /// <param name="disk">The service to use for accessing the file system</param>
         /// <returns></returns>
-        ISerializer Read(string path, AssetInfo info);
+        ISerializer Read(string path, AssetInfo info, IFileSystem disk);
 
         /// <summary>
         /// Write all assets inside a container
         /// </summary>
         /// <param name="path">The path to the container file/directory</param>
         /// <param name="assets">A list of pairs containing asset metadata and the corresponding raw bytes of the asset</param>
-        void Write(string path, IList<(AssetInfo, byte[])> assets);
+        /// <param name="disk">The service to use for accessing the file system</param>
+        void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk);
         
         /// <summary>
         /// Open the container and return the sub-item ranges that are present inside it.
         /// </summary>
         /// <param name="path">The path to the container file/directory</param>
         /// <param name="info">The config metadata for the container</param>
+        /// <param name="disk">The service to use for accessing the file system</param>
         /// <returns>A list of range pairs: (subItemId of start of range, count of ids in range)</returns>
-        List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info); 
+        List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk); 
     }
 }

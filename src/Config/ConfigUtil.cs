@@ -17,11 +17,12 @@ namespace UAlbion.Config
             ContractResolver = new PrivatePropertyJsonContractResolver()
         };
 
-        public static string FindBasePath()
+        public static string FindBasePath(IFileSystem disk)
         {
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
             var exeLocation = Assembly.GetExecutingAssembly().Location;
             var curDir = new DirectoryInfo(Path.GetDirectoryName(exeLocation) ?? throw new InvalidOperationException());
-            while (curDir != null && !File.Exists(Path.Combine(curDir.FullName, "data", "config.json")))
+            while (curDir != null && !disk.FileExists(Path.Combine(curDir.FullName, "data", "config.json")))
                 curDir = curDir.Parent;
 
             var baseDir = curDir?.FullName;

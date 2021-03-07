@@ -1,5 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.IO;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using UAlbion.Api;
 
@@ -26,12 +26,13 @@ namespace UAlbion.Core
             }
         }
 
-        public static CoreConfig Load(string configPath)
+        public static CoreConfig Load(string configPath, IFileSystem disk)
         {
-            if (!File.Exists(configPath))
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (!disk.FileExists(configPath))
                 return new CoreConfig();
 
-            var configText = File.ReadAllText(configPath);
+            var configText = disk.ReadAllText(configPath);
             return (CoreConfig)JsonConvert.DeserializeObject<CoreConfig>(configText,
                 new JsonSerializerSettings { ContractResolver = new PrivatePropertyJsonContractResolver() });
         }

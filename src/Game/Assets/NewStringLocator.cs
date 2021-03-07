@@ -36,7 +36,7 @@ namespace UAlbion.Game.Assets
 
             var settings = Resolve<ISettings>();
             var filename = Path.Combine(settings.BasePath, "data", "strings.json");
-            var rawJson = File.ReadAllText(filename);
+            var rawJson = disk.ReadAllText(filename);
             var json = JsonConvert.DeserializeObject<
                 Dictionary<string, Dictionary<string, string>>>
                 (rawJson);

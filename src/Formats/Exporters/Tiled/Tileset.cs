@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Maps;
 
@@ -88,9 +89,10 @@ namespace UAlbion.Formats.Exporters.Tiled
             return test;
         }
 
-        public static Tileset Load(string path)
+        public static Tileset Load(string path, IFileSystem disk)
         {
-            using var stream = File.OpenRead(path);
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            using var stream = disk.OpenRead(path);
             using var xr = new XmlTextReader(stream);
             var serializer = new XmlSerializer(typeof(Tileset));
             var tilemap = (Tileset)serializer.Deserialize(xr);
@@ -98,8 +100,9 @@ namespace UAlbion.Formats.Exporters.Tiled
             return tilemap;
         }
 
-        public void Save(string path)
+        public void Save(string path, IFileSystem disk)
         {
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
             var dir = Path.GetDirectoryName(path);
             foreach (var tile in Tiles)
                 if (!string.IsNullOrEmpty(tile.Image?.Source))
@@ -108,7 +111,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             if (!string.IsNullOrEmpty(Image?.Source))
                 Image.Source = ConfigUtil.GetRelativePath(Image.Source, dir, false);
 
-            using var stream = File.Open(path, FileMode.Create);
+            using var stream = disk.OpenWriteTruncate(path);
             using var sw = new StreamWriter(stream);
             Serialize(sw);
         }

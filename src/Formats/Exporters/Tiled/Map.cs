@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Maps;
 
@@ -32,21 +33,23 @@ namespace UAlbion.Formats.Exporters.Tiled
         [XmlElement("layer")] public List<MapLayer> Layers { get; set; }
         [XmlElement("objectgroup")] public List<ObjectGroup> ObjectGroups { get; set; }
 
-        public static Map Load(string path)
+        public static Map Load(string path, IFileSystem disk)
         {
-            using var stream = File.OpenRead(path);
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            using var stream = disk.OpenRead(path);
             using var xr = new XmlTextReader(stream);
             var serializer = new XmlSerializer(typeof(Map));
             return (Map)serializer.Deserialize(xr);
         }
 
-        public void Save(string path)
+        public void Save(string path, IFileSystem disk)
         {
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
             var dir = Path.GetDirectoryName(path);
             foreach (var tileset in Tilesets)
                 tileset.Source = ConfigUtil.GetRelativePath(tileset.Source, dir, false);
 
-            using var stream = File.Open(path, FileMode.Create);
+            using var stream = disk.OpenWriteTruncate(path);
             using var sw = new StreamWriter(stream);
             Serialize(sw);
         }

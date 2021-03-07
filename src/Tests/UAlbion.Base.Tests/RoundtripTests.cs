@@ -16,12 +16,15 @@ namespace UAlbion.Base.Tests
 {
     public class RoundtripTests
     {
+        readonly IFileSystem _disk;
         public RoundtripTests()
         {
             AssetMapping.GlobalIsThreadLocal = true;
+            _disk = new MockFileSystem(true);
+            _baseDir = ConfigUtil.FindBasePath(_disk);
             var mapping = AssetMapping.Global;
-            var assetConfigPath = Path.Combine(BaseDir, "mods", "Base", "assets.json");
-            var assetConfig = AssetConfig.Load(assetConfigPath);
+            var assetConfigPath = Path.Combine(_baseDir, "mods", "Base", "assets.json");
+            var assetConfig = AssetConfig.Load(assetConfigPath, _disk);
 
             foreach (var assetType in assetConfig.IdTypes.Values)
             {
@@ -35,8 +38,8 @@ namespace UAlbion.Base.Tests
         }
 
         static readonly XldContainer XldLoader = new XldContainer();
-        static readonly string BaseDir = ConfigUtil.FindBasePath();
         static readonly JsonSerializer JsonSerializer = JsonSerializer.Create(ConfigUtil.JsonSerializerSettings);
+        readonly string _baseDir;
 
         static string ReadToEnd(Stream stream)
         {
@@ -92,13 +95,13 @@ namespace UAlbion.Base.Tests
             return (T)JsonSerializer.Deserialize<T>(jsonReader);
         }
 
-        static byte[] BytesFromXld(IGeneralConfig conf, string path, AssetInfo info)
+        byte[] BytesFromXld(IGeneralConfig conf, string path, AssetInfo info)
         {
-            using var s = XldLoader.Read(conf.ResolvePath(path), info);
+            using var s = XldLoader.Read(conf.ResolvePath(path), info, _disk);
             return s.ByteArray(null, null, (int)s.BytesRemaining);
         }
 
-        static void Compare(string testName, byte[] originalBytes, byte[] roundTripBytes, string preText, string postText, string reloadText)
+        void Compare(string testName, byte[] originalBytes, byte[] roundTripBytes, string preText, string postText, string reloadText)
         {
             ApiUtil.Assert(originalBytes.Length == roundTripBytes.Length, $"Asset size changed after round trip (delta {roundTripBytes.Length - originalBytes.Length})");
             ApiUtil.Assert(originalBytes.SequenceEqual(roundTripBytes));
@@ -107,7 +110,7 @@ namespace UAlbion.Base.Tests
 
             if (originalBytes.Length != roundTripBytes.Length || diffs.Length > 1)
             {
-                var resultDir = Path.Combine(BaseDir, "re", "RoundTripTests");
+                var resultDir = Path.Combine(_baseDir, "re", "RoundTripTests");
                 if (!Directory.Exists(resultDir))
                     Directory.CreateDirectory(resultDir);
 
@@ -126,7 +129,7 @@ namespace UAlbion.Base.Tests
                     });
         }
 
-        static void RoundTrip<T>(string testName, byte[] bytes, Func<T, ISerializer, T> serdes) where T : class
+        void RoundTrip<T>(string testName, byte[] bytes, Func<T, ISerializer, T> serdes) where T : class
         {
             var (asset, preTxt) = Load(bytes, serdes);
             var (postBytes, postTxt) = Save(asset, serdes);
@@ -142,37 +145,37 @@ namespace UAlbion.Base.Tests
             Compare(testName + ".json", bytes, fromJsonBytes, preTxt, json, fromJsonTxt);
         }
 
-        static void RoundTripXld<T>(string testName, string file, int subId, Func<T, ISerializer, T> serdes) where T : class
+        void RoundTripXld<T>(string testName, string file, int subId, Func<T, ISerializer, T> serdes) where T : class
         {
-            var conf = AssetSystem.LoadGeneralConfig(BaseDir);
+            var conf = AssetSystem.LoadGeneralConfig(_baseDir, _disk);
             var info = new AssetInfo { SubAssetId = subId };
             var bytes = BytesFromXld(conf, file, info);
             RoundTrip(testName, bytes, serdes);
         }
 
-        static void RoundTripRaw<T>(string testName, string file, Func<T, ISerializer, T> serdes) where T : class
+        void RoundTripRaw<T>(string testName, string file, Func<T, ISerializer, T> serdes) where T : class
         {
-            var conf = AssetSystem.LoadGeneralConfig(BaseDir);
+            var conf = AssetSystem.LoadGeneralConfig(_baseDir, _disk);
             var bytes = File.ReadAllBytes(conf.ResolvePath(file));
             RoundTrip(testName, bytes, serdes);
         }
 
-        static void RoundTripItem<T>(string testName, string file, int subId, Func<T, ISerializer, T> serdes) where T : class
+        void RoundTripItem<T>(string testName, string file, int subId, Func<T, ISerializer, T> serdes) where T : class
         {
-            var conf = AssetSystem.LoadGeneralConfig(BaseDir);
+            var conf = AssetSystem.LoadGeneralConfig(_baseDir, _disk);
             var info = new AssetInfo { SubAssetId = subId };
             var loader = new ItemListContainer();
-            using var s = loader.Read(conf.ResolvePath(file), info);
+            using var s = loader.Read(conf.ResolvePath(file), info, _disk);
             var bytes = s.ByteArray(null, null, (int)s.BytesRemaining);
             RoundTrip(testName, bytes, serdes);
         }
 
-        static void RoundTripSpell<T>(string testName, string file, int subId, Func<T, ISerializer, T> serdes) where T : class
+        void RoundTripSpell<T>(string testName, string file, int subId, Func<T, ISerializer, T> serdes) where T : class
         {
-            var conf = AssetSystem.LoadGeneralConfig(BaseDir);
+            var conf = AssetSystem.LoadGeneralConfig(_baseDir, _disk);
             var info = new AssetInfo { SubAssetId = subId };
             var loader = new SpellListContainer();
-            using var s = loader.Read(conf.ResolvePath(file), info);
+            using var s = loader.Read(conf.ResolvePath(file), info, _disk);
             var bytes = s.ByteArray(null, null, (int)s.BytesRemaining);
             RoundTrip(testName, bytes, serdes);
         }
@@ -363,6 +366,51 @@ namespace UAlbion.Base.Tests
             var info = new AssetInfo { AssetId = AssetId.From(Tileset.Toronto) };
             RoundTripXld<TilesetData>(nameof(TilesetTest), "$(XLD)/ICONDAT0.XLD", 7,
                 (x, s) => TilesetLoader.Serdes(x, info, AssetMapping.Global, s));
+        }
+
+        [Fact]
+        public void TiledTilesetTest()
+        {
+            var info = new AssetInfo { AssetId = AssetId.From(Tileset.Toronto), SubAssetId = 7 };
+            var conf = AssetSystem.LoadGeneralConfig(_baseDir, _disk);
+            var bytes = BytesFromXld(conf, "$(XLD)/ICONDAT0.XLD", info);
+
+            TilesetData Serdes(TilesetData x, ISerializer s) => TilesetLoader.Serdes(x, info, AssetMapping.Global, s);
+            var (asset, preTxt) = Load<TilesetData>(bytes, Serdes);
+
+            var loader = new Formats.Exporters.Tiled.TilesetLoader();
+            var (tiledBytes, tiledTxt) = Save(asset, (x, s) => loader.Serdes(x, info, AssetMapping.Global, s));
+
+            var (fromTiled, fromTiledTxt) = Load<TilesetData>(tiledBytes,
+                (x, s) => loader.Serdes(x, info, AssetMapping.Global, s));
+
+            var (roundTripped, roundTripTxt) = Save(fromTiled, Serdes);
+            Compare(nameof(TiledTilesetTest),  bytes, roundTripped, preTxt, tiledTxt, roundTripTxt);
+        }
+
+        [Fact]
+        public void TiledStampTest()
+        {
+            var info = new AssetInfo { AssetId = AssetId.From(BlockList.Toronto), SubAssetId = 7 };
+            var conf = AssetSystem.LoadGeneralConfig(_baseDir, _disk);
+            var bytes = BytesFromXld(conf, "$(XLD)/BLKLIST0.XLD", info);
+
+            Formats.Assets.BlockList Serdes(Formats.Assets.BlockList x, ISerializer s) => BlockListLoader.Serdes(x, info, AssetMapping.Global, s);
+            var (asset, preTxt) = Load<Formats.Assets.BlockList>(bytes, Serdes);
+
+            var loader = new Formats.Exporters.Tiled.StampLoader();
+            var (tiledBytes, tiledTxt) = Save(asset, (x, s) => loader.Serdes(x, info, AssetMapping.Global, s));
+
+            var (fromTiled, fromTiledTxt) = Load<Formats.Assets.BlockList>(tiledBytes,
+                (x, s) => loader.Serdes(x, info, AssetMapping.Global, s));
+
+            var (roundTripped, roundTripTxt) = Save(fromTiled, Serdes);
+            Compare(nameof(TiledStampTest),  bytes, roundTripped, preTxt, tiledTxt, roundTripTxt);
+        }
+
+        [Fact]
+        public void TiledMap2dTest()
+        {
         }
 
         [Fact]

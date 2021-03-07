@@ -6,6 +6,7 @@ using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Containers;
 using UAlbion.Formats.MapEvents;
 using Xunit;
 
@@ -13,13 +14,14 @@ namespace UAlbion.Base.Tests
 {
     public class EventRoundTripTests
     {
-        static readonly string BaseDir = ConfigUtil.FindBasePath();
         public EventRoundTripTests()
         {
             AssetMapping.GlobalIsThreadLocal = true;
             var mapping = AssetMapping.Global;
-            var assetConfigPath = Path.Combine(BaseDir, "mods", "Base", "assets.json");
-            var assetConfig = AssetConfig.Load(assetConfigPath);
+            var disk = new MockFileSystem(true);
+            var baseDir = ConfigUtil.FindBasePath(disk);
+            var assetConfigPath = Path.Combine(baseDir, "mods", "Base", "assets.json");
+            var assetConfig = AssetConfig.Load(assetConfigPath, disk);
 
             foreach (var assetType in assetConfig.IdTypes.Values)
             {

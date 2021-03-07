@@ -111,7 +111,7 @@ namespace UAlbion.Game.Gui.Status
 
         protected override void Subscribed() => LoadSprite();
         public override Vector2 GetSize() => _portrait.GetSize() + new Vector2(0,6); // Add room for health + mana bars
-        IPlayer PartyMember => Resolve<IParty>()?.StatusBarOrder.ElementAtOrDefault(_order);
+        IPlayer PartyMember => TryResolve<IParty>()?.StatusBarOrder.ElementAtOrDefault(_order);
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {

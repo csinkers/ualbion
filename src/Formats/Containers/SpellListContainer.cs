@@ -14,18 +14,20 @@ namespace UAlbion.Formats.Containers
     /// </summary>
     public class SpellListContainer : IAssetContainer
     {
-        public ISerializer Read(string file, AssetInfo info)
+        public ISerializer Read(string file, AssetInfo info, IFileSystem disk)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
-            var stream = File.OpenRead(file);
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            var stream = disk.OpenRead(file);
             var br = new BinaryReader(stream);
             stream.Position = info.SubAssetId * SpellData.SizeOnDisk;
             return new AlbionReader(br, SpellData.SizeOnDisk);
         }
 
-        public void Write(string path, IList<(AssetInfo, byte[])> assets)
+        public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk)
         {
-            using var fs = File.OpenWrite(path);
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            using var fs = disk.OpenWriteTruncate(path);
             using var bw = new BinaryWriter(fs);
             foreach (var (info, bytes) in assets.OrderBy(x => x.Item1.SubAssetId))
             {
@@ -35,9 +37,10 @@ namespace UAlbion.Formats.Containers
             }
         }
 
-        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info)
+        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk)
         {
-            using var f = File.OpenRead(path);
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            using var f = disk.OpenRead(path);
             return new List<(int, int)> { (0, (int)f.Length / SpellData.SizeOnDisk) };
         }
     }

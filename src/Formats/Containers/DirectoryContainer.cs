@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Parsers;
 
@@ -14,10 +15,11 @@ namespace UAlbion.Formats.Containers
     /// </summary>
     public class DirectoryContainer : IAssetContainer
     {
-        public ISerializer Read(string path, AssetInfo info)
+        public ISerializer Read(string path, AssetInfo info, IFileSystem disk)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
-            foreach (var filePath in Directory.EnumerateFiles(path, $"{info.SubAssetId}*.*"))
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            foreach (var filePath in disk.EnumerateDirectory(path, $"{info.SubAssetId}*.*"))
             {
                 var file = Path.GetFileName(filePath);
                 int index = file.IndexOf('_');
@@ -28,7 +30,7 @@ namespace UAlbion.Formats.Containers
                 if (numeric != info.SubAssetId)
                     continue;
 
-                var stream = File.OpenRead(filePath);
+                var stream = disk.OpenRead(filePath);
                 var br = new BinaryReader(stream);
                 return new AlbionReader(br, stream.Length, () => { br.Dispose(); stream.Dispose(); });
             }
@@ -36,14 +38,15 @@ namespace UAlbion.Formats.Containers
             return null;
         }
 
-        public void Write(string path, IList<(AssetInfo, byte[])> assets)
+        public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk)
         {
             if (assets == null) throw new ArgumentNullException(nameof(assets));
-            if (File.Exists(path))
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (disk.FileExists(path))
                 throw new InvalidOperationException($"Cannot save directory container at \"{path}\", as there is already a file with that name.");
 
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            if (!disk.DirectoryExists(path))
+                disk.CreateDirectory(path);
 
             foreach (var (info, bytes) in assets)
             {
@@ -60,7 +63,7 @@ namespace UAlbion.Formats.Containers
                 if (frames.Count == 1)
                 {
                     var filename = string.Format(CultureInfo.InvariantCulture, pattern, info.SubAssetId, 0, name);
-                    File.WriteAllBytes(Path.Combine(path, filename), frames[0]);
+                    disk.WriteAllBytes(Path.Combine(path, filename), frames[0]);
                 }
                 else
                 {
@@ -70,19 +73,20 @@ namespace UAlbion.Formats.Containers
                             continue;
 
                         var filename = string.Format(CultureInfo.InvariantCulture, pattern, info.SubAssetId, i, name);
-                        File.WriteAllBytes(Path.Combine(path, filename), frames[i]);
+                        disk.WriteAllBytes(Path.Combine(path, filename), frames[i]);
                     }
                 }
             }
         }
 
-        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info)
+        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk)
         {
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
             var subIds = new List<int>();
-            if (!Directory.Exists(path))
+            if (!disk.DirectoryExists(path))
                 return new List<(int, int)> { (0, 1) };
 
-            foreach (var filePath in Directory.EnumerateFiles(path))
+            foreach (var filePath in disk.EnumerateDirectory(path))
             {
                 var file = Path.GetFileName(filePath);
                 int index = file.IndexOf('_');

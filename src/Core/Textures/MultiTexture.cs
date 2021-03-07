@@ -275,6 +275,6 @@ namespace UAlbion.Core.Textures
             }
         }
 
-        public abstract void SavePng(int logicalId, int tick, string path);
+        public abstract void SavePng(int logicalId, int tick, string path, IFileSystem disk);
     }
 }

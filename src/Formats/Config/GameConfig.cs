@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Newtonsoft.Json;
+using UAlbion.Api;
 using UAlbion.Config;
 
 #pragma warning disable CA1034 // Nested types should not be visible
@@ -81,12 +83,13 @@ namespace UAlbion.Formats.Config
             public int CarryWeightPerStrength { get; private set; }
         }
 
-        public static GameConfig Load(string configPath)
+        public static GameConfig Load(string configPath, IFileSystem disk)
         {
-            if (!File.Exists(configPath))
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (!disk.FileExists(configPath))
                 throw new FileNotFoundException($"Could not find game config file at expected path {configPath}");
 
-            var configText = File.ReadAllText(configPath);
+            var configText = disk.ReadAllText(configPath);
             return JsonConvert.DeserializeObject<GameConfig>(configText, ConfigUtil.JsonSerializerSettings);
         }
 

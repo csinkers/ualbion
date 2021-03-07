@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using UAlbion.Api;
 using UAlbion.Core;
 
 namespace UAlbion.Game.Settings
@@ -31,10 +32,11 @@ namespace UAlbion.Game.Settings
             EngineFlags.VSync | 
             EngineFlags.UseCylindricalBillboards;
 
-        public static GeneralSettings Load(string configPath)
+        public static GeneralSettings Load(string configPath, IFileSystem disk)
         {
-            var settings = File.Exists(configPath) 
-                ? JsonConvert.DeserializeObject<GeneralSettings>(File.ReadAllText(configPath)) 
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            var settings = disk.FileExists(configPath) 
+                ? JsonConvert.DeserializeObject<GeneralSettings>(disk.ReadAllText(configPath)) 
                 : new GeneralSettings();
 
             settings._configPath = configPath;
@@ -43,8 +45,9 @@ namespace UAlbion.Game.Settings
             return settings;
         }
 
-        public void Save()
+        public void Save(IFileSystem disk)
         {
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
             var serializerSettings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented,
@@ -52,7 +55,7 @@ namespace UAlbion.Game.Settings
             };
 
             var json = JsonConvert.SerializeObject(this, serializerSettings);
-            File.WriteAllText(_configPath, json);
+            disk.WriteAllText(_configPath, json);
         }
     }
 }

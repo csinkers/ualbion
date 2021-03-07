@@ -64,7 +64,15 @@ namespace UAlbion.Core
         /// </summary>
         /// <typeparam name="T">The interface type to resolve</typeparam>
         /// <returns></returns>
-        protected T Resolve<T>() => Exchange.Resolve<T>();
+        protected T Resolve<T>() => Exchange.Resolve<T>() ?? throw new MissingDependencyException($"{GetType().Name} could not locate dependency of type {typeof(T).Name}");
+
+        /// <summary>
+        /// Resolve the currently active object that provides the given interface.
+        /// Service interfaces should have a maximum of one active instance at any one time.
+        /// </summary>
+        /// <typeparam name="T">The interface type to resolve</typeparam>
+        /// <returns></returns>
+        protected T TryResolve<T>() => Exchange.Resolve<T>();
 
         /// <summary>
         /// Raise an event via the currently subscribed event exchange (if subscribed), and

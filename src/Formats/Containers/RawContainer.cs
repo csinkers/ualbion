@@ -13,31 +13,34 @@ namespace UAlbion.Formats.Containers
     /// </summary>
     public class RawContainer : IAssetContainer
     {
-        public ISerializer Read(string file, AssetInfo info)
+        public ISerializer Read(string file, AssetInfo info, IFileSystem disk)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
             ApiUtil.Assert(info.SubAssetId == 0, "SubItem should always be 0 when accessing a non-container file");
-            var stream = File.OpenRead(file);
+            var stream = disk.OpenRead(file);
             var br = new BinaryReader(stream);
             return new AlbionReader(br);
         }
 
-        public void Write(string path, IList<(AssetInfo, byte[])> assets)
+        public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk)
         {
             if (assets == null) throw new ArgumentNullException(nameof(assets));
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
             if (assets.Count == 0)
             {
-                if (File.Exists(path))
-                    File.Delete(path);
+                if (disk.FileExists(path))
+                    disk.DeleteFile(path);
                 return;
             }
 
             if (assets.Count > 1) throw new ArgumentOutOfRangeException(nameof(assets), "A RawContainer can only hold a single asset");
 
             var (_, bytes) = assets.Single();
-            File.WriteAllBytes(path, bytes);
+            disk.WriteAllBytes(path, bytes);
         }
 
-        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info) => new List<(int, int)> { (0, 1) };
+        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk) 
+            => new List<(int, int)> { (0, 1) };
     }
 }

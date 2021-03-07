@@ -18,10 +18,11 @@ namespace UAlbion.Formats.Containers
     public class JsonObjectContainer : IAssetContainer
     {
         [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The serializer will handle it")]
-        public ISerializer Read(string path, AssetInfo info)
+        public ISerializer Read(string path, AssetInfo info, IFileSystem disk)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
-            var dict = Load(path);
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            var dict = Load(path, disk);
             if (!dict.TryGetValue(info.AssetId, out var token))
                 return null;
 
@@ -35,11 +36,12 @@ namespace UAlbion.Formats.Containers
                 () => { br.Dispose(); ms.Dispose(); });
         }
 
-        public void Write(string path, IList<(AssetInfo, byte[])> assets)
+        public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk)
         {
             if (assets == null) throw new ArgumentNullException(nameof(assets));
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
             var dict = new Dictionary<string, JObject>();
-            foreach(var (info, bytes) in assets)
+            foreach (var (info, bytes) in assets)
             {
                 var json = Encoding.UTF8.GetString(bytes);
                 var jObject = JObject.Parse(json);
@@ -47,20 +49,21 @@ namespace UAlbion.Formats.Containers
             }
 
             var fullText = JsonConvert.SerializeObject(dict, ConfigUtil.JsonSerializerSettings);
-             File.WriteAllText(path, fullText);
+            disk.WriteAllText(path, fullText);
         }
 
-        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info)
+        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk)
         {
-            if (!File.Exists(path))
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (!disk.FileExists(path))
                 return null;
-            var dict = Load(path);
+            var dict = Load(path, disk);
             return FormatUtil.SortedIntsToRanges(dict.Keys.Select(x => x.Id).OrderBy(x => x));
         }
 
-        static IDictionary<AssetId, JObject> Load(string path)
+        static IDictionary<AssetId, JObject> Load(string path, IFileSystem disk)
         {
-            var text = File.ReadAllText(path);
+            var text = disk.ReadAllText(path);
             var dict = (IDictionary<string, JObject>)JsonConvert.DeserializeObject<IDictionary<string, JObject>>(text);
             if (dict == null)
                 throw new FileLoadException($"Could not deserialize \"{path}\"");

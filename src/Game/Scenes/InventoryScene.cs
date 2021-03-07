@@ -1,6 +1,7 @@
 ﻿using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Config;
+using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Scenes

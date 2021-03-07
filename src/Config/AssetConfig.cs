@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using UAlbion.Api;
 
 namespace UAlbion.Config
 {
@@ -27,22 +28,24 @@ namespace UAlbion.Config
             return (AssetConfig)config;
         }
 
-        public static AssetConfig Load(string configPath)
+        public static AssetConfig Load(string configPath, IFileSystem disk)
         {
-            if (!File.Exists(configPath))
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (!disk.FileExists(configPath))
                 throw new FileNotFoundException($"Could not open asset config from {configPath}");
 
-            var configText = File.ReadAllText(configPath);
+            var configText = disk.ReadAllText(configPath);
             var config = Parse(configText);
             if(config == null)
                 throw new FileLoadException($"Could not load asset config from \"{configPath}\"");
             return config;
         }
 
-        public void Save(string configPath)
+        public void Save(string configPath, IFileSystem disk)
         {
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
             var json = JsonConvert.SerializeObject(this, ConfigUtil.JsonSerializerSettings);
-            File.WriteAllText(configPath, json);
+            disk.WriteAllText(configPath, json);
         }
 
         public AssetInfo[] GetAssetInfo(AssetId id)

@@ -6,6 +6,7 @@ using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities.Map2D

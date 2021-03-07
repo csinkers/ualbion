@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Events;
@@ -39,7 +40,7 @@ namespace UAlbion.Game.Settings
             On<EngineFlagEvent>(e => _settings.Flags = (EngineFlags)CoreUtil.UpdateFlag((uint)_settings.Flags, e.Operation, (uint)e.Flag));
         }
 
-        public void Save() => _settings.Save();
+        public void Save() => _settings.Save(Resolve<IFileSystem>());
 
         protected override void Subscribed()
         {

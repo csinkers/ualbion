@@ -42,7 +42,7 @@ namespace UAlbion.Game.Assets
 
         protected override void Subscribed()
         {
-            _assetLocator ??= Resolve<IAssetLocator>() ?? throw new ComponentNotFoundException(nameof(IAssetLocator));
+            _assetLocator ??= Resolve<IAssetLocator>();
             Exchange.Register<IModApplier>(this);
         }
 
@@ -55,13 +55,14 @@ namespace UAlbion.Game.Assets
             _modsInReverseDependencyOrder.Clear();
             AssetMapping.Global.Clear();
 
+            var disk = Resolve<IFileSystem>();
             foreach (var mod in mods)
-                LoadMod(config.ResolvePath("$(MODS)"), mod);
+                LoadMod(config.ResolvePath("$(MODS)"), mod, disk);
 
             _modsInReverseDependencyOrder.Reverse();
         }
 
-        void LoadMod(string dataDir, string modName)
+        void LoadMod(string dataDir, string modName, IFileSystem disk)
         {
             if (string.IsNullOrEmpty(modName))
                 return;
@@ -78,27 +79,27 @@ namespace UAlbion.Game.Assets
             string path = Path.Combine(dataDir, modName);
 
             var assetConfigPath = Path.Combine(path, "assets.json");
-            if (!File.Exists(assetConfigPath))
+            if (!disk.FileExists(assetConfigPath))
             {
                 Raise(new LogEvent(LogEvent.Level.Error, $"Mod {modName} does not contain an asset.config file"));
                 return;
             }
 
             var modConfigPath = Path.Combine(path, "modinfo.json");
-            if (!File.Exists(modConfigPath))
+            if (!disk.FileExists(modConfigPath))
             {
                 Raise(new LogEvent(LogEvent.Level.Error, $"Mod {modName} does not contain an modinfo.config file"));
                 return;
             }
 
-            var assetConfig = AssetConfig.Load(assetConfigPath);
-            var modConfig = ModConfig.Load(modConfigPath);
+            var assetConfig = AssetConfig.Load(assetConfigPath, disk);
+            var modConfig = ModConfig.Load(modConfigPath, disk);
             var modInfo = new ModInfo(modName, assetConfig, modConfig, path);
 
             // Load dependencies
             foreach (var dependency in modConfig.Dependencies)
             {
-                LoadMod(dataDir, dependency);
+                LoadMod(dataDir, dependency, disk);
                 if (!_mods.TryGetValue(dependency, out var dependencyInfo))
                 {
                     Raise(new LogEvent(LogEvent.Level.Error, $"Dependency {dependency} of mod {modName} could not be loaded, skipping load of {modName}"));
@@ -282,11 +283,9 @@ namespace UAlbion.Game.Assets
             if (flushCacheFunc == null) throw new ArgumentNullException(nameof(flushCacheFunc));
 
             var config = Resolve<IGeneralConfig>();
-            if (config == null)
-                throw new ComponentNotFoundException(nameof(IGeneralConfig));
-
             var loaderRegistry = Resolve<IAssetLoaderRegistry>();
             var containerRegistry = Resolve<IContainerRegistry>();
+            var disk = Resolve<IFileSystem>();
             var target = _modsInReverseDependencyOrder.Last();
 
             // Add any missing ids
@@ -353,7 +352,7 @@ namespace UAlbion.Game.Assets
                 }
 
                 if (assets.Count > 0)
-                    container.Write(path, assets);
+                    container.Write(path, assets, disk);
             }
         }
     }

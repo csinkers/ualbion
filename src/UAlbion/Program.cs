@@ -27,7 +27,8 @@ namespace UAlbion
                 return;
 
             PerfTracker.StartupEvent($"Running as {commandLine.Mode}");
-            var baseDir = ConfigUtil.FindBasePath();
+            var disk = new FileSystem();
+            var baseDir = ConfigUtil.FindBasePath(disk);
             if (baseDir == null)
                 throw new InvalidOperationException("No base directory could be found.");
 
@@ -44,7 +45,7 @@ namespace UAlbion
                 return;
             }
 
-            var setupAssetSystem = Task.Run(() => AssetSystem.SetupAsync(baseDir));
+            var setupAssetSystem = Task.Run(() => AssetSystem.SetupAsync(baseDir, disk));
             using var engine = commandLine.NeedsEngine ? BuildEngine(commandLine) : null;
             var (exchange, services) = setupAssetSystem.Result;
             var assets = exchange.Resolve<IAssetManager>();
@@ -69,7 +70,7 @@ namespace UAlbion
                         DumpText.Dump(assets, baseDir, tf, commandLine.DumpAssetTypes, parsedIds);
 
                     if ((commandLine.DumpFormats & DumpFormats.Png) != 0)
-                        DumpGraphics.Dump(assets, baseDir, commandLine.DumpAssetTypes, commandLine.DumpFormats, parsedIds);
+                        DumpGraphics.Dump(assets, disk, baseDir, commandLine.DumpAssetTypes, commandLine.DumpFormats, parsedIds);
 
                     //if ((commandLine.DumpFormats & DumpFormats.Tiled) != 0)
                     //    DumpTiled.Dump(baseDir, assets, commandLine.DumpAssetTypes, parsedIds);

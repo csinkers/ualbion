@@ -49,7 +49,7 @@ namespace UAlbion.Game.Gui.Status
             maxOrder = Math.Max(maxOrder, func(_hoverTextContainer, extents, order + 2));
             maxOrder = Math.Max(maxOrder, func(_descriptionTextContainer, extents, order + 2));
 
-            var party = Resolve<IParty>();
+            var party = TryResolve<IParty>();
             if (party == null)
                 return maxOrder;
 

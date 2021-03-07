@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using UAlbion.Api;
 using UAlbion.Formats.Assets;
 
 #pragma warning disable CA2227 // Collection properties should be read only
@@ -135,12 +136,18 @@ namespace UAlbion.Formats.Exporters.Tiled
           }]
         }
          */
-        public static Stamp Load(string path) => Parse(File.ReadAllText(path));
+        public static Stamp Load(string path, IFileSystem disk)
+        {
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            return Parse(disk.ReadAllText(path));
+        }
+
         public static Stamp Parse(string json) => JsonConvert.DeserializeObject<Stamp>(json);
 
-        public void Save(string path)
+        public void Save(string path, IFileSystem disk)
         {
-            using var stream = File.Open(path, FileMode.Create);
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            using var stream = disk.OpenWriteTruncate(path);
             using var sw = new StreamWriter(stream);
             Serialize(sw);
         }

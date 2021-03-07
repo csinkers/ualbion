@@ -35,7 +35,7 @@ namespace UAlbion.Game.Gui.Status
 
         void Update()
         {
-            var party = Resolve<IParty>();
+            var party = TryResolve<IParty>();
             bool visible = party != null && _order < party.StatusBarOrder.Count;
             _bar.IsActive = visible;
             _frame.IsActive = visible;

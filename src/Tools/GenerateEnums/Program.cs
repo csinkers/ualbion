@@ -1,11 +1,14 @@
-﻿namespace UAlbion.CodeGenerator
+﻿using UAlbion.Api;
+
+namespace UAlbion.CodeGenerator
 {
     static class Program
     {
         static void Main()
         {
             // TODO: Add verify mode
-            var assets = new Assets();
+            var disk = new FileSystem();
+            var assets = new Assets(disk);
             GenerateAssetIds.Generate(assets);
         }
     }

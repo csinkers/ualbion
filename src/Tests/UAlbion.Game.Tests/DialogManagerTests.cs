@@ -48,6 +48,7 @@ namespace UAlbion.Game.Tests
             ex
                 .Attach(mma)
                 .Attach(new AssetManager())
+                .Attach(new WordLookup())
                 .Attach(new TextFormatter())
                 .Attach(new TextManager())
                 .Attach(new SpriteManager())

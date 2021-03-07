@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -48,12 +49,13 @@ namespace UAlbion.Game.Assets
             if (info == null) throw new ArgumentNullException(nameof(info));
 
             var generalConfig = Resolve<IGeneralConfig>();
+            var disk = Resolve<IFileSystem>();
             var resolved = generalConfig.ResolvePath(info.Filename, extraPaths);
-            var containerLoader = GetContainerLoader(resolved, info.Container);
-            return containerLoader?.GetSubItemRanges(resolved, info) ?? new List<(int, int)> { (0, 1) };
+            var containerLoader = GetContainerLoader(resolved, info.Container, disk);
+            return containerLoader?.GetSubItemRanges(resolved, info, disk) ?? new List<(int, int)> { (0, 1) };
         }
 
-        IAssetContainer GetContainerLoader(string path, string container)
+        IAssetContainer GetContainerLoader(string path, string container, IFileSystem disk)
         {
             if (!string.IsNullOrEmpty(container))
                 return _containerRegistry.GetContainer(container);
@@ -63,7 +65,7 @@ namespace UAlbion.Game.Assets
                 case ".XLD" : return _containerRegistry.GetContainer(typeof(XldContainer));
                 case ".ZIP" : return _containerRegistry.GetContainer(typeof(ZipContainer));
                 default:
-                    return Directory.Exists(path) 
+                    return disk.DirectoryExists(path) 
                         ? _containerRegistry.GetContainer(typeof(DirectoryContainer)) 
                         : null;
             }
@@ -72,20 +74,21 @@ namespace UAlbion.Game.Assets
         ISerializer Search(IGeneralConfig generalConfig, AssetInfo info, IDictionary<string, string> extraPaths)
         {
             var path = generalConfig.ResolvePath(info.File.Filename, extraPaths);
-            if (info.File.Sha256Hash != null && !info.File.Sha256Hash.Equals(GetHash(path), StringComparison.OrdinalIgnoreCase))
+            var disk = Resolve<IFileSystem>();
+            if (info.File.Sha256Hash != null && !info.File.Sha256Hash.Equals(GetHash(path, disk), StringComparison.OrdinalIgnoreCase))
                 return null;
 
-            var containerLoader = GetContainerLoader(path, info.File.Container);
-            return containerLoader?.Read(path, info);
+            var containerLoader = GetContainerLoader(path, info.File.Container, disk);
+            return containerLoader?.Read(path, info, disk);
         }
 
-        string GetHash(string filename)
+        string GetHash(string filename, IFileSystem disk)
         {
             if (_hashCache.TryGetValue(filename, out var hash))
                 return hash;
 
             using var sha256 = SHA256.Create();
-            using var stream = File.OpenRead(filename);
+            using var stream = disk.OpenRead(filename);
             var hashBytes = sha256.ComputeHash(stream);
             hash = FormatUtil.BytesToHexString(hashBytes);
 

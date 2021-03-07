@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State.Player;
 using UAlbion.Game.Text;
@@ -149,6 +151,7 @@ namespace UAlbion.Game.State
             if (_game == null)
                 return;
 
+            var disk = Resolve<IFileSystem>();
             _game.Name = name;
 
             for (int i = 0; i < SavedGame.MaxPartySize; i++)
@@ -157,7 +160,7 @@ namespace UAlbion.Game.State
                     : PartyMemberId.None;
 
             // var key = new AssetId(AssetType.SavedGame, id);
-            using var stream = File.Open(IdToPath(id), FileMode.Create);
+            using var stream = disk.OpenWriteTruncate(IdToPath(id));
             using var bw = new BinaryWriter(stream);
             var mapping = new AssetMapping(); // TODO
             using var aw = new AlbionWriter(bw);

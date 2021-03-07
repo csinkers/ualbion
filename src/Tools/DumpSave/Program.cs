@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -174,7 +175,8 @@ namespace DumpSave
 
         static void Main(string[] args)
         {
-            var baseDir = ConfigUtil.FindBasePath();
+            var disk = new FileSystem();
+            var baseDir = ConfigUtil.FindBasePath(disk);
             if (baseDir == null)
                 throw new InvalidOperationException("No base directory could be found.");
 
@@ -186,10 +188,10 @@ namespace DumpSave
             }
 
             var filename = args[0];
-            var stream = File.OpenRead(filename);
+            var stream = disk.OpenRead(filename);
             using var br = new BinaryReader(stream, Encoding.GetEncoding(850));
-            var generalConfig = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir);
-            var settings = GeneralSettings.Load(generalConfig.ResolvePath("$(DATA)/settings.json", null));
+            var generalConfig = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir, disk);
+            var settings = GeneralSettings.Load(generalConfig.ResolvePath("$(DATA)/settings.json"), disk);
             var settingsManager = new SettingsManager(settings);
             var assets = new AssetManager();
             var loaderRegistry = new AssetLoaderRegistry();

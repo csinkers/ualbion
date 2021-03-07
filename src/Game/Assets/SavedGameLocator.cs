@@ -27,7 +27,7 @@ namespace UAlbion.Game.Assets
             var filename = Path.Combine(generalConfig.BasePath, generalConfig.SavePath, $"SAVE.{key.Id:D3}");
 
             var loader = _assetLoaderRegistry.GetLoader<SavedGame>(FileFormat.SavedGame);
-            using var stream = File.Open(filename, FileMode.Open);
+            using var stream = disk.OpenRead(filename);
             using var br = new BinaryReader(stream);
             return loader.Serdes(
                 null,

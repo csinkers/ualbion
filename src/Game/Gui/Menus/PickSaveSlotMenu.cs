@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
@@ -49,6 +50,8 @@ namespace UAlbion.Game.Gui.Menus
 
         protected override void Subscribed()
         {
+            var disk = Resolve<IFileSystem>();
+
             IText BuildEmptySlotText(int x) =>
                 new DynamicText(() =>
                 {
@@ -65,9 +68,9 @@ namespace UAlbion.Game.Gui.Menus
             for (ushort i = 1; i <= MaxSaveNumber; i++)
             {
                 var filename = BuildSaveFilename(i);
-                if (File.Exists(filename))
+                if (disk.FileExists(filename))
                 {
-                    using var stream = File.OpenRead(filename);
+                    using var stream = disk.OpenRead(filename);
                     using var br = new BinaryReader(stream);
                     var name = SavedGame.GetName(br) ?? "Invalid";
                     var text = $"{i,2}    {name}";

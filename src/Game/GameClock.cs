@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.Config;
+using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
 

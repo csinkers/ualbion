@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
@@ -12,13 +13,15 @@ namespace UAlbion
 {
     static class ConvertAssets
     {
-        static (ModApplier, EventExchange) BuildModApplier(string baseDir, string mod)
+        static (ModApplier, EventExchange) BuildModApplier(string baseDir, string mod, IFileSystem disk)
         {
-            var config = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir);
+            var config = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir, disk);
             var applier = new ModApplier();
             var exchange = new EventExchange(new LogExchange());
             exchange
+                .Register(disk)
                 .Register<IGeneralConfig>(config)
+                .Register<ICoreFactory>(new VeldridCoreFactory())
                 .Attach(new StdioConsoleLogger())
                 .Attach(new AssetLoaderRegistry())
                 .Attach(new ContainerRegistry())
@@ -26,7 +29,6 @@ namespace UAlbion
                 .Attach(new AssetLocator())
                 .Attach(new SettingsManager(new GeneralSettings())) // Used for event comments
                 .Attach(applier)
-                .Register<ICoreFactory>(new VeldridCoreFactory())
                 ;
             applier.LoadMods(config, new[] { mod });
             return (applier, exchange);
@@ -39,8 +41,9 @@ namespace UAlbion
             string[] ids,
             ISet<AssetType> assetTypes)
         {
-            var (from, fromExchange) = BuildModApplier(baseDir, fromMod);
-            var (to, toExchange) = BuildModApplier(baseDir, toMod);
+            var disk = new FileSystem();
+            var (from, fromExchange) = BuildModApplier(baseDir, fromMod, disk);
+            var (to, toExchange) = BuildModApplier(baseDir, toMod, disk);
 
             using (fromExchange)
             using (toExchange)
@@ -50,7 +53,7 @@ namespace UAlbion
                 fromExchange.Attach(new AssetManager(from)); // From also needs an asset manager for the inventory post-processor etc
 
                 var parsedIds = ids?.Select(AssetId.Parse).ToHashSet();
-                var paletteHints = PaletteHints.Load(Path.Combine(baseDir, "mods", "Base", "palette_hints.json"));
+                var paletteHints = PaletteHints.Load(Path.Combine(baseDir, "mods", "Base", "palette_hints.json"), disk);
                 var cache = new Dictionary<(AssetId, string), object>();
 
                 (object, AssetInfo) LoaderFunc(AssetId id, string language)

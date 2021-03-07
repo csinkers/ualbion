@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using Newtonsoft.Json;
+using UAlbion.Api;
 
 namespace UAlbion.Config
 {
@@ -11,10 +13,11 @@ namespace UAlbion.Config
         public static PaletteHints Parse(string text) 
             => new PaletteHints { Raw = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, int>>>(text) };
 
-        public static PaletteHints Load(string path)
+        public static PaletteHints Load(string path, IFileSystem disk)
         {
-            if (!File.Exists(path)) throw new FileNotFoundException($"Could not open palette hint config from {path}");
-            var configText = File.ReadAllText(path);
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (!disk.FileExists(path)) throw new FileNotFoundException($"Could not open palette hint config from {path}");
+            var configText = disk.ReadAllText(path);
             return Parse(configText);
         }
 

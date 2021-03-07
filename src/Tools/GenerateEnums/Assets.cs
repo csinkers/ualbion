@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UAlbion.Api;
 using UAlbion.Config;
 
 namespace UAlbion.CodeGenerator
@@ -15,14 +17,15 @@ namespace UAlbion.CodeGenerator
         public Dictionary<string, string[]> EnumsByAssetId { get; }
         public ILookup<AssetType, string> AssetIdsByType { get; }
 
-        public Assets() // Everything in this class should be treated as read-only once the constructor finishes.
+        public Assets(IFileSystem disk) // Everything in this class should be treated as read-only once the constructor finishes.
         {
-            BaseDir = ConfigUtil.FindBasePath();
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            BaseDir = ConfigUtil.FindBasePath(disk);
             var assetIdConfigPath = Path.Combine(BaseDir, @"src/Formats/AssetIdTypes.json");
-            var config = GeneralConfig.Load(Path.Combine(BaseDir, "data/config.json"), BaseDir);
+            var config = GeneralConfig.Load(Path.Combine(BaseDir, "data/config.json"), BaseDir, disk);
 
-            AssetConfig = AssetConfig.Load(config.ResolvePath("$(MODS)/Base/assets.json", null));
-            AssetIdConfig = AssetIdConfig.Load(assetIdConfigPath);
+            AssetConfig = AssetConfig.Load(config.ResolvePath("$(MODS)/Base/assets.json"), disk);
+            AssetIdConfig = AssetIdConfig.Load(assetIdConfigPath, disk);
 
             AssetIdsByType = FindAssetIdsByType(AssetIdConfig);
             ParentsByAssetId = FindAssetIdParents(AssetIdConfig, AssetIdsByType);

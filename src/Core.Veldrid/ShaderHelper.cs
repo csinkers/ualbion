@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using UAlbion.Api;
 using Veldrid;
 using Veldrid.SPIRV;
 
@@ -14,12 +15,13 @@ namespace UAlbion.Core.Veldrid
         public static (Shader vs, Shader fs) LoadSpirv(
             GraphicsDevice gd,
             ResourceFactory factory,
-            string setName)
+            string setName,
+            IFileSystem disk)
         {
             if (gd == null) throw new ArgumentNullException(nameof(gd));
             if (factory == null) throw new ArgumentNullException(nameof(factory));
-            byte[] vsBytes = LoadBytecode(GraphicsBackend.Vulkan, setName, ShaderStages.Vertex);
-            byte[] fsBytes = LoadBytecode(GraphicsBackend.Vulkan, setName, ShaderStages.Fragment);
+            byte[] vsBytes = LoadBytecode(GraphicsBackend.Vulkan, setName, ShaderStages.Vertex, disk);
+            byte[] fsBytes = LoadBytecode(GraphicsBackend.Vulkan, setName, ShaderStages.Fragment, disk);
 
             Shader[] shaders = factory.CreateFromSpirv(
                 new ShaderDescription(ShaderStages.Vertex, vsBytes, "main", CoreUtil.IsDebug),
@@ -60,7 +62,7 @@ namespace UAlbion.Core.Veldrid
             return specializations.ToArray();
         }
 
-        public static byte[] LoadBytecode(GraphicsBackend backend, string setName, ShaderStages stage)
+        public static byte[] LoadBytecode(GraphicsBackend backend, string setName, ShaderStages stage, IFileSystem disk)
         {
             string stageExt = stage == ShaderStages.Vertex ? "vert" : "frag";
             string name = setName + "." + stageExt;
@@ -69,15 +71,15 @@ namespace UAlbion.Core.Veldrid
             {
                 string bytecodeExtension = GetBytecodeExtension(backend);
                 string bytecodePath = AssetHelper.GetPath(Path.Combine("Shaders", name + bytecodeExtension));
-                if (File.Exists(bytecodePath))
+                if (disk.FileExists(bytecodePath))
                 {
-                    return File.ReadAllBytes(bytecodePath);
+                    return disk.ReadAllBytes(bytecodePath);
                 }
             }
 
             string extension = GetSourceExtension(backend);
             string path = AssetHelper.GetPath(Path.Combine("Shaders.Generated", name + extension));
-            return File.ReadAllBytes(path);
+            return disk.ReadAllBytes(path);
         }
 
         static string GetBytecodeExtension(GraphicsBackend backend)

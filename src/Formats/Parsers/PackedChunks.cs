@@ -39,6 +39,15 @@ namespace UAlbion.Formats.Parsers
         public static void Pack(ISerializer s, int count, Func<int, byte[]> buildChunk)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
+            if (buildChunk == null) throw new ArgumentNullException(nameof(buildChunk));
+
+            if (count == 1)
+            {
+                var chunk = buildChunk(0);
+                s.ByteArray(null, chunk, chunk.Length);
+                return;
+            }
+
             s.FixedLengthString(null, Magic, Magic.Length);
             s.Int32(null, count);
             for(int i = 0; i < count; i++)

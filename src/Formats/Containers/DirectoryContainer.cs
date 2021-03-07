@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -19,23 +19,36 @@ namespace UAlbion.Formats.Containers
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
-            foreach (var filePath in disk.EnumerateDirectory(path, $"{info.SubAssetId}*.*"))
+            var subAssets = new Dictionary<int, string>();
+            var pattern = info.Get(AssetProperty.Pattern, "{0}_{1}_{2}.dat");
+            foreach (var filePath in disk.EnumerateDirectory(path, $"{info.Index}_*.*"))
             {
-                var file = Path.GetFileName(filePath);
-                int index = file.IndexOf('_');
-                var prefix = index == -1 ? file : file.Substring(0, index);
-                if (!int.TryParse(prefix, out int numeric))
+                var filename = Path.GetFileName(filePath);
+                var (index, subAsset) = info.ParseFilename(pattern, filename);
+
+                if (index != info.Index)
                     continue;
 
-                if (numeric != info.SubAssetId)
-                    continue;
-
-                var stream = disk.OpenRead(filePath);
-                var br = new BinaryReader(stream);
-                return new AlbionReader(br, stream.Length, () => { br.Dispose(); stream.Dispose(); });
+                subAssets[subAsset] = filePath;
             }
 
-            return null;
+            var ms = new MemoryStream();
+
+            {
+                using var bw = new BinaryWriter(ms, Encoding.UTF8, true);
+                using var s = new AlbionWriter(bw);
+                PackedChunks.Pack(s, subAssets.Keys.Max() + 1, i => !subAssets.TryGetValue(i, out var filePath) 
+                    ? Array.Empty<byte>() 
+                    : disk.ReadAllBytes(filePath));
+            }
+
+            ms.Position = 0;
+            var br = new BinaryReader(ms);
+            return new AlbionReader(br, ms.Length, () =>
+            {
+                br.Dispose();
+                ms.Dispose();
+            });
         }
 
         public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk)
@@ -59,10 +72,9 @@ namespace UAlbion.Formats.Containers
                 var frames = PackedChunks.Unpack(s).ToList();
 
                 var pattern = info.Get(AssetProperty.Pattern, "{0}_{1}_{2}.dat");
-                var name = ConfigUtil.AssetName(info.AssetId);
                 if (frames.Count == 1)
                 {
-                    var filename = string.Format(CultureInfo.InvariantCulture, pattern, info.SubAssetId, 0, name);
+                    var filename = info.BuildFilename(pattern, 0);
                     disk.WriteAllBytes(Path.Combine(path, filename), frames[0]);
                 }
                 else
@@ -72,7 +84,7 @@ namespace UAlbion.Formats.Containers
                         if (frames[i].Length == 0)
                             continue;
 
-                        var filename = string.Format(CultureInfo.InvariantCulture, pattern, info.SubAssetId, i, name);
+                        var filename = info.BuildFilename(pattern, i);
                         disk.WriteAllBytes(Path.Combine(path, filename), frames[i]);
                     }
                 }

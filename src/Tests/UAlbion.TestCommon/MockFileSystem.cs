@@ -13,9 +13,13 @@ namespace UAlbion.TestCommon
     {
         static readonly char[] SeparatorChars = { '\\', '/' };
         readonly DirNode _root = new DirNode(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "" : "/");
-        readonly bool _fallbackToFileSystem;
+        readonly Func<string, bool> _maskingFunc;
 
-        public MockFileSystem(bool fallbackToFileSystem) => _fallbackToFileSystem = fallbackToFileSystem;
+        public MockFileSystem(Func<string, bool> maskingFunc) => _maskingFunc = maskingFunc ?? throw new ArgumentNullException(nameof(maskingFunc));
+        public MockFileSystem(bool fallBackToFileSystem) 
+            => _maskingFunc = fallBackToFileSystem
+                ? (Func<string, bool>)(_ => true) 
+                : _ => false;
 
         interface INode { string Path { get; } }
 
@@ -23,25 +27,15 @@ namespace UAlbion.TestCommon
         {
             public DirNode(string path) => Path = path;
             public string Path { get; }
+            public override string ToString() => Path;
         }
 
         class FileNode : INode
         {
-            public FileNode(string path)
-            {
-                Path = path;
-                Stream = new MemoryStream();
-            }
-
-            public FileNode(string path, byte[] content)
-            {
-                if (content == null) throw new ArgumentNullException(nameof(content));
-                Path = path;
-                Stream = new MemoryStream(content);
-            }
-
+            public FileNode(string path) { Path = path; Stream = new MemoryStream(); }
             public string Path { get; }
             public MemoryStream Stream { get; }
+            public override string ToString() => $"{Path} ({Stream.Length} bytes)";
         }
 
         INode GetDir(string path)
@@ -56,7 +50,7 @@ namespace UAlbion.TestCommon
                 if (dir.TryGetValue(part, out node)) continue;
 
                 var nodePath = Path.Combine(dir.Path, part);
-                if (_fallbackToFileSystem && Directory.Exists(nodePath))
+                if (_maskingFunc(nodePath) && Directory.Exists(nodePath))
                 {
                     node = new DirNode(nodePath);
                     dir[part] = node;
@@ -74,7 +68,7 @@ namespace UAlbion.TestCommon
             var filename = Path.GetFileName(path);
             dir.TryGetValue(filename, out var node);
 
-            if (node == null && _fallbackToFileSystem && File.Exists(path))
+            if (node == null && _maskingFunc(path) && File.Exists(path))
             {
                 var newFile = new FileNode(Path.Combine(dir.Path, filename));
                 using var s = File.OpenRead(path);
@@ -99,11 +93,12 @@ namespace UAlbion.TestCommon
                     case FileNode file:
                         throw new IOException($"Cannot create \"{file.Path}\" because a file or directory with the same name already exists.");
                     case DirNode dir:
-                    {
                         if (!dir.TryGetValue(part, out node))
-                            dir[part] = new DirNode(Path.Combine(dir.Path, part));
+                        {
+                            node = new DirNode(Path.Combine(dir.Path, part));
+                            dir[part] = node;
+                        }
                         break;
-                    }
                 }
             }
         }
@@ -134,7 +129,7 @@ namespace UAlbion.TestCommon
 
             var filename = Path.GetFileName(path);
             var result = dir.ContainsKey(filename);
-            return !result && _fallbackToFileSystem ? File.Exists(path) : result;
+            return !result && _maskingFunc(path) ? File.Exists(path) : result;
         }
 
         public bool DirectoryExists(string path) => GetDir(path) is DirNode;

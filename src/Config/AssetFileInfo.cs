@@ -70,6 +70,7 @@ namespace UAlbion.Config
 
             foreach(var asset in Map.Values)
             {
+                last ??= asset; // Let last start off as the first mapped info, in case the range doesn't overlap with the mapped ids.
                 if (asset.Id == null || !asset.AssetId.IsNone) continue;
                 asset.AssetId = resolveId(asset.Id);
             }
@@ -95,9 +96,9 @@ namespace UAlbion.Config
                         throw new FormatException("The first sub-item in a file's asset mapping must have its Id property set");
 
                     asset.File = this;
-                    asset.SubAssetId = i;
+                    asset.Index = i;
                     if (asset.Id == null && last != null)
-                        asset.AssetId = new AssetId(last.AssetId.Type, i - last.SubAssetId + last.AssetId.Id);
+                        asset.AssetId = new AssetId(last.AssetId.Type, i - last.Index + last.AssetId.Id);
                     last = asset;
                 }
             }

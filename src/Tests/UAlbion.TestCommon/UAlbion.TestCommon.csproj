@@ -5,8 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="xunit.assert" Version="2.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Config\UAlbion.Config.csproj" />
     <ProjectReference Include="..\..\Core\UAlbion.Core.csproj" />
+    <ProjectReference Include="..\..\Formats\UAlbion.Formats.csproj" />
   </ItemGroup>
 
 </Project>

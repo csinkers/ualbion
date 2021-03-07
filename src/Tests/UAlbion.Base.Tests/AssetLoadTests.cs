@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -10,12 +9,11 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
-using UAlbion.Formats.Containers;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game;
-using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
+using UAlbion.TestCommon;
 using Xunit;
 
 namespace UAlbion.Base.Tests
@@ -58,11 +56,9 @@ namespace UAlbion.Base.Tests
 
         static T Test<T>(Func<IAssetManager, T> func)
         {
-            var generalConfigTask = Task.FromResult(GeneralConfig);
-            var settingsTask = Task.FromResult(Settings);
-            var coreConfigTask = Task.FromResult(CoreConfig);
-            var gameConfigTask = Task.FromResult(GameConfig);
-            var (exchange, _) = AssetSystem.SetupCore(generalConfigTask, settingsTask, coreConfigTask, gameConfigTask).Result;
+            var disk = new MockFileSystem(true);
+            var factory = new MockFactory();
+            var (exchange, _) = AssetSystem.Setup(disk, factory, GeneralConfig, Settings, CoreConfig, GameConfig);
 
             var assets = exchange.Resolve<IAssetManager>();
             var result = func(assets);
@@ -146,8 +142,8 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void CommonPaletteTest()
         {
-            var pal = Test(assets => assets.LoadPalette(Palette.CommonPalette));
-            Assert.Equal(AssetId.From(Palette.CommonPalette), AssetId.FromUInt32(pal.Id));
+            var pal = Test(assets => assets.LoadPalette(Palette.Common));
+            Assert.Equal(AssetId.From(Palette.Common), AssetId.FromUInt32(pal.Id));
             Assert.False(pal.IsAnimated);
             Assert.Equal(1, pal.Period);
             Assert.Equal("Palette.CommonPalette", pal.Name);

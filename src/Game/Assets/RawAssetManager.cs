@@ -42,7 +42,7 @@ namespace UAlbion.Game.Assets
             if (palette == null)
                 return null;
 
-            var commonPalette = (AlbionPalette)_modApplier.LoadAssetCached(AssetId.From(Base.Palette.CommonPalette));
+            var commonPalette = (AlbionPalette)_modApplier.LoadAssetCached(AssetId.From(Base.Palette.Common));
             palette.SetCommonPalette(commonPalette);
 
             return palette;

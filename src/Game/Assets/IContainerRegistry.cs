@@ -1,11 +1,10 @@
-﻿using System;
+﻿using UAlbion.Api;
 using UAlbion.Formats.Containers;
 
 namespace UAlbion.Game.Assets
 {
     public interface IContainerRegistry
     {
-        IAssetContainer GetContainer(string containerName);
-        IAssetContainer GetContainer(Type containerType);
+        IAssetContainer GetContainer(string path, string container, IFileSystem disk);
     }
 }

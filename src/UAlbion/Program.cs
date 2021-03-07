@@ -28,6 +28,8 @@ namespace UAlbion
 
             PerfTracker.StartupEvent($"Running as {commandLine.Mode}");
             var disk = new FileSystem();
+            var factory = new VeldridCoreFactory();
+
             var baseDir = ConfigUtil.FindBasePath(disk);
             if (baseDir == null)
                 throw new InvalidOperationException("No base directory could be found.");
@@ -37,7 +39,8 @@ namespace UAlbion
             if (commandLine.Mode == ExecutionMode.ConvertAssets)
             {
                 ConvertAssets.Convert(
-                    baseDir,
+                    disk,
+                    factory,
                     commandLine.ConvertFrom,
                     commandLine.ConvertTo,
                     commandLine.DumpIds,
@@ -45,7 +48,7 @@ namespace UAlbion
                 return;
             }
 
-            var setupAssetSystem = Task.Run(() => AssetSystem.SetupAsync(baseDir, disk));
+            var setupAssetSystem = Task.Run(() => AssetSystem.SetupAsync(baseDir, disk, factory));
             using var engine = commandLine.NeedsEngine ? BuildEngine(commandLine) : null;
             var (exchange, services) = setupAssetSystem.Result;
             var assets = exchange.Resolve<IAssetManager>();

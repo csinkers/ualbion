@@ -40,6 +40,11 @@ namespace UAlbion.Formats.Containers
         {
             if (assets == null) throw new ArgumentNullException(nameof(assets));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
+
+            var dir = Path.GetDirectoryName(path);
+            if (!disk.DirectoryExists(dir))
+                disk.CreateDirectory(dir);
+
             var dict = new Dictionary<string, JObject>();
             foreach (var (info, bytes) in assets)
             {

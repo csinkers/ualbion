@@ -8,14 +8,14 @@ namespace UAlbion.Base
     [JsonConverter(typeof(StringEnumConverter))]
     public enum Palette : byte
     {
-        CommonPalette = 0,
+        Common = 0,
         FirstIslandDay = 1,
         SecondIslandDay = 2,
         JirinaarDay = 3,
         DesertDay = 4,
         StoneyDay = 5,
         IskaiIndoorLight = 6,
-        Light2D = 7,
+        Toronto3D = 7,
         Light2D2 = 8,
         CeltDungeon2D = 9,
         Dark2D = 10,

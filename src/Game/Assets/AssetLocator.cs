@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Security.Cryptography;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
-using UAlbion.Formats.Containers;
 
 namespace UAlbion.Game.Assets
 {
@@ -51,24 +49,8 @@ namespace UAlbion.Game.Assets
             var generalConfig = Resolve<IGeneralConfig>();
             var disk = Resolve<IFileSystem>();
             var resolved = generalConfig.ResolvePath(info.Filename, extraPaths);
-            var containerLoader = GetContainerLoader(resolved, info.Container, disk);
-            return containerLoader?.GetSubItemRanges(resolved, info, disk) ?? new List<(int, int)> { (0, 1) };
-        }
-
-        IAssetContainer GetContainerLoader(string path, string container, IFileSystem disk)
-        {
-            if (!string.IsNullOrEmpty(container))
-                return _containerRegistry.GetContainer(container);
-
-            switch (Path.GetExtension(path).ToUpperInvariant())
-            {
-                case ".XLD" : return _containerRegistry.GetContainer(typeof(XldContainer));
-                case ".ZIP" : return _containerRegistry.GetContainer(typeof(ZipContainer));
-                default:
-                    return disk.DirectoryExists(path) 
-                        ? _containerRegistry.GetContainer(typeof(DirectoryContainer)) 
-                        : null;
-            }
+            var container = _containerRegistry.GetContainer(resolved, info.Container, disk);
+            return container?.GetSubItemRanges(resolved, info, disk) ?? new List<(int, int)> { (0, 1) };
         }
 
         ISerializer Search(IGeneralConfig generalConfig, AssetInfo info, IDictionary<string, string> extraPaths)
@@ -78,8 +60,8 @@ namespace UAlbion.Game.Assets
             if (info.File.Sha256Hash != null && !info.File.Sha256Hash.Equals(GetHash(path, disk), StringComparison.OrdinalIgnoreCase))
                 return null;
 
-            var containerLoader = GetContainerLoader(path, info.File.Container, disk);
-            return containerLoader?.Read(path, info, disk);
+            var container = _containerRegistry.GetContainer(path, info.File.Container, disk);
+            return container?.Read(path, info, disk);
         }
 
         string GetHash(string filename, IFileSystem disk)

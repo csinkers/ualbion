@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.Containers;
 
@@ -10,7 +12,24 @@ namespace UAlbion.Game.Assets
         readonly object _syncRoot = new object();
         readonly IDictionary<Type, IAssetContainer> _containers = new Dictionary<Type, IAssetContainer>();
 
-        public IAssetContainer GetContainer(string containerName)
+        public IAssetContainer GetContainer(string path, string container, IFileSystem disk)
+        {
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (!string.IsNullOrEmpty(container))
+                return GetContainer(container);
+
+            switch (Path.GetExtension(path).ToUpperInvariant())
+            {
+                case ".XLD" : return GetContainer(typeof(XldContainer));
+                case ".ZIP" : return GetContainer(typeof(ZipContainer));
+                default:
+                    return disk.DirectoryExists(path) 
+                        ? GetContainer(typeof(DirectoryContainer)) 
+                        : null;
+            }
+        }
+
+        IAssetContainer GetContainer(string containerName)
         {
             if (string.IsNullOrEmpty(containerName))
                 throw new ArgumentNullException(nameof(containerName));
@@ -23,7 +42,7 @@ namespace UAlbion.Game.Assets
                 return _containers.TryGetValue(type, out var container) ? container : Instantiate(type);
         }
 
-        public IAssetContainer GetContainer(Type containerType)
+        IAssetContainer GetContainer(Type containerType)
         {
             if (containerType == null) throw new ArgumentNullException(nameof(containerType));
             lock (_syncRoot)

@@ -242,7 +242,7 @@ namespace UAlbion.Core
             var (r, g, b, a) = ApiUtil.UnpackColor(value);
             byte result = 0;
             int best = int.MaxValue;
-            for (byte i = 0; i < palette.Length; i++)
+            for (int i = 0; i < palette.Length; i++)
             {
                 var (r2, g2, b2, a2) = ApiUtil.UnpackColor(palette[i]);
                 int dr = r - r2;
@@ -253,29 +253,29 @@ namespace UAlbion.Core
                 if (dist2 < best)
                 {
                     best = dist2;
-                    result = i;
+                    result = (byte)i;
                 }
             }
             return result;
         }
 
-        public static void Blit32To8(ReadOnlyUIntImageBuffer fromBuffer, ByteImageBuffer toBuffer, uint[] palette)
+        public static void Blit32To8(ReadOnlyUIntImageBuffer fromBuffer, ByteImageBuffer toBuffer, uint[] palette, Dictionary<uint, byte> quantizeCache = null)
         {
+            quantizeCache ??= new Dictionary<uint, byte>();
             var from = fromBuffer.Buffer;
             var to = toBuffer.Buffer;
             int fromOffset = 0;
             int toOffset = 0;
 
-            var quantized = new Dictionary<uint, byte>();
             for (int j = 0; j < fromBuffer.Height; j++)
             {
                 for (int i = 0; i < fromBuffer.Width; i++)
                 {
                     uint pixel = from[fromOffset];
-                    if (!quantized.TryGetValue(pixel, out var index))
+                    if (!quantizeCache.TryGetValue(pixel, out var index))
                     {
                         index = Quantize(pixel, palette);
-                        quantized[pixel] = index;
+                        quantizeCache[pixel] = index;
                     }
 
                     to[toOffset] = index;

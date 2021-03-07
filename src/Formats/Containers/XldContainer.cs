@@ -22,7 +22,7 @@ namespace UAlbion.Formats.Containers
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
             using var s = new AlbionReader(new BinaryReader(disk.OpenRead(file)));
-            var bytes = LoadAsset(info.SubAssetId, s);
+            var bytes = LoadAsset(info.Index, s);
             var ms = new MemoryStream(bytes);
             return new AlbionReader(new BinaryReader(ms));
         }
@@ -31,13 +31,18 @@ namespace UAlbion.Formats.Containers
         {
             if (assets == null) throw new ArgumentNullException(nameof(assets));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
-            int count = assets.Max(x => x.Item1.SubAssetId);
+
+            var dir = Path.GetDirectoryName(path);
+            if (!disk.DirectoryExists(dir))
+                disk.CreateDirectory(dir);
+
+            int count = assets.Max(x => x.Item1.Index) + 1;
             var ordered = new (AssetInfo, byte[])[count];
             var lengths = new int[count];
             foreach (var (info, bytes) in assets)
             {
-                ordered[info.SubAssetId] = (info, bytes);
-                lengths[info.SubAssetId] = bytes.Length;
+                ordered[info.Index] = (info, bytes);
+                lengths[info.Index] = bytes.Length;
             }
 
             using var fs = disk.OpenWriteTruncate(path);

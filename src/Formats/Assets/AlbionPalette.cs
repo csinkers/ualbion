@@ -179,9 +179,9 @@ namespace UAlbion.Formats.Assets
                 // AssetId is None when loading palettes from raw data in ImageReverser
                 p = new AlbionPalette
                 {
-                    Id = info.AssetId.IsNone ? (uint)info.SubAssetId : info.AssetId.ToUInt32(),
+                    Id = info.AssetId.IsNone ? (uint)info.Index : info.AssetId.ToUInt32(),
                     Name = info.AssetId.IsNone 
-                        ? info.SubAssetId.ToString(CultureInfo.InvariantCulture) 
+                        ? info.Index.ToString(CultureInfo.InvariantCulture) 
                         : info.AssetId.ToString()
                 };
             }

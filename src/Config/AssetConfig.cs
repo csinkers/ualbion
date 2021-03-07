@@ -75,7 +75,7 @@ namespace UAlbion.Config
 
                 foreach (var asset in kvp.Value.Map)
                 {
-                    asset.Value.SubAssetId = asset.Key;
+                    asset.Value.Index = asset.Key;
                     asset.Value.File = kvp.Value;
                 }
             }

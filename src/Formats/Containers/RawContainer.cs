@@ -17,7 +17,7 @@ namespace UAlbion.Formats.Containers
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
-            ApiUtil.Assert(info.SubAssetId == 0, "SubItem should always be 0 when accessing a non-container file");
+            ApiUtil.Assert(info.Index == 0, "SubItem should always be 0 when accessing a non-container file");
             var stream = disk.OpenRead(file);
             var br = new BinaryReader(stream);
             return new AlbionReader(br);
@@ -27,6 +27,11 @@ namespace UAlbion.Formats.Containers
         {
             if (assets == null) throw new ArgumentNullException(nameof(assets));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
+
+            var dir = Path.GetDirectoryName(path);
+            if (!disk.DirectoryExists(dir))
+                disk.CreateDirectory(dir);
+
             if (assets.Count == 0)
             {
                 if (disk.FileExists(path))

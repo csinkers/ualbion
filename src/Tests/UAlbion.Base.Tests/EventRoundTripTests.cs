@@ -6,8 +6,8 @@ using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Containers;
 using UAlbion.Formats.MapEvents;
+using UAlbion.TestCommon;
 using Xunit;
 
 namespace UAlbion.Base.Tests

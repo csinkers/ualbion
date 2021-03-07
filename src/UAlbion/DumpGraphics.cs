@@ -87,7 +87,7 @@ namespace UAlbion
             AlbionPalette palette;
             if (config != null)
             {
-                var rawPaletteId = hints.Get(config.File.Filename, config.SubAssetId);
+                var rawPaletteId = hints.Get(config.File.Filename, config.Index);
                 var paletteId = new PaletteId(AssetType.Palette, rawPaletteId);
                 palette = assets.LoadPalette(paletteId);
             }

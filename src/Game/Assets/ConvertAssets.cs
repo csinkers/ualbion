@@ -1,19 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Core.Veldrid;
 using UAlbion.Formats.Assets;
-using UAlbion.Game.Assets;
 using UAlbion.Game.Settings;
 
-namespace UAlbion
+namespace UAlbion.Game.Assets
 {
-    static class ConvertAssets
+    public static class ConvertAssets
     {
-        static (ModApplier, EventExchange) BuildModApplier(string baseDir, string mod, IFileSystem disk)
+        static (ModApplier, EventExchange) BuildModApplier(string baseDir, string mod, IFileSystem disk, ICoreFactory factory)
         {
             var config = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir, disk);
             var applier = new ModApplier();
@@ -21,7 +20,7 @@ namespace UAlbion
             exchange
                 .Register(disk)
                 .Register<IGeneralConfig>(config)
-                .Register<ICoreFactory>(new VeldridCoreFactory())
+                .Register(factory)
                 .Attach(new StdioConsoleLogger())
                 .Attach(new AssetLoaderRegistry())
                 .Attach(new ContainerRegistry())
@@ -35,15 +34,19 @@ namespace UAlbion
         }
 
         public static void Convert(
-            string baseDir,
+            IFileSystem disk,
+            ICoreFactory factory,
             string fromMod,
             string toMod,
             string[] ids,
             ISet<AssetType> assetTypes)
         {
-            var disk = new FileSystem();
-            var (from, fromExchange) = BuildModApplier(baseDir, fromMod, disk);
-            var (to, toExchange) = BuildModApplier(baseDir, toMod, disk);
+            if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (factory == null) throw new ArgumentNullException(nameof(factory));
+
+            var baseDir = ConfigUtil.FindBasePath(disk);
+            var (from, fromExchange) = BuildModApplier(baseDir, fromMod, disk, factory);
+            var (to, toExchange) = BuildModApplier(baseDir, toMod, disk, factory);
 
             using (fromExchange)
             using (toExchange)

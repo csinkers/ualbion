@@ -41,6 +41,7 @@ namespace UAlbion.Game.Veldrid.Assets
             var pixels = new byte[totalWidth * totalHeight];
             var frames = new List<AlbionSpriteFrame>();
             int currentY = 0;
+            var quantizeCache = new Dictionary<uint, byte>();
             for (int i = 0; i < images.Count; i++)
             {
                 Image<Rgba32> image = images[i];
@@ -52,7 +53,7 @@ namespace UAlbion.Game.Veldrid.Assets
                 var from = new ReadOnlyUIntImageBuffer(image.Width, image.Height, image.Width, uintSpan);
                 var byteSpan = pixels.AsSpan(currentY * totalWidth, totalWidth * (image.Height - 1) + image.Width);
                 var to = new ByteImageBuffer(image.Width, image.Height, totalWidth, byteSpan);
-                CoreUtil.Blit32To8(from, to, palette);
+                CoreUtil.Blit32To8(from, to, palette, quantizeCache);
 
                 currentY += image.Height;
             }
@@ -66,17 +67,19 @@ namespace UAlbion.Game.Veldrid.Assets
             if (config == null) throw new ArgumentNullException(nameof(config));
             if (s == null) throw new ArgumentNullException(nameof(s));
 
-            var paletteId = config.Get(AssetProperty.PaletteId, 0);
-            var palette = Resolve<IAssetManager>()
-                .LoadPalette(new PaletteId(AssetType.Palette, paletteId))
-                .GetUnambiguousPalette();
+            var paletteNum = config.Get(AssetProperty.PaletteId, 0);
+            var paletteId = new PaletteId(AssetType.Palette, paletteNum);
+            var palette = Resolve<IAssetManager>().LoadPalette(paletteId);
+            if (palette == null)
+                throw new InvalidOperationException($"Could not load palette {paletteId} ({paletteNum}) for asset {config.AssetId} in file {config.File.Filename}");
+            var unambiguousPalette = palette.GetUnambiguousPalette();
 
             if (s.IsWriting())
             {
                 if (existing == null)
                     throw new ArgumentNullException(nameof(existing));
                 var encoder = new PngEncoder();
-                PackedChunks.Pack(s, existing.SubImageCount, frameNum => Write(encoder, palette, existing, frameNum));
+                PackedChunks.Pack(s, existing.SubImageCount, frameNum => Write(encoder, unambiguousPalette, existing, frameNum));
                 return existing;
             }
 
@@ -92,7 +95,7 @@ namespace UAlbion.Game.Veldrid.Assets
                     images.Add(decoder.Decode<Rgba32>(configuration, stream));
                 }
 
-                return Read(config.AssetId, palette, images);
+                return Read(config.AssetId, unambiguousPalette, images);
             }
             finally { foreach (var image in images) image.Dispose(); }
         }

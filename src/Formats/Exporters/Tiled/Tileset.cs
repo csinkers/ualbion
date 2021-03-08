@@ -125,11 +125,11 @@ namespace UAlbion.Formats.Exporters.Tiled
         }
 
         static TileProperty Prop(string name, string value, string type = null) => new TileProperty { Name = name, Type = type, Value = value };
-        public static Tileset FromTileset(TilesetData tileset, TilemapProperties properties)
+        public static Tileset FromTileset(TilesetData tileset, TilemapProperties properties, AssetInfo tileGraphicsInfo)
         {
             if (tileset == null) throw new ArgumentNullException(nameof(tileset));
             if (properties == null) throw new ArgumentNullException(nameof(properties));
-            // +1 to go from max index to count, then + another so we have a blank tile at the end.
+            if (tileGraphicsInfo == null) throw new ArgumentNullException(nameof(tileGraphicsInfo));
 
             static List<TileProperty> Props(TileData x)
             {
@@ -142,25 +142,30 @@ namespace UAlbion.Formats.Exporters.Tiled
                 return properties;
             }
 
-            List<Tile> tiles = 
-                tileset.Tiles
-                .Where(x => !x.IsBlank)
-                .Select(x => new Tile
+            Tile BuildTile(int index, ushort imageNumber, List<TileProperty> tileProperties)
+            {
+                var source = imageNumber == 0xffff
+                    ? properties.BlankTilePath
+                    : tileGraphicsInfo.BuildFilename(properties.GraphicsTemplate, imageNumber);
+
+                return new Tile
                 {
-                    Id = x.Index,
-                    Properties = Props(x),
+                    Id = index,
+                    Properties = tileProperties,
                     Image = new TilesetImage
                     {
                         Width = properties.TileWidth,
                         Height = properties.TileHeight,
-                        Source = x.ImageNumber == 0xffff  
-                            ? properties.BlankTilePath 
-                            : string.Format(CultureInfo.InvariantCulture,
-                                properties.GraphicsTemplate,
-                                properties.TilesetId, 
-                                x.ImageNumber)
-                    },
-                }).ToList();
+                        Source = source
+                    }
+                };
+            }
+
+            List<Tile> tiles = 
+                tileset.Tiles
+                .Where(x => !x.IsBlank)
+                .Select(x => BuildTile(x.Index, x.ImageNumber, Props(x)))
+                .ToList();
 
             // Add tiles for the extra frames of animated tiles
             int nextId = tileset.Tiles[tileset.Tiles.Count - 1].Index + 1;
@@ -175,20 +180,11 @@ namespace UAlbion.Formats.Exporters.Tiled
                 tile.Frames = new List<TileFrame> { new TileFrame(tile.Id, properties.FrameDurationMs) };
                 for (int f = 1; f < sourceTile.FrameCount; f++)
                 {
-                    tiles.Add(new Tile
-                    {
-                        Id = nextId,
-                        Properties = new List<TileProperty> { Prop("Frame", "true", "boolean") },
-                        Image = new TilesetImage
-                        {
-                            Width = properties.TileWidth,
-                            Height = properties.TileHeight,
-                            Source = string.Format(CultureInfo.InvariantCulture,
-                                properties.GraphicsTemplate,
-                                properties.TilesetId,
-                                sourceTile.ImageNumber + f)
-                        }
-                    });
+                    tiles.Add(BuildTile(
+                        nextId,
+                        (ushort)(sourceTile.ImageNumber + f),
+                        new List<TileProperty> { Prop("Frame", "true", "boolean") }));
+
                     tile.Frames.Add(new TileFrame(nextId, properties.FrameDurationMs));
                     nextId++;
                 }

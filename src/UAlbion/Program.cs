@@ -51,6 +51,8 @@ namespace UAlbion
             var setupAssetSystem = Task.Run(() => AssetSystem.SetupAsync(baseDir, disk, factory));
             using var engine = commandLine.NeedsEngine ? BuildEngine(commandLine) : null;
             var (exchange, services) = setupAssetSystem.Result;
+            services.Add(new StdioConsoleReader());
+
             var assets = exchange.Resolve<IAssetManager>();
             AutodetectLanguage(exchange, assets);
 
@@ -73,7 +75,7 @@ namespace UAlbion
                         DumpText.Dump(assets, baseDir, tf, commandLine.DumpAssetTypes, parsedIds);
 
                     if ((commandLine.DumpFormats & DumpFormats.Png) != 0)
-                        DumpGraphics.Dump(assets, disk, baseDir, commandLine.DumpAssetTypes, commandLine.DumpFormats, parsedIds);
+                        DumpGraphics.Dump(assets, baseDir, commandLine.DumpAssetTypes, commandLine.DumpFormats, parsedIds);
 
                     //if ((commandLine.DumpFormats & DumpFormats.Tiled) != 0)
                     //    DumpTiled.Dump(baseDir, assets, commandLine.DumpAssetTypes, parsedIds);

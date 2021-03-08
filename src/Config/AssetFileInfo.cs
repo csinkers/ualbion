@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 #pragma warning disable CA2227 // Collection properties should be read only
 namespace UAlbion.Config
 {
+    public class MappingDictionary : Dictionary<int, AssetInfo> { }
     public class AssetFileInfo
     {
         [JsonIgnore] public string Filename { get; set; } // Just mirrors the dictionary key
@@ -14,7 +15,8 @@ namespace UAlbion.Config
         public string Container { get; set; }
         public string Loader { get; set; }
         public string Post { get; set; }
-        public IDictionary<int, AssetInfo> Map { get; } = new Dictionary<int, AssetInfo>();
+        public MappingDictionary Map { get; } = new MappingDictionary();
+        public string MapFile { get; set; }
         [JsonExtensionData] public IDictionary<string, JToken> Properties { get; set; }
 
         [JsonIgnore] public int? Width // For sprites only
@@ -56,12 +58,47 @@ namespace UAlbion.Config
             }
         }
 
-        // TODO: Text encoding
+        void MergeMapping(MappingDictionary mapping)
+        {
+            foreach (var kvp in mapping)
+            {
+                if (Map.TryGetValue(kvp.Key, out var info))
+                {
+                    kvp.Value.File = this;
+                    info.Id ??= kvp.Value.Id;
+                    if(kvp.Value.Properties != null)
+                    {
+                        info.Properties ??= new Dictionary<string, JToken>();
+                        foreach(var prop in kvp.Value.Properties)
+                            info.Properties[prop.Key] = prop.Value;
+                    }
+                }
+                else
+                {
+                    info = kvp.Value;
+                    Map[kvp.Key] = info;
+                }
+
+                info.Index = kvp.Key;
+                info.File = this;
+            }
+        }
+
         public void PopulateAssetIds(
             Func<string, AssetId> resolveId,
-            Func<AssetFileInfo, IList<(int, int)>> getSubItemCountForFile)
+            Func<AssetFileInfo, IList<(int, int)>> getSubItemCountForFile,
+            Func<string, string> readAllTextFunc)
         {
             if (getSubItemCountForFile == null) throw new ArgumentNullException(nameof(getSubItemCountForFile));
+            if (readAllTextFunc == null) throw new ArgumentNullException(nameof(readAllTextFunc));
+
+            if (!string.IsNullOrEmpty(MapFile))
+            {
+                var mappingJson = readAllTextFunc(MapFile);
+                var mapping = JsonConvert.DeserializeObject<MappingDictionary>(mappingJson);
+                MergeMapping(mapping);
+                MapFile = null;
+            }
 
             AssetInfo last = null;
             var ranges = getSubItemCountForFile(this);
@@ -79,16 +116,15 @@ namespace UAlbion.Config
             {
                 for (int i = range.Item1; i < range.Item1 + range.Item2; i++)
                 {
+                    if (last != null && i < last.Index) // Don't add any assets below the mapped range
+                        break;
+
                     if (!Map.TryGetValue(i, out var asset))
                     {
                         if (last == null)
                             continue;
 
-                        asset = new AssetInfo
-                        {
-                            Width = last.Width,
-                            Height = last.Height
-                        };
+                        asset = new AssetInfo();
                         Map[i] = asset;
                     }
 

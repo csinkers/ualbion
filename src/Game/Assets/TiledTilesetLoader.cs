@@ -1,12 +1,15 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Config;
+using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Exporters.Tiled;
 
-namespace UAlbion.Formats.Exporters.Tiled
+namespace UAlbion.Game.Assets
 {
-    public class TilesetLoader : IAssetLoader<TilesetData>
+    public class TiledTilesetLoader : Component, IAssetLoader<TilesetData>
     {
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
             => Serdes((TilesetData) existing, config, mapping, s);
@@ -32,7 +35,9 @@ namespace UAlbion.Formats.Exporters.Tiled
                     TileHeight = 16
                 };
 
-                var tiledTileset = Tileset.FromTileset(existing, properties);
+                var assets = Resolve<IAssetManager>();
+                var graphicsInfo = assets.GetAssetInfo(existing.Id.ToTilesetGraphics());
+                var tiledTileset = Tileset.FromTileset(existing, properties, graphicsInfo);
                 var bytes = FormatUtil.BytesFromTextWriter(tiledTileset.Serialize);
                 s.ByteArray(null, bytes, bytes.Length);
 

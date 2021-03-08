@@ -11,7 +11,6 @@ namespace UAlbion.Base
         FestivalTime = 1,
         InventoryItems = 2,
         Unknown3 = 3,
-        Unknown32 = 32,
         IskaiWordSet = 100,
         Unknown101 = 101,
         IskaiChildWordSet = 102,

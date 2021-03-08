@@ -58,7 +58,7 @@ namespace UAlbion.Base.Tests
         {
             var disk = new MockFileSystem(true);
             var factory = new MockFactory();
-            var (exchange, _) = AssetSystem.Setup(disk, factory, GeneralConfig, Settings, CoreConfig, GameConfig);
+            var exchange = AssetSystem.Setup(disk, factory, GeneralConfig, Settings, CoreConfig, GameConfig);
 
             var assets = exchange.Resolve<IAssetManager>();
             var result = func(assets);
@@ -146,7 +146,7 @@ namespace UAlbion.Base.Tests
             Assert.Equal(AssetId.From(Palette.Common), AssetId.FromUInt32(pal.Id));
             Assert.False(pal.IsAnimated);
             Assert.Equal(1, pal.Period);
-            Assert.Equal("Palette.CommonPalette", pal.Name);
+            Assert.Equal("Palette.Common", pal.Name);
             var at0 = pal.GetPaletteAtTime(0);
             for (int i = 0; i < 192; i++)
                 Assert.Equal(0u, at0[i]);

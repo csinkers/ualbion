@@ -56,7 +56,6 @@ namespace UAlbion.Game.Assets
                 fromExchange.Attach(new AssetManager(from)); // From also needs an asset manager for the inventory post-processor etc
 
                 var parsedIds = ids?.Select(AssetId.Parse).ToHashSet();
-                var paletteHints = PaletteHints.Load(Path.Combine(baseDir, "mods", "Base", "palette_hints.json"), disk);
                 var cache = new Dictionary<(AssetId, string), object>();
 
                 (object, AssetInfo) LoaderFunc(AssetId id, string language)
@@ -84,7 +83,7 @@ namespace UAlbion.Game.Assets
                     return (asset, info);
                 }
 
-                to.SaveAssets(LoaderFunc, () => cache.Clear(), paletteHints, parsedIds, assetTypes);
+                to.SaveAssets(LoaderFunc, () => cache.Clear(), parsedIds, assetTypes);
             }
         }
     }

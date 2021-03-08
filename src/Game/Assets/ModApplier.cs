@@ -92,6 +92,7 @@ namespace UAlbion.Game.Assets
                 return;
             }
 
+            var generalConfig = Resolve<IGeneralConfig>();
             var assetConfig = AssetConfig.Load(assetConfigPath, disk);
             var modConfig = ModConfig.Load(modConfigPath, disk);
             var modInfo = new ModInfo(modName, assetConfig, modConfig, path);
@@ -116,7 +117,10 @@ namespace UAlbion.Game.Assets
             AssetMapping.Global.MergeFrom(modInfo.Mapping);
             modConfig.AssetPath ??= path;
             var extraPaths = new Dictionary<string, string> { ["MOD"] = modConfig.AssetPath };
-            assetConfig.PopulateAssetIds(AssetMapping.Global, x => _assetLocator.GetSubItemRangesForFile(x, extraPaths));
+            assetConfig.PopulateAssetIds(
+                AssetMapping.Global,
+                x => _assetLocator.GetSubItemRangesForFile(x, extraPaths),
+                x => disk.ReadAllText(generalConfig.ResolvePath(x, extraPaths)));
             _mods.Add(modName, modInfo);
             _modsInReverseDependencyOrder.Add(modInfo);
         }
@@ -275,7 +279,6 @@ namespace UAlbion.Game.Assets
         public void SaveAssets(
             Func<AssetId, string, (object, AssetInfo)> loaderFunc,
             Action flushCacheFunc,
-            PaletteHints paletteHints,
             ISet<AssetId> ids,
             ISet<AssetType> assetTypes)
         {
@@ -290,30 +293,33 @@ namespace UAlbion.Game.Assets
 
             // Add any missing ids
             Raise(new LogEvent(LogEvent.Level.Info, "Populating destination asset info..."));
-            target.AssetConfig.PopulateAssetIds(AssetMapping.Global, file =>
-            {
-                // Don't need to resolve the filename as we're not actually using the container - we just want to find the type.
-                var container = containerRegistry.GetContainer(file.Filename, file.Container, disk);
-                var firstAsset = file.Map[file.Map.Keys.Min()];
-                if (assetTypes != null && !assetTypes.Contains(firstAsset.AssetId.Type))
-                    return new List<(int, int)> { (firstAsset.Index, 1) };
+            var extraPaths = new Dictionary<string, string> { ["MOD"] = target.AssetPath };
+            target.AssetConfig.PopulateAssetIds(
+                AssetMapping.Global,
+                file =>
+                {
+                    // Don't need to resolve the filename as we're not actually using the container - we just want to find the type.
+                    var container = containerRegistry.GetContainer(file.Filename, file.Container, disk);
+                    var firstAsset = file.Map[file.Map.Keys.Min()];
+                    if (assetTypes != null && !assetTypes.Contains(firstAsset.AssetId.Type))
+                        return new List<(int, int)> { (firstAsset.Index, 1) };
 
-                var assets = target.Mapping.EnumerateAssetsOfType(firstAsset.AssetId.Type).ToList();
-                var idsInRange =
-                    assets
-                    .Where(x => x.Id >= firstAsset.AssetId.Id)
-                    .OrderBy(x => x.Id)
-                    .Select(x => x.Id - firstAsset.AssetId.Id + firstAsset.Index);
+                    var assets = target.Mapping.EnumerateAssetsOfType(firstAsset.AssetId.Type).ToList();
+                    var idsInRange =
+                        assets
+                        .Where(x => x.Id >= firstAsset.AssetId.Id)
+                        .OrderBy(x => x.Id)
+                        .Select(x => x.Id - firstAsset.AssetId.Id + firstAsset.Index);
 
-                if (container is XldContainer)
-                    idsInRange = idsInRange.Where(x => x < 100);
+                    if (container is XldContainer)
+                        idsInRange = idsInRange.Where(x => x < 100);
 
-                int maxSubId = file.Get(AssetProperty.Max, -1);
-                if (maxSubId != -1)
-                    idsInRange = idsInRange.Where(x => x <= maxSubId);
+                    int maxSubId = file.Get(AssetProperty.Max, -1);
+                    if (maxSubId != -1)
+                        idsInRange = idsInRange.Where(x => x <= maxSubId);
 
-                return FormatUtil.SortedIntsToRanges(idsInRange);
-            });
+                    return FormatUtil.SortedIntsToRanges(idsInRange);
+                }, x => disk.ReadAllText(config.ResolvePath(x, extraPaths)));
 
             Resolve<IGeneralConfig>().SetPath("MOD", target.AssetPath);
             foreach (var file in target.AssetConfig.Files.Values)
@@ -339,7 +345,7 @@ namespace UAlbion.Game.Assets
                         notify = false;
                     }
 
-                    var paletteId = paletteHints.Get(sourceInfo.File.Filename, sourceInfo.Index);
+                    var paletteId = sourceInfo.Get(AssetProperty.PaletteId, 0);
                     if (paletteId != 0)
                         assetInfo.Set(AssetProperty.PaletteId, paletteId);
 

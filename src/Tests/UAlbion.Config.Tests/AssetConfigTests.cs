@@ -184,7 +184,6 @@ namespace UAlbion.Config.Tests
                     Assert.Equal("block", t.Alias);
                     Assert.Equal(AssetType.BlockList, t.AssetType);
                     Assert.Equal("UAlbion.Base.BlockList, UAlbion.Base", t.EnumType);
-                    Assert.Equal("UAlbion.Base.TilesetData, UAlbion.Base", t.CopiedFrom);
                 },
                 t =>
                 {
@@ -257,7 +256,6 @@ namespace UAlbion.Config.Tests
                     Assert.Equal("tilegfx", t.Alias);
                     Assert.Equal(AssetType.TilesetGraphics, t.AssetType);
                     Assert.Equal("UAlbion.Base.TilesetGraphics, UAlbion.Base", t.EnumType);
-                    Assert.Equal("UAlbion.Base.TilesetData, UAlbion.Base", t.CopiedFrom);
                 },
                 t =>
                 {

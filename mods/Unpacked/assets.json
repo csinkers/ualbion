@@ -108,8 +108,8 @@
     "tiledMap":         "UAlbion.Game.Assets.TiledMapLoader, UAlbion.Game",
     "tiledStamp":       "UAlbion.Formats.Exporters.Tiled.StampLoader, UAlbion.Formats",
     "tiledTileGfx":     "UAlbion.Formats.Exporters.Tiled.TileGraphicsLoader, UAlbion.Formats",
-    "tiledTileset":     "UAlbion.Formats.Exporters.Tiled.TilesetLoader, UAlbion.Formats",
-    "tiledNpcTileset":  "UAlbion.Formats.Exporters.Tiled.NpcTilesetLoader, UAlbion.Formats",
+    "tiledTileset":     "UAlbion.Game.Assets.TiledTilesetLoader, UAlbion.Game",
+    "tiledNpcTileset":  "UAlbion.Game.Assets.NpcTilesetLoader, UAlbion.Game",
     "utf8":             "UAlbion.Formats.Parsers.Utf8Loader, UAlbion.Formats"
   },
 

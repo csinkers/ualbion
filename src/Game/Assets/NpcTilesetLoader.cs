@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using SerdesNet;
 using UAlbion.Config;
+using UAlbion.Core;
+using UAlbion.Formats;
+using UAlbion.Formats.Exporters.Tiled;
 
-namespace UAlbion.Formats.Exporters.Tiled
+namespace UAlbion.Game.Assets
 {
-    public class NpcTilesetLoader : IAssetLoader
+    public class NpcTilesetLoader : Component, IAssetLoader
     {
         public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
         {
@@ -19,14 +21,13 @@ namespace UAlbion.Formats.Exporters.Tiled
                 var graphicsPattern = config.Get(AssetProperty.GraphicsPattern, "");
                 bool small = config.Get(AssetProperty.IsSmall, false);
 
-                var tiles = new List<Tiled.TileProperties>();
+                var tiles = new List<TileProperties>();
+                var assets = Resolve<IAssetManager>();
                 var assetIds = AssetMapping.Global.EnumerateAssetsOfType(small ? AssetType.SmallNpcGraphics : AssetType.LargeNpcGraphics);
                 foreach (var id in assetIds)
                 {
-                    var path = string.Format(CultureInfo.InvariantCulture,
-                        graphicsPattern,
-                        id.Id, 9, // 9 = First frame facing west for both large and small
-                        ConfigUtil.AssetName(id));
+                    var info = assets.GetAssetInfo(id);
+                    var path = info.BuildFilename(graphicsPattern, 9); // 9 = First frame facing west for both large and small
 
                     tiles.Add(new TileProperties
                     {

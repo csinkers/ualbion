@@ -19,6 +19,7 @@
     <ProjectReference Include="..\..\Formats\UAlbion.Formats.csproj" />
     <ProjectReference Include="..\..\Game\UAlbion.Game.csproj" />
     <ProjectReference Include="..\..\UAlbion\UAlbion.csproj" />
+    <ProjectReference Include="..\UAlbion.Game.Tests\UAlbion.Game.Tests.csproj" />
     <ProjectReference Include="..\UAlbion.TestCommon\UAlbion.TestCommon.csproj" />
   </ItemGroup>
 

@@ -81,14 +81,17 @@ namespace UAlbion.Config
             }
         }
 
-        public void PopulateAssetIds(AssetMapping mapping, Func<AssetFileInfo, IList<(int, int)>> getSubItemCountForFile)
+        public void PopulateAssetIds(
+            AssetMapping mapping,
+            Func<AssetFileInfo, IList<(int, int)>> getSubItemCountForFile,
+            Func<string, string> readAllTextFunc)
         {
             if (mapping == null) throw new ArgumentNullException(nameof(mapping));
 
             var temp = new Dictionary<AssetId, List<AssetInfo>>();
             foreach (var file in Files)
             {
-                file.Value.PopulateAssetIds(x => ResolveId(mapping, x), getSubItemCountForFile);
+                file.Value.PopulateAssetIds(x => ResolveId(mapping, x), getSubItemCountForFile, readAllTextFunc);
 
                 foreach (var asset in file.Value.Map.Values)
                 {

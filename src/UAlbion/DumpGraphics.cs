@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid.Textures;
@@ -15,9 +14,8 @@ namespace UAlbion
 {
     static class DumpGraphics
     {
-        public static void Dump(IAssetManager assets, IFileSystem disk, string baseDir, ISet<AssetType> types, DumpFormats formats, AssetId[] dumpIds)
+        public static void Dump(IAssetManager assets, string baseDir, ISet<AssetType> types, DumpFormats formats, AssetId[] dumpIds)
         {
-            var hints = PaletteHints.Load(Path.Combine(baseDir, "mods", "Base", "palette_hints.json"), disk);
             void Export<TEnum>(string name) where TEnum : unmanaged, Enum
             {
                 var directory = Path.Combine(baseDir, "data", "exported", "gfx", name);
@@ -32,7 +30,7 @@ namespace UAlbion
                     if (dumpIds != null && !dumpIds.Contains(assetId))
                         continue;
 
-                    ExportImage(assetId, assets, hints, directory, formats, (frame, palFrame) => palFrame < 10); // Limit to 10, some of the tile sets can get a bit silly.
+                    ExportImage(assetId, assets, directory, formats, (frame, palFrame) => palFrame < 10); // Limit to 10, some of the tile sets can get a bit silly.
                 }
             }
 
@@ -77,7 +75,6 @@ namespace UAlbion
         public static IList<ExportedImageInfo> ExportImage(
             AssetId assetId,
             IAssetManager assets,
-            PaletteHints hints,
             string directory,
             DumpFormats formats,
             Func<int, int, bool> frameFilter = null)
@@ -87,7 +84,7 @@ namespace UAlbion
             AlbionPalette palette;
             if (config != null)
             {
-                var rawPaletteId = hints.Get(config.File.Filename, config.Index);
+                var rawPaletteId = config.Get(AssetProperty.PaletteId, 0);
                 var paletteId = new PaletteId(AssetType.Palette, rawPaletteId);
                 palette = assets.LoadPalette(paletteId);
             }

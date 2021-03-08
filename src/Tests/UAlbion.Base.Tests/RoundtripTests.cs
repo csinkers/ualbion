@@ -3,9 +3,12 @@ using System.IO;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Core;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Containers;
+using UAlbion.Game.Assets;
+using UAlbion.Game.Tests;
 using UAlbion.TestCommon;
 using Xunit;
 
@@ -289,13 +292,23 @@ namespace UAlbion.Base.Tests
         public void TiledTilesetTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Tileset.Toronto), Index = 7 };
+            var gfxInfo = new AssetInfo {AssetId = AssetId.From(TilesetGraphics.Toronto), Index = 7};
+            gfxInfo.Set(AssetProperty.PaletteId, 26);
+
+            var modApplier = new MockModApplier();
+            modApplier.AddInfo(gfxInfo.AssetId, gfxInfo);
+            var exchange = new EventExchange()
+                .Attach(modApplier)
+                .Attach(new AssetManager());
+
             var conf = AssetSystem.LoadGeneralConfig(_baseDir, _disk);
             var bytes = BytesFromXld(conf, "$(XLD)/ICONDAT0.XLD", info);
 
             TilesetData Serdes(TilesetData x, ISerializer s) => Loaders.TilesetLoader.Serdes(x, info, AssetMapping.Global, s);
             var (asset, preTxt) = Asset.Load<TilesetData>(bytes, Serdes);
 
-            var loader = new Formats.Exporters.Tiled.TilesetLoader();
+            var loader = new TiledTilesetLoader();
+            exchange.Attach(loader);
             var (tiledBytes, tiledTxt) = Asset.Save(asset, (x, s) => loader.Serdes(x, info, AssetMapping.Global, s));
 
             var (fromTiled, _) = Asset.Load<TilesetData>(tiledBytes,

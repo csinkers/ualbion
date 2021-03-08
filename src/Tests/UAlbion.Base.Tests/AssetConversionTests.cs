@@ -47,7 +47,7 @@ namespace UAlbion.Base.Tests
                 Language = Language.English
             };
             var factory = new MockFactory();
-            var (exchange, _) = AssetSystem.Setup(_disk, factory, generalConfig, settings, coreConfig, gameConfig);
+            var exchange = AssetSystem.Setup(_disk, factory, generalConfig, settings, coreConfig, gameConfig);
             return exchange.Resolve<IModApplier>();
         }
 

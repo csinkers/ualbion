@@ -125,11 +125,10 @@ namespace UAlbion.Formats.Exporters.Tiled
         }
 
         static TileProperty Prop(string name, string value, string type = null) => new TileProperty { Name = name, Type = type, Value = value };
-        public static Tileset FromTileset(TilesetData tileset, TilemapProperties properties, AssetInfo tileGraphicsInfo)
+        public static Tileset FromTileset(TilesetData tileset, TilemapProperties properties)
         {
             if (tileset == null) throw new ArgumentNullException(nameof(tileset));
             if (properties == null) throw new ArgumentNullException(nameof(properties));
-            if (tileGraphicsInfo == null) throw new ArgumentNullException(nameof(tileGraphicsInfo));
 
             static List<TileProperty> Props(TileData x)
             {
@@ -146,7 +145,11 @@ namespace UAlbion.Formats.Exporters.Tiled
             {
                 var source = imageNumber == 0xffff
                     ? properties.BlankTilePath
-                    : tileGraphicsInfo.BuildFilename(properties.GraphicsTemplate, imageNumber);
+                    : string.Format(CultureInfo.InvariantCulture,
+                        properties.GraphicsTemplate,
+                        tileset.Id.Id,
+                        imageNumber
+                        );
 
                 return new Tile
                 {

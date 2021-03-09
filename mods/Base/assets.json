@@ -361,7 +361,6 @@
     "$(XLD)/COMBACK0.XLD": { "Post": "gfx",  "Loader": "fixedsize", "Width": 360, "MapFile": "$(MOD)/Meta/COMBACK0.json" },
     "$(XLD)/COMGFX0.XLD":  { "Post": "gfx",  "Loader": "multiheader", "PaletteId": 23, "Map": { "0": { "Id": "comgfx.1"} } },
     "$(XLD)/FBODPIX0.XLD": { "Post": "gfx",  "Loader": "header", "PaletteId": 19, "Map": { "0": { "Id": "fullbody.1" } } },
-    "$(XLD)/ICONGFX0.XLD": { "Post": "tile", "Loader": "fixedsize", "Width": 16, "Height": 16, "MapFile": "$(MOD)/Meta/ICONGFX0.json" },
     "$(XLD)/MONGFX0.XLD":  { "Post": "gfx",  "Loader": "multiheader", "PaletteId": 24, "MapFile": "$(MOD)/Meta/MONGFX0.json" },
     "$(XLD)/NPCGR0.XLD":   { "Post": "gfx",  "Loader": "header", "MapFile": "$(MOD)/Meta/NPCGR0.json" },
     "$(XLD)/NPCGR1.XLD":   { "Post": "gfx",  "Loader": "header", "MapFile": "$(MOD)/Meta/NPCGR1.json" },
@@ -388,6 +387,25 @@
       "Map": {
         "0": { "Id": "autotile.1", "SubSprites": "(8,8,576) (16,16)", "PaletteId": 11 },
         "1": { "SubSprites": "(8,8,576) (16,16)", "PaletteId": 30 }
+      }
+    },
+    "$(XLD)/ICONGFX0.XLD": {
+      "Post": "tile",
+      "Loader": "fixedsize",
+      "Width": 16,
+      "Height": 16,
+      "Map": {
+          "0": { "Id": "tilegfx.1", "PaletteId": 1 },
+          "1": { "PaletteId": 2 },
+          "2": { "PaletteId": 6 },
+          "3": { "PaletteId": 4 },
+          "4": { "PaletteId": 5 },
+          "5": { "PaletteId": 16 },
+          "6": { "PaletteId": 9 },
+          "7": { "PaletteId": 26 },
+          "8": { "PaletteId": 28 },
+          "9": { "PaletteId": 45 },
+          "10": { "PaletteId": 56 }
       }
     },
     "$(XLD)/ITEMGFX":      {

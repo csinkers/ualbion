@@ -35,9 +35,7 @@ namespace UAlbion.Game.Assets
                     TileHeight = 16
                 };
 
-                var assets = Resolve<IAssetManager>();
-                var graphicsInfo = assets.GetAssetInfo(existing.Id.ToTilesetGraphics());
-                var tiledTileset = Tileset.FromTileset(existing, properties, graphicsInfo);
+                var tiledTileset = Tileset.FromTileset(existing, properties);
                 var bytes = FormatUtil.BytesFromTextWriter(tiledTileset.Serialize);
                 s.ByteArray(null, bytes, bytes.Length);
 

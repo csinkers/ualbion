@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
@@ -258,6 +259,20 @@ namespace UAlbion.Formats
             func(stream);
             stream.Position = 0;
             return stream.ToArray();
+        }
+
+        public static ISerializer SerializeWithSerdes(Action<ISerializer> serdes)
+        {
+            if (serdes == null) throw new ArgumentNullException(nameof(serdes));
+            var ms = new MemoryStream();
+            using var bw = new BinaryWriter(ms, AlbionEncoding, true);
+            using var s = new AlbionWriter(bw);
+            serdes(s);
+            bw.Flush();
+            ms.Position = 0;
+
+            var br = new BinaryReader(ms);
+            return new AlbionReader(br, ms.Length, () => { br.Dispose(); ms.Dispose(); });
         }
     }
 }

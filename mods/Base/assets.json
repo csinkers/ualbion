@@ -130,7 +130,7 @@
 
     // Items
     "$(XLD)/ITEMLIST.DAT": { "Loader": "itemdata", "Container": "items", "Map": { "0": { "Id": "item.1" } } },
-    "$(XLD)/ITEMNAME.DAT": { "Loader": "itemname", "Container": "raw", "Map": { "0": { "Id": "special.ItemNames" } } },
+    "$(XLD)/ITEMNAME.DAT": { "Loader": "itemname", "Container": "raw", "Max": 0, "Map": { "0": { "Id": "special.ItemNames" } } },
 
     // Events
     "$(XLD)/EVNTSET0.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.1" } } },
@@ -168,6 +168,7 @@
     "$(XLD)/PALETTE.000":  {
       "Loader": "pal",
       "Container": "raw",
+      "Max": 0,
       "Map": { "0": { "Id": "pal.0", "IsCommon": true } }
     },
     "$(XLD)/PALETTE0.XLD": {
@@ -250,18 +251,21 @@
       "Language": "GERMAN",
       "Loader": "json",
       "Container": "raw",
+      "Max": 0,
       "Map": { "0": { "Id": "special.UAlbionStrings" } }
     },
     "$(MOD)/ENGLISH/strings.json": {
       "Language": "ENGLISH",
       "Loader": "json",
       "Container": "raw",
+      "Max": 0,
       "Map": { "0": { "Id": "special.UAlbionStrings" } }
     },
     "$(MOD)/FRENCH/strings.json": {
       "Language": "FRENCH",
       "Loader": "json",
       "Container": "raw",
+      "Max": 0,
       "Map": { "0": { "Id": "special.UAlbionStrings" } }
     },
 
@@ -269,18 +273,21 @@
       "Language": "GERMAN",
       "Loader": "stext",
       "Container": "raw",
+      "Max": 0,
       "Map": { "0": { "Id": "special.SystemStrings" } }
     },
     "$(XLD)/ENGLISH/SYSTEXTS":     {
       "Language": "ENGLISH",
       "Loader": "stext",
       "Container": "raw",
+      "Max": 0,
       "Map": { "0": { "Id": "special.SystemStrings" } }
     },
     "$(XLD)/FRENCH/SYSTEXTS":     {
       "Language": "FRENCH",
       "Loader": "stext",
       "Container": "raw",
+      "Max": 0,
       "Map": { "0": { "Id": "special.SystemStrings" } }
     },
 

@@ -19,9 +19,8 @@ namespace UAlbion.Formats.Exporters.Tiled
             if (block == null) throw new ArgumentNullException(nameof(block));
             if (tileset == null) throw new ArgumentNullException(nameof(tileset));
 
-            var (underlay, overlay) = FormatUtil.FromPacked(block.RawLayout);
-            for (int i = 0; i < underlay.Length; i++) if (underlay[i] == 1) underlay[i] = 0;
-            for (int i = 0; i < overlay.Length; i++) if (overlay[i] == 1) overlay[i] = 0;
+            var underlay = block.Underlay;
+            var overlay = block.Overlay;
 
             Name = $"{blockId:000}_{block.Width}x{block.Height}";
             Variations.Add(new Variation
@@ -67,14 +66,16 @@ namespace UAlbion.Formats.Exporters.Tiled
             var map = Variations[0].Map;
             var underlayLayer = map.Layers.Find(x => x.Name == "Underlay");
             var overlayLayer = map.Layers.Find(x => x.Name == "Overlay");
-            var underlay = ZipUtil.Inflate(underlayLayer.Data);
-            var overlay = ZipUtil.Inflate(overlayLayer.Data);
-            return new Block
+            if (underlayLayer.Compression == CompressionFormat.Zlib)
             {
-                Width = (byte) map.Width,
-                Height = (byte) map.Height,
-                RawLayout = FormatUtil.ToPacked(underlay, overlay)
-            };
+                var underlay = ZipUtil.Inflate(underlayLayer.Data);
+                var overlay = ZipUtil.Inflate(overlayLayer.Data);
+                return new Block((byte) map.Width, (byte) map.Height, underlay, overlay);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
 
         /*
@@ -196,7 +197,7 @@ namespace UAlbion.Formats.Exporters.Tiled
         [JsonProperty("x")] public int X { get; set; } = 0;
         [JsonProperty("y")] public int Y { get; set; } = 0;
         [JsonProperty("type")] public string Type { get; set; } = "tilelayer";
-        [JsonProperty("compression")] public string Compression { get; set; } = "zlib";
+        [JsonProperty("compression")] public string Compression { get; set; } = Tiled.CompressionFormat.Zlib;
         [JsonProperty("encoding")] public string Encoding { get; set; } = "base64";
         [JsonProperty("opacity")] public int Opacity { get; set; } = 1;
         [JsonProperty("visible")] public bool Visible { get; set; } = true;

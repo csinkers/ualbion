@@ -48,13 +48,16 @@ namespace UAlbion.Formats.Exporters.Tiled
             }
 
             var list = new BlockList();
-            foreach(var jsonBytes in  PackedChunks.Unpack(s))
+            foreach (var jsonBytes in PackedChunks.Unpack(s))
             {
                 var json = Encoding.UTF8.GetString(jsonBytes);
                 var stamp = Stamp.Parse(json);
-                var block = stamp.ToBlock();
+                var block = stamp != null ? stamp.ToBlock() : new Block();
                 list.Add(block);
             }
+
+            while (list.Count < BlockList.MaxCount)
+                list.Add(new Block());
 
             return list;
         }

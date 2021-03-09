@@ -78,6 +78,7 @@ namespace UAlbion.Config
                     Get(AssetProperty.PaletteId, 0)); // 3 = palette id
 
         static readonly Dictionary<string, Regex> RegexCache = new Dictionary<string, Regex>();
+        static readonly Regex ParameterRegex = new Regex(@"\\{(\d+)(:[^}]+)?}", RegexOptions.Compiled);
         public (int, int) ParseFilename(string pattern, string filename) // Return index and sub-asset number, may set palette id.
         {
             Regex regex;
@@ -85,11 +86,17 @@ namespace UAlbion.Config
             {
                 if (!RegexCache.TryGetValue(pattern, out regex))
                 {
-                    regex = new Regex(Regex.Escape(pattern)
-                        .Replace(@"\{0}", @"(?<Index>\d+)")
-                        .Replace(@"\{1}", @"(?<SubAsset>\d+)")
-                        .Replace(@"\{2}", @"(?<Name>\w+)")
-                        .Replace(@"\{3}", @"(?<Palette>\d+)"));
+                    var replaced = ParameterRegex.Replace(
+                        Regex.Escape(pattern),
+                        x => x.Groups[1].Value switch
+                        {
+                            "0" => @"(?<Index>\d+)",
+                            "1" => @"(?<SubAsset>\d+)",
+                            "2" => @"(?<Name>\w+)",
+                            "3" => @"(?<Palette>\d+)",
+                            _ => x.Groups[1].Value
+                        });
+                    regex = new Regex(replaced);
                     RegexCache[pattern] = regex;
                 }
             }

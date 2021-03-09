@@ -115,8 +115,8 @@ namespace UAlbion.Base.Tests
             Assert.Equal(4095, blocks.Count);
             Assert.Equal(1, blocks[0].Width);
             Assert.Equal(1, blocks[0].Height);
-            Assert.Equal(2, blocks[0].GetUnderlay(0));
-            Assert.Equal(1, blocks[0].GetOverlay(0));
+            Assert.Equal(1, blocks[0].Underlay[0]);
+            Assert.Equal(0, blocks[0].Overlay[0]);
         }
 
         [Fact]

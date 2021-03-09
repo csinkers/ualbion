@@ -132,6 +132,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Config.Tests", "Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Base.Tests", "Tests\UAlbion.Base.Tests\UAlbion.Base.Tests.csproj", "{8F548F05-E3CF-4929-B341-C2AC179612F7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unpacked", "Unpacked", "{DC1CBF5C-D2A8-4617-B6B0-F91A91216B7C}"
+	ProjectSection(SolutionItems) = preProject
+		..\mods\Unpacked\assets.json = ..\mods\Unpacked\assets.json
+		..\mods\Unpacked\modinfo.json = ..\mods\Unpacked\modinfo.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repacked", "Repacked", "{8BC04F87-80BC-42D4-8BA3-25913BA6C13A}"
+	ProjectSection(SolutionItems) = preProject
+		..\mods\Repacked\assets.json = ..\mods\Repacked\assets.json
+		..\mods\Repacked\modinfo.json = ..\mods\Repacked\modinfo.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -636,6 +648,8 @@ Global
 		{E770E959-7E1E-4395-B6E9-CFC03EFBC7E8} = {149A8BC2-91D1-4249-9E1D-7B0054347832}
 		{BDDB3782-96AE-4D83-8F67-680DD55BC2E4} = {EC61DB68-353D-4825-B221-FADABA7ADFF3}
 		{8F548F05-E3CF-4929-B341-C2AC179612F7} = {EC61DB68-353D-4825-B221-FADABA7ADFF3}
+		{DC1CBF5C-D2A8-4617-B6B0-F91A91216B7C} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
+		{8BC04F87-80BC-42D4-8BA3-25913BA6C13A} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2759A62D-227A-4D68-B6B5-966B9141AA74}

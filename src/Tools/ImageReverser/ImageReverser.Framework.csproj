@@ -44,7 +44,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup Condition="Exists('..\..\..\deps\Newtonsoft.Json\')">
-    <ProjectReference Include="..\..\..\deps\Newtonsoft.Json\Src\Newtonsoft.Json\Newtonsoft.Json.csproj" />
+    <ProjectReference Include="..\..\..\deps\Newtonsoft.Json\Src\Newtonsoft.Json\Newtonsoft.Json.csproj">
+      <Project>{016A3830-51BA-4435-9AB8-961025A1CDEF}</Project>
+      <Name>Newtonsoft.Json</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

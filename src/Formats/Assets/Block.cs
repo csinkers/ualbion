@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 using SerdesNet;
 
 namespace UAlbion.Formats.Assets
@@ -7,16 +8,39 @@ namespace UAlbion.Formats.Assets
     {
         int[] _underlay;
         int[] _overlay;
+
+        public Block() { }
+        public Block(byte width, byte height, int[] underlay, int[] overlay)
+        {
+            Width = width;
+            Height = height;
+            _underlay = underlay ?? throw new ArgumentNullException(nameof(underlay));
+            _overlay = overlay ?? throw new ArgumentNullException(nameof(overlay));
+
+            if (Width * Height != underlay.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(underlay),
+                    $"Underlay should consist of {Width * Height} tiles " +
+                    $"(i.e. {Width}x{Height}) but actually contains {underlay.Length}");
+            }
+            if (Width * Height != overlay.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(overlay),
+                    $"Overlay should consist of {Width * Height} tiles " +
+                    $"(i.e. {Width}x{Height}) but actually contains {overlay.Length}");
+            }
+        }
+
         public byte Width { get; set; }
         public byte Height { get; set; }
-        public int GetUnderlay(int index) => _underlay[index];
-        public int GetOverlay(int index) => _overlay[index];
+        [JsonIgnore] public ReadOnlySpan<int> Underlay => _underlay;
+        [JsonIgnore] public ReadOnlySpan<int> Overlay => _overlay;
         public override string ToString() => $"BLK {Width}x{Height}";
 
         public byte[] RawLayout
         {
-            get => FormatUtil.ToPacked(_underlay, _overlay);
-            set => (_underlay, _overlay) = FormatUtil.FromPacked(value);
+            get => FormatUtil.ToPacked(_underlay, _overlay, 1);
+            set => (_underlay, _overlay) = FormatUtil.FromPacked(value, -1);
         }
 
         public static Block Serdes(int _, Block b, ISerializer s)

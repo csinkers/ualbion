@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using ICSharpCode.SharpZipLib.Zip.Compression;
 
 namespace UAlbion.Formats
@@ -29,11 +30,12 @@ namespace UAlbion.Formats
             return results;
         }
 
-        public static byte[] Deflate(int[] ints)
+        public static byte[] Deflate(ReadOnlySpan<int> ints)
         {
             if (ints == null) throw new ArgumentNullException(nameof(ints));
             byte[] input = new byte[ints.Length * sizeof(int)];
-            Buffer.BlockCopy(ints, 0, input, 0, input.Length);
+            var asBytes = MemoryMarshal.Cast<int, byte>(ints);
+            asBytes.CopyTo(input.AsSpan());
 
             var deflater = new Deflater();
             deflater.SetLevel(Deflater.DEFAULT_COMPRESSION);

@@ -172,7 +172,7 @@ namespace UAlbion.Game.Entities.Map2D
                     }
 
                     int underlay = _mapData.Underlay[targetIndex];
-                    int newUnderlay = block.GetUnderlay(targetBlockIndex);
+                    int newUnderlay = block.Underlay[targetBlockIndex];
                     if (newUnderlay > 1 && (overwrite || underlay <= 1))
                     {
                         _mapData.Underlay[targetIndex] = newUnderlay;
@@ -180,7 +180,7 @@ namespace UAlbion.Game.Entities.Map2D
                     }
 
                     int overlay = _mapData.Overlay[targetIndex];
-                    int newOverlay = block.GetOverlay(targetBlockIndex);
+                    int newOverlay = block.Overlay[targetBlockIndex];
                     if (overwrite || overlay > 1)
                     {
                         _mapData.Overlay[targetIndex] = newOverlay;

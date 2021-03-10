@@ -11,13 +11,13 @@ namespace UAlbion.Formats.Parsers
     {
         const int WordLength = 21;
 
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((ListStringCollection)existing, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes((ListStringCollection)existing, info, mapping, s);
 
-        public ListStringCollection Serdes(ListStringCollection existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public ListStringCollection Serdes(ListStringCollection existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            if (info == null) throw new ArgumentNullException(nameof(info));
 
             ApiUtil.Assert(s.BytesRemaining % WordLength == 0);
 

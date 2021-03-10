@@ -18,10 +18,10 @@ namespace UAlbion.Formats.Parsers
             return text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None).Select(x => x.Trim());
         }
 
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((IList<IEvent>)existing, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes((IList<IEvent>)existing, info, mapping, s);
 
-        public IList<IEvent> Serdes(IList<IEvent> events, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public IList<IEvent> Serdes(IList<IEvent> events, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
 

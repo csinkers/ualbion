@@ -6,10 +6,10 @@ namespace UAlbion.Formats.Parsers
 {
     public class SavedGameLoader : IAssetLoader<SavedGame>
     {
-        public SavedGame Serdes(SavedGame existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public SavedGame Serdes(SavedGame existing, AssetInfo info, AssetMapping mapping, ISerializer s)
             => SavedGame.Serdes(existing, mapping, s);
 
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes(existing as SavedGame, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes(existing as SavedGame, info, mapping, s);
     }
 }

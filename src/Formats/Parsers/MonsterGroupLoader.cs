@@ -6,10 +6,10 @@ namespace UAlbion.Formats.Parsers
 {
     public class MonsterGroupLoader : IAssetLoader<MonsterGroup>
     {
-        public MonsterGroup Serdes(MonsterGroup existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => MonsterGroup.Serdes(config?.AssetId.Id ?? 0, existing, mapping, s);
+        public MonsterGroup Serdes(MonsterGroup existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => MonsterGroup.Serdes(info?.AssetId.Id ?? 0, existing, mapping, s);
 
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes(existing as MonsterGroup, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes(existing as MonsterGroup, info, mapping, s);
     }
 }

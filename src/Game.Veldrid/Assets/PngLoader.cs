@@ -62,16 +62,16 @@ namespace UAlbion.Game.Veldrid.Assets
             return new AlbionSprite2(id, totalWidth, totalHeight, uniform, pixels, frames);
         }
 
-        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));
 
-            var paletteNum = config.Get(AssetProperty.PaletteId, 0);
+            var paletteNum = info.Get(AssetProperty.PaletteId, 0);
             var paletteId = new PaletteId(AssetType.Palette, paletteNum);
             var palette = Resolve<IAssetManager>().LoadPalette(paletteId);
             if (palette == null)
-                throw new InvalidOperationException($"Could not load palette {paletteId} ({paletteNum}) for asset {config.AssetId} in file {config.File.Filename}");
+                throw new InvalidOperationException($"Could not load palette {paletteId} ({paletteNum}) for asset {info.AssetId} in file {info.File.Filename}");
             var unambiguousPalette = palette.GetUnambiguousPalette();
 
             if (s.IsWriting())
@@ -95,12 +95,12 @@ namespace UAlbion.Game.Veldrid.Assets
                     images.Add(decoder.Decode<Rgba32>(configuration, stream));
                 }
 
-                return Read(config.AssetId, unambiguousPalette, images);
+                return Read(info.AssetId, unambiguousPalette, images);
             }
             finally { foreach (var image in images) image.Dispose(); }
         }
 
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((IEightBitImage)existing, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes((IEightBitImage)existing, info, mapping, s);
     }
 }

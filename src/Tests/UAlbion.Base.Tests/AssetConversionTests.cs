@@ -123,7 +123,10 @@ namespace UAlbion.Base.Tests
         public void ChestTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Chest.Unknown121) };
-            Test<Inventory>(info.AssetId, null, (x, s) => Loaders.ChestLoader.Serdes(x, info, AssetMapping.Global, s));
+            Test<Inventory>(
+                info.AssetId,
+                 AssetId.EnumerateAll(AssetType.Item).ToArray(),
+                (x, s) => Loaders.ChestLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
         [Fact]
@@ -181,7 +184,10 @@ namespace UAlbion.Base.Tests
         public void MerchantTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Merchant.Unknown109) };
-            Test<Inventory>(info.AssetId, null, (x, s) => Loaders.MerchantLoader.Serdes(x, info, AssetMapping.Global, s));
+            Test<Inventory>(
+                info.AssetId,
+                 AssetId.EnumerateAll(AssetType.Item).ToArray(),
+                (x, s) => Loaders.MerchantLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
         [Fact]
@@ -195,7 +201,10 @@ namespace UAlbion.Base.Tests
         public void MonsterTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Monster.Krondir1) };
-            Test<CharacterSheet>(info.AssetId, null, (x, s) => Loaders.CharacterSheetLoader.Serdes(x, info, AssetMapping.Global, s));
+            Test<CharacterSheet>(
+                info.AssetId,
+                AssetId.EnumerateAll(AssetType.Item).ToArray(),
+                (x, s) => Loaders.CharacterSheetLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
         [Fact]
@@ -216,7 +225,10 @@ namespace UAlbion.Base.Tests
         public void PartyMemberTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(PartyMember.Tom) };
-            Test<CharacterSheet>(info.AssetId, null, (x, s) => Loaders.CharacterSheetLoader.Serdes(x, info, AssetMapping.Global, s));
+            Test<CharacterSheet>(
+                info.AssetId,
+                AssetId.EnumerateAll(AssetType.Item).ToArray(),
+                (x, s) => Loaders.CharacterSheetLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
         [Fact]

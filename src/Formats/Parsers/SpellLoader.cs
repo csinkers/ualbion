@@ -7,14 +7,14 @@ namespace UAlbion.Formats.Parsers
 {
     public class SpellLoader : IAssetLoader<SpellData>
     {
-        public SpellData Serdes(SpellData existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public SpellData Serdes(SpellData existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));
-            return SpellData.Serdes(config.AssetId, existing, s);
+            return SpellData.Serdes(info.AssetId, existing, s);
         }
 
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes(existing as SpellData, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes(existing as SpellData, info, mapping, s);
     }
 }

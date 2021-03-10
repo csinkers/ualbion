@@ -79,7 +79,7 @@ namespace UAlbion.Config
 
         static readonly Dictionary<string, Regex> RegexCache = new Dictionary<string, Regex>();
         static readonly Regex ParameterRegex = new Regex(@"\\{(\d+)(:[^}]+)?}", RegexOptions.Compiled);
-        public (int, int) ParseFilename(string pattern, string filename) // Return index and sub-asset number, may set palette id.
+        public static (int, int, int?, string) ParseFilename(string pattern, string filename) // Return index and sub-asset number, may set palette id.
         {
             Regex regex;
             lock (RegexCache)
@@ -103,19 +103,17 @@ namespace UAlbion.Config
 
             var m = regex.Match(filename);
             if (!m.Success)
-                return (-1, -1);
+                return (-1, -1, null, null);
 
             var indexGroup = m.Groups["Index"];
             var subAssetGroup = m.Groups["SubAsset"];
             var paletteGroup = m.Groups["Palette"];
-            int paletteId = paletteGroup.Success ?int.Parse(paletteGroup.Value, CultureInfo.InvariantCulture)  : 0;
-            if (paletteGroup.Success)
-                Set(AssetProperty.PaletteId, paletteId);
+            int? paletteId = paletteGroup.Success ? (int?)int.Parse(paletteGroup.Value, CultureInfo.InvariantCulture) : null;
 
             int index = indexGroup.Success ? int.Parse(indexGroup.Value, CultureInfo.InvariantCulture) : -1;
             int subAsset = subAssetGroup.Success ? int.Parse(subAssetGroup.Value, CultureInfo.InvariantCulture) : 0;
 
-            return (index, subAsset);
+            return (index, subAsset, paletteId, m.Groups["Name"].Value);
         }
     }
 }

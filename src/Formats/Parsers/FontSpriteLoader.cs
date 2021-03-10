@@ -9,12 +9,12 @@ namespace UAlbion.Formats.Parsers
 {
     public class FontSpriteLoader : IAssetLoader<IEightBitImage>
     {
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((IEightBitImage)existing, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes((IEightBitImage)existing, info, mapping, s);
 
-        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));
 
             AlbionSprite2 uniformFrames = null;
@@ -25,7 +25,7 @@ namespace UAlbion.Formats.Parsers
                 for (int i = 0; i < frames.Length; i++)
                 {
                     var frame = existing.GetSubImage(i);
-                    frames[i] = new AlbionSpriteFrame(frame.X, frame.Y, config.Width, config.Height, existing.Width);
+                    frames[i] = new AlbionSpriteFrame(frame.X, frame.Y, info.Width, info.Height, existing.Width);
                 }
 
                 uniformFrames = new AlbionSprite2(
@@ -35,7 +35,7 @@ namespace UAlbion.Formats.Parsers
                     existing.PixelData.ToArray(), frames);
             }
 
-            var font = new FixedSizeSpriteLoader().Serdes(uniformFrames, config, mapping, s);
+            var font = new FixedSizeSpriteLoader().Serdes(uniformFrames, info, mapping, s);
             if (font == null)
                 return null;
 

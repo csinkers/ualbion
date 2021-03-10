@@ -6,10 +6,10 @@ namespace UAlbion.Formats.Parsers
 {
     public class BlockListLoader : IAssetLoader<BlockList>
     {
-        public BlockList Serdes(BlockList existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => BlockList.Serdes(config?.AssetId.Id ?? 0, existing, s);
+        public BlockList Serdes(BlockList existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => BlockList.Serdes(info?.AssetId.Id ?? 0, existing, s);
 
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes(existing as BlockList, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes(existing as BlockList, info, mapping, s);
     }
 }

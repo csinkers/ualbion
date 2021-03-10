@@ -7,12 +7,12 @@ namespace UAlbion.Formats.Parsers
 {
     public class WaveLibLoader : IAssetLoader<WaveLib>
     {
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((WaveLib)existing, config, mapping, s);
-        public WaveLib Serdes(WaveLib existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes((WaveLib)existing, info, mapping, s);
+        public WaveLib Serdes(WaveLib existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            if (info == null) throw new ArgumentNullException(nameof(info));
             return WaveLib.Serdes(existing, s);
         }
     }

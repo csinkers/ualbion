@@ -7,13 +7,13 @@ namespace UAlbion.Formats.Parsers
 {
     public class EventSetLoader : IAssetLoader<EventSet>
     {
-        public EventSet Serdes(EventSet existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public EventSet Serdes(EventSet existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
-            if (config == null) throw new ArgumentNullException(nameof(config));
-            return EventSet.Serdes(config.AssetId, existing, mapping, s);
+            if (info == null) throw new ArgumentNullException(nameof(info));
+            return EventSet.Serdes(info.AssetId, existing, mapping, s);
         }
 
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes(existing as EventSet, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes(existing as EventSet, info, mapping, s);
     }
 }

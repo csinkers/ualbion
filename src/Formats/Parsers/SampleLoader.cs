@@ -7,14 +7,17 @@ namespace UAlbion.Formats.Parsers
 {
     public class SampleLoader : IAssetLoader<AlbionSample>
     {
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((AlbionSample) existing, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes((AlbionSample) existing, info, mapping, s);
 
-        public AlbionSample Serdes(AlbionSample existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public AlbionSample Serdes(AlbionSample existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            if (config == null) throw new ArgumentNullException(nameof(config));
-            return new AlbionSample(s.ByteArray("Samples", existing?.Samples, (int)s.BytesRemaining));
+            if (info == null) throw new ArgumentNullException(nameof(info));
+            return new AlbionSample
+            {
+                Samples = s.ByteArray("Samples", existing?.Samples, (int)s.BytesRemaining)
+            };
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 
 // ReSharper disable StringLiteralTypo
@@ -89,13 +90,19 @@ namespace UAlbion.Formats.Exporters.Tiled
             return test;
         }
 
+        public static Tileset Parse(Stream stream)
+        {
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+            using var xr = new XmlTextReader(stream);
+            var serializer = new XmlSerializer(typeof(Tileset));
+            return (Tileset)serializer.Deserialize(xr);
+        }
+
         public static Tileset Load(string path, IFileSystem disk)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
             using var stream = disk.OpenRead(path);
-            using var xr = new XmlTextReader(stream);
-            var serializer = new XmlSerializer(typeof(Tileset));
-            var tilemap = (Tileset)serializer.Deserialize(xr);
+            var tilemap = Parse(stream);
             tilemap.Filename = path;
             return tilemap;
         }
@@ -125,7 +132,7 @@ namespace UAlbion.Formats.Exporters.Tiled
         }
 
         static TileProperty Prop(string name, string value, string type = null) => new TileProperty { Name = name, Type = type, Value = value };
-        public static Tileset FromTileset(TilesetData tileset, TilemapProperties properties)
+        public static Tileset FromAlbion(TilesetData tileset, TilemapProperties properties)
         {
             if (tileset == null) throw new ArgumentNullException(nameof(tileset));
             if (properties == null) throw new ArgumentNullException(nameof(properties));
@@ -240,6 +247,69 @@ namespace UAlbion.Formats.Exporters.Tiled
                         }
                 }).ToList(),
             };
+        }
+
+        static TileData InterpretTile(Tile tile, TilemapProperties properties)
+        {
+            ushort SourceStringToImageNumber(string source)
+            {
+                if (source == properties.BlankTilePath)
+                    return 0xffff;
+
+                var (_, subId, _, _) = AssetInfo.ParseFilename(properties.GraphicsTemplate, source);
+                return (ushort)subId;
+            }
+
+            var result = new TileData
+            {
+                Index = (ushort)tile.Id,
+                ImageNumber = SourceStringToImageNumber(tile.Image.Source),
+                FrameCount = (byte)(tile.Frames?.Count ?? 0)
+            };
+
+            if (result.FrameCount == 0)
+                result.FrameCount = 1;
+
+            if (tile.Id == 39)
+                result.FrameCount = 1;
+
+            foreach (var prop in tile.Properties)
+            {
+                switch (prop.Name.ToUpperInvariant())
+                {
+                    case "FLAGS": result.Flags = (TileFlags)Enum.Parse(typeof(TileFlags), prop.Value); break;
+                    case "LAYER": result.Layer = (TileLayer)Enum.Parse(typeof(TileLayer), prop.Value); break;
+                    case "PASSABILITY":
+                        result.Collision = (Passability) int.Parse(prop.Value, CultureInfo.InvariantCulture);
+                        //Enum.Parse(typeof(Passability), prop.Value); 
+                        break;
+                    case "TYPE": result.Type = (TileType)Enum.Parse(typeof(TileType), prop.Value); break;
+                    case "UNK7": result.Unk7 = byte.Parse(prop.Value, CultureInfo.InvariantCulture); break;
+                    case "FRAME": return null;
+                }
+            }
+
+            return result;
+        }
+
+        public TilesetData ToAlbion(TilesetId id, TilemapProperties properties)
+        {
+            if (properties == null) throw new ArgumentNullException(nameof(properties));
+
+            var t = new TilesetData(id);
+            var tileLookup =
+                Tiles
+                .Select(x => InterpretTile(x, properties))
+                .Where(x => x != null)
+                .ToDictionary(x => x.Index);
+
+            for (ushort i = 0; i < TilesetData.TileCount; i++)
+            {
+                tileLookup.TryGetValue(i, out var tile);
+                t.Tiles.Add(tile ?? new TileData { Index = i });
+            }
+
+            return t;
         }
     }
 }

@@ -8,13 +8,13 @@ namespace UAlbion.Formats.Parsers
 {
     public class MapLoader : IAssetLoader<IMapData>
     {
-        public IMapData Serdes(IMapData existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public IMapData Serdes(IMapData existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
-            if (config == null) throw new ArgumentNullException(nameof(config));
-            return BaseMapData.Serdes(config, existing, mapping, s);
+            if (info == null) throw new ArgumentNullException(nameof(info));
+            return BaseMapData.Serdes(info, existing, mapping, s);
         }
 
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes(existing as IMapData, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes(existing as IMapData, info, mapping, s);
     }
 }

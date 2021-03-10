@@ -31,20 +31,22 @@ namespace UAlbion.Formats.Assets
             _readOnlyList = new ReadOnlyCollection<IReadOnlyItemSlot>(Slots);
         }
 
+        ItemSlot TrySlot(ItemSlotId id) => Slots.Length > (int)id ? Slots[(int)id] : null;
+
         [JsonIgnore] public InventoryId Id { get; private set; }
         public ItemSlot[] Slots { get; private set; }
         [JsonIgnore] public IEnumerable<ItemSlot> BackpackSlots { get { for (int i = 0; i < (int)ItemSlotId.NormalSlotCount; i++) yield return Slots[i]; } }
-        [JsonIgnore] public ItemSlot Gold => Slots[(int)ItemSlotId.Gold];
-        [JsonIgnore] public ItemSlot Rations => Slots[(int)ItemSlotId.Rations];
-        [JsonIgnore] public ItemSlot Neck => Slots[(int)ItemSlotId.Neck];
-        [JsonIgnore] public ItemSlot Head => Slots[(int)ItemSlotId.Head];
-        [JsonIgnore] public ItemSlot Tail => Slots[(int)ItemSlotId.Tail];
-        [JsonIgnore] public ItemSlot LeftHand => Slots[(int)ItemSlotId.LeftHand];
-        [JsonIgnore] public ItemSlot Chest => Slots[(int)ItemSlotId.Chest];
-        [JsonIgnore] public ItemSlot RightHand => Slots[(int)ItemSlotId.RightHand];
-        [JsonIgnore] public ItemSlot LeftFinger => Slots[(int)ItemSlotId.LeftFinger];
-        [JsonIgnore] public ItemSlot Feet => Slots[(int)ItemSlotId.Feet];
-        [JsonIgnore] public ItemSlot RightFinger => Slots[(int)ItemSlotId.RightFinger];
+        [JsonIgnore] public ItemSlot Gold        => TrySlot(ItemSlotId.Gold);
+        [JsonIgnore] public ItemSlot Rations     => TrySlot(ItemSlotId.Rations);
+        [JsonIgnore] public ItemSlot Neck        => TrySlot(ItemSlotId.Neck);
+        [JsonIgnore] public ItemSlot Head        => TrySlot(ItemSlotId.Head);
+        [JsonIgnore] public ItemSlot Tail        => TrySlot(ItemSlotId.Tail);
+        [JsonIgnore] public ItemSlot LeftHand    => TrySlot(ItemSlotId.LeftHand);
+        [JsonIgnore] public ItemSlot Chest       => TrySlot(ItemSlotId.Chest);
+        [JsonIgnore] public ItemSlot RightHand   => TrySlot(ItemSlotId.RightHand);
+        [JsonIgnore] public ItemSlot LeftFinger  => TrySlot(ItemSlotId.LeftFinger);
+        [JsonIgnore] public ItemSlot Feet        => TrySlot(ItemSlotId.Feet);
+        [JsonIgnore] public ItemSlot RightFinger => TrySlot(ItemSlotId.RightFinger);
         public static Inventory SerdesChest(int n, Inventory inv, AssetMapping mapping, ISerializer s) => Serdes(n, inv, mapping, s, InventoryType.Chest);
         public static Inventory SerdesMerchant(int n, Inventory inv, AssetMapping mapping, ISerializer s) => Serdes(n, inv, mapping, s, InventoryType.Merchant);
         public static Inventory SerdesCharacter(int n, Inventory inv, AssetMapping mapping, ISerializer s) => Serdes(n, inv, mapping, s, InventoryType.Player);

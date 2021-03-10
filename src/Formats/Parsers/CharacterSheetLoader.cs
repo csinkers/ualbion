@@ -7,13 +7,13 @@ namespace UAlbion.Formats.Parsers
 {
     public class CharacterSheetLoader : IAssetLoader<CharacterSheet>
     {
-        public CharacterSheet Serdes(CharacterSheet existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public CharacterSheet Serdes(CharacterSheet existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
-            if (config == null) throw new ArgumentNullException(nameof(config));
-            return CharacterSheet.Serdes(config.AssetId, existing, mapping, s);
+            if (info == null) throw new ArgumentNullException(nameof(info));
+            return CharacterSheet.Serdes(info.AssetId, existing, mapping, s);
         }
 
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes(existing as CharacterSheet, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes(existing as CharacterSheet, info, mapping, s);
     }
 }

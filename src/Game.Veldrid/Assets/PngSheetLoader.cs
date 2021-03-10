@@ -48,17 +48,17 @@ namespace UAlbion.Game.Veldrid.Assets
             return new AlbionSprite2(id, image.Width, image.Height, uniform, pixels, frames);
         }
 
-        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));
 
-            var paletteId = config.Get(AssetProperty.PaletteId, 0);
+            var paletteId = info.Get(AssetProperty.PaletteId, 0);
             var palette = Resolve<IAssetManager>()
                 .LoadPalette(new PaletteId(AssetType.Palette, paletteId))
                 .GetUnambiguousPalette();
 
-            if (config.AssetId.Type == AssetType.Font)
+            if (info.AssetId.Type == AssetType.Font)
             {
                 palette[1] = 0xffffffff;
                 palette[2] = 0xffcccccc;
@@ -83,11 +83,11 @@ namespace UAlbion.Game.Veldrid.Assets
                 var bytes = s.ByteArray(null, null, (int) s.BytesRemaining);
                 using var stream = new MemoryStream(bytes);
                 using var image = decoder.Decode<Rgba32>(configuration, stream);
-                return Read(config.AssetId, palette, image, config.Width, config.Height);
+                return Read(info.AssetId, palette, image, info.Width, info.Height);
             }
         }
 
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((IEightBitImage)existing, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes((IEightBitImage)existing, info, mapping, s);
     }
 }

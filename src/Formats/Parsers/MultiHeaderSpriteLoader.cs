@@ -11,13 +11,13 @@ namespace UAlbion.Formats.Parsers
 {
     public class MultiHeaderSpriteLoader : IAssetLoader<IEightBitImage>
     {
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((IEightBitImage)existing, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes((IEightBitImage)existing, info, mapping, s);
 
-        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            if (info == null) throw new ArgumentNullException(nameof(info));
             if (s.IsWriting() && existing == null) throw new ArgumentNullException(nameof(existing));
 
             int width = s.UInt16("Width", (ushort?)existing?.GetSubImage(0).Width ?? 0);
@@ -96,7 +96,7 @@ namespace UAlbion.Formats.Parsers
 
             s.Check();
             return new AlbionSprite2(
-                config.AssetId,
+                info.AssetId,
                 totalWidth,
                 currentY,
                 false,

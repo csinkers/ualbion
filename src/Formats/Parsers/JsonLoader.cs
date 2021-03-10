@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Parsers
 {
     public class JsonLoader<T> : IAssetLoader<T> where T : class
     {
-        public T Serdes(T existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public T Serdes(T existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (s.IsWriting())
@@ -29,7 +29,7 @@ namespace UAlbion.Formats.Parsers
             }
         }
 
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((T)existing, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes((T)existing, info, mapping, s);
     }
 }

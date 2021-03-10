@@ -6,6 +6,6 @@ namespace UAlbion.Formats.Parsers
 {
     public class FlicLoader : IAssetLoader
     {
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s) => new FlicFile(s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s) => new FlicFile(s);
     }
 }

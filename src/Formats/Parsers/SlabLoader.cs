@@ -9,10 +9,10 @@ namespace UAlbion.Formats.Parsers
     public class SlabLoader : IAssetLoader<IEightBitImage>
     {
         const int StatusBarHeight = 48;
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((IEightBitImage)existing, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes((IEightBitImage)existing, info, mapping, s);
 
-        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             IEightBitImage singleFrame = null;
             if (s.IsWriting())
@@ -32,7 +32,7 @@ namespace UAlbion.Formats.Parsers
                 );
             }
 
-            var sprite = new FixedSizeSpriteLoader().Serdes(singleFrame, config, mapping, s);
+            var sprite = new FixedSizeSpriteLoader().Serdes(singleFrame, info, mapping, s);
             if (sprite == null)
                 return null;
 

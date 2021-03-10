@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Api;
 
@@ -15,8 +16,8 @@ namespace UAlbion.Formats.Assets
         public int Unk14 { get; set; }
         public int Unk18 { get; set; }
         public int SampleRate { get; private set; } // -1 = Use default sample rate (11025)
-        public int Channels => 1;
-        public int BytesPerSample => 1;
+        [JsonIgnore] public int Channels => 1;
+        [JsonIgnore] public int BytesPerSample => 1;
         public byte[] Samples { get; set; } = Array.Empty<byte>();
 
         public static WaveLibSample Serdes(int i, WaveLibSample w, ISerializer s)

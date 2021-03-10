@@ -23,7 +23,7 @@ namespace UAlbion.Game.Assets
 
             foreach (var slot in inventory.EnumerateAll())
                 if (slot.Item is ItemProxy proxy)
-                    slot.Item = assets.LoadItem(proxy.Id);
+                    slot.Item = assets.LoadItem(proxy.Id) ?? throw new InvalidOperationException($"Could not resolve item proxy for {slot.ItemId}");
         }
 
         public object Process(object asset, AssetInfo info, ICoreFactory factory)

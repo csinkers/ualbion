@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Parsers
 {
     public class JsonStringLoader : IAssetLoader
     {
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             var bytes = s.ByteArray(null, null, (int)s.BytesRemaining);

@@ -11,10 +11,10 @@ namespace UAlbion.Formats.Parsers
     {
         static readonly Regex Regex = new Regex(@"\[(\d+):(.*)\]");
 
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((IntStringDictionary) existing, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes((IntStringDictionary) existing, info, mapping, s);
 
-        public IntStringDictionary Serdes(IntStringDictionary existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public IntStringDictionary Serdes(IntStringDictionary existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (s.IsWriting()) throw new NotImplementedException("Saving of system text not currently supported");

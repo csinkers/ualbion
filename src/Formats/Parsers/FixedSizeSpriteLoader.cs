@@ -10,13 +10,13 @@ namespace UAlbion.Formats.Parsers
     {
         public const string TypeString = "UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats";
 
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((IEightBitImage) existing, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes((IEightBitImage) existing, info, mapping, s);
 
-        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            if (info == null) throw new ArgumentNullException(nameof(info));
             if (s.IsWriting() && existing == null) throw new ArgumentNullException(nameof(existing));
             // TODO: Assert uniform frames when writing
 
@@ -27,8 +27,8 @@ namespace UAlbion.Formats.Parsers
             if (streamLength == 0)
                 return null;
 
-            int width = existing?.Width ?? config.Width;
-            int height = existing?.Height ?? config.Height;
+            int width = existing?.Width ?? info.Width;
+            int height = existing?.Height ?? info.Height;
             if (width == 0) width = (int)Math.Sqrt(streamLength);
             if (height == 0) height = (int)streamLength / width;
 
@@ -40,7 +40,7 @@ namespace UAlbion.Formats.Parsers
             height = (int)streamLength / (width * spriteCount);
 
             byte[] pixelData = existing?.PixelData.ToArray();
-            if (existing != null && config.Get(AssetProperty.Transposed, false))
+            if (existing != null && info.Get(AssetProperty.Transposed, false))
             {
                 pixelData = new byte[existing.PixelData.Length];
                 for (int n = 0; n < spriteCount; n++)
@@ -59,8 +59,8 @@ namespace UAlbion.Formats.Parsers
             for (int n = 0; n < spriteCount; n++)
                 frames[n] ??= new AlbionSpriteFrame(0, height * n, width, height, width);
 
-            var sprite = new AlbionSprite2(config.AssetId, width, height * spriteCount, true, pixelData, frames);
-            if (!config.Get(AssetProperty.Transposed, false))
+            var sprite = new AlbionSprite2(info.AssetId, width, height * spriteCount, true, pixelData, frames);
+            if (!info.Get(AssetProperty.Transposed, false))
                 return sprite;
 
             int rotatedFrameHeight = width;
@@ -75,7 +75,7 @@ namespace UAlbion.Formats.Parsers
                     new Span<byte>(pixelData, n * width * height, width * height));
             }
 
-            return new AlbionSprite2(config.AssetId, height, width * spriteCount, true, pixelData, frames);
+            return new AlbionSprite2(info.AssetId, height, width * spriteCount, true, pixelData, frames);
         }
     }
 }

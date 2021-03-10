@@ -24,7 +24,9 @@ namespace UAlbion.Formats.Containers
             foreach (var filePath in disk.EnumerateDirectory(path, $"{info.Index}_*.*"))
             {
                 var filename = Path.GetFileName(filePath);
-                var (index, subAsset) = info.ParseFilename(pattern, filename);
+                var (index, subAsset, paletteId, name) = AssetInfo.ParseFilename(pattern, filename);
+                if (paletteId.HasValue)
+                    info.Set(AssetProperty.PaletteId, paletteId);
 
                 if (index != info.Index)
                     continue;

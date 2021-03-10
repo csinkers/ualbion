@@ -43,15 +43,15 @@ namespace UAlbion.Formats.Parsers
             }
         }
 
-        public object Serdes(object existing, AssetInfo config, AssetMapping mapping, ISerializer s)
-            => Serdes((IEightBitImage)existing, config, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+            => Serdes((IEightBitImage)existing, info, mapping, s);
 
-        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo config, AssetMapping mapping, ISerializer s)
+        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            if (info == null) throw new ArgumentNullException(nameof(info));
 
-            var sizes = ParseSpriteSizes(config.Get<string>(AssetProperty.SubSprites, null));
+            var sizes = ParseSpriteSizes(info.Get<string>(AssetProperty.SubSprites, null));
 
             int totalWidth = 0;
             int currentY = 0;
@@ -103,7 +103,7 @@ namespace UAlbion.Formats.Parsers
 
             s.Check();
             return new AlbionSprite2(
-                config.AssetId,
+                info.AssetId,
                 totalWidth,
                 totalHeight,
                 false,

@@ -276,7 +276,7 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void TilesetTest()
         {
-            var info = new AssetInfo { AssetId = AssetId.From(Tileset.Toronto) };
+            var info = new AssetInfo { AssetId = AssetId.From(Tileset.Outdoors) };
             Test<TilesetData>(info.AssetId, null, (x, s) => Loaders.TilesetLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 

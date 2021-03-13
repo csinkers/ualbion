@@ -68,6 +68,7 @@ namespace UAlbion.Game.Veldrid.Assets
 
             if (info.AssetId.Type == AssetType.Font)
             {
+                palette = new uint[256];
                 palette[1] = 0xffffffff;
                 palette[2] = 0xffcccccc;
                 palette[3] = 0xffaaaaaa;

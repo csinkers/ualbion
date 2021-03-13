@@ -10,7 +10,7 @@ namespace UAlbion.Formats.Assets.Maps
         public const int TileCount = 4097;
         public TilesetData() { }
         public TilesetData(TilesetId id) => Id = id;
-        public TilesetId Id { get; private set; }
+        public TilesetId Id { get; private set; } // Setter required for JSON
         public bool UseSmallGraphics { get; set; } // Careful if renaming: needs to match up to asset property in assets.json
         public IList<TileData> Tiles { get; private set; } = new List<TileData>();
 

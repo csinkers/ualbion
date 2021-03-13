@@ -148,21 +148,24 @@ namespace UAlbion.Formats.Exporters.Tiled
                 return properties;
             }
 
-            Tile BuildTile(int index, ushort imageNumber, List<TileProperty> tileProperties)
+            Tile BuildTile(int index, ushort? imageNumber, List<TileProperty> tileProperties)
             {
-                var source = imageNumber == 0xffff
-                    ? properties.BlankTilePath
-                    : string.Format(CultureInfo.InvariantCulture,
-                        properties.GraphicsTemplate,
-                        tileset.Id.Id,
-                        imageNumber
-                        );
+                var source = imageNumber switch
+                    {
+                        null => null,
+                        0xffff => properties.BlankTilePath,
+                        _ => string.Format(CultureInfo.InvariantCulture,
+                                properties.GraphicsTemplate,
+                                tileset.Id.Id,
+                                imageNumber
+                        )
+                    };
 
                 return new Tile
                 {
                     Id = index,
                     Properties = tileProperties,
-                    Image = new TilesetImage
+                    Image = source == null ? null : new TilesetImage
                     {
                         Width = properties.TileWidth,
                         Height = properties.TileHeight,
@@ -174,7 +177,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             List<Tile> tiles = 
                 tileset.Tiles
                 .Where(x => !x.IsBlank)
-                .Select(x => BuildTile(x.Index, x.ImageNumber, Props(x)))
+                .Select(x => BuildTile(x.Index, x.FrameCount > 0 ? x.ImageNumber : (ushort?)null, Props(x)))
                 .ToList();
 
             // Add tiles for the extra frames of animated tiles
@@ -253,6 +256,9 @@ namespace UAlbion.Formats.Exporters.Tiled
         {
             ushort SourceStringToImageNumber(string source)
             {
+                if (string.IsNullOrEmpty(source))
+                    return 0;
+
                 if (source == properties.BlankTilePath)
                     return 0xffff;
 
@@ -263,14 +269,11 @@ namespace UAlbion.Formats.Exporters.Tiled
             var result = new TileData
             {
                 Index = (ushort)tile.Id,
-                ImageNumber = SourceStringToImageNumber(tile.Image.Source),
+                ImageNumber = SourceStringToImageNumber(tile.Image?.Source),
                 FrameCount = (byte)(tile.Frames?.Count ?? 0)
             };
 
-            if (result.FrameCount == 0)
-                result.FrameCount = 1;
-
-            if (tile.Id == 39)
+            if (result.FrameCount == 0 && tile.Image != null)
                 result.FrameCount = 1;
 
             foreach (var prop in tile.Properties)

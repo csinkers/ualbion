@@ -1,6 +1,6 @@
 ﻿using System;
 using SerdesNet;
-using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 
@@ -18,10 +18,10 @@ namespace UAlbion.Formats.Parsers
             if (s.IsWriting())
             {
                 if (existing == null) throw new ArgumentNullException(nameof(existing));
-                singleFrame = new AlbionSprite2(
+                singleFrame = new AlbionSprite(
                     AssetId.FromUInt32(existing.Id.ToUInt32()),
                     existing.Width, existing.Height, true,
-                    existing.PixelData.ToArray(),
+                    existing.PixelData,
                     new[] { new AlbionSpriteFrame(
                         existing.GetSubImage(0).X,
                         existing.GetSubImage(0).Y,
@@ -42,12 +42,12 @@ namespace UAlbion.Formats.Parsers
                 new AlbionSpriteFrame(0, sprite.Height - StatusBarHeight, sprite.Width, StatusBarHeight, sprite.Width)
             };
 
-            return new AlbionSprite2(
+            return new AlbionSprite(
                 AssetId.FromUInt32(sprite.Id.ToUInt32()),
                 sprite.Width,
                 sprite.Height,
                 false,
-                sprite.PixelData.ToArray(),
+                sprite.PixelData,
                 frames);
         }
     }

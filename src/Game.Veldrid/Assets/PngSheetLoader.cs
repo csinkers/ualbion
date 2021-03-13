@@ -8,11 +8,10 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
-using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid.Textures;
-using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 
@@ -22,16 +21,11 @@ namespace UAlbion.Game.Veldrid.Assets
     {
         static byte[] Write(IImageEncoder encoder, uint[] palette, IEightBitImage existing)
         {
-            var image = ImageUtil.PackSpriteSheet(palette, existing.SubImageCount, i =>
-            {
-                var frame = existing.GetSubImage(i);
-                ReadOnlySpan<byte> fromSlice = existing.PixelData.Slice(frame.PixelOffset, frame.PixelLength);
-                return new ReadOnlyByteImageBuffer(frame.Width, frame.Height, existing.Width, fromSlice);
-            });
+            var image = ImageUtil.PackSpriteSheet(palette, existing.SubImageCount, existing.GetSubImageBuffer);
             return FormatUtil.BytesFromStream(stream => encoder.Encode(image, stream));
         }
 
-        static AlbionSprite2 Read(AssetId id, uint[] palette, Image<Rgba32> image, int subItemWidth, int subItemHeight)
+        static AlbionSprite Read(AssetId id, uint[] palette, Image<Rgba32> image, int subItemWidth, int subItemHeight)
         {
             var pixels = new byte[image.Width * image.Height];
             var frames = new List<AlbionSpriteFrame>();
@@ -45,7 +39,21 @@ namespace UAlbion.Game.Veldrid.Assets
                 (x,y,w,h) => frames.Add(new AlbionSpriteFrame(x, y, w, h, image.Width)));
 
             bool uniform = frames.All(x => x.Width == frames[0].Width && x.Height == frames[0].Height);
-            return new AlbionSprite2(id, image.Width, image.Height, uniform, pixels, frames);
+
+            while (IsFrameEmpty(frames.Last(), pixels, image.Width))
+                frames.RemoveAt(frames.Count - 1);
+
+            return new AlbionSprite(id, image.Width, image.Height, uniform, pixels, frames);
+        }
+
+        static bool IsFrameEmpty(ISubImage frame, byte[] pixels, int stride)
+        {
+            var span = pixels.AsSpan(frame.PixelOffset, frame.PixelLength);
+            for (int j = 0; j < frame.Height; j++)
+                for (int i = 0; i < frame.Width; i++)
+                    if (span[i + j * stride] != 0)
+                        return false;
+            return true;
         }
 
         public IEightBitImage Serdes(IEightBitImage existing, AssetInfo info, AssetMapping mapping, ISerializer s)
@@ -73,14 +81,14 @@ namespace UAlbion.Game.Veldrid.Assets
                     throw new ArgumentNullException(nameof(existing));
                 var encoder = new PngEncoder();
                 var bytes = Write(encoder, palette, existing);
-                s.ByteArray(null, bytes, bytes.Length);
+                s.Bytes(null, bytes, bytes.Length);
                 return existing;
             }
             else // Read
             {
                 var decoder = new PngDecoder();
                 var configuration = new Configuration();
-                var bytes = s.ByteArray(null, null, (int) s.BytesRemaining);
+                var bytes = s.Bytes(null, null, (int) s.BytesRemaining);
                 using var stream = new MemoryStream(bytes);
                 using var image = decoder.Decode<Rgba32>(configuration, stream);
                 return Read(info.AssetId, palette, image, info.Width, info.Height);

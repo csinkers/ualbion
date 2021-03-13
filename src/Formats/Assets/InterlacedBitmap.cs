@@ -61,7 +61,7 @@ namespace UAlbion.Formats.Assets
                         case IFFChunkType.Thumbnail: img.SerdesThumbnail(s, chunk.Length); break;
                         case IFFChunkType.Body: img.SerdesPixels(s, chunk.Length); break;
                         default:
-                            s.ByteArray("Unk", null, chunk.Length);
+                            s.Bytes("Unk", null, chunk.Length);
                             break;
                     }
 
@@ -134,14 +134,14 @@ namespace UAlbion.Formats.Assets
 
             Thumbnail = Compression == 1 
                 ? s.IsReading() ? Unpack(s, length - 4) : Pack(Thumbnail, s)
-                : s.ByteArray("Pixels", null, length - 4);
+                : s.Bytes("Pixels", null, length - 4);
         }
 
         void SerdesPixels(ISerializer s, int length)
         {
             ImageData = Compression == 1
                 ? s.IsReading() ? Unpack(s, length) : Pack(ImageData, s)
-                : s.ByteArray("Pixels", ImageData, length);
+                : s.Bytes("Pixels", ImageData, length);
         }
 
         static byte[] Pack(byte[] data, ISerializer s)
@@ -159,7 +159,7 @@ namespace UAlbion.Formats.Assets
 
                 if (n <= 127)
                 {
-                    var rawBytes = s.ByteArray("Raw", null, n + 1);
+                    var rawBytes = s.Bytes("Raw", null, n + 1);
                     ms.Write(rawBytes, 0, rawBytes.Length);
                 }
                 else if (129 <= n && n <= 255)

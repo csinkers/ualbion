@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets
 {
-    public class AlbionSprite2 : IEightBitImage
+    public class AlbionSprite : IEightBitImage
     {
-        public AlbionSprite2(AssetId id, int width, int height, bool uniformFrames, byte[] pixelData, IEnumerable<AlbionSpriteFrame> frames)
+        public AlbionSprite(AssetId id, int width, int height, bool uniformFrames, byte[] pixelData, IEnumerable<AlbionSpriteFrame> frames)
         {
             AssetId = id;
             Width = width;
@@ -30,7 +30,6 @@ namespace UAlbion.Formats.Assets
         public bool UniformFrames { get; }
         public IReadOnlyList<AlbionSpriteFrame> Frames { get; }
         public byte[] PixelData { get; }
-        ReadOnlySpan<byte> IEightBitImage.PixelData => PixelData;
 
         public override string ToString() => $"AlbionSprite {Id} {Width}x{Height} ({Frames.Count} frames)";
 
@@ -44,6 +43,13 @@ namespace UAlbion.Formats.Assets
                 throw new ArgumentOutOfRangeException(nameof(row), $"Tried to get span for row {row}, but the frame only has a height of {frame.Height}");
             int index = frame.X + Width * (frame.Y + row);
             return PixelData.AsSpan(index, frame.Width);
+        }
+
+        public ReadOnlyByteImageBuffer GetSubImageBuffer(int i)
+        {
+            var frame = GetSubImage(i);
+            ReadOnlySpan<byte> fromSlice = PixelData.AsSpan(frame.PixelOffset, frame.PixelLength);
+            return new ReadOnlyByteImageBuffer(frame.Width, frame.Height, Width, fromSlice);
         }
     }
 }

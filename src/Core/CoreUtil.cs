@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Threading;
 using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Core.Textures;
-using UAlbion.Core.Visual;
 
 namespace UAlbion.Core
 {

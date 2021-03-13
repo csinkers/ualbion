@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Api
+﻿namespace UAlbion.Api.Visual
 {
     public interface IImage
     {
@@ -6,8 +6,8 @@
         string Name { get; }
         int Width { get; }
         int Height { get; }
-        int SubImageCount { get; }
         int SizeInBytes { get; }
         ISubImage GetSubImage(int subImage);
+        int SubImageCount { get; }
     }
 }

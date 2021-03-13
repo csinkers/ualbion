@@ -35,7 +35,7 @@ namespace UAlbion.Formats.Assets
             //-------------\\
             // File Header \\
             //-------------\\
-            var magic = Encoding.ASCII.GetString(s.ByteArray("Magic", Magic, 2)); // 0
+            var magic = Encoding.ASCII.GetString(s.Bytes("Magic", Magic, 2)); // 0
             if (magic != MagicString)
                 throw new FormatException($"Tried to read as bitmap, but incorrect signature \"{magic}\" found (expected BM)");
 

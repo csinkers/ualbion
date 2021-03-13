@@ -65,9 +65,9 @@ namespace UAlbion.Formats.Assets.Maps
                 (n, x, s2) => MapNpc.Serdes(n, x, map.MapType, mapping, s2)).ToArray();
 
             if (s.IsReading())
-                map.RawLayout = s.ByteArray("Layout", null, 3 * map.Width * map.Height);
+                map.RawLayout = s.Bytes("Layout", null, 3 * map.Width * map.Height);
             else
-                s.ByteArray("Layout", map.RawLayout, 3 * map.Width * map.Height);
+                s.Bytes("Layout", map.RawLayout, 3 * map.Width * map.Height);
 
             s.Check();
             ApiUtil.Assert(s.Offset == startOffset + 10 + npcCount * MapNpc.SizeOnDisk + 3 * map.Width * map.Height);

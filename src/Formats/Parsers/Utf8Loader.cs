@@ -14,12 +14,12 @@ namespace UAlbion.Formats.Parsers
             {
                 if (existing == null) throw new ArgumentNullException(nameof(existing));
                 var bytes = Encoding.UTF8.GetBytes(existing);
-                s.ByteArray(null, bytes, bytes.Length);
+                s.Bytes(null, bytes, bytes.Length);
                 return existing;
             }
             else
             {
-                var bytes = s.ByteArray(null, null, (int)s.BytesRemaining);
+                var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
                 return Encoding.UTF8.GetString(bytes);
             }
         }

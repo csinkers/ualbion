@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Core.Textures;
 using Veldrid;
 using Veldrid.ImageSharp;

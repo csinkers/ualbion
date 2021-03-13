@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UAlbion.Api
+namespace UAlbion.Api.Visual
 {
     public interface IRgbaImage : IImage
     {

@@ -15,7 +15,7 @@ namespace UAlbion.Formats.Parsers
             var initial = s.Offset;
             if (s.BytesRemaining < Magic.Length)
             {
-                yield return s.ByteArray(null, null, (int)s.BytesRemaining);
+                yield return s.Bytes(null, null, (int)s.BytesRemaining);
                 yield break;
             }
 
@@ -23,7 +23,7 @@ namespace UAlbion.Formats.Parsers
             if (!string.Equals(magic, Magic, StringComparison.Ordinal))
             {
                 s.Seek(initial);
-                yield return s.ByteArray(null, null, (int)s.BytesRemaining);
+                yield return s.Bytes(null, null, (int)s.BytesRemaining);
                 yield break;
             }
 
@@ -31,7 +31,7 @@ namespace UAlbion.Formats.Parsers
             for(int i = 0; i < count; i++)
             {
                 int length = s.Int32(null, 0);
-                var chunk = s.ByteArray(null, null, length);
+                var chunk = s.Bytes(null, null, length);
                 yield return chunk;
             }
         }
@@ -44,7 +44,7 @@ namespace UAlbion.Formats.Parsers
             if (count == 1)
             {
                 var chunk = buildChunk(0);
-                s.ByteArray(null, chunk, chunk.Length);
+                s.Bytes(null, chunk, chunk.Length);
                 return;
             }
 
@@ -54,7 +54,7 @@ namespace UAlbion.Formats.Parsers
             {
                 var chunk = buildChunk(i);
                 s.Int32(null, chunk.Length);
-                s.ByteArray(null, chunk, chunk.Length);
+                s.Bytes(null, chunk, chunk.Length);
             }
         }
     }

@@ -8,11 +8,10 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
-using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid.Textures;
-using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Parsers;
@@ -28,7 +27,7 @@ namespace UAlbion.Game.Veldrid.Assets
                 frame.Width,
                 frame.Height,
                 existing.Width,
-                existing.PixelData.Slice(frame.PixelOffset, frame.PixelLength));
+                existing.PixelData.AsSpan(frame.PixelOffset, frame.PixelLength));
 
             Image<Rgba32> image = ImageUtil.BuildImageForFrame(buffer, palette);
             return FormatUtil.BytesFromStream(stream => encoder.Encode(image, stream));
@@ -59,7 +58,7 @@ namespace UAlbion.Game.Veldrid.Assets
             }
 
             bool uniform = frames.All(x => x.Width == frames[0].Width && x.Height == frames[0].Height);
-            return new AlbionSprite2(id, totalWidth, totalHeight, uniform, pixels, frames);
+            return new AlbionSprite(id, totalWidth, totalHeight, uniform, pixels, frames);
         }
 
         public IEightBitImage Serdes(IEightBitImage existing, AssetInfo info, AssetMapping mapping, ISerializer s)

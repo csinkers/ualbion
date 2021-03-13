@@ -30,7 +30,7 @@ namespace UAlbion.Game.Assets
                     _ => null
                 };
 
-                if (bytes != null) s.ByteArray(null, bytes, bytes.Length);
+                if (bytes != null) s.Bytes(null, bytes, bytes.Length);
                 return existing;
             }
 

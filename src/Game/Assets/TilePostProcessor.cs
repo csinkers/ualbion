@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
-using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Assets
 {
@@ -20,64 +20,47 @@ namespace UAlbion.Game.Assets
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (factory == null) throw new ArgumentNullException(nameof(factory));
 
-            var sprite = (AlbionSprite2)asset;
+            var sprite = (IEightBitImage)asset;
+            var layout = SpriteSheetUtil.ArrangeSpriteSheet(sprite.SubImageCount, 1, sprite.GetSubImageBuffer);
+            var totalHeight = ApiUtil.NextPowerOfTwo(layout.Height);
+            byte[] pixelData = new byte[layout.Width * totalHeight];
+            var subImages = new SubImage[sprite.SubImageCount];
 
-            int srcTileWidth = sprite.Width;
-            int srcTileHeight = sprite.Height / sprite.Frames.Count;
-            int destTileWidth = srcTileWidth + MarginPixels * 2;
-            int destTileHeight = srcTileHeight + MarginPixels * 2;
-            var (width, height) = GetAtlasSize(destTileWidth, destTileHeight, sprite.Frames.Count);
-            byte[] pixelData = new byte[width * height];
-            var subImages = new SubImage[sprite.Frames.Count];
-
-            int curX = 0;
-            int curY = 0;
-            for (int n = 0; n < sprite.Frames.Count; n++)
+            for (int n = 0; n < sprite.SubImageCount; n++)
             {
-                for (int j = 0; j < destTileHeight; j++)
+                var frame = sprite.GetSubImageBuffer(n);
+                var destWidth = frame.Width + 2 * MarginPixels;
+                var destHeight = frame.Height + 2 * MarginPixels;
+                var (x, y) = layout.Positions[n];
+                for (int j = 0; j < destHeight; j++)
                 {
-                    for (int i = 0; i < destTileWidth; i++)
+                    for (int i = 0; i < destWidth; i++)
                     {
-                        var sourceX = Math.Clamp(i - MarginPixels, 0, srcTileWidth - MarginPixels);
-                        var sourceY = Math.Clamp(j - MarginPixels, 0, srcTileHeight - MarginPixels) + n * srcTileHeight;
-                        var destX = curX + i;
-                        var destY = curY + j;
-                        pixelData[destY * width + destX] = sprite.PixelData[sourceX + sourceY * srcTileWidth];
+                        var sourceX = Math.Clamp(i - MarginPixels, 0, frame.Width - 1);
+                        var sourceY = Math.Clamp(j - MarginPixels, 0, frame.Height - 1);
+                        int src = sourceX + sourceY * sprite.Width;
+                        int dest = x + i + (y + j) * layout.Width;
+                        byte pixel = frame.Buffer[src];
+                        pixelData[dest] = pixel;
                     }
                 }
 
                 subImages[n] = new SubImage(
-                    new Vector2(curX + MarginPixels, curY + MarginPixels),
-                    new Vector2(sprite.Frames[n].Width, sprite.Frames[n].Height),
-                    new Vector2(width, height),
+                    new Vector2(x + MarginPixels, y + MarginPixels),
+                    new Vector2(frame.Width, frame.Height),
+                    new Vector2(layout.Width, totalHeight),
                     0);
-
-                curX += destTileWidth;
-                if (curX + destTileWidth > width)
-                {
-                    curX = 0;
-                    curY += destTileHeight;
-                }
             }
 
             return factory.CreateEightBitTexture(
                 info.AssetId,
                 sprite.Id.ToString(),
-                width,
-                height,
+                layout.Width,
+                totalHeight,
                 1,
                 1,
                 pixelData,
                 subImages);
-        }
-
-        static (int, int) GetAtlasSize(int tileWidth, int tileHeight, int count)
-        {
-            int tilesPerRow = (int)Math.Ceiling(Math.Sqrt(count));
-            int width = ApiUtil.NextPowerOfTwo(tileWidth * tilesPerRow);
-            int requiredHeight = tileHeight * ((count + tilesPerRow - 1) / tilesPerRow);
-            int height = ApiUtil.NextPowerOfTwo(requiredHeight);
-            return (width, height);
         }
     }
 }

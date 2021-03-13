@@ -7,7 +7,7 @@ namespace UAlbion.Formats.MapEvents
     [Event("query_gold")]
     public class QueryGoldEvent : QueryEvent
     {
-        public override QueryType QueryType => QueryType.Map;
+        public override QueryType QueryType => QueryType.Gold;
         [EventPart("op")] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
         [EventPart("imm")] public byte Immediate { get; private set; } // immediate value?
         [EventPart("arg")] public ushort Argument { get; set; }

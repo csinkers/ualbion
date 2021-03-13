@@ -34,10 +34,10 @@ namespace UAlbion.Formats.Assets.Flic
             ReqMemory   =  s.UInt32(null, 0); // EGI: maximum chunk size (uncompressed)
             MaxRegions  =  s.UInt16(null, 0); // EGI: max. number of regions in a CHK_REGION chunk
             TranspNum   =  s.UInt16(null, 0); // EGI: number of transparent levels
-            Reserved2   =  s.ByteArray(null, null, 24); // Set to zero
+            Reserved2   =  s.Bytes(null, null, 24); // Set to zero
             OFrame1     =  s.UInt32(null, 0); // Offset to frame 1 (FLC only)
             OFrame2     =  s.UInt32(null, 0); // Offset to frame 2 (FLC only)
-            Reserved3   =  s.ByteArray(null, null, 40); // Set to zero
+            Reserved3   =  s.Bytes(null, null, 40); // Set to zero
 
             var finalOffset = startOffset + Size;
             while (s.Offset < finalOffset)

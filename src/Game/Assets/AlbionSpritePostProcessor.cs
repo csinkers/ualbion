@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Numerics;
+using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
-using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Assets
 {
@@ -16,16 +15,19 @@ namespace UAlbion.Game.Assets
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (factory == null) throw new ArgumentNullException(nameof(factory));
 
-            var sprite = (AlbionSprite2)asset;
+            var sprite = (IEightBitImage)asset;
 
             // For non-uniforms just use the on-disk packing
-            var subImages = sprite.Frames
-                .Select(x => new SubImage(
+            var subImages = new SubImage[sprite.SubImageCount];
+            for (int i = 0; i < subImages.Length; i++)
+            {
+                var x = sprite.GetSubImage(i);
+                subImages[i] = new SubImage(
                     new Vector2(x.X, x.Y),
                     new Vector2(x.Width, x.Height),
                     new Vector2(sprite.Width, sprite.Height),
-                    0))
-                .ToArray();
+                    0);
+            }
 
             return factory.CreateEightBitTexture(
                 info.AssetId,

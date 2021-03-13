@@ -1,4 +1,4 @@
-﻿using UAlbion.Api;
+﻿using UAlbion.Api.Visual;
 
 namespace UAlbion.Core.Textures
 {

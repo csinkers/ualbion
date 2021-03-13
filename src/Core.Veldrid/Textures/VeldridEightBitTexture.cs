@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Core.Textures;
-using UAlbion.Core.Visual;
 using Veldrid;
 
 namespace UAlbion.Core.Veldrid.Textures
@@ -81,20 +80,12 @@ namespace UAlbion.Core.Veldrid.Textures
         {
         }
 
-        public Image<Rgba32> ToImage(uint[] palette)
-        {
-            return ImageUtil.PackSpriteSheet(palette, SubImages.Count, frame =>
-            {
-                GetSubImageOffset(frame, out var siw, out var sih, out var offset, out var stride);
-                ReadOnlySpan<byte> fromSlice = PixelData.Slice(offset, siw + (sih - 1) * stride);
-                return new ReadOnlyByteImageBuffer(siw, sih, stride, fromSlice);
-            });
-        }
+        public Image<Rgba32> ToImage(uint[] palette) => ImageUtil.PackSpriteSheet(palette, SubImages.Count, GetSubImageBuffer);
 
         public Image<Rgba32> ToImage(int subImage, uint[] palette)
         {
             GetSubImageOffset(subImage, out var width, out var height, out var offset, out var stride);
-            var fromSlice = PixelData.Slice(offset, width + (height - 1) * stride);
+            var fromSlice = PixelData.AsSpan(offset, width + (height - 1) * stride);
             var from = new ReadOnlyByteImageBuffer(width, height, stride, fromSlice);
             return ImageUtil.BuildImageForFrame(from, palette);
         }

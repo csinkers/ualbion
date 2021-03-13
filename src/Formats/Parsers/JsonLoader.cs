@@ -18,12 +18,12 @@ namespace UAlbion.Formats.Parsers
 
                 var json = JsonConvert.SerializeObject(existing, ConfigUtil.JsonSerializerSettings);
                 var bytes = Encoding.UTF8.GetBytes(json);
-                s.ByteArray(null, bytes, bytes.Length);
+                s.Bytes(null, bytes, bytes.Length);
                 return existing;
             }
             else
             {
-                var bytes = s.ByteArray(null, null, (int) s.BytesRemaining);
+                var bytes = s.Bytes(null, null, (int) s.BytesRemaining);
                 var json = Encoding.UTF8.GetString(bytes);
                 return (T)JsonConvert.DeserializeObject<T>(json, ConfigUtil.JsonSerializerSettings);
             }

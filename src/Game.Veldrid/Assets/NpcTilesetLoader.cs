@@ -60,7 +60,7 @@ namespace UAlbion.Game.Veldrid.Assets
 
                 var tilemap = Tileset.FromSprites(small ? "SmallNPCs" : "LargeNPCs", "NPC", tiles);
                 var bytes = FormatUtil.BytesFromTextWriter(tilemap.Serialize);
-                s.ByteArray(null, bytes, bytes.Length);
+                s.Bytes(null, bytes, bytes.Length);
 
                 return existing;
             }

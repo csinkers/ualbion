@@ -79,7 +79,7 @@ namespace UAlbion.Formats.Assets.Save
             var versionOffset = s.Offset;
             save.Version = s.UInt16(nameof(Version), save.Version); // 0
             ApiUtil.Assert(save.Version == 138); // TODO: Throw error for other versions?
-            save.Unk9 = s.ByteArray(nameof(Unk9), save.Unk9, 6); // 2
+            save.Unk9 = s.Bytes(nameof(Unk9), save.Unk9, 6); // 2
 
             ushort days = s.UInt16("Days", (ushort)save.ElapsedTime.TotalDays);  // 8
             ushort hours = s.UInt16("Hours", (ushort)save.ElapsedTime.Hours);    // A
@@ -89,7 +89,7 @@ namespace UAlbion.Formats.Assets.Save
             save.PartyX = s.UInt16(nameof(PartyX), save.PartyX);   // 10
             save.PartyY = s.UInt16(nameof(PartyY), save.PartyY);   // 12
             save.PartyDirection = s.EnumU8(nameof(PartyDirection), save.PartyDirection); // 14
-            save.Unknown15 = s.ByteArray(nameof(Unknown15), save.Unknown15, 0x185); // 15
+            save.Unknown15 = s.Bytes(nameof(Unknown15), save.Unknown15, 0x185); // 15
 
             save.ActiveMembers = s.List(
                 nameof(ActiveMembers),
@@ -104,18 +104,18 @@ namespace UAlbion.Formats.Assets.Save
 
             save.Misc = s.Object(nameof(Misc), save.Misc, MiscState.Serdes); // 1A6
             save._switches.SetPacked(0,
-                s.ByteArray("Switches",
+                s.Bytes("Switches",
                     save._switches.GetPacked(0, FlagDictionary.OriginalSaveGameMax, mapping),
                     FlagDictionary.PackedSize(0, FlagDictionary.OriginalSaveGameMax)), mapping); // 276
 
-            save.Unknown2C1 = s.ByteArray(nameof(Unknown2C1), save.Unknown2C1, 0x5833); // 0x2C1
+            save.Unknown2C1 = s.Bytes(nameof(Unknown2C1), save.Unknown2C1, 0x5833); // 0x2C1
             s.Object(nameof(Tickers), save._tickers, TickerDictionary.Serdes); // 5AF4
 
-            save.Unknown5B9F = s.ByteArray(nameof(Unknown5B9F), save.Unknown5B9F, 0x2C);
+            save.Unknown5B9F = s.Bytes(nameof(Unknown5B9F), save.Unknown5B9F, 0x2C);
             var mapType = MapType.TwoD;
             s.List(nameof(save.Npcs), save.Npcs, (mapType, mapping), MaxNpcCount, NpcState.Serdes);
 
-            save.Unknown5B71 = s.ByteArray(
+            save.Unknown5B71 = s.Bytes(
                 nameof(Unknown5B71),
                 save.Unknown5B71,
                 0x8c0); // (int)(0x947C + versionOffset - s.Offset)); // 5B9F
@@ -225,9 +225,9 @@ namespace UAlbion.Formats.Assets.Save
             var mapping = context.Item2;
             var key = AutomapId.FromDisk(i, mapping);
             if (save.Automaps.TryGetValue(key, out _))
-                serializer.ByteArray(null, save.Automaps[key], save.Automaps[key].Length);
+                serializer.Bytes(null, save.Automaps[key], save.Automaps[key].Length);
             else if (serializer.IsReading())
-                save.Automaps[key] = serializer.ByteArray(null, null, size);
+                save.Automaps[key] = serializer.Bytes(null, null, size);
         }
 
         static void SerdesChest(int i, int size, (SavedGame, AssetMapping) context, ISerializer serializer)

@@ -2,6 +2,7 @@
 using System.IO;
 using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats.Assets;
@@ -46,23 +47,33 @@ namespace UAlbion.Base.Tests
         byte[] BytesFromXld(IGeneralConfig conf, string path, AssetInfo info)
         {
             using var s = XldLoader.Read(conf.ResolvePath(path), info, _disk);
-            return s.ByteArray(null, null, (int)s.BytesRemaining);
+            return s.Bytes(null, null, (int)s.BytesRemaining);
         }
 
-        void RoundTrip<T>(string testName, byte[] bytes, Func<T, ISerializer, T> serdes) where T : class
+        T RoundTrip<T>(string testName, byte[] bytes, Func<T, ISerializer, T> serdes) where T : class
         {
             var (asset, preTxt) = Asset.Load(bytes, serdes);
             var (postBytes, postTxt) = Asset.Save(asset, serdes);
             var (_, reloadTxt) = Asset.Load(postBytes, serdes);
-            Asset.Compare(_resultDir, testName, bytes, postBytes, preTxt, postTxt, reloadTxt);
+            Asset.Compare(_resultDir,
+                testName,
+                bytes,
+                postBytes,
+                new[] { (".pre.txt", preTxt), (".post.txt", postTxt), (".reload.txt", reloadTxt)});
 
             if (asset is IEightBitImage) // TODO: Png round-trip?
-                return;
+                return asset;
 
             var json = Asset.SaveJson(asset);
             var fromJson = Asset.LoadJson<T>(json);
             var (fromJsonBytes, fromJsonTxt) = Asset.Save(fromJson, serdes);
-            Asset.Compare(_resultDir, testName + ".json", bytes, fromJsonBytes, preTxt, json, fromJsonTxt);
+            Asset.Compare(_resultDir,
+                testName + ".json",
+                bytes,
+                fromJsonBytes,
+                new[] { (".pre.txt", preTxt), (".post.txt", json), (".reload.txt", fromJsonTxt)});
+
+            return asset;
         }
 
         void RoundTripXld<T>(string testName, string file, int subId, Func<T, ISerializer, T> serdes) where T : class
@@ -86,7 +97,7 @@ namespace UAlbion.Base.Tests
             var info = new AssetInfo { Index = subId };
             var loader = new ItemListContainer();
             using var s = loader.Read(conf.ResolvePath(file), info, _disk);
-            var bytes = s.ByteArray(null, null, (int)s.BytesRemaining);
+            var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
             RoundTrip(testName, bytes, serdes);
         }
 
@@ -96,7 +107,7 @@ namespace UAlbion.Base.Tests
             var info = new AssetInfo { Index = subId };
             var loader = new SpellListContainer();
             using var s = loader.Read(conf.ResolvePath(file), info, _disk);
-            var bytes = s.ByteArray(null, null, (int)s.BytesRemaining);
+            var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
             RoundTrip(testName, bytes, serdes);
         }
 
@@ -315,7 +326,11 @@ namespace UAlbion.Base.Tests
                 (x, s) => loader.Serdes(x, info, AssetMapping.Global, s));
 
             var (roundTripped, roundTripTxt) = Asset.Save(fromTiled, Serdes);
-            Asset.Compare(_resultDir, nameof(TiledTilesetTest),  bytes, roundTripped, preTxt, tiledTxt, roundTripTxt);
+            Asset.Compare(_resultDir,
+                nameof(TiledTilesetTest),
+                bytes,
+                roundTripped,
+                new[] { (".pre.txt", preTxt), (".post.txt", tiledTxt), (".reload.txt", roundTripTxt)});
         }
 
         [Fact]
@@ -335,7 +350,11 @@ namespace UAlbion.Base.Tests
                 (x, s) => loader.Serdes(x, info, AssetMapping.Global, s));
 
             var (roundTripped, roundTripTxt) = Asset.Save(fromTiled, Serdes);
-            Asset.Compare(_resultDir, nameof(TiledStampTest),  bytes, roundTripped, preTxt, tiledTxt, roundTripTxt);
+            Asset.Compare(_resultDir,
+                nameof(TiledStampTest),
+                bytes,
+                roundTripped,
+                new[] { (".pre.txt", preTxt), (".post.txt", tiledTxt), (".reload.txt", roundTripTxt)});
         }
 
         [Fact]
@@ -366,6 +385,47 @@ namespace UAlbion.Base.Tests
             info.Set(AssetProperty.SubSprites, "(8,8,576) (16,16)");
             RoundTripXld<IEightBitImage>(nameof(AutomapGfxTest), "$(XLD)/AUTOGFX0.XLD", 0,
                 (x, s) => Loaders.AmorphousSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
+        }
+
+        [Fact]
+        public void AmorphousTest()
+        {
+            var bytes = new byte[]
+            {
+                0,
+                1,
+                2,
+
+                3, 4, 
+                5, 6, 
+
+                7, 8, 
+                9, 10
+            };
+            var info = new AssetInfo();
+            var factory = new MockFactory();
+            info.Set(AssetProperty.SubSprites, "(1,1,3) (2,2)");
+            var sprite = RoundTrip<IEightBitImage>(
+                nameof(AmorphousTest),
+                bytes,
+                (x, s) =>
+                {
+                    var albionSprite = Loaders.AmorphousSpriteLoader.Serdes(x, info, AssetMapping.Global, s);
+                    var pp = new AlbionSpritePostProcessor();
+                    return (IEightBitImage)pp.Process(albionSprite, info, factory);
+                });
+
+            Assert.Equal(2, sprite.Width);
+            Assert.Equal(7, sprite.Height);
+            Assert.Equal(5, sprite.SubImageCount);
+            Assert.Collection(sprite.PixelData,
+                x => Assert.Equal(0, x), x => Assert.Equal(0, x),
+                x => Assert.Equal(1, x), x => Assert.Equal(0, x),
+                x => Assert.Equal(2, x), x => Assert.Equal(0, x),
+                x => Assert.Equal(3, x), x => Assert.Equal(4, x),
+                x => Assert.Equal(5, x), x => Assert.Equal(6, x),
+                x => Assert.Equal(7, x), x => Assert.Equal(8, x),
+                x => Assert.Equal(9, x), x => Assert.Equal(10, x));
         }
 
         [Fact]
@@ -501,14 +561,31 @@ namespace UAlbion.Base.Tests
         {
             var info = new AssetInfo
             {
-                AssetId = AssetId.From(WallOverlay.JiriWindow),
-                Width = 44,
+                AssetId = AssetId.From(WallOverlay.JiriFrameL),
+                Width = 112,
                 File = new AssetFileInfo()
             };
             info.File.Set(AssetProperty.Transposed, true);
-            RoundTripXld<IEightBitImage>(nameof(OverlayTest), "$(XLD)/3DOVERL0.XLD", 1,
+            RoundTripXld<IEightBitImage>(nameof(OverlayTest), "$(XLD)/3DOVERL0.XLD", 17,
                 (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
+
+        [Fact]
+        public void OverlayMultiFrameTest()
+        {
+            var info = new AssetInfo
+            {
+                AssetId = AssetId.From(WallOverlay.Unknown201),
+                Width = 6,
+                Height = 20,
+                File = new AssetFileInfo()
+            };
+            info.File.Set(AssetProperty.Transposed, true);
+            RoundTripXld<IEightBitImage>(nameof(OverlayTest), "$(XLD)/3DOVERL2.XLD", 1,
+                (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
+        }
+
+        // 201
 
         /* No code to write these atm, if anyone wants to mod them or add new ones they can still use ImageMagick or something to convert to ILBM
         [Fact]

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using SerdesNet;
-using UAlbion.Api;
+using UAlbion.Api.Visual;
 
 namespace UAlbion.Config
 {

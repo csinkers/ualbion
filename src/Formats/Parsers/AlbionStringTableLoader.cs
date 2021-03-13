@@ -33,7 +33,7 @@ namespace UAlbion.Formats.Parsers
 
                 for (int i = 0; i < stringCount; i++)
                 {
-                    s.ByteArray(null, byteArrays[i], byteArrays[i].Length);
+                    s.Bytes(null, byteArrays[i], byteArrays[i].Length);
                     s.UInt8(null, 0);
                 }
 

@@ -2,7 +2,6 @@
 using UAlbion.Core;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
-using UAlbion.Game.Events;
 
 namespace UAlbion.Game
 {

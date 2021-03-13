@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 
@@ -52,12 +53,12 @@ namespace UAlbion.Formats.Parsers
                     Debug.Assert(existing != null, nameof(existing) + " != null");
 
                     FormatUtil.Blit(
-                        existing.PixelData.Slice(fy * existing.Width),
+                        existing.PixelData.AsSpan(fy * existing.Width),
                         frameBytes.AsSpan(),
                         fw, fh,
                         existing.Width, fw);
                 }
-                frameBytes = s.ByteArray("Frame" + i, frameBytes, width * height);
+                frameBytes = s.Bytes("Frame" + i, frameBytes, width * height);
                 frames[i] = (currentY, width, height);
                 allFrames.Add(frameBytes);
 
@@ -85,7 +86,7 @@ namespace UAlbion.Formats.Parsers
             }
 
             s.Check();
-            return new AlbionSprite2(
+            return new AlbionSprite(
                 info.AssetId,
                 totalWidth,
                 currentY,

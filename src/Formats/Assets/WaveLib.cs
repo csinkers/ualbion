@@ -17,7 +17,7 @@ namespace UAlbion.Formats.Assets
             s.List(nameof(w.Samples), w.Samples, 512, WaveLibSample.Serdes);
 
             foreach (var header in w.Samples.Where(x => x.IsValid != -1))
-                header.Samples = s.ByteArray(nameof(header.Samples), header.Samples.ToArray(), (int)header.Length);
+                header.Samples = s.Bytes(nameof(header.Samples), header.Samples.ToArray(), (int)header.Length);
 
             return w;
         }

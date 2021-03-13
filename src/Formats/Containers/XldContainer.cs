@@ -51,7 +51,7 @@ namespace UAlbion.Formats.Containers
             HeaderSerdes(lengths, s);
 
             for (int i = 0; i < count; i++)
-                s.ByteArray(null, ordered[i].Item2, lengths[i]);
+                s.Bytes(null, ordered[i].Item2, lengths[i]);
         }
 
         public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk)
@@ -74,7 +74,7 @@ namespace UAlbion.Formats.Containers
             long offset = s.Offset;
             offset += lengths.Where((x, i) => i < subItem).Sum();
             s.Seek(offset);
-            return s.ByteArray(null, null, lengths[subItem]);
+            return s.Bytes(null, null, lengths[subItem]);
         }
 
         static int[] HeaderSerdes(int[] lengths, ISerializer s)

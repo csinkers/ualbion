@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
 
 namespace UAlbion.Game.Entities

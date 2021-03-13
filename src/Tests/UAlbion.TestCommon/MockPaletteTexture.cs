@@ -1,4 +1,5 @@
 ﻿using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Core.Textures;
 
 namespace UAlbion.TestCommon

@@ -70,7 +70,7 @@
     "eset":        "UAlbion.Formats.Parsers.EventSetLoader, UAlbion.Formats",
     "fixedsize":   "UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats",
     "flic":        "UAlbion.Formats.Parsers.FlicLoader, UAlbion.Formats",
-    "font":        "UAlbion.Formats.Parsers.FontSpriteLoader, UAlbion.Formats",
+    "font":        "UAlbion.Game.Assets.FontSpriteLoader`1[[UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats]], UAlbion.Game",
     "header":      "UAlbion.Formats.Parsers.HeaderBasedSpriteLoader, UAlbion.Formats",
     "multiheader": "UAlbion.Formats.Parsers.MultiHeaderSpriteLoader, UAlbion.Formats",
     "interlaced":  "UAlbion.Formats.Parsers.InterlacedBitmapLoader, UAlbion.Formats",

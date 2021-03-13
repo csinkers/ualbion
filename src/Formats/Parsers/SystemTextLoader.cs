@@ -19,7 +19,7 @@ namespace UAlbion.Formats.Parsers
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (s.IsWriting()) throw new NotImplementedException("Saving of system text not currently supported");
             var results = new IntStringDictionary();
-            var bytes = s.ByteArray(null, null, (int)s.BytesRemaining);
+            var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
             var data = FormatUtil.BytesTo850String(bytes);
             foreach (var line in FormatUtil.SplitLines(data))
             {

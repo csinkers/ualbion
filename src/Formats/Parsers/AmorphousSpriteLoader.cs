@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using SerdesNet;
-using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 
@@ -50,7 +50,41 @@ namespace UAlbion.Formats.Parsers
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (info == null) throw new ArgumentNullException(nameof(info));
+            return s.IsWriting()
+                ? Write(existing, s)
+                : Read(info, s);
+        }
 
+        static IEightBitImage Write(IEightBitImage existing, ISerializer s)
+        {
+            if (existing == null) throw new ArgumentNullException(nameof(existing));
+
+            int bufferW = 0, bufferH = 0;
+            for (int i = 0; i < existing.SubImageCount; i++)
+            {
+                var frame = existing.GetSubImage(i);
+                if (frame.Width > bufferW) bufferW = frame.Width;
+                if (frame.Height > bufferH) bufferH = frame.Height;
+            }
+
+            var buffer = new byte[bufferW * bufferH];
+            for(int i = 0; i < existing.SubImageCount; i++)
+            {
+                var frame = existing.GetSubImage(i);
+                FormatUtil.Blit(
+                    existing.PixelData.AsSpan(frame.PixelOffset, frame.PixelLength),
+                    buffer.AsSpan(),
+                    frame.Width, frame.Height,
+                    existing.Width, frame.Width);
+
+                s.Bytes("PixelData", buffer, frame.Width * frame.Height);
+            }
+
+            return existing;
+        }
+
+        static IEightBitImage Read(AssetInfo info, ISerializer s)
+        {
             var sizes = ParseSpriteSizes(info.Get<string>(AssetProperty.SubSprites, null));
 
             int totalWidth = 0;
@@ -60,23 +94,10 @@ namespace UAlbion.Formats.Parsers
 
             foreach(var (width, height) in sizes)
             {
-                if (s.BytesRemaining <= 0 || (existing != null && existing.Height <= currentY))
+                if (s.BytesRemaining <= 0)
                     break;
 
-                byte[] frameBytes = null;
-                if (s.IsWriting())
-                {
-                    if (existing == null) throw new ArgumentNullException(nameof(existing));
-                    frameBytes = new byte[width * height];
-
-                    FormatUtil.Blit(
-                        existing.PixelData.Slice(currentY * existing.Width),
-                        frameBytes.AsSpan(),
-                        width, height,
-                        existing.Width, width);
-                }
-
-                frameBytes = s.ByteArray("PixelData", frameBytes, width * height);
+                byte[] frameBytes = s.Bytes("PixelData", null, width * height);
                 frames.Add((currentY, width, height));
                 allFrames.Add(frameBytes);
 
@@ -85,11 +106,8 @@ namespace UAlbion.Formats.Parsers
                     totalWidth = width;
             }
 
-            if (s.IsWriting())
-                return existing;
-
             var totalHeight = currentY;
-            var pixelData = new byte[frames.Count * totalWidth * currentY];
+            var pixelData = new byte[totalWidth * totalHeight];
 
             for (int n = 0; n < frames.Count; n++)
             {
@@ -102,7 +120,7 @@ namespace UAlbion.Formats.Parsers
             }
 
             s.Check();
-            return new AlbionSprite2(
+            return new AlbionSprite(
                 info.AssetId,
                 totalWidth,
                 totalHeight,

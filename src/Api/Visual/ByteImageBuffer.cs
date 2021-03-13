@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UAlbion.Core.Visual
+namespace UAlbion.Api.Visual
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Never compared")]
     public readonly ref struct ByteImageBuffer

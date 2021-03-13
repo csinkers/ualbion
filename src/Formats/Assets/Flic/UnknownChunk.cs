@@ -12,7 +12,7 @@ namespace UAlbion.Formats.Assets.Flic
         protected override uint LoadChunk(uint length, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            Bytes = s.ByteArray(null, null, (int)length);
+            Bytes = s.Bytes(null, null, (int)length);
             return (uint)Bytes.Length;
         }
     }

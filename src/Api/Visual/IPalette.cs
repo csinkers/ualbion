@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UAlbion.Api
+namespace UAlbion.Api.Visual
 {
     public interface IPalette
     {

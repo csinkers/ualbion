@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UAlbion.Api;
-using UAlbion.Core.Visual;
+using UAlbion.Api.Visual;
 
 namespace UAlbion.Core.Textures
 {
     public abstract class EightBitTexture : ITexture, IEightBitImage
     {
-        readonly byte[] _pixelData;
-
         public ITextureId Id { get; }
         public string Name { get; }
         public int Width { get; }
@@ -17,7 +14,7 @@ namespace UAlbion.Core.Textures
         public int Depth => 1;
         public int MipLevels { get; }
         public int ArrayLayers { get; }
-        public ReadOnlySpan<byte> PixelData => _pixelData;
+        public byte[] PixelData { get; }
         public int SubImageCount => _subImages.Count;
         public bool IsDirty { get; protected set; }
         public IReadOnlyList<SubImage> SubImages { get; }
@@ -44,7 +41,7 @@ namespace UAlbion.Core.Textures
             Height = height;
             MipLevels = mipLevels;
             ArrayLayers = arrayLayers;
-            _pixelData = textureData;
+            PixelData = textureData;
             if (subImages != null)
                 foreach (var subImage in subImages)
                     _subImages.Add(subImage);
@@ -52,7 +49,7 @@ namespace UAlbion.Core.Textures
             SubImages = _subImages.AsReadOnly();
         }
 
-        public bool ContainsColors(IEnumerable<byte> colors) => _pixelData.Distinct().Intersect(colors).Any();
+        public bool ContainsColors(IEnumerable<byte> colors) => PixelData.Distinct().Intersect(colors).Any();
         public IList<byte> DistinctColors(int? subImageId)
         {
             if (subImageId == null)
@@ -63,7 +60,7 @@ namespace UAlbion.Core.Textures
             else
             {
                 GetSubImageOffset(subImageId.Value, out var width, out var height, out var offset, out var stride);
-                ReadOnlySpan<byte> slice = PixelData.Slice(
+                ReadOnlySpan<byte> slice = PixelData.AsSpan(
                     offset,
                     width + (height - 1) * stride);
                 var buffer = new ReadOnlyByteImageBuffer(width, height, stride, slice);
@@ -109,6 +106,13 @@ namespace UAlbion.Core.Textures
                 ret /= 2;
 
             return Math.Max(1, ret);
+        }
+
+        public ReadOnlyByteImageBuffer GetSubImageBuffer(int i)
+        {
+            var frame = GetSubImage(i);
+            ReadOnlySpan<byte> fromSlice = PixelData.AsSpan(frame.PixelOffset, frame.PixelLength);
+            return new ReadOnlyByteImageBuffer(frame.Width, frame.Height, Width, fromSlice);
         }
     }
 }

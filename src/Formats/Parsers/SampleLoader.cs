@@ -14,10 +14,23 @@ namespace UAlbion.Formats.Parsers
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (info == null) throw new ArgumentNullException(nameof(info));
+            return s.IsWriting() ? Write(existing, s) : Read(s);
+        }
+
+        static AlbionSample Read(ISerializer s)
+        {
             return new AlbionSample
             {
-                Samples = s.ByteArray("Samples", existing?.Samples, (int)s.BytesRemaining)
+                Samples = s.Bytes(nameof(AlbionSample.Samples), null, (int)s.BytesRemaining)
             };
         }
+
+        static AlbionSample Write(AlbionSample sample, ISerializer s)
+        {
+            if (sample == null) throw new ArgumentNullException(nameof(sample));
+            s.Bytes(nameof(sample.Samples), sample.Samples, sample.Samples.Length);
+            return sample;
+        }
+
     }
 }

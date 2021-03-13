@@ -6,7 +6,6 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.ScriptEvents;
-using UAlbion.Game.Events;
 using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities

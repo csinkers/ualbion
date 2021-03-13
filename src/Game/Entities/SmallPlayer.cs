@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Numerics;
-using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;

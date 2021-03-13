@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Api
+﻿namespace UAlbion.Api.Visual
 {
     public interface ITextureId
     {

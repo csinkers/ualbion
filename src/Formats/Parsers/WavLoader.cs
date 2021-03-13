@@ -68,7 +68,7 @@ namespace UAlbion.Formats.Parsers
             var tag = s.FixedLengthString("Tag", "data", 4); // Subchunk2 (raw sample data)
             ApiUtil.Assert(tag == "data");
             int sampleCount = s.Int32("SampleCount", w.Samples?.Length ?? 0);
-            w.Samples = s.ByteArray(nameof(w.Samples), w.Samples, sampleCount);
+            w.Samples = s.Bytes(nameof(w.Samples), w.Samples, sampleCount);
         }
 
         public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)

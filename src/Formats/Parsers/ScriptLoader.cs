@@ -13,7 +13,7 @@ namespace UAlbion.Formats.Parsers
     {
         static IEnumerable<string> ReadLines(ISerializer s)
         {
-            var bytes = s.ByteArray(null, null, (int)s.BytesRemaining);
+            var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
             var text = FormatUtil.BytesTo850String(bytes);
             return text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None).Select(x => x.Trim());
         }

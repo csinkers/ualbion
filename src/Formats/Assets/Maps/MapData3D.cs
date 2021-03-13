@@ -85,7 +85,7 @@ namespace UAlbion.Formats.Assets.Maps
                 s.Check();
             }
 
-            AutomapGraphics = s.ByteArray(nameof(AutomapGraphics), AutomapGraphics, 0x40);
+            AutomapGraphics = s.Bytes(nameof(AutomapGraphics), AutomapGraphics, 0x40);
             s.Check();
         }
     }

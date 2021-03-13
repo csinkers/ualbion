@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats.Assets;
@@ -75,8 +76,13 @@ namespace UAlbion.Base.Tests
                 assetTypes);
 
             var unpackedAsset = (T)BuildApplier(UnpackedAssetMod).LoadAsset(id);
+            Assert.NotNull(unpackedAsset);
             var (unpackedBytes, unpackedNotes) = Asset.Save(unpackedAsset, serdes);
-            Asset.Compare(resultsDir, id.Type.ToString(), baseBytes, unpackedBytes, baseNotes, unpackedNotes, null);
+            Asset.Compare(resultsDir,
+                id.Type.ToString(),
+                baseBytes,
+                unpackedBytes,
+                new[] { (".saveBase.txt", baseNotes), (".saveUnpacked.txt", unpackedNotes) });
 
             ConvertAssets.Convert(
                 _disk,
@@ -88,7 +94,11 @@ namespace UAlbion.Base.Tests
 
             var repackedAsset = (T)BuildApplier(RepackedAssetMod).LoadAsset(id);
             var (repackedBytes, repackedNotes) = Asset.Save(repackedAsset, serdes);
-            Asset.Compare(resultsDir, id.Type.ToString(), baseBytes, repackedBytes, baseNotes, repackedNotes, null);
+            Asset.Compare(resultsDir,
+                id.Type.ToString(),
+                baseBytes,
+                repackedBytes,
+                new[] { (".saveBase.txt", baseNotes), (".saveRepacked.txt", repackedNotes) });
         }
 
         [Fact]
@@ -288,7 +298,7 @@ namespace UAlbion.Base.Tests
             var info = new AssetInfo { AssetId = AssetId.From(AutomapTiles.Set1) };
             info.Set(AssetProperty.SubSprites, "(8,8,576) (16,16)");
             Test<IEightBitImage>(info.AssetId,
-                new[] { AssetId.From(Palette.Common) },
+                new[] { AssetId.From(Palette.Common), AssetId.From(Palette.Unknown11) },
                 (x, s) => Loaders.AmorphousSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -315,7 +325,7 @@ namespace UAlbion.Base.Tests
                 Height = 165
             };
             Test<IEightBitImage>(info.AssetId,
-                new[] { AssetId.From(Palette.GlowyPlantDungeon), AssetId.From(Palette.Common) },
+                new[] { AssetId.From(Palette.JirinaarDay), AssetId.From(Palette.Common) },
                 (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 

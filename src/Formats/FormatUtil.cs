@@ -21,7 +21,8 @@ namespace UAlbion.Formats
             Justification = "Encoding.GetEncoding must happen after Encoding.RegisterProvider")]
         static FormatUtil()
         {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
+            Encoding.RegisterProvider(CodePagesEncodingProvider
+                .Instance); // Required for code page 850 support in .NET Core
             PerfTracker.StartupEvent("Registered encodings");
             AlbionEncoding = Encoding.GetEncoding(850);
         }
@@ -30,7 +31,7 @@ namespace UAlbion.Formats
             AlbionEncoding
                 .GetString(bytes)
                 .Replace("×", "ß")
-                .TrimEnd((char) 0);
+                .TrimEnd((char)0);
 
         public static byte[] BytesFrom850String(string str)
         {
@@ -56,6 +57,7 @@ namespace UAlbion.Formats
                     n = 0;
                 }
             }
+
             return sb.ToString();
         }
 
@@ -127,10 +129,13 @@ namespace UAlbion.Formats
         public static int ParseHex(string s) =>
             s != null && s.StartsWith("0x", StringComparison.InvariantCulture)
                 ? int.Parse(s.Substring(2), NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture)
-                : s == null ? 0 : int.Parse(s, CultureInfo.InvariantCulture);
+                : s == null
+                    ? 0
+                    : int.Parse(s, CultureInfo.InvariantCulture);
 
 
         const string HexChars = "0123456789ABCDEF";
+
         public static string BytesToHexString(ReadOnlySpan<byte> bytes)
         {
             if (bytes == null) return "";
@@ -154,7 +159,8 @@ namespace UAlbion.Formats
         public static byte[] HexStringToBytes(string s)
         {
             if (string.IsNullOrEmpty(s)) return Array.Empty<byte>();
-            if ((s.Length & 1) == 1) throw new FormatException("Hex string did not consist of an even number of characters");
+            if ((s.Length & 1) == 1)
+                throw new FormatException("Hex string did not consist of an even number of characters");
 
             var result = new byte[s.Length / 2];
             for (int i = 0, j = 0; i < result.Length; i++)
@@ -178,7 +184,8 @@ namespace UAlbion.Formats
             foreach (var value in values)
             {
                 if (value < last)
-                    throw new ArgumentOutOfRangeException(nameof(values), $"A non-sorted list was passed to {nameof(SortedIntsToRanges)}");
+                    throw new ArgumentOutOfRangeException(nameof(values),
+                        $"A non-sorted list was passed to {nameof(SortedIntsToRanges)}");
 
                 if (value == last) // Ignore duplicates
                     continue;
@@ -205,15 +212,16 @@ namespace UAlbion.Formats
         public static StringId ResolveTextId(TextId id)
         {
             var result = AssetMapping.Global.TextIdToStringId(id);
-            return result.HasValue 
-                ? new StringId(result.Value.Item1, result.Value.Item2) 
+            return result.HasValue
+                ? new StringId(result.Value.Item1, result.Value.Item2)
                 : new StringId(id, 0);
         }
 
         static readonly char[] NewLineChars = { '\n', '\r' };
+
         public static string[] SplitLines(string s)
-             => s?.Split(NewLineChars, StringSplitOptions.RemoveEmptyEntries)
-            ?? Array.Empty<string>();
+            => s?.Split(NewLineChars, StringSplitOptions.RemoveEmptyEntries)
+               ?? Array.Empty<string>();
 
         public static bool Compare(QueryOperation operation, int value, int immediate) =>
             operation switch
@@ -228,7 +236,8 @@ namespace UAlbion.Formats
                 _ => true
             };
 
-        public static void Blit(ReadOnlySpan<byte> from, Span<byte> to, int width, int height, int fromStride, int toStride)
+        public static void Blit(ReadOnlySpan<byte> from, Span<byte> to, int width, int height, int fromStride,
+            int toStride)
         {
             int srcIndex = 0;
             int destIndex = 0;
@@ -272,7 +281,12 @@ namespace UAlbion.Formats
             ms.Position = 0;
 
             var br = new BinaryReader(ms);
-            return new AlbionReader(br, ms.Length, () => { br.Dispose(); ms.Dispose(); });
+            return new AlbionReader(br, ms.Length, () =>
+            {
+                br.Dispose();
+                ms.Dispose();
+            });
         }
     }
 }
+

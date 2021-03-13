@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Numerics;
 using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Textures;

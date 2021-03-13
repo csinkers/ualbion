@@ -18,9 +18,7 @@ namespace UAlbion.TestCommon
             string testName,
             byte[] originalBytes,
             byte[] roundTripBytes,
-            string preText,
-            string postText,
-            string reloadText)
+            (string, string)[] notes) // (extension, text)
         {
             ApiUtil.Assert(originalBytes.Length == roundTripBytes.Length, $"Asset size changed after round trip (delta {roundTripBytes.Length - originalBytes.Length})");
             ApiUtil.Assert(originalBytes.SequenceEqual(roundTripBytes));
@@ -33,9 +31,9 @@ namespace UAlbion.TestCommon
                     Directory.CreateDirectory(resultDir);
 
                 var path = Path.Combine(resultDir, testName);
-                if (!string.IsNullOrEmpty(preText)) File.WriteAllText(path + ".pre.txt", preText);
-                if (!string.IsNullOrEmpty(postText)) File.WriteAllText(path + ".post.txt", postText);
-                if (!string.IsNullOrEmpty(reloadText)) File.WriteAllText(path + ".reload.txt", reloadText);
+                foreach (var (extension, text) in notes)
+                    if (!string.IsNullOrEmpty(text))
+                        File.WriteAllText(path + extension, text);
             }
 
             Assert.Collection(diffs,
@@ -58,15 +56,18 @@ namespace UAlbion.TestCommon
         {
             using var stream = new MemoryStream(bytes);
             using var br = new BinaryReader(stream);
+            using var ar = new AlbionReader(br, stream.Length);
+
             using var annotationStream = new MemoryStream();
             using var annotationWriter = new StreamWriter(annotationStream);
-            using var ar = new AnnotationFacadeSerializer(new AlbionReader(br, stream.Length), annotationWriter, FormatUtil.BytesFrom850String);
-            var result = serdes(null, ar);
+            using var afs = new AnnotationFacadeSerializer(ar, annotationWriter, FormatUtil.BytesFrom850String);
+
+            var result = serdes(null, afs);
             annotationWriter.Flush();
             var annotation = ReadToEnd(annotationStream);
 
-            if (ar.BytesRemaining > 0)
-                throw new InvalidOperationException($"{ar.BytesRemaining} bytes left over after reading");
+            if (afs.BytesRemaining > 0)
+                throw new InvalidOperationException($"{afs.BytesRemaining} bytes left over after reading");
 
             return (result, annotation);
         }

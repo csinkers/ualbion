@@ -38,7 +38,7 @@ namespace UAlbion.Game.Assets
 
         TilesetData Load(AssetInfo info, TilemapProperties properties, ISerializer serializer)
         {
-            var xmlBytes = serializer.ByteArray(null, null, (int)serializer.BytesRemaining);
+            var xmlBytes = serializer.Bytes(null, null, (int)serializer.BytesRemaining);
             using var ms = new MemoryStream(xmlBytes);
             var tileset = Tileset.Parse(ms);
             return tileset.ToAlbion(info.AssetId, properties);
@@ -49,7 +49,7 @@ namespace UAlbion.Game.Assets
             if (tileset == null) throw new ArgumentNullException(nameof(tileset));
             var tiledTileset = Tileset.FromAlbion(tileset, properties);
             var bytes = FormatUtil.BytesFromTextWriter(tiledTileset.Serialize);
-            s.ByteArray(null, bytes, bytes.Length);
+            s.Bytes(null, bytes, bytes.Length);
             return tileset;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using UAlbion.Formats.Parsers;
+using UAlbion.Game.Assets;
 
 namespace UAlbion.Base.Tests
 {
@@ -12,7 +13,7 @@ namespace UAlbion.Base.Tests
         public static readonly ChestLoader ChestLoader = new ChestLoader();
         public static readonly EventSetLoader EventSetLoader = new EventSetLoader();
         public static readonly FixedSizeSpriteLoader FixedSizeSpriteLoader = new FixedSizeSpriteLoader();
-        public static readonly FontSpriteLoader FontSpriteLoader = new FontSpriteLoader();
+        public static readonly FontSpriteLoader<FixedSizeSpriteLoader> FontSpriteLoader = new FontSpriteLoader<FixedSizeSpriteLoader>();
         public static readonly HeaderBasedSpriteLoader HeaderBasedSpriteLoader = new HeaderBasedSpriteLoader();
         public static readonly MultiHeaderSpriteLoader MultiHeaderSpriteLoader = new MultiHeaderSpriteLoader();
         // public static readonly InterlacedBitmapLoader InterlacedBitmapLoader = new InterlacedBitmapLoader();

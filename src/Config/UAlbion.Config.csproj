@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\deps\SerdesNet')">
-    <PackageReference Include="SerdesNet" Version="1.6.1" />
+    <PackageReference Include="SerdesNet" Version="1.7.1" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\..\deps\SerdesNet')">
     <ProjectReference Include="..\..\deps\SerdesNet\src\SerdesNet.csproj" />

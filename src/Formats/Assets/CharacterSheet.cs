@@ -247,7 +247,7 @@ namespace UAlbion.Formats.Assets
             sheet.Unknown90 = s.UInt16(nameof(sheet.Unknown90), sheet.Unknown90);
             sheet.Skills.LockPicking = s.UInt16(nameof(sheet.Skills.LockPicking), sheet.Skills.LockPicking);
             sheet.Skills.LockPickingMax = s.UInt16(nameof(sheet.Skills.LockPickingMax), sheet.Skills.LockPickingMax);
-            sheet.UnusedBlock = s.ByteArray(nameof(sheet.UnusedBlock), sheet.UnusedBlock, 52);
+            sheet.UnusedBlock = s.Bytes(nameof(sheet.UnusedBlock), sheet.UnusedBlock, 52);
             sheet.Combat.LifePoints = s.UInt16(nameof(sheet.Combat.LifePoints), sheet.Combat.LifePoints);
             sheet.Combat.LifePointsMax = s.UInt16(nameof(sheet.Combat.LifePointsMax), sheet.Combat.LifePointsMax);
             sheet.UnknownCE = s.UInt16(nameof(sheet.UnknownCE), sheet.UnknownCE);
@@ -289,7 +289,7 @@ namespace UAlbion.Formats.Assets
                 spellStrengthBytes = spellStrengths.Select(BitConverter.GetBytes).SelectMany(x => x).ToArray();
             }
 
-            knownSpellBytes = s.ByteArray("KnownSpells", knownSpellBytes, SpellSchoolCount * sizeof(uint));
+            knownSpellBytes = s.Bytes("KnownSpells", knownSpellBytes, SpellSchoolCount * sizeof(uint));
             s.Check();
 
             sheet.UnknownFA = s.UInt16(nameof(sheet.UnknownFA), sheet.UnknownFA);
@@ -302,7 +302,7 @@ namespace UAlbion.Formats.Assets
 
             s.Check();
 
-            spellStrengthBytes = s.ByteArray("SpellStrength", spellStrengthBytes, MaxSpellsPerSchool * SpellSchoolCount * sizeof(ushort));
+            spellStrengthBytes = s.Bytes("SpellStrength", spellStrengthBytes, MaxSpellsPerSchool * SpellSchoolCount * sizeof(ushort));
 
             if (s.IsReading())
             {
@@ -359,7 +359,7 @@ namespace UAlbion.Formats.Assets
 
             // Must be a monster
             Inventory.SerdesMonster(id.Id, sheet.Inventory, mapping, s);
-            sheet.UnkMonster = s.ByteArray(nameof(UnkMonster), sheet.UnkMonster, 328);
+            sheet.UnkMonster = s.Bytes(nameof(UnkMonster), sheet.UnkMonster, 328);
             ApiUtil.Assert(s.Offset - initialOffset == 1214, "Expected monster character sheet to be 1214 bytes");
             s.End();
             return sheet;

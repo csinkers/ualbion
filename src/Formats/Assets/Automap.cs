@@ -61,7 +61,7 @@ namespace UAlbion.Formats.Assets
                 length = bytes.Length;
             }
 
-            bytes = s.ByteArray(null, bytes, length);
+            bytes = s.Bytes(null, bytes, length);
 
             if (s.IsReading())
                 map.AsBytes = bytes;

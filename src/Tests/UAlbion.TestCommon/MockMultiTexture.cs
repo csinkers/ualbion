@@ -1,5 +1,6 @@
 ﻿using System;
 using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 

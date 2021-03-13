@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Api;
+using UAlbion.Api.Visual;
 
 namespace UAlbion.Game.Entities.Map2D
 {

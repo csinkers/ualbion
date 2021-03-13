@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
 
 namespace UAlbion.Core.Textures
@@ -261,7 +262,7 @@ namespace UAlbion.Core.Textures
                     continue;
                 }
 
-                ReadOnlySpan<byte> fromSlice = eightBitTexture.PixelData.Slice(
+                ReadOnlySpan<byte> fromSlice = eightBitTexture.PixelData.AsSpan(
                     sourceOffset,
                     sourceWidth + (sourceHeight - 1) * sourceStride);
 

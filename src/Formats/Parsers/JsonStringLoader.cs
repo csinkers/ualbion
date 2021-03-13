@@ -12,7 +12,7 @@ namespace UAlbion.Formats.Parsers
         public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            var bytes = s.ByteArray(null, null, (int)s.BytesRemaining);
+            var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
             var text = Encoding.UTF8.GetString(bytes);
             return JsonConvert.DeserializeObject<IntStringDictionary>(text);
         }

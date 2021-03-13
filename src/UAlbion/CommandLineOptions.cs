@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UAlbion.Config;
 using Veldrid;
 
@@ -20,6 +21,7 @@ namespace UAlbion
         public bool UseRenderDoc { get; }
         public string ConvertFrom { get; }
         public string ConvertTo { get; }
+        public Regex ConvertFilePattern { get; }
 
         public string[] Commands { get; }
         public string[] DumpIds { get; }
@@ -108,7 +110,20 @@ namespace UAlbion
                     DumpIds = args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 }
 
-                if (arg == "--FORMATS" || arg == "--FORMAT" || arg == "-F")
+                if (arg == "--FILES" || arg == "-F")
+                {
+                    i++;
+                    if (i == args.Length)
+                    {
+                        Console.WriteLine("\"--files\" requires an argument specifying the regex to match against");
+                        Mode = ExecutionMode.Exit;
+                        return;
+                    }
+
+                    ConvertFilePattern = new Regex(args[i]);
+                }
+
+                if (arg == "--FORMATS" || arg == "--FORMAT")
                 {
                     i++;
                     if (i == args.Length)
@@ -192,9 +207,10 @@ Options:
     --renderdoc -rd  : Load the RenderDoc plugin on startup
 
 Dump / Convert options:
-    --formats -f <Formats>    : Specifies the formats for the dumped data (defaults to JSON, valid formats: {formats})
+    --formats <Formats>       : Specifies the formats for the dumped data (defaults to JSON, valid formats: {formats})
     --id --ids -id -ids <Ids> : Dump specific asset ids (space separated list)
     --type -t <Types>         : Dump specific types of game data (space separated list, valid types: {dumpTypes})
+    --files -f <Regex>      : Convert only the assets required for files in the target mod that match the given regular expression
 
 Game Mode: (if running as game)
     --main-menu (default)              : Show the main menu on startup

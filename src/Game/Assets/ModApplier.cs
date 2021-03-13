@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -280,7 +281,8 @@ namespace UAlbion.Game.Assets
             Func<AssetId, string, (object, AssetInfo)> loaderFunc,
             Action flushCacheFunc,
             ISet<AssetId> ids,
-            ISet<AssetType> assetTypes)
+            ISet<AssetType> assetTypes,
+            Regex filePattern)
         {
             if (loaderFunc == null) throw new ArgumentNullException(nameof(loaderFunc));
             if (flushCacheFunc == null) throw new ArgumentNullException(nameof(flushCacheFunc));
@@ -298,10 +300,14 @@ namespace UAlbion.Game.Assets
                 AssetMapping.Global,
                 file =>
                 {
+
                     // Don't need to resolve the filename as we're not actually using the container - we just want to find the type.
                     var container = containerRegistry.GetContainer(file.Filename, file.Container, disk);
                     var firstAsset = file.Map[file.Map.Keys.Min()];
                     if (assetTypes != null && !assetTypes.Contains(firstAsset.AssetId.Type))
+                        return new List<(int, int)> { (firstAsset.Index, 1) };
+
+                    if (filePattern != null && !filePattern.IsMatch(file.Filename))
                         return new List<(int, int)> { (firstAsset.Index, 1) };
 
                     var assets = target.Mapping.EnumerateAssetsOfType(firstAsset.AssetId.Type).ToList();
@@ -324,6 +330,9 @@ namespace UAlbion.Game.Assets
             Resolve<IGeneralConfig>().SetPath("MOD", target.AssetPath);
             foreach (var file in target.AssetConfig.Files.Values)
             {
+                if (filePattern != null && !filePattern.IsMatch(file.Filename))
+                    continue;
+
                 bool notify = true;
                 flushCacheFunc();
                 var path = config.ResolvePath(file.Filename);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -33,13 +34,13 @@ namespace UAlbion.Game.Assets
             return (applier, exchange);
         }
 
-        public static void Convert(
-            IFileSystem disk,
+        public static void Convert(IFileSystem disk,
             ICoreFactory factory,
             string fromMod,
             string toMod,
             string[] ids,
-            ISet<AssetType> assetTypes)
+            ISet<AssetType> assetTypes,
+            Regex filePattern)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
             if (factory == null) throw new ArgumentNullException(nameof(factory));
@@ -83,7 +84,7 @@ namespace UAlbion.Game.Assets
                     return (asset, info);
                 }
 
-                to.SaveAssets(LoaderFunc, () => cache.Clear(), parsedIds, assetTypes);
+                to.SaveAssets(LoaderFunc, () => cache.Clear(), parsedIds, assetTypes, filePattern);
             }
         }
     }

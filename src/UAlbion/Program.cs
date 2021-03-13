@@ -44,7 +44,8 @@ namespace UAlbion
                     commandLine.ConvertFrom,
                     commandLine.ConvertTo,
                     commandLine.DumpIds,
-                    commandLine.DumpAssetTypes);
+                    commandLine.DumpAssetTypes,
+                    commandLine.ConvertFilePattern);
                 return;
             }
 

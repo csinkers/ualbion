@@ -73,7 +73,8 @@ namespace UAlbion.Base.Tests
                 BaseAssetMod,
                 UnpackedAssetMod,
                 idStrings,
-                assetTypes);
+                assetTypes, 
+                null);
 
             var unpackedAsset = (T)BuildApplier(UnpackedAssetMod).LoadAsset(id);
             Assert.NotNull(unpackedAsset);
@@ -90,7 +91,8 @@ namespace UAlbion.Base.Tests
                 UnpackedAssetMod,
                 RepackedAssetMod,
                 idStrings,
-                assetTypes);
+                assetTypes, 
+                null);
 
             var repackedAsset = (T)BuildApplier(RepackedAssetMod).LoadAsset(id);
             var (repackedBytes, repackedNotes) = Asset.Save(repackedAsset, serdes);

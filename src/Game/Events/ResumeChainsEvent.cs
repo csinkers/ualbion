@@ -2,5 +2,5 @@
 
 namespace UAlbion.Game.Events
 {
-    public class ResumeChainsEvent : IVerboseEvent { }
+    public class ResumeChainsEvent : Event, IVerboseEvent { }
 }

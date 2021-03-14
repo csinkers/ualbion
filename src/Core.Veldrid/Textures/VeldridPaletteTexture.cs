@@ -57,6 +57,6 @@ namespace UAlbion.Core.Veldrid.Textures
             return texture;
         }
 
-        public VeldridPaletteTexture(ITextureId id, string name, uint[] paletteData) : base(id, name, paletteData) { }
+        public VeldridPaletteTexture(IAssetId id, string name, uint[] paletteData) : base(id, name, paletteData) { }
     }
 }

@@ -2,7 +2,7 @@
 {
     public interface IImage
     {
-        ITextureId Id { get; }
+        IAssetId Id { get; }
         string Name { get; }
         int Width { get; }
         int Height { get; }

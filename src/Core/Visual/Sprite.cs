@@ -10,7 +10,7 @@ namespace UAlbion.Core.Visual
     {
         readonly DrawLayer _layer;
         readonly SpriteKeyFlags _keyFlags;
-        readonly Func<ITextureId, ITexture> _loaderFunc;
+        readonly Func<IAssetId, ITexture> _loaderFunc;
 
         SpriteLease _sprite;
         Vector3 _position;
@@ -19,15 +19,15 @@ namespace UAlbion.Core.Visual
         SpriteFlags _flags;
         bool _dirty = true;
 
-        public static Sprite CharacterSprite(ITextureId id) =>
+        public static Sprite CharacterSprite(IAssetId id) =>
             new Sprite(id, Vector3.Zero, DrawLayer.Character, 0, SpriteFlags.BottomAligned);
 
-        public static Sprite ScreenSpaceSprite(ITextureId id, Vector2 position, Vector2 size) =>
+        public static Sprite ScreenSpaceSprite(IAssetId id, Vector2 position, Vector2 size) =>
             new Sprite(id, new Vector3(position, 0), DrawLayer.Interface,
                 SpriteKeyFlags.NoTransform,
                 SpriteFlags.LeftAligned) { Size = size };
 
-        public Sprite(ITextureId id, Vector3 position, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags, Func<ITextureId, ITexture> loaderFunc = null)
+        public Sprite(IAssetId id, Vector3 position, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags, Func<IAssetId, ITexture> loaderFunc = null)
         {
             On<BackendChangedEvent>(_ => Dirty = true);
             On<RenderEvent>(e => UpdateSprite());
@@ -51,7 +51,7 @@ namespace UAlbion.Core.Visual
             _loaderFunc = loaderFunc ?? DefaultLoader;
         }
 
-        public ITextureId Id { get; }
+        public IAssetId Id { get; }
 
         public event EventHandler<SpriteSelectedEventArgs> Selected;
         static Vector3 Normal => Vector3.UnitZ; // TODO
@@ -133,7 +133,7 @@ namespace UAlbion.Core.Visual
             _sprite = null;
         }
 
-        ITexture DefaultLoader(ITextureId id) => Resolve<ITextureLoader>().LoadTexture(id);
+        ITexture DefaultLoader(IAssetId id) => Resolve<ITextureLoader>().LoadTexture(id);
 
         void UpdateSprite()
         {

@@ -22,6 +22,8 @@ namespace UAlbion.Game
         bool IsStringDefined(StringId id, string language);
         string LoadString(TextId id);
         string LoadString(StringId id);
+        string LoadString(TextId id, string language);
+        string LoadString(StringId id, string language);
         ISample LoadSample(SampleId id);
         WaveLib LoadWaveLib(WaveLibraryId waveLibraryId);
         FlicFile LoadVideo(VideoId id);

@@ -22,10 +22,10 @@ namespace UAlbion.Formats.Containers
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
             var dict = Load(path, disk);
-            if (!dict.TryGetValue(info.AssetId, out var token))
+            if (!dict.TryGetValue(info.AssetId, out var value))
                 return null;
 
-            var ms = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(token, ConfigUtil.JsonSerializerSettings)));
+            var ms = new MemoryStream(Encoding.UTF8.GetBytes(value));
             var br = new BinaryReader(ms);
             return new GenericBinaryReader(
                 br,

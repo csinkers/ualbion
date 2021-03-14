@@ -9,5 +9,6 @@ namespace UAlbion.Game.Events
         public YesNoPromptEvent(StringId stringId) => StringId = stringId;
         [EventPart("id")] public StringId StringId { get; }
         [EventPart("sub_id")] public int SubId => StringId.SubId;
+        public string ToStringNumeric() => ToString();
     }
 }

@@ -19,10 +19,9 @@ namespace UAlbion.Formats.Parsers
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (info == null) throw new ArgumentNullException(nameof(info));
 
-            ApiUtil.Assert(s.BytesRemaining % WordLength == 0);
-
             if (s.IsReading())
             {
+                ApiUtil.Assert(s.BytesRemaining % WordLength == 0, "Expected word list file length to be a whole multiple of the string size");
                 var strings = new List<string>();
                 while (!s.IsComplete())
                     strings.Add(s.FixedLengthString(null, null, WordLength));
@@ -34,7 +33,12 @@ namespace UAlbion.Formats.Parsers
                     throw new ArgumentNullException(nameof(existing));
 
                 foreach (var x in existing)
+                {
+                    if (x != null && x.Length > WordLength)
+                        throw new ArgumentOutOfRangeException(nameof(existing), $"Tried to write a word ({x}) of length {x.Length} to a word list, but the maximum length is {WordLength}");
+
                     s.FixedLengthString(null, x, WordLength);
+                }
 
                 return existing;
             }

@@ -8,10 +8,10 @@ namespace UAlbion.Core
 {
     public interface ICoreFactory
     {
-        MultiTexture CreateMultiTexture(ITextureId id, string name, IPaletteManager paletteManager);
+        MultiTexture CreateMultiTexture(IAssetId id, string name, IPaletteManager paletteManager);
         IDisposable CreateRenderDebugGroup(IRendererContext context, string name);
         ITexture CreateEightBitTexture(
-            ITextureId id,
+            IAssetId id,
             string name,
             int width,
             int height,
@@ -20,7 +20,7 @@ namespace UAlbion.Core
             byte[] pixels,
             IEnumerable<SubImage> subImages);
 
-        PaletteTexture CreatePaletteTexture(ITextureId id, string name, uint[] colours);
+        PaletteTexture CreatePaletteTexture(IAssetId id, string name, uint[] colours);
         ISceneGraph CreateSceneGraph();
     }
 }

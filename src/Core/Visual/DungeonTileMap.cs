@@ -8,7 +8,7 @@ namespace UAlbion.Core.Visual
 {
     public class DungeonTileMap : IRenderable
     {
-        public DungeonTileMap(ITextureId id, string name, DrawLayer renderOrder, Vector3 tileSize, uint width, uint height, ICoreFactory factory, IPaletteManager paletteManager)
+        public DungeonTileMap(IAssetId id, string name, DrawLayer renderOrder, Vector3 tileSize, uint width, uint height, ICoreFactory factory, IPaletteManager paletteManager)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
             if (paletteManager == null) throw new ArgumentNullException(nameof(paletteManager));

@@ -2,8 +2,9 @@
 {
     // Some of these interfaces are checked for extremely frequently and the performance cost of using attributes instead would be excessive.
 #pragma warning disable CA1040 // Avoid empty interfaces
-    public interface IEvent { }
+    public interface IEvent { string ToStringNumeric(); }
     public interface IAsyncEvent : IEvent { }
+    // ReSharper disable once UnusedTypeParameter
     public interface IAsyncEvent<T> : IAsyncEvent { }
     public interface IHighlightEvent { }
     public interface IVerboseEvent : IEvent { }

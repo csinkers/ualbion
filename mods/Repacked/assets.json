@@ -124,6 +124,7 @@
     "$(ALBION)/DRIVERS/ALBISND.OPL": {
       "Container": "raw",
       "Loader": "soundbank",
+      "Max": 0, 
       "Map": { "0": { "Id": "special.SoundBank" } }
     },
 
@@ -296,6 +297,7 @@
     "$(MOD)/Albion/CD/XLDLIBS/GERMAN/WORDLIS0.XLD": {
       "Language": "GERMAN",
       "Loader": "wordlist",
+      "Max": 2, 
       "Map": {
         "0": { "Id": "special.Words1" },
         "1": { "Id": "special.Words2" },
@@ -305,6 +307,7 @@
     "$(MOD)/Albion/CD/XLDLIBS/ENGLISH/WORDLIS0.XLD": {
       "Language": "ENGLISH",
       "Loader": "wordlist",
+      "Max": 2, 
       "Map": {
         "0": { "Id": "special.Words1" },
         "1": { "Id": "special.Words2" },
@@ -314,6 +317,7 @@
     "$(MOD)/Albion/CD/XLDLIBS/FRENCH/WORDLIS0.XLD": {
       "Language": "FRENCH",
       "Loader": "wordlist",
+      "Max": 2, 
       "Map": {
         "0": { "Id": "special.Words1" },
         "1": { "Id": "special.Words2" },
@@ -322,19 +326,7 @@
     },
 
     // Spells
-    "$(MOD)/Albion/CD/XLDLIBS/SPELLDAT.DAT": {
-      "Loader": "spell",
-      "Container": "spells",
-      "Map": { // Ids = 1 + OffsetInSchool + School * 256
-        "0":   { "Id": "spell.1" },
-        "30":  { "Id": "spell.257" },
-        "60":  { "Id": "spell.513" },
-        "90":  { "Id": "spell.769" },
-        "120": { "Id": "spell.1025" },
-        "150": { "Id": "spell.1281" },
-        "180": { "Id": "spell.1537" }
-      }
-    },
+    "$(MOD)/Albion/CD/XLDLIBS/SPELLDAT.DAT": { "Loader": "spell", "Container": "spells", "Map": { "0": { "Id": "spell.1" } } },
 
     // Initial game state data
     "$(MOD)/Albion/CD/XLDLIBS/INITIAL/AUTOMAP1.XLD": { "Loader": "automap", "Map": { "0": { "Id": "automap.100" } } },
@@ -423,6 +415,7 @@
       "Container": "raw",
       "Width": 16,
       "Height": 16,
+      "Max":  0, 
       "Map": { "0": { "Id": "itemgfx.1" } }
     },
     "$(MOD)/Albion/CD/XLDLIBS/SLAB": {
@@ -430,6 +423,7 @@
       "Loader": "slab",
       "Container": "raw",
       "Width": 360,
+      "Max":  0, 
       "Map": { "0": { "Id": "uibg.1" } }
     },
     "$(ALBION)/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710": { // EN+DE

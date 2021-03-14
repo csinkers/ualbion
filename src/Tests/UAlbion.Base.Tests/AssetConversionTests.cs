@@ -114,7 +114,9 @@ namespace UAlbion.Base.Tests
         public void ItemNameTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Special.ItemNames) };
-            Test<MultiLanguageStringDictionary>(info.AssetId, null, (x, s) => Loaders.ItemNameLoader.Serdes(x, info, AssetMapping.Global, s));
+            Test<MultiLanguageStringDictionary>(info.AssetId,
+                AssetMapping.Global.EnumerateAssetsOfType(AssetType.ItemName).ToArray(),
+                (x, s) => Loaders.ItemNameLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
         [Fact]
@@ -301,7 +303,10 @@ namespace UAlbion.Base.Tests
         public void WordTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Special.Words1) };
-            Test<ListStringCollection>(info.AssetId, null, (x, s) => Loaders.WordListLoader.Serdes(x, info, AssetMapping.Global, s));
+            Test<ListStringCollection>(
+                info.AssetId,
+                AssetMapping.Global.EnumerateAssetsOfType(AssetType.Word).ToArray(),
+                (x, s) => Loaders.WordListLoader.Serdes(x, info, AssetMapping.Global, s));
         }
         //*
         [Fact]

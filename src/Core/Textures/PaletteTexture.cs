@@ -16,7 +16,7 @@ namespace UAlbion.Core.Textures
             new Vector2(PaletteWidth, PaletteHeight),
             0);
 
-        public ITextureId Id { get; }
+        public IAssetId Id { get; }
         public string Name { get; }
         public int Width => PaletteWidth;
         public int Height => PaletteHeight;
@@ -30,7 +30,7 @@ namespace UAlbion.Core.Textures
         public PixelFormat Format => PixelFormat.Rgba32;
         public abstract int FormatSize { get; }
 
-        public PaletteTexture(ITextureId id, string name, uint[] paletteData)
+        public PaletteTexture(IAssetId id, string name, uint[] paletteData)
         {
             Id = id;
             Name = name;

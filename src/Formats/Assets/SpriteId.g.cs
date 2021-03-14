@@ -1,4 +1,4 @@
-// Note: This file was automatically generated using Tools/GenerateEnums.
+// Note: This file was automatically generated using Tools/CodeGenerator.
 // No changes should be made to this file by hand. Instead, the relevant json
 // files should be modified and then GenerateEnums should be used to regenerate
 // the various types.
@@ -14,7 +14,7 @@ namespace UAlbion.Formats.Assets
 {
     [JsonConverter(typeof(ToStringJsonConverter))]
     [TypeConverter(typeof(SpriteIdConverter))]
-    public readonly struct SpriteId : IEquatable<SpriteId>, IEquatable<AssetId>, IComparable, ITextureId
+    public readonly struct SpriteId : IEquatable<SpriteId>, IEquatable<AssetId>, IComparable, IAssetId
     {
         readonly uint _value;
         public SpriteId(AssetType type, int id = 0)
@@ -94,6 +94,7 @@ namespace UAlbion.Formats.Assets
         public bool IsNone => Type == AssetType.None;
 
         public override string ToString() => AssetMapping.Global.IdToName(this);
+        public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
         public static AssetType[] ValidTypes = { AssetType.AutomapGraphics, AssetType.BackgroundGraphics, AssetType.CombatBackground, AssetType.CombatGraphics, AssetType.CoreGraphics, AssetType.Floor, AssetType.Font, AssetType.FullBodyPicture, AssetType.ItemGraphics, AssetType.LargeNpcGraphics, AssetType.LargePartyGraphics, AssetType.MonsterGraphics, AssetType.Object3D, AssetType.Picture, AssetType.Slab, AssetType.SmallNpcGraphics, AssetType.SmallPartyGraphics, AssetType.Portrait, AssetType.TacticalIcon, AssetType.TilesetGraphics, AssetType.Wall, AssetType.WallOverlay };
         public static SpriteId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 
@@ -136,8 +137,8 @@ namespace UAlbion.Formats.Assets
         public static bool operator >=(SpriteId x, SpriteId y) => x.CompareTo(y) != -1;
         public bool Equals(SpriteId other) => _value == other._value;
         public bool Equals(AssetId other) => _value == other.ToUInt32();
-        public override bool Equals(object obj) => obj is ITextureId other && other.ToUInt32() == _value;
-        public int CompareTo(object obj) => (obj is ITextureId other) ? _value.CompareTo(other.ToUInt32()) : -1;
+        public override bool Equals(object obj) => obj is IAssetId other && other.ToUInt32() == _value;
+        public int CompareTo(object obj) => (obj is IAssetId other) ? _value.CompareTo(other.ToUInt32()) : -1;
         public override int GetHashCode() => unchecked((int)_value);
     }
 

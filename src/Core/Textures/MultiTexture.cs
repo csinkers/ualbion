@@ -61,7 +61,7 @@ namespace UAlbion.Core.Textures
         uint _lastPaletteId;
         bool _isDirty;
 
-        public MultiTexture(ITextureId id, string name, IPaletteManager paletteManager)
+        public MultiTexture(IAssetId id, string name, IPaletteManager paletteManager)
         {
             Id = id;
             Name = name;
@@ -74,7 +74,7 @@ namespace UAlbion.Core.Textures
 
         public PixelFormat Format => PixelFormat.Rgba32;
         public abstract int FormatSize { get; }
-        public ITextureId Id { get; }
+        public IAssetId Id { get; }
         public string Name { get; }
         public int Width { get; private set; }
         public int Height { get; private set; }

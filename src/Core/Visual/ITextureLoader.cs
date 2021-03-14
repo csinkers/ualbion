@@ -5,6 +5,6 @@ namespace UAlbion.Core.Visual
 {
     public interface ITextureLoader
     {
-        ITexture LoadTexture(ITextureId id);
+        ITexture LoadTexture(IAssetId id);
     }
 }

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using UAlbion.Api.Visual;
 
 namespace UAlbion.Api
 {
@@ -49,7 +51,7 @@ namespace UAlbion.Api
             Parser ??= BuildParser(partsParameter);
         }
 
-        public string Serialize(object instance)
+        public string Serialize(object instance, bool useNumericIds)
         {
             var sb = new StringBuilder();
             sb.Append(Name);
@@ -60,9 +62,8 @@ namespace UAlbion.Api
                 if (part.PropertyType == typeof(string) && value is string s)
                 {
                     sb.Append('"');
-                    for (int i = 0; i < s.Length; i++)
+                    foreach (var c in s)
                     {
-                        char c = s[i];
                         switch (c)
                         {
                             case '\\': sb.Append("\\\\"); break;
@@ -72,6 +73,19 @@ namespace UAlbion.Api
                         }
                     }
                     sb.Append('"');
+                }
+                else if (value is IAssetId id)
+                {
+                    sb.Append(useNumericIds ? id.ToStringNumeric() : id.ToString());
+                }
+                else if (value is Enum enumValue)
+                {
+                    if (useNumericIds)
+                    {
+                        object numeric = Convert.ChangeType(enumValue, enumValue.GetTypeCode(), CultureInfo.InvariantCulture);
+                        sb.Append(numeric);
+                    }
+                    else sb.Append(enumValue);
                 }
                 else sb.Append(value);
             }

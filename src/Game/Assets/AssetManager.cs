@@ -59,7 +59,7 @@ namespace UAlbion.Game.Assets
         }
 
         public ITexture LoadTexture(SpriteId id) => (ITexture)_modApplier.LoadAssetCached(id);
-        public ITexture LoadTexture(ITextureId id) => (ITexture)_modApplier.LoadAssetCached(SpriteId.FromUInt32(id?.ToUInt32() ?? 0));
+        public ITexture LoadTexture(IAssetId id) => (ITexture)_modApplier.LoadAssetCached(SpriteId.FromUInt32(id?.ToUInt32() ?? 0));
         public ITexture LoadFont(FontColor color, bool isBold) 
             => (ITexture)_modApplier.LoadAssetCached(new AssetId(
                 AssetType.MetaFont, (ushort)new MetaFontId(isBold, color)));
@@ -79,7 +79,11 @@ namespace UAlbion.Game.Assets
 
         string LoadStringCore(StringId id, string language, bool cached)
         {
-            language ??= Resolve<IGameplaySettings>().Language;
+            var currentLanguage = Resolve<IGameplaySettings>().Language;
+            if (language != null && language != currentLanguage)
+                cached = false;
+            language ??= currentLanguage;
+
             var asset = cached 
                 ?  _modApplier.LoadAssetCached(id.Id)
                 : _modApplier.LoadAsset(id.Id, language);
@@ -93,9 +97,11 @@ namespace UAlbion.Game.Assets
         }
         public bool IsStringDefined(TextId id, string language) => LoadStringCore(id, language, false) != null;
         public bool IsStringDefined(StringId id, string language) => LoadStringCore(id, language, false) != null;
-        public string LoadString(TextId id) => LoadString((StringId)id);
-        public string LoadString(StringId id) => LoadStringCore(id, null, true)
-                                                 ?? $"!MISSING STRING {id.Id}:{id.SubId}!";
+        public string LoadString(TextId id) => LoadString((StringId)id, null);
+        public string LoadString(StringId id) => LoadString(id, null);
+        public string LoadString(TextId id, string language) => LoadString((StringId)id, language);
+        public string LoadString(StringId id, string language)
+            => LoadStringCore(id, language, true) ?? $"!MISSING STRING {id.Id}:{id.SubId}!";
 
         public ISample LoadSample(SampleId id) => (AlbionSample)_modApplier.LoadAssetCached(id);
         public WaveLib LoadWaveLib(WaveLibraryId waveLibraryId) => (WaveLib)_modApplier.LoadAssetCached(waveLibraryId);

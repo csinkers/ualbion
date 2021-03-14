@@ -10,20 +10,20 @@ namespace UAlbion.TestCommon
 {
     public class MockFactory : ICoreFactory
     {
-        public MultiTexture CreateMultiTexture(ITextureId id, string name, IPaletteManager paletteManager)
+        public MultiTexture CreateMultiTexture(IAssetId id, string name, IPaletteManager paletteManager)
             => new MockMultiTexture(id, name, paletteManager);
         public IDisposable CreateRenderDebugGroup(IRendererContext context, string name)
             => new MockDisposable();
 
         public ITexture CreateEightBitTexture(
-            ITextureId id,
+            IAssetId id,
             string name, 
             int width, int height,
             int mipLevels, int arrayLayers,
             byte[] pixels, IEnumerable<SubImage> subImages) =>
             new MockTexture(id, name, width, height, mipLevels, arrayLayers, pixels, subImages);
 
-        public PaletteTexture CreatePaletteTexture(ITextureId id, string name, uint[] colours)
+        public PaletteTexture CreatePaletteTexture(IAssetId id, string name, uint[] colours)
             => new MockPaletteTexture(id, name, colours);
 
         public ISceneGraph CreateSceneGraph()

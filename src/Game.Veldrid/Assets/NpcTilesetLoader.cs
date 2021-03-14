@@ -24,7 +24,7 @@ namespace UAlbion.Game.Veldrid.Assets
             if (s == null) throw new ArgumentNullException(nameof(s));
 
             if (!s.IsWriting())
-                throw new NotImplementedException();
+                return new object();
 
             if (existing == null) throw new ArgumentNullException(nameof(existing));
             var graphicsPattern = info.Get(AssetProperty.GraphicsPattern, "");

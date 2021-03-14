@@ -11,7 +11,7 @@ namespace UAlbion.Core.Veldrid.Textures
 {
     public class ImageSharpTrueColorTexture : IVeldridTexture
     {
-        public ITextureId Id { get; }
+        public IAssetId Id { get; }
         public string Name { get; }
         public PixelFormat Format => PixelFormat.Rgba32;
         public TextureType Type => TextureType.Texture2D;
@@ -27,7 +27,7 @@ namespace UAlbion.Core.Veldrid.Textures
         readonly ImageSharpTexture _texture;
         readonly SubImage _subImage;
 
-        public ImageSharpTrueColorTexture(ITextureId id, string name, Image<Rgba32> image)
+        public ImageSharpTrueColorTexture(IAssetId id, string name, Image<Rgba32> image)
         {
             Id = id;
             Name = name;

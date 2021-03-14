@@ -1,6 +1,8 @@
-﻿namespace UAlbion.Editor
+﻿using UAlbion.Api;
+
+namespace UAlbion.Editor
 {
-    public class EditorSetPropertyEvent : IEditorEvent
+    public class EditorSetPropertyEvent : Event, IEditorEvent
     {
         public EditorSetPropertyEvent(int id, string propertyName, object currentValue, object newValue)
         {

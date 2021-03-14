@@ -29,6 +29,7 @@ namespace UAlbion.Base.Tests
         public static readonly SongLoader SongLoader = new SongLoader();
         public static readonly SpellLoader SpellLoader = new SpellLoader();
         public static readonly TilesetLoader TilesetLoader = new TilesetLoader();
+        public static readonly Utf8Loader Utf8Loader = new Utf8Loader();
         public static readonly WaveLibLoader WaveLibLoader = new WaveLibLoader();
         public static readonly WordListLoader WordListLoader = new WordListLoader();
     }

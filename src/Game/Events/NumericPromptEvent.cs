@@ -16,5 +16,7 @@ namespace UAlbion.Game.Events
         [EventPart("id")] public StringId Text { get; }
         [EventPart("min")] public int Min { get; }
         [EventPart("max")] public int Max { get; }
+
+        public string ToStringNumeric() => ToString();
     }
 }

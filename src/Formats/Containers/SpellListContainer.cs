@@ -14,6 +14,7 @@ namespace UAlbion.Formats.Containers
     /// </summary>
     public class SpellListContainer : IAssetContainer
     {
+        static readonly byte[] Blank = { 0, 0, 0, 0, 0 };
         public ISerializer Read(string file, AssetInfo info, IFileSystem disk)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
@@ -34,10 +35,17 @@ namespace UAlbion.Formats.Containers
 
             using var fs = disk.OpenWriteTruncate(path);
             using var bw = new BinaryWriter(fs);
-            foreach (var (info, bytes) in assets.OrderBy(x => x.Item1.Index))
+
+            var dict = assets.ToDictionary(x => x.Item1.Index, x => x.Item2);
+            var maxId = dict.Keys.Max();
+
+            for(int i = 0; i <= maxId; i++)
             {
+                if (!dict.TryGetValue(i, out var bytes))
+                    bytes = Blank;
+
                 ApiUtil.Assert(bytes.Length == SpellData.SizeOnDisk,
-                    $"Expected spell data for {info.AssetId} to be {SpellData.SizeOnDisk} bytes, but was {bytes.Length}");
+                    $"Expected spell data for entry {i} to be {SpellData.SizeOnDisk} bytes, but was {bytes.Length}");
                 bw.Write(bytes);
             }
         }

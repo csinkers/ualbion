@@ -8,7 +8,7 @@ namespace UAlbion.TestCommon
     public class MockTexture : EightBitTexture
     {
         public MockTexture(
-            ITextureId id,
+            IAssetId id,
             string name, 
             int width, int height,
             byte[] pixels, IEnumerable<SubImage> subImages) 
@@ -17,7 +17,7 @@ namespace UAlbion.TestCommon
         }
 
         public MockTexture(
-            ITextureId id,
+            IAssetId id,
             string name, 
             int width, int height,
             int mipLevels, int arrayLayers,

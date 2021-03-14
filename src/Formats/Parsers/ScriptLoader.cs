@@ -5,11 +5,12 @@ using System.Text;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class ScriptLoader : IAssetLoader<IList<IEvent>>
+    public class ScriptLoader : IAssetLoader<Script>
     {
         static IEnumerable<string> ReadLines(ISerializer s)
         {
@@ -19,15 +20,15 @@ namespace UAlbion.Formats.Parsers
         }
 
         public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
-            => Serdes((IList<IEvent>)existing, info, mapping, s);
+            => Serdes((Script)existing, info, mapping, s);
 
-        public IList<IEvent> Serdes(IList<IEvent> events, AssetInfo info, AssetMapping mapping, ISerializer s)
+        public Script Serdes(Script script, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
 
             if (s.IsReading())
             {
-                events = new List<IEvent>();
+                script = new Script();
                 foreach (var line in ReadLines(s))
                 {
                     IEvent e;
@@ -44,19 +45,21 @@ namespace UAlbion.Formats.Parsers
                         e = new UnparsableEvent(line);
                     }
 
-                    events.Add(e);
+                    script.Add(e);
                 }
             }
             else
             {
-                if (events == null) throw new ArgumentNullException(nameof(events));
+                if (script == null) throw new ArgumentNullException(nameof(script));
                 var sb = new StringBuilder();
-                foreach (var e in events)
-                    sb.AppendLine(e.ToString());
-                s.NullTerminatedString(null, sb.ToString());
+                foreach (var e in script)
+                    sb.AppendLine(e.ToStringNumeric());
+
+                var text = sb.ToString();
+                s.FixedLengthString(null, text, text.Length);
             }
 
-            return events;
+            return script;
         }
     }
 }

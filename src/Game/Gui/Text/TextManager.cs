@@ -163,7 +163,7 @@ namespace UAlbion.Game.Gui.Text
             }
 
         }
-        Dictionary<char, int> GetFontMapping(ITextureId fontId, IAssetManager assets)
+        Dictionary<char, int> GetFontMapping(IAssetId fontId, IAssetManager assets)
         {
             var id = AssetId.FromUInt32(fontId.ToUInt32());
             lock (_syncRoot)

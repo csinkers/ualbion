@@ -65,7 +65,14 @@ namespace UAlbion.Api
         public override string ToString()
         {
             if (Serializers.TryGetValue(GetType(), out var metadata))
-                return metadata.Serialize(this);
+                return metadata.Serialize(this, false);
+            return GetType().Name;
+        }
+
+        public string ToStringNumeric()
+        {
+            if (Serializers.TryGetValue(GetType(), out var metadata))
+                return metadata.Serialize(this, true);
             return GetType().Name;
         }
 

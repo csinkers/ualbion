@@ -8,7 +8,7 @@ namespace UAlbion.TestCommon
 {
     public class MockMultiTexture : MultiTexture
     {
-        public MockMultiTexture(ITextureId id, string name, IPaletteManager paletteManager) : base(id, name, paletteManager)
+        public MockMultiTexture(IAssetId id, string name, IPaletteManager paletteManager) : base(id, name, paletteManager)
         {
         }
 

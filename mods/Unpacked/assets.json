@@ -56,20 +56,20 @@
 
   "StringMappings": {
     "stext.*":        "special.SystemStrings",
-    "utext.*":        "special.UAlbionStrings",
-    "word.1-500":     "special.Words1:0",
-    "word.501-1000":  "special.Words2:500",
-    "word.1001-1500": "special.Words3:1000"
+    "utext.*":        "special.UAlbionStrings"
   },
 
   "Loaders": {
     "automap":          "UAlbion.Formats.Parsers.AutomapLoader, UAlbion.Formats",
     "font":             "UAlbion.Game.Assets.FontSpriteLoader`1[[UAlbion.Game.Veldrid.Assets.PngSheetLoader, UAlbion.Game.Veldrid]], UAlbion.Game",
+    "itemNameCollector": "UAlbion.Game.Assets.ItemNameCollector, UAlbion.Game",
+    "wordCollector":    "UAlbion.Game.Assets.WordCollector, UAlbion.Game",
     "jsonEventSet":     "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.EventSet, UAlbion.Formats]], UAlbion.Formats",
     "jsonInv":          "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.Inventory, UAlbion.Formats]], UAlbion.Formats",
     "jsonItems":        "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.ItemData, UAlbion.Formats]], UAlbion.Formats",
     "jsonMonsterGroup": "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.MonsterGroup, UAlbion.Formats]], UAlbion.Formats",
     "jsonPal":          "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.AlbionPalette, UAlbion.Formats]], UAlbion.Formats",
+    "script":           "UAlbion.Formats.Parsers.ScriptLoader, UAlbion.Formats",
     "jsonSheet":        "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.CharacterSheet, UAlbion.Formats]], UAlbion.Formats",
     "jsonSpell":        "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.SpellData, UAlbion.Formats]], UAlbion.Formats",
     "jsonText":         "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.ListStringCollection, UAlbion.Formats]], UAlbion.Formats",
@@ -89,10 +89,11 @@
   },
 
   "Containers": {
-    "raw": "UAlbion.Formats.Containers.RawContainer, UAlbion.Formats",
+    "dummy": "UAlbion.Formats.Containers.DummyContainer, UAlbion.Formats",
     "dir": "UAlbion.Formats.Containers.DirectoryContainer, UAlbion.Formats",
     "jsonObj": "UAlbion.Formats.Containers.JsonObjectContainer, UAlbion.Formats",
-    "jsonStrings": "UAlbion.Formats.Containers.JsonStringContainer, UAlbion.Formats"
+    "jsonStrings": "UAlbion.Formats.Containers.JsonStringContainer, UAlbion.Formats",
+    "raw": "UAlbion.Formats.Containers.RawContainer, UAlbion.Formats"
   },
 
   "Languages": { // Just used for the options screen
@@ -127,11 +128,13 @@
     "$(MOD)/Assets/Palettes":      { "Loader": "jsonPal",          "Container": "dir", "Pattern": "{0}_{2}.json", "Map": { "0": { "Id": "pal.0"      } } },
     "$(MOD)/Assets/PartyMembers":  { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{0}_{2}.json", "Map": { "1": { "Id": "party.1"    } } },
     "$(MOD)/Assets/Samples":       { "Loader": "wav",              "Container": "dir", "Pattern": "{0}_{2}.wav",  "Map": { "1": { "Id": "sample.1"   } } },
+    "$(MOD)/Assets/Scripts":       { "Loader": "script",           "Container": "dir", "Pattern": "{0}_{2}.txt",  "Map": { "1": { "Id": "script.1"   } } },
     "$(MOD)/Assets/Songs":         { "Loader": "song",             "Container": "dir", "Pattern": "{0}_{2}.xmi",  "Map": { "1": { "Id": "song.1"     } } },
     "$(MOD)/Assets/WaveLib":       { "Loader": "wavlib",           "Container": "dir", "Pattern": "{0}_{1}_{2}.wav", "Map": { "1": { "Id": "wavlib.1" } } },
     "$(MOD)/Assets/Items.json":    { "Loader": "jsonItems", "Container": "jsonObj", "Map": { "1": { "Id": "item.1"  } } },
     "$(MOD)/Assets/Spells.json":   { "Loader": "jsonSpell", "Container": "jsonObj", "Map": { "1": { "Id": "spell.1" } } },
 
+    "dummy": { "Loader": "itemNameCollector", "Container": "dummy", "Max": 0, "Map": { "0": { "Id": "special.ItemNames" } } },
     "$(MOD)/Assets/ItemNamesDE.json": { "Language": "GERMAN",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "1": { "Id": "itemname.1"  } } },
     "$(MOD)/Assets/ItemNamesEN.json": { "Language": "ENGLISH", "Loader": "utf8", "Container": "jsonStrings", "Map": { "1": { "Id": "itemname.1"  } } },
     "$(MOD)/Assets/ItemNamesFR.json": { "Language": "FRENCH",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "1": { "Id": "itemname.1"  } } },
@@ -179,6 +182,9 @@
       "Map": { "100": { "Id": "mtext.100" } }
     },
 
+    "dummy2": { "Language": "GERMAN",  "Loader": "wordCollector", "Container": "dummy", "Max": 2, "Map": { "0": { "Id": "special.Words1" }, "1": { "Id": "special.Words2" }, "2": { "Id": "special.Words3" } } },
+    "dummy3": { "Language": "ENGLISH", "Loader": "wordCollector", "Container": "dummy", "Max": 2, "Map": { "0": { "Id": "special.Words1" }, "1": { "Id": "special.Words2" }, "2": { "Id": "special.Words3" } } },
+    "dummy4": { "Language": "FRENCH",  "Loader": "wordCollector", "Container": "dummy", "Max": 2, "Map": { "0": { "Id": "special.Words1" }, "1": { "Id": "special.Words2" }, "2": { "Id": "special.Words3" } } },
     "$(MOD)/Assets/WordsDE.json": {
       "Language": "GERMAN",
       "Loader": "utf8",

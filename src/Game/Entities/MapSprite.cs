@@ -20,7 +20,7 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        public MapSprite(ITextureId id, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags)
+        public MapSprite(IAssetId id, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags)
             : base(id, Vector3.Zero, layer, keyFlags, flags) { }
     }
 }

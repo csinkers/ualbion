@@ -15,8 +15,8 @@ namespace UAlbion.Formats.Parsers
         public MultiLanguageStringDictionary Serdes(MultiLanguageStringDictionary names, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            var streamLength = s.BytesRemaining;
-            ApiUtil.Assert(streamLength % StringSize == 0);
+            if (s.IsWriting() && names == null) throw new ArgumentNullException(nameof(names));
+
             names ??= new MultiLanguageStringDictionary();
             if (!names.ContainsKey(Base.Language.German)) names[Base.Language.German] = new ListStringCollection();
             if (!names.ContainsKey(Base.Language.English)) names[Base.Language.English] = new ListStringCollection();
@@ -32,6 +32,9 @@ namespace UAlbion.Formats.Parsers
 
             if (s.IsReading())
             {
+                var streamLength = s.BytesRemaining;
+                ApiUtil.Assert(streamLength % StringSize == 0, "Expected item name file length to be a whole multiple of the string size");
+
                 int i = 1;
                 long end = s.Offset + streamLength;
                 while (s.Offset < end)

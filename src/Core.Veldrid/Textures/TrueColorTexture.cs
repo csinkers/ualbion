@@ -12,7 +12,7 @@ namespace UAlbion.Core.Veldrid.Textures
 {
     public class TrueColorTexture : IVeldridTexture, IRgbaImage
     {
-        public ITextureId Id { get; }
+        public IAssetId Id { get; }
         public string Name { get; }
         public PixelFormat Format => PixelFormat.Rgba32;
         public TextureType Type => TextureType.Texture2D;
@@ -29,7 +29,7 @@ namespace UAlbion.Core.Veldrid.Textures
         readonly uint[] _pixelData;
         readonly SubImage _subImage;
 
-        public TrueColorTexture(ITextureId id, string name, int width, int height, uint[] palette, byte[] pixels)
+        public TrueColorTexture(IAssetId id, string name, int width, int height, uint[] palette, byte[] pixels)
         {
             if (palette == null) throw new ArgumentNullException(nameof(palette));
             if (pixels == null) throw new ArgumentNullException(nameof(pixels));

@@ -18,7 +18,7 @@ namespace UAlbion.Formats.Assets
             Frames = frames.ToArray();
         }
 
-        public ITextureId Id => AssetId;
+        public IAssetId Id => AssetId;
         public string Name => AssetId.ToString();
         public AssetId AssetId { get; }
         public int Width { get; }

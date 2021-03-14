@@ -152,23 +152,7 @@ namespace UAlbion.Game.Assets
                            string.Equals(assetLanguage, language, StringComparison.OrdinalIgnoreCase);
                 });
 
-        public object LoadAsset(AssetId id)
-        {
-            try
-            {
-                var asset = LoadAssetInternal(id, _extraPaths);
-                return asset is Exception ? null : asset;
-            }
-            catch (Exception e)
-            {
-                if (CoreUtil.IsCriticalException(e))
-                    throw;
-
-                Raise(new LogEvent(LogEvent.Level.Error, $"Could not load asset {id}: {e}"));
-                return null;
-            }
-        }
-
+        public object LoadAsset(AssetId id) => LoadAsset(id, null);
         public object LoadAsset(AssetId id, string language)
         {
             try
@@ -195,18 +179,7 @@ namespace UAlbion.Game.Assets
             if (asset != null)
                 return asset;
 
-            try
-            {
-                asset = LoadAssetInternal(id, _extraPaths);
-            }
-            catch (Exception e)
-            {
-                if (CoreUtil.IsCriticalException(e))
-                    throw;
-
-                Raise(new LogEvent(LogEvent.Level.Error, $"Could not load asset {id}: {e}"));
-                asset = e;
-            }
+            asset = LoadAsset(id, null);
 
             _assetCache.Add(asset, id);
             return asset is Exception ? null : asset;

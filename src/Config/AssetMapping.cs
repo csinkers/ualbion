@@ -366,7 +366,10 @@ namespace UAlbion.Config
             }
         }
 
-        public (AssetId, ushort)? TextIdToStringId(AssetId id) => _stringLookup.ContainsKey(id) ? _stringLookup[id] : ((AssetId, ushort)?)null;
+        public (AssetId, ushort)? TextIdToStringId(AssetId id) 
+            => _stringLookup.ContainsKey(id) 
+                ? _stringLookup[id] 
+                : ((AssetId, ushort)?)null;
 
         public IEnumerable<AssetId> EnumerateAssetsOfType(AssetType type)
         {

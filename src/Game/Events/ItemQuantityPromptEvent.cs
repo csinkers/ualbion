@@ -20,5 +20,7 @@ namespace UAlbion.Game.Events
         [EventPart("iconSubId")] public int IconSubId { get; }
         [EventPart("max")] public int Max { get; }
         [EventPart("useTenths")] public bool UseTenths { get; }
+
+        public string ToStringNumeric() => ToString();
     }
 }

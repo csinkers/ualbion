@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UAlbion.Api;
 
 namespace UAlbion.Editor
 {
-    public class EditorAggregateChangeEvent : IEditorEvent
+    public class EditorAggregateChangeEvent : Event, IEditorEvent
     {
         public EditorAggregateChangeEvent(int id, IList<IEditorEvent> events)
         {

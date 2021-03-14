@@ -7,5 +7,6 @@ namespace UAlbion.Formats.MapEvents
         [EventPart("msg")] public string Comment { get; }
         public CommentEvent(string comment) => Comment = comment;
         public override string ToString() => Comment == null ? "" : $";{Comment}";
+        public string ToStringNumeric() => ToString();
     }
 }

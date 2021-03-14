@@ -15,8 +15,10 @@ namespace UAlbion.Game.Events
             Source = source ?? throw new ArgumentNullException(nameof(source));
         }
 
+        public string ToStringNumeric() => ToString();
         public override string ToString() =>
             $"Triggering chain {ChainSource}:{Chain} due to {Source} (first event {Node})";
+
 
         public AssetId ChainSource { get; }
         public ushort Chain { get; }

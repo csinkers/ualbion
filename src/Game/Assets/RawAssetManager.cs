@@ -50,7 +50,7 @@ namespace UAlbion.Game.Assets
         }
 
         public ITexture LoadTexture(SpriteId id) => (ITexture)_modApplier.LoadAsset(id);
-        public ITexture LoadTexture(ITextureId id) => (ITexture)_modApplier.LoadAsset(SpriteId.FromUInt32(id?.ToUInt32() ?? 0));
+        public ITexture LoadTexture(IAssetId id) => (ITexture)_modApplier.LoadAsset(SpriteId.FromUInt32(id?.ToUInt32() ?? 0));
         public ITexture LoadFont(FontColor color, bool isBold) 
             => (ITexture)_modApplier.LoadAsset(new AssetId(
                 AssetType.MetaFont, (ushort)new MetaFontId(isBold, color)));
@@ -71,8 +71,10 @@ namespace UAlbion.Game.Assets
         }
         public bool IsStringDefined(TextId id, string language) => LoadStringCore(id, language) != null;
         public bool IsStringDefined(StringId id, string language) => LoadStringCore(id, language) != null;
-        public string LoadString(TextId id) => LoadString((StringId)id);
-        public string LoadString(StringId id) => LoadStringCore(id, null) // Raw manager - not cached
+        public string LoadString(TextId id) => LoadString((StringId)id, null);
+        public string LoadString(StringId id) => LoadString(id, null);
+        public string LoadString(TextId id, string language) => LoadString((StringId)id, language);
+        public string LoadString(StringId id, string language) => LoadStringCore(id, language) // Raw manager - not cached
                                                  ?? $"!MISSING STRING {id.Id}:{id.SubId}!";
 
         public ISample LoadSample(SampleId id) => (AlbionSample)_modApplier.LoadAsset(id);

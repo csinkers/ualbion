@@ -1,6 +1,8 @@
-﻿namespace UAlbion.Editor
+﻿using UAlbion.Api;
+
+namespace UAlbion.Editor
 {
-    public class EditorAddInstanceEvent : IEditorEvent
+    public class EditorAddInstanceEvent : Event, IEditorEvent
     {
         public int Id { get; }
         public string CollectionName { get; }

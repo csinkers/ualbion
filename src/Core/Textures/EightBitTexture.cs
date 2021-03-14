@@ -7,7 +7,7 @@ namespace UAlbion.Core.Textures
 {
     public abstract class EightBitTexture : ITexture, IEightBitImage
     {
-        public ITextureId Id { get; }
+        public IAssetId Id { get; }
         public string Name { get; }
         public int Width { get; }
         public int Height { get; }
@@ -26,7 +26,7 @@ namespace UAlbion.Core.Textures
         readonly List<SubImage> _subImages = new List<SubImage>();
 
         public EightBitTexture(
-            ITextureId id,
+            IAssetId id,
             string name,
             int width,
             int height,

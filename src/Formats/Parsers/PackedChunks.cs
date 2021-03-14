@@ -9,13 +9,13 @@ namespace UAlbion.Formats.Parsers
         const string Magic = "CHUNKED_MAGIC";
 
         // Format: u32 count; [ u32 size; byte[size] chunk ]
-        public static IEnumerable<byte[]> Unpack(ISerializer s)
+        public static IEnumerable<(byte[], string)> Unpack(ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             var initial = s.Offset;
             if (s.BytesRemaining < Magic.Length)
             {
-                yield return s.Bytes(null, null, (int)s.BytesRemaining);
+                yield return (s.Bytes(null, null, (int)s.BytesRemaining), null);
                 yield break;
             }
 
@@ -23,27 +23,28 @@ namespace UAlbion.Formats.Parsers
             if (!string.Equals(magic, Magic, StringComparison.Ordinal))
             {
                 s.Seek(initial);
-                yield return s.Bytes(null, null, (int)s.BytesRemaining);
+                yield return (s.Bytes(null, null, (int)s.BytesRemaining), null);
                 yield break;
             }
 
             var count = s.Int32(null, 0);
             for(int i = 0; i < count; i++)
             {
+                var name = s.NullTerminatedString(null, string.Empty);
                 int length = s.Int32(null, 0);
                 var chunk = s.Bytes(null, null, length);
-                yield return chunk;
+                yield return (chunk, name);
             }
         }
 
-        public static void Pack(ISerializer s, int count, Func<int, byte[]> buildChunk)
+        public static void Pack(ISerializer s, int count, Func<int, (byte[], string)> buildChunk)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (buildChunk == null) throw new ArgumentNullException(nameof(buildChunk));
 
             if (count == 1)
             {
-                var chunk = buildChunk(0);
+                var (chunk, _) = buildChunk(0);
                 s.Bytes(null, chunk, chunk.Length);
                 return;
             }
@@ -52,7 +53,8 @@ namespace UAlbion.Formats.Parsers
             s.Int32(null, count);
             for(int i = 0; i < count; i++)
             {
-                var chunk = buildChunk(i);
+                var (chunk, name) = buildChunk(i);
+                s.NullTerminatedString(null, name ?? string.Empty);
                 s.Int32(null, chunk.Length);
                 s.Bytes(null, chunk, chunk.Length);
             }

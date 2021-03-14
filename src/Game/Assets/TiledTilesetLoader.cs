@@ -36,7 +36,7 @@ namespace UAlbion.Game.Assets
             return s.IsWriting() ? Save(existing, properties, s) : Load(info, properties, s);
         }
 
-        TilesetData Load(AssetInfo info, TilemapProperties properties, ISerializer serializer)
+        static TilesetData Load(AssetInfo info, TilemapProperties properties, ISerializer serializer)
         {
             var xmlBytes = serializer.Bytes(null, null, (int)serializer.BytesRemaining);
             using var ms = new MemoryStream(xmlBytes);

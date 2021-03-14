@@ -19,19 +19,21 @@ namespace UAlbion.Formats.Containers
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
-            var subAssets = new Dictionary<int, string>();
+            var subAssets = new Dictionary<int, (string, string)>(); // path and name
             var pattern = info.Get(AssetProperty.Pattern, "{0}_{1}_{2}.dat");
+
             foreach (var filePath in disk.EnumerateDirectory(path, $"{info.Index}_*.*"))
             {
                 var filename = Path.GetFileName(filePath);
                 var (index, subAsset, paletteId, name) = AssetInfo.ParseFilename(pattern, filename);
+
                 if (paletteId.HasValue)
                     info.Set(AssetProperty.PaletteId, paletteId);
 
                 if (index != info.Index)
                     continue;
 
-                subAssets[subAsset] = filePath;
+                subAssets[subAsset] = (filePath, name);
             }
 
             var ms = new MemoryStream();
@@ -39,9 +41,10 @@ namespace UAlbion.Formats.Containers
             {
                 using var bw = new BinaryWriter(ms, Encoding.UTF8, true);
                 using var s = new AlbionWriter(bw);
-                PackedChunks.Pack(s, subAssets.Keys.Max() + 1, i => !subAssets.TryGetValue(i, out var filePath) 
-                    ? Array.Empty<byte>() 
-                    : disk.ReadAllBytes(filePath));
+                PackedChunks.Pack(s, subAssets.Keys.Max() + 1, i => 
+                    !subAssets.TryGetValue(i, out var pathAndName)
+                        ? (Array.Empty<byte>(), null)
+                        : (disk.ReadAllBytes(pathAndName.Item1), pathAndName.Item2));
             }
 
             ms.Position = 0;
@@ -63,31 +66,33 @@ namespace UAlbion.Formats.Containers
             if (!disk.DirectoryExists(path))
                 disk.CreateDirectory(path);
 
-            foreach (var (info, bytes) in assets)
+            foreach (var (info, assetBytes) in assets)
             {
-                if (bytes.Length == 0)
+                if (assetBytes.Length == 0)
                     continue;
 
-                using var ms = new MemoryStream(bytes);
+                using var ms = new MemoryStream(assetBytes);
                 using var br = new BinaryReader(ms);
                 using var s = new AlbionReader(br);
-                var frames = PackedChunks.Unpack(s).ToList();
+                var subAssets = PackedChunks.Unpack(s).ToList();
 
                 var pattern = info.Get(AssetProperty.Pattern, "{0}_{1}_{2}.dat");
-                if (frames.Count == 1)
+                if (subAssets.Count == 1)
                 {
-                    var filename = info.BuildFilename(pattern, 0);
-                    disk.WriteAllBytes(Path.Combine(path, filename), frames[0]);
+                    var (subAssetBytes, name) = subAssets[0];
+                    var filename = info.BuildFilename(pattern, 0, name);
+                    disk.WriteAllBytes(Path.Combine(path, filename), subAssetBytes);
                 }
                 else
                 {
-                    for (int i = 0; i < frames.Count; i++)
+                    for (int i = 0; i < subAssets.Count; i++)
                     {
-                        if (frames[i].Length == 0)
+                        var (subAssetBytes, name) = subAssets[i];
+                        if (subAssetBytes.Length == 0)
                             continue;
 
-                        var filename = info.BuildFilename(pattern, i);
-                        disk.WriteAllBytes(Path.Combine(path, filename), frames[i]);
+                        var filename = info.BuildFilename(pattern, i, name);
+                        disk.WriteAllBytes(Path.Combine(path, filename), subAssetBytes);
                     }
                 }
             }

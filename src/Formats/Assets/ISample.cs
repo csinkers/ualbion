@@ -2,9 +2,9 @@
 {
     public interface ISample
     {
-        int SampleRate { get; }
-        int Channels { get; }
-        int BytesPerSample { get; }
-        byte[] Samples { get; }
+        int SampleRate { get; set; }
+        int Channels { get; set; }
+        int BytesPerSample { get; set; }
+        byte[] Samples { get; set; }
     }
 }

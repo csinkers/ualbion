@@ -39,16 +39,16 @@ namespace UAlbion.Formats.Exporters.Tiled
                 PackedChunks.Pack(s, existing.Count, stampNumber =>
                 {
                     if (existing[stampNumber].Width == 0 || existing[stampNumber].Height == 0)
-                        return Array.Empty<byte>();
+                        return (Array.Empty<byte>(), null);
                     var stamp = new Stamp(stampNumber, existing[stampNumber], tileset);
-                    return FormatUtil.BytesFromTextWriter(stamp.Serialize);
+                    return (FormatUtil.BytesFromTextWriter(stamp.Serialize), null);
                 });
 
                 return existing;
             }
 
             var list = new BlockList();
-            foreach (var jsonBytes in PackedChunks.Unpack(s))
+            foreach (var (jsonBytes, _) in PackedChunks.Unpack(s))
             {
                 var json = Encoding.UTF8.GetString(jsonBytes);
                 var stamp = Stamp.Parse(json);

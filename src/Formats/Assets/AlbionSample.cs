@@ -2,9 +2,9 @@
 {
     public class AlbionSample : ISample
     {
-        public int SampleRate => 11025;
-        public int Channels => 1;
-        public int BytesPerSample => 1;
+        public int SampleRate { get; set; }
+        public int Channels { get; set; }
+        public int BytesPerSample { get; set; }
         public byte[] Samples { get; set; } // Setter for JSON
     }
 }

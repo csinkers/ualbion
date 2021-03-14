@@ -20,7 +20,7 @@ namespace UAlbion.Game.Veldrid.Assets
 {
     public class PngLoader : Component, IAssetLoader<IEightBitImage>
     {
-        static byte[] Write(IImageEncoder encoder, uint[] palette, IEightBitImage existing, int frameNum)
+        static (byte[], string) Write(IImageEncoder encoder, uint[] palette, IEightBitImage existing, int frameNum)
         {
             var frame = existing.GetSubImage(frameNum);
             var buffer = new ReadOnlyByteImageBuffer(
@@ -30,7 +30,8 @@ namespace UAlbion.Game.Veldrid.Assets
                 existing.PixelData.AsSpan(frame.PixelOffset, frame.PixelLength));
 
             Image<Rgba32> image = ImageUtil.BuildImageForFrame(buffer, palette);
-            return FormatUtil.BytesFromStream(stream => encoder.Encode(image, stream));
+            var bytes = FormatUtil.BytesFromStream(stream => encoder.Encode(image, stream));
+            return (bytes, null);
         }
 
         static IEightBitImage Read(AssetId id, uint[] palette, IList<Image<Rgba32>> images)
@@ -88,7 +89,7 @@ namespace UAlbion.Game.Veldrid.Assets
             var images = new List<Image<Rgba32>>();
             try
             {
-                foreach (var bytes in PackedChunks.Unpack(s))
+                foreach (var (bytes, _) in PackedChunks.Unpack(s))
                 {
                     using var stream = new MemoryStream(bytes);
                     images.Add(decoder.Decode<Rgba32>(configuration, stream));

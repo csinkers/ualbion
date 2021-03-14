@@ -6,9 +6,9 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class WavLoader : IAssetLoader<AlbionSample>
+    public class WavLoader : IAssetLoader<ISample>
     {
-        public AlbionSample Serdes(AlbionSample w, AssetInfo info, AssetMapping mapping, ISerializer s)
+        public ISample Serdes(ISample w, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (s.IsWriting() && w == null)
@@ -40,7 +40,7 @@ namespace UAlbion.Formats.Parsers
             return w;
         }
 
-        static void SerdesFormatTag(AlbionSample w, ISerializer s)
+        static void SerdesFormatTag(ISample w, ISerializer s)
         {
             var tag = s.FixedLengthString(null, "fmt ",4); // Subchunk1 (format metadata)
             ApiUtil.Assert(tag == "fmt ", "tag == 'fmt '");
@@ -50,20 +50,14 @@ namespace UAlbion.Formats.Parsers
             int format = s.UInt16("Format", 1); // Format = Linear Quantisation
             ApiUtil.Assert(format == 1, "format == 1");
 
-            int channels = s.UInt16(nameof(w.Channels), (ushort)w.Channels); // NumChannels
-            ApiUtil.Assert(channels == 1, "channels == 1");
-
-            int sampleRate = s.Int32(nameof(w.SampleRate), w.SampleRate ); // SampleRate
-            ApiUtil.Assert(sampleRate == 11025, "sampleRate == 11025");
-
-            int byteRate = s.Int32("ByteRate", w.SampleRate * w.Channels * w.BytesPerSample); // ByteRate
-            int blockAlign = s.Int16("BlockAlign",  (short)(w.Channels * w.BytesPerSample)); // BlockAlign
-
-            int bps = s.UInt16("BitsPerSample", (ushort)(w.BytesPerSample * 8)); // BitsPerSample
-            ApiUtil.Assert(bps == 8, "bps == 8");
+            w.Channels = s.UInt16(nameof(w.Channels), (ushort)w.Channels); // NumChannels
+            w.SampleRate = s.Int32(nameof(w.SampleRate), w.SampleRate ); // SampleRate
+            s.Int32("ByteRate", w.SampleRate * w.Channels * w.BytesPerSample); // ByteRate
+            s.Int16("BlockAlign",  (short)(w.Channels * w.BytesPerSample)); // BlockAlign
+            w.BytesPerSample = s.UInt16("BitsPerSample", (ushort)(w.BytesPerSample * 8)) / 8; // BitsPerSample
         }
 
-        static void SerdesDataTag(AlbionSample w, ISerializer s)
+        static void SerdesDataTag(ISample w, ISerializer s)
         {
             var tag = s.FixedLengthString("Tag", "data", 4); // Subchunk2 (raw sample data)
             ApiUtil.Assert(tag == "data");
@@ -72,6 +66,6 @@ namespace UAlbion.Formats.Parsers
         }
 
         public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
-            => Serdes((AlbionSample) existing, info, mapping, s);
+            => Serdes((ISample) existing, info, mapping, s);
     }
 }

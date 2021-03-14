@@ -83,7 +83,8 @@
     "tiledTileset":     "UAlbion.Game.Assets.TiledTilesetLoader, UAlbion.Game",
     "tiledNpcTileset":  "UAlbion.Game.Veldrid.Assets.NpcTilesetLoader, UAlbion.Game.Veldrid",
     "utf8":             "UAlbion.Formats.Parsers.Utf8Loader, UAlbion.Formats",
-    "wav":              "UAlbion.Formats.Parsers.WavLoader, UAlbion.Formats"
+    "wav":              "UAlbion.Formats.Parsers.WavLoader, UAlbion.Formats",
+    "wavlib":           "UAlbion.Formats.Parsers.WaveLibWavLoader, UAlbion.Formats"
   },
 
   "Containers": {
@@ -124,8 +125,9 @@
     "$(MOD)/Assets/Npcs":          { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{0}_{2}.json", "Map": { "1": { "Id": "npc.1"      } } },
     "$(MOD)/Assets/Palettes":      { "Loader": "jsonPal",          "Container": "dir", "Pattern": "{0}_{2}.json", "Map": { "0": { "Id": "pal.0"      } } },
     "$(MOD)/Assets/PartyMembers":  { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{0}_{2}.json", "Map": { "1": { "Id": "party.1"    } } },
-    "$(MOD)/Assets/Samples":       { "Loader": "wav",              "Container": "dir", "Pattern": "{0}_{2}.wav",  "Map": { "1": { "Id": "sample.1"     } } },
+    "$(MOD)/Assets/Samples":       { "Loader": "wav",              "Container": "dir", "Pattern": "{0}_{2}.wav",  "Map": { "1": { "Id": "sample.1"   } } },
     "$(MOD)/Assets/Songs":         { "Loader": "song",             "Container": "dir", "Pattern": "{0}_{2}.xmi",  "Map": { "1": { "Id": "song.1"     } } },
+    "$(MOD)/Assets/WaveLib":       { "Loader": "wavlib",           "Container": "dir", "Pattern": "{0}_{1}_{2}.wav", "Map": { "1": { "Id": "wavlib.1" } } },
     "$(MOD)/Assets/Items.json":    { "Loader": "jsonItems", "Container": "jsonObj", "Map": { "1": { "Id": "item.1"  } } },
     "$(MOD)/Assets/Spells.json":   { "Loader": "jsonSpell", "Container": "jsonObj", "Map": { "1": { "Id": "spell.1" } } },
 

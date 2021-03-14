@@ -287,6 +287,27 @@ namespace UAlbion.Formats
                 ms.Dispose();
             });
         }
+
+        public static byte[] SerializeToBytes(Action<ISerializer> serdes)
+        {
+            if (serdes == null) throw new ArgumentNullException(nameof(serdes));
+            var ms = new MemoryStream();
+            using var bw = new BinaryWriter(ms, AlbionEncoding, true);
+            using var s = new AlbionWriter(bw);
+            serdes(s);
+            bw.Flush();
+            ms.Position = 0;
+            return ms.ToArray();
+        }
+
+        public static T DeserializeFromBytes<T>(byte[] bytes, Func<ISerializer, T> serdes)
+        {
+            if (serdes == null) throw new ArgumentNullException(nameof(serdes));
+            using var ms = new MemoryStream(bytes);
+            var br = new BinaryReader(ms);
+            using var s = new AlbionReader(br);
+            return serdes(s);
+        }
     }
 }
 

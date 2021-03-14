@@ -69,12 +69,12 @@ namespace UAlbion.Config
 
         public JToken GetRaw(string property) => Properties != null && Properties.TryGetValue(property, out var token) ? token : null;
 
-        public string BuildFilename(string pattern, int frameNum)
+        public string BuildFilename(string pattern, int frameNum, string overrideName = null)
             => string.Format(CultureInfo.InvariantCulture,
                     pattern,
                     Index,    // 0 = Index in container
                     frameNum, // 1 = frame/sub-asset number
-                    ConfigUtil.AssetName(AssetId), // 2 = asset name
+                    string.IsNullOrEmpty(overrideName) ? ConfigUtil.AssetName(AssetId) : overrideName, // 2 = asset name
                     Get(AssetProperty.PaletteId, 0)); // 3 = palette id
 
         static readonly Dictionary<string, Regex> RegexCache = new Dictionary<string, Regex>();

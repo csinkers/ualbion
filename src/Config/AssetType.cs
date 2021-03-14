@@ -72,6 +72,7 @@ namespace UAlbion.Config
 
         [Localised] [IsomorphicTo(EventSet)] EventText,
         [Localised] [IsomorphicTo(Map)] MapText,
+        [Localised] [IsomorphicTo(Item)] ItemName,
         [Localised] Text,
         [Localised] Word,
 

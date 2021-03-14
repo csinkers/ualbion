@@ -152,6 +152,13 @@ namespace UAlbion.Formats.Assets
                 for (int i = 0; i < 256; i++)
                 {
                     uint entry = Entries[i];
+
+                    // Always set full alpha when it's not index 0 so things like item graphics
+                    // that should just use the common palette still round-trip correctly if 
+                    // they accidentally contain some indices < 192
+                    if (i > 0)
+                        entry |= 0xff000000; 
+
                     if (used.Contains(entry))
                         entry = Search(entry, used);
 

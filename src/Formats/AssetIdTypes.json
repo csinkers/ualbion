@@ -72,6 +72,7 @@
 
     "TextId": [
       "EventText",
+      "ItemName",
       "MapText",
       "Special",
       "Text",
@@ -81,6 +82,7 @@
   "Extras": {
     "EventSetId": [ "        public readonly TextId ToEventText() => new TextId(AssetType.EventText, Id);" ],
     "MapId": [ "        public readonly TextId ToMapText() => new TextId(AssetType.MapText, Id);" ],
+    "ItemId": [ "        public readonly TextId ToName() => new TextId(AssetType.ItemName, Id);" ],
     "TilesetId": [
       "        public readonly BlockListId ToBlockList() => new BlockListId(AssetType.BlockList, Id);",
       "        public readonly TilesetGraphicsId ToTilesetGraphics() => new TilesetGraphicsId(AssetType.TilesetGraphics, Id);"

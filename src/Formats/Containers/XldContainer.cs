@@ -45,6 +45,9 @@ namespace UAlbion.Formats.Containers
                 lengths[info.Index] = bytes.Length;
             }
 
+            count = lengths.Select((x, i) => (x, i)).Last(x => x.x > 0).i + 1;
+            lengths = lengths.Take(count).ToArray();
+
             using var fs = disk.OpenWriteTruncate(path);
             using var bw = new BinaryWriter(fs);
             using var s = new AlbionWriter(bw);
@@ -176,7 +179,7 @@ namespace UAlbion.Formats.Containers
             IList<int> populatedIds)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            if(lastId < firstId) throw new ArgumentOutOfRangeException(nameof(lastId));
+            if (lastId < firstId) throw new ArgumentOutOfRangeException(nameof(lastId));
 
             s.Object($"{category}.{firstId}-{lastId}", s2 =>
             {

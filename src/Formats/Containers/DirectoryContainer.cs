@@ -37,7 +37,7 @@ namespace UAlbion.Formats.Containers
             }
 
             var ms = new MemoryStream();
-
+            if (subAssets.Count > 0)
             {
                 using var bw = new BinaryWriter(ms, Encoding.UTF8, true);
                 using var s = new AlbionWriter(bw);

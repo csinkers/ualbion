@@ -300,7 +300,6 @@ namespace UAlbion.Game.Assets
                 AssetMapping.Global,
                 file =>
                 {
-
                     // Don't need to resolve the filename as we're not actually using the container - we just want to find the type.
                     var container = containerRegistry.GetContainer(file.Filename, file.Container, disk);
                     var firstAsset = file.Map[file.Map.Keys.Min()];

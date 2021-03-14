@@ -17,6 +17,7 @@
     "fullbody": { "AssetType": "FullBodyPicture",    "EnumType": "UAlbion.Base.FullBodyPicture, UAlbion.Base" },
     "item":     { "AssetType": "Item",               "EnumType": "UAlbion.Base.Item, UAlbion.Base" },
     "itemgfx":  { "AssetType": "ItemGraphics",       "EnumType": "UAlbion.Base.ItemGraphics, UAlbion.Base" },
+    "itemname": { "AssetType": "ItemName",           "EnumType": "UAlbion.Base.ItemName, UAlbion.Base" },
     "lab":      { "AssetType": "Labyrinth",          "EnumType": "UAlbion.Base.LabyrinthData, UAlbion.Base" },
     "lnpc":     { "AssetType": "LargeNpcGraphics",   "EnumType": "UAlbion.Base.LargeNpc, UAlbion.Base" },
     "lparty":   { "AssetType": "LargePartyGraphics", "EnumType": "UAlbion.Base.LargePartyMember, UAlbion.Base" },
@@ -131,6 +132,9 @@
     "$(MOD)/Assets/Items.json":    { "Loader": "jsonItems", "Container": "jsonObj", "Map": { "1": { "Id": "item.1"  } } },
     "$(MOD)/Assets/Spells.json":   { "Loader": "jsonSpell", "Container": "jsonObj", "Map": { "1": { "Id": "spell.1" } } },
 
+    "$(MOD)/Assets/ItemNamesDE.json": { "Language": "GERMAN",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "1": { "Id": "itemname.1"  } } },
+    "$(MOD)/Assets/ItemNamesEN.json": { "Language": "ENGLISH", "Loader": "utf8", "Container": "jsonStrings", "Map": { "1": { "Id": "itemname.1"  } } },
+    "$(MOD)/Assets/ItemNamesFR.json": { "Language": "FRENCH",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "1": { "Id": "itemname.1"  } } },
     "$(MOD)/Assets/EventTextDE": {
       "Language": "GERMAN",
       "Loader": "jsonText",
@@ -218,7 +222,7 @@
       "Pattern": "{0}_{2}.png",
       "Width": 16,
       "Height": 16,
-      "Map": { "1": { "Id": "itemgfx.1"  } }
+      "Map": { "0": { "Id": "itemgfx.1"  } }
     },
 
     "$(MOD)/Assets/Tilesets/1":  { "Loader": "png", "Container": "dir", "PaletteId":  1, "Pattern": "{0}_{1}.png", "Max":  1, "Map": {  "1": { "Id": "tilegfx.1"  } } },

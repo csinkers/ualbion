@@ -6,7 +6,7 @@ using Newtonsoft.Json.Converters;
 namespace UAlbion.Base
 {
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum Sample : byte
+    public enum Sample : ushort
     {
         CreakyWoodenDoor = 1,
         SqueekyMetalDoor = 2,
@@ -242,5 +242,21 @@ namespace UAlbion.Base
         Unknown253 = 253,
         Unknown254 = 254,
         Unknown255 = 255,
+        Unknown256 = 256,
+        Unknown257 = 257,
+        Unknown258 = 258,
+        Unknown259 = 259,
+        Unknown260 = 260,
+        Unknown261 = 261,
+        Unknown262 = 262,
+        Unknown263 = 263,
+        Unknown264 = 264,
+        Unknown265 = 265,
+        Unknown266 = 266,
+        Unknown267 = 267,
+        Unknown268 = 268,
+        Unknown269 = 269,
+        Unknown270 = 270,
+        Unknown271 = 271,
     }
 }

@@ -94,12 +94,13 @@ namespace UAlbion.Formats.Assets
         public bool IsNone => Type == AssetType.None;
 
         public override string ToString() => AssetMapping.Global.IdToName(this);
-        public static AssetType[] ValidTypes = { AssetType.EventText, AssetType.MapText, AssetType.Special, AssetType.Text, AssetType.Word };
+        public static AssetType[] ValidTypes = { AssetType.EventText, AssetType.ItemName, AssetType.MapText, AssetType.Special, AssetType.Text, AssetType.Word };
         public static TextId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 
         public static implicit operator AssetId(TextId id) => AssetId.FromUInt32(id._value);
         public static implicit operator TextId(AssetId id) => new TextId(id.ToUInt32());
         public static implicit operator TextId(UAlbion.Base.EventText id) => TextId.From(id);
+        public static implicit operator TextId(UAlbion.Base.ItemName id) => TextId.From(id);
         public static implicit operator TextId(UAlbion.Base.MapText id) => TextId.From(id);
         public static implicit operator TextId(UAlbion.Base.Special id) => TextId.From(id);
         public static implicit operator TextId(UAlbion.Base.SystemText id) => TextId.From(id);

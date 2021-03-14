@@ -1,11 +1,12 @@
-﻿using UAlbion.Api;
+﻿using System;
+using UAlbion.Api;
 
 namespace UAlbion.Game.Events
 {
     [Event("set_language", "Change the current game language.")]
     public class SetLanguageEvent : GameEvent
     {
-        public SetLanguageEvent(string language) { Language = language; }
+        public SetLanguageEvent(string language) => Language = (language ?? throw new ArgumentNullException(nameof(language))).ToUpperInvariant();
         [EventPart("language")] public string Language { get; }
     }
 

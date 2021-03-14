@@ -165,9 +165,9 @@ namespace UAlbion.Core
             {
                 for (int i = 0; i < fromBuffer.Width; i++)
                 {
-                    byte pixel = from[fromOffset];
-                    if (pixel != transparentColor)
-                        to[toOffset] = palette[pixel] & 0x00ffffff | ((uint)componentAlpha << 24);
+                    byte index = from[fromOffset];
+                    if (index != transparentColor)
+                        to[toOffset] = palette[index] & 0x00ffffff | ((uint)componentAlpha << 24);
 
                     fromOffset++;
                     toOffset++;
@@ -189,7 +189,9 @@ namespace UAlbion.Core
             {
                 for (int i = 0; i < fromBuffer.Width; i++)
                 {
-                    to[toOffset] = palette[from[fromOffset]] & 0x00ffffff | ((uint)componentAlpha << 24);
+                    byte index = from[fromOffset];
+                    uint color = palette[index] & 0x00ffffff | ((uint)componentAlpha << 24);
+                    to[toOffset] = color;
                     fromOffset++;
                     toOffset++;
                 }
@@ -240,6 +242,7 @@ namespace UAlbion.Core
             if (palette.Length > 256) throw new ArgumentOutOfRangeException(nameof(palette), "Only 8-bit palettes are supported");
 
             var (r, g, b, a) = ApiUtil.UnpackColor(value);
+
             byte result = 0;
             int best = int.MaxValue;
             for (int i = 0; i < palette.Length; i++)

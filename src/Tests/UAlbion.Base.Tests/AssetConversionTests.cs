@@ -203,6 +203,16 @@ namespace UAlbion.Base.Tests
         }
 
         [Fact]
+        public void BrokenMerchantTest()
+        {
+            var info = new AssetInfo { AssetId = AssetId.From(Merchant.Unknown1) };
+            Test<Inventory>(
+                info.AssetId,
+                 AssetId.EnumerateAll(AssetType.Item).ToArray(),
+                (x, s) => Loaders.MerchantLoader.Serdes(x, info, AssetMapping.Global, s));
+        }
+
+        [Fact]
         public void MonsterGroupTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(MonsterGroup.TwoSkrinn1OneKrondir1) };

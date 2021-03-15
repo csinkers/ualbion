@@ -25,11 +25,11 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public uint Collision { get; set; } // 1, len = 3 bytes
         public SpriteId SpriteId { get; set; } // 4, ushort
         public byte AnimationFrames { get; set; } // 6
-        public byte AutoGfxType { get; set; }     // 7
-        public byte TransparentColour { get; set; }            // 8 (PaletteId??)
-        public byte Unk9 { get; set; }            // 9
-        public ushort Width { get; set; }         // A
-        public ushort Height { get; set; }        // C
+        public byte AutoGfxType { get; set; } // 7
+        public byte TransparentColour { get; set; } // 8 (PaletteId??)
+        public byte Unk9 { get; set; } // 9
+        public ushort Width { get; set; } // A
+        public ushort Height { get; set; } // C
         public IList<Overlay> Overlays { get; } = new List<Overlay>();
 
         public override string ToString() =>

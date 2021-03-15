@@ -67,6 +67,7 @@
     "jsonEventSet":     "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.EventSet, UAlbion.Formats]], UAlbion.Formats",
     "jsonInv":          "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.Inventory, UAlbion.Formats]], UAlbion.Formats",
     "jsonItems":        "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.ItemData, UAlbion.Formats]], UAlbion.Formats",
+    "jsonLab":          "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.Labyrinth.LabyrinthData, UAlbion.Formats]], UAlbion.Formats",
     "jsonMonsterGroup": "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.MonsterGroup, UAlbion.Formats]], UAlbion.Formats",
     "jsonPal":          "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.AlbionPalette, UAlbion.Formats]], UAlbion.Formats",
     "script":           "UAlbion.Formats.Parsers.ScriptLoader, UAlbion.Formats",
@@ -202,6 +203,13 @@
       "Loader": "utf8",
       "Container": "jsonStrings",
       "Map": { "1": { "Id": "word.1"    } }
+    },
+
+    "$(MOD)/Assets/3dTilesets": {
+      "Loader": "jsonLab",
+      "Container": "dir",
+      "Pattern": "{0}_{2}.json",
+      "Map": { "1": { "Id": "lab.1" } }
     },
 
 //    "$(MOD)/Assets/3dTilesets": {

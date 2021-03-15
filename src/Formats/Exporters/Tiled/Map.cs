@@ -33,13 +33,18 @@ namespace UAlbion.Formats.Exporters.Tiled
         [XmlElement("layer")] public List<MapLayer> Layers { get; set; }
         [XmlElement("objectgroup")] public List<ObjectGroup> ObjectGroups { get; set; }
 
+        public static Map Parse(Stream stream)
+        {
+            using var xr = new XmlTextReader(stream);
+            var serializer = new XmlSerializer(typeof(Map));
+            return (Map)serializer.Deserialize(xr);
+        }
+
         public static Map Load(string path, IFileSystem disk)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
             using var stream = disk.OpenRead(path);
-            using var xr = new XmlTextReader(stream);
-            var serializer = new XmlSerializer(typeof(Map));
-            return (Map)serializer.Deserialize(xr);
+            return Parse(stream);
         }
 
         public void Save(string path, IFileSystem disk)
@@ -278,6 +283,60 @@ namespace UAlbion.Formats.Exporters.Tiled
                 sb.AppendLine();
             }
             return sb.ToString(0, sb.Length - (Environment.NewLine.Length + 1));
+        }
+
+        public BaseMapData ToAlbion(AssetInfo info)
+        {
+            if (info == null) throw new ArgumentNullException(nameof(info));
+
+            // Check width/height <= 255
+            // Check layer existence
+
+            var rawUnderlay = Layers.First(x => x.Name == "Underlay").Data.Content;
+            var rawOverlay = Layers.First(x => x.Name == "Overlay").Data.Content;
+
+            var underlay = ParseCsv(rawUnderlay).ToArray();
+            var overlay = ParseCsv(rawOverlay).ToArray();
+
+
+            // Check underlay/overlay length matches W*H
+
+            /*
+                ObjectGroups = new[] {
+                    BuildTriggers(map, properties, eventFormatter, ref nextObjectGroupId, ref nextObjectId),
+                    BuildNpcs(map, properties, eventFormatter, npcTileset, ref nextObjectGroupId, ref nextObjectId)
+                }.SelectMany(x => x).ToList()
+            */
+
+            var result = new MapData2D(info.AssetId, (byte)Width, (byte)Height)
+            {
+                Events = { },
+                Chains = { },
+                Zones = { },
+                RawLayout = FormatUtil.ToPacked(underlay, overlay, 1)
+            };
+            // Post-processing, unswizzle event nodes, build zone lookups etc
+            return result;
+        }
+
+        IEnumerable<int> ParseCsv(string csv)
+        {
+            int n = 0;
+            foreach (var c in csv)
+            {
+                switch (c)
+                {
+                    case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
+                        n *= 10;
+                        n += c - '0';
+                        break;
+                    case ',':
+                        yield return n;
+                        n = 0;
+                        break;
+                }
+            }
+            yield return n;
         }
     }
 }

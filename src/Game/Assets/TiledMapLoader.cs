@@ -34,7 +34,15 @@ namespace UAlbion.Game.Assets
                 return existing;
             }
 
-            throw new NotImplementedException();
+            return Read(info, s);
+        }
+
+        static BaseMapData Read(AssetInfo info, ISerializer s)
+        {
+            var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
+            using var ms = new MemoryStream(bytes);
+            var map = Map.Parse(ms);
+            return map.ToAlbion(info);
         }
 
         byte[] Write2D(MapData2D map, AssetInfo info)

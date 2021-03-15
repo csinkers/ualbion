@@ -176,7 +176,16 @@ namespace UAlbion.Base.Tests
         public void Map2DTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Map.TorontoBegin) };
-            Test<MapData2D>(info.AssetId, null, (x, s) => MapData2D.Serdes(info, x, AssetMapping.Global, s));
+
+            var small = AssetMapping.Global.EnumerateAssetsOfType(AssetType.SmallNpcGraphics);
+            var large = AssetMapping.Global.EnumerateAssetsOfType(AssetType.LargeNpcGraphics);
+            var prereqs =
+                    new[] { AssetId.From(Special.DummyObject) }
+                    .Concat(small)
+                    .Concat(large)
+                    .ToArray();
+
+            Test<MapData2D>(info.AssetId, prereqs, (x, s) => MapData2D.Serdes(info, x, AssetMapping.Global, s));
         }
 
 

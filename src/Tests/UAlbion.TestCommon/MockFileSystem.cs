@@ -82,6 +82,7 @@ namespace UAlbion.TestCommon
 
         public void CreateDirectory(string path)
         {
+            path = Path.GetFullPath(path);
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path));
             if (path.Length > 260) throw new PathTooLongException();
 
@@ -124,6 +125,7 @@ namespace UAlbion.TestCommon
 
         public bool FileExists(string path)
         {
+            path = Path.GetFullPath(path);
             if (!(GetDir(Path.GetDirectoryName(path)) is DirNode dir))
                 return false;
 
@@ -132,9 +134,15 @@ namespace UAlbion.TestCommon
             return !result && _maskingFunc(path) ? File.Exists(path) : result;
         }
 
-        public bool DirectoryExists(string path) => GetDir(path) is DirNode;
+        public bool DirectoryExists(string path)
+        {
+            path = Path.GetFullPath(path);
+            return GetDir(path) is DirNode;
+        }
+
         public IEnumerable<string> EnumerateDirectory(string path, string filter = null)
         {
+            path = Path.GetFullPath(path);
             if (!(GetDir(path) is DirNode dir))
                 return Enumerable.Empty<string>();
 
@@ -145,7 +153,7 @@ namespace UAlbion.TestCommon
         }
 
         public Stream OpenRead(string path) =>
-            GetFile(path) switch
+            GetFile(Path.GetFullPath(path)) switch
             {
                 ({ }, FileNode file) => new MockFileStream(file.Stream, true),
                 ({ }, DirNode _) => throw new UnauthorizedAccessException($"Access to the path '{path}' is denied."),
@@ -154,6 +162,7 @@ namespace UAlbion.TestCommon
 
         public Stream OpenWriteTruncate(string path)
         {
+            path = Path.GetFullPath(path);
             var filename = Path.GetFileName(path);
             switch (GetFile(path))
             {
@@ -172,6 +181,7 @@ namespace UAlbion.TestCommon
 
         public void DeleteFile(string path)
         {
+            path = Path.GetFullPath(path);
             var (dir, file) = GetFile(path);
             if (file == null)
                 return;
@@ -181,6 +191,7 @@ namespace UAlbion.TestCommon
 
         public string ReadAllText(string path)
         {
+            path = Path.GetFullPath(path);
             using var s = OpenRead(path);
             using var sr = new StreamReader(s);
             return sr.ReadToEnd();
@@ -188,6 +199,7 @@ namespace UAlbion.TestCommon
 
         public void WriteAllText(string path, string fullText)
         {
+            path = Path.GetFullPath(path);
             using var s = OpenWriteTruncate(path);
             using var sw = new StreamWriter(s);
             sw.Write(fullText);
@@ -195,6 +207,7 @@ namespace UAlbion.TestCommon
 
         public IEnumerable<string> ReadAllLines(string path)
         {
+            path = Path.GetFullPath(path);
             using var s = OpenRead(path);
             using var sr = new StreamReader(s);
             while (!sr.EndOfStream)
@@ -203,6 +216,7 @@ namespace UAlbion.TestCommon
 
         public byte[] ReadAllBytes(string path)
         {
+            path = Path.GetFullPath(path);
             using var s = OpenRead(path);
             using var br = new BinaryReader(s);
             return br.ReadBytes((int)s.Length);
@@ -210,6 +224,7 @@ namespace UAlbion.TestCommon
 
         public void WriteAllBytes(string path, byte[] bytes)
         {
+            path = Path.GetFullPath(path);
             using var s = OpenWriteTruncate(path);
             using var bw = new BinaryWriter(s);
             bw.Write(bytes);

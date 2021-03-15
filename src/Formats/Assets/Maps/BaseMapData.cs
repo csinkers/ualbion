@@ -150,6 +150,7 @@ namespace UAlbion.Formats.Assets.Maps
             if (s == null) throw new ArgumentNullException(nameof(s));
             foreach (var npc in Npcs)
             {
+                if (npc == null) continue;
                 s.Begin("NpcWaypoints" + npc.Index);
                 if (npc.Id.Type != AssetType.None)
                     npc.LoadWaypoints(s);

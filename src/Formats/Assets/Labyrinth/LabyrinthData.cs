@@ -43,9 +43,9 @@ namespace UAlbion.Formats.Assets.Labyrinth
             PerfTracker.StartupEvent("Start loading labyrinth data");
             // s.ByteArray("UnknownBlock6C", () => sheet.UnknownBlock6C, x => sheet.UnknownBlock6C = x, 14);
 
-            d.WallHeight   = s.UInt16(nameof(d.WallHeight), d.WallHeight);       // 0
+            d.WallHeight   = s.UInt16(nameof(d.WallHeight), d.WallHeight);     // 0
             d.CameraHeight = s.UInt16(nameof(d.CameraHeight), d.CameraHeight); // 2
-            d.Unk4         = s.UInt16(nameof(d.Unk4), d.Unk4);                         // 4
+            d.Unk4         = s.UInt16(nameof(d.Unk4), d.Unk4);                 // 4
             d.BackgroundId = SpriteId.SerdesU16(nameof(BackgroundId), d.BackgroundId, AssetType.BackgroundGraphics, mapping, s); // 6
             d.BackgroundYPosition  = s.UInt16(nameof(d.BackgroundYPosition), d.BackgroundYPosition);   // 8
             d.FogDistance          = s.UInt16(nameof(d.FogDistance), d.FogDistance);                   // A

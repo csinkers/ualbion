@@ -1,3 +1,0 @@
-﻿namespace UAlbion.Game.Assets
-{
-}

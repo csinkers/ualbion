@@ -22,6 +22,9 @@ namespace UAlbion.Formats.Containers
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (!disk.FileExists(path))
+                return null;
+
             var dict = Load(path, disk);
             if (!dict.TryGetValue(info.AssetId, out var token))
                 return null;

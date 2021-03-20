@@ -94,7 +94,7 @@ Many thanks to Florian Ziesche and the other contributers to the [freealbion wik
 Thanks to IllidanS4 for the ILBM loading code in [AlbLib](https://github.com/IllidanS4/AlbLib) (MIT License) which my InterlacedBitmap implementation was based on.
 
 Thanks also to the authors of and contributers to the dependencies of this project:
-- [Veldrid](https://github.com/mellinoe/veldrid) graphics API abstraction by Eric Mellinoe et al
+- [Veldrid](https://github.com/mellinoe/veldrid) graphics API abstraction by Eric Mellino et al
 - [ImGui](https://github.com/ocornut/imgui/) immediate mode graphics library by Omar Cornut et al
 - [OpenAL](https://www.openal.org/) audio abstraction API from Loki Entertainment / Creative Technology
 - [OpenAL-CS](https://github.com/flibitijibibo/OpenAL-CS) C# wrapper for OpenAL (using the NuGet package of the [OpenRA](https://github.com/OpenRA/OpenAL-CS) fork)

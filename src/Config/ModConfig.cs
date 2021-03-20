@@ -14,6 +14,7 @@ namespace UAlbion.Config
         public string Author { get; set; }
         public Version Version { get; set; }
         [JsonProperty("asset_path")] public string AssetPath { get; set; }
+        [JsonProperty("shader_path")] public string ShaderPath { get; set; }
         public List<string> Dependencies { get; } = new List<string>();
 
         public static ModConfig Load(string configPath, IFileSystem disk)

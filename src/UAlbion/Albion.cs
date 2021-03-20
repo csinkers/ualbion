@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Globalization;
-using System.IO;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Textures;
@@ -38,12 +38,16 @@ namespace UAlbion
         public static void RunGame(IEngine engine, EventExchange global, IContainer services, string baseDir, CommandLineOptions commandLine)
         {
 #pragma warning disable CA2000 // Dispose objects before losing scopes
-            services
-                .Add(new ShaderCache(Path.Combine(baseDir, "data", "ShaderCache"))
-                    .AddShaderPath(Path.Combine(baseDir, "src", "Core", "Visual", "Shaders")) // TODO: Pull from mod config
-                    .AddShaderPath(Path.Combine(baseDir, "src", "Game", "Visual", "Shaders")))
-                .Add(engine);
+            var config = global.Resolve<IGeneralConfig>();
+            var shaderCache = new ShaderCache(config.ResolvePath("$(CACHE)/ShaderCache"));
+
+            foreach (var shaderPath in global.Resolve<IModApplier>().ShaderPaths)
+                shaderCache.AddShaderPath(shaderPath);
 #pragma warning restore CA2000 // Dispose objects before losing scopes
+
+            services
+                .Add(shaderCache)
+                .Add(engine);
 
             RegisterComponents(global, services, baseDir, commandLine);
 

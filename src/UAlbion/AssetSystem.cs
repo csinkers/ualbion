@@ -16,11 +16,15 @@ namespace UAlbion
     {
         public static async Task<(EventExchange, IContainer)> SetupAsync(string baseDir, IFileSystem disk, ICoreFactory factory)
         {
-            var generalConfigTask = Task.Run(() => LoadGeneralConfig(baseDir, disk));
-            var settingsTask = Task.Run(() => LoadSettings(baseDir, disk));
+            var configAndSettingsTask = Task.Run(() =>
+            {
+                var config = LoadGeneralConfig(baseDir, disk);
+                var settings = LoadSettings(config, disk);
+                return (config, settings);
+            });
             var coreConfigTask = Task.Run(() => LoadCoreConfig(baseDir, disk));
             var gameConfigTask = Task.Run(() => LoadGameConfig(baseDir, disk));
-            return await SetupCore(disk, factory, generalConfigTask, settingsTask, coreConfigTask, gameConfigTask).ConfigureAwait(false);
+            return await SetupCore(disk, factory, configAndSettingsTask, coreConfigTask, gameConfigTask).ConfigureAwait(false);
         }
 
         public static EventExchange Setup(IFileSystem disk, ICoreFactory factory,
@@ -29,32 +33,29 @@ namespace UAlbion
             CoreConfig coreConfig,
             GameConfig gameConfig)
         {
-            var generalConfigTask = Task.FromResult(generalConfig);
-            var settingsTask = Task.FromResult(settings);
+            var configAndSettingsTask = Task.FromResult((generalConfig, settings));
             var coreConfigTask = Task.FromResult(coreConfig);
             var gameConfigTask = Task.FromResult(gameConfig);
-            var task = SetupCore(disk, factory, generalConfigTask, settingsTask, coreConfigTask, gameConfigTask);
+            var task = SetupCore(disk, factory, configAndSettingsTask, coreConfigTask, gameConfigTask);
             return task.Result.Item1;
         }
 
         static async Task<(EventExchange, IContainer)> SetupCore(
             IFileSystem disk,
             ICoreFactory factory,
-            Task<GeneralConfig> generalConfigTask,
-            Task<GeneralSettings> settingsTask,
+            Task<(GeneralConfig, GeneralSettings)> configAndSettingsTask,
             Task<CoreConfig> coreConfigTask,
             Task<GameConfig> gameConfigTask)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
             if (factory == null) throw new ArgumentNullException(nameof(factory));
-            if (generalConfigTask == null) throw new ArgumentNullException(nameof(generalConfigTask));
-            if (settingsTask == null) throw new ArgumentNullException(nameof(settingsTask));
+            if (configAndSettingsTask == null) throw new ArgumentNullException(nameof(configAndSettingsTask));
             if (coreConfigTask == null) throw new ArgumentNullException(nameof(coreConfigTask));
             if (gameConfigTask == null) throw new ArgumentNullException(nameof(gameConfigTask));
 
-            var modApplier = new ModApplier();
+            IModApplier modApplier = new ModApplier();
 
-            var settings = await settingsTask.ConfigureAwait(false);
+            var (generalConfig, settings) = await configAndSettingsTask.ConfigureAwait(false);
             var settingsManager = new SettingsManager(settings);
             var services = new Container("Services", settingsManager, // Need to register settings first, as the AssetLocator relies on it.
                 new AssetLoaderRegistry(),
@@ -68,8 +69,6 @@ namespace UAlbion
                 new AssetLocator(),
                 modApplier,
                 new AssetManager());
-
-            var generalConfig = await generalConfigTask.ConfigureAwait(false);
 
 #pragma warning disable CA2000 // Dispose objects before losing scope
             var exchange = new EventExchange(new LogExchange())
@@ -103,9 +102,9 @@ namespace UAlbion
             return result;
         }
 
-        static GeneralSettings LoadSettings(string baseDir, IFileSystem disk)
+        static GeneralSettings LoadSettings(IGeneralConfig config, IFileSystem disk)
         {
-            var result = GeneralSettings.Load(Path.Combine(baseDir, "data", "settings.json"), disk);
+            var result = GeneralSettings.Load(config, disk);
             PerfTracker.StartupEvent("Loaded settings");
             return result;
         }

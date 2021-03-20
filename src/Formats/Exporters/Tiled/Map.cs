@@ -10,7 +10,6 @@ using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Maps;
 
-#pragma warning disable CA1034 // Nested types should not be visible
 #pragma warning disable CA2227 // Collection properties should be read only
 namespace UAlbion.Formats.Exporters.Tiled
 {
@@ -319,14 +318,19 @@ namespace UAlbion.Formats.Exporters.Tiled
             return result;
         }
 
-        IEnumerable<int> ParseCsv(string csv)
+        static IEnumerable<int> ParseCsv(string csv)
         {
+            if (string.IsNullOrEmpty(csv))
+                yield break;
+
             int n = 0;
             foreach (var c in csv)
             {
                 switch (c)
                 {
-                    case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
+                    case '0': case '1': case '2': case '3':
+                    case '4': case '5': case '6': case '7':
+                    case '8': case '9':
                         n *= 10;
                         n += c - '0';
                         break;
@@ -341,4 +345,3 @@ namespace UAlbion.Formats.Exporters.Tiled
     }
 }
 #pragma warning restore CA2227 // Collection properties should be read only
-#pragma warning restore CA1034 // Nested types should not be visible

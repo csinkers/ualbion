@@ -16,6 +16,7 @@ namespace UAlbion.Config
         public IDictionary<string, string> PostProcessors { get; } = new Dictionary<string, string>();
         public IDictionary<string, LanguageConfig> Languages { get; } = new Dictionary<string, LanguageConfig>();
         public IDictionary<string, AssetFileInfo> Files { get; } = new Dictionary<string, AssetFileInfo>();
+
         Dictionary<AssetId, AssetInfo[]> _assetLookup;
 
         public static AssetConfig Parse(string configText)

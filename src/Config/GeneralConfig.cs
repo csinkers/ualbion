@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using UAlbion.Api;
@@ -9,6 +10,7 @@ namespace UAlbion.Config
 {
     public class GeneralConfig : IGeneralConfig
     {
+        const string ConfigSubdir = "ualbion";
         static readonly Regex Pattern = new Regex(@"(\$\([A-Z]+\))");
         [JsonIgnore] public string BasePath { get; set; }
         public IDictionary<string, string> Paths { get; } = new Dictionary<string, string>();
@@ -21,6 +23,9 @@ namespace UAlbion.Config
                 : new GeneralConfig();
 
             config.BasePath = baseDir;
+            config.Paths["CONFIG"] = Path.Combine(GetConfigBaseDir(), ConfigSubdir);
+            config.Paths["CACHE"] = Path.Combine(GetCacheBaseDir(), ConfigSubdir);
+
             return config;
         }
 
@@ -50,6 +55,60 @@ namespace UAlbion.Config
             });
 
             return Path.Combine(BasePath, resolved);
+        }
+
+        static string GetConfigBaseDir()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                var configHome = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
+                if (configHome == null)
+                {
+                    var home = Environment.GetEnvironmentVariable("HOME");
+                    if (home != null)
+                        configHome = Path.Combine(home, ".config");
+                }
+
+                if (configHome == null)
+                    throw new FileNotFoundException("Could not find a suitable location for config storage based on environment variables XDG_CONFIG_HOME / HOME");
+
+                if (!Path.IsPathRooted(configHome))
+                    throw new InvalidOperationException($"Found config path {configHome}, but it is not absolute");
+
+                return configHome;
+            }
+
+            throw new NotSupportedException();
+        }
+
+        static string GetCacheBaseDir()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                var cacheHome = Environment.GetEnvironmentVariable("XDG_CACHE_HOME");
+                if (cacheHome == null)
+                {
+                    var home = Environment.GetEnvironmentVariable("HOME");
+                    if (home != null)
+                        cacheHome = Path.Combine(home, ".config");
+                }
+
+                if (cacheHome == null)
+                    throw new FileNotFoundException("Could not find a suitable location for cache storage based on environment variables XDG_CACHE_HOME / HOME");
+
+                if (!Path.IsPathRooted(cacheHome))
+                    throw new InvalidOperationException($"Found cache path {cacheHome}, but it is not absolute");
+
+                return cacheHome;
+            }
+
+            throw new NotSupportedException();
         }
     }
 }

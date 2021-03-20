@@ -125,7 +125,7 @@ namespace UAlbion.Core.Veldrid.Visual
             cl.UpdateBuffer(_vb, 0, Vertices);
             cl.UpdateBuffer(_ib, 0, Indices);
 
-            var shaderCache = Resolve<IShaderCache>();
+            var shaderCache = Resolve<IVeldridShaderCache>();
             _shaders = shaderCache.GetShaderPair(gd.ResourceFactory,
                 VertexShaderName,
                 FragmentShaderName,

@@ -24,6 +24,8 @@ namespace UAlbion.Game.Tests
             = new ReadOnlyDictionary<string, LanguageConfig>(
                 new Dictionary<string, LanguageConfig>());
 
+        public IEnumerable<string> ShaderPaths => Array.Empty<string>();
+
         public MockModApplier Add(AssetId id, object asset)
         {
             _assets[id] = asset;

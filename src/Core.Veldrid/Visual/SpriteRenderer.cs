@@ -58,7 +58,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
         Pipeline BuildPipeline(GraphicsDevice gd, SceneContext sc, SpriteShaderKey key)
         {
-            var shaderCache = Resolve<IShaderCache>();
+            var shaderCache = Resolve<IVeldridShaderCache>();
             var shaderName = key.UseCylindricalShader ? "CylindricalSprite" : "Sprite"; 
             var vertexShaderName = shaderName + "SV.vert";
             var fragmentShaderName = shaderName + "SF.frag";

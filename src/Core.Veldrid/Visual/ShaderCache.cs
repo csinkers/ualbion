@@ -7,12 +7,13 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using UAlbion.Api;
+using UAlbion.Core.Visual;
 using Veldrid;
 using Veldrid.SPIRV;
 
 namespace UAlbion.Core.Veldrid.Visual
 {
-    public sealed class ShaderCache : ServiceComponent<IShaderCache>, IShaderCache, IDisposable
+    public sealed class ShaderCache : Component, IVeldridShaderCache, IDisposable
     {
         readonly object _syncRoot = new object();
         readonly IDictionary<string, CacheEntry> _cache = new Dictionary<string, CacheEntry>();
@@ -38,15 +39,22 @@ namespace UAlbion.Core.Veldrid.Visual
             public ShaderDescription FragmentShader { get; }
         }
 
-        public ShaderCache(string shaderCachePath)
-        {
-            _shaderCachePath = shaderCachePath;
-        }
+        public ShaderCache(string shaderCachePath) => _shaderCachePath = shaderCachePath;
+
         protected override void Subscribed()
         {
+            Exchange.Register(typeof(IVeldridShaderCache), this, false);
+            Exchange.Register(typeof(IShaderCache), this, false);
+
             _disk = Resolve<IFileSystem>();
             if (!_disk.DirectoryExists(_shaderCachePath))
                 _disk.CreateDirectory(_shaderCachePath);
+        }
+
+        protected override void Unsubscribed()
+        {
+            Exchange.Unregister(typeof(IShaderCache), this);
+            Exchange.Unregister(typeof(IVeldridShaderCache), this);
         }
 
         public IShaderCache AddShaderPath(string path)
@@ -154,11 +162,10 @@ namespace UAlbion.Core.Veldrid.Visual
         };
 
         CacheEntry BuildShaderPair(
-            GraphicsBackend backendType,
+            GraphicsBackend backend,
             string vertexName, string fragmentName,
             string vertexContent, string fragmentContent)
         {
-            GraphicsBackend backend = backendType;
             string entryPoint = (backend == GraphicsBackend.Metal) ? "main0" : "main";
 
             var (vertexPath, vertexSpirv) = LoadSpirvByteCode(vertexName, vertexContent, ShaderStages.Vertex);
@@ -170,7 +177,7 @@ namespace UAlbion.Core.Veldrid.Visual
             if (backend == GraphicsBackend.Vulkan)
                 return new CacheEntry(vertexPath, fragmentPath, vertexShaderDescription, fragmentShaderDescription);
 
-            CrossCompileTarget target = GetCompilationTarget(backendType);
+            CrossCompileTarget target = GetCompilationTarget(backend);
             var options = new CrossCompileOptions();
             using (PerfTracker.InfrequentEvent($"cross compiling {vertexName} to {target}"))
             {

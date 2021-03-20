@@ -14,5 +14,6 @@ namespace UAlbion.Game.Assets
         object LoadAssetCached(AssetId assetId);
         SavedGame LoadSavedGame(string path);
         IReadOnlyDictionary<string, LanguageConfig> Languages { get; }
+        IEnumerable<string> ShaderPaths { get; }
     }
 }

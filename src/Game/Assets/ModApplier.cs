@@ -61,7 +61,13 @@ namespace UAlbion.Game.Assets
                 LoadMod(config.ResolvePath("$(MODS)"), mod, disk);
 
             _modsInReverseDependencyOrder.Reverse();
+
         }
+
+        public IEnumerable<string> ShaderPaths =>
+            _modsInReverseDependencyOrder
+                .Select(mod => mod.ShaderPath)
+                .Where(x => x != null);
 
         void LoadMod(string dataDir, string modName, IFileSystem disk)
         {

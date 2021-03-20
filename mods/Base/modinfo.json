@@ -4,5 +4,6 @@
     "description": "Asset description information for the original Albion data files",
     "author": "Cam Sinclair et al",
     "version": "0.1.0",
+    "shader_path": "Shaders",
     "dependencies": []
 }

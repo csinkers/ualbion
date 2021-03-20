@@ -17,7 +17,7 @@ layout(set = 0, binding = 1) uniform _Uniform {
 };
 
 // Shared set
-#include "../../../Core/Visual/Shaders/CommonResources.glsl"
+#include "CommonResources.glsl"
 
 // Inputs from vertex shader
 layout(location = 0) in vec2 iTilePosition;

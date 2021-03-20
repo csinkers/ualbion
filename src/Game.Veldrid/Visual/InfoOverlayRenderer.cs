@@ -44,7 +44,7 @@ namespace UAlbion.Game.Veldrid.Visual
         public RenderPasses RenderPasses => RenderPasses.Standard;
         Pipeline BuildPipeline(GraphicsDevice gd, SceneContext sc)
         {
-            var shaderCache = Resolve<IShaderCache>();
+            var shaderCache = Resolve<IVeldridShaderCache>();
             var shaderName = "InfoOverlay"; 
             var vertexShaderName = shaderName + "SV.vert";
             var fragmentShaderName = shaderName + "SF.frag";

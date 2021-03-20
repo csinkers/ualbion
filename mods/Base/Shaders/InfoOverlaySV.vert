@@ -13,7 +13,7 @@ layout(binding = 1) uniform _Uniform {
 };
 
 // Shared set
-#include "../../../Core/Visual/Shaders/CommonResources.glsl"
+#include "CommonResources.glsl"
 
 // Vertex Data
 layout(location = 0) in vec2 vPosition;

@@ -191,7 +191,7 @@ namespace DumpSave
             var stream = disk.OpenRead(filename);
             using var br = new BinaryReader(stream, Encoding.GetEncoding(850));
             var generalConfig = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir, disk);
-            var settings = GeneralSettings.Load(generalConfig.ResolvePath("$(DATA)/settings.json"), disk);
+            var settings = GeneralSettings.Load(generalConfig, disk);
             var settingsManager = new SettingsManager(settings);
             var assets = new AssetManager();
             var loaderRegistry = new AssetLoaderRegistry();

@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerdesNet.Tests", "deps\SerdesNet\test\SerdesNet.Tests\SerdesNet.Tests.csproj", "{3C02E45C-ABD8-4B3A-B49E-70E3C3D70936}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{EC61DB68-353D-4825-B221-FADABA7ADFF3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Api.Tests", "src\Tests\UAlbion.Api.Tests\UAlbion.Api.Tests.csproj", "{480BEB1D-4045-411D-9AA1-3C20D29C5347}"
@@ -157,18 +155,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3C02E45C-ABD8-4B3A-B49E-70E3C3D70936}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3C02E45C-ABD8-4B3A-B49E-70E3C3D70936}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3C02E45C-ABD8-4B3A-B49E-70E3C3D70936}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{3C02E45C-ABD8-4B3A-B49E-70E3C3D70936}.Debug|x64.Build.0 = Debug|Any CPU
-		{3C02E45C-ABD8-4B3A-B49E-70E3C3D70936}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3C02E45C-ABD8-4B3A-B49E-70E3C3D70936}.Debug|x86.Build.0 = Debug|Any CPU
-		{3C02E45C-ABD8-4B3A-B49E-70E3C3D70936}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3C02E45C-ABD8-4B3A-B49E-70E3C3D70936}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3C02E45C-ABD8-4B3A-B49E-70E3C3D70936}.Release|x64.ActiveCfg = Release|Any CPU
-		{3C02E45C-ABD8-4B3A-B49E-70E3C3D70936}.Release|x64.Build.0 = Release|Any CPU
-		{3C02E45C-ABD8-4B3A-B49E-70E3C3D70936}.Release|x86.ActiveCfg = Release|Any CPU
-		{3C02E45C-ABD8-4B3A-B49E-70E3C3D70936}.Release|x86.Build.0 = Release|Any CPU
 		{480BEB1D-4045-411D-9AA1-3C20D29C5347}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{480BEB1D-4045-411D-9AA1-3C20D29C5347}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{480BEB1D-4045-411D-9AA1-3C20D29C5347}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -438,7 +424,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{3C02E45C-ABD8-4B3A-B49E-70E3C3D70936} = {EC61DB68-353D-4825-B221-FADABA7ADFF3}
 		{480BEB1D-4045-411D-9AA1-3C20D29C5347} = {EC61DB68-353D-4825-B221-FADABA7ADFF3}
 		{04CF6C1C-F6CD-441E-B70E-DACA79D95AC6} = {EC61DB68-353D-4825-B221-FADABA7ADFF3}
 		{2C41FA26-ABB3-41CA-B4E9-4BF41D0742BC} = {EC61DB68-353D-4825-B221-FADABA7ADFF3}

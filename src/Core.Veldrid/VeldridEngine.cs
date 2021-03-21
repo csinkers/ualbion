@@ -8,7 +8,6 @@ using UAlbion.Api;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Veldrid.Events;
-using UAlbion.Core.Veldrid.Visual;
 using UAlbion.Core.Visual;
 using Veldrid;
 using Veldrid.Sdl2;
@@ -20,9 +19,6 @@ namespace UAlbion.Core.Veldrid
 {
     public sealed class VeldridEngine : Engine, IDisposable
     {
-        const int DefaultWidth = 720;
-        const int DefaultHeight = 480;
-
         static RenderDoc _renderDoc;
         Sdl2Window _window;
 
@@ -32,6 +28,10 @@ namespace UAlbion.Core.Veldrid
         readonly IDictionary<Type, IRenderer> _renderers = new Dictionary<Type, IRenderer>();
         readonly IDictionary<IRenderer, List<IRenderable>> _renderables = new Dictionary<IRenderer, List<IRenderable>>();
         readonly bool _startupOnly;
+        readonly int _defaultWidth = 720;
+        readonly int _defaultHeight = 480;
+        readonly int _defaultX = 648;
+        readonly int _defaultY = 431;
 
         SceneContext _sceneContext;
         CommandList _frameCommands;
@@ -48,20 +48,20 @@ namespace UAlbion.Core.Veldrid
         internal GraphicsDevice GraphicsDevice { get; private set; }
         internal static RenderDoc RenderDoc => _renderDoc;
 
+        public string WindowTitle { get; set; }
+
         public override ICoreFactory Factory { get; } = new VeldridCoreFactory();
 
         public override string FrameTimeText =>
             $"{_frameTimeAverager.CurrentAverageFramesPerSecond:000.0 fps} / {_frameTimeAverager.CurrentAverageFrameTimeMilliseconds:#00.00 ms}";
 
-        public VeldridEngine(GraphicsBackend backend, bool useRenderDoc, bool startupOnly)
+        public VeldridEngine(GraphicsBackend backend, bool useRenderDoc, bool startupOnly, Rectangle? windowRect = null)
         {
             On<LoadRenderDocEvent>(e =>
             {
-                if (_renderDoc == null && RenderDoc.Load(out _renderDoc))
-                {
-                    _newBackend = GraphicsDevice.BackendType;
-                    _recreateWindow = true;
-                }
+                if (_renderDoc != null || !RenderDoc.Load(out _renderDoc)) return;
+                _newBackend = GraphicsDevice.BackendType;
+                _recreateWindow = true;
             });
             On<GarbageCollectionEvent>(e => GC.Collect());
             On<QuitEvent>(e => _done = true);
@@ -95,6 +95,15 @@ namespace UAlbion.Core.Veldrid
             _windowManager = AttachChild(new WindowManager());
             _newBackend = backend;
             _startupOnly = startupOnly;
+
+            if (windowRect.HasValue)
+            {
+                _defaultX = windowRect.Value.X;
+                _defaultY = windowRect.Value.Y;
+                _defaultWidth = windowRect.Value.Width;
+                _defaultHeight = windowRect.Value.Height;
+            }
+
             if (useRenderDoc)
                 using(PerfTracker.InfrequentEvent("Loading renderdoc"))
                     RenderDoc.Load(out _renderDoc);
@@ -156,11 +165,15 @@ namespace UAlbion.Core.Veldrid
             CreateAllObjects();
             PerfTracker.StartupEvent("Set up backend");
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
-            ImGui.StyleColorsClassic();
 
-            // Turn on ImGui docking if it's supported
-            if (Enum.TryParse(typeof(ImGuiConfigFlags), "DockingEnable", out var dockingFlag))
-                ImGui.GetIO().ConfigFlags |= (ImGuiConfigFlags)dockingFlag;
+            if (ImGui.GetCurrentContext() != IntPtr.Zero)
+            {
+                ImGui.StyleColorsClassic();
+
+                // Turn on ImGui docking if it's supported
+                if (Enum.TryParse(typeof(ImGuiConfigFlags), "DockingEnable", out var dockingFlag))
+                    ImGui.GetIO().ConfigFlags |= (ImGuiConfigFlags) dockingFlag;
+            }
 
             Raise(new WindowResizedEvent(_window.Width, _window.Height));
             Raise(BeginFrameEvent.Instance);
@@ -346,10 +359,10 @@ namespace UAlbion.Core.Veldrid
 
                     WindowCreateInfo windowInfo = new WindowCreateInfo
                     {
-                        X = _window?.X ?? 648,
-                        Y = _window?.Y ?? 431,
-                        WindowWidth = _window?.Width ?? DefaultWidth,
-                        WindowHeight = _window?.Height ?? DefaultHeight,
+                        X = _window?.X ?? _defaultX,
+                        Y = _window?.Y ?? _defaultY,
+                        WindowWidth = _window?.Width ?? _defaultWidth,
+                        WindowHeight = _window?.Height ?? _defaultHeight,
                         WindowInitialState = _window?.WindowState ?? WindowState.Normal,
                         WindowTitle = "UAlbion"
                     };
@@ -392,7 +405,7 @@ namespace UAlbion.Core.Veldrid
             if (DateTime.UtcNow - _lastTitleUpdateTime <= TimeSpan.FromSeconds(1)) 
                 return;
 
-            _window.Title = $"{GraphicsDevice.BackendType} ({FrameTimeText})";
+            _window.Title = $"{WindowTitle} - {GraphicsDevice.BackendType} ({FrameTimeText})";
             _lastTitleUpdateTime = DateTime.UtcNow;
         }
 

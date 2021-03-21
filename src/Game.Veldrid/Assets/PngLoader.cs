@@ -53,7 +53,7 @@ namespace UAlbion.Game.Veldrid.Assets
                 var from = new ReadOnlyUIntImageBuffer(image.Width, image.Height, image.Width, uintSpan);
                 var byteSpan = pixels.AsSpan(currentY * totalWidth, totalWidth * (image.Height - 1) + image.Width);
                 var to = new ByteImageBuffer(image.Width, image.Height, totalWidth, byteSpan);
-                CoreUtil.Blit32To8(from, to, palette, quantizeCache);
+                BlitUtil.Blit32To8(from, to, palette, quantizeCache);
 
                 currentY += image.Height;
             }

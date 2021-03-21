@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core;
@@ -19,6 +20,7 @@ namespace UAlbion.Game.Entities
 
         public CameraMotion2D(OrthographicCamera camera)
         {
+            if (camera == null) throw new ArgumentNullException(nameof(camera));
             On<EngineUpdateEvent>(Update);
             On<BeginFrameEvent>(e => _velocity = Vector2.Zero);
             On<CameraLockEvent>(e => _locked = true);

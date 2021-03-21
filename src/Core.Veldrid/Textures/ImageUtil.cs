@@ -16,7 +16,7 @@ namespace UAlbion.Core.Veldrid.Textures
 
             Span<uint> toBuffer = MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan);
             var to = new UIntImageBuffer(from.Width, from.Height, from.Width, toBuffer);
-            CoreUtil.Blit8To32(from, to, palette, 255, 0);
+            BlitUtil.Blit8To32(from, to, palette, 255, 0);
 
             return image;
         }
@@ -35,7 +35,7 @@ namespace UAlbion.Core.Veldrid.Textures
                 var (toX, toY) = layout.Positions[i];
                 var target = pixels.Slice(toX + toY * layout.Width);
                 var to = new UIntImageBuffer(frame.Width, frame.Height, layout.Width, target);
-                CoreUtil.Blit8To32(frame, to, palette, 255, 0);
+                BlitUtil.Blit8To32(frame, to, palette, 255, 0);
             }
 
             return image;
@@ -52,7 +52,7 @@ namespace UAlbion.Core.Veldrid.Textures
             if (dest.Width < source.Width) throw new ArgumentOutOfRangeException(nameof(dest), "Tried to unpack to a smaller destination");
             if (dest.Height < source.Height) throw new ArgumentOutOfRangeException(nameof(dest), "Tried to unpack to a smaller destination");
 
-            CoreUtil.Blit32To8(source, dest, palette);
+            BlitUtil.Blit32To8(source, dest, palette);
 
             int x = 0; int y = 0;
             do

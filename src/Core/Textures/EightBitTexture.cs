@@ -55,7 +55,7 @@ namespace UAlbion.Core.Textures
             if (subImageId == null)
             {
                 var buffer = new ReadOnlyByteImageBuffer(Width, Height, Width, PixelData);
-                return CoreUtil.DistinctColors(buffer);
+                return BlitUtil.DistinctColors(buffer);
             }
             else
             {
@@ -64,7 +64,7 @@ namespace UAlbion.Core.Textures
                     offset,
                     width + (height - 1) * stride);
                 var buffer = new ReadOnlyByteImageBuffer(width, height, stride, slice);
-                return CoreUtil.DistinctColors(buffer);
+                return BlitUtil.DistinctColors(buffer);
             }
         }
 

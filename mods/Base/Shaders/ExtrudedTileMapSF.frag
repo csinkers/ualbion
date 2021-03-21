@@ -75,6 +75,13 @@ void main()
 	if ((uEngineFlags & EF_RENDER_DEPTH) != 0)
 		color = DEPTH_COLOR(depth);
 
+	if ((uEngineFlags & EF_SHOW_BOUNDING_BOXES) != 0)
+	{
+		color = mix(color, vec4(1.0f),
+				max(smoothstep(0.47, 0.5, abs(iTexCoords.x-0.5f)),
+					smoothstep(0.47, 0.5, abs(iTexCoords.y-0.5f))));
+	}
+
 	OutputColor = color;
 
 	gl_FragDepth = ((uEngineFlags & EF_FLIP_DEPTH_RANGE) != 0) ? 1.0f - depth : depth;

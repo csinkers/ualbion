@@ -58,7 +58,7 @@ namespace UAlbion.Game.Entities.Map3D
                 return;
             }
 
-            TileSize = new Vector3(_labyrinthData.EffectiveWallWidth, _labyrinthData.WallHeight, _labyrinthData.EffectiveWallWidth);
+            TileSize = _labyrinthData.TileSize;
             _selection = AttachChild(new Selection3D());
             AttachChild(new MapRenderable3D(MapId, _mapData, _labyrinthData, TileSize));
             AttachChild(new ScriptManager());

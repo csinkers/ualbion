@@ -5,6 +5,7 @@
         Game,
         DumpData,
         ConvertAssets,
+        BakeIsometric,
         Exit,
     }
 }

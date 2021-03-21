@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using SerdesNet;
 using System.Linq;
+using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Config;
 
@@ -9,6 +10,10 @@ namespace UAlbion.Formats.Assets.Labyrinth
 {
     public class LabyrinthData
     {
+        public const int MaxWalls = 155;
+        public const int MaxObjectGroups = 100;
+
+        public LabyrinthId Id { get; private set; }
         public ushort WallHeight { get; set; }
         public ushort CameraHeight { get; set; } // EffectiveHeight = (CameraHeight << 16) + 165??
         public ushort Unk4 { get; set; }
@@ -35,11 +40,13 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public IList<LabyrinthObject> Objects { get; } = new List<LabyrinthObject>();
         public IList<FloorAndCeiling> FloorAndCeilings { get; } = new List<FloorAndCeiling>();
         public IList<Wall> Walls { get; } = new List<Wall>();
+        public Vector3 TileSize => new Vector3(EffectiveWallWidth, WallHeight, EffectiveWallWidth);
 
-        public static LabyrinthData Serdes(int _, LabyrinthData d, AssetMapping mapping, ISerializer s)
+        public static LabyrinthData Serdes(LabyrinthData d, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
+            if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));
-            d ??= new LabyrinthData();
+            d ??= new LabyrinthData { Id = info.AssetId };
             PerfTracker.StartupEvent("Start loading labyrinth data");
             // s.ByteArray("UnknownBlock6C", () => sheet.UnknownBlock6C, x => sheet.UnknownBlock6C = x, 14);
 

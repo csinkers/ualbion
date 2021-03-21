@@ -10,7 +10,7 @@ namespace UAlbion.Formats.Parsers
         public LabyrinthData Serdes(LabyrinthData existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
-            return LabyrinthData.Serdes(info.AssetId.ToInt32(), existing, mapping, s);
+            return LabyrinthData.Serdes(existing, info, mapping, s);
         }
 
         public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)

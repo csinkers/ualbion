@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using UAlbion.Api;
@@ -34,6 +35,19 @@ namespace UAlbion.Core.Veldrid.Visual
 
         const string VertexShaderName = "ExtrudedTileMapSV.vert";
         const string FragmentShaderName = "ExtrudedTileMapSF.frag";
+
+        static Vertex3DTextured[] RotatedVertices(float yaw, float pitch) 
+        {
+            var m =
+                Matrix4x4.CreateRotationY(yaw) *
+                Matrix4x4.CreateRotationX(pitch);
+
+            return Vertices
+                .Select(v => new Vertex3DTextured(
+                    Vector3.Transform(v.Position, m),
+                    v.TextureCoordinates))
+                .ToArray();
+        }
 
         static readonly Vertex3DTextured[] Vertices =
         {
@@ -89,6 +103,7 @@ namespace UAlbion.Core.Veldrid.Visual
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
         readonly IList<DeviceBuffer> _instanceBuffers = new List<DeviceBuffer>();
         readonly IList<ResourceSet> _resourceSets = new List<ResourceSet>();
+        readonly Vector2? _isometric;
         DeviceBuffer _vb;
         DeviceBuffer _ib;
         DeviceBuffer _miscUniformBuffer;
@@ -96,6 +111,8 @@ namespace UAlbion.Core.Veldrid.Visual
         ResourceLayout _layout;
         Sampler _textureSampler;
         Shader[] _shaders;
+
+        public ExtrudedTileMapRenderer(Vector2? isometric = null) => _isometric = isometric;
 
         // ReSharper disable NotAccessedField.Local
         struct MiscUniformData
@@ -122,7 +139,7 @@ namespace UAlbion.Core.Veldrid.Visual
             _vb.Name = "TileMapVertexBuffer";
             _ib.Name = "TileMapIndexBuffer";
             _miscUniformBuffer.Name = "TileMapMiscBuffer";
-            cl.UpdateBuffer(_vb, 0, Vertices);
+            cl.UpdateBuffer(_vb, 0, _isometric.HasValue ? RotatedVertices(_isometric.Value.X, _isometric.Value.Y) : Vertices);
             cl.UpdateBuffer(_ib, 0, Indices);
 
             var shaderCache = Resolve<IVeldridShaderCache>();
@@ -148,7 +165,7 @@ namespace UAlbion.Core.Veldrid.Visual
                     : DepthStencilStateDescription.DepthOnlyGreaterEqual;
 
             var rasterizerMode = new RasterizerStateDescription(
-                FaceCullMode.Front, PolygonFillMode.Solid, FrontFace.Clockwise,
+                _isometric.HasValue ? FaceCullMode.None : FaceCullMode.Back, PolygonFillMode.Solid, FrontFace.CounterClockwise,
                 true, true);
 
             var pd = new GraphicsPipelineDescription(

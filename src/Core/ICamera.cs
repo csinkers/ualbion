@@ -9,6 +9,8 @@ namespace UAlbion.Core
         Matrix4x4 ProjectionMatrix { get; }
         Vector3 Position { get; }
         Vector3 LookDirection { get; }
+        float Yaw { get; }
+        float Pitch { get; }
         float NearDistance { get; }
         float FarDistance { get; }
         float FieldOfView { get; }

@@ -23,6 +23,9 @@ namespace UAlbion.Core.Visual
         }
 
         public Vertex3DTextured(float x, float y, float z, float u, float v) { X = x; Y = y; Z = z; U = u; V = v; }
+        public Vector3 Position => new Vector3(X, Y, Z);
+        public Vector2 TextureCoordinates => new Vector2(U, V);
+
         public override bool Equals(object obj) => obj is Vertex3DTextured other && Equals(other);
         public bool Equals(Vertex3DTextured other) => X == other.X && Y == other.Y && Z == other.Z && U == other.U && V == other.V;
         public override int GetHashCode() => HashCode.Combine(X, Y, Z, U, V);

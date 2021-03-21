@@ -9,6 +9,7 @@
         Automap,
         Inventory,
         Combat,
-        Editor
+        Editor,
+        IsometricBake
     }
 }

@@ -37,7 +37,7 @@ namespace UAlbion.Core.Visual
         public void DefineWall(int id, ITexture texture, int x, int y, byte transparentColour, bool isAlphaTested) 
             => Walls.AddTexture(id, texture, x, y, transparentColour, isAlphaTested);
 
-        public void Set(int index, int x, int y, byte floorSubImage, byte ceilingSubImage, byte wallSubImage, int frame)
+        public void Set(int index, float x, float y, byte floorSubImage, byte ceilingSubImage, byte wallSubImage, int frame)
         {
             bool isAnimated = Floors.IsAnimated(floorSubImage) || Floors.IsAnimated(ceilingSubImage) || Walls.IsAnimated(wallSubImage);
             if (isAnimated) AnimatedTiles.Add(index);

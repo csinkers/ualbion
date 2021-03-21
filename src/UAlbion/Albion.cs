@@ -56,7 +56,7 @@ namespace UAlbion
 
             PerfTracker.StartupEvent("Running game");
             global.Raise(new SetSceneEvent(SceneId.Empty), null);
-            switch(commandLine.GameMode)
+            switch (commandLine.GameMode)
             {
                 case GameMode.MainMenu:
                     global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
@@ -65,10 +65,12 @@ namespace UAlbion
                     global.Raise(new NewGameEvent(Base.Map.TorontoBegin, 30, 75), null);
                     break;
                 case GameMode.LoadGame:
-                    global.Raise(new LoadGameEvent(ushort.Parse(commandLine.GameModeArgument, CultureInfo.InvariantCulture)), null);
+                    var saveSlot = ushort.Parse(commandLine.GameModeArgument, CultureInfo.InvariantCulture);
+                    global.Raise(new LoadGameEvent(saveSlot), null);
                     break;
                 case GameMode.LoadMap:
-                    global.Raise(new NewGameEvent((Base.Map)int.Parse(commandLine.GameModeArgument, CultureInfo.InvariantCulture), 40, 40), null); 
+                    var map = (Base.Map)int.Parse(commandLine.GameModeArgument, CultureInfo.InvariantCulture);
+                    global.Raise(new NewGameEvent(map, 40, 40), null);
                     break;
                 case GameMode.Inventory:
                     global.Raise(new SetSceneEvent(SceneId.Inventory), null);
@@ -79,7 +81,7 @@ namespace UAlbion
 
             if (commandLine.Commands != null)
             {
-                foreach(var command in commandLine.Commands)
+                foreach (var command in commandLine.Commands)
                     global.Raise(Event.Parse(command), null);
             }
 

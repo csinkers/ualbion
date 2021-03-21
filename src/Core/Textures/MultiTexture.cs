@@ -117,7 +117,7 @@ namespace UAlbion.Core.Textures
 
         public int GetSubImageAtTime(int logicalId, int tick)
         {
-            if(IsMetadataDirty)
+            if (IsMetadataDirty)
                 RebuildLayers();
 
             if (logicalId >= LogicalSubImages.Count)
@@ -272,7 +272,7 @@ namespace UAlbion.Core.Textures
 
                 var from = new ReadOnlyByteImageBuffer(sourceWidth, sourceHeight, sourceStride, fromSlice);
                 var to = new UIntImageBuffer(destWidth, destHeight, Width, toSlice);
-                CoreUtil.Blit8To32(from, to, palette[PaletteManager.Frame], component.Alpha, lsi.TransparentColor);
+                BlitUtil.Blit8To32(from, to, palette[PaletteManager.Frame], component.Alpha, lsi.TransparentColor);
             }
         }
 

@@ -7,31 +7,35 @@ namespace UAlbion.Core.Visual
 {
     public class OrthographicCamera : ServiceComponent<ICamera>, ICamera
     {
-        Vector3 _position = new Vector3(0, 0, 1);
+        Vector3 _position = new Vector3(0, 0, 0);
+        Vector3 _lookDirection = new Vector3(0, 0, -1f);
         Vector2 _windowSize = Vector2.One;
-        Matrix4x4 _viewMatrix;
         Matrix4x4 _projectionMatrix;
-        float _magnification = 2.0f; // TODO: Ensure this defaults to something sensible, and at some point lock it to a value that fits the gameplay and map design.
+        float _magnification = 1.0f; // TODO: Ensure this defaults to something sensible, and at some point lock it to a value that fits the gameplay and map design.
+        float _yaw;
+        float _pitch;
+        float _farDistance = 1;
 
-        public Matrix4x4 ViewMatrix => _viewMatrix;
+        public Matrix4x4 ViewMatrix { get; private set; }
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;
         public Vector3 Position { get => _position; set { _position = value; UpdateViewMatrix(); } }
-        public float Magnification { get => _magnification; set { _magnification = value; UpdatePerspectiveMatrix(); } }
-        public Vector3 LookDirection { get; } = new Vector3(0, 0, -1f);
-        public float FarDistance => 100f;
+        public float Magnification { get => _magnification; private set { _magnification = value; UpdatePerspectiveMatrix(); } }
+        public Vector3 LookDirection => _lookDirection;
         public float FieldOfView => 1f;
-        public float NearDistance => 0.1f;
 
+        public float NearDistance => 0;
+        public float FarDistance { get => _farDistance; private set { _farDistance = value; UpdatePerspectiveMatrix(); } } 
+        public float Yaw { get => _yaw; private set { _yaw = value; UpdateViewMatrix(); } } // Radians
+        public float Pitch { get => _pitch; private set { _pitch = Math.Clamp(value, (float)-Math.PI / 2, (float)Math.PI / 2); UpdateViewMatrix(); } } // Radians
         public float AspectRatio => _windowSize.X / _windowSize.Y;
 
         public OrthographicCamera()
         {
             OnAsync<ScreenCoordinateSelectEvent, Selection>(TransformSelect);
-            On<SetCameraMagnificationEvent>(e =>
-            {
-                _magnification = e.Magnification;
-                UpdatePerspectiveMatrix();
-            });
+            On<CameraPositionEvent>(e => Position = new Vector3(e.X, e.Y, e.Z));
+            On<CameraPlanesEvent>(e => FarDistance = e.Far);
+            On<CameraDirectionEvent>(e => { Yaw = ApiUtil.DegToRad(e.Yaw); Pitch = ApiUtil.DegToRad(e.Pitch); });
+            On<CameraMagnificationEvent>(e => { Magnification = e.Magnification; });
 
             On<MagnifyEvent>(e =>
             {
@@ -43,7 +47,7 @@ namespace UAlbion.Core.Visual
                 if (_magnification < 0.5f)
                     _magnification = 0.5f;
                 UpdatePerspectiveMatrix();
-                Raise(new SetCameraMagnificationEvent(_magnification));
+                Raise(new CameraMagnificationEvent(_magnification));
             });
 
             On<RenderEvent>(e =>
@@ -74,33 +78,34 @@ namespace UAlbion.Core.Visual
             _projectionMatrix = Matrix4x4.Identity;
             _projectionMatrix.M11 = (2.0f * _magnification) / _windowSize.X;
             _projectionMatrix.M22 = (-2.0f * _magnification) / _windowSize.Y;
+            _projectionMatrix.M33 = 1 / FarDistance;
         }
 
         void UpdateViewMatrix()
         {
-            _viewMatrix = Matrix4x4.Identity;
-            _viewMatrix.M41 = -_position.X;
-            _viewMatrix.M42 = -_position.Y;
+            Quaternion lookRotation = Quaternion.CreateFromYawPitchRoll(Yaw, Pitch, 0f);
+            _lookDirection = Vector3.Transform(-Vector3.UnitZ, lookRotation);
+            ViewMatrix = Matrix4x4.CreateTranslation(-_position) * Matrix4x4.CreateFromQuaternion(lookRotation);
+            // Matrix4x4.CreateLookAt(_position, _position + _lookDirection, Vector3.UnitY);
         }
 
         public CameraInfo GetCameraInfo()
         {
-            var clock = Resolve<IClock>();
-            var settings = Resolve<IEngineSettings>();
+            var clock = TryResolve<IClock>();
+            var settings = TryResolve<IEngineSettings>();
 
             return new CameraInfo
             {
                 WorldSpacePosition = _position,
                 Resolution = _windowSize,
-                Time = clock.ElapsedTime,
-                Special1 = settings.Special1,
-                Special2 = settings.Special2,
-                EngineFlags = (uint)settings.Flags
+                Time = clock?.ElapsedTime ?? 0,
+                Special1 = settings?.Special1 ?? 0,
+                Special2 = settings?.Special2 ?? 0,
+                EngineFlags = (uint?)settings?.Flags ?? 0
             };
         }
 
-        public Vector3 ProjectWorldToNorm(Vector3 worldPosition) 
-            => Vector3.Transform(worldPosition, ViewMatrix * ProjectionMatrix) - Vector3.UnitZ;
+        public Vector3 ProjectWorldToNorm(Vector3 worldPosition) => Vector3.Transform(worldPosition, ViewMatrix * ProjectionMatrix) - Vector3.UnitZ;
         public Vector3 UnprojectNormToWorld(Vector3 normPosition)
         {
             var totalMatrix = ViewMatrix * ProjectionMatrix;

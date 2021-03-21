@@ -23,8 +23,8 @@ namespace UAlbion.Core.Visual
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;
         public Vector3 LookDirection => _lookDirection;
         public float FieldOfView { get; private set; }
-        public float NearDistance => 10f;
-        public float FarDistance => 512.0f * 256.0f * 2.0f;
+        public float NearDistance { get; private set; } = 10f;
+        public float FarDistance { get; private set; } = 512.0f * 256.0f * 2.0f;
         public bool LegacyPitch { get; }
         public float AspectRatio => _windowSize.X / _windowSize.Y;
         public float Magnification { get; set; } // Ignored.
@@ -35,9 +35,9 @@ namespace UAlbion.Core.Visual
             get => _pitch;
             set
             {
-                _pitch = LegacyPitch ? Math.Clamp(value, -0.48f, 0.48f) : Math.Clamp(value, -1.55f, 1.55f);
-                
-                if(LegacyPitch)        
+                _pitch = LegacyPitch ? Math.Clamp(value, -0.48f, 0.48f) : Math.Clamp(value, (float)-Math.PI / 2, (float)Math.PI / 2);
+
+                if (LegacyPitch)
                     UpdatePerspectiveMatrix();
                 else
                     UpdateViewMatrix();
@@ -47,12 +47,7 @@ namespace UAlbion.Core.Visual
         public Vector3 Position
         {
             get => _position;
-            set
-            {
-                _position = value;
-                UpdateViewMatrix();
-                //Raise(new SetCameraPositionEvent(_position));
-            }
+            set { _position = value; UpdateViewMatrix(); }
         }
 
         public PerspectiveCamera(bool legacyPitch = false)
@@ -61,7 +56,18 @@ namespace UAlbion.Core.Visual
             On<BackendChangedEvent>(UpdateBackend);
             // BUG: This event is not received when the screen is resized while a 2D scene is active.
             On<WindowResizedEvent>(e => WindowResized(e.Width, e.Height));
-            On<SetCameraDirectionEvent>(e => { Yaw = e.Yaw; Pitch = e.Pitch; });
+            On<CameraPositionEvent>(e => Position = new Vector3(e.X, e.Y, e.Z));
+            On<CameraDirectionEvent>(e =>
+            {
+                Yaw = ApiUtil.DegToRad(e.Yaw);
+                Pitch = ApiUtil.DegToRad(e.Pitch);
+            });
+            On<CameraPlanesEvent>(e =>
+            {
+                NearDistance = e.Near; FarDistance = e.Far; 
+                UpdatePerspectiveMatrix();
+            });
+
             On<SetFieldOfViewEvent>(e =>
             {
                 if (e.Degrees == null)
@@ -120,7 +126,7 @@ namespace UAlbion.Core.Visual
         void UpdatePerspectiveMatrix()
         {
             _projectionMatrix = LegacyPitch
-                ? CoreUtil.CreateLegacyPerspective(
+                ? MatrixUtil.CreateLegacyPerspective(
                     _isClipSpaceYInverted,
                     _useReverseDepth,
                     FieldOfView,
@@ -128,7 +134,7 @@ namespace UAlbion.Core.Visual
                     NearDistance,
                     FarDistance,
                     Pitch)
-                : CoreUtil.CreatePerspective(
+                : MatrixUtil.CreatePerspective(
                     _isClipSpaceYInverted,
                     _useReverseDepth,
                     FieldOfView,
@@ -140,15 +146,14 @@ namespace UAlbion.Core.Visual
         void UpdateViewMatrix()
         {
             Quaternion lookRotation = Quaternion.CreateFromYawPitchRoll(Yaw, LegacyPitch ? 0f : Pitch, 0f);
-            Vector3 lookDir = Vector3.Transform(-Vector3.UnitZ, lookRotation);
-            _lookDirection = lookDir;
+            _lookDirection = Vector3.Transform(-Vector3.UnitZ, lookRotation);
             _viewMatrix = Matrix4x4.CreateLookAt(_position, _position + _lookDirection, Vector3.UnitY);
         }
 
         public CameraInfo GetCameraInfo()
         {
-            var clock = Resolve<IClock>();
-            var settings = Resolve<IEngineSettings>();
+            var clock = TryResolve<IClock>();
+            var settings = TryResolve<IEngineSettings>();
 
             return new CameraInfo
             {
@@ -156,10 +161,10 @@ namespace UAlbion.Core.Visual
                 CameraPitch = Pitch,
                 CameraYaw = Yaw,
                 Resolution = _windowSize,
-                Time = clock.ElapsedTime,
-                Special1 = settings.Special1,
-                Special2 = settings.Special2,
-                EngineFlags = (uint)settings.Flags
+                Time = clock?.ElapsedTime ?? 0,
+                Special1 = settings?.Special1 ?? 0,
+                Special2 = settings?.Special2 ?? 0,
+                EngineFlags = (uint?)settings?.Flags ?? 0
             };
         }
 

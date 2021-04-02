@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -20,7 +21,15 @@ namespace UAlbion
         static void Main(string[] args)
         {
             PerfTracker.StartupEvent("Entered main");
-            Task.Run(() => new LogEvent(LogEvent.Level.Verbose, "Preheat Event Metadata").ToString());
+            Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Api.Event)));
+            Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Core.Events.HelpEvent)));
+            Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Core.Veldrid.Events.InputEvent)));
+            Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Editor.EditorSetPropertyEvent)));
+            Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Formats.ScriptEvents.PartyMoveEvent)));
+            Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Game.Events.StartEvent)));
+            Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Game.Veldrid.Debugging.HideDebugWindowEvent)));
+            Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.IsoPosEvent)));
+            PerfTracker.StartupEvent("Built events");
 
             var commandLine = new CommandLineOptions(args);
             if (commandLine.Mode == ExecutionMode.Exit)

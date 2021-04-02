@@ -9,58 +9,43 @@ namespace UAlbion.Api
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1716:Identifiers should not match keywords", Justification = "Don't care about VB")]
     public abstract class Event : IEvent // Contains no fields, only helper methods for reflection-based parsing and serialization.
     {
-        static IEnumerable<Assembly> EventAssemblies => 
-            AppDomain.CurrentDomain.GetAssemblies()
-                .Where(assembly => assembly.FullName.Contains("Albion"));
+        static readonly IDictionary<Type, EventMetadata> Serializers = new Dictionary<Type, EventMetadata>();
+        static readonly IDictionary<string, EventMetadata> Events = new Dictionary<string, EventMetadata>();
 
-        static IEnumerable<Type> TypesFromAssembly(Assembly assembly)
+        static IEnumerable<Type> GetTypesFromAssembly(Assembly assembly)
         {
             Type[] types;
-            try
-            {
-                types = assembly.GetTypes();
-            }
-            catch (ReflectionTypeLoadException e)
-            {
-                types = e.Types;
-            }
-
+            try { types = assembly.GetTypes(); }
+            catch (ReflectionTypeLoadException e) { types = e.Types; }
             return types.Where(x => x != null);
         }
 
-        public static IEnumerable<Type> AllEventTypes =>
-            from assembly in EventAssemblies 
-            from type in TypesFromAssembly(assembly) 
-            where typeof(Event).IsAssignableFrom(type) && !type.IsAbstract 
-            select type;
+        public static IEnumerable<Type> AllEventTypes => Serializers.Keys;
 
-        static IEnumerable<Type> AllSerializableEventTypes
+        public static void AddEventsFromAssembly(Assembly assembly)
         {
-            get
-            {
-                PerfTracker.StartupEvent("Building event types");
-                foreach (var type in AllEventTypes)
-                {
-                    var eventAttribute = (EventAttribute)type.GetCustomAttribute(
-                        typeof(EventAttribute),
-                        false);
+            if (assembly == null) throw new ArgumentNullException(nameof(assembly));
 
-                    if (eventAttribute != null)
-                        yield return type;
+            var types =
+                from type in GetTypesFromAssembly(assembly) 
+                where typeof(Event).IsAssignableFrom(type) && !type.IsAbstract 
+                select type;
+
+            foreach (var type in types)
+            {
+                var eventAttribute = (EventAttribute)type.GetCustomAttribute(typeof(EventAttribute), false);
+                if (eventAttribute != null)
+                {
+                    var metadata = new EventMetadata(type);
+                    Serializers[type] = metadata;
+
+                    Events[metadata.Name.ToUpperInvariant()] = metadata;
+                    if (metadata.Aliases != null)
+                        foreach (var alias in metadata.Aliases)
+                            Events[alias.ToUpperInvariant()] = metadata;
                 }
-                PerfTracker.StartupEvent("Built event types");
             }
         }
-
-        static readonly IDictionary<Type, EventMetadata> Serializers =
-            AllSerializableEventTypes.ToDictionary(x => x, x => new EventMetadata(x));
-
-        static readonly IDictionary<string, EventMetadata> Events =
-            Serializers
-            .SelectMany(x =>
-                new[] { x.Value.Name }.Concat(x.Value.Aliases)
-                .Select(y => new { Name = y, Meta = x.Value }))
-            .ToDictionary(x => x.Name.ToUpperInvariant(), x => x.Meta);
 
         public override string ToString()
         {

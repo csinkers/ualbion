@@ -9,6 +9,7 @@ namespace UAlbion.Api
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1716:Identifiers should not match keywords", Justification = "Don't care about VB")]
     public abstract class Event : IEvent // Contains no fields, only helper methods for reflection-based parsing and serialization.
     {
+        static readonly object SyncRoot = new object();
         static readonly IDictionary<Type, EventMetadata> Serializers = new Dictionary<Type, EventMetadata>();
         static readonly IDictionary<string, EventMetadata> Events = new Dictionary<string, EventMetadata>();
 
@@ -31,18 +32,23 @@ namespace UAlbion.Api
                 where typeof(Event).IsAssignableFrom(type) && !type.IsAbstract 
                 select type;
 
-            foreach (var type in types)
+            lock (SyncRoot)
             {
-                var eventAttribute = (EventAttribute)type.GetCustomAttribute(typeof(EventAttribute), false);
-                if (eventAttribute != null)
+                foreach (var type in types)
                 {
+                    var eventAttribute = (EventAttribute) type.GetCustomAttribute(typeof(EventAttribute), false);
+                    if (eventAttribute == null) 
+                        continue;
+
                     var metadata = new EventMetadata(type);
                     Serializers[type] = metadata;
-
                     Events[metadata.Name.ToUpperInvariant()] = metadata;
-                    if (metadata.Aliases != null)
-                        foreach (var alias in metadata.Aliases)
-                            Events[alias.ToUpperInvariant()] = metadata;
+
+                    if (metadata.Aliases == null) 
+                        continue;
+
+                    foreach (var alias in metadata.Aliases)
+                        Events[alias.ToUpperInvariant()] = metadata;
                 }
             }
         }

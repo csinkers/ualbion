@@ -16,6 +16,7 @@ namespace UAlbion.Base.Tests
     {
         public EventRoundTripTests()
         {
+            Event.AddEventsFromAssembly(typeof(ActionEvent).Assembly);
             AssetMapping.GlobalIsThreadLocal = true;
             var mapping = AssetMapping.Global;
             var disk = new MockFileSystem(true);

@@ -6,6 +6,11 @@ namespace UAlbion.Api.Tests
 {
     public class EventTests
     {
+        public EventTests()
+        {
+            Event.AddEventsFromAssembly(GetType().Assembly);
+        }
+
         [Event("event0", "A basic event")]
         public class Event0 : Event { }
 

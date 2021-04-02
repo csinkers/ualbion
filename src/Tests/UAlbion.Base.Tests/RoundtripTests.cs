@@ -8,6 +8,7 @@ using UAlbion.Core;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Containers;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Tests;
 using UAlbion.TestCommon;
@@ -23,6 +24,7 @@ namespace UAlbion.Base.Tests
 
         public RoundtripTests()
         {
+            Event.AddEventsFromAssembly(typeof(ActionEvent).Assembly);
             AssetMapping.GlobalIsThreadLocal = true;
             _disk = new MockFileSystem(true);
             _baseDir = ConfigUtil.FindBasePath(_disk);

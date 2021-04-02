@@ -8,6 +8,7 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Settings;
 using UAlbion.TestCommon;
@@ -27,6 +28,7 @@ namespace UAlbion.Base.Tests
 
         public AssetConversionTests()
         {
+            Event.AddEventsFromAssembly(typeof(ActionEvent).Assembly);
             AssetMapping.GlobalIsThreadLocal = true;
             // Hide any assets that have already been unpacked on the actual disk to prevent them interfering in the tests
             _disk = new MockFileSystem(x =>

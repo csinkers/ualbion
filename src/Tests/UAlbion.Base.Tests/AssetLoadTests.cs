@@ -44,6 +44,7 @@ namespace UAlbion.Base.Tests
 
         public AssetLoadTests()
         {
+            Event.AddEventsFromAssembly(typeof(ActionEvent).Assembly);
             AssetMapping.GlobalIsThreadLocal = true;
             AssetMapping.Global.Clear();
             _testNum = Interlocked.Increment(ref s_testNum);

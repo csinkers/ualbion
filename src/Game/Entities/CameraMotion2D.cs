@@ -14,29 +14,36 @@ namespace UAlbion.Game.Entities
     public class CameraMotion2D : Component
     {
         readonly OrthographicCamera _camera;
-        Vector2 _position;
-        Vector2 _velocity;
+        Vector3 _position;
+        Vector3 _velocity;
         bool _locked;
 
         public CameraMotion2D(OrthographicCamera camera)
         {
             if (camera == null) throw new ArgumentNullException(nameof(camera));
             On<EngineUpdateEvent>(Update);
-            On<BeginFrameEvent>(e => _velocity = Vector2.Zero);
+            On<BeginFrameEvent>(e => _velocity = Vector3.Zero);
             On<CameraLockEvent>(e => _locked = true);
             On<CameraUnlockEvent>(e => _locked = false);
             On<CameraJumpEvent>(e =>
             {
-                var map = Resolve<IMapManager>().Current;
-                if (map == null) return;
-                _position = new Vector2(e.X * map.TileSize.X + 0.1f, e.Y * map.TileSize.Y + 0.1f);
-                _camera.Position = new Vector3(_position, map.BaseCameraHeight);
+                var map = TryResolve<IMapManager>()?.Current;
+                if (map == null)
+                {
+                    _position = new Vector3(e.X, e.Y, _camera.Position.Z);
+                    _camera.Position = _position;
+                }
+                else
+                {
+                    _position = new Vector3(e.X * map.TileSize.X + 0.1f, e.Y * map.TileSize.Y + 0.1f, map.BaseCameraHeight);
+                    _camera.Position = _position;
+                }
             });
             On<CameraMoveEvent>(e =>
             {
-                var map = Resolve<IMapManager>().Current;
-                if (map == null) return;
-                _velocity += new Vector2(e.X * map.TileSize.X, e.Y * map.TileSize.Y);
+                var map = TryResolve<IMapManager>()?.Current;
+                if (map == null) _velocity += new Vector3(e.X, e.Y, e.Z ?? 0);
+                else _velocity += new Vector3(e.X * map.TileSize.X, e.Y * map.TileSize.Y, e.Z ?? 0);
             });
 
             _camera = camera;
@@ -44,10 +51,13 @@ namespace UAlbion.Game.Entities
 
         void Update(EngineUpdateEvent e)
         {
-            var map = Resolve<IMapManager>().Current;
+            var map = TryResolve<IMapManager>()?.Current;
+            if (map == null)
+                _locked = true;
+
             if (_locked)
             {
-                _position += new Vector2(_velocity.X, _velocity.Y) * e.DeltaSeconds;
+                _position += _velocity * e.DeltaSeconds;
             }
             else
             {
@@ -59,18 +69,21 @@ namespace UAlbion.Game.Entities
                     return;
 
                 var position = leader.GetPosition() * map.TileSize;
+                var curPosition2 = new Vector2(_position.X, _position.Y);
                 var position2 = new Vector2(position.X, position.Y);
 
-                if ((_position - position2).LengthSquared() < 0.25f)
-                    _position = position2;
+                if ((curPosition2 - position2).LengthSquared() < 0.25f)
+                    _position = new Vector3(position2, _position.Z);
                 else
-                    _position = new Vector2(
+                {
+                    _position = new Vector3(
                         ApiUtil.Lerp(_position.X, position.X, config.LerpRate * e.DeltaSeconds),
-                        ApiUtil.Lerp(_position.Y, position.Y, config.LerpRate * e.DeltaSeconds));
+                        ApiUtil.Lerp(_position.Y, position.Y, config.LerpRate * e.DeltaSeconds),
+                        map.BaseCameraHeight);
+                }
             }
 
-            if (map == null) return;
-            _camera.Position = new Vector3(_position, map.BaseCameraHeight);
+            _camera.Position = _position;
         }
     }
 }

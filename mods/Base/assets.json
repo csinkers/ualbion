@@ -18,7 +18,7 @@
     "item":     { "AssetType": "Item",               "EnumType": "UAlbion.Base.Item, UAlbion.Base" },
     "itemgfx":  { "AssetType": "ItemGraphics",       "EnumType": "UAlbion.Base.ItemGraphics, UAlbion.Base" },
     "itemname": { "AssetType": "ItemName",           "EnumType": "UAlbion.Base.ItemName, UAlbion.Base" },
-    "lab":      { "AssetType": "Labyrinth",          "EnumType": "UAlbion.Base.LabyrinthData, UAlbion.Base" },
+    "lab":      { "AssetType": "Labyrinth",          "EnumType": "UAlbion.Base.Labyrinth, UAlbion.Base" },
     "lnpc":     { "AssetType": "LargeNpcGraphics",   "EnumType": "UAlbion.Base.LargeNpc, UAlbion.Base" },
     "lparty":   { "AssetType": "LargePartyGraphics", "EnumType": "UAlbion.Base.LargePartyMember, UAlbion.Base" },
     "map":      { "AssetType": "Map",                "EnumType": "UAlbion.Base.Map, UAlbion.Base" },
@@ -146,9 +146,9 @@
 
     // Maps
     "$(XLD)/BLKLIST0.XLD": { "Loader": "block", "Map": { "0": {"Id": "block.1" } } },
-    "$(XLD)/LABDATA0.XLD": { "Loader": "lab", "Map": { "0": { "Id": "lab.1" } } },
-    "$(XLD)/LABDATA1.XLD": { "Loader": "lab", "Map": { "0": { "Id": "lab.100" } } },
-    "$(XLD)/LABDATA2.XLD": { "Loader": "lab", "Map": { "0": { "Id": "lab.200" } } },
+    "$(XLD)/LABDATA0.XLD": { "Loader": "lab", "MapFile": "$(MOD)/Meta/LABDATA0.json" },
+    "$(XLD)/LABDATA1.XLD": { "Loader": "lab", "MapFile": "$(MOD)/Meta/LABDATA1.json" },
+    "$(XLD)/LABDATA2.XLD": { "Loader": "lab", "MapFile": "$(MOD)/Meta/LABDATA2.json" },
     "$(XLD)/MAPDATA1.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.100" } } },
     "$(XLD)/MAPDATA2.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.200" } } },
     "$(XLD)/MAPDATA3.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.300" } } },

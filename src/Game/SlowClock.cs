@@ -8,7 +8,6 @@ namespace UAlbion.Game
     public class SlowClock : Component
     {
         int _ticks;
-        int _frameCount;
 
         public SlowClock() => On<FastClockEvent>(OnUpdate);
 
@@ -26,8 +25,7 @@ namespace UAlbion.Game
             if (delta <= 0)
                 return;
 
-            _frameCount += delta;
-            Raise(new SlowClockEvent(delta, _frameCount));
+            Raise(new SlowClockEvent(delta));
         }
     }
 
@@ -35,12 +33,9 @@ namespace UAlbion.Game
     public class SlowClockEvent : GameEvent, IVerboseEvent
     {
         [EventPart("delta")] public int Delta { get; }
-        [EventPart("frame_count")] public int FrameCount { get; }
-
-        public SlowClockEvent(int delta, int frameCount)
+        public SlowClockEvent(int delta)
         {
             Delta = delta;
-            FrameCount = frameCount;
         }
     }
 }

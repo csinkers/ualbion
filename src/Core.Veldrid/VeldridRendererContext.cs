@@ -40,6 +40,8 @@ namespace UAlbion.Core.Veldrid
             _lastPaletteVersion = newVersion;
             SceneContext.PaletteTexture = _paletteTexture.CreateDeviceTexture(GraphicsDevice, GraphicsDevice.ResourceFactory, TextureUsage.Sampled);
             SceneContext.PaletteView = GraphicsDevice.ResourceFactory.CreateTextureView(SceneContext.PaletteTexture);
+            SceneContext.PaletteTexture.Name = "T_" + _paletteTexture.Name;
+            SceneContext.PaletteView.Name = "TV_" + _paletteTexture.Name;
         }
 
         public void UpdatePerFrameResources()

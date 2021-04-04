@@ -2,21 +2,31 @@
 //!#define gl_VertexIndex gl_VertexID
 
 // Resource Sets / Uniforms
-layout(binding = 0) uniform _Misc { vec3 uTileSize; int Unused1; };
+layout(binding = 0) uniform Properties 
+{
+	vec4 uScale;
+	vec4 uRotation;
+	vec4 uOrigin;
+	vec4 uHorizontalSpacing;
+	vec4 uVerticalSpacing;
+	uint uWidth;
+	uint uAmbient;
+	uint uFogColor; // RGBA, A = distance in tiles
+	uint uPad1;
+};
 
 #include "CommonResources.glsl"
 
 // TODO: Lighting info
 
 // Vertex Data
-layout(location = 0) in vec3 vVertexPosition; // N.B. Tile origins are in the middle of the floor.
+layout(location = 0) in vec3 vPosition; // N.B. Tile origins are in the centre of the cube
 layout(location = 1) in vec2 vTexCoords;
 
 // Instance Data
-layout(location = 2) in vec2 iTilePosition; // X & Z, in tiles
-layout(location = 3) in uint iTextures;     // Floor, Ceiling, Walls, Overlay - 1 byte each, 0 = transparent / off
-layout(location = 4) in uint iFlags;        // Bits 2 - 31 are instance flags, 0 & 1 denote texture type.
-layout(location = 5) in vec2 iWallSize;     // U & W, normalised
+layout(location = 2) in uint iTextures; // Floor, Ceiling, Walls, Overlay - 1 byte each, 0 = transparent / off
+layout(location = 3) in uint iFlags;    // Bits 2 - 31 are instance flags, 0 & 1 denote texture type.
+layout(location = 4) in vec2 iWallSize; // U & W, normalised
 
 // Outputs
 layout(location = 0) out vec2 oTexCoords;     // Texture Coordinates
@@ -45,8 +55,29 @@ void main()
 	}
 	else
 	{
-		vec3 instanceTilePosition = vec3(iTilePosition.x, 0.0f, iTilePosition.y);
-		vec3 worldSpace = (vVertexPosition + instanceTilePosition) * uTileSize;
+		float cosX = cos(uRotation.x);
+		float sinX = sin(uRotation.x);
+		mat3 instanceRotX = mat3(
+			1, 0, 0,
+			0, cosX, -sinX,
+			0, sinX, cosX);
+
+		float cosY = cos(uRotation.y);
+		float sinY = sin(uRotation.y);
+		mat3 instanceRotY = mat3(
+			cosY, 0, sinY,
+			0, 1, 0,
+			-sinY, 0, cosY);
+
+		mat3 mRot = instanceRotX * instanceRotY;
+		mat3 mScale = mat3(uScale.x, 0, 0, 0, uScale.y, 0, 0, 0, uScale.z);
+
+		uint index = gl_InstanceIndex; //! uint index = gl_InstanceID;
+		uint j = index / uWidth;
+		uint i = index - j * uWidth;
+		
+		vec3 iPosition = uOrigin.xyz + i * uHorizontalSpacing.xyz + j * uVerticalSpacing.xyz;
+		vec3 worldSpace = mScale * mRot * vPosition + iPosition;
 		gl_Position = uProjection * uView * vec4(worldSpace, 1);
 	}
 }

@@ -7,6 +7,6 @@ namespace UAlbion.Core.Veldrid.Visual
     {
         Shader[] GetShaderPair(ResourceFactory factory,
             string vertexShaderName, string fragmentShaderName,
-            string vertexShaderContent, string fragmentShaderContent);
+            string vertexShaderContent = null, string fragmentShaderContent = null);
     }
 }

@@ -156,7 +156,7 @@ namespace UAlbion.Core.Veldrid.Visual
                 if (sprite.ActiveInstances == 0)
                     continue;
 
-                cl.PushDebugGroup(sprite.Name);
+                bool didSomething = false;
                 var shaderKey = new SpriteShaderKey(sprite, engineFlags);
                 if (!_pipelines.ContainsKey(shaderKey))
                     _pipelines.Add(shaderKey, BuildPipeline(gd, c.SceneContext, shaderKey));
@@ -174,6 +174,8 @@ namespace UAlbion.Core.Veldrid.Visual
 
                 if (sprite.InstancesDirty)
                 {
+                    cl.PushDebugGroup(sprite.Name);
+                    didSomething = true;
                     var instances = sprite.Instances;
                     VeldridUtil.UpdateBufferSpan(cl, buffer, instances);
                     PerfTracker.IncrementFrameCounter("Update InstanceBuffers");
@@ -185,6 +187,7 @@ namespace UAlbion.Core.Veldrid.Visual
                 var uniformBuffer = objectManager.GetDeviceObject<DeviceBuffer>((sprite, textureView, "UniformBuffer"));
                 if (uniformBuffer == null)
                 {
+                    if (!didSomething) { cl.PushDebugGroup(sprite.Name); didSomething = true; } 
                     uniformBuffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)Unsafe.SizeOf<SpriteUniformInfo>(), BufferUsage.UniformBuffer));
                     uniformBuffer.Name = $"B_SpriteUniform:{sprite.Name}";
                     PerfTracker.IncrementFrameCounter("Create sprite uniform buffer");
@@ -202,6 +205,7 @@ namespace UAlbion.Core.Veldrid.Visual
                 var resourceSet = objectManager.GetDeviceObject<ResourceSet>((sprite, textureView, "ResourceSet"));
                 if (resourceSet == null)
                 {
+                    if (!didSomething) { cl.PushDebugGroup(sprite.Name); didSomething = true; } 
                     resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
                         _perSpriteResourceLayout,
                         textureView,
@@ -214,7 +218,8 @@ namespace UAlbion.Core.Veldrid.Visual
 
                 sprite.InstancesDirty = false;
                 results.Add(sprite);
-                cl.PopDebugGroup();
+                if (didSomething)
+                    cl.PopDebugGroup();
             }
 
             Resolve<ISpriteManager>().Cleanup();
@@ -238,8 +243,6 @@ namespace UAlbion.Core.Veldrid.Visual
             //if (!shaderKey.UseArrayTexture)
             //    return;
 
-            cl.PushDebugGroup(sprite.Name);
-
             if (c.SceneContext.PaletteView == null)
                 return;
 
@@ -247,6 +250,7 @@ namespace UAlbion.Core.Veldrid.Visual
             var resourceSet = dom.GetDeviceObject<ResourceSet>((sprite, textureView, "ResourceSet"));
             var instanceBuffer = dom.GetDeviceObject<DeviceBuffer>((sprite, sprite, "InstanceBuffer"));
 
+            cl.PushDebugGroup(sprite.Name);
             if (sprite.Key.ScissorRegion.HasValue)
             {
                 IWindowManager wm = Resolve<IWindowManager>();

@@ -1,0 +1,11 @@
+{
+    "0": { "Id": "lab.1", "PaletteId": 1 }, //  Test1
+    "1": { "PaletteId": 1 }, // Test2
+    "2": { "PaletteId": 1 }, // Test3
+    "3": { "PaletteId": 1 }, // Test4
+    "4": { "PaletteId": 14}, // Test5
+    "5": { "PaletteId": 15 }, // TestArgim
+    "6": { "PaletteId": 1 }, // Unknown7
+    "7": { "PaletteId": 1 }, // Unknown8
+    "8": { "PaletteId": 1 }  // Unknown9
+}        

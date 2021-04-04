@@ -10,9 +10,6 @@ namespace UAlbion
     class CommandLineOptions
     {
         public ExecutionMode Mode { get; }
-        public GameMode GameMode { get; }
-        public string GameModeArgument { get; }
-
         public GraphicsBackend Backend { get; }
         public bool DebugMenus { get; }
         public bool Mute { get; }
@@ -32,7 +29,6 @@ namespace UAlbion
         {
             // Defaults
             Mode = ExecutionMode.Game;
-            GameMode = GameMode.MainMenu;
             Backend = GraphicsBackend.Vulkan;
 
             for (int i = 0; i < args.Length; i++)
@@ -67,7 +63,7 @@ namespace UAlbion
                 if (arg == "-D3D" || arg == "--DIRECT3D") Backend = GraphicsBackend.Direct3D11;
 
                 if (arg == "--MENUS") DebugMenus = true;
-                if (arg == "--NO-AUDIO") Mute = true;
+                if (arg == "--NO-AUDIO" || arg == "-MUTE" || arg == "--MUTE") Mute = true;
                 if (arg == "--STARTUPONlY" || arg == "-S") StartupOnly = true;
                 if (arg == "--RENDERDOC" || arg == "-RD") UseRenderDoc = true;
 
@@ -136,37 +132,6 @@ namespace UAlbion
                     DumpFormats = 0;
                     foreach (var type in args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries))
                         DumpFormats |= Enum.Parse<DumpFormats>(type, true);
-                }
-
-                // SubModes
-                if (arg == "--MAIN-MENU") GameMode = GameMode.MainMenu;
-                if (arg == "--NEW-GAME") GameMode = GameMode.NewGame;
-                if (arg == "--INVENTORY") GameMode = GameMode.Inventory;
-
-                if (arg == "--LOAD" || arg == "-L")
-                {
-                    i++;
-                    if (i == args.Length)
-                    {
-                        Console.WriteLine("\"--load-game\" requires an argument specifying the saved game to load");
-                        Mode = ExecutionMode.Exit;
-                        return;
-                    }
-                    GameMode = GameMode.LoadGame;
-                    GameModeArgument = args[i];
-                }
-
-                if (arg == "--LOAD-MAP" || arg == "-MAP" || arg == "--MAP" || arg == "-M")
-                {
-                    i++;
-                    if (i == args.Length)
-                    {
-                        Console.WriteLine("\"--load-map\" requires an argument specifying the map to load");
-                        Mode = ExecutionMode.Exit;
-                        return;
-                    }
-                    GameMode = GameMode.LoadMap;
-                    GameModeArgument = args[i];
                 }
             }
         }

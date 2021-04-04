@@ -18,12 +18,18 @@ namespace UAlbion.Game.Entities
     {
         readonly MapNpc _npc;
         readonly MapSprite _sprite;
+        int _frameCount;
+
         public override string ToString() => $"SNpc {_npc.Id} {_sprite.Id}";
 
         public SmallNpc(MapNpc npc)
         {
-            On<SlowClockEvent>(e => { _sprite.Frame = e.FrameCount; });
             On<ShowMapMenuEvent>(OnRightClick);
+            On<SlowClockEvent>(e =>
+            {
+                _frameCount += e.Delta;
+                _sprite.Frame = _frameCount;
+            });
 
             _npc = npc ?? throw new ArgumentNullException(nameof(npc));
             _sprite = AttachChild(new MapSprite(npc.SpriteOrGroup, DrawLayer.Underlay - 1, 0, SpriteFlags.BottomAligned));

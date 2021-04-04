@@ -24,9 +24,10 @@ namespace UAlbion.Game.Entities.Map3D
         readonly LabyrinthData _labyrinthData;
         readonly Vector3 _tileSize;
         readonly IDictionary<int, IList<int>> _tilesByDistance = new Dictionary<int, IList<int>>();
-        DungeonTileMap _tilemap;
+        DungeonTilemap _tilemap;
         bool _isSorting;
         bool _fullUpdate = true;
+        int _frameCount;
 
         public MapRenderable3D(MapId mapId, MapData3D mapData, LabyrinthData labyrinthData, Vector3 tileSize)
         {
@@ -48,15 +49,25 @@ namespace UAlbion.Game.Entities.Map3D
                 return;
 
             var assets = Resolve<IAssetManager>();
-            _tilemap = new DungeonTileMap(_mapId, 
-                _mapId.ToString(),
-                DrawLayer.Background,
+            var properties = new DungeonTileMapProperties(
                 _tileSize,
-                _mapData.Width, _mapData.Height,
+                Vector3.Zero,
+                _tileSize.Y / 2 * Vector3.UnitY,
+                _tileSize * Vector3.UnitX,
+                _tileSize * Vector3.UnitZ,
+                _mapData.Width,
+                _labyrinthData.Lighting,
+                _labyrinthData.FogColor);
+
+            _tilemap = new DungeonTilemap(
+                _mapId,
+                _mapId.ToString(),
+                _mapData.Width * _mapData.Height,
+                properties,
                 Resolve<ICoreFactory>(),
                 Resolve<IPaletteManager>());
 
-            for(int i = 0; i < _labyrinthData.FloorAndCeilings.Count; i++)
+            for (int i = 0; i < _labyrinthData.FloorAndCeilings.Count; i++)
             {
                 var floorInfo = _labyrinthData.FloorAndCeilings[i];
                 ITexture floor = assets.LoadTexture(floorInfo?.SpriteId ?? AssetId.None);
@@ -98,8 +109,6 @@ namespace UAlbion.Game.Entities.Map3D
 
         void SetTile(int index, int order, int frameCount)
         {
-            byte i = (byte)(index % _mapData.Width);
-            byte j = (byte)(index / _mapData.Width);
             byte floorIndex = _mapData.Floors[index];
             byte ceilingIndex = _mapData.Ceilings[index];
             int contents = _mapData.Contents[index];
@@ -107,14 +116,15 @@ namespace UAlbion.Game.Entities.Map3D
                 ? 0
                 : contents - 100);
 
-            _tilemap.Set(order, i, j, floorIndex, ceilingIndex, wallIndex, frameCount);
+            _tilemap.Set(order, floorIndex, ceilingIndex, wallIndex, frameCount);
         }
 
         void OnSlowClock(SlowClockEvent e)
         {
+            _frameCount += e.Delta;
             if (_isSorting)
             {
-                SortingUpdate(e);
+                SortingUpdate();
                 return;
             }
 
@@ -127,7 +137,7 @@ namespace UAlbion.Game.Entities.Map3D
                     for (int i = 0; i < _mapData.Width; i++)
                     {
                         int index = j * _mapData.Width + i;
-                        SetTile(index, index, e.FrameCount);
+                        SetTile(index, index, _frameCount);
                     }
                 }
 
@@ -135,10 +145,10 @@ namespace UAlbion.Game.Entities.Map3D
             }
             else
                 foreach (var index in _tilemap.AnimatedTiles)
-                    SetTile(index, index, e.FrameCount);
+                    SetTile(index, index, _frameCount);
         }
 
-        void SortingUpdate(SlowClockEvent e)
+        void SortingUpdate()
         {
             using var _ = PerfTracker.FrameEvent("5.1 Update tilemap (sorting)");
 
@@ -182,7 +192,7 @@ namespace UAlbion.Game.Entities.Map3D
 
                 foreach (var index in distance.Value)
                 {
-                    SetTile(index, order, e.FrameCount);
+                    SetTile(index, order, _frameCount);
                     order++;
                 }
             }

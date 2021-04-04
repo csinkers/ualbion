@@ -8,8 +8,8 @@ namespace UAlbion.Core.Visual
 {
     public class DeviceObjectManager : ServiceComponent<IDeviceObjectManager>, IDeviceObjectManager
     {
-        readonly IDictionary<(object, object, object), CacheEntry> _cache = new Dictionary<(object, object, object), CacheEntry>();
         readonly object _syncRoot = new object();
+        readonly IDictionary<(object, object, object), CacheEntry> _cache = new Dictionary<(object, object, object), CacheEntry>();
         readonly HashSet<(object, object, object)> _staleOwners = new HashSet<(object, object, object)>();
         long _frame;
 
@@ -20,11 +20,7 @@ namespace UAlbion.Core.Visual
 
         class CacheEntry : IDisposable
         {
-            public CacheEntry(IDisposable resource)
-            {
-                Resource = resource;
-            }
-
+            public CacheEntry(IDisposable resource) => Resource = resource;
             public IDisposable Resource { get; }
             public long LastAccessed { get; set; }
             public void Dispose() => Resource?.Dispose();
@@ -39,7 +35,11 @@ namespace UAlbion.Core.Visual
                         _staleOwners.Add(kvp.Key);
 
                 foreach (var owner in _staleOwners)
+                {
+                    var entry = _cache[owner];
+                    entry.Dispose();
                     _cache.Remove(owner);
+                }
 
                 _staleOwners.Clear();
                 _frame++;

@@ -28,6 +28,7 @@ namespace UAlbion.Core.Veldrid
         readonly IDictionary<Type, IRenderer> _renderers = new Dictionary<Type, IRenderer>();
         readonly IDictionary<IRenderer, List<IRenderable>> _renderables = new Dictionary<IRenderer, List<IRenderable>>();
         readonly bool _startupOnly;
+        readonly bool _useRenderDoc;
         readonly int _defaultWidth = 720;
         readonly int _defaultHeight = 480;
         readonly int _defaultX = 648;
@@ -35,6 +36,7 @@ namespace UAlbion.Core.Veldrid
 
         SceneContext _sceneContext;
         CommandList _frameCommands;
+        VeldridRendererContext _renderContext;
         TextureSampleCount? _newSampleCount;
         bool _windowResized;
         bool _done;
@@ -44,6 +46,7 @@ namespace UAlbion.Core.Veldrid
         Vector2? _pendingCursorUpdate;
         GraphicsBackend? _newBackend;
         DateTime _lastTitleUpdateTime;
+        int _frameCounter;
 
         internal GraphicsDevice GraphicsDevice { get; private set; }
         internal static RenderDoc RenderDoc => _renderDoc;
@@ -84,6 +87,7 @@ namespace UAlbion.Core.Veldrid
             On<RefreshDeviceObjectsEvent>(e => RefreshDeviceObjects(e.Count ?? 1));
             On<RecreateWindowEvent>(e => { _recreateWindow = true; _newBackend = GraphicsDevice.BackendType; });
             On<SetBackendEvent>(e => _newBackend = e.Value);
+            On<TriggerRenderDocEvent>(e => _renderDoc?.TriggerCapture());
             On<SetVSyncEvent>(e =>
             {
                 if (_vsync == e.Value) return;
@@ -94,6 +98,7 @@ namespace UAlbion.Core.Veldrid
             _coreFactory = new VeldridCoreFactory();
             _windowManager = AttachChild(new WindowManager());
             _newBackend = backend;
+            _useRenderDoc = useRenderDoc;
             _startupOnly = startupOnly;
 
             if (windowRect.HasValue)
@@ -103,10 +108,6 @@ namespace UAlbion.Core.Veldrid
                 _defaultWidth = windowRect.Value.Width;
                 _defaultHeight = windowRect.Value.Height;
             }
-
-            if (useRenderDoc)
-                using(PerfTracker.InfrequentEvent("Loading renderdoc"))
-                    RenderDoc.Load(out _renderDoc);
         }
 
         protected override void Subscribed()
@@ -183,6 +184,8 @@ namespace UAlbion.Core.Veldrid
             while (!_done)
             {
                 ChangeBackend();
+                if (_frameCounter < 3)
+                    _renderDoc.TriggerCapture();
                 CreateAllObjects();
 
                 PerfTracker.BeginFrame();
@@ -245,6 +248,8 @@ namespace UAlbion.Core.Veldrid
 
                 if (_startupOnly)
                     _done = true;
+
+                _frameCounter++;
             }
 
             Resolve<IShaderCache>()?.CleanupOldFiles();
@@ -305,7 +310,6 @@ namespace UAlbion.Core.Veldrid
             }
 
             var scenes = new List<Scene>();
-            var context = new VeldridRendererContext(GraphicsDevice, _frameCommands, _sceneContext, _coreFactory); // TODO: Reuse
             Raise(new CollectScenesEvent(scenes.Add));
 
             using (PerfTracker.FrameEvent("6.1 Prepare scenes"))
@@ -313,7 +317,7 @@ namespace UAlbion.Core.Veldrid
                 _frameCommands.Begin();
                 Raise(RenderEvent.Instance);
                 foreach (var scene in scenes)
-                    scene.UpdatePerFrameResources(context, _renderables);
+                    scene.UpdatePerFrameResources(_renderContext, _renderables);
                 _frameCommands.End();
                 GraphicsDevice.SubmitCommands(_frameCommands);
             }
@@ -322,7 +326,7 @@ namespace UAlbion.Core.Veldrid
             {
                 _frameCommands.Begin();
                 foreach (var scene in scenes)
-                    scene.RenderAllStages(context, _renderers);
+                    scene.RenderAllStages(_renderContext, _renderers);
                 _frameCommands.End();
             }
 
@@ -347,9 +351,20 @@ namespace UAlbion.Core.Veldrid
                 if (GraphicsDevice != null)
                 {
                     DestroyAllObjects();
-                    if(GraphicsDevice.BackendType != backend)
+                    if (GraphicsDevice.BackendType != backend)
                         Resolve<IShaderCache>().DestroyAllDeviceObjects();
                     GraphicsDevice.Dispose();
+                }
+
+                if (_useRenderDoc)
+                {
+                    using (PerfTracker.InfrequentEvent("Loading renderdoc"))
+                    {
+                        if (!RenderDoc.Load(out _renderDoc))
+                            throw new InvalidOperationException("Failed to load renderdoc");
+                    }
+
+                    _renderDoc.APIValidation = true;
                 }
 
                 if (_window == null || _recreateWindow)
@@ -387,7 +402,7 @@ namespace UAlbion.Core.Veldrid
 
                 // Currently this field only exists in my local build of veldrid, so set it via reflection.
                 var singleThreadedProperty = typeof(GraphicsDeviceOptions).GetField("SingleThreaded");
-                if(singleThreadedProperty != null)
+                if (singleThreadedProperty != null)
                     singleThreadedProperty.SetValueDirect(__makeref(gdOptions), true);
 
                 GraphicsDevice = VeldridStartup.CreateGraphicsDevice(_window, gdOptions, backend);
@@ -425,9 +440,10 @@ namespace UAlbion.Core.Veldrid
                 _sceneContext = new SceneContext();
                 _sceneContext.CreateDeviceObjects(GraphicsDevice, initList);
 
-                var context = new VeldridRendererContext(GraphicsDevice, initList, _sceneContext, _coreFactory);
+                var initContext = new VeldridRendererContext(GraphicsDevice, initList, _sceneContext, _coreFactory);
+                _renderContext = new VeldridRendererContext(GraphicsDevice, _frameCommands, _sceneContext, _coreFactory);
                 foreach (var r in _renderers.Values.Distinct())
-                    r.CreateDeviceObjects(context);
+                    r.CreateDeviceObjects(initContext);
 
                 initList.End();
                 GraphicsDevice.SubmitCommands(initList);
@@ -450,6 +466,8 @@ namespace UAlbion.Core.Veldrid
                 _sceneContext?.Dispose();
                 _frameCommands = null;
                 _sceneContext = null;
+                _renderContext = null;
+
                 foreach (var r in _renderers.Values.Distinct())
                     r.DestroyDeviceObjects();
 

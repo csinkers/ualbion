@@ -28,8 +28,8 @@ namespace UAlbion
             Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Formats.ScriptEvents.PartyMoveEvent)));
             Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Game.Events.StartEvent)));
             Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Game.Veldrid.Debugging.HideDebugWindowEvent)));
-            Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.IsoPosEvent)));
-            PerfTracker.StartupEvent("Built events");
+            Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.IsoYawEvent)));
+            PerfTracker.StartupEvent("Built event parsers");
 
             var commandLine = new CommandLineOptions(args);
             if (commandLine.Mode == ExecutionMode.Exit)

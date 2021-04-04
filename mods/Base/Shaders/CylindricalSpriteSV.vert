@@ -35,7 +35,12 @@ layout(location = 5) out flat float oFrontDepth; // Sprite front depth
 
 void main()
 {
-	mat4 transform = mat4(vec4(iTransform1, 0), vec4(iTransform2, 0), vec4(iTransform3, 0), vec4(iTransform4, 1));
+	mat4 transform = mat4(
+		vec4(iTransform1, 0),
+		vec4(iTransform2, 0),
+		vec4(iTransform3, 0),
+		vec4(iTransform4, 1));
+
 	vec4 worldSpace = transform * vec4(vPosition, 0, 1);
 	mat4 viewTransform = uView * transform;
 	viewTransform[0] = transform[0];

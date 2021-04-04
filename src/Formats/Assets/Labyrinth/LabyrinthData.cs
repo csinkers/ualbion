@@ -41,6 +41,11 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public IList<FloorAndCeiling> FloorAndCeilings { get; } = new List<FloorAndCeiling>();
         public IList<Wall> Walls { get; } = new List<Wall>();
         public Vector3 TileSize => new Vector3(EffectiveWallWidth, WallHeight, EffectiveWallWidth);
+        public uint FogColor => ApiUtil.PackColor(
+            (byte)(FogRed >> 8),
+            (byte)(FogGreen >> 8),
+            (byte)(FogBlue >> 8),
+            (byte)Math.Min(byte.MaxValue, FogDistance));
 
         public static LabyrinthData Serdes(LabyrinthData d, AssetInfo info, AssetMapping mapping, ISerializer s)
         {

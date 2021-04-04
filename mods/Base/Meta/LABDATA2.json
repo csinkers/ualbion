@@ -1,0 +1,13 @@
+{
+    "0": { "Id": "lab.200", "PaletteId": 14 }, // KounosCave
+    "1": { "PaletteId": 25 }, // Unknown201
+    "2": { "PaletteId": 13 }, // Kontos
+    "3": { "PaletteId": 25 }, // Beloveno
+    "4": { "PaletteId": 3 }, // Srimalinar
+    "5": { "PaletteId": 1 }, // Unknown205
+    "6": { "PaletteId": 51 }, // UmajoKenta
+    "7": { "PaletteId": 30 }, // UmajoPrison
+    "8": { "PaletteId": 13 }, // DeviceMaker
+    "9": { "PaletteId": 1 }, // Unknown209
+    "10": { "PaletteId": 30 }  // MountainPass
+}

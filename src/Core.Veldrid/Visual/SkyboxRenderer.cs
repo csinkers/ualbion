@@ -57,16 +57,8 @@ namespace UAlbion.Core.Veldrid.Visual
         Pipeline BuildPipeline(GraphicsDevice gd, SceneContext sc)
         {
             var shaderCache = Resolve<IVeldridShaderCache>();
-            var vertexShaderName = "SkyBoxSV.vert";
-            var fragmentShaderName = "SkyBoxSF.frag";
-            var vertexShaderContent = shaderCache.GetGlsl(vertexShaderName);
-            var fragmentShaderContent = shaderCache.GetGlsl(fragmentShaderName);
 
-            var shaders = shaderCache.GetShaderPair(
-                gd.ResourceFactory,
-                vertexShaderName, fragmentShaderName,
-                vertexShaderContent, fragmentShaderContent);
-
+            var shaders = shaderCache.GetShaderPair(gd.ResourceFactory, "SkyBoxSV.vert", "SkyBoxSF.frag");
             _shaders.AddRange(shaders);
             var shaderSet = new ShaderSetDescription(new[] { VertexLayout }, shaders);
             var depthStencilMode = DepthStencilStateDescription.Disabled;

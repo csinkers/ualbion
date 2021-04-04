@@ -98,7 +98,7 @@ namespace UAlbion.Formats.Assets
 
         public static implicit operator AssetId(LabyrinthId id) => AssetId.FromUInt32(id._value);
         public static implicit operator LabyrinthId(AssetId id) => new LabyrinthId(id.ToUInt32());
-        public static implicit operator LabyrinthId(UAlbion.Base.LabyrinthData id) => LabyrinthId.From(id);
+        public static implicit operator LabyrinthId(UAlbion.Base.Labyrinth id) => LabyrinthId.From(id);
 
         public readonly int ToInt32() => unchecked((int)_value);
         public readonly uint ToUInt32() => _value;

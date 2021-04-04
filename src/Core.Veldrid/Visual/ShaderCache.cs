@@ -192,9 +192,14 @@ namespace UAlbion.Core.Veldrid.Visual
         public Shader[] GetShaderPair(
             ResourceFactory factory,
             string vertexName, string fragmentName,
-            string vertexContent, string fragmentContent)
+            string vertexContent = null, string fragmentContent = null)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
+            if(string.IsNullOrEmpty(vertexName)) throw new ArgumentNullException(nameof(vertexName));
+            if(string.IsNullOrEmpty(fragmentName)) throw new ArgumentNullException(nameof(fragmentName));
+
+            vertexContent ??= GetGlsl(vertexName);
+            fragmentContent ??= GetGlsl(fragmentName);
 
 #if DEBUG
                 vertexContent =

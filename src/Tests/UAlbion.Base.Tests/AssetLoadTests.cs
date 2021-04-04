@@ -239,7 +239,7 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void LabyrinthTest()
         {
-            var lab = Test(assets => assets.LoadLabyrinthData(LabyrinthData.Jirinaar));
+            var lab = Test(assets => assets.LoadLabyrinthData(Labyrinth.Jirinaar));
             Assert.Equal(182, lab.BackgroundColour);
             Assert.Equal(DungeonBackground.EarlyGameS, lab.BackgroundId);
             Assert.Equal(12, lab.BackgroundTileAmount);
@@ -426,7 +426,7 @@ namespace UAlbion.Base.Tests
             Assert.Equal(SpriteId.None, map.CombatBackgroundId);
             Assert.Equal(Song.Ethereal, map.SongId);
             Assert.Equal(Palette.GlowyPlantDungeon, map.PaletteId);
-            Assert.Equal(LabyrinthData.Argim, map.LabDataId);
+            Assert.Equal(Labyrinth.Argim, map.LabDataId);
             Assert.Equal(64, map.AutomapGraphics.Length);
             Assert.Equal(Song.DungeonAmbient, map.AmbientSongId);
             Assert.Equal(Map3DFlags.Unk0 | Map3DFlags.Unk2, map.Flags);

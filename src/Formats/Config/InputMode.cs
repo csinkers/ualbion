@@ -13,6 +13,7 @@
         ContextMenu,
         MainMenu,
         TextEntry,
-        Editor
+        Editor,
+        IsoBake
     }
 }

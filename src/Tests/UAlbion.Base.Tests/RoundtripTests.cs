@@ -181,7 +181,7 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void LabyrinthTest()
         {
-            var info = new AssetInfo { AssetId = AssetId.From(LabyrinthData.Jirinaar) };
+            var info = new AssetInfo { AssetId = AssetId.From(Labyrinth.Jirinaar) };
             RoundTripXld<Formats.Assets.Labyrinth.LabyrinthData>(nameof(LabyrinthTest), "$(XLD)/LABDATA1.XLD", 9,
                 (x, s) => Loaders.LabyrinthDataLoader.Serdes(x, info, AssetMapping.Global, s));
         }

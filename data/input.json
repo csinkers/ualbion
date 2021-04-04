@@ -9,8 +9,6 @@
     "F10": "update 1",
     "F11": "start_clock",
     "F12": "stop_clock",
-    "Control+A": "!loadnextmap",
-    "Control+X": "!loadprevmap",
     "Control+D": "engine_flag toggle RenderDepth",
     "Control+E": "push_scene Editor",
     "Control+B": "engine_flag toggle ShowBoundingBoxes",
@@ -28,6 +26,8 @@
   },
   "World2D": {
     "Escape": "push_scene MainMenu",
+    "Control+A": "!loadnextmap",
+    "Control+X": "!loadprevmap",
     "BracketLeft": "e:mag -1",
     "BracketRight": "e:mag 1",
     "Shift+BracketLeft": "toggle_underlay",
@@ -72,6 +72,8 @@
   "World3D": {
     "Escape": "push_scene MainMenu",
     "Tab": "push_scene inventory",
+    "Control+A": "!loadnextmap",
+    "Control+X": "!loadprevmap",
     "Control+Q": "engine_flag toggle UseCylindricalBillboards",
 
     "Control+Number1": "set_active_member 0",
@@ -124,5 +126,40 @@
   },
   "Editor": {
     "Control+E": "pop_scene Editor"
+  },
+  "IsoBake": {
+    "W": "+cam_move   0 -50",
+    "A": "+cam_move -50   0",
+    "S": "+cam_move   0  50",
+    "D": "+cam_move  50   0",
+    "Q": "+cam_move 0 0 -10",
+    "F": "+cam_move 0 0 10",
+
+    "Control+A": "iso_lab 1",
+    "Control+X": "iso_lab -1",
+
+    "Shift+W": "+cam_move   0 -150",
+    "Shift+A": "+cam_move -150   0",
+    "Shift+S": "+cam_move   0  150",
+    "Shift+D": "+cam_move  150   0",
+    "Shift+Q": "+cam_move 0 0 -50",
+    "Shift+F": "+cam_move 0 0  50",
+
+    "Period": "iso_row_width -1",
+    "Comma": "iso_row_width 1",
+    "Slash": "+slow_clock 1",
+
+    "I": "+iso_height 1",
+    "J": "+iso_width -1",
+    "K": "+iso_height -1",
+    "L": "+iso_width 1",
+
+    "Up": "+iso_pitch -1",
+    "Down": "+iso_pitch 1",
+    "Left": "+iso_yaw -1",
+    "Right": "+iso_yaw 1",
+
+    "BracketLeft": "e:mag -1",
+    "BracketRight": "e:mag 1"
   }
 }

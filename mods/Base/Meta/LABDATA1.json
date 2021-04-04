@@ -1,0 +1,28 @@
+{
+    "0": { "Id": "lab.100", "PaletteId": 1 }, // Unknown100
+    "1": { "PaletteId": 3 }, // TestSrimalinar
+    "2": { "PaletteId": 7 }, // Toronto1
+    "3": { "PaletteId": 8 }, // Toronto2
+    "4": { "PaletteId": 13 }, // TestDrinno
+    "5": { "PaletteId": 1 }, // Unknown105
+    "6": { "PaletteId": 15 }, // Argim
+    "7": { "PaletteId": 1 }, // Unknown107
+    "8": { "PaletteId": 18 }, // TestKenget
+    "9": { "PaletteId": 3 }, // Jirinaar
+    "10": { "PaletteId": 25 }, // Test110
+    "11": { "PaletteId": 15 }, // HunterCellar
+    "12": { "PaletteId": 13 }, // Drinno
+    "13": { "PaletteId": 0 }, // Unknown113
+    "14": { "PaletteId": 29 }, // ArgimDead
+    "15": { "PaletteId": 0 }, // Unknown115
+    "16": { "PaletteId": 0 }, // Unknown116
+    "17": { "PaletteId": 22 }, // TransportCaves
+    "18": { "PaletteId": 18 }, // Kenget1
+    "19": { "PaletteId": 18 }, // Kenget2
+    "20": { "PaletteId": 18 }, // Kenget3
+    "21": { "PaletteId": 18 }, // Kenget4
+    "22": { "PaletteId": 18 }, // Kenget5
+    "23": { "PaletteId": 18 }, // Kenget6
+    "24": { "PaletteId": 18 }, // Kenget7
+    "25": { "PaletteId": 18 }  // Kenget8
+}

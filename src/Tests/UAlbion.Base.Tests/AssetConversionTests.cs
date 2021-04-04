@@ -170,7 +170,7 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void LabyrinthTest()
         {
-            var info = new AssetInfo { AssetId = AssetId.From(LabyrinthData.Jirinaar) };
+            var info = new AssetInfo { AssetId = AssetId.From(Labyrinth.Jirinaar) };
             Test<Formats.Assets.Labyrinth.LabyrinthData>(info.AssetId, null, (x, s) => Loaders.LabyrinthDataLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 

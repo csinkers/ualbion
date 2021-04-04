@@ -1,6 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Numerics;
+﻿using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
@@ -56,34 +54,13 @@ namespace UAlbion
 
             PerfTracker.StartupEvent("Running game");
             global.Raise(new SetSceneEvent(SceneId.Empty), null);
-            switch (commandLine.GameMode)
-            {
-                case GameMode.MainMenu:
-                    global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
-                    break;
-                case GameMode.NewGame:
-                    global.Raise(new NewGameEvent(Base.Map.TorontoBegin, 30, 75), null);
-                    break;
-                case GameMode.LoadGame:
-                    var saveSlot = ushort.Parse(commandLine.GameModeArgument, CultureInfo.InvariantCulture);
-                    global.Raise(new LoadGameEvent(saveSlot), null);
-                    break;
-                case GameMode.LoadMap:
-                    var map = (Base.Map)int.Parse(commandLine.GameModeArgument, CultureInfo.InvariantCulture);
-                    global.Raise(new NewGameEvent(map, 40, 40), null);
-                    break;
-                case GameMode.Inventory:
-                    global.Raise(new SetSceneEvent(SceneId.Inventory), null);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException($"Unexpected game mode \"{commandLine.GameMode}\"");
-            }
 
             if (commandLine.Commands != null)
             {
                 foreach (var command in commandLine.Commands)
                     global.Raise(Event.Parse(command), null);
             }
+            else global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
 
             engine.Run();
             // TODO: Ensure all sprite leases returned etc to weed out memory leaks

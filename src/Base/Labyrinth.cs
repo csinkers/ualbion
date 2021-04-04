@@ -6,7 +6,7 @@ using Newtonsoft.Json.Converters;
 namespace UAlbion.Base
 {
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum LabyrinthData : byte
+    public enum Labyrinth : byte
     {
         Test1 = 1,
         Test2 = 2,

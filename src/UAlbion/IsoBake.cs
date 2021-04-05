@@ -28,14 +28,16 @@ namespace UAlbion
         LabyrinthId _labId;
         float _pitch;
         float _yaw = 45;
+        int _initialDiamondHeight = 40;
         int _width = 48;
         int _height = 64;
-        int _tilesPerRow = 8;
+        int _tilesPerRow = 16;
 
         IsoBake()
         {
             _labId = Base.Labyrinth.Argim;
             _layout = AttachChild(new IsometricLayout());
+            _pitch = ApiUtil.RadToDeg(MathF.Asin((float)_initialDiamondHeight / _width));
 
             On<IsoYawEvent>(e => { _yaw += e.Delta; Update(); });
             On<IsoPitchEvent>(e => { _pitch += e.Delta; Update(); });
@@ -68,28 +70,41 @@ namespace UAlbion
         {
             Raise(new InputModeEvent(InputMode.IsoBake));
             Raise(new EngineFlagEvent(FlagOperation.Set, EngineFlags.FlipDepthRange));
-            Raise(new CameraMagnificationEvent(0.5f));
+            Raise(new CameraMagnificationEvent(1.0f));
             Raise(new CameraPlanesEvent(0, 5000));
-            Raise(new TriggerRenderDocEvent());
-            Raise(new EngineFlagEvent(FlagOperation.Set, EngineFlags.ShowBoundingBoxes));
+            // Raise(new EngineFlagEvent(FlagOperation.Set, EngineFlags.ShowBoundingBoxes));
             RecreateLayout();
         }
 
-        void RecreateLayout() => _layout.Load(_labId, BuildProperties());
+        void RecreateLayout()
+        {
+            _layout.Load(_labId, BuildProperties(false));
+            Update();
+        }
+
         void Update() => _layout.Properties = BuildProperties();
 
-        DungeonTileMapProperties BuildProperties()
+        DungeonTileMapProperties BuildProperties(bool log = true)
         {
             _yaw = Math.Clamp(_yaw, -45.0f, 45.0f);
-            _pitch = Math.Clamp(_pitch, 0, 45.0f);
+            _pitch = Math.Clamp(_pitch, 0, 85.0f);
             float yawRads = ApiUtil.DegToRad(_yaw);
             float pitchRads = ApiUtil.DegToRad(_pitch);
 
             float sideLength = _width * MathF.Cos(yawRads);
-            float diamondHeight = _width * MathF.Tan(pitchRads);
+            float diamondHeight = _width * MathF.Sin(pitchRads);
             float height = (_height - diamondHeight) / MathF.Cos(pitchRads);
 
-            Raise(new LogEvent(LogEvent.Level.Info, $"Y:{(int)_yaw} P:{(int)_pitch} {_width}x{_height} = {sideLength:N2}x{height:N2} DH:{diamondHeight:N2} R:{diamondHeight / _width:N2}"));
+            int rows = (_layout.TileCount + _tilesPerRow - 1) / _tilesPerRow;
+            if (log)
+            {
+                Raise(new LogEvent(LogEvent.Level.Info,
+                    $"{_tilesPerRow}x{rows} " +
+                    $"Y:{(int) _yaw} P:{(int) _pitch} " +
+                    $"{_width}x{_height} = {sideLength:N2}x{height:N2} " +
+                    $"DH:{diamondHeight:N2} R:{diamondHeight / _width:N2} " +
+                    $"Total Dims: {_width * _tilesPerRow}x{_height * rows}"));
+            }
 
             return new DungeonTileMapProperties(
                 new Vector3(sideLength, height, sideLength),

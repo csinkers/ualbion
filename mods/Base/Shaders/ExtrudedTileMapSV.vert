@@ -69,15 +69,15 @@ void main()
 			0, 1, 0,
 			-sinY, 0, cosY);
 
-		mat3 mRot = instanceRotX * instanceRotY;
 		mat3 mScale = mat3(uScale.x, 0, 0, 0, uScale.y, 0, 0, 0, uScale.z);
+		mat3 mWorld = instanceRotX * instanceRotY * mScale;
 
 		uint index = gl_InstanceIndex; //! uint index = gl_InstanceID;
 		uint j = index / uWidth;
 		uint i = index - j * uWidth;
 		
 		vec3 iPosition = uOrigin.xyz + i * uHorizontalSpacing.xyz + j * uVerticalSpacing.xyz;
-		vec3 worldSpace = mScale * mRot * vPosition + iPosition;
+		vec3 worldSpace = mWorld * vPosition + iPosition;
 		gl_Position = uProjection * uView * vec4(worldSpace, 1);
 	}
 }

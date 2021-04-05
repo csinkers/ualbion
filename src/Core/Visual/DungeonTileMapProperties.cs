@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace UAlbion.Core.Visual
 {
+#pragma warning disable CA1815 // Override equals and operator equals on value types
     [StructLayout(LayoutKind.Sequential)]
     public readonly struct DungeonTileMapProperties
     {
@@ -39,4 +40,5 @@ namespace UAlbion.Core.Visual
             Pad1 = 0;
         }
     }
+#pragma warning restore CA1815 // Override equals and operator equals on value types
 }

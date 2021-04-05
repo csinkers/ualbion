@@ -9,5 +9,6 @@ namespace UAlbion.Api.Visual
         IList<uint[]> GetCompletePalette();
         bool IsAnimated { get; }
         uint[] GetPaletteAtTime(int paletteFrame);
+        IEnumerable<(byte, int)> AnimatedEntries { get; }
     }
 }

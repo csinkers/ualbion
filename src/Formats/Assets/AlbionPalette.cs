@@ -97,6 +97,12 @@ namespace UAlbion.Formats.Assets
             }
         }
 
+        public IEnumerable<(byte, int)> AnimatedEntries =>
+            from r in Ranges
+            let rangeLength = r.Item2 - r.Item1 + 1
+            from e in Enumerable.Range(r.Item1, rangeLength)
+            select ((byte)e, rangeLength);
+
         public int CalculatePeriod(IEnumerable<byte> distinctColors)
             => (int)ApiUtil.Lcm(distinctColors.Select(x => (long)_periods[x]).Append(1));
 

@@ -24,6 +24,8 @@ namespace UAlbion
             set => _tilemap.Properties = value;
         }
 
+        public int TileCount => _tilemap?.Tiles.Length ?? 0;
+
         protected override void Subscribed()
         {
             if (_tilemap != null)

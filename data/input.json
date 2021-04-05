@@ -145,8 +145,8 @@
     "Shift+Q": "+cam_move 0 0 -50",
     "Shift+F": "+cam_move 0 0  50",
 
-    "Period": "iso_row_width -1",
-    "Comma": "iso_row_width 1",
+    "Comma": "iso_row_width -1",
+    "Period": "iso_row_width 1",
     "Slash": "+slow_clock 1",
 
     "I": "+iso_height 1",

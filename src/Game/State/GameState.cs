@@ -143,6 +143,9 @@ namespace UAlbion.Game.State
         void LoadGame(ushort id)
         {
             _game = Resolve<IAssetManager>().LoadSavedGame(IdToPath(id));
+            if (_game == null)
+                return;
+
             InitialiseGame();
         }
 

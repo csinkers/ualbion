@@ -206,7 +206,8 @@ namespace UAlbion.Game.Entities.Map2D
             {
                 zone.ChainSource = _mapData.Id;
                 zone.Chain = value;
-                zone.Node = _mapData.Events[_mapData.Chains[value]];
+                var firstEventId = _mapData.Chains[value];
+                zone.Node = firstEventId >= _mapData.Events.Count ? null : _mapData.Events[firstEventId];
             }
         }
 

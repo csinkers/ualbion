@@ -3,5 +3,5 @@
 namespace UAlbion.Game.Events
 {
     [Event("close_window", "Closes the currently active window")]
-    public class CloseWindowEvent : GameEvent { }
+    public class CloseWindowEvent : CancellableEvent { }
 }

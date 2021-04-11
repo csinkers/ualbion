@@ -253,7 +253,17 @@ namespace UAlbion.Game.Assets
 
         public SavedGame LoadSavedGame(string path)
         {
-            throw new NotImplementedException();
+            var disk = Resolve<IFileSystem>();
+            if (!disk.FileExists(path))
+            {
+                Raise(new LogEvent(LogEvent.Level.Error, $"Could not find save game file \"{path}\""));
+                return null;
+            }
+
+            using var stream = disk.OpenRead(path);
+            using var br = new BinaryReader(stream);
+            using var s = new AlbionReader(br, stream.Length);
+            return SavedGame.Serdes(null, AssetMapping.Global, s);
         }
 
         public void SaveAssets(

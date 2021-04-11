@@ -28,6 +28,12 @@ namespace UAlbion.Game.Gui.Menus
                 Closed?.Invoke(this, null);
                 e.Propagating = false;
             });
+            On<CloseWindowEvent>(e =>
+            {
+                Remove();
+                Closed?.Invoke(this, null);
+                e.Propagating = false;
+            });
 
             _showEmptySlots = showEmptySlots;
             _stringId = stringId;

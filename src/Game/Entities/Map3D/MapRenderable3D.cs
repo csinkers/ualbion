@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
@@ -47,6 +48,8 @@ namespace UAlbion.Game.Entities.Map3D
                 return;
 
             var assets = Resolve<IAssetManager>();
+            var dayPalette = assets.LoadPalette(_mapData.PaletteId);
+            IPalette nightPalette = null; // TODO
             var properties = new DungeonTileMapProperties(
                 _tileSize,
                 Vector3.Zero,
@@ -63,7 +66,8 @@ namespace UAlbion.Game.Entities.Map3D
                 _mapData.Width * _mapData.Height,
                 properties,
                 Resolve<ICoreFactory>(),
-                Resolve<IPaletteManager>());
+                dayPalette,
+                nightPalette);
 
             for (int i = 0; i < _labyrinthData.FloorAndCeilings.Count; i++)
             {

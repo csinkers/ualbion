@@ -10,17 +10,22 @@ namespace UAlbion.Core.Visual
         readonly DungeonTile[] _tiles;
         DungeonTileMapProperties _properties;
 
-        public DungeonTilemap(IAssetId id, string name, int tileCount, DungeonTileMapProperties properties, ICoreFactory factory, IPaletteManager paletteManager)
+        public DungeonTilemap(IAssetId id, string name, int tileCount, DungeonTileMapProperties properties, ICoreFactory factory, IPalette dayPalette, IPalette nightPalette)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
-            if (paletteManager == null) throw new ArgumentNullException(nameof(paletteManager));
+            if (dayPalette == null) throw new ArgumentNullException(nameof(dayPalette));
 
             Properties = properties;
             _tiles = new DungeonTile[tileCount];
 
             Name = name;
-            Floors = factory.CreateMultiTexture(id, "FloorTiles:" + name, paletteManager);
-            Walls = factory.CreateMultiTexture(id, "WallTiles:" + name, paletteManager);
+            DayFloors = factory.CreateMultiTexture(id, "FloorTiles:" + name, dayPalette);
+            DayWalls = factory.CreateMultiTexture(id, "WallTiles:" + name, dayPalette);
+            if (nightPalette != null)
+            {
+                NightFloors = factory.CreateMultiTexture(id, "FloorTiles:" + name, nightPalette);
+                NightWalls = factory.CreateMultiTexture(id, "WallTiles:" + name, nightPalette);
+            }
         }
 
         public string Name { get; }
@@ -34,18 +39,28 @@ namespace UAlbion.Core.Visual
         }
 
         public ISet<int> AnimatedTiles { get; } = new HashSet<int>();
-        public MultiTexture Floors { get; }
-        public MultiTexture Walls { get; }
+        public MultiTexture DayFloors { get; }
+        public MultiTexture DayWalls { get; }
+        public MultiTexture NightFloors { get; }
+        public MultiTexture NightWalls { get; }
         public bool TilesDirty { get; set; } = true;
         public bool PropertiesDirty { get; set; } = true;
 
-        public void DefineFloor(int id, ITexture texture) => Floors.AddTexture(id, texture, 0, 0, null, false);
-        public void DefineWall(int id, ITexture texture, int x, int y, byte transparentColour, bool isAlphaTested) 
-            => Walls.AddTexture(id, texture, x, y, transparentColour, isAlphaTested);
+        public void DefineFloor(int id, ITexture texture)
+        {
+            DayFloors.AddTexture(id, texture, 0, 0, null, false);
+            NightFloors?.AddTexture(id, texture, 0, 0, null, false);
+        }
+
+        public void DefineWall(int id, ITexture texture, int x, int y, byte transparentColour, bool isAlphaTested)
+        {
+            DayWalls.AddTexture(id, texture, x, y, transparentColour, isAlphaTested);
+            NightWalls?.AddTexture(id, texture, x, y, transparentColour, isAlphaTested);
+        }
 
         public void Set(int index, byte floorSubImage, byte ceilingSubImage, byte wallSubImage, int frame)
         {
-            bool isAnimated = Floors.IsAnimated(floorSubImage) || Floors.IsAnimated(ceilingSubImage) || Walls.IsAnimated(wallSubImage);
+            bool isAnimated = DayFloors.IsAnimated(floorSubImage) || DayFloors.IsAnimated(ceilingSubImage) || DayWalls.IsAnimated(wallSubImage);
             if (isAnimated) AnimatedTiles.Add(index);
             else AnimatedTiles.Remove(index);
 
@@ -53,11 +68,11 @@ namespace UAlbion.Core.Visual
             {
                 fixed (DungeonTile* tile = &Tiles[index])
                 {
-                    tile->Floor = (byte)Floors.GetSubImageAtTime(floorSubImage, frame);
-                    tile->Ceiling = (byte)Floors.GetSubImageAtTime(ceilingSubImage, frame);
-                    tile->Wall = (byte)Walls.GetSubImageAtTime(wallSubImage, frame);
+                    tile->Floor = (byte)DayFloors.GetSubImageAtTime(floorSubImage, frame);
+                    tile->Ceiling = (byte)DayFloors.GetSubImageAtTime(ceilingSubImage, frame);
+                    tile->Wall = (byte)DayWalls.GetSubImageAtTime(wallSubImage, frame);
                     tile->Flags = 0; // DungeonTileFlags.UsePalette;
-                    var subImage = (SubImage)Walls.GetSubImage(tile->Wall);
+                    var subImage = (SubImage)DayWalls.GetSubImage(tile->Wall);
                     tile->WallSize = subImage.TexSize;
                 }
             }

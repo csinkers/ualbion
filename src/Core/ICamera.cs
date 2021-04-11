@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using UAlbion.Core.Visual;
 
 namespace UAlbion.Core
 {
@@ -16,7 +15,6 @@ namespace UAlbion.Core
         float FieldOfView { get; }
         float AspectRatio { get; }
         float Magnification { get; }
-        CameraInfo GetCameraInfo();
         Vector3 ProjectWorldToNorm(Vector3 worldPosition);
         Vector3 UnprojectNormToWorld(Vector3 normPosition);
     }

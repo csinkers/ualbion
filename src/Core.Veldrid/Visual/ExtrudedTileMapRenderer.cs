@@ -28,8 +28,10 @@ namespace UAlbion.Core.Veldrid.Visual
 
         static readonly ResourceLayoutDescription UniformLayout = new ResourceLayoutDescription(
             ResourceLayoutHelper.UniformV("Properties"), // Property Data
-            ResourceLayoutHelper.Texture("Floors"),
-            ResourceLayoutHelper.Texture("Walls"),
+            ResourceLayoutHelper.Texture("DayFloors"),
+            ResourceLayoutHelper.Texture("DayWalls"),
+            ResourceLayoutHelper.Texture("NightFloors"),
+            ResourceLayoutHelper.Texture("NightWalls"),
             ResourceLayoutHelper.Sampler("TextureSampler"));
 
         const string VertexShaderName = "ExtrudedTileMapSV.vert";
@@ -174,8 +176,14 @@ namespace UAlbion.Core.Veldrid.Visual
                     continue;
 
                 c.CommandList.PushDebugGroup($"Tiles3D:{tilemap.Name}:{tilemap.RenderOrder}");
-                textureManager.PrepareTexture(tilemap.Floors, c);
-                textureManager.PrepareTexture(tilemap.Walls, c);
+                textureManager.PrepareTexture(tilemap.DayFloors, c);
+                textureManager.PrepareTexture(tilemap.DayWalls, c);
+                if (tilemap.NightFloors != null)
+                {
+                    textureManager.PrepareTexture(tilemap.NightFloors, c);
+                    textureManager.PrepareTexture(tilemap.NightWalls, c);
+                }
+
                 UpdateInstanceBuffer(tilemap, objectManager, c);
                 UpdateResourceSet(tilemap, objectManager, c);
                 c.CommandList.PopDebugGroup();
@@ -197,7 +205,7 @@ namespace UAlbion.Core.Veldrid.Visual
             cl.PushDebugGroup($"Tiles3D:{tilemap.Name}:{tilemap.RenderOrder}");
 
             var textureManager = Resolve<ITextureManager>();
-            TextureView floors = (TextureView)textureManager.GetTexture(tilemap.Floors); 
+            TextureView floors = (TextureView)textureManager.GetTexture(tilemap.DayFloors); 
             var instanceBuffer = objectManager.GetDeviceObject<DeviceBuffer>(InstanceBufferKey(tilemap));
             var resourceSet = objectManager.GetDeviceObject<ResourceSet>(ResourceSetKey(tilemap, floors));
 
@@ -247,22 +255,27 @@ namespace UAlbion.Core.Veldrid.Visual
 
             // Need to retrieve textures every time to prevent them being flushed from the cache
             var textureManager = Resolve<ITextureManager>();
-            TextureView floors = (TextureView)textureManager.GetTexture(tilemap.Floors); 
-            TextureView walls = (TextureView)textureManager.GetTexture(tilemap.Walls);
-            if (floors == null || walls == null)
+            TextureView dayFloors = (TextureView)textureManager.GetTexture(tilemap.DayFloors); 
+            TextureView dayWalls = (TextureView)textureManager.GetTexture(tilemap.DayWalls);
+            TextureView nightFloors = (TextureView)textureManager.GetTexture(tilemap.NightFloors ?? tilemap.DayFloors); 
+            TextureView nightWalls = (TextureView)textureManager.GetTexture(tilemap.NightWalls ?? tilemap.DayWalls);
+
+            if (dayFloors == null || dayWalls == null || nightFloors == null || nightWalls == null)
                 throw new InvalidOperationException("Could not locate floor/wall multi-texture");
 
-            var resourceSet = objectManager.GetDeviceObject<ResourceSet>(ResourceSetKey(tilemap, floors));
+            var resourceSet = objectManager.GetDeviceObject<ResourceSet>(ResourceSetKey(tilemap, dayFloors));
             if (resourceSet == null || isNew) // Only recreate the resource set if we need to
             {
                 resourceSet = c.GraphicsDevice.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_layout,
                     propertiesBuffer,
-                    floors,
-                    walls,
+                    dayFloors,
+                    dayWalls,
+                    nightFloors,
+                    nightWalls,
                     _textureSampler));
 
                 resourceSet.Name = $"RS_TileMap:{tilemap.Name}";
-                objectManager.SetDeviceObject(ResourceSetKey(tilemap, floors), resourceSet);
+                objectManager.SetDeviceObject(ResourceSetKey(tilemap, dayFloors), resourceSet);
             }
         }
 

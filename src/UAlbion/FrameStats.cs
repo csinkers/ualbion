@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Core;
 using UAlbion.Core.Textures;
-using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Formats.Assets;
 using UAlbion.Game;
 
@@ -27,7 +27,7 @@ namespace UAlbion
 
                 var frames = texture.SubImageCount;
                 var uniqueColours = texture.PixelData.ToHashSet();
-                var lcm = ImageUtil.CalculatePalettePeriod(uniqueColours, palette);
+                var lcm = BlitUtil.CalculatePalettePeriod(uniqueColours, palette);
                 dict[id] = (int)ApiUtil.Lcm(frames, lcm);
             }
         }

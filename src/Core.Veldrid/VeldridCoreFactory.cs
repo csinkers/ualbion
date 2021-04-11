@@ -9,7 +9,7 @@ namespace UAlbion.Core.Veldrid
 {
     public class VeldridCoreFactory : ICoreFactory
     {
-        public MultiTexture CreateMultiTexture(IAssetId id, string name, IPaletteManager paletteManager) => new VeldridMultiTexture(id, name, paletteManager);
+        public MultiTexture CreateMultiTexture(IAssetId id, string name, IPalette palette) => new VeldridMultiTexture(id, name, palette);
         public IDisposable CreateRenderDebugGroup(IRendererContext context, string name)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));

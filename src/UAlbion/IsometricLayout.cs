@@ -4,7 +4,6 @@ using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
-using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game;
 
 namespace UAlbion
@@ -37,7 +36,6 @@ namespace UAlbion
             var engine = Resolve<IEngine>();
             var assets = Resolve<IAssetManager>();
             var coreFactory = Resolve<ICoreFactory>();
-            var paletteManager = Resolve<IPaletteManager>();
 
             if (_tilemap != null)
                 engine.UnregisterRenderable(_tilemap);
@@ -52,7 +50,7 @@ namespace UAlbion
 
             var info = assets.GetAssetInfo(labyrinthId);
             int paletteId = info.Get(AssetProperty.PaletteId, 0);
-            Raise(new LoadPaletteEvent(new PaletteId(AssetType.Palette, paletteId)));
+            var palette = assets.LoadPalette(new PaletteId(AssetType.Palette, paletteId));
 
             _totalTiles =
                 (floors ? labyrinthData.FloorAndCeilings.Count : 0) +
@@ -74,7 +72,7 @@ namespace UAlbion
             if (walls)
                 for (byte i = 0; i < labyrinthData.Walls.Count; i++) _contents[index++] = (byte)(i + 100);
 
-            _tilemap = new DungeonTilemap(labyrinthData.Id, labyrinthData.Id.ToString(), _totalTiles, properties, coreFactory, paletteManager)
+            _tilemap = new DungeonTilemap(labyrinthData.Id, labyrinthData.Id.ToString(), _totalTiles, properties, coreFactory, palette, null)
             {
                 PipelineId = (int)DungeonTilemapPipeline.NoCulling
             };

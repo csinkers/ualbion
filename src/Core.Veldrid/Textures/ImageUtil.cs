@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using UAlbion.Api;
 using UAlbion.Api.Visual;
 
 namespace UAlbion.Core.Veldrid.Textures
@@ -42,46 +39,6 @@ namespace UAlbion.Core.Veldrid.Textures
             }
 
             return image;
-        }
-
-        public static void UnpackSpriteSheet(
-            uint[] palette,
-            int frameWidth,
-            int frameHeight,
-            ReadOnlyUIntImageBuffer source,
-            ByteImageBuffer dest,
-            Action<int, int, int, int> frameFunc)
-        {
-            if (dest.Width < source.Width) throw new ArgumentOutOfRangeException(nameof(dest), "Tried to unpack to a smaller destination");
-            if (dest.Height < source.Height) throw new ArgumentOutOfRangeException(nameof(dest), "Tried to unpack to a smaller destination");
-
-            BlitUtil.Blit32To8(source, dest, palette);
-
-            int x = 0; int y = 0;
-            do
-            {
-                frameFunc(x, y, frameWidth, frameHeight);
-                x += frameWidth;
-                if (x + frameWidth > source.Width)
-                {
-                    y += frameHeight;
-                    x = 0;
-                }
-            } while (y + frameHeight <= source.Height);
-        }
-
-        public static long CalculatePalettePeriod(ISet<byte> colors, IPalette palette)
-        {
-            if (colors == null) throw new ArgumentNullException(nameof(colors));
-            if (palette == null) throw new ArgumentNullException(nameof(palette));
-
-            var periods =
-                palette.AnimatedEntries
-                    .Where(x => colors.Contains(x.Item1))
-                    .Select(x => (long)x.Item2)
-                    .Distinct();
-
-            return ApiUtil.Lcm(periods);
         }
     }
 }

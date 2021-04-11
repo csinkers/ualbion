@@ -4,7 +4,6 @@ using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Textures;
-using UAlbion.Core.Visual;
 using Veldrid;
 
 namespace UAlbion.Core.Veldrid.Textures
@@ -23,7 +22,6 @@ namespace UAlbion.Core.Veldrid.Textures
             if (IsMetadataDirty)
                 RebuildLayers();
 
-            var palette = PaletteManager.Palette.GetCompletePalette();
             using var staging = rf.CreateTexture(new TextureDescription(
                 (uint)Width,
                 (uint)Height,
@@ -36,7 +34,7 @@ namespace UAlbion.Core.Veldrid.Textures
 
             staging.Name = "T_" + Name + "_Staging";
 
-            Span<uint> toBuffer = stackalloc uint[(int)(Width * Height)];
+            Span<uint> toBuffer = stackalloc uint[Width * Height];
             foreach (var lsi in LogicalSubImages)
             {
                 //if (!rebuildAll && !lsi.IsPaletteAnimated) // TODO: Requires caching a single Texture and then modifying it
@@ -45,7 +43,7 @@ namespace UAlbion.Core.Veldrid.Textures
                 for (int i = 0; i < lsi.Frames; i++)
                 {
                     toBuffer.Fill(lsi.IsAlphaTested ? 0 : 0xff000000);
-                    Rebuild(lsi, i, toBuffer, palette);
+                    Rebuild(lsi, i, toBuffer, Palette.GetCompletePalette());
 
                     uint destinationLayer = (uint)LayerLookup[new LayerKey(lsi.Id, i)];
 
@@ -98,7 +96,6 @@ namespace UAlbion.Core.Veldrid.Textures
             if (IsMetadataDirty)
                 RebuildLayers();
 
-            var palette = PaletteManager.Palette.GetCompletePalette();
             var logicalImage = LogicalSubImages[logicalId];
             if (!LayerLookup.TryGetValue(new LayerKey(logicalId, tick % logicalImage.Frames), out var subImageId))
                 return;
@@ -113,7 +110,7 @@ namespace UAlbion.Core.Veldrid.Textures
                 fixed (Rgba32* pixelPtr = pixels)
                 {
                     Span<uint> toBuffer = new Span<uint>((uint*)pixelPtr, pixels.Length);
-                    Rebuild(logicalImage, tick, toBuffer, palette);
+                    Rebuild(logicalImage, tick, toBuffer, Palette.GetCompletePalette());
                 }
             }
 
@@ -124,7 +121,7 @@ namespace UAlbion.Core.Veldrid.Textures
             image.SaveAsPng(stream);
         }
 
-        public VeldridMultiTexture(IAssetId id, string name, IPaletteManager paletteManager) : base(id, name, paletteManager)
+        public VeldridMultiTexture(IAssetId id, string name, IPalette palette) : base(id, name, palette)
         {
         }
     }

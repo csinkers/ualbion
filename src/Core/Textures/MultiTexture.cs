@@ -4,14 +4,11 @@ using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
-using UAlbion.Core.Visual;
 
 namespace UAlbion.Core.Textures
 {
     public abstract class MultiTexture : ITexture
     {
-        protected IPaletteManager PaletteManager { get; }
-
         protected class SubImageComponent
         {
             public ITexture Source { get; set; }
@@ -31,12 +28,11 @@ namespace UAlbion.Core.Textures
             public int W { get; set; }
             public int H { get; set; }
             public int Frames { get; set; }
-            public bool IsPaletteAnimated { get; set; }
             public bool IsAlphaTested { get; set; }
             public byte? TransparentColor { get; set; }
             public IList<SubImageComponent> Components { get; } = new List<SubImageComponent>();
 
-            public override string ToString() => $"LSI{Id} {W}x{H}:{Frames}{(IsPaletteAnimated ? "P":" ")} {string.Join("; ",  Components.Select(x => x.ToString()))}";
+            public override string ToString() => $"LSI{Id} {W}x{H}:{Frames} {string.Join("; ",  Components.Select(x => x.ToString()))}";
         }
 
         protected struct LayerKey : IEquatable<LayerKey>
@@ -52,24 +48,21 @@ namespace UAlbion.Core.Textures
             public override string ToString() => $"LK{_id}.{_frame}";
         }
 
+        protected IPalette Palette { get; }
         protected IList<LogicalSubImage> LogicalSubImages { get; }= new List<LogicalSubImage>();
         protected IDictionary<LayerKey, int> LayerLookup { get; }= new Dictionary<LayerKey, int>();
         protected IList<Vector2> LayerSizes { get; }= new List<Vector2>();
         protected bool IsMetadataDirty { get; private set; } = true;
-        bool _isAnySubImagePaletteAnimated;
-        int _lastPaletteVersion;
-        uint _lastPaletteId;
-        bool _isDirty;
 
-        public MultiTexture(IAssetId id, string name, IPaletteManager paletteManager)
+        protected MultiTexture(IAssetId id, string name, IPalette palette)
         {
             Id = id;
             Name = name;
-            PaletteManager = paletteManager;
+            Palette = palette ?? throw new ArgumentNullException(nameof(palette));
             MipLevels = 1; //(int)Math.Min(Math.Log(Width, 2.0), Math.Log(Height, 2.0));
 
             // Add empty texture for disabled walls/ceilings etc
-            LogicalSubImages.Add(new LogicalSubImage(0) { W = 1, H = 1, Frames = 1, IsPaletteAnimated = false });
+            LogicalSubImages.Add(new LogicalSubImage(0) { W = 1, H = 1, Frames = 1 });
         }
 
         public PixelFormat Format => PixelFormat.Rgba32;
@@ -82,26 +75,8 @@ namespace UAlbion.Core.Textures
         public int MipLevels { get; }
         public int ArrayLayers { get { if (IsMetadataDirty) RebuildLayers(); return LayerSizes.Count; } }
         public int SubImageCount => LayerSizes.Count;
-
-        public bool IsDirty
-        {
-            get
-            {
-                var version = PaletteManager.Version;
-                if (_isAnySubImagePaletteAnimated && version != _lastPaletteVersion || PaletteManager.Palette.Id != _lastPaletteId)
-                {
-                    _lastPaletteVersion = version;
-                    _lastPaletteId = PaletteManager.Palette.Id;
-                    return true;
-                }
-
-                return _isDirty;
-            }
-            protected set => _isDirty = value;
-        }
-
+        public bool IsDirty { get; protected set; }
         public int SizeInBytes => Width * Height * LayerSizes.Count * FormatSize;
-
         public void Invalidate() => IsDirty = true; 
 
         public bool IsAnimated(int logicalId)
@@ -124,9 +99,7 @@ namespace UAlbion.Core.Textures
                 return 0;
 
             var logicalImage = LogicalSubImages[logicalId];
-            if (LayerLookup.TryGetValue(new LayerKey(logicalId, tick % logicalImage.Frames), out var result))
-                return result;
-            return 0;
+            return LayerLookup.TryGetValue(new LayerKey(logicalId, tick % logicalImage.Frames), out var result) ? result : 0;
         }
 
         public ISubImage GetSubImage(int subImage)
@@ -144,29 +117,21 @@ namespace UAlbion.Core.Textures
 
         protected void RebuildLayers()
         {
-            _isAnySubImagePaletteAnimated = false;
             IsMetadataDirty = false;
             LayerLookup.Clear();
             LayerSizes.Clear();
-
-            var palette = PaletteManager.Palette.GetCompletePalette();
-            var animatedRange =
-                palette
-                    .SelectMany(x => x.Select((y, i) => (y, i)))
-                    .GroupBy(x => x.i)
-                    .Where(x => x.Distinct().Count() > 1)
-                    .Select(x => (byte)x.Key)
-                    .ToHashSet();
 
             foreach (var lsi in LogicalSubImages)
             {
                 lsi.W = 1;
                 lsi.H = 1;
+                long frames = 1;
 
                 foreach (var component in lsi.Components)
                 {
                     if (component.Source == null)
                         continue;
+
                     var size = ((SubImage)component.Source.GetSubImage(0)).Size;
                     if (component.W.HasValue) size.X = component.W.Value;
                     if (component.H.HasValue) size.Y = component.H.Value;
@@ -176,14 +141,16 @@ namespace UAlbion.Core.Textures
                     if (lsi.H < component.Y + size.Y)
                         lsi.H = component.Y + (int)size.Y;
 
-                    if (!lsi.IsPaletteAnimated && component.Source is EightBitTexture t)
-                        lsi.IsPaletteAnimated = t.ContainsColors(animatedRange);
-
-                    if (lsi.IsPaletteAnimated)
-                        _isAnySubImagePaletteAnimated = true;
+                    frames = ApiUtil.Lcm(frames, component.Source.SubImageCount);
+                    if (component.Source is IEightBitImage eightBit)
+                    {
+                        var colours = eightBit.PixelData.ToHashSet();
+                        long paletteFrames = BlitUtil.CalculatePalettePeriod(colours, Palette);
+                        frames = ApiUtil.Lcm(frames, paletteFrames);
+                    }
                 }
 
-                lsi.Frames = (int)ApiUtil.Lcm(lsi.Components.Select(x => (long)x.Source.SubImageCount).Append(1));
+                lsi.Frames = (int)frames;
                 for (int i = 0; i < lsi.Frames; i++)
                 {
                     LayerLookup[new LayerKey(lsi.Id, i)] = LayerSizes.Count;
@@ -197,10 +164,19 @@ namespace UAlbion.Core.Textures
             }
 
             if (LayerSizes.Count > 255)
-                throw new InvalidOperationException("Too many textures added to multi-texture");
+                ApiUtil.Assert($"Too many textures added to multi-texture: {LayerSizes.Count}");
         }
 
-        public void AddTexture(int logicalId, ITexture texture, int x, int y, byte? transparentColor, bool isAlphaTested, int? w = null, int? h = null, byte alpha = 255)
+        public void AddTexture(
+            int logicalId,
+            ITexture texture,
+            int x,
+            int y,
+            byte? transparentColor,
+            bool isAlphaTested,
+            int? w = null,
+            int? h = null,
+            byte alpha = 255)
         {
             if (logicalId == 0)
                 throw new InvalidOperationException("Logical Subimage Index 0 is reserved for a blank / transparent state");
@@ -250,6 +226,7 @@ namespace UAlbion.Core.Textures
 
                 var eightBitTexture = (EightBitTexture)component.Source;
                 int frame = frameNumber % eightBitTexture.SubImageCount;
+                int palFrame = frameNumber % palette.Count;
                 eightBitTexture.GetSubImageOffset(frame, out var sourceWidth, out var sourceHeight, out var sourceOffset, out var sourceStride);
                 int destWidth = component.W ?? sourceWidth;
                 int destHeight = component.H ?? sourceHeight;
@@ -272,7 +249,7 @@ namespace UAlbion.Core.Textures
 
                 var from = new ReadOnlyByteImageBuffer(sourceWidth, sourceHeight, sourceStride, fromSlice);
                 var to = new UIntImageBuffer(destWidth, destHeight, Width, toSlice);
-                BlitUtil.Blit8To32(from, to, palette[PaletteManager.Frame], component.Alpha, lsi.TransparentColor);
+                BlitUtil.Blit8To32(from, to, palette[palFrame], component.Alpha, lsi.TransparentColor);
             }
         }
 

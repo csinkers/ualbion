@@ -50,7 +50,7 @@ namespace UAlbion.Core.Textures
         }
 
         public bool ContainsColors(IEnumerable<byte> colors) => PixelData.Distinct().Intersect(colors).Any();
-        public IList<byte> DistinctColors(int? subImageId)
+        public ISet<byte> DistinctColors(int? subImageId)
         {
             if (subImageId == null)
             {

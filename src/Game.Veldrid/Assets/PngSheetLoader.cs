@@ -35,7 +35,7 @@ namespace UAlbion.Game.Veldrid.Assets
             var uintSpan = MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan);
             var source = new ReadOnlyUIntImageBuffer(image.Width, image.Height, image.Width, uintSpan);
             var dest = new ByteImageBuffer(image.Width, image.Height, image.Width, pixels);
-            ImageUtil.UnpackSpriteSheet(palette, subItemWidth, subItemHeight, source, dest,
+            BlitUtil.UnpackSpriteSheet(palette, subItemWidth, subItemHeight, source, dest,
                 (x,y,w,h) => frames.Add(new AlbionSpriteFrame(x, y, w, h, image.Width)));
 
             bool uniform = frames.All(x => x.Width == frames[0].Width && x.Height == frames[0].Height);

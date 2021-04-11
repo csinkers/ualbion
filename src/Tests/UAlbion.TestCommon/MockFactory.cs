@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
@@ -10,8 +9,8 @@ namespace UAlbion.TestCommon
 {
     public class MockFactory : ICoreFactory
     {
-        public MultiTexture CreateMultiTexture(IAssetId id, string name, IPaletteManager paletteManager)
-            => new MockMultiTexture(id, name, paletteManager);
+        public MultiTexture CreateMultiTexture(IAssetId id, string name, IPalette palette)
+            => new MockMultiTexture(id, name, palette);
         public IDisposable CreateRenderDebugGroup(IRendererContext context, string name)
             => new MockDisposable();
 

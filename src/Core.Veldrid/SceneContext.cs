@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using UAlbion.Api;
+using UAlbion.Core.Events;
+using UAlbion.Core.Textures;
+using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
 using Veldrid;
 using Veldrid.Utilities;
@@ -8,21 +12,40 @@ using Veldrid.Utilities;
 #pragma warning disable CA2213 // Analysis doesn't know about DisposeCollector
 namespace UAlbion.Core.Veldrid
 {
-    public sealed class SceneContext : IDisposable
+    public sealed class SceneContext : Component, IDisposable
     {
         readonly DisposeCollector _disposer = new DisposeCollector();
+        VeldridPaletteTexture _paletteTexture;
+        int _lastPaletteVersion = -1;
 
         public DeviceBuffer IdentityMatrixBuffer { get; private set; }
         public DeviceBuffer ProjectionMatrixBuffer { get; private set; }
         public DeviceBuffer ModelViewMatrixBuffer { get; private set; }
-        public DeviceBuffer DepthLimitsBuffer { get; internal set; }
+        public DeviceBuffer DepthLimitsBuffer { get; private set; }
         public DeviceBuffer CameraInfoBuffer { get; private set; }
         public ResourceSet CommonResourceSet { get; private set; }
         public ResourceLayout CommonResourceLayout { get; private set; }
+        public Texture PaletteTexture { get; private set; }
+        public TextureView PaletteView { get; private set; }
+        public TextureSampleCount MainSceneSampleCount { get; private set; } // TODO: Implement
 
-        public Texture PaletteTexture { get; internal set; }
-        public TextureView PaletteView { get; internal set; }
-        public TextureSampleCount MainSceneSampleCount { get; internal set; }
+        public SceneContext()
+        {
+            On<SetMsaaLevelEvent>(e => {
+                var sampleCount = e.SampleCount switch
+                {
+                    1 => TextureSampleCount.Count1,
+                    2 => TextureSampleCount.Count2,
+                    4 => TextureSampleCount.Count4,
+                    8 => TextureSampleCount.Count8,
+                    16 => TextureSampleCount.Count16,
+                    32 => TextureSampleCount.Count32,
+                    _ => throw new InvalidOperationException($"Invalid sample count {e.SampleCount}")
+                };
+
+                MainSceneSampleCount = sampleCount;
+            });
+        }
 
         public void CreateDeviceObjects(GraphicsDevice gd, CommandList cl)
         {
@@ -53,14 +76,41 @@ namespace UAlbion.Core.Veldrid
 
             CommonResourceLayout = factory.CreateResourceLayout(commonLayoutDescription);
             CommonResourceLayout.Name = "RL_Common";
+            SetCurrentPalette(gd);
+            UpdateResourceSet(gd);
         }
 
-        public void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, ICamera camera)
+        public void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl)
         {
             if (gd == null) throw new ArgumentNullException(nameof(gd));
             if (cl == null) throw new ArgumentNullException(nameof(cl));
-            if (camera == null) throw new ArgumentNullException(nameof(camera));
 
+            var camera = Resolve<ICamera>();
+            var clock = TryResolve<IClock>();
+            var settings = TryResolve<IEngineSettings>();
+            var window = Resolve<IWindowManager>();
+
+            SetCurrentPalette(gd);
+
+            var info = new CameraInfo
+            {
+                WorldSpacePosition = camera.Position,
+                CameraPitch = camera.Pitch,
+                CameraYaw = camera.Yaw,
+                Resolution =  new Vector2(window.PixelWidth, window.PixelHeight),
+                Time = clock?.ElapsedTime ?? 0,
+                Special1 = settings?.Special1 ?? 0,
+                Special2 = settings?.Special2 ?? 0,
+                EngineFlags = (uint?)settings?.Flags ?? 0,
+            };
+
+            cl.UpdateBuffer(ProjectionMatrixBuffer, 0, camera.ProjectionMatrix);
+            cl.UpdateBuffer(ModelViewMatrixBuffer, 0, camera.ViewMatrix);
+            cl.UpdateBuffer(CameraInfoBuffer, 0, info);
+        }
+
+        void UpdateResourceSet(GraphicsDevice gd)
+        {
             CommonResourceSet?.Dispose();
             CommonResourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
                 CommonResourceLayout,
@@ -70,10 +120,28 @@ namespace UAlbion.Core.Veldrid
                 PaletteView));
 
             CommonResourceSet.Name = "RS_Common";
+        }
 
-            cl.UpdateBuffer(ProjectionMatrixBuffer, 0, camera.ProjectionMatrix);
-            cl.UpdateBuffer(ModelViewMatrixBuffer, 0, camera.ViewMatrix);
-            cl.UpdateBuffer(CameraInfoBuffer, 0, camera.GetCameraInfo());
+        void SetCurrentPalette(GraphicsDevice gd)
+        {
+            var paletteManager = Resolve<IPaletteManager>();
+            PaletteTexture newPalette = paletteManager.PaletteTexture;
+            int newVersion = paletteManager.Version;
+
+            if (newPalette == null) return;
+            if (PaletteView != null && _paletteTexture == newPalette && _lastPaletteVersion == newVersion)
+                return;
+
+            PaletteView?.Dispose();
+            PaletteTexture?.Dispose();
+            CoreTrace.Log.Info("Scene", "Disposed palette device texture");
+            _paletteTexture = (VeldridPaletteTexture)newPalette;
+            _lastPaletteVersion = newVersion;
+            PaletteTexture = _paletteTexture.CreateDeviceTexture(gd, gd.ResourceFactory, TextureUsage.Sampled);
+            PaletteView = gd.ResourceFactory.CreateTextureView(PaletteTexture);
+            PaletteTexture.Name = "T_" + _paletteTexture.Name;
+            PaletteView.Name = "TV_" + _paletteTexture.Name;
+            UpdateResourceSet(gd);
         }
 
         public void Dispose()

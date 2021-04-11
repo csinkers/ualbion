@@ -37,7 +37,7 @@ namespace UAlbion.Api
         /// </summary>
         /// <param name="numbers"></param>
         /// <returns></returns>
-        public static long Lcm(IEnumerable<long> numbers) => numbers.Aggregate(Lcm);
+        public static long Lcm(IEnumerable<long> numbers) => numbers.Aggregate(1L, Lcm);
 
         /// <summary>
         /// Calculate the lowest common multiple of two numbers.

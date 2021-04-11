@@ -29,15 +29,12 @@ namespace UAlbion.Core
             foreach (var renderer in renderables)
                 CoreTrace.Log.CollectedRenderables(renderer.Key.GetType().Name, 0, renderer.Value.Count);
 
-            var paletteManager = Resolve<IPaletteManager>();
-            var camera = Resolve<ICamera>();
-            context.SetCurrentPalette(paletteManager.PaletteTexture, paletteManager.Version);
-
-            CoreTrace.Log.Info("Scene", "Created palette device texture");
+            context.UpdatePerFrameResources();
 
             using (PerfTracker.FrameEvent("6.2.2 Prepare per-frame resources"))
             using (context.Factory.CreateRenderDebugGroup(context, "Prepare per-frame resources"))
             {
+
                 _processedRenderables.Clear();
                 List<IRenderable> processed = new List<IRenderable>();
                 foreach (var renderableGroup in renderables)
@@ -57,8 +54,6 @@ namespace UAlbion.Core
                 CoreTrace.Log.CollectedRenderables("ProcessedRenderables",
                         _processedRenderables.Count,
                         _processedRenderables.Sum(x => x.Value.Count));
-
-                context.UpdatePerFrameResources(camera);
             }
         }
 

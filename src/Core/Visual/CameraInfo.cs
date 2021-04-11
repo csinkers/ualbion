@@ -16,12 +16,12 @@ namespace UAlbion.Core.Visual
         readonly uint _padding2;
 
         public Vector2 Resolution;
-
         public float Time;
         public float Special1;
+
         public float Special2;
         public uint EngineFlags;
-        readonly uint _padding3;
+        public float PaletteBlend;
         readonly uint _padding4;
     }
 #pragma warning restore CA1051 // Do not declare visible instance fields

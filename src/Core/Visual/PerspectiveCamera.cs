@@ -112,9 +112,9 @@ namespace UAlbion.Core.Visual
             var e = TryResolve<IEngine>();
             if (settings != null && e != null)
             {
-                _useReverseDepth = (settings?.Flags & EngineFlags.FlipDepthRange) == EngineFlags.FlipDepthRange;
+                _useReverseDepth = (settings.Flags & EngineFlags.FlipDepthRange) == EngineFlags.FlipDepthRange;
                 _depthZeroToOne = e.IsDepthRangeZeroToOne;
-                _isClipSpaceYInverted = (settings?.Flags & EngineFlags.FlipYSpace) == EngineFlags.FlipYSpace
+                _isClipSpaceYInverted = (settings.Flags & EngineFlags.FlipYSpace) == EngineFlags.FlipYSpace
                     ? !e.IsClipSpaceYInverted
                     : e.IsClipSpaceYInverted;
             }
@@ -157,24 +157,6 @@ namespace UAlbion.Core.Visual
             Quaternion lookRotation = Quaternion.CreateFromYawPitchRoll(Yaw, LegacyPitch ? 0f : Pitch, 0f);
             _lookDirection = Vector3.Transform(-Vector3.UnitZ, lookRotation);
             _viewMatrix = Matrix4x4.CreateLookAt(_position, _position + _lookDirection, Vector3.UnitY);
-        }
-
-        public CameraInfo GetCameraInfo()
-        {
-            var clock = TryResolve<IClock>();
-            var settings = TryResolve<IEngineSettings>();
-
-            return new CameraInfo
-            {
-                WorldSpacePosition = _position,
-                CameraPitch = Pitch,
-                CameraYaw = Yaw,
-                Resolution = _windowSize,
-                Time = clock?.ElapsedTime ?? 0,
-                Special1 = settings?.Special1 ?? 0,
-                Special2 = settings?.Special2 ?? 0,
-                EngineFlags = (uint?)settings?.Flags ?? 0
-            };
         }
 
         public Vector3 ProjectWorldToNorm(Vector3 worldPosition)

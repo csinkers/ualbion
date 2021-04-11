@@ -1,16 +1,18 @@
 ﻿// UAlbion.Core.CameraInfo
 layout(set = 1, binding = 0) uniform _Shared {
-	vec3 uWorldSpacePosition; // 12
-	uint _s_padding_1;
-	vec3 uCameraLookDirection; // 24
-	uint _s_padding_2;
-	vec2 uResolution;   // 32
-	float uTime;        // 36
-	float uSpecial1;    // 40
-	float uSpecial2;    // 44
-	uint uEngineFlags; // 48
-	uint _s_padding_3;
-	uint _s_padding_4;
+	vec3 uWorldSpacePosition;  // 12
+	uint _s_padding_1;         // 16
+	vec3 uCameraLookDirection; // 28
+	uint _s_padding_2;         // 32
+
+	vec2 uResolution;    // 40
+	float uTime;         // 44
+	float uSpecial1;     // 48
+
+	float uSpecial2;     // 52
+	uint uEngineFlags;   // 56
+	float uPaletteBlend; // 60
+	uint _s_padding_3;   // 64
 };
 
 layout(set = 1, binding = 1) uniform _Projection { mat4 uProjection; };

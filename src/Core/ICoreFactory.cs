@@ -8,7 +8,7 @@ namespace UAlbion.Core
 {
     public interface ICoreFactory
     {
-        MultiTexture CreateMultiTexture(IAssetId id, string name, IPaletteManager paletteManager);
+        MultiTexture CreateMultiTexture(IAssetId id, string name, IPalette palette);
         IDisposable CreateRenderDebugGroup(IRendererContext context, string name);
         ITexture CreateEightBitTexture(
             IAssetId id,

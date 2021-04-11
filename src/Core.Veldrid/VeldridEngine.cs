@@ -37,7 +37,6 @@ namespace UAlbion.Core.Veldrid
         SceneContext _sceneContext;
         CommandList _frameCommands;
         VeldridRendererContext _renderContext;
-        TextureSampleCount? _newSampleCount;
         bool _windowResized;
         bool _done;
         bool _recreateWindow;
@@ -77,16 +76,6 @@ namespace UAlbion.Core.Veldrid
             On<ToggleHardwareCursorEvent>(e => _window.CursorVisible = !_window.CursorVisible);
             On<ToggleResizableEvent>(e => _window.Resizable = !_window.Resizable);
             On<ToggleVisibleBorderEvent>(e => _window.BorderVisible = !_window.BorderVisible);
-            On<SetMsaaLevelEvent>(e => _newSampleCount = e.SampleCount switch
-            {
-                1 => TextureSampleCount.Count1,
-                2 => TextureSampleCount.Count2,
-                4 => TextureSampleCount.Count4,
-                8 => TextureSampleCount.Count8,
-                16 => TextureSampleCount.Count16,
-                32 => TextureSampleCount.Count32,
-                _ => throw new InvalidOperationException($"Invalid sample count {e.SampleCount}")
-            });
             On<RefreshDeviceObjectsEvent>(e => RefreshDeviceObjects(e.Count ?? 1));
             On<RecreateWindowEvent>(e => { _recreateWindow = true; _newBackend = GraphicsDevice.BackendType; });
             On<SetBackendEvent>(e => _newBackend = e.Value);
@@ -303,14 +292,6 @@ namespace UAlbion.Core.Veldrid
                 CoreTrace.Log.Info("Engine", "Resize finished");
             }
 
-            if (_newSampleCount != null)
-            {
-                _sceneContext.MainSceneSampleCount = _newSampleCount.Value;
-                _newSampleCount = null;
-                DestroyAllObjects();
-                CreateAllObjects();
-            }
-
             var scenes = new List<Scene>();
             Raise(new CollectScenesEvent(scenes.Add));
 
@@ -412,8 +393,6 @@ namespace UAlbion.Core.Veldrid
                 SetTitle();
 
                 Raise(new BackendChangedEvent());
-                if (!firstCreate)
-                    Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.FlipDepthRange));
             }
         }
 
@@ -440,6 +419,7 @@ namespace UAlbion.Core.Veldrid
                 initList.Name = "Recreation Initialization Command List";
                 initList.Begin();
                 _sceneContext = new SceneContext();
+                AttachChild(_sceneContext);
                 _sceneContext.CreateDeviceObjects(GraphicsDevice, initList);
 
                 var initContext = new VeldridRendererContext(GraphicsDevice, initList, _sceneContext, _coreFactory);
@@ -465,9 +445,15 @@ namespace UAlbion.Core.Veldrid
             {
                 GraphicsDevice.WaitForIdle();
                 _frameCommands?.Dispose();
-                _sceneContext?.Dispose();
+
+                if (_sceneContext != null)
+                {
+                    _sceneContext.Dispose();
+                    RemoveChild(_sceneContext);
+                    _sceneContext = null;
+                }
+
                 _frameCommands = null;
-                _sceneContext = null;
                 _renderContext = null;
 
                 foreach (var r in _renderers.Values.Distinct())

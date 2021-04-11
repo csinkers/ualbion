@@ -39,7 +39,7 @@ namespace UAlbion.Game.Gui.Controls
 
             var assets = Resolve<IAssetManager>();
             var multi = factory.CreateMultiTexture(AssetId.None, $"Background {width}x{height}",
-                new DummyPaletteManager(assets.LoadPalette(Base.Palette.Inventory)));
+                assets.LoadPalette(Base.Palette.Inventory));
 
             // Background
             var background = assets.LoadTexture(Base.CoreSprite.UiBackground);

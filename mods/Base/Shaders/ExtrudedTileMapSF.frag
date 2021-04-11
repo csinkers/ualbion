@@ -2,9 +2,11 @@
 //!#extension GL_KHR_vulkan_glsl: enable
 
 // Resource Sets / Uniforms 
-layout(binding = 1) uniform texture2DArray Floors;   //!
-layout(binding = 2) uniform texture2DArray Walls;    //!
-layout(binding = 3) uniform sampler TextureSampler;  //!
+layout(binding = 1) uniform texture2DArray DayFloors;   //!
+layout(binding = 2) uniform texture2DArray DayWalls;    //!
+layout(binding = 3) uniform texture2DArray NightFloors; //!
+layout(binding = 4) uniform texture2DArray NightWalls;  //!
+layout(binding = 5) uniform sampler TextureSampler;     //!
 
 #include "CommonResources.glsl"
 
@@ -17,7 +19,23 @@ layout(location = 2) in flat uint iFlags;    // Flags
 
 layout(location = 0) out vec4 OutputColor;
 
+vec4 getFloor(vec3 coords)
+{
+	vec4 day = texture(sampler2DArray(DayFloors, TextureSampler), coords); //! vec4 day;
+	vec4 night = texture(sampler2DArray(NightFloors, TextureSampler), coords); //! vec4 night;
+	return mix(day, night, uPaletteBlend);
+}
+
+vec4 getWall(vec3 coords)
+{
+	vec4 day = texture(sampler2DArray(DayWalls, TextureSampler), coords); //! vec4 day;
+	vec4 night = texture(sampler2DArray(NightWalls, TextureSampler), coords); //! vec4 night;
+	return mix(day, night, uPaletteBlend);
+}
+
+
 void main()
+
 {
 	float floorLayer   = float(iTextures & 0x000000ff);
 	float ceilingLayer = float((iTextures & 0x0000ff00) >> 8);
@@ -28,13 +46,13 @@ void main()
 	switch (iFlags & TF_TEXTURE_TYPE_MASK)
 	{
 		case TF_TEXTURE_TYPE_FLOOR:
-			color = texture(sampler2DArray(Floors, TextureSampler), vec3(iTexCoords, floorLayer)); //! {}
+			color = getFloor(vec3(iTexCoords, floorLayer)); //! {}
 			break;
 		case TF_TEXTURE_TYPE_CEILING:
-			color = texture(sampler2DArray(Floors, TextureSampler), vec3(iTexCoords, ceilingLayer)); //! {}
+			color = getFloor(vec3(iTexCoords, ceilingLayer)); //! {}
 			break;
 		case TF_TEXTURE_TYPE_WALL:
-			color = texture(sampler2DArray(Walls, TextureSampler), vec3(iTexCoords, wallLayer)); //! {}
+			color = getWall(vec3(iTexCoords, wallLayer)); //! {}
 			break;
 	}
 

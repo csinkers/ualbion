@@ -93,6 +93,11 @@
     "S": "+camera_move  0  4",
     "D": "+camera_move  4  0",
 
+    "Up": "+cam_rotate 0 0.03",
+    "Down": "+cam_rotate 0 -0.03",
+    "Left": "+cam_rotate 0.03 0",
+    "Right": "+cam_rotate -0.03 0",
+
     "Shift+W": "+camera_move  0 -8",
     "Shift+A": "+camera_move -8  0",
     "Shift+S": "+camera_move  0  8",
@@ -100,6 +105,7 @@
 
     "Q": "+cursor_mode examine",
     "E": "+cursor_mode manipulate",
+    // "F":" toggle between MouseLook and Normal mouse modes
     "R": "+cursor_mode talk",
     "Z": "+cursor_mode take"
   },
@@ -128,22 +134,22 @@
     "Control+E": "pop_scene Editor"
   },
   "IsoBake": {
-    "W": "+cam_move   0 -50",
-    "A": "+cam_move -50   0",
-    "S": "+cam_move   0  50",
-    "D": "+cam_move  50   0",
+    "W": "+cam_move 0 50",
+    "A": "+cam_move -50 0",
+    "S": "+cam_move 0 -50",
+    "D": "+cam_move 50 0",
     "Q": "+cam_move 0 0 -10",
     "F": "+cam_move 0 0 10",
 
     "Control+A": "iso_lab 1",
     "Control+X": "iso_lab -1",
 
-    "Shift+W": "+cam_move   0 -150",
-    "Shift+A": "+cam_move -150   0",
-    "Shift+S": "+cam_move   0  150",
-    "Shift+D": "+cam_move  150   0",
+    "Shift+W": "+cam_move 0 150",
+    "Shift+A": "+cam_move -150 0",
+    "Shift+S": "+cam_move 0 -150",
+    "Shift+D": "+cam_move 150 0",
     "Shift+Q": "+cam_move 0 0 -50",
-    "Shift+F": "+cam_move 0 0  50",
+    "Shift+F": "+cam_move 0 0 50",
 
     "Comma": "iso_row_width -1",
     "Period": "iso_row_width 1",

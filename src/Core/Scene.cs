@@ -13,14 +13,10 @@ namespace UAlbion.Core
         readonly IDictionary<(DrawLayer, int), List<IRenderable>> _processedRenderables = new Dictionary<(DrawLayer, int), List<IRenderable>>();
         (float Red, float Green, float Blue) _clearColour;
 
-        public ICamera Camera { get; }
-
-        protected Scene(string name, ICamera camera) : base(name)
+        protected Scene(string name) : base(name)
         {
             On<CollectScenesEvent>(e => e.Register(this));
             On<SetClearColourEvent>(e => _clearColour = (e.Red, e.Green, e.Blue));
-
-            Camera = AttachChild(camera);
         }
 
         public override string ToString() => $"Scene:{Name}";
@@ -30,12 +26,11 @@ namespace UAlbion.Core
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (renderables == null) throw new ArgumentNullException(nameof(renderables));
 
-            context.SetCurrentScene(this);
-
             foreach (var renderer in renderables)
                 CoreTrace.Log.CollectedRenderables(renderer.Key.GetType().Name, 0, renderer.Value.Count);
 
             var paletteManager = Resolve<IPaletteManager>();
+            var camera = Resolve<ICamera>();
             context.SetCurrentPalette(paletteManager.PaletteTexture, paletteManager.Version);
 
             CoreTrace.Log.Info("Scene", "Created palette device texture");
@@ -63,7 +58,7 @@ namespace UAlbion.Core
                         _processedRenderables.Count,
                         _processedRenderables.Sum(x => x.Value.Count));
 
-                context.UpdatePerFrameResources();
+                context.UpdatePerFrameResources(camera);
             }
         }
 

@@ -32,7 +32,7 @@ namespace UAlbion
                 Resolve<IEngine>()?.RegisterRenderable(_tilemap);
         }
 
-        public void Load(LabyrinthId labyrinthId, DungeonTileMapProperties properties)
+        public void Load(LabyrinthId labyrinthId, IsometricMode mode, DungeonTileMapProperties properties)
         {
             var engine = Resolve<IEngine>();
             var assets = Resolve<IAssetManager>();
@@ -46,53 +46,73 @@ namespace UAlbion
             if (labyrinthData == null)
                 return;
 
+            bool floors = mode == IsometricMode.Floors || mode == IsometricMode.All;
+            bool ceilings = mode == IsometricMode.Ceilings || mode == IsometricMode.All;
+            bool walls = mode == IsometricMode.Walls || mode == IsometricMode.All;
+
             var info = assets.GetAssetInfo(labyrinthId);
             int paletteId = info.Get(AssetProperty.PaletteId, 0);
             Raise(new LoadPaletteEvent(new PaletteId(AssetType.Palette, paletteId)));
 
-            _totalTiles = 2 * labyrinthData.FloorAndCeilings.Count + labyrinthData.Walls.Count;
+            _totalTiles =
+                (floors ? labyrinthData.FloorAndCeilings.Count : 0) +
+                (ceilings ? labyrinthData.FloorAndCeilings.Count : 0) +
+                (walls ? labyrinthData.Walls.Count : 0);
+
             _wallCount = labyrinthData.Walls.Count;
             _floors = new byte[_totalTiles];
             _ceilings = new byte[_totalTiles];
             _contents = new byte[_totalTiles];
 
             int index = 0;
-            for (byte i = 0; i < labyrinthData.FloorAndCeilings.Count; i++) _floors[index++] = i;
-            for (byte i = 0; i < labyrinthData.FloorAndCeilings.Count; i++) _ceilings[index++] = i;
-            for (byte i = 0; i < labyrinthData.Walls.Count; i++) _contents[index++] = (byte)(i + 100);
+            if (floors)
+                for (byte i = 0; i < labyrinthData.FloorAndCeilings.Count; i++) _floors[index++] = i;
+
+            if (ceilings)
+                for (byte i = 0; i < labyrinthData.FloorAndCeilings.Count; i++) _ceilings[index++] = i;
+
+            if (walls)
+                for (byte i = 0; i < labyrinthData.Walls.Count; i++) _contents[index++] = (byte)(i + 100);
 
             _tilemap = new DungeonTilemap(labyrinthData.Id, labyrinthData.Id.ToString(), _totalTiles, properties, coreFactory, paletteManager)
             {
                 PipelineId = (int)DungeonTilemapPipeline.NoCulling
             };
 
-            for (int i = 0; i < labyrinthData.FloorAndCeilings.Count; i++)
+            if (floors || ceilings)
             {
-                var floorInfo = labyrinthData.FloorAndCeilings[i];
-                var floor = assets.LoadTexture(floorInfo?.SpriteId ?? AssetId.None);
-                _tilemap.DefineFloor(i + 1, floor);
+                for (int i = 0; i < labyrinthData.FloorAndCeilings.Count; i++)
+                {
+                    var floorInfo = labyrinthData.FloorAndCeilings[i];
+                    var floor = assets.LoadTexture(floorInfo?.SpriteId ?? AssetId.None);
+                    _tilemap.DefineFloor(i + 1, floor);
+                }
             }
 
-            for (int i = 0; i < labyrinthData.Walls.Count; i++)
+            if (walls)
             {
-                var wallInfo = labyrinthData.Walls[i];
-                if (wallInfo == null)
-                    continue;
-
-                ITexture wall = assets.LoadTexture(wallInfo.SpriteId);
-                if (wall == null)
-                    continue;
-
-                bool isAlphaTested = (wallInfo.Properties & Wall.WallFlags.AlphaTested) != 0;
-                _tilemap.DefineWall(i + 1, wall, 0, 0, wallInfo.TransparentColour, isAlphaTested);
-
-                foreach (var overlayInfo in wallInfo.Overlays)
+                for (int i = 0; i < labyrinthData.Walls.Count; i++)
                 {
-                    if (overlayInfo.SpriteId.IsNone)
+                    var wallInfo = labyrinthData.Walls[i];
+                    if (wallInfo == null)
                         continue;
 
-                    var overlay = assets.LoadTexture(overlayInfo.SpriteId);
-                    _tilemap.DefineWall(i + 1, overlay, overlayInfo.XOffset, overlayInfo.YOffset, wallInfo.TransparentColour, isAlphaTested);
+                    ITexture wall = assets.LoadTexture(wallInfo.SpriteId);
+                    if (wall == null)
+                        continue;
+
+                    bool isAlphaTested = (wallInfo.Properties & Wall.WallFlags.AlphaTested) != 0;
+                    _tilemap.DefineWall(i + 1, wall, 0, 0, wallInfo.TransparentColour, isAlphaTested);
+
+                    foreach (var overlayInfo in wallInfo.Overlays)
+                    {
+                        if (overlayInfo.SpriteId.IsNone)
+                            continue;
+
+                        var overlay = assets.LoadTexture(overlayInfo.SpriteId);
+                        _tilemap.DefineWall(i + 1, overlay, overlayInfo.XOffset, overlayInfo.YOffset,
+                            wallInfo.TransparentColour, isAlphaTested);
+                    }
                 }
             }
 

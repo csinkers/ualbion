@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
-using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
@@ -13,7 +12,6 @@ using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
-using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities.Map3D
 {
@@ -155,8 +153,7 @@ namespace UAlbion.Game.Entities.Map3D
             foreach (var list in _tilesByDistance.Values)
                 list.Clear();
 
-            var scene = Resolve<ISceneManager>().ActiveScene;
-            var cameraTilePosition = scene.Camera.Position;
+            var cameraTilePosition = Resolve<ICamera>().Position;
 
             var map = Resolve<IMapManager>().Current;
             if (map != null)

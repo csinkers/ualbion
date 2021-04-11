@@ -58,6 +58,9 @@ namespace UAlbion.Core.Veldrid
         public override string FrameTimeText =>
             $"{_frameTimeAverager.CurrentAverageFramesPerSecond:000.0 fps} / {_frameTimeAverager.CurrentAverageFrameTimeMilliseconds:#00.00 ms}";
 
+        public override bool IsDepthRangeZeroToOne => GraphicsDevice?.IsDepthRangeZeroToOne ?? false;
+        public override bool IsClipSpaceYInverted => GraphicsDevice?.IsClipSpaceYInverted ?? false;
+
         public VeldridEngine(GraphicsBackend backend, bool useRenderDoc, bool startupOnly, Rectangle? windowRect = null)
         {
             On<LoadRenderDocEvent>(e =>
@@ -371,7 +374,7 @@ namespace UAlbion.Core.Veldrid
                     _recreateWindow = false;
                     _window?.Close();
 
-                    WindowCreateInfo windowInfo = new WindowCreateInfo
+                    var windowInfo = new WindowCreateInfo
                     {
                         X = _window?.X ?? _defaultX,
                         Y = _window?.Y ?? _defaultY,
@@ -408,7 +411,7 @@ namespace UAlbion.Core.Veldrid
                 GraphicsDevice.WaitForIdle();
                 SetTitle();
 
-                Raise(new BackendChangedEvent(GraphicsDevice.IsDepthRangeZeroToOne, GraphicsDevice.IsClipSpaceYInverted));
+                Raise(new BackendChangedEvent());
                 if (!firstCreate)
                     Raise(new EngineFlagEvent(FlagOperation.Toggle, EngineFlags.FlipDepthRange));
             }

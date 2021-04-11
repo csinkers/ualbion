@@ -3,8 +3,8 @@
     public enum QueryOperation : byte
     {
         IsTrue = 0,             // NZ >0
-        NotEqual = 1,           // NE !=
-        OpUnk2 = 2,             // U2 ??
+        LessThanOrEqual = 1,    // LE <=
+        NotEqual = 2,           // NE !=
         Equals = 3,             // EQ ==
         GreaterThanOrEqual = 4, // GE >=
         GreaterThan = 5,        // GT >

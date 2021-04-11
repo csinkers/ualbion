@@ -22,10 +22,20 @@ using UAlbion.Game.Veldrid.Input;
 
 namespace UAlbion
 {
+    public enum IsometricMode
+    {
+        All,
+        Floors,
+        Ceilings,
+        Walls,
+        Contents
+    }
+
     class IsoBake : Component
     {
         readonly IsometricLayout _layout;
         LabyrinthId _labId;
+        IsometricMode _mode = IsometricMode.All;
         float _pitch;
         float _yaw = 45;
         int _initialDiamondHeight = 40;
@@ -78,7 +88,7 @@ namespace UAlbion
 
         void RecreateLayout()
         {
-            _layout.Load(_labId, BuildProperties(false));
+            _layout.Load(_labId, _mode, BuildProperties(false));
             Update();
         }
 
@@ -87,13 +97,14 @@ namespace UAlbion
         DungeonTileMapProperties BuildProperties(bool log = true)
         {
             _yaw = Math.Clamp(_yaw, -45.0f, 45.0f);
-            _pitch = Math.Clamp(_pitch, 0, 85.0f);
+            _pitch = Math.Clamp(_pitch, -85.0f, 85.0f);
             float yawRads = ApiUtil.DegToRad(_yaw);
-            float pitchRads = ApiUtil.DegToRad(_pitch);
+            float pitchRads = ApiUtil.DegToRad(-_pitch);
+            float absPitchRads = MathF.Abs(pitchRads);
 
             float sideLength = _width * MathF.Cos(yawRads);
-            float diamondHeight = _width * MathF.Sin(pitchRads);
-            float height = (_height - diamondHeight) / MathF.Cos(pitchRads);
+            float diamondHeight = _width * MathF.Sin(absPitchRads);
+            float height = (_height - diamondHeight) / MathF.Cos(absPitchRads);
 
             int rows = (_layout.TileCount + _tilesPerRow - 1) / _tilesPerRow;
             if (log)
@@ -106,10 +117,14 @@ namespace UAlbion
                     $"Total Dims: {_width * _tilesPerRow}x{_height * rows}"));
             }
 
+            var camera = Resolve<ICamera>();
+            var topLeft = camera.UnprojectNormToWorld(new Vector3(-1, 1, 0));
+            var origin = new Vector3(-(_tilesPerRow - 1) * _width / 2.0f, -rows * _height / 2.0f, 100);
+
             return new DungeonTileMapProperties(
                 new Vector3(sideLength, height, sideLength),
                 new Vector3(pitchRads, yawRads, 0),
-                new Vector3(0, 0, 100), 
+                origin,
                 _width * Vector3.UnitX,
                 _height * Vector3.UnitY,
                 (uint)_tilesPerRow,
@@ -126,8 +141,14 @@ namespace UAlbion
             foreach (var shaderPath in global.Resolve<IModApplier>().ShaderPaths)
                 shaderCache.AddShaderPath(shaderPath);
 
-            using var engine = new VeldridEngine(commandLine.Backend, commandLine.UseRenderDoc, commandLine.StartupOnly)
-            { WindowTitle = "UAlbion" }
+            using var engine = new VeldridEngine(
+                    commandLine.Backend,
+                    commandLine.UseRenderDoc,
+                    commandLine.StartupOnly,
+                    new Rectangle(0, 0, 48*16, 64 * 8))
+                {
+                    WindowTitle = "UAlbion",
+                }
                 .AddRenderer(new ExtrudedTileMapRenderer())
                 .AddRenderer(new DebugGuiRenderer());
 

@@ -10,8 +10,11 @@ namespace UAlbion.Game.Scenes
     public class MenuScene : Scene, IMenuScene
     {
         bool _clockWasRunning;
-        public MenuScene() : base(nameof(SceneId.MainMenu), new OrthographicCamera())
-        { }
+
+        public MenuScene() : base(nameof(SceneId.MainMenu))
+        {
+            AttachChild(new OrthographicCamera());
+        }
 
         protected override void Subscribed()
         {

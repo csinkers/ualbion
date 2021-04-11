@@ -9,9 +9,12 @@ namespace UAlbion.Game.Scenes
     [Scene(SceneId.IsometricBake)]
     public class IsometricBakeScene : Scene, IIsometricBakeScene
     {
-        public IsometricBakeScene() : base(nameof(SceneId.IsometricBake), new OrthographicCamera())
-            => AttachChild(new CameraMotion2D((OrthographicCamera)Camera));
-        // public IsometricBakeScene() : base(nameof(SceneId.IsometricBake), new PerspectiveCamera()) { }
+        public IsometricBakeScene() : base(nameof(SceneId.IsometricBake))
+        {
+            var camera = AttachChild(new OrthographicCamera(false));
+            AttachChild(new CameraMotion2D(camera));
+        }
+
         protected override void Subscribed() { }
         protected override void Unsubscribed() { }
     }

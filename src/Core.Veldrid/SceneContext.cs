@@ -22,7 +22,6 @@ namespace UAlbion.Core.Veldrid
 
         public Texture PaletteTexture { get; internal set; }
         public TextureView PaletteView { get; internal set; }
-        public ICamera Camera { get; set; }
         public TextureSampleCount MainSceneSampleCount { get; internal set; }
 
         public void CreateDeviceObjects(GraphicsDevice gd, CommandList cl)
@@ -56,10 +55,12 @@ namespace UAlbion.Core.Veldrid
             CommonResourceLayout.Name = "RL_Common";
         }
 
-        public void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl)
+        public void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, ICamera camera)
         {
             if (gd == null) throw new ArgumentNullException(nameof(gd));
             if (cl == null) throw new ArgumentNullException(nameof(cl));
+            if (camera == null) throw new ArgumentNullException(nameof(camera));
+
             CommonResourceSet?.Dispose();
             CommonResourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
                 CommonResourceLayout,
@@ -70,15 +71,9 @@ namespace UAlbion.Core.Veldrid
 
             CommonResourceSet.Name = "RS_Common";
 
-            cl.UpdateBuffer(ProjectionMatrixBuffer, 0, Camera.ProjectionMatrix);
-            cl.UpdateBuffer(ModelViewMatrixBuffer, 0, Camera.ViewMatrix);
-            cl.UpdateBuffer(CameraInfoBuffer, 0, Camera.GetCameraInfo());
-        }
-
-        public void SetCurrentScene(Scene scene)
-        {
-            if (scene == null) throw new ArgumentNullException(nameof(scene));
-            Camera = scene.Camera;
+            cl.UpdateBuffer(ProjectionMatrixBuffer, 0, camera.ProjectionMatrix);
+            cl.UpdateBuffer(ModelViewMatrixBuffer, 0, camera.ViewMatrix);
+            cl.UpdateBuffer(CameraInfoBuffer, 0, camera.GetCameraInfo());
         }
 
         public void Dispose()

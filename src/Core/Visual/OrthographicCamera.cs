@@ -7,6 +7,7 @@ namespace UAlbion.Core.Visual
 {
     public class OrthographicCamera : ServiceComponent<ICamera>, ICamera
     {
+        readonly bool _yAxisIncreasesDownTheScreen;
         Vector3 _position = new Vector3(0, 0, 0);
         Vector3 _lookDirection = new Vector3(0, 0, -1f);
         Vector2 _windowSize = Vector2.One;
@@ -29,9 +30,11 @@ namespace UAlbion.Core.Visual
         public float Pitch { get => _pitch; private set { _pitch = Math.Clamp(value, (float)-Math.PI / 2, (float)Math.PI / 2); UpdateViewMatrix(); } } // Radians
         public float AspectRatio => _windowSize.X / _windowSize.Y;
 
-        public OrthographicCamera()
+        public OrthographicCamera(bool yAxisIncreasesDownTheScreen = true)
         {
+            _yAxisIncreasesDownTheScreen = yAxisIncreasesDownTheScreen;
             OnAsync<ScreenCoordinateSelectEvent, Selection>(TransformSelect);
+            On<BackendChangedEvent>(_ => UpdatePerspectiveMatrix());
             On<CameraPositionEvent>(e => Position = new Vector3(e.X, e.Y, e.Z));
             On<CameraPlanesEvent>(e => FarDistance = e.Far);
             On<CameraDirectionEvent>(e => { Yaw = ApiUtil.DegToRad(e.Yaw); Pitch = ApiUtil.DegToRad(e.Pitch); });
@@ -60,6 +63,11 @@ namespace UAlbion.Core.Visual
                     UpdatePerspectiveMatrix();
                 }
             });
+        }
+
+        protected override void Subscribed()
+        {
+            base.Subscribed();
             UpdatePerspectiveMatrix();
             UpdateViewMatrix();
         }
@@ -76,9 +84,13 @@ namespace UAlbion.Core.Visual
         void UpdatePerspectiveMatrix()
         {
             _projectionMatrix = Matrix4x4.Identity;
-            _projectionMatrix.M11 = (2.0f * _magnification) / _windowSize.X;
-            _projectionMatrix.M22 = (-2.0f * _magnification) / _windowSize.Y;
+            _projectionMatrix.M11 = 2.0f * _magnification / _windowSize.X;
+            _projectionMatrix.M22 = 2.0f * _magnification / _windowSize.Y;
             _projectionMatrix.M33 = 1 / FarDistance;
+
+            var e = TryResolve<IEngine>();
+            if (e != null && _yAxisIncreasesDownTheScreen != e.IsClipSpaceYInverted)
+                _projectionMatrix.M22 = -_projectionMatrix.M22;
         }
 
         void UpdateViewMatrix()
@@ -86,7 +98,6 @@ namespace UAlbion.Core.Visual
             Quaternion lookRotation = Quaternion.CreateFromYawPitchRoll(Yaw, Pitch, 0f);
             _lookDirection = Vector3.Transform(-Vector3.UnitZ, lookRotation);
             ViewMatrix = Matrix4x4.CreateTranslation(-_position) * Matrix4x4.CreateFromQuaternion(lookRotation);
-            // Matrix4x4.CreateLookAt(_position, _position + _lookDirection, Vector3.UnitY);
         }
 
         public CameraInfo GetCameraInfo()

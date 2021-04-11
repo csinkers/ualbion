@@ -25,7 +25,6 @@ namespace UAlbion.Core.Veldrid
         public CommandList CommandList { get; }
         public SceneContext SceneContext { get; }
         public ICoreFactory Factory { get; }
-        public void SetCurrentScene(Scene scene) => SceneContext.SetCurrentScene(scene);
         public void SetClearColor(float red, float green, float blue) => _clearColour = new RgbaFloat(red, green, blue, 1.0f);
         public void SetCurrentPalette(PaletteTexture newPalette, int newVersion)
         {
@@ -44,9 +43,9 @@ namespace UAlbion.Core.Veldrid
             SceneContext.PaletteView.Name = "TV_" + _paletteTexture.Name;
         }
 
-        public void UpdatePerFrameResources()
+        public void UpdatePerFrameResources(ICamera camera)
         {
-            SceneContext.UpdatePerFrameResources(GraphicsDevice, CommandList);
+            SceneContext.UpdatePerFrameResources(GraphicsDevice, CommandList, camera);
         }
 
         public void StartSwapchainPass()

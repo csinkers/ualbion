@@ -18,6 +18,7 @@ namespace UAlbion.Core.Visual
         float _pitch;
         bool _useReverseDepth;
         bool _isClipSpaceYInverted;
+        bool _depthZeroToOne;
 
         public Matrix4x4 ViewMatrix => _viewMatrix;
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;
@@ -35,7 +36,9 @@ namespace UAlbion.Core.Visual
             get => _pitch;
             set
             {
-                _pitch = LegacyPitch ? Math.Clamp(value, -0.48f, 0.48f) : Math.Clamp(value, (float)-Math.PI / 2, (float)Math.PI / 2);
+                _pitch = LegacyPitch
+                    ? Math.Clamp(value, -0.48f, 0.48f)
+                    : Math.Clamp(value, (float)-Math.PI / 2, (float)Math.PI / 2);
 
                 if (LegacyPitch)
                     UpdatePerspectiveMatrix();
@@ -53,7 +56,8 @@ namespace UAlbion.Core.Visual
         public PerspectiveCamera(bool legacyPitch = false)
         {
             OnAsync<ScreenCoordinateSelectEvent, Selection>(TransformSelect);
-            On<BackendChangedEvent>(UpdateBackend);
+            On<BackendChangedEvent>(_ => UpdateBackend());
+            On<EngineFlagEvent>(_ => UpdateBackend());
             // BUG: This event is not received when the screen is resized while a 2D scene is active.
             On<WindowResizedEvent>(e => WindowResized(e.Width, e.Height));
             On<CameraPositionEvent>(e => Position = new Vector3(e.X, e.Y, e.Z));
@@ -88,7 +92,7 @@ namespace UAlbion.Core.Visual
         protected override void Subscribed()
         {
             _windowSize = Resolve<IWindowManager>().Size;
-            UpdatePerspectiveMatrix();
+            UpdateBackend();
             UpdateViewMatrix();
             base.Subscribed();
         }
@@ -102,16 +106,19 @@ namespace UAlbion.Core.Visual
             return true;
         }
 
-        void UpdateBackend(BackendChangedEvent e)
+        void UpdateBackend()
         {
-            var settings = Resolve<IEngineSettings>();
-            _useReverseDepth = (settings?.Flags & EngineFlags.FlipDepthRange) == EngineFlags.FlipDepthRange
-                ? !e.IsDepthRangeZeroToOne
-                : e.IsDepthRangeZeroToOne;
+            var settings = TryResolve<IEngineSettings>();
+            var e = TryResolve<IEngine>();
+            if (settings != null && e != null)
+            {
+                _useReverseDepth = (settings?.Flags & EngineFlags.FlipDepthRange) == EngineFlags.FlipDepthRange;
+                _depthZeroToOne = e.IsDepthRangeZeroToOne;
+                _isClipSpaceYInverted = (settings?.Flags & EngineFlags.FlipYSpace) == EngineFlags.FlipYSpace
+                    ? !e.IsClipSpaceYInverted
+                    : e.IsClipSpaceYInverted;
+            }
 
-            _isClipSpaceYInverted = (settings?.Flags & EngineFlags.FlipYSpace) == EngineFlags.FlipYSpace
-                ? !e.IsClipSpaceYInverted
-                : e.IsClipSpaceYInverted;
 
             UpdatePerspectiveMatrix();
         }
@@ -129,6 +136,7 @@ namespace UAlbion.Core.Visual
                 ? MatrixUtil.CreateLegacyPerspective(
                     _isClipSpaceYInverted,
                     _useReverseDepth,
+                    _depthZeroToOne,
                     FieldOfView,
                     AspectRatio,
                     NearDistance,
@@ -137,6 +145,7 @@ namespace UAlbion.Core.Visual
                 : MatrixUtil.CreatePerspective(
                     _isClipSpaceYInverted,
                     _useReverseDepth,
+                    _depthZeroToOne,
                     FieldOfView,
                     AspectRatio,
                     NearDistance,

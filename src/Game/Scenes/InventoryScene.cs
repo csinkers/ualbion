@@ -12,7 +12,11 @@ namespace UAlbion.Game.Scenes
     public class InventoryScene : Scene, IInventoryScene
     {
         bool _clockWasRunning;
-        public InventoryScene() : base("Inventory", new OrthographicCamera()) { }
+
+        public InventoryScene() : base("Inventory")
+        {
+            AttachChild(new OrthographicCamera());
+        }
 
         protected override void Subscribed()
         {

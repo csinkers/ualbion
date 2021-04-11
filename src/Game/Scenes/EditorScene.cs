@@ -10,8 +10,12 @@ namespace UAlbion.Game.Scenes
     [Scene(SceneId.Editor)]
     public class EditorScene : Scene, IEditorScene
     {
-        public EditorScene() : base(nameof(SceneId.Editor), new OrthographicCamera()) 
-            => AttachChild(new CameraMotion2D((OrthographicCamera)Camera));
+        public EditorScene() : base(nameof(SceneId.Editor))
+        {
+            var camera = AttachChild(new OrthographicCamera());
+            AttachChild(new CameraMotion2D(camera));
+        }
+
 
         protected override void Subscribed() => Raise(new PushInputModeEvent(InputMode.Editor));
         protected override void Unsubscribed() => Raise(new PopInputModeEvent());

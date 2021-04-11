@@ -17,13 +17,14 @@ namespace UAlbion.Core
         public static Matrix4x4 CreatePerspective(
             bool isClipSpaceYInverted,
             bool useReverseDepth,
+            bool depthZeroToOne,
             float fov,
             float aspectRatio,
             float near, float far)
         {
             var persp = useReverseDepth
-                ? CreatePerspective(fov, aspectRatio, far, near)
-                : CreatePerspective(fov, aspectRatio, near, far);
+                ? CreatePerspective(depthZeroToOne, fov, aspectRatio, far, near)
+                : CreatePerspective(depthZeroToOne, fov, aspectRatio, near, far);
 
             if (isClipSpaceYInverted)
             {
@@ -40,12 +41,13 @@ namespace UAlbion.Core
         public static Matrix4x4 CreateLegacyPerspective(
             bool isClipSpaceYInverted,
             bool useReverseDepth,
+            bool depthZeroToOne,
             float fov,
             float aspectRatio,
             float near, float far,
             float pitch)
         {
-            var persp = CreatePerspective(isClipSpaceYInverted, useReverseDepth, fov, aspectRatio, near, far);
+            var persp = CreatePerspective(isClipSpaceYInverted, useReverseDepth, depthZeroToOne, fov, aspectRatio, near, far);
 
             persp *= new Matrix4x4(
                 1, 0, 0, 0,
@@ -56,7 +58,7 @@ namespace UAlbion.Core
             return persp;
         }
 
-        static Matrix4x4 CreatePerspective(float fov, float aspectRatio, float near, float far)
+        static Matrix4x4 CreatePerspective(bool depthZeroToOne, float fov, float aspectRatio, float near, float far)
         {
             if (fov <= 0.0f || fov >= MathF.PI) throw new ArgumentOutOfRangeException(nameof(fov));
             if (near <= 0.0f) throw new ArgumentOutOfRangeException(nameof(near));
@@ -64,24 +66,42 @@ namespace UAlbion.Core
 
             float yScale = 1.0f / MathF.Tan(fov * 0.5f);
             float xScale = yScale / aspectRatio;
-
-            Matrix4x4 result;
-
-            result.M11 = xScale;
-            result.M12 = result.M13 = result.M14 = 0.0f;
-
-            result.M22 = yScale;
-            result.M21 = result.M23 = result.M24 = 0.0f;
-
-            result.M31 = result.M32 = 0.0f;
             var negFarRange = float.IsPositiveInfinity(far) ? -1.0f : far / (near - far);
-            result.M33 = negFarRange;
-            result.M34 = -1.0f;
 
-            result.M41 = result.M42 = result.M44 = 0.0f;
-            result.M43 = near * negFarRange;
+            if (depthZeroToOne)
+            {
+                return new Matrix4x4(
+                    xScale, 0, 0, 0,
+                    0, yScale, 0, 0,
+                    0, 0, negFarRange, -1.0f,
+                    0, 0, near * negFarRange, 0);
+            }
+            else
+            {
+                // TODO
+                return new Matrix4x4(
+                    xScale, 0, 0, 0,
+                    0, yScale, 0, 0,
+                    0, 0, negFarRange, -1.0f,
+                    0, 0, near * negFarRange, 0);
+            }
 
-            return result;
+/*
+    z' = z * m22 + 1 * m23
+    For [0..1]
+    z'(f) = f  * m22 + m23 = 1
+    z'(n) = n * m22 + m23 = 0
+
+1 0  0 0
+0 1  0 0
+0 0 -1 0
+0 0  1 0
+
+    Diff: (f - n) m22 = 1 => m22 = 1/(f-n)
+    m23 = n / (f-n) + m23 = 0 => m23 = -n/(f-n)
+
+    For [-1..1]
+*/
         }
     }
 }

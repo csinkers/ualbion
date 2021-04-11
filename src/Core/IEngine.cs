@@ -8,6 +8,8 @@ namespace UAlbion.Core
         void ChangeBackend();
         ICoreFactory Factory { get; }
         string FrameTimeText { get; }
+        bool IsDepthRangeZeroToOne { get; }
+        bool IsClipSpaceYInverted { get; }
         void RegisterRenderable(IRenderable renderable);
         void UnregisterRenderable(IRenderable renderable);
     }

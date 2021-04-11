@@ -62,21 +62,21 @@ namespace UAlbion.Game.Veldrid.Debugging
             if (_hits == null)
                 return;
 
-            var state = Resolve<IGameState>();
-            var window = Resolve<IWindowManager>();
+            var state = TryResolve<IGameState>();
             if (state == null)
                 return;
 
-            var scene = Resolve<ISceneManager>().ActiveScene;
-            Vector3 cameraPosition = scene.Camera.Position;
+            var camera = Resolve<ICamera>();
+            var window = Resolve<IWindowManager>();
+            Vector3 cameraPosition = camera.Position;
             Vector3 cameraTilePosition = cameraPosition;
 
             var map = Resolve<IMapManager>().Current;
             if (map != null)
                 cameraTilePosition /= map.TileSize;
 
-            Vector3 cameraDirection = scene.Camera.LookDirection;
-            float cameraMagnification = scene.Camera.Magnification;
+            Vector3 cameraDirection = camera.LookDirection;
+            float cameraMagnification = camera.Magnification;
 
             ImGui.Begin("Inspector");
             ImGui.SetWindowPos(new Vector2(2 * window.PixelWidth / 3.0f, 0), ImGuiCond.FirstUseEver);

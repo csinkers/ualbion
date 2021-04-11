@@ -23,14 +23,15 @@ namespace UAlbion.Game.Entities
 
         bool LinearFromTilePosition(int x, int y, ItemId itemId, float? transitionTime, Action continuation)
         {
-            var scene = Resolve<ISceneManager>()?.ActiveScene;
-            var map = Resolve<IMapManager>()?.Current;
+            var scene = TryResolve<ISceneManager>()?.ActiveScene;
+            var map = TryResolve<IMapManager>()?.Current;
 
             if (scene == null || map == null)
                 return false;
 
+            var camera = Resolve<ICamera>();
             var worldPosition = new Vector3(x, y, 0) * map.TileSize;
-            var normPosition = scene.Camera.ProjectWorldToNorm(worldPosition);
+            var normPosition = camera.ProjectWorldToNorm(worldPosition);
 
             return LinearFromNormPosition(
                 new Vector2(normPosition.X, normPosition.Y),

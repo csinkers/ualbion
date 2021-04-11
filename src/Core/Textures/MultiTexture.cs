@@ -106,7 +106,7 @@ namespace UAlbion.Core.Textures
 
         public bool IsAnimated(int logicalId)
         {
-            if(IsMetadataDirty)
+            if (IsMetadataDirty)
                 RebuildLayers();
 
             if (logicalId >= LogicalSubImages.Count)

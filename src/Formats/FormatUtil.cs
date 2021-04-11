@@ -228,7 +228,7 @@ namespace UAlbion.Formats
             {
                 QueryOperation.IsTrue => value != 0,
                 QueryOperation.NotEqual => value != immediate,
-                QueryOperation.OpUnk2 => value == immediate,
+                QueryOperation.LessThanOrEqual => value <= immediate,
                 QueryOperation.Equals => value == immediate,
                 QueryOperation.GreaterThanOrEqual => value >= immediate,
                 QueryOperation.GreaterThan => value > immediate,

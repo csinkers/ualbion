@@ -8,6 +8,9 @@ namespace UAlbion.Game.Scenes
     [Scene(SceneId.Empty)]
     public class EmptyScene : Scene, IEmptyScene
     {
-        public EmptyScene() : base("Empty", new OrthographicCamera()) { }
+        public EmptyScene() : base("Empty")
+        {
+            AttachChild(new OrthographicCamera());
+        }
     }
 }

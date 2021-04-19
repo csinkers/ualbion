@@ -91,6 +91,9 @@ namespace UAlbion.Formats.Containers
                         if (subAssetBytes.Length == 0)
                             continue;
 
+                        if (string.IsNullOrWhiteSpace(name))
+                            name = null;
+
                         var filename = name ?? info.BuildFilename(pattern, i, ConfigUtil.AssetName(info.AssetId));
                         var fullPath = Path.Combine(path, filename);
 
